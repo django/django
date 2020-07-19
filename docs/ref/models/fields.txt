@@ -153,7 +153,7 @@ The first element in each tuple is the name to apply to the group. The
 second element is an iterable of 2-tuples, with each 2-tuple containing
 a value and a human-readable name for an option. Grouped options may be
 combined with ungrouped options within a single list (such as the
-`unknown` option in this example).
+``'unknown'`` option in this example).
 
 For each model field that has :attr:`~Field.choices` set, Django will add a
 method to retrieve the human-readable name for the field's current value. See
@@ -301,10 +301,6 @@ There are some additional caveats to be aware of:
 
         __empty__ = _('(Unknown)')
 
-.. versionadded:: 3.0
-
-   The ``TextChoices``, ``IntegerChoices``, and ``Choices`` classes were added.
-
 ``db_column``
 -------------
 
@@ -348,7 +344,7 @@ The default can't be a mutable object (model instance, ``list``, ``set``, etc.),
 as a reference to the same instance of that object would be used as the default
 value in all new model instances. Instead, wrap the desired default in a
 callable. For example, if you want to specify a default ``dict`` for
-:class:`~django.contrib.postgres.fields.JSONField`, use a function::
+:class:`~django.db.models.JSONField`, use a function::
 
     def contact_default():
         return {"email": "to1@example.com"}
@@ -546,7 +542,7 @@ guaranteed to fit numbers from ``1`` to ``9223372036854775807``.
 A 64-bit integer, much like an :class:`IntegerField` except that it is
 guaranteed to fit numbers from ``-9223372036854775808`` to
 ``9223372036854775807``. The default form widget for this field is a
-:class:`~django.forms.TextInput`.
+:class:`~django.forms.NumberInput`.
 
 ``BinaryField``
 ---------------
@@ -647,7 +643,7 @@ optional arguments:
       :func:`django.utils.timezone.now`
 
 The default form widget for this field is a
-:class:`~django.forms.TextInput`. The admin adds a JavaScript calendar,
+:class:`~django.forms.DateInput`. The admin adds a JavaScript calendar,
 and a shortcut for "Today". Includes an additional ``invalid_date`` error
 message key.
 
@@ -677,7 +673,7 @@ A date and time, represented in Python by a ``datetime.datetime`` instance.
 Takes the same extra arguments as :class:`DateField`.
 
 The default form widget for this field is a single
-:class:`~django.forms.TextInput`. The admin uses two separate
+:class:`~django.forms.DateTimeInput`. The admin uses two separate
 :class:`~django.forms.TextInput` widgets with JavaScript shortcuts.
 
 ``DecimalField``
@@ -816,14 +812,15 @@ Has two optional arguments:
         class MyModel(models.Model):
             upload = models.FileField(upload_to=user_directory_path)
 
-    .. versionchanged:: 3.0
-
-        Support for :class:`pathlib.Path` was added.
-
 .. attribute:: FileField.storage
 
-    A storage object, which handles the storage and retrieval of your
-    files. See :doc:`/topics/files` for details on how to provide this object.
+    A storage object, or a callable which returns a storage object. This
+    handles the storage and retrieval of your files. See :doc:`/topics/files`
+    for details on how to provide this object.
+
+    .. versionchanged:: 3.1
+
+        The ability to provide a callable was added.
 
 The default form widget for this field is a
 :class:`~django.forms.ClearableFileInput`.
@@ -1001,10 +998,10 @@ periodically via e.g. cron).
 ``FilePathField``
 -----------------
 
-.. class:: FilePathField(path=None, match=None, recursive=False, max_length=100, **options)
+.. class:: FilePathField(path='', match=None, recursive=False, allow_files=True, allow_folders=False, max_length=100, **options)
 
 A :class:`CharField` whose choices are limited to the filenames in a certain
-directory on the filesystem. Has three special arguments, of which the first is
+directory on the filesystem. Has some special arguments, of which the first is
 **required**:
 
 .. attribute:: FilePathField.path
@@ -1024,10 +1021,6 @@ directory on the filesystem. Has three special arguments, of which the first is
 
         class MyModel(models.Model):
             file = models.FilePathField(path=images_path)
-
-    .. versionchanged:: 3.0
-
-        ``path`` can now be a callable.
 
 .. attribute:: FilePathField.match
 
@@ -1052,8 +1045,6 @@ directory on the filesystem. Has three special arguments, of which the first is
     Optional.  Either ``True`` or ``False``.  Default is ``False``.  Specifies
     whether folders in the specified location should be included.  Either this
     or :attr:`~FilePathField.allow_files` must be ``True``.
-
-Of course, these arguments can be used together.
 
 The one potential gotcha is that :attr:`~FilePathField.match` applies to the
 base filename, not the full path. So, this example::
@@ -1172,13 +1163,83 @@ are converted to lowercase.
 If you allow for blank values, you have to allow for null values since blank
 values are stored as null.
 
+``JSONField``
+-------------
+
+.. class:: JSONField(encoder=None, decoder=None, **options)
+
+.. versionadded:: 3.1
+
+A field for storing JSON encoded data. In Python the data is represented in its
+Python native format: dictionaries, lists, strings, numbers, booleans and
+``None``.
+
+``JSONField`` is supported on MariaDB 10.2.7+, MySQL 5.7.8+, Oracle,
+PostgreSQL, and SQLite 3.9.0+ (with the :ref:`JSON1 extension enabled
+<sqlite-json1>`).
+
+.. attribute:: JSONField.encoder
+
+    An optional :py:class:`json.JSONEncoder` subclass to serialize data types
+    not supported by the standard JSON serializer (e.g. ``datetime.datetime``
+    or :class:`~python:uuid.UUID`). For example, you can use the
+    :class:`~django.core.serializers.json.DjangoJSONEncoder` class.
+
+    Defaults to ``json.JSONEncoder``.
+
+.. attribute:: JSONField.decoder
+
+    An optional :py:class:`json.JSONDecoder` subclass to deserialize the value
+    retrieved from the database. The value will be in the format chosen by the
+    custom encoder (most often a string). Your deserialization may need to
+    account for the fact that you can't be certain of the input type. For
+    example, you run the risk of returning a ``datetime`` that was actually a
+    string that just happened to be in the same format chosen for
+    ``datetime``\s.
+
+    Defaults to ``json.JSONDecoder``.
+
+If you give the field a :attr:`~django.db.models.Field.default`, ensure it's an
+immutable object, such as a ``str``, or a callable object that returns a fresh
+mutable object each time, such as ``dict`` or a function. Providing a mutable
+default object like ``default={}`` or ``default=[]`` shares the one object
+between all model instances.
+
+To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
+
+.. admonition:: Indexing
+
+    :class:`~django.db.models.Index` and :attr:`.Field.db_index` both create a
+    B-tree index, which isn't particularly helpful when querying ``JSONField``.
+    On PostgreSQL only, you can use
+    :class:`~django.contrib.postgres.indexes.GinIndex` that is better suited.
+
+.. admonition:: PostgreSQL users
+
+    PostgreSQL has two native JSON based data types: ``json`` and ``jsonb``.
+    The main difference between them is how they are stored and how they can be
+    queried. PostgreSQL's ``json`` field is stored as the original string
+    representation of the JSON and must be decoded on the fly when queried
+    based on keys. The ``jsonb`` field is stored based on the actual structure
+    of the JSON which allows indexing. The trade-off is a small additional cost
+    on writing to the ``jsonb`` field. ``JSONField`` uses ``jsonb``.
+
+.. admonition:: Oracle users
+
+    Oracle Database does not support storing JSON scalar values. Only JSON
+    objects and arrays (represented in Python using :py:class:`dict` and
+    :py:class:`list`) are supported.
+
 ``NullBooleanField``
 --------------------
 
 .. class:: NullBooleanField(**options)
 
-Like :class:`BooleanField` with ``null=True``. Use that instead of this field
-as it's likely to be deprecated in a future version of Django.
+Like :class:`BooleanField` with ``null=True``.
+
+.. deprecated:: 3.1
+
+    ``NullBooleanField`` is deprecated in favor of ``BooleanField(null=True)``.
 
 ``PositiveBigIntegerField``
 ---------------------------
@@ -1214,7 +1275,7 @@ databases supported by Django.
 
 .. class:: SlugField(max_length=50, **options)
 
-:term:`Slug` is a newspaper term. A slug is a short label for something,
+:term:`Slug <slug>` is a newspaper term. A slug is a short label for something,
 containing only letters, numbers, underscores or hyphens. They're generally used
 in URLs.
 
@@ -1241,8 +1302,6 @@ It uses :class:`~django.core.validators.validate_slug` or
 ------------------
 
 .. class:: SmallAutoField(**options)
-
-.. versionadded:: 3.0
 
 Like an :class:`AutoField`, but only allows values under a certain
 (database-dependent) limit. Values from ``1`` to ``32767`` are safe in all
@@ -1278,7 +1337,7 @@ However it is not enforced at the model or database level. Use a
 A time, represented in Python by a ``datetime.time`` instance. Accepts the same
 auto-population options as :class:`DateField`.
 
-The default form widget for this field is a :class:`~django.forms.TextInput`.
+The default form widget for this field is a :class:`~django.forms.TimeInput`.
 The admin adds some JavaScript shortcuts.
 
 ``URLField``
@@ -1289,7 +1348,7 @@ The admin adds some JavaScript shortcuts.
 A :class:`CharField` for a URL, validated by
 :class:`~django.core.validators.URLValidator`.
 
-The default form widget for this field is a :class:`~django.forms.TextInput`.
+The default form widget for this field is a :class:`~django.forms.URLInput`.
 
 Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 :attr:`~CharField.max_length` argument. If you don't specify
@@ -1451,7 +1510,7 @@ relation works.
             null=True,
         )
 
-    ``on_delete`` doesn't create a SQL constraint in the database. Support for
+    ``on_delete`` doesn't create an SQL constraint in the database. Support for
     database-level cascade options :ticket:`may be implemented later <21961>`.
 
 The possible values for :attr:`~ForeignKey.on_delete` are found in
@@ -1747,11 +1806,6 @@ that control how the relationship functions.
     add the descriptor for the reverse relationship, allowing
     :class:`ManyToManyField` relationships to be non-symmetrical.
 
-    .. versionchanged:: 3.0
-
-        Specifying ``symmetrical=True`` for recursive many-to-many
-        relationships using an intermediary model was allowed.
-
 .. attribute:: ManyToManyField.through
 
     Django will automatically generate a table to manage many-to-many
@@ -1763,6 +1817,13 @@ that control how the relationship functions.
     The most common use for this option is when you want to associate
     :ref:`extra data with a many-to-many relationship
     <intermediary-manytomany>`.
+
+    .. note::
+
+        If you don't want multiple associations between the same instances, add
+        a :class:`~django.db.models.UniqueConstraint` including the from and to
+        fields. Django's automatically generated many-to-many tables include
+        such a constraint.
 
     .. note::
 
@@ -1797,7 +1858,9 @@ that control how the relationship functions.
       points (i.e. the target model instance).
 
     This class can be used to query associated records for a given model
-    instance like a normal model.
+    instance like a normal model::
+
+        Model.m2mfield.through.objects.all()
 
 .. attribute:: ManyToManyField.through_fields
 
@@ -2004,8 +2067,6 @@ Field API reference
         where the arguments are interpolated from the field's ``__dict__``.
 
     .. attribute:: descriptor_class
-
-        .. versionadded:: 3.0
 
         A class implementing the :py:ref:`descriptor protocol <descriptors>`
         that is instantiated and assigned to the model instance attribute. The

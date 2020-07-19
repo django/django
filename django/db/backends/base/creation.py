@@ -97,25 +97,25 @@ class BaseDatabaseCreation:
         Designed only for test runner usage; will not handle large
         amounts of data.
         """
-        # Build list of all apps to serialize
-        from django.db.migrations.loader import MigrationLoader
-        loader = MigrationLoader(self.connection)
-        app_list = []
-        for app_config in apps.get_app_configs():
-            if (
-                app_config.models_module is not None and
-                app_config.label in loader.migrated_apps and
-                app_config.name not in settings.TEST_NON_SERIALIZED_APPS
-            ):
-                app_list.append((app_config, None))
-
-        # Make a function to iteratively return every object
+        # Iteratively return every object for all models to serialize.
         def get_objects():
-            for model in serializers.sort_dependencies(app_list):
-                if (model._meta.can_migrate(self.connection) and
-                        router.allow_migrate_model(self.connection.alias, model)):
-                    queryset = model._default_manager.using(self.connection.alias).order_by(model._meta.pk.name)
-                    yield from queryset.iterator()
+            from django.db.migrations.loader import MigrationLoader
+            loader = MigrationLoader(self.connection)
+            for app_config in apps.get_app_configs():
+                if (
+                    app_config.models_module is not None and
+                    app_config.label in loader.migrated_apps and
+                    app_config.name not in settings.TEST_NON_SERIALIZED_APPS
+                ):
+                    for model in app_config.get_models():
+                        if (
+                            model._meta.can_migrate(self.connection) and
+                            router.allow_migrate_model(self.connection.alias, model)
+                        ):
+                            queryset = model._default_manager.using(
+                                self.connection.alias,
+                            ).order_by(model._meta.pk.name)
+                            yield from queryset.iterator()
         # Serialize to a string
         out = StringIO()
         serializers.serialize("json", get_objects(), indent=None, stream=out)
@@ -127,6 +127,7 @@ class BaseDatabaseCreation:
         the serialize_db_to_string() method.
         """
         data = StringIO(data)
+        table_names = set()
         # Load data in a transaction to handle forward references and cycles.
         with atomic(using=self.connection.alias):
             # Disable constraint checks, because some databases (MySQL) doesn't
@@ -134,9 +135,10 @@ class BaseDatabaseCreation:
             with self.connection.constraint_checks_disabled():
                 for obj in serializers.deserialize('json', data, using=self.connection.alias):
                     obj.save()
+                    table_names.add(obj.object.__class__._meta.db_table)
             # Manually check for any invalid keys that might have been added,
             # because constraint checks were disabled.
-            self.connection.check_constraints()
+            self.connection.check_constraints(table_names=table_names)
 
     def _get_database_display_str(self, verbosity, database_name):
         """

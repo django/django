@@ -470,10 +470,10 @@ Notice the following:
 
 * Each field type has a default HTML representation. ``CharField`` is
   represented by an ``<input type="text">`` and ``EmailField`` by an
-  ``<input type="email">``.
-  ``BooleanField`` is represented by an ``<input type="checkbox">``. Note
-  these are merely sensible defaults; you can specify which HTML to use for
-  a given field by using widgets, which we'll explain shortly.
+  ``<input type="email">``. ``BooleanField(null=False)`` is represented by an
+  ``<input type="checkbox">``. Note these are merely sensible defaults; you can
+  specify which HTML to use for a given field by using widgets, which we'll
+  explain shortly.
 
 * The HTML ``name`` for each tag is taken directly from its attribute name
   in the ``ContactForm`` class.
@@ -972,6 +972,23 @@ Attributes of ``BoundField``
         >>> print(f['message'].name)
         message
 
+.. attribute:: BoundField.widget_type
+
+    .. versionadded:: 3.1
+
+    Returns the lowercased class name of the wrapped field's widget, with any
+    trailing ``input`` or ``widget`` removed. This may be used when building
+    forms where the layout is dependent upon the widget type. For example::
+
+        {% for field in form %}
+            {% if field.widget_type == 'checkbox' %}
+                # render one way
+            {% else %}
+                # render another way
+            {% endif %}
+        {% endfor %}
+
+
 Methods of ``BoundField``
 -------------------------
 
@@ -992,7 +1009,7 @@ Methods of ``BoundField``
     ``only_initial`` is used by Django internals and should not be set
     explicitly.
 
-.. method:: BoundField.css_classes()
+.. method:: BoundField.css_classes(extra_classes=None)
 
     When you use Django's rendering shortcuts, CSS classes are used to
     indicate required form fields or fields that contain errors. If you're

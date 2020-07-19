@@ -159,8 +159,8 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         "Return the version of GEOS used by SpatiaLite as a string."
         return self._get_spatialite_func('geos_version()')
 
-    def proj4_version(self):
-        "Return the version of the PROJ.4 library used by SpatiaLite."
+    def proj_version(self):
+        """Return the version of the PROJ library used by SpatiaLite."""
         return self._get_spatialite_func('proj4_version()')
 
     def lwgeom_version(self):

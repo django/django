@@ -174,12 +174,11 @@ specialized date-based list views.)
 Using Django's class-based view mixins
 ======================================
 
-Now we've seen how Django's generic class-based views use the provided
-mixins, let's look at other ways we can combine them. Of course we're
-still going to be combining them with either built-in class-based
-views, or other generic class-based views, but there are a range of
-rarer problems you can solve than are provided for by Django out of
-the box.
+Now we've seen how Django's generic class-based views use the provided mixins,
+let's look at other ways we can combine them. We're still going to be combining
+them with either built-in class-based views, or other generic class-based
+views, but there are a range of rarer problems you can solve than are provided
+for by Django out of the box.
 
 .. warning::
 
@@ -556,7 +555,7 @@ already know that calling :meth:`~django.views.generic.base.View.as_view()` on
 a class-based view gives us something that behaves exactly like a function
 based view, so we can do that at the point we choose between the two subviews.
 
-You can of course pass through keyword arguments to
+You can pass through keyword arguments to
 :meth:`~django.views.generic.base.View.as_view()` in the same way you
 would in your URLconf, such as if you wanted the ``AuthorInterest`` behavior
 to also appear at another URL but using a different template::

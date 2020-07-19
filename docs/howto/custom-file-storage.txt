@@ -99,8 +99,6 @@ and underscores from the original filename, removing everything else.
 
 .. method:: get_alternative_name(file_root, file_ext)
 
-.. versionadded:: 3.0
-
 Returns an alternative filename based on the ``file_root`` and ``file_ext``
 parameters. By default, an underscore plus a random 7 character alphanumeric
 string is appended to the filename before the extension.

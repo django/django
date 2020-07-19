@@ -3,6 +3,7 @@ import datetime
 from django.core import signing
 from django.test import SimpleTestCase
 from django.test.utils import freeze_time
+from django.utils.crypto import InvalidAlgorithm
 
 
 class TestSigner(SimpleTestCase):
@@ -18,7 +19,12 @@ class TestSigner(SimpleTestCase):
         ):
             self.assertEqual(
                 signer.signature(s),
-                signing.base64_hmac(signer.salt + 'signer', s, 'predictable-secret')
+                signing.base64_hmac(
+                    signer.salt + 'signer',
+                    s,
+                    'predictable-secret',
+                    algorithm=signer.algorithm,
+                )
             )
             self.assertNotEqual(signer.signature(s), signer2.signature(s))
 
@@ -27,11 +33,38 @@ class TestSigner(SimpleTestCase):
         signer = signing.Signer('predictable-secret', salt='extra-salt')
         self.assertEqual(
             signer.signature('hello'),
-            signing.base64_hmac('extra-salt' + 'signer', 'hello', 'predictable-secret')
+            signing.base64_hmac(
+                'extra-salt' + 'signer',
+                'hello',
+                'predictable-secret',
+                algorithm=signer.algorithm,
+            )
         )
         self.assertNotEqual(
             signing.Signer('predictable-secret', salt='one').signature('hello'),
             signing.Signer('predictable-secret', salt='two').signature('hello'))
+
+    def test_custom_algorithm(self):
+        signer = signing.Signer('predictable-secret', algorithm='sha512')
+        self.assertEqual(
+            signer.signature('hello'),
+            'Usf3uVQOZ9m6uPfVonKR-EBXjPe7bjMbp3_Fq8MfsptgkkM1ojidN0BxYaT5HAEN1'
+            'VzO9_jVu7R-VkqknHYNvw',
+        )
+
+    def test_invalid_algorithm(self):
+        signer = signing.Signer('predictable-secret', algorithm='whatever')
+        msg = "'whatever' is not an algorithm accepted by the hashlib module."
+        with self.assertRaisesMessage(InvalidAlgorithm, msg):
+            signer.sign('hello')
+
+    def test_legacy_signature(self):
+        # RemovedInDjango40Warning: pre-Django 3.1 signatures won't be
+        # supported.
+        signer = signing.Signer()
+        sha1_sig = 'foo:l-EMM5FtewpcHMbKFeQodt3X9z8'
+        self.assertNotEqual(signer.sign('foo'), sha1_sig)
+        self.assertEqual(signer.unsign(sha1_sig), 'foo')
 
     def test_sign_unsign(self):
         "sign/unsign should be reversible"
@@ -115,13 +148,19 @@ class TestSigner(SimpleTestCase):
         binary_key = b'\xe7'  # Set some binary (non-ASCII key)
 
         s = signing.Signer(binary_key)
-        self.assertEqual('foo:6NB0fssLW5RQvZ3Y-MTerq2rX7w', s.sign('foo'))
+        self.assertEqual(
+            'foo:EE4qGC5MEKyQG5msxYA0sBohAxLC0BJf8uRhemh0BGU',
+            s.sign('foo'),
+        )
 
     def test_valid_sep(self):
         separators = ['/', '*sep*', ',']
         for sep in separators:
             signer = signing.Signer('predictable-secret', sep=sep)
-            self.assertEqual('foo%ssH9B01cZcJ9FoT_jEVkRkNULrl8' % sep, signer.sign('foo'))
+            self.assertEqual(
+                'foo%sjZQoX_FtSO70jX9HLRGg2A_2s4kdDBxz1QoO_OpEQb0' % sep,
+                signer.sign('foo'),
+            )
 
     def test_invalid_sep(self):
         """should warn on invalid separator"""

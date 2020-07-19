@@ -1,4 +1,5 @@
-from django.forms import IntegerField, Textarea, ValidationError
+from django.core.exceptions import ValidationError
+from django.forms import IntegerField, Textarea
 from django.test import SimpleTestCase
 
 from . import FormFieldAssertionsMixin

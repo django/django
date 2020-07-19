@@ -1,25 +1,3 @@
-body {
-    direction: rtl;
-}
-
-/* LOGIN */
-
-.login .form-row {
-    float: right;
-}
-
-.login .form-row label {
-    float: right;
-    padding-left: 0.5em;
-    padding-right: 0;
-    text-align: left;
-}
-
-.login .submit-row {
-    clear: both;
-    padding: 1em 9.4em 0 0;
-}
-
 /* GLOBAL */
 
 th {
@@ -256,14 +234,4 @@ form .form-row p.datetime {
 .inline-related h3 span.delete label {
     margin-left: inherit;
     margin-right: 2px;
-}
-
-/* IE7 specific bug fixes */
-
-div.colM {
-    position: relative;
-}
-
-.submit-row input {
-    float: left;
 }

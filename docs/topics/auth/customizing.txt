@@ -577,14 +577,6 @@ password resets. You must then provide some key implementation details:
         ``REQUIRED_FIELDS`` has no effect in other parts of Django, like
         creating a user in the admin.
 
-        .. versionadded:: 3.0
-
-            :attr:`REQUIRED_FIELDS` now supports
-            :class:`~django.db.models.ManyToManyField`\s without a custom
-            through model. Since there is no way to pass model instances during
-            the :djadmin:`createsuperuser` prompt, expect the user to enter IDs
-            of existing instances of the class to which the model is related.
-
         For example, here is the partial definition for a user model that
         defines two required fields - a date of birth and height::
 
@@ -712,6 +704,10 @@ The following attributes and methods are available on any subclass of
 
         Returns an HMAC of the password field. Used for
         :ref:`session-invalidation-on-password-change`.
+
+        .. versionchanged:: 3.1
+
+            The hashing algorithm was changed to the SHA-256.
 
 :class:`~models.AbstractUser` subclasses :class:`~models.AbstractBaseUser`:
 
@@ -855,6 +851,7 @@ must define some additional attributes and methods. These methods allow the
 admin to control access of the user to admin content:
 
 .. class:: models.CustomUser
+    :noindex:
 
 .. attribute:: is_staff
 
@@ -928,8 +925,6 @@ methods and attributes:
         explicitly assigning them.
 
     .. method:: models.PermissionsMixin.get_user_permissions(obj=None)
-
-        .. versionadded:: 3.0
 
         Returns a set of permission strings that the user has directly.
 
@@ -1099,6 +1094,7 @@ code would be required in the app's ``admin.py`` file::
     from django.contrib.auth.models import Group
     from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
     from django.contrib.auth.forms import ReadOnlyPasswordHashField
+    from django.core.exceptions import ValidationError
 
     from customauth.models import MyUser
 
@@ -1118,7 +1114,7 @@ code would be required in the app's ``admin.py`` file::
             password1 = self.cleaned_data.get("password1")
             password2 = self.cleaned_data.get("password2")
             if password1 and password2 and password1 != password2:
-                raise forms.ValidationError("Passwords don't match")
+                raise ValidationError("Passwords don't match")
             return password2
 
         def save(self, commit=True):

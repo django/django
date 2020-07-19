@@ -14,7 +14,7 @@ class Command(BaseCommand):
         "as code."
     )
 
-    requires_system_checks = False
+    requires_system_checks = []
     shells = ['ipython', 'bpython', 'python']
 
     def add_arguments(self, parser):

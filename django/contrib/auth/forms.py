@@ -10,6 +10,7 @@ from django.contrib.auth.hashers import (
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.template import loader
 from django.utils.encoding import force_bytes
@@ -113,7 +114,7 @@ class UserCreationForm(forms.ModelForm):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
-            raise forms.ValidationError(
+            raise ValidationError(
                 self.error_messages['password_mismatch'],
                 code='password_mismatch',
             )
@@ -127,7 +128,7 @@ class UserCreationForm(forms.ModelForm):
         if password:
             try:
                 password_validation.validate_password(password, self.instance)
-            except forms.ValidationError as error:
+            except ValidationError as error:
                 self.add_error('password2', error)
 
     def save(self, commit=True):
@@ -226,12 +227,12 @@ class AuthenticationForm(forms.Form):
         allow login by active users, and reject login by inactive users.
 
         If the given user cannot log in, this method should raise a
-        ``forms.ValidationError``.
+        ``ValidationError``.
 
         If the given user may log in, this method should return None.
         """
         if not user.is_active:
-            raise forms.ValidationError(
+            raise ValidationError(
                 self.error_messages['inactive'],
                 code='inactive',
             )
@@ -240,7 +241,7 @@ class AuthenticationForm(forms.Form):
         return self.user_cache
 
     def get_invalid_login_error(self):
-        return forms.ValidationError(
+        return ValidationError(
             self.error_messages['invalid_login'],
             code='invalid_login',
             params={'username': self.username_field.verbose_name},
@@ -354,7 +355,7 @@ class SetPasswordForm(forms.Form):
         password2 = self.cleaned_data.get('new_password2')
         if password1 and password2:
             if password1 != password2:
-                raise forms.ValidationError(
+                raise ValidationError(
                     self.error_messages['password_mismatch'],
                     code='password_mismatch',
                 )
@@ -392,7 +393,7 @@ class PasswordChangeForm(SetPasswordForm):
         """
         old_password = self.cleaned_data["old_password"]
         if not self.user.check_password(old_password):
-            raise forms.ValidationError(
+            raise ValidationError(
                 self.error_messages['password_incorrect'],
                 code='password_incorrect',
             )
@@ -429,7 +430,7 @@ class AdminPasswordChangeForm(forms.Form):
         password2 = self.cleaned_data.get('password2')
         if password1 and password2:
             if password1 != password2:
-                raise forms.ValidationError(
+                raise ValidationError(
                     self.error_messages['password_mismatch'],
                     code='password_mismatch',
                 )

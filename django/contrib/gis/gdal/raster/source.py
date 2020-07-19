@@ -425,17 +425,24 @@ class GDALRaster(GDALRasterBase):
 
         return target
 
-    def transform(self, srid, driver=None, name=None, resampling='NearestNeighbour',
+    def transform(self, srs, driver=None, name=None, resampling='NearestNeighbour',
                   max_error=0.0):
         """
-        Return a copy of this raster reprojected into the given SRID.
+        Return a copy of this raster reprojected into the given spatial
+        reference system.
         """
         # Convert the resampling algorithm name into an algorithm id
         algorithm = GDAL_RESAMPLE_ALGORITHMS[resampling]
 
-        # Instantiate target spatial reference system
-        target_srs = SpatialReference(srid)
-
+        if isinstance(srs, SpatialReference):
+            target_srs = srs
+        elif isinstance(srs, (int, str)):
+            target_srs = SpatialReference(srs)
+        else:
+            raise TypeError(
+                'Transform only accepts SpatialReference, string, and integer '
+                'objects.'
+            )
         # Create warped virtual dataset in the target reference system
         target = capi.auto_create_warped_vrt(
             self._ptr, self.srs.wkt.encode(), target_srs.wkt.encode(),
@@ -445,7 +452,7 @@ class GDALRaster(GDALRasterBase):
 
         # Construct the target warp dictionary from the virtual raster
         data = {
-            'srid': srid,
+            'srid': target_srs.srid,
             'width': target.width,
             'height': target.height,
             'origin': [target.origin.x, target.origin.y],

@@ -338,7 +338,7 @@ The ``Func`` API is as follows:
                         **extra_context
                     )
 
-        To avoid a SQL injection vulnerability, ``extra_context`` :ref:`must
+        To avoid an SQL injection vulnerability, ``extra_context`` :ref:`must
         not contain untrusted user input <avoiding-sql-injection-in-query-expressions>`
         as these values are interpolated into the SQL string rather than passed
         as query parameters, where the database driver would escape them.
@@ -353,7 +353,7 @@ assumed to be column references and will be wrapped in ``F()`` expressions
 while other values will be wrapped in ``Value()`` expressions.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
-into the ``template`` attribute. To avoid a SQL injection vulnerability,
+into the ``template`` attribute. To avoid an SQL injection vulnerability,
 ``extra`` :ref:`must not contain untrusted user input
 <avoiding-sql-injection-in-query-expressions>` as these values are interpolated
 into the SQL string rather than passed as query parameters, where the database
@@ -484,7 +484,15 @@ The ``output_field`` argument should be a model field instance, like
 after it's retrieved from the database. Usually no arguments are needed when
 instantiating the model field as any arguments relating to data validation
 (``max_length``, ``max_digits``, etc.) will not be enforced on the expression's
-output value.
+output value. If no ``output_field`` is specified it will be tentatively
+inferred from the :py:class:`type` of the provided ``value``, if possible. For
+example, passing an instance of :py:class:`datetime.datetime` as ``value``
+would default ``output_field`` to :class:`~django.db.models.DateTimeField`.
+
+.. versionchanged:: 3.2
+
+  Support for inferring a default ``output_field`` from the type of ``value``
+  was added.
 
 ``ExpressionWrapper()`` expressions
 -----------------------------------
@@ -640,13 +648,6 @@ directly filter a queryset::
 
 This will ensure that the subquery will not be added to the ``SELECT`` columns,
 which may result in a better performance.
-
-.. versionchanged:: 3.0
-
-    In previous versions of Django, it was necessary to first annotate and then
-    filter against the annotation. This resulted in the annotated value always
-    being present in the query result, and often resulted in a query that took
-    more time to execute.
 
 Using aggregates within a ``Subquery`` expression
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -995,10 +996,6 @@ calling the appropriate methods on the wrapped expression.
         to a column. The ``alias`` parameter will be ``None`` unless the
         expression has been annotated and is used for grouping.
 
-        .. versionchanged:: 3.0
-
-            The ``alias`` parameter was added.
-
     .. method:: asc(nulls_first=False, nulls_last=False)
 
         Returns the expression ready to be sorted in ascending order.
@@ -1151,12 +1148,12 @@ SQL injection::
         template = "%(function)s('%(substring)s' in %(expressions)s)"
 
         def __init__(self, expression, substring):
-            # substring=substring is a SQL injection vulnerability!
+            # substring=substring is an SQL injection vulnerability!
             super().__init__(expression, substring=substring)
 
-This function generates a SQL string without any parameters. Since ``substring``
-is passed to ``super().__init__()`` as a keyword argument, it's interpolated
-into the SQL string before the query is sent to the database.
+This function generates an SQL string without any parameters. Since
+``substring`` is passed to ``super().__init__()`` as a keyword argument, it's
+interpolated into the SQL string before the query is sent to the database.
 
 Here's a corrected rewrite::
 

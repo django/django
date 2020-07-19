@@ -9,7 +9,7 @@ from django.db.backends.base.introspection import (
 from django.db.models import Index
 from django.utils.datastructures import OrderedSet
 
-FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('extra', 'is_unsigned'))
+FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('extra', 'is_unsigned', 'has_json_constraint'))
 InfoLine = namedtuple('InfoLine', 'col_name data_type max_len num_prec num_scale extra column_default is_unsigned')
 
 
@@ -24,6 +24,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         FIELD_TYPE.DOUBLE: 'FloatField',
         FIELD_TYPE.FLOAT: 'FloatField',
         FIELD_TYPE.INT24: 'IntegerField',
+        FIELD_TYPE.JSON: 'JSONField',
         FIELD_TYPE.LONG: 'IntegerField',
         FIELD_TYPE.LONGLONG: 'BigIntegerField',
         FIELD_TYPE.SHORT: 'SmallIntegerField',
@@ -53,6 +54,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 return 'PositiveIntegerField'
             elif field_type == 'SmallIntegerField':
                 return 'PositiveSmallIntegerField'
+        # JSON data type is an alias for LONGTEXT in MariaDB, use check
+        # constraints clauses to introspect JSONField.
+        if description.has_json_constraint:
+            return 'JSONField'
         return field_type
 
     def get_table_list(self, cursor):
@@ -66,6 +71,19 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Return a description of the table with the DB-API cursor.description
         interface."
         """
+        json_constraints = {}
+        if self.connection.mysql_is_mariadb and self.connection.features.can_introspect_json_field:
+            # JSON data type is an alias for LONGTEXT in MariaDB, select
+            # JSON_VALID() constraints to introspect JSONField.
+            cursor.execute("""
+                SELECT c.constraint_name AS column_name
+                FROM information_schema.check_constraints AS c
+                WHERE
+                    c.table_name = %s AND
+                    LOWER(c.check_clause) = 'json_valid(`' + LOWER(c.constraint_name) + '`)' AND
+                    c.constraint_schema = DATABASE()
+            """, [table_name])
+            json_constraints = {row[0] for row in cursor.fetchall()}
         # information_schema database gives more accurate results for some figures:
         # - varchar length returned by cursor.description is an internal length,
         #   not visible length (#5725)
@@ -100,6 +118,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 info.column_default,
                 info.extra,
                 info.is_unsigned,
+                line[0] in json_constraints,
             ))
         return fields
 

@@ -142,7 +142,6 @@
 
 #changelist-filter h3 {
     font-weight: 400;
-    font-size: 14px;
     padding: 0 15px;
     margin-bottom: 10px;
 }
@@ -155,7 +154,6 @@
 
 #changelist-filter ul:last-child {
     border-bottom: none;
-    padding-bottom: none;
 }
 
 #changelist-filter li {
@@ -238,7 +236,6 @@
 }
 
 .paginator a.showall {
-    padding: 0;
     border: none;
     background: none;
     color: #5b80b2;
@@ -302,7 +299,6 @@
 #changelist .actions span.question {
     font-size: 13px;
     margin: 0 0.5em;
-    display: none;
 }
 
 #changelist .actions:last-child {

@@ -48,10 +48,6 @@ objects that have an ``output_field`` that is a
 :class:`~django.db.models.BooleanField`. The result is provided using the
 ``then`` keyword.
 
-.. versionchanged:: 3.0
-
-    Support for boolean :class:`~django.db.models.Expression` was added.
-
 Some examples::
 
     >>> from django.db.models import F, Q, When
@@ -85,6 +81,10 @@ Keep in mind that each of these values can be an expression.
         >>> When(then__exact=0, then=1)
         >>> When(Q(then=0), then=1)
 
+.. versionchanged:: 3.2
+
+    Support for using the ``condition`` argument with ``lookups`` was added.
+
 ``Case``
 --------
 
@@ -100,7 +100,7 @@ An example::
 
     >>>
     >>> from datetime import date, timedelta
-    >>> from django.db.models import Case, CharField, Value, When
+    >>> from django.db.models import Case, Value, When
     >>> Client.objects.create(
     ...     name='Jane Doe',
     ...     account_type=Client.REGULAR,
@@ -119,7 +119,6 @@ An example::
     ...         When(account_type=Client.GOLD, then=Value('5%')),
     ...         When(account_type=Client.PLATINUM, then=Value('10%')),
     ...         default=Value('0%'),
-    ...         output_field=CharField(),
     ...     ),
     ... ).values_list('name', 'discount')
     <QuerySet [('Jane Doe', '0%'), ('James Smith', '5%'), ('Jack Black', '10%')]>
@@ -141,7 +140,6 @@ the ``Client`` has been with us, we could do so using lookups::
     ...         When(registered_on__lte=a_year_ago, then=Value('10%')),
     ...         When(registered_on__lte=a_month_ago, then=Value('5%')),
     ...         default=Value('0%'),
-    ...         output_field=CharField(),
     ...     )
     ... ).values_list('name', 'discount')
     <QuerySet [('Jane Doe', '5%'), ('James Smith', '0%'), ('Jack Black', '10%')]>
@@ -251,8 +249,6 @@ The two SQL statements are functionally equivalent but the more explicit
 
 Conditional filter
 ------------------
-
-.. versionadded:: 3.0
 
 When a conditional expression returns a boolean value, it is possible to use it
 directly in filters. This means that it will not be added to the ``SELECT``

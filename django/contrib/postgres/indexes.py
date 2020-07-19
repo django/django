@@ -68,10 +68,6 @@ class BloomIndex(PostgresIndex):
             kwargs['columns'] = self.columns
         return path, args, kwargs
 
-    def check_supported(self, schema_editor):
-        if not schema_editor.connection.features.has_bloom_index:
-            raise NotSupportedError('Bloom indexes require PostgreSQL 9.6+.')
-
     def get_with_params(self):
         with_params = []
         if self.length is not None:
@@ -183,6 +179,10 @@ class GistIndex(PostgresIndex):
         if self.fillfactor is not None:
             with_params.append('fillfactor = %d' % self.fillfactor)
         return with_params
+
+    def check_supported(self, schema_editor):
+        if self.include and not schema_editor.connection.features.supports_covering_gist_indexes:
+            raise NotSupportedError('Covering GiST indexes requires PostgreSQL 12+.')
 
 
 class HashIndex(PostgresIndex):

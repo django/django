@@ -1,0 +1,410 @@
+============================================
+Django 3.2 release notes - UNDER DEVELOPMENT
+============================================
+
+*Expected April 2021*
+
+Welcome to Django 3.2!
+
+These release notes cover the :ref:`new features <whats-new-3.2>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-3.2>` you'll
+want to be aware of when upgrading from Django 3.1 or earlier. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-3.2>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Django 3.2 is designated as a :term:`long-term support release
+<Long-term support release>`. It will receive security updates for at least
+three years after its release. Support for the previous LTS, Django 2.2, will
+end in April 2022.
+
+Python compatibility
+====================
+
+Django 3.2 supports Python 3.6, 3.7, and 3.8. We **highly recommend** and only
+officially support the latest release of each series.
+
+.. _whats-new-3.2:
+
+What's new in Django 3.2
+========================
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* :attr:`.ModelAdmin.search_fields` now allows searching against quoted phrases
+  with spaces.
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The default iteration count for the PBKDF2 password hasher is increased from
+  216,000 to 260,000.
+
+* The default variant for the Argon2 password hasher is changed to Argon2id.
+  ``memory_cost`` and ``parallelism`` are increased to 102,400 and 8
+  respectively to match the ``argon2-cffi`` defaults.
+
+  Increasing the ``memory_cost`` pushes the required memory from 512 KB to 100
+  MB. This is still rather conservative but can lead to problems in memory
+  constrained environments. If this is the case, the existing hasher can be
+  subclassed to override the defaults.
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The :meth:`.GDALRaster.transform` method now supports
+  :class:`~django.contrib.gis.gdal.SpatialReference`.
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The :class:`~django.contrib.postgres.operations.CreateExtension` operation
+  now checks that the extension already exists in the database and skips the
+  migration if so.
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :attr:`.ExclusionConstraint.include` attribute allows creating
+  covering exclusion constraints on PostgreSQL 12+.
+
+* The new :attr:`.ExclusionConstraint.opclasses` attribute allows setting
+  PostgreSQL operator classes.
+
+* The new :attr:`.JSONBAgg.ordering` attribute determines the ordering of the
+  aggregated elements.
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Email
+~~~~~
+
+* ...
+
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* ...
+
+File Storage
+~~~~~~~~~~~~
+
+* ...
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+
+Forms
+~~~~~
+
+* The new ``absolute_max`` argument for :func:`.formset_factory`,
+  :func:`.inlineformset_factory`, and :func:`.modelformset_factory` allows
+  customizing the maximum number of forms that can be instantiated when
+  supplying ``POST`` data. See :ref:`formsets-absolute-max` for more details.
+
+* The new ``can_delete_extra`` argument for :func:`.formset_factory`,
+  :func:`.inlineformset_factory`, and :func:`.modelformset_factory` allows
+  removal of the option to delete extra forms. See
+  :attr:`~.BaseFormSet.can_delete_extra` for more information.
+
+Generic Views
+~~~~~~~~~~~~~
+
+* The ``week_format`` attributes of
+  :class:`~django.views.generic.dates.WeekMixin` and
+  :class:`~django.views.generic.dates.WeekArchiveView` now support the
+  ``'%V'`` ISO 8601 week format.
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Logging
+~~~~~~~
+
+* ...
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* :djadmin:`loaddata` now supports fixtures stored in XZ archives (``.xz``) and
+  LZMA archives (``.lzma``).
+
+* :djadmin:`makemigrations` can now be called without an active database
+  connection. In that case, check for a consistent migration history is
+  skipped.
+
+* :attr:`.BaseCommand.requires_system_checks` now supports specifying a list of
+  tags. System checks registered in the chosen tags will be checked for errors
+  prior to executing the command. In previous versions, either all or none
+  of the system checks were performed.
+
+Migrations
+~~~~~~~~~~
+
+* The new ``Operation.migration_name_fragment`` property allows providing a
+  filename fragment that will be used to name a migration containing only that
+  operation.
+
+* Migrations now support serialization of pure and concrete path objects from
+  :mod:`pathlib`, and :class:`os.PathLike` instances.
+
+Models
+~~~~~~
+
+* The new ``no_key`` parameter for :meth:`.QuerySet.select_for_update()`,
+  supported on PostgreSQL, allows acquiring weaker locks that don't block the
+  creation of rows that reference locked rows through a foreign key.
+
+* :class:`When() <django.db.models.expressions.When>` expression now allows
+  using the ``condition`` argument with ``lookups``.
+
+* The new :attr:`.Index.include` and :attr:`.UniqueConstraint.include`
+  attributes allow creating covering indexes and covering unique constraints on
+  PostgreSQL 11+.
+
+* The new :attr:`.UniqueConstraint.opclasses` attribute allows setting
+  PostgreSQL operator classes.
+
+* The :meth:`.QuerySet.update` method now respects the ``order_by()`` clause on
+  MySQL and MariaDB.
+
+* :class:`FilteredRelation() <django.db.models.FilteredRelation>` now supports
+  nested relations.
+
+* The ``of`` argument of :meth:`.QuerySet.select_for_update()` is now allowed
+  on MySQL 8.0.1+.
+
+* :class:`Value() <django.db.models.Value>` expression now
+  automatically resolves its ``output_field`` to the appropriate
+  :class:`Field <django.db.models.Field>` subclass based on the type of
+  it's provided ``value`` for :py:class:`bool`, :py:class:`bytes`,
+  :py:class:`float`, :py:class:`int`, :py:class:`str`,
+  :py:class:`datetime.date`, :py:class:`datetime.datetime`,
+  :py:class:`datetime.time`, :py:class:`datetime.timedelta`,
+  :py:class:`decimal.Decimal`, and :py:class:`uuid.UUID` instances.
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Security
+~~~~~~~~
+
+* ...
+
+Serialization
+~~~~~~~~~~~~~
+
+* The new :ref:`JSONL <serialization-formats-jsonl>` serializer allows using
+  the JSON Lines format with :djadmin:`dumpdata` and :djadmin:`loaddata`. This
+  can be useful for populating large databases because data is loaded line by
+  line into memory, rather than being loaded all at once.
+
+Signals
+~~~~~~~
+
+* ...
+
+Templates
+~~~~~~~~~
+
+* ...
+
+Tests
+~~~~~
+
+* Objects assigned to class attributes in :meth:`.TestCase.setUpTestData` are
+  now isolated for each test method. Such objects are now required to support
+  creating deep copies with :py:func:`copy.deepcopy`. Assigning objects which
+  don't support ``deepcopy()`` is deprecated and will be removed in Django 4.1.
+
+* :class:`~django.test.runner.DiscoverRunner` now enables
+  :py:mod:`faulthandler` by default. This can be disabled by using the
+  :option:`test --no-faulthandler` option.
+
+* :class:`~django.test.Client` now preserves the request query string when
+  following 307 and 308 redirects.
+
+* The new :meth:`.TestCase.captureOnCommitCallbacks` method captures callback
+  functions passed to :func:`transaction.on_commit()
+  <django.db.transaction.on_commit>` in a list. This allows you to test such
+  callbacks without using the slower :class:`.TransactionTestCase`.
+
+URLs
+~~~~
+
+* ...
+
+Utilities
+~~~~~~~~~
+
+* The new ``depth`` parameter of ``django.utils.timesince.timesince()`` and
+  ``django.utils.timesince.timeuntil()`` functions allows specifying the number
+  of adjacent time units to return.
+
+Validators
+~~~~~~~~~~
+
+* ...
+
+.. _backwards-incompatible-3.2:
+
+Backwards incompatible changes in 3.2
+=====================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* The new ``DatabaseFeatures.introspected_field_types`` property replaces these
+  features:
+
+  * ``can_introspect_autofield``
+  * ``can_introspect_big_integer_field``
+  * ``can_introspect_binary_field``
+  * ``can_introspect_decimal_field``
+  * ``can_introspect_duration_field``
+  * ``can_introspect_ip_address_field``
+  * ``can_introspect_positive_integer_field``
+  * ``can_introspect_small_integer_field``
+  * ``can_introspect_time_field``
+  * ``introspected_big_auto_field_type``
+  * ``introspected_small_auto_field_type``
+  * ``introspected_boolean_field_type``
+
+* To enable support for covering indexes (:attr:`.Index.include`) and covering
+  unique constraints (:attr:`.UniqueConstraint.include`), set
+  ``DatabaseFeatures.supports_covering_indexes`` to ``True``.
+
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for PostGIS 2.2 is removed.
+
+Dropped support for PostgreSQL 9.5
+----------------------------------
+
+Upstream support for PostgreSQL 9.5 ends in February 2021. Django 3.2 supports
+PostgreSQL 9.6 and higher.
+
+Dropped support for MySQL 5.6
+-----------------------------
+
+The end of upstream support for MySQL 5.6 is April 2021. Django 3.2 supports
+MySQL 5.7 and higher.
+
+Miscellaneous
+-------------
+
+* The undocumented ``SpatiaLiteOperations.proj4_version()`` method is renamed
+  to ``proj_version()``.
+
+* Minified JavaScript files are no longer included with the admin. If you
+  require these files to be minified, consider using a third party app or
+  external build tool. The minified vendored JavaScript files packaged with the
+  admin (e.g. :ref:`jquery.min.js <contrib-admin-jquery>`) are still included.
+
+* :attr:`.ModelAdmin.prepopulated_fields` no longer strips English stop words,
+  such as ``'a'`` or ``'an'``.
+
+* :func:`~django.utils.text.slugify` now removes leading and trailing dashes
+  and underscores.
+
+* The :tfilter:`intcomma` and :tfilter:`intword` template filters no longer
+  depend on the :setting:`USE_L10N` setting.
+
+* Support for ``argon2-cffi`` < 19.1.0 is removed.
+
+* The cache keys no longer includes the language when internationalization is
+  disabled (``USE_I18N = False``) and localization is enabled
+  (``USE_L10N = True``). After upgrading to Django 3.2 in such configurations,
+  the first request to any previously cached value will be a cache miss.
+
+* ``ForeignKey.validate()`` now uses
+  :attr:`~django.db.models.Model._base_manager` rather than
+  :attr:`~django.db.models.Model._default_manager` to check that related
+  instances exist.
+
+.. _deprecated-features-3.2:
+
+Features deprecated in 3.2
+==========================
+
+Miscellaneous
+-------------
+
+* Assigning objects which don't support creating deep copies with
+  :py:func:`copy.deepcopy` to class attributes in
+  :meth:`.TestCase.setUpTestData` is deprecated.
+
+* Using a boolean value in :attr:`.BaseCommand.requires_system_checks` is
+  deprecated. Use ``'__all__'`` instead of ``True``, and ``[]`` (an empty list)
+  instead of ``False``.
+
+* The ``whitelist`` argument and ``domain_whitelist`` attribute of
+  :class:`~django.core.validators.EmailValidator` are deprecated. Use
+  ``allowlist`` instead of ``whitelist``, and ``domain_allowlist`` instead of
+  ``domain_whitelist``. You may need to rename ``whitelist`` in existing
+  migrations.

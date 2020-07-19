@@ -10,7 +10,7 @@ from django.db import (
 class Command(BaseCommand):
     help = "Creates the tables needed to use the SQL cache backend."
 
-    requires_system_checks = False
+    requires_system_checks = []
 
     def add_arguments(self, parser):
         parser.add_argument(

@@ -45,7 +45,7 @@ so that it can be of use to the widest audience.
     chat with other Django users who might be able to help.
 
 __ https://diveinto.org/python3/table-of-contents.html
-__ irc://irc.freenode.net/django-dev
+__ https://webchat.freenode.net/#django-dev
 
 What does this tutorial cover?
 ------------------------------
@@ -77,8 +77,7 @@ probably got the answers.
 
 .. admonition:: For Windows users
 
-    When installing Python on Windows, make sure you check the option "Add
-    python.exe to Path", so that it is always available on the command line.
+    See :ref:`install_python_windows` on Windows docs for additional guidance.
 
 Code of Conduct
 ===============
@@ -152,8 +151,7 @@ If the ``source`` command is not available, you can try using a dot instead:
     $ . ~/.virtualenvs/djangodev/bin/activate
 
 You have to activate the virtual environment whenever you open a new
-terminal window. virtualenvwrapper__ is a useful tool for making this
-more convenient.
+terminal window.
 
 .. admonition:: For Windows users
 
@@ -162,15 +160,6 @@ more convenient.
     .. code-block:: doscon
 
         ...\> %HOMEPATH%\.virtualenvs\djangodev\Scripts\activate.bat
-
-    or you can install :ref:`a Windows version of virtualenvwrapper
-    <virtualenvwrapper-win>` and then use:
-
-    .. code-block:: doscon
-
-        ...\> workon djangodev
-
-__ https://virtualenvwrapper.readthedocs.io/en/latest/
 
 The name of the currently activated virtual environment is displayed on the
 command line to help you keep track of which one you are using. Anything you
@@ -230,7 +219,8 @@ some other flavor of Unix, run:
     $ ./runtests.py
 
 Now sit back and relax. Django's entire test suite has thousands of tests, and
-it takes at least a few minutes run, depending on the speed of your computer.
+it takes at least a few minutes to run, depending on the speed of your
+computer.
 
 While Django's test suite is running, you'll see a stream of characters
 representing the status of each test as it completes. ``E`` indicates that an

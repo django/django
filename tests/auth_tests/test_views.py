@@ -1,16 +1,15 @@
 import datetime
 import itertools
-import os
 import re
 from importlib import import_module
 from unittest import mock
-from urllib.parse import quote
+from urllib.parse import quote, urljoin
 
 from django.apps import apps
 from django.conf import settings
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth import (
-    BACKEND_SESSION_KEY, REDIRECT_FIELD_NAME, SESSION_KEY,
+    BACKEND_SESSION_KEY, HASH_SESSION_KEY, REDIRECT_FIELD_NAME, SESSION_KEY,
 )
 from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, SetPasswordForm,
@@ -201,7 +200,7 @@ class PasswordResetTest(AuthViewsTestCase):
     def _read_signup_email(self, email):
         urlmatch = re.search(r"https?://[^/]*(/.*reset/\S*)", email.body)
         self.assertIsNotNone(urlmatch, "No URL found in sent email")
-        return urlmatch.group(), urlmatch.groups()[0]
+        return urlmatch[0], urlmatch[1]
 
     def test_confirm_valid(self):
         url, path = self._test_confirm_start()
@@ -414,7 +413,7 @@ class CustomUserPasswordResetTest(AuthViewsTestCase):
     def _read_signup_email(self, email):
         urlmatch = re.search(r"https?://[^/]*(/.*reset/\S*)", email.body)
         self.assertIsNotNone(urlmatch, "No URL found in sent email")
-        return urlmatch.group(), urlmatch.groups()[0]
+        return urlmatch[0], urlmatch[1]
 
     def test_confirm_valid_custom_user(self):
         url, path = self._test_confirm_start()
@@ -709,6 +708,27 @@ class LoginTest(AuthViewsTestCase):
         user.save()
 
         self.login(password='foobar')
+        self.assertNotEqual(original_session_key, self.client.session.session_key)
+
+    def test_legacy_session_key_flushed_on_login(self):
+        # RemovedInDjango40Warning.
+        user = User.objects.get(username='testclient')
+        engine = import_module(settings.SESSION_ENGINE)
+        session = engine.SessionStore()
+        session[SESSION_KEY] = user.id
+        session[HASH_SESSION_KEY] = user._legacy_get_session_auth_hash()
+        session.save()
+        original_session_key = session.session_key
+        self.client.cookies[settings.SESSION_COOKIE_NAME] = original_session_key
+        # Legacy session key is flushed on login.
+        self.login()
+        self.assertNotEqual(original_session_key, self.client.session.session_key)
+        # Legacy session key is flushed after a password change.
+        user.set_password('password_2')
+        user.save()
+        original_session_key = session.session_key
+        self.client.cookies[settings.SESSION_COOKIE_NAME] = original_session_key
+        self.login(password='password_2')
         self.assertNotEqual(original_session_key, self.client.session.session_key)
 
     def test_login_session_without_hash_session_key(self):
@@ -1194,11 +1214,8 @@ class ChangelistTests(AuthViewsTestCase):
         rel_link = re.search(
             r'you can change the password using <a href="([^"]*)">this form</a>',
             response.content.decode()
-        ).groups()[0]
-        self.assertEqual(
-            os.path.normpath(user_change_url + rel_link),
-            os.path.normpath(password_change_url)
-        )
+        )[1]
+        self.assertEqual(urljoin(user_change_url, rel_link), password_change_url)
 
         response = self.client.post(
             password_change_url,

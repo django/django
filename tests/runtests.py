@@ -24,7 +24,9 @@ else:
     from django.test.runner import default_test_processes
     from django.test.selenium import SeleniumTestCaseBase
     from django.test.utils import get_runner
-    from django.utils.deprecation import RemovedInDjango40Warning
+    from django.utils.deprecation import (
+        RemovedInDjango40Warning, RemovedInDjango41Warning,
+    )
     from django.utils.log import DEFAULT_LOGGING
     from django.utils.version import PY37
 
@@ -38,6 +40,7 @@ else:
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
 warnings.simplefilter("error", RemovedInDjango40Warning)
+warnings.simplefilter('error', RemovedInDjango41Warning)
 # Make resource and runtime warning errors to ensure no usage of error prone
 # patterns.
 warnings.simplefilter("error", ResourceWarning)
@@ -181,6 +184,7 @@ def setup(verbosity, test_labels, parallel, start_at, start_after):
     settings.LOGGING = log_config
     settings.SILENCED_SYSTEM_CHECKS = [
         'fields.W342',  # ForeignKey(unique=True) -> OneToOneField
+        'fields.W903',  # NullBooleanField deprecated.
     ]
 
     # Load all the ALWAYS_INSTALLED_APPS.

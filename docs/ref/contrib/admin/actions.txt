@@ -189,16 +189,19 @@ provided by the admin.
 For example, we can use ``self`` to flash a message to the user informing her
 that the action was successful::
 
+    from django.contrib import messages
+    from django.utils.translation import ngettext
+
     class ArticleAdmin(admin.ModelAdmin):
         ...
 
         def make_published(self, request, queryset):
-            rows_updated = queryset.update(status='p')
-            if rows_updated == 1:
-                message_bit = "1 story was"
-            else:
-                message_bit = "%s stories were" % rows_updated
-            self.message_user(request, "%s successfully marked as published." % message_bit)
+            updated = queryset.update(status='p')
+            self.message_user(request, ngettext(
+                '%d story was successfully marked as published.',
+                '%d stories were successfully marked as published.',
+                updated,
+            ) % updated, messages.SUCCESS)
 
 This make the action match what the admin itself does after successfully
 performing an action:

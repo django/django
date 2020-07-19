@@ -34,7 +34,7 @@ or Jinja2_, you should feel right at home with Django's templates.
 Templates
 =========
 
-.. highlightlang:: html+django
+.. highlight:: html+django
 
 A template is a text file. It can generate any text-based format (HTML, XML,
 CSV, etc.).
@@ -68,11 +68,8 @@ explained later in this document.
 
     Why use a text-based template instead of an XML-based one (like Zope's
     TAL)? We wanted Django's template language to be usable for more than
-    just XML/HTML templates. At World Online, we use it for emails,
-    JavaScript and CSV. You can use the template language for any text-based
-    format.
-
-    Oh, and one more thing: making humans edit XML is sadistic!
+    just XML/HTML templates. You can use the template language for any
+    text-based format such as emails, JavaScript and CSV.
 
 .. _template-variables:
 
@@ -646,8 +643,7 @@ of all comments related to the current task with::
 
     {{ task.comment_set.all.count }}
 
-And of course you can easily access methods you've explicitly defined on your
-own models:
+You can also access methods you've explicitly defined on your own models:
 
 .. code-block:: python
     :caption: models.py
@@ -710,5 +706,5 @@ This is a feature for the sake of maintainability and sanity.
 .. seealso::
 
     :doc:`The Templates Reference </ref/templates/index>`
-        Covers built-in tags, built-in filters, using an alternative template,
+        Covers built-in tags, built-in filters, using an alternative template
         language, and more.

@@ -582,9 +582,9 @@ we need to add a similar  constraint to ``DetailView``:
             """
             return Question.objects.filter(pub_date__lte=timezone.now())
 
-And of course, we will add some tests, to check that a ``Question`` whose
-``pub_date`` is in the past can be displayed, and that one with a ``pub_date``
-in the future is not:
+We should then add some tests, to check that a ``Question`` whose ``pub_date``
+is in the past can be displayed, and that one with a ``pub_date`` in the future
+is not:
 
 .. code-block:: python
     :caption: polls/tests.py

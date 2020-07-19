@@ -1,3 +1,4 @@
+import json
 import os
 import tempfile
 import uuid
@@ -7,6 +8,7 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.storage import FileSystemStorage
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.fields.files import ImageFieldFile
 from django.utils.translation import gettext_lazy as _
@@ -330,6 +332,35 @@ if Image:
                                   storage=temp_storage, upload_to='tests',
                                   height_field='headshot_height',
                                   width_field='headshot_width')
+
+
+class CustomJSONDecoder(json.JSONDecoder):
+    def __init__(self, object_hook=None, *args, **kwargs):
+        return super().__init__(object_hook=self.as_uuid, *args, **kwargs)
+
+    def as_uuid(self, dct):
+        if 'uuid' in dct:
+            dct['uuid'] = uuid.UUID(dct['uuid'])
+        return dct
+
+
+class JSONModel(models.Model):
+    value = models.JSONField()
+
+    class Meta:
+        required_db_features = {'supports_json_field'}
+
+
+class NullableJSONModel(models.Model):
+    value = models.JSONField(blank=True, null=True)
+    value_custom = models.JSONField(
+        encoder=DjangoJSONEncoder,
+        decoder=CustomJSONDecoder,
+        null=True,
+    )
+
+    class Meta:
+        required_db_features = {'supports_json_field'}
 
 
 class AllFieldsModel(models.Model):

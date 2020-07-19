@@ -71,21 +71,13 @@ need to distinguish caches by the ``Accept-language`` header.
     private`` header to a response to indicate that a page should never be
     cached.
 
-    .. versionchanged:: 3.0
-
-        ``private`` directive was added.
-
 .. function:: patch_vary_headers(response, newheaders)
 
     Adds (or updates) the ``Vary`` header in the given ``HttpResponse`` object.
     ``newheaders`` is a list of header names that should be in ``Vary``. If
     headers contains an asterisk, then ``Vary`` header will consist of a single
-    asterisk ``'*'``. Otherwise, existing headers in ``Vary`` aren't removed.
-
-    .. versionchanged:: 3.0
-
-        Handling an asterisk ``'*'`` according to :rfc:`7231#section-7.1.4` was
-        added.
+    asterisk ``'*'``, according to :rfc:`7231#section-7.1.4`. Otherwise,
+    existing headers in ``Vary`` aren't removed.
 
 .. function:: get_cache_key(request, key_prefix=None, method='GET', cache=None)
 
@@ -464,7 +456,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
 .. class:: Atom1Feed(SyndicationFeed)
 
-    Spec: https://tools.ietf.org/html/rfc4287
+    Spec: :rfc:`4287`
 
 ``django.utils.functional``
 ===========================
@@ -556,6 +548,14 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
         z = person.friends         # does not call
         x is z                     # is True
 
+.. class:: classproperty(method=None)
+
+    .. versionadded:: 3.1
+
+    Similar to :py:func:`@classmethod <classmethod>`, the ``@classproperty``
+    decorator converts the result of a method with a single ``cls`` argument
+    into a property that can be accessed directly from the class.
+
 .. function:: keep_lazy(func, *resultclasses)
 
     Django offers many utility functions (particularly in ``django.utils``)
@@ -634,11 +634,6 @@ escaping HTML.
     Returns the given text with ampersands, quotes and angle brackets encoded
     for use in HTML. The input is first coerced to a string and the output has
     :func:`~django.utils.safestring.mark_safe` applied.
-
-    .. versionchanged:: 3.0
-
-        In older versions, ``'`` is converted to its decimal code ``&#39;``
-        instead of the equivalent hex code ``&#x27;``.
 
 .. function:: conditional_escape(text)
 
@@ -858,8 +853,8 @@ appropriate entities.
     #. Converting to lowercase.
     #. Removing characters that aren't alphanumerics, underscores, hyphens, or
        whitespace.
-    #. Removing leading and trailing whitespace.
     #. Replacing any whitespace or repeated dashes with single dashes.
+    #. Removing leading and trailing whitespace, dashes, and underscores.
 
     For example::
 
@@ -871,6 +866,11 @@ appropriate entities.
 
         >>> slugify('你好 World', allow_unicode=True)
         '你好-world'
+
+    .. versionchanged:: 3.2
+
+        In older versions, leading and trailing dashes and underscores are not
+        removed.
 
 .. _time-zone-selection-functions:
 
@@ -1018,10 +1018,6 @@ appropriate entities.
 
 For a complete discussion on the usage of the following see the
 :doc:`translation documentation </topics/i18n/translation>`.
-
-The ``u`` prefix on the functions below comes from a difference in Python 2
-between unicode and bytestrings. If your code doesn't support Python 2, use the
-functions without the ``u``.
 
 .. function:: gettext(message)
 

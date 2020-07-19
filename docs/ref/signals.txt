@@ -101,10 +101,10 @@ Arguments sent with this signal:
 
     .. note::
 
-        ``instance._state`` isn't set before sending the ``post_init`` signal,
-        so ``_state`` attributes always have their default values. For example,
-        ``_state.db`` is ``None`` and cannot be used to check an ``instance``
-        database.
+        :attr:`instance._state <django.db.models.Model._state>` isn't set
+        before sending the ``post_init`` signal, so ``_state`` attributes
+        always have their default values. For example, ``_state.db`` is
+        ``None``.
 
 .. warning::
 

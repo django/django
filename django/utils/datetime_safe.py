@@ -76,7 +76,7 @@ def strftime(dt, fmt):
         return super(type(dt), dt).strftime(fmt)
     illegal_formatting = _illegal_formatting.search(fmt)
     if illegal_formatting:
-        raise TypeError("strftime of dates before 1000 does not handle " + illegal_formatting.group(0))
+        raise TypeError('strftime of dates before 1000 does not handle ' + illegal_formatting[0])
 
     year = dt.year
     # For every non-leap year century, advance by
@@ -100,7 +100,7 @@ def strftime(dt, fmt):
             sites.append(site)
 
     s = s1
-    syear = "%04d" % (dt.year,)
+    syear = "%04d" % dt.year
     for site in sites:
         s = s[:site] + syear + s[site + 4:]
     return s

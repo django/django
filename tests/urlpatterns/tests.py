@@ -1,9 +1,11 @@
 import uuid
 
+from django.conf.urls import url as conf_url
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, Resolver404, path, resolve, reverse
+from django.utils.deprecation import RemovedInDjango40Warning
 
 from .converters import DynamicConverter
 from .views import empty_view
@@ -249,13 +251,21 @@ class SameNameTests(SimpleTestCase):
 
 
 class ParameterRestrictionTests(SimpleTestCase):
-    def test_non_identifier_parameter_name_causes_exception(self):
+    def test_integer_parameter_name_causes_exception(self):
         msg = (
             "URL route 'hello/<int:1>/' uses parameter name '1' which isn't "
             "a valid Python identifier."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             path(r'hello/<int:1>/', lambda r: None)
+
+    def test_non_identifier_parameter_name_causes_exception(self):
+        msg = (
+            "URL route 'b/<int:book.id>/' uses parameter name 'book.id' which "
+            "isn't a valid Python identifier."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            path(r'b/<int:book.id>/', lambda r: None)
 
     def test_allows_non_ascii_but_valid_identifiers(self):
         # \u0394 is "GREEK CAPITAL LETTER DELTA", a valid identifier.
@@ -295,3 +305,13 @@ class ConversionExceptionTests(SimpleTestCase):
             raise TypeError('This type error propagates.')
         with self.assertRaisesMessage(TypeError, 'This type error propagates.'):
             reverse('dynamic', kwargs={'value': object()})
+
+
+class DeprecationTests(SimpleTestCase):
+    def test_url_warning(self):
+        msg = (
+            'django.conf.urls.url() is deprecated in favor of '
+            'django.urls.re_path().'
+        )
+        with self.assertRaisesMessage(RemovedInDjango40Warning, msg):
+            conf_url(r'^regex/(?P<pk>[0-9]+)/$', empty_view, name='regex')

@@ -141,8 +141,11 @@ Helper function to return a URL pattern for serving files in debug mode::
 
 .. function:: url(regex, view, kwargs=None, name=None)
 
-This function is an alias to :func:`django.urls.re_path()`. It's likely to be
-deprecated in a future release.
+This function is an alias to :func:`django.urls.re_path()`.
+
+.. deprecated:: 3.1
+
+    Alias of :func:`django.urls.re_path` for backwards compatibility.
 
 ``handler400``
 ==============

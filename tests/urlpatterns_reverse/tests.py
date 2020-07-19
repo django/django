@@ -1065,16 +1065,14 @@ class ErrorHandlerResolutionTests(SimpleTestCase):
         self.callable_resolver = URLResolver(RegexPattern(r'^$'), urlconf_callables)
 
     def test_named_handlers(self):
-        handler = (empty_view, {})
         for code in [400, 404, 500]:
             with self.subTest(code=code):
-                self.assertEqual(self.resolver.resolve_error_handler(code), handler)
+                self.assertEqual(self.resolver.resolve_error_handler(code), empty_view)
 
     def test_callable_handlers(self):
-        handler = (empty_view, {})
         for code in [400, 404, 500]:
             with self.subTest(code=code):
-                self.assertEqual(self.callable_resolver.resolve_error_handler(code), handler)
+                self.assertEqual(self.callable_resolver.resolve_error_handler(code), empty_view)
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls_without_handlers')

@@ -137,7 +137,7 @@ js_catalog_template = r"""
 
     django.pgettext = function(context, msgid) {
       var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
@@ -145,7 +145,7 @@ js_catalog_template = r"""
 
     django.npgettext = function(context, singular, plural, count) {
       var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -196,8 +196,8 @@ class JavaScriptCatalog(View):
     Return the selected language catalog as a JavaScript library.
 
     Receive the list of packages to check for translations in the `packages`
-    kwarg either from the extra dictionary passed to the url() function or as a
-    plus-sign delimited string from the request. Default is 'django.conf'.
+    kwarg either from the extra dictionary passed to the path() function or as
+    a plus-sign delimited string from the request. Default is 'django.conf'.
 
     You can override the gettext domain for this view, but usually you don't
     want to do that as JavaScript messages go to the djangojs domain. This
@@ -237,7 +237,7 @@ class JavaScriptCatalog(View):
         """
         match = re.search(r'nplurals=\s*(\d+)', self._plural_string or '')
         if match:
-            return int(match.groups()[0])
+            return int(match[1])
         return 2
 
     @property

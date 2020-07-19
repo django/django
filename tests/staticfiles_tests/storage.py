@@ -88,3 +88,8 @@ class ExtraPatternsStorage(ManifestStaticFilesStorage):
             ),
         ),
     )
+
+
+class NoneHashStorage(ManifestStaticFilesStorage):
+    def file_hash(self, name, content=None):
+        return None

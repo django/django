@@ -1,8 +1,6 @@
 """
 Various complex queries that have been problematic in the past.
 """
-import threading
-
 from django.db import models
 from django.db.models.functions import Now
 
@@ -51,13 +49,6 @@ class Note(models.Model):
     def __str__(self):
         return self.note
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Regression for #13227 -- having an attribute that
-        # is unpicklable doesn't stop you from cloning queries
-        # that use objects of that type as an argument.
-        self.lock = threading.Lock()
-
 
 class Annotation(models.Model):
     name = models.CharField(max_length=10)
@@ -77,6 +68,7 @@ class ExtraInfo(models.Model):
     note = models.ForeignKey(Note, models.CASCADE, null=True)
     value = models.IntegerField(null=True)
     date = models.ForeignKey(DateTimePK, models.SET_NULL, null=True)
+    filterable = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['info']
@@ -150,6 +142,7 @@ class Cover(models.Model):
 class Number(models.Model):
     num = models.IntegerField()
     other_num = models.IntegerField(null=True)
+    another_num = models.IntegerField(null=True)
 
     def __str__(self):
         return str(self.num)
@@ -386,7 +379,7 @@ class Node(models.Model):
     parent = models.ForeignKey("self", models.SET_NULL, to_field="num", null=True)
 
     def __str__(self):
-        return "%s" % self.num
+        return str(self.num)
 
 # Bug #12252
 
@@ -604,7 +597,7 @@ class Order(models.Model):
         ordering = ('pk',)
 
     def __str__(self):
-        return '%s' % self.pk
+        return str(self.pk)
 
 
 class OrderItem(models.Model):
@@ -615,7 +608,7 @@ class OrderItem(models.Model):
         ordering = ('pk',)
 
     def __str__(self):
-        return '%s' % self.pk
+        return str(self.pk)
 
 
 class BaseUser(models.Model):
@@ -747,3 +740,10 @@ class ReturningModel(models.Model):
 
 class NonIntegerPKReturningModel(models.Model):
     created = CreatedField(editable=False, primary_key=True)
+
+
+class JSONFieldNullable(models.Model):
+    json_field = models.JSONField(blank=True, null=True)
+
+    class Meta:
+        required_db_features = {'supports_json_field'}

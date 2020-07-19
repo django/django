@@ -6,7 +6,7 @@ from copy import copy
 from django.core.exceptions import EmptyResultSet
 from django.db.models.expressions import Case, Exists, Func, Value, When
 from django.db.models.fields import (
-    BooleanField, CharField, DateTimeField, Field, IntegerField, UUIDField,
+    CharField, DateTimeField, Field, IntegerField, UUIDField,
 )
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.datastructures import OrderedSet
@@ -123,7 +123,7 @@ class Lookup:
         exprs = []
         for expr in (self.lhs, self.rhs):
             if isinstance(expr, Exists):
-                expr = Case(When(expr, then=True), default=False, output_field=BooleanField())
+                expr = Case(When(expr, then=True), default=False)
                 wrapped = True
             exprs.append(expr)
         lookup = type(self)(*exprs) if wrapped else self
@@ -256,6 +256,17 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
         return sql, tuple(params)
 
 
+class PostgresOperatorLookup(FieldGetDbPrepValueMixin, Lookup):
+    """Lookup defined by operators on PostgreSQL."""
+    postgres_operator = None
+
+    def as_postgresql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        params = tuple(lhs_params) + tuple(rhs_params)
+        return '%s %s %s' % (lhs, self.postgres_operator, rhs), params
+
+
 @Field.register_lookup
 class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = 'exact'
@@ -355,10 +366,12 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             )
 
         if self.rhs_is_direct_value():
+            # Remove None from the list as NULL is never equal to anything.
             try:
                 rhs = OrderedSet(self.rhs)
+                rhs.discard(None)
             except TypeError:  # Unhashable items in self.rhs
-                rhs = self.rhs
+                rhs = [r for r in self.rhs if r is not None]
 
             if not rhs:
                 raise EmptyResultSet

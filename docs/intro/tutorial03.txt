@@ -50,7 +50,7 @@ Django will choose a view by examining the URL that's requested (to be precise,
 the part of the URL after the domain name).
 
 Now in your time on the web you may have come across such beauties as
-"ME2/Sites/dirmod.asp?sid=&type=gen&mod=Core+Pages&gid=A6CD4967199A42D9B65B1B".
+``ME2/Sites/dirmod.htm?sid=&type=gen&mod=Core+Pages&gid=A6CD4967199A42D9B65B1B``.
 You will be pleased to know that Django allows us much more elegant
 *URL patterns* than that.
 

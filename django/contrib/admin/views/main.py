@@ -59,6 +59,8 @@ class ChangeList:
         self.list_display_links = list_display_links
         self.list_filter = list_filter
         self.has_filters = None
+        self.has_active_filters = None
+        self.clear_all_filters_qs = None
         self.date_hierarchy = date_hierarchy
         self.search_fields = search_fields
         self.list_select_related = list_select_related
@@ -121,6 +123,7 @@ class ChangeList:
     def get_filters(self, request):
         lookup_params = self.get_filters_params()
         use_distinct = False
+        has_active_filters = False
 
         for key, value in lookup_params.items():
             if not self.model_admin.lookup_allowed(key, value):
@@ -128,6 +131,7 @@ class ChangeList:
 
         filter_specs = []
         for list_filter in self.list_filter:
+            lookup_params_count = len(lookup_params)
             if callable(list_filter):
                 # This is simply a custom list filter class.
                 spec = list_filter(request, lookup_params, self.model, self.model_admin)
@@ -145,7 +149,6 @@ class ChangeList:
                     field_path = field
                     field = get_fields_from_path(self.model, field_path)[-1]
 
-                lookup_params_count = len(lookup_params)
                 spec = field_list_filter_class(
                     field, request, lookup_params,
                     self.model, self.model_admin, field_path=field_path,
@@ -157,6 +160,8 @@ class ChangeList:
                     use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, field_path)
             if spec and spec.has_output():
                 filter_specs.append(spec)
+                if lookup_params_count > len(lookup_params):
+                    has_active_filters = True
 
         if self.date_hierarchy:
             # Create bounded lookup parameters so that the query is more
@@ -199,7 +204,10 @@ class ChangeList:
             for key, value in lookup_params.items():
                 lookup_params[key] = prepare_lookup_value(key, value)
                 use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, key)
-            return filter_specs, bool(filter_specs), lookup_params, use_distinct
+            return (
+                filter_specs, bool(filter_specs), lookup_params, use_distinct,
+                has_active_filters,
+            )
         except FieldDoesNotExist as e:
             raise IncorrectLookupParameters(e) from e
 
@@ -433,9 +441,13 @@ class ChangeList:
 
     def get_queryset(self, request):
         # First, we collect all the declared list filters.
-        (self.filter_specs, self.has_filters, remaining_lookup_params,
-         filters_use_distinct) = self.get_filters(request)
-
+        (
+            self.filter_specs,
+            self.has_filters,
+            remaining_lookup_params,
+            filters_use_distinct,
+            self.has_active_filters,
+        ) = self.get_filters(request)
         # Then, we let every list filter modify the queryset to its liking.
         qs = self.root_queryset
         for filter_spec in self.filter_specs:
@@ -470,6 +482,11 @@ class ChangeList:
         # Apply search results
         qs, search_use_distinct = self.model_admin.get_search_results(request, qs, self.query)
 
+        # Set query string for clearing all filters.
+        self.clear_all_filters_qs = self.get_query_string(
+            new_params=remaining_lookup_params,
+            remove=self.get_filters_params(),
+        )
         # Remove duplicates from results, if necessary
         if filters_use_distinct | search_use_distinct:
             return qs.distinct()

@@ -18,7 +18,9 @@ whose name doesn't begin with an underscore. For example::
         __init__.py
         models.py
         management/
+            __init__.py
             commands/
+                __init__.py
                 _private.py
                 closepoll.py
         tests.py
@@ -215,8 +217,15 @@ All attributes can be set in your derived class and can be used in
 
 .. attribute:: BaseCommand.requires_system_checks
 
-    A boolean; if ``True``, the entire Django project will be checked for
-    potential problems prior to executing the command. Default value is ``True``.
+    A list or tuple of tags, e.g. ``[Tags.staticfiles, Tags.models]``. System
+    checks registered in the chosen tags will be checked for errors prior to
+    executing the command. The value ``'__all__'`` can be used to specify
+    that all system checks should be performed. Default value is ``'__all__'``.
+
+    .. versionchanged:: 3.2
+
+        In older versions, the ``requires_system_checks`` attribute expects a
+        boolean value instead of a list or tuple of tags.
 
 .. attribute:: BaseCommand.style
 
@@ -340,7 +349,7 @@ Rather than implementing :meth:`~BaseCommand.handle`, subclasses must implement
 Command exceptions
 ------------------
 
-.. exception:: CommandError
+.. exception:: CommandError(returncode=1)
 
 Exception class indicating a problem while executing a management command.
 
@@ -348,8 +357,14 @@ If this exception is raised during the execution of a management command from a
 command line console, it will be caught and turned into a nicely-printed error
 message to the appropriate output stream (i.e., stderr); as a result, raising
 this exception (with a sensible description of the error) is the preferred way
-to indicate that something has gone wrong in the execution of a command.
+to indicate that something has gone wrong in the execution of a command. It
+accepts the optional ``returncode`` argument to customize the exit status for
+the management command to exit with, using :func:`sys.exit`.
 
 If a management command is called from code through
 :func:`~django.core.management.call_command`, it's up to you to catch the
 exception when needed.
+
+.. versionchanged:: 3.1
+
+    The ``returncode`` argument was added.

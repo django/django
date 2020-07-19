@@ -1,7 +1,8 @@
 import pickle
 
+from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import FileField, ValidationError
+from django.forms import FileField
 from django.test import SimpleTestCase
 
 

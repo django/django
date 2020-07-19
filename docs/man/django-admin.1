@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "DJANGO-ADMIN" "1" "September 10, 2019" "3.0" "Django"
+.TH "DJANGO-ADMIN" "1" "May 12, 2020" "3.1" "Django"
 .SH NAME
 django-admin \- Utility script for the Django Web framework
 .
@@ -40,14 +40,8 @@ does the same thing as \fBdjango\-admin\fP but also sets the
 project\(aqs \fBsettings.py\fP file.
 .sp
 The \fBdjango\-admin\fP script should be on your system path if you installed
-Django via its \fBsetup.py\fP utility. If it\(aqs not on your path, you can find it
-in \fBsite\-packages/django/bin\fP within your Python installation. Consider
-symlinking it from some place on your path, such as \fB/usr/local/bin\fP\&.
-.sp
-For Windows users, who do not have symlinking functionality available, you can
-copy \fBdjango\-admin.exe\fP to a location on your existing path or edit the
-\fBPATH\fP settings (under \fBSettings \- Control Panel \- System \- Advanced \-
-Environment...\fP) to point to its installed location.
+Django via \fBpip\fP\&. If it\(aqs not in your path, ensure you have your virtual
+environment activated.
 .sp
 Generally, when working on a single Django project, it\(aqs easier to use
 \fBmanage.py\fP than \fBdjango\-admin\fP\&. If you need to switch between multiple
@@ -162,6 +156,26 @@ django\-admin check \-\-tag models \-\-tag compatibility
 .fi
 .UNINDENT
 .UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-database DATABASE
+.UNINDENT
+.sp
+
+.sp
+Specifies the database to run checks requiring database access:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+django\-admin check \-\-database default \-\-database other
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+By default, these checks will not be run.
 .INDENT 0.0
 .TP
 .B \-\-list\-tags
@@ -321,6 +335,56 @@ program manually.
 .UNINDENT
 .sp
 Specifies the database onto which to open a shell. Defaults to \fBdefault\fP\&.
+.INDENT 0.0
+.TP
+.B \-\- ARGUMENTS
+.UNINDENT
+.sp
+
+.sp
+Any arguments following a \fB\-\-\fP divider will be passed on to the underlying
+command\-line client. For example, with PostgreSQL you can use the \fBpsql\fP
+command\(aqs \fB\-c\fP flag to execute a raw SQL query directly:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ django\-admin dbshell \-\- \-c \(aqselect current_user\(aq
+ current_user
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+ postgres
+(1 row)
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+On MySQL/MariaDB, you can do this with the \fBmysql\fP command\(aqs \fB\-e\fP flag:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ django\-admin dbshell \-\- \-e "select user()"
++\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-+
+| user()               |
++\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-+
+| djangonaut@localhost |
++\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-+
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Be aware that not all options set in the \fBOPTIONS\fP part of your
+database configuration in \fBDATABASES\fP are passed to the
+command\-line client, e.g. \fB\(aqisolation_level\(aq\fP\&.
+.UNINDENT
+.UNINDENT
 .SS \fBdiffsettings\fP
 .INDENT 0.0
 .TP
@@ -558,9 +622,6 @@ Models are created for materialized views if
 Models are created for partition tables if
 \fI\%\-\-include\-partitions\fP is used.
 .UNINDENT
-.sp
-Support for foreign tables and materialized views was added.
-
 .INDENT 0.0
 .TP
 .B \-\-database DATABASE
@@ -571,8 +632,6 @@ Specifies the database to introspect. Defaults to \fBdefault\fP\&.
 .TP
 .B \-\-include\-partitions
 .UNINDENT
-.sp
-
 .sp
 If this option is provided, models are also created for partitions.
 .sp
@@ -1082,8 +1141,6 @@ name must be a valid Python \fI\%identifier\fP\&.
 .B \-\-no\-header
 .UNINDENT
 .sp
-
-.sp
 Generate migration files without Django version and timestamp header.
 .INDENT 0.0
 .TP
@@ -1114,8 +1171,19 @@ to dependencies.
 \fB<app_label> <migrationname>\fP: Brings the database schema to a state where
 the named migration is applied, but no later migrations in the same app are
 applied. This may involve unapplying migrations if you have previously
-migrated past the named migration. Use the name \fBzero\fP to unapply all
+migrated past the named migration. You can use a prefix of the migration
+name, e.g. \fB0001\fP, as long as it\(aqs unique for the given app name. Use the
+name \fBzero\fP to migrate all the way back i.e. to revert all applied
 migrations for an app.
+.UNINDENT
+.sp
+\fBWARNING:\fP
+.INDENT 0.0
+.INDENT 3.5
+When unapplying migrations, all dependent migrations will also be
+unapplied, regardless of \fB<app_label>\fP\&. You can use \fB\-\-plan\fP to check
+which migrations will be unapplied.
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1154,8 +1222,6 @@ schema matches what is recorded in your initial migration.
 .B \-\-plan
 .UNINDENT
 .sp
-
-.sp
 Shows the migration operations that will be performed for the given \fBmigrate\fP
 command.
 .INDENT 0.0
@@ -1173,6 +1239,15 @@ with hundreds of models.
 .sp
 Suppresses all user prompts. An example prompt is asking about removing stale
 content types.
+.INDENT 0.0
+.TP
+.B \-\-check
+.UNINDENT
+.sp
+
+.sp
+Makes \fBmigrate\fP exit with a non\-zero status when unapplied migrations are
+detected.
 .SS \fBrunserver\fP
 .INDENT 0.0
 .TP
@@ -1225,9 +1300,6 @@ The default timeout of \fBWatchman\fP client is 5 seconds. You can change it
 by setting the \fBDJANGO_WATCHMAN_TIMEOUT\fP environment variable.
 .UNINDENT
 .UNINDENT
-.sp
-Watchman support replaced support for \fIpyinotify\fP\&.
-
 .sp
 When you start the server, and each time you change Python code while the
 server is running, the system check framework will check your entire Django
@@ -1659,8 +1731,6 @@ first and last migration, with \fB_squashed_\fP in between.
 .B \-\-no\-header
 .UNINDENT
 .sp
-
-.sp
 Generate squashed migration file without Django version and timestamp header.
 .SS \fBstartapp\fP
 .INDENT 0.0
@@ -1901,8 +1971,9 @@ Preserves the test database between test runs. This has the advantage of
 skipping both the create and destroy actions which can greatly decrease the
 time to run tests, especially those in a large test suite. If the test database
 does not exist, it will be created on the first run and then preserved for each
-subsequent run. Any unapplied migrations will also be applied to the test
-database before running the test suite.
+subsequent run. Unless the \fBMIGRATE\fP test setting is
+\fBFalse\fP, any unapplied migrations will also be applied to the test database
+before running the test suite.
 .INDENT 0.0
 .TP
 .B \-\-reverse, \-r
@@ -1945,6 +2016,15 @@ will reduce the number of processes accordingly.
 Each process gets its own database. You must ensure that different test cases
 don\(aqt access the same resources. For instance, test cases that touch the
 filesystem should create a temporary directory for their own use.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+If you have test classes that cannot be run in parallel, you can use
+\fBSerializeMixin\fP to run them sequentially. See Enforce running test
+classes sequentially\&.
+.UNINDENT
+.UNINDENT
 .sp
 This option requires the third\-party \fBtblib\fP package to display tracebacks
 correctly:
@@ -2018,6 +2098,15 @@ This feature is only available for Python 3.7 and later.
 .sp
 Spawns a \fBpdb\fP debugger at each test error or failure. If you have it
 installed, \fBipdb\fP is used instead.
+.INDENT 0.0
+.TP
+.B \-\-buffer, \-b
+.UNINDENT
+.sp
+
+.sp
+Discards output (\fBstdout\fP and \fBstderr\fP) for passing tests, in the same way
+as \fI\%unittest\(aqs \-\-buffer option\fP\&.
 .SS \fBtestserver\fP
 .INDENT 0.0
 .TP
@@ -2235,6 +2324,15 @@ the deletion.
 .UNINDENT
 .sp
 Specifies the database to use. Defaults to \fBdefault\fP\&.
+.INDENT 0.0
+.TP
+.B \-\-include\-stale\-apps
+.UNINDENT
+.sp
+
+.sp
+Deletes stale content types including ones from previously installed apps that
+have been removed from \fBINSTALLED_APPS\fP\&. Defaults to \fBFalse\fP\&.
 .SS \fBdjango.contrib.gis\fP
 .SS \fBogrinspect\fP
 .sp
@@ -2393,8 +2491,6 @@ django\-admin runserver \-\-no\-color
 .TP
 .B \-\-force\-color
 .UNINDENT
-.sp
-
 .sp
 Forces colorization of the command output if it would otherwise be disabled
 as discussed in \fI\%Syntax coloring\fP\&. For example, you may want to pipe

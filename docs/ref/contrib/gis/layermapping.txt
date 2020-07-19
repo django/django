@@ -114,7 +114,7 @@ Keyword Arguments
 
 ``source_srs``         Use this to specify the source SRS manually (for
                        example, some shapefiles don't come with a ``'.prj'``
-                       file).  An integer SRID, WKT or PROJ.4 strings, and
+                       file).  An integer SRID, WKT or PROJ strings, and
                        :class:`django.contrib.gis.gdal.SpatialReference`
                        objects are accepted.
 

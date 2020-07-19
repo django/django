@@ -75,9 +75,9 @@ location (:setting:`MEDIA_ROOT` if you are using the default
 
 .. note::
 
-    Whilst :class:`~django.db.models.ImageField` non-image data attributes,
-    such as ``height``, ``width``, and ``size`` are available on the instance,
-    the underlying image data cannot be used without reopening the image. For
+    While :class:`~django.db.models.ImageField` non-image data attributes, such
+    as ``height``, ``width``, and ``size`` are available on the instance, the
+    underlying image data cannot be used without reopening the image. For
     example::
 
         >>> from PIL import Image
@@ -202,3 +202,31 @@ For example, the following code will store uploaded files under
 :doc:`Custom storage systems </howto/custom-file-storage>` work the same way:
 you can pass them in as the ``storage`` argument to a
 :class:`~django.db.models.FileField`.
+
+Using a callable
+----------------
+
+.. versionadded:: 3.1
+
+You can use a callable as the :attr:`~django.db.models.FileField.storage`
+parameter for :class:`~django.db.models.FileField` or
+:class:`~django.db.models.ImageField`. This allows you to modify the used
+storage at runtime, selecting different storages for different environments,
+for example.
+
+Your callable will be evaluated when your models classes are loaded, and must
+return an instance of :class:`~django.core.files.storage.Storage`.
+
+For example::
+
+    from django.conf import settings
+    from django.db import models
+    from .storages import MyLocalStorage, MyRemoteStorage
+
+
+    def select_storage():
+        return MyLocalStorage() if settings.DEBUG else MyRemoteStorage()
+
+
+    class MyModel(models.Model):
+        my_file = models.FileField(storage=select_storage)

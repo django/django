@@ -12,18 +12,17 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_real_datatype = True
     has_native_uuid_field = True
     has_native_duration_field = True
+    has_native_json_field = True
     can_defer_constraint_checks = True
     has_select_for_update = True
     has_select_for_update_nowait = True
     has_select_for_update_of = True
     has_select_for_update_skip_locked = True
+    has_select_for_no_key_update = True
     can_release_savepoints = True
     supports_tablespaces = True
     supports_transactions = True
-    can_introspect_autofield = True
-    can_introspect_ip_address_field = True
     can_introspect_materialized_views = True
-    can_introspect_small_integer_field = True
     can_distinct_on_fields = True
     can_rollback_ddl = True
     supports_combined_alters = True
@@ -56,10 +55,17 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_aggregate_filter_clause = True
     supported_explain_formats = {'JSON', 'TEXT', 'XML', 'YAML'}
     validates_explain_options = False  # A query will error on invalid options.
+    supports_deferrable_unique_constraints = True
+    has_json_operators = True
 
     @cached_property
-    def is_postgresql_9_6(self):
-        return self.connection.pg_version >= 90600
+    def introspected_field_types(self):
+        return {
+            **super().introspected_field_types,
+            'PositiveBigIntegerField': 'BigIntegerField',
+            'PositiveIntegerField': 'IntegerField',
+            'PositiveSmallIntegerField': 'SmallIntegerField',
+        }
 
     @cached_property
     def is_postgresql_10(self):
@@ -73,8 +79,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def is_postgresql_12(self):
         return self.connection.pg_version >= 120000
 
-    has_bloom_index = property(operator.attrgetter('is_postgresql_9_6'))
     has_brin_autosummarize = property(operator.attrgetter('is_postgresql_10'))
-    has_phraseto_tsquery = property(operator.attrgetter('is_postgresql_9_6'))
     has_websearch_to_tsquery = property(operator.attrgetter('is_postgresql_11'))
     supports_table_partitions = property(operator.attrgetter('is_postgresql_10'))
+    supports_covering_indexes = property(operator.attrgetter('is_postgresql_11'))
+    supports_covering_gist_indexes = property(operator.attrgetter('is_postgresql_12'))

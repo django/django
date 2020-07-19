@@ -8,7 +8,8 @@ from unittest import mock
 from django.apps import apps
 from django.core.management import CommandError, call_command
 from django.db import (
-    ConnectionHandler, DatabaseError, connection, connections, models,
+    ConnectionHandler, DatabaseError, OperationalError, connection,
+    connections, models,
 )
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.utils import truncate_name
@@ -160,37 +161,37 @@ class MigrateTests(MigrationTestBase):
             "migrations.0001_initial... faked",
             out.getvalue().lower()
         )
-        # Run migrations all the way
-        call_command("migrate", verbosity=0)
-        call_command("migrate", verbosity=0, database="other")
-        # Make sure the right tables exist
-        self.assertTableExists("migrations_author")
-        self.assertTableNotExists("migrations_tribble")
-        self.assertTableExists("migrations_book")
-        self.assertTableNotExists("migrations_author", using="other")
-        self.assertTableNotExists("migrations_tribble", using="other")
-        self.assertTableNotExists("migrations_book", using="other")
-        # Fake a roll-back
-        call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
-        call_command("migrate", "migrations", "zero", fake=True, verbosity=0, database="other")
-        # Make sure the tables still exist
-        self.assertTableExists("migrations_author")
-        self.assertTableNotExists("migrations_tribble")
-        self.assertTableExists("migrations_book")
-        # Try to run initial migration
-        with self.assertRaises(DatabaseError):
-            call_command("migrate", "migrations", verbosity=0)
-        # Run initial migration with an explicit --fake-initial
-        with self.assertRaises(DatabaseError):
-            # Fails because "migrations_tribble" does not exist but needs to in
-            # order to make --fake-initial work.
-            call_command("migrate", "migrations", fake_initial=True, verbosity=0)
-        # Fake an apply
-        call_command("migrate", "migrations", fake=True, verbosity=0)
-        call_command("migrate", "migrations", fake=True, verbosity=0, database="other")
-        # Unmigrate everything
-        call_command("migrate", "migrations", "zero", verbosity=0)
-        call_command("migrate", "migrations", "zero", verbosity=0, database="other")
+        try:
+            # Run migrations all the way.
+            call_command('migrate', verbosity=0)
+            call_command('migrate', verbosity=0, database="other")
+            self.assertTableExists('migrations_author')
+            self.assertTableNotExists('migrations_tribble')
+            self.assertTableExists('migrations_book')
+            self.assertTableNotExists('migrations_author', using='other')
+            self.assertTableNotExists('migrations_tribble', using='other')
+            self.assertTableNotExists('migrations_book', using='other')
+            # Fake a roll-back.
+            call_command('migrate', 'migrations', 'zero', fake=True, verbosity=0)
+            call_command('migrate', 'migrations', 'zero', fake=True, verbosity=0, database='other')
+            self.assertTableExists('migrations_author')
+            self.assertTableNotExists('migrations_tribble')
+            self.assertTableExists('migrations_book')
+            # Run initial migration.
+            with self.assertRaises(DatabaseError):
+                call_command('migrate', 'migrations', verbosity=0)
+            # Run initial migration with an explicit --fake-initial.
+            with self.assertRaises(DatabaseError):
+                # Fails because "migrations_tribble" does not exist but needs
+                # to in order to make --fake-initial work.
+                call_command('migrate', 'migrations', fake_initial=True, verbosity=0)
+            # Fake an apply.
+            call_command('migrate', 'migrations', fake=True, verbosity=0)
+            call_command('migrate', 'migrations', fake=True, verbosity=0, database='other')
+        finally:
+            # Unmigrate everything.
+            call_command('migrate', 'migrations', 'zero', verbosity=0)
+            call_command('migrate', 'migrations', 'zero', verbosity=0, database='other')
         # Make sure it's all gone
         for db in self.databases:
             self.assertTableNotExists("migrations_author", using=db)
@@ -246,8 +247,47 @@ class MigrateTests(MigrationTestBase):
         """
         migrate exits if it detects a conflict.
         """
-        with self.assertRaisesMessage(CommandError, "Conflicting migrations detected"):
+        msg = (
+            "Conflicting migrations detected; multiple leaf nodes in the "
+            "migration graph: (0002_conflicting_second, 0002_second in "
+            "migrations).\n"
+            "To fix them run 'python manage.py makemigrations --merge'"
+        )
+        with self.assertRaisesMessage(CommandError, msg):
             call_command("migrate", "migrations")
+
+    @override_settings(MIGRATION_MODULES={
+        'migrations': 'migrations.test_migrations',
+    })
+    def test_migrate_check(self):
+        with self.assertRaises(SystemExit):
+            call_command('migrate', 'migrations', '0001', check_unapplied=True)
+        self.assertTableNotExists('migrations_author')
+        self.assertTableNotExists('migrations_tribble')
+        self.assertTableNotExists('migrations_book')
+
+    @override_settings(MIGRATION_MODULES={
+        'migrations': 'migrations.test_migrations_plan',
+    })
+    def test_migrate_check_plan(self):
+        out = io.StringIO()
+        with self.assertRaises(SystemExit):
+            call_command(
+                'migrate',
+                'migrations',
+                '0001',
+                check_unapplied=True,
+                plan=True,
+                stdout=out,
+                no_color=True,
+            )
+        self.assertEqual(
+            'Planned operations:\n'
+            'migrations.0001_initial\n'
+            '    Create model Salamander\n'
+            '    Raw Python operation -> Grow salamander tail.\n',
+            out.getvalue(),
+        )
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_showmigrations_list(self):
@@ -746,7 +786,7 @@ class MigrateTests(MigrationTestBase):
         "B" was not included in the ProjectState that is used to detect
         soft-applied migrations (#22823).
         """
-        call_command("migrate", "migrated_unapplied_app", stdout=io.StringIO())
+        call_command('migrate', 'migrated_unapplied_app', verbosity=0)
 
         # unmigrated_app.SillyModel has a foreign key to 'migrations.Tribble',
         # but that model is only defined in a migration, so the global app
@@ -855,6 +895,40 @@ class MigrateTests(MigrationTestBase):
             call_command("migrate")
         applied_migrations = recorder.applied_migrations()
         self.assertNotIn(("migrations", "0001_initial"), applied_migrations)
+
+    @override_settings(INSTALLED_APPS=[
+        'migrations.migrations_test_apps.migrated_unapplied_app',
+        'migrations.migrations_test_apps.migrated_app',
+    ])
+    def test_migrate_not_reflected_changes(self):
+        class NewModel1(models.Model):
+            class Meta():
+                app_label = 'migrated_app'
+
+        class NewModel2(models.Model):
+            class Meta():
+                app_label = 'migrated_unapplied_app'
+
+        out = io.StringIO()
+        try:
+            call_command('migrate', verbosity=0)
+            call_command('migrate', stdout=out, no_color=True)
+            self.assertEqual(
+                "operations to perform:\n"
+                "  apply all migrations: migrated_app, migrated_unapplied_app\n"
+                "running migrations:\n"
+                "  no migrations to apply.\n"
+                "  your models in app(s): 'migrated_app', "
+                "'migrated_unapplied_app' have changes that are not yet "
+                "reflected in a migration, and so won't be applied.\n"
+                "  run 'manage.py makemigrations' to make new migrations, and "
+                "then re-run 'manage.py migrate' to apply them.\n",
+                out.getvalue().lower(),
+            )
+        finally:
+            # Unmigrate everything.
+            call_command('migrate', 'migrated_app', 'zero', verbosity=0)
+            call_command('migrate', 'migrated_unapplied_app', 'zero', verbosity=0)
 
 
 class MakeMigrationsTests(MigrationTestBase):
@@ -998,16 +1072,13 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module(module="migrations.test_migrations_conflict"):
             with self.assertRaises(CommandError) as context:
                 call_command("makemigrations")
-        exception_message = str(context.exception)
-        self.assertIn(
-            'Conflicting migrations detected; multiple leaf nodes '
-            'in the migration graph:',
-            exception_message
+        self.assertEqual(
+            str(context.exception),
+            "Conflicting migrations detected; multiple leaf nodes in the "
+            "migration graph: (0002_conflicting_second, 0002_second in "
+            "migrations).\n"
+            "To fix them run 'python manage.py makemigrations --merge'"
         )
-        self.assertIn('0002_second', exception_message)
-        self.assertIn('0002_conflicting_second', exception_message)
-        self.assertIn('in migrations', exception_message)
-        self.assertIn("To fix them run 'python manage.py makemigrations --merge'", exception_message)
 
     def test_makemigrations_merge_no_conflict(self):
         """
@@ -1160,10 +1231,9 @@ class MakeMigrationsTests(MigrationTestBase):
             class Meta:
                 app_label = "migrations"
 
-        out = io.StringIO()
         with self.assertRaises(SystemExit):
             with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
-                call_command("makemigrations", "migrations", interactive=False, stdout=out)
+                call_command("makemigrations", "migrations", interactive=False)
 
     def test_makemigrations_non_interactive_not_null_alteration(self):
         """
@@ -1421,20 +1491,16 @@ class MakeMigrationsTests(MigrationTestBase):
                     "makemigrations", "conflicting_app_with_dependencies",
                     merge=True, interactive=True, stdout=out
                 )
-            val = out.getvalue().lower()
-            self.assertIn('merging conflicting_app_with_dependencies\n', val)
-            self.assertIn(
+            self.assertEqual(
+                out.getvalue().lower(),
+                'merging conflicting_app_with_dependencies\n'
                 '  branch 0002_conflicting_second\n'
-                '    - create model something\n',
-                val
-            )
-            self.assertIn(
+                '    - create model something\n'
                 '  branch 0002_second\n'
                 '    - delete model tribble\n'
                 '    - remove field silly_field from author\n'
                 '    - add field rating to author\n'
-                '    - create model book\n',
-                val
+                '    - create model book\n'
             )
 
     def test_makemigrations_with_custom_name(self):
@@ -1523,6 +1589,20 @@ class MakeMigrationsTests(MigrationTestBase):
             with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
                 call_command("makemigrations")
 
+    def test_makemigrations_inconsistent_history_db_failure(self):
+        msg = (
+            "Got an error checking a consistent migration history performed "
+            "for database connection 'default': could not connect to server"
+        )
+        with mock.patch(
+            'django.db.migrations.loader.MigrationLoader.check_consistent_history',
+            side_effect=OperationalError('could not connect to server'),
+        ):
+            with self.temporary_migration_module():
+                with self.assertWarns(RuntimeWarning) as cm:
+                    call_command('makemigrations', verbosity=0)
+                self.assertEqual(str(cm.warning), msg)
+
     @mock.patch('builtins.input', return_value='1')
     @mock.patch('django.db.migrations.questioner.sys.stdin', mock.MagicMock(encoding=sys.getdefaultencoding()))
     def test_makemigrations_auto_now_add_interactive(self, *args):
@@ -1557,11 +1637,25 @@ class SquashMigrationsTests(MigrationTestBase):
         """
         squashmigrations squashes migrations.
         """
+        out = io.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations") as migration_dir:
-            call_command("squashmigrations", "migrations", "0002", interactive=False, verbosity=0)
+            call_command('squashmigrations', 'migrations', '0002', interactive=False, stdout=out, no_color=True)
 
             squashed_migration_file = os.path.join(migration_dir, "0001_squashed_0002_second.py")
             self.assertTrue(os.path.exists(squashed_migration_file))
+        self.assertEqual(
+            out.getvalue(),
+            'Will squash the following migrations:\n'
+            ' - 0001_initial\n'
+            ' - 0002_second\n'
+            'Optimizing...\n'
+            '  Optimized from 8 operations to 2 operations.\n'
+            'Created new squashed migration %s\n'
+            '  You should commit this migration but leave the old ones in place;\n'
+            '  the new migration will be used for new installs. Once you are sure\n'
+            '  all instances of the codebase have applied the migrations you squashed,\n'
+            '  you can delete them.\n' % squashed_migration_file
+        )
 
     def test_squashmigrations_initial_attribute(self):
         with self.temporary_migration_module(module="migrations.test_migrations") as migration_dir:

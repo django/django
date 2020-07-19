@@ -1194,7 +1194,7 @@ implementation details see :ref:`using-the-views`.
       :file:`registration/password_change_form.html` if not supplied.
 
     * ``success_url``: The URL to redirect to after a successful password
-      change.
+      change. Defaults to ``'password_change_done'``.
 
     * ``form_class``: A custom "change password" form which must accept a
       ``user`` keyword argument. The form is responsible for actually changing
@@ -1238,6 +1238,16 @@ implementation details see :ref:`using-the-views`.
     :class:`~django.contrib.auth.forms.PasswordResetForm` and use the
     ``form_class`` attribute.
 
+    .. note::
+
+        Be aware that sending an email costs extra time, hence you may be
+        vulnerable to an email address enumeration timing attack due to a
+        difference between the duration of a reset request for an existing
+        email address and the duration of a reset request for a nonexistent
+        email address. To reduce the overhead, you can use a 3rd party package
+        that allows to send emails asynchronously, e.g. `django-mailer
+        <https://pypi.org/project/django-mailer/>`_.
+
     Users flagged with an unusable password (see
     :meth:`~django.contrib.auth.models.User.set_unusable_password()` aren't
     allowed to request a password reset to prevent misuse when using an
@@ -1268,7 +1278,7 @@ implementation details see :ref:`using-the-views`.
       ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
 
     * ``success_url``: The URL to redirect to after a successful password reset
-      request.
+      request. Defaults to ``'password_reset_done'``.
 
     * ``from_email``: A valid email address. By default Django uses
       the :setting:`DEFAULT_FROM_EMAIL`.
@@ -1277,8 +1287,8 @@ implementation details see :ref:`using-the-views`.
       default context data passed to the template.
 
     * ``html_email_template_name``: The full name of a template to use
-      for generating a ``text/html`` multipart email with the password reset
-      link. By default, HTML email is not sent.
+      for generating a :mimetype:`text/html` multipart email with the password
+      reset link. By default, HTML email is not sent.
 
     * ``extra_email_context``: A dictionary of context data that will be
       available in the email template. It can be used to override default
@@ -1388,10 +1398,6 @@ implementation details see :ref:`using-the-views`.
     * ``reset_url_token``: Token parameter displayed as a component of password
       reset URLs. Defaults to ``'set-password'``.
 
-      .. versionchanged:: 3.0
-
-        The ``reset_url_token`` class attribute was added.
-
     **Template context:**
 
     * ``form``: The form (see ``form_class`` above) for setting the new user's
@@ -1498,12 +1504,12 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
             class PickyAuthenticationForm(AuthenticationForm):
                 def confirm_login_allowed(self, user):
                     if not user.is_active:
-                        raise forms.ValidationError(
+                        raise ValidationError(
                             _("This account is inactive."),
                             code='inactive',
                         )
                     if user.username.startswith('b'):
-                        raise forms.ValidationError(
+                        raise ValidationError(
                             _("Sorry, accounts starting with 'b' aren't welcome here."),
                             code='no_b_users',
                         )

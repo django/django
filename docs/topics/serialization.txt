@@ -135,8 +135,8 @@ something like::
             deserialized_object.save()
 
 In other words, the usual use is to examine the deserialized objects to make
-sure that they are "appropriate" for saving before doing so.  Of course, if you
-trust your data source you can instead save the object directly and move on.
+sure that they are "appropriate" for saving before doing so. If you trust your
+data source you can instead save the object directly and move on.
 
 The Django object itself can be inspected as ``deserialized_object.object``.
 If fields in the serialized data do not exist on a model, a
@@ -160,11 +160,14 @@ Identifier  Information
 
 ``json``    Serializes to and from JSON_.
 
+``jsonl``   Serializes to and from JSONL_.
+
 ``yaml``    Serializes to YAML (YAML Ain't a Markup Language). This
             serializer is only available if PyYAML_ is installed.
 ==========  ==============================================================
 
 .. _json: https://json.org/
+.. _jsonl: http://jsonlines.org/
 .. _PyYAML: https://pyyaml.org/
 
 XML
@@ -274,6 +277,11 @@ function::
 Also note that GeoDjango provides a :doc:`customized GeoJSON serializer
 </ref/contrib/gis/serializers>`.
 
+.. versionchanged:: 3.1
+
+    All data is now dumped with Unicode. If you need the previous behavior,
+    pass ``ensure_ascii=True`` to the ``serializers.serialize()`` function.
+
 ``DjangoJSONEncoder``
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -302,6 +310,24 @@ The JSON serializer uses ``DjangoJSONEncoder`` for encoding. A subclass of
 
 .. _ecma-262: https://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15
 
+.. _serialization-formats-jsonl:
+
+JSONL
+-----
+
+.. versionadded:: 3.2
+
+*JSONL* stands for *JSON Lines*. With this format, objects are separated by new
+lines, and each line contains a valid JSON object. JSONL serialized data looks
+like this::
+
+    {"pk": "4b678b301dfd8a4e0dad910de3ae245b", "model": "sessions.session", "fields": {...}}
+    {"pk": "88bea72c02274f3c9bf1cb2bb8cee4fc", "model": "sessions.session", "fields": {...}}
+    {"pk": "9cf0e26691b64147a67e2a9f06ad7a53", "model": "sessions.session", "fields": {...}}
+
+JSONL can be useful for populating large databases, since the data can be
+processed line by line, rather than being loaded into memory all at once.
+
 YAML
 ----
 
@@ -314,6 +340,11 @@ again a mapping with the key being name of the field and the value the value::
         pk: 4b678b301dfd8a4e0dad910de3ae245b
 
 Referential fields are again represented by the PK or sequence of PKs.
+
+.. versionchanged:: 3.1
+
+    All data is now dumped with Unicode. If you need the previous behavior,
+    pass ``allow_unicode=False`` to the ``serializers.serialize()`` function.
 
 .. _topics-serialization-natural-keys:
 

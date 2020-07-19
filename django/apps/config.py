@@ -75,7 +75,7 @@ class AppConfig:
             raise ImproperlyConfigured(
                 "The app module %r has no filesystem location, "
                 "you must configure this app with an AppConfig subclass "
-                "with a 'path' class attribute." % (module,))
+                "with a 'path' class attribute." % module)
         return paths[0]
 
     @classmethod

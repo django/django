@@ -1,9 +1,9 @@
 import datetime
 import pickle
 
+import django
 from django.db import models
 from django.test import TestCase
-from django.utils.version import get_version
 
 from .models import Container, Event, Group, Happening, M2MModel, MyEvent
 
@@ -195,6 +195,18 @@ class PickleabilityTestCase(TestCase):
         with self.assertNumQueries(0):
             self.assert_pickles(groups)
 
+    def test_pickle_exists_kwargs_queryset_not_evaluated(self):
+        group = Group.objects.create(name='group')
+        Event.objects.create(title='event', group=group)
+        groups = Group.objects.annotate(
+            has_event=models.Exists(
+                queryset=Event.objects.filter(group_id=models.OuterRef('id')),
+            ),
+        )
+        list(groups)  # evaluate QuerySet.
+        with self.assertNumQueries(0):
+            self.assert_pickles(groups)
+
     def test_pickle_subquery_queryset_not_evaluated(self):
         group = Group.objects.create(name='group')
         Event.objects.create(title='event', group=group)
@@ -234,7 +246,10 @@ class PickleabilityTestCase(TestCase):
         unpickled with a different Django version than the current
         """
         qs = Group.previous_django_version_objects.all()
-        msg = "Pickled queryset instance's Django version 1.0 does not match the current version %s." % get_version()
+        msg = (
+            "Pickled queryset instance's Django version 1.0 does not match "
+            "the current version %s." % django.__version__
+        )
         with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(qs))
 

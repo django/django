@@ -15,7 +15,10 @@ class Redirect(models.Model):
         _('redirect to'),
         max_length=200,
         blank=True,
-        help_text=_('This can be either an absolute path (as above) or a full URL starting with “http://”.'),
+        help_text=_(
+            'This can be either an absolute path (as above) or a full URL '
+            'starting with a scheme such as “https://”.'
+        ),
     )
 
     class Meta:

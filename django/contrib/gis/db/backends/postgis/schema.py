@@ -45,6 +45,7 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
             columns=field_column,
             extra='',
             condition='',
+            include='',
         )
 
     def _alter_column_type_sql(self, table, old_field, new_field, new_type):

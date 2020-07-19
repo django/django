@@ -127,8 +127,8 @@ Activates some additional checks that are only relevant in a deployment setting.
 You can use this option in your local development environment, but since your
 local development settings module may not have many of your production settings,
 you will probably want to point the ``check`` command at a different settings
-module, either by setting the ``DJANGO_SETTINGS_MODULE`` environment variable,
-or by passing the ``--settings`` option::
+module, either by setting the :envvar:`DJANGO_SETTINGS_MODULE` environment
+variable, or by passing the ``--settings`` option::
 
     django-admin check --deploy --settings=production_settings
 
@@ -160,7 +160,7 @@ are excluded.
 
 .. django-admin-option:: --use-fuzzy, -f
 
-Includes fuzzy translations into compiled files.
+Includes `fuzzy translations`_ into compiled files.
 
 Example usage::
 
@@ -173,9 +173,9 @@ Example usage::
     django-admin compilemessages -x pt_BR
     django-admin compilemessages -x pt_BR -x fr
 
-.. django-admin-option:: --ignore PATTERN, -i PATTERN
+.. _fuzzy translations: https://www.gnu.org/software/gettext/manual/html_node/Fuzzy-Entries.html
 
-.. versionadded:: 3.0
+.. django-admin-option:: --ignore PATTERN, -i PATTERN
 
 Ignores directories matching the given :mod:`glob`-style pattern. Use
 multiple times to ignore more.
@@ -225,6 +225,33 @@ program manually.
 .. django-admin-option:: --database DATABASE
 
 Specifies the database onto which to open a shell. Defaults to ``default``.
+
+.. django-admin-option:: -- ARGUMENTS
+
+.. versionadded:: 3.1
+
+Any arguments following a ``--`` divider will be passed on to the underlying
+command-line client. For example, with PostgreSQL you can use the ``psql``
+command's ``-c`` flag to execute a raw SQL query directly:
+
+.. console::
+
+    $ django-admin dbshell -- -c 'select current_user'
+     current_user
+    --------------
+     postgres
+    (1 row)
+
+On MySQL/MariaDB, you can do this with the ``mysql`` command's ``-e`` flag:
+
+.. console::
+
+    $ django-admin dbshell -- -e "select user()"
+    +----------------------+
+    | user()               |
+    +----------------------+
+    | djangonaut@localhost |
+    +----------------------+
 
 .. note::
 
@@ -574,13 +601,14 @@ The :djadmin:`dumpdata` command can be used to generate input for ``loaddata``.
 Compressed fixtures
 ~~~~~~~~~~~~~~~~~~~
 
-Fixtures may be compressed in ``zip``, ``gz``, or ``bz2`` format. For example::
+Fixtures may be compressed in ``zip``, ``gz``, ``bz2``, ``lzma``, or ``xz``
+format. For example::
 
     django-admin loaddata mydata.json
 
-would look for any of ``mydata.json``, ``mydata.json.zip``,
-``mydata.json.gz``, or ``mydata.json.bz2``. The first file contained within a
-zip-compressed archive is used.
+would look for any of ``mydata.json``, ``mydata.json.zip``, ``mydata.json.gz``,
+``mydata.json.bz2``, ``mydata.json.lzma``, or ``mydata.json.xz``. The first
+file contained within a compressed archive is used.
 
 Note that if two fixtures with the same name but different
 fixture type are discovered (for example, if ``mydata.json`` and
@@ -593,6 +621,10 @@ installation will be aborted, and any data installed in the call to
     The MyISAM storage engine of MySQL doesn't support transactions or
     constraints, so if you use MyISAM, you won't get validation of fixture
     data, or a rollback if multiple transaction files are found.
+
+.. versionchanged:: 3.2
+
+    Support for XZ archives (``.xz``) and LZMA archives (``.lzma``) was added.
 
 Database-specific fixtures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -794,6 +826,12 @@ Generate migration files without Django version and timestamp header.
 Makes ``makemigrations`` exit with a non-zero status when model changes without
 migrations are detected.
 
+.. versionchanged:: 3.2
+
+    Support for calling ``makemigrations`` without an active database
+    connection was added. In that case, check for a consistent migration
+    history is skipped.
+
 ``migrate``
 -----------
 
@@ -865,6 +903,13 @@ with hundreds of models.
 Suppresses all user prompts. An example prompt is asking about removing stale
 content types.
 
+.. django-admin-option:: --check
+
+.. versionadded:: 3.1
+
+Makes ``migrate`` exit with a non-zero status when unapplied migrations are
+detected.
+
 ``runserver``
 -------------
 
@@ -908,12 +953,14 @@ more robust change detection, and a reduction in power usage. Django supports
 
 .. admonition:: Watchman timeout
 
+    .. envvar:: DJANGO_WATCHMAN_TIMEOUT
+
     The default timeout of ``Watchman`` client is 5 seconds. You can change it
-    by setting the ``DJANGO_WATCHMAN_TIMEOUT`` environment variable.
+    by setting the :envvar:`DJANGO_WATCHMAN_TIMEOUT` environment variable.
 
 .. _Watchman: https://facebook.github.io/watchman/
 .. _pywatchman: https://pypi.org/project/pywatchman/
-.. _watchman documentation: https://facebook.github.io/watchman/docs/config.html#ignore_dirs
+.. _watchman documentation: https://facebook.github.io/watchman/docs/config#ignore_dirs
 
 When you start the server, and each time you change Python code while the
 server is running, the system check framework will check your entire Django
@@ -1097,10 +1144,6 @@ under them.
 
 This is the default output format.
 
-.. versionchanged:: 3.0
-
-    Output of the applied datetimes at verbosity 2 and above was added.
-
 .. django-admin-option:: --plan, -p
 
 Shows the migration plan Django will follow to apply migrations. Like
@@ -1241,11 +1284,6 @@ For example, taking advantage of GitHub's feature to expose repositories as
 zip files, you can use a URL like::
 
     django-admin startapp --template=https://github.com/githubuser/django-app-template/archive/master.zip myapp
-
-.. versionchanged:: 3.0
-
-    Support for XZ archives (``.tar.xz``, ``.txz``) and LZMA archives
-    (``.tar.lzma``, ``.tlz``) was added.
 
 .. django-admin-option:: --extension EXTENSIONS, -e EXTENSIONS
 
@@ -1397,13 +1435,15 @@ Enables :ref:`SQL logging <django-db-logger>` for failing tests. If
 
 .. django-admin-option:: --parallel [N]
 
+.. envvar:: DJANGO_TEST_PROCESSES
+
 Runs tests in separate parallel processes. Since modern processors have
 multiple cores, this allows running tests significantly faster.
 
 By default ``--parallel`` runs one process per core according to
 :func:`multiprocessing.cpu_count()`. You can adjust the number of processes
 either by providing it as the option's value, e.g. ``--parallel=4``, or by
-setting the ``DJANGO_TEST_PROCESSES`` environment variable.
+setting the :envvar:`DJANGO_TEST_PROCESSES` environment variable.
 
 Django distributes test cases — :class:`unittest.TestCase` subclasses — to
 subprocesses. If there are fewer test cases than configured processes, Django
@@ -1456,8 +1496,6 @@ May be specified multiple times and combined with :option:`test --tag`.
 
 .. django-admin-option:: -k TEST_NAME_PATTERNS
 
-.. versionadded:: 3.0
-
 Runs test methods and classes matching test name patterns, in the same way as
 :option:`unittest's -k option<unittest.-k>`. Can be specified multiple times.
 
@@ -1466,8 +1504,6 @@ Runs test methods and classes matching test name patterns, in the same way as
     This feature is only available for Python 3.7 and later.
 
 .. django-admin-option:: --pdb
-
-.. versionadded:: 3.0
 
 Spawns a ``pdb`` debugger at each test error or failure. If you have it
 installed, ``ipdb`` is used instead.
@@ -1478,6 +1514,14 @@ installed, ``ipdb`` is used instead.
 
 Discards output (``stdout`` and ``stderr``) for passing tests, in the same way
 as :option:`unittest's --buffer option<unittest.-b>`.
+
+.. django-admin-option:: --no-faulthandler
+
+.. versionadded:: 3.2
+
+Django automatically calls :func:`faulthandler.enable()` when starting the
+tests, which allows it to print a traceback if the interpreter crashes. Pass
+``--no-faulthandler`` to disable this behavior.
 
 ``testserver``
 --------------
@@ -1580,6 +1624,8 @@ Example usage::
 
 .. django-admin:: createsuperuser
 
+.. envvar:: DJANGO_SUPERUSER_PASSWORD
+
 This command is only available if Django's :doc:`authentication system
 </topics/auth/index>` (``django.contrib.auth``) is installed.
 
@@ -1589,9 +1635,9 @@ programmatically generate superuser accounts for your site(s).
 
 When run interactively, this command will prompt for a password for
 the new superuser account. When run non-interactively, you can provide
-a password by setting the ``DJANGO_SUPERUSER_PASSWORD`` environment variable.
-Otherwise, no password will be set, and the superuser account will not be able
-to log in until a password has been manually set for it.
+a password by setting the :envvar:`DJANGO_SUPERUSER_PASSWORD` environment
+variable. Otherwise, no password will be set, and the superuser account will
+not be able to log in until a password has been manually set for it.
 
 In non-interactive mode, the
 :attr:`~django.contrib.auth.models.CustomUser.USERNAME_FIELD` and required
@@ -1600,11 +1646,6 @@ fields (listed in
 ``DJANGO_SUPERUSER_<uppercase_field_name>`` environment variables, unless they
 are overridden by a command line argument. For example, to provide an ``email``
 field, you can use ``DJANGO_SUPERUSER_EMAIL`` environment variable.
-
-.. versionchanged:: 3.0
-
-    Support for using ``DJANGO_SUPERUSER_PASSWORD`` and
-    ``DJANGO_SUPERUSER_<uppercase_field_name>`` environment variables was added.
 
 .. django-admin-option:: --noinput, --no-input
 
@@ -1724,7 +1765,7 @@ allows for the following options:
 .. django-admin-option:: --pythonpath PYTHONPATH
 
 Adds the given filesystem path to the Python `import search path`_. If this
-isn't provided, ``django-admin`` will use the ``PYTHONPATH`` environment
+isn't provided, ``django-admin`` will use the :envvar:`PYTHONPATH` environment
 variable.
 
 This option is unnecessary in ``manage.py``, because it takes care of setting
@@ -1740,7 +1781,8 @@ Example usage::
 
 Specifies the settings module to use. The settings module should be in Python
 package syntax, e.g. ``mysite.settings``. If this isn't provided,
-``django-admin`` will use the ``DJANGO_SETTINGS_MODULE`` environment variable.
+``django-admin`` will use the :envvar:`DJANGO_SETTINGS_MODULE` environment
+variable.
 
 This option is unnecessary in ``manage.py``, because it uses
 ``settings.py`` from the current project by default.
@@ -1791,12 +1833,10 @@ colored output to another command.
 
 .. django-admin-option:: --skip-checks
 
-.. versionadded:: 3.0
-
 Skips running system checks prior to running the command. This option is only
 available if the
 :attr:`~django.core.management.BaseCommand.requires_system_checks` command
-attribute is set to ``True``.
+attribute is not an empty list or tuple.
 
 Example usage::
 
@@ -1809,6 +1849,8 @@ Extra niceties
 
 Syntax coloring
 ---------------
+
+.. envvar:: DJANGO_COLORS
 
 The ``django-admin`` / ``manage.py`` commands will use pretty
 color-coded output if your terminal supports ANSI-colored output. It
@@ -1831,7 +1873,7 @@ ships with three color palettes:
 
 * ``nocolor``, which disables syntax highlighting.
 
-You select a palette by setting a ``DJANGO_COLORS`` environment
+You select a palette by setting a :envvar:`DJANGO_COLORS` environment
 variable to specify the palette you want to use. For example, to
 specify the ``light`` palette under a Unix or OS/X BASH shell, you
 would run the following at a command prompt::

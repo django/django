@@ -6,7 +6,7 @@ All text copyright Python (Monty) Pictures. Thanks to sacred-texts.com for the
 transcript.
 """
 from django.db import connection
-from django.db.models import F
+from django.db.models import F, Value
 from django.test import modify_settings, skipUnlessDBFeature
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
@@ -31,7 +31,7 @@ class GrailTestData:
                 'Bravely bold Sir Robin, rode forth from Camelot. '
                 'He was not afraid to die, o Brave Sir Robin. '
                 'He was not at all afraid to be killed in nasty ways. '
-                'Brave, brave, brave, brave Sir Robin!'
+                'Brave, brave, brave, brave Sir Robin'
             ),
             (
                 'He was not in the least bit scared to be mashed into a pulp, '
@@ -195,7 +195,6 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
         ).filter(search=str(self.crowd.id))
         self.assertSequenceEqual(searched, [self.crowd])
 
-    @skipUnlessDBFeature('has_phraseto_tsquery')
     def test_phrase_search(self):
         line_qs = Line.objects.annotate(search=SearchVector('dialogue'))
         searched = line_qs.filter(search=SearchQuery('burned body his away', search_type='phrase'))
@@ -203,7 +202,6 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
         searched = line_qs.filter(search=SearchQuery('his body burned away', search_type='phrase'))
         self.assertSequenceEqual(searched, [self.verse1])
 
-    @skipUnlessDBFeature('has_phraseto_tsquery')
     def test_phrase_search_with_config(self):
         line_qs = Line.objects.annotate(
             search=SearchVector('scene__setting', 'dialogue', config='french'),
@@ -386,7 +384,6 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
         )
         self.assertSequenceEqual(searched, [self.verse2])
 
-    @skipUnlessDBFeature('has_phraseto_tsquery')
     def test_combine_raw_phrase(self):
         searched = Line.objects.filter(
             dialogue__search=(
@@ -448,6 +445,66 @@ class TestRankingAndWeights(GrailTestData, PostgreSQLTestCase):
             rank=SearchRank(SearchVector('dialogue'), SearchQuery('brave sir robin')),
         ).filter(rank__gt=0.3)
         self.assertSequenceEqual(searched, [self.verse0])
+
+    def test_cover_density_ranking(self):
+        not_dense_verse = Line.objects.create(
+            scene=self.robin,
+            character=self.minstrel,
+            dialogue=(
+                'Bravely taking to his feet, he beat a very brave retreat. '
+                'A brave retreat brave Sir Robin.'
+            )
+        )
+        searched = Line.objects.filter(character=self.minstrel).annotate(
+            rank=SearchRank(
+                SearchVector('dialogue'),
+                SearchQuery('brave robin'),
+                cover_density=True,
+            ),
+        ).order_by('rank', '-pk')
+        self.assertSequenceEqual(
+            searched,
+            [self.verse2, not_dense_verse, self.verse1, self.verse0],
+        )
+
+    def test_ranking_with_normalization(self):
+        short_verse = Line.objects.create(
+            scene=self.robin,
+            character=self.minstrel,
+            dialogue='A brave retreat brave Sir Robin.',
+        )
+        searched = Line.objects.filter(character=self.minstrel).annotate(
+            rank=SearchRank(
+                SearchVector('dialogue'),
+                SearchQuery('brave sir robin'),
+                # Divide the rank by the document length.
+                normalization=2,
+            ),
+        ).order_by('rank')
+        self.assertSequenceEqual(
+            searched,
+            [self.verse2, self.verse1, self.verse0, short_verse],
+        )
+
+    def test_ranking_with_masked_normalization(self):
+        short_verse = Line.objects.create(
+            scene=self.robin,
+            character=self.minstrel,
+            dialogue='A brave retreat brave Sir Robin.',
+        )
+        searched = Line.objects.filter(character=self.minstrel).annotate(
+            rank=SearchRank(
+                SearchVector('dialogue'),
+                SearchQuery('brave sir robin'),
+                # Divide the rank by the document length and by the number of
+                # unique words in document.
+                normalization=Value(2).bitor(Value(8)),
+            ),
+        ).order_by('rank')
+        self.assertSequenceEqual(
+            searched,
+            [self.verse2, self.verse1, self.verse0, short_verse],
+        )
 
 
 class SearchVectorIndexTests(PostgreSQLTestCase):
@@ -521,7 +578,7 @@ class SearchHeadlineTests(GrailTestData, PostgreSQLTestCase):
         self.assertEqual(
             searched.headline,
             'Robin. He was not at all afraid to be <b>killed</b> in nasty '
-            'ways. Brave, brave, brave, brave Sir Robin!',
+            'ways. Brave, brave, brave, brave Sir Robin',
         )
 
     def test_headline_with_config(self):
@@ -584,13 +641,15 @@ class SearchHeadlineTests(GrailTestData, PostgreSQLTestCase):
         searched = Line.objects.annotate(
             headline=SearchHeadline(
                 'dialogue',
-                SearchQuery('brave sir robin', config='english'),
-                short_word=6,
+                SearchQuery('Camelot', config='english'),
+                short_word=5,
+                min_words=8,
             ),
         ).get(pk=self.verse0.pk)
-        self.assertIs(searched.headline.endswith(
-            '<b>Brave</b>, <b>brave</b>, <b>brave</b>, <b>brave</b> <b>Sir</b>'
-        ), True)
+        self.assertEqual(searched.headline, (
+            '<b>Camelot</b>. He was not afraid to die, o Brave Sir Robin. He '
+            'was not at all afraid'
+        ))
 
     def test_headline_fragments_words_options(self):
         searched = Line.objects.annotate(

@@ -79,11 +79,11 @@ class MigrationLoader:
             was_loaded = module_name in sys.modules
             try:
                 module = import_module(module_name)
-            except ImportError as e:
-                # I hate doing this, but I don't want to squash other import errors.
-                # Might be better to try a directory check directly.
-                if ((explicit and self.ignore_no_migrations) or (
-                        not explicit and "No module named" in str(e) and MIGRATIONS_MODULE_NAME in str(e))):
+            except ModuleNotFoundError as e:
+                if (
+                    (explicit and self.ignore_no_migrations) or
+                    (not explicit and MIGRATIONS_MODULE_NAME in e.name.split('.'))
+                ):
                     self.unmigrated_apps.add(app_config.label)
                     continue
                 raise
@@ -317,7 +317,7 @@ class MigrationLoader:
             if app_label in seen_apps:
                 conflicting_apps.add(app_label)
             seen_apps.setdefault(app_label, set()).add(migration_name)
-        return {app_label: seen_apps[app_label] for app_label in conflicting_apps}
+        return {app_label: sorted(seen_apps[app_label]) for app_label in conflicting_apps}
 
     def project_state(self, nodes=None, at_end=True):
         """

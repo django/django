@@ -28,7 +28,7 @@ Bugfixes
 * Fixed a regression in Django 3.0 by restoring the ability to use Django
   inside Jupyter and other environments that force an async context, by adding
   an option to disable :ref:`async-safety` mechanism with
-  ``DJANGO_ALLOW_ASYNC_UNSAFE`` environment variable (:ticket:`31056`).
+  :envvar:`DJANGO_ALLOW_ASYNC_UNSAFE` environment variable (:ticket:`31056`).
 
 * Fixed a regression in Django 3.0 where ``RegexPattern``, used by
   :func:`~django.urls.re_path`, returned positional arguments to be passed to

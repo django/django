@@ -9,6 +9,7 @@ import binascii
 import cgi
 import collections
 import html
+import os
 from urllib.parse import unquote
 
 from django.conf import settings
@@ -208,6 +209,7 @@ class MultiPartParser:
                     # This is a file, use the handler...
                     file_name = disposition.get('filename')
                     if file_name:
+                        file_name = os.path.basename(file_name)
                         file_name = force_str(file_name, encoding, errors='replace')
                         file_name = self.IE_sanitize(html.unescape(file_name))
                     if not file_name:

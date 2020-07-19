@@ -1,7 +1,6 @@
 import json
 
 from django import forms
-from django.conf import settings
 from django.contrib.admin.utils import (
     display_for_field, flatten_fieldsets, help_text_for_field, label_for_field,
     lookup_field,
@@ -80,8 +79,7 @@ class Fieldset:
     @property
     def media(self):
         if 'collapse' in self.classes:
-            extra = '' if settings.DEBUG else '.min'
-            return forms.Media(js=['admin/js/collapse%s.js' % extra])
+            return forms.Media(js=['admin/js/collapse.js'])
         return forms.Media()
 
     def __iter__(self):

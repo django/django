@@ -1,6 +1,6 @@
-from django import forms
 from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.admin.helpers import ActionForm
+from django.core.exceptions import ValidationError
 
 
 class CustomAdminAuthenticationForm(AdminAuthenticationForm):
@@ -11,7 +11,7 @@ class CustomAdminAuthenticationForm(AdminAuthenticationForm):
     def clean_username(self):
         username = self.cleaned_data.get('username')
         if username == 'customform':
-            raise forms.ValidationError('custom form error')
+            raise ValidationError('custom form error')
         return username
 
 

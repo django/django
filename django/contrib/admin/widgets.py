@@ -12,7 +12,7 @@ from django.db.models import CASCADE
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import smart_urlquote
-from django.utils.safestring import mark_safe
+from django.utils.http import urlencode
 from django.utils.text import Truncator
 from django.utils.translation import get_language, gettext as _
 
@@ -24,17 +24,12 @@ class FilteredSelectMultiple(forms.SelectMultiple):
     Note that the resulting JavaScript assumes that the jsi18n
     catalog has been loaded in the page
     """
-    @property
-    def media(self):
-        extra = '' if settings.DEBUG else '.min'
+    class Media:
         js = [
-            'vendor/jquery/jquery%s.js' % extra,
-            'jquery.init.js',
-            'core.js',
-            'SelectBox.js',
-            'SelectFilter2.js',
+            'admin/js/core.js',
+            'admin/js/SelectBox.js',
+            'admin/js/SelectFilter2.js',
         ]
-        return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, verbose_name, is_stacked, attrs=None, choices=()):
         self.verbose_name = verbose_name
@@ -150,8 +145,8 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
             params = self.url_parameters()
             if params:
-                related_url += '?' + '&amp;'.join('%s=%s' % (k, v) for k, v in params.items())
-            context['related_url'] = mark_safe(related_url)
+                related_url += '?' + urlencode(params)
+            context['related_url'] = related_url
             context['link_title'] = _('Lookup')
             # The JavaScript code looks for this class.
             context['widget']['attrs'].setdefault('class', 'vForeignKeyRawIdAdminField')

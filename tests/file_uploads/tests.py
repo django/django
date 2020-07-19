@@ -209,10 +209,14 @@ class FileUploadTests(TestCase):
         Receiving file upload when filename is blank (before and after
         sanitization) should be okay.
         """
-        # The second value is normalized to an empty name by
-        # MultiPartParser.IE_sanitize()
-        filenames = ['', 'C:\\Windows\\']
-
+        filenames = [
+            '',
+            # Normalized by MultiPartParser.IE_sanitize().
+            'C:\\Windows\\',
+            # Normalized by os.path.basename().
+            '/',
+            'ends-with-slash/',
+        ]
         payload = client.FakePayload()
         for i, name in enumerate(filenames):
             payload.write('\r\n'.join([

@@ -131,7 +131,7 @@ class SchemaTests(TransactionTestCase):
         self.assertIsNotNone(match)
         self.assertEqual(
             'integer NOT NULL PRIMARY KEY AUTOINCREMENT',
-            match.group(1),
+            match[1],
             'Wrong SQL used to create an auto-increment column on SQLite'
         )
 

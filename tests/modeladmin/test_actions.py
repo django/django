@@ -76,3 +76,42 @@ class AdminActionsTests(TestCase):
         ma2 = AdminB(Band, admin.AdminSite())
         action_names = [name for _, name, _ in ma2._get_base_actions()]
         self.assertEqual(action_names, ['delete_selected'])
+
+    def test_actions_replace_global_action(self):
+        def global_action_1(modeladmin, request, queryset):
+            pass
+
+        def global_action_2(modeladmin, request, queryset):
+            pass
+
+        global_action_1.short_description = 'Site-wide admin action 1.'
+        global_action_2.short_description = 'Site-wide admin action 2.'
+        admin.site.add_action(global_action_1, name='custom_action_1')
+        admin.site.add_action(global_action_2, name='custom_action_2')
+
+        def custom_action_1(modeladmin, request, queryset):
+            pass
+
+        custom_action_1.short_description = 'Local admin action 1.'
+
+        class BandAdmin(admin.ModelAdmin):
+            actions = [custom_action_1, 'custom_action_2']
+
+            def custom_action_2(self, request, queryset):
+                pass
+
+            custom_action_2.short_description = 'Local admin action 2.'
+
+        ma = BandAdmin(Band, admin.site)
+        self.assertEqual(ma.check(), [])
+        self.assertEqual(
+            [
+                desc
+                for _, name, desc in ma._get_base_actions()
+                if name.startswith('custom_action')
+            ],
+            [
+                'Local admin action 1.',
+                'Local admin action 2.',
+            ],
+        )

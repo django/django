@@ -74,6 +74,21 @@ class ClearableFileInputTest(WidgetTest):
         """
         self.check_html(self.widget, 'myfile', None, html='<input type="file" name="myfile">')
 
+    def test_render_disabled(self):
+        self.check_html(
+            self.widget,
+            'myfile',
+            FakeFieldFile(),
+            attrs={'disabled': True},
+            html=(
+                'Currently: <a href="something">something</a>'
+                '<input type="checkbox" name="myfile-clear" '
+                'id="myfile-clear_id" disabled>'
+                '<label for="myfile-clear_id">Clear</label><br>'
+                'Change: <input type="file" name="myfile" disabled>'
+            ),
+        )
+
     def test_render_as_subwidget(self):
         """A ClearableFileInput as a subwidget of MultiWidget."""
         widget = MultiWidget(widgets=(self.widget,))

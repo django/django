@@ -2,7 +2,6 @@ import datetime
 import re
 from unittest import mock
 
-from django import forms
 from django.contrib.auth.forms import (
     AdminPasswordChangeForm, AuthenticationForm, PasswordChangeForm,
     PasswordResetForm, ReadOnlyPasswordHashField, ReadOnlyPasswordHashWidget,
@@ -12,6 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_login_failed
 from django.contrib.sites.models import Site
 from django.core import mail
+from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.forms.fields import CharField, Field, IntegerField
 from django.test import SimpleTestCase, TestCase, override_settings
@@ -372,13 +372,13 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         form = AuthenticationFormWithInactiveUsersOkay(None, data)
         self.assertTrue(form.is_valid())
 
-        # If we want to disallow some logins according to custom logic,
-        # we should raise a django.forms.ValidationError in the form.
+        # Raise a ValidationError in the form to disallow some logins according
+        # to custom logic.
         class PickyAuthenticationForm(AuthenticationForm):
             def confirm_login_allowed(self, user):
                 if user.username == "inactive":
-                    raise forms.ValidationError("This user is disallowed.")
-                raise forms.ValidationError("Sorry, nobody's allowed in.")
+                    raise ValidationError("This user is disallowed.")
+                raise ValidationError("Sorry, nobody's allowed in.")
 
         form = PickyAuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
@@ -496,7 +496,7 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
 
     def test_get_invalid_login_error(self):
         error = AuthenticationForm().get_invalid_login_error()
-        self.assertIsInstance(error, forms.ValidationError)
+        self.assertIsInstance(error, ValidationError)
         self.assertEqual(
             error.message,
             'Please enter a correct %(username)s and password. Note that both '

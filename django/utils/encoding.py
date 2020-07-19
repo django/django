@@ -157,7 +157,7 @@ _hextobyte = {
     for fmt in ['%02x', '%02X']
 }
 # And then everything above 128, because bytes ≥ 128 are part of multibyte
-# unicode characters.
+# Unicode characters.
 _hexdig = '0123456789ABCDEFabcdef'
 _hextobyte.update({
     (a + b).encode(): bytes.fromhex(a + b)

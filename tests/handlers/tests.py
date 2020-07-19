@@ -50,7 +50,7 @@ class HandlerTests(SimpleTestCase):
             environ['QUERY_STRING'] = str(raw_query_string, 'iso-8859-1')
             request = WSGIRequest(environ)
             got.append(request.GET['want'])
-        # %E9 is converted to the unicode replacement character by parse_qsl
+        # %E9 is converted to the Unicode replacement character by parse_qsl
         self.assertEqual(got, ['café', 'café', 'caf\ufffd', 'café'])
 
     def test_non_ascii_cookie(self):
@@ -269,9 +269,10 @@ class AsyncHandlerRequestTests(SimpleTestCase):
 
     async def test_unawaited_response(self):
         msg = (
-            "The view handlers.views.async_unawaited didn't return an "
-            "HttpResponse object. It returned an unawaited coroutine instead. "
-            "You may need to add an 'await' into your view."
+            "The view handlers.views.CoroutineClearingView.__call__ didn't"
+            " return an HttpResponse object. It returned an unawaited"
+            " coroutine instead. You may need to add an 'await'"
+            " into your view."
         )
         with self.assertRaisesMessage(ValueError, msg):
             await self.async_client.get('/unawaited/')

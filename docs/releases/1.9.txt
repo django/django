@@ -246,7 +246,7 @@ Minor features
 
 * The new :meth:`GDALRaster.warp() <django.contrib.gis.gdal.GDALRaster.warp>`
   method allows warping a raster by specifying target raster properties such as
-  origin, width, height, or pixel size (amongst others).
+  origin, width, height, or pixel size (among others).
 
 * The new :meth:`GDALRaster.transform()
   <django.contrib.gis.gdal.GDALRaster.transform>` method allows transforming a
@@ -792,7 +792,7 @@ Consequently, the expected URLs passed to ``assertRedirects`` should generally
 no longer include the scheme and domain part of the URLs. For example,
 ``self.assertRedirects(response, 'http://testserver/some-url/')`` should be
 replaced by ``self.assertRedirects(response, '/some-url/')`` (unless the
-redirection specifically contained an absolute URL, of course).
+redirection specifically contained an absolute URL).
 
 In the rare case that you need the old behavior (discovered with an ancient
 version of Apache with ``mod_scgi`` that interprets a relative redirect as an
@@ -1115,7 +1115,7 @@ Miscellaneous
   :attr:`~django.forms.CharField.strip` argument to ``False``.
 
 * Template text that is translated and uses two or more consecutive percent
-  signs, e.g. ``"%%"``, may have a new `msgid` after ``makemessages`` is run
+  signs, e.g. ``"%%"``, may have a new ``msgid`` after ``makemessages`` is run
   (most likely the translation will be marked fuzzy). The new ``msgid`` will be
   marked ``"#, python-format"``.
 
@@ -1289,7 +1289,7 @@ to:
 
 This change also means that the old way of including an ``AdminSite`` instance
 is deprecated. Instead, pass ``admin.site.urls`` directly to
-:func:`~django.conf.urls.url()`:
+``django.conf.urls.url()``:
 
 .. code-block:: python
     :caption: urls.py
@@ -1506,7 +1506,7 @@ remove usage of these features.
 * Database test settings as independent entries in the database settings,
   prefixed by ``TEST_``, are no longer supported.
 
-* The `cache_choices` option to :class:`~django.forms.ModelChoiceField` and
+* The ``cache_choices`` option to :class:`~django.forms.ModelChoiceField` and
   :class:`~django.forms.ModelMultipleChoiceField` is removed.
 
 * The default value of the

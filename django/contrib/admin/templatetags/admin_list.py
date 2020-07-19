@@ -2,7 +2,8 @@ import datetime
 
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
-    display_for_field, display_for_value, label_for_field, lookup_field,
+    display_for_field, display_for_value, get_fields_from_path,
+    label_for_field, lookup_field,
 )
 from django.contrib.admin.views.main import (
     ALL_VAR, ORDER_VAR, PAGE_VAR, SEARCH_VAR,
@@ -13,7 +14,7 @@ from django.template import Library
 from django.template.loader import get_template
 from django.templatetags.static import static
 from django.urls import NoReverseMatch
-from django.utils import formats
+from django.utils import formats, timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
@@ -252,8 +253,6 @@ def items_for_result(cl, result, form):
                     result_repr = display_for_field(value, f, empty_value_display)
                 if isinstance(f, (models.DateField, models.TimeField, models.ForeignKey)):
                     row_classes.append('nowrap')
-        if str(result_repr) == '':
-            result_repr = mark_safe('&nbsp;')
         row_class = mark_safe(' class="%s"' % ' '.join(row_classes))
         # If list_display_links not defined, add the link tag to the first field
         if link_in_col(first, field_name, cl):
@@ -359,6 +358,13 @@ def date_hierarchy(cl):
     """
     if cl.date_hierarchy:
         field_name = cl.date_hierarchy
+        field = get_fields_from_path(cl.model, field_name)[-1]
+        if isinstance(field, models.DateTimeField):
+            dates_or_datetimes = 'datetimes'
+            qs_kwargs = {'is_dst': True}
+        else:
+            dates_or_datetimes = 'dates'
+            qs_kwargs = {}
         year_field = '%s__year' % field_name
         month_field = '%s__month' % field_name
         day_field = '%s__day' % field_name
@@ -375,6 +381,11 @@ def date_hierarchy(cl):
             date_range = cl.queryset.aggregate(first=models.Min(field_name),
                                                last=models.Max(field_name))
             if date_range['first'] and date_range['last']:
+                if dates_or_datetimes == 'datetimes':
+                    date_range = {
+                        k: timezone.localtime(v) if timezone.is_aware(v) else v
+                        for k, v in date_range.items()
+                    }
                 if date_range['first'].year == date_range['last'].year:
                     year_lookup = date_range['first'].year
                     if date_range['first'].month == date_range['last'].month:
@@ -391,7 +402,7 @@ def date_hierarchy(cl):
                 'choices': [{'title': capfirst(formats.date_format(day, 'MONTH_DAY_FORMAT'))}]
             }
         elif year_lookup and month_lookup:
-            days = getattr(cl.queryset, 'dates')(field_name, 'day')
+            days = getattr(cl.queryset, dates_or_datetimes)(field_name, 'day', **qs_kwargs)
             return {
                 'show': True,
                 'back': {
@@ -404,7 +415,7 @@ def date_hierarchy(cl):
                 } for day in days]
             }
         elif year_lookup:
-            months = getattr(cl.queryset, 'dates')(field_name, 'month')
+            months = getattr(cl.queryset, dates_or_datetimes)(field_name, 'month', **qs_kwargs)
             return {
                 'show': True,
                 'back': {
@@ -417,7 +428,7 @@ def date_hierarchy(cl):
                 } for month in months]
             }
         else:
-            years = getattr(cl.queryset, 'dates')(field_name, 'year')
+            years = getattr(cl.queryset, dates_or_datetimes)(field_name, 'year', **qs_kwargs)
             return {
                 'show': True,
                 'back': None,

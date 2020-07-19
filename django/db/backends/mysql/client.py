@@ -7,11 +7,14 @@ class DatabaseClient(BaseDatabaseClient):
     executable_name = 'mysql'
 
     @classmethod
-    def settings_to_cmd_args(cls, settings_dict):
+    def settings_to_cmd_args(cls, settings_dict, parameters):
         args = [cls.executable_name]
         db = settings_dict['OPTIONS'].get('db', settings_dict['NAME'])
         user = settings_dict['OPTIONS'].get('user', settings_dict['USER'])
-        passwd = settings_dict['OPTIONS'].get('passwd', settings_dict['PASSWORD'])
+        password = settings_dict['OPTIONS'].get(
+            'password',
+            settings_dict['OPTIONS'].get('passwd', settings_dict['PASSWORD'])
+        )
         host = settings_dict['OPTIONS'].get('host', settings_dict['HOST'])
         port = settings_dict['OPTIONS'].get('port', settings_dict['PORT'])
         server_ca = settings_dict['OPTIONS'].get('ssl', {}).get('ca')
@@ -24,8 +27,8 @@ class DatabaseClient(BaseDatabaseClient):
             args += ["--defaults-file=%s" % defaults_file]
         if user:
             args += ["--user=%s" % user]
-        if passwd:
-            args += ["--password=%s" % passwd]
+        if password:
+            args += ["--password=%s" % password]
         if host:
             if '/' in host:
                 args += ["--socket=%s" % host]
@@ -41,8 +44,9 @@ class DatabaseClient(BaseDatabaseClient):
             args += ["--ssl-key=%s" % client_key]
         if db:
             args += [db]
+        args.extend(parameters)
         return args
 
-    def runshell(self):
-        args = DatabaseClient.settings_to_cmd_args(self.connection.settings_dict)
+    def runshell(self, parameters):
+        args = DatabaseClient.settings_to_cmd_args(self.connection.settings_dict, parameters)
         subprocess.run(args, check=True)

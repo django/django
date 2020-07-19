@@ -8,7 +8,6 @@ import warnings
 from collections import defaultdict
 from itertools import chain
 
-from django.conf import settings
 from django.forms.utils import to_current_timezone
 from django.templatetags.static import static
 from django.utils import datetime_safe, formats
@@ -140,7 +139,7 @@ class Media:
         except CyclicDependencyError:
             warnings.warn(
                 'Detected duplicate Media files in an opposite order: {}'.format(
-                    ', '.join(repr(l) for l in lists)
+                    ', '.join(repr(list_) for list_ in lists)
                 ), MediaOrderConflictWarning,
             )
             return list(all_items)
@@ -225,16 +224,16 @@ class Widget(metaclass=MediaDefiningClass):
         return str(value)
 
     def get_context(self, name, value, attrs):
-        context = {}
-        context['widget'] = {
-            'name': name,
-            'is_hidden': self.is_hidden,
-            'required': self.is_required,
-            'value': self.format_value(value),
-            'attrs': self.build_attrs(self.attrs, attrs),
-            'template_name': self.template_name,
+        return {
+            'widget': {
+                'name': name,
+                'is_hidden': self.is_hidden,
+                'required': self.is_required,
+                'value': self.format_value(value),
+                'attrs': self.build_attrs(self.attrs, attrs),
+                'template_name': self.template_name,
+            },
         }
-        return context
 
     def render(self, name, value, attrs=None, renderer=None):
         """Render the widget as an HTML string."""
@@ -799,6 +798,13 @@ class MultiWidget(Widget):
     template_name = 'django/forms/widgets/multiwidget.html'
 
     def __init__(self, widgets, attrs=None):
+        if isinstance(widgets, dict):
+            self.widgets_names = [
+                ('_%s' % name) if name else '' for name in widgets
+            ]
+            widgets = widgets.values()
+        else:
+            self.widgets_names = ['_%s' % i for i in range(len(widgets))]
         self.widgets = [w() if isinstance(w, type) else w for w in widgets]
         super().__init__(attrs)
 
@@ -820,10 +826,10 @@ class MultiWidget(Widget):
         input_type = final_attrs.pop('type', None)
         id_ = final_attrs.get('id')
         subwidgets = []
-        for i, widget in enumerate(self.widgets):
+        for i, (widget_name, widget) in enumerate(zip(self.widgets_names, self.widgets)):
             if input_type is not None:
                 widget.input_type = input_type
-            widget_name = '%s_%s' % (name, i)
+            widget_name = name + widget_name
             try:
                 widget_value = value[i]
             except IndexError:
@@ -843,12 +849,15 @@ class MultiWidget(Widget):
         return id_
 
     def value_from_datadict(self, data, files, name):
-        return [widget.value_from_datadict(data, files, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
+        return [
+            widget.value_from_datadict(data, files, name + widget_name)
+            for widget_name, widget in zip(self.widgets_names, self.widgets)
+        ]
 
     def value_omitted_from_data(self, data, files, name):
         return all(
-            widget.value_omitted_from_data(data, files, name + '_%s' % i)
-            for i, widget in enumerate(self.widgets)
+            widget.value_omitted_from_data(data, files, name + widget_name)
+            for widget_name, widget in zip(self.widgets_names, self.widgets)
         )
 
     def decompress(self, value):
@@ -1018,7 +1027,7 @@ class SelectDateWidget(Widget):
                 # Convert any zeros in the date to empty strings to match the
                 # empty option value.
                 year, month, day = [int(val) or '' for val in match.groups()]
-            elif settings.USE_L10N:
+            else:
                 input_format = get_format('DATE_INPUT_FORMATS')[0]
                 try:
                     d = datetime.datetime.strptime(value, input_format)
