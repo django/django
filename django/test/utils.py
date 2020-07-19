@@ -1,11 +1,11 @@
 import asyncio
+import datetime
 import logging
 import re
 import sys
 import time
 import warnings
 from contextlib import contextmanager
-from datetime import datetime
 from functools import wraps
 from io import StringIO
 from itertools import chain
