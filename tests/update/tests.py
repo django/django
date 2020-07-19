@@ -1,6 +1,5 @@
-from datetime import datetime
-
 import unittest
+from datetime import datetime
 
 from django.core.exceptions import FieldError
 from django.db import IntegrityError, connection, transaction

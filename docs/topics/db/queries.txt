@@ -1246,13 +1246,14 @@ Updating multiple objects at once
 Sometimes you want to set a field to a particular value for all the objects in
 a :class:`~django.db.models.query.QuerySet`. You can do this with the
 :meth:`~django.db.models.query.QuerySet.update` method. For example::
-    # Update all the headlines with pub_date in 2007.
-    # log_modified_datetime, log_modified_date are modified also with datetime.now() caused by auto_now=True
+
+    # Update all the headlines with pub_date in 2007 and Update log_modified_datetime, log_modified_date with "datetime.now()" also caused by auto_now.
     Entry.objects.filter(pub_date__year=2007).update(headline='Everything is the same')
 
 When model has DateTimeField(auto_now=True) or DateField(auto_now=True),
 these fields will be updated even if not specified to .update()
 if you don't want to update  Fields which auto_now option is True, use .update() with _ignore_auto_now=True. For example::
+
     # Update only headlines Field with pub_date in 2007.
     Entry.objects.filter(pub_date__year=2007).update(headline='Everything is the same',_ignore_auto_now=True)
 
