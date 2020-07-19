@@ -7,7 +7,6 @@ from django.db import IntegrityError, connection, transaction
 from django.db.models import Count, F, Max
 from django.db.models.functions import Concat, Lower
 from django.test import TestCase
-from django.test.utils import freeze_datetime
 
 from .models import A, B, Bar, D, DataPoint, Foo, RelatedPoint, UniqueNumber
 
