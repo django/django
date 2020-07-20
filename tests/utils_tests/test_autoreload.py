@@ -173,27 +173,25 @@ class TestChildArguments(SimpleTestCase):
 
     @mock.patch('sys.warnoptions', [])
     def test_exe_fallback(self):
-        tmpdir = tempfile.TemporaryDirectory()
-        self.addCleanup(tmpdir.cleanup)
-        exe_path = Path(tmpdir.name) / 'django-admin.exe'
-        exe_path.touch()
-        with mock.patch('sys.argv', [exe_path.with_suffix(''), 'runserver']):
-            self.assertEqual(
-                autoreload.get_child_arguments(),
-                [exe_path, 'runserver']
-            )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            exe_path = Path(tmpdir) / 'django-admin.exe'
+            exe_path.touch()
+            with mock.patch('sys.argv', [exe_path.with_suffix(''), 'runserver']):
+                self.assertEqual(
+                    autoreload.get_child_arguments(),
+                    [exe_path, 'runserver']
+                )
 
     @mock.patch('sys.warnoptions', [])
     def test_entrypoint_fallback(self):
-        tmpdir = tempfile.TemporaryDirectory()
-        self.addCleanup(tmpdir.cleanup)
-        script_path = Path(tmpdir.name) / 'django-admin-script.py'
-        script_path.touch()
-        with mock.patch('sys.argv', [script_path.with_name('django-admin'), 'runserver']):
-            self.assertEqual(
-                autoreload.get_child_arguments(),
-                [sys.executable, script_path, 'runserver']
-            )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            script_path = Path(tmpdir) / 'django-admin-script.py'
+            script_path.touch()
+            with mock.patch('sys.argv', [script_path.with_name('django-admin'), 'runserver']):
+                self.assertEqual(
+                    autoreload.get_child_arguments(),
+                    [sys.executable, script_path, 'runserver']
+                )
 
     @mock.patch('sys.argv', ['does-not-exist', 'runserver'])
     @mock.patch('sys.warnoptions', [])
