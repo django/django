@@ -379,8 +379,8 @@ if connection.features.interprets_empty_strings_as_nulls:
                          data[3] is None)]
 
 # Regression test for #8651 -- a FK to an object with PK of 0
-# This won't work on MySQL since it won't let you create an object
-# with an autoincrement primary key of 0,
+# This won't work on MySQL without the NO_AUTO_VALUE_ON_ZERO SQL mode since it
+# won't let you create an object with an autoincrement primary key of 0.
 if connection.features.allows_auto_pk_0:
     test_data.extend([
         (data_obj, 0, Anchor, "Anchor 0"),
