@@ -75,6 +75,20 @@ General-purpose aggregation functions
     Returns ``True``, if all input values are true, ``None`` if all values are
     null or if there are no values, otherwise ``False`` .
 
+    Usage example::
+
+        class Comment(models.Model):
+            body = models.TextField()
+            published = models.BooleanField()
+            rank = models.IntegerField()
+
+        >>> from django.db.models import BooleanField, Q
+        >>> from django.contrib.postgres.aggregates import BoolAnd
+        >>> Comment.objects.aggregate(booland=BoolAnd('published'))
+        {'booland': False}
+        >>> Comment.objects.aggregate(booland=BoolAnd(Q(rank__lt=100), output_field=BooleanField()))
+        {'booland': True}
+
 ``BoolOr``
 ----------
 
@@ -82,6 +96,20 @@ General-purpose aggregation functions
 
     Returns ``True`` if at least one input value is true, ``None`` if all
     values are null or if there are no values, otherwise ``False``.
+
+    Usage example::
+
+        class Comment(models.Model):
+            body = models.TextField()
+            published = models.BooleanField()
+            rank = models.IntegerField()
+
+        >>> from django.db.models import BooleanField, Q
+        >>> from django.contrib.postgres.aggregates import BoolOr
+        >>> Comment.objects.aggregate(boolor=BoolOr('published'))
+        {'boolor': True}
+        >>> Comment.objects.aggregate(boolor=BoolOr(Q(rank__gt=2), output_field=BooleanField()))
+        {'boolor': False}
 
 ``JSONBAgg``
 ------------
