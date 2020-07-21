@@ -152,9 +152,6 @@ Django core exception classes are defined in ``django.core.exceptions``.
     :ref:`Model Field Validation <validating-objects>` and the
     :doc:`Validator Reference </ref/validators>`.
 
-``NON_FIELD_ERRORS``
-~~~~~~~~~~~~~~~~~~~~
-
 .. data:: NON_FIELD_ERRORS
 
 ``ValidationError``\s that don't belong to a particular field in a form
