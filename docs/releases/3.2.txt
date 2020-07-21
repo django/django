@@ -341,6 +341,9 @@ Validators
   of a raised :exc:`~django.core.exceptions.ValidationError`. This allows
   custom error messages to use the ``%(value)s`` placeholder.
 
+* The :class:`.ValidationError` equality operator now ignores ``messages`` and
+  ``params`` ordering.
+
 .. _backwards-incompatible-3.2:
 
 Backwards incompatible changes in 3.2
