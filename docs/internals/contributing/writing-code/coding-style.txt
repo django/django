@@ -52,6 +52,37 @@ Python style
   single quote. Don't waste time doing unrelated refactoring of existing code
   to conform to this style.
 
+* String variable interpolation may use
+  :py:ref:`%-formatting <old-string-formatting>`, :py:ref:`f-strings
+  <f-strings>`, or :py:meth:`str.format` as appropriate, with the goal of
+  maximizing code readability.
+
+  Final judgments of readability are left to the Merger's discretion. As a
+  guide, f-strings should use only plain variable and property access, with
+  prior local variable assignment for more complex cases::
+
+    # Allowed
+    f'hello {user}'
+    f'hello {user.name}'
+    f'hello {self.user.name}'
+
+    # Disallowed
+    f'hello {get_user()}'
+    f'you are {user.age * 365.25} days old'
+
+    # Allowed with local variable assignment
+    user = get_user()
+    f'hello {user}'
+    user_days_old = user.age * 365.25
+    f'you are {user_days_old} days old'
+
+  f-strings should not be used for any string that may require translation,
+  including error and logging messages. In general ``format()`` is more
+  verbose, so the other formatting methods are preferred.
+
+  Don't waste time doing unrelated refactoring of existing code to adjust the
+  formatting method.
+
 * Avoid use of "we" in comments, e.g. "Loop over" rather than "We loop over".
 
 * Use underscores, not camelCase, for variable, function and method names
