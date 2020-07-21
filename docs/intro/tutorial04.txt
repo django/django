@@ -303,7 +303,7 @@ We're using two generic views here:
 two views abstract the concepts of "display a list of objects" and
 "display a detail page for a particular type of object."
 
-* Each generic view needs to know what model it will be acting
+* Each :class:`~django.views.generic.detail.DetailView` generic view needs to know what model it will be acting
   upon. This is provided using the ``model`` attribute.
 
 * The :class:`~django.views.generic.detail.DetailView` generic view
