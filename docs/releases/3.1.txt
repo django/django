@@ -337,12 +337,6 @@ Management Commands
 * The :djadmin:`flush` and :djadmin:`sqlflush` commands now include SQL to
   reset sequences on SQLite.
 
-Migrations
-~~~~~~~~~~
-
-* Migrations are now loaded also from directories without ``__init__.py``
-  files.
-
 Models
 ~~~~~~
 
