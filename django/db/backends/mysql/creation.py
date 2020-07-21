@@ -1,3 +1,4 @@
+import multiprocessing
 import subprocess
 import sys
 
@@ -5,6 +6,27 @@ from django.db.backends.base.creation import BaseDatabaseCreation
 
 from .client import DatabaseClient
 
+def db_restore(args):
+    source_db, settings_dict, target_db = args
+    load_cmd = DatabaseClient.settings_to_cmd_args(settings_dict, [])
+    with open(source_db, 'r') as dump:
+        with open(target_db, 'w+') as modified_dump:
+            total_dump = dump.read()
+            modified_dump.write(total_dump.replace(source_db, target_db))
+    modified_dump = open(target_db, 'r')
+    with subprocess.Popen(load_cmd, stdin=modified_dump, stdout=subprocess.DEVNULL):
+        pass
+    modified_dump.close()
+
+def parallel_restore(source_db, settings_dict, parallel):
+    args = [
+        (source_db, settings_dict, '%s_%s' % (source_db, index+1))
+        for index in range(parallel)
+    ]
+    pool = multiprocessing.Pool(parallel)
+    pool.imap_unordered(db_restore, args)
+    pool.close()
+    pool.join()
 
 class DatabaseCreation(BaseDatabaseCreation):
 
@@ -27,6 +49,12 @@ class DatabaseCreation(BaseDatabaseCreation):
                 sys.exit(2)
             else:
                 raise
+
+    def clone_test_databases(self, verbosity, keepdb, parallel):
+        source_db = self.connection.settings_dict['NAME']
+        self.create_dump(source_db, parallel)
+        super().clone_test_databases(verbosity=verbosity, keepdb=keepdb)
+        parallel_restore(source_db, self.connection.settings_dict, parallel)
 
     def _clone_test_db(self, suffix, verbosity, keepdb=False):
         source_database_name = self.connection.settings_dict['NAME']
@@ -52,15 +80,11 @@ class DatabaseCreation(BaseDatabaseCreation):
                 except Exception as e:
                     self.log('Got an error recreating the test database: %s' % e)
                     sys.exit(2)
-        self._clone_db(source_database_name, target_database_name)
 
-    def _clone_db(self, source_database_name, target_database_name):
+    def create_dump(self, source_db, parallel):
         dump_args = DatabaseClient.settings_to_cmd_args(self.connection.settings_dict, [])[1:]
-        dump_cmd = ['mysqldump', *dump_args[:-1], '--routines', '--events', source_database_name]
-        load_cmd = DatabaseClient.settings_to_cmd_args(self.connection.settings_dict, [])
-        load_cmd[-1] = target_database_name
+        dump_cmd = ['mysqlpump', *dump_args[:-1], '--no-create-db', '--default-parallelism={parallel}'
+                     '--routines', '--events', '--include-databases={source_db}',
+                     '--result-file={source_db}']
+        subprocess.run(dump_cmd, check=True)
 
-        with subprocess.Popen(dump_cmd, stdout=subprocess.PIPE) as dump_proc:
-            with subprocess.Popen(load_cmd, stdin=dump_proc.stdout, stdout=subprocess.DEVNULL):
-                # Allow dump_proc to receive a SIGPIPE if the load process exits.
-                dump_proc.stdout.close()

@@ -204,6 +204,10 @@ class BaseDatabaseCreation:
 
         return test_database_name
 
+    def clone_test_databases(self, verbosity, keepdb, parallel):
+        for index in range(parallel):
+            self.clone_test_db(suffix=index + 1,verbosity=verbosity, keepdb=keepdb)
+
     def clone_test_db(self, suffix, verbosity=1, autoclobber=False, keepdb=False):
         """
         Clone a test database.
@@ -221,7 +225,7 @@ class BaseDatabaseCreation:
 
         # We could skip this call if keepdb is True, but we instead
         # give it the keepdb param. See create_test_db for details.
-        self._clone_test_db(suffix, verbosity, keepdb)
+        self._clone_test_db(suffix, verbosity, keepdb, parallel)
 
     def get_test_db_clone_settings(self, suffix):
         """
@@ -233,7 +237,7 @@ class BaseDatabaseCreation:
         orig_settings_dict = self.connection.settings_dict
         return {**orig_settings_dict, 'NAME': '{}_{}'.format(orig_settings_dict['NAME'], suffix)}
 
-    def _clone_test_db(self, suffix, verbosity, keepdb=False):
+    def _clone_test_db(self, suffix, verbosity, keepdb=False, parallel=0):
         """
         Internal implementation - duplicate the test db tables.
         """

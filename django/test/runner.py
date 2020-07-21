@@ -16,6 +16,7 @@ from django.core.management import call_command
 from django.db import connections
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import (
+    clone_databases as _clone_databases,
     setup_databases as _setup_databases, setup_test_environment,
     teardown_databases as _teardown_databases, teardown_test_environment,
 )
@@ -628,6 +629,10 @@ class DiscoverRunner:
             self.parallel, **kwargs
         )
 
+    def clone_databases(self, old_config):
+        if self.parallel > 1:
+            _clone_databases(old_config, self.verbosity, self.keepdb, self.parallel)    
+
     def get_resultclass(self):
         if self.debug_sql:
             return DebugSQLTextTestResult
@@ -708,6 +713,7 @@ class DiscoverRunner:
         run_failed = False
         try:
             self.run_checks(databases)
+            self.clone_databases(old_config)
             result = self.run_suite(suite)
         except Exception:
             run_failed = True

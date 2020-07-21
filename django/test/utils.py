@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import multiprocessing
 import re
 import sys
 import time
@@ -173,13 +174,6 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
                     keepdb=keepdb,
                     serialize=connection.settings_dict['TEST'].get('SERIALIZE', True),
                 )
-                if parallel > 1:
-                    for index in range(parallel):
-                        connection.creation.clone_test_db(
-                            suffix=str(index + 1),
-                            verbosity=verbosity,
-                            keepdb=keepdb,
-                        )
             # Configure all other connections as mirrors of the first one
             else:
                 connections[alias].creation.set_as_test_mirror(connections[first_alias].settings_dict)
@@ -194,6 +188,46 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
             connections[alias].force_debug_cursor = True
 
     return old_names
+
+
+def parallel_clone_db(args):
+    databases, suffix, verbosity, keepdb = args
+    for alias in connections:
+        connection = connections[alias]
+        # Only clone initialized databases
+        if connection.settings_dict['NAME'] in databases:
+            connection.creation.clone_test_db(suffix=suffix, verbosity=verbosity, keepdb=keepdb)
+
+
+def _init_worker(counter, initial_settings):
+    for alias in connections:
+        if initial_settings:
+            # Re-initialize settings for spawned workers
+            connections[alias].settings_dict.update(initial_settings[alias])
+
+
+def pool_setup(databases, verbosity, keepdb, parallel, initial_settings=None):
+    args = [
+        (databases, clone + 1, verbosity, keepdb)
+        for clone in range(parallel)
+    ]
+    pool = multiprocessing.Pool(
+        processes=parallel,
+        initializer=_init_worker,
+        initargs=[initial_settings],
+    )
+    pool.map(parallel_clone_db, args)
+    pool.close()
+    pool.join()
+
+
+def clone_databases(old_config, verbosity, keepdb, parallel):
+    #databases = [f'test_{db_name}'for _, db_name, clone in old_config if clone]
+    #pool_setup(databases, verbosity, keepdb, parallel, initial_settings)
+    for connection, _, clone in old_config:
+        if clone:
+            for index in range(parallel):
+                connection.creation.clone_test_db(suffix=index+1,verbosity=verbosity,keepdb=keepdb,parallel=parallel)
 
 
 def dependency_ordered(test_databases, dependencies):
