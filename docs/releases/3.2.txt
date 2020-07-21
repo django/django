@@ -31,6 +31,28 @@ officially support the latest release of each series.
 What's new in Django 3.2
 ========================
 
+Automatic :class:`~django.apps.AppConfig` discovery
+---------------------------------------------------
+
+Most pluggable applications define an :class:`~django.apps.AppConfig` subclass
+in an ``apps.py`` submodule. Many define a ``default_app_config`` variable
+pointing to this class in their ``__init__.py``.
+
+When the ``apps.py`` submodule exists and defines a single
+:class:`~django.apps.AppConfig` subclass, Django now uses that configuration
+automatically, so you can remove ``default_app_config``.
+
+``default_app_config`` made it possible to declare only the application's path
+in :setting:`INSTALLED_APPS` (e.g. ``'django.contrib.admin'``) rather than the
+app config's path (e.g. ``'django.contrib.admin.apps.AdminConfig'``). It was
+introduced for backwards-compatibility with the former style, with the intent
+to switch the ecosystem to the latter, but the switch didn't happen.
+
+With automatic ``AppConfig`` discovery, ``default_app_config`` is no longer
+needed. As a consequence, it's deprecated.
+
+See :ref:`configuring-applications-ref` for full details.
+
 Minor features
 --------------
 
@@ -387,6 +409,12 @@ Miscellaneous
   :attr:`~django.db.models.Model._default_manager` to check that related
   instances exist.
 
+* When an application defines an :class:`~django.apps.AppConfig` subclass in
+  an ``apps.py`` submodule, Django now uses this configuration automatically,
+  even if it isn't enabled with ``default_app_config``. Set ``default = False``
+  in the :class:`~django.apps.AppConfig` subclass if you need to prevent this
+  behavior. See :ref:`whats-new-3.2` for more details.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2
@@ -408,3 +436,7 @@ Miscellaneous
   ``allowlist`` instead of ``whitelist``, and ``domain_allowlist`` instead of
   ``domain_whitelist``. You may need to rename ``whitelist`` in existing
   migrations.
+
+* The ``default_app_config`` application configuration variable is deprecated,
+  due to the now automatic ``AppConfig`` discovery. See :ref:`whats-new-3.2`
+  for more details.

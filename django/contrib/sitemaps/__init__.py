@@ -158,6 +158,3 @@ class GenericSitemap(Sitemap):
         if self.date_field is not None:
             return getattr(item, self.date_field)
         return None
-
-
-default_app_config = 'django.contrib.sitemaps.apps.SiteMapsConfig'

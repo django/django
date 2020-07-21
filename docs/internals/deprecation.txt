@@ -24,6 +24,8 @@ details on these changes.
 * The ``whitelist`` argument and ``domain_whitelist`` attribute of
   ``django.core.validators.EmailValidator`` will be removed.
 
+* The ``default_app_config`` module variable will be removed.
+
 .. _deprecation-removed-in-4.0:
 
 4.0
