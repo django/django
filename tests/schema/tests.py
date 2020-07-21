@@ -2,7 +2,7 @@ import datetime
 import itertools
 import unittest
 from copy import copy
-from unittest import mock
+from unittest import mock, skipIf
 
 from django.core.management.color import no_style
 from django.db import (
@@ -706,6 +706,12 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Foo, old_field, new_field, strict=True)
         Foo.objects.create()
 
+    @skipIf(
+        connection.vendor == 'mysql' and
+        connection.mysql_is_mariadb and
+        (10, 4, 3) < connection.mysql_version < (10, 5, 2),
+        'https://jira.mariadb.org/browse/MDEV-19598',
+    )
     def test_alter_not_unique_field_to_primary_key(self):
         # Create the table.
         with connection.schema_editor() as editor:
@@ -2940,6 +2946,12 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Author, new_field, old_field, strict=True)
         self.assertEqual(self.get_constraints_for_column(Author, 'weight'), [])
 
+    @skipIf(
+        connection.vendor == 'mysql' and
+        connection.mysql_is_mariadb and
+        (10, 4, 12) < connection.mysql_version < (10, 5),
+        'https://jira.mariadb.org/browse/MDEV-22775',
+    )
     def test_alter_pk_with_self_referential_field(self):
         """
         Changing the primary key field name of a model with a self-referential
