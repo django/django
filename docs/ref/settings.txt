@@ -251,7 +251,7 @@ See the :ref:`cache documentation <cache_versioning>` for more information.
 ``CACHE_MIDDLEWARE_ALIAS``
 --------------------------
 
-Default: ``default``
+Default: ``'default'``
 
 The cache connection to use for the :ref:`cache middleware
 <the-per-site-cache>`.
