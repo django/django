@@ -1,5 +1,7 @@
 import asyncio
+import collections
 import logging
+import os
 import re
 import sys
 import time
@@ -152,7 +154,8 @@ def teardown_test_environment():
     del mail.outbox
 
 
-def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, aliases=None, **kwargs):
+def setup_databases(verbosity, interactive, *, time_keeper, keepdb=False, debug_sql=False, parallel=0,
+                    aliases=None):
     """Create the test databases."""
     test_databases, mirrored_aliases = get_unique_databases_and_mirrors(aliases)
 
@@ -167,19 +170,21 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
             # Actually create the database for the first connection
             if first_alias is None:
                 first_alias = alias
-                connection.creation.create_test_db(
-                    verbosity=verbosity,
-                    autoclobber=not interactive,
-                    keepdb=keepdb,
-                    serialize=connection.settings_dict['TEST'].get('SERIALIZE', True),
-                )
+                with time_keeper.timed("  Creating '%s'" % alias):
+                    connection.creation.create_test_db(
+                        verbosity=verbosity,
+                        autoclobber=not interactive,
+                        keepdb=keepdb,
+                        serialize=connection.settings_dict['TEST'].get('SERIALIZE', True),
+                    )
                 if parallel > 1:
                     for index in range(parallel):
-                        connection.creation.clone_test_db(
-                            suffix=str(index + 1),
-                            verbosity=verbosity,
-                            keepdb=keepdb,
-                        )
+                        with time_keeper.timed("  Cloning '%s'" % alias):
+                            connection.creation.clone_test_db(
+                                suffix=str(index + 1),
+                                verbosity=verbosity,
+                                keepdb=keepdb,
+                            )
             # Configure all other connections as mirrors of the first one
             else:
                 connections[alias].creation.set_as_test_mirror(connections[first_alias].settings_dict)
@@ -839,6 +844,36 @@ class isolate_apps(TestContextDecorator):
 
     def disable(self):
         setattr(Options, 'default_apps', self.old_apps)
+
+
+class TimeKeeper:
+    def __init__(self):
+        self.records = collections.defaultdict(list)
+
+    @contextmanager
+    def timed(self, name):
+        self.records[name]
+        start_time = time.perf_counter()
+        try:
+            yield
+        finally:
+            end_time = time.perf_counter() - start_time
+            self.records[name].append(end_time)
+
+    def print_results(self):
+        for name, end_times in self.records.items():
+            for record_time in end_times:
+                record = '%s took %.3fs' % (name, record_time)
+                sys.stderr.write(record + os.linesep)
+
+
+class NullTimeKeeper:
+    @contextmanager
+    def timed(self, name):
+        yield
+
+    def print_results(self):
+        pass
 
 
 def tag(*tags):

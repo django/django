@@ -510,7 +510,7 @@ behavior. This class defines the ``run_tests()`` entry point, plus a
 selection of other methods that are used to by ``run_tests()`` to set up,
 execute and tear down the test suite.
 
-.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, test_name_patterns=None, pdb=False, buffer=False, enable_faulthandler=True, **kwargs)
+.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, test_name_patterns=None, pdb=False, buffer=False, enable_faulthandler=True, timing=True, **kwargs)
 
     ``DiscoverRunner`` will search for tests in any file matching ``pattern``.
 
@@ -560,6 +560,9 @@ execute and tear down the test suite.
     If ``enable_faulthandler`` is ``True``, :py:mod:`faulthandler` will be
     enabled.
 
+    If ``timing`` is ``True``, test timings, including database setup and total
+    run time, will be shown.
+
     Django may, from time to time, extend the capabilities of the test runner
     by adding new arguments. The ``**kwargs`` declaration allows for this
     expansion. If you subclass ``DiscoverRunner`` or write your own test
@@ -576,7 +579,7 @@ execute and tear down the test suite.
 
     .. versionadded:: 3.2
 
-        The ``enable_faulthandler`` argument was added.
+        The ``enable_faulthandler`` and ``timing`` arguments were added.
 
 Attributes
 ~~~~~~~~~~
@@ -659,7 +662,7 @@ Methods
 
     Returns a ``TestSuite`` instance ready to be run.
 
-.. method:: DiscoverRunner.setup_databases(**kwargs)
+.. method:: DiscoverRunner.setup_databases(verbosity, interactive, **kwargs)
 
     Creates the test databases by calling
     :func:`~django.test.utils.setup_databases`.
@@ -723,7 +726,7 @@ utility methods in the ``django.test.utils`` module.
     Performs global post-test teardown, such as removing instrumentation from
     the template system and restoring normal email services.
 
-.. function:: setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, aliases=None, **kwargs)
+.. function:: setup_databases(verbosity, interactive, *, time_keeper, keepdb=False, debug_sql=False, parallel=0, aliases=None, **kwargs)
 
     Creates the test databases.
 
@@ -734,6 +737,11 @@ utility methods in the ``django.test.utils`` module.
     The ``aliases`` argument determines which :setting:`DATABASES` aliases test
     databases should be setup for. If it's not provided, it defaults to all of
     :setting:`DATABASES` aliases.
+
+    .. versionchanged:: 3.2
+
+        The ``time_keeper`` kwarg was added, and all kwargs were made
+        keyword-only.
 
 .. function:: teardown_databases(old_config, parallel=0, keepdb=False)
 
