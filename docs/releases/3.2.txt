@@ -330,6 +330,11 @@ Tests
   :py:mod:`faulthandler` by default. This can be disabled by using the
   :option:`test --no-faulthandler` option.
 
+* :class:`~django.test.runner.DiscoverRunner` and the
+  :djadmin:`test` management command can now track timings, including database
+  setup and total run time. This can be enabled by using the :option:`test
+  --timing` option.
+
 * :class:`~django.test.Client` now preserves the request query string when
   following 307 and 308 redirects.
 
@@ -453,6 +458,9 @@ Miscellaneous
   behavior. See :ref:`whats-new-3.2` for more details.
 
 * Instantiating an abstract model now raises ``TypeError``.
+
+* Keyword arguments to :func:`~django.test.utils.setup_databases` are now
+  keyword-only.
 
 .. _deprecated-features-3.2:
 
