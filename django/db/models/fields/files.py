@@ -299,6 +299,10 @@ class FileField(Field):
             file.save(file.name, file.file, save=False)
         return file
 
+    def contribute_to_class(self, cls, name, **kwargs):
+        super().contribute_to_class(cls, name, **kwargs)
+        setattr(cls, self.attname, self.descriptor_class(self))
+
     def generate_filename(self, instance, filename):
         """
         Apply (if callable) or prepend (if a string) upload_to to the filename,
