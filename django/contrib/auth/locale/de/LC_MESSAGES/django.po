@@ -67,7 +67,7 @@ msgid "Password confirmation"
 msgstr "Passwort bestätigen"
 
 msgid "Enter the same password as before, for verification."
-msgstr "Bitte das selbe Passwort zur Bestätigung erneut eingeben."
+msgstr "Bitte dasselbe Passwort zur Bestätigung erneut eingeben."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user’s "
