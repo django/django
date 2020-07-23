@@ -144,7 +144,8 @@ Minor features
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new ``item_comments`` hook allows specifying a comments URL per feed
+  item.
 
 Cache
 ~~~~~

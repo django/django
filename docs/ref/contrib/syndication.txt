@@ -889,6 +889,27 @@ This example illustrates all possible attributes and methods for a
 
         item_copyright = 'Copyright (c) 2007, Sally Smith' # Hard-coded copyright notice.
 
+        # ITEM COMMENTS URL -- It's optional to use one of these three. This is
+        # a hook that specifies how to get the URL of a page for comments for a
+        # given item.
+
+        def item_comments(self, obj):
+            """
+            Takes an item, as returned by items(), and returns the item's
+            comments URL as a normal Python string.
+            """
+
+        def item_comments(self):
+            """
+            Returns the comments URL for every item in the feed.
+            """
+
+        item_comments = 'https://www.example.com/comments' # Hard-coded comments URL
+
+.. versionchanged:: 3.2
+
+    Support for a comments URL per feed item was added through the
+    ``item_comments`` hook.
 
 The low-level framework
 =======================
