@@ -1540,10 +1540,9 @@ The numeric mode (i.e. ``0o644``) to set newly uploaded files to. For
 more information about what these modes mean, see the documentation for
 :func:`os.chmod`.
 
-If this isn't given or is ``None``, you'll get operating-system
-dependent behavior. On most platforms, temporary files will have a mode
-of ``0o600``, and files saved from memory will be saved using the
-system's standard umask.
+If ``None``, you'll get operating-system dependent behavior. On most platforms,
+temporary files will have a mode of ``0o600``, and files saved from memory will
+be saved using the system's standard umask.
 
 For security reasons, these permissions aren't applied to the temporary files
 that are stored in :setting:`FILE_UPLOAD_TEMP_DIR`.
