@@ -1,7 +1,7 @@
 argon2-cffi >= 16.1.0
 bcrypt
 docutils
-geoip2
+geoip2 < 4.0.0
 jinja2 >= 2.9.2
 numpy
 Pillow != 5.4.0
