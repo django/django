@@ -37,12 +37,13 @@ class GEOSGeometryBase(GEOSBase):
             if cls is None:
                 if GEOSGeometryBase._GEOS_CLASSES is None:
                     # Inner imports avoid import conflicts with GEOSGeometry.
-                    from .linestring import LineString, LinearRing
+                    from .collections import (
+                        GeometryCollection, MultiLineString, MultiPoint,
+                        MultiPolygon,
+                    )
+                    from .linestring import LinearRing, LineString
                     from .point import Point
                     from .polygon import Polygon
-                    from .collections import (
-                        GeometryCollection, MultiPoint, MultiLineString, MultiPolygon,
-                    )
                     GEOSGeometryBase._GEOS_CLASSES = {
                         0: Point,
                         1: LineString,

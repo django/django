@@ -1,3 +1,4 @@
+import _thread
 import copy
 import threading
 import time
@@ -5,7 +6,6 @@ import warnings
 from collections import deque
 from contextlib import contextmanager
 
-import _thread
 import pytz
 
 from django.conf import settings

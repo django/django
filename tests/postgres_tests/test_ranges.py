@@ -18,6 +18,7 @@ from .models import (
 
 try:
     from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange
+
     from django.contrib.postgres import fields as pg_fields, forms as pg_forms
     from django.contrib.postgres.validators import (
         RangeMaxValueValidator, RangeMinValueValidator,

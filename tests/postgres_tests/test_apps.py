@@ -8,6 +8,7 @@ try:
     from psycopg2.extras import (
         DateRange, DateTimeRange, DateTimeTZRange, NumericRange,
     )
+
     from django.contrib.postgres.fields import (
         DateRangeField, DateTimeRangeField, IntegerRangeField,
     )

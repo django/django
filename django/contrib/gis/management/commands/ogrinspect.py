@@ -107,6 +107,7 @@ class Command(BaseCommand):
         # Returning the output of ogrinspect with the given arguments
         # and options.
         from django.contrib.gis.utils.ogrinspect import _ogrinspect, mapping
+
         # Filter options to params accepted by `_ogrinspect`
         ogr_options = {k: v for k, v in options.items()
                        if k in get_func_args(_ogrinspect) and v is not None}
