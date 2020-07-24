@@ -80,7 +80,7 @@ version of Python. A list of default environments can be seen as follows:
     py3
     flake8
     docs
-    isort
+    isort>=5.1.0
 
 Testing other Python versions and database backends
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

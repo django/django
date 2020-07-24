@@ -7,7 +7,7 @@ from .models import (
 )
 
 try:
-    from psycopg2.extras import NumericRange, DateRange
+    from psycopg2.extras import DateRange, NumericRange
 except ImportError:
     pass  # psycopg2 isn't installed.
 

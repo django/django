@@ -41,6 +41,7 @@ class Command(BaseCommand):
 
     def python(self, options):
         import code
+
         # Set up a dictionary to serve as the environment for the shell, so
         # that tab completion works on objects that are imported at runtime.
         imported_objects = {}

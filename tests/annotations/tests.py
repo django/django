@@ -26,6 +26,7 @@ def cxOracle_py3_bug(func):
     we mark them as expected failures until someone fixes them in #23843.
     """
     from unittest import expectedFailure
+
     from django.db import connection
     return expectedFailure(func) if connection.vendor == 'oracle' else func
 

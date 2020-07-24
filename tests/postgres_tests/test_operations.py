@@ -11,10 +11,10 @@ from django.test.utils import CaptureQueriesContext
 from . import PostgreSQLTestCase
 
 try:
+    from django.contrib.postgres.indexes import BrinIndex, BTreeIndex
     from django.contrib.postgres.operations import (
         AddIndexConcurrently, CreateExtension, RemoveIndexConcurrently,
     )
-    from django.contrib.postgres.indexes import BrinIndex, BTreeIndex
 except ImportError:
     pass
 

@@ -142,7 +142,7 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
         Testing LayerMapping on 3D models.
         """
         # Import here as GDAL is required for those imports
-        from django.contrib.gis.utils import LayerMapping, LayerMapError
+        from django.contrib.gis.utils import LayerMapError, LayerMapping
 
         point_mapping = {'point': 'POINT'}
         mpoint_mapping = {'mpoint': 'MULTIPOINT'}
