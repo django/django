@@ -59,9 +59,11 @@ class FieldFile(File):
 
     @property
     def url(self):
-        self._require_file()
-        return self.storage.url(self.name)
-
+        if self:  # if file exists only then return url
+            return self.storage.url(self.name)
+        # else return none or something more relevant
+        return None 
+    
     @property
     def size(self):
         self._require_file()
