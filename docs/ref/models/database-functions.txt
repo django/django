@@ -1404,6 +1404,64 @@ It can also be registered as a transform. For example::
 Text functions
 ==============
 
+``BitLength``
+-------------
+
+.. class:: BitLength(expression, **extra)
+
+.. versionadded:: 3.2
+
+Accepts a single text field or expression and returns the bit length of the
+value. If the expression is null, then the length will also be null.
+
+Usage example::
+
+    >>> # Get the bit length of the name and goes_by fields
+    >>> from django.db.models.functions import BitLength
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(
+    ...    name_bit_length=BitLength('name'),
+    ...    goes_by_bit_length=BitLength('goes_by')).get()
+    >>> print(author.name_bit_length, author.goes_by_bit_length)
+    (112, None)
+
+It can also be registered as a transform. For example::
+
+    >>> from django.db.models import CharField
+    >>> from django.db.models.functions import BitLength
+    >>> CharField.register_lookup(BitLength)
+    >>> # Get authors whose name is longer than 56 bits
+    >>> authors = Author.objects.filter(name__bit_length__gt=56)
+
+``ByteLength``
+---------------
+
+.. class:: ByteLength(expression, **extra)
+
+.. versionadded:: 3.2
+
+Accepts a single text field or expression and returns the byte length of the
+value. If the expression is null, then the length will also be null.
+
+Usage example::
+
+    >>> # Get the byte length of the name and goes_by fields
+    >>> from django.db.models.functions import ByteLength
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(
+    ...    name_byte_length=ByteLength('name'),
+    ...    goes_by_byte_length=ByteLength('goes_by')).get()
+    >>> print(author.name_byte_length, author.goes_by_byte_length)
+    (14, None)
+
+It can also be registered as a transform. For example::
+
+    >>> from django.db.models import CharField
+    >>> from django.db.models.functions import ByteLength
+    >>> CharField.register_lookup(ByteLength)
+    >>> # Get authors whose name is longer than 7 bytes
+    >>> authors = Author.objects.filter(name__byte_length__gt=7)
+
 ``Chr``
 -------
 

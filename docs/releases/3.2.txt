@@ -271,6 +271,8 @@ Models
 * Added :class:`~django.db.models.functions.ACosh`,
   :class:`~django.db.models.functions.ASinh`,
   :class:`~django.db.models.functions.ATanh`,
+  :class:`~django.db.models.functions.BitLength`,
+  :class:`~django.db.models.functions.ByteLength`,
   :class:`~django.db.models.functions.Cosh`,
   :class:`~django.db.models.functions.Log2`,
   :class:`~django.db.models.functions.Log10`,

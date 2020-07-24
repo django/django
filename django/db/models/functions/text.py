@@ -39,6 +39,26 @@ class PostgreSQLSHAMixin:
         )
 
 
+class BitLength(Transform):
+    function = 'BIT_LENGTH'
+    lookup_name = 'bit_length'
+    output_field = IntegerField()
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        # LENGTHB doesn't work correctly with multibyte strings.
+        raise NotSupportedError('BitLength is not supported on Oracle.')
+
+
+class ByteLength(Transform):
+    function = 'OCTET_LENGTH'
+    lookup_name = 'byte_length'
+    output_field = IntegerField()
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        # LENGTHB doesn't work correctly with multibyte strings.
+        raise NotSupportedError('ByteLength is not supported on Oracle.')
+
+
 class Chr(Transform):
     function = 'CHR'
     lookup_name = 'chr'
