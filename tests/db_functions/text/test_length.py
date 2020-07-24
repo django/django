@@ -1,5 +1,5 @@
 from django.db.models import CharField
-from django.db.models.functions import Length
+from django.db.models.functions import Length, Reverse
 from django.test import TestCase
 from django.test.utils import register_lookup
 
@@ -7,40 +7,43 @@ from ..models import Author
 
 
 class LengthTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.john = Author.objects.create(name='John Smith', alias='smithj')
+        cls.elena = Author.objects.create(name='Élena Jordan', alias='elena')
+        cls.python = Author.objects.create(name='パイソン')
+
+    def test_null(self):
+        author = Author.objects.annotate(length=Length('alias')).get(pk=self.python.pk)
+        self.assertEqual(author.length, None)
 
     def test_basic(self):
-        Author.objects.create(name='John Smith', alias='smithj')
-        Author.objects.create(name='Rhonda')
         authors = Author.objects.annotate(
             name_length=Length('name'),
             alias_length=Length('alias'),
         )
         self.assertQuerysetEqual(
-            authors.order_by('name'), [(10, 6), (6, None)],
-            lambda a: (a.name_length, a.alias_length)
+            authors,
+            [(10, 6), (12, 5), (4, None)],
+            lambda a: (a.name_length, a.alias_length),
+            ordered=False,
         )
-        self.assertEqual(authors.filter(alias_length__lte=Length('name')).count(), 1)
-
-    def test_ordering(self):
-        Author.objects.create(name='John Smith', alias='smithj')
-        Author.objects.create(name='John Smith', alias='smithj1')
-        Author.objects.create(name='Rhonda', alias='ronny')
-        authors = Author.objects.order_by(Length('name'), Length('alias'))
-        self.assertQuerysetEqual(
-            authors, [
-                ('Rhonda', 'ronny'),
-                ('John Smith', 'smithj'),
-                ('John Smith', 'smithj1'),
-            ],
-            lambda a: (a.name, a.alias)
-        )
+        self.assertEqual(authors.filter(alias_length__lte=Length('name')).count(), 2)
 
     def test_transform(self):
         with register_lookup(CharField, Length):
-            Author.objects.create(name='John Smith', alias='smithj')
-            Author.objects.create(name='Rhonda')
-            authors = Author.objects.filter(name__length__gt=7)
-            self.assertQuerysetEqual(
-                authors.order_by('name'), ['John Smith'],
-                lambda a: a.name
-            )
+            authors = Author.objects.all()
+            self.assertCountEqual(authors.filter(name__length__gt=10), [self.elena])
+            self.assertCountEqual(authors.exclude(name__length__gt=10), [self.john, self.python])
+
+    def test_expressions(self):
+        author = Author.objects.annotate(length=Length(Reverse('name'))).get(pk=self.python.pk)
+        self.assertEqual(author.length, 4)
+        with register_lookup(CharField, Length), register_lookup(CharField, Reverse):
+            authors = Author.objects.all()
+            self.assertCountEqual(authors.filter(name__reverse__length__gt=10), [self.elena])
+            self.assertCountEqual(authors.exclude(name__reverse__length__gt=10), [self.john, self.python])
+
+    def test_ordering(self):
+        authors = Author.objects.order_by(Length('name'))
+        self.assertSequenceEqual(authors, [self.python, self.john, self.elena])
