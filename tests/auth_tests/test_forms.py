@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_login_failed
 from django.contrib.sites.models import Site
 from django.core import mail
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.forms.fields import CharField, Field, IntegerField
@@ -476,6 +477,7 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         form = AuthenticationForm(None, data)
         form.is_valid()  # Not necessary to have valid credentails for the test.
         self.assertEqual(form.cleaned_data['password'], data['password'])
+        cache.clear()  # Avoid the 5 secs delay in the next test.
 
     @override_settings(AUTH_USER_MODEL='auth_tests.IntegerUsernameUser')
     def test_integer_username(self):

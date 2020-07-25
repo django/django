@@ -23,6 +23,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
 from django.core import mail
+from django.core.cache import cache
 from django.db import connection
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import CsrfViewMiddleware, get_token
@@ -459,6 +460,7 @@ class ChangePasswordTest(AuthViewsTestCase):
         self.assertFormError(response, AuthenticationForm.error_messages['invalid_login'] % {
             'username': User._meta.get_field('username').verbose_name
         })
+        cache.clear()  # Avoid the 5 secs delay in the next test.
 
     def logout(self):
         self.client.get('/logout/')

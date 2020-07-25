@@ -1,4 +1,7 @@
 import unicodedata
+from datetime import timedelta
+from hashlib import sha256
+from time import sleep
 
 from django import forms
 from django.contrib.auth import (
@@ -10,9 +13,11 @@ from django.contrib.auth.hashers import (
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.template import loader
+from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.text import capfirst
@@ -181,6 +186,8 @@ class AuthenticationForm(forms.Form):
         strip=False,
         widget=forms.PasswordInput(attrs={'autocomplete': 'current-password'}),
     )
+    DELAY_AFTER_FAILED_LOGIN = 5  # seconds
+    FAILED_LOGIN_CACHE_PREFIX = 'auth-failed'
 
     error_messages = {
         'invalid_login': _(
@@ -212,13 +219,31 @@ class AuthenticationForm(forms.Form):
         password = self.cleaned_data.get('password')
 
         if username is not None and password:
+            self.pre_authenticate(username)
             self.user_cache = authenticate(self.request, username=username, password=password)
             if self.user_cache is None:
+                # Cache failed login with delay.
+                cache.set(
+                    '%s:%s' % (self.FAILED_LOGIN_CACHE_PREFIX, sha256(force_bytes(username)).hexdigest()),
+                    timezone.now() + timedelta(seconds=self.DELAY_AFTER_FAILED_LOGIN),
+                    60
+                )
                 raise self.get_invalid_login_error()
             else:
                 self.confirm_login_allowed(self.user_cache)
 
         return self.cleaned_data
+
+    def pre_authenticate(self, username):
+        # Check for failed logins delay in the cache.
+        auth_delay = cache.get('%s:%s' % (
+            self.FAILED_LOGIN_CACHE_PREFIX,
+            sha256(force_bytes(username)).hexdigest()
+        ))
+        if auth_delay:
+            wait_for = (auth_delay - timezone.now()).total_seconds()
+            if wait_for > 0:
+                sleep(wait_for)
 
     def confirm_login_allowed(self, user):
         """
