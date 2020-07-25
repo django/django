@@ -1037,10 +1037,16 @@ class BaseDatabaseSchemaEditor:
         return output
 
     def _field_should_be_altered(self, old_field, new_field):
-        # Don't alter when changing only a field name.
+        _, old_path, old_args, old_kwargs = old_field.deconstruct()
+        _, new_path, new_args, new_kwargs = new_field.deconstruct()
+        # Don't alter when:
+        # - changing only a field name
+        # - adding only a db_column and the column name is not changed
+        old_kwargs.pop('db_column', None)
+        new_kwargs.pop('db_column', None)
         return (
             old_field.column != new_field.column or
-            old_field.deconstruct()[1:] != new_field.deconstruct()[1:]
+            (old_path, old_args, old_kwargs) != (new_path, new_args, new_kwargs)
         )
 
     def _field_should_be_indexed(self, model, field):
