@@ -905,10 +905,10 @@ To query for missing keys, use the ``isnull`` lookup::
 
     The lookup examples given above implicitly use the :lookup:`exact` lookup.
     Key, index, and path transforms can also be chained with:
-    :lookup:`contains`, :lookup:`icontains`, :lookup:`endswith`,
-    :lookup:`iendswith`, :lookup:`iexact`, :lookup:`regex`, :lookup:`iregex`,
-    :lookup:`startswith`, :lookup:`istartswith`, :lookup:`lt`, :lookup:`lte`,
-    :lookup:`gt`, and :lookup:`gte` lookups.
+    :lookup:`icontains`, :lookup:`endswith`, :lookup:`iendswith`,
+    :lookup:`iexact`, :lookup:`regex`, :lookup:`iregex`, :lookup:`startswith`,
+    :lookup:`istartswith`, :lookup:`lt`, :lookup:`lte`, :lookup:`gt`, and
+    :lookup:`gte`, as well as with :ref:`containment-and-key-lookups`.
 
 .. warning::
 
@@ -937,8 +937,10 @@ To query for missing keys, use the ``isnull`` lookup::
     On PostgreSQL, if only one key or index is used, the SQL operator ``->`` is
     used. If multiple operators are used then the ``#>`` operator is used.
 
-Containment and key operations
-------------------------------
+.. _containment-and-key-lookups:
+
+Containment and key lookups
+---------------------------
 
 .. fieldlookup:: jsonfield.contains
 
