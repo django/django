@@ -431,10 +431,6 @@ class KeyTransformIContains(CaseInsensitiveMixin, KeyTransformTextLookupMixin, l
     pass
 
 
-class KeyTransformContains(KeyTransformTextLookupMixin, lookups.Contains):
-    pass
-
-
 class KeyTransformStartsWith(KeyTransformTextLookupMixin, lookups.StartsWith):
     pass
 
@@ -486,7 +482,6 @@ class KeyTransformGte(KeyTransformNumericLookupMixin, lookups.GreaterThanOrEqual
 KeyTransform.register_lookup(KeyTransformExact)
 KeyTransform.register_lookup(KeyTransformIExact)
 KeyTransform.register_lookup(KeyTransformIsNull)
-KeyTransform.register_lookup(KeyTransformContains)
 KeyTransform.register_lookup(KeyTransformIContains)
 KeyTransform.register_lookup(KeyTransformStartsWith)
 KeyTransform.register_lookup(KeyTransformIStartsWith)
