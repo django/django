@@ -50,7 +50,7 @@ class PasswordResetTokenGenerator:
                 return False
 
         # Check the timestamp is within limit.
-        if (self._num_seconds(self._now()) - ts) > settings.PASSWORD_RESET_TIMEOUT:
+        if (self._num_seconds(self._now()) - ts) > self._timeout:
             return False
 
         return True
@@ -96,6 +96,10 @@ class PasswordResetTokenGenerator:
     def _now(self):
         # Used for mocking in tests
         return datetime.now()
+
+    @property
+    def _timeout(self):
+        return settings.PASSWORD_RESET_TIMEOUT
 
 
 default_token_generator = PasswordResetTokenGenerator()
