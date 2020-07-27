@@ -287,7 +287,7 @@ class ActionSelenium(argparse.Action):
 
 def django_tests(verbosity, interactive, failfast, keepdb, reverse,
                  test_labels, debug_sql, parallel, tags, exclude_tags,
-                 test_name_patterns, start_at, start_after, pdb, buffer):
+                 test_name_patterns, start_at, start_after, pdb, no_buffer):
     state = setup(verbosity, test_labels, parallel, start_at, start_after)
     extra_tests = []
 
@@ -308,7 +308,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
         exclude_tags=exclude_tags,
         test_name_patterns=test_name_patterns,
         pdb=pdb,
-        buffer=buffer,
+        buffer=not no_buffer,
     )
     failures = test_runner.run_tests(
         test_labels or get_installed(),
@@ -505,8 +505,8 @@ if __name__ == "__main__":
         help='Runs the PDB debugger on error or failure.'
     )
     parser.add_argument(
-        '-b', '--buffer', action='store_true',
-        help='Discard output of passing tests.',
+        '-nb', '--no-buffer', action='store_true', default=False,
+        help='Shows output from passing tests.',
     )
     if PY37:
         parser.add_argument(
@@ -574,7 +574,7 @@ if __name__ == "__main__":
             options.debug_sql, options.parallel, options.tags,
             options.exclude_tags,
             getattr(options, 'test_name_patterns', None),
-            options.start_at, options.start_after, options.pdb, options.buffer,
+            options.start_at, options.start_after, options.pdb, options.no_buffer,
         )
         if failures:
             sys.exit(1)
