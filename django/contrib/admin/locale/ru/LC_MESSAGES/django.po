@@ -135,23 +135,23 @@ msgid "log entries"
 msgstr "записи в журнале"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "Добавлено \"%(object)s\"."
+msgid "Added “%(object)s”."
+msgstr "Добавлено “%(object)s”."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "Изменено \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” - %(changes)s"
+msgstr "Изменено “%(object)s” - %(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "Удалено \"%(object)s.\""
+msgid "Deleted “%(object)s.”"
+msgstr "Удалено “%(object)s.”"
 
 msgid "LogEntry Object"
 msgstr "Запись в журнале"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "Добавлен {name} \"{object}\"."
+msgid "Added {name} “{object}”."
+msgstr "Добавлен {name} “{object}”."
 
 msgid "Added."
 msgstr "Добавлено."
@@ -160,16 +160,16 @@ msgid "and"
 msgstr "и"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "Изменено {fields} у {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "Изменено {fields} у {name} “{object}”."
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "Изменено {fields}."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr "Удален {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
+msgstr "Удален {name} “{object}”."
 
 msgid "No fields changed."
 msgstr "Ни одно поле не изменено."
@@ -178,49 +178,49 @@ msgid "None"
 msgstr "Нет"
 
 msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+"Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
-"Удерживайте \"Control\" (или \"Command\" на Mac), чтобы выбрать несколько "
+"Удерживайте “Control” (или “Command” на Mac), чтобы выбрать несколько "
 "значений."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" было успешно добавлено."
+msgid "The {name} “{obj}” was added successfully."
+msgstr "{name} “{obj}” было успешно добавлено."
 
 msgid "You may edit it again below."
 msgstr "Вы можете снова изменить этот объект ниже."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"{name} \"{obj}\" был успешно добавлен. Вы можете добавить еще один {name} "
+"{name} “{obj}” был успешно добавлен. Вы можете добавить еще один {name} "
 "ниже."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
-"{name} \"{obj}\" был изменен успешно. Вы можете отредактировать его снова "
+"{name} “{obj}” был изменен успешно. Вы можете отредактировать его снова "
 "ниже."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+"The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
-"{name} \"{obj}\" был успешно добавлен. Вы можете отредактировать его еще раз "
+"{name} “{obj}” был успешно добавлен. Вы можете отредактировать его еще раз "
 "ниже."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
-msgstr "{name} \"{obj}\" был изменен. Вы можете добавить еще один {name} ниже."
+msgstr "{name} “{obj}” был изменен. Вы можете добавить еще один {name} ниже."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "{name} \"{obj}\" был изменен."
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "{name} “{obj}” был изменен."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -233,12 +233,12 @@ msgid "No action selected."
 msgstr "Действие не выбрано."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" был успешно удален."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "%(name)s “%(obj)s” был успешно удален."
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
-msgstr "%(name)s с ID \"%(key)s\" не существует. Возможно оно было удалено?"
+msgid "%(name)s with ID “%(key)s” doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s с ID “%(key)s” не существует. Возможно оно было удалено?"
 
 #, python-format
 msgid "Add %s"
