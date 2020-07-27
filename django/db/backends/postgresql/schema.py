@@ -38,8 +38,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def quote_value(self, value):
         if isinstance(value, str):
             value = value.replace('%', '%%')
+        adapted = psycopg2.extensions.adapt(value)
+        if hasattr(adapted, 'encoding'):
+            adapted.encoding = 'utf8'
         # getquoted() returns a quoted bytestring of the adapted value.
-        return psycopg2.extensions.adapt(value).getquoted().decode()
+        return adapted.getquoted().decode()
 
     def _field_indexes_sql(self, model, field):
         output = super()._field_indexes_sql(model, field)

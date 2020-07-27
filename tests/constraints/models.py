@@ -4,6 +4,7 @@ from django.db import models
 class Product(models.Model):
     price = models.IntegerField(null=True)
     discounted_price = models.IntegerField(null=True)
+    unit = models.CharField(max_length=15, null=True)
 
     class Meta:
         required_db_features = {
@@ -30,6 +31,13 @@ class Product(models.Model):
                     output_field=models.BooleanField()
                 ),
                 name='%(app_label)s_price_neq_500_wrap',
+            ),
+            models.CheckConstraint(
+                check=models.Q(
+                    models.Q(unit__isnull=True) |
+                    models.Q(unit__in=['μg/mL', 'ng/mL'])
+                ),
+                name='unicode_unit_list',
             ),
         ]
 
