@@ -222,12 +222,13 @@ class AuthenticationForm(forms.Form):
             self.pre_authenticate(username)
             self.user_cache = authenticate(self.request, username=username, password=password)
             if self.user_cache is None:
-                # Cache failed login with delay.
-                cache.set(
-                    '%s:%s' % (self.FAILED_LOGIN_CACHE_PREFIX, sha256(force_bytes(username)).hexdigest()),
-                    timezone.now() + timedelta(seconds=self.DELAY_AFTER_FAILED_LOGIN),
-                    60
-                )
+                if self.DELAY_AFTER_FAILED_LOGIN > 0:
+                    # Cache failed login with delay.
+                    cache.set(
+                        '%s:%s' % (self.FAILED_LOGIN_CACHE_PREFIX, sha256(force_bytes(username)).hexdigest()),
+                        timezone.now() + timedelta(seconds=self.DELAY_AFTER_FAILED_LOGIN),
+                        60
+                    )
                 raise self.get_invalid_login_error()
             else:
                 self.confirm_login_allowed(self.user_cache)
@@ -235,6 +236,8 @@ class AuthenticationForm(forms.Form):
         return self.cleaned_data
 
     def pre_authenticate(self, username):
+        if self.DELAY_AFTER_FAILED_LOGIN <= 0:
+            return
         # Check for failed logins delay in the cache.
         auth_delay = cache.get('%s:%s' % (
             self.FAILED_LOGIN_CACHE_PREFIX,
