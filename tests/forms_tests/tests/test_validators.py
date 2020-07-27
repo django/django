@@ -1,4 +1,5 @@
 import re
+import types
 from unittest import TestCase
 
 from django import forms
@@ -62,3 +63,43 @@ class TestFieldWithValidators(TestCase):
         form = UserForm({'full_name': 'not int nor mail'})
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['full_name'], ['Enter a valid integer.', 'Enter a valid email address.'])
+
+
+class ValidatorCustomMessageTests(TestCase):
+    def test_value_placeholder_with_char_field(self):
+        cases = [
+            (validators.MaxLengthValidator(10), 11 * 'x', 'max_length'),
+            (validators.MinLengthValidator(10), 9 * 'x', 'min_length'),
+        ]
+        for validator, value, code in cases:
+            if isinstance(validator, types.FunctionType):
+                name = validator.__name__
+            else:
+                name = type(validator).__name__
+            with self.subTest(name, value=value):
+                class MyForm(forms.Form):
+                    field = forms.CharField(
+                        validators=[validator],
+                        error_messages={code: '%(value)s'},
+                    )
+
+                form = MyForm({'field': value})
+                self.assertIs(form.is_valid(), False)
+                self.assertEqual(form.errors, {'field': [value]})
+
+    def test_value_placeholder_with_integer_field(self):
+        cases = [
+            (validators.MaxValueValidator(0), 1, 'max_value'),
+            (validators.MinValueValidator(0), -1, 'min_value'),
+        ]
+        for validator, value, code in cases:
+            with self.subTest(type(validator).__name__, value=value):
+                class MyForm(forms.Form):
+                    field = forms.IntegerField(
+                        validators=[validator],
+                        error_messages={code: '%(value)s'},
+                    )
+
+                form = MyForm({'field': value})
+                self.assertIs(form.is_valid(), False)
+                self.assertEqual(form.errors, {'field': [str(value)]})
