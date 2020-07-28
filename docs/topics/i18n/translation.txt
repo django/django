@@ -447,7 +447,7 @@ helper function described next.
 Lazy translations and plural
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When using lazy translation for a plural string (``[u]n[p]gettext_lazy``), you
+When using lazy translation for a plural string (``n[p]gettext_lazy``), you
 generally don't know the ``number`` argument at the time of the string
 definition. Therefore, you are authorized to pass a key name instead of an
 integer as the ``number`` argument. Then ``number`` will be looked up in the
