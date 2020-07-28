@@ -186,7 +186,7 @@ class AuthenticationForm(forms.Form):
         strip=False,
         widget=forms.PasswordInput(attrs={'autocomplete': 'current-password'}),
     )
-    DELAY_AFTER_FAILED_LOGIN = 5  # seconds
+    DELAY_AFTER_FAILED_LOGIN = 3  # seconds
     FAILED_LOGIN_CACHE_PREFIX = 'auth-failed'
 
     error_messages = {
