@@ -43,6 +43,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_aggregate_filter_clause = Database.sqlite_version_info >= (3, 30, 1)
     supports_order_by_nulls_modifier = Database.sqlite_version_info >= (3, 30, 0)
     order_by_nulls_first = True
+    supports_json_field_contains = False
 
     @cached_property
     def supports_atomic_references_rename(self):

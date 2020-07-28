@@ -960,9 +960,9 @@ contained in the top-level of the field. For example::
     >>> Dog.objects.filter(data__contains={'breed': 'collie'})
     <QuerySet [<Dog: Meg>]>
 
-.. admonition:: Oracle
+.. admonition:: Oracle and SQLite
 
-    ``contains`` is not supported on Oracle.
+    ``contains`` is not supported on Oracle and SQLite.
 
 .. fieldlookup:: jsonfield.contained_by
 
@@ -984,9 +984,9 @@ subset of those in the value passed. For example::
     >>> Dog.objects.filter(data__contained_by={'breed': 'collie'})
     <QuerySet [<Dog: Fred>]>
 
-.. admonition:: Oracle
+.. admonition:: Oracle and SQLite
 
-    ``contained_by`` is not supported on Oracle.
+    ``contained_by`` is not supported on Oracle and SQLite.
 
 .. fieldlookup:: jsonfield.has_key
 
