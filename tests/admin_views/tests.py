@@ -19,6 +19,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME, get_permission_codename
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
+from django.core.cache import cache
 from django.core.checks import Error
 from django.core.files import temp as tempfile
 from django.forms.utils import ErrorList
@@ -1543,14 +1544,17 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(response.status_code, 302)
         login = self.client.post(login_url, self.super_email_login)
         self.assertContains(login, ERROR_MESSAGE)
+        cache.clear()
         # only correct passwords get a username hint
         login = self.client.post(login_url, self.super_email_bad_login)
         self.assertContains(login, ERROR_MESSAGE)
+        cache.clear()
         new_user = User(username='jondoe', password='secret', email='super@example.com')
         new_user.save()
         # check to ensure if there are multiple email addresses a user doesn't get a 500
         login = self.client.post(login_url, self.super_email_login)
         self.assertContains(login, ERROR_MESSAGE)
+        cache.clear()
 
         # View User
         response = self.client.get(self.index_url)
@@ -1590,6 +1594,7 @@ class AdminViewPermissionsTest(TestCase):
         login = self.client.post(login_url, self.joepublic_login)
         self.assertEqual(login.status_code, 200)
         self.assertContains(login, ERROR_MESSAGE)
+        cache.clear()
 
         # Requests without username should not return 500 errors.
         response = self.client.get(self.index_url)

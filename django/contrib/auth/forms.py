@@ -1,7 +1,6 @@
 import unicodedata
 from datetime import timedelta
 from hashlib import sha256
-from time import sleep
 
 from django import forms
 from django.contrib.auth import (
@@ -21,7 +20,7 @@ from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.text import capfirst
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _, ngettext_lazy
 
 UserModel = get_user_model()
 
@@ -195,6 +194,10 @@ class AuthenticationForm(forms.Form):
             "fields may be case-sensitive."
         ),
         'inactive': _("This account is inactive."),
+        'early_retry': ngettext_lazy(
+            "After a failed login, you need to wait for %s second before trying a new login.",
+            "After a failed login, you need to wait for %s seconds before trying a new login.",
+        ),
     }
 
     def __init__(self, request=None, *args, **kwargs):
@@ -243,10 +246,11 @@ class AuthenticationForm(forms.Form):
             self.FAILED_LOGIN_CACHE_PREFIX,
             sha256(force_bytes(username)).hexdigest()
         ))
-        if auth_delay:
-            wait_for = (auth_delay - timezone.now()).total_seconds()
-            if wait_for > 0:
-                sleep(wait_for)
+        if auth_delay and (auth_delay - timezone.now()).total_seconds() > 0:
+            raise ValidationError(
+                self.error_messages['early_retry'] % self.DELAY_AFTER_FAILED_LOGIN,
+                code='early_retry',
+            )
 
     def confirm_login_allowed(self, user):
         """

@@ -346,6 +346,27 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         finally:
             user_login_failed.disconnect(signal_handler)
 
+    def test_failed_login_throttled(self):
+        form = AuthenticationForm(None, {
+            'username': 'testclient',
+            'password': 'incorrect',
+        })
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors['__all__'],
+            ['Please enter a correct username and password. Note that both fields may be case-sensitive.']
+        )
+        form = AuthenticationForm(None, {
+            'username': 'testclient',
+            'password': 'incorrect',
+        })
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors['__all__'],
+            ['After a failed login, you need to wait for 3 seconds before trying a new login.']
+        )
+        cache.clear()
+
     def test_inactive_user_i18n(self):
         with self.settings(USE_I18N=True), translation.override('pt-br', deactivate=True):
             # The user is inactive.
