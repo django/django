@@ -441,6 +441,10 @@ class TestQuerying(TestCase):
             [self.objs[3], self.objs[4], self.objs[6]],
         )
 
+    @skipIf(
+        connection.vendor == 'oracle',
+        "Oracle doesn't support contains lookup.",
+    )
     def test_contains(self):
         tests = [
             ({}, self.objs[2:5] + self.objs[6:8]),
@@ -455,6 +459,17 @@ class TestQuerying(TestCase):
             with self.subTest(value=value):
                 qs = NullableJSONModel.objects.filter(value__contains=value)
                 self.assertSequenceEqual(qs, expected)
+
+    @skipUnless(
+        connection.vendor == 'oracle',
+        "Oracle doesn't support contains lookup.",
+    )
+    def test_contains_unsupported(self):
+        msg = 'contains lookup is not supported on Oracle.'
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            NullableJSONModel.objects.filter(
+                value__contains={'baz': {'a': 'b', 'c': 'd'}},
+            ).get()
 
     @skipUnlessDBFeature('supports_primitives_in_json_field')
     def test_contains_primitives(self):
@@ -662,12 +677,12 @@ class TestQuerying(TestCase):
             ('value__baz__has_key', 'c'),
             ('value__baz__has_keys', ['a', 'c']),
             ('value__baz__has_any_keys', ['a', 'x']),
-            ('value__contains', KeyTransform('bax', 'value')),
             ('value__has_key', KeyTextTransform('foo', 'value')),
         )
-        # contained_by lookup is not supported on Oracle.
+        # contained_by and contains lookups are not supported on Oracle.
         if connection.vendor != 'oracle':
             tests += (
+                ('value__contains', KeyTransform('bax', 'value')),
                 ('value__baz__contained_by', {'a': 'b', 'c': 'd', 'e': 'f'}),
                 (
                     'value__contained_by',

@@ -146,24 +146,7 @@ class DataContains(PostgresOperatorLookup):
         return 'JSON_CONTAINS(%s, %s)' % (lhs, rhs), params
 
     def as_oracle(self, compiler, connection):
-        if isinstance(self.rhs, KeyTransform):
-            return HasKey(self.lhs, self.rhs).as_oracle(compiler, connection)
-        lhs, lhs_params = self.process_lhs(compiler, connection)
-        params = tuple(lhs_params)
-        sql = (
-            "JSON_QUERY(%s, '$%s' WITH WRAPPER) = "
-            "JSON_QUERY('%s', '$.value' WITH WRAPPER)"
-        )
-        rhs = json.loads(self.rhs)
-        if isinstance(rhs, dict):
-            if not rhs:
-                return "DBMS_LOB.SUBSTR(%s) LIKE '{%%%%}'" % lhs, params
-            return ' AND '.join([
-                sql % (
-                    lhs, '.%s' % json.dumps(key), json.dumps({'value': value}),
-                ) for key, value in rhs.items()
-            ]), params
-        return sql % (lhs, '', json.dumps({'value': rhs})), params
+        raise NotSupportedError('contains lookup is not supported on Oracle.')
 
 
 class ContainedBy(PostgresOperatorLookup):
