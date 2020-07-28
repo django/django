@@ -533,7 +533,10 @@ backends.
   ``DatabaseFeatures.supports_json_field`` to ``False``. If storing primitives
   is not supported, set ``DatabaseFeatures.supports_primitives_in_json_field``
   to ``False``. If there is a true datatype for JSON, set
-  ``DatabaseFeatures.has_native_json_field`` to ``True``.
+  ``DatabaseFeatures.has_native_json_field`` to ``True``. If
+  :lookup:`jsonfield.contains` and :lookup:`jsonfield.contained_by` are not
+  supported, set ``DatabaseFeatures.supports_json_field_contains`` to
+  ``False``.
 
 * Third party database backends must implement introspection for ``JSONField``
   or set ``can_introspect_json_field`` to ``False``.
