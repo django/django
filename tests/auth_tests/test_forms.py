@@ -15,6 +15,7 @@ from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.forms.fields import CharField, Field, IntegerField
+from django.http import HttpRequest
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils import translation
 from django.utils.text import capfirst
@@ -347,15 +348,14 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
             user_login_failed.disconnect(signal_handler)
 
     def test_failed_login_throttled(self):
+        invalid_error = AuthenticationForm.error_messages['invalid_login'] % {'username': 'username'}
         form = AuthenticationForm(None, {
             'username': 'testclient',
             'password': 'incorrect',
         })
         self.assertFalse(form.is_valid())
-        self.assertEqual(
-            form.errors['__all__'],
-            ['Please enter a correct username and password. Note that both fields may be case-sensitive.']
-        )
+        self.assertEqual(form.errors['__all__'], [invalid_error])
+
         form = AuthenticationForm(None, {
             'username': 'testclient',
             'password': 'incorrect',
@@ -365,6 +365,15 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
             form.errors['__all__'],
             ['After a failed login, you need to wait for 3 seconds before trying a new login.']
         )
+        # Not throttled if coming from a different IP
+        req = HttpRequest()
+        req.META["REMOTE_ADDR"] = '192.168.1.1'
+        form = AuthenticationForm(req, {
+            'username': 'testclient',
+            'password': 'incorrect',
+        })
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors['__all__'], [invalid_error])
         cache.clear()
 
     def test_inactive_user_i18n(self):

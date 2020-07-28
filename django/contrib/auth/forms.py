@@ -217,6 +217,14 @@ class AuthenticationForm(forms.Form):
         if self.fields['username'].label is None:
             self.fields['username'].label = capfirst(self.username_field.verbose_name)
 
+    def _failed_login_cache_key(self, username):
+        try:
+            origin = str(username) + self.request.META.get('REMOTE_ADDR', '')
+        except AttributeError:
+            origin = username
+        digest = sha256(force_bytes(origin)).hexdigest()
+        return '%s:%s' % (self.FAILED_LOGIN_CACHE_PREFIX, digest)
+
     def clean(self):
         username = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
@@ -228,7 +236,7 @@ class AuthenticationForm(forms.Form):
                 if self.DELAY_AFTER_FAILED_LOGIN > 0:
                     # Cache failed login with delay.
                     cache.set(
-                        '%s:%s' % (self.FAILED_LOGIN_CACHE_PREFIX, sha256(force_bytes(username)).hexdigest()),
+                        self._failed_login_cache_key(username),
                         timezone.now() + timedelta(seconds=self.DELAY_AFTER_FAILED_LOGIN),
                         60
                     )
@@ -242,10 +250,7 @@ class AuthenticationForm(forms.Form):
         if self.DELAY_AFTER_FAILED_LOGIN <= 0:
             return
         # Check for failed logins delay in the cache.
-        auth_delay = cache.get('%s:%s' % (
-            self.FAILED_LOGIN_CACHE_PREFIX,
-            sha256(force_bytes(username)).hexdigest()
-        ))
+        auth_delay = cache.get(self._failed_login_cache_key(username))
         if auth_delay and (auth_delay - timezone.now()).total_seconds() > 0:
             raise ValidationError(
                 self.error_messages['early_retry'] % self.DELAY_AFTER_FAILED_LOGIN,
