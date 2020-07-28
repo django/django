@@ -5,7 +5,6 @@ import datetime
 import decimal
 import functools
 import hashlib
-import json
 import math
 import operator
 import re
@@ -235,7 +234,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         create_deterministic_function('DEGREES', 1, none_guard(math.degrees))
         create_deterministic_function('EXP', 1, none_guard(math.exp))
         create_deterministic_function('FLOOR', 1, none_guard(math.floor))
-        create_deterministic_function('JSON_CONTAINS', 2, _sqlite_json_contains)
         create_deterministic_function('LN', 1, none_guard(math.log))
         create_deterministic_function('LOG', 2, none_guard(lambda x, y: math.log(y, x)))
         create_deterministic_function('LPAD', 3, _sqlite_lpad)
@@ -601,11 +599,3 @@ def _sqlite_lpad(text, length, fill_text):
 @none_guard
 def _sqlite_rpad(text, length, fill_text):
     return (text + fill_text * length)[:length]
-
-
-@none_guard
-def _sqlite_json_contains(haystack, needle):
-    target, candidate = json.loads(haystack), json.loads(needle)
-    if isinstance(target, dict) and isinstance(candidate, dict):
-        return target.items() >= candidate.items()
-    return target == candidate
