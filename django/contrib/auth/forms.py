@@ -238,7 +238,7 @@ class AuthenticationForm(forms.Form):
                     cache.set(
                         self._failed_login_cache_key(username),
                         timezone.now() + timedelta(seconds=self.DELAY_AFTER_FAILED_LOGIN),
-                        60
+                        timeout=60,
                     )
                 raise self.get_invalid_login_error()
             else:

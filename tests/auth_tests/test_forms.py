@@ -363,7 +363,7 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form.errors['__all__'],
-            ['After a failed login, you need to wait for 3 seconds before trying a new login.']
+            ['After a failed login, you need to wait for 3 seconds before trying a new login.'],
         )
         # Not throttled if coming from a different IP
         req = HttpRequest()
@@ -507,7 +507,7 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         form = AuthenticationForm(None, data)
         form.is_valid()  # Not necessary to have valid credentails for the test.
         self.assertEqual(form.cleaned_data['password'], data['password'])
-        cache.clear()  # Avoid the 5 secs delay in the next test.
+        cache.clear()  # Avoid the failed login delay in the next test.
 
     @override_settings(AUTH_USER_MODEL='auth_tests.IntegerUsernameUser')
     def test_integer_username(self):

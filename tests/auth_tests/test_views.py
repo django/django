@@ -460,7 +460,7 @@ class ChangePasswordTest(AuthViewsTestCase):
         self.assertFormError(response, AuthenticationForm.error_messages['invalid_login'] % {
             'username': User._meta.get_field('username').verbose_name
         })
-        cache.clear()  # Avoid the 5 secs delay in the next test.
+        cache.clear()  # Avoid the failed login delay in the next test.
 
     def logout(self):
         self.client.get('/logout/')
