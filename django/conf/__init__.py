@@ -76,6 +76,12 @@ class LazySettings(LazyObject):
         if self._wrapped is empty:
             self._setup(name)
         val = getattr(self._wrapped, name)
+
+        # Special case some settings which require further modification.
+        # This is done here for performance reasons so the modified value is cached.
+        if name in {'MEDIA_URL', 'STATIC_URL'} and val is not None:
+            val = self._add_script_prefix(val)
+
         self.__dict__[name] = val
         return val
 
@@ -148,14 +154,6 @@ class LazySettings(LazyObject):
                 stacklevel=2,
             )
         return self.__getattr__('PASSWORD_RESET_TIMEOUT_DAYS')
-
-    @property
-    def STATIC_URL(self):
-        return self._add_script_prefix(self.__getattr__('STATIC_URL'))
-
-    @property
-    def MEDIA_URL(self):
-        return self._add_script_prefix(self.__getattr__('MEDIA_URL'))
 
 
 class Settings:
