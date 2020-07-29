@@ -67,7 +67,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         "A simple sitemap section can be rendered"
         response = self.client.get('/simple/sitemap-simple.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """ % (self.base_url, date.today())
@@ -92,7 +92,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         "A simple sitemap can be rendered"
         response = self.client.get('/simple/sitemap.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """ % (self.base_url, date.today())
@@ -191,7 +191,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         # doesn't raise an exception.
         response = self.client.get('/simple/sitemap.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 <url><loc>http://testserver/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """ % date.today()
@@ -257,7 +257,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         "A simple i18n sitemap index can be rendered"
         response = self.client.get('/simple/i18n.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 <url><loc>{0}/en/i18n/testmodel/{1}/</loc><changefreq>never</changefreq><priority>0.5</priority></url><url><loc>{0}/pt/i18n/testmodel/{1}/</loc><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """.format(self.base_url, self.i18n_model.pk)
@@ -266,7 +266,7 @@ class HTTPSitemapTests(SitemapTestsBase):
     def test_sitemap_without_entries(self):
         response = self.client.get('/sitemap-without-entries/sitemap.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
 </urlset>"""
         self.assertXMLEqual(response.content.decode(), expected_content)
