@@ -116,7 +116,7 @@ Other topics
 The ``register`` decorator
 --------------------------
 
-.. function:: register(*models, site=django.admin.sites.site)
+.. function:: register(*models, site=django.contrib.admin.sites.site)
 
     There is also a decorator for registering your ``ModelAdmin`` classes::
 
