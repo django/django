@@ -253,14 +253,90 @@ class HTTPSitemapTests(SitemapTestsBase):
         self.assertEqual(response.status_code, 200)
 
     @override_settings(LANGUAGES=(('en', 'English'), ('pt', 'Portuguese')))
-    def test_simple_i18nsitemap_index(self):
-        "A simple i18n sitemap index can be rendered"
+    def test_simple_i18n_sitemap_index(self):
+        """
+        A simple i18n sitemap index can be rendered.
+        """
         response = self.client.get('/simple/i18n.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 <url><loc>{0}/en/i18n/testmodel/{1}/</loc><changefreq>never</changefreq><priority>0.5</priority></url><url><loc>{0}/pt/i18n/testmodel/{1}/</loc><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """.format(self.base_url, self.i18n_model.pk)
+        self.assertXMLEqual(response.content.decode(), expected_content)
+
+    @override_settings(LANGUAGES=(('en', 'English'), ('pt', 'Portuguese')))
+    def test_alternate_i18n_sitemap_index(self):
+        """
+        A i18n sitemap with alternate/hreflang links can be rendered.
+        """
+        response = self.client.get('/alternates/i18n.xml')
+        url, pk = self.base_url, self.i18n_model.pk
+        expected_urls = f"""
+<url><loc>{url}/en/i18n/testmodel/{pk}/</loc><changefreq>never</changefreq><priority>0.5</priority>
+<xhtml:link rel="alternate" hreflang="en" href="{url}/en/i18n/testmodel/{pk}/"/>
+<xhtml:link rel="alternate" hreflang="pt" href="{url}/pt/i18n/testmodel/{pk}/"/>
+</url>
+<url><loc>{url}/pt/i18n/testmodel/{pk}/</loc><changefreq>never</changefreq><priority>0.5</priority>
+<xhtml:link rel="alternate" hreflang="en" href="{url}/en/i18n/testmodel/{pk}/"/>
+<xhtml:link rel="alternate" hreflang="pt" href="{url}/pt/i18n/testmodel/{pk}/"/>
+</url>
+""".replace('\n', '')
+        expected_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+{expected_urls}
+</urlset>
+"""
+        self.assertXMLEqual(response.content.decode(), expected_content)
+
+    @override_settings(LANGUAGES=(('en', 'English'), ('pt', 'Portuguese'), ('es', 'Spanish')))
+    def test_alternate_i18n_sitemap_limited(self):
+        """
+        A i18n sitemap index with limited languages can be rendered.
+        """
+        response = self.client.get('/limited/i18n.xml')
+        url, pk = self.base_url, self.i18n_model.pk
+        expected_urls = f"""
+<url><loc>{url}/en/i18n/testmodel/{pk}/</loc><changefreq>never</changefreq><priority>0.5</priority>
+<xhtml:link rel="alternate" hreflang="en" href="{url}/en/i18n/testmodel/{pk}/"/>
+<xhtml:link rel="alternate" hreflang="es" href="{url}/es/i18n/testmodel/{pk}/"/>
+</url>
+<url><loc>{url}/es/i18n/testmodel/{pk}/</loc><changefreq>never</changefreq><priority>0.5</priority>
+<xhtml:link rel="alternate" hreflang="en" href="{url}/en/i18n/testmodel/{pk}/"/>
+<xhtml:link rel="alternate" hreflang="es" href="{url}/es/i18n/testmodel/{pk}/"/>
+</url>
+""".replace('\n', '')
+        expected_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+{expected_urls}
+</urlset>
+"""
+        self.assertXMLEqual(response.content.decode(), expected_content)
+
+    @override_settings(LANGUAGES=(('en', 'English'), ('pt', 'Portuguese')))
+    def test_alternate_i18n_sitemap_xdefault(self):
+        """
+        A i18n sitemap index with x-default can be rendered.
+        """
+        response = self.client.get('/x-default/i18n.xml')
+        url, pk = self.base_url, self.i18n_model.pk
+        expected_urls = f"""
+<url><loc>{url}/en/i18n/testmodel/{pk}/</loc><changefreq>never</changefreq><priority>0.5</priority>
+<xhtml:link rel="alternate" hreflang="en" href="{url}/en/i18n/testmodel/{pk}/"/>
+<xhtml:link rel="alternate" hreflang="pt" href="{url}/pt/i18n/testmodel/{pk}/"/>
+<xhtml:link rel="alternate" hreflang="x-default" href="{url}/i18n/testmodel/{pk}/"/>
+</url>
+<url><loc>{url}/pt/i18n/testmodel/{pk}/</loc><changefreq>never</changefreq><priority>0.5</priority>
+<xhtml:link rel="alternate" hreflang="en" href="{url}/en/i18n/testmodel/{pk}/"/>
+<xhtml:link rel="alternate" hreflang="pt" href="{url}/pt/i18n/testmodel/{pk}/"/>
+<xhtml:link rel="alternate" hreflang="x-default" href="{url}/i18n/testmodel/{pk}/"/>
+</url>
+""".replace('\n', '')
+        expected_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+{expected_urls}
+</urlset>
+"""
         self.assertXMLEqual(response.content.decode(), expected_content)
 
     def test_sitemap_without_entries(self):
