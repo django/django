@@ -272,7 +272,13 @@ Requests and Responses
 Security
 ~~~~~~~~
 
-* ...
+* The :setting:`SECRET_KEY` setting is now checked for a valid value upon first
+  access, rather than when settings are first loaded. This enables running
+  management commands that do not rely on the ``SECRET_KEY`` without needing to
+  provide a value. As a consequence of this, calling
+  :func:`~django.conf.settings.configure` without providing a valid
+  ``SECRET_KEY``, and then going on to access ``settings.SECRET_KEY`` will now
+  raise an :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
 Serialization
 ~~~~~~~~~~~~~
