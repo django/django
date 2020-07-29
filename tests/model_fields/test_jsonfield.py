@@ -714,8 +714,9 @@ class TestQuerying(TestCase):
                 )),
             ),
         ]
-        # PostgreSQL requires a layer of nesting.
-        if connection.vendor != 'postgresql':
+        # For databases where {'f': 'g'} (without surrounding []) matches
+        # [{'f': 'g'}].
+        if not connection.features.json_key_contains_list_matching_requires_list:
             tests.append(('value__d__contains', {'f': 'g'}))
         for lookup, value in tests:
             with self.subTest(lookup=lookup, value=value):

@@ -298,6 +298,9 @@ class BaseDatabaseFeatures:
     # Does the backend support __contains and __contained_by lookups for
     # a JSONField?
     supports_json_field_contains = True
+    # Does value__d__contains={'f': 'g'} (without a list around the dict) match
+    # {'d': [{'f': 'g'}]}?
+    json_key_contains_list_matching_requires_list = False
 
     def __init__(self, connection):
         self.connection = connection
