@@ -125,7 +125,11 @@ Minor features
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :class:`~django.contrib.sitemaps.Sitemap` attributes
+  :attr:`~django.contrib.sitemaps.Sitemap.alternates`,
+  :attr:`~django.contrib.sitemaps.Sitemap.languages` and
+  :attr:`~django.contrib.sitemaps.Sitemap.x_default` allow
+  generating sitemap *alternates* to localized versions of your pages.
 
 :mod:`django.contrib.sites`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
