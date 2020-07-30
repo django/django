@@ -1246,22 +1246,28 @@ class ChangeListTests(TestCase):
 
         for page_num, objects_count, expected_page_range in [
             (1, per_page, []),
-            (1, per_page * 2, list(range(1, 3))),
-            (6, per_page * 11, list(range(1, 12))),
-            (6, per_page * 12, [1, 2, 3, 4, 5, 6, 7, 8, 9, '.', 11, 12]),
-            (7, per_page * 12, [1, 2, '.', 4, 5, 6, 7, 8, 9, 10, 11, 12]),
-            (7, per_page * 13, [1, 2, '.', 4, 5, 6, 7, 8, 9, 10, '.', 12, 13]),
+            (1, per_page * 2, [1, 2]),
+            (6, per_page * 11, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
+            (6, per_page * 12, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
+            (6, per_page * 13, [1, 2, 3, 4, 5, 6, 7, 8, 9, '.', 12, 13]),
+            (7, per_page * 12, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
+            (7, per_page * 13, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]),
+            (7, per_page * 14, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, '.', 13, 14]),
+            (8, per_page * 13, [1, 2, '.', 5, 6, 7, 8, 9, 10, 11, 12, 13]),
+            (8, per_page * 14, [1, 2, '.', 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]),
+            (8, per_page * 15, [1, 2, '.', 5, 6, 7, 8, 9, 10, 11, '.', 14, 15]),
         ]:
-            # assuming we have exactly `objects_count` objects
-            Group.objects.all().delete()
-            for i in range(objects_count):
-                Group.objects.create(name='test band')
+            with self.subTest(number=number, pages=pages):
+                # assuming exactly `objects_count` objects
+                Group.objects.all().delete()
+                for i in range(objects_count):
+                    Group.objects.create(name='test band')
 
-            # setting page number and calculating page range
-            cl.page_num = page_num
-            cl.get_results(request)
-            real_page_range = pagination(cl)['page_range']
-            self.assertEqual(expected_page_range, list(real_page_range))
+                # setting page number and calculating page range
+                cl.page_num = page_num
+                cl.get_results(request)
+                real_page_range = pagination(cl)['page_range']
+                self.assertEqual(expected_page_range, list(real_page_range))
 
     def test_object_tools_displayed_no_add_permission(self):
         """

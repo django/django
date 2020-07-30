@@ -67,14 +67,14 @@ def pagination(cl):
             # links at either end of the list of pages, and there are always
             # ON_EACH_SIDE links at either end of the "current page" link.
             page_range = []
-            if page_num > (1 + ON_EACH_SIDE + ON_ENDS):
+            if page_num > (1 + ON_EACH_SIDE + ON_ENDS) + 1:
                 page_range += [
                     *range(1, ON_ENDS + 1), DOT,
                     *range(page_num - ON_EACH_SIDE, page_num + 1),
                 ]
             else:
                 page_range.extend(range(1, page_num + 1))
-            if page_num < (paginator.num_pages - ON_EACH_SIDE - ON_ENDS):
+            if page_num < (paginator.num_pages - ON_EACH_SIDE - ON_ENDS) - 1:
                 page_range += [
                     *range(page_num + 1, page_num + ON_EACH_SIDE + 1), DOT,
                     *range(paginator.num_pages - ON_ENDS + 1, paginator.num_pages + 1)
