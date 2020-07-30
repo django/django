@@ -195,6 +195,10 @@ In this example, the cache table's name is ``my_cache_table``::
         }
     }
 
+Unlike other cache backends, the database cache does not support automatic
+culling of expired entries at the database level. Instead, expired cache
+entries are culled each time ``add()``, ``set()``, or ``touch()`` is called.
+
 Creating the cache table
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
