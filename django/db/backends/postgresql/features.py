@@ -59,6 +59,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     validates_explain_options = False  # A query will error on invalid options.
     supports_deferrable_unique_constraints = True
     has_json_operators = True
+    json_key_contains_list_matching_requires_list = True
 
     @cached_property
     def is_postgresql_9_6(self):
