@@ -892,19 +892,26 @@ class SimpleTestCase(unittest.TestCase):
         Asserts that a form is valid
         """
         if not form.is_valid():
-            standardMsg = 'Form validation failed. Error(s):\n'
+            standardMsg = 'Form validation failed. Error(s):'
             for field, field_errors in form.errors.items():
-                standardMsg += f'- {field}:\n'
+                standardMsg += f'\n- {field}:'
                 for error in field_errors:
-                    standardMsg += f'    - {error}\n'
+                    standardMsg += f'\n    - {error}'
             self.fail(self._formatMessage(msg, standardMsg))
 
     def assertFormNotValid(self, form, expected_errors=None,
-                           allow_all_errors=True, msg=None):
+                           msg=None):
         """
         Asserts that a form is not valid
         """
+        if form.is_valid():
+            self.fail(self._formatMessage(
+                msg,
+                'Error: Form is valid',
+            ))
+
         error_list = []
+        # flatten expected_errors dict
         if expected_errors:
             for field, errors in expected_errors.items():
                 if isinstance(errors, tuple):
@@ -913,30 +920,22 @@ class SimpleTestCase(unittest.TestCase):
                 else:
                     error_list.append((field, errors))
 
-        to_report = ''
-        if form.is_valid():
-            to_report = 'Form is valid\n'
-        else:
-            for field, error in error_list:
-                # if test passes additional expected errors which are not
-                # found, fail the test
-                if not form.has_error(field, error):
-                    to_report = f"('{field}', '{error}') expected error not found.\n"
+            to_report = ''
+            for field, errors in form.errors.as_data().items():
+                for error in errors:
+                    if (field, error.code) in error_list:
+                        error_list.remove((field, error.code))
+                    else:
+                        to_report += f"\n- ('{field}', '{error}') unexpected error found."
+            if error_list:
+                for field, error in error_list:
+                    to_report += f"\n- ('{field}', '{error}') expected error not found."
 
-            if not allow_all_errors:
-                other_errors = []
-                for field, errors in form.errors.as_data().items():
-                    for error in errors:
-                        if not (field, error.code) in error_list:
-                            other_errors.append((field, error))
-                if other_errors:
-                    to_report += 'Other errors reported:\n'
-                    for field, error in other_errors:
-                        to_report += f'    - {field}: {error.messages[0]}\n'
-
-        if to_report:
-            self.fail(self._formatMessage(
-                msg, f'FormNotValid failed. Error(s):\n- {to_report}'))
+            if to_report:
+                self.fail(self._formatMessage(
+                    msg,
+                    f'Error(s):{to_report}',
+                ))
 
 
 class TransactionTestCase(SimpleTestCase):

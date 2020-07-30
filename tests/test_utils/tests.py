@@ -13,9 +13,6 @@ from django.db import (
     IntegrityError, connection, connections, models, router, transaction,
 )
 from django.forms import EmailField, IntegerField
-from django.core.validators import validate_email
-from django.db import connection, connections, models, router
-from django.forms import CharField, EmailField, Form, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import (
