@@ -125,7 +125,11 @@ Minor features
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :class:`~django.contrib.sitemaps.Sitemap` attributes
+  :attr:`~django.contrib.sitemaps.Sitemap.alternates`,
+  :attr:`~django.contrib.sitemaps.Sitemap.languages` and
+  :attr:`~django.contrib.sitemaps.Sitemap.x_default` allow
+  generating sitemap *alternates* to localized versions of your pages.
 
 :mod:`django.contrib.sites`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -140,7 +144,8 @@ Minor features
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new ``item_comments`` hook allows specifying a comments URL per feed
+  item.
 
 Cache
 ~~~~~
@@ -272,7 +277,13 @@ Requests and Responses
 Security
 ~~~~~~~~
 
-* ...
+* The :setting:`SECRET_KEY` setting is now checked for a valid value upon first
+  access, rather than when settings are first loaded. This enables running
+  management commands that do not rely on the ``SECRET_KEY`` without needing to
+  provide a value. As a consequence of this, calling
+  :func:`~django.conf.settings.configure` without providing a valid
+  ``SECRET_KEY``, and then going on to access ``settings.SECRET_KEY`` will now
+  raise an :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
 Serialization
 ~~~~~~~~~~~~~
@@ -327,7 +338,12 @@ Utilities
 Validators
 ~~~~~~~~~~
 
-* ...
+* Built-in validators now include the provided value in the ``params`` argument
+  of a raised :exc:`~django.core.exceptions.ValidationError`. This allows
+  custom error messages to use the ``%(value)s`` placeholder.
+
+* The :class:`.ValidationError` equality operator now ignores ``messages`` and
+  ``params`` ordering.
 
 .. _backwards-incompatible-3.2:
 

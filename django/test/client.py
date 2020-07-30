@@ -611,6 +611,7 @@ class ClientMixin:
 
     def _login(self, user, backend=None):
         from django.contrib.auth import login
+
         # Create a fake request to store login details.
         request = HttpRequest()
         if self.session:

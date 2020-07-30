@@ -840,20 +840,6 @@ duplicated. That also means you cannot use those methods on unsaved objects.
 Other attributes
 ================
 
-``DoesNotExist``
-----------------
-
-.. exception:: Model.DoesNotExist
-
-    This exception is raised by the ORM in a couple places, for example by
-    :meth:`QuerySet.get() <django.db.models.query.QuerySet.get>` when an object
-    is not found for the given query parameters.
-
-    Django provides a ``DoesNotExist`` exception as an attribute of each model
-    class to identify the class of object that could not be found and to allow
-    you to catch a particular model class with ``try/except``. The exception is
-    a subclass of :exc:`django.core.exceptions.ObjectDoesNotExist`.
-
 ``_state``
 ----------
 

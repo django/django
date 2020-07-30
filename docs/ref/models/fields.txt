@@ -1999,14 +1999,16 @@ your resulting ``User`` model will have the following attributes::
     >>> hasattr(user, 'supervisor_of')
     True
 
-A ``DoesNotExist`` exception is raised when accessing the reverse relationship
-if an entry in the related table doesn't exist. For example, if a user doesn't
-have a supervisor designated by ``MySpecialUser``::
+A ``RelatedObjectDoesNotExist`` exception is raised when accessing the reverse
+relationship if an entry in the related table doesn't exist. This is a subclass
+of the target model's :exc:`Model.DoesNotExist
+<django.db.models.Model.DoesNotExist>` exception. For example, if a user
+doesn't have a supervisor designated by ``MySpecialUser``::
 
     >>> user.supervisor_of
     Traceback (most recent call last):
         ...
-    DoesNotExist: User matching query does not exist.
+    RelatedObjectDoesNotExist: User has no supervisor_of.
 
 .. _onetoone-arguments:
 

@@ -76,6 +76,14 @@ class LazySettings(LazyObject):
         if self._wrapped is empty:
             self._setup(name)
         val = getattr(self._wrapped, name)
+
+        # Special case some settings which require further modification.
+        # This is done here for performance reasons so the modified value is cached.
+        if name in {'MEDIA_URL', 'STATIC_URL'} and val is not None:
+            val = self._add_script_prefix(val)
+        elif name == 'SECRET_KEY' and not val:
+            raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
+
         self.__dict__[name] = val
         return val
 
@@ -149,14 +157,6 @@ class LazySettings(LazyObject):
             )
         return self.__getattr__('PASSWORD_RESET_TIMEOUT_DAYS')
 
-    @property
-    def STATIC_URL(self):
-        return self._add_script_prefix(self.__getattr__('STATIC_URL'))
-
-    @property
-    def MEDIA_URL(self):
-        return self._add_script_prefix(self.__getattr__('MEDIA_URL'))
-
 
 class Settings:
     def __init__(self, settings_module):
@@ -185,9 +185,6 @@ class Settings:
                     raise ImproperlyConfigured("The %s setting must be a list or a tuple. " % setting)
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
-
-        if not self.SECRET_KEY:
-            raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
 
         if self.is_overridden('PASSWORD_RESET_TIMEOUT_DAYS'):
             if self.is_overridden('PASSWORD_RESET_TIMEOUT'):

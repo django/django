@@ -815,7 +815,7 @@ class BaseModelFormSet(BaseFormSet):
 
     def add_fields(self, form, index):
         """Add a hidden field for the object's primary key."""
-        from django.db.models import AutoField, OneToOneField, ForeignKey
+        from django.db.models import AutoField, ForeignKey, OneToOneField
         self._pk_field = pk = self.model._meta.pk
         # If a pk isn't editable, then it won't be on the form, so we need to
         # add it here so we can tell which object is which when we get the

@@ -47,7 +47,7 @@ class Queries1Tests(TestCase):
 
         cls.n1 = Note.objects.create(note='n1', misc='foo', id=1)
         cls.n2 = Note.objects.create(note='n2', misc='bar', id=2)
-        cls.n3 = Note.objects.create(note='n3', misc='foo', id=3)
+        cls.n3 = Note.objects.create(note='n3', misc='foo', id=3, negate=False)
 
         ann1 = Annotation.objects.create(name='a1', tag=cls.t1)
         ann1.notes.add(cls.n1)
@@ -1215,6 +1215,13 @@ class Queries1Tests(TestCase):
             Author.objects.filter(extra=self.e2),
             [self.a3, self.a4],
         )
+
+    def test_negate_field(self):
+        self.assertSequenceEqual(
+            Note.objects.filter(negate=True),
+            [self.n1, self.n2],
+        )
+        self.assertSequenceEqual(Note.objects.exclude(negate=True), [self.n3])
 
 
 class Queries2Tests(TestCase):

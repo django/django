@@ -212,6 +212,7 @@ class Feed:
                 author_name=author_name,
                 author_email=author_email,
                 author_link=author_link,
+                comments=self._get_dynamic_attr('item_comments', item),
                 categories=self._get_dynamic_attr('item_categories', item),
                 item_copyright=self._get_dynamic_attr('item_copyright', item),
                 **self.item_extra_kwargs(item)

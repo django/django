@@ -53,11 +53,17 @@ spatialite = _default_db == 'spatialite'
 gisfield_may_be_null = not mysql
 
 if oracle and 'gis' in settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE']:
-    from django.contrib.gis.db.backends.oracle.models import OracleSpatialRefSys as SpatialRefSys
+    from django.contrib.gis.db.backends.oracle.models import (
+        OracleSpatialRefSys as SpatialRefSys,
+    )
 elif postgis:
-    from django.contrib.gis.db.backends.postgis.models import PostGISSpatialRefSys as SpatialRefSys
+    from django.contrib.gis.db.backends.postgis.models import (
+        PostGISSpatialRefSys as SpatialRefSys,
+    )
 elif spatialite:
-    from django.contrib.gis.db.backends.spatialite.models import SpatialiteSpatialRefSys as SpatialRefSys
+    from django.contrib.gis.db.backends.spatialite.models import (
+        SpatialiteSpatialRefSys as SpatialRefSys,
+    )
 else:
     SpatialRefSys = None
 

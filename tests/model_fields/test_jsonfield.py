@@ -1,6 +1,6 @@
 import operator
 import uuid
-from unittest import mock, skipIf, skipUnless
+from unittest import mock, skipIf
 
 from django import forms
 from django.core import serializers
@@ -441,13 +441,20 @@ class TestQuerying(TestCase):
             [self.objs[3], self.objs[4], self.objs[6]],
         )
 
+    @skipUnlessDBFeature('supports_json_field_contains')
     def test_contains(self):
         tests = [
             ({}, self.objs[2:5] + self.objs[6:8]),
             ({'baz': {'a': 'b', 'c': 'd'}}, [self.objs[7]]),
+            ({'baz': {'a': 'b'}}, [self.objs[7]]),
+            ({'baz': {'c': 'd'}}, [self.objs[7]]),
             ({'k': True, 'l': False}, [self.objs[6]]),
             ({'d': ['e', {'f': 'g'}]}, [self.objs[4]]),
+            ({'d': ['e']}, [self.objs[4]]),
+            ({'d': [{'f': 'g'}]}, [self.objs[4]]),
             ([1, [2]], [self.objs[5]]),
+            ([1], [self.objs[5]]),
+            ([[2]], [self.objs[5]]),
             ({'n': [None]}, [self.objs[4]]),
             ({'j': None}, [self.objs[4]]),
         ]
@@ -456,27 +463,32 @@ class TestQuerying(TestCase):
                 qs = NullableJSONModel.objects.filter(value__contains=value)
                 self.assertSequenceEqual(qs, expected)
 
-    @skipUnlessDBFeature('supports_primitives_in_json_field')
+    @skipIfDBFeature('supports_json_field_contains')
+    def test_contains_unsupported(self):
+        msg = 'contains lookup is not supported on this database backend.'
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            NullableJSONModel.objects.filter(
+                value__contains={'baz': {'a': 'b', 'c': 'd'}},
+            ).get()
+
+    @skipUnlessDBFeature(
+        'supports_primitives_in_json_field',
+        'supports_json_field_contains',
+    )
     def test_contains_primitives(self):
         for value in self.primitives:
             with self.subTest(value=value):
                 qs = NullableJSONModel.objects.filter(value__contains=value)
                 self.assertIs(qs.exists(), True)
 
-    @skipIf(
-        connection.vendor == 'oracle',
-        "Oracle doesn't support contained_by lookup.",
-    )
+    @skipUnlessDBFeature('supports_json_field_contains')
     def test_contained_by(self):
         qs = NullableJSONModel.objects.filter(value__contained_by={'a': 'b', 'c': 14, 'h': True})
         self.assertSequenceEqual(qs, self.objs[2:4])
 
-    @skipUnless(
-        connection.vendor == 'oracle',
-        "Oracle doesn't support contained_by lookup.",
-    )
+    @skipIfDBFeature('supports_json_field_contains')
     def test_contained_by_unsupported(self):
-        msg = 'contained_by lookup is not supported on Oracle.'
+        msg = 'contained_by lookup is not supported on this database backend.'
         with self.assertRaisesMessage(NotSupportedError, msg):
             NullableJSONModel.objects.filter(value__contained_by={'a': 'b'}).get()
 
@@ -596,12 +608,29 @@ class TestQuerying(TestCase):
             self.objs[3:5],
         )
 
+    @skipUnlessDBFeature('supports_json_field_contains')
+    def test_array_key_contains(self):
+        tests = [
+            ([], [self.objs[7]]),
+            ('bar', [self.objs[7]]),
+            (['bar'], [self.objs[7]]),
+            ('ar', []),
+        ]
+        for value, expected in tests:
+            with self.subTest(value=value):
+                self.assertSequenceEqual(
+                    NullableJSONModel.objects.filter(value__bar__contains=value),
+                    expected,
+                )
+
     def test_key_iexact(self):
         self.assertIs(NullableJSONModel.objects.filter(value__foo__iexact='BaR').exists(), True)
         self.assertIs(NullableJSONModel.objects.filter(value__foo__iexact='"BaR"').exists(), False)
 
+    @skipUnlessDBFeature('supports_json_field_contains')
     def test_key_contains(self):
-        self.assertIs(NullableJSONModel.objects.filter(value__foo__contains='ar').exists(), True)
+        self.assertIs(NullableJSONModel.objects.filter(value__foo__contains='ar').exists(), False)
+        self.assertIs(NullableJSONModel.objects.filter(value__foo__contains='bar').exists(), True)
 
     def test_key_icontains(self):
         self.assertIs(NullableJSONModel.objects.filter(value__foo__icontains='Ar').exists(), True)
@@ -658,27 +687,39 @@ class TestQuerying(TestCase):
 
     def test_lookups_with_key_transform(self):
         tests = (
-            ('value__d__contains', 'e'),
             ('value__baz__has_key', 'c'),
             ('value__baz__has_keys', ['a', 'c']),
             ('value__baz__has_any_keys', ['a', 'x']),
-            ('value__contains', KeyTransform('bax', 'value')),
             ('value__has_key', KeyTextTransform('foo', 'value')),
         )
-        # contained_by lookup is not supported on Oracle.
-        if connection.vendor != 'oracle':
-            tests += (
-                ('value__baz__contained_by', {'a': 'b', 'c': 'd', 'e': 'f'}),
-                (
-                    'value__contained_by',
-                    KeyTransform('x', RawSQL(
-                        self.raw_sql,
-                        ['{"x": {"a": "b", "c": 1, "d": "e"}}'],
-                    )),
-                ),
-            )
         for lookup, value in tests:
             with self.subTest(lookup=lookup):
+                self.assertIs(NullableJSONModel.objects.filter(
+                    **{lookup: value},
+                ).exists(), True)
+
+    @skipUnlessDBFeature('supports_json_field_contains')
+    def test_contains_contained_by_with_key_transform(self):
+        tests = [
+            ('value__d__contains', 'e'),
+            ('value__d__contains', [{'f': 'g'}]),
+            ('value__contains', KeyTransform('bax', 'value')),
+            ('value__baz__contains', {'a': 'b'}),
+            ('value__baz__contained_by', {'a': 'b', 'c': 'd', 'e': 'f'}),
+            (
+                'value__contained_by',
+                KeyTransform('x', RawSQL(
+                    self.raw_sql,
+                    ['{"x": {"a": "b", "c": 1, "d": "e"}}'],
+                )),
+            ),
+        ]
+        # For databases where {'f': 'g'} (without surrounding []) matches
+        # [{'f': 'g'}].
+        if not connection.features.json_key_contains_list_matching_requires_list:
+            tests.append(('value__d__contains', {'f': 'g'}))
+        for lookup, value in tests:
+            with self.subTest(lookup=lookup, value=value):
                 self.assertIs(NullableJSONModel.objects.filter(
                     **{lookup: value},
                 ).exists(), True)

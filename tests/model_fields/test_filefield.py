@@ -8,8 +8,9 @@ from pathlib import Path
 from django.core.files import File, temp
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import TemporaryUploadedFile
-from django.db import IntegrityError
+from django.db import IntegrityError, models
 from django.test import TestCase, override_settings
+from django.test.utils import isolate_apps
 
 from .models import Document
 
@@ -147,3 +148,21 @@ class FileFieldTests(TestCase):
                         self.assertEqual(document.myfile.field, loaded_myfile.field)
                     finally:
                         document.myfile.delete()
+
+    @isolate_apps('model_fields')
+    def test_abstract_filefield_model(self):
+        """
+        FileField.model returns the concrete model for fields defined in an
+        abstract model.
+        """
+        class AbstractMyDocument(models.Model):
+            myfile = models.FileField(upload_to='unused')
+
+            class Meta:
+                abstract = True
+
+        class MyDocument(AbstractMyDocument):
+            pass
+
+        document = MyDocument(myfile='test_file.py')
+        self.assertEqual(document.myfile.field.model, MyDocument)

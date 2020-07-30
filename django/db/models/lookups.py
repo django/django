@@ -29,7 +29,9 @@ class Lookup:
         if bilateral_transforms:
             # Warn the user as soon as possible if they are trying to apply
             # a bilateral transformation on a nested QuerySet: that won't work.
-            from django.db.models.sql.query import Query  # avoid circular import
+            from django.db.models.sql.query import (  # avoid circular import
+                Query,
+            )
             if isinstance(rhs, Query):
                 raise NotImplementedError("Bilateral transformations on nested querysets are not implemented.")
         self.bilateral_transforms = bilateral_transforms

@@ -43,6 +43,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_aggregate_filter_clause = Database.sqlite_version_info >= (3, 30, 1)
     supports_order_by_nulls_modifier = Database.sqlite_version_info >= (3, 30, 0)
     order_by_nulls_first = True
+    supports_json_field_contains = False
+
+    @cached_property
+    def supports_atomic_references_rename(self):
+        # SQLite 3.28.0 bundled with MacOS 10.15 does not support renaming
+        # references atomically.
+        if platform.mac_ver()[0].startswith('10.15.') and Database.sqlite_version_info == (3, 28, 0):
+            return False
+        return Database.sqlite_version_info >= (3, 26, 0)
 
     @cached_property
     def supports_atomic_references_rename(self):

@@ -12,7 +12,10 @@ class PasswordResetTokenGenerator:
     """
     key_salt = "django.contrib.auth.tokens.PasswordResetTokenGenerator"
     algorithm = 'sha256'
-    secret = settings.SECRET_KEY
+    secret = None
+
+    def __init__(self):
+        self.secret = self.secret or settings.SECRET_KEY
 
     def make_token(self, user):
         """

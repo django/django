@@ -15,10 +15,9 @@ except ImproperlyConfigured:
 
 if Image:
     from .models import (
-        Person, PersonWithHeight, PersonWithHeightAndWidth,
-        PersonDimensionsFirst, PersonTwoImages, TestImageFieldFile,
+        Person, PersonDimensionsFirst, PersonTwoImages, PersonWithHeight,
+        PersonWithHeightAndWidth, TestImageFieldFile, temp_storage_dir,
     )
-    from .models import temp_storage_dir
 else:
     # Pillow not available, create dummy classes (tests will be skipped anyway)
     class Person:
