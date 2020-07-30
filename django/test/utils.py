@@ -173,13 +173,6 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
                     keepdb=keepdb,
                     serialize=connection.settings_dict['TEST'].get('SERIALIZE', True),
                 )
-                if parallel > 1:
-                    for index in range(parallel):
-                        connection.creation.clone_test_db(
-                            suffix=str(index + 1),
-                            verbosity=verbosity,
-                            keepdb=keepdb,
-                        )
             # Configure all other connections as mirrors of the first one
             else:
                 connections[alias].creation.set_as_test_mirror(connections[first_alias].settings_dict)
@@ -194,6 +187,14 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
             connections[alias].force_debug_cursor = True
 
     return old_names
+
+
+def clone_databases(old_config, parallel, verbosity, keepdb):
+    for connection, _, clone in old_config:
+        if clone:
+            connection.creation.clone_test_databases(parallel=parallel,
+                                                     verbosity=verbosity,
+                                                     keepdb=keepdb)
 
 
 def dependency_ordered(test_databases, dependencies):

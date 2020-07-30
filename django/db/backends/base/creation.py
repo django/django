@@ -204,6 +204,10 @@ class BaseDatabaseCreation:
 
         return test_database_name
 
+    def clone_test_databases(self, parallel, verbosity=1, keepdb=False):
+        for index in range(parallel):
+            self.clone_test_db(suffix=index + 1, verbosity=verbosity, keepdb=keepdb)
+
     def clone_test_db(self, suffix, verbosity=1, autoclobber=False, keepdb=False):
         """
         Clone a test database.
