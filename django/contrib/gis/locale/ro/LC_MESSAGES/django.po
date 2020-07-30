@@ -4,14 +4,15 @@
 # Bogdan Mateescu, 2019
 # Daniel Ursache-Dogariu, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011,2014
+# Eugenol Man <neatusebastian@gmail.com>, 2020
 # Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-10-12 00:00+0000\n"
-"Last-Translator: Bogdan Mateescu\n"
+"PO-Revision-Date: 2020-07-15 11:21+0000\n"
+"Last-Translator: Eugenol Man <neatusebastian@gmail.com>\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -88,4 +89,4 @@ msgstr "Nici un feed registrat."
 
 #, python-format
 msgid "Slug %r isn’t registered."
-msgstr ""
+msgstr "Slug %r nu este înregistrat."

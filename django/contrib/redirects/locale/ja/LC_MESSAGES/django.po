@@ -3,13 +3,14 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Shinya Okano <tokibito@gmail.com>, 2014-2015
+# Takuya N <takninnovationresearch@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-02-07 16:04+0000\n"
+"Last-Translator: Takuya N <takninnovationresearch@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -28,17 +29,17 @@ msgid "redirect from"
 msgstr "リダイレクト元"
 
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr "'/events/search/' のように、ドメイン名を除いた絶対パスにします。 "
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
+msgstr "“/events/search/” のように、ドメイン名を除いた絶対パスにします。 "
 
 msgid "redirect to"
 msgstr "リダイレクト先"
 
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr "上記のような絶対パスか、 'http://' で始まる完全な URL にします。"
+"“http://”."
+msgstr "上記のような絶対パスか、 “http://” で始まる完全な URL にします。"
 
 msgid "redirect"
 msgstr "リダイレクト"

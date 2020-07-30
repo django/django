@@ -3,7 +3,8 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Erik Wognsen <r4mses@gmail.com>, 2013,2015-2019
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2013,2015-2020
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # valberg <valberg@orn.li>, 2014-2015
@@ -11,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-17 19:58+0000\n"
-"Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-07-15 08:56+0000\n"
+"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -71,6 +72,12 @@ msgstr "Ingen dato"
 
 msgid "Has date"
 msgstr "Har dato"
+
+msgid "Empty"
+msgstr "Tom"
+
+msgid "Not empty"
+msgstr "Ikke tom"
 
 #, python-format
 msgid ""
@@ -332,6 +339,19 @@ msgstr "Vælg alle %(total_count)s  %(module_name)s "
 msgid "Clear selection"
 msgstr "Ryd valg"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modeller i applikationen %(name)s"
+
+msgid "Add"
+msgstr "Tilføj"
+
+msgid "View"
+msgstr "Vis"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Du har ikke rettigheder til at se eller redigere noget."
+
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
@@ -379,6 +399,9 @@ msgstr "Se på website"
 
 msgid "Filter"
 msgstr "Filtrer"
+
+msgid "Clear all filters"
+msgstr "Nulstil alle filtre"
 
 msgid "Remove from sorting"
 msgstr "Fjern fra sortering"
@@ -457,9 +480,6 @@ msgstr ""
 "Er du sikker på du vil slette de valgte %(objects_name)s? Alle de følgende "
 "objekter og deres relaterede emner vil blive slettet:"
 
-msgid "View"
-msgstr "Vis"
-
 msgid "Delete?"
 msgstr "Slet?"
 
@@ -469,16 +489,6 @@ msgstr " Efter %(filter_title)s "
 
 msgid "Summary"
 msgstr "Sammendrag"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modeller i applikationen %(name)s"
-
-msgid "Add"
-msgstr "Tilføj"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr "Du har ikke rettigheder til at se eller redigere noget."
 
 msgid "Recent actions"
 msgstr "Seneste handlinger"
@@ -511,6 +521,9 @@ msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "Har du glemt dit password eller brugernavn?"
+
+msgid "Toggle navigation"
+msgstr "Vis/skjul navigation"
 
 msgid "Date/time"
 msgstr "Dato/tid"

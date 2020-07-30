@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2018
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2018,2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-26 10:31+0000\n"
-"Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
 "MIME-Version: 1.0\n"
@@ -32,24 +32,14 @@ msgid "Map of strings to strings/nulls"
 msgstr "Konwertěrowanje znamuškowych rjeśazkow do znamuškowych rjeśazkow/nulow"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "Gódnota \" %(key)s\" njejo znamuškowy rjeśazk abo null."
-
-msgid "A JSON object"
-msgstr "JSON-objekt"
-
-msgid "Value must be valid JSON."
-msgstr "Gódnota musy płaśiwy JSON byś."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "Gódnota „%(key)s“ njejo znamuškowy rjeśazk abo null."
 
 msgid "Could not load JSON data."
 msgstr "JSON-daty njejsu se zacytowaś dali."
 
 msgid "Input must be a JSON dictionary."
 msgstr "Zapódaśe musy JSON-słownik byś."
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "Gódnota '%(value)s' musy płaśiwy JSON byś."
 
 msgid "Enter two valid values."
 msgstr "Zapódajśo dwě płaśiwej gódnośe."
