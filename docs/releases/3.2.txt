@@ -380,6 +380,12 @@ backends.
   unique constraints (:attr:`.UniqueConstraint.include`), set
   ``DatabaseFeatures.supports_covering_indexes`` to ``True``.
 
+:mod:`django.contrib.admin`
+---------------------------
+
+* Pagination links in the admin are now 1-indexed instead of 0-indexed, i.e.
+  the query string for the first page is ``?p=1`` instead of ``?p=0``.
+
 :mod:`django.contrib.gis`
 -------------------------
 
