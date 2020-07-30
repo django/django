@@ -15,12 +15,13 @@ class DecimalFieldTests(TestCase):
         f = models.DecimalField(max_digits=4, decimal_places=2)
         self.assertEqual(f.to_python(3), Decimal('3'))
         self.assertEqual(f.to_python('3.14'), Decimal('3.14'))
-        # to_python() converts floats and honors max_digits.
-        self.assertEqual(f.to_python(3.1415926535897), Decimal('3.142'))
+        # to_python() converts floats and honors max_digits and decimal_places
+        self.assertEqual(f.to_python(3.1415926535897), Decimal('3.14'))
+        self.assertEqual(f.to_python(0.2), Decimal('0.20'))
         self.assertEqual(f.to_python(2.4), Decimal('2.400'))
         # Uses default rounding of ROUND_HALF_EVEN.
-        self.assertEqual(f.to_python(2.0625), Decimal('2.062'))
-        self.assertEqual(f.to_python(2.1875), Decimal('2.188'))
+        self.assertEqual(f.to_python(2.0625), Decimal('2.06'))
+        self.assertEqual(f.to_python(2.1875), Decimal('2.19'))
 
     def test_invalid_value(self):
         field = models.DecimalField(max_digits=4, decimal_places=2)

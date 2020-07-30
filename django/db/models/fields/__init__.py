@@ -1498,7 +1498,12 @@ class DecimalField(Field):
         if value is None:
             return value
         if isinstance(value, float):
-            return self.context.create_decimal_from_float(value)
+            v = self.context.create_decimal_from_float(value)
+            if self.decimal_places is not None:
+                # Make sure to respect max decimal_places here but only if it
+                # is defined (lookups will have them as None)
+                v = round(v, self.decimal_places)
+            return v
         try:
             return decimal.Decimal(value)
         except (decimal.InvalidOperation, TypeError, ValueError):
