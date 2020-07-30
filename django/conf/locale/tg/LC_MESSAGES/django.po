@@ -1,0 +1,1299 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2020
+# Surush Sufiew <siriusproger@gmail.com>, 2020
+# Siroj Sufiew <alibabasiroj@gmail.com>, 2020
+# Surush Sufiew <siriusproger@gmail.com>, 2020
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-30 18:50+0000\n"
+"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
+"Language-Team: Tajik (http://www.transifex.com/django/django/language/tg/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: tg\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Afrikaans"
+msgstr "Ҳолландӣ"
+
+msgid "Arabic"
+msgstr "Арабӣ"
+
+msgid "Algerian Arabic"
+msgstr "Арабӣ"
+
+msgid "Asturian"
+msgstr "Астурӣ"
+
+msgid "Azerbaijani"
+msgstr "Озарбойҷонӣ"
+
+msgid "Bulgarian"
+msgstr "Булғорӣ"
+
+msgid "Belarusian"
+msgstr "Белорусӣ"
+
+msgid "Bengali"
+msgstr "Бенгалӣ"
+
+msgid "Breton"
+msgstr "Бретонӣ"
+
+msgid "Bosnian"
+msgstr "Боснӣ"
+
+msgid "Catalan"
+msgstr "Каталанӣ"
+
+msgid "Czech"
+msgstr "Чехӣ"
+
+msgid "Welsh"
+msgstr "Уэлсӣ"
+
+msgid "Danish"
+msgstr "Даниягӣ"
+
+msgid "German"
+msgstr "Олмонӣ"
+
+msgid "Lower Sorbian"
+msgstr "Сербиягӣ"
+
+msgid "Greek"
+msgstr "Юнонӣ"
+
+msgid "English"
+msgstr "Англисӣ"
+
+msgid "Australian English"
+msgstr "Англисии австралиёӣ"
+
+msgid "British English"
+msgstr "Ангилисии бритониёӣ"
+
+msgid "Esperanto"
+msgstr "Эсперантоӣ"
+
+msgid "Spanish"
+msgstr "Испанӣ"
+
+msgid "Argentinian Spanish"
+msgstr "Испании аргентиноӣ"
+
+msgid "Colombian Spanish"
+msgstr "Испании колумбигӣ"
+
+msgid "Mexican Spanish"
+msgstr "Испании мексикоӣ"
+
+msgid "Nicaraguan Spanish"
+msgstr "Никарагуанский испанский"
+
+msgid "Venezuelan Spanish"
+msgstr "Испании венесуэлӣ"
+
+msgid "Estonian"
+msgstr "Эстонӣ"
+
+msgid "Basque"
+msgstr "Баскувӣ"
+
+msgid "Persian"
+msgstr "Форсӣ"
+
+msgid "Finnish"
+msgstr "Финикӣ"
+
+msgid "French"
+msgstr "Фаронсавӣ"
+
+msgid "Frisian"
+msgstr "Фризӣ"
+
+msgid "Irish"
+msgstr "Ирландӣ"
+
+msgid "Scottish Gaelic"
+msgstr "Шотландӣ"
+
+msgid "Galician"
+msgstr ""
+
+msgid "Hebrew"
+msgstr "Ивритӣ"
+
+msgid "Hindi"
+msgstr "Ҳиндӣ"
+
+msgid "Croatian"
+msgstr "Хорватӣ"
+
+msgid "Upper Sorbian"
+msgstr "Себриягӣ"
+
+msgid "Hungarian"
+msgstr ""
+
+msgid "Armenian"
+msgstr "Арманӣ"
+
+msgid "Interlingua"
+msgstr ""
+
+msgid "Indonesian"
+msgstr "Индонезӣ"
+
+msgid "Igbo"
+msgstr ""
+
+msgid "Ido"
+msgstr ""
+
+msgid "Icelandic"
+msgstr "Исландӣ"
+
+msgid "Italian"
+msgstr "Итолиёвӣ"
+
+msgid "Japanese"
+msgstr "Японӣ"
+
+msgid "Georgian"
+msgstr "Грузӣ"
+
+msgid "Kabyle"
+msgstr "Кабилӣ"
+
+msgid "Kazakh"
+msgstr "Қазоқӣ"
+
+msgid "Khmer"
+msgstr ""
+
+msgid "Kannada"
+msgstr ""
+
+msgid "Korean"
+msgstr "Кореӣ"
+
+msgid "Kyrgyz"
+msgstr ""
+
+msgid "Luxembourgish"
+msgstr "Люксембургӣ"
+
+msgid "Lithuanian"
+msgstr "Литвигӣ"
+
+msgid "Latvian"
+msgstr "Латвигӣ"
+
+msgid "Macedonian"
+msgstr "Македонӣ"
+
+msgid "Malayalam"
+msgstr ""
+
+msgid "Mongolian"
+msgstr "Монголӣ"
+
+msgid "Marathi"
+msgstr ""
+
+msgid "Burmese"
+msgstr ""
+
+msgid "Norwegian Bokmål"
+msgstr "Норвежский (Букмол)"
+
+msgid "Nepali"
+msgstr "Непалӣ"
+
+msgid "Dutch"
+msgstr "Голландӣ"
+
+msgid "Norwegian Nynorsk"
+msgstr "Норвегӣ"
+
+msgid "Ossetic"
+msgstr "Осетинӣ"
+
+msgid "Punjabi"
+msgstr "Панҷобӣ"
+
+msgid "Polish"
+msgstr "Полякӣ"
+
+msgid "Portuguese"
+msgstr "Португалӣ"
+
+msgid "Brazilian Portuguese"
+msgstr "Португалии бразилиёгӣ"
+
+msgid "Romanian"
+msgstr "Руминӣ"
+
+msgid "Russian"
+msgstr "Руссӣ"
+
+msgid "Slovak"
+msgstr "Словакӣ"
+
+msgid "Slovenian"
+msgstr "Словенӣ"
+
+msgid "Albanian"
+msgstr "Албанӣ"
+
+msgid "Serbian"
+msgstr "Сербӣ"
+
+msgid "Serbian Latin"
+msgstr "Сербӣ"
+
+msgid "Swedish"
+msgstr "Шведӣ"
+
+msgid "Swahili"
+msgstr "Суахили"
+
+msgid "Tamil"
+msgstr "Тамилӣ"
+
+msgid "Telugu"
+msgstr "Телугу"
+
+msgid "Tajik"
+msgstr ""
+
+msgid "Thai"
+msgstr "Тайский"
+
+msgid "Turkmen"
+msgstr ""
+
+msgid "Turkish"
+msgstr "Туркӣ"
+
+msgid "Tatar"
+msgstr "Тоторӣ"
+
+msgid "Udmurt"
+msgstr "Удмуртӣ"
+
+msgid "Ukrainian"
+msgstr "Украинӣ"
+
+msgid "Urdu"
+msgstr "Урдуӣ"
+
+msgid "Uzbek"
+msgstr "Узбекӣ"
+
+msgid "Vietnamese"
+msgstr "Вэтнамӣ"
+
+msgid "Simplified Chinese"
+msgstr "Хитоӣ"
+
+msgid "Traditional Chinese"
+msgstr "Хитоӣ"
+
+msgid "Messages"
+msgstr "Маълумот"
+
+msgid "Site Maps"
+msgstr "Харитаи сайт"
+
+msgid "Static Files"
+msgstr "Файлҳои статикӣ"
+
+msgid "Syndication"
+msgstr "Тасмаи хабарҳо"
+
+msgid "That page number is not an integer"
+msgstr "Рақами саҳифа бояд адади натуралӣ бошад"
+
+msgid "That page number is less than 1"
+msgstr "Рақами саҳифа камтар аз 1"
+
+msgid "That page contains no results"
+msgstr "Саҳифа холӣ аст"
+
+msgid "Enter a valid value."
+msgstr "Қимматро дуруст ворид созед."
+
+msgid "Enter a valid URL."
+msgstr "Суроға(URL)-ро дуруст ворид созед."
+
+msgid "Enter a valid integer."
+msgstr "Ададро дуруст ворид созед."
+
+msgid "Enter a valid email address."
+msgstr "Суроғаи почтаи электрониро дуруст ворид созед."
+
+#. Translators: "letters" means latin letters: a-z and A-Z.
+msgid ""
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"Қимати “slug”-ро дуруст ворид созед, бояд аз ҳарфҳо (“a-z ва A-Z”), рақамҳо, "
+"зердефисҳо(_) ва дефисҳо иборат бошад."
+
+msgid ""
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Қимати “slug”-ро дуруст ворид созед, бояд аз Unicode-ҳарфҳо (“a-z ва A-Z”), "
+"рақамҳо, зердефисҳо(_) ва дефисҳо иборат бошад."
+
+msgid "Enter a valid IPv4 address."
+msgstr "Шакли дурусти IPv4-суроғаро ворид созед."
+
+msgid "Enter a valid IPv6 address."
+msgstr "Шакли ҳақиқии IPv4-суроғаро ворид кунед."
+
+msgid "Enter a valid IPv4 or IPv6 address."
+msgstr "Шакли ҳақиқии IPv4  ё IPv6 -суроғаро ворид кунед."
+
+msgid "Enter only digits separated by commas."
+msgstr "Рақамҳои бо вергул шудокардашударо ворид созед."
+
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr ""
+"Боварӣ ҳосил кунед, ки қиммати — %(limit_value)s (ҳоло шакли — "
+"%(show_value)s -ро дорад)."
+
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr ""
+"Боварӣ ҳосил кунед, ки ин қиммат хурд ё баробар аст ба %(limit_value)s."
+
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr ""
+"Боварӣ ҳосил кунед, ки ин қиммат калон ё баробар аст ба %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Enter a number."
+msgstr "Ададро ворид созед."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid ""
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
+msgstr ""
+
+msgid "Null characters are not allowed."
+msgstr "Маълумот символӣ мамнӯъро дар бар мегирад: 0-байт"
+
+msgid "and"
+msgstr "ва"
+
+#, python-format
+msgid "%(model_name)s with this %(field_labels)s already exists."
+msgstr ""
+"%(model_name)s бо ин гуна майдонӣ қиматдор  %(field_labels)s алакай вуҷуд "
+"дорад."
+
+#, python-format
+msgid "Value %(value)r is not a valid choice."
+msgstr "Қимати %(value)r дар байни вариантҳои омадашуда вуҷуд надорад."
+
+msgid "This field cannot be null."
+msgstr "Ин майдон наметавонад қимати NULL дошта бошад."
+
+msgid "This field cannot be blank."
+msgstr "Ин майдон наметавонад холӣ бошад."
+
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s бо ин гуна %(field_label)s алакай вуҷуд дорад."
+
+#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
+#. Eg: "Title must be unique for pub_date year"
+#, python-format
+msgid ""
+"%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
+msgstr ""
+"Қимат дар майдони «%(field_label)s» бояд барои фрагменти«%(lookup_type)s» "
+"ягона бошад, санаҳо барои майдон %(date_field_label)s."
+
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "Майдони намуди %(field_type)s"
+
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr "Қимати “%(value)s” бояд True ё False бошад."
+
+#, python-format
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr "Қимати “%(value)s” бояд True, False ё None бошад."
+
+msgid "Boolean (Either True or False)"
+msgstr "Мантиқан (True ё False)"
+
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "Сатр (то %(max_length)s)"
+
+msgid "Comma-separated integers"
+msgstr "Яклухт, бо вергул ҷудокардашуда"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
+"format."
+msgstr "“%(value)s” шакли нодуруст дорад. Шакли дуруст: сол.моҳ.рӯз, аст"
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
+"date."
+msgstr "“%(value)s” шакли дуруст (сол.моҳ.рӯз) дорад, аммо сана нодуруст аст"
+
+msgid "Date (without time)"
+msgstr "Сана (бе ишораи вақт)"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
+msgstr ""
+"“%(value)s” шакли нодуруст дорад. Шакли дуруст: сол.моҳ.рӯз соат.дақ[:сония[."
+"uuuuuu]][TZ] аст"
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) but it is an invalid date/time."
+msgstr ""
+"“%(value)s” шакли дуруст дорад (сол.моҳ.рӯз соат.дақ[:сония[.uuuuuu]][TZ]), "
+"аммо 'сана/вақт'' нодуруст аст"
+
+msgid "Date (with time)"
+msgstr "Сана (бо ишораи вақт)"
+
+#, python-format
+msgid "“%(value)s” value must be a decimal number."
+msgstr "“%(value)s” бояд адади даҳӣ бошад"
+
+msgid "Decimal number"
+msgstr "Адади 'даҳӣ' ."
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
+"uuuuuu] format."
+msgstr ""
+"“%(value)s” шакли нодуруст дорад. Шакли дуруст [рӯз] [[соат:]дақ:]сония[."
+"uuuuuu]"
+
+msgid "Duration"
+msgstr "Давомнокӣ"
+
+msgid "Email address"
+msgstr "Суроғаи почтаи электронӣ"
+
+msgid "File path"
+msgstr "Суроғаи файл"
+
+#, python-format
+msgid "“%(value)s” value must be a float."
+msgstr "Қимати “%(value)s” бояд бутун бошад"
+
+msgid "Floating point number"
+msgstr "Адади бутун."
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr "Қимати “%(value)s” бояд яклухт бошад"
+
+msgid "Integer"
+msgstr "Яклухт"
+
+msgid "Big (8 byte) integer"
+msgstr "Адади калони яклухт (8 байт)"
+
+msgid "IPv4 address"
+msgstr "IPv4 - суроға"
+
+msgid "IP address"
+msgstr "IP-суроға"
+
+#, python-format
+msgid "“%(value)s” value must be either None, True or False."
+msgstr "Қимати “%(value)s” бояд 'None', 'True' ё 'False' бошад"
+
+msgid "Boolean (Either True, False or None)"
+msgstr "Мантиқӣ (True, False ё None)"
+
+msgid "Positive big integer"
+msgstr ""
+
+msgid "Positive integer"
+msgstr "Адади яклухти мусбат"
+
+msgid "Positive small integer"
+msgstr "дади яклухти мусбати хурд"
+
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr "Слаг (то %(max_length)s)"
+
+msgid "Small integer"
+msgstr "Адади яклухти хурд"
+
+msgid "Text"
+msgstr "Матн"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"format."
+msgstr ""
+"“%(value)s” шакли нодуруст дорад. Шакли дуруст  соат:дақ[:сония[.uuuuuu]"
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"invalid time."
+msgstr ""
+"“%(value)s” шакли дуруст дорад (соат:моҳ[:сония[.uuuuuu, аммо 'вақт' "
+"нодуруст қайд шудааст "
+
+msgid "Time"
+msgstr "Вақт"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Raw binary data"
+msgstr "Маълумоти бинари(дуи)-и коркарднашуда"
+
+#, python-format
+msgid "“%(value)s” is not a valid UUID."
+msgstr "Қимати “%(value)s” барои UUID номувофиқ аст."
+
+msgid "Universally unique identifier"
+msgstr "Майдони UUID, идентификатори универсалии ягона"
+
+msgid "File"
+msgstr "Файл"
+
+msgid "Image"
+msgstr "Тасвир"
+
+msgid "A JSON object"
+msgstr ""
+
+msgid "Value must be valid JSON."
+msgstr ""
+
+#, python-format
+msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgstr ""
+"Объекти модели %(model)s бо майдони %(field)s, -и дорои қимати %(value)r, "
+"вуҷқд надорад."
+
+msgid "Foreign Key (type determined by related field)"
+msgstr ""
+"Калиди беруна(Foreign Key) (Шакл муайян шудаст аз рӯи майдони алоқамандшуда.)"
+
+msgid "One-to-one relationship"
+msgstr "Алоқаи \"як ба як\""
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "Алоқаи %(from)s-%(to)s"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "Алоқаи %(from)s-%(to)s"
+
+msgid "Many-to-many relationship"
+msgstr "Алоқаи \\'бисёр ба бисёр\\'"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
+msgid "This field is required."
+msgstr "Майдони ҳатмӣ."
+
+msgid "Enter a whole number."
+msgstr "Адади яклухтро ворид кунед."
+
+msgid "Enter a valid date."
+msgstr "Санаи дурстро ворид кунед."
+
+msgid "Enter a valid time."
+msgstr "Вақтро дуруст ворид кунед.."
+
+msgid "Enter a valid date/time."
+msgstr "Сана ва вақтро дуруст ворид кунед."
+
+msgid "Enter a valid duration."
+msgstr "авомнокии дурустро ворид кунед."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
+"Миқдори рӯзҳо бояд доираи аз {min_days} то {max_days} -ро дарбар гирад."
+
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "Файл равон карда нашуд. Шакли кодировкаи формаро тафтиш кунед."
+
+msgid "No file was submitted."
+msgstr "Ягон файл равон карда нашуд"
+
+msgid "The submitted file is empty."
+msgstr "Файли равонкардашуда холӣ аст."
+
+#, python-format
+msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
+msgid_plural ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+"Хоҳиш  мекунем файлро бор кунед ё байрақчаи ишоратӣ гузоред \"Тоза кардан\", "
+"вале ҳарду амалро дар якҷоягӣ иҷро накунед."
+
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Тасвири дурустро бор кунед. Файли боркардаи шумо нуқсон дорад ва ё 'тасвира' "
+"нест"
+
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr ""
+"Варианти дурустро интихоб кунед. %(value)s дар байни варианҳои дастрас вуҷуд "
+"надорад."
+
+msgid "Enter a list of values."
+msgstr "Рӯйхати қиматҳоро ворид кунед."
+
+msgid "Enter a complete value."
+msgstr "Рӯйхати ҳамаи қиматҳоро ворид кунед."
+
+msgid "Enter a valid UUID."
+msgstr "Шакли дурусти UUID -ро ворид кунед."
+
+msgid "Enter a valid JSON."
+msgstr ""
+
+#. Translators: This is the default suffix added to form field labels
+msgid ":"
+msgstr ":"
+
+#, python-format
+msgid "(Hidden field %(name)s) %(error)s"
+msgstr "(Майдони махфии %(name)s) %(error)s"
+
+msgid "ManagementForm data is missing or has been tampered with"
+msgstr "Маълумоти идоракунандаи форма вуҷуд надорад ё ин ки осеб дидааст."
+
+#, python-format
+msgid "Please submit %d or fewer forms."
+msgid_plural "Please submit %d or fewer forms."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "Please submit %d or more forms."
+msgid_plural "Please submit %d or more forms."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Order"
+msgstr "Тартиб"
+
+msgid "Delete"
+msgstr "Нест кардан"
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr ""
+"Илтимос қимати такроршудаистодаи майдони \"%(field)s\" ро тағйир диҳед."
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr ""
+"Илтимос, қимати майдони %(field)s ро тағйир диҳед, вай бояд 'ягона' бошад."
+
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+"Илтимос, қимати майдони %(field_name)s ро тағйир диҳед, вай бояд барои "
+"%(lookup)s дар майдони %(date_field)s ягона бошад (Ягона будан маънои "
+"такрорнашавандагиро дорад)."
+
+msgid "Please correct the duplicate values below."
+msgstr "Хоҳиш мекунам, қимати такроршудаистодаи зеринро иваз кунед."
+
+msgid "The inline value did not match the parent instance."
+msgstr ""
+"Қимати дар форма воридкардашуда бо қимати формаи база мутобиқат намекунад."
+
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr ""
+"Варианти дурустро интихоб кунед. Варианти шумо дар қатори қиматҳои "
+"овардашуда вуҷуд надорад."
+
+#, python-format
+msgid "“%(pk)s” is not a valid value."
+msgstr ""
+
+#, python-format
+msgid ""
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+
+msgid "Clear"
+msgstr "Тоза кардан"
+
+msgid "Currently"
+msgstr "Дар айни замон"
+
+msgid "Change"
+msgstr "Тағйир додан"
+
+msgid "Unknown"
+msgstr "Номаълум"
+
+msgid "Yes"
+msgstr "Ҳа"
+
+msgid "No"
+msgstr "Не"
+
+#. Translators: Please do not add spaces around commas.
+msgid "yes,no,maybe"
+msgstr "ҳа,не,шояд"
+
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%s KB"
+msgstr "%s КБ"
+
+#, python-format
+msgid "%s MB"
+msgstr "%s МБ"
+
+#, python-format
+msgid "%s GB"
+msgstr "%s ГБ"
+
+#, python-format
+msgid "%s TB"
+msgstr "%s ТБ"
+
+#, python-format
+msgid "%s PB"
+msgstr "%s ПБ"
+
+msgid "p.m."
+msgstr "н.ш."
+
+msgid "a.m."
+msgstr "н.р."
+
+msgid "PM"
+msgstr "НШ"
+
+msgid "AM"
+msgstr "НР"
+
+msgid "midnight"
+msgstr "нимашабӣ"
+
+msgid "noon"
+msgstr "нисфирузӣ"
+
+msgid "Monday"
+msgstr "Душанбе"
+
+msgid "Tuesday"
+msgstr "Сешанбе"
+
+msgid "Wednesday"
+msgstr "Чоршанбе"
+
+msgid "Thursday"
+msgstr "Панҷшанбе"
+
+msgid "Friday"
+msgstr "Ҷумъа"
+
+msgid "Saturday"
+msgstr "Шанбе"
+
+msgid "Sunday"
+msgstr "Якшанбе"
+
+msgid "Mon"
+msgstr "Дш"
+
+msgid "Tue"
+msgstr "Яш"
+
+msgid "Wed"
+msgstr "Чш"
+
+msgid "Thu"
+msgstr "Пш"
+
+msgid "Fri"
+msgstr "Ҷ"
+
+msgid "Sat"
+msgstr "Ш"
+
+msgid "Sun"
+msgstr "Яш"
+
+msgid "January"
+msgstr "Январ"
+
+msgid "February"
+msgstr "Феврал"
+
+msgid "March"
+msgstr "Март"
+
+msgid "April"
+msgstr "Апрел"
+
+msgid "May"
+msgstr "Май"
+
+msgid "June"
+msgstr "Июн"
+
+msgid "July"
+msgstr "Июл"
+
+msgid "August"
+msgstr "Август"
+
+msgid "September"
+msgstr "Сентябр"
+
+msgid "October"
+msgstr "Октябр"
+
+msgid "November"
+msgstr "Ноябр"
+
+msgid "December"
+msgstr "Декабр"
+
+msgid "jan"
+msgstr "янв"
+
+msgid "feb"
+msgstr "фев"
+
+msgid "mar"
+msgstr "мар"
+
+msgid "apr"
+msgstr "апр"
+
+msgid "may"
+msgstr "май"
+
+msgid "jun"
+msgstr "июн"
+
+msgid "jul"
+msgstr "июл"
+
+msgid "aug"
+msgstr "авг"
+
+msgid "sep"
+msgstr "сен"
+
+msgid "oct"
+msgstr "окт"
+
+msgid "nov"
+msgstr "ноя"
+
+msgid "dec"
+msgstr "дек"
+
+msgctxt "abbrev. month"
+msgid "Jan."
+msgstr "Янв."
+
+msgctxt "abbrev. month"
+msgid "Feb."
+msgstr "Фев."
+
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "Март"
+
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "Апрел"
+
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "Май"
+
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "Июн"
+
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "Июл"
+
+msgctxt "abbrev. month"
+msgid "Aug."
+msgstr "Авг."
+
+msgctxt "abbrev. month"
+msgid "Sept."
+msgstr "Сен."
+
+msgctxt "abbrev. month"
+msgid "Oct."
+msgstr "Окт."
+
+msgctxt "abbrev. month"
+msgid "Nov."
+msgstr "Ноя."
+
+msgctxt "abbrev. month"
+msgid "Dec."
+msgstr "Дек."
+
+msgctxt "alt. month"
+msgid "January"
+msgstr "январ"
+
+msgctxt "alt. month"
+msgid "February"
+msgstr "феврал"
+
+msgctxt "alt. month"
+msgid "March"
+msgstr "март"
+
+msgctxt "alt. month"
+msgid "April"
+msgstr "апрел"
+
+msgctxt "alt. month"
+msgid "May"
+msgstr "май"
+
+msgctxt "alt. month"
+msgid "June"
+msgstr "июн"
+
+msgctxt "alt. month"
+msgid "July"
+msgstr "июл"
+
+msgctxt "alt. month"
+msgid "August"
+msgstr "август"
+
+msgctxt "alt. month"
+msgid "September"
+msgstr "сентябр"
+
+msgctxt "alt. month"
+msgid "October"
+msgstr "октябр"
+
+msgctxt "alt. month"
+msgid "November"
+msgstr "ноябр"
+
+msgctxt "alt. month"
+msgid "December"
+msgstr "декабр"
+
+msgid "This is not a valid IPv6 address."
+msgstr "Қиммат суроғаи дурусти IPv6 нест."
+
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
+
+msgid "or"
+msgstr "ё"
+
+#. Translators: This string is used as a separator between list elements
+msgid ", "
+msgstr ", "
+
+#, python-format
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Forbidden"
+msgstr "Мушкилӣ дар воридшавӣ"
+
+msgid "CSRF verification failed. Request aborted."
+msgstr "Мушкили дар тафтиши CSRF. Дархост рад шуд."
+
+msgid ""
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
+"required for security reasons, to ensure that your browser is not being "
+"hijacked by third parties."
+msgstr ""
+"Шумо ин хабарро барои он мебинед, ки ин  HTTPS -сомона, тавассути браузери "
+"шумо дархости равон кардани 'Referer' 'header' -ро  дорад. Вале ягон дархост "
+"равон нашудааст.Иҷрои ин амал аз ҷиҳати бехатарӣ барои мутмаин шудани он, ки "
+"браузери шумо аз тарафи шахси сеюм 'шикаста'' (взлом)нашудааст, ҳатмӣ "
+"мебошад."
+
+msgid ""
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
+msgstr ""
+"Агар шумо браузери худро ба таври 'Referer'-сархатҳояшон дастнорас ба танзим "
+"даровада бошед,хоҳиш мекунем, ки ҳадди ақал барои сомонаи мазкур ё барои "
+"пайсшавии таввассути HTTPS ё ин ки бароидархостҳои манбаашон якхела, амали "
+"азнавбатанзимдарориро иҷро намоед."
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
+msgstr ""
+
+msgid ""
+"You are seeing this message because this site requires a CSRF cookie when "
+"submitting forms. This cookie is required for security reasons, to ensure "
+"that your browser is not being hijacked by third parties."
+msgstr ""
+"Шумо ин хабарро барои он мебинед, ки сомонаи мазкур талаб менамояд, то амали "
+"равонкунииформа ва CSRF cookie дар якҷоягӣ сурат гирад. Ин намуди 'cookie' "
+"аз ҷиҳати бехатарӣбарои мутмаин шудани он, ки браузери шумо аз тарафи шахси "
+"сеюм 'шикаста'' (взлом)нашудааст, ҳатмӣ мебошад."
+
+msgid ""
+"If you have configured your browser to disable cookies, please re-enable "
+"them, at least for this site, or for “same-origin” requests."
+msgstr ""
+"Агар шумо браузери худро ба таври дастнораси ба cookies' ба танзим даровада "
+"бошед,хоҳиш мекунем, ки ҳадди ақал барои сомонаи мазкур ё барои пайсшавии "
+"таввассути HTTPS ё ин ки бароидархостҳои манбаашон якхела, амали "
+"азнавбатанзимдарориро иҷро намоед."
+
+msgid "More information is available with DEBUG=True."
+msgstr ""
+"Маълумоти бештар дар режими 'танзимдарорӣ'(отладчика), бо фаъолсозии "
+"DEBUG=True."
+
+msgid "No year specified"
+msgstr "Сол ишора нашудааст"
+
+msgid "Date out of range"
+msgstr "сана аз доираи муайян берун аст"
+
+msgid "No month specified"
+msgstr "Моҳ ишора нашудааст"
+
+msgid "No day specified"
+msgstr "Рӯз ишора нашудааст"
+
+msgid "No week specified"
+msgstr "Ҳафта ишора нашудааст"
+
+#, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "%(verbose_name_plural)s дастнорас аст"
+
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+"%(verbose_name_plural)s навбатӣ дастнорасанд барои он ки %(class_name)s."
+"allow_future бо қимати \" False\" гузошта шудааст."
+
+#, python-format
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr "Санаи нодурусти “%(datestr)s” шакли “%(format)s” гирифтааст"
+
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "Ягон %(verbose_name)s, мувофиқ бо дархости шумо ёфт нашуд"
+
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr "Саҳифа 'охирин' нест ва ё ки бо адади яклухт(int) ишора нашудааст"
+
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr "Саҳифаи нодуруст (%(page_number)s): %(message)s"
+
+#, python-format
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr ""
+
+msgid "Directory indexes are not allowed here."
+msgstr "Азназаргузаронии рӯёхати файлҳо дар директорияи зерин номумкин аст."
+
+#, python-format
+msgid "“%(path)s” does not exist"
+msgstr "“%(path)s” вуҷуд надорад"
+
+#, python-format
+msgid "Index of %(directory)s"
+msgstr "Рӯёхати файлҳои директорияи %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+"Django: веб-фреймворк барои перфектсионистҳо бо дедлайнҳо. Бисёр фреймворки "
+"табъи дилва хастанакунанда ҳангоми кор."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Инҷо <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\\'noopener\\''>андешаҳо</a> оиди баромади Django "
+"%(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Ҷобаҷогузорӣ муваффақона анҷом ёфт! Табрик!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Шумо ин хабарро барои он мебинед, ки дар <a href=\"https://docs."
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
+"\\'noopener\\'>ишора намудед: DEBUG=True</a> ва дар файли "
+"ҷобаҷогузорӣ(settings)ягонто танзимгари URL-суроғаҳоро ишора нанамудед."
+
+msgid "Django Documentation"
+msgstr "Ҳуҷҷатгузории Django"
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr "Роҳбарият: Барнома барои овоздиҳӣ"
+
+msgid "Get started with Django"
+msgstr "оғози кор бо Django"
+
+msgid "Django Community"
+msgstr "Иттиҳоди Django"
+
+msgid "Connect, get help, or contribute"
+msgstr "Бо мо ҳамкорӣ намуда имкониятҳои навро пайдо намоед."

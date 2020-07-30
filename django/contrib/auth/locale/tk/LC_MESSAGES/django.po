@@ -1,0 +1,303 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Resulkary <resulsaparov@gmail.com>, 2020
+# Welbeck Garli <welbeckgrlyw@gmail.com>, 2020
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-07-06 17:52+0000\n"
+"Last-Translator: Resulkary <resulsaparov@gmail.com>\n"
+"Language-Team: Turkmen (http://www.transifex.com/django/django/language/"
+"tk/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: tk\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Personal info"
+msgstr "Şahsy maglumat"
+
+msgid "Permissions"
+msgstr "Rugsatlar"
+
+msgid "Important dates"
+msgstr "Möhüm seneler"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Esasy açary %(key)r bolan %(name)s obýekt ýok."
+
+msgid "Password changed successfully."
+msgstr "Parol üstünlikli üýtgedildi."
+
+#, python-format
+msgid "Change password: %s"
+msgstr "Paroly üýtgetmek: %s"
+
+msgid "Authentication and Authorization"
+msgstr "Şahsyýet tanamak we Ygtyýarnama"
+
+msgid "password"
+msgstr "parol"
+
+msgid "last login"
+msgstr "soňky giriş"
+
+msgid "No password set."
+msgstr "Parol goýulmady."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Nädogry parol formaty ýa-da näbelli hashing algoritmi."
+
+msgid "The two password fields didn’t match."
+msgstr "Iki parol meýdançasy gabat gelmedi."
+
+msgid "Password"
+msgstr "Parol"
+
+msgid "Password confirmation"
+msgstr "Parol tassyklamasy"
+
+msgid "Enter the same password as before, for verification."
+msgstr "Barlamak üçin öňküsi ýaly paroly giriziň."
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
+msgstr ""
+"Çig parollar saklanmaýar, şonuň üçin bu ulanyjynyň parolyny görmegiň "
+"mümkinçiligi ýok, ýöne <a href=\"{}\">şu formany</a> ulanyp üýtgedip "
+"bilersiňiz."
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"Haýyş, dogry %(username)s we paroly giriziň. Iki meýdançanyň hem baş-setir "
+"harpa duýgur bolup biljekdigine üns beriň."
+
+msgid "This account is inactive."
+msgstr "Bu hasap hereketsiz."
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "New password"
+msgstr "Täze parol"
+
+msgid "New password confirmation"
+msgstr "Täze parol tassyklamasy"
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+"Köne parolyňyz nädogry girizildi. Gaýtadan girizmegiňizi haýyş edýäris."
+
+msgid "Old password"
+msgstr "Köne parol"
+
+msgid "Password (again)"
+msgstr "Parol (gaýtadan)"
+
+msgid "algorithm"
+msgstr "algoritm"
+
+msgid "iterations"
+msgstr "gaýtalama"
+
+msgid "salt"
+msgstr "duz"
+
+msgid "hash"
+msgstr "hash"
+
+msgid "variety"
+msgstr "dürlülik"
+
+msgid "version"
+msgstr "wersiýa"
+
+msgid "memory cost"
+msgstr "ýadyň bahasy"
+
+msgid "time cost"
+msgstr "wagt bahasy"
+
+msgid "parallelism"
+msgstr "parallellik"
+
+msgid "work factor"
+msgstr "iş faktory"
+
+msgid "checksum"
+msgstr "çek"
+
+msgid "name"
+msgstr "at"
+
+msgid "content type"
+msgstr "mazmunyň görnüşi"
+
+msgid "codename"
+msgstr "kod ady"
+
+msgid "permission"
+msgstr "rugsat"
+
+msgid "permissions"
+msgstr "rugsatlar"
+
+msgid "group"
+msgstr "topar"
+
+msgid "groups"
+msgstr "toparlar"
+
+msgid "superuser status"
+msgstr "superuser ýagdaýy"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Bu ulanyjynyň aç-açan bellemezden ähli rugsatlarynyň bardygyny belleýär."
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+"Bu ulanyjynyň degişli toparlary. Ulanyjy her bir topara berlen ähli "
+"rugsatlary alar."
+
+msgid "user permissions"
+msgstr "ulanyjy rugsatlary"
+
+msgid "Specific permissions for this user."
+msgstr "Bu ulanyjy üçin ýörite rugsatlar."
+
+msgid "username"
+msgstr "ulanyjy ady"
+
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Gerekli. 150 harp ýa-da azyrak. Diňe harplar, sanlar we @/./+/-/_ mümkin."
+
+msgid "A user with that username already exists."
+msgstr "Bu ulanyjy adyny ulanýan ulanyjy eýýäm bar."
+
+msgid "first name"
+msgstr "at"
+
+msgid "last name"
+msgstr "familiýa"
+
+msgid "email address"
+msgstr "email salgy"
+
+msgid "staff status"
+msgstr "işgärleriň ýagdaýy"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr "Ulanyjynyň bu administrator sahypasyna girip biljekdigini kesgitleýär."
+
+msgid "active"
+msgstr "işjeň"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Bu ulanyja işjeň garalmalydygyny ýa-da ýokdugyny kesgitleýär. Hasaplary "
+"pozmagyň ýerine şuny saýlaň."
+
+msgid "date joined"
+msgstr "goşulan senesi"
+
+msgid "user"
+msgstr "ulanyjy"
+
+msgid "users"
+msgstr "ulanyjylar"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Bu parol gaty gysga. Iň azyndan %(min_length)d nyşandan ybarat bolmaly."
+msgstr[1] ""
+"Bu parol gaty gysga. Iň azyndan %(min_length)d nyşandan ybarat bolmaly."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Parolyňyzda azyndan %(min_length)d nyşan bolmaly."
+msgstr[1] "Parolyňyzda azyndan %(min_length)d nyşan bolmaly."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Parol %(verbose_name)s-e gaty meňzeýär."
+
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Parolyňyz beýleki şahsy maglumatlaryňyza gaty meňzeş bolmaly däl."
+
+msgid "This password is too common."
+msgstr "Bu parol gaty ýygy ulanylýar."
+
+msgid "Your password can’t be a commonly used password."
+msgstr "Parolyňyz köplenç ulanylýan parol bolmaly däl."
+
+msgid "This password is entirely numeric."
+msgstr "Bu parol diňe sanlardan ybarat."
+
+msgid "Your password can’t be entirely numeric."
+msgstr "Parolyňyz diňe sanlardan ybarat bolup bilmez."
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "%(site_name)s-de paroly täzeden düzüldi"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Dogry ulanyjy adyny giriziň. Bu bahada diňe iňlis harplary, sanlar we @/./"
+"+/-/_ nyşanlary bolup biler."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Dogry ulanyjy adyny giriziň. Bu bahada diňe harplar, sanlar we @/./+/-/_ "
+"nyşanlary bolup biler."
+
+msgid "Logged out"
+msgstr "Çykyldy"
+
+msgid "Password reset"
+msgstr "Paroly täzeden düzmek"
+
+msgid "Password reset sent"
+msgstr "Paroly täzeden düzmek boýunça görkezmeler iberildi"
+
+msgid "Enter new password"
+msgstr "Täze parol giriziň"
+
+msgid "Password reset unsuccessful"
+msgstr "Paroly täzeden düzüp bolmady"
+
+msgid "Password reset complete"
+msgstr "Paroly täzeden düzüldi"
+
+msgid "Password change"
+msgstr "Parol üýtgetmek"
+
+msgid "Password change successful"
+msgstr "Parol üýtgetmek üstünlikli tamamlandy"

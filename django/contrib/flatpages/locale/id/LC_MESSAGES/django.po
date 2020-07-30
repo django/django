@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2019
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2019-2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # rodin <romihardiyanto@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-01-26 23:58+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-02-06 02:33+0000\n"
 "Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
@@ -29,10 +29,9 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"Contoh: '/about/contact/'. Pastikan dimulai dan diakhiri dengan garis miring "
-"(/)."
+"Contoh: “/about/contact/”. Pastikan memiliki awalan dan akhiran garis miring."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
@@ -41,8 +40,8 @@ msgstr ""
 "Nilai hanya hanya dapat berisi huruf, angka, titik, garis bawah, tanda "
 "minus, garis miring, atau tanda tilde."
 
-msgid "Example: '/about/contact'. Make sure to have a leading slash."
-msgstr "Contoh: '/about/contact'. Pastikan anda memiliki awalan garis miring."
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr "Contoh: “/about/contact”. Pastikan memiliki awalan garis miring."
 
 msgid "URL is missing a leading slash."
 msgstr "Tidak ada garis miring awal pada URL."
@@ -67,11 +66,11 @@ msgid "template name"
 msgstr "nama templat"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"Contoh: 'flatpages/contact_page.html'. Jika tidak tersedia, sistem akan "
-"menggunakan 'flatpages/default.html'."
+"Contoh: “flatpages/contact_page.html”. Jika tidak disediakan, sistem akan "
+"menggunakan “flatpages/default.html”."
 
 msgid "registration required"
 msgstr "pendaftaran diwajibkan"

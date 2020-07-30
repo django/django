@@ -6,16 +6,16 @@
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
 # madisvain <madisvain@gmail.com>, 2011
 # Martin Pajuste <martinpajuste@gmail.com>, 2014-2015
-# Martin Pajuste <martinpajuste@gmail.com>, 2016-2017,2019
+# Martin Pajuste <martinpajuste@gmail.com>, 2016-2017,2019-2020
 # Marti Raudsepp <marti@juffo.org>, 2014,2016
 # Ragnar Rebase <rrebase@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-12-28 02:29+0000\n"
-"Last-Translator: Ragnar Rebase <rrebase@gmail.com>\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-21 06:41+0000\n"
+"Last-Translator: Martin Pajuste <martinpajuste@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -29,6 +29,9 @@ msgstr "afrikaani"
 
 msgid "Arabic"
 msgstr "araabia"
+
+msgid "Algerian Arabic"
+msgstr ""
 
 msgid "Asturian"
 msgstr "astuuria"
@@ -67,7 +70,7 @@ msgid "German"
 msgstr "saksa"
 
 msgid "Lower Sorbian"
-msgstr " alamsorbi"
+msgstr "alamsorbi"
 
 msgid "Greek"
 msgstr "kreeka"
@@ -153,6 +156,9 @@ msgstr "interlingua"
 msgid "Indonesian"
 msgstr "indoneesi"
 
+msgid "Igbo"
+msgstr "ibo"
+
 msgid "Ido"
 msgstr "ido"
 
@@ -182,6 +188,9 @@ msgstr "kannada"
 
 msgid "Korean"
 msgstr "korea"
+
+msgid "Kyrgyz"
+msgstr "kirgiisi"
 
 msgid "Luxembourgish"
 msgstr "letseburgi"
@@ -267,8 +276,14 @@ msgstr "tamiili"
 msgid "Telugu"
 msgstr "telugu"
 
+msgid "Tajik"
+msgstr "tadžiki"
+
 msgid "Thai"
 msgstr "tai"
+
+msgid "Turkmen"
+msgstr "türkmeeni"
 
 msgid "Turkish"
 msgstr "türgi"
@@ -575,6 +590,9 @@ msgstr "“%(value)s” väärtus peab olema kas Tühi, Tõene või Väär."
 msgid "Boolean (Either True, False or None)"
 msgstr "Tõeväärtus (Kas tõene, väär või tühi)"
 
+msgid "Positive big integer"
+msgstr "Positiivne suur täisarv"
+
 msgid "Positive integer"
 msgstr "Positiivne täisarv"
 
@@ -628,6 +646,12 @@ msgstr "Fail"
 
 msgid "Image"
 msgstr "Pilt"
+
+msgid "A JSON object"
+msgstr "JSON objekt"
+
+msgid "Value must be valid JSON."
+msgstr "Väärtus peab olema korrektne JSON."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -721,6 +745,9 @@ msgstr "Sisestage täielik väärtus."
 msgid "Enter a valid UUID."
 msgstr "Sisestage korrektne UUID."
 
+msgid "Enter a valid JSON."
+msgstr "Sisestage korrektne JSON."
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -806,15 +833,7 @@ msgstr "Jah"
 msgid "No"
 msgstr "Ei"
 
-msgid "Year"
-msgstr "Aasta"
-
-msgid "Month"
-msgstr "Kuu"
-
-msgid "Day"
-msgstr "Päev"
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "jah,ei,võib-olla"
 
@@ -1122,9 +1141,6 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minut"
 msgstr[1] "%d minutit"
-
-msgid "0 minutes"
-msgstr "0 minutit"
 
 msgid "Forbidden"
 msgstr "Keelatud"

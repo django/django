@@ -3,14 +3,15 @@
 # Translators:
 # Carles Barrobés <carles@barrobes.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Manel Clos <manelclos@gmail.com>, 2020
 # Roger Pons <rogerpons@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Roger Pons <rogerpons@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-04-28 20:20+0000\n"
+"Last-Translator: Manel Clos <manelclos@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -29,18 +30,18 @@ msgid "redirect from"
 msgstr "redirecció des de"
 
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
 msgstr ""
-"Aquesta ruta hauria de ser un camí absolut, excloent-ne el nom del domini. "
-"Exemple '/events/search/'."
+"Aquesta ruta hauria de ser una camí absolut, excloent-ne el nom del domini. "
+"Exemple: '/events/search/'."
 
 msgid "redirect to"
 msgstr "redirigir a"
 
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+"“http://”."
 msgstr ""
 "Això pot ser bé una ruta absoluta (com a sobre) o una URL completa que "
 "comenci per 'http://'."

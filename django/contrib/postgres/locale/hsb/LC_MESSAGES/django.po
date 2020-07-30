@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-21 19:31+0000\n"
-"Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
 "language/hsb/)\n"
 "MIME-Version: 1.0\n"
@@ -35,21 +35,11 @@ msgstr "Konwertowanje znamješkowych rjećazkow do znamješkowych rjećazkow/nul
 msgid "The value of “%(key)s” is not a string or null."
 msgstr "Hódnota \" %(key)s\" znamješkowy rjećazk abo null njeje."
 
-msgid "A JSON object"
-msgstr "JSON-objekt"
-
-msgid "Value must be valid JSON."
-msgstr "Hódnota dyrbi płaćiwy JSON być."
-
 msgid "Could not load JSON data."
 msgstr "JSON-daty njedachu so začitać."
 
 msgid "Input must be a JSON dictionary."
 msgstr "Zapodaće dyrbi JSON-słownik być."
-
-#, python-format
-msgid "“%(value)s” value must be valid JSON."
-msgstr "Hódnota '%(value)s' dyrbi płaćiwy JSON być."
 
 msgid "Enter two valid values."
 msgstr "Zapodajće dwě płaćiwej hódnoće."
