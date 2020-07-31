@@ -115,6 +115,11 @@ E023 = Error(
     id='security.E023',
 )
 
+E100 = Error(
+    "DEFAULT_HASHING_ALGORITHM must be 'sha1' or 'sha256'.",
+    id='security.E100',
+)
+
 
 def _security_middleware():
     return 'django.middleware.security.SecurityMiddleware' in settings.MIDDLEWARE
@@ -222,4 +227,12 @@ def check_referrer_policy(app_configs, **kwargs):
             values = set(settings.SECURE_REFERRER_POLICY)
         if not values <= REFERRER_POLICY_VALUES:
             return [E023]
+    return []
+
+
+# RemovedInDjango40Warning
+@register(Tags.security)
+def check_default_hashing_algorithm(app_configs, **kwargs):
+    if settings.DEFAULT_HASHING_ALGORITHM not in {'sha1', 'sha256'}:
+        return [E100]
     return []
