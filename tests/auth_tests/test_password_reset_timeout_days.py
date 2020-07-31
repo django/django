@@ -23,6 +23,7 @@ class DeprecationTests(TestCase):
         class Mocked(PasswordResetTokenGenerator):
             def __init__(self, now):
                 self._now_val = now
+                super().__init__()
 
             def _now(self):
                 return self._now_val
