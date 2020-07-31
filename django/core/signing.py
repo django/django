@@ -147,7 +147,7 @@ class Signer:
     # RemovedInDjango40Warning.
     legacy_algorithm = 'sha1'
 
-    def __init__(self, key=None, sep=':', salt=None, algorithm='sha256'):
+    def __init__(self, key=None, sep=':', salt=None, algorithm=None):
         self.key = key or settings.SECRET_KEY
         self.sep = sep
         if _SEP_UNSAFE.match(self.sep):
@@ -156,7 +156,9 @@ class Signer:
                 'only A-z0-9-_=)' % sep,
             )
         self.salt = salt or '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
-        self.algorithm = algorithm
+        # RemovedInDjango40Warning: when the deprecation ends, replace with:
+        # self.algorithm = algorithm or 'sha256'
+        self.algorithm = algorithm or settings.DEFAULT_HASHING_ALGORITHM
 
     def signature(self, value):
         return base64_hmac(self.salt + 'signer', value, self.key, algorithm=self.algorithm)

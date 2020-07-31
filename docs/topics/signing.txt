@@ -81,13 +81,13 @@ generate signatures. You can use a different secret by passing it to the
     >>> value
     'My string:EkfQJafvGyiofrdGnuthdxImIJw'
 
-.. class:: Signer(key=None, sep=':', salt=None, algorithm='sha256')
+.. class:: Signer(key=None, sep=':', salt=None, algorithm=None)
 
     Returns a signer which uses ``key`` to generate signatures and ``sep`` to
     separate values. ``sep`` cannot be in the :rfc:`URL safe base64 alphabet
     <4648#section-5>`. This alphabet contains alphanumeric characters, hyphens,
     and underscores. ``algorithm`` must be an algorithm supported by
-    :py:mod:`hashlib`.
+    :py:mod:`hashlib`, it defaults to ``'sha256'``.
 
     .. versionchanged:: 3.1
 

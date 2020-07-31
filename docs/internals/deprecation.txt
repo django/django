@@ -118,6 +118,8 @@ details on these changes.
 
 * The ``{% ifequal %}`` and ``{% ifnotequal %}`` template tags will be removed.
 
+* The ``DEFAULT_HASHING_ALGORITHM`` transitional setting will be removed.
+
 .. _deprecation-removed-in-3.1:
 
 3.1

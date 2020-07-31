@@ -27,6 +27,12 @@ PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG = (
     'PASSWORD_RESET_TIMEOUT instead.'
 )
 
+DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG = (
+    'The DEFAULT_HASHING_ALGORITHM transitional setting is deprecated. '
+    'Support for it and tokens, cookies, sessions, and signatures that use '
+    'SHA-1 hashing algorithm will be removed in Django 4.0.'
+)
+
 
 class SettingsReference(str):
     """
@@ -195,6 +201,9 @@ class Settings:
             setattr(self, 'PASSWORD_RESET_TIMEOUT', self.PASSWORD_RESET_TIMEOUT_DAYS * 60 * 60 * 24)
             warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
 
+        if self.is_overridden('DEFAULT_HASHING_ALGORITHM'):
+            warnings.warn(DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG, RemovedInDjango40Warning)
+
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
             # this file, no check happens and it's harmless.
@@ -241,6 +250,8 @@ class UserSettingsHolder:
         if name == 'PASSWORD_RESET_TIMEOUT_DAYS':
             setattr(self, 'PASSWORD_RESET_TIMEOUT', value * 60 * 60 * 24)
             warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
+        if name == 'DEFAULT_HASHING_ALGORITHM':
+            warnings.warn(DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG, RemovedInDjango40Warning)
         super().__setattr__(name, value)
 
     def __delattr__(self, name):
