@@ -187,8 +187,8 @@ and tuples) if you pass in a tuple, you will get a list from
 
 .. function:: dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False)
 
-    Returns URL-safe, sha1 signed base64 compressed JSON string. Serialized
-    object is signed using :class:`~TimestampSigner`.
+    Returns URL-safe, signed base64 compressed JSON string. Serialized object
+    is signed using :class:`~TimestampSigner`.
 
 .. function:: loads(string, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None)
 
