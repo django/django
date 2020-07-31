@@ -134,6 +134,24 @@ class TestSigner(SimpleTestCase):
         signed = 'ImEgc3RyaW5nIFx1MjAyMCI:1k1beT:ZfNhN1kdws7KosUleOvuYroPHEc'
         self.assertEqual(signing.loads(signed), value)
 
+    def test_dumps_loads_custom_algorithm(self):
+        value = 'a string \u2020'
+        signed = signing.dumps(value, algorithm='sha512')
+        self.assertEqual(signing.loads(signed, algorithm='sha512'), value)
+        with self.assertRaises(signing.BadSignature):
+            signing.loads(signed, algorithm='sha256')
+
+    def test_dumps_invalid_algorithm(self):
+        msg = "'whatever' is not an algorithm accepted by the hashlib module."
+        with self.assertRaisesMessage(InvalidAlgorithm, msg):
+            signing.dumps('value', algorithm='whatever')
+
+    def test_loads_invalid_algorithm(self):
+        signed = signing.dumps('value')
+        msg = "'whatever' is not an algorithm accepted by the hashlib module."
+        with self.assertRaisesMessage(InvalidAlgorithm, msg):
+            signing.loads(signed, algorithm='whatever')
+
     def test_decode_detects_tampering(self):
         "loads should raise exception for tampered objects"
         transforms = (

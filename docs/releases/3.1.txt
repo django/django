@@ -423,8 +423,9 @@ Security
   changed to the SHA-256. Support for signatures made with the old SHA-1
   algorithm remains until Django 4.0.
 
-  Also, the new ``algorithm`` parameter of the
-  :class:`~django.core.signing.Signer` allows customizing the hashing
+  Also, the new ``algorithm`` parameter of
+  :class:`~django.core.signing.Signer`, :meth:`~django.core.signing.loads`,
+  and :meth:`~django.core.signing.dumps` allows customizing the hashing
   algorithm.
 
 Templates

@@ -185,12 +185,22 @@ and tuples) if you pass in a tuple, you will get a list from
     >>> signing.loads(value)
     ['a', 'b', 'c']
 
-.. function:: dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False)
+.. function:: dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False, algorithm='sha256')
 
     Returns URL-safe, signed base64 compressed JSON string. Serialized object
-    is signed using :class:`~TimestampSigner`.
+    is signed using :class:`~TimestampSigner`. ``algorithm`` must be an
+    algorithm supported by :py:mod:`hashlib`.
 
-.. function:: loads(string, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None)
+    .. versionchanged:: 3.1
+
+        The ``algorithm`` parameter was added.
+
+.. function:: loads(string, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None, algorithm='sha256')
 
     Reverse of ``dumps()``, raises ``BadSignature`` if signature fails.
-    Checks ``max_age`` (in seconds) if given.
+    Checks ``max_age`` (in seconds) if given. ``algorithm`` must be an
+    algorithm supported by :py:mod:`hashlib`.
+
+    .. versionchanged:: 3.1
+
+        The ``algorithm`` parameter was added.

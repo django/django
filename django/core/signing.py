@@ -90,7 +90,7 @@ class JSONSerializer:
         return json.loads(data.decode('latin-1'))
 
 
-def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False):
+def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False, algorithm='sha256'):
     """
     Return URL-safe, hmac signed base64 compressed JSON string. If key is
     None, use settings.SECRET_KEY instead. The hmac algorithm is the default
@@ -121,10 +121,10 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
     base64d = b64_encode(data).decode()
     if is_compressed:
         base64d = '.' + base64d
-    return TimestampSigner(key, salt=salt).sign(base64d)
+    return TimestampSigner(key, salt=salt, algorithm=algorithm).sign(base64d)
 
 
-def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None):
+def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None, algorithm='sha256'):
     """
     Reverse of dumps(), raise BadSignature if signature fails.
 
@@ -132,7 +132,7 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
     """
     # TimestampSigner.unsign() returns str but base64 and zlib compression
     # operate on bytes.
-    base64d = TimestampSigner(key, salt=salt).unsign(s, max_age=max_age).encode()
+    base64d = TimestampSigner(key, salt=salt, algorithm=algorithm).unsign(s, max_age=max_age).encode()
     decompress = base64d[:1] == b'.'
     if decompress:
         # It's compressed; uncompress it first
