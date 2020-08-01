@@ -3007,6 +3007,19 @@ The list of validators that are used to check the strength of user's passwords.
 See :ref:`password-validation` for more details. By default, no validation is
 performed and all passwords are accepted.
 
+.. setting:: AUTH_USERNAME_VALIDATORS
+
+``AUTH_USERNAME_VALIDATORS``
+----------------------------
+
+Default:: 
+    
+    [
+        {
+            'NAME': 'contrib.auth.validators.UnicodeUsernameValidators'
+        },
+    ]
+
 .. _settings-messages:
 
 Messages

@@ -8,6 +8,7 @@ User authentication in Django
    default
    passwords
    customizing
+   username
 
 .. module:: django.contrib.auth
    :synopsis: Django's authentication framework.
@@ -87,3 +88,5 @@ Usage
 :doc:`Customizing Users and authentication <customizing>`
 
 :doc:`Password management in Django <passwords>`
+
+:doc:`Username Validation in Django <username>`

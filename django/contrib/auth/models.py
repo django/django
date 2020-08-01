@@ -1,5 +1,8 @@
 from django.contrib import auth
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.username_validation import (
+    get_default_username_validators, username_validators_help_texts
+)
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
@@ -325,8 +328,8 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         _('username'),
         max_length=150,
         unique=True,
-        help_text=_('Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
-        validators=[username_validator],
+        help_text=username_validators_help_texts(),
+        validators=get_default_username_validators(),
         error_messages={
             'unique': _("A user with that username already exists."),
         },

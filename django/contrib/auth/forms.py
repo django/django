@@ -4,6 +4,9 @@ from django import forms
 from django.contrib.auth import (
     authenticate, get_user_model, password_validation,
 )
+from django.contrib.auth.username_validation import (
+    get_default_username_validators, username_validators_help_text_html
+)
 from django.contrib.auth.hashers import (
     UNUSABLE_PASSWORD_PREFIX, identify_hasher,
 )
@@ -72,6 +75,8 @@ class UsernameField(forms.CharField):
         return unicodedata.normalize('NFKC', super().to_python(value))
 
     def widget_attrs(self, widget):
+        self.validators = get_default_username_validators()
+        self.help_text = username_validators_help_text_html()
         return {
             **super().widget_attrs(widget),
             'autocapitalize': 'none',

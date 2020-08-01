@@ -1,0 +1,130 @@
+=============================
+Username Validation in Django
+=============================
+
+.. module:: django.contrib.auth.username_validation
+
+Django offers pluggable username validation.You can configure multiple
+username validators at the same time. A few validators are included in 
+Django, but you can write your own as well.
+
+Each username validator must provide a help text to explain the requirements to
+the user, validate  a given username and return an error message if it does not 
+meet the requirements. Validators can also have optional settings to fine tune
+their behavior.
+
+Validation is controlled by the :setting:`AUTH_USERNAME_VALIDATORS` setting.
+The default for the setting is an ``UnicodeUsernameValidator`` which
+validates whether given username contains English letters, numbers and @/./+/-/_
+characters or not.
+
+By default, validators are used in the forms and in the 
+:djadmin:`createsuperuser` management commands.
+
+Enabling username validation
+----------------------------
+
+Username validation is configured in the
+:setting:`AUTH_USERNAME_VALIDATORS` settings::
+
+    AUTH_USERNAME_VALIDATORS = [
+        {
+            'NAME': 'django.contrib.auth.validators.UnicodeUsernameValidators',
+        },
+        {
+            'NAME': 'django.contrib.auth.validators.UsernameMinimumLengthValidator',
+            'OPTIONS':{
+                'min_length':3,
+            }
+        }
+    ]
+
+This example enables two included validators:
+
+* ``UnicodeUsernameValidator``, which checks whether username contains
+  anything other than the English letters, numbers and @/./+/-/_.
+* ``UsernameMinimumLengthValidator``, which checks whether the username meets a minimum
+  length. This validator is configured with a custom option it now requires
+  the minimum length to be nine characters, instead of the default eight.
+
+The help texts and any errors from username validators are always returned in
+the order they are listed in :setting:`AUTH_USERNAME_VALIDATORS`.
+
+Included validators
+-------------------
+
+Django includes two validators:
+
+.. class:: UnicodeUsernameValidators
+    
+    Validates whether the username contains Unicode characters, in addition
+    to @,.,+,-, and _. This is the default validator.
+
+.. class:: ASCIIUsernameValidators
+
+    Validates whether the username contains ASCII letters, in addition
+    to @,.,+,-, and _.
+
+.. class:: UsernameMinimumLengthValidator(min_length=3)
+    
+    Validates whether the username meets a minimum length.
+    The minimum length can be customized with the ``min_length`` parameter.
+
+Integrating validation
+----------------------
+
+There are few function in ``django.contrib.auth.username_validation`` that
+you can call from your own forms or other code to integrate username
+validation.
+
+.. function:: username_validators_help_texts(username_validators=None)
+    
+    Returns a list of the help texts of all validators. These explain the
+    username requirements to the user.
+
+.. function:: username_validators_help_text_html(username_validators=None)
+    
+    Returns an HTML string with all the text in an ``<ul>``. This is
+    helpful when adding username validation to forms, as you can pass the
+    output directly to the ``help_text`` parameter of a form field.
+
+Writing your own validator
+--------------------------
+
+If Django's built-in validators are not sufficient for your requirements,
+you can write your own username validators. Validators have a fairly small
+interface. They must must implement two methods.
+
+* ``__call__(self, username)``: validate a username. Return ``None`` if the
+  username is valid, or raise a 
+  :exc:`~django.core.exceptions.ValidationError` with an error message if the
+  username is not valid.
+* ``get_help_text(self)``: provide a help text to explain the requirements to
+  the user.
+
+Any items in the ``OPTIONS`` in :setting:``AUTH_USERNAME_VALIDATORS`` for your
+validator will be passed to the constructor. All constructor arguments should
+have default value.
+
+Here's a  basic example of a validator, with one optional setting::
+
+    from django.core.exceptions import ValidationError
+    from django.utils.translation import gettext as _
+
+    class UsernameMinimumLengthValidator:
+        def __init__(self, min_length=3):
+            self.min_length = min_length
+
+        def __call__(self, username):
+            if len(username) < self.min_length:
+                raise ValidationError(
+                    _("This username must contain at least %(min_length)d characters."),
+                    code='invalid',
+                    params={'min_length': self.min_length},
+                )
+        
+        def get_help_text(self):
+            return _(
+                "Your username must onctain at least %(min_length)d characters."
+                "% {'min_length': self.min_length}
+            )
