@@ -130,7 +130,8 @@ class TestSigner(SimpleTestCase):
         # RemovedInDjango40Warning: pre-Django 3.1 signatures won't be
         # supported.
         value = 'a string \u2020'
-        signed = signing.dumps(value, algorithm='sha1')
+        # SHA-1 signed value.
+        signed = 'ImEgc3RyaW5nIFx1MjAyMCI:1k1beT:ZfNhN1kdws7KosUleOvuYroPHEc'
         self.assertEqual(signing.loads(signed), value)
 
     def test_decode_detects_tampering(self):
