@@ -71,7 +71,7 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
 
     def test_view_detail(self):
         url = reverse(
-            'admindocs:django-admindocs-views-detail', 
+            'admindocs:django-admindocs-views-detail',
             args=['django.contrib.admindocs.views.BaseAdminDocsView']
         )
         response = self.client.get(url)
