@@ -5470,7 +5470,7 @@ class AdminDocsTest(TestCase):
         self.client.force_login(self.superuser)
 
     def test_tags(self):
-        response = self.client.get(reverse('django-admindocs-tags'))
+        response = self.client.get(reverse('admindocs:django-admindocs-tags'))
 
         # The builtin tag group exists
         self.assertContains(response, "<h2>Built-in tags</h2>", count=2, html=True)
@@ -5491,7 +5491,7 @@ class AdminDocsTest(TestCase):
         self.assertContains(response, '<li><a href="#admin_list-admin_actions">admin_actions</a></li>', html=True)
 
     def test_filters(self):
-        response = self.client.get(reverse('django-admindocs-filters'))
+        response = self.client.get(reverse('admindocs:django-admindocs-filters'))
 
         # The builtin filter group exists
         self.assertContains(response, "<h2>Built-in filters</h2>", count=2, html=True)
