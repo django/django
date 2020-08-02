@@ -8,7 +8,7 @@ backend_urls = ([
 ], 'backend')
 
 urlpatterns = [
-    path('admin/doc/', include('django.contrib.admindocs.urls')),
+    path('admin/doc/', include('django.contrib.admindocs.urls', namespace='admindocs')),
     path('admin/', admin.site.urls),
     path('api/backend/', include(backend_urls, namespace='backend')),
 ]
