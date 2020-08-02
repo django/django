@@ -184,7 +184,7 @@ def auth_username_validators_changed(**kwargs):
     if kwargs['setting'] == 'AUTH_USERNAME_VALIDATORS':
         from django.contrib.auth.username_validation import get_default_username_validators
         get_default_username_validators.cache_clear()
-    
+
 
 @receiver(setting_changed)
 def user_model_swapped(**kwargs):
