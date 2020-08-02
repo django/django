@@ -1,5 +1,6 @@
 from django.contrib import auth
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.username_validation import (
     get_default_username_validators, username_validators_help_texts,
 )
