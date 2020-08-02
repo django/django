@@ -70,7 +70,10 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         )
 
     def test_view_detail(self):
-        url = reverse('admindocs:django-admindocs-views-detail', args=['django.contrib.admindocs.views.BaseAdminDocsView'])
+        url = reverse(
+            'admindocs:django-admindocs-views-detail', 
+            args=['django.contrib.admindocs.views.BaseAdminDocsView']
+        )
         response = self.client.get(url)
         # View docstring
         self.assertContains(response, 'Base view for admindocs views.')
@@ -104,7 +107,9 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         )
 
     def test_template_detail(self):
-        response = self.client.get(reverse('admindocs:django-admindocs-templates', args=['admin_doc/template_detail.html']))
+        response = self.client.get(
+            reverse('admindocs:django-admindocs-templates', args=['admin_doc/template_detail.html'])
+        )
         self.assertContains(response, '<h1>Template: <q>admin_doc/template_detail.html</q></h1>', html=True)
 
     def test_missing_docutils(self):
@@ -168,7 +173,9 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
         with captured_stderr() as self.docutils_stderr:
-            self.response = self.client.get(reverse('admindocs:django-admindocs-models-detail', args=['admin_docs', 'Person']))
+            self.response = self.client.get(
+                reverse('admindocs:django-admindocs-models-detail', args=['admin_docs', 'Person'])
+            )
 
     def test_method_excludes(self):
         """
@@ -307,12 +314,16 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         self.assertContains(self.response, '<h1>admin_docs.Person</h1>', html=True)
 
     def test_app_not_found(self):
-        response = self.client.get(reverse('admindocs:django-admindocs-models-detail', args=['doesnotexist', 'Person']))
+        response = self.client.get(
+            reverse('admindocs:django-admindocs-models-detail', args=['doesnotexist', 'Person'])
+        )
         self.assertEqual(response.context['exception'], "App 'doesnotexist' not found")
         self.assertEqual(response.status_code, 404)
 
     def test_model_not_found(self):
-        response = self.client.get(reverse('admindocs:django-admindocs-models-detail', args=['admin_docs', 'doesnotexist']))
+        response = self.client.get(
+            reverse('admindocs:django-admindocs-models-detail', args=['admin_docs', 'doesnotexist'])
+        )
         self.assertEqual(response.context['exception'], "Model 'doesnotexist' not found in app 'admin_docs'")
         self.assertEqual(response.status_code, 404)
 
