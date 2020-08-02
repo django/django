@@ -435,6 +435,8 @@ Miscellaneous
   in the :class:`~django.apps.AppConfig` subclass if you need to prevent this
   behavior. See :ref:`whats-new-3.2` for more details.
 
+* Instantiating an abstract model now raises ``TypeError``.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2

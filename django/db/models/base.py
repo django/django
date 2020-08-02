@@ -409,6 +409,8 @@ class Model(metaclass=ModelBase):
         opts = self._meta
         _setattr = setattr
         _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError('Abstract models cannot be instantiated.')
 
         pre_init.send(sender=cls, args=args, kwargs=kwargs)
 
