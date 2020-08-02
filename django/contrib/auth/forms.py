@@ -4,14 +4,14 @@ from django import forms
 from django.contrib.auth import (
     authenticate, get_user_model, password_validation,
 )
-from django.contrib.auth.username_validation import (
-    get_default_username_validators, username_validators_help_text_html
-)
 from django.contrib.auth.hashers import (
     UNUSABLE_PASSWORD_PREFIX, identify_hasher,
 )
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.username_validation import (
+    get_default_username_validators, username_validators_help_text_html,
+)
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives

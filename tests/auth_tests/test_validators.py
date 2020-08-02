@@ -11,8 +11,7 @@ from django.contrib.auth.password_validation import (
 )
 from django.contrib.auth.username_validation import (
     get_default_username_validators, get_username_validators,
-    username_validators_help_texts,
-    username_validators_help_text_html,
+    username_validators_help_text_html, username_validators_help_texts,
 )
 from django.core.exceptions import ValidationError
 from django.db import models
