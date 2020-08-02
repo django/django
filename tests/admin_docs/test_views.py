@@ -22,28 +22,28 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         self.client.force_login(self.superuser)
 
     def test_index(self):
-        response = self.client.get(reverse('django-admindocs-docroot'))
+        response = self.client.get(reverse('admindocs:django-admindocs-docroot'))
         self.assertContains(response, '<h1>Documentation</h1>', html=True)
         self.assertContains(response, '<h1 id="site-name"><a href="/admin/">Django administration</a></h1>')
         self.client.logout()
-        response = self.client.get(reverse('django-admindocs-docroot'), follow=True)
+        response = self.client.get(reverse('admindocs:django-admindocs-docroot'), follow=True)
         # Should display the login screen
         self.assertContains(response, '<input type="hidden" name="next" value="/admindocs/">', html=True)
 
     def test_bookmarklets(self):
-        response = self.client.get(reverse('django-admindocs-bookmarklets'))
+        response = self.client.get(reverse('admindocs:django-admindocs-bookmarklets'))
         self.assertContains(response, '/admindocs/views/')
 
     def test_templatetag_index(self):
-        response = self.client.get(reverse('django-admindocs-tags'))
+        response = self.client.get(reverse('admindocs:django-admindocs-tags'))
         self.assertContains(response, '<h3 id="built_in-extends">extends</h3>', html=True)
 
     def test_templatefilter_index(self):
-        response = self.client.get(reverse('django-admindocs-filters'))
+        response = self.client.get(reverse('admindocs:django-admindocs-filters'))
         self.assertContains(response, '<h3 id="built_in-first">first</h3>', html=True)
 
     def test_view_index(self):
-        response = self.client.get(reverse('django-admindocs-views-index'))
+        response = self.client.get(reverse('admindocs:django-admindocs-views-index'))
         self.assertContains(
             response,
             '<h3><a href="/admindocs/views/django.contrib.admindocs.views.BaseAdminDocsView/">/admindocs/</a></h3>',
@@ -62,7 +62,7 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         """
         Views that are methods are listed correctly.
         """
-        response = self.client.get(reverse('django-admindocs-views-index'))
+        response = self.client.get(reverse('admindocs:django-admindocs-views-index'))
         self.assertContains(
             response,
             '<h3><a href="/admindocs/views/django.contrib.admin.sites.AdminSite.index/">/admin/</a></h3>',
@@ -70,19 +70,19 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         )
 
     def test_view_detail(self):
-        url = reverse('django-admindocs-views-detail', args=['django.contrib.admindocs.views.BaseAdminDocsView'])
+        url = reverse('admindocs:django-admindocs-views-detail', args=['django.contrib.admindocs.views.BaseAdminDocsView'])
         response = self.client.get(url)
         # View docstring
         self.assertContains(response, 'Base view for admindocs views.')
 
     @override_settings(ROOT_URLCONF='admin_docs.namespace_urls')
     def test_namespaced_view_detail(self):
-        url = reverse('django-admindocs-views-detail', args=['admin_docs.views.XViewClass'])
+        url = reverse('admindocs:django-admindocs-views-detail', args=['admin_docs.views.XViewClass'])
         response = self.client.get(url)
         self.assertContains(response, '<h1>admin_docs.views.XViewClass</h1>')
 
     def test_view_detail_illegal_import(self):
-        url = reverse('django-admindocs-views-detail', args=['urlpatterns_reverse.nonimported_module.view'])
+        url = reverse('admindocs:django-admindocs-views-detail', args=['urlpatterns_reverse.nonimported_module.view'])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
         self.assertNotIn("urlpatterns_reverse.nonimported_module", sys.modules)
@@ -91,12 +91,12 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         """
         Views that are methods can be displayed.
         """
-        url = reverse('django-admindocs-views-detail', args=['django.contrib.admin.sites.AdminSite.index'])
+        url = reverse('admindocs:django-admindocs-views-detail', args=['django.contrib.admin.sites.AdminSite.index'])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
     def test_model_index(self):
-        response = self.client.get(reverse('django-admindocs-models-index'))
+        response = self.client.get(reverse('admindocs:django-admindocs-models-index'))
         self.assertContains(
             response,
             '<h2 id="app-auth">Authentication and Authorization (django.contrib.auth)</h2>',
@@ -104,13 +104,13 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         )
 
     def test_template_detail(self):
-        response = self.client.get(reverse('django-admindocs-templates', args=['admin_doc/template_detail.html']))
+        response = self.client.get(reverse('admindocs:django-admindocs-templates', args=['admin_doc/template_detail.html']))
         self.assertContains(response, '<h1>Template: <q>admin_doc/template_detail.html</q></h1>', html=True)
 
     def test_missing_docutils(self):
         utils.docutils_is_available = False
         try:
-            response = self.client.get(reverse('django-admindocs-docroot'))
+            response = self.client.get(reverse('admindocs:django-admindocs-docroot'))
             self.assertContains(
                 response,
                 '<h3>The admin documentation system requires Python’s '
@@ -133,7 +133,7 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         """
         Site.objects.all().delete()
         del settings.SITE_ID
-        response = self.client.get(reverse('django-admindocs-views-index'))
+        response = self.client.get(reverse('admindocs:django-admindocs-views-index'))
         self.assertContains(response, 'View documentation')
 
 
@@ -152,13 +152,13 @@ class AdminDocViewWithMultipleEngines(AdminDocViewTests):
     def test_templatefilter_index(self):
         # Overridden because non-trivial TEMPLATES settings aren't supported
         # but the page shouldn't crash (#24125).
-        response = self.client.get(reverse('django-admindocs-filters'))
+        response = self.client.get(reverse('admindocs:django-admindocs-filters'))
         self.assertContains(response, '<title>Template filters</title>', html=True)
 
     def test_templatetag_index(self):
         # Overridden because non-trivial TEMPLATES settings aren't supported
         # but the page shouldn't crash (#24125).
-        response = self.client.get(reverse('django-admindocs-tags'))
+        response = self.client.get(reverse('admindocs:django-admindocs-tags'))
         self.assertContains(response, '<title>Template tags</title>', html=True)
 
 
@@ -168,7 +168,7 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
         with captured_stderr() as self.docutils_stderr:
-            self.response = self.client.get(reverse('django-admindocs-models-detail', args=['admin_docs', 'Person']))
+            self.response = self.client.get(reverse('admindocs:django-admindocs-models-detail', args=['admin_docs', 'Person']))
 
     def test_method_excludes(self):
         """
@@ -264,7 +264,7 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
     def test_model_with_many_to_one(self):
         link = '<a class="reference external" href="/admindocs/models/%s/">%s</a>'
         response = self.client.get(
-            reverse('django-admindocs-models-detail', args=['admin_docs', 'company'])
+            reverse('admindocs:django-admindocs-models-detail', args=['admin_docs', 'company'])
         )
         self.assertContains(
             response,
@@ -280,7 +280,7 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         A model with ``related_name`` of `+` shouldn't show backward
         relationship links.
         """
-        response = self.client.get(reverse('django-admindocs-models-detail', args=['admin_docs', 'family']))
+        response = self.client.get(reverse('admindocs:django-admindocs-models-detail', args=['admin_docs', 'family']))
         fields = response.context_data.get('fields')
         self.assertEqual(len(fields), 2)
 
@@ -307,12 +307,12 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         self.assertContains(self.response, '<h1>admin_docs.Person</h1>', html=True)
 
     def test_app_not_found(self):
-        response = self.client.get(reverse('django-admindocs-models-detail', args=['doesnotexist', 'Person']))
+        response = self.client.get(reverse('admindocs:django-admindocs-models-detail', args=['doesnotexist', 'Person']))
         self.assertEqual(response.context['exception'], "App 'doesnotexist' not found")
         self.assertEqual(response.status_code, 404)
 
     def test_model_not_found(self):
-        response = self.client.get(reverse('django-admindocs-models-detail', args=['admin_docs', 'doesnotexist']))
+        response = self.client.get(reverse('admindocs:django-admindocs-models-detail', args=['admin_docs', 'doesnotexist']))
         self.assertEqual(response.context['exception'], "Model 'doesnotexist' not found in app 'admin_docs'")
         self.assertEqual(response.status_code, 404)
 
