@@ -1,6 +1,8 @@
 from django.contrib.admindocs import views
 from django.urls import path, re_path
 
+app_name = 'admindocs'
+
 urlpatterns = [
     path(
         '',
