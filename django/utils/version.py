@@ -17,26 +17,10 @@ PY39 = sys.version_info >= (3, 9)
 
 def get_version(version=None):
     """Return a PEP 440-compliant version number from VERSION."""
-    version = get_complete_version(version)
-
-    # Now build the two parts of the version number:
-    # main = X.Y[.Z]
-    # sub = .devN - for pre-alpha releases
-    #     | {a|b|rc}N - for alpha, beta, and rc releases
-
-    main = get_main_version(version)
-
-    sub = ''
-    if version[3] == 'alpha' and version[4] == 0:
-        git_changeset = get_git_changeset()
-        if git_changeset:
-            sub = '.dev%s' % git_changeset
-
-    elif version[3] != 'final':
-        mapping = {'alpha': 'a', 'beta': 'b', 'rc': 'rc'}
-        sub = mapping[version[3]] + str(version[4])
-
-    return main + sub
+    if version is None:
+        version = _get_version_from_django()
+    _assert(version)
+    return get_main_version(version) + _get_sub_version(version)
 
 
 def get_main_version(version=None):
@@ -44,6 +28,44 @@ def get_main_version(version=None):
     version = get_complete_version(version)
     parts = 2 if version[2] == 0 else 3
     return '.'.join(str(x) for x in version[:parts])
+
+
+def _get_sub_version(version):
+    """
+    Return sub version
+       sub = .devN - for pre-alpha releases
+           | {a|b|rc}N - for alpha, beta, and rc releases
+    """
+    if _is_pre_alpha_release(version):
+        return _create_pre_alpha_sub()
+
+    if _is_final_release(version):
+        return ''
+
+    return _create_alpha_beta_or_rc_sub(version)
+
+
+def _is_pre_alpha_release(version):
+    prerelease_name, prerelease_number = version[3: 5]
+    return prerelease_name == 'alpha' and prerelease_number == 0
+
+
+def _is_final_release(version):
+    prerelease_name = version[3]
+    return prerelease_name == 'final'
+
+
+def _create_pre_alpha_sub():
+    git_changeset = get_git_changeset()
+    if git_changeset:
+        return '.dev%s' % git_changeset
+    else:
+        return ''
+
+
+def _create_alpha_beta_or_rc_sub(version):
+    prerelease_name, prerelease_number = version[3: 5]
+    return {'alpha': 'a', 'beta': 'b', 'rc': 'rc'}[prerelease_name] + str(prerelease_number)
 
 
 def get_complete_version(version=None):
@@ -58,6 +80,24 @@ def get_complete_version(version=None):
         assert version[3] in ('alpha', 'beta', 'rc', 'final')
 
     return version
+
+
+def _get_version_from_django():
+    from django import VERSION
+    return VERSION
+
+
+def _assert(version):
+    assert len(version) == 5
+    major, minor, micro, prerelease_name, prerelease_number = version
+    assert prerelease_name in ('alpha', 'beta', 'rc', 'final')
+    try:
+        assert int(major) >= 0
+        assert int(minor) >= 0
+        assert int(micro) >= 0
+        assert int(prerelease_number) >= 0
+    except ValueError:
+        assert False
 
 
 def get_docs_version(version=None):

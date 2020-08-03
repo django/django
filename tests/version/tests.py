@@ -20,9 +20,46 @@ class VersionTests(SimpleTestCase):
             ((1, 4, 0, 'final', 0), '1.4'),
             ((1, 4, 1, 'rc', 2), '1.4.1rc2'),
             ((1, 4, 1, 'final', 0), '1.4.1'),
+            (('1', '4', '1', 'beta', '1'), '1.4.1b1'),
         )
         for ver_tuple, ver_string in tuples_to_strings:
             self.assertEqual(get_version(ver_tuple), ver_string)
+
+    def test_tuple_item_count_assertion(self):
+        with self.assertRaises(AssertionError):
+            get_version((1, 4, 1, 'final'))
+
+    def test_major_is_a_non_negative_numeric(self):
+        with self.assertRaises(AssertionError):
+            get_version((-1, 4, 1, 'beta', 1))
+
+    def test_major_is_a_non_negative_string(self):
+        with self.assertRaises(AssertionError):
+            get_version(('a', 4, 1, 'beta', 1))
+
+    def test_minor_is_a_non_negative_numeric(self):
+        with self.assertRaises(AssertionError):
+            get_version((1, -4, 1, 'beta', 1))
+
+    def test_minor_is_a_non_negative_string(self):
+        with self.assertRaises(AssertionError):
+            get_version((1, 'c', 1, 'beta', 1))
+
+    def test_micro_is_a_non_negative_numeric(self):
+        with self.assertRaises(AssertionError):
+            get_version((1, 4, -1, 'beta', 1))
+
+    def test_micro_is_a_non_negative_string(self):
+        with self.assertRaises(AssertionError):
+            get_version((1, 4, 'd', 'beta', 1))
+
+    def test_prerelase_number_is_a_non_negative_numeric(self):
+        with self.assertRaises(AssertionError):
+            get_version((1, 4, 1, 'beta', -1))
+
+    def test_prerelase_number_is_a_non_negative_string(self):
+        with self.assertRaises(AssertionError):
+            get_version((1, 4, 1, 'beta', 'x'))
 
     def test_get_version_tuple(self):
         self.assertEqual(get_version_tuple('1.2.3'), (1, 2, 3))
