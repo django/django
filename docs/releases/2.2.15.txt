@@ -2,7 +2,7 @@
 Django 2.2.15 release notes
 ===========================
 
-*Expected August 3, 2020*
+*August 3, 2020*
 
 Django 2.2.15 fixes two bugs in 2.2.14.
 
