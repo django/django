@@ -2,7 +2,7 @@
 Django 3.0.9 release notes
 ==========================
 
-*Expected August 3, 2020*
+*August 3, 2020*
 
 Django 3.0.9 fixes several bugs in 3.0.8.
 
