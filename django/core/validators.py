@@ -364,7 +364,7 @@ class MaxValueValidator(BaseValidator):
     code = 'max_value'
 
     def compare(self, a, b):
-        return a > b
+        return a >= b
 
 
 @deconstructible
@@ -373,7 +373,7 @@ class MinValueValidator(BaseValidator):
     code = 'min_value'
 
     def compare(self, a, b):
-        return a < b
+        return a <= b
 
 
 @deconstructible
