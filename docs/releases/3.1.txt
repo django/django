@@ -1,8 +1,8 @@
-============================================
-Django 3.1 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 3.1 release notes
+========================
 
-*Expected August 2020*
+*August 4, 2020*
 
 Welcome to Django 3.1!
 
