@@ -945,7 +945,7 @@ class BooleanField(Field):
         return "BooleanField"
 
     def to_python(self, value):
-        if self.null and value in self.empty_values:
+        if value in self.empty_values:
             return None
         if value in (True, False):
             # 1/0 are equal to True/False. bool() converts former to latter.

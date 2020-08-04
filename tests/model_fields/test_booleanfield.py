@@ -47,6 +47,30 @@ class BooleanFieldTests(TestCase):
         f = models.BooleanField(choices=choices, default=1, null=False)
         self.assertEqual(f.formfield().choices, choices)
 
+    def test_booleanfield_choices_blank_null_validation(self):
+        choices = [(1, 'Si'), (2, 'No')]
+        blank_msg = 'This field cannot be blank.'
+        null_msg = 'This field cannot be null.'
+
+        blank_false = models.BooleanField(choices=choices, blank=False, null=False)
+        # Blank choice supplied unless default choice provided (#23130).
+        self.assertEqual(blank_false.formfield().choices, [('', '---------')] + choices)
+        with self.assertRaisesMessage(ValidationError, null_msg):
+            blank_false.clean('', None)
+
+        blank_false_nullable = models.BooleanField(choices=choices, blank=False, null=True)
+        self.assertEqual(blank_false_nullable.formfield().required, True)
+        with self.assertRaisesMessage(ValidationError, blank_msg):
+            blank_false_nullable.clean('', None)
+
+        blank_true = models.BooleanField(choices=choices, blank=True, null=False)
+        with self.assertRaisesMessage(ValidationError, null_msg):
+            blank_true.clean('', None)
+
+        blank_true_nullable = models.BooleanField(choices=choices, blank=True, null=True)
+        self.assertEqual(blank_true_nullable.formfield().required, False)
+        blank_true_nullable.clean('', None)
+
     def test_nullbooleanfield_formfield(self):
         f = models.BooleanField(null=True)
         self.assertIsInstance(f.formfield(), forms.NullBooleanField)
