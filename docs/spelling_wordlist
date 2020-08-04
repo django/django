@@ -278,6 +278,7 @@ hstore
 html
 http
 https
+Hypercorn
 hyperlinks
 ie
 ies
