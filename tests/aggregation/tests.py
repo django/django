@@ -468,6 +468,11 @@ class AggregateTestCase(TestCase):
         vals = Book.objects.annotate(num_authors=Count("authors__id")).aggregate(Avg("num_authors"))
         self.assertEqual(vals, {"num_authors__avg": Approximate(1.66, places=1)})
 
+    def test_aggregate_annotation_keyword_conflict(self):
+        msg = 'The named aggregate num_authors conflicts with another identically named annotation.'
+        with self.assertRaisesMessage(ValueError, msg):
+            Book.objects.annotate(num_authors=Count("authors__id")).aggregate(num_authors=Avg("num_authors"))
+
     def test_avg_duration_field(self):
         # Explicit `output_field`.
         self.assertEqual(

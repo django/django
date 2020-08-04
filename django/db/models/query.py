@@ -392,6 +392,9 @@ class QuerySet:
 
         query = self.query.chain()
         for (alias, aggregate_expr) in kwargs.items():
+            if alias in self.query.annotations:
+                raise ValueError(
+                    f'The named aggregate {alias} conflicts with another identically named annotation.')
             query.add_annotation(aggregate_expr, alias, is_summary=True)
             if not query.annotations[alias].contains_aggregate:
                 raise TypeError("%s is not an aggregate expression" % alias)
