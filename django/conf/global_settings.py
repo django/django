@@ -522,7 +522,9 @@ PASSWORD_HASHERS = [
 AUTH_PASSWORD_VALIDATORS = []
 
 AUTH_USERNAME_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.validators.UnicodeUsernameValidator'},
+    {
+        'NAME': 'django.contrib.auth.validators.UnicodeUsernameValidator'
+    },
 ]
 
 ###########

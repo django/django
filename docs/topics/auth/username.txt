@@ -1,8 +1,12 @@
+.. _username-validation:
+
 =============================
 Username Validation in Django
 =============================
 
 .. module:: django.contrib.auth.username_validation
+
+.. versionadded:: 3.2
 
 Django offers pluggable username validation.You can configure multiple
 username validators at the same time. A few validators are included in 
@@ -58,32 +62,38 @@ Django includes two validators:
 .. class:: UnicodeUsernameValidators
     
     Validates whether the username contains Unicode characters, in addition
-    to @,.,+,-, and _. This is the default validator.
+    to ``@``,``.``,``+``,``-``,and ``_``. This is the default validator.
 
 .. class:: ASCIIUsernameValidators
 
     Validates whether the username contains ASCII letters, in addition
-    to @,.,+,-, and _.
+    to ``@``,``.``,``+``,``-``,and ``_``. 
 
-.. class:: UsernameMinimumLengthValidator(min_length=3)
-    
+.. class:: UsernameMinimumLengthValidator(min_length=1)
+
+.. versionadded:: 3.2
+
     Validates whether the username meets a minimum length.
     The minimum length can be customized with the ``min_length`` parameter.
 
 Integrating validation
 ----------------------
 
-There are few function in ``django.contrib.auth.username_validation`` that
+There are few functions in ``django.contrib.auth.username_validation`` that
 you can call from your own forms or other code to integrate username
 validation.
 
 .. function:: username_validators_help_texts(username_validators=None)
-    
+
+.. versionadded:: 3.2
+
     Returns a list of the help texts of all validators. These explain the
     username requirements to the user.
 
 .. function:: username_validators_help_text_html(username_validators=None)
-    
+
+.. versionadded:: 3.2
+
     Returns an HTML string with all the text in an ``<ul>``. This is
     helpful when adding username validation to forms, as you can pass the
     output directly to the ``help_text`` parameter of a form field.
@@ -104,7 +114,7 @@ interface. They must must implement two methods.
 
 Any items in the ``OPTIONS`` in :setting:``AUTH_USERNAME_VALIDATORS`` for your
 validator will be passed to the constructor. All constructor arguments should
-have default value.
+have a default value.
 
 Here's a  basic example of a validator, with one optional setting::
 

@@ -31,6 +31,19 @@ officially support the latest release of each series.
 What's new in Django 3.2
 ========================
 
+Username Validation
+-------------------
+
+Django offers username validation to help users to manage their username
+requirements. The new :setting:`AUTH_USERNAME_VALIDATORS` setting helps
+users to configure their custom validators. You can combine multiple
+validators, and have optional setting to fine tune the validator.
+
+The default validator is ``UnicodeUsernameValidators``. Each validator 
+provides a help text to explain it's requirements to the user.
+
+See :ref:`username-validation` for more details.
+
 Minor features
 --------------
 
@@ -49,6 +62,17 @@ Minor features
 
 * The default iteration count for the PBKDF2 password hasher is increased from
   216,000 to 260,000.
+
+* The new :setting:`AUTH_USERNAME_VALIDATORS` setting allows users to
+  implement their own username validators with options to fine tune the
+  validator.
+
+* Added :meth::help_text() method to ``UnicodUsernameValidator`` and
+  ``ASCIIUsernameValidator``, which returns a help text string to provide
+  requirements to the user.
+
+* Added ``UsernameMinimumLengthValidator`` with ``min_length`` parameter.
+  The default minimum length is 1.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -272,9 +272,10 @@ class UsernameValidatorsTests(SimpleTestCase):
         for valid in valid_usernames:
             with self.subTest(valid=valid):
                 v(valid)
+        msg = 'This username is too short. It must contain at least 3 characters.'
         for invalid in invalid_usernames:
             with self.subTest(invalid=invalid):
-                with self.assertRaises(ValidationError):
+                with self.assertRaisesMessage(ValidationError, msg):
                     v(invalid)
 
     def test_username_validators_help_text(self):
@@ -295,25 +296,22 @@ class UsernameValidatorsTests(SimpleTestCase):
         self.assertEqual(help_texts[1], length)
 
 
-@override_settings(AUTH_USERNAME_VALIDATORS=[
-    {'NAME': 'django.contrib.auth.validators.UnicodeUsernameValidator'},
-    {'NAME': 'django.contrib.auth.validators.UsernameMinimumLengthValidator', 'OPTIONS': {
-        'min_length': 3,
-    }},
-])
 class UsernameValidationTests(SimpleTestCase):
+    def test_get_default_username_validators(self):
+        validators_list = get_default_username_validators()
+        self.assertIsInstance(validators_list[0], validators.UnicodeUsernameValidator)
+
+    @override_settings(AUTH_USERNAME_VALIDATORS=[
+        {'NAME': 'django.contrib.auth.validators.UnicodeUsernameValidator'},
+        {'NAME': 'django.contrib.auth.validators.UsernameMinimumLengthValidator', 'OPTIONS': {
+            'min_length': 3,
+        }},
+    ])
     def test_customized_validation(self):
         validators_list = get_default_username_validators()
         self.assertIsInstance(validators_list[0], validators.UnicodeUsernameValidator)
         self.assertIsInstance(validators_list[1], validators.UsernameMinimumLengthValidator)
         self.assertEqual(validators_list[1].min_length, 3)
-
-    @override_settings(AUTH_USERNAME_VALIDATORS=[
-        {'NAME': 'django.contrib.auth.validators.UnicodeUsernameValidator'},
-    ])
-    def test_get_default_username_validators(self):
-        validators_list = get_default_username_validators()
-        self.assertIsInstance(validators_list[0], validators.UnicodeUsernameValidator)
 
     def test_get_username_validators(self):
         validator_config = [
