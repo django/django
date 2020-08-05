@@ -668,9 +668,11 @@ The ``contained_by`` lookup is also available on the non-range field types:
 :class:`~django.db.models.DateTimeField`. For example::
 
     >>> from psycopg2.extras import DateTimeTZRange
-    >>> Event.objects.filter(start__contained_by=DateTimeTZRange(
-    ...     timezone.now() - datetime.timedelta(hours=1),
-    ...     timezone.now() + datetime.timedelta(hours=1),
+    >>> Event.objects.filter(
+    ...     start__contained_by=DateTimeTZRange(
+    ...         timezone.now() - datetime.timedelta(hours=1),
+    ...         timezone.now() + datetime.timedelta(hours=1),
+    ...     ),
     ... )
     <QuerySet [<Event: Soft play>]>
 
