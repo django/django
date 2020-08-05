@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed wrapping of translated action labels in the admin's navigation sidebar
   for East Asian languages (:ticket:`31853`).
+
+* Fixed wrapping of long model names in the admin's navigation sidebar
+  (:ticket:`31854`).
