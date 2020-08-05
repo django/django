@@ -78,6 +78,10 @@
     padding-left: 16px;
 }
 
+#nav-sidebar .module td {
+    white-space: nowrap;
+}
+
 [dir="rtl"] #nav-sidebar .module th,
 [dir="rtl"] #nav-sidebar .module caption {
     padding-left: 8px;

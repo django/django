@@ -9,4 +9,5 @@ Django 3.1.1 fixes several bugs in 3.1.
 Bugfixes
 ========
 
-* ...
+* Fixed wrapping of translated action labels in the admin's navigation sidebar
+  for East Asian languages (:ticket:`31853`).
