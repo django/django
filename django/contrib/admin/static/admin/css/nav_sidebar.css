@@ -71,6 +71,7 @@
 
 #nav-sidebar .module th {
     width: 100%;
+    overflow-wrap: anywhere;
 }
 
 #nav-sidebar .module th,
