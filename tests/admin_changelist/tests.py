@@ -1242,32 +1242,32 @@ class ChangeListTests(TestCase):
         request = self.factory.get('/group/')
         request.user = self.superuser
         cl = m.get_changelist_instance(request)
-        per_page = cl.list_per_page = 10
+        cl.list_per_page = 10
 
-        for page_num, objects_count, expected_page_range in [
-            (1, per_page, []),
-            (1, per_page * 2, [1, 2]),
-            (6, per_page * 11, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
-            (6, per_page * 12, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
-            (6, per_page * 13, [1, 2, 3, 4, 5, 6, 7, 8, 9, '.', 12, 13]),
-            (7, per_page * 12, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
-            (7, per_page * 13, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]),
-            (7, per_page * 14, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, '.', 13, 14]),
-            (8, per_page * 13, [1, 2, '.', 5, 6, 7, 8, 9, 10, 11, 12, 13]),
-            (8, per_page * 14, [1, 2, '.', 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]),
-            (8, per_page * 15, [1, 2, '.', 5, 6, 7, 8, 9, 10, 11, '.', 14, 15]),
+        ELLIPSIS = cl.paginator.ELLIPSIS
+        for number, pages, expected in [
+            (1, 1, []),
+            (1, 2, [1, 2]),
+            (6, 11, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
+            (6, 12, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
+            (6, 13, [1, 2, 3, 4, 5, 6, 7, 8, 9, ELLIPSIS, 12, 13]),
+            (7, 12, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
+            (7, 13, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]),
+            (7, 14, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ELLIPSIS, 13, 14]),
+            (8, 13, [1, 2, ELLIPSIS, 5, 6, 7, 8, 9, 10, 11, 12, 13]),
+            (8, 14, [1, 2, ELLIPSIS, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]),
+            (8, 15, [1, 2, ELLIPSIS, 5, 6, 7, 8, 9, 10, 11, ELLIPSIS, 14, 15]),
         ]:
             with self.subTest(number=number, pages=pages):
-                # assuming exactly `objects_count` objects
+                # assuming exactly `pages * cl.list_per_page` objects
                 Group.objects.all().delete()
-                for i in range(objects_count):
+                for i in range(pages * cl.list_per_page):
                     Group.objects.create(name='test band')
 
                 # setting page number and calculating page range
-                cl.page_num = page_num
+                cl.page_num = number
                 cl.get_results(request)
-                real_page_range = pagination(cl)['page_range']
-                self.assertEqual(expected_page_range, list(real_page_range))
+                self.assertEqual(list(pagination(cl)['page_range']), expected)
 
     def test_object_tools_displayed_no_add_permission(self):
         """
