@@ -78,8 +78,39 @@ Methods
     Returns a :class:`Page` object with the given 1-based index. Raises
     :exc:`InvalidPage` if the given page number doesn't exist.
 
+.. method:: Paginator.get_elided_page_range(number, *, on_each_side=3, on_ends=2)
+
+    .. versionadded:: 3.2
+
+    Returns a 1-based list of page numbers similar to
+    :attr:`Paginator.page_range`, but may add an ellipsis to either or both
+    sides of the current page number when :attr:`Paginator.num_pages` is large.
+
+    The number of pages to include on each side of the current page number is
+    determined by the ``on_each_side`` argument which defaults to 3.
+
+    The number of pages to include at the beginning and end of page range is
+    determined by the ``on_ends`` argument which defaults to 2.
+
+    For example, with the default values for ``on_each_side`` and ``on_ends``,
+    if the current page is 10 and there are 50 pages, the page range will be
+    ``[1, 2, '…', 7, 8, 9, 10, 11, 12, 13, '…', 49, 50]``. This will result in
+    pages 4, 5, and 6 to the left of and 8, 9, and 10 to the right of the
+    current page as well as pages 1 and 2 at the start and 49 and 50 at the
+    end.
+
+    Raises :exc:`InvalidPage` if the given page number doesn't exist.
+
 Attributes
 ----------
+
+.. attribute:: Paginator.ELLIPSIS
+
+    .. versionadded:: 3.2
+
+    A translatable string used as a substitute for elided page numbers in the
+    page range returned by :meth:`~Paginator.get_elided_page_range`. Default is
+    ``'…'``.
 
 .. attribute:: Paginator.count
 

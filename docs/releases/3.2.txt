@@ -273,6 +273,14 @@ Models
   expressions that don't need to be selected but are used for filtering,
   ordering, or as a part of complex expressions.
 
+Pagination
+~~~~~~~~~~
+
+* The new :meth:`django.core.paginator.Paginator.get_elided_page_range` method
+  allows generating a page range with some of the values elided. If there are a
+  large number of pages, this can be helpful for generating a reasonable number
+  of page links in a template.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
