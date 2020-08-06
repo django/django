@@ -8,12 +8,12 @@ Username Validation in Django
 
 .. versionadded:: 3.2
 
-Django offers pluggable username validation.You can configure multiple
+Django offers pluggable username validation. You can configure multiple
 username validators at the same time. A few validators are included in 
 Django, but you can write your own as well.
 
 Each username validator must provide a help text to explain the requirements to
-the user, validate  a given username and return an error message if it does not 
+the user, validate a given username and return an error message if it does not
 meet the requirements. Validators can also have optional settings to fine tune
 their behavior.
 
@@ -22,14 +22,14 @@ The default for the setting is an ``UnicodeUsernameValidator`` which
 validates whether given username contains English letters, numbers and @/./+/-/_
 characters or not.
 
-By default, validators are used in the forms and in the 
+By default, validators are used in the forms and in the
 :djadmin:`createsuperuser` management commands.
 
 Enabling username validation
 ----------------------------
 
 Username validation is configured in the
-:setting:`AUTH_USERNAME_VALIDATORS` settings::
+:setting:`AUTH_USERNAME_VALIDATORS` setting::
 
     AUTH_USERNAME_VALIDATORS = [
         {
@@ -49,7 +49,7 @@ This example enables two included validators:
   anything other than the English letters, numbers and @/./+/-/_.
 * ``UsernameMinimumLengthValidator``, which checks whether the username meets a minimum
   length. This validator is configured with a custom option it now requires
-  the minimum length to be nine characters, instead of the default eight.
+  the minimum length to be three characters instead of the default one.
 
 The help texts and any errors from username validators are always returned in
 the order they are listed in :setting:`AUTH_USERNAME_VALIDATORS`.
@@ -122,7 +122,7 @@ Here's a  basic example of a validator, with one optional setting::
     from django.utils.translation import gettext as _
 
     class UsernameMinimumLengthValidator:
-        def __init__(self, min_length=3):
+        def __init__(self, min_length=1):
             self.min_length = min_length
 
         def __call__(self, username):
