@@ -544,7 +544,10 @@ class Model(metaclass=ModelBase):
 
     def __getstate__(self):
         """Hook to allow choosing the attributes to pickle."""
-        return self.__dict__
+        state = self.__dict__.copy()
+        state['_state'] = copy.copy(state['_state'])
+        state['_state'].fields_cache = state['_state'].fields_cache.copy()
+        return state
 
     def __setstate__(self, state):
         msg = None
