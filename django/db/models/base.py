@@ -50,6 +50,10 @@ class Deferred:
 DEFERRED = Deferred()
 
 
+class Empty:
+    pass
+
+
 def subclass_exception(name, bases, module, attached_to):
     """
     Create exception subclass. Used by ModelBase below.
@@ -535,6 +539,18 @@ class Model(metaclass=ModelBase):
         if self.pk is None:
             raise TypeError("Model instances without primary key value are unhashable")
         return hash(self.pk)
+
+    def __copy__(self):
+        # We need to avoid hitting __reduce__, so define this
+        # slightly weird copy construct.
+        obj = Empty()
+        obj.__class__ = self.__class__
+        obj.__dict__ = self.__dict__.copy()
+
+        obj._state = copy.copy(obj._state)
+        obj._state.fields_cache = {}
+
+        return obj
 
     def __reduce__(self):
         data = self.__getstate__()

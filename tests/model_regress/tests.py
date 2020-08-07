@@ -1,3 +1,4 @@
+import copy
 import datetime
 from operator import attrgetter
 
@@ -256,3 +257,26 @@ class EvaluateMethodTest(TestCase):
         dept = Department.objects.create(pk=1, name='abc')
         dept.evaluate = 'abc'
         Worker.objects.filter(department=dept)
+
+
+class ModelFieldsCacheTest(TestCase):
+    """
+    Regression test for #31863: Incorrect field caching behavior on copy
+    """
+    def test_fields_cache_reset_on_copy(self):
+        department1 = Department.objects.create(id=1, name='department1')
+        department2 = Department.objects.create(id=2, name='department2')
+        worker1 = Worker.objects.create(name='worker1', department=department1)
+
+        worker2 = copy.copy(worker1)
+
+        worker2.pk = None
+        worker2.department = department2
+
+        # worker2 is in department2
+        self.assertEqual(worker2.department, department2)
+        self.assertEqual(worker2.department.id, worker2.department_id)
+
+        # worker1 is unchanged and must still be in department1
+        self.assertEqual(worker1.department, department1)
+        self.assertEqual(worker1.department.id, worker1.department_id)
