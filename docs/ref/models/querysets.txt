@@ -151,8 +151,7 @@ Here's the formal declaration of a ``QuerySet``:
         The ``query`` parameter to :class:`QuerySet` exists so that specialized
         query subclasses can reconstruct internal query state. The value of the
         parameter is an opaque representation of that query state and is not
-        part of a public API. To put it another way: if you need to ask, you
-        don't need to use it.
+        part of a public API.
 
 .. currentmodule:: django.db.models.query.QuerySet
 
