@@ -14,3 +14,6 @@ Bugfixes
 
 * Fixed wrapping of long model names in the admin's navigation sidebar
   (:ticket:`31854`).
+
+* Fixed encoding session data while upgrading multiple instances of the same
+  project to Django 3.1 (:ticket:`31864`).
