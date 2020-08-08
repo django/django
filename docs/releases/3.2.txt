@@ -273,6 +273,9 @@ Models
   expressions that don't need to be selected but are used for filtering,
   ordering, or as a part of complex expressions.
 
+* The new :class:`~django.db.models.functions.Collate` function allows
+  filtering and ordering by specified database collations.
+
 Pagination
 ~~~~~~~~~~
 

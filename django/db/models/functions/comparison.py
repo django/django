@@ -1,5 +1,6 @@
 """Database functions that do comparisons or type conversions."""
 from django.db.models.expressions import Func, Value
+from django.utils.regex_helper import _lazy_re_compile
 
 
 class Cast(Func):
@@ -72,6 +73,23 @@ class Coalesce(Func):
             ])
             return super(Coalesce, clone).as_sql(compiler, connection, **extra_context)
         return self.as_sql(compiler, connection, **extra_context)
+
+
+class Collate(Func):
+    function = 'COLLATE'
+    template = '%(expressions)s %(function)s %(collation)s'
+    # Inspired from https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+    collation_re = _lazy_re_compile(r'^[\w\-]+$')
+
+    def __init__(self, expression, collation):
+        if not (collation and self.collation_re.match(collation)):
+            raise ValueError('Invalid collation name: %r.' % collation)
+        self.collation = collation
+        super().__init__(expression)
+
+    def as_sql(self, compiler, connection, **extra_context):
+        extra_context.setdefault('collation', connection.ops.quote_name(self.collation))
+        return super().as_sql(compiler, connection, **extra_context)
 
 
 class Greatest(Func):

@@ -302,6 +302,13 @@ class BaseDatabaseFeatures:
     # {'d': [{'f': 'g'}]}?
     json_key_contains_list_matching_requires_list = False
 
+    # Collation names for use by the Django test suite.
+    test_collations = {
+        'ci': None,  # Case-insensitive.
+        'cs': None,  # Case-sensitive.
+        'swedish-ci': None  # Swedish case-insensitive.
+    }
+
     def __init__(self, connection):
         self.connection = connection
 
