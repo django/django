@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import warnings
 from functools import update_wrapper
@@ -30,13 +31,14 @@ class ContextMixin:
         return kwargs
 
 
-class View:
+class BaseView:
     """
-    Intentionally simple parent class for all views. Only implements
-    dispatch-by-method and simple sanity checking.
+    Base class for View and AsyncView
     """
 
-    http_method_names = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']
+    http_method_names = [
+        'get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'
+    ]
 
     def __init__(self, **kwargs):
         """
@@ -47,6 +49,29 @@ class View:
         # instance, or raise an error.
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+    @classonlymethod
+    def _get_view_func(cls, initkwargs):
+        """Return async/sync view function"""
+        raise NotImplementedError(
+            "Method `%s._get_view_func` must be "
+            "overridden." % cls.__name__
+        )
+
+    def _get_method_handler(self, request):
+        """
+        Try to choose the right method; if a method doesn't exist,
+        choose to the error handler. Also choose to the error handler if the
+        request method isn't on the approved list.
+        """
+        if request.method.lower() in self.http_method_names:
+            handler = getattr(
+                self, request.method.lower(), self.http_method_not_allowed
+            )
+        else:
+            handler = self.http_method_not_allowed
+
+        return handler
 
     @classonlymethod
     def as_view(cls, **initkwargs):
@@ -62,15 +87,7 @@ class View:
                                 "only accepts arguments that are already "
                                 "attributes of the class." % (cls.__name__, key))
 
-        def view(request, *args, **kwargs):
-            self = cls(**initkwargs)
-            self.setup(request, *args, **kwargs)
-            if not hasattr(self, 'request'):
-                raise AttributeError(
-                    "%s instance has no 'request' attribute. Did you override "
-                    "setup() and forget to call super()?" % cls.__name__
-                )
-            return self.dispatch(request, *args, **kwargs)
+        view = cls._get_view_func(initkwargs)
         view.view_class = cls
         view.view_initkwargs = initkwargs
 
@@ -91,14 +108,14 @@ class View:
         self.kwargs = kwargs
 
     def dispatch(self, request, *args, **kwargs):
-        # Try to dispatch to the right method; if a method doesn't exist,
-        # defer to the error handler. Also defer to the error handler if the
-        # request method isn't on the approved list.
-        if request.method.lower() in self.http_method_names:
-            handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
-        else:
-            handler = self.http_method_not_allowed
-        return handler(request, *args, **kwargs)
+        """Call sync/async request handler"""
+        raise NotImplementedError(
+            "Method `%s._dispatch` must be "
+            "overridden." % self.__class__.__name__
+        )
+
+    def _allowed_methods(self):
+        return [m.upper() for m in self.http_method_names if hasattr(self, m)]
 
     def http_method_not_allowed(self, request, *args, **kwargs):
         logger.warning(
@@ -114,8 +131,59 @@ class View:
         response['Content-Length'] = '0'
         return response
 
-    def _allowed_methods(self):
-        return [m.upper() for m in self.http_method_names if hasattr(self, m)]
+
+class View(BaseView):
+    """
+    Intentionally simple parent class for all views. Only implements
+    dispatch-by-method and simple sanity checking.
+    """
+
+    @classonlymethod
+    def _get_view_func(cls, initkwargs):
+        """Return sync view function"""
+        def view(request, *args, **kwargs):
+            self = cls(**initkwargs)
+            self.setup(request, *args, **kwargs)
+            if not hasattr(self, 'request'):
+                raise AttributeError(
+                    "%s instance has no 'request' attribute. Did you override "
+                    "setup() and forget to call super()?" % cls.__name__
+                )
+            return self.dispatch(request, *args, **kwargs)
+
+        return view
+
+    def dispatch(self, request, *args, **kwargs):
+        """Call sync request method"""
+        handler = self._get_method_handler(request)
+        return handler(request, *args, **kwargs)
+
+
+class AsyncView(BaseView):
+    """Base parent class for all asynchronous views"""
+
+    @classonlymethod
+    def _get_view_func(cls, initkwargs):
+        """Return async view function"""
+        async def view(request, *args, **kwargs):
+            self = cls(**initkwargs)
+            self.setup(request, *args, **kwargs)
+            if not hasattr(self, 'request'):
+                raise AttributeError(
+                    "%s instance has no 'request' attribute. Did you override "
+                    "setup() and forget to call super()?" % cls.__name__
+                )
+            return await self.dispatch(request, *args, **kwargs)
+
+        return view
+
+    async def dispatch(self, request, *args, **kwargs):
+        """Call async request method"""
+        handler = self._get_method_handler(request)
+        if not asyncio.iscoroutinefunction(handler):
+            return handler(request, *args, **kwargs)
+
+        return await handler(request, *args, **kwargs)
 
 
 class TemplateResponseMixin:
