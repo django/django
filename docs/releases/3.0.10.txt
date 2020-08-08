@@ -9,4 +9,7 @@ Django 3.0.10 fixes a data loss bug in 3.0.9.
 Bugfixes
 ========
 
-* ...
+* Fixed a data loss possibility in the
+  :meth:`~django.db.models.query.QuerySet.select_for_update()`. When using
+  related fields pointing to a proxy model in the ``of`` argument, the
+  corresponding model was not locked (:ticket:`31866`).
