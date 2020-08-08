@@ -20,3 +20,8 @@ Bugfixes
 
 * Adjusted admin's navigation sidebar template to reduce debug logging when
   rendering (:ticket:`31865`).
+
+* Fixed a data loss possibility in the
+  :meth:`~django.db.models.query.QuerySet.select_for_update()`. When using
+  related fields pointing to a proxy model in the ``of`` argument, the
+  corresponding model was not locked (:ticket:`31866`).

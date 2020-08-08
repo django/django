@@ -982,7 +982,8 @@ class SQLCompiler:
         the query.
         """
         def _get_parent_klass_info(klass_info):
-            for parent_model, parent_link in klass_info['model']._meta.parents.items():
+            concrete_model = klass_info['model']._meta.concrete_model
+            for parent_model, parent_link in concrete_model._meta.parents.items():
                 parent_list = parent_model._meta.get_parent_list()
                 yield {
                     'model': parent_model,
@@ -1007,8 +1008,9 @@ class SQLCompiler:
             select_fields is filled recursively, so it also contains fields
             from the parent models.
             """
+            concrete_model = klass_info['model']._meta.concrete_model
             for select_index in klass_info['select_fields']:
-                if self.select[select_index][0].target.model == klass_info['model']:
+                if self.select[select_index][0].target.model == concrete_model:
                     return self.select[select_index][0]
 
         def _get_field_choices():
