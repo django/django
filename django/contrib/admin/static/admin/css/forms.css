@@ -520,3 +520,34 @@ form .related-widget-wrapper ul {
 .clearable-file-input input {
     margin-top: 0;
 }
+
+@media (prefers-color-scheme: dark) {
+    label {
+        color: #e0e0e0;
+    }
+
+    .required label, label.required {
+        color: #eeeeee;
+    }
+
+    .form-row {
+        border-bottom-color: #212121;
+    }
+
+    .submit-row {
+        background: #1b1b1b;
+        border-color: #212121;
+    }
+
+    .inline-related h3,
+    .inline-group div.add-row,
+    .inline-group .tabular tr.add-row td {
+        color: #e0e0e0;
+        background: #1b1b1b;
+        border-color: #212121;
+    }
+
+    .inline-related fieldset {
+        background: #121212;
+    }
+}

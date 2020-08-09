@@ -345,3 +345,61 @@
 #changelist .actions .button:focus, #changelist .actions .button:hover {
     border-color: #999;
 }
+
+@media (prefers-color-scheme: dark) {
+    #changelist .paginator {
+        color: #e0e0e0;
+        border-bottom-color: #212121;
+        background: #121212;
+    }
+
+    #changelist #toolbar {
+        color: #e0e0e0;
+        background: #1b1b1b;
+        border-color: #212121;
+    }
+
+    #changelist #toolbar form input {
+        color: #eeeeee;
+    }
+
+    #changelist #toolbar form #searchbar {
+        border-color: #353535;
+    }
+
+    #changelist #toolbar form #searchbar:focus {
+        border-color: #999;
+    }
+
+    #changelist #toolbar form input[type="submit"] {
+        border-color: #353535;
+        background: #121212;
+        color: #eeeeee;
+    }
+
+    #changelist-filter {
+        background: #1b1b1b;
+    }
+
+    #changelist .actions {
+        background: #121212;
+    }
+
+    #changelist .actions select {
+        color: #eeeeee;
+    }
+
+    #changelist .actions .button {
+        border-color: #353535;
+        background: #121212;
+        color: #eeeeee;
+    }
+
+    .paginator {
+        border-top-color: #212121;
+    }
+
+    .paginator a:link, .paginator a:visited {
+        background: #264b5d;
+    }
+}

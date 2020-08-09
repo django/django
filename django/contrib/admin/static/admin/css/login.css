@@ -58,3 +58,18 @@
 .login .password-reset-link {
     text-align: center;
 }
+
+@media (prefers-color-scheme: dark) {
+    body.login {
+        background: #121212;
+    }
+
+    .login #container {
+        background: #1b1b1b;
+        border-color: #272727;
+    }
+
+    .login .form-row label {
+        color: #eeeeee;
+    }
+}

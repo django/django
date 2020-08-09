@@ -1,0 +1,107 @@
+body {
+    color: #eeeeee;
+    background: #121212;
+}
+
+/* LINKS */
+
+a:link, a:visited {
+    color: #81d4fa;
+}
+
+/* GLOBAL DEFAULTS */
+
+h1, h3, h5 {
+    color: #e0e0e0;
+}
+
+/* TABLES */
+
+td, th {
+    border-bottom-color: #212121;
+}
+
+thead th,
+tfoot td {
+    color: #e0e0e0;
+    background: #121212;
+    border-top-color: #212121;
+    border-bottom-color: #212121;
+}
+
+tr:nth-child(odd), .row-form-errors {
+    background: #121212;
+}
+
+tr:nth-child(even),
+tr:nth-child(even) .errorlist,
+tr:nth-child(odd) + .row-form-errors,
+tr:nth-child(odd) + .row-form-errors .errorlist {
+    background: #212121;
+}
+
+thead th.sorted {
+    background: #212121;
+}
+
+thead th a:link, thead th a:visited {
+    color: #e0e0e0;
+}
+
+table thead th .text a:focus, table thead th .text a:hover {
+    background: #212121;
+}
+
+/* FORM DEFAULTS */
+
+input[type=text], input[type=password], input[type=email], input[type=url],
+input[type=number], input[type=tel], textarea, select, .vTextField {
+    background: #121212;
+    border-color: #353535;
+    color: #eeeeee;
+}
+
+input[type=text]:focus, input[type=password]:focus, input[type=email]:focus,
+input[type=url]:focus, input[type=number]:focus, input[type=tel]:focus,
+textarea:focus, select:focus, .vTextField:focus {
+    border-color: #999;
+}
+
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: #264b5d;
+}
+
+/* MODULES */
+
+.module {
+    background: #121212;
+}
+
+.module h2, .module caption, .inline-group h2 {
+    background: #264b5d;
+}
+
+/* BREADCRUMBS */
+
+div.breadcrumbs {
+    background: #264b5d;
+}
+
+.object-tools a:link, .object-tools a:visited {
+    background: #6b6b6b;
+}
+
+/* SIDEBAR */
+
+#content-related {
+    background: #1b1b1b;
+}
+
+#content-related h3 {
+    color: #e0e0e0;
+}
+
+#content-related .module h2 {
+    border-bottom-color: #272727;
+    color: #eeeeee;
+}

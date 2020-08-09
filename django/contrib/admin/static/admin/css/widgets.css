@@ -572,3 +572,78 @@ select + .related-widget-wrapper-link,
 .related-widget-wrapper-link + .related-widget-wrapper-link {
     margin-left: 7px;
 }
+
+@media (prefers-color-scheme: dark) {
+    .selector-available h2, .selector-chosen h2 {
+        border-color: #353535;
+    }
+
+    .selector-chosen h2 {
+        background: #264b5d;
+    }
+
+    .selector .selector-available h2 {
+        background: #1b1b1b;
+        color: #e0e0e0;
+    }
+
+    .selector .selector-filter {
+        background: #121212;
+        border-color: #353535;
+    }
+
+    a.selector-chooseall, a.selector-clearall {
+        color: #e0e0e0;
+    }
+
+    p.datetime {
+        color: #e0e0e0;
+    }
+
+    .calendarbox, .clockbox {
+        background: #121212;
+        border-color: #212121;
+    }
+
+    .calendar th {
+        background: #1b1b1b;
+        border-bottom-color: #212121;
+        color: #e0e0e0;
+    }
+
+    .calendar td {
+        border-top-color: #212121;
+    }
+
+    .calendar td.selected a {
+        background: #264b5d;
+    }
+
+    .calendar td.nonday {
+        background: #1b1b1b;
+    }
+
+    .calendar td a, .timelist a {
+        color: #cfcfcf;
+    }
+
+    .calendar-shortcuts {
+        background: #121212;
+        border-top-color: #212121;
+        color: #353535;
+    }
+
+    .calendar-cancel {
+        background: #212121;
+        border-top-color: #212121;
+        color: #eeeeee;
+    }
+
+    .calendar-cancel:focus, .calendar-cancel:hover {
+        background: #121212;
+    }
+
+    .calendar-cancel a {
+        color: #eeeeee;
+    }
+}

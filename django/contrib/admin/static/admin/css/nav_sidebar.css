@@ -104,3 +104,25 @@
         display: none;
     }
 }
+
+@media (prefers-color-scheme: dark) {
+    .toggle-nav-sidebar {
+        border-color: #272727;
+        background-color: #121212;
+        color: #81d4fa;
+    }
+
+    .toggle-nav-sidebar:hover,
+    .toggle-nav-sidebar:focus {
+        background-color: #1b1b1b;
+    }
+
+    #nav-sidebar {
+        border-right-color: #272727;
+        background-color: #121212;
+    }
+
+    #nav-sidebar .current-model {
+        background: #00363a;
+    }
+}
