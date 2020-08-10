@@ -604,7 +604,7 @@ class Model(metaclass=ModelBase):
         if fields is None:
             self._prefetched_objects_cache = {}
         else:
-            prefetched_objects_cache = getattr(self, '_prefetched_objects_cache', ())
+            prefetched_objects_cache = getattr(self, '_prefetched_objects_cache', {})
             for field in fields:
                 if field in prefetched_objects_cache:
                     del prefetched_objects_cache[field]
