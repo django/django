@@ -89,6 +89,7 @@ class AppConfig:
         """
         # create() eventually returns app_config_class(app_name, app_module).
         app_config_class = None
+        app_config_name = None
         app_name = None
         app_module = None
 
@@ -161,12 +162,15 @@ class AppConfig:
                     )
                 else:
                     message += (
-                        "However, Django's automatic detection picked another "
-                        "configuration, %r. You should move the default "
-                        "config class to the apps submodule of your "
-                        "application and, if this module defines several "
-                        "config classes, mark the default one with default = "
-                        "True." % app_config_name
+                        "However, Django's automatic detection %s. You should "
+                        "move the default config class to the apps submodule "
+                        "of your application and, if this module defines "
+                        "several config classes, mark the default one with "
+                        "default = True." % (
+                            "picked another configuration, %r" % app_config_name
+                            if app_config_name
+                            else "did not find this configuration"
+                        )
                     )
                 warnings.warn(message, RemovedInDjango41Warning, stacklevel=2)
                 entry = new_entry
