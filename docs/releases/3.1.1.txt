@@ -17,3 +17,6 @@ Bugfixes
 
 * Fixed encoding session data while upgrading multiple instances of the same
   project to Django 3.1 (:ticket:`31864`).
+
+* Adjusted admin's navigation sidebar template to reduce debug logging when
+  rendering (:ticket:`31865`).
