@@ -501,8 +501,13 @@ class DeprecationTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
             with self.settings(INSTALLED_APPS=['apps.explicit_default_config_app']):
-                config = apps.get_app_config('explicit_default_config_app')
-            self.assertIsInstance(config, ExplicitDefaultConfig)
+                pass
+        with ignore_warnings(category=RemovedInDjango41Warning):
+            with self.settings(INSTALLED_APPS=['apps.explicit_default_config_app']):
+                self.assertIsInstance(
+                    apps.get_app_config('explicit_default_config_app'),
+                    ExplicitDefaultConfig,
+                )
 
     def test_explicit_default_app_config_mismatch(self):
         """
@@ -522,8 +527,13 @@ class DeprecationTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
             with self.settings(INSTALLED_APPS=['apps.explicit_default_config_mismatch_app']):
-                config = apps.get_app_config('explicit_default_config_mismatch_app')
-            self.assertIsInstance(config, ExplicitDefaultConfigMismatch)
+                pass
+        with ignore_warnings(category=RemovedInDjango41Warning):
+            with self.settings(INSTALLED_APPS=['apps.explicit_default_config_mismatch_app']):
+                self.assertIsInstance(
+                    apps.get_app_config('explicit_default_config_mismatch_app'),
+                    ExplicitDefaultConfigMismatch,
+                )
 
     def test_explicit_default_app_config_empty_apps(self):
         """
