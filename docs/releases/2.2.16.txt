@@ -1,0 +1,12 @@
+===========================
+Django 2.2.16 release notes
+===========================
+
+*Expected September 1, 2020*
+
+Django 2.2.16 fixes a data loss bug in 2.2.15.
+
+Bugfixes
+========
+
+* ...
