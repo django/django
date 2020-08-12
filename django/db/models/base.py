@@ -727,7 +727,7 @@ class Model(metaclass=ModelBase):
             update_fields = frozenset(update_fields)
             field_names = set()
 
-            for field in self._meta.fields:
+            for field in self._meta.concrete_fields:
                 if not field.primary_key:
                     field_names.add(field.name)
 
@@ -737,9 +737,11 @@ class Model(metaclass=ModelBase):
             non_model_fields = update_fields.difference(field_names)
 
             if non_model_fields:
-                raise ValueError("The following fields do not exist in this "
-                                 "model or are m2m fields: %s"
-                                 % ', '.join(non_model_fields))
+                raise ValueError(
+                    'The following fields do not exist in this model, are m2m '
+                    'fields, or are non-concrete fields: %s'
+                    % ', '.join(non_model_fields)
+                )
 
         # If saving to the same database, and this model is deferred, then
         # automatically do an "update_fields" save on the loaded fields.
