@@ -271,6 +271,40 @@ class InspectDBTestCase(TestCase):
         finally:
             connection.introspection.data_types_reverse = orig_data_types_reverse
 
+    def test_guessed_primary_key(self):
+        """
+        Mysql may declare pk in a way ignored by ORM (#31846)
+        """
+        with connection.cursor() as c:
+            c.execute(
+                'CREATE TABLE inspectdb_a ('
+                '  id INT NOT NULL, misc TEXT NOT NULL'
+                ');'
+            )
+            c.execute(
+                'CREATE TABLE inspectdb_b ('
+                '  id INT NOT NULL, misc TEXT PRIMARY KEY NOT NULL'
+                ');'
+            )
+        try:
+            out = StringIO()
+            call_command('inspectdb', stdout=out)
+            output = out.getvalue()
+            self.assertIn(
+                'id = models.IntegerField(primary_key=True)',
+                output
+            )
+            self.assertIn(
+                "id_field = models.IntegerField(db_column='id')  "
+                "# Field renamed because 'id' can only be used as a "
+                "field name if the field also sets 'primary_key=True'",
+                output
+            )
+        finally:
+            with connection.cursor() as c:
+                c.execute('DROP TABLE inspectdb_a')
+                c.execute('DROP TABLE inspectdb_b')
+
     def test_introspection_errors(self):
         """
         Introspection errors should not crash the command, and the error should

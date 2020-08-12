@@ -101,8 +101,10 @@ class Command(BaseCommand):
                     column_name = row.name
                     is_relation = column_name in relations
 
+                    is_pk = column_name == primary_key_column
+                    has_pk = primary_key_column
                     att_name, params, notes = self.normalize_col_name(
-                        column_name, used_column_names, is_relation)
+                        column_name, used_column_names, is_relation, is_pk, has_pk)
                     extra_params.update(params)
                     comment_notes.extend(notes)
 
@@ -110,7 +112,7 @@ class Command(BaseCommand):
                     column_to_field_name[column_name] = att_name
 
                     # Add primary_key and unique, if necessary.
-                    if column_name == primary_key_column:
+                    if is_pk or (column_name == 'id' and not has_pk):
                         extra_params['primary_key'] = True
                     elif column_name in unique_columns:
                         extra_params['unique'] = True
@@ -172,7 +174,7 @@ class Command(BaseCommand):
                 is_partition = any(info.name == table_name and info.type == 'p' for info in table_info)
                 yield from self.get_meta(table_name, constraints, column_to_field_name, is_view, is_partition)
 
-    def normalize_col_name(self, col_name, used_column_names, is_relation):
+    def normalize_col_name(self, col_name, used_column_names, is_relation, is_pk, has_pk):
         """
         Modify the column name to make it Python-compatible as a field name
         """
@@ -211,6 +213,13 @@ class Command(BaseCommand):
         if keyword.iskeyword(new_name):
             new_name += '_field'
             field_notes.append('Field renamed because it was a Python reserved word.')
+
+        if new_name == 'id' and not is_pk and has_pk:
+            new_name += '_field'
+            field_notes.append(
+                "Field renamed because 'id' can only be used as a field name "
+                "if the field also sets 'primary_key=True'."
+            )
 
         if new_name[0].isdigit():
             new_name = 'number_%s' % new_name
