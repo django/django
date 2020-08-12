@@ -36,6 +36,26 @@ class TestInline(TestDataMixin, TestCase):
         cls.holder = Holder.objects.create(dummy=13)
         Inner.objects.create(dummy=42, holder=cls.holder)
 
+        cls.parent = SomeParentModel.objects.create(name='a')
+        SomeChildModel.objects.create(name='b', position='0', parent=cls.parent)
+        SomeChildModel.objects.create(name='c', position='1', parent=cls.parent)
+
+        cls.view_only_user = User.objects.create_user(
+            username='user', password='pwd', is_staff=True,
+        )
+        parent_ct = ContentType.objects.get_for_model(SomeParentModel)
+        child_ct = ContentType.objects.get_for_model(SomeChildModel)
+        permission = Permission.objects.get(
+            codename='view_someparentmodel',
+            content_type=parent_ct,
+        )
+        cls.view_only_user.user_permissions.add(permission)
+        permission = Permission.objects.get(
+            codename='view_somechildmodel',
+            content_type=child_ct,
+        )
+        cls.view_only_user.user_permissions.add(permission)
+
     def setUp(self):
         self.client.force_login(self.superuser)
 
@@ -224,6 +244,113 @@ class TestInline(TestDataMixin, TestCase):
         self.assertInHTML(
             '<input id="id_somechildmodel_set-1-position" '
             'name="somechildmodel_set-1-position" type="hidden" value="1">',
+            response.rendered_content,
+        )
+
+    def test_tabular_inline_hidden_field_with_view_only_permissions(self):
+        """
+        Content of hidden field is not visible in tabular inline when user has
+        view-only permission.
+        """
+        self.client.force_login(self.view_only_user)
+        url = reverse(
+            'tabular_inline_hidden_field_admin:admin_inlines_someparentmodel_change',
+            args=(self.parent.pk,),
+        )
+        response = self.client.get(url)
+        self.assertInHTML('<th class="column-position hidden">Position</th>', response.rendered_content)
+        self.assertInHTML('<td class="field-position hidden"><p>0</p></td>', response.rendered_content)
+        self.assertInHTML('<td class="field-position hidden"><p>1</p></td>', response.rendered_content)
+
+    def test_stacked_inline_hidden_field_with_view_only_permissions(self):
+        """
+        Content of hidden field is not visible in stacked inline when user has
+        view-only permission.
+        """
+        self.client.force_login(self.view_only_user)
+        url = reverse(
+            'stacked_inline_hidden_field_in_group_admin:admin_inlines_someparentmodel_change',
+            args=(self.parent.pk,),
+        )
+        response = self.client.get(url)
+        # The whole line containing name + position fields is not hidden.
+        self.assertContains(response, '<div class="form-row field-name field-position">')
+        # The div containing the position field is hidden.
+        self.assertInHTML(
+            '<div class="fieldBox field-position hidden">'
+            '<label class="inline">Position:</label>'
+            '<div class="readonly">0</div></div>',
+            response.rendered_content,
+        )
+        self.assertInHTML(
+            '<div class="fieldBox field-position hidden">'
+            '<label class="inline">Position:</label>'
+            '<div class="readonly">1</div></div>',
+            response.rendered_content,
+        )
+
+    def test_stacked_inline_single_hidden_field_in_line_with_view_only_permissions(self):
+        """
+        Content of hidden field is not visible in stacked inline when user has
+        view-only permission and the field is grouped on a separate line.
+        """
+        self.client.force_login(self.view_only_user)
+        url = reverse(
+            'stacked_inline_hidden_field_on_single_line_admin:admin_inlines_someparentmodel_change',
+            args=(self.parent.pk,),
+        )
+        response = self.client.get(url)
+        # The whole line containing position field is hidden.
+        self.assertInHTML(
+            '<div class="form-row hidden field-position">'
+            '<div><label>Position:</label>'
+            '<div class="readonly">0</div></div></div>',
+            response.rendered_content,
+        )
+        self.assertInHTML(
+            '<div class="form-row hidden field-position">'
+            '<div><label>Position:</label>'
+            '<div class="readonly">1</div></div></div>',
+            response.rendered_content,
+        )
+
+    def test_tabular_inline_with_hidden_field_non_field_errors_has_correct_colspan(self):
+        """
+        In tabular inlines, when a form has non-field errors, those errors
+        are rendered in a table line with a single cell spanning the whole
+        table width. Colspan must be equal to the number of visible columns.
+        """
+        parent = SomeParentModel.objects.create(name='a')
+        child = SomeChildModel.objects.create(name='b', position='0', parent=parent)
+        url = reverse(
+            'tabular_inline_hidden_field_admin:admin_inlines_someparentmodel_change',
+            args=(parent.id,),
+        )
+        data = {
+            'name': parent.name,
+            'somechildmodel_set-TOTAL_FORMS': 1,
+            'somechildmodel_set-INITIAL_FORMS': 1,
+            'somechildmodel_set-MIN_NUM_FORMS': 0,
+            'somechildmodel_set-MAX_NUM_FORMS': 1000,
+            '_save': 'Save',
+            'somechildmodel_set-0-id': child.id,
+            'somechildmodel_set-0-parent': parent.id,
+            'somechildmodel_set-0-name': child.name,
+            'somechildmodel_set-0-position': 1,
+        }
+        response = self.client.post(url, data)
+        # Form has 3 visible columns and 1 hidden column.
+        self.assertInHTML(
+            '<thead><tr><th class="original"></th>'
+            '<th class="column-name required">Name</th>'
+            '<th class="column-position required hidden">Position</th>'
+            '<th>Delete?</th></tr></thead>',
+            response.rendered_content,
+        )
+        # The non-field error must be spanned on 3 (visible) columns.
+        self.assertInHTML(
+            '<tr class="row-form-errors"><td colspan="3">'
+            '<ul class="errorlist nonfield"><li>A non-field error</li></ul></td></tr>',
             response.rendered_content,
         )
 

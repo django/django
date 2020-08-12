@@ -177,11 +177,17 @@ class AdminReadonlyField:
         else:
             help_text = help_text_for_field(class_name, form._meta.model)
 
+        if field in form.fields:
+            is_hidden = form.fields[field].widget.is_hidden
+        else:
+            is_hidden = False
+
         self.field = {
             'name': class_name,
             'label': label,
             'help_text': help_text,
             'field': field,
+            'is_hidden': is_hidden,
         }
         self.form = form
         self.model_admin = model_admin
@@ -302,6 +308,10 @@ class InlineAdminFormSet:
             if fk and fk.name == field_name:
                 continue
             if not self.has_change_permission or field_name in self.readonly_fields:
+                form_field = empty_form.fields.get(field_name)
+                widget_is_hidden = False
+                if form_field is not None:
+                    widget_is_hidden = form_field.widget.is_hidden
                 yield {
                     'name': field_name,
                     'label': meta_labels.get(field_name) or label_for_field(
@@ -310,7 +320,7 @@ class InlineAdminFormSet:
                         self.opts,
                         form=empty_form,
                     ),
-                    'widget': {'is_hidden': False},
+                    'widget': {'is_hidden': widget_is_hidden},
                     'required': False,
                     'help_text': meta_help_texts.get(field_name) or help_text_for_field(field_name, self.opts.model),
                 }
