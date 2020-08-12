@@ -154,11 +154,11 @@ class AdminField:
         return mark_safe(self.field.errors.as_ul())
 
 
-class AdminReadonlyField:
-    def __init__(self, form, field, is_first, model_admin=None):
-        # Make self.field look a little bit like a field. This means that
-        # {{ field.name }} must be a useful class name to identify the field.
-        # For convenience, store other field-related data here too.
+class _AdminReadonlyFormField:
+    """
+    Looks like a field but will render raw text for field instead of a form input
+    """
+    def __init__(self, form, field, admin_field, model_admin=None):
         if callable(field):
             class_name = field.__name__ if field.__name__ != '<lambda>' else ''
         else:
@@ -174,12 +174,32 @@ class AdminReadonlyField:
         else:
             help_text = help_text_for_field(class_name, form._meta.model)
 
-        self.field = {
-            'name': class_name,
-            'label': label,
-            'help_text': help_text,
-            'field': field,
-        }
+        if field in form.fields:
+            is_hidden = form.fields[field].widget.is_hidden
+        else:
+            is_hidden = False
+
+        self.name = class_name
+        self.label = label
+        self.help_text = help_text
+        self.field = field
+        self.is_hidden = is_hidden
+        self._admin_field = admin_field
+
+    def __str__(self):
+        result_repr = self._admin_field.contents()
+        attrs = {"class": "field-%(name)s" % {'name': self.name}}
+        if self.is_hidden:
+            attrs["class"] += " hidden"
+        return format_html('<div{}>{}</div>', flatatt(attrs), result_repr)
+
+
+class AdminReadonlyField:
+    def __init__(self, form, field, is_first, model_admin=None):
+        # Make self.field look a little bit like a field. This means that
+        # {{ field.name }} must be a useful class name to identify the field.
+        # For convenience, store other field-related data here too.
+        self.field = _AdminReadonlyFormField(form, field, self, model_admin)
         self.form = form
         self.model_admin = model_admin
         self.is_first = is_first
@@ -191,12 +211,12 @@ class AdminReadonlyField:
         attrs = {}
         if not self.is_first:
             attrs["class"] = "inline"
-        label = self.field['label']
+        label = self.field.label
         return format_html('<label{}>{}:</label>', flatatt(attrs), capfirst(label))
 
     def contents(self):
         from django.contrib.admin.templatetags.admin_list import _boolean_icon
-        field, obj, model_admin = self.field['field'], self.form.instance, self.model_admin
+        field, obj, model_admin = self.field.field, self.form.instance, self.model_admin
         try:
             f, attr, value = lookup_field(field, obj, model_admin)
         except (AttributeError, ValueError, ObjectDoesNotExist):
@@ -283,9 +303,10 @@ class InlineAdminFormSet:
             if fk and fk.name == field_name:
                 continue
             if not self.has_change_permission or field_name in self.readonly_fields:
+                form_field = empty_form.fields.get(field_name)
                 yield {
                     'label': meta_labels.get(field_name) or label_for_field(field_name, self.opts.model, self.opts),
-                    'widget': {'is_hidden': False},
+                    'widget': {'is_hidden': form_field.widget.is_hidden if form_field is not None else False},
                     'required': False,
                     'help_text': meta_help_texts.get(field_name) or help_text_for_field(field_name, self.opts.model),
                 }

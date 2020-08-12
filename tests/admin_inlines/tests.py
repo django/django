@@ -205,6 +205,25 @@ class TestInline(TestDataMixin, TestCase):
             response.rendered_content,
         )
 
+    def test_inline_hidden_field_with_view_only_permissions(self):
+        """#31867 -- Make sure content of hidden field is not visible when user has view-only permission"""
+        parent = SomeParentModel.objects.create(name='a')
+        SomeChildModel.objects.create(name='b', position='0', parent=parent)
+        SomeChildModel.objects.create(name='c', position='1', parent=parent)
+        user = User.objects.create_user(username="user", password="pwd", is_staff=True)
+        someparent_ct = ContentType.objects.get_for_model(SomeParentModel)
+        somechild_ct = ContentType.objects.get_for_model(SomeChildModel)
+        permission = Permission.objects.get(codename='view_someparentmodel', content_type=someparent_ct)
+        user.user_permissions.add(permission)
+        permission = Permission.objects.get(codename='view_somechildmodel', content_type=somechild_ct)
+        user.user_permissions.add(permission)
+        self.client.login(username="user", password="pwd")
+        response = self.client.get(reverse('admin:admin_inlines_someparentmodel_change', args=(parent.pk,)))
+        self.assertNotContains(response, '<th>Position')
+        self.assertNotContains(response, '<td class="field-position">')
+        self.assertInHTML('<div class="field-position hidden">0</div>', response.rendered_content)
+        self.assertInHTML('<div class="field-position hidden">1</div>', response.rendered_content)
+
     def test_non_related_name_inline(self):
         """
         Multiple inlines with related_name='+' have correct form prefixes.
