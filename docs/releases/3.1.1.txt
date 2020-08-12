@@ -25,3 +25,7 @@ Bugfixes
   :meth:`~django.db.models.query.QuerySet.select_for_update()`. When using
   related fields pointing to a proxy model in the ``of`` argument, the
   corresponding model was not locked (:ticket:`31866`).
+
+* Fixed a regression in Django 3.1 that caused a crash when passing deprecated
+  keyword arguments to a queryset in ``TemplateView.get_context_data()``
+  (:ticket:`31877`).
