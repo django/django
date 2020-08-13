@@ -1145,11 +1145,9 @@ class Exists(Subquery):
     output_field = fields.BooleanField()
 
     def __init__(self, queryset, negated=False, **kwargs):
-        # As a performance optimization, remove ordering since EXISTS doesn't
-        # care about it, just whether or not a row matches.
-        queryset = queryset.order_by()
         self.negated = negated
         super().__init__(queryset, **kwargs)
+        self.query = self.query.exists()
 
     def __invert__(self):
         clone = self.copy()

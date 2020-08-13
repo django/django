@@ -22,7 +22,7 @@ from django.db.models.functions import (
 from django.db.models.sql import constants
 from django.db.models.sql.datastructures import Join
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import Approximate, isolate_apps
+from django.test.utils import Approximate, CaptureQueriesContext, isolate_apps
 from django.utils.functional import SimpleLazyObject
 
 from .models import (
@@ -1736,6 +1736,26 @@ class ValueTests(TestCase):
         msg = 'Cannot resolve expression type, unknown output_field'
         with self.assertRaisesMessage(FieldError, msg):
             Value(object()).output_field
+
+
+class ExistsTests(TestCase):
+    def test_optimizations(self):
+        with CaptureQueriesContext(connection) as context:
+            list(Experiment.objects.values(exists=Exists(
+                Experiment.objects.order_by('pk'),
+            )).order_by())
+        captured_queries = context.captured_queries
+        self.assertEqual(len(captured_queries), 1)
+        captured_sql = captured_queries[0]['sql']
+        self.assertNotIn(
+            connection.ops.quote_name(Experiment._meta.pk.column),
+            captured_sql,
+        )
+        self.assertIn(
+            connection.ops.limit_offset_sql(None, 1),
+            captured_sql,
+        )
+        self.assertNotIn('ORDER BY', captured_sql)
 
 
 class FieldTransformTests(TestCase):
