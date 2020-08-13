@@ -4,7 +4,7 @@ Django 3.0.10 release notes
 
 *Expected September 1, 2020*
 
-Django 3.0.10 fixes a data loss bug in 3.0.9.
+Django 3.0.10 fixes two data loss bugs in 3.0.9.
 
 Bugfixes
 ========
@@ -13,3 +13,6 @@ Bugfixes
   :meth:`~django.db.models.query.QuerySet.select_for_update()`. When using
   related fields pointing to a proxy model in the ``of`` argument, the
   corresponding model was not locked (:ticket:`31866`).
+
+* Fixed a data loss possibility, following a regression in Django 2.0, when
+  copying model instances with a cached fields value (:ticket:`31863`).
