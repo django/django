@@ -345,7 +345,6 @@ class SimpleTestCase(unittest.TestCase):
             )
 
             url, status_code = response.redirect_chain[-1]
-            scheme, netloc, path, query, fragment = urlsplit(url)
 
             self.assertEqual(
                 response.status_code, target_status_code,
