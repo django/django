@@ -102,6 +102,7 @@ class MockInputTests(TestCase):
 
 
 class GetDefaultUsernameTestCase(TestCase):
+    databases = {'default', 'other'}
 
     def setUp(self):
         self.old_get_system_username = management.get_system_username
@@ -127,6 +128,15 @@ class GetDefaultUsernameTestCase(TestCase):
         # 'Julia' with accented 'u':
         management.get_system_username = lambda: 'J\xfalia'
         self.assertEqual(management.get_default_username(), 'julia')
+
+    def test_with_database(self):
+        User.objects.create(username='joe')
+        management.get_system_username = lambda: 'joe'
+        self.assertEqual(management.get_default_username(), '')
+        self.assertEqual(management.get_default_username(database='other'), 'joe')
+
+        User.objects.using('other').create(username='joe')
+        self.assertEqual(management.get_default_username(database='other'), '')
 
 
 @override_settings(AUTH_PASSWORD_VALIDATORS=[
@@ -1046,6 +1056,36 @@ class MultiDBCreatesuperuserTestCase(TestCase):
         self.assertEqual(command_output, 'Superuser created successfully.')
         user = User.objects.using('other').get(username='joe')
         self.assertEqual(user.email, 'joe@somewhere.org')
+
+    def test_createsuperuser_command_suggested_username_with_database_option(self):
+        default_username = get_default_username(database='other')
+        qs = User.objects.using('other')
+
+        @mock_inputs({'password': 'nopasswd', 'username': '', 'email': ''})
+        def test_other_create_with_suggested_username(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                stdin=MockTTY(),
+                verbosity=0,
+                database='other',
+            )
+            self.assertIs(qs.filter(username=default_username).exists(), True)
+
+        test_other_create_with_suggested_username(self)
+
+        @mock_inputs({'password': 'nopasswd', 'Username: ': 'other', 'email': ''})
+        def test_other_no_suggestion(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                stdin=MockTTY(),
+                verbosity=0,
+                database='other',
+            )
+            self.assertIs(qs.filter(username='other').exists(), True)
+
+        test_other_no_suggestion(self)
 
 
 class CreatePermissionsTests(TestCase):
