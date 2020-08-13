@@ -35,9 +35,11 @@ except ImportError:
 
 __all__ = (
     'Approximate', 'ContextList', 'isolate_lru_cache', 'get_runner',
-    'modify_settings', 'override_settings',
+    'CaptureQueriesContext',
+    'ignore_warnings', 'isolate_apps', 'modify_settings', 'override_settings',
+    'override_system_checks', 'tag',
     'requires_tz_support',
-    'setup_test_environment', 'teardown_test_environment',
+    'setup_databases', 'setup_test_environment', 'teardown_test_environment',
 )
 
 TZ_SUPPORT = hasattr(time, 'tzset')

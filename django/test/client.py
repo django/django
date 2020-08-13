@@ -30,7 +30,10 @@ from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
 from django.utils.regex_helper import _lazy_re_compile
 
-__all__ = ('Client', 'RedirectCycleError', 'RequestFactory', 'encode_file', 'encode_multipart')
+__all__ = (
+    'AsyncClient', 'AsyncRequestFactory', 'Client', 'RedirectCycleError',
+    'RequestFactory', 'encode_file', 'encode_multipart',
+)
 
 
 BOUNDARY = 'BoUnDaRyStRiNg'
