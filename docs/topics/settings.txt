@@ -17,7 +17,7 @@ Here are a couple of example settings::
     DEBUG = False
     DEFAULT_FROM_EMAIL = 'webmaster@example.com'
 
-.. note::
+.. admonition:: DEBUG and ALLOWED_HOSTS
 
     If you set :setting:`DEBUG` to ``False``, you also need to properly set
     the :setting:`ALLOWED_HOSTS` setting.
@@ -120,10 +120,16 @@ In your Django apps, use settings by importing the object
     if settings.DEBUG:
         # Do something
 
+.. admonition:: settings.DEBUG in testing
+
+    ``settings.DEBUG`` will always return ``False`` while :ref:`running tests <other-test-conditions>`.
+
 Note that ``django.conf.settings`` isn't a module -- it's an object. So
 importing individual settings is not possible::
 
     from django.conf.settings import DEBUG  # This won't work.
+
+Additionally,
 
 Also note that your code should *not* import from either ``global_settings`` or
 your own settings file. ``django.conf.settings`` abstracts the concepts of
