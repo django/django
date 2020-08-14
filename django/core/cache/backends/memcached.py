@@ -18,10 +18,8 @@ class BaseMemcachedCache(BaseCache):
         else:
             self._servers = server
 
-        # The exception type to catch from the underlying library for a key
-        # that was not found. This is a ValueError for python-memcache,
-        # pylibmc.NotFound for pylibmc, and cmemcache will return None without
-        # raising an exception.
+        # Exception type raised by the underlying client library for a
+        # nonexistent key.
         self.LibraryValueNotFoundException = value_not_found_exception
 
         self._lib = library
@@ -106,10 +104,8 @@ class BaseMemcachedCache(BaseCache):
         try:
             val = self._cache.incr(key, delta)
 
-        # python-memcache responds to incr on nonexistent keys by
-        # raising a ValueError, pylibmc by raising a pylibmc.NotFound
-        # and Cmemcache returns None. In all cases,
-        # we should raise a ValueError though.
+        # Normalize an exception raised by the underlying client library to
+        # ValueError in the event of a nonexistent key when calling incr().
         except self.LibraryValueNotFoundException:
             val = None
         if val is None:
@@ -125,10 +121,8 @@ class BaseMemcachedCache(BaseCache):
         try:
             val = self._cache.decr(key, delta)
 
-        # python-memcache responds to incr on nonexistent keys by
-        # raising a ValueError, pylibmc by raising a pylibmc.NotFound
-        # and Cmemcache returns None. In all cases,
-        # we should raise a ValueError though.
+        # Normalize an exception raised by the underlying client library to
+        # ValueError in the event of a nonexistent key when calling decr().
         except self.LibraryValueNotFoundException:
             val = None
         if val is None:
@@ -160,6 +154,8 @@ class BaseMemcachedCache(BaseCache):
 class MemcachedCache(BaseMemcachedCache):
     "An implementation of a cache binding using python-memcached"
     def __init__(self, server, params):
+        # python-memcached ≥ 1.45 returns None for a nonexistent key in
+        # incr/decr(), python-memcached < 1.45 raises ValueError.
         import memcache
         super().__init__(server, params, library=memcache, value_not_found_exception=ValueError)
 
