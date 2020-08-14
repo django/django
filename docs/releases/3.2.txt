@@ -67,7 +67,7 @@ Minor features
   implement their own username validators with options to fine tune the
   validator.
 
-* Added :meth::help_text() method to ``UnicodUsernameValidator`` and
+* Added :meth::help_text() method to ``UnicodeUsernameValidator`` and
   ``ASCIIUsernameValidator``, which returns a help text string to provide
   requirements to the user.
 

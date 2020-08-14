@@ -19,8 +19,8 @@ their behavior.
 
 Validation is controlled by the :setting:`AUTH_USERNAME_VALIDATORS` setting.
 The default for the setting is an ``UnicodeUsernameValidator`` which
-validates whether given username contains English letters, numbers and @/./+/-/_
-characters or not.
+validates whether the given username contains only English letters, numbers 
+and ``@``, ``.``, ``+``, ``-``, and ``_`` characters.
 
 By default, validators are used in the forms and in the
 :djadmin:`createsuperuser` management commands.
@@ -45,8 +45,9 @@ Username validation is configured in the
 
 This example enables two included validators:
 
-* ``UnicodeUsernameValidator``, which checks whether username contains
-  anything other than the English letters, numbers and @/./+/-/_.
+* ``UnicodeUsernameValidator``, which checks whether the username contains
+  anything other than the English letters, numbers and ``@``, ``.``, ``+``,
+  ``-``, ``_``.
 * ``UsernameMinimumLengthValidator``, which checks whether the username meets a minimum
   length. This validator is configured with a custom option it now requires
   the minimum length to be three characters instead of the default one.
@@ -79,7 +80,7 @@ Django includes two validators:
 Integrating validation
 ----------------------
 
-There are few functions in ``django.contrib.auth.username_validation`` that
+There are a few functions in ``django.contrib.auth.username_validation`` that
 you can call from your own forms or other code to integrate username
 validation.
 
@@ -87,7 +88,7 @@ validation.
 
 .. versionadded:: 3.2
 
-    Returns a list of the help texts of all validators. These explain the
+    Returns a string of the help texts of all validators. These explain the
     username requirements to the user.
 
 .. function:: username_validators_help_text_html(username_validators=None)
@@ -109,17 +110,17 @@ interface. They must must implement two methods.
   username is valid, or raise a 
   :exc:`~django.core.exceptions.ValidationError` with an error message if the
   username is not valid.
-* ``get_help_text(self)``: provide a help text to explain the requirements to
+* ``help_text(self)``: provide a help text to explain the requirements to
   the user.
 
 Any items in the ``OPTIONS`` in :setting:``AUTH_USERNAME_VALIDATORS`` for your
 validator will be passed to the constructor. All constructor arguments should
 have a default value.
 
-Here's a  basic example of a validator, with one optional setting::
+Here's a basic example of a validator, with one optional setting::
 
     from django.core.exceptions import ValidationError
-    from django.utils.translation import gettext as _
+    from django.utils.translation import ngettext 
 
     class UsernameMinimumLengthValidator:
         def __init__(self, min_length=1):
@@ -128,13 +129,24 @@ Here's a  basic example of a validator, with one optional setting::
         def __call__(self, username):
             if len(username) < self.min_length:
                 raise ValidationError(
-                    _("This username must contain at least %(min_length)d characters."),
+                    ngettext(
+                        'This username is too short. It must contain at least
+                        %(min_length)d character.',
+                        'This username is too short. It must contain at least
+                        %(min_length)d characters.',
+                        self.min_length,
+                    ),
                     code='invalid',
                     params={'min_length': self.min_length},
                 )
         
-        def get_help_text(self):
-            return _(
-                "Your username must onctain at least %(min_length)d characters."
-                "% {'min_length': self.min_length}
-            )
+        def help_text(self):
+            return ngettext(
+                'Your username must contain at least %(min_length)d 
+                character.',
+                'Your username must contain at least %(min_length)d
+                characters.',
+                self.min_length
+            ) % {'min_length': self.min_length}
+            
+               

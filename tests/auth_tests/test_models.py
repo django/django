@@ -10,8 +10,10 @@ from django.contrib.auth.models import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
+from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
 from django.test import SimpleTestCase, TestCase, override_settings
+from django.utils.translation import gettext as _
 
 from .models import IntegerUsernameUser
 from .models.with_custom_email_field import CustomEmailField
@@ -260,6 +262,22 @@ class AbstractUserTestCase(TestCase):
             self.assertNotEqual(initial_password, user.password)
         finally:
             hasher.iterations = old_iterations
+
+    def test_username_validators(self):
+        msg = _(
+            'Enter a valid username. This value may contain only letters, '
+            'numbers, and @/./+/-/_ characters.'
+        )
+        user = User.objects.create_user(username='user')
+        user.full_clean()
+        self.assertEqual(user.username, 'user')
+        with self.assertRaisesMessage(ValidationError, str(msg)):
+            user1 = User.objects.create_user(
+                id=56,
+                username="o'conor",
+                password='unique672',
+            )
+            user1.full_clean()
 
 
 class CustomModelBackend(ModelBackend):

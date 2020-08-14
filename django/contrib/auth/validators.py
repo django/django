@@ -33,7 +33,7 @@ class UnicodeUsernameValidator(validators.RegexValidator):
 
     def help_text(self):
         return _(
-            'Enter a valid username. This value may contain only English letters, '
+            'Enter a valid username. This value may contain only letters, '
             'numbers, and @/./+/-/_ characters.'
         )
 

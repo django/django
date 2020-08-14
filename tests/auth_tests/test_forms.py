@@ -1086,3 +1086,59 @@ class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
         for field_name, autocomplete in tests:
             with self.subTest(field_name=field_name, autocomplete=autocomplete):
                 self.assertEqual(form.fields[field_name].widget.attrs['autocomplete'], autocomplete)
+
+
+class UsernameValidationTest(TestCase):
+
+    def test_helptext(self):
+        data = {'username': 'testclient'}
+        form = UserCreationForm(data)
+        help_text = _(
+            '<ul><li>Enter a valid username. This value may contain only '
+            'letters, numbers, and @/./+/-/_ characters.</li></ul>'
+        )
+        form_help_text = form.fields['username'].help_text
+        self.assertEqual(help_text, form_help_text)
+
+    def test_validators(self):
+        data = {
+            'username': 'testclient',
+            'password1': 'theunique123',
+            'password2': 'theunique123',
+        }
+        invalid_data = {'username': 'test*client'}
+        form = UserCreationForm(data)
+        self.assertEqual(form.is_valid(), True)
+        msg = _(
+            'Enter a valid username. This value may contain only letters, '
+            'numbers, and @/./+/-/_ characters.'
+        )
+        form1 = UserCreationForm(invalid_data)
+        form1.is_valid()
+        self.assertEqual(form1.errors['username'][0], str(msg))
+
+    def test_username_change(self):
+        data = {
+            'username': 'testclient',
+            'password1': 'theunique123',
+            'password2': 'theunique123',
+        }
+        create_user_form = UserCreationForm(data)
+        create_user_form.save()
+        new_username = {
+            'username': 'test_client',
+            'date_joined': '2020-08-14',
+        }
+        form = UserChangeForm(new_username)
+        self.assertEqual(form.is_valid(), True)
+        invalid_data = {
+            'username': 'test*client',
+            'date_joined': '2020-08-14'
+        }
+        msg = _(
+            'Enter a valid username. This value may contain only letters, '
+            'numbers, and @/./+/-/_ characters.'
+        )
+        form1 = UserChangeForm(invalid_data)
+        form1.is_valid()
+        self.assertEqual(form1.errors['username'][0], str(msg))

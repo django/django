@@ -3012,6 +3012,8 @@ performed and all passwords are accepted.
 ``AUTH_USERNAME_VALIDATORS``
 ----------------------------
 
+.. versionadded:: 3.2
+
 Default:: 
     
     [
@@ -3019,6 +3021,11 @@ Default::
             'NAME': 'contrib.auth.validators.UnicodeUsernameValidators'
         },
     ]
+
+The list of validators that are used to check username requirement.
+See :ref:`username-validation` for more details. By default, 
+UnicodeUsernameValidator is used to perform the validation.
+
 
 .. _settings-messages:
 

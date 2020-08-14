@@ -281,19 +281,21 @@ class UsernameValidatorsTests(SimpleTestCase):
     def test_username_validators_help_text(self):
         validator_config = [
             {'NAME': 'django.contrib.auth.validators.UnicodeUsernameValidator'},
-            {'NAME': 'django.contrib.auth.validators.UsernameMinimumLengthValidator', 'OPTIONS': {
-                'min_length': 3,
-            }},
+            {
+                'NAME': 'django.contrib.auth.validators.UsernameMinimumLengthValidator',
+                'OPTIONS': {
+                    'min_length': 3,
+                },
+            },
         ]
-        ASCII_and_unicode = _(
-            'Enter a valid username. This value may contain only English letters, '
-            'numbers, and @/./+/-/_ characters.'
+        both_help_text = _(
+            'Enter a valid username. This value may contain only letters, '
+            'numbers, and @/./+/-/_ characters. '
+            'Your username must contain at least 3 characters.'
         )
-        length = 'Your username must contain at least 3 characters.'
         validators_list = get_username_validators(validator_config)
         help_texts = username_validators_help_texts(validators_list)
-        self.assertEqual(help_texts[0], ASCII_and_unicode)
-        self.assertEqual(help_texts[1], length)
+        self.assertEqual(help_texts, both_help_text)
 
 
 class UsernameValidationTests(SimpleTestCase):
@@ -303,9 +305,10 @@ class UsernameValidationTests(SimpleTestCase):
 
     @override_settings(AUTH_USERNAME_VALIDATORS=[
         {'NAME': 'django.contrib.auth.validators.UnicodeUsernameValidator'},
-        {'NAME': 'django.contrib.auth.validators.UsernameMinimumLengthValidator', 'OPTIONS': {
-            'min_length': 3,
-        }},
+        {
+            'NAME': 'django.contrib.auth.validators.UsernameMinimumLengthValidator',
+            'OPTIONS': {'min_length': 3}
+        },
     ])
     def test_customized_validation(self):
         validators_list = get_default_username_validators()
@@ -323,10 +326,10 @@ class UsernameValidationTests(SimpleTestCase):
     def test_username_validator_help_texts(self):
         help_text = username_validators_help_texts()
         text = _(
-            'Enter a valid username. This value may contain only English letters, '
+            'Enter a valid username. This value may contain only letters, '
             'numbers, and @/./+/-/_ characters.'
         )
-        self.assertIn(str(text), help_text[0])
+        self.assertIn(str(text), help_text)
 
     def test_username_validators_help_text_html(self):
         html_text = username_validators_help_text_html()
