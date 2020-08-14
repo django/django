@@ -421,6 +421,13 @@ subclass::
         rendered for :class:`~django.contrib.admin.TabularInline` due to its
         layout.
 
+        Example::
+
+            {
+            'description': 'these fields are mandatory/optional',
+            }
+
+
         Note that this value is *not* HTML-escaped when it's displayed in
         the admin interface. This lets you include HTML if you so desire.
         Alternatively you can use plain text and
