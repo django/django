@@ -122,7 +122,7 @@ In your Django apps, use settings by importing the object
 
 .. admonition:: settings.DEBUG in testing
 
-    ``settings.DEBUG`` will always return ``False`` while :ref:`running tests <other-test-conditions>`.
+    ``settings.DEBUG`` will always return ``False`` while :ref:`running tests <other-test-conditions>`. Use ``override_settings()`` to override this functionality.
 
 Note that ``django.conf.settings`` isn't a module -- it's an object. So
 importing individual settings is not possible::
