@@ -1031,7 +1031,7 @@ class MultiDBCreatesuperuserTestCase(TestCase):
 
     def test_createsuperuser_command_with_database_option(self):
         """
-        changepassword --database should operate on the specified DB.
+        createsuperuser --database should operate on the specified DB.
         """
         new_io = StringIO()
         call_command(
