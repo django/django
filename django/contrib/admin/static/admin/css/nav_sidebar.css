@@ -99,8 +99,22 @@
     background: #ffc;
 }
 
+.main > #nav-sidebar+.content {
+    position: absolute;
+    left: 23px;
+    right: 0;
+}
+
+.main.shifted > #nav-sidebar+.content {
+    left: 298px;
+}
+
 @media (max-width: 767px) {
     #nav-sidebar, #toggle-nav-sidebar {
         display: none;
+    }
+    .main > #nav-sidebar+.content,
+    .main.shifted > #nav-sidebar+.content {
+        left: 0;
     }
 }
