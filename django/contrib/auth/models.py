@@ -13,8 +13,6 @@ from django.db.models.manager import EmptyManager
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from .validators import UnicodeUsernameValidator
-
 
 def update_last_login(sender, user, **kwargs):
     """
