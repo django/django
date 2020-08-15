@@ -250,6 +250,19 @@ class SerializersTestBase:
         with self.assertNumQueries(0):
             serializers.serialize(self.serializer_name, [mv])
 
+    def test_serialize_prefetch_related_m2m(self):
+        # One query for the Article table and one for each prefetched m2m
+        # field.
+        with self.assertNumQueries(3):
+            serializers.serialize(
+                self.serializer_name,
+                Article.objects.all().prefetch_related('categories', 'meta_data'),
+            )
+        # One query for the Article table, and two m2m queries for each
+        # article.
+        with self.assertNumQueries(5):
+            serializers.serialize(self.serializer_name, Article.objects.all())
+
     def test_serialize_with_null_pk(self):
         """
         Serialized data with no primary key results

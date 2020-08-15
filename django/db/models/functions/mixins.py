@@ -32,7 +32,9 @@ class FixDurationInputMixin:
         if self.output_field.get_internal_type() == 'DurationField':
             expression = self.get_source_expressions()[0]
             options = self._get_repr_options()
-            from django.db.backends.oracle.functions import IntervalToSeconds, SecondsToInterval
+            from django.db.backends.oracle.functions import (
+                IntervalToSeconds, SecondsToInterval,
+            )
             return compiler.compile(
                 SecondsToInterval(self.__class__(IntervalToSeconds(expression), **options))
             )

@@ -14,10 +14,11 @@
     ready(function() {
         function handleClick(event) {
             event.preventDefault();
-            if (window.location.search.indexOf('&_popup=1') === -1) {
-                window.history.back(); // Go back if not a popup.
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('_popup')) {
+                window.close(); // Close the popup.
             } else {
-                window.close(); // Otherwise, close the popup.
+                window.history.back(); // Otherwise, go back.
             }
         }
 

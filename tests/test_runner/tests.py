@@ -14,7 +14,7 @@ from django.core.management.base import SystemCheckError
 from django.test import TransactionTestCase, skipUnlessDBFeature, testcases
 from django.test.runner import DiscoverRunner
 from django.test.testcases import connections_support_transactions
-from django.test.utils import dependency_ordered
+from django.test.utils import captured_stderr, dependency_ordered
 
 from .models import B, Person, Through
 
@@ -147,6 +147,11 @@ class ManageCommandTests(unittest.TestCase):
     def test_bad_test_runner(self):
         with self.assertRaises(AttributeError):
             call_command('test', 'sites', testrunner='test_runner.NonexistentRunner')
+
+    def test_time_recorded(self):
+        with captured_stderr() as stderr:
+            call_command('test', '--timing', 'sites', testrunner='test_runner.tests.MockTestRunner')
+        self.assertIn('Total run took', stderr.getvalue())
 
 
 class CustomTestRunnerOptionsSettingsTests(AdminScriptTestCase):

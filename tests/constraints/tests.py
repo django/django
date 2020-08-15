@@ -8,7 +8,8 @@ from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
 from .models import (
     ChildModel, Product, UniqueConstraintConditionProduct,
-    UniqueConstraintDeferrable, UniqueConstraintProduct,
+    UniqueConstraintDeferrable, UniqueConstraintInclude,
+    UniqueConstraintProduct,
 )
 
 
@@ -86,6 +87,12 @@ class CheckConstraintTests(TestCase):
         Product.objects.create(price=10, discounted_price=5)
         with self.assertRaises(IntegrityError):
             Product.objects.create(price=10, discounted_price=20)
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_database_constraint_unicode(self):
+        Product.objects.create(price=10, discounted_price=5, unit='μg/mL')
+        with self.assertRaises(IntegrityError):
+            Product.objects.create(price=10, discounted_price=7, unit='l')
 
     @skipUnlessDBFeature('supports_table_check_constraints')
     def test_database_constraint_expression(self):
@@ -181,6 +188,34 @@ class UniqueConstraintTests(TestCase):
         self.assertEqual(constraint_1, constraint_1)
         self.assertNotEqual(constraint_1, constraint_2)
 
+    def test_eq_with_include(self):
+        constraint_1 = models.UniqueConstraint(
+            fields=['foo', 'bar'],
+            name='include',
+            include=['baz_1'],
+        )
+        constraint_2 = models.UniqueConstraint(
+            fields=['foo', 'bar'],
+            name='include',
+            include=['baz_2'],
+        )
+        self.assertEqual(constraint_1, constraint_1)
+        self.assertNotEqual(constraint_1, constraint_2)
+
+    def test_eq_with_opclasses(self):
+        constraint_1 = models.UniqueConstraint(
+            fields=['foo', 'bar'],
+            name='opclasses',
+            opclasses=['text_pattern_ops', 'varchar_pattern_ops'],
+        )
+        constraint_2 = models.UniqueConstraint(
+            fields=['foo', 'bar'],
+            name='opclasses',
+            opclasses=['varchar_pattern_ops', 'text_pattern_ops'],
+        )
+        self.assertEqual(constraint_1, constraint_1)
+        self.assertNotEqual(constraint_1, constraint_2)
+
     def test_repr(self):
         fields = ['foo', 'bar']
         name = 'unique_fields'
@@ -212,6 +247,30 @@ class UniqueConstraintTests(TestCase):
             repr(constraint),
             "<UniqueConstraint: fields=('foo', 'bar') name='unique_fields' "
             "deferrable=Deferrable.IMMEDIATE>",
+        )
+
+    def test_repr_with_include(self):
+        constraint = models.UniqueConstraint(
+            fields=['foo', 'bar'],
+            name='include_fields',
+            include=['baz_1', 'baz_2'],
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<UniqueConstraint: fields=('foo', 'bar') name='include_fields' "
+            "include=('baz_1', 'baz_2')>",
+        )
+
+    def test_repr_with_opclasses(self):
+        constraint = models.UniqueConstraint(
+            fields=['foo', 'bar'],
+            name='opclasses_fields',
+            opclasses=['text_pattern_ops', 'varchar_pattern_ops'],
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<UniqueConstraint: fields=('foo', 'bar') name='opclasses_fields' "
+            "opclasses=['text_pattern_ops', 'varchar_pattern_ops']>",
         )
 
     def test_deconstruction(self):
@@ -248,6 +307,34 @@ class UniqueConstraintTests(TestCase):
             'fields': tuple(fields),
             'name': name,
             'deferrable': models.Deferrable.DEFERRED,
+        })
+
+    def test_deconstruction_with_include(self):
+        fields = ['foo', 'bar']
+        name = 'unique_fields'
+        include = ['baz_1', 'baz_2']
+        constraint = models.UniqueConstraint(fields=fields, name=name, include=include)
+        path, args, kwargs = constraint.deconstruct()
+        self.assertEqual(path, 'django.db.models.UniqueConstraint')
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {
+            'fields': tuple(fields),
+            'name': name,
+            'include': tuple(include),
+        })
+
+    def test_deconstruction_with_opclasses(self):
+        fields = ['foo', 'bar']
+        name = 'unique_fields'
+        opclasses = ['varchar_pattern_ops', 'text_pattern_ops']
+        constraint = models.UniqueConstraint(fields=fields, name=name, opclasses=opclasses)
+        path, args, kwargs = constraint.deconstruct()
+        self.assertEqual(path, 'django.db.models.UniqueConstraint')
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {
+            'fields': tuple(fields),
+            'name': name,
+            'opclasses': opclasses,
         })
 
     def test_database_constraint(self):
@@ -325,6 +412,26 @@ class UniqueConstraintTests(TestCase):
                 deferrable=models.Deferrable.DEFERRED,
             )
 
+    def test_deferrable_with_include(self):
+        message = 'UniqueConstraint with include fields cannot be deferred.'
+        with self.assertRaisesMessage(ValueError, message):
+            models.UniqueConstraint(
+                fields=['name'],
+                name='name_inc_color_color_unique',
+                include=['color'],
+                deferrable=models.Deferrable.DEFERRED,
+            )
+
+    def test_deferrable_with_opclasses(self):
+        message = 'UniqueConstraint with opclasses cannot be deferred.'
+        with self.assertRaisesMessage(ValueError, message):
+            models.UniqueConstraint(
+                fields=['name'],
+                name='name_text_pattern_ops_unique',
+                opclasses=['text_pattern_ops'],
+                deferrable=models.Deferrable.DEFERRED,
+            )
+
     def test_invalid_defer_argument(self):
         message = 'UniqueConstraint.deferrable must be a Deferrable instance.'
         with self.assertRaisesMessage(ValueError, message):
@@ -332,4 +439,43 @@ class UniqueConstraintTests(TestCase):
                 fields=['name'],
                 name='name_invalid',
                 deferrable='invalid',
+            )
+
+    @skipUnlessDBFeature(
+        'supports_table_check_constraints',
+        'supports_covering_indexes',
+    )
+    def test_include_database_constraint(self):
+        UniqueConstraintInclude.objects.create(name='p1', color='red')
+        with self.assertRaises(IntegrityError):
+            UniqueConstraintInclude.objects.create(name='p1', color='blue')
+
+    def test_invalid_include_argument(self):
+        msg = 'UniqueConstraint.include must be a list or tuple.'
+        with self.assertRaisesMessage(ValueError, msg):
+            models.UniqueConstraint(
+                name='uniq_include',
+                fields=['field'],
+                include='other',
+            )
+
+    def test_invalid_opclasses_argument(self):
+        msg = 'UniqueConstraint.opclasses must be a list or tuple.'
+        with self.assertRaisesMessage(ValueError, msg):
+            models.UniqueConstraint(
+                name='uniq_opclasses',
+                fields=['field'],
+                opclasses='jsonb_path_ops',
+            )
+
+    def test_opclasses_and_fields_same_length(self):
+        msg = (
+            'UniqueConstraint.fields and UniqueConstraint.opclasses must have '
+            'the same number of elements.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            models.UniqueConstraint(
+                name='uniq_opclasses',
+                fields=['field'],
+                opclasses=['foo', 'bar'],
             )

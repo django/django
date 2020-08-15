@@ -29,20 +29,22 @@ class DatabaseCheckTests(TestCase):
             'STRICT_TRANS_TABLES',
             'STRICT_ALL_TABLES',
         ]
-        for response in good_sql_modes:
-            with mock.patch(
-                'django.db.backends.utils.CursorWrapper.fetchone', create=True,
-                return_value=(response,)
+        for sql_mode in good_sql_modes:
+            with mock.patch.object(
+                connection, 'mysql_server_data', {'sql_mode': sql_mode},
             ):
                 self.assertEqual(check_database_backends(databases=self.databases), [])
             _clean_sql_mode()
 
         bad_sql_modes = ['', 'WHATEVER']
-        for response in bad_sql_modes:
-            with mock.patch(
-                'django.db.backends.utils.CursorWrapper.fetchone', create=True,
-                return_value=(response,)
-            ):
+        for sql_mode in bad_sql_modes:
+            mocker_default = mock.patch.object(
+                connection, 'mysql_server_data', {'sql_mode': sql_mode},
+            )
+            mocker_other = mock.patch.object(
+                connections['other'], 'mysql_server_data', {'sql_mode': sql_mode},
+            )
+            with mocker_default, mocker_other:
                 # One warning for each database alias
                 result = check_database_backends(databases=self.databases)
                 self.assertEqual(len(result), 2)

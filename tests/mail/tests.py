@@ -188,14 +188,22 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             EmailMessage(reply_to='reply_to@example.com')
 
     def test_header_injection(self):
+        msg = "Header values can't contain newlines "
         email = EmailMessage('Subject\nInjection Test', 'Content', 'from@example.com', ['to@example.com'])
-        with self.assertRaises(BadHeaderError):
+        with self.assertRaisesMessage(BadHeaderError, msg):
             email.message()
         email = EmailMessage(
             gettext_lazy('Subject\nInjection Test'), 'Content', 'from@example.com', ['to@example.com']
         )
-        with self.assertRaises(BadHeaderError):
+        with self.assertRaisesMessage(BadHeaderError, msg):
             email.message()
+        with self.assertRaisesMessage(BadHeaderError, msg):
+            EmailMessage(
+                'Subject',
+                'Content',
+                'from@example.com',
+                ['Name\nInjection test <to@example.com>'],
+            ).message()
 
     def test_space_continuation(self):
         """
@@ -730,14 +738,14 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             (
                 ('A name', 'to@example.com'),
                 'utf-8',
-                '=?utf-8?q?A_name?= <to@example.com>',
+                'A name <to@example.com>',
             ),
             ('localpartonly', 'ascii', 'localpartonly'),
             # ASCII addresses with display names.
             ('A name <to@example.com>', 'ascii', 'A name <to@example.com>'),
-            ('A name <to@example.com>', 'utf-8', '=?utf-8?q?A_name?= <to@example.com>'),
+            ('A name <to@example.com>', 'utf-8', 'A name <to@example.com>'),
             ('"A name" <to@example.com>', 'ascii', 'A name <to@example.com>'),
-            ('"A name" <to@example.com>', 'utf-8', '=?utf-8?q?A_name?= <to@example.com>'),
+            ('"A name" <to@example.com>', 'utf-8', 'A name <to@example.com>'),
             # Unicode addresses (supported per RFC-6532).
             ('tó@example.com', 'utf-8', '=?utf-8?b?dMOz?=@example.com'),
             ('to@éxample.com', 'utf-8', 'to@xn--xample-9ua.com'),
@@ -756,20 +764,45 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             (
                 'To Example <to@éxample.com>',
                 'utf-8',
-                '=?utf-8?q?To_Example?= <to@xn--xample-9ua.com>',
+                'To Example <to@xn--xample-9ua.com>',
             ),
             # Addresses with two @ signs.
             ('"to@other.com"@example.com', 'utf-8', r'"to@other.com"@example.com'),
             (
                 '"to@other.com" <to@example.com>',
                 'utf-8',
-                '=?utf-8?q?to=40other=2Ecom?= <to@example.com>',
+                '"to@other.com" <to@example.com>',
             ),
             (
                 ('To Example', 'to@other.com@example.com'),
                 'utf-8',
-                '=?utf-8?q?To_Example?= <"to@other.com"@example.com>',
+                'To Example <"to@other.com"@example.com>',
             ),
+            # Addresses with long unicode display names.
+            (
+                'Tó Example very long' * 4 + ' <to@example.com>',
+                'utf-8',
+                '=?utf-8?q?T=C3=B3_Example_very_longT=C3=B3_Example_very_longT'
+                '=C3=B3_Example_?=\n'
+                ' =?utf-8?q?very_longT=C3=B3_Example_very_long?= '
+                '<to@example.com>',
+            ),
+            (
+                ('Tó Example very long' * 4, 'to@example.com'),
+                'utf-8',
+                '=?utf-8?q?T=C3=B3_Example_very_longT=C3=B3_Example_very_longT'
+                '=C3=B3_Example_?=\n'
+                ' =?utf-8?q?very_longT=C3=B3_Example_very_long?= '
+                '<to@example.com>',
+            ),
+            # Address with long display name and unicode domain.
+            (
+                ('To Example very long' * 4, 'to@exampl€.com'),
+                'utf-8',
+                'To Example very longTo Example very longTo Example very longT'
+                'o Example very\n'
+                ' long <to@xn--exampl-nc1c.com>'
+            )
         ):
             with self.subTest(email_address=email_address, encoding=encoding):
                 self.assertEqual(sanitize_address(email_address, encoding), expected_result)
@@ -787,6 +820,19 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         ):
             with self.subTest(email_address=email_address):
                 with self.assertRaises(ValueError):
+                    sanitize_address(email_address, encoding='utf-8')
+
+    def test_sanitize_address_header_injection(self):
+        msg = 'Invalid address; address parts cannot contain newlines.'
+        tests = [
+            'Name\nInjection <to@example.com>',
+            ('Name\nInjection', 'to@xample.com'),
+            'Name <to\ninjection@example.com>',
+            ('Name', 'to\ninjection@example.com'),
+        ]
+        for email_address in tests:
+            with self.subTest(email_address=email_address):
+                with self.assertRaisesMessage(ValueError, msg):
                     sanitize_address(email_address, encoding='utf-8')
 
 
@@ -1447,7 +1493,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     def test_reopen_connection(self):
         backend = smtp.EmailBackend()
         # Simulate an already open connection.
-        backend.connection = True
+        backend.connection = mock.Mock(spec=object())
         self.assertIs(backend.open(), False)
 
     def test_server_login(self):
@@ -1607,20 +1653,20 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         backend = smtp.EmailBackend()
         # Simulate connection initialization success and a subsequent
         # connection exception.
-        backend.connection = True
+        backend.connection = mock.Mock(spec=object())
         backend.open = lambda: None
         email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'])
         self.assertEqual(backend.send_messages([email]), 0)
 
     def test_send_messages_empty_list(self):
         backend = smtp.EmailBackend()
-        backend.connection = True
+        backend.connection = mock.Mock(spec=object())
         self.assertEqual(backend.send_messages([]), 0)
 
     def test_send_messages_zero_sent(self):
         """A message isn't sent if it doesn't have any recipients."""
         backend = smtp.EmailBackend()
-        backend.connection = True
+        backend.connection = mock.Mock(spec=object())
         email = EmailMessage('Subject', 'Content', 'from@example.com', to=[])
         sent = backend.send_messages([email])
         self.assertEqual(sent, 0)

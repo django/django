@@ -85,6 +85,7 @@ Django's system checks are organized using the following tags:
 * ``models``: Checks of model, field, and manager definitions.
 * ``security``: Checks security related configuration.
 * ``signals``: Checks on signal declarations and handler registrations.
+* ``sites``: Checks :mod:`django.contrib.sites` configuration.
 * ``staticfiles``: Checks :mod:`django.contrib.staticfiles` configuration.
 * ``templates``: Checks template related configuration.
 * ``translation``: Checks translation related configuration.
@@ -100,6 +101,10 @@ Some checks may be registered with multiple tags.
 
     The ``database`` checks are now run only for database aliases specified
     using the :option:`check --database` option.
+
+.. versionchanged:: 3.2
+
+    The ``sites`` tag was added.
 
 Core system checks
 ==================
@@ -146,7 +151,7 @@ If you're using MySQL or MariaDB, the following checks will be performed:
   ``max_length`` > 255. *This check was changed to* ``mysql.W003`` *in Django
   3.1 as the real maximum size depends on many factors.*
 * **mysql.W002**: MySQL/MariaDB Strict Mode is not set for database connection
-  '<alias>'. See also :ref:`mysql-sql-mode`.
+  ``<alias>``. See also :ref:`mysql-sql-mode`.
 * **mysql.W003**: MySQL/MariaDB may not allow unique ``CharField``\s to have a
   ``max_length`` > 255.
 
@@ -343,11 +348,11 @@ Models
 * **models.E028**: ``db_table`` ``<db_table>`` is used by multiple models:
   ``<model list>``.
 * **models.E029**: index name ``<index>`` is not unique for model ``<model>``.
-* **models.E030**: index name ``<index>`` is not unique amongst models:
+* **models.E030**: index name ``<index>`` is not unique among models:
   ``<model list>``.
 * **models.E031**: constraint name ``<constraint>`` is not unique for model
   ``<model>``.
-* **models.E032**: constraint name ``<constraint>`` is not unique amongst
+* **models.E032**: constraint name ``<constraint>`` is not unique among
   models: ``<model list>``.
 * **models.E033**: The index name ``<index>`` cannot start with an underscore
   or a number.
@@ -360,6 +365,11 @@ Models
 * **models.W037**: ``<database>`` does not support indexes with conditions.
 * **models.W038**: ``<database>`` does not support deferrable unique
   constraints.
+* **models.W039**: ``<database>`` does not support unique constraints with
+  non-key columns.
+* **models.W040**: ``<database>`` does not support indexes with non-key
+  columns.
+* **models.E041**: ``constraints`` refers to the joined field ``<field name>``.
 
 Security
 --------
@@ -413,8 +423,8 @@ The following checks are run if you use the :option:`check --deploy` option:
   set to ``True``, so your pages will not be served with an
   ``'X-XSS-Protection: 1; mode=block'`` header. You should consider enabling
   this header to activate the browser's XSS filtering and help prevent XSS
-  attacks. *This check is removed in Django 3.0 as the ``X-XSS-Protection``
-  header is no longer honored by modern browsers.*
+  attacks. *This check is removed in Django 3.0 as the* ``X-XSS-Protection``
+  *header is no longer honored by modern browsers.*
 * **security.W008**: Your :setting:`SECURE_SSL_REDIRECT` setting is not set to
   ``True``. Unless your site should be available over both SSL and non-SSL
   connections, you may want to either set this setting to ``True`` or configure
@@ -473,6 +483,12 @@ The following checks are run if you use the :option:`check --deploy` option:
   should consider enabling this header to protect user privacy.
 * **security.E023**: You have set the :setting:`SECURE_REFERRER_POLICY` setting
   to an invalid value.
+
+The following checks verify that your security-related settings are correctly
+configured:
+
+* **security.E100**: :setting:`DEFAULT_HASHING_ALGORITHM` must be ``'sha1'`` or
+  ``'sha256'``.
 
 Signals
 -------
@@ -807,6 +823,11 @@ The following checks are performed on any model using a
   ``<field name>``.
 * **sites.E002**: ``CurrentSiteManager`` cannot use ``<field>`` as it is not a
   foreign key or a many-to-many field.
+
+The following checks verify that :mod:`django.contrib.sites` is correctly
+configured:
+
+* **sites.E101**: The :setting:`SITE_ID` setting must be an integer.
 
 ``staticfiles``
 ---------------

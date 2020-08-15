@@ -2,6 +2,7 @@
 #
 # Translators:
 # Eugene <eugene.mechanism@gmail.com>, 2012
+# crazyzubr <hjcnbckfd@gmail.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Mike Yumatov <mike@yumatov.org>, 2011
 # Алексей Борискин <sun.void@gmail.com>, 2012,2014-2015,2019
@@ -9,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-02-18 21:16+0000\n"
-"Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-05-14 18:19+0000\n"
+"Last-Translator: crazyzubr <hjcnbckfd@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -32,9 +33,9 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"Пример: '/about/contact/'. Убедитесь, что ввели начальную и конечную косые "
+"Пример: “/about/contact/”. Убедитесь, что ввели начальную и конечную косые "
 "черты."
 
 msgid ""
@@ -44,9 +45,9 @@ msgstr ""
 "Значение должно состоять только из букв, цифр и символов точки, "
 "подчеркивания, тире, косой черты и тильды."
 
-msgid "Example: '/about/contact'. Make sure to have a leading slash."
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
 msgstr ""
-"Например: '/about/contact'. Убедитесь, что в начале адреса находится косая "
+"Пример: “/about/contact”. Убедитесь, что в начале адреса находится косая "
 "черта."
 
 msgid "URL is missing a leading slash."
@@ -72,11 +73,11 @@ msgid "template name"
 msgstr "имя шаблона"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"Пример: 'flatpages/contact_page.html'. Если не указано, система будет "
-"использовать 'flatpages/default.html'."
+"Пример: “flatpages/contact_page.html“. Если не указано, система будет "
+"использовать “flatpages/default.html“."
 
 msgid "registration required"
 msgstr "требуется регистрация"

@@ -50,7 +50,7 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
             default_lat: 0,
             default_lon: 0,
             default_zoom: 12,
-            is_collection: options.geom_name.indexOf('Multi') > -1 || options.geom_name.indexOf('Collection') > -1
+            is_collection: options.geom_name.includes('Multi') || options.geom_name.includes('Collection')
         };
 
         // Altering using user-provided options

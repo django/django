@@ -24,6 +24,7 @@ from django.utils import translation
 from .models import (
     Advisor, Album, Band, Bee, Car, Company, Event, Honeycomb, Individual,
     Inventory, Member, MyFileField, Profile, School, Student,
+    UnsafeLimitChoicesTo,
 )
 from .widgetadmin import site as widget_admin_site
 
@@ -487,6 +488,20 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
             },
         )
 
+    def test_render_disabled(self):
+        widget = widgets.AdminFileWidget(attrs={'disabled': True})
+        self.assertHTMLEqual(
+            widget.render('test', self.album.cover_art),
+            '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/'
+            r'hybrid_theory.jpg">albums\hybrid_theory.jpg</a> '
+            '<span class="clearable-file-input">'
+            '<input type="checkbox" name="test-clear" id="test-clear_id" disabled>'
+            '<label for="test-clear_id">Clear</label></span><br>'
+            'Change: <input type="file" name="test" disabled></p>' % {
+                'STORAGE_URL': default_storage.url(''),
+            },
+        )
+
     def test_readonly_fields(self):
         """
         File widgets should render as a link when they're marked "read only."
@@ -601,6 +616,16 @@ class ForeignKeyRawIdWidgetTest(TestCase):
             'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
             '&nbsp;<strong><a href="/admin_widgets/inventory/%(pk)s/change/">'
             'Hidden</a></strong>' % {'pk': hidden.pk}
+        )
+
+    def test_render_unsafe_limit_choices_to(self):
+        rel = UnsafeLimitChoicesTo._meta.get_field('band').remote_field
+        w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
+        self.assertHTMLEqual(
+            w.render('test', None),
+            '<input type="text" name="test" class="vForeignKeyRawIdAdminField">\n'
+            '<a href="/admin_widgets/band/?name=%22%26%3E%3Cescapeme&amp;_to_field=id" '
+            'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
         )
 
 

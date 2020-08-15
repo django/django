@@ -214,6 +214,12 @@ class SystemChecksTestCase(SimpleTestCase):
             checks.Error(
                 "'django.contrib.sessions.middleware.SessionMiddleware' "
                 "must be in MIDDLEWARE in order to use the admin application.",
+                hint=(
+                    "Insert "
+                    "'django.contrib.sessions.middleware.SessionMiddleware' "
+                    "before "
+                    "'django.contrib.auth.middleware.AuthenticationMiddleware'."
+                ),
                 id='admin.E410',
             ),
         ]

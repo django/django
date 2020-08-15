@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Hrishikesh <hrishi.kb@gmail.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Rajeesh Nair <rajeeshrnair@gmail.com>, 2012
 msgid ""
@@ -8,8 +9,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2018-05-18 01:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2020-05-13 21:29+0000\n"
+"Last-Translator: Hrishikesh <hrishi.kb@gmail.com>\n"
 "Language-Team: Malayalam (http://www.transifex.com/django/django/language/"
 "ml/)\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +20,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Humanize"
-msgstr ""
+msgstr "ഹ്യൂമനൈസ്"
 
 #. Translators: Ordinal format for 11 (11th), 12 (12th), and 13 (13th).
 msgctxt "ordinal 11, 12, 13"
@@ -79,8 +80,8 @@ msgstr ""
 #, python-format
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
-msgstr[0] "%(value).1f മില്ല്യണ്‍ (ദശലക്ഷം)"
-msgstr[1] "%(value).1f മില്ല്യണ്‍ (ദശലക്ഷം)"
+msgstr[0] "%(value).1f ദശലക്ഷം"
+msgstr[1] "%(value).1f ദശലക്ഷം"
 
 #, python-format
 msgid "%(value)s million"
@@ -91,8 +92,8 @@ msgstr[1] "%(value)s ദശലക്ഷം"
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
-msgstr[0] "%(value).1f ബില്ല്യണ്‍ (ശതകോടി)"
-msgstr[1] "%(value).1f ബില്ല്യണ്‍ (ശതകോടി)"
+msgstr[0] "%(value).1f ശതകോടി"
+msgstr[1] "%(value).1f ശതകോടി"
 
 #, python-format
 msgid "%(value)s billion"

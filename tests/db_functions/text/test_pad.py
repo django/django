@@ -1,5 +1,5 @@
 from django.db import connection
-from django.db.models import CharField, Value
+from django.db.models import Value
 from django.db.models.functions import Length, LPad, RPad
 from django.test import TestCase
 
@@ -42,7 +42,7 @@ class PadTests(TestCase):
     def test_combined_with_length(self):
         Author.objects.create(name='Rhonda', alias='john_smith')
         Author.objects.create(name='♥♣♠', alias='bytes')
-        authors = Author.objects.annotate(filled=LPad('name', Length('alias'), output_field=CharField()))
+        authors = Author.objects.annotate(filled=LPad('name', Length('alias')))
         self.assertQuerysetEqual(
             authors.order_by('alias'),
             ['  ♥♣♠', '    Rhonda'],

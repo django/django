@@ -639,7 +639,7 @@ Option          MariaDB   MySQL
 =============== ========= ==========
 ``SKIP LOCKED``           X (≥8.0.1)
 ``NOWAIT``      X (≥10.3) X (≥8.0.1)
-``OF``
+``OF``                    X (≥8.0.1)
 ``NO KEY``
 =============== ========= ==========
 
@@ -1057,17 +1057,15 @@ Using a 3rd-party database backend
 In addition to the officially supported databases, there are backends provided
 by 3rd parties that allow you to use other databases with Django:
 
-* `IBM DB2`_
+* `CockroachDB`_
+* `Firebird`_
 * `Microsoft SQL Server`_
-* Firebird_
-* ODBC_
 
 The Django versions and ORM features supported by these unofficial backends
 vary considerably. Queries regarding the specific capabilities of these
 unofficial backends, along with any support queries, should be directed to
 the support channels provided by each 3rd party project.
 
-.. _IBM DB2: https://pypi.org/project/ibm_db_django/
-.. _Microsoft SQL Server: https://pypi.org/project/django-pyodbc-azure/
-.. _Firebird: https://github.com/maxirobaina/django-firebird
-.. _ODBC: https://github.com/lionheart/django-pyodbc/
+.. _CockroachDB: https://pypi.org/project/django-cockroachdb/
+.. _Firebird: https://pypi.org/project/django-firebird/
+.. _Microsoft SQL Server: https://pypi.org/project/django-mssql-backend/

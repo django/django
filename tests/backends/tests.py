@@ -806,7 +806,8 @@ class ThreadTests(TransactionTestCase):
 class MySQLPKZeroTests(TestCase):
     """
     Zero as id for AutoField should raise exception in MySQL, because MySQL
-    does not allow zero for autoincrement primary key.
+    does not allow zero for autoincrement primary key if the
+    NO_AUTO_VALUE_ON_ZERO SQL mode is not enabled.
     """
     @skipIfDBFeature('allows_auto_pk_0')
     def test_zero_as_autoval(self):

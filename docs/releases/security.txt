@@ -1082,3 +1082,27 @@ Versions affected
 * Django 3.0 :commit:`(patch) <26a5cf834526e291db00385dd33d319b8271fc4c>`
 * Django 2.2 :commit:`(patch) <fe886a3b58a93cfbe8864b485f93cb6d426cd1f2>`
 * Django 1.11 :commit:`(patch) <02d97f3c9a88adc890047996e5606180bd1c6166>`
+
+June 3, 2020 - :cve:`2020-13254`
+--------------------------------
+
+Potential data leakage via malformed memcached keys. `Full description
+<https://www.djangoproject.com/weblog/2020/jun/03/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.0 :commit:`(patch) <84b2da5552e100ae3294f564f6c862fef8d0e693>`
+* Django 2.2 :commit:`(patch) <07e59caa02831c4569bbebb9eb773bdd9cb4b206>`
+
+June 3, 2020 - :cve:`2020-13596`
+--------------------------------
+
+Possible XSS via admin ``ForeignKeyRawIdWidget``. `Full description
+<https://www.djangoproject.com/weblog/2020/jun/03/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.0 :commit:`(patch) <1f2dd37f6fcefdd10ed44cb233b2e62b520afb38>`
+* Django 2.2 :commit:`(patch) <6d61860b22875f358fac83d903dc629897934815>`

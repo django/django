@@ -1,4 +1,5 @@
 import operator
+import platform
 
 from django.db import transaction
 from django.db.backends.base.features import BaseDatabaseFeatures
@@ -18,17 +19,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_timezones = False
     max_query_params = 999
     supports_mixed_date_datetime_comparisons = False
-    can_introspect_autofield = True
-    can_introspect_decimal_field = False
-    can_introspect_duration_field = False
-    can_introspect_positive_integer_field = True
-    can_introspect_small_integer_field = True
-    introspected_big_auto_field_type = 'AutoField'
-    introspected_small_auto_field_type = 'AutoField'
     supports_transactions = True
     atomic_transactions = False
     can_rollback_ddl = True
-    supports_atomic_references_rename = Database.sqlite_version_info >= (3, 26, 0)
     can_create_inline_fk = False
     supports_paramstyle_pyformat = False
     can_clone_databases = True
@@ -50,6 +43,29 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_aggregate_filter_clause = Database.sqlite_version_info >= (3, 30, 1)
     supports_order_by_nulls_modifier = Database.sqlite_version_info >= (3, 30, 0)
     order_by_nulls_first = True
+    supports_json_field_contains = False
+    test_collations = {
+        'ci': 'nocase',
+        'cs': 'binary',
+    }
+
+    @cached_property
+    def supports_atomic_references_rename(self):
+        # SQLite 3.28.0 bundled with MacOS 10.15 does not support renaming
+        # references atomically.
+        if platform.mac_ver()[0].startswith('10.15.') and Database.sqlite_version_info == (3, 28, 0):
+            return False
+        return Database.sqlite_version_info >= (3, 26, 0)
+
+    @cached_property
+    def introspected_field_types(self):
+        return{
+            **super().introspected_field_types,
+            'BigAutoField': 'AutoField',
+            'DurationField': 'BigIntegerField',
+            'GenericIPAddressField': 'CharField',
+            'SmallAutoField': 'AutoField',
+        }
 
     @cached_property
     def supports_json_field(self):

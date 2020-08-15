@@ -1,4 +1,4 @@
-from django.db.models import CharField, Value as V
+from django.db.models import Value as V
 from django.db.models.functions import Lower, StrIndex, Substr, Upper
 from django.test import TestCase
 
@@ -45,7 +45,7 @@ class SubstrTests(TestCase):
     def test_expressions(self):
         Author.objects.create(name='John Smith', alias='smithj')
         Author.objects.create(name='Rhonda')
-        substr = Substr(Upper('name'), StrIndex('name', V('h')), 5, output_field=CharField())
+        substr = Substr(Upper('name'), StrIndex('name', V('h')), 5)
         authors = Author.objects.annotate(name_part=substr)
         self.assertQuerysetEqual(
             authors.order_by('name'), ['HN SM', 'HONDA'],

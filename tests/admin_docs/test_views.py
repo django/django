@@ -113,7 +113,7 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
             response = self.client.get(reverse('django-admindocs-docroot'))
             self.assertContains(
                 response,
-                '<h3>The admin documentation system requires Python\'s '
+                '<h3>The admin documentation system requires Python’s '
                 '<a href="https://docutils.sourceforge.io/">docutils</a> '
                 'library.</h3>'
                 '<p>Please ask your administrators to install '

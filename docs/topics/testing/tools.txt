@@ -881,6 +881,42 @@ It also provides an additional method:
         previous versions of Django these objects were reused and changes made
         to them were persisted between test methods.
 
+.. classmethod:: TestCase.captureOnCommitCallbacks(using=DEFAULT_DB_ALIAS, execute=False)
+
+    .. versionadded:: 3.2
+
+    Returns a context manager that captures :func:`transaction.on_commit()
+    <django.db.transaction.on_commit>` callbacks for the given database
+    connection. It returns a list that contains, on exit of the context, the
+    captured callback functions. From this list you can make assertions on the
+    callbacks or call them to invoke their side effects, emulating a commit.
+
+    ``using`` is the alias of the database connection to capture callbacks for.
+
+    If ``execute`` is ``True``, all the callbacks will be called as the context
+    manager exits, if no exception occurred. This emulates a commit after the
+    wrapped block of code.
+
+    For example::
+
+        from django.core import mail
+        from django.test import TestCase
+
+
+        class ContactTests(TestCase):
+            def test_post(self):
+                with self.captureOnCommitCallbacks(execute=True) as callbacks:
+                    response = self.client.post(
+                        '/contact/',
+                        {'message': 'I like your site'},
+                    )
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(callbacks), 1)
+                self.assertEqual(len(mail.outbox), 1)
+                self.assertEqual(mail.outbox[0].subject, 'Contact Form')
+                self.assertEqual(mail.outbox[0].body, 'I like your site')
+
 .. _live-test-server:
 
 ``LiveServerTestCase``
@@ -1651,10 +1687,11 @@ your test suite.
 
     Asserts that a queryset ``qs`` returns a particular list of values ``values``.
 
-    The comparison of the contents of ``qs`` and ``values`` is performed using
-    the function ``transform``; by default, this means that the ``repr()`` of
-    each value is compared. Any other callable can be used if ``repr()`` doesn't
-    provide a unique or helpful comparison.
+    The comparison of the contents of ``qs`` and ``values`` is performed by
+    applying ``transform`` to ``qs``. By default, this means that the
+    ``repr()`` of each value in ``qs`` is compared to the ``values``. Any other
+    callable can be used if ``repr()`` doesn't provide a unique or helpful
+    comparison.
 
     By default, the comparison is also ordering dependent. If ``qs`` doesn't
     provide an implicit ordering, you can set the ``ordered`` parameter to

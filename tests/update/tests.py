@@ -1,9 +1,12 @@
+import unittest
+
 from django.core.exceptions import FieldError
+from django.db import IntegrityError, connection, transaction
 from django.db.models import Count, F, Max
 from django.db.models.functions import Concat, Lower
 from django.test import TestCase
 
-from .models import A, B, Bar, D, DataPoint, Foo, RelatedPoint
+from .models import A, B, Bar, D, DataPoint, Foo, RelatedPoint, UniqueNumber
 
 
 class SimpleTest(TestCase):
@@ -199,3 +202,38 @@ class AdvancedTests(TestCase):
             with self.subTest(annotation=annotation):
                 with self.assertRaisesMessage(FieldError, msg):
                     RelatedPoint.objects.annotate(new_name=annotation).update(name=F('new_name'))
+
+
+@unittest.skipUnless(
+    connection.vendor == 'mysql',
+    'UPDATE...ORDER BY syntax is supported on MySQL/MariaDB',
+)
+class MySQLUpdateOrderByTest(TestCase):
+    """Update field with a unique constraint using an ordered queryset."""
+    @classmethod
+    def setUpTestData(cls):
+        UniqueNumber.objects.create(number=1)
+        UniqueNumber.objects.create(number=2)
+
+    def test_order_by_update_on_unique_constraint(self):
+        tests = [
+            ('-number', 'id'),
+            (F('number').desc(), 'id'),
+            (F('number') * -1, 'id'),
+        ]
+        for ordering in tests:
+            with self.subTest(ordering=ordering), transaction.atomic():
+                updated = UniqueNumber.objects.order_by(*ordering).update(
+                    number=F('number') + 1,
+                )
+                self.assertEqual(updated, 2)
+
+    def test_order_by_update_on_unique_constraint_annotation(self):
+        # Ordering by annotations is omitted because they cannot be resolved in
+        # .update().
+        with self.assertRaises(IntegrityError):
+            UniqueNumber.objects.annotate(
+                number_inverse=F('number').desc(),
+            ).order_by('number_inverse').update(
+                number=F('number') + 1,
+            )

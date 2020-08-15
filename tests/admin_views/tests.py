@@ -791,7 +791,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertEqual(response.status_code, 200)
 
         # Filters should be allowed if they involve a local field without the
-        # need to whitelist them in list_filter or date_hierarchy.
+        # need to allow them in list_filter or date_hierarchy.
         response = self.client.get("%s?age__gt=30" % reverse('admin:admin_views_person_changelist'))
         self.assertEqual(response.status_code, 200)
 
@@ -1006,26 +1006,26 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         )
         response = self.client.get(reverse('admin6:admin_views_article_changelist'))
         for field_name in expected_sortable_fields:
-            self.assertContains(response, '<th scope="col"  class="sortable column-%s">' % field_name)
+            self.assertContains(response, '<th scope="col" class="sortable column-%s">' % field_name)
         for field_name in expected_not_sortable_fields:
-            self.assertContains(response, '<th scope="col"  class="column-%s">' % field_name)
+            self.assertContains(response, '<th scope="col" class="column-%s">' % field_name)
 
     def test_get_sortable_by_columns_subset(self):
         response = self.client.get(reverse('admin6:admin_views_actor_changelist'))
-        self.assertContains(response, '<th scope="col"  class="sortable column-age">')
-        self.assertContains(response, '<th scope="col"  class="column-name">')
+        self.assertContains(response, '<th scope="col" class="sortable column-age">')
+        self.assertContains(response, '<th scope="col" class="column-name">')
 
     def test_sortable_by_no_column(self):
         expected_not_sortable_fields = ('title', 'book')
         response = self.client.get(reverse('admin6:admin_views_chapter_changelist'))
         for field_name in expected_not_sortable_fields:
-            self.assertContains(response, '<th scope="col"  class="column-%s">' % field_name)
-        self.assertNotContains(response, '<th scope="col"  class="sortable column')
+            self.assertContains(response, '<th scope="col" class="column-%s">' % field_name)
+        self.assertNotContains(response, '<th scope="col" class="sortable column')
 
     def test_get_sortable_by_no_column(self):
         response = self.client.get(reverse('admin6:admin_views_color_changelist'))
-        self.assertContains(response, '<th scope="col"  class="column-value">')
-        self.assertNotContains(response, '<th scope="col"  class="sortable column')
+        self.assertContains(response, '<th scope="col" class="column-value">')
+        self.assertNotContains(response, '<th scope="col" class="sortable column')
 
 
 @override_settings(TEMPLATES=[{
@@ -3292,7 +3292,7 @@ class AdminViewListEditable(TestCase):
         self.assertContains(response, 'Unordered object #3')
         self.assertContains(response, 'Unordered object #2')
         self.assertNotContains(response, 'Unordered object #1')
-        response = self.client.get(reverse('admin:admin_views_unorderedobject_changelist') + '?p=1')
+        response = self.client.get(reverse('admin:admin_views_unorderedobject_changelist') + '?p=2')
         self.assertNotContains(response, 'Unordered object #3')
         self.assertNotContains(response, 'Unordered object #2')
         self.assertContains(response, 'Unordered object #1')
@@ -3439,6 +3439,8 @@ class AdminSearchTest(TestCase):
         cls.per1 = Person.objects.create(name='John Mauchly', gender=1, alive=True)
         cls.per2 = Person.objects.create(name='Grace Hopper', gender=1, alive=False)
         cls.per3 = Person.objects.create(name='Guido van Rossum', gender=1, alive=True)
+        Person.objects.create(name='John Doe', gender=1)
+        Person.objects.create(name="John O'Hara", gender=1)
 
         cls.t1 = Recommender.objects.create()
         cls.t2 = Recommendation.objects.create(the_recommender=cls.t1)
@@ -3513,7 +3515,7 @@ class AdminSearchTest(TestCase):
             response = self.client.get(reverse('admin:admin_views_person_changelist') + '?q=Gui')
         self.assertContains(
             response,
-            """<span class="small quiet">1 result (<a href="?">3 total</a>)</span>""",
+            """<span class="small quiet">1 result (<a href="?">5 total</a>)</span>""",
             html=True
         )
 
@@ -3532,6 +3534,24 @@ class AdminSearchTest(TestCase):
             html=True
         )
         self.assertTrue(response.context['cl'].show_admin_actions)
+
+    def test_search_with_spaces(self):
+        url = reverse('admin:admin_views_person_changelist') + '?q=%s'
+        tests = [
+            ('"John Doe"', 1),
+            ("'John Doe'", 1),
+            ('John Doe', 0),
+            ('"John Doe" John', 1),
+            ("'John Doe' John", 1),
+            ("John Doe John", 0),
+            ('"John Do"', 1),
+            ("'John Do'", 1),
+            ("'John O\\'Hara'", 1),
+        ]
+        for search, hits in tests:
+            with self.subTest(search=search):
+                response = self.client.get(url % search)
+                self.assertContains(response, '\n%s person' % hits)
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
@@ -4440,6 +4460,17 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
         self.p1 = PrePopulatedPost.objects.create(title='A Long Title', published=True, slug='a-long-title')
 
+    def test_login_button_centered(self):
+        self.selenium.get(self.live_server_url + reverse('admin:login'))
+        button = self.selenium.find_element_by_css_selector('.submit-row input')
+        offset_left = button.get_property('offsetLeft')
+        offset_right = (
+            button.get_property('offsetParent').get_property('offsetWidth') -
+            (offset_left + button.get_property('offsetWidth'))
+        )
+        # Use assertAlmostEqual to avoid pixel rounding errors.
+        self.assertAlmostEqual(offset_left, offset_right, delta=3)
+
     def test_prepopulated_fields(self):
         """
         The JavaScript-automated prepopulated fields work with the main form
@@ -4453,13 +4484,13 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Main form ----------------------------------------------------------
         self.selenium.find_element_by_id('id_pubdate').send_keys('2012-02-18')
         self.select_option('#id_status', 'option two')
-        self.selenium.find_element_by_id('id_name').send_keys(' this is the mAin nÀMë and it\'s awεšomeıııİ')
+        self.selenium.find_element_by_id('id_name').send_keys(' the mAin nÀMë and it\'s awεšomeıııİ')
         slug1 = self.selenium.find_element_by_id('id_slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_id('id_slug2').get_attribute('value')
         slug3 = self.selenium.find_element_by_id('id_slug3').get_attribute('value')
-        self.assertEqual(slug1, 'main-name-and-its-awesomeiiii-2012-02-18')
-        self.assertEqual(slug2, 'option-two-main-name-and-its-awesomeiiii')
-        self.assertEqual(slug3, 'this-is-the-main-n\xe0m\xeb-and-its-aw\u03b5\u0161ome\u0131\u0131\u0131i')
+        self.assertEqual(slug1, 'the-main-name-and-its-awesomeiiii-2012-02-18')
+        self.assertEqual(slug2, 'option-two-the-main-name-and-its-awesomeiiii')
+        self.assertEqual(slug3, 'the-main-n\xe0m\xeb-and-its-aw\u03b5\u0161ome\u0131\u0131\u0131i')
 
         # Stacked inlines ----------------------------------------------------
         # Initial inline
@@ -4470,8 +4501,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         slug1 = self.selenium.find_element_by_id('id_relatedprepopulated_set-0-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_id('id_relatedprepopulated_set-0-slug2').get_attribute('value')
-        self.assertEqual(slug1, 'here-stacked-inline-2011-12-17')
-        self.assertEqual(slug2, 'option-one-here-stacked-inline')
+        self.assertEqual(slug1, 'here-is-a-stacked-inline-2011-12-17')
+        self.assertEqual(slug2, 'option-one-here-is-a-stacked-inline')
         initial_select2_inputs = self.selenium.find_elements_by_class_name('select2-selection')
         # Inline formsets have empty/invisible forms.
         # Only the 4 visible select2 inputs are initialized.
@@ -4493,9 +4524,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         slug1 = self.selenium.find_element_by_id('id_relatedprepopulated_set-1-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_id('id_relatedprepopulated_set-1-slug2').get_attribute('value')
         # 50 characters maximum for slug1 field
-        self.assertEqual(slug1, 'now-you-have-another-stacked-inline-very-loooooooo')
+        self.assertEqual(slug1, 'now-you-have-another-stacked-inline-with-a-very-lo')
         # 60 characters maximum for slug2 field
-        self.assertEqual(slug2, 'option-two-now-you-have-another-stacked-inline-very-looooooo')
+        self.assertEqual(slug2, 'option-two-now-you-have-another-stacked-inline-with-a-very-l')
 
         # Tabular inlines ----------------------------------------------------
         # Initial inline
@@ -4506,8 +4537,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         slug1 = self.selenium.find_element_by_id('id_relatedprepopulated_set-2-0-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_id('id_relatedprepopulated_set-2-0-slug2').get_attribute('value')
-        self.assertEqual(slug1, 'and-now-tabular-inline-1234-12-07')
-        self.assertEqual(slug2, 'option-two-and-now-tabular-inline')
+        self.assertEqual(slug1, 'and-now-with-a-tabular-inline-1234-12-07')
+        self.assertEqual(slug2, 'option-two-and-now-with-a-tabular-inline')
 
         # Add an inline
         # Button may be outside the browser frame.
@@ -4521,12 +4552,12 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-pubdate').send_keys('1981-08-22')
         self.select_option('#id_relatedprepopulated_set-2-1-status', 'option one')
         self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-name').send_keys(
-            r'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters'
+            r'tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters'
         )
         slug1 = self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-slug2').get_attribute('value')
-        self.assertEqual(slug1, 'tabular-inline-ignored-characters-1981-08-22')
-        self.assertEqual(slug2, 'option-one-tabular-inline-ignored-characters')
+        self.assertEqual(slug1, 'tabular-inline-with-ignored-characters-1981-08-22')
+        self.assertEqual(slug2, 'option-one-tabular-inline-with-ignored-characters')
         # Add an inline without an initial inline.
         # The button is outside of the browser frame.
         self.selenium.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -4540,42 +4571,42 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         self.assertEqual(MainPrepopulated.objects.all().count(), 1)
         MainPrepopulated.objects.get(
-            name=' this is the mAin nÀMë and it\'s awεšomeıııİ',
+            name=' the mAin nÀMë and it\'s awεšomeıııİ',
             pubdate='2012-02-18',
             status='option two',
-            slug1='main-name-and-its-awesomeiiii-2012-02-18',
-            slug2='option-two-main-name-and-its-awesomeiiii',
-            slug3='this-is-the-main-nàmë-and-its-awεšomeıııi',
+            slug1='the-main-name-and-its-awesomeiiii-2012-02-18',
+            slug2='option-two-the-main-name-and-its-awesomeiiii',
+            slug3='the-main-nàmë-and-its-awεšomeıııi',
         )
         self.assertEqual(RelatedPrepopulated.objects.all().count(), 4)
         RelatedPrepopulated.objects.get(
             name=' here is a sŤāÇkeð   inline !  ',
             pubdate='2011-12-17',
             status='option one',
-            slug1='here-stacked-inline-2011-12-17',
-            slug2='option-one-here-stacked-inline',
+            slug1='here-is-a-stacked-inline-2011-12-17',
+            slug2='option-one-here-is-a-stacked-inline',
         )
         RelatedPrepopulated.objects.get(
             # 75 characters in name field
             name=' now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooo',
             pubdate='1999-01-25',
             status='option two',
-            slug1='now-you-have-another-stacked-inline-very-loooooooo',
-            slug2='option-two-now-you-have-another-stacked-inline-very-looooooo',
+            slug1='now-you-have-another-stacked-inline-with-a-very-lo',
+            slug2='option-two-now-you-have-another-stacked-inline-with-a-very-l',
         )
         RelatedPrepopulated.objects.get(
             name='And now, with a tÃbűlaŘ inline !!!',
             pubdate='1234-12-07',
             status='option two',
-            slug1='and-now-tabular-inline-1234-12-07',
-            slug2='option-two-and-now-tabular-inline',
+            slug1='and-now-with-a-tabular-inline-1234-12-07',
+            slug2='option-two-and-now-with-a-tabular-inline',
         )
         RelatedPrepopulated.objects.get(
-            name=r'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters',
+            name=r'tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters',
             pubdate='1981-08-22',
             status='option one',
-            slug1='tabular-inline-ignored-characters-1981-08-22',
-            slug2='option-one-tabular-inline-ignored-characters',
+            slug1='tabular-inline-with-ignored-characters-1981-08-22',
+            slug2='option-one-tabular-inline-with-ignored-characters',
         )
 
     def test_populate_existing_object(self):
@@ -4601,8 +4632,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         # The slugs got prepopulated since they were originally empty
         slug1 = self.selenium.find_element_by_id('id_slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_id('id_slug2').get_attribute('value')
-        self.assertEqual(slug1, 'main-name-best-2012-02-18')
-        self.assertEqual(slug2, 'option-two-main-name-best')
+        self.assertEqual(slug1, 'this-is-the-main-name-the-best-2012-02-18')
+        self.assertEqual(slug2, 'option-two-this-is-the-main-name-the-best')
 
         # Save the object
         with self.wait_page_loaded():
@@ -4614,8 +4645,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         # The slugs got prepopulated didn't change since they were originally not empty
         slug1 = self.selenium.find_element_by_id('id_slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_id('id_slug2').get_attribute('value')
-        self.assertEqual(slug1, 'main-name-best-2012-02-18')
-        self.assertEqual(slug2, 'option-two-main-name-best')
+        self.assertEqual(slug1, 'this-is-the-main-name-the-best-2012-02-18')
+        self.assertEqual(slug2, 'option-two-this-is-the-main-name-the-best')
 
     def test_collapsible_fieldset(self):
         """
@@ -4801,6 +4832,23 @@ class SeleniumTests(AdminSeleniumTestCase):
         # The newly selected pk should appear in the raw id input.
         value = self.selenium.find_element_by_id('id_form-0-parent').get_attribute('value')
         self.assertEqual(value, str(parent2.pk))
+
+    def test_input_element_font(self):
+        """
+        Browsers' default stylesheets override the font of inputs. The admin
+        adds additional CSS to handle this.
+        """
+        self.selenium.get(self.live_server_url + reverse('admin:login'))
+        element = self.selenium.find_element_by_id('id_username')
+        # Some browsers quotes the fonts, some don't.
+        fonts = [
+            font.strip().strip('"')
+            for font in element.value_of_css_property('font-family').split(',')
+        ]
+        self.assertEqual(
+            fonts,
+            ['Roboto', 'Lucida Grande', 'Verdana', 'Arial', 'sans-serif'],
+        )
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')

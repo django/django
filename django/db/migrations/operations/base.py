@@ -79,6 +79,14 @@ class Operation:
         """
         return "%s: %s" % (self.__class__.__name__, self._constructor_args)
 
+    @property
+    def migration_name_fragment(self):
+        """
+        A filename part suitable for automatically naming a migration
+        containing this operation, or None if not applicable.
+        """
+        return None
+
     def references_model(self, name, app_label):
         """
         Return True if there is a chance this operation references the given

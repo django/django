@@ -143,7 +143,9 @@ class RasterFieldTest(TransactionTestCase):
         unprojected coordinate systems. This test just checks that the lookup
         can be called, but doesn't check if the result makes logical sense.
         """
-        from django.contrib.gis.db.backends.postgis.operations import PostGISOperations
+        from django.contrib.gis.db.backends.postgis.operations import (
+            PostGISOperations,
+        )
 
         # Create test raster and geom.
         rast = GDALRaster(json.loads(JSON_RASTER))

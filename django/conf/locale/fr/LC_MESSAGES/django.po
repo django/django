@@ -2,7 +2,7 @@
 #
 # Translators:
 # Simon Charette <charette.s@gmail.com>, 2012
-# Claude Paroz <claude@2xlibre.net>, 2013-2019
+# Claude Paroz <claude@2xlibre.net>, 2013-2020
 # Claude Paroz <claude@2xlibre.net>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jean-Baptiste Mora, 2014
@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-29 09:09+0000\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-15 08:41+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -27,6 +27,9 @@ msgstr "Afrikaans"
 
 msgid "Arabic"
 msgstr "Arabe"
+
+msgid "Algerian Arabic"
+msgstr "Arabe algérien"
 
 msgid "Asturian"
 msgstr "Asturien"
@@ -151,6 +154,9 @@ msgstr "Interlingua"
 msgid "Indonesian"
 msgstr "Indonésien"
 
+msgid "Igbo"
+msgstr "Igbo"
+
 msgid "Ido"
 msgstr "Ido"
 
@@ -180,6 +186,9 @@ msgstr "Kannada"
 
 msgid "Korean"
 msgstr "Coréen"
+
+msgid "Kyrgyz"
+msgstr "Kirghize"
 
 msgid "Luxembourgish"
 msgstr "Luxembourgeois"
@@ -265,8 +274,14 @@ msgstr "Tamoul"
 msgid "Telugu"
 msgstr "Télougou"
 
+msgid "Tajik"
+msgstr "Tadjik"
+
 msgid "Thai"
 msgstr "Thaï"
+
+msgid "Turkmen"
+msgstr "Turkmène"
 
 msgid "Turkish"
 msgstr "Turc"
@@ -583,6 +598,9 @@ msgstr ""
 msgid "Boolean (Either True, False or None)"
 msgstr "Booléen (soit vrai, faux ou nul)"
 
+msgid "Positive big integer"
+msgstr "Grand nombre entier positif"
+
 msgid "Positive integer"
 msgstr "Nombre entier positif"
 
@@ -636,6 +654,12 @@ msgstr "Fichier"
 
 msgid "Image"
 msgstr "Image"
+
+msgid "A JSON object"
+msgstr "Un objet JSON"
+
+msgid "Value must be valid JSON."
+msgstr "La valeur doit être de la syntaxe JSON valable."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -730,6 +754,9 @@ msgstr "Saisissez une valeur complète."
 msgid "Enter a valid UUID."
 msgstr "Saisissez un UUID valide."
 
+msgid "Enter a valid JSON."
+msgstr "Saisissez du contenu JSON valide."
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr " :"
@@ -820,15 +847,7 @@ msgstr "Oui"
 msgid "No"
 msgstr "Non"
 
-msgid "Year"
-msgstr "Année"
-
-msgid "Month"
-msgstr "Mois"
-
-msgid "Day"
-msgstr "Jour"
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "oui,non,peut-être"
 
@@ -1136,9 +1155,6 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minute"
 msgstr[1] "%d minutes"
-
-msgid "0 minutes"
-msgstr "0 minute"
 
 msgid "Forbidden"
 msgstr "Interdit"

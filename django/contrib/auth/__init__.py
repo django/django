@@ -217,6 +217,3 @@ def update_session_auth_hash(request, user):
     request.session.cycle_key()
     if hasattr(user, 'get_session_auth_hash') and request.user == user:
         request.session[HASH_SESSION_KEY] = user.get_session_auth_hash()
-
-
-default_app_config = 'django.contrib.auth.apps.AuthConfig'

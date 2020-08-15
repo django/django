@@ -307,7 +307,7 @@ class TemplateCommand(BaseCommand):
 
     def extract(self, filename):
         """
-        Extract the given file to a temporarily and return
+        Extract the given file to a temporary directory and return
         the path of the directory with the extracted content.
         """
         prefix = 'django_%s_template_' % self.app_or_project

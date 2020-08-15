@@ -136,10 +136,20 @@ class SyndicationFeedTest(FeedTestCase):
             'guid': 'http://example.com/blog/1/',
             'pubDate': pub_date,
             'author': 'test@example.com (Sally Smith)',
+            'comments': '/blog/1/comments',
         })
         self.assertCategories(items[0], ['python', 'testing'])
         for item in items:
-            self.assertChildNodes(item, ['title', 'link', 'description', 'guid', 'category', 'pubDate', 'author'])
+            self.assertChildNodes(item, [
+                'title',
+                'link',
+                'description',
+                'guid',
+                'category',
+                'pubDate',
+                'author',
+                'comments',
+            ])
             # Assert that <guid> does not have any 'isPermaLink' attribute
             self.assertIsNone(item.getElementsByTagName(
                 'guid')[0].attributes.get('isPermaLink'))

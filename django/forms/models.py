@@ -815,7 +815,7 @@ class BaseModelFormSet(BaseFormSet):
 
     def add_fields(self, form, index):
         """Add a hidden field for the object's primary key."""
-        from django.db.models import AutoField, OneToOneField, ForeignKey
+        from django.db.models import AutoField, ForeignKey, OneToOneField
         self._pk_field = pk = self.model._meta.pk
         # If a pk isn't editable, then it won't be on the form, so we need to
         # add it here so we can tell which object is which when we get the
@@ -862,7 +862,8 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
                          can_order=False, max_num=None, fields=None, exclude=None,
                          widgets=None, validate_max=False, localized_fields=None,
                          labels=None, help_texts=None, error_messages=None,
-                         min_num=None, validate_min=False, field_classes=None):
+                         min_num=None, validate_min=False, field_classes=None,
+                         absolute_max=None, can_delete_extra=True):
     """Return a FormSet class for the given Django model class."""
     meta = getattr(form, 'Meta', None)
     if (getattr(meta, 'fields', fields) is None and
@@ -879,7 +880,8 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
                              error_messages=error_messages, field_classes=field_classes)
     FormSet = formset_factory(form, formset, extra=extra, min_num=min_num, max_num=max_num,
                               can_order=can_order, can_delete=can_delete,
-                              validate_min=validate_min, validate_max=validate_max)
+                              validate_min=validate_min, validate_max=validate_max,
+                              absolute_max=absolute_max, can_delete_extra=can_delete_extra)
     FormSet.model = model
     return FormSet
 
@@ -1048,7 +1050,8 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
                           can_delete=True, max_num=None, formfield_callback=None,
                           widgets=None, validate_max=False, localized_fields=None,
                           labels=None, help_texts=None, error_messages=None,
-                          min_num=None, validate_min=False, field_classes=None):
+                          min_num=None, validate_min=False, field_classes=None,
+                          absolute_max=None, can_delete_extra=True):
     """
     Return an ``InlineFormSet`` for the given kwargs.
 
@@ -1078,6 +1081,8 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
         'help_texts': help_texts,
         'error_messages': error_messages,
         'field_classes': field_classes,
+        'absolute_max': absolute_max,
+        'can_delete_extra': can_delete_extra,
     }
     FormSet = modelformset_factory(model, **kwargs)
     FormSet.fk = fk

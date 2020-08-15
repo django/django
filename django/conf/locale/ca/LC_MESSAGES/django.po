@@ -7,15 +7,16 @@
 # Gil Obradors Via <gil.obradors@gmail.com>, 2019
 # Gil Obradors Via <gil.obradors@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Manel Clos <manelclos@gmail.com>, 2020
 # Manuel Miranda <manu.mirandad@gmail.com>, 2015
 # Roger Pons <rogerpons@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-05 00:38+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-14 21:42+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -29,6 +30,9 @@ msgstr "Afrikans"
 
 msgid "Arabic"
 msgstr "àrab"
+
+msgid "Algerian Arabic"
+msgstr "àrab argelià"
 
 msgid "Asturian"
 msgstr "Asturià"
@@ -153,6 +157,9 @@ msgstr "Interlingua"
 msgid "Indonesian"
 msgstr "indonesi"
 
+msgid "Igbo"
+msgstr ""
+
 msgid "Ido"
 msgstr "Ido"
 
@@ -182,6 +189,9 @@ msgstr "kannarès"
 
 msgid "Korean"
 msgstr "coreà"
+
+msgid "Kyrgyz"
+msgstr ""
 
 msgid "Luxembourgish"
 msgstr "Luxemburguès"
@@ -267,8 +277,14 @@ msgstr "tàmil"
 msgid "Telugu"
 msgstr "telugu"
 
+msgid "Tajik"
+msgstr ""
+
 msgid "Thai"
 msgstr "tailandès"
+
+msgid "Turkmen"
+msgstr ""
 
 msgid "Turkish"
 msgstr "turc"
@@ -286,7 +302,7 @@ msgid "Urdu"
 msgstr "urdu"
 
 msgid "Uzbek"
-msgstr ""
+msgstr "Uzbek"
 
 msgid "Vietnamese"
 msgstr "vietnamita"
@@ -577,6 +593,9 @@ msgstr "El valor '%(value)s' ha de ser None, True o False."
 msgid "Boolean (Either True, False or None)"
 msgstr "Booleà (Cert, Fals o Cap ('None'))"
 
+msgid "Positive big integer"
+msgstr "Enter gran positiu"
+
 msgid "Positive integer"
 msgstr "Enter positiu"
 
@@ -630,6 +649,12 @@ msgstr "Arxiu"
 
 msgid "Image"
 msgstr "Imatge"
+
+msgid "A JSON object"
+msgstr "Un objecte JSON"
+
+msgid "Value must be valid JSON."
+msgstr "El valor ha de ser JSON vàlid."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -726,6 +751,9 @@ msgstr "Introduïu un valor complet."
 msgid "Enter a valid UUID."
 msgstr "Intrudueixi un UUID vàlid."
 
+msgid "Enter a valid JSON."
+msgstr "Entreu un JSON vàlid."
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -813,15 +841,7 @@ msgstr "Sí"
 msgid "No"
 msgstr "No"
 
-msgid "Year"
-msgstr "Any"
-
-msgid "Month"
-msgstr "Mes"
-
-msgid "Day"
-msgstr "Dia"
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "sí,no,potser"
 
@@ -1129,9 +1149,6 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minut"
 msgstr[1] "%d minuts"
-
-msgid "0 minutes"
-msgstr "0 minuts"
 
 msgid "Forbidden"
 msgstr "Prohibit"

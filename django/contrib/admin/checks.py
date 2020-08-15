@@ -132,6 +132,12 @@ def check_dependencies(**kwargs):
         errors.append(checks.Error(
             "'django.contrib.sessions.middleware.SessionMiddleware' must "
             "be in MIDDLEWARE in order to use the admin application.",
+            hint=(
+                "Insert "
+                "'django.contrib.sessions.middleware.SessionMiddleware' "
+                "before "
+                "'django.contrib.auth.middleware.AuthenticationMiddleware'."
+            ),
             id='admin.E410',
         ))
     return errors
@@ -808,8 +814,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         2. ('field', SomeFieldListFilter) - a field-based list filter class
         3. SomeListFilter - a non-field list filter class
         """
-
-        from django.contrib.admin import ListFilter, FieldListFilter
+        from django.contrib.admin import FieldListFilter, ListFilter
 
         if callable(item) and not isinstance(item, models.Field):
             # If item is option 3, it should be a ListFilter...

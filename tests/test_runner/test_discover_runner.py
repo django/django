@@ -1,12 +1,16 @@
 import os
 from argparse import ArgumentParser
 from contextlib import contextmanager
-from unittest import TestSuite, TextTestRunner, defaultTestLoader, skipUnless
+from unittest import (
+    TestSuite, TextTestRunner, defaultTestLoader, mock, skipUnless,
+)
 
 from django.db import connections
 from django.test import SimpleTestCase
 from django.test.runner import DiscoverRunner
-from django.test.utils import captured_stderr, captured_stdout
+from django.test.utils import (
+    NullTimeKeeper, TimeKeeper, captured_stderr, captured_stdout,
+)
 from django.utils.version import PY37
 
 
@@ -296,6 +300,49 @@ class DiscoverRunnerTests(SimpleTestCase):
             runner.run_suite(suite)
         self.assertIn('Write to stderr.', stderr.getvalue())
         self.assertIn('Write to stdout.', stdout.getvalue())
+
+    @mock.patch('faulthandler.enable')
+    def test_faulthandler_enabled(self, mocked_enable):
+        with mock.patch('faulthandler.is_enabled', return_value=False):
+            DiscoverRunner(enable_faulthandler=True)
+            mocked_enable.assert_called()
+
+    @mock.patch('faulthandler.enable')
+    def test_faulthandler_already_enabled(self, mocked_enable):
+        with mock.patch('faulthandler.is_enabled', return_value=True):
+            DiscoverRunner(enable_faulthandler=True)
+            mocked_enable.assert_not_called()
+
+    @mock.patch('faulthandler.enable')
+    def test_faulthandler_enabled_fileno(self, mocked_enable):
+        # sys.stderr that is not an actual file.
+        with mock.patch('faulthandler.is_enabled', return_value=False), captured_stderr():
+            DiscoverRunner(enable_faulthandler=True)
+            mocked_enable.assert_called()
+
+    @mock.patch('faulthandler.enable')
+    def test_faulthandler_disabled(self, mocked_enable):
+        with mock.patch('faulthandler.is_enabled', return_value=False):
+            DiscoverRunner(enable_faulthandler=False)
+            mocked_enable.assert_not_called()
+
+    def test_timings_not_captured(self):
+        runner = DiscoverRunner(timing=False)
+        with captured_stderr() as stderr:
+            with runner.time_keeper.timed('test'):
+                pass
+            runner.time_keeper.print_results()
+        self.assertTrue(isinstance(runner.time_keeper, NullTimeKeeper))
+        self.assertNotIn('test', stderr.getvalue())
+
+    def test_timings_captured(self):
+        runner = DiscoverRunner(timing=True)
+        with captured_stderr() as stderr:
+            with runner.time_keeper.timed('test'):
+                pass
+            runner.time_keeper.print_results()
+        self.assertTrue(isinstance(runner.time_keeper, TimeKeeper))
+        self.assertIn('test', stderr.getvalue())
 
 
 class DiscoverRunnerGetDatabasesTests(SimpleTestCase):

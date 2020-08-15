@@ -246,7 +246,7 @@ Minor features
 
 * The new :meth:`GDALRaster.warp() <django.contrib.gis.gdal.GDALRaster.warp>`
   method allows warping a raster by specifying target raster properties such as
-  origin, width, height, or pixel size (amongst others).
+  origin, width, height, or pixel size (among others).
 
 * The new :meth:`GDALRaster.transform()
   <django.contrib.gis.gdal.GDALRaster.transform>` method allows transforming a

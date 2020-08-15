@@ -1,5 +1,6 @@
 from django.db import InterfaceError
 from django.db.backends.base.features import BaseDatabaseFeatures
+from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
@@ -10,7 +11,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update_of = True
     select_for_update_of_column = True
     can_return_columns_from_insert = True
-    can_introspect_autofield = True
     supports_subqueries_in_group_by = False
     supports_transactions = True
     supports_timezones = False
@@ -22,7 +22,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_tablespaces = True
     supports_sequence_reset = False
     can_introspect_materialized_views = True
-    can_introspect_time_field = False
     atomic_transactions = False
     supports_combined_alters = False
     nulls_order_largest = True
@@ -61,3 +60,21 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     allows_multiple_constraints_on_same_fields = False
     supports_boolean_expr_in_select_clause = False
     supports_primitives_in_json_field = False
+    supports_json_field_contains = False
+    test_collations = {
+        'ci': 'BINARY_CI',
+        'cs': 'BINARY',
+        'swedish_ci': 'SWEDISH_CI',
+    }
+
+    @cached_property
+    def introspected_field_types(self):
+        return {
+            **super().introspected_field_types,
+            'GenericIPAddressField': 'CharField',
+            'PositiveBigIntegerField': 'BigIntegerField',
+            'PositiveIntegerField': 'IntegerField',
+            'PositiveSmallIntegerField': 'IntegerField',
+            'SmallIntegerField': 'IntegerField',
+            'TimeField': 'DateTimeField',
+        }

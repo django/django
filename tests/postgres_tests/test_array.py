@@ -25,14 +25,17 @@ from .models import (
 )
 
 try:
+    from psycopg2.extras import NumericRange
+
     from django.contrib.postgres.aggregates import ArrayAgg
     from django.contrib.postgres.fields import ArrayField
-    from django.contrib.postgres.fields.array import IndexTransform, SliceTransform
+    from django.contrib.postgres.fields.array import (
+        IndexTransform, SliceTransform,
+    )
     from django.contrib.postgres.forms import (
         SimpleArrayField, SplitArrayField, SplitArrayWidget,
     )
     from django.db.backends.postgresql.base import PSYCOPG2_VERSION
-    from psycopg2.extras import NumericRange
 except ImportError:
     pass
 
@@ -489,7 +492,9 @@ class TestQuerying(PostgreSQLTestCase):
         value = models.Value([1], output_field=ArrayField(models.IntegerField()))
         self.assertEqual(
             NullableIntegerArrayModel.objects.annotate(
-                array_length=models.Func(value, 1, function='ARRAY_LENGTH'),
+                array_length=models.Func(
+                    value, 1, function='ARRAY_LENGTH', output_field=models.IntegerField(),
+                ),
             ).values('array_length').annotate(
                 count=models.Count('pk'),
             ).get()['array_length'],

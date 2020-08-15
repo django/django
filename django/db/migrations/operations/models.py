@@ -99,6 +99,10 @@ class CreateModel(ModelOperation):
     def describe(self):
         return "Create %smodel %s" % ("proxy " if self.options.get("proxy", False) else "", self.name)
 
+    @property
+    def migration_name_fragment(self):
+        return self.name_lower
+
     def references_model(self, name, app_label):
         name_lower = name.lower()
         if name_lower == self.name_lower:
@@ -273,6 +277,10 @@ class DeleteModel(ModelOperation):
     def describe(self):
         return "Delete model %s" % self.name
 
+    @property
+    def migration_name_fragment(self):
+        return 'delete_%s' % self.name_lower
+
 
 class RenameModel(ModelOperation):
     """Rename a model."""
@@ -397,6 +405,10 @@ class RenameModel(ModelOperation):
     def describe(self):
         return "Rename model %s to %s" % (self.old_name, self.new_name)
 
+    @property
+    def migration_name_fragment(self):
+        return 'rename_%s_%s' % (self.old_name_lower, self.new_name_lower)
+
     def reduce(self, operation, app_label):
         if (isinstance(operation, RenameModel) and
                 self.new_name_lower == operation.old_name_lower):
@@ -470,6 +482,10 @@ class AlterModelTable(ModelOptionOperation):
             self.table if self.table is not None else "(default)"
         )
 
+    @property
+    def migration_name_fragment(self):
+        return 'alter_%s_table' % self.name_lower
+
 
 class AlterTogetherOptionOperation(ModelOptionOperation):
     option_name = None
@@ -525,6 +541,10 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
 
     def describe(self):
         return "Alter %s for %s (%s constraint(s))" % (self.option_name, self.name, len(self.option_value or ''))
+
+    @property
+    def migration_name_fragment(self):
+        return 'alter_%s_%s' % (self.name_lower, self.option_name)
 
 
 class AlterUniqueTogether(AlterTogetherOptionOperation):
@@ -607,6 +627,10 @@ class AlterOrderWithRespectTo(ModelOptionOperation):
     def describe(self):
         return "Set order_with_respect_to on %s to %s" % (self.name, self.order_with_respect_to)
 
+    @property
+    def migration_name_fragment(self):
+        return 'alter_%s_order_with_respect_to' % self.name_lower
+
 
 class AlterModelOptions(ModelOptionOperation):
     """
@@ -662,6 +686,10 @@ class AlterModelOptions(ModelOptionOperation):
     def describe(self):
         return "Change Meta options on %s" % self.name
 
+    @property
+    def migration_name_fragment(self):
+        return 'alter_%s_options' % self.name_lower
+
 
 class AlterModelManagers(ModelOptionOperation):
     """Alter the model's managers."""
@@ -692,6 +720,10 @@ class AlterModelManagers(ModelOptionOperation):
 
     def describe(self):
         return "Change managers on %s" % self.name
+
+    @property
+    def migration_name_fragment(self):
+        return 'alter_%s_managers' % self.name_lower
 
 
 class IndexOperation(Operation):
@@ -747,6 +779,10 @@ class AddIndex(IndexOperation):
             self.model_name,
         )
 
+    @property
+    def migration_name_fragment(self):
+        return '%s_%s' % (self.model_name_lower, self.index.name.lower())
+
 
 class RemoveIndex(IndexOperation):
     """Remove an index from a model."""
@@ -789,6 +825,10 @@ class RemoveIndex(IndexOperation):
     def describe(self):
         return 'Remove index %s from %s' % (self.name, self.model_name)
 
+    @property
+    def migration_name_fragment(self):
+        return 'remove_%s_%s' % (self.model_name_lower, self.name.lower())
+
 
 class AddConstraint(IndexOperation):
     option_name = 'constraints'
@@ -820,6 +860,10 @@ class AddConstraint(IndexOperation):
 
     def describe(self):
         return 'Create constraint %s on model %s' % (self.constraint.name, self.model_name)
+
+    @property
+    def migration_name_fragment(self):
+        return '%s_%s' % (self.model_name_lower, self.constraint.name.lower())
 
 
 class RemoveConstraint(IndexOperation):
@@ -857,3 +901,7 @@ class RemoveConstraint(IndexOperation):
 
     def describe(self):
         return 'Remove constraint %s from model %s' % (self.name, self.model_name)
+
+    @property
+    def migration_name_fragment(self):
+        return 'remove_%s_%s' % (self.model_name_lower, self.name.lower())

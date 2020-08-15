@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015-2019
+# BouRock, 2015-2020
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@protonmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
@@ -10,12 +10,13 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Mesut Can Gürle <mesutcang@gmail.com>, 2013
 # Murat Sahin <martinamca@gmail.com>, 2011
+# Yigit Guler <yigit@hipo.biz>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-17 07:45+0000\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-07-15 08:30+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -75,6 +76,12 @@ msgstr "Tarih yok"
 
 msgid "Has date"
 msgstr "Tarih var"
+
+msgid "Empty"
+msgstr "Boş"
+
+msgid "Not empty"
+msgstr "Boş değil"
 
 #, python-format
 msgid ""
@@ -323,7 +330,7 @@ msgid ""
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 "Bir hata oluştu. Site yöneticilerine e-posta yoluyla bildirildi ve kısa süre "
-"içinde düzeltilmelidir. Sabrınız için teşekkür ederiz."
+"içinde düzeltilecektir. Sabrınız için teşekkür ederiz."
 
 msgid "Run the selected action"
 msgstr "Seçilen eylemi çalıştır"
@@ -340,6 +347,19 @@ msgstr "Tüm %(total_count)s %(module_name)s nesnelerini seç"
 
 msgid "Clear selection"
 msgstr "Seçimi temizle"
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "%(name)s uygulamasındaki modeller"
+
+msgid "Add"
+msgstr "Ekle"
+
+msgid "View"
+msgstr "Göster"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Hiçbir şeyi düzenlemek ve göstermek için izne sahip değilsiniz."
 
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
@@ -388,6 +408,9 @@ msgstr "Sitede görüntüle"
 
 msgid "Filter"
 msgstr "Süz"
+
+msgid "Clear all filters"
+msgstr "Tüm süzgeçleri temizle"
 
 msgid "Remove from sorting"
 msgstr "Sıralamadan kaldır"
@@ -466,9 +489,6 @@ msgstr ""
 "Seçilen %(objects_name)s nesnelerini silmek istediğinize emin misiniz? "
 "Aşağıdaki nesnelerin tümü ve onların ilgili öğeleri silinecektir:"
 
-msgid "View"
-msgstr "Göster"
-
 msgid "Delete?"
 msgstr "Silinsin mi?"
 
@@ -478,16 +498,6 @@ msgstr " %(filter_title)s süzgecine göre"
 
 msgid "Summary"
 msgstr "Özet"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s uygulamasındaki modeller"
-
-msgid "Add"
-msgstr "Ekle"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr "Hiçbir şeyi düzenlemek ve göstermek için izne sahip değilsiniz."
 
 msgid "Recent actions"
 msgstr "Son eylemler"
@@ -520,6 +530,9 @@ msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "Kullanıcı adınızı veya parolanızı mı unuttunuz?"
+
+msgid "Toggle navigation"
+msgstr "Gezinmeyi aç/kapat"
 
 msgid "Date/time"
 msgstr "Tarih/saat"
@@ -587,8 +600,7 @@ msgid "Delete selected %(model)s"
 msgstr "Seçilen %(model)s sil"
 
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr ""
-"Bugün Web sitesinde biraz güzel zaman geçirdiğiniz için teşekkür ederiz."
+msgstr "Bugün Web sitesine ayırdığınız kaliteli zaman için teşekkür ederiz."
 
 msgid "Log in again"
 msgstr "Tekrar oturum aç"

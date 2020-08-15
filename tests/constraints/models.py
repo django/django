@@ -4,6 +4,7 @@ from django.db import models
 class Product(models.Model):
     price = models.IntegerField(null=True)
     discounted_price = models.IntegerField(null=True)
+    unit = models.CharField(max_length=15, null=True)
 
     class Meta:
         required_db_features = {
@@ -30,6 +31,13 @@ class Product(models.Model):
                     output_field=models.BooleanField()
                 ),
                 name='%(app_label)s_price_neq_500_wrap',
+            ),
+            models.CheckConstraint(
+                check=models.Q(
+                    models.Q(unit__isnull=True) |
+                    models.Q(unit__in=['μg/mL', 'ng/mL'])
+                ),
+                name='unicode_unit_list',
             ),
         ]
 
@@ -77,6 +85,24 @@ class UniqueConstraintDeferrable(models.Model):
                 fields=['shelf'],
                 name='sheld_init_immediate_uniq',
                 deferrable=models.Deferrable.IMMEDIATE,
+            ),
+        ]
+
+
+class UniqueConstraintInclude(models.Model):
+    name = models.CharField(max_length=255)
+    color = models.CharField(max_length=32, null=True)
+
+    class Meta:
+        required_db_features = {
+            'supports_table_check_constraints',
+            'supports_covering_indexes',
+        }
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name'],
+                name='name_include_color_uniq',
+                include=['color'],
             ),
         ]
 

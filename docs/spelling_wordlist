@@ -10,9 +10,9 @@ affordances
 aggregator
 Ai
 Alchin
+allowlist
 alphanumerics
 amet
-amongst
 analytics
 apnumber
 app
@@ -278,10 +278,12 @@ hstore
 html
 http
 https
+Hypercorn
 hyperlinks
 ie
 ies
 iframe
+Igbo
 inbox
 incrementing
 indexable
@@ -662,6 +664,7 @@ systemwide
 tablespace
 tablespaces
 tagline
+Tajik
 tarball
 tarballs
 teardown
@@ -701,6 +704,7 @@ trigram
 trigrams
 tuple
 tuples
+Turkmen
 tv
 txt
 tz
@@ -778,12 +782,8 @@ versioned
 versioning
 vertices
 viewable
-virtualenv
-virtualenvs
 virtualized
 Weblog
-whitelist
-whitelisted
 whitespace
 whitespaces
 whizbang

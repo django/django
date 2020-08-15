@@ -495,7 +495,7 @@ is ``'Beatles Blog'``::
 
 This spanning can be as deep as you'd like.
 
-It works backwards, too. Whilst it :attr:`can be customized
+It works backwards, too. While it :attr:`can be customized
 <.ForeignKey.related_query_name>`, by default you refer to a "reverse"
 relationship in a lookup using the lowercase name of the model.
 
@@ -905,10 +905,10 @@ To query for missing keys, use the ``isnull`` lookup::
 
     The lookup examples given above implicitly use the :lookup:`exact` lookup.
     Key, index, and path transforms can also be chained with:
-    :lookup:`contains`, :lookup:`icontains`, :lookup:`endswith`,
-    :lookup:`iendswith`, :lookup:`iexact`, :lookup:`regex`, :lookup:`iregex`,
-    :lookup:`startswith`, :lookup:`istartswith`, :lookup:`lt`, :lookup:`lte`,
-    :lookup:`gt`, and :lookup:`gte` lookups.
+    :lookup:`icontains`, :lookup:`endswith`, :lookup:`iendswith`,
+    :lookup:`iexact`, :lookup:`regex`, :lookup:`iregex`, :lookup:`startswith`,
+    :lookup:`istartswith`, :lookup:`lt`, :lookup:`lte`, :lookup:`gt`, and
+    :lookup:`gte`, as well as with :ref:`containment-and-key-lookups`.
 
 .. warning::
 
@@ -937,8 +937,10 @@ To query for missing keys, use the ``isnull`` lookup::
     On PostgreSQL, if only one key or index is used, the SQL operator ``->`` is
     used. If multiple operators are used then the ``#>`` operator is used.
 
-Containment and key operations
-------------------------------
+.. _containment-and-key-lookups:
+
+Containment and key lookups
+---------------------------
 
 .. fieldlookup:: jsonfield.contains
 
@@ -960,6 +962,10 @@ contained in the top-level of the field. For example::
     >>> Dog.objects.filter(data__contains={'breed': 'collie'})
     <QuerySet [<Dog: Meg>]>
 
+.. admonition:: Oracle and SQLite
+
+    ``contains`` is not supported on Oracle and SQLite.
+
 .. fieldlookup:: jsonfield.contained_by
 
 ``contained_by``
@@ -980,9 +986,9 @@ subset of those in the value passed. For example::
     >>> Dog.objects.filter(data__contained_by={'breed': 'collie'})
     <QuerySet [<Dog: Fred>]>
 
-.. admonition:: Oracle
+.. admonition:: Oracle and SQLite
 
-    ``contained_by`` is not supported on Oracle.
+    ``contained_by`` is not supported on Oracle and SQLite.
 
 .. fieldlookup:: jsonfield.has_key
 
@@ -1315,8 +1321,9 @@ Using the models at the top of this page, for example, an ``Entry`` object ``e``
 can get its associated ``Blog`` object by accessing the ``blog`` attribute:
 ``e.blog``.
 
-(Behind the scenes, this functionality is implemented by Python descriptors_.
-This shouldn't really matter to you, but we point it out here for the curious.)
+(Behind the scenes, this functionality is implemented by Python
+:doc:`descriptors <python:howto/descriptor>`. This shouldn't really matter to
+you, but we point it out here for the curious.)
 
 Django also creates API accessors for the "other" side of the relationship --
 the link from the related model to the model that defines the relationship.
@@ -1325,8 +1332,6 @@ For example, a ``Blog`` object ``b`` has access to a list of all related
 
 All examples in this section use the sample ``Blog``, ``Author`` and ``Entry``
 models defined at the top of this page.
-
-.. _descriptors: https://docs.python.org/howto/descriptor.html
 
 One-to-many relationships
 -------------------------

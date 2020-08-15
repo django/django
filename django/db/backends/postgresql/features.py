@@ -22,10 +22,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_release_savepoints = True
     supports_tablespaces = True
     supports_transactions = True
-    can_introspect_autofield = True
-    can_introspect_ip_address_field = True
     can_introspect_materialized_views = True
-    can_introspect_small_integer_field = True
     can_distinct_on_fields = True
     can_rollback_ddl = True
     supports_combined_alters = True
@@ -60,6 +57,19 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     validates_explain_options = False  # A query will error on invalid options.
     supports_deferrable_unique_constraints = True
     has_json_operators = True
+    json_key_contains_list_matching_requires_list = True
+    test_collations = {
+        'swedish-ci': 'sv-x-icu',
+    }
+
+    @cached_property
+    def introspected_field_types(self):
+        return {
+            **super().introspected_field_types,
+            'PositiveBigIntegerField': 'BigIntegerField',
+            'PositiveIntegerField': 'IntegerField',
+            'PositiveSmallIntegerField': 'SmallIntegerField',
+        }
 
     @cached_property
     def is_postgresql_10(self):
@@ -73,6 +83,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def is_postgresql_12(self):
         return self.connection.pg_version >= 120000
 
+    @cached_property
+    def is_postgresql_13(self):
+        return self.connection.pg_version >= 130000
+
     has_brin_autosummarize = property(operator.attrgetter('is_postgresql_10'))
     has_websearch_to_tsquery = property(operator.attrgetter('is_postgresql_11'))
     supports_table_partitions = property(operator.attrgetter('is_postgresql_10'))
+    supports_covering_indexes = property(operator.attrgetter('is_postgresql_11'))
+    supports_covering_gist_indexes = property(operator.attrgetter('is_postgresql_12'))

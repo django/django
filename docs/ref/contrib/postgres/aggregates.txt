@@ -75,6 +75,20 @@ General-purpose aggregation functions
     Returns ``True``, if all input values are true, ``None`` if all values are
     null or if there are no values, otherwise ``False`` .
 
+    Usage example::
+
+        class Comment(models.Model):
+            body = models.TextField()
+            published = models.BooleanField()
+            rank = models.IntegerField()
+
+        >>> from django.db.models import Q
+        >>> from django.contrib.postgres.aggregates import BoolAnd
+        >>> Comment.objects.aggregate(booland=BoolAnd('published'))
+        {'booland': False}
+        >>> Comment.objects.aggregate(booland=BoolAnd(Q(rank__lt=100)))
+        {'booland': True}
+
 ``BoolOr``
 ----------
 
@@ -83,12 +97,37 @@ General-purpose aggregation functions
     Returns ``True`` if at least one input value is true, ``None`` if all
     values are null or if there are no values, otherwise ``False``.
 
+    Usage example::
+
+        class Comment(models.Model):
+            body = models.TextField()
+            published = models.BooleanField()
+            rank = models.IntegerField()
+
+        >>> from django.db.models import Q
+        >>> from django.contrib.postgres.aggregates import BoolOr
+        >>> Comment.objects.aggregate(boolor=BoolOr('published'))
+        {'boolor': True}
+        >>> Comment.objects.aggregate(boolor=BoolOr(Q(rank__gt=2)))
+        {'boolor': False}
+
 ``JSONBAgg``
 ------------
 
-.. class:: JSONBAgg(expressions, filter=None, **extra)
+.. class:: JSONBAgg(expressions, filter=None, ordering=(), **extra)
 
     Returns the input values as a ``JSON`` array.
+
+    .. attribute:: ordering
+
+        .. versionadded:: 3.2
+
+        An optional string of a field name (with an optional ``"-"`` prefix
+        which indicates descending order) or an expression (or a tuple or list
+        of strings and/or expressions) that specifies the ordering of the
+        elements in the result list.
+
+        Examples are the same as for :attr:`ArrayAgg.ordering`.
 
 ``StringAgg``
 -------------

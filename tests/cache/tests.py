@@ -16,7 +16,7 @@ from unittest import mock
 from django.conf import settings
 from django.core import management, signals
 from django.core.cache import (
-    DEFAULT_CACHE_ALIAS, CacheKeyWarning, cache, caches,
+    DEFAULT_CACHE_ALIAS, CacheKeyWarning, InvalidCacheKey, cache, caches,
 )
 from django.core.cache.backends.base import InvalidCacheBackendError
 from django.core.cache.utils import make_template_fragment_key
@@ -621,12 +621,26 @@ class BaseCacheTests:
     def test_zero_cull(self):
         self._perform_cull_test('zero_cull', 50, 19)
 
+    def test_cull_delete_when_store_empty(self):
+        try:
+            cull_cache = caches['cull']
+        except InvalidCacheBackendError:
+            self.skipTest("Culling isn't implemented.")
+        old_max_entries = cull_cache._max_entries
+        # Force _cull to delete on first cached record.
+        cull_cache._max_entries = -1
+        try:
+            cull_cache.set('force_cull_delete', 'value', 1000)
+            self.assertIs(cull_cache.has_key('force_cull_delete'), True)
+        finally:
+            cull_cache._max_entries = old_max_entries
+
     def _perform_invalid_key_test(self, key, expected_warning):
         """
-        All the builtin backends (except memcached, see below) should warn on
-        keys that would be refused by memcached. This encourages portable
-        caching code without making it too difficult to use production backends
-        with more liberal key rules. Refs #6447.
+        All the builtin backends should warn (except memcached that should
+        error) on keys that would be refused by memcached. This encourages
+        portable caching code without making it too difficult to use production
+        backends with more liberal key rules. Refs #6447.
         """
         # mimic custom ``make_key`` method being defined since the default will
         # never show the below warnings
@@ -637,8 +651,9 @@ class BaseCacheTests:
         cache.key_func = func
 
         try:
-            with self.assertWarnsMessage(CacheKeyWarning, expected_warning):
+            with self.assertWarns(CacheKeyWarning) as cm:
                 cache.set(key, 'value')
+            self.assertEqual(str(cm.warning), expected_warning)
         finally:
             cache.key_func = old_func
 
@@ -1270,24 +1285,15 @@ class BaseMemcachedTests(BaseCacheTests):
                 with self.settings(CACHES={'default': params}):
                     self.assertEqual(cache._servers, ['server1.tld', 'server2:11211'])
 
-    def test_invalid_key_characters(self):
+    def _perform_invalid_key_test(self, key, expected_warning):
         """
-        On memcached, we don't introduce a duplicate key validation
-        step (for speed reasons), we just let the memcached API
-        library raise its own exception on bad keys. Refs #6447.
-
-        In order to be memcached-API-library agnostic, we only assert
-        that a generic exception of some kind is raised.
+        While other backends merely warn, memcached should raise for an invalid
+        key.
         """
-        # memcached does not allow whitespace or control characters in keys
-        # when using the ascii protocol.
-        with self.assertRaises(Exception):
-            cache.set('key with spaces', 'value')
-
-    def test_invalid_key_length(self):
-        # memcached limits key length to 250
-        with self.assertRaises(Exception):
-            cache.set('a' * 251, 'value')
+        msg = expected_warning.replace(key, cache.make_key(key))
+        with self.assertRaises(InvalidCacheKey) as cm:
+            cache.set(key, 'value')
+        self.assertEqual(str(cm.exception), msg)
 
     def test_default_never_expiring_timeout(self):
         # Regression test for #22845
@@ -1395,15 +1401,6 @@ class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
     client_library_name = 'pylibmc'
     # libmemcached manages its own connections.
     should_disconnect_on_close = False
-
-    # By default, pylibmc/libmemcached don't verify keys client-side and so
-    # this test triggers a server-side bug that causes later tests to fail
-    # (#19914). The `verify_keys` behavior option could be set to True (which
-    # would avoid triggering the server-side bug), however this test would
-    # still fail due to https://github.com/lericson/pylibmc/issues/219.
-    @unittest.skip("triggers a memcached-server bug, causing subsequent tests to fail")
-    def test_invalid_key_characters(self):
-        pass
 
     @override_settings(CACHES=caches_setting_for_tests(
         base=PyLibMCCache_params,
@@ -1819,7 +1816,7 @@ class CacheI18nTest(SimpleTestCase):
     def tearDown(self):
         cache.clear()
 
-    @override_settings(USE_I18N=True, USE_L10N=False, USE_TZ=False)
+    @override_settings(USE_I18N=True, USE_TZ=False)
     def test_cache_key_i18n_translation(self):
         request = self.factory.get(self.path)
         lang = translation.get_language()
@@ -1840,7 +1837,7 @@ class CacheI18nTest(SimpleTestCase):
         self.assertEqual(key, reference_key)
         self.assertEqual(key2, reference_key)
 
-    @override_settings(USE_I18N=True, USE_L10N=False, USE_TZ=False)
+    @override_settings(USE_I18N=True, USE_TZ=False)
     def test_cache_key_i18n_translation_accept_language(self):
         lang = translation.get_language()
         self.assertEqual(lang, 'en')
@@ -1896,17 +1893,7 @@ class CacheI18nTest(SimpleTestCase):
             key
         )
 
-    @override_settings(USE_I18N=False, USE_L10N=True, USE_TZ=False)
-    def test_cache_key_i18n_formatting(self):
-        request = self.factory.get(self.path)
-        lang = translation.get_language()
-        response = HttpResponse()
-        key = learn_cache_key(request, response)
-        self.assertIn(lang, key, "Cache keys should include the language name when formatting is active")
-        key2 = get_cache_key(request)
-        self.assertEqual(key, key2)
-
-    @override_settings(USE_I18N=False, USE_L10N=False, USE_TZ=True)
+    @override_settings(USE_I18N=False, USE_TZ=True)
     def test_cache_key_i18n_timezone(self):
         request = self.factory.get(self.path)
         tz = timezone.get_current_timezone_name()
@@ -1916,7 +1903,7 @@ class CacheI18nTest(SimpleTestCase):
         key2 = get_cache_key(request)
         self.assertEqual(key, key2)
 
-    @override_settings(USE_I18N=False, USE_L10N=False)
+    @override_settings(USE_I18N=False)
     def test_cache_key_no_i18n(self):
         request = self.factory.get(self.path)
         lang = translation.get_language()

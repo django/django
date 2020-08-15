@@ -93,6 +93,7 @@ LANGUAGES = [
     ('hy', gettext_noop('Armenian')),
     ('ia', gettext_noop('Interlingua')),
     ('id', gettext_noop('Indonesian')),
+    ('ig', gettext_noop('Igbo')),
     ('io', gettext_noop('Ido')),
     ('is', gettext_noop('Icelandic')),
     ('it', gettext_noop('Italian')),
@@ -132,7 +133,9 @@ LANGUAGES = [
     ('sw', gettext_noop('Swahili')),
     ('ta', gettext_noop('Tamil')),
     ('te', gettext_noop('Telugu')),
+    ('tg', gettext_noop('Tajik')),
     ('th', gettext_noop('Thai')),
+    ('tk', gettext_noop('Turkmen')),
     ('tr', gettext_noop('Turkish')),
     ('tt', gettext_noop('Tatar')),
     ('udm', gettext_noop('Udmurt')),
@@ -433,6 +436,12 @@ WSGI_APPLICATION = None
 # you may be opening yourself up to a security risk.
 SECURE_PROXY_SSL_HEADER = None
 
+# Default hashing algorithm to use for encoding cookies, password reset tokens
+# in the admin site, user sessions, and signatures. It's a transitional setting
+# helpful in migrating multiple instance of the same project to Django 3.1+.
+# Algorithm must be 'sha1' or 'sha256'.
+DEFAULT_HASHING_ALGORITHM = 'sha256'
+
 ##############
 # MIDDLEWARE #
 ##############
@@ -461,7 +470,7 @@ SESSION_COOKIE_PATH = '/'
 # Whether to use the HttpOnly flag.
 SESSION_COOKIE_HTTPONLY = True
 # Whether to set the flag restricting cookie leaks on cross-site requests.
-# This can be 'Lax', 'Strict', or None to disable the flag.
+# This can be 'Lax', 'Strict', 'None', or False to disable the flag.
 SESSION_COOKIE_SAMESITE = 'Lax'
 # Whether to save the session data on every request.
 SESSION_SAVE_EVERY_REQUEST = False

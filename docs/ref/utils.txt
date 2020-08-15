@@ -853,8 +853,8 @@ appropriate entities.
     #. Converting to lowercase.
     #. Removing characters that aren't alphanumerics, underscores, hyphens, or
        whitespace.
-    #. Removing leading and trailing whitespace.
     #. Replacing any whitespace or repeated dashes with single dashes.
+    #. Removing leading and trailing whitespace, dashes, and underscores.
 
     For example::
 
@@ -866,6 +866,11 @@ appropriate entities.
 
         >>> slugify('你好 World', allow_unicode=True)
         '你好-world'
+
+    .. versionchanged:: 3.2
+
+        In older versions, leading and trailing dashes and underscores are not
+        removed.
 
 .. _time-zone-selection-functions:
 

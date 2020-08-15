@@ -2,8 +2,9 @@ import datetime
 
 from django.core import signing
 from django.test import SimpleTestCase
-from django.test.utils import freeze_time
+from django.test.utils import freeze_time, ignore_warnings
 from django.utils.crypto import InvalidAlgorithm
+from django.utils.deprecation import RemovedInDjango40Warning
 
 
 class TestSigner(SimpleTestCase):
@@ -51,6 +52,14 @@ class TestSigner(SimpleTestCase):
             'Usf3uVQOZ9m6uPfVonKR-EBXjPe7bjMbp3_Fq8MfsptgkkM1ojidN0BxYaT5HAEN1'
             'VzO9_jVu7R-VkqknHYNvw',
         )
+
+    @ignore_warnings(category=RemovedInDjango40Warning)
+    def test_default_hashing_algorithm(self):
+        signer = signing.Signer('predictable-secret', algorithm='sha1')
+        signature_sha1 = signer.signature('hello')
+        with self.settings(DEFAULT_HASHING_ALGORITHM='sha1'):
+            signer = signing.Signer('predictable-secret')
+            self.assertEqual(signer.signature('hello'), signature_sha1)
 
     def test_invalid_algorithm(self):
         signer = signing.Signer('predictable-secret', algorithm='whatever')
@@ -125,6 +134,21 @@ class TestSigner(SimpleTestCase):
             self.assertEqual(o, signing.loads(signing.dumps(o)))
             self.assertNotEqual(o, signing.dumps(o, compress=True))
             self.assertEqual(o, signing.loads(signing.dumps(o, compress=True)))
+
+    def test_dumps_loads_legacy_signature(self):
+        # RemovedInDjango40Warning: pre-Django 3.1 signatures won't be
+        # supported.
+        value = 'a string \u2020'
+        # SHA-1 signed value.
+        signed = 'ImEgc3RyaW5nIFx1MjAyMCI:1k1beT:ZfNhN1kdws7KosUleOvuYroPHEc'
+        self.assertEqual(signing.loads(signed), value)
+
+    @ignore_warnings(category=RemovedInDjango40Warning)
+    def test_dumps_loads_default_hashing_algorithm_sha1(self):
+        value = 'a string \u2020'
+        with self.settings(DEFAULT_HASHING_ALGORITHM='sha1'):
+            signed = signing.dumps(value)
+        self.assertEqual(signing.loads(signed), value)
 
     def test_decode_detects_tampering(self):
         "loads should raise exception for tampered objects"

@@ -4,15 +4,15 @@
 # Dagur Ammendrup <dagurp@gmail.com>, 2019
 # Hafsteinn Einarsson <haffi67@gmail.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Kári Tristan Helgason <inactive+einherji@transifex.com>, 2013
-# Thordur Sigurdsson <thordur@ja.is>, 2016-2019
+# 479d446b5da12875beba10cac54e9faf_a7ca1e7 <fdc140c3760f65c48c895bd61a47665c_99067>, 2013
+# Thordur Sigurdsson <thordur@ja.is>, 2016-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-11-20 05:02+0000\n"
-"Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-07-14 22:38+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
 "MIME-Version: 1.0\n"
@@ -71,6 +71,12 @@ msgstr "Engin dagsetning"
 
 msgid "Has date"
 msgstr "Hefur dagsetningu"
+
+msgid "Empty"
+msgstr "Tómt"
+
+msgid "Not empty"
+msgstr "Ekki tómt"
 
 #, python-format
 msgid ""
@@ -333,6 +339,19 @@ msgstr "Velja alla %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Hreinsa val"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Módel í appinu %(name)s"
+
+msgid "Add"
+msgstr "Bæta við"
+
+msgid "View"
+msgstr "Skoða"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Þú hefur ekki réttindi til að skoða eða breyta neinu."
+
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
@@ -380,6 +399,9 @@ msgstr "Skoða á vef"
 
 msgid "Filter"
 msgstr "Sía"
+
+msgid "Clear all filters"
+msgstr "Hreinsa allar síur"
 
 msgid "Remove from sorting"
 msgstr "Taka úr röðun"
@@ -456,9 +478,6 @@ msgstr ""
 "Ertu viss um að þú viljir eyða völdum %(objects_name)s? Öllum eftirtöldum "
 "hlutum og skyldum hlutum verður eytt:"
 
-msgid "View"
-msgstr "Skoða"
-
 msgid "Delete?"
 msgstr "Eyða?"
 
@@ -468,16 +487,6 @@ msgstr " Eftir %(filter_title)s "
 
 msgid "Summary"
 msgstr "Samantekt"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Módel í appinu %(name)s"
-
-msgid "Add"
-msgstr "Bæta við"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr "Þú hefur ekki réttindi til að skoða eða breyta neinu."
 
 msgid "Recent actions"
 msgstr "Nýlegar aðgerðir"
@@ -509,6 +518,9 @@ msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "Gleymt notandanafn eða lykilorð?"
+
+msgid "Toggle navigation"
+msgstr ""
 
 msgid "Date/time"
 msgstr "Dagsetning/tími"

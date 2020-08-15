@@ -2,17 +2,11 @@ from django.apps import apps
 from django.db import models
 
 
-def sql_flush(style, connection, only_django=False, reset_sequences=True, allow_cascade=False):
+def sql_flush(style, connection, reset_sequences=True, allow_cascade=False):
     """
     Return a list of the SQL statements used to flush the database.
-
-    If only_django is True, only include the table names that have associated
-    Django models and are in INSTALLED_APPS .
     """
-    if only_django:
-        tables = connection.introspection.django_table_names(only_existing=True, include_views=False)
-    else:
-        tables = connection.introspection.table_names(include_views=False)
+    tables = connection.introspection.django_table_names(only_existing=True, include_views=False)
     return connection.ops.sql_flush(
         style,
         tables,

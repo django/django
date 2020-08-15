@@ -2,7 +2,8 @@
 #
 # Translators:
 # c1007a0b890405f1fbddfacebc4c6ef7, 2013
-# Hrishikesh <hrishi.kb@gmail.com>, 2019
+# Claude Paroz <claude@2xlibre.net>, 2020
+# Hrishikesh <hrishi.kb@gmail.com>, 2019-2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jaseem KM <napsterjaseem@gmail.com>, 2019
 # Jeffy <jeffymj@gmail.com>, 2012
@@ -13,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-05 00:38+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-14 21:42+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Malayalam (http://www.transifex.com/django/django/language/"
 "ml/)\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +29,10 @@ msgid "Afrikaans"
 msgstr "ആഫ്രിക്കാന്‍സ്"
 
 msgid "Arabic"
-msgstr "അറബിക്"
+msgstr "അറബിൿ"
+
+msgid "Algerian Arabic"
+msgstr "അൾഗേരിയൻ അറബിൿ"
 
 msgid "Asturian"
 msgstr "ആസ്ടൂറിയൻ"
@@ -153,6 +157,9 @@ msgstr "ഇന്റര്‍ലിംഗ്വാ"
 msgid "Indonesian"
 msgstr "ഇന്തൊനേഷ്യന്‍"
 
+msgid "Igbo"
+msgstr ""
+
 msgid "Ido"
 msgstr "ഈടോ"
 
@@ -182,6 +189,9 @@ msgstr "കന്നഡ"
 
 msgid "Korean"
 msgstr "കൊറിയന്‍"
+
+msgid "Kyrgyz"
+msgstr ""
 
 msgid "Luxembourgish"
 msgstr "ലക്സംബര്‍ഗിഷ് "
@@ -267,8 +277,14 @@ msgstr "തമിഴ്"
 msgid "Telugu"
 msgstr "തെലുങ്ക്"
 
+msgid "Tajik"
+msgstr ""
+
 msgid "Thai"
 msgstr "തായ്"
+
+msgid "Turkmen"
+msgstr ""
 
 msgid "Turkish"
 msgstr "ടര്‍ക്കിഷ്"
@@ -286,7 +302,7 @@ msgid "Urdu"
 msgstr "ഉര്‍ദു"
 
 msgid "Uzbek"
-msgstr ""
+msgstr "ഉസ്ബെൿ"
 
 msgid "Vietnamese"
 msgstr "വിയറ്റ്നാമീസ്"
@@ -334,11 +350,14 @@ msgstr "ശരിയായ ഇമെയില്‍ വിലാസം നല്
 msgid ""
 "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
+"അക്ഷരങ്ങള്‍, അക്കങ്ങള്‍, അണ്ടര്‍സ്കോര്‍, ഹൈഫന്‍ എന്നിവ മാത്രം അടങ്ങിയ ശരിയായ ഒരു 'സ്ലഗ്ഗ്' നൽകുക. "
 
 msgid ""
 "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
+"യൂണികോഡ് അക്ഷരങ്ങൾ, അക്കങ്ങൾ, ഹൈഫണുകൾ, അണ്ടർസ്കോറുക‌‌ൾ എന്നിവമാത്രം അടങ്ങിയ ശെരിയായ ‌ഒരു "
+"“സ്ലഗ്” എഴുതുക ."
 
 msgid "Enter a valid IPv4 address."
 msgstr "ശരിയായ IPv4 വിലാസം നൽകുക."
@@ -420,6 +439,8 @@ msgid ""
 "File extension “%(extension)s” is not allowed. Allowed extensions are: "
 "%(allowed_extensions)s."
 msgstr ""
+"“%(extension)s” എന്ന ഫയൽ എക്സ്റ്റൻഷൻ അനുവദനീയമല്ല. അനുവദനീയമായ എക്സ്റ്റൻഷനുകൾ ഇവയാണ്: "
+"%(allowed_extensions)s"
 
 msgid "Null characters are not allowed."
 msgstr "Null  ക്യാരക്ടറുകൾ അനുവദനീയമല്ല."
@@ -459,11 +480,13 @@ msgstr "%(field_type)s എന്ന തരത്തിലുള്ള കളം 
 
 #, python-format
 msgid "“%(value)s” value must be either True or False."
-msgstr ""
+msgstr "“%(value)s” മൂല്യം ഒന്നുകിൽ True, False എന്നിവയിലേതെങ്കിലുമേ ആവാൻ പാടുള്ളൂ."
 
 #, python-format
 msgid "“%(value)s” value must be either True, False, or None."
 msgstr ""
+"“%(value)s” മൂല്യം ഒന്നുകിൽ True, False അല്ലെങ്കിൽ None എന്നിവയിലേതെങ്കിലുമേ ആവാൻ "
+"പാടുള്ളൂ."
 
 msgid "Boolean (Either True or False)"
 msgstr "ശരിയോ തെറ്റോ (True അഥവാ False)"
@@ -557,6 +580,9 @@ msgstr ""
 msgid "Boolean (Either True, False or None)"
 msgstr "ശരിയോ തെറ്റോ എന്നു മാത്രം (True, False, None എന്നിവയില്‍ ഏതെങ്കിലും ഒന്ന്)"
 
+msgid "Positive big integer"
+msgstr ""
+
 msgid "Positive integer"
 msgstr "ധന പൂര്‍ണസംഖ്യ"
 
@@ -606,6 +632,12 @@ msgstr "ഫയല്‍"
 
 msgid "Image"
 msgstr "ചിത്രം"
+
+msgid "A JSON object"
+msgstr ""
+
+msgid "Value must be valid JSON."
+msgstr ""
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -699,6 +731,9 @@ msgstr "പൂർണ്ണമായ വാല്യൂ നല്കുക."
 msgid "Enter a valid UUID."
 msgstr "സാധുവായ യു യു ഐ ഡി നല്കുക."
 
+msgid "Enter a valid JSON."
+msgstr ""
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -781,17 +816,9 @@ msgstr "അതെ"
 msgid "No"
 msgstr "അല്ല"
 
-msgid "Year"
-msgstr ""
-
-msgid "Month"
-msgstr ""
-
-msgid "Day"
-msgstr ""
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
-msgstr "ഉണ്ട്, ഇല്ല, ഉണ്ടായേക്കാം"
+msgstr "ഉണ്ട്,ഇല്ല,ഉണ്ടായേക്കാം"
 
 #, python-format
 msgid "%(size)d byte"
@@ -1097,9 +1124,6 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d മിനിറ്റ്"
 msgstr[1] "%d മിനിറ്റുകൾ"
-
-msgid "0 minutes"
-msgstr "0 മിനിറ്റ്"
 
 msgid "Forbidden"
 msgstr "വിലക്കപ്പെട്ടത്"

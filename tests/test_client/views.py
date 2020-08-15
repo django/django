@@ -131,6 +131,14 @@ def redirect_view(request):
     return HttpResponseRedirect('/get_view/' + query)
 
 
+def method_saving_307_redirect_query_string_view(request):
+    return HttpResponseRedirect('/post_view/?hello=world', status=307)
+
+
+def method_saving_308_redirect_query_string_view(request):
+    return HttpResponseRedirect('/post_view/?hello=world', status=308)
+
+
 def _post_view_redirect(request, status_code):
     """Redirect to /post_view/ using the status code."""
     redirect_to = request.GET.get('to', '/post_view/')

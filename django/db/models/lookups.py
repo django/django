@@ -6,7 +6,7 @@ from copy import copy
 from django.core.exceptions import EmptyResultSet
 from django.db.models.expressions import Case, Exists, Func, Value, When
 from django.db.models.fields import (
-    BooleanField, CharField, DateTimeField, Field, IntegerField, UUIDField,
+    CharField, DateTimeField, Field, IntegerField, UUIDField,
 )
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.datastructures import OrderedSet
@@ -29,7 +29,9 @@ class Lookup:
         if bilateral_transforms:
             # Warn the user as soon as possible if they are trying to apply
             # a bilateral transformation on a nested QuerySet: that won't work.
-            from django.db.models.sql.query import Query  # avoid circular import
+            from django.db.models.sql.query import (  # avoid circular import
+                Query,
+            )
             if isinstance(rhs, Query):
                 raise NotImplementedError("Bilateral transformations on nested querysets are not implemented.")
         self.bilateral_transforms = bilateral_transforms
@@ -123,7 +125,7 @@ class Lookup:
         exprs = []
         for expr in (self.lhs, self.rhs):
             if isinstance(expr, Exists):
-                expr = Case(When(expr, then=True), default=False, output_field=BooleanField())
+                expr = Case(When(expr, then=True), default=False)
                 wrapped = True
             exprs.append(expr)
         lookup = type(self)(*exprs) if wrapped else self
@@ -366,10 +368,12 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             )
 
         if self.rhs_is_direct_value():
+            # Remove None from the list as NULL is never equal to anything.
             try:
                 rhs = OrderedSet(self.rhs)
+                rhs.discard(None)
             except TypeError:  # Unhashable items in self.rhs
-                rhs = self.rhs
+                rhs = [r for r in self.rhs if r is not None]
 
             if not rhs:
                 raise EmptyResultSet

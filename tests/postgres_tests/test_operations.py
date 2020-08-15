@@ -11,10 +11,11 @@ from django.test.utils import CaptureQueriesContext
 from . import PostgreSQLTestCase
 
 try:
-    from django.contrib.postgres.operations import (
-        AddIndexConcurrently, CreateExtension, RemoveIndexConcurrently,
-    )
     from django.contrib.postgres.indexes import BrinIndex, BTreeIndex
+    from django.contrib.postgres.operations import (
+        AddIndexConcurrently, BloomExtension, CreateExtension,
+        RemoveIndexConcurrently,
+    )
 except ImportError:
     pass
 
@@ -158,7 +159,7 @@ class CreateExtensionTests(PostgreSQLTestCase):
 
     @override_settings(DATABASE_ROUTERS=[NoExtensionRouter()])
     def test_no_allow_migrate(self):
-        operation = CreateExtension('uuid-ossp')
+        operation = CreateExtension('tablefunc')
         project_state = ProjectState()
         new_state = project_state.clone()
         # Don't create an extension.
@@ -173,16 +174,42 @@ class CreateExtensionTests(PostgreSQLTestCase):
         self.assertEqual(len(captured_queries), 0)
 
     def test_allow_migrate(self):
-        operation = CreateExtension('uuid-ossp')
+        operation = CreateExtension('tablefunc')
+        self.assertEqual(operation.migration_name_fragment, 'create_extension_tablefunc')
         project_state = ProjectState()
         new_state = project_state.clone()
         # Create an extension.
         with CaptureQueriesContext(connection) as captured_queries:
             with connection.schema_editor(atomic=False) as editor:
                 operation.database_forwards(self.app_label, editor, project_state, new_state)
-        self.assertIn('CREATE EXTENSION', captured_queries[0]['sql'])
+        self.assertEqual(len(captured_queries), 4)
+        self.assertIn('CREATE EXTENSION IF NOT EXISTS', captured_queries[1]['sql'])
         # Reversal.
         with CaptureQueriesContext(connection) as captured_queries:
             with connection.schema_editor(atomic=False) as editor:
                 operation.database_backwards(self.app_label, editor, new_state, project_state)
-        self.assertIn('DROP EXTENSION', captured_queries[0]['sql'])
+        self.assertEqual(len(captured_queries), 2)
+        self.assertIn('DROP EXTENSION IF EXISTS', captured_queries[1]['sql'])
+
+    def test_create_existing_extension(self):
+        operation = BloomExtension()
+        self.assertEqual(operation.migration_name_fragment, 'create_extension_bloom')
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        # Don't create an existing extension.
+        with CaptureQueriesContext(connection) as captured_queries:
+            with connection.schema_editor(atomic=False) as editor:
+                operation.database_forwards(self.app_label, editor, project_state, new_state)
+        self.assertEqual(len(captured_queries), 3)
+        self.assertIn('SELECT', captured_queries[0]['sql'])
+
+    def test_drop_nonexistent_extension(self):
+        operation = CreateExtension('tablefunc')
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        # Don't drop a nonexistent extension.
+        with CaptureQueriesContext(connection) as captured_queries:
+            with connection.schema_editor(atomic=False) as editor:
+                operation.database_backwards(self.app_label, editor, project_state, new_state)
+        self.assertEqual(len(captured_queries), 1)
+        self.assertIn('SELECT', captured_queries[0]['sql'])

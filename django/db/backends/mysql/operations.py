@@ -3,7 +3,6 @@ import uuid
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.utils import timezone
-from django.utils.duration import duration_microseconds
 from django.utils.encoding import force_str
 
 
@@ -140,9 +139,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             return "TIME(%s)" % (field_name)
 
-    def date_interval_sql(self, timedelta):
-        return 'INTERVAL %s MICROSECOND' % duration_microseconds(timedelta)
-
     def fetch_returned_insert_rows(self, cursor):
         """
         Given a cursor object that has just performed an INSERT...RETURNING
@@ -231,8 +227,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         ]
 
     def validate_autopk_value(self, value):
-        # MySQLism: zero in AUTO_INCREMENT field does not work. Refs #17653.
-        if value == 0:
+        # Zero in AUTO_INCREMENT field does not work without the
+        # NO_AUTO_VALUE_ON_ZERO SQL mode.
+        if value == 0 and not self.connection.features.allows_auto_pk_0:
             raise ValueError('The database backend does not accept 0 as a '
                              'value for AutoField.')
         return value
@@ -269,6 +266,9 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def max_name_length(self):
         return 64
+
+    def pk_default_value(self):
+        return 'NULL'
 
     def bulk_insert_sql(self, fields, placeholder_rows):
         placeholder_rows_sql = (", ".join(row) for row in placeholder_rows)

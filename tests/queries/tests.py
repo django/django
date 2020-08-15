@@ -47,7 +47,7 @@ class Queries1Tests(TestCase):
 
         cls.n1 = Note.objects.create(note='n1', misc='foo', id=1)
         cls.n2 = Note.objects.create(note='n2', misc='bar', id=2)
-        cls.n3 = Note.objects.create(note='n3', misc='foo', id=3)
+        cls.n3 = Note.objects.create(note='n3', misc='foo', id=3, negate=False)
 
         ann1 = Annotation.objects.create(name='a1', tag=cls.t1)
         ann1.notes.add(cls.n1)
@@ -56,12 +56,12 @@ class Queries1Tests(TestCase):
 
         # Create these out of order so that sorting by 'id' will be different to sorting
         # by 'info'. Helps detect some problems later.
-        cls.e2 = ExtraInfo.objects.create(info='e2', note=cls.n2, value=41)
+        cls.e2 = ExtraInfo.objects.create(info='e2', note=cls.n2, value=41, filterable=False)
         e1 = ExtraInfo.objects.create(info='e1', note=cls.n1, value=42)
 
         cls.a1 = Author.objects.create(name='a1', num=1001, extra=e1)
         cls.a2 = Author.objects.create(name='a2', num=2002, extra=e1)
-        a3 = Author.objects.create(name='a3', num=3003, extra=cls.e2)
+        cls.a3 = Author.objects.create(name='a3', num=3003, extra=cls.e2)
         cls.a4 = Author.objects.create(name='a4', num=4004, extra=cls.e2)
 
         cls.time1 = datetime.datetime(2007, 12, 19, 22, 25, 0)
@@ -77,7 +77,7 @@ class Queries1Tests(TestCase):
         i4.tags.set([t4])
 
         cls.r1 = Report.objects.create(name='r1', creator=cls.a1)
-        Report.objects.create(name='r2', creator=a3)
+        Report.objects.create(name='r2', creator=cls.a3)
         Report.objects.create(name='r3')
 
         # Ordering by 'rank' gives us rank2, rank1, rank3. Ordering by the Meta.ordering
@@ -1209,6 +1209,19 @@ class Queries1Tests(TestCase):
             Note.objects.filter(tag__annotation__name='a1').filter(~Q(tag__annotation__name=F('note'))),
             [],
         )
+
+    def test_field_with_filterable(self):
+        self.assertSequenceEqual(
+            Author.objects.filter(extra=self.e2),
+            [self.a3, self.a4],
+        )
+
+    def test_negate_field(self):
+        self.assertSequenceEqual(
+            Note.objects.filter(negate=True),
+            [self.n1, self.n2],
+        )
+        self.assertSequenceEqual(Note.objects.exclude(negate=True), [self.n3])
 
 
 class Queries2Tests(TestCase):
@@ -2366,7 +2379,10 @@ class ValuesQuerysetTests(TestCase):
         qs = Number.objects.extra(select={'num2': 'num+1'}).annotate(Count('id'))
         values = qs.values_list(named=True).first()
         self.assertEqual(type(values).__name__, 'Row')
-        self.assertEqual(values._fields, ('num2', 'id', 'num', 'other_num', 'id__count'))
+        self.assertEqual(
+            values._fields,
+            ('num2', 'id', 'num', 'other_num', 'another_num', 'id__count'),
+        )
         self.assertEqual(values.num, 72)
         self.assertEqual(values.num2, 73)
         self.assertEqual(values.id__count, 1)
@@ -2848,6 +2864,18 @@ class ExcludeTests(TestCase):
         self.assertTrue(qs.exists())
         self.r1.delete()
         self.assertFalse(qs.exists())
+
+    def test_exclude_nullable_fields(self):
+        number = Number.objects.create(num=1, other_num=1)
+        Number.objects.create(num=2, other_num=2, another_num=2)
+        self.assertSequenceEqual(
+            Number.objects.exclude(other_num=F('another_num')),
+            [number],
+        )
+        self.assertSequenceEqual(
+            Number.objects.exclude(num=F('another_num')),
+            [number],
+        )
 
 
 class ExcludeTest17600(TestCase):

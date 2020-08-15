@@ -14,16 +14,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_forward_references = False
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
-    can_introspect_autofield = True
-    can_introspect_binary_field = False
-    can_introspect_duration_field = False
-    can_introspect_small_integer_field = True
-    can_introspect_positive_integer_field = True
-    introspected_boolean_field_type = 'IntegerField'
     supports_index_column_ordering = False
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
-    allows_auto_pk_0 = False
     can_release_savepoints = True
     atomic_transactions = False
     can_clone_databases = True
@@ -47,19 +40,27 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             SET V_I = P_I;
         END;
     """
-    db_functions_convert_bytes_to_str = True
     # Neither MySQL nor MariaDB support partial indexes.
     supports_partial_indexes = False
     supports_order_by_nulls_modifier = False
     order_by_nulls_first = True
+    test_collations = {
+        'ci': 'utf8_general_ci',
+        'swedish-ci': 'utf8_swedish_ci',
+    }
 
     @cached_property
     def _mysql_storage_engine(self):
         "Internal method used in Django tests. Don't rely on this from your code"
-        with self.connection.cursor() as cursor:
-            cursor.execute("SELECT ENGINE FROM INFORMATION_SCHEMA.ENGINES WHERE SUPPORT = 'DEFAULT'")
-            result = cursor.fetchone()
-        return result[0]
+        return self.connection.mysql_server_data['default_storage_engine']
+
+    @cached_property
+    def allows_auto_pk_0(self):
+        """
+        Autoincrement primary key can be set to 0 if it doesn't generate new
+        autoincrement values.
+        """
+        return 'NO_AUTO_VALUE_ON_ZERO' in self.connection.sql_mode
 
     @cached_property
     def update_can_self_select(self):
@@ -71,6 +72,16 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self._mysql_storage_engine != 'MyISAM'
 
     @cached_property
+    def introspected_field_types(self):
+        return {
+            **super().introspected_field_types,
+            'BinaryField': 'TextField',
+            'BooleanField': 'IntegerField',
+            'DurationField': 'BigIntegerField',
+            'GenericIPAddressField': 'CharField',
+        }
+
+    @cached_property
     def can_return_columns_from_insert(self):
         return self.connection.mysql_is_mariadb and self.connection.mysql_version >= (10, 5, 0)
 
@@ -78,18 +89,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def has_zoneinfo_database(self):
-        # Test if the time zone definitions are installed. CONVERT_TZ returns
-        # NULL if 'UTC' timezone isn't loaded into the mysql.time_zone.
-        with self.connection.cursor() as cursor:
-            cursor.execute("SELECT CONVERT_TZ('2001-01-01 01:00:00', 'UTC', 'UTC')")
-            return cursor.fetchone()[0] is not None
+        return self.connection.mysql_server_data['has_zoneinfo_database']
 
     @cached_property
     def is_sql_auto_is_null_enabled(self):
-        with self.connection.cursor() as cursor:
-            cursor.execute('SELECT @@SQL_AUTO_IS_NULL')
-            result = cursor.fetchone()
-            return result and result[0] == 1
+        return self.connection.mysql_server_data['sql_auto_is_null']
 
     @cached_property
     def supports_over_clause(self):
@@ -125,6 +129,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self.connection.mysql_version >= (8, 0, 1)
 
     @cached_property
+    def has_select_for_update_of(self):
+        return not self.connection.mysql_is_mariadb and self.connection.mysql_version >= (8, 0, 1)
+
+    @cached_property
     def supports_explain_analyze(self):
         return self.connection.mysql_is_mariadb or self.connection.mysql_version >= (8, 0, 18)
 
@@ -146,10 +154,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def ignores_table_name_case(self):
-        with self.connection.cursor() as cursor:
-            cursor.execute('SELECT @@LOWER_CASE_TABLE_NAMES')
-            result = cursor.fetchone()
-            return result and result[0] != 0
+        return self.connection.mysql_server_data['lower_case_table_names']
 
     @cached_property
     def supports_default_in_lead_lag(self):

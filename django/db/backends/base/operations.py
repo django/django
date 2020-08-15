@@ -99,12 +99,6 @@ class BaseDatabaseOperations:
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a date_extract_sql() method')
 
-    def date_interval_sql(self, timedelta):
-        """
-        Implement the date interval functionality for expressions.
-        """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a date_interval_sql() method')
-
     def date_trunc_sql(self, lookup_type, field_name):
         """
         Given a lookup_type of 'year', 'month', or 'day', return the SQL that

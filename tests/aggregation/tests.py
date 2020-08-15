@@ -841,16 +841,12 @@ class AggregateTestCase(TestCase):
             Book.objects.aggregate(fail=F('price'))
 
     def test_nonfield_annotation(self):
-        book = Book.objects.annotate(val=Max(Value(2, output_field=IntegerField()))).first()
+        book = Book.objects.annotate(val=Max(Value(2))).first()
         self.assertEqual(book.val, 2)
         book = Book.objects.annotate(val=Max(Value(2), output_field=IntegerField())).first()
         self.assertEqual(book.val, 2)
         book = Book.objects.annotate(val=Max(2, output_field=IntegerField())).first()
         self.assertEqual(book.val, 2)
-
-    def test_missing_output_field_raises_error(self):
-        with self.assertRaisesMessage(FieldError, 'Cannot resolve expression type, unknown output_field'):
-            Book.objects.annotate(val=Max(2)).first()
 
     def test_annotation_expressions(self):
         authors = Author.objects.annotate(combined_ages=Sum(F('age') + F('friends__age'))).order_by('name')
@@ -893,7 +889,7 @@ class AggregateTestCase(TestCase):
 
     def test_combine_different_types(self):
         msg = (
-            'Expression contains mixed types: FloatField, IntegerField. '
+            'Expression contains mixed types: FloatField, DecimalField. '
             'You must set output_field.'
         )
         qs = Book.objects.annotate(sums=Sum('rating') + Sum('pages') + Sum('price'))

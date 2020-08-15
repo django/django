@@ -1,3 +1,5 @@
+import operator
+
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import Exists, F, IntegerField, OuterRef, Value
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
@@ -11,11 +13,8 @@ class QuerySetSetOperationTests(TestCase):
     def setUpTestData(cls):
         Number.objects.bulk_create(Number(num=i, other_num=10 - i) for i in range(10))
 
-    def number_transform(self, value):
-        return value.num
-
     def assertNumbersEqual(self, queryset, expected_numbers, ordered=True):
-        self.assertQuerysetEqual(queryset, expected_numbers, self.number_transform, ordered)
+        self.assertQuerysetEqual(queryset, expected_numbers, operator.attrgetter('num'), ordered)
 
     def test_simple_union(self):
         qs1 = Number.objects.filter(num__lte=1)
@@ -51,6 +50,13 @@ class QuerySetSetOperationTests(TestCase):
         qs2 = Number.objects.all()
         self.assertEqual(len(list(qs1.union(qs2, all=True))), 20)
         self.assertEqual(len(list(qs1.union(qs2))), 10)
+
+    def test_union_none(self):
+        qs1 = Number.objects.filter(num__lte=1)
+        qs2 = Number.objects.filter(num__gte=8)
+        qs3 = qs1.union(qs2)
+        self.assertSequenceEqual(qs3.none(), [])
+        self.assertNumbersEqual(qs3, [0, 1, 8, 9], ordered=False)
 
     @skipUnlessDBFeature('supports_select_intersection')
     def test_intersection_with_empty_qs(self):
@@ -110,10 +116,34 @@ class QuerySetSetOperationTests(TestCase):
         qs2 = Number.objects.filter(num__gte=2, num__lte=3)
         self.assertNumbersEqual(qs1.union(qs2).order_by('-num'), [3, 2, 1, 0])
 
+    def test_ordering_by_alias(self):
+        qs1 = Number.objects.filter(num__lte=1).values(alias=F('num'))
+        qs2 = Number.objects.filter(num__gte=2, num__lte=3).values(alias=F('num'))
+        self.assertQuerysetEqual(
+            qs1.union(qs2).order_by('-alias'),
+            [3, 2, 1, 0],
+            operator.itemgetter('alias'),
+        )
+
     def test_ordering_by_f_expression(self):
         qs1 = Number.objects.filter(num__lte=1)
         qs2 = Number.objects.filter(num__gte=2, num__lte=3)
         self.assertNumbersEqual(qs1.union(qs2).order_by(F('num').desc()), [3, 2, 1, 0])
+
+    def test_ordering_by_f_expression_and_alias(self):
+        qs1 = Number.objects.filter(num__lte=1).values(alias=F('other_num'))
+        qs2 = Number.objects.filter(num__gte=2, num__lte=3).values(alias=F('other_num'))
+        self.assertQuerysetEqual(
+            qs1.union(qs2).order_by(F('alias').desc()),
+            [10, 9, 8, 7],
+            operator.itemgetter('alias'),
+        )
+        Number.objects.create(num=-1)
+        self.assertQuerysetEqual(
+            qs1.union(qs2).order_by(F('alias').desc(nulls_last=True)),
+            [10, 9, 8, 7, None],
+            operator.itemgetter('alias'),
+        )
 
     def test_union_with_values(self):
         ReservedName.objects.create(name='a', order=2)
@@ -243,6 +273,10 @@ class QuerySetSetOperationTests(TestCase):
         # 'num' got realiased to num2
         with self.assertRaisesMessage(DatabaseError, msg):
             list(qs1.union(qs2).order_by('num'))
+        with self.assertRaisesMessage(DatabaseError, msg):
+            list(qs1.union(qs2).order_by(F('num')))
+        with self.assertRaisesMessage(DatabaseError, msg):
+            list(qs1.union(qs2).order_by(F('num').desc()))
         # switched order, now 'exists' again:
         list(qs2.union(qs1).order_by('num'))
 
@@ -269,6 +303,7 @@ class QuerySetSetOperationTests(TestCase):
             combinators.append('intersection')
         for combinator in combinators:
             for operation in (
+                'alias',
                 'annotate',
                 'defer',
                 'delete',
