@@ -1441,6 +1441,18 @@ class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
         self.assertTrue(cache._cache.binary)
         self.assertEqual(cache._cache.behaviors['tcp_nodelay'], int(True))
 
+    def test_pylibmc_client_servers(self):
+        backend = self.base_params['BACKEND']
+        tests = [
+            ('unix:/run/memcached/socket', '/run/memcached/socket'),
+            ('/run/memcached/socket', '/run/memcached/socket'),
+            ('127.0.0.1:11211', '127.0.0.1:11211'),
+        ]
+        for location, expected in tests:
+            settings = {'default': {'BACKEND': backend, 'LOCATION': location}}
+            with self.subTest(location), self.settings(CACHES=settings):
+                self.assertEqual(cache.client_servers, [expected])
+
 
 @override_settings(CACHES=caches_setting_for_tests(
     BACKEND='django.core.cache.backends.filebased.FileBasedCache',

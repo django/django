@@ -114,15 +114,6 @@ In this example, Memcached is available through a local Unix socket file
         }
     }
 
-When using the ``pylibmc`` binding, do not include the ``unix:/`` prefix::
-
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
-            'LOCATION': '/tmp/memcached.sock',
-        }
-    }
-
 One excellent feature of Memcached is its ability to share a cache over
 multiple servers. This means you can run Memcached daemons on multiple
 machines, and the program will treat the group of machines as a *single*

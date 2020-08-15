@@ -26,12 +26,16 @@ class BaseMemcachedCache(BaseCache):
         self._class = library.Client
         self._options = params.get('OPTIONS') or {}
 
+    @property
+    def client_servers(self):
+        return self._servers
+
     @cached_property
     def _cache(self):
         """
         Implement transparent thread-safe access to a memcached client.
         """
-        return self._class(self._servers, **self._options)
+        return self._class(self.client_servers, **self._options)
 
     def get_backend_timeout(self, timeout=DEFAULT_TIMEOUT):
         """
@@ -191,6 +195,13 @@ class PyLibMCCache(BaseMemcachedCache):
     def __init__(self, server, params):
         import pylibmc
         super().__init__(server, params, library=pylibmc, value_not_found_exception=pylibmc.NotFound)
+
+    @property
+    def client_servers(self):
+        output = []
+        for server in self._servers:
+            output.append(server[5:] if server.startswith('unix:') else server)
+        return output
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
