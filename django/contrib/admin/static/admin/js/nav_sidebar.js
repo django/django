@@ -35,5 +35,9 @@
             localStorage.setItem('django.admin.navSidebarIsOpen', navSidebarIsOpen);
             main.classList.toggle('shifted');
         });
+
+        toggleNavSidebar.addEventListener('mouseup', function() {
+            toggleNavSidebar.blur();
+        });
     }
 }
