@@ -39,8 +39,9 @@ requirements. The new :setting:`AUTH_USERNAME_VALIDATORS` setting helps
 users to configure their custom validators. You can combine multiple
 validators, and have optional setting to fine tune the validator.
 
-The default validator is ``UnicodeUsernameValidators``. Each validator 
-provides a help text to explain it's requirements to the user.
+The default validator is 
+:class:`~django.contrib.auth.validators.UnicodeUsernameValidator`. 
+Each validator provides a help text to explain its requirements to the user.
 
 See :ref:`username-validation` for more details.
 

@@ -323,7 +323,6 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
 
     Username and password are required. Other fields are optional.
     """
-    username_validator = UnicodeUsernameValidator()
 
     username = models.CharField(
         _('username'),

@@ -12,7 +12,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import (
+    SimpleTestCase, TestCase, TransactionTestCase, override_settings,
+)
 from django.utils.translation import gettext as _
 
 from .models import IntegerUsernameUser

@@ -18,9 +18,9 @@ meet the requirements. Validators can also have optional settings to fine tune
 their behavior.
 
 Validation is controlled by the :setting:`AUTH_USERNAME_VALIDATORS` setting.
-The default for the setting is an ``UnicodeUsernameValidator`` which
-validates whether the given username contains only English letters, numbers 
-and ``@``, ``.``, ``+``, ``-``, and ``_`` characters.
+The default for the setting is a ``UnicodeUsernameValidator`` which
+validates whether the given username contains only letters, numbers 
+and ``@``, ``.``, ``+``, ``-``, ``_`` characters.
 
 By default, validators are used in the forms and in the
 :djadmin:`createsuperuser` management commands.
@@ -33,7 +33,7 @@ Username validation is configured in the
 
     AUTH_USERNAME_VALIDATORS = [
         {
-            'NAME': 'django.contrib.auth.validators.UnicodeUsernameValidators',
+            'NAME': 'django.contrib.auth.validators.UnicodeUsernameValidator',
         },
         {
             'NAME': 'django.contrib.auth.validators.UsernameMinimumLengthValidator',
@@ -46,11 +46,11 @@ Username validation is configured in the
 This example enables two included validators:
 
 * ``UnicodeUsernameValidator``, which checks whether the username contains
-  anything other than the English letters, numbers and ``@``, ``.``, ``+``,
+  anything other than the letters, numbers and ``@``, ``.``, ``+``,
   ``-``, ``_``.
 * ``UsernameMinimumLengthValidator``, which checks whether the username meets a minimum
-  length. This validator is configured with a custom option it now requires
-  the minimum length to be three characters instead of the default one.
+  length. This validator is configured to enforce a minimum length of three characters
+  rather than the default one.
 
 The help texts and any errors from username validators are always returned in
 the order they are listed in :setting:`AUTH_USERNAME_VALIDATORS`.
@@ -58,21 +58,21 @@ the order they are listed in :setting:`AUTH_USERNAME_VALIDATORS`.
 Included validators
 -------------------
 
-Django includes two validators:
+Django includes three validators:
 
-.. class:: UnicodeUsernameValidators
-    
+.. class:: UnicodeUsernameValidator
+
     Validates whether the username contains Unicode characters, in addition
-    to ``@``,``.``,``+``,``-``,and ``_``. This is the default validator.
+    to ``@``, ``.``, ``+``, ``-``, and ``_``. This is the default validator.
 
-.. class:: ASCIIUsernameValidators
+.. class:: ASCIIUsernameValidator
 
     Validates whether the username contains ASCII letters, in addition
-    to ``@``,``.``,``+``,``-``,and ``_``. 
+    to ``@``, ``.``, ``+``, ``-``, and ``_``. 
 
 .. class:: UsernameMinimumLengthValidator(min_length=1)
 
-.. versionadded:: 3.2
+    .. versionadded:: 3.2
 
     Validates whether the username meets a minimum length.
     The minimum length can be customized with the ``min_length`` parameter.
@@ -86,14 +86,14 @@ validation.
 
 .. function:: username_validators_help_texts(username_validators=None)
 
-.. versionadded:: 3.2
+    .. versionadded:: 3.2
 
     Returns a string of the help texts of all validators. These explain the
     username requirements to the user.
 
 .. function:: username_validators_help_text_html(username_validators=None)
 
-.. versionadded:: 3.2
+    .. versionadded:: 3.2
 
     Returns an HTML string with all the text in an ``<ul>``. This is
     helpful when adding username validation to forms, as you can pass the
@@ -113,7 +113,7 @@ interface. They must must implement two methods.
 * ``help_text(self)``: provide a help text to explain the requirements to
   the user.
 
-Any items in the ``OPTIONS`` in :setting:``AUTH_USERNAME_VALIDATORS`` for your
+Any items in the ``OPTIONS`` in :setting:`AUTH_USERNAME_VALIDATORS` for your
 validator will be passed to the constructor. All constructor arguments should
 have a default value.
 
@@ -148,5 +148,3 @@ Here's a basic example of a validator, with one optional setting::
                 characters.',
                 self.min_length
             ) % {'min_length': self.min_length}
-            
-               

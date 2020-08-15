@@ -3018,7 +3018,7 @@ Default::
     
     [
         {
-            'NAME': 'contrib.auth.validators.UnicodeUsernameValidators'
+            'NAME': 'contrib.auth.validators.UnicodeUsernameValidator'
         },
     ]
 
