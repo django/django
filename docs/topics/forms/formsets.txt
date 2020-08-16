@@ -415,6 +415,11 @@ deletion, is greater than or equal to ``min_num``.
     >>> formset.non_form_errors()
     ['Please submit 3 or more forms.']
 
+.. note::
+
+    When a formset contains no initial data, the number of forms displayed is
+    the sum of ``min_num`` and ``extra``.
+
 Dealing with ordering and deletion of forms
 ===========================================
 
