@@ -720,6 +720,10 @@ Miscellaneous
 * The minimum supported version of ``asgiref`` is increased from 3.2 to
   3.2.10.
 
+* The :doc:`Media </topics/forms/media>` class now renders ``<script>`` tags
+  without the ``type`` attribute to follow `WHATWG recommendations
+  <https://html.spec.whatwg.org/multipage/scripting.html#the-script-element>`_.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
