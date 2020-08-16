@@ -79,6 +79,10 @@ class BaseMemcachedCache(BaseCache):
             # make sure the key doesn't keep its old value in case of failure to set (memcached's 1MB limit)
             self._cache.delete(key)
 
+    def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
+        key = self.make_key(key, version=version)
+        return bool(self._cache.touch(key, self.get_backend_timeout(timeout)))
+
     def delete(self, key, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
@@ -166,10 +170,6 @@ class MemcachedCache(BaseMemcachedCache):
             client_kwargs.update(self._options)
             self._client = self._lib.Client(self._servers, **client_kwargs)
         return self._client
-
-    def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
-        return self._cache.touch(key, self.get_backend_timeout(timeout)) != 0
 
     def get(self, key, default=None, version=None):
         key = self.make_key(key, version=version)
