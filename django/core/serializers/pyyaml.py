@@ -18,7 +18,10 @@ from django.db import models
 
 # Use the C (faster) implementation if possible
 try:
-    from yaml import CSafeDumper as SafeDumper, CSafeLoader as SafeLoader, CUnsafeLoader as UnsafeLoader
+    from yaml import (
+        CSafeDumper as SafeDumper, CSafeLoader as SafeLoader,
+        CUnsafeLoader as UnsafeLoader,
+    )
 except ImportError:
     from yaml import SafeDumper, SafeLoader, UnsafeLoader
 
