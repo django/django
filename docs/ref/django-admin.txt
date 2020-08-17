@@ -1527,7 +1527,7 @@ tests, which allows it to print a traceback if the interpreter crashes. Pass
 
 .. versionadded:: 3.2
 
-Outputs timings, including including database setup and total run time.
+Outputs timings, including database setup and total run time.
 
 ``testserver``
 --------------
