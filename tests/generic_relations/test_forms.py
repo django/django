@@ -271,3 +271,27 @@ id="id_generic_relations-taggeditem-content_type-object_id-1-id"></p>""" % tagge
             formset.non_form_errors(),
             ['Please submit 20 or fewer forms.'],
         )
+
+    def test_can_delete_extra(self):
+        GenericFormSet = generic_inlineformset_factory(
+            TaggedItem,
+            can_delete=True,
+            can_delete_extra=True,
+            extra=2,
+        )
+        formset = GenericFormSet()
+        self.assertEqual(len(formset), 2)
+        self.assertIn('DELETE', formset.forms[0].fields)
+        self.assertIn('DELETE', formset.forms[1].fields)
+
+    def test_disable_delete_extra(self):
+        GenericFormSet = generic_inlineformset_factory(
+            TaggedItem,
+            can_delete=True,
+            can_delete_extra=False,
+            extra=2,
+        )
+        formset = GenericFormSet()
+        self.assertEqual(len(formset), 2)
+        self.assertNotIn('DELETE', formset.forms[0].fields)
+        self.assertNotIn('DELETE', formset.forms[1].fields)
