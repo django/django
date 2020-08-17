@@ -18,9 +18,9 @@ from django.db import models
 
 # Use the C (faster) implementation if possible
 try:
-    from yaml import CSafeDumper as SafeDumper, CSafeLoader as SafeLoader
+    from yaml import CSafeDumper as SafeDumper, CSafeLoader as SafeLoader, CUnsafeLoader as UnsafeLoader
 except ImportError:
-    from yaml import SafeDumper, SafeLoader
+    from yaml import SafeDumper, SafeLoader, UnsafeLoader
 
 
 class DjangoSafeDumper(SafeDumper):
@@ -73,7 +73,8 @@ def Deserializer(stream_or_string, **options):
     else:
         stream = stream_or_string
     try:
-        yield from PythonDeserializer(yaml.load(stream, Loader=SafeLoader), **options)
+        Loader = UnsafeLoader if options.get('load_unsafe', False) else SafeLoader
+        yield from PythonDeserializer(yaml.load(stream, Loader=Loader), **options)
     except (GeneratorExit, DeserializationError):
         raise
     except Exception as exc:

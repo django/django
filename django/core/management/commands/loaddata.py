@@ -175,7 +175,7 @@ class Command(BaseCommand):
 
                 objects = serializers.deserialize(
                     ser_fmt, fixture, using=self.using, ignorenonexistent=self.ignore,
-                    handle_forward_references=True,
+                    handle_forward_references=True, load_unsafe=True,
                 )
 
                 for obj in objects:
