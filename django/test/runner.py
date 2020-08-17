@@ -629,9 +629,9 @@ class DiscoverRunner:
             self.parallel, **kwargs
         )
 
-    def clone_databases(self, old_config):
+    def clone_databases(self, old_config, initial_settings):
         if self.parallel > 1:
-            _clone_databases(old_config, self.parallel, self.verbosity, self.keepdb)
+            _clone_databases(old_config, initial_settings, self.verbosity, self.keepdb, self.parallel)
 
     def get_resultclass(self):
         if self.debug_sql:
@@ -711,9 +711,13 @@ class DiscoverRunner:
         databases = self.get_databases(suite)
         old_config = self.setup_databases(aliases=databases)
         run_failed = False
+        initial_settings = {
+            str(alias): connections[alias].settings_dict
+            for alias in connections
+        }
         try:
             self.run_checks(databases)
-            self.clone_databases(old_config)
+            self.clone_databases(old_config, initial_settings)
             result = self.run_suite(suite)
         except Exception:
             run_failed = True
