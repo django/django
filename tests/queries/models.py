@@ -42,6 +42,7 @@ class Note(models.Model):
     note = models.CharField(max_length=100)
     misc = models.CharField(max_length=10)
     tag = models.ForeignKey(Tag, models.SET_NULL, blank=True, null=True)
+    negate = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['note']
@@ -142,6 +143,7 @@ class Cover(models.Model):
 class Number(models.Model):
     num = models.IntegerField()
     other_num = models.IntegerField(null=True)
+    another_num = models.IntegerField(null=True)
 
     def __str__(self):
         return str(self.num)

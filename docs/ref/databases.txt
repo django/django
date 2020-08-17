@@ -639,7 +639,7 @@ Option          MariaDB   MySQL
 =============== ========= ==========
 ``SKIP LOCKED``           X (≥8.0.1)
 ``NOWAIT``      X (≥10.3) X (≥8.0.1)
-``OF``
+``OF``                    X (≥8.0.1)
 ``NO KEY``
 =============== ========= ==========
 
@@ -1059,9 +1059,7 @@ by 3rd parties that allow you to use other databases with Django:
 
 * `CockroachDB`_
 * `Firebird`_
-* `IBM DB2`_
 * `Microsoft SQL Server`_
-* `ODBC`_
 
 The Django versions and ORM features supported by these unofficial backends
 vary considerably. Queries regarding the specific capabilities of these
@@ -1070,6 +1068,4 @@ the support channels provided by each 3rd party project.
 
 .. _CockroachDB: https://pypi.org/project/django-cockroachdb/
 .. _Firebird: https://pypi.org/project/django-firebird/
-.. _IBM DB2: https://pypi.org/project/ibm_db_django/
 .. _Microsoft SQL Server: https://pypi.org/project/django-mssql-backend/
-.. _ODBC: https://pypi.org/project/django-pyodbc/

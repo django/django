@@ -11,7 +11,6 @@ from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.models.expressions import Col
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
-from django.utils.duration import duration_microseconds
 from django.utils.functional import cached_property
 
 
@@ -73,9 +72,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         string and could otherwise cause a collision with a field name.
         """
         return "django_date_extract('%s', %s)" % (lookup_type.lower(), field_name)
-
-    def date_interval_sql(self, timedelta):
-        return str(duration_microseconds(timedelta))
 
     def format_for_duration_arithmetic(self, sql):
         """Do nothing since formatting is handled in the custom function."""

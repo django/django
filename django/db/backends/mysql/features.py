@@ -17,7 +17,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_index_column_ordering = False
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
-    allows_auto_pk_0 = False
     can_release_savepoints = True
     atomic_transactions = False
     can_clone_databases = True
@@ -41,16 +40,27 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             SET V_I = P_I;
         END;
     """
-    db_functions_convert_bytes_to_str = True
     # Neither MySQL nor MariaDB support partial indexes.
     supports_partial_indexes = False
     supports_order_by_nulls_modifier = False
     order_by_nulls_first = True
+    test_collations = {
+        'ci': 'utf8_general_ci',
+        'swedish-ci': 'utf8_swedish_ci',
+    }
 
     @cached_property
     def _mysql_storage_engine(self):
         "Internal method used in Django tests. Don't rely on this from your code"
         return self.connection.mysql_server_data['default_storage_engine']
+
+    @cached_property
+    def allows_auto_pk_0(self):
+        """
+        Autoincrement primary key can be set to 0 if it doesn't generate new
+        autoincrement values.
+        """
+        return 'NO_AUTO_VALUE_ON_ZERO' in self.connection.sql_mode
 
     @cached_property
     def update_can_self_select(self):
@@ -117,6 +127,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.mysql_is_mariadb:
             return self.connection.mysql_version >= (10, 3, 0)
         return self.connection.mysql_version >= (8, 0, 1)
+
+    @cached_property
+    def has_select_for_update_of(self):
+        return not self.connection.mysql_is_mariadb and self.connection.mysql_version >= (8, 0, 1)
 
     @cached_property
     def supports_explain_analyze(self):

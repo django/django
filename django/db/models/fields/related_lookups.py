@@ -64,7 +64,9 @@ class RelatedIn(In):
             # For multicolumn lookups we need to build a multicolumn where clause.
             # This clause is either a SubqueryConstraint (for values that need to be compiled to
             # SQL) or an OR-combined list of (col1 = val1 AND col2 = val2 AND ...) clauses.
-            from django.db.models.sql.where import WhereNode, SubqueryConstraint, AND, OR
+            from django.db.models.sql.where import (
+                AND, OR, SubqueryConstraint, WhereNode,
+            )
 
             root_constraint = WhereNode(connector=OR)
             if self.rhs_is_direct_value():
@@ -120,7 +122,7 @@ class RelatedLookupMixin:
         if isinstance(self.lhs, MultiColSource):
             assert self.rhs_is_direct_value()
             self.rhs = get_normalized_value(self.rhs, self.lhs)
-            from django.db.models.sql.where import WhereNode, AND
+            from django.db.models.sql.where import AND, WhereNode
             root_constraint = WhereNode()
             for target, source, val in zip(self.lhs.targets, self.lhs.sources, self.rhs):
                 lookup_class = target.get_lookup(self.lookup_name)

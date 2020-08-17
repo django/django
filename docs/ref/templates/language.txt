@@ -407,6 +407,13 @@ Here are some tips for working with inheritance:
   not be automatically escaped (see the `next section`_), since it was
   already escaped, if necessary, in the parent template.
 
+* By using the same template name as you are inheriting from,
+  :ttag:`{% extends %}<extends>` can be used to inherit a template at the same
+  time as overriding it. Combined with ``{{ block.super }}``, this can be a
+  powerful way to make small customizations. See
+  :ref:`extending_an_overridden_template` in the *Overriding templates* How-to
+  for a full example.
+
 * Variables created outside of a :ttag:`{% block %}<block>` using the template
   tag ``as`` syntax can't be used inside the block. For example, this template
   doesn't render anything::

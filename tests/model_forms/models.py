@@ -28,8 +28,17 @@ class Category(models.Model):
         return self.__str__()
 
 
+class WriterManager(models.Manager):
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(archived=False)
+
+
 class Writer(models.Model):
     name = models.CharField(max_length=50, help_text='Use both first and last names.')
+    archived = models.BooleanField(default=False, editable=False)
+
+    objects = WriterManager()
 
     class Meta:
         ordering = ('name',)

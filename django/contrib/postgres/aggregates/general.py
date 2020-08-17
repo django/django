@@ -1,5 +1,5 @@
 from django.contrib.postgres.fields import ArrayField
-from django.db.models import Aggregate, JSONField, Value
+from django.db.models import Aggregate, BooleanField, JSONField, Value
 
 from .mixins import OrderableAggMixin
 
@@ -33,10 +33,12 @@ class BitOr(Aggregate):
 
 class BoolAnd(Aggregate):
     function = 'BOOL_AND'
+    output_field = BooleanField()
 
 
 class BoolOr(Aggregate):
     function = 'BOOL_OR'
+    output_field = BooleanField()
 
 
 class JSONBAgg(OrderableAggMixin, Aggregate):

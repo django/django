@@ -3,7 +3,8 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Danni Randeris <danniranderis+djangocore@gmail.com>, 2014
-# Erik Wognsen <r4mses@gmail.com>, 2013-2019
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2013-2019
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jonaskoelker <jonaskoelker@gnu.org>, 2012
@@ -13,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-05 05:53+0000\n"
-"Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-15 08:18+0000\n"
+"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -28,6 +29,9 @@ msgstr "afrikaans"
 
 msgid "Arabic"
 msgstr "arabisk"
+
+msgid "Algerian Arabic"
+msgstr "algerisk arabisk"
 
 msgid "Asturian"
 msgstr "Asturisk"
@@ -152,6 +156,9 @@ msgstr "interlingua"
 msgid "Indonesian"
 msgstr "indonesisk"
 
+msgid "Igbo"
+msgstr "igbo"
+
 msgid "Ido"
 msgstr "Ido"
 
@@ -181,6 +188,9 @@ msgstr "kannada"
 
 msgid "Korean"
 msgstr "koreansk"
+
+msgid "Kyrgyz"
+msgstr "kirgisisk"
 
 msgid "Luxembourgish"
 msgstr "luxembourgisk"
@@ -266,8 +276,14 @@ msgstr "tamil"
 msgid "Telugu"
 msgstr "telugu"
 
+msgid "Tajik"
+msgstr "tadsjikisk"
+
 msgid "Thai"
 msgstr "thai"
+
+msgid "Turkmen"
+msgstr "turkmensk"
 
 msgid "Turkish"
 msgstr "tyrkisk"
@@ -568,6 +584,9 @@ msgstr "“%(value)s”-værdien skal være enten None, True eller False."
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolsk (True, False eller None)"
 
+msgid "Positive big integer"
+msgstr "Positivt stort heltal"
+
 msgid "Positive integer"
 msgstr "Positivt heltal"
 
@@ -621,6 +640,12 @@ msgstr "Fil"
 
 msgid "Image"
 msgstr "Billede"
+
+msgid "A JSON object"
+msgstr "Et JSON-objekt"
+
+msgid "Value must be valid JSON."
+msgstr "Værdien skal være gyldig JSON."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -714,6 +739,9 @@ msgstr "Indtast en komplet værdi."
 msgid "Enter a valid UUID."
 msgstr "Indtast et gyldigt UUID."
 
+msgid "Enter a valid JSON."
+msgstr "Indtast gyldig JSON."
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -800,15 +828,7 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nej"
 
-msgid "Year"
-msgstr "År"
-
-msgid "Month"
-msgstr "Måned"
-
-msgid "Day"
-msgstr "Dag"
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "ja,nej,måske"
 
@@ -1116,9 +1136,6 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minut"
 msgstr[1] "%d minutter"
-
-msgid "0 minutes"
-msgstr "0 minutter"
 
 msgid "Forbidden"
 msgstr "Forbudt"

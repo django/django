@@ -11,7 +11,7 @@ Formset API reference. For introductory material about formsets, see the
 ``formset_factory``
 ===================
 
-.. function:: formset_factory(form, formset=BaseFormSet, extra=1, can_order=False, can_delete=False, max_num=None, validate_max=False, min_num=None, validate_min=False, absolute_max=None)
+.. function:: formset_factory(form, formset=BaseFormSet, extra=1, can_order=False, can_delete=False, max_num=None, validate_max=False, min_num=None, validate_min=False, absolute_max=None, can_delete_extra=True)
 
     Returns a ``FormSet`` class for the given ``form`` class.
 
@@ -19,4 +19,4 @@ Formset API reference. For introductory material about formsets, see the
 
     .. versionchanged:: 3.2
 
-        The ``absolute_max`` argument was added.
+        The ``absolute_max`` and ``can_delete_extra`` arguments were added.

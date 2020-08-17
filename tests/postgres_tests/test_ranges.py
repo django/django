@@ -18,6 +18,7 @@ from .models import (
 
 try:
     from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange
+
     from django.contrib.postgres import fields as pg_fields, forms as pg_forms
     from django.contrib.postgres.validators import (
         RangeMaxValueValidator, RangeMinValueValidator,
@@ -170,7 +171,7 @@ class TestRangeContainsLookup(PostgreSQLTestCase):
             self.aware_timestamps[1],
             (self.timestamps[1], self.timestamps[2]),
             (self.aware_timestamps[1], self.aware_timestamps[2]),
-            Value(self.dates[0], output_field=DateTimeField()),
+            Value(self.dates[0]),
             Func(F('dates'), function='lower', output_field=DateTimeField()),
             F('timestamps_inner'),
         )

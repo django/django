@@ -1006,26 +1006,26 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         )
         response = self.client.get(reverse('admin6:admin_views_article_changelist'))
         for field_name in expected_sortable_fields:
-            self.assertContains(response, '<th scope="col"  class="sortable column-%s">' % field_name)
+            self.assertContains(response, '<th scope="col" class="sortable column-%s">' % field_name)
         for field_name in expected_not_sortable_fields:
-            self.assertContains(response, '<th scope="col"  class="column-%s">' % field_name)
+            self.assertContains(response, '<th scope="col" class="column-%s">' % field_name)
 
     def test_get_sortable_by_columns_subset(self):
         response = self.client.get(reverse('admin6:admin_views_actor_changelist'))
-        self.assertContains(response, '<th scope="col"  class="sortable column-age">')
-        self.assertContains(response, '<th scope="col"  class="column-name">')
+        self.assertContains(response, '<th scope="col" class="sortable column-age">')
+        self.assertContains(response, '<th scope="col" class="column-name">')
 
     def test_sortable_by_no_column(self):
         expected_not_sortable_fields = ('title', 'book')
         response = self.client.get(reverse('admin6:admin_views_chapter_changelist'))
         for field_name in expected_not_sortable_fields:
-            self.assertContains(response, '<th scope="col"  class="column-%s">' % field_name)
-        self.assertNotContains(response, '<th scope="col"  class="sortable column')
+            self.assertContains(response, '<th scope="col" class="column-%s">' % field_name)
+        self.assertNotContains(response, '<th scope="col" class="sortable column')
 
     def test_get_sortable_by_no_column(self):
         response = self.client.get(reverse('admin6:admin_views_color_changelist'))
-        self.assertContains(response, '<th scope="col"  class="column-value">')
-        self.assertNotContains(response, '<th scope="col"  class="sortable column')
+        self.assertContains(response, '<th scope="col" class="column-value">')
+        self.assertNotContains(response, '<th scope="col" class="sortable column')
 
 
 @override_settings(TEMPLATES=[{
@@ -3292,7 +3292,7 @@ class AdminViewListEditable(TestCase):
         self.assertContains(response, 'Unordered object #3')
         self.assertContains(response, 'Unordered object #2')
         self.assertNotContains(response, 'Unordered object #1')
-        response = self.client.get(reverse('admin:admin_views_unorderedobject_changelist') + '?p=1')
+        response = self.client.get(reverse('admin:admin_views_unorderedobject_changelist') + '?p=2')
         self.assertNotContains(response, 'Unordered object #3')
         self.assertNotContains(response, 'Unordered object #2')
         self.assertContains(response, 'Unordered object #1')
@@ -4460,6 +4460,17 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
         self.p1 = PrePopulatedPost.objects.create(title='A Long Title', published=True, slug='a-long-title')
 
+    def test_login_button_centered(self):
+        self.selenium.get(self.live_server_url + reverse('admin:login'))
+        button = self.selenium.find_element_by_css_selector('.submit-row input')
+        offset_left = button.get_property('offsetLeft')
+        offset_right = (
+            button.get_property('offsetParent').get_property('offsetWidth') -
+            (offset_left + button.get_property('offsetWidth'))
+        )
+        # Use assertAlmostEqual to avoid pixel rounding errors.
+        self.assertAlmostEqual(offset_left, offset_right, delta=3)
+
     def test_prepopulated_fields(self):
         """
         The JavaScript-automated prepopulated fields work with the main form
@@ -4821,6 +4832,23 @@ class SeleniumTests(AdminSeleniumTestCase):
         # The newly selected pk should appear in the raw id input.
         value = self.selenium.find_element_by_id('id_form-0-parent').get_attribute('value')
         self.assertEqual(value, str(parent2.pk))
+
+    def test_input_element_font(self):
+        """
+        Browsers' default stylesheets override the font of inputs. The admin
+        adds additional CSS to handle this.
+        """
+        self.selenium.get(self.live_server_url + reverse('admin:login'))
+        element = self.selenium.find_element_by_id('id_username')
+        # Some browsers quotes the fonts, some don't.
+        fonts = [
+            font.strip().strip('"')
+            for font in element.value_of_css_property('font-family').split(',')
+        ]
+        self.assertEqual(
+            fonts,
+            ['Roboto', 'Lucida Grande', 'Verdana', 'Arial', 'sans-serif'],
+        )
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')

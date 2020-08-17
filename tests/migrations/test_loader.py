@@ -506,12 +506,11 @@ class LoaderTests(TestCase):
         MIGRATION_MODULES={'migrations': 'migrations.test_migrations_namespace_package'},
     )
     def test_loading_namespace_package(self):
-        """Migration directories without an __init__.py file are loaded."""
-        migration_loader = MigrationLoader(connection)
-        self.assertEqual(
-            migration_loader.graph.forwards_plan(('migrations', '0001_initial')),
-            [('migrations', '0001_initial')],
-        )
+        """Migration directories without an __init__.py file are ignored."""
+        loader = MigrationLoader(connection)
+        loader.load_disk()
+        migrations = [name for app, name in loader.disk_migrations if app == 'migrations']
+        self.assertEqual(migrations, [])
 
 
 class PycLoaderTests(MigrationTestBase):

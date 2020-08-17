@@ -11,18 +11,23 @@
     <div id="qunit-fixture">
     </div>
     <script type="text/html" id="result-table">
-        <table id="result_list">
-            <tr>
-                <th>
-                   <input type="checkbox" id="action-toggle">
-                </th>
-            </tr>
-            <tr>
-                <td class="action-checkbox">
-                    <input class="action-select" type="checkbox" value="618">
-                </td>
-            </tr>
-        </table>
+        <form id="changelist-form">
+            <button type="submit" class="button" name="index" value="0">Go</button>
+            <span class="action-counter" data-actions-icnt="100"></span>
+            <table id="result_list">
+                <tr>
+                    <th>
+                       <input type="checkbox" id="action-toggle">
+                    </th>
+                </tr>
+                <tr>
+                    <td class="action-checkbox">
+                        <input class="action-select" type="checkbox" value="618">
+                    </td>
+                </tr>
+            </table>
+            <input type="submit" name="_save" value="Save">
+        </form>
     </script>
     <script type="text/html" id="tabular-formset">
         <input id="id_first-TOTAL_FORMS" value="1">

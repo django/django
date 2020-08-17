@@ -295,10 +295,17 @@ class Command(BaseCommand):
                 subclass = type("Migration", (Migration,), {
                     "dependencies": [(app_label, migration.name) for migration in merge_migrations],
                 })
-                migration_name = "%04i_%s" % (
-                    biggest_number + 1,
-                    self.migration_name or ("merge_%s" % get_migration_name_timestamp())
-                )
+                parts = ['%04i' % (biggest_number + 1)]
+                if self.migration_name:
+                    parts.append(self.migration_name)
+                else:
+                    parts.append('merge')
+                    leaf_names = '_'.join(sorted(migration.name for migration in merge_migrations))
+                    if len(leaf_names) > 47:
+                        parts.append(get_migration_name_timestamp())
+                    else:
+                        parts.append(leaf_names)
+                migration_name = '_'.join(parts)
                 new_migration = subclass(migration_name, app_label)
                 writer = MigrationWriter(new_migration, self.include_header)
 

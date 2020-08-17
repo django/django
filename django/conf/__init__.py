@@ -27,6 +27,12 @@ PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG = (
     'PASSWORD_RESET_TIMEOUT instead.'
 )
 
+DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG = (
+    'The DEFAULT_HASHING_ALGORITHM transitional setting is deprecated. '
+    'Support for it and tokens, cookies, sessions, and signatures that use '
+    'SHA-1 hashing algorithm will be removed in Django 4.0.'
+)
+
 
 class SettingsReference(str):
     """
@@ -76,6 +82,14 @@ class LazySettings(LazyObject):
         if self._wrapped is empty:
             self._setup(name)
         val = getattr(self._wrapped, name)
+
+        # Special case some settings which require further modification.
+        # This is done here for performance reasons so the modified value is cached.
+        if name in {'MEDIA_URL', 'STATIC_URL'} and val is not None:
+            val = self._add_script_prefix(val)
+        elif name == 'SECRET_KEY' and not val:
+            raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
+
         self.__dict__[name] = val
         return val
 
@@ -149,14 +163,6 @@ class LazySettings(LazyObject):
             )
         return self.__getattr__('PASSWORD_RESET_TIMEOUT_DAYS')
 
-    @property
-    def STATIC_URL(self):
-        return self._add_script_prefix(self.__getattr__('STATIC_URL'))
-
-    @property
-    def MEDIA_URL(self):
-        return self._add_script_prefix(self.__getattr__('MEDIA_URL'))
-
 
 class Settings:
     def __init__(self, settings_module):
@@ -186,9 +192,6 @@ class Settings:
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
-        if not self.SECRET_KEY:
-            raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
-
         if self.is_overridden('PASSWORD_RESET_TIMEOUT_DAYS'):
             if self.is_overridden('PASSWORD_RESET_TIMEOUT'):
                 raise ImproperlyConfigured(
@@ -197,6 +200,9 @@ class Settings:
                 )
             setattr(self, 'PASSWORD_RESET_TIMEOUT', self.PASSWORD_RESET_TIMEOUT_DAYS * 60 * 60 * 24)
             warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
+
+        if self.is_overridden('DEFAULT_HASHING_ALGORITHM'):
+            warnings.warn(DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG, RemovedInDjango40Warning)
 
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
@@ -244,6 +250,8 @@ class UserSettingsHolder:
         if name == 'PASSWORD_RESET_TIMEOUT_DAYS':
             setattr(self, 'PASSWORD_RESET_TIMEOUT', value * 60 * 60 * 24)
             warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
+        if name == 'DEFAULT_HASHING_ALGORITHM':
+            warnings.warn(DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG, RemovedInDjango40Warning)
         super().__setattr__(name, value)
 
     def __delattr__(self, name):

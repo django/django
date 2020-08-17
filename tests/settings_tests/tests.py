@@ -289,15 +289,11 @@ class SettingsTests(SimpleTestCase):
         with self.assertRaises(AttributeError):
             getattr(settings, 'TEST2')
 
+    @override_settings(SECRET_KEY='')
     def test_no_secret_key(self):
-        settings_module = ModuleType('fake_settings_module')
-        sys.modules['fake_settings_module'] = settings_module
         msg = 'The SECRET_KEY setting must not be empty.'
-        try:
-            with self.assertRaisesMessage(ImproperlyConfigured, msg):
-                Settings('fake_settings_module')
-        finally:
-            del sys.modules['fake_settings_module']
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            settings.SECRET_KEY
 
     def test_no_settings_module(self):
         msg = (

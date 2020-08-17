@@ -484,7 +484,15 @@ The ``output_field`` argument should be a model field instance, like
 after it's retrieved from the database. Usually no arguments are needed when
 instantiating the model field as any arguments relating to data validation
 (``max_length``, ``max_digits``, etc.) will not be enforced on the expression's
-output value.
+output value. If no ``output_field`` is specified it will be tentatively
+inferred from the :py:class:`type` of the provided ``value``, if possible. For
+example, passing an instance of :py:class:`datetime.datetime` as ``value``
+would default ``output_field`` to :class:`~django.db.models.DateTimeField`.
+
+.. versionchanged:: 3.2
+
+  Support for inferring a default ``output_field`` from the type of ``value``
+  was added.
 
 ``ExpressionWrapper()`` expressions
 -----------------------------------

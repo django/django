@@ -466,8 +466,10 @@ class BaseDatabaseSchemaEditor:
             if self.sql_create_column_inline_fk:
                 to_table = field.remote_field.model._meta.db_table
                 to_column = field.remote_field.model._meta.get_field(field.remote_field.field_name).column
+                namespace, _ = split_identifier(model._meta.db_table)
                 definition += " " + self.sql_create_column_inline_fk % {
                     'name': self._fk_constraint_name(model, field, constraint_suffix),
+                    'namespace': '%s.' % self.quote_name(namespace) if namespace else '',
                     'column': self.quote_name(field.column),
                     'to_table': self.quote_name(to_table),
                     'to_column': self.quote_name(to_column),
@@ -536,6 +538,8 @@ class BaseDatabaseSchemaEditor:
         If `strict` is True, raise errors if the old column does not match
         `old_field` precisely.
         """
+        if not self._field_should_be_altered(old_field, new_field):
+            return
         # Ensure this field is even column-based
         old_db_params = old_field.db_parameters(connection=self.connection)
         old_type = old_db_params['type']
@@ -1031,6 +1035,19 @@ class BaseDatabaseSchemaEditor:
         if self._field_should_be_indexed(model, field):
             output.append(self._create_index_sql(model, [field]))
         return output
+
+    def _field_should_be_altered(self, old_field, new_field):
+        _, old_path, old_args, old_kwargs = old_field.deconstruct()
+        _, new_path, new_args, new_kwargs = new_field.deconstruct()
+        # Don't alter when:
+        # - changing only a field name
+        # - adding only a db_column and the column name is not changed
+        old_kwargs.pop('db_column', None)
+        new_kwargs.pop('db_column', None)
+        return (
+            old_field.column != new_field.column or
+            (old_path, old_args, old_kwargs) != (new_path, new_args, new_kwargs)
+        )
 
     def _field_should_be_indexed(self, model, field):
         return field.db_index and not field.unique

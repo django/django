@@ -151,8 +151,7 @@ Here's the formal declaration of a ``QuerySet``:
         The ``query`` parameter to :class:`QuerySet` exists so that specialized
         query subclasses can reconstruct internal query state. The value of the
         parameter is an opaque representation of that query state and is not
-        part of a public API. To put it another way: if you need to ask, you
-        don't need to use it.
+        part of a public API.
 
 .. currentmodule:: django.db.models.query.QuerySet
 
@@ -267,6 +266,42 @@ control the name of the annotation::
 
 For an in-depth discussion of aggregation, see :doc:`the topic guide on
 Aggregation </topics/db/aggregation>`.
+
+``alias()``
+~~~~~~~~~~~
+
+.. method:: alias(*args, **kwargs)
+
+.. versionadded:: 3.2
+
+Same as :meth:`annotate`, but instead of annotating objects in the
+``QuerySet``, saves the expression for later reuse with other ``QuerySet``
+methods. This is useful when the result of the expression itself is not needed
+but it is used for filtering, ordering, or as a part of a complex expression.
+Not selecting the unused value removes redundant work from the database which
+should result in better performance.
+
+For example, if you want to find blogs with more than 5 entries, but are not
+interested in the exact number of entries, you could do this::
+
+    >>> from django.db.models import Count
+    >>> blogs = Blog.objects.alias(entries=Count('entry')).filter(entries__gt=5)
+
+``alias()`` can be used in conjunction with :meth:`annotate`, :meth:`exclude`,
+:meth:`filter`, :meth:`order_by`, and :meth:`update`. To use aliased expression
+with other methods (e.g. :meth:`aggregate`), you must promote it to an
+annotation::
+
+    Blog.objects.alias(entries=Count('entry')).annotate(
+        entries=F('entries'),
+    ).aggregate(Sum('entries'))
+
+:meth:`filter` and :meth:`order_by` can take expressions directly, but
+expression construction and usage often does not happen in the same place (for
+example, ``QuerySet`` method creates expressions, for later use in views).
+``alias()`` allows building complex expressions incrementally, possibly
+spanning multiple methods and modules, refer to the expression parts by their
+aliases and only use :meth:`annotate` for the final result.
 
 ``order_by()``
 ~~~~~~~~~~~~~~
@@ -859,8 +894,8 @@ duplicate values, use the ``all=True`` argument.
 of the type of the first ``QuerySet`` even if the arguments are ``QuerySet``\s
 of other models. Passing different models works as long as the ``SELECT`` list
 is the same in all ``QuerySet``\s (at least the types, the names don't matter
-as long as the types in the same order). In such cases, you must use the column
-names from the first ``QuerySet`` in ``QuerySet`` methods applied to the
+as long as the types are in the same order). In such cases, you must use the
+column names from the first ``QuerySet`` in ``QuerySet`` methods applied to the
 resulting ``QuerySet``. For example::
 
     >>> qs1 = Author.objects.values_list('name')
@@ -1729,9 +1764,9 @@ them::
 
 Currently, the ``postgresql``, ``oracle``, and ``mysql`` database
 backends support ``select_for_update()``. However, MariaDB 10.3+ supports only
-the ``nowait`` argument and MySQL 8.0.1+ supports the ``nowait`` and
-``skip_locked`` arguments. MySQL and MariaDB don't support the ``of`` argument.
-The ``no_key`` argument is supported only on PostgreSQL.
+the ``nowait`` argument and MySQL 8.0.1+ supports the ``nowait``,
+``skip_locked``, and ``of`` arguments. The ``no_key`` argument is supported
+only on PostgreSQL.
 
 Passing ``nowait=True``, ``skip_locked=True``, ``no_key=True``, or ``of`` to
 ``select_for_update()`` using database backends that do not support these
@@ -1768,6 +1803,8 @@ raised if ``select_for_update()`` is used in autocommit mode.
 .. versionchanged:: 3.2
 
     The ``no_key`` argument was added.
+
+    The ``of`` argument was allowed on MySQL 8.0.1+.
 
 ``raw()``
 ~~~~~~~~~
@@ -1842,34 +1879,42 @@ they query the database each time they're called.
 .. method:: get(**kwargs)
 
 Returns the object matching the given lookup parameters, which should be in
-the format described in `Field lookups`_.
+the format described in `Field lookups`_. You should use lookups that are
+guaranteed unique, such as the primary key or fields in a unique constraint.
+For example::
 
-``get()`` raises :exc:`~django.core.exceptions.MultipleObjectsReturned` if more
-than one object was found. The
-:exc:`~django.core.exceptions.MultipleObjectsReturned` exception is an
-attribute of the model class.
+    Entry.objects.get(id=1)
+    Entry.objects.get(blog=blog, entry_number=1)
 
-``get()`` raises a :exc:`~django.db.models.Model.DoesNotExist` exception if an
-object wasn't found for the given parameters. This exception is an attribute
-of the model class. Example::
+If you expect a queryset to already return one row, you can use ``get()``
+without any arguments to return the object for that row::
 
-    Entry.objects.get(id='foo') # raises Entry.DoesNotExist
+    Entry.objects.filter(pk=1).get()
 
-The :exc:`~django.db.models.Model.DoesNotExist` exception inherits from
-:exc:`django.core.exceptions.ObjectDoesNotExist`, so you can target multiple
-:exc:`~django.db.models.Model.DoesNotExist` exceptions. Example::
+If ``get()`` doesn't find any object, it raises a :exc:`Model.DoesNotExist
+<django.db.models.Model.DoesNotExist>` exception::
+
+    Entry.objects.get(id=-999) # raises Entry.DoesNotExist
+
+If ``get()`` finds more than one object, it raises a
+:exc:`Model.MultipleObjectsReturned
+<django.db.models.Model.MultipleObjectsReturned>` exception::
+
+    Entry.objects.get(name='A Duplicated Name') # raises Entry.MultipleObjectsReturned
+
+Both these exception classes are attributes of the model class, and specific to
+that model. If you want to handle such exceptions from several ``get()`` calls
+for different models, you can use their generic base classes. For example, you
+can use :exc:`django.core.exceptions.ObjectDoesNotExist`  to handle
+:exc:`~django.db.models.Model.DoesNotExist` exceptions from multiple models::
 
     from django.core.exceptions import ObjectDoesNotExist
+
     try:
-        e = Entry.objects.get(id=3)
-        b = Blog.objects.get(id=1)
+        blog = Blog.objects.get(id=1)
+        entry = Entry.objects.get(blog=blog, entry_number=1)
     except ObjectDoesNotExist:
-        print("Either the entry or blog doesn't exist.")
-
-If you expect a queryset to return one row, you can use ``get()`` without any
-arguments to return the object for that row::
-
-    entry = Entry.objects.filter(...).exclude(...).get()
+        print("Either the blog or entry doesn't exist.")
 
 ``create()``
 ~~~~~~~~~~~~
@@ -2529,6 +2574,21 @@ update a bunch of records for a model that has a custom
     for e in Entry.objects.filter(pub_date__year=2010):
         e.comments_on = False
         e.save()
+
+Ordered queryset
+^^^^^^^^^^^^^^^^
+
+.. versionadded:: 3.2
+
+Chaining ``order_by()`` with ``update()`` is supported only on MariaDB and
+MySQL, and is ignored for different databases. This is useful for updating a
+unique field in the order that is specified without conflicts. For example::
+
+    Entry.objects.order_by('-number').update(number=F('number') + 1)
+
+.. note::
+
+    If the ``order_by()`` clause contains annotations, it will be ignored.
 
 ``delete()``
 ~~~~~~~~~~~~
@@ -3692,17 +3752,10 @@ operate on vegetarian pizzas.
 
 ``FilteredRelation`` doesn't support:
 
-* Conditions that span relational fields. For example::
-
-    >>> Restaurant.objects.annotate(
-    ...    pizzas_with_toppings_startswith_n=FilteredRelation(
-    ...        'pizzas__toppings',
-    ...        condition=Q(pizzas__toppings__name__startswith='n'),
-    ...    ),
-    ... )
-    Traceback (most recent call last):
-    ...
-    ValueError: FilteredRelation's condition doesn't support nested relations (got 'pizzas__toppings__name__startswith').
 * :meth:`.QuerySet.only` and :meth:`~.QuerySet.prefetch_related`.
 * A :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
   inherited from a parent model.
+
+.. versionchanged:: 3.2
+
+    Support for nested relations was added.

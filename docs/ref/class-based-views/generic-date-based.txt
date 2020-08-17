@@ -342,6 +342,12 @@ views for displaying drilldown pages for date-based data.
       * ``'%W'``: Similar to ``'%U'``, except it assumes that the week
         begins on Monday. This is not the same as the ISO 8601 week number.
 
+      * ``'%V'``: ISO 8601 week number where the week begins on Monday.
+
+        .. versionadded:: 3.2
+
+            Support for the ``'%V'`` week format was added.
+
     **Example myapp/views.py**::
 
         from django.views.generic.dates import WeekArchiveView

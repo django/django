@@ -278,6 +278,12 @@ LANG_INFO = {
         'name': 'Indonesian',
         'name_local': 'Bahasa Indonesia',
     },
+    'ig': {
+        'bidi': False,
+        'code': 'ig',
+        'name': 'Igbo',
+        'name_local': 'Asụsụ Ìgbò',
+    },
     'is': {
         'bidi': False,
         'code': 'is',
@@ -523,6 +529,12 @@ LANG_INFO = {
         'code': 'th',
         'name': 'Thai',
         'name_local': 'ภาษาไทย',
+    },
+    'tk': {
+        'bidi': False,
+        'code': 'tk',
+        'name': 'Turkmen',
+        'name_local': 'Türkmençe',
     },
     'tr': {
         'bidi': False,

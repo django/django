@@ -77,6 +77,14 @@ class AdminSidebarTests(TestCase):
         self.assertContains(response, '<a href="%s">Users</a>' % url)
         self.assertNotContains(response, 'aria-current')
 
+    @override_settings(DEBUG=True)
+    def test_included_app_list_template_context_fully_set(self):
+        # All context variables should be set when rendering the sidebar.
+        url = reverse('test_with_sidebar:auth_user_changelist')
+        with self.assertRaisesMessage(AssertionError, 'no logs'):
+            with self.assertLogs('django.template', 'DEBUG'):
+                self.client.get(url)
+
 
 @override_settings(ROOT_URLCONF='admin_views.test_nav_sidebar')
 class SeleniumTests(AdminSeleniumTestCase):

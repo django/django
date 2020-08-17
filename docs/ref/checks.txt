@@ -85,6 +85,7 @@ Django's system checks are organized using the following tags:
 * ``models``: Checks of model, field, and manager definitions.
 * ``security``: Checks security related configuration.
 * ``signals``: Checks on signal declarations and handler registrations.
+* ``sites``: Checks :mod:`django.contrib.sites` configuration.
 * ``staticfiles``: Checks :mod:`django.contrib.staticfiles` configuration.
 * ``templates``: Checks template related configuration.
 * ``translation``: Checks translation related configuration.
@@ -100,6 +101,10 @@ Some checks may be registered with multiple tags.
 
     The ``database`` checks are now run only for database aliases specified
     using the :option:`check --database` option.
+
+.. versionchanged:: 3.2
+
+    The ``sites`` tag was added.
 
 Core system checks
 ==================
@@ -364,6 +369,7 @@ Models
   non-key columns.
 * **models.W040**: ``<database>`` does not support indexes with non-key
   columns.
+* **models.E041**: ``constraints`` refers to the joined field ``<field name>``.
 
 Security
 --------
@@ -477,6 +483,12 @@ The following checks are run if you use the :option:`check --deploy` option:
   should consider enabling this header to protect user privacy.
 * **security.E023**: You have set the :setting:`SECURE_REFERRER_POLICY` setting
   to an invalid value.
+
+The following checks verify that your security-related settings are correctly
+configured:
+
+* **security.E100**: :setting:`DEFAULT_HASHING_ALGORITHM` must be ``'sha1'`` or
+  ``'sha256'``.
 
 Signals
 -------
@@ -811,6 +823,11 @@ The following checks are performed on any model using a
   ``<field name>``.
 * **sites.E002**: ``CurrentSiteManager`` cannot use ``<field>`` as it is not a
   foreign key or a many-to-many field.
+
+The following checks verify that :mod:`django.contrib.sites` is correctly
+configured:
+
+* **sites.E101**: The :setting:`SITE_ID` setting must be an integer.
 
 ``staticfiles``
 ---------------

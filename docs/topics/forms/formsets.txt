@@ -593,6 +593,18 @@ On the other hand, if you are using a plain ``FormSet``, it's up to you to
 handle ``formset.deleted_forms``, perhaps in your formset's ``save()`` method,
 as there's no general notion of what it means to delete a form.
 
+``can_delete_extra``
+--------------------
+
+.. versionadded:: 3.2
+
+.. attribute:: BaseFormSet.can_delete_extra
+
+Default: ``True``
+
+While setting ``can_delete=True``, specifying ``can_delete_extra=False`` will
+remove the option to delete extra forms.
+
 Adding additional fields to a formset
 =====================================
 

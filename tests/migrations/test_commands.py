@@ -247,7 +247,13 @@ class MigrateTests(MigrationTestBase):
         """
         migrate exits if it detects a conflict.
         """
-        with self.assertRaisesMessage(CommandError, "Conflicting migrations detected"):
+        msg = (
+            "Conflicting migrations detected; multiple leaf nodes in the "
+            "migration graph: (0002_conflicting_second, 0002_second in "
+            "migrations).\n"
+            "To fix them run 'python manage.py makemigrations --merge'"
+        )
+        with self.assertRaisesMessage(CommandError, msg):
             call_command("migrate", "migrations")
 
     @override_settings(MIGRATION_MODULES={
@@ -1066,16 +1072,13 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module(module="migrations.test_migrations_conflict"):
             with self.assertRaises(CommandError) as context:
                 call_command("makemigrations")
-        exception_message = str(context.exception)
-        self.assertIn(
-            'Conflicting migrations detected; multiple leaf nodes '
-            'in the migration graph:',
-            exception_message
+        self.assertEqual(
+            str(context.exception),
+            "Conflicting migrations detected; multiple leaf nodes in the "
+            "migration graph: (0002_conflicting_second, 0002_second in "
+            "migrations).\n"
+            "To fix them run 'python manage.py makemigrations --merge'"
         )
-        self.assertIn('0002_second', exception_message)
-        self.assertIn('0002_conflicting_second', exception_message)
-        self.assertIn('in migrations', exception_message)
-        self.assertIn("To fix them run 'python manage.py makemigrations --merge'", exception_message)
 
     def test_makemigrations_merge_no_conflict(self):
         """
@@ -1205,12 +1208,27 @@ class MakeMigrationsTests(MigrationTestBase):
                 self.assertTrue(os.path.exists(merge_file))
             self.assertIn("Created new merge migration", out.getvalue())
 
+    def test_makemigrations_default_merge_name(self):
+        out = io.StringIO()
+        with self.temporary_migration_module(
+            module='migrations.test_migrations_conflict'
+        ) as migration_dir:
+            call_command('makemigrations', 'migrations', merge=True, interactive=False, stdout=out)
+            merge_file = os.path.join(
+                migration_dir,
+                '0003_merge_0002_conflicting_second_0002_second.py',
+            )
+            self.assertIs(os.path.exists(merge_file), True)
+        self.assertIn('Created new merge migration %s' % merge_file, out.getvalue())
+
     @mock.patch('django.db.migrations.utils.datetime')
-    def test_makemigrations_default_merge_name(self, mock_datetime):
+    def test_makemigrations_auto_merge_name(self, mock_datetime):
         mock_datetime.datetime.now.return_value = datetime.datetime(2016, 1, 2, 3, 4)
         with mock.patch('builtins.input', mock.Mock(return_value='y')):
             out = io.StringIO()
-            with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
+            with self.temporary_migration_module(
+                module='migrations.test_migrations_conflict_long_name'
+            ) as migration_dir:
                 call_command("makemigrations", "migrations", merge=True, interactive=True, stdout=out)
                 merge_file = os.path.join(migration_dir, '0003_merge_20160102_0304.py')
                 self.assertTrue(os.path.exists(merge_file))
@@ -1488,20 +1506,16 @@ class MakeMigrationsTests(MigrationTestBase):
                     "makemigrations", "conflicting_app_with_dependencies",
                     merge=True, interactive=True, stdout=out
                 )
-            val = out.getvalue().lower()
-            self.assertIn('merging conflicting_app_with_dependencies\n', val)
-            self.assertIn(
+            self.assertEqual(
+                out.getvalue().lower(),
+                'merging conflicting_app_with_dependencies\n'
                 '  branch 0002_conflicting_second\n'
-                '    - create model something\n',
-                val
-            )
-            self.assertIn(
+                '    - create model something\n'
                 '  branch 0002_second\n'
                 '    - delete model tribble\n'
                 '    - remove field silly_field from author\n'
                 '    - add field rating to author\n'
-                '    - create model book\n',
-                val
+                '    - create model book\n'
             )
 
     def test_makemigrations_with_custom_name(self):

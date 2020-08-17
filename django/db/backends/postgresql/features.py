@@ -57,6 +57,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     validates_explain_options = False  # A query will error on invalid options.
     supports_deferrable_unique_constraints = True
     has_json_operators = True
+    json_key_contains_list_matching_requires_list = True
+    test_collations = {
+        'swedish-ci': 'sv-x-icu',
+    }
 
     @cached_property
     def introspected_field_types(self):
@@ -78,6 +82,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def is_postgresql_12(self):
         return self.connection.pg_version >= 120000
+
+    @cached_property
+    def is_postgresql_13(self):
+        return self.connection.pg_version >= 130000
 
     has_brin_autosummarize = property(operator.attrgetter('is_postgresql_10'))
     has_websearch_to_tsquery = property(operator.attrgetter('is_postgresql_11'))

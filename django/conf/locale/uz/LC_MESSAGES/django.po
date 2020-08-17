@@ -1,15 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Abdulaminkhon Khaydarov <webdasturuz@gmail.com>, 2020
 # Bedilbek Khamidov <bedilbek@gmail.com>, 2019
+# Claude Paroz <claude@2xlibre.net>, 2020
 # Sukhrobbek Ismatov <isukhrobbek@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-12 06:31+0000\n"
-"Last-Translator: Bedilbek Khamidov <bedilbek@gmail.com>\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-25 17:08+0000\n"
+"Last-Translator: Abdulaminkhon Khaydarov <webdasturuz@gmail.com>\n"
 "Language-Team: Uzbek (http://www.transifex.com/django/django/language/uz/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,6 +24,9 @@ msgstr "Afrika tili"
 
 msgid "Arabic"
 msgstr "Arab tili"
+
+msgid "Algerian Arabic"
+msgstr "Jazoir arab tili"
 
 msgid "Asturian"
 msgstr "Asturiya tili"
@@ -146,6 +151,9 @@ msgstr "Interlingua tili"
 msgid "Indonesian"
 msgstr "Indoneziya tili"
 
+msgid "Igbo"
+msgstr "Igbo tili"
+
 msgid "Ido"
 msgstr "Ido tili"
 
@@ -175,6 +183,9 @@ msgstr "Kannada tili"
 
 msgid "Korean"
 msgstr "Koreys tili"
+
+msgid "Kyrgyz"
+msgstr "Qirg'iz tili"
 
 msgid "Luxembourgish"
 msgstr "Lyuksemburg tili"
@@ -260,8 +271,14 @@ msgstr "Tamil tili"
 msgid "Telugu"
 msgstr "Telugu tili"
 
+msgid "Tajik"
+msgstr "Tojik tili"
+
 msgid "Thai"
 msgstr "Tay tili"
+
+msgid "Turkmen"
+msgstr "Turkman tili"
 
 msgid "Turkish"
 msgstr "Turk tili"
@@ -568,6 +585,9 @@ msgstr "\"%(value)s\" qiymati Yo‘q, To‘g‘ri yoki Noto'g'ri bo'lishi kerak.
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolean (To'g'ri, Yolg'on yoki Hech biri)"
 
+msgid "Positive big integer"
+msgstr "Musbat katta butun son"
+
 msgid "Positive integer"
 msgstr "Ijobiy butun son"
 
@@ -621,6 +641,12 @@ msgstr "Fayl"
 
 msgid "Image"
 msgstr "Rasm"
+
+msgid "A JSON object"
+msgstr "JSON ob'ekti"
+
+msgid "Value must be valid JSON."
+msgstr "Qiymat yaroqli JSON bo'lishi kerak."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -712,6 +738,9 @@ msgstr "To'liq qiymatni kiriting."
 msgid "Enter a valid UUID."
 msgstr "To'g'ri UUID kiriting."
 
+msgid "Enter a valid JSON."
+msgstr "Yaroqli JSONni kiriting."
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -796,17 +825,9 @@ msgstr "Ha"
 msgid "No"
 msgstr "Yo'q"
 
-msgid "Year"
-msgstr "Yil"
-
-msgid "Month"
-msgstr "Oy"
-
-msgid "Day"
-msgstr "Kun"
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
-msgstr "ha, yo'q, ehtimol"
+msgstr "ha,yo'q,ehtimol"
 
 #, python-format
 msgid "%(size)d byte"
@@ -1105,9 +1126,6 @@ msgstr[0] "%dsoat"
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%dminut"
-
-msgid "0 minutes"
-msgstr "0 daqiqa"
 
 msgid "Forbidden"
 msgstr "Taqiqlangan"

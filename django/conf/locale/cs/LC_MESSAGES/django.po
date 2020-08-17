@@ -1,18 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Claude Paroz <claude@2xlibre.net>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jan Papež <honyczek@centrum.cz>, 2012
 # Jirka Vejrazka <Jirka.Vejrazka@gmail.com>, 2011
+# trendspotter <j.podhorecky@volny.cz>, 2020
 # Tomáš Ehrlich <tomas.ehrlich@gmail.com>, 2015
 # Vláďa Macek <macek@sandbox.cz>, 2012-2014
-# Vláďa Macek <macek@sandbox.cz>, 2015-2019
+# Vláďa Macek <macek@sandbox.cz>, 2015-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-18 11:37+0000\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-20 09:27+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -28,11 +30,14 @@ msgstr "afrikánsky"
 msgid "Arabic"
 msgstr "arabsky"
 
+msgid "Algerian Arabic"
+msgstr "alžírskou arabštinou"
+
 msgid "Asturian"
 msgstr "asturštinou"
 
 msgid "Azerbaijani"
-msgstr "ázerbájdžánštinou"
+msgstr "ázerbájdžánsky"
 
 msgid "Bulgarian"
 msgstr "bulharsky"
@@ -151,8 +156,11 @@ msgstr "interlingua"
 msgid "Indonesian"
 msgstr "indonésky"
 
+msgid "Igbo"
+msgstr "igboštinou"
+
 msgid "Ido"
-msgstr "Ido"
+msgstr "idem"
 
 msgid "Icelandic"
 msgstr "islandsky"
@@ -180,6 +188,9 @@ msgstr "kannadsky"
 
 msgid "Korean"
 msgstr "korejsky"
+
+msgid "Kyrgyz"
+msgstr "kyrgyzštinou"
 
 msgid "Luxembourgish"
 msgstr "lucembursky"
@@ -265,8 +276,14 @@ msgstr "tamilsky"
 msgid "Telugu"
 msgstr "telužsky"
 
+msgid "Tajik"
+msgstr "Tádžik"
+
 msgid "Thai"
 msgstr "thajsky"
+
+msgid "Turkmen"
+msgstr "turkmenštinou"
 
 msgid "Turkish"
 msgstr "turecky"
@@ -591,6 +608,9 @@ msgstr "Hodnota \"%(value)s\" musí být buď None, True nebo False."
 msgid "Boolean (Either True, False or None)"
 msgstr "Pravdivost (buď Ano (True), Ne (False) nebo Nic (None))"
 
+msgid "Positive big integer"
+msgstr "Velké kladné celé číslo"
+
 msgid "Positive integer"
 msgstr "Kladné celé číslo"
 
@@ -643,6 +663,12 @@ msgstr "Soubor"
 
 msgid "Image"
 msgstr "Obrázek"
+
+msgid "A JSON object"
+msgstr "Objekt typu JSON"
+
+msgid "Value must be valid JSON."
+msgstr "Hodnota musí být platná struktura typu JSON."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -739,6 +765,9 @@ msgstr "Zadejte úplnou hodnotu."
 msgid "Enter a valid UUID."
 msgstr "Zadejte platné UUID."
 
+msgid "Enter a valid JSON."
+msgstr "Zadejte platnou strukturu typu JSON."
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -827,17 +856,9 @@ msgstr "Ano"
 msgid "No"
 msgstr "Ne"
 
-msgid "Year"
-msgstr "Rok"
-
-msgid "Month"
-msgstr "Měsíc"
-
-msgid "Day"
-msgstr "Den"
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
-msgstr "ano, ne, možná"
+msgstr "ano,ne,možná"
 
 #, python-format
 msgid "%(size)d byte"
@@ -1157,9 +1178,6 @@ msgstr[0] "%d minuta"
 msgstr[1] "%d minuty"
 msgstr[2] "%d minut"
 msgstr[3] "%d minut"
-
-msgid "0 minutes"
-msgstr "0 minut"
 
 msgid "Forbidden"
 msgstr "Nepřístupné (Forbidden)"

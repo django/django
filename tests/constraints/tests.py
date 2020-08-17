@@ -89,6 +89,12 @@ class CheckConstraintTests(TestCase):
             Product.objects.create(price=10, discounted_price=20)
 
     @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_database_constraint_unicode(self):
+        Product.objects.create(price=10, discounted_price=5, unit='μg/mL')
+        with self.assertRaises(IntegrityError):
+            Product.objects.create(price=10, discounted_price=7, unit='l')
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
     def test_database_constraint_expression(self):
         Product.objects.create(price=999, discounted_price=5)
         with self.assertRaises(IntegrityError):
@@ -403,6 +409,26 @@ class UniqueConstraintTests(TestCase):
                 fields=['name'],
                 name='name_without_color_unique',
                 condition=models.Q(color__isnull=True),
+                deferrable=models.Deferrable.DEFERRED,
+            )
+
+    def test_deferrable_with_include(self):
+        message = 'UniqueConstraint with include fields cannot be deferred.'
+        with self.assertRaisesMessage(ValueError, message):
+            models.UniqueConstraint(
+                fields=['name'],
+                name='name_inc_color_color_unique',
+                include=['color'],
+                deferrable=models.Deferrable.DEFERRED,
+            )
+
+    def test_deferrable_with_opclasses(self):
+        message = 'UniqueConstraint with opclasses cannot be deferred.'
+        with self.assertRaisesMessage(ValueError, message):
+            models.UniqueConstraint(
+                fields=['name'],
+                name='name_text_pattern_ops_unique',
+                opclasses=['text_pattern_ops'],
                 deferrable=models.Deferrable.DEFERRED,
             )
 

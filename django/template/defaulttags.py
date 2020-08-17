@@ -428,7 +428,7 @@ class URLNode(Node):
         self.asvar = asvar
 
     def render(self, context):
-        from django.urls import reverse, NoReverseMatch
+        from django.urls import NoReverseMatch, reverse
         args = [arg.resolve(context) for arg in self.args]
         kwargs = {k: v.resolve(context) for k, v in self.kwargs.items()}
         view_name = self.view_name.resolve(context)

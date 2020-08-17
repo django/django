@@ -2,12 +2,14 @@
 #
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
+# Amanda Savluchinske <amandasavluchinske@gmail.com>, 2019
 # amcorreia <mutley.sandro@gmail.com>, 2018
 # andrewsmedina <andrewsmedina@gmail.com>, 2014-2015
 # Arthur Silva <arxdsilva@gmail.com>, 2017
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
 # Camilo B. Moreira <camilo.moreira@fatec.sp.gov.br>, 2017
-# Carlos E C Leite - Cadu <caduado@gmail.com>, 2016,2019
+# Carlos C. Leite <caduado@gmail.com>, 2020
+# Carlos C. Leite <caduado@gmail.com>, 2016,2019
 # Filipe Cifali Stangler <cifali.filipe@gmail.com>, 2016
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # dudanogueira <dudanogueira@gmail.com>, 2019
@@ -31,9 +33,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-05 00:38+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-14 21:42+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -47,6 +49,9 @@ msgstr "Africânder"
 
 msgid "Arabic"
 msgstr "Árabe"
+
+msgid "Algerian Arabic"
+msgstr ""
 
 msgid "Asturian"
 msgstr "Asturiano"
@@ -171,6 +176,9 @@ msgstr "Interlíngua"
 msgid "Indonesian"
 msgstr "Indonésio"
 
+msgid "Igbo"
+msgstr ""
+
 msgid "Ido"
 msgstr "Ido"
 
@@ -200,6 +208,9 @@ msgstr "Canarês"
 
 msgid "Korean"
 msgstr "Coreano"
+
+msgid "Kyrgyz"
+msgstr ""
 
 msgid "Luxembourgish"
 msgstr "Luxemburguês"
@@ -285,8 +296,14 @@ msgstr "Tâmil"
 msgid "Telugu"
 msgstr "Telugu"
 
+msgid "Tajik"
+msgstr ""
+
 msgid "Thai"
 msgstr "Tailandês"
+
+msgid "Turkmen"
+msgstr ""
 
 msgid "Turkish"
 msgstr "Turco"
@@ -304,7 +321,7 @@ msgid "Urdu"
 msgstr "Urdu"
 
 msgid "Uzbek"
-msgstr ""
+msgstr "Uzbeque"
 
 msgid "Vietnamese"
 msgstr "Vietnamita"
@@ -505,7 +522,9 @@ msgstr "Inteiros separados por vírgula"
 msgid ""
 "“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
-msgstr "%(value)s"
+msgstr ""
+"O valor \"%(value)s\" tem um formato de data inválido. Deve ser no formato  "
+"YYY-MM-DD."
 
 #, python-format
 msgid ""
@@ -531,7 +550,7 @@ msgid ""
 "[TZ]) but it is an invalid date/time."
 msgstr ""
 "O valor “%(value)s” está no formato correto. (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
-"[TZ]) mas em um date/time inválido."
+"[TZ]) mas é uma data/hora inválida"
 
 msgid "Date (with time)"
 msgstr "Data (com hora)"
@@ -548,7 +567,7 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"O valor “%(value)s” está em um formato inválido. IDeve ser no formato  [DD] "
+"O valor “%(value)s” está em um formato inválido. Deve ser no formato  [DD] "
 "[[HH:]MM:]ss[.uuuuuu]."
 
 msgid "Duration"
@@ -589,6 +608,9 @@ msgstr "O valor “%(value)s” deve ser None, True ou False."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Booleano (Verdadeiro, Falso ou Nada)"
+
+msgid "Positive big integer"
+msgstr ""
 
 msgid "Positive integer"
 msgstr "Inteiro positivo"
@@ -643,6 +665,12 @@ msgstr "Arquivo"
 
 msgid "Image"
 msgstr "Imagem"
+
+msgid "A JSON object"
+msgstr ""
+
+msgid "Value must be valid JSON."
+msgstr ""
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -736,6 +764,9 @@ msgstr "Insira um valor completo."
 msgid "Enter a valid UUID."
 msgstr "Insira um UUID válido."
 
+msgid "Enter a valid JSON."
+msgstr ""
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -821,15 +852,7 @@ msgstr "Sim"
 msgid "No"
 msgstr "Não"
 
-msgid "Year"
-msgstr "Ano"
-
-msgid "Month"
-msgstr "Mês"
-
-msgid "Day"
-msgstr "Dia"
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "sim,não,talvez"
 
@@ -1138,9 +1161,6 @@ msgid_plural "%d minutes"
 msgstr[0] "%d minuto"
 msgstr[1] "%d minutos"
 
-msgid "0 minutes"
-msgstr "0 minutos"
-
 msgid "Forbidden"
 msgstr "Proibido"
 
@@ -1164,7 +1184,7 @@ msgid ""
 "origin” requests."
 msgstr ""
 "Se você configurou seu browser para desabilitar os cabeçalhos “Referer”, por "
-"favor remova-os, ao menos para este site, ou para conexões HTTPS, ou para "
+"favor reabilite-os, ao menos para este site, ou para conexões HTTPS, ou para "
 "requisições “same-origin”."
 
 msgid ""
@@ -1177,7 +1197,7 @@ msgstr ""
 "Se estiver usando a tag <meta name=\"referrer\" content=\"no-referrer\"> ou "
 "incluindo o cabeçalho “Referrer-Policy: no-referrer”, por favor remova-os. A "
 "proteção CSRF requer o cabeçalho “Referer” para fazer a checagem de "
-"referência. Se estiver preocupado com privacidade, use alternatica como <a "
+"referência. Se estiver preocupado com privacidade, use alternativas como <a "
 "rel=\"noreferrer\" …> para links de sites de terceiros."
 
 msgid ""
@@ -1193,9 +1213,8 @@ msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for “same-origin” requests."
 msgstr ""
-"Se você configurou seu browser para desabilitar os cookies, por favor "
-"reabilite-os, ao menos para este site ou para requisições do tipo \"same-"
-"origin\" (de mesma origem)."
+"Se você configurou seu browser para desabilitar cookies, por favor reabilite-"
+"os, ao menos para este site ou para requisições do tipo \"same-origin\"."
 
 msgid "More information is available with DEBUG=True."
 msgstr "Mais informações estão disponíveis com DEBUG=True."
@@ -1245,7 +1264,7 @@ msgstr "Página inválida (%(page_number)s): %(message)s"
 
 #, python-format
 msgid "Empty list and “%(class_name)s.allow_empty” is False."
-msgstr "Lista vazia e \"%(class_name)s.allow_empty está como False."
+msgstr "Lista vazia e o \"%(class_name)s.allow_empty\" está como False."
 
 msgid "Directory indexes are not allowed here."
 msgstr "Índices de diretório não são permitidos aqui."

@@ -6,12 +6,16 @@ from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.hashers import get_hasher
 from django.contrib.auth.models import (
-    AbstractUser, AnonymousUser, Group, Permission, User, UserManager,
+    AnonymousUser, Group, Permission, User, UserManager,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
+from django.db import connection, migrations
+from django.db.migrations.state import ModelState, ProjectState
 from django.db.models.signals import post_save
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import (
+    SimpleTestCase, TestCase, TransactionTestCase, override_settings,
+)
 
 from .models import IntegerUsernameUser
 from .models.with_custom_email_field import CustomEmailField
@@ -101,7 +105,12 @@ class LoadDataWithNaturalKeysAndMultipleDatabasesTestCase(TestCase):
         self.assertEqual(perm_other.content_type_id, other_objects[0].id)
 
 
-class UserManagerTestCase(TestCase):
+class UserManagerTestCase(TransactionTestCase):
+    available_apps = [
+        'auth_tests',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+    ]
 
     def test_create_user(self):
         email_lowercase = 'normal@normal.com'
@@ -156,6 +165,30 @@ class UserManagerTestCase(TestCase):
         for char in password:
             self.assertIn(char, allowed_chars)
 
+    def test_runpython_manager_methods(self):
+        def forwards(apps, schema_editor):
+            UserModel = apps.get_model('auth', 'User')
+            user = UserModel.objects.create_user('user1', password='secure')
+            self.assertIsInstance(user, UserModel)
+
+        operation = migrations.RunPython(forwards, migrations.RunPython.noop)
+        project_state = ProjectState()
+        project_state.add_model(ModelState.from_model(User))
+        project_state.add_model(ModelState.from_model(Group))
+        project_state.add_model(ModelState.from_model(Permission))
+        project_state.add_model(ModelState.from_model(ContentType))
+        new_state = project_state.clone()
+        with connection.schema_editor() as editor:
+            operation.state_forwards('test_manager_methods', new_state)
+            operation.database_forwards(
+                'test_manager_methods',
+                editor,
+                project_state,
+                new_state,
+            )
+        user = User.objects.get(username='user1')
+        self.assertTrue(user.check_password('secure'))
+
 
 class AbstractBaseUserTests(SimpleTestCase):
 
@@ -182,8 +215,7 @@ class AbstractBaseUserTests(SimpleTestCase):
                 self.assertEqual(username, 'iamtheΩ')  # U+03A9 GREEK CAPITAL LETTER OMEGA
 
     def test_default_email(self):
-        user = AbstractBaseUser()
-        self.assertEqual(user.get_email_field_name(), 'email')
+        self.assertEqual(AbstractBaseUser.get_email_field_name(), 'email')
 
     def test_custom_email(self):
         user = CustomEmailField()
@@ -200,8 +232,8 @@ class AbstractUserTestCase(TestCase):
             "connection": None,
             "html_message": None,
         }
-        abstract_user = AbstractUser(email='foo@bar.com')
-        abstract_user.email_user(
+        user = User(email='foo@bar.com')
+        user.email_user(
             subject="Subject here",
             message="This is a message",
             from_email="from@domain.com",
@@ -212,7 +244,7 @@ class AbstractUserTestCase(TestCase):
         self.assertEqual(message.subject, "Subject here")
         self.assertEqual(message.body, "This is a message")
         self.assertEqual(message.from_email, "from@domain.com")
-        self.assertEqual(message.to, [abstract_user.email])
+        self.assertEqual(message.to, [user.email])
 
     def test_last_login_default(self):
         user1 = User.objects.create(username='user1')

@@ -41,3 +41,7 @@ class Foo(models.Model):
 class Bar(models.Model):
     foo = models.ForeignKey(Foo, models.CASCADE, to_field='target')
     m2m_foo = models.ManyToManyField(Foo, related_name='m2m_foo')
+
+
+class UniqueNumber(models.Model):
+    number = models.IntegerField(unique=True)

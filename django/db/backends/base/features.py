@@ -100,7 +100,7 @@ class BaseDatabaseFeatures:
     # The database's limit on the number of query parameters.
     max_query_params = None
 
-    # Can an object have an autoincrement primary key of 0? MySQL says No.
+    # Can an object have an autoincrement primary key of 0?
     allows_auto_pk_0 = True
 
     # Do we need to NULL a ForeignKey out, or can the constraint check be
@@ -253,9 +253,6 @@ class BaseDatabaseFeatures:
     # Does the backend support keyword parameters for cursor.callproc()?
     supports_callproc_kwargs = False
 
-    # Convert CharField results from bytes to str in database functions.
-    db_functions_convert_bytes_to_str = False
-
     # What formats does the backend EXPLAIN syntax support?
     supported_explain_formats = set()
 
@@ -298,6 +295,19 @@ class BaseDatabaseFeatures:
     has_native_json_field = False
     # Does the backend use PostgreSQL-style JSON operators like '->'?
     has_json_operators = False
+    # Does the backend support __contains and __contained_by lookups for
+    # a JSONField?
+    supports_json_field_contains = True
+    # Does value__d__contains={'f': 'g'} (without a list around the dict) match
+    # {'d': [{'f': 'g'}]}?
+    json_key_contains_list_matching_requires_list = False
+
+    # Collation names for use by the Django test suite.
+    test_collations = {
+        'ci': None,  # Case-insensitive.
+        'cs': None,  # Case-sensitive.
+        'swedish-ci': None  # Swedish case-insensitive.
+    }
 
     def __init__(self, connection):
         self.connection = connection

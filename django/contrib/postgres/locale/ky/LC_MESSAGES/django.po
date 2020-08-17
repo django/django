@@ -1,0 +1,100 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020
+# Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-23 06:06+0000\n"
+"Last-Translator: Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>\n"
+"Language-Team: Kyrgyz (http://www.transifex.com/django/django/language/ky/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ky\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "PostgreSQL extensions"
+msgstr "PostgreSQL кеңейтүүлөрү"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "%(nth)s нерсеси тизмекте туураланган эмес:"
+
+msgid "Nested arrays must have the same length."
+msgstr "Кийишилген тизмектер окшош узундукта болуш керек."
+
+msgid "Map of strings to strings/nulls"
+msgstr "сап -> сап\\боштук сөздүгү"
+
+#, python-format
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "%(key)sмааниси сап эмес же бош эмес."
+
+msgid "Could not load JSON data."
+msgstr "JSON берилиши жүктөлбөй жатат."
+
+msgid "Input must be a JSON dictionary."
+msgstr "Терүү JSON  сөздүгү болуусу керек."
+
+msgid "Enter two valid values."
+msgstr "Туура кош маани тер."
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "Чекебелдин башталышы бүтүшүн ашпоосу керек."
+
+msgid "Enter two whole numbers."
+msgstr "Туура кош бүтүн сан тер."
+
+msgid "Enter two numbers."
+msgstr "Кош сан тер."
+
+msgid "Enter two valid date/times."
+msgstr "Туура кош күн\\убак тер."
+
+msgid "Enter two valid dates."
+msgstr "Туура кош күн тер."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"Тизме %(show_value)dнерсе камтыйт, бирок ал %(limit_value)dнерседен ашык "
+"камтыбашы керек. "
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"Тизме %(show_value)dнерсе камтыйт, бирок ал %(limit_value)dнерседен аз "
+"камтыбашы керек. "
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "Кээ бир ачкытарга %(keys)s жетишпе жатат"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "Кээ бир белгисиз ачкычтар %(keys)s тейлейт"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr "Чекебел %(limit_value)s дан ашпоосун текшериңиз."
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr "Чекебел жок дегенде %(limit_value)s экендигин текшериңиз."

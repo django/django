@@ -27,7 +27,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     # transaction.
     sql_create_column_inline_fk = (
         'CONSTRAINT %(name)s REFERENCES %(to_table)s(%(to_column)s)%(deferrable)s'
-        '; SET CONSTRAINTS %(name)s IMMEDIATE'
+        '; SET CONSTRAINTS %(namespace)s%(name)s IMMEDIATE'
     )
     # Setting the constraint to IMMEDIATE runs any deferred checks to allow
     # dropping it in the same transaction.
@@ -38,8 +38,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def quote_value(self, value):
         if isinstance(value, str):
             value = value.replace('%', '%%')
+        adapted = psycopg2.extensions.adapt(value)
+        if hasattr(adapted, 'encoding'):
+            adapted.encoding = 'utf8'
         # getquoted() returns a quoted bytestring of the adapted value.
-        return psycopg2.extensions.adapt(value).getquoted().decode()
+        return adapted.getquoted().decode()
 
     def _field_indexes_sql(self, model, field):
         output = super()._field_indexes_sql(model, field)

@@ -394,9 +394,19 @@ Use in tests
 Django's :class:`~django.test.TestCase` class wraps each test in a transaction
 and rolls back that transaction after each test, in order to provide test
 isolation. This means that no transaction is ever actually committed, thus your
-:func:`on_commit` callbacks will never be run. If you need to test the results
-of an :func:`on_commit` callback, use a
-:class:`~django.test.TransactionTestCase` instead.
+:func:`on_commit` callbacks will never be run.
+
+You can overcome this limitation by using
+:meth:`.TestCase.captureOnCommitCallbacks`. This captures your
+:func:`on_commit` callbacks in a list, allowing you to make assertions on them,
+or emulate the transaction committing by calling them.
+
+Another way to overcome the limitation is to use
+:class:`~django.test.TransactionTestCase` instead of
+:class:`~django.test.TestCase`. This will mean your transactions are committed,
+and the callbacks will run. However
+:class:`~django.test.TransactionTestCase` flushes the database between tests,
+which is significantly slower than :class:`~django.test.TestCase`\'s isolation.
 
 Why no rollback hook?
 ---------------------

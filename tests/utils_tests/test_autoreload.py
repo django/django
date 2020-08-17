@@ -173,27 +173,25 @@ class TestChildArguments(SimpleTestCase):
 
     @mock.patch('sys.warnoptions', [])
     def test_exe_fallback(self):
-        tmpdir = tempfile.TemporaryDirectory()
-        self.addCleanup(tmpdir.cleanup)
-        exe_path = Path(tmpdir.name) / 'django-admin.exe'
-        exe_path.touch()
-        with mock.patch('sys.argv', [exe_path.with_suffix(''), 'runserver']):
-            self.assertEqual(
-                autoreload.get_child_arguments(),
-                [exe_path, 'runserver']
-            )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            exe_path = Path(tmpdir) / 'django-admin.exe'
+            exe_path.touch()
+            with mock.patch('sys.argv', [exe_path.with_suffix(''), 'runserver']):
+                self.assertEqual(
+                    autoreload.get_child_arguments(),
+                    [exe_path, 'runserver']
+                )
 
     @mock.patch('sys.warnoptions', [])
     def test_entrypoint_fallback(self):
-        tmpdir = tempfile.TemporaryDirectory()
-        self.addCleanup(tmpdir.cleanup)
-        script_path = Path(tmpdir.name) / 'django-admin-script.py'
-        script_path.touch()
-        with mock.patch('sys.argv', [script_path.with_name('django-admin'), 'runserver']):
-            self.assertEqual(
-                autoreload.get_child_arguments(),
-                [sys.executable, script_path, 'runserver']
-            )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            script_path = Path(tmpdir) / 'django-admin-script.py'
+            script_path.touch()
+            with mock.patch('sys.argv', [script_path.with_name('django-admin'), 'runserver']):
+                self.assertEqual(
+                    autoreload.get_child_arguments(),
+                    [sys.executable, script_path, 'runserver']
+                )
 
     @mock.patch('sys.argv', ['does-not-exist', 'runserver'])
     @mock.patch('sys.warnoptions', [])
@@ -410,14 +408,17 @@ class RestartWithReloaderTests(SimpleTestCase):
         return mock_call
 
     def test_manage_py(self):
-        script = Path('manage.py')
-        script.touch()
-        self.addCleanup(script.unlink)
-        argv = ['./manage.py', 'runserver']
-        mock_call = self.patch_autoreload(argv)
-        autoreload.restart_with_reloader()
-        self.assertEqual(mock_call.call_count, 1)
-        self.assertEqual(mock_call.call_args[0][0], [self.executable, '-Wall'] + argv)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            script = Path(temp_dir) / 'manage.py'
+            script.touch()
+            argv = [script, 'runserver']
+            mock_call = self.patch_autoreload(argv)
+            autoreload.restart_with_reloader()
+            self.assertEqual(mock_call.call_count, 1)
+            self.assertEqual(
+                mock_call.call_args[0][0],
+                [self.executable, '-Wall'] + argv,
+            )
 
     def test_python_m_django(self):
         main = '/usr/lib/pythonX.Y/site-packages/django/__main__.py'

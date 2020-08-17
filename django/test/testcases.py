@@ -345,7 +345,6 @@ class SimpleTestCase(unittest.TestCase):
             )
 
             url, status_code = response.redirect_chain[-1]
-            scheme, netloc, path, query, fragment = urlsplit(url)
 
             self.assertEqual(
                 response.status_code, target_status_code,
@@ -1228,6 +1227,21 @@ class TestCase(TransactionTestCase):
             connection.features.can_defer_constraint_checks and
             not connection.needs_rollback and connection.is_usable()
         )
+
+    @classmethod
+    @contextmanager
+    def captureOnCommitCallbacks(cls, *, using=DEFAULT_DB_ALIAS, execute=False):
+        """Context manager to capture transaction.on_commit() callbacks."""
+        callbacks = []
+        start_count = len(connections[using].run_on_commit)
+        try:
+            yield callbacks
+        finally:
+            run_on_commit = connections[using].run_on_commit[start_count:]
+            callbacks[:] = [func for sids, func in run_on_commit]
+            if execute:
+                for callback in callbacks:
+                    callback()
 
 
 class CheckCondition:

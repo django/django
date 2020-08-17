@@ -2,15 +2,15 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2014-2015
-# znotdead <zhirafchik@gmail.com>, 2016-2017,2019
+# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2020
 # Дмитрий Шатера <mr.bobsans@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-05 00:38+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-15 01:21+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -26,6 +26,9 @@ msgstr "Афрыкаанс"
 
 msgid "Arabic"
 msgstr "Арабская"
+
+msgid "Algerian Arabic"
+msgstr "Алжырская арабская"
 
 msgid "Asturian"
 msgstr "Астурыйская"
@@ -150,6 +153,9 @@ msgstr "Інтэрлінгва"
 msgid "Indonesian"
 msgstr "Інданэзійская"
 
+msgid "Igbo"
+msgstr "Ігба"
+
 msgid "Ido"
 msgstr "Іда"
 
@@ -179,6 +185,9 @@ msgstr "Каннада"
 
 msgid "Korean"
 msgstr "Карэйская"
+
+msgid "Kyrgyz"
+msgstr "Кіргізская"
 
 msgid "Luxembourgish"
 msgstr "Люксэмбургская"
@@ -264,8 +273,14 @@ msgstr "Тамільская"
 msgid "Telugu"
 msgstr "Тэлуґу"
 
+msgid "Tajik"
+msgstr "Таджыкскі"
+
 msgid "Thai"
 msgstr "Тайская"
+
+msgid "Turkmen"
+msgstr "Туркменская"
 
 msgid "Turkish"
 msgstr "Турэцкая"
@@ -283,7 +298,7 @@ msgid "Urdu"
 msgstr "Урду"
 
 msgid "Uzbek"
-msgstr ""
+msgstr "Узбецкі"
 
 msgid "Vietnamese"
 msgstr "Віетнамская"
@@ -591,6 +606,9 @@ msgstr "Значэньне “%(value)s” павінна быць None, True а
 msgid "Boolean (Either True, False or None)"
 msgstr "Ляґічнае («сапраўдна», «не сапраўдна» ці «нічога»)"
 
+msgid "Positive big integer"
+msgstr "Дадатны вялікі цэлы лік"
+
 msgid "Positive integer"
 msgstr "Дадатны цэлы лік"
 
@@ -644,6 +662,12 @@ msgstr "Файл"
 
 msgid "Image"
 msgstr "Выява"
+
+msgid "A JSON object"
+msgstr "Аб'ект JSON"
+
+msgid "Value must be valid JSON."
+msgstr "Значэньне павінна быць сапраўдным JSON."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -744,6 +768,9 @@ msgstr "Калі ласка, увядзіце поўнае значэньне."
 msgid "Enter a valid UUID."
 msgstr "Увядзіце сапраўдны UUID."
 
+msgid "Enter a valid JSON."
+msgstr "Пазначце сапраўдны JSON."
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -832,15 +859,7 @@ msgstr "Так"
 msgid "No"
 msgstr "Не"
 
-msgid "Year"
-msgstr "Год"
-
-msgid "Month"
-msgstr "Месяц"
-
-msgid "Day"
-msgstr "Дзень"
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "так,не,магчыма"
 
@@ -1162,9 +1181,6 @@ msgstr[0] "%d хвіліна"
 msgstr[1] "%d хвіліны"
 msgstr[2] "%d хвілінаў"
 msgstr[3] "%d хвілінаў"
-
-msgid "0 minutes"
-msgstr "0 хвілін"
 
 msgid "Forbidden"
 msgstr "Забаронена"

@@ -1,7 +1,6 @@
 from datetime import datetime
 from operator import attrgetter
 
-from django.core.exceptions import FieldError
 from django.db.models import (
     CharField, DateTimeField, F, Max, OuterRef, Subquery, Value,
 )
@@ -438,17 +437,6 @@ class OrderingTests(TestCase):
         # Order by constant.
         qs = Article.objects.order_by(Value('1', output_field=CharField()), '-headline')
         self.assertSequenceEqual(qs, [self.a4, self.a3, self.a2, self.a1])
-
-    def test_order_by_constant_value_without_output_field(self):
-        msg = 'Cannot resolve expression type, unknown output_field'
-        qs = Article.objects.annotate(constant=Value('1')).order_by('constant')
-        for ordered_qs in (
-            qs,
-            qs.values('headline'),
-            Article.objects.order_by(Value('1')),
-        ):
-            with self.subTest(ordered_qs=ordered_qs), self.assertRaisesMessage(FieldError, msg):
-                ordered_qs.first()
 
     def test_related_ordering_duplicate_table_reference(self):
         """

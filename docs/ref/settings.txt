@@ -251,7 +251,7 @@ See the :ref:`cache documentation <cache_versioning>` for more information.
 ``CACHE_MIDDLEWARE_ALIAS``
 --------------------------
 
-Default: ``default``
+Default: ``'default'``
 
 The cache connection to use for the :ref:`cache middleware
 <the-per-site-cache>`.
@@ -1295,6 +1295,27 @@ Default email address to use for various automated correspondence from the
 site manager(s). This doesn't include error messages sent to :setting:`ADMINS`
 and :setting:`MANAGERS`; for that, see :setting:`SERVER_EMAIL`.
 
+.. setting:: DEFAULT_HASHING_ALGORITHM
+
+``DEFAULT_HASHING_ALGORITHM``
+-----------------------------
+
+.. versionadded:: 3.1
+
+Default: ``'sha256'``
+
+Default hashing algorithm to use for encoding cookies, password reset tokens in
+the admin site, user sessions, and signatures created by
+:class:`django.core.signing.Signer` and :meth:`django.core.signing.dumps`.
+Algorithm must be ``'sha1'`` or ``'sha256'``. See
+:ref:`release notes <default-hashing-algorithm-usage>` for usage details.
+
+.. deprecated:: 3.1
+
+    This transitional setting is deprecated. Support for it and tokens,
+    cookies, sessions, and signatures that use SHA-1 hashing algorithm will be
+    removed in Django 4.0.
+
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
 ``DEFAULT_INDEX_TABLESPACE``
@@ -1540,10 +1561,9 @@ The numeric mode (i.e. ``0o644``) to set newly uploaded files to. For
 more information about what these modes mean, see the documentation for
 :func:`os.chmod`.
 
-If this isn't given or is ``None``, you'll get operating-system
-dependent behavior. On most platforms, temporary files will have a mode
-of ``0o600``, and files saved from memory will be saved using the
-system's standard umask.
+If ``None``, you'll get operating-system dependent behavior. On most platforms,
+temporary files will have a mode of ``0o600``, and files saved from memory will
+be saved using the system's standard umask.
 
 For security reasons, these permissions aren't applied to the temporary files
 that are stored in :setting:`FILE_UPLOAD_TEMP_DIR`.
@@ -2764,11 +2784,10 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
 Default: ``False``
 
 A boolean that specifies whether to display numbers using a thousand separator.
-When :setting:`USE_L10N` is set to ``True`` and if this is also set to
-``True``, Django will use the values of :setting:`THOUSAND_SEPARATOR` and
-:setting:`NUMBER_GROUPING` to format numbers unless the locale already has an
-existing thousands separator. If there is a thousands separator in the locale
-format, it will have higher precedence and will be applied instead.
+When set to ``True`` and :setting:`USE_L10N` is also ``True``, Django will
+format numbers using the :setting:`NUMBER_GROUPING` and
+:setting:`THOUSAND_SEPARATOR` settings. These settings may also be dictated by
+the locale, which takes precedence.
 
 See also :setting:`DECIMAL_SEPARATOR`, :setting:`NUMBER_GROUPING` and
 :setting:`THOUSAND_SEPARATOR`.

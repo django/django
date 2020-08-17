@@ -1,0 +1,34 @@
+==========================
+Django 3.1.1 release notes
+==========================
+
+*Expected September 1, 2020*
+
+Django 3.1.1 fixes several bugs in 3.1.
+
+Bugfixes
+========
+
+* Fixed wrapping of translated action labels in the admin's navigation sidebar
+  for East Asian languages (:ticket:`31853`).
+
+* Fixed wrapping of long model names in the admin's navigation sidebar
+  (:ticket:`31854`).
+
+* Fixed encoding session data while upgrading multiple instances of the same
+  project to Django 3.1 (:ticket:`31864`).
+
+* Adjusted admin's navigation sidebar template to reduce debug logging when
+  rendering (:ticket:`31865`).
+
+* Fixed a data loss possibility in the
+  :meth:`~django.db.models.query.QuerySet.select_for_update()`. When using
+  related fields pointing to a proxy model in the ``of`` argument, the
+  corresponding model was not locked (:ticket:`31866`).
+
+* Fixed a regression in Django 3.1 that caused a crash when passing deprecated
+  keyword arguments to a queryset in ``TemplateView.get_context_data()``
+  (:ticket:`31877`).
+
+* Fixed a data loss possibility, following a regression in Django 2.0, when
+  copying model instances with a cached fields value (:ticket:`31863`).

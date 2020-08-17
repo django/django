@@ -11,7 +11,7 @@ QUnit.module('admin.actions', {
         const $ = django.jQuery;
         $('#qunit-fixture').append($('#result-table').text());
 
-        $('tr input.action-select').actions();
+        Actions(document.querySelectorAll('tr input.action-select'));
     }
 });
 

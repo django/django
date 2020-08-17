@@ -4,13 +4,13 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jirka Vejrazka <Jirka.Vejrazka@gmail.com>, 2011
 # Vláďa Macek <macek@sandbox.cz>, 2012,2014
-# Vláďa Macek <macek@sandbox.cz>, 2015-2016
+# Vláďa Macek <macek@sandbox.cz>, 2015-2016,2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-06-05 06:06+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -88,20 +88,20 @@ msgstr ""
 "operaci provedete."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
 "Byla vybrána operace, ale dosud nedošlo k uložení změn jednotlivých polí. "
 "Uložíte klepnutím na tlačítko OK. Pak bude třeba operaci spustit znovu."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Byla vybrána operace a jednotlivá pole nejsou změněná. Patrně hledáte "
-"tlačítko Provést spíše než Uložit."
+"Byla vybrána operace, ale dosud nedošlo k uložení změn jednotlivých polí. "
+"Patrně využijete tlačítko Provést spíše než tlačítko Uložit."
 
 msgid "Now"
 msgstr "Nyní"

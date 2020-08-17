@@ -14,10 +14,12 @@ from . import PostgreSQLTestCase
 from .models import HotelReservation, RangesModel, Room, Scene
 
 try:
-    from django.contrib.postgres.constraints import ExclusionConstraint
-    from django.contrib.postgres.fields import DateTimeRangeField, RangeBoundary, RangeOperators
-
     from psycopg2.extras import DateRange, NumericRange
+
+    from django.contrib.postgres.constraints import ExclusionConstraint
+    from django.contrib.postgres.fields import (
+        DateTimeRangeField, RangeBoundary, RangeOperators,
+    )
 except ImportError:
     pass
 

@@ -612,6 +612,26 @@ class AutodetectorTests(TestCase):
         self.assertEqual(changes["otherapp"][0].name, "0002_pony_stable")
         self.assertEqual(changes["otherapp"][0].dependencies, [("otherapp", "0001_initial")])
 
+    def test_arrange_for_graph_with_multiple_initial(self):
+        # Make a fake graph.
+        graph = MigrationGraph()
+        # Use project state to make a new migration change set.
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_with_book, self.book, self.attribution])
+        autodetector = MigrationAutodetector(before, after, MigrationQuestioner({'ask_initial': True}))
+        changes = autodetector._detect_changes()
+        changes = autodetector.arrange_for_graph(changes, graph)
+
+        self.assertEqual(changes['otherapp'][0].name, '0001_initial')
+        self.assertEqual(changes['otherapp'][0].dependencies, [])
+        self.assertEqual(changes['otherapp'][1].name, '0002_initial')
+        self.assertCountEqual(
+            changes['otherapp'][1].dependencies,
+            [('testapp', '0001_initial'), ('otherapp', '0001_initial')],
+        )
+        self.assertEqual(changes['testapp'][0].name, '0001_initial')
+        self.assertEqual(changes['testapp'][0].dependencies, [('otherapp', '0001_initial')])
+
     def test_trim_apps(self):
         """
         Trim does not remove dependencies but does remove unwanted apps.
@@ -2131,6 +2151,115 @@ class AutodetectorTests(TestCase):
         )
         self.assertNotIn("_order", [name for name, field in changes['testapp'][0].operations[0].fields])
 
+    def test_add_model_order_with_respect_to_index_foo_together(self):
+        changes = self.get_changes([], [
+            self.book,
+            ModelState('testapp', 'Author', [
+                ('id', models.AutoField(primary_key=True)),
+                ('name', models.CharField(max_length=200)),
+                ('book', models.ForeignKey('otherapp.Book', models.CASCADE)),
+            ], options={
+                'order_with_respect_to': 'book',
+                'index_together': {('name', '_order')},
+                'unique_together': {('id', '_order')},
+            }),
+        ])
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['CreateModel'])
+        self.assertOperationAttributes(
+            changes,
+            'testapp',
+            0,
+            0,
+            name='Author',
+            options={
+                'order_with_respect_to': 'book',
+                'index_together': {('name', '_order')},
+                'unique_together': {('id', '_order')},
+            },
+        )
+
+    def test_add_model_order_with_respect_to_index_constraint(self):
+        tests = [
+            (
+                'AddIndex',
+                {'indexes': [
+                    models.Index(fields=['_order'], name='book_order_idx'),
+                ]},
+            ),
+            (
+                'AddConstraint',
+                {'constraints': [
+                    models.CheckConstraint(
+                        check=models.Q(_order__gt=1),
+                        name='book_order_gt_1',
+                    ),
+                ]},
+            ),
+        ]
+        for operation, extra_option in tests:
+            with self.subTest(operation=operation):
+                after = ModelState('testapp', 'Author', [
+                    ('id', models.AutoField(primary_key=True)),
+                    ('name', models.CharField(max_length=200)),
+                    ('book', models.ForeignKey('otherapp.Book', models.CASCADE)),
+                ], options={
+                    'order_with_respect_to': 'book',
+                    **extra_option,
+                })
+                changes = self.get_changes([], [self.book, after])
+                self.assertNumberMigrations(changes, 'testapp', 1)
+                self.assertOperationTypes(changes, 'testapp', 0, [
+                    'CreateModel', operation,
+                ])
+                self.assertOperationAttributes(
+                    changes,
+                    'testapp',
+                    0,
+                    0,
+                    name='Author',
+                    options={'order_with_respect_to': 'book'},
+                )
+
+    def test_set_alter_order_with_respect_to_index_constraint_foo_together(self):
+        tests = [
+            (
+                'AddIndex',
+                {'indexes': [
+                    models.Index(fields=['_order'], name='book_order_idx'),
+                ]},
+            ),
+            (
+                'AddConstraint',
+                {'constraints': [
+                    models.CheckConstraint(
+                        check=models.Q(_order__gt=1),
+                        name='book_order_gt_1',
+                    ),
+                ]},
+            ),
+            ('AlterIndexTogether', {'index_together': {('name', '_order')}}),
+            ('AlterUniqueTogether', {'unique_together': {('id', '_order')}}),
+        ]
+        for operation, extra_option in tests:
+            with self.subTest(operation=operation):
+                after = ModelState('testapp', 'Author', [
+                    ('id', models.AutoField(primary_key=True)),
+                    ('name', models.CharField(max_length=200)),
+                    ('book', models.ForeignKey('otherapp.Book', models.CASCADE)),
+                ], options={
+                    'order_with_respect_to': 'book',
+                    **extra_option,
+                })
+                changes = self.get_changes(
+                    [self.book, self.author_with_book],
+                    [self.book, after],
+                )
+                self.assertNumberMigrations(changes, 'testapp', 1)
+                self.assertOperationTypes(changes, 'testapp', 0, [
+                    'AlterOrderWithRespectTo', operation,
+                ])
+
     def test_alter_model_managers(self):
         """
         Changing the model managers adds a new operation.
@@ -2481,25 +2610,58 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, 'app', 0, 1, name='book')
 
 
-class AutodetectorSuggestNameTests(SimpleTestCase):
+class MigrationSuggestNameTests(SimpleTestCase):
     def test_single_operation(self):
-        ops = [migrations.CreateModel('Person', fields=[])]
-        self.assertEqual(MigrationAutodetector.suggest_name(ops), 'person')
-        ops = [migrations.DeleteModel('Person')]
-        self.assertEqual(MigrationAutodetector.suggest_name(ops), 'delete_person')
+        class Migration(migrations.Migration):
+            operations = [migrations.CreateModel('Person', fields=[])]
+
+        migration = Migration('0001_initial', 'test_app')
+        self.assertEqual(migration.suggest_name(), 'person')
+
+        class Migration(migrations.Migration):
+            operations = [migrations.DeleteModel('Person')]
+
+        migration = Migration('0002_initial', 'test_app')
+        self.assertEqual(migration.suggest_name(), 'delete_person')
 
     def test_two_create_models(self):
-        ops = [
-            migrations.CreateModel('Person', fields=[]),
-            migrations.CreateModel('Animal', fields=[]),
-        ]
-        self.assertEqual(MigrationAutodetector.suggest_name(ops), 'animal_person')
+        class Migration(migrations.Migration):
+            operations = [
+                migrations.CreateModel('Person', fields=[]),
+                migrations.CreateModel('Animal', fields=[]),
+            ]
+
+        migration = Migration('0001_initial', 'test_app')
+        self.assertEqual(migration.suggest_name(), 'animal_person')
+
+    def test_two_create_models_with_initial_true(self):
+        class Migration(migrations.Migration):
+            initial = True
+            operations = [
+                migrations.CreateModel('Person', fields=[]),
+                migrations.CreateModel('Animal', fields=[]),
+            ]
+
+        migration = Migration('0001_initial', 'test_app')
+        self.assertEqual(migration.suggest_name(), 'animal_person')
 
     def test_none_name(self):
-        ops = [migrations.RunSQL('SELECT 1 FROM person;')]
-        suggest_name = MigrationAutodetector.suggest_name(ops)
+        class Migration(migrations.Migration):
+            operations = [migrations.RunSQL('SELECT 1 FROM person;')]
+
+        migration = Migration('0001_initial', 'test_app')
+        suggest_name = migration.suggest_name()
         self.assertIs(suggest_name.startswith('auto_'), True)
 
+    def test_none_name_with_initial_true(self):
+        class Migration(migrations.Migration):
+            initial = True
+            operations = [migrations.RunSQL('SELECT 1 FROM person;')]
+
+        migration = Migration('0001_initial', 'test_app')
+        self.assertEqual(migration.suggest_name(), 'initial')
+
     def test_auto(self):
-        suggest_name = MigrationAutodetector.suggest_name([])
+        migration = migrations.Migration('0001_initial', 'test_app')
+        suggest_name = migration.suggest_name()
         self.assertIs(suggest_name.startswith('auto_'), True)

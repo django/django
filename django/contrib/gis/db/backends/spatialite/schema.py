@@ -83,6 +83,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
 
     def delete_model(self, model, **kwargs):
         from django.contrib.gis.db.models import GeometryField
+
         # Drop spatial metadata (dropping the table does not automatically remove them)
         for field in model._meta.local_fields:
             if isinstance(field, GeometryField):
@@ -113,6 +114,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
 
     def remove_field(self, model, field):
         from django.contrib.gis.db.models import GeometryField
+
         # NOTE: If the field is a geometry field, the table is just recreated,
         # the parent's remove_field can't be used cause it will skip the
         # recreation if the field does not have a database type. Geometry fields
@@ -125,6 +127,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
 
     def alter_db_table(self, model, old_db_table, new_db_table, disable_constraints=True):
         from django.contrib.gis.db.models import GeometryField
+
         # Remove geometry-ness from temp table
         for field in model._meta.local_fields:
             if isinstance(field, GeometryField):

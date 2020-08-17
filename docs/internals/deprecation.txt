@@ -24,6 +24,8 @@ details on these changes.
 * The ``whitelist`` argument and ``domain_whitelist`` attribute of
   ``django.core.validators.EmailValidator`` will be removed.
 
+* The ``default_app_config`` module variable will be removed.
+
 .. _deprecation-removed-in-4.0:
 
 4.0
@@ -51,6 +53,9 @@ details on these changes.
 
 * ``django.utils.http.is_safe_url()`` will be removed.
 
+See the :ref:`Django 3.1 release notes <deprecated-features-3.1>` for more
+details on these changes.
+
 * The ``PASSWORD_RESET_TIMEOUT_DAYS`` setting will be removed.
 
 * The undocumented usage of the :lookup:`isnull` lookup with non-boolean values
@@ -73,6 +78,10 @@ details on these changes.
 
 * Support for the pre-Django 3.1 ``django.core.signing.Signer`` signatures
   (encoded with the SHA-1 algorithm) will be removed.
+
+* Support for the pre-Django 3.1 ``django.core.signing.dumps()`` signatures
+  (encoded with the SHA-1 algorithm) in ``django.core.signing.loads()`` will be
+  removed.
 
 * Support for the pre-Django 3.1 user sessions (that use the SHA-1 algorithm)
   will be removed.
@@ -109,8 +118,7 @@ details on these changes.
 
 * The ``{% ifequal %}`` and ``{% ifnotequal %}`` template tags will be removed.
 
-See the :ref:`Django 3.1 release notes <deprecated-features-3.1>` for more
-details on these changes.
+* The ``DEFAULT_HASHING_ALGORITHM`` transitional setting will be removed.
 
 .. _deprecation-removed-in-3.1:
 

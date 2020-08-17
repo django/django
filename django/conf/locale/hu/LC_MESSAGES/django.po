@@ -2,7 +2,7 @@
 #
 # Translators:
 # Akos Zsolt Hochrein <hoch.akos@gmail.com>, 2018
-# András Veres-Szentkirályi, 2016-2019
+# András Veres-Szentkirályi, 2016-2020
 # Attila Nagy <>, 2012
 # Dóra Szendrei <szendrgigi@gmail.com>, 2017
 # Istvan Farkas <istvan.farkas@gmail.com>, 2019
@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-18 10:10+0000\n"
-"Last-Translator: Istvan Farkas <istvan.farkas@gmail.com>\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-20 07:32+0000\n"
+"Last-Translator: András Veres-Szentkirályi\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -30,6 +30,9 @@ msgstr "Afrikaans"
 
 msgid "Arabic"
 msgstr "Arab"
+
+msgid "Algerian Arabic"
+msgstr "algériai arab"
 
 msgid "Asturian"
 msgstr "Asztúriai"
@@ -154,6 +157,9 @@ msgstr "Interlingua"
 msgid "Indonesian"
 msgstr "Indonéz"
 
+msgid "Igbo"
+msgstr "igbo"
+
 msgid "Ido"
 msgstr "Ido"
 
@@ -183,6 +189,9 @@ msgstr "Kannada"
 
 msgid "Korean"
 msgstr "Koreai"
+
+msgid "Kyrgyz"
+msgstr "kirgiz"
 
 msgid "Luxembourgish"
 msgstr "Luxemburgi"
@@ -268,8 +277,14 @@ msgstr "Tamil"
 msgid "Telugu"
 msgstr "Telugu"
 
+msgid "Tajik"
+msgstr "tadzsik"
+
 msgid "Thai"
 msgstr "Thai"
+
+msgid "Turkmen"
+msgstr "türkmén"
 
 msgid "Turkish"
 msgstr "Török"
@@ -583,6 +598,9 @@ msgstr "Az  \"%(value)s\" értéke csak üres, True, vagy False lehet."
 msgid "Boolean (Either True, False or None)"
 msgstr "Logikai (True, False vagy None)"
 
+msgid "Positive big integer"
+msgstr "Pozitív nagy egész"
+
 msgid "Positive integer"
 msgstr "Pozitív egész"
 
@@ -636,6 +654,12 @@ msgstr "Fájl"
 
 msgid "Image"
 msgstr "Kép"
+
+msgid "A JSON object"
+msgstr "Egy JSON objektum"
+
+msgid "Value must be valid JSON."
+msgstr "Az érték érvényes JSON kell legyen."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -732,6 +756,9 @@ msgstr "Adjon meg egy teljes értéket."
 msgid "Enter a valid UUID."
 msgstr "Adjon meg egy érvényes UUID-t."
 
+msgid "Enter a valid JSON."
+msgstr "Adjon meg egy érvényes JSON-t."
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -820,15 +847,7 @@ msgstr "Igen"
 msgid "No"
 msgstr "Nem"
 
-msgid "Year"
-msgstr "Év"
-
-msgid "Month"
-msgstr "Hónap"
-
-msgid "Day"
-msgstr "Nap"
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "igen,nem,talán"
 
@@ -1136,9 +1155,6 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d perc"
 msgstr[1] "%d perc"
-
-msgid "0 minutes"
-msgstr "0 perc"
 
 msgid "Forbidden"
 msgstr "Hozzáférés megtagadva"

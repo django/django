@@ -185,21 +185,6 @@ class DatabaseOperations(BaseDatabaseOperations):
                         )
                     )
                     break  # Only one AutoField is allowed per model, so don't bother continuing.
-            for f in model._meta.many_to_many:
-                if not f.remote_field.through:
-                    output.append(
-                        "%s setval(pg_get_serial_sequence('%s','%s'), "
-                        "coalesce(max(%s), 1), max(%s) %s null) %s %s;" % (
-                            style.SQL_KEYWORD('SELECT'),
-                            style.SQL_TABLE(qn(f.m2m_db_table())),
-                            style.SQL_FIELD('id'),
-                            style.SQL_FIELD(qn('id')),
-                            style.SQL_FIELD(qn('id')),
-                            style.SQL_KEYWORD('IS NOT'),
-                            style.SQL_KEYWORD('FROM'),
-                            style.SQL_TABLE(qn(f.m2m_db_table()))
-                        )
-                    )
         return output
 
     def prep_for_iexact_query(self, x):
@@ -255,6 +240,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         return value
 
     def adapt_timefield_value(self, value):
+        return value
+
+    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
         return value
 
     def adapt_ipaddressfield_value(self, value):

@@ -30,7 +30,7 @@ from .models import (
 )
 
 if test_images:
-    from .models import ImageFile, OptionalImageFile, NoExtensionImageFile
+    from .models import ImageFile, NoExtensionImageFile, OptionalImageFile
 
     class ImageFileForm(forms.ModelForm):
         class Meta:
@@ -1644,6 +1644,52 @@ class ModelFormBasicTests(TestCase):
         obj.name = 'Alice'
         obj.full_clean()
 
+    def test_validate_foreign_key_uses_default_manager(self):
+        class MyForm(forms.ModelForm):
+            class Meta:
+                model = Article
+                fields = '__all__'
+
+        # Archived writers are filtered out by the default manager.
+        w = Writer.objects.create(name='Randy', archived=True)
+        data = {
+            'headline': 'My Article',
+            'slug': 'my-article',
+            'pub_date': datetime.date.today(),
+            'writer': w.pk,
+            'article': 'lorem ipsum',
+        }
+        form = MyForm(data)
+        self.assertIs(form.is_valid(), False)
+        self.assertEqual(
+            form.errors,
+            {'writer': ['Select a valid choice. That choice is not one of the available choices.']},
+        )
+
+    def test_validate_foreign_key_to_model_with_overridden_manager(self):
+        class MyForm(forms.ModelForm):
+            class Meta:
+                model = Article
+                fields = '__all__'
+
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                # Allow archived authors.
+                self.fields['writer'].queryset = Writer._base_manager.all()
+
+        w = Writer.objects.create(name='Randy', archived=True)
+        data = {
+            'headline': 'My Article',
+            'slug': 'my-article',
+            'pub_date': datetime.date.today(),
+            'writer': w.pk,
+            'article': 'lorem ipsum',
+        }
+        form = MyForm(data)
+        self.assertIs(form.is_valid(), True)
+        article = form.save()
+        self.assertEqual(article.writer, w)
+
 
 class ModelMultipleChoiceFieldTests(TestCase):
     @classmethod
@@ -1817,11 +1863,11 @@ class ModelMultipleChoiceFieldTests(TestCase):
             self.assertTrue(form.has_changed())
 
     def test_clean_does_deduplicate_values(self):
-        class WriterForm(forms.Form):
-            persons = forms.ModelMultipleChoiceField(queryset=Writer.objects.all())
+        class PersonForm(forms.Form):
+            persons = forms.ModelMultipleChoiceField(queryset=Person.objects.all())
 
-        person1 = Writer.objects.create(name="Person 1")
-        form = WriterForm(data={})
+        person1 = Person.objects.create(name='Person 1')
+        form = PersonForm(data={})
         queryset = form.fields['persons'].clean([str(person1.pk)] * 50)
         sql, params = queryset.query.sql_with_params()
         self.assertEqual(len(params), 1)

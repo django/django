@@ -15,6 +15,7 @@ class Tags:
     models = 'models'
     security = 'security'
     signals = 'signals'
+    sites = 'sites'
     staticfiles = 'staticfiles'
     templates = 'templates'
     translation = 'translation'

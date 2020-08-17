@@ -189,11 +189,15 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     # Routines for getting the OGC-compliant models.
     def geometry_columns(self):
-        from django.contrib.gis.db.backends.spatialite.models import SpatialiteGeometryColumns
+        from django.contrib.gis.db.backends.spatialite.models import (
+            SpatialiteGeometryColumns,
+        )
         return SpatialiteGeometryColumns
 
     def spatial_ref_sys(self):
-        from django.contrib.gis.db.backends.spatialite.models import SpatialiteSpatialRefSys
+        from django.contrib.gis.db.backends.spatialite.models import (
+            SpatialiteSpatialRefSys,
+        )
         return SpatialiteSpatialRefSys
 
     def get_geometry_converter(self, expression):

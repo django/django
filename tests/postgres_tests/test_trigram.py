@@ -4,7 +4,9 @@ from . import PostgreSQLTestCase
 from .models import CharFieldModel, TextFieldModel
 
 try:
-    from django.contrib.postgres.search import TrigramDistance, TrigramSimilarity
+    from django.contrib.postgres.search import (
+        TrigramDistance, TrigramSimilarity,
+    )
 except ImportError:
     pass
 

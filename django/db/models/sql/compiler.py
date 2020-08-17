@@ -982,7 +982,8 @@ class SQLCompiler:
         the query.
         """
         def _get_parent_klass_info(klass_info):
-            for parent_model, parent_link in klass_info['model']._meta.parents.items():
+            concrete_model = klass_info['model']._meta.concrete_model
+            for parent_model, parent_link in concrete_model._meta.parents.items():
                 parent_list = parent_model._meta.get_parent_list()
                 yield {
                     'model': parent_model,
@@ -1007,8 +1008,9 @@ class SQLCompiler:
             select_fields is filled recursively, so it also contains fields
             from the parent models.
             """
+            concrete_model = klass_info['model']._meta.concrete_model
             for select_index in klass_info['select_fields']:
-                if self.select[select_index][0].target.model == klass_info['model']:
+                if self.select[select_index][0].target.model == concrete_model:
                     return self.select[select_index][0]
 
         def _get_field_choices():
@@ -1125,9 +1127,6 @@ class SQLCompiler:
         Backends (e.g. NoSQL) can override this in order to use optimized
         versions of "query has any results."
         """
-        # This is always executed on a query clone, so we can modify self.query
-        self.query.add_extra({'a': 1}, None, None, None, None, None)
-        self.query.set_extra_mask(['a'])
         return bool(self.execute_sql(SINGLE))
 
     def execute_sql(self, result_type=MULTI, chunked_fetch=False, chunk_size=GET_ITERATOR_CHUNK_SIZE):

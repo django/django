@@ -155,6 +155,12 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         values = AggregateTestModel.objects.aggregate(booland=BoolAnd('boolean_field'))
         self.assertEqual(values, {'booland': None})
 
+    def test_bool_and_q_object(self):
+        values = AggregateTestModel.objects.aggregate(
+            booland=BoolAnd(Q(integer_field__gt=2)),
+        )
+        self.assertEqual(values, {'booland': False})
+
     def test_bool_or_general(self):
         values = AggregateTestModel.objects.aggregate(boolor=BoolOr('boolean_field'))
         self.assertEqual(values, {'boolor': True})
@@ -163,6 +169,12 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         AggregateTestModel.objects.all().delete()
         values = AggregateTestModel.objects.aggregate(boolor=BoolOr('boolean_field'))
         self.assertEqual(values, {'boolor': None})
+
+    def test_bool_or_q_object(self):
+        values = AggregateTestModel.objects.aggregate(
+            boolor=BoolOr(Q(integer_field__gt=2)),
+        )
+        self.assertEqual(values, {'boolor': False})
 
     def test_string_agg_requires_delimiter(self):
         with self.assertRaises(TypeError):

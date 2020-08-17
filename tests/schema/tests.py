@@ -88,8 +88,12 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             connection.disable_constraint_checking()
             table_names = connection.introspection.table_names()
+            if connection.features.ignores_table_name_case:
+                table_names = [table_name.lower() for table_name in table_names]
             for model in itertools.chain(SchemaTests.models, self.local_models):
                 tbl = converter(model._meta.db_table)
+                if connection.features.ignores_table_name_case:
+                    tbl = tbl.lower()
                 if tbl in table_names:
                     editor.delete_model(model)
                     table_names.remove(tbl)
@@ -707,6 +711,12 @@ class SchemaTests(TransactionTestCase):
         Foo.objects.create()
 
     def test_alter_not_unique_field_to_primary_key(self):
+        if (
+            connection.vendor == 'mysql' and
+            connection.mysql_is_mariadb and
+            (10, 4, 3) < connection.mysql_version < (10, 5, 2)
+        ):
+            self.skipTest('https://jira.mariadb.org/browse/MDEV-19598')
         # Create the table.
         with connection.schema_editor() as editor:
             editor.create_model(Author)
@@ -2945,6 +2955,12 @@ class SchemaTests(TransactionTestCase):
         Changing the primary key field name of a model with a self-referential
         foreign key (#26384).
         """
+        if (
+            connection.vendor == 'mysql' and
+            connection.mysql_is_mariadb and
+            (10, 4, 12) < connection.mysql_version < (10, 5)
+        ):
+            self.skipTest('https://jira.mariadb.org/browse/MDEV-22775')
         with connection.schema_editor() as editor:
             editor.create_model(Node)
         old_field = Node._meta.get_field('node_id')
@@ -3059,6 +3075,35 @@ class SchemaTests(TransactionTestCase):
         doc = Document.objects.create(name='Test Name')
         student = Student.objects.create(name='Some man')
         doc.students.add(student)
+
+    @isolate_apps('schema')
+    @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific db_table syntax.')
+    def test_namespaced_db_table_foreign_key_reference(self):
+        with connection.cursor() as cursor:
+            cursor.execute('CREATE SCHEMA django_schema_tests')
+
+        def delete_schema():
+            with connection.cursor() as cursor:
+                cursor.execute('DROP SCHEMA django_schema_tests CASCADE')
+
+        self.addCleanup(delete_schema)
+
+        class Author(Model):
+            class Meta:
+                app_label = 'schema'
+
+        class Book(Model):
+            class Meta:
+                app_label = 'schema'
+                db_table = '"django_schema_tests"."schema_book"'
+
+        author = ForeignKey(Author, CASCADE)
+        author.set_attributes_from_name('author')
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+            editor.add_field(Book, author)
 
     def test_rename_table_renames_deferred_sql_references(self):
         atomic_rename = connection.features.supports_atomic_references_rename
