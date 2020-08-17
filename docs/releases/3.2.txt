@@ -85,7 +85,10 @@ Minor features
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new ``absolute_max`` argument for
+  :func:`~django.contrib.contenttypes.forms.generic_inlineformset_factory`
+  allows customizing the maximum number of forms that can be instantiated when
+  supplying ``POST`` data. See :ref:`formsets-absolute-max` for more details.
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
