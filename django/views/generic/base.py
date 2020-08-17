@@ -27,7 +27,11 @@ class ContextMixin:
         kwargs.setdefault('view', self)
         if self.extra_context is not None:
             kwargs.update(self.extra_context)
+        kwargs.update(self.get_context_updates())
         return kwargs
+
+    def get_context_updates(self):
+        return {}
 
 
 class View:
