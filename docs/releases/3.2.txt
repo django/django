@@ -90,6 +90,11 @@ Minor features
   allows customizing the maximum number of forms that can be instantiated when
   supplying ``POST`` data. See :ref:`formsets-absolute-max` for more details.
 
+* The new ``can_delete_extra`` argument for
+  :func:`~django.contrib.contenttypes.forms.generic_inlineformset_factory`
+  allows removal of the option to delete extra forms. See
+  :attr:`~.BaseFormSet.can_delete_extra` for more information.
+
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
