@@ -44,6 +44,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_partial_indexes = False
     supports_order_by_nulls_modifier = False
     order_by_nulls_first = True
+    test_collations = {
+        'ci': 'utf8_general_ci',
+        'swedish-ci': 'utf8_swedish_ci',
+    }
 
     @cached_property
     def _mysql_storage_engine(self):

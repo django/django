@@ -2,13 +2,13 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016-2017,2019
+# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-10-16 19:04+0000\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-07-15 01:22+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
@@ -70,6 +70,12 @@ msgstr "Няма даты"
 
 msgid "Has date"
 msgstr "Мае дату"
+
+msgid "Empty"
+msgstr "Пусты"
+
+msgid "Not empty"
+msgstr "Не пусты"
 
 #, python-format
 msgid ""
@@ -335,6 +341,19 @@ msgstr "Абраць усе %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Не абіраць нічога"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Мадэлі ў %(name)s праграме"
+
+msgid "Add"
+msgstr "Дадаць"
+
+msgid "View"
+msgstr "Праглядзець"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Вы ня маеце дазволу праглядаць ці нешта зьмяняць."
+
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
@@ -382,6 +401,9 @@ msgstr "Зірнуць на пляцоўцы"
 
 msgid "Filter"
 msgstr "Прасеяць"
+
+msgid "Clear all filters"
+msgstr "Ачысьціць усе фільтры"
 
 msgid "Remove from sorting"
 msgstr "Прыбраць з упарадкаванага"
@@ -458,9 +480,6 @@ msgstr ""
 "Ці выдаліць абранае (%(objects_name)s)? Усе наступныя аб’екты ды зьвязаныя "
 "зь імі складнікі выдаляцца:"
 
-msgid "View"
-msgstr "Праглядзець"
-
 msgid "Delete?"
 msgstr "Ці выдаліць?"
 
@@ -470,16 +489,6 @@ msgstr " %(filter_title)s "
 
 msgid "Summary"
 msgstr "Рэзюмэ"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Мадэлі ў %(name)s праграме"
-
-msgid "Add"
-msgstr "Дадаць"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr "Вы ня маеце дазволу праглядаць ці нешта зьмяняць."
 
 msgid "Recent actions"
 msgstr "Нядаўнія дзеянні"
@@ -511,6 +520,9 @@ msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "Забыліся на імя ці пароль?"
+
+msgid "Toggle navigation"
+msgstr "Пераключыць навігацыю"
 
 msgid "Date/time"
 msgstr "Час, дата"

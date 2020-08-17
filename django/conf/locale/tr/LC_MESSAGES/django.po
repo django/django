@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015-2019
+# BouRock, 2015-2020
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@protonmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
@@ -10,15 +10,15 @@
 # Gökmen Görgen <gokmen@alageek.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Mesut Can Gürle <mesutcang@gmail.com>, 2013
-# Murat Çorlu <muratcorlu@gmail.com>, 2012
+# Murat Çorlu <muratcorlu@me.com>, 2012
 # Murat Sahin <martinamca@gmail.com>, 2011-2012
 # Türker Sezer <dirigeant@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-05 17:42+0000\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-15 08:31+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -33,6 +33,9 @@ msgstr "Afrikanca"
 
 msgid "Arabic"
 msgstr "Arapça"
+
+msgid "Algerian Arabic"
+msgstr "Cezayir Arapçası"
 
 msgid "Asturian"
 msgstr "Asturyaca"
@@ -157,6 +160,9 @@ msgstr "Interlingua"
 msgid "Indonesian"
 msgstr "Endonezce"
 
+msgid "Igbo"
+msgstr "Igbo dili"
+
 msgid "Ido"
 msgstr "Ido dili"
 
@@ -186,6 +192,9 @@ msgstr "Kannada dili"
 
 msgid "Korean"
 msgstr "Korece"
+
+msgid "Kyrgyz"
+msgstr "Kırgızca"
 
 msgid "Luxembourgish"
 msgstr "Lüksemburgca"
@@ -271,8 +280,14 @@ msgstr "Tamilce"
 msgid "Telugu"
 msgstr "Telugu dili"
 
+msgid "Tajik"
+msgstr "Tacikçe"
+
 msgid "Thai"
 msgstr "Tayca"
+
+msgid "Turkmen"
+msgstr "Türkmence"
 
 msgid "Turkish"
 msgstr "Türkçe"
@@ -581,6 +596,9 @@ msgstr "“%(value)s” değeri ya None, True ya da False olmak zorundadır."
 msgid "Boolean (Either True, False or None)"
 msgstr "Booleanl (Ya True, False, ya da None)"
 
+msgid "Positive big integer"
+msgstr "Pozitif büyük tamsayı"
+
 msgid "Positive integer"
 msgstr "Pozitif tamsayı"
 
@@ -634,6 +652,12 @@ msgstr "Dosya"
 
 msgid "Image"
 msgstr "Resim"
+
+msgid "A JSON object"
+msgstr "JSON nesnesi"
+
+msgid "Value must be valid JSON."
+msgstr "Değer geçerli JSON olmak zorundadır."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -729,6 +753,9 @@ msgstr "Tam bir değer girin."
 msgid "Enter a valid UUID."
 msgstr "Geçerli bir UUID girin."
 
+msgid "Enter a valid JSON."
+msgstr "Geçerli bir JSON girin."
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -815,15 +842,7 @@ msgstr "Evet"
 msgid "No"
 msgstr "Hayır"
 
-msgid "Year"
-msgstr "Yıl"
-
-msgid "Month"
-msgstr "Ay"
-
-msgid "Day"
-msgstr "Gün"
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "evet,hayır,olabilir"
 
@@ -1131,9 +1150,6 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d dakika"
 msgstr[1] "%d dakika"
-
-msgid "0 minutes"
-msgstr "0 dakika"
 
 msgid "Forbidden"
 msgstr "Yasak"

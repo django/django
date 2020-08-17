@@ -303,6 +303,7 @@ class QuerySetSetOperationTests(TestCase):
             combinators.append('intersection')
         for combinator in combinators:
             for operation in (
+                'alias',
                 'annotate',
                 'defer',
                 'delete',

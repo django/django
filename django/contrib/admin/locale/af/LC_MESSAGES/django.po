@@ -3,15 +3,15 @@
 # Translators:
 # Christopher Penkin, 2012
 # Christopher Penkin, 2012
-# F Wolff <friedel@translate.org.za>, 2019
+# F Wolff <friedel@translate.org.za>, 2019-2020
 # Pi Delport <pjdelport@gmail.com>, 2012
 # Pi Delport <pjdelport@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-06-03 14:32+0000\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-07-20 17:06+0000\n"
 "Last-Translator: F Wolff <friedel@translate.org.za>\n"
 "Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
 "af/)\n"
@@ -72,6 +72,12 @@ msgstr "Geen datum"
 msgid "Has date"
 msgstr "Het datum"
 
+msgid "Empty"
+msgstr "Leeg"
+
+msgid "Not empty"
+msgstr "Nie leeg nie"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -129,22 +135,22 @@ msgid "log entries"
 msgstr "log-inskrywingings"
 
 #, python-format
-msgid "Added \"%(object)s\"."
+msgid "Added “%(object)s”."
 msgstr "Het “%(object)s” bygevoeg."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "Het “%(object)s” verander — %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "Het “%(object)s” gewysig — %(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "Het “%(object)s” verwyder."
+msgid "Deleted “%(object)s.”"
+msgstr "Het “%(object)s” geskrap."
 
 msgid "LogEntry Object"
 msgstr "LogEntry-objek"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
+msgid "Added {name} “{object}”."
 msgstr "Het {name} “{object}” bygevoeg."
 
 msgid "Added."
@@ -154,15 +160,15 @@ msgid "and"
 msgstr "en"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "Het {fields} vir {name} “{object}” gewysig."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "Het {fields} vir {name} “{object}” bygevoeg."
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "Het {fields} verander."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
 msgstr "Het {name} “{object}” geskrap."
 
 msgid "No fields changed."
@@ -171,12 +177,11 @@ msgstr "Geen velde het verander nie."
 msgid "None"
 msgstr "Geen"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr "Hou “Ctrl” in (of “⌘” op ’n Mac) om meer as een te kies."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr "Hou “Control” in (of “Command” op ’n Mac) om meer as een te kies."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid "The {name} “{obj}” was added successfully."
 msgstr "Die {name} “{obj}” is suksesvol bygevoeg."
 
 msgid "You may edit it again below."
@@ -184,35 +189,30 @@ msgstr "Dit kan weer hieronder gewysig word."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr ""
+"Die {name} “{obj}” is suksesvol bygevoeg. Voeg gerus nog ’n {name} onder by."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+"Die {name} “{obj}” is suksesvol gewysig. Redigeer dit gerus weer onder."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr ""
+"Die {name} “{obj}” is suksesvol bygevoeg. Redigeer dit gerus weer onder."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
-"Die {name} “{obj}” is suksesvol bygevoeg. Nog ’n {name} kan onder bygevoeg "
-"word."
+"Die {name} “{obj}” is suksesvol bygevoeg. Voeg gerus nog ’n {name} onder by."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
-"Die {name} “{obj}” is suksesvol gewysig. Dit kan weer hieronder gewysig word."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"Die {name} “{obj}” is suksesvol bygevoeg. Dit kan weer hieronder gewysig "
-"word."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-"Die {name} “{obj}” is suksesvol gewysig. Nog ’n {name} kan onder bygevoeg "
-"word."
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
+msgid "The {name} “{obj}” was changed successfully."
 msgstr "Die {name} “{obj}” is suksesvol gewysig."
 
 msgid ""
@@ -226,12 +226,12 @@ msgid "No action selected."
 msgstr "Geen aksie gekies nie."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
 msgstr "Die %(name)s “%(obj)s” is suksesvol geskrap."
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
-msgstr "Die %(name)s met ID “%(key)s” bestaan nie. Miskien is dit geskrap?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr "%(name)s met ID “%(key)s” bestaan nie. Is dit dalk geskrap?"
 
 #, python-format
 msgid "Add %s"
@@ -301,8 +301,8 @@ msgstr "%(app)s-administrasie"
 msgid "Page not found"
 msgstr "Bladsy nie gevind nie"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Jammer, maar die aangevraagde bladsy kon nie gevind word nie."
+msgid "We’re sorry, but the requested page could not be found."
+msgstr "Jammer! Die aangevraagde bladsy kon nie gevind word nie."
 
 msgid "Home"
 msgstr "Tuis"
@@ -317,12 +317,11 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Bedienerfout <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"’n Fout het voorgekom. Dit is per e-pos gerapporteer aan die "
-"werfadministrateurs en behoort binnekort reggestel te word. Dankie vir u "
-"geduld."
+"’n Fout het voorgekom Dit is via e-pos aan die werfadministrateurs "
+"gerapporteer en behoort binnekort reggestel te word. Dankie vir u geduld."
 
 msgid "Run the selected action"
 msgstr "Voer die gekose aksie uit"
@@ -340,12 +339,25 @@ msgstr "Kies al %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Verwyder keuses"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modelle in die %(name)s-toepassing"
+
+msgid "Add"
+msgstr "Voeg by"
+
+msgid "View"
+msgstr "Bekyk"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr ""
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
-"Vul eers ’n gebruikersnaam en wagwoord in. Daarna kan mens meer "
-"gebruikersopsies wysig."
+"Gee eerstens ’n gebruikernaam en wagwoord. Daarna kan meer gebruikervelde "
+"geredigeer word."
 
 msgid "Enter a username and password."
 msgstr "Vul ’n gebruikersnaam en wagwoord in."
@@ -387,6 +399,9 @@ msgstr "Bekyk op werf"
 
 msgid "Filter"
 msgstr "Filtreer"
+
+msgid "Clear all filters"
+msgstr ""
 
 msgid "Remove from sorting"
 msgstr "Verwyder uit sortering"
@@ -430,7 +445,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Objekte"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Ja, ek is seker"
 
 msgid "No, take me back"
@@ -464,9 +479,6 @@ msgstr ""
 "Wil u definitief die gekose %(objects_name)s skrap? Al die volgende objekte "
 "en hul verwante items sal geskrap word:"
 
-msgid "View"
-msgstr "Bekyk"
-
 msgid "Delete?"
 msgstr "Skrap?"
 
@@ -476,16 +488,6 @@ msgstr " Volgens %(filter_title)s "
 
 msgid "Summary"
 msgstr "Opsomming"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modelle in die %(name)s-toepassing"
-
-msgid "Add"
-msgstr "Voeg by"
-
-msgid "You don't have permission to view or edit anything."
-msgstr "U het nie toestemming om enigiets te sien of te wysig nie."
 
 msgid "Recent actions"
 msgstr "Onlangse aksies"
@@ -500,13 +502,13 @@ msgid "Unknown content"
 msgstr "Onbekende inhoud"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Iets is verkeerd met die databasisinstallasie. Maak seker dat die gepaste "
-"databasistabelle geskep is, en maak seker dat die databasis leesbaar is deur "
-"die gepaste gebruiker."
+"Iets is fout met die databasisinstallasie. Maak seker die gepaste "
+"databasistabelle is geskep en maak seker die databasis is leesbaar deur die "
+"gepaste gebruiker."
 
 #, python-format
 msgid ""
@@ -519,6 +521,9 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "Wagwoord of gebruikersnaam vergeet?"
 
+msgid "Toggle navigation"
+msgstr ""
+
 msgid "Date/time"
 msgstr "Datum/tyd"
 
@@ -529,11 +534,11 @@ msgid "Action"
 msgstr "Aksie"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"Hierdie item het nie ’n veranderingsgeskiedenis nie. Dit is waarskynlik nie "
-"deur middel van hierdie adminwerf bygevoeg nie."
+"Dié objek het nie 'n wysigingsgeskiedenis. Dit is waarskynlik nie deur dié "
+"adminwerf bygevoeg nie."
 
 msgid "Show all"
 msgstr "Wys almal"
@@ -598,11 +603,11 @@ msgid "Your password was changed."
 msgstr "Die wagwoord is verander."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Tik die ou wagwoord ter wille van sekuriteit, en dan die nuwe wagwoord twee "
-"keer so dat ons kan seker wees dat dit korrek ingetik is."
+"Gee asb. die ou wagwoord t.w.v. sekuriteit, en gee dan die nuwe wagwoord "
+"twee keer sodat ons kan verifieer dat dit korrek getik is."
 
 msgid "Change my password"
 msgstr "Verander my wagwoord"
@@ -637,19 +642,18 @@ msgstr ""
 "is. Vra gerus ’n nuwe een aan."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Instruksies vir die instel van u wagwoord is per e-pos gestuur as ’n "
-"rekening bestaan met die e-posadres wat u gegee het. Die e-pos behoort "
-"binnekort daar te wees."
+"Ons het instruksies gestuur om ’n wagwoord in te stel as ’n rekening bestaan "
+"met die gegewe e-posadres. Dit behoort binnekort afgelewer te word."
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"Indien u nie ’n e-pos ontvang nie, maak seker dat die getikte adres die een "
-"is waarmee u geregistreer het, en kontroleer ook u gemorspos."
+"As u geen e-pos ontvang nie, kontroleer dat die e-posadres waarmee "
+"geregistreer is, gegee is, en kontroleer die gemorspos."
 
 #, python-format
 msgid ""
@@ -662,8 +666,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Gaan asseblief na die volgende bladsy en kies ’n nuwe wagwoord:"
 
-msgid "Your username, in case you've forgotten:"
-msgstr "Jou gebruikersnaam, in geval jy vergeet het:"
+msgid "Your username, in case you’ve forgotten:"
+msgstr "U gebruikernaam vir ingeval u vergeet het:"
 
 msgid "Thanks for using our site!"
 msgstr "Dankie vir die gebruik van ons webwerf!"
@@ -673,11 +677,11 @@ msgid "The %(site_name)s team"
 msgstr "Die %(site_name)s span"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"Wagwoord vergeet? Tik u e-posadres hieronder in, en ons pos instruksies vir "
-"die instel van ’n nuwe een."
+"Die wagwoord vergeet? Tik u e-posadres hieronder en ons sal instruksies vir "
+"die instel van ’n nuwe wagwoord stuur."
 
 msgid "Email address:"
 msgstr "E-posadres:"

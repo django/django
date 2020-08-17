@@ -7,6 +7,8 @@ from django.contrib.messages.storage.cookie import (
     CookieStorage, MessageDecoder, MessageEncoder,
 )
 from django.test import SimpleTestCase, override_settings
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.safestring import SafeData, mark_safe
 
 from .base import BaseTests
@@ -169,3 +171,14 @@ class CookieTests(BaseTests, SimpleTestCase):
         encoded_messages = '%s$%s' % (storage._legacy_hash(value), value)
         decoded_messages = storage._decode(encoded_messages)
         self.assertEqual(messages, decoded_messages)
+
+    @ignore_warnings(category=RemovedInDjango40Warning)
+    def test_default_hashing_algorithm(self):
+        messages = Message(constants.DEBUG, ['this', 'that'])
+        with self.settings(DEFAULT_HASHING_ALGORITHM='sha1'):
+            storage = self.get_storage()
+            encoded = storage._encode(messages)
+            decoded = storage._decode(encoded)
+            self.assertEqual(decoded, messages)
+        storage_default = self.get_storage()
+        self.assertNotEqual(encoded, storage_default._encode(messages))

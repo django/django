@@ -58,6 +58,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_deferrable_unique_constraints = True
     has_json_operators = True
     json_key_contains_list_matching_requires_list = True
+    test_collations = {
+        'swedish-ci': 'sv-x-icu',
+    }
 
     @cached_property
     def introspected_field_types(self):

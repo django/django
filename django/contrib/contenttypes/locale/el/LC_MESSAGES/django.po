@@ -4,13 +4,13 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Nikolas Demiridis <nikolas@demiridis.gr>, 2014
 # Pãnoș <panos.laganakos@gmail.com>, 2014
-# Pãnoș <panos.laganakos@gmail.com>, 2016
+# Pãnoș <panos.laganakos@gmail.com>, 2016,2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-05-04 07:05+0000\n"
 "Last-Translator: Pãnoș <panos.laganakos@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -37,9 +37,9 @@ msgstr ""
 "Το αντικείμενο %(ct_id)s τύπου περιεχομένου δεν έχει συσχετισμένο μοντέλο"
 
 #, python-format
-msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
+msgid "Content type %(ct_id)s object %(obj_id)s doesn’t exist"
 msgstr "Το αντικείμενο %(obj_id)s τύπου περιεχομένου %(ct_id)s δεν υπάρχει"
 
 #, python-format
-msgid "%(ct_name)s objects don't have a get_absolute_url() method"
+msgid "%(ct_name)s objects don’t have a get_absolute_url() method"
 msgstr "τα αντικείμενα %(ct_name)s δεν έχουν μέθοδο get_absolute_url()"

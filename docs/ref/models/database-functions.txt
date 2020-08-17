@@ -87,6 +87,25 @@ Usage examples::
     >>> now = timezone.now()
     >>> Coalesce('updated', Cast(now, DateTimeField()))
 
+``Collate``
+-----------
+
+.. class:: Collate(expression, collation)
+
+.. versionadded:: 3.2
+
+Takes an expression and a collation name to query against.
+
+For example, to filter case-insensitively in SQLite::
+
+    >>> Author.objects.filter(name=Collate(Value('john'), 'nocase'))
+    <QuerySet [<Author: John>, <Author: john>]>
+
+It can also be used when ordering, for example with PostgreSQL::
+
+    >>> Author.objects.order_by(Collate('name', 'et-x-icu'))
+    <QuerySet [<Author: Ursula>, <Author: Veronika>, <Author: Ülle>]>
+
 ``Greatest``
 ------------
 

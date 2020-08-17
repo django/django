@@ -3,15 +3,16 @@
 # Translators:
 # alkuma <alok.kumar@gmail.com>, 2013
 # Chandan kumar <chandankumar.093047@gmail.com>, 2012
+# Claude Paroz <claude@2xlibre.net>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Pratik <kpratik217@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-05 00:38+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-14 21:42+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Hindi (http://www.transifex.com/django/django/language/hi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,6 +25,9 @@ msgstr "अफ़्रीकांस"
 
 msgid "Arabic"
 msgstr "अरबी"
+
+msgid "Algerian Arabic"
+msgstr ""
 
 msgid "Asturian"
 msgstr ""
@@ -148,6 +152,9 @@ msgstr "इंतर्लिंगुआ"
 msgid "Indonesian"
 msgstr "इन्डोनेशियन "
 
+msgid "Igbo"
+msgstr ""
+
 msgid "Ido"
 msgstr ""
 
@@ -177,6 +184,9 @@ msgstr "कन्‍नड़"
 
 msgid "Korean"
 msgstr "कोरियन"
+
+msgid "Kyrgyz"
+msgstr ""
 
 msgid "Luxembourgish"
 msgstr "लक्संबर्गी"
@@ -262,8 +272,14 @@ msgstr "तमिल"
 msgid "Telugu"
 msgstr "तेलुगु"
 
+msgid "Tajik"
+msgstr ""
+
 msgid "Thai"
 msgstr "थाई"
+
+msgid "Turkmen"
+msgstr ""
 
 msgid "Turkish"
 msgstr "तुर्किश"
@@ -545,6 +561,9 @@ msgstr ""
 msgid "Boolean (Either True, False or None)"
 msgstr "बूलियन (सही, गलत या कुछ नहीं)"
 
+msgid "Positive big integer"
+msgstr ""
+
 msgid "Positive integer"
 msgstr "धनात्मक पूर्णांक"
 
@@ -594,6 +613,12 @@ msgstr "फाइल"
 
 msgid "Image"
 msgstr "छवि"
+
+msgid "A JSON object"
+msgstr ""
+
+msgid "Value must be valid JSON."
+msgstr ""
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -681,6 +706,9 @@ msgstr ""
 msgid "Enter a valid UUID."
 msgstr ""
 
+msgid "Enter a valid JSON."
+msgstr ""
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ""
@@ -763,17 +791,9 @@ msgstr "हाँ"
 msgid "No"
 msgstr "नहीं"
 
-msgid "Year"
-msgstr ""
-
-msgid "Month"
-msgstr ""
-
-msgid "Day"
-msgstr ""
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
-msgstr "हाँ, नहीं, शायद"
+msgstr "हाँ,नहीं,शायद"
 
 #, python-format
 msgid "%(size)d byte"
@@ -1079,9 +1099,6 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] ""
 msgstr[1] ""
-
-msgid "0 minutes"
-msgstr ""
 
 msgid "Forbidden"
 msgstr ""

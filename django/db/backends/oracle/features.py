@@ -61,6 +61,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_boolean_expr_in_select_clause = False
     supports_primitives_in_json_field = False
     supports_json_field_contains = False
+    test_collations = {
+        'ci': 'BINARY_CI',
+        'cs': 'BINARY',
+        'swedish_ci': 'SWEDISH_CI',
+    }
 
     @cached_property
     def introspected_field_types(self):

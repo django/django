@@ -19,7 +19,10 @@ except ImportError:
     UnaccentExtension = mock.Mock()
     needs_crypto_extension = False
 else:
-    needs_crypto_extension = not connection.features.is_postgresql_13
+    needs_crypto_extension = (
+        connection.vendor == 'postgresql' and
+        not connection.features.is_postgresql_13
+    )
 
 
 class Migration(migrations.Migration):

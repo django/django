@@ -1523,6 +1523,12 @@ Django automatically calls :func:`faulthandler.enable()` when starting the
 tests, which allows it to print a traceback if the interpreter crashes. Pass
 ``--no-faulthandler`` to disable this behavior.
 
+.. django-admin-option:: --timing
+
+.. versionadded:: 3.2
+
+Outputs timings, including including database setup and total run time.
+
 ``testserver``
 --------------
 

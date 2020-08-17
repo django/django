@@ -99,6 +99,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             super().alter_db_table(model, old_db_table, new_db_table)
 
     def alter_field(self, model, old_field, new_field, strict=False):
+        if not self._field_should_be_altered(old_field, new_field):
+            return
         old_field_name = old_field.name
         table_name = model._meta.db_table
         _, old_column_name = old_field.get_attname_column()

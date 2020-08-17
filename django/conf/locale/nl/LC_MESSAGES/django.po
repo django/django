@@ -12,16 +12,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012,2014
 # Michiel Overtoom <motoom@xs4all.nl>, 2014
-# Meteor 0id, 2019
-# Sander Steffann <inactive+steffann@transifex.com>, 2014-2015
+# Meteor0id, 2019-2020
+# 8de006b1b0894aab6aef71979dcd8bd6_5c6b207 <ff2658a8d8dbebbd9cc240b8c133a515_234097>, 2014-2015
 # Tino de Bruijn <tinodb@gmail.com>, 2013
-# Tonnes <tonnes.mb@gmail.com>, 2017,2019
+# Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-05 11:26+0000\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-15 08:30+0000\n"
 "Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -35,6 +35,9 @@ msgstr "Afrikaans"
 
 msgid "Arabic"
 msgstr "Arabisch"
+
+msgid "Algerian Arabic"
+msgstr "Algerijns Arabisch"
 
 msgid "Asturian"
 msgstr "Asturisch"
@@ -159,6 +162,9 @@ msgstr "Interlingua"
 msgid "Indonesian"
 msgstr "Indonesisch"
 
+msgid "Igbo"
+msgstr "Igbo"
+
 msgid "Ido"
 msgstr "Ido"
 
@@ -188,6 +194,9 @@ msgstr "Kannada"
 
 msgid "Korean"
 msgstr "Koreaans"
+
+msgid "Kyrgyz"
+msgstr "Kirgizisch"
 
 msgid "Luxembourgish"
 msgstr "Luxemburgs"
@@ -273,8 +282,14 @@ msgstr "Tamil"
 msgid "Telugu"
 msgstr "Telegu"
 
+msgid "Tajik"
+msgstr "Tadzjieks"
+
 msgid "Thai"
 msgstr "Thai"
+
+msgid "Turkmen"
+msgstr "Turkmeens"
 
 msgid "Turkish"
 msgstr "Turks"
@@ -581,6 +596,9 @@ msgstr "Waarde van ‘%(value)s’ moet None, True of False zijn."
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolean (True, False of None)"
 
+msgid "Positive big integer"
+msgstr "Positief groot geheel getal"
+
 msgid "Positive integer"
 msgstr "Positief geheel getal"
 
@@ -634,6 +652,12 @@ msgstr "Bestand"
 
 msgid "Image"
 msgstr "Afbeelding"
+
+msgid "A JSON object"
+msgstr "Een JSON-object"
+
+msgid "Value must be valid JSON."
+msgstr "Waarde moet geldige JSON zijn."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -728,6 +752,9 @@ msgstr "Voer een volledige waarde in."
 msgid "Enter a valid UUID."
 msgstr "Voer een geldige UUID in."
 
+msgid "Enter a valid JSON."
+msgstr "Voer een geldige JSON in."
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -812,15 +839,7 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nee"
 
-msgid "Year"
-msgstr "Jaar"
-
-msgid "Month"
-msgstr "Maand"
-
-msgid "Day"
-msgstr "Dag"
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "ja,nee,misschien"
 
@@ -1128,9 +1147,6 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minuut"
 msgstr[1] "%d minuten"
-
-msgid "0 minutes"
-msgstr "0 minuten"
 
 msgid "Forbidden"
 msgstr "Verboden"

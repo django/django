@@ -15,7 +15,9 @@ from django.test import (
 )
 from django.test.utils import CaptureQueriesContext
 
-from .models import City, Country, EUCity, EUCountry, Person, PersonProfile
+from .models import (
+    City, CityCountryProxy, Country, EUCity, EUCountry, Person, PersonProfile,
+)
 
 
 class SelectForUpdateTests(TransactionTestCase):
@@ -206,6 +208,21 @@ class SelectForUpdateTests(TransactionTestCase):
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
 
     @skipUnlessDBFeature('has_select_for_update_of')
+    def test_for_update_sql_model_proxy_generated_of(self):
+        with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
+            list(CityCountryProxy.objects.select_related(
+                'country',
+            ).select_for_update(
+                of=('country',),
+            ))
+        if connection.features.select_for_update_of_column:
+            expected = ['select_for_update_country"."entity_ptr_id']
+        else:
+            expected = ['select_for_update_country']
+        expected = [connection.ops.quote_name(value) for value in expected]
+        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
+
+    @skipUnlessDBFeature('has_select_for_update_of')
     def test_for_update_of_followed_by_values(self):
         with transaction.atomic():
             values = list(Person.objects.select_for_update(of=('self',)).values('pk'))
@@ -374,6 +391,19 @@ class SelectForUpdateTests(TransactionTestCase):
         with self.assertRaisesMessage(FieldError, msg % 'country_ptr, country_ptr__entity_ptr'):
             with transaction.atomic():
                 EUCountry.objects.select_for_update(of=('name',)).get()
+
+    @skipUnlessDBFeature('has_select_for_update', 'has_select_for_update_of')
+    def test_model_proxy_of_argument_raises_error_proxy_field_in_choices(self):
+        msg = (
+            'Invalid field name(s) given in select_for_update(of=(...)): '
+            'name. Only relational fields followed in the query are allowed. '
+            'Choices are: self, country, country__entity_ptr.'
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            with transaction.atomic():
+                CityCountryProxy.objects.select_related(
+                    'country',
+                ).select_for_update(of=('name',)).get()
 
     @skipUnlessDBFeature('has_select_for_update', 'has_select_for_update_of')
     def test_reverse_one_to_one_of_arguments(self):
