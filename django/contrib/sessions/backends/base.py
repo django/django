@@ -121,6 +121,15 @@ class SessionBase:
             return signing.loads(session_data, salt=self.key_salt, serializer=self.serializer)
         # RemovedInDjango40Warning: when the deprecation ends, handle here
         # exceptions similar to what _legacy_decode() does now.
+        except signing.BadSignature:
+            try:
+                # Return an empty session if data is not in the pre-Django 3.1
+                # format.
+                return self._legacy_decode(session_data)
+            except Exception:
+                logger = logging.getLogger('django.security.SuspiciousSession')
+                logger.warning('Session data corrupted')
+                return {}
         except Exception:
             return self._legacy_decode(session_data)
 
