@@ -417,8 +417,8 @@ deletion, is greater than or equal to ``min_num``.
 
 .. note::
 
-    When a formset contains no initial data, the number of forms displayed is
-    the sum of ``min_num`` and ``extra``.
+    Regardless of ``validate_min``, if a formset contains no data, then
+    ``extra + min_num`` empty forms will be displayed.
 
 Dealing with ordering and deletion of forms
 ===========================================
