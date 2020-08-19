@@ -23,6 +23,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_sequence_reset = False
     can_introspect_materialized_views = True
     atomic_transactions = False
+    can_clone_databases = True
     supports_combined_alters = False
     nulls_order_largest = True
     requires_literal_defaults = True

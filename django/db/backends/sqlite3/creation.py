@@ -81,7 +81,8 @@ class DatabaseCreation(BaseDatabaseCreation):
                 self.log('Got an error cloning the test database: %s' % e)
                 sys.exit(2)
 
-    def _destroy_test_db(self, test_database_name, verbosity):
+    def _destroy_test_db(self, test_settings_dict, verbosity):
+        test_database_name = test_settings_dict['NAME']
         if test_database_name and not self.is_in_memory_db(test_database_name):
             # Remove the SQLite database file
             os.remove(test_database_name)

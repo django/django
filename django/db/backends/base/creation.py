@@ -248,9 +248,9 @@ class BaseDatabaseCreation:
         """
         self.connection.close()
         if suffix is None:
-            test_database_name = self.connection.settings_dict['NAME']
+            test_settings_dict = self.connection.settings_dict
         else:
-            test_database_name = self.get_test_db_clone_settings(suffix)['NAME']
+            test_settings_dict = self.get_test_db_clone_settings(suffix)
 
         if verbosity >= 1:
             action = 'Destroying'
@@ -258,20 +258,20 @@ class BaseDatabaseCreation:
                 action = 'Preserving'
             self.log('%s test database for alias %s...' % (
                 action,
-                self._get_database_display_str(verbosity, test_database_name),
+                self._get_database_display_str(verbosity, test_settings_dict['NAME']),
             ))
 
         # if we want to preserve the database
         # skip the actual destroying piece.
         if not keepdb:
-            self._destroy_test_db(test_database_name, verbosity)
+            self._destroy_test_db(test_settings_dict, verbosity)
 
         # Restore the original database name
         if old_database_name is not None:
             settings.DATABASES[self.connection.alias]["NAME"] = old_database_name
             self.connection.settings_dict["NAME"] = old_database_name
 
-    def _destroy_test_db(self, test_database_name, verbosity):
+    def _destroy_test_db(self, test_settings_dict, verbosity):
         """
         Internal implementation - remove the test db tables.
         """
@@ -279,6 +279,7 @@ class BaseDatabaseCreation:
         # ourselves. Connect to the previous database (not the test database)
         # to do so, because it's not allowed to delete a database while being
         # connected to it.
+        test_database_name = test_settings_dict['NAME']
         with self._nodb_cursor() as cursor:
             cursor.execute("DROP DATABASE %s"
                            % self.connection.ops.quote_name(test_database_name))
