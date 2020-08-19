@@ -90,6 +90,7 @@
     margin: 0;
     vertical-align: top;
     font-size: 13px;
+    max-width: 230px;
 }
 
 #changelist #toolbar form #searchbar:focus {
