@@ -52,6 +52,12 @@ class AuthTemplateTests(TestCase):
         response = client.get(url)
         self.assertContains(response, '<title>Enter new password</title>')
         self.assertContains(response, '<h1>Enter new password</h1>')
+        # The username is added to the password reset confirmation form to help
+        # browser's password managers.
+        self.assertContains(
+            response,
+            '<input style="display: none;" autocomplete="username" value="jsmith">',
+        )
 
     def test_PasswordResetCompleteView(self):
         response = PasswordResetCompleteView.as_view()(self.request)
