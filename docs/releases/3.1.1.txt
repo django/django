@@ -62,3 +62,6 @@ Bugfixes
 
 * Fixed a ``django.contrib.admin.EmptyFieldListFilter`` crash when using on
   reverse relations (:ticket:`31952`).
+
+* Prevented content overflowing in the admin changelist view when the
+  navigation sidebar is enabled (:ticket:`31901`).

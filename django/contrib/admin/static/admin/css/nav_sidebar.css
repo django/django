@@ -104,3 +104,7 @@
         display: none;
     }
 }
+
+.change-list .main > #nav-sidebar+.content {
+    overflow: hidden;
+}
