@@ -81,6 +81,7 @@ class BaseMemcachedCache(BaseCache):
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
+        self.validate_key(key)
         return bool(self._cache.touch(key, self.get_backend_timeout(timeout)))
 
     def delete(self, key, version=None):
@@ -145,7 +146,10 @@ class BaseMemcachedCache(BaseCache):
         return [original_keys[k] for k in failed_keys]
 
     def delete_many(self, keys, version=None):
-        self._cache.delete_multi(self.make_key(key, version=version) for key in keys)
+        keys = [self.make_key(key, version=version) for key in keys]
+        for key in keys:
+            self.validate_key(key)
+        self._cache.delete_multi(keys)
 
     def clear(self):
         self._cache.flush_all()
@@ -173,6 +177,7 @@ class MemcachedCache(BaseMemcachedCache):
 
     def get(self, key, default=None, version=None):
         key = self.make_key(key, version=version)
+        self.validate_key(key)
         val = self._cache.get(key)
         # python-memcached doesn't support default values in get().
         # https://github.com/linsomniac/python-memcached/issues/159
@@ -186,6 +191,7 @@ class MemcachedCache(BaseMemcachedCache):
         # https://github.com/linsomniac/python-memcached/issues/170
         # Call _deletetouch() without the NOT_FOUND in expected results.
         key = self.make_key(key, version=version)
+        self.validate_key(key)
         return bool(self._cache._deletetouch([b'DELETED'], 'delete', key))
 
 
@@ -201,6 +207,7 @@ class PyLibMCCache(BaseMemcachedCache):
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
+        self.validate_key(key)
         if timeout == 0:
             return self._cache.delete(key)
         return self._cache.touch(key, self.get_backend_timeout(timeout))

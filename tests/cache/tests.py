@@ -656,6 +656,7 @@ class BaseCacheTests:
             ('set', [key, 1]),
             ('incr', [key]),
             ('decr', [key]),
+            ('touch', [key]),
             ('delete', [key]),
             ('get_many', [[key, 'b']]),
             ('set_many', [{key: 1, 'b': 2}]),
@@ -1306,11 +1307,15 @@ class BaseMemcachedTests(BaseCacheTests):
         msg = expected_warning.replace(key, cache.make_key(key))
         tests = [
             ('add', [key, 1]),
+            ('get', [key]),
             ('set', [key, 1]),
             ('incr', [key]),
             ('decr', [key]),
+            ('touch', [key]),
+            ('delete', [key]),
             ('get_many', [[key, 'b']]),
             ('set_many', [{key: 1, 'b': 2}]),
+            ('delete_many', [{key: 1, 'b': 2}]),
         ]
         for operation, args in tests:
             with self.subTest(operation=operation):
