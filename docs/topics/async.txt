@@ -196,7 +196,7 @@ as either a direct wrapper or a decorator::
     async def get_other_data(...):
         ...
 
-The async function is run in the event loop for the current thread, if one is
+The async task is added to the event loop for the current thread, if one is
 present. If there is no current event loop, a new event loop is spun up
 specifically for the single async invocation and shut down again once it
 completes. In either situation, the async function will execute on a different
