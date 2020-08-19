@@ -514,6 +514,9 @@ Save these changes and start a new Python interactive shell by running
     >>> q = Question.objects.get(pk=1)
 
     # Display any choices from the related object set -- none so far.
+    # Note that the method "choice_set" is automatically created as both 
+    # "Question" and "Choice" are related via the "ForeignKey" method.
+    # For more info, see :attr:`~django.db.models.ForeignKey.related_name`
     >>> q.choice_set.all()
     <QuerySet []>
 
