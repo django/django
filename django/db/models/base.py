@@ -402,6 +402,7 @@ class ModelState:
 
 
 class Model(metaclass=ModelBase):
+    _state: ModelState
 
     def __init__(self, *args, **kwargs):
         # Alias some things as locals to avoid repeat global lookups
