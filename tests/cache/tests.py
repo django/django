@@ -650,10 +650,23 @@ class BaseCacheTests:
         old_func = cache.key_func
         cache.key_func = func
 
+        tests = [
+            ('add', [key, 1]),
+            ('get', [key]),
+            ('set', [key, 1]),
+            ('incr', [key]),
+            ('decr', [key]),
+            ('delete', [key]),
+            ('get_many', [[key, 'b']]),
+            ('set_many', [{key: 1, 'b': 2}]),
+            ('delete_many', [{key: 1, 'b': 2}]),
+        ]
         try:
-            with self.assertWarns(CacheKeyWarning) as cm:
-                cache.set(key, 'value')
-            self.assertEqual(str(cm.warning), expected_warning)
+            for operation, args in tests:
+                with self.subTest(operation=operation):
+                    with self.assertWarns(CacheKeyWarning) as cm:
+                        getattr(cache, operation)(*args)
+                    self.assertEqual(str(cm.warning), expected_warning)
         finally:
             cache.key_func = old_func
 
@@ -1291,9 +1304,19 @@ class BaseMemcachedTests(BaseCacheTests):
         key.
         """
         msg = expected_warning.replace(key, cache.make_key(key))
-        with self.assertRaises(InvalidCacheKey) as cm:
-            cache.set(key, 'value')
-        self.assertEqual(str(cm.exception), msg)
+        tests = [
+            ('add', [key, 1]),
+            ('set', [key, 1]),
+            ('incr', [key]),
+            ('decr', [key]),
+            ('get_many', [[key, 'b']]),
+            ('set_many', [{key: 1, 'b': 2}]),
+        ]
+        for operation, args in tests:
+            with self.subTest(operation=operation):
+                with self.assertRaises(InvalidCacheKey) as cm:
+                    getattr(cache, operation)(*args)
+                self.assertEqual(str(cm.exception), msg)
 
     def test_default_never_expiring_timeout(self):
         # Regression test for #22845
