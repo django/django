@@ -297,8 +297,8 @@ class AbstractUserTestCase(TestCase):
 
     def test_username_validators(self):
         msg = _(
-            'Enter a valid username. This value may contain only letters, '
-            'numbers, and @/./+/-/_ characters.'
+            'Enter a valid username. This value may contain only letters,'
+            ' numbers, and @/./+/-/_ characters.'
         )
         user = User.objects.create_user(username='user')
         user.full_clean()

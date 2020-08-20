@@ -10,15 +10,15 @@ from django.utils.translation import gettext_lazy as _, ngettext
 class ASCIIUsernameValidator(validators.RegexValidator):
     regex = r'^[\w.@+-]+\Z'
     message = _(
-        'Enter a valid username. This value may contain only English letters, '
-        'numbers, and @/./+/-/_ characters.'
+        'Enter a valid username. This value may contain only letters from the Latin alphabet,'
+        ' numbers, and @/./+/-/_ characters.'
     )
     flags = re.ASCII
 
     def help_text(self):
         return _(
-            'Enter a valid username. This value may contain only English letters, '
-            'numbers, and @/./+/-/_ characters.'
+            'Enter a valid username. This value may contain only letters from the Latin alphabet,'
+            ' numbers, and @/./+/-/_ characters.'
         )
 
 
@@ -33,7 +33,7 @@ class UnicodeUsernameValidator(validators.RegexValidator):
 
     def help_text(self):
         return _(
-            'Enter a valid username. This value may contain only letters, '
+            'Enter a valid username. This value may contain only letters, ' 
             'numbers, and @/./+/-/_ characters.'
         )
 

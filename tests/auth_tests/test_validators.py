@@ -289,8 +289,8 @@ class UsernameValidatorsTests(SimpleTestCase):
             },
         ]
         both_help_text = _(
-            'Enter a valid username. This value may contain only letters, '
-            'numbers, and @/./+/-/_ characters. '
+            'Enter a valid username. This value may contain only letters,'
+            ' numbers, and @/./+/-/_ characters. '
             'Your username must contain at least 3 characters.'
         )
         validators_list = get_username_validators(validator_config)
@@ -326,8 +326,8 @@ class UsernameValidationTests(SimpleTestCase):
     def test_username_validator_help_texts(self):
         help_text = username_validators_help_texts()
         text = _(
-            'Enter a valid username. This value may contain only letters, '
-            'numbers, and @/./+/-/_ characters.'
+            'Enter a valid username. This value may contain only letters,'
+            ' numbers, and @/./+/-/_ characters.'
         )
         self.assertIn(str(text), help_text)
 

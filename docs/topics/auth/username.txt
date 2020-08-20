@@ -19,8 +19,8 @@ their behavior.
 
 Validation is controlled by the :setting:`AUTH_USERNAME_VALIDATORS` setting.
 The default for the setting is a ``UnicodeUsernameValidator`` which
-validates whether the given username contains only letters, numbers 
-and ``@``, ``.``, ``+``, ``-``, ``_`` characters.
+validates whether the given username contains only letters, numbers and
+``@``, ``.``, ``+``, ``-``, ``_`` characters.
 
 By default, validators are used in the forms and in the
 :djadmin:`createsuperuser` management commands.

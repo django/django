@@ -1110,8 +1110,8 @@ class UsernameValidationTest(TestCase):
         form = UserCreationForm(data)
         self.assertEqual(form.is_valid(), True)
         msg = _(
-            'Enter a valid username. This value may contain only letters, '
-            'numbers, and @/./+/-/_ characters.'
+            'Enter a valid username. This value may contain only letters,'
+            ' numbers, and @/./+/-/_ characters.'
         )
         form1 = UserCreationForm(invalid_data)
         form1.is_valid()
@@ -1136,8 +1136,8 @@ class UsernameValidationTest(TestCase):
             'date_joined': '2020-08-14'
         }
         msg = _(
-            'Enter a valid username. This value may contain only letters, '
-            'numbers, and @/./+/-/_ characters.'
+            'Enter a valid username. This value may contain only letters,'
+            ' numbers, and @/./+/-/_ characters.'
         )
         form1 = UserChangeForm(invalid_data)
         form1.is_valid()
