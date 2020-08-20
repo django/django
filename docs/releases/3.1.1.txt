@@ -35,3 +35,7 @@ Bugfixes
 * Reverted a deprecation in Django 3.1 that caused a crash when passing
   deprecated keyword arguments to a queryset in
   ``TemplateView.get_context_data()`` (:ticket:`31877`).
+
+* Enforced thread sensitivity of the :class:`MiddlewareMixin.process_request()
+  <django.utils.deprecation.MiddlewareMixin>` and ``process_response()`` hooks
+  when in an async context (:ticket:`31905`).
