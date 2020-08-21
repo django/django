@@ -1425,7 +1425,7 @@ customize the yielded 2-tuple choices.
     .. attribute:: field
 
         The instance of ``ModelChoiceField`` or ``ModelMultipleChoiceField`` to
-        iterator and yield choice.
+        iterate and yield choices.
 
     ``ModelChoiceIterator`` has the following method:
 
