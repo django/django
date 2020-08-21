@@ -4,7 +4,18 @@ Django 3.1.1 release notes
 
 *Expected September 1, 2020*
 
-Django 3.1.1 fixes several bugs in 3.1.
+Django 3.1.1 fixes a security issue and several bugs in 3.1.
+
+CVE-2020-24583: Incorrect permissions on intermediate-level directories on Python 3.7+
+======================================================================================
+
+On Python 3.7+, :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS` mode was not
+applied to intermediate-level directories created in the process of uploading
+files and to intermediate-level collected static directories when using the
+:djadmin:`collectstatic` management command.
+
+You should review and manually fix permissions on existing intermediate-level
+directories.
 
 Bugfixes
 ========
