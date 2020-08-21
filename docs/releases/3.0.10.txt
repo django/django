@@ -4,7 +4,7 @@ Django 3.0.10 release notes
 
 *Expected September 1, 2020*
 
-Django 3.0.10 fixes a security issue and two data loss bugs in 3.0.9.
+Django 3.0.10 fixes two security issues and two data loss bugs in 3.0.9.
 
 CVE-2020-24583: Incorrect permissions on intermediate-level directories on Python 3.7+
 ======================================================================================
@@ -16,6 +16,13 @@ files and to intermediate-level collected static directories when using the
 
 You should review and manually fix permissions on existing intermediate-level
 directories.
+
+CVE-2020-24584: Permission escalation in intermediate-level directories of the file system cache on Python 3.7+
+===============================================================================================================
+
+On Python 3.7+, the intermediate-level directories of the file system cache had
+the system's standard umask rather than ``0o077`` (no group or others
+permissions).
 
 Bugfixes
 ========
