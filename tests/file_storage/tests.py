@@ -972,16 +972,19 @@ class FileStoragePermissions(unittest.TestCase):
     @override_settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o765)
     def test_file_upload_directory_permissions(self):
         self.storage = FileSystemStorage(self.storage_dir)
-        name = self.storage.save("the_directory/the_file", ContentFile("data"))
-        dir_mode = os.stat(os.path.dirname(self.storage.path(name)))[0] & 0o777
-        self.assertEqual(dir_mode, 0o765)
+        name = self.storage.save('the_directory/subdir/the_file', ContentFile('data'))
+        file_path = Path(self.storage.path(name))
+        self.assertEqual(file_path.parent.stat().st_mode & 0o777, 0o765)
+        self.assertEqual(file_path.parent.parent.stat().st_mode & 0o777, 0o765)
 
     @override_settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=None)
     def test_file_upload_directory_default_permissions(self):
         self.storage = FileSystemStorage(self.storage_dir)
-        name = self.storage.save("the_directory/the_file", ContentFile("data"))
-        dir_mode = os.stat(os.path.dirname(self.storage.path(name)))[0] & 0o777
-        self.assertEqual(dir_mode, 0o777 & ~self.umask)
+        name = self.storage.save('the_directory/subdir/the_file', ContentFile('data'))
+        file_path = Path(self.storage.path(name))
+        expected_mode = 0o777 & ~self.umask
+        self.assertEqual(file_path.parent.stat().st_mode & 0o777, expected_mode)
+        self.assertEqual(file_path.parent.parent.stat().st_mode & 0o777, expected_mode)
 
 
 class FileStoragePathParsing(SimpleTestCase):
