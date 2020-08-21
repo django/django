@@ -6,12 +6,13 @@ import os
 import pickle
 import re
 import shutil
+import sys
 import tempfile
 import threading
 import time
 import unittest
 from pathlib import Path
-from unittest import mock
+from unittest import mock, skipIf
 
 from django.conf import settings
 from django.core import management, signals
@@ -1493,6 +1494,28 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         os.unlink(cache._key_to_file('foo'))
         # Returns the default instead of erroring.
         self.assertEqual(cache.get('foo', 'baz'), 'baz')
+
+    @skipIf(
+        sys.platform == 'win32',
+        'Windows only partially supports umasks and chmod.',
+    )
+    def test_cache_dir_permissions(self):
+        os.rmdir(self.dirname)
+        dir_path = Path(self.dirname) / 'nested' / 'filebasedcache'
+        for cache_params in settings.CACHES.values():
+            cache_params['LOCATION'] = dir_path
+        setting_changed.send(self.__class__, setting='CACHES', enter=False)
+        cache.set('foo', 'bar')
+        self.assertIs(dir_path.exists(), True)
+        tests = [
+            dir_path,
+            dir_path.parent,
+            dir_path.parent.parent,
+        ]
+        for directory in tests:
+            with self.subTest(directory=directory):
+                dir_mode = directory.stat().st_mode & 0o777
+                self.assertEqual(dir_mode, 0o700)
 
     def test_get_does_not_ignore_non_filenotfound_exceptions(self):
         with mock.patch('builtins.open', side_effect=OSError):
