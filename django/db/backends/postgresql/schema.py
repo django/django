@@ -155,6 +155,19 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     ),
                 ],
             )
+        elif old_field.db_parameters(connection=self.connection)['type'] in serial_fields_map:
+            # Drop the sequence if migrating away from AutoField.
+            column = strip_quotes(new_field.column)
+            sequence_name = '%s_%s_seq' % (table, column)
+            fragment, _ = super()._alter_column_type_sql(model, old_field, new_field, new_type)
+            return fragment, [
+                (
+                    self.sql_delete_sequence % {
+                        'sequence': self.quote_name(sequence_name),
+                    },
+                    [],
+                ),
+            ]
         else:
             return super()._alter_column_type_sql(model, old_field, new_field, new_type)
 

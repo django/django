@@ -677,6 +677,11 @@ class SchemaTests(TransactionTestCase):
         new_field.model = Author
         with connection.schema_editor() as editor:
             editor.alter_field(Author, old_field, new_field, strict=True)
+        # Now that ID is an IntegerField, the database raises an error if it
+        # isn't provided.
+        if not connection.features.supports_unspecified_pk:
+            with self.assertRaises(DatabaseError):
+                Author.objects.create()
 
     def test_alter_auto_field_to_char_field(self):
         # Create the table
