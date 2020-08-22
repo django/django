@@ -286,6 +286,10 @@ Models
 * The new :class:`~django.db.models.functions.Collate` function allows
   filtering and ordering by specified database collations.
 
+* The ``field_name`` argument of :meth:`.QuerySet.in_bulk()` now accepts
+  distinct fields if there's only one field specified in
+  :meth:`.QuerySet.distinct`.
+
 Pagination
 ~~~~~~~~~~
 

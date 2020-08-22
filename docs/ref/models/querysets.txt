@@ -2250,8 +2250,9 @@ database query like ``count()`` would.
 Takes a list of field values (``id_list``) and the ``field_name`` for those
 values, and returns a dictionary mapping each value to an instance of the
 object with the given field value. If ``id_list`` isn't provided, all objects
-in the queryset are returned. ``field_name`` must be a unique field, and it
-defaults to the primary key.
+in the queryset are returned. ``field_name`` must be a unique field or a
+distinct field (if there's only one field specified in :meth:`distinct`).
+``field_name`` defaults to the primary key.
 
 Example::
 
@@ -2265,8 +2266,14 @@ Example::
     {1: <Blog: Beatles Blog>, 2: <Blog: Cheddar Talk>, 3: <Blog: Django Weblog>}
     >>> Blog.objects.in_bulk(['beatles_blog'], field_name='slug')
     {'beatles_blog': <Blog: Beatles Blog>}
+    >>> Blog.objects.distinct('name').in_bulk(field_name='name')
+    {'Beatles Blog': <Blog: Beatles Blog>, 'Cheddar Talk': <Blog: Cheddar Talk>, 'Django Weblog': <Blog: Django Weblog>}
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
+
+.. versionchanged:: 3.2
+
+    Using a distinct field was allowed.
 
 ``iterator()``
 ~~~~~~~~~~~~~~
