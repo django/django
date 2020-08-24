@@ -57,6 +57,8 @@ class ExplainTests(TestCase):
             test_options.append({'summary': True})
         if connection.features.is_postgresql_12:
             test_options.append({'settings': True})
+        if connection.features.is_postgresql_13:
+            test_options.append({'analyze': True, 'wal': True})
         for options in test_options:
             with self.subTest(**options), transaction.atomic():
                 with CaptureQueriesContext(connection) as captured_queries:
