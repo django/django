@@ -117,7 +117,8 @@ MRO is an acronym for Method Resolution Order.
 
 .. class:: django.views.generic.base.TemplateView
 
-    Renders a given template.
+    Renders a given template, with the context containing parameters captured
+    in the URL.
 
     **Ancestors (MRO)**
 
@@ -161,16 +162,11 @@ MRO is an acronym for Method Resolution Order.
 
     **Context**
 
-    * Populated (through :class:`~django.views.generic.base.ContextMixin`).
+    * Populated (through :class:`~django.views.generic.base.ContextMixin`) with
+      the keyword arguments captured from the URL pattern that served the view.
     * You can also add context using the
       :attr:`~django.views.generic.base.ContextMixin.extra_context` keyword
       argument for :meth:`~django.views.generic.base.View.as_view`.
-
-    .. deprecated:: 3.1
-
-        Starting in Django 4.0, the keyword arguments captured from the URL
-        pattern won't be passed to the context. Reference them with
-        ``view.kwargs`` instead.
 
 ``RedirectView``
 ================
