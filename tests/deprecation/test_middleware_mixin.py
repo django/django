@@ -1,3 +1,4 @@
+import asyncio
 import threading
 
 from asgiref.sync import async_to_sync
@@ -68,6 +69,29 @@ class MiddlewareMixinTests(SimpleTestCase):
             with self.subTest(middleware=middleware):
                 with self.assertRaisesMessage(RemovedInDjango40Warning, self.msg):
                     middleware(None)
+
+    def test_coroutine(self):
+        async def async_get_response(request):
+            return HttpResponse()
+
+        def sync_get_response(request):
+            return HttpResponse()
+
+        for middleware in [
+            CacheMiddleware,
+            FetchFromCacheMiddleware,
+            UpdateCacheMiddleware,
+            SecurityMiddleware,
+        ]:
+            with self.subTest(middleware=middleware.__qualname__):
+                # Middleware appears as coroutine if get_function is
+                # a coroutine.
+                middleware_instance = middleware(async_get_response)
+                self.assertIs(asyncio.iscoroutinefunction(middleware_instance), True)
+                # Middleware doesn't appear as coroutine if get_function is not
+                # a coroutine.
+                middleware_instance = middleware(sync_get_response)
+                self.assertIs(asyncio.iscoroutinefunction(middleware_instance), False)
 
     def test_sync_to_async_uses_base_thread_and_connection(self):
         """
