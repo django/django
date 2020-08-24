@@ -1,5 +1,4 @@
 import logging
-import warnings
 from functools import update_wrapper
 
 from django.core.exceptions import ImproperlyConfigured
@@ -10,8 +9,6 @@ from django.http import (
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import classonlymethod
-from django.utils.deprecation import RemovedInDjango40Warning
-from django.utils.functional import SimpleLazyObject
 
 logger = logging.getLogger('django.request')
 
@@ -155,31 +152,12 @@ class TemplateResponseMixin:
 
 
 class TemplateView(TemplateResponseMixin, ContextMixin, View):
-    """Render a template."""
+    """
+    Render a template. Pass keyword arguments from the URLconf to the context.
+    """
     def get(self, request, *args, **kwargs):
-        # RemovedInDjango40Warning: when the deprecation ends, replace with:
-        #   context = self.get_context_data()
-        context_kwargs = _wrap_url_kwargs_with_deprecation_warning(kwargs)
-        context = self.get_context_data(**context_kwargs)
+        context = self.get_context_data(**kwargs)
         return self.render_to_response(context)
-
-
-# RemovedInDjango40Warning
-def _wrap_url_kwargs_with_deprecation_warning(url_kwargs):
-    context_kwargs = {}
-    for key, value in url_kwargs.items():
-        # Bind into function closure.
-        @SimpleLazyObject
-        def access_value(key=key, value=value):
-            warnings.warn(
-                'TemplateView passing URL kwargs to the context is '
-                'deprecated. Reference %s in your template through '
-                'view.kwargs instead.' % key,
-                RemovedInDjango40Warning, stacklevel=2,
-            )
-            return value
-        context_kwargs[key] = access_value
-    return context_kwargs
 
 
 class RedirectView(View):
