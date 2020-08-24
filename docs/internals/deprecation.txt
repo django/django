@@ -98,9 +98,6 @@ details on these changes.
 
 * The ``list`` message for ``ModelMultipleChoiceField`` will be removed.
 
-* ``django.views.generic.TemplateView`` will no longer pass URL kwargs directly
-  to the ``context``.
-
 * Support for passing raw column aliases to ``QuerySet.order_by()`` will be
   removed.
 
