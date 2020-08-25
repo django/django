@@ -117,7 +117,7 @@ Minor features
 
 * The new :attr:`.JSONBAgg.ordering` attribute determines the ordering of the
   aggregated elements.
-  
+
 * The :class:`~django.contrib.postgres.operations.CreateExtension` operation
   now checks that the extension already exists in the database and skips the
   migration if so.
