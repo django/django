@@ -229,7 +229,11 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :class:`~django.middleware.security.SecurityMiddleware` now adds the
+  :ref:`Cross-Origin Opener Policy <cross-origin-opener-policy>` header with a
+  value of ``'same-origin'`` to prevent cross-origin popups from sharing the
+  same browsing context. You can prevent this header from being added by
+  setting the :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY` setting to ``None``.
 
 Security
 ~~~~~~~~

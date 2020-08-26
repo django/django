@@ -213,6 +213,19 @@ protect the privacy of your users, restricting under which circumstances the
 ``Referer`` header is set. See :ref:`the referrer policy section of the
 security middleware reference <referrer-policy>` for details.
 
+Cross-origin opener policy
+==========================
+
+.. versionadded:: 4.0
+
+The cross-origin opener policy (COOP) header allows browsers to isolate a
+top-level window from other documents by putting them in a different context
+group so that they cannot directly interact with the top-level window. If a
+document protected by COOP opens a cross-origin popup window, the popup’s
+``window.opener`` property will be ``null``. COOP protects against cross-origin
+attacks. See :ref:`the cross-origin opener policy section of the security
+middleware reference <cross-origin-opener-policy>` for details.
+
 Session security
 ================
 

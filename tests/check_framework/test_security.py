@@ -504,3 +504,28 @@ class CSRFFailureViewTest(SimpleTestCase):
             csrf.check_csrf_failure_view(None),
             [Error(msg, id='security.E101')],
         )
+
+
+class CheckCrossOriginOpenerPolicyTest(SimpleTestCase):
+    @override_settings(
+        MIDDLEWARE=['django.middleware.security.SecurityMiddleware'],
+        SECURE_CROSS_ORIGIN_OPENER_POLICY=None,
+    )
+    def test_no_coop(self):
+        self.assertEqual(base.check_cross_origin_opener_policy(None), [])
+
+    @override_settings(MIDDLEWARE=['django.middleware.security.SecurityMiddleware'])
+    def test_with_coop(self):
+        tests = ['same-origin', 'same-origin-allow-popups', 'unsafe-none']
+        for value in tests:
+            with self.subTest(value=value), override_settings(
+                SECURE_CROSS_ORIGIN_OPENER_POLICY=value,
+            ):
+                self.assertEqual(base.check_cross_origin_opener_policy(None), [])
+
+    @override_settings(
+        MIDDLEWARE=['django.middleware.security.SecurityMiddleware'],
+        SECURE_CROSS_ORIGIN_OPENER_POLICY='invalid-value',
+    )
+    def test_with_invalid_coop(self):
+        self.assertEqual(base.check_cross_origin_opener_policy(None), [base.E024])

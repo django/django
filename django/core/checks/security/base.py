@@ -3,6 +3,9 @@ from django.core.exceptions import ImproperlyConfigured
 
 from .. import Error, Tags, Warning, register
 
+CROSS_ORIGIN_OPENER_POLICY_VALUES = {
+    'same-origin', 'same-origin-allow-popups', 'unsafe-none',
+}
 REFERRER_POLICY_VALUES = {
     'no-referrer', 'no-referrer-when-downgrade', 'origin',
     'origin-when-cross-origin', 'same-origin', 'strict-origin',
@@ -17,8 +20,8 @@ W001 = Warning(
     "You do not have 'django.middleware.security.SecurityMiddleware' "
     "in your MIDDLEWARE so the SECURE_HSTS_SECONDS, "
     "SECURE_CONTENT_TYPE_NOSNIFF, SECURE_BROWSER_XSS_FILTER, "
-    "SECURE_REFERRER_POLICY, and SECURE_SSL_REDIRECT settings will have no "
-    "effect.",
+    "SECURE_REFERRER_POLICY, SECURE_CROSS_ORIGIN_OPENER_POLICY, "
+    "and SECURE_SSL_REDIRECT settings will have no effect.",
     id='security.W001',
 )
 
@@ -117,6 +120,15 @@ E023 = Error(
     'You have set the SECURE_REFERRER_POLICY setting to an invalid value.',
     hint='Valid values are: {}.'.format(', '.join(sorted(REFERRER_POLICY_VALUES))),
     id='security.E023',
+)
+
+E024 = Error(
+    'You have set the SECURE_CROSS_ORIGIN_OPENER_POLICY setting to an invalid '
+    'value.',
+    hint='Valid values are: {}.'.format(
+        ', '.join(sorted(CROSS_ORIGIN_OPENER_POLICY_VALUES)),
+    ),
+    id='security.E024',
 )
 
 
@@ -231,4 +243,15 @@ def check_referrer_policy(app_configs, **kwargs):
             values = set(settings.SECURE_REFERRER_POLICY)
         if not values <= REFERRER_POLICY_VALUES:
             return [E023]
+    return []
+
+
+@register(Tags.security, deploy=True)
+def check_cross_origin_opener_policy(app_configs, **kwargs):
+    if (
+        _security_middleware() and
+        settings.SECURE_CROSS_ORIGIN_OPENER_POLICY is not None and
+        settings.SECURE_CROSS_ORIGIN_OPENER_POLICY not in CROSS_ORIGIN_OPENER_POLICY_VALUES
+    ):
+        return [E024]
     return []

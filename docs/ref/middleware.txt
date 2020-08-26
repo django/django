@@ -198,6 +198,7 @@ enabled or disabled with a setting.
 
 * :setting:`SECURE_BROWSER_XSS_FILTER`
 * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
+* :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY`
 * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
 * :setting:`SECURE_HSTS_PRELOAD`
 * :setting:`SECURE_HSTS_SECONDS`
@@ -353,6 +354,43 @@ this setting are:
     comma-separated string can be used with :setting:`SECURE_REFERRER_POLICY`.
 
     __ https://w3c.github.io/webappsec-referrer-policy/#unknown-policy-values
+
+.. _cross-origin-opener-policy:
+
+Cross-Origin Opener Policy
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 4.0
+
+Some browsers have the ability to isolate top-level windows from other
+documents by putting them in a separate browsing context group based on the
+value of the `Cross-Origin Opener Policy`__ (COOP) header. If a document that
+is isolated in this way opens a cross-origin popup window, the popup’s
+``window.opener`` property will be ``null``. Isolating windows using COOP is a
+defense-in-depth protection against cross-origin attacks, especially those like
+Spectre which allowed exfiltration of data loaded into a shared browsing
+context.
+
+__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy
+
+``SecurityMiddleware`` can set the ``Cross-Origin-Opener-Policy`` header for
+you, based on the :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY` setting. The
+valid values for this setting are:
+
+``same-origin``
+    Isolates the browsing context exclusively to same-origin documents.
+    Cross-origin documents are not loaded in the same browsing context. This
+    is the default and most secure option.
+
+``same-origin-allow-popups``
+    Isolates the browsing context to same-origin documents or those which
+    either don't set COOP or which opt out of isolation by setting a COOP of
+    ``unsafe-none``.
+
+``unsafe-none``
+    Allows the document to be added to its opener's browsing context group
+    unless the opener itself has a COOP of ``same-origin`` or
+    ``same-origin-allow-popups``.
 
 .. _x-content-type-options:
 
