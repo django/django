@@ -9,6 +9,10 @@ REFERRER_POLICY_VALUES = {
     'strict-origin-when-cross-origin', 'unsafe-url',
 }
 
+CROSS_ORIGIN_OPENER_POLICY_VALUES = {
+    'same-origin', 'same-origin-allow-popups', 'unsafe-none',
+}
+
 SECRET_KEY_MIN_LENGTH = 50
 SECRET_KEY_MIN_UNIQUE_CHARACTERS = 5
 
@@ -16,8 +20,8 @@ W001 = Warning(
     "You do not have 'django.middleware.security.SecurityMiddleware' "
     "in your MIDDLEWARE so the SECURE_HSTS_SECONDS, "
     "SECURE_CONTENT_TYPE_NOSNIFF, SECURE_BROWSER_XSS_FILTER, "
-    "SECURE_REFERRER_POLICY, and SECURE_SSL_REDIRECT settings will have no "
-    "effect.",
+    "SECURE_REFERRER_POLICY, SECURE_CROSS_ORIGIN_OPENER_POLICY, "
+    "and SECURE_SSL_REDIRECT settings will have no effect.",
     id='security.W001',
 )
 
@@ -114,6 +118,19 @@ E023 = Error(
     'You have set the SECURE_REFERRER_POLICY setting to an invalid value.',
     hint='Valid values are: {}.'.format(', '.join(sorted(REFERRER_POLICY_VALUES))),
     id='security.E023',
+)
+
+W024 = Warning(
+    'You have not set the SECURE_CROSS_ORIGIN_OPENER_POLICY setting. Without this '
+    'your site will not send the Cross-Origin-Opener-Policy header. Consider '
+    'setting this header to protect your site from cross-origin attacks.',
+    id='security.W024',
+)
+E025 = Error(
+    'You have set the SECURE_CROSS_ORIGIN_OPENER_POLICY setting to an invalid '
+    'value.',
+    hint='Valid values are: {}.'.format(', '.join(CROSS_ORIGIN_OPENER_POLICY_VALUES)),
+    id='security.E025'
 )
 
 E100 = Error(
@@ -232,6 +249,16 @@ def check_referrer_policy(app_configs, **kwargs):
             values = set(settings.SECURE_REFERRER_POLICY)
         if not values <= REFERRER_POLICY_VALUES:
             return [E023]
+    return []
+
+
+@register(Tags.security, deploy=True)
+def check_cross_origin_opener_policy(app_configs, **kwargs):
+    if _security_middleware():
+        if settings.SECURE_CROSS_ORIGIN_OPENER_POLICY is None:
+            return [W024]
+        if settings.SECURE_CROSS_ORIGIN_OPENER_POLICY not in CROSS_ORIGIN_OPENER_POLICY_VALUES:
+            return [E025]
     return []
 
 

@@ -2273,6 +2273,17 @@ If ``True``, the :class:`~django.middleware.security.SecurityMiddleware`
 sets the :ref:`x-content-type-options` header on all responses that do not
 already have it.
 
+.. setting:: SECURE_CROSS_ORIGIN_OPENER_POLICY
+
+``SECURE_CROSS_ORIGIN___OPENER_POLICY``
+---------------------------------------
+
+Default: ``'same-origin'``
+
+If configured, the :class:`~django.middleware.security.SecurityMiddleware` sets
+the :ref:`cross-origin-opener-policy` header on all responses that do not 
+already have it to the value provided.
+
 .. setting:: SECURE_HSTS_INCLUDE_SUBDOMAINS
 
 ``SECURE_HSTS_INCLUDE_SUBDOMAINS``
@@ -3626,6 +3637,7 @@ HTTP
 
   * :setting:`SECURE_BROWSER_XSS_FILTER`
   * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
+  * :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY`
   * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
   * :setting:`SECURE_HSTS_PRELOAD`
   * :setting:`SECURE_HSTS_SECONDS`

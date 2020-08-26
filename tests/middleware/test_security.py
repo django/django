@@ -255,3 +255,34 @@ class SecurityMiddlewareTest(SimpleTestCase):
         """
         response = self.process_response(headers={'Referrer-Policy': 'unsafe-url'})
         self.assertEqual(response['Referrer-Policy'], 'unsafe-url')
+
+    @override_settings(SECURE_CROSS_ORIGIN_OPENER_POLICY=None)
+    def test_coop_off(self):
+        """
+        With SECURE_CROSS_ORiGIN_OPENER_POLICY set to None, the middleware does not
+        add a "Cross-Origin-Opener-Policy" header to the response.
+        """
+        self.assertNotIn('Cross-Origin-Opener-Policy', self.process_response())
+
+    def test_coop_on(self):
+        """
+        With SECURE_CROSS_ORIGIN_OPENER_POLICY set to a valid value, the middleware
+        adds a "Cross-Origin_Opener-Policy" header to the response.
+        """
+        tests = (
+            ('same-origin', 'same-origin'),
+            ('same-origin-allow-popups', 'same-origin-allow-popups'),
+            ('unsafe-none', 'unsafe-none'),
+        )
+        for value, expected in tests:
+            with self.subTest(value=value), override_settings(SECURE_CROSS_ORIGIN_OPENER_POLICY=value):
+                self.assertEqual(self.process_response()['Cross-Origin-Opener-Policy'], expected)
+
+    @override_settings(SECURE_CROSS_ORIGIN_OPENER_POLICY='unsafe-none')
+    def test_coop_already_present(self):
+        """
+        The middleware will not override a "Cross-Origin-Opener-Policy" header already
+        present in the response.
+        """
+        response = self.process_response(headers={'Cross-Origin-Opener-Policy': 'same-origin'})
+        self.assertEqual(response['Cross-Origin-Opener-Policy'], 'same-origin')

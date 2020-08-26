@@ -464,3 +464,38 @@ class CheckReferrerPolicyTest(SimpleTestCase):
     )
     def test_with_invalid_referrer_policy(self):
         self.assertEqual(base.check_referrer_policy(None), [base.E023])
+
+
+class CheckCrossOriginOpenerPolicyTest(SimpleTestCase):
+    @override_settings(
+        MIDDLEWARE=['django.middleware.security.SecurityMiddleware'],
+        SECURE_CROSS_ORIGIN_OPENER_POLICY=None,
+    )
+    def test_no_coop(self):
+        self.assertEqual(base.check_cross_origin_opener_policy(None), [base.W024])
+
+    @override_settings(MIDDLEWARE=[], SECURE_CROSS_ORIGIN_OPENER_POLICY=None)
+    def test_no_coop_no_middleware(self):
+        """
+        Don't warn if SECURE_CROSS_ORIGIN_OPENER_POLICY is None and SecurityMiddleware
+        isn't in MIDDLEWARE.
+        """
+        self.assertEqual(base.check_cross_origin_opener_policy(None), [])
+
+    @override_settings(MIDDLEWARE=['django.middleware.security.SecurityMiddleware'])
+    def test_with_coop(self):
+        tests = (
+            'same-origin',
+            'same-origin-allow-popups',
+            'unsafe-none',
+        )
+        for value in tests:
+            with self.subTest(value=value), override_settings(SECURE_CROSS_ORIGIN_OPENER_POLICY=value):
+                self.assertEqual(base.check_cross_origin_opener_policy(None), [])
+
+    @override_settings(
+        MIDDLEWARE=['django.middleware.security.SecurityMiddleware'],
+        SECURE_CROSS_ORIGIN_OPENER_POLICY='invalid-value',
+    )
+    def test_with_invalid_coop(self):
+        self.assertEqual(base.check_cross_origin_opener_policy(None), [base.E025])

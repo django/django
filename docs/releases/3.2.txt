@@ -289,6 +289,9 @@ Security
   ``SECRET_KEY``, and then going on to access ``settings.SECRET_KEY`` will now
   raise an :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
+* :class:`~django.middleware.security.SecurityMiddleware` can now send the
+  :ref:`Cross-Origin Opener Policy <cross-origin-opener-policy>` header.
+
 Serialization
 ~~~~~~~~~~~~~
 

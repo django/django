@@ -391,8 +391,8 @@ The following checks are run if you use the :option:`check --deploy` option:
   :class:`django.middleware.security.SecurityMiddleware` in your
   :setting:`MIDDLEWARE` so the :setting:`SECURE_HSTS_SECONDS`,
   :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, :setting:`SECURE_BROWSER_XSS_FILTER`,
-  :setting:`SECURE_REFERRER_POLICY`, and :setting:`SECURE_SSL_REDIRECT`
-  settings will have no effect.
+  :setting:`SECURE_REFERRER_POLICY`, :setting:`SECURE_SSL_REDIRECT`, and
+  :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY` settings will have no effect.
 * **security.W002**: You do not have
   :class:`django.middleware.clickjacking.XFrameOptionsMiddleware` in your
   :setting:`MIDDLEWARE`, so your pages will not be served with an
@@ -483,6 +483,12 @@ The following checks are run if you use the :option:`check --deploy` option:
   should consider enabling this header to protect user privacy.
 * **security.E023**: You have set the :setting:`SECURE_REFERRER_POLICY` setting
   to an invalid value.
+* **security.W024**: You have not set the :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY`
+  setting. Without this, your site will not send the Cross-Origin-Opener-Policy 
+  header. Consider setting this header to protect your site from cross-origin 
+  attacks.
+* **security.E025**: You have set the :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY`
+  setting to an invalid value.'
 
 The following checks verify that your security-related settings are correctly
 configured:
