@@ -73,7 +73,7 @@ class PasswordResetTokenGenerator:
             # legacy argument and replace with:
             #   algorithm=self.algorithm,
             algorithm='sha1' if legacy else self.algorithm,
-        ).hexdigest()[::2]  # Limit to 20 characters to shorten the URL.
+        ).hexdigest()[::2]  # Limit to shorten the URL.
         return "%s-%s" % (ts_b36, hash_string)
 
     def _make_hash_value(self, user, timestamp):
