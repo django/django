@@ -59,3 +59,6 @@ Bugfixes
 * Fixed a ``QuerySet.delete()`` crash on MySQL, following a performance
   regression in Django 3.1 on MariaDB 10.3.2+, when filtering against an
   aggregate function (:ticket:`31965`).
+
+* Fixed a ``django.contrib.admin.EmptyFieldListFilter`` crash when using on
+  reverse relations (:ticket:`31952`).

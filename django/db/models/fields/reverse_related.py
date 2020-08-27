@@ -33,6 +33,7 @@ class ForeignObjectRel(FieldCacheMixin):
     # Reverse relations are always nullable (Django can't enforce that a
     # foreign key on the related model points to this model).
     null = True
+    empty_strings_allowed = False
 
     def __init__(self, field, to, related_name=None, related_query_name=None,
                  limit_choices_to=None, parent_link=False, on_delete=None):

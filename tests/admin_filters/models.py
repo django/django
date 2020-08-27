@@ -38,6 +38,10 @@ class Book(models.Model):
         return self.title
 
 
+class ImprovedBook(models.Model):
+    book = models.OneToOneField(Book, models.CASCADE)
+
+
 class Department(models.Model):
     code = models.CharField(max_length=4, unique=True)
     description = models.CharField(max_length=50, blank=True, null=True)
