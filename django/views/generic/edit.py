@@ -178,6 +178,26 @@ class CreateView(SingleObjectTemplateResponseMixin, BaseCreateView):
     """
     template_name_suffix = '_form'
 
+class CreateViewV2(CreateView):
+    def __init__(self):
+        self.context = {'forms': []}
+
+    def get(self,request):
+        for model,fields in self.__class__.models_fields.items():
+            self.context['forms'].append(
+                model_forms.modelform_factory(model = model,fields = fields)
+            )
+        return render(request,self.__class__.template_name,self.context)
+
+    def post(self,request):
+        for model,fields in self.__class__.models_fields.items():
+            valores = dict.fromkeys(self.__class__.models_fields[model], '')
+            for f in fields:
+                valores[f] = dict(request.POST)[f][0]
+                dict(request.POST)[f].pop(0)
+            save_model = model(**valores)
+            save_model.save()
+        return render(request,self.__class__.template_name,self.context)
 
 class BaseUpdateView(ModelFormMixin, ProcessFormView):
     """
