@@ -276,6 +276,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
                     # password reset form at a URL without the token. That
                     # avoids the possibility of leaking the token in the
                     # HTTP Referer header.
+                    auth_logout(self.request)
                     self.request.session[INTERNAL_RESET_SESSION_TOKEN] = token
                     redirect_url = self.request.path.replace(token, self.reset_url_token)
                     return HttpResponseRedirect(redirect_url)
