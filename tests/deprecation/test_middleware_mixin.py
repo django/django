@@ -77,12 +77,7 @@ class MiddlewareMixinTests(SimpleTestCase):
         def sync_get_response(request):
             return HttpResponse()
 
-        for middleware in [
-            CacheMiddleware,
-            FetchFromCacheMiddleware,
-            UpdateCacheMiddleware,
-            SecurityMiddleware,
-        ]:
+        for middleware in self.middlewares:
             with self.subTest(middleware=middleware.__qualname__):
                 # Middleware appears as coroutine if get_function is
                 # a coroutine.
