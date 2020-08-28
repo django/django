@@ -74,9 +74,6 @@ class DatabaseOperations(BaseDatabaseOperations):
     def time_trunc_sql(self, lookup_type, field_name):
         return "DATE_TRUNC('%s', %s)::time" % (lookup_type, field_name)
 
-    def json_cast_text_sql(self, field_name):
-        return '(%s)::text' % field_name
-
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 

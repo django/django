@@ -51,3 +51,7 @@ Bugfixes
 
 * Fixed detecting an async ``get_response`` callable in various builtin
   middlewares (:ticket:`31928`).
+
+* Fixed a ``QuerySet.order_by()`` crash on PostgreSQL when ordering and
+  grouping by :class:`~django.db.models.JSONField` with a custom
+  :attr:`~django.db.models.JSONField.decoder` (:ticket:`31956`).
