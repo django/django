@@ -290,6 +290,11 @@ Models
   distinct fields if there's only one field specified in
   :meth:`.QuerySet.distinct`.
 
+* The new ``tzinfo`` parameter of the
+  :class:`~django.db.models.functions.TruncDate` and
+  :class:`~django.db.models.functions.TruncTime` database functions allows
+  truncating datetimes in a specific timezone.
+
 Pagination
 ~~~~~~~~~~
 

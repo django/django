@@ -623,19 +623,27 @@ that deal with date-parts can be used with ``DateField``::
 ``DateTimeField`` truncation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. class:: TruncDate(expression, **extra)
+.. class:: TruncDate(expression, tzinfo=None, **extra)
 
     .. attribute:: lookup_name = 'date'
     .. attribute:: output_field = DateField()
+
+    .. versionchanged:: 3.2
+
+        The ``tzinfo`` parameter was added.
 
 ``TruncDate`` casts ``expression`` to a date rather than using the built-in SQL
 truncate function. It's also registered as a transform on  ``DateTimeField`` as
 ``__date``.
 
-.. class:: TruncTime(expression, **extra)
+.. class:: TruncTime(expression, tzinfo=None, **extra)
 
     .. attribute:: lookup_name = 'time'
     .. attribute:: output_field = TimeField()
+
+    .. versionchanged:: 3.2
+
+        The ``tzinfo`` parameter was added.
 
 ``TruncTime`` casts ``expression`` to a time rather than using the built-in SQL
 truncate function. It's also registered as a transform on ``DateTimeField`` as
