@@ -4,7 +4,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import generic
 
-from .forms import AuthorForm, ContactForm
+from .forms import AuthorForm, ConfirmDeleteForm, ContactForm
 from .models import Artist, Author, Book, BookSigning, Page
 
 
@@ -177,6 +177,14 @@ class NaiveAuthorDelete(generic.DeleteView):
 class AuthorDelete(generic.DeleteView):
     model = Author
     success_url = '/list/authors/'
+
+
+class AuthorDeleteFormView(generic.DeleteView):
+    model = Author
+    form_class = ConfirmDeleteForm
+
+    def get_success_url(self):
+        return reverse('authors_list')
 
 
 class SpecializedAuthorDelete(generic.DeleteView):
