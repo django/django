@@ -151,40 +151,40 @@ msgid "Tomorrow"
 msgstr "Amanhã"
 
 msgid "January"
-msgstr "Janeiro"
+msgstr "janeiro"
 
 msgid "February"
-msgstr "Fevereiro"
+msgstr "fevereiro"
 
 msgid "March"
-msgstr "Março"
+msgstr "março"
 
 msgid "April"
-msgstr "Abril"
+msgstr "abril"
 
 msgid "May"
-msgstr "Maio"
+msgstr "maio"
 
 msgid "June"
-msgstr "Junho"
+msgstr "junho"
 
 msgid "July"
-msgstr "Julho"
+msgstr "julho"
 
 msgid "August"
-msgstr "Agosto"
+msgstr "agosto"
 
 msgid "September"
-msgstr "Setembro"
+msgstr "setembro"
 
 msgid "October"
-msgstr "Outubro"
+msgstr "outubro"
 
 msgid "November"
-msgstr "Novembro"
+msgstr "novembro"
 
 msgid "December"
-msgstr "Dezembro"
+msgstr "dezembro"
 
 msgctxt "one letter Sunday"
 msgid "S"

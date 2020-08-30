@@ -901,82 +901,82 @@ msgid "noon"
 msgstr "meio-dia"
 
 msgid "Monday"
-msgstr "Segunda-feira"
+msgstr "segunda-feira"
 
 msgid "Tuesday"
-msgstr "Terça-feira"
+msgstr "terça-feira"
 
 msgid "Wednesday"
-msgstr "Quarta-feira"
+msgstr "quarta-feira"
 
 msgid "Thursday"
-msgstr "Quinta-feira"
+msgstr "quinta-feira"
 
 msgid "Friday"
-msgstr "Sexta-feira"
+msgstr "sexta-feira"
 
 msgid "Saturday"
-msgstr "Sábado"
+msgstr "sábado"
 
 msgid "Sunday"
-msgstr "Domingo"
+msgstr "domingo"
 
 msgid "Mon"
-msgstr "Seg"
+msgstr "seg"
 
 msgid "Tue"
-msgstr "Ter"
+msgstr "ter"
 
 msgid "Wed"
-msgstr "Qua"
+msgstr "qua"
 
 msgid "Thu"
-msgstr "Qui"
+msgstr "qui"
 
 msgid "Fri"
-msgstr "Sex"
+msgstr "sex"
 
-msgid "Sat"
+msgid "sat"
 msgstr "Sab"
 
 msgid "Sun"
-msgstr "Dom"
+msgstr "dom"
 
 msgid "January"
-msgstr "Janeiro"
+msgstr "janeiro"
 
 msgid "February"
-msgstr "Fevereiro"
+msgstr "fevereiro"
 
 msgid "March"
-msgstr "Março"
+msgstr "março"
 
 msgid "April"
-msgstr "Abril"
+msgstr "abril"
 
 msgid "May"
-msgstr "Maio"
+msgstr "maio"
 
 msgid "June"
-msgstr "Junho"
+msgstr "junho"
 
 msgid "July"
-msgstr "Julho"
+msgstr "julho"
 
 msgid "August"
-msgstr "Agosto"
+msgstr "agosto"
 
 msgid "September"
-msgstr "Setembro"
+msgstr "setembro"
 
 msgid "October"
-msgstr "Outubro"
+msgstr "outubro"
 
 msgid "November"
-msgstr "Novembro"
+msgstr "novembro"
 
 msgid "December"
-msgstr "Dezembro"
+msgstr "dezembro"
 
 msgid "jan"
 msgstr "jan"
@@ -1016,99 +1016,99 @@ msgstr "dez"
 
 msgctxt "abbrev. month"
 msgid "Jan."
-msgstr "Jan."
+msgstr "jan."
 
 msgctxt "abbrev. month"
 msgid "Feb."
-msgstr "Fev."
+msgstr "fev."
 
 msgctxt "abbrev. month"
 msgid "March"
-msgstr "Março"
+msgstr "março"
 
 msgctxt "abbrev. month"
 msgid "April"
-msgstr "Abril"
+msgstr "abril"
 
 msgctxt "abbrev. month"
 msgid "May"
-msgstr "Maio"
+msgstr "maio"
 
 msgctxt "abbrev. month"
 msgid "June"
-msgstr "Junho"
+msgstr "junho"
 
 msgctxt "abbrev. month"
 msgid "July"
-msgstr "Julho"
+msgstr "julho"
 
 msgctxt "abbrev. month"
 msgid "Aug."
-msgstr "Ago."
+msgstr "ago."
 
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr "Set."
+msgstr "set."
 
 msgctxt "abbrev. month"
 msgid "Oct."
-msgstr "Out."
+msgstr "out."
 
 msgctxt "abbrev. month"
 msgid "Nov."
-msgstr "Nov."
+msgstr "nov."
 
 msgctxt "abbrev. month"
 msgid "Dec."
-msgstr "Dez."
+msgstr "dez."
 
 msgctxt "alt. month"
 msgid "January"
-msgstr "Janeiro"
+msgstr "janeiro"
 
 msgctxt "alt. month"
 msgid "February"
-msgstr "Fevereiro"
+msgstr "fevereiro"
 
 msgctxt "alt. month"
 msgid "March"
-msgstr "Março"
+msgstr "março"
 
 msgctxt "alt. month"
 msgid "April"
-msgstr "Abril"
+msgstr "abril"
 
 msgctxt "alt. month"
 msgid "May"
-msgstr "Maio"
+msgstr "maio"
 
 msgctxt "alt. month"
 msgid "June"
-msgstr "Junho"
+msgstr "junho"
 
 msgctxt "alt. month"
 msgid "July"
-msgstr "Julho"
+msgstr "julho"
 
 msgctxt "alt. month"
 msgid "August"
-msgstr "Agosto"
+msgstr "agosto"
 
 msgctxt "alt. month"
 msgid "September"
-msgstr "Setembro"
+msgstr "setembro"
 
 msgctxt "alt. month"
 msgid "October"
-msgstr "Outubro"
+msgstr "outubro"
 
 msgctxt "alt. month"
 msgid "November"
-msgstr "Novembro"
+msgstr "novembro"
 
 msgctxt "alt. month"
 msgid "December"
-msgstr "Dezembro"
+msgstr "dezembro"
 
 msgid "This is not a valid IPv6 address."
 msgstr "Este não é um endereço IPv6 válido."
