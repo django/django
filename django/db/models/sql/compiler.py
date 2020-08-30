@@ -1443,6 +1443,11 @@ class SQLDeleteCompiler(SQLCompiler):
         ]
         outerq = Query(self.query.model)
         outerq.where = self.query.where_class()
+        if not self.connection.features.update_can_self_select:
+            # Force the materialization of the inner query to allow reference
+            # to the target table on MySQL.
+            sql, params = innerq.get_compiler(connection=self.connection).as_sql()
+            innerq = RawSQL('SELECT * FROM (%s) subquery' % sql, params)
         outerq.add_q(Q(pk__in=innerq))
         return self._as_sql(outerq)
 
