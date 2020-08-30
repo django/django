@@ -275,7 +275,7 @@ class TestQuerying(TestCase):
                 'n': [None],
             },
             [1, [2]],
-            {'k': True, 'l': False},
+            {'k': True, 'l': False, 'foo': 'bax'},
             {
                 'foo': 'bar',
                 'baz': {'a': 'b', 'c': 'd'},
@@ -615,6 +615,52 @@ class TestQuerying(TestCase):
             [self.objs[3], self.objs[4]],
         )
         self.assertIs(NullableJSONModel.objects.filter(value__c__lt=5).exists(), False)
+
+    def test_lookup_exclude(self):
+        tests = [
+            (Q(value__a='b'), [self.objs[0]]),
+            (Q(value__foo='bax'), [self.objs[0], self.objs[7]]),
+        ]
+        for condition, expected in tests:
+            self.assertSequenceEqual(
+                NullableJSONModel.objects.exclude(condition),
+                expected,
+            )
+            self.assertSequenceEqual(
+                NullableJSONModel.objects.filter(~condition),
+                expected,
+            )
+
+    def test_lookup_exclude_nonexistent_key(self):
+        # Values without the key are ignored.
+        condition = Q(value__foo='bax')
+        objs_with_value = [self.objs[6]]
+        objs_with_different_value = [self.objs[0], self.objs[7]]
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.exclude(condition),
+            objs_with_different_value,
+        )
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.exclude(~condition),
+            objs_with_value,
+        )
+        self.assertCountEqual(
+            NullableJSONModel.objects.filter(condition | ~condition),
+            objs_with_value + objs_with_different_value,
+        )
+        self.assertCountEqual(
+            NullableJSONModel.objects.exclude(condition & ~condition),
+            objs_with_value + objs_with_different_value,
+        )
+        # Add the __isnull lookup to get an exhaustive set.
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.exclude(condition & Q(value__foo__isnull=False)),
+            self.objs[0:6] + self.objs[7:],
+        )
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(condition & Q(value__foo__isnull=False)),
+            objs_with_value,
+        )
 
     @skipIf(
         connection.vendor == 'oracle',
