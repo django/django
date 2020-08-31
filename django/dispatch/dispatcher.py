@@ -133,10 +133,7 @@ class Signal:
             dispatch_uid
                 the unique identifier of the receiver to disconnect
         """
-        if dispatch_uid:
-            lookup_key = (dispatch_uid, _make_id(sender))
-        else:
-            lookup_key = (_make_id(receiver), _make_id(sender))
+        lookup_key = (dispatch_uid, _make_id(sender)) if dispatch_uid else (_make_id(receiver), _make_id(sender))
 
         disconnected = False
         with self.lock:
