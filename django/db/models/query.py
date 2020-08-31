@@ -142,6 +142,10 @@ class ValuesListIterable(BaseIterable):
         return compiler.results_iter(tuple_expected=True, chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size)
 
 
+def _named_row_unpickle(names, values):
+    return NamedValuesListIterable.create_namedtuple_class(*names)._make(values)
+
+
 class NamedValuesListIterable(ValuesListIterable):
     """
     Iterable returned by QuerySet.values_list(named=True) that yields a
@@ -151,9 +155,12 @@ class NamedValuesListIterable(ValuesListIterable):
     @staticmethod
     @lru_cache()
     def create_namedtuple_class(*names):
-        # Cache namedtuple() with @lru_cache() since it's too slow to be
+        # Cache type() with @lru_cache() since it's too slow to be
         # called for every QuerySet evaluation.
-        return namedtuple('Row', names)
+        return type('Row', (namedtuple('Row', names),), {
+            '__slots__': (),
+            '__reduce__': lambda self: (_named_row_unpickle, (names, tuple(self)))
+        })
 
     def __iter__(self):
         queryset = self.queryset

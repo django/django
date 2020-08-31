@@ -2381,6 +2381,13 @@ class ValuesQuerysetTests(TestCase):
         values = qs.first()
         self.assertEqual(values._fields, ('combinedexpression2', 'combinedexpression1'))
 
+    def test_named_values_pickle_ticket_31843(self):
+        qs = Number.objects.extra(select={'num3': 'num+3'})
+        value = qs.values_list('num', 'num3', named=True).first()
+        self.assertIsInstance(value, tuple)
+        self.assertTupleEqual(value, (72, 75))
+        self.assertTupleEqual(value, pickle.loads(pickle.dumps(value)))
+
 
 class QuerySetSupportsPythonIdioms(TestCase):
 
