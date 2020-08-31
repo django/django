@@ -5,8 +5,6 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
-from collections import namedtuple
-from functools import lru_cache
 from itertools import chain
 
 import django
@@ -23,7 +21,7 @@ from django.db.models.expressions import Case, Expression, F, Value, When
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
-from django.db.models.utils import resolve_callables
+from django.db.models.utils import create_namedtuple_class, resolve_callables
 from django.utils import timezone
 from django.utils.functional import cached_property, partition
 
@@ -148,13 +146,6 @@ class NamedValuesListIterable(ValuesListIterable):
     namedtuple for each row.
     """
 
-    @staticmethod
-    @lru_cache()
-    def create_namedtuple_class(*names):
-        # Cache namedtuple() with @lru_cache() since it's too slow to be
-        # called for every QuerySet evaluation.
-        return namedtuple('Row', names)
-
     def __iter__(self):
         queryset = self.queryset
         if queryset._fields:
@@ -162,7 +153,7 @@ class NamedValuesListIterable(ValuesListIterable):
         else:
             query = queryset.query
             names = [*query.extra_select, *query.values_select, *query.annotation_select]
-        tuple_class = self.create_namedtuple_class(*names)
+        tuple_class = create_namedtuple_class(*names)
         new = tuple.__new__
         for row in super().__iter__():
             yield new(tuple_class, row)
