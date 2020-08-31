@@ -421,6 +421,7 @@ class Expression(BaseExpression, Combinable):
 
 _connector_combinators = {
     connector: [
+        (fields.IntegerField, fields.IntegerField, fields.IntegerField),
         (fields.IntegerField, fields.DecimalField, fields.DecimalField),
         (fields.DecimalField, fields.IntegerField, fields.DecimalField),
         (fields.IntegerField, fields.FloatField, fields.FloatField),

@@ -9,8 +9,8 @@ from unittest import mock
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import (
-    Avg, BinaryField, BooleanField, Case, CharField, Count, DateField,
-    DateTimeField, DecimalField, DurationField, Exists, Expression,
+    AutoField, Avg, BinaryField, BooleanField, Case, CharField, Count,
+    DateField, DateTimeField, DecimalField, DurationField, Exists, Expression,
     ExpressionList, ExpressionWrapper, F, FloatField, Func, IntegerField, Max,
     Min, Model, OrderBy, OuterRef, Q, StdDev, Subquery, Sum, TimeField,
     UUIDField, Value, Variance, When,
@@ -1893,6 +1893,8 @@ class CombinableTests(SimpleTestCase):
 class CombinedExpressionTests(SimpleTestCase):
     def test_resolve_output_field(self):
         tests = [
+            (IntegerField, AutoField, IntegerField),
+            (AutoField, IntegerField, IntegerField),
             (IntegerField, DecimalField, DecimalField),
             (DecimalField, IntegerField, DecimalField),
             (IntegerField, FloatField, FloatField),
