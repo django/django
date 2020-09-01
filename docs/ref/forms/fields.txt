@@ -413,8 +413,8 @@ For each field, we describe the default widget used if you don't specify
         accepts the same formats as the ``choices`` argument to a model field.
         See the :ref:`model field reference documentation on choices
         <field-choices>` for more details. If the argument is a callable, it is
-        evaluated each time the field's form is initialized. Defaults to an
-        empty list.
+        evaluated each time the field's form is initialized, in addition to
+        during rendering. Defaults to an empty list.
 
 ``TypedChoiceField``
 --------------------
