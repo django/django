@@ -1106,3 +1106,31 @@ Versions affected
 
 * Django 3.0 :commit:`(patch) <1f2dd37f6fcefdd10ed44cb233b2e62b520afb38>`
 * Django 2.2 :commit:`(patch) <6d61860b22875f358fac83d903dc629897934815>`
+
+September 1, 2020 - :cve:`2020-24583`
+-------------------------------------
+
+Incorrect permissions on intermediate-level directories on Python 3.7+. `Full
+description
+<https://www.djangoproject.com/weblog/2020/sep/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.1 :commit:`(patch) <934430d22aa5d90c2ba33495ff69a6a1d997d584>`
+* Django 3.0 :commit:`(patch) <08892bffd275c79ee1f8f67639eb170aaaf1181e>`
+* Django 2.2 :commit:`(patch) <375657a71c889c588f723469bd868bd1d40c369f>`
+
+September 1, 2020 - :cve:`2020-24584`
+-------------------------------------
+
+Permission escalation in intermediate-level directories of the file system
+cache on Python 3.7+. `Full description
+<https://www.djangoproject.com/weblog/2020/sep/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.1 :commit:`(patch) <2b099caa5923afa8cfb5f1e8c0d56b6e0e81915b>`
+* Django 3.0 :commit:`(patch) <cdb367c92a0ba72ddc0cbd13ff42b0e6df709554>`
+* Django 2.2 :commit:`(patch) <a3aebfdc8153dc230686b6d2454ccd32ed4c9e6f>`
