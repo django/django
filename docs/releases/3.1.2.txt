@@ -2,6 +2,11 @@
 Django 3.1.2 release notes
 ==========================
 
-*October 1, 2020*
+*Expected October 1, 2020*
 
 Django 3.1.2 fixes several bugs in 3.1.1.
+
+Bugfixes
+========
+
+* ...
