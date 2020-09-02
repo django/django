@@ -156,9 +156,12 @@ def teardown_test_environment():
     del mail.outbox
 
 
-def setup_databases(verbosity, interactive, *, time_keeper, keepdb=False, debug_sql=False, parallel=0,
+def setup_databases(verbosity, interactive, *, time_keeper=None, keepdb=False, debug_sql=False, parallel=0,
                     aliases=None):
     """Create the test databases."""
+    if time_keeper is None:
+        time_keeper = NullTimeKeeper()
+
     test_databases, mirrored_aliases = get_unique_databases_and_mirrors(aliases)
 
     old_names = []
