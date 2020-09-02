@@ -1446,6 +1446,11 @@ class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
         tests = [
             ('unix:/run/memcached/socket', '/run/memcached/socket'),
             ('/run/memcached/socket', '/run/memcached/socket'),
+            ('localhost', 'localhost'),
+            ('localhost:11211', 'localhost:11211'),
+            ('[::1]', '[::1]'),
+            ('[::1]:11211', '[::1]:11211'),
+            ('127.0.0.1', '127.0.0.1'),
             ('127.0.0.1:11211', '127.0.0.1:11211'),
         ]
         for location, expected in tests:
