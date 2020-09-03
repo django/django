@@ -573,7 +573,7 @@ class ModelState:
             # if all base metaclasses are the same, set our metaclass to that
             base_type = type(bases[0])
             if all(type(base) == base_type for base in bases[1:]):
-                self.metaclass = base_type
+                metaclass = base_type
             else:
                 raise TypeError(
                     'Please specify a metaclass that is a (non-strict) subclass of the metaclasses of all bases'
