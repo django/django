@@ -356,7 +356,7 @@ class ModelState:
     assign new ones, as these are not detached during a clone.
     """
 
-    def __init__(self, app_label, name, fields, options=None, bases=None, managers=None):
+    def __init__(self, app_label, name, fields, options=None, bases=None, managers=None, metaclass=models.base.ModelBase):
         self.app_label = app_label
         self.name = name
         self.fields = dict(fields)
@@ -365,6 +365,7 @@ class ModelState:
         self.options.setdefault('constraints', [])
         self.bases = bases or (models.Model,)
         self.managers = managers or []
+        self.metaclass = metaclass
         for name, field in self.fields.items():
             # Sanity-check that fields are NOT already bound to a model.
             if hasattr(field, 'model'):
@@ -521,6 +522,7 @@ class ModelState:
             options,
             bases,
             managers,
+            type(model),
         )
 
     def construct_managers(self):
@@ -571,7 +573,7 @@ class ModelState:
         # Restore managers
         body.update(self.construct_managers())
         # Then, make a Model object (apps.register_model is called in __new__)
-        return type(self.name, bases, body)
+        return self.metaclass(self.name, bases, body)
 
     def get_index_by_name(self, name):
         for index in self.options['indexes']:
