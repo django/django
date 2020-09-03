@@ -53,7 +53,7 @@ class CreateModel(ModelOperation):
         else:
             # if all base metaclasses are the same, set our metaclass to that
             base_type = type(self.bases[0])
-            if all(type(base) == base_type for base in self.bases[1:])
+            if all(type(base) == base_type for base in self.bases[1:]):
                 self.metaclass = base_type
             else:
                 raise ValueError(

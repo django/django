@@ -370,7 +370,7 @@ class ModelState:
         else:
             # if all base metaclasses are the same, set our metaclass to that
             base_type = type(self.bases[0])
-            if all(type(base) == base_type for base in self.bases[1:])
+            if all(type(base) == base_type for base in self.bases[1:]):
                 self.metaclass = base_type
             else:
                 raise ValueError(
@@ -583,6 +583,9 @@ class ModelState:
         # Restore managers
         body.update(self.construct_managers())
         # Then, make a Model object (apps.register_model is called in __new__)
+        # debug line, delete this later
+        print(self.bases)
+        print(self.metaclass)
         return self.metaclass(self.name, bases, body)
 
     def get_index_by_name(self, name):
