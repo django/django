@@ -726,7 +726,7 @@ utility methods in the ``django.test.utils`` module.
     Performs global post-test teardown, such as removing instrumentation from
     the template system and restoring normal email services.
 
-.. function:: setup_databases(verbosity, interactive, *, time_keeper, keepdb=False, debug_sql=False, parallel=0, aliases=None, **kwargs)
+.. function:: setup_databases(verbosity, interactive, *, time_keeper=None, keepdb=False, debug_sql=False, parallel=0, aliases=None, **kwargs)
 
     Creates the test databases.
 
