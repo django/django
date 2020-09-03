@@ -587,9 +587,6 @@ class ModelState:
         # Restore managers
         body.update(self.construct_managers())
         # Then, make a Model object (apps.register_model is called in __new__)
-        # debug line, delete this later
-        print(bases)
-        print(metaclass)
         return metaclass(self.name, bases, body)
 
     def get_index_by_name(self, name):
