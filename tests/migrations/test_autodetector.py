@@ -2371,9 +2371,6 @@ class AutodetectorTests(TestCase):
         class ABase(AlphaBase, type(models.Model)):
             pass
 
-        class A(Alpha, models.Model, metaclass=ABase):
-            x = models.IntegerField(default=10)
-
         A = ModelState(
             "app",
             "A",
