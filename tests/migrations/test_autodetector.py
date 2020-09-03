@@ -2365,31 +2365,27 @@ class AutodetectorTests(TestCase):
         class AlphaBase(type):
             pass
 
-
         class Alpha(metaclass=AlphaBase):
             pass
-
 
         class ABase(AlphaBase, type(models.Model)):
             pass
 
-
         class A(Alpha, models.Model, metaclass=ABase):
             x = models.IntegerField(default=10)
 
-
-        class B(Alpha, models.Model, metaclass=ABase):
-            y = models.IntegerField(default=10)
-
-
-        C = ModelState("app", "C", [], bases=(A,))
-        D = ModelState("app", "D", [], bases=(A, B))
-        changes = self.get_changes([], [C, D])
+        A = ModelState(
+            "app",
+            "A",
+            [("a_id", models.AutoField(primary_key=True))],
+            bases=(Alpha, models.Model),
+            metaclass=ABase
+        )
+        changes = self.get_changes([], [A])
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "app", 1)
-        self.assertOperationTypes(changes, "app", 0, ["CreateModel", "CreateModel"])
-        self.assertOperationAttributes(changes, "app", 0, 0, name="C")
-        self.assertOperationAttributes(changes, "app", 0, 1, name="D")
+        self.assertOperationTypes(changes, "app", 0, ["CreateModel"])
+        self.assertOperationAttributes(changes, "app", 0, 0, name="A")
 
     def test_proxy_bases_first(self):
         """Bases of proxies come first."""
