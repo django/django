@@ -365,17 +365,7 @@ class ModelState:
         self.options.setdefault('constraints', [])
         self.bases = bases or (models.Model,)
         self.managers = managers or []
-        if metaclass:
-            self.metaclass = metaclass
-        else:
-            # if all base metaclasses are the same, set our metaclass to that
-            base_type = type(self.bases[0])
-            if all(type(base) == base_type for base in self.bases[1:]):
-                self.metaclass = base_type
-            else:
-                raise ValueError(
-                    'Please specify a metaclass that is a (non-strict) subclass of the metaclasses of all bases'
-                )
+        self.metaclass = metaclass
         for name, field in self.fields.items():
             # Sanity-check that fields are NOT already bound to a model.
             if hasattr(field, 'model'):
@@ -575,6 +565,20 @@ class ModelState:
             )
         except LookupError:
             raise InvalidBasesError("Cannot resolve one or more bases from %r" % (self.bases,))
+
+        # Now figure out our metaclass
+        if self.metaclass:
+            metaclass = self.metaclass
+        else:
+            # if all base metaclasses are the same, set our metaclass to that
+            base_type = type(bases[0])
+            if all(type(base) == base_type for base in bases[1:]):
+                self.metaclass = base_type
+            else:
+                raise TypeError(
+                    'Please specify a metaclass that is a (non-strict) subclass of the metaclasses of all bases'
+                )
+
         # Clone fields for the body, add other bits.
         body = {name: field.clone() for name, field in self.fields.items()}
         body['Meta'] = meta
@@ -584,9 +588,9 @@ class ModelState:
         body.update(self.construct_managers())
         # Then, make a Model object (apps.register_model is called in __new__)
         # debug line, delete this later
-        print(self.bases)
-        print(self.metaclass)
-        return self.metaclass(self.name, bases, body)
+        print(bases)
+        print(metaclass)
+        return metaclass(self.name, bases, body)
 
     def get_index_by_name(self, name):
         for index in self.options['indexes']:

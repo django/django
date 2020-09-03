@@ -48,17 +48,7 @@ class CreateModel(ModelOperation):
         self.options = options or {}
         self.bases = bases or (models.Model,)
         self.managers = managers or []
-        if metaclass:
-            self.metaclass = metaclass
-        else:
-            # if all base metaclasses are the same, set our metaclass to that
-            base_type = type(self.bases[0])
-            if all(type(base) == base_type for base in self.bases[1:]):
-                self.metaclass = base_type
-            else:
-                raise ValueError(
-                    'Please specify a metaclass that is a (non-strict) subclass of the metaclasses of all bases'
-                )
+        self.metaclass = metaclass
         super().__init__(name)
         # Sanity-check that there are no duplicated field names, bases, or
         # manager names
