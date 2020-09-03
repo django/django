@@ -2077,6 +2077,23 @@ If ``value`` is ``Django``, the output will be ``"    Django"``.
 Marks a string as not requiring further HTML escaping prior to output. When
 autoescaping is off, this filter has no effect.
 
+For example::
+
+    {{ var }}
+
+If ``var`` is ``<p>something</p>``, the output would be the string
+``<p>something</p>``.html tags are ignored here. But :tfilter:`safe` filter 
+do not ignores the html tags.
+
+
+For example::
+
+    {{ var|safe }}
+
+If ``var`` is ``<p>something</p>``, the output would be ``something``.
+It returns the value that we get by the html tag.
+
+
 .. note::
 
     If you are chaining filters, a filter applied after ``safe`` can
