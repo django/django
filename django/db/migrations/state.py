@@ -550,6 +550,7 @@ class ModelState:
             options=dict(self.options),
             bases=self.bases,
             managers=list(self.managers),
+            metaclass=self.metaclass,
         )
 
     def render(self, apps):
