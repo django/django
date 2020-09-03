@@ -356,7 +356,7 @@ class ModelState:
     assign new ones, as these are not detached during a clone.
     """
 
-    def __init__(self, app_label, name, fields, options=None, bases=None, managers=None, metaclass=models.base.ModelBase):
+    def __init__(self, app_label, name, fields, options=None, bases=None, managers=None, metaclass=None):
         self.app_label = app_label
         self.name = name
         self.fields = dict(fields)
@@ -365,7 +365,15 @@ class ModelState:
         self.options.setdefault('constraints', [])
         self.bases = bases or (models.Model,)
         self.managers = managers or []
-        self.metaclass = metaclass
+        if metaclass:
+            self.metaclass = metaclass
+        else:
+            if len(self.bases) == 1:
+                self.metaclass = type(self.bases[0])
+            else:
+                raise ValueError(
+                    'Please specify a metaclass that is a (non-strict) subclass of the metaclasses of all bases'
+                )
         for name, field in self.fields.items():
             # Sanity-check that fields are NOT already bound to a model.
             if hasattr(field, 'model'):

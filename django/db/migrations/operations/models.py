@@ -43,12 +43,20 @@ class CreateModel(ModelOperation):
 
     serialization_expand_args = ['fields', 'options', 'managers']
 
-    def __init__(self, name, fields, options=None, bases=None, managers=None, metaclass=models.base.ModelBase):
+    def __init__(self, name, fields, options=None, bases=None, managers=None, metaclass=None):
         self.fields = fields
         self.options = options or {}
         self.bases = bases or (models.Model,)
         self.managers = managers or []
-        self.metaclass = metaclass
+        if metaclass:
+            self.metaclass = metaclass
+        else:
+            if len(self.bases) == 1:
+                self.metaclass = type(self.bases[0])
+            else:
+                raise ValueError(
+                    'Please specify a metaclass that is a (non-strict) subclass of the metaclasses of all bases'
+                )
         super().__init__(name)
         # Sanity-check that there are no duplicated field names, bases, or
         # manager names
