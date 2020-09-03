@@ -144,6 +144,7 @@ class CreateModel(ModelOperation):
                     options=self.options,
                     bases=self.bases,
                     managers=self.managers,
+                    metaclass=self.metaclass,
                 ),
             ]
         elif isinstance(operation, AlterModelOptions) and self.name_lower == operation.name_lower:
@@ -154,6 +155,7 @@ class CreateModel(ModelOperation):
                     options={**self.options, **operation.options},
                     bases=self.bases,
                     managers=self.managers,
+                    metaclass=self.metaclass,
                 ),
             ]
         elif isinstance(operation, AlterTogetherOptionOperation) and self.name_lower == operation.name_lower:
@@ -164,6 +166,7 @@ class CreateModel(ModelOperation):
                     options={**self.options, **{operation.option_name: operation.option_value}},
                     bases=self.bases,
                     managers=self.managers,
+                    metaclass=self.metaclass,
                 ),
             ]
         elif isinstance(operation, AlterOrderWithRespectTo) and self.name_lower == operation.name_lower:
@@ -174,6 +177,7 @@ class CreateModel(ModelOperation):
                     options={**self.options, 'order_with_respect_to': operation.order_with_respect_to},
                     bases=self.bases,
                     managers=self.managers,
+                    metaclass=self.metaclass,
                 ),
             ]
         elif isinstance(operation, FieldOperation) and self.name_lower == operation.model_name_lower:
@@ -185,6 +189,7 @@ class CreateModel(ModelOperation):
                         options=self.options,
                         bases=self.bases,
                         managers=self.managers,
+                        metaclass=self.metaclass,
                     ),
                 ]
             elif isinstance(operation, AlterField):
@@ -198,6 +203,7 @@ class CreateModel(ModelOperation):
                         options=self.options,
                         bases=self.bases,
                         managers=self.managers,
+                        metaclass=self.metaclass,
                     ),
                 ]
             elif isinstance(operation, RemoveField):
@@ -224,6 +230,7 @@ class CreateModel(ModelOperation):
                         options=options,
                         bases=self.bases,
                         managers=self.managers,
+                        metaclass=self.metaclass,
                     ),
                 ]
             elif isinstance(operation, RenameField):
@@ -248,6 +255,7 @@ class CreateModel(ModelOperation):
                         options=options,
                         bases=self.bases,
                         managers=self.managers,
+                        metaclass=self.metaclass,
                     ),
                 ]
         return super().reduce(operation, app_label)
