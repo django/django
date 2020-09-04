@@ -184,7 +184,7 @@ class HttpResponseBase:
         else:
             self.cookies[key]['expires'] = ''
         if max_age is not None:
-            self.cookies[key]['max-age'] = max_age
+            self.cookies[key]['max-age'] = int(max_age)
             # IE requires expires, so set it if hasn't been already.
             if not expires:
                 self.cookies[key]['expires'] = http_date(time.time() + max_age)

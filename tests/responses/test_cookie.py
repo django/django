@@ -65,6 +65,11 @@ class SetCookieTests(SimpleTestCase):
         self.assertEqual(max_age_cookie['max-age'], 10)
         self.assertEqual(max_age_cookie['expires'], http_date(set_cookie_time + 10))
 
+    def test_max_age_int(self):
+        response = HttpResponse()
+        response.set_cookie('max_age', max_age=10.6)
+        self.assertEqual(response.cookies['max_age']['max-age'], 10)
+
     def test_httponly_cookie(self):
         response = HttpResponse()
         response.set_cookie('example', httponly=True)
