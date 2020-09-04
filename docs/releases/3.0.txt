@@ -513,7 +513,7 @@ In older versions, the :setting:`FILE_UPLOAD_PERMISSIONS` setting defaults to
 uploaded files having different permissions depending on their size and which
 upload handler is used.
 
-``FILE_UPLOAD_PERMISSION`` now defaults to ``0o644`` to avoid this
+``FILE_UPLOAD_PERMISSIONS`` now defaults to ``0o644`` to avoid this
 inconsistency.
 
 New default values for security settings

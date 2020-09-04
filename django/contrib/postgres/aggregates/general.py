@@ -48,7 +48,7 @@ class JSONBAgg(OrderableAggMixin, Aggregate):
 
     def convert_value(self, value, expression, connection):
         if not value:
-            return []
+            return '[]'
         return value
 
 

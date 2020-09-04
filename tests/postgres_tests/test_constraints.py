@@ -7,6 +7,7 @@ from django.db import (
 from django.db.models import (
     CheckConstraint, Deferrable, F, Func, Q, UniqueConstraint,
 )
+from django.db.models.functions import Left
 from django.test import skipUnlessDBFeature
 from django.utils import timezone
 
@@ -607,6 +608,17 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.remove_constraint(RangesModel, constraint)
         self.assertNotIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+
+    def test_expressions_with_params(self):
+        constraint_name = 'scene_left_equal'
+        self.assertNotIn(constraint_name, self.get_constraints(Scene._meta.db_table))
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            expressions=[(Left('scene', 4), RangeOperators.EQUAL)],
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Scene, constraint)
+        self.assertIn(constraint_name, self.get_constraints(Scene._meta.db_table))
 
     def test_range_adjacent_initially_deferred(self):
         constraint_name = 'ints_adjacent_deferred'

@@ -6,12 +6,13 @@ import os
 import pickle
 import re
 import shutil
+import sys
 import tempfile
 import threading
 import time
 import unittest
 from pathlib import Path
-from unittest import mock
+from unittest import mock, skipIf
 
 from django.conf import settings
 from django.core import management, signals
@@ -650,10 +651,24 @@ class BaseCacheTests:
         old_func = cache.key_func
         cache.key_func = func
 
+        tests = [
+            ('add', [key, 1]),
+            ('get', [key]),
+            ('set', [key, 1]),
+            ('incr', [key]),
+            ('decr', [key]),
+            ('touch', [key]),
+            ('delete', [key]),
+            ('get_many', [[key, 'b']]),
+            ('set_many', [{key: 1, 'b': 2}]),
+            ('delete_many', [{key: 1, 'b': 2}]),
+        ]
         try:
-            with self.assertWarns(CacheKeyWarning) as cm:
-                cache.set(key, 'value')
-            self.assertEqual(str(cm.warning), expected_warning)
+            for operation, args in tests:
+                with self.subTest(operation=operation):
+                    with self.assertWarns(CacheKeyWarning) as cm:
+                        getattr(cache, operation)(*args)
+                    self.assertEqual(str(cm.warning), expected_warning)
         finally:
             cache.key_func = old_func
 
@@ -1291,9 +1306,23 @@ class BaseMemcachedTests(BaseCacheTests):
         key.
         """
         msg = expected_warning.replace(key, cache.make_key(key))
-        with self.assertRaises(InvalidCacheKey) as cm:
-            cache.set(key, 'value')
-        self.assertEqual(str(cm.exception), msg)
+        tests = [
+            ('add', [key, 1]),
+            ('get', [key]),
+            ('set', [key, 1]),
+            ('incr', [key]),
+            ('decr', [key]),
+            ('touch', [key]),
+            ('delete', [key]),
+            ('get_many', [[key, 'b']]),
+            ('set_many', [{key: 1, 'b': 2}]),
+            ('delete_many', [{key: 1, 'b': 2}]),
+        ]
+        for operation, args in tests:
+            with self.subTest(operation=operation):
+                with self.assertRaises(InvalidCacheKey) as cm:
+                    getattr(cache, operation)(*args)
+                self.assertEqual(str(cm.exception), msg)
 
     def test_default_never_expiring_timeout(self):
         # Regression test for #22845
@@ -1345,7 +1374,7 @@ class BaseMemcachedTests(BaseCacheTests):
         # connection is closed when the request is complete.
         signals.request_finished.disconnect(close_old_connections)
         try:
-            with mock.patch.object(cache._lib.Client, 'disconnect_all', autospec=True) as mock_disconnect:
+            with mock.patch.object(cache._class, 'disconnect_all', autospec=True) as mock_disconnect:
                 signals.request_finished.send(self.__class__)
                 self.assertIs(mock_disconnect.called, self.should_disconnect_on_close)
         finally:
@@ -1354,7 +1383,7 @@ class BaseMemcachedTests(BaseCacheTests):
     def test_set_many_returns_failing_keys(self):
         def fail_set_multi(mapping, *args, **kwargs):
             return mapping.keys()
-        with mock.patch('%s.Client.set_multi' % self.client_library_name, side_effect=fail_set_multi):
+        with mock.patch.object(cache._class, 'set_multi', side_effect=fail_set_multi):
             failing_keys = cache.set_many({'key': 'value'})
             self.assertEqual(failing_keys, ['key'])
 
@@ -1366,7 +1395,6 @@ class BaseMemcachedTests(BaseCacheTests):
 ))
 class MemcachedCacheTests(BaseMemcachedTests, TestCase):
     base_params = MemcachedCache_params
-    client_library_name = 'memcache'
 
     def test_memcached_uses_highest_pickle_version(self):
         # Regression test for #19810
@@ -1398,7 +1426,6 @@ class MemcachedCacheTests(BaseMemcachedTests, TestCase):
 ))
 class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
     base_params = PyLibMCCache_params
-    client_library_name = 'pylibmc'
     # libmemcached manages its own connections.
     should_disconnect_on_close = False
 
@@ -1413,6 +1440,18 @@ class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
     def test_pylibmc_options(self):
         self.assertTrue(cache._cache.binary)
         self.assertEqual(cache._cache.behaviors['tcp_nodelay'], int(True))
+
+    def test_pylibmc_client_servers(self):
+        backend = self.base_params['BACKEND']
+        tests = [
+            ('unix:/run/memcached/socket', '/run/memcached/socket'),
+            ('/run/memcached/socket', '/run/memcached/socket'),
+            ('127.0.0.1:11211', '127.0.0.1:11211'),
+        ]
+        for location, expected in tests:
+            settings = {'default': {'BACKEND': backend, 'LOCATION': location}}
+            with self.subTest(location), self.settings(CACHES=settings):
+                self.assertEqual(cache.client_servers, [expected])
 
 
 @override_settings(CACHES=caches_setting_for_tests(
@@ -1465,6 +1504,28 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         os.unlink(cache._key_to_file('foo'))
         # Returns the default instead of erroring.
         self.assertEqual(cache.get('foo', 'baz'), 'baz')
+
+    @skipIf(
+        sys.platform == 'win32',
+        'Windows only partially supports umasks and chmod.',
+    )
+    def test_cache_dir_permissions(self):
+        os.rmdir(self.dirname)
+        dir_path = Path(self.dirname) / 'nested' / 'filebasedcache'
+        for cache_params in settings.CACHES.values():
+            cache_params['LOCATION'] = dir_path
+        setting_changed.send(self.__class__, setting='CACHES', enter=False)
+        cache.set('foo', 'bar')
+        self.assertIs(dir_path.exists(), True)
+        tests = [
+            dir_path,
+            dir_path.parent,
+            dir_path.parent.parent,
+        ]
+        for directory in tests:
+            with self.subTest(directory=directory):
+                dir_mode = directory.stat().st_mode & 0o777
+                self.assertEqual(dir_mode, 0o700)
 
     def test_get_does_not_ignore_non_filenotfound_exceptions(self):
         with mock.patch('builtins.open', side_effect=OSError):
@@ -2055,6 +2116,7 @@ class CacheMiddlewareTest(SimpleTestCase):
         self.assertEqual(middleware.cache_timeout, 30)
         self.assertEqual(middleware.key_prefix, 'middlewareprefix')
         self.assertEqual(middleware.cache_alias, 'other')
+        self.assertEqual(middleware.cache, self.other_cache)
 
         # If more arguments are being passed in construction, it's being used
         # as a decorator. First, test with "defaults":
@@ -2064,6 +2126,7 @@ class CacheMiddlewareTest(SimpleTestCase):
         self.assertEqual(as_view_decorator.key_prefix, '')
         # Value of DEFAULT_CACHE_ALIAS from django.core.cache
         self.assertEqual(as_view_decorator.cache_alias, 'default')
+        self.assertEqual(as_view_decorator.cache, self.default_cache)
 
         # Next, test with custom values:
         as_view_decorator_with_custom = CacheMiddleware(
@@ -2073,6 +2136,21 @@ class CacheMiddlewareTest(SimpleTestCase):
         self.assertEqual(as_view_decorator_with_custom.cache_timeout, 60)
         self.assertEqual(as_view_decorator_with_custom.key_prefix, 'foo')
         self.assertEqual(as_view_decorator_with_custom.cache_alias, 'other')
+        self.assertEqual(as_view_decorator_with_custom.cache, self.other_cache)
+
+    def test_update_cache_middleware_constructor(self):
+        middleware = UpdateCacheMiddleware(empty_response)
+        self.assertEqual(middleware.cache_timeout, 30)
+        self.assertIsNone(middleware.page_timeout)
+        self.assertEqual(middleware.key_prefix, 'middlewareprefix')
+        self.assertEqual(middleware.cache_alias, 'other')
+        self.assertEqual(middleware.cache, self.other_cache)
+
+    def test_fetch_cache_middleware_constructor(self):
+        middleware = FetchFromCacheMiddleware(empty_response)
+        self.assertEqual(middleware.key_prefix, 'middlewareprefix')
+        self.assertEqual(middleware.cache_alias, 'other')
+        self.assertEqual(middleware.cache, self.other_cache)
 
     def test_middleware(self):
         middleware = CacheMiddleware(hello_world_view)

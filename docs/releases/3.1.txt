@@ -109,9 +109,9 @@ reset tokens in the admin site, user sessions, and signatures created by
 Support for SHA-256 was added in Django 3.1. If you are upgrading multiple
 instances of the same project to Django 3.1, you should set
 :setting:`DEFAULT_HASHING_ALGORITHM` to ``'sha1'`` during the transition, in
-order to allow compatibility with the older versions of Django. Once the
-transition to 3.1 is complete you can stop overriding
-:setting:`DEFAULT_HASHING_ALGORITHM`.
+order to allow compatibility with the older versions of Django. Note that this
+requires Django 3.1.1+. Once the transition to 3.1 is complete you can stop
+overriding :setting:`DEFAULT_HASHING_ALGORITHM`.
 
 This setting is deprecated as of this release, because support for tokens,
 cookies, sessions, and signatures that use SHA-1 algorithm will be removed in
@@ -720,6 +720,10 @@ Miscellaneous
 * The minimum supported version of ``asgiref`` is increased from 3.2 to
   3.2.10.
 
+* The :doc:`Media </topics/forms/media>` class now renders ``<script>`` tags
+  without the ``type`` attribute to follow `WHATWG recommendations
+  <https://html.spec.whatwg.org/multipage/scripting.html#the-script-element>`_.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
@@ -793,10 +797,6 @@ Miscellaneous
 
 * The ``list`` message for :class:`~django.forms.ModelMultipleChoiceField` is
   deprecated in favor of ``invalid_list``.
-
-* The passing of URL kwargs directly to the context by
-  :class:`~django.views.generic.base.TemplateView` is deprecated. Reference
-  them in the template with ``view.kwargs`` instead.
 
 * Passing raw column aliases to :meth:`.QuerySet.order_by` is deprecated. The
   same result can be achieved by passing aliases in a

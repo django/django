@@ -182,12 +182,12 @@ class MigrationAutodetector:
         self.generate_removed_fields()
         self.generate_added_fields()
         self.generate_altered_fields()
+        self.generate_altered_order_with_respect_to()
         self.generate_altered_unique_together()
         self.generate_altered_index_together()
         self.generate_added_indexes()
         self.generate_added_constraints()
         self.generate_altered_db_table()
-        self.generate_altered_order_with_respect_to()
 
         self._sort_migrations()
         self._build_migration_list(graph)
@@ -613,6 +613,18 @@ class MigrationAutodetector:
                     dependencies=list(set(dependencies)),
                 )
             # Generate other opns
+            if order_with_respect_to:
+                self.add_operation(
+                    app_label,
+                    operations.AlterOrderWithRespectTo(
+                        name=model_name,
+                        order_with_respect_to=order_with_respect_to,
+                    ),
+                    dependencies=[
+                        (app_label, model_name, order_with_respect_to, True),
+                        (app_label, model_name, None, True),
+                    ]
+                )
             related_dependencies = [
                 (app_label, model_name, name, True)
                 for name in sorted(related_fields)
@@ -654,19 +666,6 @@ class MigrationAutodetector:
                     ),
                     dependencies=related_dependencies
                 )
-            if order_with_respect_to:
-                self.add_operation(
-                    app_label,
-                    operations.AlterOrderWithRespectTo(
-                        name=model_name,
-                        order_with_respect_to=order_with_respect_to,
-                    ),
-                    dependencies=[
-                        (app_label, model_name, order_with_respect_to, True),
-                        (app_label, model_name, None, True),
-                    ]
-                )
-
             # Fix relationships if the model changed from a proxy model to a
             # concrete model.
             if (app_label, model_name) in self.old_proxy_keys:

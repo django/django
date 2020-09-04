@@ -522,7 +522,7 @@ class Query(BaseExpression):
     def has_filters(self):
         return self.where
 
-    def has_results(self, using):
+    def exists(self):
         q = self.clone()
         if not q.distinct:
             if q.group_by is True:
@@ -533,6 +533,12 @@ class Query(BaseExpression):
             q.clear_select_clause()
         q.clear_ordering(True)
         q.set_limits(high=1)
+        q.add_extra({'a': 1}, None, None, None, None, None)
+        q.set_extra_mask(['a'])
+        return q
+
+    def has_results(self, using):
+        q = self.exists()
         compiler = q.get_compiler(using=using)
         return compiler.has_results()
 

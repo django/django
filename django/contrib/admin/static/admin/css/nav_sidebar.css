@@ -71,11 +71,16 @@
 
 #nav-sidebar .module th {
     width: 100%;
+    overflow-wrap: anywhere;
 }
 
 #nav-sidebar .module th,
 #nav-sidebar .module caption {
     padding-left: 16px;
+}
+
+#nav-sidebar .module td {
+    white-space: nowrap;
 }
 
 [dir="rtl"] #nav-sidebar .module th,
@@ -98,4 +103,8 @@
     #nav-sidebar, #toggle-nav-sidebar {
         display: none;
     }
+}
+
+.change-list .main > #nav-sidebar+.content {
+    overflow: hidden;
 }

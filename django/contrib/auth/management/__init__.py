@@ -101,14 +101,15 @@ def get_system_username():
     return result
 
 
-def get_default_username(check_db=True):
+def get_default_username(check_db=True, database=DEFAULT_DB_ALIAS):
     """
     Try to determine the current system user's username to use as a default.
 
     :param check_db: If ``True``, requires that the username does not match an
         existing ``auth.User`` (otherwise returns an empty string).
+    :param database: The database where the unique check will be performed.
     :returns: The username, or an empty string if no username can be
-        determined.
+        determined or the suggested username is already taken.
     """
     # This file is used in apps.py, it should not trigger models import.
     from django.contrib.auth import models as auth_app
@@ -137,7 +138,9 @@ def get_default_username(check_db=True):
     # Don't return the default username if it is already taken.
     if check_db and default_username:
         try:
-            auth_app.User._default_manager.get(username=default_username)
+            auth_app.User._default_manager.db_manager(database).get(
+                username=default_username,
+            )
         except auth_app.User.DoesNotExist:
             pass
         else:

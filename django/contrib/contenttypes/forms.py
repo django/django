@@ -56,7 +56,8 @@ def generic_inlineformset_factory(model, form=ModelForm,
                                   extra=3, can_order=False, can_delete=True,
                                   max_num=None, formfield_callback=None,
                                   validate_max=False, for_concrete_model=True,
-                                  min_num=None, validate_min=False):
+                                  min_num=None, validate_min=False,
+                                  absolute_max=None, can_delete_extra=True):
     """
     Return a ``GenericInlineFormSet`` for the given kwargs.
 
@@ -75,6 +76,7 @@ def generic_inlineformset_factory(model, form=ModelForm,
         formset=formset, extra=extra, can_delete=can_delete,
         can_order=can_order, fields=fields, exclude=exclude, max_num=max_num,
         validate_max=validate_max, min_num=min_num, validate_min=validate_min,
+        absolute_max=absolute_max, can_delete_extra=can_delete_extra,
     )
     FormSet.ct_field = ct_field
     FormSet.ct_fk_field = fk_field

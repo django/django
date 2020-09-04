@@ -6,7 +6,7 @@ from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.hashers import get_hasher
 from django.contrib.auth.models import (
-    AbstractUser, AnonymousUser, Group, Permission, User, UserManager,
+    AnonymousUser, Group, Permission, User, UserManager,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
@@ -215,8 +215,7 @@ class AbstractBaseUserTests(SimpleTestCase):
                 self.assertEqual(username, 'iamtheΩ')  # U+03A9 GREEK CAPITAL LETTER OMEGA
 
     def test_default_email(self):
-        user = AbstractBaseUser()
-        self.assertEqual(user.get_email_field_name(), 'email')
+        self.assertEqual(AbstractBaseUser.get_email_field_name(), 'email')
 
     def test_custom_email(self):
         user = CustomEmailField()
@@ -233,8 +232,8 @@ class AbstractUserTestCase(TestCase):
             "connection": None,
             "html_message": None,
         }
-        abstract_user = AbstractUser(email='foo@bar.com')
-        abstract_user.email_user(
+        user = User(email='foo@bar.com')
+        user.email_user(
             subject="Subject here",
             message="This is a message",
             from_email="from@domain.com",
@@ -245,7 +244,7 @@ class AbstractUserTestCase(TestCase):
         self.assertEqual(message.subject, "Subject here")
         self.assertEqual(message.body, "This is a message")
         self.assertEqual(message.from_email, "from@domain.com")
-        self.assertEqual(message.to, [abstract_user.email])
+        self.assertEqual(message.to, [user.email])
 
     def test_last_login_default(self):
         user1 = User.objects.create(username='user1')

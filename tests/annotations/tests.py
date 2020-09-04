@@ -1,6 +1,5 @@
 import datetime
 from decimal import Decimal
-from unittest import skipIf
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import connection
@@ -647,12 +646,12 @@ class NonAggregateAnnotationTestCase(TestCase):
             datetime.date(2008, 11, 3),
         ])
 
-    @skipIf(
-        connection.vendor == 'mysql' and 'ONLY_FULL_GROUP_BY' in connection.sql_mode,
-        'GROUP BY optimization does not work properly when ONLY_FULL_GROUP_BY '
-        'mode is enabled on MySQL, see #31331.',
-    )
     def test_annotation_aggregate_with_m2o(self):
+        if connection.vendor == 'mysql' and 'ONLY_FULL_GROUP_BY' in connection.sql_mode:
+            self.skipTest(
+                'GROUP BY optimization does not work properly when '
+                'ONLY_FULL_GROUP_BY mode is enabled on MySQL, see #31331.'
+            )
         qs = Author.objects.filter(age__lt=30).annotate(
             max_pages=Case(
                 When(book_contact_set__isnull=True, then=Value(0)),

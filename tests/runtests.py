@@ -23,7 +23,7 @@ else:
     from django.test import TestCase, TransactionTestCase
     from django.test.runner import default_test_processes
     from django.test.selenium import SeleniumTestCaseBase
-    from django.test.utils import get_runner
+    from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
     from django.utils.deprecation import (
         RemovedInDjango40Warning, RemovedInDjango41Warning,
     )
@@ -90,8 +90,9 @@ ALWAYS_MIDDLEWARE = [
 # avoid "RuntimeError: Model class X doesn't declare an explicit app_label
 # and isn't in an application in INSTALLED_APPS."
 CONTRIB_TESTS_TO_APPS = {
-    'flatpages_tests': 'django.contrib.flatpages',
-    'redirects_tests': 'django.contrib.redirects',
+    'deprecation': ['django.contrib.flatpages', 'django.contrib.redirects'],
+    'flatpages_tests': ['django.contrib.flatpages'],
+    'redirects_tests': ['django.contrib.redirects'],
 }
 
 
@@ -228,7 +229,9 @@ def setup(verbosity, test_labels, parallel, start_at, start_after):
         )
 
         if module_name in CONTRIB_TESTS_TO_APPS and module_found_in_labels:
-            settings.INSTALLED_APPS.append(CONTRIB_TESTS_TO_APPS[module_name])
+            for contrib_app in CONTRIB_TESTS_TO_APPS[module_name]:
+                if contrib_app not in settings.INSTALLED_APPS:
+                    settings.INSTALLED_APPS.append(contrib_app)
 
         if module_found_in_labels and module_label not in installed_app_names:
             if verbosity >= 2:
@@ -287,7 +290,8 @@ class ActionSelenium(argparse.Action):
 
 def django_tests(verbosity, interactive, failfast, keepdb, reverse,
                  test_labels, debug_sql, parallel, tags, exclude_tags,
-                 test_name_patterns, start_at, start_after, pdb, buffer):
+                 test_name_patterns, start_at, start_after, pdb, buffer,
+                 timing):
     state = setup(verbosity, test_labels, parallel, start_at, start_after)
     extra_tests = []
 
@@ -309,6 +313,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
         test_name_patterns=test_name_patterns,
         pdb=pdb,
         buffer=buffer,
+        timing=timing,
     )
     failures = test_runner.run_tests(
         test_labels or get_installed(),
@@ -508,6 +513,10 @@ if __name__ == "__main__":
         '-b', '--buffer', action='store_true',
         help='Discard output of passing tests.',
     )
+    parser.add_argument(
+        '--timing', action='store_true',
+        help='Output timings, including database set up and total run time.',
+    )
     if PY37:
         parser.add_argument(
             '-k', dest='test_name_patterns', action='append',
@@ -568,13 +577,17 @@ if __name__ == "__main__":
             options.start_at, options.start_after,
         )
     else:
-        failures = django_tests(
-            options.verbosity, options.interactive, options.failfast,
-            options.keepdb, options.reverse, options.modules,
-            options.debug_sql, options.parallel, options.tags,
-            options.exclude_tags,
-            getattr(options, 'test_name_patterns', None),
-            options.start_at, options.start_after, options.pdb, options.buffer,
-        )
+        time_keeper = TimeKeeper() if options.timing else NullTimeKeeper()
+        with time_keeper.timed('Total run'):
+            failures = django_tests(
+                options.verbosity, options.interactive, options.failfast,
+                options.keepdb, options.reverse, options.modules,
+                options.debug_sql, options.parallel, options.tags,
+                options.exclude_tags,
+                getattr(options, 'test_name_patterns', None),
+                options.start_at, options.start_after, options.pdb, options.buffer,
+                options.timing,
+            )
+        time_keeper.print_results()
         if failures:
             sys.exit(1)

@@ -275,7 +275,7 @@ class TestQuerying(TestCase):
                 'n': [None],
             },
             [1, [2]],
-            {'k': True, 'l': False},
+            {'k': True, 'l': False, 'foo': 'bax'},
             {
                 'foo': 'bar',
                 'baz': {'a': 'b', 'c': 'd'},
@@ -313,20 +313,28 @@ class TestQuerying(TestCase):
         )
 
     def test_ordering_by_transform(self):
-        objs = [
-            NullableJSONModel.objects.create(value={'ord': 93, 'name': 'bar'}),
-            NullableJSONModel.objects.create(value={'ord': 22.1, 'name': 'foo'}),
-            NullableJSONModel.objects.create(value={'ord': -1, 'name': 'baz'}),
-            NullableJSONModel.objects.create(value={'ord': 21.931902, 'name': 'spam'}),
-            NullableJSONModel.objects.create(value={'ord': -100291029, 'name': 'eggs'}),
-        ]
-        query = NullableJSONModel.objects.filter(value__name__isnull=False).order_by('value__ord')
-        expected = [objs[4], objs[2], objs[3], objs[1], objs[0]]
         mariadb = connection.vendor == 'mysql' and connection.mysql_is_mariadb
-        if mariadb or connection.vendor == 'oracle':
-            # MariaDB and Oracle return JSON values as strings.
-            expected = [objs[2], objs[4], objs[3], objs[1], objs[0]]
-        self.assertSequenceEqual(query, expected)
+        values = [
+            {'ord': 93, 'name': 'bar'},
+            {'ord': 22.1, 'name': 'foo'},
+            {'ord': -1, 'name': 'baz'},
+            {'ord': 21.931902, 'name': 'spam'},
+            {'ord': -100291029, 'name': 'eggs'},
+        ]
+        for field_name in ['value', 'value_custom']:
+            with self.subTest(field=field_name):
+                objs = [
+                    NullableJSONModel.objects.create(**{field_name: value})
+                    for value in values
+                ]
+                query = NullableJSONModel.objects.filter(
+                    **{'%s__name__isnull' % field_name: False},
+                ).order_by('%s__ord' % field_name)
+                expected = [objs[4], objs[2], objs[3], objs[1], objs[0]]
+                if mariadb or connection.vendor == 'oracle':
+                    # MariaDB and Oracle return JSON values as strings.
+                    expected = [objs[2], objs[4], objs[3], objs[1], objs[0]]
+                self.assertSequenceEqual(query, expected)
 
     def test_ordering_grouping_by_key_transform(self):
         base_qs = NullableJSONModel.objects.filter(value__d__0__isnull=False)
@@ -350,6 +358,18 @@ class TestQuerying(TestCase):
             value__isnull=False,
         ).values('value__d__0').annotate(count=Count('value__d__0')).order_by('count')
         self.assertQuerysetEqual(qs, [1, 11], operator.itemgetter('count'))
+
+    def test_order_grouping_custom_decoder(self):
+        NullableJSONModel.objects.create(value_custom={'a': 'b'})
+        qs = NullableJSONModel.objects.filter(value_custom__isnull=False)
+        self.assertSequenceEqual(
+            qs.values(
+                'value_custom__a',
+            ).annotate(
+                count=Count('id'),
+            ).order_by('value_custom__a'),
+            [{'value_custom__a': 'b', 'count': 1}],
+        )
 
     def test_key_transform_raw_expression(self):
         expr = RawSQL(self.raw_sql, ['{"x": "bar"}'])
@@ -596,6 +616,52 @@ class TestQuerying(TestCase):
         )
         self.assertIs(NullableJSONModel.objects.filter(value__c__lt=5).exists(), False)
 
+    def test_lookup_exclude(self):
+        tests = [
+            (Q(value__a='b'), [self.objs[0]]),
+            (Q(value__foo='bax'), [self.objs[0], self.objs[7]]),
+        ]
+        for condition, expected in tests:
+            self.assertSequenceEqual(
+                NullableJSONModel.objects.exclude(condition),
+                expected,
+            )
+            self.assertSequenceEqual(
+                NullableJSONModel.objects.filter(~condition),
+                expected,
+            )
+
+    def test_lookup_exclude_nonexistent_key(self):
+        # Values without the key are ignored.
+        condition = Q(value__foo='bax')
+        objs_with_value = [self.objs[6]]
+        objs_with_different_value = [self.objs[0], self.objs[7]]
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.exclude(condition),
+            objs_with_different_value,
+        )
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.exclude(~condition),
+            objs_with_value,
+        )
+        self.assertCountEqual(
+            NullableJSONModel.objects.filter(condition | ~condition),
+            objs_with_value + objs_with_different_value,
+        )
+        self.assertCountEqual(
+            NullableJSONModel.objects.exclude(condition & ~condition),
+            objs_with_value + objs_with_different_value,
+        )
+        # Add the __isnull lookup to get an exhaustive set.
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.exclude(condition & Q(value__foo__isnull=False)),
+            self.objs[0:6] + self.objs[7:],
+        )
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(condition & Q(value__foo__isnull=False)),
+            objs_with_value,
+        )
+
     @skipIf(
         connection.vendor == 'oracle',
         'Raises ORA-00600: internal error code on Oracle 18.',
@@ -626,6 +692,25 @@ class TestQuerying(TestCase):
     def test_key_iexact(self):
         self.assertIs(NullableJSONModel.objects.filter(value__foo__iexact='BaR').exists(), True)
         self.assertIs(NullableJSONModel.objects.filter(value__foo__iexact='"BaR"').exists(), False)
+
+    def test_key_in(self):
+        tests = [
+            ('value__c__in', [14], self.objs[3:5]),
+            ('value__c__in', [14, 15], self.objs[3:5]),
+            ('value__0__in', [1], [self.objs[5]]),
+            ('value__0__in', [1, 3], [self.objs[5]]),
+            ('value__foo__in', ['bar'], [self.objs[7]]),
+            ('value__foo__in', ['bar', 'baz'], [self.objs[7]]),
+            ('value__bar__in', [['foo', 'bar']], [self.objs[7]]),
+            ('value__bar__in', [['foo', 'bar'], ['a']], [self.objs[7]]),
+            ('value__bax__in', [{'foo': 'bar'}, {'a': 'b'}], [self.objs[7]]),
+        ]
+        for lookup, value, expected in tests:
+            with self.subTest(lookup=lookup, value=value):
+                self.assertSequenceEqual(
+                    NullableJSONModel.objects.filter(**{lookup: value}),
+                    expected,
+                )
 
     @skipUnlessDBFeature('supports_json_field_contains')
     def test_key_contains(self):

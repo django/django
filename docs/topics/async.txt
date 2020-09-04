@@ -39,7 +39,7 @@ class-based view, this means making its ``__call__()`` method an ``async def``
     to ``asyncio.coroutines._is_coroutine`` so this function returns ``True``.
 
 Under a WSGI server, async views will run in their own, one-off event loop.
-This means you can use async features, like parallel async HTTP requests,
+This means you can use async features, like concurrent async HTTP requests,
 without any issues, but you will not get the benefits of an async stack.
 
 The main benefits are the ability to service hundreds of connections without
@@ -63,7 +63,7 @@ If you want to use these, you will need to deploy Django using
     messages about *"Synchronous middleware ... adapted"*.
 
 In both ASGI and WSGI mode, you can still safely use asynchronous support to
-run code in parallel rather than serially. This is especially handy when
+run code concurrently rather than serially. This is especially handy when
 dealing with external APIs or data stores.
 
 If you want to call a part of Django that is still synchronous, like the ORM,
@@ -71,16 +71,17 @@ you will need to wrap it in a :func:`sync_to_async` call. For example::
 
     from asgiref.sync import sync_to_async
 
-    results = sync_to_async(Blog.objects.get)(pk=123)
+    results = await sync_to_async(Blog.objects.get, thread_sensitive=True)(pk=123)
 
 You may find it easier to move any ORM code into its own function and call that
 entire function using :func:`sync_to_async`. For example::
 
     from asgiref.sync import sync_to_async
 
-    @sync_to_async
-    def get_blog(pk):
+    def _get_blog(pk):
         return Blog.objects.select_related('author').get(pk=pk)
+
+    get_blog = sync_to_async(_get_blog, thread_sensitive=True)
 
 If you accidentally try to call a part of Django that is still synchronous-only
 from an async view, you will trigger Django's

@@ -9,20 +9,22 @@ from unittest import mock
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import (
-    Avg, BinaryField, BooleanField, Case, CharField, Count, DateField,
-    DateTimeField, DecimalField, DurationField, Exists, Expression,
+    AutoField, Avg, BinaryField, BooleanField, Case, CharField, Count,
+    DateField, DateTimeField, DecimalField, DurationField, Exists, Expression,
     ExpressionList, ExpressionWrapper, F, FloatField, Func, IntegerField, Max,
     Min, Model, OrderBy, OuterRef, Q, StdDev, Subquery, Sum, TimeField,
     UUIDField, Value, Variance, When,
 )
-from django.db.models.expressions import Col, Combinable, Random, RawSQL, Ref
+from django.db.models.expressions import (
+    Col, Combinable, CombinedExpression, Random, RawSQL, Ref,
+)
 from django.db.models.functions import (
     Coalesce, Concat, Left, Length, Lower, Substr, Upper,
 )
 from django.db.models.sql import constants
 from django.db.models.sql.datastructures import Join
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import Approximate, isolate_apps
+from django.test.utils import Approximate, CaptureQueriesContext, isolate_apps
 from django.utils.functional import SimpleLazyObject
 
 from .models import (
@@ -1738,6 +1740,26 @@ class ValueTests(TestCase):
             Value(object()).output_field
 
 
+class ExistsTests(TestCase):
+    def test_optimizations(self):
+        with CaptureQueriesContext(connection) as context:
+            list(Experiment.objects.values(exists=Exists(
+                Experiment.objects.order_by('pk'),
+            )).order_by())
+        captured_queries = context.captured_queries
+        self.assertEqual(len(captured_queries), 1)
+        captured_sql = captured_queries[0]['sql']
+        self.assertNotIn(
+            connection.ops.quote_name(Experiment._meta.pk.column),
+            captured_sql,
+        )
+        self.assertIn(
+            connection.ops.limit_offset_sql(None, 1),
+            captured_sql,
+        )
+        self.assertNotIn('ORDER BY', captured_sql)
+
+
 class FieldTransformTests(TestCase):
 
     @classmethod
@@ -1866,6 +1888,28 @@ class CombinableTests(SimpleTestCase):
     def test_reversed_or(self):
         with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
             object() | Combinable()
+
+
+class CombinedExpressionTests(SimpleTestCase):
+    def test_resolve_output_field(self):
+        tests = [
+            (IntegerField, AutoField, IntegerField),
+            (AutoField, IntegerField, IntegerField),
+            (IntegerField, DecimalField, DecimalField),
+            (DecimalField, IntegerField, DecimalField),
+            (IntegerField, FloatField, FloatField),
+            (FloatField, IntegerField, FloatField),
+        ]
+        connectors = [Combinable.ADD, Combinable.SUB, Combinable.MUL, Combinable.DIV]
+        for lhs, rhs, combined in tests:
+            for connector in connectors:
+                with self.subTest(lhs=lhs, connector=connector, rhs=rhs, combined=combined):
+                    expr = CombinedExpression(
+                        Expression(lhs()),
+                        connector,
+                        Expression(rhs()),
+                    )
+                    self.assertIsInstance(expr.output_field, combined)
 
 
 class ExpressionWrapperTests(SimpleTestCase):

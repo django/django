@@ -421,6 +421,7 @@ class Expression(BaseExpression, Combinable):
 
 _connector_combinators = {
     connector: [
+        (fields.IntegerField, fields.IntegerField, fields.IntegerField),
         (fields.IntegerField, fields.DecimalField, fields.DecimalField),
         (fields.DecimalField, fields.IntegerField, fields.DecimalField),
         (fields.IntegerField, fields.FloatField, fields.FloatField),
@@ -1145,11 +1146,9 @@ class Exists(Subquery):
     output_field = fields.BooleanField()
 
     def __init__(self, queryset, negated=False, **kwargs):
-        # As a performance optimization, remove ordering since EXISTS doesn't
-        # care about it, just whether or not a row matches.
-        queryset = queryset.order_by()
         self.negated = negated
         super().__init__(queryset, **kwargs)
+        self.query = self.query.exists()
 
     def __invert__(self):
         clone = self.copy()

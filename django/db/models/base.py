@@ -409,6 +409,8 @@ class Model(metaclass=ModelBase):
         opts = self._meta
         _setattr = setattr
         _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError('Abstract models cannot be instantiated.')
 
         pre_init.send(sender=cls, args=args, kwargs=kwargs)
 
@@ -544,7 +546,10 @@ class Model(metaclass=ModelBase):
 
     def __getstate__(self):
         """Hook to allow choosing the attributes to pickle."""
-        return self.__dict__
+        state = self.__dict__.copy()
+        state['_state'] = copy.copy(state['_state'])
+        state['_state'].fields_cache = state['_state'].fields_cache.copy()
+        return state
 
     def __setstate__(self, state):
         pickled_version = state.get(DJANGO_VERSION_PICKLE_KEY)
@@ -722,7 +727,7 @@ class Model(metaclass=ModelBase):
             update_fields = frozenset(update_fields)
             field_names = set()
 
-            for field in self._meta.fields:
+            for field in self._meta.concrete_fields:
                 if not field.primary_key:
                     field_names.add(field.name)
 
@@ -732,9 +737,11 @@ class Model(metaclass=ModelBase):
             non_model_fields = update_fields.difference(field_names)
 
             if non_model_fields:
-                raise ValueError("The following fields do not exist in this "
-                                 "model or are m2m fields: %s"
-                                 % ', '.join(non_model_fields))
+                raise ValueError(
+                    'The following fields do not exist in this model, are m2m '
+                    'fields, or are non-concrete fields: %s'
+                    % ', '.join(non_model_fields)
+                )
 
         # If saving to the same database, and this model is deferred, then
         # automatically do an "update_fields" save on the loaded fields.

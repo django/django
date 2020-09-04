@@ -114,7 +114,13 @@ class FileBasedCache(BaseCache):
             self._delete(fname)
 
     def _createdir(self):
-        os.makedirs(self._dir, 0o700, exist_ok=True)
+        # Set the umask because os.makedirs() doesn't apply the "mode" argument
+        # to intermediate-level directories.
+        old_umask = os.umask(0o077)
+        try:
+            os.makedirs(self._dir, 0o700, exist_ok=True)
+        finally:
+            os.umask(old_umask)
 
     def _key_to_file(self, key, version=None):
         """

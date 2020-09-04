@@ -3292,7 +3292,7 @@ class AdminViewListEditable(TestCase):
         self.assertContains(response, 'Unordered object #3')
         self.assertContains(response, 'Unordered object #2')
         self.assertNotContains(response, 'Unordered object #1')
-        response = self.client.get(reverse('admin:admin_views_unorderedobject_changelist') + '?p=1')
+        response = self.client.get(reverse('admin:admin_views_unorderedobject_changelist') + '?p=2')
         self.assertNotContains(response, 'Unordered object #3')
         self.assertNotContains(response, 'Unordered object #2')
         self.assertContains(response, 'Unordered object #1')
@@ -4739,6 +4739,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         name_input.send_keys('<i>edited section</i>')
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         self.selenium.switch_to.window(self.selenium.window_handles[0])
+        # Hide sidebar.
+        toggle_button = self.selenium.find_element_by_css_selector('#toggle-nav-sidebar')
+        toggle_button.click()
         select = Select(self.selenium.find_element_by_id('id_form-0-section'))
         self.assertEqual(select.first_selected_option.text, '<i>edited section</i>')
         # Rendered select2 input.
