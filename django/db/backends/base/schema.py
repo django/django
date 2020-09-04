@@ -1045,7 +1045,7 @@ class BaseDatabaseSchemaEditor:
         old_kwargs.pop('db_column', None)
         new_kwargs.pop('db_column', None)
         return (
-            old_field.column != new_field.column or
+            self.quote_name(old_field.column) != self.quote_name(new_field.column) or
             (old_path, old_args, old_kwargs) != (new_path, new_args, new_kwargs)
         )
 
