@@ -910,6 +910,14 @@ To query for missing keys, use the ``isnull`` lookup::
     :lookup:`istartswith`, :lookup:`lt`, :lookup:`lte`, :lookup:`gt`, and
     :lookup:`gte`, as well as with :ref:`containment-and-key-lookups`.
 
+.. note::
+
+    Due to the way in which key-path queries work,
+    :meth:`~django.db.models.query.QuerySet.exclude` and
+    :meth:`~django.db.models.query.QuerySet.filter` are not guaranteed to
+    produce exhaustive sets. If you want to include objects that do not have
+    the path, add the ``isnull`` lookup.
+
 .. warning::
 
     Since any string could be a key in a JSON object, any lookup other than
