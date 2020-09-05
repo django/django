@@ -201,6 +201,7 @@ class Query(BaseExpression):
 
         # SQL annotation-related attributes
         self.annotations = {}  # Maps alias -> Annotation Expression
+        self.overridden_summary_annotations = {}  # Maps alias -> Overridden Annotation Expression
         self.annotation_select_mask = None
         self._annotation_select_cache = None
 
@@ -301,6 +302,7 @@ class Query(BaseExpression):
         obj.table_map = self.table_map.copy()
         obj.where = self.where.clone()
         obj.annotations = self.annotations.copy()
+        obj.overridden_summary_annotations = self.overridden_summary_annotations.copy()
         if self.annotation_select_mask is None:
             obj.annotation_select_mask = None
         else:
@@ -436,7 +438,7 @@ class Query(BaseExpression):
         # aggregates on the limit and/or distinct results instead of applying
         # the distinct and limit after the aggregation.
         if (isinstance(self.group_by, tuple) or self.is_sliced or existing_annotations or
-                self.distinct or self.combinator):
+                self.overridden_summary_annotations or self.distinct or self.combinator):
             from django.db.models.sql.subqueries import AggregateQuery
             outer_query = AggregateQuery(self.model)
             inner_query = self.clone()
@@ -1029,6 +1031,10 @@ class Query(BaseExpression):
             self.append_annotation_mask([alias])
         else:
             self.set_annotation_mask(set(self.annotation_select).difference({alias}))
+
+        if is_summary and alias in self.annotations:
+            self.overridden_summary_annotations[alias] = self.annotations[alias]
+
         self.annotations[alias] = annotation
 
     def resolve_expression(self, query, *args, **kwargs):
@@ -2230,18 +2236,19 @@ class Query(BaseExpression):
         Return the dictionary of aggregate columns that are not masked and
         should be used in the SELECT clause. Cache this result for performance.
         """
+        annotations = {**self.overridden_summary_annotations, **self.annotations}
         if self._annotation_select_cache is not None:
             return self._annotation_select_cache
-        elif not self.annotations:
+        elif not annotations:
             return {}
         elif self.annotation_select_mask is not None:
             self._annotation_select_cache = {
-                k: v for k, v in self.annotations.items()
+                k: v for k, v in annotations.items()
                 if k in self.annotation_select_mask
             }
             return self._annotation_select_cache
         else:
-            return self.annotations
+            return annotations
 
     @property
     def extra_select(self):

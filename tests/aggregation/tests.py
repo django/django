@@ -991,6 +991,16 @@ class AggregateTestCase(TestCase):
 
         self.assertEqual(alias_age['sum_age'], age['sum_age'])
 
+    def test_overlapping_annotate_aggregate_alias(self):
+        alias_age = Author.objects.annotate(
+            age_alias=F('age')
+        ).aggregate(age_alias=Sum(F('age')), avg_age=Avg(F('age_alias')))
+
+        age = Author.objects.values('age').aggregate(sum_age=Sum('age'), avg_age=Avg('age'))
+
+        self.assertEqual(alias_age['age_alias'], age['sum_age'])
+        self.assertEqual(alias_age['avg_age'], age['avg_age'])
+
     def test_annotate_over_annotate(self):
         author = Author.objects.annotate(
             age_alias=F('age')
