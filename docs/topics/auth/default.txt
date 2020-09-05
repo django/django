@@ -238,6 +238,11 @@ group ``'Special users'``, and you could write code that could, say, give them
 access to a members-only portion of your site, or send them members-only email
 messages.
 
+Groups have to be created only once, possibly when you start running your 
+website. As such, here are some of the ways you could create them programmatically. 
+For examplle, by creating your own :doc:`command</howto/custom-management-commands/>`,
+or by creating a custom :doc:`migration</howto/writing-migrations/>`.
+
 Programmatically creating permissions
 -------------------------------------
 
