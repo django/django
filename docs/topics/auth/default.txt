@@ -240,7 +240,7 @@ messages.
 
 Groups have to be created only once, possibly when you start running your 
 website. As such, here are some of the ways you could create them programmatically. 
-For examplle, by creating your own :doc:`command</howto/custom-management-commands/>`,
+For example, by creating your own :doc:`command</howto/custom-management-commands/>`,
 or by creating a custom :doc:`migration</howto/writing-migrations/>`.
 
 Programmatically creating permissions
