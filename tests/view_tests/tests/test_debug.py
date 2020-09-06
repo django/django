@@ -122,7 +122,6 @@ class DebugViewTests(SimpleTestCase):
 
     def test_404(self):
         response = self.client.get('/raises404/')
-        self.assertEqual(response.status_code, 404)
         self.assertContains(
             response,
             '<p>The current path, <code>not-in-urls</code>, didn’t match any '

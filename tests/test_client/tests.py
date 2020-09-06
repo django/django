@@ -96,10 +96,9 @@ class ClientTest(TestCase):
         response = self.client.post('/post_view/', post_data)
 
         # Check some response details
-        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Data received')
         self.assertEqual(response.context['data'], '37')
         self.assertEqual(response.templates[0].name, 'POST Template')
-        self.assertContains(response, 'Data received')
 
     def test_post_data_none(self):
         msg = (
@@ -124,9 +123,8 @@ class ClientTest(TestCase):
                         client_method = getattr(self.client, method)
                         method_name = method.upper()
                         response = client_method('/json_view/', data, content_type='application/json')
-                        self.assertEqual(response.status_code, 200)
-                        self.assertEqual(response.context['data'], expected)
                         self.assertContains(response, 'Viewing %s page.' % method_name)
+                        self.assertEqual(response.context['data'], expected)
 
     def test_json_encoder_argument(self):
         """The test Client accepts a json_encoder."""
@@ -366,10 +364,9 @@ class ClientTest(TestCase):
             'multi': ('b', 'c', 'e')
         }
         response = self.client.get('/form_view/', data=hints)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "Form GET Template")
         # The multi-value data has been rolled out ok
         self.assertContains(response, 'Select a valid choice.', 0)
+        self.assertTemplateUsed(response, "Form GET Template")
 
     def test_incomplete_data_form(self):
         "POST incomplete data to a form"
@@ -379,7 +376,6 @@ class ClientTest(TestCase):
         }
         response = self.client.post('/form_view/', post_data)
         self.assertContains(response, 'This field is required.', 3)
-        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Invalid POST Template")
 
         self.assertFormError(response, 'form', 'email', 'This field is required.')
