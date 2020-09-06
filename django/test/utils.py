@@ -351,24 +351,15 @@ class TestContextDecorator:
     def decorate_class(self, cls):
         if issubclass(cls, TestCase):
             decorated_setUp = cls.setUp
-            decorated_tearDown = cls.tearDown
 
             def setUp(inner_self):
                 context = self.enable()
+                inner_self.addCleanup(self.disable)
                 if self.attr_name:
                     setattr(inner_self, self.attr_name, context)
-                try:
-                    decorated_setUp(inner_self)
-                except Exception:
-                    self.disable()
-                    raise
-
-            def tearDown(inner_self):
-                decorated_tearDown(inner_self)
-                self.disable()
+                decorated_setUp(inner_self)
 
             cls.setUp = setUp
-            cls.tearDown = tearDown
             return cls
         raise TypeError('Can only decorate subclasses of unittest.TestCase')
 

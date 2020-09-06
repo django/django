@@ -484,6 +484,11 @@ Miscellaneous
 * The undocumented ``django.utils.http.limited_parse_qsl()`` function is
   removed. Please use :func:`urllib.parse.parse_qsl` instead.
 
+* ``django.test.utils.TestContextDecorator`` now uses
+  :py:meth:`~unittest.TestCase.addCleanup` so that cleanups registered in the
+  :py:meth:`~unittest.TestCase.setUp` method are called before
+  ``TestContextDecorator.disable()``.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2
