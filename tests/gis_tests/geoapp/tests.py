@@ -14,8 +14,7 @@ from django.db.models import F, OuterRef, Subquery
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import (
-    mariadb, mysql, no_oracle, oracle, postgis, skipUnlessGISLookup,
-    spatialite,
+    mariadb, mysql, oracle, postgis, skipUnlessGISLookup, spatialite,
 )
 from .models import (
     City, Country, Feature, MinusOneSRID, MultiFields, NonConcreteModel,
@@ -157,9 +156,6 @@ class GeoModelTest(TestCase):
         self.assertIsInstance(f_4.geom, GeometryCollection)
         self.assertEqual(f_3.geom, f_4.geom[2])
 
-    # TODO: fix on Oracle: ORA-22901: cannot compare nested table or VARRAY or
-    # LOB attributes of an object type.
-    @no_oracle
     @skipUnlessDBFeature("supports_transform")
     def test_inherited_geofields(self):
         "Database functions on inherited Geometry fields."
