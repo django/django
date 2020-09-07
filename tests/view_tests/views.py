@@ -3,7 +3,9 @@ import decimal
 import logging
 import sys
 
-from django.core.exceptions import PermissionDenied, SuspiciousOperation
+from django.core.exceptions import (
+    BadRequest, PermissionDenied, SuspiciousOperation,
+)
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.template import TemplateDoesNotExist
@@ -48,6 +50,10 @@ def raises500(request):
 
 def raises400(request):
     raise SuspiciousOperation
+
+
+def raises400_bad_request(request):
+    raise BadRequest('Malformed request syntax')
 
 
 def raises403(request):

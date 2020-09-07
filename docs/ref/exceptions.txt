@@ -162,6 +162,18 @@ or model are classified as ``NON_FIELD_ERRORS``. This constant is used
 as a key in dictionaries that otherwise map fields to their respective
 list of errors.
 
+``BadRequest``
+--------------
+
+.. exception:: BadRequest
+
+    .. versionadded:: 3.2
+
+    The :exc:`BadRequest` exception is raised when the request cannot be
+    processed due to a client error. If a ``BadRequest`` exception reaches the
+    ASGI/WSGI handler level it results in a
+    :class:`~django.http.HttpResponseBadRequest`.
+
 ``RequestAborted``
 ------------------
 
@@ -270,6 +282,24 @@ Http exceptions may be imported from ``django.http``.
 .. exception:: UnreadablePostError
 
     :exc:`UnreadablePostError` is raised when a user cancels an upload.
+
+.. currentmodule:: django.contrib.sessions.exceptions
+
+Sessions Exceptions
+===================
+
+Sessions exceptions are defined in ``django.contrib.sessions.exceptions``.
+
+``SessionInterrupted``
+----------------------
+
+.. exception:: SessionInterrupted
+
+    .. versionadded:: 3.2
+
+    :exc:`SessionInterrupted` is raised when a session is destroyed in a
+    concurrent request. It's a subclass of
+    :exc:`~django.core.exceptions.BadRequest`.
 
 Transaction Exceptions
 ======================

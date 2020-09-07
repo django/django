@@ -8,7 +8,7 @@ from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core import signals
 from django.core.exceptions import (
-    PermissionDenied, RequestDataTooBig, SuspiciousOperation,
+    BadRequest, PermissionDenied, RequestDataTooBig, SuspiciousOperation,
     TooManyFieldsSent,
 )
 from django.http import Http404
@@ -76,6 +76,17 @@ def response_for_exception(request, exc):
             exc_info=sys.exc_info(),
         )
 
+    elif isinstance(exc, BadRequest):
+        if settings.DEBUG:
+            response = debug.technical_500_response(request, *sys.exc_info(), status_code=400)
+        else:
+            response = get_exception_response(request, get_resolver(get_urlconf()), 400, exc)
+        log_response(
+            '%s: %s', str(exc), request.path,
+            response=response,
+            request=request,
+            exc_info=sys.exc_info(),
+        )
     elif isinstance(exc, SuspiciousOperation):
         if isinstance(exc, (RequestDataTooBig, TooManyFieldsSent)):
             # POST data can't be accessed again, otherwise the original

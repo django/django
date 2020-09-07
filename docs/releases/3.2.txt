@@ -489,6 +489,11 @@ Miscellaneous
   :py:meth:`~unittest.TestCase.setUp` method are called before
   ``TestContextDecorator.disable()``.
 
+* ``SessionMiddleware`` now raises a
+  :exc:`~django.contrib.sessions.exceptions.SessionInterrupted` exception
+  instead of :exc:`~django.core.exceptions.SuspiciousOperation` when a session
+  is destroyed in a concurrent request.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2

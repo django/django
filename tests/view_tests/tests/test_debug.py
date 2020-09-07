@@ -86,6 +86,16 @@ class DebugViewTests(SimpleTestCase):
             response = self.client.get('/raises400/')
         self.assertContains(response, '<div class="context" id="', status_code=400)
 
+    def test_400_bad_request(self):
+        # When DEBUG=True, technical_500_template() is called.
+        with self.assertLogs('django.request', 'WARNING') as cm:
+            response = self.client.get('/raises400_bad_request/')
+        self.assertContains(response, '<div class="context" id="', status_code=400)
+        self.assertEqual(
+            cm.records[0].getMessage(),
+            'Malformed request syntax: /raises400_bad_request/',
+        )
+
     # Ensure no 403.html template exists to test the default case.
     @override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -320,6 +330,16 @@ class NonDjangoTemplatesDebugViewTests(SimpleTestCase):
         with self.assertLogs('django.security', 'WARNING'):
             response = self.client.get('/raises400/')
         self.assertContains(response, '<div class="context" id="', status_code=400)
+
+    def test_400_bad_request(self):
+        # When DEBUG=True, technical_500_template() is called.
+        with self.assertLogs('django.request', 'WARNING') as cm:
+            response = self.client.get('/raises400_bad_request/')
+        self.assertContains(response, '<div class="context" id="', status_code=400)
+        self.assertEqual(
+            cm.records[0].getMessage(),
+            'Malformed request syntax: /raises400_bad_request/',
+        )
 
     def test_403(self):
         response = self.client.get('/raises403/')

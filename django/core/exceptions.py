@@ -71,6 +71,11 @@ class RequestAborted(Exception):
     pass
 
 
+class BadRequest(Exception):
+    """The request is malformed and cannot be processed."""
+    pass
+
+
 class PermissionDenied(Exception):
     """The user did not have permission to do that"""
     pass

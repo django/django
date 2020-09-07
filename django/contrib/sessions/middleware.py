@@ -3,7 +3,7 @@ from importlib import import_module
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import UpdateError
-from django.core.exceptions import SuspiciousOperation
+from django.contrib.sessions.exceptions import SessionInterrupted
 from django.utils.cache import patch_vary_headers
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import http_date
@@ -60,7 +60,7 @@ class SessionMiddleware(MiddlewareMixin):
                     try:
                         request.session.save()
                     except UpdateError:
-                        raise SuspiciousOperation(
+                        raise SessionInterrupted(
                             "The request's session was deleted before the "
                             "request completed. The user may have logged "
                             "out in a concurrent request, for example."

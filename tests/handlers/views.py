@@ -1,7 +1,7 @@
 import asyncio
 from http import HTTPStatus
 
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import BadRequest, SuspiciousOperation
 from django.db import connection, transaction
 from django.http import HttpResponse, StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -31,6 +31,10 @@ def in_transaction(request):
 @transaction.non_atomic_requests
 def not_in_transaction(request):
     return HttpResponse(str(connection.in_atomic_block))
+
+
+def bad_request(request):
+    raise BadRequest()
 
 
 def suspicious(request):
