@@ -355,7 +355,7 @@ class TestQuerying(TestCase):
             operator.itemgetter('key', 'count'),
         )
 
-    @skipIf(connection.vendor == 'oracle', "Oracle doesn't support grouping by LOBs, see #24096.")
+    @skipUnlessDBFeature('allows_group_by_lob')
     def test_ordering_grouping_by_count(self):
         qs = NullableJSONModel.objects.filter(
             value__isnull=False,

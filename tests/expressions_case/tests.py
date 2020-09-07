@@ -5,6 +5,7 @@ from operator import attrgetter, itemgetter
 from uuid import UUID
 
 from django.core.exceptions import FieldError
+from django.db import connection
 from django.db.models import (
     BinaryField, BooleanField, Case, Count, DecimalField, F,
     GenericIPAddressField, IntegerField, Max, Min, Q, Sum, TextField, Value,
@@ -56,10 +57,13 @@ class CaseExpressionTests(TestCase):
         O2OCaseTestModel.objects.create(o2o=o, integer=1)
         FKCaseTestModel.objects.create(fk=o, integer=5)
 
-        # GROUP BY on Oracle fails with TextField/BinaryField; see #24096.
-        cls.non_lob_fields = [
+        cls.group_by_fields = [
             f.name for f in CaseTestModel._meta.get_fields()
-            if not (f.is_relation and f.auto_created) and not isinstance(f, (BinaryField, TextField))
+            if not (f.is_relation and f.auto_created) and
+            (
+                connection.features.allows_group_by_lob or
+                not isinstance(f, (BinaryField, TextField))
+            )
         ]
 
     def test_annotate(self):
@@ -197,7 +201,7 @@ class CaseExpressionTests(TestCase):
 
     def test_annotate_with_aggregation_in_value(self):
         self.assertQuerysetEqual(
-            CaseTestModel.objects.values(*self.non_lob_fields).annotate(
+            CaseTestModel.objects.values(*self.group_by_fields).annotate(
                 min=Min('fk_rel__integer'),
                 max=Max('fk_rel__integer'),
             ).annotate(
@@ -212,7 +216,7 @@ class CaseExpressionTests(TestCase):
 
     def test_annotate_with_aggregation_in_condition(self):
         self.assertQuerysetEqual(
-            CaseTestModel.objects.values(*self.non_lob_fields).annotate(
+            CaseTestModel.objects.values(*self.group_by_fields).annotate(
                 min=Min('fk_rel__integer'),
                 max=Max('fk_rel__integer'),
             ).annotate(
@@ -227,7 +231,7 @@ class CaseExpressionTests(TestCase):
 
     def test_annotate_with_aggregation_in_predicate(self):
         self.assertQuerysetEqual(
-            CaseTestModel.objects.values(*self.non_lob_fields).annotate(
+            CaseTestModel.objects.values(*self.group_by_fields).annotate(
                 max=Max('fk_rel__integer'),
             ).annotate(
                 test=Case(
@@ -483,7 +487,7 @@ class CaseExpressionTests(TestCase):
 
     def test_filter_with_aggregation_in_value(self):
         self.assertQuerysetEqual(
-            CaseTestModel.objects.values(*self.non_lob_fields).annotate(
+            CaseTestModel.objects.values(*self.group_by_fields).annotate(
                 min=Min('fk_rel__integer'),
                 max=Max('fk_rel__integer'),
             ).filter(
@@ -498,7 +502,7 @@ class CaseExpressionTests(TestCase):
 
     def test_filter_with_aggregation_in_condition(self):
         self.assertQuerysetEqual(
-            CaseTestModel.objects.values(*self.non_lob_fields).annotate(
+            CaseTestModel.objects.values(*self.group_by_fields).annotate(
                 min=Min('fk_rel__integer'),
                 max=Max('fk_rel__integer'),
             ).filter(
@@ -513,7 +517,7 @@ class CaseExpressionTests(TestCase):
 
     def test_filter_with_aggregation_in_predicate(self):
         self.assertQuerysetEqual(
-            CaseTestModel.objects.values(*self.non_lob_fields).annotate(
+            CaseTestModel.objects.values(*self.group_by_fields).annotate(
                 max=Max('fk_rel__integer'),
             ).filter(
                 integer=Case(
