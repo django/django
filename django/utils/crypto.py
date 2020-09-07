@@ -20,7 +20,7 @@ def salted_hmac(key_salt, value, secret=None, *, algorithm='sha1'):
     """
     Return the HMAC of 'value', using a key generated from key_salt and a
     secret (which defaults to settings.SECRET_KEY). Default algorithm is SHA1,
-    but any algorithm name supported by hashlib.new() can be passed.
+    but any algorithm name supported by hashlib can be passed.
 
     A different key_salt should be passed in for every application of HMAC.
     """
