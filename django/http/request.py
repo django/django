@@ -29,7 +29,7 @@ from .multipartparser import parse_header
 # detect whether the max_num_fields argument is available as this security fix
 # was backported to Python 3.6.8 and 3.7.2, and may also have been applied by
 # downstream package maintainers to other versions in their repositories.
-if func_supports_parameter(parse_qsl, 'max_num_fields'):
+if not func_supports_parameter(parse_qsl, 'max_num_fields'):
     from django.utils.http import parse_qsl
 
 
