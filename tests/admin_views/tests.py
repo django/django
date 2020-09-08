@@ -100,10 +100,16 @@ class AdminViewBasicTestCase(TestCase):
         cls.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
         cls.s1 = Section.objects.create(name='Test section')
         cls.a1 = Article.objects.create(
-            content='<p>Middle content</p>', date=datetime.datetime(2008, 3, 18, 11, 54, 58), section=cls.s1
+            content='<p>Middle content</p>',
+            date=datetime.datetime(2008, 3, 18, 11, 54, 58),
+            section=cls.s1,
+            title='Article 1',
         )
         cls.a2 = Article.objects.create(
-            content='<p>Oldest content</p>', date=datetime.datetime(2000, 3, 18, 11, 54, 58), section=cls.s1
+            content='<p>Oldest content</p>',
+            date=datetime.datetime(2000, 3, 18, 11, 54, 58),
+            section=cls.s1,
+            title='Article 2',
         )
         cls.a3 = Article.objects.create(
             content='<p>Newest content</p>', date=datetime.datetime(2009, 3, 18, 11, 54, 58), section=cls.s1
@@ -1026,6 +1032,53 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse('admin6:admin_views_color_changelist'))
         self.assertContains(response, '<th scope="col" class="column-value">')
         self.assertNotContains(response, '<th scope="col" class="sortable column')
+
+    def test_change_view_subtitle_per_object(self):
+        response = self.client.get(
+            reverse('admin:admin_views_article_change', args=(self.a1.pk,)),
+        )
+        self.assertContains(
+            response,
+            '<title>Article 1 | Change article | Django site admin</title>',
+        )
+        self.assertContains(response, '<h1>Change article</h1>')
+        self.assertContains(response, '<h2>Article 1</h2>')
+        response = self.client.get(
+            reverse('admin:admin_views_article_change', args=(self.a2.pk,)),
+        )
+        self.assertContains(
+            response,
+            '<title>Article 2 | Change article | Django site admin</title>',
+        )
+        self.assertContains(response, '<h1>Change article</h1>')
+        self.assertContains(response, '<h2>Article 2</h2>')
+
+    def test_view_subtitle_per_object(self):
+        viewuser = User.objects.create_user(
+            username='viewuser', password='secret', is_staff=True,
+        )
+        viewuser.user_permissions.add(
+            get_perm(Article, get_permission_codename('view', Article._meta)),
+        )
+        self.client.force_login(viewuser)
+        response = self.client.get(
+            reverse('admin:admin_views_article_change', args=(self.a1.pk,)),
+        )
+        self.assertContains(
+            response,
+            '<title>Article 1 | View article | Django site admin</title>',
+        )
+        self.assertContains(response, '<h1>View article</h1>')
+        self.assertContains(response, '<h2>Article 1</h2>')
+        response = self.client.get(
+            reverse('admin:admin_views_article_change', args=(self.a2.pk,)),
+        )
+        self.assertContains(
+            response,
+            '<title>Article 2 | View article | Django site admin</title>',
+        )
+        self.assertContains(response, '<h1>View article</h1>')
+        self.assertContains(response, '<h2>Article 2</h2>')
 
 
 @override_settings(TEMPLATES=[{
