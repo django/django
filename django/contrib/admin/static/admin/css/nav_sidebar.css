@@ -103,8 +103,18 @@
     #nav-sidebar, #toggle-nav-sidebar {
         display: none;
     }
+    .change-list .main > #nav-sidebar+.content,
+    .change-list .main.shifted > #nav-sidebar+.content {
+        left: 0;
+    }
+}
+.change-list .main > #nav-sidebar+.content {
+    position: absolute;
+    left: 23px;
+    right: 0;
+
 }
 
-.change-list .main > #nav-sidebar+.content {
-    overflow: hidden;
+.change-list .main.shifted > #nav-sidebar+.content {
+    left: 298px;
 }
