@@ -37,8 +37,6 @@ Schema Operations
 ``CreateModel``
 ---------------
 
-..versionchanged:: 3.2
-
 .. class:: CreateModel(name, fields, options=None, bases=None, managers=None, metaclass=None)
 
 Creates a new model in the project history and a corresponding table in the
@@ -62,10 +60,10 @@ from the standard ``models.Model``.
 The first manager in the list will be the default manager for this model during
 migrations.
 
-..versionadded:: 3.2
+.. versionadded:: 3.2
 
 ``metaclass`` takes a class that is the metaclass of the model if the model's
-bases don't have related metaclasses.
+bases don't have related metaclasses. Used for constructing the model's class.
 
 ``DeleteModel``
 ---------------
