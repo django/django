@@ -277,7 +277,10 @@ Models
   :py:class:`float`, :py:class:`int`, :py:class:`str`,
   :py:class:`datetime.date`, :py:class:`datetime.datetime`,
   :py:class:`datetime.time`, :py:class:`datetime.timedelta`,
-  :py:class:`decimal.Decimal`, and :py:class:`uuid.UUID` instances.
+  :py:class:`decimal.Decimal`, and :py:class:`uuid.UUID` instances. As a
+  consequence, resolving an ``output_field`` for database functions and
+  combined expressions may now crash with mixed types when using ``Value()``.
+  You will need to explicitly set the ``output_field`` in such cases.
 
 * The new :meth:`.QuerySet.alias` method allows creating reusable aliases for
   expressions that don't need to be selected but are used for filtering,
