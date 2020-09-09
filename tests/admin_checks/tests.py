@@ -135,12 +135,6 @@ class SystemChecksTestCase(SimpleTestCase):
                 "the admin application.",
                 id='admin.E404',
             ),
-            checks.Warning(
-                "'django.template.context_processors.request' must be enabled "
-                "in DjangoTemplates (TEMPLATES) in order to use the admin "
-                "navigation sidebar.",
-                id='admin.W411',
-            )
         ]
         self.assertEqual(admin.checks.check_dependencies(), expected)
         # The first error doesn't happen if

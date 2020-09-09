@@ -305,6 +305,7 @@ class AdminSite:
         script_name = request.META['SCRIPT_NAME']
         site_url = script_name if self.site_url == '/' and script_name else self.site_url
         return {
+            'request': request,
             'site_title': self.site_title,
             'site_header': self.site_header,
             'site_url': site_url,
