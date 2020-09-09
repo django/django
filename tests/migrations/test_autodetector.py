@@ -2371,24 +2371,46 @@ class AutodetectorTests(TestCase):
         class ABase(AlphaBase, type(models.Model)):
             pass
 
-        A = ModelState(
+        Failure = ModelState(
             "app",
-            "A",
+            "Failure",
+            [("a_id", models.AutoField(primary_key=True))],
+            bases=(Alpha, models.Model),
+        )
+
+        Failure1 = ModelState(
+            "app",
+            "Failure",
+            [("a_id", models.AutoField(primary_key=True))],
+            bases=(Alpha, models.Model),
+            metaclass=AlphaBase
+        )
+
+        Success = ModelState(
+            "app",
+            "Success",
             [("a_id", models.AutoField(primary_key=True))],
             bases=(Alpha, models.Model),
             metaclass=ABase
         )
-        changes = self.get_changes([], [A])
+
+        # test TypeError raised if correct metaclass isn't provided
+        with self.assertRaises(TypeError):
+            changes = self.get_changes([], [Failure])
+        with self.assertRaises(TypeError):
+            changes = self.get_changes([], [Failure1])
+
+        changes = self.get_changes([], [Success])
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "app", 1)
         self.assertOperationTypes(changes, "app", 0, ["CreateModel"])
-        self.assertOperationAttributes(changes, "app", 0, 0, name="A")
+        self.assertOperationAttributes(changes, "app", 0, 0, name="Success")
 
         # test deletion of model
-        changes = self.get_changes([A], [])
+        changes = self.get_changes([Success], [])
         self.assertNumberMigrations(changes, "app", 1)
         self.assertOperationTypes(changes, "app", 0, ["DeleteModel"])
-        self.assertOperationAttributes(changes, "app", 0, 0, name="A")
+        self.assertOperationAttributes(changes, "app", 0, 0, name="Success")
 
     def test_proxy_bases_first(self):
         """Bases of proxies come first."""
