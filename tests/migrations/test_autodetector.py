@@ -2384,6 +2384,12 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, "app", 0, ["CreateModel"])
         self.assertOperationAttributes(changes, "app", 0, 0, name="A")
 
+        # test deletion of model
+        changes = self.get_changes([A], [])
+        self.assertNumberMigrations(changes, "app", 1)
+        self.assertOperationTypes(changes, "app", 0, ["DeleteModel"])
+        self.assertOperationAttributes(changes, "app", 0, 0, name="A")
+
     def test_proxy_bases_first(self):
         """Bases of proxies come first."""
         changes = self.get_changes([], [self.author_empty, self.author_proxy, self.author_proxy_proxy])
