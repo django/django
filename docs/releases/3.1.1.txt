@@ -72,7 +72,10 @@ Bugfixes
 
 * Fixed a ``QuerySet.order_by()`` crash on PostgreSQL when ordering and
   grouping by :class:`~django.db.models.JSONField` with a custom
-  :attr:`~django.db.models.JSONField.decoder` (:ticket:`31956`).
+  :attr:`~django.db.models.JSONField.decoder` (:ticket:`31956`). As a
+  consequence, fetching a ``JSONField`` with raw SQL now returns a string
+  instead of pre-loaded data. You will need to explicitly call ``json.loads()``
+  in such cases.
 
 * Fixed a ``QuerySet.delete()`` crash on MySQL, following a performance
   regression in Django 3.1 on MariaDB 10.3.2+, when filtering against an
