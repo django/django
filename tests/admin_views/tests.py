@@ -1726,6 +1726,8 @@ class AdminViewPermissionsTest(TestCase):
         # Now give the user permission to add but not change.
         self.viewuser.user_permissions.add(get_perm(Article, get_permission_codename('add', Article._meta)))
         response = self.client.get(reverse('admin:admin_views_article_add'))
+        self.assertEqual(response.context['title'], 'Add article')
+        self.assertContains(response, '<title>Add article | Django site admin</title>')
         self.assertContains(response, '<input type="submit" value="Save and view" name="_continue">')
         post = self.client.post(reverse('admin:admin_views_article_add'), add_dict, follow=False)
         self.assertEqual(post.status_code, 302)
@@ -1824,11 +1826,16 @@ class AdminViewPermissionsTest(TestCase):
         # view user can view articles but not make changes.
         self.client.force_login(self.viewuser)
         response = self.client.get(article_changelist_url)
-        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['title'], 'Select article to view')
+        self.assertContains(
+            response,
+            '<title>Select article to view | Django site admin</title>',
+        )
+        self.assertContains(response, '<h1>Select article to view</h1>')
         response = self.client.get(article_change_url)
-        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['title'], 'View article')
+        self.assertContains(response, '<title>View article | Django site admin</title>')
+        self.assertContains(response, '<h1>View article</h1>')
         self.assertContains(response, '<label>Extra form field:</label>')
         self.assertContains(response, '<a href="/test_admin/admin/admin_views/article/" class="closelink">Close</a>')
         post = self.client.post(article_change_url, change_dict)
@@ -1839,11 +1846,19 @@ class AdminViewPermissionsTest(TestCase):
         # change user can view all items and edit them
         self.client.force_login(self.changeuser)
         response = self.client.get(article_changelist_url)
-        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['title'], 'Select article to change')
+        self.assertContains(
+            response,
+            '<title>Select article to change | Django site admin</title>',
+        )
+        self.assertContains(response, '<h1>Select article to change</h1>')
         response = self.client.get(article_change_url)
-        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['title'], 'Change article')
+        self.assertContains(
+            response,
+            '<title>Change article | Django site admin</title>',
+        )
+        self.assertContains(response, '<h1>Change article</h1>')
         post = self.client.post(article_change_url, change_dict)
         self.assertRedirects(post, article_changelist_url)
         self.assertEqual(Article.objects.get(pk=self.a1.pk).content, '<p>edited article</p>')
@@ -1923,8 +1938,9 @@ class AdminViewPermissionsTest(TestCase):
         change_url = reverse('admin9:admin_views_article_change', args=(self.a1.pk,))
         self.client.force_login(self.viewuser)
         response = self.client.get(change_url)
-        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['title'], 'View article')
+        self.assertContains(response, '<title>View article | Django site admin</title>')
+        self.assertContains(response, '<h1>View article</h1>')
         self.assertContains(response, '<a href="/test_admin/admin9/admin_views/article/" class="closelink">Close</a>')
 
     def test_change_view_save_as_new(self):
