@@ -106,6 +106,20 @@ the query construction and is not part of the public API. However, it is safe
 (and fully supported) to pickle and unpickle the attribute's contents as
 described here.
 
+.. admonition:: Restrictions on ``QuerySet.values_list()``
+
+    If you recreate :meth:`QuerySet.values_list` using the pickled ``query``
+    attribute, it will be converted to :meth:`QuerySet.values`::
+
+        >>> import pickle
+        >>> qs = Blog.objects.values_list('id', 'name')
+        >>> qs
+        <QuerySet [(1, 'Beatles Blog')]>
+        >>> reloaded_qs = Blog.objects.all()
+        >>> reloaded_qs.query = pickle.loads(pickle.dumps(qs.query))
+        >>> reloaded_qs
+        <QuerySet [{'id': 1, 'name': 'Beatles Blog'}]>
+
 .. admonition:: You can't share pickles between versions
 
     Pickles of ``QuerySets`` are only valid for the version of Django that
