@@ -15,35 +15,31 @@ def sql_flush(style, connection, reset_sequences=True, allow_cascade=False):
     )
 
 
-def emit_pre_migrate_signal(verbosity, interactive, db, **kwargs):
-    # Emit the pre_migrate signal for every application.
-    for app_config in apps.get_app_configs():
-        if app_config.models_module is None:
-            continue
-        if verbosity >= 2:
-            print("Running pre-migrate handlers for application %s" % app_config.label)
-        models.signals.pre_migrate.send(
-            sender=app_config,
-            app_config=app_config,
-            verbosity=verbosity,
-            interactive=interactive,
-            using=db,
-            **kwargs
-        )
+def generic_signal_emitter(signal, verbose_message):
+    def emit_signal(verbosity, interactive, db, **kwargs):
+        # Emit the pre_migrate signal for every application.
+        for app_config in apps.get_app_configs():
+            if app_config.models_module is None:
+                continue
+            if verbosity >= 2:
+                print(verbose_message % app_config.label)
+            signal.send(
+                sender=app_config,
+                app_config=app_config,
+                verbosity=verbosity,
+                interactive=interactive,
+                using=db,
+                **kwargs
+            )
+    return emit_signal
 
 
-def emit_post_migrate_signal(verbosity, interactive, db, **kwargs):
-    # Emit the post_migrate signal for every application.
-    for app_config in apps.get_app_configs():
-        if app_config.models_module is None:
-            continue
-        if verbosity >= 2:
-            print("Running post-migrate handlers for application %s" % app_config.label)
-        models.signals.post_migrate.send(
-            sender=app_config,
-            app_config=app_config,
-            verbosity=verbosity,
-            interactive=interactive,
-            using=db,
-            **kwargs
-        )
+emit_pre_migrate_signal = generic_signal_emitter(
+    models.signals.pre_migrate, 
+    "Running pre-migrate handlers for application %s"
+)
+
+emit_post_migrate_signal = generic_signal_emitter(
+    models.signals.post_migrate, 
+    "Running post-migrate handlers for application %s"
+)
