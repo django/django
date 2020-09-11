@@ -99,12 +99,21 @@
     background: #ffc;
 }
 
+.main > #nav-sidebar + .content {
+    max-width: calc(100% - 23px);
+}
+
+.main.shifted > #nav-sidebar + .content {
+    max-width: calc(100% - 299px);
+}
+
 @media (max-width: 767px) {
     #nav-sidebar, #toggle-nav-sidebar {
         display: none;
     }
-}
 
-.change-list .main > #nav-sidebar+.content {
-    overflow: hidden;
+    .main > #nav-sidebar + .content,
+    .main.shifted > #nav-sidebar + .content {
+        max-width: 100%;
+    }
 }
