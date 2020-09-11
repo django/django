@@ -43,3 +43,13 @@ emit_post_migrate_signal = generic_signal_emitter(
     models.signals.post_migrate, 
     "Running post-migrate handlers for application %s"
 )
+
+emit_pre_migration_signal = generic_signal_emitter(
+    models.signals.pre_migration, 
+    "Running pre-migrate handlers for application %s"
+)
+
+emit_post_migration_signal = generic_signal_emitter(
+    models.signals.post_migration, 
+    "Running post-migrate handlers for application %s"
+)
