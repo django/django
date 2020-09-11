@@ -430,6 +430,7 @@ body.popup .submit-row {
 
 .inline-related.tabular fieldset.module table {
     width: 100%;
+    overflow-x: scroll;
 }
 
 .last-related fieldset {

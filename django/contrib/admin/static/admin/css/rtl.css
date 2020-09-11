@@ -109,15 +109,10 @@ thead th.sorted .text {
 }
 
 #changelist-filter {
-    right: auto;
-    left: 0;
     border-left: none;
     border-right: none;
-}
-
-.change-list .filtered .results, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull {
-    margin-right: 0;
-    margin-left: 280px;
+    margin-left: 0;
+    margin-right: 30px;
 }
 
 #changelist-filter li.selected {
@@ -127,11 +122,6 @@ thead th.sorted .text {
     border-right: 5px solid #eaeaea;
     padding-right: 10px;
     margin-right: -15px;
-}
-
-.filtered .actions {
-    margin-left: 280px;
-    margin-right: 0;
 }
 
 #changelist table tbody td:first-child, #changelist table tbody th:first-child {
