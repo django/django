@@ -504,6 +504,10 @@ Miscellaneous
   distinguishes inherited field instances across models. Additionally, the
   ordering of such fields is now defined.
 
+* The undocumented ``django.core.files.locks.lock()`` function now returns
+  ``False`` if the file cannot be locked, instead of raising
+  :exc:`BlockingIOError`.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2
