@@ -644,7 +644,7 @@ A few subtleties that are worth mentioning:
   ignored.
 
 * Calling :meth:`only()` and :meth:`defer()` after ``values()`` doesn't make
-  sense, so doing so will raise a ``NotImplementedError``.
+  sense, so doing so will raise a ``TypeError``.
 
 * Combining transforms and aggregates requires the use of two :meth:`annotate`
   calls, either explicitly or as keyword arguments to :meth:`values`. As above,
@@ -3491,8 +3491,7 @@ documentation to learn how to create your aggregates.
     SQLite can't handle aggregation on date/time fields out of the box.
     This is because there are no native date/time fields in SQLite and Django
     currently emulates these features using a text field. Attempts to use
-    aggregation on date/time fields in SQLite will raise
-    ``NotImplementedError``.
+    aggregation on date/time fields in SQLite will raise ``NotSupportedError``.
 
 .. admonition:: Note
 
