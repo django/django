@@ -37,9 +37,7 @@ class Tests(TestCase):
             check_sqlite_version()
 
     def test_aggregation(self):
-        """
-        Raise NotImplementedError when aggregating on date/time fields (#19360).
-        """
+        """Raise NotSupportedError when aggregating on date/time fields."""
         for aggregate in (Sum, Avg, Variance, StdDev):
             with self.assertRaises(NotSupportedError):
                 Item.objects.all().aggregate(aggregate('time'))
