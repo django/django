@@ -17,7 +17,7 @@ def sql_flush(style, connection, reset_sequences=True, allow_cascade=False):
 
 def generic_signal_emitter(signal, verbose_message):
     def emit_signal(verbosity, interactive, db, **kwargs):
-        # Emit the pre_migrate signal for every application.
+        # Emit the signal for every application.
         for app_config in apps.get_app_configs():
             if app_config.models_module is None:
                 continue
