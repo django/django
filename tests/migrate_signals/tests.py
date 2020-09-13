@@ -67,6 +67,8 @@ class MigrateSignalTests(TransactionTestCase):
     def test_args(self):
         pre_migrate_receiver = Receiver(signals.pre_migrate)
         post_migrate_receiver = Receiver(signals.post_migrate)
+        pre_migration_receiver = Receiver(signals.pre_migration)
+        post_migration_receiver = Receiver(signals.post_migration)
         management.call_command(
             'migrate', database=MIGRATE_DATABASE, verbosity=MIGRATE_VERBOSITY,
             interactive=MIGRATE_INTERACTIVE,
@@ -82,6 +84,9 @@ class MigrateSignalTests(TransactionTestCase):
             self.assertEqual(args['using'], 'default')
             self.assertEqual(args['plan'], [])
             self.assertIsInstance(args['apps'], migrations.state.StateApps)
+   
+        self.assertEqual(pre_migration_receiver.call_counter, 1)
+        self.assertEqual(post_migration_receiver.call_counter, 1)
 
     @override_settings(MIGRATION_MODULES={'migrate_signals': 'migrate_signals.custom_migrations'})
     def test_migrations_only(self):
@@ -90,6 +95,8 @@ class MigrateSignalTests(TransactionTestCase):
         """
         pre_migrate_receiver = Receiver(signals.pre_migrate)
         post_migrate_receiver = Receiver(signals.post_migrate)
+        pre_migration_receiver = Receiver(signals.pre_migration)
+        post_migration_receiver = Receiver(signals.post_migration)
         management.call_command(
             'migrate', database=MIGRATE_DATABASE, verbosity=MIGRATE_VERBOSITY,
             interactive=MIGRATE_INTERACTIVE,
@@ -106,6 +113,8 @@ class MigrateSignalTests(TransactionTestCase):
             # The migration isn't applied backward.
             self.assertFalse(args['plan'][0][1])
             self.assertIsInstance(args['apps'], migrations.state.StateApps)
+        self.assertEqual(pre_migration_receiver.call_counter, 1)
+        self.assertEqual(post_migration_receiver.call_counter, 1)
         self.assertEqual(pre_migrate_receiver.call_args['apps'].get_models(), [])
         self.assertEqual(
             [model._meta.label for model in post_migrate_receiver.call_args['apps'].get_models()],
@@ -114,6 +123,8 @@ class MigrateSignalTests(TransactionTestCase):
         # Migrating with an empty plan.
         pre_migrate_receiver = Receiver(signals.pre_migrate)
         post_migrate_receiver = Receiver(signals.post_migrate)
+        pre_migration_receiver = Receiver(signals.pre_migration)
+        post_migration_receiver = Receiver(signals.post_migration)
         management.call_command(
             'migrate', database=MIGRATE_DATABASE, verbosity=MIGRATE_VERBOSITY,
             interactive=MIGRATE_INTERACTIVE,
@@ -126,3 +137,5 @@ class MigrateSignalTests(TransactionTestCase):
             [model._meta.label for model in post_migrate_receiver.call_args['apps'].get_models()],
             ['migrate_signals.Signal']
         )
+        self.assertEqual(pre_migration_receiver.call_counter, 1)
+        self.assertEqual(post_migration_receiver.call_counter, 1)
