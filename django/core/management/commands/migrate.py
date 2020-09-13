@@ -7,7 +7,7 @@ from django.core.management.base import (
     BaseCommand, CommandError, no_translations,
 )
 from django.core.management.sql import (
-    emit_post_migrate_signal, emit_pre_migrate_signal, emit_pre_migration_signal, 
+    emit_post_migrate_signal, emit_pre_migrate_signal, emit_pre_migration_signal,
     emit_post_migration_signal,
 )
 from django.db import DEFAULT_DB_ALIAS, connections, router
