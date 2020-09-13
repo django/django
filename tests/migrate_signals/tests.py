@@ -84,7 +84,7 @@ class MigrateSignalTests(TransactionTestCase):
             self.assertEqual(args['using'], 'default')
             self.assertEqual(args['plan'], [])
             self.assertIsInstance(args['apps'], migrations.state.StateApps)
-   
+
         self.assertEqual(pre_migration_receiver.call_counter, 1)
         self.assertEqual(post_migration_receiver.call_counter, 1)
 
