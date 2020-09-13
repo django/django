@@ -35,21 +35,21 @@ def generic_signal_emitter(signal, verbose_message):
 
 
 emit_pre_migrate_signal = generic_signal_emitter(
-    models.signals.pre_migrate, 
+    models.signals.pre_migrate,
     "Running pre-migrate handlers for application %s"
 )
 
 emit_post_migrate_signal = generic_signal_emitter(
-    models.signals.post_migrate, 
+    models.signals.post_migrate,
     "Running post-migrate handlers for application %s"
 )
 
 emit_pre_migration_signal = generic_signal_emitter(
-    models.signals.pre_migration, 
+    models.signals.pre_migration,
     "Running pre-migration handlers for application %s"
 )
 
 emit_post_migration_signal = generic_signal_emitter(
-    models.signals.post_migration, 
+    models.signals.post_migration,
     "Running post-migration handlers for application %s"
 )
