@@ -7,7 +7,8 @@ from django.core.management.base import (
     BaseCommand, CommandError, no_translations,
 )
 from django.core.management.sql import (
-    emit_post_migrate_signal, emit_pre_migrate_signal,
+    emit_post_migrate_signal, emit_pre_migrate_signal, emit_pre_migration_signal, 
+    emit_post_migration_signal,
 )
 from django.db import DEFAULT_DB_ALIAS, connections, router
 from django.db.migrations.autodetector import MigrationAutodetector
@@ -84,7 +85,7 @@ class Command(BaseCommand):
                 import_module('.management', app_config.name)
 
         # Get the database we're operating from
-        connection = connections[database]
+        self.connection = connection = connections[database]
 
         # Hook for backends needing any database preparation
         connection.prepare_database()
@@ -278,7 +279,7 @@ class Command(BaseCommand):
                 self.stdout.write("  Applying %s..." % migration, ending="")
                 self.stdout.flush()
                 emit_pre_migration_signal(
-                    self.verbosity, self.interactive, connection.alias, migration=migration,
+                    self.verbosity, self.interactive, self.connection.alias, migration=migration,
                     fake=fake,
                 )
             elif action == "apply_success":
@@ -288,7 +289,7 @@ class Command(BaseCommand):
                 else:
                     self.stdout.write(self.style.SUCCESS(" OK" + elapsed))
                 emit_post_migration_signal(
-                    self.verbosity, self.interactive, connection.alias, migration=migration,
+                    self.verbosity, self.interactive, self.connection.alias, migration=migration,
                     fake=fake,
                 )
             elif action == "unapply_start":
@@ -297,7 +298,7 @@ class Command(BaseCommand):
                 self.stdout.write("  Unapplying %s..." % migration, ending="")
                 self.stdout.flush()
                 emit_pre_migration_signal(
-                    self.verbosity, self.interactive, connection.alias, migration=migration,
+                    self.verbosity, self.interactive, self.connection.alias, migration=migration,
                     fake=fake,
                 )
             elif action == "unapply_success":
@@ -307,7 +308,7 @@ class Command(BaseCommand):
                 else:
                     self.stdout.write(self.style.SUCCESS(" OK" + elapsed))
                 emit_post_migration_signal(
-                    self.verbosity, self.interactive, connection.alias, migration=migration,
+                    self.verbosity, self.interactive, self.connection.alias, migration=migration,
                     fake=fake,
                 )
             elif action == "render_start":
