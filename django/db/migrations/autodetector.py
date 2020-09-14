@@ -709,7 +709,7 @@ class MigrationAutodetector:
                     options=model_state.options,
                     bases=model_state.bases,
                     managers=model_state.managers,
-                    metaclass=model_state.metaclass
+                    metaclass=model_state.metaclass,
                 ),
                 # Depend on the deletion of any possible non-proxy version of us
                 dependencies=dependencies,
