@@ -567,19 +567,6 @@ class ModelState:
         except LookupError:
             raise InvalidBasesError("Cannot resolve one or more bases from %r" % (self.bases,))
 
-        # Now figure out our metaclass
-        if self.metaclass:
-            metaclass = self.metaclass
-        else:
-            # if all base metaclasses are the same, set our metaclass to that
-            base_type = type(bases[0])
-            if all(type(base) == base_type for base in bases[1:]):
-                metaclass = base_type
-            else:
-                raise TypeError(
-                    'Please specify a metaclass that is a (non-strict) subclass of the metaclasses of all bases'
-                )
-
         # Clone fields for the body, add other bits.
         body = {name: field.clone() for name, field in self.fields.items()}
         body['Meta'] = meta
@@ -588,6 +575,7 @@ class ModelState:
         # Restore managers
         body.update(self.construct_managers())
         # Then, make a Model object (apps.register_model is called in __new__)
+        metaclass = self.metaclass or type
         return metaclass(self.name, bases, body)
 
     def get_index_by_name(self, name):
