@@ -62,8 +62,7 @@ migrations.
 
 .. versionadded:: 3.2
 
-``metaclass`` takes a class that is the metaclass of the model if the model's
-bases don't have related metaclasses. Used for constructing the model's class.
+    The ``metaclass`` argument was added.
 
 ``DeleteModel``
 ---------------
