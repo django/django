@@ -1,8 +1,10 @@
 import re
 
+from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
+from django.utils.functional import cached_property
 
-from .utils import SpatialRefSys, oracle, postgis, spatialite
+from .utils import oracle, postgis, spatialite
 
 test_srs = ({
     'srid': 4326,
@@ -51,9 +53,13 @@ test_srs = ({
 @skipUnlessDBFeature("has_spatialrefsys_table")
 class SpatialRefSysTest(TestCase):
 
+    @cached_property
+    def SpatialRefSys(self):
+        return connection.ops.connection.ops.spatial_ref_sys()
+
     def test_get_units(self):
         epsg_4326 = next(f for f in test_srs if f['srid'] == 4326)
-        unit, unit_name = SpatialRefSys().get_units(epsg_4326['wkt'])
+        unit, unit_name = self.SpatialRefSys().get_units(epsg_4326['wkt'])
         self.assertEqual(unit_name, 'degree')
         self.assertAlmostEqual(unit, 0.01745329251994328)
 
@@ -62,7 +68,7 @@ class SpatialRefSysTest(TestCase):
         Test retrieval of SpatialRefSys model objects.
         """
         for sd in test_srs:
-            srs = SpatialRefSys.objects.get(srid=sd['srid'])
+            srs = self.SpatialRefSys.objects.get(srid=sd['srid'])
             self.assertEqual(sd['srid'], srs.srid)
 
             # Some of the authority names are borked on Oracle, e.g., SRID=32140.
@@ -84,7 +90,7 @@ class SpatialRefSysTest(TestCase):
         Test getting OSR objects from SpatialRefSys model objects.
         """
         for sd in test_srs:
-            sr = SpatialRefSys.objects.get(srid=sd['srid'])
+            sr = self.SpatialRefSys.objects.get(srid=sd['srid'])
             self.assertTrue(sr.spheroid.startswith(sd['spheroid']))
             self.assertEqual(sd['geographic'], sr.geographic)
             self.assertEqual(sd['projected'], sr.projected)
@@ -110,7 +116,7 @@ class SpatialRefSysTest(TestCase):
             prec = sd['eprec']
 
             # Getting our spatial reference and its ellipsoid
-            srs = SpatialRefSys.objects.get(srid=sd['srid'])
+            srs = self.SpatialRefSys.objects.get(srid=sd['srid'])
             ellps2 = srs.ellipsoid
 
             for i in range(3):
@@ -126,9 +132,9 @@ class SpatialRefSysTest(TestCase):
 
         add_srs_entry(3857)
         self.assertTrue(
-            SpatialRefSys.objects.filter(srid=3857).exists()
+            self.SpatialRefSys.objects.filter(srid=3857).exists()
         )
-        srs = SpatialRefSys.objects.get(srid=3857)
+        srs = self.SpatialRefSys.objects.get(srid=3857)
         self.assertTrue(
-            SpatialRefSys.get_spheroid(srs.wkt).startswith('SPHEROID[')
+            self.SpatialRefSys.get_spheroid(srs.wkt).startswith('SPHEROID[')
         )
