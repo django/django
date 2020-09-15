@@ -183,6 +183,17 @@ class NonAggregateAnnotationTestCase(TestCase):
         self.assertEqual(book.combined, 13410.0)
         self.assertEqual(book.rating_count, 1)
 
+    def test_q_expression_annotation_with_aggregation(self):
+        book = Book.objects.filter(isbn='159059725').annotate(
+            isnull_pubdate=ExpressionWrapper(
+                Q(pubdate__isnull=True),
+                output_field=BooleanField(),
+            ),
+            rating_count=Count('rating'),
+        ).first()
+        self.assertEqual(book.isnull_pubdate, False)
+        self.assertEqual(book.rating_count, 1)
+
     def test_aggregate_over_annotation(self):
         agg = Author.objects.annotate(other_age=F('age')).aggregate(otherage_sum=Sum('other_age'))
         other_agg = Author.objects.aggregate(age_sum=Sum('age'))

@@ -16,3 +16,6 @@ Bugfixes
   attribute returned incorrectly ``True`` for ``GROUP BY`` queries (e.g.
   ``.annotate().values()``) on models with ``Meta.ordering``. A model's
   ``Meta.ordering`` doesn't affect such queries (:ticket:`31990`).
+
+* Fixed a regression in Django 3.1 where a queryset would crash if it contained
+  an aggregation and a ``Q`` object annotation (:ticket:`32007`).
