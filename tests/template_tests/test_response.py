@@ -216,6 +216,14 @@ class SimpleTemplateResponseTest(SimpleTestCase):
 
         self.assertEqual(unpickled_response.cookies['key'].value, 'value')
 
+    def test_headers(self):
+        response = SimpleTemplateResponse(
+            'first/test.html',
+            {'value': 123, 'fn': datetime.now},
+            headers={'X-Foo': 'foo'},
+        )
+        self.assertEqual(response.headers['X-Foo'], 'foo')
+
 
 @override_settings(TEMPLATES=[{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -318,6 +326,15 @@ class TemplateResponseTest(SimpleTestCase):
         pickled_response = pickle.dumps(response)
         unpickled_response = pickle.loads(pickled_response)
         pickle.dumps(unpickled_response)
+
+    def test_headers(self):
+        response = TemplateResponse(
+            self.factory.get('/'),
+            'first/test.html',
+            {'value': 123, 'fn': datetime.now},
+            headers={'X-Foo': 'foo'},
+        )
+        self.assertEqual(response.headers['X-Foo'], 'foo')
 
 
 @modify_settings(MIDDLEWARE={'append': ['template_tests.test_response.custom_urlconf_middleware']})

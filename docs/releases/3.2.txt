@@ -332,6 +332,11 @@ Requests and Responses
   Both interfaces will continue to be supported. See
   :ref:`setting-header-fields` for details.
 
+* The new ``headers`` parameter of :class:`~django.http.HttpResponse`,
+  :class:`~django.template.response.SimpleTemplateResponse`, and
+  :class:`~django.template.response.TemplateResponse` allows setting response
+  :attr:`~django.http.HttpResponse.headers` on instantiation.
+
 Security
 ~~~~~~~~
 

@@ -724,6 +724,10 @@ by ``HttpResponse``.
 When using this interface, unlike a dictionary, ``del`` doesn't raise
 ``KeyError`` if the header field doesn't exist.
 
+You can also set headers on instantiation::
+
+    >>> response = HttpResponse(headers={'Age': 120})
+
 For setting the ``Cache-Control`` and ``Vary`` header fields, it is recommended
 to use the :func:`~django.utils.cache.patch_cache_control` and
 :func:`~django.utils.cache.patch_vary_headers` methods from
@@ -738,15 +742,19 @@ containing a newline character (CR or LF) will raise ``BadHeaderError``
 
     The :attr:`HttpResponse.headers` interface was added.
 
+    The ability to set headers on instantiation was added.
+
 Telling the browser to treat the response as a file attachment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To tell the browser to treat the response as a file attachment, use the
-``content_type`` argument and set the ``Content-Disposition`` header. For example,
-this is how you might return a Microsoft Excel spreadsheet::
+To tell the browser to treat the response as a file attachment, set the
+``Content-Type`` and ``Content-Disposition`` headers. For example, this is how
+you might return a Microsoft Excel spreadsheet::
 
-    >>> response = HttpResponse(my_data, content_type='application/vnd.ms-excel')
-    >>> response.headers['Content-Disposition'] = 'attachment; filename="foo.xls"'
+    >>> response = HttpResponse(my_data, headers={
+    ...     'Content-Type': 'application/vnd.ms-excel',
+    ...     'Content-Disposition': 'attachment; filename="foo.xls"',
+    ... })
 
 There's nothing Django-specific about the ``Content-Disposition`` header, but
 it's easy to forget the syntax, so we've included it here.
@@ -802,10 +810,10 @@ Attributes
 Methods
 -------
 
-.. method:: HttpResponse.__init__(content=b'', content_type=None, status=200, reason=None, charset=None)
+.. method:: HttpResponse.__init__(content=b'', content_type=None, status=200, reason=None, charset=None, headers=None)
 
-    Instantiates an ``HttpResponse`` object with the given page content and
-    content type.
+    Instantiates an ``HttpResponse`` object with the given page content,
+    content type, and headers.
 
     ``content`` is most commonly an iterator, bytestring, :class:`memoryview`,
     or string. Other types will be converted to a bytestring by encoding their
@@ -828,6 +836,12 @@ Methods
     ``charset`` is the charset in which the response will be encoded. If not
     given it will be extracted from ``content_type``, and if that
     is unsuccessful, the :setting:`DEFAULT_CHARSET` setting will be used.
+
+    ``headers`` is a :class:`dict` of HTTP headers for the response.
+
+    .. versionchanged:: 3.2
+
+        The ``headers`` parameter was added.
 
 .. method:: HttpResponse.__setitem__(header, value)
 
