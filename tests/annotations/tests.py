@@ -183,6 +183,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         self.assertEqual(book.combined, 13410.0)
         self.assertEqual(book.rating_count, 1)
 
+    @skipUnlessDBFeature('supports_boolean_expr_in_select_clause')
     def test_q_expression_annotation_with_aggregation(self):
         book = Book.objects.filter(isbn='159059725').annotate(
             isnull_pubdate=ExpressionWrapper(
