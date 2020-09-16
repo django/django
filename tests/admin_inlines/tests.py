@@ -1348,3 +1348,52 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(
             len(self.selenium.find_elements_by_css_selector(tabular_inline_formset_selector)), 1
         )
+
+    def test_inlines_verbose_name(self):
+        """
+        The item added by the "Add another XXX" link shows the correct verbose_name in the inline form.
+        """
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_course_add'))
+
+        # There first inline shows the verbose_name
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
+            '.dynamic-class_set')), 1)
+        self.assertEqual(self.selenium.find_elements_by_css_selector(
+            '.dynamic-class_set')[0].get_attribute('id'), 'class_set-0')
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
+            '.dynamic-class_set#class_set-0 h2')), 2)
+        self.assertEqual(self.selenium.find_elements_by_css_selector(
+            '.dynamic-class_set#class_set-0 h2')[0].text, 'AVAILABLE ATTENDANT')
+        self.assertEqual(self.selenium.find_elements_by_css_selector(
+            '.dynamic-class_set#class_set-0 h2')[1].text, 'CHOSEN ATTENDANT')
+
+        # Add an inline
+        self.selenium.find_element_by_link_text('Add another Class').click()
+
+        # The inline has been added, it must have the correct verbose_name
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
+            '.dynamic-class_set')), 2)
+        self.assertEqual(self.selenium.find_elements_by_css_selector(
+            '.dynamic-class_set')[1].get_attribute('id'), 'class_set-1')
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
+            '.dynamic-class_set#class_set-1 h2')), 2)
+        self.assertEqual(self.selenium.find_elements_by_css_selector(
+            '.dynamic-class_set#class_set-1 h2')[0].text, 'AVAILABLE ATTENDANT')
+        self.assertEqual(self.selenium.find_elements_by_css_selector(
+            '.dynamic-class_set#class_set-1 h2')[1].text, 'CHOSEN ATTENDANT')
+
+        # Add a third inline
+        self.selenium.find_element_by_link_text('Add another Class').click()
+
+        # Even the third inlines should have the correct verbose_name
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
+            '.dynamic-class_set')), 3)
+        self.assertEqual(self.selenium.find_elements_by_css_selector(
+            '.dynamic-class_set')[2].get_attribute('id'), 'class_set-2')
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
+            '.dynamic-class_set#class_set-2 h2')), 2)
+        self.assertEqual(self.selenium.find_elements_by_css_selector(
+            '.dynamic-class_set#class_set-2 h2')[0].text, 'AVAILABLE ATTENDANT')
+        self.assertEqual(self.selenium.find_elements_by_css_selector(
+            '.dynamic-class_set#class_set-2 h2')[1].text, 'CHOSEN ATTENDANT')

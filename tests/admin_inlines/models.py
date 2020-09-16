@@ -293,6 +293,21 @@ class SomeChildModel(models.Model):
     parent = models.ForeignKey(SomeParentModel, models.CASCADE)
     readonly_field = models.CharField(max_length=1)
 
+
+# Models for #30231
+class Course(models.Model):
+    name = models.CharField(max_length=128)
+    teacher = models.ForeignKey(Person, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+
+class Class(models.Model):
+    person = models.ManyToManyField(Person, verbose_name='attendant')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    date = models.DateField()
+
 # Other models
 
 

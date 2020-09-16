@@ -5,7 +5,7 @@ from django.db import models
 
 from .models import (
     Author, BinaryTree, CapoFamiglia, Chapter, Child, ChildModel1, ChildModel2,
-    Consigliere, EditablePKBook, ExtraTerrestrial, Fashionista, FootNote,
+    Class, Consigliere, Course, EditablePKBook, ExtraTerrestrial, Fashionista, FootNote,
     Holder, Holder2, Holder3, Holder4, Holder5, Inner, Inner2, Inner3,
     Inner4Stacked, Inner4Tabular, Inner5Stacked, Inner5Tabular, NonAutoPKBook,
     NonAutoPKBookChild, Novel, NovelReadonlyChapter, OutfitItem,
@@ -279,6 +279,17 @@ class SomeChildModelInline(admin.TabularInline):
     form = SomeChildModelForm
     readonly_fields = ('readonly_field',)
 
+    
+#admin for #30231
+class ClassInline(admin.TabularInline):
+    model = Class
+    extra = 1
+    filter_horizontal = ['person']
+
+
+class CourseAdmin(admin.ModelAdmin):
+    inlines = [ClassInline]
+
 
 class StudentInline(admin.StackedInline):
     model = Child
@@ -318,3 +329,4 @@ site.register([Question, Inner4Stacked, Inner4Tabular])
 site.register(Teacher, TeacherAdmin)
 site.register(Chapter, inlines=[FootNoteNonEditableInlineCustomForm])
 site.register(OutfitItem, inlines=[WeaknessInlineCustomForm])
+site.register(Course, CourseAdmin)
