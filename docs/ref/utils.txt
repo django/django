@@ -122,11 +122,13 @@ The functions defined in this module share the following properties:
 
 .. function:: parse_date(value)
 
-    Parses a string and returns a :class:`datetime.date`.
+    Parses a string and returns a :class:`datetime.date`, or ``None`` if the
+    string cannot be parsed.
 
 .. function:: parse_time(value)
 
-    Parses a string and returns a :class:`datetime.time`.
+    Parses a string and returns a :class:`datetime.time`, or ``None`` if the
+    string cannot be parsed.
 
     UTC offsets aren't supported; if ``value`` describes one, the result is
     ``None``.
@@ -137,7 +139,8 @@ The functions defined in this module share the following properties:
 
 .. function:: parse_datetime(value)
 
-    Parses a string and returns a :class:`datetime.datetime`.
+    Parses a string and returns a :class:`datetime.datetime`, or ``None`` if
+    the string cannot be parsed.
 
     UTC offsets are supported; if ``value`` describes one, the result's
     ``tzinfo`` attribute is a :class:`datetime.timezone` instance.
@@ -148,7 +151,8 @@ The functions defined in this module share the following properties:
 
 .. function:: parse_duration(value)
 
-    Parses a string and returns a :class:`datetime.timedelta`.
+    Parses a string and returns a :class:`datetime.timedelta`, or ``None`` if
+    the string cannot be parsed.
 
     Expects data in the format ``"DD HH:MM:SS.uuuuuu"``,
     ``"DD HH:MM:SS,uuuuuu"``,  or as specified by ISO 8601 (e.g.
