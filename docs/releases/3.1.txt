@@ -724,6 +724,14 @@ Miscellaneous
   without the ``type`` attribute to follow `WHATWG recommendations
   <https://html.spec.whatwg.org/multipage/scripting.html#the-script-element>`_.
 
+* :class:`~django.forms.ModelChoiceIterator`, used by
+  :class:`~django.forms.ModelChoiceField` and
+  :class:`~django.forms.ModelMultipleChoiceField`, now yields 2-tuple choices
+  containing :class:`~django.forms.ModelChoiceIteratorValue` instances as the
+  first ``value`` element in each choice. In most cases this proxies
+  transparently, but if you need the ``field`` value itself, use the
+  :attr:`.ModelChoiceIteratorValue.value` attribute instead.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
