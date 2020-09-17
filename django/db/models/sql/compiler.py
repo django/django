@@ -359,7 +359,7 @@ class SQLCompiler:
 
         for expr, is_ref in order_by:
             resolved = expr.resolve_expression(self.query, allow_joins=True, reuse=None)
-            if self.query.combinator:
+            if self.query.combinator and self.select:
                 src = resolved.get_source_expressions()[0]
                 expr_src = expr.get_source_expressions()[0]
                 # Relabel order by columns to raw numbers if this is a combined
