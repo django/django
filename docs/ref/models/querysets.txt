@@ -1295,6 +1295,26 @@ where prefetching with a custom ``QuerySet`` is useful:
     >>> restaurants = Restaurant.objects.prefetch_related(
     ...     Prefetch('best_pizza', queryset=queryset))
 
+When using multiple databases, ``Prefetch`` will respect your choice of
+database. If the inner query does not specify a database, it will use the
+database selected by the outer query. All of the following are valid::
+
+    >>> # Both inner and outer queries will use the 'replica' database
+    >>> Restaurant.objects.prefetch_related('pizzas__toppings').using('replica')
+    >>> Restaurant.objects.prefetch_related(
+    ...     Prefetch('pizzas__toppings'),
+    ... ).using('replica')
+    >>>
+    >>> # Inner will use the 'replica' database; outer will use 'default' database
+    >>> Restaurant.objects.prefetch_related(
+    ...     Prefetch('pizzas__toppings', queryset=Toppings.objects.using('replica')),
+    ... )
+    >>>
+    >>> # Inner will use 'replica' database; outer will use 'cold-storage' database
+    >>> Restaurant.objects.prefetch_related(
+    ...     Prefetch('pizzas__toppings', queryset=Toppings.objects.using('replica')),
+    ... ).using('cold-storage')
+
 .. note::
 
     The ordering of lookups matters.
@@ -3731,6 +3751,10 @@ lookups or :class:`Prefetch` objects you want to prefetch for. For example::
     >>> from django.db.models import prefetch_related_objects
     >>> restaurants = fetch_top_restaurants_from_cache()  # A list of Restaurants
     >>> prefetch_related_objects(restaurants, 'pizzas__toppings')
+
+When using multiple databases with ``prefetch_related_objects``, the prefetch
+query will use the database associated with the model instance. This can be
+overridden by using a custom queryset in a related lookup.
 
 ``FilteredRelation()`` objects
 ------------------------------
