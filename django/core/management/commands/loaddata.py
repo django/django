@@ -232,7 +232,7 @@ class Command(BaseCommand):
         fixture_name, ser_fmt, cmp_fmt = self.parse_name(fixture_label)
         databases = [self.using, None]
         cmp_fmts = list(self.compression_formats) if cmp_fmt is None else [cmp_fmt]
-        ser_fmts = serializers.get_public_serializer_formats() if ser_fmt is None else [ser_fmt]
+        ser_fmts = self.serialization_formats if ser_fmt is None else [ser_fmt]
 
         if self.verbosity >= 2:
             self.stdout.write("Loading '%s' fixtures..." % fixture_name)
