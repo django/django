@@ -306,7 +306,7 @@ class BaseDatabaseFeatures:
     test_collations = {
         'ci': None,  # Case-insensitive.
         'cs': None,  # Case-sensitive.
-        'swedish-ci': None  # Swedish case-insensitive.
+        'swedish_ci': None  # Swedish case-insensitive.
     }
 
     def __init__(self, connection):

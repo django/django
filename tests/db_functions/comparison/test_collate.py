@@ -31,7 +31,7 @@ class CollateTests(TestCase):
         self.assertSequenceEqual(qs, [self.author2, self.author1])
 
     def test_language_collation_order_by(self):
-        collation = connection.features.test_collations.get('swedish-ci')
+        collation = connection.features.test_collations.get('swedish_ci')
         if not collation:
             self.skipTest('This backend does not support language collations.')
         author3 = Author.objects.create(alias='O', name='Jones')

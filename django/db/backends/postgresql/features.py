@@ -59,7 +59,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_json_operators = True
     json_key_contains_list_matching_requires_list = True
     test_collations = {
-        'swedish-ci': 'sv-x-icu',
+        'swedish_ci': 'sv-x-icu',
     }
 
     @cached_property

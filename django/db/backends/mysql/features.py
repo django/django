@@ -46,7 +46,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     order_by_nulls_first = True
     test_collations = {
         'ci': 'utf8_general_ci',
-        'swedish-ci': 'utf8_swedish_ci',
+        'swedish_ci': 'utf8_swedish_ci',
     }
 
     @cached_property
