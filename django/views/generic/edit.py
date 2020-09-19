@@ -238,7 +238,7 @@ class BaseDeleteView(DeletionMixin, FormMixin, SingleObjectMixin, ProcessFormVie
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return super(BaseDeleteView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
