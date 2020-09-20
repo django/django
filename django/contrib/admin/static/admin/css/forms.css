@@ -4,7 +4,7 @@
 
 .form-row {
     overflow: hidden;
-    padding: 10px;
+    padding: 10px 2px;
     font-size: 13px;
     border-bottom: 1px solid #eee;
 }
@@ -20,6 +20,11 @@
 
 form .form-row p {
     padding-left: 0;
+}
+
+.inline-related .form-row {
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 /* FORM LABELS */
