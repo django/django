@@ -2376,13 +2376,6 @@ class AutodetectorTests(TestCase):
             "Failure",
             [("a_id", models.AutoField(primary_key=True))],
             bases=(Alpha, models.Model),
-        )
-
-        Failure1 = ModelState(
-            "app",
-            "Failure",
-            [("a_id", models.AutoField(primary_key=True))],
-            bases=(Alpha, models.Model),
             metaclass=AlphaBase
         )
 
@@ -2397,8 +2390,6 @@ class AutodetectorTests(TestCase):
         # test TypeError raised if correct metaclass isn't provided
         with self.assertRaises(TypeError):
             changes = self.get_changes([], [Failure])
-        with self.assertRaises(TypeError):
-            changes = self.get_changes([], [Failure1])
 
         changes = self.get_changes([], [Success])
         # Right number/type of migrations?

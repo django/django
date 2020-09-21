@@ -522,7 +522,6 @@ class ModelState:
             options,
             bases,
             managers,
-            type(model),
         )
 
     def construct_managers(self):
@@ -572,10 +571,18 @@ class ModelState:
         body['Meta'] = meta
         body['__module__'] = "__fake__"
 
+        if self.metaclass:
+            metaclass = self.metaclass
+        else:
+            base_types = {type(base) for base in bases}
+            metaclass_bases = tuple((
+                base for base in base_types if all((b == base or not issubclass(b, base) for b in base_types))
+            ))
+            metaclass = type(f'{self.name}FakeMeta', metaclass_bases, {})
+
         # Restore managers
         body.update(self.construct_managers())
         # Then, make a Model object (apps.register_model is called in __new__)
-        metaclass = self.metaclass or type
         return metaclass(self.name, bases, body)
 
     def get_index_by_name(self, name):
