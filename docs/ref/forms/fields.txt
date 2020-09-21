@@ -1439,7 +1439,9 @@ customize the yielded 2-tuple choices.
 
             In older versions, the first ``value`` element in the choice tuple
             is the ``field`` value itself, rather than a
-            ``ModelChoiceIteratorValue`` instance.
+            ``ModelChoiceIteratorValue`` instance. In most cases this proxies
+            transparently but, if you need the ``field`` value itself, use the
+            :attr:`ModelChoiceIteratorValue.value` attribute instead.
 
 ``ModelChoiceIteratorValue``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
