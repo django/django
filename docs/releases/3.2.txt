@@ -92,6 +92,13 @@ Minor features
   constrained environments. If this is the case, the existing hasher can be
   subclassed to override the defaults.
 
+
+:mod:`django.shortcuts`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :func:`django.shortcuts.make_toast` function returns ``'Abdullah: I want to say...'``.
+
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
