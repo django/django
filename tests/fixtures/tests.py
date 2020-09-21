@@ -601,7 +601,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         # MySQL needs a little prodding to reject invalid data.
         # This won't affect other tests because the database connection
         # is closed at the end of each test.
-        if connection.vendor == 'mysql':
+        if connection.vendor in ('mariadb', 'mysql'):
             with connection.cursor() as cursor:
                 cursor.execute("SET sql_mode = 'TRADITIONAL'")
         msg = 'Could not load fixtures.Article(pk=1):'

@@ -68,7 +68,7 @@ class ExplainTests(TestCase):
                     option = '{} {}'.format(name.upper(), 'true' if value else 'false')
                     self.assertIn(option, captured_queries[0]['sql'])
 
-    @unittest.skipUnless(connection.vendor == 'mysql', 'MySQL specific')
+    @unittest.skipUnless(connection.vendor in ('mariadb', 'mysql'), 'MySQL specific')
     def test_mysql_text_to_traditional(self):
         # Ensure these cached properties are initialized to prevent queries for
         # the MariaDB or MySQL version during the QuerySet evaluation.
@@ -78,7 +78,7 @@ class ExplainTests(TestCase):
         self.assertEqual(len(captured_queries), 1)
         self.assertIn('FORMAT=TRADITIONAL', captured_queries[0]['sql'])
 
-    @unittest.skipUnless(connection.vendor == 'mysql', 'MariaDB and MySQL >= 8.0.18 specific.')
+    @unittest.skipUnless(connection.vendor in ('mariadb', 'mysql'), 'MariaDB and MySQL >= 8.0.18 specific.')
     def test_mysql_analyze(self):
         # Inner skip to avoid module level query for MySQL version.
         if not connection.features.supports_explain_analyze:

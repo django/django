@@ -1,9 +1,10 @@
 from django.db.models import IntegerField
+from django.db import connection
 from django.db.models.functions import Chr, Left, Ord
 from django.test import TestCase
 from django.test.utils import register_lookup
-
 from ..models import Author
+import unittest
 
 
 class ChrTests(TestCase):
@@ -18,6 +19,7 @@ class ChrTests(TestCase):
         self.assertCountEqual(authors.filter(first_initial=Chr(ord('J'))), [self.john])
         self.assertCountEqual(authors.exclude(first_initial=Chr(ord('J'))), [self.elena, self.rhonda])
 
+    @unittest.skipIf(connection.vendor == 'mariadb', 'MariaDB uses utf8mb4')
     def test_non_ascii(self):
         authors = Author.objects.annotate(first_initial=Left('name', 1))
         self.assertCountEqual(authors.filter(first_initial=Chr(ord('É'))), [self.elena])

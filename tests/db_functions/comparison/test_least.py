@@ -35,7 +35,7 @@ class LeastTests(TestCase):
         articles = Article.objects.annotate(first_updated=Least('written', 'published'))
         self.assertIsNone(articles.first().first_updated)
 
-    @skipIf(connection.vendor == 'mysql', "This doesn't work on MySQL")
+    @skipIf(connection.vendor in ('mariadb', 'mysql'), "This doesn't work on MySQL")
     def test_coalesce_workaround(self):
         future = datetime(2100, 1, 1)
         now = timezone.now()
@@ -48,7 +48,7 @@ class LeastTests(TestCase):
         )
         self.assertEqual(articles.first().last_updated, now)
 
-    @skipUnless(connection.vendor == 'mysql', "MySQL-specific workaround")
+    @skipUnless(connection.vendor in ('mariadb', 'mysql'), "MySQL-specific workaround")
     def test_coalesce_workaround_mysql(self):
         future = datetime(2100, 1, 1)
         now = timezone.now()

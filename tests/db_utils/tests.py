@@ -59,7 +59,7 @@ class LoadBackendTests(SimpleTestCase):
         msg = (
             "'foo' isn't an available database backend.\n"
             "Try using 'django.db.backends.XXX', where XXX is one of:\n"
-            "    'mysql', 'oracle', 'postgresql', 'sqlite3'"
+            "    'mariadb', 'mysql', 'oracle', 'postgresql', 'sqlite3'"
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg) as cm:
             load_backend('foo')

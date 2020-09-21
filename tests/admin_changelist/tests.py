@@ -23,6 +23,7 @@ from django.test.utils import (
 )
 from django.urls import reverse
 from django.utils import formats
+import unittest
 
 from .admin import (
     BandAdmin, ChildAdmin, ChordsBandAdmin, ConcertAdmin,
@@ -927,6 +928,10 @@ class ChangeListTests(TestCase):
         queryset = m._get_list_editable_queryset(request, prefix='form$')
         self.assertEqual(queryset.count(), 1)
 
+    @unittest.skipIf(
+        connection.vendor == 'mariadb',
+        'MariaDB does not substitute parameters in query due to use of binary protocol'
+    )
     def test_changelist_view_list_editable_changed_objects_uses_filter(self):
         """list_editable edits use a filtered queryset to limit memory usage."""
         a = Swallow.objects.create(origin='Swallow A', load=4, speed=1)

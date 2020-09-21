@@ -189,6 +189,9 @@ class HasKeyLookup(PostgresOperatorLookup):
     def as_mysql(self, compiler, connection):
         return self.as_sql(compiler, connection, template="JSON_CONTAINS_PATH(%s, 'one', %%s)")
 
+    # Same behavior in MariaDB
+    as_mariadb = as_mysql
+
     def as_oracle(self, compiler, connection):
         sql, params = self.as_sql(compiler, connection, template="JSON_EXISTS(%s, '%%s')")
         # Add paths directly into SQL because path expressions cannot be passed
@@ -245,7 +248,7 @@ class JSONExact(lookups.Exact):
         # Treat None lookup values as null.
         if rhs == '%s' and rhs_params == [None]:
             rhs_params = ['null']
-        if connection.vendor == 'mysql':
+        if connection.vendor in ('mariadb', 'mysql'):
             func = ["JSON_EXTRACT(%s, '$')"] * len(rhs_params)
             rhs = rhs % tuple(func)
         return rhs, rhs_params
@@ -285,6 +288,9 @@ class KeyTransform(Transform):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
         json_path = compile_json_path(key_transforms)
         return 'JSON_EXTRACT(%s, %%s)' % lhs, tuple(params) + (json_path,)
+
+    # Same behavior in MariaDB
+    as_mariadb = as_mysql
 
     def as_oracle(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
@@ -344,13 +350,13 @@ class CaseInsensitiveMixin:
     """
     def process_lhs(self, compiler, connection):
         lhs, lhs_params = super().process_lhs(compiler, connection)
-        if connection.vendor == 'mysql':
+        if connection.vendor in ('mariadb', 'mysql'):
             return 'LOWER(%s)' % lhs, lhs_params
         return lhs, lhs_params
 
     def process_rhs(self, compiler, connection):
         rhs, rhs_params = super().process_rhs(compiler, connection)
-        if connection.vendor == 'mysql':
+        if connection.vendor in ('mariadb', 'mysql'):
             return 'LOWER(%s)' % rhs, rhs_params
         return rhs, rhs_params
 
@@ -384,9 +390,9 @@ class KeyTransformIn(lookups.In):
                     ))
                 func = tuple(func)
                 rhs_params = ()
-            elif connection.vendor == 'mysql' and connection.mysql_is_mariadb:
+            elif connection.vendor in ('mariadb', 'mysql') and connection.mysql_is_mariadb:
                 func = ("JSON_UNQUOTE(JSON_EXTRACT(%s, '$'))",) * len(rhs_params)
-            elif connection.vendor in {'sqlite', 'mysql'}:
+            elif connection.vendor in {'sqlite', 'mysql', 'mariadb'}:
                 func = ("JSON_EXTRACT(%s, '$')",) * len(rhs_params)
             rhs = rhs % func
         return rhs, rhs_params

@@ -26,6 +26,8 @@ class Div3Lookup(models.Lookup):
         params.extend(rhs_params)
         return 'mod(%s, 3) = %s' % (lhs, rhs), params
 
+    as_mariadb = as_oracle
+
 
 class Div3Transform(models.Transform):
     lookup_name = 'div3'
@@ -37,6 +39,8 @@ class Div3Transform(models.Transform):
     def as_oracle(self, compiler, connection, **extra_context):
         lhs, lhs_params = compiler.compile(self.lhs)
         return 'mod(%s, 3)' % lhs, lhs_params
+
+    as_mariadb = as_oracle
 
 
 class Div3BilateralTransform(Div3Transform):
@@ -388,7 +392,7 @@ class BilateralTransformTests(TestCase):
 
 @override_settings(USE_TZ=True)
 class DateTimeLookupTests(TestCase):
-    @unittest.skipUnless(connection.vendor == 'mysql', "MySQL specific SQL used")
+    @unittest.skipUnless(connection.vendor in ('mariadb', 'mysql'), "MySQL specific SQL used")
     def test_datetime_output_field(self):
         with register_lookup(models.PositiveIntegerField, DateTimeTransform):
             ut = MySQLUnixTimestamp.objects.create(timestamp=time.time())

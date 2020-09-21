@@ -28,6 +28,9 @@ class FixDurationInputMixin:
             sql = 'CAST(%s AS SIGNED)' % sql
         return sql, params
 
+    # Same behavior in MariaDB
+    as_mariadb = as_mysql
+
     def as_oracle(self, compiler, connection, **extra_context):
         if self.output_field.get_internal_type() == 'DurationField':
             expression = self.get_source_expressions()[0]

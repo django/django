@@ -123,7 +123,7 @@ class DatesTests(TestCase):
             ]
         )
 
-    @skipUnless(connection.vendor == 'mysql', "Test checks MySQL query syntax")
+    @skipUnless(connection.vendor in ('mariadb', 'mysql'), "Test checks MySQL query syntax")
     def test_dates_avoid_datetime_cast(self):
         Article.objects.create(pub_date=datetime.date(2015, 10, 21))
         for kind in ['day', 'month', 'year']:

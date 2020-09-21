@@ -205,7 +205,7 @@ class AdvancedTests(TestCase):
 
 
 @unittest.skipUnless(
-    connection.vendor == 'mysql',
+    connection.vendor in ('mariadb', 'mysql'),
     'UPDATE...ORDER BY syntax is supported on MySQL/MariaDB',
 )
 class MySQLUpdateOrderByTest(TestCase):

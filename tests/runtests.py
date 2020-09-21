@@ -139,7 +139,7 @@ def setup(verbosity, test_labels, parallel, start_at, start_after):
                         "and its subclasses.")
     TransactionTestCase.available_apps = property(no_available_apps)
     TestCase.available_apps = None
-
+    print(settings)
     state = {
         'INSTALLED_APPS': settings.INSTALLED_APPS,
         'ROOT_URLCONF': getattr(settings, "ROOT_URLCONF", ""),

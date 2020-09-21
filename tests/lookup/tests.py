@@ -14,6 +14,7 @@ from django.utils.deprecation import RemovedInDjango40Warning
 from .models import (
     Article, Author, Freebie, Game, IsNullWithNoneAsRHS, Player, Season, Tag,
 )
+import unittest
 
 
 class LookupTests(TestCase):
@@ -622,6 +623,10 @@ class LookupTests(TestCase):
         query = Article.objects.filter(slug__in=['a%d' % i for i in range(1, 8)]).values('pk').query
         self.assertIn(' IN (a1, a2, a3, a4, a5, a6, a7) ', str(query))
 
+    @unittest.skipIf(
+        connection.vendor == 'mariadb',
+        'MariaDB does not substitute parameters in query due to use of binary protocol'
+    )
     def test_in_ignore_none(self):
         with self.assertNumQueries(1) as ctx:
             self.assertSequenceEqual(
@@ -635,6 +640,10 @@ class LookupTests(TestCase):
         with self.assertNumQueries(0):
             self.assertSequenceEqual(Article.objects.filter(id__in=[None]), [])
 
+    @unittest.skipIf(
+        connection.vendor == 'mariadb',
+        'MariaDB does not substitute parameters in query due to use of binary protocol'
+    )
     def test_in_ignore_none_with_unhashable_items(self):
         class UnhashableInt(int):
             __hash__ = None

@@ -313,6 +313,10 @@ class CaptureQueriesContextManagerTests(TestCase):
     def setUpTestData(cls):
         cls.person_pk = str(Person.objects.create(name='test').pk)
 
+    @unittest.skipIf(
+        connection.vendor == 'mariadb',
+        'MariaDB does not substitute parameters in query due to use of binary protocol'
+    )
     def test_simple(self):
         with CaptureQueriesContext(connection) as captured_queries:
             Person.objects.get(pk=self.person_pk)
@@ -323,12 +327,20 @@ class CaptureQueriesContextManagerTests(TestCase):
             pass
         self.assertEqual(0, len(captured_queries))
 
+    @unittest.skipIf(
+        connection.vendor == 'mariadb',
+        'MariaDB does not substitute parameters in query due to use of binary protocol'
+    )
     def test_within(self):
         with CaptureQueriesContext(connection) as captured_queries:
             Person.objects.get(pk=self.person_pk)
             self.assertEqual(len(captured_queries), 1)
             self.assertIn(self.person_pk, captured_queries[0]['sql'])
 
+    @unittest.skipIf(
+        connection.vendor == 'mariadb',
+        'MariaDB does not substitute parameters in query due to use of binary protocol'
+    )
     def test_nested(self):
         with CaptureQueriesContext(connection) as captured_queries:
             Person.objects.count()
@@ -342,6 +354,10 @@ class CaptureQueriesContextManagerTests(TestCase):
             with CaptureQueriesContext(connection):
                 raise TypeError
 
+    @unittest.skipIf(
+        connection.vendor == 'mariadb',
+        'MariaDB does not substitute parameters in query due to use of binary protocol'
+    )
     def test_with_client(self):
         with CaptureQueriesContext(connection) as captured_queries:
             self.client.get("/test_utils/get_person/%s/" % self.person_pk)

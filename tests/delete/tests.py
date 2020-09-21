@@ -5,6 +5,7 @@ from django.db.models import ProtectedError, RestrictedError
 from django.db.models.deletion import Collector
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+import unittest
 
 from .models import (
     B1, B2, B3, MR, A, Avatar, B, Base, Child, DeleteBottom, DeleteTop,
@@ -570,6 +571,10 @@ class DeletionTests(TestCase):
         with self.assertNumQueries(2):
             avatar.delete()
 
+    @unittest.skipIf(
+        connection.vendor == 'mariadb',
+        'MariaDB does not substitute parameters in query due to use of binary protocol'
+    )
     def test_only_referenced_fields_selected(self):
         """
         Only referenced fields are selected during cascade deletion SELECT

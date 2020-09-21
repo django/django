@@ -618,7 +618,7 @@ class SchemaTests(TransactionTestCase):
         # these two types.
         self.assertIn(columns['bits'][0], ("BinaryField", "TextField"))
 
-    @unittest.skipUnless(connection.vendor == 'mysql', "MySQL specific")
+    @unittest.skipUnless(connection.vendor in ('mariadb', 'mysql'), "MySQL/MariaDB specific")
     def test_add_binaryfield_mediumblob(self):
         """
         Test adding a custom-sized binary field on MySQL (#24846).
@@ -717,7 +717,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_alter_not_unique_field_to_primary_key(self):
         if (
-            connection.vendor == 'mysql' and
+            connection.vendor in ('mariadb', 'mysql') and
             connection.mysql_is_mariadb and
             (10, 4, 3) < connection.mysql_version < (10, 5, 2)
         ):
@@ -2565,7 +2565,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
             editor.create_model(Book)
-        if connection.vendor == 'mysql':
+        if connection.vendor in ('mariadb', 'mysql'):
             self.assertForeignKeyExists(Book, 'author_id', '"table_author_double_quoted"')
         else:
             self.assertForeignKeyExists(Book, 'author_id', 'table_author_double_quoted')
@@ -2989,7 +2989,7 @@ class SchemaTests(TransactionTestCase):
         foreign key (#26384).
         """
         if (
-            connection.vendor == 'mysql' and
+            connection.vendor in ('mariadb', 'mysql') and
             connection.mysql_is_mariadb and
             (10, 4, 12) < connection.mysql_version < (10, 5)
         ):

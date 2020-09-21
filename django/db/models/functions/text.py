@@ -13,6 +13,7 @@ class MySQLSHA2Mixin:
             template='SHA2(%%(expressions)s, %s)' % self.function[3:],
             **extra_content,
         )
+    as_mariadb = as_mysql
 
 
 class OracleHashMixin:
@@ -50,6 +51,13 @@ class Chr(Transform):
             **extra_context
         )
 
+    def as_mariadb(self, compiler, connection, **extra_context):
+        return super().as_sql(
+            compiler, connection, function='CHAR',
+            template='%(function)s(%(expressions)s USING utf8mb4)',
+            **extra_context
+        )
+
     def as_oracle(self, compiler, connection, **extra_context):
         return super().as_sql(
             compiler, connection,
@@ -82,6 +90,8 @@ class ConcatPair(Func):
             template="%(function)s('', %(expressions)s)",
             **extra_context
         )
+
+    as_mariadb = as_mysql
 
     def coalesce(self):
         # null on either side results in null for expression, wrap with coalesce
@@ -150,6 +160,8 @@ class Length(Transform):
     def as_mysql(self, compiler, connection, **extra_context):
         return super().as_sql(compiler, connection, function='CHAR_LENGTH', **extra_context)
 
+    as_mariadb = as_mysql
+
 
 class Lower(Transform):
     function = 'LOWER'
@@ -183,6 +195,8 @@ class Ord(Transform):
 
     def as_mysql(self, compiler, connection, **extra_context):
         return super().as_sql(compiler, connection, function='ORD', **extra_context)
+
+    as_mariadb = as_mysql
 
     def as_sqlite(self, compiler, connection, **extra_context):
         return super().as_sql(compiler, connection, function='UNICODE', **extra_context)

@@ -364,7 +364,7 @@ class CharFieldTests(SimpleTestCase):
             ),
         ])
 
-    @unittest.skipUnless(connection.vendor == 'mysql',
+    @unittest.skipUnless(connection.vendor in ('mariadb', 'mysql'),
                          "Test valid only for MySQL")
     def test_too_long_char_field_under_mysql(self):
         from django.db.backends.mysql.validation import DatabaseValidation

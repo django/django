@@ -321,6 +321,9 @@ class GeoHash(GeoFunc):
             clone.source_expressions.append(Value(100))
         return clone.as_sql(compiler, connection, **extra_context)
 
+    # Same behavior in MariaDB
+    as_mariadb = as_mysql
+
 
 class GeometryDistance(GeoFunc):
     output_field = FloatField()

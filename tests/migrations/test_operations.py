@@ -10,6 +10,7 @@ from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 
 from .models import FoodManager, FoodQuerySet, UnicodeModel
 from .test_base import OperationTestBase
+from unittest import skipIf
 
 
 class Mixin:
@@ -1727,6 +1728,7 @@ class OperationTests(OperationTestBase):
                 operation.database_backwards('test_rfwdbc', editor, new_state, project_state)
         self.assertColumnExists('test_rfwdbc_pony', 'db_fk_field')
 
+    @skipIf(connection.vendor == 'mariadb', "MariaDB Bug MDEV-23852")
     def test_rename_field_case(self):
         project_state = self.apply_operations('test_rfmx', ProjectState(), operations=[
             migrations.CreateModel('Pony', fields=[

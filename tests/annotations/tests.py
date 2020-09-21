@@ -659,7 +659,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         ])
 
     def test_annotation_aggregate_with_m2o(self):
-        if connection.vendor == 'mysql' and 'ONLY_FULL_GROUP_BY' in connection.sql_mode:
+        if connection.vendor in ('mariadb', 'mysql') and 'ONLY_FULL_GROUP_BY' in connection.sql_mode:
             self.skipTest(
                 'GROUP BY optimization does not work properly when '
                 'ONLY_FULL_GROUP_BY mode is enabled on MySQL, see #31331.'

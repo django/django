@@ -354,7 +354,7 @@ class AtomicErrorsTests(TransactionTestCase):
         self.assertEqual(Reporter.objects.count(), 0)
 
 
-@skipUnless(connection.vendor == 'mysql', "MySQL-specific behaviors")
+@skipUnless(connection.vendor in ('mariadb', 'mysql'), "MySQL-specific behaviors")
 class AtomicMySQLTests(TransactionTestCase):
 
     available_apps = ['transactions']

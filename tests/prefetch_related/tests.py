@@ -1,4 +1,4 @@
-from unittest import mock
+from unittest import mock, skipIf
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
@@ -271,6 +271,10 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
         # save of reverse relation assignment.
         self.assertEqual(self.author1.books.count(), 2)
 
+    @skipIf(
+        connection.vendor == 'mariadb',
+        'MariaDB does not substitute parameters in query due to use of binary protocol'
+    )
     def test_m2m_then_reverse_fk_object_ids(self):
         with CaptureQueriesContext(connection) as queries:
             list(Book.objects.prefetch_related('authors__addresses'))
@@ -278,6 +282,10 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
         sql = queries[-1]['sql']
         self.assertWhereContains(sql, self.author1.name)
 
+    @skipIf(
+        connection.vendor == 'mariadb',
+        'MariaDB does not substitute parameters in query due to use of binary protocol'
+    )
     def test_m2m_then_m2m_object_ids(self):
         with CaptureQueriesContext(connection) as queries:
             list(Book.objects.prefetch_related('authors__favorite_authors'))
@@ -285,6 +293,10 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
         sql = queries[-1]['sql']
         self.assertWhereContains(sql, self.author1.name)
 
+    @skipIf(
+        connection.vendor == 'mariadb',
+        'MariaDB does not substitute parameters in query due to use of binary protocol'
+    )
     def test_m2m_then_reverse_one_to_one_object_ids(self):
         with CaptureQueriesContext(connection) as queries:
             list(Book.objects.prefetch_related('authors__authorwithage'))

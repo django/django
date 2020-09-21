@@ -4,7 +4,7 @@ from django.db import connection
 from django.test import TestCase
 
 
-@skipUnless(connection.vendor == 'mysql', 'MySQL tests')
+@skipUnless(connection.vendor in ('mariadb', 'mysql'), 'MySQL tests')
 class ParsingTests(TestCase):
     def test_parse_constraint_columns(self):
         _parse_constraint_columns = connection.introspection._parse_constraint_columns

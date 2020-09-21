@@ -73,6 +73,10 @@ class LastExecutedQueryTest(TestCase):
             last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
         self.assertIsInstance(last_sql, str)
 
+    @unittest.skipIf(
+        connection.vendor == 'mariadb',
+        'MariaDB does not substitute parameters in query due to use of binary protocol'
+    )
     def test_last_executed_query(self):
         # last_executed_query() interpolate all parameters, in most cases it is
         # not equal to QuerySet.query.
@@ -275,6 +279,10 @@ class BackendTestCase(TransactionTestCase):
         self.create_squares_with_executemany(args)
         self.assertEqual(Square.objects.count(), 0)
 
+    @unittest.skipIf(
+        connection.vendor == 'mariadb',
+        'MariaDB accepts Tuple/List object for parameters'
+    )
     def test_cursor_executemany_with_iterator(self):
         # Test executemany accepts iterators #10320
         args = ((i, i ** 2) for i in range(-3, 2))

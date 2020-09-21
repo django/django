@@ -1046,7 +1046,6 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         melb = pytz.timezone('Australia/Melbourne')
         delta_tzinfo_pos = datetime_timezone(timedelta(hours=5))
         delta_tzinfo_neg = datetime_timezone(timedelta(hours=-5, minutes=17))
-
         qs = DTModel.objects.annotate(
             day=Extract('start_datetime', 'day'),
             day_melb=Extract('start_datetime', 'day', tzinfo=melb),
@@ -1216,7 +1215,6 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                 ],
                 lambda m: (m.start_datetime, m.truncated)
             )
-
         test_date_kind('year')
         test_date_kind('quarter')
         test_date_kind('month')

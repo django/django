@@ -47,6 +47,7 @@ class SchemaIndexesTests(TestCase):
         )
         expected = {
             'mysql': 'indexes_article_c1_c2_looooooooooooooooooo_255179b2ix',
+            'mariadb': 'indexes_article_c1_c2_looooooooooooooooooo_255179b2ix',
             'oracle': 'indexes_a_c1_c2_loo_255179b2ix',
             'postgresql': 'indexes_article_c1_c2_loooooooooooooooooo_255179b2ix',
             'sqlite': 'indexes_article_c1_c2_l%sng_255179b2ix' % ('o' * 100),
@@ -296,7 +297,7 @@ class SchemaIndexesPostgreSQLTests(TransactionTestCase):
             )
 
 
-@skipUnless(connection.vendor == 'mysql', 'MySQL tests')
+@skipUnless(connection.vendor in ('mariadb', 'mysql'), 'MySQL tests')
 class SchemaIndexesMySQLTests(TransactionTestCase):
     available_apps = ['indexes']
 

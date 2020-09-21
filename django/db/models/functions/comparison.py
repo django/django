@@ -40,6 +40,9 @@ class Cast(Func):
             template = "JSON_EXTRACT(%(expressions)s, '$')"
         return self.as_sql(compiler, connection, template=template, **extra_context)
 
+    # Same behavior in MariaDB
+    as_mariadb = as_mysql
+
     def as_postgresql(self, compiler, connection, **extra_context):
         # CAST would be valid too, but the :: shortcut syntax is more readable.
         # 'expressions' is wrapped in parentheses in case it's a complex

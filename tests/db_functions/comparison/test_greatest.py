@@ -33,7 +33,7 @@ class GreatestTests(TestCase):
         articles = Article.objects.annotate(last_updated=Greatest('written', 'published'))
         self.assertIsNone(articles.first().last_updated)
 
-    @skipIf(connection.vendor == 'mysql', "This doesn't work on MySQL")
+    @skipIf(connection.vendor in ('mariadb', 'mysql'), "This doesn't work on MySQL")
     def test_coalesce_workaround(self):
         past = datetime(1900, 1, 1)
         now = timezone.now()
@@ -46,7 +46,7 @@ class GreatestTests(TestCase):
         )
         self.assertEqual(articles.first().last_updated, now)
 
-    @skipUnless(connection.vendor == 'mysql', "MySQL-specific workaround")
+    @skipUnless(connection.vendor in ('mariadb', 'mysql'), "MySQL-specific workaround")
     def test_coalesce_workaround_mysql(self):
         past = datetime(1900, 1, 1)
         now = timezone.now()

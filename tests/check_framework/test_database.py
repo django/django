@@ -16,7 +16,7 @@ class DatabaseCheckTests(TestCase):
         check_database_backends(databases=self.databases)
         self.assertTrue(mocked_check.called)
 
-    @unittest.skipUnless(connection.vendor == 'mysql', 'Test only for MySQL')
+    @unittest.skipUnless(connection.vendor in ('mariadb', 'mysql'), 'Test only for MySQL')
     def test_mysql_strict_mode(self):
         def _clean_sql_mode():
             for alias in self.databases:

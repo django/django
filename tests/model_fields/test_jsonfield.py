@@ -313,7 +313,7 @@ class TestQuerying(TestCase):
         )
 
     def test_ordering_by_transform(self):
-        mariadb = connection.vendor == 'mysql' and connection.mysql_is_mariadb
+        mariadb = connection.vendor in ('mariadb', 'mysql') and connection.mysql_is_mariadb
         values = [
             {'ord': 93, 'name': 'bar'},
             {'ord': 22.1, 'name': 'foo'},
