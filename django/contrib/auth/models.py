@@ -368,7 +368,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
 
     def clean(self):
         super().clean()
-        self.email = self.__class__.objects.normalize_email(self.email)
+        self.email = self.__class__._default_manager.normalize_email(self.email)
 
     def get_full_name(self):
         """
