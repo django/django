@@ -570,10 +570,10 @@ class ModelState:
         body['__module__'] = "__fake__"
 
         # resolve metaclass conflicts
-        base_types = {type(base) for base in bases}
-        metaclass_bases = tuple((
+        base_types = [type(base) for base in bases]
+        metaclass_bases = tuple(dict.fromkeys((
             base for base in base_types if all((b == base or not issubclass(b, base) for b in base_types))
-        ))
+        )))
         metaclass = type(f'{self.name}FakeMeta', metaclass_bases, {})
 
         # Restore managers
