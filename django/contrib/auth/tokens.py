@@ -5,7 +5,7 @@ from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.http import base36_to_int, int_to_base36
 
 
-class PasswordResetTokenGenerator:
+class BaseTokenGenerator:
     """
     Strategy object used to generate and check tokens for the password
     reset mechanism.
@@ -15,6 +15,7 @@ class PasswordResetTokenGenerator:
     secret = None
 
     def __init__(self):
+        self.timeout = self.get_timeout()
         self.secret = self.secret or settings.SECRET_KEY
         # RemovedInDjango40Warning: when the deprecation ends, replace with:
         # self.algorithm = self.algorithm or 'sha256'
@@ -56,10 +57,16 @@ class PasswordResetTokenGenerator:
                 return False
 
         # Check the timestamp is within limit.
-        if (self._num_seconds(self._now()) - ts) > settings.PASSWORD_RESET_TIMEOUT:
+        if (self._num_seconds(self._now()) - ts) > self.timeout:
             return False
 
         return True
+
+    def make_hash(self, user, timestamp):
+        raise NotImplementedError('subclasses of BaseTokenGenerator must a provide make_hash() method')
+
+    def get_timeout(self):
+        raise NotImplementedError('subclasses of BaseTokenGenerator must a provide get_timeout() method')
 
     def _make_token_with_timestamp(self, user, timestamp, legacy=False):
         # timestamp is number of seconds since 2001-1-1. Converted to base 36,
@@ -77,6 +84,25 @@ class PasswordResetTokenGenerator:
         return "%s-%s" % (ts_b36, hash_string)
 
     def _make_hash_value(self, user, timestamp):
+        return self.make_hash(user, timestamp)
+
+    def _num_seconds(self, dt):
+        return int((dt - datetime(2001, 1, 1)).total_seconds())
+
+    def _now(self):
+        # Used for mocking in tests
+        return datetime.now()
+
+
+class PasswordResetTokenGenerator(BaseTokenGenerator):
+    """
+    Strategy object used to generate and check tokens for the password
+    reset mechanism.
+    """
+    def get_timeout(self):
+        return settings.PASSWORD_RESET_TIMEOUT
+
+    def make_hash(self, user, timestamp):
         """
         Hash the user's primary key and some user state that's sure to change
         after a password reset to produce a token that invalidated when it's
@@ -95,13 +121,6 @@ class PasswordResetTokenGenerator:
         # database doesn't support microseconds.
         login_timestamp = '' if user.last_login is None else user.last_login.replace(microsecond=0, tzinfo=None)
         return str(user.pk) + user.password + str(login_timestamp) + str(timestamp)
-
-    def _num_seconds(self, dt):
-        return int((dt - datetime(2001, 1, 1)).total_seconds())
-
-    def _now(self):
-        # Used for mocking in tests
-        return datetime.now()
 
 
 default_token_generator = PasswordResetTokenGenerator()
