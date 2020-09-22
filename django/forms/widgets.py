@@ -776,7 +776,7 @@ class CheckboxSelectMultiple(ChoiceWidget):
         return False
 
     def id_for_label(self, id_, index=None):
-        """"
+        """
         Don't include for="field_0" in <label> because clicking such a label
         would toggle the first checkbox.
         """

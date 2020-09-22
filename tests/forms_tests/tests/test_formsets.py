@@ -266,7 +266,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertEqual([form.cleaned_data for form in formset.forms], [{}, {}, {}])
 
     def test_min_num_displaying_more_than_one_blank_form(self):
-        """"
+        """
         More than 1 empty form can also be displayed using formset_factory's
         min_num argument. It will (essentially) increment the extra argument.
         """
