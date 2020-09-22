@@ -356,7 +356,7 @@ class ModelState:
     assign new ones, as these are not detached during a clone.
     """
 
-    def __init__(self, app_label, name, fields, options=None, bases=None, managers=None, metaclass=None):
+    def __init__(self, app_label, name, fields, options=None, bases=None, managers=None):
         self.app_label = app_label
         self.name = name
         self.fields = dict(fields)
@@ -365,7 +365,6 @@ class ModelState:
         self.options.setdefault('constraints', [])
         self.bases = bases or (models.Model,)
         self.managers = managers or []
-        self.metaclass = metaclass
         for name, field in self.fields.items():
             # Sanity-check that fields are NOT already bound to a model.
             if hasattr(field, 'model'):
@@ -549,7 +548,6 @@ class ModelState:
             options=dict(self.options),
             bases=self.bases,
             managers=list(self.managers),
-            metaclass=self.metaclass,
         )
 
     def render(self, apps):
@@ -571,14 +569,12 @@ class ModelState:
         body['Meta'] = meta
         body['__module__'] = "__fake__"
 
-        if self.metaclass:
-            metaclass = self.metaclass
-        else:
-            base_types = {type(base) for base in bases}
-            metaclass_bases = tuple((
-                base for base in base_types if all((b == base or not issubclass(b, base) for b in base_types))
-            ))
-            metaclass = type(f'{self.name}FakeMeta', metaclass_bases, {})
+        # resolve metaclass conflicts
+        base_types = {type(base) for base in bases}
+        metaclass_bases = tuple((
+            base for base in base_types if all((b == base or not issubclass(b, base) for b in base_types))
+        ))
+        metaclass = type(f'{self.name}FakeMeta', metaclass_bases, {})
 
         # Restore managers
         body.update(self.construct_managers())

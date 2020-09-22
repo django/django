@@ -244,8 +244,8 @@ Migrations
 * Migrations now support serialization of pure and concrete path objects from
   :mod:`pathlib`, and :class:`os.PathLike` instances.
 
-* The migration framework now supports models with custom metaclasses and
-  supports changing them.
+* The migration framework now resolves metaclass type conflicts in model
+  migrations.
 
 Models
 ~~~~~~

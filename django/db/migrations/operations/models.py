@@ -43,12 +43,11 @@ class CreateModel(ModelOperation):
 
     serialization_expand_args = ['fields', 'options', 'managers']
 
-    def __init__(self, name, fields, options=None, bases=None, managers=None, metaclass=None):
+    def __init__(self, name, fields, options=None, bases=None, managers=None):
         self.fields = fields
         self.options = options or {}
         self.bases = bases or (models.Model,)
         self.managers = managers or []
-        self.metaclass = metaclass
         super().__init__(name)
         # Sanity-check that there are no duplicated field names, bases, or
         # manager names
@@ -85,7 +84,6 @@ class CreateModel(ModelOperation):
             dict(self.options),
             tuple(self.bases),
             list(self.managers),
-            self.metaclass,
         ))
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
@@ -136,7 +134,6 @@ class CreateModel(ModelOperation):
                     options=self.options,
                     bases=self.bases,
                     managers=self.managers,
-                    metaclass=self.metaclass,
                 ),
             ]
         elif isinstance(operation, AlterModelOptions) and self.name_lower == operation.name_lower:
@@ -147,7 +144,6 @@ class CreateModel(ModelOperation):
                     options={**self.options, **operation.options},
                     bases=self.bases,
                     managers=self.managers,
-                    metaclass=self.metaclass,
                 ),
             ]
         elif isinstance(operation, AlterTogetherOptionOperation) and self.name_lower == operation.name_lower:
@@ -158,7 +154,6 @@ class CreateModel(ModelOperation):
                     options={**self.options, **{operation.option_name: operation.option_value}},
                     bases=self.bases,
                     managers=self.managers,
-                    metaclass=self.metaclass,
                 ),
             ]
         elif isinstance(operation, AlterOrderWithRespectTo) and self.name_lower == operation.name_lower:
@@ -169,7 +164,6 @@ class CreateModel(ModelOperation):
                     options={**self.options, 'order_with_respect_to': operation.order_with_respect_to},
                     bases=self.bases,
                     managers=self.managers,
-                    metaclass=self.metaclass,
                 ),
             ]
         elif isinstance(operation, FieldOperation) and self.name_lower == operation.model_name_lower:
@@ -181,7 +175,6 @@ class CreateModel(ModelOperation):
                         options=self.options,
                         bases=self.bases,
                         managers=self.managers,
-                        metaclass=self.metaclass,
                     ),
                 ]
             elif isinstance(operation, AlterField):
@@ -195,7 +188,6 @@ class CreateModel(ModelOperation):
                         options=self.options,
                         bases=self.bases,
                         managers=self.managers,
-                        metaclass=self.metaclass,
                     ),
                 ]
             elif isinstance(operation, RemoveField):
@@ -222,7 +214,6 @@ class CreateModel(ModelOperation):
                         options=options,
                         bases=self.bases,
                         managers=self.managers,
-                        metaclass=self.metaclass,
                     ),
                 ]
             elif isinstance(operation, RenameField):
@@ -247,7 +238,6 @@ class CreateModel(ModelOperation):
                         options=options,
                         bases=self.bases,
                         managers=self.managers,
-                        metaclass=self.metaclass,
                     ),
                 ]
         return super().reduce(operation, app_label)
