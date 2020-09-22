@@ -2403,6 +2403,37 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, "app", 0, ["DeleteModel"])
         self.assertOperationAttributes(changes, "app", 0, 0, name="Success")
 
+    def test_metaclass_change(self):
+        class AlphaBase(type):
+            pass
+
+        class Alpha(metaclass=AlphaBase):
+            pass
+
+        class ABase(AlphaBase, type(models.Model)):
+            pass
+
+        class BBase(AlphaBase, type(models.Model)):
+            pass
+
+        pre = ModelState(
+            "testapp",
+            "Success",
+            [("a_id", models.AutoField(primary_key=True))],
+            bases=(Alpha, models.Model),
+            metaclass=ABase
+        )
+        post = ModelState(
+            "testapp",
+            "Success",
+            [("a_id", models.AutoField(primary_key=True))],
+            bases=(Alpha, models.Model),
+            metaclass=BBase
+        )
+        """Changing the metaclass should not make a change."""
+        changes = self.get_changes([pre], [post])
+        self.assertNumberMigrations(changes, "testapp", 0)
+
     def test_proxy_bases_first(self):
         """Bases of proxies come first."""
         changes = self.get_changes([], [self.author_empty, self.author_proxy, self.author_proxy_proxy])
