@@ -518,10 +518,9 @@ class AdminSite:
             raise Http404('The requested admin page does not exist.')
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(key=lambda x: x['name'])
-        app_name = apps.get_app_config(app_label).verbose_name
         context = {
             **self.each_context(request),
-            'title': _('%(app)s administration') % {'app': app_name},
+            'title': _('%(app)s administration') % {'app': app_dict['name']},
             'app_list': [app_dict],
             'app_label': app_label,
             **(extra_context or {}),
