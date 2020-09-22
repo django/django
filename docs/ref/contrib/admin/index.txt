@@ -3025,12 +3025,17 @@ Templates can override or extend base admin templates as described in
 
       Each model is a dict with the following keys:
 
+      * ``model``: the model class
       * ``object_name``: class name of the model
       * ``name``: plural name of the model
       * ``perms``: a ``dict`` tracking ``add``, ``change``, ``delete``, and
         ``view`` permissions
       * ``admin_url``: admin changelist URL for the model
       * ``add_url``: admin URL to add a new model instance
+
+    .. versionchanged:: 4.0
+
+        The ``model`` variable for each model was added.
 
 .. method:: AdminSite.has_permission(request)
 

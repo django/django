@@ -461,6 +461,7 @@ class AdminSite:
 
             info = (app_label, model._meta.model_name)
             model_dict = {
+                'model': model,
                 'name': capfirst(model._meta.verbose_name_plural),
                 'object_name': model._meta.object_name,
                 'perms': perms,

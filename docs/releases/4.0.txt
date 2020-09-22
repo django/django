@@ -72,6 +72,9 @@ Minor features
 
 * The navigation sidebar now has a quick filter toolbar.
 
+* The new context variable ``model`` which contains the model class for each
+  model is added to the :meth:`.AdminSite.each_context` method.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
