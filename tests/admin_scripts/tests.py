@@ -194,7 +194,7 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_commands_with_invalid_settings(self):
-        """"
+        """
         Commands that don't require settings succeed if the settings file
         doesn't exist.
         """
