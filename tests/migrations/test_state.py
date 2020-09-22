@@ -410,6 +410,26 @@ class StateTests(SimpleTestCase):
         ModelState.from_model(Book).render(apps)
         ModelState.from_model(Novel).render(apps)
 
+    def test_render_metaclass(self):
+        class AlphaBase(type):
+            pass
+
+        class Alpha(metaclass=AlphaBase):
+            pass
+
+        class SuccessBase(AlphaBase, type(models.Model)):
+            pass
+
+        class Success(Alpha, models.Model, metaclass=SuccessBase):
+            a_id = models.AutoField(primary_key=True)
+
+            class Meta:
+                app_label = "migrations"
+                apps = Apps()
+
+        apps = Apps(["migrations"])
+        ModelState.from_model(Success).render(apps)
+
     def test_render_model_with_multiple_inheritance(self):
         class Foo(models.Model):
             class Meta:
