@@ -336,7 +336,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         ChoiceFormSet = formset_factory(Choice, extra=1, max_num=1, validate_max=True)
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset.non_form_errors(), ['Please submit 1 or fewer forms.'])
+        self.assertEqual(formset.non_form_errors(), ['Please submit at most 1 form.'])
 
     def test_formset_validate_min_flag(self):
         """
@@ -358,7 +358,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         ChoiceFormSet = formset_factory(Choice, extra=1, min_num=3, validate_min=True)
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset.non_form_errors(), ['Please submit 3 or more forms.'])
+        self.assertEqual(formset.non_form_errors(), ['Please submit at least 3 forms.'])
 
     def test_formset_validate_min_unchanged_forms(self):
         """
@@ -394,7 +394,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = ChoiceFormSet(data, prefix='choices')
         self.assertFalse(formset.has_changed())
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset.non_form_errors(), ['Please submit 1 or more forms.'])
+        self.assertEqual(formset.non_form_errors(), ['Please submit at least 1 form.'])
 
     def test_second_form_partially_filled_2(self):
         """A partially completed form is invalid."""
@@ -888,7 +888,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertIs(formset.is_valid(), False)
         self.assertEqual(
             formset.non_form_errors(),
-            ['Please submit 1000 or fewer forms.'],
+            ['Please submit at most 1000 forms.'],
         )
         self.assertEqual(formset.absolute_max, 2000)
 
@@ -912,7 +912,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertEqual(len(formset.forms), 3000)
         self.assertEqual(
             formset.non_form_errors(),
-            ['Please submit 1000 or fewer forms.'],
+            ['Please submit at most 1000 forms.'],
         )
 
     def test_absolute_max_with_max_num(self):
@@ -931,7 +931,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertEqual(len(formset.forms), 1000)
         self.assertEqual(
             formset.non_form_errors(),
-            ['Please submit 30 or fewer forms.'],
+            ['Please submit at most 30 forms.'],
         )
 
     def test_absolute_max_invalid(self):

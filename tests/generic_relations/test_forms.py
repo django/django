@@ -250,7 +250,7 @@ id="id_generic_relations-taggeditem-content_type-object_id-1-id"></p>""" % tagge
         self.assertEqual(len(formset.forms), 1500)
         self.assertEqual(
             formset.non_form_errors(),
-            ['Please submit 1000 or fewer forms.'],
+            ['Please submit at most 1000 forms.'],
         )
 
     def test_absolute_max_with_max_num(self):
@@ -269,7 +269,7 @@ id="id_generic_relations-taggeditem-content_type-object_id-1-id"></p>""" % tagge
         self.assertEqual(len(formset.forms), 100)
         self.assertEqual(
             formset.non_form_errors(),
-            ['Please submit 20 or fewer forms.'],
+            ['Please submit at most 20 forms.'],
         )
 
     def test_can_delete_extra(self):

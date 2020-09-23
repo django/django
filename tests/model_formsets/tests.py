@@ -1267,13 +1267,55 @@ class ModelFormsetTest(TestCase):
         FormSet = modelformset_factory(Price, fields="__all__", extra=1, max_num=1, validate_max=True)
         formset = FormSet(data)
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset.non_form_errors(), ['Please submit 1 or fewer forms.'])
+        self.assertEqual(formset.non_form_errors(), ['Please submit at most 1 form.'])
 
         # Now test the same thing without the validate_max flag to ensure
         # default behavior is unchanged
         FormSet = modelformset_factory(Price, fields="__all__", extra=1, max_num=1)
         formset = FormSet(data)
         self.assertTrue(formset.is_valid())
+
+    def test_modelformset_min_num_equals_max_num_less_than(self):
+        data = {
+            'form-TOTAL_FORMS': '3',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '2',
+            'form-0-slug': 'car-red',
+            'form-1-slug': 'car-blue',
+            'form-2-slug': 'car-black',
+        }
+        FormSet = modelformset_factory(
+            Product,
+            fields='__all__',
+            extra=1,
+            max_num=2,
+            validate_max=True,
+            min_num=2,
+            validate_min=True,
+        )
+        formset = FormSet(data)
+        self.assertFalse(formset.is_valid())
+        self.assertEqual(formset.non_form_errors(), ['Please submit at most 2 forms.'])
+
+    def test_modelformset_min_num_equals_max_num_more_than(self):
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '2',
+            'form-0-slug': 'car-red',
+        }
+        FormSet = modelformset_factory(
+            Product,
+            fields='__all__',
+            extra=1,
+            max_num=2,
+            validate_max=True,
+            min_num=2,
+            validate_min=True,
+        )
+        formset = FormSet(data)
+        self.assertFalse(formset.is_valid())
+        self.assertEqual(formset.non_form_errors(), ['Please submit at least 2 forms.'])
 
     def test_unique_together_validation(self):
         FormSet = modelformset_factory(Price, fields="__all__", extra=1)
@@ -1851,7 +1893,7 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         self.assertEqual(len(formset.forms), 1500)
         self.assertEqual(
             formset.non_form_errors(),
-            ['Please submit 1000 or fewer forms.'],
+            ['Please submit at most 1000 forms.'],
         )
 
     def test_modelformset_factory_absolute_max_with_max_num(self):
@@ -1871,7 +1913,7 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         self.assertEqual(len(formset.forms), 100)
         self.assertEqual(
             formset.non_form_errors(),
-            ['Please submit 20 or fewer forms.'],
+            ['Please submit at most 20 forms.'],
         )
 
     def test_inlineformset_factory_absolute_max(self):
@@ -1892,7 +1934,7 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         self.assertEqual(len(formset.forms), 1500)
         self.assertEqual(
             formset.non_form_errors(),
-            ['Please submit 1000 or fewer forms.'],
+            ['Please submit at most 1000 forms.'],
         )
 
     def test_inlineformset_factory_absolute_max_with_max_num(self):
@@ -1914,7 +1956,7 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         self.assertEqual(len(formset.forms), 100)
         self.assertEqual(
             formset.non_form_errors(),
-            ['Please submit 20 or fewer forms.'],
+            ['Please submit at most 20 forms.'],
         )
 
     def test_modelformset_factory_can_delete_extra(self):
