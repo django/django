@@ -2725,7 +2725,7 @@ PostgreSQL's ``'TEXT'`` output and is used by default, if supported.
 Some databases accept flags that can return more information about the query.
 Pass these flags as keyword arguments. For example, when using PostgreSQL::
 
-    >>> print(Blog.objects.filter(title='My Blog').explain(verbose=True))
+    >>> print(Blog.objects.filter(title='My Blog').explain(verbose=True, analyze=True))
     Seq Scan on public.blog  (cost=0.00..35.50 rows=10 width=12) (actual time=0.004..0.004 rows=10 loops=1)
       Output: id, title
       Filter: (blog.title = 'My Blog'::bpchar)
