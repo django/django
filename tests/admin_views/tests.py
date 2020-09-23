@@ -1033,6 +1033,15 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertContains(response, '<th scope="col" class="column-value">')
         self.assertNotContains(response, '<th scope="col" class="sortable column')
 
+    def test_app_index_context(self):
+        response = self.client.get(reverse('admin:app_list', args=('admin_views',)))
+        self.assertContains(
+            response,
+            '<title>Admin_Views administration | Django site admin</title>',
+        )
+        self.assertEqual(response.context['title'], 'Admin_Views administration')
+        self.assertEqual(response.context['app_label'], 'admin_views')
+
     def test_change_view_subtitle_per_object(self):
         response = self.client.get(
             reverse('admin:admin_views_article_change', args=(self.a1.pk,)),
