@@ -6,6 +6,7 @@ from django.db.backends.base.creation import (
     TEST_DATABASE_PREFIX, BaseDatabaseCreation,
 )
 from django.test import SimpleTestCase, TransactionTestCase
+from django.test.utils import override_settings
 
 from ..models import (
     CircularA, CircularB, Object, ObjectReference, ObjectSelfReference,
@@ -49,31 +50,57 @@ class TestDbSignatureTests(SimpleTestCase):
         self.assertEqual(signature[3], test_name)
 
 
+@override_settings(INSTALLED_APPS=['backends.base.app_unmigrated'])
 @mock.patch.object(connection, 'ensure_connection')
-@mock.patch('django.core.management.commands.migrate.Command.handle', return_value=None)
+@mock.patch.object(connection, 'prepare_database')
+@mock.patch('django.db.migrations.recorder.MigrationRecorder.has_table', return_value=False)
+@mock.patch('django.db.migrations.executor.MigrationExecutor.migrate')
+@mock.patch('django.core.management.commands.migrate.Command.sync_apps')
 class TestDbCreationTests(SimpleTestCase):
-    def test_migrate_test_setting_false(self, mocked_migrate, mocked_ensure_connection):
+    available_apps = ['backends.base.app_unmigrated']
+
+    def test_migrate_test_setting_false(self, mocked_sync_apps, mocked_migrate, *mocked_objects):
         test_connection = get_connection_copy()
         test_connection.settings_dict['TEST']['MIGRATE'] = False
         creation = test_connection.creation_class(test_connection)
+        if connection.vendor == 'oracle':
+            # Don't close connection on Oracle.
+            creation.connection.close = mock.Mock()
         old_database_name = test_connection.settings_dict['NAME']
         try:
             with mock.patch.object(creation, '_create_test_db'):
                 creation.create_test_db(verbosity=0, autoclobber=True, serialize=False)
-            mocked_migrate.assert_not_called()
+            # Migrations don't run.
+            mocked_migrate.assert_called()
+            args, kwargs = mocked_migrate.call_args
+            self.assertEqual(args, ([],))
+            self.assertEqual(kwargs['plan'], [])
+            # App is synced.
+            mocked_sync_apps.assert_called()
+            mocked_args, _ = mocked_sync_apps.call_args
+            self.assertEqual(mocked_args[1], {'app_unmigrated'})
         finally:
             with mock.patch.object(creation, '_destroy_test_db'):
                 creation.destroy_test_db(old_database_name, verbosity=0)
 
-    def test_migrate_test_setting_true(self, mocked_migrate, mocked_ensure_connection):
+    def test_migrate_test_setting_true(self, mocked_sync_apps, mocked_migrate, *mocked_objects):
         test_connection = get_connection_copy()
         test_connection.settings_dict['TEST']['MIGRATE'] = True
         creation = test_connection.creation_class(test_connection)
+        if connection.vendor == 'oracle':
+            # Don't close connection on Oracle.
+            creation.connection.close = mock.Mock()
         old_database_name = test_connection.settings_dict['NAME']
         try:
             with mock.patch.object(creation, '_create_test_db'):
                 creation.create_test_db(verbosity=0, autoclobber=True, serialize=False)
-            mocked_migrate.assert_called_once()
+            # Migrations run.
+            mocked_migrate.assert_called()
+            args, kwargs = mocked_migrate.call_args
+            self.assertEqual(args, ([('app_unmigrated', '0001_initial')],))
+            self.assertEqual(len(kwargs['plan']), 1)
+            # App is not synced.
+            mocked_sync_apps.assert_not_called()
         finally:
             with mock.patch.object(creation, '_destroy_test_db'):
                 creation.destroy_test_db(old_database_name, verbosity=0)

@@ -19,3 +19,7 @@ Bugfixes
 
 * Fixed a regression in Django 3.1 where a queryset would crash if it contained
   an aggregation and a ``Q`` object annotation (:ticket:`32007`).
+
+* Fixed a bug in Django 3.1 where a test database was not synced during
+  creation when using the :setting:`MIGRATE <TEST_MIGRATE>` test database
+  setting (:ticket:`32012`).
