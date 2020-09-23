@@ -792,6 +792,8 @@ on :ref:`controlling the creation order of test databases
 Default: ``True``
 
 When set to ``False``, migrations won't run when creating the test database.
+This is similar to setting ``None`` as a value in :setting:`MIGRATION_MODULES`,
+but for all apps.
 
 .. setting:: TEST_MIRROR
 
