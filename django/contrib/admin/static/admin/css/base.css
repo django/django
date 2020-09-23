@@ -554,6 +554,7 @@ ul.messagelist li.error {
     border-radius: 4px;
     background-color: #fff;
     background-position: 5px 12px;
+    overflow-wrap: break-word;
 }
 
 ul.errorlist {
@@ -567,6 +568,7 @@ ul.errorlist li {
     font-size: 13px;
     display: block;
     margin-bottom: 4px;
+    overflow-wrap: break-word;
 }
 
 ul.errorlist li:first-child {
