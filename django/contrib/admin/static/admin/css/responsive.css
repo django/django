@@ -667,7 +667,7 @@ input[type="submit"], button {
         margin-bottom: -3px;
     }
 
-    form .aligned ul.radiolist li + li {
+    form .aligned ul.radiolist:not(.inline) li + li {
         margin-top: 5px;
     }
 
