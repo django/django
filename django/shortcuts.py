@@ -121,10 +121,9 @@ def resolve_url(to, *args, **kwargs):
         # further to some Python functions like urlparse.
         to = str(to)
 
-    if isinstance(to, str):
-        # Handle relative URLs
-        if to.startswith(('./', '../')):
-            return to
+    # Handle relative URLs
+    if isinstance(to, str) and to.startswith(('./', '../')):
+        return to
 
     # Next try a reverse URL resolution.
     try:

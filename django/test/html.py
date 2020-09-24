@@ -23,29 +23,26 @@ class Element:
     def append(self, element):
         if isinstance(element, str):
             element = normalize_whitespace(element)
-            if self.children:
-                if isinstance(self.children[-1], str):
-                    self.children[-1] += element
-                    self.children[-1] = normalize_whitespace(self.children[-1])
-                    return
+            if self.children and isinstance(self.children[-1], str):
+                self.children[-1] += element
+                self.children[-1] = normalize_whitespace(self.children[-1])
+                return
         elif self.children:
             # removing last children if it is only whitespace
             # this can result in incorrect dom representations since
             # whitespace between inline tags like <span> is significant
-            if isinstance(self.children[-1], str):
-                if self.children[-1].isspace():
-                    self.children.pop()
+            if isinstance(self.children[-1], str) and self.children[-1].isspace():
+                self.children.pop()
         if element:
             self.children.append(element)
 
     def finalize(self):
         def rstrip_last_element(children):
-            if children:
-                if isinstance(children[-1], str):
-                    children[-1] = children[-1].rstrip()
-                    if not children[-1]:
-                        children.pop()
-                        children = rstrip_last_element(children)
+            if children and isinstance(children[-1], str):
+                children[-1] = children[-1].rstrip()
+                if not children[-1]:
+                    children.pop()
+                    children = rstrip_last_element(children)
             return children
 
         rstrip_last_element(self.children)
@@ -79,12 +76,10 @@ class Element:
         return hash((self.name, *self.attributes))
 
     def _count(self, element, count=True):
-        if not isinstance(element, str):
-            if self == element:
-                return 1
-        if isinstance(element, RootElement):
-            if self.children == element.children:
-                return 1
+        if not isinstance(element, str) and self == element:
+            return 1
+        if isinstance(element, RootElement) and self.children == element.children:
+            return 1
         i = 0
         elem_child_idx = 0
         for child in self.children:
@@ -241,7 +236,6 @@ def parse_html(html):
     document = parser.root
     document.finalize()
     # Removing ROOT element if it's not necessary
-    if len(document.children) == 1:
-        if not isinstance(document.children[0], str):
-            document = document.children[0]
+    if len(document.children) == 1 and not isinstance(document.children[0], str):
+        document = document.children[0]
     return document

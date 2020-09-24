@@ -180,10 +180,13 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
             return _precondition_failed(request)
 
     # Step 4: Test the If-Modified-Since precondition.
-    if (not if_none_match_etags and if_modified_since and
-            not _if_modified_since_passes(last_modified, if_modified_since)):
-        if request.method in ('GET', 'HEAD'):
-            return _not_modified(request, response)
+    if (
+        not if_none_match_etags and
+        if_modified_since and
+        not _if_modified_since_passes(last_modified, if_modified_since) and
+        request.method in ('GET', 'HEAD')
+    ):
+        return _not_modified(request, response)
 
     # Step 5: Test the If-Range precondition (not supported).
     # Step 6: Return original response since there isn't a conditional response.
