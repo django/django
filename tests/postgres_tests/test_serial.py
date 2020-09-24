@@ -9,11 +9,6 @@ from . import PostgreSQLTestCase, PostgreSQLTransactionTestCase
 from .fields import BigSerialField, SerialField, SmallSerialField
 from .models import SerialModel
 
-try:
-    from django.db.backends.postgresql.base import DatabaseWrapper
-except ImproperlyConfigured:
-    from django.db.backends.dummy.base import DatabaseWrapper
-
 
 @isolate_apps('invalid_models_tests')
 class SerialFieldModelTests(PostgreSQLTestCase):
@@ -36,7 +31,7 @@ class SerialFieldModelTests(PostgreSQLTestCase):
         expected = []
         self.assertEqual(errors, expected)
 
-    def test_internal_type(self):
+    def test_db_type(self):
         class Model(models.Model):
             small = SmallSerialField()
             regular = SerialField()
@@ -46,13 +41,9 @@ class SerialFieldModelTests(PostgreSQLTestCase):
         regular = Model._meta.get_field('regular')
         big = Model._meta.get_field('big')
 
-        self.assertIn(regular.get_internal_type(), DatabaseWrapper.data_types)
-        self.assertIn(small.get_internal_type(), DatabaseWrapper.data_types)
-        self.assertIn(big.get_internal_type(), DatabaseWrapper.data_types)
-
-        self.assertEqual(DatabaseWrapper.data_types[regular.get_internal_type()], 'serial')
-        self.assertEqual(DatabaseWrapper.data_types[small.get_internal_type()], 'smallserial')
-        self.assertEqual(DatabaseWrapper.data_types[big.get_internal_type()], 'bigserial')
+        self.assertEqual(regular.db_type(connection), 'serial')
+        self.assertEqual(small.db_type(connection), 'smallserial')
+        self.assertEqual(big.db_type(connection), 'bigserial')
 
 
 @isolate_apps('postgres_tests')

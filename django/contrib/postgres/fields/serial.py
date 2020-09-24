@@ -30,6 +30,9 @@ class BigSerialField(SerialFieldMixin, models.BigIntegerField):
     def get_internal_type(self):
         return 'BigSerialField'
 
+    def db_type(self, connection):
+        return 'bigserial'
+
 
 class SmallSerialField(SerialFieldMixin, models.SmallIntegerField):
     description = _('Small serial')
@@ -37,9 +40,15 @@ class SmallSerialField(SerialFieldMixin, models.SmallIntegerField):
     def get_internal_type(self):
         return 'SmallSerialField'
 
+    def db_type(self, connection):
+        return 'smallserial'
+
 
 class SerialField(SerialFieldMixin, models.IntegerField):
     description = _('Serial')
 
     def get_internal_type(self):
         return 'SerialField'
+
+    def db_type(self, connection):
+        return 'serial'
