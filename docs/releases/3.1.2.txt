@@ -23,3 +23,6 @@ Bugfixes
 * Fixed a bug in Django 3.1 where a test database was not synced during
   creation when using the :setting:`MIGRATE <TEST_MIGRATE>` test database
   setting (:ticket:`32012`).
+
+* Fixed a ``django.contrib.admin.EmptyFieldListFilter`` crash when using on a
+  ``GenericRelation`` (:ticket:`32038`).
