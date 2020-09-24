@@ -615,7 +615,7 @@ class BaseDatabaseOperations:
         return a tuple of the (min_value, max_value) form representing the
         range of the column type bound to the field.
         """
-        return self.integer_field_ranges[internal_type]
+        return self.integer_field_ranges.get(internal_type, (None, None))
 
     def subtract_temporals(self, internal_type, lhs, rhs):
         if self.connection.features.supports_temporal_subtraction:

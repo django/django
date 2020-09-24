@@ -114,6 +114,9 @@ class SimpleDatabaseOperationTests(SimpleTestCase):
         with self.assertRaisesMessage(NotImplementedError, self.may_require_msg % 'datetime_extract_sql'):
             self.ops.datetime_extract_sql(None, None, None)
 
+    def test_unknown_integer_field_range(self):
+        self.assertEqual(self.ops.integer_field_range('unknown_type'), (None, None))
+
 
 class DatabaseOperationTests(TestCase):
     def setUp(self):
