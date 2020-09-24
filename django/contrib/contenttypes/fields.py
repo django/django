@@ -277,6 +277,7 @@ class GenericRelation(ForeignObject):
 
     # Field flags
     auto_created = False
+    empty_strings_allowed = False
 
     many_to_many = False
     many_to_one = False
@@ -295,6 +296,9 @@ class GenericRelation(ForeignObject):
             limit_choices_to=limit_choices_to,
         )
 
+        # Reverse relations are always nullable (Django can't enforce that a
+        # foreign key on the related model points to this model).
+        kwargs['null'] = True
         kwargs['blank'] = True
         kwargs['on_delete'] = models.CASCADE
         kwargs['editable'] = False
