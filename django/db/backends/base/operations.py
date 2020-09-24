@@ -30,9 +30,6 @@ class BaseDatabaseOperations:
         'SmallAutoField': (-32768, 32767),
         'AutoField': (-2147483648, 2147483647),
         'BigAutoField': (-9223372036854775808, 9223372036854775807),
-        'SmallSerialField': (-32768, 32767),
-        'SerialField': (-2147483648, 2147483647),
-        'BigSerialField': (-9223372036854775808, 9223372036854775807),
     }
     set_operators = {
         'union': 'UNION',
