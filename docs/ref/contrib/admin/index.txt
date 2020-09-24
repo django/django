@@ -992,6 +992,11 @@ subclass::
         The ``FieldListFilter`` API is considered internal and might be
         changed.
 
+      .. note::
+
+        The :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
+        field is not supported.
+
       .. versionadded:: 3.1
 
           The ``EmptyFieldListFilter`` class was added.
