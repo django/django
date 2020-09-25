@@ -787,7 +787,7 @@ For each field, we describe the default widget used if you don't specify
     :class:`~django.db.models.JSONField`.
 
     * Default widget: :class:`Textarea`
-    * Empty value: ``''`` (an empty string)
+    * Empty value: ``None``
     * Normalizes to: A Python representation of the JSON value (usually as a
       ``dict``, ``list``, or ``None``), depending on :attr:`JSONField.decoder`.
     * Validates that the given value is a valid JSON.
@@ -1014,7 +1014,7 @@ For each field, we describe the default widget used if you don't specify
 .. class:: UUIDField(**kwargs)
 
     * Default widget: :class:`TextInput`
-    * Empty value: ``''`` (an empty string)
+    * Empty value: ``None``
     * Normalizes to: A :class:`~python:uuid.UUID` object.
     * Error message keys: ``required``, ``invalid``
 
