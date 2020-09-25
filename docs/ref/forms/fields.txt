@@ -373,13 +373,13 @@ For each field, we describe the default widget used if you don't specify
       ``min_length`` are provided. Otherwise, all inputs are valid.
     * Error message keys: ``required``, ``max_length``, ``min_length``
 
-    Has three optional arguments for validation:
+    Has four optional arguments for validation:
 
     .. attribute:: max_length
     .. attribute:: min_length
 
-    If provided, these arguments ensure that the string is at most or at least
-    the given length.
+        If provided, these arguments ensure that the string is at most or at
+        least the given length.
 
     .. attribute:: strip
 
@@ -774,7 +774,7 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: max_value
     .. attribute:: min_value
 
-    These control the range of values permitted in the field.
+        These control the range of values permitted in the field.
 
 ``JSONField``
 -------------
@@ -1005,7 +1005,8 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: max_length
     .. attribute:: min_length
 
-    These are the same as ``CharField.max_length`` and ``CharField.min_length``.
+        These are the same as ``CharField.max_length`` and
+        ``CharField.min_length``.
 
 ``UUIDField``
 -------------
