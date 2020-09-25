@@ -16,8 +16,8 @@ class JSONFieldTest(SimpleTestCase):
 
     def test_valid_empty(self):
         field = JSONField(required=False)
-        value = field.clean('')
-        self.assertIsNone(value)
+        self.assertIsNone(field.clean(''))
+        self.assertIsNone(field.clean(None))
 
     def test_invalid(self):
         field = JSONField()
