@@ -472,3 +472,6 @@ class Award(models.Model):
 
 class NullableUniqueCharFieldModel(models.Model):
     codename = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    email = models.EmailField(blank=True, null=True)
+    slug = models.SlugField(blank=True, null=True)
+    url = models.URLField(blank=True, null=True)
