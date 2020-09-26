@@ -2,14 +2,14 @@
 Django documentation
 ====================
 
-.. rubric:: Everything you need to know about Django.
+.. rubric:: Everything about Django.
 
 .. _index-first-steps:
 
 First steps
 ===========
 
-Are you new to Django or to programming? This is the place to start!
+New to Django or to programming? This is the place to start!
 
 * **From scratch:**
   :doc:`Overview <intro/overview>` |
@@ -48,7 +48,7 @@ Having trouble? We'd like to help!
 How the documentation is organized
 ==================================
 
-Django has a lot of documentation. A high-level overview of how it's organized
+Django has loads of documentation. A high-level overview of how it's organized
 will help you know where to look for certain things:
 
 * :doc:`Tutorials </intro/index>` take you by the hand through a series of
@@ -197,8 +197,8 @@ manipulation of form data.
 The development process
 =======================
 
-Learn about the various components and tools to help you in the development and
-testing of Django applications:
+Learn about the various components and tools provided to help you in the development and
+testing process of Django applications:
 
 * **Settings:**
   :doc:`Overview <topics/settings>` |
@@ -282,7 +282,7 @@ applications and harness the power of spatially enabled data.
 Common Web application tools
 ============================
 
-Django offers multiple tools commonly needed in the development of Web
+Django provides multiple tools commonly needed in the development of Web
 applications:
 
 * **Authentication:**
@@ -306,7 +306,7 @@ applications:
 Other core functionalities
 ==========================
 
-Learn about some other core functionalities of the Django framework:
+Learn about some other core functionalities provided by the Django framework:
 
 * :doc:`Conditional content processing <topics/conditional-view-processing>`
 * :doc:`Content types and generic relations <ref/contrib/contenttypes>`
