@@ -2,14 +2,14 @@
 Django documentation
 ====================
 
-.. rubric:: Everything you need to know about Django.
+.. rubric:: Everything you need to know about Django is here.
 
 .. _index-first-steps:
 
 First steps
 ===========
 
-Are you new to Django or to programming? This is the place to start!
+Are you new to Django or to programming? This is a great place to start!
 
 * **From scratch:**
   :doc:`Overview <intro/overview>` |
