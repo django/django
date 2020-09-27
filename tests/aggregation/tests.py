@@ -1004,6 +1004,16 @@ class AggregateTestCase(TestCase):
 
         self.assertEqual(author.sum_age, other_author.sum_age)
 
+    def test_aggregate_over_aggregate(self):
+        msg = "Cannot compute Avg('age'): 'age' is an aggregate"
+        with self.assertRaisesMessage(FieldError, msg):
+            Author.objects.annotate(
+                age_alias=F('age'),
+            ).aggregate(
+                age=Sum(F('age')),
+                avg_age=Avg(F('age')),
+            )
+
     def test_annotated_aggregate_over_annotated_aggregate(self):
         with self.assertRaisesMessage(FieldError, "Cannot compute Sum('id__max'): 'id__max' is an aggregate"):
             Book.objects.annotate(Max('id')).annotate(Sum('id__max'))
