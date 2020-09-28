@@ -26,29 +26,24 @@
           main {
             text-align: center;
           }
-          .u-clearfix:after {
-            content: "";
-            clear: both;
-            display: table;
-          }
           h1, h2, h3, h4, h5, p, ul {
             padding: 0;
             margin: 0;
             font-weight: 400;
           }
           header {
+            display: grid;
+            grid-template-columns: auto auto;
+            align-items: self-end;
+            justify-content: space-between;
+            gap: 7px;
             padding-top: 20px;
             padding-bottom: 10px;
           }
           .logo {
-            float: left;
             font-weight: 700;
             font-size: 1.375rem;
             text-decoration: none;
-          }
-          .release-notes {
-            float: right;
-            margin-top: 7px;
           }
           .figure {
             margin-top: 19vh;
@@ -108,8 +103,12 @@
             margin: 15px auto 0;
           }
           footer {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 5px;
             padding: 25px 0;
             position: fixed;
+            box-sizing: border-box;
             left: 50%;
             bottom: 0;
             width: 960px;
@@ -118,11 +117,10 @@
             border-top: 1px solid #efefef;
           }
           .option {
-            display: block;
-            float: left;
-            width: 33.33%;
+            display: grid;
+            grid-template-columns: min-content 1fr;
+            gap: 10px;
             box-sizing: border-box;
-            padding-right: 5px;
             text-decoration: none;
           }
           .option svg {
@@ -132,8 +130,6 @@
             border: 1px solid #d6d6d6;
             padding: 5px;
             border-radius: 100%;
-            float: left;
-            margin-right: 10px;
           }
           .option p {
             font-weight: 300;
@@ -152,27 +148,12 @@
             }
           }
           @media (max-width: 800px) {
-            footer, main {
-              position: relative;
-            }
             footer {
               height: 100%;
-            }
-            .option {
+              grid-template-columns: 1fr;
+              gap: 60px;
               position: relative;
-              width: 100%;
-              left: auto;
-              right: auto;
-              top: auto;
-              padding: 0 25px;
-              margin-bottom: 60px;
-            }
-            .two {
-              margin-left: 0px;
-              transform: none;
-            }
-            .logo, .option, .release-notes {
-              float: none;
+              padding: 25px;
             }
             .figure {
               margin-top: 10px;
@@ -184,11 +165,11 @@
               font-size: 1.25rem;
             }
             header {
+              grid-template-columns: 1fr;
               padding-left: 20px;
               padding-right: 20px;
             }
             footer {
-              overflow: hidden;
               width: 100%;
               margin-top: 50px;
             }
@@ -219,13 +200,11 @@
         </style>
     </head>
     <body>
-      <header class="u-clearfix">
+      <header>
           <a class="logo" href="https://www.djangoproject.com/" target="_blank" rel="noopener">
             django
           </a>
-          <div class="release-notes">
-            <p>{% blocktranslate %}View <a href="https://docs.djangoproject.com/en/{{ version }}/releases/" target="_blank" rel="noopener">release notes</a> for Django {{ version }}{% endblocktranslate %}</p>
-          </div>
+          <p>{% blocktranslate %}View <a href="https://docs.djangoproject.com/en/{{ version }}/releases/" target="_blank" rel="noopener">release notes</a> for Django {{ version }}{% endblocktranslate %}</p>
       </header>
       <main>
         <svg class="figure" viewBox="0 0 508 268" aria-hidden="true">
@@ -242,8 +221,8 @@
         <h1>{% translate "The install worked successfully! Congratulations!" %}</h1>
         <p>{% blocktranslate %}You are seeing this page because <a href="https://docs.djangoproject.com/en/{{ version }}/ref/settings/#debug" target="_blank" rel="noopener">DEBUG=True</a> is in your settings file and you have not configured any URLs.{% endblocktranslate %}</p>
       </main>
-      <footer class="u-clearfix">
-        <a class="option one" href="https://docs.djangoproject.com/en/{{ version }}/" target="_blank" rel="noopener">
+      <footer>
+        <a class="option" href="https://docs.djangoproject.com/en/{{ version }}/" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6A4.997 4.997 0 017 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"></path>
           </svg>
@@ -252,7 +231,7 @@
             {% translate 'Topics, references, &amp; how-to’s' %}
           </p>
         </a>
-        <a class="option two" href="https://docs.djangoproject.com/en/{{ version }}/intro/tutorial01/" target="_blank" rel="noopener">
+        <a class="option" href="https://docs.djangoproject.com/en/{{ version }}/intro/tutorial01/" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"></path>
           </svg>
@@ -261,7 +240,7 @@
             {% translate "Get started with Django" %}
           </p>
         </a>
-        <a class="option three" href="https://www.djangoproject.com/community/" target="_blank" rel="noopener">
+        <a class="option" href="https://www.djangoproject.com/community/" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M16.5 13c-1.2 0-3.07.34-4.5 1-1.43-.67-3.3-1-4.5-1C5.33 13 1 14.08 1 16.25V19h22v-2.75c0-2.17-4.33-3.25-6.5-3.25zm-4 4.5h-10v-1.25c0-.54 2.56-1.75 5-1.75s5 1.21 5 1.75v1.25zm9 0H14v-1.25c0-.46-.2-.86-.52-1.22.88-.3 1.96-.53 3.02-.53 2.44 0 5 1.21 5 1.75v1.25zM7.5 12c1.93 0 3.5-1.57 3.5-3.5S9.43 5 7.5 5 4 6.57 4 8.5 5.57 12 7.5 12zm0-5.5c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 5.5c1.93 0 3.5-1.57 3.5-3.5S18.43 5 16.5 5 13 6.57 13 8.5s1.57 3.5 3.5 3.5zm0-5.5c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"></path>
           </svg>
