@@ -435,6 +435,14 @@ class FileUploadTests(TestCase):
             with self.assertRaisesMessage(AttributeError, msg):
                 self.client.post('/quota/broken/', {'f': file})
 
+    def test_stop_upload_temporary_file_handler(self):
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write(b'a')
+            temp_file.seek(0)
+            response = self.client.post('/temp_file/stop_upload/', {'file': temp_file})
+            temp_path = response.json()['temp_path']
+            self.assertIs(os.path.exists(temp_path), False)
+
     def test_fileupload_getlist(self):
         file = tempfile.NamedTemporaryFile
         with file() as file1, file() as file2, file() as file2a:

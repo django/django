@@ -6,7 +6,9 @@ from django.http import HttpResponse, HttpResponseServerError, JsonResponse
 
 from .models import FileModel
 from .tests import UNICODE_FILENAME, UPLOAD_TO
-from .uploadhandler import ErroringUploadHandler, QuotaUploadHandler
+from .uploadhandler import (
+    ErroringUploadHandler, QuotaUploadHandler, StopUploadTemporaryFileHandler,
+)
 
 
 def file_upload_view(request):
@@ -99,6 +101,15 @@ def file_upload_quota_broken(request):
     response = file_upload_echo(request)
     request.upload_handlers.insert(0, QuotaUploadHandler())
     return response
+
+
+def file_stop_upload_temporary_file(request):
+    request.upload_handlers.insert(0, StopUploadTemporaryFileHandler())
+    request.upload_handlers.pop(2)
+    request.FILES  # Trigger file parsing.
+    return JsonResponse(
+        {'temp_path': request.upload_handlers[0].file.temporary_file_path()},
+    )
 
 
 def file_upload_getlist_count(request):
