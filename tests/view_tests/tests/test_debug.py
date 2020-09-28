@@ -243,7 +243,7 @@ class DebugViewTests(SimpleTestCase):
         response = self.client.get('/')
         self.assertContains(
             response,
-            "<h2>The install worked successfully! Congratulations!</h2>"
+            "<h1>The install worked successfully! Congratulations!</h1>"
         )
 
     @override_settings(ROOT_URLCONF='view_tests.regression_21530_urls')
