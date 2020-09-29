@@ -597,6 +597,7 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
             resp['Cache-Control'] = 'public'
             resp['Content-Location'] = '/alt'
             resp['Content-Language'] = 'en'  # shouldn't be preserved
+            resp['Surrogate-Control'] = 'max-age=300'
             resp['ETag'] = '"spam"'
             resp.set_cookie('key', 'value')
             return resp
@@ -606,7 +607,8 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         new_response = ConditionalGetMiddleware(get_response)(self.req)
         self.assertEqual(new_response.status_code, 304)
         base_response = get_response(self.req)
-        for header in ('Cache-Control', 'Content-Location', 'Date', 'ETag', 'Expires', 'Last-Modified', 'Vary'):
+        for header in ('Cache-Control', 'Content-Location', 'Date', 'ETag', 'Expires',
+                       'Last-Modified', 'Surrogate-Control', 'Vary'):
             self.assertEqual(new_response.headers[header], base_response.headers[header])
         self.assertEqual(new_response.cookies, base_response.cookies)
         self.assertNotIn('Content-Language', new_response)

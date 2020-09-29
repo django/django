@@ -138,7 +138,8 @@ def _not_modified(request, response=None):
     if response:
         # Preserve the headers required by Section 4.1 of RFC 7232, as well as
         # Last-Modified.
-        for header in ('Cache-Control', 'Content-Location', 'Date', 'ETag', 'Expires', 'Last-Modified', 'Vary'):
+        for header in ('Cache-Control', 'Content-Location', 'Date', 'ETag',
+                       'Expires', 'Last-Modified', 'Surrogate-Control', 'Vary'):
             if header in response:
                 new_response.headers[header] = response.headers[header]
 
