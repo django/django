@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-12-28 02:40+0000\n"
-"Last-Translator: Ragnar Rebase <rrebase@gmail.com>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -37,21 +37,11 @@ msgstr "Teisendus sõnedest sõnedeks/tühjadeks"
 msgid "The value of “%(key)s” is not a string or null."
 msgstr "Võtme “%(key)s” väärtus ei ole sõne ega tühi."
 
-msgid "A JSON object"
-msgstr "JSON objekt"
-
-msgid "Value must be valid JSON."
-msgstr "Väärtus peab olema korrektne JSON."
-
 msgid "Could not load JSON data."
 msgstr "Ei saanud laadida JSON andmeid."
 
 msgid "Input must be a JSON dictionary."
 msgstr "Sisend peab olema JSON sõnastik."
-
-#, python-format
-msgid "“%(value)s” value must be valid JSON."
-msgstr "“%(value)s” väärtus peab olema korrektne JSON."
 
 msgid "Enter two valid values."
 msgstr "Sisesta kaks korrektset väärtust."

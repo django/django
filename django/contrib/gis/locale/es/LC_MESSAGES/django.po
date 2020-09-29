@@ -8,13 +8,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Marc Garcia <garcia.marc@gmail.com>, 2011
+# Uriel Medina <urimeba511@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-01-08 08:24+0000\n"
-"Last-Translator: Ernesto Avilés\n"
+"PO-Revision-Date: 2020-09-25 17:36+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -32,8 +33,7 @@ msgstr "El campo GIS base."
 msgid ""
 "The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
-"El campo base Geometry -- coincide con el tipo OpenGIS Specification "
-"Geometry."
+"El campo base Geometry — coincide con el tipo OpenGIS Specification Geometry."
 
 msgid "Point"
 msgstr "Punto"

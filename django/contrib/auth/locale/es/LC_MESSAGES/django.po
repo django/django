@@ -11,14 +11,15 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011
+# Uriel Medina <urimeba511@gmail.com>, 2020
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-01-08 08:16+0000\n"
-"Last-Translator: Ernesto Avilés\n"
+"PO-Revision-Date: 2020-09-25 17:48+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -119,7 +120,7 @@ msgid "iterations"
 msgstr "iteraciones"
 
 msgid "salt"
-msgstr "sal"
+msgstr "salto"
 
 msgid "hash"
 msgstr "función resumen"
@@ -167,7 +168,7 @@ msgid "groups"
 msgstr "grupos"
 
 msgid "superuser status"
-msgstr "es superusuario"
+msgstr "estado de superusuario"
 
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
