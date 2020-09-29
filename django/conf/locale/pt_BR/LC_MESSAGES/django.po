@@ -24,6 +24,7 @@
 # Lucas Infante <maccinza@gmail.com>, 2015
 # Luiz Boaretto <lboaretto@gmail.com>, 2017
 # Marcelo Moro Brondani <mbrondani@inf.ufsm.br>, 2018
+# Samuel Nogueira Bacelar <samuelnbacelar@hotmail.com>, 2020
 # Sandro <sandrossv@hotmail.com>, 2011
 # Sergio Garcia <sergio@ginx.com.br>, 2015
 # Tânia Andrea <taniaa.moreira@gmail.com>, 2017
@@ -34,8 +35,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-05-19 20:23+0200\n"
-"PO-Revision-Date: 2020-07-14 21:42+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2020-09-22 14:14+0000\n"
+"Last-Translator: Samuel Nogueira Bacelar <samuelnbacelar@hotmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -610,7 +611,7 @@ msgid "Boolean (Either True, False or None)"
 msgstr "Booleano (Verdadeiro, Falso ou Nada)"
 
 msgid "Positive big integer"
-msgstr ""
+msgstr "Inteiro grande positivo"
 
 msgid "Positive integer"
 msgstr "Inteiro positivo"
@@ -667,10 +668,10 @@ msgid "Image"
 msgstr "Imagem"
 
 msgid "A JSON object"
-msgstr ""
+msgstr "Um objeto JSON"
 
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "o Valor deve ser um JSON válido"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -765,7 +766,7 @@ msgid "Enter a valid UUID."
 msgstr "Insira um UUID válido."
 
 msgid "Enter a valid JSON."
-msgstr ""
+msgstr "Insira um JSON válido"
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"

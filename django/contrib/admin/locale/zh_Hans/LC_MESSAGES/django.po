@@ -20,6 +20,7 @@
 # yf zhan <daxian12345@gmail.com>, 2018
 # dykai <yingkaidang@gmail.com>, 2019
 # ced773123cfad7b4e8b79ca80f736af9, 2012
+# 嘉琪 方 <370358679@qq.com>, 2020
 # Kevin Sze <leiarix@gmail.com>, 2012
 # 考证 李 <likaozheng@gmail.com>, 2020
 # 雨翌 <yumendy@163.com>, 2016
@@ -29,8 +30,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-14 22:38+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2020-09-11 01:47+0000\n"
+"Last-Translator: 嘉琪 方 <370358679@qq.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -523,7 +524,7 @@ msgid "Forgotten your password or username?"
 msgstr "忘记了您的密码或用户名？"
 
 msgid "Toggle navigation"
-msgstr ""
+msgstr "切换导航"
 
 msgid "Date/time"
 msgstr "日期/时间"

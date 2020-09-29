@@ -4,7 +4,7 @@
 # BouRock, 2019
 # BouRock, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Murat Çorlu <muratcorlu@gmail.com>, 2012
+# Murat Çorlu <muratcorlu@me.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"

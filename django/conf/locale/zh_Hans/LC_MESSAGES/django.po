@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bai HuanCheng <xiqingongzi@gmail.com>, 2017-2018
+# HuanCheng Bai白宦成 <xiqingongzi@gmail.com>, 2017-2018
 # Daniel Duan <DaNmarner@gmail.com>, 2013
 # jamin M <lxxmbyx@163.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -27,14 +27,15 @@
 # ced773123cfad7b4e8b79ca80f736af9, 2011-2012
 # Ziya Tang <tcztzy@gmail.com>, 2018
 # 付峥 <fuzheng1998@outlook.com>, 2018
+# 嘉琪 方 <370358679@qq.com>, 2020
 # Kevin Sze <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-05-19 20:23+0200\n"
-"PO-Revision-Date: 2020-07-14 21:42+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2020-09-11 01:47+0000\n"
+"Last-Translator: 嘉琪 方 <370358679@qq.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -176,7 +177,7 @@ msgid "Indonesian"
 msgstr "印尼语"
 
 msgid "Igbo"
-msgstr ""
+msgstr "伊博"
 
 msgid "Ido"
 msgstr "简化伊多语"
@@ -302,7 +303,7 @@ msgid "Thai"
 msgstr "泰语"
 
 msgid "Turkmen"
-msgstr ""
+msgstr "土库曼人"
 
 msgid "Turkish"
 msgstr "土耳其语"
