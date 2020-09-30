@@ -135,6 +135,11 @@ Minor features
   now checks that the extension already exists in the database and skips the
   migration if so.
 
+* The new :class:`~django.contrib.postgres.operations.CreateCollation` and
+  :class:`~django.contrib.postgres.operations.RemoveCollation` operations
+  allow creating and dropping collations on PostgreSQL. See
+  :ref:`manage-postgresql-collations` for more details.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

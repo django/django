@@ -164,3 +164,100 @@ class RemoveIndexConcurrently(NotInTransactionMixin, RemoveIndex):
             to_model_state = to_state.models[app_label, self.model_name_lower]
             index = to_model_state.get_index_by_name(self.name)
             schema_editor.add_index(model, index, concurrently=True)
+
+
+class CollationOperation(Operation):
+    def __init__(self, name, locale, *, provider='libc', deterministic=True):
+        self.name = name
+        self.locale = locale
+        self.provider = provider
+        self.deterministic = deterministic
+
+    def state_forwards(self, app_label, state):
+        pass
+
+    def deconstruct(self):
+        kwargs = {'name': self.name, 'locale': self.locale}
+        if self.provider and self.provider != 'libc':
+            kwargs['provider'] = self.provider
+        if self.deterministic is False:
+            kwargs['deterministic'] = self.deterministic
+        return (
+            self.__class__.__qualname__,
+            [],
+            kwargs,
+        )
+
+    def create_collation(self, schema_editor):
+        if (
+            self.deterministic is False and
+            not schema_editor.connection.features.supports_non_deterministic_collations
+        ):
+            raise NotSupportedError(
+                'Non-deterministic collations require PostgreSQL 12+.'
+            )
+        if (
+            self.provider != 'libc' and
+            not schema_editor.connection.features.supports_alternate_collation_providers
+        ):
+            raise NotSupportedError('Non-libc providers require PostgreSQL 10+.')
+        args = {'locale': schema_editor.quote_name(self.locale)}
+        if self.provider != 'libc':
+            args['provider'] = schema_editor.quote_name(self.provider)
+        if self.deterministic is False:
+            args['deterministic'] = 'false'
+        schema_editor.execute('CREATE COLLATION %(name)s (%(args)s)' % {
+            'name': schema_editor.quote_name(self.name),
+            'args': ', '.join(f'{option}={value}' for option, value in args.items()),
+        })
+
+    def remove_collation(self, schema_editor):
+        schema_editor.execute(
+            'DROP COLLATION %s' % schema_editor.quote_name(self.name),
+        )
+
+
+class CreateCollation(CollationOperation):
+    """Create a collation."""
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        if (
+            schema_editor.connection.vendor != 'postgresql' or
+            not router.allow_migrate(schema_editor.connection.alias, app_label)
+        ):
+            return
+        self.create_collation(schema_editor)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        if not router.allow_migrate(schema_editor.connection.alias, app_label):
+            return
+        self.remove_collation(schema_editor)
+
+    def describe(self):
+        return f'Create collation {self.name}'
+
+    @property
+    def migration_name_fragment(self):
+        return 'create_collation_%s' % self.name.lower()
+
+
+class RemoveCollation(CollationOperation):
+    """Remove a collation."""
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        if (
+            schema_editor.connection.vendor != 'postgresql' or
+            not router.allow_migrate(schema_editor.connection.alias, app_label)
+        ):
+            return
+        self.remove_collation(schema_editor)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        if not router.allow_migrate(schema_editor.connection.alias, app_label):
+            return
+        self.create_collation(schema_editor)
+
+    def describe(self):
+        return f'Remove collation {self.name}'
+
+    @property
+    def migration_name_fragment(self):
+        return 'remove_collation_%s' % self.name.lower()

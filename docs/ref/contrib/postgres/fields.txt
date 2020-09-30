@@ -285,6 +285,16 @@ transform do not change. For example::
     .. _citext: https://www.postgresql.org/docs/current/citext.html
     .. _the performance considerations: https://www.postgresql.org/docs/current/citext.html#id-1.11.7.17.7
 
+.. admonition:: Case-insensitive collations
+
+    On PostgreSQL 12+, it's preferable to use non-deterministic collations
+    instead of the ``citext`` extension. You can create them using the
+    :class:`~django.contrib.postgres.operations.CreateCollation` migration
+    operation. For more details, see :ref:`manage-postgresql-collations` and
+    the PostgreSQL documentation about `non-deterministic collations`_.
+
+    .. _non-deterministic collations: https://www.postgresql.org/docs/current/collation.html#COLLATION-NONDETERMINISTIC
+
 ``HStoreField``
 ===============
 

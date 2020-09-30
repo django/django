@@ -115,6 +115,56 @@ them. In that case, connect to your Django database and run the query
 
     Installs the ``unaccent`` extension.
 
+.. _manage-postgresql-collations:
+
+Managing collations using migrations
+====================================
+
+.. versionadded:: 3.2
+
+If you need to filter or order a column using a particular collation that your
+operating system provides but PostgreSQL does not, you can manage collations in
+your database using a migration file. These collations can then be used with
+the ``db_collation`` parameter on :class:`~django.db.models.CharField`,
+:class:`~django.db.models.TextField`, and their subclasses.
+
+For example, to create a collation for German phone book ordering::
+
+    from django.contrib.postgres.operations import CreateCollation
+
+    class Migration(migrations.Migration):
+        ...
+
+        operations = [
+            CreateCollation(
+                'german_phonebook',
+                provider='icu',
+                locale='und-u-ks-level2',
+            ),
+            ...
+        ]
+
+.. class:: CreateCollation(name, locale, *, provider='libc', deterministic=True)
+
+    Creates a collation with the given ``name``, ``locale`` and ``provider``.
+
+    Set the ``deterministic`` parameter to ``False`` to create a
+    non-deterministic collation, such as for case-insensitive filtering.
+
+.. class:: RemoveCollation(name, locale, *, provider='libc', deterministic=True)
+
+    Removes the collations named ``name``.
+
+    When reversed this is creating a collation with the provided ``locale``,
+    ``provider``, and ``deterministic`` arguments. Therefore, ``locale`` is
+    required to make this operation reversible.
+
+.. admonition:: Restrictions
+
+    PostgreSQL 9.6 only supports the ``'libc'`` provider.
+
+    Non-deterministic collations are supported only on PostgreSQL 12+.
+
 Concurrent index operations
 ===========================
 

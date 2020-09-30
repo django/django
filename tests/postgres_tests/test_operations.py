@@ -1,11 +1,13 @@
 import unittest
+from unittest import mock
 
 from migrations.test_base import OperationTestBase
 
 from django.db import NotSupportedError, connection
 from django.db.migrations.state import ProjectState
 from django.db.models import Index
-from django.test import modify_settings, override_settings
+from django.db.utils import ProgrammingError
+from django.test import modify_settings, override_settings, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
 from . import PostgreSQLTestCase
@@ -13,8 +15,8 @@ from . import PostgreSQLTestCase
 try:
     from django.contrib.postgres.indexes import BrinIndex, BTreeIndex
     from django.contrib.postgres.operations import (
-        AddIndexConcurrently, BloomExtension, CreateExtension,
-        RemoveIndexConcurrently,
+        AddIndexConcurrently, BloomExtension, CreateCollation, CreateExtension,
+        RemoveCollation, RemoveIndexConcurrently,
     )
 except ImportError:
     pass
@@ -148,7 +150,7 @@ class RemoveIndexConcurrentlyTests(OperationTestBase):
         self.assertEqual(kwargs, {'model_name': 'Pony', 'name': 'pony_pink_idx'})
 
 
-class NoExtensionRouter():
+class NoMigrationRouter():
     def allow_migrate(self, db, app_label, **hints):
         return False
 
@@ -157,7 +159,7 @@ class NoExtensionRouter():
 class CreateExtensionTests(PostgreSQLTestCase):
     app_label = 'test_allow_create_extention'
 
-    @override_settings(DATABASE_ROUTERS=[NoExtensionRouter()])
+    @override_settings(DATABASE_ROUTERS=[NoMigrationRouter()])
     def test_no_allow_migrate(self):
         operation = CreateExtension('tablefunc')
         project_state = ProjectState()
@@ -213,3 +215,199 @@ class CreateExtensionTests(PostgreSQLTestCase):
                 operation.database_backwards(self.app_label, editor, project_state, new_state)
         self.assertEqual(len(captured_queries), 1)
         self.assertIn('SELECT', captured_queries[0]['sql'])
+
+
+@unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific tests.')
+class CreateCollationTests(PostgreSQLTestCase):
+    app_label = 'test_allow_create_collation'
+
+    @override_settings(DATABASE_ROUTERS=[NoMigrationRouter()])
+    def test_no_allow_migrate(self):
+        operation = CreateCollation('C_test', locale='C')
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        # Don't create a collation.
+        with CaptureQueriesContext(connection) as captured_queries:
+            with connection.schema_editor(atomic=False) as editor:
+                operation.database_forwards(self.app_label, editor, project_state, new_state)
+        self.assertEqual(len(captured_queries), 0)
+        # Reversal.
+        with CaptureQueriesContext(connection) as captured_queries:
+            with connection.schema_editor(atomic=False) as editor:
+                operation.database_backwards(self.app_label, editor, new_state, project_state)
+        self.assertEqual(len(captured_queries), 0)
+
+    def test_create(self):
+        operation = CreateCollation('C_test', locale='C')
+        self.assertEqual(operation.migration_name_fragment, 'create_collation_c_test')
+        self.assertEqual(operation.describe(), 'Create collation C_test')
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        # Create a collation.
+        with CaptureQueriesContext(connection) as captured_queries:
+            with connection.schema_editor(atomic=False) as editor:
+                operation.database_forwards(self.app_label, editor, project_state, new_state)
+        self.assertEqual(len(captured_queries), 1)
+        self.assertIn('CREATE COLLATION', captured_queries[0]['sql'])
+        # Creating the same collation raises an exception.
+        with self.assertRaisesMessage(ProgrammingError, 'already exists'):
+            with connection.schema_editor(atomic=True) as editor:
+                operation.database_forwards(self.app_label, editor, project_state, new_state)
+        # Reversal.
+        with CaptureQueriesContext(connection) as captured_queries:
+            with connection.schema_editor(atomic=False) as editor:
+                operation.database_backwards(self.app_label, editor, new_state, project_state)
+        self.assertEqual(len(captured_queries), 1)
+        self.assertIn('DROP COLLATION', captured_queries[0]['sql'])
+        # Deconstruction.
+        name, args, kwargs = operation.deconstruct()
+        self.assertEqual(name, 'CreateCollation')
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {'name': 'C_test', 'locale': 'C'})
+
+    @skipUnlessDBFeature('supports_non_deterministic_collations')
+    def test_create_non_deterministic_collation(self):
+        operation = CreateCollation(
+            'case_insensitive_test',
+            'und-u-ks-level2',
+            provider='icu',
+            deterministic=False,
+        )
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        # Create a collation.
+        with CaptureQueriesContext(connection) as captured_queries:
+            with connection.schema_editor(atomic=False) as editor:
+                operation.database_forwards(self.app_label, editor, project_state, new_state)
+        self.assertEqual(len(captured_queries), 1)
+        self.assertIn('CREATE COLLATION', captured_queries[0]['sql'])
+        # Reversal.
+        with CaptureQueriesContext(connection) as captured_queries:
+            with connection.schema_editor(atomic=False) as editor:
+                operation.database_backwards(self.app_label, editor, new_state, project_state)
+        self.assertEqual(len(captured_queries), 1)
+        self.assertIn('DROP COLLATION', captured_queries[0]['sql'])
+        # Deconstruction.
+        name, args, kwargs = operation.deconstruct()
+        self.assertEqual(name, 'CreateCollation')
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {
+            'name': 'case_insensitive_test',
+            'locale': 'und-u-ks-level2',
+            'provider': 'icu',
+            'deterministic': False,
+        })
+
+    @skipUnlessDBFeature('supports_alternate_collation_providers')
+    def test_create_collation_alternate_provider(self):
+        operation = CreateCollation(
+            'german_phonebook_test',
+            provider='icu',
+            locale='de-u-co-phonebk',
+        )
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        # Create an collation.
+        with CaptureQueriesContext(connection) as captured_queries:
+            with connection.schema_editor(atomic=False) as editor:
+                operation.database_forwards(self.app_label, editor, project_state, new_state)
+        self.assertEqual(len(captured_queries), 1)
+        self.assertIn('CREATE COLLATION', captured_queries[0]['sql'])
+        # Reversal.
+        with CaptureQueriesContext(connection) as captured_queries:
+            with connection.schema_editor(atomic=False) as editor:
+                operation.database_backwards(self.app_label, editor, new_state, project_state)
+        self.assertEqual(len(captured_queries), 1)
+        self.assertIn('DROP COLLATION', captured_queries[0]['sql'])
+
+    def test_nondeterministic_collation_not_supported(self):
+        operation = CreateCollation(
+            'case_insensitive_test',
+            provider='icu',
+            locale='und-u-ks-level2',
+            deterministic=False,
+        )
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        msg = 'Non-deterministic collations require PostgreSQL 12+.'
+        with connection.schema_editor(atomic=False) as editor:
+            with mock.patch(
+                'django.db.backends.postgresql.features.DatabaseFeatures.'
+                'supports_non_deterministic_collations',
+                False,
+            ):
+                with self.assertRaisesMessage(NotSupportedError, msg):
+                    operation.database_forwards(self.app_label, editor, project_state, new_state)
+
+    def test_collation_with_icu_provider_raises_error(self):
+        operation = CreateCollation(
+            'german_phonebook',
+            provider='icu',
+            locale='de-u-co-phonebk',
+        )
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        msg = 'Non-libc providers require PostgreSQL 10+.'
+        with connection.schema_editor(atomic=False) as editor:
+            with mock.patch(
+                'django.db.backends.postgresql.features.DatabaseFeatures.'
+                'supports_alternate_collation_providers',
+                False,
+            ):
+                with self.assertRaisesMessage(NotSupportedError, msg):
+                    operation.database_forwards(self.app_label, editor, project_state, new_state)
+
+
+@unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific tests.')
+class RemoveCollationTests(PostgreSQLTestCase):
+    app_label = 'test_allow_remove_collation'
+
+    @override_settings(DATABASE_ROUTERS=[NoMigrationRouter()])
+    def test_no_allow_migrate(self):
+        operation = RemoveCollation('C_test', locale='C')
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        # Don't create a collation.
+        with CaptureQueriesContext(connection) as captured_queries:
+            with connection.schema_editor(atomic=False) as editor:
+                operation.database_forwards(self.app_label, editor, project_state, new_state)
+        self.assertEqual(len(captured_queries), 0)
+        # Reversal.
+        with CaptureQueriesContext(connection) as captured_queries:
+            with connection.schema_editor(atomic=False) as editor:
+                operation.database_backwards(self.app_label, editor, new_state, project_state)
+        self.assertEqual(len(captured_queries), 0)
+
+    def test_remove(self):
+        operation = CreateCollation('C_test', locale='C')
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        with connection.schema_editor(atomic=False) as editor:
+            operation.database_forwards(self.app_label, editor, project_state, new_state)
+
+        operation = RemoveCollation('C_test', locale='C')
+        self.assertEqual(operation.migration_name_fragment, 'remove_collation_c_test')
+        self.assertEqual(operation.describe(), 'Remove collation C_test')
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        # Remove a collation.
+        with CaptureQueriesContext(connection) as captured_queries:
+            with connection.schema_editor(atomic=False) as editor:
+                operation.database_forwards(self.app_label, editor, project_state, new_state)
+        self.assertEqual(len(captured_queries), 1)
+        self.assertIn('DROP COLLATION', captured_queries[0]['sql'])
+        # Removing a nonexistent collation raises an exception.
+        with self.assertRaisesMessage(ProgrammingError, 'does not exist'):
+            with connection.schema_editor(atomic=True) as editor:
+                operation.database_forwards(self.app_label, editor, project_state, new_state)
+        # Reversal.
+        with CaptureQueriesContext(connection) as captured_queries:
+            with connection.schema_editor(atomic=False) as editor:
+                operation.database_backwards(self.app_label, editor, new_state, project_state)
+        self.assertEqual(len(captured_queries), 1)
+        self.assertIn('CREATE COLLATION', captured_queries[0]['sql'])
+        # Deconstruction.
+        name, args, kwargs = operation.deconstruct()
+        self.assertEqual(name, 'RemoveCollation')
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {'name': 'C_test', 'locale': 'C'})
