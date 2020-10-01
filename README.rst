@@ -1,5 +1,5 @@
 ======
-Django
+Django-web dovelopment
 ======
 
 Django is a high-level Python Web framework that encourages rapid development
