@@ -820,6 +820,15 @@ Methods
 
     Returns the value for the given header name. Case-insensitive.
 
+.. method:: HttpResponse.get(header,alternate=none)
+    
+    Returns the value for the given header, or returns alternate if header
+    doesn't exist.
+
+.. method:: HttpResponse.items()
+
+    Returns all the tuples in the response's headers.
+  
 .. method:: HttpResponse.has_header(header)
 
     Returns ``True`` or ``False`` based on a case-insensitive check for a
