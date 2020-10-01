@@ -820,14 +820,14 @@ Methods
 
     Returns the value for the given header name. Case-insensitive.
 
-.. method:: HttpResponse.get(header,alternate=none)
+.. method:: HttpResponse.get(header,alternate=None)
     
-    Returns the value for the given header, or returns alternate if header
+    Returns the value for the given header, or an ``alternate`` if the header
     doesn't exist.
 
 .. method:: HttpResponse.items()
 
-    Returns all the tuples in the response's headers.
+    Acts like :meth:`dict.items` for :attr:`HttpResponse.headers`.
   
 .. method:: HttpResponse.has_header(header)
 
