@@ -648,21 +648,25 @@ def create_reverse_many_to_one_manager(superclass, rel):
                     raise TypeError("'%s' instance expected, got %r" % (
                         self.model._meta.object_name, obj,
                     ))
+                if getattr(obj, self.field.name) == self.instance:
+                    return False
                 setattr(obj, self.field.name, self.instance)
+                return True
 
             if bulk:
                 pks = []
                 for obj in objs:
-                    check_and_update_obj(obj)
-                    if obj._state.adding or obj._state.db != db:
-                        raise ValueError(
-                            "%r instance isn't saved. Use bulk=False or save "
-                            "the object first." % obj
-                        )
-                    pks.append(obj.pk)
-                self.model._base_manager.using(db).filter(pk__in=pks).update(**{
-                    self.field.name: self.instance,
-                })
+                    if check_and_update_obj(obj):
+                        if obj._state.adding or obj._state.db != db:
+                            raise ValueError(
+                                "%r instance isn't saved. Use bulk=False or save "
+                                "the object first." % obj
+                            )
+                        pks.append(obj.pk)
+                if pks:
+                    self.model._base_manager.using(db).filter(pk__in=pks).update(**{
+                        self.field.name: self.instance,
+                    })
             else:
                 with transaction.atomic(using=db, savepoint=False):
                     for obj in objs:
