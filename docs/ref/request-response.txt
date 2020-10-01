@@ -843,10 +843,19 @@ Methods
 
     Returns the value for the given header name. Case-insensitive.
 
+.. method:: HttpResponse.get(header, alternate=None)
+
+    Returns the value for the given header, or an ``alternate`` if the header
+    doesn't exist.
+
 .. method:: HttpResponse.has_header(header)
 
     Returns ``True`` or ``False`` based on a case-insensitive check for a
     header with the given name.
+
+.. method:: HttpResponse.items()
+
+    Acts like :meth:`dict.items` for HTTP headers on the response.
 
 .. method:: HttpResponse.setdefault(header, value)
 
