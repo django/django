@@ -1,9 +1,8 @@
 ======
-Django
+Django Web Framework
 ======
-
-Django is a high-level Python Web framework that encourages rapid development
-and clean, pragmatic design. Thanks for checking it out.
+Djnago is a free, open-source Python based high-level Python Web framework.
+It follow the Model view template (MVT) architecture.
 
 All documentation is in the "``docs``" directory and online at
 https://docs.djangoproject.com/en/stable/. If you're just getting started,
