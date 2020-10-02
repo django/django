@@ -3,6 +3,7 @@ Tests for stuff in django.utils.datastructures.
 """
 
 import copy
+import pickle
 
 from django.test import SimpleTestCase
 from django.utils.datastructures import (
@@ -57,28 +58,34 @@ class OrderedSetTests(SimpleTestCase):
 
 class MultiValueDictTests(SimpleTestCase):
 
+    def test_repr(self):
+        d = MultiValueDict({'key': 'value'})
+        self.assertEqual(repr(d), "<MultiValueDict: {'key': 'value'}>")
+
     def test_multivaluedict(self):
-        d = MultiValueDict({'name': ['Adrian', 'Simon'], 'position': ['Developer']})
+        d = MultiValueDict({'name': ['Adrian', 'Simon'], 'position': ['Developer'], 'empty': []})
         self.assertEqual(d['name'], 'Simon')
         self.assertEqual(d.get('name'), 'Simon')
         self.assertEqual(d.getlist('name'), ['Adrian', 'Simon'])
         self.assertEqual(
-            sorted(d.items()),
-            [('name', 'Simon'), ('position', 'Developer')]
+            list(d.items()),
+            [('name', 'Simon'), ('position', 'Developer'), ('empty', [])]
         )
         self.assertEqual(
-            sorted(d.lists()),
-            [('name', ['Adrian', 'Simon']), ('position', ['Developer'])]
+            list(d.lists()),
+            [('name', ['Adrian', 'Simon']), ('position', ['Developer']), ('empty', [])]
         )
         with self.assertRaisesMessage(MultiValueDictKeyError, "'lastname'"):
             d.__getitem__('lastname')
+        self.assertIsNone(d.get('empty'))
+        self.assertEqual(d.get('empty', 'nonexistent'), 'nonexistent')
         self.assertIsNone(d.get('lastname'))
         self.assertEqual(d.get('lastname', 'nonexistent'), 'nonexistent')
         self.assertEqual(d.getlist('lastname'), [])
         self.assertEqual(d.getlist('doesnotexist', ['Adrian', 'Simon']), ['Adrian', 'Simon'])
         d.setlist('lastname', ['Holovaty', 'Willison'])
         self.assertEqual(d.getlist('lastname'), ['Holovaty', 'Willison'])
-        self.assertEqual(sorted(d.values()), ['Developer', 'Simon', 'Willison'])
+        self.assertEqual(list(d.values()), ['Simon', 'Developer', [], 'Willison'])
 
     def test_appendlist(self):
         d = MultiValueDict()
@@ -88,23 +95,31 @@ class MultiValueDictTests(SimpleTestCase):
 
     def test_copy(self):
         for copy_func in [copy.copy, lambda d: d.copy()]:
-            d1 = MultiValueDict({
-                "developers": ["Carl", "Fred"]
-            })
-            self.assertEqual(d1["developers"], "Fred")
-            d2 = copy_func(d1)
-            d2.update({"developers": "Groucho"})
-            self.assertEqual(d2["developers"], "Groucho")
-            self.assertEqual(d1["developers"], "Fred")
+            with self.subTest(copy_func):
+                d1 = MultiValueDict({'developers': ['Carl', 'Fred']})
+                self.assertEqual(d1['developers'], 'Fred')
+                d2 = copy_func(d1)
+                d2.update({'developers': 'Groucho'})
+                self.assertEqual(d2['developers'], 'Groucho')
+                self.assertEqual(d1['developers'], 'Fred')
 
-            d1 = MultiValueDict({
-                "key": [[]]
-            })
-            self.assertEqual(d1["key"], [])
-            d2 = copy_func(d1)
-            d2["key"].append("Penguin")
-            self.assertEqual(d1["key"], ["Penguin"])
-            self.assertEqual(d2["key"], ["Penguin"])
+                d1 = MultiValueDict({'key': [[]]})
+                self.assertEqual(d1['key'], [])
+                d2 = copy_func(d1)
+                d2['key'].append('Penguin')
+                self.assertEqual(d1['key'], ['Penguin'])
+                self.assertEqual(d2['key'], ['Penguin'])
+
+    def test_deepcopy(self):
+        d1 = MultiValueDict({'a': [[123]]})
+        d2 = copy.copy(d1)
+        d3 = copy.deepcopy(d1)
+        self.assertIs(d1['a'], d2['a'])
+        self.assertIsNot(d1['a'], d3['a'])
+
+    def test_pickle(self):
+        x = MultiValueDict({'a': ['1', '2'], 'b': ['3']})
+        self.assertEqual(x, pickle.loads(pickle.dumps(x)))
 
     def test_dict_translation(self):
         mvd = MultiValueDict({
@@ -112,7 +127,7 @@ class MultiValueDictTests(SimpleTestCase):
             'pm': ['Rory'],
         })
         d = mvd.dict()
-        self.assertEqual(sorted(d), sorted(mvd))
+        self.assertEqual(list(d), list(mvd))
         for key in mvd:
             self.assertEqual(d[key], mvd[key])
 
@@ -140,6 +155,45 @@ class MultiValueDictTests(SimpleTestCase):
         x = MultiValueDict({'a': None, 'b': []})
         self.assertIsNone(x.getlist('a'))
         self.assertEqual(x.getlist('b'), [])
+
+    def test_setitem(self):
+        x = MultiValueDict({'a': [1, 2]})
+        x['a'] = 3
+        self.assertEqual(list(x.lists()), [('a', [3])])
+
+    def test_setdefault(self):
+        x = MultiValueDict({'a': [1, 2]})
+        a = x.setdefault('a', 3)
+        b = x.setdefault('b', 3)
+        self.assertEqual(a, 2)
+        self.assertEqual(b, 3)
+        self.assertEqual(list(x.lists()), [('a', [1, 2]), ('b', [3])])
+
+    def test_update_too_many_args(self):
+        x = MultiValueDict({'a': []})
+        msg = 'update expected at most 1 argument, got 2'
+        with self.assertRaisesMessage(TypeError, msg):
+            x.update(1, 2)
+
+    def test_update_no_args(self):
+        x = MultiValueDict({'a': []})
+        x.update()
+        self.assertEqual(list(x.lists()), [('a', [])])
+
+    def test_update_dict_arg(self):
+        x = MultiValueDict({'a': [1], 'b': [2], 'c': [3]})
+        x.update({'a': 4, 'b': 5})
+        self.assertEqual(list(x.lists()), [('a', [1, 4]), ('b', [2, 5]), ('c', [3])])
+
+    def test_update_multivaluedict_arg(self):
+        x = MultiValueDict({'a': [1], 'b': [2], 'c': [3]})
+        x.update(MultiValueDict({'a': [4], 'b': [5]}))
+        self.assertEqual(list(x.lists()), [('a', [1, 4]), ('b', [2, 5]), ('c', [3])])
+
+    def test_update_kwargs(self):
+        x = MultiValueDict({'a': [1], 'b': [2], 'c': [3]})
+        x.update(a=4, b=5)
+        self.assertEqual(list(x.lists()), [('a', [1, 4]), ('b', [2, 5]), ('c', [3])])
 
 
 class ImmutableListTests(SimpleTestCase):
