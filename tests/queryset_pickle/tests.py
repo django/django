@@ -219,6 +219,40 @@ class PickleabilityTestCase(TestCase):
         with self.assertNumQueries(0):
             self.assert_pickles(groups)
 
+    def test_pickle_filteredrelation(self):
+        group = Group.objects.create(name='group')
+        event_1 = Event.objects.create(title='Big event', group=group)
+        event_2 = Event.objects.create(title='Small event', group=group)
+        Happening.objects.bulk_create([
+            Happening(event=event_1, number1=5),
+            Happening(event=event_2, number1=3),
+        ])
+        groups = Group.objects.annotate(
+            big_events=models.FilteredRelation(
+                'event',
+                condition=models.Q(event__title__startswith='Big'),
+            ),
+        ).annotate(sum_number=models.Sum('big_events__happening__number1'))
+        groups_query = pickle.loads(pickle.dumps(groups.query))
+        groups = Group.objects.all()
+        groups.query = groups_query
+        self.assertEqual(groups.get().sum_number, 5)
+
+    def test_pickle_filteredrelation_m2m(self):
+        group = Group.objects.create(name='group')
+        m2mmodel = M2MModel.objects.create()
+        m2mmodel.groups.add(group)
+        groups = Group.objects.annotate(
+            first_m2mmodels=models.FilteredRelation(
+                'm2mmodel',
+                condition=models.Q(m2mmodel__pk__lt=10),
+            ),
+        ).annotate(count_groups=models.Count('first_m2mmodels__groups'))
+        groups_query = pickle.loads(pickle.dumps(groups.query))
+        groups = Group.objects.all()
+        groups.query = groups_query
+        self.assertEqual(groups.get().count_groups, 1)
+
     def test_annotation_with_callable_default(self):
         # Happening.when has a callable default of datetime.datetime.now.
         qs = Happening.objects.annotate(latest_time=models.Max('when'))
