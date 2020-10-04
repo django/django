@@ -1,4 +1,7 @@
 import signal
+import subprocess
+import sys
+from pathlib import Path
 from unittest import mock, skipUnless
 
 from django.db import connection
@@ -113,3 +116,13 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
             connection.client.runshell([])
         # dbshell restores the original handler.
         self.assertEqual(sigint_handler, signal.getsignal(signal.SIGINT))
+
+    def test_crash_password_does_not_leak(self):
+        # The password doesn't leak in an exception that results from a client
+        # crash.
+        args, env = self.settings_to_cmd_args_env({'PASSWORD': 'somepassword'}, [])
+        fake_client = Path(__file__).with_name('fake_client.py')
+        args[0:1] = [sys.executable, str(fake_client)]
+        with self.assertRaises(subprocess.CalledProcessError) as ctx:
+            subprocess.run(args, check=True, env=env)
+        self.assertNotIn('somepassword', str(ctx.exception))
