@@ -1,3 +1,7 @@
+import subprocess
+import sys
+from pathlib import Path
+
 from django.db.backends.mysql.client import DatabaseClient
 from django.test import SimpleTestCase
 
@@ -16,12 +20,11 @@ class MySqlDbshellCommandTestCase(SimpleTestCase):
         expected_args = [
             'mysql',
             '--user=someuser',
-            '--password=somepassword',
             '--host=somehost',
             '--port=444',
             'somedbname',
         ]
-        expected_env = None
+        expected_env = {'MYSQL_PWD': 'somepassword'}
         self.assertEqual(
             self.settings_to_cmd_args_env({
                 'NAME': 'somedbname',
@@ -41,12 +44,11 @@ class MySqlDbshellCommandTestCase(SimpleTestCase):
         expected_args = [
             'mysql',
             '--user=optionuser',
-            '--password=optionpassword',
             '--host=optionhost',
             '--port=%s' % options_port,
             'optiondbname',
         ]
-        expected_env = None
+        expected_env = {'MYSQL_PWD': 'optionpassword'}
         self.assertEqual(
             self.settings_to_cmd_args_env({
                 'NAME': 'settingdbname',
@@ -69,12 +71,11 @@ class MySqlDbshellCommandTestCase(SimpleTestCase):
         expected_args = [
             'mysql',
             '--user=someuser',
-            '--password=optionpassword',
             '--host=somehost',
             '--port=444',
             'somedbname',
         ]
-        expected_env = None
+        expected_env = {'MYSQL_PWD': 'optionpassword'}
         self.assertEqual(
             self.settings_to_cmd_args_env({
                 'NAME': 'somedbname',
@@ -91,13 +92,12 @@ class MySqlDbshellCommandTestCase(SimpleTestCase):
         expected_args = [
             'mysql',
             '--user=someuser',
-            '--password=somepassword',
             '--host=somehost',
             '--port=444',
             '--default-character-set=utf8',
             'somedbname',
         ]
-        expected_env = None
+        expected_env = {'MYSQL_PWD': 'somepassword'}
         self.assertEqual(
             self.settings_to_cmd_args_env({
                 'NAME': 'somedbname',
@@ -114,11 +114,10 @@ class MySqlDbshellCommandTestCase(SimpleTestCase):
         expected_args = [
             'mysql',
             '--user=someuser',
-            '--password=somepassword',
             '--socket=/path/to/mysql.socket.file',
             'somedbname',
         ]
-        expected_env = None
+        expected_env = {'MYSQL_PWD': 'somepassword'}
         self.assertEqual(
             self.settings_to_cmd_args_env({
                 'NAME': 'somedbname',
@@ -135,7 +134,6 @@ class MySqlDbshellCommandTestCase(SimpleTestCase):
         expected_args = [
             'mysql',
             '--user=someuser',
-            '--password=somepassword',
             '--host=somehost',
             '--port=444',
             '--ssl-ca=sslca',
@@ -143,7 +141,7 @@ class MySqlDbshellCommandTestCase(SimpleTestCase):
             '--ssl-key=sslkey',
             'somedbname',
         ]
-        expected_env = None
+        expected_env = {'MYSQL_PWD': 'somepassword'}
         self.assertEqual(
             self.settings_to_cmd_args_env({
                 'NAME': 'somedbname',
@@ -177,3 +175,23 @@ class MySqlDbshellCommandTestCase(SimpleTestCase):
             ),
             (['mysql', 'somedbname', '--help'], None),
         )
+
+    def test_crash_password_does_not_leak(self):
+        # The password doesn't leak in an exception that results from a client
+        # crash.
+        args, env = DatabaseClient.settings_to_cmd_args_env(
+            {
+                'NAME': 'somedbname',
+                'USER': 'someuser',
+                'PASSWORD': 'somepassword',
+                'HOST': 'somehost',
+                'PORT': 444,
+                'OPTIONS': {},
+            },
+            [],
+        )
+        fake_client = Path(__file__).with_name('fake_client.py')
+        args[0:1] = [sys.executable, str(fake_client)]
+        with self.assertRaises(subprocess.CalledProcessError) as ctx:
+            subprocess.run(args, check=True, env=env)
+        self.assertNotIn('somepassword', str(ctx.exception))
