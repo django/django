@@ -140,6 +140,12 @@ HTML attribute of field's widget:
     class FileFieldForm(forms.Form):
         file_field = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
 
+.. note::
+	All file type scan be uploaded when ``multiple`` is set to true irrespective of the field type provided a
+	user upload more than 1 file, if only 1 file is uploaded then it should be of field type.
+	For instance, multiple .txt files can be uploaded for an image but uploading a single .txt file for an 
+	image field would raise an error.
+
 Then override the ``post`` method of your
 :class:`~django.views.generic.edit.FormView` subclass to handle multiple file
 uploads:
