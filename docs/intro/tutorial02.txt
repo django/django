@@ -650,7 +650,7 @@ edit it to look like this:
 
     from django.contrib import admin
 
-    from .models import Question
+    from polls.models import Question
 
     admin.site.register(Question)
 
