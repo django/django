@@ -150,7 +150,7 @@ commas, according to publication date:
 
     from django.http import HttpResponse
 
-    from .models import Question
+    from polls.models import Question
 
 
     def index(request):
