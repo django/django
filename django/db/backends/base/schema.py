@@ -1063,9 +1063,25 @@ class BaseDatabaseSchemaEditor:
         _, new_path, new_args, new_kwargs = new_field.deconstruct()
         # Don't alter when:
         # - changing only a field name
+        # - changing an attribute that doesn't affect the schema
         # - adding only a db_column and the column name is not changed
-        old_kwargs.pop('db_column', None)
-        new_kwargs.pop('db_column', None)
+        non_database_attrs = [
+            'blank',
+            'db_column',
+            'editable',
+            'error_messages',
+            'help_text',
+            'limit_choices_to',
+            # Database-level options are not supported, see #21961.
+            'on_delete',
+            'related_name',
+            'related_query_name',
+            'validators',
+            'verbose_name',
+        ]
+        for attr in non_database_attrs:
+            old_kwargs.pop(attr, None)
+            new_kwargs.pop(attr, None)
         return (
             self.quote_name(old_field.column) != self.quote_name(new_field.column) or
             (old_path, old_args, old_kwargs) != (new_path, new_args, new_kwargs)
