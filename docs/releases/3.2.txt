@@ -458,6 +458,10 @@ backends.
 * ``DatabaseOperations.random_function_sql()`` is removed in favor of the new
   :class:`~django.db.models.functions.Random` database function.
 
+* ``DatabaseOperations.date_trunc_sql()`` and
+  ``DatabaseOperations.time_trunc_sql()`` now take the optional ``tzname``
+  argument in order to truncate in a specific timezone.
+
 :mod:`django.contrib.admin`
 ---------------------------
 

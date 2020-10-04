@@ -89,7 +89,8 @@ END;
             # https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/EXTRACT-datetime.html
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
-    def date_trunc_sql(self, lookup_type, field_name):
+    def date_trunc_sql(self, lookup_type, field_name, tzname=None):
+        field_name = self._convert_field_to_tz(field_name, tzname)
         # https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/ROUND-and-TRUNC-Date-Functions.html
         if lookup_type in ('year', 'month'):
             return "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
@@ -114,7 +115,7 @@ END;
         return tzname
 
     def _convert_field_to_tz(self, field_name, tzname):
-        if not settings.USE_TZ:
+        if not (settings.USE_TZ and tzname):
             return field_name
         if not self._tzname_re.match(tzname):
             raise ValueError("Invalid time zone name: %s" % tzname)
@@ -161,10 +162,11 @@ END;
             sql = "CAST(%s AS DATE)" % field_name  # Cast to DATE removes sub-second precision.
         return sql
 
-    def time_trunc_sql(self, lookup_type, field_name):
+    def time_trunc_sql(self, lookup_type, field_name, tzname=None):
         # The implementation is similar to `datetime_trunc_sql` as both
         # `DateTimeField` and `TimeField` are stored as TIMESTAMP where
         # the date part of the later is ignored.
+        field_name = self._convert_field_to_tz(field_name, tzname)
         if lookup_type == 'hour':
             sql = "TRUNC(%s, 'HH24')" % field_name
         elif lookup_type == 'minute':

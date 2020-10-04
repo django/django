@@ -55,7 +55,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             # EXTRACT returns 1-53 based on ISO-8601 for the week number.
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
-    def date_trunc_sql(self, lookup_type, field_name):
+    def date_trunc_sql(self, lookup_type, field_name, tzname=None):
+        field_name = self._convert_field_to_tz(field_name, tzname)
         fields = {
             'year': '%%Y-01-01',
             'month': '%%Y-%%m-01',
@@ -82,7 +83,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return tzname
 
     def _convert_field_to_tz(self, field_name, tzname):
-        if settings.USE_TZ and self.connection.timezone_name != tzname:
+        if tzname and settings.USE_TZ and self.connection.timezone_name != tzname:
             field_name = "CONVERT_TZ(%s, '%s', '%s')" % (
                 field_name,
                 self.connection.timezone_name,
@@ -128,7 +129,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
         return sql
 
-    def time_trunc_sql(self, lookup_type, field_name):
+    def time_trunc_sql(self, lookup_type, field_name, tzname=None):
+        field_name = self._convert_field_to_tz(field_name, tzname)
         fields = {
             'hour': '%%H:00:00',
             'minute': '%%H:%%i:00',

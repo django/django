@@ -213,13 +213,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         else:
             create_deterministic_function = conn.create_function
         create_deterministic_function('django_date_extract', 2, _sqlite_datetime_extract)
-        create_deterministic_function('django_date_trunc', 2, _sqlite_date_trunc)
+        create_deterministic_function('django_date_trunc', 4, _sqlite_date_trunc)
         create_deterministic_function('django_datetime_cast_date', 3, _sqlite_datetime_cast_date)
         create_deterministic_function('django_datetime_cast_time', 3, _sqlite_datetime_cast_time)
         create_deterministic_function('django_datetime_extract', 4, _sqlite_datetime_extract)
         create_deterministic_function('django_datetime_trunc', 4, _sqlite_datetime_trunc)
         create_deterministic_function('django_time_extract', 2, _sqlite_time_extract)
-        create_deterministic_function('django_time_trunc', 2, _sqlite_time_trunc)
+        create_deterministic_function('django_time_trunc', 4, _sqlite_time_trunc)
         create_deterministic_function('django_time_diff', 2, _sqlite_time_diff)
         create_deterministic_function('django_timestamp_diff', 2, _sqlite_timestamp_diff)
         create_deterministic_function('django_format_dtdelta', 3, _sqlite_format_dtdelta)
@@ -445,8 +445,8 @@ def _sqlite_datetime_parse(dt, tzname=None, conn_tzname=None):
     return dt
 
 
-def _sqlite_date_trunc(lookup_type, dt):
-    dt = _sqlite_datetime_parse(dt)
+def _sqlite_date_trunc(lookup_type, dt, tzname, conn_tzname):
+    dt = _sqlite_datetime_parse(dt, tzname, conn_tzname)
     if dt is None:
         return None
     if lookup_type == 'year':
@@ -463,13 +463,17 @@ def _sqlite_date_trunc(lookup_type, dt):
         return "%i-%02i-%02i" % (dt.year, dt.month, dt.day)
 
 
-def _sqlite_time_trunc(lookup_type, dt):
+def _sqlite_time_trunc(lookup_type, dt, tzname, conn_tzname):
     if dt is None:
         return None
-    try:
-        dt = backend_utils.typecast_time(dt)
-    except (ValueError, TypeError):
-        return None
+    dt_parsed = _sqlite_datetime_parse(dt, tzname, conn_tzname)
+    if dt_parsed is None:
+        try:
+            dt = backend_utils.typecast_time(dt)
+        except (ValueError, TypeError):
+            return None
+    else:
+        dt = dt_parsed
     if lookup_type == 'hour':
         return "%02i:00:00" % dt.hour
     elif lookup_type == 'minute':
