@@ -56,7 +56,7 @@ from .features import DatabaseFeatures                      # NOQA isort:skip
 from .introspection import DatabaseIntrospection            # NOQA isort:skip
 from .operations import DatabaseOperations                  # NOQA isort:skip
 from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
-from .utils import Oracle_datetime                          # NOQA isort:skip
+from .utils import dsn, Oracle_datetime                     # NOQA isort:skip
 from .validation import DatabaseValidation                  # NOQA isort:skip
 
 
@@ -218,17 +218,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         use_returning_into = self.settings_dict["OPTIONS"].get('use_returning_into', True)
         self.features.can_return_columns_from_insert = use_returning_into
 
-    def _dsn(self):
-        settings_dict = self.settings_dict
-        if not settings_dict['HOST'].strip():
-            settings_dict['HOST'] = 'localhost'
-        if settings_dict['PORT']:
-            return Database.makedsn(settings_dict['HOST'], int(settings_dict['PORT']), settings_dict['NAME'])
-        return settings_dict['NAME']
-
-    def _connect_string(self):
-        return '%s/"%s"@%s' % (self.settings_dict['USER'], self.settings_dict['PASSWORD'], self._dsn())
-
     def get_connection_params(self):
         conn_params = self.settings_dict['OPTIONS'].copy()
         if 'use_returning_into' in conn_params:
@@ -240,7 +229,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return Database.connect(
             user=self.settings_dict['USER'],
             password=self.settings_dict['PASSWORD'],
-            dsn=self._dsn(),
+            dsn=dsn(self.settings_dict),
             **conn_params,
         )
 

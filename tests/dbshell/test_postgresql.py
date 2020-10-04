@@ -1,41 +1,25 @@
-import os
 import signal
-import subprocess
-from unittest import mock
+from unittest import mock, skipUnless
 
+from django.db import connection
 from django.db.backends.postgresql.client import DatabaseClient
 from django.test import SimpleTestCase
 
 
 class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
-
-    def _run_it(self, dbinfo, parameters=None):
-        """
-        That function invokes the runshell command, while mocking
-        subprocess.run(). It returns a 2-tuple with:
-        - The command line list
-        - The dictionary of PG* environment variables, or {}.
-        """
-        def _mock_subprocess_run(*args, env=os.environ, **kwargs):
-            self.subprocess_args = list(*args)
-            # PostgreSQL environment variables.
-            self.pg_env = {key: env[key] for key in env if key.startswith('PG')}
-            return subprocess.CompletedProcess(self.subprocess_args, 0)
-
+    def settings_to_cmd_args_env(self, settings_dict, parameters=None):
         if parameters is None:
             parameters = []
-        with mock.patch('subprocess.run', new=_mock_subprocess_run):
-            DatabaseClient.runshell_db(dbinfo, parameters)
-        return self.subprocess_args, self.pg_env
+        return DatabaseClient.settings_to_cmd_args_env(settings_dict, parameters)
 
     def test_basic(self):
         self.assertEqual(
-            self._run_it({
-                'database': 'dbname',
-                'user': 'someuser',
-                'password': 'somepassword',
-                'host': 'somehost',
-                'port': '444',
+            self.settings_to_cmd_args_env({
+                'NAME': 'dbname',
+                'USER': 'someuser',
+                'PASSWORD': 'somepassword',
+                'HOST': 'somehost',
+                'PORT': '444',
             }), (
                 ['psql', '-U', 'someuser', '-h', 'somehost', '-p', '444', 'dbname'],
                 {'PGPASSWORD': 'somepassword'},
@@ -44,11 +28,11 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
 
     def test_nopass(self):
         self.assertEqual(
-            self._run_it({
-                'database': 'dbname',
-                'user': 'someuser',
-                'host': 'somehost',
-                'port': '444',
+            self.settings_to_cmd_args_env({
+                'NAME': 'dbname',
+                'USER': 'someuser',
+                'HOST': 'somehost',
+                'PORT': '444',
             }), (
                 ['psql', '-U', 'someuser', '-h', 'somehost', '-p', '444', 'dbname'],
                 {},
@@ -57,15 +41,17 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
 
     def test_ssl_certificate(self):
         self.assertEqual(
-            self._run_it({
-                'database': 'dbname',
-                'user': 'someuser',
-                'host': 'somehost',
-                'port': '444',
-                'sslmode': 'verify-ca',
-                'sslrootcert': 'root.crt',
-                'sslcert': 'client.crt',
-                'sslkey': 'client.key',
+            self.settings_to_cmd_args_env({
+                'NAME': 'dbname',
+                'USER': 'someuser',
+                'HOST': 'somehost',
+                'PORT': '444',
+                'OPTIONS': {
+                    'sslmode': 'verify-ca',
+                    'sslrootcert': 'root.crt',
+                    'sslcert': 'client.crt',
+                    'sslkey': 'client.key',
+                },
             }), (
                 ['psql', '-U', 'someuser', '-h', 'somehost', '-p', '444', 'dbname'],
                 {
@@ -79,12 +65,12 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
 
     def test_column(self):
         self.assertEqual(
-            self._run_it({
-                'database': 'dbname',
-                'user': 'some:user',
-                'password': 'some:password',
-                'host': '::1',
-                'port': '444',
+            self.settings_to_cmd_args_env({
+                'NAME': 'dbname',
+                'USER': 'some:user',
+                'PASSWORD': 'some:password',
+                'HOST': '::1',
+                'PORT': '444',
             }), (
                 ['psql', '-U', 'some:user', '-h', '::1', '-p', '444', 'dbname'],
                 {'PGPASSWORD': 'some:password'},
@@ -95,12 +81,12 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
         username = 'rôle'
         password = 'sésame'
         self.assertEqual(
-            self._run_it({
-                'database': 'dbname',
-                'user': username,
-                'password': password,
-                'host': 'somehost',
-                'port': '444',
+            self.settings_to_cmd_args_env({
+                'NAME': 'dbname',
+                'USER': username,
+                'PASSWORD': password,
+                'HOST': 'somehost',
+                'PORT': '444',
             }), (
                 ['psql', '-U', username, '-h', 'somehost', '-p', '444', 'dbname'],
                 {'PGPASSWORD': password},
@@ -109,10 +95,11 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
 
     def test_parameters(self):
         self.assertEqual(
-            self._run_it({'database': 'dbname'}, ['--help']),
+            self.settings_to_cmd_args_env({'NAME': 'dbname'}, ['--help']),
             (['psql', 'dbname', '--help'], {}),
         )
 
+    @skipUnless(connection.vendor == 'postgresql', 'Requires a PostgreSQL connection')
     def test_sigint_handler(self):
         """SIGINT is ignored in Python and passed to psql to abort queries."""
         def _mock_subprocess_run(*args, **kwargs):
@@ -123,6 +110,6 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
         # The default handler isn't SIG_IGN.
         self.assertNotEqual(sigint_handler, signal.SIG_IGN)
         with mock.patch('subprocess.run', new=_mock_subprocess_run):
-            DatabaseClient.runshell_db({}, [])
+            connection.client.runshell([])
         # dbshell restores the original handler.
         self.assertEqual(sigint_handler, signal.getsignal(signal.SIGINT))

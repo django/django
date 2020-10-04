@@ -86,7 +86,10 @@ class TransactionalTests(TransactionTestCase):
         old_password = connection.settings_dict['PASSWORD']
         connection.settings_dict['PASSWORD'] = 'p@ssword'
         try:
-            self.assertIn('/"p@ssword"@', connection._connect_string())
+            self.assertIn(
+                '/"p@ssword"@',
+                connection.client.connect_string(connection.settings_dict),
+            )
             with self.assertRaises(DatabaseError) as context:
                 connection.cursor()
             # Database exception: "ORA-01017: invalid username/password" is

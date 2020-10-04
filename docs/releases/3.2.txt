@@ -477,6 +477,12 @@ backends.
   ``DatabaseOperations.time_trunc_sql()`` now take the optional ``tzname``
   argument in order to truncate in a specific timezone.
 
+* ``DatabaseClient.runshell()`` now gets arguments and an optional dictionary
+  with environment variables to the underlying command-line client from
+  ``DatabaseClient.settings_to_cmd_args_env()`` method. Third-party database
+  backends must implement ``DatabaseClient.settings_to_cmd_args_env()`` or
+  override ``DatabaseClient.runshell()``.
+
 :mod:`django.contrib.admin`
 ---------------------------
 
