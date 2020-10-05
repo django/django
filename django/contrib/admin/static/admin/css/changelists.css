@@ -89,7 +89,7 @@
     color: #333;
 }
 
-#searchbar {
+#toolbar #searchbar {
     height: 19px;
     border: 1px solid #ccc;
     padding: 2px 5px;
@@ -99,7 +99,7 @@
     max-width: 100%;
 }
 
-#searchbar:focus {
+#toolbar #searchbar:focus {
     border-color: #999;
 }
 
