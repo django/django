@@ -195,6 +195,35 @@ class MultiValueDictTests(SimpleTestCase):
         x.update(a=4, b=5)
         self.assertEqual(list(x.lists()), [('a', [1, 4]), ('b', [2, 5]), ('c', [3])])
 
+    def test_update_with_empty_iterable(self):
+        for value in ['', b'', (), [], set(), {}]:
+            d = MultiValueDict()
+            d.update(value)
+            self.assertEqual(d, MultiValueDict())
+
+    def test_update_with_iterable_of_pairs(self):
+        for value in [(('a', 1),), [('a', 1)], {('a', 1)}]:
+            d = MultiValueDict()
+            d.update(value)
+            self.assertEqual(d, MultiValueDict({'a': [1]}))
+
+    def test_update_raises_correct_exceptions(self):
+        # MultiValueDict.update() raises equivalent exceptions to
+        # dict.update().
+        # Non-iterable values raise TypeError.
+        for value in [None, True, False, 123, 123.45]:
+            with self.subTest(value), self.assertRaises(TypeError):
+                MultiValueDict().update(value)
+        # Iterables of objects that cannot be unpacked raise TypeError.
+        for value in [b'123', b'abc', (1, 2, 3), [1, 2, 3], {1, 2, 3}]:
+            with self.subTest(value), self.assertRaises(TypeError):
+                MultiValueDict().update(value)
+        # Iterables of unpackable objects with incorrect number of items raise
+        # ValueError.
+        for value in ['123', 'abc', ('a', 'b', 'c'), ['a', 'b', 'c'], {'a', 'b', 'c'}]:
+            with self.subTest(value), self.assertRaises(ValueError):
+                MultiValueDict().update(value)
+
 
 class ImmutableListTests(SimpleTestCase):
 
