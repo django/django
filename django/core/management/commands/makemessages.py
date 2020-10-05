@@ -579,7 +579,7 @@ class Command(BaseCommand):
                 file_path = os.path.normpath(build_files[0].path)
                 raise CommandError(
                     'Unable to find a locale path to store translations for '
-                    'file %s' % file_path
+                    'file %s\n\nWe are looking for a directory called "locale".' % file_path
                 )
             for build_file in build_files:
                 msgs = build_file.postprocess_messages(msgs)
