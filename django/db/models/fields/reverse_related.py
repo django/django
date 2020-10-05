@@ -123,7 +123,7 @@ class ForeignObjectRel(FieldCacheMixin):
             self.model,
             self.related_name,
             self.related_query_name,
-            tuple(sorted(make_hashable(self.limit_choices_to))),
+            make_hashable(self.limit_choices_to),
             self.parent_link,
             self.on_delete,
             self.symmetrical,
