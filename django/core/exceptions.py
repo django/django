@@ -196,15 +196,14 @@ class ValidationError(Exception):
         return hash(self) == hash(other)
 
     def __hash__(self):
-        # Ignore params and messages ordering.
         if hasattr(self, 'message'):
             return hash((
                 self.message,
                 self.code,
-                tuple(sorted(make_hashable(self.params))) if self.params else None,
+                make_hashable(self.params),
             ))
         if hasattr(self, 'error_dict'):
-            return hash(tuple(sorted(make_hashable(self.error_dict))))
+            return hash(make_hashable(self.error_dict))
         return hash(tuple(sorted(self.error_list, key=operator.attrgetter('message'))))
 
 
