@@ -9,4 +9,5 @@ Django 3.1.3 fixes several bugs in 3.1.2.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 3.1.2 that caused the incorrect height of the
+  admin changelist search bar (:ticket:`32072`).
