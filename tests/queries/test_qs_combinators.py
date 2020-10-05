@@ -227,6 +227,22 @@ class QuerySetSetOperationTests(TestCase):
         qs2 = Number.objects.filter(num__lte=5)
         self.assertEqual(qs1.intersection(qs2).count(), 1)
 
+    def test_get_union(self):
+        qs = Number.objects.filter(num=2)
+        self.assertEqual(qs.union(qs).get().num, 2)
+
+    @skipUnlessDBFeature('supports_select_difference')
+    def test_get_difference(self):
+        qs1 = Number.objects.all()
+        qs2 = Number.objects.exclude(num=2)
+        self.assertEqual(qs1.difference(qs2).get().num, 2)
+
+    @skipUnlessDBFeature('supports_select_intersection')
+    def test_get_intersection(self):
+        qs1 = Number.objects.all()
+        qs2 = Number.objects.filter(num=2)
+        self.assertEqual(qs1.intersection(qs2).get().num, 2)
+
     @skipUnlessDBFeature('supports_slicing_ordering_in_compound')
     def test_ordering_subqueries(self):
         qs1 = Number.objects.order_by('num')[:2]
