@@ -1111,6 +1111,18 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
             self.assertEqual(model.day_melb, 16)
             self.assertEqual(model.day_utc, 15)
 
+    def test_extract_invalid_field_with_timezone(self):
+        melb = pytz.timezone('Australia/Melbourne')
+        msg = 'tzinfo can only be used with DateTimeField.'
+        with self.assertRaisesMessage(ValueError, msg):
+            DTModel.objects.annotate(
+                day_melb=Extract('start_date', 'day', tzinfo=melb),
+            ).get()
+        with self.assertRaisesMessage(ValueError, msg):
+            DTModel.objects.annotate(
+                hour_melb=Extract('start_time', 'hour', tzinfo=melb),
+            ).get()
+
     def test_trunc_timezone_applied_before_truncation(self):
         start_datetime = datetime(2016, 1, 1, 1, 30, 50, 321)
         end_datetime = datetime(2016, 6, 15, 14, 10, 50, 123)

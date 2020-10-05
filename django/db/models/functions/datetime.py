@@ -46,6 +46,8 @@ class Extract(TimezoneMixin, Transform):
         if isinstance(lhs_output_field, DateTimeField):
             tzname = self.get_tzname()
             sql = connection.ops.datetime_extract_sql(self.lookup_name, sql, tzname)
+        elif self.tzinfo is not None:
+            raise ValueError('tzinfo can only be used with DateTimeField.')
         elif isinstance(lhs_output_field, DateField):
             sql = connection.ops.date_extract_sql(self.lookup_name, sql)
         elif isinstance(lhs_output_field, TimeField):
