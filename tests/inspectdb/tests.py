@@ -105,6 +105,7 @@ class InspectDBTestCase(TestCase):
         self.assertIn('null_json_field = models.JSONField(blank=True, null=True)', output)
 
     @skipUnlessDBFeature('supports_collation_on_charfield')
+    @skipUnless(test_collation, 'Language collations are not supported.')
     def test_char_field_db_collation(self):
         out = StringIO()
         call_command('inspectdb', 'inspectdb_charfielddbcollation', stdout=out)
@@ -123,6 +124,7 @@ class InspectDBTestCase(TestCase):
             )
 
     @skipUnlessDBFeature('supports_collation_on_textfield')
+    @skipUnless(test_collation, 'Language collations are not supported.')
     def test_text_field_db_collation(self):
         out = StringIO()
         call_command('inspectdb', 'inspectdb_textfielddbcollation', stdout=out)

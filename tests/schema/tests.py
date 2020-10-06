@@ -3236,7 +3236,9 @@ class SchemaTests(TransactionTestCase):
     @isolate_apps('schema')
     @skipUnlessDBFeature('supports_collation_on_charfield')
     def test_db_collation_charfield(self):
-        collation = connection.features.test_collations['non_default']
+        collation = connection.features.test_collations.get('non_default')
+        if not collation:
+            self.skipTest('Language collations are not supported.')
 
         class Foo(Model):
             field = CharField(max_length=255, db_collation=collation)
@@ -3256,7 +3258,9 @@ class SchemaTests(TransactionTestCase):
     @isolate_apps('schema')
     @skipUnlessDBFeature('supports_collation_on_textfield')
     def test_db_collation_textfield(self):
-        collation = connection.features.test_collations['non_default']
+        collation = connection.features.test_collations.get('non_default')
+        if not collation:
+            self.skipTest('Language collations are not supported.')
 
         class Foo(Model):
             field = TextField(db_collation=collation)
@@ -3275,10 +3279,13 @@ class SchemaTests(TransactionTestCase):
 
     @skipUnlessDBFeature('supports_collation_on_charfield')
     def test_add_field_db_collation(self):
+        collation = connection.features.test_collations.get('non_default')
+        if not collation:
+            self.skipTest('Language collations are not supported.')
+
         with connection.schema_editor() as editor:
             editor.create_model(Author)
 
-        collation = connection.features.test_collations['non_default']
         new_field = CharField(max_length=255, db_collation=collation)
         new_field.set_attributes_from_name('alias')
         with connection.schema_editor() as editor:
@@ -3292,10 +3299,13 @@ class SchemaTests(TransactionTestCase):
 
     @skipUnlessDBFeature('supports_collation_on_charfield')
     def test_alter_field_db_collation(self):
+        collation = connection.features.test_collations.get('non_default')
+        if not collation:
+            self.skipTest('Language collations are not supported.')
+
         with connection.schema_editor() as editor:
             editor.create_model(Author)
 
-        collation = connection.features.test_collations['non_default']
         old_field = Author._meta.get_field('name')
         new_field = CharField(max_length=255, db_collation=collation)
         new_field.set_attributes_from_name('name')
@@ -3312,10 +3322,13 @@ class SchemaTests(TransactionTestCase):
 
     @skipUnlessDBFeature('supports_collation_on_charfield')
     def test_alter_field_type_and_db_collation(self):
+        collation = connection.features.test_collations.get('non_default')
+        if not collation:
+            self.skipTest('Language collations are not supported.')
+
         with connection.schema_editor() as editor:
             editor.create_model(Note)
 
-        collation = connection.features.test_collations['non_default']
         old_field = Note._meta.get_field('info')
         new_field = CharField(max_length=255, db_collation=collation)
         new_field.set_attributes_from_name('info')
