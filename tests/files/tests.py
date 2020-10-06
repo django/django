@@ -17,9 +17,11 @@ from django.core.files.uploadedfile import (
 )
 
 try:
-    from PIL import Image
+    from PIL import Image, features
+    HAS_WEBP = features.check('webp')
 except ImportError:
     Image = None
+    HAS_WEBP = False
 else:
     from django.core.files import images
 
@@ -343,6 +345,7 @@ class GetImageDimensionsTests(unittest.TestCase):
                 size = images.get_image_dimensions(fh)
                 self.assertEqual(size, (None, None))
 
+    @unittest.skipUnless(HAS_WEBP, 'WEBP not installed')
     def test_webp(self):
         img_path = os.path.join(os.path.dirname(__file__), 'test.webp')
         with open(img_path, 'rb') as fh:
