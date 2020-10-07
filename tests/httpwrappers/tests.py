@@ -470,6 +470,10 @@ class HttpResponseTests(unittest.TestCase):
         # del doesn't raise a KeyError on nonexistent headers.
         del r.headers['X-Foo']
 
+    def test_content_type(self):
+        r = HttpResponse('hello', content_type='application/json')
+        self.assertEqual(r.headers['Content-Type'], 'application/json')
+
 
 class HttpResponseSubclassesTests(SimpleTestCase):
     def test_redirect(self):
