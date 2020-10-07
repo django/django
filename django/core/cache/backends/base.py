@@ -113,12 +113,29 @@ class BaseCache:
         """
         raise NotImplementedError('subclasses of BaseCache must provide an add() method')
 
+    async def add_async(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+        """
+        Set a value in the cache if the key does not already exist. If
+        timeout is given, use that timeout for the key; otherwise use the
+        default cache timeout.
+
+        Return True if the value was stored, False otherwise.
+        """
+        raise NotImplementedError('subclasses of BaseCache must provide an add_async() method')
+
     def get(self, key, default=None, version=None):
         """
         Fetch a given key from the cache. If the key does not exist, return
         default, which itself defaults to None.
         """
         raise NotImplementedError('subclasses of BaseCache must provide a get() method')
+
+    async def get_async(self, key, default=None, version=None):
+        """
+        Fetch a given key from the cache. If the key does not exist, return
+        default, which itself defaults to None.
+        """
+        raise NotImplementedError('subclasses of BaseCache must provide a get_async() method')
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         """
@@ -127,6 +144,13 @@ class BaseCache:
         """
         raise NotImplementedError('subclasses of BaseCache must provide a set() method')
 
+    async def set_async(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+        """
+        Set a value in the cache. If timeout is given, use that timeout for the
+        key; otherwise use the default cache timeout.
+        """
+        raise NotImplementedError('subclasses of BaseCache must provide a set_async() method')
+
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
         """
         Update the key's expiry time using timeout. Return True if successful
@@ -134,12 +158,26 @@ class BaseCache:
         """
         raise NotImplementedError('subclasses of BaseCache must provide a touch() method')
 
+    async def touch_async(self, key, timeout=DEFAULT_TIMEOUT, version=None):
+        """
+        Update the key's expiry time using timeout. Return True if successful
+        or False if the key does not exist.
+        """
+        raise NotImplementedError('subclasses of BaseCache must provide a touch_async() method')
+
     def delete(self, key, version=None):
         """
         Delete a key from the cache and return whether it succeeded, failing
         silently.
         """
         raise NotImplementedError('subclasses of BaseCache must provide a delete() method')
+
+    async def delete_async(self, key, version=None):
+        """
+        Delete a key from the cache and return whether it succeeded, failing
+        silently.
+        """
+        raise NotImplementedError('subclasses of BaseCache must provide a delete_async() method')
 
     def get_many(self, keys, version=None):
         """
@@ -152,6 +190,21 @@ class BaseCache:
         d = {}
         for k in keys:
             val = self.get(k, version=version)
+            if val is not None:
+                d[k] = val
+        return d
+
+    async def get_many_async(self, keys, version=None):
+        """
+        Fetch a bunch of keys from the cache. For certain backends (memcached,
+        pgsql) this can be *much* faster when fetching multiple values.
+
+        Return a dict mapping each key in keys to its value. If the given
+        key is missing, it will be missing from the response dict.
+        """
+        d = {}
+        for k in keys:
+            val = await self.get_async(k, version=version)
             if val is not None:
                 d[k] = val
         return d
@@ -177,11 +230,38 @@ class BaseCache:
                 return self.get(key, default, version=version)
         return val
 
+    async def get_or_set_async(self, key, default, timeout=DEFAULT_TIMEOUT, version=None):
+        """
+        Fetch a given key from the cache. If the key does not exist,
+        add the key and set it to the default value. The default value can
+        also be any callable. If timeout is given, use that timeout for the
+        key; otherwise use the default cache timeout.
+
+        Return the value of the key stored or retrieved.
+        """
+        val = await self.get_async(key, version=version)
+        if val is None:
+            if callable(default):
+                default = default()
+            if default is not None:
+                await self.add_async(key, default, timeout=timeout, version=version)
+                # Fetch the value again to avoid a race condition if another
+                # caller added a value between the first get() and the add()
+                # above.
+                return await self.get_async(key, default, version=version)
+        return val
+
     def has_key(self, key, version=None):
         """
         Return True if the key is in the cache and has not expired.
         """
         return self.get(key, version=version) is not None
+
+    async def has_key_async(self, key, version=None):
+        """
+        Return True if the key is in the cache and has not expired.
+        """
+        return await self.get_async(key, version=version) is not None
 
     def incr(self, key, delta=1, version=None):
         """
@@ -195,12 +275,31 @@ class BaseCache:
         self.set(key, new_value, version=version)
         return new_value
 
+    async def incr_async(self, key, delta=1, version=None):
+        """
+        Add delta to value in the cache. If the key does not exist, raise a
+        ValueError exception.
+        """
+        value = await self.get_async(key, version=version)
+        if value is None:
+            raise ValueError("Key '%s' not found" % key)
+        new_value = value + delta
+        await self.set_async(key, new_value, version=version)
+        return new_value
+
     def decr(self, key, delta=1, version=None):
         """
         Subtract delta from value in the cache. If the key does not exist, raise
         a ValueError exception.
         """
         return self.incr(key, -delta, version=version)
+
+    async def decr_async(self, key, delta=1, version=None):
+        """
+        Subtract delta from value in the cache. If the key does not exist, raise
+        a ValueError exception.
+        """
+        return await self.incr_async(key, -delta, version=version)
 
     def __contains__(self, key):
         """
@@ -227,6 +326,22 @@ class BaseCache:
             self.set(key, value, timeout=timeout, version=version)
         return []
 
+    async def set_many_async(self, data, timeout=DEFAULT_TIMEOUT, version=None):
+        """
+        Set a bunch of values in the cache at once from a dict of key/value
+        pairs.  For certain backends (memcached), this is much more efficient
+        than calling set() multiple times.
+
+        If timeout is given, use that timeout for the key; otherwise use the
+        default cache timeout.
+
+        On backends that support it, return a list of keys that failed
+        insertion, or an empty list if all keys were inserted successfully.
+        """
+        for key, value in data.items():
+            await self.set_async(key, value, timeout=timeout, version=version)
+        return []
+
     def delete_many(self, keys, version=None):
         """
         Delete a bunch of values in the cache at once. For certain backends
@@ -236,7 +351,20 @@ class BaseCache:
         for key in keys:
             self.delete(key, version=version)
 
+    async def delete_many_async(self, keys, version=None):
+        """
+        Delete a bunch of values in the cache at once. For certain backends
+        (memcached), this is much more efficient than calling delete() multiple
+        times.
+        """
+        for key in keys:
+            await self.delete_async(key, version=version)
+
     def clear(self):
+        """Remove *all* values from the cache at once."""
+        raise NotImplementedError('subclasses of BaseCache must provide a clear() method')
+
+    async def clear_async(self):
         """Remove *all* values from the cache at once."""
         raise NotImplementedError('subclasses of BaseCache must provide a clear() method')
 
@@ -265,6 +393,22 @@ class BaseCache:
         self.delete(key, version=version)
         return version + delta
 
+    async def incr_version_async(self, key, delta=1, version=None):
+        """
+        Add delta to the cache version for the supplied key. Return the new
+        version.
+        """
+        if version is None:
+            version = self.version
+
+        value = await self.get_async(key, version=version)
+        if value is None:
+            raise ValueError("Key '%s' not found" % key)
+
+        await self.set_async(key, value, version=version + delta)
+        await self.delete_async(key, version=version)
+        return version + delta
+
     def decr_version(self, key, delta=1, version=None):
         """
         Subtract delta from the cache version for the supplied key. Return the
@@ -272,7 +416,19 @@ class BaseCache:
         """
         return self.incr_version(key, -delta, version)
 
+    async def decr_version_async(self, key, delta=1, version=None):
+        """
+        Subtract delta from the cache version for the supplied key. Return the
+        new version.
+        """
+        await self.close_async()
+        return await self.incr_version_async(key, -delta, version)
+
     def close(self, **kwargs):
+        """Close the cache connection"""
+        pass
+
+    async def close_async(self, **kwargs):
         """Close the cache connection"""
         pass
 
