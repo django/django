@@ -1919,7 +1919,16 @@ class BaseCacheTests:
             self.assertEqual(cache.get_or_set('key', 'default'), 'default')
 
     async def test_get_or_set_racing_async(self):
-        with mock.patch('%s.%s' % (settings.CACHES['default']['BACKEND'], 'add_async')) as cache_add:
+        class AsyncMock(mock.MagicMock):
+            """AsyncMock for Py3.6/7 compat"""
+
+            async def __call__(self, *args, **kwargs):
+                return super(AsyncMock, self).__call__(*args, **kwargs)
+
+        with mock.patch(
+            '%s.%s' % (settings.CACHES['default']['BACKEND'], 'add_async'),
+            new_callable=AsyncMock
+        ) as cache_add:
             # Simulate cache.add_async() failing to add a value. In that case, the
             # default value should be returned.
             cache_add.return_value = False
@@ -2331,7 +2340,8 @@ class BaseMemcachedTests(BaseCacheTests):
         with self.settings(CACHES=caches_setting_for_tests(
             base=self.base_params,
             exclude=memcached_excluded_caches,
-            TIMEOUT=None)):
+            TIMEOUT=None)
+        ):
             cache.set('infinite_foo', 'bar')
             self.assertEqual(cache.get('infinite_foo'), 'bar')
 
