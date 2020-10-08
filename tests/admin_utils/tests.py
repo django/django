@@ -186,6 +186,7 @@ class UtilsTests(SimpleTestCase):
             ({'a': {'b': 'c'}}, '{"a": {"b": "c"}}'),
             (['a', 'b'], '["a", "b"]'),
             ('a', '"a"'),
+            ({'a': '你好 世界'}, '{"a": "你好 世界"}'),
             ({('a', 'b'): 'c'}, "{('a', 'b'): 'c'}"),  # Invalid JSON.
         ]
         for value, display_value in tests:
