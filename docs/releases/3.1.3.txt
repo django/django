@@ -11,3 +11,8 @@ Bugfixes
 
 * Fixed a regression in Django 3.1.2 that caused the incorrect height of the
   admin changelist search bar (:ticket:`32072`).
+
+* Fixed displaying Unicode characters in
+  :class:`forms.JSONField <django.forms.JSONField>` and read-only
+  :class:`models.JSONField <django.db.models.JSONField>` values in the admin
+  (:ticket:`32080`).
