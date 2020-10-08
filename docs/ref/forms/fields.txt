@@ -913,6 +913,20 @@ For each field, we describe the default widget used if you don't specify
     * Normalizes to: A Python ``True``, ``False`` or ``None`` value.
     * Validates nothing (i.e., it never raises a ``ValidationError``).
 
+    ``NullBooleanField`` may be used with widgets such as
+    :class:`~django.forms.Select` or :class:`~django.forms.RadioSelect`
+    by providing the widget ``choices``::
+
+        NullBooleanField(
+            widget=Select(
+                choices=[
+                    ('', 'Unknown'),
+                    (True, 'Yes'),
+                    (False, 'No'),
+                ]
+            )
+        )
+
 ``RegexField``
 --------------
 
