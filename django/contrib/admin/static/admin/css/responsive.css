@@ -120,7 +120,8 @@ input[type="submit"], button {
     }
 
     #changelist-search .quiet {
-        width: 100%;
+        width: 0;
+        flex: 1 0 auto;
         margin: 5px 0 0 25px;
     }
 
