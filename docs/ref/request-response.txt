@@ -584,8 +584,8 @@ In addition, ``QueryDict`` has the following methods:
 .. method:: QueryDict.getlist(key, default=None)
 
     Returns a list of the data with the requested key. Returns an empty list if
-    the key doesn't exist and a default value wasn't provided. It's guaranteed
-    to return a list unless the default value provided isn't a list.
+    the key doesn't exist and ``default`` is ``None``. It's guaranteed to
+    return a list unless the default value provided isn't a list.
 
 .. method:: QueryDict.setlist(key, list_)
 
