@@ -76,6 +76,8 @@ If you attempt to access a database that you haven't defined in your
 :setting:`DATABASES` setting, Django will raise a
 ``django.db.utils.ConnectionDoesNotExist`` exception.
 
+.. _synchronizing_multiple_databases:
+
 Synchronizing your databases
 ============================
 
@@ -402,7 +404,8 @@ setting listed the two routers in the other order,
 catch-all nature of the PrimaryReplicaRouter implementation would mean
 that all models would be available on all databases.
 
-With this setup installed, lets run some Django code::
+With this setup installed, and all databases migrated as per
+:ref:`synchronizing_multiple_databases`, lets run some Django code::
 
     >>> # This retrieval will be performed on the 'auth_db' database
     >>> fred = User.objects.get(username='fred')
