@@ -15,6 +15,8 @@ import unittest
 from pathlib import Path
 from unittest import mock, skipIf
 
+from asgiref.sync import async_to_sync, sync_to_async
+
 from django.conf import settings
 from django.core import management, signals
 from django.core.cache import (
@@ -34,8 +36,8 @@ from django.template import engines
 from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
 from django.test import (
-    RequestFactory, SimpleTestCase, TestCase, TransactionTestCase,
-    override_settings,
+    AsyncRequestFactory, RequestFactory, SimpleTestCase, TestCase,
+    TransactionTestCase, override_settings,
 )
 from django.test.signals import setting_changed
 from django.utils import timezone, translation
@@ -426,25 +428,43 @@ def caches_setting_for_tests(base=None, exclude=None, **params):
 class BaseCacheTests:
     # A common set of tests to apply to all cache backends
     factory = RequestFactory()
+    async_factory = AsyncRequestFactory()
 
     def tearDown(self):
         cache.clear()
+        async_to_sync(cache.clear_async)()
 
     def test_simple(self):
         # Simple cache set/get works
         cache.set("key", "value")
         self.assertEqual(cache.get("key"), "value")
 
+    async def test_simple_async(self):
+        # Simple cache set/get works
+        await cache.set_async("key", "value")
+        self.assertEqual(await cache.get_async("key"), "value")
+
     def test_default_used_when_none_is_set(self):
         """If None is cached, get() returns it instead of the default."""
         cache.set('key_default_none', None)
         self.assertIsNone(cache.get('key_default_none', default='default'))
+
+    async def test_default_used_when_none_is_set_async(self):
+        """If None is cached, get() returns it instead of the default."""
+        await cache.set_async('key_default_none', None)
+        self.assertIsNone(await cache.get_async('key_default_none', default='default'))
 
     def test_add(self):
         # A key can be added to a cache
         self.assertIs(cache.add("addkey1", "value"), True)
         self.assertIs(cache.add("addkey1", "newvalue"), False)
         self.assertEqual(cache.get("addkey1"), "value")
+
+    async def test_add_async(self):
+        # A key can be added to a cache
+        self.assertIs(await cache.add_async("addkey1", "value"), True)
+        self.assertIs(await cache.add_async("addkey1", "newvalue"), False)
+        self.assertEqual(await cache.get_async("addkey1"), "value")
 
     def test_prefix(self):
         # Test for same cache key conflicts between shared backend
@@ -458,10 +478,27 @@ class BaseCacheTests:
         self.assertEqual(cache.get('somekey'), 'value')
         self.assertEqual(caches['prefix'].get('somekey'), 'value2')
 
+    async def test_prefix_async(self):
+        # Test for same cache key conflicts between shared backend
+        await cache.set_async('somekey', 'value')
+
+        # should not be set in the prefixed cache
+        self.assertIs(await caches['prefix'].has_key_async('somekey'), False)
+
+        await caches['prefix'].set_async('somekey', 'value2')
+
+        self.assertEqual(await cache.get_async('somekey'), 'value')
+        self.assertEqual(await caches['prefix'].get_async('somekey'), 'value2')
+
     def test_non_existent(self):
         """Nonexistent cache keys return as None/default."""
         self.assertIsNone(cache.get("does_not_exist"))
         self.assertEqual(cache.get("does_not_exist", "bang!"), "bang!")
+
+    async def test_non_existent_async(self):
+        """Nonexistent cache keys return as None/default."""
+        self.assertIsNone(await cache.get_async("does_not_exist"))
+        self.assertEqual(await cache.get_async("does_not_exist", "bang!"), "bang!")
 
     def test_get_many(self):
         # Multiple cache keys can be returned using get_many
@@ -469,6 +506,13 @@ class BaseCacheTests:
         self.assertEqual(cache.get_many(['a', 'c', 'd']), {'a': 'a', 'c': 'c', 'd': 'd'})
         self.assertEqual(cache.get_many(['a', 'b', 'e']), {'a': 'a', 'b': 'b'})
         self.assertEqual(cache.get_many(iter(['a', 'b', 'e'])), {'a': 'a', 'b': 'b'})
+
+    async def test_get_many_async(self):
+        # Multiple cache keys can be returned using get_many
+        await cache.set_many_async({'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd'})
+        self.assertEqual(await cache.get_many_async(['a', 'c', 'd']), {'a': 'a', 'c': 'c', 'd': 'd'})
+        self.assertEqual(await cache.get_many_async(['a', 'b', 'e']), {'a': 'a', 'b': 'b'})
+        self.assertEqual(await cache.get_many_async(iter(['a', 'b', 'e'])), {'a': 'a', 'b': 'b'})
 
     def test_delete(self):
         # Cache keys can be deleted
@@ -478,8 +522,19 @@ class BaseCacheTests:
         self.assertIsNone(cache.get("key1"))
         self.assertEqual(cache.get("key2"), "eggs")
 
+    async def test_delete_async(self):
+        # Cache keys can be deleted
+        await cache.set_many_async({'key1': 'spam', 'key2': 'eggs'})
+        self.assertEqual(await cache.get_async("key1"), "spam")
+        self.assertIs(await cache.delete_async("key1"), True)
+        self.assertIsNone(await cache.get_async("key1"))
+        self.assertEqual(await cache.get_async("key2"), "eggs")
+
     def test_delete_nonexistent(self):
         self.assertIs(cache.delete('nonexistent_key'), False)
+
+    async def test_delete_nonexistent_async(self):
+        self.assertIs(await cache.delete_async('nonexistent_key'), False)
 
     def test_has_key(self):
         # The cache can be inspected for cache keys
@@ -489,11 +544,22 @@ class BaseCacheTests:
         cache.set("no_expiry", "here", None)
         self.assertIs(cache.has_key("no_expiry"), True)
 
+    async def test_has_key_async(self):
+        # The cache can be inspected for cache keys
+        await cache.set_async("hello1", "goodbye1")
+        self.assertIs(await cache.has_key_async("hello1"), True)
+        self.assertIs(await cache.has_key_async("goodbye1"), False)
+        await cache.set_async("no_expiry", "here", None)
+        self.assertIs(await cache.has_key_async("no_expiry"), True)
+
     def test_in(self):
         # The in operator can be used to inspect cache contents
         cache.set("hello2", "goodbye2")
         self.assertIn("hello2", cache)
         self.assertNotIn("goodbye2", cache)
+
+    # Async version of test_in cannot be done and is discouraged since that
+    # would require context switching.
 
     def test_incr(self):
         # Cache values can be incremented
@@ -506,6 +572,17 @@ class BaseCacheTests:
         with self.assertRaises(ValueError):
             cache.incr('does_not_exist')
 
+    async def test_incr_async(self):
+        # Cache values can be incremented
+        await cache.set_async('answer', 41)
+        self.assertEqual(await cache.incr_async('answer'), 42)
+        self.assertEqual(await cache.get_async('answer'), 42)
+        self.assertEqual(await cache.incr_async('answer', 10), 52)
+        self.assertEqual(await cache.get_async('answer'), 52)
+        self.assertEqual(await cache.incr_async('answer', -10), 42)
+        with self.assertRaises(ValueError):
+            await cache.incr_async('does_not_exist')
+
     def test_decr(self):
         # Cache values can be decremented
         cache.set('answer', 43)
@@ -517,9 +594,24 @@ class BaseCacheTests:
         with self.assertRaises(ValueError):
             cache.decr('does_not_exist')
 
+    async def test_decr_async(self):
+        # Cache values can be decremented
+        await cache.set_async('answer', 43)
+        self.assertEqual(await cache.decr_async('answer'), 42)
+        self.assertEqual(await cache.get_async('answer'), 42)
+        self.assertEqual(await cache.decr_async('answer', 10), 32)
+        self.assertEqual(await cache.get_async('answer'), 32)
+        self.assertEqual(await cache.decr_async('answer', -10), 42)
+        with self.assertRaises(ValueError):
+            await cache.decr_async('does_not_exist')
+
     def test_close(self):
         self.assertTrue(hasattr(cache, 'close'))
         cache.close()
+
+    async def test_close_async(self):
+        self.assertTrue(hasattr(cache, 'close_async'))
+        await cache.close_async()
 
     def test_data_types(self):
         # Many different data types can be cached
@@ -535,6 +627,20 @@ class BaseCacheTests:
         cache.set("stuff", stuff)
         self.assertEqual(cache.get("stuff"), stuff)
 
+    async def test_data_types_async(self):
+        # Many different data types can be cached
+        stuff = {
+            'string': 'this is a string',
+            'int': 42,
+            'list': [1, 2, 3, 4],
+            'tuple': (1, 2, 3, 4),
+            'dict': {'A': 1, 'B': 2},
+            'function': f,
+            'class': C,
+        }
+        await cache.set_async("stuff", stuff)
+        self.assertEqual(await cache.get_async("stuff"), stuff)
+
     def test_cache_read_for_model_instance(self):
         # Don't want fields with callable as default to be called on cache read
         expensive_calculation.num_runs = 0
@@ -544,6 +650,24 @@ class BaseCacheTests:
         pub_date = my_poll.pub_date
         cache.set('question', my_poll)
         cached_poll = cache.get('question')
+        self.assertEqual(cached_poll.pub_date, pub_date)
+        # We only want the default expensive calculation run once
+        self.assertEqual(expensive_calculation.num_runs, 1)
+
+    async def test_cache_read_for_model_instance_async(self):
+        # Don't want fields with callable as default to be called on cache read
+        expensive_calculation.num_runs = 0
+
+        def _create_data():
+            Poll.objects.all().delete()
+            obj = Poll.objects.create(question="Well?")
+            self.assertEqual(Poll.objects.count(), 1)
+            return obj
+
+        my_poll = await sync_to_async(_create_data, thread_sensitive=True)()
+        pub_date = my_poll.pub_date
+        await cache.set_async('question', my_poll)
+        cached_poll = await cache.get_async('question')
         self.assertEqual(cached_poll.pub_date, pub_date)
         # We only want the default expensive calculation run once
         self.assertEqual(expensive_calculation.num_runs, 1)
@@ -558,6 +682,28 @@ class BaseCacheTests:
         self.assertEqual(defer_qs.count(), 1)
         self.assertEqual(expensive_calculation.num_runs, 1)
         cache.set('deferred_queryset', defer_qs)
+        # cache set should not re-evaluate default functions
+        self.assertEqual(expensive_calculation.num_runs, 1)
+
+    async def test_cache_write_for_model_instance_with_deferred_async(self):
+        # Don't want fields with callable as default to be called on cache write
+        expensive_calculation.num_runs = 0
+
+        def _create_data():
+            Poll.objects.all().delete()
+            Poll.objects.create(question="What?")
+            self.assertEqual(expensive_calculation.num_runs, 1)
+
+        await sync_to_async(_create_data, thread_sensitive=True)()
+
+        def _test_count():
+            qs = Poll.objects.all().defer('question')
+            self.assertEqual(qs.count(), 1)
+            self.assertEqual(expensive_calculation.num_runs, 1)
+            return qs
+
+        defer_qs = await sync_to_async(_test_count, thread_sensitive=True)()
+        await cache.set_async('deferred_queryset', defer_qs)
         # cache set should not re-evaluate default functions
         self.assertEqual(expensive_calculation.num_runs, 1)
 
@@ -576,6 +722,30 @@ class BaseCacheTests:
         # We only want the default expensive calculation run on creation and set
         self.assertEqual(expensive_calculation.num_runs, runs_before_cache_read)
 
+    async def test_cache_read_for_model_instance_with_deferred_async(self):
+        # Don't want fields with callable as default to be called on cache read
+        expensive_calculation.num_runs = 0
+
+        def _create_data():
+            Poll.objects.all().delete()
+            Poll.objects.create(question="What?")
+
+        await sync_to_async(_create_data, thread_sensitive=True)()
+        self.assertEqual(expensive_calculation.num_runs, 1)
+
+        def _test_defer():
+            qs = Poll.objects.all().defer('question')
+            self.assertEqual(qs.count(), 1)
+            return qs
+
+        defer_qs = await sync_to_async(_test_defer, thread_sensitive=True)()
+        await cache.set_async('deferred_queryset', defer_qs)
+        self.assertEqual(expensive_calculation.num_runs, 1)
+        runs_before_cache_read = expensive_calculation.num_runs
+        await cache.get_async('deferred_queryset')
+        # We only want the default expensive calculation run on creation and set
+        self.assertEqual(expensive_calculation.num_runs, runs_before_cache_read)
+
     def test_expiration(self):
         # Cache values can be set to expire
         cache.set('expire1', 'very quickly', 1)
@@ -588,6 +758,19 @@ class BaseCacheTests:
         self.assertIs(cache.add("expire2", "newvalue"), True)
         self.assertEqual(cache.get("expire2"), "newvalue")
         self.assertIs(cache.has_key("expire3"), False)
+
+    async def test_expiration_async(self):
+        # Cache values can be set to expire
+        await cache.set_async('expire1', 'very quickly', 1)
+        await cache.set_async('expire2', 'very quickly', 1)
+        await cache.set_async('expire3', 'very quickly', 1)
+
+        await asyncio.sleep(2)
+        self.assertIsNone(await cache.get_async("expire1"))
+
+        self.assertIs(await cache.add_async("expire2", "newvalue"), True)
+        self.assertEqual(await cache.get_async("expire2"), "newvalue")
+        self.assertIs(await cache.has_key_async("expire3"), False)
 
     def test_touch(self):
         # cache.touch() updates the timeout.
@@ -604,6 +787,22 @@ class BaseCacheTests:
         self.assertIs(cache.has_key('expire1'), True)
 
         self.assertIs(cache.touch('nonexistent'), False)
+
+    async def test_touch_async(self):
+        # cache.touch() updates the timeout.
+        await cache.set_async('expire1', 'very quickly', timeout=1)
+        self.assertIs(await cache.touch_async('expire1', timeout=4), True)
+        await asyncio.sleep(2)
+        self.assertIs(await cache.has_key_async('expire1'), True)
+        await asyncio.sleep(3)
+        self.assertIs(await cache.has_key_async('expire1'), False)
+        # cache.touch() works without the timeout argument.
+        await cache.set_async('expire1', 'very quickly', timeout=1)
+        self.assertIs(await cache.touch_async('expire1'), True)
+        await asyncio.sleep(2)
+        self.assertIs(await cache.has_key_async('expire1'), True)
+
+        self.assertIs(await cache.touch_async('nonexistent'), False)
 
     def test_unicode(self):
         # Unicode values can be cached
@@ -634,6 +833,35 @@ class BaseCacheTests:
             with self.subTest(key=key):
                 self.assertEqual(cache.get(key), value)
 
+    async def test_unicode_async(self):
+        # Unicode values can be cached
+        stuff = {
+            'ascii': 'ascii_value',
+            'unicode_ascii': 'Iñtërnâtiônàlizætiøn1',
+            'Iñtërnâtiônàlizætiøn': 'Iñtërnâtiônàlizætiøn2',
+            'ascii2': {'x': 1}
+        }
+        # Test `set`
+        for (key, value) in stuff.items():
+            with self.subTest(key=key):
+                await cache.set_async(key, value)
+                self.assertEqual(await cache.get_async(key), value)
+
+        # Test `add`
+        for (key, value) in stuff.items():
+            with self.subTest(key=key):
+                self.assertIs(await cache.delete_async(key), True)
+                self.assertIs(await cache.add_async(key, value), True)
+                self.assertEqual(await cache.get_async(key), value)
+
+        # Test `set_many`
+        for (key, value) in stuff.items():
+            self.assertIs(await cache.delete_async(key), True)
+        await cache.set_many_async(stuff)
+        for (key, value) in stuff.items():
+            with self.subTest(key=key):
+                self.assertEqual(await cache.get_async(key), value)
+
     def test_binary_string(self):
         # Binary strings should be cacheable
         from zlib import compress, decompress
@@ -658,15 +886,50 @@ class BaseCacheTests:
         self.assertEqual(compressed_value, compressed_result)
         self.assertEqual(value, decompress(compressed_result).decode())
 
+    async def test_binary_string_async(self):
+        # Binary strings should be cacheable
+        from zlib import compress, decompress
+        value = 'value_to_be_compressed'
+        compressed_value = compress(value.encode())
+
+        # Test set
+        await cache.set_async('binary1', compressed_value)
+        compressed_result = await cache.get_async('binary1')
+        self.assertEqual(compressed_value, compressed_result)
+        self.assertEqual(value, decompress(compressed_result).decode())
+
+        # Test add
+        self.assertIs(await cache.add_async('binary1-add', compressed_value), True)
+        compressed_result = await cache.get_async('binary1-add')
+        self.assertEqual(compressed_value, compressed_result)
+        self.assertEqual(value, decompress(compressed_result).decode())
+
+        # Test set_many
+        await cache.set_many_async({'binary1-set_many': compressed_value})
+        compressed_result = await cache.get_async('binary1-set_many')
+        self.assertEqual(compressed_value, compressed_result)
+        self.assertEqual(value, decompress(compressed_result).decode())
+
     def test_set_many(self):
         # Multiple keys can be set using set_many
         cache.set_many({"key1": "spam", "key2": "eggs"})
         self.assertEqual(cache.get("key1"), "spam")
         self.assertEqual(cache.get("key2"), "eggs")
 
+    async def test_set_many_async(self):
+        # Multiple keys can be set using set_many
+        await cache.set_many_async({"key1": "spam", "key2": "eggs"})
+        self.assertEqual(await cache.get_async("key1"), "spam")
+        self.assertEqual(await cache.get_async("key2"), "eggs")
+
     def test_set_many_returns_empty_list_on_success(self):
         """set_many() returns an empty list when all keys are inserted."""
         failing_keys = cache.set_many({'key1': 'spam', 'key2': 'eggs'})
+        self.assertEqual(failing_keys, [])
+
+    async def test_set_many_returns_empty_list_on_success_async(self):
+        """set_many() returns an empty list when all keys are inserted."""
+        failing_keys = await cache.set_many_async({'key1': 'spam', 'key2': 'eggs'})
         self.assertEqual(failing_keys, [])
 
     def test_set_many_expiration(self):
@@ -676,6 +939,13 @@ class BaseCacheTests:
         self.assertIsNone(cache.get("key1"))
         self.assertIsNone(cache.get("key2"))
 
+    async def test_set_many_expiration_async(self):
+        # set_many takes a second ``timeout`` parameter
+        await cache.set_many_async({"key1": "spam", "key2": "eggs"}, 1)
+        await asyncio.sleep(2)
+        self.assertIsNone(await cache.get_async("key1"))
+        self.assertIsNone(await cache.get_async("key2"))
+
     def test_delete_many(self):
         # Multiple keys can be deleted using delete_many
         cache.set_many({'key1': 'spam', 'key2': 'eggs', 'key3': 'ham'})
@@ -684,12 +954,27 @@ class BaseCacheTests:
         self.assertIsNone(cache.get("key2"))
         self.assertEqual(cache.get("key3"), "ham")
 
+    async def test_delete_many_async(self):
+        # Multiple keys can be deleted using delete_many
+        await cache.set_many_async({'key1': 'spam', 'key2': 'eggs', 'key3': 'ham'})
+        await cache.delete_many_async(["key1", "key2"])
+        self.assertIsNone(await cache.get_async("key1"))
+        self.assertIsNone(await cache.get_async("key2"))
+        self.assertEqual(await cache.get_async("key3"), "ham")
+
     def test_clear(self):
         # The cache can be emptied using clear
         cache.set_many({'key1': 'spam', 'key2': 'eggs'})
         cache.clear()
         self.assertIsNone(cache.get("key1"))
         self.assertIsNone(cache.get("key2"))
+
+    async def test_clear_async(self):
+        # The cache can be emptied using clear
+        await cache.set_many_async({'key1': 'spam', 'key2': 'eggs'})
+        await cache.clear_async()
+        self.assertIsNone(await cache.get_async("key1"))
+        self.assertIsNone(await cache.get_async("key2"))
 
     def test_long_timeout(self):
         """
@@ -706,6 +991,22 @@ class BaseCacheTests:
         cache.set_many({'key3': 'sausage', 'key4': 'lobster bisque'}, 60 * 60 * 24 * 30 + 1)
         self.assertEqual(cache.get('key3'), 'sausage')
         self.assertEqual(cache.get('key4'), 'lobster bisque')
+
+    async def test_long_timeout_async(self):
+        """
+        Follow memcached's convention where a timeout greater than 30 days is
+        treated as an absolute expiration timestamp instead of a relative
+        offset (#12399).
+        """
+        await cache.set_async('key1', 'eggs', 60 * 60 * 24 * 30 + 1)  # 30 days + 1 second
+        self.assertEqual(await cache.get_async('key1'), 'eggs')
+
+        self.assertIs(await cache.add_async('key2', 'ham', 60 * 60 * 24 * 30 + 1), True)
+        self.assertEqual(await cache.get_async('key2'), 'ham')
+
+        await cache.set_many_async({'key3': 'sausage', 'key4': 'lobster bisque'}, 60 * 60 * 24 * 30 + 1)
+        self.assertEqual(await cache.get_async('key3'), 'sausage')
+        self.assertEqual(await cache.get_async('key4'), 'lobster bisque')
 
     def test_forever_timeout(self):
         """
@@ -728,6 +1029,27 @@ class BaseCacheTests:
         time.sleep(2)
         self.assertEqual(cache.get('key5'), 'belgian fries')
 
+    async def test_forever_timeout_async(self):
+        """
+        Passing in None into timeout results in a value that is cached forever
+        """
+        await cache.set_async('key1', 'eggs', None)
+        self.assertEqual(await cache.get_async('key1'), 'eggs')
+
+        self.assertIs(await cache.add_async('key2', 'ham', None), True)
+        self.assertEqual(await cache.get_async('key2'), 'ham')
+        self.assertIs(await cache.add_async('key1', 'new eggs', None), False)
+        self.assertEqual(await cache.get_async('key1'), 'eggs')
+
+        await cache.set_many_async({'key3': 'sausage', 'key4': 'lobster bisque'}, None)
+        self.assertEqual(await cache.get_async('key3'), 'sausage')
+        self.assertEqual(await cache.get_async('key4'), 'lobster bisque')
+
+        await cache.set_async('key5', 'belgian fries', timeout=1)
+        self.assertIs(await cache.touch_async('key5', timeout=None), True)
+        await asyncio.sleep(2)
+        self.assertEqual(await cache.get_async('key5'), 'belgian fries')
+
     def test_zero_timeout(self):
         """
         Passing in zero into timeout results in a value that is not cached
@@ -746,10 +1068,33 @@ class BaseCacheTests:
         self.assertIs(cache.touch('key5', timeout=0), True)
         self.assertIsNone(cache.get('key5'))
 
+    async def test_zero_timeout_async(self):
+        """
+        Passing in zero into timeout results in a value that is not cached
+        """
+        await cache.set_async('key1', 'eggs', 0)
+        self.assertIsNone(await cache.get_async('key1'))
+
+        self.assertIs(await cache.add_async('key2', 'ham', 0), True)
+        self.assertIsNone(await cache.get_async('key2'))
+
+        await cache.set_many_async({'key3': 'sausage', 'key4': 'lobster bisque'}, 0)
+        self.assertIsNone(await cache.get_async('key3'))
+        self.assertIsNone(await cache.get_async('key4'))
+
+        await cache.set_async('key5', 'belgian fries', timeout=5)
+        self.assertIs(await cache.touch_async('key5', timeout=0), True)
+        self.assertIsNone(await cache.get_async('key5'))
+
     def test_float_timeout(self):
         # Make sure a timeout given as a float doesn't crash anything.
         cache.set("key1", "spam", 100.2)
         self.assertEqual(cache.get("key1"), "spam")
+
+    async def test_float_timeout_async(self):
+        # Make sure a timeout given as a float doesn't crash anything.
+        await cache.set_async("key1", "spam", 100.2)
+        self.assertEqual(await cache.get_async("key1"), "spam")
 
     def _perform_cull_test(self, cull_cache_name, initial_count, final_count):
         try:
@@ -774,6 +1119,29 @@ class BaseCacheTests:
     def test_zero_cull(self):
         self._perform_cull_test('zero_cull', 50, 19)
 
+    async def _perform_cull_test_async(self, cull_cache_name, initial_count, final_count):
+        try:
+            cull_cache = caches[cull_cache_name]
+        except InvalidCacheBackendError:
+            self.skipTest("Culling isn't implemented.")
+
+        # Create initial cache key entries. This will overflow the cache,
+        # causing a cull.
+        for i in range(1, initial_count):
+            await cull_cache.set_async('cull%d' % i, 'value', 1000)
+        count = 0
+        # Count how many keys are left in the cache.
+        for i in range(1, initial_count):
+            if await cull_cache.has_key_async('cull%d' % i):
+                count += 1
+        self.assertEqual(count, final_count)
+
+    async def test_cull_async(self):
+        await self._perform_cull_test_async('cull', 50, 29)
+
+    async def test_zero_cull_async(self):
+        await self._perform_cull_test_async('zero_cull', 50, 19)
+
     def test_cull_delete_when_store_empty(self):
         try:
             cull_cache = caches['cull']
@@ -788,6 +1156,20 @@ class BaseCacheTests:
         finally:
             cull_cache._max_entries = old_max_entries
 
+    async def test_cull_delete_when_store_empty_async(self):
+        try:
+            cull_cache = caches['cull']
+        except InvalidCacheBackendError:
+            self.skipTest("Culling isn't implemented.")
+        old_max_entries = cull_cache._max_entries
+        # Force _cull to delete on first cached record.
+        cull_cache._max_entries = -1
+        try:
+            await cull_cache.set_async('force_cull_delete', 'value', 1000)
+            self.assertIs(await cull_cache.has_key_async('force_cull_delete'), True)
+        finally:
+            cull_cache._max_entries = old_max_entries
+
     def _perform_invalid_key_test(self, key, expected_warning):
         """
         All the builtin backends should warn (except memcached that should
@@ -795,6 +1177,7 @@ class BaseCacheTests:
         portable caching code without making it too difficult to use production
         backends with more liberal key rules. Refs #6447.
         """
+
         # mimic custom ``make_key`` method being defined since the default will
         # never show the below warnings
         def func(key, *args):
@@ -838,6 +1221,57 @@ class BaseCacheTests:
         )
         self._perform_invalid_key_test(key, expected_warning)
 
+    async def _perform_invalid_key_test_async(self, key, expected_warning):
+        """
+        All the builtin backends should warn (except memcached that should
+        error) on keys that would be refused by memcached. This encourages
+        portable caching code without making it too difficult to use production
+        backends with more liberal key rules. Refs #6447.
+        """
+
+        # mimic custom ``make_key`` method being defined since the default will
+        # never show the below warnings
+        def func(key, *args):
+            return key
+
+        old_func = cache.key_func
+        cache.key_func = func
+
+        tests = [
+            ('add_async', [key, 1]),
+            ('get_async', [key]),
+            ('set_async', [key, 1]),
+            ('incr_async', [key]),
+            ('decr_async', [key]),
+            ('touch_async', [key]),
+            ('delete_async', [key]),
+            ('get_many_async', [[key, 'b']]),
+            ('set_many_async', [{key: 1, 'b': 2}]),
+            ('delete_many_async', [{key: 1, 'b': 2}]),
+        ]
+        try:
+            for operation, args in tests:
+                with self.subTest(operation=operation):
+                    with self.assertWarns(CacheKeyWarning) as cm:
+                        await getattr(cache, operation)(*args)
+                    self.assertEqual(str(cm.warning), expected_warning)
+        finally:
+            cache.key_func = old_func
+
+    async def test_invalid_key_characters_async(self):
+        # memcached doesn't allow whitespace or control characters in keys.
+        key = 'key with spaces and 清'
+        await self._perform_invalid_key_test_async(key, KEY_ERRORS_WITH_MEMCACHED_MSG % key)
+
+    async def test_invalid_key_length_async(self):
+        # memcached limits key length to 250.
+        key = ('a' * 250) + '清'
+        expected_warning = (
+            'Cache key will cause errors if used with memcached: '
+            '%r (longer than %s)' % (key, 250)
+        )
+        await self._perform_invalid_key_test_async(key, expected_warning)
+
     def test_cache_versioning_get_set(self):
         # set, using default version = 1
         cache.set('answer1', 42)
@@ -878,6 +1312,47 @@ class BaseCacheTests:
         self.assertIsNone(caches['v2'].get('answer4'))
         self.assertEqual(caches['v2'].get('answer4', version=1), 42)
         self.assertIsNone(caches['v2'].get('answer4', version=2))
+
+    async def test_cache_versioning_get_set_async(self):
+        # set, using default version = 1
+        await cache.set_async('answer1', 42)
+        self.assertEqual(await cache.get_async('answer1'), 42)
+        self.assertEqual(await cache.get_async('answer1', version=1), 42)
+        self.assertIsNone(await cache.get_async('answer1', version=2))
+
+        self.assertIsNone(await caches['v2'].get_async('answer1'))
+        self.assertEqual(await caches['v2'].get_async('answer1', version=1), 42)
+        self.assertIsNone(await caches['v2'].get_async('answer1', version=2))
+
+        # set, default version = 1, but manually override version = 2
+        await cache.set_async('answer2', 42, version=2)
+        self.assertIsNone(await cache.get_async('answer2'))
+        self.assertIsNone(await cache.get_async('answer2', version=1))
+        self.assertEqual(await cache.get_async('answer2', version=2), 42)
+
+        self.assertEqual(await caches['v2'].get_async('answer2'), 42)
+        self.assertIsNone(await caches['v2'].get_async('answer2', version=1))
+        self.assertEqual(await caches['v2'].get_async('answer2', version=2), 42)
+
+        # v2 set, using default version = 2
+        await caches['v2'].set_async('answer3', 42)
+        self.assertIsNone(await cache.get_async('answer3'))
+        self.assertIsNone(await cache.get_async('answer3', version=1))
+        self.assertEqual(await cache.get_async('answer3', version=2), 42)
+
+        self.assertEqual(await caches['v2'].get_async('answer3'), 42)
+        self.assertIsNone(await caches['v2'].get_async('answer3', version=1))
+        self.assertEqual(await caches['v2'].get_async('answer3', version=2), 42)
+
+        # v2 set, default version = 2, but manually override version = 1
+        await caches['v2'].set_async('answer4', 42, version=1)
+        self.assertEqual(await cache.get_async('answer4'), 42)
+        self.assertEqual(await cache.get_async('answer4', version=1), 42)
+        self.assertIsNone(await cache.get_async('answer4', version=2))
+
+        self.assertIsNone(await caches['v2'].get_async('answer4'))
+        self.assertEqual(await caches['v2'].get_async('answer4', version=1), 42)
+        self.assertIsNone(await caches['v2'].get_async('answer4', version=2))
 
     def test_cache_versioning_add(self):
 
@@ -920,6 +1395,47 @@ class BaseCacheTests:
         self.assertEqual(cache.get('answer3', version=1), 42)
         self.assertEqual(cache.get('answer3', version=2), 37)
 
+    async def test_cache_versioning_add_async(self):
+
+        # add, default version = 1, but manually override version = 2
+        self.assertIs(await cache.add_async('answer1', 42, version=2), True)
+        self.assertIsNone(await cache.get_async('answer1', version=1))
+        self.assertEqual(await cache.get_async('answer1', version=2), 42)
+
+        self.assertIs(await cache.add_async('answer1', 37, version=2), False)
+        self.assertIsNone(await cache.get_async('answer1', version=1))
+        self.assertEqual(await cache.get_async('answer1', version=2), 42)
+
+        self.assertIs(await cache.add_async('answer1', 37, version=1), True)
+        self.assertEqual(await cache.get_async('answer1', version=1), 37)
+        self.assertEqual(await cache.get_async('answer1', version=2), 42)
+
+        # v2 add, using default version = 2
+        self.assertIs(await caches['v2'].add_async('answer2', 42), True)
+        self.assertIsNone(await cache.get_async('answer2', version=1))
+        self.assertEqual(await cache.get_async('answer2', version=2), 42)
+
+        self.assertIs(await caches['v2'].add_async('answer2', 37), False)
+        self.assertIsNone(await cache.get_async('answer2', version=1))
+        self.assertEqual(await cache.get_async('answer2', version=2), 42)
+
+        self.assertIs(await caches['v2'].add_async('answer2', 37, version=1), True)
+        self.assertEqual(await cache.get_async('answer2', version=1), 37)
+        self.assertEqual(await cache.get_async('answer2', version=2), 42)
+
+        # v2 add, default version = 2, but manually override version = 1
+        self.assertIs(await caches['v2'].add_async('answer3', 42, version=1), True)
+        self.assertEqual(await cache.get_async('answer3', version=1), 42)
+        self.assertIsNone(await cache.get_async('answer3', version=2))
+
+        self.assertIs(await caches['v2'].add_async('answer3', 37, version=1), False)
+        self.assertEqual(await cache.get_async('answer3', version=1), 42)
+        self.assertIsNone(await cache.get_async('answer3', version=2))
+
+        self.assertIs(await caches['v2'].add_async('answer3', 37), True)
+        self.assertEqual(await cache.get_async('answer3', version=1), 42)
+        self.assertEqual(await cache.get_async('answer3', version=2), 37)
+
     def test_cache_versioning_has_key(self):
         cache.set('answer1', 42)
 
@@ -931,6 +1447,18 @@ class BaseCacheTests:
         self.assertIs(caches['v2'].has_key('answer1'), False)
         self.assertIs(caches['v2'].has_key('answer1', version=1), True)
         self.assertIs(caches['v2'].has_key('answer1', version=2), False)
+
+    async def test_cache_versioning_has_key_async(self):
+        await cache.set_async('answer1', 42)
+
+        # has_key
+        self.assertIs(await cache.has_key_async('answer1'), True)
+        self.assertIs(await cache.has_key_async('answer1', version=1), True)
+        self.assertIs(await cache.has_key_async('answer1', version=2), False)
+
+        self.assertIs(await caches['v2'].has_key_async('answer1'), False)
+        self.assertIs(await caches['v2'].has_key_async('answer1', version=1), True)
+        self.assertIs(await caches['v2'].has_key_async('answer1', version=2), False)
 
     def test_cache_versioning_delete(self):
         cache.set('answer1', 37, version=1)
@@ -956,6 +1484,31 @@ class BaseCacheTests:
         self.assertIs(caches['v2'].delete('answer4', version=1), True)
         self.assertIsNone(cache.get('answer4', version=1))
         self.assertEqual(cache.get('answer4', version=2), 42)
+
+    async def test_cache_versioning_delete_async(self):
+        await cache.set_async('answer1', 37, version=1)
+        await cache.set_async('answer1', 42, version=2)
+        self.assertIs(await cache.delete_async('answer1'), True)
+        self.assertIsNone(await cache.get_async('answer1', version=1))
+        self.assertEqual(await cache.get_async('answer1', version=2), 42)
+
+        await cache.set_async('answer2', 37, version=1)
+        await cache.set_async('answer2', 42, version=2)
+        self.assertIs(await cache.delete_async('answer2', version=2), True)
+        self.assertEqual(await cache.get_async('answer2', version=1), 37)
+        self.assertIsNone(await cache.get_async('answer2', version=2))
+
+        await cache.set_async('answer3', 37, version=1)
+        await cache.set_async('answer3', 42, version=2)
+        self.assertIs(await caches['v2'].delete_async('answer3'), True)
+        self.assertEqual(await cache.get_async('answer3', version=1), 37)
+        self.assertIsNone(await cache.get_async('answer3', version=2))
+
+        await cache.set_async('answer4', 37, version=1)
+        await cache.set_async('answer4', 42, version=2)
+        self.assertIs(await caches['v2'].delete_async('answer4', version=1), True)
+        self.assertIsNone(await cache.get_async('answer4', version=1))
+        self.assertEqual(await cache.get_async('answer4', version=2), 42)
 
     def test_cache_versioning_incr_decr(self):
         cache.set('answer1', 37, version=1)
@@ -993,6 +1546,43 @@ class BaseCacheTests:
         self.assertEqual(caches['v2'].decr('answer4', version=1), 37)
         self.assertEqual(cache.get('answer4', version=1), 37)
         self.assertEqual(cache.get('answer4', version=2), 42)
+
+    async def test_cache_versioning_incr_decr_async(self):
+        await cache.set_async('answer1', 37, version=1)
+        await cache.set_async('answer1', 42, version=2)
+        self.assertEqual(await cache.incr_async('answer1'), 38)
+        self.assertEqual(await cache.get_async('answer1', version=1), 38)
+        self.assertEqual(await cache.get_async('answer1', version=2), 42)
+        self.assertEqual(await cache.decr_async('answer1'), 37)
+        self.assertEqual(await cache.get_async('answer1', version=1), 37)
+        self.assertEqual(await cache.get_async('answer1', version=2), 42)
+
+        await cache.set_async('answer2', 37, version=1)
+        await cache.set_async('answer2', 42, version=2)
+        self.assertEqual(await cache.incr_async('answer2', version=2), 43)
+        self.assertEqual(await cache.get_async('answer2', version=1), 37)
+        self.assertEqual(await cache.get_async('answer2', version=2), 43)
+        self.assertEqual(await cache.decr_async('answer2', version=2), 42)
+        self.assertEqual(await cache.get_async('answer2', version=1), 37)
+        self.assertEqual(await cache.get_async('answer2', version=2), 42)
+
+        await cache.set_async('answer3', 37, version=1)
+        await cache.set_async('answer3', 42, version=2)
+        self.assertEqual(await caches['v2'].incr_async('answer3'), 43)
+        self.assertEqual(await cache.get_async('answer3', version=1), 37)
+        self.assertEqual(await cache.get_async('answer3', version=2), 43)
+        self.assertEqual(await caches['v2'].decr_async('answer3'), 42)
+        self.assertEqual(await cache.get_async('answer3', version=1), 37)
+        self.assertEqual(await cache.get_async('answer3', version=2), 42)
+
+        await cache.set_async('answer4', 37, version=1)
+        await cache.set_async('answer4', 42, version=2)
+        self.assertEqual(await caches['v2'].incr_async('answer4', version=1), 38)
+        self.assertEqual(await cache.get_async('answer4', version=1), 38)
+        self.assertEqual(await cache.get_async('answer4', version=2), 42)
+        self.assertEqual(await caches['v2'].decr_async('answer4', version=1), 37)
+        self.assertEqual(await cache.get_async('answer4', version=1), 37)
+        self.assertEqual(await cache.get_async('answer4', version=2), 42)
 
     def test_cache_versioning_get_set_many(self):
         # set, using default version = 1
@@ -1035,6 +1625,51 @@ class BaseCacheTests:
         self.assertEqual(caches['v2'].get_many(['ford4', 'arthur4'], version=1), {'ford4': 37, 'arthur4': 42})
         self.assertEqual(caches['v2'].get_many(['ford4', 'arthur4'], version=2), {})
 
+    async def test_cache_versioning_get_set_many_async(self):
+        # set, using default version = 1
+        await cache.set_many_async({'ford1': 37, 'arthur1': 42})
+        self.assertEqual(await cache.get_many_async(['ford1', 'arthur1']), {'ford1': 37, 'arthur1': 42})
+        self.assertEqual(await cache.get_many_async(['ford1', 'arthur1'], version=1), {'ford1': 37, 'arthur1': 42})
+        self.assertEqual(await cache.get_many_async(['ford1', 'arthur1'], version=2), {})
+
+        self.assertEqual(await caches['v2'].get_many_async(['ford1', 'arthur1']), {})
+        self.assertEqual(await caches['v2'].get_many_async(['ford1', 'arthur1'], version=1),
+                         {'ford1': 37, 'arthur1': 42})
+        self.assertEqual(await caches['v2'].get_many_async(['ford1', 'arthur1'], version=2), {})
+
+        # set, default version = 1, but manually override version = 2
+        await cache.set_many_async({'ford2': 37, 'arthur2': 42}, version=2)
+        self.assertEqual(await cache.get_many_async(['ford2', 'arthur2']), {})
+        self.assertEqual(await cache.get_many_async(['ford2', 'arthur2'], version=1), {})
+        self.assertEqual(await cache.get_many_async(['ford2', 'arthur2'], version=2), {'ford2': 37, 'arthur2': 42})
+
+        self.assertEqual(await caches['v2'].get_many_async(['ford2', 'arthur2']), {'ford2': 37, 'arthur2': 42})
+        self.assertEqual(await caches['v2'].get_many_async(['ford2', 'arthur2'], version=1), {})
+        self.assertEqual(await caches['v2'].get_many_async(['ford2', 'arthur2'], version=2),
+                         {'ford2': 37, 'arthur2': 42})
+
+        # v2 set, using default version = 2
+        await caches['v2'].set_many_async({'ford3': 37, 'arthur3': 42})
+        self.assertEqual(await cache.get_many_async(['ford3', 'arthur3']), {})
+        self.assertEqual(await cache.get_many_async(['ford3', 'arthur3'], version=1), {})
+        self.assertEqual(await cache.get_many_async(['ford3', 'arthur3'], version=2), {'ford3': 37, 'arthur3': 42})
+
+        self.assertEqual(await caches['v2'].get_many_async(['ford3', 'arthur3']), {'ford3': 37, 'arthur3': 42})
+        self.assertEqual(await caches['v2'].get_many_async(['ford3', 'arthur3'], version=1), {})
+        self.assertEqual(await caches['v2'].get_many_async(['ford3', 'arthur3'], version=2),
+                         {'ford3': 37, 'arthur3': 42})
+
+        # v2 set, default version = 2, but manually override version = 1
+        await caches['v2'].set_many_async({'ford4': 37, 'arthur4': 42}, version=1)
+        self.assertEqual(await cache.get_many_async(['ford4', 'arthur4']), {'ford4': 37, 'arthur4': 42})
+        self.assertEqual(await cache.get_many_async(['ford4', 'arthur4'], version=1), {'ford4': 37, 'arthur4': 42})
+        self.assertEqual(await cache.get_many_async(['ford4', 'arthur4'], version=2), {})
+
+        self.assertEqual(await caches['v2'].get_many_async(['ford4', 'arthur4']), {})
+        self.assertEqual(await caches['v2'].get_many_async(['ford4', 'arthur4'], version=1),
+                         {'ford4': 37, 'arthur4': 42})
+        self.assertEqual(await caches['v2'].get_many_async(['ford4', 'arthur4'], version=2), {})
+
     def test_incr_version(self):
         cache.set('answer', 42, version=2)
         self.assertIsNone(cache.get('answer'))
@@ -1063,6 +1698,34 @@ class BaseCacheTests:
         with self.assertRaises(ValueError):
             cache.incr_version('does_not_exist')
 
+    async def test_incr_version_async(self):
+        await cache.set_async('answer', 42, version=2)
+        self.assertIsNone(await cache.get_async('answer'))
+        self.assertIsNone(await cache.get_async('answer', version=1))
+        self.assertEqual(await cache.get_async('answer', version=2), 42)
+        self.assertIsNone(await cache.get_async('answer', version=3))
+
+        self.assertEqual(await cache.incr_version_async('answer', version=2), 3)
+        self.assertIsNone(await cache.get_async('answer'))
+        self.assertIsNone(await cache.get_async('answer', version=1))
+        self.assertIsNone(await cache.get_async('answer', version=2))
+        self.assertEqual(await cache.get_async('answer', version=3), 42)
+
+        await caches['v2'].set_async('answer2', 42)
+        self.assertEqual(await caches['v2'].get_async('answer2'), 42)
+        self.assertIsNone(await caches['v2'].get_async('answer2', version=1))
+        self.assertEqual(await caches['v2'].get_async('answer2', version=2), 42)
+        self.assertIsNone(await caches['v2'].get_async('answer2', version=3))
+
+        self.assertEqual(await caches['v2'].incr_version_async('answer2'), 3)
+        self.assertIsNone(await caches['v2'].get_async('answer2'))
+        self.assertIsNone(await caches['v2'].get_async('answer2', version=1))
+        self.assertIsNone(await caches['v2'].get_async('answer2', version=2))
+        self.assertEqual(await caches['v2'].get_async('answer2', version=3), 42)
+
+        with self.assertRaises(ValueError):
+            await cache.incr_version_async('does_not_exist')
+
     def test_decr_version(self):
         cache.set('answer', 42, version=2)
         self.assertIsNone(cache.get('answer'))
@@ -1087,6 +1750,30 @@ class BaseCacheTests:
         with self.assertRaises(ValueError):
             cache.decr_version('does_not_exist', version=2)
 
+    async def test_decr_version_async(self):
+        await cache.set_async('answer', 42, version=2)
+        self.assertIsNone(await cache.get_async('answer'))
+        self.assertIsNone(await cache.get_async('answer', version=1))
+        self.assertEqual(await cache.get_async('answer', version=2), 42)
+
+        self.assertEqual(await cache.decr_version_async('answer', version=2), 1)
+        self.assertEqual(await cache.get_async('answer'), 42)
+        self.assertEqual(await cache.get_async('answer', version=1), 42)
+        self.assertIsNone(await cache.get_async('answer', version=2))
+
+        await caches['v2'].set_async('answer2', 42)
+        self.assertEqual(await caches['v2'].get_async('answer2'), 42)
+        self.assertIsNone(await caches['v2'].get_async('answer2', version=1))
+        self.assertEqual(await caches['v2'].get_async('answer2', version=2), 42)
+
+        self.assertEqual(await caches['v2'].decr_version_async('answer2'), 1)
+        self.assertIsNone(await caches['v2'].get_async('answer2'))
+        self.assertEqual(await caches['v2'].get_async('answer2', version=1), 42)
+        self.assertIsNone(await caches['v2'].get_async('answer2', version=2))
+
+        with self.assertRaises(ValueError):
+            await cache.decr_version_async('does_not_exist', version=2)
+
     def test_custom_key_func(self):
         # Two caches with different key functions aren't visible to each other
         cache.set('answer1', 42)
@@ -1098,6 +1785,18 @@ class BaseCacheTests:
         self.assertIsNone(cache.get('answer2'))
         self.assertEqual(caches['custom_key'].get('answer2'), 42)
         self.assertEqual(caches['custom_key2'].get('answer2'), 42)
+
+    async def test_custom_key_func_async(self):
+        # Two caches with different key functions aren't visible to each other
+        await cache.set_async('answer1', 42)
+        self.assertEqual(await cache.get_async('answer1'), 42)
+        self.assertIsNone(await caches['custom_key'].get_async('answer1'))
+        self.assertIsNone(await caches['custom_key2'].get_async('answer1'))
+
+        await caches['custom_key'].set_async('answer2', 42)
+        self.assertIsNone(await cache.get_async('answer2'))
+        self.assertEqual(await caches['custom_key'].get_async('answer2'), 42)
+        self.assertEqual(await caches['custom_key2'].get_async('answer2'), 42)
 
     def test_cache_write_unpicklable_object(self):
         fetch_middleware = FetchFromCacheMiddleware(empty_response)
@@ -1130,20 +1829,39 @@ class BaseCacheTests:
         self.assertEqual(get_cache_data.content, content.encode())
         self.assertEqual(get_cache_data.cookies, response.cookies)
 
+    async def test_cache_write_unpicklable_object_async(self):
+        # TODO Change cache middleware to be async; then change cache test case
+        ...
+
     def test_add_fail_on_pickleerror(self):
         # Shouldn't fail silently if trying to cache an unpicklable type.
         with self.assertRaises(pickle.PickleError):
             cache.add('unpicklable', Unpicklable())
 
+    async def test_add_fail_on_pickleerror_async(self):
+        # Shouldn't fail silently if trying to cache an unpicklable type.
+        with self.assertRaises(pickle.PickleError):
+            await cache.add_async('unpicklable', Unpicklable())
+
     def test_set_fail_on_pickleerror(self):
         with self.assertRaises(pickle.PickleError):
             cache.set('unpicklable', Unpicklable())
+
+    async def test_set_fail_on_pickleerror_async(self):
+        with self.assertRaises(pickle.PickleError):
+            await cache.set_async('unpicklable', Unpicklable())
 
     def test_get_or_set(self):
         self.assertIsNone(cache.get('projector'))
         self.assertEqual(cache.get_or_set('projector', 42), 42)
         self.assertEqual(cache.get('projector'), 42)
         self.assertIsNone(cache.get_or_set('null', None))
+
+    async def test_get_or_set_async(self):
+        self.assertIsNone(await cache.get_async('projector'))
+        self.assertEqual(await cache.get_or_set_async('projector', 42), 42)
+        self.assertEqual(await cache.get_async('projector'), 42)
+        self.assertIsNone(await cache.get_or_set_async('null', None))
 
     def test_get_or_set_callable(self):
         def my_callable():
@@ -1152,10 +1870,22 @@ class BaseCacheTests:
         self.assertEqual(cache.get_or_set('mykey', my_callable), 'value')
         self.assertEqual(cache.get_or_set('mykey', my_callable()), 'value')
 
+    async def test_get_or_set_callable_async(self):
+        def my_callable():
+            return 'value'
+
+        self.assertEqual(await cache.get_or_set_async('mykey', my_callable), 'value')
+        self.assertEqual(await cache.get_or_set_async('mykey', my_callable()), 'value')
+
     def test_get_or_set_callable_returning_none(self):
         self.assertIsNone(cache.get_or_set('mykey', lambda: None))
         # Previous get_or_set() doesn't store None in the cache.
         self.assertEqual(cache.get('mykey', 'default'), 'default')
+
+    async def test_get_or_set_callable_returning_none_async(self):
+        self.assertIsNone(await cache.get_or_set_async('mykey', lambda: None))
+        # Previous get_or_set_async() doesn't store None in the cache.
+        self.assertEqual(await cache.get_async('mykey', 'default'), 'default')
 
     def test_get_or_set_version(self):
         msg = "get_or_set() missing 1 required positional argument: 'default'"
@@ -1169,12 +1899,31 @@ class BaseCacheTests:
         self.assertEqual(cache.get_or_set('brian', 1979, version=2), 1979)
         self.assertIsNone(cache.get('brian', version=3))
 
+    async def test_get_or_set_version_async(self):
+        msg = "get_or_set_async() missing 1 required positional argument: 'default'"
+        self.assertEqual(await cache.get_or_set_async('brian', 1979, version=2), 1979)
+        with self.assertRaisesMessage(TypeError, msg):
+            await cache.get_or_set_async('brian')
+        with self.assertRaisesMessage(TypeError, msg):
+            await cache.get_or_set_async('brian', version=1)
+        self.assertIsNone(await cache.get_async('brian', version=1))
+        self.assertEqual(await cache.get_or_set_async('brian', 42, version=1), 42)
+        self.assertEqual(await cache.get_or_set_async('brian', 1979, version=2), 1979)
+        self.assertIsNone(await cache.get_async('brian', version=3))
+
     def test_get_or_set_racing(self):
         with mock.patch('%s.%s' % (settings.CACHES['default']['BACKEND'], 'add')) as cache_add:
             # Simulate cache.add() failing to add a value. In that case, the
             # default value should be returned.
             cache_add.return_value = False
             self.assertEqual(cache.get_or_set('key', 'default'), 'default')
+
+    async def test_get_or_set_racing_async(self):
+        with mock.patch('%s.%s' % (settings.CACHES['default']['BACKEND'], 'add_async')) as cache_add:
+            # Simulate cache.add_async() failing to add a value. In that case, the
+            # default value should be returned.
+            cache_add.return_value = False
+            self.assertEqual(await cache.get_or_set_async('key', 'default'), 'default')
 
 
 @override_settings(CACHES=caches_setting_for_tests(
@@ -1183,7 +1932,6 @@ class BaseCacheTests:
     LOCATION='test cache table'
 ))
 class DBCacheTests(BaseCacheTests, TransactionTestCase):
-
     available_apps = ['cache']
 
     def setUp(self):
@@ -1220,6 +1968,9 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
 
     def test_zero_cull(self):
         self._perform_cull_test('zero_cull', 50, 18)
+
+    async def test_zero_cull_async(self):
+        await self._perform_cull_test_async('zero_cull', 50, 18)
 
     def test_second_call_doesnt_crash(self):
         out = io.StringIO()
@@ -1357,6 +2108,19 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(caches['default'].get('value'), 42)
         self.assertIsNone(caches['other'].get('value'))
 
+    @override_settings(CACHES={
+        'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'},
+        'other': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'other'
+        },
+    })
+    async def test_multiple_caches_async(self):
+        "Multiple locmem caches are isolated"
+        await cache.set_async('value', 42)
+        self.assertEqual(await caches['default'].get_async('value'), 42)
+        self.assertIsNone(await caches['other'].get_async('value'))
+
     def test_locking_on_pickle(self):
         """#20613/#18541 -- Ensures pickling is done outside of the lock."""
         bad_obj = PicklingSideEffect(cache)
@@ -1364,6 +2128,15 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         self.assertFalse(bad_obj.locked, "Cache was locked during pickling")
 
         self.assertIs(cache.add('add', bad_obj), True)
+        self.assertFalse(bad_obj.locked, "Cache was locked during pickling")
+
+    async def test_locking_on_pickle_async(self):
+        """#20613/#18541 -- Ensures pickling is done outside of the lock."""
+        bad_obj = PicklingSideEffect(cache)
+        await cache.set_async('set_async', bad_obj)
+        self.assertFalse(bad_obj.locked, "Cache was locked during pickling")
+
+        self.assertIs(await cache.add_async('add_async', bad_obj), True)
         self.assertFalse(bad_obj.locked, "Cache was locked during pickling")
 
     def test_incr_decr_timeout(self):
@@ -1375,6 +2148,17 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(cache.incr(key), 2)
         self.assertEqual(expire, cache._expire_info[_key])
         self.assertEqual(cache.decr(key), 1)
+        self.assertEqual(expire, cache._expire_info[_key])
+
+    async def test_incr_decr_timeout_async(self):
+        """incr/decr does not modify expiry time (matches memcached behavior)"""
+        key = 'value'
+        _key = cache.make_key(key)
+        await cache.set_async(key, 1, timeout=cache.default_timeout * 10)
+        expire = cache._expire_info[_key]
+        self.assertEqual(await cache.incr_async(key), 2)
+        self.assertEqual(expire, cache._expire_info[_key])
+        self.assertEqual(await cache.decr_async(key), 1)
         self.assertEqual(expire, cache._expire_info[_key])
 
     @limit_locmem_entries
@@ -1392,6 +2176,20 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(cache.get(9), 9)
 
     @limit_locmem_entries
+    async def test_lru_get_async(self):
+        """get_async() moves cache keys."""
+        for key in range(9):
+            await cache.set_async(key, key, timeout=None)
+        for key in range(6):
+            self.assertEqual(await cache.get_async(key), key)
+        await cache.set_async(9, 9, timeout=None)
+        for key in range(6):
+            self.assertEqual(await cache.get_async(key), key)
+        for key in range(6, 9):
+            self.assertIsNone(await cache.get_async(key))
+        self.assertEqual(await cache.get_async(9), 9)
+
+    @limit_locmem_entries
     def test_lru_set(self):
         """set() moves cache keys."""
         for key in range(9):
@@ -1403,6 +2201,19 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
             self.assertEqual(cache.get(key), key)
         for key in range(3):
             self.assertIsNone(cache.get(key))
+
+    @limit_locmem_entries
+    async def test_lru_set_async(self):
+        """set_async() moves cache keys."""
+        for key in range(9):
+            await cache.set_async(key, key, timeout=None)
+        for key in range(3, 9):
+            await cache.set_async(key, key, timeout=None)
+        await cache.set_async(9, 9, timeout=None)
+        for key in range(3, 10):
+            self.assertEqual(await cache.get_async(key), key)
+        for key in range(3):
+            self.assertIsNone(await cache.get_async(key))
 
     @limit_locmem_entries
     def test_lru_incr(self):
@@ -1417,6 +2228,20 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         for key in range(6, 9):
             self.assertIsNone(cache.get(key))
         self.assertEqual(cache.get(9), 9)
+
+    @limit_locmem_entries
+    async def test_lru_incr_async(self):
+        """incr_async() moves cache keys."""
+        for key in range(9):
+            await cache.set_async(key, key, timeout=None)
+        for key in range(6):
+            self.assertEqual(await cache.incr_async(key), key + 1)
+        await cache.set_async(9, 9, timeout=None)
+        for key in range(6):
+            self.assertEqual(await cache.get_async(key), key + 1)
+        for key in range(6, 9):
+            self.assertIsNone(await cache.get_async(key))
+        self.assertEqual(await cache.get_async(9), 9)
 
 
 # memcached backend isn't guaranteed to be available.
@@ -2648,6 +3473,28 @@ class CacheHandlerTest(SimpleTestCase):
         for x in range(2):
             t = threading.Thread(target=runner)
             t.start()
+            t.join()
+
+        self.assertIsNot(c[0], c[1])
+
+    async def test_per_thread_async(self):
+        """
+        Requesting the same alias from separate threads should yield separate
+        instances when running with asyncio.
+        """
+        c = []
+
+        def runner(loop):
+            asyncio.set_event_loop(loop)
+            loop.run_forever()
+            c.append(caches['default'])
+            loop.close()
+
+        for x in range(2):
+            loop = asyncio.new_event_loop()
+            t = threading.Thread(target=runner, args=(loop,))
+            t.start()
+            loop.call_soon_threadsafe(loop.stop)
             t.join()
 
         self.assertIsNot(c[0], c[1])

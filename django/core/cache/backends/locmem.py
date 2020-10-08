@@ -1,10 +1,14 @@
 "Thread-safe in-memory cache backend."
 import pickle
 import time
+from asyncio import Lock as AsyncLock
 from collections import OrderedDict
 from threading import Lock
 
+from asgiref.sync import sync_to_async
+
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
+from django.core.exceptions import SynchronousOnlyOperation
 
 # Global in-memory store of cache data. Keyed by name, to provide
 # multiple named local memory caches.
@@ -20,7 +24,12 @@ class LocMemCache(BaseCache):
         super().__init__(params)
         self._cache = _caches.setdefault(name, OrderedDict())
         self._expire_info = _expire_info.setdefault(name, {})
-        self._lock = _locks.setdefault(name, Lock())
+        self._lock = _locks.setdefault(name + "_sync", Lock())
+        try:
+            self._lock_async = _locks.setdefault(name + "_async", AsyncLock())
+        except RuntimeError:
+            # Not run with an event loop
+            pass
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
@@ -32,10 +41,31 @@ class LocMemCache(BaseCache):
                 return True
             return False
 
+    async def add_async(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+        key = self.make_key(key, version=version)
+        self.validate_key(key)
+        pickled = pickle.dumps(value, self.pickle_protocol)
+        async with self._lock_async:
+            if self._has_expired(key):
+                self._set(key, pickled, timeout)
+                return True
+            return False
+
     def get(self, key, default=None, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         with self._lock:
+            if self._has_expired(key):
+                self._delete(key)
+                return default
+            pickled = self._cache[key]
+            self._cache.move_to_end(key, last=False)
+        return pickle.loads(pickled)
+
+    async def get_async(self, key, default=None, version=None):
+        key = self.make_key(key, version=version)
+        self.validate_key(key)
+        async with self._lock_async:
             if self._has_expired(key):
                 self._delete(key)
                 return default
@@ -57,6 +87,19 @@ class LocMemCache(BaseCache):
         with self._lock:
             self._set(key, pickled, timeout)
 
+    async def set_async(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+        key = self.make_key(key, version=version)
+        self.validate_key(key)
+        try:
+            pickled = pickle.dumps(value, self.pickle_protocol)
+        except SynchronousOnlyOperation:
+            # Evaluates QuerySet
+            pickled = await sync_to_async(
+                pickle.dumps, thread_sensitive=True
+            )(value, self.pickle_protocol)
+        async with self._lock_async:
+            self._set(key, pickled, timeout)
+
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
@@ -66,25 +109,52 @@ class LocMemCache(BaseCache):
             self._expire_info[key] = self.get_backend_timeout(timeout)
             return True
 
+    async def touch_async(self, key, timeout=DEFAULT_TIMEOUT, version=None):
+        key = self.make_key(key, version=version)
+        self.validate_key(key)
+        async with self._lock_async:
+            if self._has_expired(key):
+                return False
+            self._expire_info[key] = self.get_backend_timeout(timeout)
+            return True
+
+    def _incr(self, key, delta):
+        if self._has_expired(key):
+            self._delete(key)
+            raise ValueError("Key '%s' not found" % key)
+        pickled = self._cache[key]
+        value = pickle.loads(pickled)
+        new_value = value + delta
+        pickled = pickle.dumps(new_value, self.pickle_protocol)
+        self._cache[key] = pickled
+        self._cache.move_to_end(key, last=False)
+        return new_value
+
     def incr(self, key, delta=1, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         with self._lock:
-            if self._has_expired(key):
-                self._delete(key)
-                raise ValueError("Key '%s' not found" % key)
-            pickled = self._cache[key]
-            value = pickle.loads(pickled)
-            new_value = value + delta
-            pickled = pickle.dumps(new_value, self.pickle_protocol)
-            self._cache[key] = pickled
-            self._cache.move_to_end(key, last=False)
-        return new_value
+            return self._incr(key, delta)
+
+    async def incr_async(self, key, delta=1, version=None):
+        key = self.make_key(key, version=version)
+        self.validate_key(key)
+        async with self._lock_async:
+            return self._incr(key, delta)
 
     def has_key(self, key, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         with self._lock:
+            if self._has_expired(key):
+                self._delete(key)
+                return False
+            return True
+
+    async def has_key_async(self, key, version=None):
+        key = self.make_key(key, version=version)
+        self.validate_key(key)
+        async with self._lock_async:
             if self._has_expired(key):
                 self._delete(key)
                 return False
@@ -118,7 +188,18 @@ class LocMemCache(BaseCache):
         with self._lock:
             return self._delete(key)
 
+    async def delete_async(self, key, version=None):
+        key = self.make_key(key, version=version)
+        self.validate_key(key)
+        async with self._lock_async:
+            return self._delete(key)
+
     def clear(self):
         with self._lock:
+            self._cache.clear()
+            self._expire_info.clear()
+
+    async def clear_async(self):
+        async with self._lock_async:
             self._cache.clear()
             self._expire_info.clear()
