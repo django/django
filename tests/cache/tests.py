@@ -2302,12 +2302,36 @@ class BaseMemcachedTests(BaseCacheTests):
                     getattr(cache, operation)(*args)
                 self.assertEqual(str(cm.exception), msg)
 
+    async def _perform_invalid_key_test_async(self, key, expected_warning):
+        """
+        While other backends merely warn, memcached should raise for an invalid
+        key.
+        """
+        msg = expected_warning.replace(key, cache.make_key(key))
+        tests = [
+            ('add_async', [key, 1]),
+            ('get_async', [key]),
+            ('set_async', [key, 1]),
+            ('incr_async', [key]),
+            ('decr_async', [key]),
+            ('touch_async', [key]),
+            ('delete_async', [key]),
+            ('get_many_async', [[key, 'b']]),
+            ('set_many_async', [{key: 1, 'b': 2}]),
+            ('delete_many_async', [{key: 1, 'b': 2}]),
+        ]
+        for operation, args in tests:
+            with self.subTest(operation=operation):
+                with self.assertRaises(InvalidCacheKey) as cm:
+                    await getattr(cache, operation)(*args)
+                self.assertEqual(str(cm.exception), msg)
+
     def test_default_never_expiring_timeout(self):
         # Regression test for #22845
         with self.settings(CACHES=caches_setting_for_tests(
-                base=self.base_params,
-                exclude=memcached_excluded_caches,
-                TIMEOUT=None)):
+            base=self.base_params,
+            exclude=memcached_excluded_caches,
+            TIMEOUT=None)):
             cache.set('infinite_foo', 'bar')
             self.assertEqual(cache.get('infinite_foo'), 'bar')
 
@@ -2395,6 +2419,14 @@ class MemcachedCacheTests(BaseMemcachedTests, TestCase):
         """
         cache.set('key_default_none', None)
         self.assertEqual(cache.get('key_default_none', default='default'), 'default')
+
+    async def test_default_used_when_none_is_set_async(self):
+        """
+        python-memcached doesn't support default in get() so this test
+        overrides the one in BaseCacheTests.
+        """
+        await cache.set_async('key_default_none', None)
+        self.assertEqual(await cache.get_async('key_default_none', default='default'), 'default')
 
 
 @unittest.skipUnless(PyLibMCCache_params, "PyLibMCCache backend not configured")
