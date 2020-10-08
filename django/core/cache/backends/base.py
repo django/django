@@ -2,6 +2,8 @@
 import time
 import warnings
 
+from asgiref.sync import sync_to_async
+
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
 
@@ -121,7 +123,7 @@ class BaseCache:
 
         Return True if the value was stored, False otherwise.
         """
-        raise NotImplementedError('subclasses of BaseCache must provide an add_async() method')
+        return await sync_to_async(self.add, thread_sensitive=True)(key, value, timeout, version)
 
     def get(self, key, default=None, version=None):
         """
@@ -135,7 +137,7 @@ class BaseCache:
         Fetch a given key from the cache. If the key does not exist, return
         default, which itself defaults to None.
         """
-        raise NotImplementedError('subclasses of BaseCache must provide a get_async() method')
+        return await sync_to_async(self.get, thread_sensitive=True)(key, default, version)
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         """
@@ -149,7 +151,7 @@ class BaseCache:
         Set a value in the cache. If timeout is given, use that timeout for the
         key; otherwise use the default cache timeout.
         """
-        raise NotImplementedError('subclasses of BaseCache must provide a set_async() method')
+        return await sync_to_async(self.set, thread_sensitive=True)(key, value, timeout, version)
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
         """
@@ -163,7 +165,7 @@ class BaseCache:
         Update the key's expiry time using timeout. Return True if successful
         or False if the key does not exist.
         """
-        raise NotImplementedError('subclasses of BaseCache must provide a touch_async() method')
+        return await sync_to_async(self.touch, thread_sensitive=True)(key, timeout, version)
 
     def delete(self, key, version=None):
         """
@@ -177,7 +179,7 @@ class BaseCache:
         Delete a key from the cache and return whether it succeeded, failing
         silently.
         """
-        raise NotImplementedError('subclasses of BaseCache must provide a delete_async() method')
+        return await sync_to_async(self.delete, thread_sensitive=True)(key, version)
 
     def get_many(self, keys, version=None):
         """
@@ -366,7 +368,7 @@ class BaseCache:
 
     async def clear_async(self):
         """Remove *all* values from the cache at once."""
-        raise NotImplementedError('subclasses of BaseCache must provide a clear() method')
+        await sync_to_async(self.clear, thread_sensitive=True)()
 
     def validate_key(self, key):
         """
@@ -421,7 +423,6 @@ class BaseCache:
         Subtract delta from the cache version for the supplied key. Return the
         new version.
         """
-        await self.close_async()
         return await self.incr_version_async(key, -delta, version)
 
     def close(self, **kwargs):
