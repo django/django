@@ -28,3 +28,14 @@ def register(*models, site=None):
 
         return admin_class
     return _model_admin_wrapper
+
+
+def action(short_description=None, allowed_permissions=None):
+    def decorator(func):
+        if short_description is not None:
+            func.short_description = short_description
+        if allowed_permissions is not None:
+            func.allowed_permissions = allowed_permissions
+        return func
+
+    return decorator
