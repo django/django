@@ -322,10 +322,15 @@ class SQLCompiler:
             if col in self.query.annotations:
                 # References to an expression which is masked out of the SELECT
                 # clause.
-                expr = self.query.annotations[col]
-                if isinstance(expr, Value):
-                    # output_field must be resolved for constants.
-                    expr = Cast(expr, expr.output_field)
+                if self.query.combinator and self.select:
+                    # Don't use the resolved annotation because other
+                    # combinated queries might define it differently.
+                    expr = F(col)
+                else:
+                    expr = self.query.annotations[col]
+                    if isinstance(expr, Value):
+                        # output_field must be resolved for constants.
+                        expr = Cast(expr, expr.output_field)
                 order_by.append((OrderBy(expr, descending=descending), False))
                 continue
 
@@ -378,10 +383,14 @@ class SQLCompiler:
                 else:
                     if col_alias:
                         raise DatabaseError('ORDER BY term does not match any column in the result set.')
-                    # Add column used in ORDER BY clause without an alias to
-                    # the selected columns.
-                    self.query.add_select_col(src)
-                    resolved.set_source_expressions([RawSQL('%d' % len(self.query.select), ())])
+                    # Add column used in ORDER BY clause to the selected
+                    # columns and to each combined query.
+                    order_by_idx = len(self.query.select) + 1
+                    col_name = f'__orderbycol{order_by_idx}'
+                    for q in self.query.combined_queries:
+                        q.add_annotation(expr_src, col_name)
+                    self.query.add_select_col(resolved, col_name)
+                    resolved.set_source_expressions([RawSQL(f'{order_by_idx}', ())])
             sql, params = self.compile(resolved)
             # Don't add the same column twice, but the order direction is
             # not taken into account so we strip it. When this entire method

@@ -1881,9 +1881,9 @@ class Query(BaseExpression):
         self.select = ()
         self.values_select = ()
 
-    def add_select_col(self, col):
+    def add_select_col(self, col, name):
         self.select += col,
-        self.values_select += col.output_field.name,
+        self.values_select += name,
 
     def set_select(self, cols):
         self.default_cols = False
