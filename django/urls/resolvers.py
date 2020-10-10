@@ -357,7 +357,7 @@ class URLPattern:
     def resolve(self, path):
         match = self.pattern.match(path)
         if match:
-            new_path, args, kwargs = match
+            _, args, kwargs = match
             # Pass any extra_kwargs as **kwargs.
             kwargs.update(self.default_args)
             return ResolverMatch(self.callback, args, kwargs, self.pattern.name, route=str(self.pattern))
