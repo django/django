@@ -939,6 +939,27 @@ class Model(metaclass=ModelBase):
             using=using, raw=raw,
         )
 
+    def update(self, data=None):
+        """
+        To update an ORM object with given dictionary object.
+
+        Args:
+            data (dict): Dict object with key-value pairs of field_name-updated_value.
+
+        Returns:
+            bool: Returns True, if Django ORM object updated else False.
+        """
+        if not isinstance(data, dict):
+            raise TypeError("Dict object is required to update object.")
+
+        # Remove id field, if exists. To avoid Integrity error.
+        _id = data.pop('id', None)  # noqa
+
+        for key, value in data.items():
+            setattr(self, key, value)
+
+        self.save(update_fields=data.keys())
+
     def delete(self, using=None, keep_parents=False):
         using = using or router.db_for_write(self.__class__, instance=self)
         assert self.pk is not None, (
