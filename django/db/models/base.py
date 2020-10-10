@@ -945,9 +945,6 @@ class Model(metaclass=ModelBase):
 
         Args:
             data (dict): Dict object with key-value pairs of field_name-updated_value.
-
-        Returns:
-            bool: Returns True, if Django ORM object updated else False.
         """
         if not isinstance(data, dict):
             raise TypeError("Dict object is required to update object.")
