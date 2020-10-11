@@ -5,7 +5,7 @@ input[type="submit"], button {
     appearance: none;
 }
 
-@media (max-width: 1280px) {
+@media (max-width: 1024px) {
     /* Basic */
 
     html {
@@ -554,7 +554,8 @@ input[type="submit"], button {
         padding: 15px 0;
     }
 
-    .aligned .form-row {
+    .aligned .form-row,
+    .aligned .form-row > div {
         display: flex;
         max-width: 100vw;
     }

@@ -107,7 +107,7 @@
     max-width: calc(100% - 299px);
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 767px) {
     #nav-sidebar, #toggle-nav-sidebar {
         display: none;
     }
