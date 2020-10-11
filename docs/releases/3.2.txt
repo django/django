@@ -143,8 +143,8 @@ Minor features
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* The new :attr:`.SessionStore.expire_date` property allows getting the
-  current session's expire date.
+* The new ``~django.contrib.sessions.backends.db.SessionStore.expire_date``
+  property allows getting the current session's expire date.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
