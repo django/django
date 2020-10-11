@@ -20,7 +20,7 @@ Who's this tutorial for?
 .. seealso::
 
     If you are looking for a reference on how to submit patches, see the
-    :doc:`/internals/contributing/writing-code/submitting-patches`
+    :doc:`/internals/contributing/submission/submitting-patches`
     documentation.
 
 For this tutorial, we expect that you have at least a basic understanding of
@@ -555,7 +555,7 @@ Next steps
 
 Congratulations, you've learned how to make a pull request to Django! Details
 of more advanced techniques you may need are in
-:doc:`/internals/contributing/writing-code/working-with-git`.
+:doc:`/internals/contributing/submission/working-with-git`.
 
 Now you can put those skills to good use by helping to improve Django's
 codebase.
@@ -568,7 +568,7 @@ information on contributing that you should probably take a look at:
 
 * You should make sure to read Django's documentation on
   :doc:`claiming tickets and submitting patches
-  </internals/contributing/writing-code/submitting-patches>`.
+  </internals/contributing/submission/submitting-patches>`.
   It covers Trac etiquette, how to claim tickets for yourself, expected
   coding style for patches, and many other important details.
 * First time contributors should also read Django's :doc:`documentation
@@ -598,7 +598,7 @@ with writing tests, you can also look at the list of
 `easy tickets that need tests`__. Remember to follow the guidelines about
 claiming tickets that were mentioned in the link to Django's documentation on
 :doc:`claiming tickets and submitting patches
-</internals/contributing/writing-code/submitting-patches>`.
+</internals/contributing/submission/submitting-patches>`.
 
 __ https://code.djangoproject.com/query?status=new&status=reopened&has_patch=0&easy=1&col=id&col=summary&col=status&col=owner&col=type&col=milestone&order=priority
 __ https://code.djangoproject.com/query?status=new&status=reopened&needs_better_patch=1&easy=1&col=id&col=summary&col=status&col=owner&col=type&col=milestone&order=priority
@@ -612,4 +612,4 @@ After submitting a pull request, update the ticket metadata by setting the
 flags on the ticket to say "has patch", "doesn't need tests", etc, so others
 can find it for review. Contributing doesn't necessarily always mean writing a
 patch from scratch. Reviewing existing patches is also a very helpful
-contribution. See :doc:`/internals/contributing/triaging-tickets` for details.
+contribution. See :doc:`/internals/contributing/maintainers/triaging-tickets` for details.

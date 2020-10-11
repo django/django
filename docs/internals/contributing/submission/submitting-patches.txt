@@ -1,6 +1,6 @@
-==================
+=========================
 Submitting Pull Requests
-==================
+=========================
 
 We're always grateful for patches to Django's code. Indeed, bug reports
 with associated patches will get fixed *far* more quickly than those
