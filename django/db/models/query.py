@@ -608,7 +608,12 @@ class QuerySet:
                 return obj, created
             for k, v in resolve_callables(defaults):
                 setattr(obj, k, v)
-            obj.save(using=self.db)
+            # `update_fields` does not support non-concrete fields yet (#31382)
+            fnames = map(lambda f: f.name, self.model._meta.concrete_fields)
+            if set(defaults).issubset(fnames):
+                obj.save(using=self.db, update_fields=defaults.keys())
+            else:
+                obj.save(using=self.db)
         return obj, False
 
     def _extract_model_params(self, defaults, **kwargs):

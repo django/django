@@ -6,6 +6,7 @@ from threading import Thread
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, IntegrityError, connection
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.test.utils import CaptureQueriesContext
 from django.utils.functional import lazy
 
 from .models import (
@@ -465,6 +466,26 @@ class UpdateOrCreateTests(TestCase):
             first_name='John', defaults=lazy(raise_exception, object)(),
         )
         self.assertFalse(created)
+
+    def test_update_only_defaults(self):
+        Person.objects.create(
+            first_name='John', last_name='Lennon', birthday=date(1940, 10, 9)
+        )
+        with CaptureQueriesContext(connection) as captured_queries:
+            _, created = Person.objects.update_or_create(
+                first_name='John', defaults={'birthday': date(1900, 1, 1)},
+            )
+        self.assertFalse(created)
+        query = None
+        for q in captured_queries:
+            if q['sql'].startswith('UPDATE'):
+                query = q['sql']
+                break
+        self.assertIsNotNone(query)
+        self.assertIn('birthday', query)
+        # Neither first_name nor last_name should get updated.
+        self.assertNotIn('first_name', query)
+        self.assertNotIn('last_name', query)
 
 
 class UpdateOrCreateTestsWithManualPKs(TestCase):
