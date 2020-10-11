@@ -614,7 +614,7 @@ class QuerySet:
                 fnames.add(f.name)
                 fnames.add(f.attname)
             if set(defaults).issubset(fnames):
-                obj.save(using=self.db, update_fields=defaults.keys())
+                obj.save(using=self.db, update_fields=defaults)
             else:
                 obj.save(using=self.db)
         return obj, False
