@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from django.contrib.sessions.backends.base import (
     CreateError, SessionBase, UpdateError,
@@ -13,8 +14,9 @@ class SessionStore(SessionBase):
     """
     Implement database session store.
     """
-    def __init__(self, session_key=None):
+    def __init__(self, session_key=None, expire_date=None):
         super().__init__(session_key)
+        self._expire_date = expire_date
 
     @classmethod
     def get_model_class(cls):
@@ -81,10 +83,13 @@ class SessionStore(SessionBase):
             return self.create()
         data = self._get_session(no_load=must_create)
         obj = self.create_model_instance(data)
+        if self.expire_date:
+            obj.expire_date = self.expire_date
         using = router.db_for_write(self.model, instance=obj)
         try:
             with transaction.atomic(using=using):
                 obj.save(force_insert=must_create, force_update=not must_create, using=using)
+                self._expire_date = obj.expire_date
         except IntegrityError:
             if must_create:
                 raise CreateError
@@ -107,3 +112,27 @@ class SessionStore(SessionBase):
     @classmethod
     def clear_expired(cls):
         cls.get_model_class().objects.filter(expire_date__lt=timezone.now()).delete()
+
+    def _get_expire_date(self):
+        """
+        Get expire date if exist or set it from current session instance.
+        """
+        if not self.__expire_date and self.session_key:
+            try:
+                self._expire_date = self.model.objects.get(session_key=self.session_key).expire_date
+            except self.model.DoesNotExist:
+                return self.__expire_date
+        return self.__expire_date
+
+    def _set_expire_date(self, value):
+        """
+        Validate expire date on assignment. Invalid values will be set to current value.
+        """
+        self.__expire_date = None
+        if isinstance(value, datetime):
+            self.__expire_date = value
+        else:
+            self.__expire_date = self.expire_date
+
+    expire_date = property(_get_expire_date)
+    _expire_date = property(_get_expire_date, _set_expire_date)

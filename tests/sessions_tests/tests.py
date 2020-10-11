@@ -474,6 +474,38 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         # ... and one is deleted.
         self.assertEqual(1, self.model.objects.count())
 
+    def test_session_expire_date(self):
+        """
+        Test set and get expire date for current session.
+        """
+        # assert initial expire date without session being set
+        self.assertIsNone(self.session.expire_date)
+
+        # Create a session
+        self.session['y'] = 1
+        self.session.save()
+        self.assertIsNotNone(self.session.expire_date)
+
+        # set new expire date
+        current_expire_date = self.session.expire_date
+        new_exp_date = self.session.expire_date + timedelta(days=2)
+        self.session._expire_date = new_exp_date
+
+        # get current session from database
+        session = self.session._get_session_from_db()
+        self.assertEqual(session.expire_date, current_expire_date)
+
+        # update db session object
+        self.session.save()
+
+        # get current updated session from database should have new expire_date
+        session = self.session._get_session_from_db()
+        self.assertEqual(session.expire_date, new_exp_date)
+
+        # set invalid expire date should keep expire_date unchanged
+        self.session._expire_date = "Invalid value"
+        self.assertEqual(self.session.expire_date, session.expire_date)
+
 
 @override_settings(USE_TZ=True)
 class DatabaseSessionWithTimeZoneTests(DatabaseSessionTests):
