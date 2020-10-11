@@ -131,7 +131,7 @@ class SessionStore(SessionBase):
         self.__expire_date = None
         if isinstance(value, datetime):
             self.__expire_date = value
-        else:
+        elif value is not None:
             self.__expire_date = self.expire_date
 
     expire_date = property(_get_expire_date)
