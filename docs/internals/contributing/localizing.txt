@@ -60,7 +60,7 @@ the date, time and numbers formatting particularities of your locale. See
 :doc:`/topics/i18n/formatting` for details.
 
 The format files aren't managed by the use of Transifex. To change them, you
-must :doc:`create a patch<writing-code/submitting-patches>` against the
+must :doc:`create a patch<submission/submitting-patches>` against the
 Django source tree, as for any code change:
 
 * Create a diff against the current Git master branch.

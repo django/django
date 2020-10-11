@@ -34,7 +34,7 @@ Triage workflow
 ===============
 
 Unfortunately, not all bug reports and feature requests in the ticket tracker
-provide all the :doc:`required details<bugs-and-features>`. A number of
+provide all the :doc:`required details<../bugs-and-features>`. A number of
 tickets have patches, but those patches don't meet all the requirements of a
 :ref:`good patch<patch-style>`.
 
@@ -167,7 +167,7 @@ Has patch
 ---------
 
 This means the ticket has an associated
-:doc:`patch<writing-code/submitting-patches>`. These will be reviewed
+:doc:`patch<../submission/submitting-patches>`. These will be reviewed
 to see if the patch is "good".
 
 The following three fields (Needs documentation, Needs tests,
@@ -382,7 +382,7 @@ Then, you can help out by:
     several that are useful for triaging tickets and reviewing patches as
     suggested above.
 
-    You can also find more :doc:`new-contributors`.
+    You can also find more :doc:`../new-contributors`.
 
     .. _Reports page: https://code.djangoproject.com/wiki/Reports
 

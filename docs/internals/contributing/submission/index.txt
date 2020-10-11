@@ -1,0 +1,9 @@
+============
+Submitting Contributions
+============
+
+.. toctree::
+   :maxdepth: 1
+
+   submitting-patches
+   working-with-git

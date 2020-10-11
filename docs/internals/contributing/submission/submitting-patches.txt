@@ -1,5 +1,5 @@
 ==================
-Submitting patches
+Submitting Pull Requests
 ==================
 
 We're always grateful for patches to Django's code. Indeed, bug reports
@@ -101,7 +101,7 @@ requirements:
 
 * The code required to fix a problem or add a feature is an essential part
   of a patch, but it is not the only part. A good patch should also include a
-  :doc:`regression test <unit-tests>` to validate the behavior that has been
+  :doc:`regression test <../writing-code/unit-tests>` to validate the behavior that has been
   fixed and to prevent the problem from arising again. Also, if some tickets
   are relevant to the code that you've written, mention the ticket numbers in
   some comments in the test so that one can easily trace back the relevant

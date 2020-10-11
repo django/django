@@ -11,6 +11,4 @@ chances to be included in Django core:
 
    coding-style
    unit-tests
-   submitting-patches
-   working-with-git
    javascript
