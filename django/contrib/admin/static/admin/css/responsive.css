@@ -463,7 +463,7 @@ input[type="submit"], button {
 
 /* Mobile */
 
-@media (max-width: 767px) {
+@media (max-width: 847px) {
     /* Layout */
 
     #header, #content, #footer {
@@ -557,7 +557,12 @@ input[type="submit"], button {
     .aligned .form-row,
     .aligned .form-row > div {
         display: flex;
-        max-width: 100vw;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .aligned .form-row .checkbox-row {
+        display: block;
     }
 
     .aligned .form-row > div {
