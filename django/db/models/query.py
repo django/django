@@ -609,7 +609,10 @@ class QuerySet:
             for k, v in resolve_callables(defaults):
                 setattr(obj, k, v)
             # `update_fields` does not support non-concrete fields yet (#31382)
-            fnames = map(lambda f: f.name, self.model._meta.concrete_fields)
+            fnames = set()
+            for f in self.model._meta.local_concrete_fields:
+                fnames.add(f.name)
+                fnames.add(f.attname)
             if set(defaults).issubset(fnames):
                 obj.save(using=self.db, update_fields=defaults.keys())
             else:

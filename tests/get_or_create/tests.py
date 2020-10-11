@@ -468,24 +468,28 @@ class UpdateOrCreateTests(TestCase):
         self.assertFalse(created)
 
     def test_update_only_defaults(self):
-        Person.objects.create(
-            first_name='John', last_name='Lennon', birthday=date(1940, 10, 9)
-        )
+        publisher = Publisher.objects.create(name="Acme Publishing")
+        book = Book.objects.create(publisher=publisher, name="The Book of Ed & Fred")
+
         with CaptureQueriesContext(connection) as captured_queries:
-            _, created = Person.objects.update_or_create(
-                first_name='John', defaults={'birthday': date(1900, 1, 1)},
+            _, created = Book.objects.update_or_create(
+                pk=book.pk, defaults={'publisher': publisher},
             )
+
+            # Retry with _id field
+            _, created = Book.objects.update_or_create(
+                pk=book.pk, defaults={'publisher_id': publisher.id},
+            )
+
         self.assertFalse(created)
-        query = None
-        for q in captured_queries:
-            if q['sql'].startswith('UPDATE'):
-                query = q['sql']
-                break
-        self.assertIsNotNone(query)
-        self.assertIn('birthday', query)
-        # Neither first_name nor last_name should get updated.
-        self.assertNotIn('first_name', query)
-        self.assertNotIn('last_name', query)
+        update_queries = [q['sql'] for q in captured_queries if q['sql'].startswith('UPDATE')]
+        # Ensure that we execute UPDATE twice
+        self.assertEqual(len(update_queries), 2)
+        for query in update_queries:
+            self.assertIsNotNone(query)
+            self.assertIn('publisher_id_column', query)
+            # Name should not get updated
+            self.assertNotIn('name', query)
 
 
 class UpdateOrCreateTestsWithManualPKs(TestCase):
