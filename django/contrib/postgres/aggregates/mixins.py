@@ -24,7 +24,7 @@ class OrderableAggMixin:
             ordering_params = []
             ordering_expr_sql = []
             for expr in self.ordering:
-                expr_sql, expr_params = expr.as_sql(compiler, connection)
+                expr_sql, expr_params = compiler.compile(expr)
                 ordering_expr_sql.append(expr_sql)
                 ordering_params.extend(expr_params)
             sql, sql_params = super().as_sql(compiler, connection, ordering=(
