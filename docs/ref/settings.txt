@@ -3040,13 +3040,14 @@ Default::
     
     [
         {
-            'NAME': 'contrib.auth.validators.UnicodeUsernameValidator'
+            'NAME': 'django.contrib.auth.validators.UnicodeUsernameValidator'
         },
     ]
 
 The list of validators that are used to check username requirement.
 See :ref:`username-validation` for more details. By default, 
-UnicodeUsernameValidator is used to perform the validation.
+:class:`~django.contrib.auth.validators.UnicodeUsernameValidator`
+is used to perform the validation.
 
 
 .. _settings-messages:

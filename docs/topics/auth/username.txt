@@ -18,7 +18,8 @@ meet the requirements. Validators can also have optional settings to fine tune
 their behavior.
 
 Validation is controlled by the :setting:`AUTH_USERNAME_VALIDATORS` setting.
-The default for the setting is a ``UnicodeUsernameValidator`` which
+The default for the setting is a 
+:class:`~django.contrib.auth.validators.UnicodeUsernameValidator` which
 validates whether the given username contains only letters, numbers and
 ``@``, ``.``, ``+``, ``-``, ``_`` characters.
 
@@ -38,7 +39,8 @@ Username validation is configured in the
         {
             'NAME': 'django.contrib.auth.validators.UsernameMinimumLengthValidator',
             'OPTIONS':{
-                'min_length':3,
+                'input_value': 3,
+                'message': 'Password is too short.'
             }
         }
     ]
@@ -49,8 +51,9 @@ This example enables two included validators:
   anything other than the letters, numbers and ``@``, ``.``, ``+``,
   ``-``, ``_``.
 * ``UsernameMinimumLengthValidator``, which checks whether the username meets a minimum
-  length. This validator is configured to enforce a minimum length of three characters
-  rather than the default one.
+  length. This validator is configured to enforce a minimum length of three characters.
+  The ``limit_value`` parameter is used to to validate minimum length of the given 
+  username.
 
 The help texts and any errors from username validators are always returned in
 the order they are listed in :setting:`AUTH_USERNAME_VALIDATORS`.
@@ -70,12 +73,14 @@ Django includes three validators:
     Validates whether the username contains ASCII letters, in addition
     to ``@``, ``.``, ``+``, ``-``, and ``_``. 
 
-.. class:: UsernameMinimumLengthValidator(min_length=1)
+.. class:: UsernameMinimumLengthValidator(limit_value, message=None)
 
     .. versionadded:: 3.2
 
-    Validates whether the username meets a minimum length.
-    The minimum length can be customized with the ``min_length`` parameter.
+    Validates whether the username meets a minimum length using 
+    ``limit_value``. This validator is extended from 
+    ``django.core.validators.MinLengthValidator``. The text given in ``message``
+    is displayed when validation fails.
 
 Integrating validation
 ----------------------
@@ -117,32 +122,18 @@ Any items in the ``OPTIONS`` in :setting:`AUTH_USERNAME_VALIDATORS` for your
 validator will be passed to the constructor. All constructor arguments should
 have a default value.
 
-Here's a basic example of a validator, with one optional setting::
+Here's a basic example of a validator. This validator extends 
+``django.core.validators.MinLengthValidator``::
 
-    from django.core.exceptions import ValidationError
+    from django.core import validators
     from django.utils.translation import ngettext 
 
-    class UsernameMinimumLengthValidator:
-        def __init__(self, min_length=1):
-            self.min_length = min_length
-
-        def __call__(self, username):
-            if len(username) < self.min_length:
-                raise ValidationError(
-                    ngettext(
-                        'This username is too short. It must contain at least %(min_length)d character.',
-                        'This username is too short. It must contain at least %(min_length)d characters.',
-                        self.min_length,
-                    ),
-                    code='invalid',
-                    params={'min_length': self.min_length},
-                )
-        
+    class UsernameMinimumLengthValidator(validators.MinLengthValidator):
+                
         def help_text(self):
             return ngettext(
-                'Your username must contain at least %(min_length)d 
-                character.',
-                'Your username must contain at least %(min_length)d
-                characters.',
-                self.min_length
-            ) % {'min_length': self.min_length}
+                'Your username must contain at least %(limit_value)d
+                character.','Your username must contain at least 
+                %(limit_value)d characters.',
+                self.limit_value
+            ) % {'limit_value': self.limit_value}

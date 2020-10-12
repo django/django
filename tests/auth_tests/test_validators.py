@@ -268,11 +268,11 @@ class UsernameValidatorsTests(SimpleTestCase):
     def test_username_minimum_length_validator(self):
         valid_usernames = ['guido', 'raymond']
         invalid_usernames = ['1t', 'tw', '']
-        v = validators.UsernameMinimumLengthValidator(min_length=3)
+        v = validators.UsernameMinimumLengthValidator(limit_value=3, message='This username is too short.')
         for valid in valid_usernames:
             with self.subTest(valid=valid):
                 v(valid)
-        msg = 'This username is too short. It must contain at least 3 characters.'
+        msg = 'This username is too short.'
         for invalid in invalid_usernames:
             with self.subTest(invalid=invalid):
                 with self.assertRaisesMessage(ValidationError, msg):
@@ -284,7 +284,8 @@ class UsernameValidatorsTests(SimpleTestCase):
             {
                 'NAME': 'django.contrib.auth.validators.UsernameMinimumLengthValidator',
                 'OPTIONS': {
-                    'min_length': 3,
+                    'limit_value': 3,
+                    'message': 'This password is too short',
                 },
             },
         ]
@@ -307,14 +308,14 @@ class UsernameValidationTests(SimpleTestCase):
         {'NAME': 'django.contrib.auth.validators.UnicodeUsernameValidator'},
         {
             'NAME': 'django.contrib.auth.validators.UsernameMinimumLengthValidator',
-            'OPTIONS': {'min_length': 3}
+            'OPTIONS': {'limit_value': 3, 'message': 'Username is too short.'}
         },
     ])
     def test_customized_validation(self):
         validators_list = get_default_username_validators()
         self.assertIsInstance(validators_list[0], validators.UnicodeUsernameValidator)
         self.assertIsInstance(validators_list[1], validators.UsernameMinimumLengthValidator)
-        self.assertEqual(validators_list[1].min_length, 3)
+        self.assertEqual(validators_list[1].limit_value, 3)
 
     def test_get_username_validators(self):
         validator_config = [

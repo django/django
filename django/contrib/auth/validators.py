@@ -1,7 +1,6 @@
 import re
 
 from django.core import validators
-from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
 from django.utils.translation import gettext_lazy as _, ngettext
 
@@ -39,29 +38,13 @@ class UnicodeUsernameValidator(validators.RegexValidator):
 
 
 @deconstructible
-class UsernameMinimumLengthValidator:
+class UsernameMinimumLengthValidator(validators.MinLengthValidator):
     """
     Validate whether the username is of a minimum length.
     """
-    def __init__(self, min_length=1):
-        self.min_length = min_length
-
-    def __call__(self, username):
-        if self.min_length:
-            if len(username) < self.min_length:
-                raise ValidationError(
-                    ngettext(
-                        'This username is too short. It must contain at least %(min_length)d character.',
-                        'This username is too short. It must contain at least %(min_length)d characters.',
-                        self.min_length,
-                    ),
-                    code='invalid',
-                    params={'min_length': self.min_length},
-                )
-
     def help_text(self):
         return ngettext(
-            'Your username must contain at least %(min_length)d character.',
-            'Your username must contain at least %(min_length)d characters.',
-            self.min_length
-        ) % {'min_length': self.min_length}
+            'Your username must contain at least %(limit_value)d character.',
+            'Your username must contain at least %(limit_value)d characters.',
+            self.limit_value
+        ) % {'limit_value': self.limit_value}

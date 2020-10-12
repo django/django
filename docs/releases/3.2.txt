@@ -104,8 +104,8 @@ Minor features
   ``ASCIIUsernameValidator``, which returns a help text string to provide
   requirements to the user.
 
-* Added ``UsernameMinimumLengthValidator`` with ``min_length`` parameter.
-  The default minimum length is 1.
+* Added ``UsernameMinimumLengthValidator`` by extending the current
+  ``django.core.validators.MinLengthValidator``..
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
