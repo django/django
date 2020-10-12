@@ -857,6 +857,10 @@ class ModelAdmin(BaseModelAdmin):
         return helpers.checkbox.render(helpers.ACTION_CHECKBOX_NAME, str(obj.pk))
     action_checkbox.short_description = mark_safe('<input type="checkbox" id="action-toggle">')
 
+    @staticmethod
+    def _get_action_description(func, name):
+        return getattr(func, 'short_description', capfirst(name.replace('_', ' ')))
+
     def _get_base_actions(self):
         """Return the list of actions, prior to any request-based filtering."""
         actions = []
@@ -869,7 +873,7 @@ class ModelAdmin(BaseModelAdmin):
         for (name, func) in self.admin_site.actions:
             if name in base_action_names:
                 continue
-            description = getattr(func, 'short_description', name.replace('_', ' '))
+            description = self._get_action_description(func, name)
             actions.append((func, name, description))
         # Add actions from this ModelAdmin.
         actions.extend(base_actions)
@@ -938,10 +942,7 @@ class ModelAdmin(BaseModelAdmin):
             except KeyError:
                 return None
 
-        if hasattr(func, 'short_description'):
-            description = func.short_description
-        else:
-            description = capfirst(action.replace('_', ' '))
+        description = self._get_action_description(func, action)
         return func, action, description
 
     def get_list_display(self, request):
