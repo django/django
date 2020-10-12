@@ -86,7 +86,7 @@ class FieldFile(File):
     def save(self, name, content, save=True):
         name = self.field.generate_filename(self.instance, name)
         self.name = self.storage.save(name, content, max_length=self.field.max_length)
-        setattr(self.instance, self.field.name, self.name)
+        setattr(self.instance, self.field.attname, self.name)
         self._committed = True
 
         # Save the object because it has changed, unless save is False
@@ -106,7 +106,7 @@ class FieldFile(File):
         self.storage.delete(self.name)
 
         self.name = None
-        setattr(self.instance, self.field.name, self.name)
+        setattr(self.instance, self.field.attname, self.name)
         self._committed = False
 
         if save:
