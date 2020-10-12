@@ -1,7 +1,7 @@
 import json
 
 from django.db.models import CharField, F, OuterRef, Q, Subquery, Value
-from django.db.models.fields.json import KeyTransform
+from django.db.models.fields.json import KeyTextTransform, KeyTransform
 from django.db.models.functions import Cast, Concat, Substr
 from django.test.utils import Approximate
 
@@ -105,6 +105,16 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             ),
         )
         self.assertEqual(values, {'arrayagg': ['pl', 'en']})
+
+    def test_array_agg_jsonfield_ordering(self):
+        values = AggregateTestModel.objects.aggregate(
+            arrayagg=ArrayAgg(
+                KeyTransform('lang', 'json_field'),
+                filter=Q(json_field__lang__isnull=False),
+                ordering=KeyTransform('lang', 'json_field'),
+            ),
+        )
+        self.assertEqual(values, {'arrayagg': ['en', 'pl']})
 
     def test_array_agg_filter(self):
         values = AggregateTestModel.objects.aggregate(
@@ -219,6 +229,17 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                     stringagg=StringAgg('char_field', delimiter=';', ordering=ordering)
                 )
                 self.assertEqual(values, {'stringagg': expected_output})
+
+    def test_string_agg_jsonfield_ordering(self):
+        values = AggregateTestModel.objects.aggregate(
+            stringagg=StringAgg(
+                KeyTextTransform('lang', 'json_field'),
+                delimiter=';',
+                ordering=KeyTextTransform('lang', 'json_field'),
+                output_field=CharField(),
+            ),
+        )
+        self.assertEqual(values, {'stringagg': 'en;pl'})
 
     def test_string_agg_filter(self):
         values = AggregateTestModel.objects.aggregate(
