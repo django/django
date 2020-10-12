@@ -142,7 +142,7 @@ Pull requests at GitHub have only two states: open and closed. The committer
 who will deal with your pull request has only two options: merge it or close
 it. For this reason, it isn't useful to make a pull request until the code is
 ready for merging -- or sufficiently close that a committer will finish it
-himself.
+themselves.
 
 Rebasing branches
 -----------------
