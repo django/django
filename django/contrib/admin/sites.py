@@ -52,7 +52,7 @@ class AdminSite:
 
     enable_nav_sidebar = True
 
-    _empty_value_display = '-'
+    empty_value_display = '-'
 
     login_form = None
     index_template = None
@@ -179,14 +179,6 @@ class AdminSite:
         Get all the enabled actions as an iterable of (name, func).
         """
         return self._actions.items()
-
-    @property
-    def empty_value_display(self):
-        return self._empty_value_display
-
-    @empty_value_display.setter
-    def empty_value_display(self, empty_value_display):
-        self._empty_value_display = empty_value_display
 
     def has_permission(self, request):
         """
