@@ -367,7 +367,8 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* :tfilter:`floatformat` template filter now allows using the ``g`` suffix to
+  force grouping by the :setting:`THOUSAND_SEPARATOR` for the active locale.
 
 Tests
 ~~~~~

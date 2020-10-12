@@ -1732,6 +1732,18 @@ displayed. For example:
 ``34.26000``  ``{{ value|floatformat:"-3" }}``  ``34.260``
 ============  ================================  ==========
 
+If the argument passed to ``floatformat`` has the ``g`` suffix, it will force
+grouping by the :setting:`THOUSAND_SEPARATOR` for the active locale. For
+example, when the active locale is ``en`` (English):
+
+============ ================================= =============
+``value``    Template                          Output
+============ ================================= =============
+``34232.34`` ``{{ value|floatformat:"2g" }}``  ``34,232.34``
+``34232.06`` ``{{ value|floatformat:"g" }}``   ``34,232.1``
+``34232.00`` ``{{ value|floatformat:"-3g" }}`` ``34,232``
+============ ================================= =============
+
 Using ``floatformat`` with no argument is equivalent to using ``floatformat``
 with an argument of ``-1``.
 
@@ -1739,6 +1751,10 @@ with an argument of ``-1``.
 
     In older versions, a negative zero ``-0`` was returned for negative numbers
     which round to zero.
+
+.. versionchanged:: 3.2
+
+    The ``g`` suffix to force grouping by thousand separators was added.
 
 .. templatefilter:: force_escape
 

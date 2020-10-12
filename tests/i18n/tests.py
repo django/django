@@ -560,6 +560,14 @@ class FormattingTests(SimpleTestCase):
             self.assertEqual('des. 31, 2009, 8:50 p.m.', Template('{{ dt }}').render(self.ctxt))
             self.assertEqual('66666.67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
             self.assertEqual('100000.0', Template('{{ f|floatformat }}').render(self.ctxt))
+            self.assertEqual(
+                '66666.67',
+                Template('{{ n|floatformat:"2g" }}').render(self.ctxt),
+            )
+            self.assertEqual(
+                '100000.0',
+                Template('{{ f|floatformat:"g" }}').render(self.ctxt),
+            )
             self.assertEqual('10:15 a.m.', Template('{{ t|time:"TIME_FORMAT" }}').render(self.ctxt))
             self.assertEqual('12/31/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
             self.assertEqual(
@@ -734,6 +742,14 @@ class FormattingTests(SimpleTestCase):
                 self.assertEqual('31 de desembre de 2009 a les 20:50', Template('{{ dt }}').render(self.ctxt))
                 self.assertEqual('66666,67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
                 self.assertEqual('100000,0', Template('{{ f|floatformat }}').render(self.ctxt))
+                self.assertEqual(
+                    '66.666,67',
+                    Template('{{ n|floatformat:"2g" }}').render(self.ctxt),
+                )
+                self.assertEqual(
+                    '100.000,0',
+                    Template('{{ f|floatformat:"g" }}').render(self.ctxt),
+                )
                 self.assertEqual('10:15', Template('{{ t|time:"TIME_FORMAT" }}').render(self.ctxt))
                 self.assertEqual('31/12/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
                 self.assertEqual(
@@ -935,6 +951,14 @@ class FormattingTests(SimpleTestCase):
                 self.assertEqual('Dec. 31, 2009, 8:50 p.m.', Template('{{ dt }}').render(self.ctxt))
                 self.assertEqual('66666.67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
                 self.assertEqual('100000.0', Template('{{ f|floatformat }}').render(self.ctxt))
+                self.assertEqual(
+                    '66,666.67',
+                    Template('{{ n|floatformat:"2g" }}').render(self.ctxt),
+                )
+                self.assertEqual(
+                    '100,000.0',
+                    Template('{{ f|floatformat:"g" }}').render(self.ctxt),
+                )
                 self.assertEqual('12/31/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
                 self.assertEqual(
                     '12/31/2009 8:50 p.m.',
