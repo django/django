@@ -143,6 +143,26 @@ class TestLanguageFeed(TestRss2Feed):
     language = 'de'
 
 
+class TestGetObjectFeed(TestRss2Feed):
+    def get_object(self, request, entry_id):
+        return Entry.objects.get(pk=entry_id)
+
+    def items(self, obj):
+        return Article.objects.filter(entry=obj)
+
+    def item_link(self, item):
+        return '%sarticle/%s/' % (item.entry.get_absolute_url(), item.pk)
+
+    def item_comments(self, item):
+        return '%scomments' % self.item_link(item)
+
+    def item_description(self, item):
+        return 'Article description: %s' % item.title
+
+    def item_title(self, item):
+        return 'Title: %s' % item.title
+
+
 class NaiveDatesFeed(TestAtomFeed):
     """
     A feed with naive (non-timezone-aware) dates.
