@@ -606,8 +606,8 @@ subclass::
       and add that method's name to ``list_display``. (See below for more
       on custom methods in ``list_display``.)
 
-    * If the field is a ``BooleanField``, Django will display a pretty "on" or
-      "off" icon instead of ``True`` or ``False``.
+    * If the field is a ``BooleanField``, Django will display a pretty "yes",
+      "no", or "unknown" icon instead of ``True``, ``False``, or ``None``.
 
     * If the string given is a method of the model, ``ModelAdmin`` or a
       callable, Django will HTML-escape the output by default. To escape
@@ -664,9 +664,9 @@ subclass::
               birth_date_view.empty_value_display = 'unknown'
 
     * If the string given is a method of the model, ``ModelAdmin`` or a
-      callable that returns True or False Django will display a pretty
-      "on" or "off" icon if you give the method a ``boolean`` attribute
-      whose value is ``True``.
+      callable that returns ``True``, ``False``, or ``None``, Django will
+      display a pretty "yes", "no", or "unknown" icon if you give the method a
+      ``boolean`` attribute whose value is ``True``.
 
       Here's a full example model::
 
