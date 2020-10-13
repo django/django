@@ -241,7 +241,7 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
         if hasattr(param, 'resolve_expression'):
             param = param.resolve_expression(compiler.query)
         if hasattr(param, 'as_sql'):
-            sql, params = param.as_sql(compiler, connection)
+            sql, params = compiler.compile(param)
         return sql, params
 
     def batch_process_rhs(self, compiler, connection, rhs=None):

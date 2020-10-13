@@ -700,6 +700,16 @@ class TestQuerying(TestCase):
             ('value__0__in', [1], [self.objs[5]]),
             ('value__0__in', [1, 3], [self.objs[5]]),
             ('value__foo__in', ['bar'], [self.objs[7]]),
+            (
+                'value__foo__in',
+                [KeyTransform('foo', KeyTransform('bax', 'value'))],
+                [self.objs[7]],
+            ),
+            (
+                'value__foo__in',
+                [KeyTransform('foo', KeyTransform('bax', 'value')), 'baz'],
+                [self.objs[7]],
+            ),
             ('value__foo__in', ['bar', 'baz'], [self.objs[7]]),
             ('value__bar__in', [['foo', 'bar']], [self.objs[7]]),
             ('value__bar__in', [['foo', 'bar'], ['a']], [self.objs[7]]),
