@@ -589,7 +589,7 @@ subclass::
               birthday = models.DateField()
 
               def decade_born_in(self):
-                  return self.birthday.strftime('%Y')[:3] + "0's"
+                  return '%d’s' % (self.birthday.year // 10 * 10)
               decade_born_in.short_description = 'Birth decade'
 
           class PersonAdmin(admin.ModelAdmin):
@@ -678,7 +678,7 @@ subclass::
               birthday = models.DateField()
 
               def born_in_fifties(self):
-                  return self.birthday.strftime('%Y')[:3] == '195'
+                  return 1950 <= self.birthday.year < 1960
               born_in_fifties.boolean = True
 
           class PersonAdmin(admin.ModelAdmin):
