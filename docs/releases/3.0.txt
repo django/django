@@ -19,8 +19,8 @@ project.
 Python compatibility
 ====================
 
-Django 3.0 supports Python 3.6, 3.7, and 3.8. We **highly recommend** and only
-officially support the latest release of each series.
+Django 3.0 supports Python 3.6, 3.7, 3.8, and 3.9 (as of 3.0.11). We **highly
+recommend** and only officially support the latest release of each series.
 
 The Django 2.2.x series is the last to support Python 3.5.
 
