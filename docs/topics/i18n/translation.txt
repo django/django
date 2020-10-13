@@ -743,8 +743,8 @@ For instance, the following ``{% blocktranslate %}`` tag::
     {% endblocktranslate %}
 
 will result in the entry ``"First sentence. Second paragraph."`` in the PO file,
-compared to ``"\n  First sentence.\n  Second sentence.\n"``, if the ``trimmed``
-option had not been specified.
+compared to ``"\n  First sentence.\n  Second paragraph.\n"``, if the
+``trimmed`` option had not been specified.
 
 .. versionchanged:: 3.1
 
