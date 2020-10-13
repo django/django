@@ -296,7 +296,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
         if callable(self.view_on_site):
             return self.view_on_site(obj)
-        elif self.view_on_site and hasattr(obj, 'get_absolute_url'):
+        elif hasattr(obj, 'get_absolute_url'):
             # use the ContentType lookup if view_on_site is True
             return reverse('admin:view_on_site', kwargs={
                 'content_type_id': get_content_type_for_model(obj).pk,
