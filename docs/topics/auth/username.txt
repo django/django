@@ -40,7 +40,7 @@ Username validation is configured in the
             'NAME': 'django.contrib.auth.validators.UsernameMinimumLengthValidator',
             'OPTIONS':{
                 'input_value': 3,
-                'message': 'Password is too short.'
+                'message': 'Username is too short.'
             }
         }
     ]
@@ -52,7 +52,7 @@ This example enables two included validators:
   ``-``, ``_``.
 * ``UsernameMinimumLengthValidator``, which checks whether the username meets a minimum
   length. This validator is configured to enforce a minimum length of three characters.
-  The ``limit_value`` parameter is used to to validate minimum length of the given 
+  The ``limit_value`` parameter is used to validate minimum length of the given 
   username.
 
 The help texts and any errors from username validators are always returned in
@@ -79,8 +79,8 @@ Django includes three validators:
 
     Validates whether the username meets a minimum length using 
     ``limit_value``. This validator is extended from 
-    ``django.core.validators.MinLengthValidator``. The text given in ``message``
-    is displayed when validation fails.
+    :class:`django.core.validators.MinLengthValidator`. The text given in
+    ``message`` is displayed when validation fails.
 
 Integrating validation
 ----------------------
@@ -123,17 +123,16 @@ validator will be passed to the constructor. All constructor arguments should
 have a default value.
 
 Here's a basic example of a validator. This validator extends 
-``django.core.validators.MinLengthValidator``::
+:class:`django.core.validators.MinLengthValidator`::
 
     from django.core import validators
-    from django.utils.translation import ngettext 
+    from django.utils.translation import ngettext
 
     class UsernameMinimumLengthValidator(validators.MinLengthValidator):
-                
+
         def help_text(self):
             return ngettext(
-                'Your username must contain at least %(limit_value)d
-                character.','Your username must contain at least 
-                %(limit_value)d characters.',
+                'Your username must contain at least %(limit_value)d character.',
+                'Your username must contain at least %(limit_value)d characters.',
                 self.limit_value
             ) % {'limit_value': self.limit_value}

@@ -100,12 +100,15 @@ Minor features
   implement their own username validators with options to fine tune the
   validator.
 
-* Added :meth::help_text() method to ``UnicodeUsernameValidator`` and
-  ``ASCIIUsernameValidator``, which returns a help text string to provide
-  requirements to the user.
+* Added :meth:`.help_text` method to
+  :class:`django.contrib.auth.validators.UnicodeUsernameValidator` and
+  :class:`django.contrib.auth.validators.ASCIIUsernameValidator`, which
+  returns a help text string to provide requirements to the user.
 
-* Added ``UsernameMinimumLengthValidator`` by extending the current
-  ``django.core.validators.MinLengthValidator``..
+* Added
+  :mod:`django.contrib.auth.validators.UsernameMinimumLengthValidator` by
+  extending the current
+  :mod:`django.core.validators.MinLengthValidator`.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

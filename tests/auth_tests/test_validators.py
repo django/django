@@ -285,7 +285,7 @@ class UsernameValidatorsTests(SimpleTestCase):
                 'NAME': 'django.contrib.auth.validators.UsernameMinimumLengthValidator',
                 'OPTIONS': {
                     'limit_value': 3,
-                    'message': 'This password is too short',
+                    'message': 'This username is too short',
                 },
             },
         ]

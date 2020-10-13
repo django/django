@@ -407,11 +407,29 @@ Validators
 
     A field validator allowing only ASCII letters and numbers, in addition to
     ``@``, ``.``, ``+``, ``-``, and ``_``.
+    
+    .. versionchanged:: 3.2
+    .. function:: help_text
+       Returns help text string to explaining the requirement of the validator
+       for the user.
 
 .. class:: validators.UnicodeUsernameValidator
 
     A field validator allowing Unicode characters, in addition to ``@``, ``.``,
     ``+``, ``-``, and ``_``. The default validator for ``User.username``.
+
+    .. versionchanged:: 3.2
+    .. function:: help_text
+       Returns string of help text explaining the requirement of the validator
+       for the user.
+
+.. versionadded:: 3.2
+
+.. class:: validators.UsernameMinimumLengthValidator
+    
+    A minimum length validator which validates if given input is of length
+    ``limit_value``. This validator extends from
+    :class:`~django.core.validators.MinLengthValidator`.
 
 .. _topics-auth-signals:
 
