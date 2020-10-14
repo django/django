@@ -10,7 +10,10 @@ from django.db import (
     DataError, IntegrityError, NotSupportedError, OperationalError, connection,
     models,
 )
-from django.db.models import Count, F, OuterRef, Q, Subquery, Transform, Value
+from django.db.models import (
+    Count, ExpressionWrapper, F, IntegerField, OuterRef, Q, Subquery,
+    Transform, Value,
+)
 from django.db.models.expressions import RawSQL
 from django.db.models.fields.json import (
     KeyTextTransform, KeyTransform, KeyTransformFactory,
@@ -403,6 +406,17 @@ class TestQuerying(TestCase):
                 expr=KeyTransform('f', KeyTransform('1', Cast('key', models.JSONField()))),
             ).filter(chain=F('expr')),
             [self.objs[4]],
+        )
+
+    def test_expression_wrapper_key_transform(self):
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.annotate(
+                expr=ExpressionWrapper(
+                    KeyTransform('c', 'value'),
+                    output_field=IntegerField(),
+                ),
+            ).filter(expr__isnull=False),
+            self.objs[3:5],
         )
 
     def test_has_key(self):
