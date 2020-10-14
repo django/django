@@ -34,3 +34,9 @@ Bugfixes
 * Fixed a regression in Django 3.1 that caused a crash of
   :class:`~django.db.models.ExpressionWrapper` with key transforms for
   :class:`~django.db.models.JSONField` (:ticket:`32096`).
+
+* Fixed a regression in Django 3.1 that caused a migrations crash on PostgreSQL
+  when adding an
+  :class:`~django.contrib.postgres.constraints.ExclusionConstraint` with key
+  transforms for :class:`~django.db.models.JSONField` in ``expressions``
+  (:ticket:`32096`).
