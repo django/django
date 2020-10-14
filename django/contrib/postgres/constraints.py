@@ -45,14 +45,15 @@ class ExclusionConstraint(BaseConstraint):
         self.deferrable = deferrable
         super().__init__(name=name)
 
-    def _get_expression_sql(self, compiler, connection, query):
+    def _get_expression_sql(self, compiler, schema_editor, query):
         expressions = []
         for expression, operator in self.expressions:
             if isinstance(expression, str):
                 expression = F(expression)
             expression = expression.resolve_expression(query=query)
-            sql, params = expression.as_sql(compiler, connection)
-            expressions.append('%s WITH %s' % (sql % params, operator))
+            sql, params = compiler.compile(expression)
+            sql = sql % tuple(schema_editor.quote_value(p) for p in params)
+            expressions.append('%s WITH %s' % (sql, operator))
         return expressions
 
     def _get_condition_sql(self, compiler, schema_editor, query):
@@ -65,7 +66,7 @@ class ExclusionConstraint(BaseConstraint):
     def constraint_sql(self, model, schema_editor):
         query = Query(model, alias_cols=False)
         compiler = query.get_compiler(connection=schema_editor.connection)
-        expressions = self._get_expression_sql(compiler, schema_editor.connection, query)
+        expressions = self._get_expression_sql(compiler, schema_editor, query)
         condition = self._get_condition_sql(compiler, schema_editor, query)
         return self.template % {
             'name': schema_editor.quote_name(self.name),
