@@ -19,6 +19,7 @@
 
 {% block sidebar %}
 <div id="content-related">
+    {% block sidebar_content %}
     <div class="module" id="recent-actions-module">
         <h2>{% translate 'Recent actions' %}</h2>
         <h3>{% translate 'My actions' %}</h3>
@@ -46,5 +47,6 @@
             </ul>
             {% endif %}
     </div>
+    {% endblock %}
 </div>
 {% endblock %}
