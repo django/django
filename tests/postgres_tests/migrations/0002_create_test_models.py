@@ -303,6 +303,7 @@ class Migration(migrations.Migration):
                 ('start', models.DateTimeField()),
                 ('end', models.DateTimeField()),
                 ('cancelled', models.BooleanField(default=False)),
+                ('requirements', models.JSONField(blank=True, null=True)),
             ],
             options={
                 'required_db_vendor': 'postgresql',
