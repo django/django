@@ -22,8 +22,7 @@ Bugfixes
   (:ticket:`32080`).
 
 * Fixed a regression in Django 3.1 that caused a crash of
-  :class:`~django.contrib.postgres.aggregates.ArrayAgg`,
-  :class:`~django.contrib.postgres.aggregates.JSONBAgg`, and
+  :class:`~django.contrib.postgres.aggregates.ArrayAgg` and
   :class:`~django.contrib.postgres.aggregates.StringAgg` with ``ordering``
   on key transforms for :class:`~django.db.models.JSONField` (:ticket:`32096`).
 
