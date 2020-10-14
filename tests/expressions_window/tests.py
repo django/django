@@ -5,16 +5,17 @@ from unittest import mock, skipIf
 from django.core.exceptions import FieldError
 from django.db import NotSupportedError, connection
 from django.db.models import (
-    Avg, BooleanField, Case, F, Func, Max, Min, OuterRef, Q, RowRange,
-    Subquery, Sum, Value, ValueRange, When, Window, WindowFrame,
+    Avg, BooleanField, Case, F, Func, IntegerField, Max, Min, OuterRef, Q,
+    RowRange, Subquery, Sum, Value, ValueRange, When, Window, WindowFrame,
 )
+from django.db.models.fields.json import KeyTextTransform, KeyTransform
 from django.db.models.functions import (
-    CumeDist, DenseRank, ExtractYear, FirstValue, Lag, LastValue, Lead,
+    Cast, CumeDist, DenseRank, ExtractYear, FirstValue, Lag, LastValue, Lead,
     NthValue, Ntile, PercentRank, Rank, RowNumber, Upper,
 )
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
-from .models import Employee
+from .models import Detail, Employee
 
 
 @skipUnlessDBFeature('supports_over_clause')
@@ -742,6 +743,36 @@ class WindowFunctionTests(TestCase):
             {'department': 'IT', 'salary': 60000},
             {'department': 'Management', 'salary': 100000}
         ])
+
+    @skipUnlessDBFeature('supports_json_field')
+    def test_key_transform(self):
+        Detail.objects.bulk_create([
+            Detail(value={'department': 'IT', 'name': 'Smith', 'salary': 37000}),
+            Detail(value={'department': 'IT', 'name': 'Nowak', 'salary': 32000}),
+            Detail(value={'department': 'HR', 'name': 'Brown', 'salary': 50000}),
+            Detail(value={'department': 'HR', 'name': 'Smith', 'salary': 55000}),
+            Detail(value={'department': 'PR', 'name': 'Moore', 'salary': 90000}),
+        ])
+        qs = Detail.objects.annotate(department_sum=Window(
+            expression=Sum(Cast(
+                KeyTextTransform('salary', 'value'),
+                output_field=IntegerField(),
+            )),
+            partition_by=[KeyTransform('department', 'value')],
+            order_by=[KeyTransform('name', 'value')],
+        )).order_by('value__department', 'department_sum')
+        self.assertQuerysetEqual(qs, [
+            ('Brown', 'HR', 50000, 50000),
+            ('Smith', 'HR', 55000, 105000),
+            ('Nowak', 'IT', 32000, 32000),
+            ('Smith', 'IT', 37000, 69000),
+            ('Moore', 'PR', 90000, 90000),
+        ], lambda entry: (
+            entry.value['name'],
+            entry.value['department'],
+            entry.value['salary'],
+            entry.department_sum,
+        ))
 
     def test_invalid_start_value_range(self):
         msg = "start argument must be a negative integer, zero, or None, but got '3'."
