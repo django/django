@@ -1205,38 +1205,6 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                 lambda m: (m.start_datetime, m.truncated)
             )
 
-        def test_date_kind(kind):
-            self.assertQuerysetEqual(
-                DTModel.objects.annotate(
-                    truncated=Trunc('start_date', kind, output_field=DateField(), tzinfo=melb)
-                ).order_by('start_datetime'),
-                [
-                    (start_datetime, truncate_to(start_datetime.date(), kind)),
-                    (end_datetime, truncate_to(end_datetime.date(), kind))
-                ],
-                lambda m: (m.start_datetime, m.truncated)
-            )
-
-        def test_time_kind(kind):
-            self.assertQuerysetEqual(
-                DTModel.objects.annotate(
-                    truncated=Trunc('start_time', kind, output_field=TimeField(), tzinfo=melb)
-                ).order_by('start_datetime'),
-                [
-                    (start_datetime, truncate_to(start_datetime.time(), kind)),
-                    (end_datetime, truncate_to(end_datetime.time(), kind))
-                ],
-                lambda m: (m.start_datetime, m.truncated)
-            )
-
-        test_date_kind('year')
-        test_date_kind('quarter')
-        test_date_kind('month')
-        test_date_kind('week')
-        test_date_kind('day')
-        test_time_kind('hour')
-        test_time_kind('minute')
-        test_time_kind('second')
         test_datetime_kind('year')
         test_datetime_kind('quarter')
         test_datetime_kind('month')
