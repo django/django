@@ -21,6 +21,7 @@ class DatabaseClient(BaseDatabaseClient):
         client_cert = settings_dict['OPTIONS'].get('ssl', {}).get('cert')
         client_key = settings_dict['OPTIONS'].get('ssl', {}).get('key')
         defaults_file = settings_dict['OPTIONS'].get('read_default_file')
+        charset = settings_dict['OPTIONS'].get('charset')
         # Seems to be no good way to set sql_mode with CLI.
 
         if defaults_file:
@@ -42,6 +43,8 @@ class DatabaseClient(BaseDatabaseClient):
             args += ["--ssl-cert=%s" % client_cert]
         if client_key:
             args += ["--ssl-key=%s" % client_key]
+        if charset:
+            args += ['--default-character-set=%s' % charset]
         if db:
             args += [db]
         args.extend(parameters)

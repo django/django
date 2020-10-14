@@ -59,6 +59,23 @@ class MySqlDbshellCommandTestCase(SimpleTestCase):
             }),
         )
 
+    def test_options_charset(self):
+        self.assertEqual(
+            [
+                'mysql', '--user=someuser', '--password=somepassword',
+                '--host=somehost', '--port=444',
+                '--default-character-set=utf8', 'somedbname',
+            ],
+            self.get_command_line_arguments({
+                'NAME': 'somedbname',
+                'USER': 'someuser',
+                'PASSWORD': 'somepassword',
+                'HOST': 'somehost',
+                'PORT': 444,
+                'OPTIONS': {'charset': 'utf8'},
+            }),
+        )
+
     def test_can_connect_using_sockets(self):
         self.assertEqual(
             ['mysql', '--user=someuser', '--password=somepassword',
