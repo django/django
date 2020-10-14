@@ -871,7 +871,7 @@ class ExpressionWrapper(Expression):
         return expression.get_group_by_cols(alias=alias)
 
     def as_sql(self, compiler, connection):
-        return self.expression.as_sql(compiler, connection)
+        return compiler.compile(self.expression)
 
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__, self.expression)
