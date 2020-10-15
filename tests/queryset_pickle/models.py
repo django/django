@@ -57,6 +57,7 @@ class Container:
 
 
 class M2MModel(models.Model):
+    added = models.DateField(default=datetime.date.today)
     groups = models.ManyToManyField(Group)
 
 
