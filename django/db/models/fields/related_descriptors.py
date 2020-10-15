@@ -424,8 +424,8 @@ class ReverseOneToOneDescriptor:
                     self.related.get_accessor_name()
                 )
             )
-        else:
-            return rel_obj
+
+        return rel_obj
 
     def __set__(self, instance, value):
         """
