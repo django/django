@@ -293,6 +293,21 @@ class DebugViewTests(SimpleTestCase):
             response = self.client.get('/raises500/')
         self.assertContains(response, 'custom traceback text', status_code=500)
 
+    @override_settings(DEFAULT_EXCEPTION_REPORTER='view_tests.views.TemplateOverrideExceptionReporter')
+    def test_template_override_exception_reporter(self):
+        with self.assertLogs('django.request', 'ERROR'):
+            response = self.client.get('/raises500/')
+        self.assertContains(
+            response,
+            '<h1>Oh no, an error occurred!</h1>',
+            status_code=500,
+            html=True,
+        )
+
+        with self.assertLogs('django.request', 'ERROR'):
+            response = self.client.get('/raises500/', HTTP_ACCEPT='text/plain')
+        self.assertContains(response, 'Oh dear, an error occurred!', status_code=500)
+
 
 class DebugViewQueriesAllowedTests(SimpleTestCase):
     # May need a query to initialize MySQL connection
