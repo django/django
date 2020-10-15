@@ -427,12 +427,13 @@ class ExceptionReporter:
         # In case there's just one exception, take the traceback from self.tb
         exc_value = exceptions.pop()
         tb = self.tb if not exceptions else exc_value.__traceback__
-        frames.extend(self.get_exception_traceback_frames(exc_value, tb))
-        while exceptions:
-            exc_value = exceptions.pop()
-            frames.extend(
-                self.get_exception_traceback_frames(exc_value, exc_value.__traceback__),
-            )
+        while True:
+            frames.extend(self.get_exception_traceback_frames(exc_value, tb))
+            try:
+                exc_value = exceptions.pop()
+            except IndexError:
+                break
+            tb = exc_value.__traceback__
         return frames
 
     def get_exception_traceback_frames(self, exc_value, tb):
