@@ -325,6 +325,22 @@ Your custom reporter class needs to inherit from
 
 .. class:: ExceptionReporter
 
+    .. attribute:: html_template_path
+
+        .. versionadded:: 3.2
+
+        A :class:`pathlib.Path` representing the absolute filesystem path to a
+        template for rendering the HTML representation of the exception.
+        Defaults to the Django provided template.
+
+    .. attribute:: text_template_path
+
+        .. versionadded:: 3.2
+
+        A :class:`pathlib.Path` representing the absolute filesystem path to a
+        template for rendering the plain-text representation of the exception.
+        Defaults to the Django provided template.
+
     .. method:: get_traceback_data()
 
         Return a dictionary containing traceback information.
