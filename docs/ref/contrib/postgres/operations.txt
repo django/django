@@ -188,3 +188,39 @@ database.
 
     The ``CONCURRENTLY`` option is not supported inside a transaction (see
     :ref:`non-atomic migration <non-atomic-migrations>`).
+
+Adding constraints without enforcing validation
+===============================================
+
+.. versionadded:: 4.0
+
+PostgreSQL supports the ``NOT VALID`` option with the ``ADD CONSTRAINT``
+statement to add check constraints without enforcing validation on existing
+rows. This option is useful if you want to skip the potentially lengthy scan of
+the table to verify that all existing rows satisfy the constraint.
+
+To validate check constraints created with the ``NOT VALID`` option at a later
+point of time, use the
+:class:`~django.contrib.postgres.operations.ValidateConstraint` operation.
+
+See `the PostgreSQL documentation <https://www.postgresql.org/docs/current/
+sql-altertable.html#SQL-ALTERTABLE-NOTES>`__ for more details.
+
+.. class:: AddConstraintNotValid(model_name, constraint)
+
+    Like :class:`~django.db.migrations.operations.AddConstraint`, but avoids
+    validating the constraint on existing rows.
+
+.. class:: ValidateConstraint(model_name, name)
+
+    Scans through the table and validates the given check constraint on
+    existing rows.
+
+.. note::
+
+    ``AddConstraintNotValid`` and ``ValidateConstraint`` operations should be
+    performed in two separate migrations. Performing both operations in the
+    same atomic migration has the same effect as
+    :class:`~django.db.migrations.operations.AddConstraint`, whereas performing
+    them in a single non-atomic migration, may leave your database in an
+    inconsistent state if the ``ValidateConstraint`` operation fails.

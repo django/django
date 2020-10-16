@@ -122,6 +122,15 @@ Minor features
 * The PostgreSQL backend now supports connecting by a service name. See
   :ref:`postgresql-connection-settings` for more details.
 
+* The new :class:`~django.contrib.postgres.operations.AddConstraintNotValid`
+  operation allows creating check constraints on PostgreSQL without verifying
+  that all existing rows satisfy the new constraint.
+
+* The new :class:`~django.contrib.postgres.operations.ValidateConstraint`
+  operation allows validating check constraints which were created using
+  :class:`~django.contrib.postgres.operations.AddConstraintNotValid` on
+  PostgreSQL.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
