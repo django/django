@@ -808,6 +808,8 @@ Accessing the cache
 
     This object is equivalent to ``caches['default']``.
 
+.. _cache-basic-interface:
+
 Basic usage
 -----------
 
@@ -997,6 +999,16 @@ the cache backend.
 
     For caches that don't implement ``close`` methods it is a no-op.
 
+.. note::
+
+    The async variants of base methods are prefixed with ``a``, e.g.
+    ``cache.aadd()`` or ``cache.adelete_many()``. See `Asynchronous support`_
+    for more details.
+
+.. versionchanged:: 4.0
+
+    The async variants of methods were added to the ``BaseCache``.
+
 .. _cache_key_prefixing:
 
 Cache key prefixing
@@ -1122,6 +1134,25 @@ instance, to do this for the ``locmem`` backend, put this code in a module::
 
 ...and use the dotted Python path to this class in the
 :setting:`BACKEND <CACHES-BACKEND>` portion of your :setting:`CACHES` setting.
+
+.. _asynchronous_support:
+
+Asynchronous support
+====================
+
+.. versionadded:: 4.0
+
+Django has developing support for asynchronous cache backends, but does not
+yet support asynchronous caching. It will be coming in a future release.
+
+``django.core.cache.backends.base.BaseCache`` has async variants of :ref:`all
+base methods <cache-basic-interface>`. By convention, the asynchronous versions
+of all methods are prefixed with ``a``. By default, the arguments for both
+variants are the same::
+
+    >>> await cache.aset('num', 1)
+    >>> await cache.ahas_key('num')
+    True
 
 .. _downstream-caches:
 

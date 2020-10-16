@@ -187,7 +187,13 @@ Minor features
 Cache
 ~~~~~
 
-* ...
+* The new async API for ``django.core.cache.backends.base.BaseCache`` begins
+  the process of making cache backends async-compatible. The new async methods
+  all have ``a`` prefixed names, e.g. ``aadd()``, ``aget()``, ``aset()``,
+  ``aget_or_set()``, or ``adelete_many()``.
+
+  Going forward, the ``a`` prefix will be used for async variants of methods
+  generally.
 
 CSRF
 ~~~~
