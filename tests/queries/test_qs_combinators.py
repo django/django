@@ -106,6 +106,11 @@ class QuerySetSetOperationTests(TestCase):
         self.assertEqual(len(qs2.union(qs2)), 0)
         self.assertEqual(len(qs3.union(qs3)), 0)
 
+    def test_empty_qs_union_with_ordered_qs(self):
+        qs1 = Number.objects.all().order_by('num')
+        qs2 = Number.objects.none().union(qs1).order_by('num')
+        self.assertEqual(list(qs1), list(qs2))
+
     def test_limits(self):
         qs1 = Number.objects.all()
         qs2 = Number.objects.all()
