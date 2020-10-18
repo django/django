@@ -39,3 +39,9 @@ Bugfixes
   :class:`~django.contrib.postgres.constraints.ExclusionConstraint` with key
   transforms for :class:`~django.db.models.JSONField` in ``expressions``
   (:ticket:`32096`).
+
+* Fixed a regression in Django 3.1 where
+  :exc:`ProtectedError.protected_objects <django.db.models.ProtectedError>` and
+  :exc:`RestrictedError.restricted_objects <django.db.models.RestrictedError>`
+  attributes returned iterators instead of :py:class:`set` of objects
+  (:ticket:`32107`).
