@@ -23,7 +23,9 @@ from django.core.exceptions import (
 from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import BaseExpression, Col, F, OuterRef, Ref
+from django.db.models.expressions import (
+    BaseExpression, Col, F, OuterRef, Ref, Subquery,
+)
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.lookups import Lookup
@@ -1359,9 +1361,10 @@ class Query(BaseExpression):
         return clause, used_joins if not require_outer else ()
 
     def add_filter(self, filter_clause):
-        self.add_q(Q(**{filter_clause[0]: filter_clause[1]}))
+        nested_subq = isinstance(filter_clause[1], Subquery)
+        self.add_q(Q(**{filter_clause[0]: filter_clause[1]}), promote_new_joins=nested_subq)
 
-    def add_q(self, q_object):
+    def add_q(self, q_object, promote_new_joins=False):
         """
         A preprocessor for the internal _add_q(). Responsible for doing final
         join promotion.
@@ -1373,10 +1376,12 @@ class Query(BaseExpression):
         # rel_a doesn't produce any rows, then the whole condition must fail.
         # So, demotion is OK.
         existing_inner = {a for a in self.alias_map if self.alias_map[a].join_type == INNER}
-        clause, _ = self._add_q(q_object, self.used_aliases)
+        clause, new_inner = self._add_q(q_object, self.used_aliases)
         if clause:
             self.where.add(clause, AND)
         self.demote_joins(existing_inner)
+        if promote_new_joins:
+            self.promote_joins(new_inner)
 
     def build_where(self, filter_expr):
         return self.build_filter(filter_expr, allow_joins=False)[0]

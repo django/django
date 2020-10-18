@@ -2880,6 +2880,20 @@ class ExcludeTests(TestCase):
         self.r1.delete()
         self.assertFalse(qs.exists())
 
+    def test_filter_q_object_with_subquery(self):
+        from django.db.models import Subquery
+        a1 = Order.objects.create(id=1, name='a1')
+        a2 = Order.objects.create(id=2, name='a2')
+        OrderItem.objects.create(order=a1, status=1)
+        OrderItem.objects.create(order=a1, status=2)
+        OrderItem.objects.create(order=a2, status=1)
+
+        q1 = Q(items__id__in=Subquery(OrderItem.objects.only('id').filter(status=1)))
+        q2 = ~Q(items__id__in=Subquery(OrderItem.objects.only('id').filter(status=2)))
+
+        qs = Order.objects.filter(q1 & q2)
+        self.assertQuerysetEqual(qs, [repr(a2)])
+
     def test_exclude_nullable_fields(self):
         number = Number.objects.create(num=1, other_num=1)
         Number.objects.create(num=2, other_num=2, another_num=2)
