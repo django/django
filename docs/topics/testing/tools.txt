@@ -1643,7 +1643,7 @@ your test suite.
     :meth:`~SimpleTestCase.assertHTMLEqual`, the comparison is
     made on parsed content, hence only semantic differences are considered, not
     syntax differences. When invalid XML is passed in any parameter, an
-    ``AssertionError`` is always raised, even if both string are identical.
+    ``AssertionError`` is always raised, even if both strings are identical.
 
     XML declaration, document type, processing instructions, and comments are
     ignored. Only the root element and its children are compared.
