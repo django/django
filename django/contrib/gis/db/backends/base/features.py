@@ -46,6 +46,9 @@ class BaseSpatialFeatures:
     # Does the database support a unique index on geometry fields?
     supports_geometry_field_unique_index = True
 
+    # Can SchemaEditor alter geometry fields?
+    can_alter_geometry_field = True
+
     @property
     def supports_bbcontains_lookup(self):
         return 'bbcontains' in self.connection.ops.gis_operators

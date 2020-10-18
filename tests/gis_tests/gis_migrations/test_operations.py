@@ -1,4 +1,4 @@
-from unittest import skipIf, skipUnless
+from unittest import skipUnless
 
 from django.contrib.gis.db.models import fields
 from django.contrib.gis.geos import MultiPolygon, Polygon
@@ -10,7 +10,7 @@ from django.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
 
-from ..utils import mysql, oracle, spatialite
+from ..utils import mysql, oracle
 
 try:
     GeometryColumns = connection.ops.geometry_columns()
@@ -190,8 +190,7 @@ class OperationTests(OperationTestCase):
         if connection.features.supports_raster:
             self.assertSpatialIndexExists('gis_neighborhood', 'rast', raster=True)
 
-    @skipUnlessDBFeature("supports_3d_storage")
-    @skipIf(spatialite, "Django currently doesn't support altering Spatialite geometry fields")
+    @skipUnlessDBFeature('can_alter_geometry_field', 'supports_3d_storage')
     def test_alter_geom_field_dim(self):
         Neighborhood = self.current_state.apps.get_model('gis', 'Neighborhood')
         p1 = Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
