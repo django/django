@@ -1683,15 +1683,13 @@ your test suite.
 
     Output in case of error can be customized with the ``msg`` argument.
 
-.. method:: TransactionTestCase.assertQuerysetEqual(qs, values, transform=repr, ordered=True, msg=None)
+.. method:: TransactionTestCase.assertQuerysetEqual(qs, values, transform=None, ordered=True, msg=None)
 
-    Asserts that a queryset ``qs`` returns a particular list of values ``values``.
+    Asserts that a queryset ``qs`` matches a particular iterable of values
+    ``values``.
 
-    The comparison of the contents of ``qs`` and ``values`` is performed by
-    applying ``transform`` to ``qs``. By default, this means that the
-    ``repr()`` of each value in ``qs`` is compared to the ``values``. Any other
-    callable can be used if ``repr()`` doesn't provide a unique or helpful
-    comparison.
+    If ``transform`` is provided, ``values`` is compared to a list produced by
+    applying ``transform`` to each member of ``qs``.
 
     By default, the comparison is also ordering dependent. If ``qs`` doesn't
     provide an implicit ordering, you can set the ``ordered`` parameter to
@@ -1701,6 +1699,21 @@ your test suite.
     raised.
 
     Output in case of error can be customized with the ``msg`` argument.
+
+    .. versionchanged:: 3.2
+
+        The default value of ``transform`` argument was changed to ``None``.
+
+    .. versionadded:: 3.2
+
+        Support for direct comparison between querysets was added.
+
+    .. deprecated:: 3.2
+
+        If ``transform`` is not provided and ``values`` is a list of strings,
+        it's compared to a list produced by applying ``repr()`` to each member
+        of ``qs``. This behavior is deprecated and will be removed in Django
+        4.1. If you need it, explicitly set ``transform`` to ``repr``.
 
 .. method:: TransactionTestCase.assertNumQueries(num, func, *args, **kwargs)
 

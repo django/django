@@ -70,9 +70,9 @@ class BasicExpressionsTests(TestCase):
         companies = Company.objects.annotate(
             foo=RawSQL('%s', ['value']),
         ).filter(foo='value').order_by('name')
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             companies,
-            ['<Company: Example Inc.>', '<Company: Foobar Ltd.>', '<Company: Test GmbH>'],
+            [self.example_inc, self.foobar_ltd, self.gmbh],
         )
 
     def test_annotate_values_count(self):
@@ -342,10 +342,10 @@ class BasicExpressionsTests(TestCase):
 
     def test_ticket_11722_iexact_lookup(self):
         Employee.objects.create(firstname="John", lastname="Doe")
-        Employee.objects.create(firstname="Test", lastname="test")
+        test = Employee.objects.create(firstname="Test", lastname="test")
 
         queryset = Employee.objects.filter(firstname__iexact=F('lastname'))
-        self.assertQuerysetEqual(queryset, ["<Employee: Test test>"])
+        self.assertSequenceEqual(queryset, [test])
 
     def test_ticket_16731_startswith_lookup(self):
         Employee.objects.create(firstname="John", lastname="Doe")
@@ -810,44 +810,38 @@ class IterableLookupInnerExpressionsTests(TestCase):
         # MySQL requires that the values calculated for expressions don't pass
         # outside of the field's range, so it's inconvenient to use the values
         # in the more general tests.
-        Company.objects.create(name='5020 Ltd', num_employees=50, num_chairs=20, ceo=ceo)
-        Company.objects.create(name='5040 Ltd', num_employees=50, num_chairs=40, ceo=ceo)
-        Company.objects.create(name='5050 Ltd', num_employees=50, num_chairs=50, ceo=ceo)
-        Company.objects.create(name='5060 Ltd', num_employees=50, num_chairs=60, ceo=ceo)
-        cls.c5 = Company.objects.create(name='99300 Ltd', num_employees=99, num_chairs=300, ceo=ceo)
+        cls.c5020 = Company.objects.create(name='5020 Ltd', num_employees=50, num_chairs=20, ceo=ceo)
+        cls.c5040 = Company.objects.create(name='5040 Ltd', num_employees=50, num_chairs=40, ceo=ceo)
+        cls.c5050 = Company.objects.create(name='5050 Ltd', num_employees=50, num_chairs=50, ceo=ceo)
+        cls.c5060 = Company.objects.create(name='5060 Ltd', num_employees=50, num_chairs=60, ceo=ceo)
+        cls.c99300 = Company.objects.create(name='99300 Ltd', num_employees=99, num_chairs=300, ceo=ceo)
 
     def test_in_lookup_allows_F_expressions_and_expressions_for_integers(self):
         # __in lookups can use F() expressions for integers.
         queryset = Company.objects.filter(num_employees__in=([F('num_chairs') - 10]))
-        self.assertQuerysetEqual(queryset, ['<Company: 5060 Ltd>'], ordered=False)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(queryset, [self.c5060])
+        self.assertCountEqual(
             Company.objects.filter(num_employees__in=([F('num_chairs') - 10, F('num_chairs') + 10])),
-            ['<Company: 5040 Ltd>', '<Company: 5060 Ltd>'],
-            ordered=False
+            [self.c5040, self.c5060],
         )
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             Company.objects.filter(
                 num_employees__in=([F('num_chairs') - 10, F('num_chairs'), F('num_chairs') + 10])
             ),
-            ['<Company: 5040 Ltd>', '<Company: 5050 Ltd>', '<Company: 5060 Ltd>'],
-            ordered=False
+            [self.c5040, self.c5050, self.c5060],
         )
 
     def test_expressions_in_lookups_join_choice(self):
         midpoint = datetime.time(13, 0)
         t1 = Time.objects.create(time=datetime.time(12, 0))
         t2 = Time.objects.create(time=datetime.time(14, 0))
-        SimulationRun.objects.create(start=t1, end=t2, midpoint=midpoint)
+        s1 = SimulationRun.objects.create(start=t1, end=t2, midpoint=midpoint)
         SimulationRun.objects.create(start=t1, end=None, midpoint=midpoint)
         SimulationRun.objects.create(start=None, end=t2, midpoint=midpoint)
         SimulationRun.objects.create(start=None, end=None, midpoint=midpoint)
 
         queryset = SimulationRun.objects.filter(midpoint__range=[F('start__time'), F('end__time')])
-        self.assertQuerysetEqual(
-            queryset,
-            ['<SimulationRun: 13:00:00 (12:00:00 to 14:00:00)>'],
-            ordered=False
-        )
+        self.assertSequenceEqual(queryset, [s1])
         for alias in queryset.query.alias_map.values():
             if isinstance(alias, Join):
                 self.assertEqual(alias.join_type, constants.INNER)
@@ -861,28 +855,21 @@ class IterableLookupInnerExpressionsTests(TestCase):
     def test_range_lookup_allows_F_expressions_and_expressions_for_integers(self):
         # Range lookups can use F() expressions for integers.
         Company.objects.filter(num_employees__exact=F("num_chairs"))
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             Company.objects.filter(num_employees__range=(F('num_chairs'), 100)),
-            ['<Company: 5020 Ltd>', '<Company: 5040 Ltd>', '<Company: 5050 Ltd>'],
-            ordered=False
+            [self.c5020, self.c5040, self.c5050],
         )
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             Company.objects.filter(num_employees__range=(F('num_chairs') - 10, F('num_chairs') + 10)),
-            ['<Company: 5040 Ltd>', '<Company: 5050 Ltd>', '<Company: 5060 Ltd>'],
-            ordered=False
+            [self.c5040, self.c5050, self.c5060],
         )
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             Company.objects.filter(num_employees__range=(F('num_chairs') - 10, 100)),
-            ['<Company: 5020 Ltd>', '<Company: 5040 Ltd>', '<Company: 5050 Ltd>', '<Company: 5060 Ltd>'],
-            ordered=False
+            [self.c5020, self.c5040, self.c5050, self.c5060],
         )
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             Company.objects.filter(num_employees__range=(1, 100)),
-            [
-                '<Company: 5020 Ltd>', '<Company: 5040 Ltd>', '<Company: 5050 Ltd>',
-                '<Company: 5060 Ltd>', '<Company: 99300 Ltd>',
-            ],
-            ordered=False
+            [self.c5020, self.c5040, self.c5050, self.c5060, self.c99300],
         )
 
     def test_range_lookup_namedtuple(self):
@@ -890,7 +877,7 @@ class IterableLookupInnerExpressionsTests(TestCase):
         qs = Company.objects.filter(
             num_employees__range=EmployeeRange(minimum=51, maximum=100),
         )
-        self.assertSequenceEqual(qs, [self.c5])
+        self.assertSequenceEqual(qs, [self.c99300])
 
     @unittest.skipUnless(connection.vendor == 'sqlite',
                          "This defensive test only works on databases that don't validate parameter types")
@@ -926,7 +913,7 @@ class IterableLookupInnerExpressionsTests(TestCase):
             completed=end.date(),
             estimated_time=end - start,
         )
-        Result.objects.create(
+        r1 = Result.objects.create(
             experiment=experiment_1,
             result_time=datetime.datetime(2016, 2, 4, 15, 0, 0),
         )
@@ -941,11 +928,11 @@ class IterableLookupInnerExpressionsTests(TestCase):
 
         within_experiment_time = [F('experiment__start'), F('experiment__end')]
         queryset = Result.objects.filter(result_time__range=within_experiment_time)
-        self.assertQuerysetEqual(queryset, ["<Result: Result at 2016-02-04 15:00:00>"])
+        self.assertSequenceEqual(queryset, [r1])
 
         within_experiment_time = [F('experiment__start'), F('experiment__end')]
         queryset = Result.objects.filter(result_time__range=within_experiment_time)
-        self.assertQuerysetEqual(queryset, ["<Result: Result at 2016-02-04 15:00:00>"])
+        self.assertSequenceEqual(queryset, [r1])
 
 
 class FTests(SimpleTestCase):
@@ -1005,30 +992,27 @@ class ExpressionsTests(TestCase):
         refs #16731
         """
         Employee.objects.bulk_create([
-            Employee(firstname="%Joh\\nny", lastname="%Joh\\n"),
             Employee(firstname="Johnny", lastname="%John"),
             Employee(firstname="Jean-Claude", lastname="Claud_"),
-            Employee(firstname="Jean-Claude", lastname="Claude"),
             Employee(firstname="Jean-Claude", lastname="Claude%"),
             Employee(firstname="Johnny", lastname="Joh\\n"),
-            Employee(firstname="Johnny", lastname="John"),
             Employee(firstname="Johnny", lastname="_ohn"),
         ])
+        claude = Employee.objects.create(firstname='Jean-Claude', lastname='Claude')
+        john = Employee.objects.create(firstname='Johnny', lastname='John')
+        john_sign = Employee.objects.create(firstname='%Joh\\nny', lastname='%Joh\\n')
 
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             Employee.objects.filter(firstname__contains=F('lastname')),
-            ["<Employee: %Joh\\nny %Joh\\n>", "<Employee: Jean-Claude Claude>", "<Employee: Johnny John>"],
-            ordered=False,
+            [john_sign, john, claude],
         )
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             Employee.objects.filter(firstname__startswith=F('lastname')),
-            ["<Employee: %Joh\\nny %Joh\\n>", "<Employee: Johnny John>"],
-            ordered=False,
+            [john_sign, john],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Employee.objects.filter(firstname__endswith=F('lastname')),
-            ["<Employee: Jean-Claude Claude>"],
-            ordered=False,
+            [claude],
         )
 
     def test_insensitive_patterns_escape(self):
@@ -1038,30 +1022,27 @@ class ExpressionsTests(TestCase):
         expression -- refs #16731
         """
         Employee.objects.bulk_create([
-            Employee(firstname="%Joh\\nny", lastname="%joh\\n"),
             Employee(firstname="Johnny", lastname="%john"),
             Employee(firstname="Jean-Claude", lastname="claud_"),
-            Employee(firstname="Jean-Claude", lastname="claude"),
             Employee(firstname="Jean-Claude", lastname="claude%"),
             Employee(firstname="Johnny", lastname="joh\\n"),
-            Employee(firstname="Johnny", lastname="john"),
             Employee(firstname="Johnny", lastname="_ohn"),
         ])
+        claude = Employee.objects.create(firstname='Jean-Claude', lastname='claude')
+        john = Employee.objects.create(firstname='Johnny', lastname='john')
+        john_sign = Employee.objects.create(firstname='%Joh\\nny', lastname='%joh\\n')
 
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             Employee.objects.filter(firstname__icontains=F('lastname')),
-            ["<Employee: %Joh\\nny %joh\\n>", "<Employee: Jean-Claude claude>", "<Employee: Johnny john>"],
-            ordered=False,
+            [john_sign, john, claude],
         )
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             Employee.objects.filter(firstname__istartswith=F('lastname')),
-            ["<Employee: %Joh\\nny %joh\\n>", "<Employee: Johnny john>"],
-            ordered=False,
+            [john_sign, john],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Employee.objects.filter(firstname__iendswith=F('lastname')),
-            ["<Employee: Jean-Claude claude>"],
-            ordered=False,
+            [claude],
         )
 
 
@@ -1126,7 +1107,8 @@ class ExpressionsNumericTests(TestCase):
         """
         self.assertQuerysetEqual(
             Number.objects.all(),
-            ['<Number: -1, -1.000>', '<Number: 42, 42.000>', '<Number: 1337, 1337.000>'],
+            [(-1, -1), (42, 42), (1337, 1337)],
+            lambda n: (n.integer, round(n.float)),
             ordered=False
         )
 
@@ -1137,7 +1119,8 @@ class ExpressionsNumericTests(TestCase):
         self.assertEqual(Number.objects.filter(integer__gt=0).update(integer=F('integer') + 1), 2)
         self.assertQuerysetEqual(
             Number.objects.all(),
-            ['<Number: -1, -1.000>', '<Number: 43, 42.000>', '<Number: 1338, 1337.000>'],
+            [(-1, -1), (43, 42), (1338, 1337)],
+            lambda n: (n.integer, round(n.float)),
             ordered=False
         )
 
@@ -1149,7 +1132,8 @@ class ExpressionsNumericTests(TestCase):
         self.assertEqual(Number.objects.filter(integer__gt=0).update(integer=F('integer') + 1), 2)
         self.assertQuerysetEqual(
             Number.objects.exclude(float=F('integer')),
-            ['<Number: 43, 42.000>', '<Number: 1338, 1337.000>'],
+            [(43, 42), (1338, 1337)],
+            lambda n: (n.integer, round(n.float)),
             ordered=False
         )
 
@@ -1790,15 +1774,15 @@ class FieldTransformTests(TestCase):
         )
 
     def test_transform_in_values(self):
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Experiment.objects.values('assigned__month'),
-            ["{'assigned__month': 6}"]
+            [{'assigned__month': 6}],
         )
 
     def test_multiple_transforms_in_values(self):
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Experiment.objects.values('end__date__month'),
-            ["{'end__date__month': 6}"]
+            [{'end__date__month': 6}],
         )
 
 

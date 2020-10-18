@@ -57,23 +57,23 @@ class ManyToOneTests(TestCase):
 
         self.r.article_set.add(new_article2, bulk=False)
         self.assertEqual(new_article2.reporter.id, self.r.id)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.r.article_set.all(),
-            ["<Article: John's second story>", "<Article: Paul's story>", "<Article: This is a test>"]
+            [new_article, new_article2, self.a],
         )
 
         # Add the same article to a different article set - check that it moves.
         self.r2.article_set.add(new_article2)
         self.assertEqual(new_article2.reporter.id, self.r2.id)
-        self.assertQuerysetEqual(self.r2.article_set.all(), ["<Article: Paul's story>"])
+        self.assertSequenceEqual(self.r2.article_set.all(), [new_article2])
 
         # Adding an object of the wrong type raises TypeError.
         with transaction.atomic():
             with self.assertRaisesMessage(TypeError, "'Article' instance expected, got <Reporter:"):
                 self.r.article_set.add(self.r2)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.r.article_set.all(),
-            ["<Article: John's second story>", "<Article: This is a test>"]
+            [new_article, self.a],
         )
 
     def test_set(self):
@@ -85,29 +85,28 @@ class ManyToOneTests(TestCase):
         new_article2.save()
         self.assertEqual(repr(new_article2.reporter), "<Reporter: John Smith>")
         self.assertEqual(new_article2.reporter.id, self.r.id)
-        self.assertQuerysetEqual(self.r.article_set.all(), [
-            "<Article: John's second story>",
-            "<Article: Paul's story>",
-            "<Article: This is a test>",
-        ])
-        self.assertQuerysetEqual(self.r2.article_set.all(), [])
+        self.assertSequenceEqual(
+            self.r.article_set.all(),
+            [new_article, new_article2, self.a],
+        )
+        self.assertSequenceEqual(self.r2.article_set.all(), [])
 
         # Set the article back again.
         self.r2.article_set.set([new_article, new_article2])
-        self.assertQuerysetEqual(self.r.article_set.all(), ["<Article: This is a test>"])
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(self.r.article_set.all(), [self.a])
+        self.assertSequenceEqual(
             self.r2.article_set.all(),
-            ["<Article: John's second story>", "<Article: Paul's story>"]
+            [new_article, new_article2],
         )
 
         # Funny case - because the ForeignKey cannot be null,
         # existing members of the set must remain.
         self.r.article_set.set([new_article])
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.r.article_set.all(),
-            ["<Article: John's second story>", "<Article: This is a test>"]
+            [new_article, self.a],
         )
-        self.assertQuerysetEqual(self.r2.article_set.all(), ["<Article: Paul's story>"])
+        self.assertSequenceEqual(self.r2.article_set.all(), [new_article2])
 
     def test_reverse_assignment_deprecation(self):
         msg = (
@@ -126,29 +125,28 @@ class ManyToOneTests(TestCase):
         new_article2.save()
         self.assertEqual(repr(new_article2.reporter), "<Reporter: John Smith>")
         self.assertEqual(new_article2.reporter.id, self.r.id)
-        self.assertQuerysetEqual(self.r.article_set.all(), [
-            "<Article: John's second story>",
-            "<Article: Paul's story>",
-            "<Article: This is a test>",
-        ])
-        self.assertQuerysetEqual(self.r2.article_set.all(), [])
+        self.assertSequenceEqual(
+            self.r.article_set.all(),
+            [new_article, new_article2, self.a],
+        )
+        self.assertSequenceEqual(self.r2.article_set.all(), [])
 
         # Set the article back again using set() method.
         self.r2.article_set.set([new_article, new_article2])
-        self.assertQuerysetEqual(self.r.article_set.all(), ["<Article: This is a test>"])
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(self.r.article_set.all(), [self.a])
+        self.assertSequenceEqual(
             self.r2.article_set.all(),
-            ["<Article: John's second story>", "<Article: Paul's story>"]
+            [new_article, new_article2],
         )
 
         # Because the ForeignKey cannot be null, existing members of the set
         # must remain.
         self.r.article_set.set([new_article])
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.r.article_set.all(),
-            ["<Article: John's second story>", "<Article: This is a test>"]
+            [new_article, self.a],
         )
-        self.assertQuerysetEqual(self.r2.article_set.all(), ["<Article: Paul's story>"])
+        self.assertSequenceEqual(self.r2.article_set.all(), [new_article2])
         # Reporter cannot be null - there should not be a clear or remove method
         self.assertFalse(hasattr(self.r2.article_set, 'remove'))
         self.assertFalse(hasattr(self.r2.article_set, 'clear'))
@@ -182,38 +180,44 @@ class ManyToOneTests(TestCase):
         self.assertTrue(Parent.bestchild.is_cached(parent))
 
     def test_selects(self):
-        self.r.article_set.create(headline="John's second story", pub_date=datetime.date(2005, 7, 29))
-        self.r2.article_set.create(headline="Paul's story", pub_date=datetime.date(2006, 1, 17))
+        new_article1 = self.r.article_set.create(
+            headline="John's second story",
+            pub_date=datetime.date(2005, 7, 29),
+        )
+        new_article2 = self.r2.article_set.create(
+            headline="Paul's story",
+            pub_date=datetime.date(2006, 1, 17),
+        )
         # Reporter objects have access to their related Article objects.
-        self.assertQuerysetEqual(self.r.article_set.all(), [
-            "<Article: John's second story>",
-            "<Article: This is a test>",
-        ])
-        self.assertQuerysetEqual(self.r.article_set.filter(headline__startswith='This'), ["<Article: This is a test>"])
+        self.assertSequenceEqual(
+            self.r.article_set.all(),
+            [new_article1, self.a],
+        )
+        self.assertSequenceEqual(self.r.article_set.filter(headline__startswith='This'), [self.a])
         self.assertEqual(self.r.article_set.count(), 2)
         self.assertEqual(self.r2.article_set.count(), 1)
         # Get articles by id
-        self.assertQuerysetEqual(Article.objects.filter(id__exact=self.a.id), ["<Article: This is a test>"])
-        self.assertQuerysetEqual(Article.objects.filter(pk=self.a.id), ["<Article: This is a test>"])
+        self.assertSequenceEqual(Article.objects.filter(id__exact=self.a.id), [self.a])
+        self.assertSequenceEqual(Article.objects.filter(pk=self.a.id), [self.a])
         # Query on an article property
-        self.assertQuerysetEqual(Article.objects.filter(headline__startswith='This'), ["<Article: This is a test>"])
+        self.assertSequenceEqual(Article.objects.filter(headline__startswith='This'), [self.a])
         # The API automatically follows relationships as far as you need.
         # Use double underscores to separate relationships.
         # This works as many levels deep as you want. There's no limit.
         # Find all Articles for any Reporter whose first name is "John".
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(reporter__first_name__exact='John'),
-            ["<Article: John's second story>", "<Article: This is a test>"]
+            [new_article1, self.a],
         )
         # Implied __exact also works
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(reporter__first_name='John'),
-            ["<Article: John's second story>", "<Article: This is a test>"]
+            [new_article1, self.a],
         )
         # Query twice over the related field.
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(reporter__first_name__exact='John', reporter__last_name__exact='Smith'),
-            ["<Article: John's second story>", "<Article: This is a test>"]
+            [new_article1, self.a],
         )
         # The underlying query only makes one join when a related table is referenced twice.
         queryset = Article.objects.filter(reporter__first_name__exact='John', reporter__last_name__exact='Smith')
@@ -221,69 +225,53 @@ class ManyToOneTests(TestCase):
         self.assertEqual(queryset.query.get_compiler(queryset.db).as_sql()[0].count('INNER JOIN'), 1)
 
         # The automatically joined table has a predictable name.
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(reporter__first_name__exact='John').extra(
                 where=["many_to_one_reporter.last_name='Smith'"]),
-            ["<Article: John's second story>", "<Article: This is a test>"]
+            [new_article1, self.a],
         )
         # ... and should work fine with the string that comes out of forms.Form.cleaned_data
         self.assertQuerysetEqual(
             (Article.objects
                 .filter(reporter__first_name__exact='John')
                 .extra(where=["many_to_one_reporter.last_name='%s'" % 'Smith'])),
-            ["<Article: John's second story>", "<Article: This is a test>"]
+            [new_article1, self.a]
         )
         # Find all Articles for a Reporter.
         # Use direct ID check, pk check, and object comparison
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(reporter__id__exact=self.r.id),
-            [
-                "<Article: John's second story>",
-                "<Article: This is a test>",
-            ])
-        self.assertQuerysetEqual(
+            [new_article1, self.a],
+        )
+        self.assertSequenceEqual(
             Article.objects.filter(reporter__pk=self.r.id),
-            [
-                "<Article: John's second story>",
-                "<Article: This is a test>",
-            ])
-        self.assertQuerysetEqual(
+            [new_article1, self.a],
+        )
+        self.assertSequenceEqual(
             Article.objects.filter(reporter=self.r.id),
-            [
-                "<Article: John's second story>",
-                "<Article: This is a test>",
-            ])
-        self.assertQuerysetEqual(
+            [new_article1, self.a],
+        )
+        self.assertSequenceEqual(
             Article.objects.filter(reporter=self.r),
-            [
-                "<Article: John's second story>",
-                "<Article: This is a test>",
-            ])
-        self.assertQuerysetEqual(
+            [new_article1, self.a],
+        )
+        self.assertSequenceEqual(
             Article.objects.filter(reporter__in=[self.r.id, self.r2.id]).distinct(),
-            [
-                "<Article: John's second story>",
-                "<Article: Paul's story>",
-                "<Article: This is a test>",
-            ])
-        self.assertQuerysetEqual(
+            [new_article1, new_article2, self.a],
+        )
+        self.assertSequenceEqual(
             Article.objects.filter(reporter__in=[self.r, self.r2]).distinct(),
-            [
-                "<Article: John's second story>",
-                "<Article: Paul's story>",
-                "<Article: This is a test>",
-            ])
+            [new_article1, new_article2, self.a],
+        )
         # You can also use a queryset instead of a literal list of instances.
         # The queryset must be reduced to a list of values using values(),
         # then converted into a query
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(
                 reporter__in=Reporter.objects.filter(first_name='John').values('pk').query
             ).distinct(),
-            [
-                "<Article: John's second story>",
-                "<Article: This is a test>",
-            ])
+            [new_article1, self.a],
+        )
 
     def test_reverse_selects(self):
         a3 = Article.objects.create(
@@ -296,48 +284,42 @@ class ManyToOneTests(TestCase):
             pub_date=datetime.date(2005, 7, 27),
             reporter_id=self.r.id,
         )
-        john_smith = ["<Reporter: John Smith>"]
+        john_smith = [self.r]
         # Reporters can be queried
-        self.assertQuerysetEqual(Reporter.objects.filter(id__exact=self.r.id), john_smith)
-        self.assertQuerysetEqual(Reporter.objects.filter(pk=self.r.id), john_smith)
-        self.assertQuerysetEqual(Reporter.objects.filter(first_name__startswith='John'), john_smith)
+        self.assertSequenceEqual(Reporter.objects.filter(id__exact=self.r.id), john_smith)
+        self.assertSequenceEqual(Reporter.objects.filter(pk=self.r.id), john_smith)
+        self.assertSequenceEqual(Reporter.objects.filter(first_name__startswith='John'), john_smith)
         # Reporters can query in opposite direction of ForeignKey definition
-        self.assertQuerysetEqual(Reporter.objects.filter(article__id__exact=self.a.id), john_smith)
-        self.assertQuerysetEqual(Reporter.objects.filter(article__pk=self.a.id), john_smith)
-        self.assertQuerysetEqual(Reporter.objects.filter(article=self.a.id), john_smith)
-        self.assertQuerysetEqual(Reporter.objects.filter(article=self.a), john_smith)
-        self.assertQuerysetEqual(Reporter.objects.filter(article__in=[self.a.id, a3.id]).distinct(), john_smith)
-        self.assertQuerysetEqual(Reporter.objects.filter(article__in=[self.a.id, a3]).distinct(), john_smith)
-        self.assertQuerysetEqual(Reporter.objects.filter(article__in=[self.a, a3]).distinct(), john_smith)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(Reporter.objects.filter(article__id__exact=self.a.id), john_smith)
+        self.assertSequenceEqual(Reporter.objects.filter(article__pk=self.a.id), john_smith)
+        self.assertSequenceEqual(Reporter.objects.filter(article=self.a.id), john_smith)
+        self.assertSequenceEqual(Reporter.objects.filter(article=self.a), john_smith)
+        self.assertSequenceEqual(Reporter.objects.filter(article__in=[self.a.id, a3.id]).distinct(), john_smith)
+        self.assertSequenceEqual(Reporter.objects.filter(article__in=[self.a.id, a3]).distinct(), john_smith)
+        self.assertSequenceEqual(Reporter.objects.filter(article__in=[self.a, a3]).distinct(), john_smith)
+        self.assertCountEqual(
             Reporter.objects.filter(article__headline__startswith='T'),
-            ["<Reporter: John Smith>", "<Reporter: John Smith>"],
-            ordered=False
+            [self.r, self.r],
         )
-        self.assertQuerysetEqual(Reporter.objects.filter(article__headline__startswith='T').distinct(), john_smith)
+        self.assertSequenceEqual(Reporter.objects.filter(article__headline__startswith='T').distinct(), john_smith)
 
         # Counting in the opposite direction works in conjunction with distinct()
         self.assertEqual(Reporter.objects.filter(article__headline__startswith='T').count(), 2)
         self.assertEqual(Reporter.objects.filter(article__headline__startswith='T').distinct().count(), 1)
 
         # Queries can go round in circles.
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             Reporter.objects.filter(article__reporter__first_name__startswith='John'),
-            [
-                "<Reporter: John Smith>",
-                "<Reporter: John Smith>",
-                "<Reporter: John Smith>",
-            ],
-            ordered=False
+            [self.r, self.r, self.r],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Reporter.objects.filter(article__reporter__first_name__startswith='John').distinct(),
             john_smith
         )
-        self.assertQuerysetEqual(Reporter.objects.filter(article__reporter__exact=self.r).distinct(), john_smith)
+        self.assertSequenceEqual(Reporter.objects.filter(article__reporter__exact=self.r).distinct(), john_smith)
 
         # Implied __exact also works.
-        self.assertQuerysetEqual(Reporter.objects.filter(article__reporter=self.r).distinct(), john_smith)
+        self.assertSequenceEqual(Reporter.objects.filter(article__reporter=self.r).distinct(), john_smith)
 
         # It's possible to use values() calls across many-to-one relations.
         # (Note, too, that we clear the ordering here so as not to drag the
@@ -370,44 +352,43 @@ class ManyToOneTests(TestCase):
         )
 
     def test_delete(self):
-        self.r.article_set.create(headline="John's second story", pub_date=datetime.date(2005, 7, 29))
-        self.r2.article_set.create(headline="Paul's story", pub_date=datetime.date(2006, 1, 17))
-        Article.objects.create(headline="Third article", pub_date=datetime.date(2005, 7, 27), reporter_id=self.r.id)
-        Article.objects.create(
+        new_article1 = self.r.article_set.create(
+            headline="John's second story",
+            pub_date=datetime.date(2005, 7, 29),
+        )
+        new_article2 = self.r2.article_set.create(
+            headline="Paul's story",
+            pub_date=datetime.date(2006, 1, 17),
+        )
+        new_article3 = Article.objects.create(
+            headline="Third article",
+            pub_date=datetime.date(2005, 7, 27),
+            reporter_id=self.r.id,
+        )
+        new_article4 = Article.objects.create(
             headline="Fourth article",
             pub_date=datetime.date(2005, 7, 27),
             reporter_id=str(self.r.id),
         )
         # If you delete a reporter, his articles will be deleted.
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.all(),
-            [
-                "<Article: Fourth article>",
-                "<Article: John's second story>",
-                "<Article: Paul's story>",
-                "<Article: Third article>",
-                "<Article: This is a test>",
-            ]
+            [new_article4, new_article1, new_article2, new_article3, self.a],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Reporter.objects.order_by('first_name'),
-            ["<Reporter: John Smith>", "<Reporter: Paul Jones>"]
+            [self.r, self.r2],
         )
         self.r2.delete()
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.all(),
-            [
-                "<Article: Fourth article>",
-                "<Article: John's second story>",
-                "<Article: Third article>",
-                "<Article: This is a test>",
-            ]
+            [new_article4, new_article1, new_article3, self.a],
         )
-        self.assertQuerysetEqual(Reporter.objects.order_by('first_name'), ["<Reporter: John Smith>"])
+        self.assertSequenceEqual(Reporter.objects.order_by('first_name'), [self.r])
         # You can delete using a JOIN in the query.
         Reporter.objects.filter(article__headline__startswith='This').delete()
-        self.assertQuerysetEqual(Reporter.objects.all(), [])
-        self.assertQuerysetEqual(Article.objects.all(), [])
+        self.assertSequenceEqual(Reporter.objects.all(), [])
+        self.assertSequenceEqual(Article.objects.all(), [])
 
     def test_explicit_fk(self):
         # Create a new Article with get_or_create using an explicit value
@@ -421,9 +402,9 @@ class ManyToOneTests(TestCase):
         self.assertEqual(a2.reporter.id, self.r.id)
 
         # You can specify filters containing the explicit FK value.
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(reporter_id__exact=self.r.id),
-            ["<Article: John's second test>", "<Article: This is a test>"]
+            [a2, self.a],
         )
 
         # Create an Article by Paul for the same date.
@@ -598,15 +579,15 @@ class ManyToOneTests(TestCase):
         r5 = Record.objects.create(category=c3)
         Relation.objects.create(left=r1, right=r2)
         Relation.objects.create(left=r3, right=r4)
-        Relation.objects.create(left=r1, right=r3)
+        rel = Relation.objects.create(left=r1, right=r3)
         Relation.objects.create(left=r5, right=r2)
         Relation.objects.create(left=r3, right=r2)
 
         q1 = Relation.objects.filter(left__category__name__in=['First'], right__category__name__in=['Second'])
-        self.assertQuerysetEqual(q1, ["<Relation: First - Second>"])
+        self.assertSequenceEqual(q1, [rel])
 
         q2 = Category.objects.filter(record__left_set__right__category__name='Second').order_by('name')
-        self.assertQuerysetEqual(q2, ["<Category: First>", "<Category: Second>"])
+        self.assertSequenceEqual(q2, [c1, c2])
 
         p = Parent.objects.create(name="Parent")
         c = Child.objects.create(name="Child", parent=p)
@@ -669,19 +650,19 @@ class ManyToOneTests(TestCase):
 
     def test_clear_after_prefetch(self):
         c = City.objects.create(name='Musical City')
-        District.objects.create(name='Ladida', city=c)
+        d = District.objects.create(name='Ladida', city=c)
         city = City.objects.prefetch_related('districts').get(id=c.id)
-        self.assertQuerysetEqual(city.districts.all(), ['<District: Ladida>'])
+        self.assertSequenceEqual(city.districts.all(), [d])
         city.districts.clear()
-        self.assertQuerysetEqual(city.districts.all(), [])
+        self.assertSequenceEqual(city.districts.all(), [])
 
     def test_remove_after_prefetch(self):
         c = City.objects.create(name='Musical City')
         d = District.objects.create(name='Ladida', city=c)
         city = City.objects.prefetch_related('districts').get(id=c.id)
-        self.assertQuerysetEqual(city.districts.all(), ['<District: Ladida>'])
+        self.assertSequenceEqual(city.districts.all(), [d])
         city.districts.remove(d)
-        self.assertQuerysetEqual(city.districts.all(), [])
+        self.assertSequenceEqual(city.districts.all(), [])
 
     def test_add_after_prefetch(self):
         c = City.objects.create(name='Musical City')
@@ -699,7 +680,7 @@ class ManyToOneTests(TestCase):
         city = City.objects.prefetch_related('districts').get(id=c.id)
         self.assertEqual(city.districts.count(), 1)
         city.districts.set([d2])
-        self.assertQuerysetEqual(city.districts.all(), ['<District: Ladidu>'])
+        self.assertSequenceEqual(city.districts.all(), [d2])
 
     def test_add_then_remove_after_prefetch(self):
         c = City.objects.create(name='Musical City')

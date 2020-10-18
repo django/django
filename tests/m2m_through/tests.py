@@ -42,20 +42,12 @@ class M2mThroughTests(TestCase):
         )
 
     def test_filter_on_intermediate_model(self):
-        Membership.objects.create(person=self.jim, group=self.rock)
-        Membership.objects.create(person=self.jane, group=self.rock)
+        m1 = Membership.objects.create(person=self.jim, group=self.rock)
+        m2 = Membership.objects.create(person=self.jane, group=self.rock)
 
         queryset = Membership.objects.filter(group=self.rock)
 
-        expected = [
-            '<Membership: Jim is a member of Rock>',
-            '<Membership: Jane is a member of Rock>',
-        ]
-
-        self.assertQuerysetEqual(
-            queryset,
-            expected
-        )
+        self.assertSequenceEqual(queryset, [m1, m2])
 
     def test_add_on_m2m_with_intermediate_model(self):
         self.rock.members.add(self.bob, through_defaults={'invite_reason': 'He is good.'})
@@ -372,12 +364,8 @@ class M2mThroughTests(TestCase):
         )
 
     def test_custom_related_name_doesnt_conflict_with_fky_related_name(self):
-        CustomMembership.objects.create(person=self.bob, group=self.rock)
-
-        self.assertQuerysetEqual(
-            self.bob.custom_person_related_name.all(),
-            ['<CustomMembership: Bob is a member of Rock>']
-        )
+        c = CustomMembership.objects.create(person=self.bob, group=self.rock)
+        self.assertSequenceEqual(self.bob.custom_person_related_name.all(), [c])
 
     def test_through_fields(self):
         """

@@ -44,7 +44,7 @@ class ManyToManyTests(TestCase):
         a5.save()
         # Associate the Article with a Publication.
         a5.publications.add(self.p1)
-        self.assertQuerysetEqual(a5.publications.all(), ['<Publication: The Python Journal>'])
+        self.assertSequenceEqual(a5.publications.all(), [self.p1])
         # Create another Article, and set it to appear in both Publications.
         a6 = Article(headline='ESA uses Python')
         a6.save()
@@ -52,13 +52,9 @@ class ManyToManyTests(TestCase):
         a6.publications.add(self.p3)
         # Adding a second time is OK
         a6.publications.add(self.p3)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             a6.publications.all(),
-            [
-                '<Publication: Science News>',
-                '<Publication: Science Weekly>',
-                '<Publication: The Python Journal>',
-            ]
+            [self.p2, self.p3, self.p1],
         )
 
         # Adding an object of the wrong type raises TypeError
@@ -68,42 +64,31 @@ class ManyToManyTests(TestCase):
                 a6.publications.add(a5)
 
         # Add a Publication directly via publications.add by using keyword arguments.
-        a6.publications.create(title='Highlights for Adults')
-        self.assertQuerysetEqual(
+        p5 = a6.publications.create(title='Highlights for Adults')
+        self.assertSequenceEqual(
             a6.publications.all(),
-            [
-                '<Publication: Highlights for Adults>',
-                '<Publication: Science News>',
-                '<Publication: Science Weekly>',
-                '<Publication: The Python Journal>',
-            ]
+            [p5, self.p2, self.p3, self.p1],
         )
 
     def test_add_remove_set_by_pk(self):
         a5 = Article.objects.create(headline='Django lets you create Web apps easily')
         a5.publications.add(self.p1.pk)
-        self.assertQuerysetEqual(
-            a5.publications.all(),
-            ['<Publication: The Python Journal>'],
-        )
+        self.assertSequenceEqual(a5.publications.all(), [self.p1])
         a5.publications.set([self.p2.pk])
-        self.assertQuerysetEqual(
-            a5.publications.all(),
-            ['<Publication: Science News>'],
-        )
+        self.assertSequenceEqual(a5.publications.all(), [self.p2])
         a5.publications.remove(self.p2.pk)
-        self.assertQuerysetEqual(a5.publications.all(), [])
+        self.assertSequenceEqual(a5.publications.all(), [])
 
     def test_add_remove_set_by_to_field(self):
         user_1 = User.objects.create(username='Jean')
         user_2 = User.objects.create(username='Joe')
         a5 = Article.objects.create(headline='Django lets you create Web apps easily')
         a5.authors.add(user_1.username)
-        self.assertQuerysetEqual(a5.authors.all(), ['<User: Jean>'])
+        self.assertSequenceEqual(a5.authors.all(), [user_1])
         a5.authors.set([user_2.username])
-        self.assertQuerysetEqual(a5.authors.all(), ['<User: Joe>'])
+        self.assertSequenceEqual(a5.authors.all(), [user_2])
         a5.authors.remove(user_2.username)
-        self.assertQuerysetEqual(a5.authors.all(), [])
+        self.assertSequenceEqual(a5.authors.all(), [])
 
     def test_add_remove_invalid_type(self):
         msg = "Field 'id' expected a number but got 'invalid'."
@@ -116,37 +101,22 @@ class ManyToManyTests(TestCase):
         a5 = Article(headline='NASA finds intelligent life on Mars')
         a5.save()
         self.p2.article_set.add(a5)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.p2.article_set.all(),
-            [
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: NASA finds intelligent life on Mars>',
-                '<Article: NASA uses Python>',
-                '<Article: Oxygen-free diet works wonders>',
-            ]
+            [self.a3, a5, self.a2, self.a4],
         )
-        self.assertQuerysetEqual(a5.publications.all(), ['<Publication: Science News>'])
+        self.assertSequenceEqual(a5.publications.all(), [self.p2])
 
         # Adding via the other end using keywords
-        self.p2.article_set.create(headline='Carbon-free diet works wonders')
-        self.assertQuerysetEqual(
+        a6 = self.p2.article_set.create(headline='Carbon-free diet works wonders')
+        self.assertSequenceEqual(
             self.p2.article_set.all(),
-            [
-                '<Article: Carbon-free diet works wonders>',
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: NASA finds intelligent life on Mars>',
-                '<Article: NASA uses Python>',
-                '<Article: Oxygen-free diet works wonders>',
-            ])
+            [a6, self.a3, a5, self.a2, self.a4],
+        )
         a6 = self.p2.article_set.all()[3]
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             a6.publications.all(),
-            [
-                '<Publication: Highlights for Children>',
-                '<Publication: Science News>',
-                '<Publication: Science Weekly>',
-                '<Publication: The Python Journal>',
-            ]
+            [self.p4, self.p2, self.p3, self.p1],
         )
 
     @skipUnlessDBFeature('supports_ignore_conflicts')
@@ -182,293 +152,195 @@ class ManyToManyTests(TestCase):
 
     def test_related_sets(self):
         # Article objects have access to their related Publication objects.
-        self.assertQuerysetEqual(self.a1.publications.all(), ['<Publication: The Python Journal>'])
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(self.a1.publications.all(), [self.p1])
+        self.assertSequenceEqual(
             self.a2.publications.all(),
-            [
-                '<Publication: Highlights for Children>',
-                '<Publication: Science News>',
-                '<Publication: Science Weekly>',
-                '<Publication: The Python Journal>',
-            ]
+            [self.p4, self.p2, self.p3, self.p1],
         )
         # Publication objects have access to their related Article objects.
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.p2.article_set.all(),
-            [
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: NASA uses Python>',
-                '<Article: Oxygen-free diet works wonders>',
-            ]
+            [self.a3, self.a2, self.a4],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.p1.article_set.all(),
-            [
-                '<Article: Django lets you build Web apps easily>',
-                '<Article: NASA uses Python>',
-            ]
+            [self.a1, self.a2],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Publication.objects.get(id=self.p4.id).article_set.all(),
-            ['<Article: NASA uses Python>']
+            [self.a2],
         )
 
     def test_selects(self):
         # We can perform kwarg queries across m2m relationships
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(publications__id__exact=self.p1.id),
-            [
-                '<Article: Django lets you build Web apps easily>',
-                '<Article: NASA uses Python>',
-            ])
-        self.assertQuerysetEqual(
+            [self.a1, self.a2],
+        )
+        self.assertSequenceEqual(
             Article.objects.filter(publications__pk=self.p1.id),
-            [
-                '<Article: Django lets you build Web apps easily>',
-                '<Article: NASA uses Python>',
-            ]
+            [self.a1, self.a2],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(publications=self.p1.id),
-            [
-                '<Article: Django lets you build Web apps easily>',
-                '<Article: NASA uses Python>',
-            ]
+            [self.a1, self.a2],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(publications=self.p1),
-            [
-                '<Article: Django lets you build Web apps easily>',
-                '<Article: NASA uses Python>',
-            ]
+            [self.a1, self.a2],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(publications__title__startswith="Science"),
-            [
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: NASA uses Python>',
-                '<Article: NASA uses Python>',
-                '<Article: Oxygen-free diet works wonders>',
-            ]
+            [self.a3, self.a2, self.a2, self.a4]
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(publications__title__startswith="Science").distinct(),
-            [
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: NASA uses Python>',
-                '<Article: Oxygen-free diet works wonders>',
-            ]
+            [self.a3, self.a2, self.a4],
         )
 
         # The count() function respects distinct() as well.
         self.assertEqual(Article.objects.filter(publications__title__startswith="Science").count(), 4)
         self.assertEqual(Article.objects.filter(publications__title__startswith="Science").distinct().count(), 3)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(publications__in=[self.p1.id, self.p2.id]).distinct(),
-            [
-                '<Article: Django lets you build Web apps easily>',
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: NASA uses Python>',
-                '<Article: Oxygen-free diet works wonders>',
-            ])
-        self.assertQuerysetEqual(
-            Article.objects.filter(publications__in=[self.p1.id, self.p2]).distinct(),
-            [
-                '<Article: Django lets you build Web apps easily>',
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: NASA uses Python>',
-                '<Article: Oxygen-free diet works wonders>',
-            ]
+            [self.a1, self.a3, self.a2, self.a4],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
+            Article.objects.filter(publications__in=[self.p1.id, self.p2]).distinct(),
+            [self.a1, self.a3, self.a2, self.a4],
+        )
+        self.assertSequenceEqual(
             Article.objects.filter(publications__in=[self.p1, self.p2]).distinct(),
-            [
-                '<Article: Django lets you build Web apps easily>',
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: NASA uses Python>',
-                '<Article: Oxygen-free diet works wonders>',
-            ]
+            [self.a1, self.a3, self.a2, self.a4],
         )
 
         # Excluding a related item works as you would expect, too (although the SQL
         # involved is a little complex).
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.exclude(publications=self.p2),
-            ['<Article: Django lets you build Web apps easily>']
+            [self.a1],
         )
 
     def test_reverse_selects(self):
         # Reverse m2m queries are supported (i.e., starting at the table that
         # doesn't have a ManyToManyField).
-        python_journal = ['<Publication: The Python Journal>']
-        self.assertQuerysetEqual(Publication.objects.filter(id__exact=self.p1.id), python_journal)
-        self.assertQuerysetEqual(Publication.objects.filter(pk=self.p1.id), python_journal)
-        self.assertQuerysetEqual(
+        python_journal = [self.p1]
+        self.assertSequenceEqual(Publication.objects.filter(id__exact=self.p1.id), python_journal)
+        self.assertSequenceEqual(Publication.objects.filter(pk=self.p1.id), python_journal)
+        self.assertSequenceEqual(
             Publication.objects.filter(article__headline__startswith="NASA"),
-            [
-                '<Publication: Highlights for Children>',
-                '<Publication: Science News>',
-                '<Publication: Science News>',
-                '<Publication: Science Weekly>',
-                '<Publication: The Python Journal>',
-            ])
+            [self.p4, self.p2, self.p2, self.p3, self.p1],
+        )
 
-        self.assertQuerysetEqual(Publication.objects.filter(article__id__exact=self.a1.id), python_journal)
-        self.assertQuerysetEqual(Publication.objects.filter(article__pk=self.a1.id), python_journal)
-        self.assertQuerysetEqual(Publication.objects.filter(article=self.a1.id), python_journal)
-        self.assertQuerysetEqual(Publication.objects.filter(article=self.a1), python_journal)
+        self.assertSequenceEqual(Publication.objects.filter(article__id__exact=self.a1.id), python_journal)
+        self.assertSequenceEqual(Publication.objects.filter(article__pk=self.a1.id), python_journal)
+        self.assertSequenceEqual(Publication.objects.filter(article=self.a1.id), python_journal)
+        self.assertSequenceEqual(Publication.objects.filter(article=self.a1), python_journal)
 
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Publication.objects.filter(article__in=[self.a1.id, self.a2.id]).distinct(),
-            [
-                '<Publication: Highlights for Children>',
-                '<Publication: Science News>',
-                '<Publication: Science Weekly>',
-                '<Publication: The Python Journal>',
-            ])
-        self.assertQuerysetEqual(
+            [self.p4, self.p2, self.p3, self.p1],
+        )
+        self.assertSequenceEqual(
             Publication.objects.filter(article__in=[self.a1.id, self.a2]).distinct(),
-            [
-                '<Publication: Highlights for Children>',
-                '<Publication: Science News>',
-                '<Publication: Science Weekly>',
-                '<Publication: The Python Journal>',
-            ])
-        self.assertQuerysetEqual(
+            [self.p4, self.p2, self.p3, self.p1],
+        )
+        self.assertSequenceEqual(
             Publication.objects.filter(article__in=[self.a1, self.a2]).distinct(),
-            [
-                '<Publication: Highlights for Children>',
-                '<Publication: Science News>',
-                '<Publication: Science Weekly>',
-                '<Publication: The Python Journal>',
-            ])
+            [self.p4, self.p2, self.p3, self.p1],
+        )
 
     def test_delete(self):
         # If we delete a Publication, its Articles won't be able to access it.
         self.p1.delete()
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Publication.objects.all(),
-            [
-                '<Publication: Highlights for Children>',
-                '<Publication: Science News>',
-                '<Publication: Science Weekly>',
-            ]
+            [self.p4, self.p2, self.p3],
         )
-        self.assertQuerysetEqual(self.a1.publications.all(), [])
+        self.assertSequenceEqual(self.a1.publications.all(), [])
         # If we delete an Article, its Publications won't be able to access it.
         self.a2.delete()
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.all(),
-            [
-                '<Article: Django lets you build Web apps easily>',
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: Oxygen-free diet works wonders>',
-            ]
+            [self.a1, self.a3, self.a4],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.p2.article_set.all(),
-            [
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: Oxygen-free diet works wonders>',
-            ]
+            [self.a3, self.a4],
         )
 
     def test_bulk_delete(self):
         # Bulk delete some Publications - references to deleted publications should go
         Publication.objects.filter(title__startswith='Science').delete()
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Publication.objects.all(),
-            [
-                '<Publication: Highlights for Children>',
-                '<Publication: The Python Journal>',
-            ]
+            [self.p4, self.p1],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.all(),
-            [
-                '<Article: Django lets you build Web apps easily>',
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: NASA uses Python>',
-                '<Article: Oxygen-free diet works wonders>',
-            ]
+            [self.a1, self.a3, self.a2, self.a4],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.a2.publications.all(),
-            [
-                '<Publication: Highlights for Children>',
-                '<Publication: The Python Journal>',
-            ]
+            [self.p4, self.p1],
         )
 
         # Bulk delete some articles - references to deleted objects should go
         q = Article.objects.filter(headline__startswith='Django')
-        self.assertQuerysetEqual(q, ['<Article: Django lets you build Web apps easily>'])
+        self.assertSequenceEqual(q, [self.a1])
         q.delete()
         # After the delete, the QuerySet cache needs to be cleared,
         # and the referenced objects should be gone
-        self.assertQuerysetEqual(q, [])
-        self.assertQuerysetEqual(self.p1.article_set.all(), ['<Article: NASA uses Python>'])
+        self.assertSequenceEqual(q, [])
+        self.assertSequenceEqual(self.p1.article_set.all(), [self.a2])
 
     def test_remove(self):
         # Removing publication from an article:
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.p2.article_set.all(),
-            [
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: NASA uses Python>',
-                '<Article: Oxygen-free diet works wonders>',
-            ]
+            [self.a3, self.a2, self.a4],
         )
         self.a4.publications.remove(self.p2)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.p2.article_set.all(),
-            [
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: NASA uses Python>',
-            ]
+            [self.a3, self.a2],
         )
-        self.assertQuerysetEqual(self.a4.publications.all(), [])
+        self.assertSequenceEqual(self.a4.publications.all(), [])
         # And from the other end
         self.p2.article_set.remove(self.a3)
-        self.assertQuerysetEqual(self.p2.article_set.all(), ['<Article: NASA uses Python>'])
-        self.assertQuerysetEqual(self.a3.publications.all(), [])
+        self.assertSequenceEqual(self.p2.article_set.all(), [self.a2])
+        self.assertSequenceEqual(self.a3.publications.all(), [])
 
     def test_set(self):
         self.p2.article_set.set([self.a4, self.a3])
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.p2.article_set.all(),
-            [
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: Oxygen-free diet works wonders>',
-            ]
+            [self.a3, self.a4],
         )
-        self.assertQuerysetEqual(self.a4.publications.all(), ['<Publication: Science News>'])
+        self.assertSequenceEqual(self.a4.publications.all(), [self.p2])
         self.a4.publications.set([self.p3.id])
-        self.assertQuerysetEqual(self.p2.article_set.all(), ['<Article: NASA finds intelligent life on Earth>'])
-        self.assertQuerysetEqual(self.a4.publications.all(), ['<Publication: Science Weekly>'])
+        self.assertSequenceEqual(self.p2.article_set.all(), [self.a3])
+        self.assertSequenceEqual(self.a4.publications.all(), [self.p3])
 
         self.p2.article_set.set([])
-        self.assertQuerysetEqual(self.p2.article_set.all(), [])
+        self.assertSequenceEqual(self.p2.article_set.all(), [])
         self.a4.publications.set([])
-        self.assertQuerysetEqual(self.a4.publications.all(), [])
+        self.assertSequenceEqual(self.a4.publications.all(), [])
 
         self.p2.article_set.set([self.a4, self.a3], clear=True)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.p2.article_set.all(),
-            [
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: Oxygen-free diet works wonders>',
-            ]
+            [self.a3, self.a4],
         )
-        self.assertQuerysetEqual(self.a4.publications.all(), ['<Publication: Science News>'])
+        self.assertSequenceEqual(self.a4.publications.all(), [self.p2])
         self.a4.publications.set([self.p3.id], clear=True)
-        self.assertQuerysetEqual(self.p2.article_set.all(), ['<Article: NASA finds intelligent life on Earth>'])
-        self.assertQuerysetEqual(self.a4.publications.all(), ['<Publication: Science Weekly>'])
+        self.assertSequenceEqual(self.p2.article_set.all(), [self.a3])
+        self.assertSequenceEqual(self.a4.publications.all(), [self.p3])
 
         self.p2.article_set.set([], clear=True)
-        self.assertQuerysetEqual(self.p2.article_set.all(), [])
+        self.assertSequenceEqual(self.p2.article_set.all(), [])
         self.a4.publications.set([], clear=True)
-        self.assertQuerysetEqual(self.a4.publications.all(), [])
+        self.assertSequenceEqual(self.a4.publications.all(), [])
 
     def test_set_existing_different_type(self):
         # Existing many-to-many relations remain the same for values provided
@@ -502,37 +374,32 @@ class ManyToManyTests(TestCase):
     def test_assign(self):
         # Relation sets can be assigned using set().
         self.p2.article_set.set([self.a4, self.a3])
-        self.assertQuerysetEqual(
-            self.p2.article_set.all(), [
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: Oxygen-free diet works wonders>',
-            ]
+        self.assertSequenceEqual(
+            self.p2.article_set.all(),
+            [self.a3, self.a4],
         )
-        self.assertQuerysetEqual(self.a4.publications.all(), ['<Publication: Science News>'])
+        self.assertSequenceEqual(self.a4.publications.all(), [self.p2])
         self.a4.publications.set([self.p3.id])
-        self.assertQuerysetEqual(self.p2.article_set.all(), ['<Article: NASA finds intelligent life on Earth>'])
-        self.assertQuerysetEqual(self.a4.publications.all(), ['<Publication: Science Weekly>'])
+        self.assertSequenceEqual(self.p2.article_set.all(), [self.a3])
+        self.assertSequenceEqual(self.a4.publications.all(), [self.p3])
 
         # An alternate to calling clear() is to set an empty set.
         self.p2.article_set.set([])
-        self.assertQuerysetEqual(self.p2.article_set.all(), [])
+        self.assertSequenceEqual(self.p2.article_set.all(), [])
         self.a4.publications.set([])
-        self.assertQuerysetEqual(self.a4.publications.all(), [])
+        self.assertSequenceEqual(self.a4.publications.all(), [])
 
     def test_assign_ids(self):
         # Relation sets can also be set using primary key values
         self.p2.article_set.set([self.a4.id, self.a3.id])
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.p2.article_set.all(),
-            [
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: Oxygen-free diet works wonders>',
-            ]
+            [self.a3, self.a4],
         )
-        self.assertQuerysetEqual(self.a4.publications.all(), ['<Publication: Science News>'])
+        self.assertSequenceEqual(self.a4.publications.all(), [self.p2])
         self.a4.publications.set([self.p3.id])
-        self.assertQuerysetEqual(self.p2.article_set.all(), ['<Article: NASA finds intelligent life on Earth>'])
-        self.assertQuerysetEqual(self.a4.publications.all(), ['<Publication: Science Weekly>'])
+        self.assertSequenceEqual(self.p2.article_set.all(), [self.a3])
+        self.assertSequenceEqual(self.a4.publications.all(), [self.p3])
 
     def test_forward_assign_with_queryset(self):
         # Querysets used in m2m assignments are pre-evaluated so their value
@@ -561,34 +428,31 @@ class ManyToManyTests(TestCase):
     def test_clear(self):
         # Relation sets can be cleared:
         self.p2.article_set.clear()
-        self.assertQuerysetEqual(self.p2.article_set.all(), [])
-        self.assertQuerysetEqual(self.a4.publications.all(), [])
+        self.assertSequenceEqual(self.p2.article_set.all(), [])
+        self.assertSequenceEqual(self.a4.publications.all(), [])
 
         # And you can clear from the other end
         self.p2.article_set.add(self.a3, self.a4)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.p2.article_set.all(),
-            [
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: Oxygen-free diet works wonders>',
-            ]
+            [self.a3, self.a4],
         )
-        self.assertQuerysetEqual(self.a4.publications.all(), ['<Publication: Science News>'])
+        self.assertSequenceEqual(self.a4.publications.all(), [self.p2])
         self.a4.publications.clear()
-        self.assertQuerysetEqual(self.a4.publications.all(), [])
-        self.assertQuerysetEqual(self.p2.article_set.all(), ['<Article: NASA finds intelligent life on Earth>'])
+        self.assertSequenceEqual(self.a4.publications.all(), [])
+        self.assertSequenceEqual(self.p2.article_set.all(), [self.a3])
 
     def test_clear_after_prefetch(self):
         a4 = Article.objects.prefetch_related('publications').get(id=self.a4.id)
-        self.assertQuerysetEqual(a4.publications.all(), ['<Publication: Science News>'])
+        self.assertSequenceEqual(a4.publications.all(), [self.p2])
         a4.publications.clear()
-        self.assertQuerysetEqual(a4.publications.all(), [])
+        self.assertSequenceEqual(a4.publications.all(), [])
 
     def test_remove_after_prefetch(self):
         a4 = Article.objects.prefetch_related('publications').get(id=self.a4.id)
-        self.assertQuerysetEqual(a4.publications.all(), ['<Publication: Science News>'])
+        self.assertSequenceEqual(a4.publications.all(), [self.p2])
         a4.publications.remove(self.p2)
-        self.assertQuerysetEqual(a4.publications.all(), [])
+        self.assertSequenceEqual(a4.publications.all(), [])
 
     def test_add_after_prefetch(self):
         a4 = Article.objects.prefetch_related('publications').get(id=self.a4.id)
@@ -610,7 +474,7 @@ class ManyToManyTests(TestCase):
         a4.publications.add(self.p1)
         self.assertEqual(a4.publications.count(), 2)
         a4.publications.remove(self.p1)
-        self.assertQuerysetEqual(a4.publications.all(), ['<Publication: Science News>'])
+        self.assertSequenceEqual(a4.publications.all(), [self.p2])
 
     def test_inherited_models_selects(self):
         """
@@ -620,22 +484,17 @@ class ManyToManyTests(TestCase):
         a = InheritedArticleA.objects.create()
         b = InheritedArticleB.objects.create()
         a.publications.add(self.p1, self.p2)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             a.publications.all(),
-            [
-                '<Publication: Science News>',
-                '<Publication: The Python Journal>',
-            ])
-        self.assertQuerysetEqual(b.publications.all(), [])
-        b.publications.add(self.p3)
-        self.assertQuerysetEqual(
-            a.publications.all(),
-            [
-                '<Publication: Science News>',
-                '<Publication: The Python Journal>',
-            ]
+            [self.p2, self.p1],
         )
-        self.assertQuerysetEqual(b.publications.all(), ['<Publication: Science Weekly>'])
+        self.assertSequenceEqual(b.publications.all(), [])
+        b.publications.add(self.p3)
+        self.assertSequenceEqual(
+            a.publications.all(),
+            [self.p2, self.p1],
+        )
+        self.assertSequenceEqual(b.publications.all(), [self.p3])
 
     def test_custom_default_manager_exists_count(self):
         a5 = Article.objects.create(headline='deleted')

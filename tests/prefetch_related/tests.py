@@ -76,7 +76,7 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
             [list(b.first_time_authors.all())
              for b in Book.objects.prefetch_related('first_time_authors')]
 
-        self.assertQuerysetEqual(self.book2.authors.all(), ["<Author: Charlotte>"])
+        self.assertSequenceEqual(self.book2.authors.all(), [self.author1])
 
     def test_onetoone_reverse_no_match(self):
         # Regression for #17439
@@ -1580,4 +1580,4 @@ class ReadPrefetchedObjectsCacheTests(TestCase):
         )
         with self.assertNumQueries(4):
             # AuthorWithAge -> Author -> FavoriteAuthors, Book
-            self.assertQuerysetEqual(authors, ['<AuthorWithAge: Rousseau>', '<AuthorWithAge: Voltaire>'])
+            self.assertSequenceEqual(authors, [self.author1, self.author2])

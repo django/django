@@ -750,13 +750,13 @@ class AggregateTestCase(TestCase):
         number of authors.
         """
         dates = Book.objects.annotate(num_authors=Count("authors")).dates('pubdate', 'year')
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             dates, [
-                "datetime.date(1991, 1, 1)",
-                "datetime.date(1995, 1, 1)",
-                "datetime.date(2007, 1, 1)",
-                "datetime.date(2008, 1, 1)"
-            ]
+                datetime.date(1991, 1, 1),
+                datetime.date(1995, 1, 1),
+                datetime.date(2007, 1, 1),
+                datetime.date(2008, 1, 1),
+            ],
         )
 
     def test_values_aggregation(self):

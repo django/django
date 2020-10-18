@@ -246,7 +246,10 @@ class InlineFormsetTests(TestCase):
         formset.save()
         self.assertQuerysetEqual(
             dalnet.host_set.order_by("hostname"),
-            ["<Host: matrix.de.eu.dal.net>", "<Host: tranquility.hub.dal.net>"]
+            Host.objects.filter(hostname__in=[
+                'matrix.de.eu.dal.net',
+                'tranquility.hub.dal.net',
+            ]).order_by('hostname'),
         )
 
     def test_initial_data(self):

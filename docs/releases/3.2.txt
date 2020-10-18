@@ -422,6 +422,11 @@ Tests
   <django.db.transaction.on_commit>` in a list. This allows you to test such
   callbacks without using the slower :class:`.TransactionTestCase`.
 
+* :meth:`.TransactionTestCase.assertQuerysetEqual` now supports direct
+  comparison against another queryset rather than being restricted to
+  comparison against a list of string representations of objects when using the
+  default value for the ``transform`` argument.
+
 URLs
 ~~~~
 
@@ -615,3 +620,8 @@ Miscellaneous
 * The ``default_app_config`` application configuration variable is deprecated,
   due to the now automatic ``AppConfig`` discovery. See :ref:`whats-new-3.2`
   for more details.
+
+* Automatically calling ``repr()`` on a queryset in
+  ``TransactionTestCase.assertQuerysetEqual()``, when compared to string
+  values, is deprecated. If you need the previous behavior, explicitly set
+  ``transform`` to ``repr``.

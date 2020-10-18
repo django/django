@@ -16,8 +16,8 @@ from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import (
-    SimpleTestCase, TestCase, TransactionTestCase, skipIfDBFeature,
-    skipUnlessDBFeature,
+    SimpleTestCase, TestCase, TransactionTestCase, ignore_warnings,
+    skipIfDBFeature, skipUnlessDBFeature,
 )
 from django.test.html import HTMLParseError, parse_html
 from django.test.utils import (
@@ -25,6 +25,7 @@ from django.test.utils import (
     override_settings, setup_test_environment,
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
+from django.utils.deprecation import RemovedInDjango41Warning
 
 from .models import Car, Person, PossessedCar
 from .views import empty_response
@@ -243,17 +244,32 @@ class AssertQuerysetEqualTests(TestCase):
         cls.p1 = Person.objects.create(name='p1')
         cls.p2 = Person.objects.create(name='p2')
 
+    def test_empty(self):
+        self.assertQuerysetEqual(Person.objects.filter(name='p3'), [])
+
     def test_ordered(self):
         self.assertQuerysetEqual(
             Person.objects.all().order_by('name'),
-            [repr(self.p1), repr(self.p2)]
+            [self.p1, self.p2],
         )
 
     def test_unordered(self):
         self.assertQuerysetEqual(
             Person.objects.all().order_by('name'),
-            [repr(self.p2), repr(self.p1)],
+            [self.p2, self.p1],
             ordered=False
+        )
+
+    def test_queryset(self):
+        self.assertQuerysetEqual(
+            Person.objects.all().order_by('name'),
+            Person.objects.all().order_by('name'),
+        )
+
+    def test_flat_values_list(self):
+        self.assertQuerysetEqual(
+            Person.objects.all().order_by('name').values_list('name', flat=True),
+            ['p1', 'p2'],
         )
 
     def test_transform(self):
@@ -263,6 +279,13 @@ class AssertQuerysetEqualTests(TestCase):
             transform=lambda x: x.pk
         )
 
+    def test_repr_transform(self):
+        self.assertQuerysetEqual(
+            Person.objects.all().order_by('name'),
+            [repr(self.p1), repr(self.p2)],
+            transform=repr,
+        )
+
     def test_undefined_order(self):
         # Using an unordered queryset with more than one ordered value
         # is an error.
@@ -270,13 +293,10 @@ class AssertQuerysetEqualTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             self.assertQuerysetEqual(
                 Person.objects.all(),
-                [repr(self.p1), repr(self.p2)]
+                [self.p1, self.p2],
             )
         # No error for one value.
-        self.assertQuerysetEqual(
-            Person.objects.filter(name='p1'),
-            [repr(self.p1)]
-        )
+        self.assertQuerysetEqual(Person.objects.filter(name='p1'), [self.p1])
 
     def test_repeated_values(self):
         """
@@ -296,14 +316,40 @@ class AssertQuerysetEqualTests(TestCase):
         with self.assertRaises(AssertionError):
             self.assertQuerysetEqual(
                 self.p1.cars.all(),
-                [repr(batmobile), repr(k2000)],
+                [batmobile, k2000],
                 ordered=False
             )
         self.assertQuerysetEqual(
             self.p1.cars.all(),
-            [repr(batmobile)] * 2 + [repr(k2000)] * 4,
+            [batmobile] * 2 + [k2000] * 4,
             ordered=False
         )
+
+
+class AssertQuerysetEqualDeprecationTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.p1 = Person.objects.create(name='p1')
+        cls.p2 = Person.objects.create(name='p2')
+
+    @ignore_warnings(category=RemovedInDjango41Warning)
+    def test_str_values(self):
+        self.assertQuerysetEqual(
+            Person.objects.all().order_by('name'),
+            [repr(self.p1), repr(self.p2)],
+        )
+
+    def test_str_values_warning(self):
+        msg = (
+            "In Django 4.1, repr() will not be called automatically on a "
+            "queryset when compared to string values. Set an explicit "
+            "'transform' to silence this warning."
+        )
+        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
+            self.assertQuerysetEqual(
+                Person.objects.all().order_by('name'),
+                [repr(self.p1), repr(self.p2)],
+            )
 
 
 @override_settings(ROOT_URLCONF='test_utils.urls')

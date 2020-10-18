@@ -25,10 +25,10 @@ class GenericRelationsTests(TestCase):
         cls.quartz = Mineral.objects.create(name='Quartz', hardness=7)
 
         # Tagging stuff.
-        cls.bacon.tags.create(tag='fatty')
-        cls.bacon.tags.create(tag='salty')
-        cls.lion.tags.create(tag='yellow')
-        cls.lion.tags.create(tag='hairy')
+        cls.fatty = cls.bacon.tags.create(tag='fatty')
+        cls.salty = cls.bacon.tags.create(tag='salty')
+        cls.yellow = cls.lion.tags.create(tag='yellow')
+        cls.hairy = cls.lion.tags.create(tag='hairy')
 
     def comp_func(self, obj):
         # Original list of tags:
@@ -86,14 +86,8 @@ class GenericRelationsTests(TestCase):
         Objects with declared GenericRelations can be tagged directly -- the
         API mimics the many-to-many API.
         """
-        self.assertQuerysetEqual(self.lion.tags.all(), [
-            "<TaggedItem: hairy>",
-            "<TaggedItem: yellow>"
-        ])
-        self.assertQuerysetEqual(self.bacon.tags.all(), [
-            "<TaggedItem: fatty>",
-            "<TaggedItem: salty>"
-        ])
+        self.assertSequenceEqual(self.lion.tags.all(), [self.hairy, self.yellow])
+        self.assertSequenceEqual(self.bacon.tags.all(), [self.fatty, self.salty])
 
     def test_access_content_object(self):
         """
@@ -105,9 +99,7 @@ class GenericRelationsTests(TestCase):
     def test_query_content_object(self):
         qs = TaggedItem.objects.filter(
             animal__isnull=False).order_by('animal__common_name', 'tag')
-        self.assertQuerysetEqual(
-            qs, ["<TaggedItem: hairy>", "<TaggedItem: yellow>"]
-        )
+        self.assertSequenceEqual(qs, [self.hairy, self.yellow])
 
         mpk = ManualPK.objects.create(id=1)
         mpk.tags.create(tag='mpk')
@@ -124,17 +116,14 @@ class GenericRelationsTests(TestCase):
         # defined. That's OK, because you can create TaggedItems explicitly.
         # However, excluding GenericRelations means your lookups have to be a
         # bit more explicit.
-        TaggedItem.objects.create(content_object=self.quartz, tag="shiny")
-        TaggedItem.objects.create(content_object=self.quartz, tag="clearish")
+        shiny = TaggedItem.objects.create(content_object=self.quartz, tag="shiny")
+        clearish = TaggedItem.objects.create(content_object=self.quartz, tag="clearish")
 
         ctype = ContentType.objects.get_for_model(self.quartz)
         q = TaggedItem.objects.filter(
             content_type__pk=ctype.id, object_id=self.quartz.id
         )
-        self.assertQuerysetEqual(q, [
-            "<TaggedItem: clearish>",
-            "<TaggedItem: shiny>"
-        ])
+        self.assertSequenceEqual(q, [clearish, shiny])
 
     def test_access_via_content_type(self):
         """
@@ -145,9 +134,10 @@ class GenericRelationsTests(TestCase):
 
         ctype = ContentType.objects.get_for_model(self.platypus)
 
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Animal.objects.filter(tags__content_type=ctype),
-            ["<Animal: Platypus>"])
+            [self.platypus],
+        )
 
     def test_set_foreign_key(self):
         """
@@ -157,9 +147,7 @@ class GenericRelationsTests(TestCase):
         tag1.content_object = self.platypus
         tag1.save()
 
-        self.assertQuerysetEqual(
-            self.platypus.tags.all(),
-            ["<TaggedItem: shiny>"])
+        self.assertSequenceEqual(self.platypus.tags.all(), [tag1])
 
     def test_queries_across_generic_relations(self):
         """
@@ -167,10 +155,10 @@ class GenericRelationsTests(TestCase):
         there are two TaggedItems with a tag of "fatty", this query only pulls
         out the one with the content type related to Animals.
         """
-        self.assertQuerysetEqual(Animal.objects.order_by('common_name'), [
-            "<Animal: Lion>",
-            "<Animal: Platypus>"
-        ])
+        self.assertSequenceEqual(
+            Animal.objects.order_by('common_name'),
+            [self.lion, self.platypus],
+        )
 
     def test_queries_content_type_restriction(self):
         """
@@ -181,10 +169,14 @@ class GenericRelationsTests(TestCase):
         mpk.tags.create(tag="fatty")
         self.platypus.tags.create(tag="fatty")
 
-        self.assertQuerysetEqual(
-            Animal.objects.filter(tags__tag='fatty'), ["<Animal: Platypus>"])
-        self.assertQuerysetEqual(
-            Animal.objects.exclude(tags__tag='fatty'), ["<Animal: Lion>"])
+        self.assertSequenceEqual(
+            Animal.objects.filter(tags__tag='fatty'),
+            [self.platypus],
+        )
+        self.assertSequenceEqual(
+            Animal.objects.exclude(tags__tag='fatty'),
+            [self.lion],
+        )
 
     def test_object_deletion_with_generic_relation(self):
         """
@@ -236,7 +228,7 @@ class GenericRelationsTests(TestCase):
             content_type__pk=ctype.id, object_id=self.lion.id, tag="hairy")
         tag.delete()
 
-        self.assertQuerysetEqual(self.lion.tags.all(), ["<TaggedItem: yellow>"])
+        self.assertSequenceEqual(self.lion.tags.all(), [self.yellow])
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
             ('fatty', Vegetable, self.bacon.pk),
             ('salty', Vegetable, self.bacon.pk),
@@ -282,32 +274,22 @@ class GenericRelationsTests(TestCase):
         salty = bacon.tags.create(tag="salty")
 
         bacon.tags.set([fatty, salty])
-        self.assertQuerysetEqual(bacon.tags.all(), [
-            "<TaggedItem: fatty>",
-            "<TaggedItem: salty>",
-        ])
+        self.assertSequenceEqual(bacon.tags.all(), [fatty, salty])
 
         bacon.tags.set([fatty])
-        self.assertQuerysetEqual(bacon.tags.all(), [
-            "<TaggedItem: fatty>",
-        ])
+        self.assertSequenceEqual(bacon.tags.all(), [fatty])
 
         bacon.tags.set([])
-        self.assertQuerysetEqual(bacon.tags.all(), [])
+        self.assertSequenceEqual(bacon.tags.all(), [])
 
         bacon.tags.set([fatty, salty], bulk=False, clear=True)
-        self.assertQuerysetEqual(bacon.tags.all(), [
-            "<TaggedItem: fatty>",
-            "<TaggedItem: salty>",
-        ])
+        self.assertSequenceEqual(bacon.tags.all(), [fatty, salty])
 
         bacon.tags.set([fatty], bulk=False, clear=True)
-        self.assertQuerysetEqual(bacon.tags.all(), [
-            "<TaggedItem: fatty>",
-        ])
+        self.assertSequenceEqual(bacon.tags.all(), [fatty])
 
         bacon.tags.set([], clear=True)
-        self.assertQuerysetEqual(bacon.tags.all(), [])
+        self.assertSequenceEqual(bacon.tags.all(), [])
 
     def test_assign(self):
         bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
@@ -315,18 +297,13 @@ class GenericRelationsTests(TestCase):
         salty = bacon.tags.create(tag="salty")
 
         bacon.tags.set([fatty, salty])
-        self.assertQuerysetEqual(bacon.tags.all(), [
-            "<TaggedItem: fatty>",
-            "<TaggedItem: salty>",
-        ])
+        self.assertSequenceEqual(bacon.tags.all(), [fatty, salty])
 
         bacon.tags.set([fatty])
-        self.assertQuerysetEqual(bacon.tags.all(), [
-            "<TaggedItem: fatty>",
-        ])
+        self.assertSequenceEqual(bacon.tags.all(), [fatty])
 
         bacon.tags.set([])
-        self.assertQuerysetEqual(bacon.tags.all(), [])
+        self.assertSequenceEqual(bacon.tags.all(), [])
 
     def test_assign_with_queryset(self):
         # Querysets used in reverse GFK assignments are pre-evaluated so their
@@ -361,42 +338,35 @@ class GenericRelationsTests(TestCase):
         bear = Animal.objects.create(common_name="bear")
 
         # Create directly
-        Comparison.objects.create(
+        c1 = Comparison.objects.create(
             first_obj=cheetah, other_obj=tiger, comparative="faster"
         )
-        Comparison.objects.create(
+        c2 = Comparison.objects.create(
             first_obj=tiger, other_obj=cheetah, comparative="cooler"
         )
 
         # Create using GenericRelation
-        tiger.comparisons.create(other_obj=bear, comparative="cooler")
-        tiger.comparisons.create(other_obj=cheetah, comparative="stronger")
-        self.assertQuerysetEqual(cheetah.comparisons.all(), [
-            "<Comparison: cheetah is faster than tiger>"
-        ])
+        c3 = tiger.comparisons.create(other_obj=bear, comparative="cooler")
+        c4 = tiger.comparisons.create(other_obj=cheetah, comparative="stronger")
+        self.assertSequenceEqual(cheetah.comparisons.all(), [c1])
 
         # Filtering works
-        self.assertQuerysetEqual(tiger.comparisons.filter(comparative="cooler"), [
-            "<Comparison: tiger is cooler than cheetah>",
-            "<Comparison: tiger is cooler than bear>",
-        ], ordered=False)
+        self.assertCountEqual(
+            tiger.comparisons.filter(comparative='cooler'),
+            [c2, c3],
+        )
 
         # Filtering and deleting works
         subjective = ["cooler"]
         tiger.comparisons.filter(comparative__in=subjective).delete()
-        self.assertQuerysetEqual(Comparison.objects.all(), [
-            "<Comparison: cheetah is faster than tiger>",
-            "<Comparison: tiger is stronger than cheetah>"
-        ], ordered=False)
+        self.assertCountEqual(Comparison.objects.all(), [c1, c4])
 
         # If we delete cheetah, Comparisons with cheetah as 'first_obj' will be
         # deleted since Animal has an explicit GenericRelation to Comparison
         # through first_obj. Comparisons with cheetah as 'other_obj' will not
         # be deleted.
         cheetah.delete()
-        self.assertQuerysetEqual(Comparison.objects.all(), [
-            "<Comparison: tiger is stronger than None>"
-        ])
+        self.assertSequenceEqual(Comparison.objects.all(), [c4])
 
     def test_gfk_subclasses(self):
         # GenericForeignKey should work with subclasses (see #8309)
