@@ -35,6 +35,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     sql_delete_procedure = 'DROP FUNCTION %(procedure)s(%(param_types)s)'
 
+    def skip_default(self, field):
+        if super().skip_default(field):
+            return True
+        # Serial fields are implemented using an implicit column default
+        # Don't interefere with this behaviour
+        field_type = field.db_parameters(connection=self.connection)["type"]
+        return field_type in ('bigserial', 'serial', 'smallserial')
+
     def quote_value(self, value):
         if isinstance(value, str):
             value = value.replace('%', '%%')

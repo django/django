@@ -3485,3 +3485,22 @@ class SchemaTests(TransactionTestCase):
         new_field.set_attributes_from_name("id")
         with connection.schema_editor() as editor:
             editor.alter_field(TestModel, old_field, new_field, strict=True)
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific tests")
+    @isolate_apps('schema')
+    def test_add_serial(self):
+        class TestModel(Model):
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(TestModel)
+        self.isolated_local_models = [TestModel]
+        TestModel.objects.create()
+
+        new_field = SerialField()
+        new_field.model = TestModel
+        new_field.set_attributes_from_name("serial")
+        with connection.schema_editor() as editor:
+            editor.add_field(TestModel, new_field)
+        TestModel.objects.create()
