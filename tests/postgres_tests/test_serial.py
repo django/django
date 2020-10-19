@@ -1,11 +1,8 @@
-import warnings
-
-from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import no_style
-from django.db import IntegrityError, connection, models
+from django.db import connection, models
 from django.test.utils import isolate_apps
 
-from . import PostgreSQLTestCase, PostgreSQLTransactionTestCase
+from . import PostgreSQLTestCase
 from .fields import BigSerialField, SerialField, SmallSerialField
 from .models import SerialModel
 
@@ -44,101 +41,6 @@ class SerialFieldModelTests(PostgreSQLTestCase):
         self.assertEqual(regular.db_type(connection), 'serial')
         self.assertEqual(small.db_type(connection), 'smallserial')
         self.assertEqual(big.db_type(connection), 'bigserial')
-
-
-@isolate_apps('postgres_tests')
-class SerialFieldSchemaTests(PostgreSQLTransactionTestCase):
-    available_apps = ['postgres_tests']
-
-    def test_serial_to_integer(self):
-        class TestModel(models.Model):
-            serial = SerialField()
-
-        try:
-            with connection.schema_editor() as editor:
-                editor.create_model(TestModel)
-            old_field = TestModel._meta.get_field('serial')
-            TestModel.objects.create()
-
-            with warnings.catch_warnings():
-                warnings.filterwarnings(
-                    'ignore', category=RuntimeWarning,
-                    message="Model 'postgres_tests.testmodel' was already registered."
-                )
-
-                class TestModel(models.Model):
-                    serial = models.IntegerField()
-
-            new_field = TestModel._meta.get_field('serial')
-            with connection.schema_editor() as editor:
-                editor.alter_field(TestModel, old_field, new_field, strict=True)
-
-            with self.assertRaises(IntegrityError):
-                TestModel.objects.create()
-            TestModel.objects.create(serial=7)
-        finally:
-            with connection.schema_editor() as editor:
-                editor.delete_model(TestModel)
-
-    def test_int_pk_to_serial_pk(self):
-        class TestModel(models.Model):
-            id = models.IntegerField(unique=True, primary_key=True)
-
-        try:
-            with connection.schema_editor() as editor:
-                editor.create_model(TestModel)
-            with self.assertRaises(IntegrityError):
-                TestModel.objects.create()
-            old_field = TestModel._meta.get_field('id')
-
-            with warnings.catch_warnings():
-                warnings.filterwarnings(
-                    'ignore', category=RuntimeWarning,
-                    message="Model 'postgres_tests.testmodel' was already registered."
-                )
-
-                class TestModel(models.Model):
-                    id = SerialField(unique=True, primary_key=True)
-
-            new_field = TestModel._meta.get_field('id')
-            with connection.schema_editor() as editor:
-                editor.alter_field(TestModel, old_field, new_field, strict=True)
-            with connection.cursor() as cursor:
-                for command in connection.ops.sequence_reset_sql(no_style(), [TestModel]):
-                    cursor.execute(command)
-
-            TestModel.objects.create()
-        finally:
-            with connection.schema_editor() as editor:
-                editor.delete_model(TestModel)
-
-    def test_implicit_id_to_serial(self):
-        class TestModel(models.Model):
-            pass
-
-        try:
-            with connection.schema_editor() as editor:
-                editor.create_model(TestModel)
-            old_field = TestModel._meta.get_field('id')
-            TestModel.objects.create()
-
-            with warnings.catch_warnings():
-                warnings.filterwarnings(
-                    'ignore', category=RuntimeWarning,
-                    message="Model 'postgres_tests.testmodel' was already registered."
-                )
-
-                class TestModel(models.Model):
-                    id = SerialField(unique=True, primary_key=True)
-
-            new_field = TestModel._meta.get_field('id')
-            with connection.schema_editor() as editor:
-                editor.alter_field(TestModel, old_field, new_field, strict=True)
-
-            TestModel.objects.create()
-        finally:
-            with connection.schema_editor() as editor:
-                editor.delete_model(TestModel)
 
 
 class SerialFieldTests(PostgreSQLTestCase):

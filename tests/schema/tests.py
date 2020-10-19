@@ -24,6 +24,7 @@ from django.utils import timezone
 
 from .fields import (
     CustomManyToManyField, InheritedManyToManyField, MediumBlobField,
+    SerialField,
 )
 from .models import (
     Author, AuthorCharFieldWithIndex, AuthorTextFieldWithIndex,
@@ -3418,3 +3419,69 @@ class SchemaTests(TransactionTestCase):
             if connection.vendor == 'postgresql':
                 with connection.cursor() as cursor:
                     cursor.execute('DROP COLLATION IF EXISTS case_insensitive')
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific tests")
+    @isolate_apps('schema')
+    def test_serial_to_integer(self):
+        class TestModel(Model):
+            serial = SerialField()
+
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(TestModel)
+        self.isolated_local_models = [TestModel]
+        old_field = TestModel._meta.get_field('serial')
+        TestModel.objects.create()
+
+        new_field = IntegerField()
+        new_field.model = TestModel
+        new_field.set_attributes_from_name("serial")
+        with connection.schema_editor() as editor:
+            editor.alter_field(TestModel, old_field, new_field, strict=True)
+
+        with self.assertRaises(DatabaseError):
+            # Database no longer provides value for serial
+            TestModel.objects.create()
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific tests")
+    @isolate_apps('schema')
+    def test_int_pk_to_serial_pk(self):
+        class TestModel(Model):
+            id = IntegerField(unique=True, primary_key=True)
+
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(TestModel)
+        self.isolated_local_models = [TestModel]
+        with self.assertRaises(IntegrityError):
+            TestModel.objects.create()
+        old_field = TestModel._meta.get_field('id')
+
+        new_field = SerialField(unique=True, primary_key=True)
+        new_field.model = TestModel
+        new_field.set_attributes_from_name("id")
+        with connection.schema_editor() as editor:
+            editor.alter_field(TestModel, old_field, new_field, strict=True)
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific tests")
+    @isolate_apps('schema')
+    def test_implicit_id_to_serial(self):
+        class TestModel(Model):
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(TestModel)
+        self.isolated_local_models = [TestModel]
+        old_field = TestModel._meta.get_field('id')
+        TestModel.objects.create()
+
+        new_field = SerialField(unique=True, primary_key=True)
+        new_field.model = TestModel
+        new_field.set_attributes_from_name("id")
+        with connection.schema_editor() as editor:
+            editor.alter_field(TestModel, old_field, new_field, strict=True)

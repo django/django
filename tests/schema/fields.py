@@ -2,9 +2,14 @@ from functools import partial
 
 from django.db import models
 from django.db.models.fields.related import (
-    RECURSIVE_RELATIONSHIP_CONSTANT, ManyToManyDescriptor, RelatedField,
+    RECURSIVE_RELATIONSHIP_CONSTANT, Field, ManyToManyDescriptor, RelatedField,
     create_many_to_many_intermediary_model,
 )
+
+try:
+    from django.contrib.postgres.fields import SerialField
+except ImportError:
+    SerialField = Field
 
 
 class CustomManyToManyField(RelatedField):
