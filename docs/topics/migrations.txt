@@ -169,6 +169,27 @@ migrations for you. If not, you'll have to go in and modify the migrations
 yourself - don't worry, this isn't difficult, and is explained more in
 :ref:`migration-files` below.
 
+Transactions
+============
+
+On databases that support DDL transactions (SQLite and PostgreSQL), all
+migration operations will run inside a single transaction by default. In
+contrast, if a database doesn't support DDL transactions (e.g. MySQL, Oracle)
+then all operations will run without a transaction.
+
+You can prevent a migration from running in a transaction by setting the
+``atomic`` attribute to ``False``. For example::
+
+    from django.db import migrations
+
+    class Migration(migrations.Migration):
+        atomic = False
+
+It's also possible to execute parts of the migration inside a transaction using
+:func:`~django.db.transaction.atomic()` or by passing ``atomic=True`` to
+:class:`~django.db.migrations.operations.RunPython`. See
+:ref:`non-atomic-migrations` for more details.
+
 Dependencies
 ============
 
