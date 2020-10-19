@@ -589,10 +589,10 @@ with the admin site:
 * **admin.E016**: The value of ``form`` must inherit from ``BaseModelForm``.
 * **admin.E017**: The value of ``filter_vertical`` must be a list or tuple.
 * **admin.E018**: The value of ``filter_horizontal`` must be a list or tuple.
-* **admin.E019**: The value of ``filter_vertical[n]/filter_vertical[n]`` refers
-  to ``<field name>``, which is not an attribute of ``<model>``.
-* **admin.E020**: The value of ``filter_vertical[n]/filter_vertical[n]`` must
-  be a many-to-many field.
+* **admin.E019**: The value of ``filter_vertical[n]/filter_horizontal[n]``
+  refers to ``<field name>``, which is not an attribute of ``<model>``.
+* **admin.E020**: The value of ``filter_vertical[n]/filter_horizontal[n]``
+  must be a many-to-many field.
 * **admin.E021**: The value of ``radio_fields`` must be a dictionary.
 * **admin.E022**: The value of ``radio_fields`` refers to ``<field name>``,
   which is not an attribute of ``<model>``.
