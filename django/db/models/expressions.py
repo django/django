@@ -1068,6 +1068,11 @@ class Case(Expression):
             sql = connection.ops.unification_cast_sql(self.output_field) % sql
         return sql, sql_params
 
+    def get_group_by_cols(self, alias=None):
+        if not self.cases:
+            return self.default.get_group_by_cols(alias)
+        return super().get_group_by_cols(alias)
+
 
 class Subquery(Expression):
     """
