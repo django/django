@@ -391,6 +391,36 @@ be used to retrieve their associated ``TaggedItems``::
     >>> b.tags.all()
     <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
 
+You can also use ``add()``, ``create()``, or ``set()`` to create
+relationships::
+
+    >>> t3 = TaggedItem(tag='Web development')
+    >>> b.tags.add(t3, bulk=False)
+    >>> b.tags.create(tag='Web framework')
+    <TaggedItem: Web framework>
+    >>> b.tags.all()
+    <QuerySet [<TaggedItem: django>, <TaggedItem: python>, <TaggedItem: Web development>, <TaggedItem: Web framework>]>
+    >>> b.tags.set([t1, t3])
+    >>> b.tags.all()
+    <QuerySet [<TaggedItem: django>, <TaggedItem: Web development>]>
+
+The ``remove()`` call will bulk delete the specified model objects::
+
+    >>> b.tags.remove(t3)
+    >>> b.tags.all()
+    <QuerySet [<TaggedItem: django>]>
+    >>> TaggedItem.objects.all()
+    <QuerySet [<TaggedItem: django>]>
+
+The ``clear()`` method can be used to bulk delete all related objects for an
+instance::
+
+    >>> b.tags.clear()
+    >>> b.tags.all()
+    <QuerySet []>
+    >>> TaggedItem.objects.all()
+    <QuerySet []>
+
 Defining :class:`~django.contrib.contenttypes.fields.GenericRelation` with
 ``related_query_name`` set allows querying from the related object::
 
