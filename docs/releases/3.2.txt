@@ -185,6 +185,13 @@ CSRF
 
 * ...
 
+Decorators
+~~~~~~~~~~
+
+* The new :func:`~django.views.decorators.common.no_append_slash` decorator
+  allows individual views to be excluded from :setting:`APPEND_SLASH` URL
+  normalization.
+
 Email
 ~~~~~
 

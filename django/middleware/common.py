@@ -67,10 +67,11 @@ class CommonMiddleware(MiddlewareMixin):
         """
         if settings.APPEND_SLASH and not request.path_info.endswith('/'):
             urlconf = getattr(request, 'urlconf', None)
-            return (
-                not is_valid_path(request.path_info, urlconf) and
-                is_valid_path('%s/' % request.path_info, urlconf)
-            )
+            if not is_valid_path(request.path_info, urlconf):
+                match = is_valid_path('%s/' % request.path_info, urlconf)
+                if match:
+                    view = match.func
+                    return getattr(view, 'should_append_slash', True)
         return False
 
     def get_full_path_with_slash(self, request):

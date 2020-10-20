@@ -128,6 +128,17 @@ class CommonMiddlewareTest(SimpleTestCase):
         self.assertEqual(CommonMiddleware(get_response_404)(request).status_code, 404)
 
     @override_settings(APPEND_SLASH=True)
+    def test_append_slash_opt_out(self):
+        """
+        Views marked with @no_append_slash should be left alone.
+        """
+        request = self.rf.get('/sensitive_fbv')
+        self.assertEqual(CommonMiddleware(get_response_404)(request).status_code, 404)
+
+        request = self.rf.get('/sensitive_cbv')
+        self.assertEqual(CommonMiddleware(get_response_404)(request).status_code, 404)
+
+    @override_settings(APPEND_SLASH=True)
     def test_append_slash_quoted(self):
         """
         URLs which require quoting should be redirected to their slash version.
