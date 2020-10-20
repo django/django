@@ -8,9 +8,10 @@ from django.db import models
 
 try:
     from django.contrib.postgres.fields import (
-        ArrayField, BigIntegerRangeField, BigSerialField, CICharField, CIEmailField,
-        CITextField, DateRangeField, DateTimeRangeField, DecimalRangeField,
-        HStoreField, IntegerRangeField, SmallSerialField, SerialField
+        ArrayField, BigIntegerRangeField, BigSerialField, CICharField,
+        CIEmailField, CITextField, DateRangeField, DateTimeRangeField,
+        DecimalRangeField, HStoreField, IntegerRangeField, SerialField,
+        SmallSerialField,
     )
     from django.contrib.postgres.search import SearchVectorField
 except ImportError:
