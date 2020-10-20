@@ -90,7 +90,14 @@ class BaseFormSet:
             form = ManagementForm(self.data, auto_id=self.auto_id, prefix=self.prefix)
             if not form.is_valid():
                 raise ValidationError(
-                    _('ManagementForm data is missing or has been tampered with'),
+                    _(
+                        'ManagementForm data is missing or has been tampered '
+                        'with. Missing fields: %(field_names)s'
+                    ) % {
+                        'field_names': ', '.join(
+                            form.add_prefix(field_name) for field_name in form.errors
+                        ),
+                    },
                     code='missing_management_form',
                 )
         else:
