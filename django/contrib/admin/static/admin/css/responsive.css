@@ -558,6 +558,7 @@ input[type="submit"], button {
     .aligned .form-row,
     .aligned .form-row > div {
         display: flex;
+        flex-wrap: wrap;
         max-width: 100vw;
     }
 
