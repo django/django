@@ -38,14 +38,6 @@ useful notifications:
 
   Sent when Django starts or finishes an HTTP request.
 
-This is an example of the ``setting_changed`` signal, which is used by many pluggable
-Django apps::
-
-    @receiver(setting_changed)
-    def reload_my_app_settings(**kwargs):
-        if kwargs['setting'] == 'MY_APP':
-            my_app_settings.reload()
-
 You can also `define and send your own custom signals`_; see below.
 
 .. _define and send your own custom signals: `defining and sending signals`_

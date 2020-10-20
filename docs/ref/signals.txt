@@ -234,11 +234,11 @@ method::
 
     class Order(models.Model):
         ...
-        def delete(self, **kwargs):
+        def delete(self, *args, **kwargs):
             if self.status != "PENDING":
                 raise OrderError("Cannot delete processed order")
 
-            return super().delete(**kwargs)
+            return super().delete(*args, **kwargs)
 
 ``post_delete``
 ---------------
@@ -273,8 +273,8 @@ method::
 
     class Order(models.Model):
         ...
-        def delete(self, **kwargs):
-            result = super().delete(**kwargs)
+        def delete(self, *args, **kwargs):
+            result = super().delete(*args, **kwargs)
 
             transaction.on_commit(self.send_order_deleted_email)
 
