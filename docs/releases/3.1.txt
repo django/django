@@ -201,10 +201,6 @@ Minor features
 * :meth:`~django.db.models.Model.get_FOO_display` now supports
   :class:`~django.contrib.postgres.fields.ArrayField` and
   :class:`~django.contrib.postgres.fields.RangeField`.
-* A new :class:`~django.db.models.expressions.Default` expression has
-  been added to allow setting a field to the default value stored in the
-  database. This is equivalent to using the ``DEFAULT`` clause in an ``INSERT``
-  or ``UPDATE`` SQL statement.
 
 * The new :lookup:`rangefield.lower_inc`, :lookup:`rangefield.lower_inf`,
   :lookup:`rangefield.upper_inc`, and :lookup:`rangefield.upper_inf` lookups
