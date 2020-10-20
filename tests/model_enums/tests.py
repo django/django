@@ -155,6 +155,20 @@ class ChoicesTests(SimpleTestCase):
         output = template.render(Context({'Suit': Suit}))
         self.assertEqual(output, 'Diamond|1')
 
+    def test_is_properties(self):
+        names = Suit.names
+        for name in names:
+            item = Suit[name]
+            for x in names:
+                prop = 'is_{}'.format(x.lower())
+                with self.subTest('{}.{}'.format(name, prop)):
+                    if name == x:
+                        # XXX.is_xxx
+                        self.assertTrue(getattr(item, prop), '{}.{}'.format(name, prop))
+                    else:
+                        # YYY.is_xxx
+                        self.assertFalse(getattr(item, prop), '{}.{}'.format(name, prop))
+
 
 class Separator(bytes, models.Choices):
     FS = b'\x1c', 'File Separator'

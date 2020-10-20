@@ -1,5 +1,8 @@
 import enum
 
+from operator import is_
+from functools import partial
+
 from django.utils.functional import Promise
 
 __all__ = ['Choices', 'IntegerChoices', 'TextChoices']
@@ -32,6 +35,10 @@ class ChoicesMeta(enum.EnumMeta):
         # label in the choices.
         cls.label = property(lambda self: cls._value2label_map_.get(self.value))
         cls.do_not_call_in_templates = True
+
+        # 'is_xxx' properties: `a.is_xxx` equivalently `a is a.XXX`
+        for name in classdict._member_names:
+            setattr(cls, "is_{}".format(name.lower()), property(partial(is_, cls[name])))
         return enum.unique(cls)
 
     def __contains__(cls, member):
