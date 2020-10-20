@@ -240,6 +240,12 @@ method::
 
             return super().delete(*args, **kwargs)
 
+.. note::
+
+    The alternative method above is not suitable for a bulk delete, since calling
+    ``delete()`` on a :class:`~django.db.models.query.QuerySet` does not call any
+    ``delete()`` methods on your model.
+
 ``post_delete``
 ---------------
 
@@ -279,6 +285,12 @@ method::
             transaction.on_commit(self.send_order_deleted_email)
 
             return result
+
+.. note::
+
+    The alternative method above is not suitable for a bulk delete, since calling
+    ``delete()`` on a :class:`~django.db.models.query.QuerySet` does not call any
+    ``delete()`` methods on your model.
 
 ``m2m_changed``
 ---------------
