@@ -198,7 +198,12 @@ class IterableSerializer(BaseSerializer):
 class ModelFieldSerializer(DeconstructableSerializer):
     def serialize(self):
         attr_name, path, args, kwargs = self.value.deconstruct()
-        return self.serialize_deconstructed(path, args, kwargs)
+        try:
+            return self.serialize_deconstructed(path, args, kwargs)
+        except ValueError as e:
+            msg = 'During serialization of the field'
+            e.args = ('{} {} the following blew up: {}'.format(msg, self.value, e.args[0]), ) + e.args[1:]
+            raise e
 
 
 class ModelManagerSerializer(DeconstructableSerializer):
