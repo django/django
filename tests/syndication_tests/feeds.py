@@ -77,7 +77,7 @@ class TestLatestFeed(TestRss2Feed):
     subtitle = TestRss2Feed.description
 
     def items(self):
-        return Entry.objects.exclude(pk=5)
+        return Entry.objects.exclude(title='My last entry')
 
 
 class ArticlesFeed(TestRss2Feed):

@@ -129,7 +129,7 @@ class SyndicationFeedTest(FeedTestCase):
         )
 
         # Find the pubdate of the first feed item
-        d = Entry.objects.get(pk=1).published
+        d = Entry.objects.get(pk=self.e1.pk).published
         pub_date = rfc2822_date(timezone.make_aware(d, TZ))
 
         items = chan.getElementsByTagName('item')
@@ -137,11 +137,11 @@ class SyndicationFeedTest(FeedTestCase):
         self.assertChildNodeContent(items[0], {
             'title': 'My first entry',
             'description': 'Overridden description: My first entry',
-            'link': 'http://example.com/blog/1/',
-            'guid': 'http://example.com/blog/1/',
+            'link': 'http://example.com/blog/%s/' % self.e1.pk,
+            'guid': 'http://example.com/blog/%s/' % self.e1.pk,
             'pubDate': pub_date,
             'author': 'test@example.com (Sally Smith)',
-            'comments': '/blog/1/comments',
+            'comments': '/blog/%s/comments' % self.e1.pk,
         })
         self.assertCategories(items[0], ['python', 'testing'])
         for item in items:
@@ -252,7 +252,7 @@ class SyndicationFeedTest(FeedTestCase):
         self.assertChildNodeContent(items[0], {
             'title': 'My first entry',
             'description': 'Overridden description: My first entry',
-            'link': 'http://example.com/blog/1/',
+            'link': 'http://example.com/blog/%s/' % self.e1.pk,
         })
         for item in items:
             self.assertChildNodes(item, ['title', 'link', 'description'])
@@ -344,7 +344,7 @@ class SyndicationFeedTest(FeedTestCase):
         feed = minidom.parseString(response.content).firstChild
         updated = feed.getElementsByTagName('updated')[0].firstChild.wholeText
 
-        d = Entry.objects.exclude(pk=5).latest('updated').updated
+        d = Entry.objects.exclude(title='My last entry').latest('updated').updated
         latest_updated = rfc3339_date(timezone.make_aware(d, TZ))
 
         self.assertEqual(updated, latest_updated)
@@ -493,7 +493,7 @@ class SyndicationFeedTest(FeedTestCase):
         self.assertChildNodeContent(items[0], {
             'title': 'Title in your templates: My first entry\n',
             'description': 'Description in your templates: My first entry\n',
-            'link': 'http://example.com/blog/1/',
+            'link': 'http://example.com/blog/%s/' % self.e1.pk,
         })
 
     def test_template_context_feed(self):
@@ -536,9 +536,9 @@ class SyndicationFeedTest(FeedTestCase):
         items = chan.getElementsByTagName('item')
 
         self.assertChildNodeContent(items[0], {
-            'comments': '/blog/1/article/1/comments',
+            'comments': '/blog/%s/article/%s/comments' % (self.e1.pk, self.a1.pk),
             'description': 'Article description: My first article',
-            'link': 'http://example.com/blog/1/article/1/',
+            'link': 'http://example.com/blog/%s/article/%s/' % (self.e1.pk, self.a1.pk),
             'title': 'Title: My first article',
             'pubDate': rfc2822_date(timezone.make_aware(self.a1.published, TZ)),
         })
