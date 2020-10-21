@@ -168,11 +168,10 @@ class BaseModelAdminChecks:
         """
         if not isinstance(obj.autocomplete_fields, (list, tuple)):
             return must_be('a list or tuple', option='autocomplete_fields', obj=obj, id='admin.E036')
-        else:
-            return list(chain.from_iterable([
-                self._check_autocomplete_fields_item(obj, field_name, 'autocomplete_fields[%d]' % index)
-                for index, field_name in enumerate(obj.autocomplete_fields)
-            ]))
+        return list(chain.from_iterable([
+            self._check_autocomplete_fields_item(obj, field_name, 'autocomplete_fields[%d]' % index)
+            for index, field_name in enumerate(obj.autocomplete_fields)
+        ]))
 
     def _check_autocomplete_fields_item(self, obj, field_name, label):
         """
@@ -183,39 +182,38 @@ class BaseModelAdminChecks:
         try:
             field = obj.model._meta.get_field(field_name)
         except FieldDoesNotExist:
-            return refer_to_missing_field(field=field_name, option=label, obj=obj, id='admin.E037')
-        else:
-            if not field.many_to_many and not isinstance(field, models.ForeignKey):
-                return must_be(
-                    'a foreign key or a many-to-many field',
+            return refer_to_missing_field(field=field_name, option=label, obj=obj, id='admin.E037'
+        if not field.many_to_many and not isinstance(field, models.ForeignKey):
+            return must_be(
+                'a foreign key or a many-to-many field',
                     option=label, obj=obj, id='admin.E038'
+            )
+        related_admin = obj.admin_site._registry.get(field.remote_field.model)
+        if related_admin is None:
+            return [
+                checks.Error(
+                    'An admin for model "%s" has to be registered '
+                    'to be referenced by %s.autocomplete_fields.' % (
+                        field.remote_field.model.__name__,
+                        type(obj).__name__,
+                    ),
+                    obj=obj.__class__,
+                    id='admin.E039',
                 )
-            related_admin = obj.admin_site._registry.get(field.remote_field.model)
-            if related_admin is None:
-                return [
-                    checks.Error(
-                        'An admin for model "%s" has to be registered '
-                        'to be referenced by %s.autocomplete_fields.' % (
-                            field.remote_field.model.__name__,
-                            type(obj).__name__,
-                        ),
-                        obj=obj.__class__,
-                        id='admin.E039',
-                    )
-                ]
-            elif not related_admin.search_fields:
-                return [
-                    checks.Error(
-                        '%s must define "search_fields", because it\'s '
-                        'referenced by %s.autocomplete_fields.' % (
-                            related_admin.__class__.__name__,
-                            type(obj).__name__,
-                        ),
-                        obj=obj.__class__,
-                        id='admin.E040',
-                    )
-                ]
-            return []
+            ]
+        elif not related_admin.search_fields:
+            return [
+                checks.Error(
+                    '%s must define "search_fields", because it\'s '
+                    'referenced by %s.autocomplete_fields.' % (
+                        related_admin.__class__.__name__,
+                        type(obj).__name__,
+                    ),
+                    obj=obj.__class__,
+                    id='admin.E040',
+                )
+            ]
+        return []
 
     def _check_raw_id_fields(self, obj):
         """ Check that `raw_id_fields` only contains field names that are listed
@@ -223,11 +221,11 @@ class BaseModelAdminChecks:
 
         if not isinstance(obj.raw_id_fields, (list, tuple)):
             return must_be('a list or tuple', option='raw_id_fields', obj=obj, id='admin.E001')
-        else:
-            return list(chain.from_iterable(
-                self._check_raw_id_fields_item(obj, field_name, 'raw_id_fields[%d]' % index)
-                for index, field_name in enumerate(obj.raw_id_fields)
-            ))
+                                          
+        return list(chain.from_iterable(
+            self._check_raw_id_fields_item(obj, field_name, 'raw_id_fields[%d]' % index)
+            for index, field_name in enumerate(obj.raw_id_fields)
+        ))
 
     def _check_raw_id_fields_item(self, obj, field_name, label):
         """ Check an item of `raw_id_fields`, i.e. check that field named
@@ -238,11 +236,10 @@ class BaseModelAdminChecks:
             field = obj.model._meta.get_field(field_name)
         except FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label, obj=obj, id='admin.E002')
-        else:
-            if not field.many_to_many and not isinstance(field, models.ForeignKey):
-                return must_be('a foreign key or a many-to-many field', option=label, obj=obj, id='admin.E003')
-            else:
-                return []
+                                          
+        if not field.many_to_many and not isinstance(field, models.ForeignKey):
+            return must_be('a foreign key or a many-to-many field', option=label, obj=obj, id='admin.E003')
+        return []
 
     def _check_fields(self, obj):
         """ Check that `fields` only refer to existing fields, doesn't contain
@@ -284,12 +281,12 @@ class BaseModelAdminChecks:
             return []
         elif not isinstance(obj.fieldsets, (list, tuple)):
             return must_be('a list or tuple', option='fieldsets', obj=obj, id='admin.E007')
-        else:
-            seen_fields = []
-            return list(chain.from_iterable(
-                self._check_fieldsets_item(obj, fieldset, 'fieldsets[%d]' % index, seen_fields)
-                for index, fieldset in enumerate(obj.fieldsets)
-            ))
+                                          
+        seen_fields = []
+        return list(chain.from_iterable(
+            self._check_fieldsets_item(obj, fieldset, 'fieldsets[%d]' % index, seen_fields)
+            for index, fieldset in enumerate(obj.fieldsets)
+        ))
 
     def _check_fieldsets_item(self, obj, fieldset, label, seen_fields):
         """ Check an item of `fieldsets`, i.e. check that this is a pair of a
