@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, time
 
 from django.conf import settings
 from django.utils.crypto import constant_time_compare, salted_hmac
@@ -35,6 +35,8 @@ class PasswordResetTokenGenerator:
         # Parse the token
         try:
             ts_b36, _ = token.split("-")
+            # RemovedInDjango40Warning.
+            legacy_token = len(ts_b36) < 4
         except ValueError:
             return False
 
@@ -54,8 +56,14 @@ class PasswordResetTokenGenerator:
             ):
                 return False
 
+        # RemovedInDjango40Warning: convert days to seconds and round to
+        # midnight (server time) for pre-Django 3.1 tokens.
+        now = self._now()
+        if legacy_token:
+            ts *= 24 * 60 * 60
+            ts += int((now - datetime.combine(now.date(), time.min)).total_seconds())
         # Check the timestamp is within limit.
-        if (self._num_seconds(self._now()) - ts) > settings.PASSWORD_RESET_TIMEOUT:
+        if (self._num_seconds(now) - ts) > settings.PASSWORD_RESET_TIMEOUT:
             return False
 
         return True
