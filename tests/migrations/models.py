@@ -38,6 +38,14 @@ class UnserializableModel(models.Model):
         apps = Apps()
 
 
+class UnserializableField(models.CharField):
+    description = 'A field that uses a lambda expression'
+
+    def __init__(self, *args, **kwargs):
+        kwargs['default'] = lambda: 'Not serializable'
+        super().__init__(*args, **kwargs)
+
+
 class UnmigratedModel(models.Model):
     """
     A model that is in a migration-less app (which this app is
