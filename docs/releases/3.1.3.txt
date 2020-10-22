@@ -14,7 +14,7 @@ Bugfixes
   admin changelist search bar (:ticket:`32072`).
 
 * Fixed a regression in Django 3.1.2 that caused the incorrect width of the
-  admin changelist search bar on a filtered admin page (:ticket:`32091`).
+  admin changelist search bar on a filtered page (:ticket:`32091`).
 
 * Fixed displaying Unicode characters in
   :class:`forms.JSONField <django.forms.JSONField>` and read-only
