@@ -321,3 +321,29 @@ class BulkCreateTests(TestCase):
         # Without ignore_conflicts=True, there's a problem.
         with self.assertRaises(IntegrityError):
             TwoFields.objects.bulk_create(conflicting_objects)
+
+    def test_nullable_fk_after_parent(self):
+        parent = NoFields()
+        child = NullableFields(auto_field=parent, integer_field=88)
+        parent.save()
+        NullableFields.objects.bulk_create([child])
+        child = NullableFields.objects.get(integer_field=88)
+        self.assertEqual(child.auto_field, parent)
+
+    @skipUnlessDBFeature('can_return_rows_from_bulk_insert')
+    def test_nullable_fk_after_parent_bulk_create(self):
+        parent = NoFields()
+        child = NullableFields(auto_field=parent, integer_field=88)
+        NoFields.objects.bulk_create([parent])
+        NullableFields.objects.bulk_create([child])
+        child = NullableFields.objects.get(integer_field=88)
+        self.assertEqual(child.auto_field, parent)
+
+    def test_unsaved_parent(self):
+        parent = NoFields()
+        msg = (
+            "bulk_create() prohibited to prevent data loss due to unsaved "
+            "related object 'auto_field'."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            NullableFields.objects.bulk_create([NullableFields(auto_field=parent)])
