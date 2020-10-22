@@ -488,6 +488,11 @@ backends.
 
 * Support for PostGIS 2.2 is removed.
 
+* The Oracle backend now clones polygons (and geometry collections containing
+  polygons) before reorienting them and saving them to the database. They are
+  no longer mutated in place. You might notice this if you use the polygons
+  after a model is saved.
+
 Dropped support for PostgreSQL 9.5
 ----------------------------------
 
