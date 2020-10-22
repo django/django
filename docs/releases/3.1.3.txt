@@ -48,3 +48,6 @@ Bugfixes
 
 * Fixed a regression in Django 3.1.2 that caused incorrect form input layout on
   small screens in the admin change form view (:ticket:`32069`).
+
+* Fixed a regression in Django 3.1 that invalidated pre-Django 3.1 password
+  reset tokens (:ticket:`32130`).
