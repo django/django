@@ -115,6 +115,8 @@ class HashedFilesMixin:
         """
         if settings.DEBUG and not force:
             hashed_name, fragment = name, ''
+            if not self.exists(hashed_name):
+                raise ValueError(f"Staticfile '{hashed_name}' does not exist.")
         else:
             clean_name, fragment = urldefrag(name)
             if urlsplit(clean_name).path.endswith('/'):  # don't hash paths
