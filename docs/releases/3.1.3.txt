@@ -51,3 +51,5 @@ Bugfixes
 
 * Fixed a regression in Django 3.1 that invalidated pre-Django 3.1 password
   reset tokens (:ticket:`32130`).
+
+* Added support for ``asgiref`` 3.3 (:ticket:`32128`).

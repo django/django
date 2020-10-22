@@ -214,14 +214,14 @@ as ensuring threadlocals work, it also enables the ``thread_sensitive`` mode of
 ``sync_to_async()``
 -------------------
 
-.. function:: sync_to_async(sync_function, thread_sensitive=False)
+.. function:: sync_to_async(sync_function, thread_sensitive=True)
 
 Takes a sync function and returns an async function that wraps it. Can be used
 as either a direct wrapper or a decorator::
 
     from asgiref.sync import sync_to_async
 
-    async_function = sync_to_async(sync_function)
+    async_function = sync_to_async(sync_function, thread_sensitive=False)
     async_function = sync_to_async(sensitive_sync_function, thread_sensitive=True)
 
     @sync_to_async
@@ -234,13 +234,21 @@ directions.
 Sync functions tend to be written assuming they all run in the main
 thread, so :func:`sync_to_async` has two threading modes:
 
-* ``thread_sensitive=False`` (the default): the sync function will run in a
-  brand new thread which is then closed once the invocation completes.
+* ``thread_sensitive=True`` (the default): the sync function will run in the
+  same thread as all other ``thread_sensitive`` functions. This will be the
+  main thread, if the main thread is synchronous and you are using the
+  :func:`async_to_sync` wrapper.
 
-* ``thread_sensitive=True``: the sync function will run in the same thread as
-  all other ``thread_sensitive`` functions. This will be the main thread, if
-  the main thread is synchronous and you are using the :func:`async_to_sync`
-  wrapper.
+* ``thread_sensitive=False``: the sync function will run in a brand new thread
+  which is then closed once the invocation completes.
+
+.. warning::
+
+    ``asgiref`` version 3.3.0 changed the default value of the
+    ``thread_sensitive`` parameter to ``True``. This is a safer default, and in
+    many cases interacting with Django the correct value, but be sure to
+    evaluate uses of ``sync_to_async()`` if updating ``asgiref`` from a prior
+    version.
 
 Thread-sensitive mode is quite special, and does a lot of work to run all
 functions in the same thread. Note, though, that it *relies on usage of*

@@ -181,7 +181,7 @@ class AsyncClientHandler(BaseHandler):
             body_file = FakePayload('')
 
         request_started.disconnect(close_old_connections)
-        await sync_to_async(request_started.send)(sender=self.__class__, scope=scope)
+        await sync_to_async(request_started.send, thread_sensitive=False)(sender=self.__class__, scope=scope)
         request_started.connect(close_old_connections)
         request = ASGIRequest(scope, body_file)
         # Sneaky little hack so that we can easily get round
@@ -197,14 +197,14 @@ class AsyncClientHandler(BaseHandler):
         response.asgi_request = request
         # Emulate a server by calling the close method on completion.
         if response.streaming:
-            response.streaming_content = await sync_to_async(closing_iterator_wrapper)(
+            response.streaming_content = await sync_to_async(closing_iterator_wrapper, thread_sensitive=False)(
                 response.streaming_content,
                 response.close,
             )
         else:
             request_finished.disconnect(close_old_connections)
             # Will fire request_finished.
-            await sync_to_async(response.close)()
+            await sync_to_async(response.close, thread_sensitive=False)()
             request_finished.connect(close_old_connections)
         return response
 

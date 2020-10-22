@@ -148,7 +148,7 @@ class BaseHandler:
         response = await self._middleware_chain(request)
         response._resource_closers.append(request.close)
         if response.status_code >= 400:
-            await sync_to_async(log_response)(
+            await sync_to_async(log_response, thread_sensitive=False)(
                 '%s: %s', response.reason_phrase, request.path,
                 response=response,
                 request=request,
