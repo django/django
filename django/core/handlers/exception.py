@@ -37,7 +37,7 @@ def convert_exception_to_response(get_response):
             try:
                 response = await get_response(request)
             except Exception as exc:
-                response = await sync_to_async(response_for_exception)(request, exc)
+                response = await sync_to_async(response_for_exception, thread_sensitive=False)(request, exc)
             return response
         return inner
     else:
