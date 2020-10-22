@@ -201,3 +201,25 @@ class NumericPasswordValidator:
 
     def get_help_text(self):
         return _('Your password can’t be entirely numeric.')
+
+
+class SpecialCharacterValidator:
+    """
+    The password must contain atleast one special character
+    :param special_characters: Allows developer to instantiate class with own list of special characters. 
+    :type special_characters: list
+    Default list will be used if developer doesnt specify
+    """
+    default_special_characters=['$','#', '@', '!','%','^','&','*','(',')']
+    def __init__(self, special_characters=default_special_characters):
+        self.special_characters=special_characters
+
+    def validate(self, password, user=None):
+        if not any(char in password for char in self.special_characters):
+            raise ValidationError(
+                _("The password must contain atleast one special character- for example: %(special_characters)s " ),
+                code='password_specialchar_required',
+                params={'special_characters': " ".join(self.special_characters)},
+            )
+    def get_help_text(self):
+        return _('The password must contain atleast one special character')

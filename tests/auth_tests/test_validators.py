@@ -7,7 +7,7 @@ from django.contrib.auth.password_validation import (
     UserAttributeSimilarityValidator, get_default_password_validators,
     get_password_validators, password_changed,
     password_validators_help_text_html, password_validators_help_texts,
-    validate_password,
+    validate_password, SpecialCharacterValidator
 )
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -259,3 +259,32 @@ class UsernameValidatorsTests(SimpleTestCase):
             with self.subTest(invalid=invalid):
                 with self.assertRaises(ValidationError):
                     v(invalid)
+
+
+class SpecialCharacterValidatorTest(SimpleTestCase):
+    
+    def test_validate(self):
+        default_special_characters=['$','#', '@', '!','%','^','&','*','(',')']
+        expected_error = "The password must contain atleast one special character- for example: %s."
+        
+        self.assertIsNone(SpecialCharacterValidator().validate('validpass123@@'))
+        self.assertIsNone(SpecialCharacterValidator(special_characters=['@','#']).validate('valid#pass12'))
+
+
+        with self.assertRaises(ValidationError) as cm:
+            SpecialCharacterValidator().validate('nonvalidpass')
+            self.assertEqual(cm.exception.messages, [expected_error % " ".join(default_special_characters) ])
+            self.assertEqual(cm.exception.error_list[0].code,'password_specialchar_required')
+        
+
+        with self.assertRaises(ValidationError) as cm:
+            special_characters=['!', '@']
+            SpecialCharacterValidator(special_characters).validate('nonvalidpass')
+            self.assertEqual(cm.exception.messages, [expected_error % " ".join(special_characters) ])
+            self.assertEqual(cm.exception.error_list[0].code,'password_specialchar_required')
+            
+    def test_help_text(self):
+        self.assertEqual(
+            SpecialCharacterValidator().get_help_text(),
+            "The password must contain atleast one special character"
+        )
