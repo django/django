@@ -201,7 +201,7 @@ class ModelFieldSerializer(DeconstructableSerializer):
         try:
             return self.serialize_deconstructed(path, args, kwargs)
         except ValueError as e:
-            raise ValueError('Error during {} serializing: {}'.format(self.value, e)) from e
+            raise ValueError(f'Error during {self.value} serializing: {e}') from e
 
 
 class ModelManagerSerializer(DeconstructableSerializer):

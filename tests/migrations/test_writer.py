@@ -254,9 +254,8 @@ class WriterTests(SimpleTestCase):
     def test_serialize_field_with_lambda(self):
         field = UnserializableField()
 
-        error = 'Cannot serialize function: lambda'
-        expected = 'Error during {} serializing: {}'.format(field, error)
-        with self.assertRaisesMessage(ValueError, expected):
+        msg = f'Error during {field} serializing: Cannot serialize function: lambda'
+        with self.assertRaisesMessage(ValueError, msg):
             self.assertSerializedEqual(field)
 
     def test_serialize_strings(self):
