@@ -252,9 +252,10 @@ class WriterTests(SimpleTestCase):
         self.assertSerializedEqual(False)
 
     def test_trying_to_serialize_a_lambda_in_field_argument_should_raise_helpful_message(self):
-        field = models.CharField(default=lambda a: a + ', nup')
+        field = models.CharField(default=lambda: 'nup')
+
         error = 'Cannot serialize function: lambda'
-        expected = 'During serialization of the field {} the following blew up: {}'.format(field, error)
+        expected = 'Error during {} serializing: {}'.format(field, error)
         with self.assertRaisesMessage(ValueError, expected):
             self.assertSerializedEqual(field)
 
