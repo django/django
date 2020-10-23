@@ -1864,6 +1864,13 @@ class BigIntegerField(IntegerField):
         })
 
 
+class SmallIntegerField(IntegerField):
+    description = _('Small integer')
+
+    def get_internal_type(self):
+        return 'SmallIntegerField'
+
+
 class IPAddressField(Field):
     empty_strings_allowed = False
     description = _("IPv4 address")
@@ -2006,6 +2013,17 @@ class NullBooleanField(BooleanField):
 
 
 class PositiveIntegerRelDbTypeMixin:
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if not hasattr(cls, 'integer_field_class'):
+            cls.integer_field_class = next(
+                (
+                    parent
+                    for parent in cls.__mro__[1:]
+                    if issubclass(parent, IntegerField)
+                ),
+                None,
+            )
 
     def rel_db_type(self, connection):
         """
@@ -2019,10 +2037,10 @@ class PositiveIntegerRelDbTypeMixin:
         if connection.features.related_fields_match_type:
             return self.db_type(connection)
         else:
-            return IntegerField().db_type(connection=connection)
+            return self.integer_field_class().db_type(connection=connection)
 
 
-class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField):
+class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField):
     description = _('Positive big integer')
 
     def get_internal_type(self):
@@ -2048,7 +2066,7 @@ class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField):
         })
 
 
-class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField):
+class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField):
     description = _("Positive small integer")
 
     def get_internal_type(self):
@@ -2092,13 +2110,6 @@ class SlugField(CharField):
             'allow_unicode': self.allow_unicode,
             **kwargs,
         })
-
-
-class SmallIntegerField(IntegerField):
-    description = _("Small integer")
-
-    def get_internal_type(self):
-        return "SmallIntegerField"
 
 
 class TextField(Field):

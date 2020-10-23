@@ -176,6 +176,11 @@ class BigIntegerFieldTests(IntegerFieldTests):
 class PositiveSmallIntegerFieldTests(IntegerFieldTests):
     model = PositiveSmallIntegerModel
     documented_range = (0, 32767)
+    rel_db_type_class = (
+        models.PositiveSmallIntegerField
+        if connection.features.related_fields_match_type
+        else models.SmallIntegerField
+    )
 
 
 class PositiveIntegerFieldTests(IntegerFieldTests):
@@ -198,6 +203,11 @@ class PositiveIntegerFieldTests(IntegerFieldTests):
 class PositiveBigIntegerFieldTests(IntegerFieldTests):
     model = PositiveBigIntegerModel
     documented_range = (0, 9223372036854775807)
+    rel_db_type_class = (
+        models.PositiveBigIntegerField
+        if connection.features.related_fields_match_type
+        else models.BigIntegerField
+    )
 
 
 class ValidationTests(SimpleTestCase):
