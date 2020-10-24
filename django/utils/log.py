@@ -91,18 +91,19 @@ class AdminEmailHandler(logging.Handler):
     def emit(self, record):
         try:
             request = record.request
-            subject = '%s (%s IP): %s' % (
-                record.levelname,
-                ('internal' if request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS
-                 else 'EXTERNAL'),
-                record.getMessage()
-            )
+            ip_type_msg = ' (%s IP)' % (
+                'internal' if request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS
+                else 'EXTERNAL')
         except Exception:
-            subject = '%s: %s' % (
-                record.levelname,
-                record.getMessage()
-            )
+            ip_type_msg = ''
             request = None
+
+        subject = '%s%s: %s' % (
+            record.levelname,
+            ip_type_msg,
+            record.getMessage()
+        )
+
         subject = self.format_subject(subject)
 
         # Since we add a nicely formatted traceback on our own, create a copy
