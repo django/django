@@ -59,12 +59,18 @@ class Library:
         def lower(value):
             return value.lower()
         """
-        if name is None and filter_func is None:
+        if name is None and filter_func is not None:
+            raise ValueError(
+                "Unsupported arguments to Library.filter: (%r, %r)" %
+                (name, filter_func),
+            )
+
+        if name is None:
             # @register.filter()
             def dec(func):
                 return self.filter_function(func, **flags)
             return dec
-        elif name is not None and filter_func is None:
+        elif filter_func is None:
             if callable(name):
                 # @register.filter
                 return self.filter_function(name, **flags)
@@ -73,7 +79,7 @@ class Library:
                 def dec(func):
                     return self.filter(name, func, **flags)
                 return dec
-        elif name is not None and filter_func is not None:
+        else:
             # register.filter('somename', somefunc)
             self.filters[name] = filter_func
             for attr in ('expects_localtime', 'is_safe', 'needs_autoescape'):
@@ -87,11 +93,6 @@ class Library:
                         setattr(filter_func._decorated_function, attr, value)
             filter_func._filter_name = name
             return filter_func
-        else:
-            raise ValueError(
-                "Unsupported arguments to Library.filter: (%r, %r)" %
-                (name, filter_func),
-            )
 
     def filter_function(self, func, **flags):
         name = getattr(func, "_decorated_function", func).__name__
