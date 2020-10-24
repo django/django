@@ -115,6 +115,7 @@ class RemoteTestResultTest(SimpleTestCase):
 
 
 class TestCaseDTOTest(SimpleTestCase):
+    @unittest.skipUnless(tblib is not None, 'requires tblib to be installed')
     def test_fields_are_set(self):
         """
         TestCaseDTO picks up the right fields from the wrapped TestCase.
