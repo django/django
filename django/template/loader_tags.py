@@ -309,6 +309,9 @@ def do_include(parser, token):
                 raise TemplateSyntaxError('"with" in %r tag needs at least '
                                           'one keyword argument.' % bits[0])
         elif option == 'only':
+            if option in options:
+                raise TemplateSyntaxError('The %r option was specified more '
+                                          'than once.' % option)
             value = True
         else:
             raise TemplateSyntaxError('Unknown argument for %r tag: %r.' %

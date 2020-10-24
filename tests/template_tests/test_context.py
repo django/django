@@ -2,7 +2,8 @@ from unittest import mock
 
 from django.http import HttpRequest
 from django.template import (
-    Context, Engine, RequestContext, Template, Variable, VariableDoesNotExist,
+    Context, Engine, RequestContext, Template, TemplateSyntaxError, Variable,
+    VariableDoesNotExist,
 )
 from django.template.context import RenderContext
 from django.test import RequestFactory, SimpleTestCase
@@ -232,6 +233,20 @@ class RequestContextTests(SimpleTestCase):
         ctx = RequestContext(request, {'var': 'parent'})
         self.assertEqual(engine.from_string('{% include "child" %}').render(ctx), 'parent')
         self.assertEqual(engine.from_string('{% include "child" only %}').render(ctx), 'none')
+
+    def test_include_template_exception_when_only_more_then_one(self):
+        """
+        Test that argument 'only' in 'include' written only once
+        """
+        engine = Engine(loaders=[
+            ('django.template.loaders.locmem.Loader', {
+                'child': '{{ var|default:"none" }}',
+            }),
+        ])
+        request = self.request_factory.get('/')
+        ctx = RequestContext(request, {'var': 'parent'})
+        with self.assertRaises(TemplateSyntaxError, msg='The only option was specified more than once.'):
+            engine.from_string('{% include "child" only only only %}').render(ctx)
 
     def test_stack_size(self):
         """Optimized RequestContext construction (#7116)."""
