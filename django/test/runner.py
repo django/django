@@ -100,6 +100,7 @@ class PDBDebugResult(unittest.TextTestResult):
         print("\nOpening PDB: %r" % exc_value)
         pdb.post_mortem(traceback)
 
+
 class TestCaseDTO:
     """
     The ParallelTestSuite requires that all test cases be pickleable. When a
@@ -135,6 +136,7 @@ class TestCaseDTO:
 
     def __str__(self):
         return self.__str
+
 
 class RemoteTestResult:
     """
