@@ -1,7 +1,7 @@
 import unittest
 
 from django.test import SimpleTestCase
-from django.test.runner import RemoteTestResult
+from django.test.runner import RemoteTestResult, TestCaseDTO
 from django.utils.version import PY37
 
 try:
@@ -49,6 +49,14 @@ class SampleFailingSubtest(SimpleTestCase):
             with self.subTest(index=i):
                 self.assertEqual(i, 1)
 
+    def pickle_error_test(self):
+        """
+        A dummy test for testing TestCaseDTO.
+        """
+        with self.subTest("I should fail"):
+            self.not_pickleable = lambda: 0
+            self.assertTrue(False)
+
 
 class RemoteTestResultTest(SimpleTestCase):
 
@@ -85,3 +93,51 @@ class RemoteTestResultTest(SimpleTestCase):
 
         event = events[2]
         self.assertEqual(repr(event[3][1]), "AssertionError('2 != 1'%s)" % trailing_comma)
+
+    @unittest.skipUnless(tblib is not None, 'requires tblib to be installed')
+    def test_add_failed_subtest_with_unpickleable_members(self):
+        """
+        When a SubTest fails in a parallel context and the TestCase contains
+        some unpickleable members, we should still be able to send the SubTest
+        back to the TestRunner.
+        """
+        result = RemoteTestResult()
+        subtest_test = SampleFailingSubtest(methodName="pickle_error_test")
+
+        # This is the meat of the test: without TestCaseDTO, we'd expect an
+        # ugly "Can't pickle local object" exception when trying to run.
+        result = subtest_test.run(result=result)
+
+        add_subtest_event = result.events[1]
+        error = add_subtest_event[3][1]
+        self.assertEqual(str(error), "False is not true")
+
+
+class TestCaseDTOTest(SimpleTestCase):
+    def test_fields_are_set(self):
+        """
+        TestCaseDTO picks up the right fields from the wrapped TestCase.
+        """
+
+        result = RemoteTestResult()
+        subtest_test = SampleFailingSubtest(methodName="pickle_error_test")
+        result = subtest_test.run(result=result)
+
+        add_subtest_event = result.events[1]
+        subtest = add_subtest_event[2]
+
+        self.assertIsInstance(subtest, TestCaseDTO)
+        self.assertEqual(subtest.shortDescription(), "A dummy test for testing TestCaseDTO.")
+        self.assertEqual(subtest._subDescription(), "[I should fail]")
+        self.assertEqual(
+            subtest.id(),
+            "test_runner.test_parallel.SampleFailingSubtest.pickle_error_test [I should fail]"
+        )
+        self.assertEqual(
+            str(subtest),
+            "pickle_error_test (test_runner.test_parallel.SampleFailingSubtest) [I should fail]"
+        )
+        self.assertEqual(
+            subtest.test_case.id(),
+            'test_runner.test_parallel.SampleFailingSubtest.pickle_error_test'
+        )
