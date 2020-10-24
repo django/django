@@ -25,20 +25,20 @@ class CacheNode(Node):
                 expire_time = int(expire_time)
             except (ValueError, TypeError):
                 raise TemplateSyntaxError('"cache" tag got a non-integer timeout value: %r' % expire_time)
+
+        cache_name = 'template_fragments'
         if self.cache_name:
             try:
                 cache_name = self.cache_name.resolve(context)
             except VariableDoesNotExist:
                 raise TemplateSyntaxError('"cache" tag got an unknown variable: %r' % self.cache_name.var)
-            try:
-                fragment_cache = caches[cache_name]
-            except InvalidCacheBackendError:
+
+        try:
+            fragment_cache = caches[cache_name]
+        except InvalidCacheBackendError:
+            if self.cache_name:
                 raise TemplateSyntaxError('Invalid cache name specified for cache tag: %r' % cache_name)
-        else:
-            try:
-                fragment_cache = caches['template_fragments']
-            except InvalidCacheBackendError:
-                fragment_cache = caches['default']
+            fragment_cache = caches['default']
 
         vary_on = [var.resolve(context) for var in self.vary_on]
         cache_key = make_template_fragment_key(self.fragment_name, vary_on)
