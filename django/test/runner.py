@@ -116,26 +116,26 @@ class TestCaseDTO:
     """
 
     def __init__(self, test):
-        self.__id = test.id()
-        self.__str = str(test)
-        self.__shortDescription = test.shortDescription()
+        self._inner_id = test.id()
+        self._inner_str = str(test)
+        self._inner_shortDescription = test.shortDescription()
         if hasattr(test, "test_case"):
             self.test_case = TestCaseDTO(test.test_case)
         if hasattr(test, "_subDescription"):
-            self.__subDescription = test._subDescription()
+            self._inner_subDescription = test._subDescription()
 
     def _subDescription(self):
         """conforming to _SubTest"""
-        return self.__subDescription
+        return self._inner_subDescription
 
     def id(self):
-        return self.__id
+        return self._inner_id
 
     def shortDescription(self):
-        return self.__shortDescription
+        return self._inner_shortDescription
 
     def __str__(self):
-        return self.__str
+        return self._inner_str
 
 
 class RemoteTestResult:
