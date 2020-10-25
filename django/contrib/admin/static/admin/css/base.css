@@ -633,21 +633,25 @@ div.breadcrumbs a:focus, div.breadcrumbs a:hover {
 .viewlink, .inlineviewlink {
     padding-left: 16px;
     background: url(../img/icon-viewlink.svg) 0 1px no-repeat;
+    word-break: keep-all;
 }
 
 .addlink {
     padding-left: 16px;
     background: url(../img/icon-addlink.svg) 0 1px no-repeat;
+    word-break: keep-all;
 }
 
 .changelink, .inlinechangelink {
     padding-left: 16px;
     background: url(../img/icon-changelink.svg) 0 1px no-repeat;
+    word-break: keep-all;
 }
 
 .deletelink {
     padding-left: 16px;
     background: url(../img/icon-deletelink.svg) 0 1px no-repeat;
+    word-break: keep-all;
 }
 
 a.deletelink:link, a.deletelink:visited {
