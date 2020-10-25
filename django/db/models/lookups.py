@@ -12,6 +12,7 @@ from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.datastructures import OrderedSet
 from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import cached_property
+from django.utils.hashable import make_hashable
 
 
 class Lookup:
@@ -142,6 +143,18 @@ class Lookup:
     @property
     def is_summary(self):
         return self.lhs.is_summary or getattr(self.rhs, 'is_summary', False)
+
+    @property
+    def identity(self):
+        return self.__class__, self.lhs, self.rhs
+
+    def __eq__(self, other):
+        if not isinstance(other, Lookup):
+            return NotImplemented
+        return self.identity == other.identity
+
+    def __hash__(self):
+        return hash(make_hashable(self.identity))
 
 
 class Transform(RegisterLookupMixin, Func):
