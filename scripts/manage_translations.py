@@ -168,8 +168,8 @@ def fetch(resources=None, languages=None):
                 errors.append((name, lang))
     if errors:
         print("\nWARNING: Errors have occurred in following cases:")
-        for resource, lang in errors:
-            print("\tResource %s for language %s" % (resource, lang))
+        for res, lang in errors:
+            print("\tResource %s for language %s" % (res, lang))
         exit(1)
 
 

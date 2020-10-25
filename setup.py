@@ -59,7 +59,7 @@ if overlay_warning:
     sys.stderr.write("""
 
 ========
-WARNING!
+WARNING!!!
 ========
 
 You have just installed Django over top of an existing
