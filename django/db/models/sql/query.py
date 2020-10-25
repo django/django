@@ -23,7 +23,9 @@ from django.core.exceptions import (
 from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import BaseExpression, Col, F, OuterRef, Ref
+from django.db.models.expressions import (
+    BaseExpression, Col, Exists, F, OuterRef, Ref, ResolvedOuterRef,
+)
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.lookups import Lookup
@@ -1765,12 +1767,12 @@ class Query(BaseExpression):
         filters in the original query.
 
         We will turn this into equivalent of:
-            WHERE NOT (pk IN (SELECT parent_id FROM thetable
-                              WHERE name = 'foo' AND parent_id IS NOT NULL))
-
-        It might be worth it to consider using WHERE NOT EXISTS as that has
-        saner null handling, and is easier for the backend's optimizer to
-        handle.
+            WHERE NOT EXISTS(
+                SELECT 1
+                FROM child
+                WHERE name = 'foo' AND child.parent_id = parent.id
+                LIMIT 1
+            )
         """
         filter_lhs, filter_rhs = filter_expr
         if isinstance(filter_rhs, OuterRef):
@@ -1786,17 +1788,9 @@ class Query(BaseExpression):
         # the subquery.
         trimmed_prefix, contains_louter = query.trim_start(names_with_path)
 
-        # Add extra check to make sure the selected field will not be null
-        # since we are adding an IN <subquery> clause. This prevents the
-        # database from tripping over IN (...,NULL,...) selects and returning
-        # nothing
         col = query.select[0]
         select_field = col.target
         alias = col.alias
-        if self.is_nullable(select_field):
-            lookup_class = select_field.get_lookup('isnull')
-            lookup = lookup_class(select_field.get_col(alias), False)
-            query.where.add(lookup, AND)
         if alias in can_reuse:
             pk = select_field.model._meta.pk
             # Need to add a restriction so that outer query's filters are in effect for
@@ -1810,9 +1804,11 @@ class Query(BaseExpression):
             query.where.add(lookup, AND)
             query.external_aliases[alias] = True
 
-        condition, needed_inner = self.build_filter(
-            ('%s__in' % trimmed_prefix, query),
-            current_negated=True, branch_negated=True, can_reuse=can_reuse)
+        lookup_class = select_field.get_lookup('exact')
+        lookup = lookup_class(col, ResolvedOuterRef(trimmed_prefix))
+        query.where.add(lookup, AND)
+        condition, needed_inner = self.build_filter(Exists(query))
+
         if contains_louter:
             or_null_condition, _ = self.build_filter(
                 ('%s__isnull' % trimmed_prefix, True),

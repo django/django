@@ -2807,11 +2807,11 @@ class ExcludeTests(TestCase):
         f1 = Food.objects.create(name='apples')
         Food.objects.create(name='oranges')
         Eaten.objects.create(food=f1, meal='dinner')
-        j1 = Job.objects.create(name='Manager')
+        cls.j1 = Job.objects.create(name='Manager')
         cls.r1 = Responsibility.objects.create(description='Playing golf')
         j2 = Job.objects.create(name='Programmer')
         r2 = Responsibility.objects.create(description='Programming')
-        JobResponsibilities.objects.create(job=j1, responsibility=cls.r1)
+        JobResponsibilities.objects.create(job=cls.j1, responsibility=cls.r1)
         JobResponsibilities.objects.create(job=j2, responsibility=r2)
 
     def test_to_field(self):
@@ -2883,6 +2883,14 @@ class ExcludeTests(TestCase):
             Number.objects.exclude(num=F('another_num')),
             [number],
         )
+
+    def test_exclude_multivalued_exists(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            self.assertSequenceEqual(
+                Job.objects.exclude(responsibilities__description='Programming'),
+                [self.j1],
+            )
+        self.assertIn('exists', captured_queries[0]['sql'].lower())
 
 
 class ExcludeTest17600(TestCase):
