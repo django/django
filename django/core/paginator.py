@@ -4,7 +4,7 @@ import warnings
 from math import ceil
 
 from django.utils.functional import cached_property
-from django.utils.inspect import method_has_no_args
+from django.utils.inspect import func_accepts_var_args, method_has_no_args
 from django.utils.translation import gettext_lazy as _
 
 
@@ -93,6 +93,9 @@ class Paginator:
     def count(self):
         """Return the total number of objects, across all pages."""
         c = getattr(self.object_list, 'count', None)
+        v = getattr(self.object_list, 'values', None)
+        if callable(v) and not inspect.isbuiltin(v) and func_accepts_var_args(v):
+            c = getattr(v('pk'), 'count', None)
         if callable(c) and not inspect.isbuiltin(c) and method_has_no_args(c):
             return c()
         return len(self.object_list)
