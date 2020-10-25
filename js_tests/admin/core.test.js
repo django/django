@@ -40,6 +40,11 @@ QUnit.test('Date.getTwoDigitSecond', function(assert) {
     assert.equal(new Date(2014, 6, 1, 0, 0, 20).getTwoDigitSecond(), '20', '12:00:20 am is 20');
 });
 
+QUnit.test('Date.getAbbrevMonthName', function(assert) {
+    assert.equal(new Date(2020, 0, 26).getAbbrevMonthName(), 'Jan', 'jan 26');
+    assert.equal(new Date(2020, 9, 26).getAbbrevMonthName(), 'Oct', 'oct 26');
+});
+
 QUnit.test('Date.getFullMonthName', function(assert) {
     assert.equal(new Date(2020, 0, 26).getFullMonthName(), 'January', 'jan 26');
     assert.equal(new Date(2020, 9, 26).getFullMonthName(), 'October', 'oct 26');
@@ -49,6 +54,7 @@ QUnit.test('Date.strftime', function(assert) {
     const date = new Date(2014, 6, 1, 11, 0, 5);
     assert.equal(date.strftime('%Y-%m-%d %H:%M:%S'), '2014-07-01 11:00:05');
     assert.equal(date.strftime('%B %d, %Y'), 'July 01, 2014');
+    assert.equal(date.strftime('%b %d, %Y'), 'Jul 01, 2014');
 });
 
 QUnit.test('String.strptime', function(assert) {
