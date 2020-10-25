@@ -143,7 +143,6 @@ protects against memory exhaustion attacks using forged ``POST`` requests::
     >>> data = {
     ...     'form-TOTAL_FORMS': '1501',
     ...     'form-INITIAL_FORMS': '0',
-    ...     'form-MAX_NUM_FORMS': '',
     ... }
     >>> formset = ArticleFormSet(data)
     >>> len(formset.forms)
@@ -171,7 +170,6 @@ all forms in the formset::
     >>> data = {
     ...     'form-TOTAL_FORMS': '1',
     ...     'form-INITIAL_FORMS': '0',
-    ...     'form-MAX_NUM_FORMS': '',
     ... }
     >>> formset = ArticleFormSet(data)
     >>> formset.is_valid()
@@ -184,7 +182,6 @@ provide an invalid article::
     >>> data = {
     ...     'form-TOTAL_FORMS': '2',
     ...     'form-INITIAL_FORMS': '0',
-    ...     'form-MAX_NUM_FORMS': '',
     ...     'form-0-title': 'Test',
     ...     'form-0-pub_date': '1904-06-16',
     ...     'form-1-title': 'Test',
@@ -224,7 +221,6 @@ sent without any data)::
     >>> data = {
     ...     'form-TOTAL_FORMS': '1',
     ...     'form-INITIAL_FORMS': '0',
-    ...     'form-MAX_NUM_FORMS': '',
     ...     'form-0-title': '',
     ...     'form-0-pub_date': '',
     ... }
@@ -238,11 +234,10 @@ Understanding the ``ManagementForm``
 ------------------------------------
 
 You may have noticed the additional data (``form-TOTAL_FORMS``,
-``form-INITIAL_FORMS`` and ``form-MAX_NUM_FORMS``) that was required
-in the formset's data above. This data is required for the
-``ManagementForm``. This form is used by the formset to manage the
-collection of forms contained in the formset. If you don't provide
-this management data, the formset will be invalid::
+``form-INITIAL_FORMS``) that was required in the formset's data above. This
+data is required for the ``ManagementForm``. This form is used by the formset
+to manage the collection of forms contained in the formset. If you don't
+provide this management data, the formset will be invalid::
 
     >>> data = {
     ...     'form-0-title': 'Test',
@@ -263,6 +258,15 @@ The management form is available as an attribute of the formset
 itself. When rendering a formset in a template, you can include all
 the management data by rendering ``{{ my_formset.management_form }}``
 (substituting the name of your formset as appropriate).
+
+.. note::
+
+    As well as the ``form-TOTAL_FORMS`` and ``form-INITIAL_FORMS`` fields shown
+    in the examples here, the management form also includes
+    ``form-MIN_NUM_FORMS`` and ``form-MAX_NUM_FORMS`` fields. They are output
+    with the rest of the management form, but only for the convenience of
+    client-side code. These fields are not required and so are not shown in
+    the example ``POST`` data.
 
 .. versionchanged:: 3.2
 
@@ -344,7 +348,6 @@ is where you define your own validation that works at the formset level::
     >>> data = {
     ...     'form-TOTAL_FORMS': '2',
     ...     'form-INITIAL_FORMS': '0',
-    ...     'form-MAX_NUM_FORMS': '',
     ...     'form-0-title': 'Test',
     ...     'form-0-pub_date': '1904-06-16',
     ...     'form-1-title': 'Test',
@@ -385,8 +388,6 @@ deletion, is less than or equal to ``max_num``.
     >>> data = {
     ...     'form-TOTAL_FORMS': '2',
     ...     'form-INITIAL_FORMS': '0',
-    ...     'form-MIN_NUM_FORMS': '',
-    ...     'form-MAX_NUM_FORMS': '',
     ...     'form-0-title': 'Test',
     ...     'form-0-pub_date': '1904-06-16',
     ...     'form-1-title': 'Test 2',
@@ -427,8 +428,6 @@ deletion, is greater than or equal to ``min_num``.
     >>> data = {
     ...     'form-TOTAL_FORMS': '2',
     ...     'form-INITIAL_FORMS': '0',
-    ...     'form-MIN_NUM_FORMS': '',
-    ...     'form-MAX_NUM_FORMS': '',
     ...     'form-0-title': 'Test',
     ...     'form-0-pub_date': '1904-06-16',
     ...     'form-1-title': 'Test 2',
@@ -490,7 +489,6 @@ happen when the user changes these values::
     >>> data = {
     ...     'form-TOTAL_FORMS': '3',
     ...     'form-INITIAL_FORMS': '2',
-    ...     'form-MAX_NUM_FORMS': '',
     ...     'form-0-title': 'Article #1',
     ...     'form-0-pub_date': '2008-05-10',
     ...     'form-0-ORDER': '2',
@@ -588,7 +586,6 @@ delete fields you can access them with ``deleted_forms``::
     >>> data = {
     ...     'form-TOTAL_FORMS': '3',
     ...     'form-INITIAL_FORMS': '2',
-    ...     'form-MAX_NUM_FORMS': '',
     ...     'form-0-title': 'Article #1',
     ...     'form-0-pub_date': '2008-05-10',
     ...     'form-0-DELETE': 'on',
