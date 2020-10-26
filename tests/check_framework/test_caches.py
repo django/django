@@ -1,4 +1,9 @@
-from django.core.checks.caches import E001, check_default_cache_is_configured
+import pathlib
+
+from django.core.checks import Warning
+from django.core.checks.caches import (
+    E001, check_cache_location_not_exposed, check_default_cache_is_configured,
+)
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 
@@ -28,3 +33,59 @@ class CheckCacheSettingsAppDirsTest(SimpleTestCase):
         Error if 'default' not present in CACHES setting.
         """
         self.assertEqual(check_default_cache_is_configured(None), [E001])
+
+
+class CheckCacheLocationTest(SimpleTestCase):
+    warning_message = (
+        "Your 'default' cache configuration might expose your cache or lead "
+        "to corruption of your data because its LOCATION %s %s."
+    )
+
+    @staticmethod
+    def get_settings(setting, cache_path, setting_path):
+        return {
+            'CACHES': {
+                'default': {
+                    'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+                    'LOCATION': cache_path,
+                },
+            },
+            setting: [setting_path] if setting == 'STATICFILES_DIRS' else setting_path,
+        }
+
+    def test_cache_path_matches_media_static_setting(self):
+        root = pathlib.Path.cwd()
+        for setting in ('MEDIA_ROOT', 'STATIC_ROOT', 'STATICFILES_DIRS'):
+            settings = self.get_settings(setting, root, root)
+            with self.subTest(setting=setting), self.settings(**settings):
+                msg = self.warning_message % ('matches', setting)
+                self.assertEqual(check_cache_location_not_exposed(None), [
+                    Warning(msg, id='caches.W002'),
+                ])
+
+    def test_cache_path_inside_media_static_setting(self):
+        root = pathlib.Path.cwd()
+        for setting in ('MEDIA_ROOT', 'STATIC_ROOT', 'STATICFILES_DIRS'):
+            settings = self.get_settings(setting, root / 'cache', root)
+            with self.subTest(setting=setting), self.settings(**settings):
+                msg = self.warning_message % ('is inside', setting)
+                self.assertEqual(check_cache_location_not_exposed(None), [
+                    Warning(msg, id='caches.W002'),
+                ])
+
+    def test_cache_path_contains_media_static_setting(self):
+        root = pathlib.Path.cwd()
+        for setting in ('MEDIA_ROOT', 'STATIC_ROOT', 'STATICFILES_DIRS'):
+            settings = self.get_settings(setting, root, root / 'other')
+            with self.subTest(setting=setting), self.settings(**settings):
+                msg = self.warning_message % ('contains', setting)
+                self.assertEqual(check_cache_location_not_exposed(None), [
+                    Warning(msg, id='caches.W002'),
+                ])
+
+    def test_cache_path_not_conflict(self):
+        root = pathlib.Path.cwd()
+        for setting in ('MEDIA_ROOT', 'STATIC_ROOT', 'STATICFILES_DIRS'):
+            settings = self.get_settings(setting, root / 'cache', root / 'other')
+            with self.subTest(setting=setting), self.settings(**settings):
+                self.assertEqual(check_cache_location_not_exposed(None), [])

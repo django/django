@@ -138,6 +138,10 @@ configured:
 
 * **caches.E001**: You must define a ``'default'`` cache in your
   :setting:`CACHES` setting.
+* **caches.W002**: Your ``<cache>`` configuration might expose your cache or
+  lead to corruption of your data because its
+  :setting:`LOCATION <CACHES-LOCATION>` matches/is inside/contains
+  :setting:`MEDIA_ROOT`/:setting:`STATIC_ROOT`/:setting:`STATICFILES_DIRS`.
 
 Database
 --------
