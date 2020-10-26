@@ -237,8 +237,7 @@ class BaseTestFormSet(BaseFormSet):
             return
 
         emails = []
-        for i in range(0, self.total_form_count()):
-            form = self.forms[i]
+        for form in self.forms:
             email = form.cleaned_data['email']
             if email in emails:
                 raise ValidationError(

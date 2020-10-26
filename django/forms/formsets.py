@@ -223,8 +223,7 @@ class BaseFormSet:
         # that have had their deletion widget set to True
         if not hasattr(self, '_deleted_form_indexes'):
             self._deleted_form_indexes = []
-            for i in range(0, self.total_form_count()):
-                form = self.forms[i]
+            for i, form in enumerate(self.forms):
                 # if this is an extra form and hasn't changed, don't consider it
                 if i >= self.initial_form_count() and not form.has_changed():
                     continue
@@ -246,8 +245,7 @@ class BaseFormSet:
         # by the form data.
         if not hasattr(self, '_ordering'):
             self._ordering = []
-            for i in range(0, self.total_form_count()):
-                form = self.forms[i]
+            for i, form in enumerate(self.forms):
                 # if this is an extra form and hasn't changed, don't consider it
                 if i >= self.initial_form_count() and not form.has_changed():
                     continue
@@ -313,8 +311,7 @@ class BaseFormSet:
         forms_valid = True
         # This triggers a full clean.
         self.errors
-        for i in range(0, self.total_form_count()):
-            form = self.forms[i]
+        for form in self.forms:
             if self.can_delete and self._should_delete_form(form):
                 # This form is going to be deleted so any of its errors
                 # shouldn't cause the entire formset to be invalid.
@@ -333,8 +330,7 @@ class BaseFormSet:
 
         if not self.is_bound:  # Stop further processing.
             return
-        for i in range(0, self.total_form_count()):
-            form = self.forms[i]
+        for i, form in enumerate(self.forms):
             # Empty forms are unchanged forms beyond those with initial data.
             if not form.has_changed() and i >= self.initial_form_count():
                 empty_forms_count += 1
