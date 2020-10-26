@@ -2227,8 +2227,8 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Test redirection when using row-level change permissions. Refs #11513.
-        rl1 = RowLevelChangePermissionModel.objects.create(name="odd id")
-        rl2 = RowLevelChangePermissionModel.objects.create(name="even id")
+        rl1 = RowLevelChangePermissionModel.objects.create(id=1, name="odd id")
+        rl2 = RowLevelChangePermissionModel.objects.create(id=2, name="even id")
         logins = [self.superuser, self.viewuser, self.adduser, self.changeuser, self.deleteuser]
         for login_user in logins:
             with self.subTest(login_user.username):
