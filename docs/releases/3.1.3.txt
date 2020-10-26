@@ -53,3 +53,7 @@ Bugfixes
   reset tokens (:ticket:`32130`).
 
 * Added support for ``asgiref`` 3.3 (:ticket:`32128`).
+
+* Fixed a regression in Django 3.1 that caused incorrect textarea layout on
+  medium-sized screens in the admin change form view with the sidebar open
+  (:ticket:`32127`).
