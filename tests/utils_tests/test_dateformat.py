@@ -165,3 +165,7 @@ class DateFormatTests(SimpleTestCase):
                 dateformat.format(dt, 'r'),
                 'Sun, 08 Jul 1979 22:00:00 +0100',
             )
+
+    def test_format_before_1000(self):
+        birthday_of_aryabhata = datetime(476, 9, 8, 5, 00)
+        self.assertEqual(dateformat.format(birthday_of_aryabhata, "d/m/y"), "08/09/76")
