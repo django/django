@@ -849,14 +849,6 @@ class Queries1Tests(TestCase):
         self.assertQuerysetEqual(Note.objects.none() & Note.objects.all(), [])
         self.assertQuerysetEqual(Note.objects.all() & Note.objects.none(), [])
 
-    def test_ticket9411(self):
-        # Make sure bump_prefix() (an internal Query method) doesn't (re-)break. It's
-        # sufficient that this query runs without error.
-        qs = Tag.objects.values_list('id', flat=True).order_by('id')
-        qs.query.bump_prefix(qs.query)
-        first = qs[0]
-        self.assertEqual(list(qs), list(range(first, first + 5)))
-
     def test_ticket8439(self):
         # Complex combinations of conjunctions, disjunctions and nullable
         # relations.
