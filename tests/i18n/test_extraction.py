@@ -152,6 +152,20 @@ class BasicExtractorTests(ExtractorTests):
             with self.assertRaisesRegex(CommandError, msg):
                 management.call_command('makemessages')
 
+    def test_valid_locale(self):
+        out = StringIO()
+        management.call_command('makemessages', locale=['de'], stdout=out, verbosity=1)
+        self.assertNotIn('invalid locale de', out.getvalue())
+        self.assertIn('processing locale de', out.getvalue())
+        self.assertIs(Path(self.PO_FILE).exists(), True)
+
+    def test_invalid_locale(self):
+        out = StringIO()
+        management.call_command('makemessages', locale=['pl-PL'], stdout=out, verbosity=1)
+        self.assertIn('invalid locale pl-PL, did you mean pl_PL?', out.getvalue())
+        self.assertNotIn('processing locale pl-PL', out.getvalue())
+        self.assertIs(Path('locale/pl-PL/LC_MESSAGES/django.po').exists(), False)
+
     def test_comments_extractor(self):
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))

@@ -383,6 +383,14 @@ class Command(BaseCommand):
 
             # Build po files for each selected locale
             for locale in locales:
+                if '-' in locale:
+                    self.stdout.write(
+                        'invalid locale %s, did you mean %s?' % (
+                            locale,
+                            locale.replace('-', '_'),
+                        ),
+                    )
+                    continue
                 if self.verbosity > 0:
                     self.stdout.write('processing locale %s' % locale)
                 for potfile in potfiles:

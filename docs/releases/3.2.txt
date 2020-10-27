@@ -600,6 +600,10 @@ Miscellaneous
 * The password reset mechanism now invalidates tokens when the user email is
   changed.
 
+* :djadmin:`makemessages` command no longer processes invalid locales specified
+  using :option:`makemessages --locale` option, when they contain hyphens
+  (``'-'``).
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2
