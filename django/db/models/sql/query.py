@@ -2210,8 +2210,10 @@ class Query(BaseExpression):
                         field_names.append(f)
             self.set_extra_mask(extra_names)
             self.set_annotation_mask(annotation_names)
+            selected = frozenset(field_names + extra_names + annotation_names)
         else:
             field_names = [f.attname for f in self.model._meta.concrete_fields]
+            selected = frozenset(field_names)
         # Selected annotations must be known before setting the GROUP BY
         # clause.
         if self.group_by is True:
@@ -2225,7 +2227,7 @@ class Query(BaseExpression):
             # the selected fields anymore.
             group_by = []
             for expr in self.group_by:
-                if isinstance(expr, Ref) and expr.refs not in field_names:
+                if isinstance(expr, Ref) and expr.refs not in selected:
                     expr = self.annotations[expr.refs]
                 group_by.append(expr)
             self.group_by = tuple(group_by)

@@ -9,7 +9,7 @@ from django.db.models import (
     Subquery, Sum, Value, When,
 )
 from django.db.models.expressions import RawSQL
-from django.db.models.functions import Coalesce, Length, Lower
+from django.db.models.functions import Coalesce, ExtractYear, Length, Lower
 from django.test import TestCase, skipUnlessDBFeature
 
 from .models import (
@@ -656,6 +656,25 @@ class NonAggregateAnnotationTestCase(TestCase):
             datetime.date(2008, 3, 3),
             datetime.date(2008, 6, 23),
             datetime.date(2008, 11, 3),
+        ])
+
+    @skipUnlessDBFeature('supports_subqueries_in_group_by')
+    def test_annotation_subquery_and_aggregate_values_chaining(self):
+        qs = Book.objects.annotate(
+            pub_year=ExtractYear('pubdate')
+        ).values('pub_year').annotate(
+            top_rating=Subquery(
+                Book.objects.filter(
+                    pubdate__year=OuterRef('pub_year')
+                ).order_by('-rating').values('rating')[:1]
+            ),
+            total_pages=Sum('pages'),
+        ).values('pub_year', 'total_pages', 'top_rating')
+        self.assertCountEqual(qs, [
+            {'pub_year': 1991, 'top_rating': 5.0, 'total_pages': 946},
+            {'pub_year': 1995, 'top_rating': 4.0, 'total_pages': 1132},
+            {'pub_year': 2007, 'top_rating': 4.5, 'total_pages': 447},
+            {'pub_year': 2008, 'top_rating': 4.0, 'total_pages': 1178},
         ])
 
     def test_annotation_aggregate_with_m2o(self):
