@@ -2,35 +2,10 @@
 Contributing to Django
 ======================
 
-Django is a community that lives on its volunteers. As it keeps growing, we
+If you think working *with* Django is fun, wait until you start working *on*
+it. Django is a community that lives on its volunteers. As it keeps growing, we
 always need more people to build Django. As a Django developer,
 you can contribute in many ways.
-If you think working *with* Django is fun, wait until you start working *on*
-it. so here are several ways you can help Django's development:
-
-* :doc:`Report bugs <bugs-and-features>` in our `ticket tracker`_.
-
-* Join the |django-developers| mailing list and share your ideas for how
-  to improve Django. We're always open to suggestions. You can also interact
-  on the `#django-dev IRC channel`_.
-
-* :doc:`Submit pull requests <submission/submitting-patches>` for new and/or
-  fixed behavior. If you're looking for a way to get started contributing
-  to Django read the :doc:`/intro/contributing` tutorial and have a look at the
-  `easy pickings`_ tickets. The :ref:`patch-review-checklist` will also be
-  helpful.
-
-* :doc:`Improve the documentation <writing-documentation>`
-
-* :doc:`Translate Django <localizing>`
-
-*  :doc:`write unit tests <writing-code/unit-tests>`.
-
-* :doc:`Triage tickets and review patches <maintainers/triaging-tickets>` created by
-  other users.
-
-Really, **ANYONE** can do something to help make Django better and greater!
-
 Browse the following sections to find out how:
 
 .. toctree::
@@ -43,6 +18,7 @@ Browse the following sections to find out how:
    writing-documentation
    localizing
    maintainers/index
+
 
 Here are some other ways you can help the Django community and others to build
 a great ecosystem to work in:
