@@ -325,8 +325,8 @@ class DateFormat(TimeFormat):
         return self.data.isocalendar()[1]
 
     def y(self):
-        "Year, 2 digits; e.g. '99'"
-        return str(self.data.year)[2:]
+        "Year, 2 digits; e.g. '99', with leading zero"
+        return ("000" + str(self.data.year))[-2:]
 
     def Y(self):
         "Year, 4 digits; e.g. '1999'"
