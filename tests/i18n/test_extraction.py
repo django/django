@@ -758,9 +758,13 @@ class CustomLayoutExtractionTests(ExtractorTests):
     work_subdir = 'project_dir'
 
     def test_no_locale_raises(self):
-        msg = "Unable to find a locale path to store translations for file"
+        msg = (
+            "Unable to find a locale path to store translations for file "
+            "__init__.py. Make sure the 'locale' directory exist in an app or "
+            "LOCALE_PATHS setting is set."
+        )
         with self.assertRaisesMessage(management.CommandError, msg):
-            management.call_command('makemessages', locale=LOCALE, verbosity=0)
+            management.call_command('makemessages', locale=[LOCALE], verbosity=0)
 
     def test_project_locale_paths(self):
         self._test_project_locale_paths(os.path.join(self.test_dir, 'project_locale'))
