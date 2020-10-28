@@ -3,7 +3,7 @@ from datetime import date, datetime, timedelta
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.utils import ignore_warnings
 from django.utils.deprecation import RemovedInDjango40Warning
 
@@ -154,3 +154,30 @@ class TokenGeneratorTest(TestCase):
         legacy_token = p_old_generator.make_token(user)
         self.assertIs(p_old_generator.check_token(user, legacy_token), True)
         self.assertIs(p_new_generator.check_token(user, legacy_token), True)
+
+    def test_verify_with_multiple_secrets(self):
+        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
+
+        p1 = PasswordResetTokenGenerator()
+        p1.secret = 'secret'
+
+        p2 = PasswordResetTokenGenerator()
+        p2.secrets = ['newsecret', 'secret']
+
+        tk1 = p1.make_token(user)
+        self.assertTrue(p1.check_token(user, tk1))
+        self.assertTrue(p2.check_token(user, tk1))
+
+    @override_settings(
+        SECRET_KEYS=['secret', 'old_secret'],
+    )
+    def test_default_keys_verification(self):
+        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
+
+        p1 = PasswordResetTokenGenerator()
+        p1.secret = 'old_secret'
+
+        p2 = PasswordResetTokenGenerator()
+        tk = p1.make_token(user)
+
+        self.assertTrue(p2.check_token(user, tk))

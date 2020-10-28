@@ -201,6 +201,16 @@ class Settings:
             setattr(self, 'PASSWORD_RESET_TIMEOUT', self.PASSWORD_RESET_TIMEOUT_DAYS * 60 * 60 * 24)
             warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
 
+        if self.SECRET_KEY:
+            if self.SECRET_KEYS is not None:
+                raise ImproperlyConfigured('Only one of SECRET_KEY and SECRET_KEYS can be specified, not both.')
+            self.SECRET_KEYS = [self.SECRET_KEY]
+        elif self.SECRET_KEYS:
+            self.SECRET_KEY = self.SECRET_KEYS[0]
+
+        if not self.SECRET_KEY:
+            raise ImproperlyConfigured("The SECRET_KEY or SECRET_KEYS setting must not be empty.")
+
         if self.is_overridden('DEFAULT_HASHING_ALGORITHM'):
             warnings.warn(DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG, RemovedInDjango40Warning)
 

@@ -79,6 +79,16 @@ def constant_time_compare(val1, val2):
     return secrets.compare_digest(force_bytes(val1), force_bytes(val2))
 
 
+def constant_time_any(seq):
+    """
+    Like any() but avoid returning early for successful outcomes.
+    """
+    result = False
+    for value in seq:
+        result |= bool(value)
+    return result
+
+
 def pbkdf2(password, salt, iterations, dklen=0, digest=None):
     """Return the hash of password using pbkdf2."""
     if digest is None:

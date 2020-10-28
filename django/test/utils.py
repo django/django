@@ -404,6 +404,9 @@ class override_settings(TestContextDecorator):
         super().__init__()
 
     def enable(self):
+        if 'SECRET_KEY' in self.options and 'SECRET_KEYS' in self.options:
+            raise AssertionError('Only SECRET_KEY or SECRET_KEYS can be specified, not both.')
+
         # Keep this code at the beginning to leave the settings unchanged
         # in case it raises an exception because INSTALLED_APPS is invalid.
         if 'INSTALLED_APPS' in self.options:
@@ -415,6 +418,13 @@ class override_settings(TestContextDecorator):
         override = UserSettingsHolder(settings._wrapped)
         for key, new_value in self.options.items():
             setattr(override, key, new_value)
+
+        if 'SECRET_KEY' in self.options:
+            override.SECRET_KEYS = [self.options['SECRET_KEY']]
+
+        if 'SECRET_KEYS' in self.options:
+            override.SECRET_KEY = self.options['SECRET_KEYS'][0]
+
         self.wrapped = settings._wrapped
         settings._wrapped = override
         for key, new_value in self.options.items():

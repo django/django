@@ -186,17 +186,18 @@ def check_ssl_redirect(app_configs, **kwargs):
     return [] if passed_check else [W008]
 
 
+# Not clear we SHOULDN'T still check SECRET_KEY.
 @register(Tags.security, deploy=True)
-def check_secret_key(app_configs, **kwargs):
-    try:
-        secret_key = settings.SECRET_KEY
-    except (ImproperlyConfigured, AttributeError):
-        passed_check = False
-    else:
-        passed_check = (
-            len(set(secret_key)) >= SECRET_KEY_MIN_UNIQUE_CHARACTERS and
-            len(secret_key) >= SECRET_KEY_MIN_LENGTH
+def check_secret_keys(app_configs, **kwargs):
+    def check_key(key):
+        return (
+            key and
+            len(set(key)) >= SECRET_KEY_MIN_UNIQUE_CHARACTERS and
+            len(key) >= SECRET_KEY_MIN_LENGTH
         )
+
+    passed_check = all(check_key(key) for key in settings.SECRET_KEYS)
+
     return [] if passed_check else [W009]
 
 

@@ -332,6 +332,16 @@ class SettingsTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, 'Incorrect timezone setting: test'):
             settings._setup()
 
+    @override_settings(SECRET_KEY='kex123')
+    def test_secret_key(self):
+        self.assertEqual(settings.SECRET_KEY, 'kex123')
+        self.assertEqual(settings.SECRET_KEYS, ['kex123'])
+
+    @override_settings(SECRET_KEYS=['aaa11', 'bbb22'])
+    def test_secret_keys(self):
+        self.assertEqual(settings.SECRET_KEY, 'aaa11')
+        self.assertEqual(settings.SECRET_KEYS, ['aaa11', 'bbb22'])
+
 
 class TestComplexSettingOverride(SimpleTestCase):
     def setUp(self):
@@ -461,6 +471,52 @@ class TestListSettings(unittest.TestCase):
             finally:
                 del sys.modules['fake_settings_module']
                 delattr(settings_module, setting)
+
+
+class TestSecretKeysSettings(unittest.TestCase):
+    def make_settings(self, **kwargs):
+        settings_module = ModuleType('fake_settings_module')
+        for k, v in kwargs.items():
+            setattr(settings_module, k, v)
+
+        try:
+            sys.modules['fake_settings_module'] = settings_module
+            result = Settings('fake_settings_module')
+        finally:
+            del sys.modules['fake_settings_module']
+
+        return result
+
+    def test_secret_key(self):
+        settings = self.make_settings(SECRET_KEY='foo')
+        self.assertEqual(settings.SECRET_KEY, 'foo')
+        self.assertEqual(settings.SECRET_KEYS, ['foo'])
+
+    def test_secret_keys(self):
+        settings = self.make_settings(SECRET_KEYS=['foo', 'bar'])
+        self.assertEqual(settings.SECRET_KEY, 'foo')
+        self.assertEqual(settings.SECRET_KEYS, ['foo', 'bar'])
+
+    def test_both_specified(self):
+        msg = 'Only one of SECRET_KEY and SECRET_KEYS must be specified, not both.'
+
+        with self.assertRaisesRegex(ImproperlyConfigured, msg):
+            self.make_settings(SECRET_KEY='a', SECRET_KEYS=['a'])
+
+    def test_empty(self):
+        msg = 'The SECRET_KEY or SECRET_KEYS setting must not be empty.'
+
+        with self.assertRaisesRegex(ImproperlyConfigured, msg):
+            self.make_settings()
+
+        with self.assertRaisesRegex(ImproperlyConfigured, msg):
+            self.make_settings(SECRET_KEY='')
+
+        with self.assertRaisesRegex(ImproperlyConfigured, msg):
+            self.make_settings(SECRET_KEYS=[])
+
+        with self.assertRaisesRegex(ImproperlyConfigured, msg):
+            self.make_settings(SECRET_KEYS=[''])
 
 
 class SettingChangeEnterException(Exception):
