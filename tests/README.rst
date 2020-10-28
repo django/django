@@ -1,5 +1,4 @@
-To run the test suite, first, create and activate a virtual environment. Then
-install some requirements and run the tests::
+To run the test suite need to create and activate a virtual environment. Then install prerequistes required and run the tests::
 
     $ cd tests
     $ python -m pip install -e ..
