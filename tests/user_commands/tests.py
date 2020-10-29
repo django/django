@@ -244,8 +244,9 @@ class CommandTests(SimpleTestCase):
         management.call_command('mutually_exclusive_required', foo_name='foo', stdout=out)
         self.assertIn('foo_name', out.getvalue())
         msg = (
-            'Error: one of the arguments --foo-id --foo-name --append_const '
-            '--const --count --flag_false --flag_true is required'
+            'Error: one of the arguments --foo-id --foo-name --foo-list '
+            '--append_const --const --count --flag_false --flag_true is '
+            'required'
         )
         with self.assertRaisesMessage(CommandError, msg):
             management.call_command('mutually_exclusive_required', stdout=out)
@@ -274,6 +275,22 @@ class CommandTests(SimpleTestCase):
                     **{arg: value, 'stdout': out},
                 )
                 self.assertIn(expected_output, out.getvalue())
+
+    def test_required_list_option(self):
+        tests = [
+            (('--foo-list', [1, 2]), {}),
+            ((), {'foo_list': [1, 2]}),
+        ]
+        for command in ['mutually_exclusive_required', 'required_list_option']:
+            for args, kwargs in tests:
+                with self.subTest(command=command, args=args, kwargs=kwargs):
+                    out = StringIO()
+                    management.call_command(
+                        command,
+                        *args,
+                        **{**kwargs, 'stdout': out},
+                    )
+                    self.assertIn('foo_list=[1, 2]', out.getvalue())
 
     def test_required_const_options(self):
         args = {

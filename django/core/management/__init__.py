@@ -120,7 +120,12 @@ def call_command(command_name, *args, **options):
         for s_opt in parser._actions if s_opt.option_strings
     }
     arg_options = {opt_mapping.get(key, key): value for key, value in options.items()}
-    parse_args = [str(a) for a in args]
+    parse_args = []
+    for arg in args:
+        if isinstance(arg, (list, tuple)):
+            parse_args += map(str, arg)
+        else:
+            parse_args.append(str(arg))
 
     def get_actions(parser):
         # Parser actions and actions from sub-parser choices.
@@ -139,15 +144,19 @@ def call_command(command_name, *args, **options):
     }
     # Any required arguments which are passed in via **options must be passed
     # to parse_args().
-    parse_args += [
-        min(opt.option_strings)
-        if isinstance(opt, (_AppendConstAction, _CountAction, _StoreConstAction))
-        else '{}={}'.format(min(opt.option_strings), arg_options[opt.dest])
-        for opt in parser_actions if (
+    for opt in parser_actions:
+        if (
             opt.dest in options and
             (opt.required or opt in mutually_exclusive_required_options)
-        )
-    ]
+        ):
+            parse_args.append(min(opt.option_strings))
+            if isinstance(opt, (_AppendConstAction, _CountAction, _StoreConstAction)):
+                continue
+            value = arg_options[opt.dest]
+            if isinstance(value, (list, tuple)):
+                parse_args += map(str, value)
+            else:
+                parse_args.append(str(value))
     defaults = parser.parse_args(args=parse_args)
     defaults = dict(defaults._get_kwargs(), **arg_options)
     # Raise an error if any unknown options were passed.
