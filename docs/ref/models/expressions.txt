@@ -728,7 +728,6 @@ that certain expressions or columns are
     .. code-block::
 
         >>> from django.db.models import Cube, Sum
-        >>>
         >>> Product.objects.annotate(total=Sum("types")).group_by()
 
 .. class:: RollUp(expressions)
