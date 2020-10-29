@@ -25,7 +25,7 @@ from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import get_default_timezone, get_fixed_timezone, utc
 from django.utils.translation import gettext_lazy as _
 
-from .models import FoodManager, FoodQuerySet, UnserializableField
+from .models import FoodManager, FoodQuerySet, MigratedModel
 
 
 class DeconstructibleInstances:
@@ -252,9 +252,10 @@ class WriterTests(SimpleTestCase):
         self.assertSerializedEqual(False)
 
     def test_serialize_field_with_lambda(self):
-        field = UnserializableField()
+        field = MigratedModel.unserializable_field.field
 
-        msg = f'Error during {field} serializing: Cannot serialize function: lambda'
+        msg = ('Error during migrations.MigratedModel.unserializable_field '
+               'serializing: Cannot serialize function: lambda')
         with self.assertRaisesMessage(ValueError, msg):
             self.assertSerializedEqual(field)
 

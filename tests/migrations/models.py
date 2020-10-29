@@ -30,20 +30,21 @@ class Unserializable:
     pass
 
 
-class UnserializableModel(models.Model):
-    title = models.CharField(max_length=20, default=Unserializable())
+class MigratedModel(models.Model):
+    name = models.CharField(max_length=255)
+    unserializable_field = models.CharField(default=lambda: 'Not serializable')
 
     class Meta:
         # Disable auto loading of this model as we load it on our own
         apps = Apps()
 
 
-class UnserializableField(models.CharField):
-    description = 'A field that uses a lambda expression'
+class UnserializableModel(models.Model):
+    title = models.CharField(max_length=20, default=Unserializable())
 
-    def __init__(self, *args, **kwargs):
-        kwargs['default'] = lambda: 'Not serializable'
-        super().__init__(*args, **kwargs)
+    class Meta:
+        # Disable auto loading of this model as we load it on our own
+        apps = Apps()
 
 
 class UnmigratedModel(models.Model):
