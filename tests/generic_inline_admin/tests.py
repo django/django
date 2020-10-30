@@ -3,7 +3,9 @@ from unittest import skipUnless
 from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.admin import GenericInlineModelAdmin, GenericTabularInline
+from django.contrib.contenttypes.admin import (
+    GenericInlineModelAdmin, GenericTabularInline,
+)
 from django.contrib.contenttypes.models import ContentType
 from django.forms.formsets import DEFAULT_MAX_NUM
 from django.forms.models import ModelForm
