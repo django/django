@@ -129,6 +129,10 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             overrides.setdefault(k, {}).update(v)
         self.formfield_overrides = overrides
 
+    @classmethod
+    def __class_getitem__(cls, *args, **kwargs):
+        return cls
+
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         """
         Hook for specifying the form Field instance for a given database Field

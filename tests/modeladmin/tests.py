@@ -1,4 +1,5 @@
 from datetime import date
+from unittest import skipUnless
 
 from django import forms
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
@@ -16,6 +17,7 @@ from django.db import models
 from django.forms.widgets import Select
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import isolate_apps
+from django.utils.version import PY37
 
 from .models import Band, Concert, Song
 
@@ -721,6 +723,12 @@ class ModelAdminTests(TestCase):
         self.assertEqual(model_count, {'bands': 1})
         self.assertEqual(perms_needed, {'band'})
         self.assertEqual(protected, [])
+
+    @skipUnless(PY37, '__class_getitem__() was added in Python 3.7')
+    def test_modeladmin_class_getitem(self):
+        self.assertIs(ModelAdmin[Band], ModelAdmin)
+        self.assertIs(ModelAdmin[Concert], ModelAdmin)
+        self.assertIs(ModelAdmin[Song], ModelAdmin)
 
 
 class ModelAdminPermissionTests(SimpleTestCase):

@@ -1,7 +1,9 @@
+from unittest import skipUnless
+
 from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.admin import GenericTabularInline
+from django.contrib.contenttypes.admin import GenericInlineModelAdmin, GenericTabularInline
 from django.contrib.contenttypes.models import ContentType
 from django.forms.formsets import DEFAULT_MAX_NUM
 from django.forms.models import ModelForm
@@ -9,6 +11,7 @@ from django.test import (
     RequestFactory, SimpleTestCase, TestCase, override_settings,
 )
 from django.urls import reverse
+from django.utils.version import PY37
 
 from .admin import MediaInline, MediaPermanentInline, site as admin_site
 from .models import Category, Episode, EpisodePermanent, Media, PhoneNumber
@@ -455,3 +458,7 @@ class GenericInlineModelAdminTest(SimpleTestCase):
             request.name = name
             self.assertEqual(ma.get_inlines(request, None), (inline_class,)),
             self.assertEqual(type(ma.get_inline_instances(request)[0]), inline_class)
+
+    @skipUnless(PY37, '__class_getitem__() was added in Python 3.7')
+    def test_inlinemodeladmin_class_getitem(self):
+        self.assertIs(GenericInlineModelAdmin[Media], GenericInlineModelAdmin)
