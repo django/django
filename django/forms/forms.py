@@ -23,14 +23,14 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
     """Collect Fields declared on the base classes."""
     def __new__(mcs, name, bases, attrs):
         # Collect fields from current class.
-        declared_fields = {
+        current_fields = {
             key: value for key, value in attrs.items()
             if isinstance(value, Field)
         }
-        for key in declared_fields:
+        for key in current_fields:
             attrs.pop(key)
 
-        attrs['declared_fields'] = declared_fields
+        attrs['declared_fields'] = current_fields
 
         new_class = super().__new__(mcs, name, bases, attrs)
 
