@@ -306,17 +306,14 @@ class BaseFormSet:
         """Return True if every form in self.forms is valid."""
         if not self.is_bound:
             return False
-        # We loop over every form.errors here rather than short circuiting on the
-        # first failure to make sure validation gets triggered for every form.
-        forms_valid = True
-        # This triggers a full clean.
+        # Accessing errors triggers a full clean the first time only.
         self.errors
-        for form in self.forms:
-            if self.can_delete and self._should_delete_form(form):
-                # This form is going to be deleted so any of its errors
-                # shouldn't cause the entire formset to be invalid.
-                continue
-            forms_valid &= form.is_valid()
+        # List comprehension ensures is_valid() is called for all forms.
+        # Forms due to be deleted shouldn't cause the formset to be invalid.
+        forms_valid = all([
+            form.is_valid() for form in self.forms
+            if not (self.can_delete and self._should_delete_form(form))
+        ])
         return forms_valid and not self.non_form_errors()
 
     def full_clean(self):
@@ -470,7 +467,5 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
 
 def all_valid(formsets):
     """Validate every formset and return True if all are valid."""
-    valid = True
-    for formset in formsets:
-        valid &= formset.is_valid()
-    return valid
+    # List comprehension ensures is_valid() is called for all formsets.
+    return all([formset.is_valid() for formset in formsets])
