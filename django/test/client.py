@@ -540,7 +540,7 @@ class AsyncRequestFactory(RequestFactory):
         }
         if data:
             s['headers'].extend([
-                (b'content-length', bytes(len(data))),
+                (b'content-length', str(len(data)).encode('ascii')),
                 (b'content-type', content_type.encode('ascii')),
             ])
             s['_body_file'] = FakePayload(data)
