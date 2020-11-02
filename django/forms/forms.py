@@ -22,13 +22,11 @@ __all__ = ('BaseForm', 'Form')
 class DeclarativeFieldsMetaclass(MediaDefiningClass):
     """Collect Fields declared on the base classes."""
     def __new__(mcs, name, bases, attrs):
-        # Collect fields from current class.
-        current_fields = []
-        for key, value in list(attrs.items()):
-            if isinstance(value, Field):
-                current_fields.append((key, value))
-                attrs.pop(key)
-        attrs['declared_fields'] = dict(current_fields)
+        # Collect fields from current class and remove them from attrs.
+        attrs['declared_fields'] = {
+            key: attrs.pop(key) for key, value in list(attrs.items())
+            if isinstance(value, Field)
+        }
 
         new_class = super().__new__(mcs, name, bases, attrs)
 
