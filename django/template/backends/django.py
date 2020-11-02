@@ -56,7 +56,8 @@ class Template:
         return self.template.origin
 
     def render(self, context=None, request=None):
-        context = make_context(context, request, autoescape=self.backend.engine.autoescape)
+        if not isinstance(context, Context):
+            context = make_context(context, request, autoescape=self.backend.engine.autoescape)
         try:
             return self.template.render(context)
         except TemplateDoesNotExist as exc:
