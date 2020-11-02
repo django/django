@@ -3471,7 +3471,7 @@ This would allow you to refer to the local file
 
 .. code-block:: html+django
 
-    <a href="{% static "downloads/polls_20101022.tar.gz" %}">
+    <a href="{% static 'downloads/polls_20101022.tar.gz' %}">
 
 .. setting:: STATICFILES_STORAGE
 
