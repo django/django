@@ -4,7 +4,7 @@ from pkgutil import walk_packages
 from django.apps import apps
 from django.conf import settings
 from django.template import TemplateDoesNotExist
-from django.template.context import make_context
+from django.template.context import make_context, Context
 from django.template.engine import Engine
 from django.template.library import InvalidTemplateLibrary
 
