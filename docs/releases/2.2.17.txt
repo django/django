@@ -2,6 +2,6 @@
 Django 2.2.17 release notes
 ===========================
 
-*Expected November 2, 2020*
+*November 2, 2020*
 
 Django 2.2.17 adds compatibility with Python 3.9.

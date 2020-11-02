@@ -2,7 +2,7 @@
 Django 3.0.11 release notes
 ===========================
 
-*Expected November 2, 2020*
+*November 2, 2020*
 
 Django 3.0.11 fixes a regression in 3.0.7 and adds compatibility with Python
 3.9.
