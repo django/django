@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -190,6 +191,8 @@ class MySqlDbshellCommandTestCase(SimpleTestCase):
             },
             [],
         )
+        if env:
+            env = {**os.environ, **env}
         fake_client = Path(__file__).with_name('fake_client.py')
         args[0:1] = [sys.executable, str(fake_client)]
         with self.assertRaises(subprocess.CalledProcessError) as ctx:
