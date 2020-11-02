@@ -143,6 +143,9 @@ Minor features
   allow creating and dropping collations on PostgreSQL. See
   :ref:`manage-postgresql-collations` for more details.
 
+* Lookups for :class:`~django.contrib.postgres.fields.ArrayField` now allow
+  (non-nested) arrays containing expressions as right-hand sides.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

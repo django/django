@@ -9,8 +9,8 @@ from django.core import checks, exceptions, serializers, validators
 from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
-from django.db.models.expressions import Exists, OuterRef, RawSQL
-from django.db.models.functions import Cast
+from django.db.models.expressions import Exists, OuterRef, RawSQL, Value
+from django.db.models.functions import Cast, Upper
 from django.test import TransactionTestCase, modify_settings, override_settings
 from django.test.utils import isolate_apps
 from django.utils import timezone
@@ -226,6 +226,12 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[:1]
         )
 
+    def test_exact_with_expression(self):
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__exact=[Value(1)]),
+            self.objs[:1],
+        )
+
     def test_exact_charfield(self):
         instance = CharArrayModel.objects.create(field=['text'])
         self.assertSequenceEqual(
@@ -296,15 +302,10 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[:2]
         )
 
-    @unittest.expectedFailure
     def test_contained_by_including_F_object(self):
-        # This test asserts that Array objects passed to filters can be
-        # constructed to contain F objects. This currently doesn't work as the
-        # psycopg2 mogrify method that generates the ARRAY() syntax is
-        # expecting literals, not column references (#27095).
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__contained_by=[models.F('id'), 2]),
-            self.objs[:2]
+            self.objs[:3],
         )
 
     def test_contains(self):
@@ -324,6 +325,14 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(Exists(inner_qs)),
             self.objs[1:3],
+        )
+
+    def test_contains_including_expression(self):
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field__contains=[2, Value(6) / Value(2)],
+            ),
+            self.objs[2:3],
         )
 
     def test_icontains(self):
@@ -351,6 +360,18 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             CharArrayModel.objects.filter(field__overlap=['text']),
             []
+        )
+
+    def test_overlap_charfield_including_expression(self):
+        obj_1 = CharArrayModel.objects.create(field=['TEXT', 'lower text'])
+        obj_2 = CharArrayModel.objects.create(field=['lower text', 'TEXT'])
+        CharArrayModel.objects.create(field=['lower text', 'text'])
+        self.assertSequenceEqual(
+            CharArrayModel.objects.filter(field__overlap=[
+                Upper(Value('text')),
+                'other',
+            ]),
+            [obj_1, obj_2],
         )
 
     def test_lookups_autofield_array(self):
