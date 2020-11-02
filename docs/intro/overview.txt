@@ -307,7 +307,7 @@ Here's what the "base.html" template, including the use of :doc:`static files
         <title>{% block title %}{% endblock %}</title>
     </head>
     <body>
-        <img src="{% static "images/sitelogo.png" %}" alt="Logo">
+        <img src="{% static 'images/sitelogo.png' %}" alt="Logo">
         {% block content %}{% endblock %}
     </body>
     </html>
