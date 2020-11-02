@@ -9,14 +9,17 @@ from .test_integerfield import (
 
 class AutoFieldTests(IntegerFieldTests):
     model = AutoModel
+    rel_db_type_class = models.IntegerField
 
 
 class BigAutoFieldTests(BigIntegerFieldTests):
     model = BigAutoModel
+    rel_db_type_class = models.BigIntegerField
 
 
 class SmallAutoFieldTests(SmallIntegerFieldTests):
     model = SmallAutoModel
+    rel_db_type_class = models.SmallIntegerField
 
 
 class AutoFieldInheritanceTests(SimpleTestCase):
