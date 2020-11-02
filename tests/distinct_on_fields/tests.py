@@ -1,3 +1,4 @@
+from django.db import connection
 from django.db.models import CharField, Max
 from django.db.models.functions import Lower
 from django.test import TestCase, skipUnlessDBFeature
@@ -70,7 +71,9 @@ class DistinctOnTests(TestCase):
             ),
             (
                 Tag.objects.order_by('parent__pk', 'pk').distinct('parent'),
-                ['<Tag: t2>', '<Tag: t4>', '<Tag: t1>'],
+                ['<Tag: t2>', '<Tag: t4>', '<Tag: t1>']
+                if connection.features.nulls_order_largest
+                else ['<Tag: t1>', '<Tag: t2>', '<Tag: t4>'],
             ),
             (
                 StaffTag.objects.select_related('staff').distinct('staff__name').order_by('staff__name'),
