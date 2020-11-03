@@ -439,7 +439,13 @@ class ExceptionReporter:
     def get_exception_traceback_frames(self, exc_value, tb):
         exc_cause = self._get_explicit_or_implicit_cause(exc_value)
         exc_cause_explicit = getattr(exc_value, '__cause__', True)
-
+        if tb is None:
+            yield {
+                'exc_cause': exc_cause,
+                'exc_cause_explicit': exc_cause_explicit,
+                'tb': None,
+                'type': 'user',
+            }
         while tb is not None:
             # Support for __traceback_hide__ which is used by a few libraries
             # to hide internal frames.
