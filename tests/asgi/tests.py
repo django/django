@@ -9,7 +9,7 @@ from asgiref.testing import ApplicationCommunicator
 
 from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
 from django.core.asgi import get_asgi_application
-from django.core.signals import request_finished, request_started
+from django.core.signals import request_finished, request_started, asgi_startup, asgi_shutdown
 from django.db import close_old_connections
 from django.test import (
     AsyncRequestFactory, SimpleTestCase, modify_settings, override_settings,
@@ -234,3 +234,29 @@ class ASGITest(SimpleTestCase):
         self.assertEqual(request_finished_thread, target_thread)
         request_started.disconnect(signal_handler)
         request_finished.disconnect(signal_handler)
+
+    async def test_lifespan(self):
+        class LifspanSignalHandler:
+            """Track threads handler is dispatched on."""
+            calls = 0
+
+            async def __call__(self, **kwargs):
+                self.calls += 1
+
+        signal_handler = LifspanSignalHandler()
+        asgi_startup.connect(signal_handler)
+        asgi_shutdown.connect(signal_handler)
+
+        application = get_asgi_application()
+        scope = {'type': 'lifespan'}
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({'type': 'lifespan.startup'})
+        response = await communicator.receive_output()
+        self.assertEqual(response['type'], 'lifespan.startup.complete')
+        await communicator.send_input({'type': 'lifespan.shutdown'})
+        response = await communicator.receive_output()
+        self.assertEqual(response['type'], 'lifespan.shutdown.complete')
+        self.assertEqual(signal_handler.calls, 2)
+
+        asgi_startup.disconnect(signal_handler)
+        asgi_shutdown.disconnect(signal_handler)

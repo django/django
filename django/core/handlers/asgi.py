@@ -139,6 +139,8 @@ class ASGIHandler(base.BaseHandler):
         """
         # Serve only HTTP connections.
         # FIXME: Allow to override this.
+        if scope['type'] == 'lifespan':
+            return await self.handle_lifespan(scope, receive, send)
         if scope['type'] != 'http':
             raise ValueError(
                 'Django can only handle ASGI/HTTP connections, not %s.'
@@ -201,6 +203,27 @@ class ASGIHandler(base.BaseHandler):
             return None, HttpResponseBadRequest()
         except RequestDataTooBig:
             return None, HttpResponse('413 Payload too large', status=413)
+
+    async def handle_lifespan(self, scope, receive, send):
+        """
+        Support of ASGI Lifespan protocol
+        https://asgi.readthedocs.io/en/latest/specs/lifespan.html
+        """
+        while True:
+            message = await receive()
+            if message['type'] == 'lifespan.startup':
+                results = signals.asgi_startup.send(self.__class__, scope=scope)
+                for _, result in results:
+                    if result:
+                        await result
+                # Do some startup here!
+                await send({'type': 'lifespan.startup.complete'})
+            elif message['type'] == 'lifespan.shutdown':
+                results = signals.asgi_shutdown.send(self.__class__, scope=scope)
+                for _, result in results:
+                    if result:
+                        await result
+                await send({'type': 'lifespan.shutdown.complete'})
 
     def handle_uncaught_exception(self, request, resolver, exc_info):
         """Last-chance handler for exceptions."""
