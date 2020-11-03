@@ -12,6 +12,7 @@ from django.core.management import call_command
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import F, OuterRef, Subquery
 from django.test import TestCase, skipUnlessDBFeature
+from django.test.utils import CaptureQueriesContext
 
 from ..utils import (
     mariadb, mysql, oracle, postgis, skipUnlessGISLookup, spatialite,
@@ -592,6 +593,19 @@ class GeoQuerySetTest(TestCase):
         self.assertTrue(union.equals(u2))
         qs = City.objects.filter(name='NotACity')
         self.assertIsNone(qs.aggregate(Union('point'))['point__union'])
+
+    @skipUnlessDBFeature('supports_union_aggr')
+    def test_geoagg_subquery(self):
+        ks = State.objects.get(name='Kansas')
+        union = GEOSGeometry('MULTIPOINT(-95.235060 38.971823)')
+        # Use distinct() to force the usage of a subquery for aggregation.
+        with CaptureQueriesContext(connection) as ctx:
+            self.assertIs(union.equals(
+                City.objects.filter(point__within=ks.poly).distinct().aggregate(
+                    Union('point'),
+                )['point__union'],
+            ), True)
+        self.assertIn('subquery', ctx.captured_queries[0]['sql'])
 
     @unittest.skipUnless(
         connection.vendor == 'oracle',
