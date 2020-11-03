@@ -9,7 +9,7 @@ from asgiref.testing import ApplicationCommunicator
 
 from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
 from django.core.asgi import get_asgi_application
-from django.core.signals import request_finished, request_started, asgi_startup, asgi_shutdown
+from django.core.signals import asgi_shutdown, asgi_startup, request_finished, request_started
 from django.db import close_old_connections
 from django.test import (
     AsyncRequestFactory, SimpleTestCase, modify_settings, override_settings,
