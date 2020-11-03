@@ -1012,3 +1012,14 @@ class AsyncRequestFactoryTest(SimpleTestCase):
         response = await async_generic_view(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'{"example": "data"}')
+
+    def test_request_factory_sets_headers(self):
+        request = self.request_factory.get(
+            '/somewhere/',
+            AUTHORIZATION='Bearer faketoken',
+            X_ANOTHER_HEADER='some other value',
+        )
+        self.assertEqual(request.headers['authorization'], 'Bearer faketoken')
+        self.assertIn('HTTP_AUTHORIZATION', request.META)
+        self.assertEqual(request.headers['x-another-header'], 'some other value')
+        self.assertIn('HTTP_X_ANOTHER_HEADER', request.META)
