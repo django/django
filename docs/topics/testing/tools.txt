@@ -1810,9 +1810,22 @@ If you are testing from an asynchronous function, you must also use the
 asynchronous test client. This is available as ``django.test.AsyncClient``,
 or as ``self.async_client`` on any test.
 
-With the exception of the ``follow`` parameter, which is not supported,
 ``AsyncClient`` has the same methods and signatures as the synchronous (normal)
-test client, but any method that makes a request must be awaited::
+test client, with two exceptions:
+
+* The ``follow`` parameter is not supported.
+* Headers passed as ``extra`` keyword arguments should not have the ``HTTP_``
+  prefix required by the synchronous client (see :meth:`Client.get`). For
+  example, here is how to set an HTTP ``Accept`` header::
+
+    >>> c = AsyncClient()
+    >>> c.get(
+    ...     '/customers/details/',
+    ...     {'name': 'fred', 'age': 7},
+    ...     ACCEPT='application/json'
+    ... )
+
+Using ``AsyncClient`` any method that makes a request must be awaited::
 
     async def test_my_thing(self):
         response = await self.async_client.get('/some-url/')

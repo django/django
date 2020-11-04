@@ -544,7 +544,13 @@ class AsyncRequestFactory(RequestFactory):
                 (b'content-type', content_type.encode('ascii')),
             ])
             s['_body_file'] = FakePayload(data)
-        s.update(extra)
+        follow = extra.pop('follow', None)
+        if follow is not None:
+            s['follow'] = follow
+        s['headers'] += [
+            (key.lower().encode('ascii'), value.encode('latin1'))
+            for key, value in extra.items()
+        ]
         # If QUERY_STRING is absent or empty, we want to extract it from the
         # URL.
         if not s.get('query_string'):
