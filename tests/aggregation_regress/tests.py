@@ -701,10 +701,10 @@ class AggregationTests(TestCase):
         qs = Book.objects.extra(select={'pub': 'publisher_id'}).values('pub').annotate(Count('id')).order_by('pub')
         self.assertSequenceEqual(
             qs, [
-                {'pub': self.b1.id, 'id__count': 2},
-                {'pub': self.b2.id, 'id__count': 1},
-                {'pub': self.b3.id, 'id__count': 2},
-                {'pub': self.b4.id, 'id__count': 1}
+                {'pub': self.p1.id, 'id__count': 2},
+                {'pub': self.p2.id, 'id__count': 1},
+                {'pub': self.p3.id, 'id__count': 2},
+                {'pub': self.p4.id, 'id__count': 1},
             ],
         )
 
