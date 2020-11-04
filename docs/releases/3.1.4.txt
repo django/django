@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed setting the ``Content-Length`` HTTP header in ``AsyncRequestFactory``
   (:ticket:`32162`).
+
+* Fixed passing extra HTTP headers to ``AsyncRequestFactory`` request methods
+  (:ticket:`32159`).
