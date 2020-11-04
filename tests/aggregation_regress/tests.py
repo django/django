@@ -876,7 +876,7 @@ class AggregationTests(TestCase):
         )
 
         # Note: intentionally no order_by(), that case needs tests, too.
-        publishers = Publisher.objects.filter(id__in=[1, 2])
+        publishers = Publisher.objects.filter(id__in=[self.p1.id, self.p2.id])
         self.assertEqual(
             sorted(p.name for p in publishers),
             [
@@ -1450,8 +1450,10 @@ class AggregationTests(TestCase):
         query = Book.objects.annotate(Count('authors')).filter(
             q1 | q2).order_by('pk')
         self.assertQuerysetEqual(
-            query, [1, 4, 5, 6],
-            lambda b: b.pk)
+            query,
+            [self.b1.pk, self.b4.pk, self.b5.pk, self.b6.pk],
+            attrgetter('pk'),
+        )
 
     def test_ticket_11293_q_immutable(self):
         """
