@@ -428,6 +428,18 @@ class TestAggregateDistinct(PostgreSQLTestCase):
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('char_field', distinct=True))
         self.assertEqual(sorted(values['arrayagg']), ['Bar', 'Foo'])
 
+    def test_json_agg_distinct_false(self):
+        values = AggregateTestModel.objects.aggregate(
+            jsonagg=JSONBAgg('char_field', distinct=False),
+        )
+        self.assertEqual(sorted(values['jsonagg']), ['Bar', 'Foo', 'Foo'])
+
+    def test_json_agg_distinct_true(self):
+        values = AggregateTestModel.objects.aggregate(
+            jsonagg=JSONBAgg('char_field', distinct=True),
+        )
+        self.assertEqual(sorted(values['jsonagg']), ['Bar', 'Foo'])
+
 
 class TestStatisticsAggregate(PostgreSQLTestCase):
     @classmethod
