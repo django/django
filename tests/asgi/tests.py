@@ -72,14 +72,23 @@ class ASGITest(SimpleTestCase):
         response_start = await communicator.receive_output()
         self.assertEqual(response_start['type'], 'http.response.start')
         self.assertEqual(response_start['status'], 200)
-        self.assertEqual(
-            set(response_start['headers']),
-            {
-                (b'Content-Length', str(len(test_file_contents)).encode('ascii')),
-                (b'Content-Type', b'text/plain' if sys.platform == 'win32' else b'text/x-python'),
-                (b'Content-Disposition', b'inline; filename="urls.py"'),
-            },
-        )
+        headers = response_start['headers']
+        self.assertEqual(len(headers), 3)
+        expected_headers = {
+            b'Content-Length': str(len(test_file_contents)).encode('ascii'),
+            b'Content-Type': b'text/x-python',
+            b'Content-Disposition': b'inline; filename="urls.py"',
+        }
+        for key, value in headers:
+            try:
+                self.assertEqual(value, expected_headers[key])
+            except AssertionError:
+                # Windows registry may not be configured with correct
+                # mimetypes.
+                if sys.platform == 'win32' and key == b'Content-Type':
+                    self.assertEqual(value, b'text/plain')
+                else:
+                    raise
         response_body = await communicator.receive_output()
         self.assertEqual(response_body['type'], 'http.response.body')
         self.assertEqual(response_body['body'], test_file_contents)
