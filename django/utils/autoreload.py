@@ -14,6 +14,7 @@ from pathlib import Path
 from types import ModuleType
 from zipimport import zipimporter
 
+import django
 from django.apps import apps
 from django.core.signals import request_finished
 from django.dispatch import Signal
@@ -43,6 +44,16 @@ try:
     import pywatchman
 except ImportError:
     pywatchman = None
+
+
+def is_django_module(module):
+    """Return True if the given module is nested under Django."""
+    return module.__name__.startswith('django.')
+
+
+def is_django_path(path):
+    """Return True if the given file path is nested under Django."""
+    return Path(django.__file__).parent in Path(path).parents
 
 
 def check_errors(fn):
@@ -431,8 +442,15 @@ class WatchmanReloader(BaseReloader):
 
     def _subscribe(self, directory, name, expression):
         root, rel_path = self._watch_root(directory)
+        # Only receive notifications of files changing, filtering out other types
+        # like special files: https://facebook.github.io/watchman/docs/type
+        only_files_expression = [
+            'allof',
+            ['anyof', ['type', 'f'], ['type', 'l']],
+            expression
+        ]
         query = {
-            'expression': expression,
+            'expression': only_files_expression,
             'fields': ['name'],
             'since': self._get_clock(root),
             'dedup_results': True,
