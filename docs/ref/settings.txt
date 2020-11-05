@@ -1651,7 +1651,7 @@ generate correct URLs when ``SCRIPT_NAME`` is not ``/``.
 
     ``FORCE_SCRIPT_NAME`` will prepend the prefix to the ``STATIC_URL`` and 
     ``MEDIA_URL`` settings, but only if they set to a relative path. If either 
-    ``STATIC_URL or MEDIA_URL`` is a vailid URL or an absolute path, example: 
+    ``STATIC_URL or MEDIA_URL`` is a valid URL or an absolute path, example: 
     ``STATIC_URL = '/static/'`` this prefix will not be applied. To apply this 
     setting to an absolute path, remove the leading ``/``.
 
