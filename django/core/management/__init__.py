@@ -252,12 +252,13 @@ class ManagementUtility:
         if '.' in command_name:
             if command_name in commands:
                 return command_name
-            raise Exception(f"{command_name=} doesn't exists!")
+            raise Exception(f"command_name={command_name} doesn't exists!")
         fit_commands = ManagementUtility.find_fit_commands(command_name, commands)
         if not fit_commands:
-            raise Exception(f"{command_name=} doesn't exists!")
+            raise Exception(f"command_name={command_name} doesn't exists!")
         if len(fit_commands) > 1:
-            raise Exception(f'Command name "{command_name}" exists in multiple sub-folders: {fit_commands}! try full path instead')
+            raise Exception(f'Command name "{command_name}" exists in multiple sub-folders: '
+                            f'{fit_commands}! try full path instead')
         return fit_commands[0]
 
     def fetch_command(self, subcommand):
