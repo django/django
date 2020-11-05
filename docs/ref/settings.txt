@@ -1647,6 +1647,16 @@ of the preferred value or not supplied at all. It is also used by
 request/response cycle (e.g. in management commands and standalone scripts) to
 generate correct URLs when ``SCRIPT_NAME`` is not ``/``.
 
+.. note::
+
+    ``FORCE_SCRIPT_NAME`` will prepend the prefix to the ``STATIC_URL`` and 
+    ``MEDIA_URL`` settings, but only if they set to a relative path. If either 
+    ``STATIC_URL or MEDIA_URL`` is a vailid URL or an absolute path, example: 
+    ``STATIC_URL = '/static/'`` this prefix will not be applied. To apply this 
+    setting to an absolute path, remove the leading ``/``.
+
+    Example: ``STATIC_URL = 'static/'`` 
+
 .. setting:: FORM_RENDERER
 
 ``FORM_RENDERER``
