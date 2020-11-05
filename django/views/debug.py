@@ -4,6 +4,7 @@ import sys
 import types
 import warnings
 from pathlib import Path
+from pprint import PrettyPrinter
 
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseNotFound
@@ -263,12 +264,26 @@ class ExceptionReporter:
             self.template_does_not_exist = True
             self.postmortem = self.exc_value.chain or [self.exc_value]
 
+        repr_cache = {}
+
+        class CachedPrettyPrinter(PrettyPrinter):
+            def format(self, object, context, maxlevels, level):
+                obj_id = id(object)
+                if obj_id in repr_cache:
+                    return repr_cache[obj_id]
+
+                result = super(CachedPrettyPrinter, self).format(object, context, maxlevels, level)
+                repr_cache[obj_id] = result
+                return result
+
+        pp = CachedPrettyPrinter()
+
         frames = self.get_traceback_frames()
         for i, frame in enumerate(frames):
             if 'vars' in frame:
                 frame_vars = []
                 for k, v in frame['vars']:
-                    v = pprint(v)
+                    v = pp.pformat(v)
                     # Trim large blobs of data
                     if len(v) > 4096:
                         v = '%s… <trimmed %d bytes string>' % (v[0:4096], len(v))
