@@ -233,6 +233,12 @@ Forms
   removal of the option to delete extra forms. See
   :attr:`~.BaseFormSet.can_delete_extra` for more information.
 
+* :class:`~django.forms.formsets.BaseFormSet` now reports a user facing error,
+  rather than raising an exception, when the management form is missing or has
+  been tampered with. To customize this error message, pass the
+  ``error_messages`` argument with the key ``'missing_management_form'`` when
+  instantiating the formset.
+
 Generic Views
 ~~~~~~~~~~~~~
 

@@ -22,7 +22,7 @@ a formset out of an ``ArticleForm`` you would do::
     >>> ArticleFormSet = formset_factory(ArticleForm)
 
 You now have created a formset class named ``ArticleFormSet``.
-Instantiating the formset gives you the ability to iterate over the forms 
+Instantiating the formset gives you the ability to iterate over the forms
 in the formset and display them as you would with a regular form::
 
     >>> formset = ArticleFormSet()
@@ -242,7 +242,7 @@ You may have noticed the additional data (``form-TOTAL_FORMS``,
 in the formset's data above. This data is required for the
 ``ManagementForm``. This form is used by the formset to manage the
 collection of forms contained in the formset. If you don't provide
-this management data, an exception will be raised::
+this management data, the formset will be invalid::
 
     >>> data = {
     ...     'form-0-title': 'Test',
@@ -250,9 +250,7 @@ this management data, an exception will be raised::
     ... }
     >>> formset = ArticleFormSet(data)
     >>> formset.is_valid()
-    Traceback (most recent call last):
-    ...
-    django.core.exceptions.ValidationError: ['ManagementForm data is missing or has been tampered with']
+    False
 
 It is used to keep track of how many form instances are being displayed. If
 you are adding new forms via JavaScript, you should increment the count fields
@@ -265,6 +263,11 @@ The management form is available as an attribute of the formset
 itself. When rendering a formset in a template, you can include all
 the management data by rendering ``{{ my_formset.management_form }}``
 (substituting the name of your formset as appropriate).
+
+.. versionchanged:: 3.2
+
+    ``formset.is_valid()`` now returns ``False`` rather than raising an
+    exception when the management form is missing or has been tampered with.
 
 ``total_form_count`` and ``initial_form_count``
 -----------------------------------------------
@@ -286,6 +289,30 @@ sure you understand what they do before doing so.
 ``BaseFormSet`` provides an additional attribute ``empty_form`` which returns
 a form instance with a prefix of ``__prefix__`` for easier use in dynamic
 forms with JavaScript.
+
+``error_messages``
+------------------
+
+.. versionadded:: 3.2
+
+The ``error_messages`` argument lets you override the default messages that the
+formset will raise. Pass in a dictionary with keys matching the error messages
+you want to override. For example, here is the default error message when the
+management form is missing::
+
+    >>> formset = ArticleFormSet({})
+    >>> formset.is_valid()
+    False
+    >>> formset.non_form_errors()
+    ['ManagementForm data is missing or has been tampered with. Missing fields: form-TOTAL_FORMS, form-INITIAL_FORMS. You may need to file a bug report if the issue persists.']
+
+And here is a custom error message::
+
+    >>> formset = ArticleFormSet({}, error_messages={'missing_management_form': 'Sorry, something went wrong.'})
+    >>> formset.is_valid()
+    False
+    >>> formset.non_form_errors()
+    ['Sorry, something went wrong.']
 
 Custom formset validation
 -------------------------

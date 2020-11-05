@@ -6,7 +6,7 @@ from django.forms.widgets import HiddenInput, NumberInput
 from django.utils.functional import cached_property
 from django.utils.html import html_safe
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext as _, ngettext
+from django.utils.translation import gettext_lazy as _, ngettext
 
 __all__ = ('BaseFormSet', 'formset_factory', 'all_valid')
 
@@ -41,6 +41,14 @@ class ManagementForm(Form):
         self.base_fields[MAX_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         super().__init__(*args, **kwargs)
 
+    def clean(self):
+        cleaned_data = super().clean()
+        # When the management form is invalid, we don't know how many forms
+        # were submitted.
+        cleaned_data.setdefault(TOTAL_FORM_COUNT, 0)
+        cleaned_data.setdefault(INITIAL_FORM_COUNT, 0)
+        return cleaned_data
+
 
 @html_safe
 class BaseFormSet:
@@ -48,9 +56,16 @@ class BaseFormSet:
     A collection of instances of the same Form class.
     """
     ordering_widget = NumberInput
+    default_error_messages = {
+        'missing_management_form': _(
+            'ManagementForm data is missing or has been tampered with. Missing fields: '
+            '%(field_names)s. You may need to file a bug report if the issue persists.'
+        ),
+    }
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList, form_kwargs=None):
+                 initial=None, error_class=ErrorList, form_kwargs=None,
+                 error_messages=None):
         self.is_bound = data is not None or files is not None
         self.prefix = prefix or self.get_default_prefix()
         self.auto_id = auto_id
@@ -61,6 +76,13 @@ class BaseFormSet:
         self.error_class = error_class
         self._errors = None
         self._non_form_errors = None
+
+        messages = {}
+        for cls in reversed(type(self).__mro__):
+            messages.update(getattr(cls, 'default_error_messages', {}))
+        if error_messages is not None:
+            messages.update(error_messages)
+        self.error_messages = messages
 
     def __str__(self):
         return self.as_table()
@@ -88,18 +110,7 @@ class BaseFormSet:
         """Return the ManagementForm instance for this FormSet."""
         if self.is_bound:
             form = ManagementForm(self.data, auto_id=self.auto_id, prefix=self.prefix)
-            if not form.is_valid():
-                raise ValidationError(
-                    _(
-                        'ManagementForm data is missing or has been tampered '
-                        'with. Missing fields: %(field_names)s'
-                    ) % {
-                        'field_names': ', '.join(
-                            form.add_prefix(field_name) for field_name in form.errors
-                        ),
-                    },
-                    code='missing_management_form',
-                )
+            form.full_clean()
         else:
             form = ManagementForm(auto_id=self.auto_id, prefix=self.prefix, initial={
                 TOTAL_FORM_COUNT: self.total_form_count(),
@@ -327,6 +338,20 @@ class BaseFormSet:
 
         if not self.is_bound:  # Stop further processing.
             return
+
+        if not self.management_form.is_valid():
+            error = ValidationError(
+                self.error_messages['missing_management_form'],
+                params={
+                    'field_names': ', '.join(
+                        self.management_form.add_prefix(field_name)
+                        for field_name in self.management_form.errors
+                    ),
+                },
+                code='missing_management_form',
+            )
+            self._non_form_errors.append(error)
+
         for i, form in enumerate(self.forms):
             # Empty forms are unchanged forms beyond those with initial data.
             if not form.has_changed() and i >= self.initial_form_count():

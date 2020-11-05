@@ -1300,13 +1300,69 @@ ArticleFormSet = formset_factory(ArticleForm)
 
 
 class TestIsBoundBehavior(SimpleTestCase):
-    def test_no_data_raises_validation_error(self):
-        msg = (
-            'ManagementForm data is missing or has been tampered with. '
-            'Missing fields: form-TOTAL_FORMS, form-INITIAL_FORMS'
+    def test_no_data_error(self):
+        formset = ArticleFormSet({})
+        self.assertIs(formset.is_valid(), False)
+        self.assertEqual(
+            formset.non_form_errors(),
+            [
+                'ManagementForm data is missing or has been tampered with. '
+                'Missing fields: form-TOTAL_FORMS, form-INITIAL_FORMS. '
+                'You may need to file a bug report if the issue persists.',
+            ],
         )
-        with self.assertRaisesMessage(ValidationError, msg):
-            ArticleFormSet({}).is_valid()
+        self.assertEqual(formset.errors, [])
+        # Can still render the formset.
+        self.assertEqual(
+            str(formset),
+            '<tr><td colspan="2">'
+            '<ul class="errorlist nonfield">'
+            '<li>(Hidden field TOTAL_FORMS) This field is required.</li>'
+            '<li>(Hidden field INITIAL_FORMS) This field is required.</li>'
+            '</ul>'
+            '<input type="hidden" name="form-TOTAL_FORMS" id="id_form-TOTAL_FORMS">'
+            '<input type="hidden" name="form-INITIAL_FORMS" id="id_form-INITIAL_FORMS">'
+            '<input type="hidden" name="form-MIN_NUM_FORMS" id="id_form-MIN_NUM_FORMS">'
+            '<input type="hidden" name="form-MAX_NUM_FORMS" id="id_form-MAX_NUM_FORMS">'
+            '</td></tr>\n'
+        )
+
+    def test_management_form_invalid_data(self):
+        data = {
+            'form-TOTAL_FORMS': 'two',
+            'form-INITIAL_FORMS': 'one',
+        }
+        formset = ArticleFormSet(data)
+        self.assertIs(formset.is_valid(), False)
+        self.assertEqual(
+            formset.non_form_errors(),
+            [
+                'ManagementForm data is missing or has been tampered with. '
+                'Missing fields: form-TOTAL_FORMS, form-INITIAL_FORMS. '
+                'You may need to file a bug report if the issue persists.',
+            ],
+        )
+        self.assertEqual(formset.errors, [])
+        # Can still render the formset.
+        self.assertEqual(
+            str(formset),
+            '<tr><td colspan="2">'
+            '<ul class="errorlist nonfield">'
+            '<li>(Hidden field TOTAL_FORMS) Enter a whole number.</li>'
+            '<li>(Hidden field INITIAL_FORMS) Enter a whole number.</li>'
+            '</ul>'
+            '<input type="hidden" name="form-TOTAL_FORMS" value="two" id="id_form-TOTAL_FORMS">'
+            '<input type="hidden" name="form-INITIAL_FORMS" value="one" id="id_form-INITIAL_FORMS">'
+            '<input type="hidden" name="form-MIN_NUM_FORMS" id="id_form-MIN_NUM_FORMS">'
+            '<input type="hidden" name="form-MAX_NUM_FORMS" id="id_form-MAX_NUM_FORMS">'
+            '</td></tr>\n',
+        )
+
+    def test_customize_management_form_error(self):
+        formset = ArticleFormSet({}, error_messages={'missing_management_form': 'customized'})
+        self.assertIs(formset.is_valid(), False)
+        self.assertEqual(formset.non_form_errors(), ['customized'])
+        self.assertEqual(formset.errors, [])
 
     def test_with_management_data_attrs_work_fine(self):
         data = {
