@@ -14,6 +14,8 @@ from pathlib import Path
 from subprocess import CompletedProcess
 from unittest import mock, skip, skipIf
 
+import pytz
+
 import django.__main__
 from django.apps.registry import Apps
 from django.test import SimpleTestCase
@@ -199,6 +201,26 @@ class TestChildArguments(SimpleTestCase):
         msg = 'Script does-not-exist does not exist.'
         with self.assertRaisesMessage(RuntimeError, msg):
             autoreload.get_child_arguments()
+
+
+class TestUtilities(SimpleTestCase):
+    def test_is_django_module(self):
+        for module, expected in (
+            (pytz, False),
+            (sys, False),
+            (autoreload, True)
+        ):
+            with self.subTest(module=module):
+                self.assertIs(autoreload.is_django_module(module), expected)
+
+    def test_is_django_path(self):
+        for module, expected in (
+            (pytz.__file__, False),
+            (contextlib.__file__, False),
+            (autoreload.__file__, True)
+        ):
+            with self.subTest(module=module):
+                self.assertIs(autoreload.is_django_path(module), expected)
 
 
 class TestCommonRoots(SimpleTestCase):
