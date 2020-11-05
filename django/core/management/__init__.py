@@ -40,6 +40,16 @@ def load_command_class(app_name, name):
     return module.Command()
 
 
+def find_commands_in_dir(command_dir):
+    return [name for _, name, is_pkg in pkgutil.iter_modules([command_dir])
+            if not is_pkg and not name.startswith('_')]
+
+
+def get_module_name(command_dir, command, base_command_dir):
+    relative_path = os.path.join(command_dir.replace(base_command_dir, ''), command)
+    return relative_path.replace('/', '.')
+
+
 @functools.lru_cache(maxsize=None)
 def get_commands():
     """
@@ -71,6 +81,12 @@ def get_commands():
     for app_config in reversed(list(apps.get_app_configs())):
         path = os.path.join(app_config.path, 'management')
         commands.update({name: app_config.name for name in find_commands(path)})
+        base_command_dir = os.path.join(app_config.path, 'management', 'commands', '')
+        recursive_sub_dirs = [root for root, _, _ in os.walk(base_command_dir)]
+        for command_dir in recursive_sub_dirs:
+            for command in find_commands_in_dir(command_dir):
+                module_name = get_module_name(command_dir, command, base_command_dir)
+                commands[module_name] = app_config.name
 
     return commands
 
@@ -225,6 +241,25 @@ class ManagementUtility:
 
         return '\n'.join(usage)
 
+    @staticmethod
+    def find_fit_commands(command_name, commands):
+        return [command for command in commands
+                if command.split('.')[-1] == command_name]
+
+    @staticmethod
+    def to_full_command_name(command_name):
+        commands = get_commands()
+        if '.' in command_name:
+            if command_name in commands:
+                return command_name
+            raise Exception(f"{command_name=} doesn't exists!")
+        fit_commands = ManagementUtility.find_fit_commands(command_name, commands)
+        if not fit_commands:
+            raise Exception(f"{command_name=} doesn't exists!")
+        if len(fit_commands) > 1:
+            raise Exception(f'Command name "{command_name}" exists in multiple sub-folders: {fit_commands}! try full path instead')
+        return fit_commands[0]
+
     def fetch_command(self, subcommand):
         """
         Try to fetch the given subcommand, printing a message with the
@@ -232,6 +267,7 @@ class ManagementUtility:
         "django-admin" or "manage.py") if it can't be found.
         """
         # Get commands outside of try block to prevent swallowing exceptions
+        subcommand = self.to_full_command_name(subcommand)
         commands = get_commands()
         try:
             app_name = commands[subcommand]
