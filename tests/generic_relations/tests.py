@@ -320,6 +320,30 @@ class GenericRelationsTests(TestCase):
         self.assertEqual(1, bacon.tags.count())
         self.assertEqual(1, qs.count())
 
+    def test_clear(self):
+        self.assertSequenceEqual(
+            TaggedItem.objects.order_by('tag'),
+            [self.fatty, self.hairy, self.salty, self.yellow],
+        )
+        self.bacon.tags.clear()
+        self.assertSequenceEqual(self.bacon.tags.all(), [])
+        self.assertSequenceEqual(
+            TaggedItem.objects.order_by('tag'),
+            [self.hairy, self.yellow],
+        )
+
+    def test_remove(self):
+        self.assertSequenceEqual(
+            TaggedItem.objects.order_by('tag'),
+            [self.fatty, self.hairy, self.salty, self.yellow],
+        )
+        self.bacon.tags.remove(self.fatty)
+        self.assertSequenceEqual(self.bacon.tags.all(), [self.salty])
+        self.assertSequenceEqual(
+            TaggedItem.objects.order_by('tag'),
+            [self.hairy, self.salty, self.yellow],
+        )
+
     def test_generic_relation_related_name_default(self):
         # GenericRelation isn't usable from the reverse side by default.
         msg = (
