@@ -248,7 +248,7 @@ class OperationTestBase(MigrationTestBase):
                 [
                     ('id', models.AutoField(primary_key=True)),
                     ('pony', models.ForeignKey('Pony', models.CASCADE)),
-                    ('friend', models.ForeignKey('self', models.CASCADE))
+                    ('friend', models.ForeignKey('self', models.CASCADE, null=True))
                 ],
             ))
         if mti_model:

@@ -2541,8 +2541,12 @@ class OperationTests(OperationTestBase):
         # Create some rows before alteration
         rendered_state = project_state.apps
         pony = rendered_state.get_model("test_alorwrtto", "Pony").objects.create(weight=50)
-        rendered_state.get_model("test_alorwrtto", "Rider").objects.create(pony=pony, friend_id=1)
-        rendered_state.get_model("test_alorwrtto", "Rider").objects.create(pony=pony, friend_id=2)
+        rider1 = rendered_state.get_model("test_alorwrtto", "Rider").objects.create(pony=pony)
+        rider1.friend = rider1
+        rider1.save()
+        rider2 = rendered_state.get_model("test_alorwrtto", "Rider").objects.create(pony=pony)
+        rider2.friend = rider2
+        rider2.save()
         # Test the database alteration
         with connection.schema_editor() as editor:
             operation.database_forwards("test_alorwrtto", editor, project_state, new_state)
