@@ -145,6 +145,19 @@ class Sum(FixDurationInputMixin, Aggregate):
     name = 'Sum'
     allow_distinct = True
 
+    def __init__(self, *expressions, default=None, **extra):
+        self.default_value = default
+        super().__init__(*expressions, **extra)
+
+    def convert_value(self, value, expression, connection):
+        value = self.default_value if value is None else value
+
+        import datetime
+        if isinstance(value, datetime.timedelta):
+            value = value.microseconds
+
+        return super().convert_value(value, expression, connection)
+
 
 class Variance(NumericOutputFieldMixin, Aggregate):
     name = 'Variance'

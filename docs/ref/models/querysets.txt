@@ -3637,14 +3637,20 @@ by the aggregate.
 ``Sum``
 ~~~~~~~
 
-.. class:: Sum(expression, output_field=None, distinct=False, filter=None, **extra)
+.. class:: Sum(expression, output_field=None, default=None, distinct=False, filter=None, **extra)
 
     Computes the sum of all values of the given expression.
 
     * Default alias: ``<field>__sum``
     * Return type: same as input field, or ``output_field`` if supplied
 
-    Has one optional argument:
+    Has two optional arguments:
+
+    .. versionchanged:: 3.2
+    .. attribute:: default
+
+        If ``default`` is set, ``Sum`` will return this value instead of ``None``
+        if the ``QuerySet`` to be summed, or its values, are empty.
 
     .. attribute:: distinct
 

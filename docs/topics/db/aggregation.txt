@@ -54,6 +54,9 @@ above::
     >>> Book.objects.filter(publisher__name='BaloneyPress').count()
     73
 
+    # Total price for all books with "Web" in name, default to zero if no books can be found.
+    >>> Book.objects.filter(name__contains="Web").aggregate(Sum('price', default=0))
+
     # Average price across all books.
     >>> from django.db.models import Avg
     >>> Book.objects.all().aggregate(Avg('price'))
@@ -133,6 +136,11 @@ by providing that name when you specify the aggregate clause::
 
     >>> Book.objects.aggregate(average_price=Avg('price'))
     {'average_price': 34.35}
+
+.. versionchanged:: 3.2
+
+The ``Sum()`` function takes a keyword argument, ``default`` that specifies
+what value to return in case no items are in the ``QuerySet`` to sum.
 
 If you want to generate more than one aggregate, you add another argument to
 the ``aggregate()`` clause. So, if we also wanted to know the maximum and

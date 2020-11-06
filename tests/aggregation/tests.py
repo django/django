@@ -485,6 +485,29 @@ class AggregateTestCase(TestCase):
             {'duration__sum': datetime.timedelta(days=3)}
         )
 
+    def test_sum_default_value(self):
+        self.assertEqual(
+            Book.objects.filter(name="IMAGINARY BOOK").aggregate(price_sum=Sum('price', default=0)),
+            {'price_sum': Decimal('0')}
+        )
+
+        self.assertEqual(
+            Book.objects.filter(name="IMAGINARY BOOK").aggregate(rating_sum=Sum('rating', default=0)),
+            {'rating_sum': 0.0}
+        )
+
+        self.assertEqual(
+            Book.objects.filter(name="IMAGINARY BOOK").aggregate(pages_sum=Sum('pages', default=0)),
+            {'pages_sum': 0}
+        )
+
+        self.assertEqual(
+            Publisher.objects.filter(
+                name="IMAGINARY PUBLISHER"
+            ).aggregate(Sum('duration', default=datetime.timedelta(0), output_field=DurationField())),
+            {'duration__sum': datetime.timedelta(seconds=0)}
+        )
+
     def test_sum_distinct_aggregate(self):
         """
         Sum on a distinct() QuerySet should aggregate only the distinct items.

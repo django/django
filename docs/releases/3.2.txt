@@ -343,6 +343,8 @@ Models
 
 * Added the :class:`~django.db.models.functions.Random` database function.
 
+* Added ``default`` kwarg to :class:`~django.db.models.Sum` aggregation function.
+
 Pagination
 ~~~~~~~~~~
 
