@@ -108,6 +108,8 @@ synchronous function and call it using :func:`sync_to_async`.
 
     Asynchronous model and related manager interfaces were added.
 
+.. _async_performance:
+
 Performance
 -----------
 

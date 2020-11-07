@@ -218,7 +218,9 @@ Serialization
 Signals
 ~~~~~~~
 
-* ...
+* The new :meth:`.Signal.asend` and :meth:`.Signal.asend_robust` methods allow
+  asynchronous signal dispatch. Signal receivers may be synchronous or
+  asynchronous, and will be automatically adapted to the correct calling style.
 
 Templates
 ~~~~~~~~~

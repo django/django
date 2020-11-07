@@ -170,9 +170,7 @@ class ASGIHandler(base.BaseHandler):
             return
         # Request is complete and can be served.
         set_script_prefix(self.get_script_prefix(scope))
-        await sync_to_async(signals.request_started.send, thread_sensitive=True)(
-            sender=self.__class__, scope=scope
-        )
+        await signals.request_started.asend(sender=self.__class__, scope=scope)
         # Get the request and check for basic issues.
         request, error_response = self.create_request(scope, body_file)
         if request is None:

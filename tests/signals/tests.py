@@ -1,5 +1,7 @@
+import asyncio
 from unittest import mock
 
+from django import dispatch
 from django.apps.registry import Apps
 from django.db import models
 from django.db.models import signals
@@ -530,3 +532,94 @@ class LazyModelRefTests(BaseSignalSetup, SimpleTestCase):
         apps2 = Apps()
         signals.post_init.connect(self.receiver, sender=Book, apps=apps2)
         self.assertEqual(list(apps2._pending_operations), [])
+
+
+class SyncHandler:
+    param = 0
+
+    def __call__(self, **kwargs):
+        self.param += 1
+        return self.param
+
+
+class AsyncHandler:
+    _is_coroutine = asyncio.coroutines._is_coroutine
+    param = 0
+
+    async def __call__(self, **kwargs):
+        self.param += 1
+        return self.param
+
+
+class AsyncReceiversTests(SimpleTestCase):
+    async def test_asend(self):
+        sync_handler = SyncHandler()
+        async_handler = AsyncHandler()
+        signal = dispatch.Signal()
+        signal.connect(sync_handler)
+        signal.connect(async_handler)
+        result = await signal.asend(self.__class__)
+        self.assertEqual(result, [(sync_handler, 1), (async_handler, 1)])
+
+    def test_send(self):
+        sync_handler = SyncHandler()
+        async_handler = AsyncHandler()
+        signal = dispatch.Signal()
+        signal.connect(sync_handler)
+        signal.connect(async_handler)
+        result = signal.send(self.__class__)
+        self.assertEqual(result, [(sync_handler, 1), (async_handler, 1)])
+
+    def test_send_robust(self):
+        class ReceiverException(Exception):
+            pass
+
+        receiver_exception = ReceiverException()
+
+        async def failing_async_handler(**kwargs):
+            raise receiver_exception
+
+        sync_handler = SyncHandler()
+        async_handler = AsyncHandler()
+        signal = dispatch.Signal()
+        signal.connect(failing_async_handler)
+        signal.connect(async_handler)
+        signal.connect(sync_handler)
+        result = signal.send_robust(self.__class__)
+        # The ordering here is different than the order that signals were
+        # connected in.
+        self.assertEqual(
+            result,
+            [
+                (sync_handler, 1),
+                (failing_async_handler, receiver_exception),
+                (async_handler, 1),
+            ],
+        )
+
+    async def test_asend_robust(self):
+        class ReceiverException(Exception):
+            pass
+
+        receiver_exception = ReceiverException()
+
+        async def failing_async_handler(**kwargs):
+            raise receiver_exception
+
+        sync_handler = SyncHandler()
+        async_handler = AsyncHandler()
+        signal = dispatch.Signal()
+        signal.connect(failing_async_handler)
+        signal.connect(async_handler)
+        signal.connect(sync_handler)
+        result = await signal.asend_robust(self.__class__)
+        # The ordering here is different than the order that signals were
+        # connected in.
+        self.assertEqual(
+            result,
+            [
+                (sync_handler, 1),
+                (failing_async_handler, receiver_exception),
+                (async_handler, 1),
+            ],
+        )
