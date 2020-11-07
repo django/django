@@ -140,7 +140,7 @@ def complex_setting_changed(**kwargs):
         # Considering the current implementation of the signals framework,
         # this stacklevel shows the line containing the override_settings call.
         warnings.warn("Overriding setting %s can lead to unexpected behavior."
-                      % kwargs['setting'], stacklevel=6)
+                      % kwargs['setting'], stacklevel=5)
 
 
 @receiver(setting_changed)

@@ -1,6 +1,9 @@
+import asyncio
 import threading
 import warnings
 import weakref
+
+from asgiref.sync import async_to_sync, sync_to_async
 
 from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.inspect import func_accepts_kwargs
@@ -173,11 +176,46 @@ class Signal:
         """
         if not self.receivers or self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
             return []
+        responses = []
+        for receiver in self._live_receivers(sender):
+            if asyncio.iscoroutinefunction(receiver):
+                response = async_to_sync(receiver)(signal=self, sender=sender, **named)
+            else:
+                response = receiver(signal=self, sender=sender, **named)
+            responses.append((receiver, response))
+        return responses
 
-        return [
-            (receiver, receiver(signal=self, sender=sender, **named))
-            for receiver in self._live_receivers(sender)
-        ]
+    async def send_async(self, sender, **named):
+        """
+        Send signal from sender to all connected receivers in async mode.
+
+        All sync receivers will be wrapped by sync_to_async.
+        If any receiver raises an error, the error propagates back through send,
+        terminating the dispatch loop. So it's possible that all receivers
+        won't be called if an error is raised.
+
+        Arguments:
+
+            sender
+                The sender of the signal. Either a specific object or None.
+
+            named
+                Named arguments which will be passed to receivers.
+
+        Return a list of tuple pairs [(receiver, response), ... ].
+        """
+        if not self.receivers or self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
+            return []
+
+        responses = []
+        for receiver in self._live_receivers(sender):
+            if asyncio.iscoroutinefunction(receiver):
+                response = await receiver(signal=self, sender=sender, **named)
+            else:
+                response = await sync_to_async(receiver, thread_sensitive=True)(
+                    sender=sender, **named)
+            responses.append((receiver, response))
+        return responses
 
     def send_robust(self, sender, **named):
         """
@@ -206,7 +244,11 @@ class Signal:
         responses = []
         for receiver in self._live_receivers(sender):
             try:
-                response = receiver(signal=self, sender=sender, **named)
+                if asyncio.iscoroutinefunction(receiver):
+                    response = async_to_sync(receiver)(
+                        signal=self, sender=sender, **named)
+                else:
+                    response = receiver(signal=self, sender=sender, **named)
             except Exception as err:
                 responses.append((receiver, err))
             else:

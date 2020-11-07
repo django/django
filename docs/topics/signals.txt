@@ -100,6 +100,17 @@ This would be wrong -- in fact, Django will throw an error if you do so. That's
 because at any point arguments could get added to the signal and your receiver
 must be able to handle those new arguments.
 
+.. versionchanged:: 3.2
+
+Receiver function can be simple function or coroutine::
+
+    async def my_callback(sender, **kwargs):
+        await asyncio.sleep(5)
+        print("Request finished!")
+
+If needed, receiver will be adapted for way signal exactly send. See
+:ref:`sending signals <sending-signals>` for more information.
+
 .. _connecting-receiver-functions:
 
 Connecting receiver functions
@@ -232,18 +243,20 @@ For example::
 
 This declares a ``pizza_done`` signal.
 
+.. _sending-signals:
+
 Sending signals
 ---------------
 
-There are two ways to send signals in Django.
+There are three ways to send signals in Django.
 
 .. method:: Signal.send(sender, **kwargs)
+.. method:: Signal.send_async(sender, **kwargs)
 .. method:: Signal.send_robust(sender, **kwargs)
 
-To send a signal, call either :meth:`Signal.send` (all built-in signals use
-this) or :meth:`Signal.send_robust`. You must provide the ``sender`` argument
-(which is a class most of the time) and may provide as many other keyword
-arguments as you like.
+To send a signal, call one of this methods. You must provide the ``sender``
+argument (which is a class most of the time) and may provide as many other
+keyword arguments as you like.
 
 For example, here's how sending our ``pizza_done`` signal might look::
 
@@ -254,9 +267,8 @@ For example, here's how sending our ``pizza_done`` signal might look::
             pizza_done.send(sender=self.__class__, toppings=toppings, size=size)
             ...
 
-Both ``send()`` and ``send_robust()`` return a list of tuple pairs
-``[(receiver, response), ... ]``, representing the list of called receiver
-functions and their response values.
+All three methods return a list of tuple pairs ``[(receiver, response), ... ]``,
+representing the list of called receiver functions and their response values.
 
 ``send()`` differs from ``send_robust()`` in how exceptions raised by receiver
 functions are handled. ``send()`` does *not* catch any exceptions raised by
@@ -269,6 +281,22 @@ error instance is returned in the tuple pair for the receiver that raised the er
 
 The tracebacks are present on the ``__traceback__`` attribute of the errors
 returned when calling ``send_robust()``.
+
+.. versionchanged:: 3.2
+
+``send_async()`` is similar as ``send()``, but it is coroutine that should be
+awaited::
+
+    async def send_pizza_async(self, toppings, size):
+        await pizza_done.send_async(
+            sender=self.__class__, toppings=toppings, size=size)
+        ...
+
+All sync receivers will be called using
+:doc:`async_to_sync </topics/async>` adoption. In opposite, ``send()`` and
+``send_robust()`` use :doc:`sync_to_async </topics/async>` to adapt async
+receivers.
+
 
 Disconnecting signals
 =====================
