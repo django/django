@@ -183,7 +183,7 @@ def complex_setting_changed(*, enter, setting, **kwargs):
         # this stacklevel shows the line containing the override_settings call.
         warnings.warn(
             f"Overriding setting {setting} can lead to unexpected behavior.",
-            stacklevel=6,
+            stacklevel=5,
         )
 
 

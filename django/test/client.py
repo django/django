@@ -219,9 +219,7 @@ class AsyncClientHandler(BaseHandler):
             body_file = FakePayload("")
 
         request_started.disconnect(close_old_connections)
-        await sync_to_async(request_started.send, thread_sensitive=False)(
-            sender=self.__class__, scope=scope
-        )
+        await request_started.asend(sender=self.__class__, scope=scope)
         request_started.connect(close_old_connections)
         # Wrap FakePayload body_file to allow large read() in test environment.
         request = ASGIRequest(scope, LimitedStream(body_file, len(body_file)))
