@@ -94,3 +94,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     return False
                 raise
             return True
+
+    @cached_property
+    def has_json_object_function(self):
+        # Oracle < 18 supports JSON_OBJECT() but it's not fully functional.
+        return self.connection.oracle_version >= (18,)

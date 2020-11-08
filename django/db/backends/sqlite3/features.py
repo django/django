@@ -79,3 +79,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return True
 
     can_introspect_json_field = property(operator.attrgetter('supports_json_field'))
+    has_json_object_function = property(operator.attrgetter('supports_json_field'))

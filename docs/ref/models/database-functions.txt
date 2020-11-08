@@ -148,6 +148,29 @@ and ``comment.modified``.
     The PostgreSQL behavior can be emulated using ``Coalesce`` if you know
     a sensible minimum value to provide as a default.
 
+``JSONObject``
+--------------
+
+.. class:: JSONObject(**fields)
+
+.. versionadded:: 3.2
+
+Takes a list of key-value pairs and returns a JSON object containing those
+pairs.
+
+Usage example::
+
+    >>> from django.db.models import F
+    >>> from django.db.models.functions import JSONObject, Lower
+    >>> Author.objects.create(name='Margaret Smith', alias='msmith', age=25)
+    >>> author = Author.objects.annotate(json_object=JSONObject(
+    ...     name=Lower('name'),
+    ...     alias='alias',
+    ...     age=F('age') * 2,
+    ... )).get()
+    >>> author.json_object
+    {'name': 'margaret smith', 'alias': 'msmith', 'age': 50}
+
 ``Least``
 ---------
 

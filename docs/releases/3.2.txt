@@ -367,6 +367,8 @@ Models
   block exits without errors. A nested atomic block marked as durable will
   raise a ``RuntimeError``.
 
+* Added the :class:`~django.db.models.functions.JSONObject` database function.
+
 Pagination
 ~~~~~~~~~~
 

@@ -306,6 +306,8 @@ class BaseDatabaseFeatures:
     # Does value__d__contains={'f': 'g'} (without a list around the dict) match
     # {'d': [{'f': 'g'}]}?
     json_key_contains_list_matching_requires_list = False
+    # Does the backend support JSONObject() database function?
+    has_json_object_function = True
 
     # Does the backend support column collations?
     supports_collation_on_charfield = True
