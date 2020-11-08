@@ -505,12 +505,8 @@ class TestFixtures(TestCase):
         error instead of an operation error for invalid FKs when table names
         are SQL keywords.
         """
-        message = (
-            "Problem installing fixtures: The row in table 'order' with primary key '1' has an "
-            "invalid foreign key: order.customer_id contains a value '1' that does not have a "
-            "corresponding value in fixtures_regress_person.id."
-        )
-        with self.assertRaisesMessage(IntegrityError, message):
+        message_regex = '^Problem installing fixtures'
+        with self.assertRaisesRegex(IntegrityError, message_regex):
             management.call_command(
                 'loaddata',
                 'order_invalid_fk',
