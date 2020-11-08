@@ -142,6 +142,8 @@ configured:
   lead to corruption of your data because its
   :setting:`LOCATION <CACHES-LOCATION>` matches/is inside/contains
   :setting:`MEDIA_ROOT`/:setting:`STATIC_ROOT`/:setting:`STATICFILES_DIRS`.
+* **caches.W003**: Your ``<cache>`` cache :setting:`LOCATION <CACHES-LOCATION>`
+  is relative. Use an absolute path instead.
 
 Database
 --------

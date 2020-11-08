@@ -3,6 +3,7 @@ import pathlib
 from django.core.checks import Warning
 from django.core.checks.caches import (
     E001, check_cache_location_not_exposed, check_default_cache_is_configured,
+    check_file_based_cache_is_absolute,
 )
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
@@ -89,3 +90,29 @@ class CheckCacheLocationTest(SimpleTestCase):
             settings = self.get_settings(setting, root / 'cache', root / 'other')
             with self.subTest(setting=setting), self.settings(**settings):
                 self.assertEqual(check_cache_location_not_exposed(None), [])
+
+
+class CheckCacheAbsolutePath(SimpleTestCase):
+    def test_absolute_path(self):
+        with self.settings(CACHES={
+            'default': {
+                'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+                'LOCATION': pathlib.Path.cwd() / 'cache',
+            },
+        }):
+            self.assertEqual(check_file_based_cache_is_absolute(None), [])
+
+    def test_relative_path(self):
+        with self.settings(CACHES={
+            'default': {
+                'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+                'LOCATION': 'cache',
+            },
+        }):
+            self.assertEqual(check_file_based_cache_is_absolute(None), [
+                Warning(
+                    "Your 'default' cache LOCATION path is relative. Use an "
+                    "absolute path instead.",
+                    id='caches.W003',
+                ),
+            ])
