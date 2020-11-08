@@ -238,6 +238,15 @@ class Thingy(models.Model):
     name = models.CharField(max_length=255)
 
 
+# Model with table purposely named as a SQL reserved keyword
+class Order(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    customer = models.ForeignKey(Person, models.SET_NULL, null=True)
+
+    class Meta:
+        db_table = 'order'
+
+
 class M2MToSelf(models.Model):
     parent = models.ManyToManyField("self", blank=True)
 

@@ -21,8 +21,8 @@ from .models import (
     M2MCircular1ThroughCA, M2MCircular2ThroughAB, M2MComplexA, M2MComplexB,
     M2MComplexCircular1A, M2MComplexCircular1B, M2MComplexCircular1C,
     M2MComplexCircular2A, M2MComplexCircular2B, M2MSimpleA, M2MSimpleB,
-    M2MSimpleCircularA, M2MSimpleCircularB, M2MThroughAB, NKChild, Parent,
-    Person, RefToNKChild, Store, Stuff, Thingy, Widget,
+    M2MSimpleCircularA, M2MSimpleCircularB, M2MThroughAB, NKChild, Order,
+    Parent, Person, RefToNKChild, Store, Stuff, Thingy, Widget,
 )
 
 _cur_dir = os.path.dirname(os.path.abspath(__file__))
@@ -484,6 +484,38 @@ class TestFixtures(TestCase):
             'm2mtoself.json',
             verbosity=0,
         )
+
+    def test_loaddata_when_table_name_is_a_reserved_sql_keyword(self):
+        """
+        Regression test for ticket #32158 -- loaddata shouldn't crash when
+        table names are SQL keywords.
+        """
+        management.call_command(
+            'loaddata',
+            'order',
+            verbosity=0,
+        )
+        order = Order.objects.all()[0]
+        self.assertEqual(order.id, 1)
+        self.assertEqual(order.name, 'Order 1')
+
+    def test_loaddata_raises_integrity_error_for_invalid_fk_when_table_name_is_a_sql_keyword(self):
+        """
+        Regression test for ticket #32158 -- loaddata should raise an integrity
+        error instead of an operation error for invalid FKs when table names
+        are SQL keywords.
+        """
+        message = (
+            "Problem installing fixtures: The row in table 'order' with primary key '1' has an "
+            "invalid foreign key: order.customer_id contains a value '1' that does not have a "
+            "corresponding value in fixtures_regress_person.id."
+        )
+        with self.assertRaisesMessage(IntegrityError, message):
+            management.call_command(
+                'loaddata',
+                'order_invalid_fk',
+                verbosity=0,
+            )
 
     @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures_1'),
                                      os.path.join(_cur_dir, 'fixtures_1')])
