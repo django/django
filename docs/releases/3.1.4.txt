@@ -14,3 +14,6 @@ Bugfixes
 
 * Fixed passing extra HTTP headers to ``AsyncRequestFactory`` request methods
   (:ticket:`32159`).
+
+* Fixed crash of key transforms for :class:`~django.db.models.JSONField` on
+  PostgreSQL when using on a ``Subquery()`` annotation (:ticket:`32182`).
