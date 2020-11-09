@@ -10,6 +10,12 @@ from django.test.utils import captured_stdin, captured_stdout
 
 class ShellCommandTestCase(SimpleTestCase):
     script_globals = 'print("__name__" in globals())'
+    script_with_inline_function = (
+        'import django\n'
+        'def f():\n'
+        '    print(django.__version__)\n'
+        'f()'
+    )
 
     def test_command_option(self):
         with self.assertLogs('test', 'INFO') as cm:
@@ -26,6 +32,11 @@ class ShellCommandTestCase(SimpleTestCase):
         with captured_stdout() as stdout:
             call_command('shell', command=self.script_globals)
         self.assertEqual(stdout.getvalue().strip(), 'True')
+
+    def test_command_option_inline_function_call(self):
+        with captured_stdout() as stdout:
+            call_command('shell', command=self.script_with_inline_function)
+        self.assertEqual(stdout.getvalue().strip(), __version__)
 
     @unittest.skipIf(sys.platform == 'win32', "Windows select() doesn't support file descriptors.")
     @mock.patch('django.core.management.commands.shell.select')
@@ -47,6 +58,18 @@ class ShellCommandTestCase(SimpleTestCase):
             stdin.seek(0)
             call_command('shell')
         self.assertEqual(stdout.getvalue().strip(), 'True')
+
+    @unittest.skipIf(
+        sys.platform == 'win32',
+        "Windows select() doesn't support file descriptors.",
+    )
+    @mock.patch('django.core.management.commands.shell.select')  # [1]
+    def test_stdin_read_inline_function_call(self, select):
+        with captured_stdin() as stdin, captured_stdout() as stdout:
+            stdin.write(self.script_with_inline_function)
+            stdin.seek(0)
+            call_command('shell')
+        self.assertEqual(stdout.getvalue().strip(), __version__)
 
     @mock.patch('django.core.management.commands.shell.select.select')  # [1]
     @mock.patch.dict('sys.modules', {'IPython': None})
