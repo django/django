@@ -23,9 +23,6 @@ class BaseSpatialOperations:
     def select_extent(self):
         return self.select
 
-    # Does the spatial database have a geography type?
-    geography = False
-
     # Aggregates
     disallowed_aggregates = ()
 

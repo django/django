@@ -10,7 +10,7 @@ from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import modify_settings
 
 from ..test_data import TEST_DATA
-from ..utils import mariadb, postgis
+from ..utils import mariadb
 from .models import AllOGRFields
 
 
@@ -44,9 +44,10 @@ class InspectDbTests(TestCase):
         output = out.getvalue()
         if connection.features.supports_geometry_field_introspection:
             self.assertIn('point = models.PointField(dim=3)', output)
-            if postgis:
-                # Geography type is specific to PostGIS
+            if connection.features.supports_geography:
                 self.assertIn('pointg = models.PointField(geography=True, dim=3)', output)
+            else:
+                self.assertIn('pointg = models.PointField(dim=3)', output)
             self.assertIn('line = models.LineStringField(dim=3)', output)
             self.assertIn('poly = models.PolygonField(dim=3)', output)
         else:

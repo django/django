@@ -98,7 +98,6 @@ class ST_Polygon(Func):
 class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     name = 'postgis'
     postgis = True
-    geography = True
     geom_func_prefix = 'ST_'
 
     Adapter = PostGISAdapter

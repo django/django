@@ -14,6 +14,8 @@ class BaseSpatialFeatures:
     # Does the backend introspect GeometryField to its subtypes?
     supports_geometry_field_introspection = True
 
+    # Does the database have a geography type?
+    supports_geography = False
     # Does the backend support storing 3D geometries?
     supports_3d_storage = False
     # Reference implementation of 3D functions is:
