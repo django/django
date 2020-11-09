@@ -213,9 +213,6 @@ class Thing(models.Model):
         apps = new_apps
         db_table = 'drop'
 
-    def __str__(self):
-        return self.when
-
 
 class UniqueTest(models.Model):
     year = models.IntegerField()

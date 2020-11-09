@@ -20,18 +20,12 @@ class UserMembership(models.Model):
 class Person(models.Model):
     name = models.CharField(max_length=128)
 
-    def __str__(self):
-        return self.name
-
 
 class Group(models.Model):
     name = models.CharField(max_length=128)
     # Membership object defined as a class
     members = models.ManyToManyField(Person, through=Membership)
     user_members = models.ManyToManyField(User, through='UserMembership')
-
-    def __str__(self):
-        return self.name
 
 
 # Using to_field on the through model
@@ -56,9 +50,6 @@ class Driver(models.Model):
 class CarDriver(models.Model):
     car = models.ForeignKey('Car', models.CASCADE, to_field='make')
     driver = models.ForeignKey('Driver', models.CASCADE, to_field='name')
-
-    def __str__(self):
-        return "pk=%s car=%s driver=%s" % (str(self.pk), self.car, self.driver)
 
 
 # Through models using multi-table inheritance

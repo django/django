@@ -9,16 +9,10 @@ class Square(models.Model):
     root = models.IntegerField()
     square = models.PositiveIntegerField()
 
-    def __str__(self):
-        return "%s ** 2 == %s" % (self.root, self.square)
-
 
 class Person(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
-
-    def __str__(self):
-        return '%s %s' % (self.first_name, self.last_name)
 
 
 class SchoolClass(models.Model):
@@ -53,9 +47,6 @@ class Reporter(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
 
-    def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
-
 
 class ReporterProxy(Reporter):
     class Meta:
@@ -73,9 +64,6 @@ class Article(models.Model):
         related_name='reporter_proxy',
     )
 
-    def __str__(self):
-        return self.headline
-
 
 class Item(models.Model):
     name = models.CharField(max_length=30)
@@ -83,23 +71,14 @@ class Item(models.Model):
     time = models.TimeField()
     last_modified = models.DateTimeField()
 
-    def __str__(self):
-        return self.name
-
 
 class Object(models.Model):
     related_objects = models.ManyToManyField("self", db_constraint=False, symmetrical=False)
     obj_ref = models.ForeignKey('ObjectReference', models.CASCADE, null=True)
 
-    def __str__(self):
-        return str(self.id)
-
 
 class ObjectReference(models.Model):
     obj = models.ForeignKey(Object, models.CASCADE, db_constraint=False)
-
-    def __str__(self):
-        return str(self.obj_id)
 
 
 class ObjectSelfReference(models.Model):

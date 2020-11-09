@@ -9,23 +9,14 @@ class SelfRefer(models.Model):
     references = models.ManyToManyField('self')
     related = models.ManyToManyField('self')
 
-    def __str__(self):
-        return self.name
-
 
 class Tag(models.Model):
     name = models.CharField(max_length=10)
-
-    def __str__(self):
-        return self.name
 
 
 # Regression for #11956 -- a many to many to the base class
 class TagCollection(Tag):
     tags = models.ManyToManyField(Tag, related_name='tag_collections')
-
-    def __str__(self):
-        return self.name
 
 
 # A related_name is required on one of the ManyToManyField entries here because
@@ -34,9 +25,6 @@ class Entry(models.Model):
     name = models.CharField(max_length=10)
     topics = models.ManyToManyField(Tag)
     related = models.ManyToManyField(Tag, related_name="similar")
-
-    def __str__(self):
-        return self.name
 
 
 # Two models both inheriting from a base model with a self-referential m2m field
@@ -51,9 +39,6 @@ class SelfReferChildSibling(SelfRefer):
 # Many-to-Many relation between models, where one of the PK's isn't an Autofield
 class Line(models.Model):
     name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
 
 
 class Worksheet(models.Model):

@@ -23,9 +23,6 @@ class Category(models.Model):
     class Meta:
         ordering = ('title',)
 
-    def __str__(self):
-        return self.title
-
 
 class Article(models.Model):
     headline = models.CharField(max_length=100, default='Default headline')
@@ -43,9 +40,6 @@ class Blog(models.Model):
     featured = models.ForeignKey(Article, models.CASCADE, related_name='fixtures_featured_set')
     articles = models.ManyToManyField(Article, blank=True,
                                       related_name='fixtures_articles_set')
-
-    def __str__(self):
-        return self.name
 
 
 class Tag(models.Model):
@@ -70,9 +64,6 @@ class Person(models.Model):
 
     class Meta:
         ordering = ('name',)
-
-    def __str__(self):
-        return self.name
 
     def natural_key(self):
         return (self.name,)
@@ -132,9 +123,6 @@ class NaturalKeyThing(models.Model):
 
     def natural_key(self):
         return (self.key,)
-
-    def __str__(self):
-        return self.key
 
 
 class CircularA(models.Model):

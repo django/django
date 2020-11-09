@@ -42,9 +42,6 @@ class Count(models.Model):
     num = models.PositiveSmallIntegerField()
     parent = models.ForeignKey('self', models.CASCADE, null=True)
 
-    def __str__(self):
-        return str(self.num)
-
 
 class Event(models.Model):
     date = models.DateTimeField(auto_now_add=True)

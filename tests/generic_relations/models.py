@@ -54,9 +54,6 @@ class Comparison(AbstractComparison):
 
     other_obj = GenericForeignKey(ct_field="content_type2", fk_field="object_id2")
 
-    def __str__(self):
-        return "%s is %s than %s" % (self.first_obj, self.comparative, self.other_obj)
-
 
 class Animal(models.Model):
     common_name = models.CharField(max_length=150)
@@ -77,9 +74,6 @@ class Vegetable(models.Model):
 
     tags = GenericRelation(TaggedItem)
 
-    def __str__(self):
-        return self.name
-
 
 class Carrot(Vegetable):
     pass
@@ -90,9 +84,6 @@ class Mineral(models.Model):
     hardness = models.PositiveSmallIntegerField()
 
     # note the lack of an explicit GenericRelation here...
-
-    def __str__(self):
-        return self.name
 
 
 class GeckoManager(models.Manager):

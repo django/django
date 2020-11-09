@@ -16,9 +16,6 @@ class Category(models.Model):
     class Meta:
         ordering = ('name',)
 
-    def __str__(self):
-        return self.name
-
 
 class Article(models.Model):
     headline = models.CharField(max_length=50)
@@ -28,6 +25,3 @@ class Article(models.Model):
 
     class Meta:
         ordering = ('pub_date',)
-
-    def __str__(self):
-        return self.headline

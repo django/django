@@ -12,9 +12,6 @@ class Artist(models.Model):
         verbose_name = 'professional artist'
         verbose_name_plural = 'professional artists'
 
-    def __str__(self):
-        return self.name
-
     def get_absolute_url(self):
         return reverse('artist_detail', kwargs={'pk': self.id})
 
@@ -25,9 +22,6 @@ class Author(models.Model):
 
     class Meta:
         ordering = ['name']
-
-    def __str__(self):
-        return self.name
 
 
 class DoesNotExistQuerySet(QuerySet):
@@ -50,9 +44,6 @@ class Book(models.Model):
 
     class Meta:
         ordering = ['-pubdate']
-
-    def __str__(self):
-        return self.name
 
 
 class Page(models.Model):

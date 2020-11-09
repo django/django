@@ -42,9 +42,6 @@ class District(models.Model):
     city = models.ForeignKey(City, models.CASCADE, related_name='districts', null=True)
     name = models.CharField(max_length=50)
 
-    def __str__(self):
-        return self.name
-
 
 # If ticket #1578 ever slips back in, these models will not be able to be
 # created (the field names being lowercased versions of their opposite classes
@@ -85,9 +82,6 @@ class ToFieldChild(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=20)
 
-    def __str__(self):
-        return self.name
-
 
 class Record(models.Model):
     category = models.ForeignKey(Category, models.CASCADE)
@@ -96,9 +90,6 @@ class Record(models.Model):
 class Relation(models.Model):
     left = models.ForeignKey(Record, models.CASCADE, related_name='left_set')
     right = models.ForeignKey(Record, models.CASCADE, related_name='right_set')
-
-    def __str__(self):
-        return "%s - %s" % (self.left.category.name, self.right.category.name)
 
 
 # Test related objects visibility.

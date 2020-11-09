@@ -12,9 +12,6 @@ class Alarm(models.Model):
     desc = models.CharField(max_length=100)
     time = models.TimeField()
 
-    def __str__(self):
-        return '%s (%s)' % (self.time, self.desc)
-
 
 class Author(models.Model):
     name = models.CharField(max_length=100)
@@ -71,9 +68,6 @@ class Season(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['year'], name='season_year_unique'),
         ]
-
-    def __str__(self):
-        return str(self.year)
 
 
 class Game(models.Model):

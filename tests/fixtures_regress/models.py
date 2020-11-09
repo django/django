@@ -11,9 +11,6 @@ class Animal(models.Model):
     # use a non-default name for the default manager
     specimens = models.Manager()
 
-    def __str__(self):
-        return self.name
-
 
 class Plant(models.Model):
     name = models.CharField(max_length=150)
@@ -26,9 +23,6 @@ class Plant(models.Model):
 class Stuff(models.Model):
     name = models.CharField(max_length=20, null=True)
     owner = models.ForeignKey(User, models.SET_NULL, null=True)
-
-    def __str__(self):
-        return self.name + ' is owned by ' + str(self.owner)
 
 
 class Absolute(models.Model):
@@ -82,9 +76,6 @@ class Widget(models.Model):
     class Meta:
         ordering = ('name',)
 
-    def __str__(self):
-        return self.name
-
 
 class WidgetProxy(Widget):
     class Meta:
@@ -106,9 +97,6 @@ class Store(models.Model):
     class Meta:
         ordering = ('name',)
 
-    def __str__(self):
-        return self.name
-
     def natural_key(self):
         return (self.name,)
 
@@ -120,9 +108,6 @@ class Person(models.Model):
 
     class Meta:
         ordering = ('name',)
-
-    def __str__(self):
-        return self.name
 
     # Person doesn't actually have a dependency on store, but we need to define
     # one to test the behavior of the dependency resolution algorithm.
@@ -159,21 +144,11 @@ class NKChild(Parent):
     def natural_key(self):
         return (self.data,)
 
-    def __str__(self):
-        return 'NKChild %s:%s' % (self.name, self.data)
-
 
 class RefToNKChild(models.Model):
     text = models.CharField(max_length=10)
     nk_fk = models.ForeignKey(NKChild, models.CASCADE, related_name='ref_fks')
     nk_m2m = models.ManyToManyField(NKChild, related_name='ref_m2ms')
-
-    def __str__(self):
-        return '%s: Reference to %s [%s]' % (
-            self.text,
-            self.nk_fk,
-            ', '.join(str(o) for o in self.nk_m2m.all())
-        )
 
 
 # ome models with pathological circular dependencies
@@ -252,9 +227,6 @@ class BaseNKModel(models.Model):
 
     class Meta:
         abstract = True
-
-    def __str__(self):
-        return self.data
 
     def natural_key(self):
         return (self.data,)

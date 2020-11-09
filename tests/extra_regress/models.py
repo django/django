@@ -31,6 +31,3 @@ class TestObject(models.Model):
     first = models.CharField(max_length=20)
     second = models.CharField(max_length=20)
     third = models.CharField(max_length=20)
-
-    def __str__(self):
-        return 'TestObject: %s,%s,%s' % (self.first, self.second, self.third)

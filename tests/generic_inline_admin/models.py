@@ -22,9 +22,6 @@ class Media(models.Model):
     description = models.CharField(max_length=100, blank=True)
     keywords = models.CharField(max_length=100, blank=True)
 
-    def __str__(self):
-        return self.url
-
 
 #
 # Generic inline with unique_together

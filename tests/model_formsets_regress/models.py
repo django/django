@@ -51,6 +51,3 @@ class Network(models.Model):
 class Host(models.Model):
     network = models.ForeignKey(Network, models.CASCADE)
     hostname = models.CharField(max_length=25)
-
-    def __str__(self):
-        return self.hostname

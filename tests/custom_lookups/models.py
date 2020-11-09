@@ -7,9 +7,6 @@ class Author(models.Model):
     birthdate = models.DateField(null=True)
     average_rating = models.FloatField(null=True)
 
-    def __str__(self):
-        return self.name
-
 
 class Article(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)

@@ -41,16 +41,10 @@ class Company(models.Model):
     )
     based_in_eu = models.BooleanField(default=False)
 
-    def __str__(self):
-        return self.name
-
 
 class Number(models.Model):
     integer = models.BigIntegerField(db_column='the_integer')
     float = models.FloatField(null=True, db_column='the_float')
-
-    def __str__(self):
-        return '%i, %.3f' % (self.integer, self.float)
 
 
 class Experiment(models.Model):
@@ -73,24 +67,15 @@ class Result(models.Model):
     experiment = models.ForeignKey(Experiment, models.CASCADE)
     result_time = models.DateTimeField()
 
-    def __str__(self):
-        return "Result at %s" % self.result_time
-
 
 class Time(models.Model):
     time = models.TimeField(null=True)
-
-    def __str__(self):
-        return str(self.time)
 
 
 class SimulationRun(models.Model):
     start = models.ForeignKey(Time, models.CASCADE, null=True, related_name='+')
     end = models.ForeignKey(Time, models.CASCADE, null=True, related_name='+')
     midpoint = models.TimeField()
-
-    def __str__(self):
-        return "%s (%s to %s)" % (self.midpoint, self.start, self.end)
 
 
 class UUIDPK(models.Model):

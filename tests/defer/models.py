@@ -15,9 +15,6 @@ class Primary(models.Model):
     value = models.CharField(max_length=50)
     related = models.ForeignKey(Secondary, models.CASCADE)
 
-    def __str__(self):
-        return self.name
-
 
 class Child(Primary):
     pass

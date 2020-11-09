@@ -100,9 +100,6 @@ class Item(models.Model):
     name = models.CharField(max_length=10)
     child = models.ForeignKey(Child, models.SET_NULL, null=True)
 
-    def __str__(self):
-        return self.name
-
 # Models for testing bug #19870.
 
 

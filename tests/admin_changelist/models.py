@@ -32,16 +32,10 @@ class Musician(models.Model):
     name = models.CharField(max_length=30)
     age = models.IntegerField(null=True, blank=True)
 
-    def __str__(self):
-        return self.name
-
 
 class Group(models.Model):
     name = models.CharField(max_length=30)
     members = models.ManyToManyField(Musician, through='Membership')
-
-    def __str__(self):
-        return self.name
 
 
 class Concert(models.Model):

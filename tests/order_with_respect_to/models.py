@@ -16,9 +16,6 @@ class Answer(models.Model):
     class Meta:
         order_with_respect_to = 'question'
 
-    def __str__(self):
-        return self.text
-
 
 class Post(models.Model):
     title = models.CharField(max_length=200)
@@ -26,9 +23,6 @@ class Post(models.Model):
 
     class Meta:
         order_with_respect_to = "parent"
-
-    def __str__(self):
-        return self.title
 
 
 # order_with_respect_to points to a model with a OneToOneField primary key.

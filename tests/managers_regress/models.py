@@ -59,9 +59,6 @@ class Parent(models.Model):
 
     manager = OnlyFred()
 
-    def __str__(self):
-        return self.name
-
 
 # Managers from base classes are inherited and, if no manager is specified
 # *and* the parent has a manager specified, the first one (in the MRO) will
@@ -69,22 +66,13 @@ class Parent(models.Model):
 class Child1(AbstractBase1):
     data = models.CharField(max_length=25)
 
-    def __str__(self):
-        return self.data
-
 
 class Child2(AbstractBase1, AbstractBase2):
     data = models.CharField(max_length=25)
 
-    def __str__(self):
-        return self.data
-
 
 class Child3(AbstractBase1, AbstractBase3):
     data = models.CharField(max_length=25)
-
-    def __str__(self):
-        return self.data
 
 
 class Child4(AbstractBase1):
@@ -94,18 +82,12 @@ class Child4(AbstractBase1):
     # inherited.
     default = models.Manager()
 
-    def __str__(self):
-        return self.data
-
 
 class Child5(AbstractBase3):
     name = models.CharField(max_length=25)
 
     default = OnlyFred()
     objects = models.Manager()
-
-    def __str__(self):
-        return self.name
 
 
 class Child6(Child4):
@@ -120,9 +102,6 @@ class Child7(Parent):
 class RelatedModel(models.Model):
     test_gfk = GenericRelation('RelationModel', content_type_field='gfk_ctype', object_id_field='gfk_id')
     exact = models.BooleanField(null=True)
-
-    def __str__(self):
-        return str(self.pk)
 
 
 class RelationModel(models.Model):

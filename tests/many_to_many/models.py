@@ -15,16 +15,10 @@ class Publication(models.Model):
     class Meta:
         ordering = ('title',)
 
-    def __str__(self):
-        return self.title
-
 
 class Tag(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.name
 
 
 class NoDeletedArticleManager(models.Manager):
@@ -51,9 +45,6 @@ class Article(models.Model):
 
 class User(models.Model):
     username = models.CharField(max_length=20, unique=True)
-
-    def __str__(self):
-        return self.username
 
 
 class UserArticle(models.Model):

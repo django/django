@@ -69,9 +69,6 @@ class TaggedItem(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
-    def __str__(self):
-        return self.tag
-
 
 class Bookmark(models.Model):
     url = models.URLField()
@@ -83,6 +80,3 @@ class Bookmark(models.Model):
         ('', '-'),
     ]
     none_or_null = models.CharField(max_length=20, choices=CHOICES, blank=True, null=True)
-
-    def __str__(self):
-        return self.url

@@ -19,9 +19,6 @@ class Article(models.Model):
     class Meta:
         ordering = ('headline',)
 
-    def __str__(self):
-        return self.headline
-
 
 class Car(models.Model):
     make = models.CharField(max_length=100, null=True, unique=True)

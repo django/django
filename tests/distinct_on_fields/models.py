@@ -14,9 +14,6 @@ class Tag(models.Model):
     class Meta:
         ordering = ['name']
 
-    def __str__(self):
-        return self.name
-
 
 class Celebrity(models.Model):
     name = models.CharField("Name", max_length=20)
@@ -26,9 +23,6 @@ class Celebrity(models.Model):
         null=True,
         unique=True,
     )
-
-    def __str__(self):
-        return self.name
 
 
 class Fan(models.Model):
@@ -42,13 +36,7 @@ class Staff(models.Model):
     tags = models.ManyToManyField(Tag, through='StaffTag')
     coworkers = models.ManyToManyField('self')
 
-    def __str__(self):
-        return self.name
-
 
 class StaffTag(models.Model):
     staff = models.ForeignKey(Staff, models.CASCADE)
     tag = models.ForeignKey(Tag, models.CASCADE)
-
-    def __str__(self):
-        return "%s -> %s" % (self.tag, self.staff)

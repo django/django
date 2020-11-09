@@ -10,9 +10,6 @@ class Action(models.Model):
     name = models.CharField(max_length=50, primary_key=True)
     description = models.CharField(max_length=70)
 
-    def __str__(self):
-        return self.name
-
 
 class ActionAdmin(admin.ModelAdmin):
     """

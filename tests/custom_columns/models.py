@@ -27,9 +27,6 @@ class Author(models.Model):
         db_table = 'my_author_table'
         ordering = ('last_name', 'first_name')
 
-    def __str__(self):
-        return '%s %s' % (self.first_name, self.last_name)
-
 
 class Article(models.Model):
     Article_ID = models.AutoField(primary_key=True, db_column='Article ID')
@@ -45,6 +42,3 @@ class Article(models.Model):
 
     class Meta:
         ordering = ('headline',)
-
-    def __str__(self):
-        return self.headline

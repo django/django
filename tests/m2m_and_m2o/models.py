@@ -18,9 +18,6 @@ class Issue(models.Model):
     class Meta:
         ordering = ('num',)
 
-    def __str__(self):
-        return str(self.num)
-
 
 class StringReferenceModel(models.Model):
     others = models.ManyToManyField('StringReferenceModel')

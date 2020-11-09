@@ -34,9 +34,6 @@ class Tag(models.Model):
     class Meta:
         ordering = ['name']
 
-    def __str__(self):
-        return self.name
-
 
 class Note(models.Model):
     note = models.CharField(max_length=100)
@@ -47,17 +44,11 @@ class Note(models.Model):
     class Meta:
         ordering = ['note']
 
-    def __str__(self):
-        return self.note
-
 
 class Annotation(models.Model):
     name = models.CharField(max_length=10)
     tag = models.ForeignKey(Tag, models.CASCADE)
     notes = models.ManyToManyField(Note)
-
-    def __str__(self):
-        return self.name
 
 
 class DateTimePK(models.Model):
@@ -74,9 +65,6 @@ class ExtraInfo(models.Model):
     class Meta:
         ordering = ['info']
 
-    def __str__(self):
-        return self.info
-
 
 class Author(models.Model):
     name = models.CharField(max_length=10)
@@ -85,9 +73,6 @@ class Author(models.Model):
 
     class Meta:
         ordering = ['name']
-
-    def __str__(self):
-        return self.name
 
 
 class Item(models.Model):
@@ -101,16 +86,10 @@ class Item(models.Model):
     class Meta:
         ordering = ['-note', 'name']
 
-    def __str__(self):
-        return self.name
-
 
 class Report(models.Model):
     name = models.CharField(max_length=10)
     creator = models.ForeignKey(Author, models.SET_NULL, to_field='num', null=True)
-
-    def __str__(self):
-        return self.name
 
 
 class ReportComment(models.Model):
@@ -125,9 +104,6 @@ class Ranking(models.Model):
         # A complex ordering specification. Should stress the system a bit.
         ordering = ('author__extra__note', 'author__name', 'rank')
 
-    def __str__(self):
-        return '%d: %s' % (self.rank, self.author.name)
-
 
 class Cover(models.Model):
     title = models.CharField(max_length=50)
@@ -136,17 +112,11 @@ class Cover(models.Model):
     class Meta:
         ordering = ['item']
 
-    def __str__(self):
-        return self.title
-
 
 class Number(models.Model):
     num = models.IntegerField()
     other_num = models.IntegerField(null=True)
     another_num = models.IntegerField(null=True)
-
-    def __str__(self):
-        return str(self.num)
 
 # Symmetrical m2m field with a normal field using the reverse accessor name
 # ("valid").
@@ -212,9 +182,6 @@ class ManagedModel(models.Model):
     objects = CustomManager()
     normal_manager = models.Manager()
 
-    def __str__(self):
-        return self.data
-
 # An inter-related setup with multiple paths from Child to Detail.
 
 
@@ -266,9 +233,6 @@ class Celebrity(models.Model):
     name = models.CharField("Name", max_length=20)
     greatest_fan = models.ForeignKey("Fan", models.SET_NULL, null=True, unique=True)
 
-    def __str__(self):
-        return self.name
-
 
 class TvChef(Celebrity):
     pass
@@ -282,9 +246,6 @@ class Fan(models.Model):
 
 class LeafA(models.Model):
     data = models.CharField(max_length=10)
-
-    def __str__(self):
-        return self.data
 
 
 class LeafB(models.Model):
@@ -300,17 +261,11 @@ class ReservedName(models.Model):
     name = models.CharField(max_length=20)
     order = models.IntegerField()
 
-    def __str__(self):
-        return self.name
-
 # A simpler shared-foreign-key setup that can expose some problems.
 
 
 class SharedConnection(models.Model):
     data = models.CharField(max_length=10)
-
-    def __str__(self):
-        return self.data
 
 
 class PointerA(models.Model):
@@ -329,9 +284,6 @@ class SingleObject(models.Model):
     class Meta:
         ordering = ['name']
 
-    def __str__(self):
-        return self.name
-
 
 class RelatedObject(models.Model):
     single = models.ForeignKey(SingleObject, models.SET_NULL, null=True)
@@ -348,48 +300,30 @@ class Plaything(models.Model):
     class Meta:
         ordering = ['others']
 
-    def __str__(self):
-        return self.name
-
 
 class Article(models.Model):
     name = models.CharField(max_length=20)
     created = models.DateTimeField()
 
-    def __str__(self):
-        return self.name
-
 
 class Food(models.Model):
     name = models.CharField(max_length=20, unique=True)
-
-    def __str__(self):
-        return self.name
 
 
 class Eaten(models.Model):
     food = models.ForeignKey(Food, models.SET_NULL, to_field="name", null=True)
     meal = models.CharField(max_length=20)
 
-    def __str__(self):
-        return "%s at %s" % (self.food, self.meal)
-
 
 class Node(models.Model):
     num = models.IntegerField(unique=True)
     parent = models.ForeignKey("self", models.SET_NULL, to_field="num", null=True)
-
-    def __str__(self):
-        return str(self.num)
 
 # Bug #12252
 
 
 class ObjectA(models.Model):
     name = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.name
 
     def __iter__(self):
         # Ticket #23721
@@ -410,9 +344,6 @@ class ObjectB(models.Model):
     objecta = models.ForeignKey(ObjectA, models.CASCADE)
     num = models.PositiveIntegerField()
 
-    def __str__(self):
-        return self.name
-
 
 class ProxyObjectB(ObjectB):
     class Meta:
@@ -425,29 +356,17 @@ class ObjectC(models.Model):
     objectb = models.ForeignKey(ObjectB, models.SET_NULL, null=True)
     childobjecta = models.ForeignKey(ChildObjectA, models.SET_NULL, null=True, related_name='ca_pk')
 
-    def __str__(self):
-        return self.name
-
 
 class SimpleCategory(models.Model):
     name = models.CharField(max_length=25)
-
-    def __str__(self):
-        return self.name
 
 
 class SpecialCategory(SimpleCategory):
     special_name = models.CharField(max_length=35)
 
-    def __str__(self):
-        return self.name + " " + self.special_name
-
 
 class CategoryItem(models.Model):
     category = models.ForeignKey(SimpleCategory, models.CASCADE)
-
-    def __str__(self):
-        return "category item: " + str(self.category)
 
 
 class MixedCaseFieldCategoryItem(models.Model):
@@ -461,9 +380,6 @@ class MixedCaseDbColumnCategoryItem(models.Model):
 class OneToOneCategory(models.Model):
     new_name = models.CharField(max_length=15)
     category = models.OneToOneField(SimpleCategory, models.CASCADE)
-
-    def __str__(self):
-        return "one2one " + self.new_name
 
 
 class CategoryRelationship(models.Model):
@@ -506,9 +422,6 @@ class ModelA(models.Model):
 class Job(models.Model):
     name = models.CharField(max_length=20, unique=True)
 
-    def __str__(self):
-        return self.name
-
 
 class JobResponsibilities(models.Model):
     job = models.ForeignKey(Job, models.CASCADE, to_field='name')
@@ -519,9 +432,6 @@ class Responsibility(models.Model):
     description = models.CharField(max_length=20, unique=True)
     jobs = models.ManyToManyField(Job, through=JobResponsibilities,
                                   related_name='responsibilities')
-
-    def __str__(self):
-        return self.description
 
 # Models for disjunction join promotion low level testing.
 
@@ -549,9 +459,6 @@ class BaseA(models.Model):
 
 class Identifier(models.Model):
     name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
 
 
 class Program(models.Model):
@@ -597,9 +504,6 @@ class Order(models.Model):
     class Meta:
         ordering = ('pk',)
 
-    def __str__(self):
-        return str(self.pk)
-
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, models.CASCADE, related_name='items')
@@ -607,9 +511,6 @@ class OrderItem(models.Model):
 
     class Meta:
         ordering = ('pk',)
-
-    def __str__(self):
-        return str(self.pk)
 
 
 class BaseUser(models.Model):
@@ -621,22 +522,13 @@ class Task(models.Model):
     owner = models.ForeignKey(BaseUser, models.CASCADE, related_name='owner')
     creator = models.ForeignKey(BaseUser, models.CASCADE, related_name='creator')
 
-    def __str__(self):
-        return self.title
-
 
 class Staff(models.Model):
     name = models.CharField(max_length=10)
 
-    def __str__(self):
-        return self.name
-
 
 class StaffUser(BaseUser):
     staff = models.OneToOneField(Staff, models.CASCADE, related_name='user')
-
-    def __str__(self):
-        return self.staff
 
 
 class Ticket21203Parent(models.Model):
@@ -657,9 +549,6 @@ class Person(models.Model):
 class Company(models.Model):
     name = models.CharField(max_length=128)
     employees = models.ManyToManyField(Person, related_name='employers', through='Employment')
-
-    def __str__(self):
-        return self.name
 
 
 class Employment(models.Model):

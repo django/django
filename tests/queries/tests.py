@@ -497,8 +497,8 @@ class Queries1Tests(TestCase):
 
         # This is also a good select_related() test because there are multiple
         # Note entries in the SQL. The two Note items should be different.
-        self.assertEqual(repr(qs[0].note), '<Note: n2>')
-        self.assertEqual(repr(qs[0].creator.extra.note), '<Note: n1>')
+        self.assertEqual(qs[0].note, self.n2)
+        self.assertEqual(qs[0].creator.extra.note, self.n1)
 
     def test_ticket3037(self):
         self.assertSequenceEqual(
@@ -1780,12 +1780,12 @@ class Queries6Tests(TestCase):
         # Parallel iterators work.
         qs = Tag.objects.all()
         i1, i2 = iter(qs), iter(qs)
-        self.assertEqual(repr(next(i1)), '<Tag: t1>')
-        self.assertEqual(repr(next(i1)), '<Tag: t2>')
-        self.assertEqual(repr(next(i2)), '<Tag: t1>')
-        self.assertEqual(repr(next(i2)), '<Tag: t2>')
-        self.assertEqual(repr(next(i2)), '<Tag: t3>')
-        self.assertEqual(repr(next(i1)), '<Tag: t3>')
+        self.assertEqual(next(i1), self.t1)
+        self.assertEqual(next(i1), self.t2)
+        self.assertEqual(next(i2), self.t1)
+        self.assertEqual(next(i2), self.t2)
+        self.assertEqual(next(i2), self.t3)
+        self.assertEqual(next(i1), self.t3)
 
         qs = X.objects.all()
         self.assertFalse(qs)

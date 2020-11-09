@@ -19,9 +19,6 @@ class Child(models.Model):
 class Poet(models.Model):
     name = models.CharField(max_length=100)
 
-    def __str__(self):
-        return self.name
-
 
 class Poem(models.Model):
     poet = models.ForeignKey(Poet, models.CASCADE)
@@ -29,6 +26,3 @@ class Poem(models.Model):
 
     class Meta:
         unique_together = ('poet', 'name')
-
-    def __str__(self):
-        return self.name

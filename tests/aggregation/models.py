@@ -7,17 +7,11 @@ class Author(models.Model):
     friends = models.ManyToManyField('self', blank=True)
     rating = models.FloatField(null=True)
 
-    def __str__(self):
-        return self.name
-
 
 class Publisher(models.Model):
     name = models.CharField(max_length=255)
     num_awards = models.IntegerField()
     duration = models.DurationField(blank=True, null=True)
-
-    def __str__(self):
-        return self.name
 
 
 class Book(models.Model):
@@ -31,15 +25,9 @@ class Book(models.Model):
     publisher = models.ForeignKey(Publisher, models.CASCADE)
     pubdate = models.DateField()
 
-    def __str__(self):
-        return self.name
-
 
 class Store(models.Model):
     name = models.CharField(max_length=255)
     books = models.ManyToManyField(Book)
     original_opening = models.DateTimeField()
     friday_night_closing = models.TimeField()
-
-    def __str__(self):
-        return self.name

@@ -19,9 +19,6 @@ class Song(models.Model):
     band = models.ForeignKey(Band, models.CASCADE)
     featuring = models.ManyToManyField(Band, related_name='featured')
 
-    def __str__(self):
-        return self.name
-
 
 class Concert(models.Model):
     main_band = models.ForeignKey(Band, models.CASCADE, related_name='main_concerts')

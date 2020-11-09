@@ -25,9 +25,6 @@ class Person(models.Model):
     colleagues = models.ManyToManyField('self', symmetrical=True, through='Colleague')
     idols = models.ManyToManyField('self', symmetrical=False, related_name='stalkers')
 
-    def __str__(self):
-        return self.name
-
 
 class Colleague(models.Model):
     first = models.ForeignKey(Person, models.CASCADE)
