@@ -1,4 +1,5 @@
 import copy
+import datetime
 from unittest import mock
 
 from django.db import DEFAULT_DB_ALIAS, connection, connections
@@ -10,6 +11,7 @@ from django.test.utils import override_settings
 
 from ..models import (
     CircularA, CircularB, Object, ObjectReference, ObjectSelfReference,
+    SchoolClass,
 )
 
 
@@ -175,3 +177,14 @@ class TestDeserializeDbFromString(TransactionTestCase):
         obj_b = CircularB.objects.get()
         self.assertEqual(obj_a.obj, obj_b)
         self.assertEqual(obj_b.obj, obj_a)
+
+    def test_serialize_db_to_string_base_manager(self):
+        SchoolClass.objects.create(year=1000, last_updated=datetime.datetime.now())
+        with mock.patch('django.db.migrations.loader.MigrationLoader') as loader:
+            # serialize_db_to_string() serializes only migrated apps, so mark
+            # the backends app as migrated.
+            loader_instance = loader.return_value
+            loader_instance.migrated_apps = {'backends'}
+            data = connection.creation.serialize_db_to_string()
+        self.assertIn('"model": "backends.schoolclass"', data)
+        self.assertIn('"year": 1000', data)

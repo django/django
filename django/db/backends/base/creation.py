@@ -122,7 +122,7 @@ class BaseDatabaseCreation:
                             model._meta.can_migrate(self.connection) and
                             router.allow_migrate_model(self.connection.alias, model)
                         ):
-                            queryset = model._default_manager.using(
+                            queryset = model._base_manager.using(
                                 self.connection.alias,
                             ).order_by(model._meta.pk.name)
                             yield from queryset.iterator()
