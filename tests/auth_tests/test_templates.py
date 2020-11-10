@@ -56,7 +56,7 @@ class AuthTemplateTests(TestCase):
         # browser's password managers.
         self.assertContains(
             response,
-            '<input style="display: none;" autocomplete="username" value="jsmith">',
+            '<input class="hidden" autocomplete="username" value="jsmith">',
         )
 
     def test_PasswordResetCompleteView(self):
