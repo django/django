@@ -287,11 +287,12 @@ The directory path should be absolute -- that is, it should start at the root
 of your filesystem. It doesn't matter whether you put a slash at the end of the
 setting.
 
-Make sure the directory pointed-to by this setting exists and is readable and
-writable by the system user under which your Web server runs. Continuing the
-above example, if your server runs as the user ``apache``, make sure the
-directory ``/var/tmp/django_cache`` exists and is readable and writable by the
-user ``apache``.
+Make sure the directory pointed-to by this setting either exists and is
+readable and writable, or that it can be created by the system user under which
+your Web server runs. Continuing the above example, if your server runs as the
+user ``apache``, make sure the directory ``/var/tmp/django_cache`` exists and
+is readable and writable by the user ``apache``, or that it can be created by
+the user ``apache``.
 
 .. warning::
 
