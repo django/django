@@ -1170,7 +1170,7 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
         # When a site has multiple passwords in the browser's password manager,
         # a browser pop up asks which user the new password is for. To prevent
         # this, the username is added to the change password form.
-        self.assertContains(response, '<input type="text" name="username" value="super" style="display: none">')
+        self.assertContains(response, '<input type="text" name="username" value="super" class="hidden">')
 
     def test_extended_bodyclass_template_index(self):
         """
