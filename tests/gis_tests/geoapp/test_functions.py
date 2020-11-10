@@ -44,14 +44,13 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},'
             '"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
         )
-        # MySQL and Oracle ignore the crs option.
-        if mysql or oracle:
+        if 'crs' in connection.features.unsupported_geojson_options:
             del houston_json['crs']
             del chicago_json['crs']
-        # Oracle ignores also the bbox and precision options.
-        if oracle:
+        if 'bbox' in connection.features.unsupported_geojson_options:
             del chicago_json['bbox']
             del victoria_json['bbox']
+        if 'precision' in connection.features.unsupported_geojson_options:
             chicago_json['coordinates'] = [-87.650175, 41.850385]
 
         # Precision argument should only be an integer

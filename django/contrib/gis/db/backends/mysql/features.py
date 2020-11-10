@@ -14,6 +14,7 @@ class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
     supports_transform = False
     supports_null_geometries = False
     supports_num_points_poly = False
+    unsupported_geojson_options = {'crs'}
 
     @cached_property
     def supports_empty_geometry_collection(self):

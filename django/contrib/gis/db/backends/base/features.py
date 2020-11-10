@@ -51,6 +51,9 @@ class BaseSpatialFeatures:
     # Can SchemaEditor alter geometry fields?
     can_alter_geometry_field = True
 
+    # Set of options that AsGeoJSON() doesn't support.
+    unsupported_geojson_options = {}
+
     @property
     def supports_bbcontains_lookup(self):
         return 'bbcontains' in self.connection.ops.gis_operators
