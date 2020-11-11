@@ -525,7 +525,7 @@ class Query(BaseExpression):
     def has_filters(self):
         return self.where
 
-    def exists(self):
+    def exists(self, using, limit=True):
         q = self.clone()
         if not q.distinct:
             if q.group_by is True:
@@ -534,14 +534,21 @@ class Query(BaseExpression):
                 # SELECT clause which is about to be cleared.
                 q.set_group_by(allow_aliases=False)
             q.clear_select_clause()
+        if q.combined_queries and q.combinator == 'union':
+            limit_combined = connections[using].features.supports_slicing_ordering_in_compound
+            q.combined_queries = tuple(
+                combined_query.exists(using, limit=limit_combined)
+                for combined_query in q.combined_queries
+            )
         q.clear_ordering(True)
-        q.set_limits(high=1)
+        if limit:
+            q.set_limits(high=1)
         q.add_extra({'a': 1}, None, None, None, None, None)
         q.set_extra_mask(['a'])
         return q
 
     def has_results(self, using):
-        q = self.exists()
+        q = self.exists(using)
         compiler = q.get_compiler(using=using)
         return compiler.has_results()
 
