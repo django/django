@@ -1863,10 +1863,44 @@ color-coded output if your terminal supports ANSI-colored output. It
 won't use the color codes if you're piping the command's output to
 another program unless the :option:`--force-color` option is used.
 
-Under Windows, the native console doesn't support ANSI escape sequences so by
-default there is no color output. But you can install the `ANSICON`_
-third-party tool, the Django commands will detect its presence and will make
-use of its services to color output just like on Unix-based platforms.
+Windows support
+~~~~~~~~~~~~~~~
+
+On Windows 10, the `Windows Terminal`_ application, `VS Code`_, and PowerShell
+(where virtual terminal processing is enabled) allow colored output, and are
+supported by default.
+
+Under Windows, the legacy ``cmd.exe`` native console doesn't support ANSI
+escape sequences so by default there is no color output. In this case either of
+two third-party libraries are needed:
+
+* Install colorama_, a Python package that translates ANSI color codes into
+  Windows API calls. Django commands will detect its presence and will make use
+  of its services to color output just like on Unix-based platforms.
+  ``colorama`` can be installed via pip::
+
+    ...\> py -m pip install colorama
+
+* Install `ANSICON`_, a third-party tool that allows ``cmd.exe`` to process
+  ANSI color codes. Django commands will detect its presence and will make use
+  of its services to color output just like on Unix-based platforms.
+
+Other modern terminal environments on Windows, that support terminal colors,
+but which are not automatically detected as supported by Django, may "fake" the
+installation of ``ANSICON`` by setting the appropriate environmental variable,
+``ANSICON="on"``.
+
+.. versionchanged:: 3.2
+
+    Updated support for syntax coloring on Windows.
+
+.. _`Windows Terminal`: https://www.microsoft.com/en-us/p/windows-terminal-preview/9n0dx20hk701
+.. _`VS Code`: https://code.visualstudio.com
+.. _ANSICON: http://adoxa.altervista.org/ansicon/
+.. _colorama: https://pypi.org/project/colorama/
+
+Custom colors
+~~~~~~~~~~~~~
 
 The colors used for syntax highlighting can be customized. Django
 ships with three color palettes:
@@ -1955,8 +1989,6 @@ palette will be loaded. So::
 would specify the use of all the colors in the light color palette,
 *except* for the colors for errors and notices which would be
 overridden as specified.
-
-.. _ANSICON: http://adoxa.altervista.org/ansicon/
 
 Bash completion
 ---------------

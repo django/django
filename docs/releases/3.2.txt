@@ -272,6 +272,11 @@ Management Commands
   prior to executing the command. In previous versions, either all or none
   of the system checks were performed.
 
+* Support for colored terminal output on Windows is updated. Various modern
+  terminal environments are automatically detected, and the options for
+  enabling support in other cases are improved. See :ref:`syntax-coloring` for
+  more details.
+
 Migrations
 ~~~~~~~~~~
 
