@@ -65,7 +65,8 @@ class SessionMiddleware(MiddlewareMixin):
                             "request completed. The user may have logged "
                             "out in a concurrent request, for example."
                         )
-                    response.set_cookie(
+                    self.set_cookie(
+                        response,
                         settings.SESSION_COOKIE_NAME,
                         request.session.session_key, max_age=max_age,
                         expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
@@ -75,3 +76,6 @@ class SessionMiddleware(MiddlewareMixin):
                         samesite=settings.SESSION_COOKIE_SAMESITE,
                     )
         return response
+
+    def set_cookie(self, response, *args, **kwargs):
+        response.set_cookie(*args, **kwargs)
