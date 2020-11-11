@@ -9,6 +9,7 @@ from django.test.utils import captured_stdin, captured_stdout
 
 
 class ShellCommandTestCase(SimpleTestCase):
+    script_globals = 'print("__name__" in globals())'
 
     def test_command_option(self):
         with self.assertLogs('test', 'INFO') as cm:
@@ -21,6 +22,11 @@ class ShellCommandTestCase(SimpleTestCase):
             )
         self.assertEqual(cm.records[0].getMessage(), __version__)
 
+    def test_command_option_globals(self):
+        with captured_stdout() as stdout:
+            call_command('shell', command=self.script_globals)
+        self.assertEqual(stdout.getvalue().strip(), 'True')
+
     @unittest.skipIf(sys.platform == 'win32', "Windows select() doesn't support file descriptors.")
     @mock.patch('django.core.management.commands.shell.select')
     def test_stdin_read(self, select):
@@ -29,6 +35,18 @@ class ShellCommandTestCase(SimpleTestCase):
             stdin.seek(0)
             call_command('shell')
         self.assertEqual(stdout.getvalue().strip(), '100')
+
+    @unittest.skipIf(
+        sys.platform == 'win32',
+        "Windows select() doesn't support file descriptors.",
+    )
+    @mock.patch('django.core.management.commands.shell.select')  # [1]
+    def test_stdin_read_globals(self, select):
+        with captured_stdin() as stdin, captured_stdout() as stdout:
+            stdin.write(self.script_globals)
+            stdin.seek(0)
+            call_command('shell')
+        self.assertEqual(stdout.getvalue().strip(), 'True')
 
     @mock.patch('django.core.management.commands.shell.select.select')  # [1]
     @mock.patch.dict('sys.modules', {'IPython': None})
