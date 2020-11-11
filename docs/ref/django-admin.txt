@@ -1890,15 +1890,14 @@ but which are not automatically detected as supported by Django, may "fake" the
 installation of ``ANSICON`` by setting the appropriate environmental variable,
 ``ANSICON="on"``.
 
-
-.. _`Windows Terminal`: https://www.microsoft.com/en-us/p/windows-terminal-preview/9n0dx20hk701
-.. _VS Code: https://code.visualstudio.com
-.. _ANSICON: http://adoxa.altervista.org/ansicon/
-.. _colorama: https://pypi.org/project/colorama/
-
 .. versionchanged:: 3.2
 
     Updated support for syntax coloring on Windows.
+
+.. _`Windows Terminal`: https://www.microsoft.com/en-us/p/windows-terminal-preview/9n0dx20hk701
+.. _`VS Code`: https://code.visualstudio.com
+.. _ANSICON: http://adoxa.altervista.org/ansicon/
+.. _colorama: https://pypi.org/project/colorama/
 
 Custom colors
 ~~~~~~~~~~~~~

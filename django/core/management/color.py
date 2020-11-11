@@ -22,16 +22,13 @@ def supports_color():
     Return True if the running system's terminal supports color,
     and False otherwise.
     """
-
     def vt_codes_enabled_in_windows_registry():
         """
         Check the Windows Registry to see if VT code handling has been enabled
-        by default.
+        by default, see https://superuser.com/a/1300251/447564.
         """
-        # see https://superuser.com/a/1300251/447564
-
         try:
-            # winreg is only available on Windows
+            # winreg is only available on Windows.
             import winreg
         except ImportError:
             return False
