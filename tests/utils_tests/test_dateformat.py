@@ -169,3 +169,15 @@ class DateFormatTests(SimpleTestCase):
     def test_format_before_1000(self):
         birthday_of_aryabhata = datetime(476, 9, 8, 5, 00)
         self.assertEqual(dateformat.format(birthday_of_aryabhata, "d/m/y"), "08/09/76")
+
+    def test_format_before_100(self):
+        some_date_i_had_no_idea_for = datetime(42, 4, 2, 4, 2)
+        self.assertEqual(
+            dateformat.format(some_date_i_had_no_idea_for, "d/m/y"), "02/04/42"
+        )
+
+    def test_format_before_10(self):
+        alternative_birthdate_christmas = datetime(4, 9, 11, 5, 00)
+        self.assertEqual(
+            dateformat.format(alternative_birthdate_christmas, "d/m/y"), "11/09/04"
+        )
