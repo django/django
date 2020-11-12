@@ -1283,7 +1283,7 @@ table. Example::
     >>> b = Blog.objects.get(pk=1)
 
     # Update all the headlines belonging to this Blog.
-    >>> Entry.objects.select_related().filter(blog=b).update(headline='Everything is the same')
+    >>> Entry.objects.filter(blog=b).update(headline='Everything is the same')
 
 Be aware that the ``update()`` method is converted directly to an SQL
 statement. It is a bulk operation for direct updates. It doesn't run any
