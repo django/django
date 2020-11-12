@@ -148,7 +148,9 @@ class FunctionTypeSerializer(BaseSerializer):
             return "%s.%s.%s" % (module, klass.__name__, self.value.__name__), {"import %s" % module}
         # Further error checking
         if self.value.__name__ == '<lambda>':
-            raise ValueError("Cannot serialize function: lambda")
+            app_name = self.value.__module__
+            model = self.value.__qualname__.split('.')[0]
+            raise ValueError("Error during serializing %s.%s: Cannot serialize function: lambda" % (app_name, model))
         if self.value.__module__ is None:
             raise ValueError("Cannot serialize function %r: No module" % self.value)
 
@@ -198,10 +200,7 @@ class IterableSerializer(BaseSerializer):
 class ModelFieldSerializer(DeconstructableSerializer):
     def serialize(self):
         attr_name, path, args, kwargs = self.value.deconstruct()
-        try:
-            return self.serialize_deconstructed(path, args, kwargs)
-        except ValueError as e:
-            raise ValueError(f'Error during {self.value} serializing: {e}') from e
+        return self.serialize_deconstructed(path, args, kwargs)
 
 
 class ModelManagerSerializer(DeconstructableSerializer):

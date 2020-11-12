@@ -30,8 +30,7 @@ class Unserializable:
     pass
 
 
-class MigratedModel(models.Model):
-    name = models.CharField(max_length=255)
+class LambdaModel(models.Model):
     unserializable_field = models.CharField(default=lambda: 'Not serializable')
 
     class Meta:
