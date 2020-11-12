@@ -100,11 +100,7 @@ class TimeFormat(Formatter):
 
     def g(self):
         "Hour, 12-hour format without leading zeros; i.e. '1' to '12'"
-        if self.data.hour == 0:
-            return 12
-        if self.data.hour > 12:
-            return self.data.hour - 12
-        return self.data.hour
+        return self.data.hour % 12 or 12
 
     def G(self):
         "Hour, 24-hour format without leading zeros; i.e. '0' to '23'"
