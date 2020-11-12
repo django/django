@@ -178,3 +178,19 @@ class DateFormatTests(SimpleTestCase):
                     dateformat.format(datetime(year, 9, 8, 5, 0), 'y'),
                     expected_date,
                 )
+
+    def test_twelve_hour_format(self):
+        tests = [
+            (0, '12'),
+            (1, '1'),
+            (11, '11'),
+            (12, '12'),
+            (13, '1'),
+            (23, '11'),
+        ]
+        for hour, expected in tests:
+            with self.subTest(hour=hour):
+                self.assertEqual(
+                    dateformat.format(datetime(2000, 1, 1, hour), 'g'),
+                    expected,
+                )
