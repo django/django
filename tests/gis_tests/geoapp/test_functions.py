@@ -12,7 +12,7 @@ from django.db import NotSupportedError, connection
 from django.db.models import IntegerField, Sum, Value
 from django.test import TestCase, skipUnlessDBFeature
 
-from ..utils import FuncTestMixin, mariadb, mysql, oracle, postgis, spatialite
+from ..utils import FuncTestMixin, mariadb, mysql, oracle, postgis
 from .models import City, Country, CountryWebMercator, State, Track
 
 
@@ -295,11 +295,10 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.annotate(inter=functions.Intersection('mpoly', geom))
         for c in qs:
-            if spatialite or (mysql and not connection.features.supports_empty_geometry_collection) or oracle:
-                # When the intersection is empty, some databases return None.
-                expected = None
-            else:
-                expected = c.mpoly.intersection(geom)
+            expected = (
+                None if connection.features.empty_intersection_returns_none
+                else c.mpoly.intersection(geom)
+            )
             self.assertEqual(c.inter, expected)
 
     @skipUnlessDBFeature("has_IsValid_function")
@@ -570,8 +569,11 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             return
         for c in qs:
             self.assertTrue(c.mpoly.difference(geom).equals(c.difference))
-            if not (spatialite or mysql):
-                self.assertEqual(c.mpoly.intersection(geom), c.intersection)
+            expected_intersection = (
+                None if connection.features.empty_intersection_returns_none
+                else c.mpoly.intersection(geom)
+            )
+            self.assertEqual(c.intersection, expected_intersection)
             self.assertTrue(c.mpoly.sym_difference(geom).equals(c.sym_difference))
             self.assertTrue(c.mpoly.union(geom).equals(c.union))
 
