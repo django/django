@@ -370,7 +370,7 @@ class ManyToOneTests(TestCase):
             pub_date=datetime.date(2005, 7, 27),
             reporter_id=str(self.r.id),
         )
-        # If you delete a reporter, his articles will be deleted.
+        # If you delete a reporter, their articles will be deleted.
         self.assertSequenceEqual(
             Article.objects.all(),
             [new_article4, new_article1, new_article2, new_article3, self.a],

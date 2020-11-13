@@ -186,7 +186,7 @@ provided by the admin.
 
 .. _custom-admin-action:
 
-For example, we can use ``self`` to flash a message to the user informing her
+For example, we can use ``self`` to flash a message to the user informing them
 that the action was successful::
 
     from django.contrib import messages
