@@ -321,12 +321,7 @@ class SchemaTests(TransactionTestCase):
             Node._meta.add_field(new_field)
             editor.execute('UPDATE schema_node SET new_parent_fk_id = %s;', [parent.pk])
             editor.add_index(Node, Index(fields=['new_parent_fk'], name='new_parent_inline_fk_idx'))
-        assertIndex = (
-            self.assertIn
-            if connection.features.indexes_foreign_keys
-            else self.assertNotIn
-        )
-        assertIndex('new_parent_fk_id', self.get_indexes(Node._meta.db_table))
+        self.assertIn('new_parent_fk_id', self.get_indexes(Node._meta.db_table))
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_char_field_with_db_index_to_fk(self):
