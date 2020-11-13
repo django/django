@@ -141,7 +141,7 @@ class CookieTests(BaseTests, SimpleTestCase):
             },
             Message(constants.INFO, 'message %s'),
         ]
-        encoder = MessageEncoder(separators=(',', ':'))
+        encoder = MessageEncoder()
         value = encoder.encode(messages)
         decoded_messages = json.loads(value, cls=MessageDecoder)
         self.assertEqual(messages, decoded_messages)
@@ -166,7 +166,7 @@ class CookieTests(BaseTests, SimpleTestCase):
         storage = self.storage_class(self.get_request())
         messages = ['this', 'that']
         # Encode/decode a message using the pre-Django 3.1 hash.
-        encoder = MessageEncoder(separators=(',', ':'))
+        encoder = MessageEncoder()
         value = encoder.encode(messages)
         encoded_messages = '%s$%s' % (storage._legacy_hash(value), value)
         decoded_messages = storage._decode(encoded_messages)
