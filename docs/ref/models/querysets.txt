@@ -917,11 +917,11 @@ resulting ``QuerySet``. For example::
     >>> qs1.union(qs2).order_by('name')
 
 In addition, only ``LIMIT``, ``OFFSET``, ``COUNT(*)``, ``ORDER BY``, and
-specifying columns (i.e. slicing, :meth:`count`, :meth:`order_by`, and
-:meth:`values()`/:meth:`values_list()`) are allowed on the resulting
-``QuerySet``. Further, databases place restrictions on what operations are
-allowed in the combined queries. For example, most databases don't allow
-``LIMIT`` or ``OFFSET`` in the combined queries.
+specifying columns (i.e. slicing, :meth:`count`, :meth:`exists`,
+:meth:`order_by`, and :meth:`values()`/:meth:`values_list()`) are allowed
+on the resulting ``QuerySet``. Further, databases place restrictions on
+what operations are allowed in the combined queries. For example, most
+databases don't allow ``LIMIT`` or ``OFFSET`` in the combined queries.
 
 ``intersection()``
 ~~~~~~~~~~~~~~~~~~

@@ -254,6 +254,29 @@ class QuerySetSetOperationTests(TestCase):
         qs2 = Number.objects.filter(num__lte=5)
         self.assertEqual(qs1.intersection(qs2).count(), 1)
 
+    def test_exists_union(self):
+        qs1 = Number.objects.filter(num__gte=5)
+        qs2 = Number.objects.filter(num__lte=5)
+        self.assertIs(qs1.union(qs2).exists(), True)
+
+    def test_exists_union_empty_result(self):
+        qs = Number.objects.filter(pk__in=[])
+        self.assertIs(qs.union(qs).exists(), False)
+
+    @skipUnlessDBFeature('supports_select_intersection')
+    def test_exists_intersection(self):
+        qs1 = Number.objects.filter(num__gt=5)
+        qs2 = Number.objects.filter(num__lt=5)
+        self.assertIs(qs1.intersection(qs1).exists(), True)
+        self.assertIs(qs1.intersection(qs2).exists(), False)
+
+    @skipUnlessDBFeature('supports_select_difference')
+    def test_exists_difference(self):
+        qs1 = Number.objects.filter(num__gte=5)
+        qs2 = Number.objects.filter(num__gte=3)
+        self.assertIs(qs1.difference(qs2).exists(), False)
+        self.assertIs(qs2.difference(qs1).exists(), True)
+
     def test_get_union(self):
         qs = Number.objects.filter(num=2)
         self.assertEqual(qs.union(qs).get().num, 2)
