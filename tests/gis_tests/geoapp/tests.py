@@ -13,9 +13,7 @@ from django.db.models import F, OuterRef, Subquery
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
-from ..utils import (
-    mariadb, mysql, oracle, postgis, skipUnlessGISLookup, spatialite,
-)
+from ..utils import skipUnlessGISLookup
 from .models import (
     City, Country, Feature, MinusOneSRID, MultiFields, NonConcreteModel,
     PennsylvaniaCity, State, Track,
@@ -109,7 +107,7 @@ class GeoModelTest(TestCase):
         # Constructing & querying with a point from a different SRID. Oracle
         # `SDO_OVERLAPBDYINTERSECT` operates differently from
         # `ST_Intersects`, so contains is used instead.
-        if oracle:
+        if connection.ops.oracle:
             tx = Country.objects.get(mpoly__contains=other_srid_pnt)
         else:
             tx = Country.objects.get(mpoly__intersects=other_srid_pnt)
@@ -299,7 +297,7 @@ class GeoLookupTest(TestCase):
         invalid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))')
         State.objects.create(name='invalid', poly=invalid_geom)
         qs = State.objects.all()
-        if oracle or (mysql and connection.mysql_version < (8, 0, 0)):
+        if connection.ops.oracle or (connection.ops.mysql and connection.mysql_version < (8, 0, 0)):
             # Kansas has adjacent vertices with distance 6.99244813842e-12
             # which is smaller than the default Oracle tolerance.
             # It's invalid on MySQL < 8 also.
@@ -453,12 +451,11 @@ class GeoLookupTest(TestCase):
             with self.assertRaises(e):
                 qs.count()
 
-        # Relate works differently for the different backends.
-        if postgis or spatialite or mariadb:
-            contains_mask = 'T*T***FF*'
-            within_mask = 'T*F**F***'
-            intersects_mask = 'T********'
-        elif oracle:
+        contains_mask = 'T*T***FF*'
+        within_mask = 'T*F**F***'
+        intersects_mask = 'T********'
+        # Relate works differently on Oracle.
+        if connection.ops.oracle:
             contains_mask = 'contains'
             within_mask = 'inside'
             # TODO: This is not quite the same as the PostGIS mask above
@@ -477,7 +474,7 @@ class GeoLookupTest(TestCase):
         self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, within_mask)).name)
 
         # Testing intersection relation mask.
-        if not oracle:
+        if not connection.ops.oracle:
             if connection.features.supports_transform:
                 self.assertEqual(
                     Country.objects.get(mpoly__relate=(pnt1, intersects_mask)).name,
@@ -487,7 +484,7 @@ class GeoLookupTest(TestCase):
             self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, intersects_mask)).name)
 
         # With a complex geometry expression
-        mask = 'anyinteract' if oracle else within_mask
+        mask = 'anyinteract' if connection.ops.oracle else within_mask
         self.assertFalse(City.objects.exclude(point__relate=(functions.Union('point', 'point'), mask)))
 
     def test_gis_lookups_with_complex_expressions(self):
