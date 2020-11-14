@@ -19,18 +19,41 @@ class EmailBackend(BaseEmailBackend):
                  ssl_cafile=None, ssl_capath=None, ssl_cadata=None,
                  **kwargs):
         super().__init__(fail_silently=fail_silently)
+
+        # server connection
         self.host = host or settings.EMAIL_HOST
         self.port = port or settings.EMAIL_PORT
+        # user identity
         self.username = settings.EMAIL_HOST_USER if username is None else username
         self.password = settings.EMAIL_HOST_PASSWORD if password is None else password
+        # type of TLS (implicit=ssl, explicit=tls)
         self.use_tls = settings.EMAIL_USE_TLS if use_tls is None else use_tls
         self.use_ssl = settings.EMAIL_USE_SSL if use_ssl is None else use_ssl
+        # client cert
+        self.ssl_keyfile = (
+            settings.EMAIL_SSL_KEYFILE if ssl_keyfile is None
+            else ssl_keyfile
+        )
+        self.ssl_certfile = (
+            settings.EMAIL_SSL_CERTFILE if ssl_certfile is None
+            else ssl_certfile
+        )
+        # server cert
+        self.ssl_cafile = (
+            settings.EMAIL_SSL_CAFILE if ssl_cafile is None
+            else ssl_cafile
+        )
+        self.ssl_capath = (
+            settings.EMAIL_SSL_CAPATH if ssl_capath is None
+            else ssl_capath
+        )
+        self.ssl_cadata = (
+            settings.EMAIL_SSL_CADATA if ssl_cadata is None
+            else ssl_cadata
+        )
+        # timeout
         self.timeout = settings.EMAIL_TIMEOUT if timeout is None else timeout
-        self.ssl_keyfile = settings.EMAIL_SSL_KEYFILE if ssl_keyfile is None else ssl_keyfile
-        self.ssl_certfile = settings.EMAIL_SSL_CERTFILE if ssl_certfile is None else ssl_certfile
-        self.ssl_cafile = ssl_cafile or getattr(settings, 'EMAIL_SSL_CAFILE', None)
-        self.ssl_capath = ssl_capath or getattr(settings, 'EMAIL_SSL_CAPATH', None)
-        self.ssl_cadata = ssl_cadata or getattr(settings, 'EMAIL_SSL_CADATA', None)
+
         if self.use_ssl and self.use_tls:
             raise ValueError(
                 "EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set "

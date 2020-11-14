@@ -1487,6 +1487,44 @@ connection. Please refer to the documentation of Python's
 :func:`python:ssl.wrap_socket` function for details on how the certificate chain
 file and private key file are handled.
 
+.. setting:: EMAIL_SSL_CAFILE
+
+``EMAIL_SSL_CAFILE``
+---------------------
+
+Default: ``None``
+
+If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True``, you can
+optionally specify the path to a file of concatenated CA certificates in PEM
+format. See the discussion of :ref:`python:ssl-certificates` for more
+information about how to arrange the certificates in this file.
+
+.. setting:: EMAIL_SSL_CAPATH
+
+``EMAIL_SSL_CAPATH``
+---------------------
+
+Default: ``None``
+
+If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True``, you can
+optionally specify the path to a directory containing several CA certificates
+in PEM format, following an `OpenSSL_specific_layout`_.
+
+.. _OpenSSL_specific_layout: https://www.openssl.org/docs/manmaster/man3/SSL_CTX_load_verify_locations.html
+
+.. setting:: EMAIL_SSL_CADATA
+
+``EMAIL_SSL_CADATA``
+---------------------
+
+Default: ``None``
+
+If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True``, you can
+optionally specify is either an ASCII string of one or more PEM-encoded
+certificates or a bytes-like object of DER-encoded certificates. Like with
+:setting:`EMAIL_SSL_CAFILE` extra lines around PEM-encoded certificates are
+ignored but at least one certificate must be present.
+
 .. setting:: EMAIL_TIMEOUT
 
 ``EMAIL_TIMEOUT``

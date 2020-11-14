@@ -1599,6 +1599,48 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         backend = smtp.EmailBackend()
         self.assertIsNone(backend.ssl_keyfile)
 
+    @override_settings(EMAIL_SSL_CAFILE='foo')
+    def test_email_ssl_cafile_use_settings(self):
+        backend = smtp.EmailBackend()
+        self.assertEqual(backend.ssl_cafile, 'foo')
+
+    @override_settings(EMAIL_SSL_CAFILE='foo')
+    def test_email_ssl_cafile_override_settings(self):
+        backend = smtp.EmailBackend(ssl_cafile='bar')
+        self.assertEqual(backend.ssl_cafile, 'bar')
+
+    def test_email_ssl_cafile_default_disabled(self):
+        backend = smtp.EmailBackend()
+        self.assertIsNone(backend.ssl_cafile)
+
+    @override_settings(EMAIL_SSL_CAPATH='foo')
+    def test_email_ssl_capath_use_settings(self):
+        backend = smtp.EmailBackend()
+        self.assertEqual(backend.ssl_capath, 'foo')
+
+    @override_settings(EMAIL_SSL_CAPATH='foo')
+    def test_email_ssl_capath_override_settings(self):
+        backend = smtp.EmailBackend(ssl_capath='bar')
+        self.assertEqual(backend.ssl_capath, 'bar')
+
+    def test_email_ssl_capath_default_disabled(self):
+        backend = smtp.EmailBackend()
+        self.assertIsNone(backend.ssl_capath)
+
+    @override_settings(EMAIL_SSL_CADATA='foo')
+    def test_email_ssl_cadata_use_settings(self):
+        backend = smtp.EmailBackend()
+        self.assertEqual(backend.ssl_cadata, 'foo')
+
+    @override_settings(EMAIL_SSL_CADATA='foo')
+    def test_email_ssl_cadata_override_settings(self):
+        backend = smtp.EmailBackend(ssl_cadata='bar')
+        self.assertEqual(backend.ssl_cadata, 'bar')
+
+    def test_email_ssl_cadata_default_disabled(self):
+        backend = smtp.EmailBackend()
+        self.assertIsNone(backend.ssl_cadata)
+
     @override_settings(EMAIL_USE_TLS=True)
     def test_email_tls_attempts_starttls(self):
         backend = smtp.EmailBackend()
