@@ -263,9 +263,11 @@ past:
 .. code-block:: python
     :caption: polls/models.py
 
-    def was_published_recently(self):
-        now = timezone.now()
-        return now - datetime.timedelta(days=1) <= self.pub_date <= now
+    class Question(models.Model):
+        # ...
+        def was_published_recently(self):
+            now = timezone.now()
+            return now - datetime.timedelta(days=1) <= self.pub_date <= now
 
 and run the test again::
 
