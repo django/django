@@ -584,6 +584,8 @@ The following checks are performed on your URL configuration:
   take the correct number of arguments (…).
 * **urls.E008**: The custom ``handlerXXX`` view ``'path.to.view'`` could not be
   imported.
+* **urls.E009**: Your URL pattern ``<pattern>`` has an invalid view, pass
+  ``<view>.as_view()`` instead of ``<view>``.
 
 ``contrib`` app checks
 ======================
