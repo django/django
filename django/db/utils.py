@@ -120,8 +120,10 @@ def load_backend(backend_name):
         if backend_name not in ['django.db.backends.%s' % b for b in builtin_backends]:
             backend_reprs = map(repr, sorted(builtin_backends))
             raise ImproperlyConfigured(
-                "%r isn't an available database backend.\n"
-                "Try using 'django.db.backends.XXX', where XXX is one of:\n"
+                "%r isn't an available database backend or couldn't be "
+                "imported. Check the above exception. To use one of the "
+                "built-in backends, use 'django.db.backends.XXX', where XXX "
+                "is one of:\n"
                 "    %s" % (backend_name, ", ".join(backend_reprs))
             ) from e_user
         else:
