@@ -3525,8 +3525,12 @@ All aggregates have the following parameters in common:
 ``expressions``
 ~~~~~~~~~~~~~~~
 
-Strings that reference fields on the model, or :doc:`query expressions
-</ref/models/expressions>`.
+Strings that reference fields on the model, transforms of the field, or
+:doc:`query expressions </ref/models/expressions>`.
+
+.. versionchanged:: 3.2
+
+    Support for transforms of the field was added.
 
 ``output_field``
 ~~~~~~~~~~~~~~~~

@@ -434,6 +434,13 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[:1],
         )
 
+    def test_index_annotation(self):
+        qs = NullableIntegerArrayModel.objects.annotate(second=models.F('field__1'))
+        self.assertCountEqual(
+            qs.values_list('second', flat=True),
+            [None, None, None, 3, 30],
+        )
+
     def test_overlap(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__overlap=[1, 2]),
@@ -493,6 +500,15 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__0_2=SliceTransform(2, 3, expr)),
             self.objs[2:3],
+        )
+
+    def test_slice_annotation(self):
+        qs = NullableIntegerArrayModel.objects.annotate(
+            first_two=models.F('field__0_2'),
+        )
+        self.assertCountEqual(
+            qs.values_list('first_two', flat=True),
+            [None, [1], [2], [2, 3], [20, 30]],
         )
 
     def test_usage_in_subquery(self):

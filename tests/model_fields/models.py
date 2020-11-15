@@ -363,6 +363,14 @@ class NullableJSONModel(models.Model):
         required_db_features = {'supports_json_field'}
 
 
+class RelatedJSONModel(models.Model):
+    value = models.JSONField()
+    json_model = models.ForeignKey(NullableJSONModel, models.CASCADE)
+
+    class Meta:
+        required_db_features = {'supports_json_field'}
+
+
 class AllFieldsModel(models.Model):
     big_integer = models.BigIntegerField()
     binary = models.BinaryField()

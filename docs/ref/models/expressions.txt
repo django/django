@@ -90,10 +90,10 @@ Built-in Expressions
 
 .. class:: F
 
-An ``F()`` object represents the value of a model field or annotated column. It
-makes it possible to refer to model field values and perform  database
-operations using them without actually having to pull them out of the  database
-into Python memory.
+An ``F()`` object represents the value of a model field, transformed value of a
+model field, or annotated column. It makes it possible to refer to model field
+values and perform database operations using them without actually having to
+pull them out of the database into Python memory.
 
 Instead, Django uses the ``F()`` object to generate an SQL expression that
 describes the required operation at the database level.
@@ -154,6 +154,10 @@ the field value of each one, and saving each one back to the database::
 
 * getting the database, rather than Python, to do work
 * reducing the number of queries some operations require
+
+.. versionchanged:: 3.2
+
+    Support for transforms of the field was added.
 
 .. _avoiding-race-conditions-using-f:
 
@@ -406,9 +410,9 @@ The ``Aggregate`` API is as follows:
         allows passing a ``distinct`` keyword argument. If set to ``False``
         (default), ``TypeError`` is raised if ``distinct=True`` is passed.
 
-The ``expressions`` positional arguments can include expressions or the names
-of model fields. They will be converted to a string and used as the
-``expressions`` placeholder within the ``template``.
+The ``expressions`` positional arguments can include expressions, transforms of
+the model field, or the names of model fields. They will be converted to a
+string and used as the ``expressions`` placeholder within the ``template``.
 
 The ``output_field`` argument requires a model field instance, like
 ``IntegerField()`` or ``BooleanField()``, into which Django will load the value
@@ -434,6 +438,10 @@ and :ref:`filtering-on-annotations` for example usage.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
 into the ``template`` attribute.
+
+.. versionchanged:: 3.2
+
+    Support for transforms of the field was added.
 
 Creating your own Aggregate Functions
 -------------------------------------
@@ -551,9 +559,9 @@ Referencing columns from the outer queryset
 .. class:: OuterRef(field)
 
 Use ``OuterRef`` when a queryset in a ``Subquery`` needs to refer to a field
-from the outer query. It acts like an :class:`F` expression except that the
-check to see if it refers to a valid field isn't made until the outer queryset
-is resolved.
+from the outer query or its transform. It acts like an :class:`F` expression
+except that the check to see if it refers to a valid field isn't made until the
+outer queryset is resolved.
 
 Instances of ``OuterRef`` may be used in conjunction with nested instances
 of ``Subquery`` to refer to a containing queryset that isn't the immediate
@@ -561,6 +569,10 @@ parent. For example, this queryset would need to be within a nested pair of
 ``Subquery`` instances to resolve correctly::
 
     >>> Book.objects.filter(author=OuterRef(OuterRef('pk')))
+
+.. versionchanged:: 3.2
+
+    Support for transforms of the field was added.
 
 Limiting a subquery to a single column
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

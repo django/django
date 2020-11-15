@@ -25,7 +25,9 @@ from django.db.models.functions import (
 from django.db.models.sql import constants
 from django.db.models.sql.datastructures import Join
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import Approximate, CaptureQueriesContext, isolate_apps
+from django.test.utils import (
+    Approximate, CaptureQueriesContext, isolate_apps, register_lookup,
+)
 from django.utils.functional import SimpleLazyObject
 
 from .models import (
@@ -1215,6 +1217,12 @@ class ExpressionOperatorTests(TestCase):
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 58)
         self.assertEqual(Number.objects.get(pk=self.n1.pk).integer, -10)
+
+    def test_lefthand_transformed_field_bitwise_or(self):
+        Employee.objects.create(firstname='Max', lastname='Mustermann')
+        with register_lookup(CharField, Length):
+            qs = Employee.objects.annotate(bitor=F('lastname__length').bitor(48))
+            self.assertEqual(qs.get().bitor, 58)
 
     def test_lefthand_power(self):
         # LH Power arithmetic operation on floats and integers

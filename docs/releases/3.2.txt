@@ -351,6 +351,11 @@ Models
 
 * Added the :class:`~django.db.models.functions.Random` database function.
 
+* :ref:`aggregation-functions`, :class:`F() <django.db.models.F>`,
+  :class:`OuterRef() <django.db.models.OuterRef>`, and other expressions now
+  allow using transforms. See :ref:`using-transforms-in-expressions` for
+  details.
+
 Pagination
 ~~~~~~~~~~
 
