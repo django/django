@@ -467,6 +467,22 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
                 output = self._collectstatic_output(clear=True)
             self.assertNotIn(self.warning_string, output)
 
+    def test_no_warning_quiet(self):
+        """
+        There are no warnings when there are dupliate destinations and quiet flag is set
+        """
+        with tempfile.TemporaryDirectory() as static_dir:
+            # Create duplicate files
+            duplicate = os.path.join(static_dir, 'test', 'file.txt')
+            os.mkdir(os.path.dirname(duplicate))
+            with open(duplicate, 'w+') as f:
+                f.write('duplicate of file.txt')
+
+            # Make sure there are no warnings
+            with self.settings(STATICFILES_DIRS=[static_dir]):
+                output = self._collectstatic_output(clear=True, quiet=True)
+            self.assertNotIn(self.warning_string, output)
+
 
 @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.DummyStorage')
 class TestCollectionNonLocalStorage(TestNoFilesCreated, CollectionTestCase):

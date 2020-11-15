@@ -68,6 +68,11 @@ class Command(BaseCommand):
             help="Don't ignore the common private glob-style patterns (defaults to 'CVS', '.*' and '*~').",
         )
 
+        parser.add_argument(
+            '--quiet', action='store_true', dest='quiet',
+            help="Ignore warnings about file conflicts.",
+        )
+
     def set_options(self, **options):
         """
         Set instance variables based on an options dict
@@ -82,6 +87,7 @@ class Command(BaseCommand):
             ignore_patterns += apps.get_app_config('staticfiles').ignore_patterns
         self.ignore_patterns = list({os.path.normpath(p) for p in ignore_patterns})
         self.post_process = options['post_process']
+        self.quiet = options['quiet']
 
     def collect(self):
         """
@@ -113,13 +119,16 @@ class Command(BaseCommand):
                     found_files[prefixed_path] = (storage, path)
                     handler(path, prefixed_path, storage)
                 else:
-                    self.log(
-                        "Found another file with the destination path '%s'. It "
-                        "will be ignored since only the first encountered file "
-                        "is collected. If this is not what you want, make sure "
-                        "every static file has a unique path." % prefixed_path,
-                        level=1,
-                    )
+                    if self.quiet == False:
+                        self.log(
+                            "Found another file with the destination path '%s'. It "
+                            "will be ignored since only the first encountered file "
+                            "is collected. If this is not what you want, make sure "
+                            "every static file has a unique path." % prefixed_path,
+                            level=1,
+                        )
+
+                    
 
         # Storage backends may define a post_process() method.
         if self.post_process and hasattr(self.storage, 'post_process'):

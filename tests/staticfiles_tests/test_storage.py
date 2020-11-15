@@ -195,6 +195,7 @@ class TestHashedFiles:
             'post_process': True,
             'use_default_ignore_patterns': True,
             'ignore_patterns': ['*.ignoreme'],
+            'quiet': False
         }
 
         collectstatic_cmd = CollectstaticCommand()

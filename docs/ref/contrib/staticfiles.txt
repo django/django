@@ -119,6 +119,10 @@ Some commonly used options are:
     Don't ignore the common private glob-style patterns ``'CVS'``, ``'.*'``
     and ``'*~'``.
 
+.. django-admin-option:: --quiet
+
+    Ignore warnings about file conflicts.
+
 For a full list of options, refer to the commands own help by running:
 
 .. console::
