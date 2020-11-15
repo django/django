@@ -24,6 +24,7 @@ class Command(BaseCommand):
         self.symlinked_files = []
         self.unmodified_files = []
         self.post_processed_files = []
+        self.skipped_files = []
         self.storage = staticfiles_storage
         self.style = no_style()
 
@@ -69,7 +70,7 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            '--quiet', action='store_true', dest='quiet',
+            '--ignore-conflicts', action='store_true', dest='ignore_conflicts',
             help="Ignore warnings about file conflicts.",
         )
 
@@ -87,7 +88,7 @@ class Command(BaseCommand):
             ignore_patterns += apps.get_app_config('staticfiles').ignore_patterns
         self.ignore_patterns = list({os.path.normpath(p) for p in ignore_patterns})
         self.post_process = options['post_process']
-        self.quiet = options['quiet']
+        self.ignore_conflicts = options['ignore_conflicts']
 
     def collect(self):
         """
@@ -119,7 +120,9 @@ class Command(BaseCommand):
                     found_files[prefixed_path] = (storage, path)
                     handler(path, prefixed_path, storage)
                 else:
-                    if self.quiet == False:
+                    self.skipped_files.append(prefixed_path)
+
+                    if self.ignore_conflicts == False:
                         self.log(
                             "Found another file with the destination path '%s'. It "
                             "will be ignored since only the first encountered file "
@@ -127,6 +130,7 @@ class Command(BaseCommand):
                             "every static file has a unique path." % prefixed_path,
                             level=1,
                         )
+                        
 
                     
 
@@ -152,6 +156,7 @@ class Command(BaseCommand):
             'modified': self.copied_files + self.symlinked_files,
             'unmodified': self.unmodified_files,
             'post_processed': self.post_processed_files,
+            'skipped': self.skipped_files
         }
 
     def handle(self, **options):
@@ -199,9 +204,10 @@ class Command(BaseCommand):
             modified_count = len(collected['modified'])
             unmodified_count = len(collected['unmodified'])
             post_processed_count = len(collected['post_processed'])
+            skipped_count = len(collected['skipped'])
             return (
                 "\n%(modified_count)s %(identifier)s %(action)s"
-                "%(destination)s%(unmodified)s%(post_processed)s."
+                "%(destination)s%(unmodified)s%(skipped)s%(post_processed)s."
             ) % {
                 'modified_count': modified_count,
                 'identifier': 'static file' + ('' if modified_count == 1 else 's'),
@@ -211,6 +217,7 @@ class Command(BaseCommand):
                 'post_processed': (collected['post_processed'] and
                                    ', %s post-processed'
                                    % post_processed_count or ''),
+                'skipped': (', %s skipped due to conflict' % skipped_count),
             }
 
     def log(self, msg, level=2):

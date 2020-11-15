@@ -480,9 +480,24 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
 
             # Make sure there are no warnings
             with self.settings(STATICFILES_DIRS=[static_dir]):
-                output = self._collectstatic_output(clear=True, quiet=True)
+                output = self._collectstatic_output(clear=True, ignore_conflicts=True)
             self.assertNotIn(self.warning_string, output)
 
+    def test_num_skipped_files(self):
+        """
+        Test the count of the number of skipped files when the --ignore-conflicts flag is set
+        """
+        with tempfile.TemporaryDirectory() as static_dir:
+            # Create duplicate files
+            duplicate = os.path.join(static_dir, 'test', 'file.txt')
+            os.mkdir(os.path.dirname(duplicate))
+            with open(duplicate, 'w+') as f:
+                f.write('duplicate of file.txt')
+
+            # Make sure there are no warnings
+            with self.settings(STATICFILES_DIRS=[static_dir]):
+                output = self._collectstatic_output(clear=True, ignore_conflicts=True)
+            self.assertIn('1 skipped due to conflict', output)
 
 @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.DummyStorage')
 class TestCollectionNonLocalStorage(TestNoFilesCreated, CollectionTestCase):
