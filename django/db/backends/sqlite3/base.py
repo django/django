@@ -27,12 +27,12 @@ from django.utils.duration import duration_microseconds
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.version import PY38
 
-from .client import DatabaseClient                          # isort:skip
-from .creation import DatabaseCreation                      # isort:skip
-from .features import DatabaseFeatures                      # isort:skip
-from .introspection import DatabaseIntrospection            # isort:skip
-from .operations import DatabaseOperations                  # isort:skip
-from .schema import DatabaseSchemaEditor                    # isort:skip
+from .client import DatabaseClient
+from .creation import DatabaseCreation
+from .features import DatabaseFeatures
+from .introspection import DatabaseIntrospection
+from .operations import DatabaseOperations
+from .schema import DatabaseSchemaEditor
 
 
 def decoder(conv_func):

@@ -19,17 +19,17 @@ except ImportError as err:
         'Did you install mysqlclient?'
     ) from err
 
-from MySQLdb.constants import CLIENT, FIELD_TYPE                # isort:skip
-from MySQLdb.converters import conversions                      # isort:skip
+from MySQLdb.constants import CLIENT, FIELD_TYPE
+from MySQLdb.converters import conversions
 
 # Some of these import MySQLdb, so import them after checking if it's installed.
-from .client import DatabaseClient                          # isort:skip
-from .creation import DatabaseCreation                      # isort:skip
-from .features import DatabaseFeatures                      # isort:skip
-from .introspection import DatabaseIntrospection            # isort:skip
-from .operations import DatabaseOperations                  # isort:skip
-from .schema import DatabaseSchemaEditor                    # isort:skip
-from .validation import DatabaseValidation                  # isort:skip
+from .client import DatabaseClient
+from .creation import DatabaseCreation
+from .features import DatabaseFeatures
+from .introspection import DatabaseIntrospection
+from .operations import DatabaseOperations
+from .schema import DatabaseSchemaEditor
+from .validation import DatabaseValidation
 
 version = Database.version_info
 if version < (1, 4, 0):

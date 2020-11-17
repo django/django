@@ -41,12 +41,12 @@ if PSYCOPG2_VERSION < (2, 5, 4):
 
 
 # Some of these import psycopg2, so import them after checking if it's installed.
-from .client import DatabaseClient                          # NOQA isort:skip
-from .creation import DatabaseCreation                      # NOQA isort:skip
-from .features import DatabaseFeatures                      # NOQA isort:skip
-from .introspection import DatabaseIntrospection            # NOQA isort:skip
-from .operations import DatabaseOperations                  # NOQA isort:skip
-from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
+from .client import DatabaseClient  # NOQA
+from .creation import DatabaseCreation  # NOQA
+from .features import DatabaseFeatures  # NOQA
+from .introspection import DatabaseIntrospection  # NOQA
+from .operations import DatabaseOperations  # NOQA
+from .schema import DatabaseSchemaEditor  # NOQA
 
 psycopg2.extensions.register_adapter(SafeString, psycopg2.extensions.QuotedString)
 psycopg2.extras.register_uuid()
