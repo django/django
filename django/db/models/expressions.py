@@ -866,9 +866,13 @@ class ExpressionWrapper(Expression):
         return [self.expression]
 
     def get_group_by_cols(self, alias=None):
-        expression = self.expression.copy()
-        expression.output_field = self.output_field
-        return expression.get_group_by_cols(alias=alias)
+        if isinstance(self.expression, Expression):
+            expression = self.expression.copy()
+            expression.output_field = self.output_field
+            return expression.get_group_by_cols(alias=alias)
+        # For non-expressions e.g. an SQL WHERE clause, the entire
+        # `expression` must be included in the GROUP BY clause.
+        return super().get_group_by_cols()
 
     def as_sql(self, compiler, connection):
         return compiler.compile(self.expression)
