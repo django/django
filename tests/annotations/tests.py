@@ -195,6 +195,18 @@ class NonAggregateAnnotationTestCase(TestCase):
         self.assertEqual(book.isnull_pubdate, False)
         self.assertEqual(book.rating_count, 1)
 
+    @skipUnlessDBFeature('supports_boolean_expr_in_select_clause')
+    def test_grouping_by_q_expression_annotation(self):
+        authors = Author.objects.annotate(
+            under_40=ExpressionWrapper(Q(age__lt=40), output_field=BooleanField()),
+        ).values('under_40').annotate(
+            count_id=Count('id'),
+        ).values('under_40', 'count_id')
+        self.assertCountEqual(authors, [
+            {'under_40': False, 'count_id': 3},
+            {'under_40': True, 'count_id': 6},
+        ])
+
     def test_aggregate_over_annotation(self):
         agg = Author.objects.annotate(other_age=F('age')).aggregate(otherage_sum=Sum('other_age'))
         other_agg = Author.objects.aggregate(age_sum=Sum('age'))
