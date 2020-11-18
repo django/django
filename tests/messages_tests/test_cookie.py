@@ -161,6 +161,16 @@ class CookieTests(BaseTests, SimpleTestCase):
         self.assertIsInstance(encode_decode(mark_safe("<b>Hello Django!</b>")), SafeData)
         self.assertNotIsInstance(encode_decode("<b>Hello Django!</b>"), SafeData)
 
+    def test_rfc6265_compliant(self):
+        storage = self.storage_class(self.get_request())
+        msg_1 = Message(constants.INFO, 'Test me')
+        msg_2 = Message(constants.INFO, 'Test me \\again')
+        example_messages = [msg_1, msg_2]
+        encoded = storage._encode(example_messages)
+        expected = ('[[%22__json_message%22%2C0%2C20%2C%22Test%20me%22]%2C'
+                    '[%22__json_message%22%2C0%2C20%2C%22Test%20me%20%5C%5Cagain%22]]')
+        self.assertEqual(encoded.split(':')[0], expected)
+
     def test_legacy_hash_decode(self):
         # RemovedInDjango40Warning: pre-Django 3.1 hashes will be invalid.
         storage = self.storage_class(self.get_request())

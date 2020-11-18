@@ -1,4 +1,5 @@
 import json
+from urllib.parse import quote, unquote
 
 from django.conf import settings
 from django.contrib.messages.storage.base import BaseStorage, Message
@@ -24,6 +25,9 @@ class MessageEncoder(json.JSONEncoder):
             return message
         return super().default(obj)
 
+    def encode(self, obj):
+        return quote(super().encode(obj), safe="!#$%&'()*+/:<=>?@[]^{|}")
+
 
 class MessageDecoder(json.JSONDecoder):
     """
@@ -43,7 +47,7 @@ class MessageDecoder(json.JSONDecoder):
         return obj
 
     def decode(self, s, **kwargs):
-        decoded = super().decode(s, **kwargs)
+        decoded = super().decode(unquote(s), **kwargs)
         return self.process_messages(decoded)
 
 
