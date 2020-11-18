@@ -28,3 +28,7 @@ Bugfixes
 * Fixed a regression in Django 3.1 that caused suppressing connection errors
   when :class:`~django.db.models.JSONField` is used on SQLite
   (:ticket:`32224`).
+
+* Fixed a crash on SQLite, when ``QuerySet.values()/values_list()`` contained
+  key transforms for :class:`~django.db.models.JSONField` returning non-string
+  primitive values (:ticket:`32203`).

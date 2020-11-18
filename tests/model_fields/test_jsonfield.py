@@ -277,6 +277,7 @@ class TestQuerying(TestCase):
                 'k': {'l': 'm'},
                 'n': [None],
                 'o': '"quoted"',
+                'p': 4.2,
             },
             [1, [2]],
             {'k': True, 'l': False, 'foo': 'bax'},
@@ -753,10 +754,14 @@ class TestQuerying(TestCase):
         qs = NullableJSONModel.objects.filter(value__h=True)
         tests = [
             ('value__a', 'b'),
+            ('value__c', 14),
             ('value__d', ['e', {'f': 'g'}]),
+            ('value__h', True),
+            ('value__i', False),
             ('value__j', None),
             ('value__k', {'l': 'm'}),
             ('value__n', [None]),
+            ('value__p', 4.2),
         ]
         for lookup, expected in tests:
             with self.subTest(lookup=lookup):
