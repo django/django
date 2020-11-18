@@ -834,6 +834,8 @@ class MigrationAutodetector:
                             old_field_dec[2]['to'] = self.renamed_models_rel[old_rel_to]
                     old_field.set_attributes_from_name(rem_field_name)
                     old_db_column = old_field.get_attname_column()[1]
+                    old_field_dec[2].pop('verbose_name', None)
+                    field_dec[2].pop('verbose_name', None)
                     if (old_field_dec == field_dec or (
                             # Was the field renamed and db_column equal to the
                             # old field's column added?

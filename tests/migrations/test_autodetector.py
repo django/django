@@ -1037,6 +1037,26 @@ class AutodetectorTests(TestCase):
             {'to': 'app.foo', 'on_delete': models.CASCADE, 'db_column': 'foo_id'},
         ))
 
+    def test_rename_change_verbose_name(self):
+        before = [
+            ModelState('app', 'Foo', [
+                ('id', models.CharField(primary_key=True)),
+                ('name', models.CharField(max_length=10, verbose_name="name")),
+            ]),
+        ]
+        after = [
+            ModelState('app', 'Foo', [
+                ('id', models.CharField(primary_key=True)),
+                ('label', models.CharField(max_length=10, verbose_name="labels")),
+            ]),
+        ]
+        changes = self.get_changes(before, after, MigrationQuestioner({'ask_rename': True}))
+        self.assertNumberMigrations(changes, 'app', 1)
+        self.assertOperationTypes(changes, 'app', 0, ['RenameField', 'AlterField'])
+        self.assertOperationAttributes(changes, 'app', 0, 0, old_name='name', new_name='label')
+        self.assertOperationAttributes(changes, "app", 0, 1, name='label')
+        self.assertEqual(changes['app'][0].operations[1].field.verbose_name, 'labels')
+
     def test_rename_model(self):
         """Tests autodetection of renamed models."""
         changes = self.get_changes(
