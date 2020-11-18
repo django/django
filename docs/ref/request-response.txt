@@ -51,7 +51,7 @@ All attributes should be considered read-only, unless stated otherwise.
 .. attribute:: HttpRequest.path
 
     A string representing the full path to the requested page, not including
-    the scheme or domain.
+    the scheme, domain, or query string.
 
     Example: ``"/music/bands/the_beatles/"``
 
