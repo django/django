@@ -100,16 +100,20 @@ This would be wrong -- in fact, Django will throw an error if you do so. That's
 because at any point arguments could get added to the signal and your receiver
 must be able to handle those new arguments.
 
-.. versionchanged:: 3.2
-
-Receiver function can be simple function or coroutine::
+Receivers may also be asynchronous functions, with the same signature but
+declared using ``async def``::
 
     async def my_callback(sender, **kwargs):
         await asyncio.sleep(5)
         print("Request finished!")
 
-If needed, receiver will be adapted for way signal exactly send. See
-:ref:`sending signals <sending-signals>` for more information.
+Signals can be sent either synchronously or asynchronously, and receivers will
+automatically be adapted to the correct call-style. See :ref:`sending signals
+<sending-signals>` for more information.
+
+.. versionchanged:: 3.2
+
+    Support for asynchronous receivers was added.
 
 .. _connecting-receiver-functions:
 
@@ -248,15 +252,21 @@ This declares a ``pizza_done`` signal.
 Sending signals
 ---------------
 
-There are three ways to send signals in Django.
+
+
+There are two ways to send signals synchronously in Django.
 
 .. method:: Signal.send(sender, **kwargs)
-.. method:: Signal.send_async(sender, **kwargs)
 .. method:: Signal.send_robust(sender, **kwargs)
 
-To send a signal, call one of this methods. You must provide the ``sender``
-argument (which is a class most of the time) and may provide as many other
-keyword arguments as you like.
+Signals may also be sent asynchronously.
+
+.. method:: Signal.send_async(sender, **kwargs)
+
+To send a signal, call either :meth:`Signal.send` or
+:meth:`Signal.send_robust`, or ``await`` :meth:`Signal.send_async`. You must
+provide the ``sender`` argument (which is a class most of the time) and may
+provide as many other keyword arguments as you like.
 
 For example, here's how sending our ``pizza_done`` signal might look::
 
@@ -277,26 +287,34 @@ be notified of a signal in the face of an error.
 
 ``send_robust()`` catches all errors derived from Python's ``Exception`` class,
 and ensures all receivers are notified of the signal. If an error occurs, the
-error instance is returned in the tuple pair for the receiver that raised the error.
+error instance is returned in the tuple pair for the receiver that raised the
+error.
 
 The tracebacks are present on the ``__traceback__`` attribute of the errors
 returned when calling ``send_robust()``.
 
-.. versionchanged:: 3.2
-
-``send_async()`` is similar as ``send()``, but it is coroutine that should be
+``send_async()`` is similar as ``send()``, but it is coroutine that must be
 awaited::
 
     async def send_pizza_async(self, toppings, size):
         await pizza_done.send_async(
-            sender=self.__class__, toppings=toppings, size=size)
+            sender=self.__class__, toppings=toppings, size=size
+        )
         ...
 
-All sync receivers will be called using
-:doc:`async_to_sync </topics/async>` adoption. In opposite, ``send()`` and
-``send_robust()`` use :doc:`sync_to_async </topics/async>` to adapt async
-receivers.
+Whether synchronous or asynchronous, receivers will be correctly adapted to
+whether ``send()`` or ``send_async()`` is used. Synchronous receivers will be
+called using :func:`sync_to_async` when invoked via ``send_async()``.
+Asynchronous receivers will be called using :func:`async_to_sync` when invoked
+via ``sync()``. Similar to the :ref:`case for middleware <async_performance>`,
+there is a small performance cost to adapting receivers in this way.
 
+All built-in signals, except those in the async request-response pathway, are
+dispatched using :meth:`Signal.send`.
+
+.. versionchanged:: 3.2
+
+    Support for asynchronous signals was added.
 
 Disconnecting signals
 =====================

@@ -88,6 +88,8 @@ from an async view, you will trigger Django's
 :ref:`asynchronous safety protection <async-safety>` to protect your data from
 corruption.
 
+.. _async_performance:
+
 Performance
 -----------
 
