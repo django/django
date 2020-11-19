@@ -221,11 +221,15 @@ def get_child_arguments():
         exe_entrypoint = py_script.with_suffix('.exe')
         if exe_entrypoint.exists():
             # Should be executed directly, ignoring sys.executable.
-            return [exe_entrypoint, *sys.argv[1:]]
+            # TODO: Remove str() when dropping support for PY37.
+            # args parameter accepts path-like on Windows from Python 3.8.
+            return [str(exe_entrypoint), *sys.argv[1:]]
         script_entrypoint = py_script.with_name('%s-script.py' % py_script.name)
         if script_entrypoint.exists():
             # Should be executed as usual.
-            return [*args, script_entrypoint, *sys.argv[1:]]
+            # TODO: Remove str() when dropping support for PY37.
+            # args parameter accepts path-like on Windows from Python 3.8.
+            return [*args, str(script_entrypoint), *sys.argv[1:]]
         raise RuntimeError('Script %s does not exist.' % py_script)
     else:
         args += sys.argv

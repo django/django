@@ -177,10 +177,10 @@ class TestChildArguments(SimpleTestCase):
         self.addCleanup(tmpdir.cleanup)
         exe_path = Path(tmpdir.name) / 'django-admin.exe'
         exe_path.touch()
-        with mock.patch('sys.argv', [exe_path.with_suffix(''), 'runserver']):
+        with mock.patch('sys.argv', [str(exe_path.with_suffix('')), 'runserver']):
             self.assertEqual(
                 autoreload.get_child_arguments(),
-                [exe_path, 'runserver']
+                [str(exe_path), 'runserver']
             )
 
     @mock.patch('sys.warnoptions', [])
@@ -189,10 +189,10 @@ class TestChildArguments(SimpleTestCase):
         self.addCleanup(tmpdir.cleanup)
         script_path = Path(tmpdir.name) / 'django-admin-script.py'
         script_path.touch()
-        with mock.patch('sys.argv', [script_path.with_name('django-admin'), 'runserver']):
+        with mock.patch('sys.argv', [str(script_path.with_name('django-admin')), 'runserver']):
             self.assertEqual(
                 autoreload.get_child_arguments(),
-                [sys.executable, script_path, 'runserver']
+                [sys.executable, str(script_path), 'runserver']
             )
 
     @mock.patch('sys.argv', ['does-not-exist', 'runserver'])
@@ -413,7 +413,7 @@ class RestartWithReloaderTests(SimpleTestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             script = Path(temp_dir) / 'manage.py'
             script.touch()
-            argv = [script, 'runserver']
+            argv = [str(script), 'runserver']
             mock_call = self.patch_autoreload(argv)
             autoreload.restart_with_reloader()
             self.assertEqual(mock_call.call_count, 1)

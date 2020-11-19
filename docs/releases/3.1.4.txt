@@ -17,3 +17,7 @@ Bugfixes
 
 * Fixed crash of key transforms for :class:`~django.db.models.JSONField` on
   PostgreSQL when using on a ``Subquery()`` annotation (:ticket:`32182`).
+
+* Fixed a regression in Django 3.1 that caused a crash of auto-reloader for
+  certain invocations of ``runserver`` on Windows with Python 3.7 and below
+  (:ticket:`32202`).
