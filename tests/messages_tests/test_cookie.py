@@ -1,4 +1,6 @@
 import json
+import random
+import string
 
 from django.conf import settings
 from django.contrib.messages import constants
@@ -117,14 +119,15 @@ class CookieTests(BaseTests, SimpleTestCase):
         # See also FallbackTest.test_session_fallback
         msg_size = int((CookieStorage.max_cookie_size - 54) / 4.5 - 37)
         for i in range(5):
-            storage.add(constants.INFO, str(i) * msg_size)
+            storage.add(constants.INFO, str(i) + ''.join(
+                random.choice(string.ascii_letters) for _ in range(msg_size - 1)))
         unstored_messages = storage.update(response)
 
         cookie_storing = self.stored_messages_count(storage, response)
         self.assertEqual(cookie_storing, 4)
 
         self.assertEqual(len(unstored_messages), 1)
-        self.assertEqual(unstored_messages[0].message, '0' * msg_size)
+        self.assertEqual(unstored_messages[0].message[0], '0')
 
     def test_json_encoder_decoder(self):
         """
@@ -167,8 +170,8 @@ class CookieTests(BaseTests, SimpleTestCase):
         msg_2 = Message(constants.INFO, 'Test me \\again')
         example_messages = [msg_1, msg_2]
         encoded = storage._encode(example_messages)
-        expected = ('[[%22__json_message%22%2C0%2C20%2C%22Test%20me%22]%2C'
-                    '[%22__json_message%22%2C0%2C20%2C%22Test%20me%20%5C%5Cagain%22]]')
+        # We expect the value to be serialized, compressed, and base64 encoded
+        expected = '.eJxTio6OUYqPzyrOz4vPTS0uTkxPjVHSMdAxMtCJUQpJLS5RyAUKxOoQVqUQAwSJ6YmZeUD1sUoAHdwc4Q'
         self.assertEqual(encoded.split(':')[0], expected)
 
     def test_legacy_hash_decode(self):
