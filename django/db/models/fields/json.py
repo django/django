@@ -385,11 +385,11 @@ class KeyTransformIn(lookups.In):
         ):
             if connection.vendor == 'oracle':
                 value = json.loads(param)
+                sql = "%s(JSON_OBJECT('value' VALUE %%s FORMAT JSON), '$.value')"
                 if isinstance(value, (list, dict)):
-                    sql = "JSON_QUERY(%s, '$.value')"
+                    sql = sql % 'JSON_QUERY'
                 else:
-                    sql = "JSON_VALUE(%s, '$.value')"
-                params = (json.dumps({'value': value}),)
+                    sql = sql % 'JSON_VALUE'
             elif connection.vendor in {'sqlite', 'mysql'}:
                 sql = "JSON_EXTRACT(%s, '$')"
         if connection.vendor == 'mysql' and connection.mysql_is_mariadb:
@@ -413,15 +413,14 @@ class KeyTransformExact(JSONExact):
         rhs, rhs_params = super().process_rhs(compiler, connection)
         if connection.vendor == 'oracle':
             func = []
+            sql = "%s(JSON_OBJECT('value' VALUE %%s FORMAT JSON), '$.value')"
             for value in rhs_params:
                 value = json.loads(value)
-                function = 'JSON_QUERY' if isinstance(value, (list, dict)) else 'JSON_VALUE'
-                func.append("%s('%s', '$.value')" % (
-                    function,
-                    json.dumps({'value': value}),
-                ))
+                if isinstance(value, (list, dict)):
+                    func.append(sql % 'JSON_QUERY')
+                else:
+                    func.append(sql % 'JSON_VALUE')
             rhs = rhs % tuple(func)
-            rhs_params = []
         elif connection.vendor == 'sqlite':
             func = ["JSON_EXTRACT(%s, '$')" if value != 'null' else '%s' for value in rhs_params]
             rhs = rhs % tuple(func)
