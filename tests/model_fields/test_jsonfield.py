@@ -276,6 +276,7 @@ class TestQuerying(TestCase):
                 'j': None,
                 'k': {'l': 'm'},
                 'n': [None],
+                'o': '"quoted"',
             },
             [1, [2]],
             {'k': True, 'l': False, 'foo': 'bax'},
@@ -773,6 +774,12 @@ class TestQuerying(TestCase):
 
     def test_key_iregex(self):
         self.assertIs(NullableJSONModel.objects.filter(value__foo__iregex=r'^bAr$').exists(), True)
+
+    def test_key_quoted_string(self):
+        self.assertEqual(
+            NullableJSONModel.objects.filter(value__o='"quoted"').get(),
+            self.objs[4],
+        )
 
     @skipUnlessDBFeature('has_json_operators')
     def test_key_sql_injection(self):
