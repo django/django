@@ -131,6 +131,11 @@ Minor features
   :class:`~django.contrib.postgres.operations.AddConstraintNotValid` on
   PostgreSQL.
 
+* The new
+  :class:`ArraySubquery() <django.contrib.postgres.expressions.ArraySubquery>`
+  expression allows using subqueries to construct lists of values on
+  PostgreSQL.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
