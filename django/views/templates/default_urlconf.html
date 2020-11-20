@@ -1,7 +1,7 @@
 {% load i18n %}
 <!doctype html>
 {% get_current_language_bidi as LANGUAGE_BIDI %}
-<html{% if LANGUAGE_BIDI %} dir="rtl"{% endif %}>
+<html dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
     <head>
         <meta charset="utf-8">
         <title>{% translate "Django: the Web framework for perfectionists with deadlines." %}</title>

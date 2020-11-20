@@ -21,7 +21,7 @@
 {% block openlayers %}{% include "gis/admin/openlayers.js" %}{% endblock %}
 //]]>
 </script>
-<div id="{{ id }}_map"{% if LANGUAGE_BIDI %} dir="ltr"{% endif %}></div>
+<div id="{{ id }}_map" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}"></div>
 {% if editable %}
 <a href="javascript:{{ module }}.clearFeatures()">{% translate "Delete all Features" %}</a>
 {% endif %}
