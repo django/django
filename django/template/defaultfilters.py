@@ -680,7 +680,19 @@ def add(value, arg):
         try:
             return value + arg
         except Exception:
-            return ''
+            try:
+                 int(arg)
+                 return ''
+            except:
+                try:
+                    proxy_arg = str(arg)
+                        
+                    return value + proxy_arg
+                except:
+                    return ''
+       
+       
+        
 
 
 @register.filter(is_safe=False)
