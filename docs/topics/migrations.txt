@@ -128,6 +128,15 @@ will be written out. Make sure to read the output to see what
 ``makemigrations`` thinks you have changed - it's not perfect, and for
 complex changes it might not be detecting what you expect.
 
+.. warning::
+
+  If you have manually added an app and it doesn't have a migrations
+  package (a folder with an __init__.py), then running :djadmin:`makemigrations`
+  will not create migrations for this app. 
+
+  Running ``makemigrations your_app_name`` however will create the
+  migrations folder, and create the migrations for that app.
+
 Once you have your new migration files, you should apply them to your
 database to make sure they work as expected::
 
