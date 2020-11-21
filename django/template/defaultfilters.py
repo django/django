@@ -681,14 +681,13 @@ def add(value, arg):
             return value + arg
         except Exception:
             try:
-                 int(arg)
-                 return ''
-            except:
+                int(arg)
+                return ''
+            except Exception:
                 try:
                     proxy_arg = str(arg)
-                        
                     return value + proxy_arg
-                except:
+                except Exception:
                     return ''
        
        
