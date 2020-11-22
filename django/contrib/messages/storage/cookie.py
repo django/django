@@ -1,5 +1,4 @@
 import json
-from urllib.parse import quote, unquote
 
 from django.conf import settings
 from django.contrib.messages.storage.base import BaseStorage, Message

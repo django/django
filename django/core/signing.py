@@ -146,7 +146,6 @@ def b64decode_decompress(base64str):
     return data
 
 
-
 def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None):
     """
     Reverse of dumps(), raise BadSignature if signature fails.
@@ -156,7 +155,7 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
     # TimestampSigner.unsign() returns str but base64 and zlib compression
     # operate on bytes.
     unsigned = TimestampSigner(key, salt=salt).unsign(s, max_age=max_age)
-    data =  b64decode_decompress(unsigned)
+    data = b64decode_decompress(unsigned)
     return serializer().loads(data)
 
 
