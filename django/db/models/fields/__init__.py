@@ -202,6 +202,7 @@ class Field(RegisterLookupMixin):
         validators=(),
         error_messages=None,
         db_comment=None,
+        db_default=NOT_PROVIDED,
     ):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
@@ -212,6 +213,13 @@ class Field(RegisterLookupMixin):
         self.remote_field = rel
         self.is_relation = self.remote_field is not None
         self.default = default
+        if db_default is not NOT_PROVIDED and not hasattr(
+            db_default, "resolve_expression"
+        ):
+            from django.db.models.expressions import Value
+
+            db_default = Value(db_default)
+        self.db_default = db_default
         self.editable = editable
         self.serialize = serialize
         self.unique_for_date = unique_for_date
@@ -263,6 +271,7 @@ class Field(RegisterLookupMixin):
         return [
             *self._check_field_name(),
             *self._check_choices(),
+            *self._check_db_default(**kwargs),
             *self._check_db_index(),
             *self._check_db_comment(**kwargs),
             *self._check_null_allowed_for_primary_keys(),
@@ -378,6 +387,39 @@ class Field(RegisterLookupMixin):
                 id="fields.E005",
             )
         ]
+
+    def _check_db_default(self, databases=None, **kwargs):
+        from django.db.models.expressions import Value
+
+        if (
+            self.db_default is NOT_PROVIDED
+            or isinstance(self.db_default, Value)
+            or databases is None
+        ):
+            return []
+        errors = []
+        for db in databases:
+            if not router.allow_migrate_model(db, self.model):
+                continue
+            connection = connections[db]
+
+            if not getattr(self.db_default, "allowed_default", False) and (
+                connection.features.supports_expression_defaults
+            ):
+                msg = f"{self.db_default} cannot be used in db_default."
+                errors.append(checks.Error(msg, obj=self, id="fields.E012"))
+
+            if not (
+                connection.features.supports_expression_defaults
+                or "supports_expression_defaults"
+                in self.model._meta.required_db_features
+            ):
+                msg = (
+                    f"{connection.display_name} does not support default database "
+                    "values with expressions (db_default)."
+                )
+                errors.append(checks.Error(msg, obj=self, id="fields.E011"))
+        return errors
 
     def _check_db_index(self):
         if self.db_index not in (None, True, False):
@@ -558,6 +600,7 @@ class Field(RegisterLookupMixin):
             "null": False,
             "db_index": False,
             "default": NOT_PROVIDED,
+            "db_default": NOT_PROVIDED,
             "editable": True,
             "serialize": True,
             "unique_for_date": None,
@@ -876,7 +919,10 @@ class Field(RegisterLookupMixin):
     @property
     def db_returning(self):
         """Private API intended only to be used by Django itself."""
-        return False
+        return (
+            self.db_default is not NOT_PROVIDED
+            and connection.features.can_return_columns_from_insert
+        )
 
     def set_attributes_from_name(self, name):
         self.name = self.name or name
@@ -929,7 +975,13 @@ class Field(RegisterLookupMixin):
 
     def pre_save(self, model_instance, add):
         """Return field's value just before saving."""
-        return getattr(model_instance, self.attname)
+        value = getattr(model_instance, self.attname)
+        if not connection.features.supports_default_keyword_in_insert:
+            from django.db.models.expressions import DatabaseDefault
+
+            if isinstance(value, DatabaseDefault):
+                return self.db_default
+        return value
 
     def get_prep_value(self, value):
         """Perform preliminary non-db specific value checks and conversions."""
@@ -967,6 +1019,11 @@ class Field(RegisterLookupMixin):
             if callable(self.default):
                 return self.default
             return lambda: self.default
+
+        if self.db_default is not NOT_PROVIDED:
+            from django.db.models.expressions import DatabaseDefault
+
+            return DatabaseDefault
 
         if (
             not self.empty_strings_allowed
