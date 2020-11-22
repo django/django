@@ -1,5 +1,3 @@
-from urllib.parse import unquote
-
 from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 from django.core.signing import b64decode_decompress
@@ -16,5 +14,6 @@ class SuccessMessageMixinTests(SimpleTestCase):
         req = self.client.post(add_url, author)
         print(type(req.cookies['messages'].value))
         print(req.cookies['messages'].value)
-        self.assertIn(bytes(ContactFormViewWithMsg.success_message % author, 'utf-8'),
-                b64decode_decompress(req.cookies['messages'].value))
+        self.assertIn(
+            bytes(ContactFormViewWithMsg.success_message % author, 'utf-8'),
+            b64decode_decompress(req.cookies['messages'].value))
