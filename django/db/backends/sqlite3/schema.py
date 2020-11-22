@@ -186,7 +186,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if create_field:
             body[create_field.name] = create_field
             # Choose a default and insert it into the copy map
-            if not create_field.many_to_many and create_field.concrete:
+            if not create_field.has_db_default() and not create_field.many_to_many and create_field.concrete:
                 mapping[create_field.column] = self.quote_value(
                     self.effective_default(create_field)
                 )
@@ -197,9 +197,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             mapping.pop(old_field.column, None)
             body[new_field.name] = new_field
             if old_field.null and not new_field.null:
+                if new_field.has_db_default():
+                    default, _ = self.db_default_sql(new_field)
+                else:
+                    default = self.quote_value(self.effective_default(new_field))
                 case_sql = "coalesce(%(col)s, %(default)s)" % {
                     'col': self.quote_name(old_field.column),
-                    'default': self.quote_value(self.effective_default(new_field))
+                    'default': default,
                 }
                 mapping[new_field.column] = case_sql
             else:
@@ -442,3 +446,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def _collate_sql(self, collation):
         return 'COLLATE ' + collation
+
+    def _format_sql_for_default(self, wrapper_sql, default_sql, params):
+        # Sqlite does not support parametrized database defaults
+        # so format here with quote_value instead.
+        default_sql %= tuple(self.quote_value(value) for value in params)
+        return wrapper_sql % default_sql, []

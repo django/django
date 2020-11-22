@@ -368,6 +368,30 @@ The default value is used when new model instances are created and a value
 isn't provided for the field. When the field is a primary key, the default is
 also used when the field is set to ``None``.
 
+``db_default``
+--------------
+
+.. attribute:: Field.db_default
+
+The default value for the field in the database. This can be a literal value or
+a database function, such as :class:`~django.db.models.functions.Now`::
+
+    created = DateTimeField(db_default=Now())
+
+More complex expressions can be used, as long as they are made from literals
+and database functions::
+
+    month_due = DateField(db_default=TruncMonth(Now() + timedelta(days=90)))
+
+However, a database default may not reference another field. This is invalid::
+
+    end = IntegerField(db_default=F('start') + 50)
+
+If both ``db_default`` and ``default`` are set, ``default`` will take
+precedence in python code. ``db_default`` will still be set at the database
+level, so raw SQL will use this value. ``db_default`` will also be used when
+adding a new field in a migration.
+
 ``editable``
 ------------
 

@@ -1371,15 +1371,16 @@ class SQLInsertCompiler(SQLCompiler):
         opts = self.query.get_meta()
         insert_statement = self.connection.ops.insert_statement(ignore_conflicts=self.query.ignore_conflicts)
         result = ['%s %s' % (insert_statement, qn(opts.db_table))]
-        fields = self.query.fields or [opts.pk]
-        result.append('(%s)' % ', '.join(qn(f.column) for f in fields))
+        fields = self.query.fields
 
-        if self.query.fields:
+        if fields:
+            result.append('(%s)' % ', '.join(qn(f.column) for f in fields))
             value_rows = [
                 [self.prepare_value(field, self.pre_save_val(field, obj)) for field in fields]
                 for obj in self.query.objs
             ]
         else:
+            result.append('(%s)' % qn(opts.pk.column))
             # An empty object.
             value_rows = [[self.connection.ops.pk_default_value()] for _ in self.query.objs]
             fields = [None]

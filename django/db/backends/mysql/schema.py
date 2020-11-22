@@ -8,6 +8,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     sql_alter_column_null = "MODIFY %(column)s %(type)s NULL"
     sql_alter_column_not_null = "MODIFY %(column)s %(type)s NOT NULL"
+    sql_alter_column_null_default = "MODIFY %(column)s %(type)s DEFAULT %(default)s NULL"
+    sql_alter_column_not_null_default = "MODIFY %(column)s %(type)s DEFAULT %(default)s NOT NULL"
     sql_alter_column_type = "MODIFY %(column)s %(type)s"
     sql_alter_column_collate = "MODIFY %(column)s %(type)s%(collation)s"
     sql_alter_column_no_default_null = 'ALTER COLUMN %(column)s SET DEFAULT NULL'
@@ -94,6 +96,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return '(%s)'
         return super()._column_default_sql(field)
 
+    def _wrapper_sql_for_default(self, default):
+        # The only database function MySQL supports before 8.0.13 is
+        # CURRENT_TIMESTAMP. It uses the same formatting as literals.
+        if not self.connection.features.supports_functions_in_defaults:
+            return '%s'
+
+        # MySQL after 8.0.13 uses the same formatting as other databases.
+        return super()._wrapper_sql_for_default(default)
+
     def add_field(self, model, field):
         super().add_field(model, field)
 
@@ -157,3 +168,38 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def _rename_field_sql(self, table, old_field, new_field, new_type):
         new_type = self._set_field_new_type_null_status(old_field, new_type)
         return super()._rename_field_sql(table, old_field, new_field, new_type)
+
+    def _alter_column_null_sql(self, model, old_field, new_field):
+        """
+        Hook to specialize column null alteration.
+
+        Return a (sql, params) fragment to set a column to null or non-null
+        as required by new_field, or None if no changes are required.
+        """
+        if (self.connection.features.interprets_empty_strings_as_nulls and
+                new_field.get_internal_type() in ("CharField", "TextField")):
+            # The field is nullable in the database anyway, leave it alone.
+            return
+        else:
+            new_db_params = new_field.db_parameters(connection=self.connection)
+            if new_field.has_db_default():
+                default, db_default = self.db_default_sql(new_field)
+                if new_field.null:
+                    sql = self.sql_alter_column_null_default
+                else:
+                    sql = self.sql_alter_column_not_null_default
+            else:
+                default = ''
+                db_default = []
+                if new_field.null:
+                    sql = self.sql_alter_column_null
+                else:
+                    sql = self.sql_alter_column_not_null
+            return (
+                sql % {
+                    'column': self.quote_name(new_field.column),
+                    'type': new_db_params['type'],
+                    'default': default,
+                },
+                db_default,
+            )

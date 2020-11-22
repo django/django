@@ -61,6 +61,10 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default='Ada Lovelace')),
     ])
+    author_name_db_default = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200, db_default='Ada Lovelace')),
+    ])
     author_name_check_constraint = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
@@ -710,6 +714,16 @@ class AutodetectorTests(TestCase):
 
     @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition',
                 side_effect=AssertionError("Should not have prompted for not null addition"))
+    def test_add_not_null_field_with_db_default(self, mocked_ask_method):
+        changes = self.get_changes([self.author_empty], [self.author_name_db_default])
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["AddField"])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="name", preserve_default=True)
+        self.assertOperationFieldAttributes(changes, "testapp", 0, 0, db_default=models.Value('Ada Lovelace'))
+
+    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition',
+                side_effect=AssertionError("Should not have prompted for not null addition"))
     def test_add_date_fields_with_auto_now_not_asking_for_default(self, mocked_ask_method):
         changes = self.get_changes([self.author_empty], [self.author_dates_of_birth_auto_now])
         # Right number/type of migrations?
@@ -819,6 +833,19 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["AlterField"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name", preserve_default=True)
         self.assertOperationFieldAttributes(changes, "testapp", 0, 0, default='Ada Lovelace')
+
+    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
+                side_effect=AssertionError("Should not have prompted for not null addition"))
+    def test_alter_field_to_not_null_with_db_default(self, mocked_ask_method):
+        """
+        #23609 - Tests autodetection of nullable to non-nullable alterations.
+        """
+        changes = self.get_changes([self.author_name_null], [self.author_name_db_default])
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["AlterField"])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="name", preserve_default=True)
+        self.assertOperationFieldAttributes(changes, "testapp", 0, 0, db_default=models.Value('Ada Lovelace'))
 
     @mock.patch(
         'django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',

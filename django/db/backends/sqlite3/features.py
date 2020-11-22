@@ -49,6 +49,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         'cs': 'binary',
         'non_default': 'nocase',
     }
+    supports_default_keyword_in_insert = False
 
     @cached_property
     def django_test_skips(self):

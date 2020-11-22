@@ -598,6 +598,17 @@ class BaseDatabaseOperations:
         """
         pass
 
+    def check_field_default_support(self, expression):
+        """
+        Check that the backend supports the provided field default.
+
+        This is used on specific backends to rule out known expressions
+        that cannot be used as field defaults. If the expression has a
+        known problem, the backend should raise NotSupportedError.
+        """
+        if not expression.allowed_default:
+            raise NotSupportedError(f'{expression} is not a valid database default.')
+
     def conditional_expression_supported_in_where_clause(self, expression):
         """
         Return True, if the conditional expression is supported in the WHERE

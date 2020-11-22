@@ -22,6 +22,7 @@ from django.db.models import (
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.constraints import CheckConstraint, UniqueConstraint
 from django.db.models.deletion import CASCADE, Collector
+from django.db.models.expressions import DB_DEFAULT
 from django.db.models.fields.related import (
     ForeignObjectRel, OneToOneField, lazy_related_operation, resolve_relation,
 )
@@ -867,6 +868,9 @@ class Model(metaclass=ModelBase):
             fields = meta.local_concrete_fields
             if not pk_set:
                 fields = [f for f in fields if f is not meta.auto_field]
+
+            if not connection.features.supports_default_keyword_in_insert:
+                fields = [f for f in fields if not isinstance(getattr(self, f.attname), DB_DEFAULT)]
 
             returning_fields = meta.db_returning_fields
             results = self._do_insert(cls._base_manager, using, fields, returning_fields, raw)

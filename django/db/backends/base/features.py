@@ -194,6 +194,12 @@ class BaseDatabaseFeatures:
     # Does the backend require literal defaults, rather than parameterized ones?
     requires_literal_defaults = False
 
+    # Does the backend support functions in defaults
+    supports_functions_in_defaults = True
+
+    # Does the backend support the DEFAULT keyword in insert queries
+    supports_default_keyword_in_insert = True
+
     # Does the backend require a connection reset after each material schema change?
     connection_persists_old_columns = False
 

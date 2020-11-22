@@ -12,7 +12,7 @@ from django import forms
 from django.apps import apps
 from django.conf import settings
 from django.core import checks, exceptions, validators
-from django.db import connection, connections, router
+from django.db import NotSupportedError, connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
 from django.utils import timezone
@@ -134,7 +134,7 @@ class Field(RegisterLookupMixin):
                  serialize=True, unique_for_date=None, unique_for_month=None,
                  unique_for_year=None, choices=None, help_text='', db_column=None,
                  db_tablespace=None, auto_created=False, validators=(),
-                 error_messages=None):
+                 error_messages=None, db_default=NOT_PROVIDED):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
         self._verbose_name = verbose_name  # Store original for deconstruction
@@ -144,6 +144,11 @@ class Field(RegisterLookupMixin):
         self.remote_field = rel
         self.is_relation = self.remote_field is not None
         self.default = default
+        if db_default is not NOT_PROVIDED:
+            from django.db.models.expressions import Value
+            if not hasattr(db_default, 'resolve_expression'):
+                db_default = Value(db_default)
+        self.db_default = db_default
         self.editable = editable
         self.serialize = serialize
         self.unique_for_date = unique_for_date
@@ -197,6 +202,7 @@ class Field(RegisterLookupMixin):
         return [
             *self._check_field_name(),
             *self._check_choices(),
+            *self._check_db_default(),
             *self._check_db_index(),
             *self._check_null_allowed_for_primary_keys(),
             *self._check_backend_specific_checks(**kwargs),
@@ -303,6 +309,22 @@ class Field(RegisterLookupMixin):
                 id='fields.E005',
             )
         ]
+
+    def _check_db_default(self):
+        if self.db_default is NOT_PROVIDED:
+            return []
+
+        if hasattr(self, 'model') and 'supports_functions_in_defaults' in self.model._meta.required_db_features:
+            # If the database does not support functions in defaults
+            # and the model is explicitly marked as requiring that feature,
+            # blocking management commands by returning an Error is unhelpful.
+            return []
+
+        try:
+            connection.ops.check_field_default_support(self.db_default)
+        except NotSupportedError as error:
+            return [checks.Error(error.args[0], obj=self, id='fields.E011')]
+        return []
 
     def _check_db_index(self):
         if self.db_index not in (None, True, False):
@@ -456,6 +478,7 @@ class Field(RegisterLookupMixin):
             "null": False,
             "db_index": False,
             "default": NOT_PROVIDED,
+            "db_default": NOT_PROVIDED,
             "editable": True,
             "serialize": True,
             "unique_for_date": None,
@@ -762,7 +785,7 @@ class Field(RegisterLookupMixin):
         Private API intended only to be used by Django itself. Currently only
         the PostgreSQL backend supports returning multiple fields on a model.
         """
-        return False
+        return self.db_default is not NOT_PROVIDED and connection.features.can_return_columns_from_insert
 
     def set_attributes_from_name(self, name):
         self.name = self.name or name
@@ -815,7 +838,12 @@ class Field(RegisterLookupMixin):
 
     def pre_save(self, model_instance, add):
         """Return field's value just before saving."""
-        return getattr(model_instance, self.attname)
+        value = getattr(model_instance, self.attname)
+        if not connection.features.supports_default_keyword_in_insert:
+            from django.db.models.expressions import DB_DEFAULT
+            if isinstance(value, DB_DEFAULT):
+                return self.db_default
+        return value
 
     def get_prep_value(self, value):
         """Perform preliminary non-db specific value checks and conversions."""
@@ -852,9 +880,17 @@ class Field(RegisterLookupMixin):
                 return self.default
             return lambda: self.default
 
+        if self.has_db_default():
+            from django.db.models.expressions import DB_DEFAULT
+            return DB_DEFAULT
+
         if not self.empty_strings_allowed or self.null and not connection.features.interprets_empty_strings_as_nulls:
             return return_None
         return str  # return empty string
+
+    def has_db_default(self):
+        """Return a boolean of whether this field has a database default value."""
+        return self.db_default is not NOT_PROVIDED
 
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None, ordering=()):
         """

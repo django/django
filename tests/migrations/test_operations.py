@@ -1,3 +1,5 @@
+import math
+
 from django.core.exceptions import FieldDoesNotExist
 from django.db import (
     IntegrityError, connection, migrations, models, transaction,
@@ -5,7 +7,8 @@ from django.db import (
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations.fields import FieldOperation
 from django.db.migrations.state import ModelState, ProjectState
-from django.db.models.functions import Abs
+from django.db.models.expressions import Value
+from django.db.models.functions import Abs, Pi
 from django.db.transaction import atomic
 from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
@@ -904,7 +907,7 @@ class OperationTests(OperationTestBase):
         self.assertEqual(operation.describe(), "Add field height to Pony")
         self.assertEqual(operation.migration_name_fragment, 'pony_height')
         project_state, new_state = self.make_test_state("test_adfl", operation)
-        self.assertEqual(len(new_state.models["test_adfl", "pony"].fields), 4)
+        self.assertEqual(len(new_state.models["test_adfl", "pony"].fields), 6)
         field = new_state.models['test_adfl', 'pony'].fields['height']
         self.assertEqual(field.default, 5)
         # Test the database alteration
@@ -1078,7 +1081,7 @@ class OperationTests(OperationTestBase):
         )
         new_state = project_state.clone()
         operation.state_forwards("test_adflpd", new_state)
-        self.assertEqual(len(new_state.models["test_adflpd", "pony"].fields), 4)
+        self.assertEqual(len(new_state.models["test_adflpd", "pony"].fields), 6)
         field = new_state.models['test_adflpd', 'pony'].fields['height']
         self.assertEqual(field.default, models.NOT_PROVIDED)
         # Test the database alteration
@@ -1095,6 +1098,124 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[1], [])
         self.assertEqual(sorted(definition[2]), ["field", "model_name", "name", "preserve_default"])
 
+    def test_add_field_database_default(self):
+        """
+        Tests the AddField operation's state alteration
+        with a database default.
+        """
+        project_state = self.set_up_test_model("test_adflpd")
+        # Test the state alteration
+        operation = migrations.AddField(
+            "Pony",
+            "height",
+            models.FloatField(null=True, db_default=4),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards("test_adflpd", new_state)
+        self.assertEqual(len(new_state.models["test_adflpd", "pony"].fields), 6)
+        field = new_state.models['test_adflpd', 'pony'].fields['height']
+        self.assertEqual(field.default, models.NOT_PROVIDED)
+        self.assertEqual(field.db_default, Value(4))
+        # Test the database alteration
+        project_state.apps.get_model("test_adflpd", "pony").objects.create(
+            weight=4,
+        )
+        self.assertColumnNotExists("test_adflpd_pony", "height")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_adflpd", editor, project_state, new_state)
+        self.assertColumnExists("test_adflpd_pony", "height")
+        new_model = new_state.apps.get_model("test_adflpd", "pony")
+        old_pony = new_model.objects.get()
+        self.assertEqual(old_pony.height, 4)
+        new_pony = new_model.objects.create(weight=5)
+        if not connection.features.can_return_columns_from_insert:
+            new_pony.refresh_from_db()
+        self.assertEqual(new_pony.height, 4)
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AddField")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(sorted(definition[2]), ["field", "model_name", "name"])
+
+    @skipUnlessDBFeature('supports_functions_in_defaults')
+    def test_add_field_database_default_function(self):
+        """
+        Tests the AddField operation's state alteration
+        with a database default function.
+        """
+        project_state = self.set_up_test_model("test_adflpd")
+        # Test the state alteration
+        operation = migrations.AddField(
+            "Pony",
+            "height",
+            models.FloatField(null=True, db_default=Pi()),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards("test_adflpd", new_state)
+        self.assertEqual(len(new_state.models["test_adflpd", "pony"].fields), 6)
+        field = new_state.models['test_adflpd', 'pony'].fields['height']
+        self.assertEqual(field.default, models.NOT_PROVIDED)
+        self.assertEqual(field.db_default, Pi())
+        # Test the database alteration
+        project_state.apps.get_model("test_adflpd", "pony").objects.create(
+            weight=4,
+        )
+        self.assertColumnNotExists("test_adflpd_pony", "height")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_adflpd", editor, project_state, new_state)
+        self.assertColumnExists("test_adflpd_pony", "height")
+        new_model = new_state.apps.get_model("test_adflpd", "pony")
+        old_pony = new_model.objects.get()
+        self.assertAlmostEqual(old_pony.height, math.pi)
+        new_pony = new_model.objects.create(weight=5)
+        if not connection.features.can_return_columns_from_insert:
+            new_pony.refresh_from_db()
+        self.assertAlmostEqual(old_pony.height, math.pi)
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AddField")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(sorted(definition[2]), ["field", "model_name", "name"])
+
+    def test_add_field_both_defaults(self):
+        """
+        Tests the AddField operation's state alteration
+        with a django default and a database default.
+        """
+        project_state = self.set_up_test_model("test_adflpd")
+        # Test the state alteration
+        operation = migrations.AddField(
+            "Pony",
+            "height",
+            models.FloatField(default=3, db_default=4),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards("test_adflpd", new_state)
+        self.assertEqual(len(new_state.models["test_adflpd", "pony"].fields), 6)
+        field = new_state.models['test_adflpd', 'pony'].fields['height']
+        self.assertEqual(field.default, 3)
+        self.assertEqual(field.db_default, Value(4))
+        # Test the database alteration
+        project_state.apps.get_model("test_adflpd", "pony").objects.create(
+            weight=4,
+        )
+        self.assertColumnNotExists("test_adflpd_pony", "height")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_adflpd", editor, project_state, new_state)
+        self.assertColumnExists("test_adflpd_pony", "height")
+        new_model = new_state.apps.get_model("test_adflpd", "pony")
+        old_pony = new_model.objects.get()
+        self.assertEqual(old_pony.height, 4)
+        new_pony = new_model.objects.create(weight=5)
+        if not connection.features.can_return_columns_from_insert:
+            new_pony.refresh_from_db()
+        self.assertEqual(new_pony.height, 3)
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AddField")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(sorted(definition[2]), ["field", "model_name", "name"])
+
     def test_add_field_m2m(self):
         """
         Tests the AddField operation with a ManyToManyField.
@@ -1104,7 +1225,7 @@ class OperationTests(OperationTestBase):
         operation = migrations.AddField("Pony", "stables", models.ManyToManyField("Stable", related_name="ponies"))
         new_state = project_state.clone()
         operation.state_forwards("test_adflmm", new_state)
-        self.assertEqual(len(new_state.models["test_adflmm", "pony"].fields), 4)
+        self.assertEqual(len(new_state.models["test_adflmm", "pony"].fields), 6)
         # Test the database alteration
         self.assertTableNotExists("test_adflmm_pony_stables")
         with connection.schema_editor() as editor:
@@ -1206,7 +1327,7 @@ class OperationTests(OperationTestBase):
         self.assertEqual(operation.migration_name_fragment, 'remove_pony_pink')
         new_state = project_state.clone()
         operation.state_forwards("test_rmfl", new_state)
-        self.assertEqual(len(new_state.models["test_rmfl", "pony"].fields), 2)
+        self.assertEqual(len(new_state.models["test_rmfl", "pony"].fields), 4)
         # Test the database alteration
         self.assertColumnExists("test_rmfl_pony", "pink")
         with connection.schema_editor() as editor:
@@ -1350,6 +1471,154 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_alfl", editor, new_state, project_state)
         self.assertColumnNotNull("test_alfl_pony", "pink")
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AlterField")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(sorted(definition[2]), ["field", "model_name", "name"])
+
+    def test_alter_field_add_database_default(self):
+        """
+        Tests the AlterField operation adding a database default.
+        """
+        project_state = self.set_up_test_model("test_alfl")
+        # Test the state alteration
+        operation = migrations.AlterField("Pony", "weight", models.FloatField(db_default=4.5))
+        self.assertEqual(operation.describe(), "Alter field weight on Pony")
+        self.assertEqual(operation.migration_name_fragment, 'alter_pony_weight')
+        new_state = project_state.clone()
+        operation.state_forwards("test_alfl", new_state)
+        old_weight = project_state.models['test_alfl', 'pony'].fields['weight']
+        self.assertIs(old_weight.db_default, models.NOT_PROVIDED)
+        new_weight = new_state.models['test_alfl', 'pony'].fields['weight']
+        self.assertEqual(new_weight.db_default, Value(4.5))
+        # Test the database alteration
+        pony = project_state.apps.get_model("test_alfl", "pony").objects.create(weight=1.5)
+        self.assertEqual(pony.weight, 1.5)
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_alfl", editor, project_state, new_state)
+        pony = new_state.apps.get_model("test_alfl", "pony").objects.create()
+        if not connection.features.can_return_columns_from_insert:
+            pony.refresh_from_db()
+        self.assertEqual(pony.weight, 4.5)
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_alfl", editor, new_state, project_state)
+        pony = project_state.apps.get_model("test_alfl", "pony").objects.create(weight=1.5)
+        self.assertEqual(pony.weight, 1.5)
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AlterField")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(sorted(definition[2]), ["field", "model_name", "name"])
+
+    def test_alter_field_change_python_default_to_database_default(self):
+        """
+        Tests the AlterField operation changing a python default to
+        a database default.
+        """
+        project_state = self.set_up_test_model("test_alfl")
+        # Test the state alteration
+        operation = migrations.AlterField("Pony", "pink", models.IntegerField(db_default=4))
+        self.assertEqual(operation.describe(), "Alter field pink on Pony")
+        self.assertEqual(operation.migration_name_fragment, 'alter_pony_pink')
+        new_state = project_state.clone()
+        operation.state_forwards("test_alfl", new_state)
+        old_pink = project_state.models['test_alfl', 'pony'].fields['pink']
+        self.assertEqual(old_pink.default, 3)
+        self.assertIs(old_pink.db_default, models.NOT_PROVIDED)
+        new_pink = new_state.models['test_alfl', 'pony'].fields['pink']
+        self.assertIs(new_pink.default, models.NOT_PROVIDED)
+        self.assertEqual(new_pink.db_default, Value(4))
+        # Test the database alteration
+        pony = project_state.apps.get_model("test_alfl", "pony").objects.create(weight=1)
+        self.assertEqual(pony.pink, 3)
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_alfl", editor, project_state, new_state)
+        pony = new_state.apps.get_model("test_alfl", "pony").objects.create(weight=1)
+        if not connection.features.can_return_columns_from_insert:
+            pony.refresh_from_db()
+        self.assertEqual(pony.pink, 4)
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_alfl", editor, new_state, project_state)
+        pony = project_state.apps.get_model("test_alfl", "pony").objects.create(weight=1)
+        self.assertEqual(pony.pink, 3)
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AlterField")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(sorted(definition[2]), ["field", "model_name", "name"])
+
+    def test_alter_field_change_nullable_to_database_default_not_null(self):
+        """
+        Tests the AlterField operation changing a null field to
+        a database default.
+        """
+        project_state = self.set_up_test_model("test_alfl")
+        # Test the state alteration
+        operation = migrations.AlterField("Pony", "green", models.IntegerField(db_default=4))
+        self.assertEqual(operation.describe(), "Alter field green on Pony")
+        self.assertEqual(operation.migration_name_fragment, 'alter_pony_green')
+        new_state = project_state.clone()
+        operation.state_forwards("test_alfl", new_state)
+        old_green = project_state.models['test_alfl', 'pony'].fields['green']
+        self.assertIs(old_green.db_default, models.NOT_PROVIDED)
+        new_green = new_state.models['test_alfl', 'pony'].fields['green']
+        self.assertEqual(new_green.db_default, Value(4))
+        # Test the database alteration
+        pony = project_state.apps.get_model("test_alfl", "pony").objects.create(weight=1)
+        self.assertIsNone(pony.green)
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_alfl", editor, project_state, new_state)
+        pony = new_state.apps.get_model("test_alfl", "pony").objects.create(weight=1)
+        if not connection.features.can_return_columns_from_insert:
+            pony.refresh_from_db()
+        self.assertEqual(pony.green, 4)
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_alfl", editor, new_state, project_state)
+        pony = project_state.apps.get_model("test_alfl", "pony").objects.create(weight=1)
+        self.assertIsNone(pony.green)
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AlterField")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(sorted(definition[2]), ["field", "model_name", "name"])
+
+    def test_alter_field_change_blank_nullable_database_default_to_not_null(self):
+        """
+        Tests the AlterField operation changing a null field with
+        a database default to not null with a database default.
+        """
+        project_state = self.set_up_test_model("test_alfl")
+        default = 'Yellow'
+        # Test the state alteration
+        operation = migrations.AlterField("Pony", "yellow", models.CharField(blank=True, db_default=default,
+                                                                             max_length=20))
+        self.assertEqual(operation.describe(), "Alter field yellow on Pony")
+        self.assertEqual(operation.migration_name_fragment, 'alter_pony_yellow')
+        new_state = project_state.clone()
+        operation.state_forwards("test_alfl", new_state)
+        self.assertColumnNull('test_alfl_pony', 'yellow')
+        # Test the database alteration
+        pony = project_state.apps.get_model("test_alfl", "pony").objects.create(weight=1, yellow=None)
+        self.assertIsNone(pony.yellow)
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_alfl", editor, project_state, new_state)
+        self.assertColumnNotNull('test_alfl_pony', 'yellow')
+        pony.refresh_from_db()
+        self.assertEqual(pony.yellow, default)
+        pony = new_state.apps.get_model("test_alfl", "pony").objects.create(weight=1)
+        if not connection.features.can_return_columns_from_insert:
+            pony.refresh_from_db()
+        self.assertEqual(pony.yellow, default)
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_alfl", editor, new_state, project_state)
+        self.assertColumnNull('test_alfl_pony', 'yellow')
+        pony = project_state.apps.get_model("test_alfl", "pony").objects.create(weight=1, yellow=None)
+        self.assertIsNone(pony.yellow)
         # And deconstruction
         definition = operation.deconstruct()
         self.assertEqual(definition[0], "AlterField")

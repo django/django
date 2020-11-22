@@ -183,6 +183,9 @@ class Now(Func):
         # other databases.
         return self.as_sql(compiler, connection, template='STATEMENT_TIMESTAMP()', **extra_context)
 
+    def as_mysql(self, compiler, connection, **extra_context):
+        return self.as_sql(compiler, connection, template='CURRENT_TIMESTAMP(6)', **extra_context)
+
 
 class TruncBase(TimezoneMixin, Transform):
     kind = None
