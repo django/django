@@ -93,7 +93,7 @@ Controlling transactions explicitly
 
 Django provides a single API to control database transactions.
 
-.. function:: atomic(using=None, savepoint=True)
+.. function:: atomic(using=None, savepoint=True, durable=False)
 
     Atomicity is the defining property of database transactions. ``atomic``
     allows us to create a block of code within which the atomicity on the
@@ -104,6 +104,12 @@ Django provides a single API to control database transactions.
     ``atomic`` blocks can be nested. In this case, when an inner block
     completes successfully, its effects can still be rolled back if an
     exception is raised in the outer block at a later point.
+
+    It is sometimes useful to ensure an ``atomic`` block is always the
+    outermost ``atomic`` block, ensuring that any database changes are
+    committed when the block is exited without errors. This is known as
+    durability and can be achieved by setting ``durable=True``. If the
+    ``atomic`` block is nested within another it raises a ``RuntimeError``.
 
     ``atomic`` is usable both as a :py:term:`decorator`::
 
@@ -231,6 +237,16 @@ Django provides a single API to control database transactions.
     minimize this overhead, keep your transactions as short as possible. This
     is especially important if you're using :func:`atomic` in long-running
     processes, outside of Django's request / response cycle.
+
+.. warning::
+
+    :class:`django.test.TestCase` disables the durability check to allow
+    testing durable atomic blocks in a transaction for performance reasons. Use
+    :class:`django.test.TransactionTestCase` for testing durability.
+
+.. versionchanged:: 3.2
+
+    The ``durable`` argument was added.
 
 Autocommit
 ==========

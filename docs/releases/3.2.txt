@@ -356,6 +356,11 @@ Models
   allow using transforms. See :ref:`using-transforms-in-expressions` for
   details.
 
+* The new ``durable`` argument for :func:`~django.db.transaction.atomic`
+  guarantees that changes made in the atomic block will be committed if the
+  block exits without errors. A nested atomic block marked as durable will
+  raise a ``RuntimeError``.
+
 Pagination
 ~~~~~~~~~~
 

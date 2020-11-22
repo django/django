@@ -158,16 +158,30 @@ class Atomic(ContextDecorator):
 
     Since database connections are thread-local, this is thread-safe.
 
+    An atomic block can be tagged as durable. In this case, raise a
+    RuntimeError if it's nested within another atomic block. This guarantees
+    that database changes in a durable block are committed to the database when
+    the block exists without error.
+
     This is a private API.
     """
+    # This private flag is provided only to disable the durability checks in
+    # TestCase.
+    _ensure_durability = True
 
-    def __init__(self, using, savepoint):
+    def __init__(self, using, savepoint, durable):
         self.using = using
         self.savepoint = savepoint
+        self.durable = durable
 
     def __enter__(self):
         connection = get_connection(self.using)
 
+        if self.durable and self._ensure_durability and connection.in_atomic_block:
+            raise RuntimeError(
+                'A durable atomic block cannot be nested within another '
+                'atomic block.'
+            )
         if not connection.in_atomic_block:
             # Reset state when entering an outermost atomic block.
             connection.commit_on_exit = True
@@ -282,14 +296,14 @@ class Atomic(ContextDecorator):
                     connection.in_atomic_block = False
 
 
-def atomic(using=None, savepoint=True):
+def atomic(using=None, savepoint=True, durable=False):
     # Bare decorator: @atomic -- although the first argument is called
     # `using`, it's actually the function being decorated.
     if callable(using):
-        return Atomic(DEFAULT_DB_ALIAS, savepoint)(using)
+        return Atomic(DEFAULT_DB_ALIAS, savepoint, durable)(using)
     # Decorator: @atomic(...) or context manager: with atomic(...): ...
     else:
-        return Atomic(using, savepoint)
+        return Atomic(using, savepoint, durable)
 
 
 def _non_atomic_requests(view, using):
