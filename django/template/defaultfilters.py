@@ -689,7 +689,7 @@ def add(value, arg):
                     return value + proxy_arg
                 except Exception:
                     return ''
-       
+
 
 @register.filter(is_safe=False)
 def get_digit(value, arg):

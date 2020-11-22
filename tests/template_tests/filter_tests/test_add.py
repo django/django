@@ -45,7 +45,7 @@ class AddTests(SimpleTestCase):
     def test_add07(self):
         output = self.engine.render_to_string('add07', {'d': date(2000, 1, 1), 't': timedelta(10)})
         self.assertEqual(output, 'Jan. 11, 2000')
-    
+
     @setup({'add08': '{{ s1|add:lazy_s2 }}'})
     def test_add08(self):
         from django.utils.translation import gettext_lazy
