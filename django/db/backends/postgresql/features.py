@@ -76,6 +76,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         "swedish_ci": "sv-x-icu",
     }
     test_now_utc_template = "STATEMENT_TIMESTAMP() AT TIME ZONE 'UTC'"
+    insert_test_table_with_defaults = "INSERT INTO {} DEFAULT VALUES"
 
     django_test_skips = {
         "opclasses are PostgreSQL only.": {

@@ -996,6 +996,13 @@ calling the appropriate methods on the wrapped expression.
 
 .. class:: Expression
 
+    .. attribute:: allowed_default
+
+        .. versionadded:: 5.0
+
+        Tells Django that this expression can be used in
+        :attr:`Field.db_default`. Defaults to ``False``.
+
     .. attribute:: contains_aggregate
 
         Tells Django that this expression contains an aggregate and that a

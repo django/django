@@ -176,6 +176,8 @@ class BaseExpression:
     filterable = True
     # Can the expression can be used as a source expression in Window?
     window_compatible = False
+    # Can the expression be used as a database default value?
+    allowed_default = False
 
     def __init__(self, output_field=None):
         if output_field is not None:
@@ -733,6 +735,10 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         c.rhs = rhs
         return c
 
+    @cached_property
+    def allowed_default(self):
+        return self.lhs.allowed_default and self.rhs.allowed_default
+
 
 class DurationExpression(CombinedExpression):
     def compile(self, side, compiler, connection):
@@ -803,6 +809,8 @@ class TemporalSubtraction(CombinedExpression):
 @deconstructible(path="django.db.models.F")
 class F(Combinable):
     """An object capable of resolving references to existing query objects."""
+
+    allowed_default = False
 
     def __init__(self, name):
         """
@@ -987,6 +995,10 @@ class Func(SQLiteNumericMixin, Expression):
         copy.extra = self.extra.copy()
         return copy
 
+    @cached_property
+    def allowed_default(self):
+        return all(expression.allowed_default for expression in self.source_expressions)
+
 
 @deconstructible(path="django.db.models.Value")
 class Value(SQLiteNumericMixin, Expression):
@@ -995,6 +1007,7 @@ class Value(SQLiteNumericMixin, Expression):
     # Provide a default value for `for_save` in order to allow unresolved
     # instances to be compiled until a decision is taken in #25425.
     for_save = False
+    allowed_default = True
 
     def __init__(self, value, output_field=None):
         """
@@ -1069,6 +1082,8 @@ class Value(SQLiteNumericMixin, Expression):
 
 
 class RawSQL(Expression):
+    allowed_default = True
+
     def __init__(self, sql, params, output_field=None):
         if output_field is None:
             output_field = fields.Field()
@@ -1108,6 +1123,13 @@ class Star(Expression):
 
     def as_sql(self, compiler, connection):
         return "*", []
+
+
+class DatabaseDefault(Expression):
+    """Placeholder expression for the database default in an insert query."""
+
+    def as_sql(self, compiler, connection):
+        return "DEFAULT", []
 
 
 class Col(Expression):
@@ -1213,6 +1235,7 @@ class ExpressionList(Func):
 
 
 class OrderByList(Func):
+    allowed_default = False
     template = "ORDER BY %(expressions)s"
 
     def __init__(self, *expressions, **extra):
@@ -1269,6 +1292,10 @@ class ExpressionWrapper(SQLiteNumericMixin, Expression):
 
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__, self.expression)
+
+    @property
+    def allowed_default(self):
+        return self.expression.allowed_default
 
 
 class NegatedExpression(ExpressionWrapper):
@@ -1397,6 +1424,10 @@ class When(Expression):
             cols.extend(source.get_group_by_cols())
         return cols
 
+    @cached_property
+    def allowed_default(self):
+        return self.condition.allowed_default and self.result.allowed_default
+
 
 @deconstructible(path="django.db.models.Case")
 class Case(SQLiteNumericMixin, Expression):
@@ -1493,6 +1524,12 @@ class Case(SQLiteNumericMixin, Expression):
         if not self.cases:
             return self.default.get_group_by_cols()
         return super().get_group_by_cols()
+
+    @cached_property
+    def allowed_default(self):
+        return self.default.allowed_default and all(
+            case_.allowed_default for case_ in self.cases
+        )
 
 
 class Subquery(BaseExpression, Combinable):

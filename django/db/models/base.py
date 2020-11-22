@@ -971,8 +971,10 @@ class Model(AltersData, metaclass=ModelBase):
             not raw
             and not force_insert
             and self._state.adding
-            and meta.pk.default
-            and meta.pk.default is not NOT_PROVIDED
+            and (
+                (meta.pk.default and meta.pk.default is not NOT_PROVIDED)
+                or (meta.pk.db_default and meta.pk.db_default is not NOT_PROVIDED)
+            )
         ):
             force_insert = True
         # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.

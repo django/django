@@ -105,6 +105,7 @@ class Coalesce(Func):
 class Collate(Func):
     function = "COLLATE"
     template = "%(expressions)s %(function)s %(collation)s"
+    allowed_default = False
     # Inspired from
     # https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
     collation_re = _lazy_re_compile(r"^[\w\-]+$")
