@@ -107,17 +107,17 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
 
     The serializer is expected to return a bytestring.
     """
-    base64d = serialize_compress_encode(obj, serializer)
+    data = serializer().dumps(obj)
+    base64d = compress_b64encode(data)
     return TimestampSigner(key, salt=salt).sign(base64d)
 
 
-def serialize_compress_encode(obj, serializer=JSONSerializer):
+def compress_b64encode(data):
     """
     Return compressed data as a base 64 string.
 
-    The input data is expected as a an object.
+    The input data is expected as a bytestring.
     """
-    data = serializer().dumps(obj)
     is_compressed = False
     compressed = zlib.compress(data)
     if len(compressed) < (len(data) - 1):
@@ -129,11 +129,11 @@ def serialize_compress_encode(obj, serializer=JSONSerializer):
     return base64d
 
 
-def decode_decompress_unserialize(base64str, serializer=JSONSerializer):
+def b64decode_decompress(base64str):
     """
     The input is a base64 string.
 
-    Returns an object.
+    Returns a decompressed bytestring.
     """
     base64d = base64str.encode()
     decompress = base64d[:1] == b'.'
@@ -143,7 +143,7 @@ def decode_decompress_unserialize(base64str, serializer=JSONSerializer):
     data = b64_decode(base64d)
     if decompress:
         data = zlib.decompress(data)
-    return serializer().loads(data)
+    return data
 
 
 
@@ -156,7 +156,8 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
     # TimestampSigner.unsign() returns str but base64 and zlib compression
     # operate on bytes.
     unsigned = TimestampSigner(key, salt=salt).unsign(s, max_age=max_age)
-    return decode_decompress_unserialize(unsigned, serializer)
+    data =  b64decode_decompress(unsigned)
+    return serializer().loads(data)
 
 
 class Signer:

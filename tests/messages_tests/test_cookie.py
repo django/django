@@ -8,6 +8,7 @@ from django.contrib.messages.storage.base import Message
 from django.contrib.messages.storage.cookie import (
     CookieStorage, MessageDecoder, MessageEncoder,
 )
+from django.core.signing import b64decode_decompress
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import ignore_warnings
 from django.utils.deprecation import RemovedInDjango40Warning
@@ -73,7 +74,7 @@ class CookieTests(BaseTests, SimpleTestCase):
         response = self.get_response()
         storage.add(constants.INFO, 'test')
         storage.update(response)
-        self.assertIn('test', response.cookies['messages'].value)
+        self.assertIn(b'test', b64decode_decompress(response.cookies['messages'].value))
         self.assertEqual(response.cookies['messages']['domain'], '.example.com')
         self.assertEqual(response.cookies['messages']['expires'], '')
         self.assertIs(response.cookies['messages']['secure'], True)
@@ -171,7 +172,7 @@ class CookieTests(BaseTests, SimpleTestCase):
         example_messages = [msg_1, msg_2]
         encoded = storage._encode(example_messages)
         # We expect the value to be serialized, compressed, and base64 encoded
-        expected = '.eJxTio6OUYqPzyrOz4vPTS0uTkxPjVHSMdAxMtCJUQpJLS5RyAUKxOoQVqUQAwSJ6YmZeUD1sUoAHdwc4Q'
+        expected = '.eJyLjlaKj88qzs-Lz00tLk5MT1XSMdAxMtBRCkktLlHITVWK1SGgQiEmJjE9MTNPKTYWANpSGQU'
         self.assertEqual(encoded.split(':')[0], expected)
 
     def test_legacy_hash_decode(self):
