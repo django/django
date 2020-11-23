@@ -967,6 +967,55 @@ class TestReadOnlyChangeViewInlinePermissions(TestCase):
 class TestVerboseNameInlineForms(TestDataMixin, TestCase):
     factory = RequestFactory()
 
+    def test_verbose_name_inline(self):
+        class NonVerboseProfileInline(TabularInline):
+            model = Profile
+            verbose_name = 'Non-verbose childs'
+
+        class VerboseNameProfileInline(TabularInline):
+            model = VerboseNameProfile
+            verbose_name = 'Childs with verbose name'
+
+        class VerboseNamePluralProfileInline(TabularInline):
+            model = VerboseNamePluralProfile
+            verbose_name = 'Childs with verbose name plural'
+
+        class BothVerboseNameProfileInline(TabularInline):
+            model = BothVerboseNameProfile
+            verbose_name = 'Childs with both verbose names'
+
+        modeladmin = ModelAdmin(ProfileCollection, admin_site)
+        modeladmin.inlines = [
+            NonVerboseProfileInline,
+            VerboseNameProfileInline,
+            VerboseNamePluralProfileInline,
+            BothVerboseNameProfileInline,
+        ]
+        obj = ProfileCollection.objects.create()
+        url = reverse('admin:admin_inlines_profilecollection_change', args=(obj.pk,))
+        request = self.factory.get(url)
+        request.user = self.superuser
+        response = modeladmin.changeform_view(request)
+        self.assertNotContains(response, 'Add another Profile')
+        # Non-verbose model.
+        self.assertContains(response, '<h2>Non-verbose childss</h2>')
+        self.assertContains(response, 'Add another Non-verbose child')
+        self.assertNotContains(response, '<h2>Profiles</h2>')
+        # Model with verbose name.
+        self.assertContains(response, '<h2>Childs with verbose names</h2>')
+        self.assertContains(response, 'Add another Childs with verbose name')
+        self.assertNotContains(response, '<h2>Model with verbose name onlys</h2>')
+        self.assertNotContains(response, 'Add another Model with verbose name only')
+        # Model with verbose name plural.
+        self.assertContains(response, '<h2>Childs with verbose name plurals</h2>')
+        self.assertContains(response, 'Add another Childs with verbose name plural')
+        self.assertNotContains(response, '<h2>Model with verbose name plural only</h2>')
+        # Model with both verbose names.
+        self.assertContains(response, '<h2>Childs with both verbose namess</h2>')
+        self.assertContains(response, 'Add another Childs with both verbose names')
+        self.assertNotContains(response, '<h2>Model with both - plural name</h2>')
+        self.assertNotContains(response, 'Add another Model with both - name')
+
     def test_verbose_name_plural_inline(self):
         class NonVerboseProfileInline(TabularInline):
             model = Profile

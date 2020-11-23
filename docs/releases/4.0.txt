@@ -85,6 +85,9 @@ Minor features
 * The new :attr:`.ModelAdmin.search_help_text` attribute allows specifying a
   descriptive text for the search box.
 
+* The :attr:`.InlineModelAdmin.verbose_name_plural` attribute now fallbacks to
+  the :attr:`.InlineModelAdmin.verbose_name` + ``'s'``.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
