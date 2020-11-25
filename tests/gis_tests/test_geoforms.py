@@ -382,6 +382,10 @@ class GeometryWidgetTests(SimpleTestCase):
         widget = BaseGeometryWidget(attrs={'geom_type': 'POLYGON'})
         context = widget.get_context('polygon', None, None)
         self.assertEqual(context['geom_type'], 'Polygon')
+        # Widget.get_context() returns 'Geometry' instead of 'Unknown'.
+        widget = BaseGeometryWidget(attrs={'geom_type': 'GEOMETRY'})
+        context = widget.get_context('geometry', None, None)
+        self.assertEqual(context['geom_type'], 'Geometry')
 
     def test_subwidgets(self):
         widget = forms.BaseGeometryWidget()
