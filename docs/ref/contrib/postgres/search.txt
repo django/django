@@ -116,7 +116,7 @@ See :ref:`postgresql-fts-search-configuration` for an explanation of the
     Support for ``'websearch'`` search type and query expressions in
     ``SearchQuery.value`` were added.
 
-.. versionchanged:: 3.1
+.. versionchanged:: 3.2
 
     ``Lexeme`` objects were added
 
@@ -269,9 +269,12 @@ floats to :class:`SearchRank` as ``weights`` in the same order above::
 Lexeme objects
 ==============
 
-Lexeme objects allow search operators to be used along with strings from an untrusted source. The contents
-of each lexeme is excaped so cannot contain any operators that PostgreSQL will recognise, but they support
-combining with other Lexemes using the & and | operators and also negation with the ~ operator.
+Lexeme objects allow search operators to be used with strings from an
+untrusted source. The content of each lexeme is escaped so any operators that
+exist in the string itself will not be interpreted.
+
+You can combine lexemes with other lexemes in Python using the ``&`` and ``|``
+operators and also negate them with the ``~`` operator. For example::
 
     >>> from django.contrib.postgres.search import SearchQuery, Lexeme
     >>> SearchRank(Lexeme("The user's search query") & Lexeme("Something else") & ~Lexeme("Exclude documents that match this"))

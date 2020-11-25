@@ -312,7 +312,7 @@ class LexemeCombinable(Expression):
     def _combine(self, other, connector, reversed, node=None):
         if not isinstance(other, LexemeCombinable):
             raise TypeError(
-                'Lexeme can only be combined with other Lexemes, '
+                'A Lexeme can only be combined with another Lexeme, '
                 'got {}.'.format(type(other))
             )
         if reversed:
@@ -388,5 +388,5 @@ class CombinedLexeme(LexemeCombinable):
 
     def __invert__(self):
         # Swap the connector and invert the lhs and rhs.
-        # This generates a query that's equvilant to what we expect (thanks to De Morgan's theorem)
+        # This generates a query that's equivalent to what we expect (thanks to De Morgan's theorem)
         return type(self)(~self.lhs, self.BITAND if self.connector == self.BITOR else self.BITOR, ~self.rhs)
