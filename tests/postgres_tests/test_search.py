@@ -739,12 +739,13 @@ class TestLexemes(GrailTestData, PostgreSQLTestCase):
             (~(Lexeme('a') | Lexeme('b') & ~Lexeme('c')), '%s', ["(!'a' & (!'b' | 'c'))"]),
 
             # Some escaping tests
-            (Lexeme("L'amour piqué par une abeille"), '%s', ["'L''amour piqué par une abeille'"]),
-            (Lexeme("'starting quote"), '%s', ["'''starting quote'"]),
-            (Lexeme("ending quote'"), '%s', ["'ending quote'''"]),
-            (Lexeme("double quo''te"), '%s', ["'double quo''''te'"]),
-            (Lexeme("triple quo'''te"), '%s', ["'triple quo''''''te'"]),
-            (Lexeme("backslash\\"), '%s', ["'backslash\\\\'"]),
+            (Lexeme("L'amour piqué par une abeille"), '%s', ["'L amour piqué par une abeille'"]),
+            (Lexeme("'starting quote"), '%s', ["'starting quote'"]),
+            (Lexeme("ending quote'"), '%s', ["'ending quote'"]),
+            (Lexeme("double quo''te"), '%s', ["'double quo te'"]),
+            (Lexeme("triple quo'''te"), '%s', ["'triple quo te'"]),
+            (Lexeme("backslash\\"), '%s', ["'backslash'"]),
+            (Lexeme("exclamation!"), '%s', ["'exclamation'"]),
         )
         for expression, expected_sql, expected_params in tests:
             with self.subTest(expression=expression):
