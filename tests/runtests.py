@@ -254,6 +254,10 @@ def setup(verbosity, test_labels, parallel, start_at, start_after):
 
     apps.set_installed_apps(settings.INSTALLED_APPS)
 
+    # Set an environment variable that other code may consult to see if
+    # Django's own test suite is running.
+    os.environ['RUNNING_DJANGOS_TEST_SUITE'] = 'true'
+
     return state
 
 
@@ -267,6 +271,7 @@ def teardown(state):
     # FileNotFoundError at the end of a test run (#27890).
     from multiprocessing.util import _finalizer_registry
     _finalizer_registry.pop((-100, 0), None)
+    del os.environ['RUNNING_DJANGOS_TEST_SUITE']
 
 
 def actual_test_processes(parallel):

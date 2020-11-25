@@ -323,6 +323,13 @@ class BaseDatabaseFeatures:
         'swedish_ci': None  # Swedish case-insensitive.
     }
 
+    # A set of dotted paths to tests in Django's test suite that are expected
+    # to fail on this database.
+    django_test_expected_failures = {}
+    # A map of reasons to sets of dotted paths to tests in Django's test suite
+    # that should be skipped for this database.
+    django_test_skips = {}
+
     def __init__(self, connection):
         self.connection = connection
 

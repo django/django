@@ -51,6 +51,52 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     }
 
     @cached_property
+    def django_test_skips(self):
+        skips = {
+            "This doesn't work on MySQL.": {
+                'db_functions.comparison.test_greatest.GreatestTests.test_coalesce_workaround',
+                'db_functions.comparison.test_least.LeastTests.test_coalesce_workaround',
+            },
+            'Running on MySQL requires utf8mb4 encoding (#18392).': {
+                'model_fields.test_textfield.TextFieldTests.test_emoji',
+                'model_fields.test_charfield.TestCharField.test_emoji',
+            },
+        }
+        if 'ONLY_FULL_GROUP_BY' in self.connection.sql_mode:
+            skips.update({
+                'GROUP BY optimization does not work properly when '
+                'ONLY_FULL_GROUP_BY mode is enabled on MySQL, see #31331.': {
+                    'aggregation.tests.AggregateTestCase.test_aggregation_subquery_annotation_multivalued',
+                    'annotations.tests.NonAggregateAnnotationTestCase.test_annotation_aggregate_with_m2o',
+                },
+            })
+        if (
+            self.connection.mysql_is_mariadb and
+            (10, 4, 3) < self.connection.mysql_version < (10, 5, 2)
+        ):
+            skips.update({
+                'https://jira.mariadb.org/browse/MDEV-19598': {
+                    'schema.tests.SchemaTests.test_alter_not_unique_field_to_primary_key',
+                },
+            })
+        if (
+            self.connection.mysql_is_mariadb and
+            (10, 4, 12) < self.connection.mysql_version < (10, 5)
+        ):
+            skips.update({
+                'https://jira.mariadb.org/browse/MDEV-22775': {
+                    'schema.tests.SchemaTests.test_alter_pk_with_self_referential_field',
+                },
+            })
+        if not self.supports_explain_analyze:
+            skips.update({
+                'MariaDB and MySQL >= 8.0.18 specific.': {
+                    'queries.test_explain.ExplainTests.test_mysql_analyze',
+                },
+            })
+        return skips
+
+    @cached_property
     def _mysql_storage_engine(self):
         "Internal method used in Django tests. Don't rely on this from your code"
         return self.connection.mysql_server_data['default_storage_engine']

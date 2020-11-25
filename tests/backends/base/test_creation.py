@@ -1,5 +1,6 @@
 import copy
 import datetime
+import os
 from unittest import mock
 
 from django.db import DEFAULT_DB_ALIAS, connection, connections
@@ -107,6 +108,22 @@ class TestDbCreationTests(SimpleTestCase):
             with mock.patch.object(creation, '_destroy_test_db'):
                 creation.destroy_test_db(old_database_name, verbosity=0)
 
+    @mock.patch.dict(os.environ, {'RUNNING_DJANGOS_TEST_SUITE': ''})
+    @mock.patch.object(BaseDatabaseCreation, 'mark_expected_failures_and_skips')
+    def test_mark_expected_failures_and_skips_call(self, mark_expected_failures_and_skips, *mocked_objects):
+        """
+        mark_expected_failures_and_skips() isn't called unless
+        RUNNING_DJANGOS_TEST_SUITE is 'true'.
+        """
+        test_connection = get_connection_copy()
+        creation = test_connection.creation_class(test_connection)
+        if connection.vendor == 'oracle':
+            # Don't close connection on Oracle.
+            creation.connection.close = mock.Mock()
+        with mock.patch.object(creation, '_create_test_db'):
+            creation.create_test_db(verbosity=0, autoclobber=True, serialize=False)
+        self.assertIs(mark_expected_failures_and_skips.called, False)
+
 
 class TestDeserializeDbFromString(TransactionTestCase):
     available_apps = ['backends']
@@ -188,3 +205,48 @@ class TestDeserializeDbFromString(TransactionTestCase):
             data = connection.creation.serialize_db_to_string()
         self.assertIn('"model": "backends.schoolclass"', data)
         self.assertIn('"year": 1000', data)
+
+
+class SkipTestClass:
+    def skip_function(self):
+        pass
+
+
+def skip_test_function():
+    pass
+
+
+def expected_failure_test_function():
+    pass
+
+
+class TestMarkTests(SimpleTestCase):
+    def test_mark_expected_failures_and_skips(self):
+        test_connection = get_connection_copy()
+        creation = BaseDatabaseCreation(test_connection)
+        creation.connection.features.django_test_expected_failures = {
+            'backends.base.test_creation.expected_failure_test_function',
+        }
+        creation.connection.features.django_test_skips = {
+            'skip test class': {
+                'backends.base.test_creation.SkipTestClass',
+            },
+            'skip test function': {
+                'backends.base.test_creation.skip_test_function',
+            },
+        }
+        creation.mark_expected_failures_and_skips()
+        self.assertIs(
+            expected_failure_test_function.__unittest_expecting_failure__,
+            True,
+        )
+        self.assertIs(SkipTestClass.__unittest_skip__, True)
+        self.assertEqual(
+            SkipTestClass.__unittest_skip_why__,
+            'skip test class',
+        )
+        self.assertIs(skip_test_function.__unittest_skip__, True)
+        self.assertEqual(
+            skip_test_function.__unittest_skip_why__,
+            'skip test function',
+        )

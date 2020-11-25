@@ -72,6 +72,28 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         'swedish_ci': 'SWEDISH_CI',
     }
 
+    django_test_skips = {
+        "Oracle doesn't support SHA224.": {
+            'db_functions.text.test_sha224.SHA224Tests.test_basic',
+            'db_functions.text.test_sha224.SHA224Tests.test_transform',
+        },
+        "Oracle doesn't support bitwise XOR.": {
+            'expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor',
+            'expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor_null',
+        },
+        "Oracle requires ORDER BY in row_number, ANSI:SQL doesn't.": {
+            'expressions_window.tests.WindowFunctionTests.test_row_number_no_ordering',
+        },
+        'Raises ORA-00600: internal error code on Oracle 18.': {
+            'model_fields.test_jsonfield.TestQuerying.test_usage_in_subquery',
+        },
+    }
+    django_test_expected_failures = {
+        # A bug in Django/cx_Oracle with respect to string handling (#23843).
+        'annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions',
+        'annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions_can_ref_other_functions',
+    }
+
     @cached_property
     def introspected_field_types(self):
         return {

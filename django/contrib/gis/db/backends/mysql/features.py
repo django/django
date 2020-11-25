@@ -24,3 +24,17 @@ class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
     def supports_geometry_field_unique_index(self):
         # Not supported in MySQL since https://dev.mysql.com/worklog/task/?id=11808
         return self.connection.mysql_is_mariadb
+
+    @cached_property
+    def django_test_skips(self):
+        skips = super().django_test_skips
+        if (
+            not self.connection.mysql_is_mariadb and
+            self.connection.mysql_version < (8, 0, 0)
+        ):
+            skips.update({
+                'MySQL < 8 gives different results.': {
+                    'gis_tests.geoapp.tests.GeoLookupTest.test_disjoint_lookup',
+                },
+            })
+        return skips

@@ -1,5 +1,4 @@
 import tempfile
-import unittest
 from io import StringIO
 
 from django.contrib.gis import gdal
@@ -229,8 +228,6 @@ class GeoLookupTest(TestCase):
 
     def test_disjoint_lookup(self):
         "Testing the `disjoint` lookup type."
-        if mysql and not mariadb and connection.mysql_version < (8, 0, 0):
-            raise unittest.SkipTest('MySQL < 8 gives different results.')
         ptown = City.objects.get(name='Pueblo')
         qs1 = City.objects.filter(point__disjoint=ptown.point)
         self.assertEqual(7, qs1.count())

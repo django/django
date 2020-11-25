@@ -2,7 +2,6 @@ import datetime
 from decimal import Decimal
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
-from django.db import connection
 from django.db.models import (
     BooleanField, Case, CharField, Count, DateTimeField, DecimalField, Exists,
     ExpressionWrapper, F, FloatField, Func, IntegerField, Max,
@@ -18,19 +17,6 @@ from django.test.utils import register_lookup
 from .models import (
     Author, Book, Company, DepartmentStore, Employee, Publisher, Store, Ticket,
 )
-
-
-def cxOracle_py3_bug(func):
-    """
-    There's a bug in Django/cx_Oracle with respect to string handling under
-    Python 3 (essentially, they treat Python 3 strings as Python 2 strings
-    rather than unicode). This makes some tests here fail under Python 3, so
-    we mark them as expected failures until someone fixes them in #23843.
-    """
-    from unittest import expectedFailure
-
-    from django.db import connection
-    return expectedFailure(func) if connection.vendor == 'oracle' else func
 
 
 class NonAggregateAnnotationTestCase(TestCase):
@@ -590,7 +576,6 @@ class NonAggregateAnnotationTestCase(TestCase):
                 e.id, e.first_name, e.manager, e.random_value, e.last_name, e.age,
                 e.salary, e.store.name, e.annotated_value))
 
-    @cxOracle_py3_bug
     def test_custom_functions(self):
         Company(name='Apple', motto=None, ticker_name='APPL', description='Beautiful Devices').save()
         Company(name='Django Software Foundation', motto=None, ticker_name=None, description=None).save()
@@ -617,7 +602,6 @@ class NonAggregateAnnotationTestCase(TestCase):
             lambda c: (c.name, c.tagline)
         )
 
-    @cxOracle_py3_bug
     def test_custom_functions_can_ref_other_functions(self):
         Company(name='Apple', motto=None, ticker_name='APPL', description='Beautiful Devices').save()
         Company(name='Django Software Foundation', motto=None, ticker_name=None, description=None).save()
@@ -770,11 +754,6 @@ class NonAggregateAnnotationTestCase(TestCase):
         ])
 
     def test_annotation_aggregate_with_m2o(self):
-        if connection.vendor == 'mysql' and 'ONLY_FULL_GROUP_BY' in connection.sql_mode:
-            self.skipTest(
-                'GROUP BY optimization does not work properly when '
-                'ONLY_FULL_GROUP_BY mode is enabled on MySQL, see #31331.'
-            )
         qs = Author.objects.filter(age__lt=30).annotate(
             max_pages=Case(
                 When(book_contact_set__isnull=True, then=Value(0)),
