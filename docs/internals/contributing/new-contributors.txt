@@ -2,83 +2,55 @@
 Advice for new contributors
 ===========================
 
-New contributor and not sure what to do? Want to help but just don't know how
-to get started? This is the section for you.
+Getting started with Open Source or contributing to a
+large project like Django can be overwhelming.
+But here is how you can get started and get on track as a
+new contributor.
 
 .. admonition:: Basic tools and workflow
 
     If you are new to contributing to Django, the :doc:`/intro/contributing`
     tutorial will give you an introduction to the tools and the workflow.
 
-First steps
-===========
+Django is hosted on Github_. You can find bugs and feature requests
+on Trac_.
 
-Start with these steps to discover Django's development process.
+**Pick a subject area**
+  Pick something that you care about, and that you are familiar with,
+  or that you want to learn about. You don't already have to be an
+  expert on the area you want to work on; you become an expert
+  through your ongoing contributions to the codebase.
 
-* **Triage tickets**
+  There are subject areas like:
 
-  If an `unreviewed ticket`_ reports a bug, try and reproduce it. If you
-  can reproduce it and it seems valid, make a note that you confirmed the bug
-  and accept the ticket. Make sure the ticket is filed under the correct
-  component area. Consider writing a patch that adds a test for the bug's
-  behavior, even if you don't fix the bug itself. See more at
-  :ref:`how-can-i-help-with-triaging`
+  * **Developers**
+      Writing Django code is one major subject area of contribution.
+      You can write patches for bugs or features and make pull requests
+      to be reviewed.
 
-* **Look for tickets that are accepted and review patches to build familiarity
-  with the codebase and the process**
+      You can start from the contributing :doc:`code guide <writing-code/index>`
 
-  Mark the appropriate flags if a patch needs docs or tests. Look through the
-  changes a patch makes, and keep an eye out for syntax that is incompatible
-  with older but still supported versions of Python. :doc:`Run the tests
-  </internals/contributing/writing-code/unit-tests>` and make sure they pass.
-  Where possible and relevant, try them out on a database other than SQLite.
-  Leave comments and feedback!
+  * **Documenting**
+      Django has a lot of documentation and most of them could use some editing
+      from you. :doc:`Improve the documentation <writing-documentation>`.
 
-* **Keep old patches up to date**
+  * **Localizing**
+      Most part of Django are internationalized, and needs more than translators
+      to increase the language reach. :doc:`Help translate Django <localizing>`.
 
-  Oftentimes the codebase will change between a patch being submitted and the
-  time it gets reviewed. Make sure it still applies cleanly and functions as
-  expected. Updating a patch is both useful and important! See more on
-  :doc:`writing-code/submitting-patches`.
+**Start small**
+  * :doc:`Report bugs <bugs-and-features>` in our `ticket tracker`_.
 
-* **Write some documentation**
+  * It's easier to get feedback on a little issue than on a big one.
+    See the `easy pickings`_.
 
-  Django's documentation is great but it can always be improved. Did you find
-  a typo? Do you think that something should be clarified? Go ahead and
-  suggest a documentation patch! See also the guide on
-  :doc:`writing-documentation`.
-
-  .. note::
-
-      The `reports page`_ contains links to many useful Trac queries, including
-      several that are useful for triaging tickets and reviewing patches as
-      suggested above.
-
-      .. _reports page: https://code.djangoproject.com/wiki/Reports
-
-* **Sign the Contributor License Agreement**
-
-  The code that you write belongs to you or your employer. If your
-  contribution is more than one or two lines of code, you need to sign the
-  `CLA`_. See the `Contributor License Agreement FAQ`_ for a more thorough
-  explanation.
-
-.. _CLA: https://www.djangoproject.com/foundation/cla/
-.. _Contributor License Agreement FAQ: https://www.djangoproject.com/foundation/cla/faq/
-.. _unreviewed ticket: https://code.djangoproject.com/query?status=!closed&stage=Unreviewed
-
+.. _Github: https://github.com/django/django
+.. _Trac: https://code.djangoproject.com/
+.. _ticket tracker: https://code.djangoproject.com/
+.. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
 
 Guidelines
 ==========
-
-As a newcomer on a large project, it's easy to experience frustration. Here's
-some advice to make your work on Django more useful and rewarding.
-
-* **Pick a subject area that you care about, that you are familiar with, or
-  that you want to learn about**
-
-  You don't already have to be an expert on the area you want to work on; you
-  become an expert through your ongoing contributions to the code.
 
 * **Analyze tickets' context and history**
 
@@ -89,11 +61,6 @@ some advice to make your work on Django more useful and rewarding.
   *hasn't* spoken -- for example, if an experienced contributor hasn't been
   recently involved in a discussion, then a ticket may not have the support
   required to get into Django.
-
-* **Start small**
-
-  It's easier to get feedback on a little issue than on a big one. See the
-  `easy pickings`_.
 
 * **If you're going to engage in a big task, make sure that your idea has
   support first**
@@ -132,15 +99,58 @@ some advice to make your work on Django more useful and rewarding.
   writing the very first tests for that feature, not that you get a pass from
   writing tests altogether.
 
-.. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
+
+Next Steps
+===========
+
+Here are some other way to contribute and discover Django's development process.
+
+* **Triage tickets**
+
+  If an `unreviewed ticket`_ reports a bug, try and reproduce it. If you
+  can reproduce it and it seems valid, make a note that you confirmed the bug
+  and accept the ticket. Make sure the ticket is filed under the correct
+  component area. Consider writing a patch that adds a test for the bug's
+  behavior, even if you don't fix the bug itself. See more at
+  :ref:`how-can-i-help-with-triaging`
+
+* **Look for tickets that are accepted and review patches to build familiarity
+  with the codebase and the process**
+
+  Mark the appropriate flags if a patch needs docs or tests. Look through the
+  changes a patch makes, and keep an eye out for syntax that is incompatible
+  with older but still supported versions of Python. :doc:`Run the tests
+  </internals/contributing/writing-code/unit-tests>` and make sure they pass.
+  Where possible and relevant, try them out on a database other than SQLite.
+  Leave comments and feedback!
+
+* **Keep old patches up to date**
+
+  Oftentimes the codebase will change between a patch being submitted and the
+  time it gets reviewed. Make sure it still applies cleanly and functions as
+  expected. Updating a patch is both useful and important! See more on
+  :doc:`writing-code/submitting-patches`.
+
+* **Sign the Contributor License Agreement**
+
+  The code that you write belongs to you or your employer. If your
+  contribution is more than one or two lines of code, you need to sign the
+  `CLA`_. See the `Contributor License Agreement FAQ`_ for a more thorough
+  explanation.
+
+
+.. _CLA: https://www.djangoproject.com/foundation/cla/
+.. _Contributor License Agreement FAQ: https://www.djangoproject.com/foundation/cla/faq/
+.. _unreviewed ticket: https://code.djangoproject.com/query?status=!closed&stage=Unreviewed
+
 
 .. _new-contributors-faq:
 
 FAQ
 ===
 
-1. **This ticket I care about has been ignored for days/weeks/months! What can
-   I do to get it committed?**
+1. **My ticket has been ignored for days/weeks/months! What can I do to
+   get it committed?**
 
    First off, it's not personal. Django is entirely developed by volunteers
    (except the Django fellow), and sometimes folks just don't have time. The
