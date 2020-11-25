@@ -749,6 +749,19 @@ class TestQuerying(TestCase):
                     expected,
                 )
 
+    def test_key_values(self):
+        qs = NullableJSONModel.objects.filter(value__h=True)
+        tests = [
+            ('value__a', 'b'),
+            ('value__d', ['e', {'f': 'g'}]),
+            ('value__j', None),
+            ('value__k', {'l': 'm'}),
+            ('value__n', [None]),
+        ]
+        for lookup, expected in tests:
+            with self.subTest(lookup=lookup):
+                self.assertEqual(qs.values_list(lookup, flat=True).get(), expected)
+
     @skipUnlessDBFeature('supports_json_field_contains')
     def test_key_contains(self):
         self.assertIs(NullableJSONModel.objects.filter(value__foo__contains='ar').exists(), False)
