@@ -152,8 +152,8 @@ class TestSigner(SimpleTestCase):
 
     def test_compress_decompress(self):
         value = b'a string'
-        compressed = signing.compress_b64encode(value)
-        self.assertEqual(signing.b64decode_decompress(compressed), value)
+        compressed = signing.compress_b64(value)
+        self.assertEqual(signing.decompress_b64(compressed), value)
 
     def test_decode_detects_tampering(self):
         "loads should raise exception for tampered objects"

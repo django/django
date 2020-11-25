@@ -1,4 +1,4 @@
-from django.core.signing import b64decode_decompress
+from django.core.signing import decompress_b64
 from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 
@@ -14,4 +14,4 @@ class SuccessMessageMixinTests(SimpleTestCase):
         req = self.client.post(add_url, author)
         self.assertIn(
             bytes(ContactFormViewWithMsg.success_message % author, 'utf-8'),
-            b64decode_decompress(req.cookies['messages'].value))
+            decompress_b64(req.cookies['messages'].value))

@@ -25,7 +25,7 @@ class MessageEncoder(json.JSONEncoder):
         return super().default(obj)
 
     def encode(self, obj):
-        return signing.compress_b64encode(bytes(super().encode(obj), 'utf-8'))
+        return signing.compress_b64(bytes(super().encode(obj), 'utf-8'))
 
 
 class MessageDecoder(json.JSONDecoder):
@@ -46,7 +46,7 @@ class MessageDecoder(json.JSONDecoder):
         return obj
 
     def decode(self, s, **kwargs):
-        decoded = super().decode(signing.b64decode_decompress(s).decode(), **kwargs)
+        decoded = super().decode(signing.decompress_b64(s).decode(), **kwargs)
         return self.process_messages(decoded)
 
 
