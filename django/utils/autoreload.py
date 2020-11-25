@@ -149,15 +149,15 @@ def iter_modules_and_files(modules, extra_files):
             continue
         path = Path(filename)
         try:
-            resolved_path = path.resolve(strict=True).absolute()
-        except FileNotFoundError:
-            # The module could have been removed, don't fail loudly if this
-            # is the case.
-            continue
+            if not path.exists():
+                # The module could have been removed, don't fail loudly if this
+                # is the case.
+                continue
         except ValueError as e:
             # Network filesystems may return null bytes in file paths.
             logger.debug('"%s" raised when resolving path: "%s"', e, path)
             continue
+        resolved_path = path.resolve().absolute()
         results.add(resolved_path)
     return frozenset(results)
 
@@ -200,10 +200,9 @@ def sys_path_directories():
     """
     for path in sys.path:
         path = Path(path)
-        try:
-            resolved_path = path.resolve(strict=True).absolute()
-        except FileNotFoundError:
+        if not path.exists():
             continue
+        resolved_path = path.resolve().absolute()
         # If the path is a file (like a zip file), watch the parent directory.
         if resolved_path.is_file():
             yield resolved_path.parent
