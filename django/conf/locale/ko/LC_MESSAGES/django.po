@@ -894,25 +894,25 @@ msgid "Sunday"
 msgstr "일요일"
 
 msgid "Mon"
-msgstr "월요일"
+msgstr "월"
 
 msgid "Tue"
-msgstr "화요일"
+msgstr "화"
 
 msgid "Wed"
-msgstr "수요일"
+msgstr "수"
 
 msgid "Thu"
-msgstr "목요일"
+msgstr "목"
 
 msgid "Fri"
-msgstr "금요일"
+msgstr "금"
 
 msgid "Sat"
-msgstr "토요일"
+msgstr "토"
 
 msgid "Sun"
-msgstr "일요일"
+msgstr "일"
 
 msgid "January"
 msgstr "1월"
