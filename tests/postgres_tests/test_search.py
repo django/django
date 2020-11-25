@@ -694,32 +694,47 @@ class TestLexemes(GrailTestData, PostgreSQLTestCase):
         self.assertSequenceEqual(searched, [self.bedemir0])
 
     def test_or(self):
-        searched = Line.objects.filter(dialogue__search=SearchQuery(Lexeme('kneecaps') | Lexeme('nostrils')))
+        searched = Line.objects.annotate(
+            search=SearchVector('dialogue')
+        ).filter(
+            search=SearchQuery(Lexeme('kneecaps') | Lexeme('nostrils'))
+        )
         self.assertCountEqual(searched, [self.verse1, self.verse2])
 
     def test_multiple_or(self):
-        searched = Line.objects.filter(
-            dialogue__search=SearchQuery(Lexeme('kneecaps') | Lexeme('nostrils') | Lexeme('Sir Robin'))
+        searched = Line.objects.annotate(
+            search=SearchVector('dialogue')
+        ).filter(
+            search=SearchQuery(Lexeme('kneecaps') | Lexeme('nostrils') | Lexeme('Sir Robin'))
         )
         self.assertCountEqual(searched, [self.verse1, self.verse2, self.verse0])
 
     def test_advanced(self):
         # Test cominbation of & and |
         # This is mainly helpful for checking the test_advanced_invert below
-        searched = Line.objects.filter(
-            dialogue__search=SearchQuery(Lexeme('shall') & Lexeme('use') & Lexeme('larger') | Lexeme('nostrils'))
+        searched = Line.objects.annotate(
+            search=SearchVector('dialogue')
+        ).filter(
+            search=SearchQuery(Lexeme('shall') & Lexeme('use') & Lexeme('larger') | Lexeme('nostrils'))
         )
         self.assertCountEqual(searched, [self.bedemir0, self.verse2])
 
     def test_invert(self):
-        searched = Line.objects.filter(character=self.minstrel, dialogue__search=SearchQuery(~Lexeme('kneecaps')))
+        searched = Line.objects.annotate(
+            search=SearchVector('dialogue')
+        ).filter(
+            character=self.minstrel,
+            search=SearchQuery(~Lexeme('kneecaps'))
+        )
         self.assertCountEqual(searched, [self.verse0, self.verse2])
 
     def test_advanced_invert(self):
         # Test inverting a query that uses a cominbation of & and |
         # Should return the opposite of test_advanced
-        searched = Line.objects.filter(
-            dialogue__search=SearchQuery(~(Lexeme('shall') & Lexeme('use') & Lexeme('larger') | Lexeme('nostrils')))
+        searched = Line.objects.annotate(
+            search=SearchVector('dialogue')
+        ).filter(
+            search=SearchQuery(~(Lexeme('shall') & Lexeme('use') & Lexeme('larger') | Lexeme('nostrils')))
         )
         expected_result = Line.objects.exclude(id__in=[self.bedemir0.id, self.verse2.id])
         self.assertCountEqual(searched, expected_result)
