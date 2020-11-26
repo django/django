@@ -498,10 +498,10 @@ class TestSecretKeysSettings(unittest.TestCase):
         self.assertEqual(settings.SECRET_KEYS, ['foo', 'bar'])
 
     def test_both_specified(self):
-        msg = 'Only one of SECRET_KEY and SECRET_KEYS must be specified, not both.'
-
-        with self.assertRaisesRegex(ImproperlyConfigured, msg):
+        try:
             self.make_settings(SECRET_KEY='a', SECRET_KEYS=['a'])
+        except ImproperlyConfigured:
+            self.fail("ImproperlyConfigured Exception raised unexpectedly.")
 
     def test_empty(self):
         msg = 'The SECRET_KEY or SECRET_KEYS setting must not be empty.'
