@@ -1,3 +1,4 @@
+import asyncio
 from functools import wraps
 
 from django.middleware.csrf import CsrfViewMiddleware, get_token
@@ -52,5 +53,11 @@ def csrf_exempt(view_func):
     # if they don't have side effects, so return a new function.
     def wrapped_view(*args, **kwargs):
         return view_func(*args, **kwargs)
+
+    async def async_wrapped_view(*args, **kwargs):
+        return await view_func(*args, **kwargs)
     wrapped_view.csrf_exempt = True
+    async_wrapped_view.csrf_exempt = True
+    if asyncio.iscoroutinefunction(view_func):
+        return wraps(view_func)(async_wrapped_view)
     return wraps(view_func)(wrapped_view)

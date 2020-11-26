@@ -186,7 +186,7 @@ Cache
 CSRF
 ~~~~
 
-* ...
+* csrf_exempt decorator now supports async views
 
 Decorators
 ~~~~~~~~~~
