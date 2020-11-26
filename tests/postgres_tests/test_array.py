@@ -9,7 +9,7 @@ from django.core import checks, exceptions, serializers, validators
 from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
-from django.db.models.expressions import RawSQL
+from django.db.models.expressions import Exists, OuterRef, RawSQL
 from django.db.models.functions import Cast
 from django.test import TransactionTestCase, modify_settings, override_settings
 from django.test.utils import isolate_apps
@@ -311,6 +311,19 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__contains=[2]),
             self.objs[1:3]
+        )
+
+    def test_contains_subquery(self):
+        IntegerArrayModel.objects.create(field=[2, 3])
+        inner_qs = IntegerArrayModel.objects.values_list('field', flat=True)
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__contains=inner_qs[:1]),
+            self.objs[2:3],
+        )
+        inner_qs = IntegerArrayModel.objects.filter(field__contains=OuterRef('field'))
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(Exists(inner_qs)),
+            self.objs[1:3],
         )
 
     def test_icontains(self):
