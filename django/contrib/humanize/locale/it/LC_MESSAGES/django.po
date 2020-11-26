@@ -11,13 +11,14 @@
 # Nicola Larosa <transifex@teknico.net>, 2011
 # palmux <palmux@gmail.com>, 2015
 # Stefano Brentegani <sbrentegani@gmail.com>, 2015
+# DaRk_ViVi <darkvivi@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-07-30 21:09+0000\n"
-"Last-Translator: Carlo Miron <C8E@miron.it>\n"
+"PO-Revision-Date: 2020-11-26 19:46+0000\n"
+"Last-Translator: DaRk_ViVi <darkvivi@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -32,57 +33,57 @@ msgstr "Umanizzazione "
 #. Translators: Ordinal format for 11 (11th), 12 (12th), and 13 (13th).
 msgctxt "ordinal 11, 12, 13"
 msgid "{}th"
-msgstr "{}esimo"
+msgstr "{}º"
 
 #. Translators: Ordinal format when value ends with 0, e.g. 80th.
 msgctxt "ordinal 0"
 msgid "{}th"
-msgstr "{}esimo"
+msgstr "{}º"
 
 #. Translators: Ordinal format when value ends with 1, e.g. 81st, except 11.
 msgctxt "ordinal 1"
 msgid "{}st"
-msgstr "{}esimo"
+msgstr "{}º"
 
 #. Translators: Ordinal format when value ends with 2, e.g. 82nd, except 12.
 msgctxt "ordinal 2"
 msgid "{}nd"
-msgstr "{}esimo"
+msgstr "{}º"
 
 #. Translators: Ordinal format when value ends with 3, e.g. 83th, except 13.
 msgctxt "ordinal 3"
 msgid "{}rd"
-msgstr "{}esimo"
+msgstr "{}º"
 
 #. Translators: Ordinal format when value ends with 4, e.g. 84th.
 msgctxt "ordinal 4"
 msgid "{}th"
-msgstr "{}esimo"
+msgstr "{}º"
 
 #. Translators: Ordinal format when value ends with 5, e.g. 85th.
 msgctxt "ordinal 5"
 msgid "{}th"
-msgstr "{}esimo"
+msgstr "{}º"
 
 #. Translators: Ordinal format when value ends with 6, e.g. 86th.
 msgctxt "ordinal 6"
 msgid "{}th"
-msgstr "{}esimo"
+msgstr "{}º"
 
 #. Translators: Ordinal format when value ends with 7, e.g. 87th.
 msgctxt "ordinal 7"
 msgid "{}th"
-msgstr "{}esimo"
+msgstr "{}º"
 
 #. Translators: Ordinal format when value ends with 8, e.g. 88th.
 msgctxt "ordinal 8"
 msgid "{}th"
-msgstr "{}esimo"
+msgstr "{}º"
 
 #. Translators: Ordinal format when value ends with 9, e.g. 89th.
 msgctxt "ordinal 9"
 msgid "{}th"
-msgstr "{}esimo"
+msgstr "{}º"
 
 #, python-format
 msgid "%(value).1f million"
