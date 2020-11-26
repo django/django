@@ -951,6 +951,12 @@ class CityAdmin(admin.ModelAdmin):
     inlines = [RestaurantInlineAdmin]
     view_on_site = True
 
+    def get_formset_kwargs(self, request, obj, inline, prefix):
+        return {
+            **super().get_formset_kwargs(request, obj, inline, prefix),
+            'form_kwargs': {'initial': {'name': 'overridden_name'}},
+        }
+
 
 class WorkerAdmin(admin.ModelAdmin):
     def view_on_site(self, obj):

@@ -2088,6 +2088,22 @@ templates used by the :class:`ModelAdmin` views:
     ``obj_id`` is the serialized identifier used to retrieve the object to be
     deleted.
 
+.. method:: ModelAdmin.get_formset_kwargs(request, obj, inline, prefix)
+
+    .. versionadded:: 4.0
+
+    A hook for customizing the keyword arguments passed to the constructor of a
+    formset. For example, to pass ``request`` to formset forms::
+
+        class MyModelAdmin(admin.ModelAdmin):
+            def get_formset_kwargs(self, request, obj, inline, prefix):
+                return {
+                    **super().get_formset_kwargs(request, obj, inline, prefix),
+                    'form_kwargs': {'request': request},
+                }
+
+    You can also used it to set ``initial`` for formset forms.
+
 .. method:: ModelAdmin.get_changeform_initial_data(request)
 
     A hook for the initial data on admin change forms. By default, fields are

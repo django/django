@@ -1117,6 +1117,10 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertContains(response, '<h1>View article</h1>')
         self.assertContains(response, '<h2>Article 2</h2>')
 
+    def test_formset_kwargs_can_be_overridden(self):
+        response = self.client.get(reverse('admin:admin_views_city_add'))
+        self.assertContains(response, 'overridden_name')
+
 
 @override_settings(TEMPLATES=[{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',

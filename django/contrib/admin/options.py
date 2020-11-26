@@ -1946,6 +1946,20 @@ class ModelAdmin(BaseModelAdmin):
             "admin/object_history.html"
         ], context)
 
+    def get_formset_kwargs(self, request, obj, inline, prefix):
+        formset_params = {
+            'instance': obj,
+            'prefix': prefix,
+            'queryset': inline.get_queryset(request),
+        }
+        if request.method == 'POST':
+            formset_params.update({
+                'data': request.POST.copy(),
+                'files': request.FILES,
+                'save_as_new': '_saveasnew' in request.POST
+            })
+        return formset_params
+
     def _create_formsets(self, request, obj, change):
         "Helper function to generate formsets for add/change_view."
         formsets = []
@@ -1959,17 +1973,7 @@ class ModelAdmin(BaseModelAdmin):
             prefixes[prefix] = prefixes.get(prefix, 0) + 1
             if prefixes[prefix] != 1 or not prefix:
                 prefix = "%s-%s" % (prefix, prefixes[prefix])
-            formset_params = {
-                'instance': obj,
-                'prefix': prefix,
-                'queryset': inline.get_queryset(request),
-            }
-            if request.method == 'POST':
-                formset_params.update({
-                    'data': request.POST.copy(),
-                    'files': request.FILES,
-                    'save_as_new': '_saveasnew' in request.POST
-                })
+            formset_params = self.get_formset_kwargs(request, obj, inline, prefix)
             formset = FormSet(**formset_params)
 
             def user_deleted_form(request, obj, formset, index):

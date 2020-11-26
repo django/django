@@ -37,6 +37,9 @@ Minor features
 * The ``admin/base.html`` template now has a new block ``header`` which
   contains the admin site header.
 
+* The new :meth:`.ModelAdmin.get_formset_kwargs` method allows customizing the
+  keyword arguments passed to the constructor of a formset.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
