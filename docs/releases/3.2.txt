@@ -114,6 +114,9 @@ Minor features
 * The :meth:`.GDALRaster.transform` method now supports
   :class:`~django.contrib.gis.gdal.SpatialReference`.
 
+* The :class:`~django.contrib.gis.gdal.DataSource` class now supports
+  :class:`pathlib.Path`.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
