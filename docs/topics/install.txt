@@ -187,7 +187,7 @@ latest bug fixes and improvements, follow these instructions:
 #. Make sure that you have Git_ installed and that you can run its commands
    from a shell. (Enter ``git help`` at a shell prompt to test this.)
 
-#. Check out Django's main development branch like so:
+#. Check out Django's ``master`` development branch like so:
 
    .. console::
 
