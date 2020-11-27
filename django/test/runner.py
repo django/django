@@ -436,7 +436,7 @@ class DiscoverRunner:
 
     def __init__(self, pattern=None, top_level=None, verbosity=1,
                  interactive=True, failfast=False, keepdb=False,
-                 reverse=False, debug_mode=False, debug_sql=False, parallel=0,
+                 reverse=False, debug_mode=False, debug_sql=False, parallel=1,
                  tags=None, exclude_tags=None, test_name_patterns=None,
                  pdb=False, buffer=False, enable_faulthandler=True,
                  timing=False, **kwargs):
@@ -450,7 +450,10 @@ class DiscoverRunner:
         self.reverse = reverse
         self.debug_mode = debug_mode
         self.debug_sql = debug_sql
-        self.parallel = parallel
+        if parallel == 0:
+            self.parallel = default_test_processes()
+        else:
+            self.parallel = parallel
         self.tags = set(tags or [])
         self.exclude_tags = set(exclude_tags or [])
         if not faulthandler.is_enabled() and enable_faulthandler:
