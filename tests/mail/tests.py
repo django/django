@@ -18,6 +18,7 @@ from ssl import SSLError
 from unittest import mock
 
 from django.core import mail
+from django.core import checks
 from django.core.mail import (
     DNS_NAME, EmailMessage, EmailMultiAlternatives, mail_admins, mail_managers,
     send_mail, send_mass_mail,
@@ -374,6 +375,25 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         msg = EmailMessage('subject', None, 'from@example.com', ['to@example.com'])
         self.assertEqual(msg.body, '')
         self.assertEqual(msg.message().get_payload(), '')
+
+    def test_message_id_fqdn(self):
+        email = EmailMessage('subject', 'content', 'from@example.com', ['to@example.com'])
+        pattern = r'^<\d+\.\d+\.\d+@%s>$' % DNS_NAME
+        self.assertRegex(email.message()['Message-ID'], pattern)
+
+    @override_settings(
+        EMAIL_MESSAGEID_FQDN='example.com',
+    )
+    def test_message_id_override(self):
+        email = EmailMessage('subject', 'content', 'from@example.com', ['to@example.com'])
+        pattern = r'^<\d+\.\d+\.\d+@example.com>$'
+        self.assertRegex(email.message()['Message-ID'], pattern)
+
+    @override_settings(
+        EMAIL_MESSAGEID_FQDN='-nowhere.com',
+    )
+    def test_check_invalid_messageid_fqdn(self):
+        self.assertIsInstance(checks.email.check_messageid_fqdn(None)[0], checks.Error)
 
     @mock.patch('socket.getfqdn', return_value='漢字')
     def test_non_ascii_dns_non_unicode_email(self, mocked_getfqdn):

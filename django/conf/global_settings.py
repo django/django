@@ -201,6 +201,9 @@ EMAIL_PORT = 25
 # Whether to send SMTP 'Date' header in the local time zone or in UTC.
 EMAIL_USE_LOCALTIME = False
 
+# Optional: Override the fully qualified domain name of the generated Message-ID.
+EMAIL_MESSAGEID_FQDN = None
+
 # Optional SMTP authentication information for EMAIL_HOST.
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''

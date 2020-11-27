@@ -12,6 +12,7 @@ class Tags:
     caches = 'caches'
     compatibility = 'compatibility'
     database = 'database'
+    email = 'email'
     models = 'models'
     security = 'security'
     signals = 'signals'

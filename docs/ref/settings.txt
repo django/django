@@ -1446,6 +1446,17 @@ Default: ``False``
 Whether to send the SMTP ``Date`` header of email messages in the local time
 zone (``True``) or in UTC (``False``).
 
+.. setting:: EMAIL_MESSAGEID_FQDN
+
+``EMAIL_MESSAGEID_FQDN``
+-----------------------
+
+Default: ``None``
+
+The fully qualified domain name of the right part of each Message-ID generated
+for delivering emails. If unset this falls back to the host name determined by
+a reverse DNS lookup.
+
 .. setting:: EMAIL_USE_TLS
 
 ``EMAIL_USE_TLS``

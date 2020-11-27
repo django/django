@@ -181,6 +181,13 @@ Minor features
 * The new ``item_comments`` hook allows specifying a comments URL per feed
   item.
 
+:mod:`django.core.mail`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* Add settings directive ``EMAIL_MESSAGEID_FQDN`` to override the fully
+  qualified domain name of the right part of each Message-ID generated
+  for delivering emails.
+
 Cache
 ~~~~~
 
