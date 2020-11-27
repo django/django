@@ -17,8 +17,7 @@ from smtplib import SMTP, SMTPAuthenticationError, SMTPException
 from ssl import SSLError
 from unittest import mock
 
-from django.core import mail
-from django.core import checks
+from django.core import checks, mail
 from django.core.mail import (
     DNS_NAME, EmailMessage, EmailMultiAlternatives, mail_admins, mail_managers,
     send_mail, send_mass_mail,
