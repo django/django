@@ -331,7 +331,7 @@ Now, open the world borders shapefile using GeoDjango's
 :class:`~django.contrib.gis.gdal.DataSource` interface::
 
     >>> from django.contrib.gis.gdal import DataSource
-    >>> ds = DataSource(world_shp)
+    >>> ds = DataSource(str(world_shp))
     >>> print(ds)
     / ... /geodjango/world/data/TM_WORLD_BORDERS-0.3.shp (ESRI Shapefile)
 
