@@ -1449,7 +1449,7 @@ zone (``True``) or in UTC (``False``).
 .. setting:: EMAIL_MESSAGEID_FQDN
 
 ``EMAIL_MESSAGEID_FQDN``
------------------------
+------------------------
 
 Default: ``None``
 
