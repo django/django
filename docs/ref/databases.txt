@@ -22,6 +22,12 @@ This file describes some of the features that might be relevant to Django
 usage. It is not intended as a replacement for server-specific documentation or
 reference manuals.
 
+.. note::
+
+   Most database backends require separate installation of client libraries and
+   Python modules in order to be used, as explained in their respective notes
+   sections. Django will not install these libraries or modules automatically.
+
 General notes
 =============
 
@@ -679,12 +685,16 @@ appropriate typecasting.
 SQLite notes
 ============
 
-Django supports SQLite 3.8.3 and later.
+Django supports SQLite 3.8.3 and later. sqlite3_ is required; in most
+installations, this is part of the Python Standard Library but may require
+separate installation in certain environments (such as FreeBSD).
 
 SQLite_ provides an excellent development alternative for applications that
 are predominantly read-only or require a smaller installation footprint. As
 with all database servers, though, there are some differences that are
 specific to SQLite that you should be aware of.
+
+.. _sqlite3: https://docs.python.org/3/library/sqlite3.html
 
 .. _SQLite: https://www.sqlite.org/
 
