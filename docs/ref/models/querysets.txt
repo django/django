@@ -1843,7 +1843,7 @@ raised if ``select_for_update()`` is used in autocommit mode.
 ``raw()``
 ~~~~~~~~~
 
-.. method:: raw(raw_query, params=None, translations=None)
+.. method:: raw(raw_query, params=(), translations=None)
 
 Takes a raw SQL query, executes it, and returns a
 ``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
@@ -1857,6 +1857,11 @@ See the :doc:`/topics/db/sql` for more information.
   ``raw()`` always triggers a new query and doesn't account for previous
   filtering. As such, it should generally be called from the ``Manager`` or
   from a fresh ``QuerySet`` instance.
+
+.. versionchanged:: 3.2
+
+    The default value of the ``params`` argument was changed from ``None`` to
+    an empty tuple.
 
 Operators that return new ``QuerySet``\s
 ----------------------------------------

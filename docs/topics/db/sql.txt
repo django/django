@@ -43,7 +43,7 @@ Performing raw queries
 The ``raw()`` manager method can be used to perform raw SQL queries that
 return model instances:
 
-.. method:: Manager.raw(raw_query, params=None, translations=None)
+.. method:: Manager.raw(raw_query, params=(), translations=None)
 
 This method takes a raw SQL query, executes it, and returns a
 ``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
@@ -98,6 +98,11 @@ make it very powerful.
     table contains the values ``'abc'``, ``'def'`` and you query for ``WHERE mycolumn=0``,
     both rows will match. To prevent this, perform the correct typecasting
     before using the value in a query.
+
+.. versionchanged:: 3.2
+
+    The default value of the ``params`` argument was changed from ``None`` to
+    an empty tuple.
 
 Mapping query fields to model fields
 ------------------------------------

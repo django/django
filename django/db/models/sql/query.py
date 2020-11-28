@@ -69,8 +69,8 @@ JoinInfo = namedtuple(
 class RawQuery:
     """A single raw SQL query."""
 
-    def __init__(self, sql, using, params=None):
-        self.params = params or ()
+    def __init__(self, sql, using, params=()):
+        self.params = params
         self.sql = sql
         self.using = using
         self.cursor = None
@@ -111,9 +111,13 @@ class RawQuery:
 
     @property
     def params_type(self):
+        if self.params is None:
+            return None
         return dict if isinstance(self.params, Mapping) else tuple
 
     def __str__(self):
+        if self.params_type is None:
+            return self.sql
         return self.sql % self.params_type(self.params)
 
     def _execute_query(self):
@@ -127,6 +131,8 @@ class RawQuery:
             params = tuple(adapter(val) for val in self.params)
         elif params_type is dict:
             params = {key: adapter(val) for key, val in self.params.items()}
+        elif params_type is None:
+            params = None
         else:
             raise RuntimeError("Unexpected params type: %s" % params_type)
 
