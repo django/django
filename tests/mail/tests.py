@@ -388,11 +388,18 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         pattern = r'^<\d+\.\d+\.\d+@example.com>$'
         self.assertRegex(email.message()['Message-ID'], pattern)
 
-    @override_settings(
-        EMAIL_MESSAGEID_FQDN='-nowhere.com',
-    )
-    def test_check_invalid_messageid_fqdn(self):
-        self.assertIsInstance(checks.email.check_messageid_fqdn(None)[0], checks.Error)
+    def test_check_setting_email_messageid_fqdn(self):
+        with override_settings(EMAIL_MESSAGEID_FQDN='@nowhere.com'):
+            self.assertIsInstance(checks.email.check_messageid_fqdn(None)[0], checks.Error)
+        with override_settings(EMAIL_MESSAGEID_FQDN='.nowhere.com'):
+            self.assertIsInstance(checks.email.check_messageid_fqdn(None)[0], checks.Error)
+        with override_settings(EMAIL_MESSAGEID_FQDN='no.where-.com'):
+            self.assertIsInstance(checks.email.check_messageid_fqdn(None)[0], checks.Error)
+        with override_settings(EMAIL_MESSAGEID_FQDN='no where.com'):
+            self.assertIsInstance(checks.email.check_messageid_fqdn(None)[0], checks.Error)
+        with override_settings(EMAIL_MESSAGEID_FQDN='valid-domain.com'):
+            self.assertEqual(checks.email.check_messageid_fqdn(None), [])
+        self.assertEqual(checks.email.check_messageid_fqdn(None), [])
 
     @mock.patch('socket.getfqdn', return_value='漢字')
     def test_non_ascii_dns_non_unicode_email(self, mocked_getfqdn):
