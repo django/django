@@ -453,7 +453,7 @@ with the following code::
     world_shp = Path(__file__).resolve().parent / 'data' / 'TM_WORLD_BORDERS-0.3.shp'
 
     def run(verbose=True):
-        lm = LayerMapping(WorldBorder, world_shp, world_mapping, transform=False)
+        lm = LayerMapping(WorldBorder, str(world_shp), world_mapping, transform=False)
         lm.save(strict=True, verbose=verbose)
 
 A few notes about what's going on:
