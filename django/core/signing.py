@@ -124,6 +124,30 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
     return TimestampSigner(key, salt=salt).sign(base64d)
 
 
+def compress_b64(s):
+    is_compressed = False
+    s = s.encode('utf-8')
+    compressed = zlib.compress(s)
+    if (len(compressed) < len(s) - 1):
+        s = compressed
+        is_compressed = True
+    s = s.decode('utf-8')
+    if is_compressed:
+        s = '.' + s
+    return s
+
+
+def decompress_b64(s):
+    decompress = s[:1] == '.'
+    s = s.encode('utf-8')
+    if decompress:
+        s = s[1:]
+    if decompress:
+        s = zlib.decompress(s)
+    s = s.decode('utf-8')
+    return s
+
+
 def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None):
     """
     Reverse of dumps(), raise BadSignature if signature fails.
