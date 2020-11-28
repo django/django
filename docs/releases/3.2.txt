@@ -117,6 +117,9 @@ Minor features
 * The :class:`~django.contrib.gis.gdal.DataSource` class now supports
   :class:`pathlib.Path`.
 
+* The :class:`~django.contrib.gis.utils.LayerMapping` class now supports
+  :class:`pathlib.Path`.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
