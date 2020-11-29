@@ -124,28 +124,30 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
     return TimestampSigner(key, salt=salt).sign(base64d)
 
 
-def compress_b64(s):
+def compress_b64(uncompressed):
     is_compressed = False
-    s = s.encode('utf-8')
-    compressed = zlib.compress(s)
-    if (len(compressed) < len(s) - 1):
-        s = compressed
+    encoded = uncompressed.encode('latin-1')
+    compressed = zlib.compress(encoded)
+    if (len(compressed) < len(uncompressed) - 1):
+        encoded = compressed
         is_compressed = True
-    s = s.decode('utf-8')
+    b64_encoded = b64_encode(encoded)
+    b64_encoded = b64_encoded.decode('latin-1')
     if is_compressed:
-        s = '.' + s
-    return s
+        b64_encoded = '.' + b64_encoded
+    return b64_encoded
 
 
-def decompress_b64(s):
-    decompress = s[:1] == '.'
-    s = s.encode('utf-8')
+def decompress_b64(compressed):
+    decompress = compressed[:1] == '.'
     if decompress:
-        s = s[1:]
+        compressed = compressed[1:]
+    compressed = compressed.encode('latin-1')
+    b64_decoded = b64_decode(compressed)
     if decompress:
-        s = zlib.decompress(s)
-    s = s.decode('utf-8')
-    return s
+        b64_decoded = zlib.decompress(b64_decoded)
+    b64_decoded = b64_decoded.decode('latin-1')
+    return b64_decoded
 
 
 def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None):

@@ -28,7 +28,7 @@ class MessageEncoder(json.JSONEncoder):
             return message
         return super().default(obj)
 
-    def enocde(self, s):
+    def encode(self, s):
         return signing.compress_b64(super().encode(s))
 
 
