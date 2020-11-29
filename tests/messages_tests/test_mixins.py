@@ -17,6 +17,5 @@ class SuccessMessageMixinTests(TestCase):
     def test_set_messages_success_on_delete(self):
         object_to_delete = SomeObject.objects.create(name="MyObject")
         delete_url = reverse('success_msg_on_delete', args=[object_to_delete.pk])
-        req = self.client.delete(delete_url)
-        self.assertIn(DeleteFormViewWithMsg.success_message,
-                      req.cookies['messages'].value)
+        req = self.client.post(delete_url)
+        self.assertIn(DeleteFormViewWithMsg.success_message, req.cookies['messages'].value)

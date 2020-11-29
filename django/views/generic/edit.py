@@ -39,7 +39,7 @@ class FormMixin(ContextMixin):
             'prefix': self.get_prefix(),
         }
 
-        if self.request.method in ('POST', 'PUT', 'DELETE'):
+        if self.request.method in ('POST', 'PUT'):
             kwargs.update({
                 'data': self.request.POST,
                 'files': self.request.FILES,
@@ -216,10 +216,6 @@ class DeletionMixin:
         self.object = self.get_object()
         return self.delete_object()
 
-    # Add support for browsers which only accept GET and POST for now.
-    def post(self, request, *args, **kwargs):
-        return self.delete(request, *args, **kwargs)
-
     def get_success_url(self):
         if self.success_url:
             return self.success_url.format(**self.object.__dict__)
@@ -240,10 +236,9 @@ class BaseDeleteView(DeletionMixin, FormMixin, SingleObjectMixin, ProcessFormVie
         self.object = self.get_object()
         return super().get(request, *args, **kwargs)
 
-    def delete(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        # Process form instead of directly deleting the object.
-        return super(DeletionMixin, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         return self.delete_object()
