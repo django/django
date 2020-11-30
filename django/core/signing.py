@@ -109,18 +109,10 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
     """
     data = serializer().dumps(obj)
 
-    # Flag for if it's been compressed or not
-    is_compressed = False
-
     if compress:
-        # Avoid zlib dependency unless compress is being used
-        compressed = zlib.compress(data)
-        if len(compressed) < (len(data) - 1):
-            data = compressed
-            is_compressed = True
-    base64d = b64_encode(data).decode()
-    if is_compressed:
-        base64d = '.' + base64d
+        base64d = compress_b64(data.decode('latin-1'))
+    else:
+        base64d = b64_encode(data).decode('latin-1')
     return TimestampSigner(key, salt=salt).sign(base64d)
 
 
