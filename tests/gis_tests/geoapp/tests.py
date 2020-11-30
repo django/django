@@ -607,10 +607,7 @@ class GeoQuerySetTest(TestCase):
             ), True)
         self.assertIn('subquery', ctx.captured_queries[0]['sql'])
 
-    @unittest.skipUnless(
-        connection.vendor == 'oracle',
-        'Oracle supports tolerance parameter.',
-    )
+    @skipUnlessDBFeature('supports_tolerance_parameter')
     def test_unionagg_tolerance(self):
         City.objects.create(
             point=fromstr('POINT(-96.467222 32.751389)', srid=4326),
@@ -633,10 +630,7 @@ class GeoQuerySetTest(TestCase):
             True,
         )
 
-    @unittest.skipUnless(
-        connection.vendor == 'oracle',
-        'Oracle supports tolerance parameter.',
-    )
+    @skipUnlessDBFeature('supports_tolerance_parameter')
     def test_unionagg_tolerance_escaping(self):
         tx = Country.objects.get(name='Texas').mpoly
         with self.assertRaises(DatabaseError):
