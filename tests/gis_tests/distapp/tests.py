@@ -432,10 +432,7 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         ).filter(d=D(m=1))
         self.assertTrue(qs.exists())
 
-    @unittest.skipUnless(
-        connection.vendor == 'oracle',
-        'Oracle supports tolerance parameter.',
-    )
+    @skipUnlessDBFeature('supports_tolerance_parameter')
     def test_distance_function_tolerance_escaping(self):
         qs = Interstate.objects.annotate(
             d=Distance(
@@ -448,10 +445,7 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         with self.assertRaisesMessage(TypeError, msg):
             qs.exists()
 
-    @unittest.skipUnless(
-        connection.vendor == 'oracle',
-        'Oracle supports tolerance parameter.',
-    )
+    @skipUnlessDBFeature('supports_tolerance_parameter')
     def test_distance_function_tolerance(self):
         # Tolerance is greater than distance.
         qs = Interstate.objects.annotate(

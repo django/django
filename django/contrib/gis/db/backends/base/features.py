@@ -51,6 +51,9 @@ class BaseSpatialFeatures:
     # Can SchemaEditor alter geometry fields?
     can_alter_geometry_field = True
 
+    # Do the database functions/aggregates support the tolerance parameter?
+    supports_tolerance_parameter = False
+
     # Set of options that AsGeoJSON() doesn't support.
     unsupported_geojson_options = {}
 
