@@ -138,7 +138,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 info.extra,
                 info.is_unsigned,
                 line[0] in json_constraints,
-                field_info[col_name].comment,
+                field_info[line[0]].comment,
             ))
         return fields
 

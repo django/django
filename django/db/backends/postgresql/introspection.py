@@ -107,7 +107,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 WHERE col.table_name = %s""", [table_name])
         field_map_comment = {line[0]: line[1] for line in cursor.fetchall()}
 
-
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
         return [
             FieldInfo(
