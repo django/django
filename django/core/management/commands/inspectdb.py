@@ -86,7 +86,8 @@ class Command(BaseCommand):
                     primary_key_columns = connection.introspection.get_primary_key_columns(cursor, table_name)
                     if primary_key_columns:
                         if len(primary_key_columns) > 1:
-                            warnings.warn(f"Multiple-columns primary key found for table \"{table_name}\" but not yet implemented, taking the first one", InspectDBWarning)
+                            warnings.warn(f"Multiple-columns primary key found for table \"{table_name}\"" +
+                                          "but not yet implemented, taking the first one", InspectDBWarning)
                         primary_key_column = primary_key_columns[0]
                     unique_columns = [
                         c['columns'][0] for c in constraints.values()
