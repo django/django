@@ -1,4 +1,5 @@
 from collections import namedtuple
+
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
