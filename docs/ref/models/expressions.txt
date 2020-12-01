@@ -939,6 +939,13 @@ calling the appropriate methods on the wrapped expression.
         Tells Django that this expression can be referenced in
         :meth:`.QuerySet.filter`. Defaults to ``True``.
 
+    .. attribute:: ordered
+
+        .. versionadded:: 3.2
+
+        Tells Django that this expression implements sort order like
+        ``OrderBy``. Defaults to ``False``.
+
     .. attribute:: window_compatible
 
         Tells Django that this expression can be used as the source expression

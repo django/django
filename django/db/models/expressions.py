@@ -158,6 +158,8 @@ class BaseExpression:
     filterable = True
     # Can the expression can be used as a source expression in Window?
     window_compatible = False
+    # Does the expression implement sort order?
+    ordered = False
 
     def __init__(self, output_field=None):
         if output_field is not None:
@@ -560,6 +562,7 @@ class TemporalSubtraction(CombinedExpression):
 @deconstructible
 class F(Combinable):
     """An object capable of resolving references to existing query objects."""
+    ordered = False
 
     def __init__(self, name):
         """
@@ -1178,6 +1181,7 @@ class Exists(Subquery):
 class OrderBy(BaseExpression):
     template = '%(expression)s %(ordering)s'
     conditional = False
+    ordered = True
 
     def __init__(self, expression, descending=False, nulls_first=False, nulls_last=False):
         if nulls_first and nulls_last:

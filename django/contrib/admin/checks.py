@@ -10,7 +10,6 @@ from django.core import checks
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import Combinable
 from django.forms.models import (
     BaseModelForm, BaseModelFormSet, _get_foreign_key,
 )
@@ -562,8 +561,8 @@ class BaseModelAdminChecks:
 
     def _check_ordering_item(self, obj, field_name, label):
         """ Check that `ordering` refers to existing fields. """
-        if isinstance(field_name, (Combinable, models.OrderBy)):
-            if not isinstance(field_name, models.OrderBy):
+        if hasattr(field_name, 'resolve_expression'):
+            if not field_name.ordered:
                 field_name = field_name.asc()
             if isinstance(field_name.expression, models.F):
                 field_name = field_name.expression.name

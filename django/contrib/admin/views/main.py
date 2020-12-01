@@ -18,7 +18,6 @@ from django.core.exceptions import (
 )
 from django.core.paginator import InvalidPage
 from django.db.models import F, Field, ManyToOneRel, OrderBy
-from django.db.models.expressions import Combinable
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.timezone import make_aware
@@ -316,14 +315,15 @@ class ChangeList:
                     order_field = self.get_ordering_field(field_name)
                     if not order_field:
                         continue  # No 'admin_order_field', skip it
-                    if isinstance(order_field, OrderBy):
-                        if pfx == '-':
-                            order_field = order_field.copy()
-                            order_field.reverse_ordering()
-                        ordering.append(order_field)
-                    elif hasattr(order_field, 'resolve_expression'):
-                        # order_field is an expression.
-                        ordering.append(order_field.desc() if pfx == '-' else order_field.asc())
+                    # order_field is an expression.
+                    if hasattr(order_field, 'resolve_expression'):
+                        if order_field.ordered:
+                            if pfx == '-':
+                                order_field = order_field.copy()
+                                order_field.reverse_ordering()
+                            ordering.append(order_field)
+                        else:
+                            ordering.append(order_field.desc() if pfx == '-' else order_field.asc())
                     # reverse order if order_field has already "-" as prefix
                     elif order_field.startswith('-') and pfx == '-':
                         ordering.append(order_field[1:])
@@ -412,8 +412,8 @@ class ChangeList:
             # the right column numbers absolutely, because there might be more
             # than one column associated with that ordering, so we guess.
             for field in ordering:
-                if isinstance(field, (Combinable, OrderBy)):
-                    if not isinstance(field, OrderBy):
+                if hasattr(field, 'resolve_expression'):
+                    if not field.ordered:
                         field = field.asc()
                     if isinstance(field.expression, F):
                         order_type = 'desc' if field.descending else 'asc'
