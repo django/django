@@ -9,11 +9,11 @@ from django.db.backends.base.introspection import (
 from django.db.models import Index
 from django.utils.datastructures import OrderedSet
 
-FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('extra', 'is_unsigned', 'has_json_constraint'))
+FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('extra', 'is_unsigned', 'has_json_constraint', 'comment'))
 InfoLine = namedtuple(
     'InfoLine',
     'col_name data_type max_len num_prec num_scale extra column_default '
-    'collation is_unsigned'
+    'collation is_unsigned comment'
 )
 
 
@@ -113,7 +113,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 CASE
                     WHEN column_type LIKE '%% unsigned' THEN 1
                     ELSE 0
-                END AS is_unsigned
+                END AS is_unsigned, column_comment
             FROM information_schema.columns
             WHERE table_name = %s AND table_schema = DATABASE()
         """, [default_column_collation, table_name])
@@ -138,6 +138,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 info.extra,
                 info.is_unsigned,
                 line[0] in json_constraints,
+                field_info[col_name].comment,
             ))
         return fields
 

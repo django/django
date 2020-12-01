@@ -8,7 +8,7 @@ from django.db.backends.base.introspection import (
 )
 from django.utils.functional import cached_property
 
-FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('is_autofield', 'is_json'))
+FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('is_autofield', 'is_json', 'comment'))
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -131,6 +131,19 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             column: (internal_size, default if default != 'NULL' else None, collation, is_autofield, is_json)
             for column, default, collation, internal_size, is_autofield, is_json in cursor.fetchall()
         }
+
+        cursor.execute("""
+            SELECT
+                tc.column_name,
+                cc.comments as comment
+            FROM user_tab_cols AS tc
+            LEFT JOIN user_col_comments AS cc ON cc.column_name = tc.column_name AND cc.table_name = tc.table_name
+            WHERE table_name = UPPER(%s)""", [table_name])
+        field_map_comment = {
+            column: comment
+            for column, comment in cursor.fetchall()
+        }
+
         self.cache_bust_counter += 1
         cursor.execute("SELECT * FROM {} WHERE ROWNUM < 2 AND {} > 0".format(
             self.connection.ops.quote_name(table_name),
@@ -143,6 +156,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             description.append(FieldInfo(
                 self.identifier_converter(name), *desc[1:3], internal_size, desc[4] or 0,
                 desc[5] or 0, *desc[6:], default, collation, is_autofield, is_json,
+                field_map_comment[name]
             ))
         return description
 
