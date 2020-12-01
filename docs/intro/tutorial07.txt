@@ -34,6 +34,7 @@ the ``admin.site.register(Question)`` line with:
     class QuestionAdmin(admin.ModelAdmin):
         fields = ['pub_date', 'question_text']
 
+
     admin.site.register(Question, QuestionAdmin)
 
 You'll follow this pattern -- create a model admin class, then pass it as the
@@ -65,6 +66,7 @@ up into fieldsets:
             (None,               {'fields': ['question_text']}),
             ('Date information', {'fields': ['pub_date']}),
         ]
+
 
     admin.site.register(Question, QuestionAdmin)
 
@@ -139,6 +141,7 @@ registration code to read:
             ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
         ]
         inlines = [ChoiceInline]
+
 
     admin.site.register(Question, QuestionAdmin)
 
@@ -299,7 +302,7 @@ Customizing your *project's* templates
 
 Create a ``templates`` directory in your project directory (the one that
 contains ``manage.py``). Templates can live anywhere on your filesystem that
-Django can access. (Django runs as whatever user your server runs.) However,
+Django can access (Django runs as whatever user your server runs as). However,
 keeping your templates within the project is a good convention to follow.
 
 Open your settings file (:file:`mysite/settings.py`, remember) and add a
