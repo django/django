@@ -1,6 +1,5 @@
 import keyword
 import re
-import warnings
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
@@ -84,11 +83,6 @@ class Command(BaseCommand):
                     except NotImplementedError:
                         constraints = {}
                     primary_key_columns = connection.introspection.get_primary_key_columns(cursor, table_name)
-                    if primary_key_columns:
-                        if len(primary_key_columns) > 1:
-                            warnings.warn(f"Multiple-columns primary key found for table \"{table_name}\"" +
-                                          "but not yet implemented, taking the first one", InspectDBWarning)
-                        primary_key_column = primary_key_columns[0]
                     unique_columns = [
                         c['columns'][0] for c in constraints.values()
                         if c['unique'] and len(c['columns']) == 1
@@ -101,6 +95,13 @@ class Command(BaseCommand):
 
                 yield ''
                 yield ''
+
+                if primary_key_columns:
+                    if len(primary_key_columns) > 1:
+                        yield f"# Multiple-columns primary key found for table \"{table_name}\"" + \
+                              "but not yet implemented, taking the first one"
+                    primary_key_column = primary_key_columns[0]
+
                 yield 'class %s(models.Model):' % table2model(table_name)
                 known_models.append(table2model(table_name))
                 used_column_names = []  # Holds column names used in the table so far
