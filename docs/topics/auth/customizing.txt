@@ -1129,19 +1129,13 @@ code would be required in the app's ``admin.py`` file::
     class UserChangeForm(forms.ModelForm):
         """A form for updating users. Includes all the fields on
         the user, but replaces the password field with admin's
-        password hash display field.
+        disabled password hash display field.
         """
         password = ReadOnlyPasswordHashField()
 
         class Meta:
             model = MyUser
             fields = ('email', 'password', 'date_of_birth', 'is_active', 'is_admin')
-
-        def clean_password(self):
-            # Regardless of what the user provides, return the initial value.
-            # This is done here, rather than on the field, because the
-            # field does not have access to the initial value
-            return self.initial["password"]
 
 
     class UserAdmin(BaseUserAdmin):
@@ -1182,3 +1176,10 @@ Finally, specify the custom model as the default user model for your project
 using the :setting:`AUTH_USER_MODEL` setting in your ``settings.py``::
 
     AUTH_USER_MODEL = 'customauth.MyUser'
+
+.. versionchanged:: 3.2
+
+    In older versions, ``ReadOnlyPasswordHashField`` is not
+    :attr:`~django.forms.Field.disabled` by default and
+    ``UserChangeForm.clean_password()`` is required to return the initial
+    value, whatever the user provides.

@@ -625,6 +625,11 @@ Miscellaneous
   using :option:`makemessages --locale` option, when they contain hyphens
   (``'-'``).
 
+* The ``django.contrib.auth.forms.ReadOnlyPasswordHashField`` form field is now
+  :attr:`~django.forms.Field.disabled` by default. Therefore
+  ``UserChangeForm.clean_password()`` is no longer required to return the
+  initial value.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2
