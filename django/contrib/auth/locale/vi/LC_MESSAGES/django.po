@@ -56,7 +56,7 @@ msgstr "Chưa đặt mật khẩu"
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Định dạng của mật khẩu không đúng hoặc thuật toán hash chưa rõ ràng."
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "Hai trường mật khẩu không giống nhau"
 
 msgid "Password"
