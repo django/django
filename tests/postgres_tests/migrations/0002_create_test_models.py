@@ -99,6 +99,7 @@ class Migration(migrations.Migration):
                     'field_nested',
                     ArrayField(ArrayField(models.IntegerField(), size=None, null=True), size=None, null=True),
                 ),
+                ('order', models.IntegerField(null=True)),
             ],
             options={
                 'required_db_vendor': 'postgresql',
