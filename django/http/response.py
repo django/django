@@ -321,7 +321,7 @@ class HttpResponse(HttpResponseBase):
     """
     An HTTP response class with a string as content.
 
-    This content that can be read, appended to, or replaced.
+    This content can be read, appended to, or replaced.
     """
 
     streaming = False
