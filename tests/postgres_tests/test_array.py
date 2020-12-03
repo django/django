@@ -205,11 +205,11 @@ class TestQuerying(PostgreSQLTestCase):
     @classmethod
     def setUpTestData(cls):
         cls.objs = NullableIntegerArrayModel.objects.bulk_create([
-            NullableIntegerArrayModel(field=[1]),
-            NullableIntegerArrayModel(field=[2]),
-            NullableIntegerArrayModel(field=[2, 3]),
-            NullableIntegerArrayModel(field=[20, 30, 40]),
-            NullableIntegerArrayModel(field=None),
+            NullableIntegerArrayModel(order=1, field=[1]),
+            NullableIntegerArrayModel(order=2, field=[2]),
+            NullableIntegerArrayModel(order=3, field=[2, 3]),
+            NullableIntegerArrayModel(order=4, field=[20, 30, 40]),
+            NullableIntegerArrayModel(order=5, field=None),
         ])
 
     def test_empty_list(self):
@@ -304,7 +304,7 @@ class TestQuerying(PostgreSQLTestCase):
 
     def test_contained_by_including_F_object(self):
         self.assertSequenceEqual(
-            NullableIntegerArrayModel.objects.filter(field__contained_by=[models.F('id'), 2]),
+            NullableIntegerArrayModel.objects.filter(field__contained_by=[models.F('order'), 2]),
             self.objs[:3],
         )
 

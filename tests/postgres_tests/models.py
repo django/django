@@ -46,6 +46,7 @@ class IntegerArrayModel(PostgreSQLModel):
 class NullableIntegerArrayModel(PostgreSQLModel):
     field = ArrayField(models.IntegerField(), blank=True, null=True)
     field_nested = ArrayField(ArrayField(models.IntegerField(null=True)), null=True)
+    order = models.IntegerField(null=True)
 
 
 class CharArrayModel(PostgreSQLModel):
