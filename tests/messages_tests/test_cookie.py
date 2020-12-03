@@ -74,7 +74,7 @@ class CookieTests(BaseTests, SimpleTestCase):
         response = self.get_response()
         storage.add(constants.INFO, 'test')
         storage.update(response)
-        self.assertIn('test', Signer().decompress_b64(response.cookies['messages'].value))
+        self.assertIn('test', Signer().decompress_b64(response.cookies['messages'].value, charset='latin-1'))
         self.assertEqual(response.cookies['messages']['domain'], '.example.com')
         self.assertEqual(response.cookies['messages']['expires'], '')
         self.assertIs(response.cookies['messages']['secure'], True)
