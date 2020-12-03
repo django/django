@@ -29,6 +29,8 @@ details on these changes.
 * ``TransactionTestCase.assertQuerysetEqual()` will no longer automatically
   call ``repr()`` on a queryset when compared to string values.
 
+* ``django.core.cache.backends.memcached.MemcachedCache`` will be removed.
+
 .. _deprecation-removed-in-4.0:
 
 4.0

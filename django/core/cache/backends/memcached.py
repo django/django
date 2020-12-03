@@ -3,10 +3,12 @@
 import pickle
 import re
 import time
+import warnings
 
 from django.core.cache.backends.base import (
     DEFAULT_TIMEOUT, BaseCache, InvalidCacheKey, memcache_key_warnings,
 )
+from django.utils.deprecation import RemovedInDjango41Warning
 from django.utils.functional import cached_property
 
 
@@ -164,6 +166,11 @@ class BaseMemcachedCache(BaseCache):
 class MemcachedCache(BaseMemcachedCache):
     "An implementation of a cache binding using python-memcached"
     def __init__(self, server, params):
+        warnings.warn(
+            'MemcachedCache is deprecated in favor of PyMemcacheCache and '
+            'PyLibMCCache.',
+            RemovedInDjango41Warning, stacklevel=2,
+        )
         # python-memcached ≥ 1.45 returns None for a nonexistent key in
         # incr/decr(), python-memcached < 1.45 raises ValueError.
         import memcache
