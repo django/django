@@ -36,4 +36,29 @@
             main.classList.toggle('shifted');
         });
     }
+
+    // init quick filter
+    (function() {
+        const options = [];
+        const navSidebar = document.getElementById('nav-sidebar');
+        if (!navSidebar) { return; }
+        navSidebar.querySelectorAll('th[scope=row] a').forEach((container) => {
+            options.push({title: container.innerHTML, node: container});
+        });
+
+        function checkValue(e) {
+            let v = e.target.value;
+            if (v) { v = v.toLowerCase(); }
+            if (e.key === 'Escape') { v = ''; e.target.value = ''; } // clear input
+            for (const o of options) {
+                // show/hide parent <TR>
+                o.node.parentNode.parentNode.style.display =
+                    (!v || o.title.toLowerCase().indexOf(v) !== -1) ? '' : 'none';
+            }
+        }
+
+        const nav = document.getElementById('nav-filter');
+        nav.addEventListener('change', checkValue, false);
+        nav.addEventListener('keyup', checkValue, false);
+    })();
 }

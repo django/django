@@ -117,3 +117,16 @@
         max-width: 100%;
     }
 }
+
+#nav-filter {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 5px 16px;
+    margin: 5px 0;
+    border: none;
+    outline: none;
+}
+
+#nav-sidebar table {
+    width: 100%;
+}
