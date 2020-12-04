@@ -63,15 +63,52 @@ class AccessMixin:
         )
 
 
-class LoginRequiredMixin(AccessMixin):
-    """Verify that the current user is authenticated."""
+class UserPassesTestMixin(AccessMixin):
+    """
+    Deny a request with a permission error if the test_func() method returns
+    False.
+    """
+
+    def test_func(self):
+        """
+        Write custom logic of your test and return either True or False
+        """
+        return True
+
+    def get_test_func(self):
+        """
+        Override this method to use a different test_func method.
+
+        This function likely to be deprecated in future,
+        use `get_test_functions()` method instead
+        """
+        return self.test_func
+
+    def get_test_functions(self):
+        if hasattr(self, "get_test_func"):
+            # DeprecationWarning: `get_test_func` likely to be deprecated in future
+            return [self.get_test_func()]
+        return [self.test_func]
+
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return self.handle_no_permission()
+        for test_func in self.get_test_functions():
+            user_test_result = test_func()
+            if not user_test_result:
+                return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
 
 
-class PermissionRequiredMixin(AccessMixin):
+class LoginRequiredMixin(UserPassesTestMixin):
+    """Verify that the current user is authenticated."""
+
+    def is_authenticated(self):
+        return self.request.user.is_authenticated
+
+    def get_test_functions(self):
+        return [self.is_authenticated, *super().get_test_functions()]
+
+
+class PermissionRequiredMixin(UserPassesTestMixin):
     """Verify that the current user has all specified permissions."""
     permission_required = None
 
@@ -98,31 +135,5 @@ class PermissionRequiredMixin(AccessMixin):
         perms = self.get_permission_required()
         return self.request.user.has_perms(perms)
 
-    def dispatch(self, request, *args, **kwargs):
-        if not self.has_permission():
-            return self.handle_no_permission()
-        return super().dispatch(request, *args, **kwargs)
-
-
-class UserPassesTestMixin(AccessMixin):
-    """
-    Deny a request with a permission error if the test_func() method returns
-    False.
-    """
-
-    def test_func(self):
-        raise NotImplementedError(
-            '{} is missing the implementation of the test_func() method.'.format(self.__class__.__name__)
-        )
-
-    def get_test_func(self):
-        """
-        Override this method to use a different test_func method.
-        """
-        return self.test_func
-
-    def dispatch(self, request, *args, **kwargs):
-        user_test_result = self.get_test_func()()
-        if not user_test_result:
-            return self.handle_no_permission()
-        return super().dispatch(request, *args, **kwargs)
+    def get_test_functions(self):
+        return [self.has_permission, *super().get_test_functions()]

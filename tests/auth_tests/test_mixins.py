@@ -23,6 +23,14 @@ class AlwaysFalseMixin(UserPassesTestMixin):
         return False
 
 
+class AlwaysFalseMixinCustomTestFunctionMixin(UserPassesTestMixin):
+    def custom_test_function(self):
+        return False
+
+    def get_test_func(self):
+        return self.custom_test_function
+
+
 class EmptyResponseView(View):
     def get(self, request, *args, **kwargs):
         return HttpResponse()
@@ -42,6 +50,16 @@ class StackedMixinsView1(LoginRequiredMixin, PermissionRequiredMixin, EmptyRespo
 
 
 class StackedMixinsView2(PermissionRequiredMixin, LoginRequiredMixin, EmptyResponseView):
+    permission_required = ['auth_tests.add_customuser', 'auth_tests.change_customuser']
+    raise_exception = True
+
+
+class StackedMixinsView3(
+    PermissionRequiredMixin,
+    LoginRequiredMixin,
+    AlwaysFalseMixinCustomTestFunctionMixin,
+    EmptyResponseView
+):
     permission_required = ['auth_tests.add_customuser', 'auth_tests.change_customuser']
     raise_exception = True
 
@@ -121,6 +139,38 @@ class AccessMixinTests(TestCase):
             view(request)
 
         view = StackedMixinsView2.as_view()
+        with self.assertRaises(PermissionDenied):
+            view(request)
+
+    def test_stacked_mixins_custom_test_function(self):
+        user = models.User.objects.create(username='joe', password='qwerty')
+        perms = models.Permission.objects.filter(codename__in=('add_customuser', 'change_customuser'))
+        user.user_permissions.add(*perms)
+        request = self.factory.get('/rand')
+        request.user = user
+
+        view = StackedMixinsView3.as_view()
+        with self.assertRaises(PermissionDenied):
+            view(request)
+
+    def test_multiple_test_func_view(self):
+        class MultipleTestFuncView(UserPassesTestMixin, EmptyResponseView):
+            raise_exception = True
+
+            def test_func_1(self):
+                return True
+
+            def test_func_2(self):
+                return False
+
+            def get_test_functions(self):
+                return [self.test_func_1, self.test_func_2, *super().get_test_functions()]
+
+        user = models.User.objects.create(username='joe', password='qwerty')
+        request = self.factory.get('/rand')
+        request.user = user
+
+        view = MultipleTestFuncView.as_view()
         with self.assertRaises(PermissionDenied):
             view(request)
 
