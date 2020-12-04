@@ -341,6 +341,54 @@ class SettingsTests(SimpleTestCase):
     def test_secret_keys(self):
         self.assertEqual(settings.SECRET_KEY, 'aaa11')
         self.assertEqual(settings.SECRET_KEYS, ['aaa11', 'bbb22'])
+#
+#   These cases aren't right yes, because they test Settings, rather than
+#   LazySettings.
+#
+# class TestSecretKeysSettings(unittest.TestCase):
+#     def make_settings(self, **kwargs):
+#         settings_module = ModuleType('fake_settings_module')
+#         for k, v in kwargs.items():
+#             setattr(settings_module, k, v)
+#
+#         try:
+#             sys.modules['fake_settings_module'] = settings_module
+#             result = Settings('fake_settings_module')
+#         finally:
+#             del sys.modules['fake_settings_module']
+#
+#         return result
+#
+#     def test_secret_key(self):
+#         settings = self.make_settings(SECRET_KEY='foo')
+#         self.assertEqual(settings.SECRET_KEY, 'foo')
+#         self.assertEqual(settings.SECRET_KEYS, ['foo'])
+#
+#     def test_secret_keys(self):
+#         settings = self.make_settings(SECRET_KEYS=['foo', 'bar'])
+#         self.assertEqual(settings.SECRET_KEY, 'foo')
+#         self.assertEqual(settings.SECRET_KEYS, ['foo', 'bar'])
+#
+#     def test_both_specified(self):
+#         msg = 'Only one of SECRET_KEY and SECRET_KEYS can be specified, not both.'
+#
+#         with self.assertRaisesRegex(ImproperlyConfigured, msg):
+#             self.make_settings(SECRET_KEY='a', SECRET_KEYS=['a'])
+#
+#     def test_empty(self):
+#         msg = 'The SECRET_KEY or SECRET_KEYS setting must not be empty.'
+#         tests = [
+#             {},
+#             {'SECRET_KEY': ''},
+#             {'SECRET_KEYS': []},
+#             {'SECRET_KEYS': ['']},
+#         ]
+#         for kwargs in tests:
+#             with self.subTest(kwargs=kwargs):
+#                 settings = self.make_settings(**kwargs)
+#                 with self.assertRaisesRegex(ImproperlyConfigured, msg):
+#                     settings.SECRET_KEY
+#
 
 
 class TestComplexSettingOverride(SimpleTestCase):
@@ -471,52 +519,6 @@ class TestListSettings(unittest.TestCase):
             finally:
                 del sys.modules['fake_settings_module']
                 delattr(settings_module, setting)
-
-
-class TestSecretKeysSettings(unittest.TestCase):
-    def make_settings(self, **kwargs):
-        settings_module = ModuleType('fake_settings_module')
-        for k, v in kwargs.items():
-            setattr(settings_module, k, v)
-
-        try:
-            sys.modules['fake_settings_module'] = settings_module
-            result = Settings('fake_settings_module')
-        finally:
-            del sys.modules['fake_settings_module']
-
-        return result
-
-    def test_secret_key(self):
-        settings = self.make_settings(SECRET_KEY='foo')
-        self.assertEqual(settings.SECRET_KEY, 'foo')
-        self.assertEqual(settings.SECRET_KEYS, ['foo'])
-
-    def test_secret_keys(self):
-        settings = self.make_settings(SECRET_KEYS=['foo', 'bar'])
-        self.assertEqual(settings.SECRET_KEY, 'foo')
-        self.assertEqual(settings.SECRET_KEYS, ['foo', 'bar'])
-
-    def test_both_specified(self):
-        try:
-            self.make_settings(SECRET_KEY='a', SECRET_KEYS=['a'])
-        except ImproperlyConfigured:
-            self.fail("ImproperlyConfigured Exception raised unexpectedly.")
-
-    def test_empty(self):
-        msg = 'The SECRET_KEY or SECRET_KEYS setting must not be empty.'
-
-        with self.assertRaisesRegex(ImproperlyConfigured, msg):
-            self.make_settings()
-
-        with self.assertRaisesRegex(ImproperlyConfigured, msg):
-            self.make_settings(SECRET_KEY='')
-
-        with self.assertRaisesRegex(ImproperlyConfigured, msg):
-            self.make_settings(SECRET_KEYS=[])
-
-        with self.assertRaisesRegex(ImproperlyConfigured, msg):
-            self.make_settings(SECRET_KEYS=[''])
 
 
 class SettingChangeEnterException(Exception):

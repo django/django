@@ -81,14 +81,32 @@ class LazySettings(LazyObject):
         """Return the value of a setting and cache it in self.__dict__."""
         if self._wrapped is empty:
             self._setup(name)
+
+        # Either of SECRET_KEY or SECRET_KEYS may be specified.
+        if name in {'SECRET_KEY', 'SECRET_KEYS'}:
+            secret_key = getattr(self._wrapped, 'SECRET_KEY', None)
+            secret_keys = getattr(self._wrapped, 'SECRET_KEYS', None)
+            # We can't check both, because override_settings.
+            #  if secret_key and secret_keys:
+            #   raise ImproperlyConfigured('Only one of SECRET_KEY and SECRET_KEYS can be specified, not both.')
+            if not secret_key and not secret_keys:
+                raise ImproperlyConfigured("The SECRET_KEY and SECRET_KEYS settings cannot both be empty.")
+            # Nor can we overide unless empty, because override_settings
+            if secret_key and not secret_keys:
+                secret_keys = [secret_key]
+            elif secret_keys and not secret_key:
+                secret_key = secret_keys[0]
+
+            self.__dict__['SECRET_KEY'] = secret_key
+            self.__dict__['SECRET_KEYS'] = secret_keys
+            return self.__dict__[name]
+
         val = getattr(self._wrapped, name)
 
         # Special case some settings which require further modification.
         # This is done here for performance reasons so the modified value is cached.
         if name in {'MEDIA_URL', 'STATIC_URL'} and val is not None:
             val = self._add_script_prefix(val)
-        elif name == 'SECRET_KEY' and not val:
-            raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
 
         self.__dict__[name] = val
         return val
@@ -192,6 +210,11 @@ class Settings:
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
+        # Validity is checked on first access, but providing both values is a
+        # clear error.
+#         if self.SECRET_KEY and self.SECRET_KEYS is not None:
+#             raise ImproperlyConfigured('Only one of SECRET_KEY and SECRET_KEYS can be specified, not both.')
+
         if self.is_overridden('PASSWORD_RESET_TIMEOUT_DAYS'):
             if self.is_overridden('PASSWORD_RESET_TIMEOUT'):
                 raise ImproperlyConfigured(
@@ -200,14 +223,6 @@ class Settings:
                 )
             setattr(self, 'PASSWORD_RESET_TIMEOUT', self.PASSWORD_RESET_TIMEOUT_DAYS * 60 * 60 * 24)
             warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
-
-        if self.SECRET_KEY:
-            self.SECRET_KEYS = [self.SECRET_KEY]
-        elif self.SECRET_KEYS:
-            self.SECRET_KEY = self.SECRET_KEYS[0]
-
-        if not self.SECRET_KEY:
-            raise ImproperlyConfigured("The SECRET_KEY or SECRET_KEYS setting must not be empty.")
 
         if self.is_overridden('DEFAULT_HASHING_ALGORITHM'):
             warnings.warn(DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG, RemovedInDjango40Warning)

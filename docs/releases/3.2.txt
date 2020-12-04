@@ -358,6 +358,9 @@ Requests and Responses
 Security
 ~~~~~~~~
 
+* The new :setting:`SECRET_KEYS` allows... TODO: flesh-out, and adjust release
+  note below.
+
 * The :setting:`SECRET_KEY` setting is now checked for a valid value upon first
   access, rather than when settings are first loaded. This enables running
   management commands that do not rely on the ``SECRET_KEY`` without needing to
