@@ -70,6 +70,8 @@ Minor features
 * The new :meth:`.ModelAdmin.get_formset_kwargs` method allows customizing the
   keyword arguments passed to the constructor of a formset.
 
+* The navigation sidebar now has a quick filter toolbar.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

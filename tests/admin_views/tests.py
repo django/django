@@ -3142,7 +3142,7 @@ class AdminViewListEditable(TestCase):
         # CSRF field = 1
         # field to track 'select all' across paginated views = 1
         # 6 + 4 + 4 + 1 + 2 + 1 + 1 = 19 inputs
-        self.assertContains(response, "<input", count=19)
+        self.assertContains(response, "<input", count=20)
         # 1 select per object = 3 selects
         self.assertContains(response, "<select", count=4)
 
@@ -4980,7 +4980,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         self.assertNotContains(response, 'name="posted"')
         # 3 fields + 2 submit buttons + 5 inline management form fields, + 2
         # hidden fields for inlines + 1 field for the inline + 2 empty form
-        self.assertContains(response, "<input", count=15)
+        self.assertContains(response, "<input", count=16)
         self.assertContains(response, formats.localize(datetime.date.today()))
         self.assertContains(response, "<label>Awesomeness level:</label>")
         self.assertContains(response, "Very awesome.")
