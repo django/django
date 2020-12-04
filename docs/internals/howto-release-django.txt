@@ -232,7 +232,8 @@ OK, this is the fun part, where we actually push out a release!
 #. Create a "checksums" file, ``Django-<<VERSION>>.checksum.txt`` containing
    the hashes and release information. Start with this template and insert the
    correct version, date, GPG key ID (from
-   ``gpg --list-keys --keyid-format LONG``), release URL, and checksums:
+   ``gpg --list-keys --keyid-format LONG``), release manager's GitHub username,
+   release URL, and checksums:
 
    .. code-block:: text
 
@@ -241,14 +242,18 @@ OK, this is the fun part, where we actually push out a release!
 
     To use this file, you will need a working install of PGP or other
     compatible public-key encryption software. You will also need to have
-    the Django release manager's public key in your keyring; this key has
+    the Django release manager's public key in your keyring. This key has
     the ID ``XXXXXXXXXXXXXXXX`` and can be imported from the MIT
-    keyserver. For example, if using the open-source GNU Privacy Guard
+    keyserver, for example, if using the open-source GNU Privacy Guard
     implementation of PGP:
 
         gpg --keyserver pgp.mit.edu --recv-key XXXXXXXXXXXXXXXX
 
-    Once the key is imported, verify this file::
+    or via the GitHub API:
+
+        curl https://github.com/<<RELEASE MANAGER GITHUB USERNAME>>.gpg | gpg --import -
+
+    Once the key is imported, verify this file:
 
         gpg --verify <<THIS FILENAME>>
 
