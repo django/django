@@ -276,19 +276,17 @@ class KeyTransform(Transform):
         super().__init__(*args, **kwargs)
         self.key_name = str(key_name)
 
-    def preprocess_lhs(self, compiler, connection, lhs_only=False):
-        if not lhs_only:
-            key_transforms = [self.key_name]
+    def preprocess_lhs(self, compiler, connection):
+        key_transforms = [self.key_name]
         previous = self.lhs
         while isinstance(previous, KeyTransform):
-            if not lhs_only:
-                key_transforms.insert(0, previous.key_name)
+            key_transforms.insert(0, previous.key_name)
             previous = previous.lhs
         lhs, params = compiler.compile(previous)
         if connection.vendor == 'oracle':
             # Escape string-formatting.
             key_transforms = [key.replace('%', '%%') for key in key_transforms]
-        return (lhs, params, key_transforms) if not lhs_only else (lhs, params)
+        return lhs, params, key_transforms
 
     def as_mysql(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
@@ -407,7 +405,7 @@ class KeyTransformExact(JSONExact):
         if connection.vendor == 'sqlite':
             rhs, rhs_params = super().process_rhs(compiler, connection)
             if rhs == '%s' and rhs_params == ['null']:
-                lhs, _ = self.lhs.preprocess_lhs(compiler, connection, lhs_only=True)
+                lhs, *_ = self.lhs.preprocess_lhs(compiler, connection)
                 lhs = 'JSON_TYPE(%s, %%s)' % lhs
         return lhs, lhs_params
 
