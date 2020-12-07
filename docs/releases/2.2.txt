@@ -95,6 +95,11 @@ Database backends
 
 * Added result streaming for :meth:`.QuerySet.iterator` on SQLite.
 
+:mod:`django.shortcuts`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :func:`django.shortcuts.make_toast` function returns ``'toast'``.
+
 Generic Views
 ~~~~~~~~~~~~~
 
