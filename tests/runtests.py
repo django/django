@@ -293,13 +293,10 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
                  test_name_patterns, start_at, start_after, pdb, buffer,
                  timing):
     state = setup(verbosity, test_labels, parallel, start_at, start_after)
-    extra_tests = []
-
     # Run the test suite, including the extra validation tests.
     if not hasattr(settings, 'TEST_RUNNER'):
         settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
     TestRunner = get_runner(settings)
-
     test_runner = TestRunner(
         verbosity=verbosity,
         interactive=interactive,
@@ -315,10 +312,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
         buffer=buffer,
         timing=timing,
     )
-    failures = test_runner.run_tests(
-        test_labels or get_installed(),
-        extra_tests=extra_tests,
-    )
+    failures = test_runner.run_tests(test_labels or get_installed())
     teardown(state)
     return failures
 
