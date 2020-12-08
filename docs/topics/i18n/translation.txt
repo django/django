@@ -204,7 +204,8 @@ For example::
         page = ngettext(
             'there is %(count)d object',
             'there are %(count)d objects',
-        count) % {
+            count,
+        ) % {
             'count': count,
         }
         return HttpResponse(page)
@@ -228,7 +229,7 @@ sophisticated, but will produce incorrect results for some languages::
     text = ngettext(
         'There is %(count)d %(name)s available.',
         'There are %(count)d %(name)s available.',
-        count
+        count,
     ) % {
         'count': count,
         'name': name
@@ -240,7 +241,7 @@ In a case like this, consider something like the following::
     text = ngettext(
         'There is %(count)d %(name)s object available.',
         'There are %(count)d %(name)s objects available.',
-        count
+        count,
     ) % {
         'count': count,
         'name': Report._meta.verbose_name,
@@ -259,11 +260,11 @@ In a case like this, consider something like the following::
         text = ngettext(
             'There is %(count)d %(name)s available.',
             'There are %(count)d %(plural_name)s available.',
-            count
+            count,
         ) % {
             'count': Report.objects.count(),
             'name': Report._meta.verbose_name,
-            'plural_name': Report._meta.verbose_name_plural
+            'plural_name': Report._meta.verbose_name_plural,
         }
 
     You would get an error when running :djadmin:`django-admin
