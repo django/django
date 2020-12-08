@@ -8,7 +8,7 @@ from django.contrib.messages.storage.base import Message
 from django.contrib.messages.storage.cookie import (
     CookieStorage, MessageDecoder, MessageEncoder,
 )
-from django.core.signing import Signer
+from django.core.signing import decompress_b64
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import ignore_warnings
 from django.utils.deprecation import RemovedInDjango40Warning
@@ -74,7 +74,7 @@ class CookieTests(BaseTests, SimpleTestCase):
         response = self.get_response()
         storage.add(constants.INFO, 'test')
         storage.update(response)
-        self.assertIn('test', Signer().decompress_b64(response.cookies['messages'].value, charset='latin-1'))
+        self.assertIn('test', decompress_b64(response.cookies['messages'].value, charset='latin-1'))
         self.assertEqual(response.cookies['messages']['domain'], '.example.com')
         self.assertEqual(response.cookies['messages']['expires'], '')
         self.assertIs(response.cookies['messages']['secure'], True)

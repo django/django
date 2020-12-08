@@ -110,7 +110,7 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
     data = serializer().dumps(obj)
 
     if compress:
-        base64d = Signer().compress_b64(data.decode('latin-1'), charset='latin-1')
+        base64d = compress_b64(data.decode('latin-1'), charset='latin-1')
     else:
         base64d = b64_encode(data).decode('latin-1')
     return TimestampSigner(key, salt=salt).sign(base64d)
@@ -125,8 +125,34 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
     # TimestampSigner.unsign() returns str but base64 and zlib compression
     # operate on bytes.
     base64d = TimestampSigner(key, salt=salt).unsign(s, max_age=max_age)
-    data = Signer().decompress_b64(base64d, charset='latin-1')
+    data = decompress_b64(base64d, charset='latin-1')
     return serializer().loads(data.encode('latin-1'))
+
+
+def compress_b64(uncompressed, charset='utf-8'):
+    is_compressed = False
+    encoded = uncompressed.encode(charset)
+    compressed = zlib.compress(encoded)
+    if (len(compressed) < len(uncompressed) - 1):
+        encoded = compressed
+        is_compressed = True
+    b64_encoded = b64_encode(encoded)
+    b64_encoded = b64_encoded.decode(charset)
+    if is_compressed:
+        b64_encoded = '.' + b64_encoded
+    return b64_encoded
+
+
+def decompress_b64(compressed, charset='utf-8'):
+    decompress = compressed[:1] == '.'
+    if decompress:
+        compressed = compressed[1:]
+    compressed = compressed.encode(charset)
+    b64_decoded = b64_decode(compressed)
+    if decompress:
+        b64_decoded = zlib.decompress(b64_decoded)
+    b64_decoded = b64_decoded.decode(charset)
+    return b64_decoded
 
 
 class Signer:
@@ -168,30 +194,6 @@ class Signer:
         ):
             return value
         raise BadSignature('Signature "%s" does not match' % sig)
-
-    def compress_b64(self, uncompressed, charset='utf-8'):
-        is_compressed = False
-        encoded = uncompressed.encode(charset)
-        compressed = zlib.compress(encoded)
-        if (len(compressed) < len(uncompressed) - 1):
-            encoded = compressed
-            is_compressed = True
-        b64_encoded = b64_encode(encoded)
-        b64_encoded = b64_encoded.decode(charset)
-        if is_compressed:
-            b64_encoded = '.' + b64_encoded
-        return b64_encoded
-
-    def decompress_b64(self, compressed, charset='utf-8'):
-        decompress = compressed[:1] == '.'
-        if decompress:
-            compressed = compressed[1:]
-        compressed = compressed.encode(charset)
-        b64_decoded = b64_decode(compressed)
-        if decompress:
-            b64_decoded = zlib.decompress(b64_decoded)
-        b64_decoded = b64_decoded.decode(charset)
-        return b64_decoded
 
 
 class TimestampSigner(Signer):

@@ -1,4 +1,4 @@
-from django.core.signing import Signer
+from django.core.signing import decompress_b64
 from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 
@@ -13,4 +13,4 @@ class SuccessMessageMixinTests(SimpleTestCase):
         add_url = reverse('add_success_msg')
         req = self.client.post(add_url, author)
         self.assertIn(ContactFormViewWithMsg.success_message % author,
-                      Signer().decompress_b64(req.cookies['messages'].value, charset='latin-1'))
+                      decompress_b64(req.cookies['messages'].value, charset='latin-1'))
