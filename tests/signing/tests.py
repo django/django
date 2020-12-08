@@ -150,6 +150,32 @@ class TestSigner(SimpleTestCase):
             signed = signing.dumps(value)
         self.assertEqual(signing.loads(signed), value)
 
+    def test_compress64_decompress64(self):
+        "compress_b64 and decompress_b64 be reversible for any string"
+        unicode_values = [
+            'a string \u2019',
+            'test Ä',
+            '‘’',
+            b'\x91\x80'.decode('latin-1'),
+            b'\xe2\x91'.decode('cp1252'),
+        ]
+        for value in unicode_values:
+            compressed = signing.Signer().compress_b64(value)
+            self.assertEqual(signing.Signer().decompress_b64(compressed), value)
+
+        latin_1_value = b'\x91\x80'.decode('latin-1')
+        compressed = signing.Signer().compress_b64(latin_1_value, charset='latin-1')
+        self.assertEqual(signing.Signer().decompress_b64(compressed, charset='latin-1'), latin_1_value)
+
+        with self.assertRaises(UnicodeDecodeError):
+            compressed = signing.Signer().compress_b64(latin_1_value, charset='latin-1')
+            signing.Signer().decompress_b64(compressed)
+
+        with self.assertRaises(AssertionError):
+            # Value will come back garbled if a non-unicode charset is used to decode and it is not used to encode
+            compressed = signing.Signer().compress_b64(latin_1_value)
+            self.assertEqual(signing.Signer().decompress_b64(compressed, charset='latin-1'), latin_1_value)
+
     def test_decode_detects_tampering(self):
         "loads should raise exception for tampered objects"
         transforms = (

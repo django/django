@@ -131,7 +131,7 @@ class CookieTests(BaseTests, SimpleTestCase):
         self.assertEqual(len(unstored_messages), 1)
         self.assertEqual(unstored_messages[0].message[0], '0')
 
-    def test_cookie_rfc6265_compliant(self):
+    def test_message_rfc6265_compliant(self):
         non_compliant_chars = ('\\', ',', ';', '"')
         messages = ['\\te,st', ';m"e', '\u2019']
         encoder = MessageEncoder()
@@ -139,6 +139,19 @@ class CookieTests(BaseTests, SimpleTestCase):
         for message in list(value):
             for illegal in non_compliant_chars:
                 self.assertEqual(message.find(illegal), -1)
+
+    def test_messages_store_any_string(self):
+        values = [
+            'a string \u2019',
+            'test Ä',
+            '‘’',
+            b'\x91\x80'.decode('latin-1'),
+            b'\xe2\x91'.decode('cp1252'),
+        ]
+        encoder = MessageEncoder()
+        value = encoder.encode(values)
+        decoded_messages = json.loads(value, cls=MessageDecoder)
+        self.assertEqual(values, decoded_messages)
 
     def test_json_encoder_decoder(self):
         """
