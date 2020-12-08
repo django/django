@@ -2504,3 +2504,16 @@ class CacheHandlerTest(SimpleTestCase):
         msg = "Could not find config for 'nonexistent' in settings.CACHES"
         with self.assertRaisesMessage(InvalidCacheBackendError, msg):
             caches['nonexistent']
+
+    def test_nonexistent_backend(self):
+        msg = (
+            "Could not find backend 'django.nonexistent.NonexistentBackend': "
+            "No module named 'django.nonexistent'"
+        )
+        with self.settings(CACHES={
+            'invalid_backend': {
+                'BACKEND': 'django.nonexistent.NonexistentBackend',
+            },
+        }):
+            with self.assertRaisesMessage(InvalidCacheBackendError, msg):
+                caches['invalid_backend']
