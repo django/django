@@ -131,6 +131,15 @@ class CookieTests(BaseTests, SimpleTestCase):
         self.assertEqual(len(unstored_messages), 1)
         self.assertEqual(unstored_messages[0].message[0], '0')
 
+    def test_cookie_rfc6265_compliant(self):
+        non_compliant_chars = ('\\', ',', ';', '"')
+        messages = ['\\te,st', ';m"e', '\u2019']
+        encoder = MessageEncoder()
+        value = encoder.encode(messages)
+        for message in list(value):
+            for illegal in non_compliant_chars:
+                self.assertEqual(message.find(illegal), -1)
+
     def test_json_encoder_decoder(self):
         """
         A complex nested data structure containing Message
