@@ -2499,3 +2499,8 @@ class CacheHandlerTest(SimpleTestCase):
             t.join()
 
         self.assertIsNot(c[0], c[1])
+
+    def test_nonexistent_alias(self):
+        msg = "Could not find config for 'nonexistent' in settings.CACHES"
+        with self.assertRaisesMessage(InvalidCacheBackendError, msg):
+            caches['nonexistent']
