@@ -77,18 +77,16 @@ database or filesystem usage.
 
 After installing Memcached itself, you'll need to install a Memcached
 binding. There are several Python Memcached bindings available; the
-three most common are `python-memcached`_, `pylibmc`_, and `pymemcache`_.
+two supported by Django are `pylibmc`_ and `pymemcache`_.
 
-.. _`python-memcached`: https://pypi.org/project/python-memcached/
 .. _`pylibmc`: https://pypi.org/project/pylibmc/
 .. _`pymemcache`: https://pypi.org/project/pymemcache/
 
 To use Memcached with Django:
 
 * Set :setting:`BACKEND <CACHES-BACKEND>` to
-  ``django.core.cache.backends.memcached.MemcachedCache``,
-  ``django.core.cache.backends.memcached.PyLibMCCache``, or
-  ``django.core.cache.backends.memcached.PyMemcacheCache`` (depending on your
+  ``django.core.cache.backends.memcached.PyMemcacheCache`` or
+  ``django.core.cache.backends.memcached.PyLibMCCache`` (depending on your
   chosen memcached binding)
 
 * Set :setting:`LOCATION <CACHES-LOCATION>` to ``ip:port`` values,
@@ -97,21 +95,21 @@ To use Memcached with Django:
   ``path`` is the path to a Memcached Unix socket file.
 
 In this example, Memcached is running on localhost (127.0.0.1) port 11211, using
-the ``python-memcached`` binding::
+the ``pymemcache`` binding::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
             'LOCATION': '127.0.0.1:11211',
         }
     }
 
 In this example, Memcached is available through a local Unix socket file
-:file:`/tmp/memcached.sock` using the ``python-memcached`` binding::
+:file:`/tmp/memcached.sock` using the ``pymemcache`` binding::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
             'LOCATION': 'unix:/tmp/memcached.sock',
         }
     }
@@ -129,7 +127,7 @@ address 172.19.26.240 and 172.19.26.242, both on port 11211::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
             'LOCATION': [
                 '172.19.26.240:11211',
                 '172.19.26.242:11211',
@@ -143,7 +141,7 @@ on the IP addresses 172.19.26.240 (port 11211), 172.19.26.242 (port 11212), and
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
             'LOCATION': [
                 '172.19.26.240:11211',
                 '172.19.26.242:11212',
@@ -164,6 +162,12 @@ particularly temporary.
 .. versionchanged:: 3.2
 
     The ``PyMemcacheCache`` backend was added.
+
+.. deprecated:: 3.2
+
+    The ``MemcachedCache`` backend is deprecated as ``python-memcached`` has
+    some problems and seems to be unmaintained. Use ``PyMemcacheCache`` or
+    ``PyLibMCCache`` instead.
 
 .. _database-caching:
 
@@ -448,19 +452,6 @@ of 60 seconds, and a maximum capacity of 1000 items::
             'TIMEOUT': 60,
             'OPTIONS': {
                 'MAX_ENTRIES': 1000
-            }
-        }
-    }
-
-Here's an example configuration for a ``python-memcached`` based backend with
-an object size limit of 2MB::
-
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-            'LOCATION': '127.0.0.1:11211',
-            'OPTIONS': {
-                'server_max_value_length': 1024 * 1024 * 2,
             }
         }
     }

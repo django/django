@@ -47,6 +47,12 @@ warnings.simplefilter("error", ResourceWarning)
 warnings.simplefilter("error", RuntimeWarning)
 # Ignore known warnings in test dependencies.
 warnings.filterwarnings("ignore", "'U' mode is deprecated", DeprecationWarning, module='docutils.io')
+# RemovedInDjango41Warning: Ignore MemcachedCache deprecation warning.
+warnings.filterwarnings(
+    'ignore',
+    'MemcachedCache is deprecated',
+    category=RemovedInDjango41Warning,
+)
 
 RUNTESTS_DIR = os.path.abspath(os.path.dirname(__file__))
 

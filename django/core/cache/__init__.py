@@ -50,9 +50,8 @@ cache = ConnectionProxy(caches, DEFAULT_CACHE_ALIAS)
 
 
 def close_caches(**kwargs):
-    # Some caches -- python-memcached in particular -- need to do a cleanup at the
-    # end of a request cycle. If not implemented in a particular backend
-    # cache.close is a no-op
+    # Some caches need to do a cleanup at the end of a request cycle. If not
+    # implemented in a particular backend cache.close() is a no-op.
     for cache in caches.all():
         cache.close()
 

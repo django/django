@@ -660,3 +660,8 @@ Miscellaneous
   ``TransactionTestCase.assertQuerysetEqual()``, when compared to string
   values, is deprecated. If you need the previous behavior, explicitly set
   ``transform`` to ``repr``.
+
+* The ``django.core.cache.backends.memcached.MemcachedCache`` backend is
+  deprecated as ``python-memcached`` has some problems and seems to be
+  unmaintained. Use ``django.core.cache.backends.memcached.PyMemcacheCache``
+  or ``django.core.cache.backends.memcached.PyLibMCCache`` instead.
