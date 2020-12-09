@@ -697,26 +697,26 @@ Putting your data on the map
 Geographic Admin
 ----------------
 
-GeoDjango extends :doc:`Django's admin application </ref/contrib/admin/index>`
-with support for editing geometry fields.
+:doc:`Django's admin application </ref/contrib/admin/index>` supports editing
+geometry fields.
 
 Basics
 ~~~~~~
 
-GeoDjango also supplements the Django admin by allowing users to create
-and modify geometries on a JavaScript slippy map (powered by `OpenLayers`_).
+The Django admin allows users to create and modify geometries on a JavaScript
+slippy map (powered by `OpenLayers`_).
 
-Let's dive right in.  Create a file called ``admin.py`` inside the
-``world`` application with the following code::
+Let's dive right in. Create a file called ``admin.py`` inside the ``world``
+application with the following code::
 
     from django.contrib.gis import admin
     from .models import WorldBorder
 
-    admin.site.register(WorldBorder, admin.GeoModelAdmin)
+    admin.site.register(WorldBorder, admin.ModelAdmin)
 
 Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
 
-    from django.contrib.gis import admin
+    from django.contrib import admin
     from django.urls import include, path
 
     urlpatterns = [
@@ -745,24 +745,22 @@ position.
 .. _Vector Map Level 0: http://web.archive.org/web/20201024202709/https://earth-info.nga.mil/publications/vmap0.html
 .. _OSGeo: https://www.osgeo.org/
 
-.. _osmgeoadmin-intro:
+``GISModelAdmin``
+~~~~~~~~~~~~~~~~~
 
-``OSMGeoAdmin``
-~~~~~~~~~~~~~~~
-
-With the :class:`~django.contrib.gis.admin.OSMGeoAdmin`, GeoDjango uses
-an `OpenStreetMap`_ layer in the admin.
+With the :class:`~django.contrib.gis.admin.GISModelAdmin`, GeoDjango uses an
+`OpenStreetMap`_ layer in the admin.
 This provides more context (including street and thoroughfare details) than
-available with the :class:`~django.contrib.gis.admin.GeoModelAdmin`
-(which uses the `Vector Map Level 0`_ WMS dataset hosted at `OSGeo`_).
+available with the :class:`~django.contrib.admin.ModelAdmin` (which uses the
+`Vector Map Level 0`_ WMS dataset hosted at `OSGeo`_).
 
 The PROJ datum shifting files must be installed (see the :ref:`PROJ
 installation instructions <proj4>` for more details).
 
-If you meet this requirement, then substitute the ``OSMGeoAdmin`` option class
+If you meet this requirement, then use the ``GISModelAdmin`` option class
 in your ``admin.py`` file::
 
-    admin.site.register(WorldBorder, admin.OSMGeoAdmin)
+    admin.site.register(WorldBorder, admin.GISModelAdmin)
 
 .. rubric:: Footnotes
 

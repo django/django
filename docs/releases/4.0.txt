@@ -171,6 +171,10 @@ Minor features
 * :class:`~django.contrib.gis.gdal.GDALRaster` now allows creating rasters in
   any GDAL virtual filesystem.
 
+* The new :class:`~django.contrib.gis.admin.GISModelAdmin` class allows
+  customizing the widget used for ``GeometryField``. This is encouraged instead
+  of deprecated ``GeoModelAdmin`` and ``OSMGeoAdmin``.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -717,6 +721,10 @@ Miscellaneous
   ``None`` when there are no rows instead of ``[]``, ``[]``, and ``''``
   respectively in Django 5.0. If you need the previous behavior, explicitly set
   ``default`` to ``Value([])``, ``Value('[]')``, or ``Value('')``.
+
+* The ``django.contrib.gis.admin.GeoModelAdmin`` and ``OSMGeoAdmin`` classes
+  are deprecated. Use :class:`~django.contrib.admin.ModelAdmin` and
+  :class:`~django.contrib.gis.admin.GISModelAdmin` instead.
 
 Features removed in 4.0
 =======================
