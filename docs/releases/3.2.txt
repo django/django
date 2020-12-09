@@ -419,6 +419,9 @@ Models
 
 * Added the :class:`~django.db.models.functions.JSONObject` database function.
 
+* :meth:`.QuerySet.bulk_create` now supports :ref:`multi-table inheritance
+  <multi-table-inheritance>` on PostgreSQL and MariaDB 10.5+.
+
 Pagination
 ~~~~~~~~~~
 

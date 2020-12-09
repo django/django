@@ -55,6 +55,10 @@ class State(models.Model):
     two_letter_code = models.CharField(max_length=2, primary_key=True)
 
 
+class ChildState(State):
+    pass
+
+
 class TwoFields(models.Model):
     f1 = models.IntegerField(unique=True)
     f2 = models.IntegerField(unique=True)
@@ -104,3 +108,11 @@ class NullableFields(models.Model):
     text_field = models.TextField(null=True, default='text')
     url_field = models.URLField(null=True, default='/')
     uuid_field = models.UUIDField(null=True, default=uuid.uuid4)
+
+
+class RestaurantWithState(State, Restaurant):
+    pass
+
+
+class StateWithRestaurant(Restaurant, State):
+    pass

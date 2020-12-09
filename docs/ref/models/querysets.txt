@@ -2167,7 +2167,11 @@ This has a number of caveats though:
 
 * The model's ``save()`` method will not be called, and the ``pre_save`` and
   ``post_save`` signals will not be sent.
-* It does not work with child models in a multi-table inheritance scenario.
+* Saving child models in a :ref:`multi-table inheritance
+  <multi-table-inheritance>` scenario only works on certain databases
+  (currently PostgreSQL and MariaDB 10.5+). On other databases, a
+  :class:`ValueError` will be raised. An additional SQL query is executed per
+  concrete model in the inheritance hierarchy.
 * If the model's primary key is an :class:`~django.db.models.AutoField`, the
   primary key attribute can only be retrieved on certain databases (currently
   PostgreSQL and MariaDB 10.5+). On other databases, it will not be set.
@@ -2214,6 +2218,10 @@ Returns ``objs`` as cast to a list, in the same order as provided.
 .. versionchanged:: 3.1
 
     Support for the fetching primary key attributes on MariaDB 10.5+ was added.
+
+.. versionchanged:: 3.2
+
+    Support for multi-table inheritance on PostgreSQL and MariaDB 10.5+ was added.
 
 ``bulk_update()``
 ~~~~~~~~~~~~~~~~~

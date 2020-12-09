@@ -9,9 +9,10 @@ from django.test import (
 )
 
 from .models import (
-    BigAutoFieldModel, Country, NoFields, NullableFields, Pizzeria,
+    BigAutoFieldModel, ChildState, Country, NoFields, NullableFields, Pizzeria,
     ProxyCountry, ProxyMultiCountry, ProxyMultiProxyCountry, ProxyProxyCountry,
-    Restaurant, SmallAutoFieldModel, State, TwoFields,
+    Restaurant, RestaurantWithState, SmallAutoFieldModel, State,
+    StateWithRestaurant, TwoFields,
 )
 
 
@@ -60,20 +61,140 @@ class BulkCreateTests(TestCase):
         ])
         self.assertEqual(Country.objects.count(), 4)
 
+    @skipIfDBFeature('can_return_rows_from_bulk_insert')
     def test_multi_table_inheritance_unsupported(self):
-        expected_message = "Can't bulk create a multi-table inherited model"
-        with self.assertRaisesMessage(ValueError, expected_message):
+        expected_message = (
+            'Bulk create a multi-table inherited model is not supported on '
+            'this database backend.'
+        )
+        with self.assertRaisesMessage(NotSupportedError, expected_message):
             Pizzeria.objects.bulk_create([
                 Pizzeria(name="The Art of Pizza"),
             ])
-        with self.assertRaisesMessage(ValueError, expected_message):
+        with self.assertRaisesMessage(NotSupportedError, expected_message):
             ProxyMultiCountry.objects.bulk_create([
                 ProxyMultiCountry(name="Fillory", iso_two_letter="FL"),
             ])
-        with self.assertRaisesMessage(ValueError, expected_message):
+        with self.assertRaisesMessage(NotSupportedError, expected_message):
             ProxyMultiProxyCountry.objects.bulk_create([
                 ProxyMultiProxyCountry(name="Fillory", iso_two_letter="FL"),
             ])
+
+    @skipUnlessDBFeature('can_return_rows_from_bulk_insert')
+    def test_multi_table_inheritance(self):
+        pizzeria, = Pizzeria.objects.bulk_create([
+            Pizzeria(name='Vegan Pizza House'),
+        ])
+        self.assertIsNotNone(pizzeria.pk)
+        self.assertIsNotNone(pizzeria.restaurant_ptr_id)
+        self.assertEqual(pizzeria.restaurant_ptr.pk, pizzeria.pk)
+        self.assertEqual(pizzeria.name, 'Vegan Pizza House')
+        self.assertEqual(pizzeria.restaurant_ptr.name, 'Vegan Pizza House')
+        self.assertSequenceEqual(Pizzeria.objects.all(), [pizzeria])
+        self.assertSequenceEqual(Restaurant.objects.all(), [pizzeria.restaurant_ptr])
+
+        country, = ProxyMultiCountry.objects.bulk_create([
+            ProxyMultiCountry(name='Fillory', iso_two_letter='FL'),
+        ])
+        self.assertIsNotNone(country.pk)
+        self.assertIsNotNone(country.country_ptr_id)
+        self.assertEqual(country.country_ptr.pk, country.pk)
+        self.assertEqual(country.name, 'Fillory')
+        self.assertEqual(country.iso_two_letter, 'FL')
+        self.assertEqual(country.country_ptr.name, 'Fillory')
+        self.assertEqual(country.country_ptr.iso_two_letter, 'FL')
+        self.assertSequenceEqual(ProxyMultiCountry.objects.all(), [country])
+        self.assertSequenceEqual(Country.objects.all(), [country.country_ptr])
+
+    @skipUnlessDBFeature('can_return_rows_from_bulk_insert')
+    def test_multi_table_inheritance_explicit_pk_field(self):
+        state, = ChildState.objects.bulk_create([ChildState(two_letter_code='NH')])
+        self.assertEqual(state.pk, 'NH')
+        self.assertEqual(state.state_ptr_id, 'NH')
+        self.assertEqual(state.state_ptr.pk, 'NH')
+        self.assertEqual(state.two_letter_code, 'NH')
+        self.assertEqual(state.state_ptr.two_letter_code, 'NH')
+        self.assertSequenceEqual(State.objects.all(), [state.state_ptr])
+        self.assertSequenceEqual(ChildState.objects.all(), [state])
+
+    @skipUnlessDBFeature('can_return_rows_from_bulk_insert')
+    def test_multi_table_inheritance_multiple_parents_autofield_last(self):
+        restaurant, = RestaurantWithState.objects.bulk_create([
+            RestaurantWithState(name='Chickpea', two_letter_code='BC'),
+        ])
+        self.assertEqual(restaurant.pk, 'BC')
+        self.assertIsNotNone(restaurant.restaurant_ptr_id)
+        self.assertEqual(restaurant.state_ptr_id, 'BC')
+        self.assertEqual(restaurant.restaurant_ptr.pk, restaurant.restaurant_ptr_id)
+        self.assertEqual(restaurant.name, 'Chickpea')
+        self.assertEqual(restaurant.restaurant_ptr.name, 'Chickpea')
+        self.assertEqual(restaurant.two_letter_code, 'BC')
+        self.assertEqual(restaurant.state_ptr.two_letter_code, 'BC')
+        self.assertSequenceEqual(RestaurantWithState.objects.all(), [restaurant])
+        self.assertSequenceEqual(Restaurant.objects.all(), [restaurant.restaurant_ptr])
+        self.assertSequenceEqual(State.objects.all(), [restaurant.state_ptr])
+
+    @skipUnlessDBFeature('can_return_rows_from_bulk_insert')
+    def test_multi_table_inheritance_multiple_parents_explicit_pk_last(self):
+        state, = StateWithRestaurant.objects.bulk_create([
+            StateWithRestaurant(name='Chickpea', two_letter_code='BC'),
+        ])
+        self.assertIsNotNone(state.pk)
+        self.assertIsNotNone(state.restaurant_ptr_id)
+        self.assertEqual(state.state_ptr_id, 'BC')
+        self.assertEqual(state.restaurant_ptr.pk, state.pk)
+        self.assertEqual(state.name, 'Chickpea')
+        self.assertEqual(state.restaurant_ptr.name, 'Chickpea')
+        self.assertEqual(state.two_letter_code, 'BC')
+        self.assertEqual(state.state_ptr.two_letter_code, 'BC')
+        self.assertSequenceEqual(StateWithRestaurant.objects.all(), [state])
+        self.assertSequenceEqual(Restaurant.objects.all(), [state.restaurant_ptr])
+        self.assertSequenceEqual(State.objects.all(), [state.state_ptr])
+
+    @skipUnlessDBFeature('can_return_rows_from_bulk_insert')
+    def test_multi_table_inheritance_existing_parent(self):
+        restaurant = Restaurant.objects.create(name='Vegan Pizza House')
+        pizzeria, = Pizzeria.objects.bulk_create([
+            Pizzeria(restaurant_ptr=restaurant),
+        ])
+        self.assertIsNotNone(pizzeria.pk)
+        self.assertIsNotNone(pizzeria.restaurant_ptr_id)
+        self.assertEqual(pizzeria.restaurant_ptr.pk, pizzeria.pk)
+        self.assertEqual(pizzeria.restaurant_ptr.name, 'Vegan Pizza House')
+        self.assertSequenceEqual(Pizzeria.objects.all(), [pizzeria])
+        self.assertSequenceEqual(Restaurant.objects.all(), [pizzeria.restaurant_ptr])
+
+        country = Country.objects.create(name='Fillory', iso_two_letter='FL')
+        proxy_country, = ProxyMultiCountry.objects.bulk_create([
+            ProxyMultiCountry(country_ptr=country)
+        ])
+        self.assertIsNotNone(proxy_country.pk)
+        self.assertIsNotNone(proxy_country.country_ptr_id)
+        self.assertEqual(proxy_country.country_ptr.pk, country.pk)
+        self.assertEqual(proxy_country.country_ptr.name, 'Fillory')
+        self.assertEqual(proxy_country.country_ptr.iso_two_letter, 'FL')
+        self.assertSequenceEqual(ProxyMultiCountry.objects.all(), [proxy_country])
+        self.assertSequenceEqual(Country.objects.all(), [country])
+
+    @skipUnlessDBFeature('can_return_rows_from_bulk_insert')
+    def test_multi_table_inheritance_existing_parent_id(self):
+        restaurant = Restaurant.objects.create(name='Vegan Pizza House')
+        pizzeria, = Pizzeria.objects.bulk_create([
+            Pizzeria(restaurant_ptr_id=restaurant.pk),
+        ])
+        self.assertIsNotNone(pizzeria.pk)
+        self.assertIsNotNone(pizzeria.restaurant_ptr_id)
+        self.assertSequenceEqual(Pizzeria.objects.all(), [pizzeria])
+        self.assertSequenceEqual(Restaurant.objects.all(), [restaurant])
+
+        country = Country.objects.create(name='Fillory', iso_two_letter='FL')
+        proxy_country, = ProxyMultiCountry.objects.bulk_create([
+            ProxyMultiCountry(country_ptr_id=country.pk)
+        ])
+        self.assertIsNotNone(proxy_country.pk)
+        self.assertIsNotNone(proxy_country.country_ptr_id)
+        self.assertSequenceEqual(ProxyMultiCountry.objects.all(), [proxy_country])
+        self.assertSequenceEqual(Country.objects.all(), [country])
 
     def test_proxy_inheritance_supported(self):
         ProxyCountry.objects.bulk_create([
