@@ -64,7 +64,7 @@ class Command(BaseCommand):
             help='Specifies file to which the output is written.'
         )
         parser.add_argument(
-            '--encoding', default='cp949',
+            '--encoding',
             help='Which encoder to use'
         )
 
