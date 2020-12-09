@@ -366,14 +366,25 @@ class CaseInsensitiveMixin:
 class KeyTransformIsNull(lookups.IsNull):
     # key__isnull=False is the same as has_key='key'
     def as_oracle(self, compiler, connection):
+        sql, params = HasKey(
+            self.lhs.lhs,
+            self.lhs.key_name,
+        ).as_oracle(compiler, connection)
         if not self.rhs:
-            return HasKey(self.lhs.lhs, self.lhs.key_name).as_oracle(compiler, connection)
-        return super().as_sql(compiler, connection)
+            return sql, params
+        # Column doesn't have a key or IS NULL.
+        lhs, lhs_params, _ = self.lhs.preprocess_lhs(compiler, connection)
+        return '(NOT %s OR %s IS NULL)' % (sql, lhs), tuple(params) + tuple(lhs_params)
 
     def as_sqlite(self, compiler, connection):
+        template = 'JSON_TYPE(%s, %%s) IS NULL'
         if not self.rhs:
-            return HasKey(self.lhs.lhs, self.lhs.key_name).as_sqlite(compiler, connection)
-        return super().as_sql(compiler, connection)
+            template = 'JSON_TYPE(%s, %%s) IS NOT NULL'
+        return HasKey(self.lhs.lhs, self.lhs.key_name).as_sql(
+            compiler,
+            connection,
+            template=template,
+        )
 
 
 class KeyTransformIn(lookups.In):
