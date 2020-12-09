@@ -63,6 +63,10 @@ class Command(BaseCommand):
             '-o', '--output',
             help='Specifies file to which the output is written.'
         )
+        parser.add_argument(
+            '--encoding', default='cp949',
+            help='Which encoder to use'
+        )
 
     def handle(self, *app_labels, **options):
         format = options['format']
@@ -70,6 +74,7 @@ class Command(BaseCommand):
         using = options['database']
         excludes = options['exclude']
         output = options['output']
+        encoding = options['encoding']
         show_traceback = options['traceback']
         use_natural_foreign_keys = options['use_natural_foreign_keys']
         use_natural_primary_keys = options['use_natural_primary_keys']
@@ -184,7 +189,7 @@ class Command(BaseCommand):
             if output and self.stdout.isatty() and options['verbosity'] > 0:
                 progress_output = self.stdout
                 object_count = sum(get_objects(count_only=True))
-            stream = open(output, 'w') if output else None
+            stream = open(output, 'w', encoding=encoding) if output else None
             try:
                 serializers.serialize(
                     format, get_objects(), indent=indent,
