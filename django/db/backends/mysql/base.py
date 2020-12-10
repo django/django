@@ -57,7 +57,7 @@ class CursorWrapper:
     Implemented as a wrapper, rather than a subclass, so that it isn't stuck
     to the particular underlying representation returned by Connection.cursor().
     """
-    
+
     codes_for_ignore = (
         1050,  # Table exists
     )
