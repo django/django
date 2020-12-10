@@ -1,5 +1,5 @@
 import datetime
-from unittest import skipIf, skipUnless
+from unittest import skipUnless
 
 from django.db import connection
 from django.db.models import CASCADE, ForeignKey, Index, Q
@@ -89,7 +89,6 @@ class SchemaIndexesTests(TestCase):
         )
 
 
-@skipIf(connection.vendor == 'postgresql', 'opclasses are PostgreSQL only')
 class SchemaIndexesNotPostgreSQLTests(TransactionTestCase):
     available_apps = ['indexes']
 

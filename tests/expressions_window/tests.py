@@ -1,6 +1,6 @@
 import datetime
 from decimal import Decimal
-from unittest import mock, skipIf
+from unittest import mock
 
 from django.core.exceptions import FieldError
 from django.db import NotSupportedError, connection
@@ -150,7 +150,6 @@ class WindowFunctionTests(TestCase):
             ('Johnson', 'Management', 12),
         ], lambda entry: (entry.name, entry.department, entry.row_number))
 
-    @skipIf(connection.vendor == 'oracle', "Oracle requires ORDER BY in row_number, ANSI:SQL doesn't")
     def test_row_number_no_ordering(self):
         """
         The row number window function computes the number based on the order
@@ -633,10 +632,6 @@ class WindowFunctionTests(TestCase):
             ('Brown', 'Sales', 53000, datetime.date(2009, 9, 1), 148000)
         ], transform=lambda row: (row.name, row.department, row.salary, row.hire_date, row.sum))
 
-    @skipIf(
-        connection.vendor == 'sqlite' and connection.Database.sqlite_version_info < (3, 27),
-        'Nondeterministic failure on SQLite < 3.27.'
-    )
     def test_subquery_row_range_rank(self):
         qs = Employee.objects.annotate(
             highest_avg_salary_date=Subquery(

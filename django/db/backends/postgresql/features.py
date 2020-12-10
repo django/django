@@ -59,6 +59,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_json_operators = True
     json_key_contains_list_matching_requires_list = True
 
+    django_test_skips = {
+        'opclasses are PostgreSQL only.': {
+            'indexes.tests.SchemaIndexesNotPostgreSQLTests.test_create_index_ignores_opclasses',
+        },
+    }
+
     @cached_property
     def test_collations(self):
         # PostgreSQL < 10 doesn't support ICU collations.

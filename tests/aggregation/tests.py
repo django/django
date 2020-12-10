@@ -1218,11 +1218,6 @@ class AggregateTestCase(TestCase):
         Subquery annotations must be included in the GROUP BY if they use
         potentially multivalued relations (contain the LOOKUP_SEP).
         """
-        if connection.vendor == 'mysql' and 'ONLY_FULL_GROUP_BY' in connection.sql_mode:
-            self.skipTest(
-                'GROUP BY optimization does not work properly when '
-                'ONLY_FULL_GROUP_BY mode is enabled on MySQL, see #31331.'
-            )
         subquery_qs = Author.objects.filter(
             pk=OuterRef('pk'),
             book__name=OuterRef('book__name'),

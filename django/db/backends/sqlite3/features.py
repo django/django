@@ -51,6 +51,37 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     }
 
     @cached_property
+    def django_test_skips(self):
+        skips = {
+            'SQLite stores values rounded to 15 significant digits.': {
+                'model_fields.test_decimalfield.DecimalFieldTests.test_fetch_from_db_without_float_rounding',
+            },
+            'SQLite naively remakes the table on field alteration.': {
+                'schema.tests.SchemaTests.test_unique_no_unnecessary_fk_drops',
+                'schema.tests.SchemaTests.test_unique_and_reverse_m2m',
+                'schema.tests.SchemaTests.test_alter_field_default_doesnt_perform_queries',
+                'schema.tests.SchemaTests.test_rename_column_renames_deferred_sql_references',
+            },
+            "SQLite doesn't have a constraint.": {
+                'model_fields.test_integerfield.PositiveIntegerFieldTests.test_negative_values',
+            },
+        }
+        if Database.sqlite_version_info < (3, 27):
+            skips.update({
+                'Nondeterministic failure on SQLite < 3.27.': {
+                    'expressions_window.tests.WindowFunctionTests.test_subquery_row_range_rank',
+                },
+            })
+        if self.connection.is_in_memory_db():
+            skips.update({
+                "the sqlite backend's close() method is a no-op when using an "
+                "in-memory database": {
+                    'servers.test_liveserverthread.LiveServerThreadTest.test_closes_connections',
+                },
+            })
+        return skips
+
+    @cached_property
     def supports_atomic_references_rename(self):
         # SQLite 3.28.0 bundled with MacOS 10.15 does not support renaming
         # references atomically.

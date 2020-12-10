@@ -1230,13 +1230,11 @@ class ExpressionOperatorTests(TestCase):
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 1764)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(61.02, places=2))
 
-    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support bitwise XOR.")
     def test_lefthand_bitwise_xor(self):
         Number.objects.update(integer=F('integer').bitxor(48))
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 26)
         self.assertEqual(Number.objects.get(pk=self.n1.pk).integer, -26)
 
-    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support bitwise XOR.")
     def test_lefthand_bitwise_xor_null(self):
         employee = Employee.objects.create(firstname='John', lastname='Doe')
         Employee.objects.update(salary=F('salary').bitxor(48))

@@ -729,12 +729,6 @@ class SchemaTests(TransactionTestCase):
         Foo.objects.create()
 
     def test_alter_not_unique_field_to_primary_key(self):
-        if (
-            connection.vendor == 'mysql' and
-            connection.mysql_is_mariadb and
-            (10, 4, 3) < connection.mysql_version < (10, 5, 2)
-        ):
-            self.skipTest('https://jira.mariadb.org/browse/MDEV-19598')
         # Create the table.
         with connection.schema_editor() as editor:
             editor.create_model(Author)
@@ -1957,7 +1951,6 @@ class SchemaTests(TransactionTestCase):
             TagUniqueRename._meta.db_table = old_table_name
 
     @isolate_apps('schema')
-    @unittest.skipIf(connection.vendor == 'sqlite', 'SQLite naively remakes the table on field alteration.')
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_unique_no_unnecessary_fk_drops(self):
         """
@@ -1991,7 +1984,6 @@ class SchemaTests(TransactionTestCase):
         self.assertEqual(len(cm.records), 1)
 
     @isolate_apps('schema')
-    @unittest.skipIf(connection.vendor == 'sqlite', 'SQLite remakes the table on field alteration.')
     def test_unique_and_reverse_m2m(self):
         """
         AlterField can modify a unique field when there's a reverse M2M
@@ -2759,7 +2751,6 @@ class SchemaTests(TransactionTestCase):
             if connection.features.can_introspect_default:
                 self.assertIsNone(field.default)
 
-    @unittest.skipIf(connection.vendor == 'sqlite', 'SQLite naively remakes the table on field alteration.')
     def test_alter_field_default_doesnt_perform_queries(self):
         """
         No queries are performed if a field default changes and the field's
@@ -3041,12 +3032,6 @@ class SchemaTests(TransactionTestCase):
         Changing the primary key field name of a model with a self-referential
         foreign key (#26384).
         """
-        if (
-            connection.vendor == 'mysql' and
-            connection.mysql_is_mariadb and
-            (10, 4, 12) < connection.mysql_version < (10, 5)
-        ):
-            self.skipTest('https://jira.mariadb.org/browse/MDEV-22775')
         with connection.schema_editor() as editor:
             editor.create_model(Node)
         old_field = Node._meta.get_field('node_id')
@@ -3203,7 +3188,6 @@ class SchemaTests(TransactionTestCase):
                 self.assertIs(statement.references_table('schema_author'), False)
                 self.assertIs(statement.references_table('schema_book'), False)
 
-    @unittest.skipIf(connection.vendor == 'sqlite', 'SQLite naively remakes the table on field alteration.')
     def test_rename_column_renames_deferred_sql_references(self):
         with connection.schema_editor() as editor:
             editor.create_model(Author)

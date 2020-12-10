@@ -2,7 +2,7 @@
 Tests for geography support in PostGIS
 """
 import os
-from unittest import skipIf, skipUnless
+from unittest import skipUnless
 
 from django.contrib.gis.db import models
 from django.contrib.gis.db.models.functions import Area, Distance
@@ -22,7 +22,6 @@ class GeographyTest(TestCase):
         "Ensure geography features loaded properly."
         self.assertEqual(8, City.objects.count())
 
-    @skipIf(spatialite, "SpatiaLite doesn't support distance lookups with Distance objects.")
     @skipUnlessDBFeature("supports_distances_lookups", "supports_distance_geodetic")
     def test02_distance_lookup(self):
         "Testing distance lookup support on non-point geography fields."

@@ -197,6 +197,14 @@ CSRF
 
 * ...
 
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* Third-party database backends can now skip or mark as expected failures
+  tests in Django's test suite using the new
+  ``DatabaseFeatures.django_test_skips`` and
+  ``django_test_expected_failures`` attributes.
+
 Decorators
 ~~~~~~~~~~
 
