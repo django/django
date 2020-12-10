@@ -386,7 +386,8 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
     @skipUnlessDBFeature("has_MemSize_function")
     def test_memsize(self):
         ptown = City.objects.annotate(size=functions.MemSize('point')).get(name='Pueblo')
-        self.assertTrue(20 <= ptown.size <= 40)  # Exact value may depend on PostGIS version
+        # Exact value depends on database and version.
+        self.assertTrue(20 <= ptown.size <= 105)
 
     @skipUnlessDBFeature("has_NumGeom_function")
     def test_num_geom(self):
