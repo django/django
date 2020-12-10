@@ -86,7 +86,6 @@ class CursorWrapper:
             else:
                 raise
 
-
     def executemany(self, query, args):
         try:
             return self.cursor.executemany(query, args)
@@ -99,7 +98,6 @@ class CursorWrapper:
                 pass
             else:
                 raise
-
 
     def __getattr__(self, attr):
         return getattr(self.cursor, attr)
