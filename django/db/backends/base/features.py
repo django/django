@@ -325,7 +325,7 @@ class BaseDatabaseFeatures:
 
     # A set of dotted paths to tests in Django's test suite that are expected
     # to fail on this database.
-    django_test_expected_failures = {}
+    django_test_expected_failures = set()
     # A map of reasons to sets of dotted paths to tests in Django's test suite
     # that should be skipped for this database.
     django_test_skips = {}
