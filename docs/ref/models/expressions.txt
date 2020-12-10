@@ -633,12 +633,13 @@ On PostgreSQL, the SQL looks like:
 .. code-block:: sql
 
     SELECT "post"."id", "post"."published_at", EXISTS(
-        SELECT U0."id", U0."post_id", U0."email", U0."created_at"
+        SELECT (1) as "a"
         FROM "comment" U0
         WHERE (
             U0."created_at" >= YYYY-MM-DD HH:MM:SS AND
-            U0."post_id" = ("post"."id")
+            U0."post_id" = "post"."id"
         )
+        LIMIT 1
     ) AS "recent_comment" FROM "post"
 
 It's unnecessary to force ``Exists`` to refer to a single column, since the
