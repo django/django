@@ -57,6 +57,11 @@ class CursorWrapper:
     Implemented as a wrapper, rather than a subclass, so that it isn't stuck
     to the particular underlying representation returned by Connection.cursor().
     """
+    
+    codes_for_ignore = (
+        1050,  # Table exists
+    )
+
     codes_for_integrityerror = (
         1048,  # Column cannot be null
         1690,  # BIGINT UNSIGNED value is out of range
@@ -76,7 +81,11 @@ class CursorWrapper:
             # misclassified and Django would prefer the more logical place.
             if e.args[0] in self.codes_for_integrityerror:
                 raise IntegrityError(*tuple(e.args))
-            raise
+            elif e.args[0] in self.codes_for_ignore:
+                pass
+            else:
+                raise
+
 
     def executemany(self, query, args):
         try:
@@ -86,7 +95,11 @@ class CursorWrapper:
             # misclassified and Django would prefer the more logical place.
             if e.args[0] in self.codes_for_integrityerror:
                 raise IntegrityError(*tuple(e.args))
-            raise
+            elif e.args[0] in self.codes_for_ignore:
+                pass
+            else:
+                raise
+
 
     def __getattr__(self, attr):
         return getattr(self.cursor, attr)
