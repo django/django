@@ -1,6 +1,3 @@
-import cgi
-import codecs
-import re
 from io import BytesIO
 
 from django.conf import settings
@@ -10,8 +7,9 @@ from django.http import HttpRequest, QueryDict, parse_cookie
 from django.urls import set_script_prefix
 from django.utils.encoding import repercent_broken_unicode
 from django.utils.functional import cached_property
+from django.utils.regex_helper import _lazy_re_compile
 
-_slashes_re = re.compile(br'/+')
+_slashes_re = _lazy_re_compile(br'/+')
 
 
 class LimitedStream:
@@ -66,33 +64,22 @@ class LimitedStream:
 class WSGIRequest(HttpRequest):
     def __init__(self, environ):
         script_name = get_script_name(environ)
-        path_info = get_path_info(environ)
-        if not path_info:
-            # Sometimes PATH_INFO exists, but is empty (e.g. accessing
-            # the SCRIPT_NAME URL without a trailing slash). We really need to
-            # operate as if they'd requested '/'. Not amazingly nice to force
-            # the path like this, but should be harmless.
-            path_info = '/'
+        # If PATH_INFO is empty (e.g. accessing the SCRIPT_NAME URL without a
+        # trailing slash), operate as if '/' was requested.
+        path_info = get_path_info(environ) or '/'
         self.environ = environ
         self.path_info = path_info
         # be careful to only replace the first slash in the path because of
         # http://test/something and http://test//something being different as
-        # stated in http://www.ietf.org/rfc/rfc2396.txt
+        # stated in https://www.ietf.org/rfc/rfc2396.txt
         self.path = '%s/%s' % (script_name.rstrip('/'),
                                path_info.replace('/', '', 1))
         self.META = environ
         self.META['PATH_INFO'] = path_info
         self.META['SCRIPT_NAME'] = script_name
         self.method = environ['REQUEST_METHOD'].upper()
-        self.content_type, self.content_params = cgi.parse_header(environ.get('CONTENT_TYPE', ''))
-        if 'charset' in self.content_params:
-            try:
-                codecs.lookup(self.content_params['charset'])
-            except LookupError:
-                pass
-            else:
-                self.encoding = self.content_params['charset']
-        self._post_parse_error = False
+        # Set content_type, content_params, and encoding.
+        self._set_content_type_params(environ)
         try:
             content_length = int(environ.get('CONTENT_LENGTH'))
         except (ValueError, TypeError):
@@ -148,12 +135,17 @@ class WSGIHandler(base.BaseHandler):
         response._handler_class = self.__class__
 
         status = '%d %s' % (response.status_code, response.reason_phrase)
-        response_headers = list(response.items())
-        for c in response.cookies.values():
-            response_headers.append(('Set-Cookie', c.output(header='')))
+        response_headers = [
+            *response.items(),
+            *(('Set-Cookie', c.output(header='')) for c in response.cookies.values()),
+        ]
         start_response(status, response_headers)
         if getattr(response, 'file_to_stream', None) is not None and environ.get('wsgi.file_wrapper'):
-            response = environ['wsgi.file_wrapper'](response.file_to_stream)
+            # If `wsgi.file_wrapper` is used the WSGI server does not call
+            # .close on the response, but on the file wrapper. Patch it to use
+            # response.close instead which takes care of closing all files.
+            response.file_to_stream.close = response.close
+            response = environ['wsgi.file_wrapper'](response.file_to_stream, response.block_size)
         return response
 
 
@@ -180,9 +172,7 @@ def get_script_name(environ):
     # rewrites. Unfortunately not every Web server (lighttpd!) passes this
     # information through all the time, so FORCE_SCRIPT_NAME, above, is still
     # needed.
-    script_url = get_bytes_from_wsgi(environ, 'SCRIPT_URL', '')
-    if not script_url:
-        script_url = get_bytes_from_wsgi(environ, 'REDIRECT_URL', '')
+    script_url = get_bytes_from_wsgi(environ, 'SCRIPT_URL', '') or get_bytes_from_wsgi(environ, 'REDIRECT_URL', '')
 
     if script_url:
         if b'//' in script_url:

@@ -12,8 +12,8 @@ Uploaded files
 
 During file uploads, the actual file data is stored in :attr:`request.FILES
 <django.http.HttpRequest.FILES>`. Each entry in this dictionary is an
-``UploadedFile`` object (or a subclass) -- a simple wrapper around an uploaded
-file. You'll usually use one of these methods to access the uploaded content:
+``UploadedFile`` object (or a subclass) -- a wrapper around an uploaded file.
+You'll usually use one of these methods to access the uploaded content:
 
 .. method:: UploadedFile.read()
 
@@ -33,9 +33,9 @@ file. You'll usually use one of these methods to access the uploaded content:
     A generator returning chunks of the file. If ``multiple_chunks()`` is
     ``True``, you should use this method in a loop instead of ``read()``.
 
-    In practice, it's often easiest simply to use ``chunks()`` all the time.
-    Looping over ``chunks()`` instead of using ``read()`` ensures that large
-    files don't overwhelm your system's memory.
+    In practice, it's often easiest to use ``chunks()`` all the time. Looping
+    over ``chunks()`` instead of using ``read()`` ensures that large files
+    don't overwhelm your system's memory.
 
 Here are some useful attributes of ``UploadedFile``:
 
@@ -61,9 +61,7 @@ Here are some useful attributes of ``UploadedFile``:
     header. This is typically provided by services, such as Google App Engine,
     that intercept and handle file uploads on your behalf. As a result your
     handler may not receive the uploaded file content, but instead a URL or
-    other pointer to the file. (see `RFC 2388`_ section 5.3).
-
-    .. _RFC 2388: https://www.ietf.org/rfc/rfc2388.txt
+    other pointer to the file (see :rfc:`RFC 2388 <2388#section-5.3>`).
 
 .. attribute:: UploadedFile.charset
 
@@ -72,19 +70,15 @@ Here are some useful attributes of ``UploadedFile``:
 
 .. note::
 
-    Like regular Python files, you can read the file line-by-line simply by
-    iterating over the uploaded file:
-
-    .. code-block:: python
+    Like regular Python files, you can read the file line-by-line by iterating
+    over the uploaded file::
 
         for line in uploadedfile:
             do_something_with(line)
 
-    Lines are split using `universal newlines`_. The following are recognized
-    as ending a line: the Unix end-of-line convention ``'\n'``, the Windows
-    convention ``'\r\n'``, and the old Macintosh convention ``'\r'``.
-
-    .. _universal newlines: https://www.python.org/dev/peps/pep-0278
+    Lines are split using :pep:`universal newlines <278>`. The following are
+    recognized as ending a line: the Unix end-of-line convention ``'\n'``, the
+    Windows convention ``'\r\n'``, and the old Macintosh convention ``'\r'``.
 
 Subclasses of ``UploadedFile`` include:
 
@@ -145,7 +139,7 @@ Custom file upload handlers **must** define the following methods:
 
     Receives a "chunk" of data from the file upload.
 
-    ``raw_data`` is a byte string containing the uploaded data.
+    ``raw_data`` is a bytestring containing the uploaded data.
 
     ``start`` is the position in the file where this ``raw_data`` chunk
     begins.
@@ -217,6 +211,13 @@ attributes:
 .. method:: FileUploadHandler.upload_complete()
 
     Callback signaling that the entire upload (all files) has completed.
+
+.. method:: FileUploadHandler.upload_interrupted()
+
+    .. versionadded:: 3.2
+
+    Callback signaling that the upload was interrupted, e.g. when the user
+    closed their browser during file upload.
 
 .. method:: FileUploadHandler.handle_raw_input(input_data, META, content_length, boundary, encoding)
 

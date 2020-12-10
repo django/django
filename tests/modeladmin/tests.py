@@ -1,19 +1,23 @@
 from datetime import date
 
 from django import forms
-from django.contrib.admin.models import LogEntry
+from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.admin.options import (
     HORIZONTAL, VERTICAL, ModelAdmin, TabularInline,
+    get_content_type_for_model,
 )
 from django.contrib.admin.sites import AdminSite
-from django.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
+from django.contrib.admin.widgets import (
+    AdminDateWidget, AdminRadioSelect, AutocompleteSelect,
+    AutocompleteSelectMultiple,
+)
 from django.contrib.auth.models import User
 from django.db import models
 from django.forms.widgets import Select
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import isolate_apps
 
-from .models import Band, Concert
+from .models import Band, Concert, Song
 
 
 class MockRequest:
@@ -21,7 +25,7 @@ class MockRequest:
 
 
 class MockSuperUser:
-    def has_perm(self, perm):
+    def has_perm(self, perm, obj=None):
         return True
 
 
@@ -31,12 +35,15 @@ request.user = MockSuperUser()
 
 class ModelAdminTests(TestCase):
 
-    def setUp(self):
-        self.band = Band.objects.create(
+    @classmethod
+    def setUpTestData(cls):
+        cls.band = Band.objects.create(
             name='The Doors',
             bio='',
             sign_date=date(1965, 1, 1),
         )
+
+    def setUp(self):
         self.site = AdminSite()
 
     def test_modeladmin_str(self):
@@ -433,6 +440,28 @@ class ModelAdminTests(TestCase):
             ['main_band', 'day', 'transport', 'id', 'DELETE']
         )
 
+    def test_raw_id_fields_widget_override(self):
+        """
+        The autocomplete_fields, raw_id_fields, and radio_fields widgets may
+        overridden by specifying a widget in get_formset().
+        """
+        class ConcertInline(TabularInline):
+            model = Concert
+            fk_name = 'main_band'
+            raw_id_fields = ('opening_band',)
+
+            def get_formset(self, request, obj=None, **kwargs):
+                kwargs['widgets'] = {'opening_band': Select}
+                return super().get_formset(request, obj, **kwargs)
+
+        class BandAdmin(ModelAdmin):
+            inlines = [ConcertInline]
+
+        ma = BandAdmin(Band, self.site)
+        band_widget = list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields['opening_band'].widget
+        # Without the override this would be ForeignKeyRawIdWidget.
+        self.assertIsInstance(band_widget, Select)
+
     def test_queryset_override(self):
         # If the queryset of a ModelChoiceField in a custom form is overridden,
         # RelatedFieldWidgetWrapper doesn't mess that up.
@@ -615,36 +644,122 @@ class ModelAdminTests(TestCase):
         ma = ModelAdmin(Band, self.site)
         mock_request = MockRequest()
         mock_request.user = User.objects.create(username='bill')
-        self.assertEqual(ma.log_addition(mock_request, self.band, 'added'), LogEntry.objects.latest('id'))
-        self.assertEqual(ma.log_change(mock_request, self.band, 'changed'), LogEntry.objects.latest('id'))
-        self.assertEqual(ma.log_change(mock_request, self.band, 'deleted'), LogEntry.objects.latest('id'))
+        content_type = get_content_type_for_model(self.band)
+        tests = (
+            (ma.log_addition, ADDITION, {'added': {}}),
+            (ma.log_change, CHANGE, {'changed': {'fields': ['name', 'bio']}}),
+            (ma.log_deletion, DELETION, str(self.band)),
+        )
+        for method, flag, message in tests:
+            with self.subTest(name=method.__name__):
+                created = method(mock_request, self.band, message)
+                fetched = LogEntry.objects.filter(action_flag=flag).latest('id')
+                self.assertEqual(created, fetched)
+                self.assertEqual(fetched.action_flag, flag)
+                self.assertEqual(fetched.content_type, content_type)
+                self.assertEqual(fetched.object_id, str(self.band.pk))
+                self.assertEqual(fetched.user, mock_request.user)
+                if flag == DELETION:
+                    self.assertEqual(fetched.change_message, '')
+                    self.assertEqual(fetched.object_repr, message)
+                else:
+                    self.assertEqual(fetched.change_message, str(message))
+                    self.assertEqual(fetched.object_repr, str(self.band))
+
+    def test_get_autocomplete_fields(self):
+        class NameAdmin(ModelAdmin):
+            search_fields = ['name']
+
+        class SongAdmin(ModelAdmin):
+            autocomplete_fields = ['featuring']
+            fields = ['featuring', 'band']
+
+        class OtherSongAdmin(SongAdmin):
+            def get_autocomplete_fields(self, request):
+                return ['band']
+
+        self.site.register(Band, NameAdmin)
+        try:
+            # Uses autocomplete_fields if not overridden.
+            model_admin = SongAdmin(Song, self.site)
+            form = model_admin.get_form(request)()
+            self.assertIsInstance(form.fields['featuring'].widget.widget, AutocompleteSelectMultiple)
+            # Uses overridden get_autocomplete_fields
+            model_admin = OtherSongAdmin(Song, self.site)
+            form = model_admin.get_form(request)()
+            self.assertIsInstance(form.fields['band'].widget.widget, AutocompleteSelect)
+        finally:
+            self.site.unregister(Band)
+
+    def test_get_deleted_objects(self):
+        mock_request = MockRequest()
+        mock_request.user = User.objects.create_superuser(username='bob', email='bob@test.com', password='test')
+        self.site.register(Band, ModelAdmin)
+        ma = self.site._registry[Band]
+        deletable_objects, model_count, perms_needed, protected = ma.get_deleted_objects([self.band], request)
+        self.assertEqual(deletable_objects, ['Band: The Doors'])
+        self.assertEqual(model_count, {'bands': 1})
+        self.assertEqual(perms_needed, set())
+        self.assertEqual(protected, [])
+
+    def test_get_deleted_objects_with_custom_has_delete_permission(self):
+        """
+        ModelAdmin.get_deleted_objects() uses ModelAdmin.has_delete_permission()
+        for permissions checking.
+        """
+        mock_request = MockRequest()
+        mock_request.user = User.objects.create_superuser(username='bob', email='bob@test.com', password='test')
+
+        class TestModelAdmin(ModelAdmin):
+            def has_delete_permission(self, request, obj=None):
+                return False
+
+        self.site.register(Band, TestModelAdmin)
+        ma = self.site._registry[Band]
+        deletable_objects, model_count, perms_needed, protected = ma.get_deleted_objects([self.band], request)
+        self.assertEqual(deletable_objects, ['Band: The Doors'])
+        self.assertEqual(model_count, {'bands': 1})
+        self.assertEqual(perms_needed, {'band'})
+        self.assertEqual(protected, [])
 
 
 class ModelAdminPermissionTests(SimpleTestCase):
 
     class MockUser:
         def has_module_perms(self, app_label):
-            if app_label == "modeladmin":
-                return True
-            return False
+            return app_label == 'modeladmin'
+
+    class MockViewUser(MockUser):
+        def has_perm(self, perm, obj=None):
+            return perm == 'modeladmin.view_band'
 
     class MockAddUser(MockUser):
-        def has_perm(self, perm):
-            if perm == "modeladmin.add_band":
-                return True
-            return False
+        def has_perm(self, perm, obj=None):
+            return perm == 'modeladmin.add_band'
 
     class MockChangeUser(MockUser):
-        def has_perm(self, perm):
-            if perm == "modeladmin.change_band":
-                return True
-            return False
+        def has_perm(self, perm, obj=None):
+            return perm == 'modeladmin.change_band'
 
     class MockDeleteUser(MockUser):
-        def has_perm(self, perm):
-            if perm == "modeladmin.delete_band":
-                return True
-            return False
+        def has_perm(self, perm, obj=None):
+            return perm == 'modeladmin.delete_band'
+
+    def test_has_view_permission(self):
+        """
+        has_view_permission() returns True for users who can view objects and
+        False for users who can't.
+        """
+        ma = ModelAdmin(Band, AdminSite())
+        request = MockRequest()
+        request.user = self.MockViewUser()
+        self.assertIs(ma.has_view_permission(request), True)
+        request.user = self.MockAddUser()
+        self.assertIs(ma.has_view_permission(request), False)
+        request.user = self.MockChangeUser()
+        self.assertIs(ma.has_view_permission(request), True)
+        request.user = self.MockDeleteUser()
+        self.assertIs(ma.has_view_permission(request), False)
 
     def test_has_add_permission(self):
         """
@@ -653,12 +768,33 @@ class ModelAdminPermissionTests(SimpleTestCase):
         """
         ma = ModelAdmin(Band, AdminSite())
         request = MockRequest()
+        request.user = self.MockViewUser()
+        self.assertFalse(ma.has_add_permission(request))
         request.user = self.MockAddUser()
         self.assertTrue(ma.has_add_permission(request))
         request.user = self.MockChangeUser()
         self.assertFalse(ma.has_add_permission(request))
         request.user = self.MockDeleteUser()
         self.assertFalse(ma.has_add_permission(request))
+
+    def test_inline_has_add_permission_uses_obj(self):
+        class ConcertInline(TabularInline):
+            model = Concert
+
+            def has_add_permission(self, request, obj):
+                return bool(obj)
+
+        class BandAdmin(ModelAdmin):
+            inlines = [ConcertInline]
+
+        ma = BandAdmin(Band, AdminSite())
+        request = MockRequest()
+        request.user = self.MockAddUser()
+        self.assertEqual(ma.get_inline_instances(request), [])
+        band = Band(name='The Doors', bio='', sign_date=date(1965, 1, 1))
+        inline_instances = ma.get_inline_instances(request, band)
+        self.assertEqual(len(inline_instances), 1)
+        self.assertIsInstance(inline_instances[0], ConcertInline)
 
     def test_has_change_permission(self):
         """
@@ -667,6 +803,8 @@ class ModelAdminPermissionTests(SimpleTestCase):
         """
         ma = ModelAdmin(Band, AdminSite())
         request = MockRequest()
+        request.user = self.MockViewUser()
+        self.assertIs(ma.has_change_permission(request), False)
         request.user = self.MockAddUser()
         self.assertFalse(ma.has_change_permission(request))
         request.user = self.MockChangeUser()
@@ -681,6 +819,8 @@ class ModelAdminPermissionTests(SimpleTestCase):
         """
         ma = ModelAdmin(Band, AdminSite())
         request = MockRequest()
+        request.user = self.MockViewUser()
+        self.assertIs(ma.has_delete_permission(request), False)
         request.user = self.MockAddUser()
         self.assertFalse(ma.has_delete_permission(request))
         request.user = self.MockChangeUser()
@@ -695,6 +835,8 @@ class ModelAdminPermissionTests(SimpleTestCase):
         """
         ma = ModelAdmin(Band, AdminSite())
         request = MockRequest()
+        request.user = self.MockViewUser()
+        self.assertIs(ma.has_module_permission(request), True)
         request.user = self.MockAddUser()
         self.assertTrue(ma.has_module_permission(request))
         request.user = self.MockChangeUser()
@@ -705,6 +847,8 @@ class ModelAdminPermissionTests(SimpleTestCase):
         original_app_label = ma.opts.app_label
         ma.opts.app_label = 'anotherapp'
         try:
+            request.user = self.MockViewUser()
+            self.assertIs(ma.has_module_permission(request), False)
             request.user = self.MockAddUser()
             self.assertFalse(ma.has_module_permission(request))
             request.user = self.MockChangeUser()

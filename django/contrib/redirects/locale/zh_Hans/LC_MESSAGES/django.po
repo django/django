@@ -1,16 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Bai HuanCheng <xiqingongzi@gmail.com>, 2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
-# Ronald White <ouyanghongyu@gmail.com>, 2014
+# Ronald White <tkliuxing@me.com>, 2014
+# wolf ice <warwolf7677@163.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-03-17 12:40+0000\n"
-"Last-Translator: mozillazg <opensource.mozillazg@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-03-04 03:33+0000\n"
+"Last-Translator: wolf ice <warwolf7677@163.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -29,17 +31,17 @@ msgid "redirect from"
 msgstr "重定向自"
 
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr "应该是一个绝对路径，不包括域名。例如：'/events/search/'。"
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
+msgstr "这应该是绝对路径，不包括域名。例如：“/events/search/”。"
 
 msgid "redirect to"
 msgstr "重定向到"
 
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr "可以是绝对路径（同上）或以'http://'起始的全URL。"
+"“http://”."
+msgstr "这可以是绝对路径（如上所述），也可以是以“http://”为开头的完整URL。"
 
 msgid "redirect"
 msgstr "重定向"

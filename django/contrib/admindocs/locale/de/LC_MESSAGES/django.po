@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis, 2013
-# Jannis Leidel <jannis@leidel.info>, 2013-2016
-# Jannis, 2016
+# Jannis Vajen, 2013
+# Jannis Leidel <jannis@leidel.info>, 2013-2016,2020
+# Jannis Vajen, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-26 11:57+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-17 22:42+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -158,13 +158,13 @@ msgid "Template: %(name)s"
 msgstr "Template: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Template: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Template: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Suchpfade für Template „%(name)s“"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Suchpfade für Template <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(existiert nicht)"
@@ -244,13 +244,6 @@ msgstr ""
 "\n"
 "    View-Funktion: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
 "code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Boolescher Wert (True oder False)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Feldtyp: %(field_type)s"
 
 msgid "tag:"
 msgstr "Tag:"

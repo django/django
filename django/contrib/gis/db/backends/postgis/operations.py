@@ -7,13 +7,13 @@ from django.contrib.gis.db.backends.base.operations import (
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import GeometryField, RasterField
 from django.contrib.gis.gdal import GDALRaster
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.geometry import GEOSGeometryBase
 from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
+from django.db import NotSupportedError, ProgrammingError
 from django.db.backends.postgresql.operations import DatabaseOperations
 from django.db.models import Func, Value
-from django.db.utils import ProgrammingError
 from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
 
@@ -31,7 +31,7 @@ class PostGISOperator(SpatialOperator):
         # geography type.
         self.geography = geography
         # Only a subset of the operators and functions are available for the
-        # raster type. Lookups that don't suport raster will be converted to
+        # raster type. Lookups that don't support raster will be converted to
         # polygons. If the raster argument is set to BILATERAL, then the
         # operator cannot handle mixed geom-raster lookups.
         self.raster = raster
@@ -98,10 +98,17 @@ class ST_Polygon(Func):
 class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     name = 'postgis'
     postgis = True
-    geography = True
     geom_func_prefix = 'ST_'
 
     Adapter = PostGISAdapter
+
+    collect = geom_func_prefix + 'Collect'
+    extent = geom_func_prefix + 'Extent'
+    extent3d = geom_func_prefix + '3DExtent'
+    length3d = geom_func_prefix + '3DLength'
+    makeline = geom_func_prefix + 'MakeLine'
+    perimeter3d = geom_func_prefix + '3DPerimeter'
+    unionagg = geom_func_prefix + 'Union'
 
     gis_operators = {
         'bbcontains': PostGISOperator(op='~', raster=True),
@@ -134,38 +141,19 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     unsupported_functions = set()
 
-    @cached_property
-    def select(self):
-        return '%s::bytea'
-
+    select = '%s::bytea'
     select_extent = None
-
-    def __init__(self, connection):
-        super().__init__(connection)
-
-        prefix = self.geom_func_prefix
-
-        self.collect = prefix + 'Collect'
-        self.extent = prefix + 'Extent'
-        self.extent3d = prefix + '3DExtent'
-        self.length3d = prefix + '3DLength'
-        self.makeline = prefix + 'MakeLine'
-        self.perimeter3d = prefix + '3DPerimeter'
-        self.unionagg = prefix + 'Union'
 
     @cached_property
     def function_names(self):
         function_names = {
+            'AsWKB': 'ST_AsBinary',
+            'AsWKT': 'ST_AsText',
             'BoundingCircle': 'ST_MinimumBoundingCircle',
             'NumPoints': 'ST_NPoints',
         }
-        if self.spatial_version < (2, 2, 0):
-            function_names.update({
-                'DistanceSphere': 'ST_distance_sphere',
-                'DistanceSpheroid': 'ST_distance_spheroid',
-                'LengthSpheroid': 'ST_length_spheroid',
-                'MemSize': 'ST_mem_size',
-            })
+        if self.spatial_version < (2, 4, 0):
+            function_names['ForcePolygonCW'] = 'ST_ForceRHR'
         return function_names
 
     @cached_property
@@ -191,7 +179,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
                 raise ImproperlyConfigured(
                     'Cannot determine PostGIS version for database "%s" '
                     'using command "SELECT postgis_lib_version()". '
-                    'GeoDjango requires at least PostGIS version 2.1. '
+                    'GeoDjango requires at least PostGIS version 2.3. '
                     'Was the database created from a spatial database '
                     'template?' % self.connection.settings_dict['NAME']
                 )
@@ -239,7 +227,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             geom_type = f.geom_type
         if f.geography:
             if f.srid != 4326:
-                raise NotImplementedError('PostGIS only supports geography columns with an SRID of 4326.')
+                raise NotSupportedError('PostGIS only supports geography columns with an SRID of 4326.')
 
             return 'geography(%s,%d)' % (geom_type, f.srid)
         else:
@@ -284,12 +272,12 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         not in the SRID of the field. Specifically, this routine will
         substitute in the ST_Transform() function call.
         """
-        tranform_func = self.spatial_function_name('Transform')
+        transform_func = self.spatial_function_name('Transform')
         if hasattr(value, 'as_sql'):
             if value.field.srid == f.srid:
                 placeholder = '%s'
             else:
-                placeholder = '%s(%%s, %s)' % (tranform_func, f.srid)
+                placeholder = '%s(%%s, %s)' % (transform_func, f.srid)
             return placeholder
 
         # Get the srid for this object
@@ -303,7 +291,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         if value_srid is None or value_srid == f.srid:
             placeholder = '%s'
         else:
-            placeholder = '%s(%%s, %s)' % (tranform_func, f.srid)
+            placeholder = '%s(%%s, %s)' % (transform_func, f.srid)
 
         return placeholder
 
@@ -325,7 +313,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         return self._get_postgis_func('postgis_lib_version')
 
     def postgis_proj_version(self):
-        "Return the version of the PROJ.4 library used with PostGIS."
+        """Return the version of the PROJ library used with PostGIS."""
         return self._get_postgis_func('postgis_proj_version')
 
     def postgis_version(self):
@@ -346,16 +334,16 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     def proj_version_tuple(self):
         """
-        Return the version of PROJ.4 used by PostGIS as a tuple of the
+        Return the version of PROJ used by PostGIS as a tuple of the
         major, minor, and subminor release numbers.
         """
         proj_regex = re.compile(r'(\d+)\.(\d+)\.(\d+)')
         proj_ver_str = self.postgis_proj_version()
         m = proj_regex.search(proj_ver_str)
         if m:
-            return tuple(map(int, [m.group(1), m.group(2), m.group(3)]))
+            return tuple(map(int, m.groups()))
         else:
-            raise Exception('Could not determine PROJ.4 version from PostGIS.')
+            raise Exception('Could not determine PROJ version from PostGIS.')
 
     def spatial_aggregate_name(self, agg_name):
         if agg_name == 'Extent3D':
@@ -392,4 +380,11 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     def get_geometry_converter(self, expression):
         read = wkb_r().read
-        return lambda value, expression, connection: None if value is None else GEOSGeometry(read(value))
+        geom_class = expression.output_field.geom_class
+
+        def converter(value, expression, connection):
+            return None if value is None else GEOSGeometryBase(read(value), geom_class)
+        return converter
+
+    def get_area_att_for_field(self, field):
+        return 'sq_m'

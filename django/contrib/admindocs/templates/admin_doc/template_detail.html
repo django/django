@@ -3,25 +3,25 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% trans 'Documentation' %}</a>
-&rsaquo; {% trans 'Templates' %}
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% translate 'Documentation' %}</a>
+&rsaquo; {% translate 'Templates' %}
 &rsaquo; {{ name }}
 </div>
 {% endblock %}
 
-{% block title %}{% blocktrans %}Template: {{ name }}{% endblocktrans %}{% endblock %}
+{% block title %}{% blocktranslate %}Template: {{ name }}{% endblocktranslate %}{% endblock %}
 
 {% block content %}
-<h1>{% blocktrans %}Template: "{{ name }}"{% endblocktrans %}</h1>
+<h1>{% blocktranslate %}Template: <q>{{ name }}</q>{% endblocktranslate %}</h1>
 
 {# Translators: Search is not a verb here, it qualifies path (a search path) #}
-<h2>{% blocktrans %}Search path for template "{{ name }}":{% endblocktrans %}</h2>
+<h2>{% blocktranslate %}Search path for template <q>{{ name }}</q>:{% endblocktranslate %}</h2>
 <ol>
 {% for template in templates|dictsort:"order" %}
-    <li><code>{{ template.file }}</code>{% if not template.exists %} <em>{% trans '(does not exist)' %}</em>{% endif %}</li>
+    <li><code>{{ template.file }}</code>{% if not template.exists %} <em>{% translate '(does not exist)' %}</em>{% endif %}</li>
 {% endfor %}
 </ol>
 
-<p class="small"><a href="{% url 'django-admindocs-docroot' %}">&lsaquo; {% trans 'Back to Documentation' %}</a></p>
+<p class="small"><a href="{% url 'django-admindocs-docroot' %}">&lsaquo; {% translate 'Back to Documentation' %}</a></p>
 {% endblock %}

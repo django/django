@@ -4,18 +4,18 @@
 # Dimitris Glezos <glezos@transifex.com>, 2011
 # Giannis Meletakis <meletakis@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Nick Mavrakis <mavrakis.n@gmail.com>, 2017
+# Nick Mavrakis <mavrakis.n@gmail.com>, 2017-2018
 # Nick Mavrakis <mavrakis.n@gmail.com>, 2016
 # Pãnoș <panos.laganakos@gmail.com>, 2014
-# Pãnoș <panos.laganakos@gmail.com>, 2016
+# Pãnoș <panos.laganakos@gmail.com>, 2016,2019
 # Yorgos Pagles <y.pagles@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-21 10:59+0000\n"
-"Last-Translator: Nick Mavrakis <mavrakis.n@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-25 19:38+0000\n"
+"Last-Translator: Pãnoș <panos.laganakos@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -93,6 +93,15 @@ msgstr "Προσθήκη και άλλου %(verbose_name)s"
 msgid "Remove"
 msgstr "Αφαίρεση"
 
+msgid "Addition"
+msgstr "Προσθήκη"
+
+msgid "Change"
+msgstr "Αλλαγή"
+
+msgid "Deletion"
+msgstr "Διαγραφή"
+
 msgid "action time"
 msgstr "ώρα ενέργειας"
 
@@ -106,7 +115,7 @@ msgid "object id"
 msgstr "ταυτότητα αντικειμένου"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "αναπαράσταση αντικειμένου"
 
@@ -172,11 +181,11 @@ msgstr ""
 "επιλέξετε παραπάνω από ένα."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"Το {name} \"{obj}\" προστέθηκε με επιτυχία. Μπορείτε να το επεξεργαστείτε "
-"πάλι παρακάτω."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "Το {name} \"{obj}\" αποθηκεύτηκε με επιτυχία."
+
+msgid "You may edit it again below."
+msgstr "Μπορείτε να το επεξεργαστείτε ξανά παρακάτω."
 
 #, python-brace-format
 msgid ""
@@ -187,15 +196,18 @@ msgstr ""
 "{name} παρακάτω."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "Το {name} \"{obj}\" αποθηκεύτηκε με επιτυχία."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "Το {name} \"{obj}\" αλλάχθηκε επιτυχώς. Μπορείτε να το επεξεργαστείτε ξανά "
 "παρακάτω."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"Το {name} \"{obj}\" προστέθηκε με επιτυχία. Μπορείτε να το επεξεργαστείτε "
+"πάλι παρακάτω."
 
 #, python-brace-format
 msgid ""
@@ -235,6 +247,10 @@ msgstr "Προσθήκη %s"
 #, python-format
 msgid "Change %s"
 msgstr "Αλλαγή του %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Προβολή %s"
 
 msgid "Database error"
 msgstr "Σφάλμα βάσεως δεδομένων"
@@ -461,8 +477,8 @@ msgstr ""
 "Αν προχωρήσετε με την διαγραφή όλα τα παρακάτω συσχετισμένα αντικείμενα θα "
 "διαγραφούν επίσης:"
 
-msgid "Change"
-msgstr "Αλλαγή"
+msgid "View"
+msgstr "Προβολή"
 
 msgid "Delete?"
 msgstr "Διαγραφή;"
@@ -481,8 +497,8 @@ msgstr "Μοντέλα στην εφαρμογή %(name)s"
 msgid "Add"
 msgstr "Προσθήκη"
 
-msgid "You don't have permission to edit anything."
-msgstr "Δεν έχετε δικαίωμα να επεξεργαστείτε τίποτα."
+msgid "You don't have permission to view or edit anything."
+msgstr "Δεν έχετε δικαίωμα να δείτε ή να επεξεργαστείτε τίποτα."
 
 msgid "Recent actions"
 msgstr "Πρόσφατες ενέργειες"
@@ -538,20 +554,8 @@ msgstr "Εμφάνιση όλων"
 msgid "Save"
 msgstr "Αποθήκευση"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Κλείσιμο popup..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Άλλαξε το επιλεγμένο %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Πρόσθεσε άλλο ένα %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Διέγραψε το επιλεγμένο %(model)s"
 
 msgid "Search"
 msgstr "Αναζήτηση"
@@ -574,6 +578,24 @@ msgstr "Αποθήκευση και προσθήκη καινούριου"
 
 msgid "Save and continue editing"
 msgstr "Αποθήκευση και συνέχεια επεξεργασίας"
+
+msgid "Save and view"
+msgstr "Αποθήκευση και προβολή"
+
+msgid "Close"
+msgstr "Κλείσιμο"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Άλλαξε το επιλεγμένο %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Πρόσθεσε άλλο ένα %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Διέγραψε το επιλεγμένο %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Ευχαριστούμε που διαθέσατε κάποιο ποιοτικό χρόνο στον ιστότοπο σήμερα."
@@ -695,6 +717,10 @@ msgstr "Επιλέξτε %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Επιλέξτε %s προς αλλαγή"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Επιλέξτε %s για προβολή"
 
 msgid "Date:"
 msgstr "Ημ/νία:"

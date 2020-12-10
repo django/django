@@ -7,19 +7,22 @@ import threading
 from admin_scripts.tests import AdminScriptTestCase
 
 from django.conf import settings
-from django.conf.urls import include, url
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.http import (
     HttpRequest, HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
 from django.shortcuts import redirect
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import (
+    RequestFactory, SimpleTestCase, TestCase, override_settings,
+)
 from django.test.utils import override_script_prefix
 from django.urls import (
-    NoReverseMatch, RegexURLPattern, RegexURLResolver, Resolver404,
-    ResolverMatch, get_callable, get_resolver, resolve, reverse, reverse_lazy,
+    NoReverseMatch, Resolver404, ResolverMatch, URLPattern, URLResolver,
+    get_callable, get_resolver, get_urlconf, include, path, re_path, resolve,
+    reverse, reverse_lazy,
 )
+from django.urls.resolvers import RegexPattern
 
 from . import middleware, urlconf_outer, views
 from .utils import URLObject
@@ -179,6 +182,8 @@ test_data = (
     ('named_optional', '/optional/1/', [], {'arg1': 1}),
     ('named_optional', '/optional/1/2/', [1, 2], {}),
     ('named_optional', '/optional/1/2/', [], {'arg1': 1, 'arg2': 2}),
+    ('named_optional_terminated', '/optional/1/', [1], {}),
+    ('named_optional_terminated', '/optional/1/', [], {'arg1': 1}),
     ('named_optional_terminated', '/optional/1/2/', [1, 2], {}),
     ('named_optional_terminated', '/optional/1/2/', [], {'arg1': 1, 'arg2': 2}),
     ('hardcoded', '/hardcoded/', [], {}),
@@ -259,9 +264,9 @@ class NoURLPatternsTests(SimpleTestCase):
 
     def test_no_urls_exception(self):
         """
-        RegexURLResolver should raise an exception when no urlpatterns exist.
+        URLResolver should raise an exception when no urlpatterns exist.
         """
-        resolver = RegexURLResolver(r'^$', settings.ROOT_URLCONF)
+        resolver = URLResolver(RegexPattern(r'^$'), settings.ROOT_URLCONF)
 
         with self.assertRaisesMessage(
             ImproperlyConfigured,
@@ -289,6 +294,11 @@ class URLPatternReverse(SimpleTestCase):
         # Reversing None should raise an error, not return the last un-named view.
         with self.assertRaises(NoReverseMatch):
             reverse(None)
+
+    def test_mixing_args_and_kwargs(self):
+        msg = "Don't mix *args and **kwargs in call to reverse()!"
+        with self.assertRaisesMessage(ValueError, msg):
+            reverse('name', args=['a'], kwargs={'b': 'c'})
 
     @override_script_prefix('/{{invalid}}/')
     def test_prefix_braces(self):
@@ -363,13 +373,13 @@ class URLPatternReverse(SimpleTestCase):
 class ResolverTests(SimpleTestCase):
     def test_resolver_repr(self):
         """
-        Test repr of RegexURLResolver, especially when urlconf_name is a list
+        Test repr of URLResolver, especially when urlconf_name is a list
         (#17892).
         """
         # Pick a resolver from a namespaced URLconf
         resolver = get_resolver('urlpatterns_reverse.namespace_urls')
         sub_resolver = resolver.namespace_dict['test-ns1'][1]
-        self.assertIn('<RegexURLPattern list>', repr(sub_resolver))
+        self.assertIn('<URLPattern list>', repr(sub_resolver))
 
     def test_reverse_lazy_object_coercion_by_resolve(self):
         """
@@ -395,7 +405,7 @@ class ResolverTests(SimpleTestCase):
 
     def test_resolver_reverse_conflict(self):
         """
-        url() name arguments don't need to be unique. The last registered
+        URL pattern name arguments don't need to be unique. The last registered
         pattern takes precedence for conflicting names.
         """
         resolver = get_resolver('urlpatterns_reverse.named_urls_conflict')
@@ -405,7 +415,7 @@ class ResolverTests(SimpleTestCase):
             ('name-conflict', (), {}, 'conflict/'),
             # With an arg, the last URL in urlpatterns has precedence.
             ('name-conflict', ('arg',), {}, 'conflict-last/arg/'),
-            # With a kwarg, other url()s can be reversed.
+            # With a kwarg, other URL patterns can be reversed.
             ('name-conflict', (), {'first': 'arg'}, 'conflict-first/arg/'),
             ('name-conflict', (), {'middle': 'arg'}, 'conflict-middle/arg/'),
             ('name-conflict', (), {'last': 'arg'}, 'conflict-last/arg/'),
@@ -424,10 +434,10 @@ class ResolverTests(SimpleTestCase):
         TypeError from occurring later (#10834).
         """
         test_urls = ['', 'a', '\\', '.']
-        for path in test_urls:
-            with self.subTest(path=path):
+        for path_ in test_urls:
+            with self.subTest(path=path_):
                 with self.assertRaises(Resolver404):
-                    resolve(path)
+                    resolve(path_)
 
     def test_404_tried_urls_have_names(self):
         """
@@ -440,13 +450,13 @@ class ResolverTests(SimpleTestCase):
         # you try to resolve a nonexistent URL in the first level of included
         # URLs in named_urls.py (e.g., '/included/nonexistent-url')
         url_types_names = [
-            [{'type': RegexURLPattern, 'name': 'named-url1'}],
-            [{'type': RegexURLPattern, 'name': 'named-url2'}],
-            [{'type': RegexURLPattern, 'name': None}],
-            [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': 'named-url3'}],
-            [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': 'named-url4'}],
-            [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': None}],
-            [{'type': RegexURLResolver}, {'type': RegexURLResolver}],
+            [{'type': URLPattern, 'name': 'named-url1'}],
+            [{'type': URLPattern, 'name': 'named-url2'}],
+            [{'type': URLPattern, 'name': None}],
+            [{'type': URLResolver}, {'type': URLPattern, 'name': 'named-url3'}],
+            [{'type': URLResolver}, {'type': URLPattern, 'name': 'named-url4'}],
+            [{'type': URLResolver}, {'type': URLPattern, 'name': None}],
+            [{'type': URLResolver}, {'type': URLResolver}],
         ]
         with self.assertRaisesMessage(Resolver404, 'tried') as cm:
             resolve('/included/nonexistent-url', urlconf=urls)
@@ -489,10 +499,10 @@ class ResolverTests(SimpleTestCase):
 
     def test_populate_concurrency(self):
         """
-        RegexURLResolver._populate() can be called concurrently, but not more
+        URLResolver._populate() can be called concurrently, but not more
         than once per thread (#26888).
         """
-        resolver = RegexURLResolver(r'^/', 'urlpatterns_reverse.urls')
+        resolver = URLResolver(RegexPattern(r'^/'), 'urlpatterns_reverse.urls')
         resolver._local.populating = True
         thread = threading.Thread(target=resolver._populate)
         thread.start()
@@ -521,6 +531,14 @@ class ReverseLazyTest(TestCase):
             'Some URL: /login/'
         )
 
+    def test_build_absolute_uri(self):
+        factory = RequestFactory()
+        request = factory.get('/')
+        self.assertEqual(
+            request.build_absolute_uri(reverse_lazy('some-login-page')),
+            'http://testserver/login/',
+        )
+
 
 class ReverseLazySettingsTest(AdminScriptTestCase):
     """
@@ -528,12 +546,11 @@ class ReverseLazySettingsTest(AdminScriptTestCase):
     import error.
     """
     def setUp(self):
-        self.write_settings('settings.py', extra="""
-from django.urls import reverse_lazy
-LOGIN_URL = reverse_lazy('login')""")
-
-    def tearDown(self):
-        self.remove_settings('settings.py')
+        super().setUp()
+        self.write_settings(
+            'settings.py',
+            extra="from django.urls import reverse_lazy\nLOGIN_URL = reverse_lazy('login')",
+        )
 
     def test_lazy_in_settings(self):
         out, err = self.run_manage(['check'])
@@ -992,8 +1009,11 @@ class RequestURLconfTests(SimpleTestCase):
         Test reversing an URL from the *default* URLconf from inside
         a response middleware.
         """
-        message = "Reverse for 'outer' not found."
-        with self.assertRaisesMessage(NoReverseMatch, message):
+        msg = (
+            "Reverse for 'outer' not found. 'outer' is not a valid view "
+            "function or pattern name."
+        )
+        with self.assertRaisesMessage(NoReverseMatch, msg):
             self.client.get('/second_test/')
 
     @override_settings(
@@ -1027,6 +1047,13 @@ class RequestURLconfTests(SimpleTestCase):
             self.client.get('/second_test/')
             b''.join(self.client.get('/second_test/'))
 
+    def test_urlconf_is_reset_after_request(self):
+        """The URLconf is reset after each request."""
+        self.assertIsNone(get_urlconf())
+        with override_settings(MIDDLEWARE=['%s.ChangeURLconfMiddleware' % middleware.__name__]):
+            self.client.get(reverse('inner'))
+        self.assertIsNone(get_urlconf())
+
 
 class ErrorHandlerResolutionTests(SimpleTestCase):
     """Tests for handler400, handler404 and handler500"""
@@ -1034,23 +1061,21 @@ class ErrorHandlerResolutionTests(SimpleTestCase):
     def setUp(self):
         urlconf = 'urlpatterns_reverse.urls_error_handlers'
         urlconf_callables = 'urlpatterns_reverse.urls_error_handlers_callables'
-        self.resolver = RegexURLResolver(r'^$', urlconf)
-        self.callable_resolver = RegexURLResolver(r'^$', urlconf_callables)
+        self.resolver = URLResolver(RegexPattern(r'^$'), urlconf)
+        self.callable_resolver = URLResolver(RegexPattern(r'^$'), urlconf_callables)
 
     def test_named_handlers(self):
-        handler = (empty_view, {})
         for code in [400, 404, 500]:
             with self.subTest(code=code):
-                self.assertEqual(self.resolver.resolve_error_handler(code), handler)
+                self.assertEqual(self.resolver.resolve_error_handler(code), empty_view)
 
     def test_callable_handlers(self):
-        handler = (empty_view, {})
         for code in [400, 404, 500]:
             with self.subTest(code=code):
-                self.assertEqual(self.callable_resolver.resolve_error_handler(code), handler)
+                self.assertEqual(self.callable_resolver.resolve_error_handler(code), empty_view)
 
 
-@override_settings(ROOT_URLCONF='urlpatterns_reverse.urls_without_full_import')
+@override_settings(ROOT_URLCONF='urlpatterns_reverse.urls_without_handlers')
 class DefaultErrorHandlerTests(SimpleTestCase):
 
     def test_default_handler(self):
@@ -1058,7 +1083,8 @@ class DefaultErrorHandlerTests(SimpleTestCase):
         response = self.client.get('/test/')
         self.assertEqual(response.status_code, 404)
 
-        with self.assertRaisesMessage(ValueError, "I don't think I'm getting good"):
+        msg = "I don't think I'm getting good value for this view"
+        with self.assertRaisesMessage(ValueError, msg):
             self.client.get('/bad_view/')
 
 
@@ -1080,15 +1106,15 @@ class NoRootUrlConfTests(SimpleTestCase):
 class ResolverMatchTests(SimpleTestCase):
 
     def test_urlpattern_resolve(self):
-        for path, url_name, app_name, namespace, view_name, func, args, kwargs in resolve_test_data:
-            with self.subTest(path=path):
+        for path_, url_name, app_name, namespace, view_name, func, args, kwargs in resolve_test_data:
+            with self.subTest(path=path_):
                 # Legacy support for extracting "function, args, kwargs".
-                match_func, match_args, match_kwargs = resolve(path)
+                match_func, match_args, match_kwargs = resolve(path_)
                 self.assertEqual(match_func, func)
                 self.assertEqual(match_args, args)
                 self.assertEqual(match_kwargs, kwargs)
                 # ResolverMatch capabilities.
-                match = resolve(path)
+                match = resolve(path_)
                 self.assertEqual(match.__class__, ResolverMatch)
                 self.assertEqual(match.url_name, url_name)
                 self.assertEqual(match.app_name, app_name)
@@ -1111,6 +1137,14 @@ class ResolverMatchTests(SimpleTestCase):
         request = HttpRequest()
         self.assertIsNone(request.resolver_match)
 
+    def test_repr(self):
+        self.assertEqual(
+            repr(resolve('/no_kwargs/42/37/')),
+            "ResolverMatch(func=urlpatterns_reverse.views.empty_view, "
+            "args=('42', '37'), kwargs={}, url_name=no-kwargs, app_names=[], "
+            "namespaces=[], route=^no_kwargs/([0-9]+)/([0-9]+)/$)",
+        )
+
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.erroneous_urls')
 class ErroneousViewTests(SimpleTestCase):
@@ -1118,7 +1152,7 @@ class ErroneousViewTests(SimpleTestCase):
     def test_noncallable_view(self):
         # View is not a callable (explicit import; arbitrary Python object)
         with self.assertRaisesMessage(TypeError, 'view must be a callable'):
-            url(r'uncallable-object/$', views.uncallable)
+            path('uncallable-object/', views.uncallable)
 
     def test_invalid_regex(self):
         # Regex contains an error (refs #6170)
@@ -1130,26 +1164,51 @@ class ErroneousViewTests(SimpleTestCase):
 class ViewLoadingTests(SimpleTestCase):
     def test_view_loading(self):
         self.assertEqual(get_callable('urlpatterns_reverse.views.empty_view'), empty_view)
-
-        # passing a callable should return the callable
         self.assertEqual(get_callable(empty_view), empty_view)
 
-    def test_exceptions(self):
-        # A missing view (identified by an AttributeError) should raise
-        # ViewDoesNotExist, ...
-        with self.assertRaisesMessage(ViewDoesNotExist, "View does not exist in"):
+    def test_view_does_not_exist(self):
+        msg = "View does not exist in module urlpatterns_reverse.views."
+        with self.assertRaisesMessage(ViewDoesNotExist, msg):
             get_callable('urlpatterns_reverse.views.i_should_not_exist')
-        # ... but if the AttributeError is caused by something else don't
-        # swallow it.
-        with self.assertRaises(AttributeError):
+
+    def test_attributeerror_not_hidden(self):
+        msg = 'I am here to confuse django.urls.get_callable'
+        with self.assertRaisesMessage(AttributeError, msg):
             get_callable('urlpatterns_reverse.views_broken.i_am_broken')
+
+    def test_non_string_value(self):
+        msg = "'1' is not a callable or a dot-notation path"
+        with self.assertRaisesMessage(ViewDoesNotExist, msg):
+            get_callable(1)
+
+    def test_string_without_dot(self):
+        msg = "Could not import 'test'. The path must be fully qualified."
+        with self.assertRaisesMessage(ImportError, msg):
+            get_callable('test')
+
+    def test_module_does_not_exist(self):
+        with self.assertRaisesMessage(ImportError, "No module named 'foo'"):
+            get_callable('foo.bar')
+
+    def test_parent_module_does_not_exist(self):
+        msg = 'Parent module urlpatterns_reverse.foo does not exist.'
+        with self.assertRaisesMessage(ViewDoesNotExist, msg):
+            get_callable('urlpatterns_reverse.foo.bar')
+
+    def test_not_callable(self):
+        msg = (
+            "Could not import 'urlpatterns_reverse.tests.resolve_test_data'. "
+            "View is not callable."
+        )
+        with self.assertRaisesMessage(ViewDoesNotExist, msg):
+            get_callable('urlpatterns_reverse.tests.resolve_test_data')
 
 
 class IncludeTests(SimpleTestCase):
     url_patterns = [
-        url(r'^inner/$', views.empty_view, name='urlobject-view'),
-        url(r'^inner/(?P<arg1>[0-9]+)/(?P<arg2>[0-9]+)/$', views.empty_view, name='urlobject-view'),
-        url(r'^inner/\+\\\$\*/$', views.empty_view, name='urlobject-special-view'),
+        path('inner/', views.empty_view, name='urlobject-view'),
+        re_path(r'^inner/(?P<arg1>[0-9]+)/(?P<arg2>[0-9]+)/$', views.empty_view, name='urlobject-view'),
+        re_path(r'^inner/\+\\\$\*/$', views.empty_view, name='urlobject-special-view'),
     ]
     app_urls = URLObject('inc-app')
 
@@ -1158,19 +1217,19 @@ class IncludeTests(SimpleTestCase):
 
     def test_include_namespace(self):
         msg = (
-            "Specifying a namespace in django.conf.urls.include() without "
-            "providing an app_name is not supported."
+            'Specifying a namespace in include() without providing an '
+            'app_name is not supported.'
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             include(self.url_patterns, 'namespace')
 
     def test_include_4_tuple(self):
-        msg = 'Passing a 4-tuple to django.conf.urls.include() is not supported.'
+        msg = 'Passing a 4-tuple to include() is not supported.'
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             include((self.url_patterns, 'app_name', 'namespace', 'blah'))
 
     def test_include_3_tuple(self):
-        msg = 'Passing a 3-tuple to django.conf.urls.include() is not supported.'
+        msg = 'Passing a 3-tuple to include() is not supported.'
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             include((self.url_patterns, 'app_name', 'namespace'))
 

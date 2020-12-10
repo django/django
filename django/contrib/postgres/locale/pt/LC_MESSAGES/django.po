@@ -3,14 +3,14 @@
 # Translators:
 # Claudio Fernandes <squeral@gmail.com>, 2015
 # jorgecarleitao <jorgecarleitao@gmail.com>, 2015
-# Nuno Mariz <nmariz@gmail.com>, 2015
+# Nuno Mariz <nmariz@gmail.com>, 2015,2017-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-15 09:52+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Portuguese (http://www.transifex.com/django/django/language/"
 "pt/)\n"
 "MIME-Version: 1.0\n"
@@ -23,34 +23,24 @@ msgid "PostgreSQL extensions"
 msgstr "Extensões de PostgresSQL"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
+msgid "Item %(nth)s in the array did not validate:"
 msgstr "Item %(nth)s na lista não validou:"
 
 msgid "Nested arrays must have the same length."
 msgstr "As sub-listas têm de ter o mesmo tamanho."
 
-msgid "Map of strings to strings"
-msgstr "Mapeamento de strings em strings."
+msgid "Map of strings to strings/nulls"
+msgstr "Mapeamento de strings para strings/nulos"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "O valor de \"%(key)s\" não é uma string."
-
-msgid "A JSON object"
-msgstr "Um objecto JSON"
-
-msgid "Value must be valid JSON."
-msgstr "O valor deve ser JSON válido"
+msgid "The value of “%(key)s” is not a string or null."
+msgstr ""
 
 msgid "Could not load JSON data."
 msgstr "Não foi possível carregar os dados JSON."
 
 msgid "Input must be a JSON dictionary."
-msgstr ""
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "O valor '%(value)s' deve ser JSON válido."
+msgstr "A entrada deve ser um dicionário JSON."
 
 msgid "Enter two valid values."
 msgstr "Introduza dois valores válidos."

@@ -4,25 +4,28 @@
 # abraham.martin <abraham.martin@gmail.com>, 2014
 # Antoni Aloy <aaloy@apsl.net>, 2011-2014
 # Claude Paroz <claude@2xlibre.net>, 2014
-# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015-2016
-# franchukelly <inactive+franchukelly@transifex.com>, 2011
+# Ernesto Avilés, 2015-2016
+# 8cb2d5a716c3c9a99b6d20472609a4d5_6d03802 <ce931cb71bc28f3f828fb2dad368a4f7_5255>, 2011
 # guillem <serra.guillem@gmail.com>, 2012
+# Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
 # Igor Támara <igor@tamarapatino.org>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Jorge Puente-Sarrín <puentesarrin@gmail.com>, 2014-2015
-# Yusuf (Josè) Luis <alagunajs@gmail.com>, 2016
+# Jorge Puente Sarrín <puentesarrin@gmail.com>, 2014-2015
+# José Luis <alagunajs@gmail.com>, 2016
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
+# Luigy, 2019
 # Marc Garcia <garcia.marc@gmail.com>, 2011
 # Miguel Angel Tribaldos <mtribaldos@gmail.com>, 2017
 # Pablo, 2015
+# Uriel Medina <urimeba511@gmail.com>, 2020
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-02-14 07:36+0000\n"
-"Last-Translator: Miguel Angel Tribaldos <mtribaldos@gmail.com>\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-09-25 17:35+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -82,6 +85,12 @@ msgstr "Sin fecha"
 msgid "Has date"
 msgstr "Tiene fecha"
 
+msgid "Empty"
+msgstr "Vacío"
+
+msgid "Not empty"
+msgstr "No vacío"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -100,6 +109,15 @@ msgstr "Agregar %(verbose_name)s adicional."
 msgid "Remove"
 msgstr "Eliminar"
 
+msgid "Addition"
+msgstr "Añadido"
+
+msgid "Change"
+msgstr "Modificar"
+
+msgid "Deletion"
+msgstr "Borrado"
+
 msgid "action time"
 msgstr "hora de la acción"
 
@@ -113,7 +131,7 @@ msgid "object id"
 msgstr "id del objeto"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "repr del objeto"
 
@@ -130,23 +148,23 @@ msgid "log entries"
 msgstr "entradas de registro"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "Añadidos \"%(object)s\"."
+msgid "Added “%(object)s”."
+msgstr "Agregado “%(object)s”."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "Cambiados \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "Modificado “%(object)s” — %(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "Eliminado/a \"%(object)s.\""
+msgid "Deleted “%(object)s.”"
+msgstr "Eliminado “%(object)s.”"
 
 msgid "LogEntry Object"
 msgstr "Objeto de registro de Log"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "Añadido {name} \"{object}\"."
+msgid "Added {name} “{object}”."
+msgstr "Agregado {name} “{object}”."
 
 msgid "Added."
 msgstr "Añadido."
@@ -155,16 +173,16 @@ msgid "and"
 msgstr "y"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "Modificado {fields} por {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "Cambios en {fields} para {name} “{object}”."
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "Modificado {fields}."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr "Eliminado {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
+msgstr "Eliminado {name} “{object}”."
 
 msgid "No fields changed."
 msgstr "No ha cambiado ningún campo."
@@ -172,49 +190,49 @@ msgstr "No ha cambiado ningún campo."
 msgid "None"
 msgstr "Ninguno"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
-"Mantenga presionado \"Control\" o \"Command\" en un Mac, para seleccionar "
-"más de una opción."
+"Mantenga presionado \"Control\" o \"Comando\" en una Mac, para seleccionar "
+"más de uno."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr "El {name} “{obj}” fue agregado correctamente."
+
+msgid "You may edit it again below."
+msgstr "Puede volverlo a editar otra vez a continuación."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
-"Se añadió con éxito el {name} \"{obj}\". Puede editarlo otra vez a "
+"El {name} “{obj}” se agregó correctamente. Puede agregar otro {name} a "
 "continuación."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+"El {name} “{obj}” se cambió correctamente. Puede editarlo nuevamente a "
+"continuación."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr ""
+"El {name} “{obj}” se agregó correctamente. Puede editarlo nuevamente a "
+"continuación."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
-"Se añadió con éxito el {name} \"{obj}\". Puede añadir otro {name} a "
+"El {name} “{obj}” se cambió correctamente. Puede agregar otro {name} a "
 "continuación."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "Se añadió con éxito el {name} \"{obj}\"."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
-"Se modificó con éxito el {name} \"{obj}\". Puede editarlo otra vez a "
-"continuación."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-"Se modificó con éxito el {name} \"{obj}\". Puede añadir otro {name} a "
-"continuación."
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "Se modificó con éxito el {name} \"{obj}\"."
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "El {name} “{obj}” se cambió correctamente."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -227,12 +245,12 @@ msgid "No action selected."
 msgstr "No se seleccionó ninguna acción."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "Se eliminó con éxito el %(name)s \"%(obj)s\"."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "El%(name)s “%(obj)s” fue eliminado con éxito."
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
-msgstr "%(name)s con ID \"%(key)s\" no existe. ¿Fue quizá eliminado?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr "%(name)s con el ID “%(key)s” no existe. ¿Quizás fue eliminado?"
 
 #, python-format
 msgid "Add %s"
@@ -241,6 +259,10 @@ msgstr "Añadir %s"
 #, python-format
 msgid "Change %s"
 msgstr "Modificar %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Vista %s"
 
 msgid "Database error"
 msgstr "Error en la base de datos"
@@ -298,8 +320,8 @@ msgstr "Administración de %(app)s "
 msgid "Page not found"
 msgstr "Página no encontrada"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Lo sentimos, pero no se encuentra la página solicitada."
+msgid "We’re sorry, but the requested page could not be found."
+msgstr "Lo sentimos, pero no se pudo encontrar la página solicitada."
 
 msgid "Home"
 msgstr "Inicio"
@@ -314,12 +336,11 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Error de servidor <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Ha habido un error. Ha sido comunicado al administrador del sitio por correo "
-"electrónico y debería solucionarse a la mayor brevedad. Gracias por su "
-"paciencia y comprensión."
+"Hubo un error. Se ha informado a los administradores del sitio por correo "
+"electrónico y debería solucionarse en breve. Gracias por su paciencia."
 
 msgid "Run the selected action"
 msgstr "Ejecutar la acción seleccionada"
@@ -337,12 +358,25 @@ msgstr "Seleccionar todos los %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Limpiar selección"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modelos en la aplicación %(name)s"
+
+msgid "Add"
+msgstr "Añadir"
+
+msgid "View"
+msgstr "Vista"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "No cuenta con permiso para ver ni editar nada."
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
-"Primero introduzca un nombre de usuario y una contraseña. Luego podrá editar "
-"el resto de opciones del usuario."
+"Primero, ingrese un nombre de usuario y contraseña. Luego, podrá editar más "
+"opciones del usuario."
 
 msgid "Enter a username and password."
 msgstr "Introduzca un nombre de usuario y contraseña"
@@ -351,7 +385,7 @@ msgid "Change password"
 msgstr "Cambiar contraseña"
 
 msgid "Please correct the error below."
-msgstr "Por favor, corrija los siguientes errores."
+msgstr "Por favor corrija el siguiente error."
 
 msgid "Please correct the errors below."
 msgstr "Por favor, corrija los siguientes errores."
@@ -363,7 +397,7 @@ msgstr ""
 "strong>."
 
 msgid "Welcome,"
-msgstr "Bienvenido/a,"
+msgstr "Bienvenidos,"
 
 msgid "View site"
 msgstr "Ver el sitio"
@@ -372,7 +406,7 @@ msgid "Documentation"
 msgstr "Documentación"
 
 msgid "Log out"
-msgstr "Terminar sesión"
+msgstr "Cerrar sesión"
 
 #, python-format
 msgid "Add %(name)s"
@@ -387,8 +421,11 @@ msgstr "Ver en el sitio"
 msgid "Filter"
 msgstr "Filtro"
 
+msgid "Clear all filters"
+msgstr "Borrar todos los filtros"
+
 msgid "Remove from sorting"
-msgstr "Elimina de la ordenación"
+msgstr "Eliminar del ordenación"
 
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
@@ -429,8 +466,8 @@ msgstr ""
 msgid "Objects"
 msgstr "Objetos"
 
-msgid "Yes, I'm sure"
-msgstr "Sí, estoy seguro"
+msgid "Yes, I’m sure"
+msgstr "Si, estoy seguro"
 
 msgid "No, take me back"
 msgstr "No, llévame atrás"
@@ -464,9 +501,6 @@ msgstr ""
 "¿Está usted seguro que quiere eliminar el %(objects_name)s seleccionado? "
 "Todos los siguientes objetos y sus elementos relacionados serán borrados:"
 
-msgid "Change"
-msgstr "Modificar"
-
 msgid "Delete?"
 msgstr "¿Eliminar?"
 
@@ -476,16 +510,6 @@ msgstr " Por %(filter_title)s "
 
 msgid "Summary"
 msgstr "Resumen"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modelos en la aplicación %(name)s"
-
-msgid "Add"
-msgstr "Añadir"
-
-msgid "You don't have permission to edit anything."
-msgstr "No tiene permiso para editar nada."
 
 msgid "Recent actions"
 msgstr "Acciones recientes"
@@ -500,13 +524,13 @@ msgid "Unknown content"
 msgstr "Contenido desconocido"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Algo va mal con la instalación de la base de datos. Asegúrese de que las "
-"tablas necesarias han sido creadas, y de que la base de datos puede ser "
-"leída por el usuario apropiado."
+"Algo anda mal con la instalación de su base de datos. Asegúrese de que se "
+"hayan creado las tablas de base de datos adecuadas y asegúrese de que el "
+"usuario adecuado pueda leer la base de datos."
 
 #, python-format
 msgid ""
@@ -519,6 +543,9 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "¿Ha olvidado la contraseña o el nombre de usuario?"
 
+msgid "Toggle navigation"
+msgstr "Activar navegación"
+
 msgid "Date/time"
 msgstr "Fecha/hora"
 
@@ -529,32 +556,20 @@ msgid "Action"
 msgstr "Acción"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"Este objeto no tiene histórico de cambios. Probablemente no fue añadido "
-"usando este sitio de administración."
+"Este objeto no tiene un historial de cambios. Probablemente no se agregó a "
+"través de este sitio de administración."
 
 msgid "Show all"
 msgstr "Mostrar todo"
 
 msgid "Save"
-msgstr "Grabar"
+msgstr "Guardar"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Cerrando ventana emergente..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Cambiar %(model)s seleccionado"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Añadir otro %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Eliminar %(model)s seleccionada/o"
 
 msgid "Search"
 msgstr "Buscar"
@@ -570,13 +585,31 @@ msgid "%(full_result_count)s total"
 msgstr "%(full_result_count)s total"
 
 msgid "Save as new"
-msgstr "Grabar como nuevo"
+msgstr "Guardar como nuevo"
 
 msgid "Save and add another"
-msgstr "Grabar y añadir otro"
+msgstr "Guardar y añadir otro"
 
 msgid "Save and continue editing"
-msgstr "Grabar y continuar editando"
+msgstr "Guardar y continuar editando"
+
+msgid "Save and view"
+msgstr "Guardar y ver"
+
+msgid "Close"
+msgstr "Cerrar"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Cambiar %(model)s seleccionados"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Añadir otro %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Eliminar %(model)s seleccionada/o"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Gracias por el tiempo que ha dedicado hoy al sitio web."
@@ -591,11 +624,11 @@ msgid "Your password was changed."
 msgstr "Su contraseña ha sido cambiada."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Por favor, introduzca su contraseña antigua, por seguridad, y después "
-"introduzca la nueva contraseña dos veces para verificar que la ha escrito "
+"Ingrese su contraseña anterior, por razones de seguridad, y luego ingrese su "
+"nueva contraseña dos veces para que podamos verificar que la ingresó "
 "correctamente."
 
 msgid "Change my password"
@@ -606,8 +639,7 @@ msgstr "Restablecer contraseña"
 
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr ""
-"Su contraseña ha sido establecida. Ahora puede seguir adelante e iniciar "
-"sesión."
+"Su contraseña ha sido establecida. Ahora puede continuar e iniciar sesión."
 
 msgid "Password reset confirmation"
 msgstr "Confirmación de restablecimiento de contraseña"
@@ -634,19 +666,19 @@ msgstr ""
 "contraseña."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Le hemos enviado por email las instrucciones para restablecer la contraseña, "
-"si es que existe una cuenta con la dirección electrónica que indicó. Debería "
-"recibirlas en breve."
+"Le enviamos instrucciones por correo electrónico para configurar su "
+"contraseña, si existe una cuenta con el correo electrónico que ingresó. "
+"Debería recibirlos en breve."
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"Si no recibe un correo, por favor asegúrese de que ha introducido la "
-"dirección de correo con la que se registró y verifique su carpeta de spam."
+"Si no recibe un correo electrónico, asegúrese de haber ingresado la "
+"dirección con la que se registró y verifique su carpeta de correo no deseado."
 
 #, python-format
 msgid ""
@@ -659,8 +691,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Por favor, vaya a la página siguiente y escoja una nueva contraseña."
 
-msgid "Your username, in case you've forgotten:"
-msgstr "Su nombre de usuario, en caso de haberlo olvidado:"
+msgid "Your username, in case you’ve forgotten:"
+msgstr "Su nombre de usuario, en caso de que lo haya olvidado:"
 
 msgid "Thanks for using our site!"
 msgstr "¡Gracias por usar nuestro sitio!"
@@ -670,12 +702,11 @@ msgid "The %(site_name)s team"
 msgstr "El equipo de %(site_name)s"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"¿Ha olvidado su clave? Introduzca su dirección de correo a continuación y le "
-"enviaremos por correo electrónico las instrucciones para establecer una "
-"nueva."
+"¿Olvidaste tu contraseña? Ingrese su dirección de correo electrónico a "
+"continuación y le enviaremos las instrucciones para configurar una nueva."
 
 msgid "Email address:"
 msgstr "Correo electrónico:"
@@ -688,11 +719,15 @@ msgstr "Todas las fechas"
 
 #, python-format
 msgid "Select %s"
-msgstr "Escoja %s"
+msgstr "Seleccione %s"
 
 #, python-format
 msgid "Select %s to change"
-msgstr "Escoja %s a modificar"
+msgstr "Seleccione %s a modificar"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Seleccione %s para ver"
 
 msgid "Date:"
 msgstr "Fecha:"

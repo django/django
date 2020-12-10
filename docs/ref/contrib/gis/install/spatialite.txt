@@ -7,9 +7,9 @@ spatial database.
 
 First, check if you can install SpatiaLite from system packages or binaries.
 
-For example, on Debian-based distributions, try to install the
-``spatialite-bin`` package. For distributions that package SpatiaLite 4.2+,
-install ``libsqlite3-mod-spatialite``.
+For example, on Debian-based distributions that package SpatiaLite 4.2+, try to
+install the ``libsqlite3-mod-spatialite`` package. For older releases install
+``spatialite-bin``.
 
 For macOS, follow the :ref:`instructions below<spatialite_macos>`.
 
@@ -23,16 +23,10 @@ __ https://www.gaia-gis.it/gaia-sins/
 
 .. _spatialite_source:
 
-.. admonition:: ``SPATIALITE_LIBRARY_PATH`` setting required for SpatiaLite 4.2+
-
-    If you're using SpatiaLite 4.2+, you must put this in your settings::
-
-        SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
-
 Installing from source
 ======================
 
-:doc:`GEOS and PROJ.4</ref/contrib/gis/install/geolibs>` should be installed
+:doc:`GEOS and PROJ</ref/contrib/gis/install/geolibs>` should be installed
 prior to building SpatiaLite.
 
 SQLite
@@ -44,14 +38,14 @@ command line interface and enter the following query::
     sqlite> CREATE VIRTUAL TABLE testrtree USING rtree(id,minX,maxX,minY,maxY);
 
 If you obtain an error, you will have to recompile SQLite from source. Otherwise,
-just skip this section.
+skip this section.
 
 To install from sources, download the latest amalgamation source archive from
 the `SQLite download page`__, and extract::
 
-    $ wget https://sqlite.org/sqlite-amalgamation-3.6.23.1.tar.gz
-    $ tar xzf sqlite-amalgamation-3.6.23.1.tar.gz
-    $ cd sqlite-3.6.23.1
+    $ wget https://www.sqlite.org/YYYY/sqlite-amalgamation-XXX0000.zip
+    $ unzip sqlite-amalgamation-XXX0000.zip
+    $ cd sqlite-amalgamation-XXX0000
 
 Next, run the ``configure`` script -- however the ``CFLAGS`` environment variable
 needs to be customized so that SQLite knows to build the R*Tree module::
@@ -72,9 +66,9 @@ SpatiaLite library (``libspatialite``)
 Get the latest SpatiaLite library source bundle from the
 `download page`__::
 
-    $ wget https://www.gaia-gis.it/gaia-sins/libspatialite-sources/libspatialite-4.1.0.tar.gz
-    $ tar xaf libspatialite-4.1.0.tar.gz
-    $ cd libspatialite-4.1.0
+    $ wget https://www.gaia-gis.it/gaia-sins/libspatialite-sources/libspatialite-X.Y.Z.tar.gz
+    $ tar xaf libspatialite-X.Y.Z.tar.gz
+    $ cd libspatialite-X.Y.Z
     $ ./configure
     $ make
     $ sudo make install
@@ -86,7 +80,7 @@ Get the latest SpatiaLite library source bundle from the
 
         $ ./configure --target=macosx
 
-__ http://www.gaia-gis.it/gaia-sins/libspatialite-sources/
+__ https://www.gaia-gis.it/gaia-sins/libspatialite-sources/
 
 .. _spatialite_macos:
 
@@ -103,12 +97,12 @@ First, follow the instructions in the :ref:`kyngchaos` section.
 
 When creating a SpatiaLite database, the ``spatialite`` program is required.
 However, instead of attempting to compile the SpatiaLite tools from source,
-download the `SpatiaLite Binaries`__ for macOS, and install ``spatialite`` in a
-location available in your ``PATH``.  For example::
+download the `SpatiaLite Tools`__ package for macOS, and install ``spatialite``
+in a location available in your ``PATH``.  For example::
 
-    $ curl -O https://www.gaia-gis.it/spatialite/spatialite-tools-osx-x86-2.3.1.tar.gz
-    $ tar xzf spatialite-tools-osx-x86-2.3.1.tar.gz
-    $ cd spatialite-tools-osx-x86-2.3.1/bin
+    $ curl -O https://www.kyngchaos.com/files/software/frameworks/Spatialite_Tools-4.3.zip
+    $ unzip Spatialite_Tools-4.3.zip
+    $ cd Spatialite\ Tools/tools
     $ sudo cp spatialite /Library/Frameworks/SQLite3.framework/Programs
 
 Finally, for GeoDjango to be able to find the KyngChaos SpatiaLite library,
@@ -116,13 +110,13 @@ add the following to your ``settings.py``::
 
     SPATIALITE_LIBRARY_PATH='/Library/Frameworks/SQLite3.framework/SQLite3'
 
-__ https://www.gaia-gis.it/spatialite-2.3.1/binaries.html
+__ https://www.kyngchaos.com/software/frameworks/
 
 Homebrew
 --------
 
 `Homebrew`_ handles all the SpatiaLite related packages on your behalf,
-including SQLite3, SpatiaLite, PROJ, and GEOS. Install them like this::
+including SQLite, SpatiaLite, PROJ, and GEOS. Install them like this::
 
     $ brew update
     $ brew install spatialite-tools

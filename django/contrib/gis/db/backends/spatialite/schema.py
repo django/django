@@ -1,7 +1,5 @@
-from contextlib import suppress
-
+from django.db import DatabaseError
 from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
-from django.db.utils import DatabaseError
 
 
 class SpatialiteSchemaEditor(DatabaseSchemaEditor):
@@ -37,7 +35,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
         return self.connection.ops.geo_quote_name(name)
 
     def column_sql(self, model, field, include_default=False):
-        from django.contrib.gis.db.models.fields import GeometryField
+        from django.contrib.gis.db.models import GeometryField
         if not isinstance(field, GeometryField):
             return super().column_sql(model, field, include_default)
 
@@ -84,24 +82,27 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
         self.geometry_sql = []
 
     def delete_model(self, model, **kwargs):
-        from django.contrib.gis.db.models.fields import GeometryField
+        from django.contrib.gis.db.models import GeometryField
+
         # Drop spatial metadata (dropping the table does not automatically remove them)
         for field in model._meta.local_fields:
             if isinstance(field, GeometryField):
                 self.remove_geometry_metadata(model, field)
         # Make sure all geom stuff is gone
         for geom_table in self.geometry_tables:
-            with suppress(DatabaseError):
+            try:
                 self.execute(
                     self.sql_discard_geometry_columns % {
                         "geom_table": geom_table,
                         "table": self.quote_name(model._meta.db_table),
                     }
                 )
+            except DatabaseError:
+                pass
         super().delete_model(model, **kwargs)
 
     def add_field(self, model, field):
-        from django.contrib.gis.db.models.fields import GeometryField
+        from django.contrib.gis.db.models import GeometryField
         if isinstance(field, GeometryField):
             # Populate self.geometry_sql
             self.column_sql(model, field)
@@ -112,7 +113,8 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
             super().add_field(model, field)
 
     def remove_field(self, model, field):
-        from django.contrib.gis.db.models.fields import GeometryField
+        from django.contrib.gis.db.models import GeometryField
+
         # NOTE: If the field is a geometry field, the table is just recreated,
         # the parent's remove_field can't be used cause it will skip the
         # recreation if the field does not have a database type. Geometry fields
@@ -123,8 +125,9 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
         else:
             super().remove_field(model, field)
 
-    def alter_db_table(self, model, old_db_table, new_db_table):
-        from django.contrib.gis.db.models.fields import GeometryField
+    def alter_db_table(self, model, old_db_table, new_db_table, disable_constraints=True):
+        from django.contrib.gis.db.models import GeometryField
+
         # Remove geometry-ness from temp table
         for field in model._meta.local_fields:
             if isinstance(field, GeometryField):
@@ -135,10 +138,10 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
                     }
                 )
         # Alter table
-        super().alter_db_table(model, old_db_table, new_db_table)
+        super().alter_db_table(model, old_db_table, new_db_table, disable_constraints)
         # Repoint any straggler names
         for geom_table in self.geometry_tables:
-            with suppress(DatabaseError):
+            try:
                 self.execute(
                     self.sql_update_geometry_columns % {
                         "geom_table": geom_table,
@@ -146,6 +149,8 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
                         "new_table": self.quote_name(new_db_table),
                     }
                 )
+            except DatabaseError:
+                pass
         # Re-add geometry-ness and rename spatial index tables
         for field in model._meta.local_fields:
             if isinstance(field, GeometryField):

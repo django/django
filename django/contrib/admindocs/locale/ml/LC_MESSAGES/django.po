@@ -1,16 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Emil Joseph <emilutan@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
+# MUHAMMED RAMEEZ <muhammedrameez2000@gmail.com>, 2019
 # Rag sagar <ragsagar@gmail.com>, 2016
 # Rajeesh Nair <rajeeshrnair@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-26 08:46+0000\n"
-"Last-Translator: Rag sagar <ragsagar@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2019-03-10 07:17+0000\n"
+"Last-Translator: Emil Joseph <emilutan@gmail.com>\n"
 "Language-Team: Malayalam (http://www.transifex.com/django/django/language/"
 "ml/)\n"
 "MIME-Version: 1.0\n"
@@ -20,10 +22,10 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "കാര്യനിർവ്വാഹകർക്കായുള്ള ഡോക്യൂമെന്റേഷൻ "
 
 msgid "Home"
-msgstr "പൂമുഖം"
+msgstr "ഹോം "
 
 msgid "Documentation"
 msgstr "സഹായക്കുറിപ്പുകള്‍"
@@ -39,6 +41,9 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"ബുക്ക്മാർക്കുകൾ ഇൻസ്റ്റാൾ ചെയ്യാൻ, നിങ്ങളുടെ ബുക്ക്മാർക്കുകൾ ടൂൾബാറിലേക്ക് ലിങ്ക് ഇഴയ്ക്കുക, "
+"അല്ലെങ്കിൽ ലിങ്കിൽ വലത് ക്ലിക്കുചെയ്ത് നിങ്ങളുടെ ബുക്ക്മാർക്കുകളിൽ ചേർക്കുക. ഇപ്പോൾ നിങ്ങൾക്ക് "
+"സൈറ്റിലെ ഏത് പേജിൽ നിന്നും ബുക്മാർക്കറ്റ് തിരഞ്ഞെടുക്കാം."
 
 msgid "Documentation for this page"
 msgstr "ഈ പേജിന്റെ സഹായക്കുറിപ്പുകള്‍"
@@ -52,7 +57,7 @@ msgid "Tags"
 msgstr "ടാഗുകള്‍"
 
 msgid "List of all the template tags and their functions."
-msgstr ""
+msgstr "എല്ലാ ടെംപ്ലേറ്റുകളും അവയുടെ ഫംഗ്ഷനുകളുടെ പട്ടിക"
 
 msgid "Filters"
 msgstr "ഫില്‍ട്ടറുകള്‍"
@@ -61,6 +66,8 @@ msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
 "the output."
 msgstr ""
+"ഫിൽറ്ററുകൾ എന്നാൽ ഔട്പുട്ടിനു മാറ്റം വരുത്തുവാൻ  ടെംപ്ലേറ്റുകൾക്കു ഉള്ളില്ലേ വാരിയബിലിസിന് "
+"(variables) നൽകുന്ന ആക്ഷൻസ്സാണ് "
 
 msgid "Models"
 msgstr "മോഡലുകള്‍"
@@ -82,9 +89,10 @@ msgstr ""
 
 msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
+"അഡ്മിൻ  ഫങ്ക്ഷണാലിറ്റിയിലേക്കു  പെട്ടെന്നു പ്രവേശിക്കുവാൻ  നിങ്ങളുടെ ബ്രൗസെറിനുള്ള ടൂളുകൾ ."
 
 msgid "Please install docutils"
-msgstr ""
+msgstr "ദയവായി ഡോക്യൂട്ടിൽസ്‌  ഇൻസ്റ്റാൾ ചെയ്യുക."
 
 #, python-format
 msgid ""
@@ -102,34 +110,34 @@ msgid "Model: %(name)s"
 msgstr ""
 
 msgid "Fields"
-msgstr ""
+msgstr "ഫീൽഡുകൾ "
 
 msgid "Field"
-msgstr ""
+msgstr "ഫീൽഡ്."
 
 msgid "Type"
-msgstr ""
+msgstr "ടൈപ്പ് "
 
 msgid "Description"
-msgstr ""
+msgstr "വിവരണം"
 
 msgid "Methods with arguments"
-msgstr ""
+msgstr "മെതോടുകൾ ഉള്ള ആർഗുമെന്റ്സ് "
 
 msgid "Method"
-msgstr ""
+msgstr "രീതി"
 
 msgid "Arguments"
-msgstr ""
+msgstr "വാദങ്ങൾ"
 
 msgid "Back to Model documentation"
-msgstr ""
+msgstr "മോഡൽ ഡോക്യൂമെന്റന്റഷനിലേക്ക് തിരികെ പോവുക ."
 
 msgid "Model documentation"
-msgstr ""
+msgstr "മോഡൽ ഡോക്യൂമെന്റേഷൻ."
 
 msgid "Model groups"
-msgstr ""
+msgstr "മോഡൽ ഗ്രൂപ്സ്"
 
 msgid "Templates"
 msgstr "ടെമ്പ്‌ലേറ്റുകള്‍"
@@ -148,19 +156,19 @@ msgid "Search path for template \"%(name)s\":"
 msgstr ""
 
 msgid "(does not exist)"
-msgstr ""
+msgstr "(എക്സിസ്റ്  ചെയ്യുന്നില്ല )"
 
 msgid "Back to Documentation"
-msgstr ""
+msgstr "ഡോക്യൂമെന്റഷനിലേക്കു തിരികെ പോവുക ."
 
 msgid "Template filters"
-msgstr ""
+msgstr "ടെമ്പ്ലേറ്റ് ഫിൽറ്ററുകൾ "
 
 msgid "Template filter documentation"
-msgstr ""
+msgstr "ടെമ്പ്ലേറ്റ് ഫിൽറ്റർ ഡോക്യൂമെന്റേഷൻ "
 
 msgid "Built-in filters"
-msgstr ""
+msgstr "ബിൽട്ടിൻ  ഫിൽറ്ററുകൾ "
 
 #, python-format
 msgid ""
@@ -169,13 +177,13 @@ msgid ""
 msgstr ""
 
 msgid "Template tags"
-msgstr ""
+msgstr "ടെമ്പ്ലേറ്റ് റ്റാഗുകൾ "
 
 msgid "Template tag documentation"
-msgstr ""
+msgstr "ടെമ്പ്ലേറ്റ് ടാഗിന്റെ ഡോക്യൂമെന്റേഷൻ "
 
 msgid "Built-in tags"
-msgstr ""
+msgstr "ബിൽട്ടിൻ  റ്റാഗുകൾ "
 
 #, python-format
 msgid ""
@@ -188,7 +196,7 @@ msgid "View: %(name)s"
 msgstr ""
 
 msgid "Context:"
-msgstr ""
+msgstr "കോണ്ടെക്സ്റ് :"
 
 msgid "Templates:"
 msgstr "ടെമ്പ്‌ലേറ്റുകള്‍"
@@ -197,10 +205,10 @@ msgid "Back to View documentation"
 msgstr ""
 
 msgid "View documentation"
-msgstr ""
+msgstr "ഡോക്യൂമെന്റെഷൻ കാണുക "
 
 msgid "Jump to namespace"
-msgstr ""
+msgstr "നെയിംസ്പേസിലേക്ക് ചാടുക ."
 
 msgid "Empty namespace"
 msgstr ""
@@ -218,13 +226,6 @@ msgid ""
 "    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
 "code>.\n"
 msgstr ""
-
-msgid "Boolean (Either True or False)"
-msgstr "ശരിയോ തെറ്റോ (True അഥവാ False)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "%(field_type)s എന്ന തരത്തിലുള്ള കളം (ഫീല്‍ഡ്)"
 
 msgid "tag:"
 msgstr "ടാഗ്:"

@@ -1,6 +1,9 @@
 """
 Global Django exception and warning classes.
 """
+import operator
+
+from django.utils.hashable import make_hashable
 
 
 class FieldDoesNotExist(Exception):
@@ -63,6 +66,16 @@ class RequestDataTooBig(SuspiciousOperation):
     pass
 
 
+class RequestAborted(Exception):
+    """The request was closed before it was completed, or timed out."""
+    pass
+
+
+class BadRequest(Exception):
+    """The request is malformed and cannot be processed."""
+    pass
+
+
 class PermissionDenied(Exception):
     """The user did not have permission to do that"""
     pass
@@ -102,8 +115,6 @@ class ValidationError(Exception):
         list or dictionary can be an actual `list` or `dict` or an instance
         of ValidationError with its `error_list` or `error_dict` attribute set.
         """
-
-        # PY2 can't pickle naive exception: http://bugs.python.org/issue1692335.
         super().__init__(message, code, params)
 
         if isinstance(message, ValidationError):
@@ -179,7 +190,28 @@ class ValidationError(Exception):
     def __repr__(self):
         return 'ValidationError(%s)' % self
 
+    def __eq__(self, other):
+        if not isinstance(other, ValidationError):
+            return NotImplemented
+        return hash(self) == hash(other)
+
+    def __hash__(self):
+        if hasattr(self, 'message'):
+            return hash((
+                self.message,
+                self.code,
+                make_hashable(self.params),
+            ))
+        if hasattr(self, 'error_dict'):
+            return hash(make_hashable(self.error_dict))
+        return hash(tuple(sorted(self.error_list, key=operator.attrgetter('message'))))
+
 
 class EmptyResultSet(Exception):
     """A database query predicate is impossible."""
+    pass
+
+
+class SynchronousOnlyOperation(Exception):
+    """The user tried to call a sync-only function from an async context."""
     pass

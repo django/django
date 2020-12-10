@@ -55,20 +55,13 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
 
     @staticmethod
     def _get_pk_values(serial_str):
-        ret_list = []
         serial_list = json.loads(serial_str)
-        for obj_dict in serial_list:
-            ret_list.append(obj_dict["pk"])
-        return ret_list
+        return [obj_dict['pk'] for obj_dict in serial_list]
 
     @staticmethod
     def _get_field_values(serial_str, field_name):
-        ret_list = []
         serial_list = json.loads(serial_str)
-        for obj_dict in serial_list:
-            if field_name in obj_dict["fields"]:
-                ret_list.append(obj_dict["fields"][field_name])
-        return ret_list
+        return [obj_dict['fields'][field_name] for obj_dict in serial_list if field_name in obj_dict['fields']]
 
     def test_indentation_whitespace(self):
         s = serializers.json.Serializer()
@@ -258,6 +251,20 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
         with self.assertRaisesMessage(DeserializationError, expected):
             for obj in serializers.deserialize('json', test_string, ignore=False):
                 obj.save()
+
+    def test_helpful_error_message_for_many2many_not_iterable(self):
+        """
+        Not iterable many-to-many field value throws a helpful error message.
+        """
+        test_string = """[{
+            "pk": 1,
+            "model": "serializers.m2mdata",
+            "fields": {"data": null}
+        }]"""
+
+        expected = "(serializers.m2mdata:pk=1) field_value was 'None'"
+        with self.assertRaisesMessage(DeserializationError, expected):
+            next(serializers.deserialize('json', test_string, ignore=False))
 
 
 class JsonSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):

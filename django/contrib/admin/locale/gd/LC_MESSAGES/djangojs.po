@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 10:22+0000\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2017-09-22 17:29+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
 "language/gd/)\n"
@@ -106,6 +106,21 @@ msgstr ""
 "’S dòcha gu bheil thu airson am putan “Siuthad” a chleachdadh seach am putan "
 "“Sàbhail”."
 
+msgid "Now"
+msgstr "An-dràsta"
+
+msgid "Midnight"
+msgstr "Meadhan-oidhche"
+
+msgid "6 a.m."
+msgstr "6m"
+
+msgid "Noon"
+msgstr "Meadhan-latha"
+
+msgid "6 p.m."
+msgstr "6f"
+
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
@@ -130,26 +145,11 @@ msgstr[2] ""
 msgstr[3] ""
 "An aire: Tha thu %s uair a thìde air dheireadh àm an fhrithealaiche."
 
-msgid "Now"
-msgstr "An-dràsta"
-
 msgid "Choose a Time"
 msgstr "Tagh àm"
 
 msgid "Choose a time"
 msgstr "Tagh àm"
-
-msgid "Midnight"
-msgstr "Meadhan-oidhche"
-
-msgid "6 a.m."
-msgstr "6m"
-
-msgid "Noon"
-msgstr "Meadhan-latha"
-
-msgid "6 p.m."
-msgstr "6f"
 
 msgid "Cancel"
 msgstr "Sguir dheth"

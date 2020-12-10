@@ -5,11 +5,11 @@ from django.contrib.gis.db.models.functions import (
 )
 from django.contrib.gis.geos import GEOSGeometry, LineString, Point
 from django.contrib.gis.measure import D  # alias for Distance
-from django.db import connection
-from django.db.models import F, Q
+from django.db import NotSupportedError, connection
+from django.db.models import Exists, F, OuterRef, Q
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from ..utils import mysql, no_oracle, oracle, postgis, spatialite
+from ..utils import FuncTestMixin, mysql, oracle, postgis, spatialite
 from .models import (
     AustraliaCity, CensusZipcode, Interstate, SouthTexasCity, SouthTexasCityFt,
     SouthTexasInterstate, SouthTexasZipcode,
@@ -79,11 +79,7 @@ class DistanceTest(TestCase):
         # Now performing the `dwithin` queries on a geodetic coordinate system.
         for dist in au_dists:
             with self.subTest(dist=dist):
-                if isinstance(dist, D) and not oracle:
-                    type_error = True
-                else:
-                    type_error = False
-
+                type_error = isinstance(dist, D) and not oracle
                 if isinstance(dist, tuple):
                     if oracle or spatialite:
                         # Result in meters
@@ -226,6 +222,40 @@ class DistanceTest(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             AustraliaCity.objects.filter(point__distance_lte=(Point(0, 0), D(m=100))).exists()
 
+    @skipUnlessDBFeature('supports_dwithin_lookup')
+    def test_dwithin_subquery(self):
+        """dwithin lookup in a subquery using OuterRef as a parameter."""
+        qs = CensusZipcode.objects.annotate(
+            annotated_value=Exists(SouthTexasCity.objects.filter(
+                point__dwithin=(OuterRef('poly'), D(m=10)),
+            ))
+        ).filter(annotated_value=True)
+        self.assertEqual(self.get_names(qs), ['77002', '77025', '77401'])
+
+    @skipUnlessDBFeature('supports_dwithin_lookup', 'supports_dwithin_distance_expr')
+    def test_dwithin_with_expression_rhs(self):
+        # LineString of Wollongong and Adelaide coords.
+        ls = LineString(((150.902, -34.4245), (138.6, -34.9258)), srid=4326)
+        qs = AustraliaCity.objects.filter(
+            point__dwithin=(ls, F('allowed_distance')),
+        ).order_by('name')
+        self.assertEqual(
+            self.get_names(qs),
+            ['Adelaide', 'Mittagong', 'Shellharbour', 'Thirroul', 'Wollongong'],
+        )
+
+    @skipIfDBFeature('supports_dwithin_distance_expr')
+    def test_dwithin_with_expression_rhs_not_supported(self):
+        ls = LineString(((150.902, -34.4245), (138.6, -34.9258)), srid=4326)
+        msg = (
+            'This backend does not support expressions for specifying '
+            'distance in the dwithin lookup.'
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            list(AustraliaCity.objects.filter(
+                point__dwithin=(ls, F('allowed_distance')),
+            ))
+
 
 '''
 =============================
@@ -262,7 +292,7 @@ Perimeter(geom1)                                |    OK              |      :-( 
 '''  # NOQA
 
 
-class DistanceFunctionsTests(TestCase):
+class DistanceFunctionsTests(FuncTestMixin, TestCase):
     fixtures = ['initial']
 
     @skipUnlessDBFeature("has_Area_function")
@@ -402,6 +432,31 @@ class DistanceFunctionsTests(TestCase):
         ).filter(d=D(m=1))
         self.assertTrue(qs.exists())
 
+    @skipUnlessDBFeature('supports_tolerance_parameter')
+    def test_distance_function_tolerance_escaping(self):
+        qs = Interstate.objects.annotate(
+            d=Distance(
+                Point(500, 500, srid=3857),
+                Point(0, 0, srid=3857),
+                tolerance='0.05) = 1 OR 1=1 OR (1+1',
+            ),
+        ).filter(d=D(m=1)).values('pk')
+        msg = 'The tolerance parameter has the wrong type'
+        with self.assertRaisesMessage(TypeError, msg):
+            qs.exists()
+
+    @skipUnlessDBFeature('supports_tolerance_parameter')
+    def test_distance_function_tolerance(self):
+        # Tolerance is greater than distance.
+        qs = Interstate.objects.annotate(
+            d=Distance(
+                Point(0, 0, srid=3857),
+                Point(1, 1, srid=3857),
+                tolerance=1.5,
+            ),
+        ).filter(d=0).values('pk')
+        self.assertIs(qs.exists(), True)
+
     @skipIfDBFeature("supports_distance_geodetic")
     @skipUnlessDBFeature("has_Distance_function")
     def test_distance_function_raw_result_d_lookup(self):
@@ -412,7 +467,6 @@ class DistanceFunctionsTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             list(qs)
 
-    @no_oracle  # Oracle already handles geographic distance calculation.
     @skipUnlessDBFeature("has_Distance_function", 'has_Transform_function')
     def test_distance_transform(self):
         """
@@ -472,7 +526,7 @@ class DistanceFunctionsTests(TestCase):
             # TODO: test with spheroid argument (True and False)
         else:
             # Does not support geodetic coordinate systems.
-            with self.assertRaises(NotImplementedError):
+            with self.assertRaises(NotSupportedError):
                 list(Interstate.objects.annotate(length=Length('path')))
 
         # Now doing length on a projected coordinate system.
@@ -511,7 +565,7 @@ class DistanceFunctionsTests(TestCase):
         if connection.features.supports_perimeter_geodetic:
             self.assertAlmostEqual(qs1[0].perim.m, 18406.3818954314, 3)
         else:
-            with self.assertRaises(NotImplementedError):
+            with self.assertRaises(NotSupportedError):
                 list(qs1)
         # But should work fine when transformed to projected coordinates
         qs2 = CensusZipcode.objects.annotate(perim=Perimeter(Transform('poly', 32140))).filter(name='77002')

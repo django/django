@@ -12,15 +12,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012,2014
 # Michiel Overtoom <motoom@xs4all.nl>, 2014
-# Sander Steffann <inactive+steffann@transifex.com>, 2014-2015
+# Meteor0id, 2019-2020
+# 8de006b1b0894aab6aef71979dcd8bd6_5c6b207 <ff2658a8d8dbebbd9cc240b8c133a515_234097>, 2014-2015
 # Tino de Bruijn <tinodb@gmail.com>, 2013
-# Tonnes <tonnes.mb@gmail.com>, 2017
+# Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-05-02 10:55+0000\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-15 08:30+0000\n"
 "Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -34,6 +35,9 @@ msgstr "Afrikaans"
 
 msgid "Arabic"
 msgstr "Arabisch"
+
+msgid "Algerian Arabic"
+msgstr "Algerijns Arabisch"
 
 msgid "Asturian"
 msgstr "Asturisch"
@@ -135,7 +139,7 @@ msgid "Galician"
 msgstr "Galicisch"
 
 msgid "Hebrew"
-msgstr "Hebreews"
+msgstr "Hebreeuws"
 
 msgid "Hindi"
 msgstr "Hindi"
@@ -149,11 +153,17 @@ msgstr "Oppersorbisch"
 msgid "Hungarian"
 msgstr "Hongaars"
 
+msgid "Armenian"
+msgstr "Armeens"
+
 msgid "Interlingua"
 msgstr "Interlingua"
 
 msgid "Indonesian"
 msgstr "Indonesisch"
+
+msgid "Igbo"
+msgstr "Igbo"
 
 msgid "Ido"
 msgstr "Ido"
@@ -170,6 +180,9 @@ msgstr "Japans"
 msgid "Georgian"
 msgstr "Georgisch"
 
+msgid "Kabyle"
+msgstr "Kabylisch"
+
 msgid "Kazakh"
 msgstr "Kazachs"
 
@@ -181,6 +194,9 @@ msgstr "Kannada"
 
 msgid "Korean"
 msgstr "Koreaans"
+
+msgid "Kyrgyz"
+msgstr "Kirgizisch"
 
 msgid "Luxembourgish"
 msgstr "Luxemburgs"
@@ -266,8 +282,14 @@ msgstr "Tamil"
 msgid "Telugu"
 msgstr "Telegu"
 
+msgid "Tajik"
+msgstr "Tadzjieks"
+
 msgid "Thai"
 msgstr "Thai"
+
+msgid "Turkmen"
+msgstr "Turkmeens"
 
 msgid "Turkish"
 msgstr "Turks"
@@ -283,6 +305,9 @@ msgstr "Oekraïens"
 
 msgid "Urdu"
 msgstr "Urdu"
+
+msgid "Uzbek"
+msgstr "Oezbeeks"
 
 msgid "Vietnamese"
 msgstr "Vietnamees"
@@ -326,17 +351,18 @@ msgstr "Voer een geldig geheel getal in."
 msgid "Enter a valid email address."
 msgstr "Voer een geldig e-mailadres in."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Voer een geldige 'slug' in, bestaande uit letters, cijfers, liggende "
+"Voer een geldige ‘slug’ in, bestaande uit letters, cijfers, liggende "
 "streepjes en verbindingsstreepjes."
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Voer een geldige 'slug' in, bestaande uit Unicode-letters, cijfers, liggende "
+"Voer een geldige ‘slug’ in, bestaande uit Unicode-letters, cijfers, liggende "
 "streepjes en verbindingsstreepjes."
 
 msgid "Enter a valid IPv4 address."
@@ -393,6 +419,9 @@ msgstr[1] ""
 "Zorg dat deze waarde niet meer dan %(limit_value)d tekens bevat (het zijn er "
 "nu %(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Voer een getal in."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -415,11 +444,14 @@ msgstr[1] "Zorg dat er niet meer dan %(max)s cijfers voor de komma staan."
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
-"Bestandsextensie '%(extension)s' is niet toegestaan. Toegestane extensies "
-"zijn: '%(allowed_extensions)s'."
+"Bestandsextensie ‘%(extension)s’ is niet toegestaan. Toegestane extensies "
+"zijn: ‘%(allowed_extensions)s’."
+
+msgid "Null characters are not allowed."
+msgstr "Null-tekens zijn niet toegestaan."
 
 msgid "and"
 msgstr "en"
@@ -454,22 +486,16 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr "Veld van type: %(field_type)s"
 
-msgid "Integer"
-msgstr "Geheel getal"
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr "Waarde van ‘%(value)s’ moet True of False zijn."
 
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr "Waarde van '%(value)s' moet een geheel getal zijn."
-
-msgid "Big (8 byte) integer"
-msgstr "Groot (8 byte) geheel getal"
-
-#, python-format
-msgid "'%(value)s' value must be either True or False."
-msgstr "Waarde van '%(value)s' moet True of False zijn."
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr "Waarde van ‘%(value)s’ moet True, False of None zijn."
 
 msgid "Boolean (Either True or False)"
-msgstr "Boolean (True danwel False)"
+msgstr "Boolean (True of False)"
 
 #, python-format
 msgid "String (up to %(max_length)s)"
@@ -480,18 +506,18 @@ msgstr "Komma-gescheiden gehele getallen"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"Waarde van '%(value)s' heeft een ongeldige datumnotatie. De juiste notatie "
+"Waarde van ‘%(value)s’ heeft een ongeldige datumnotatie. De juiste notatie "
 "is YYYY-MM-DD."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"Waarde van '%(value)s' heeft de juiste notatie (YYYY-MM-DD), maar het is een "
+"Waarde van ‘%(value)s’ heeft de juiste notatie (YYYY-MM-DD), maar het is een "
 "ongeldige datum."
 
 msgid "Date (without time)"
@@ -499,37 +525,37 @@ msgstr "Datum (zonder tijd)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"Waarde van '%(value)s' heeft een ongeldige notatie. De juiste notatie is "
+"Waarde van ‘%(value)s’ heeft een ongeldige notatie. De juiste notatie is "
 "YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"Waarde van '%(value)s' heeft de juiste notatie (YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ]), maar is een ongeldige datum/tijd."
+"Waarde van ‘%(value)s’ heeft de juiste notatie (YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ]), maar het is een ongeldige datum/tijd."
 
 msgid "Date (with time)"
 msgstr "Datum (met tijd)"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
-msgstr "Waarde van '%(value)s' moet een decimaal getal zijn."
+msgid "“%(value)s” value must be a decimal number."
+msgstr "Waarde van ‘%(value)s’ moet een decimaal getal zijn."
 
 msgid "Decimal number"
 msgstr "Decimaal getal"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"Waarde van '%(value)s' heeft een ongeldige notatie. De juiste notatie is "
-"[DD] [HH:[MM:]]ss[.uuuuuu]."
+"Waarde van ‘%(value)s’ heeft een ongeldige notatie. De juiste notatie is "
+"[DD] [[HH:]MM:]ss[.uuuuuu]."
 
 msgid "Duration"
 msgstr "Tijdsduur"
@@ -541,11 +567,21 @@ msgid "File path"
 msgstr "Bestandspad"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
-msgstr "Waarde van '%(value)s' moet een drijvende-kommagetal zijn."
+msgid "“%(value)s” value must be a float."
+msgstr "Waarde van ‘%(value)s’ moet een drijvende-kommagetal zijn."
 
 msgid "Floating point number"
 msgstr "Drijvende-kommagetal"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr "Waarde van ‘%(value)s’ moet een geheel getal zijn."
+
+msgid "Integer"
+msgstr "Geheel getal"
+
+msgid "Big (8 byte) integer"
+msgstr "Groot (8 byte) geheel getal"
 
 msgid "IPv4 address"
 msgstr "IPv4-adres"
@@ -554,11 +590,14 @@ msgid "IP address"
 msgstr "IP-adres"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
-msgstr "Waarde van '%(value)s' moet None, True of False zijn."
+msgid "“%(value)s” value must be either None, True or False."
+msgstr "Waarde van ‘%(value)s’ moet None, True of False zijn."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolean (True, False of None)"
+
+msgid "Positive big integer"
+msgstr "Positief groot geheel getal"
 
 msgid "Positive integer"
 msgstr "Positief geheel getal"
@@ -578,18 +617,18 @@ msgstr "Tekst"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"Waarde van '%(value)s' heeft een ongeldige notatie. De juiste notatie is HH:"
+"Waarde van ‘%(value)s’ heeft een ongeldige notatie. De juiste notatie is HH:"
 "MM[:ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"Waarde van '%(value)s' heeft de juiste notatie (HH:MM[:ss[.uuuuuu]]), maar "
+"Waarde van ‘%(value)s’ heeft de juiste notatie (HH:MM[:ss[.uuuuuu]]), maar "
 "het is een ongeldige tijd."
 
 msgid "Time"
@@ -602,14 +641,23 @@ msgid "Raw binary data"
 msgstr "Onbewerkte binaire gegevens"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
-msgstr "'%(value)s' is geen geldige UUID."
+msgid "“%(value)s” is not a valid UUID."
+msgstr "‘%(value)s’ is geen geldige UUID."
+
+msgid "Universally unique identifier"
+msgstr "Universally unique identifier"
 
 msgid "File"
 msgstr "Bestand"
 
 msgid "Image"
 msgstr "Afbeelding"
+
+msgid "A JSON object"
+msgstr "Een JSON-object"
+
+msgid "Value must be valid JSON."
+msgstr "Waarde moet geldige JSON zijn."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -644,9 +692,6 @@ msgstr "Dit veld is verplicht."
 msgid "Enter a whole number."
 msgstr "Voer een geheel getal in."
 
-msgid "Enter a number."
-msgstr "Voer een getal in."
-
 msgid "Enter a valid date."
 msgstr "Voer een geldige datum in."
 
@@ -659,13 +704,16 @@ msgstr "Voer een geldige datum/tijd in."
 msgid "Enter a valid duration."
 msgstr "Voer een geldige tijdsduur in."
 
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Het aantal dagen moet tussen {min_days} en {max_days} liggen."
+
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
-"Er was geen bestand verstuurd. Controleer het coderingstype van het "
-"formulier."
+"Er is geen bestand verstuurd. Controleer het coderingstype op het formulier."
 
 msgid "No file was submitted."
-msgstr "Er was geen bestand verstuurd."
+msgstr "Er is geen bestand verstuurd."
 
 msgid "The submitted file is empty."
 msgstr "Het verstuurde bestand is leeg."
@@ -688,8 +736,8 @@ msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"Bestand ongeldig. Het bestand dat is gegeven is geen afbeelding of is "
-"beschadigd."
+"Upload een geldige afbeelding. Het geüploade bestand is geen of een "
+"beschadigde afbeelding."
 
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
@@ -704,6 +752,9 @@ msgstr "Voer een volledige waarde in."
 msgid "Enter a valid UUID."
 msgstr "Voer een geldige UUID in."
 
+msgid "Enter a valid JSON."
+msgstr "Voer een geldige JSON in."
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -713,7 +764,7 @@ msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Verborgen veld %(name)s) %(error)s"
 
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr "ManagementForm gegevens missen of zijn mee geknoeid"
+msgstr "ManagementForm-gegevens ontbreken, of er is mee geknoeid"
 
 #, python-format
 msgid "Please submit %d or fewer forms."
@@ -735,38 +786,36 @@ msgstr "Verwijderen"
 
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
-msgstr "Verbeter de dubbele gegevens voor %(field)s."
+msgstr "Corrigeer de dubbele gegevens voor %(field)s."
 
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
-msgstr "Verbeter de dubbele gegevens voor %(field)s, welke uniek moet zijn."
+msgstr "Corrigeer de dubbele gegevens voor %(field)s, dat uniek moet zijn."
 
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
-"Verbeter de dubbele gegevens voor %(field_name)s, welke uniek moet zijn voor "
+"Corrigeer de dubbele gegevens voor %(field_name)s, dat uniek moet zijn voor "
 "de %(lookup)s in %(date_field)s."
 
 msgid "Please correct the duplicate values below."
-msgstr "Verbeter de dubbele waarden hieronder."
+msgstr "Corrigeer de dubbele waarden hieronder."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
-"De secundaire sleutel komt niet overeen met de primaire sleutel van de "
-"bovenliggende instantie."
+msgid "The inline value did not match the parent instance."
+msgstr "De inline waarde komt niet overeen met de bovenliggende instantie."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Selecteer een geldige keuze. Deze keuze is niet beschikbaar."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "'%(pk)s' is geen geldige waarde voor een primaire sleutel."
+msgid "“%(pk)s” is not a valid value."
+msgstr "‘%(pk)s’ is geen geldige waarde."
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
 "%(datetime)s kon niet worden geïnterpreteerd in tijdzone "
@@ -790,6 +839,7 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nee"
 
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "ja,nee,misschien"
 
@@ -1052,8 +1102,8 @@ msgstr "Dit is geen geldig IPv6-adres."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "of"
@@ -1098,9 +1148,6 @@ msgid_plural "%d minutes"
 msgstr[0] "%d minuut"
 msgstr[1] "%d minuten"
 
-msgid "0 minutes"
-msgstr "0 minuten"
-
 msgid "Forbidden"
 msgstr "Verboden"
 
@@ -1108,24 +1155,37 @@ msgid "CSRF verification failed. Request aborted."
 msgstr "CSRF-verificatie mislukt. Aanvraag afgebroken."
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
 "U ziet deze melding, omdat deze HTTPS-website vereist dat uw webbrowser een "
-"'Referer header' meestuurt, maar deze ontbreekt. Deze header is om "
+"‘Referer header’ meestuurt, maar deze ontbreekt. Deze header is om "
 "veiligheidsredenen vereist om er zeker van te zijn dat uw browser niet door "
 "derden wordt gekaapt."
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
 msgstr ""
-"Als u uw webbrowser hebt ingesteld heeft om geen 'Referer headers' mee te "
-"sturen, schakelt u deze dan weer in, op zijn minst voor deze website, of "
-"voor HTTPS-verbindingen, of voor 'same-origin'-aanvragen."
+"Als u ‘Referer’-headers in uw browser hebt uitgeschakeld, schakel deze dan "
+"weer in, op zijn minst voor deze website, of voor HTTPS-verbindingen, of "
+"voor ‘same-origin’-aanvragen."
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
+msgstr ""
+"Als u de tag <meta name=\"referrer\" content=\"no-referrer\"> gebruikt of de "
+"header ‘Referrer-Policy: no-referrer’ opneemt, verwijder deze dan. De CSRF-"
+"bescherming vereist de ‘Referer’-header voor strenge referer-controle. Als u "
+"bezorgd bent om privacy, gebruik dan alternatieven zoals <a rel=\"noreferrer"
+"\" …> voor koppelingen naar websites van derden."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1139,40 +1199,19 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
 "Als u cookies in uw webbrowser hebt uitgeschakeld, schakel deze dan weer in, "
-"op zijn minst voor deze website, of voor 'same-origin'-aanvragen."
+"op zijn minst voor deze website, of voor ‘same-origin’-aanvragen."
 
 msgid "More information is available with DEBUG=True."
 msgstr "Meer informatie is beschikbaar met DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Welkom bij Django"
-
-msgid "It worked!"
-msgstr "Het werkt!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Gefeliciteerd met uw eerste Django-aangedreven pagina."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Start nu uw eerste app door <code>python manage.py startapp [app_label]</"
-"code> uit te voeren."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"U ziet dit bericht, omdat u <code>DEBUG = True</code> in uw Django-"
-"instellingenbestand hebt staan en u nog geen URL's hebt geconfigureerd. Aan "
-"het werk!"
-
 msgid "No year specified"
 msgstr "Geen jaar opgegeven"
+
+msgid "Date out of range"
+msgstr "Datum buiten bereik"
 
 msgid "No month specified"
 msgstr "Geen maand opgegeven"
@@ -1196,16 +1235,16 @@ msgstr ""
 "allow_future de waarde False (Onwaar) heeft."
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
-msgstr "Ongeldige datumtekst '%(datestr)s' op basis van notatie '%(format)s'"
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr "Ongeldige datumtekst ‘%(datestr)s’ op basis van notatie ‘%(format)s’"
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "Geen %(verbose_name)s gevonden die voldoet aan de query"
 
-msgid "Page is not 'last', nor can it be converted to an int."
+msgid "Page is not “last”, nor can it be converted to an int."
 msgstr ""
-"Pagina is niet 'last' en kan ook niet naar een geheel getal worden "
+"Pagina is niet ‘last’ en kan ook niet naar een geheel getal worden "
 "geconverteerd."
 
 #, python-format
@@ -1213,17 +1252,60 @@ msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "Ongeldige pagina (%(page_number)s): %(message)s"
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr ""
-"Lege lijst en %(class_name)s.allow_empty heeft de waarde False (Onwaar)."
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr "Lege lijst en ‘%(class_name)s.allow_empty’ is False."
 
 msgid "Directory indexes are not allowed here."
 msgstr "Directoryindexen zijn hier niet toegestaan."
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "'%(path)s' bestaat niet"
+msgid "“%(path)s” does not exist"
+msgstr "‘%(path)s’ bestaat niet"
 
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Index van %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: het webframework voor perfectionisten met deadlines."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"<a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" target="
+"\"_blank\" rel=\"noopener\">Uitgaveopmerkingen</a> voor Django %(version)s "
+"weergeven"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "De installatie is gelukt! Gefeliciteerd!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"U ziet deze pagina, omdat uw instellingenbestand <a href=\"https://docs."
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
+"\"noopener\">DEBUG=True</a> bevat en u geen URL's hebt geconfigureerd."
+
+msgid "Django Documentation"
+msgstr "Django-documentatie"
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr "Onderwerpen, referenties en instructies"
+
+msgid "Tutorial: A Polling App"
+msgstr "Handleiding: een app voor peilingen"
+
+msgid "Get started with Django"
+msgstr "Beginnen met Django"
+
+msgid "Django Community"
+msgstr "Django-gemeenschap"
+
+msgid "Connect, get help, or contribute"
+msgstr "Contact met anderen, hulp verkrijgen of bijdragen"

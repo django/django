@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016
+# Michael Wolf <milupo@sorbzilla.de>, 2016,2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-06-10 18:23+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-02-25 16:10+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -28,21 +28,21 @@ msgid "redirect from"
 msgstr "dalejpósrědnjenje wót"
 
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
 msgstr ""
-"To by dejało absolutna sćažka byś, mimo domenowego mjenja. Pśikład: '/events/"
-"search/'."
+"To by dejało absolutna sćažka byś, mimo domenowego mjenja. Pśikład: „/events/"
+"search/“."
 
 msgid "redirect to"
 msgstr "dalejpósrědnjenje do"
 
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+"“http://”."
 msgstr ""
 "To móžo pak absolutna sćažka byś (ako górjejce) pak dopołny URL, kótaryž "
-"zachopina se z 'http://'."
+"zachopina se z „http://“."
 
 msgid "redirect"
 msgstr "dalejpósrědnjenje"

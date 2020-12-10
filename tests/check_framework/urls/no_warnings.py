@@ -1,9 +1,9 @@
-from django.conf.urls import include, url
+from django.urls import include, path, re_path
 
 urlpatterns = [
-    url(r'^foo/', lambda x: x, name='foo'),
+    path('foo/', lambda x: x, name='foo'),
     # This dollar is ok as it is escaped
-    url(r'^\$', include([
-        url(r'^bar/$', lambda x: x, name='bar'),
+    re_path(r'^\$', include([
+        path('bar/', lambda x: x, name='bar'),
     ])),
 ]

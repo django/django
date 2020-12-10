@@ -5,12 +5,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.checks import Error
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import isolate_apps
 
 
 @isolate_apps('model_inheritance')
-class AbstractInheritanceTests(TestCase):
+class AbstractInheritanceTests(SimpleTestCase):
     def test_single_parent(self):
         class AbstractBase(models.Model):
             name = models.CharField(max_length=30)
@@ -34,33 +34,30 @@ class AbstractInheritanceTests(TestCase):
         self.assertEqual(DerivedChild._meta.get_field('name').max_length, 50)
         self.assertEqual(DerivedGrandChild._meta.get_field('name').max_length, 50)
 
-    def test_multiple_parents_mro(self):
-        class AbstractBaseOne(models.Model):
-            class Meta:
-                abstract = True
-
-        class AbstractBaseTwo(models.Model):
-            name = models.CharField(max_length=30)
+    def test_multiple_inheritance_cannot_shadow_inherited_field(self):
+        class ParentA(models.Model):
+            name = models.CharField(max_length=255)
 
             class Meta:
                 abstract = True
 
-        class DescendantOne(AbstractBaseOne, AbstractBaseTwo):
-            class Meta:
-                abstract = True
-
-        class DescendantTwo(AbstractBaseOne, AbstractBaseTwo):
-            name = models.CharField(max_length=50)
+        class ParentB(models.Model):
+            name = models.IntegerField()
 
             class Meta:
                 abstract = True
 
-        class Derived(DescendantOne, DescendantTwo):
+        class Child(ParentA, ParentB):
             pass
 
-        self.assertEqual(DescendantOne._meta.get_field('name').max_length, 30)
-        self.assertEqual(DescendantTwo._meta.get_field('name').max_length, 50)
-        self.assertEqual(Derived._meta.get_field('name').max_length, 50)
+        self.assertEqual(Child.check(), [
+            Error(
+                "The field 'name' clashes with the field 'name' from model "
+                "'model_inheritance.child'.",
+                obj=Child._meta.get_field('name'),
+                id='models.E006',
+            ),
+        ])
 
     def test_multiple_inheritance_cannot_shadow_concrete_inherited_field(self):
         class ConcreteParent(models.Model):

@@ -1,6 +1,6 @@
 """
  The OGRGeometry is a wrapper for using the OGR Geometry class
- (see http://www.gdal.org/classOGRGeometry.html).  OGRGeometry
+ (see https://www.gdal.org/classOGRGeometry.html).  OGRGeometry
  may be instantiated when reading geometries from OGR Data Sources
  (e.g. SHP files), or when given OGC WKT (a string).
 
@@ -39,24 +39,21 @@
   True True
 """
 import sys
-from binascii import a2b_hex, b2a_hex
+from binascii import b2a_hex
 from ctypes import byref, c_char_p, c_double, c_ubyte, c_void_p, string_at
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
-from django.contrib.gis.gdal.error import (
-    GDALException, OGRIndexError, SRSException,
-)
+from django.contrib.gis.gdal.error import GDALException, SRSException
 from django.contrib.gis.gdal.geomtype import OGRGeomType
-from django.contrib.gis.gdal.libgdal import GDAL_VERSION
 from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
 from django.contrib.gis.gdal.srs import CoordTransform, SpatialReference
-from django.contrib.gis.geometry.regex import hex_regex, json_regex, wkt_regex
+from django.contrib.gis.geometry import hex_regex, json_regex, wkt_regex
 from django.utils.encoding import force_bytes
 
 
 # For more information, see the OGR C API source code:
-#  http://www.gdal.org/ogr__api_8h.html
+#  https://www.gdal.org/ogr__api_8h.html
 #
 # The OGR_G_* routines are relevant here.
 class OGRGeometry(GDALBase):
@@ -69,7 +66,7 @@ class OGRGeometry(GDALBase):
 
         # If HEX, unpack input to a binary buffer.
         if str_instance and hex_regex.match(geom_input):
-            geom_input = memoryview(a2b_hex(geom_input.upper().encode()))
+            geom_input = memoryview(bytes.fromhex(geom_input))
             str_instance = False
 
         # Constructing the geometry,
@@ -77,16 +74,16 @@ class OGRGeometry(GDALBase):
             wkt_m = wkt_regex.match(geom_input)
             json_m = json_regex.match(geom_input)
             if wkt_m:
-                if wkt_m.group('srid'):
+                if wkt_m['srid']:
                     # If there's EWKT, set the SRS w/value of the SRID.
-                    srs = int(wkt_m.group('srid'))
-                if wkt_m.group('type').upper() == 'LINEARRING':
+                    srs = int(wkt_m['srid'])
+                if wkt_m['type'].upper() == 'LINEARRING':
                     # OGR_G_CreateFromWkt doesn't work with LINEARRING WKT.
-                    #  See http://trac.osgeo.org/gdal/ticket/1992.
-                    g = capi.create_geom(OGRGeomType(wkt_m.group('type')).num)
-                    capi.import_wkt(g, byref(c_char_p(wkt_m.group('wkt').encode())))
+                    #  See https://trac.osgeo.org/gdal/ticket/1992.
+                    g = capi.create_geom(OGRGeomType(wkt_m['type']).num)
+                    capi.import_wkt(g, byref(c_char_p(wkt_m['wkt'].encode())))
                 else:
-                    g = capi.from_wkt(byref(c_char_p(wkt_m.group('wkt').encode())), None, byref(c_void_p()))
+                    g = capi.from_wkt(byref(c_char_p(wkt_m['wkt'].encode())), None, byref(c_void_p()))
             elif json_m:
                 g = self._from_json(geom_input.encode())
             else:
@@ -142,17 +139,7 @@ class OGRGeometry(GDALBase):
 
     @staticmethod
     def _from_json(geom_input):
-        ptr = capi.from_json(geom_input)
-        if GDAL_VERSION < (2, 0):
-            has_srs = True
-            try:
-                capi.get_geom_srs(ptr)
-            except SRSException:
-                has_srs = False
-            if not has_srs:
-                srs = SpatialReference(4326)
-                capi.assign_srs(ptr, srs.ptr)
-        return ptr
+        return capi.from_json(geom_input)
 
     @classmethod
     def from_bbox(cls, bbox):
@@ -192,10 +179,7 @@ class OGRGeometry(GDALBase):
 
     def __eq__(self, other):
         "Is this Geometry equal to the other?"
-        if isinstance(other, OGRGeometry):
-            return self.equals(other)
-        else:
-            return False
+        return isinstance(other, OGRGeometry) and self.equals(other)
 
     def __str__(self):
         "WKT is used for the string representation."
@@ -399,7 +383,7 @@ class OGRGeometry(GDALBase):
         """
         Transform this geometry to a different spatial reference system.
         May take a CoordTransform object, a SpatialReference object, string
-        WKT or PROJ.4, and/or an integer SRID.  By default, return nothing
+        WKT or PROJ, and/or an integer SRID.  By default, return nothing
         and transform the geometry in-place. However, if the `clone` keyword is
         set, return a transformed clone of this geometry.
         """
@@ -555,7 +539,7 @@ class LineString(OGRGeometry):
 
     def __getitem__(self, index):
         "Return the Point at the given index."
-        if index >= 0 and index < self.point_count:
+        if 0 <= index < self.point_count:
             x, y, z = c_double(), c_double(), c_double()
             capi.get_point(self.ptr, index, byref(x), byref(y), byref(z))
             dim = self.coord_dim
@@ -566,12 +550,7 @@ class LineString(OGRGeometry):
             elif dim == 3:
                 return (x.value, y.value, z.value)
         else:
-            raise OGRIndexError('index out of range: %s' % index)
-
-    def __iter__(self):
-        "Iterate over each point in the LineString."
-        for i in range(self.point_count):
-            yield self[i]
+            raise IndexError('Index out of range when accessing points of a line string: %s.' % index)
 
     def __len__(self):
         "Return the number of points in the LineString."
@@ -618,17 +597,12 @@ class Polygon(OGRGeometry):
         "Return the number of interior rings in this Polygon."
         return self.geom_count
 
-    def __iter__(self):
-        "Iterate through each ring in the Polygon."
-        for i in range(self.geom_count):
-            yield self[i]
-
     def __getitem__(self, index):
         "Get the ring at the specified index."
-        if index < 0 or index >= self.geom_count:
-            raise OGRIndexError('index out of range: %s' % index)
-        else:
+        if 0 <= index < self.geom_count:
             return OGRGeometry(capi.clone_geom(capi.get_geom_ref(self.ptr, index)), self.srs)
+        else:
+            raise IndexError('Index out of range when accessing rings of a polygon: %s.' % index)
 
     # Polygon Properties
     @property
@@ -664,15 +638,10 @@ class GeometryCollection(OGRGeometry):
 
     def __getitem__(self, index):
         "Get the Geometry at the specified index."
-        if index < 0 or index >= self.geom_count:
-            raise OGRIndexError('index out of range: %s' % index)
-        else:
+        if 0 <= index < self.geom_count:
             return OGRGeometry(capi.clone_geom(capi.get_geom_ref(self.ptr, index)), self.srs)
-
-    def __iter__(self):
-        "Iterate over each Geometry."
-        for i in range(self.geom_count):
-            yield self[i]
+        else:
+            raise IndexError('Index out of range when accessing geometry in a collection: %s.' % index)
 
     def __len__(self):
         "Return the number of geometries in this Geometry Collection."
@@ -719,19 +688,20 @@ class MultiPolygon(GeometryCollection):
 
 
 # Class mapping dictionary (using the OGRwkbGeometryType as the key)
-GEO_CLASSES = {1: Point,
-               2: LineString,
-               3: Polygon,
-               4: MultiPoint,
-               5: MultiLineString,
-               6: MultiPolygon,
-               7: GeometryCollection,
-               101: LinearRing,
-               1 + OGRGeomType.wkb25bit: Point,
-               2 + OGRGeomType.wkb25bit: LineString,
-               3 + OGRGeomType.wkb25bit: Polygon,
-               4 + OGRGeomType.wkb25bit: MultiPoint,
-               5 + OGRGeomType.wkb25bit: MultiLineString,
-               6 + OGRGeomType.wkb25bit: MultiPolygon,
-               7 + OGRGeomType.wkb25bit: GeometryCollection,
-               }
+GEO_CLASSES = {
+    1: Point,
+    2: LineString,
+    3: Polygon,
+    4: MultiPoint,
+    5: MultiLineString,
+    6: MultiPolygon,
+    7: GeometryCollection,
+    101: LinearRing,
+    1 + OGRGeomType.wkb25bit: Point,
+    2 + OGRGeomType.wkb25bit: LineString,
+    3 + OGRGeomType.wkb25bit: Polygon,
+    4 + OGRGeomType.wkb25bit: MultiPoint,
+    5 + OGRGeomType.wkb25bit: MultiLineString,
+    6 + OGRGeomType.wkb25bit: MultiPolygon,
+    7 + OGRGeomType.wkb25bit: GeometryCollection,
+}

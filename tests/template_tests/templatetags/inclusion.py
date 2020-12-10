@@ -136,6 +136,15 @@ def inclusion_one_default(one, two='hi'):
 inclusion_one_default.anything = "Expected inclusion_one_default __dict__"
 
 
+@register.inclusion_tag('inclusion.html')
+def inclusion_keyword_only_default(*, kwarg=42):
+    return {
+        'result': (
+            'inclusion_keyword_only_default - Expected result: %s' % kwarg
+        ),
+    }
+
+
 @register.inclusion_tag(engine.get_template('inclusion.html'))
 def inclusion_one_default_from_template(one, two='hi'):
     """Expected inclusion_one_default_from_template __doc__"""
@@ -151,7 +160,7 @@ def inclusion_unlimited_args(one, two='hi', *args):
     return {
         "result": (
             "inclusion_unlimited_args - Expected result: %s" % (
-                ', '.join(str(arg) for arg in [one, two] + list(args))
+                ', '.join(str(arg) for arg in [one, two, *args])
             )
         )
     }
@@ -166,7 +175,7 @@ def inclusion_unlimited_args_from_template(one, two='hi', *args):
     return {
         "result": (
             "inclusion_unlimited_args_from_template - Expected result: %s" % (
-                ', '.join(str(arg) for arg in [one, two] + list(args))
+                ', '.join(str(arg) for arg in [one, two, *args])
             )
         )
     }
@@ -216,7 +225,7 @@ def inclusion_unlimited_args_kwargs(one, two='hi', *args, **kwargs):
     # Sort the dictionary by key to guarantee the order for testing.
     sorted_kwarg = sorted(kwargs.items(), key=operator.itemgetter(0))
     return {"result": "inclusion_unlimited_args_kwargs - Expected result: %s / %s" % (
-        ', '.join(str(arg) for arg in [one, two] + list(args)),
+        ', '.join(str(arg) for arg in [one, two, *args]),
         ', '.join('%s=%s' % (k, v) for (k, v) in sorted_kwarg)
     )}
 

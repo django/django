@@ -1,26 +1,29 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Ahmad Hosseini <ahmadly.com@gmail.com>, 2020
 # Ali Nikneshan <ali@nikneshan.com>, 2015
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Arash Fazeli <a.fazeli@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# MJafar Mashhadi <raindigital2007@gmail.com>, 2018
+# Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2017,2019
 # Pouya Abbassi, 2016
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-08-16 13:50+0000\n"
-"Last-Translator: Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-08-20 15:46+0000\n"
+"Last-Translator: Ahmad Hosseini <ahmadly.com@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fa\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -73,6 +76,12 @@ msgstr "بدون تاریخ"
 msgid "Has date"
 msgstr "دارای تاریخ"
 
+msgid "Empty"
+msgstr ""
+
+msgid "Not empty"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -91,6 +100,15 @@ msgstr "افزودن یک %(verbose_name)s دیگر"
 msgid "Remove"
 msgstr "حذف"
 
+msgid "Addition"
+msgstr "افزودن"
+
+msgid "Change"
+msgstr "تغییر"
+
+msgid "Deletion"
+msgstr "کاستن"
+
 msgid "action time"
 msgstr "زمان اقدام"
 
@@ -104,7 +122,7 @@ msgid "object id"
 msgstr "شناسهٔ شیء"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "صورت شیء"
 
@@ -121,23 +139,23 @@ msgid "log entries"
 msgstr "موارد اتفاقات"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "\"%(object)s\" افروده شد."
+msgid "Added “%(object)s”."
+msgstr ""
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "تغییر \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr ""
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "\"%(object)s\" حدف شد."
+msgid "Deleted “%(object)s.”"
+msgstr ""
 
 msgid "LogEntry Object"
 msgstr "شئ LogEntry"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "اضافه شد {name} «{object}»."
+msgid "Added {name} “{object}”."
+msgstr ""
 
 msgid "Added."
 msgstr "اضافه شد"
@@ -146,16 +164,16 @@ msgid "and"
 msgstr "و"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "{fields} برای {name} \"{object}\" تغییر یافتند."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr ""
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "{fields} تغییر یافتند."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr "{name} \"{object}\" حذف شد."
+msgid "Deleted {name} “{object}”."
+msgstr ""
 
 msgid "No fields changed."
 msgstr "فیلدی تغییر نیافته است."
@@ -163,49 +181,39 @@ msgstr "فیلدی تغییر نیافته است."
 msgid "None"
 msgstr "هیچ"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
-"برای انتخاب بیش از یکی \"Control\"، یا \"Command\" روی Mac، را پایین نگه "
-"دارید."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
+msgstr "می‌توانید مجدداً ویرایش کنید."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
-" {name} \"{obj}\" به موفقیت اضافه شد. شما میتوانید در قسمت پایین، آنرا "
-"ویرایش کنید."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
-"{name} \"{obj}\" با موفقیت اضافه شد. شما میتوانید {name} دیگری در قسمت پایین "
-"اضافه کنید."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" با موفقیت اضافه شد."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgid "The {name} “{obj}” was changed successfully."
 msgstr ""
-"{name} \"{obj}\" با موفقیت تغییر یافت. شما میتوانید دوباره آنرا در قسمت "
-"پایین ویرایش کنید."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-"{name} \"{obj}\" با موفقیت تغییر یافت. شما میتوانید {name} دیگری در قسمت "
-"پایین اضافه کنید."
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "{name} \"{obj}\" با موفقیت تغییر یافت."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -218,12 +226,12 @@ msgid "No action selected."
 msgstr "فعالیتی انتخاب نشده"
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s·\"%(obj)s\" با موفقیت حذف شد."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr ""
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "ایتم%(name)s با کلید اصلی %(key)r وجود ندارد."
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr ""
 
 #, python-format
 msgid "Add %s"
@@ -233,6 +241,10 @@ msgstr "اضافه کردن %s"
 msgid "Change %s"
 msgstr "تغییر %s"
 
+#, python-format
+msgid "View %s"
+msgstr "مشاهده %s"
+
 msgid "Database error"
 msgstr "خطا در بانک اطلاعاتی"
 
@@ -240,11 +252,13 @@ msgstr "خطا در بانک اطلاعاتی"
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s با موفقیت تغییر کرد."
+msgstr[1] "%(count)s %(name)s با موفقیت تغییر کرد."
 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "همه موارد %(total_count)s انتخاب شده"
+msgstr[1] "همه موارد %(total_count)s انتخاب شده"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -287,8 +301,8 @@ msgstr "مدیریت ‎%(app)s‎"
 msgid "Page not found"
 msgstr "صفحه یافت نشد"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "شرمنده، صفحه مورد تقاضا یافت نشد."
+msgid "We’re sorry, but the requested page could not be found."
+msgstr ""
 
 msgid "Home"
 msgstr "شروع"
@@ -303,11 +317,9 @@ msgid "Server Error <em>(500)</em>"
 msgstr "خطای سرور <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"مشکلی پیش آمده. این مشکل از طریق ایمیل به مدیران سایت اطلاع داده شد و به "
-"زودی اصلاح میگردد. از صبر شما ممنونیم"
 
 msgid "Run the selected action"
 msgstr "اجرای حرکت انتخاب شده"
@@ -325,8 +337,21 @@ msgstr "انتخاب تمامی %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "لغو انتخاب‌ها"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "مدلها در برنامه %(name)s "
+
+msgid "Add"
+msgstr "اضافه کردن"
+
+msgid "View"
+msgstr "مشاهده"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "شما اجازهٔ مشاهده یا ویرایش چیزی را ندارید."
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
 "ابتدا یک نام کاربری و گذرواژه وارد کنید. سپس می توانید مشخصات دیگر کاربر را "
@@ -373,6 +398,9 @@ msgstr "مشاهده در وب‌گاه"
 msgid "Filter"
 msgstr "فیلتر"
 
+msgid "Clear all filters"
+msgstr "پاک کردن همه فیلترها"
+
 msgid "Remove from sorting"
 msgstr "حذف از مرتب سازی"
 
@@ -414,7 +442,7 @@ msgstr ""
 msgid "Objects"
 msgstr "اشیاء"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "بله، مطمئن هستم."
 
 msgid "No, take me back"
@@ -448,9 +476,6 @@ msgstr ""
 "آیا در خصوص حذف %(objects_name)s انتخاب شده اطمینان دارید؟ تمام موجودیت‌های "
 "ذیل به همراه موارد مرتبط با آنها حذف خواهند شد:"
 
-msgid "Change"
-msgstr "تغییر"
-
 msgid "Delete?"
 msgstr "حذف؟"
 
@@ -460,16 +485,6 @@ msgstr "براساس %(filter_title)s "
 
 msgid "Summary"
 msgstr "خلاصه"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "مدلها در برنامه %(name)s "
-
-msgid "Add"
-msgstr "اضافه کردن"
-
-msgid "You don't have permission to edit anything."
-msgstr "شما اجازهٔ ویرایش چیزی را ندارید."
 
 msgid "Recent actions"
 msgstr "فعالیتهای اخیر"
@@ -484,13 +499,10 @@ msgid "Unknown content"
 msgstr "محتوا ناشناخته"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"در نصب بانک اطلاعاتی شما مشکلی وجود دارد. مطمئن شوید که جداول مربوطه به "
-"درستی ایجاد شده‌اند و اطمینان حاصل کنید که بانک اطلاعاتی توسط کاربر مربوطه "
-"قابل خواندن می باشد."
 
 #, python-format
 msgid ""
@@ -503,6 +515,9 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "گذرواژه یا نام کاربری خود را فراموش کرده‌اید؟"
 
+msgid "Toggle navigation"
+msgstr ""
+
 msgid "Date/time"
 msgstr "تاریخ/ساعت"
 
@@ -513,11 +528,9 @@ msgid "Action"
 msgstr "عمل"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"این شیء تاریخچهٔ تغییرات ندارد. احتمالا این شیء توسط وب‌گاه مدیریت ایجاد نشده "
-"است."
 
 msgid "Show all"
 msgstr "نمایش همه"
@@ -525,20 +538,8 @@ msgstr "نمایش همه"
 msgid "Save"
 msgstr "ذخیره"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "در حال بستن پنجره..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "تغییر دادن %(model)s انتخاب شده"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "افزدون %(model)s دیگر"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "حذف کردن %(model)s انتخاب شده"
 
 msgid "Search"
 msgstr "جستجو"
@@ -547,6 +548,7 @@ msgstr "جستجو"
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s نتیجه"
+msgstr[1] "%(counter)s نتیجه"
 
 #, python-format
 msgid "%(full_result_count)s total"
@@ -561,6 +563,24 @@ msgstr "ذخیره و ایجاد یکی دیگر"
 msgid "Save and continue editing"
 msgstr "ذخیره و ادامهٔ ویرایش"
 
+msgid "Save and view"
+msgstr "ذخیره و نمایش"
+
+msgid "Close"
+msgstr "بستن"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "تغییر دادن %(model)s انتخاب شده"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "افزدون %(model)s دیگر"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "حذف کردن %(model)s انتخاب شده"
+
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "متشکر از اینکه مدتی از وقت خود را به ما اختصاص دادید."
 
@@ -574,11 +594,11 @@ msgid "Your password was changed."
 msgstr "گذرواژهٔ شما تغییر یافت."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"گذرواژهٔ قدیمی خود را، برای امنیت بیشتر، وارد کنید و سپس گذرواژهٔ جدیدتان را "
-"دوبار وارد کنید تا ما بتوانیم چک کنیم که به درستی تایپ کرده‌اید."
+"برای امنیت بیشتر٬ لطفا گذرواژه قدیمی خود را وارد کنید٬ سپس گذرواژه جدیدتان "
+"را دوبار وارد کنید تا ما بتوانیم چک کنیم که به درستی تایپ کرده‌اید. "
 
 msgid "Change my password"
 msgstr "تغییر گذرواژهٔ من"
@@ -613,18 +633,14 @@ msgstr ""
 "استفاده شده است. لطفاً برای یک گذرواژهٔ جدید درخواست دهید."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"دستورالعمل تنظیم گذرواژه را برایتان ایمیل کردیم. اگر با ایمیلی که وارد کردید "
-"اکانتی وجود داشت باشد باید به زودی این دستورالعمل‌ها  را دریافت کنید."
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"اگر ایمیلی دریافت نمی‌کنید، لطفاً بررسی کنید که آدرسی که وارد کرده‌اید همان است "
-"که با آن ثبت نام کرده‌اید، و پوشهٔ اسپم خود را نیز چک کنید."
 
 #, python-format
 msgid ""
@@ -637,7 +653,7 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "لطفاً به صفحهٔ زیر بروید و یک گذرواژهٔ جدید انتخاب کنید:"
 
-msgid "Your username, in case you've forgotten:"
+msgid "Your username, in case you’ve forgotten:"
 msgstr "نام کاربری‌تان، چنانچه احیاناً یادتان رفته است:"
 
 msgid "Thanks for using our site!"
@@ -648,11 +664,9 @@ msgid "The %(site_name)s team"
 msgstr "گروه %(site_name)s"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"رمز خود را فراموش کرده اید؟ آدرس ایمیل خود را در زیر وارد کنید، و ما روش "
-"تنظیم رمز جدید را برایتان می فرستیم."
 
 msgid "Email address:"
 msgstr "آدرس ایمیل:"
@@ -670,6 +684,10 @@ msgstr "%s انتخاب کنید"
 #, python-format
 msgid "Select %s to change"
 msgstr "%s را برای تغییر انتخاب کنید"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "%s را برای مشاهده انتخاب کنید"
 
 msgid "Date:"
 msgstr "تاریخ:"

@@ -3,20 +3,21 @@
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
 # andrewsmedina <andrewsmedina@gmail.com>, 2016
-# Carlos E C Leite <caduado@gmail.com>, 2016
-# Filipe Cifali <cifali.filipe@gmail.com>, 2016
+# Carlos C. Leite <caduado@gmail.com>, 2016
+# Filipe Cifali Stangler <cifali.filipe@gmail.com>, 2016
 # Eduardo Cereto Carvalho, 2016
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
-# Guilherme Gondim, 2012
+# semente, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
+# Vinícius Muniz de Melo <viniciusdesk@icloud.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-28 23:31+0000\n"
-"Last-Translator: Tarsis Azevedo <tarsis.azevedo@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-12-19 17:59+0000\n"
+"Last-Translator: Vinícius Muniz de Melo <viniciusdesk@icloud.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -163,13 +164,13 @@ msgid "Template: %(name)s"
 msgstr "Template: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Template: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Template: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Caminho de busca para o template \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Caminho de busca para o template <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(não existe)"
@@ -248,13 +249,6 @@ msgid ""
 msgstr ""
 "\n"
 "View função: <code>%(full_name)s</code>. Nome: <code>%(url_name)s</code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Booleano (Verdadeiro ou Falso)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Campo do tipo: %(field_type)s"
 
 msgid "tag:"
 msgstr "tag:"

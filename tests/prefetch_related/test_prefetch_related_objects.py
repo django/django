@@ -43,7 +43,7 @@ class PrefetchRelatedObjectsTests(TestCase):
             prefetch_related_objects([book1], 'authors')
 
         with self.assertNumQueries(0):
-            self.assertEqual(set(book1.authors.all()), {self.author1, self.author2, self.author3})
+            self.assertCountEqual(book1.authors.all(), [self.author1, self.author2, self.author3])
 
     def test_m2m_reverse(self):
         author1 = Author.objects.get(id=self.author1.id)
@@ -51,7 +51,7 @@ class PrefetchRelatedObjectsTests(TestCase):
             prefetch_related_objects([author1], 'books')
 
         with self.assertNumQueries(0):
-            self.assertEqual(set(author1.books.all()), {self.book1, self.book2})
+            self.assertCountEqual(author1.books.all(), [self.book1, self.book2])
 
     def test_foreignkey_forward(self):
         authors = list(Author.objects.all())
@@ -95,7 +95,7 @@ class PrefetchRelatedObjectsTests(TestCase):
             prefetch_related_objects([book1], Prefetch('authors'))
 
         with self.assertNumQueries(0):
-            self.assertEqual(set(book1.authors.all()), {self.author1, self.author2, self.author3})
+            self.assertCountEqual(book1.authors.all(), [self.author1, self.author2, self.author3])
 
     def test_prefetch_object_to_attr(self):
         book1 = Book.objects.get(id=self.book1.id)
@@ -103,7 +103,7 @@ class PrefetchRelatedObjectsTests(TestCase):
             prefetch_related_objects([book1], Prefetch('authors', to_attr='the_authors'))
 
         with self.assertNumQueries(0):
-            self.assertEqual(set(book1.the_authors), {self.author1, self.author2, self.author3})
+            self.assertCountEqual(book1.the_authors, [self.author1, self.author2, self.author3])
 
     def test_prefetch_queryset(self):
         book1 = Book.objects.get(id=self.book1.id)
@@ -114,4 +114,4 @@ class PrefetchRelatedObjectsTests(TestCase):
             )
 
         with self.assertNumQueries(0):
-            self.assertEqual(set(book1.authors.all()), {self.author1, self.author2})
+            self.assertCountEqual(book1.authors.all(), [self.author1, self.author2])

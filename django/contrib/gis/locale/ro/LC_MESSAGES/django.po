@@ -1,16 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Daniel Ursache-Dogariu <contact@danniel.net>, 2011
+# Bogdan Mateescu, 2019
+# Daniel Ursache-Dogariu, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011,2014
+# Eugenol Man <neatusebastian@gmail.com>, 2020
 # Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-01-07 10:52+0000\n"
-"Last-Translator: Razvan Stefanescu <razvan.stefanescu@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-07-15 11:21+0000\n"
+"Last-Translator: Eugenol Man <neatusebastian@gmail.com>\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -27,10 +29,8 @@ msgid "The base GIS field."
 msgstr "Câmpul GIS de bază."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
-"Câmpul Geometrie de bază -- mapat către tipul Geometrie din Specificația "
-"OpenGIS."
 
 msgid "Point"
 msgstr "Punct"
@@ -54,7 +54,7 @@ msgid "Geometry collection"
 msgstr "Colecție geometrie"
 
 msgid "Extent Aggregate Field"
-msgstr "Câmp de Agregare Extinsă"
+msgstr "Câmp agregat extins"
 
 msgid "Raster Field"
 msgstr "Câmp raster"
@@ -81,9 +81,6 @@ msgstr "Șterge toate Entitățile"
 msgid "WKT debugging window:"
 msgstr "Fereastra de depanare WKT:"
 
-msgid "Google Maps via GeoDjango"
-msgstr "Google Maps prin GeoDjango"
-
 msgid "Debugging window (serialized value)"
 msgstr "Fereastra de depanare (valoare serializată)"
 
@@ -91,5 +88,5 @@ msgid "No feeds are registered."
 msgstr "Nici un feed registrat."
 
 #, python-format
-msgid "Slug %r isn't registered."
-msgstr "Slugul %r nu este registrat."
+msgid "Slug %r isn’t registered."
+msgstr "Slug %r nu este înregistrat."

@@ -1,12 +1,15 @@
 import os
 import re
-import unittest
+from datetime import datetime
+from pathlib import Path
 
 from django.contrib.gis.gdal import (
-    GDAL_VERSION, DataSource, Envelope, GDALException, OGRGeometry,
-    OGRIndexError,
+    DataSource, Envelope, GDALException, OGRGeometry,
 )
-from django.contrib.gis.gdal.field import OFTInteger, OFTReal, OFTString
+from django.contrib.gis.gdal.field import (
+    OFTDateTime, OFTInteger, OFTReal, OFTString,
+)
+from django.test import SimpleTestCase
 
 from ..test_data import TEST_DATA, TestDS, get_ds_file
 
@@ -16,12 +19,9 @@ wgs_84_wkt = (
     '0.017453292519943295]]'
 )
 # Using a regex because of small differences depending on GDAL versions.
-# AUTHORITY part has been added in GDAL 2.2.
-wgs_84_wkt_regex = (
-    r'^GEOGCS\["GCS_WGS_1984",DATUM\["WGS_1984",SPHEROID\["WGS_(19)?84",'
-    r'6378137,298.257223563\]\],PRIMEM\["Greenwich",0\],UNIT\["Degree",'
-    r'0.017453292519943295\](,AUTHORITY\["EPSG","4326"\])?\]$'
-)
+wgs_84_wkt_regex = r'^GEOGCS\["(GCS_)?WGS[ _](19)?84".*$'
+
+datetime_format = '%Y-%m-%dT%H:%M:%S'
 
 # List of acceptable data sources.
 ds_list = (
@@ -39,7 +39,7 @@ ds_list = (
     ),
     TestDS(
         'test_vrt', ext='vrt', nfeat=3, nfld=3, geom='POINT', gtype='Point25D',
-        driver='OGR_VRT' if GDAL_VERSION >= (2, 0) else 'VRT',
+        driver='OGR_VRT',
         fields={
             'POINT_X': OFTString,
             'POINT_Y': OFTString,
@@ -59,13 +59,43 @@ ds_list = (
         fields={'float': OFTReal, 'int': OFTInteger, 'str': OFTString},
         extent=(-1.01513, -0.558245, 0.161876, 0.839637),  # Got extent from QGIS
         srs_wkt=wgs_84_wkt,
-    )
+    ),
+    TestDS(
+        'has_nulls', nfeat=3, nfld=6, geom='POLYGON', gtype=3,
+        driver='GeoJSON', ext='geojson',
+        fields={
+            'uuid': OFTString,
+            'name': OFTString,
+            'num': OFTReal,
+            'integer': OFTInteger,
+            'datetime': OFTDateTime,
+            'boolean': OFTInteger,
+        },
+        extent=(-75.274200, 39.846504, -74.959717, 40.119040),  # Got extent from QGIS
+        field_values={
+            'uuid': [
+                '1378c26f-cbe6-44b0-929f-eb330d4991f5',
+                'fa2ba67c-a135-4338-b924-a9622b5d869f',
+                '4494c1f3-55ab-4256-b365-12115cb388d5',
+            ],
+            'name': ['Philadelphia', None, 'north'],
+            'num': [1.001, None, 0.0],
+            'integer': [5, None, 8],
+            'boolean': [True, None, False],
+            'datetime': [
+                datetime.strptime('1994-08-14T11:32:14', datetime_format),
+                None,
+                datetime.strptime('2018-11-29T03:02:52', datetime_format),
+            ]
+        },
+        fids=range(3),
+    ),
 )
 
 bad_ds = (TestDS('foo'),)
 
 
-class DataSourceTest(unittest.TestCase):
+class DataSourceTest(SimpleTestCase):
 
     def test01_valid_shp(self):
         "Testing valid SHP Data Source files."
@@ -84,8 +114,17 @@ class DataSourceTest(unittest.TestCase):
             self.assertEqual(source.driver, str(ds.driver))
 
             # Making sure indexing works
-            with self.assertRaises(OGRIndexError):
-                ds[len(ds)]
+            msg = 'Index out of range when accessing layers in a datasource: %s.'
+            with self.assertRaisesMessage(IndexError, msg % len(ds)):
+                ds.__getitem__(len(ds))
+
+            with self.assertRaisesMessage(IndexError, 'Invalid OGR layer name given: invalid.'):
+                ds.__getitem__('invalid')
+
+    def test_ds_input_pathlib(self):
+        test_shp = Path(get_ds_file('test_point', 'shp'))
+        ds = DataSource(test_shp)
+        self.assertEqual(len(ds), 1)
 
     def test02_invalid_shp(self):
         "Testing invalid SHP files for the Data Source."
@@ -120,9 +159,9 @@ class DataSourceTest(unittest.TestCase):
                     self.assertIn(f, source.fields)
 
                 # Negative FIDs are not allowed.
-                with self.assertRaises(OGRIndexError):
+                with self.assertRaisesMessage(IndexError, 'Negative indices are not allowed on OGR Layers.'):
                     layer.__getitem__(-1)
-                with self.assertRaises(OGRIndexError):
+                with self.assertRaisesMessage(IndexError, 'Invalid feature id: 50000.'):
                     layer.__getitem__(50000)
 
                 if hasattr(source, 'field_values'):
@@ -138,6 +177,13 @@ class DataSourceTest(unittest.TestCase):
                         # the feature values here while in this loop.
                         for fld_name, fld_value in source.field_values.items():
                             self.assertEqual(fld_value[i], feat.get(fld_name))
+
+                        msg = 'Index out of range when accessing field in a feature: %s.'
+                        with self.assertRaisesMessage(IndexError, msg % len(feat)):
+                            feat.__getitem__(len(feat))
+
+                        with self.assertRaisesMessage(IndexError, 'Invalid OFT field name given: invalid.'):
+                            feat.__getitem__('invalid')
 
     def test03b_layer_slice(self):
         "Test indexing and slicing on Layers."

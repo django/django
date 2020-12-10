@@ -1,0 +1,191 @@
+=====================
+Constraints reference
+=====================
+
+.. module:: django.db.models.constraints
+
+.. currentmodule:: django.db.models
+
+The classes defined in this module create database constraints. They are added
+in the model :attr:`Meta.constraints <django.db.models.Options.constraints>`
+option.
+
+.. admonition:: Referencing built-in constraints
+
+    Constraints are defined in ``django.db.models.constraints``, but for
+    convenience they're imported into :mod:`django.db.models`. The standard
+    convention is to use ``from django.db import models`` and refer to the
+    constraints as ``models.<Foo>Constraint``.
+
+.. admonition:: Constraints in abstract base classes
+
+    You must always specify a unique name for the constraint. As such, you
+    cannot normally specify a constraint on an abstract base class, since the
+    :attr:`Meta.constraints <django.db.models.Options.constraints>` option is
+    inherited by subclasses, with exactly the same values for the attributes
+    (including ``name``) each time. To work around name collisions, part of the
+    name may contain ``'%(app_label)s'`` and ``'%(class)s'``, which are
+    replaced, respectively, by the lowercased app label and class name of the
+    concrete model. For example ``CheckConstraint(check=Q(age__gte=18),
+    name='%(app_label)s_%(class)s_is_adult')``.
+
+.. admonition:: Validation of Constraints
+
+    In general constraints are **not** checked during ``full_clean()``, and do
+    not raise ``ValidationError``\s. Rather you'll get a database integrity
+    error on ``save()``. ``UniqueConstraint``\s without a
+    :attr:`~UniqueConstraint.condition` (i.e. non-partial unique constraints)
+    are different in this regard, in that they leverage the existing
+    ``validate_unique()`` logic, and thus enable two-stage validation. In
+    addition to ``IntegrityError`` on ``save()``, ``ValidationError`` is also
+    raised during model validation when the ``UniqueConstraint`` is violated.
+
+``CheckConstraint``
+===================
+
+.. class:: CheckConstraint(*, check, name)
+
+    Creates a check constraint in the database.
+
+``check``
+---------
+
+.. attribute:: CheckConstraint.check
+
+A :class:`Q` object or boolean :class:`~django.db.models.Expression` that
+specifies the check you want the constraint to enforce.
+
+For example, ``CheckConstraint(check=Q(age__gte=18), name='age_gte_18')``
+ensures the age field is never less than 18.
+
+.. versionchanged:: 3.1
+
+    Support for boolean :class:`~django.db.models.Expression` was added.
+
+``name``
+--------
+
+.. attribute:: CheckConstraint.name
+
+The name of the constraint. You must always specify a unique name for the
+constraint.
+
+``UniqueConstraint``
+====================
+
+.. class:: UniqueConstraint(*, fields, name, condition=None, deferrable=None, include=None, opclasses=())
+
+    Creates a unique constraint in the database.
+
+``fields``
+----------
+
+.. attribute:: UniqueConstraint.fields
+
+A list of field names that specifies the unique set of columns you want the
+constraint to enforce.
+
+For example, ``UniqueConstraint(fields=['room', 'date'],
+name='unique_booking')`` ensures each room can only be booked once for each
+date.
+
+``name``
+--------
+
+.. attribute:: UniqueConstraint.name
+
+The name of the constraint. You must always specify a unique name for the
+constraint.
+
+``condition``
+-------------
+
+.. attribute:: UniqueConstraint.condition
+
+A :class:`Q` object that specifies the condition you want the constraint to
+enforce.
+
+For example::
+
+    UniqueConstraint(fields=['user'], condition=Q(status='DRAFT'), name='unique_draft_user')
+
+ensures that each user only has one draft.
+
+These conditions have the same database restrictions as
+:attr:`Index.condition`.
+
+``deferrable``
+--------------
+
+.. attribute:: UniqueConstraint.deferrable
+
+.. versionadded:: 3.1
+
+Set this parameter to create a deferrable unique constraint. Accepted values
+are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::
+
+    from django.db.models import Deferrable, UniqueConstraint
+
+    UniqueConstraint(
+        name='unique_order',
+        fields=['order'],
+        deferrable=Deferrable.DEFERRED,
+    )
+
+By default constraints are not deferred. A deferred constraint will not be
+enforced until the end of the transaction. An immediate constraint will be
+enforced immediately after every command.
+
+.. admonition:: MySQL, MariaDB, and SQLite.
+
+    Deferrable unique constraints are ignored on MySQL, MariaDB, and SQLite as
+    neither supports them.
+
+.. warning::
+
+    Deferred unique constraints may lead to a `performance penalty
+    <https://www.postgresql.org/docs/current/sql-createtable.html#id-1.9.3.85.9.4>`_.
+
+``include``
+-----------
+
+.. attribute:: UniqueConstraint.include
+
+.. versionadded:: 3.2
+
+A list or tuple of the names of the fields to be included in the covering
+unique index as non-key columns. This allows index-only scans to be used for
+queries that select only included fields (:attr:`~UniqueConstraint.include`)
+and filter only by unique fields (:attr:`~UniqueConstraint.fields`).
+
+For example::
+
+    UniqueConstraint(name='unique_booking', fields=['room', 'date'], include=['full_name'])
+
+will allow filtering on ``room`` and ``date``, also selecting ``full_name``,
+while fetching data only from the index.
+
+``include`` is supported only on PostgreSQL.
+
+Non-key columns have the same database restrictions as :attr:`Index.include`.
+
+
+``opclasses``
+-------------
+
+.. attribute:: UniqueConstraint.opclasses
+
+.. versionadded:: 3.2
+
+The names of the `PostgreSQL operator classes
+<https://www.postgresql.org/docs/current/indexes-opclass.html>`_ to use for
+this unique index. If you require a custom operator class, you must provide one
+for each field in the index.
+
+For example::
+
+    UniqueConstraint(name='unique_username', fields=['username'], opclasses=['varchar_pattern_ops'])
+
+creates a unique index on ``username`` using ``varchar_pattern_ops``.
+
+``opclasses`` are ignored for databases besides PostgreSQL.

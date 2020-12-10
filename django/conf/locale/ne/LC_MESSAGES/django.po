@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Claude Paroz <claude@2xlibre.net>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2014
 # Paras Nath Chaudhary <opnchaudhary@gmail.com>, 2012
-# Sagar Chalise <chalisesagar@gmail.com>, 2011-2012,2015
+# Sagar Chalise <chalisesagar@gmail.com>, 2011-2012,2015,2018
 # Sagar Chalise <chalisesagar@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 09:03+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-14 21:42+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,6 +25,9 @@ msgstr "अफ्रिकन"
 
 msgid "Arabic"
 msgstr "अरबिक"
+
+msgid "Algerian Arabic"
+msgstr ""
 
 msgid "Asturian"
 msgstr "अस्टुरियन"
@@ -139,11 +143,17 @@ msgstr "माथिल्लो सोर्बियन "
 msgid "Hungarian"
 msgstr "हन्गेरियन"
 
+msgid "Armenian"
+msgstr "अर्मेनियन"
+
 msgid "Interlingua"
 msgstr "ईन्टरलिन्गुवा"
 
 msgid "Indonesian"
 msgstr "इन्डोनेसियाली"
+
+msgid "Igbo"
+msgstr ""
 
 msgid "Ido"
 msgstr "आइडु"
@@ -160,6 +170,9 @@ msgstr "जापनिज"
 msgid "Georgian"
 msgstr "जर्जीयन"
 
+msgid "Kabyle"
+msgstr "कबायल"
+
 msgid "Kazakh"
 msgstr "कजाक"
 
@@ -167,10 +180,13 @@ msgid "Khmer"
 msgstr "ख्मेर"
 
 msgid "Kannada"
-msgstr "कन्नडा"
+msgstr "कन्नड"
 
 msgid "Korean"
 msgstr "कोरियाली"
+
+msgid "Kyrgyz"
+msgstr ""
 
 msgid "Luxembourgish"
 msgstr "लक्जेमबर्गेली"
@@ -256,8 +272,14 @@ msgstr "तामिल"
 msgid "Telugu"
 msgstr "तेलुगु"
 
+msgid "Tajik"
+msgstr ""
+
 msgid "Thai"
 msgstr "थाई"
+
+msgid "Turkmen"
+msgstr ""
 
 msgid "Turkish"
 msgstr "टर्किस"
@@ -273,6 +295,9 @@ msgstr "युक्रेनि"
 
 msgid "Urdu"
 msgstr "उर्दु"
+
+msgid "Uzbek"
+msgstr "उज्बेक"
 
 msgid "Vietnamese"
 msgstr "भियतनामी"
@@ -296,13 +321,13 @@ msgid "Syndication"
 msgstr "सिन्डिकेसन"
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "पृष्ठ नं अंक होइन ।"
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "पृष्ठ नं १ भन्दा कम भयो ।"
 
 msgid "That page contains no results"
-msgstr ""
+msgstr "पृष्ठमा नतिजा छैन ।"
 
 msgid "Enter a valid value."
 msgstr "उपयुक्त मान राख्नुहोस ।"
@@ -316,14 +341,15 @@ msgstr "उपयुक्त अंक राख्नुहोस ।"
 msgid "Enter a valid email address."
 msgstr "सही ई-मेल ठेगाना राख्नु होस ।"
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
-msgstr "अक्षर, अंक, _  र - भएका 'स्लग' मात्र हाल्नुहोस ।"
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
+msgstr ""
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
-msgstr "युनिकोड अक्षर, अंक, _  र - भएका मात्र मान्य 'स्लग' राख्नु होस ।"
+msgstr ""
 
 msgid "Enter a valid IPv4 address."
 msgstr "उपयुक्त IPv4 ठेगाना राख्नुहोस"
@@ -377,6 +403,9 @@ msgstr[1] ""
 "यो मान बढिमा पनि %(limit_value)d अक्षरहरु छ भन्ने निश्चित गर्नुहोस । (यसमा "
 "%(show_value)d छ ।)"
 
+msgid "Enter a number."
+msgstr "संख्या राख्नुहोस ।"
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -399,9 +428,12 @@ msgstr[1] "दशमलव अघि %(max)s भन्दा बढी अक्
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
+
+msgid "Null characters are not allowed."
+msgstr "शून्य मान अनुमति छैन।"
 
 msgid "and"
 msgstr "र"
@@ -436,19 +468,13 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr "फाँटको प्रकार: %(field_type)s"
 
-msgid "Integer"
-msgstr "अंक"
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr ""
 
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr "'%(value)s' अंक हुनु पर्छ ।"
-
-msgid "Big (8 byte) integer"
-msgstr "ठूलो (८ बाइटको) अंक"
-
-#, python-format
-msgid "'%(value)s' value must be either True or False."
-msgstr "%(value)s' को मान True अथवा False हुनुपर्दछ ।."
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "बुलियन (True अथवा False)"
@@ -462,28 +488,28 @@ msgstr "कम्माले छुट्याइएका अंकहरु 
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
-msgstr "'%(value)s' अमान्य मिति स्वरूप भयो । मिति YYYY-MM-DD स्वरूपको हुनु पर्दछ ।"
+msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
-msgstr "'%(value)s' (YYYY-MM-DD) स्वरूपको भए पनि मिति मिलेन ।"
+msgstr ""
 
 msgid "Date (without time)"
 msgstr "मिति (समय रहित)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
 
@@ -491,15 +517,15 @@ msgid "Date (with time)"
 msgstr "मिति (समय सहित)"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
-msgstr "'%(value)s' दशमलव  हुनु पर्छ ।"
+msgid "“%(value)s” value must be a decimal number."
+msgstr ""
 
 msgid "Decimal number"
 msgstr "दश्मलव संख्या"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
 
@@ -513,11 +539,21 @@ msgid "File path"
 msgstr "फाइलको मार्ग"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
-msgstr "'%(value)s' दशमलव   हुनु पर्छ ।"
+msgid "“%(value)s” value must be a float."
+msgstr ""
 
 msgid "Floating point number"
 msgstr "दश्मलव हुने संख्या"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr ""
+
+msgid "Integer"
+msgstr "अंक"
+
+msgid "Big (8 byte) integer"
+msgstr "ठूलो (८ बाइटको) अंक"
 
 msgid "IPv4 address"
 msgstr "आइ.पी.भी४ ठेगाना"
@@ -526,11 +562,14 @@ msgid "IP address"
 msgstr "IP ठेगाना"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
-msgstr "'%(value)s' को मान None, True अथवा False हुनुपर्दछ ।"
+msgid "“%(value)s” value must be either None, True or False."
+msgstr ""
 
 msgid "Boolean (Either True, False or None)"
 msgstr "बुलियन (True, False अथवा None)"
+
+msgid "Positive big integer"
+msgstr ""
 
 msgid "Positive integer"
 msgstr "सकारात्मक पूर्णांक"
@@ -550,13 +589,13 @@ msgstr "पाठ"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
 
@@ -570,14 +609,23 @@ msgid "Raw binary data"
 msgstr "र बाइनरी डाटा"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
-msgstr "'%(value)s' मान्य  UUID होइन ।"
+msgid "“%(value)s” is not a valid UUID."
+msgstr ""
+
+msgid "Universally unique identifier"
+msgstr ""
 
 msgid "File"
 msgstr "फाइल"
 
 msgid "Image"
 msgstr "चित्र"
+
+msgid "A JSON object"
+msgstr ""
+
+msgid "Value must be valid JSON."
+msgstr ""
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -612,9 +660,6 @@ msgstr "यो फाँट अनिवार्य छ ।"
 msgid "Enter a whole number."
 msgstr "संख्या राख्नुहोस ।"
 
-msgid "Enter a number."
-msgstr "संख्या राख्नुहोस ।"
-
 msgid "Enter a valid date."
 msgstr "उपयुक्त मिति राख्नुहोस ।"
 
@@ -626,6 +671,10 @@ msgstr "उपयुक्त मिति/समय राख्नुहोस
 
 msgid "Enter a valid duration."
 msgstr "उपयुक्त अवधि राख्नुहोस ।"
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "दिन गन्ती {min_days} र {max_days} बीचमा हुनु पर्छ । "
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "कुनै फाईल पेश गरिएको छैन । फारममा ईनकोडिङको प्रकार जाँच गर्नुहोस । "
@@ -669,6 +718,9 @@ msgstr "पुरा मान राख्नु होस ।"
 
 msgid "Enter a valid UUID."
 msgstr "उपयुक्त UUID राख्नु होस ।"
+
+msgid "Enter a valid JSON."
+msgstr ""
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -718,19 +770,19 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "कृपया तलका दोहोरिइका मानहरु सच्याउनुहोस ।"
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "भित्रि फोरेन की र अभिभावक प्राइमरी की मिलेन ।"
+msgid "The inline value did not match the parent instance."
+msgstr ""
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "उपयुक्त विकल्प छान्नुहोस ।  छानिएको विकल्प प्रस्तावित विकल्प होइन ।"
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\"  प्राइमरी  कि का  लागि मान्य छैन ।"
+msgid "“%(pk)s” is not a valid value."
+msgstr ""
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
 
@@ -752,8 +804,9 @@ msgstr "हुन्छ"
 msgid "No"
 msgstr "होइन"
 
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
-msgstr "हो, होइन, सायद"
+msgstr "हो,होइन,सायद"
 
 #, python-format
 msgid "%(size)d byte"
@@ -1014,8 +1067,8 @@ msgstr "यो उपयुक्त IPv6 ठेगाना होइन ।"
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "अथवा"
@@ -1060,9 +1113,6 @@ msgid_plural "%d minutes"
 msgstr[0] "%d मिनट"
 msgstr[1] "%d मिनटहरु"
 
-msgid "0 minutes"
-msgstr "० मिनट"
-
 msgid "Forbidden"
 msgstr "निषेधित"
 
@@ -1070,16 +1120,24 @@ msgid "CSRF verification failed. Request aborted."
 msgstr "CSRF प्रमाणीकरण भएन । अनुरोध विफल ।"
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
+msgstr ""
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
 msgstr ""
 
 msgid ""
@@ -1090,35 +1148,17 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
 
 msgid "More information is available with DEBUG=True."
 msgstr "DEBUG=True ले ज्यादा सुचना प्रदान गर्दछ ।"
 
-msgid "Welcome to Django"
-msgstr "Django स्वागत गर्दछ ।"
-
-msgid "It worked!"
-msgstr "कार्य सफल !"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Django ले बनाइएको प्रथम वेब पृष्ठको लागी तपाईँलाई शुभकामना ।"
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"सेटिङमा <code>DEBUG = True</code> राख्नाले यो सूचना देखी राख्नु भएको छ । अगाडि बढ्नु "
-"होस ।"
-
 msgid "No year specified"
 msgstr "साल तोकिएको छैन ।"
+
+msgid "Date out of range"
+msgstr "मिति मिलेन ।"
 
 msgid "No month specified"
 msgstr "महिना तोकिएको छैन ।"
@@ -1142,31 +1182,72 @@ msgstr ""
 "छैन ।"
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
-msgstr "मिति ढाँचा'%(format)s'को लागि अनुपयुक्त मिति '%(datestr)s'"
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr ""
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "%(verbose_name)s भेटिएन ।"
 
-msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "पृष्ठ अन्तिमा पनि होइन र अंकमा बदलिन पनि सकिदैन ।"
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr ""
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "रद्द पृष्ठ (%(page_number)s): %(message)s"
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr "'%(class_name)s.allow_empty' 'False' छ र लिस्ट पनि खालि छ । "
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr ""
 
 msgid "Directory indexes are not allowed here."
 msgstr "डाइरेक्टरी इन्डेक्सहरु यहाँ अनुमति छैन ।"
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" नभएको पाइयो ।"
+msgid "“%(path)s” does not exist"
+msgstr ""
 
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "%(directory)s को सूची"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "ज्याङ्गो : वेब साइट र एप्लिकेसन बनाउन सहयोगी औजार "
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"ज्याङ्गो %(version)s को परिवर्तन तथा विशेषता <a href=\"https://docs."
+"djangoproject.com/en/%(version)s/releases/\" target=\"_blank\" rel=\"noopener"
+"\">यहाँ हेर्नु होस</a>"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "बधाई छ । स्थापना भएको छ ।"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr "ज्याङ्गो दस्तावेज ।"
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr "मतदान एप उदाहरण "
+
+msgid "Get started with Django"
+msgstr "ज्याङ्गो सुरु गर्नु होस ।"
+
+msgid "Django Community"
+msgstr "ज्याङ्गो समुदाय"
+
+msgid "Connect, get help, or contribute"
+msgstr "सहयोग अथवा योगदान गरी जोडिनु होस"

@@ -2,8 +2,6 @@
 Useful auxiliary data structures for query construction. Not useful outside
 the SQL domain.
 """
-# for backwards-compatibility in Django 1.11
-from django.core.exceptions import EmptyResultSet  # NOQA: F401
 from django.db.models.sql.constants import INNER, LOUTER
 
 
@@ -41,7 +39,7 @@ class Join:
         - relabeled_clone()
     """
     def __init__(self, table_name, parent_alias, table_alias, join_type,
-                 join_field, nullable):
+                 join_field, nullable, filtered_relation=None):
         # Join table
         self.table_name = table_name
         self.parent_alias = parent_alias
@@ -56,6 +54,7 @@ class Join:
         self.join_field = join_field
         # Is this join nullabled?
         self.nullable = nullable
+        self.filtered_relation = filtered_relation
 
     def as_sql(self, compiler, connection):
         """
@@ -69,7 +68,7 @@ class Join:
         qn2 = connection.ops.quote_name
 
         # Add a join condition for each pair of joining columns.
-        for index, (lhs_col, rhs_col) in enumerate(self.join_cols):
+        for lhs_col, rhs_col in self.join_cols:
             join_conditions.append('%s.%s = %s.%s' % (
                 qn(self.parent_alias),
                 qn2(lhs_col),
@@ -85,7 +84,11 @@ class Join:
             extra_sql, extra_params = compiler.compile(extra_cond)
             join_conditions.append('(%s)' % extra_sql)
             params.extend(extra_params)
-
+        if self.filtered_relation:
+            extra_sql, extra_params = compiler.compile(self.filtered_relation)
+            if extra_sql:
+                join_conditions.append('(%s)' % extra_sql)
+                params.extend(extra_params)
         if not join_conditions:
             # This might be a rel on the other end of an actual declared field.
             declared_field = getattr(self.join_field, 'field', self.join_field)
@@ -101,18 +104,38 @@ class Join:
     def relabeled_clone(self, change_map):
         new_parent_alias = change_map.get(self.parent_alias, self.parent_alias)
         new_table_alias = change_map.get(self.table_alias, self.table_alias)
+        if self.filtered_relation is not None:
+            filtered_relation = self.filtered_relation.clone()
+            filtered_relation.path = [change_map.get(p, p) for p in self.filtered_relation.path]
+        else:
+            filtered_relation = None
         return self.__class__(
             self.table_name, new_parent_alias, new_table_alias, self.join_type,
-            self.join_field, self.nullable)
+            self.join_field, self.nullable, filtered_relation=filtered_relation,
+        )
+
+    @property
+    def identity(self):
+        return (
+            self.__class__,
+            self.table_name,
+            self.parent_alias,
+            self.join_field,
+            self.filtered_relation,
+        )
 
     def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return (
-                self.table_name == other.table_name and
-                self.parent_alias == other.parent_alias and
-                self.join_field == other.join_field
-            )
-        return False
+        if not isinstance(other, Join):
+            return NotImplemented
+        return self.identity == other.identity
+
+    def __hash__(self):
+        return hash(self.identity)
+
+    def equals(self, other, with_filtered_relation):
+        if with_filtered_relation:
+            return self == other
+        return self.identity[:-1] == other.identity[:-1]
 
     def demote(self):
         new = self.relabeled_clone({})
@@ -134,6 +157,7 @@ class BaseTable:
     """
     join_type = None
     parent_alias = None
+    filtered_relation = None
 
     def __init__(self, table_name, alias):
         self.table_name = table_name
@@ -146,3 +170,18 @@ class BaseTable:
 
     def relabeled_clone(self, change_map):
         return self.__class__(self.table_name, change_map.get(self.table_alias, self.table_alias))
+
+    @property
+    def identity(self):
+        return self.__class__, self.table_name, self.table_alias
+
+    def __eq__(self, other):
+        if not isinstance(other, BaseTable):
+            return NotImplemented
+        return self.identity == other.identity
+
+    def __hash__(self):
+        return hash(self.identity)
+
+    def equals(self, other, with_filtered_relation):
+        return self.identity == other.identity

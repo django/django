@@ -19,7 +19,7 @@ class MakeListTests(SimpleTestCase):
     @setup({'make_list02': '{{ a|make_list }}'})
     def test_make_list02(self):
         output = self.engine.render_to_string('make_list02', {"a": mark_safe("&")})
-        self.assertEqual(output, "[&#39;&amp;&#39;]")
+        self.assertEqual(output, '[&#x27;&amp;&#x27;]')
 
     @setup({'make_list03': '{% autoescape off %}{{ a|make_list|stringformat:"s"|safe }}{% endautoescape %}'})
     def test_make_list03(self):

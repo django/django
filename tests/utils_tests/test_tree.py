@@ -19,6 +19,21 @@ class NodeTests(unittest.TestCase):
                          "<Node: (DEFAULT: ('a', 1), ('b', 2))>")
         self.assertEqual(repr(self.node2), "<Node: (DEFAULT: )>")
 
+    def test_hash(self):
+        node3 = Node(self.node1_children, negated=True)
+        node4 = Node(self.node1_children, connector='OTHER')
+        node5 = Node(self.node1_children)
+        node6 = Node([['a', 1], ['b', 2]])
+        node7 = Node([('a', [1, 2])])
+        node8 = Node([('a', (1, 2))])
+        self.assertNotEqual(hash(self.node1), hash(self.node2))
+        self.assertNotEqual(hash(self.node1), hash(node3))
+        self.assertNotEqual(hash(self.node1), hash(node4))
+        self.assertEqual(hash(self.node1), hash(node5))
+        self.assertEqual(hash(self.node1), hash(node6))
+        self.assertEqual(hash(self.node2), hash(Node()))
+        self.assertEqual(hash(node7), hash(node8))
+
     def test_len(self):
         self.assertEqual(len(self.node1), 2)
         self.assertEqual(len(self.node2), 0)

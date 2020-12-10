@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext, gettext_lazy as _
 
 
@@ -9,7 +10,7 @@ class FlatpageForm(forms.ModelForm):
         label=_("URL"),
         max_length=100,
         regex=r'^[-\w/\.~]+$',
-        help_text=_("Example: '/about/contact/'. Make sure to have leading and trailing slashes."),
+        help_text=_('Example: “/about/contact/”. Make sure to have leading and trailing slashes.'),
         error_messages={
             "invalid": _(
                 "This value must contain only letters, numbers, dots, "
@@ -22,17 +23,28 @@ class FlatpageForm(forms.ModelForm):
         model = FlatPage
         fields = '__all__'
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self._trailing_slash_required():
+            self.fields['url'].help_text = _(
+                'Example: “/about/contact”. Make sure to have a leading slash.'
+            )
+
+    def _trailing_slash_required(self):
+        return (
+            settings.APPEND_SLASH and
+            'django.middleware.common.CommonMiddleware' in settings.MIDDLEWARE
+        )
+
     def clean_url(self):
         url = self.cleaned_data['url']
         if not url.startswith('/'):
-            raise forms.ValidationError(
+            raise ValidationError(
                 gettext("URL is missing a leading slash."),
                 code='missing_leading_slash',
             )
-        if (settings.APPEND_SLASH and
-                'django.middleware.common.CommonMiddleware' in settings.MIDDLEWARE and
-                not url.endswith('/')):
-            raise forms.ValidationError(
+        if self._trailing_slash_required() and not url.endswith('/'):
+            raise ValidationError(
                 gettext("URL is missing a trailing slash."),
                 code='missing_trailing_slash',
             )
@@ -49,7 +61,7 @@ class FlatpageForm(forms.ModelForm):
         if sites and same_url.filter(sites__in=sites).exists():
             for site in sites:
                 if same_url.filter(sites=site).exists():
-                    raise forms.ValidationError(
+                    raise ValidationError(
                         _('Flatpage with url %(url)s already exists for site %(site)s'),
                         code='duplicate_url',
                         params={'url': url, 'site': site},

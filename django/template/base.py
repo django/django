@@ -3,9 +3,10 @@ This is the Django template system.
 
 How it works:
 
-The Lexer.tokenize() function converts a template string (i.e., a string containing
-markup with custom template tags) to tokens, which can be either plain text
-(TOKEN_TEXT), variables (TOKEN_VAR) or block statements (TOKEN_BLOCK).
+The Lexer.tokenize() method converts a template string (i.e., a string
+containing markup with custom template tags) to tokens, which can be either
+plain text (TokenType.TEXT), variables (TokenType.VAR), or block statements
+(TokenType.BLOCK).
 
 The Parser() class takes a list of tokens in its constructor, and its parse()
 method returns a compiled template -- which is, under the hood, a list of
@@ -49,15 +50,15 @@ times with multiple contexts)
 '<html></html>'
 """
 
+import inspect
 import logging
 import re
-from inspect import getcallargs, getfullargspec
+from enum import Enum
 
-from django.template.context import (  # NOQA: imported for backwards compatibility
-    BaseContext, Context, ContextPopException, RequestContext,
-)
+from django.template.context import BaseContext
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import SafeData, mark_safe
 from django.utils.text import (
     get_text_list, smart_split, unescape_string_literal,
@@ -66,17 +67,6 @@ from django.utils.timezone import template_localtime
 from django.utils.translation import gettext_lazy, pgettext_lazy
 
 from .exceptions import TemplateSyntaxError
-
-TOKEN_TEXT = 0
-TOKEN_VAR = 1
-TOKEN_BLOCK = 2
-TOKEN_COMMENT = 3
-TOKEN_MAPPING = {
-    TOKEN_TEXT: 'Text',
-    TOKEN_VAR: 'Var',
-    TOKEN_BLOCK: 'Block',
-    TOKEN_COMMENT: 'Comment',
-}
 
 # template syntax constants
 FILTER_SEPARATOR = '|'
@@ -98,12 +88,19 @@ UNKNOWN_SOURCE = '<unknown source>'
 
 # match a variable or block tag and capture the entire tag, including start/end
 # delimiters
-tag_re = (re.compile('(%s.*?%s|%s.*?%s|%s.*?%s)' %
+tag_re = (_lazy_re_compile('(%s.*?%s|%s.*?%s|%s.*?%s)' %
           (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END),
            re.escape(VARIABLE_TAG_START), re.escape(VARIABLE_TAG_END),
            re.escape(COMMENT_TAG_START), re.escape(COMMENT_TAG_END))))
 
 logger = logging.getLogger('django.template')
+
+
+class TokenType(Enum):
+    TEXT = 0
+    VAR = 1
+    BLOCK = 2
+    COMMENT = 3
 
 
 class VariableDoesNotExist(Exception):
@@ -126,10 +123,8 @@ class Origin:
         return self.name
 
     def __eq__(self, other):
-        if not isinstance(other, Origin):
-            return False
-
         return (
+            isinstance(other, Origin) and
             self.name == other.name and
             self.loader == other.loader
         )
@@ -156,7 +151,7 @@ class Template:
         self.name = name
         self.origin = origin
         self.engine = engine
-        self.source = template_string
+        self.source = str(template_string)  # May be lazy.
         self.nodelist = self.compile_nodelist()
 
     def __iter__(self):
@@ -180,7 +175,7 @@ class Template:
         """
         Parse and compile the template source into a nodelist. If debug
         is True and an exception occurs during parsing, the exception is
-        is annotated with contextual line information where it occurred in the
+        annotated with contextual line information where it occurred in the
         template source.
         """
         if self.engine.debug:
@@ -295,7 +290,7 @@ class Token:
         A token representing a string from the template.
 
         token_type
-            One of TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK, or TOKEN_COMMENT.
+            A TokenType, either .TEXT, .VAR, .BLOCK, or .COMMENT.
 
         contents
             The token source string.
@@ -314,7 +309,7 @@ class Token:
         self.position = position
 
     def __str__(self):
-        token_name = TOKEN_MAPPING[self.token_type]
+        token_name = self.token_type.name.capitalize()
         return ('<%s token: "%s...">' %
                 (token_name, self.contents[:20].replace('\n', '')))
 
@@ -369,19 +364,18 @@ class Lexer:
                 self.verbatim = False
         if in_tag and not self.verbatim:
             if token_string.startswith(VARIABLE_TAG_START):
-                token = Token(TOKEN_VAR, token_string[2:-2].strip(), position, lineno)
+                return Token(TokenType.VAR, token_string[2:-2].strip(), position, lineno)
             elif token_string.startswith(BLOCK_TAG_START):
                 if block_content[:9] in ('verbatim', 'verbatim '):
                     self.verbatim = 'end%s' % block_content
-                token = Token(TOKEN_BLOCK, block_content, position, lineno)
+                return Token(TokenType.BLOCK, block_content, position, lineno)
             elif token_string.startswith(COMMENT_TAG_START):
                 content = ''
                 if token_string.find(TRANSLATOR_COMMENT_MARK):
                     content = token_string[2:-2].strip()
-                token = Token(TOKEN_COMMENT, content, position, lineno)
+                return Token(TokenType.COMMENT, content, position, lineno)
         else:
-            token = Token(TOKEN_TEXT, token_string, position, lineno)
-        return token
+            return Token(TokenType.TEXT, token_string, position, lineno)
 
 
 class DebugLexer(Lexer):
@@ -400,7 +394,6 @@ class DebugLexer(Lexer):
                 token_string = self.template_string[upto:start]
                 result.append(self.create_token(token_string, (upto, start), lineno, in_tag=False))
                 lineno += token_string.count('\n')
-                upto = start
             token_string = self.template_string[start:end]
             result.append(self.create_token(token_string, (start, end), lineno, in_tag=True))
             lineno += token_string.count('\n')
@@ -413,7 +406,9 @@ class DebugLexer(Lexer):
 
 class Parser:
     def __init__(self, tokens, libraries=None, builtins=None, origin=None):
-        self.tokens = tokens
+        # Reverse the tokens so delete_first_token(), prepend_token(), and
+        # next_token() can operate at the end of the list in constant time.
+        self.tokens = list(reversed(tokens))
         self.tags = {}
         self.filters = {}
         self.command_stack = []
@@ -442,10 +437,10 @@ class Parser:
         nodelist = NodeList()
         while self.tokens:
             token = self.next_token()
-            # Use the raw values here for TOKEN_* for a tiny performance boost.
-            if token.token_type == 0:  # TOKEN_TEXT
+            # Use the raw values here for TokenType.* for a tiny performance boost.
+            if token.token_type.value == 0:  # TokenType.TEXT
                 self.extend_nodelist(nodelist, TextNode(token.contents), token)
-            elif token.token_type == 1:  # TOKEN_VAR
+            elif token.token_type.value == 1:  # TokenType.VAR
                 if not token.contents:
                     raise self.error(token, 'Empty variable tag on line %d' % token.lineno)
                 try:
@@ -454,7 +449,7 @@ class Parser:
                     raise self.error(token, e)
                 var_node = VariableNode(filter_expression)
                 self.extend_nodelist(nodelist, var_node, token)
-            elif token.token_type == 2:  # TOKEN_BLOCK
+            elif token.token_type.value == 2:  # TokenType.BLOCK
                 try:
                     command = token.contents.split()[0]
                 except IndexError:
@@ -491,7 +486,7 @@ class Parser:
     def skip_past(self, endtag):
         while self.tokens:
             token = self.next_token()
-            if token.token_type == TOKEN_BLOCK and token.contents == endtag:
+            if token.token_type == TokenType.BLOCK and token.contents == endtag:
                 return
         self.unclosed_block_tag([endtag])
 
@@ -549,13 +544,13 @@ class Parser:
         raise self.error(token, msg)
 
     def next_token(self):
-        return self.tokens.pop(0)
+        return self.tokens.pop()
 
     def prepend_token(self, token):
-        self.tokens.insert(0, token)
+        self.tokens.append(token)
 
     def delete_first_token(self):
-        del self.tokens[0]
+        del self.tokens[-1]
 
     def add_library(self, lib):
         self.tags.update(lib.tags)
@@ -609,7 +604,7 @@ filter_raw_string = r"""
     'arg_sep': re.escape(FILTER_ARGUMENT_SEPARATOR),
 }
 
-filter_re = re.compile(filter_raw_string, re.VERBOSE)
+filter_re = _lazy_re_compile(filter_raw_string, re.VERBOSE)
 
 
 class FilterExpression:
@@ -640,7 +635,7 @@ class FilterExpression:
                                           (token[:upto], token[upto:start],
                                            token[start:]))
             if var_obj is None:
-                var, constant = match.group("var", "constant")
+                var, constant = match['var'], match['constant']
                 if constant:
                     try:
                         var_obj = Variable(constant).resolve({})
@@ -652,9 +647,9 @@ class FilterExpression:
                 else:
                     var_obj = Variable(var)
             else:
-                filter_name = match.group("filter_name")
+                filter_name = match['filter_name']
                 args = []
-                constant_arg, var_arg = match.group("constant_arg", "var_arg")
+                constant_arg, var_arg = match['constant_arg'], match['var_arg']
                 if constant_arg:
                     args.append((False, Variable(constant_arg).resolve({})))
                 elif var_arg:
@@ -712,9 +707,9 @@ class FilterExpression:
         # First argument, filter input, is implied.
         plen = len(provided) + 1
         # Check to see if a decorator is providing the real function.
-        func = getattr(func, '_decorated_function', func)
+        func = inspect.unwrap(func)
 
-        args, _, _, defaults, _, _, _ = getfullargspec(func)
+        args, _, _, defaults, _, _, _ = inspect.getfullargspec(func)
         alen = len(args)
         dlen = len(defaults or [])
         # Not enough OR Too many
@@ -764,17 +759,16 @@ class Variable:
             # Note that this could cause an OverflowError here that we're not
             # catching. Since this should only happen at compile time, that's
             # probably OK.
-            self.literal = float(var)
 
-            # So it's a float... is it an int? If the original value contained a
-            # dot or an "e" then it was a float, not an int.
-            if '.' not in var and 'e' not in var.lower():
-                self.literal = int(self.literal)
-
-            # "2." is invalid
-            if var.endswith('.'):
-                raise ValueError
-
+            # Try to interpret values containing a period or an 'e'/'E'
+            # (possibly scientific notation) as a float;  otherwise, try int.
+            if '.' in var or 'e' in var.lower():
+                self.literal = float(var)
+                # "2." is invalid
+                if var.endswith('.'):
+                    raise ValueError
+            else:
+                self.literal = int(var)
         except ValueError:
             # A ValueError means that the variable isn't a number.
             if var.startswith('_(') and var.endswith(')'):
@@ -863,8 +857,9 @@ class Variable:
                         try:  # method call (assuming no args required)
                             current = current()
                         except TypeError:
+                            signature = inspect.signature(current)
                             try:
-                                getcallargs(current)
+                                signature.bind()
                             except TypeError:  # arguments *were* required
                                 current = context.template.engine.string_if_invalid  # invalid method call
                             else:
@@ -1000,7 +995,7 @@ class VariableNode(Node):
 
 
 # Regex for token keyword arguments
-kwarg_re = re.compile(r"(?:(\w+)=)?(.+)")
+kwarg_re = _lazy_re_compile(r"(?:(\w+)=)?(.+)")
 
 
 def token_kwargs(bits, parser, support_legacy=False):
@@ -1022,7 +1017,7 @@ def token_kwargs(bits, parser, support_legacy=False):
     if not bits:
         return {}
     match = kwarg_re.match(bits[0])
-    kwarg_format = match and match.group(1)
+    kwarg_format = match and match[1]
     if not kwarg_format:
         if not support_legacy:
             return {}
@@ -1033,7 +1028,7 @@ def token_kwargs(bits, parser, support_legacy=False):
     while bits:
         if kwarg_format:
             match = kwarg_re.match(bits[0])
-            if not match or not match.group(1):
+            if not match or not match[1]:
                 return kwargs
             key, value = match.groups()
             del bits[:1]

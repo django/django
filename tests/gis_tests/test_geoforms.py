@@ -1,11 +1,10 @@
 import re
 
 from django.contrib.gis import forms
-from django.contrib.gis.forms import BaseGeometryWidget
+from django.contrib.gis.forms import BaseGeometryWidget, OpenLayersWidget
 from django.contrib.gis.geos import GEOSGeometry
-from django.forms import ValidationError
+from django.core.exceptions import ValidationError
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import patch_logger
 from django.utils.html import escape
 
 
@@ -29,17 +28,18 @@ class GeometryFieldTest(SimpleTestCase):
         # Making the field in a different SRID from that of the geometry, and
         # asserting it transforms.
         fld = forms.GeometryField(srid=32140)
-        tol = 0.0000001
+        tol = 0.0001
         xform_geom = GEOSGeometry('POINT (951640.547328465 4219369.26171664)', srid=32140)
-        # The cleaned geometry should be transformed to 32140.
-        cleaned_geom = fld.clean('SRID=4326;POINT (-95.363151 29.763374)')
+        # The cleaned geometry is transformed to 32140 (the widget map_srid is 3857).
+        cleaned_geom = fld.clean('SRID=3857;POINT (-10615777.40976205 3473169.895707852)')
+        self.assertEqual(cleaned_geom.srid, 32140)
         self.assertTrue(xform_geom.equals_exact(cleaned_geom, tol))
 
     def test_null(self):
         "Testing GeometryField's handling of null (None) geometries."
         # Form fields, by default, are required (`required=True`)
         fld = forms.GeometryField()
-        with self.assertRaisesMessage(forms.ValidationError, "No geometry value provided."):
+        with self.assertRaisesMessage(ValidationError, "No geometry value provided."):
             fld.clean(None)
 
         # This will clean None as a geometry (See #10660).
@@ -64,24 +64,41 @@ class GeometryFieldTest(SimpleTestCase):
             pnt_fld.to_python('LINESTRING(0 0, 1 1)')
         )
         # but rejected by `clean`
-        with self.assertRaises(forms.ValidationError):
+        with self.assertRaises(ValidationError):
             pnt_fld.clean('LINESTRING(0 0, 1 1)')
 
     def test_to_python(self):
         """
-        Testing to_python returns a correct GEOSGeometry object or
-        a ValidationError
+        to_python() either returns a correct GEOSGeometry object or
+        a ValidationError.
         """
+        good_inputs = [
+            'POINT(5 23)',
+            'MULTIPOLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))',
+            'LINESTRING(0 0, 1 1)',
+        ]
+        bad_inputs = [
+            'POINT(5)',
+            'MULTI   POLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))',
+            'BLAH(0 0, 1 1)',
+            '{"type": "FeatureCollection", "features": ['
+            '{"geometry": {"type": "Point", "coordinates": [508375, 148905]}, "type": "Feature"}]}',
+        ]
         fld = forms.GeometryField()
         # to_python returns the same GEOSGeometry for a WKT
-        for wkt in ('POINT(5 23)', 'MULTIPOLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'LINESTRING(0 0, 1 1)'):
-            with self.subTest(wkt=wkt):
-                self.assertEqual(GEOSGeometry(wkt, srid=fld.widget.map_srid), fld.to_python(wkt))
+        for geo_input in good_inputs:
+            with self.subTest(geo_input=geo_input):
+                self.assertEqual(GEOSGeometry(geo_input, srid=fld.widget.map_srid), fld.to_python(geo_input))
         # but raises a ValidationError for any other string
-        for wkt in ('POINT(5)', 'MULTI   POLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'BLAH(0 0, 1 1)'):
-            with self.subTest(wkt=wkt):
-                with self.assertRaises(forms.ValidationError):
-                    fld.to_python(wkt)
+        for geo_input in bad_inputs:
+            with self.subTest(geo_input=geo_input):
+                with self.assertRaises(ValidationError):
+                    fld.to_python(geo_input)
+
+    def test_to_python_different_map_srid(self):
+        f = forms.GeometryField(widget=OpenLayersWidget)
+        json = '{ "type": "Point", "coordinates": [ 5.0, 23.0 ] }'
+        self.assertEqual(GEOSGeometry('POINT(5 23)', srid=f.widget.map_srid), f.to_python(json))
 
     def test_field_with_text_widget(self):
         class PointForm(forms.Form):
@@ -91,6 +108,8 @@ class GeometryFieldTest(SimpleTestCase):
         cleaned_pt = form.fields['pt'].clean('POINT(5 23)')
         self.assertEqual(cleaned_pt, GEOSGeometry('POINT(5 23)', srid=4326))
         self.assertEqual(4326, cleaned_pt.srid)
+        with self.assertRaisesMessage(ValidationError, 'Invalid geometry value.'):
+            form.fields['pt'].clean('POINT(5)')
 
         point = GEOSGeometry('SRID=4326;POINT(5 23)')
         form = PointForm(data={'pt': 'POINT(5 23)'}, initial={'pt': point})
@@ -112,12 +131,12 @@ class GeometryFieldTest(SimpleTestCase):
             'pt3': 'PNT(0)',  # invalid
         })
 
-        with patch_logger('django.contrib.gis', 'error') as logger_calls:
+        with self.assertLogs('django.contrib.gis', 'ERROR') as logger_calls:
             output = str(form)
 
         # The first point can't use assertInHTML() due to non-deterministic
         # ordering of the rendered dictionary.
-        pt1_serialized = re.search(r'<textarea [^>]*>({[^<]+})<', output).groups()[0]
+        pt1_serialized = re.search(r'<textarea [^>]*>({[^<]+})<', output)[1]
         pt1_json = pt1_serialized.replace('&quot;', '"')
         pt1_expected = GEOSGeometry(form.data['pt1']).transform(3857, clone=True)
         self.assertJSONEqual(pt1_json, pt1_expected.json)
@@ -132,10 +151,11 @@ class GeometryFieldTest(SimpleTestCase):
             ' rows="10" name="pt3"></textarea>',
             output
         )
-        # Only the invalid PNT(0) should trigger an error log entry
-        self.assertEqual(len(logger_calls), 1)
+        # Only the invalid PNT(0) triggers an error log entry.
+        # Deserialization is called in form clean and in widget rendering.
+        self.assertEqual(len(logger_calls.records), 2)
         self.assertEqual(
-            logger_calls[0],
+            logger_calls.records[0].getMessage(),
             "Error creating geometry from value 'PNT(0)' (String input "
             "unrecognized as WKT EWKT, and HEXEWKB.)"
         )
@@ -215,7 +235,7 @@ class SpecializedFieldTest(SimpleTestCase):
         ogr.transform(3857)
         self.assertIn(escape(ogr.json), rendered)
 
-    # map_srid in operlayers.html template must not be localized.
+    # map_srid in openlayers.html template must not be localized.
     @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
     def test_pointfield(self):
         class PointForm(forms.Form):
@@ -354,10 +374,18 @@ class OSMWidgetTest(SimpleTestCase):
 class GeometryWidgetTests(SimpleTestCase):
 
     def test_get_context_attrs(self):
-        """The Widget.get_context() attrs argument overrides self.attrs."""
+        # The Widget.get_context() attrs argument overrides self.attrs.
         widget = BaseGeometryWidget(attrs={'geom_type': 'POINT'})
         context = widget.get_context('point', None, attrs={'geom_type': 'POINT2'})
         self.assertEqual(context['geom_type'], 'POINT2')
+        # Widget.get_context() returns expected name for geom_type.
+        widget = BaseGeometryWidget(attrs={'geom_type': 'POLYGON'})
+        context = widget.get_context('polygon', None, None)
+        self.assertEqual(context['geom_type'], 'Polygon')
+        # Widget.get_context() returns 'Geometry' instead of 'Unknown'.
+        widget = BaseGeometryWidget(attrs={'geom_type': 'GEOMETRY'})
+        context = widget.get_context('geometry', None, None)
+        self.assertEqual(context['geom_type'], 'Geometry')
 
     def test_subwidgets(self):
         widget = forms.BaseGeometryWidget()

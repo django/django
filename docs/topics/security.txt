@@ -10,7 +10,7 @@ on securing a Django-powered site.
 Cross site scripting (XSS) protection
 =====================================
 
-.. highlightlang:: html+django
+.. highlight:: html+django
 
 XSS attacks allow a user to inject client side scripts into the browsers of
 other users. This is usually achieved by storing the malicious scripts in the
@@ -66,10 +66,10 @@ this if you know what you are doing. There are other :ref:`limitations
 control.
 
 :ref:`CSRF protection works <how-csrf-works>` by checking for a secret in each
-POST request. This ensures that a malicious user cannot simply "replay" a form
-POST to your website and have another logged in user unwittingly submit that
-form. The malicious user would have to know the secret, which is user specific
-(using a cookie).
+POST request. This ensures that a malicious user cannot "replay" a form POST to
+your website and have another logged in user unwittingly submit that form. The
+malicious user would have to know the secret, which is user specific (using a
+cookie).
 
 When deployed with :ref:`HTTPS <security-recommendation-ssl>`,
 ``CsrfViewMiddleware`` will check that the HTTP referer header is set to a
@@ -90,14 +90,17 @@ SQL injection is a type of attack where a malicious user is able to execute
 arbitrary SQL code on a database. This can result in records
 being deleted or data leakage.
 
-By using Django's querysets, the resulting SQL will be properly escaped by
-the underlying database driver. However, Django also gives developers power to
-write :ref:`raw queries <executing-raw-queries>` or execute
-:ref:`custom sql <executing-custom-sql>`. These capabilities should be used
-sparingly and you should always be careful to properly escape any parameters
-that the user can control. In addition, you should exercise caution when using
-:meth:`~django.db.models.query.QuerySet.extra` and
-:class:`~django.db.models.expressions.RawSQL`.
+Django's querysets are protected from SQL injection since their queries are
+constructed using query parameterization. A query's SQL code is defined
+separately from the query's parameters. Since parameters may be user-provided
+and therefore unsafe, they are escaped by the underlying database driver.
+
+Django also gives developers power to write :ref:`raw queries
+<executing-raw-queries>` or execute :ref:`custom sql <executing-custom-sql>`.
+These capabilities should be used sparingly and you should always be careful to
+properly escape any parameters that the user can control. In addition, you
+should exercise caution when using :meth:`~django.db.models.query.QuerySet.extra`
+and :class:`~django.db.models.expressions.RawSQL`.
 
 Clickjacking protection
 =======================
@@ -201,6 +204,15 @@ Additionally, Django requires you to explicitly enable support for the
 ``X-Forwarded-Host`` header (via the :setting:`USE_X_FORWARDED_HOST` setting)
 if your configuration requires it.
 
+Referrer policy
+===============
+
+Browsers use the ``Referer`` header as a way to send information to a site
+about how users got there. By setting a *Referrer Policy* you can help to
+protect the privacy of your users, restricting under which circumstances the
+``Referer`` header is set. See :ref:`the referrer policy section of the
+security middleware reference <referrer-policy>` for details.
+
 Session security
 ================
 
@@ -241,7 +253,7 @@ User-uploaded content
   validate all user uploaded file content, however, there are some other steps
   you can take to mitigate these attacks:
 
-  1. One class of attacks can be prevented by always serving user uploaded
+  #. One class of attacks can be prevented by always serving user uploaded
      content from a distinct top-level or second-level domain. This prevents
      any exploit blocked by `same-origin policy`_ protections such as cross
      site scripting. For example, if your site runs on ``example.com``, you
@@ -249,7 +261,7 @@ User-uploaded content
      from something like ``usercontent-example.com``. It's *not* sufficient to
      serve content from a subdomain like ``usercontent.example.com``.
 
-  2. Beyond this, applications may choose to define a whitelist of allowable
+  #. Beyond this, applications may choose to define a list of allowable
      file extensions for user uploaded files and configure the web server
      to only serve such files.
 
@@ -278,6 +290,9 @@ security protection of the Web server, operating system and other components.
   list`_ which identifies some common vulnerabilities in web applications. While
   Django has tools to address some of the issues, other issues must be
   accounted for in the design of your project.
+* Mozilla discusses various topics regarding `web security`_. Their
+  pages also include security principles that apply to any system.
 
 .. _LimitRequestBody: https://httpd.apache.org/docs/2.4/mod/core.html#limitrequestbody
-.. _Top 10 list: https://www.owasp.org/index.php/Top_10_2013-Top_10
+.. _Top 10 list: https://owasp.org/www-project-top-ten/OWASP_Top_Ten_2017/
+.. _web security: https://infosec.mozilla.org/guidelines/web_security.html

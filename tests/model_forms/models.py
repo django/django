@@ -11,18 +11,6 @@ from django.db import models
 temp_storage_dir = tempfile.mkdtemp()
 temp_storage = FileSystemStorage(temp_storage_dir)
 
-ARTICLE_STATUS = (
-    (1, 'Draft'),
-    (2, 'Pending'),
-    (3, 'Live'),
-)
-
-ARTICLE_STATUS_CHAR = (
-    ('d', 'Draft'),
-    ('p', 'Pending'),
-    ('l', 'Live'),
-)
-
 
 class Person(models.Model):
     name = models.CharField(max_length=100)
@@ -40,8 +28,17 @@ class Category(models.Model):
         return self.__str__()
 
 
+class WriterManager(models.Manager):
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(archived=False)
+
+
 class Writer(models.Model):
     name = models.CharField(max_length=50, help_text='Use both first and last names.')
+    archived = models.BooleanField(default=False, editable=False)
+
+    objects = WriterManager()
 
     class Meta:
         ordering = ('name',)
@@ -51,6 +48,11 @@ class Writer(models.Model):
 
 
 class Article(models.Model):
+    ARTICLE_STATUS = (
+        (1, 'Draft'),
+        (2, 'Pending'),
+        (3, 'Live'),
+    )
     headline = models.CharField(max_length=50)
     slug = models.SlugField()
     pub_date = models.DateField()
@@ -151,7 +153,7 @@ class CustomFF(models.Model):
 
 
 class FilePathModel(models.Model):
-    path = models.FilePathField(path=os.path.dirname(__file__), match=r".*\.py$", blank=True)
+    path = models.FilePathField(path=os.path.dirname(__file__), match='models.py', blank=True)
 
 
 try:
@@ -222,11 +224,11 @@ class Price(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField()
 
-    def __str__(self):
-        return "%s for %s" % (self.quantity, self.price)
-
     class Meta:
         unique_together = (('price', 'quantity'),)
+
+    def __str__(self):
+        return "%s for %s" % (self.quantity, self.price)
 
 
 class Triple(models.Model):
@@ -239,6 +241,11 @@ class Triple(models.Model):
 
 
 class ArticleStatus(models.Model):
+    ARTICLE_STATUS_CHAR = (
+        ('d', 'Draft'),
+        ('p', 'Pending'),
+        ('l', 'Live'),
+    )
     status = models.CharField(max_length=2, choices=ARTICLE_STATUS_CHAR, blank=True, null=True)
 
 
@@ -395,15 +402,23 @@ class Character(models.Model):
     username = models.CharField(max_length=100)
     last_action = models.DateTimeField()
 
+    def __str__(self):
+        return self.username
+
 
 class StumpJoke(models.Model):
     most_recently_fooled = models.ForeignKey(
         Character,
         models.CASCADE,
         limit_choices_to=today_callable_dict,
-        related_name="+",
+        related_name='jokes',
     )
-    has_fooled_today = models.ManyToManyField(Character, limit_choices_to=today_callable_q, related_name="+")
+    has_fooled_today = models.ManyToManyField(
+        Character,
+        limit_choices_to=today_callable_q,
+        related_name='jokes_today',
+    )
+    funny = models.BooleanField(default=False)
 
 
 # Model for #13776
@@ -462,3 +477,6 @@ class Award(models.Model):
 
 class NullableUniqueCharFieldModel(models.Model):
     codename = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    email = models.EmailField(blank=True, null=True)
+    slug = models.SlugField(blank=True, null=True)
+    url = models.URLField(blank=True, null=True)

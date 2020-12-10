@@ -1,14 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Branko Kokanovic <branko@kokanovic.org>, 2018
+# Igor Jerosimić, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-21 20:01+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -19,30 +21,30 @@ msgstr ""
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "Redirects"
-msgstr ""
+msgstr "Преусмеравања"
 
 msgid "site"
-msgstr ""
+msgstr "сајт"
 
 msgid "redirect from"
 msgstr "преусмерен са"
 
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
 msgstr ""
-"Ово мора бити апсолутна путања без имена домена. На пример: '/events/"
-"search/'."
+"Ово треба да буде апсолутна путања, искључујући име домена. Пример: “/events/"
+"search/”."
 
 msgid "redirect to"
 msgstr "преусмери ка"
 
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+"“http://”."
 msgstr ""
-"Ово може бити или апсолутна путања (као горе) или пун URL који почиње са "
-"'http://'."
+"Ово може да буде апсолутна путања (као изнад) или потпун URL који почиње са "
+"“http://”."
 
 msgid "redirect"
 msgstr "преусмеравање"

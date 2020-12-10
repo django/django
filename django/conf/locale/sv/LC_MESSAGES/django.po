@@ -9,16 +9,17 @@
 # Jonathan Lindén, 2014
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
 # Mattias Benjaminsson <mattias@colourandcode.se>, 2011
+# Petter Strandmark <petter.strandmark@gmail.com>, 2019
 # Rasmus Précenth <prillan91@gmail.com>, 2014
 # Samuel Linde <samuel@linde.im>, 2011
-# Thomas Lundqvist <thomas@biljettshop.se>, 2013,2016
+# Thomas Lundqvist, 2013,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 09:03+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-27 22:40+0200\n"
+"PO-Revision-Date: 2019-11-05 00:38+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -147,6 +148,9 @@ msgstr "Högsorbiska"
 msgid "Hungarian"
 msgstr "Ungerska"
 
+msgid "Armenian"
+msgstr "Armeniska"
+
 msgid "Interlingua"
 msgstr "Interlingua"
 
@@ -167,6 +171,9 @@ msgstr "Japanska"
 
 msgid "Georgian"
 msgstr "Georgiska"
+
+msgid "Kabyle"
+msgstr "Kabyliska"
 
 msgid "Kazakh"
 msgstr "Kazakiska"
@@ -282,6 +289,9 @@ msgstr "Ukrainska"
 msgid "Urdu"
 msgstr "Urdu"
 
+msgid "Uzbek"
+msgstr ""
+
 msgid "Vietnamese"
 msgstr "Vietnamesiska"
 
@@ -304,13 +314,13 @@ msgid "Syndication"
 msgstr "Syndikering"
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "Sidnumret är inte ett heltal"
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "Sidnumret är mindre än 1"
 
 msgid "That page contains no results"
-msgstr ""
+msgstr "Sidan innehåller inga resultat"
 
 msgid "Enter a valid value."
 msgstr "Fyll i ett giltigt värde."
@@ -324,18 +334,15 @@ msgstr "Fyll i ett giltigt heltal."
 msgid "Enter a valid email address."
 msgstr "Fyll i en giltig e-postadress."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Fyll i en giltig 'slug', beståendes av enbart bokstäver, siffror, "
-"understreck samt bindestreck."
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Fyll i en giltig 'slug', beståendes av Unicode bokstäver, siffror, "
-"understreck eller bindestreck."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Fyll i en giltig IPv4 adress."
@@ -392,6 +399,9 @@ msgstr[1] ""
 "Säkerställ att detta värde har som mest %(limit_value)d tecken (den har "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Fyll i ett tal."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -416,9 +426,12 @@ msgstr[1] ""
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
+
+msgid "Null characters are not allowed."
+msgstr "Null-tecken är inte tillåtna."
 
 msgid "and"
 msgstr "och"
@@ -453,19 +466,13 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr "Fält av typ: %(field_type)s"
 
-msgid "Integer"
-msgstr "Heltal"
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr ""
 
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr "Värdet '%(value)s' måste vara ett heltal."
-
-msgid "Big (8 byte) integer"
-msgstr "Stort (8 byte) heltal"
-
-#, python-format
-msgid "'%(value)s' value must be either True or False."
-msgstr "Värdet '%(value)s' måste vara antingen True eller False."
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolesk (antingen True eller False)"
@@ -479,56 +486,46 @@ msgstr "Komma-separerade heltal"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"Värdet '%(value)s' har ett ogiltigt datumformat. Det måste vara i formatet "
-"YYYY-MM-DD."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"Värdet '%(value)s' har det giltiga formatet (YYYY-MM-DD) men det är ett "
-"ogiltigt datum."
 
 msgid "Date (without time)"
 msgstr "Datum (utan tid)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"Värdet '%(value)s' har ett ogiltigt datumformat. Det måste vara i formatet "
-"YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"Värdet '%(value)s' har det giltiga formatet (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
-"[TZ]) men det är ett ogiltigt datum/tid."
 
 msgid "Date (with time)"
 msgstr "Datum (med tid)"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
-msgstr "Värdet '%(value)s' måste vara ett decimaltal."
+msgid "“%(value)s” value must be a decimal number."
+msgstr ""
 
 msgid "Decimal number"
 msgstr "Decimaltal"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"Värdet '%(value)s' har ett ogiltigt format. Det måste vara i formatet [DD] "
-"[HH:[MM:]]ss[.uuuuuu]."
 
 msgid "Duration"
 msgstr "Tidsspann"
@@ -540,11 +537,21 @@ msgid "File path"
 msgstr "Sökväg till fil"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
-msgstr "Värdet '%(value)s' måste vara ett flyttal."
+msgid "“%(value)s” value must be a float."
+msgstr ""
 
 msgid "Floating point number"
 msgstr "Flyttal"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr ""
+
+msgid "Integer"
+msgstr "Heltal"
+
+msgid "Big (8 byte) integer"
+msgstr "Stort (8 byte) heltal"
 
 msgid "IPv4 address"
 msgstr "IPv4-adress"
@@ -553,8 +560,8 @@ msgid "IP address"
 msgstr "IP-adress"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
-msgstr "Värdet '%(value)s' måste vara antingen None, True eller False."
+msgid "“%(value)s” value must be either None, True or False."
+msgstr ""
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolesk (antingen True, False eller None)"
@@ -577,19 +584,15 @@ msgstr "Text"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"Värdet '%(value)s' har ett ogiltigt format. Det måste vara i formatet HH:MM[:"
-"ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"Värdet '%(value)s' har det korrekta formatet (HH:MM[:ss[.uuuuuu]]) men är en "
-"ogiltig tid."
 
 msgid "Time"
 msgstr "Tid"
@@ -601,8 +604,11 @@ msgid "Raw binary data"
 msgstr "Rå binärdata"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
-msgstr "Värdet '%(value)s' är inget giltigt UUID."
+msgid "“%(value)s” is not a valid UUID."
+msgstr ""
+
+msgid "Universally unique identifier"
+msgstr "Globalt unik identifierare"
 
 msgid "File"
 msgstr "Fil"
@@ -643,9 +649,6 @@ msgstr "Detta fält måste fyllas i."
 msgid "Enter a whole number."
 msgstr "Fyll i ett heltal."
 
-msgid "Enter a number."
-msgstr "Fyll i ett tal."
-
 msgid "Enter a valid date."
 msgstr "Fyll i ett giltigt datum."
 
@@ -657,6 +660,10 @@ msgstr "Fyll i ett giltigt datum/tid."
 
 msgid "Enter a valid duration."
 msgstr "Fyll i ett giltigt tidsspann."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Antalet dagar måste vara mellan {min_days} och {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Ingen fil skickades. Kontrollera kodningstypen i formuläret."
@@ -751,10 +758,8 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Vänligen korrigera duplikatvärdena nedan."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
-"Den infogade främmande nyckeln matchade inte den överordnade instansens "
-"primära nyckel."
+msgid "The inline value did not match the parent instance."
+msgstr "Värdet för InlineForeignKeyField motsvarade inte dess motpart."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -762,16 +767,14 @@ msgstr ""
 "alternativ."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" är inte ett giltigt värde för en primärnyckel."
+msgid "“%(pk)s” is not a valid value."
+msgstr ""
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
-"%(datetime)s kunde inte tolkas i tidszonen %(current_timezone)s; det kan "
-"vara en ogiltig eller tvetydigt tidpunkt"
 
 msgid "Clear"
 msgstr "Rensa"
@@ -790,6 +793,15 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nej"
+
+msgid "Year"
+msgstr ""
+
+msgid "Month"
+msgstr ""
+
+msgid "Day"
+msgstr ""
 
 msgid "yes,no,maybe"
 msgstr "ja,nej,kanske"
@@ -1053,8 +1065,8 @@ msgstr "Detta är inte en giltig IPv6 adress."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "eller"
@@ -1109,23 +1121,25 @@ msgid "CSRF verification failed. Request aborted."
 msgstr "CSRF-verifikation misslyckades. Förfrågan avbröts."
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Du ser detta meddelande eftersom denna HTTPS-sida kräver att en 'Referer "
-"header' skickas från din webbläsare, men ingen skickades. Denna header krävs "
-"av säkerhetsskäl, för att säkerställa att din webbläsare inte kapats."
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
 msgstr ""
-"Om 'Referer' headers är inaktiverade i din webbläsare, vänligen återaktivera "
-"dem, åtminstone för denna sida, eller för HTTPS-anslutningar eller för 'same-"
-"origin'-förfrågningar."
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
+msgstr ""
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1138,37 +1152,17 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
-"Om cookies är inaktiverade i din webbläsare, vänligen återaktivera dem, "
-"åtminstone för denna sida eller för 'same-origin'-förfrågningar."
 
 msgid "More information is available with DEBUG=True."
 msgstr "Mer information är tillgänglig med DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Välkommen till Django"
-
-msgid "It worked!"
-msgstr "Det fungerade!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Grattis till din nya Django-drivna sida."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Du ser detta meddelande eftersom du har <code>DEBUG = True</code> i din "
-"inställningsfil och inte har konfigurerat några URLer än. Börja jobba!"
-
 msgid "No year specified"
 msgstr "Inget år angivet"
+
+msgid "Date out of range"
+msgstr "Datum är utanför intervallet"
 
 msgid "No month specified"
 msgstr "Ingen månad angiven"
@@ -1192,31 +1186,75 @@ msgstr ""
 "%(class_name)s.allow_future är False."
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
-msgstr "Ogiltig datumsträng '%(datestr)s' med givet format '%(format)s'"
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr ""
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "Hittade inga %(verbose_name)s  som matchar frågan"
 
-msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "Sidan är inte 'last', och kan inte heller omvandlas till en int."
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr ""
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "Ogiltig sida (%(page_number)s): %(message)s"
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr "Tom lista och '%(class_name)s.allow_empty' är False."
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr ""
 
 msgid "Directory indexes are not allowed here."
 msgstr "Kataloglistningar är inte tillåtna här."
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" finns inte"
+msgid "“%(path)s” does not exist"
+msgstr ""
 
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Innehåll i %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: webb-ramverket för perfektionister med deadlines."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Visa <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> för Django %(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Installationen lyckades! Grattis!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Du ser den här sidan eftersom <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> i din settings-fil och du har inte konfigurerat några URL:"
+"er."
+
+msgid "Django Documentation"
+msgstr "Djangodokumentation"
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr "Tutorial: En undersöknings-app"
+
+msgid "Get started with Django"
+msgstr "Kom igång med Django"
+
+msgid "Django Community"
+msgstr "Djangos community"
+
+msgid "Connect, get help, or contribute"
+msgstr "Kontakta, begär hjälp eller bidra"

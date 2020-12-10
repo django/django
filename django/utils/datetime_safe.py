@@ -1,17 +1,18 @@
-# Python's datetime strftime doesn't handle dates before 1900.
-# These classes override date and datetime to support the formatting of a date
-# through its full "proleptic Gregorian" date range.
+# These classes override date and datetime to ensure that strftime('%Y')
+# returns four digits (with leading zeros) on years < 1000.
+# https://bugs.python.org/issue13305
 #
 # Based on code submitted to comp.lang.python by Andrew Dalke
 #
-# >>> datetime_safe.date(1850, 8, 2).strftime("%Y/%m/%d was a %A")
-# '1850/08/02 was a Friday'
+# >>> datetime_safe.date(10, 8, 2).strftime("%Y/%m/%d was a %A")
+# '0010/08/02 was a Monday'
 
-import re
 import time as ttime
 from datetime import (
     date as real_date, datetime as real_datetime, time as real_time,
 )
+
+from django.utils.regex_helper import _lazy_re_compile
 
 
 class date(real_date):
@@ -54,28 +55,28 @@ def new_datetime(d):
 
 # This library does not support strftime's "%s" or "%y" format strings.
 # Allowed if there's an even number of "%"s because they are escaped.
-_illegal_formatting = re.compile(r"((^|[^%])(%%)*%[sy])")
+_illegal_formatting = _lazy_re_compile(r"((^|[^%])(%%)*%[sy])")
 
 
 def _findall(text, substr):
     # Also finds overlaps
     sites = []
     i = 0
-    while 1:
-        j = text.find(substr, i)
-        if j == -1:
+    while True:
+        i = text.find(substr, i)
+        if i == -1:
             break
-        sites.append(j)
-        i = j + 1
+        sites.append(i)
+        i += 1
     return sites
 
 
 def strftime(dt, fmt):
-    if dt.year >= 1900:
+    if dt.year >= 1000:
         return super(type(dt), dt).strftime(fmt)
     illegal_formatting = _illegal_formatting.search(fmt)
     if illegal_formatting:
-        raise TypeError("strftime of dates before 1900 does not handle" + illegal_formatting.group(0))
+        raise TypeError('strftime of dates before 1000 does not handle ' + illegal_formatting[0])
 
     year = dt.year
     # For every non-leap year century, advance by
@@ -99,7 +100,7 @@ def strftime(dt, fmt):
             sites.append(site)
 
     s = s1
-    syear = "%04d" % (dt.year,)
+    syear = "%04d" % dt.year
     for site in sites:
         s = s[:site] + syear + s[site + 4:]
     return s

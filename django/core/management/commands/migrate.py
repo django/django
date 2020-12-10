@@ -1,10 +1,11 @@
+import sys
 import time
-from collections import OrderedDict
 from importlib import import_module
 
 from django.apps import apps
-from django.core.checks import Tags, run_checks
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import (
+    BaseCommand, CommandError, no_translations,
+)
 from django.core.management.sql import (
     emit_post_migrate_signal, emit_pre_migrate_signal,
 )
@@ -14,12 +15,18 @@ from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import AmbiguityError
 from django.db.migrations.state import ModelState, ProjectState
 from django.utils.module_loading import module_has_submodule
+from django.utils.text import Truncator
 
 
 class Command(BaseCommand):
     help = "Updates database schema. Manages both apps with migrations and those without."
+    requires_system_checks = []
 
     def add_arguments(self, parser):
+        parser.add_argument(
+            '--skip-checks', action='store_true',
+            help='Skip system checks.',
+        )
         parser.add_argument(
             'app_label', nargs='?',
             help='App label of an application to synchronize the state.',
@@ -34,31 +41,38 @@ class Command(BaseCommand):
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
         parser.add_argument(
-            '--database', action='store', dest='database',
+            '--database',
             default=DEFAULT_DB_ALIAS,
             help='Nominates a database to synchronize. Defaults to the "default" database.',
         )
         parser.add_argument(
-            '--fake', action='store_true', dest='fake',
+            '--fake', action='store_true',
             help='Mark migrations as run without actually running them.',
         )
         parser.add_argument(
-            '--fake-initial', action='store_true', dest='fake_initial',
+            '--fake-initial', action='store_true',
             help='Detect if tables already exist and fake-apply initial migrations if so. Make sure '
                  'that the current database schema matches your initial migration before using this '
                  'flag. Django will only check for an existing table name.',
         )
         parser.add_argument(
-            '--run-syncdb', action='store_true', dest='run_syncdb',
+            '--plan', action='store_true',
+            help='Shows a list of the migration actions that will be performed.',
+        )
+        parser.add_argument(
+            '--run-syncdb', action='store_true',
             help='Creates tables for apps without migrations.',
         )
+        parser.add_argument(
+            '--check', action='store_true', dest='check_unapplied',
+            help='Exits with a non-zero status if unapplied migrations exist.',
+        )
 
-    def _run_checks(self, **kwargs):
-        issues = run_checks(tags=[Tags.database])
-        issues.extend(super()._run_checks(**kwargs))
-        return issues
-
+    @no_translations
     def handle(self, *args, **options):
+        database = options['database']
+        if not options['skip_checks']:
+            self.check(databases=[database])
 
         self.verbosity = options['verbosity']
         self.interactive = options['interactive']
@@ -70,8 +84,7 @@ class Command(BaseCommand):
                 import_module('.management', app_config.name)
 
         # Get the database we're operating from
-        db = options['database']
-        connection = connections[db]
+        connection = connections[database]
 
         # Hook for backends needing any database preparation
         connection.prepare_database()
@@ -96,13 +109,23 @@ class Command(BaseCommand):
             )
 
         # If they supplied command line arguments, work out what they mean.
+        run_syncdb = options['run_syncdb']
         target_app_labels_only = True
+        if options['app_label']:
+            # Validate app_label.
+            app_label = options['app_label']
+            try:
+                apps.get_app_config(app_label)
+            except LookupError as err:
+                raise CommandError(str(err))
+            if run_syncdb:
+                if app_label in executor.loader.migrated_apps:
+                    raise CommandError("Can't use run_syncdb with app '%s' as it has migrations." % app_label)
+            elif app_label not in executor.loader.migrated_apps:
+                raise CommandError("App '%s' does not have migrations." % app_label)
+
         if options['app_label'] and options['migration_name']:
-            app_label, migration_name = options['app_label'], options['migration_name']
-            if app_label not in executor.loader.migrated_apps:
-                raise CommandError(
-                    "App '%s' does not have migrations." % app_label
-                )
+            migration_name = options['migration_name']
             if migration_name == "zero":
                 targets = [(app_label, None)]
             else:
@@ -120,26 +143,44 @@ class Command(BaseCommand):
                 targets = [(app_label, migration.name)]
             target_app_labels_only = False
         elif options['app_label']:
-            app_label = options['app_label']
-            if app_label not in executor.loader.migrated_apps:
-                raise CommandError(
-                    "App '%s' does not have migrations." % app_label
-                )
             targets = [key for key in executor.loader.graph.leaf_nodes() if key[0] == app_label]
         else:
             targets = executor.loader.graph.leaf_nodes()
 
         plan = executor.migration_plan(targets)
-        run_syncdb = options['run_syncdb'] and executor.loader.unmigrated_apps
+        exit_dry = plan and options['check_unapplied']
 
+        if options['plan']:
+            self.stdout.write('Planned operations:', self.style.MIGRATE_LABEL)
+            if not plan:
+                self.stdout.write('  No planned migration operations.')
+            for migration, backwards in plan:
+                self.stdout.write(str(migration), self.style.MIGRATE_HEADING)
+                for operation in migration.operations:
+                    message, is_error = self.describe_operation(operation, backwards)
+                    style = self.style.WARNING if is_error else None
+                    self.stdout.write('    ' + message, style)
+            if exit_dry:
+                sys.exit(1)
+            return
+        if exit_dry:
+            sys.exit(1)
+
+        # At this point, ignore run_syncdb if there aren't any apps to sync.
+        run_syncdb = options['run_syncdb'] and executor.loader.unmigrated_apps
         # Print some useful info
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Operations to perform:"))
             if run_syncdb:
-                self.stdout.write(
-                    self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") +
-                    (", ".join(sorted(executor.loader.unmigrated_apps)))
-                )
+                if options['app_label']:
+                    self.stdout.write(
+                        self.style.MIGRATE_LABEL("  Synchronize unmigrated app: %s" % app_label)
+                    )
+                else:
+                    self.stdout.write(
+                        self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") +
+                        (", ".join(sorted(executor.loader.unmigrated_apps)))
+                    )
             if target_app_labels_only:
                 self.stdout.write(
                     self.style.MIGRATE_LABEL("  Apply all migrations: ") +
@@ -147,8 +188,9 @@ class Command(BaseCommand):
                 )
             else:
                 if targets[0][1] is None:
-                    self.stdout.write(self.style.MIGRATE_LABEL(
-                        "  Unapply all migrations: ") + "%s" % (targets[0][0], )
+                    self.stdout.write(
+                        self.style.MIGRATE_LABEL('  Unapply all migrations: ') +
+                        str(targets[0][0])
                     )
                 else:
                     self.stdout.write(self.style.MIGRATE_LABEL(
@@ -166,7 +208,10 @@ class Command(BaseCommand):
         if run_syncdb:
             if self.verbosity >= 1:
                 self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
-            self.sync_apps(connection, executor.loader.unmigrated_apps)
+            if options['app_label']:
+                self.sync_apps(connection, [app_label])
+            else:
+                self.sync_apps(connection, executor.loader.unmigrated_apps)
 
         # Migrate!
         if self.verbosity >= 1:
@@ -182,8 +227,9 @@ class Command(BaseCommand):
                 changes = autodetector.changes(graph=executor.loader.graph)
                 if changes:
                     self.stdout.write(self.style.NOTICE(
-                        "  Your models have changes that are not yet reflected "
-                        "in a migration, and so won't be applied."
+                        "  Your models in app(s): %s have changes that are not "
+                        "yet reflected in a migration, and so won't be "
+                        "applied." % ", ".join(repr(app) for app in sorted(changes))
                     ))
                     self.stdout.write(self.style.NOTICE(
                         "  Run 'manage.py makemigrations' to make new "
@@ -228,33 +274,33 @@ class Command(BaseCommand):
             compute_time = self.verbosity > 1
             if action == "apply_start":
                 if compute_time:
-                    self.start = time.time()
+                    self.start = time.monotonic()
                 self.stdout.write("  Applying %s..." % migration, ending="")
                 self.stdout.flush()
             elif action == "apply_success":
-                elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
+                elapsed = " (%.3fs)" % (time.monotonic() - self.start) if compute_time else ""
                 if fake:
                     self.stdout.write(self.style.SUCCESS(" FAKED" + elapsed))
                 else:
                     self.stdout.write(self.style.SUCCESS(" OK" + elapsed))
             elif action == "unapply_start":
                 if compute_time:
-                    self.start = time.time()
+                    self.start = time.monotonic()
                 self.stdout.write("  Unapplying %s..." % migration, ending="")
                 self.stdout.flush()
             elif action == "unapply_success":
-                elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
+                elapsed = " (%.3fs)" % (time.monotonic() - self.start) if compute_time else ""
                 if fake:
                     self.stdout.write(self.style.SUCCESS(" FAKED" + elapsed))
                 else:
                     self.stdout.write(self.style.SUCCESS(" OK" + elapsed))
             elif action == "render_start":
                 if compute_time:
-                    self.start = time.time()
+                    self.start = time.monotonic()
                 self.stdout.write("  Rendering model states...", ending="")
                 self.stdout.flush()
             elif action == "render_success":
-                elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
+                elapsed = " (%.3fs)" % (time.monotonic() - self.start) if compute_time else ""
                 self.stdout.write(self.style.SUCCESS(" DONE" + elapsed))
 
     def sync_apps(self, connection, app_labels):
@@ -274,20 +320,20 @@ class Command(BaseCommand):
 
         def model_installed(model):
             opts = model._meta
-            converter = connection.introspection.table_name_converter
+            converter = connection.introspection.identifier_converter
             return not (
                 (converter(opts.db_table) in tables) or
                 (opts.auto_created and converter(opts.auto_created._meta.db_table) in tables)
             )
 
-        manifest = OrderedDict(
-            (app_name, list(filter(model_installed, model_list)))
+        manifest = {
+            app_name: list(filter(model_installed, model_list))
             for app_name, model_list in all_models
-        )
+        }
 
         # Create the tables for each model
         if self.verbosity >= 1:
-            self.stdout.write("  Creating tables...\n")
+            self.stdout.write('  Creating tables...')
         with connection.schema_editor() as editor:
             for app_name, model_list in manifest.items():
                 for model in model_list:
@@ -296,12 +342,36 @@ class Command(BaseCommand):
                         continue
                     if self.verbosity >= 3:
                         self.stdout.write(
-                            "    Processing %s.%s model\n" % (app_name, model._meta.object_name)
+                            '    Processing %s.%s model' % (app_name, model._meta.object_name)
                         )
                     if self.verbosity >= 1:
-                        self.stdout.write("    Creating table %s\n" % model._meta.db_table)
+                        self.stdout.write('    Creating table %s' % model._meta.db_table)
                     editor.create_model(model)
 
             # Deferred SQL is executed when exiting the editor's context.
             if self.verbosity >= 1:
-                self.stdout.write("    Running deferred SQL...\n")
+                self.stdout.write('    Running deferred SQL...')
+
+    @staticmethod
+    def describe_operation(operation, backwards):
+        """Return a string that describes a migration operation for --plan."""
+        prefix = ''
+        is_error = False
+        if hasattr(operation, 'code'):
+            code = operation.reverse_code if backwards else operation.code
+            action = (code.__doc__ or '') if code else None
+        elif hasattr(operation, 'sql'):
+            action = operation.reverse_sql if backwards else operation.sql
+        else:
+            action = ''
+            if backwards:
+                prefix = 'Undo '
+        if action is not None:
+            action = str(action).replace('\n', '')
+        elif backwards:
+            action = 'IRREVERSIBLE'
+            is_error = True
+        if action:
+            action = ' -> ' + action
+        truncated = Truncator(action)
+        return prefix + operation.describe() + truncated.chars(40), is_error

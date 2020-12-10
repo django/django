@@ -1,4 +1,5 @@
-from django.forms import URLField, ValidationError
+from django.core.exceptions import ValidationError
+from django.forms import URLField
 from django.test import SimpleTestCase
 
 from . import FormFieldAssertionsMixin
@@ -8,7 +9,7 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_urlfield_1(self):
         f = URLField()
-        self.assertWidgetRendersTo(f, '<input type="url" name="f" id="id_f" required />')
+        self.assertWidgetRendersTo(f, '<input type="url" name="f" id="id_f" required>')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean('')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
@@ -88,7 +89,7 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_urlfield_5(self):
         f = URLField(min_length=15, max_length=20)
-        self.assertWidgetRendersTo(f, '<input id="id_f" type="url" name="f" maxlength="20" minlength="15" required />')
+        self.assertWidgetRendersTo(f, '<input id="id_f" type="url" name="f" maxlength="20" minlength="15" required>')
         with self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 15 characters (it has 12).'"):
             f.clean('http://f.com')
         self.assertEqual('http://example.com', f.clean('http://example.com'))
@@ -153,6 +154,7 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_urlfield_strip_on_none_value(self):
         f = URLField(required=False, empty_value=None)
+        self.assertIsNone(f.clean(''))
         self.assertIsNone(f.clean(None))
 
     def test_urlfield_unable_to_set_strip_kwarg(self):

@@ -74,8 +74,7 @@ def get_flatpages(parser, token):
                       "['url_starts_with'] [for user] as context_name" %
                       {'tag_name': bits[0]})
     # Must have at 3-6 bits in the tag
-    if len(bits) >= 3 and len(bits) <= 6:
-
+    if 3 <= len(bits) <= 6:
         # If there's an even number of bits, there's no prefix
         if len(bits) % 2 == 0:
             prefix = bits[1]

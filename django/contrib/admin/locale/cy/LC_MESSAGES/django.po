@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Welsh (http://www.transifex.com/django/django/language/cy/)\n"
 "MIME-Version: 1.0\n"
@@ -208,8 +208,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Dilëwyd %(name)s \"%(obj)s\" yn llwyddiannus."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Nid ydy gwrthrych %(name)s gyda'r prif allwedd %(key)r yn bodoli."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
 
 #, python-format
 msgid "Add %s"

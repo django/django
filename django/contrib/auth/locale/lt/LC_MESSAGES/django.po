@@ -3,7 +3,7 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lauris <lauris@runbox.com>, 2011
-# Matas Dailyda <matas@dailyda.com>, 2015-2016
+# Matas Dailyda <matas@dailyda.com>, 2015-2017
 # naktinis <naktinis@gmail.com>, 2012
 # Nikolajus Krauklis <nikolajus@gmail.com>, 2013
 # Simonas Kazlauskas <simonas@kazlauskas.me>, 2012-2013
@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-23 12:06+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-11-16 08:45+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
 "lt/)\n"
@@ -20,8 +20,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: lt\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
-"%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < "
+"11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? "
+"1 : n % 1 != 0 ? 2: 3);\n"
 
 msgid "Personal info"
 msgstr "Asmeninė informacija"
@@ -72,12 +73,11 @@ msgstr "Patikrinimui įveskite tokį patį slaptažodį, kaip anksčiau."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Neužkoduoti slaptažodžiai nėra saugomi, todėl galimybės pasižiūrėti šio "
-"vartotojo slaptažodžio nėra, bet slaptažodį galite pakeisti naudodamiesi <a "
-"href=\"../password/\">šia forma</a>."
+"vartotojo slaptažodį nėra, bet galite slaptažodį pakeisti naudodamiesi <a "
+"href=\"{}\">šia forma</a>."
 
 #, python-format
 msgid ""
@@ -244,6 +244,9 @@ msgstr[1] ""
 msgstr[2] ""
 "Šis slaptažodis yra per trumpas. Jį turi sudaryti bent %(min_length)d "
 "simbolių."
+msgstr[3] ""
+"Šis slaptažodis yra per trumpas. Jį turi sudaryti bent %(min_length)d "
+"simbolių."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -251,6 +254,7 @@ msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "Jūsų slaptažodį turi sudaryti bent %(min_length)d simbolis."
 msgstr[1] "Jūsų slaptažodį turi sudaryti bent %(min_length)d simboliai."
 msgstr[2] "Jūsų slaptažodį turi sudaryti bent %(min_length)d simbolių."
+msgstr[3] "Jūsų slaptažodį turi sudaryti bent %(min_length)d simbolių."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."

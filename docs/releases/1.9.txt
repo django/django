@@ -40,7 +40,7 @@ invalidating caches.
 This functionality from the `django-transaction-hooks`_ package has been
 integrated into Django.
 
-.. _django-transaction-hooks: https://pypi.python.org/pypi/django-transaction-hooks
+.. _django-transaction-hooks: https://pypi.org/project/django-transaction-hooks/
 
 Password validation
 -------------------
@@ -216,7 +216,7 @@ Minor features
   makes it possible to use ``REMOTE_USER`` for setups where the header is only
   populated on login pages instead of every request in the session.
 
-* The :func:`~django.contrib.auth.views.password_reset` view accepts an
+* The ``django.contrib.auth.views.password_reset()`` view accepts an
   ``extra_email_context`` parameter.
 
 :mod:`django.contrib.contenttypes`
@@ -246,7 +246,7 @@ Minor features
 
 * The new :meth:`GDALRaster.warp() <django.contrib.gis.gdal.GDALRaster.warp>`
   method allows warping a raster by specifying target raster properties such as
-  origin, width, height, or pixel size (amongst others).
+  origin, width, height, or pixel size (among others).
 
 * The new :meth:`GDALRaster.transform()
   <django.contrib.gis.gdal.GDALRaster.transform>` method allows transforming a
@@ -657,7 +657,7 @@ URLs
 * The application namespace can now be set using an ``app_name`` attribute
   on the included module or object. It can also be set by passing a 2-tuple
   of (<list of patterns>, <application namespace>) as the first argument to
-  :func:`~django.conf.urls.include`.
+  ``include()``.
 
 * System checks have been added for common URL pattern mistakes.
 
@@ -755,7 +755,7 @@ followed by a call to ``add()``. This caused needlessly large data changes and
 prevented using the :data:`~django.db.models.signals.m2m_changed` signal to
 track individual changes in many-to-many relations.
 
-Direct assignment now relies on the the new
+Direct assignment now relies on the new
 :meth:`~django.db.models.fields.related.RelatedManager.set` method on related
 managers which by default only processes changes between the existing related
 set and the one that's newly assigned. The previous behavior can be restored by
@@ -792,7 +792,7 @@ Consequently, the expected URLs passed to ``assertRedirects`` should generally
 no longer include the scheme and domain part of the URLs. For example,
 ``self.assertRedirects(response, 'http://testserver/some-url/')`` should be
 replaced by ``self.assertRedirects(response, '/some-url/')`` (unless the
-redirection specifically contained an absolute URL, of course).
+redirection specifically contained an absolute URL).
 
 In the rare case that you need the old behavior (discovered with an ancient
 version of Apache with ``mod_scgi`` that interprets a relative redirect as an
@@ -1045,9 +1045,9 @@ When installing Django 1.9 or 1.9.1 with setuptools 5.5.x, you'll see::
 
 It's safe to ignore these errors (Django will still install just fine), but you
 can avoid them by upgrading setuptools to a more recent version. If you're
-using pip, you can upgrade pip using ``pip install -U pip`` which will also
-upgrade setuptools. This is resolved in later versions of Django as described
-in the :doc:`/releases/1.9.2`.
+using pip, you can upgrade pip using ``python -m pip install -U pip`` which
+will also upgrade setuptools. This is resolved in later versions of Django as
+described in the :doc:`/releases/1.9.2`.
 
 Miscellaneous
 -------------
@@ -1091,9 +1091,8 @@ Miscellaneous
 
 * In order to enforce test isolation, database queries are not allowed
   by default in :class:`~django.test.SimpleTestCase` tests anymore. You
-  can disable this behavior by setting the
-  :attr:`~django.test.SimpleTestCase.allow_database_queries` class attribute
-  to ``True`` on your test class.
+  can disable this behavior by setting the ``allow_database_queries`` class
+  attribute to ``True`` on your test class.
 
 * ``ResolverMatch.app_name`` was changed to contain the full namespace path in
   the case of nested namespaces. For consistency with
@@ -1116,7 +1115,7 @@ Miscellaneous
   :attr:`~django.forms.CharField.strip` argument to ``False``.
 
 * Template text that is translated and uses two or more consecutive percent
-  signs, e.g. ``"%%"``, may have a new `msgid` after ``makemessages`` is run
+  signs, e.g. ``"%%"``, may have a new ``msgid`` after ``makemessages`` is run
   (most likely the translation will be marked fuzzy). The new ``msgid`` will be
   marked ``"#, python-format"``.
 
@@ -1233,8 +1232,8 @@ extending. This change necessitated a new template loader API. The old
 Details about the new API can be found :ref:`in the template loader
 documentation <custom-template-loaders>`.
 
-Passing a 3-tuple or an ``app_name`` to :func:`~django.conf.urls.include()`
----------------------------------------------------------------------------
+Passing a 3-tuple or an ``app_name`` to ``include()``
+-----------------------------------------------------
 
 The instance namespace part of passing a tuple as an argument to ``include()``
 has been replaced by passing the ``namespace`` argument to ``include()``. For
@@ -1264,8 +1263,8 @@ attribute (as below). If the ``app_name`` is set in this new way, the
 ``namespace`` argument is no longer required. It will default to the value of
 ``app_name``. For example, the URL patterns in the tutorial are changed from:
 
-.. snippet::
-    :filename: mysite/urls.py
+.. code-block:: python
+    :caption: mysite/urls.py
 
     urlpatterns = [
         url(r'^polls/', include('polls.urls', namespace="polls")),
@@ -1274,26 +1273,26 @@ attribute (as below). If the ``app_name`` is set in this new way, the
 
 to:
 
-.. snippet::
-    :filename: mysite/urls.py
+.. code-block:: python
+    :caption: mysite/urls.py
 
     urlpatterns = [
         url(r'^polls/', include('polls.urls')),  # 'namespace="polls"' removed
         ...
     ]
 
-.. snippet::
-    :filename: polls/urls.py
+.. code-block:: python
+    :caption: polls/urls.py
 
     app_name = 'polls'  # added
     urlpatterns = [...]
 
 This change also means that the old way of including an ``AdminSite`` instance
 is deprecated. Instead, pass ``admin.site.urls`` directly to
-:func:`~django.conf.urls.url()`:
+``django.conf.urls.url()``:
 
-.. snippet::
-    :filename: urls.py
+.. code-block:: python
+    :caption: urls.py
 
     from django.conf.urls import url
     from django.contrib import admin
@@ -1507,7 +1506,7 @@ remove usage of these features.
 * Database test settings as independent entries in the database settings,
   prefixed by ``TEST_``, are no longer supported.
 
-* The `cache_choices` option to :class:`~django.forms.ModelChoiceField` and
+* The ``cache_choices`` option to :class:`~django.forms.ModelChoiceField` and
   :class:`~django.forms.ModelMultipleChoiceField` is removed.
 
 * The default value of the

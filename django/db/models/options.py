@@ -1,21 +1,15 @@
+import bisect
 import copy
 import inspect
-import warnings
-from bisect import bisect
-from collections import OrderedDict, defaultdict
-from contextlib import suppress
-from itertools import chain
+from collections import defaultdict
 
 from django.apps import apps
 from django.conf import settings
-from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
+from django.core.exceptions import FieldDoesNotExist
 from django.db import connections
-from django.db.models import Manager
-from django.db.models.fields import AutoField
-from django.db.models.fields.proxy import OrderWrt
+from django.db.models import AutoField, Manager, OrderWrt, UniqueConstraint
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, OrderedSet
-from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.functional import cached_property
 from django.utils.text import camel_case_to_spaces, format_lazy
 from django.utils.translation import override
@@ -36,7 +30,7 @@ DEFAULT_NAMES = (
     'auto_created', 'index_together', 'apps', 'default_permissions',
     'select_on_save', 'default_related_name', 'required_db_features',
     'required_db_vendor', 'base_manager_name', 'default_manager_name',
-    'indexes',
+    'indexes', 'constraints',
 )
 
 
@@ -91,10 +85,11 @@ class Options:
         self.ordering = []
         self._ordering_clash = False
         self.indexes = []
+        self.constraints = []
         self.unique_together = []
         self.index_together = []
         self.select_on_save = False
-        self.default_permissions = ('add', 'change', 'delete')
+        self.default_permissions = ('add', 'change', 'delete', 'view')
         self.permissions = []
         self.object_name = None
         self.app_label = app_label
@@ -120,7 +115,7 @@ class Options:
         # concrete models, the concrete_model is always the class itself.
         self.concrete_model = None
         self.swappable = None
-        self.parents = OrderedDict()
+        self.parents = {}
         self.auto_created = False
 
         # List of all lookups defined in ForeignKey 'limit_choices_to' options
@@ -183,6 +178,12 @@ class Options:
 
             self.unique_together = normalize_together(self.unique_together)
             self.index_together = normalize_together(self.index_together)
+            # App label/class name interpolation for names of constraints and
+            # indexes.
+            if not getattr(cls._meta, 'abstract', False):
+                for attr_name in {'constraints', 'indexes'}:
+                    objs = getattr(self, attr_name, [])
+                    setattr(self, attr_name, self._format_names_with_class(cls, objs))
 
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
@@ -203,6 +204,18 @@ class Options:
         if not self.db_table:
             self.db_table = "%s_%s" % (self.app_label, self.model_name)
             self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
+
+    def _format_names_with_class(self, cls, objs):
+        """App label/class name interpolation for object names."""
+        new_objs = []
+        for obj in objs:
+            obj = obj.clone()
+            obj.name = obj.name % {
+                'app_label': cls._meta.app_label.lower(),
+                'class': cls.__name__.lower(),
+            }
+            new_objs.append(obj)
+        return new_objs
 
     def _prepare(self, model):
         if self.order_with_respect_to:
@@ -236,10 +249,6 @@ class Options:
                     field = already_created[0]
                 field.primary_key = True
                 self.setup_pk(field)
-                if not field.remote_field.parent_link:
-                    raise ImproperlyConfigured(
-                        'Add parent_link=True to %s.' % field,
-                    )
             else:
                 auto = AutoField(verbose_name='ID', primary_key=True, auto_created=True)
                 model.add_to_class('id', auto)
@@ -256,9 +265,9 @@ class Options:
         if private:
             self.private_fields.append(field)
         elif field.is_relation and field.many_to_many:
-            self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
+            bisect.insort(self.local_many_to_many, field)
         else:
-            self.local_fields.insert(bisect(self.local_fields, field), field)
+            bisect.insort(self.local_fields, field)
             self.setup_pk(field)
 
         # If the field being added is a relation to another known field,
@@ -270,8 +279,10 @@ class Options:
         # is a cached property, and all the models haven't been loaded yet, so
         # we need to make sure we don't cache a string reference.
         if field.is_relation and hasattr(field.remote_field, 'model') and field.remote_field.model:
-            with suppress(AttributeError):
+            try:
                 field.remote_field.model._meta._expire_cache(forward=False)
+            except AttributeError:
+                pass
             self._expire_cache()
         else:
             self._expire_cache(reverse=False)
@@ -294,7 +305,7 @@ class Options:
         return '<Options for %s>' % self.object_name
 
     def __str__(self):
-        return "%s.%s" % (self.app_label, self.model_name)
+        return self.label_lower
 
     def can_migrate(self, connection):
         """
@@ -519,8 +530,10 @@ class Options:
             # Due to the way Django's internals work, get_field() should also
             # be able to fetch a field by attname. In the case of a concrete
             # field with relation, includes the *_id name too
-            with suppress(AttributeError):
+            try:
                 res[field.attname] = field
+            except AttributeError:
+                pass
         return res
 
     @cached_property
@@ -532,8 +545,10 @@ class Options:
             # Due to the way Django's internals work, get_field() should also
             # be able to fetch a field by attname. In the case of a concrete
             # field with relation, includes the *_id name too
-            with suppress(AttributeError):
+            try:
                 res[field.attname] = field
+            except AttributeError:
+                pass
         return res
 
     def get_field(self, field_name):
@@ -628,7 +643,15 @@ class Options:
                 final_field = opts.parents[int_model]
                 targets = (final_field.remote_field.get_related_field(),)
                 opts = int_model._meta
-                path.append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
+                path.append(PathInfo(
+                    from_opts=final_field.model._meta,
+                    to_opts=opts,
+                    target_fields=targets,
+                    join_field=final_field,
+                    m2m=False,
+                    direct=True,
+                    filtered_relation=None,
+                ))
         return path
 
     def get_path_from_parent(self, parent):
@@ -675,7 +698,8 @@ class Options:
             )
             for f in fields_with_relations:
                 if not isinstance(f.remote_field.model, str):
-                    related_objects_graph[f.remote_field.model._meta.concrete_model._meta].append(f)
+                    remote_label = f.remote_field.model._meta.concrete_model._meta.label
+                    related_objects_graph[remote_label].append(f)
 
         for model in all_models:
             # Set the relation_tree using the internal __dict__. In this way
@@ -683,7 +707,7 @@ class Options:
             # __dict__ takes precedence over a data descriptor (such as
             # @cached_property). This means that the _meta._relation_tree is
             # only called if related_objects is not in __dict__.
-            related_objects = related_objects_graph[model._meta.concrete_model._meta]
+            related_objects = related_objects_graph[model._meta.concrete_model._meta.label]
             model._meta.__dict__['_relation_tree'] = related_objects
         # It seems it is possible that self is not in all_models, so guard
         # against that with default for get().
@@ -741,19 +765,20 @@ class Options:
 
         # We must keep track of which models we have already seen. Otherwise we
         # could include the same field multiple times from different models.
-        topmost_call = False
-        if seen_models is None:
+        topmost_call = seen_models is None
+        if topmost_call:
             seen_models = set()
-            topmost_call = True
         seen_models.add(self.model)
 
         # Creates a cache key composed of all arguments
         cache_key = (forward, reverse, include_parents, include_hidden, topmost_call)
 
-        with suppress(KeyError):
+        try:
             # In order to avoid list manipulation. Always return a shallow copy
             # of the results.
             return self._get_fields_cache[cache_key]
+        except KeyError:
+            pass
 
         fields = []
         # Recursively call _get_fields() on each parent, with the same
@@ -771,9 +796,8 @@ class Options:
                 for obj in parent._meta._get_fields(
                         forward=forward, reverse=reverse, include_parents=include_parents,
                         include_hidden=include_hidden, seen_models=seen_models):
-                    if getattr(obj, 'parent_link', False) and obj.model != self.concrete_model:
-                        continue
-                    fields.append(obj)
+                    if not getattr(obj, 'parent_link', False) or obj.model == self.concrete_model:
+                        fields.append(obj)
         if reverse and not self.proxy:
             # Tree is computed once and cached until the app cache is expired.
             # It is composed of a list of fields pointing to the current model
@@ -786,18 +810,15 @@ class Options:
                     fields.append(field.remote_field)
 
         if forward:
-            fields.extend(
-                field for field in chain(self.local_fields, self.local_many_to_many)
-            )
+            fields += self.local_fields
+            fields += self.local_many_to_many
             # Private fields are recopied to each child model, and they get a
             # different model as field.model in each child. Hence we have to
             # add the private fields separately from the topmost call. If we
             # did this recursively similar to local_fields, we would get field
             # instances with field.model != self.model.
             if topmost_call:
-                fields.extend(
-                    f for f in self.private_fields
-                )
+                fields += self.private_fields
 
         # In order to avoid list manipulation. Always
         # return a shallow copy of the results
@@ -807,18 +828,17 @@ class Options:
         self._get_fields_cache[cache_key] = fields
         return fields
 
-    @property
-    def has_auto_field(self):
-        warnings.warn(
-            'Model._meta.has_auto_field is deprecated in favor of checking if '
-            'Model._meta.auto_field is not None.',
-            RemovedInDjango21Warning, stacklevel=2
-        )
-        return self.auto_field is not None
-
-    @has_auto_field.setter
-    def has_auto_field(self, value):
-        pass
+    @cached_property
+    def total_unique_constraints(self):
+        """
+        Return a list of total unique constraints. Useful for determining set
+        of fields guaranteed to be unique for all rows.
+        """
+        return [
+            constraint
+            for constraint in self.constraints
+            if isinstance(constraint, UniqueConstraint) and constraint.condition is None
+        ]
 
     @cached_property
     def _property_names(self):
@@ -829,3 +849,14 @@ class Options:
             if isinstance(attr, property):
                 names.append(name)
         return frozenset(names)
+
+    @cached_property
+    def db_returning_fields(self):
+        """
+        Private API intended only to be used by Django itself.
+        Fields to be returned after a database insert.
+        """
+        return [
+            field for field in self._get_fields(forward=True, reverse=False, include_parents=PROXY_PARENTS)
+            if getattr(field, 'db_returning', False)
+        ]

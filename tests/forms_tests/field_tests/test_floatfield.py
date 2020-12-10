@@ -1,4 +1,5 @@
-from django.forms import FloatField, NumberInput, ValidationError
+from django.core.exceptions import ValidationError
+from django.forms import FloatField, NumberInput
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils import formats, translation
@@ -10,7 +11,7 @@ class FloatFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_floatfield_1(self):
         f = FloatField()
-        self.assertWidgetRendersTo(f, '<input step="any" type="number" name="f" id="id_f" required />')
+        self.assertWidgetRendersTo(f, '<input step="any" type="number" name="f" id="id_f" required>')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean('')
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
@@ -49,7 +50,7 @@ class FloatFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         f = FloatField(max_value=1.5, min_value=0.5)
         self.assertWidgetRendersTo(
             f,
-            '<input step="any" name="f" min="0.5" max="1.5" type="number" id="id_f" required />',
+            '<input step="any" name="f" min="0.5" max="1.5" type="number" id="id_f" required>',
         )
         with self.assertRaisesMessage(ValidationError, "'Ensure this value is less than or equal to 1.5.'"):
             f.clean('1.6')
@@ -64,7 +65,7 @@ class FloatFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         f = FloatField(widget=NumberInput(attrs={'step': 0.01, 'max': 1.0, 'min': 0.0}))
         self.assertWidgetRendersTo(
             f,
-            '<input step="0.01" name="f" min="0.0" max="1.0" type="number" id="id_f" required />',
+            '<input step="0.01" name="f" min="0.0" max="1.0" type="number" id="id_f" required>',
         )
 
     def test_floatfield_localized(self):
@@ -73,7 +74,7 @@ class FloatFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         number input specific attributes.
         """
         f = FloatField(localize=True)
-        self.assertWidgetRendersTo(f, '<input id="id_f" name="f" type="text" required />')
+        self.assertWidgetRendersTo(f, '<input id="id_f" name="f" type="text" required>')
 
     def test_floatfield_changed(self):
         f = FloatField()

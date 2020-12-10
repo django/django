@@ -4,6 +4,8 @@ The following classes are for testing basic data marshalling, including
 NULL values, where allowed.
 The basic idea is to have a model for each Django data type.
 """
+import uuid
+
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
@@ -18,7 +20,7 @@ class BinaryData(models.Model):
 
 
 class BooleanData(models.Model):
-    data = models.BooleanField(default=False)
+    data = models.BooleanField(default=False, null=True)
 
 
 class CharData(models.Model):
@@ -70,6 +72,10 @@ class GenericIPAddressData(models.Model):
 
 class NullBooleanData(models.Model):
     data = models.NullBooleanField(null=True)
+
+
+class PositiveBigIntegerData(models.Model):
+    data = models.PositiveBigIntegerField(null=True)
 
 
 class PositiveIntegerData(models.Model):
@@ -226,10 +232,6 @@ class IntegerPKData(models.Model):
 class GenericIPAddressPKData(models.Model):
     data = models.GenericIPAddressField(primary_key=True)
 
-# This is just a Boolean field with null=True, and we can't test a PK value of NULL.
-# class NullBooleanPKData(models.Model):
-#     data = models.NullBooleanField(primary_key=True)
-
 
 class PositiveIntegerPKData(models.Model):
     data = models.PositiveIntegerField(primary_key=True)
@@ -255,6 +257,10 @@ class SmallPKData(models.Model):
 
 class UUIDData(models.Model):
     data = models.UUIDField(primary_key=True)
+
+
+class UUIDDefaultData(models.Model):
+    data = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
 
 class FKToUUID(models.Model):

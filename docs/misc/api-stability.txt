@@ -2,12 +2,21 @@
 API stability
 =============
 
-Django promises API stability and forwards-compatibility since version 1.0. In
-a nutshell, this means that code you develop against a version of Django will
-continue to work with future releases. You may need to make minor changes when
-upgrading the version of Django your project uses: see the "Backwards
-incompatible changes" section of the :doc:`release note </releases/index>` for
-the version or versions to which you are upgrading.
+Django is committed to API stability and forwards-compatibility. In a nutshell,
+this means that code you develop against a version of Django will continue to
+work with future releases. You may need to make minor changes when upgrading
+the version of Django your project uses: see the "Backwards incompatible
+changes" section of the :doc:`release note </releases/index>` for the version
+or versions to which you are upgrading.
+
+At the same time as making API stability a very high priority, Django is also
+committed to continual improvement, along with aiming for "one way to do it"
+(eventually) in the APIs we provide. This means that when we discover clearly
+superior ways to do things, we will deprecate and eventually remove the old
+ways. Our aim is to provide a modern, dependable web framework of the highest
+quality that encourages best practices in all projects that use it. By using
+incremental improvements, we try to avoid both stagnation and large breaking
+upgrades.
 
 What "stable" means
 ===================
@@ -29,8 +38,8 @@ In this context, stable means:
   See :ref:`official-releases` for more details on how Django's version
   numbering scheme works, and how features will be deprecated.
 
-- We'll only break backwards compatibility of these APIs if a bug or
-  security hole makes it completely unavoidable.
+- We'll only break backwards compatibility of these APIs without a deprecation
+  process if a bug or security hole makes it completely unavoidable.
 
 Stable APIs
 ===========

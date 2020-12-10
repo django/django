@@ -26,6 +26,8 @@ class WhereNode(tree.Node):
     contains_aggregate attribute.
     """
     default = AND
+    resolved = False
+    conditional = True
 
     def split_having(self, negated=False):
         """
@@ -108,11 +110,11 @@ class WhereNode(tree.Node):
                 # around the inner SQL in the negated case, even if the
                 # inner SQL contains just a single expression.
                 sql_string = 'NOT (%s)' % sql_string
-            elif len(result) > 1:
+            elif len(result) > 1 or self.resolved:
                 sql_string = '(%s)' % sql_string
         return sql_string, result_params
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         cols = []
         for child in self.children:
             cols.extend(child.get_group_by_cols())
@@ -140,7 +142,7 @@ class WhereNode(tree.Node):
     def clone(self):
         """
         Create a clone of the tree. Must only be called on root nodes (nodes
-        with empty subtree_parents). Childs must be either (Contraint, lookup,
+        with empty subtree_parents). Childs must be either (Constraint, lookup,
         value) tuples, or objects supporting .clone().
         """
         clone = self.__class__._new_instance(
@@ -157,6 +159,9 @@ class WhereNode(tree.Node):
         clone.relabel_aliases(change_map)
         return clone
 
+    def copy(self):
+        return self.clone()
+
     @classmethod
     def _contains_aggregate(cls, obj):
         if isinstance(obj, tree.Node):
@@ -167,9 +172,41 @@ class WhereNode(tree.Node):
     def contains_aggregate(self):
         return self._contains_aggregate(self)
 
+    @classmethod
+    def _contains_over_clause(cls, obj):
+        if isinstance(obj, tree.Node):
+            return any(cls._contains_over_clause(c) for c in obj.children)
+        return obj.contains_over_clause
+
+    @cached_property
+    def contains_over_clause(self):
+        return self._contains_over_clause(self)
+
     @property
     def is_summary(self):
         return any(child.is_summary for child in self.children)
+
+    @staticmethod
+    def _resolve_leaf(expr, query, *args, **kwargs):
+        if hasattr(expr, 'resolve_expression'):
+            expr = expr.resolve_expression(query, *args, **kwargs)
+        return expr
+
+    @classmethod
+    def _resolve_node(cls, node, query, *args, **kwargs):
+        if hasattr(node, 'children'):
+            for child in node.children:
+                cls._resolve_node(child, query, *args, **kwargs)
+        if hasattr(node, 'lhs'):
+            node.lhs = cls._resolve_leaf(node.lhs, query, *args, **kwargs)
+        if hasattr(node, 'rhs'):
+            node.rhs = cls._resolve_leaf(node.rhs, query, *args, **kwargs)
+
+    def resolve_expression(self, *args, **kwargs):
+        clone = self.clone()
+        clone._resolve_node(clone, *args, **kwargs)
+        clone.resolved = True
+        return clone
 
 
 class NothingNode:

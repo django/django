@@ -49,7 +49,14 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
                 )
             )
 
-        if isinstance(coords, (tuple, list)):
+        numpy_coords = not isinstance(coords, (tuple, list))
+        if numpy_coords:
+            shape = coords.shape  # Using numpy's shape.
+            if len(shape) != 2:
+                raise TypeError('Too many dimensions.')
+            self._checkdim(shape[1])
+            ndim = shape[1]
+        else:
             # Getting the number of coords and the number of dimensions -- which
             #  must stay the same, e.g., no LineString((1, 2), (1, 2, 3)).
             ndim = None
@@ -63,14 +70,6 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
                     self._checkdim(ndim)
                 elif len(coord) != ndim:
                     raise TypeError('Dimension mismatch.')
-            numpy_coords = False
-        else:
-            shape = coords.shape  # Using numpy's shape.
-            if len(shape) != 2:
-                raise TypeError('Too many dimensions.')
-            self._checkdim(shape[1])
-            ndim = shape[1]
-            numpy_coords = True
 
         # Creating a coordinate sequence object because it is easier to
         # set the points using its methods.
@@ -92,7 +91,8 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 
     def __iter__(self):
         "Allow iteration over this LineString."
-        return iter(self._cs)
+        for i in range(len(self)):
+            yield self[i]
 
     def __len__(self):
         "Return the number of points in this LineString."
@@ -106,6 +106,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
     def _set_list(self, length, items):
         ndim = self._cs.dims
         hasz = self._cs.hasz  # I don't understand why these are different
+        srid = self.srid
 
         # create a new coordinate sequence and populate accordingly
         cs = GEOSCoordSeq(capi.create_cs(length, ndim), z=hasz)
@@ -116,7 +117,9 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
         if ptr:
             capi.destroy_geom(self.ptr)
             self.ptr = ptr
-            self._post_init(self.srid)
+            if srid is not None:
+                self.srid = srid
+            self._post_init()
         else:
             # can this happen?
             raise GEOSException('Geometry resulting from slice deletion was invalid.')
@@ -174,3 +177,11 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 class LinearRing(LineString):
     _minlength = 4
     _init_func = capi.create_linearring
+
+    @property
+    def is_counterclockwise(self):
+        if self.empty:
+            raise ValueError(
+                'Orientation of an empty LinearRing cannot be determined.'
+            )
+        return self._cs.is_counterclockwise

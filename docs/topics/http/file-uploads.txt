@@ -19,10 +19,10 @@ and in memory, and how to customize the default behavior.
 Basic file uploads
 ==================
 
-Consider a simple form containing a :class:`~django.forms.FileField`:
+Consider a form containing a :class:`~django.forms.FileField`:
 
-.. snippet::
-    :filename: forms.py
+.. code-block:: python
+    :caption: forms.py
 
     from django import forms
 
@@ -38,16 +38,15 @@ subclass) in the form. So the data from the above form would
 be accessible as ``request.FILES['file']``.
 
 Note that :attr:`request.FILES <django.http.HttpRequest.FILES>` will only
-contain data if the request method was ``POST`` and the ``<form>`` that posted
-the request has the attribute ``enctype="multipart/form-data"``. Otherwise,
-``request.FILES`` will be empty.
+contain data if the request method was ``POST``, at least one file field was
+actually posted, and the ``<form>`` that posted the request has the attribute
+``enctype="multipart/form-data"``. Otherwise, ``request.FILES`` will be empty.
 
-Most of the time, you'll simply pass the file data from ``request`` into the
-form as described in :ref:`binding-uploaded-files`. This would look
-something like:
+Most of the time, you'll pass the file data from ``request`` into the form as
+described in :ref:`binding-uploaded-files`. This would look something like:
 
-.. snippet::
-    :filename: views.py
+.. code-block:: python
+    :caption: views.py
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import render
@@ -107,9 +106,9 @@ corresponding :class:`~django.db.models.FileField` when calling
             form = ModelFormWithFileField()
         return render(request, 'upload.html', {'form': form})
 
-If you are constructing an object manually, you can simply assign the file
-object from :attr:`request.FILES <django.http.HttpRequest.FILES>` to the file
-field in the model::
+If you are constructing an object manually, you can assign the file object from
+:attr:`request.FILES <django.http.HttpRequest.FILES>` to the file field in the
+model::
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import render
@@ -133,8 +132,8 @@ Uploading multiple files
 If you want to upload multiple files using one form field, set the ``multiple``
 HTML attribute of field's widget:
 
-.. snippet::
-    :filename: forms.py
+.. code-block:: python
+    :caption: forms.py
 
     from django import forms
 
@@ -145,8 +144,8 @@ Then override the ``post`` method of your
 :class:`~django.views.generic.edit.FormView` subclass to handle multiple file
 uploads:
 
-.. snippet::
-    :filename: views.py
+.. code-block:: python
+    :caption: views.py
 
     from django.views.generic.edit import FormView
     from .forms import FileFieldForm
@@ -190,8 +189,6 @@ data on the fly, render progress bars, and even send data to another storage
 location directly without storing it locally. See :ref:`custom_upload_handlers`
 for details on how you can customize or completely replace upload behavior.
 
-.. _modifying_upload_handlers_on_the_fly:
-
 Where uploaded data is stored
 -----------------------------
 
@@ -207,14 +204,16 @@ platform this means you can expect Django to generate a file called something
 like ``/tmp/tmpzfp6I6.upload``. If an upload is large enough, you can watch this
 file grow in size as Django streams the data onto disk.
 
-These specifics -- 2.5 megabytes; ``/tmp``; etc. -- are simply "reasonable
-defaults" which can be customized as described in the next section.
+These specifics -- 2.5 megabytes; ``/tmp``; etc. -- are "reasonable defaults"
+which can be customized as described in the next section.
 
 Changing upload handler behavior
 --------------------------------
 
 There are a few settings which control Django's file upload behavior. See
 :ref:`File Upload Settings <file-upload-settings>` for details.
+
+.. _modifying_upload_handlers_on_the_fly:
 
 Modifying upload handlers on the fly
 ------------------------------------
@@ -235,7 +234,7 @@ You'd probably want to use ``list.insert()`` in this case (instead of
 ``append()``) because a progress bar handler would need to run *before* any
 other handlers. Remember, the upload handlers are processed in order.
 
-If you want to replace the upload handlers completely, you can just assign a new
+If you want to replace the upload handlers completely, you can assign a new
 list::
 
    request.upload_handlers = [ProgressBarUploadHandler(request)]

@@ -1,5 +1,5 @@
-from django.conf.urls import url
 from django.contrib.auth import views as auth_views
+from django.urls import path
 from django.views.generic import RedirectView
 
 from . import views
@@ -25,22 +25,20 @@ numeric_days_info_dict = dict(date_based_info_dict, day_format='%d')
 date_based_datefield_info_dict = dict(date_based_info_dict, queryset=DateArticle.objects.all())
 
 urlpatterns = [
-    url(r'^accounts/login/$', auth_views.LoginView.as_view(template_name='login.html')),
-    url(r'^accounts/logout/$', auth_views.LogoutView.as_view()),
+    path('accounts/login/', auth_views.LoginView.as_view(template_name='login.html')),
+    path('accounts/logout/', auth_views.LogoutView.as_view()),
 
     # Special URLs for particular regression cases.
-    url('^中文/target/$', views.index_page),
+    path('中文/target/', views.index_page),
 ]
 
 # redirects, both temporary and permanent, with non-ASCII targets
 urlpatterns += [
-    url('^nonascii_redirect/$', RedirectView.as_view(
-        url='/中文/target/', permanent=False)),
-    url('^permanent_nonascii_redirect/$', RedirectView.as_view(
-        url='/中文/target/', permanent=True)),
+    path('nonascii_redirect/', RedirectView.as_view(url='/中文/target/', permanent=False)),
+    path('permanent_nonascii_redirect/', RedirectView.as_view(url='/中文/target/', permanent=True)),
 ]
 
 # json response
 urlpatterns += [
-    url(r'^json/response/$', views.json_response_view),
+    path('json/response/', views.json_response_view),
 ]

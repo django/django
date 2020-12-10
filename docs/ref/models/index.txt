@@ -9,6 +9,7 @@ Model API reference. For introductory material, see :doc:`/topics/db/models`.
 
    fields
    indexes
+   constraints
    meta
    relations
    class

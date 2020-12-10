@@ -7,15 +7,20 @@ import time
 import unittest
 from datetime import datetime, timedelta
 from io import StringIO
+from pathlib import Path
 from urllib.request import urlopen
 
 from django.core.cache import cache
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files.base import ContentFile, File
-from django.core.files.storage import FileSystemStorage, get_storage_class
+from django.core.files.storage import (
+    FileSystemStorage, Storage as BaseStorage, default_storage,
+    get_storage_class,
+)
 from django.core.files.uploadedfile import (
     InMemoryUploadedFile, SimpleUploadedFile, TemporaryUploadedFile,
 )
+from django.db.models import FileField
 from django.db.models.fields.files import FileDescriptor
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
@@ -24,7 +29,9 @@ from django.test.utils import requires_tz_support
 from django.urls import NoReverseMatch, reverse_lazy
 from django.utils import timezone
 
-from .models import Storage, temp_storage, temp_storage_location
+from .models import (
+    Storage, callable_storage, temp_storage, temp_storage_location,
+)
 
 FILE_SUFFIX_REGEX = '[A-Za-z0-9]{7}'
 
@@ -371,13 +378,14 @@ class FileStorageTests(SimpleTestCase):
         self.storage.save('storage_test_2', ContentFile('custom content'))
         os.mkdir(os.path.join(self.temp_dir, 'storage_dir_1'))
 
-        dirs, files = self.storage.listdir('')
-        self.assertEqual(set(dirs), {'storage_dir_1'})
-        self.assertEqual(set(files), {'storage_test_1', 'storage_test_2'})
+        self.addCleanup(self.storage.delete, 'storage_test_1')
+        self.addCleanup(self.storage.delete, 'storage_test_2')
 
-        self.storage.delete('storage_test_1')
-        self.storage.delete('storage_test_2')
-        os.rmdir(os.path.join(self.temp_dir, 'storage_dir_1'))
+        for directory in ('', Path('')):
+            with self.subTest(directory=directory):
+                dirs, files = self.storage.listdir(directory)
+                self.assertEqual(set(dirs), {'storage_dir_1'})
+                self.assertEqual(set(files), {'storage_test_1', 'storage_test_2'})
 
     def test_file_storage_prevents_directory_traversal(self):
         """
@@ -410,14 +418,15 @@ class FileStorageTests(SimpleTestCase):
 
         # Monkey-patch os.makedirs, to simulate a normal call, a raced call,
         # and an error.
-        def fake_makedirs(path):
+        def fake_makedirs(path, mode=0o777, exist_ok=False):
             if path == os.path.join(self.temp_dir, 'normal'):
-                real_makedirs(path)
+                real_makedirs(path, mode, exist_ok)
             elif path == os.path.join(self.temp_dir, 'raced'):
-                real_makedirs(path)
-                raise FileNotFoundError()
+                real_makedirs(path, mode, exist_ok)
+                if not exist_ok:
+                    raise FileExistsError()
             elif path == os.path.join(self.temp_dir, 'error'):
-                raise FileExistsError()
+                raise PermissionError()
             else:
                 self.fail('unexpected argument %r' % path)
 
@@ -432,8 +441,8 @@ class FileStorageTests(SimpleTestCase):
             with self.storage.open('raced/test.file') as f:
                 self.assertEqual(f.read(), b'saved with race')
 
-            # Exceptions aside from FileNotFoundError are raised.
-            with self.assertRaises(FileExistsError):
+            # Exceptions aside from FileExistsError are raised.
+            with self.assertRaises(PermissionError):
                 self.storage.save('error/test.file', ContentFile('not saved'))
         finally:
             os.makedirs = real_makedirs
@@ -482,9 +491,9 @@ class FileStorageTests(SimpleTestCase):
         f1 = ContentFile('chunks fails')
 
         def failing_chunks():
-            raise IOError
+            raise OSError
         f1.chunks = failing_chunks
-        with self.assertRaises(IOError):
+        with self.assertRaises(OSError):
             self.storage.save('error.file', f1)
 
     def test_delete_no_name(self):
@@ -519,8 +528,8 @@ class FileStorageTests(SimpleTestCase):
         )
         defaults_storage = self.storage_class()
         settings = {
-            'MEDIA_ROOT': 'overriden_media_root',
-            'MEDIA_URL': 'overriden_media_url/',
+            'MEDIA_ROOT': 'overridden_media_root',
+            'MEDIA_URL': '/overridden_media_url/',
             'FILE_UPLOAD_PERMISSIONS': 0o333,
             'FILE_UPLOAD_DIRECTORY_PERMISSIONS': 0o333,
         }
@@ -538,17 +547,29 @@ class FileStorageTests(SimpleTestCase):
                 defaults_storage.directory_permissions_mode, settings['FILE_UPLOAD_DIRECTORY_PERMISSIONS']
             )
 
+    def test_file_methods_pathlib_path(self):
+        p = Path('test.file')
+        self.assertFalse(self.storage.exists(p))
+        f = ContentFile('custom contents')
+        f_name = self.storage.save(p, f)
+        # Storage basic methods.
+        self.assertEqual(self.storage.path(p), os.path.join(self.temp_dir, p))
+        self.assertEqual(self.storage.size(p), 15)
+        self.assertEqual(self.storage.url(p), self.storage.base_url + f_name)
+        with self.storage.open(p) as f:
+            self.assertEqual(f.read(), b'custom contents')
+        self.addCleanup(self.storage.delete, p)
+
 
 class CustomStorage(FileSystemStorage):
     def get_available_name(self, name, max_length=None):
         """
         Append numbers to duplicate files rather than underscores, like Trac.
         """
-        parts = name.split('.')
-        basename, ext = parts[0], parts[1:]
+        basename, *ext = os.path.splitext(name)
         number = 2
         while self.exists(name):
-            name = '.'.join([basename, str(number)] + ext)
+            name = ''.join([basename, '.', str(number)] + ext)
             number += 1
 
         return name
@@ -564,6 +585,47 @@ class CustomStorageTests(FileStorageTests):
         self.assertEqual(second, 'custom_storage.2')
         self.storage.delete(first)
         self.storage.delete(second)
+
+
+class OverwritingStorage(FileSystemStorage):
+    """
+    Overwrite existing files instead of appending a suffix to generate an
+    unused name.
+    """
+    # Mask out O_EXCL so os.open() doesn't raise OSError if the file exists.
+    OS_OPEN_FLAGS = FileSystemStorage.OS_OPEN_FLAGS & ~os.O_EXCL
+
+    def get_available_name(self, name, max_length=None):
+        """Override the effort to find an used name."""
+        return name
+
+
+class OverwritingStorageTests(FileStorageTests):
+    storage_class = OverwritingStorage
+
+    def test_save_overwrite_behavior(self):
+        """Saving to same file name twice overwrites the first file."""
+        name = 'test.file'
+        self.assertFalse(self.storage.exists(name))
+        content_1 = b'content one'
+        content_2 = b'second content'
+        f_1 = ContentFile(content_1)
+        f_2 = ContentFile(content_2)
+        stored_name_1 = self.storage.save(name, f_1)
+        try:
+            self.assertEqual(stored_name_1, name)
+            self.assertTrue(self.storage.exists(name))
+            self.assertTrue(os.path.exists(os.path.join(self.temp_dir, name)))
+            with self.storage.open(name) as fp:
+                self.assertEqual(fp.read(), content_1)
+            stored_name_2 = self.storage.save(name, f_2)
+            self.assertEqual(stored_name_2, name)
+            self.assertTrue(self.storage.exists(name))
+            self.assertTrue(os.path.exists(os.path.join(self.temp_dir, name)))
+            with self.storage.open(name) as fp:
+                self.assertEqual(fp.read(), content_2)
+        finally:
+            self.storage.delete(name)
 
 
 class DiscardingFalseContentStorage(FileSystemStorage):
@@ -715,7 +777,7 @@ class FileFieldStorageTests(TestCase):
                 o.delete()
 
     @unittest.skipIf(
-        sys.platform.startswith('win'),
+        sys.platform == 'win32',
         "Windows supports at most 260 characters in a path.",
     )
     def test_extended_length_storage(self):
@@ -751,6 +813,14 @@ class FileFieldStorageTests(TestCase):
         self.assertEqual(obj.empty.read(), b"more content")
         obj.empty.close()
 
+    def test_pathlib_upload_to(self):
+        obj = Storage()
+        obj.pathlib_callable.save('some_file1.txt', ContentFile('some content'))
+        self.assertEqual(obj.pathlib_callable.name, 'bar/some_file1.txt')
+        obj.pathlib_direct.save('some_file2.txt', ContentFile('some content'))
+        self.assertEqual(obj.pathlib_direct.name, 'bar/some_file2.txt')
+        obj.random.close()
+
     def test_random_upload_to(self):
         # Verify the fix for #5655, making sure the directory is only
         # determined once.
@@ -781,7 +851,7 @@ class FileFieldStorageTests(TestCase):
         # Create sample file
         temp_storage.save('tests/example.txt', ContentFile('some content'))
 
-        # Load it as python file object
+        # Load it as Python file object
         with open(temp_storage.path('tests/example.txt')) as file_obj:
             # Save it using storage and read its content
             temp_storage.save('tests/file_obj', file_obj)
@@ -800,6 +870,58 @@ class FileFieldStorageTests(TestCase):
         self.assertTrue(temp_storage.exists('tests/stringio'))
         with temp_storage.open('tests/stringio') as f:
             self.assertEqual(f.read(), b'content')
+
+
+class FieldCallableFileStorageTests(SimpleTestCase):
+    def setUp(self):
+        self.temp_storage_location = tempfile.mkdtemp(suffix='filefield_callable_storage')
+
+    def tearDown(self):
+        shutil.rmtree(self.temp_storage_location)
+
+    def test_callable_base_class_error_raises(self):
+        class NotStorage:
+            pass
+        msg = 'FileField.storage must be a subclass/instance of django.core.files.storage.Storage'
+        for invalid_type in (NotStorage, str, list, set, tuple):
+            with self.subTest(invalid_type=invalid_type):
+                with self.assertRaisesMessage(TypeError, msg):
+                    FileField(storage=invalid_type)
+
+    def test_file_field_storage_none_uses_default_storage(self):
+        self.assertEqual(FileField().storage, default_storage)
+
+    def test_callable_function_storage_file_field(self):
+        storage = FileSystemStorage(location=self.temp_storage_location)
+
+        def get_storage():
+            return storage
+
+        obj = FileField(storage=get_storage)
+        self.assertEqual(obj.storage, storage)
+        self.assertEqual(obj.storage.location, storage.location)
+
+    def test_callable_class_storage_file_field(self):
+        class GetStorage(FileSystemStorage):
+            pass
+
+        obj = FileField(storage=GetStorage)
+        self.assertIsInstance(obj.storage, BaseStorage)
+
+    def test_callable_storage_file_field_in_model(self):
+        obj = Storage()
+        self.assertEqual(obj.storage_callable.storage, temp_storage)
+        self.assertEqual(obj.storage_callable.storage.location, temp_storage_location)
+        self.assertIsInstance(obj.storage_callable_class.storage, BaseStorage)
+
+    def test_deconstruction(self):
+        """
+        Deconstructing gives the original callable, not the evaluated value.
+        """
+        obj = Storage()
+        *_, kwargs = obj._meta.get_field('storage_callable').deconstruct()
+        storage = kwargs['storage']
+        self.assertIs(storage, callable_storage)
 
 
 # Tests for a race condition on file saving (#4948).
@@ -833,7 +955,7 @@ class FileSaveRaceConditionTest(SimpleTestCase):
         self.assertRegex(files[1], 'conflict_%s' % FILE_SUFFIX_REGEX)
 
 
-@unittest.skipIf(sys.platform.startswith('win'), "Windows only partially supports umasks and chmod.")
+@unittest.skipIf(sys.platform == 'win32', "Windows only partially supports umasks and chmod.")
 class FileStoragePermissions(unittest.TestCase):
     def setUp(self):
         self.umask = 0o027
@@ -861,16 +983,19 @@ class FileStoragePermissions(unittest.TestCase):
     @override_settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o765)
     def test_file_upload_directory_permissions(self):
         self.storage = FileSystemStorage(self.storage_dir)
-        name = self.storage.save("the_directory/the_file", ContentFile("data"))
-        dir_mode = os.stat(os.path.dirname(self.storage.path(name)))[0] & 0o777
-        self.assertEqual(dir_mode, 0o765)
+        name = self.storage.save('the_directory/subdir/the_file', ContentFile('data'))
+        file_path = Path(self.storage.path(name))
+        self.assertEqual(file_path.parent.stat().st_mode & 0o777, 0o765)
+        self.assertEqual(file_path.parent.parent.stat().st_mode & 0o777, 0o765)
 
     @override_settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=None)
     def test_file_upload_directory_default_permissions(self):
         self.storage = FileSystemStorage(self.storage_dir)
-        name = self.storage.save("the_directory/the_file", ContentFile("data"))
-        dir_mode = os.stat(os.path.dirname(self.storage.path(name)))[0] & 0o777
-        self.assertEqual(dir_mode, 0o777 & ~self.umask)
+        name = self.storage.save('the_directory/subdir/the_file', ContentFile('data'))
+        file_path = Path(self.storage.path(name))
+        expected_mode = 0o777 & ~self.umask
+        self.assertEqual(file_path.parent.stat().st_mode & 0o777, expected_mode)
+        self.assertEqual(file_path.parent.parent.stat().st_mode & 0o777, expected_mode)
 
 
 class FileStoragePathParsing(SimpleTestCase):
@@ -943,9 +1068,10 @@ class FileLikeObjectTestCase(LiveServerTestCase):
     def tearDown(self):
         shutil.rmtree(self.temp_dir)
 
-    def test_urllib2_urlopen(self):
+    def test_urllib_request_urlopen(self):
         """
-        Test the File storage API with a file like object coming from urllib2.urlopen()
+        Test the File storage API with a file-like object coming from
+        urllib.request.urlopen().
         """
         file_like_object = urlopen(self.live_server_url + '/')
         f = File(file_like_object)

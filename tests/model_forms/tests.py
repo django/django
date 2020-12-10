@@ -5,19 +5,18 @@ from unittest import mock, skipUnless
 
 from django import forms
 from django.core.exceptions import (
-    NON_FIELD_ERRORS, FieldError, ImproperlyConfigured,
+    NON_FIELD_ERRORS, FieldError, ImproperlyConfigured, ValidationError,
 )
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.validators import ValidationError
 from django.db import connection, models
 from django.db.models.query import EmptyQuerySet
 from django.forms.models import (
-    ModelChoiceIterator, ModelFormMetaclass, construct_instance,
-    fields_for_model, model_to_dict, modelform_factory,
+    ModelFormMetaclass, construct_instance, fields_for_model, model_to_dict,
+    modelform_factory,
 )
-from django.forms.widgets import CheckboxSelectMultiple
 from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test.utils import isolate_apps
 
 from .models import (
     Article, ArticleStatus, Author, Author1, Award, BetterWriter, BigInt, Book,
@@ -32,7 +31,7 @@ from .models import (
 )
 
 if test_images:
-    from .models import ImageFile, OptionalImageFile, NoExtensionImageFile
+    from .models import ImageFile, NoExtensionImageFile, OptionalImageFile
 
     class ImageFileForm(forms.ModelForm):
         class Meta:
@@ -174,8 +173,7 @@ class CustomErrorMessageForm(forms.ModelForm):
 
 class ModelFormBaseTest(TestCase):
     def test_base_form(self):
-        self.assertEqual(list(BaseCategoryForm.base_fields),
-                         ['name', 'slug', 'url'])
+        self.assertEqual(list(BaseCategoryForm.base_fields), ['name', 'slug', 'url'])
 
     def test_no_model_class(self):
         class NoModelModelForm(forms.ModelForm):
@@ -225,8 +223,7 @@ class ModelFormBaseTest(TestCase):
                 super().__init__(*args, **kwargs)
                 self.fields['character'].required = False
 
-        char = Character.objects.create(username='user',
-                                        last_action=datetime.datetime.today())
+        char = Character.objects.create(username='user', last_action=datetime.datetime.today())
         data = {'study': 'Engineering'}
         data2 = {'study': 'Engineering', 'character': char.pk}
 
@@ -262,6 +259,37 @@ class ModelFormBaseTest(TestCase):
         award = form.save()
         self.assertIsNone(award.character)
 
+    def test_blank_foreign_key_with_radio(self):
+        class BookForm(forms.ModelForm):
+            class Meta:
+                model = Book
+                fields = ['author']
+                widgets = {'author': forms.RadioSelect()}
+
+        writer = Writer.objects.create(name='Joe Doe')
+        form = BookForm()
+        self.assertEqual(list(form.fields['author'].choices), [
+            ('', '---------'),
+            (writer.pk, 'Joe Doe'),
+        ])
+
+    def test_non_blank_foreign_key_with_radio(self):
+        class AwardForm(forms.ModelForm):
+            class Meta:
+                model = Award
+                fields = ['character']
+                widgets = {'character': forms.RadioSelect()}
+
+        character = Character.objects.create(
+            username='user',
+            last_action=datetime.datetime.today(),
+        )
+        form = AwardForm()
+        self.assertEqual(
+            list(form.fields['character'].choices),
+            [(character.pk, 'user')],
+        )
+
     def test_save_blank_false_with_required_false(self):
         """
         A ModelForm with a model with a field set to blank=False and the form
@@ -274,19 +302,30 @@ class ModelFormBaseTest(TestCase):
         self.assertEqual(obj.name, '')
 
     def test_save_blank_null_unique_charfield_saves_null(self):
-        form_class = modelform_factory(model=NullableUniqueCharFieldModel, fields=['codename'])
+        form_class = modelform_factory(model=NullableUniqueCharFieldModel, fields='__all__')
         empty_value = '' if connection.features.interprets_empty_strings_as_nulls else None
-
-        form = form_class(data={'codename': ''})
+        data = {
+            'codename': '',
+            'email': '',
+            'slug': '',
+            'url': '',
+        }
+        form = form_class(data=data)
         self.assertTrue(form.is_valid())
         form.save()
         self.assertEqual(form.instance.codename, empty_value)
+        self.assertEqual(form.instance.email, empty_value)
+        self.assertEqual(form.instance.slug, empty_value)
+        self.assertEqual(form.instance.url, empty_value)
 
         # Save a second form to verify there isn't a unique constraint violation.
-        form = form_class(data={'codename': ''})
+        form = form_class(data=data)
         self.assertTrue(form.is_valid())
         form.save()
         self.assertEqual(form.instance.codename, empty_value)
+        self.assertEqual(form.instance.email, empty_value)
+        self.assertEqual(form.instance.slug, empty_value)
+        self.assertEqual(form.instance.url, empty_value)
 
     def test_missing_fields_attribute(self):
         message = (
@@ -515,8 +554,7 @@ class ModelFormBaseTest(TestCase):
             """
             pass
 
-        self.assertEqual(list(SubCategoryForm.base_fields),
-                         ['name', 'slug', 'url'])
+        self.assertEqual(list(SubCategoryForm.base_fields), ['name', 'slug', 'url'])
 
     def test_subclassmeta_form(self):
         class SomeCategoryForm(forms.ModelForm):
@@ -536,11 +574,11 @@ class ModelFormBaseTest(TestCase):
         self.assertHTMLEqual(
             str(SubclassMeta()),
             """<tr><th><label for="id_name">Name:</label></th>
-<td><input id="id_name" type="text" name="name" maxlength="20" required /></td></tr>
+<td><input id="id_name" type="text" name="name" maxlength="20" required></td></tr>
 <tr><th><label for="id_slug">Slug:</label></th>
-<td><input id="id_slug" type="text" name="slug" maxlength="20" required /></td></tr>
+<td><input id="id_slug" type="text" name="slug" maxlength="20" required></td></tr>
 <tr><th><label for="id_checkbox">Checkbox:</label></th>
-<td><input type="checkbox" name="checkbox" id="id_checkbox" required /></td></tr>"""
+<td><input type="checkbox" name="checkbox" id="id_checkbox" required></td></tr>"""
         )
 
     def test_orderfields_form(self):
@@ -554,9 +592,9 @@ class ModelFormBaseTest(TestCase):
         self.assertHTMLEqual(
             str(OrderFields()),
             """<tr><th><label for="id_url">The URL:</label></th>
-<td><input id="id_url" type="text" name="url" maxlength="40" required /></td></tr>
+<td><input id="id_url" type="text" name="url" maxlength="40" required></td></tr>
 <tr><th><label for="id_name">Name:</label></th>
-<td><input id="id_name" type="text" name="name" maxlength="20" required /></td></tr>"""
+<td><input id="id_name" type="text" name="name" maxlength="20" required></td></tr>"""
         )
 
     def test_orderfields2_form(self):
@@ -566,8 +604,7 @@ class ModelFormBaseTest(TestCase):
                 fields = ['slug', 'url', 'name']
                 exclude = ['url']
 
-        self.assertEqual(list(OrderFields2.base_fields),
-                         ['slug', 'name'])
+        self.assertEqual(list(OrderFields2.base_fields), ['slug', 'name'])
 
     def test_default_populated_on_optional_field(self):
         class PubForm(forms.ModelForm):
@@ -589,6 +626,32 @@ class ModelFormBaseTest(TestCase):
         self.assertEqual(mf2.errors, {})
         m2 = mf2.save(commit=False)
         self.assertEqual(m2.mode, '')
+
+    def test_default_not_populated_on_non_empty_value_in_cleaned_data(self):
+        class PubForm(forms.ModelForm):
+            mode = forms.CharField(max_length=255, required=False)
+            mocked_mode = None
+
+            def clean(self):
+                self.cleaned_data['mode'] = self.mocked_mode
+                return self.cleaned_data
+
+            class Meta:
+                model = PublicationDefaults
+                fields = ('mode',)
+
+        pub_form = PubForm({})
+        pub_form.mocked_mode = 'de'
+        pub = pub_form.save(commit=False)
+        self.assertEqual(pub.mode, 'de')
+        # Default should be populated on an empty value in cleaned_data.
+        default_mode = 'di'
+        for empty_value in pub_form.fields['mode'].empty_values:
+            with self.subTest(empty_value=empty_value):
+                pub_form = PubForm({})
+                pub_form.mocked_mode = empty_value
+                pub = pub_form.save(commit=False)
+                self.assertEqual(pub.mode, default_mode)
 
     def test_default_not_populated_on_optional_checkbox_input(self):
         class PubForm(forms.ModelForm):
@@ -652,6 +715,10 @@ class ModelFormBaseTest(TestCase):
         self.assertEqual(mf1.errors, {})
         m1 = mf1.save(commit=False)
         self.assertEqual(m1.mode, mode)
+
+    def test_renderer_kwarg(self):
+        custom = object()
+        self.assertIs(ProductForm(renderer=custom).renderer, custom)
 
     def test_default_splitdatetime_field(self):
         class PubForm(forms.ModelForm):
@@ -742,11 +809,11 @@ class TestFieldOverridesByFormMeta(SimpleTestCase):
         )
         self.assertHTMLEqual(
             str(form['url']),
-            '<input id="id_url" type="text" class="url" name="url" maxlength="40" required />',
+            '<input id="id_url" type="text" class="url" name="url" maxlength="40" required>',
         )
         self.assertHTMLEqual(
             str(form['slug']),
-            '<input id="id_slug" type="text" name="slug" maxlength="20" required />',
+            '<input id="id_slug" type="text" name="slug" maxlength="20" required>',
         )
 
     def test_label_overrides(self):
@@ -818,23 +885,24 @@ class IncompleteCategoryFormWithExclude(forms.ModelForm):
 class ValidationTest(SimpleTestCase):
     def test_validates_with_replaced_field_not_specified(self):
         form = IncompleteCategoryFormWithFields(data={'name': 'some name', 'slug': 'some-slug'})
-        assert form.is_valid()
+        self.assertIs(form.is_valid(), True)
 
     def test_validates_with_replaced_field_excluded(self):
         form = IncompleteCategoryFormWithExclude(data={'name': 'some name', 'slug': 'some-slug'})
-        assert form.is_valid()
+        self.assertIs(form.is_valid(), True)
 
     def test_notrequired_overrides_notblank(self):
         form = CustomWriterForm({})
-        assert form.is_valid()
+        self.assertIs(form.is_valid(), True)
 
 
 class UniqueTest(TestCase):
     """
     unique/unique_together validation.
     """
-    def setUp(self):
-        self.writer = Writer.objects.create(name='Mike Royko')
+    @classmethod
+    def setUpTestData(cls):
+        cls.writer = Writer.objects.create(name='Mike Royko')
 
     def test_simple_unique(self):
         form = ProductForm({'slug': 'teddy-bear-blue'})
@@ -855,6 +923,34 @@ class UniqueTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['__all__'], ['Price with this Price and Quantity already exists.'])
+
+    def test_unique_together_exclusion(self):
+        """
+        Forms don't validate unique_together constraints when only part of the
+        constraint is included in the form's fields. This allows using
+        form.save(commit=False) and then assigning the missing field(s) to the
+        model instance.
+        """
+        class BookForm(forms.ModelForm):
+            class Meta:
+                model = DerivedBook
+                fields = ('isbn', 'suffix1')
+
+        # The unique_together is on suffix1/suffix2 but only suffix1 is part
+        # of the form. The fields must have defaults, otherwise they'll be
+        # skipped by other logic.
+        self.assertEqual(DerivedBook._meta.unique_together, (('suffix1', 'suffix2'),))
+        for name in ('suffix1', 'suffix2'):
+            with self.subTest(name=name):
+                field = DerivedBook._meta.get_field(name)
+                self.assertEqual(field.default, 0)
+
+        # The form fails validation with "Derived book with this Suffix1 and
+        # Suffix2 already exists." if the unique_together validation isn't
+        # skipped.
+        DerivedBook.objects.create(isbn='12345')
+        form = BookForm({'isbn': '56789', 'suffix1': '0'})
+        self.assertTrue(form.is_valid(), form.errors)
 
     def test_multiple_field_unique_together(self):
         """
@@ -935,8 +1031,10 @@ class UniqueTest(TestCase):
         })
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
-        self.assertEqual(form.errors['__all__'],
-                         ['Derived book with this Suffix1 and Suffix2 already exists.'])
+        self.assertEqual(
+            form.errors['__all__'],
+            ['Derived book with this Suffix1 and Suffix2 already exists.'],
+        )
 
     def test_explicitpk_unspecified(self):
         """Test for primary_key being in the form and failing validation."""
@@ -1108,12 +1206,9 @@ class UniqueTest(TestCase):
 
 class ModelFormBasicTests(TestCase):
     def create_basic_data(self):
-        self.c1 = Category.objects.create(
-            name="Entertainment", slug="entertainment", url="entertainment")
-        self.c2 = Category.objects.create(
-            name="It's a test", slug="its-test", url="test")
-        self.c3 = Category.objects.create(
-            name="Third test", slug="third-test", url="third")
+        self.c1 = Category.objects.create(name='Entertainment', slug='entertainment', url='entertainment')
+        self.c2 = Category.objects.create(name="It's a test", slug='its-test', url='test')
+        self.c3 = Category.objects.create(name='Third test', slug='third-test', url='third')
         self.w_royko = Writer.objects.create(name='Mike Royko')
         self.w_woodward = Writer.objects.create(name='Bob Woodward')
 
@@ -1123,29 +1218,29 @@ class ModelFormBasicTests(TestCase):
         self.assertHTMLEqual(
             str(f),
             """<tr><th><label for="id_name">Name:</label></th>
-<td><input id="id_name" type="text" name="name" maxlength="20" required /></td></tr>
+<td><input id="id_name" type="text" name="name" maxlength="20" required></td></tr>
 <tr><th><label for="id_slug">Slug:</label></th>
-<td><input id="id_slug" type="text" name="slug" maxlength="20" required /></td></tr>
+<td><input id="id_slug" type="text" name="slug" maxlength="20" required></td></tr>
 <tr><th><label for="id_url">The URL:</label></th>
-<td><input id="id_url" type="text" name="url" maxlength="40" required /></td></tr>"""
+<td><input id="id_url" type="text" name="url" maxlength="40" required></td></tr>"""
         )
         self.assertHTMLEqual(
             str(f.as_ul()),
-            """<li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" maxlength="20" required /></li>
-<li><label for="id_slug">Slug:</label> <input id="id_slug" type="text" name="slug" maxlength="20" required /></li>
-<li><label for="id_url">The URL:</label> <input id="id_url" type="text" name="url" maxlength="40" required /></li>"""
+            """<li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" maxlength="20" required></li>
+<li><label for="id_slug">Slug:</label> <input id="id_slug" type="text" name="slug" maxlength="20" required></li>
+<li><label for="id_url">The URL:</label> <input id="id_url" type="text" name="url" maxlength="40" required></li>"""
         )
         self.assertHTMLEqual(
             str(f["name"]),
-            """<input id="id_name" type="text" name="name" maxlength="20" required />""")
+            """<input id="id_name" type="text" name="name" maxlength="20" required>""")
 
     def test_auto_id(self):
         f = BaseCategoryForm(auto_id=False)
         self.assertHTMLEqual(
             str(f.as_ul()),
-            """<li>Name: <input type="text" name="name" maxlength="20" required /></li>
-<li>Slug: <input type="text" name="slug" maxlength="20" required /></li>
-<li>The URL: <input type="text" name="url" maxlength="40" required /></li>"""
+            """<li>Name: <input type="text" name="name" maxlength="20" required></li>
+<li>Slug: <input type="text" name="slug" maxlength="20" required></li>
+<li>The URL: <input type="text" name="url" maxlength="40" required></li>"""
         )
 
     def test_initial_values(self):
@@ -1159,18 +1254,18 @@ class ModelFormBasicTests(TestCase):
             })
         self.assertHTMLEqual(
             f.as_ul(),
-            '''<li>Headline: <input type="text" name="headline" value="Your headline here" maxlength="50" required /></li>
-<li>Slug: <input type="text" name="slug" maxlength="50" required /></li>
-<li>Pub date: <input type="text" name="pub_date" required /></li>
+            '''<li>Headline: <input type="text" name="headline" value="Your headline here" maxlength="50" required></li>
+<li>Slug: <input type="text" name="slug" maxlength="50" required></li>
+<li>Pub date: <input type="text" name="pub_date" required></li>
 <li>Writer: <select name="writer" required>
 <option value="" selected>---------</option>
 <option value="%s">Bob Woodward</option>
 <option value="%s">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
-<li>Categories: <select multiple="multiple" name="categories">
+<li>Categories: <select multiple name="categories">
 <option value="%s" selected>Entertainment</option>
-<option value="%s" selected>It&#39;s a test</option>
+<option value="%s" selected>It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select></li>
 <li>Status: <select name="status">
@@ -1185,7 +1280,7 @@ class ModelFormBasicTests(TestCase):
         f = RoykoForm(auto_id=False, instance=self.w_royko)
         self.assertHTMLEqual(
             str(f),
-            '''<tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" required /><br />
+            '''<tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" required><br>
             <span class="helptext">Use both first and last names.</span></td></tr>'''
         )
 
@@ -1201,18 +1296,18 @@ class ModelFormBasicTests(TestCase):
         f = ArticleForm(auto_id=False, instance=art)
         self.assertHTMLEqual(
             f.as_ul(),
-            '''<li>Headline: <input type="text" name="headline" value="Test article" maxlength="50" required /></li>
-<li>Slug: <input type="text" name="slug" value="test-article" maxlength="50" required /></li>
-<li>Pub date: <input type="text" name="pub_date" value="1988-01-04" required /></li>
+            '''<li>Headline: <input type="text" name="headline" value="Test article" maxlength="50" required></li>
+<li>Slug: <input type="text" name="slug" value="test-article" maxlength="50" required></li>
+<li>Pub date: <input type="text" name="pub_date" value="1988-01-04" required></li>
 <li>Writer: <select name="writer" required>
 <option value="">---------</option>
 <option value="%s">Bob Woodward</option>
 <option value="%s" selected>Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
-<li>Categories: <select multiple="multiple" name="categories">
+<li>Categories: <select multiple name="categories">
 <option value="%s">Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select></li>
 <li>Status: <select name="status">
@@ -1250,26 +1345,31 @@ class ModelFormBasicTests(TestCase):
             return db_field.formfield(**kwargs)
 
         # Create a ModelForm, instantiate it, and check that the output is as expected
-        ModelForm = modelform_factory(Article, fields=['headline', 'categories'],
-                                      formfield_callback=formfield_for_dbfield)
+        ModelForm = modelform_factory(
+            Article,
+            fields=['headline', 'categories'],
+            formfield_callback=formfield_for_dbfield,
+        )
         form = ModelForm()
         self.assertHTMLEqual(
             form.as_ul(),
             """<li><label for="id_headline">Headline:</label>
-<input id="id_headline" type="text" name="headline" maxlength="50" required /></li>
+<input id="id_headline" type="text" name="headline" maxlength="50" required></li>
 <li><label for="id_categories">Categories:</label>
-<select multiple="multiple" name="categories" id="id_categories">
+<select multiple name="categories" id="id_categories">
 <option value="%d" selected>Entertainment</option>
-<option value="%d" selected>It&39;s a test</option>
+<option value="%d" selected>It&#x27;s a test</option>
 <option value="%d">Third test</option>
 </select></li>"""
             % (self.c1.pk, self.c2.pk, self.c3.pk))
 
     def test_basic_creation(self):
         self.assertEqual(Category.objects.count(), 0)
-        f = BaseCategoryForm({'name': 'Entertainment',
-                              'slug': 'entertainment',
-                              'url': 'entertainment'})
+        f = BaseCategoryForm({
+            'name': 'Entertainment',
+            'slug': 'entertainment',
+            'url': 'entertainment',
+        })
         self.assertTrue(f.is_valid())
         self.assertEqual(f.cleaned_data['name'], 'Entertainment')
         self.assertEqual(f.cleaned_data['slug'], 'entertainment')
@@ -1300,7 +1400,7 @@ class ModelFormBasicTests(TestCase):
         self.assertEqual(f.errors['name'], ['This field is required.'])
         self.assertEqual(
             f.errors['slug'],
-            ["Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."]
+            ['Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.']
         )
         self.assertEqual(f.cleaned_data, {'url': 'foo'})
         msg = "The Category could not be created because the data didn't validate."
@@ -1318,18 +1418,18 @@ class ModelFormBasicTests(TestCase):
         f = ArticleForm(auto_id=False)
         self.assertHTMLEqual(
             str(f),
-            '''<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" required /></td></tr>
-<tr><th>Slug:</th><td><input type="text" name="slug" maxlength="50" required /></td></tr>
-<tr><th>Pub date:</th><td><input type="text" name="pub_date" required /></td></tr>
+            '''<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" required></td></tr>
+<tr><th>Slug:</th><td><input type="text" name="slug" maxlength="50" required></td></tr>
+<tr><th>Pub date:</th><td><input type="text" name="pub_date" required></td></tr>
 <tr><th>Writer:</th><td><select name="writer" required>
 <option value="" selected>---------</option>
 <option value="%s">Bob Woodward</option>
 <option value="%s">Mike Royko</option>
 </select></td></tr>
 <tr><th>Article:</th><td><textarea rows="10" cols="40" name="article" required></textarea></td></tr>
-<tr><th>Categories:</th><td><select multiple="multiple" name="categories">
+<tr><th>Categories:</th><td><select multiple name="categories">
 <option value="%s">Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select></td></tr>
 <tr><th>Status:</th><td><select name="status">
@@ -1344,22 +1444,22 @@ class ModelFormBasicTests(TestCase):
             article="Hello.", headline="New headline", slug="new-headline",
             pub_date=datetime.date(1988, 1, 4), writer=self.w_royko)
         new_art.categories.add(Category.objects.get(name='Entertainment'))
-        self.assertQuerysetEqual(new_art.categories.all(), ["Entertainment"])
+        self.assertSequenceEqual(new_art.categories.all(), [self.c1])
         f = ArticleForm(auto_id=False, instance=new_art)
         self.assertHTMLEqual(
             f.as_ul(),
-            '''<li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" required /></li>
-<li>Slug: <input type="text" name="slug" value="new-headline" maxlength="50" required /></li>
-<li>Pub date: <input type="text" name="pub_date" value="1988-01-04" required /></li>
+            '''<li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" required></li>
+<li>Slug: <input type="text" name="slug" value="new-headline" maxlength="50" required></li>
+<li>Pub date: <input type="text" name="pub_date" value="1988-01-04" required></li>
 <li>Writer: <select name="writer" required>
 <option value="">---------</option>
 <option value="%s">Bob Woodward</option>
 <option value="%s" selected>Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
-<li>Categories: <select multiple="multiple" name="categories">
+<li>Categories: <select multiple name="categories">
 <option value="%s" selected>Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select></li>
 <li>Status: <select name="status">
@@ -1384,8 +1484,8 @@ class ModelFormBasicTests(TestCase):
         f = PartialArticleForm(auto_id=False)
         self.assertHTMLEqual(
             str(f),
-            '''<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" required /></td></tr>
-<tr><th>Pub date:</th><td><input type="text" name="pub_date" required /></td></tr>''')
+            '''<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" required></td></tr>
+<tr><th>Pub date:</th><td><input type="text" name="pub_date" required></td></tr>''')
 
         class PartialArticleFormWithSlug(forms.ModelForm):
             class Meta:
@@ -1403,9 +1503,9 @@ class ModelFormBasicTests(TestCase):
         }, auto_id=False, instance=art)
         self.assertHTMLEqual(
             f.as_ul(),
-            '''<li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" required /></li>
-<li>Slug: <input type="text" name="slug" value="new-headline" maxlength="50" required /></li>
-<li>Pub date: <input type="text" name="pub_date" value="1988-01-04" required /></li>'''
+            '''<li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" required></li>
+<li>Slug: <input type="text" name="slug" value="new-headline" maxlength="50" required></li>
+<li>Pub date: <input type="text" name="pub_date" value="1988-01-04" required></li>'''
         )
         self.assertTrue(f.is_valid())
         new_art = f.save()
@@ -1428,7 +1528,7 @@ class ModelFormBasicTests(TestCase):
         new_art = f.save()
         new_art = Article.objects.get(id=new_art.id)
         art_id_1 = new_art.id
-        self.assertQuerysetEqual(new_art.categories.order_by('name'), ["Entertainment", "It's a test"])
+        self.assertSequenceEqual(new_art.categories.order_by('name'), [self.c1, self.c2])
 
         # Now, submit form data with no categories. This deletes the existing categories.
         form_data['categories'] = []
@@ -1436,7 +1536,7 @@ class ModelFormBasicTests(TestCase):
         new_art = f.save()
         self.assertEqual(new_art.id, art_id_1)
         new_art = Article.objects.get(id=art_id_1)
-        self.assertQuerysetEqual(new_art.categories.all(), [])
+        self.assertSequenceEqual(new_art.categories.all(), [])
 
         # Create a new article, with no categories, via the form.
         f = ArticleForm(form_data)
@@ -1444,7 +1544,7 @@ class ModelFormBasicTests(TestCase):
         art_id_2 = new_art.id
         self.assertNotIn(art_id_2, (None, art_id_1))
         new_art = Article.objects.get(id=art_id_2)
-        self.assertQuerysetEqual(new_art.categories.all(), [])
+        self.assertSequenceEqual(new_art.categories.all(), [])
 
         # Create a new article, with categories, via the form, but use commit=False.
         # The m2m data won't be saved until save_m2m() is invoked on the form.
@@ -1459,11 +1559,11 @@ class ModelFormBasicTests(TestCase):
 
         # The instance doesn't have m2m data yet
         new_art = Article.objects.get(id=art_id_3)
-        self.assertQuerysetEqual(new_art.categories.all(), [])
+        self.assertSequenceEqual(new_art.categories.all(), [])
 
         # Save the m2m data on the form
         f.save_m2m()
-        self.assertQuerysetEqual(new_art.categories.order_by('name'), ["Entertainment", "It's a test"])
+        self.assertSequenceEqual(new_art.categories.order_by('name'), [self.c1, self.c2])
 
     def test_custom_form_fields(self):
         # Here, we define a custom ModelForm. Because it happens to have the same fields as
@@ -1492,18 +1592,18 @@ class ModelFormBasicTests(TestCase):
         f = ArticleForm(auto_id=False)
         self.assertHTMLEqual(
             f.as_ul(),
-            '''<li>Headline: <input type="text" name="headline" maxlength="50" required /></li>
-<li>Slug: <input type="text" name="slug" maxlength="50" required /></li>
-<li>Pub date: <input type="text" name="pub_date" required /></li>
+            '''<li>Headline: <input type="text" name="headline" maxlength="50" required></li>
+<li>Slug: <input type="text" name="slug" maxlength="50" required></li>
+<li>Pub date: <input type="text" name="pub_date" required></li>
 <li>Writer: <select name="writer" required>
 <option value="" selected>---------</option>
 <option value="%s">Bob Woodward</option>
 <option value="%s">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
-<li>Categories: <select multiple="multiple" name="categories">
+<li>Categories: <select multiple name="categories">
 <option value="%s">Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select> </li>
 <li>Status: <select name="status">
@@ -1517,9 +1617,9 @@ class ModelFormBasicTests(TestCase):
         w_bernstein = Writer.objects.create(name='Carl Bernstein')
         self.assertHTMLEqual(
             f.as_ul(),
-            '''<li>Headline: <input type="text" name="headline" maxlength="50" required /></li>
-<li>Slug: <input type="text" name="slug" maxlength="50" required /></li>
-<li>Pub date: <input type="text" name="pub_date" required /></li>
+            '''<li>Headline: <input type="text" name="headline" maxlength="50" required></li>
+<li>Slug: <input type="text" name="slug" maxlength="50" required></li>
+<li>Pub date: <input type="text" name="pub_date" required></li>
 <li>Writer: <select name="writer" required>
 <option value="" selected>---------</option>
 <option value="%s">Bob Woodward</option>
@@ -1527,9 +1627,9 @@ class ModelFormBasicTests(TestCase):
 <option value="%s">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
-<li>Categories: <select multiple="multiple" name="categories">
+<li>Categories: <select multiple name="categories">
 <option value="%s">Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 <option value="%s">Fourth</option>
 </select></li>
@@ -1556,270 +1656,59 @@ class ModelFormBasicTests(TestCase):
         obj.name = 'Alice'
         obj.full_clean()
 
+    def test_validate_foreign_key_uses_default_manager(self):
+        class MyForm(forms.ModelForm):
+            class Meta:
+                model = Article
+                fields = '__all__'
 
-class ModelChoiceFieldTests(TestCase):
-    def setUp(self):
-        self.c1 = Category.objects.create(
-            name="Entertainment", slug="entertainment", url="entertainment")
-        self.c2 = Category.objects.create(
-            name="It's a test", slug="its-test", url="test")
-        self.c3 = Category.objects.create(
-            name="Third", slug="third-test", url="third")
+        # Archived writers are filtered out by the default manager.
+        w = Writer.objects.create(name='Randy', archived=True)
+        data = {
+            'headline': 'My Article',
+            'slug': 'my-article',
+            'pub_date': datetime.date.today(),
+            'writer': w.pk,
+            'article': 'lorem ipsum',
+        }
+        form = MyForm(data)
+        self.assertIs(form.is_valid(), False)
+        self.assertEqual(
+            form.errors,
+            {'writer': ['Select a valid choice. That choice is not one of the available choices.']},
+        )
 
-    # ModelChoiceField ############################################################
-    def test_modelchoicefield(self):
-        f = forms.ModelChoiceField(Category.objects.all())
-        self.assertEqual(list(f.choices), [
-            ('', '---------'),
-            (self.c1.pk, 'Entertainment'),
-            (self.c2.pk, "It's a test"),
-            (self.c3.pk, 'Third')])
-        with self.assertRaises(ValidationError):
-            f.clean('')
-        with self.assertRaises(ValidationError):
-            f.clean(None)
-        with self.assertRaises(ValidationError):
-            f.clean(0)
-
-        # Invalid types that require TypeError to be caught (#22808).
-        with self.assertRaises(ValidationError):
-            f.clean([['fail']])
-        with self.assertRaises(ValidationError):
-            f.clean([{'foo': 'bar'}])
-
-        self.assertEqual(f.clean(self.c2.id).name, "It's a test")
-        self.assertEqual(f.clean(self.c3.id).name, 'Third')
-
-        # Add a Category object *after* the ModelChoiceField has already been
-        # instantiated. This proves clean() checks the database during clean() rather
-        # than caching it at time of instantiation.
-        c4 = Category.objects.create(name='Fourth', url='4th')
-        self.assertEqual(f.clean(c4.id).name, 'Fourth')
-
-        # Delete a Category object *after* the ModelChoiceField has already been
-        # instantiated. This proves clean() checks the database during clean() rather
-        # than caching it at time of instantiation.
-        Category.objects.get(url='4th').delete()
-        msg = "['Select a valid choice. That choice is not one of the available choices.']"
-        with self.assertRaisesMessage(ValidationError, msg):
-            f.clean(c4.id)
-
-    def test_modelchoicefield_choices(self):
-        f = forms.ModelChoiceField(Category.objects.filter(pk=self.c1.id), required=False)
-        self.assertIsNone(f.clean(''))
-        self.assertEqual(f.clean(str(self.c1.id)).name, "Entertainment")
-        with self.assertRaises(ValidationError):
-            f.clean('100')
-
-        # len can be called on choices
-        self.assertEqual(len(f.choices), 2)
-
-        # queryset can be changed after the field is created.
-        f.queryset = Category.objects.exclude(name='Third')
-        self.assertEqual(list(f.choices), [
-            ('', '---------'),
-            (self.c1.pk, 'Entertainment'),
-            (self.c2.pk, "It's a test")])
-        self.assertEqual(f.clean(self.c2.id).name, "It's a test")
-        with self.assertRaises(ValidationError):
-            f.clean(self.c3.id)
-
-        # check that we can safely iterate choices repeatedly
-        gen_one = list(f.choices)
-        gen_two = f.choices
-        self.assertEqual(gen_one[2], (self.c2.pk, "It's a test"))
-        self.assertEqual(list(gen_two), [
-            ('', '---------'),
-            (self.c1.pk, 'Entertainment'),
-            (self.c2.pk, "It's a test")])
-
-        # check that we can override the label_from_instance method to print custom labels (#4620)
-        f.queryset = Category.objects.all()
-        f.label_from_instance = lambda obj: "category " + str(obj)
-        self.assertEqual(list(f.choices), [
-            ('', '---------'),
-            (self.c1.pk, 'category Entertainment'),
-            (self.c2.pk, "category It's a test"),
-            (self.c3.pk, 'category Third')])
-
-    def test_modelchoicefield_11183(self):
-        """
-        Regression test for ticket #11183.
-        """
-        class ModelChoiceForm(forms.Form):
-            category = forms.ModelChoiceField(Category.objects.all())
-
-        form1 = ModelChoiceForm()
-        field1 = form1.fields['category']
-        # To allow the widget to change the queryset of field1.widget.choices correctly,
-        # without affecting other forms, the following must hold:
-        self.assertIsNot(field1, ModelChoiceForm.base_fields['category'])
-        self.assertIs(field1.widget.choices.field, field1)
-
-    def test_modelchoicefield_result_cache_not_shared(self):
-        class ModelChoiceForm(forms.Form):
-            category = forms.ModelChoiceField(Category.objects.all())
-
-        form1 = ModelChoiceForm()
-        self.assertCountEqual(form1.fields['category'].queryset, [self.c1, self.c2, self.c3])
-        form2 = ModelChoiceForm()
-        self.assertIsNone(form2.fields['category'].queryset._result_cache)
-
-    def test_modelchoicefield_queryset_none(self):
-        class ModelChoiceForm(forms.Form):
-            category = forms.ModelChoiceField(queryset=None)
+    def test_validate_foreign_key_to_model_with_overridden_manager(self):
+        class MyForm(forms.ModelForm):
+            class Meta:
+                model = Article
+                fields = '__all__'
 
             def __init__(self, *args, **kwargs):
                 super().__init__(*args, **kwargs)
-                self.fields['category'].queryset = Category.objects.filter(slug__contains='test')
+                # Allow archived authors.
+                self.fields['writer'].queryset = Writer._base_manager.all()
 
-        form = ModelChoiceForm()
-        self.assertCountEqual(form.fields['category'].queryset, [self.c2, self.c3])
-
-    def test_modelchoicefield_22745(self):
-        """
-        #22745 -- Make sure that ModelChoiceField with RadioSelect widget
-        doesn't produce unnecessary db queries when accessing its BoundField's
-        attrs.
-        """
-        class ModelChoiceForm(forms.Form):
-            category = forms.ModelChoiceField(Category.objects.all(), widget=forms.RadioSelect)
-
-        form = ModelChoiceForm()
-        field = form['category']  # BoundField
-        template = Template('{{ field.name }}{{ field }}{{ field.help_text }}')
-        with self.assertNumQueries(1):
-            template.render(Context({'field': field}))
-
-    def test_disabled_modelchoicefield(self):
-        class ModelChoiceForm(forms.ModelForm):
-            author = forms.ModelChoiceField(Author.objects.all(), disabled=True)
-
-            class Meta:
-                model = Book
-                fields = ['author']
-
-        book = Book.objects.create(author=Writer.objects.create(name='Test writer'))
-        form = ModelChoiceForm({}, instance=book)
-        self.assertEqual(
-            form.errors['author'],
-            ['Select a valid choice. That choice is not one of the available choices.']
-        )
-
-    def test_disabled_modelchoicefield_has_changed(self):
-        field = forms.ModelChoiceField(Author.objects.all(), disabled=True)
-        self.assertIs(field.has_changed('x', 'y'), False)
-
-    def test_disabled_multiplemodelchoicefield(self):
-        class ArticleForm(forms.ModelForm):
-            categories = forms.ModelMultipleChoiceField(Category.objects.all(), required=False)
-
-            class Meta:
-                model = Article
-                fields = ['categories']
-
-        category1 = Category.objects.create(name='cat1')
-        category2 = Category.objects.create(name='cat2')
-        article = Article.objects.create(
-            pub_date=datetime.date(1988, 1, 4),
-            writer=Writer.objects.create(name='Test writer'),
-        )
-        article.categories.set([category1.pk])
-
-        form = ArticleForm(data={'categories': [category2.pk]}, instance=article)
-        self.assertEqual(form.errors, {})
-        self.assertEqual([x.pk for x in form.cleaned_data['categories']], [category2.pk])
-        # Disabled fields use the value from `instance` rather than `data`.
-        form = ArticleForm(data={'categories': [category2.pk]}, instance=article)
-        form.fields['categories'].disabled = True
-        self.assertEqual(form.errors, {})
-        self.assertEqual([x.pk for x in form.cleaned_data['categories']], [category1.pk])
-
-    def test_disabled_modelmultiplechoicefield_has_changed(self):
-        field = forms.ModelMultipleChoiceField(Author.objects.all(), disabled=True)
-        self.assertIs(field.has_changed('x', 'y'), False)
-
-    def test_modelchoicefield_iterator(self):
-        """
-        Iterator defaults to ModelChoiceIterator and can be overridden with
-        the iterator attribute on a ModelChoiceField subclass.
-        """
-        field = forms.ModelChoiceField(Category.objects.all())
-        self.assertIsInstance(field.choices, ModelChoiceIterator)
-
-        class CustomModelChoiceIterator(ModelChoiceIterator):
-            pass
-
-        class CustomModelChoiceField(forms.ModelChoiceField):
-            iterator = CustomModelChoiceIterator
-
-        field = CustomModelChoiceField(Category.objects.all())
-        self.assertIsInstance(field.choices, CustomModelChoiceIterator)
-
-    def test_modelchoicefield_iterator_pass_model_to_widget(self):
-        class CustomModelChoiceValue:
-            def __init__(self, value, obj):
-                self.value = value
-                self.obj = obj
-
-            def __str__(self):
-                return str(self.value)
-
-        class CustomModelChoiceIterator(ModelChoiceIterator):
-            def choice(self, obj):
-                value, label = super().choice(obj)
-                return CustomModelChoiceValue(value, obj), label
-
-        class CustomCheckboxSelectMultiple(CheckboxSelectMultiple):
-            def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-                option = super().create_option(name, value, label, selected, index, subindex=None, attrs=None)
-                # Modify the HTML based on the object being rendered.
-                c = value.obj
-                option['attrs']['data-slug'] = c.slug
-                return option
-
-        class CustomModelMultipleChoiceField(forms.ModelMultipleChoiceField):
-            iterator = CustomModelChoiceIterator
-            widget = CustomCheckboxSelectMultiple
-
-        field = CustomModelMultipleChoiceField(Category.objects.all())
-        self.assertHTMLEqual(
-            field.widget.render('name', []),
-            '''<ul>
-<li><label><input type="checkbox" name="name" value="%d" data-slug="entertainment" />Entertainment</label></li>
-<li><label><input type="checkbox" name="name" value="%d" data-slug="its-test" />It&#39;s a test</label></li>
-<li><label><input type="checkbox" name="name" value="%d" data-slug="third-test" />Third</label></li>
-</ul>''' % (self.c1.pk, self.c2.pk, self.c3.pk),
-        )
-
-    def test_modelchoicefield_num_queries(self):
-        """
-        Widgets that render multiple subwidgets shouldn't make more than one
-        database query.
-        """
-        categories = Category.objects.all()
-
-        class CategoriesForm(forms.Form):
-            radio = forms.ModelChoiceField(queryset=categories, widget=forms.RadioSelect)
-            checkbox = forms.ModelMultipleChoiceField(queryset=categories, widget=forms.CheckboxSelectMultiple)
-
-        template = Template("""
-            {% for widget in form.checkbox %}{{ widget }}{% endfor %}
-            {% for widget in form.radio %}{{ widget }}{% endfor %}
-        """)
-
-        with self.assertNumQueries(2):
-            template.render(Context({'form': CategoriesForm()}))
+        w = Writer.objects.create(name='Randy', archived=True)
+        data = {
+            'headline': 'My Article',
+            'slug': 'my-article',
+            'pub_date': datetime.date.today(),
+            'writer': w.pk,
+            'article': 'lorem ipsum',
+        }
+        form = MyForm(data)
+        self.assertIs(form.is_valid(), True)
+        article = form.save()
+        self.assertEqual(article.writer, w)
 
 
 class ModelMultipleChoiceFieldTests(TestCase):
-    def setUp(self):
-        self.c1 = Category.objects.create(
-            name="Entertainment", slug="entertainment", url="entertainment")
-        self.c2 = Category.objects.create(
-            name="It's a test", slug="its-test", url="test")
-        self.c3 = Category.objects.create(
-            name="Third", slug="third-test", url="third")
+    @classmethod
+    def setUpTestData(cls):
+        cls.c1 = Category.objects.create(name='Entertainment', slug='entertainment', url='entertainment')
+        cls.c2 = Category.objects.create(name="It's a test", slug='its-test', url='test')
+        cls.c3 = Category.objects.create(name='Third', slug='third-test', url='third')
 
     def test_model_multiple_choice_field(self):
         f = forms.ModelMultipleChoiceField(Category.objects.all())
@@ -1831,20 +1720,20 @@ class ModelMultipleChoiceFieldTests(TestCase):
             f.clean(None)
         with self.assertRaises(ValidationError):
             f.clean([])
-        self.assertQuerysetEqual(f.clean([self.c1.id]), ["Entertainment"])
-        self.assertQuerysetEqual(f.clean([self.c2.id]), ["It's a test"])
-        self.assertQuerysetEqual(f.clean([str(self.c1.id)]), ["Entertainment"])
-        self.assertQuerysetEqual(
+        self.assertCountEqual(f.clean([self.c1.id]), [self.c1])
+        self.assertCountEqual(f.clean([self.c2.id]), [self.c2])
+        self.assertCountEqual(f.clean([str(self.c1.id)]), [self.c1])
+        self.assertCountEqual(
             f.clean([str(self.c1.id), str(self.c2.id)]),
-            ["Entertainment", "It's a test"], ordered=False
+            [self.c1, self.c2],
         )
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             f.clean([self.c1.id, str(self.c2.id)]),
-            ["Entertainment", "It's a test"], ordered=False
+            [self.c1, self.c2],
         )
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             f.clean((self.c1.id, str(self.c2.id))),
-            ["Entertainment", "It's a test"], ordered=False
+            [self.c1, self.c2],
         )
         with self.assertRaises(ValidationError):
             f.clean(['100'])
@@ -1866,7 +1755,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
         # this may create categories with primary keys up to 6. Use
         # a number that will not conflict.
         c6 = Category.objects.create(id=1006, name='Sixth', url='6th')
-        self.assertQuerysetEqual(f.clean([c6.id]), ["Sixth"])
+        self.assertCountEqual(f.clean([c6.id]), [c6])
 
         # Delete a Category object *after* the ModelMultipleChoiceField has already been
         # instantiated. This proves clean() checks the database during clean() rather
@@ -1891,7 +1780,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
         self.assertEqual(list(f.choices), [
             (self.c1.pk, 'Entertainment'),
             (self.c2.pk, "It's a test")])
-        self.assertQuerysetEqual(f.clean([self.c2.id]), ["It's a test"])
+        self.assertSequenceEqual(f.clean([self.c2.id]), [self.c2])
         with self.assertRaises(ValidationError):
             f.clean([self.c3.id])
         with self.assertRaises(ValidationError):
@@ -1925,9 +1814,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
         def my_validator(value):
             self._validator_run = True
 
-        f = forms.ModelMultipleChoiceField(queryset=Writer.objects.all(),
-                                           validators=[my_validator])
-
+        f = forms.ModelMultipleChoiceField(queryset=Writer.objects.all(), validators=[my_validator])
         f.clean([p.pk for p in Writer.objects.all()[8:9]])
         self.assertTrue(self._validator_run)
 
@@ -1936,21 +1823,28 @@ class ModelMultipleChoiceFieldTests(TestCase):
         Test support of show_hidden_initial by ModelMultipleChoiceField.
         """
         class WriterForm(forms.Form):
-            persons = forms.ModelMultipleChoiceField(show_hidden_initial=True,
-                                                     queryset=Writer.objects.all())
+            persons = forms.ModelMultipleChoiceField(show_hidden_initial=True, queryset=Writer.objects.all())
 
         person1 = Writer.objects.create(name="Person 1")
         person2 = Writer.objects.create(name="Person 2")
 
-        form = WriterForm(initial={'persons': [person1, person2]},
-                          data={'initial-persons': [str(person1.pk), str(person2.pk)],
-                                'persons': [str(person1.pk), str(person2.pk)]})
+        form = WriterForm(
+            initial={'persons': [person1, person2]},
+            data={
+                'initial-persons': [str(person1.pk), str(person2.pk)],
+                'persons': [str(person1.pk), str(person2.pk)],
+            },
+        )
         self.assertTrue(form.is_valid())
         self.assertFalse(form.has_changed())
 
-        form = WriterForm(initial={'persons': [person1, person2]},
-                          data={'initial-persons': [str(person1.pk), str(person2.pk)],
-                                'persons': [str(person2.pk)]})
+        form = WriterForm(
+            initial={'persons': [person1, person2]},
+            data={
+                'initial-persons': [str(person1.pk), str(person2.pk)],
+                'persons': [str(person2.pk)],
+            },
+        )
         self.assertTrue(form.is_valid())
         self.assertTrue(form.has_changed())
 
@@ -1981,11 +1875,11 @@ class ModelMultipleChoiceFieldTests(TestCase):
             self.assertTrue(form.has_changed())
 
     def test_clean_does_deduplicate_values(self):
-        class WriterForm(forms.Form):
-            persons = forms.ModelMultipleChoiceField(queryset=Writer.objects.all())
+        class PersonForm(forms.Form):
+            persons = forms.ModelMultipleChoiceField(queryset=Person.objects.all())
 
-        person1 = Writer.objects.create(name="Person 1")
-        form = WriterForm(data={})
+        person1 = Person.objects.create(name='Person 1')
+        form = PersonForm(data={})
         queryset = form.fields['persons'].clean([str(person1.pk)] * 50)
         sql, params = queryset.query.sql_with_params()
         self.assertEqual(len(params), 1)
@@ -2033,8 +1927,11 @@ class ModelOneToOneFieldTests(TestCase):
                 fields = '__all__'
 
         bw = BetterWriter.objects.create(name='Joe Better', score=10)
-        self.assertEqual(sorted(model_to_dict(bw)),
-                         ['id', 'name', 'score', 'writer_ptr'])
+        self.assertEqual(sorted(model_to_dict(bw)), ['id', 'name', 'score', 'writer_ptr'])
+        self.assertEqual(sorted(model_to_dict(bw, fields=[])), [])
+        self.assertEqual(sorted(model_to_dict(bw, fields=['id', 'name'])), ['id', 'name'])
+        self.assertEqual(sorted(model_to_dict(bw, exclude=[])), ['id', 'name', 'score', 'writer_ptr'])
+        self.assertEqual(sorted(model_to_dict(bw, exclude=['id', 'name'])), ['score', 'writer_ptr'])
 
         form = BetterWriterForm({'name': 'Some Name', 'score': 12})
         self.assertTrue(form.is_valid())
@@ -2059,7 +1956,7 @@ class ModelOneToOneFieldTests(TestCase):
 <option value="%s">Bob Woodward</option>
 <option value="%s">Mike Royko</option>
 </select></p>
-<p><label for="id_age">Age:</label> <input type="number" name="age" id="id_age" min="0" required /></p>''' % (
+<p><label for="id_age">Age:</label> <input type="number" name="age" id="id_age" min="0" required></p>''' % (
                 self.w_woodward.pk, self.w_royko.pk,
             )
         )
@@ -2081,7 +1978,7 @@ class ModelOneToOneFieldTests(TestCase):
 <option value="%s">Mike Royko</option>
 </select></p>
 <p><label for="id_age">Age:</label>
-<input type="number" name="age" value="65" id="id_age" min="0" required /></p>''' % (
+<input type="number" name="age" value="65" id="id_age" min="0" required></p>''' % (
                 self.w_woodward.pk, self.w_royko.pk,
             )
         )
@@ -2174,9 +2071,11 @@ class FileAndImageFieldTests(TestCase):
         form = DocumentForm(files={'myfile': SimpleUploadedFile('something.txt', b'content')})
         self.assertTrue(form.is_valid())
         doc = form.save(commit=False)
-        form = DocumentForm(instance=doc,
-                            files={'myfile': SimpleUploadedFile('something.txt', b'content')},
-                            data={'myfile-clear': 'true'})
+        form = DocumentForm(
+            instance=doc,
+            files={'myfile': SimpleUploadedFile('something.txt', b'content')},
+            data={'myfile-clear': 'true'},
+        )
         self.assertTrue(not form.is_valid())
         self.assertEqual(form.errors['myfile'],
                          ['Please either submit a file or check the clear checkbox, not both.'])
@@ -2194,7 +2093,7 @@ class FileAndImageFieldTests(TestCase):
         form = DocumentForm(instance=doc)
         self.assertHTMLEqual(
             str(form['myfile']),
-            '<input id="id_myfile" name="myfile" type="file" />'
+            '<input id="id_myfile" name="myfile" type="file">'
         )
 
     def test_file_field_data(self):
@@ -2207,7 +2106,8 @@ class FileAndImageFieldTests(TestCase):
         # Upload a file and ensure it all works as expected.
         f = TextFileForm(
             data={'description': 'Assistance'},
-            files={'file': SimpleUploadedFile('test1.txt', b'hello world')})
+            files={'file': SimpleUploadedFile('test1.txt', b'hello world')},
+        )
         self.assertTrue(f.is_valid())
         self.assertEqual(type(f.cleaned_data['file']), SimpleUploadedFile)
         instance = f.save()
@@ -2217,7 +2117,8 @@ class FileAndImageFieldTests(TestCase):
         # If the previous file has been deleted, the file name can be reused
         f = TextFileForm(
             data={'description': 'Assistance'},
-            files={'file': SimpleUploadedFile('test1.txt', b'hello world')})
+            files={'file': SimpleUploadedFile('test1.txt', b'hello world')},
+        )
         self.assertTrue(f.is_valid())
         self.assertEqual(type(f.cleaned_data['file']), SimpleUploadedFile)
         instance = f.save()
@@ -2226,14 +2127,13 @@ class FileAndImageFieldTests(TestCase):
         # Check if the max_length attribute has been inherited from the model.
         f = TextFileForm(
             data={'description': 'Assistance'},
-            files={'file': SimpleUploadedFile('test-maxlength.txt', b'hello world')})
+            files={'file': SimpleUploadedFile('test-maxlength.txt', b'hello world')},
+        )
         self.assertFalse(f.is_valid())
 
         # Edit an instance that already has the file defined in the model. This will not
         # save the file again, but leave it exactly as it is.
-        f = TextFileForm(
-            data={'description': 'Assistance'},
-            instance=instance)
+        f = TextFileForm({'description': 'Assistance'}, instance=instance)
         self.assertTrue(f.is_valid())
         self.assertEqual(f.cleaned_data['file'].name, 'tests/test1.txt')
         instance = f.save()
@@ -2245,7 +2145,9 @@ class FileAndImageFieldTests(TestCase):
         # Override the file by uploading a new one.
         f = TextFileForm(
             data={'description': 'Assistance'},
-            files={'file': SimpleUploadedFile('test2.txt', b'hello world')}, instance=instance)
+            files={'file': SimpleUploadedFile('test2.txt', b'hello world')},
+            instance=instance,
+        )
         self.assertTrue(f.is_valid())
         instance = f.save()
         self.assertEqual(instance.file.name, 'tests/test2.txt')
@@ -2264,15 +2166,15 @@ class FileAndImageFieldTests(TestCase):
 
         f = TextFileForm(
             data={'description': 'Assistance'},
-            files={'file': SimpleUploadedFile('test3.txt', b'hello world')}, instance=instance)
+            files={'file': SimpleUploadedFile('test3.txt', b'hello world')},
+            instance=instance,
+        )
         self.assertTrue(f.is_valid())
         instance = f.save()
         self.assertEqual(instance.file.name, 'tests/test3.txt')
 
         # Instance can be edited w/out re-uploading the file and existing file should be preserved.
-        f = TextFileForm(
-            data={'description': 'New Description'},
-            instance=instance)
+        f = TextFileForm({'description': 'New Description'}, instance=instance)
         f.fields['file'].required = False
         self.assertTrue(f.is_valid())
         instance = f.save()
@@ -2328,18 +2230,14 @@ class FileAndImageFieldTests(TestCase):
             p.image.delete(save=False)
 
     def test_file_path_field_blank(self):
-        """
-        Regression test for #8842: FilePathField(blank=True)
-        """
+        """FilePathField(blank=True) includes the empty option."""
         class FPForm(forms.ModelForm):
             class Meta:
                 model = FilePathModel
                 fields = '__all__'
 
         form = FPForm()
-        names = [p[1] for p in form['path'].field.choices]
-        names.sort()
-        self.assertEqual(names, ['---------', '__init__.py', 'models.py', 'test_uuid.py', 'tests.py'])
+        self.assertEqual([name for _, name in form['path'].field.choices], ['---------', 'models.py'])
 
     @skipUnless(test_images, "Pillow not installed")
     def test_image_field(self):
@@ -2354,7 +2252,8 @@ class FileAndImageFieldTests(TestCase):
 
         f = ImageFileForm(
             data={'description': 'An image'},
-            files={'image': SimpleUploadedFile('test.png', image_data)})
+            files={'image': SimpleUploadedFile('test.png', image_data)},
+        )
         self.assertTrue(f.is_valid())
         self.assertEqual(type(f.cleaned_data['image']), SimpleUploadedFile)
         instance = f.save()
@@ -2367,7 +2266,8 @@ class FileAndImageFieldTests(TestCase):
         instance.image.delete(save=False)
         f = ImageFileForm(
             data={'description': 'An image'},
-            files={'image': SimpleUploadedFile('test.png', image_data)})
+            files={'image': SimpleUploadedFile('test.png', image_data)},
+        )
         self.assertTrue(f.is_valid())
         self.assertEqual(type(f.cleaned_data['image']), SimpleUploadedFile)
         instance = f.save()
@@ -2393,7 +2293,9 @@ class FileAndImageFieldTests(TestCase):
 
         f = ImageFileForm(
             data={'description': 'Changed it'},
-            files={'image': SimpleUploadedFile('test2.png', image_data2)}, instance=instance)
+            files={'image': SimpleUploadedFile('test2.png', image_data2)},
+            instance=instance,
+        )
         self.assertTrue(f.is_valid())
         instance = f.save()
         self.assertEqual(instance.image.name, 'tests/test2.png')
@@ -2407,7 +2309,8 @@ class FileAndImageFieldTests(TestCase):
 
         f = ImageFileForm(
             data={'description': 'Changed it'},
-            files={'image': SimpleUploadedFile('test2.png', image_data2)})
+            files={'image': SimpleUploadedFile('test2.png', image_data2)},
+        )
         self.assertTrue(f.is_valid())
         instance = f.save()
         self.assertEqual(instance.image.name, 'tests/test2.png')
@@ -2436,7 +2339,9 @@ class FileAndImageFieldTests(TestCase):
 
         f = OptionalImageFileForm(
             data={'description': 'And a final one'},
-            files={'image': SimpleUploadedFile('test3.png', image_data)}, instance=instance)
+            files={'image': SimpleUploadedFile('test3.png', image_data)},
+            instance=instance,
+        )
         self.assertTrue(f.is_valid())
         instance = f.save()
         self.assertEqual(instance.image.name, 'tests/test3.png')
@@ -2445,9 +2350,7 @@ class FileAndImageFieldTests(TestCase):
 
         # Editing the instance without re-uploading the image should not affect
         # the image or its width/height properties.
-        f = OptionalImageFileForm(
-            data={'description': 'New Description'},
-            instance=instance)
+        f = OptionalImageFileForm({'description': 'New Description'}, instance=instance)
         self.assertTrue(f.is_valid())
         instance = f.save()
         self.assertEqual(instance.description, 'New Description')
@@ -2472,7 +2375,8 @@ class FileAndImageFieldTests(TestCase):
         # Test callable upload_to behavior that's dependent on the value of another field in the model
         f = ImageFileForm(
             data={'description': 'And a final one', 'path': 'foo'},
-            files={'image': SimpleUploadedFile('test4.png', image_data)})
+            files={'image': SimpleUploadedFile('test4.png', image_data)},
+        )
         self.assertTrue(f.is_valid())
         instance = f.save()
         self.assertEqual(instance.image.name, 'foo/test4.png')
@@ -2569,8 +2473,8 @@ class OtherModelFormTests(TestCase):
         f = ModelFormWithMedia()
         self.assertHTMLEqual(
             str(f.media),
-            '''<link href="/some/form/css" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="/some/form/javascript"></script>'''
+            '''<link href="/some/form/css" type="text/css" media="all" rel="stylesheet">
+<script src="/some/form/javascript"></script>'''
         )
 
     def test_choices_type(self):
@@ -2599,7 +2503,7 @@ class OtherModelFormTests(TestCase):
                 return ', '.join(c.name for c in obj.colours.all())
 
         field = ColorModelChoiceField(ColourfulItem.objects.prefetch_related('colours'))
-        with self.assertNumQueries(4):  # would be 5 if prefetch is ignored
+        with self.assertNumQueries(3):  # would be 4 if prefetch is ignored
             self.assertEqual(tuple(field.choices), (
                 ('', '---------'),
                 (multicolor_item.pk, 'blue, red'),
@@ -2608,7 +2512,7 @@ class OtherModelFormTests(TestCase):
 
     def test_foreignkeys_which_use_to_field(self):
         apple = Inventory.objects.create(barcode=86, name='Apple')
-        Inventory.objects.create(barcode=22, name='Pear')
+        pear = Inventory.objects.create(barcode=22, name='Pear')
         core = Inventory.objects.create(barcode=87, name='Core', parent=apple)
 
         field = forms.ModelChoiceField(Inventory.objects.all(), to_field_name='barcode')
@@ -2638,34 +2542,32 @@ class OtherModelFormTests(TestCase):
                 model = Category
                 fields = ['description', 'url']
 
-        self.assertEqual(list(CategoryForm.base_fields),
-                         ['description', 'url'])
+        self.assertEqual(list(CategoryForm.base_fields), ['description', 'url'])
 
         self.assertHTMLEqual(
             str(CategoryForm()),
             '''<tr><th><label for="id_description">Description:</label></th>
-<td><input type="text" name="description" id="id_description" required /></td></tr>
+<td><input type="text" name="description" id="id_description" required></td></tr>
 <tr><th><label for="id_url">The URL:</label></th>
-<td><input id="id_url" type="text" name="url" maxlength="40" required /></td></tr>'''
+<td><input id="id_url" type="text" name="url" maxlength="40" required></td></tr>'''
         )
         # to_field_name should also work on ModelMultipleChoiceField ##################
 
         field = forms.ModelMultipleChoiceField(Inventory.objects.all(), to_field_name='barcode')
         self.assertEqual(tuple(field.choices), ((86, 'Apple'), (87, 'Core'), (22, 'Pear')))
-        self.assertQuerysetEqual(field.clean([86]), ['Apple'])
+        self.assertSequenceEqual(field.clean([86]), [apple])
 
         form = SelectInventoryForm({'items': [87, 22]})
         self.assertTrue(form.is_valid())
         self.assertEqual(len(form.cleaned_data), 1)
-        self.assertQuerysetEqual(form.cleaned_data['items'], ['Core', 'Pear'])
+        self.assertSequenceEqual(form.cleaned_data['items'], [core, pear])
 
     def test_model_field_that_returns_none_to_exclude_itself_with_explicit_fields(self):
-        self.assertEqual(list(CustomFieldForExclusionForm.base_fields),
-                         ['name'])
+        self.assertEqual(list(CustomFieldForExclusionForm.base_fields), ['name'])
         self.assertHTMLEqual(
             str(CustomFieldForExclusionForm()),
             '''<tr><th><label for="id_name">Name:</label></th>
-<td><input id="id_name" type="text" name="name" maxlength="10" required /></td></tr>'''
+<td><input id="id_name" type="text" name="name" maxlength="10" required></td></tr>'''
         )
 
     def test_iterable_model_m2m(self):
@@ -2679,9 +2581,9 @@ class OtherModelFormTests(TestCase):
         self.maxDiff = 1024
         self.assertHTMLEqual(
             form.as_p(),
-            """<p><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" maxlength="50" required /></p>
+            """<p><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" maxlength="50" required></p>
         <p><label for="id_colours">Colours:</label>
-        <select multiple="multiple" name="colours" id="id_colours" required>
+        <select multiple name="colours" id="id_colours" required>
         <option value="%(blue_pk)s">Blue</option>
         </select></p>"""
             % {'blue_pk': colour.pk})
@@ -2699,19 +2601,19 @@ class OtherModelFormTests(TestCase):
             form.as_p(),
             """
             <p><label for="id_title">Title:</label>
-                <input id="id_title" maxlength="30" name="title" type="text" required /></p>
+                <input id="id_title" maxlength="30" name="title" type="text" required></p>
             <p><label for="id_date_published">Date published:</label>
-                <input id="id_date_published" name="date_published" type="text" value="{0}" required />
-                <input id="initial-id_date_published" name="initial-date_published" type="hidden" value="{0}" /></p>
+                <input id="id_date_published" name="date_published" type="text" value="{0}" required>
+                <input id="initial-id_date_published" name="initial-date_published" type="hidden" value="{0}"></p>
             <p><label for="id_mode">Mode:</label> <select id="id_mode" name="mode">
                 <option value="di" selected>direct</option>
                 <option value="de">delayed</option></select>
-                <input id="initial-id_mode" name="initial-mode" type="hidden" value="di" /></p>
+                <input id="initial-id_mode" name="initial-mode" type="hidden" value="di"></p>
            <p><label for="id_category">Category:</label> <select id="id_category" name="category">
                 <option value="1">Games</option>
                 <option value="2">Comics</option>
                 <option value="3" selected>Novel</option></select>
-                <input id="initial-id_category" name="initial-category" type="hidden" value="3" />
+                <input id="initial-id_category" name="initial-category" type="hidden" value="3">
             """.format(today_str)
         )
         empty_data = {
@@ -2774,7 +2676,7 @@ class CustomCleanTests(TestCase):
 
             def clean(self):
                 if not self.cleaned_data['left'] == self.cleaned_data['right']:
-                    raise forms.ValidationError('Left and right should be equal')
+                    raise ValidationError('Left and right should be equal')
                 return self.cleaned_data
 
         form = TripleFormWithCleanOverride({'left': 1, 'middle': 2, 'right': 1})
@@ -2928,6 +2830,72 @@ class LimitChoicesToTests(TestCase):
             StumpJokeForm()
             self.assertEqual(today_callable_dict.call_count, 3)
 
+    @isolate_apps('model_forms')
+    def test_limit_choices_to_no_duplicates(self):
+        joke1 = StumpJoke.objects.create(
+            funny=True,
+            most_recently_fooled=self.threepwood,
+        )
+        joke2 = StumpJoke.objects.create(
+            funny=True,
+            most_recently_fooled=self.threepwood,
+        )
+        joke3 = StumpJoke.objects.create(
+            funny=True,
+            most_recently_fooled=self.marley,
+        )
+        StumpJoke.objects.create(funny=False, most_recently_fooled=self.marley)
+        joke1.has_fooled_today.add(self.marley, self.threepwood)
+        joke2.has_fooled_today.add(self.marley)
+        joke3.has_fooled_today.add(self.marley, self.threepwood)
+
+        class CharacterDetails(models.Model):
+            character1 = models.ForeignKey(
+                Character,
+                models.CASCADE,
+                limit_choices_to=models.Q(
+                    jokes__funny=True,
+                    jokes_today__funny=True,
+                ),
+                related_name='details_fk_1',
+            )
+            character2 = models.ForeignKey(
+                Character,
+                models.CASCADE,
+                limit_choices_to={
+                    'jokes__funny': True,
+                    'jokes_today__funny': True,
+                },
+                related_name='details_fk_2',
+            )
+            character3 = models.ManyToManyField(
+                Character,
+                limit_choices_to=models.Q(
+                    jokes__funny=True,
+                    jokes_today__funny=True,
+                ),
+                related_name='details_m2m_1',
+            )
+
+        class CharacterDetailsForm(forms.ModelForm):
+            class Meta:
+                model = CharacterDetails
+                fields = '__all__'
+
+        form = CharacterDetailsForm()
+        self.assertCountEqual(
+            form.fields['character1'].queryset,
+            [self.marley, self.threepwood],
+        )
+        self.assertCountEqual(
+            form.fields['character2'].queryset,
+            [self.marley, self.threepwood],
+        )
+        self.assertCountEqual(
+            form.fields['character3'].queryset,
+            [self.marley, self.threepwood],
+        )
+
 
 class FormFieldCallbackTests(SimpleTestCase):
 
@@ -3077,7 +3045,7 @@ class CustomMetaclassTestCase(SimpleTestCase):
         self.assertEqual(new_cls.base_fields, {})
 
 
-class StrictAssignmentTests(TestCase):
+class StrictAssignmentTests(SimpleTestCase):
     """
     Should a model do anything special with __setattr__() or descriptors which
     raise a ValidationError, a model form should catch the error (#24706).
@@ -3113,3 +3081,18 @@ class StrictAssignmentTests(TestCase):
             '__all__': ['Cannot set attribute'],
             'title': ['This field cannot be blank.']
         })
+
+
+class ModelToDictTests(TestCase):
+    def test_many_to_many(self):
+        """Data for a ManyToManyField is a list rather than a lazy QuerySet."""
+        blue = Colour.objects.create(name='blue')
+        red = Colour.objects.create(name='red')
+        item = ColourfulItem.objects.create()
+        item.colours.set([blue])
+        data = model_to_dict(item)['colours']
+        self.assertEqual(data, [blue])
+        item.colours.set([red])
+        # If data were a QuerySet, it would be reevaluated here and give "red"
+        # instead of the original value.
+        self.assertEqual(data, [blue])

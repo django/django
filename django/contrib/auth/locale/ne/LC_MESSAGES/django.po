@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-12-03 04:45+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-12-15 05:39+0000\n"
 "Last-Translator: Sagar Chalise <chalisesagar@gmail.com>\n"
 "Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
@@ -51,8 +51,8 @@ msgstr "पासवर्ड राखिएको छैन ।"
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "अमान्य पासवर्ड स्वरूप वा अज्ञात ह्यासिङ अलगोरिदम ।"
 
-msgid "The two password fields didn't match."
-msgstr "दुई पासवर्ड मिलेन ।"
+msgid "The two password fields didn’t match."
+msgstr ""
 
 msgid "Password"
 msgstr "पासवर्ड"
@@ -64,10 +64,11 @@ msgid "Enter the same password as before, for verification."
 msgstr "प्रमाणित गर्न पुन: उही पासवर्ड राख्नु होस ।"
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
+"पासवर्ड जस्ताको त्यस्तै राखेको हुँदैन, त्यसैले हेर्न मिल्दैन । पासवर्ड परिवर्तन गर्न <a href="
+"\"{}\">यो फारम</a> भर्नु होस ।"
 
 #, python-format
 msgid ""
@@ -223,27 +224,27 @@ msgstr[1] "पासवर्ड छोटो भयो । कम्तीम�
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "पासवर्डमा कम्तीमा पनि %(min_length)d अक्षर हुनु पर्छ । "
+msgstr[1] "पासवर्डमा कम्तीमा पनि %(min_length)d अक्षरहरू हुनु पर्छ । "
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "%(verbose_name)s संग मिल्दो पासवर्ड भयो ।"
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
 
 msgid "This password is too common."
 msgstr "यो पासवर्ड साधारण भयो ।"
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr ""
 
 msgid "This password is entirely numeric."
 msgstr "यो पासवर्डमा अंक मात्र छ ।"
 
-msgid "Your password can't be entirely numeric."
-msgstr "पासवर्डमा अंक मात्र नराख्नु होस ।"
+msgid "Your password can’t be entirely numeric."
+msgstr ""
 
 #, python-format
 msgid "Password reset on %(site_name)s"
@@ -253,17 +254,18 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"उपयुक्त प्रयोगकर्ता नाम राख्नु होस । अङ्ग्रेजी अक्षर, अङ्क र @/./+/-/_ मात्र मान्य छन् ।"
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
-msgstr ""
+msgstr "उपयुक्त प्रयोगकर्ता नाम राख्नु होस । अक्षर, अङ्क र @/./+/-/_ मात्र मान्य छन् ।"
 
 msgid "Logged out"
 msgstr "लग आउट "
 
 msgid "Password reset"
-msgstr ""
+msgstr "पासवर्ड पून: दर्ता"
 
 msgid "Password reset sent"
 msgstr ""

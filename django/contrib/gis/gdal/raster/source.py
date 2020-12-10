@@ -16,8 +16,8 @@ from django.contrib.gis.gdal.raster.const import (
     VSI_FILESYSTEM_BASE_PATH, VSI_TAKE_BUFFER_OWNERSHIP,
 )
 from django.contrib.gis.gdal.srs import SpatialReference, SRSException
-from django.contrib.gis.geometry.regex import json_regex
-from django.utils.encoding import force_bytes, force_text
+from django.contrib.gis.geometry import json_regex
+from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
 
 
@@ -31,7 +31,7 @@ class TransformPoint(list):
     def __init__(self, raster, prop):
         x = raster.geotransform[self.indices[prop][0]]
         y = raster.geotransform[self.indices[prop][1]]
-        list.__init__(self, [x, y])
+        super().__init__([x, y])
         self._raster = raster
         self._prop = prop
 
@@ -73,6 +73,13 @@ class GDALRaster(GDALRasterBase):
 
         # If input is a valid file path, try setting file as source.
         if isinstance(ds_input, str):
+            if (
+                not ds_input.startswith(VSI_FILESYSTEM_BASE_PATH) and
+                not os.path.exists(ds_input)
+            ):
+                raise GDALException(
+                    'Unable to read raster source input "%s".' % ds_input
+                )
             try:
                 # GDALOpen will auto-detect the data source type.
                 self._ptr = capi.open_ds(force_bytes(ds_input), self._write)
@@ -225,7 +232,7 @@ class GDALRaster(GDALRasterBase):
 
     @cached_property
     def is_vsi_based(self):
-        return self.name.startswith(VSI_FILESYSTEM_BASE_PATH)
+        return self._ptr and self.name.startswith(VSI_FILESYSTEM_BASE_PATH)
 
     @property
     def name(self):
@@ -233,7 +240,7 @@ class GDALRaster(GDALRasterBase):
         Return the name of this raster. Corresponds to filename
         for file-based rasters.
         """
-        return force_text(capi.get_ds_description(self._ptr))
+        return force_str(capi.get_ds_description(self._ptr))
 
     @cached_property
     def driver(self):
@@ -381,27 +388,14 @@ class GDALRaster(GDALRasterBase):
         consult the GDAL_RESAMPLE_ALGORITHMS constant.
         """
         # Get the parameters defining the geotransform, srid, and size of the raster
-        if 'width' not in ds_input:
-            ds_input['width'] = self.width
-
-        if 'height' not in ds_input:
-            ds_input['height'] = self.height
-
-        if 'srid' not in ds_input:
-            ds_input['srid'] = self.srs.srid
-
-        if 'origin' not in ds_input:
-            ds_input['origin'] = self.origin
-
-        if 'scale' not in ds_input:
-            ds_input['scale'] = self.scale
-
-        if 'skew' not in ds_input:
-            ds_input['skew'] = self.skew
-
+        ds_input.setdefault('width', self.width)
+        ds_input.setdefault('height', self.height)
+        ds_input.setdefault('srid', self.srs.srid)
+        ds_input.setdefault('origin', self.origin)
+        ds_input.setdefault('scale', self.scale)
+        ds_input.setdefault('skew', self.skew)
         # Get the driver, name, and datatype of the target raster
-        if 'driver' not in ds_input:
-            ds_input['driver'] = self.driver.name
+        ds_input.setdefault('driver', self.driver.name)
 
         if 'name' not in ds_input:
             ds_input['name'] = self.name + '_copy.' + self.driver.name
@@ -431,17 +425,48 @@ class GDALRaster(GDALRasterBase):
 
         return target
 
-    def transform(self, srid, driver=None, name=None, resampling='NearestNeighbour',
+    def clone(self, name=None):
+        """Return a clone of this GDALRaster."""
+        if name:
+            clone_name = name
+        elif self.driver.name != 'MEM':
+            clone_name = self.name + '_copy.' + self.driver.name
+        else:
+            clone_name = os.path.join(VSI_FILESYSTEM_BASE_PATH, str(uuid.uuid4()))
+        return GDALRaster(
+            capi.copy_ds(
+                self.driver._ptr,
+                force_bytes(clone_name),
+                self._ptr,
+                c_int(),
+                c_char_p(),
+                c_void_p(),
+                c_void_p(),
+            ),
+            write=self._write,
+        )
+
+    def transform(self, srs, driver=None, name=None, resampling='NearestNeighbour',
                   max_error=0.0):
         """
-        Return a copy of this raster reprojected into the given SRID.
+        Return a copy of this raster reprojected into the given spatial
+        reference system.
         """
         # Convert the resampling algorithm name into an algorithm id
         algorithm = GDAL_RESAMPLE_ALGORITHMS[resampling]
 
-        # Instantiate target spatial reference system
-        target_srs = SpatialReference(srid)
+        if isinstance(srs, SpatialReference):
+            target_srs = srs
+        elif isinstance(srs, (int, str)):
+            target_srs = SpatialReference(srs)
+        else:
+            raise TypeError(
+                'Transform only accepts SpatialReference, string, and integer '
+                'objects.'
+            )
 
+        if target_srs.srid == self.srid and (not driver or driver == self.driver.name):
+            return self.clone(name)
         # Create warped virtual dataset in the target reference system
         target = capi.auto_create_warped_vrt(
             self._ptr, self.srs.wkt.encode(), target_srs.wkt.encode(),
@@ -451,7 +476,7 @@ class GDALRaster(GDALRasterBase):
 
         # Construct the target warp dictionary from the virtual raster
         data = {
-            'srid': srid,
+            'srid': target_srs.srid,
             'width': target.width,
             'height': target.height,
             'origin': [target.origin.x, target.origin.y],

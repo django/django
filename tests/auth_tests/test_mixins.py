@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import (
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.views.generic import View
 
 
@@ -80,6 +80,34 @@ class AccessMixinTests(TestCase):
         with self.assertRaises(PermissionDenied):
             view(request)
 
+    def test_access_mixin_permission_denied_response(self):
+        user = models.User.objects.create(username='joe', password='qwerty')
+        # Authenticated users receive PermissionDenied.
+        request = self.factory.get('/rand')
+        request.user = user
+        view = AlwaysFalseView.as_view()
+        with self.assertRaises(PermissionDenied):
+            view(request)
+        # Anonymous users are redirected to the login page.
+        request.user = AnonymousUser()
+        response = view(request)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/accounts/login/?next=/rand')
+
+    def test_access_mixin_permission_denied_remote_login_url(self):
+        class AView(AlwaysFalseView):
+            login_url = 'https://www.remote.example.com/login'
+
+        view = AView.as_view()
+        request = self.factory.get('/rand')
+        request.user = AnonymousUser()
+        response = view(request)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.url,
+            'https://www.remote.example.com/login?next=http%3A//testserver/rand',
+        )
+
     @mock.patch.object(models.User, 'is_authenticated', False)
     def test_stacked_mixins_not_logged_in(self):
         user = models.User.objects.create(username='joe', password='qwerty')
@@ -97,7 +125,7 @@ class AccessMixinTests(TestCase):
             view(request)
 
 
-class UserPassesTestTests(TestCase):
+class UserPassesTestTests(SimpleTestCase):
 
     factory = RequestFactory()
 
@@ -150,9 +178,8 @@ class UserPassesTestTests(TestCase):
         request = self.factory.get('/rand')
         request.user = AnonymousUser()
         view = AView.as_view()
-        with self.assertRaises(PermissionDenied) as cm:
+        with self.assertRaisesMessage(PermissionDenied, msg):
             view(request)
-        self.assertEqual(cm.exception.args[0], msg)
 
     def test_raise_exception_custom_message_function(self):
         msg = "You don't have access here"
@@ -166,9 +193,8 @@ class UserPassesTestTests(TestCase):
         request = self.factory.get('/rand')
         request.user = AnonymousUser()
         view = AView.as_view()
-        with self.assertRaises(PermissionDenied) as cm:
+        with self.assertRaisesMessage(PermissionDenied, msg):
             view(request)
-        self.assertEqual(cm.exception.args[0], msg)
 
     def test_user_passes(self):
         view = AlwaysTrueView.as_view()
@@ -241,8 +267,13 @@ class PermissionsRequiredMixinTests(TestCase):
                 'auth_tests.add_customuser', 'auth_tests.change_customuser', 'nonexistent-permission',
             ]
 
+        # Authenticated users receive PermissionDenied.
         request = self.factory.get('/rand')
         request.user = self.user
+        with self.assertRaises(PermissionDenied):
+            AView.as_view()(request)
+        # Anonymous users are redirected to the login page.
+        request.user = AnonymousUser()
         resp = AView.as_view()(request)
         self.assertEqual(resp.status_code, 302)
 

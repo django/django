@@ -69,7 +69,7 @@ class ManagerMixin(models.Model):
 
 class OtherPerson(Person, ManagerMixin):
     """
-    A class with the default manager from Person, plus an secondary manager.
+    A class with the default manager from Person, plus a secondary manager.
     """
     class Meta:
         proxy = True

@@ -3,6 +3,7 @@ import operator
 from django import template
 from django.template.defaultfilters import stringfilter
 from django.utils.html import escape, format_html
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -11,6 +12,13 @@ register = template.Library()
 @stringfilter
 def trim(value, num):
     return value[:num]
+
+
+@register.filter
+@mark_safe
+def make_data_div(value):
+    """A filter that uses a decorator (@mark_safe)."""
+    return '<div data-name="%s"></div>' % value
 
 
 @register.filter
@@ -103,7 +111,7 @@ simple_one_default.anything = "Expected simple_one_default __dict__"
 def simple_unlimited_args(one, two='hi', *args):
     """Expected simple_unlimited_args __doc__"""
     return "simple_unlimited_args - Expected result: %s" % (
-        ', '.join(str(arg) for arg in [one, two] + list(args))
+        ', '.join(str(arg) for arg in [one, two, *args])
     )
 
 
@@ -125,7 +133,7 @@ def simple_unlimited_args_kwargs(one, two='hi', *args, **kwargs):
     # Sort the dictionary by key to guarantee the order for testing.
     sorted_kwarg = sorted(kwargs.items(), key=operator.itemgetter(0))
     return "simple_unlimited_args_kwargs - Expected result: %s / %s" % (
-        ', '.join(str(arg) for arg in [one, two] + list(args)),
+        ', '.join(str(arg) for arg in [one, two, *args]),
         ', '.join('%s=%s' % (k, v) for (k, v) in sorted_kwarg)
     )
 
@@ -145,13 +153,13 @@ simple_tag_without_context_parameter.anything = "Expected simple_tag_without_con
 @register.simple_tag(takes_context=True)
 def escape_naive(context):
     """A tag that doesn't even think about escaping issues"""
-    return "Hello {0}!".format(context['name'])
+    return "Hello {}!".format(context['name'])
 
 
 @register.simple_tag(takes_context=True)
 def escape_explicit(context):
     """A tag that uses escape explicitly"""
-    return escape("Hello {0}!".format(context['name']))
+    return escape("Hello {}!".format(context['name']))
 
 
 @register.simple_tag(takes_context=True)
@@ -162,12 +170,12 @@ def escape_format_html(context):
 
 @register.simple_tag(takes_context=True)
 def current_app(context):
-    return "%s" % context.current_app
+    return str(context.current_app)
 
 
 @register.simple_tag(takes_context=True)
 def use_l10n(context):
-    return "%s" % context.use_l10n
+    return str(context.use_l10n)
 
 
 @register.simple_tag(name='minustwo')

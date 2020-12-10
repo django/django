@@ -3,20 +3,21 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Vláďa Macek <macek@sandbox.cz>, 2011-2012,2014
-# Vláďa Macek <macek@sandbox.cz>, 2015
+# Vláďa Macek <macek@sandbox.cz>, 2015,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-15 17:40+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-19 09:23+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: cs\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
+"<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
 msgid "Advanced options"
 msgstr "Pokročilá nastavení"
@@ -28,9 +29,10 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"Příklad: \"/o/kontakt/\". Ujistěte se, že máte počáteční a konečná lomítka."
+"Příklad: \"/about/contact/\". Ujistěte se, že máte počáteční a konečná "
+"lomítka."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
@@ -38,6 +40,9 @@ msgid ""
 msgstr ""
 "Tato hodnota musí obsahovat pouze písmena, číslice, tečky, podtržítka, "
 "pomlčky, lomítka nebo vlnovky."
+
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr "Příklad: \"/about/contact\". Úvodní lomítko je důležité."
 
 msgid "URL is missing a leading slash."
 msgstr "V adrese URL chybí úvodní lomítko."
@@ -62,8 +67,8 @@ msgid "template name"
 msgstr "název šablony"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
 "Příklad: \"flatpages/kontaktni_stranka.html\". Pokud toto není zadáno, bude "
 "použita šablona \"flatpages/default.html\"."

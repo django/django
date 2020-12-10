@@ -8,13 +8,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
 # Renata Barbosa Almeida <renata-rj000@hotmail.com>, 2016
+# Samuel Nogueira Bacelar <samuelnbacelar@hotmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-28 23:30+0000\n"
-"Last-Translator: Tarsis Azevedo <tarsis.azevedo@gmail.com>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-09-22 14:12+0000\n"
+"Last-Translator: Samuel Nogueira Bacelar <samuelnbacelar@hotmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -87,20 +88,36 @@ msgstr ""
 "executar uma ação suas alterações não salvas serão perdidas."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Você selecionou uma ação, mas você não salvou as alterações de cada campo "
-"ainda. Clique em OK para salvar. Você vai precisar executar novamente a ação."
+"Você selecionou uma ação, mas você ainda não salvou suas alterações nos "
+"campos individuais. Por favor clique OK para salvar. você precisará de rodar "
+"novamente a ação."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Você selecionou uma ação, e você não fez alterações em campos individuais. "
-"Você provavelmente está procurando o botão Ir ao invés do botão Salvar."
+"Você selecionou uma ação sem fazer mudanças nos campos individuais. Você "
+"provavelmente está procurando pelo botão Go ao invés do botão Save."
+
+msgid "Now"
+msgstr "Agora"
+
+msgid "Midnight"
+msgstr "Meia-noite"
+
+msgid "6 a.m."
+msgstr "6 da manhã"
+
+msgid "Noon"
+msgstr "Meio-dia"
+
+msgid "6 p.m."
+msgstr "6 da tarde"
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
@@ -114,26 +131,11 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Nota: Você está %s hora atrás do tempo do servidor."
 msgstr[1] "Nota: Você está %s horas atrás do horário do servidor."
 
-msgid "Now"
-msgstr "Agora"
-
 msgid "Choose a Time"
 msgstr "Escolha um horário"
 
 msgid "Choose a time"
 msgstr "Escolha uma hora"
-
-msgid "Midnight"
-msgstr "Meia-noite"
-
-msgid "6 a.m."
-msgstr "6 da manhã"
-
-msgid "Noon"
-msgstr "Meio-dia"
-
-msgid "6 p.m."
-msgstr "6 da tarde"
 
 msgid "Cancel"
 msgstr "Cancelar"

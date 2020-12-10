@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -25,8 +27,17 @@ class Band(models.Model):
         return self.name
 
 
+class UnsafeLimitChoicesTo(models.Model):
+    band = models.ForeignKey(
+        Band,
+        models.CASCADE,
+        limit_choices_to={'name': '"&><escapeme'},
+    )
+
+
 class Album(models.Model):
     band = models.ForeignKey(Band, models.CASCADE)
+    featuring = models.ManyToManyField(Band, related_name='featured')
     name = models.CharField(max_length=100)
     cover_art = models.FileField(upload_to='albums')
     backside_art = MyFileField(upload_to='albums_back', null=True)
@@ -91,6 +102,7 @@ class CarTire(models.Model):
 
 
 class Honeycomb(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     location = models.CharField(max_length=20)
 
 
@@ -131,11 +143,11 @@ class Advisor(models.Model):
 class Student(models.Model):
     name = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ('name',)
+
+    def __str__(self):
+        return self.name
 
 
 class School(models.Model):

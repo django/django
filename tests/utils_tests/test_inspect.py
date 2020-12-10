@@ -33,3 +33,17 @@ class TestInspectMethods(unittest.TestCase):
 
     def test_func_accepts_var_args_no_var_args(self):
         self.assertIs(inspect.func_accepts_var_args(Person.one_argument), False)
+
+    def test_method_has_no_args(self):
+        self.assertIs(inspect.method_has_no_args(Person.no_arguments), True)
+        self.assertIs(inspect.method_has_no_args(Person.one_argument), False)
+        self.assertIs(inspect.method_has_no_args(Person().no_arguments), True)
+        self.assertIs(inspect.method_has_no_args(Person().one_argument), False)
+
+    def test_func_supports_parameter(self):
+        self.assertIs(inspect.func_supports_parameter(Person.all_kinds, 'address'), True)
+        self.assertIs(inspect.func_supports_parameter(Person.all_kinds, 'zone'), False)
+
+    def test_func_accepts_kwargs(self):
+        self.assertIs(inspect.func_accepts_kwargs(Person.just_args), False)
+        self.assertIs(inspect.func_accepts_kwargs(Person.all_kinds), True)

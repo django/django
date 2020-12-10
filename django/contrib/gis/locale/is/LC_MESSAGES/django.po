@@ -3,13 +3,14 @@
 # Translators:
 # Hafsteinn Einarsson <haffi67@gmail.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Thordur Sigurdsson <thordur@ja.is>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-11-20 05:37+0000\n"
+"Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
 "MIME-Version: 1.0\n"
@@ -25,8 +26,8 @@ msgid "The base GIS field."
 msgstr ""
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
-msgstr ""
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
+msgstr "Grunn GIS reitur — varpast í OpenGIS rúmgerð."
 
 msgid "Point"
 msgstr "Punktur"
@@ -75,9 +76,6 @@ msgstr ""
 msgid "WKT debugging window:"
 msgstr ""
 
-msgid "Google Maps via GeoDjango"
-msgstr ""
-
 msgid "Debugging window (serialized value)"
 msgstr ""
 
@@ -85,5 +83,5 @@ msgid "No feeds are registered."
 msgstr "Engir listar (feeds) eru skráðir"
 
 #, python-format
-msgid "Slug %r isn't registered."
-msgstr "Slögg %r er ekki skráður"
+msgid "Slug %r isn’t registered."
+msgstr ""

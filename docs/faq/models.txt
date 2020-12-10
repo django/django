@@ -8,7 +8,7 @@ How can I see the raw SQL queries Django is running?
 ====================================================
 
 Make sure your Django :setting:`DEBUG` setting is set to ``True``.
-Then, just do this::
+Then do this::
 
     >>> from django.db import connection
     >>> connection.queries
@@ -32,7 +32,7 @@ same interface on each member of the ``connections`` dictionary::
     >>> connections['my_db_alias'].queries
 
 If you need to clear the query list manually at any point in your functions,
-just call ``reset_queries()``, like this::
+call ``reset_queries()``, like this::
 
     from django.db import reset_queries
     reset_queries()
@@ -61,20 +61,19 @@ But this isn't an issue in practice, because there's nothing stopping you from
 adding other constraints (using the ``unique_together`` model option or
 creating the constraint directly in your database), and enforcing the
 uniqueness at that level. Single-column primary keys are needed for things such
-as the admin interface to work; e.g., you need a simple way of being able to
-specify an object to edit or delete.
+as the admin interface to work; e.g., you need a single value to specify
+an object to edit or delete.
 
 Does Django support NoSQL databases?
 ====================================
 
 NoSQL databases are not officially supported by Django itself. There are,
-however, a number of side project and forks which allow NoSQL functionality in
-Django, like `Django non-rel`_.
+however, a number of side projects and forks which allow NoSQL functionality in
+Django.
 
-You can also take a look on `the wiki page`_ which discusses some alternatives.
+You can take a look on `the wiki page`_ which discusses some projects.
 
-.. _`Django non-rel`: http://django-nonrel.org/
-.. _`the wiki page`: https://code.djangoproject.com/wiki/NoSqlSupport
+.. _the wiki page: https://code.djangoproject.com/wiki/NoSqlSupport
 
 How do I add database-specific options to my CREATE TABLE statements, such as specifying MyISAM as the table type?
 ==================================================================================================================

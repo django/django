@@ -4,14 +4,14 @@
 # Aitzol Naberan <anaberan@codesyntax.com>, 2013
 # Eneko Illarramendi <eneko@illarra.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
-# julen <julenx@gmail.com>, 2015
-# Urtzi Odriozola <urtzi.odriozola@gmail.com>, 2016
+# julen, 2015
+# Urtzi Odriozola <urtzi.odriozola@gmail.com>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-03-22 15:07+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-12-11 13:39+0000\n"
 "Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
@@ -31,7 +31,7 @@ msgstr "Data garrantzitsuak"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "Ez dago %(key)r gakodun %(name)s objekturik."
 
 msgid "Password changed successfully."
 msgstr "Ondo aldatu da pasahitza."
@@ -69,9 +69,10 @@ msgstr "Idatzi aurreko pasahitz bera, egiaztapenerako."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
+"Pasahitzak zifratuta gordetzen direnez ez dago erabiltzaile pasahitza "
+"ikusterik, baina pasahitza aldatu dezakezu <a href=\"{}\">hemen</a>."
 
 #, python-format
 msgid ""
@@ -115,19 +116,19 @@ msgid "hash"
 msgstr "hash"
 
 msgid "variety"
-msgstr ""
+msgstr "aldaera"
 
 msgid "version"
 msgstr "bertsioa"
 
 msgid "memory cost"
-msgstr ""
+msgstr "memoria kostua"
 
 msgid "time cost"
-msgstr ""
+msgstr "denbora kostua"
 
 msgid "parallelism"
-msgstr ""
+msgstr "paralelismoa"
 
 msgid "work factor"
 msgstr "work factor"
@@ -170,18 +171,22 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
+"Erabiltzailea zein taldetakoa den. Erabiltzaileak bere talde bakoitzari "
+"emandako baimen guztiak jasoko ditu."
 
 msgid "user permissions"
 msgstr "Erabiltzailearen baimenak"
 
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Erabiltzaile honentzako baimenak."
 
 msgid "username"
-msgstr "erabiltzaile izena"
+msgstr "erabiltzailea"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"Beharrezkoa. 150 karaktere edo gutxiago. Hizki, zenbaki eta @/./+/-/_ "
+"bakarrik."
 
 msgid "A user with that username already exists."
 msgstr "Erabiltzaile izen hori ez dago eskuragarri."
@@ -238,27 +243,29 @@ msgstr[1] ""
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] ""
+msgstr[0] "Zure pasahitzak gutxienez karaktere %(min_length)d eduki behar du."
 msgstr[1] ""
+"Zure pasahitzak gutxienez %(min_length)d karaktere eduki behar ditu."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "Zure pasahitza %(verbose_name)s-(r)en oso antzekoa da."
 
 msgid "Your password can't be too similar to your other personal information."
 msgstr ""
+"Zure pasahitza ezin da izan zure beste informazio pertsonalaren antzekoa."
 
 msgid "This password is too common."
 msgstr "Pasahitz hau arruntegia da."
 
 msgid "Your password can't be a commonly used password."
-msgstr ""
+msgstr "Zure pasahitza ezin da izan normalean erabiltzen den pasahitza."
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "Zure pasahitza osorik zenbakizkoa da."
 
 msgid "Your password can't be entirely numeric."
-msgstr ""
+msgstr "Zure pasahitza ezin da izan osorik zenbakizkoa."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
@@ -285,7 +292,7 @@ msgid "Password reset"
 msgstr "Pasahitz-berrezartzea"
 
 msgid "Password reset sent"
-msgstr ""
+msgstr "Pasahitz-berrezartzea bidalita"
 
 msgid "Enter new password"
 msgstr "Idatzi pasahitz berria"

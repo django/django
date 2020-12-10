@@ -3,14 +3,14 @@ from django.core.exceptions import NON_FIELD_ERRORS
 from django.test import TestCase
 from django.utils.functional import lazy
 
-from . import ValidationTestCase
+from . import ValidationAssertions
 from .models import (
     Article, Author, GenericIPAddressTestModel, GenericIPAddrUnpackUniqueTest,
     ModelToValidate,
 )
 
 
-class BaseModelValidationTests(ValidationTestCase):
+class BaseModelValidationTests(ValidationAssertions, TestCase):
 
     def test_missing_required_field_raises_error(self):
         mtv = ModelToValidate(f_with_custom_validator=42)
@@ -48,6 +48,13 @@ class BaseModelValidationTests(ValidationTestCase):
         mtv = ModelToValidate(number=10, name='Some Name', parent_id=parent.pk)
         self.assertFailsValidation(mtv.full_clean, ['parent'])
 
+    def test_FK_validates_using_base_manager(self):
+        # Archived articles are not available through the default manager, only
+        # the base manager.
+        author = Author.objects.create(name="Randy", archived=True)
+        article = Article(title='My Article', author=author)
+        self.assertIsNone(article.full_clean())
+
     def test_wrong_email_value_raises_error(self):
         mtv = ModelToValidate(number=10, name='Some Name', email='not-an-email')
         self.assertFailsValidation(mtv.full_clean, ['email'])
@@ -83,8 +90,9 @@ class ArticleForm(forms.ModelForm):
 
 
 class ModelFormsTests(TestCase):
-    def setUp(self):
-        self.author = Author.objects.create(name='Joseph Kocherhans')
+    @classmethod
+    def setUpTestData(cls):
+        cls.author = Author.objects.create(name='Joseph Kocherhans')
 
     def test_partial_validation(self):
         # Make sure the "commit=False and set field values later" idiom still
@@ -126,7 +134,7 @@ class ModelFormsTests(TestCase):
         self.assertEqual(list(form.errors), ['pub_date'])
 
 
-class GenericIPAddressFieldTests(ValidationTestCase):
+class GenericIPAddressFieldTests(ValidationAssertions, TestCase):
 
     def test_correct_generic_ip_passes(self):
         giptm = GenericIPAddressTestModel(generic_ip="1.2.3.4")

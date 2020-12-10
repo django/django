@@ -11,5 +11,5 @@ class NumberInputTests(WidgetTest):
         widget = NumberInput(attrs={'max': 12345, 'min': 1234, 'step': 9999})
         self.check_html(
             widget, 'name', 'value',
-            '<input type="number" name="name" value="value" max="12345" min="1234" step="9999" />'
+            '<input type="number" name="name" value="value" max="12345" min="1234" step="9999">'
         )

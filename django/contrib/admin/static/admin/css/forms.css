@@ -22,10 +22,6 @@ form .form-row p {
     padding-left: 0;
 }
 
-.hidden {
-    display: none;
-}
-
 /* FORM LABELS */
 
 label {
@@ -177,7 +173,7 @@ form .aligned table p {
     padding-left: 0;
 }
 
-fieldset .field-box {
+fieldset .fieldBox {
     float: left;
     margin-right: 20px;
 }
@@ -291,10 +287,27 @@ body.popup .submit-row {
     color: #fff;
 }
 
+.submit-row a.closelink {
+    display: inline-block;
+    background: #bbbbbb;
+    border-radius: 4px;
+    padding: 10px 15px;
+    height: 15px;
+    line-height: 15px;
+    margin: 0 0 0 5px;
+    color: #fff;
+}
+
 .submit-row a.deletelink:focus,
 .submit-row a.deletelink:hover,
 .submit-row a.deletelink:active {
     background: #a41515;
+}
+
+.submit-row a.closelink:focus,
+.submit-row a.closelink:hover,
+.submit-row a.closelink:active {
+    background: #aaaaaa;
 }
 
 /* CUSTOM FORM FIELDS */
@@ -336,7 +349,7 @@ body.popup .submit-row {
     width: 2.2em;
 }
 
-.vTextField {
+.vTextField, .vUUIDField {
     width: 20em;
 }
 
@@ -413,6 +426,7 @@ body.popup .submit-row {
 
 .inline-related.tabular fieldset.module table {
     width: 100%;
+    overflow-x: scroll;
 }
 
 .last-related fieldset {
@@ -484,18 +498,12 @@ body.popup .submit-row {
 
 /* RELATED FIELD ADD ONE / LOOKUP */
 
-.add-another, .related-lookup {
+.related-lookup {
     margin-left: 5px;
     display: inline-block;
     vertical-align: middle;
     background-repeat: no-repeat;
     background-size: 14px;
-}
-
-.add-another {
-    width: 16px;
-    height: 16px;
-    background-image: url(../img/icon-addlink.svg);
 }
 
 .related-lookup {

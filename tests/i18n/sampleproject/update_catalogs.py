@@ -8,12 +8,12 @@ by using catalogs created from management commands.
 
 Example:
 
-The string "Two %% Three %%%" renders differently using trans and blocktrans.
-This issue is difficult to debug, it could be a problem with extraction,
-interpolation, or both.
+The string "Two %% Three %%%" renders differently using translate and
+blocktranslate. This issue is difficult to debug, it could be a problem with
+extraction, interpolation, or both.
 
 How this script helps:
- * Add {% trans "Two %% Three %%%" %} and blocktrans equivalent to templates.
+ * Add {% translate "Two %% Three %%%" %} and blocktranslate equivalent to templates.
  * Run this script.
  * Test extraction - verify the new msgid in sampleproject's django.po.
  * Add a translation to sampleproject's django.po.

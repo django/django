@@ -1,0 +1,72 @@
+=======================
+How to deploy with ASGI
+=======================
+
+As well as WSGI, Django also supports deploying on ASGI_, the emerging Python
+standard for asynchronous web servers and applications.
+
+.. _ASGI: https://asgi.readthedocs.io/en/latest/
+
+Django's :djadmin:`startproject` management command sets up a default ASGI
+configuration for you, which you can tweak as needed for your project, and
+direct any ASGI-compliant application server to use.
+
+Django includes getting-started documentation for the following ASGI servers:
+
+.. toctree::
+   :maxdepth: 1
+
+   daphne
+   hypercorn
+   uvicorn
+
+The ``application`` object
+==========================
+
+Like WSGI, ASGI has you supply an ``application`` callable which
+the application server uses to communicate with your code. It's commonly
+provided as an object named ``application`` in a Python module accessible to
+the server.
+
+The :djadmin:`startproject` command creates a file
+:file:`<project_name>/asgi.py` that contains such an ``application`` callable.
+
+It's not used by the development server (``runserver``), but can be used by
+any ASGI server either in development or in production.
+
+ASGI servers usually take the path to the application callable as a string;
+for most Django projects, this will look like ``myproject.asgi:application``.
+
+.. warning::
+
+    While Django's default ASGI handler will run all your code in a synchronous
+    thread, if you choose to run your own async handler you must be aware of
+    async-safety.
+
+    Do not call blocking synchronous functions or libraries in any async code.
+    Django prevents you from doing this with the parts of Django that are not
+    async-safe, but the same may not be true of third-party apps or Python
+    libraries.
+
+Configuring the settings module
+===============================
+
+When the ASGI server loads your application, Django needs to import the
+settings module — that's where your entire application is defined.
+
+Django uses the :envvar:`DJANGO_SETTINGS_MODULE` environment variable to locate
+the appropriate settings module. It must contain the dotted path to the
+settings module. You can use a different value for development and production;
+it all depends on how you organize your settings.
+
+If this variable isn't set, the default :file:`asgi.py` sets it to
+``mysite.settings``, where ``mysite`` is the name of your project.
+
+Applying ASGI middleware
+========================
+
+To apply ASGI middleware, or to embed Django in another ASGI application, you
+can wrap Django's ``application`` object in the ``asgi.py`` file. For example::
+
+    from some_asgi_library import AmazingMiddleware
+    application = AmazingMiddleware(application)

@@ -1,20 +1,12 @@
 from django.apps import apps
 from django.db import models
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 from django.test.utils import isolate_apps
+
+from .models import ManyToMany
 
 
 class ManyToManyFieldTests(SimpleTestCase):
-
-    @isolate_apps('model_fields')
-    def test_value_from_object_instance_without_pk(self):
-        class ManyToManyModel(models.Model):
-            m2m = models.ManyToManyField('self', models.CASCADE)
-
-        instance = ManyToManyModel()
-        qs = instance._meta.get_field('m2m').value_from_object(instance)
-        self.assertEqual(qs.model, ManyToManyModel)
-        self.assertEqual(list(qs), [])
 
     def test_abstract_model_pending_operations(self):
         """
@@ -66,3 +58,16 @@ class ManyToManyFieldTests(SimpleTestCase):
 
         assert_app_model_resolved('model_fields')
         assert_app_model_resolved('tests')
+
+
+class ManyToManyFieldDBTests(TestCase):
+
+    def test_value_from_object_instance_without_pk(self):
+        obj = ManyToMany()
+        self.assertEqual(obj._meta.get_field('m2m').value_from_object(obj), [])
+
+    def test_value_from_object_instance_with_pk(self):
+        obj = ManyToMany.objects.create()
+        related_obj = ManyToMany.objects.create()
+        obj.m2m.add(related_obj)
+        self.assertEqual(obj._meta.get_field('m2m').value_from_object(obj), [related_obj])

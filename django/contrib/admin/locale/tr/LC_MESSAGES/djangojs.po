@@ -1,17 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015-2016
+# BouRock, 2015-2016,2019-2020
 # BouRock, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Metin Amiroff <amiroff@gmail.com>, 2011
-# Murat Çorlu <muratcorlu@gmail.com>, 2012
+# Murat Çorlu <muratcorlu@me.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 11:20+0000\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-13 07:28+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -86,21 +86,36 @@ msgstr ""
 "bir eylem çalıştırırsanız, kaydedilmemiş değişiklikleriniz kaybolacaktır."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Bir eylem seçtiniz, fakat henüz bireysel alanlara değişikliklerinizi "
-"kaydetmediniz. Kaydetmek için lütfen TAMAM düğmesine tıklayın. Eylemi "
-"yeniden çalıştırmanız gerekecek."
+"Bir eylem seçtiniz, ancak değişikliklerinizi tek tek alanlara kaydetmediniz. "
+"Kaydetmek için lütfen TAMAM düğmesine tıklayın. Eylemi yeniden çalıştırmanız "
+"gerekecek."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Bir eylem seçtiniz, fakat bireysel alanlar üzerinde hiçbir değişiklik "
+"Bir eylem seçtiniz, ancak tek tek alanlarda herhangi bir değişiklik "
 "yapmadınız. Muhtemelen Kaydet düğmesi yerine Git düğmesini arıyorsunuz."
+
+msgid "Now"
+msgstr "Şimdi"
+
+msgid "Midnight"
+msgstr "Geceyarısı"
+
+msgid "6 a.m."
+msgstr "Sabah 6"
+
+msgid "Noon"
+msgstr "Öğle"
+
+msgid "6 p.m."
+msgstr "6 ö.s."
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
@@ -114,26 +129,11 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Not: Sunucu saatinin %s saat gerisindesiniz."
 msgstr[1] "Not: Sunucu saatinin %s saat gerisindesiniz."
 
-msgid "Now"
-msgstr "Şimdi"
-
 msgid "Choose a Time"
 msgstr "Bir Saat Seçin"
 
 msgid "Choose a time"
 msgstr "Bir saat seçin"
-
-msgid "Midnight"
-msgstr "Geceyarısı"
-
-msgid "6 a.m."
-msgstr "Sabah 6"
-
-msgid "Noon"
-msgstr "Öğle"
-
-msgid "6 p.m."
-msgstr "6 ö.s."
 
 msgid "Cancel"
 msgstr "İptal"
@@ -192,7 +192,7 @@ msgstr "P"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr "P"
+msgstr "Pt"
 
 msgctxt "one letter Tuesday"
 msgid "T"
@@ -204,7 +204,7 @@ msgstr "Ç"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr "P"
+msgstr "Pe"
 
 msgctxt "one letter Friday"
 msgid "F"
@@ -212,7 +212,7 @@ msgstr "C"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr "C"
+msgstr "Ct"
 
 msgid "Show"
 msgstr "Göster"

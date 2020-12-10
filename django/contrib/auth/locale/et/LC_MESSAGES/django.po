@@ -5,15 +5,16 @@
 # Janno Liivak <jannolii@gmail.com>, 2013,2015
 # madisvain <madisvain@gmail.com>, 2011
 # Martin Pajuste <martinpajuste@gmail.com>, 2015
-# Martin Pajuste <martinpajuste@gmail.com>, 2016
+# Martin Pajuste <martinpajuste@gmail.com>, 2016-2017
 # Marti Raudsepp <marti@juffo.org>, 2014,2016
+# Ragnar Rebase <rrebase@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-18 21:34+0000\n"
-"Last-Translator: Marti Raudsepp <marti@juffo.org>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-12-28 01:45+0000\n"
+"Last-Translator: Ragnar Rebase <rrebase@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -57,8 +58,8 @@ msgstr "Parool on määramata."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Lubamatu parooli formaat või tundmatu räsialgoritm."
 
-msgid "The two password fields didn't match."
-msgstr "Kaks sisestatud parooli ei olnud identsed."
+msgid "The two password fields didn’t match."
+msgstr "Sisestatud paroolid polnud identsed."
 
 msgid "Password"
 msgstr "Salasõna"
@@ -71,13 +72,12 @@ msgstr ""
 "Sisestage sama salasõna uuesti veendumaks, et sisestamisel ei tekkinud vigu"
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Paroole ei salvestata töötlemata kujul, seega puudub võimalus selle kasutaja "
-"parooli nägemiseks, kuid saate seda muuta kasutades <a href=\"../password/"
-"\">seda vormi</a>."
+"Salasõnu ei salvestata töötlemata kujul, seega puudub võimalus selle "
+"kasutaja salasõna nägemiseks, kuid saate seda muuta kasutades <a href="
+"\"{}\">seda vormi</a>."
 
 #, python-format
 msgid ""
@@ -250,19 +250,19 @@ msgstr[1] "Salasõna peab sisaldama vähemalt %(min_length)d tähte."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Salasõna ja %(verbose_name)s on liiga sarnased."
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr "Salasõna ei tohi olla liialt sarnane sinu üldinfos määratuga."
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Salasõna ei tohi olla liialt sarnane teie isiklike andmetega."
 
 msgid "This password is too common."
 msgstr "Salasõna on liiga teada-tuntud."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Salasõna ei tohi olla teada-tuntud salasõna."
+msgid "Your password can’t be a commonly used password."
+msgstr "Salasõna ei tohi olla üks enimlevinud salasõnadest."
 
 msgid "This password is entirely numeric."
 msgstr "See salasõna koosneb ainult numbritest."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Salasõna ei tohi koosneda ainult numbritest."
 
 #, python-format

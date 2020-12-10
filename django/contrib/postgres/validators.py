@@ -1,5 +1,3 @@
-import copy
-
 from django.core.exceptions import ValidationError
 from django.core.validators import (
     MaxLengthValidator, MaxValueValidator, MinLengthValidator,
@@ -37,8 +35,7 @@ class KeysValidator:
         self.keys = set(keys)
         self.strict = strict
         if messages is not None:
-            self.messages = copy.copy(self.messages)
-            self.messages.update(messages)
+            self.messages = {**self.messages, **messages}
 
     def __call__(self, value):
         keys = set(value)
@@ -69,11 +66,11 @@ class KeysValidator:
 
 class RangeMaxValueValidator(MaxValueValidator):
     def compare(self, a, b):
-        return a.upper > b
+        return a.upper is None or a.upper > b
     message = _('Ensure that this range is completely less than or equal to %(limit_value)s.')
 
 
 class RangeMinValueValidator(MinValueValidator):
     def compare(self, a, b):
-        return a.lower < b
+        return a.lower is None or a.lower < b
     message = _('Ensure that this range is completely greater than or equal to %(limit_value)s.')

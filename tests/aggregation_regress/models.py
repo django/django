@@ -10,16 +10,10 @@ class Author(models.Model):
     age = models.IntegerField()
     friends = models.ManyToManyField('self', blank=True)
 
-    def __str__(self):
-        return self.name
-
 
 class Publisher(models.Model):
     name = models.CharField(max_length=255)
     num_awards = models.IntegerField()
-
-    def __str__(self):
-        return self.name
 
 
 class ItemTag(models.Model):
@@ -44,18 +38,12 @@ class Book(models.Model):
     class Meta:
         ordering = ('name',)
 
-    def __str__(self):
-        return self.name
-
 
 class Store(models.Model):
     name = models.CharField(max_length=255)
     books = models.ManyToManyField(Book)
     original_opening = models.DateTimeField()
     friday_night_closing = models.TimeField()
-
-    def __str__(self):
-        return self.name
 
 
 class Entries(models.Model):
@@ -80,9 +68,6 @@ class WithManualPK(models.Model):
 
 class HardbackBook(Book):
     weight = models.FloatField()
-
-    def __str__(self):
-        return "%s (hardback): %s" % (self.name, self.weight)
 
 
 # Models for ticket #21150

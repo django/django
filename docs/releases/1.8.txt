@@ -17,9 +17,9 @@ See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
 
 Django 1.8 has been designated as Django's second :term:`long-term support
-release`. It will receive security updates for at least three years after its
-release. Support for the previous LTS, Django 1.4, will end 6 months from the
-release date of Django 1.8.
+release <Long-term support release>`. It will receive security updates for at
+least three years after its release. Support for the previous LTS, Django 1.4,
+will end 6 months from the release date of Django 1.8.
 
 Python compatibility
 ====================
@@ -49,9 +49,7 @@ The ``Model._meta`` object has been part of Django since the days of pre-0.96
 "Magic Removal" -- it just wasn't an official, stable API. In recognition of
 this, we've endeavored to maintain backwards-compatibility with the old
 API endpoint where possible. However, API endpoints that aren't part of the
-new official API have been deprecated and will eventually be removed. A
-:ref:`guide to migrating from the old API to the new API
-<migrating-old-meta-api>` has been provided.
+new official API have been deprecated and will eventually be removed.
 
 Multiple template engines
 -------------------------
@@ -72,7 +70,7 @@ provides several security enhancements to the request/response cycle. The new
 :option:`check --deploy` option allows you to check your production settings
 file for ways to increase the security of your site.
 
-.. _django-secure: https://pypi.python.org/pypi/django-secure
+.. _django-secure: https://pypi.org/project/django-secure/
 
 New PostgreSQL specific functionality
 -------------------------------------
@@ -200,7 +198,7 @@ Minor features
   and :meth:`~django.contrib.auth.models.User.has_module_perms`
   to short-circuit permission checking.
 * :class:`~django.contrib.auth.forms.PasswordResetForm` now
-  has a method :meth:`~django.contrib.auth.forms.PasswordResetForm.send_email`
+  has a method :meth:`~django.contrib.auth.forms.PasswordResetForm.send_mail`
   that can be overridden to customize the mail to be sent.
 
 * The ``max_length`` of :attr:`Permission.name
@@ -660,7 +658,7 @@ Validators
 ~~~~~~~~~~
 
 * :class:`~django.core.validators.URLValidator` now supports IPv6 addresses,
-  unicode domains, and URLs containing authentication data.
+  Unicode domains, and URLs containing authentication data.
 
 .. _backwards-incompatible-1.8:
 
@@ -755,10 +753,10 @@ in :doc:`/howto/custom-management-commands`.
 Custom test management command arguments through test runner
 ------------------------------------------------------------
 
-The method to add custom arguments to the `test` management command through the
-test runner has changed. Previously, you could provide an `option_list` class
-variable on the test runner to add more arguments (à la :py:mod:`optparse`).
-Now to implement the same behavior, you have to create an
+The method to add custom arguments to the ``test`` management command through
+the test runner has changed. Previously, you could provide an ``option_list``
+class variable on the test runner to add more arguments (à la
+:py:mod:`optparse`). Now to implement the same behavior, you have to create an
 ``add_arguments(cls, parser)`` class method on the test runner and call
 ``parser.add_argument`` to add any custom arguments, as parser is now an
 :py:class:`argparse.ArgumentParser` instance.
@@ -991,8 +989,7 @@ will work with both Django 1.8 and older versions::
     for relation in opts.get_all_related_objects():
         to_model = getattr(relation, 'related_model', relation.model)
 
-Also note that ``get_all_related_objects()`` is deprecated in 1.8. See the
-:ref:`upgrade guide <migrating-old-meta-api>` for the new API.
+Also note that ``get_all_related_objects()`` is deprecated in 1.8.
 
 Database backend API
 --------------------
@@ -1089,7 +1086,7 @@ Miscellaneous
   If you wish to customize that error message, :ref:`override it on the form
   <modelforms-overriding-default-fields>` using the ``'unique'`` key in
   ``Meta.error_messages['username']`` or, if you have a custom form field for
-  ``'username'``, using the the ``'unique'`` key in its
+  ``'username'``, using the ``'unique'`` key in its
   :attr:`~django.forms.Field.error_messages` argument.
 
 * The block ``usertools`` in the ``base.html`` template of
@@ -1114,7 +1111,7 @@ Miscellaneous
   (or 200M, before 1.7.2) to 500M.
 
 * ``reverse()`` and ``reverse_lazy()`` now return Unicode strings instead of
-  byte strings.
+  bytestrings.
 
 * The ``CacheClass`` shim has been removed from all cache backends.
   These aliases were provided for backwards compatibility with Django 1.3.
@@ -1126,11 +1123,9 @@ Miscellaneous
   check framework (unless you pass it ``skip_checks=False``).
 
 * When iterating over lines, :class:`~django.core.files.File` now uses
-  `universal newlines`_. The following are recognized as ending a line: the
-  Unix end-of-line convention ``'\n'``, the Windows convention ``'\r\n'``, and
-  the old Macintosh convention ``'\r'``.
-
-  .. _universal newlines: https://www.python.org/dev/peps/pep-0278
+  :pep:`universal newlines <278>`. The following are recognized as ending a
+  line: the Unix end-of-line convention ``'\n'``, the Windows convention
+  ``'\r\n'``, and the old Macintosh convention ``'\r'``.
 
 * The Memcached cache backends ``MemcachedCache`` and ``PyLibMCCache`` will
   delete a key if ``set()`` fails. This is necessary to ensure the ``cache_db``
@@ -1166,7 +1161,7 @@ Miscellaneous
   that Django includes) will no longer convert null values back to an empty
   string. This is consistent with other backends.
 
-* When the :attr:`~django.core.management.BaseCommand.leave_locale_alone`
+* When the ``BaseCommand.leave_locale_alone``
   attribute is ``False``, translations are now deactivated instead of forcing
   the "en-us" locale. In the case your models contained non-English strings and
   you counted on English translations to be activated in management commands,
@@ -1222,9 +1217,6 @@ deprecated and will be removed in Django 1.10:
 * ``get_fields_with_model()``
 * ``get_m2m_with_model()``
 
-A :ref:`migration guide <migrating-old-meta-api>` has been provided to assist
-in converting your code from the old API to the new, official API.
-
 Loading ``cycle`` and ``firstof`` template tags from ``future`` library
 -----------------------------------------------------------------------
 
@@ -1276,7 +1268,7 @@ Thus ``patterns()`` serves little purpose and is a burden when teaching new user
 (answering the newbie's question "why do I need this empty string as the first
 argument to ``patterns()``?"). For these reasons, we are deprecating it.
 Updating your code is as simple as ensuring that ``urlpatterns`` is a list of
-:func:`django.conf.urls.url` instances. For example::
+``django.conf.urls.url()`` instances. For example::
 
     from django.conf.urls import url
     from myapp import views
@@ -1286,8 +1278,8 @@ Updating your code is as simple as ensuring that ``urlpatterns`` is a list of
         url('^other/$', views.otherview),
     ]
 
-Passing a string as ``view`` to :func:`~django.conf.urls.url`
--------------------------------------------------------------
+Passing a string as ``view`` to ``django.conf.urls.url()``
+----------------------------------------------------------
 
 Related to the previous item, referencing views as strings in the ``url()``
 function is deprecated. Pass the callable view as described in the previous
@@ -1325,7 +1317,7 @@ instead.
 
 Related to the previous item, the ``prefix`` argument to
 :func:`django.conf.urls.i18n.i18n_patterns` has been deprecated. Simply pass a
-list of :func:`django.conf.urls.url` instances instead.
+list of ``django.conf.urls.url()`` instances instead.
 
 Using an incorrect count of unpacked values in the :ttag:`for` template tag
 ---------------------------------------------------------------------------
@@ -1493,7 +1485,7 @@ in Django 1.10. The functionality it provided (validating checksum using the
 Luhn algorithm) was undocumented and not used in Django. The module has been
 moved to the `django-localflavor`_ package (version 1.1+).
 
-.. _django-localflavor: https://pypi.python.org/pypi/django-localflavor
+.. _django-localflavor: https://pypi.org/project/django-localflavor/
 
 ``InlineAdminForm.original_content_type_id``
 --------------------------------------------

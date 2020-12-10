@@ -2,22 +2,22 @@
 #
 # Translators:
 # André Bouatchidzé <a@anbz.net>, 2013-2015
-# avsd05 <avsd05@gmail.com>, 2011
+# David A. <avsd05@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 00:36+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Georgian (http://www.transifex.com/django/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ka\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -88,6 +88,15 @@ msgstr "კიდევ ერთი %(verbose_name)s-ის დამატე�
 msgid "Remove"
 msgstr "წაშლა"
 
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "შეცვლა"
+
+msgid "Deletion"
+msgstr ""
+
 msgid "action time"
 msgstr "მოქმედების დრო"
 
@@ -101,7 +110,7 @@ msgid "object id"
 msgstr "ობიექტის id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "ობიექტის წარმ."
 
@@ -165,8 +174,10 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -176,12 +187,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -209,8 +221,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" წარმატებით წაიშალა."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(name)s-ის ობიექტი პირველადი გასაღებით %(key)r არ არსებობს."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
 
 #, python-format
 msgid "Add %s"
@@ -220,6 +232,10 @@ msgstr "დავამატოთ %s"
 msgid "Change %s"
 msgstr "შევცვალოთ %s"
 
+#, python-format
+msgid "View %s"
+msgstr ""
+
 msgid "Database error"
 msgstr "მონაცემთა ბაზის შეცდომა"
 
@@ -227,11 +243,13 @@ msgstr "მონაცემთა ბაზის შეცდომა"
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s წარმატებით შეიცვალა."
+msgstr[1] "%(count)s %(name)s წარმატებით შეიცვალა."
 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s-ია არჩეული"
+msgstr[1] "%(total_count)s-ია არჩეული"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -324,7 +342,7 @@ msgid "Change password"
 msgstr "პაროლის შეცვლა"
 
 msgid "Please correct the error below."
-msgstr "გთხოვთ, გაასწოროთ შეცდომები."
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr "გთხოვთ, შეასწოროთ ქვემოთმოყვანილი შეცდომები."
@@ -435,8 +453,8 @@ msgstr ""
 "დარწმუნებული ხართ, რომ გსურთ %(objects_name)s ობიექტის წაშლა? ყველა შემდეგი "
 "ობიექტი, და მათზე დამოკიდებული ჩანაწერები წაშლილი იქნება:"
 
-msgid "Change"
-msgstr "შეცვლა"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "წავშალოთ?"
@@ -455,8 +473,8 @@ msgstr "მოდელები %(name)s აპლიკაციაში"
 msgid "Add"
 msgstr "დამატება"
 
-msgid "You don't have permission to edit anything."
-msgstr "თქვენ არა გაქვთ რედაქტირების უფლება."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr ""
@@ -510,20 +528,8 @@ msgstr "ვაჩვენოთ ყველა"
 msgid "Save"
 msgstr "შევინახოთ"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr ""
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "მონიშნული %(model)s-ის შეცვლა"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "მონიშნული %(model)s-ის წაშლა"
 
 msgid "Search"
 msgstr "ძებნა"
@@ -532,6 +538,7 @@ msgstr "ძებნა"
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s შედეგი"
+msgstr[1] "%(counter)s შედეგი"
 
 #, python-format
 msgid "%(full_result_count)s total"
@@ -545,6 +552,24 @@ msgstr "შევინახოთ და დავამატოთ ახა
 
 msgid "Save and continue editing"
 msgstr "შევინახოთ და გავაგრძელოთ რედაქტირება"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "მონიშნული %(model)s-ის შეცვლა"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "მონიშნული %(model)s-ის წაშლა"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "გმადლობთ, რომ დღეს ამ საიტთან მუშაობას დაუთმეთ დრო."
@@ -653,6 +678,10 @@ msgstr "ავირჩიოთ %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "აირჩიეთ %s შესაცვლელად"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "თარიღი;"

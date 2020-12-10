@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.apps import apps
 from django.core import checks
+from django.core.exceptions import FieldError
 from django.db import models
 from django.test import TestCase, skipIfDBFeature
 from django.test.utils import isolate_apps
@@ -93,3 +94,56 @@ class ForeignKeyTests(TestCase):
 
         assert_app_model_resolved('model_fields')
         assert_app_model_resolved('tests')
+
+    @isolate_apps('model_fields')
+    def test_to_python(self):
+        class Foo(models.Model):
+            pass
+
+        class Bar(models.Model):
+            fk = models.ForeignKey(Foo, models.CASCADE)
+
+        self.assertEqual(Bar._meta.get_field('fk').to_python('1'), 1)
+
+    @isolate_apps('model_fields')
+    def test_fk_to_fk_get_col_output_field(self):
+        class Foo(models.Model):
+            pass
+
+        class Bar(models.Model):
+            foo = models.ForeignKey(Foo, models.CASCADE, primary_key=True)
+
+        class Baz(models.Model):
+            bar = models.ForeignKey(Bar, models.CASCADE, primary_key=True)
+
+        col = Baz._meta.get_field('bar').get_col('alias')
+        self.assertIs(col.output_field, Foo._meta.pk)
+
+    @isolate_apps('model_fields')
+    def test_recursive_fks_get_col(self):
+        class Foo(models.Model):
+            bar = models.ForeignKey('Bar', models.CASCADE, primary_key=True)
+
+        class Bar(models.Model):
+            foo = models.ForeignKey(Foo, models.CASCADE, primary_key=True)
+
+        with self.assertRaisesMessage(ValueError, 'Cannot resolve output_field'):
+            Foo._meta.get_field('bar').get_col('alias')
+
+    @isolate_apps('model_fields')
+    def test_non_local_to_field(self):
+        class Parent(models.Model):
+            key = models.IntegerField(unique=True)
+
+        class Child(Parent):
+            pass
+
+        class Related(models.Model):
+            child = models.ForeignKey(Child, on_delete=models.CASCADE, to_field='key')
+
+        msg = (
+            "'model_fields.Related.child' refers to field 'key' which is not "
+            "local to model 'model_fields.Child'."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Related._meta.get_field('child').related_fields

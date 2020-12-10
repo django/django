@@ -1,18 +1,20 @@
 import base64
 import logging
 import string
-from contextlib import suppress
+import warnings
 from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib.sessions.exceptions import SuspiciousSession
+from django.core import signing
 from django.core.exceptions import SuspiciousOperation
 from django.utils import timezone
 from django.utils.crypto import (
     constant_time_compare, get_random_string, salted_hmac,
 )
-from django.utils.encoding import force_bytes
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.module_loading import import_string
+from django.utils.translation import LANGUAGE_SESSION_KEY
 
 # session_key should not be case sensitive because some backends can store it
 # on case insensitive file systems.
@@ -53,6 +55,13 @@ class SessionBase:
         return key in self._session
 
     def __getitem__(self, key):
+        if key == LANGUAGE_SESSION_KEY:
+            warnings.warn(
+                'The user language will no longer be stored in '
+                'request.session in Django 4.0. Read it from '
+                'request.COOKIES[settings.LANGUAGE_COOKIE_NAME] instead.',
+                RemovedInDjango40Warning, stacklevel=2,
+            )
         return self._session[key]
 
     def __setitem__(self, key, value):
@@ -62,6 +71,10 @@ class SessionBase:
     def __delitem__(self, key):
         del self._session[key]
         self.modified = True
+
+    @property
+    def key_salt(self):
+        return 'django.contrib.sessions.' + self.__class__.__qualname__
 
     def get(self, key, default=None):
         return self._session.get(key, default)
@@ -89,17 +102,46 @@ class SessionBase:
         del self[self.TEST_COOKIE_NAME]
 
     def _hash(self, value):
+        # RemovedInDjango40Warning: pre-Django 3.1 format will be invalid.
         key_salt = "django.contrib.sessions" + self.__class__.__name__
         return salted_hmac(key_salt, value).hexdigest()
 
     def encode(self, session_dict):
         "Return the given session dictionary serialized and encoded as a string."
-        serialized = self.serializer().dumps(session_dict)
-        hash = self._hash(serialized)
-        return base64.b64encode(hash.encode() + b":" + serialized).decode('ascii')
+        # RemovedInDjango40Warning: DEFAULT_HASHING_ALGORITHM will be removed.
+        if settings.DEFAULT_HASHING_ALGORITHM == 'sha1':
+            return self._legacy_encode(session_dict)
+        return signing.dumps(
+            session_dict, salt=self.key_salt, serializer=self.serializer,
+            compress=True,
+        )
 
     def decode(self, session_data):
-        encoded_data = base64.b64decode(force_bytes(session_data))
+        try:
+            return signing.loads(session_data, salt=self.key_salt, serializer=self.serializer)
+        # RemovedInDjango40Warning: when the deprecation ends, handle here
+        # exceptions similar to what _legacy_decode() does now.
+        except signing.BadSignature:
+            try:
+                # Return an empty session if data is not in the pre-Django 3.1
+                # format.
+                return self._legacy_decode(session_data)
+            except Exception:
+                logger = logging.getLogger('django.security.SuspiciousSession')
+                logger.warning('Session data corrupted')
+                return {}
+        except Exception:
+            return self._legacy_decode(session_data)
+
+    def _legacy_encode(self, session_dict):
+        # RemovedInDjango40Warning.
+        serialized = self.serializer().dumps(session_dict)
+        hash = self._hash(serialized)
+        return base64.b64encode(hash.encode() + b':' + serialized).decode('ascii')
+
+    def _legacy_decode(self, session_data):
+        # RemovedInDjango40Warning: pre-Django 3.1 format will be invalid.
+        encoded_data = base64.b64decode(session_data.encode('ascii'))
         try:
             # could produce ValueError if there is no ':'
             hash, serialized = encoded_data.split(b':', 1)
@@ -143,7 +185,7 @@ class SessionBase:
     def is_empty(self):
         "Return True when there is no session_key and the session is empty."
         try:
-            return not bool(self._session_key) and not self._session_cache
+            return not self._session_key and not self._session_cache
         except AttributeError:
             return True
 
@@ -152,8 +194,7 @@ class SessionBase:
         while True:
             session_key = get_random_string(32, VALID_KEY_CHARS)
             if not self.exists(session_key):
-                break
-        return session_key
+                return session_key
 
     def _get_or_create_session_key(self):
         if self._session_key is None:
@@ -199,6 +240,9 @@ class SessionBase:
 
     _session = property(_get_session)
 
+    def get_session_cookie_age(self):
+        return settings.SESSION_COOKIE_AGE
+
     def get_expiry_age(self, **kwargs):
         """Get the number of seconds until the session expires.
 
@@ -218,7 +262,7 @@ class SessionBase:
             expiry = self.get('_session_expiry')
 
         if not expiry:   # Checks both None and 0 cases
-            return settings.SESSION_COOKIE_AGE
+            return self.get_session_cookie_age()
         if not isinstance(expiry, datetime):
             return expiry
         delta = expiry - modification
@@ -242,8 +286,7 @@ class SessionBase:
 
         if isinstance(expiry, datetime):
             return expiry
-        if not expiry:   # Checks both None and 0 cases
-            expiry = settings.SESSION_COOKIE_AGE
+        expiry = expiry or self.get_session_cookie_age()
         return modification + timedelta(seconds=expiry)
 
     def set_expiry(self, value):
@@ -263,8 +306,10 @@ class SessionBase:
         """
         if value is None:
             # Remove any custom expiration for this session.
-            with suppress(KeyError):
+            try:
                 del self['_session_expiry']
+            except KeyError:
+                pass
             return
         if isinstance(value, timedelta):
             value = timezone.now() + value

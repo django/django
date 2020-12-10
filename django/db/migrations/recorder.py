@@ -1,6 +1,6 @@
 from django.apps.registry import Apps
-from django.db import models
-from django.db.utils import DatabaseError
+from django.db import DatabaseError, models
+from django.utils.functional import classproperty
 from django.utils.timezone import now
 
 from .exceptions import MigrationSchemaMissing
@@ -18,19 +18,30 @@ class MigrationRecorder:
     If a migration is unapplied its row is removed from the table. Having
     a row in the table always means a migration is applied.
     """
+    _migration_class = None
 
-    class Migration(models.Model):
-        app = models.CharField(max_length=255)
-        name = models.CharField(max_length=255)
-        applied = models.DateTimeField(default=now)
+    @classproperty
+    def Migration(cls):
+        """
+        Lazy load to avoid AppRegistryNotReady if installed apps import
+        MigrationRecorder.
+        """
+        if cls._migration_class is None:
+            class Migration(models.Model):
+                app = models.CharField(max_length=255)
+                name = models.CharField(max_length=255)
+                applied = models.DateTimeField(default=now)
 
-        class Meta:
-            apps = Apps()
-            app_label = "migrations"
-            db_table = "django_migrations"
+                class Meta:
+                    apps = Apps()
+                    app_label = 'migrations'
+                    db_table = 'django_migrations'
 
-        def __str__(self):
-            return "Migration %s for %s" % (self.name, self.app)
+                def __str__(self):
+                    return 'Migration %s for %s' % (self.name, self.app)
+
+            cls._migration_class = Migration
+        return cls._migration_class
 
     def __init__(self, connection):
         self.connection = connection
@@ -41,7 +52,9 @@ class MigrationRecorder:
 
     def has_table(self):
         """Return True if the django_migrations table exists."""
-        return self.Migration._meta.db_table in self.connection.introspection.table_names(self.connection.cursor())
+        with self.connection.cursor() as cursor:
+            tables = self.connection.introspection.table_names(cursor)
+        return self.Migration._meta.db_table in tables
 
     def ensure_schema(self):
         """Ensure the table exists and has the correct schema."""
@@ -57,13 +70,16 @@ class MigrationRecorder:
             raise MigrationSchemaMissing("Unable to create the django_migrations table (%s)" % exc)
 
     def applied_migrations(self):
-        """Return a set of (app, name) of applied migrations."""
+        """
+        Return a dict mapping (app_name, migration_name) to Migration instances
+        for all applied migrations.
+        """
         if self.has_table():
-            return {tuple(x) for x in self.migration_qs.values_list('app', 'name')}
+            return {(migration.app, migration.name): migration for migration in self.migration_qs}
         else:
             # If the django_migrations table doesn't exist, then no migrations
             # are applied.
-            return set()
+            return {}
 
     def record_applied(self, app, name):
         """Record that a migration was applied."""

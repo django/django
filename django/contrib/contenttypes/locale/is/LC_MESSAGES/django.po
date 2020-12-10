@@ -3,13 +3,13 @@
 # Translators:
 # Hafsteinn Einarsson <haffi67@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Thordur Sigurdsson <thordur@ja.is>, 2016
+# Thordur Sigurdsson <thordur@ja.is>, 2016,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2016-10-07 16:50+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-11-20 05:05+0000\n"
 "Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
@@ -36,9 +36,9 @@ msgid "Content type %(ct_id)s object has no associated model"
 msgstr "Gerð innihalds %(ct_id)s hefur ekkert tengt módel"
 
 #, python-format
-msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
+msgid "Content type %(ct_id)s object %(obj_id)s doesn’t exist"
 msgstr "Gerð innihalds %(ct_id)s hlutar %(obj_id)s er ekki til"
 
 #, python-format
-msgid "%(ct_name)s objects don't have a get_absolute_url() method"
+msgid "%(ct_name)s objects don’t have a get_absolute_url() method"
 msgstr "%(ct_name)s hlutir hafa ekki get_absolute_url () aðferð"

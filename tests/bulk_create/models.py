@@ -64,6 +64,14 @@ class NoFields(models.Model):
     pass
 
 
+class SmallAutoFieldModel(models.Model):
+    id = models.SmallAutoField(primary_key=True)
+
+
+class BigAutoFieldModel(models.Model):
+    id = models.BigAutoField(primary_key=True)
+
+
 class NullableFields(models.Model):
     # Fields in db.backends.oracle.BulkInsertMapper
     big_int_filed = models.BigIntegerField(null=True, default=1)
@@ -74,11 +82,16 @@ class NullableFields(models.Model):
     duration_field = models.DurationField(null=True, default=datetime.timedelta(1))
     float_field = models.FloatField(null=True, default=3.2)
     integer_field = models.IntegerField(null=True, default=2)
-    null_boolean_field = models.NullBooleanField(null=True, default=False)
+    null_boolean_field = models.BooleanField(null=True, default=False)
+    null_boolean_field_old = models.NullBooleanField(null=True, default=False)
+    positive_big_integer_field = models.PositiveBigIntegerField(null=True, default=2 ** 63 - 1)
     positive_integer_field = models.PositiveIntegerField(null=True, default=3)
     positive_small_integer_field = models.PositiveSmallIntegerField(null=True, default=4)
     small_integer_field = models.SmallIntegerField(null=True, default=5)
     time_field = models.TimeField(null=True, default=timezone.now)
+    auto_field = models.ForeignKey(NoFields, on_delete=models.CASCADE, null=True)
+    small_auto_field = models.ForeignKey(SmallAutoFieldModel, on_delete=models.CASCADE, null=True)
+    big_auto_field = models.ForeignKey(BigAutoFieldModel, on_delete=models.CASCADE, null=True)
     # Fields not required in BulkInsertMapper
     char_field = models.CharField(null=True, max_length=4, default='char')
     email_field = models.EmailField(null=True, default='user@example.com')

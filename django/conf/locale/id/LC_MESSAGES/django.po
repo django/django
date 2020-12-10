@@ -1,20 +1,23 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2017
+# Adiyat Mubarak <adiyatmubarak@gmail.com>, 2017
+# Claude Paroz <claude@2xlibre.net>, 2018
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
-# oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016
+# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011
 # rodin <romihardiyanto@gmail.com>, 2013-2016
-# Sutrisno Efendi <kangfend@gmail.com>, 2015
+# sage <laymonage@gmail.com>, 2018-2019
+# Sutrisno Efendi <kangfend@gmail.com>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-03-05 13:15+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
+"POT-Creation-Date: 2019-09-27 22:40+0200\n"
+"PO-Revision-Date: 2019-11-18 04:50+0000\n"
+"Last-Translator: sage <laymonage@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -143,6 +146,9 @@ msgstr "Sorbian Atas"
 msgid "Hungarian"
 msgstr "Hungaria"
 
+msgid "Armenian"
+msgstr "Armenia"
+
 msgid "Interlingua"
 msgstr "Interlingua"
 
@@ -163,6 +169,9 @@ msgstr "Jepang"
 
 msgid "Georgian"
 msgstr "Georgia"
+
+msgid "Kabyle"
+msgstr "Kabyle"
 
 msgid "Kazakh"
 msgstr "Kazakhstan"
@@ -278,6 +287,9 @@ msgstr "Ukrainia"
 msgid "Urdu"
 msgstr "Urdu"
 
+msgid "Uzbek"
+msgstr "Uzbek"
+
 msgid "Vietnamese"
 msgstr "Vietnam"
 
@@ -294,7 +306,7 @@ msgid "Site Maps"
 msgstr "Peta Situs"
 
 msgid "Static Files"
-msgstr "Bidang Tetap"
+msgstr "Berkas Statis"
 
 msgid "Syndication"
 msgstr "Sindikasi"
@@ -306,7 +318,7 @@ msgid "That page number is less than 1"
 msgstr "Nomor halaman itu kurang dari 1"
 
 msgid "That page contains no results"
-msgstr "Halaman itu mengandung tidak ada hasil"
+msgstr "Tidak ada hasil untuk halaman tersebut"
 
 msgid "Enter a valid value."
 msgstr "Masukkan nilai yang valid."
@@ -320,18 +332,19 @@ msgstr "Masukan sebuah bilangan bulat yang benar"
 msgid "Enter a valid email address."
 msgstr "Masukkan alamat email yang valid."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Masukkan 'slug' yang terdiri dari huruf, angka, garis bawah, atau tanda "
-"minus."
+"Masukkan “slug” valid yang terdiri dari huruf, angka, garis bawah, atau "
+"tanda hubung."
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Masukkan 'slug' valid yang terdiri dari karakter, bilangan, garis bawah, "
-"atau tanda minus."
+"Masukkan sebuah “slug” valid yang terdiri dari huruf, angka, garis bawah, "
+"atau penghubung Unicode."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Masukkan alamat IPv4 yang valid."
@@ -379,6 +392,9 @@ msgstr[0] ""
 "Pastikan nilai ini mengandung paling banyak %(limit_value)d karakter "
 "(sekarang %(show_value)d karakter)."
 
+msgid "Enter a number."
+msgstr "Masukkan sebuah bilangan."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -400,11 +416,14 @@ msgstr[0] ""
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
-"Tambahan berkas '%(extension)s' tidak diizinkan. Tambahan diizinkan adalah: "
-"'%(allowed_extensions)s'. "
+"Ekstensi berkas “%(extension)s” tidak diizinkan. Ekstensi diizinkan adalah: "
+"%(allowed_extensions)s."
+
+msgid "Null characters are not allowed."
+msgstr "Karakter null tidak diizinkan."
 
 msgid "and"
 msgstr "dan"
@@ -439,19 +458,13 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr "Field dengan tipe: %(field_type)s"
 
-msgid "Integer"
-msgstr "Bilangan Asli"
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr "Nilai “%(value)s” harus berupa True atau False."
 
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr "%(value)s' nilai harus merupakan bilangan bulat."
-
-msgid "Big (8 byte) integer"
-msgstr "Bilangan asli raksasa (8 byte)"
-
-#, python-format
-msgid "'%(value)s' value must be either True or False."
-msgstr "Nilai '%(value)s' haruslah bernilai Benar atau Salah."
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr "Nilai “%(value)s” harus berupa True, False, atau None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Nilai Boolean (Salah satu dari True atau False)"
@@ -465,18 +478,18 @@ msgstr "Bilangan asli yang dipisahkan dengan koma"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"Nilai '%(value)s' tidak sesuai format penanggalan. Formatnya harus dalam "
-"TTTT-BB-HH."
+"Nilai “%(value)s” mempunyai format tanggal yang tidak valid. Tanggal harus "
+"dalam format YYYY-MM-DD."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"Nilai '%(value)s' memiliki format yang sesuai (TTTT-BB-HH) tetap tanggalnya "
+"Nilai “%(value)s” memiliki format yang benar (YYYY-MM-DD), tetapi tanggalnya "
 "tidak valid."
 
 msgid "Date (without time)"
@@ -484,37 +497,37 @@ msgstr "Tanggal (tanpa waktu)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"Format nilai '%(value)s' tidak valid. Formatnya harus dalam TTTT-BB-HH JJ:"
-"MM[:dd[.mmmmmm]][TZ]."
+"Nilai “%(value)s” memiliki format yang tidak valid. Tanggal dan waktu harus "
+"dalam format YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"Nilai '%(value)s mempunyai bentuk benar (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
-"tetapi itu adalah sebuah tanggal/waktu tidak sah."
+"Nilai “%(value)s” memiliki format yang benar (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]), tetapi tanggal/waktunya tidak valid."
 
 msgid "Date (with time)"
 msgstr "Tanggal (dengan waktu)"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
-msgstr "Nilai '%(value)s' haruslah berupa bilangan desimal."
+msgid "“%(value)s” value must be a decimal number."
+msgstr "Nilai “%(value)s” harus berupa bilangan desimal."
 
 msgid "Decimal number"
 msgstr "Bilangan desimal"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"nilai '%(value)s' tidak sesuai format. Formatnya harus dalam [DD] [HH:"
-"[MM:]]ss[.uuuuuu] ."
+"Nilai “%(value)s” mempunyai format yang tidak valid. Waktu harus dalam "
+"format [DD] [[HH:]MM:]ss[.uuuuuu]."
 
 msgid "Duration"
 msgstr "Durasi"
@@ -526,11 +539,21 @@ msgid "File path"
 msgstr "Lokasi berkas"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
-msgstr "Nilai '%(value)s' harus berupa bilangan float."
+msgid "“%(value)s” value must be a float."
+msgstr "Nilai “%(value)s” harus berupa bilangan real."
 
 msgid "Floating point number"
 msgstr "Bilangan 'floating point'"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr "Nilai “%(value)s” harus berupa integer."
+
+msgid "Integer"
+msgstr "Bilangan Asli"
+
+msgid "Big (8 byte) integer"
+msgstr "Bilangan asli raksasa (8 byte)"
 
 msgid "IPv4 address"
 msgstr "Alamat IPv4"
@@ -539,8 +562,8 @@ msgid "IP address"
 msgstr "Alamat IP"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
-msgstr "'%(value)s' nilai harus salah satu antara None, True atau False."
+msgid "“%(value)s” value must be either None, True or False."
+msgstr "Nilai “%(value)s” harus berupa None, True, atau False."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolean (Salah satu dari True, False, atau None)"
@@ -563,19 +586,19 @@ msgstr "Teks"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"nilai '%(value)s' tidak sesuai format. Formatnya harus dalam HH:MM[:ss[."
-"uuuuuu]] ."
+"Nilai “%(value)s” mempunyai format yang tidak valid. Waktu harus dalam "
+"format HH:MM[:ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"nilai '%(value)s' sesuai dengan format (HH:MM[:ss[.uuuuuu]]) tetapi waktunya "
-"tidak benar."
+"Nilai “%(value)s” mempunyai format yang benar (HH:MM[:ss[.uuuuuu]]), tetapi "
+"nilai waktunya tidak valid."
 
 msgid "Time"
 msgstr "Waktu"
@@ -587,8 +610,11 @@ msgid "Raw binary data"
 msgstr "Data biner mentah"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
-msgstr "'%(value)s' bukan UUID yang benar"
+msgid "“%(value)s” is not a valid UUID."
+msgstr "“%(value)s” bukan UUID yang valid."
+
+msgid "Universally unique identifier"
+msgstr "Pengenal unik secara universal"
 
 msgid "File"
 msgstr "Berkas"
@@ -598,7 +624,7 @@ msgstr "Gambar"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(model)s instan dengan %(field)s %(value)r tidak ditemukan."
+msgstr "Salinan %(model)s dengan %(field)s %(value)r tidak ada."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Kunci Asing (tipe tergantung dari bidang yang berkaitan)"
@@ -629,9 +655,6 @@ msgstr "Bidang ini tidak boleh kosong."
 msgid "Enter a whole number."
 msgstr "Masukkan keseluruhan angka bilangan."
 
-msgid "Enter a number."
-msgstr "Masukkan sebuah bilangan."
-
 msgid "Enter a valid date."
 msgstr "Masukkan tanggal yang valid."
 
@@ -643,6 +666,10 @@ msgstr "Masukkan tanggal/waktu yang valid."
 
 msgid "Enter a valid duration."
 msgstr "Masukan durasi waktu yang benar."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Jumlah hari harus di antara {min_days} dan {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Tidak ada berkas yang dikirimkan. Periksa tipe pengaksaraan formulir."
@@ -683,7 +710,7 @@ msgid "Enter a list of values."
 msgstr "Masukkan beberapa nilai."
 
 msgid "Enter a complete value."
-msgstr "Masukan sebuah nilai dengan komplit"
+msgstr "Masukkan nilai yang komplet."
 
 msgid "Enter a valid UUID."
 msgstr "Masukan UUID yang benar."
@@ -707,7 +734,7 @@ msgstr[0] "Pastikan mengirim %d formulir atau lebih sedikit. "
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] "Kirimkan %d atau lebih forms."
+msgstr[0] "Kirimkan %d atau lebih formulir."
 
 msgid "Order"
 msgstr "Urutan"
@@ -734,9 +761,8 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Perbaiki nilai ganda di bawah ini."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
-"Kunci asing 'inline' tidak cocok dengan kunci utama 'instance' milik induk."
+msgid "The inline value did not match the parent instance."
+msgstr "Nilai sebaris tidak cocok dengan instance induk."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -744,16 +770,16 @@ msgstr ""
 "yang tersedia."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" bukan nilai yang benar untuk kunci utama."
+msgid "“%(pk)s” is not a valid value."
+msgstr "“%(pk)s” bukan nilai yang valid."
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
-"%(datetime)s tidak dapat diinterpretasikan pada zona waktu "
-"%(current_timezone)s; mungkin nilainya ambigu atau mungkin tidak ada."
+"%(datetime)s tidak dapat diterjemahkan dalam zona waktu "
+"%(current_timezone)s; mungkin nilainya ambigu atau tidak ada."
 
 msgid "Clear"
 msgstr "Hapus"
@@ -772,6 +798,15 @@ msgstr "Ya"
 
 msgid "No"
 msgstr "Tidak"
+
+msgid "Year"
+msgstr "Tahun"
+
+msgid "Month"
+msgstr "Bulan"
+
+msgid "Day"
+msgstr "Hari"
 
 msgid "yes,no,maybe"
 msgstr "ya,tidak,mungkin"
@@ -1030,12 +1065,12 @@ msgid "December"
 msgstr "Desember"
 
 msgid "This is not a valid IPv6 address."
-msgstr "Ini bukan alamat IPv6 yang benar"
+msgstr "Ini bukan alamat IPv6 yang valid."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "atau"
@@ -1084,70 +1119,64 @@ msgid "CSRF verification failed. Request aborted."
 msgstr "Verifikasi CSRF gagal, Permintaan dibatalkan."
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Anda melihat pesan ini karena situs HTTP ini membutuhkan 'Referer header' "
-"dikirim dari Web browser anda, tapi tidak terkirim. Header tersebut wajib "
-"karena alasan keamanan, untuk memastikan bahwa browser anda tidak dibajak "
-"oleh pihak ketiga."
+"Anda sedang melihat pesan ini karena situs HTTPS ini membutuhkan “Referer "
+"header” dikirim oleh peramban Web Anda, tetapi tidak terkirim. Bagian kepala "
+"tersebut dibutuhkan karena alasan keamanan, untuk memastikan bahwa peramban "
+"Anda tidak sedang dibajak oleh pihak ketiga."
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
 msgstr ""
-"Jika anda menonaktifkan 'Referer' headers pada konfigurasi browser anda, "
-"mohon aktfikan kembali, setidaknya untuk situs ini atau untuk koneksi HTTPS, "
-"atau untuk 'same-origin' requests."
+"Jika Anda menonaktifkan header 'Referrer' pada konfigurasi peramban Anda, "
+"mohon aktfikan kembali, setidaknya untuk situs ini, untuk koneksi HTTPS, "
+"atau untuk request 'same-origin'."
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
+msgstr ""
+"Jika Anda menggunakan tag <meta name=\"referrer\" content=\"no-referrer\"> "
+"atau menyertakan bagian kepala 'Referrer-Policy: no-referrer', harap hapus "
+"hal tersebut. Perlindungan CSRF membutuhkan bagian kepala 'Referrer' untuk "
+"melakukan pemeriksaan pengarahan ketat. Jika Anda khawatir mengenai privasi, "
+"gunakan cara lain seperti <a rel=\"noreferrer\" ...> untuk tautan ke situs "
+"pihak ketiga."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
-"Kamu melihat pesan ini karena situs ini membutuhkan sebuah CSRF cookie "
-"ketika mengirimkan sebuah form. Cookie ini dibutuhkan for alasalan keamanan, "
-"untuk memastikan bahwa browser Anda tidak sedang dibajak oleh pihak ketiga."
+"Anda melihat pesan ini karena situs ini membutuhkan sebuah kuki CSRF ketika "
+"mengirimkan formulir. Kuki ini dibutuhkan untuk alasan keamanan, untuk "
+"memastikan bahwa peramban Anda tidak sedang dibajak oleh pihak ketiga."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
-"Jika browser kamu memiliki konfigurasi untuk menyalakan cookies, maka "
-"nyalakan kembali, setidak nya untuk website ini."
+"Jika Anda telah mengatur peramban Anda untuk menonaktifkan kuki, maka "
+"aktifkanlah kembali, setidaknya untuk website ini, atau untuk request 'same-"
+"origin'."
 
 msgid "More information is available with DEBUG=True."
 msgstr "Informasi lebih lanjut tersedia dengan DEBUG=True"
 
-msgid "Welcome to Django"
-msgstr "Selamat datang di Django"
-
-msgid "It worked!"
-msgstr "Berhasil!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Selamat untuk halaman Django pertama Anda."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Selanjutnya, mulai aplikasi pertama anda dengan menjalankan <code>python "
-"manage.py startapp [app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Anda dapat meilhat pesan ini karena ada <code>DEBUG = True</code> di berkas "
-"konfigurasi Django dan belum dikonfigurasi untuk suatu URL apapun. Get to "
-"work!"
-
 msgid "No year specified"
 msgstr "Tidak ada tahun dipilih"
+
+msgid "Date out of range"
+msgstr "Tanggal di luar kisaran"
 
 msgid "No month specified"
 msgstr "Tidak ada bulan dipilih"
@@ -1171,33 +1200,78 @@ msgstr ""
 "allow_future bernilai False."
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
-msgstr "Teks tanggal tidak valid '%(datestr)s' dalam format '%(format)s'"
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr "Nilai tanggal tidak valid “%(datestr)s” untuk format “%(format)s”"
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "Tidak ada %(verbose_name)s yang cocok dengan kueri"
 
-msgid "Page is not 'last', nor can it be converted to an int."
+msgid "Page is not “last”, nor can it be converted to an int."
 msgstr ""
-"Laman bukan yang 'terakhir' atau juga tidak dapat dikonversikan ke bilangan "
-"bulat."
+"Laman bukan yang “terakhir” dan juga tidak dapat dikonversikan ke sebuah "
+"integer."
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "Laman tidak valid (%(page_number)s): %(message)s"
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
 msgstr "Daftar kosong dan '%(class_name)s.allow_empty' bernilai False."
 
 msgid "Directory indexes are not allowed here."
 msgstr "Indeks direktori tidak diizinkan di sini."
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" tidak ada"
+msgid "“%(path)s” does not exist"
+msgstr "“%(path)s” tidak ada"
 
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Daftar isi %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+"Django: kerangka kerja Web untuk para perfeksionis dengan tenggat waktu."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Lihat <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">catatan rilis</a> untuk Django %(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Selamat! Instalasi berjalan lancar!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Anda sedang melihat halaman ini karena <a href=\"https://docs.djangoproject."
+"com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> berada di berkas pengaturan Anda dan Anda belum "
+"mengonfigurasi URL apa pun."
+
+msgid "Django Documentation"
+msgstr "Dokumentasi Django"
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr "Topik, referensi, &amp; cara pemakaian"
+
+msgid "Tutorial: A Polling App"
+msgstr "Tutorial: Sebuah Aplikasi Jajak Pendapat"
+
+msgid "Get started with Django"
+msgstr "Memulai dengan Django"
+
+msgid "Django Community"
+msgstr "Komunitas Django"
+
+msgid "Connect, get help, or contribute"
+msgstr "Terhubung, minta bantuan, atau berkontribusi"

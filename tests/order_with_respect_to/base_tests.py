@@ -50,6 +50,13 @@ class BaseOrderWithRespectToTests:
         a2 = self.Answer.objects.create(text="Number five", question=self.q1)
         self.assertEqual(list(a1.question.get_answer_order()), list(a2.question.get_answer_order()))
 
+    def test_set_order_unrelated_object(self):
+        """An answer that's not related isn't updated."""
+        q = self.Question.objects.create(text='other')
+        a = self.Answer.objects.create(text='Number five', question=q)
+        self.q1.set_answer_order([o.pk for o in self.q1.answer_set.all()] + [a.pk])
+        self.assertEqual(self.Answer.objects.get(pk=a.pk)._order, 0)
+
     def test_change_ordering(self):
         # The ordering can be altered
         a = self.Answer.objects.create(text="Number five", question=self.q1)
@@ -80,3 +87,17 @@ class BaseOrderWithRespectToTests:
         self.Post.objects.create(title="2.1", parent=p2)
         p1_3 = self.Post.objects.create(title="1.3", parent=p1)
         self.assertSequenceEqual(p1.get_post_order(), [p1_1.pk, p1_2.pk, p1_3.pk])
+
+    def test_delete_and_insert(self):
+        q1 = self.Question.objects.create(text='What is your favorite color?')
+        q2 = self.Question.objects.create(text='What color is it?')
+        a1 = self.Answer.objects.create(text='Blue', question=q1)
+        a2 = self.Answer.objects.create(text='Red', question=q1)
+        a3 = self.Answer.objects.create(text='Green', question=q1)
+        a4 = self.Answer.objects.create(text='Yellow', question=q1)
+        self.assertSequenceEqual(q1.answer_set.all(), [a1, a2, a3, a4])
+        a3.question = q2
+        a3.save()
+        a1.delete()
+        new_answer = self.Answer.objects.create(text='Black', question=q1)
+        self.assertSequenceEqual(q1.answer_set.all(), [a2, a4, new_answer])

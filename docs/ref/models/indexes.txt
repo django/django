@@ -6,8 +6,6 @@ Model index reference
 
 .. currentmodule:: django.db.models
 
-.. versionadded:: 1.11
-
 Index classes ease creating database indexes. They can be added using the
 :attr:`Meta.indexes <django.db.models.Options.indexes>` option. This document
 explains the API references of :class:`Index` which includes the `index
@@ -23,7 +21,7 @@ options`_.
 ``Index`` options
 =================
 
-.. class:: Index(fields=[], name=None, db_tablespace=None)
+.. class:: Index(fields=(), name=None, db_tablespace=None, opclasses=(), condition=None, include=None)
 
     Creates an index (B-Tree) in the database.
 
@@ -32,7 +30,7 @@ options`_.
 
 .. attribute:: Index.fields
 
-A list of the name of the fields on which the index is desired.
+A list or tuple of the name of the fields on which the index is desired.
 
 By default, indexes are created with an ascending order for each column. To
 define an index with a descending order for a column, add a hyphen before the
@@ -41,12 +39,6 @@ field's name.
 For example ``Index(fields=['headline', '-pub_date'])`` would create SQL with
 ``(headline, pub_date DESC)``. Index ordering isn't supported on MySQL. In that
 case, a descending index is created as a normal index.
-
-.. admonition:: Support for column ordering on SQLite
-
-    Column ordering is supported on SQLite 3.3.0+ and only for some database
-    file formats. Refer to the `SQLite docs
-    <https://www.sqlite.org/lang_createindex.html>`_ for specifics.
 
 ``name``
 --------
@@ -57,12 +49,22 @@ The name of the index. If ``name`` isn't provided Django will auto-generate a
 name. For compatibility with different databases, index names cannot be longer
 than 30 characters and shouldn't start with a number (0-9) or underscore (_).
 
+.. admonition:: Partial indexes in abstract base classes
+
+    You must always specify a unique name for an index. As such, you
+    cannot normally specify a partial index on an abstract base class, since
+    the :attr:`Meta.indexes <django.db.models.Options.indexes>` option is
+    inherited by subclasses, with exactly the same values for the attributes
+    (including ``name``) each time. To work around name collisions, part of the
+    name may contain ``'%(app_label)s'`` and ``'%(class)s'``, which are
+    replaced, respectively, by the lowercased app label and class name of the
+    concrete model. For example ``Index(fields=['title'],
+    name='%(app_label)s_%(class)s_title_index')``.
+
 ``db_tablespace``
 -----------------
 
 .. attribute:: Index.db_tablespace
-
-.. versionadded:: 2.0
 
 The name of the :doc:`database tablespace </topics/db/tablespaces>` to use for
 this index. For single field indexes, if ``db_tablespace`` isn't provided, the
@@ -78,3 +80,97 @@ in the same tablespace as the table.
 
     For a list of PostgreSQL-specific indexes, see
     :mod:`django.contrib.postgres.indexes`.
+
+``opclasses``
+-------------
+
+.. attribute:: Index.opclasses
+
+The names of the `PostgreSQL operator classes
+<https://www.postgresql.org/docs/current/indexes-opclass.html>`_ to use for
+this index. If you require a custom operator class, you must provide one for
+each field in the index.
+
+For example, ``GinIndex(name='json_index', fields=['jsonfield'],
+opclasses=['jsonb_path_ops'])`` creates a gin index on ``jsonfield`` using
+``jsonb_path_ops``.
+
+``opclasses`` are ignored for databases besides PostgreSQL.
+
+:attr:`Index.name` is required when using ``opclasses``.
+
+``condition``
+-------------
+
+.. attribute:: Index.condition
+
+If the table is very large and your queries mostly target a subset of rows,
+it may be useful to restrict an index to that subset. Specify a condition as a
+:class:`~django.db.models.Q`. For example, ``condition=Q(pages__gt=400)``
+indexes records with more than 400 pages.
+
+:attr:`Index.name` is required when using ``condition``.
+
+.. admonition:: Restrictions on PostgreSQL
+
+    PostgreSQL requires functions referenced in the condition to be marked as
+    IMMUTABLE. Django doesn't validate this but PostgreSQL will error. This
+    means that functions such as :ref:`date-functions` and
+    :class:`~django.db.models.functions.Concat` aren't accepted. If you store
+    dates in :class:`~django.db.models.DateTimeField`, comparison to
+    :class:`~datetime.datetime` objects may require the ``tzinfo`` argument
+    to be provided because otherwise the comparison could result in a mutable
+    function due to the casting Django does for :ref:`lookups <field-lookups>`.
+
+.. admonition:: Restrictions on SQLite
+
+    SQLite `imposes restrictions <https://www.sqlite.org/partialindex.html>`_
+    on how a partial index can be constructed.
+
+.. admonition:: Oracle
+
+    Oracle does not support partial indexes. Instead, partial indexes can be
+    emulated using functional indexes. Use a :doc:`migration
+    </topics/migrations>` to add the index using :class:`.RunSQL`.
+
+.. admonition:: MySQL and MariaDB
+
+    The ``condition`` argument is ignored with MySQL and MariaDB as neither
+    supports conditional indexes.
+
+``include``
+-----------
+
+.. attribute:: Index.include
+
+.. versionadded:: 3.2
+
+A list or tuple of the names of the fields to be included in the covering index
+as non-key columns. This allows index-only scans to be used for queries that
+select only included fields (:attr:`~Index.include`) and filter only by indexed
+fields (:attr:`~Index.fields`).
+
+For example::
+
+    Index(name='covering_index', fields=['headline'], include=['pub_date'])
+
+will allow filtering on ``headline``, also selecting ``pub_date``, while
+fetching data only from the index.
+
+Using ``include`` will produce a smaller index than using a multiple column
+index but with the drawback that non-key columns can not be used for sorting or
+filtering.
+
+``include`` is ignored for databases besides PostgreSQL.
+
+:attr:`Index.name` is required when using ``include``.
+
+See the PostgreSQL documentation for more details about `covering indexes`_.
+
+.. admonition:: Restrictions on PostgreSQL
+
+    PostgreSQL 11+ only supports covering B-Tree indexes, and PostgreSQL 12+
+    also supports covering :class:`GiST indexes
+    <django.contrib.postgres.indexes.GistIndex>`.
+
+.. _covering indexes: https://www.postgresql.org/docs/current/indexes-index-only-scans.html

@@ -9,14 +9,41 @@ for a list of all possible variables.
 import importlib
 import os
 import time
+import traceback
 import warnings
+from pathlib import Path
 
+import django
 from django.conf import global_settings
-from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import RemovedInDjango30Warning
+from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.validators import URLValidator
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
+
+PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG = (
+    'The PASSWORD_RESET_TIMEOUT_DAYS setting is deprecated. Use '
+    'PASSWORD_RESET_TIMEOUT instead.'
+)
+
+DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG = (
+    'The DEFAULT_HASHING_ALGORITHM transitional setting is deprecated. '
+    'Support for it and tokens, cookies, sessions, and signatures that use '
+    'SHA-1 hashing algorithm will be removed in Django 4.0.'
+)
+
+
+class SettingsReference(str):
+    """
+    String subclass which references a current settings value. It's treated as
+    the value in memory but serializes to a settings.NAME attribute reference.
+    """
+    def __new__(self, value, setting_name):
+        return str.__new__(self, value)
+
+    def __init__(self, value, setting_name):
+        self.setting_name = setting_name
 
 
 class LazySettings(LazyObject):
@@ -55,6 +82,14 @@ class LazySettings(LazyObject):
         if self._wrapped is empty:
             self._setup(name)
         val = getattr(self._wrapped, name)
+
+        # Special case some settings which require further modification.
+        # This is done here for performance reasons so the modified value is cached.
+        if name in {'MEDIA_URL', 'STATIC_URL'} and val is not None:
+            val = self._add_script_prefix(val)
+        elif name == 'SECRET_KEY' and not val:
+            raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
+
         self.__dict__[name] = val
         return val
 
@@ -84,13 +119,49 @@ class LazySettings(LazyObject):
             raise RuntimeError('Settings already configured.')
         holder = UserSettingsHolder(default_settings)
         for name, value in options.items():
+            if not name.isupper():
+                raise TypeError('Setting %r must be uppercase.' % name)
             setattr(holder, name, value)
         self._wrapped = holder
+
+    @staticmethod
+    def _add_script_prefix(value):
+        """
+        Add SCRIPT_NAME prefix to relative paths.
+
+        Useful when the app is being served at a subpath and manually prefixing
+        subpath to STATIC_URL and MEDIA_URL in settings is inconvenient.
+        """
+        # Don't apply prefix to valid URLs.
+        try:
+            URLValidator()(value)
+            return value
+        except (ValidationError, AttributeError):
+            pass
+        # Don't apply prefix to absolute paths.
+        if value.startswith('/'):
+            return value
+        from django.urls import get_script_prefix
+        return '%s%s' % (get_script_prefix(), value)
 
     @property
     def configured(self):
         """Return True if the settings have already been configured."""
         return self._wrapped is not empty
+
+    @property
+    def PASSWORD_RESET_TIMEOUT_DAYS(self):
+        stack = traceback.extract_stack()
+        # Show a warning if the setting is used outside of Django.
+        # Stack index: -1 this line, -2 the caller.
+        filename, _, _, _ = stack[-2]
+        if not filename.startswith(os.path.dirname(django.__file__)):
+            warnings.warn(
+                PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG,
+                RemovedInDjango40Warning,
+                stacklevel=2,
+            )
+        return self.__getattr__('PASSWORD_RESET_TIMEOUT_DAYS')
 
 
 class Settings:
@@ -121,18 +192,24 @@ class Settings:
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
-        if not self.SECRET_KEY:
-            raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
+        if self.is_overridden('PASSWORD_RESET_TIMEOUT_DAYS'):
+            if self.is_overridden('PASSWORD_RESET_TIMEOUT'):
+                raise ImproperlyConfigured(
+                    'PASSWORD_RESET_TIMEOUT_DAYS/PASSWORD_RESET_TIMEOUT are '
+                    'mutually exclusive.'
+                )
+            setattr(self, 'PASSWORD_RESET_TIMEOUT', self.PASSWORD_RESET_TIMEOUT_DAYS * 60 * 60 * 24)
+            warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
 
-        if self.is_overridden('DEFAULT_CONTENT_TYPE'):
-            warnings.warn('The DEFAULT_CONTENT_TYPE setting is deprecated.', RemovedInDjango30Warning)
+        if self.is_overridden('DEFAULT_HASHING_ALGORITHM'):
+            warnings.warn(DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG, RemovedInDjango40Warning)
 
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
             # this file, no check happens and it's harmless.
-            zoneinfo_root = '/usr/share/zoneinfo'
-            if (os.path.exists(zoneinfo_root) and not
-                    os.path.exists(os.path.join(zoneinfo_root, *(self.TIME_ZONE.split('/'))))):
+            zoneinfo_root = Path('/usr/share/zoneinfo')
+            zone_info_file = zoneinfo_root.joinpath(*self.TIME_ZONE.split('/'))
+            if zoneinfo_root.exists() and not zone_info_file.exists():
                 raise ValueError("Incorrect timezone setting: %s" % self.TIME_ZONE)
             # Move the time zone info into os.environ. See ticket #2315 for why
             # we don't do this unconditionally (breaks Windows).
@@ -164,14 +241,17 @@ class UserSettingsHolder:
         self.default_settings = default_settings
 
     def __getattr__(self, name):
-        if name in self._deleted:
+        if not name.isupper() or name in self._deleted:
             raise AttributeError
         return getattr(self.default_settings, name)
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        if name == 'DEFAULT_CONTENT_TYPE':
-            warnings.warn('The DEFAULT_CONTENT_TYPE setting is deprecated.', RemovedInDjango30Warning)
+        if name == 'PASSWORD_RESET_TIMEOUT_DAYS':
+            setattr(self, 'PASSWORD_RESET_TIMEOUT', value * 60 * 60 * 24)
+            warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
+        if name == 'DEFAULT_HASHING_ALGORITHM':
+            warnings.warn(DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG, RemovedInDjango40Warning)
         super().__setattr__(name, value)
 
     def __delattr__(self, name):
@@ -181,7 +261,7 @@ class UserSettingsHolder:
 
     def __dir__(self):
         return sorted(
-            s for s in list(self.__dict__) + dir(self.default_settings)
+            s for s in [*self.__dict__, *dir(self.default_settings)]
             if s not in self._deleted
         )
 
@@ -189,7 +269,7 @@ class UserSettingsHolder:
         deleted = (setting in self._deleted)
         set_locally = (setting in self.__dict__)
         set_on_default = getattr(self.default_settings, 'is_overridden', lambda s: False)(setting)
-        return (deleted or set_locally or set_on_default)
+        return deleted or set_locally or set_on_default
 
     def __repr__(self):
         return '<%(cls)s>' % {

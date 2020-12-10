@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-21 16:32+0000\n"
-"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
+"POT-Creation-Date: 2019-09-27 22:40+0200\n"
+"PO-Revision-Date: 2019-11-05 00:38+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -146,6 +146,9 @@ msgstr "上索布語"
 msgid "Hungarian"
 msgstr "匈牙利語"
 
+msgid "Armenian"
+msgstr ""
+
 msgid "Interlingua"
 msgstr "國際語"
 
@@ -166,6 +169,9 @@ msgstr "日語"
 
 msgid "Georgian"
 msgstr "喬治亞語"
+
+msgid "Kabyle"
+msgstr "卡拜爾語"
 
 msgid "Kazakh"
 msgstr "哈薩克語"
@@ -281,6 +287,9 @@ msgstr "烏克蘭語"
 msgid "Urdu"
 msgstr "烏爾都語"
 
+msgid "Uzbek"
+msgstr ""
+
 msgid "Vietnamese"
 msgstr "越南語"
 
@@ -323,14 +332,15 @@ msgstr "請輸入有效的整數。"
 msgid "Enter a valid email address."
 msgstr "請輸入有效的電子郵件地址。"
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
-msgstr "請輸入一個有效的「slug」，由字母、數字、底線與連字號組成。"
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
+msgstr ""
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
-msgstr "請輸入一個有效的「slug」，由 Unicode 字母、數字、底線與連字號組成。"
+msgstr ""
 
 msgid "Enter a valid IPv4 address."
 msgstr "請輸入有效的 IPv4 位址。"
@@ -376,6 +386,9 @@ msgid_plural ""
 msgstr[0] ""
 "請確認這個值至多包含 %(limit_value)d 個字 (目前為 %(show_value)d 個字)。"
 
+msgid "Enter a number."
+msgstr "輸入一個數字"
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -395,10 +408,12 @@ msgstr[0] "請確認小數點前不多於 %(max)s 位。"
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
-"副檔名「%(extension)s」不被允許。允許的副檔名包含：%(allowed_extensions)s。"
+
+msgid "Null characters are not allowed."
+msgstr "不允許空（null）字元。"
 
 msgid "and"
 msgstr "和"
@@ -432,19 +447,13 @@ msgstr "%(field_label)s 在 %(date_field_label)s %(lookup_type)s 上必須唯一
 msgid "Field of type: %(field_type)s"
 msgstr "欄位型態： %(field_type)s"
 
-msgid "Integer"
-msgstr "整數"
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr ""
 
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr "'%(value)s' 必須為整數。"
-
-msgid "Big (8 byte) integer"
-msgstr "大整數 (8 位元組)"
-
-#, python-format
-msgid "'%(value)s' value must be either True or False."
-msgstr "'%(value)s' 必須為 True 或 False。"
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "布林值 (True 或 False)"
@@ -458,48 +467,46 @@ msgstr "逗號分隔的整數"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
-msgstr "'%(value)s' 格式錯誤，必須為 YYYY-MM-DD。"
+msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
-msgstr "'%(value)s' 的格式正確 (YYYY-MM-DD)，但不是有效的日期。"
+msgstr ""
 
 msgid "Date (without time)"
 msgstr "日期 (不包括時間)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
-msgstr "'%(value)s' 格式錯誤，必須為 YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]。"
+msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"'%(value)s' 格式正確 (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ])，但不是有效的日期／"
-"時間。"
 
 msgid "Date (with time)"
 msgstr "日期 (包括時間)"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
-msgstr "'%(value)s' 必須為十進位數字。"
+msgid "“%(value)s” value must be a decimal number."
+msgstr ""
 
 msgid "Decimal number"
 msgstr "十進位數"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
-msgstr "'%(value)s' 格式錯誤，必須為 [DD] [HH:[MM:]]ss[.uuuuuu]。"
+msgstr ""
 
 msgid "Duration"
 msgstr "時間長"
@@ -511,11 +518,21 @@ msgid "File path"
 msgstr "檔案路徑"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
-msgstr "'%(value)s' 必須為浮點數。"
+msgid "“%(value)s” value must be a float."
+msgstr ""
 
 msgid "Floating point number"
 msgstr "浮點數"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr ""
+
+msgid "Integer"
+msgstr "整數"
+
+msgid "Big (8 byte) integer"
+msgstr "大整數 (8 位元組)"
 
 msgid "IPv4 address"
 msgstr "IPv4 地址"
@@ -524,8 +541,8 @@ msgid "IP address"
 msgstr "IP 位址"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
-msgstr "'%(value)s' 必須為空、True 或 False。"
+msgid "“%(value)s” value must be either None, True or False."
+msgstr ""
 
 msgid "Boolean (Either True, False or None)"
 msgstr "布林值 (True, False 或 None)"
@@ -548,15 +565,15 @@ msgstr "文字"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
-msgstr "'%(value)s' 格式錯誤，必須為 HH:MM[:ss[.uuuuuu]]。"
+msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
-msgstr "'%(value)s' 格式正確 (HH:MM[:ss[.uuuuuu]])，但不是有效的時間。"
+msgstr ""
 
 msgid "Time"
 msgstr "時間"
@@ -568,8 +585,11 @@ msgid "Raw binary data"
 msgstr "原始二進制數據"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
-msgstr "'%(value)s' 不是有效的 UUID"
+msgid "“%(value)s” is not a valid UUID."
+msgstr ""
+
+msgid "Universally unique identifier"
+msgstr ""
 
 msgid "File"
 msgstr "檔案"
@@ -610,9 +630,6 @@ msgstr "這個欄位是必須的。"
 msgid "Enter a whole number."
 msgstr "輸入整數"
 
-msgid "Enter a number."
-msgstr "輸入一個數字"
-
 msgid "Enter a valid date."
 msgstr "輸入有效的日期"
 
@@ -624,6 +641,10 @@ msgstr "輸入有效的日期/時間"
 
 msgid "Enter a valid duration."
 msgstr "輸入有效的時間長。"
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "沒有檔案被送出。請檢查表單的編碼類型。"
@@ -706,23 +727,21 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "請修正下方重覆的數值"
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "內含的外鍵無法連接到對應的上層實體主鍵。"
+msgid "The inline value did not match the parent instance."
+msgstr "內含的外鍵無法連接到對應的上層實體。"
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "選擇有效的選項： 此選擇不在可用的選項中。"
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" 不是一個主鍵的有效資料。"
+msgid "“%(pk)s” is not a valid value."
+msgstr ""
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
-"%(datetime)s 無法被轉換成 %(current_timezone)s 時區格式; 可能是不符格式或不存"
-"在。"
 
 msgid "Clear"
 msgstr "清除"
@@ -741,6 +760,15 @@ msgstr "是"
 
 msgid "No"
 msgstr "否"
+
+msgid "Year"
+msgstr ""
+
+msgid "Month"
+msgstr ""
+
+msgid "Day"
+msgstr ""
 
 msgid "yes,no,maybe"
 msgstr "是、否、也許"
@@ -1003,8 +1031,8 @@ msgstr "這是無效的 IPv6 位址。"
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr ""
 
 msgid "or"
 msgstr "或"
@@ -1053,21 +1081,25 @@ msgid "CSRF verification failed. Request aborted."
 msgstr "CSRF 驗證失敗。已中止請求。"
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"你看到這個訊息，是因為這個 HTTPS 網站要求你的網頁瀏覽器送出一個 'Referer 標"
-"頭'，但它並未被送出。這個標頭是用於安全用途，保護你的瀏覽器不被第三方挾持。"
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
 msgstr ""
-"若你的瀏覽器設定為將「Referer」標頭關閉，請重新為這個網站、HTTPS 連線、或"
-"「same-origin」請求啟用它。"
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
+msgstr ""
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1079,39 +1111,17 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
-"若你的瀏覽器設定為將 cookie 關閉，請重新為這個網站或「same-origin」請求啟用"
-"它。"
 
 msgid "More information is available with DEBUG=True."
 msgstr "設定 DEBUG=True 以獲得更多資訊。"
 
-msgid "Welcome to Django"
-msgstr "歡迎使用 Django"
-
-msgid "It worked!"
-msgstr "設定成功！"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "觀迎來到你的第一個 Django 頁面。"
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"馬上用 <code>python manage.py startapp [app_label]</code> 建立你的第一個 app "
-"吧。"
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"你看到這個訊息，是因為你在 Django 設定檔中包含 <code>DEBUG = True</code>，且"
-"尚未配置任何網址。開始工作吧！"
-
 msgid "No year specified"
 msgstr "不指定年份"
+
+msgid "Date out of range"
+msgstr "日期超過範圍"
 
 msgid "No month specified"
 msgstr "不指定月份"
@@ -1135,31 +1145,74 @@ msgstr ""
 "False."
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
-msgstr "無效的日期字串 '%(datestr)s' 可接受格式 '%(format)s'"
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr ""
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "無 %(verbose_name)s 符合本次搜尋"
 
-msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "頁面不是最後一頁，也無法被轉換為整數。"
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr ""
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "無效的頁面 (%(page_number)s): %(message)s"
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr "為空list且 '%(class_name)s.allow_empty' 為False."
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr ""
 
 msgid "Directory indexes are not allowed here."
 msgstr "這裡不允許目錄索引。"
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" 路徑不存在"
+msgid "“%(path)s” does not exist"
+msgstr ""
 
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "%(directory)s 的索引"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django：為有時間壓力的完美主義者設計的網站框架。"
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"查看 <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">Django %(version)s 的發行筆記</a>"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "安裝成功！恭喜！"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"你看到這個訊息，是因為你在 Django 設定檔中包含 <a href=\"https://docs."
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
+"\"noopener\">DEBUG = True</a>，且尚未配置任何網址。開始工作吧！"
+
+msgid "Django Documentation"
+msgstr "Django 文件"
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr "教學：投票應用"
+
+msgid "Get started with Django"
+msgstr "初學 Django"
+
+msgid "Django Community"
+msgstr "Django 社群"
+
+msgid "Connect, get help, or contribute"
+msgstr "聯繫、求助、貢獻"

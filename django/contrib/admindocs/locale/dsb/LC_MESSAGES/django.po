@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016
+# Michael Wolf <milupo@sorbzilla.de>, 2016,2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-13 11:51+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-02-25 15:55+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -157,13 +157,13 @@ msgid "Template: %(name)s"
 msgstr "Pśedłoga: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Pśedłoga: „%(name)s“"
+msgid "Template: <q>%(name)s</q>"
+msgstr "Pśedłoga: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Py´tańska sćažka za pśedłogu „%(name)s“:"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Pytańska sćažka za pśedłogu <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(njeeksistěrujo)"
@@ -243,13 +243,6 @@ msgstr ""
 "\n"
 "    Naglědowa funkcija: <code>%(full_name)s</code>. Mě: <code>%(url_name)s</"
 "code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Boolean (pak True pak False)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Pólny typ: %(field_type)s"
 
 msgid "tag:"
 msgstr "wobznamjenje:"

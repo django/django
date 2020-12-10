@@ -1,7 +1,7 @@
+from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
-from django.db.migrations.executor import MigrationExecutor
-from django.db.migrations.loader import AmbiguityError
+from django.db.migrations.loader import AmbiguityError, MigrationLoader
 
 
 class Command(BaseCommand):
@@ -17,7 +17,7 @@ class Command(BaseCommand):
             help='Nominates a database to create SQL for. Defaults to the "default" database.',
         )
         parser.add_argument(
-            '--backwards', action='store_true', dest='backwards',
+            '--backwards', action='store_true',
             help='Creates SQL to unapply the migration, rather than to apply it',
         )
 
@@ -32,28 +32,37 @@ class Command(BaseCommand):
         # Get the database we're operating from
         connection = connections[options['database']]
 
-        # Load up an executor to get all the migration data
-        executor = MigrationExecutor(connection)
+        # Load up an loader to get all the migration data, but don't replace
+        # migrations.
+        loader = MigrationLoader(connection, replace_migrations=False)
 
         # Resolve command-line arguments into a migration
         app_label, migration_name = options['app_label'], options['migration_name']
-        if app_label not in executor.loader.migrated_apps:
+        # Validate app_label
+        try:
+            apps.get_app_config(app_label)
+        except LookupError as err:
+            raise CommandError(str(err))
+        if app_label not in loader.migrated_apps:
             raise CommandError("App '%s' does not have migrations" % app_label)
         try:
-            migration = executor.loader.get_migration_by_prefix(app_label, migration_name)
+            migration = loader.get_migration_by_prefix(app_label, migration_name)
         except AmbiguityError:
             raise CommandError("More than one migration matches '%s' in app '%s'. Please be more specific." % (
                 migration_name, app_label))
         except KeyError:
             raise CommandError("Cannot find a migration matching '%s' from app '%s'. Is it in INSTALLED_APPS?" % (
                 migration_name, app_label))
-        targets = [(app_label, migration.name)]
+        target = (app_label, migration.name)
 
-        # Show begin/end around output only for atomic migrations
-        self.output_transaction = migration.atomic
+        # Show begin/end around output for atomic migrations, if the database
+        # supports transactional DDL.
+        self.output_transaction = migration.atomic and connection.features.can_rollback_ddl
 
         # Make a plan that represents just the requested migrations and show SQL
         # for it
-        plan = [(executor.loader.graph.nodes[targets[0]], options['backwards'])]
-        sql_statements = executor.collect_sql(plan)
+        plan = [(loader.graph.nodes[target], options['backwards'])]
+        sql_statements = loader.collect_sql(plan)
+        if not sql_statements and options['verbosity'] >= 1:
+            self.stderr.write('No operations found.')
         return '\n'.join(sql_statements)

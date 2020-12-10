@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
 "PO-Revision-Date: 2015-01-18 20:56+0100\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -14,75 +14,62 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/postgres/apps.py:12
+#: contrib/postgres/apps.py:42
 msgid "PostgreSQL extensions"
 msgstr ""
 
-#: contrib/postgres/fields/array.py:19 contrib/postgres/forms/array.py:15
-#: contrib/postgres/forms/array.py:145
+#: contrib/postgres/fields/array.py:21 contrib/postgres/forms/array.py:16
+#: contrib/postgres/forms/array.py:170
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
+msgid "Item %(nth)s in the array did not validate:"
 msgstr ""
 
-#: contrib/postgres/fields/array.py:20
+#: contrib/postgres/fields/array.py:22
 msgid "Nested arrays must have the same length."
 msgstr ""
 
-#: contrib/postgres/fields/hstore.py:16
+#: contrib/postgres/fields/hstore.py:15
 msgid "Map of strings to strings/nulls"
 msgstr ""
 
 #: contrib/postgres/fields/hstore.py:17
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
+msgid "The value of “%(key)s” is not a string or null."
 msgstr ""
 
-#: contrib/postgres/fields/jsonb.py:15
-msgid "A JSON object"
-msgstr ""
-
-#: contrib/postgres/fields/jsonb.py:17
-msgid "Value must be valid JSON."
-msgstr ""
-
-#: contrib/postgres/forms/hstore.py:15
+#: contrib/postgres/forms/hstore.py:16
 msgid "Could not load JSON data."
 msgstr ""
 
-#: contrib/postgres/forms/hstore.py:18
+#: contrib/postgres/forms/hstore.py:17
 msgid "Input must be a JSON dictionary."
 msgstr ""
 
-#: contrib/postgres/forms/jsonb.py:16
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr ""
-
-#: contrib/postgres/forms/ranges.py:13
+#: contrib/postgres/forms/ranges.py:33
 msgid "Enter two valid values."
 msgstr ""
 
-#: contrib/postgres/forms/ranges.py:14
+#: contrib/postgres/forms/ranges.py:34
 msgid "The start of the range must not exceed the end of the range."
 msgstr ""
 
-#: contrib/postgres/forms/ranges.py:59
+#: contrib/postgres/forms/ranges.py:82
 msgid "Enter two whole numbers."
 msgstr ""
 
-#: contrib/postgres/forms/ranges.py:65
+#: contrib/postgres/forms/ranges.py:88
 msgid "Enter two numbers."
 msgstr ""
 
-#: contrib/postgres/forms/ranges.py:71
+#: contrib/postgres/forms/ranges.py:94
 msgid "Enter two valid date/times."
 msgstr ""
 
-#: contrib/postgres/forms/ranges.py:77
+#: contrib/postgres/forms/ranges.py:100
 msgid "Enter two valid dates."
 msgstr ""
 
-#: contrib/postgres/validators.py:14
+#: contrib/postgres/validators.py:12
 #, python-format
 msgid ""
 "List contains %(show_value)d item, it should contain no more than "
@@ -93,7 +80,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/postgres/validators.py:21
+#: contrib/postgres/validators.py:19
 #, python-format
 msgid ""
 "List contains %(show_value)d item, it should contain no fewer than "
@@ -104,23 +91,23 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/postgres/validators.py:31
+#: contrib/postgres/validators.py:29
 #, python-format
 msgid "Some keys were missing: %(keys)s"
 msgstr ""
 
-#: contrib/postgres/validators.py:32
+#: contrib/postgres/validators.py:30
 #, python-format
 msgid "Some unknown keys were provided: %(keys)s"
 msgstr ""
 
-#: contrib/postgres/validators.py:73
+#: contrib/postgres/validators.py:70
 #, python-format
 msgid ""
 "Ensure that this range is completely less than or equal to %(limit_value)s."
 msgstr ""
 
-#: contrib/postgres/validators.py:78
+#: contrib/postgres/validators.py:76
 #, python-format
 msgid ""
 "Ensure that this range is completely greater than or equal to "

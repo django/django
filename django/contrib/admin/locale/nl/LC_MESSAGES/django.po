@@ -9,15 +9,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012
 # dokterbob <mathijs@mathijsfietst.nl>, 2015
-# Sander Steffann <inactive+steffann@transifex.com>, 2014-2015
+# Meteor0id, 2019-2020
+# 8de006b1b0894aab6aef71979dcd8bd6_5c6b207 <ff2658a8d8dbebbd9cc240b8c133a515_234097>, 2014-2015
 # Tino de Bruijn <tinodb@gmail.com>, 2011
-# Tonnes <tonnes.mb@gmail.com>, 2017
+# Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-05-02 10:02+0000\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-07-15 08:30+0000\n"
 "Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +29,7 @@ msgstr ""
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr "%(count)d %(items)s succesvol verwijderd."
+msgstr "%(count)d %(items)s met succes verwijderd."
 
 #, python-format
 msgid "Cannot delete %(name)s"
@@ -39,7 +40,7 @@ msgstr "Weet u het zeker?"
 
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Verwijder geselecteerde %(verbose_name_plural)s"
+msgstr "Geselecteerde %(verbose_name_plural)s verwijderen"
 
 msgid "Administration"
 msgstr "Beheer"
@@ -77,6 +78,12 @@ msgstr "Geen datum"
 msgid "Has date"
 msgstr "Heeft datum"
 
+msgid "Empty"
+msgstr "Leeg"
+
+msgid "Not empty"
+msgstr "Niet leeg"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -90,10 +97,19 @@ msgstr "Actie:"
 
 #, python-format
 msgid "Add another %(verbose_name)s"
-msgstr "Voeg nog een %(verbose_name)s toe"
+msgstr "Nog een %(verbose_name)s toevoegen"
 
 msgid "Remove"
 msgstr "Verwijderen"
+
+msgid "Addition"
+msgstr "Toevoeging"
+
+msgid "Change"
+msgstr "Wijzigen"
+
+msgid "Deletion"
+msgstr "Verwijdering"
 
 msgid "action time"
 msgstr "actietijd"
@@ -108,7 +124,7 @@ msgid "object id"
 msgstr "object-id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "object-repr"
 
@@ -125,23 +141,23 @@ msgid "log entries"
 msgstr "logboekvermeldingen"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "'%(object)s' toegevoegd."
+msgid "Added “%(object)s”."
+msgstr "‘%(object)s’ toegevoegd."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "'%(object)s' gewijzigd - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "‘%(object)s’ gewijzigd - %(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "'%(object)s' verwijderd."
+msgid "Deleted “%(object)s.”"
+msgstr "‘%(object)s’ verwijderd."
 
 msgid "LogEntry Object"
 msgstr "LogEntry-object"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "{name} \"{object}\" toegevoegd."
+msgid "Added {name} “{object}”."
+msgstr "{name} ‘{object}’ toegevoegd."
 
 msgid "Added."
 msgstr "Toegevoegd."
@@ -150,16 +166,16 @@ msgid "and"
 msgstr "en"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "{fields} voor {name} \"{object}\" gewijzigd."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "{fields} voor {name} ‘{object}’ gewijzigd."
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "{fields} gewijzigd."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr "{name} \"{object}\" verwijderd."
+msgid "Deleted {name} “{object}”."
+msgstr "{name} ‘{object}’ verwijderd."
 
 msgid "No fields changed."
 msgstr "Geen velden gewijzigd."
@@ -167,49 +183,49 @@ msgstr "Geen velden gewijzigd."
 msgid "None"
 msgstr "Geen"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
-"Houd 'Control', of 'Command' op een Mac, ingedrukt om meerdere items te "
+"Houd ‘Control’, of ‘Command’ op een Mac, ingedrukt om meerdere items te "
 "selecteren."
 
 #, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr "De {name} ‘{obj}’ is met succes toegevoegd."
+
+msgid "You may edit it again below."
+msgstr "U kunt deze hieronder weer bewerken."
+
+#, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
-"De {name} '{obj}' is met succes toegevoegd. U kunt deze hieronder nogmaals "
+"De {name} ‘{obj}’ is met succes toegevoegd. U kunt hieronder nog een {name} "
+"toevoegen."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+"De {name} ‘{obj}’ is met succes gewijzigd. U kunt deze hieronder nogmaals "
+"bewerken."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr ""
+"De {name} ‘{obj}’ is met succes toegevoegd. U kunt deze hieronder nogmaals "
 "bewerken."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
-"De {name} '{obj}' is met succes toegevoegd. U kunt hieronder nog een {name} "
+"De {name} ‘{obj}’ is met succes gewijzigd. U kunt hieronder nog een {name} "
 "toevoegen."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "De {name} \"{obj}\" is succesvol toegevoegd."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
-"De {name} '{obj}' is met succes gewijzigd. U kunt deze hieronder nogmaals "
-"bewerken."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-"De {name} '{obj}' is met succes gewijzigd. U kunt hieronder nog een {name} "
-"toevoegen."
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "De {name} \"{obj}\" is succesvol gewijzigd."
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "De {name} ‘{obj}’ is met succes gewijzigd."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -222,12 +238,12 @@ msgid "No action selected."
 msgstr "Geen actie geselecteerd."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "De %(name)s '%(obj)s' is met succes verwijderd."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "De %(name)s ‘%(obj)s’ is met succes verwijderd."
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
-msgstr "%(name)s met ID '%(key)s' bestaat niet. Misschien is deze verwijderd?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr "%(name)s met ID ‘%(key)s’ bestaat niet. Misschien is deze verwijderd?"
 
 #, python-format
 msgid "Add %s"
@@ -236,6 +252,10 @@ msgstr "%s toevoegen"
 #, python-format
 msgid "Change %s"
 msgstr "%s wijzigen"
+
+#, python-format
+msgid "View %s"
+msgstr "%s weergeven"
 
 msgid "Database error"
 msgstr "Databasefout"
@@ -293,7 +313,7 @@ msgstr "%(app)s-beheer"
 msgid "Page not found"
 msgstr "Pagina niet gevonden"
 
-msgid "We're sorry, but the requested page could not be found."
+msgid "We’re sorry, but the requested page could not be found."
 msgstr "Het spijt ons, maar de opgevraagde pagina kon niet worden gevonden."
 
 msgid "Home"
@@ -309,7 +329,7 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Serverfout <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 "Er heeft zich een fout voorgedaan. Dit is via e-mail bij de "
@@ -332,12 +352,25 @@ msgstr "Alle %(total_count)s %(module_name)s selecteren"
 msgid "Clear selection"
 msgstr "Selectie wissen"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modellen in de %(name)s-toepassing"
+
+msgid "Add"
+msgstr "Toevoegen"
+
+msgid "View"
+msgstr "Weergeven"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "U hebt geen rechten om iets te bekijken of te bewerken."
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
-"Vul allereerst een gebruikersnaam en wachtwoord in. Vervolgens kunt u de "
-"andere opties instellen."
+"Vul allereerst een gebruikersnaam en wachtwoord in. Daarna kunt u meer "
+"gebruikersopties bewerken."
 
 msgid "Enter a username and password."
 msgstr "Voer een gebruikersnaam en wachtwoord in."
@@ -346,10 +379,10 @@ msgid "Change password"
 msgstr "Wachtwoord wijzigen"
 
 msgid "Please correct the error below."
-msgstr "Herstel de fouten hieronder."
+msgstr "Corrigeer de fout hieronder."
 
 msgid "Please correct the errors below."
-msgstr "Herstel de fouten hieronder."
+msgstr "Corrigeer de fouten hieronder."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
@@ -381,6 +414,9 @@ msgstr "Weergeven op website"
 msgid "Filter"
 msgstr "Filter"
 
+msgid "Clear all filters"
+msgstr "Alle filters wissen"
+
 msgid "Remove from sorting"
 msgstr "Verwijderen uit sortering"
 
@@ -400,9 +436,9 @@ msgid ""
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Het verwijderen van %(object_name)s '%(escaped_object)s' zal ook "
-"gerelateerde objecten verwijderen. U hebt echter geen rechten om de volgende "
-"typen objecten te verwijderen:"
+"Het verwijderen van %(object_name)s '%(escaped_object)s' zou ook "
+"gerelateerde objecten verwijderen, maar uw account heeft geen rechten om de "
+"volgende typen objecten te verwijderen:"
 
 #, python-format
 msgid ""
@@ -423,7 +459,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Objecten"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Ja, ik weet het zeker"
 
 msgid "No, take me back"
@@ -438,9 +474,9 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Het verwijderen van de geselecteerde %(objects_name)s vereist het "
-"verwijderen van gerelateerde objecten, maar uw account heeft geen "
-"toestemming om de volgende soorten objecten te verwijderen:"
+"Het verwijderen van de geselecteerde %(objects_name)s zou ook gerelateerde "
+"objecten verwijderen, maar uw account heeft geen rechten om de volgende "
+"typen objecten te verwijderen:"
 
 #, python-format
 msgid ""
@@ -458,9 +494,6 @@ msgstr ""
 "Weet u zeker dat u de geselecteerde %(objects_name)s wilt verwijderen? Alle "
 "volgende objecten en hun aanverwante items zullen worden verwijderd:"
 
-msgid "Change"
-msgstr "Wijzigen"
-
 msgid "Delete?"
 msgstr "Verwijderen?"
 
@@ -470,16 +503,6 @@ msgstr " Op %(filter_title)s "
 
 msgid "Summary"
 msgstr "Samenvatting"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modellen in de %(name)s applicatie"
-
-msgid "Add"
-msgstr "Toevoegen"
-
-msgid "You don't have permission to edit anything."
-msgstr "U heeft geen rechten om iets te wijzigen."
 
 msgid "Recent actions"
 msgstr "Recente acties"
@@ -494,12 +517,13 @@ msgid "Unknown content"
 msgstr "Onbekende inhoud"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Er is iets mis met de database. Verzeker u ervan dat de benodigde tabellen "
-"zijn aangemaakt en dat de database toegankelijk is voor de juiste gebruiker."
+"Er is iets mis met de installatie van uw database. Zorg ervoor dat de juiste "
+"databasetabellen zijn aangemaakt en dat de database voor de juiste gebruiker "
+"leesbaar is."
 
 #, python-format
 msgid ""
@@ -512,6 +536,9 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "Wachtwoord of gebruikersnaam vergeten?"
 
+msgid "Toggle navigation"
+msgstr "Navigatie aan/uit"
+
 msgid "Date/time"
 msgstr "Datum/tijd"
 
@@ -522,11 +549,11 @@ msgid "Action"
 msgstr "Actie"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
 "Dit object heeft geen wijzigingsgeschiedenis. Het is mogelijk niet via de "
-"beheersite toegevoegd."
+"beheerwebsite toegevoegd."
 
 msgid "Show all"
 msgstr "Alles tonen"
@@ -534,20 +561,8 @@ msgstr "Alles tonen"
 msgid "Save"
 msgstr "Opslaan"
 
-msgid "Popup closing..."
-msgstr "Pop-up wordt gesloten..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Geselecteerde %(model)s wijzigen"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Nog een %(model)s toevoegen"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Geselecteerde %(model)s verwijderen"
+msgid "Popup closing…"
+msgstr "Pop-up sluiten…"
 
 msgid "Search"
 msgstr "Zoeken"
@@ -571,6 +586,24 @@ msgstr "Opslaan en nieuwe toevoegen"
 msgid "Save and continue editing"
 msgstr "Opslaan en opnieuw bewerken"
 
+msgid "Save and view"
+msgstr "Opslaan en weergeven"
+
+msgid "Close"
+msgstr "Sluiten"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Geselecteerde %(model)s wijzigen"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Nog een %(model)s toevoegen"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Geselecteerde %(model)s verwijderen"
+
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Bedankt voor de aanwezigheid op de site vandaag."
 
@@ -584,11 +617,11 @@ msgid "Your password was changed."
 msgstr "Uw wachtwoord is gewijzigd."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Vanwege de beveiliging moet u uw oude en twee keer uw nieuwe wachtwoord "
-"invoeren, zodat we kunnen controleren of er geen typefouten zijn gemaakt."
+"Voer omwille van beveiliging uw oude en twee keer uw nieuwe wachtwoord in, "
+"zodat we kunnen controleren of u geen typefouten hebt gemaakt."
 
 msgid "Change my password"
 msgstr "Mijn wachtwoord wijzigen"
@@ -623,7 +656,7 @@ msgstr ""
 "omdat de link al eens is gebruikt. Vraag opnieuw een wachtwoord aan."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
 "We hebben u instructies gestuurd voor het instellen van uw wachtwoord, als "
@@ -631,24 +664,24 @@ msgstr ""
 "straks moeten ontvangen."
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
 "Als u geen e-mail ontvangt, controleer dan of u het e-mailadres hebt "
-"opgegeven waar u zich mee geregistreerd heeft en controleer uw spam-map."
+"ingevoerd waarmee u zich hebt geregistreerd, en controleer uw spam-map."
 
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
-"U ontvangt deze email omdat u heeft verzocht het wachtwoord te resetten voor "
-"uw account op %(site_name)s."
+"U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het "
+"wachtwoord voor uw account op %(site_name)s hebt gedaan."
 
 msgid "Please go to the following page and choose a new password:"
-msgstr "Gaat u naar de volgende pagina en kies een nieuw wachtwoord:"
+msgstr "Ga naar de volgende pagina en kies een nieuw wachtwoord:"
 
-msgid "Your username, in case you've forgotten:"
+msgid "Your username, in case you’ve forgotten:"
 msgstr "Uw gebruikersnaam, mocht u deze vergeten zijn:"
 
 msgid "Thanks for using our site!"
@@ -659,7 +692,7 @@ msgid "The %(site_name)s team"
 msgstr "Het %(site_name)s-team"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
 "Wachtwoord vergeten? Vul hieronder uw e-mailadres in, en we sturen "
@@ -672,7 +705,7 @@ msgid "Reset my password"
 msgstr "Mijn wachtwoord opnieuw instellen"
 
 msgid "All dates"
-msgstr "Alle data"
+msgstr "Alle datums"
 
 #, python-format
 msgid "Select %s"
@@ -681,6 +714,10 @@ msgstr "Selecteer %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Selecteer %s om te wijzigen"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Selecteer %s om te bekijken"
 
 msgid "Date:"
 msgstr "Datum:"

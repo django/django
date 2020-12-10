@@ -3,9 +3,8 @@ from contextlib import contextmanager
 from io import StringIO
 from unittest import mock
 
-from django.db import connection
+from django.db import DatabaseError, connection
 from django.db.backends.base.creation import BaseDatabaseCreation
-from django.db.utils import DatabaseError
 from django.test import SimpleTestCase
 
 try:
@@ -14,6 +13,7 @@ except ImportError:
     pass
 else:
     from psycopg2 import errorcodes
+
     from django.db.backends.postgresql.creation import DatabaseCreation
 
 
@@ -33,7 +33,7 @@ class DatabaseCreationTests(SimpleTestCase):
         try:
             yield
         finally:
-            for name, value in kwargs.items():
+            for name in kwargs:
                 if name in saved_values:
                     settings[name] = saved_values[name]
                 else:
@@ -89,7 +89,14 @@ class DatabaseCreationTests(SimpleTestCase):
             creation._create_test_db(verbosity=0, autoclobber=False, keepdb=True)
         # Simulate test database creation raising unexpected error
         with self.patch_test_db_creation(self._execute_raise_permission_denied):
-            with self.assertRaises(SystemExit):
-                creation._create_test_db(verbosity=0, autoclobber=False, keepdb=False)
-            with self.assertRaises(SystemExit):
+            with mock.patch.object(DatabaseCreation, '_database_exists', return_value=False):
+                with self.assertRaises(SystemExit):
+                    creation._create_test_db(verbosity=0, autoclobber=False, keepdb=False)
+                with self.assertRaises(SystemExit):
+                    creation._create_test_db(verbosity=0, autoclobber=False, keepdb=True)
+        # Simulate test database creation raising "insufficient privileges".
+        # An error shouldn't appear when keepdb is on and the database already
+        # exists.
+        with self.patch_test_db_creation(self._execute_raise_permission_denied):
+            with mock.patch.object(DatabaseCreation, '_database_exists', return_value=True):
                 creation._create_test_db(verbosity=0, autoclobber=False, keepdb=True)

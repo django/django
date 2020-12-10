@@ -3,7 +3,9 @@ from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
 from django.core.exceptions import FieldDoesNotExist
-from django.db.models.fields import CharField, Field, related
+from django.db.models import (
+    CharField, Field, ForeignObjectRel, ManyToManyField,
+)
 from django.db.models.options import EMPTY_RELATION_TREE, IMMUTABLE_WARNING
 from django.test import SimpleTestCase
 
@@ -27,7 +29,7 @@ class OptionsBaseTests(SimpleTestCase):
         return None if model == current_model else model
 
     def _details(self, current_model, relation):
-        direct = isinstance(relation, Field) or isinstance(relation, GenericForeignKey)
+        direct = isinstance(relation, (Field, GenericForeignKey))
         model = relation.model._meta.concrete_model
         if model == current_model:
             model = None
@@ -175,17 +177,17 @@ class GetFieldByNameTests(OptionsBaseTests):
     def test_get_m2m_field(self):
         field_info = self._details(Person, Person._meta.get_field('m2m_base'))
         self.assertEqual(field_info[1:], (BasePerson, True, True))
-        self.assertIsInstance(field_info[0], related.ManyToManyField)
+        self.assertIsInstance(field_info[0], ManyToManyField)
 
     def test_get_related_object(self):
         field_info = self._details(Person, Person._meta.get_field('relating_baseperson'))
         self.assertEqual(field_info[1:], (BasePerson, False, False))
-        self.assertIsInstance(field_info[0], related.ForeignObjectRel)
+        self.assertIsInstance(field_info[0], ForeignObjectRel)
 
     def test_get_related_m2m(self):
         field_info = self._details(Person, Person._meta.get_field('relating_people'))
         self.assertEqual(field_info[1:], (None, False, True))
-        self.assertIsInstance(field_info[0], related.ForeignObjectRel)
+        self.assertIsInstance(field_info[0], ForeignObjectRel)
 
     def test_get_generic_relation(self):
         field_info = self._details(Person, Person._meta.get_field('generic_relation_base'))
@@ -277,5 +279,19 @@ class ParentListTests(SimpleTestCase):
 class PropertyNamesTests(SimpleTestCase):
     def test_person(self):
         # Instance only descriptors don't appear in _property_names.
-        self.assertEqual(AbstractPerson().test_instance_only_descriptor, 1)
+        self.assertEqual(BasePerson().test_instance_only_descriptor, 1)
+        with self.assertRaisesMessage(AttributeError, 'Instance only'):
+            AbstractPerson.test_instance_only_descriptor
         self.assertEqual(AbstractPerson._meta._property_names, frozenset(['pk', 'test_property']))
+
+
+class ReturningFieldsTests(SimpleTestCase):
+    def test_pk(self):
+        self.assertEqual(Relation._meta.db_returning_fields, [Relation._meta.pk])
+
+
+class AbstractModelTests(SimpleTestCase):
+    def test_abstract_model_not_instantiated(self):
+        msg = 'Abstract models cannot be instantiated.'
+        with self.assertRaisesMessage(TypeError, msg):
+            AbstractPerson()

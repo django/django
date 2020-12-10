@@ -1,0 +1,15 @@
+============================
+Django 1.11.17 release notes
+============================
+
+*December 3, 2018*
+
+Django 1.11.17 fixes several bugs in 1.11.16 and adds compatibility with
+Python 3.7.
+
+Bugfixes
+========
+
+* Prevented repetitive calls to ``geos_version_tuple()`` in the ``WKBWriter``
+  class in an attempt to fix a random crash involving ``LooseVersion`` since
+  Django 1.11.14 (:ticket:`29959`).

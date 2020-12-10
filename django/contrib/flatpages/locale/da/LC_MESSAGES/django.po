@@ -2,15 +2,15 @@
 #
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
-# Erik Wognsen <r4mses@gmail.com>, 2012,2014-2015
+# Erik Wognsen <r4mses@gmail.com>, 2012,2014-2015,2019
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-12-01 20:05+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-17 18:11+0000\n"
 "Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -29,9 +29,9 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"Eksempel: '/om/kontakt/'. Vær opmærksom på, at der skal være skråstreg både "
+"Eksempel: “/om/kontakt/”. Vær opmærksom på, at der skal være skråstreg både "
 "først og sidst."
 
 msgid ""
@@ -40,6 +40,10 @@ msgid ""
 msgstr ""
 "Denne værdi må kun indeholde bogstaver, tal, punktum, understreger, "
 "bindestreger, skråstreger eller tilder."
+
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr ""
+"Eksempel: “/om/kontakt/”. Vær opmærksom på, at der skal være skråstreg først."
 
 msgid "URL is missing a leading slash."
 msgstr "URL mangler en skråstreg i starten."
@@ -64,11 +68,11 @@ msgid "template name"
 msgstr "skabelonnavn"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"Eksempel: 'flatpages/kontaktside'. Hvis dette ikke tilbydes, bruger systemet "
-"'flatpages/default'."
+"Eksempel: “flatpages/kontaktside”. Hvis dette ikke gives bruger systemet "
+"“flatpages/default”."
 
 msgid "registration required"
 msgstr "registrering påkrævet"

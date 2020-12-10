@@ -6,14 +6,14 @@
 # fasouto <fsoutomoure@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Leandro Regueiro <leandro.regueiro@gmail.com>, 2013
-# Oscar Carballal <oscar.carballal@gmail.com>, 2011-2012
+# Oscar Carballal <oscar.carballal@protonmail.com>, 2011-2012
 # Pablo, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-03-28 16:25+0000\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: fasouto <fsoutomoure@gmail.com>\n"
 "Language-Team: Galician (http://www.transifex.com/django/django/language/"
 "gl/)\n"

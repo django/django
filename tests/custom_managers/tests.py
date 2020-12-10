@@ -607,6 +607,32 @@ class CustomManagersRegressTestCase(TestCase):
         # there would now be two objects in the database.
         self.assertEqual(RestrictedModel.plain_manager.count(), 1)
 
+    def test_refresh_from_db_when_default_manager_filters(self):
+        """
+        Model.refresh_from_db() works for instances hidden by the default
+        manager.
+        """
+        book = Book._base_manager.create(is_published=False)
+        Book._base_manager.filter(pk=book.pk).update(title='Hi')
+        book.refresh_from_db()
+        self.assertEqual(book.title, 'Hi')
+
+    def test_save_clears_annotations_from_base_manager(self):
+        """Model.save() clears annotations from the base manager."""
+        self.assertEqual(Book._meta.base_manager.name, 'annotated_objects')
+        book = Book.annotated_objects.create(title='Hunting')
+        Person.objects.create(
+            first_name='Bugs', last_name='Bunny', fun=True,
+            favorite_book=book, favorite_thing_id=1,
+        )
+        book = Book.annotated_objects.first()
+        self.assertEqual(book.favorite_avg, 1)  # Annotation from the manager.
+        book.title = 'New Hunting'
+        # save() fails if annotations that involve related fields aren't
+        # cleared before the update query.
+        book.save()
+        self.assertEqual(Book.annotated_objects.first().title, 'New Hunting')
+
     def test_delete_related_on_filtered_manager(self):
         """Deleting related objects should also not be distracted by a
         restricted manager on the related object. This is a regression

@@ -1,40 +1,33 @@
-from django.db.models import Lookup, Transform
+from django.db.models import Transform
+from django.db.models.lookups import PostgresOperatorLookup
 
 from .search import SearchVector, SearchVectorExact, SearchVectorField
 
 
-class PostgresSimpleLookup(Lookup):
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
-        params = lhs_params + rhs_params
-        return '%s %s %s' % (lhs, self.operator, rhs), params
-
-
-class DataContains(PostgresSimpleLookup):
+class DataContains(PostgresOperatorLookup):
     lookup_name = 'contains'
-    operator = '@>'
+    postgres_operator = '@>'
 
 
-class ContainedBy(PostgresSimpleLookup):
+class ContainedBy(PostgresOperatorLookup):
     lookup_name = 'contained_by'
-    operator = '<@'
+    postgres_operator = '<@'
 
 
-class Overlap(PostgresSimpleLookup):
+class Overlap(PostgresOperatorLookup):
     lookup_name = 'overlap'
-    operator = '&&'
+    postgres_operator = '&&'
 
 
-class HasKey(PostgresSimpleLookup):
+class HasKey(PostgresOperatorLookup):
     lookup_name = 'has_key'
-    operator = '?'
+    postgres_operator = '?'
     prepare_rhs = False
 
 
-class HasKeys(PostgresSimpleLookup):
+class HasKeys(PostgresOperatorLookup):
     lookup_name = 'has_keys'
-    operator = '?&'
+    postgres_operator = '?&'
 
     def get_prep_lookup(self):
         return [str(item) for item in self.rhs]
@@ -42,7 +35,7 @@ class HasKeys(PostgresSimpleLookup):
 
 class HasAnyKeys(HasKeys):
     lookup_name = 'has_any_keys'
-    operator = '?|'
+    postgres_operator = '?|'
 
 
 class Unaccent(Transform):
@@ -56,11 +49,12 @@ class SearchLookup(SearchVectorExact):
 
     def process_lhs(self, qn, connection):
         if not isinstance(self.lhs.output_field, SearchVectorField):
-            self.lhs = SearchVector(self.lhs)
+            config = getattr(self.rhs, 'config', None)
+            self.lhs = SearchVector(self.lhs, config=config)
         lhs, lhs_params = super().process_lhs(qn, connection)
         return lhs, lhs_params
 
 
-class TrigramSimilar(PostgresSimpleLookup):
+class TrigramSimilar(PostgresOperatorLookup):
     lookup_name = 'trigram_similar'
-    operator = '%%'
+    postgres_operator = '%%'

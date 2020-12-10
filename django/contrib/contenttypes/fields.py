@@ -1,16 +1,17 @@
+import functools
+import itertools
+import operator
 from collections import defaultdict
-from contextlib import suppress
 
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import DEFAULT_DB_ALIAS, models, router, transaction
-from django.db.models import DO_NOTHING
+from django.db.models import DO_NOTHING, ForeignObject, ForeignObjectRel
 from django.db.models.base import ModelBase, make_foreign_order_accessors
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related import (
-    ForeignObject, ForeignObjectRel, ReverseManyToOneDescriptor,
-    lazy_related_operation,
+    ReverseManyToOneDescriptor, lazy_related_operation,
 )
 from django.db.models.query_utils import PathInfo
 from django.utils.functional import cached_property
@@ -73,11 +74,11 @@ class GenericForeignKey(FieldCacheMixin):
         return '%s.%s.%s' % (app, model._meta.object_name, self.name)
 
     def check(self, **kwargs):
-        errors = []
-        errors.extend(self._check_field_name())
-        errors.extend(self._check_object_id_field())
-        errors.extend(self._check_content_type_field())
-        return errors
+        return [
+            *self._check_field_name(),
+            *self._check_object_id_field(),
+            *self._check_content_type_field(),
+        ]
 
     def _check_field_name(self):
         if self.name.endswith("_"):
@@ -237,8 +238,10 @@ class GenericForeignKey(FieldCacheMixin):
                 rel_obj = None
         if ct_id is not None:
             ct = self.get_content_type(id=ct_id, using=instance._state.db)
-            with suppress(ObjectDoesNotExist):
+            try:
                 rel_obj = ct.get_object_for_this_type(pk=pk_val)
+            except ObjectDoesNotExist:
+                pass
         self.set_cached_value(instance, rel_obj)
         return rel_obj
 
@@ -274,6 +277,7 @@ class GenericRelation(ForeignObject):
 
     # Field flags
     auto_created = False
+    empty_strings_allowed = False
 
     many_to_many = False
     many_to_one = False
@@ -281,6 +285,8 @@ class GenericRelation(ForeignObject):
     one_to_one = False
 
     rel_class = GenericRel
+
+    mti_inherited = False
 
     def __init__(self, to, object_id_field='object_id', content_type_field='content_type',
                  for_concrete_model=True, related_query_name=None, limit_choices_to=None, **kwargs):
@@ -290,6 +296,9 @@ class GenericRelation(ForeignObject):
             limit_choices_to=limit_choices_to,
         )
 
+        # Reverse relations are always nullable (Django can't enforce that a
+        # foreign key on the related model points to this model).
+        kwargs['null'] = True
         kwargs['blank'] = True
         kwargs['on_delete'] = models.CASCADE
         kwargs['editable'] = False
@@ -307,9 +316,10 @@ class GenericRelation(ForeignObject):
         self.for_concrete_model = for_concrete_model
 
     def check(self, **kwargs):
-        errors = super().check(**kwargs)
-        errors.extend(self._check_generic_foreign_key_existence())
-        return errors
+        return [
+            *super().check(**kwargs),
+            *self._check_generic_foreign_key_existence(),
+        ]
 
     def _is_matching_generic_foreign_key(self, field):
         """
@@ -347,7 +357,7 @@ class GenericRelation(ForeignObject):
         self.to_fields = [self.model._meta.pk.name]
         return [(self.remote_field.model._meta.get_field(self.object_id_field_name), self.model._meta.pk)]
 
-    def _get_path_info_with_parent(self):
+    def _get_path_info_with_parent(self, filtered_relation):
         """
         Return the path that joins the current model through any parent models.
         The idea is that if you have a GFK defined on a parent model then we
@@ -364,7 +374,15 @@ class GenericRelation(ForeignObject):
         opts = self.remote_field.model._meta.concrete_model._meta
         parent_opts = opts.get_field(self.object_id_field_name).model._meta
         target = parent_opts.pk
-        path.append(PathInfo(self.model._meta, parent_opts, (target,), self.remote_field, True, False))
+        path.append(PathInfo(
+            from_opts=self.model._meta,
+            to_opts=parent_opts,
+            target_fields=(target,),
+            join_field=self.remote_field,
+            m2m=True,
+            direct=False,
+            filtered_relation=filtered_relation,
+        ))
         # Collect joins needed for the parent -> child chain. This is easiest
         # to do if we collect joins for the child -> parent chain and then
         # reverse the direction (call to reverse() and use of
@@ -379,19 +397,35 @@ class GenericRelation(ForeignObject):
             path.extend(field.remote_field.get_path_info())
         return path
 
-    def get_path_info(self):
+    def get_path_info(self, filtered_relation=None):
         opts = self.remote_field.model._meta
         object_id_field = opts.get_field(self.object_id_field_name)
         if object_id_field.model != opts.model:
-            return self._get_path_info_with_parent()
+            return self._get_path_info_with_parent(filtered_relation)
         else:
             target = opts.pk
-            return [PathInfo(self.model._meta, opts, (target,), self.remote_field, True, False)]
+            return [PathInfo(
+                from_opts=self.model._meta,
+                to_opts=opts,
+                target_fields=(target,),
+                join_field=self.remote_field,
+                m2m=True,
+                direct=False,
+                filtered_relation=filtered_relation,
+            )]
 
-    def get_reverse_path_info(self):
+    def get_reverse_path_info(self, filtered_relation=None):
         opts = self.model._meta
         from_opts = self.remote_field.model._meta
-        return [PathInfo(from_opts, opts, (opts.pk,), self, not self.unique, False)]
+        return [PathInfo(
+            from_opts=from_opts,
+            to_opts=opts,
+            target_fields=(opts.pk,),
+            join_field=self,
+            m2m=not self.unique,
+            direct=False,
+            filtered_relation=filtered_relation,
+        )]
 
     def value_to_string(self, obj):
         qs = getattr(obj, self.name).all()
@@ -401,6 +435,12 @@ class GenericRelation(ForeignObject):
         kwargs['private_only'] = True
         super().contribute_to_class(cls, name, **kwargs)
         self.model = cls
+        # Disable the reverse relation for fields inherited by subclasses of a
+        # model in multi-table inheritance. The reverse relation points to the
+        # field of the base model.
+        if self.mti_inherited:
+            self.remote_field.related_name = '+'
+            self.remote_field.related_query_name = None
         setattr(cls, self.name, ReverseGenericManyToOneDescriptor(self.remote_field))
 
         # Add get_RELATED_order() and set_RELATED_order() to the model this
@@ -481,17 +521,18 @@ def create_generic_related_manager(superclass, rel):
             self.instance = instance
 
             self.model = rel.model
-
-            content_type = ContentType.objects.db_manager(instance._state.db).get_for_model(
-                instance, for_concrete_model=rel.field.for_concrete_model)
-            self.content_type = content_type
+            self.get_content_type = functools.partial(
+                ContentType.objects.db_manager(instance._state.db).get_for_model,
+                for_concrete_model=rel.field.for_concrete_model,
+            )
+            self.content_type = self.get_content_type(instance)
             self.content_type_field_name = rel.field.content_type_field_name
             self.object_id_field_name = rel.field.object_id_field_name
             self.prefetch_cache_name = rel.field.attname
             self.pk_val = instance.pk
 
             self.core_filters = {
-                '%s__pk' % self.content_type_field_name: content_type.id,
+                '%s__pk' % self.content_type_field_name: self.content_type.id,
                 self.object_id_field_name: self.pk_val,
             }
 
@@ -511,6 +552,12 @@ def create_generic_related_manager(superclass, rel):
             db = self._db or router.db_for_read(self.model, instance=self.instance)
             return queryset.using(db).filter(**self.core_filters)
 
+        def _remove_prefetched_objects(self):
+            try:
+                self.instance._prefetched_objects_cache.pop(self.prefetch_cache_name)
+            except (AttributeError, KeyError):
+                pass  # nothing to clear from cache
+
         def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
@@ -524,25 +571,36 @@ def create_generic_related_manager(superclass, rel):
 
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
-
-            query = {
-                '%s__pk' % self.content_type_field_name: self.content_type.id,
-                '%s__in' % self.object_id_field_name: {obj.pk for obj in instances}
-            }
-
+            # Group instances by content types.
+            content_type_queries = (
+                models.Q(**{
+                    '%s__pk' % self.content_type_field_name: content_type_id,
+                    '%s__in' % self.object_id_field_name: {obj.pk for obj in objs}
+                })
+                for content_type_id, objs in itertools.groupby(
+                    sorted(instances, key=lambda obj: self.get_content_type(obj).pk),
+                    lambda obj: self.get_content_type(obj).pk,
+                )
+            )
+            query = functools.reduce(operator.or_, content_type_queries)
             # We (possibly) need to convert object IDs to the type of the
             # instances' PK in order to match up instances:
             object_id_converter = instances[0]._meta.pk.to_python
+            content_type_id_field_name = '%s_id' % self.content_type_field_name
             return (
-                queryset.filter(**query),
-                lambda relobj: object_id_converter(getattr(relobj, self.object_id_field_name)),
-                lambda obj: obj.pk,
+                queryset.filter(query),
+                lambda relobj: (
+                    object_id_converter(getattr(relobj, self.object_id_field_name)),
+                    getattr(relobj, content_type_id_field_name),
+                ),
+                lambda obj: (obj.pk, self.get_content_type(obj).pk),
                 False,
                 self.prefetch_cache_name,
                 False,
             )
 
         def add(self, *objs, bulk=True):
+            self._remove_prefetched_objects()
             db = router.db_for_write(self.model, instance=self.instance)
 
             def check_and_update_obj(obj):
@@ -586,6 +644,7 @@ def create_generic_related_manager(superclass, rel):
         clear.alters_data = True
 
         def _clear(self, queryset, bulk):
+            self._remove_prefetched_objects()
             db = router.db_for_write(self.model, instance=self.instance)
             queryset = queryset.using(db)
             if bulk:
@@ -622,6 +681,7 @@ def create_generic_related_manager(superclass, rel):
         set.alters_data = True
 
         def create(self, **kwargs):
+            self._remove_prefetched_objects()
             kwargs[self.content_type_field_name] = self.content_type
             kwargs[self.object_id_field_name] = self.pk_val
             db = router.db_for_write(self.model, instance=self.instance)

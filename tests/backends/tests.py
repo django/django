@@ -3,7 +3,6 @@ import datetime
 import threading
 import unittest
 import warnings
-from contextlib import suppress
 
 from django.core.management.color import no_style
 from django.db import (
@@ -52,13 +51,13 @@ class DateQuotingTest(TestCase):
 @override_settings(DEBUG=True)
 class LastExecutedQueryTest(TestCase):
 
-    def test_last_executed_query(self):
+    def test_last_executed_query_without_previous_query(self):
         """
         last_executed_query should not raise an exception even if no previous
         query has been run.
         """
-        cursor = connection.cursor()
-        connection.ops.last_executed_query(cursor, '', ())
+        with connection.cursor() as cursor:
+            connection.ops.last_executed_query(cursor, '', ())
 
     def test_debug_sql(self):
         list(Reporter.objects.filter(first_name="test"))
@@ -70,25 +69,59 @@ class LastExecutedQueryTest(TestCase):
         """last_executed_query() returns a string."""
         data = RawData.objects.filter(raw_data=b'\x00\x46  \xFE').extra(select={'föö': 1})
         sql, params = data.query.sql_with_params()
-        cursor = data.query.get_compiler('default').execute_sql(CURSOR)
-        last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
+        with data.query.get_compiler('default').execute_sql(CURSOR) as cursor:
+            last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
         self.assertIsInstance(last_sql, str)
+
+    def test_last_executed_query(self):
+        # last_executed_query() interpolate all parameters, in most cases it is
+        # not equal to QuerySet.query.
+        for qs in (
+            Article.objects.filter(pk=1),
+            Article.objects.filter(pk__in=(1, 2), reporter__pk=3),
+            Article.objects.filter(
+                pk=1,
+                reporter__pk=9,
+            ).exclude(reporter__pk__in=[2, 1]),
+        ):
+            sql, params = qs.query.sql_with_params()
+            with qs.query.get_compiler(DEFAULT_DB_ALIAS).execute_sql(CURSOR) as cursor:
+                self.assertEqual(
+                    cursor.db.ops.last_executed_query(cursor, sql, params),
+                    str(qs.query),
+                )
+
+    @skipUnlessDBFeature('supports_paramstyle_pyformat')
+    def test_last_executed_query_dict(self):
+        square_opts = Square._meta
+        sql = 'INSERT INTO %s (%s, %s) VALUES (%%(root)s, %%(square)s)' % (
+            connection.introspection.identifier_converter(square_opts.db_table),
+            connection.ops.quote_name(square_opts.get_field('root').column),
+            connection.ops.quote_name(square_opts.get_field('square').column),
+        )
+        with connection.cursor() as cursor:
+            params = {'root': 2, 'square': 4}
+            cursor.execute(sql, params)
+            self.assertEqual(
+                cursor.db.ops.last_executed_query(cursor, sql, params),
+                sql % params,
+            )
 
 
 class ParameterHandlingTest(TestCase):
 
     def test_bad_parameter_count(self):
         "An executemany call with too many/not enough parameters will raise an exception (Refs #12612)"
-        cursor = connection.cursor()
-        query = ('INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (
-            connection.introspection.table_name_converter('backends_square'),
-            connection.ops.quote_name('root'),
-            connection.ops.quote_name('square')
-        ))
-        with self.assertRaises(Exception):
-            cursor.executemany(query, [(1, 2, 3)])
-        with self.assertRaises(Exception):
-            cursor.executemany(query, [(1,)])
+        with connection.cursor() as cursor:
+            query = ('INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (
+                connection.introspection.identifier_converter('backends_square'),
+                connection.ops.quote_name('root'),
+                connection.ops.quote_name('square')
+            ))
+            with self.assertRaises(Exception):
+                cursor.executemany(query, [(1, 2, 3)])
+            with self.assertRaises(Exception):
+                cursor.executemany(query, [(1,)])
 
 
 class LongNameTest(TransactionTestCase):
@@ -128,15 +161,8 @@ class LongNameTest(TransactionTestCase):
             VLM._meta.db_table,
             VLM_m2m._meta.db_table,
         ]
-        sequences = [
-            {
-                'column': VLM._meta.pk.column,
-                'table': VLM._meta.db_table
-            },
-        ]
-        cursor = connection.cursor()
-        for statement in connection.ops.sql_flush(no_style(), tables, sequences):
-            cursor.execute(statement)
+        sql_list = connection.ops.sql_flush(no_style(), tables, reset_sequences=True)
+        connection.ops.execute_sql_flush(sql_list)
 
 
 class SequenceResetTest(TestCase):
@@ -147,10 +173,10 @@ class SequenceResetTest(TestCase):
         Post.objects.create(id=10, name='1st post', text='hello world')
 
         # Reset the sequences for the database
-        cursor = connection.cursor()
         commands = connections[DEFAULT_DB_ALIAS].ops.sequence_reset_sql(no_style(), [Post])
-        for sql in commands:
-            cursor.execute(sql)
+        with connection.cursor() as cursor:
+            for sql in commands:
+                cursor.execute(sql)
 
         # If we create a new object now, it should have a PK greater
         # than the PK we specified manually.
@@ -175,12 +201,14 @@ class ConnectionCreatedSignalTest(TransactionTestCase):
 
         connection_created.connect(receiver)
         connection.close()
-        connection.cursor()
+        with connection.cursor():
+            pass
         self.assertIs(data["connection"].connection, connection.connection)
 
         connection_created.disconnect(receiver)
         data.clear()
-        connection.cursor()
+        with connection.cursor():
+            pass
         self.assertEqual(data, {})
 
 
@@ -193,14 +221,14 @@ class EscapingChecks(TestCase):
     bare_select_suffix = connection.features.bare_select_suffix
 
     def test_paramless_no_escaping(self):
-        cursor = connection.cursor()
-        cursor.execute("SELECT '%s'" + self.bare_select_suffix)
-        self.assertEqual(cursor.fetchall()[0][0], '%s')
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT '%s'" + self.bare_select_suffix)
+            self.assertEqual(cursor.fetchall()[0][0], '%s')
 
     def test_parameter_escaping(self):
-        cursor = connection.cursor()
-        cursor.execute("SELECT '%%', %s" + self.bare_select_suffix, ('%d',))
-        self.assertEqual(cursor.fetchall()[0], ('%', '%d'))
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT '%%', %s" + self.bare_select_suffix, ('%d',))
+            self.assertEqual(cursor.fetchall()[0], ('%', '%d'))
 
 
 @override_settings(DEBUG=True)
@@ -216,9 +244,8 @@ class BackendTestCase(TransactionTestCase):
         self.create_squares(args, 'format', True)
 
     def create_squares(self, args, paramstyle, multiple):
-        cursor = connection.cursor()
         opts = Square._meta
-        tbl = connection.introspection.table_name_converter(opts.db_table)
+        tbl = connection.introspection.identifier_converter(opts.db_table)
         f1 = connection.ops.quote_name(opts.get_field('root').column)
         f2 = connection.ops.quote_name(opts.get_field('square').column)
         if paramstyle == 'format':
@@ -227,10 +254,11 @@ class BackendTestCase(TransactionTestCase):
             query = 'INSERT INTO %s (%s, %s) VALUES (%%(root)s, %%(square)s)' % (tbl, f1, f2)
         else:
             raise ValueError("unsupported paramstyle in test")
-        if multiple:
-            cursor.executemany(query, args)
-        else:
-            cursor.execute(query, args)
+        with connection.cursor() as cursor:
+            if multiple:
+                cursor.executemany(query, args)
+            else:
+                cursor.execute(query, args)
 
     def test_cursor_executemany(self):
         # Test cursor.executemany #4896
@@ -249,11 +277,11 @@ class BackendTestCase(TransactionTestCase):
 
     def test_cursor_executemany_with_iterator(self):
         # Test executemany accepts iterators #10320
-        args = iter((i, i ** 2) for i in range(-3, 2))
+        args = ((i, i ** 2) for i in range(-3, 2))
         self.create_squares_with_executemany(args)
         self.assertEqual(Square.objects.count(), 5)
 
-        args = iter((i, i ** 2) for i in range(3, 7))
+        args = ((i, i ** 2) for i in range(3, 7))
         with override_settings(DEBUG=True):
             # same test for DebugCursorWrapper
             self.create_squares_with_executemany(args)
@@ -278,18 +306,18 @@ class BackendTestCase(TransactionTestCase):
 
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_cursor_executemany_with_pyformat_iterator(self):
-        args = iter({'root': i, 'square': i ** 2} for i in range(-3, 2))
+        args = ({'root': i, 'square': i ** 2} for i in range(-3, 2))
         self.create_squares(args, 'pyformat', multiple=True)
         self.assertEqual(Square.objects.count(), 5)
 
-        args = iter({'root': i, 'square': i ** 2} for i in range(3, 7))
+        args = ({'root': i, 'square': i ** 2} for i in range(3, 7))
         with override_settings(DEBUG=True):
             # same test for DebugCursorWrapper
             self.create_squares(args, 'pyformat', multiple=True)
         self.assertEqual(Square.objects.count(), 9)
 
     def test_unicode_fetches(self):
-        # fetchone, fetchmany, fetchall return strings as unicode objects #6254
+        # fetchone, fetchmany, fetchall return strings as Unicode objects.
         qn = connection.ops.quote_name
         Person(first_name="John", last_name="Doe").save()
         Person(first_name="Jane", last_name="Doe").save()
@@ -298,29 +326,30 @@ class BackendTestCase(TransactionTestCase):
         Person(first_name="Clark", last_name="Kent").save()
         opts2 = Person._meta
         f3, f4 = opts2.get_field('first_name'), opts2.get_field('last_name')
-        cursor = connection.cursor()
-        cursor.execute(
-            'SELECT %s, %s FROM %s ORDER BY %s' % (
-                qn(f3.column),
-                qn(f4.column),
-                connection.introspection.table_name_converter(opts2.db_table),
-                qn(f3.column),
+        with connection.cursor() as cursor:
+            cursor.execute(
+                'SELECT %s, %s FROM %s ORDER BY %s' % (
+                    qn(f3.column),
+                    qn(f4.column),
+                    connection.introspection.identifier_converter(opts2.db_table),
+                    qn(f3.column),
+                )
             )
-        )
-        self.assertEqual(cursor.fetchone(), ('Clark', 'Kent'))
-        self.assertEqual(list(cursor.fetchmany(2)), [('Jane', 'Doe'), ('John', 'Doe')])
-        self.assertEqual(list(cursor.fetchall()), [('Mary', 'Agnelline'), ('Peter', 'Parker')])
+            self.assertEqual(cursor.fetchone(), ('Clark', 'Kent'))
+            self.assertEqual(list(cursor.fetchmany(2)), [('Jane', 'Doe'), ('John', 'Doe')])
+            self.assertEqual(list(cursor.fetchall()), [('Mary', 'Agnelline'), ('Peter', 'Parker')])
 
     def test_unicode_password(self):
         old_password = connection.settings_dict['PASSWORD']
         connection.settings_dict['PASSWORD'] = "françois"
         try:
-            connection.cursor()
+            with connection.cursor():
+                pass
         except DatabaseError:
             # As password is probably wrong, a database exception is expected
             pass
         except Exception as e:
-            self.fail("Unexpected error raised with unicode password: %s" % e)
+            self.fail('Unexpected error raised with Unicode password: %s' % e)
         finally:
             connection.settings_dict['PASSWORD'] = old_password
 
@@ -340,15 +369,14 @@ class BackendTestCase(TransactionTestCase):
 
     def test_cached_db_features(self):
         self.assertIn(connection.features.supports_transactions, (True, False))
-        self.assertIn(connection.features.supports_stddev, (True, False))
         self.assertIn(connection.features.can_introspect_foreign_keys, (True, False))
 
     def test_duplicate_table_error(self):
         """ Creating an existing table returns a DatabaseError """
-        cursor = connection.cursor()
         query = 'CREATE TABLE %s (id INTEGER);' % Article._meta.db_table
-        with self.assertRaises(DatabaseError):
-            cursor.execute(query)
+        with connection.cursor() as cursor:
+            with self.assertRaises(DatabaseError):
+                cursor.execute(query)
 
     def test_cursor_contextmanager(self):
         """
@@ -390,25 +418,41 @@ class BackendTestCase(TransactionTestCase):
         finally:
             # Clean up the mess created by connection._close(). Since the
             # connection is already closed, this crashes on some backends.
-            with suppress(Exception):
+            try:
                 connection.close()
+            except Exception:
+                pass
 
     @override_settings(DEBUG=True)
     def test_queries(self):
         """
         Test the documented API of connection.queries.
         """
+        sql = 'SELECT 1' + connection.features.bare_select_suffix
         with connection.cursor() as cursor:
             reset_queries()
-            cursor.execute("SELECT 1" + connection.features.bare_select_suffix)
+            cursor.execute(sql)
         self.assertEqual(1, len(connection.queries))
-
         self.assertIsInstance(connection.queries, list)
         self.assertIsInstance(connection.queries[0], dict)
-        self.assertCountEqual(connection.queries[0], ['sql', 'time'])
+        self.assertEqual(list(connection.queries[0]), ['sql', 'time'])
+        self.assertEqual(connection.queries[0]['sql'], sql)
 
         reset_queries()
         self.assertEqual(0, len(connection.queries))
+
+        sql = ('INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (
+            connection.introspection.identifier_converter('backends_square'),
+            connection.ops.quote_name('root'),
+            connection.ops.quote_name('square'),
+        ))
+        with connection.cursor() as cursor:
+            cursor.executemany(sql, [(1, 1), (2, 4)])
+        self.assertEqual(1, len(connection.queries))
+        self.assertIsInstance(connection.queries, list)
+        self.assertIsInstance(connection.queries[0], dict)
+        self.assertEqual(list(connection.queries[0]), ['sql', 'time'])
+        self.assertEqual(connection.queries[0]['sql'], '2 times: %s' % sql)
 
     # Unfortunately with sqlite3 the in-memory test database cannot be closed.
     @skipUnlessDBFeature('test_db_allows_multiple_connections')
@@ -439,13 +483,10 @@ class BackendTestCase(TransactionTestCase):
                 cursor.execute("SELECT 3" + new_connection.features.bare_select_suffix)
                 cursor.execute("SELECT 4" + new_connection.features.bare_select_suffix)
 
-            with warnings.catch_warnings(record=True) as w:
+            msg = "Limit for query logging exceeded, only the last 3 queries will be returned."
+            with self.assertWarnsMessage(UserWarning, msg):
                 self.assertEqual(3, len(new_connection.queries))
-                self.assertEqual(1, len(w))
-                self.assertEqual(
-                    str(w[0].message),
-                    "Limit for query logging exceeded, only the last 3 queries will be returned."
-                )
+
         finally:
             BaseDatabaseWrapper.queries_limit = old_queries_limit
             new_connection.close()
@@ -456,13 +497,8 @@ class BackendTestCase(TransactionTestCase):
             connection.init_connection_state()
 
 
-# We don't make these tests conditional because that means we would need to
-# check and differentiate between:
-# * MySQL+InnoDB, MySQL+MYISAM (something we currently can't do).
-# * if sqlite3 (if/once we get #14204 fixed) has referential integrity turned
-#   on or not, something that would be controlled by runtime support and user
-#   preference.
-# verify if its type is django.database.db.IntegrityError.
+# These tests aren't conditional because it would require differentiating
+# between MySQL+InnoDB and MySQL+MYISAM (something we currently can't do).
 class FkConstraintsTests(TransactionTestCase):
 
     available_apps = ['backends']
@@ -602,7 +638,8 @@ class ThreadTests(TransactionTestCase):
         # Map connections by id because connections with identical aliases
         # have the same hash.
         connections_dict = {}
-        connection.cursor()
+        with connection.cursor():
+            pass
         connections_dict[id(connection)] = connection
 
         def runner():
@@ -612,21 +649,25 @@ class ThreadTests(TransactionTestCase):
             connection = connections[DEFAULT_DB_ALIAS]
             # Allow thread sharing so the connection can be closed by the
             # main thread.
-            connection.allow_thread_sharing = True
-            connection.cursor()
+            connection.inc_thread_sharing()
+            with connection.cursor():
+                pass
             connections_dict[id(connection)] = connection
-        for x in range(2):
-            t = threading.Thread(target=runner)
-            t.start()
-            t.join()
-        # Each created connection got different inner connection.
-        self.assertEqual(len({conn.connection for conn in connections_dict.values()}), 3)
-        # Finish by closing the connections opened by the other threads (the
-        # connection opened in the main thread will automatically be closed on
-        # teardown).
-        for conn in connections_dict.values():
-            if conn is not connection:
-                conn.close()
+        try:
+            for x in range(2):
+                t = threading.Thread(target=runner)
+                t.start()
+                t.join()
+            # Each created connection got different inner connection.
+            self.assertEqual(len({conn.connection for conn in connections_dict.values()}), 3)
+        finally:
+            # Finish by closing the connections opened by the other threads
+            # (the connection opened in the main thread will automatically be
+            # closed on teardown).
+            for conn in connections_dict.values():
+                if conn is not connection and conn.allow_thread_sharing:
+                    conn.close()
+                    conn.dec_thread_sharing()
 
     def test_connections_thread_local(self):
         """
@@ -643,19 +684,26 @@ class ThreadTests(TransactionTestCase):
             for conn in connections.all():
                 # Allow thread sharing so the connection can be closed by the
                 # main thread.
-                conn.allow_thread_sharing = True
+                conn.inc_thread_sharing()
                 connections_dict[id(conn)] = conn
-        for x in range(2):
-            t = threading.Thread(target=runner)
-            t.start()
-            t.join()
-        self.assertEqual(len(connections_dict), 6)
-        # Finish by closing the connections opened by the other threads (the
-        # connection opened in the main thread will automatically be closed on
-        # teardown).
-        for conn in connections_dict.values():
-            if conn is not connection:
-                conn.close()
+        try:
+            num_new_threads = 2
+            for x in range(num_new_threads):
+                t = threading.Thread(target=runner)
+                t.start()
+                t.join()
+            self.assertEqual(
+                len(connections_dict),
+                len(connections.all()) * (num_new_threads + 1),
+            )
+        finally:
+            # Finish by closing the connections opened by the other threads
+            # (the connection opened in the main thread will automatically be
+            # closed on teardown).
+            for conn in connections_dict.values():
+                if conn is not connection and conn.allow_thread_sharing:
+                    conn.close()
+                    conn.dec_thread_sharing()
 
     def test_pass_connection_between_threads(self):
         """
@@ -675,25 +723,22 @@ class ThreadTests(TransactionTestCase):
             t.start()
             t.join()
 
-        # Without touching allow_thread_sharing, which should be False by default.
+        # Without touching thread sharing, which should be False by default.
         exceptions = []
         do_thread()
         # Forbidden!
         self.assertIsInstance(exceptions[0], DatabaseError)
+        connections['default'].close()
 
-        # If explicitly setting allow_thread_sharing to False
-        connections['default'].allow_thread_sharing = False
-        exceptions = []
-        do_thread()
-        # Forbidden!
-        self.assertIsInstance(exceptions[0], DatabaseError)
-
-        # If explicitly setting allow_thread_sharing to True
-        connections['default'].allow_thread_sharing = True
-        exceptions = []
-        do_thread()
-        # All good
-        self.assertEqual(exceptions, [])
+        # After calling inc_thread_sharing() on the connection.
+        connections['default'].inc_thread_sharing()
+        try:
+            exceptions = []
+            do_thread()
+            # All good
+            self.assertEqual(exceptions, [])
+        finally:
+            connections['default'].dec_thread_sharing()
 
     def test_closing_non_shared_connections(self):
         """
@@ -728,21 +773,39 @@ class ThreadTests(TransactionTestCase):
                 except DatabaseError as e:
                     exceptions.add(e)
             # Enable thread sharing
-            connections['default'].allow_thread_sharing = True
-            t2 = threading.Thread(target=runner2, args=[connections['default']])
-            t2.start()
-            t2.join()
+            connections['default'].inc_thread_sharing()
+            try:
+                t2 = threading.Thread(target=runner2, args=[connections['default']])
+                t2.start()
+                t2.join()
+            finally:
+                connections['default'].dec_thread_sharing()
         t1 = threading.Thread(target=runner1)
         t1.start()
         t1.join()
         # No exception was raised
         self.assertEqual(len(exceptions), 0)
 
+    def test_thread_sharing_count(self):
+        self.assertIs(connection.allow_thread_sharing, False)
+        connection.inc_thread_sharing()
+        self.assertIs(connection.allow_thread_sharing, True)
+        connection.inc_thread_sharing()
+        self.assertIs(connection.allow_thread_sharing, True)
+        connection.dec_thread_sharing()
+        self.assertIs(connection.allow_thread_sharing, True)
+        connection.dec_thread_sharing()
+        self.assertIs(connection.allow_thread_sharing, False)
+        msg = 'Cannot decrement the thread sharing count below zero.'
+        with self.assertRaisesMessage(RuntimeError, msg):
+            connection.dec_thread_sharing()
+
 
 class MySQLPKZeroTests(TestCase):
     """
     Zero as id for AutoField should raise exception in MySQL, because MySQL
-    does not allow zero for autoincrement primary key.
+    does not allow zero for autoincrement primary key if the
+    NO_AUTO_VALUE_ON_ZERO SQL mode is not enabled.
     """
     @skipIfDBFeature('allows_auto_pk_0')
     def test_zero_as_autoval(self):

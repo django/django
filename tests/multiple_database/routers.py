@@ -43,9 +43,7 @@ class AuthRouter:
 
     def allow_relation(self, obj1, obj2, **hints):
         "Allow any relation if a model in Auth is involved"
-        if obj1._meta.app_label == 'auth' or obj2._meta.app_label == 'auth':
-            return True
-        return None
+        return obj1._meta.app_label == 'auth' or obj2._meta.app_label == 'auth' or None
 
     def allow_migrate(self, db, app_label, **hints):
         "Make sure the auth app only appears on the 'other' db"

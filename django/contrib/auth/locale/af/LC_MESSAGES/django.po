@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# F Wolff <friedel@translate.org.za>, 2019-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-07-20 17:08+0000\n"
+"Last-Translator: F Wolff <friedel@translate.org.za>\n"
 "Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
 "af/)\n"
 "MIME-Version: 1.0\n"
@@ -17,78 +18,82 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Personal info"
-msgstr ""
+msgstr "Persoonlike inligting"
 
 msgid "Permissions"
-msgstr ""
+msgstr "Toestemmings"
 
 msgid "Important dates"
-msgstr ""
+msgstr "Belangrike datums"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "%(name)s-objek met primêre sleutel %(key)r bestaan nie."
 
 msgid "Password changed successfully."
-msgstr ""
+msgstr "Wagwoord is suksesvol verander."
 
 #, python-format
 msgid "Change password: %s"
-msgstr ""
+msgstr "Verander wagwoord: %s"
 
 msgid "Authentication and Authorization"
-msgstr ""
+msgstr "Waarmerking en magtiging"
 
 msgid "password"
-msgstr ""
+msgstr "wagwoord"
 
 msgid "last login"
-msgstr ""
+msgstr "laas aangemeld"
 
 msgid "No password set."
-msgstr ""
+msgstr "Geen wagwoord gestel nie."
 
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr ""
+msgstr "Ongeldige wagwoordformaat of onbekende hutsalgoritme."
 
-msgid "The two password fields didn't match."
-msgstr ""
+msgid "The two password fields didn’t match."
+msgstr "Die twee wagwoordvelde stem nie ooreen nie"
 
 msgid "Password"
 msgstr "Wagwoord"
 
 msgid "Password confirmation"
-msgstr ""
+msgstr "Wagwoordbevestiging"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "Tik die wagwoord net soos tevore om te bevestig."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
+"Rou wagwoorde word nie gestoor nie, dus is daar geen manier om die gebruiker "
+"se wagwoord te sien nie, maar die wagwoord kan gewysig word met <a href="
+"\"{}\">hierdie vorm</a>."
 
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
+"Tik asb. 'n korrekte %(username)s en wagwoord. Neem kennis dat altwee velde "
+"moontlik kassensitief is."
 
 msgid "This account is inactive."
-msgstr ""
+msgstr "Dié rekening is nie aktief nie."
 
 msgid "Email"
-msgstr ""
+msgstr "E-pos"
 
 msgid "New password"
 msgstr "Nuwe wagwoord"
 
 msgid "New password confirmation"
-msgstr ""
+msgstr "Bevestiging van nuwe wagwoord"
 
 msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr ""
+msgstr "Die ou wagwoord is verkeerd ingetik. Tik dit asb. weer in."
 
 msgid "Old password"
 msgstr "Ou wagwoord"
@@ -97,118 +102,126 @@ msgid "Password (again)"
 msgstr "Wagwoord (weer)"
 
 msgid "algorithm"
-msgstr ""
+msgstr "algoritme"
 
 msgid "iterations"
-msgstr ""
+msgstr "iterasies"
 
 msgid "salt"
-msgstr ""
+msgstr "sout"
 
 msgid "hash"
-msgstr ""
+msgstr "hutswaarde"
 
 msgid "variety"
-msgstr ""
+msgstr "variëteit"
 
 msgid "version"
-msgstr ""
+msgstr "weergawe"
 
 msgid "memory cost"
-msgstr ""
+msgstr "geheuekoste"
 
 msgid "time cost"
-msgstr ""
+msgstr "tydkoste"
 
 msgid "parallelism"
-msgstr ""
+msgstr "parallelisme"
 
 msgid "work factor"
-msgstr ""
+msgstr "werkfaktor"
 
 msgid "checksum"
-msgstr ""
+msgstr "kontrolesom"
 
 msgid "name"
-msgstr ""
+msgstr "naam"
 
 msgid "content type"
-msgstr ""
+msgstr "inhoudtipe"
 
 msgid "codename"
-msgstr ""
+msgstr "kodenaam"
 
 msgid "permission"
-msgstr ""
+msgstr "toestemming"
 
 msgid "permissions"
-msgstr ""
+msgstr "toestemmings"
 
 msgid "group"
-msgstr ""
+msgstr "groep"
 
 msgid "groups"
-msgstr ""
+msgstr "groepe"
 
 msgid "superuser status"
-msgstr ""
+msgstr "supergebruikerstatus"
 
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
+"Dui aan dat die gebruiker alle toestemmings het sonder om hulle eksplisiet "
+"toe te ken."
 
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
+"Die groepe waaraan die gebruiker behoort. ’n Gebruiker sal alle toestemmings "
+"hê wat aan elkeen van sy groepe gegee is."
 
 msgid "user permissions"
-msgstr ""
+msgstr "gebruikertoestemmings"
 
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Spesifieke toestemmings vir dié gebruiker."
 
 msgid "username"
-msgstr ""
+msgstr "gebruikernaam"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"Vereis. Hoogstens 150 karakters. Slegs: letters, syfers en die karakters @/./"
+"+/-/_"
 
 msgid "A user with that username already exists."
-msgstr ""
+msgstr "’n Gebruiker met daardie gebruikernaam bestaan reeds."
 
 msgid "first name"
-msgstr ""
+msgstr "naam"
 
 msgid "last name"
-msgstr ""
+msgstr "van"
 
 msgid "email address"
-msgstr ""
+msgstr "e-posadres"
 
 msgid "staff status"
-msgstr ""
+msgstr "personeelstatus"
 
 msgid "Designates whether the user can log into this admin site."
-msgstr ""
+msgstr "Dui aan of die gebruiker by dié adminwerf kan aanmeld."
 
 msgid "active"
-msgstr ""
+msgstr "aktief"
 
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
+"Dui aan of dié gebruiker as aktief gesien moet word. Neem merkie weg in "
+"plaas van om rekeninge te skrap."
 
 msgid "date joined"
-msgstr ""
+msgstr "datum aangesluit"
 
 msgid "user"
-msgstr ""
+msgstr "gebruiker"
 
 msgid "users"
-msgstr ""
+msgstr "gebruikers"
 
 #, python-format
 msgid ""
@@ -218,67 +231,74 @@ msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
 msgstr[0] ""
+"Dié wagwoord is te kort. Dit moet ten minste %(min_length)d karakter bevat."
 msgstr[1] ""
+"Dié wagwoord is te kort. Dit moet ten minste %(min_length)d karakters bevat."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "’n Wagwoord moet ten minste %(min_length)d karakter bevat."
+msgstr[1] "’n Wagwoord moet ten minste %(min_length)d karakters bevat."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "Die wagwoord is te soortgelyk aan die %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
+"Die wagwoord mag nie soortgelyk wees aan u ander persoonlike inligting nie."
 
 msgid "This password is too common."
-msgstr ""
+msgstr "Dié wagwoord is te algemeen."
 
-msgid "Your password can't be a commonly used password."
-msgstr ""
+msgid "Your password can’t be a commonly used password."
+msgstr "U wagwoord mag nie ’n algemeen gebruikte wagwoord wees nie."
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "Dié wagwoord is heeltemal numeries."
 
-msgid "Your password can't be entirely numeric."
-msgstr ""
+msgid "Your password can’t be entirely numeric."
+msgstr "Die wagwoord mag nie geheel numeries wees nie."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
-msgstr ""
+msgstr "Wagwoordherstel op %(site_name)s"
 
 msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Tik 'n geldige gebruikernaam. Dié waarde mag slegs alfabetletters, syfers en "
+"die karakters @/./+/-/_ bevat."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Tik 'n geldige gebruikernaam. Dié waarde mag slegs letters, syfers en die "
+"karakters @/./+/-/_ bevat."
 
 msgid "Logged out"
-msgstr ""
+msgstr "Afgemeld"
 
 msgid "Password reset"
-msgstr ""
+msgstr "Wagwoordherstel"
 
 msgid "Password reset sent"
-msgstr ""
+msgstr "Wagwoordherstel gestuur"
 
 msgid "Enter new password"
-msgstr ""
+msgstr "Tik nuwe wagwoord"
 
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Herstel van wagwoord onsuksesvol"
 
 msgid "Password reset complete"
-msgstr ""
+msgstr "Herstel van wagwoord is voltooi"
 
 msgid "Password change"
-msgstr ""
+msgstr "Wagwoordverandering"
 
 msgid "Password change successful"
-msgstr ""
+msgstr "Verandering van wagwoord was suksesvol"

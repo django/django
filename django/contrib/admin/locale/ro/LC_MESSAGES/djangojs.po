@@ -1,19 +1,21 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Daniel Ursache-Dogariu <contact@danniel.net>, 2011
+# Bogdan Mateescu, 2018-2019
+# Daniel Ursache-Dogariu, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011
+# Eugenol Man <neatusebastian@gmail.com>, 2020
 # Ionel Cristian Mărieș <ionel.mc@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Răzvan Ionescu <ionescu77@gmail.com>, 2015
-# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016
+# razvan ionescu <ionescu77@gmail.com>, 2015
+# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 10:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-07-15 11:16+0000\n"
+"Last-Translator: Eugenol Man <neatusebastian@gmail.com>\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -90,44 +92,23 @@ msgstr ""
 "o acțiune, modificările nesalvate vor fi pierdute."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Aţi selectat o acţiune, dar nu aţi salvat încă modificările la câmpuri "
-"individuale. Faceţi clic pe OK pentru a salva. Va trebui să executați "
-"acțiunea din nou."
+"Ai selectat o acțiune dar nu ai salvat modificările făcute în câmpuri "
+"individuale. Te rugăm apasa Ok pentru a salva. Va trebui sa reiei acțiunea."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Ați selectat o acţiune și nu ațţi făcut modificări în cîmpuri individuale. "
-"Probabil căutați butonul Go, în loc de Salvează."
-
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Notă: Sunteți cu %s ora înaintea orei serverului."
-msgstr[1] "Notă: Sunteți cu %s ore înaintea orei serverului."
-msgstr[2] "Notă: Sunteți cu %s ore înaintea orei serverului."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Notă: Sunteți cu %s oră în urma orei serverului."
-msgstr[1] "Notă: Sunteți cu %s ore în urma orei serverului."
-msgstr[2] "Notă: Sunteți cu %s ore în urma orei serverului."
+"Ai selectat o acțiune și nu ai făcut modificări. Probabil că dorești butonul "
+"de Go mai putin cel de Salvează."
 
 msgid "Now"
 msgstr "Acum"
-
-msgid "Choose a Time"
-msgstr "Alege o oră"
-
-msgid "Choose a time"
-msgstr "Alege o oră"
 
 msgid "Midnight"
 msgstr "Miezul nopții"
@@ -141,6 +122,26 @@ msgstr "Amiază"
 msgid "6 p.m."
 msgstr "6 p.m."
 
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Notă: Sunteți cu %s oră înaintea orei serverului."
+msgstr[1] "Notă: Sunteți cu %s ore înaintea orei serverului."
+msgstr[2] "Notă: Sunteți cu %s de ore înaintea orei serverului."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Notă: Sunteți cu %s oră în urma orei serverului."
+msgstr[1] "Notă: Sunteți cu %s ore în urma orei serverului."
+msgstr[2] "Notă: Sunteți cu %s de ore în urma orei serverului."
+
+msgid "Choose a Time"
+msgstr "Alege o oră"
+
+msgid "Choose a time"
+msgstr "Alege o oră"
+
 msgid "Cancel"
 msgstr "Anulează"
 
@@ -148,7 +149,7 @@ msgid "Today"
 msgstr "Astăzi"
 
 msgid "Choose a Date"
-msgstr "Alege a dată"
+msgstr "Alege o dată"
 
 msgid "Yesterday"
 msgstr "Ieri"
@@ -157,68 +158,68 @@ msgid "Tomorrow"
 msgstr "Mâine"
 
 msgid "January"
-msgstr ""
+msgstr "Ianuarie"
 
 msgid "February"
-msgstr ""
+msgstr "Februarie"
 
 msgid "March"
-msgstr ""
+msgstr "Martie"
 
 msgid "April"
-msgstr ""
+msgstr "Aprilie"
 
 msgid "May"
-msgstr ""
+msgstr "Mai"
 
 msgid "June"
-msgstr ""
+msgstr "Iunie"
 
 msgid "July"
-msgstr ""
+msgstr "Iulie"
 
 msgid "August"
-msgstr ""
+msgstr "August"
 
 msgid "September"
-msgstr ""
+msgstr "Septembrie"
 
 msgid "October"
-msgstr ""
+msgstr "Octombrie"
 
 msgid "November"
-msgstr ""
+msgstr "Noiembrie"
 
 msgid "December"
-msgstr ""
+msgstr "Decembrie"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "D"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "L"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "M"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "M"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "J"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "V"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 msgid "Show"
 msgstr "Arată"

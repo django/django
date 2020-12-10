@@ -1,22 +1,26 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# David <huangtao0202@gmail.com>, 2019
+# ausaki <www.ljm969087551@qq.com>, 2017
+# jamin M <lxxmbyx@163.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015
 # Liping Wang <lynn.config@gmail.com>, 2016-2017
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # pylemon <leeway1985@gmail.com>, 2012-2013
+# Wentao Han <wentao.han@gmail.com>, 2020
 # hizyn <zhangyanan5552@gmail.com>, 2016
-# Ziang Song <songziang@gmail.com>, 2011
+# ced773123cfad7b4e8b79ca80f736af9, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-03-14 10:30+0000\n"
-"Last-Translator: Liping Wang <lynn.config@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-02-24 16:54+0000\n"
+"Last-Translator: Wentao Han <wentao.han@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -60,8 +64,8 @@ msgstr "密码未设置。"
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "不可用的密码格式或未知的哈希算法。"
 
-msgid "The two password fields didn't match."
-msgstr "两个密码字段不一致。"
+msgid "The two password fields didn’t match."
+msgstr "输入的两个密码不一致。"
 
 msgid "Password"
 msgstr "密码"
@@ -73,12 +77,11 @@ msgid "Enter the same password as before, for verification."
 msgstr "为了校验，请输入与上面相同的密码。"
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"原始密码不存储，所以没有办法看到这个用户的密码，但可以使用 <a href=\"../"
-"password/\">这个表单</a> 来更改密码 。"
+"密码原文未存储在系统中，因此无法看到该用户的密码。然而你可以通过<a href="
+"\"{}\">这个表单</a>来修改密码。"
 
 #, python-format
 msgid ""
@@ -126,10 +129,10 @@ msgid "version"
 msgstr "版本"
 
 msgid "memory cost"
-msgstr "消耗内存"
+msgstr "内存花销"
 
 msgid "time cost"
-msgstr "消耗时间"
+msgstr "时间花销"
 
 msgid "parallelism"
 msgstr "对比"
@@ -178,7 +181,7 @@ msgid "user permissions"
 msgstr "用户权限"
 
 msgid "Specific permissions for this user."
-msgstr "为该用户声明权限。"
+msgstr "这个用户的特定权限。"
 
 msgid "username"
 msgstr "用户名"
@@ -199,7 +202,7 @@ msgid "email address"
 msgstr "电子邮件地址"
 
 msgid "staff status"
-msgstr "职员状态"
+msgstr "工作人员状态"
 
 msgid "Designates whether the user can log into this admin site."
 msgstr "指明用户是否可以登录到这个管理站点。"
@@ -210,7 +213,7 @@ msgstr "有效"
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
-msgstr "指明用户是否被认为活跃的。以反选代替删除帐号。"
+msgstr "指明用户是否被认为是活跃的。以反选代替删除帐号。"
 
 msgid "date joined"
 msgstr "加入日期"
@@ -239,20 +242,20 @@ msgstr[0] "你的密码必须包含至少 %(min_length)d 个字符。"
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "密码跟 %(verbose_name)s 太相似了。"
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr "你的密码不能与其他个人信息太相似。"
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "你的密码不能与你的其他个人信息太相似。"
 
 msgid "This password is too common."
 msgstr "这个密码太常见了。"
 
-msgid "Your password can't be a commonly used password."
-msgstr "你的密码不能是大家都爱用的常见密码。"
+msgid "Your password can’t be a commonly used password."
+msgstr "你的密码不能是一个常见密码。"
 
 msgid "This password is entirely numeric."
-msgstr "这个密码全部是数字的。"
+msgstr "密码只包含数字。"
 
-msgid "Your password can't be entirely numeric."
-msgstr "你的密码不能全部为数字。"
+msgid "Your password can’t be entirely numeric."
+msgstr "你的密码不能全都是数字。"
 
 #, python-format
 msgid "Password reset on %(site_name)s"
@@ -269,10 +272,10 @@ msgid ""
 msgstr "请输入合法用户名。只能包含字母，数字和@/./+/-/_ 字符。"
 
 msgid "Logged out"
-msgstr "退出登录"
+msgstr "登出"
 
 msgid "Password reset"
-msgstr "密码重置"
+msgstr "重置密码"
 
 msgid "Password reset sent"
 msgstr "密码重置链接已经发送。"

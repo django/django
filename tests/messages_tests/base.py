@@ -60,7 +60,7 @@ class BaseTests:
                 },
             }],
             ROOT_URLCONF='messages_tests.urls',
-            MESSAGE_TAGS='',
+            MESSAGE_TAGS={},
             MESSAGE_STORAGE='%s.%s' % (self.storage_class.__module__, self.storage_class.__name__),
             SESSION_SERIALIZER='django.contrib.sessions.serializers.JSONSerializer',
         )
@@ -252,7 +252,7 @@ class BaseTests:
     def test_middleware_disabled_fail_silently(self):
         """
         When the middleware is disabled, an exception is not raised
-        if 'fail_silently' = True
+        if 'fail_silently' is True.
         """
         data = {
             'messages': ['Test message %d' % x for x in range(5)],

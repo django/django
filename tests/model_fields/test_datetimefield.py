@@ -24,7 +24,6 @@ class DateTimeFieldTests(TestCase):
         self.assertEqual(f.to_python('01:02:03.000004'), datetime.time(1, 2, 3, 4))
         self.assertEqual(f.to_python('01:02:03.999999'), datetime.time(1, 2, 3, 999999))
 
-    @skipUnlessDBFeature('supports_microsecond_precision')
     def test_datetimes_save_completely(self):
         dat = datetime.date(2014, 3, 12)
         datetim = datetime.datetime(2014, 3, 12, 21, 22, 23, 240000)
@@ -60,14 +59,13 @@ class DateTimeFieldTests(TestCase):
         m1 = DateTimeModel.objects.create(d=d, dt=dt1, t=t)
         m2 = DateTimeModel.objects.create(d=d, dt=dt2, t=t)
         # In Vancouver, we expect both results.
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             DateTimeModel.objects.filter(dt__date=d),
-            [repr(m1), repr(m2)],
-            ordered=False
+            [m1, m2],
         )
         with self.settings(TIME_ZONE='UTC'):
             # But in UTC, the __date only matches one of them.
-            self.assertQuerysetEqual(DateTimeModel.objects.filter(dt__date=d), [repr(m1)])
+            self.assertCountEqual(DateTimeModel.objects.filter(dt__date=d), [m1])
 
 
 class ValidationTest(SimpleTestCase):

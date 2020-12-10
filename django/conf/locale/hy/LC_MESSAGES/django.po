@@ -1,0 +1,1237 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Սմբատ Պետրոսյան <smbatpetrosyan@gmail.com>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-09-27 22:40+0200\n"
+"PO-Revision-Date: 2019-11-05 00:38+0000\n"
+"Last-Translator: Ramiro Morales\n"
+"Language-Team: Armenian (http://www.transifex.com/django/django/language/"
+"hy/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: hy\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Afrikaans"
+msgstr "Աֆրիկաանս"
+
+msgid "Arabic"
+msgstr "Արաբերեն"
+
+msgid "Asturian"
+msgstr "Աստուրերեն"
+
+msgid "Azerbaijani"
+msgstr "Ադրբեջաներեն"
+
+msgid "Bulgarian"
+msgstr "Բուլղարերեն"
+
+msgid "Belarusian"
+msgstr "Բելոռուսերեն"
+
+msgid "Bengali"
+msgstr "Բենգալերեն"
+
+msgid "Breton"
+msgstr "Բրետոներեն"
+
+msgid "Bosnian"
+msgstr "Բոսնիերեն"
+
+msgid "Catalan"
+msgstr "Կատալաներեն"
+
+msgid "Czech"
+msgstr "Չեխերեն"
+
+msgid "Welsh"
+msgstr "Վալլիերեն"
+
+msgid "Danish"
+msgstr "Դանիերեն"
+
+msgid "German"
+msgstr "Գերմաներեն"
+
+msgid "Lower Sorbian"
+msgstr ""
+
+msgid "Greek"
+msgstr "Հունարեն"
+
+msgid "English"
+msgstr "Անգլերեն"
+
+msgid "Australian English"
+msgstr "Ավստրալական Անգլերեն"
+
+msgid "British English"
+msgstr "Բրիտանական Անգլերեն"
+
+msgid "Esperanto"
+msgstr "Էսպերանտո"
+
+msgid "Spanish"
+msgstr "Իսպաներեն"
+
+msgid "Argentinian Spanish"
+msgstr "Արգենտինական իսպաներեն"
+
+msgid "Colombian Spanish"
+msgstr "Կոլումբիական իսպաներեն"
+
+msgid "Mexican Spanish"
+msgstr "Մեքսիկական իսպաներեն"
+
+msgid "Nicaraguan Spanish"
+msgstr "Նիկարագուական իսպաներեն"
+
+msgid "Venezuelan Spanish"
+msgstr "Վենեսուելլական իսպաներեն"
+
+msgid "Estonian"
+msgstr "Էստոներեն"
+
+msgid "Basque"
+msgstr "Բասկերեն"
+
+msgid "Persian"
+msgstr "Պարսկերեն"
+
+msgid "Finnish"
+msgstr "Ֆիներեն"
+
+msgid "French"
+msgstr "Ֆրանսերեն"
+
+msgid "Frisian"
+msgstr "Ֆրիզերեն"
+
+msgid "Irish"
+msgstr "Իռլանդերեն"
+
+msgid "Scottish Gaelic"
+msgstr "Գելական շոտլանդերեն"
+
+msgid "Galician"
+msgstr "Գալիսերեն"
+
+msgid "Hebrew"
+msgstr "Եբրայերեն"
+
+msgid "Hindi"
+msgstr "Հինդի"
+
+msgid "Croatian"
+msgstr "Խորվաթերեն"
+
+msgid "Upper Sorbian"
+msgstr ""
+
+msgid "Hungarian"
+msgstr "Հունգարերեն"
+
+msgid "Armenian"
+msgstr ""
+
+msgid "Interlingua"
+msgstr "Ինտերլինգուա"
+
+msgid "Indonesian"
+msgstr "Ինդոնեզերեն"
+
+msgid "Ido"
+msgstr "Իդո"
+
+msgid "Icelandic"
+msgstr "Իսլանդերեն"
+
+msgid "Italian"
+msgstr "Իտալերեն"
+
+msgid "Japanese"
+msgstr "Ճապոներեն"
+
+msgid "Georgian"
+msgstr "Վրացերեն"
+
+msgid "Kabyle"
+msgstr ""
+
+msgid "Kazakh"
+msgstr "Ղազախերեն"
+
+msgid "Khmer"
+msgstr "Քեմերերեն"
+
+msgid "Kannada"
+msgstr "Կանադա"
+
+msgid "Korean"
+msgstr "Կորեերեն"
+
+msgid "Luxembourgish"
+msgstr "Լյուքսեմբուրգերեն"
+
+msgid "Lithuanian"
+msgstr "Լիտվերեն"
+
+msgid "Latvian"
+msgstr "Լատիշերեն"
+
+msgid "Macedonian"
+msgstr "Մակեդոներեն"
+
+msgid "Malayalam"
+msgstr "Մալայալամ"
+
+msgid "Mongolian"
+msgstr "Մոնղոլերեն"
+
+msgid "Marathi"
+msgstr "Մարատխի"
+
+msgid "Burmese"
+msgstr "Բիրմաներեն"
+
+msgid "Norwegian Bokmål"
+msgstr ""
+
+msgid "Nepali"
+msgstr "Նեպալերեն"
+
+msgid "Dutch"
+msgstr "Հոլանդերեն"
+
+msgid "Norwegian Nynorsk"
+msgstr "Նորվեգերեն (Նյունորսկ)"
+
+msgid "Ossetic"
+msgstr "Օսերեն"
+
+msgid "Punjabi"
+msgstr "Փանջաբի"
+
+msgid "Polish"
+msgstr "Լեհերեն"
+
+msgid "Portuguese"
+msgstr "Պորտուգալերեն"
+
+msgid "Brazilian Portuguese"
+msgstr "Բրազիլական պորտուգալերեն"
+
+msgid "Romanian"
+msgstr "Ռումիներեն"
+
+msgid "Russian"
+msgstr "Ռուսերեն"
+
+msgid "Slovak"
+msgstr "Սլովակերեն"
+
+msgid "Slovenian"
+msgstr "Սլովեներեն"
+
+msgid "Albanian"
+msgstr "Ալբաներեն"
+
+msgid "Serbian"
+msgstr "Սերբերեն"
+
+msgid "Serbian Latin"
+msgstr "Սերբերեն (լատինատառ)"
+
+msgid "Swedish"
+msgstr "Շվեդերեն"
+
+msgid "Swahili"
+msgstr "Սվահիլի"
+
+msgid "Tamil"
+msgstr "Թամիլերեն"
+
+msgid "Telugu"
+msgstr "Թելուգու"
+
+msgid "Thai"
+msgstr "Թայերեն"
+
+msgid "Turkish"
+msgstr "Թուրքերեն"
+
+msgid "Tatar"
+msgstr "Թաթարերեն"
+
+msgid "Udmurt"
+msgstr "Ումուրտերեն"
+
+msgid "Ukrainian"
+msgstr "Ուկրաիներեն"
+
+msgid "Urdu"
+msgstr "Ուրդու"
+
+msgid "Uzbek"
+msgstr ""
+
+msgid "Vietnamese"
+msgstr "Վիետնամերեն"
+
+msgid "Simplified Chinese"
+msgstr "Հեշտացված չինարեն"
+
+msgid "Traditional Chinese"
+msgstr "Ավանդական չինարեն"
+
+msgid "Messages"
+msgstr "Հաղորդագրություններ"
+
+msgid "Site Maps"
+msgstr "Կայքի քարտեզ"
+
+msgid "Static Files"
+msgstr "Ստատիկ ֆայլեր\t"
+
+msgid "Syndication"
+msgstr "Նորություններ"
+
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
+msgid "Enter a valid value."
+msgstr "Մուտքագրեք ճիշտ արժեք"
+
+msgid "Enter a valid URL."
+msgstr "Մուտքագրեք ճիշտ URL"
+
+msgid "Enter a valid integer."
+msgstr "Մուտքագրեք ամբողջ թիվ"
+
+msgid "Enter a valid email address."
+msgstr "Մուտքագրեք ճիշտ էլեկտրոնային փոստի հասցե"
+
+#. Translators: "letters" means latin letters: a-z and A-Z.
+msgid ""
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+
+msgid ""
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+
+msgid "Enter a valid IPv4 address."
+msgstr "Մուտքագրեք ճիշտ IPv4 հասցե"
+
+msgid "Enter a valid IPv6 address."
+msgstr "Մուտքագրեք ճիշտ IPv6 հասցե"
+
+msgid "Enter a valid IPv4 or IPv6 address."
+msgstr "Մուտքագրեք ճիշտ IPv4 կամ IPv6  հասցե"
+
+msgid "Enter only digits separated by commas."
+msgstr "Մուտքագրեք միայն ստորակետով բաժանված թվեր"
+
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr "Համոզվեք, որ այս արժեքը %(limit_value)s (հիմա այն — %(show_value)s)"
+
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "Համոզվեք, որ այս արժեքը փոքր է, կամ հավասար %(limit_value)s"
+
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "Համոզվեք, որ այս արժեքը մեծ է, համ հավասար %(limit_value)s"
+
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+"Համոզվեք, որ արժեքը պարունակում է ամենաքիչը %(limit_value)d նիշ (այն "
+"պարունակում է %(show_value)d)."
+msgstr[1] ""
+"Համոզվեք, որ արժեքը պարունակում է ամենաքիչը %(limit_value)d նիշ (այն "
+"պարունակում է %(show_value)d)."
+
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+"Համոզվեք, որ արժեքը պարունակում է ամենաքիչը %(limit_value)d  նիշ (այն "
+"պարունակում է %(show_value)d)."
+msgstr[1] ""
+"Համոզվեք, որ արժեքը պարունակում է ամենաքիչը %(limit_value)d  նիշ (այն "
+"պարունակում է %(show_value)d)."
+
+msgid "Enter a number."
+msgstr "Մուտքագրեք թիվ"
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Համոզվեք, որ թվերի քանակը մեծ չէ %(max)s -ից"
+msgstr[1] "Համոզվեք, որ թվերի քանակը մեծ չէ %(max)s -ից"
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Համոզվեք, որ ստորակետից հետո թվերի քանակը մեծ չէ %(max)s -ից"
+msgstr[1] "Համոզվեք, որ ստորակետից հետո թվերի քանակը մեծ չէ %(max)s -ից"
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "Համոզվեք, որ ստորակետից առաջ թվերի քանակը մեծ չէ %(max)s -ից"
+msgstr[1] "Համոզվեք, որ ստորակետից առաջ թվերի քանակը մեծ չէ %(max)s -ից"
+
+#, python-format
+msgid ""
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
+msgstr ""
+
+msgid "Null characters are not allowed."
+msgstr ""
+
+msgid "and"
+msgstr "և"
+
+#, python-format
+msgid "%(model_name)s with this %(field_labels)s already exists."
+msgstr ""
+"%(field_labels)s դաշտերի այս արժեքով %(model_name)s արդեն գոյություն ունի"
+
+#, python-format
+msgid "Value %(value)r is not a valid choice."
+msgstr "%(value)r արժեքը չի մտնում թույլատրված տարբերակների մեջ"
+
+msgid "This field cannot be null."
+msgstr "Այս դաշտը չի կարող ունենալ NULL արժեք "
+
+msgid "This field cannot be blank."
+msgstr "Այս դաշտը չի կարող լինել դատարկ"
+
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(field_label)s դաշտի այս արժեքով %(model_name)s արդեն գոյություն ունի"
+
+#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
+#. Eg: "Title must be unique for pub_date year"
+#, python-format
+msgid ""
+"%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
+msgstr ""
+"«%(field_label)s» դաշտի արժեքը պետք է լինի միակը %(date_field_label)s "
+"%(lookup_type)s համար"
+
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "%(field_type)s տիպի դաշտ"
+
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr ""
+
+#, python-format
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr ""
+
+msgid "Boolean (Either True or False)"
+msgstr "Տրամաբանական (True կամ False)"
+
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "Տող (մինչև %(max_length)s երկարությամբ)"
+
+msgid "Comma-separated integers"
+msgstr "Ստորակետով բաժանված ամբողջ թվեր"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
+"format."
+msgstr ""
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
+"date."
+msgstr ""
+
+msgid "Date (without time)"
+msgstr "Ամսաթիվ (առանց ժամանակի)"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
+msgstr ""
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) but it is an invalid date/time."
+msgstr ""
+
+msgid "Date (with time)"
+msgstr "Ամսաթիվ (և ժամանակ)"
+
+#, python-format
+msgid "“%(value)s” value must be a decimal number."
+msgstr ""
+
+msgid "Decimal number"
+msgstr "Տասնորդական թիվ"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
+"uuuuuu] format."
+msgstr ""
+
+msgid "Duration"
+msgstr "Տևողություն"
+
+msgid "Email address"
+msgstr "Email հասցե"
+
+msgid "File path"
+msgstr "Ֆայլի ճանապարհ"
+
+#, python-format
+msgid "“%(value)s” value must be a float."
+msgstr ""
+
+msgid "Floating point number"
+msgstr "Floating point թիվ"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr ""
+
+msgid "Integer"
+msgstr "Ամբողջ"
+
+msgid "Big (8 byte) integer"
+msgstr "Մեծ (8 բայթ) ամբողջ թիվ"
+
+msgid "IPv4 address"
+msgstr "IPv4 հասցե"
+
+msgid "IP address"
+msgstr "IP հասցե"
+
+#, python-format
+msgid "“%(value)s” value must be either None, True or False."
+msgstr ""
+
+msgid "Boolean (Either True, False or None)"
+msgstr "Տրամաբանական (Either True, False կամ None)"
+
+msgid "Positive integer"
+msgstr "Դրական ամբողջ թիվ"
+
+msgid "Positive small integer"
+msgstr "Դրայան փոքր ամբողջ թիվ"
+
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr "Slug (մինչև %(max_length)s նիշ)"
+
+msgid "Small integer"
+msgstr "Փոքր ամբողջ թիվ"
+
+msgid "Text"
+msgstr "Տեքստ"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"format."
+msgstr ""
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"invalid time."
+msgstr ""
+
+msgid "Time"
+msgstr "Ժամանակ"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Raw binary data"
+msgstr "Երկուական տվյալներ"
+
+#, python-format
+msgid "“%(value)s” is not a valid UUID."
+msgstr ""
+
+msgid "Universally unique identifier"
+msgstr ""
+
+msgid "File"
+msgstr "Ֆայլ"
+
+msgid "Image"
+msgstr "Պատկեր"
+
+#, python-format
+msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgstr ""
+" %(field)s դաշտի %(value)r արժեք ունեցող %(model)s օրինակ գոյություն չունի"
+
+msgid "Foreign Key (type determined by related field)"
+msgstr "Արտաքին բանալի (տեսակը որոշվում է հարակից դաշտից)"
+
+msgid "One-to-one relationship"
+msgstr "Մեկը մեկին կապ"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
+msgid "Many-to-many relationship"
+msgstr "Մի քանիսը մի քանիսին կապ"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
+msgid "This field is required."
+msgstr "Այս դաշտը պարտադիր է"
+
+msgid "Enter a whole number."
+msgstr "Մուտքագրեք ամբողջ թիվ"
+
+msgid "Enter a valid date."
+msgstr "Մուտքագրեք ճիշտ ամսաթիվ"
+
+msgid "Enter a valid time."
+msgstr "Մուտքագրեք ճիշտ ժամանակ"
+
+msgid "Enter a valid date/time."
+msgstr "Մուտքագրեք ճիշտ ամսաթիվ/ժամանակ"
+
+msgid "Enter a valid duration."
+msgstr "Մուտքագրեք ճիշտ տևողություն"
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
+
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "Ոչ մի ֆայլ չի ուղարկվել։ Ստուգեք ձևաթղթի կոդավորում տեսակը"
+
+msgid "No file was submitted."
+msgstr "Ոչ մի ֆայլ չի ուղարկվել"
+
+msgid "The submitted file is empty."
+msgstr "Ուղարկված ֆայլը դատարկ է"
+
+#, python-format
+msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
+msgid_plural ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr[0] ""
+"Համոզվեք, որ ֆայլի անունը պարունակում է ամենաշատը %(max)d նիշ (այն "
+"պարունակում է %(length)d)"
+msgstr[1] ""
+"Համոզվեք, որ ֆայլի անունը պարունակում է ամենաշատը  %(max)d  նիշ (այն "
+"պարունակում է %(length)d)"
+
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+"Ուղարկեք ֆայլ, կամ ակտիվացրեք մաքրելու նշման վանդակը, ոչ թե երկուսը միասին"
+
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr "Ուղարկեք ճիշտ պատկեր․ Ուղարկված ֆայլը պատկեր չէ, կամ վնասված է"
+
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr "Ընտրեք ճիշտ տարբերակ։ %(value)s արժեքը չի մտնում ճիշտ արժեքների մեջ"
+
+msgid "Enter a list of values."
+msgstr "Մուտքագրեք արժեքների ցուցակ"
+
+msgid "Enter a complete value."
+msgstr "Մուտքագրեք ամբողջական արժեք"
+
+msgid "Enter a valid UUID."
+msgstr "Մուտքագրեք ճիշտ UUID"
+
+#. Translators: This is the default suffix added to form field labels
+msgid ":"
+msgstr ":"
+
+#, python-format
+msgid "(Hidden field %(name)s) %(error)s"
+msgstr "(Թաքցված դաշտ %(name)s) %(error)s"
+
+msgid "ManagementForm data is missing or has been tampered with"
+msgstr "Կառավարման ձևաթղթի տվյալները բացակայում են, կամ վնասված են"
+
+#, python-format
+msgid "Please submit %d or fewer forms."
+msgid_plural "Please submit %d or fewer forms."
+msgstr[0] "Ուղարկեք %d կամ քիչ ձևաթղթեր"
+msgstr[1] "Ուղարկեք %d կամ քիչ ձևաթղթեր"
+
+#, python-format
+msgid "Please submit %d or more forms."
+msgid_plural "Please submit %d or more forms."
+msgstr[0] "Ուղարկեք %d կամ շատ ձևաթղթեր"
+msgstr[1] "Ուղարկեք %d կամ շատ ձևաթղթեր"
+
+msgid "Order"
+msgstr "Հերթականություն"
+
+msgid "Delete"
+msgstr "Հեռացնել"
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Ուղղեք %(field)s դաշտի կրկնվող տվյալները"
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr "Ուղղեք %(field)s դաշտի կրկնվող տվյալները, որոնք պետք է լինեն եզակի"
+
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+"Ուղղեք %(field_name)s դաշտի կրկնվող տվյալները, որոնք պետք է լինեն եզակի "
+"%(date_field)s-ում %(lookup)s֊ի համար"
+
+msgid "Please correct the duplicate values below."
+msgstr "Ուղղեք կրկնվող տվյալները"
+
+msgid "The inline value did not match the parent instance."
+msgstr ""
+
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "Ընտրեք ճիշտ տարբերակ։ Այս արժեքը չի մտնում ճիշտ արժեքների մեջ"
+
+#, python-format
+msgid "“%(pk)s” is not a valid value."
+msgstr ""
+
+#, python-format
+msgid ""
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+
+msgid "Clear"
+msgstr "Մաքրել"
+
+msgid "Currently"
+msgstr "Տվյալ պահին"
+
+msgid "Change"
+msgstr "Փոխել"
+
+msgid "Unknown"
+msgstr "Անհայտ"
+
+msgid "Yes"
+msgstr "Այո"
+
+msgid "No"
+msgstr "Ոչ"
+
+msgid "Year"
+msgstr ""
+
+msgid "Month"
+msgstr ""
+
+msgid "Day"
+msgstr ""
+
+msgid "yes,no,maybe"
+msgstr "այո,ոչ,միգուցե"
+
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] "%(size)d բայթ"
+msgstr[1] "%(size)d բայթ"
+
+#, python-format
+msgid "%s KB"
+msgstr "%s ԿԲ"
+
+#, python-format
+msgid "%s MB"
+msgstr "%s ՄԲ"
+
+#, python-format
+msgid "%s GB"
+msgstr "%s ԳԲ"
+
+#, python-format
+msgid "%s TB"
+msgstr "%s ՏԲ"
+
+#, python-format
+msgid "%s PB"
+msgstr "%s ՊԲ"
+
+msgid "p.m."
+msgstr "p.m."
+
+msgid "a.m."
+msgstr "a.m."
+
+msgid "PM"
+msgstr "PM"
+
+msgid "AM"
+msgstr "AM"
+
+msgid "midnight"
+msgstr "կեսգիշեր"
+
+msgid "noon"
+msgstr "կեսօր"
+
+msgid "Monday"
+msgstr "Երկուշաբթի"
+
+msgid "Tuesday"
+msgstr "Երեքշաբթի"
+
+msgid "Wednesday"
+msgstr "Չորեքշաբթի"
+
+msgid "Thursday"
+msgstr "Հինգշաբթի"
+
+msgid "Friday"
+msgstr "Ուրբաթ"
+
+msgid "Saturday"
+msgstr "Շաբաթ"
+
+msgid "Sunday"
+msgstr "Կիրակի"
+
+msgid "Mon"
+msgstr "Երկ"
+
+msgid "Tue"
+msgstr "Երք"
+
+msgid "Wed"
+msgstr "Չրք"
+
+msgid "Thu"
+msgstr "Հնգ"
+
+msgid "Fri"
+msgstr "Ուրբ"
+
+msgid "Sat"
+msgstr "Շբթ"
+
+msgid "Sun"
+msgstr "Կիր"
+
+msgid "January"
+msgstr "Հունվար"
+
+msgid "February"
+msgstr "Փետրվար"
+
+msgid "March"
+msgstr "Մարտ"
+
+msgid "April"
+msgstr "Ապրիլ"
+
+msgid "May"
+msgstr "Մայիս"
+
+msgid "June"
+msgstr "Հունիս"
+
+msgid "July"
+msgstr "Հուլիս"
+
+msgid "August"
+msgstr "Օգոստոս"
+
+msgid "September"
+msgstr "Սեպտեմբեր"
+
+msgid "October"
+msgstr "Հոկտեմբեր"
+
+msgid "November"
+msgstr "Նոյեմբեր"
+
+msgid "December"
+msgstr "Դեկտեմբեր"
+
+msgid "jan"
+msgstr "հուն"
+
+msgid "feb"
+msgstr "փետ"
+
+msgid "mar"
+msgstr "մար"
+
+msgid "apr"
+msgstr "ապր"
+
+msgid "may"
+msgstr "մայ"
+
+msgid "jun"
+msgstr "հուն"
+
+msgid "jul"
+msgstr "հուլ"
+
+msgid "aug"
+msgstr "օգտ"
+
+msgid "sep"
+msgstr "սեպ"
+
+msgid "oct"
+msgstr "հոկ"
+
+msgid "nov"
+msgstr "նոյ"
+
+msgid "dec"
+msgstr "դեկ"
+
+msgctxt "abbrev. month"
+msgid "Jan."
+msgstr "Հուն․"
+
+msgctxt "abbrev. month"
+msgid "Feb."
+msgstr "Փետ․"
+
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "Մարտ"
+
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "Մարտ"
+
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "Մայիս"
+
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "Հունիս"
+
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "Հուլիս"
+
+msgctxt "abbrev. month"
+msgid "Aug."
+msgstr "Օգոստ․"
+
+msgctxt "abbrev. month"
+msgid "Sept."
+msgstr "Սեպտ․"
+
+msgctxt "abbrev. month"
+msgid "Oct."
+msgstr "Հոկտ․"
+
+msgctxt "abbrev. month"
+msgid "Nov."
+msgstr "Նոյ․"
+
+msgctxt "abbrev. month"
+msgid "Dec."
+msgstr "Դեկ․"
+
+msgctxt "alt. month"
+msgid "January"
+msgstr "Հունվար"
+
+msgctxt "alt. month"
+msgid "February"
+msgstr "Փետրվար"
+
+msgctxt "alt. month"
+msgid "March"
+msgstr "Մարտ"
+
+msgctxt "alt. month"
+msgid "April"
+msgstr "Ապրիլ"
+
+msgctxt "alt. month"
+msgid "May"
+msgstr "Մայիս"
+
+msgctxt "alt. month"
+msgid "June"
+msgstr "Հունիս"
+
+msgctxt "alt. month"
+msgid "July"
+msgstr "Հուլիս"
+
+msgctxt "alt. month"
+msgid "August"
+msgstr "Օգոստոս"
+
+msgctxt "alt. month"
+msgid "September"
+msgstr "Սեպտեմբեր"
+
+msgctxt "alt. month"
+msgid "October"
+msgstr "Հոկտեմբեր"
+
+msgctxt "alt. month"
+msgid "November"
+msgstr "Նոյեմբեր"
+
+msgctxt "alt. month"
+msgid "December"
+msgstr "Դեկտեմբեր"
+
+msgid "This is not a valid IPv6 address."
+msgstr "Սա ճիշտ IPv6 հասցե չէ"
+
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s…"
+msgstr ""
+
+msgid "or"
+msgstr "կամ"
+
+#. Translators: This string is used as a separator between list elements
+msgid ", "
+msgstr ", "
+
+#, python-format
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d տարի"
+msgstr[1] "%d տարի"
+
+#, python-format
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "%d ամիս"
+msgstr[1] "%d ամիս"
+
+#, python-format
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] "%d շաբաթ"
+msgstr[1] "%d շաբաթ"
+
+#, python-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d օր"
+msgstr[1] "%d օր"
+
+#, python-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d ժամ"
+msgstr[1] "%d ժամ"
+
+#, python-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d րոպե"
+msgstr[1] "%d րոպե"
+
+msgid "0 minutes"
+msgstr "0 րոպե"
+
+msgid "Forbidden"
+msgstr "Արգելված"
+
+msgid "CSRF verification failed. Request aborted."
+msgstr "CSRF ստուգման սխալ․ Հարցումն ընդհատված է"
+
+msgid ""
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
+"required for security reasons, to ensure that your browser is not being "
+"hijacked by third parties."
+msgstr ""
+
+msgid ""
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
+msgstr ""
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
+msgstr ""
+
+msgid ""
+"You are seeing this message because this site requires a CSRF cookie when "
+"submitting forms. This cookie is required for security reasons, to ensure "
+"that your browser is not being hijacked by third parties."
+msgstr ""
+"Դուք տեսնում եք այս հաղորդագրությունը, քանի որ այս կայքը ձևաթերթերը "
+"ուղարկելու համար պահանջում է CSRF cookie։ Այն անհրաժեշտ է անվտանգության "
+"նկատառումներից ելնելով, համոզվելու համար, որ ձեր բրաուզերը չի գտնվում երրորդ "
+"անձանց կառավարման տակ։"
+
+msgid ""
+"If you have configured your browser to disable cookies, please re-enable "
+"them, at least for this site, or for “same-origin” requests."
+msgstr ""
+
+msgid "More information is available with DEBUG=True."
+msgstr "Ավելի մանրամասն տեղեկությունը հասանելի է DEBUG=True֊ի ժամանակ"
+
+msgid "No year specified"
+msgstr "Տարին նշված չէ"
+
+msgid "Date out of range"
+msgstr ""
+
+msgid "No month specified"
+msgstr "Ամիսը նշված չէ"
+
+msgid "No day specified"
+msgstr "Օրը նշված չէ"
+
+msgid "No week specified"
+msgstr "Շաբաթը նշված չէ"
+
+#, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "Ոչ մի %(verbose_name_plural)s հասանելի չէ"
+
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+"Ապագա %(verbose_name_plural)s հասանելի չեն, քանի որ %(class_name)s."
+"allow_future ունի False արժեք"
+
+#, python-format
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr ""
+
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "Հարցմանը համապատասխանող ոչ մի %(verbose_name)s չի գտնվել"
+
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr ""
+
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr "Սխալ էջ (%(page_number)s): %(message)s"
+
+#, python-format
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr ""
+
+msgid "Directory indexes are not allowed here."
+msgstr "Կատալոգների ինդեքսավորումը թույլատրված չէ այստեղ"
+
+#, python-format
+msgid "“%(path)s” does not exist"
+msgstr ""
+
+#, python-format
+msgid "Index of %(directory)s"
+msgstr "%(directory)s֊ի ինդեքսը"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr ""
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+msgid "Get started with Django"
+msgstr ""
+
+msgid "Django Community"
+msgstr ""
+
+msgid "Connect, get help, or contribute"
+msgstr ""

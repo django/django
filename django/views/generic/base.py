@@ -21,8 +21,7 @@ class ContextMixin:
     extra_context = None
 
     def get_context_data(self, **kwargs):
-        if 'view' not in kwargs:
-            kwargs['view'] = self
+        kwargs.setdefault('view', self)
         if self.extra_context is not None:
             kwargs.update(self.extra_context)
         return kwargs
@@ -51,9 +50,10 @@ class View:
         """Main entry point for a request-response process."""
         for key in initkwargs:
             if key in cls.http_method_names:
-                raise TypeError("You tried to pass in the %s method name as a "
-                                "keyword argument to %s(). Don't do that."
-                                % (key, cls.__name__))
+                raise TypeError(
+                    'The method name %s is not accepted as a keyword argument '
+                    'to %s().' % (key, cls.__name__)
+                )
             if not hasattr(cls, key):
                 raise TypeError("%s() received an invalid keyword %r. as_view "
                                 "only accepts arguments that are already "
@@ -61,11 +61,12 @@ class View:
 
         def view(request, *args, **kwargs):
             self = cls(**initkwargs)
-            if hasattr(self, 'get') and not hasattr(self, 'head'):
-                self.head = self.get
-            self.request = request
-            self.args = args
-            self.kwargs = kwargs
+            self.setup(request, *args, **kwargs)
+            if not hasattr(self, 'request'):
+                raise AttributeError(
+                    "%s instance has no 'request' attribute. Did you override "
+                    "setup() and forget to call super()?" % cls.__name__
+                )
             return self.dispatch(request, *args, **kwargs)
         view.view_class = cls
         view.view_initkwargs = initkwargs
@@ -77,6 +78,14 @@ class View:
         # like csrf_exempt from dispatch
         update_wrapper(view, cls.dispatch, assigned=())
         return view
+
+    def setup(self, request, *args, **kwargs):
+        """Initialize attributes shared by all view methods."""
+        if hasattr(self, 'get') and not hasattr(self, 'head'):
+            self.head = self.get
+        self.request = request
+        self.args = args
+        self.kwargs = kwargs
 
     def dispatch(self, request, *args, **kwargs):
         # Try to dispatch to the right method; if a method doesn't exist,
@@ -98,8 +107,8 @@ class View:
     def options(self, request, *args, **kwargs):
         """Handle responding to requests for the OPTIONS HTTP verb."""
         response = HttpResponse()
-        response['Allow'] = ', '.join(self._allowed_methods())
-        response['Content-Length'] = '0'
+        response.headers['Allow'] = ', '.join(self._allowed_methods())
+        response.headers['Content-Length'] = '0'
         return response
 
     def _allowed_methods(self):

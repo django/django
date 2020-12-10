@@ -9,14 +9,13 @@
 """
 import re
 
+from django.contrib.gis.db import models
 from django.contrib.gis.db.backends.base.operations import (
     BaseSpatialOperations,
 )
 from django.contrib.gis.db.backends.oracle.adapter import OracleSpatialAdapter
 from django.contrib.gis.db.backends.utils import SpatialOperator
-from django.contrib.gis.db.models import aggregates
-from django.contrib.gis.geometry.backend import Geometry
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.geometry import GEOSGeometry, GEOSGeometryBase
 from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
 from django.db.backends.oracle.operations import DatabaseOperations
@@ -46,15 +45,15 @@ class SDORelate(SpatialOperator):
             raise ValueError('Invalid SDO_RELATE mask: "%s"' % arg)
 
     def as_sql(self, connection, lookup, template_params, sql_params):
-        template_params['mask'] = sql_params.pop()
-        return super().as_sql(connection, lookup, template_params, sql_params)
+        template_params['mask'] = sql_params[-1]
+        return super().as_sql(connection, lookup, template_params, sql_params[:-1])
 
 
 class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     name = 'oracle'
     oracle = True
-    disallowed_aggregates = (aggregates.Collect, aggregates.Extent3D, aggregates.MakeLine)
+    disallowed_aggregates = (models.Collect, models.Extent3D, models.MakeLine)
 
     Adapter = OracleSpatialAdapter
 
@@ -65,10 +64,14 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     function_names = {
         'Area': 'SDO_GEOM.SDO_AREA',
+        'AsGeoJSON': 'SDO_UTIL.TO_GEOJSON',
+        'AsWKB': 'SDO_UTIL.TO_WKBGEOMETRY',
+        'AsWKT': 'SDO_UTIL.TO_WKTGEOMETRY',
         'BoundingCircle': 'SDO_GEOM.SDO_MBC',
         'Centroid': 'SDO_GEOM.SDO_CENTROID',
         'Difference': 'SDO_GEOM.SDO_DIFFERENCE',
         'Distance': 'SDO_GEOM.SDO_DISTANCE',
+        'Envelope': 'SDO_GEOM_MBR',
         'Intersection': 'SDO_GEOM.SDO_INTERSECTION',
         'IsValid': 'SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT',
         'Length': 'SDO_GEOM.SDO_LENGTH',
@@ -106,9 +109,9 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     }
 
     unsupported_functions = {
-        'AsGeoJSON', 'AsKML', 'AsSVG', 'Azimuth', 'Envelope', 'ForceRHR',
-        'GeoHash', 'LineLocatePoint', 'MakeValid', 'MemSize', 'Scale',
-        'SnapToGrid', 'Translate',
+        'AsKML', 'AsSVG', 'Azimuth', 'ForcePolygonCW', 'GeoHash',
+        'GeometryDistance', 'LineLocatePoint', 'MakeValid', 'MemSize',
+        'Scale', 'SnapToGrid', 'Translate',
     }
 
     def geo_quote_name(self, name):
@@ -119,7 +122,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
             # Generally, Oracle returns a polygon for the extent -- however,
             # it can return a single point if there's only one Point in the
             # table.
-            ext_geom = Geometry(memoryview(clob.read()))
+            ext_geom = GEOSGeometry(memoryview(clob.read()))
             gtype = str(ext_geom.geom_type)
             if gtype == 'Polygon':
                 # Construct the 4-tuple from the coordinates in the polygon.
@@ -183,11 +186,15 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     # Routines for getting the OGC-compliant models.
     def geometry_columns(self):
-        from django.contrib.gis.db.backends.oracle.models import OracleGeometryColumns
+        from django.contrib.gis.db.backends.oracle.models import (
+            OracleGeometryColumns,
+        )
         return OracleGeometryColumns
 
     def spatial_ref_sys(self):
-        from django.contrib.gis.db.backends.oracle.models import OracleSpatialRefSys
+        from django.contrib.gis.db.backends.oracle.models import (
+            OracleSpatialRefSys,
+        )
         return OracleSpatialRefSys
 
     def modify_insert_params(self, placeholder, params):
@@ -203,7 +210,15 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         srid = expression.output_field.srid
         if srid == -1:
             srid = None
+        geom_class = expression.output_field.geom_class
 
         def converter(value, expression, connection):
-            return None if value is None else GEOSGeometry(read(memoryview(value.read())), srid)
+            if value is not None:
+                geom = GEOSGeometryBase(read(memoryview(value.read())), geom_class)
+                if srid:
+                    geom.srid = srid
+                return geom
         return converter
+
+    def get_area_att_for_field(self, field):
+        return 'sq_m'

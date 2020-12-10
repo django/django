@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 09:32+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Croatian (http://www.transifex.com/django/django/language/"
 "hr/)\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +23,7 @@ msgid "PostgreSQL extensions"
 msgstr ""
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
+msgid "Item %(nth)s in the array did not validate:"
 msgstr ""
 
 msgid "Nested arrays must have the same length."
@@ -33,24 +33,14 @@ msgid "Map of strings to strings/nulls"
 msgstr ""
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
+msgid "The value of “%(key)s” is not a string or null."
 msgstr ""
-
-msgid "A JSON object"
-msgstr "JSON objekt"
-
-msgid "Value must be valid JSON."
-msgstr "Vrijednost mora biti ispravan JSON"
 
 msgid "Could not load JSON data."
 msgstr "JSON podatci neuspješno učitani."
 
 msgid "Input must be a JSON dictionary."
 msgstr ""
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' vrijednost mora biti ispravan JSON."
 
 msgid "Enter two valid values."
 msgstr "Unesite 2 ispravne vrijednosti."

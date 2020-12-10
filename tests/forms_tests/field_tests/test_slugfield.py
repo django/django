@@ -17,3 +17,11 @@ class SlugFieldTest(SimpleTestCase):
         self.assertEqual(f.clean('  你-好  '), '你-好')
         self.assertEqual(f.clean('ıçğüş'), 'ıçğüş')
         self.assertEqual(f.clean('foo-ıç-bar'), 'foo-ıç-bar')
+
+    def test_empty_value(self):
+        f = SlugField(required=False)
+        self.assertEqual(f.clean(''), '')
+        self.assertEqual(f.clean(None), '')
+        f = SlugField(required=False, empty_value=None)
+        self.assertIsNone(f.clean(''))
+        self.assertIsNone(f.clean(None))

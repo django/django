@@ -1,6 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# crazyzubr <hjcnbckfd@gmail.com>, 2020
+# Ivan Khomutov <iskhomutov@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Алексей Борискин <sun.void@gmail.com>, 2012-2015
 # Андрей Щуров <shurov9009@gmail.com>, 2016
@@ -9,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-24 20:40+0000\n"
-"Last-Translator: Дмитрий Шатера <mr.bobsans@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-05-13 18:48+0000\n"
+"Last-Translator: crazyzubr <hjcnbckfd@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -57,8 +59,8 @@ msgstr "Пароль не задан."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Неизвестный формат пароля или алгоритм хеширования."
 
-msgid "The two password fields didn't match."
-msgstr "Два поля с паролями не совпадают."
+msgid "The two password fields didn’t match."
+msgstr "Введенные пароли не совпадают."
 
 msgid "Password"
 msgstr "Пароль"
@@ -70,13 +72,12 @@ msgid "Enter the same password as before, for verification."
 msgstr "Для подтверждения введите, пожалуйста, пароль ещё раз."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Пароли хранятся в защищённом виде, так что у нас нет способа узнать пароль "
-"этого пользователя. Однако вы можете сменить его/её пароль, используя <a "
-"href=\"../password/\">эту форму</a>."
+"Пароли хранятся в зашифрованном виде, поэтому нет возможности посмотреть "
+"пароль этого пользователя, но вы можете изменить его используя <a href="
+"\"{}\">эту форму</a>."
 
 #, python-format
 msgid ""
@@ -260,22 +261,20 @@ msgstr[3] "Ваш пароль должен содержать как миним
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Введённый пароль слишком похож на %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr ""
-"Ваш пароль не должен совпадать с вашим именем или другой персональной "
-"информацией или быть слишком похожим на неё."
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Пароль не должен быть слишком похож на другую вашу личную информацию."
 
 msgid "This password is too common."
 msgstr "Введённый пароль слишком широко распространён."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Ваш пароль не может быть одним из широко распространённых паролей."
+msgid "Your password can’t be a commonly used password."
+msgstr "Такой пароль часто используется."
 
 msgid "This password is entirely numeric."
 msgstr "Введённый пароль состоит только из цифр."
 
-msgid "Your password can't be entirely numeric."
-msgstr "Ваш пароль не может состоять только из цифр."
+msgid "Your password can’t be entirely numeric."
+msgstr "Пароль не может состоять только из цифр."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

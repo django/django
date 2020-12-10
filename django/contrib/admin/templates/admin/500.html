@@ -3,15 +3,15 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-&rsaquo; {% trans 'Server error' %}
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; {% translate 'Server error' %}
 </div>
 {% endblock %}
 
-{% block title %}{% trans 'Server error (500)' %}{% endblock %}
+{% block title %}{% translate 'Server error (500)' %}{% endblock %}
 
 {% block content %}
-<h1>{% trans 'Server Error <em>(500)</em>' %}</h1>
-<p>{% trans "There's been an error. It's been reported to the site administrators via email and should be fixed shortly. Thanks for your patience." %}</p>
+<h1>{% translate 'Server Error <em>(500)</em>' %}</h1>
+<p>{% translate 'There’s been an error. It’s been reported to the site administrators via email and should be fixed shortly. Thanks for your patience.' %}</p>
 
 {% endblock %}

@@ -2,12 +2,14 @@ import hashlib
 import os
 
 from django.core.files.uploadedfile import UploadedFile
+from django.core.files.uploadhandler import TemporaryFileUploadHandler
 from django.http import HttpResponse, HttpResponseServerError, JsonResponse
-from django.utils.encoding import force_bytes, force_text
 
 from .models import FileModel
 from .tests import UNICODE_FILENAME, UPLOAD_TO
-from .uploadhandler import ErroringUploadHandler, QuotaUploadHandler
+from .uploadhandler import (
+    ErroringUploadHandler, QuotaUploadHandler, StopUploadTemporaryFileHandler,
+)
 
 
 def file_upload_view(request):
@@ -21,7 +23,7 @@ def file_upload_view(request):
         # not the full path.
         if os.path.dirname(form_data['file_field'].name) != '':
             return HttpResponseServerError()
-        return HttpResponse('')
+        return HttpResponse()
     else:
         return HttpResponseServerError()
 
@@ -42,7 +44,7 @@ def file_upload_view_verify(request):
         if isinstance(value, UploadedFile):
             new_hash = hashlib.sha1(value.read()).hexdigest()
         else:
-            new_hash = hashlib.sha1(force_bytes(value)).hexdigest()
+            new_hash = hashlib.sha1(value.encode()).hexdigest()
         if new_hash != submitted_hash:
             return HttpResponseServerError()
 
@@ -51,36 +53,19 @@ def file_upload_view_verify(request):
     obj = FileModel()
     obj.testfile.save(largefile.name, largefile)
 
-    return HttpResponse('')
+    return HttpResponse()
 
 
 def file_upload_unicode_name(request):
-
-    # Check to see if unicode name came through properly.
+    # Check to see if Unicode name came through properly.
     if not request.FILES['file_unicode'].name.endswith(UNICODE_FILENAME):
         return HttpResponseServerError()
-
-    response = None
-
     # Check to make sure the exotic characters are preserved even
     # through file save.
     uni_named_file = request.FILES['file_unicode']
-    obj = FileModel.objects.create(testfile=uni_named_file)
+    FileModel.objects.create(testfile=uni_named_file)
     full_name = '%s/%s' % (UPLOAD_TO, uni_named_file.name)
-    if not os.path.exists(full_name):
-        response = HttpResponseServerError()
-
-    # Cleanup the object with its exotic file name immediately.
-    # (shutil.rmtree used elsewhere in the tests to clean up the
-    # upload directory has been seen to choke on unicode
-    # filenames on Windows.)
-    obj.delete()
-    os.unlink(full_name)
-
-    if response:
-        return response
-    else:
-        return HttpResponse('')
+    return HttpResponse() if os.path.exists(full_name) else HttpResponseServerError()
 
 
 def file_upload_echo(request):
@@ -119,6 +104,24 @@ def file_upload_quota_broken(request):
     return response
 
 
+def file_stop_upload_temporary_file(request):
+    request.upload_handlers.insert(0, StopUploadTemporaryFileHandler())
+    request.upload_handlers.pop(2)
+    request.FILES  # Trigger file parsing.
+    return JsonResponse(
+        {'temp_path': request.upload_handlers[0].file.temporary_file_path()},
+    )
+
+
+def file_upload_interrupted_temporary_file(request):
+    request.upload_handlers.insert(0, TemporaryFileUploadHandler())
+    request.upload_handlers.pop(2)
+    request.FILES  # Trigger file parsing.
+    return JsonResponse(
+        {'temp_path': request.upload_handlers[0].file.temporary_file_path()},
+    )
+
+
 def file_upload_getlist_count(request):
     """
     Check the .getlist() function to ensure we receive the correct number of files.
@@ -151,11 +154,11 @@ def file_upload_content_type_extra(request):
     """
     params = {}
     for file_name, uploadedfile in request.FILES.items():
-        params[file_name] = {k: force_text(v) for k, v in uploadedfile.content_type_extra.items()}
+        params[file_name] = {k: v.decode() for k, v in uploadedfile.content_type_extra.items()}
     return JsonResponse(params)
 
 
 def file_upload_fd_closing(request, access):
     if access == 't':
         request.FILES  # Trigger file parsing.
-    return HttpResponse('')
+    return HttpResponse()

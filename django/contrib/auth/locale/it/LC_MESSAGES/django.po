@@ -6,15 +6,15 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Luciano De Falco Alfano, 2016
 # Marco Bonetti, 2014
-# palmux <palmux@gmail.com>, 2015
+# palmux <palmux@gmail.com>, 2015,2019
 # Mattia Procopio <promat85@gmail.com>, 2015
-# Stefano Brentegani <sbrentegani@gmail.com>, 2015
+# Stefano Brentegani <sbrentegani@gmail.com>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-18 09:50+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-24 08:45+0000\n"
 "Last-Translator: palmux <palmux@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
@@ -59,7 +59,7 @@ msgstr "Nessuna password impostata."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Formato di password non valido o algoritmo di hash sconosciuto."
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "I due campi password non corrispondono."
 
 msgid "Password"
@@ -72,13 +72,12 @@ msgid "Enter the same password as before, for verification."
 msgstr "Inserisci la stessa password inserita sopra, come verifica."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Le password inserite non vengono conservate, quindi non c'è modo di vedere "
-"la password di questo utente, ma è possibile modificarla usando <a href=\"../"
-"password/\">questo modulo</a>."
+"Le password grezze non vengono salvate, quindi non è possibile visualizzare "
+"la password di questo utente, ma è possibile modificarla utilizzando <a href="
+"\"{}\">questo form</a>."
 
 #, python-format
 msgid ""
@@ -254,7 +253,7 @@ msgstr[1] "La tua password deve contenere almeno %(min_length)d caratteri."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "La password è troppo simile a %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
 "La tua password non può essere troppo simile alle altre tue informazioni "
 "personali."
@@ -262,13 +261,13 @@ msgstr ""
 msgid "This password is too common."
 msgstr "Questa password è troppo comune."
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr "La tua password non può essere una password comunemente usata."
 
 msgid "This password is entirely numeric."
 msgstr "Questa password è interamente numerica."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "La tua password non può essere interamente numerica."
 
 #, python-format

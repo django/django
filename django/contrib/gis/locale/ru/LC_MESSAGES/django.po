@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Eugene MechanisM <eugene@mechanism.pro>, 2012
+# Eugene <eugene.mechanism@gmail.com>, 2012
 # eXtractor <evg.kirov@gmail.com>, 2015
+# crazyzubr <hjcnbckfd@gmail.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Алексей Борискин <sun.void@gmail.com>, 2012,2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-22 18:06+0000\n"
-"Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-05-14 18:54+0000\n"
+"Last-Translator: crazyzubr <hjcnbckfd@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -29,7 +30,7 @@ msgid "The base GIS field."
 msgstr "Базовое ГИС-поле."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "Базовое геометрическое поле. Соответствует типу OpenGIS Specification "
 "Geometry."
@@ -82,9 +83,6 @@ msgstr "Удалить все объекты"
 msgid "WKT debugging window:"
 msgstr "Окно отладки WKT:"
 
-msgid "Google Maps via GeoDjango"
-msgstr "Google Maps при помощи GeoDjango"
-
 msgid "Debugging window (serialized value)"
 msgstr "Отладочное окно (сериализованные значения)"
 
@@ -92,5 +90,5 @@ msgid "No feeds are registered."
 msgstr "Нет зарегистрированных фидов."
 
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr "Слаг %r не зарегистрирован."

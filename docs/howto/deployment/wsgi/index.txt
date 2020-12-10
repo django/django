@@ -5,9 +5,9 @@ How to deploy with WSGI
 Django's primary deployment platform is WSGI_, the Python standard for web
 servers and applications.
 
-.. _WSGI: http://www.wsgi.org
+.. _WSGI: https://wsgi.readthedocs.io/en/latest/
 
-Django's :djadmin:`startproject` management command sets up a simple default
+Django's :djadmin:`startproject` management command sets up a minimal default
 WSGI configuration for you, which you can tweak as needed for your project,
 and direct any WSGI-compliant application server to use.
 
@@ -16,10 +16,10 @@ Django includes getting-started documentation for the following WSGI servers:
 .. toctree::
    :maxdepth: 1
 
-   modwsgi
-   apache-auth
    gunicorn
    uwsgi
+   modwsgi
+   apache-auth
 
 The ``application`` object
 ==========================
@@ -70,8 +70,10 @@ If this variable isn't set, the default :file:`wsgi.py` sets it to
 Applying WSGI middleware
 ========================
 
-To apply `WSGI middleware`_ you can simply wrap the application object. For
-instance you could add these lines at the bottom of :file:`wsgi.py`::
+To apply :pep:`WSGI middleware
+<3333#middleware-components-that-play-both-sides>` you can wrap the application
+object. For instance you could add these lines at the bottom of
+:file:`wsgi.py`::
 
     from helloworld.wsgi import HelloWorldApplication
     application = HelloWorldApplication(application)
@@ -79,5 +81,3 @@ instance you could add these lines at the bottom of :file:`wsgi.py`::
 You could also replace the Django WSGI application with a custom WSGI
 application that later delegates to the Django WSGI application, if you want
 to combine a Django application with a WSGI application of another framework.
-
-.. _`WSGI middleware`: https://www.python.org/dev/peps/pep-3333/#middleware-components-that-play-both-sides

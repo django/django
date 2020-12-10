@@ -31,6 +31,7 @@ Simple generic views
 * :meth:`~django.views.generic.base.View.dispatch`
 * ``head()``
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
+* :meth:`~django.views.generic.base.View.setup`
 
 ``TemplateView``
 ----------------
@@ -55,6 +56,7 @@ Simple generic views
 * ``head()``
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
+* :meth:`~django.views.generic.base.View.setup`
 
 ``RedirectView``
 ----------------
@@ -80,6 +82,7 @@ Simple generic views
 * ``options()``
 * ``post()``
 * ``put()``
+* :meth:`~django.views.generic.base.View.setup`
 
 Detail Views
 ============
@@ -97,6 +100,7 @@ Detail Views
 * :attr:`~django.views.generic.base.View.http_method_names`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.model`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
+* :attr:`~django.views.generic.detail.SingleObjectMixin.query_pk_and_slug`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_field` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`]
@@ -116,6 +120,7 @@ Detail Views
 * ``head()``
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
+* :meth:`~django.views.generic.base.View.setup`
 
 List Views
 ==========
@@ -154,6 +159,7 @@ List Views
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
 * :meth:`~django.views.generic.list.MultipleObjectMixin.paginate_queryset`
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
+* :meth:`~django.views.generic.base.View.setup`
 
 Editing views
 =============
@@ -189,6 +195,7 @@ Editing views
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
 * :meth:`~django.views.generic.edit.ProcessFormView.post`
 * :meth:`~django.views.generic.edit.ProcessFormView.put`
+* :meth:`~django.views.generic.base.View.setup`
 
 ``CreateView``
 --------------
@@ -207,6 +214,7 @@ Editing views
 * :attr:`~django.views.generic.detail.SingleObjectMixin.model`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
 * :attr:`~django.views.generic.edit.FormMixin.prefix` [:meth:`~django.views.generic.edit.FormMixin.get_prefix`]
+* :attr:`~django.views.generic.detail.SingleObjectMixin.query_pk_and_slug`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_field` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`]
@@ -233,6 +241,7 @@ Editing views
 * :meth:`~django.views.generic.edit.ProcessFormView.post`
 * ``put()``
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
+* :meth:`~django.views.generic.base.View.setup`
 
 ``UpdateView``
 --------------
@@ -251,6 +260,7 @@ Editing views
 * :attr:`~django.views.generic.detail.SingleObjectMixin.model`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
 * :attr:`~django.views.generic.edit.FormMixin.prefix` [:meth:`~django.views.generic.edit.FormMixin.get_prefix`]
+* :attr:`~django.views.generic.detail.SingleObjectMixin.query_pk_and_slug`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_field` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`]
@@ -277,6 +287,7 @@ Editing views
 * :meth:`~django.views.generic.edit.ProcessFormView.post`
 * ``put()``
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
+* :meth:`~django.views.generic.base.View.setup`
 
 ``DeleteView``
 --------------
@@ -291,6 +302,7 @@ Editing views
 * :attr:`~django.views.generic.base.View.http_method_names`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.model`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
+* :attr:`~django.views.generic.detail.SingleObjectMixin.query_pk_and_slug`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_field` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`]
@@ -313,6 +325,7 @@ Editing views
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
 * ``post()``
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
+* :meth:`~django.views.generic.base.View.setup`
 
 Date-based views
 ================
@@ -356,6 +369,7 @@ Date-based views
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
 * :meth:`~django.views.generic.list.MultipleObjectMixin.paginate_queryset`
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
+* :meth:`~django.views.generic.base.View.setup`
 
 ``YearArchiveView``
 -------------------
@@ -399,6 +413,7 @@ Date-based views
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
 * :meth:`~django.views.generic.list.MultipleObjectMixin.paginate_queryset`
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
+* :meth:`~django.views.generic.base.View.setup`
 
 ``MonthArchiveView``
 --------------------
@@ -445,6 +460,7 @@ Date-based views
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
 * :meth:`~django.views.generic.list.MultipleObjectMixin.paginate_queryset`
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
+* :meth:`~django.views.generic.base.View.setup`
 
 ``WeekArchiveView``
 -------------------
@@ -489,6 +505,7 @@ Date-based views
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
 * :meth:`~django.views.generic.list.MultipleObjectMixin.paginate_queryset`
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
+* :meth:`~django.views.generic.base.View.setup`
 
 ``DayArchiveView``
 ------------------
@@ -539,6 +556,7 @@ Date-based views
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
 * :meth:`~django.views.generic.list.MultipleObjectMixin.paginate_queryset`
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
+* :meth:`~django.views.generic.base.View.setup`
 
 ``TodayArchiveView``
 --------------------
@@ -589,6 +607,7 @@ Date-based views
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
 * :meth:`~django.views.generic.list.MultipleObjectMixin.paginate_queryset`
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
+* :meth:`~django.views.generic.base.View.setup`
 
 ``DateDetailView``
 ------------------
@@ -609,6 +628,7 @@ Date-based views
 * :attr:`~django.views.generic.dates.MonthMixin.month` [:meth:`~django.views.generic.dates.MonthMixin.get_month`]
 * :attr:`~django.views.generic.dates.MonthMixin.month_format` [:meth:`~django.views.generic.dates.MonthMixin.get_month_format`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
+* :attr:`~django.views.generic.detail.SingleObjectMixin.query_pk_and_slug`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_field` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`]
@@ -634,3 +654,4 @@ Date-based views
 * ``head()``
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
+* :meth:`~django.views.generic.base.View.setup`

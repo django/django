@@ -1,23 +1,57 @@
+import sys
 from datetime import date
 from unittest import mock
 
 from django.contrib.auth import (
-    BACKEND_SESSION_KEY, SESSION_KEY, authenticate, get_user, signals,
+    BACKEND_SESSION_KEY, SESSION_KEY, _clean_credentials, authenticate,
+    get_user, signals,
 )
-from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth.backends import BaseBackend, ModelBackend
 from django.contrib.auth.hashers import MD5PasswordHasher
 from django.contrib.auth.models import AnonymousUser, Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpRequest
 from django.test import (
-    SimpleTestCase, TestCase, modify_settings, override_settings,
+    RequestFactory, SimpleTestCase, TestCase, modify_settings,
+    override_settings,
 )
+from django.views.debug import technical_500_response
+from django.views.decorators.debug import sensitive_variables
 
 from .models import (
     CustomPermissionsUser, CustomUser, CustomUserWithoutIsActiveField,
     ExtensionUser, UUIDUser,
 )
+
+
+class SimpleBackend(BaseBackend):
+    def get_user_permissions(self, user_obj, obj=None):
+        return ['user_perm']
+
+    def get_group_permissions(self, user_obj, obj=None):
+        return ['group_perm']
+
+
+@override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.SimpleBackend'])
+class BaseBackendTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user('test', 'test@example.com', 'test')
+
+    def test_get_user_permissions(self):
+        self.assertEqual(self.user.get_user_permissions(), {'user_perm'})
+
+    def test_get_group_permissions(self):
+        self.assertEqual(self.user.get_group_permissions(), {'group_perm'})
+
+    def test_get_all_permissions(self):
+        self.assertEqual(self.user.get_all_permissions(), {'user_perm', 'group_perm'})
+
+    def test_has_perm(self):
+        self.assertIs(self.user.has_perm('user_perm'), True)
+        self.assertIs(self.user.has_perm('group_perm'), True)
+        self.assertIs(self.user.has_perm('other_perm', TestObj()), False)
 
 
 class CountingMD5PasswordHasher(MD5PasswordHasher):
@@ -80,6 +114,7 @@ class BaseModelBackendTest:
         # reloading user to purge the _perm_cache
         user = self.UserModel._default_manager.get(pk=self.user.pk)
         self.assertEqual(user.get_all_permissions(), {'auth.test'})
+        self.assertEqual(user.get_user_permissions(), {'auth.test'})
         self.assertEqual(user.get_group_permissions(), set())
         self.assertIs(user.has_module_perms('Group'), False)
         self.assertIs(user.has_module_perms('auth'), True)
@@ -89,7 +124,8 @@ class BaseModelBackendTest:
         perm = Permission.objects.create(name='test3', content_type=content_type, codename='test3')
         user.user_permissions.add(perm)
         user = self.UserModel._default_manager.get(pk=self.user.pk)
-        self.assertEqual(user.get_all_permissions(), {'auth.test2', 'auth.test', 'auth.test3'})
+        expected_user_perms = {'auth.test2', 'auth.test', 'auth.test3'}
+        self.assertEqual(user.get_all_permissions(), expected_user_perms)
         self.assertIs(user.has_perm('test'), False)
         self.assertIs(user.has_perm('auth.test'), True)
         self.assertIs(user.has_perms(['auth.test2', 'auth.test3']), True)
@@ -99,8 +135,8 @@ class BaseModelBackendTest:
         group.permissions.add(perm)
         user.groups.add(group)
         user = self.UserModel._default_manager.get(pk=self.user.pk)
-        exp = {'auth.test2', 'auth.test', 'auth.test3', 'auth.test_group'}
-        self.assertEqual(user.get_all_permissions(), exp)
+        self.assertEqual(user.get_all_permissions(), {*expected_user_perms, 'auth.test_group'})
+        self.assertEqual(user.get_user_permissions(), expected_user_perms)
         self.assertEqual(user.get_group_permissions(), {'auth.test_group'})
         self.assertIs(user.has_perms(['auth.test3', 'auth.test_group']), True)
 
@@ -138,7 +174,7 @@ class BaseModelBackendTest:
         group.permissions.add(group_perm)
 
         self.assertEqual(backend.get_all_permissions(user), {'auth.test_user', 'auth.test_group'})
-        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user', 'auth.test_group'})
+        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user'})
         self.assertEqual(backend.get_group_permissions(user), {'auth.test_group'})
 
         with mock.patch.object(self.UserModel, 'is_anonymous', True):
@@ -164,7 +200,7 @@ class BaseModelBackendTest:
         group.permissions.add(group_perm)
 
         self.assertEqual(backend.get_all_permissions(user), {'auth.test_user', 'auth.test_group'})
-        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user', 'auth.test_group'})
+        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user'})
         self.assertEqual(backend.get_group_permissions(user), {'auth.test_group'})
 
         user.is_active = False
@@ -194,6 +230,19 @@ class BaseModelBackendTest:
         CountingMD5PasswordHasher.calls = 0
         authenticate(username='no_such_user', password='test')
         self.assertEqual(CountingMD5PasswordHasher.calls, 1)
+
+    @override_settings(PASSWORD_HASHERS=['auth_tests.test_auth_backends.CountingMD5PasswordHasher'])
+    def test_authentication_without_credentials(self):
+        CountingMD5PasswordHasher.calls = 0
+        for credentials in (
+            {},
+            {'username': getattr(self.user, self.UserModel.USERNAME_FIELD)},
+            {'password': 'test'},
+        ):
+            with self.subTest(credentials=credentials):
+                with self.assertNumQueries(0):
+                    authenticate(**credentials)
+                self.assertEqual(CountingMD5PasswordHasher.calls, 0)
 
 
 class ModelBackendTest(BaseModelBackendTest, TestCase):
@@ -339,9 +388,7 @@ class SimpleRowlevelBackend:
         return False
 
     def has_module_perms(self, user, app_label):
-        if not user.is_anonymous and not user.is_active:
-            return False
-        return app_label == "app1"
+        return (user.is_anonymous or user.is_active) and app_label == 'app1'
 
     def get_all_permissions(self, user, obj=None):
         if not obj:
@@ -378,10 +425,11 @@ class RowlevelBackendTest(TestCase):
     Tests for auth backend that supports object level permissions
     """
 
-    def setUp(self):
-        self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
-        self.user2 = User.objects.create_user('test2', 'test2@example.com', 'test')
-        self.user3 = User.objects.create_user('test3', 'test3@example.com', 'test')
+    @classmethod
+    def setUpTestData(cls):
+        cls.user1 = User.objects.create_user('test', 'test@example.com', 'test')
+        cls.user2 = User.objects.create_user('test2', 'test2@example.com', 'test')
+        cls.user3 = User.objects.create_user('test3', 'test3@example.com', 'test')
 
     def tearDown(self):
         # The get_group_permissions test messes with ContentTypes, which will
@@ -441,8 +489,9 @@ class NoBackendsTest(TestCase):
     """
     An appropriate error is raised if no auth backends are provided.
     """
-    def setUp(self):
-        self.user = User.objects.create_user('test', 'test@example.com', 'test')
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user('test', 'test@example.com', 'test')
 
     def test_raises_exception(self):
         msg = (
@@ -459,10 +508,11 @@ class InActiveUserBackendTest(TestCase):
     Tests for an inactive user
     """
 
-    def setUp(self):
-        self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
-        self.user1.is_active = False
-        self.user1.save()
+    @classmethod
+    def setUpTestData(cls):
+        cls.user1 = User.objects.create_user('test', 'test@example.com', 'test')
+        cls.user1.is_active = False
+        cls.user1.save()
 
     def test_has_perm(self):
         self.assertIs(self.user1.has_perm('perm', TestObj()), False)
@@ -494,8 +544,11 @@ class PermissionDeniedBackendTest(TestCase):
     """
     backend = 'auth_tests.test_auth_backends.PermissionDeniedBackend'
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.user1 = User.objects.create_user('test', 'test@example.com', 'test')
+
     def setUp(self):
-        self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
         self.user_login_failed = []
         signals.user_login_failed.connect(self.user_login_failed_listener)
 
@@ -549,8 +602,9 @@ class ChangedBackendSettingsTest(TestCase):
     TEST_PASSWORD = 'test_password'
     TEST_EMAIL = 'test@example.com'
 
-    def setUp(self):
-        User.objects.create_user(self.TEST_USERNAME, self.TEST_EMAIL, self.TEST_PASSWORD)
+    @classmethod
+    def setUpTestData(cls):
+        User.objects.create_user(cls.TEST_USERNAME, cls.TEST_EMAIL, cls.TEST_PASSWORD)
 
     @override_settings(AUTHENTICATION_BACKENDS=[backend])
     def test_changed_backend_settings(self):
@@ -561,8 +615,8 @@ class ChangedBackendSettingsTest(TestCase):
         # Get a session for the test user
         self.assertTrue(self.client.login(
             username=self.TEST_USERNAME,
-            password=self.TEST_PASSWORD)
-        )
+            password=self.TEST_PASSWORD,
+        ))
         # Prepare a request object
         request = HttpRequest()
         request.session = self.client.session
@@ -583,6 +637,7 @@ class TypeErrorBackend:
     Always raises TypeError.
     """
 
+    @sensitive_variables('password')
     def authenticate(self, request, username=None, password=None):
         raise TypeError
 
@@ -593,15 +648,60 @@ class SkippedBackend:
         pass
 
 
+class SkippedBackendWithDecoratedMethod:
+    @sensitive_variables()
+    def authenticate(self):
+        pass
+
+
 class AuthenticateTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user1 = User.objects.create_user('test', 'test@example.com', 'test')
+
     def setUp(self):
-        self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
+        self.sensitive_password = 'mypassword'
 
     @override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.TypeErrorBackend'])
     def test_type_error_raised(self):
         """A TypeError within a backend is propagated properly (#18171)."""
         with self.assertRaises(TypeError):
             authenticate(username='test', password='test')
+
+    @override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.TypeErrorBackend'])
+    def test_authenticate_sensitive_variables(self):
+        try:
+            authenticate(username='testusername', password=self.sensitive_password)
+        except TypeError:
+            exc_info = sys.exc_info()
+        rf = RequestFactory()
+        response = technical_500_response(rf.get('/'), *exc_info)
+        self.assertNotContains(response, self.sensitive_password, status_code=500)
+        self.assertContains(response, 'TypeErrorBackend', status_code=500)
+        self.assertContains(
+            response,
+            '<tr><td>credentials</td><td class="code">'
+            '<pre>&#39;********************&#39;</pre></td></tr>',
+            html=True,
+            status_code=500,
+        )
+
+    def test_clean_credentials_sensitive_variables(self):
+        try:
+            # Passing in a list to cause an exception
+            _clean_credentials([1, self.sensitive_password])
+        except TypeError:
+            exc_info = sys.exc_info()
+        rf = RequestFactory()
+        response = technical_500_response(rf.get('/'), *exc_info)
+        self.assertNotContains(response, self.sensitive_password, status_code=500)
+        self.assertContains(
+            response,
+            '<tr><td>credentials</td><td class="code">'
+            '<pre>&#39;********************&#39;</pre></td></tr>',
+            html=True,
+            status_code=500,
+        )
 
     @override_settings(AUTHENTICATION_BACKENDS=(
         'auth_tests.test_auth_backends.SkippedBackend',
@@ -614,14 +714,24 @@ class AuthenticateTests(TestCase):
         """
         self.assertEqual(authenticate(username='test', password='test'), self.user1)
 
+    @override_settings(AUTHENTICATION_BACKENDS=(
+        'auth_tests.test_auth_backends.SkippedBackendWithDecoratedMethod',
+        'django.contrib.auth.backends.ModelBackend',
+    ))
+    def test_skips_backends_with_decorated_method(self):
+        self.assertEqual(authenticate(username='test', password='test'), self.user1)
+
 
 class ImproperlyConfiguredUserModelTest(TestCase):
     """
     An exception from within get_user_model() is propagated and doesn't
     raise an UnboundLocalError (#21439).
     """
+    @classmethod
+    def setUpTestData(cls):
+        cls.user1 = User.objects.create_user('test', 'test@example.com', 'test')
+
     def setUp(self):
-        self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
         self.client.login(username='test', password='test')
 
     @override_settings(AUTH_USER_MODEL='thismodel.doesntexist')
@@ -696,6 +806,15 @@ class SelectingBackendTests(TestCase):
         )
         with self.assertRaisesMessage(ValueError, expected_message):
             self.client._login(user)
+
+    def test_non_string_backend(self):
+        user = User.objects.create_user(self.username, 'email', self.password)
+        expected_message = (
+            'backend must be a dotted import path string (got '
+            '<class \'django.contrib.auth.backends.ModelBackend\'>).'
+        )
+        with self.assertRaisesMessage(TypeError, expected_message):
+            self.client._login(user, backend=ModelBackend)
 
     @override_settings(AUTHENTICATION_BACKENDS=[backend, other_backend])
     def test_backend_path_login_with_explicit_backends(self):

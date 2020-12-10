@@ -10,9 +10,9 @@ distributing. In this document, we will be building a custom ``closepoll``
 command for the ``polls`` application from the
 :doc:`tutorial</intro/tutorial01>`.
 
-To do this, just add a ``management/commands`` directory to the application.
-Django will register a ``manage.py`` command for each Python module in that
-directory whose name doesn't begin with an underscore. For example::
+To do this, add a ``management/commands`` directory to the application. Django
+will register a ``manage.py`` command for each Python module in that directory
+whose name doesn't begin with an underscore. For example::
 
     polls/
         __init__.py
@@ -51,10 +51,10 @@ look like this::
         help = 'Closes the specified poll for voting'
 
         def add_arguments(self, parser):
-            parser.add_argument('poll_id', nargs='+', type=int)
+            parser.add_argument('poll_ids', nargs='+', type=int)
 
         def handle(self, *args, **options):
-            for poll_id in options['poll_id']:
+            for poll_id in options['poll_ids']:
                 try:
                     poll = Poll.objects.get(pk=poll_id)
                 except Poll.DoesNotExist:
@@ -79,12 +79,12 @@ look like this::
         self.stdout.write("Unterminated line", ending='')
 
 The new custom command can be called using ``python manage.py closepoll
-<poll_id>``.
+<poll_ids>``.
 
 The ``handle()`` method takes one or more ``poll_ids`` and sets ``poll.opened``
 to ``False`` for each one. If the user referenced any nonexistent polls, a
 :exc:`CommandError` is raised. The ``poll.opened`` attribute does not exist in
-the :doc:`tutorial</intro/tutorial01>` and was added to
+the :doc:`tutorial</intro/tutorial02>` and was added to
 ``polls.models.Question`` for this example.
 
 .. _custom-commands-options:
@@ -99,13 +99,12 @@ options can be added in the :meth:`~BaseCommand.add_arguments` method like this:
     class Command(BaseCommand):
         def add_arguments(self, parser):
             # Positional arguments
-            parser.add_argument('poll_id', nargs='+', type=int)
+            parser.add_argument('poll_ids', nargs='+', type=int)
 
             # Named (optional) arguments
             parser.add_argument(
                 '--delete',
                 action='store_true',
-                dest='delete',
                 help='Delete poll instead of closing it',
             )
 
@@ -128,58 +127,48 @@ such as :option:`--verbosity` and :option:`--traceback`.
 Management commands and locales
 ===============================
 
-By default, the :meth:`BaseCommand.execute` method deactivates translations
-because some commands shipped with Django perform several tasks (for example,
-user-facing content rendering and database population) that require a
-project-neutral string language.
+By default, management commands are executed with the current active locale.
 
-If, for some reason, your custom management command needs to use a fixed locale,
-you should manually activate and deactivate it in your
-:meth:`~BaseCommand.handle` method using the functions provided by the I18N
-support code::
+If, for some reason, your custom management command must run without an active
+locale (for example, to prevent translated content from being inserted into
+the database), deactivate translations using the ``@no_translations``
+decorator on your :meth:`~BaseCommand.handle` method::
 
-    from django.core.management.base import BaseCommand, CommandError
-    from django.utils import translation
+    from django.core.management.base import BaseCommand, no_translations
 
     class Command(BaseCommand):
         ...
 
+        @no_translations
         def handle(self, *args, **options):
-
-            # Activate a fixed locale, e.g. Russian
-            translation.activate('ru')
-
-            # Or you can activate the LANGUAGE_CODE # chosen in the settings:
-            from django.conf import settings
-            translation.activate(settings.LANGUAGE_CODE)
-
-            # Your command logic here
             ...
 
-            translation.deactivate()
-
-Another need might be that your command simply should use the locale set in
-settings and Django should be kept from deactivating it. You can achieve
-it by using the :data:`BaseCommand.leave_locale_alone` option.
-
-When working on the scenarios described above though, take into account that
-system management commands typically have to be very careful about running in
-non-uniform locales, so you might need to:
-
-* Make sure the :setting:`USE_I18N` setting is always ``True`` when running
-  the command (this is a good example of the potential problems stemming
-  from a dynamic runtime environment that Django commands avoid offhand by
-  deactivating translations).
-
-* Review the code of your command and the code it calls for behavioral
-  differences when locales are changed and evaluate its impact on
-  predictable behavior of your command.
+Since translation deactivation requires access to configured settings, the
+decorator can't be used for commands that work without configured settings.
 
 Testing
 =======
 
 Information on how to test custom management commands can be found in the
 :ref:`testing docs <topics-testing-management-commands>`.
+
+Overriding commands
+===================
+
+Django registers the built-in commands and then searches for commands in
+:setting:`INSTALLED_APPS` in reverse. During the search, if a command name
+duplicates an already registered command, the newly discovered command
+overrides the first.
+
+In other words, to override a command, the new command must have the same name
+and its app must be before the overridden command's app in
+:setting:`INSTALLED_APPS`.
+
+Management commands from third-party apps that have been unintentionally
+overridden can be made available under a new name by creating a new command in
+one of your project's apps (ordered before the third-party app in
+:setting:`INSTALLED_APPS`) which imports the ``Command`` of the overridden
+command.
 
 Command objects
 ===============
@@ -228,23 +217,15 @@ All attributes can be set in your derived class and can be used in
 
 .. attribute:: BaseCommand.requires_system_checks
 
-    A boolean; if ``True``, the entire Django project will be checked for
-    potential problems prior to executing the command. Default value is ``True``.
+    A list or tuple of tags, e.g. ``[Tags.staticfiles, Tags.models]``. System
+    checks registered in the chosen tags will be checked for errors prior to
+    executing the command. The value ``'__all__'`` can be used to specify
+    that all system checks should be performed. Default value is ``'__all__'``.
 
-.. attribute:: BaseCommand.leave_locale_alone
+    .. versionchanged:: 3.2
 
-    A boolean indicating whether the locale set in settings should be preserved
-    during the execution of the command instead of being forcibly set to 'en-us'.
-
-    Default value is ``False``.
-
-    Make sure you know what you are doing if you decide to change the value of
-    this option in your custom command if it creates database content that
-    is locale-sensitive and such content shouldn't contain any translations
-    (like it happens e.g. with :mod:`django.contrib.auth` permissions) as
-    making the locale differ from the de facto default 'en-us' might cause
-    unintended effects. See the `Management commands and locales`_ section
-    above for further details.
+        In older versions, the ``requires_system_checks`` attribute expects a
+        boolean value instead of a list or tuple of tags.
 
 .. attribute:: BaseCommand.style
 
@@ -275,6 +256,15 @@ the :meth:`~BaseCommand.handle` method must be implemented.
             def __init__(self, *args, **kwargs):
                 super().__init__(*args, **kwargs)
                 # ...
+
+.. method:: BaseCommand.create_parser(prog_name, subcommand, **kwargs)
+
+    Returns a ``CommandParser`` instance, which is an
+    :class:`~argparse.ArgumentParser` subclass with a few customizations for
+    Django.
+
+    You can customize the instance by overriding this method and calling
+    ``super()`` with ``kwargs`` of :class:`~argparse.ArgumentParser` parameters.
 
 .. method:: BaseCommand.add_arguments(parser)
 
@@ -359,7 +349,7 @@ Rather than implementing :meth:`~BaseCommand.handle`, subclasses must implement
 Command exceptions
 ------------------
 
-.. exception:: CommandError
+.. exception:: CommandError(returncode=1)
 
 Exception class indicating a problem while executing a management command.
 
@@ -367,8 +357,14 @@ If this exception is raised during the execution of a management command from a
 command line console, it will be caught and turned into a nicely-printed error
 message to the appropriate output stream (i.e., stderr); as a result, raising
 this exception (with a sensible description of the error) is the preferred way
-to indicate that something has gone wrong in the execution of a command.
+to indicate that something has gone wrong in the execution of a command. It
+accepts the optional ``returncode`` argument to customize the exit status for
+the management command to exit with, using :func:`sys.exit`.
 
 If a management command is called from code through
 :func:`~django.core.management.call_command`, it's up to you to catch the
 exception when needed.
+
+.. versionchanged:: 3.1
+
+    The ``returncode`` argument was added.

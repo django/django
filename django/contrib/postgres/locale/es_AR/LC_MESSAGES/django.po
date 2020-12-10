@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Ramiro Morales, 2015-2017
+# Ramiro Morales, 2015-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-02-23 14:23+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgid "PostgreSQL extensions"
 msgstr "Extensiones PostgreSQL"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
+msgid "Item %(nth)s in the array did not validate:"
 msgstr "La validación del ítem %(nth)s del arreglo falló:"
 
 msgid "Nested arrays must have the same length."
@@ -31,24 +31,14 @@ msgid "Map of strings to strings/nulls"
 msgstr "Mapa de cadenas a cadenas/nulos"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "El valor de \"%(key)s\" no es una cadena o nulo."
-
-msgid "A JSON object"
-msgstr "Un objeto JSON"
-
-msgid "Value must be valid JSON."
-msgstr "El valor debe ser JSON valido."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "El valor de \"%(key)s” no es una cadena o nulo."
 
 msgid "Could not load JSON data."
 msgstr "No se han podido cargar los datos JSON."
 
 msgid "Input must be a JSON dictionary."
 msgstr "debe ser un diccionario JSON."
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "El valor de '%(value)s' debe ser JSON valido."
 
 msgid "Enter two valid values."
 msgstr "Introduzca dos valores válidos."
@@ -57,7 +47,7 @@ msgid "The start of the range must not exceed the end of the range."
 msgstr "El inicio del rango no debe ser mayor que el fin del rango."
 
 msgid "Enter two whole numbers."
-msgstr "Introduzca don números enteros."
+msgstr "Introduzca dos números enteros."
 
 msgid "Enter two numbers."
 msgstr "Introduzca dos números."
@@ -76,10 +66,10 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no more than "
 "%(limit_value)d."
 msgstr[0] ""
-"La lista contiene %(show_value)d item, debe contener no mas de "
+"La lista contiene %(show_value)d ítem, debe contener no mas de "
 "%(limit_value)d."
 msgstr[1] ""
-"La lista contiene %(show_value)d items, debe contener no mas de "
+"La lista contiene %(show_value)d ítems, debe contener no mas de "
 "%(limit_value)d."
 
 #, python-format
@@ -90,10 +80,10 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no fewer than "
 "%(limit_value)d."
 msgstr[0] ""
-"La lista contiene %(show_value)d item, debe contener no mas de "
+"La lista contiene %(show_value)d ítem, debe contener no mas de "
 "%(limit_value)d."
 msgstr[1] ""
-"La lista contiene %(show_value)d items, debe contener no menos de "
+"La lista contiene %(show_value)d ítems, debe contener no menos de "
 "%(limit_value)d."
 
 #, python-format

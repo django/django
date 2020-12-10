@@ -1,18 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Daniel Ursache-Dogariu <contact@danniel.net>, 2011
+# Bogdan Mateescu, 2018
+# Daniel Ursache-Dogariu, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011
+# Eugenol Man <neatusebastian@gmail.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Răzvan Ionescu <ionescu77@gmail.com>, 2015
-# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016
+# razvan ionescu <ionescu77@gmail.com>, 2015
+# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:39+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-07-15 11:11+0000\n"
+"Last-Translator: Eugenol Man <neatusebastian@gmail.com>\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -58,8 +60,8 @@ msgid "Invalid password format or unknown hashing algorithm."
 msgstr ""
 "Parolă nu are formatarea corectă sau algoritmul de criptare nu este cunoscut."
 
-msgid "The two password fields didn't match."
-msgstr "Cele două câmpuri pentru parole nu coincid."
+msgid "The two password fields didn’t match."
+msgstr "Cele două parole nu corespund."
 
 msgid "Password"
 msgstr "Parolă"
@@ -71,21 +73,19 @@ msgid "Enter the same password as before, for verification."
 msgstr "Introduceți parola precedentă pentru confirmare."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Parolele nu sunt stocate în clar, deci nu există nici o metodă de a vedea "
-"care este parola unui utilizator, dar puteți schimba parola utilizând <a "
-"href=\"../password/\">acest formular</a>."
+"Parolele nu sunt salvate în clar așa că nu poți vedea parola. O poți schimba "
+"<a href=\"{}\">de aici</a>."
 
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
-"Introduceți vă rog un %(username)s corect și o parolă. De remarcat că ambele "
-"țint cont de capitalizare."
+"Introduceți vă rog un %(username)s corect și o parolă. Reţineţi că ambele "
+"câmpuri pot fi sensibile la litere mari şi mici."
 
 msgid "This account is inactive."
 msgstr "Acest cont este inactiv."
@@ -121,19 +121,19 @@ msgid "hash"
 msgstr "hash"
 
 msgid "variety"
-msgstr ""
+msgstr "varietate"
 
 msgid "version"
-msgstr ""
+msgstr "versiune"
 
 msgid "memory cost"
-msgstr ""
+msgstr "memorie necesară"
 
 msgid "time cost"
-msgstr ""
+msgstr "timp necesar"
 
 msgid "parallelism"
-msgstr ""
+msgstr "paralelism"
 
 msgid "work factor"
 msgstr "factor de efort"
@@ -190,6 +190,8 @@ msgstr "nume utilizator"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"Obligatoriu. 150 de caractere sau mai puține. Numai litere, cifre și @/./+/-/"
+"_."
 
 msgid "A user with that username already exists."
 msgstr "Un utilizator cu acest nume de utilizator există deja."
@@ -218,8 +220,8 @@ msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"Marchează dacă acest utilizator trebuie tratat ca activ sau nu. Deselectați "
-"în loc de a șterge conturi."
+"Desemnează dacă acest utilizator trebuie tratat ca activ. Deselectaţi "
+"această opţiune în loc să ştergeţi conturi."
 
 msgid "date joined"
 msgstr "data înscrierii"
@@ -244,7 +246,7 @@ msgstr[1] ""
 "Parola este prea scurtă. Trebuie să conțină cel puțin %(min_length)d "
 "caractere."
 msgstr[2] ""
-"Parola este prea scurtă. Trebuie să conțină cel puțin %(min_length)d "
+"Parola este prea scurtă. Trebuie să conțină cel puțin %(min_length)d de "
 "caractere."
 
 #, python-format
@@ -252,28 +254,28 @@ msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "Parola trebuie să conțină cel puțin %(min_length)d caracter."
 msgstr[1] "Parola trebuie să conțină cel puțin %(min_length)d caractere."
-msgstr[2] "Parola trebuie să conțină cel puțin %(min_length)d caractere."
+msgstr[2] "Parola trebuie să conțină cel puțin %(min_length)d de caractere."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Parola este prea asemănătoare cu %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
-"Se recomandă ca parola să nu conțină elemente similare cu datele de "
-"identificare personală."
+"Nu este recomandabil ca parola sa fie asemănătoare cu celelalte date "
+"personale."
 
 msgid "This password is too common."
 msgstr "Această parolă este prea răspândită."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Parola Dvs. nu poate fi o parolă folosită în mod uzual."
+msgid "Your password can’t be a commonly used password."
+msgstr "Parola nu poate fi atât de comună. "
 
 msgid "This password is entirely numeric."
 msgstr "Acestă parolă este compusă exclusiv din elemente numerice."
 
-msgid "Your password can't be entirely numeric."
-msgstr "Parola Dvs. nu poate fi alcătuită exclusiv din elemente numerice."
+msgid "Your password can’t be entirely numeric."
+msgstr "Parola nu poate fi doar cu numere."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
@@ -283,11 +285,15 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Vă rugăm să folosiți un nume acceptat. Această valoare poate conține doar "
+"litere, cifre și caracterele @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Vă rugăm să folosiți un nume acceptat. Această valoare poate conține doar "
+"litere, cifre și caracterele @/./+/-/_"
 
 msgid "Logged out"
 msgstr "Deautentificat"

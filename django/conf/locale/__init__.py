@@ -20,6 +20,12 @@ LANG_INFO = {
         'name': 'Arabic',
         'name_local': 'العربيّة',
     },
+    'ar-dz': {
+        'bidi': True,
+        'code': 'ar-dz',
+        'name': 'Algerian Arabic',
+        'name_local': 'العربية الجزائرية',
+    },
     'ast': {
         'bidi': False,
         'code': 'ast',
@@ -228,7 +234,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'hi',
         'name': 'Hindi',
-        'name_local': 'Hindi',
+        'name_local': 'हिंदी',
     },
     'hr': {
         'bidi': False,
@@ -248,6 +254,12 @@ LANG_INFO = {
         'name': 'Hungarian',
         'name_local': 'Magyar',
     },
+    'hy': {
+        'bidi': False,
+        'code': 'hy',
+        'name': 'Armenian',
+        'name_local': 'հայերեն',
+    },
     'ia': {
         'bidi': False,
         'code': 'ia',
@@ -265,6 +277,12 @@ LANG_INFO = {
         'code': 'id',
         'name': 'Indonesian',
         'name_local': 'Bahasa Indonesia',
+    },
+    'ig': {
+        'bidi': False,
+        'code': 'ig',
+        'name': 'Igbo',
+        'name_local': 'Asụsụ Ìgbò',
     },
     'is': {
         'bidi': False,
@@ -290,6 +308,12 @@ LANG_INFO = {
         'name': 'Georgian',
         'name_local': 'ქართული',
     },
+    'kab': {
+        'bidi': False,
+        'code': 'kab',
+        'name': 'Kabyle',
+        'name_local': 'taqbaylit',
+    },
     'kk': {
         'bidi': False,
         'code': 'kk',
@@ -313,6 +337,12 @@ LANG_INFO = {
         'code': 'ko',
         'name': 'Korean',
         'name_local': '한국어',
+    },
+    'ky': {
+        'bidi': False,
+        'code': 'ky',
+        'name': 'Kyrgyz',
+        'name_local': 'Кыргызча',
     },
     'lb': {
         'bidi': False,
@@ -342,7 +372,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'ml',
         'name': 'Malayalam',
-        'name_local': 'Malayalam',
+        'name_local': 'മലയാളം',
     },
     'mn': {
         'bidi': False,
@@ -488,11 +518,23 @@ LANG_INFO = {
         'name': 'Telugu',
         'name_local': 'తెలుగు',
     },
+    'tg': {
+        'bidi': False,
+        'code': 'tg',
+        'name': 'Tajik',
+        'name_local': 'тоҷикӣ',
+    },
     'th': {
         'bidi': False,
         'code': 'th',
         'name': 'Thai',
         'name_local': 'ภาษาไทย',
+    },
+    'tk': {
+        'bidi': False,
+        'code': 'tk',
+        'name': 'Turkmen',
+        'name_local': 'Türkmençe',
     },
     'tr': {
         'bidi': False,
@@ -523,6 +565,12 @@ LANG_INFO = {
         'code': 'ur',
         'name': 'Urdu',
         'name_local': 'اردو',
+    },
+    'uz': {
+        'bidi': False,
+        'code': 'uz',
+        'name': 'Uzbek',
+        'name_local': 'oʻzbek tili',
     },
     'vi': {
         'bidi': False,

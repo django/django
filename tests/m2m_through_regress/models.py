@@ -8,9 +8,6 @@ class Membership(models.Model):
     group = models.ForeignKey('Group', models.CASCADE)
     price = models.IntegerField(default=100)
 
-    def __str__(self):
-        return "%s is a member of %s" % (self.person.name, self.group.name)
-
 
 # using custom id column to test ticket #11107
 class UserMembership(models.Model):
@@ -18,9 +15,6 @@ class UserMembership(models.Model):
     user = models.ForeignKey(User, models.CASCADE)
     group = models.ForeignKey('Group', models.CASCADE)
     price = models.IntegerField(default=100)
-
-    def __str__(self):
-        return "%s is a user and member of %s" % (self.user.username, self.group.name)
 
 
 class Person(models.Model):
@@ -40,42 +34,23 @@ class Group(models.Model):
         return self.name
 
 
-# A set of models that use an non-abstract inherited model as the 'through' model.
-class A(models.Model):
-    a_text = models.CharField(max_length=20)
-
-
-class ThroughBase(models.Model):
-    a = models.ForeignKey(A, models.CASCADE)
-    b = models.ForeignKey('B', models.CASCADE)
-
-
-class Through(ThroughBase):
-    extra = models.CharField(max_length=20)
-
-
-class B(models.Model):
-    b_text = models.CharField(max_length=20)
-    a_list = models.ManyToManyField(A, through=Through)
-
-
 # Using to_field on the through model
 class Car(models.Model):
     make = models.CharField(max_length=20, unique=True, null=True)
     drivers = models.ManyToManyField('Driver', through='CarDriver')
 
     def __str__(self):
-        return "%s" % self.make
+        return str(self.make)
 
 
 class Driver(models.Model):
     name = models.CharField(max_length=20, unique=True, null=True)
 
-    def __str__(self):
-        return "%s" % self.name
-
     class Meta:
         ordering = ('name',)
+
+    def __str__(self):
+        return str(self.name)
 
 
 class CarDriver(models.Model):

@@ -3,7 +3,7 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lauris <lauris@runbox.com>, 2011
-# Matas Dailyda <matas@dailyda.com>, 2015-2017
+# Matas Dailyda <matas@dailyda.com>, 2015-2019
 # Nikolajus Krauklis <nikolajus@gmail.com>, 2013
 # Simonas Kazlauskas <simonas@kazlauskas.me>, 2012-2013
 # sirex <sirexas@gmail.com>, 2011
@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-30 14:04+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 10:32+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
 "lt/)\n"
@@ -20,8 +20,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: lt\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
-"%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < "
+"11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? "
+"1 : n % 1 != 0 ? 2: 3);\n"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -92,6 +93,15 @@ msgstr "Pridėti dar viena %(verbose_name)s"
 msgid "Remove"
 msgstr "Pašalinti"
 
+msgid "Addition"
+msgstr "Pridėjimas"
+
+msgid "Change"
+msgstr "Pakeisti"
+
+msgid "Deletion"
+msgstr "Pašalinimas"
+
 msgid "action time"
 msgstr "veiksmo laikas"
 
@@ -105,7 +115,7 @@ msgid "object id"
 msgstr "objekto id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "objekto repr"
 
@@ -171,10 +181,11 @@ msgstr ""
 "daugiau nei vieną."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"{name} \"{obj}\" buvo sėkmingai pridėtas. Galite jį vėl redaguoti žemiau."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" buvo sėkmingai pridėtas."
+
+msgid "You may edit it again below."
+msgstr "Galite tai dar kartą redaguoti žemiau."
 
 #, python-brace-format
 msgid ""
@@ -184,13 +195,15 @@ msgstr ""
 "{name} \"{obj}\" buvo sėkmingai pridėtas. Galite pridėti kitą {name} žemiau."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" buvo sėkmingai pridėtas."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr "{name} \"{obj}\" buvo sėkmingai pakeistas. Galite jį koreguoti žemiau."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"{name} \"{obj}\" buvo sėkmingai pridėtas. Galite jį vėl redaguoti žemiau."
 
 #, python-brace-format
 msgid ""
@@ -229,6 +242,10 @@ msgstr "Pridėti %s"
 msgid "Change %s"
 msgstr "Pakeisti %s"
 
+#, python-format
+msgid "View %s"
+msgstr "Peržiūrėti %s"
+
 msgid "Database error"
 msgstr "Duomenų bazės klaida"
 
@@ -238,6 +255,7 @@ msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s sėkmingai pakeistas."
 msgstr[1] "%(count)s %(name)s sėkmingai pakeisti."
 msgstr[2] "%(count)s %(name)s "
+msgstr[3] "%(count)s %(name)s "
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -245,6 +263,7 @@ msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s pasirinktas"
 msgstr[1] "%(total_count)s pasirinkti"
 msgstr[2] "Visi %(total_count)s pasirinkti"
+msgstr[3] "Visi %(total_count)s pasirinkti"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -339,7 +358,7 @@ msgid "Change password"
 msgstr "Keisti slaptažodį"
 
 msgid "Please correct the error below."
-msgstr "Ištaisykite žemiau esancias klaidas."
+msgstr "Prašome ištaisyti žemiau esančią klaidą."
 
 msgid "Please correct the errors below."
 msgstr "Ištaisykite žemiau esančias klaidas."
@@ -448,8 +467,8 @@ msgstr ""
 "Ar esate tikri, kad norite ištrinti pasirinktus %(objects_name)s? Sekantys "
 "pasirinkti bei susiję objektai bus ištrinti:"
 
-msgid "Change"
-msgstr "Pakeisti"
+msgid "View"
+msgstr "Peržiūrėti"
 
 msgid "Delete?"
 msgstr "Ištrinti?"
@@ -468,8 +487,8 @@ msgstr "%(name)s aplikacijos modeliai"
 msgid "Add"
 msgstr "Pridėti"
 
-msgid "You don't have permission to edit anything."
-msgstr "Neturite teisių ką nors keistis."
+msgid "You don't have permission to view or edit anything."
+msgstr "Jūs neturite teisių peržiūrai ir redagavimui."
 
 msgid "Recent actions"
 msgstr "Paskutiniai veiksmai"
@@ -525,20 +544,8 @@ msgstr "Rodyti visus"
 msgid "Save"
 msgstr "Išsaugoti"
 
-msgid "Popup closing..."
-msgstr "Langas užsidaro..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Keisti pasirinktus %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Pridėti dar vieną %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Pašalinti pasirinktus %(model)s"
+msgid "Popup closing…"
+msgstr "Iškylantysis langas užsidaro..."
 
 msgid "Search"
 msgstr "Ieškoti"
@@ -549,6 +556,7 @@ msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s rezultatas"
 msgstr[1] "%(counter)s rezultatai"
 msgstr[2] "%(counter)s rezultatai"
+msgstr[3] "%(counter)s rezultatai"
 
 #, python-format
 msgid "%(full_result_count)s total"
@@ -562,6 +570,24 @@ msgstr "Išsaugoti ir pridėti naują"
 
 msgid "Save and continue editing"
 msgstr "Išsaugoti ir tęsti redagavimą"
+
+msgid "Save and view"
+msgstr "Išsaugoti ir peržiūrėti"
+
+msgid "Close"
+msgstr "Uždaryti"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Keisti pasirinktus %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Pridėti dar vieną %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Pašalinti pasirinktus %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Dėkui už šiandien tinklalapyje turiningai praleistą laiką."
@@ -673,6 +699,10 @@ msgstr "Pasirinkti %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Pasirinkite %s kurį norite keisti"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Pasirinkti %s peržiūrai"
 
 msgid "Date:"
 msgstr "Data:"

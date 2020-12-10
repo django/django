@@ -1,0 +1,38 @@
+==========================
+Django 3.0.4 release notes
+==========================
+
+*March 4, 2020*
+
+Django 3.0.4 fixes a security issue and several bugs in 3.0.3.
+
+CVE-2020-9402: Potential SQL injection via ``tolerance`` parameter in GIS functions and aggregates on Oracle
+============================================================================================================
+
+GIS functions and aggregates on Oracle were subject to SQL injection,
+using a suitably crafted ``tolerance``.
+
+Bugfixes
+========
+
+* Fixed a data loss possibility when using caching from async code
+  (:ticket:`31253`).
+
+* Fixed a regression in Django 3.0 that caused a file response using a
+  temporary file to be closed incorrectly (:ticket:`31240`).
+
+* Fixed a data loss possibility in the
+  :meth:`~django.db.models.query.QuerySet.select_for_update`. When using
+  related fields or parent link fields with :ref:`multi-table-inheritance` in
+  the ``of`` argument, the corresponding models were not locked
+  (:ticket:`31246`).
+
+* Fixed a regression in Django 3.0 that caused misplacing parameters in logged
+  SQL queries on Oracle (:ticket:`31271`).
+
+* Fixed a regression in Django 3.0.3 that caused misplacing parameters of SQL
+  queries when subtracting ``DateField`` or ``DateTimeField`` expressions on
+  MySQL (:ticket:`31312`).
+
+* Fixed a regression in Django 3.0 that didn't include subqueries spanning
+  multivalued relations in the ``GROUP BY`` clause (:ticket:`31150`).

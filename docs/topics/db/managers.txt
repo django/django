@@ -135,9 +135,9 @@ With this sample model, ``Book.objects.all()`` will return all books in the
 database, but ``Book.dahl_objects.all()`` will only return the ones written by
 Roald Dahl.
 
-Of course, because ``get_queryset()`` returns a ``QuerySet`` object, you can
-use ``filter()``, ``exclude()`` and all the other ``QuerySet`` methods on it.
-So these statements are all legal::
+Because ``get_queryset()`` returns a ``QuerySet`` object, you can use
+``filter()``, ``exclude()`` and all the other ``QuerySet`` methods on it. So
+these statements are all legal::
 
     Book.dahl_objects.all()
     Book.dahl_objects.filter(title='Matilda')
@@ -145,8 +145,8 @@ So these statements are all legal::
 
 This example also pointed out another interesting technique: using multiple
 managers on the same model. You can attach as many ``Manager()`` instances to
-a model as you'd like. This is an easy way to define common "filters" for your
-models.
+a model as you'd like. This is a non-repetitive way to define common "filters"
+for your models.
 
 For example::
 
@@ -161,7 +161,7 @@ For example::
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
-        role = models.CharField(max_length=1, choices=(('A', _('Author')), ('E', _('Editor'))))
+        role = models.CharField(max_length=1, choices=[('A', _('Author')), ('E', _('Editor'))])
         people = models.Manager()
         authors = AuthorManager()
         editors = EditorManager()
@@ -214,11 +214,13 @@ appropriate for your circumstances, you can tell Django which class to use by
 setting :attr:`Meta.base_manager_name
 <django.db.models.Options.base_manager_name>`.
 
-Manager's aren't used when querying on related models. For example, if the
-``Question`` model :ref:`from the tutorial <creating-models>` had a ``deleted``
-field and a base manager that filters out instances with ``deleted=True``, a
-queryset like ``Choice.objects.filter(question__name__startswith='What')``
-would include choices related to deleted questions.
+Base managers aren't used when querying on related models, or when
+:ref:`accessing a one-to-many or many-to-many relationship
+<backwards-related-objects>`. For example, if the ``Question`` model
+:ref:`from the tutorial <creating-models>` had a ``deleted`` field and a base
+manager that filters out instances with ``deleted=True``, a queryset like
+``Choice.objects.filter(question__name__startswith='What')`` would include
+choices related to deleted questions.
 
 Don't filter away any results in this type of manager subclass
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -228,9 +230,8 @@ model. In those situations, Django has to be able to see all the objects for
 the model it is fetching, so that *anything* which is referred to can be
 retrieved.
 
-If you override the ``get_queryset()`` method and filter out any rows, Django
-will return incorrect results. Don't do that. A manager that filters results
-in ``get_queryset()`` is not appropriate for use as a base manager.
+Therefore, you should not override ``get_queryset()`` to filter out any rows.
+If you do so, Django will return incomplete results.
 
 .. _calling-custom-queryset-methods-from-manager:
 
@@ -261,7 +262,7 @@ custom ``QuerySet`` if you also implement them on the ``Manager``::
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
-        role = models.CharField(max_length=1, choices=(('A', _('Author')), ('E', _('Editor'))))
+        role = models.CharField(max_length=1, choices=[('A', _('Author')), ('E', _('Editor'))])
         people = PersonManager()
 
 This example allows you to call both ``authors()`` and ``editors()`` directly from
@@ -328,7 +329,7 @@ For advanced usage you might want both a custom ``Manager`` and a custom
 returns a *subclass* of your base ``Manager`` with a copy of the custom
 ``QuerySet`` methods::
 
-    class BaseManager(models.Manager):
+    class CustomManager(models.Manager):
         def manager_only_method(self):
             return
 
@@ -337,14 +338,14 @@ returns a *subclass* of your base ``Manager`` with a copy of the custom
             return
 
     class MyModel(models.Model):
-        objects = BaseManager.from_queryset(CustomQuerySet)()
+        objects = CustomManager.from_queryset(CustomQuerySet)()
 
 You may also store the generated class into a variable::
 
-    CustomManager = BaseManager.from_queryset(CustomQuerySet)
+    MyManager = CustomManager.from_queryset(CustomQuerySet)
 
     class MyModel(models.Model):
-        objects = CustomManager()
+        objects = MyManager()
 
 .. _custom-managers-and-inheritance:
 
@@ -396,7 +397,7 @@ manager, you can provide the default manager on the child class::
         default_manager = OtherManager()
 
 Here, ``default_manager`` is the default. The ``objects`` manager is
-still available, since it's inherited. It just isn't used as the default.
+still available, since it's inherited, but isn't used as the default.
 
 Finally for this example, suppose you want to add extra managers to the child
 class, but still use the default from ``AbstractBase``. You can't add the new

@@ -3,22 +3,23 @@
 # Translators:
 # Ali Nikneshan <ali@nikneshan.com>, 2011-2012
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
+# Fariman Ghaedi <farimanghaedi@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Reza Mohammadi <reza@teeleh.ir>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-08-16 13:53+0000\n"
-"Last-Translator: Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-17 01:03+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fa\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "Advanced options"
 msgstr "گزینه‌های پیشرفته"
@@ -30,15 +31,16 @@ msgid "URL"
 msgstr "نشانی اینترنتی"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"مثال: '/about/contact/'. مطمئن شوید که اسلش را هم در ابتدا و هم در انتها "
-"گذاشته‌اید."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr "این مقدار فقط باید حاوی حروف، اعداد، خط زیر، خط تیره و یا اسلش باشد."
+
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr ""
 
 msgid "URL is missing a leading slash."
 msgstr "در آدرس اسلش آغازین فراموش شده است."
@@ -63,11 +65,9 @@ msgid "template name"
 msgstr "نام قالب"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"مثال: 'flatpages/contact_page.html'. اگر این مشخص نشود، سیستم از 'flatpages/"
-"default.html' استفاده خواهد کرد."
 
 msgid "registration required"
 msgstr "عضویت لازم است"

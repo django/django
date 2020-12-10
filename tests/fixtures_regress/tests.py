@@ -2,8 +2,8 @@
 import json
 import os
 import re
-import warnings
 from io import StringIO
+from pathlib import Path
 
 from django.core import management, serializers
 from django.core.exceptions import ImproperlyConfigured
@@ -183,11 +183,11 @@ class TestFixtures(TestCase):
         Test for ticket #4371 -- Loading data of an unknown format should fail
         Validate that error conditions are caught correctly
         """
-        msg = "Problem installing fixture 'bad_fixture1': unkn is not a known serialization format."
+        msg = "Problem installing fixture 'bad_fix.ture1': unkn is not a known serialization format."
         with self.assertRaisesMessage(management.CommandError, msg):
             management.call_command(
                 'loaddata',
-                'bad_fixture1.unkn',
+                'bad_fix.ture1.unkn',
                 verbosity=0,
             )
 
@@ -199,7 +199,7 @@ class TestFixtures(TestCase):
         with self.assertRaisesMessage(ImportError, "No module named 'unexistent'"):
             management.call_command(
                 'loaddata',
-                'bad_fixture1.unkn',
+                'bad_fix.ture1.unkn',
                 verbosity=0,
             )
 
@@ -209,18 +209,12 @@ class TestFixtures(TestCase):
         using explicit filename.
         Test for ticket #18213 -- warning conditions are caught correctly
         """
-        with warnings.catch_warnings(record=True) as warning_list:
-            warnings.simplefilter("always")
+        msg = "No fixture data found for 'bad_fixture2'. (File format may be invalid.)"
+        with self.assertWarnsMessage(RuntimeWarning, msg):
             management.call_command(
                 'loaddata',
                 'bad_fixture2.xml',
                 verbosity=0,
-            )
-            warning = warning_list.pop()
-            self.assertEqual(warning.category, RuntimeWarning)
-            self.assertEqual(
-                str(warning.message),
-                "No fixture data found for 'bad_fixture2'. (File format may be invalid.)"
             )
 
     def test_invalid_data_no_ext(self):
@@ -229,18 +223,12 @@ class TestFixtures(TestCase):
         without file extension.
         Test for ticket #18213 -- warning conditions are caught correctly
         """
-        with warnings.catch_warnings(record=True) as warning_list:
-            warnings.simplefilter("always")
+        msg = "No fixture data found for 'bad_fixture2'. (File format may be invalid.)"
+        with self.assertWarnsMessage(RuntimeWarning, msg):
             management.call_command(
                 'loaddata',
                 'bad_fixture2',
                 verbosity=0,
-            )
-            warning = warning_list.pop()
-            self.assertEqual(warning.category, RuntimeWarning)
-            self.assertEqual(
-                str(warning.message),
-                "No fixture data found for 'bad_fixture2'. (File format may be invalid.)"
             )
 
     def test_empty(self):
@@ -248,35 +236,26 @@ class TestFixtures(TestCase):
         Test for ticket #18213 -- Loading a fixture file with no data output a warning.
         Previously empty fixture raises an error exception, see ticket #4371.
         """
-        with warnings.catch_warnings(record=True) as warning_list:
-            warnings.simplefilter("always")
+        msg = "No fixture data found for 'empty'. (File format may be invalid.)"
+        with self.assertWarnsMessage(RuntimeWarning, msg):
             management.call_command(
                 'loaddata',
                 'empty',
                 verbosity=0,
             )
-            warning = warning_list.pop()
-            self.assertEqual(warning.category, RuntimeWarning)
-            self.assertEqual(str(warning.message), "No fixture data found for 'empty'. (File format may be invalid.)")
 
     def test_error_message(self):
         """
         Regression for #9011 - error message is correct.
         Change from error to warning for ticket #18213.
         """
-        with warnings.catch_warnings(record=True) as warning_list:
-            warnings.simplefilter("always")
+        msg = "No fixture data found for 'bad_fixture2'. (File format may be invalid.)"
+        with self.assertWarnsMessage(RuntimeWarning, msg):
             management.call_command(
                 'loaddata',
                 'bad_fixture2',
                 'animal',
                 verbosity=0,
-            )
-            warning = warning_list.pop()
-            self.assertEqual(warning.category, RuntimeWarning)
-            self.assertEqual(
-                str(warning.message),
-                "No fixture data found for 'bad_fixture2'. (File format may be invalid.)"
             )
 
     def test_pg_sequence_resetting_checks(self):
@@ -539,6 +518,11 @@ class TestFixtures(TestCase):
             verbosity=0,
         )
 
+    @override_settings(FIXTURE_DIRS=[Path(_cur_dir) / 'fixtures_1'])
+    def test_fixtures_dir_pathlib(self):
+        management.call_command('loaddata', 'inner/absolute.json', verbosity=0)
+        self.assertQuerysetEqual(Absolute.objects.all(), [1], transform=lambda o: o.pk)
+
 
 class NaturalKeyFixtureTests(TestCase):
 
@@ -763,7 +747,8 @@ class NaturalKeyFixtureTests(TestCase):
                 "<Book: Cryptonomicon by Neal Stephenson (available at Amazon, Borders)>",
                 "<Book: Ender's Game by Orson Scott Card (available at Collins Bookstore)>",
                 "<Book: Permutation City by Greg Egan (available at Angus and Robertson)>",
-            ]
+            ],
+            transform=repr,
         )
 
 
@@ -861,10 +846,7 @@ class M2MNaturalKeyFixtureTests(TestCase):
             obj.save()
 
         new_a = M2MSimpleA.objects.get_by_natural_key("a")
-        self.assertQuerysetEqual(new_a.b_set.all(), [
-            "<M2MSimpleB: b1>",
-            "<M2MSimpleB: b2>"
-        ], ordered=False)
+        self.assertCountEqual(new_a.b_set.all(), [b1, b2])
 
 
 class TestTicket11101(TransactionTestCase):

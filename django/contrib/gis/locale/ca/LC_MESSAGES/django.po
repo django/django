@@ -5,14 +5,15 @@
 # Carles Barrobés <carles@barrobes.com>, 2012,2014
 # duub qnnp, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Manel Clos <manelclos@gmail.com>, 2020
 # Roger Pons <rogerpons@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-21 12:09+0000\n"
-"Last-Translator: Roger Pons <rogerpons@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-04-28 20:24+0000\n"
+"Last-Translator: Manel Clos <manelclos@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -28,10 +29,10 @@ msgid "The base GIS field."
 msgstr "El camp base de GIS"
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
-"El camp base de Geometry -- mapeja amb el tipus Geometry d'OpenGIS "
-"Specification"
+"El camp base Geometry -- correspon al tipus Geometry de l'especificació "
+"OpenGIS."
 
 msgid "Point"
 msgstr "Punt"
@@ -82,9 +83,6 @@ msgstr "Elimina totes les característiques"
 msgid "WKT debugging window:"
 msgstr "Fines de de depuració WKT"
 
-msgid "Google Maps via GeoDjango"
-msgstr "Google Maps via GeoDjango"
-
 msgid "Debugging window (serialized value)"
 msgstr "Finestra de depuració (valor serialitzat)"
 
@@ -92,5 +90,5 @@ msgid "No feeds are registered."
 msgstr "No s'han registrat canal de contingut"
 
 #, python-format
-msgid "Slug %r isn't registered."
-msgstr "L'slug %r no està registrat"
+msgid "Slug %r isn’t registered."
+msgstr "El 'slug' %r no està registrat"

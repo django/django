@@ -2,11 +2,11 @@ import base64
 import os
 import shutil
 import string
-import sys
 import tempfile
 import unittest
 from datetime import timedelta
 from http import cookies
+from pathlib import Path
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import UpdateError
@@ -19,7 +19,9 @@ from django.contrib.sessions.backends.file import SessionStore as FileSession
 from django.contrib.sessions.backends.signed_cookies import (
     SessionStore as CookieSession,
 )
-from django.contrib.sessions.exceptions import InvalidSessionKey
+from django.contrib.sessions.exceptions import (
+    InvalidSessionKey, SessionInterrupted,
+)
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.serializers import (
@@ -28,13 +30,14 @@ from django.contrib.sessions.serializers import (
 from django.core import management
 from django.core.cache import caches
 from django.core.cache.backends.base import InvalidCacheBackendError
-from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
+from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.test import (
-    RequestFactory, TestCase, ignore_warnings, override_settings,
+    RequestFactory, SimpleTestCase, TestCase, ignore_warnings,
+    override_settings,
 )
-from django.test.utils import patch_logger
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango40Warning
 
 from .models import SessionStore as CustomDatabaseSession
 
@@ -312,13 +315,36 @@ class SessionTestsMixin:
         encoded = self.session.encode(data)
         self.assertEqual(self.session.decode(encoded), data)
 
+    @override_settings(SECRET_KEY='django_tests_secret_key')
+    def test_decode_legacy(self):
+        # RemovedInDjango40Warning: pre-Django 3.1 sessions will be invalid.
+        legacy_encoded = (
+            'OWUzNTNmNWQxNTBjOWExZmM4MmQ3NzNhMDRmMjU4NmYwNDUyNGI2NDp7ImEgdGVzd'
+            'CBrZXkiOiJhIHRlc3QgdmFsdWUifQ=='
+        )
+        self.assertEqual(
+            self.session.decode(legacy_encoded),
+            {'a test key': 'a test value'},
+        )
+
+    @ignore_warnings(category=RemovedInDjango40Warning)
+    def test_default_hashing_algorith_legacy_decode(self):
+        with self.settings(DEFAULT_HASHING_ALGORITHM='sha1'):
+            data = {'a test key': 'a test value'}
+            encoded = self.session.encode(data)
+            self.assertEqual(self.session._legacy_decode(encoded), data)
+
     def test_decode_failure_logged_to_security(self):
-        bad_encode = base64.b64encode(b'flaskdj:alkdjf')
-        with patch_logger('django.security.SuspiciousSession', 'warning') as calls:
-            self.assertEqual({}, self.session.decode(bad_encode))
-            # check that the failed decode is logged
-            self.assertEqual(len(calls), 1)
-            self.assertIn('corrupted', calls[0])
+        tests = [
+            base64.b64encode(b'flaskdj:alkdjf').decode('ascii'),
+            'bad:encoded:value',
+        ]
+        for encoded in tests:
+            with self.subTest(encoded=encoded):
+                with self.assertLogs('django.security.SuspiciousSession', 'WARNING') as cm:
+                    self.assertEqual(self.session.decode(encoded), {})
+                # The failed decode is logged.
+                self.assertIn('Session data corrupted', cm.output[0])
 
     def test_actual_expiry(self):
         # this doesn't work with JSONSerializer (serializing timedelta)
@@ -457,6 +483,7 @@ class DatabaseSessionWithTimeZoneTests(DatabaseSessionTests):
 class CustomDatabaseSessionTests(DatabaseSessionTests):
     backend = CustomDatabaseSession
     session_engine = 'sessions_tests.models'
+    custom_session_cookie_age = 60 * 60 * 24  # One day.
 
     def test_extra_session_field(self):
         # Set the account ID to be picked up by a custom session storage
@@ -475,6 +502,17 @@ class CustomDatabaseSessionTests(DatabaseSessionTests):
         # Make sure that save() on an existing session did the right job.
         s = self.model.objects.get(session_key=self.session.session_key)
         self.assertIsNone(s.account_id)
+
+    def test_custom_expiry_reset(self):
+        self.session.set_expiry(None)
+        self.session.set_expiry(10)
+        self.session.set_expiry(None)
+        self.assertEqual(self.session.get_expiry_age(), self.custom_session_cookie_age)
+
+    def test_default_expiry(self):
+        self.assertEqual(self.session.get_expiry_age(), self.custom_session_cookie_age)
+        self.session.set_expiry(0)
+        self.assertEqual(self.session.get_expiry_age(), self.custom_session_cookie_age)
 
 
 class CacheDBSessionTests(SessionTestsMixin, TestCase):
@@ -504,15 +542,14 @@ class CacheDBSessionWithTimeZoneTests(CacheDBSessionTests):
     pass
 
 
-# Don't need DB flushing for these tests, so can use unittest.TestCase as base class
-class FileSessionTests(SessionTestsMixin, unittest.TestCase):
+class FileSessionTests(SessionTestsMixin, SimpleTestCase):
 
     backend = FileSession
 
     def setUp(self):
         # Do file session tests in an isolated directory, and kill it after we're done.
         self.original_session_file_path = settings.SESSION_FILE_PATH
-        self.temp_session_store = settings.SESSION_FILE_PATH = tempfile.mkdtemp()
+        self.temp_session_store = settings.SESSION_FILE_PATH = self.mkdtemp()
         # Reset the file session backend's internal caches
         if hasattr(self.backend, '_storage_path'):
             del self.backend._storage_path
@@ -523,8 +560,12 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         settings.SESSION_FILE_PATH = self.original_session_file_path
         shutil.rmtree(self.temp_session_store)
 
+    def mkdtemp(self):
+        return tempfile.mkdtemp()
+
     @override_settings(
-        SESSION_FILE_PATH="/if/this/directory/exists/you/have/a/weird/computer")
+        SESSION_FILE_PATH='/if/this/directory/exists/you/have/a/weird/computer',
+    )
     def test_configuration_check(self):
         del self.backend._storage_path
         # Make sure the file backend checks for a good storage dir
@@ -534,7 +575,7 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
     def test_invalid_key_backslash(self):
         # Ensure we don't allow directory-traversal.
         # This is tested directly on _key_to_file, as load() will swallow
-        # a SuspiciousOperation in the same way as an IOError - by creating
+        # a SuspiciousOperation in the same way as an OSError - by creating
         # a new session, making it unclear whether the slashes were detected.
         with self.assertRaises(InvalidSessionKey):
             self.backend()._key_to_file("a\\b\\c")
@@ -588,7 +629,13 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         self.assertEqual(1, count_sessions())
 
 
-class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
+class FileSessionPathLibTests(FileSessionTests):
+    def mkdtemp(self):
+        tmp_dir = super().mkdtemp()
+        return Path(tmp_dir)
+
+
+class CacheSessionTests(SessionTestsMixin, SimpleTestCase):
 
     backend = CacheSession
 
@@ -627,51 +674,47 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
 
 
 class SessionMiddlewareTests(TestCase):
+    request_factory = RequestFactory()
+
+    @staticmethod
+    def get_response_touching_session(request):
+        request.session['hello'] = 'world'
+        return HttpResponse('Session test')
 
     @override_settings(SESSION_COOKIE_SECURE=True)
     def test_secure_session_cookie(self):
-        request = RequestFactory().get('/')
-        response = HttpResponse('Session test')
-        middleware = SessionMiddleware()
-
-        # Simulate a request the modifies the session
-        middleware.process_request(request)
-        request.session['hello'] = 'world'
+        request = self.request_factory.get('/')
+        middleware = SessionMiddleware(self.get_response_touching_session)
 
         # Handle the response through the middleware
-        response = middleware.process_response(request, response)
+        response = middleware(request)
         self.assertIs(response.cookies[settings.SESSION_COOKIE_NAME]['secure'], True)
 
     @override_settings(SESSION_COOKIE_HTTPONLY=True)
     def test_httponly_session_cookie(self):
-        request = RequestFactory().get('/')
-        response = HttpResponse('Session test')
-        middleware = SessionMiddleware()
-
-        # Simulate a request the modifies the session
-        middleware.process_request(request)
-        request.session['hello'] = 'world'
+        request = self.request_factory.get('/')
+        middleware = SessionMiddleware(self.get_response_touching_session)
 
         # Handle the response through the middleware
-        response = middleware.process_response(request, response)
+        response = middleware(request)
         self.assertIs(response.cookies[settings.SESSION_COOKIE_NAME]['httponly'], True)
         self.assertIn(
             cookies.Morsel._reserved['httponly'],
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )
 
+    @override_settings(SESSION_COOKIE_SAMESITE='Strict')
+    def test_samesite_session_cookie(self):
+        request = self.request_factory.get('/')
+        middleware = SessionMiddleware(self.get_response_touching_session)
+        response = middleware(request)
+        self.assertEqual(response.cookies[settings.SESSION_COOKIE_NAME]['samesite'], 'Strict')
+
     @override_settings(SESSION_COOKIE_HTTPONLY=False)
     def test_no_httponly_session_cookie(self):
-        request = RequestFactory().get('/')
-        response = HttpResponse('Session test')
-        middleware = SessionMiddleware()
-
-        # Simulate a request the modifies the session
-        middleware.process_request(request)
-        request.session['hello'] = 'world'
-
-        # Handle the response through the middleware
-        response = middleware.process_response(request, response)
+        request = self.request_factory.get('/')
+        middleware = SessionMiddleware(self.get_response_touching_session)
+        response = middleware(request)
         self.assertEqual(response.cookies[settings.SESSION_COOKIE_NAME]['httponly'], '')
         self.assertNotIn(
             cookies.Morsel._reserved['httponly'],
@@ -679,136 +722,134 @@ class SessionMiddlewareTests(TestCase):
         )
 
     def test_session_save_on_500(self):
-        request = RequestFactory().get('/')
-        response = HttpResponse('Horrible error')
-        response.status_code = 500
-        middleware = SessionMiddleware()
+        def response_500(requset):
+            response = HttpResponse('Horrible error')
+            response.status_code = 500
+            request.session['hello'] = 'world'
+            return response
 
-        # Simulate a request the modifies the session
-        middleware.process_request(request)
-        request.session['hello'] = 'world'
-
-        # Handle the response through the middleware
-        response = middleware.process_response(request, response)
+        request = self.request_factory.get('/')
+        SessionMiddleware(response_500)(request)
 
         # The value wasn't saved above.
         self.assertNotIn('hello', request.session.load())
 
     def test_session_update_error_redirect(self):
-        path = '/foo/'
-        request = RequestFactory().get(path)
-        response = HttpResponse()
-        middleware = SessionMiddleware()
+        def response_delete_session(request):
+            request.session = DatabaseSession()
+            request.session.save(must_create=True)
+            request.session.delete()
+            return HttpResponse()
 
-        request.session = DatabaseSession()
-        request.session.save(must_create=True)
-        request.session.delete()
+        request = self.request_factory.get('/foo/')
+        middleware = SessionMiddleware(response_delete_session)
 
         msg = (
             "The request's session was deleted before the request completed. "
             "The user may have logged out in a concurrent request, for example."
         )
-        with self.assertRaisesMessage(SuspiciousOperation, msg):
+        with self.assertRaisesMessage(SessionInterrupted, msg):
             # Handle the response through the middleware. It will try to save
             # the deleted session which will cause an UpdateError that's caught
-            # and raised as a SuspiciousOperation.
-            middleware.process_response(request, response)
+            # and raised as a SessionInterrupted.
+            middleware(request)
 
     def test_session_delete_on_end(self):
-        request = RequestFactory().get('/')
-        response = HttpResponse('Session test')
-        middleware = SessionMiddleware()
+        def response_ending_session(request):
+            request.session.flush()
+            return HttpResponse('Session test')
+
+        request = self.request_factory.get('/')
+        middleware = SessionMiddleware(response_ending_session)
 
         # Before deleting, there has to be an existing cookie
         request.COOKIES[settings.SESSION_COOKIE_NAME] = 'abc'
 
-        # Simulate a request that ends the session
-        middleware.process_request(request)
-        request.session.flush()
-
         # Handle the response through the middleware
-        response = middleware.process_response(request, response)
+        response = middleware(request)
 
         # The cookie was deleted, not recreated.
         # A deleted cookie header looks like:
-        #  Set-Cookie: sessionid=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
+        #  Set-Cookie: sessionid=; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; Path=/
         self.assertEqual(
-            'Set-Cookie: {}={}; expires=Thu, 01-Jan-1970 00:00:00 GMT; '
-            'Max-Age=0; Path=/'.format(
+            'Set-Cookie: {}=""; expires=Thu, 01 Jan 1970 00:00:00 GMT; '
+            'Max-Age=0; Path=/; SameSite={}'.format(
                 settings.SESSION_COOKIE_NAME,
-                '""' if sys.version_info >= (3, 5) else '',
+                settings.SESSION_COOKIE_SAMESITE,
             ),
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )
+        # SessionMiddleware sets 'Vary: Cookie' to prevent the 'Set-Cookie'
+        # from being cached.
+        self.assertEqual(response.headers['Vary'], 'Cookie')
 
     @override_settings(SESSION_COOKIE_DOMAIN='.example.local', SESSION_COOKIE_PATH='/example/')
     def test_session_delete_on_end_with_custom_domain_and_path(self):
-        request = RequestFactory().get('/')
-        response = HttpResponse('Session test')
-        middleware = SessionMiddleware()
+        def response_ending_session(request):
+            request.session.flush()
+            return HttpResponse('Session test')
+
+        request = self.request_factory.get('/')
+        middleware = SessionMiddleware(response_ending_session)
 
         # Before deleting, there has to be an existing cookie
         request.COOKIES[settings.SESSION_COOKIE_NAME] = 'abc'
 
-        # Simulate a request that ends the session
-        middleware.process_request(request)
-        request.session.flush()
-
         # Handle the response through the middleware
-        response = middleware.process_response(request, response)
+        response = middleware(request)
 
         # The cookie was deleted, not recreated.
         # A deleted cookie header with a custom domain and path looks like:
         #  Set-Cookie: sessionid=; Domain=.example.local;
-        #              expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0;
+        #              expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0;
         #              Path=/example/
         self.assertEqual(
-            'Set-Cookie: {}={}; Domain=.example.local; expires=Thu, '
-            '01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/example/'.format(
+            'Set-Cookie: {}=""; Domain=.example.local; expires=Thu, '
+            '01 Jan 1970 00:00:00 GMT; Max-Age=0; Path=/example/; SameSite={}'.format(
                 settings.SESSION_COOKIE_NAME,
-                '""' if sys.version_info >= (3, 5) else '',
+                settings.SESSION_COOKIE_SAMESITE,
             ),
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )
 
     def test_flush_empty_without_session_cookie_doesnt_set_cookie(self):
-        request = RequestFactory().get('/')
-        response = HttpResponse('Session test')
-        middleware = SessionMiddleware()
+        def response_ending_session(request):
+            request.session.flush()
+            return HttpResponse('Session test')
 
-        # Simulate a request that ends the session
-        middleware.process_request(request)
-        request.session.flush()
+        request = self.request_factory.get('/')
+        middleware = SessionMiddleware(response_ending_session)
 
         # Handle the response through the middleware
-        response = middleware.process_response(request, response)
+        response = middleware(request)
 
         # A cookie should not be set.
         self.assertEqual(response.cookies, {})
         # The session is accessed so "Vary: Cookie" should be set.
-        self.assertEqual(response['Vary'], 'Cookie')
+        self.assertEqual(response.headers['Vary'], 'Cookie')
 
     def test_empty_session_saved(self):
         """
         If a session is emptied of data but still has a key, it should still
         be updated.
         """
-        request = RequestFactory().get('/')
-        response = HttpResponse('Session test')
-        middleware = SessionMiddleware()
+        def response_set_session(request):
+            # Set a session key and some data.
+            request.session['foo'] = 'bar'
+            return HttpResponse('Session test')
 
-        # Set a session key and some data.
-        middleware.process_request(request)
-        request.session['foo'] = 'bar'
+        request = self.request_factory.get('/')
+        middleware = SessionMiddleware(response_set_session)
+
         # Handle the response through the middleware.
-        response = middleware.process_response(request, response)
+        response = middleware(request)
         self.assertEqual(tuple(request.session.items()), (('foo', 'bar'),))
         # A cookie should be set, along with Vary: Cookie.
         self.assertIn(
             'Set-Cookie: sessionid=%s' % request.session.session_key,
             str(response.cookies)
         )
-        self.assertEqual(response['Vary'], 'Cookie')
+        self.assertEqual(response.headers['Vary'], 'Cookie')
 
         # Empty the session data.
         del request.session['foo']
@@ -825,11 +866,10 @@ class SessionMiddlewareTests(TestCase):
             'Set-Cookie: sessionid=%s' % request.session.session_key,
             str(response.cookies)
         )
-        self.assertEqual(response['Vary'], 'Cookie')
+        self.assertEqual(response.headers['Vary'], 'Cookie')
 
 
-# Don't need DB flushing for these tests, so can use unittest.TestCase as base class
-class CookieSessionTests(SessionTestsMixin, unittest.TestCase):
+class CookieSessionTests(SessionTestsMixin, SimpleTestCase):
 
     backend = CookieSession
 

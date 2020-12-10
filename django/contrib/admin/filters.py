@@ -27,8 +27,9 @@ class ListFilter:
         self.used_parameters = {}
         if self.title is None:
             raise ImproperlyConfigured(
-                "The list filter '%s' does not specify "
-                "a 'title'." % self.__class__.__name__)
+                "The list filter '%s' does not specify a 'title'."
+                % self.__class__.__name__
+            )
 
     def has_output(self):
         """
@@ -66,8 +67,9 @@ class SimpleListFilter(ListFilter):
         super().__init__(request, params, model, model_admin)
         if self.parameter_name is None:
             raise ImproperlyConfigured(
-                "The list filter '%s' does not specify "
-                "a 'parameter_name'." % self.__class__.__name__)
+                "The list filter '%s' does not specify a 'parameter_name'."
+                % self.__class__.__name__
+            )
         if self.parameter_name in params:
             value = params.pop(self.parameter_name)
             self.used_parameters[self.parameter_name] = value
@@ -93,7 +95,8 @@ class SimpleListFilter(ListFilter):
         """
         raise NotImplementedError(
             'The SimpleListFilter.lookups() method must be overridden to '
-            'return a list of tuples (value, verbose value)')
+            'return a list of tuples (value, verbose value).'
+        )
 
     def expected_parameters(self):
         return [self.parameter_name]
@@ -101,13 +104,13 @@ class SimpleListFilter(ListFilter):
     def choices(self, changelist):
         yield {
             'selected': self.value() is None,
-            'query_string': changelist.get_query_string({}, [self.parameter_name]),
+            'query_string': changelist.get_query_string(remove=[self.parameter_name]),
             'display': _('All'),
         }
         for lookup, title in self.lookup_choices:
             yield {
                 'selected': self.value() == str(lookup),
-                'query_string': changelist.get_query_string({self.parameter_name: lookup}, []),
+                'query_string': changelist.get_query_string({self.parameter_name: lookup}),
                 'display': title,
             }
 
@@ -152,9 +155,8 @@ class FieldListFilter(ListFilter):
     @classmethod
     def create(cls, field, request, params, model, model_admin, field_path):
         for test, list_filter_class in cls._field_list_filters:
-            if not test(field):
-                continue
-            return list_filter_class(field, request, params, model, model_admin, field_path=field_path)
+            if test(field):
+                return list_filter_class(field, request, params, model, model_admin, field_path=field_path)
 
 
 class RelatedFieldListFilter(FieldListFilter):
@@ -162,8 +164,8 @@ class RelatedFieldListFilter(FieldListFilter):
         other_model = get_model_from_relation(field)
         self.lookup_kwarg = '%s__%s__exact' % (field_path, field.target_field.name)
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
-        self.lookup_val = request.GET.get(self.lookup_kwarg)
-        self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull)
+        self.lookup_val = params.get(self.lookup_kwarg)
+        self.lookup_val_isnull = params.get(self.lookup_kwarg_isnull)
         super().__init__(field, request, params, model, model_admin, field_path)
         self.lookup_choices = self.field_choices(field, request, model_admin)
         if hasattr(field, 'verbose_name'):
@@ -191,32 +193,35 @@ class RelatedFieldListFilter(FieldListFilter):
     def expected_parameters(self):
         return [self.lookup_kwarg, self.lookup_kwarg_isnull]
 
+    def field_admin_ordering(self, field, request, model_admin):
+        """
+        Return the model admin's ordering for related field, if provided.
+        """
+        related_admin = model_admin.admin_site._registry.get(field.remote_field.model)
+        if related_admin is not None:
+            return related_admin.get_ordering(request)
+        return ()
+
     def field_choices(self, field, request, model_admin):
-        return field.get_choices(include_blank=False)
+        ordering = self.field_admin_ordering(field, request, model_admin)
+        return field.get_choices(include_blank=False, ordering=ordering)
 
     def choices(self, changelist):
         yield {
             'selected': self.lookup_val is None and not self.lookup_val_isnull,
-            'query_string': changelist.get_query_string(
-                {},
-                [self.lookup_kwarg, self.lookup_kwarg_isnull]
-            ),
+            'query_string': changelist.get_query_string(remove=[self.lookup_kwarg, self.lookup_kwarg_isnull]),
             'display': _('All'),
         }
         for pk_val, val in self.lookup_choices:
             yield {
                 'selected': self.lookup_val == str(pk_val),
-                'query_string': changelist.get_query_string({
-                    self.lookup_kwarg: pk_val,
-                }, [self.lookup_kwarg_isnull]),
+                'query_string': changelist.get_query_string({self.lookup_kwarg: pk_val}, [self.lookup_kwarg_isnull]),
                 'display': val,
             }
         if self.include_empty_choice:
             yield {
                 'selected': bool(self.lookup_val_isnull),
-                'query_string': changelist.get_query_string({
-                    self.lookup_kwarg_isnull: 'True',
-                }, [self.lookup_kwarg]),
+                'query_string': changelist.get_query_string({self.lookup_kwarg_isnull: 'True'}, [self.lookup_kwarg]),
                 'display': self.empty_value_display,
             }
 
@@ -228,8 +233,8 @@ class BooleanFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.lookup_kwarg = '%s__exact' % field_path
         self.lookup_kwarg2 = '%s__isnull' % field_path
-        self.lookup_val = request.GET.get(self.lookup_kwarg)
-        self.lookup_val2 = request.GET.get(self.lookup_kwarg2)
+        self.lookup_val = params.get(self.lookup_kwarg)
+        self.lookup_val2 = params.get(self.lookup_kwarg2)
         super().__init__(field, request, params, model, model_admin, field_path)
         if (self.used_parameters and self.lookup_kwarg in self.used_parameters and
                 self.used_parameters[self.lookup_kwarg] in ('1', '0')):
@@ -239,39 +244,34 @@ class BooleanFieldListFilter(FieldListFilter):
         return [self.lookup_kwarg, self.lookup_kwarg2]
 
     def choices(self, changelist):
+        field_choices = dict(self.field.flatchoices)
         for lookup, title in (
-                (None, _('All')),
-                ('1', _('Yes')),
-                ('0', _('No'))):
+            (None, _('All')),
+            ('1', field_choices.get(True, _('Yes'))),
+            ('0', field_choices.get(False, _('No'))),
+        ):
             yield {
                 'selected': self.lookup_val == lookup and not self.lookup_val2,
-                'query_string': changelist.get_query_string({
-                    self.lookup_kwarg: lookup,
-                }, [self.lookup_kwarg2]),
+                'query_string': changelist.get_query_string({self.lookup_kwarg: lookup}, [self.lookup_kwarg2]),
                 'display': title,
             }
-        if isinstance(self.field, models.NullBooleanField):
+        if self.field.null:
             yield {
                 'selected': self.lookup_val2 == 'True',
-                'query_string': changelist.get_query_string({
-                    self.lookup_kwarg2: 'True',
-                }, [self.lookup_kwarg]),
-                'display': _('Unknown'),
+                'query_string': changelist.get_query_string({self.lookup_kwarg2: 'True'}, [self.lookup_kwarg]),
+                'display': field_choices.get(None, _('Unknown')),
             }
 
 
-FieldListFilter.register(
-    lambda f: isinstance(f, (models.BooleanField, models.NullBooleanField)),
-    BooleanFieldListFilter
-)
+FieldListFilter.register(lambda f: isinstance(f, models.BooleanField), BooleanFieldListFilter)
 
 
 class ChoicesFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.lookup_kwarg = '%s__exact' % field_path
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
-        self.lookup_val = request.GET.get(self.lookup_kwarg)
-        self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull)
+        self.lookup_val = params.get(self.lookup_kwarg)
+        self.lookup_val_isnull = params.get(self.lookup_kwarg_isnull)
         super().__init__(field, request, params, model, model_admin, field_path)
 
     def expected_parameters(self):
@@ -280,9 +280,7 @@ class ChoicesFieldListFilter(FieldListFilter):
     def choices(self, changelist):
         yield {
             'selected': self.lookup_val is None,
-            'query_string': changelist.get_query_string(
-                {}, [self.lookup_kwarg, self.lookup_kwarg_isnull]
-            ),
+            'query_string': changelist.get_query_string(remove=[self.lookup_kwarg, self.lookup_kwarg_isnull]),
             'display': _('All')
         }
         none_title = ''
@@ -292,17 +290,13 @@ class ChoicesFieldListFilter(FieldListFilter):
                 continue
             yield {
                 'selected': str(lookup) == self.lookup_val,
-                'query_string': changelist.get_query_string(
-                    {self.lookup_kwarg: lookup}, [self.lookup_kwarg_isnull]
-                ),
+                'query_string': changelist.get_query_string({self.lookup_kwarg: lookup}, [self.lookup_kwarg_isnull]),
                 'display': title,
             }
         if none_title:
             yield {
                 'selected': bool(self.lookup_val_isnull),
-                'query_string': changelist.get_query_string({
-                    self.lookup_kwarg_isnull: 'True',
-                }, [self.lookup_kwarg]),
+                'query_string': changelist.get_query_string({self.lookup_kwarg_isnull: 'True'}, [self.lookup_kwarg]),
                 'display': none_title,
             }
 
@@ -387,8 +381,8 @@ class AllValuesFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.lookup_kwarg = field_path
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
-        self.lookup_val = request.GET.get(self.lookup_kwarg)
-        self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull)
+        self.lookup_val = params.get(self.lookup_kwarg)
+        self.lookup_val_isnull = params.get(self.lookup_kwarg_isnull)
         self.empty_value_display = model_admin.get_empty_value_display()
         parent_model, reverse_path = reverse_field_path(model, field_path)
         # Obey parent ModelAdmin queryset when deciding which options to show
@@ -396,10 +390,7 @@ class AllValuesFieldListFilter(FieldListFilter):
             queryset = model_admin.get_queryset(request)
         else:
             queryset = parent_model._default_manager.all()
-        self.lookup_choices = (queryset
-                               .distinct()
-                               .order_by(field.name)
-                               .values_list(field.name, flat=True))
+        self.lookup_choices = queryset.distinct().order_by(field.name).values_list(field.name, flat=True)
         super().__init__(field, request, params, model, model_admin, field_path)
 
     def expected_parameters(self):
@@ -408,7 +399,7 @@ class AllValuesFieldListFilter(FieldListFilter):
     def choices(self, changelist):
         yield {
             'selected': self.lookup_val is None and self.lookup_val_isnull is None,
-            'query_string': changelist.get_query_string({}, [self.lookup_kwarg, self.lookup_kwarg_isnull]),
+            'query_string': changelist.get_query_string(remove=[self.lookup_kwarg, self.lookup_kwarg_isnull]),
             'display': _('All'),
         }
         include_none = False
@@ -419,17 +410,13 @@ class AllValuesFieldListFilter(FieldListFilter):
             val = str(val)
             yield {
                 'selected': self.lookup_val == val,
-                'query_string': changelist.get_query_string({
-                    self.lookup_kwarg: val,
-                }, [self.lookup_kwarg_isnull]),
+                'query_string': changelist.get_query_string({self.lookup_kwarg: val}, [self.lookup_kwarg_isnull]),
                 'display': val,
             }
         if include_none:
             yield {
                 'selected': bool(self.lookup_val_isnull),
-                'query_string': changelist.get_query_string({
-                    self.lookup_kwarg_isnull: 'True',
-                }, [self.lookup_kwarg]),
+                'query_string': changelist.get_query_string({self.lookup_kwarg_isnull: 'True'}, [self.lookup_kwarg]),
                 'display': self.empty_value_display,
             }
 
@@ -440,4 +427,50 @@ FieldListFilter.register(lambda f: True, AllValuesFieldListFilter)
 class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
     def field_choices(self, field, request, model_admin):
         pk_qs = model_admin.get_queryset(request).distinct().values_list('%s__pk' % self.field_path, flat=True)
-        return field.get_choices(include_blank=False, limit_choices_to={'pk__in': pk_qs})
+        ordering = self.field_admin_ordering(field, request, model_admin)
+        return field.get_choices(include_blank=False, limit_choices_to={'pk__in': pk_qs}, ordering=ordering)
+
+
+class EmptyFieldListFilter(FieldListFilter):
+    def __init__(self, field, request, params, model, model_admin, field_path):
+        if not field.empty_strings_allowed and not field.null:
+            raise ImproperlyConfigured(
+                "The list filter '%s' cannot be used with field '%s' which "
+                "doesn't allow empty strings and nulls." % (
+                    self.__class__.__name__,
+                    field.name,
+                )
+            )
+        self.lookup_kwarg = '%s__isempty' % field_path
+        self.lookup_val = params.get(self.lookup_kwarg)
+        super().__init__(field, request, params, model, model_admin, field_path)
+
+    def queryset(self, request, queryset):
+        if self.lookup_kwarg not in self.used_parameters:
+            return queryset
+        if self.lookup_val not in ('0', '1'):
+            raise IncorrectLookupParameters
+
+        lookup_condition = models.Q()
+        if self.field.empty_strings_allowed:
+            lookup_condition |= models.Q(**{self.field_path: ''})
+        if self.field.null:
+            lookup_condition |= models.Q(**{'%s__isnull' % self.field_path: True})
+        if self.lookup_val == '1':
+            return queryset.filter(lookup_condition)
+        return queryset.exclude(lookup_condition)
+
+    def expected_parameters(self):
+        return [self.lookup_kwarg]
+
+    def choices(self, changelist):
+        for lookup, title in (
+            (None, _('All')),
+            ('1', _('Empty')),
+            ('0', _('Not empty')),
+        ):
+            yield {
+                'selected': self.lookup_val == lookup,
+                'query_string': changelist.get_query_string({self.lookup_kwarg: lookup}),
+                'display': title,
+            }

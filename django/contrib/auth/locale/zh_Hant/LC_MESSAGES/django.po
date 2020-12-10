@@ -6,16 +6,16 @@
 # ilay <ilay@ilay.tw>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # tcc <tcchou@tcchou.org>, 2011
-# Tzu-ping Chung <uranusjr@gmail.com>, 2016
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016-2017,2019
 # Yeh-Yung <yyc1217@gmail.com>, 2013
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-11-07 19:24+0000\n"
-"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-18 09:03+0000\n"
+"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -59,7 +59,7 @@ msgstr "無設定密碼。"
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "無效的密碼格式或不知名的雜湊演算法。"
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "兩個密碼欄位不相符。"
 
 msgid "Password"
@@ -72,12 +72,11 @@ msgid "Enter the same password as before, for verification."
 msgstr "為檢查用，請輸入與前面相同的密碼。"
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"原始密碼並未儲存，因此無法存取此帳號的密碼，但你可以透過<a href=\"../"
-"password/\">這個表單</a>來變更密碼。"
+"原始密碼尚未儲存，因此無法存取此帳號的密碼，但你可以透過<a href=\"{}\">這個表"
+"單</a>來變更密碼。"
 
 #, python-format
 msgid ""
@@ -119,7 +118,7 @@ msgid "hash"
 msgstr "哈希碼"
 
 msgid "variety"
-msgstr ""
+msgstr "變種"
 
 msgid "version"
 msgstr "版本"
@@ -238,19 +237,19 @@ msgstr[0] "你的密碼必須包含至少 %(min_length)d 個字元。"
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "這個密碼與%(verbose_name)s太相近。"
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr "你的密碼不能與其他個人資訊太相近。"
 
 msgid "This password is too common."
 msgstr "這個密碼太普通。"
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr "你不能使用常見的密碼。"
 
 msgid "This password is entirely numeric."
 msgstr "這個密碼只包含數字。"
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "你的密碼不能完全是數字。"
 
 #, python-format

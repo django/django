@@ -13,7 +13,7 @@ the domain names and "verbose" names of your Django-powered sites.
 Use it if your single Django installation powers more than one site and you
 need to differentiate between those sites in some way.
 
-The sites framework is mainly based on a simple model:
+The sites framework is mainly based on this model:
 
 .. class:: models.Site
 
@@ -37,7 +37,7 @@ try to get the current site by comparing the
 the :meth:`request.get_host() <django.http.HttpRequest.get_host>` method.
 
 How you use this is up to you, but Django uses it in a couple of ways
-automatically via simple conventions.
+automatically via a couple of conventions.
 
 Example usage
 =============
@@ -47,24 +47,23 @@ Why would you use sites? It's best explained through examples.
 Associating content with multiple sites
 ---------------------------------------
 
-The Django-powered sites LJWorld.com_ and Lawrence.com_ are operated by the
-same news organization -- the Lawrence Journal-World newspaper in Lawrence,
-Kansas. LJWorld.com focuses on news, while Lawrence.com focuses on local
-entertainment. But sometimes editors want to publish an article on *both*
-sites.
+The LJWorld.com_ and Lawrence.com_ sites are operated by the same news
+organization -- the Lawrence Journal-World newspaper in Lawrence, Kansas.
+LJWorld.com focused on news, while Lawrence.com focused on local entertainment.
+But sometimes editors wanted to publish an article on *both* sites.
 
 The naive way of solving the problem would be to require site producers to
 publish the same story twice: once for LJWorld.com and again for Lawrence.com.
 But that's inefficient for site producers, and it's redundant to store
 multiple copies of the same story in the database.
 
-The better solution is simple: Both sites use the same article database, and an
-article is associated with one or more sites. In Django model terminology,
-that's represented by a :class:`~django.db.models.ManyToManyField` in the
-``Article`` model::
+A better solution removes the content duplication: Both sites use the same
+article database, and an article is associated with one or more sites. In
+Django model terminology, that's represented by a
+:class:`~django.db.models.ManyToManyField` in the ``Article`` model::
 
-    from django.db import models
     from django.contrib.sites.models import Site
+    from django.db import models
 
     class Article(models.Model):
         headline = models.CharField(max_length=200)
@@ -80,8 +79,8 @@ This accomplishes several things quite nicely:
   database; it only has a single record in the database.
 
 * It lets the site developers use the same Django view code for both sites.
-  The view code that displays a given story just checks to make sure the
-  requested story is on the current site. It looks something like this::
+  The view code that displays a given story checks to make sure the requested
+  story is on the current site. It looks something like this::
 
       from django.contrib.sites.shortcuts import get_current_site
 
@@ -106,8 +105,8 @@ model in a many-to-one relationship, using
 For example, if an article is only allowed on a single site, you'd use a model
 like this::
 
-    from django.db import models
     from django.contrib.sites.models import Site
+    from django.db import models
 
     class Article(models.Model):
         headline = models.CharField(max_length=200)
@@ -135,8 +134,7 @@ For example::
             # Do something else.
             pass
 
-Of course, it's ugly to hard-code the site IDs like that. This sort of
-hard-coding is best for hackish fixes that you need done quickly. The
+It's fragile to hard-code the site IDs like that, in case they change. The
 cleaner way of accomplishing the same thing is to check the current site's
 domain::
 
@@ -215,17 +213,17 @@ subscribing to LJWorld.com alerts." Same goes for the email's message body.
 Note that an even more flexible (but more heavyweight) way of doing this would
 be to use Django's template system. Assuming Lawrence.com and LJWorld.com have
 different template directories (:setting:`DIRS <TEMPLATES-DIRS>`), you could
-simply farm out to the template system like so::
+farm out to the template system like so::
 
     from django.core.mail import send_mail
-    from django.template import loader, Context
+    from django.template import loader
 
     def register_for_newsletter(request):
         # Check form values, etc., and subscribe the user.
         # ...
 
-        subject = loader.get_template('alerts/subject.txt').render(Context({}))
-        message = loader.get_template('alerts/message.txt').render(Context({}))
+        subject = loader.get_template('alerts/subject.txt').render({})
+        message = loader.get_template('alerts/message.txt').render({})
         send_mail(subject, message, 'editor@ljworld.com', [user.email])
 
         # ...
@@ -243,7 +241,7 @@ Getting the current domain for full URLs
 Django's ``get_absolute_url()`` convention is nice for getting your objects'
 URL without the domain name, but in some cases you might want to display the
 full URL -- with ``http://`` and the domain and everything -- for an object.
-To do this, you can use the sites framework. A simple example::
+To do this, you can use the sites framework. An example::
 
     >>> from django.contrib.sites.models import Site
     >>> obj = MyModel.objects.get(id=3)
@@ -261,14 +259,13 @@ Enabling the sites framework
 
 To enable the sites framework, follow these steps:
 
-1. Add ``'django.contrib.sites'`` to your :setting:`INSTALLED_APPS`
-   setting.
+#. Add ``'django.contrib.sites'`` to your :setting:`INSTALLED_APPS` setting.
 
-2. Define a :setting:`SITE_ID` setting::
+#. Define a :setting:`SITE_ID` setting::
 
     SITE_ID = 1
 
-3. Run :djadmin:`migrate`.
+#. Run :djadmin:`migrate`.
 
 ``django.contrib.sites`` registers a
 :data:`~django.db.models.signals.post_migrate` signal handler which creates a
@@ -325,9 +322,9 @@ with the current :class:`~django.contrib.sites.models.Site`.
 Use :class:`~django.contrib.sites.managers.CurrentSiteManager` by adding it to
 your model explicitly. For example::
 
-    from django.db import models
     from django.contrib.sites.models import Site
     from django.contrib.sites.managers import CurrentSiteManager
+    from django.db import models
 
     class Photo(models.Model):
         photo = models.FileField(upload_to='photos')
@@ -362,9 +359,9 @@ a parameter to
 model. The following model, which has a field called ``publish_on``,
 demonstrates this::
 
-    from django.db import models
     from django.contrib.sites.models import Site
     from django.contrib.sites.managers import CurrentSiteManager
+    from django.db import models
 
     class Photo(models.Model):
         photo = models.FileField(upload_to='photos')
@@ -402,7 +399,7 @@ If you often use this pattern::
         site = Site.objects.get_current()
         ...
 
-there is simple way to avoid repetitions. Add
+To avoid repetitions, add
 :class:`django.contrib.sites.middleware.CurrentSiteMiddleware` to
 :setting:`MIDDLEWARE`. The middleware sets the ``site`` attribute on every
 request object, so you can use ``request.site`` to get the current site.

@@ -1,4 +1,5 @@
 from django.core.exceptions import FieldError
+from django.db.models import FilteredRelation
 from django.test import SimpleTestCase, TestCase
 
 from .models import (
@@ -9,18 +10,17 @@ from .models import (
 
 
 class ReverseSelectRelatedTestCase(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         user = User.objects.create(username="test")
         UserProfile.objects.create(user=user, state="KS", city="Lawrence")
         results = UserStatResult.objects.create(results='first results')
-        userstat = UserStat.objects.create(user=user, posts=150,
-                                           results=results)
+        userstat = UserStat.objects.create(user=user, posts=150, results=results)
         StatDetails.objects.create(base_stats=userstat, comments=259)
 
         user2 = User.objects.create(username="bob")
         results2 = UserStatResult.objects.create(results='moar results')
-        advstat = AdvancedUserStat.objects.create(user=user2, posts=200, karma=5,
-                                                  results=results2)
+        advstat = AdvancedUserStat.objects.create(user=user2, posts=200, karma=5, results=results2)
         StatDetails.objects.create(base_stats=advstat, comments=250)
         p1 = Parent1(name1="Only Parent1")
         p1.save()
@@ -81,7 +81,7 @@ class ReverseSelectRelatedTestCase(TestCase):
             stat = UserStat.objects.select_related('user', 'advanceduserstat').get(posts=200)
             self.assertEqual(stat.advanceduserstat.posts, 200)
             self.assertEqual(stat.user.username, 'bob')
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(0):
             self.assertEqual(stat.advanceduserstat.user.username, 'bob')
 
     def test_nullable_relation(self):
@@ -230,3 +230,8 @@ class ReverseSelectRelatedValidationTests(SimpleTestCase):
 
         with self.assertRaisesMessage(FieldError, self.non_relational_error % ('username', fields)):
             list(User.objects.select_related('username'))
+
+    def test_reverse_related_validation_with_filtered_relation(self):
+        fields = 'userprofile, userstat, relation'
+        with self.assertRaisesMessage(FieldError, self.invalid_error % ('foobar', fields)):
+            list(User.objects.annotate(relation=FilteredRelation('userprofile')).select_related('foobar'))

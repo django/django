@@ -3,15 +3,16 @@
 # Translators:
 # fasouto <fsoutomoure@gmail.com>, 2011
 # fonso <fonzzo@gmail.com>, 2011,2013
+# fasouto <fsoutomoure@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Leandro Regueiro <leandro.regueiro@gmail.com>, 2011,2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2019-02-15 16:54+0000\n"
+"Last-Translator: fasouto <fsoutomoure@gmail.com>\n"
 "Language-Team: Galician (http://www.transifex.com/django/django/language/"
 "gl/)\n"
 "MIME-Version: 1.0\n"
@@ -69,8 +70,7 @@ msgstr ""
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 
 #, python-format
@@ -118,16 +118,16 @@ msgid "variety"
 msgstr ""
 
 msgid "version"
-msgstr ""
+msgstr "versión"
 
 msgid "memory cost"
-msgstr ""
+msgstr "custo de memoria"
 
 msgid "time cost"
 msgstr ""
 
 msgid "parallelism"
-msgstr ""
+msgstr "paralelismo"
 
 msgid "work factor"
 msgstr "factor de traballo"

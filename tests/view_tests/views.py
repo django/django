@@ -2,19 +2,24 @@ import datetime
 import decimal
 import logging
 import sys
+from pathlib import Path
 
-from django.core.exceptions import PermissionDenied, SuspiciousOperation
+from django.core.exceptions import (
+    BadRequest, PermissionDenied, SuspiciousOperation,
+)
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.template import TemplateDoesNotExist
 from django.urls import get_resolver
 from django.views import View
 from django.views.debug import (
-    SafeExceptionReporterFilter, technical_500_response,
+    ExceptionReporter, SafeExceptionReporterFilter, technical_500_response,
 )
 from django.views.decorators.debug import (
     sensitive_post_parameters, sensitive_variables,
 )
+
+TEMPLATES_PATH = Path(__file__).resolve().parent / 'templates'
 
 
 def index_page(request):
@@ -48,6 +53,10 @@ def raises500(request):
 
 def raises400(request):
     raise SuspiciousOperation
+
+
+def raises400_bad_request(request):
+    raise BadRequest('Malformed request syntax')
 
 
 def raises403(request):
@@ -224,6 +233,27 @@ def custom_exception_reporter_filter_view(request):
     except Exception:
         exc_info = sys.exc_info()
         send_log(request, exc_info)
+        return technical_500_response(request, *exc_info)
+
+
+class CustomExceptionReporter(ExceptionReporter):
+    custom_traceback_text = 'custom traceback text'
+
+    def get_traceback_html(self):
+        return self.custom_traceback_text
+
+
+class TemplateOverrideExceptionReporter(ExceptionReporter):
+    html_template_path = TEMPLATES_PATH / 'my_technical_500.html'
+    text_template_path = TEMPLATES_PATH / 'my_technical_500.txt'
+
+
+def custom_reporter_class_view(request):
+    request.exception_reporter_class = CustomExceptionReporter
+    try:
+        raise Exception
+    except Exception:
+        exc_info = sys.exc_info()
         return technical_500_response(request, *exc_info)
 
 

@@ -29,7 +29,7 @@ model system.
     override in your own code.
 
     If you override these methods on your model, you must call the parent class'
-    methods for this signals to be sent.
+    methods for these signals to be sent.
 
     Note also that Django stores signal handlers as weak references by default,
     so if your handler is a local function, it may be garbage collected.  To
@@ -39,8 +39,8 @@ model system.
 
     Model signals ``sender`` model can be lazily referenced when connecting a
     receiver by specifying its full application label. For example, an
-    ``Answer`` model defined in the ``polls`` application could be referenced
-    as ``'polls.Answer'``. This sort of reference can be quite handy when
+    ``Question`` model defined in the ``polls`` application could be referenced
+    as ``'polls.Question'``. This sort of reference can be quite handy when
     dealing with circular import dependencies and swappable models.
 
 ``pre_init``
@@ -60,26 +60,27 @@ Arguments sent with this signal:
     The model class that just had an instance created.
 
 ``args``
-    A list of positional arguments passed to ``__init__()``:
+    A list of positional arguments passed to ``__init__()``.
 
 ``kwargs``
-    A dictionary of keyword arguments passed to ``__init__()``:
+    A dictionary of keyword arguments passed to ``__init__()``.
 
-For example, the :doc:`tutorial </intro/tutorial01>` has this line::
+For example, the :doc:`tutorial </intro/tutorial02>` has this line::
 
-    p = Poll(question="What's up?", pub_date=datetime.now())
+    q = Question(question_text="What's new?", pub_date=timezone.now())
 
 The arguments sent to a :data:`pre_init` handler would be:
 
 ==========  ===============================================================
 Argument    Value
 ==========  ===============================================================
-``sender``  ``Poll`` (the class itself)
+``sender``  ``Question`` (the class itself)
 
 ``args``    ``[]`` (an empty list because there were no positional
-            arguments passed to ``__init__()``.)
+            arguments passed to ``__init__()``)
 
-``kwargs``  ``{'question': "What's up?", 'pub_date': datetime.now()}``
+``kwargs``  ``{'question_text': "What's new?",``
+            ``'pub_date': datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=<UTC>)}``
 ==========  ===============================================================
 
 ``post_init``
@@ -97,6 +98,19 @@ Arguments sent with this signal:
 
 ``instance``
     The actual instance of the model that's just been created.
+
+    .. note::
+
+        :attr:`instance._state <django.db.models.Model._state>` isn't set
+        before sending the ``post_init`` signal, so ``_state`` attributes
+        always have their default values. For example, ``_state.db`` is
+        ``None``.
+
+.. warning::
+
+    For performance reasons, you shouldn't perform queries in receivers of
+    ``pre_init`` or ``post_init`` signals because they would be executed for
+    each instance returned during queryset iteration.
 
 ``pre_save``
 ------------
@@ -256,9 +270,16 @@ Arguments sent with this signal:
     from the relation.
 
 ``pk_set``
-    For the ``pre_add``, ``post_add``, ``pre_remove`` and ``post_remove``
-    actions, this is a set of primary key values that have been added to
-    or removed from the relation.
+    For the ``pre_add`` and ``post_add`` actions, this is a set of primary key
+    values that will be, or have been, added to the relation. This may be a
+    subset of the values submitted to be added, since inserts must filter
+    existing values in order to avoid a database ``IntegrityError``.
+
+    For the ``pre_remove`` and ``post_remove`` actions, this is a set of
+    primary key values that was submitted to be removed from the relation. This
+    is not dependent on whether the values actually will be, or have been,
+    removed. In particular, non-existent values may be submitted, and will
+    appear in ``pk_set``, even though they have no effect on the database.
 
     For the ``pre_clear`` and ``post_clear`` actions, this is ``None``.
 
@@ -547,7 +568,7 @@ This signal is sent whenever Django encounters an exception while processing an 
 Arguments sent with this signal:
 
 ``sender``
-    The handler class, as above.
+    Unused (always ``None``).
 
 ``request``
     The :class:`~django.http.HttpRequest` object.

@@ -1,6 +1,7 @@
 from django.apps import apps as global_apps
-from django.db import DEFAULT_DB_ALIAS, migrations, router, transaction
-from django.db.utils import IntegrityError
+from django.db import (
+    DEFAULT_DB_ALIAS, IntegrityError, migrations, router, transaction,
+)
 
 
 class RenameContentType(migrations.RunPython):
@@ -24,14 +25,14 @@ class RenameContentType(migrations.RunPython):
             content_type.model = new_model
             try:
                 with transaction.atomic(using=db):
-                    content_type.save(update_fields={'model'})
+                    content_type.save(using=db, update_fields={'model'})
             except IntegrityError:
                 # Gracefully fallback if a stale content type causes a
                 # conflict as remove_stale_contenttypes will take care of
                 # asking the user what should be done next.
                 content_type.model = old_model
             else:
-                # Clear the cache as the `get_by_natual_key()` call will cache
+                # Clear the cache as the `get_by_natural_key()` call will cache
                 # the renamed ContentType instance by its old model name.
                 ContentType.objects.clear_cache()
 
@@ -61,7 +62,7 @@ def inject_rename_contenttypes_operations(plan=None, apps=global_apps, using=DEF
         available = True
 
     for migration, backward in plan:
-        if ((migration.app_label, migration.name) == ('contenttypes', '0001_initial')):
+        if (migration.app_label, migration.name) == ('contenttypes', '0001_initial'):
             # There's no point in going forward if the initial contenttypes
             # migration is unapplied as the ContentType model will be
             # unavailable from this point.

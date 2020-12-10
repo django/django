@@ -1,17 +1,21 @@
-from django.contrib.postgres.fields import JSONField
-from django.db.models.aggregates import Aggregate
+from django.contrib.postgres.fields import ArrayField
+from django.db.models import Aggregate, BooleanField, JSONField, Value
+
+from .mixins import OrderableAggMixin
 
 __all__ = [
     'ArrayAgg', 'BitAnd', 'BitOr', 'BoolAnd', 'BoolOr', 'JSONBAgg', 'StringAgg',
 ]
 
 
-class ArrayAgg(Aggregate):
+class ArrayAgg(OrderableAggMixin, Aggregate):
     function = 'ARRAY_AGG'
-    template = '%(function)s(%(distinct)s%(expressions)s)'
+    template = '%(function)s(%(distinct)s%(expressions)s %(ordering)s)'
+    allow_distinct = True
 
-    def __init__(self, expression, distinct=False, **extra):
-        super().__init__(expression, distinct='DISTINCT ' if distinct else '', **extra)
+    @property
+    def output_field(self):
+        return ArrayField(self.source_expressions[0].output_field)
 
     def convert_value(self, value, expression, connection):
         if not value:
@@ -29,29 +33,34 @@ class BitOr(Aggregate):
 
 class BoolAnd(Aggregate):
     function = 'BOOL_AND'
+    output_field = BooleanField()
 
 
 class BoolOr(Aggregate):
     function = 'BOOL_OR'
+    output_field = BooleanField()
 
 
-class JSONBAgg(Aggregate):
+class JSONBAgg(OrderableAggMixin, Aggregate):
     function = 'JSONB_AGG'
+    template = '%(function)s(%(distinct)s%(expressions)s %(ordering)s)'
+    allow_distinct = True
     output_field = JSONField()
 
     def convert_value(self, value, expression, connection):
         if not value:
-            return []
+            return '[]'
         return value
 
 
-class StringAgg(Aggregate):
+class StringAgg(OrderableAggMixin, Aggregate):
     function = 'STRING_AGG'
-    template = "%(function)s(%(distinct)s%(expressions)s, '%(delimiter)s')"
+    template = '%(function)s(%(distinct)s%(expressions)s %(ordering)s)'
+    allow_distinct = True
 
-    def __init__(self, expression, delimiter, distinct=False, **extra):
-        distinct = 'DISTINCT ' if distinct else ''
-        super().__init__(expression, delimiter=delimiter, distinct=distinct, **extra)
+    def __init__(self, expression, delimiter, **extra):
+        delimiter_expr = Value(str(delimiter))
+        super().__init__(expression, delimiter_expr, **extra)
 
     def convert_value(self, value, expression, connection):
         if not value:

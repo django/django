@@ -8,8 +8,8 @@ from django.forms.utils import ErrorDict, ErrorList
 from django.test import TestCase
 
 from .models import (
-    Host, Manager, Network, ProfileNetwork, Restaurant, User, UserProfile,
-    UserSite,
+    Host, Manager, Network, ProfileNetwork, Restaurant, User, UserPreferences,
+    UserProfile, UserSite,
 )
 
 
@@ -171,6 +171,14 @@ class InlineFormsetTests(TestCase):
         # Testing the inline model's relation
         self.assertEqual(formset[0].instance.user_id, "guido")
 
+    def test_inline_model_with_primary_to_field(self):
+        """An inline model with a OneToOneField with to_field & primary key."""
+        FormSet = inlineformset_factory(User, UserPreferences, exclude=('is_superuser',))
+        user = User.objects.create(username='guido', serial=1337)
+        UserPreferences.objects.create(user=user, favorite_number=10)
+        formset = FormSet(instance=user)
+        self.assertEqual(formset[0].fields['user'].initial, 'guido')
+
     def test_inline_model_with_to_field_to_rel(self):
         """
         #13794 --- An inline model with a to_field to a related field of a
@@ -238,7 +246,10 @@ class InlineFormsetTests(TestCase):
         formset.save()
         self.assertQuerysetEqual(
             dalnet.host_set.order_by("hostname"),
-            ["<Host: matrix.de.eu.dal.net>", "<Host: tranquility.hub.dal.net>"]
+            Host.objects.filter(hostname__in=[
+                'matrix.de.eu.dal.net',
+                'tranquility.hub.dal.net',
+            ]).order_by('hostname'),
         )
 
     def test_initial_data(self):
@@ -288,10 +299,12 @@ class FormsetTests(TestCase):
 
     def test_extraneous_query_is_not_run(self):
         Formset = modelformset_factory(Network, fields="__all__")
-        data = {'test-TOTAL_FORMS': '1',
-                'test-INITIAL_FORMS': '0',
-                'test-MAX_NUM_FORMS': '',
-                'test-0-name': 'Random Place', }
+        data = {
+            'test-TOTAL_FORMS': '1',
+            'test-INITIAL_FORMS': '0',
+            'test-MAX_NUM_FORMS': '',
+            'test-0-name': 'Random Place',
+        }
         with self.assertNumQueries(1):
             formset = Formset(data, prefix="test")
             formset.save()
@@ -362,8 +375,7 @@ class FormfieldCallbackTests(TestCase):
 
     def test_modelformset_custom_callback(self):
         callback = Callback()
-        modelformset_factory(UserSite, form=UserSiteForm,
-                             formfield_callback=callback)
+        modelformset_factory(UserSite, form=UserSiteForm, formfield_callback=callback)
         self.assertCallbackCalled(callback)
 
 
@@ -399,8 +411,8 @@ class FormfieldShouldDeleteFormTests(TestCase):
             fields = "__all__"
 
         def should_delete(self):
-            """ delete form if odd PK """
-            return self.instance.pk % 2 != 0
+            """Delete form if odd serial."""
+            return self.instance.serial % 2 != 0
 
     NormalFormset = modelformset_factory(User, form=CustomDeleteUserForm, can_delete=True)
     DeleteFormset = modelformset_factory(User, form=CustomDeleteUserForm, formset=BaseCustomDeleteModelFormSet)
@@ -483,14 +495,14 @@ class FormfieldShouldDeleteFormTests(TestCase):
         data.update(self.delete_all_ids)
         formset = self.DeleteFormset(data, queryset=User.objects.all())
 
-        # verify two were deleted
+        # Three with odd serial values were deleted.
         self.assertTrue(formset.is_valid())
         self.assertEqual(len(formset.save()), 0)
-        self.assertEqual(len(User.objects.all()), 2)
+        self.assertEqual(User.objects.count(), 1)
 
-        # verify no "odd" PKs left
-        odd_ids = [user.pk for user in User.objects.all() if user.pk % 2]
-        self.assertEqual(len(odd_ids), 0)
+        # No odd serial values left.
+        odd_serials = [user.serial for user in User.objects.all() if user.serial % 2]
+        self.assertEqual(len(odd_serials), 0)
 
 
 class RedeleteTests(TestCase):

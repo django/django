@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2017
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-02-08 20:42+0000\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-21 12:56+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -23,6 +23,9 @@ msgstr "Afrikaanšćina"
 
 msgid "Arabic"
 msgstr "Arabšćina"
+
+msgid "Algerian Arabic"
+msgstr "Algeriska arabšćina"
 
 msgid "Asturian"
 msgstr "Asturišćina"
@@ -138,11 +141,17 @@ msgstr "Górnoserbšćina"
 msgid "Hungarian"
 msgstr "Hungoršćina"
 
+msgid "Armenian"
+msgstr "Armeńšćina"
+
 msgid "Interlingua"
 msgstr "Interlingua"
 
 msgid "Indonesian"
 msgstr "Indonešćina"
+
+msgid "Igbo"
+msgstr "Igbo"
 
 msgid "Ido"
 msgstr "Ido"
@@ -159,6 +168,9 @@ msgstr "Japańšćina"
 msgid "Georgian"
 msgstr "Georgišćina"
 
+msgid "Kabyle"
+msgstr "Kabylšćina"
+
 msgid "Kazakh"
 msgstr "Kazachšćina"
 
@@ -170,6 +182,9 @@ msgstr "Kannadišćina"
 
 msgid "Korean"
 msgstr "Korejańšćina"
+
+msgid "Kyrgyz"
+msgstr "Kirgišćina"
 
 msgid "Luxembourgish"
 msgstr "Luxemburgšćina"
@@ -255,8 +270,14 @@ msgstr "Tamilšćina"
 msgid "Telugu"
 msgstr "Telugu"
 
+msgid "Tajik"
+msgstr "Tadźikišćina"
+
 msgid "Thai"
 msgstr "Thaišćina"
+
+msgid "Turkmen"
+msgstr "Turkmeńšćina"
 
 msgid "Turkish"
 msgstr "Turkojšćina"
@@ -272,6 +293,9 @@ msgstr "Ukrainšćina"
 
 msgid "Urdu"
 msgstr "Urdu"
+
+msgid "Uzbek"
+msgstr "Uzbekšćina"
 
 msgid "Vietnamese"
 msgstr "Vietnamšćina"
@@ -315,17 +339,18 @@ msgstr "Zapódajśo płaśiwu cełu licbu."
 msgid "Enter a valid email address."
 msgstr "Zapódajśo płaśiwu e-mailowu adresu."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Zapódajśo płaśiwe 'adresowe mě', kótarež jano wopśimujo pismiki, licby, "
+"Zapódajśo płaśiwe „adresowe mě“, kótarež jano wopśimujo pismiki, licby, "
 "pódsmužki abo wězawki."
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Zapódajśo płaśiwe 'adresowe mě', kótarež jano wopśimujo unicodowe pismiki, "
+"Zapódajśo płaśiwe „adresowe mě“, kótarež jano wopśimujo unicodowe pismiki, "
 "licby, pódmužki abo wězawki."
 
 msgid "Enter a valid IPv4 address."
@@ -394,6 +419,9 @@ msgstr[3] ""
 "Zawěććo, až toś ta gódnota ma maksimalnje %(limit_value)d znamuškow (ma "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Zapódajśo licbu."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -422,11 +450,14 @@ msgstr[3] "Zawěsććo, až njejo wěcej ako %(max)s cyfrow pśed decimalneju ko
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
-"Datajowy sufiks ' %(extension)s' njejo dowólony. Dowólone sufikse su: ' "
-"%(allowed_extensions)s'."
+"Datajowy sufiks „%(extension)s“ njejo dowólony. Dowólone sufikse su: "
+"%(allowed_extensions)s."
+
+msgid "Null characters are not allowed."
+msgstr "Znamuška nul njejsu dowólone."
 
 msgid "and"
 msgstr "a"
@@ -461,19 +492,13 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr "Typ póla: %(field_type)s"
 
-msgid "Integer"
-msgstr "Integer"
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr "Gódnota „%(value)s“ musy pak True pak False byś."
 
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr "Gódnota '%(value)s' musy ceła licba byś."
-
-msgid "Big (8 byte) integer"
-msgstr "Big (8 bajtow) integer"
-
-#, python-format
-msgid "'%(value)s' value must be either True or False."
-msgstr "Gódnota '%(value)s musy pak True pak False byś."
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr "Gódnota „%(value)s“ musy pak True, False pak None byś."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (pak True pak False)"
@@ -487,55 +512,55 @@ msgstr "Pśez komu źělone cełe licby"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"Gódnota '%(value)s' ma njepłaśiwy datumowy format. Musy we formaśe DD.MM."
+"Gódnota „%(value)s“ ma njepłaśiwy datumowy format. Musy we formaśe DD.MM."
 "YYYY byś."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"Gódnota '%(value)s' ma korektny format (DD.MM.YYYY), ale jo njepłaśiwy datum."
+"Gódnota „%(value)s“ ma korektny format (DD.MM.YYYY), ale jo njepłaśiwy datum."
 
 msgid "Date (without time)"
 msgstr "Datum (bźez casa)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"Gódnota '%(value)s' ma njepłaśiwy format. Musy w formaśe DD.MM.YYYY HH:MM[:"
+"Gódnota „%(value)s“ ma njepłaśiwy format. Musy w formaśe DD.MM.YYYY HH:MM[:"
 "ss[.uuuuuu]][TZ] byś."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"Gódnota '%(value)s' ma korektny format (DD.MM.YYYY HH:MM[:ss[.uuuuuu]][TZ]), "
+"Gódnota „%(value)s“ ma korektny format (DD.MM.YYYY HH:MM[:ss[.uuuuuu]][TZ]), "
 "ale jo njepłaśiwy datum/cas."
 
 msgid "Date (with time)"
 msgstr "Datum (z casom)"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
-msgstr "Gódnota '%(value)s' musy decimalna licba byś."
+msgid "“%(value)s” value must be a decimal number."
+msgstr "Gódnota „%(value)s“ musy decimalna licba byś."
 
 msgid "Decimal number"
 msgstr "Decimalna licba"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"Gódnota '%(value)s ma njepłaśiwy format. Musy we formaśe  [DD] [HH:[MM:]]ss[."
-"uuuuuu] byś."
+"Gódnota „%(value)s“ ma njepłaśiwy format. Musy we formaśe  [DD] "
+"[[HH:]MM:]ss[.uuuuuu] byś."
 
 msgid "Duration"
 msgstr "Traśe"
@@ -547,11 +572,21 @@ msgid "File path"
 msgstr "Datajowa sćažka"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
-msgstr "Gódnota '%(value)s' musy typ float měś."
+msgid "“%(value)s” value must be a float."
+msgstr "Gódnota „%(value)s“ musy typ float měś."
 
 msgid "Floating point number"
 msgstr "Licba běžeceje komy"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr "Gódnota „%(value)s“ musy ceła licba byś."
+
+msgid "Integer"
+msgstr "Integer"
+
+msgid "Big (8 byte) integer"
+msgstr "Big (8 bajtow) integer"
 
 msgid "IPv4 address"
 msgstr "IPv4-adresa"
@@ -560,11 +595,14 @@ msgid "IP address"
 msgstr "IP-adresa"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
-msgstr "Gódnota '%(value)s' musy pak None, True pak False byś."
+msgid "“%(value)s” value must be either None, True or False."
+msgstr "Gódnota „%(value)s“ musy pak None, True pak False byś."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolean (pak True, False pak None)"
+
+msgid "Positive big integer"
+msgstr "Pozitiwna wjelika ceła licba"
 
 msgid "Positive integer"
 msgstr "Pozitiwna ceła licba"
@@ -584,18 +622,18 @@ msgstr "Tekst"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"Gódnota '%(value)s'  ma njepłaśiwy format. Musy w formaśe HH:MM[:ss[."
+"Gódnota „%(value)s“  ma njepłaśiwy format. Musy w formaśe HH:MM[:ss[."
 "uuuuuu]] byś."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"Gódnota '%(value)s' ma korektny format (HH:MM[:ss[.uuuuuu]]), ale jo "
+"Gódnota „%(value)s“ ma korektny format (HH:MM[:ss[.uuuuuu]]), ale jo "
 "njepłaśiwy cas."
 
 msgid "Time"
@@ -608,14 +646,23 @@ msgid "Raw binary data"
 msgstr "Gropne binarne daty"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
-msgstr "'%(value)s' njejo płaśiwy UUID."
+msgid "“%(value)s” is not a valid UUID."
+msgstr "„%(value)s“ njejo płaśiwy UUID."
+
+msgid "Universally unique identifier"
+msgstr "Uniwerselnje jadnorazowy identifikator"
 
 msgid "File"
 msgstr "Dataja"
 
 msgid "Image"
 msgstr "Woraz"
+
+msgid "A JSON object"
+msgstr "JSON-objekt"
+
+msgid "Value must be valid JSON."
+msgstr "Gódnota musy płaśiwy JSON byś."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -650,9 +697,6 @@ msgstr "Toś to pólo jo trěbne."
 msgid "Enter a whole number."
 msgstr "Zapódajśo cełu licbu."
 
-msgid "Enter a number."
-msgstr "Zapódajśo licbu."
-
 msgid "Enter a valid date."
 msgstr "Zapódajśo płaśiwy datum."
 
@@ -664,6 +708,10 @@ msgstr "Zapódajśo płaśiwy datum/cas."
 
 msgid "Enter a valid duration."
 msgstr "Zapódaśe płaśiwe traśe."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Licba dnjow musy mjazy  {min_days} a {max_days} byś."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
@@ -719,6 +767,9 @@ msgstr "Zapódajśo dopołnu gódnotu."
 msgid "Enter a valid UUID."
 msgstr "Zapódajśo płaśiwy UUID."
 
+msgid "Enter a valid JSON."
+msgstr "Zapódajśo płaśiwy JSON."
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -772,10 +823,8 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Pšosym korigěrujśo slědujuce dwójne gódnoty."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
-"Nutśkowny cuzy kluc njejo primarnemu klucoju nadrědowaneje instance "
-"wótpowědował."
+msgid "The inline value did not match the parent instance."
+msgstr "Gódnota inline nadrědowanej instance njewótpowědujo."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -783,12 +832,12 @@ msgstr ""
 "wóleńskich móžnosćow."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" njejo płaśiwa gódnota za primarny kluc."
+msgid "“%(pk)s” is not a valid value."
+msgstr "„%(pk)s“ njejo płaśiwa gódnota."
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
 "%(datetime)s njedajo se w casowej conje %(current_timezone)s "
@@ -812,6 +861,7 @@ msgstr "Jo"
 msgid "No"
 msgstr "Ně"
 
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "jo,ně,snaź"
 
@@ -1076,8 +1126,8 @@ msgstr "To njejo płaśiwa IPv6-adresa."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "abo"
@@ -1134,9 +1184,6 @@ msgstr[1] "%d minuśe"
 msgstr[2] "%d minuty"
 msgstr[3] "%d minutow"
 
-msgid "0 minutes"
-msgstr "0 minutow"
-
 msgid "Forbidden"
 msgstr "Zakazany"
 
@@ -1144,8 +1191,8 @@ msgid "CSRF verification failed. Request aborted."
 msgstr "CSRF-pśeglědanje njejo se raźiło. Napšašowanje jo se pśetergnuło."
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
@@ -1155,13 +1202,26 @@ msgstr ""
 "njekaprujo se wót tśeśich."
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
 msgstr ""
 "Jolic sćo swój wobglědowak tak konfigurěrował, aby se głowy 'Referer' "
 "znjemóžnili, zmóžniśo je pšosym zasej, nanejmjenjej za toś to sedło, za "
 "HTTPS-zwiski abo za napšašowanja 'same-origin'."
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
+msgstr ""
+"Jolic woznamjenje <meta name=\"referrer\" content=\"no-referrer\"> wužywaśo "
+"abo głowu „Referrer-Policy: no-referrer“ zapśimujośo, wótwónoźćo je. CSRF-"
+"šćit pomina se głowu „Referer“, aby striktnu kontrolu referera pśewjasć. "
+"Jolic se wó swóju priwatnosć staraśo, wužywajśo alternatiwy ako <a rel="
+"\"noreferrer\" …> za wótkazy k sedłam tśeśich."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1174,40 +1234,20 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
 "Jolic sćo swój wobglědowak tak konfigurěrował, aby cookieje znjemóžnili, "
 "zmóžniśo je pšosym zasej, nanejmjenjej za toś to sedło abo za napšašowanja "
-"'same-origin'."
+"„same-origin“."
 
 msgid "More information is available with DEBUG=True."
 msgstr "Dalšne informacije su k dispoziciji  z DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Witajśo k Django"
-
-msgid "It worked!"
-msgstr "Jo funkcioněrowało!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Glukužycenje za waš prědny bok, kótaryž spěchujo se wót Django."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Wuwjeźćo ako pśiduce <code>python manage.py startapp [app_label]</code>, aby "
-"swójo prědne nałoženje startował."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Wiźiśo toś tu powěźeńku, dokulaž maśo <code>DEBUG = True</code> w swójej "
-"dataji nastajenjow Django a njejsćo URL konfigurěrował. Dajśo se na źěło!"
-
 msgid "No year specified"
 msgstr "Žedno lěto pódane"
+
+msgid "Date out of range"
+msgstr "Datum zwenka wobcerka"
 
 msgid "No month specified"
 msgstr "Žeden mjasec pódany"
@@ -1231,32 +1271,77 @@ msgstr ""
 "%(class_name)s.allow_future jo False."
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
 msgstr ""
-"Njepłaśiwy '%(format)s' za datumowy znamuškowy rjeśazk '%(datestr)s' pódany"
+"Njepłaśiwy „%(format)s“ za datumowy znamuškowy rjeśazk „%(datestr)s“ pódany"
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "Žedno %(verbose_name)s namakane, kótarež wótpowědujo napšašowanjeju."
 
-msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "Bok njejo 'last', ani njedajo se do 'int' konwertěrowaś."
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr "Bok njejo „last“, ani njedajo se do „int“ konwertěrowaś."
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "Njepłaśiwy bok (%(page_number)s): %(message)s"
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr "Prozna lisćina a '%(class_name)s.allow_empty' jo False."
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr "Prozna lisćina a „%(class_name)s.allow_empty“ jo False."
 
 msgid "Directory indexes are not allowed here."
 msgstr "Zapisowe indekse njejsu how dowólone."
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" njeeksistěrujo"
+msgid "“%(path)s” does not exist"
+msgstr "„%(path)s“ njeeksistěrujo"
 
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Indeks %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django? Web-framework za perfekcionisty z terminami."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"<a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" target="
+"\"_blank\" rel=\"noopener\">Wersijowe informacije</a> za Django %(version)s "
+"pokazaś"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Instalacija jo była wuspěšna! Gratulacija!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Wiźiśo toś ten bok, dokulaž <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> jo w swójej dataji nastajenjow a njejsćo konfigurěrował "
+"URL."
+
+msgid "Django Documentation"
+msgstr "Dokumentacija Django"
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr "Temy, reference a rozpokazanja"
+
+msgid "Tutorial: A Polling App"
+msgstr "Rozpokazanje: Napšašowańske nałoženje"
+
+msgid "Get started with Django"
+msgstr "Prědne kšace z Django"
+
+msgid "Django Community"
+msgstr "Zgromaźeństwo Django"
+
+msgid "Connect, get help, or contribute"
+msgstr "Zwězajśo, wobsarajśo se pomoc abo źěłajśo sobu"

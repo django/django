@@ -173,7 +173,7 @@ The following mixins are used to construct Django's editing views:
         redirects to
         :meth:`~django.views.generic.edit.FormMixin.get_success_url`.
 
-    .. method:: form_invalid()
+    .. method:: form_invalid(form)
 
         Renders a response, providing the invalid form as context.
 
@@ -209,8 +209,8 @@ The following mixins are used to construct Django's editing views:
 
     .. method:: put(*args, **kwargs)
 
-        The ``PUT`` action is also handled and just passes all parameters
-        through to :meth:`post`.
+        The ``PUT`` action is also handled and passes all parameters through to
+        :meth:`post`.
 
 
 ``DeletionMixin``
@@ -231,6 +231,11 @@ The following mixins are used to construct Django's editing views:
         interpolated against the object's field attributes. For example, you
         could use ``success_url="/parent/{parent_id}/"`` to redirect to a URL
         composed out of the ``parent_id`` field on a model.
+
+    .. method:: delete(request, *args, **kwargs)
+
+        Retrieves the target object and calls its ``delete()`` method, then
+        redirects to the success URL.
 
     .. method:: get_success_url()
 

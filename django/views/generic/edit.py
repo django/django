@@ -83,7 +83,7 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
             if self.model is not None:
                 # If a model has been explicitly provided, use it
                 model = self.model
-            elif hasattr(self, 'object') and self.object is not None:
+            elif getattr(self, 'object', None) is not None:
                 # If this view is operating on a single object, use
                 # the class of that object
                 model = self.object.__class__
@@ -159,7 +159,7 @@ class FormView(TemplateResponseMixin, BaseFormView):
 
 class BaseCreateView(ModelFormMixin, ProcessFormView):
     """
-    Base view for creating an new object instance.
+    Base view for creating a new object instance.
 
     Using this base class requires subclassing to provide a response mixin.
     """

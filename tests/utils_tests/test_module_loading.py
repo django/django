@@ -4,7 +4,7 @@ import unittest
 from importlib import import_module
 from zipimport import zipimporter
 
-from django.test import SimpleTestCase, TestCase, modify_settings
+from django.test import SimpleTestCase, modify_settings
 from django.test.utils import extend_sys_path
 from django.utils.module_loading import (
     autodiscover_modules, import_string, module_has_submodule,
@@ -119,7 +119,7 @@ class EggLoader(unittest.TestCase):
                 import_module('egg_module.sub1.sub2.no_such_module')
 
 
-class ModuleImportTestCase(TestCase):
+class ModuleImportTests(SimpleTestCase):
     def test_import_string(self):
         cls = import_string('django.utils.module_loading.import_string')
         self.assertEqual(cls, import_string)

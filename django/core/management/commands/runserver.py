@@ -11,9 +11,9 @@ from django.core.servers.basehttp import (
     WSGIServer, get_internal_wsgi_application, run,
 )
 from django.utils import autoreload
+from django.utils.regex_helper import _lazy_re_compile
 
-
-naiveip_re = re.compile(r"""^(?:
+naiveip_re = _lazy_re_compile(r"""^(?:
 (?P<addr>
     (?P<ipv4>\d{1,3}(?:\.\d{1,3}){3}) |         # IPv4 address
     (?P<ipv6>\[[a-fA-F0-9:]+\]) |               # IPv6 address
@@ -25,8 +25,8 @@ class Command(BaseCommand):
     help = "Starts a lightweight Web server for development."
 
     # Validation is called explicitly each time the server is reloaded.
-    requires_system_checks = False
-    leave_locale_alone = True
+    requires_system_checks = []
+    stealth_options = ('shutdown_message',)
 
     default_addr = '127.0.0.1'
     default_addr_ipv6 = '::1'
@@ -65,8 +65,6 @@ class Command(BaseCommand):
         return get_internal_wsgi_application()
 
     def handle(self, *args, **options):
-        from django.conf import settings
-
         if not settings.DEBUG and not settings.ALLOWED_HOSTS:
             raise CommandError('You must set settings.ALLOWED_HOSTS if DEBUG is False.')
 
@@ -102,7 +100,7 @@ class Command(BaseCommand):
         use_reloader = options['use_reloader']
 
         if use_reloader:
-            autoreload.main(self.inner_run, None, options)
+            autoreload.run_with_reloader(self.inner_run, **options)
         else:
             self.inner_run(None, **options)
 
@@ -126,7 +124,7 @@ class Command(BaseCommand):
         self.stdout.write((
             "Django version %(version)s, using settings %(settings)r\n"
             "Starting development server at %(protocol)s://%(addr)s:%(port)s/\n"
-            "Quit the server with %(quit_command)s.\n"
+            "Quit the server with %(quit_command)s."
         ) % {
             "version": self.get_version(),
             "settings": settings.SETTINGS_MODULE,
@@ -140,7 +138,7 @@ class Command(BaseCommand):
             handler = self.get_handler(*args, **options)
             run(self.addr, int(self.port), handler,
                 ipv6=self.use_ipv6, threading=threading, server_cls=self.server_cls)
-        except socket.error as e:
+        except OSError as e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {
                 errno.EACCES: "You don't have permission to access that port.",
@@ -158,7 +156,3 @@ class Command(BaseCommand):
             if shutdown_message:
                 self.stdout.write(shutdown_message)
             sys.exit(0)
-
-
-# Kept for backward compatibility
-BaseRunserverCommand = Command

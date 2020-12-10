@@ -1,5 +1,6 @@
-from django.conf.urls import url
+from django.urls import path, re_path
 
 urlpatterns = [
-    url(r'/starting-with-slash/$', lambda x: x),
+    path('/path-starting-with-slash/', lambda x: x),
+    re_path(r'/url-starting-with-slash/$', lambda x: x),
 ]

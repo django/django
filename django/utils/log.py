@@ -7,7 +7,8 @@ from django.core import mail
 from django.core.mail import get_connection
 from django.core.management.color import color_style
 from django.utils.module_loading import import_string
-from django.views.debug import ExceptionReporter
+
+request_logger = logging.getLogger('django.request')
 
 # Default logging for Django. This sends an email to the site admins on every
 # HTTP 500 error. Depending on DEBUG, all other log records are either sent to
@@ -27,7 +28,8 @@ DEFAULT_LOGGING = {
     'formatters': {
         'django.server': {
             '()': 'django.utils.log.ServerFormatter',
-            'format': '[%(server_time)s] %(message)s',
+            'format': '[{server_time}] {message}',
+            'style': '{',
         }
     },
     'handlers': {
@@ -80,10 +82,11 @@ class AdminEmailHandler(logging.Handler):
     request data will be provided in the email report.
     """
 
-    def __init__(self, include_html=False, email_backend=None):
-        logging.Handler.__init__(self)
+    def __init__(self, include_html=False, email_backend=None, reporter_class=None):
+        super().__init__()
         self.include_html = include_html
         self.email_backend = email_backend
+        self.reporter_class = import_string(reporter_class or settings.DEFAULT_EXCEPTION_REPORTER)
 
     def emit(self, record):
         try:
@@ -113,7 +116,7 @@ class AdminEmailHandler(logging.Handler):
         else:
             exc_info = (None, record.getMessage(), None)
 
-        reporter = ExceptionReporter(request, is_email=True, *exc_info)
+        reporter = self.reporter_class(request, is_email=True, *exc_info)
         message = "%s\n\n%s" % (self.format(no_exc_record), reporter.get_traceback_text())
         html_message = reporter.get_traceback_html() if self.include_html else None
         self.send_mail(subject, message, fail_silently=True, html_message=html_message)
@@ -157,6 +160,8 @@ class RequireDebugTrue(logging.Filter):
 
 
 class ServerFormatter(logging.Formatter):
+    default_time_format = '%d/%b/%Y %H:%M:%S'
+
     def __init__(self, *args, **kwargs):
         self.style = color_style()
         super().__init__(*args, **kwargs)
@@ -190,4 +195,38 @@ class ServerFormatter(logging.Formatter):
         return super().format(record)
 
     def uses_server_time(self):
-        return self._fmt.find('%(server_time)') >= 0
+        return self._fmt.find('{server_time}') >= 0
+
+
+def log_response(message, *args, response=None, request=None, logger=request_logger, level=None, exc_info=None):
+    """
+    Log errors based on HttpResponse status.
+
+    Log 5xx responses as errors and 4xx responses as warnings (unless a level
+    is given as a keyword argument). The HttpResponse status_code and the
+    request are passed to the logger's extra parameter.
+    """
+    # Check if the response has already been logged. Multiple requests to log
+    # the same response can be received in some cases, e.g., when the
+    # response is the result of an exception and is logged at the time the
+    # exception is caught so that the exc_info can be recorded.
+    if getattr(response, '_has_been_logged', False):
+        return
+
+    if level is None:
+        if response.status_code >= 500:
+            level = 'error'
+        elif response.status_code >= 400:
+            level = 'warning'
+        else:
+            level = 'info'
+
+    getattr(logger, level)(
+        message, *args,
+        extra={
+            'status_code': response.status_code,
+            'request': request,
+        },
+        exc_info=exc_info,
+    )
+    response._has_been_logged = True

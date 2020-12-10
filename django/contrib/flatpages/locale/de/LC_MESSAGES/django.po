@@ -2,14 +2,14 @@
 #
 # Translators:
 # André Hagenbruch, 2012
-# Jannis Leidel <jannis@leidel.info>, 2011,2013-2017
+# Jannis Leidel <jannis@leidel.info>, 2011,2013-2017,2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-03-22 10:44+0000\n"
-"Last-Translator: Markus Holtermann <inyoka@markusholtermann.eu>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-17 23:00+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,9 +27,10 @@ msgid "URL"
 msgstr "Adresse (URL)"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"Beispiel: „/about/contact/“. Wichtig: Am Anfang und Ende muss ein / stehen."
+"Beispiel: „/about/contact/“. Wichtig: Am Anfang und Ende muss ein "
+"Schrägstrich („/“) stehen."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
@@ -37,6 +38,11 @@ msgid ""
 msgstr ""
 "Dieser Wert darf nur Buchstaben, Ziffern, Punkte, Unterstriche, "
 "Bindestriche, Schrägstriche und Tilden enthalten."
+
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr ""
+"Beispiel: „/about/contact“. Wichtig: Am Anfang muss ein Schrägstrich („/“) "
+"stehen."
 
 msgid "URL is missing a leading slash."
 msgstr "Der URL fehlt ein vorangestellter Schrägstrich."
@@ -62,8 +68,8 @@ msgid "template name"
 msgstr "Name des Templates"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
 "Beispiel: „flatpages/contact_page.html“. Wenn dieses Feld nicht gesetzt ist, "
 "wird standardmäßig „flatpages/default.html“ benutzt."

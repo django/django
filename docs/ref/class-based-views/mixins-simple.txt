@@ -11,10 +11,8 @@ Simple mixins
 
     .. attribute:: extra_context
 
-        .. versionadded:: 2.0
-
         A dictionary to include in the context. This is a convenient way of
-        specifying some simple context in
+        specifying some context in
         :meth:`~django.views.generic.base.View.as_view`. Example usage::
 
             from django.views.generic import TemplateView
@@ -85,7 +83,7 @@ Simple mixins
 
         The content type to use for the response. ``content_type`` is passed
         as a keyword argument to ``response_class``. Default is ``None`` --
-        meaning that Django uses :setting:`DEFAULT_CONTENT_TYPE`.
+        meaning that Django uses ``'text/html'``.
 
     **Methods**
 
@@ -104,5 +102,5 @@ Simple mixins
         Returns a list of template names to search for when rendering the
         template. The first template that is found will be used.
 
-        If :attr:`template_name` is specified, the default implementation will
-        return a list containing :attr:`template_name` (if it is specified).
+        The default implementation will return a list containing
+        :attr:`template_name` (if it is specified).

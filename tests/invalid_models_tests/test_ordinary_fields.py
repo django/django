@@ -1,10 +1,16 @@
 import unittest
+import uuid
 
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import connection, models
-from django.test import SimpleTestCase, TestCase, skipIfDBFeature
+from django.test import (
+    SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature,
+)
 from django.test.utils import isolate_apps, override_settings
+from django.utils.functional import lazy
 from django.utils.timezone import now
+from django.utils.translation import gettext_lazy as _
+from django.utils.version import get_docs_version
 
 
 @isolate_apps('invalid_models_tests')
@@ -36,21 +42,45 @@ class AutoFieldTests(SimpleTestCase):
             ),
         ])
 
+    def test_max_length_warning(self):
+        class Model(models.Model):
+            auto = models.AutoField(primary_key=True, max_length=2)
+
+        field = Model._meta.get_field('auto')
+        self.assertEqual(field.check(), [
+            DjangoWarning(
+                "'max_length' is ignored when used with %s."
+                % field.__class__.__name__,
+                hint="Remove 'max_length' from field",
+                obj=field,
+                id='fields.W122',
+            ),
+        ])
+
 
 @isolate_apps('invalid_models_tests')
-class BooleanFieldTests(SimpleTestCase):
+class BinaryFieldTests(SimpleTestCase):
 
-    def test_nullable_boolean_field(self):
+    def test_valid_default_value(self):
         class Model(models.Model):
-            field = models.BooleanField(null=True)
+            field1 = models.BinaryField(default=b'test')
+            field2 = models.BinaryField(default=None)
+
+        for field_name in ('field1', 'field2'):
+            field = Model._meta.get_field(field_name)
+            self.assertEqual(field.check(), [])
+
+    def test_str_default_value(self):
+        class Model(models.Model):
+            field = models.BinaryField(default='test')
 
         field = Model._meta.get_field('field')
         self.assertEqual(field.check(), [
             Error(
-                'BooleanFields do not accept null values.',
-                hint='Use a NullBooleanField instead.',
+                "BinaryField's default cannot be a string. Use bytes content "
+                "instead.",
                 obj=field,
-                id='fields.E110',
+                id='fields.E170',
             ),
         ])
 
@@ -66,7 +96,8 @@ class CharFieldTests(TestCase):
                     ('1', 'item1'),
                     ('2', 'item2'),
                 ],
-                db_index=True)
+                db_index=True,
+            )
 
         field = Model._meta.get_field('field')
         self.assertEqual(field.check(), [])
@@ -149,6 +180,21 @@ class CharFieldTests(TestCase):
             ),
         ])
 
+    def test_non_iterable_choices_two_letters(self):
+        """Two letters isn't a valid choice pair."""
+        class Model(models.Model):
+            field = models.CharField(max_length=10, choices=['ab'])
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(), [
+            Error(
+                "'choices' must be an iterable containing (actual value, "
+                "human readable name) tuples.",
+                obj=field,
+                id='fields.E005',
+            ),
+        ])
+
     def test_iterable_of_iterable_choices(self):
         class ThingItem:
             def __init__(self, value, display):
@@ -156,14 +202,14 @@ class CharFieldTests(TestCase):
                 self.display = display
 
             def __iter__(self):
-                return (x for x in [self.value, self.display])
+                return iter((self.value, self.display))
 
             def __len__(self):
                 return 2
 
         class Things:
             def __iter__(self):
-                return (x for x in [ThingItem(1, 2), ThingItem(3, 4)])
+                return iter((ThingItem(1, 2), ThingItem(3, 4)))
 
         class ThingWithIterableChoices(models.Model):
             thing = models.CharField(max_length=100, blank=True, choices=Things())
@@ -174,14 +220,119 @@ class CharFieldTests(TestCase):
         class Model(models.Model):
             field = models.CharField(max_length=10, choices=[(1, 2, 3), (1, 2, 3)])
 
+        class Model2(models.Model):
+            field = models.IntegerField(choices=[0])
+
+        for model in (Model, Model2):
+            with self.subTest(model.__name__):
+                field = model._meta.get_field('field')
+                self.assertEqual(field.check(), [
+                    Error(
+                        "'choices' must be an iterable containing (actual "
+                        "value, human readable name) tuples.",
+                        obj=field,
+                        id='fields.E005',
+                    ),
+                ])
+
+    def test_choices_containing_lazy(self):
+        class Model(models.Model):
+            field = models.CharField(max_length=10, choices=[['1', _('1')], ['2', _('2')]])
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
+    def test_lazy_choices(self):
+        class Model(models.Model):
+            field = models.CharField(max_length=10, choices=lazy(lambda: [[1, '1'], [2, '2']], tuple)())
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
+    def test_choices_named_group(self):
+        class Model(models.Model):
+            field = models.CharField(
+                max_length=10, choices=[
+                    ['knights', [['L', 'Lancelot'], ['G', 'Galahad']]],
+                    ['wizards', [['T', 'Tim the Enchanter']]],
+                    ['R', 'Random character'],
+                ],
+            )
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
+    def test_choices_named_group_non_pairs(self):
+        class Model(models.Model):
+            field = models.CharField(
+                max_length=10,
+                choices=[['knights', [['L', 'Lancelot', 'Du Lac']]]],
+            )
+
         field = Model._meta.get_field('field')
         self.assertEqual(field.check(), [
             Error(
-                "'choices' must be an iterable containing (actual value, human readable name) tuples.",
+                "'choices' must be an iterable containing (actual value, "
+                "human readable name) tuples.",
                 obj=field,
                 id='fields.E005',
             ),
         ])
+
+    def test_choices_named_group_bad_structure(self):
+        class Model(models.Model):
+            field = models.CharField(
+                max_length=10, choices=[
+                    ['knights', [
+                        ['Noble', [['G', 'Galahad']]],
+                        ['Combative', [['L', 'Lancelot']]],
+                    ]],
+                ],
+            )
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(), [
+            Error(
+                "'choices' must be an iterable containing (actual value, "
+                "human readable name) tuples.",
+                obj=field,
+                id='fields.E005',
+            ),
+        ])
+
+    def test_choices_named_group_lazy(self):
+        class Model(models.Model):
+            field = models.CharField(
+                max_length=10, choices=[
+                    [_('knights'), [['L', _('Lancelot')], ['G', _('Galahad')]]],
+                    ['R', _('Random character')],
+                ],
+            )
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
+    def test_choices_in_max_length(self):
+        class Model(models.Model):
+            field = models.CharField(
+                max_length=2, choices=[
+                    ('ABC', 'Value Too Long!'), ('OK', 'Good')
+                ],
+            )
+            group = models.CharField(
+                max_length=2, choices=[
+                    ('Nested', [('OK', 'Good'), ('Longer', 'Longer')]),
+                    ('Grouped', [('Bad', 'Bad')]),
+                ],
+            )
+
+        for name, choice_max_length in (('field', 3), ('group', 6)):
+            with self.subTest(name):
+                field = Model._meta.get_field(name)
+                self.assertEqual(field.check(), [
+                    Error(
+                        "'max_length' is too small to fit the longest value "
+                        "in 'choices' (%d characters)." % choice_max_length,
+                        obj=field,
+                        id='fields.E009',
+                    ),
+                ])
 
     def test_bad_db_index_value(self):
         class Model(models.Model):
@@ -224,16 +375,45 @@ class CharFieldTests(TestCase):
         field = Model._meta.get_field('field')
         validator = DatabaseValidation(connection=connection)
         self.assertEqual(validator.check_field(field), [
-            Error(
-                'MySQL does not allow unique CharFields to have a max_length > 255.',
+            DjangoWarning(
+                '%s may not allow unique CharFields to have a max_length > '
+                '255.' % connection.display_name,
+                hint=(
+                    'See: https://docs.djangoproject.com/en/%s/ref/databases/'
+                    '#mysql-character-fields' % get_docs_version()
+                ),
                 obj=field,
-                id='mysql.E001',
+                id='mysql.W003',
             )
         ])
 
+    def test_db_collation(self):
+        class Model(models.Model):
+            field = models.CharField(max_length=100, db_collation='anything')
+
+        field = Model._meta.get_field('field')
+        error = Error(
+            '%s does not support a database collation on CharFields.'
+            % connection.display_name,
+            id='fields.E190',
+            obj=field,
+        )
+        expected = [] if connection.features.supports_collation_on_charfield else [error]
+        self.assertEqual(field.check(databases=self.databases), expected)
+
+    def test_db_collation_required_db_features(self):
+        class Model(models.Model):
+            field = models.CharField(max_length=100, db_collation='anything')
+
+            class Meta:
+                required_db_features = {'supports_collation_on_charfield'}
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(databases=self.databases), [])
+
 
 @isolate_apps('invalid_models_tests')
-class DateFieldTests(TestCase):
+class DateFieldTests(SimpleTestCase):
     maxDiff = None
 
     def test_auto_now_and_auto_now_add_raise_error(self):
@@ -296,7 +476,7 @@ class DateFieldTests(TestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class DateTimeFieldTests(TestCase):
+class DateTimeFieldTests(SimpleTestCase):
     maxDiff = None
 
     def test_fix_default_value(self):
@@ -524,8 +704,8 @@ class ImageFieldTests(SimpleTestCase):
         expected = [] if pillow_installed else [
             Error(
                 'Cannot use ImageField because Pillow is not installed.',
-                hint=('Get Pillow at https://pypi.python.org/pypi/Pillow '
-                      'or run command "pip install Pillow".'),
+                hint=('Get Pillow at https://pypi.org/project/Pillow/ '
+                      'or run command "python -m pip install Pillow".'),
                 obj=field,
                 id='fields.E210',
             ),
@@ -538,21 +718,29 @@ class IntegerFieldTests(SimpleTestCase):
 
     def test_max_length_warning(self):
         class Model(models.Model):
-            value = models.IntegerField(max_length=2)
+            integer = models.IntegerField(max_length=2)
+            biginteger = models.BigIntegerField(max_length=2)
+            smallinteger = models.SmallIntegerField(max_length=2)
+            positiveinteger = models.PositiveIntegerField(max_length=2)
+            positivebiginteger = models.PositiveBigIntegerField(max_length=2)
+            positivesmallinteger = models.PositiveSmallIntegerField(max_length=2)
 
-        field = Model._meta.get_field('value')
-        self.assertEqual(field.check(), [
-            DjangoWarning(
-                "'max_length' is ignored when used with IntegerField",
-                hint="Remove 'max_length' from field",
-                obj=field,
-                id='fields.W122',
-            )
-        ])
+        for field in Model._meta.get_fields():
+            if field.auto_created:
+                continue
+            with self.subTest(name=field.name):
+                self.assertEqual(field.check(), [
+                    DjangoWarning(
+                        "'max_length' is ignored when used with %s." % field.__class__.__name__,
+                        hint="Remove 'max_length' from field",
+                        obj=field,
+                        id='fields.W122',
+                    )
+                ])
 
 
 @isolate_apps('invalid_models_tests')
-class TimeFieldTests(TestCase):
+class TimeFieldTests(SimpleTestCase):
     maxDiff = None
 
     def test_fix_default_value(self):
@@ -602,7 +790,7 @@ class TextFieldTests(TestCase):
             value = models.TextField(db_index=True)
         field = Model._meta.get_field('value')
         field_type = field.db_type(connection)
-        self.assertEqual(field.check(), [
+        self.assertEqual(field.check(databases=self.databases), [
             DjangoWarning(
                 '%s does not support a database index on %s columns.'
                 % (connection.display_name, field_type),
@@ -614,3 +802,88 @@ class TextFieldTests(TestCase):
                 id='fields.W162',
             )
         ])
+
+    def test_db_collation(self):
+        class Model(models.Model):
+            field = models.TextField(db_collation='anything')
+
+        field = Model._meta.get_field('field')
+        error = Error(
+            '%s does not support a database collation on TextFields.'
+            % connection.display_name,
+            id='fields.E190',
+            obj=field,
+        )
+        expected = [] if connection.features.supports_collation_on_textfield else [error]
+        self.assertEqual(field.check(databases=self.databases), expected)
+
+    def test_db_collation_required_db_features(self):
+        class Model(models.Model):
+            field = models.TextField(db_collation='anything')
+
+            class Meta:
+                required_db_features = {'supports_collation_on_textfield'}
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(databases=self.databases), [])
+
+
+@isolate_apps('invalid_models_tests')
+class UUIDFieldTests(TestCase):
+    def test_choices_named_group(self):
+        class Model(models.Model):
+            field = models.UUIDField(
+                choices=[
+                    ['knights', [
+                        [uuid.UUID('5c859437-d061-4847-b3f7-e6b78852f8c8'), 'Lancelot'],
+                        [uuid.UUID('c7853ec1-2ea3-4359-b02d-b54e8f1bcee2'), 'Galahad'],
+                    ]],
+                    [uuid.UUID('25d405be-4895-4d50-9b2e-d6695359ce47'), 'Other'],
+                ],
+            )
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
+
+@isolate_apps('invalid_models_tests')
+@skipUnlessDBFeature('supports_json_field')
+class JSONFieldTests(TestCase):
+    def test_invalid_default(self):
+        class Model(models.Model):
+            field = models.JSONField(default={})
+
+        self.assertEqual(Model._meta.get_field('field').check(), [
+            DjangoWarning(
+                msg=(
+                    "JSONField default should be a callable instead of an "
+                    "instance so that it's not shared between all field "
+                    "instances."
+                ),
+                hint=(
+                    'Use a callable instead, e.g., use `dict` instead of `{}`.'
+                ),
+                obj=Model._meta.get_field('field'),
+                id='fields.E010',
+            )
+        ])
+
+    def test_valid_default(self):
+        class Model(models.Model):
+            field = models.JSONField(default=dict)
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
+    def test_valid_default_none(self):
+        class Model(models.Model):
+            field = models.JSONField(default=None)
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
+    def test_valid_callable_default(self):
+        def callable_default():
+            return {'it': 'works'}
+
+        class Model(models.Model):
+            field = models.JSONField(default=callable_default)
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])

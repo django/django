@@ -1,10 +1,9 @@
-from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin.actions import delete_selected
 from django.contrib.auth.models import User
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.client import RequestFactory
-from django.urls import reverse
+from django.urls import path, reverse
 
 from .models import Article
 
@@ -13,7 +12,7 @@ site.register(User)
 site.register(Article)
 
 urlpatterns = [
-    url(r'^test_admin/admin/', site.urls),
+    path('test_admin/admin/', site.urls),
 ]
 
 
@@ -23,13 +22,14 @@ class SiteEachContextTest(TestCase):
     Check each_context contains the documented variables and that available_apps context
     variable structure is the expected one.
     """
+    request_factory = RequestFactory()
+
     @classmethod
     def setUpTestData(cls):
         cls.u1 = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
 
     def setUp(self):
-        factory = RequestFactory()
-        request = factory.get(reverse('test_adminsite:index'))
+        request = self.request_factory.get(reverse('test_adminsite:index'))
         request.user = self.u1
         self.ctx = site.each_context(request)
 
@@ -41,7 +41,7 @@ class SiteEachContextTest(TestCase):
         self.assertIs(ctx['has_permission'], True)
 
     def test_each_context_site_url_with_script_name(self):
-        request = RequestFactory().get(reverse('test_adminsite:index'), SCRIPT_NAME='/my-script-name/')
+        request = self.request_factory.get(reverse('test_adminsite:index'), SCRIPT_NAME='/my-script-name/')
         request.user = self.u1
         self.assertEqual(site.each_context(request)['site_url'], '/my-script-name/')
 

@@ -2,14 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# NullIsNot0 <nullisnot0@inbox.lv>, 2019
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 08:20+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-11-07 05:24+0000\n"
+"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -26,8 +27,9 @@ msgid "The base GIS field."
 msgstr "ĢIS bāzes lauks."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
-msgstr "Bāzes ĢIS lauks -- atbilst OpenGIS specifikācijas Geometry tipam."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
+msgstr ""
+"Bāzes Ģeometrijas lauks -- atbilst OpenGIS specifikācijas Geometry tipam."
 
 msgid "Point"
 msgstr "Punkts"
@@ -84,5 +86,5 @@ msgid "No feeds are registered."
 msgstr "Nav reģistrētu barotņu."
 
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr "Vienkāršotais nosaukums %r nav reģistrēts."

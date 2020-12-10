@@ -29,7 +29,7 @@ from django.contrib.gis.gdal.datasource import DataSource
 from django.contrib.gis.gdal.driver import Driver
 from django.contrib.gis.gdal.envelope import Envelope
 from django.contrib.gis.gdal.error import (
-    GDALException, OGRException, OGRIndexError, SRSException, check_err,
+    GDALException, SRSException, check_err,
 )
 from django.contrib.gis.gdal.geometries import OGRGeometry
 from django.contrib.gis.gdal.geomtype import OGRGeomType
@@ -37,11 +37,13 @@ from django.contrib.gis.gdal.libgdal import (
     GDAL_VERSION, gdal_full_version, gdal_version,
 )
 from django.contrib.gis.gdal.raster.source import GDALRaster
-from django.contrib.gis.gdal.srs import CoordTransform, SpatialReference
+from django.contrib.gis.gdal.srs import (
+    AxisOrder, CoordTransform, SpatialReference,
+)
 
 __all__ = (
-    'Driver', 'DataSource', 'CoordTransform', 'Envelope', 'GDALException',
-    'GDALRaster', 'GDAL_VERSION', 'OGRException', 'OGRGeometry', 'OGRGeomType',
-    'OGRIndexError', 'SpatialReference', 'SRSException',
-    'check_err', 'gdal_version', 'gdal_full_version',
+    'AxisOrder', 'Driver', 'DataSource', 'CoordTransform', 'Envelope',
+    'GDALException', 'GDALRaster', 'GDAL_VERSION', 'OGRGeometry',
+    'OGRGeomType', 'SpatialReference', 'SRSException', 'check_err',
+    'gdal_version', 'gdal_full_version',
 )

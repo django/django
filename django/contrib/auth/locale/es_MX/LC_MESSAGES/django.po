@@ -1,15 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Abraham Estrada, 2011-2012
+# Abe Estrada, 2011-2012
+# Claude Paroz <claude@2xlibre.net>, 2017
+# Jesús Bautista <jesbam98@gmail.com>, 2019
 # Juan Pablo Flores <juanpflores94@gmail.com>, 2016
+# zodman <zodman@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-11-30 03:03+0000\n"
-"Last-Translator: Juan Pablo Flores <juanpflores94@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-12-26 17:00+0000\n"
+"Last-Translator: Jesús Bautista <jesbam98@gmail.com>\n"
 "Language-Team: Spanish (Mexico) (http://www.transifex.com/django/django/"
 "language/es_MX/)\n"
 "MIME-Version: 1.0\n"
@@ -53,8 +56,8 @@ msgstr "No se ha establecido ninguna contraseña."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Formato de contraseña no válido o algoritmo de hash desconocido."
 
-msgid "The two password fields didn't match."
-msgstr "Los dos campos de contraseñas no coinciden entre si."
+msgid "The two password fields didn’t match."
+msgstr "Los dos campos de contraseña no coinciden."
 
 msgid "Password"
 msgstr "Contraseña"
@@ -66,20 +69,19 @@ msgid "Enter the same password as before, for verification."
 msgstr "Para verificar, introduzca la misma contraseña que introdujo antes."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Las contraseñas no se almacenan en texto plano, así que no hay manera de ver "
-"la contraseña del usuario, pero se puede cambiar la contraseña mediante <a "
-"href=\"password/\">este formulario</a>."
+"Las contraseñas sin procesar no se almacenan, por lo que no hay forma de ver "
+"la contraseña de este usuario, pero puede cambiarla usando <a href="
+"\"{}\">este formulario</a>. "
 
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
-"Por favor introduza %(username)s y contraseña correctos. Note que puede que "
+"Por favor introduzca %(username)s y contraseña correctos. Note que puede que "
 "ambos campos sean estrictos en relación a diferencias entre mayúsculas y "
 "minúsculas."
 
@@ -252,20 +254,20 @@ msgstr[1] ""
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "La contraseña es muy similar a  %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr "Su contraseña no puede ser similar a su otra información personal."
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Su contraseña no puede ser muy similar a su otra información personal."
 
 msgid "This password is too common."
 msgstr "Esta contraseña es muy común."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Su contraseña no puede ser una contraseña común."
+msgid "Your password can’t be a commonly used password."
+msgstr "Su contraseña no puede ser una contraseña de uso común."
 
 msgid "This password is entirely numeric."
 msgstr "Esta contraseña es totalmente numérica."
 
-msgid "Your password can't be entirely numeric."
-msgstr "Su contraseña no puede ser enteramente numérica."
+msgid "Your password can’t be entirely numeric."
+msgstr "Su contraseña no puede ser completamente numérica."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

@@ -3,13 +3,13 @@
 # Translators:
 # Chen Chun-Chia <ccc.larc@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Tzu-ping Chung <uranusjr@gmail.com>, 2016
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-08-19 08:10+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-18 09:01+0000\n"
 "Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
@@ -29,17 +29,17 @@ msgid "redirect from"
 msgstr "重導向自"
 
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
-msgstr "應該是一個絕對路徑，不包括網域。例如：'/events/search/'。"
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
+msgstr "應該是一個絕對路徑，不包括網域。例如：「/events/search/」。"
 
 msgid "redirect to"
 msgstr "重導向到"
 
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
-msgstr "此可為一絕對路徑 (如上) 或一個以 'http://' 開頭的完整 URL。"
+"“http://”."
+msgstr "此可為一絕對路徑（如上）或一個以「http://」開頭的完整 URL。"
 
 msgid "redirect"
 msgstr "重導向"

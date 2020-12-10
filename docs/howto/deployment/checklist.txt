@@ -109,9 +109,6 @@ and in production. Django defaults to per-process :ref:`local-memory caching
 Cache servers often have weak authentication. Make sure they only accept
 connections from your application servers.
 
-If you're using Memcached, consider using :ref:`cached sessions
-<cached-sessions-backend>` to improve performance.
-
 :setting:`DATABASES`
 --------------------
 
@@ -187,6 +184,15 @@ Performance optimizations
 Setting :setting:`DEBUG = False <DEBUG>` disables several features that are
 only useful in development. In addition, you can tune the following settings.
 
+Sessions
+--------
+
+Consider using :ref:`cached sessions <cached-sessions-backend>` to improve
+performance.
+
+If using database-backed sessions, regularly :ref:`clear old sessions
+<clearing-the-session-store>` to avoid storing unnecessary data.
+
 :setting:`CONN_MAX_AGE`
 -----------------------
 
@@ -242,11 +248,6 @@ Customize the default error views
 Django includes default views and templates for several HTTP error codes. You
 may want to override the default templates by creating the following templates
 in your root template directory: ``404.html``, ``500.html``, ``403.html``, and
-``400.html``. The default views should suffice for 99% of Web applications, but
-if you desire to customize them, see these instructions which also contain
-details about the default templates:
-
-* :ref:`http_not_found_view`
-* :ref:`http_internal_server_error_view`
-* :ref:`http_forbidden_view`
-* :ref:`http_bad_request_view`
+``400.html``. The :ref:`default error views <error-views>` that use these
+templates should suffice for 99% of Web applications, but you can
+:ref:`customize them <customizing-error-views>` as well.

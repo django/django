@@ -21,10 +21,17 @@ class Person(models.Model):
         return '%s %s' % (self.first_name, self.last_name)
 
 
+class SchoolClassManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().exclude(year=1000)
+
+
 class SchoolClass(models.Model):
     year = models.PositiveIntegerField()
     day = models.CharField(max_length=9, blank=True)
     last_updated = models.DateTimeField()
+
+    objects = SchoolClassManager()
 
 
 class VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ(models.Model):
@@ -89,6 +96,7 @@ class Item(models.Model):
 
 class Object(models.Model):
     related_objects = models.ManyToManyField("self", db_constraint=False, symmetrical=False)
+    obj_ref = models.ForeignKey('ObjectReference', models.CASCADE, null=True)
 
     def __str__(self):
         return str(self.id)
@@ -101,5 +109,34 @@ class ObjectReference(models.Model):
         return str(self.obj_id)
 
 
+class ObjectSelfReference(models.Model):
+    key = models.CharField(max_length=3, unique=True)
+    obj = models.ForeignKey('ObjectSelfReference', models.SET_NULL, null=True)
+
+
+class CircularA(models.Model):
+    key = models.CharField(max_length=3, unique=True)
+    obj = models.ForeignKey('CircularB', models.SET_NULL, null=True)
+
+    def natural_key(self):
+        return (self.key,)
+
+
+class CircularB(models.Model):
+    key = models.CharField(max_length=3, unique=True)
+    obj = models.ForeignKey('CircularA', models.SET_NULL, null=True)
+
+    def natural_key(self):
+        return (self.key,)
+
+
 class RawData(models.Model):
     raw_data = models.BinaryField()
+
+
+class Author(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+
+class Book(models.Model):
+    author = models.ForeignKey(Author, models.CASCADE, to_field='name')

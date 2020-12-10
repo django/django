@@ -1,4 +1,4 @@
-# http://editorconfig.org
+# https://editorconfig.org/
 
 root = true
 
@@ -39,3 +39,6 @@ indent_style = tab
 # Batch files use tabs for indentation
 [*.bat]
 indent_style = tab
+
+[docs/**.txt]
+max_line_length = 79

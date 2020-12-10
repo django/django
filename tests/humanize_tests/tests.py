@@ -31,10 +31,14 @@ class HumanizeTests(SimpleTestCase):
 
     def humanize_tester(self, test_list, result_list, method, normalize_result_func=escape):
         for test_content, result in zip(test_list, result_list):
-            t = Template('{%% load humanize %%}{{ test_content|%s }}' % method)
-            rendered = t.render(Context(locals())).strip()
-            self.assertEqual(rendered, normalize_result_func(result),
-                             msg="%s test failed, produced '%s', should've produced '%s'" % (method, rendered, result))
+            with self.subTest(test_content):
+                t = Template('{%% load humanize %%}{{ test_content|%s }}' % method)
+                rendered = t.render(Context(locals())).strip()
+                self.assertEqual(
+                    rendered,
+                    normalize_result_func(result),
+                    msg="%s test failed, produced '%s', should've produced '%s'" % (method, rendered, result)
+                )
 
     def test_ordinal(self):
         test_list = ('1', '2', '3', '4', '11', '12',
@@ -95,18 +99,27 @@ class HumanizeTests(SimpleTestCase):
             self.humanize_tester([100], ['100'], 'intcomma')
 
     def test_intword(self):
-        test_list = (
+        # Positive integers.
+        test_list_positive = (
             '100', '1000000', '1200000', '1290000', '1000000000', '2000000000',
             '6000000000000', '1300000000000000', '3500000000000000000000',
-            '8100000000000000000000000000000000', None,
+            '8100000000000000000000000000000000', ('1' + '0' * 100),
+            ('1' + '0' * 104),
         )
-        result_list = (
+        result_list_positive = (
             '100', '1.0 million', '1.2 million', '1.3 million', '1.0 billion',
             '2.0 billion', '6.0 trillion', '1.3 quadrillion', '3.5 sextillion',
-            '8.1 decillion', None,
+            '8.1 decillion', '1.0 googol', ('1' + '0' * 104),
         )
+        # Negative integers.
+        test_list_negative = ('-' + test for test in test_list_positive)
+        result_list_negative = ('-' + result for result in result_list_positive)
         with translation.override('en'):
-            self.humanize_tester(test_list, result_list, 'intword')
+            self.humanize_tester(
+                (*test_list_positive, *test_list_negative, None),
+                (*result_list_positive, *result_list_negative, None),
+                'intword',
+            )
 
     def test_i18n_intcomma(self):
         test_list = (100, 1000, 10123, 10311, 1000000, 1234567.25,
@@ -118,17 +131,25 @@ class HumanizeTests(SimpleTestCase):
                 self.humanize_tester(test_list, result_list, 'intcomma')
 
     def test_i18n_intword(self):
-        test_list = (
+        # Positive integers.
+        test_list_positive = (
             '100', '1000000', '1200000', '1290000', '1000000000', '2000000000',
             '6000000000000',
         )
-        result_list = (
+        result_list_positive = (
             '100', '1,0 Million', '1,2 Millionen', '1,3 Millionen',
             '1,0 Milliarde', '2,0 Milliarden', '6,0 Billionen',
         )
+        # Negative integers.
+        test_list_negative = ('-' + test for test in test_list_positive)
+        result_list_negative = ('-' + result for result in result_list_positive)
         with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True):
             with translation.override('de'):
-                self.humanize_tester(test_list, result_list, 'intword')
+                self.humanize_tester(
+                    (*test_list_positive, *test_list_negative),
+                    (*result_list_positive, *result_list_negative),
+                    'intword',
+                )
 
     def test_apnumber(self):
         test_list = [str(x) for x in range(1, 11)]
@@ -183,7 +204,9 @@ class HumanizeTests(SimpleTestCase):
             def utcoffset(self, dt):
                 return None
         test_list = [
+            'test',
             now,
+            now - datetime.timedelta(microseconds=1),
             now - datetime.timedelta(seconds=1),
             now - datetime.timedelta(seconds=30),
             now - datetime.timedelta(minutes=1, seconds=30),
@@ -205,6 +228,8 @@ class HumanizeTests(SimpleTestCase):
             now.replace(tzinfo=utc),
         ]
         result_list = [
+            'test',
+            'now',
             'now',
             'a second ago',
             '30\xa0seconds ago',
@@ -284,8 +309,53 @@ class HumanizeTests(SimpleTestCase):
         humanize.datetime = DocumentedMockDateTime
         try:
             for test_time_string, expected_natural_time in test_data:
-                test_time = datetime.datetime.strptime(test_time_string, time_format)
-                natural_time = humanize.naturaltime(test_time).replace('\xa0', ' ')
-                self.assertEqual(expected_natural_time, natural_time)
+                with self.subTest(test_time_string):
+                    test_time = datetime.datetime.strptime(test_time_string, time_format)
+                    natural_time = humanize.naturaltime(test_time).replace('\xa0', ' ')
+                    self.assertEqual(expected_natural_time, natural_time)
+        finally:
+            humanize.datetime = orig_humanize_datetime
+
+    def test_inflection_for_timedelta(self):
+        """
+        Translation of '%d day'/'%d month'/… may differ depending on the context
+        of the string it is inserted in.
+        """
+        test_list = [
+            # "%(delta)s ago" translations
+            now - datetime.timedelta(days=1),
+            now - datetime.timedelta(days=2),
+            now - datetime.timedelta(days=30),
+            now - datetime.timedelta(days=60),
+            now - datetime.timedelta(days=500),
+            now - datetime.timedelta(days=865),
+            # "%(delta)s from now" translations
+            now + datetime.timedelta(days=1),
+            now + datetime.timedelta(days=2),
+            now + datetime.timedelta(days=30),
+            now + datetime.timedelta(days=60),
+            now + datetime.timedelta(days=500),
+            now + datetime.timedelta(days=865),
+        ]
+        result_list = [
+            'před 1\xa0dnem',
+            'před 2\xa0dny',
+            'před 1\xa0měsícem',
+            'před 2\xa0měsíci',
+            'před 1\xa0rokem, 4\xa0měsíci',
+            'před 2\xa0lety, 4\xa0měsíci',
+            'za 1\xa0den',
+            'za 2\xa0dny',
+            'za 1\xa0měsíc',
+            'za 2\xa0měsíce',
+            'za 1\xa0rok, 4\xa0měsíce',
+            'za 2\xa0roky, 4\xa0měsíce',
+        ]
+
+        orig_humanize_datetime, humanize.datetime = humanize.datetime, MockDateTime
+        try:
+            # Choose a language with different naturaltime-past/naturaltime-future translations
+            with translation.override('cs'), self.settings(USE_L10N=True):
+                self.humanize_tester(test_list, result_list, 'naturaltime')
         finally:
             humanize.datetime = orig_humanize_datetime

@@ -1,8 +1,10 @@
 import os
+import shutil
 import struct
 import tempfile
+from unittest import mock
 
-from django.contrib.gis.gdal import GDAL_VERSION, GDALRaster
+from django.contrib.gis.gdal import GDAL_VERSION, GDALRaster, SpatialReference
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.raster.band import GDALBand
 from django.contrib.gis.shortcuts import numpy
@@ -145,7 +147,11 @@ class GDALRasterTests(SimpleTestCase):
 
         # Reload newly created raster from file
         restored_raster = GDALRaster(rstfile.name)
-        self.assertEqual(restored_raster.srs.wkt, self.rs.srs.wkt)
+        # Presence of TOWGS84 depend on GDAL/Proj versions.
+        self.assertEqual(
+            restored_raster.srs.wkt.replace('TOWGS84[0,0,0,0,0,0,0],', ''),
+            self.rs.srs.wkt.replace('TOWGS84[0,0,0,0,0,0,0],', '')
+        )
         self.assertEqual(restored_raster.geotransform, self.rs.geotransform)
         if numpy:
             numpy.testing.assert_equal(
@@ -154,6 +160,11 @@ class GDALRasterTests(SimpleTestCase):
             )
         else:
             self.assertEqual(restored_raster.bands[0].data(), self.rs.bands[0].data())
+
+    def test_nonexistent_file(self):
+        msg = 'Unable to read raster source input "nonexistent.tif".'
+        with self.assertRaisesMessage(GDALException, msg):
+            GDALRaster('nonexistent.tif')
 
     def test_vsi_raster_creation(self):
         # Open a raster as a file object.
@@ -256,7 +267,7 @@ class GDALRasterTests(SimpleTestCase):
         if numpy:
             result = result.flatten().tolist()
         # All band data is equal to nodata value.
-        self.assertEqual(result, [23, ] * 4)
+        self.assertEqual(result, [23] * 4)
 
     def test_set_nodata_none_on_raster_creation(self):
         if GDAL_VERSION < (2, 1):
@@ -273,21 +284,13 @@ class GDALRasterTests(SimpleTestCase):
         result = rast.bands[0].data()
         if numpy:
             result = result.flatten().tolist()
-        # Band data is equal to zero becaues no nodata value has been specified.
+        # Band data is equal to zero because no nodata value has been specified.
         self.assertEqual(result, [0] * 4)
 
     def test_raster_metadata_property(self):
-        # Check for required gdal version.
-        if GDAL_VERSION < (1, 11):
-            msg = 'GDAL ≥ 1.11 is required for using the metadata property.'
-            with self.assertRaisesMessage(ValueError, msg):
-                self.rs.metadata
-            return
-
-        self.assertEqual(
-            self.rs.metadata,
-            {'DEFAULT': {'AREA_OR_POINT': 'Area'}, 'IMAGE_STRUCTURE': {'INTERLEAVE': 'BAND'}},
-        )
+        data = self.rs.metadata
+        self.assertEqual(data['DEFAULT'], {'AREA_OR_POINT': 'Area'})
+        self.assertEqual(data['IMAGE_STRUCTURE'], {'INTERLEAVE': 'BAND'})
 
         # Create file-based raster from scratch
         source = GDALRaster({
@@ -299,7 +302,7 @@ class GDALRasterTests(SimpleTestCase):
         })
         # Set metadata on raster and on a band.
         metadata = {
-            'DEFAULT': {'OWNER': 'Django', 'VERSION': '1.0', 'AREA_OR_POINT': 'Point', },
+            'DEFAULT': {'OWNER': 'Django', 'VERSION': '1.0', 'AREA_OR_POINT': 'Point'},
         }
         source.metadata = metadata
         source.bands[0].metadata = metadata
@@ -307,13 +310,13 @@ class GDALRasterTests(SimpleTestCase):
         self.assertEqual(source.bands[0].metadata['DEFAULT'], metadata['DEFAULT'])
         # Update metadata on raster.
         metadata = {
-            'DEFAULT': {'VERSION': '2.0', },
+            'DEFAULT': {'VERSION': '2.0'},
         }
         source.metadata = metadata
         self.assertEqual(source.metadata['DEFAULT']['VERSION'], '2.0')
         # Remove metadata on raster.
         metadata = {
-            'DEFAULT': {'OWNER': None, },
+            'DEFAULT': {'OWNER': None},
         }
         source.metadata = metadata
         self.assertNotIn('OWNER', source.metadata['DEFAULT'])
@@ -324,54 +327,33 @@ class GDALRasterTests(SimpleTestCase):
             with self.assertRaisesMessage(ValueError, msg):
                 self.rs.info
             return
-        gdalinfo = """
-        Driver: GTiff/GeoTIFF
-        Files: {0}
-        Size is 163, 174
-        Coordinate System is:
-        PROJCS["NAD83 / Florida GDL Albers",
-            GEOGCS["NAD83",
-                DATUM["North_American_Datum_1983",
-                    SPHEROID["GRS 1980",6378137,298.257222101,
-                        AUTHORITY["EPSG","7019"]],
-                    TOWGS84[0,0,0,0,0,0,0],
-                    AUTHORITY["EPSG","6269"]],
-                PRIMEM["Greenwich",0,
-                    AUTHORITY["EPSG","8901"]],
-                UNIT["degree",0.0174532925199433,
-                    AUTHORITY["EPSG","9122"]],
-                AUTHORITY["EPSG","4269"]],
-            PROJECTION["Albers_Conic_Equal_Area"],
-            PARAMETER["standard_parallel_1",24],
-            PARAMETER["standard_parallel_2",31.5],
-            PARAMETER["latitude_of_center",24],
-            PARAMETER["longitude_of_center",-84],
-            PARAMETER["false_easting",400000],
-            PARAMETER["false_northing",0],
-            UNIT["metre",1,
-                AUTHORITY["EPSG","9001"]],
-            AXIS["X",EAST],
-            AXIS["Y",NORTH],
-            AUTHORITY["EPSG","3086"]]
-        Origin = (511700.468070655711927,435103.377123198588379)
-        Pixel Size = (100.000000000000000,-100.000000000000000)
-        Metadata:
-          AREA_OR_POINT=Area
-        Image Structure Metadata:
-          INTERLEAVE=BAND
-        Corner Coordinates:
-        Upper Left  (  511700.468,  435103.377) ( 82d51'46.16"W, 27d55' 1.53"N)
-        Lower Left  (  511700.468,  417703.377) ( 82d51'52.04"W, 27d45'37.50"N)
-        Upper Right (  528000.468,  435103.377) ( 82d41'48.81"W, 27d54'56.30"N)
-        Lower Right (  528000.468,  417703.377) ( 82d41'55.54"W, 27d45'32.28"N)
-        Center      (  519850.468,  426403.377) ( 82d46'50.64"W, 27d50'16.99"N)
-        Band 1 Block=163x50 Type=Byte, ColorInterp=Gray
-          NoData Value=15
-        """.format(self.rs_path)
+        infos = self.rs.info
         # Data
-        info_dyn = [line.strip() for line in self.rs.info.split('\n') if line.strip() != '']
-        info_ref = [line.strip() for line in gdalinfo.split('\n') if line.strip() != '']
-        self.assertEqual(info_dyn, info_ref)
+        info_lines = [line.strip() for line in infos.split('\n') if line.strip() != '']
+        for line in [
+            'Driver: GTiff/GeoTIFF',
+            'Files: {}'.format(self.rs_path),
+            'Size is 163, 174',
+            'Origin = (511700.468070655711927,435103.377123198588379)',
+            'Pixel Size = (100.000000000000000,-100.000000000000000)',
+            'Metadata:',
+            'AREA_OR_POINT=Area',
+            'Image Structure Metadata:',
+            'INTERLEAVE=BAND',
+            'Band 1 Block=163x50 Type=Byte, ColorInterp=Gray',
+            'NoData Value=15'
+        ]:
+            self.assertIn(line, info_lines)
+        for line in [
+            r'Upper Left  \(  511700.468,  435103.377\) \( 82d51\'46.1\d"W, 27d55\' 1.5\d"N\)',
+            r'Lower Left  \(  511700.468,  417703.377\) \( 82d51\'52.0\d"W, 27d45\'37.5\d"N\)',
+            r'Upper Right \(  528000.468,  435103.377\) \( 82d41\'48.8\d"W, 27d54\'56.3\d"N\)',
+            r'Lower Right \(  528000.468,  417703.377\) \( 82d41\'55.5\d"W, 27d45\'32.2\d"N\)',
+            r'Center      \(  519850.468,  426403.377\) \( 82d46\'50.6\d"W, 27d50\'16.9\d"N\)',
+        ]:
+            self.assertRegex(infos, line)
+        # CRS (skip the name because string depends on the GDAL/Proj versions).
+        self.assertIn("NAD83 / Florida GDL Albers", infos)
 
     def test_compressed_file_based_raster_creation(self):
         rstfile = tempfile.NamedTemporaryFile(suffix='.tif')
@@ -379,37 +361,36 @@ class GDALRasterTests(SimpleTestCase):
         compressed = self.rs.warp({'papsz_options': {'compress': 'packbits'}, 'name': rstfile.name})
         # Check physically if compression worked.
         self.assertLess(os.path.getsize(compressed.name), os.path.getsize(self.rs.name))
-        if GDAL_VERSION > (1, 11):
-            # Create file-based raster with options from scratch.
-            compressed = GDALRaster({
-                'datatype': 1,
-                'driver': 'tif',
-                'name': rstfile.name,
-                'width': 40,
-                'height': 40,
-                'srid': 3086,
-                'origin': (500000, 400000),
-                'scale': (100, -100),
-                'skew': (0, 0),
-                'bands': [{
-                    'data': range(40 ^ 2),
-                    'nodata_value': 255,
-                }],
-                'papsz_options': {
-                    'compress': 'packbits',
-                    'pixeltype': 'signedbyte',
-                    'blockxsize': 23,
-                    'blockysize': 23,
-                }
-            })
-            # Check if options used on creation are stored in metadata.
-            # Reopening the raster ensures that all metadata has been written
-            # to the file.
-            compressed = GDALRaster(compressed.name)
-            self.assertEqual(compressed.metadata['IMAGE_STRUCTURE']['COMPRESSION'], 'PACKBITS',)
-            self.assertEqual(compressed.bands[0].metadata['IMAGE_STRUCTURE']['PIXELTYPE'], 'SIGNEDBYTE')
-            if GDAL_VERSION >= (2, 1):
-                self.assertIn('Block=40x23', compressed.info)
+        # Create file-based raster with options from scratch.
+        compressed = GDALRaster({
+            'datatype': 1,
+            'driver': 'tif',
+            'name': rstfile.name,
+            'width': 40,
+            'height': 40,
+            'srid': 3086,
+            'origin': (500000, 400000),
+            'scale': (100, -100),
+            'skew': (0, 0),
+            'bands': [{
+                'data': range(40 ^ 2),
+                'nodata_value': 255,
+            }],
+            'papsz_options': {
+                'compress': 'packbits',
+                'pixeltype': 'signedbyte',
+                'blockxsize': 23,
+                'blockysize': 23,
+            }
+        })
+        # Check if options used on creation are stored in metadata.
+        # Reopening the raster ensures that all metadata has been written
+        # to the file.
+        compressed = GDALRaster(compressed.name)
+        self.assertEqual(compressed.metadata['IMAGE_STRUCTURE']['COMPRESSION'], 'PACKBITS',)
+        self.assertEqual(compressed.bands[0].metadata['IMAGE_STRUCTURE']['PIXELTYPE'], 'SIGNEDBYTE')
+        if GDAL_VERSION >= (2, 1):
+            self.assertIn('Block=40x23', compressed.info)
 
     def test_raster_warp(self):
         # Create in memory raster
@@ -490,12 +471,129 @@ class GDALRasterTests(SimpleTestCase):
         # The result is an empty raster filled with the correct nodata value.
         self.assertEqual(result, [23] * 16)
 
-    def test_raster_transform(self):
-        # Prepare tempfile and nodata value
+    def test_raster_clone(self):
         rstfile = tempfile.NamedTemporaryFile(suffix='.tif')
-        ndv = 99
+        tests = [
+            ('MEM', '', 23),  # In memory raster.
+            ('tif', rstfile.name, 99),  # In file based raster.
+        ]
+        for driver, name, nodata_value in tests:
+            with self.subTest(driver=driver):
+                source = GDALRaster({
+                    'datatype': 1,
+                    'driver': driver,
+                    'name': name,
+                    'width': 4,
+                    'height': 4,
+                    'srid': 3086,
+                    'origin': (500000, 400000),
+                    'scale': (100, -100),
+                    'skew': (0, 0),
+                    'bands': [{
+                        'data': range(16),
+                        'nodata_value': nodata_value,
+                    }],
+                })
+                clone = source.clone()
+                self.assertNotEqual(clone.name, source.name)
+                self.assertEqual(clone._write, source._write)
+                self.assertEqual(clone.srs.srid, source.srs.srid)
+                self.assertEqual(clone.width, source.width)
+                self.assertEqual(clone.height, source.height)
+                self.assertEqual(clone.origin, source.origin)
+                self.assertEqual(clone.scale, source.scale)
+                self.assertEqual(clone.skew, source.skew)
+                self.assertIsNot(clone, source)
 
-        # Create in file based raster
+    def test_raster_transform(self):
+        tests = [
+            3086,
+            '3086',
+            SpatialReference(3086),
+        ]
+        for srs in tests:
+            with self.subTest(srs=srs):
+                # Prepare tempfile and nodata value.
+                rstfile = tempfile.NamedTemporaryFile(suffix='.tif')
+                ndv = 99
+                # Create in file based raster.
+                source = GDALRaster({
+                    'datatype': 1,
+                    'driver': 'tif',
+                    'name': rstfile.name,
+                    'width': 5,
+                    'height': 5,
+                    'nr_of_bands': 1,
+                    'srid': 4326,
+                    'origin': (-5, 5),
+                    'scale': (2, -2),
+                    'skew': (0, 0),
+                    'bands': [{
+                        'data': range(25),
+                        'nodata_value': ndv,
+                    }],
+                })
+
+                target = source.transform(srs)
+
+                # Reload data from disk.
+                target = GDALRaster(target.name)
+                self.assertEqual(target.srs.srid, 3086)
+                self.assertEqual(target.width, 7)
+                self.assertEqual(target.height, 7)
+                self.assertEqual(target.bands[0].datatype(), source.bands[0].datatype())
+                self.assertAlmostEqual(target.origin[0], 9124842.791079799, 3)
+                self.assertAlmostEqual(target.origin[1], 1589911.6476407414, 3)
+                self.assertAlmostEqual(target.scale[0], 223824.82664250192, 3)
+                self.assertAlmostEqual(target.scale[1], -223824.82664250192, 3)
+                self.assertEqual(target.skew, [0, 0])
+
+                result = target.bands[0].data()
+                if numpy:
+                    result = result.flatten().tolist()
+                # The reprojection of a raster that spans over a large area
+                # skews the data matrix and might introduce nodata values.
+                self.assertEqual(
+                    result,
+                    [
+                        ndv, ndv, ndv, ndv, 4, ndv, ndv,
+                        ndv, ndv, 2, 3, 9, ndv, ndv,
+                        ndv, 1, 2, 8, 13, 19, ndv,
+                        0, 6, 6, 12, 18, 18, 24,
+                        ndv, 10, 11, 16, 22, 23, ndv,
+                        ndv, ndv, 15, 21, 22, ndv, ndv,
+                        ndv, ndv, 20, ndv, ndv, ndv, ndv,
+                    ],
+                )
+
+    def test_raster_transform_clone(self):
+        with mock.patch.object(GDALRaster, 'clone') as mocked_clone:
+            # Create in file based raster.
+            rstfile = tempfile.NamedTemporaryFile(suffix='.tif')
+            source = GDALRaster({
+                'datatype': 1,
+                'driver': 'tif',
+                'name': rstfile.name,
+                'width': 5,
+                'height': 5,
+                'nr_of_bands': 1,
+                'srid': 4326,
+                'origin': (-5, 5),
+                'scale': (2, -2),
+                'skew': (0, 0),
+                'bands': [{
+                    'data': range(25),
+                    'nodata_value': 99,
+                }],
+            })
+            # transform() returns a clone because it is the same SRID and
+            # driver.
+            source.transform(4326)
+            self.assertEqual(mocked_clone.call_count, 1)
+
+    def test_raster_transform_clone_name(self):
+        # Create in file based raster.
+        rstfile = tempfile.NamedTemporaryFile(suffix='.tif')
         source = GDALRaster({
             'datatype': 1,
             'driver': 'tif',
@@ -509,93 +607,63 @@ class GDALRasterTests(SimpleTestCase):
             'skew': (0, 0),
             'bands': [{
                 'data': range(25),
-                'nodata_value': ndv,
+                'nodata_value': 99,
             }],
         })
-
-        # Transform raster into srid 4326.
-        target = source.transform(3086)
-
-        # Reload data from disk
-        target = GDALRaster(target.name)
-
-        self.assertEqual(target.srs.srid, 3086)
-        self.assertEqual(target.width, 7)
-        self.assertEqual(target.height, 7)
-        self.assertEqual(target.bands[0].datatype(), source.bands[0].datatype())
-        self.assertAlmostEqual(target.origin[0], 9124842.791079799)
-        self.assertAlmostEqual(target.origin[1], 1589911.6476407414)
-        self.assertAlmostEqual(target.scale[0], 223824.82664250192)
-        self.assertAlmostEqual(target.scale[1], -223824.82664250192)
-        self.assertEqual(target.skew, [0, 0])
-
-        result = target.bands[0].data()
-        if numpy:
-            result = result.flatten().tolist()
-
-        # The reprojection of a raster that spans over a large area
-        # skews the data matrix and might introduce nodata values.
-        self.assertEqual(
-            result,
-            [
-                ndv, ndv, ndv, ndv, 4, ndv, ndv,
-                ndv, ndv, 2, 3, 9, ndv, ndv,
-                ndv, 1, 2, 8, 13, 19, ndv,
-                0, 6, 6, 12, 18, 18, 24,
-                ndv, 10, 11, 16, 22, 23, ndv,
-                ndv, ndv, 15, 21, 22, ndv, ndv,
-                ndv, ndv, 20, ndv, ndv, ndv, ndv,
-            ]
-        )
+        clone_name = rstfile.name + '_respect_name.GTiff'
+        target = source.transform(4326, name=clone_name)
+        self.assertEqual(target.name, clone_name)
 
 
 class GDALBandTests(SimpleTestCase):
-    def setUp(self):
-        self.rs_path = os.path.join(os.path.dirname(__file__), '../data/rasters/raster.tif')
-        rs = GDALRaster(self.rs_path)
-        self.band = rs.bands[0]
+    rs_path = os.path.join(os.path.dirname(__file__), '../data/rasters/raster.tif')
 
     def test_band_data(self):
-        pam_file = self.rs_path + '.aux.xml'
-        self.assertEqual(self.band.width, 163)
-        self.assertEqual(self.band.height, 174)
-        self.assertEqual(self.band.description, '')
-        self.assertEqual(self.band.datatype(), 1)
-        self.assertEqual(self.band.datatype(as_string=True), 'GDT_Byte')
-        self.assertEqual(self.band.nodata_value, 15)
+        rs = GDALRaster(self.rs_path)
+        band = rs.bands[0]
+        self.assertEqual(band.width, 163)
+        self.assertEqual(band.height, 174)
+        self.assertEqual(band.description, '')
+        self.assertEqual(band.datatype(), 1)
+        self.assertEqual(band.datatype(as_string=True), 'GDT_Byte')
+        self.assertEqual(band.color_interp(), 1)
+        self.assertEqual(band.color_interp(as_string=True), 'GCI_GrayIndex')
+        self.assertEqual(band.nodata_value, 15)
         if numpy:
-            data = self.band.data()
+            data = band.data()
             assert_array = numpy.loadtxt(
                 os.path.join(os.path.dirname(__file__), '../data/rasters/raster.numpy.txt')
             )
             numpy.testing.assert_equal(data, assert_array)
-            self.assertEqual(data.shape, (self.band.height, self.band.width))
-        try:
-            smin, smax, smean, sstd = self.band.statistics(approximate=True)
+            self.assertEqual(data.shape, (band.height, band.width))
+
+    def test_band_statistics(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            rs_path = os.path.join(tmp_dir, 'raster.tif')
+            shutil.copyfile(self.rs_path, rs_path)
+            rs = GDALRaster(rs_path)
+            band = rs.bands[0]
+            pam_file = rs_path + '.aux.xml'
+            smin, smax, smean, sstd = band.statistics(approximate=True)
             self.assertEqual(smin, 0)
             self.assertEqual(smax, 9)
             self.assertAlmostEqual(smean, 2.842331288343558)
             self.assertAlmostEqual(sstd, 2.3965567248965356)
 
-            smin, smax, smean, sstd = self.band.statistics(approximate=False, refresh=True)
+            smin, smax, smean, sstd = band.statistics(approximate=False, refresh=True)
             self.assertEqual(smin, 0)
             self.assertEqual(smax, 9)
             self.assertAlmostEqual(smean, 2.828326634228898)
             self.assertAlmostEqual(sstd, 2.4260526986669095)
 
-            self.assertEqual(self.band.min, 0)
-            self.assertEqual(self.band.max, 9)
-            self.assertAlmostEqual(self.band.mean, 2.828326634228898)
-            self.assertAlmostEqual(self.band.std, 2.4260526986669095)
+            self.assertEqual(band.min, 0)
+            self.assertEqual(band.max, 9)
+            self.assertAlmostEqual(band.mean, 2.828326634228898)
+            self.assertAlmostEqual(band.std, 2.4260526986669095)
 
             # Statistics are persisted into PAM file on band close
-            self.band = None
+            rs = band = None
             self.assertTrue(os.path.isfile(pam_file))
-        finally:
-            # Close band and remove file if created
-            self.band = None
-            if os.path.isfile(pam_file):
-                os.remove(pam_file)
 
     def test_read_mode_error(self):
         # Open raster in read mode

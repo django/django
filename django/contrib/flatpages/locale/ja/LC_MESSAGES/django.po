@@ -2,15 +2,17 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Shinichi Katsumata <shinichi.katsumata@gmail.com>, 2019
 # Shinya Okano <tokibito@gmail.com>, 2012,2014-2015
+# Takuya N <takninnovationresearch@gmail.com>, 2020
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-31 12:12+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-02-07 16:07+0000\n"
+"Last-Translator: Takuya N <takninnovationresearch@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -29,9 +31,9 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"例: '/about/contact/'. 先頭と最後にスラッシュがあるか確認してください。"
+"例: “/about/contact/”. 先頭と最後にスラッシュがあるか確認してください。"
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
@@ -39,6 +41,9 @@ msgid ""
 msgstr ""
 "この値は文字、数字、ドット、アンダースコア、ダッシュ、スラッシュかチルダのみ"
 "でなければいけません。"
+
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr "例: “/about/contact”. 先頭にスラッシュがあるか確認してください。"
 
 msgid "URL is missing a leading slash."
 msgstr "URLの先頭はスラッシュが必要です。"
@@ -63,11 +68,11 @@ msgid "template name"
 msgstr "テンプレート名"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"例: 'flatpages/contact_page.html'. 指定しなければ、デフォルト設定"
-"の'flatpages/default.html' を使います。"
+"例: “flatpages/contact_page.html”. 指定しなければ、デフォルト値の “flatpages/"
+"default.html” を使います。"
 
 msgid "registration required"
 msgstr "登録が必要です"

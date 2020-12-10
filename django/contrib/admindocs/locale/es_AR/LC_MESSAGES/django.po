@@ -3,13 +3,13 @@
 # Translators:
 # Federico Bond <federicobond@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Ramiro Morales, 2012-2016
+# Ramiro Morales, 2012-2016,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-30 23:49+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-10-01 10:17+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -158,13 +158,13 @@ msgid "Template: %(name)s"
 msgstr "Plantilla: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Plantilla: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Plantilla: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Buscar ruta para la plantilla \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Ruta de búsqueda para la plantilla <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(no existe)"
@@ -244,13 +244,6 @@ msgstr ""
 "\n"
 "Función vista: <code>%(full_name)s</code>. Nombre: <code>%(url_name)s</"
 "code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Booleano (Verdadero o Falso)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Campo tipo: %(field_type)s"
 
 msgid "tag:"
 msgstr "etiqueta:"

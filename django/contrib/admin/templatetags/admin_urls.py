@@ -1,4 +1,4 @@
-from urllib.parse import parse_qsl, urlparse, urlunparse
+from urllib.parse import parse_qsl, unquote, urlparse, urlunparse
 
 from django import template
 from django.contrib.admin.utils import quote
@@ -30,7 +30,7 @@ def add_preserved_filters(context, url, popup=False, to_field=None):
     if opts and preserved_filters:
         preserved_filters = dict(parse_qsl(preserved_filters))
 
-        match_url = '/%s' % url.partition(get_script_prefix())[2]
+        match_url = '/%s' % unquote(url).partition(get_script_prefix())[2]
         try:
             match = resolve(match_url)
         except Resolver404:

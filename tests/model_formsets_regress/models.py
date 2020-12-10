@@ -16,6 +16,15 @@ class UserProfile(models.Model):
     about = models.TextField()
 
 
+class UserPreferences(models.Model):
+    user = models.OneToOneField(
+        User, models.CASCADE,
+        to_field='username',
+        primary_key=True,
+    )
+    favorite_number = models.IntegerField()
+
+
 class ProfileNetwork(models.Model):
     profile = models.ForeignKey(UserProfile, models.CASCADE, to_field="user")
     network = models.IntegerField()

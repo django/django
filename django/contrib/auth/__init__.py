@@ -1,15 +1,13 @@
 import inspect
 import re
-import warnings
 
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.middleware.csrf import rotate_token
 from django.utils.crypto import constant_time_compare
-from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.module_loading import import_string
-from django.utils.translation import LANGUAGE_SESSION_KEY
+from django.views.decorators.debug import sensitive_variables
 
 from .signals import user_logged_in, user_logged_out, user_login_failed
 
@@ -40,6 +38,7 @@ def get_backends():
     return _get_backends(return_tuples=False)
 
 
+@sensitive_variables('credentials')
 def _clean_credentials(credentials):
     """
     Clean a dictionary of credentials of potentially sensitive info before
@@ -61,13 +60,20 @@ def _get_user_session_key(request):
     return get_user_model()._meta.pk.to_python(request.session[SESSION_KEY])
 
 
+@sensitive_variables('credentials')
 def authenticate(request=None, **credentials):
     """
     If the given credentials are valid, return a User object.
     """
     for backend, backend_path in _get_backends(return_tuples=True):
+        backend_signature = inspect.signature(backend.authenticate)
         try:
-            user = _authenticate_with_backend(backend, backend_path, request, credentials)
+            backend_signature.bind(request, **credentials)
+        except TypeError:
+            # This backend doesn't accept these credentials as arguments. Try the next one.
+            continue
+        try:
+            user = backend.authenticate(request, **credentials)
         except PermissionDenied:
             # This backend says to stop in our tracks - this user should not be allowed in at all.
             break
@@ -79,40 +85,6 @@ def authenticate(request=None, **credentials):
 
     # The credentials supplied are invalid to all backends, fire signal
     user_login_failed.send(sender=__name__, credentials=_clean_credentials(credentials), request=request)
-
-
-def _authenticate_with_backend(backend, backend_path, request, credentials):
-    args = (request,)
-    # Does the backend accept a request argument?
-    try:
-        inspect.getcallargs(backend.authenticate, request, **credentials)
-    except TypeError:
-        args = ()
-        credentials.pop('request', None)
-        # Does the backend accept a request keyword argument?
-        try:
-            inspect.getcallargs(backend.authenticate, request=request, **credentials)
-        except TypeError:
-            # Does the backend accept credentials without request?
-            try:
-                inspect.getcallargs(backend.authenticate, **credentials)
-            except TypeError:
-                # This backend doesn't accept these credentials as arguments. Try the next one.
-                return None
-            else:
-                warnings.warn(
-                    "Update %s.authenticate() to accept a positional "
-                    "`request` argument." % backend_path,
-                    RemovedInDjango21Warning
-                )
-        else:
-            credentials['request'] = request
-            warnings.warn(
-                "In %s.authenticate(), move the `request` keyword argument "
-                "to the first positional argument." % backend_path,
-                RemovedInDjango21Warning
-            )
-    return backend.authenticate(*args, **credentials)
 
 
 def login(request, user, backend=None):
@@ -150,6 +122,9 @@ def login(request, user, backend=None):
                 'therefore must provide the `backend` argument or set the '
                 '`backend` attribute on the user.'
             )
+    else:
+        if not isinstance(backend, str):
+            raise TypeError('backend must be a dotted import path string (got %r).' % backend)
 
     request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)
     request.session[BACKEND_SESSION_KEY] = backend
@@ -168,18 +143,10 @@ def logout(request):
     # Dispatch the signal before the user is logged out so the receivers have a
     # chance to find out *who* logged out.
     user = getattr(request, 'user', None)
-    if hasattr(user, 'is_authenticated') and not user.is_authenticated:
+    if not getattr(user, 'is_authenticated', True):
         user = None
     user_logged_out.send(sender=user.__class__, request=request, user=user)
-
-    # remember language choice saved to session
-    language = request.session.get(LANGUAGE_SESSION_KEY)
-
     request.session.flush()
-
-    if language is not None:
-        request.session[LANGUAGE_SESSION_KEY] = language
-
     if hasattr(request, 'user'):
         from django.contrib.auth.models import AnonymousUser
         request.user = AnonymousUser()
@@ -223,8 +190,13 @@ def get_user(request):
                     user.get_session_auth_hash()
                 )
                 if not session_hash_verified:
-                    request.session.flush()
-                    user = None
+                    if not (
+                        session_hash and
+                        hasattr(user, '_legacy_get_session_auth_hash') and
+                        constant_time_compare(session_hash, user._legacy_get_session_auth_hash())
+                    ):
+                        request.session.flush()
+                        user = None
 
     return user or AnonymousUser()
 
@@ -248,6 +220,3 @@ def update_session_auth_hash(request, user):
     request.session.cycle_key()
     if hasattr(user, 'get_session_auth_hash') and request.user == user:
         request.session[HASH_SESSION_KEY] = user.get_session_auth_hash()
-
-
-default_app_config = 'django.contrib.auth.apps.AuthConfig'

@@ -6,22 +6,26 @@
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
 # eigrad <andrew@ei-grad.ru>, 2012
-# Eugene MechanisM <eugene@mechanism.pro>, 2013
+# Eugene <eugene.mechanism@gmail.com>, 2013
 # eXtractor <evg.kirov@gmail.com>, 2015
+# crazyzubr <hjcnbckfd@gmail.com>, 2020
 # Igor Melnyk, 2014
+# Ivan Khomutov <iskhomutov@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lilo.panic, 2016
 # Mikhail Zholobov <legal90@gmail.com>, 2013
-# Vasiliy Anikin <anikin.vasya@gmail.com>, 2017
-# Алексей Борискин <sun.void@gmail.com>, 2013-2016
-# Дмитрий Шатера <mr.bobsans@gmail.com>, 2016
+# Nikolay Korotkiy <sikmir@gmail.com>, 2018
+# Вася Аникин <anikin.vasya@gmail.com>, 2017
+# SeryiMysh <vital@dorokhin.kz>, 2020
+# Алексей Борискин <sun.void@gmail.com>, 2013-2017,2019-2020
+# Дмитрий Шатера <mr.bobsans@gmail.com>, 2016,2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-03-25 05:25+0000\n"
-"Last-Translator: Vasiliy Anikin <anikin.vasya@gmail.com>\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-21 09:34+0000\n"
+"Last-Translator: crazyzubr <hjcnbckfd@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -37,6 +41,9 @@ msgstr "Бурский"
 
 msgid "Arabic"
 msgstr "Арабский"
+
+msgid "Algerian Arabic"
+msgstr "Алжирский арабский"
 
 msgid "Asturian"
 msgstr "Астурийский"
@@ -152,11 +159,17 @@ msgstr "Верхнелужицкий"
 msgid "Hungarian"
 msgstr "Венгерский"
 
+msgid "Armenian"
+msgstr "Армянский"
+
 msgid "Interlingua"
 msgstr "Интерлингва"
 
 msgid "Indonesian"
 msgstr "Индонезийский"
+
+msgid "Igbo"
+msgstr "Игбо"
 
 msgid "Ido"
 msgstr "Идо"
@@ -173,6 +186,9 @@ msgstr "Японский"
 msgid "Georgian"
 msgstr "Грузинский"
 
+msgid "Kabyle"
+msgstr "Кабильский"
+
 msgid "Kazakh"
 msgstr "Казахский"
 
@@ -184,6 +200,9 @@ msgstr "Каннада"
 
 msgid "Korean"
 msgstr "Корейский"
+
+msgid "Kyrgyz"
+msgstr "Киргизский"
 
 msgid "Luxembourgish"
 msgstr "Люксембургский"
@@ -269,8 +288,14 @@ msgstr "Тамильский"
 msgid "Telugu"
 msgstr "Телугу"
 
+msgid "Tajik"
+msgstr "Таджикский"
+
 msgid "Thai"
 msgstr "Тайский"
+
+msgid "Turkmen"
+msgstr "Туркменский"
 
 msgid "Turkish"
 msgstr "Турецкий"
@@ -286,6 +311,9 @@ msgstr "Украинский"
 
 msgid "Urdu"
 msgstr "Урду"
+
+msgid "Uzbek"
+msgstr "Узбекский"
 
 msgid "Vietnamese"
 msgstr "Вьетнамский"
@@ -329,18 +357,19 @@ msgstr "Введите правильное число."
 msgid "Enter a valid email address."
 msgstr "Введите правильный адрес электронной почты."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Значение должно состоять только из букв, цифр, знаков подчеркивания или "
-"дефиса."
+"Значение должно состоять только из латинских букв, цифр, знаков "
+"подчеркивания или дефиса."
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Значение должно состоять только из букв, цифр, символов подчёркивания или "
-"дефисов, входящих в стандарт Юникод."
+"Значение должно состоять только из символов входящих в стандарт Юникод, "
+"цифр, символов подчёркивания или дефисов."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Введите правильный IPv4 адрес."
@@ -407,6 +436,9 @@ msgstr[3] ""
 "Убедитесь, что это значение содержит не более %(limit_value)d символов "
 "(сейчас %(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Введите число."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -435,11 +467,14 @@ msgstr[3] "Убедитесь, что вы ввели не более %(max)s ц
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
-"Формат файлов '%(extension)s' не поддерживается. Поддерживаемые форматы "
-"файлов: '%(allowed_extensions)s'."
+"Расширение файлов “%(extension)s” не поддерживается. Разрешенные расширения: "
+"%(allowed_extensions)s."
+
+msgid "Null characters are not allowed."
+msgstr "Данные содержат запрещённый символ: ноль-байт"
 
 msgid "and"
 msgstr "и"
@@ -476,19 +511,13 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr "Поле типа %(field_type)s"
 
-msgid "Integer"
-msgstr "Целое"
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr "Значение “%(value)s” должно быть True или False."
 
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr "Значение '%(value)s' должно быть целым числом."
-
-msgid "Big (8 byte) integer"
-msgstr "Длинное целое (8 байт)"
-
-#, python-format
-msgid "'%(value)s' value must be either True or False."
-msgstr "Значение '%(value)s' должно быть True или False."
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr "Значение “%(value)s” должно быть True, False или None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Логическое (True или False)"
@@ -502,18 +531,18 @@ msgstr "Целые, разделенные запятыми"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"Значение '%(value)s' имеет неверный формат даты. Оно должно быть в формате "
+"Значение “%(value)s” имеет неверный формат даты. Оно должно быть в формате "
 "YYYY-MM-DD."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"Значение '%(value)s' имеет корректный формат (YYYY-MM-DD), но это "
+"Значение “%(value)s” имеет корректный формат (YYYY-MM-DD), но это "
 "недействительная дата."
 
 msgid "Date (without time)"
@@ -521,36 +550,36 @@ msgstr "Дата (без указания времени)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"Значение '%(value)s' имеет неверный формат. Оно должно быть в формате YYYY-"
+"Значение “%(value)s” имеет неверный формат. Оно должно быть в формате YYYY-"
 "MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"Значение '%(value)s' имеет корректный формат (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"Значение “%(value)s” имеет корректный формат (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]), но это недействительные дата/время."
 
 msgid "Date (with time)"
 msgstr "Дата (с указанием времени)"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
-msgstr "Значение '%(value)s' должно быть числом с фиксированной запятой."
+msgid "“%(value)s” value must be a decimal number."
+msgstr "Значение “%(value)s” должно быть десятичным числом."
 
 msgid "Decimal number"
 msgstr "Число с фиксированной запятой"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"Значение '%(value)s' имеет неверный формат. Оно должно быть в формате [DD] "
+"Значение “%(value)s” имеет неверный формат. Оно должно быть в формате [DD] "
 "[HH:[MM:]]ss[.uuuuuu]."
 
 msgid "Duration"
@@ -563,11 +592,21 @@ msgid "File path"
 msgstr "Путь к файлу"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
-msgstr "Значение '%(value)s' должно быть числом с плавающей запятой."
+msgid "“%(value)s” value must be a float."
+msgstr "Значение “%(value)s” должно быть числом с плавающей запятой."
 
 msgid "Floating point number"
 msgstr "Число с плавающей запятой"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr "Значение “%(value)s” должно быть целым числом."
+
+msgid "Integer"
+msgstr "Целое"
+
+msgid "Big (8 byte) integer"
+msgstr "Длинное целое (8 байт)"
 
 msgid "IPv4 address"
 msgstr "IPv4 адрес"
@@ -576,11 +615,14 @@ msgid "IP address"
 msgstr "IP-адрес"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
-msgstr "Значение '%(value)s' должно быть None, True или False."
+msgid "“%(value)s” value must be either None, True or False."
+msgstr "Значение “%(value)s” должно быть None, True или False."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Логическое (True, False или None)"
+
+msgid "Positive big integer"
+msgstr "Положительное большое целое число"
 
 msgid "Positive integer"
 msgstr "Положительное целое число"
@@ -600,18 +642,18 @@ msgstr "Текст"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"Значение '%(value)s' имеет неверный формат. Оно должно быть в формате HH:MM[:"
+"Значение “%(value)s” имеет неверный формат. Оно должно быть в формате HH:MM[:"
 "ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"Значение '%(value)s' имеет корректный формат (HH:MM[:ss[.uuuuuu]]), но это "
+"Значение “%(value)s” имеет корректный формат (HH:MM[:ss[.uuuuuu]]), но это "
 "недействительное время."
 
 msgid "Time"
@@ -624,14 +666,23 @@ msgid "Raw binary data"
 msgstr "Необработанные двоичные данные"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
-msgstr "Значение '%(value)s' не является верным UUID-ом."
+msgid "“%(value)s” is not a valid UUID."
+msgstr "Значение “%(value)s” не является верным UUID-ом."
+
+msgid "Universally unique identifier"
+msgstr "Поле для UUID, универсального уникального идентификатора"
 
 msgid "File"
 msgstr "Файл"
 
 msgid "Image"
 msgstr "Изображение"
+
+msgid "A JSON object"
+msgstr "JSON-объект"
+
+msgid "Value must be valid JSON."
+msgstr "Значение должно быть корректным JSON-ом."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -668,9 +719,6 @@ msgstr "Обязательное поле."
 msgid "Enter a whole number."
 msgstr "Введите целое число."
 
-msgid "Enter a number."
-msgstr "Введите число."
-
 msgid "Enter a valid date."
 msgstr "Введите правильную дату."
 
@@ -682,6 +730,10 @@ msgstr "Введите правильную дату и время."
 
 msgid "Enter a valid duration."
 msgstr "Введите правильную продолжительность."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Количество дней должно быть в диапазоне от {min_days} до {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Ни одного файла не было отправлено. Проверьте тип кодировки формы."
@@ -733,6 +785,9 @@ msgstr "Введите весь список значений."
 
 msgid "Enter a valid UUID."
 msgstr "Введите правильный UUID."
+
+msgid "Enter a valid JSON."
+msgstr "Введите корректный JSON."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -787,20 +842,20 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Пожалуйста, измените повторяющиеся значения ниже."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "Внешний ключ не совпадает с первичным ключом родителя."
+msgid "The inline value did not match the parent instance."
+msgstr "Значение во вложенной форме не совпадает со значением в базовой форме."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Выберите корректный вариант. Вашего варианта нет среди допустимых значений."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" не является верным значением для первичного ключа."
+msgid "“%(pk)s” is not a valid value."
+msgstr "“%(pk)s” является неверным значением."
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
 "%(datetime)s не может быть интерпретирована в часовом поясе "
@@ -825,6 +880,7 @@ msgstr "Да"
 msgid "No"
 msgstr "Нет"
 
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "да,нет,может быть"
 
@@ -1089,8 +1145,8 @@ msgstr "Значение не является корректным адресо
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "или"
@@ -1147,9 +1203,6 @@ msgstr[1] "%d минуты"
 msgstr[2] "%d минут"
 msgstr[3] "%d минут"
 
-msgid "0 minutes"
-msgstr "0 минут"
-
 msgid "Forbidden"
 msgstr "Ошибка доступа"
 
@@ -1157,27 +1210,41 @@ msgid "CSRF verification failed. Request aborted."
 msgstr "Ошибка проверки CSRF. Запрос отклонён."
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
 "Вы видите это сообщение, потому что данный сайт использует защищённое "
-"соединение и требует, чтобы заголовок 'Referer' был передан вашим браузером, "
+"соединение и требует, чтобы заголовок “Referer” был передан вашим браузером, "
 "но он не был им передан. Данный заголовок необходим по соображениям "
 "безопасности, чтобы убедиться, что ваш браузер не был взломан, а запрос к "
 "серверу не был перехвачен или подменён."
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
 msgstr ""
 "Если вы настроили свой браузер таким образом, чтобы запретить ему передавать "
-"заголовок 'Referer', пожалуйста, разрешите ему отсылать данный заголовок по "
+"заголовок “Referer”, пожалуйста, разрешите ему отсылать данный заголовок по "
 "крайней мере для данного сайта, или для всех HTTPS-соединений, или для "
 "запросов, домен и порт назначения совпадают с доменом и портом текущей "
 "страницы."
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
+msgstr ""
+"Если Вы используете HTML-тэг <meta name=\"referrer\" content=\"no-referrer"
+"\"> или добавили HTTP-заголовок “Referrer-Policy: no-referrer”, пожалуйста "
+"удалите их. CSRF защите необходим заголовок “Referer” для строгой проверки "
+"адреса ссылающейся страницы. Если Вы беспокоитесь о приватности, используйте "
+"альтернативы, например <a rel=\"noreferrer\" …>, для ссылок на сайты третьих "
+"лиц."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1191,44 +1258,21 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
-"Если вы настроили свой браузер таким образом, чтобы он не передавал или не "
-"хранил cookie, пожалуйста, включите эту функцию вновь, по крайней мере для "
-"этого сайта, или для запросов, чьи домен и порт совпадают с доменом и портом "
-"текущей страницы."
+"Если в вашем браузере отключены cookie, пожалуйста, включите эту функцию "
+"вновь, по крайней мере для этого сайта, или для \"same-orign\" запросов."
 
 msgid "More information is available with DEBUG=True."
 msgstr ""
 "В отладочном режиме доступно больше информации.  Включить отладочный режим "
 "можно, установив значение переменной DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Добро пожаловать в Django"
-
-msgid "It worked!"
-msgstr "Заработало!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Поздравляем вас с вашей первой страницей, работающей на Django."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Сейчас вы можете создать ваше первое приложение, запустив команду "
-"<code>python manage.py startapp [app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Вы видите это сообщение, потому что в файле ваших настроек Django есть "
-"строчка <code>DEBUG = True</code> и вы не сконфигурировали ни одного URL. За "
-"работу!"
-
 msgid "No year specified"
 msgstr "Не указан год"
+
+msgid "Date out of range"
+msgstr "Дата выходит за пределы диапазона"
 
 msgid "No month specified"
 msgstr "Не указан месяц"
@@ -1252,18 +1296,18 @@ msgstr ""
 "allow_future выставлен в значение \"Ложь\"."
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
 msgstr ""
-"Не удалось распознать строку с датой '%(datestr)s', используя формат "
-"'%(format)s'"
+"Не удалось распознать строку с датой “%(datestr)s”, в заданном формате "
+"“%(format)s”"
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "Не найден ни один %(verbose_name)s, соответствующий запросу"
 
-msgid "Page is not 'last', nor can it be converted to an int."
+msgid "Page is not “last”, nor can it be converted to an int."
 msgstr ""
-"Номер страницы не содержит особое значение 'last', и его не удалось "
+"Номер страницы не содержит особое значение “last” и его не удалось "
 "преобразовать к целому числу."
 
 #, python-format
@@ -1271,18 +1315,63 @@ msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "Неправильная страница (%(page_number)s): %(message)s"
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
 msgstr ""
-"Список пуст, но '%(class_name)s.allow_empty' выставлено в значение \"Ложь\", "
+"Список пуст, но “%(class_name)s.allow_empty” выставлено в значение \"Ложь\", "
 "что запрещает показывать пустые списки."
 
 msgid "Directory indexes are not allowed here."
 msgstr "Просмотр списка файлов директории здесь не разрешен."
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" не существует"
+msgid "“%(path)s” does not exist"
+msgstr "“%(path)s” не существует"
 
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Список файлов директории %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: веб-фреймворк для перфекционистов с дедлайнами."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Посмотреть <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/"
+"\" target=\"_blank\" rel=\"noopener\">примечания к выпуску</a> для Django "
+"%(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Установка прошла успешно! Поздравляем!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Вы видите данную страницу, потому что указали <a href=\"https://docs."
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
+"\"noopener\">DEBUG=True</a> в файле настроек и не настроили ни одного "
+"обработчика URL-адресов."
+
+msgid "Django Documentation"
+msgstr "Документация Django"
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr "Разделы, справочник, &amp; примеры"
+
+msgid "Tutorial: A Polling App"
+msgstr "Руководство: Приложение для голосования"
+
+msgid "Get started with Django"
+msgstr "Начало работы с Django"
+
+msgid "Django Community"
+msgstr "Сообщество Django"
+
+msgid "Connect, get help, or contribute"
+msgstr "Присоединяйтесь, получайте помощь или помогайте в разработке"

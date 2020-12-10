@@ -9,6 +9,26 @@ from .models import Car, Part, Person, SportsCar
 
 
 class ManyToManySignalsTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.vw = Car.objects.create(name='VW')
+        cls.bmw = Car.objects.create(name='BMW')
+        cls.toyota = Car.objects.create(name='Toyota')
+
+        cls.wheelset = Part.objects.create(name='Wheelset')
+        cls.doors = Part.objects.create(name='Doors')
+        cls.engine = Part.objects.create(name='Engine')
+        cls.airbag = Part.objects.create(name='Airbag')
+        cls.sunroof = Part.objects.create(name='Sunroof')
+
+        cls.alice = Person.objects.create(name='Alice')
+        cls.bob = Person.objects.create(name='Bob')
+        cls.chuck = Person.objects.create(name='Chuck')
+        cls.daisy = Person.objects.create(name='Daisy')
+
+    def setUp(self):
+        self.m2m_changed_messages = []
+
     def m2m_changed_signal_receiver(self, signal, sender, **kwargs):
         message = {
             'instance': kwargs['instance'],
@@ -21,24 +41,6 @@ class ManyToManySignalsTest(TestCase):
                 kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
             )
         self.m2m_changed_messages.append(message)
-
-    def setUp(self):
-        self.m2m_changed_messages = []
-
-        self.vw = Car.objects.create(name='VW')
-        self.bmw = Car.objects.create(name='BMW')
-        self.toyota = Car.objects.create(name='Toyota')
-
-        self.wheelset = Part.objects.create(name='Wheelset')
-        self.doors = Part.objects.create(name='Doors')
-        self.engine = Part.objects.create(name='Engine')
-        self.airbag = Part.objects.create(name='Airbag')
-        self.sunroof = Part.objects.create(name='Sunroof')
-
-        self.alice = Person.objects.create(name='Alice')
-        self.bob = Person.objects.create(name='Bob')
-        self.chuck = Person.objects.create(name='Chuck')
-        self.daisy = Person.objects.create(name='Daisy')
 
     def tearDown(self):
         # disconnect all signal handlers
@@ -66,6 +68,34 @@ class ManyToManySignalsTest(TestCase):
         models.signals.m2m_changed.connect(
             self.m2m_changed_signal_receiver, Car.default_parts.through
         )
+
+    def test_pk_set_on_repeated_add_remove(self):
+        """
+        m2m_changed is always fired, even for repeated calls to the same
+        method, but the behavior of pk_sets differs by action.
+
+        - For signals related to `add()`, only PKs that will actually be
+          inserted are sent.
+        - For `remove()` all PKs are sent, even if they will not affect the DB.
+        """
+        pk_sets_sent = []
+
+        def handler(signal, sender, **kwargs):
+            if kwargs['action'] in ['pre_add', 'pre_remove']:
+                pk_sets_sent.append(kwargs['pk_set'])
+
+        models.signals.m2m_changed.connect(handler, Car.default_parts.through)
+
+        self.vw.default_parts.add(self.wheelset)
+        self.vw.default_parts.add(self.wheelset)
+
+        self.vw.default_parts.remove(self.wheelset)
+        self.vw.default_parts.remove(self.wheelset)
+
+        expected_pk_sets = [{self.wheelset.pk}, set(), {self.wheelset.pk}, {self.wheelset.pk}]
+        self.assertEqual(pk_sets_sent, expected_pk_sets)
+
+        models.signals.m2m_changed.disconnect(handler, Car.default_parts.through)
 
     def test_m2m_relations_add_remove_clear(self):
         expected_messages = []

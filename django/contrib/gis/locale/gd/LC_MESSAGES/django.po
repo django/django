@@ -3,12 +3,13 @@
 # Translators:
 # GunChleoc, 2015-2016
 # GunChleoc, 2015
+# GunChleoc, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-06-11 06:45+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-12-13 12:40+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
 "language/gd/)\n"
@@ -26,10 +27,10 @@ msgid "The base GIS field."
 msgstr "Bun-raon GIS."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
-"Bun-raon geomatrais -- thèid a mhapachadh dhan t-seòrsa geomatrais a chaidh "
-"a shònrachadh le OpenGIS."
+"Bun-raon geomatrais – thèid a mhapachadh dhan t-seòrsa geomatrais a chaidh a "
+"shònrachadh le OpenGIS."
 
 msgid "Point"
 msgstr "Puing"
@@ -38,7 +39,7 @@ msgid "Line string"
 msgstr "Sreang loidhne"
 
 msgid "Polygon"
-msgstr "ioma-cheàrnach"
+msgstr "Ioma-cheàrnach"
 
 msgid "Multi-point"
 msgstr "Iomadh-phuing"
@@ -47,7 +48,7 @@ msgid "Multi-line string"
 msgstr "Sreang ioma-loidhne"
 
 msgid "Multi polygon"
-msgstr "Iomadh iomadh-phuing"
+msgstr "Iomadh ioma-cheàrnach"
 
 msgid "Geometry collection"
 msgstr "Cruinneachadh geomatrais"
@@ -80,9 +81,6 @@ msgstr "Sguab às a h-uile gleus"
 msgid "WKT debugging window:"
 msgstr "Uinneag dì-bhugachadh WKT:"
 
-msgid "Google Maps via GeoDjango"
-msgstr "Google Maps slighe GeoDjango"
-
 msgid "Debugging window (serialized value)"
 msgstr "Uinneag dì-bhugachaidh (luach sreathaichte)"
 
@@ -90,5 +88,5 @@ msgid "No feeds are registered."
 msgstr "Cha deach inbhir a shònrachadh."
 
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr "Cha deach an sluga %r a chlàradh."

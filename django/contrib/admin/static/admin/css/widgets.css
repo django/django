@@ -211,6 +211,11 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 }
 
 .stacked .active.selector-add {
+    background-position: 0 -32px;
+    cursor: pointer;
+}
+
+.stacked .active.selector-add:focus, .stacked .active.selector-add:hover {
     background-position: 0 -48px;
     cursor: pointer;
 }
@@ -221,6 +226,11 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 }
 
 .stacked .active.selector-remove {
+    background-position: 0 0px;
+    cursor: pointer;
+}
+
+.stacked .active.selector-remove:focus, .stacked .active.selector-remove:hover {
     background-position: 0 -16px;
     cursor: pointer;
 }
@@ -263,7 +273,6 @@ p.datetime {
 }
 
 .datetime input, .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
-    min-width: 0;
     margin-left: 5px;
     margin-bottom: 4px;
 }

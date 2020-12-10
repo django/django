@@ -1,6 +1,3 @@
-from contextlib import suppress
-
-from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth import load_backend
 from django.contrib.auth.backends import RemoteUserBackend
@@ -19,10 +16,10 @@ class AuthenticationMiddleware(MiddlewareMixin):
     def process_request(self, request):
         assert hasattr(request, 'session'), (
             "The Django authentication middleware requires session middleware "
-            "to be installed. Edit your MIDDLEWARE%s setting to insert "
+            "to be installed. Edit your MIDDLEWARE setting to insert "
             "'django.contrib.sessions.middleware.SessionMiddleware' before "
             "'django.contrib.auth.middleware.AuthenticationMiddleware'."
-        ) % ("_CLASSES" if settings.MIDDLEWARE is None else "")
+        )
         request.user = SimpleLazyObject(lambda: get_user(request))
 
 
@@ -91,8 +88,10 @@ class RemoteUserMiddleware(MiddlewareMixin):
         """
         backend_str = request.session[auth.BACKEND_SESSION_KEY]
         backend = auth.load_backend(backend_str)
-        with suppress(AttributeError):  # Backend has no clean_username method.
+        try:
             username = backend.clean_username(username)
+        except AttributeError:  # Backend has no clean_username method.
+            pass
         return username
 
     def _remove_invalid_user(self, request):

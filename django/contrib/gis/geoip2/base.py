@@ -1,4 +1,3 @@
-import os
 import socket
 
 import geoip2.database
@@ -6,6 +5,7 @@ import geoip2.database
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv46_address
+from django.utils._os import to_path
 
 from .resources import City, Country
 
@@ -73,31 +73,31 @@ class GeoIP2:
             raise GeoIP2Exception('Invalid GeoIP caching option: %s' % cache)
 
         # Getting the GeoIP data path.
+        path = path or GEOIP_SETTINGS['GEOIP_PATH']
         if not path:
-            path = GEOIP_SETTINGS['GEOIP_PATH']
-            if not path:
-                raise GeoIP2Exception('GeoIP path must be provided via parameter or the GEOIP_PATH setting.')
-        if not isinstance(path, str):
-            raise TypeError('Invalid path type: %s' % type(path).__name__)
+            raise GeoIP2Exception('GeoIP path must be provided via parameter or the GEOIP_PATH setting.')
 
-        if os.path.isdir(path):
+        path = to_path(path)
+        if path.is_dir():
             # Constructing the GeoIP database filenames using the settings
             # dictionary. If the database files for the GeoLite country
             # and/or city datasets exist, then try to open them.
-            country_db = os.path.join(path, country or GEOIP_SETTINGS['GEOIP_COUNTRY'])
-            if os.path.isfile(country_db):
-                self._country = geoip2.database.Reader(country_db, mode=cache)
+            country_db = path / (country or GEOIP_SETTINGS['GEOIP_COUNTRY'])
+            if country_db.is_file():
+                self._country = geoip2.database.Reader(str(country_db), mode=cache)
                 self._country_file = country_db
 
-            city_db = os.path.join(path, city or GEOIP_SETTINGS['GEOIP_CITY'])
-            if os.path.isfile(city_db):
-                self._city = geoip2.database.Reader(city_db, mode=cache)
+            city_db = path / (city or GEOIP_SETTINGS['GEOIP_CITY'])
+            if city_db.is_file():
+                self._city = geoip2.database.Reader(str(city_db), mode=cache)
                 self._city_file = city_db
-        elif os.path.isfile(path):
+            if not self._reader:
+                raise GeoIP2Exception('Could not load a database from %s.' % path)
+        elif path.is_file():
             # Otherwise, some detective work will be needed to figure out
             # whether the given database path is for the GeoIP country or city
             # databases.
-            reader = geoip2.database.Reader(path, mode=cache)
+            reader = geoip2.database.Reader(str(path), mode=cache)
             db_type = reader.metadata().database_type
 
             if db_type.endswith('City'):
@@ -115,10 +115,7 @@ class GeoIP2:
 
     @property
     def _reader(self):
-        if self._country:
-            return self._country
-        else:
-            return self._city
+        return self._country or self._city
 
     @property
     def _country_or_city(self):

@@ -3,21 +3,23 @@
 # Translators:
 # Alex Nordlund <deep.alexander@gmail.com>, 2012
 # Andreas Pelme <andreas@pelme.se>, 2014
-# cvitan <tome@cvitan.com>, 2011
+# d7bcbd5f5cbecdc2b959899620582440, 2011
 # Cybjit <cybjit@gmail.com>, 2012
+# Henrik Palmlund Wahlgren <henrik@pwit.se>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2015
 # Jonathan Lindén, 2014
+# metteludwig <luudde@gmail.com>, 2019
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
 # Mikko Hellsing <mikko@aino.se>, 2011
-# Thomas Lundqvist <thomas@biljettshop.se>, 2013,2016
+# Thomas Lundqvist, 2013,2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 08:14+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-11-18 14:26+0000\n"
+"Last-Translator: metteludwig <luudde@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -95,6 +97,15 @@ msgstr "Lägg till ytterligare %(verbose_name)s"
 msgid "Remove"
 msgstr "Ta bort"
 
+msgid "Addition"
+msgstr "Tillägg"
+
+msgid "Change"
+msgstr "Ändra"
+
+msgid "Deletion"
+msgstr "Borttagning"
+
 msgid "action time"
 msgstr "händelsetid"
 
@@ -108,7 +119,7 @@ msgid "object id"
 msgstr "objektets id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "objektets beskrivning"
 
@@ -125,23 +136,23 @@ msgid "log entries"
 msgstr "loggposter"
 
 #, python-format
-msgid "Added \"%(object)s\"."
+msgid "Added “%(object)s”."
 msgstr "Lade till \"%(object)s\"."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "Ändrade \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "Ändrade “%(object)s” — %(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "Tog bort \"%(object)s.\""
+msgid "Deleted “%(object)s.”"
+msgstr "Tog bort “%(object)s.”"
 
 msgid "LogEntry Object"
 msgstr "LogEntry-Objekt"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "Lade till {name} \"{object}\"."
+msgid "Added {name} “{object}”."
+msgstr "Lade till {name} “{object}”."
 
 msgid "Added."
 msgstr "Lagt till."
@@ -150,16 +161,16 @@ msgid "and"
 msgstr "och"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "Ändrade {fields} på {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "Ändrade {fields} för {name} “{object}”."
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "Ändrade {fields}."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr "Tog bort {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
+msgstr "Tog bort {name} “{object}”."
 
 msgid "No fields changed."
 msgstr "Inga fält ändrade."
@@ -167,43 +178,40 @@ msgstr "Inga fält ändrade."
 msgid "None"
 msgstr "Inget"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
-"Håll ner \"Control\", eller \"Command\" på en Mac, för att välja fler än en."
+"Håll inne “Control”, eller “Command” på en Mac, för att välja fler än en."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr "Lade till {name} “{obj}”."
+
+msgid "You may edit it again below."
+msgstr "Du kan redigera det igen nedan"
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" lades till. Du kan redigera objektet igen nedanför."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr "Lade till {name} “{obj}”. Du kan lägga till ytterligare {name} nedan."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr "Ändrade {name} “{obj}”. Du kan göra ytterligare förändringar nedan."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr "Lade till {name} “{obj}”. Du kan göra ytterligare förändringar nedan."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
-msgstr ""
-"{name} \"{obj}\" lades till. Du kan lägga till ytterligare {name} nedan."
+msgstr "Ändrade {name} “{obj}”. Du kan lägga till ytterligare {name} nedan."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" lades till."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" ändrades. Du kan ändra det igen nedan."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "{name} \"{obj}\" ändrades."
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "Ändrade {name} “{obj}”."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -215,12 +223,12 @@ msgid "No action selected."
 msgstr "Inga åtgärder valda."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" togs bort."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "Tog bort %(name)s “%(obj)s”."
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
-msgstr ""
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr "%(name)s med ID “%(key)s” finns inte. Kan den ha blivit borttagen?"
 
 #, python-format
 msgid "Add %s"
@@ -229,6 +237,10 @@ msgstr "Lägg till %s"
 #, python-format
 msgid "Change %s"
 msgstr "Ändra %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Visa 1%s"
 
 msgid "Database error"
 msgstr "Databasfel"
@@ -286,8 +298,8 @@ msgstr "Administration av %(app)s"
 msgid "Page not found"
 msgstr "Sidan kunde inte hittas"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Vi beklagar men den begärda sidan hittades inte."
+msgid "We’re sorry, but the requested page could not be found."
+msgstr "Tyvärr kunde inte den begärda sidan hittas."
 
 msgid "Home"
 msgstr "Hem"
@@ -302,12 +314,11 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Serverfel <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Det har uppstått ett fel. Det har rapporterats till "
-"webbplatsadministratörerna via e-post och bör bli rättat omgående. Tack för "
-"ditt tålamod."
+"Ett fel har inträffat. Felet är rapporterat till sidans administratörer via "
+"e-post, och borde åtgärdas skyndsamt. Tack för ditt tålamod."
 
 msgid "Run the selected action"
 msgstr "Kör markerade operationer"
@@ -326,11 +337,11 @@ msgid "Clear selection"
 msgstr "Rensa urval"
 
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
-"Ange först ett användarnamn och ett lösenord. Efter det kommer du att få "
-"fler användaralternativ."
+"Ange först ett användarnamn och ett lösenord. Därefter kan du ändra fler "
+"egenskaper för användaren."
 
 msgid "Enter a username and password."
 msgstr "Mata in användarnamn och lösenord."
@@ -339,7 +350,7 @@ msgid "Change password"
 msgstr "Ändra lösenord"
 
 msgid "Please correct the error below."
-msgstr "Rätta till felen nedan."
+msgstr "Vänligen rätta nedanstående fel"
 
 msgid "Please correct the errors below."
 msgstr "Vänligen rätta till felen nedan."
@@ -415,7 +426,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Objekt"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Ja, jag är säker"
 
 msgid "No, take me back"
@@ -450,8 +461,8 @@ msgstr ""
 "Är du säker på att du vill ta bort valda %(objects_name)s? Alla följande "
 "objekt samt relaterade objekt kommer att tas bort: "
 
-msgid "Change"
-msgstr "Ändra"
+msgid "View"
+msgstr "Visa"
 
 msgid "Delete?"
 msgstr "Radera?"
@@ -470,8 +481,8 @@ msgstr "Modeller i applikationen %(name)s"
 msgid "Add"
 msgstr "Lägg till"
 
-msgid "You don't have permission to edit anything."
-msgstr "Du har inte rättigheter att redigera något."
+msgid "You don’t have permission to view or edit anything."
+msgstr "Du har inte tillåtelse att se eller ändra någonting."
 
 msgid "Recent actions"
 msgstr "Senaste Händelser"
@@ -486,12 +497,13 @@ msgid "Unknown content"
 msgstr "Okänt innehåll"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Någonting är fel med din databasinstallation. Se till att de rätta "
-"databastabellerna har skapats och att databasen är läsbar av rätt användare."
+"Någonting är fel med din databas-installation. Kontrollera att relevanta "
+"tabeller i databasen är skapta, och kontrollera även att databasen är läsbar "
+"av rätt användare."
 
 #, python-format
 msgid ""
@@ -514,11 +526,11 @@ msgid "Action"
 msgstr "Händelse"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"Detta objekt har ingen ändringshistorik. Det lades antagligen inte till via "
-"denna administrationssida."
+"Det här objektet har ingen förändringshistorik. Det var antagligen inte "
+"tillagt via den här admin-sidan."
 
 msgid "Show all"
 msgstr "Visa alla"
@@ -526,20 +538,8 @@ msgstr "Visa alla"
 msgid "Save"
 msgstr "Spara"
 
-msgid "Popup closing..."
-msgstr "Popup stänger..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Ändra markerade %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Lägg till %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Ta bort markerade %(model)s"
+msgid "Popup closing…"
+msgstr "Popup stängs..."
 
 msgid "Search"
 msgstr "Sök"
@@ -563,6 +563,24 @@ msgstr "Spara och lägg till ny"
 msgid "Save and continue editing"
 msgstr "Spara och fortsätt redigera"
 
+msgid "Save and view"
+msgstr "Spara och visa"
+
+msgid "Close"
+msgstr "Stäng"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Ändra markerade %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Lägg till %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Ta bort markerade %(model)s"
+
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Tack för att du spenderade lite kvalitetstid med webbplatsen idag."
 
@@ -576,11 +594,11 @@ msgid "Your password was changed."
 msgstr "Ditt lösenord har ändrats."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Var god fyll i ditt gamla lösenord för säkerhets skull och skriv sedan in "
-"ditt nya lösenord två gånger så vi kan kontrollera att du skrev det rätt."
+"Vänligen ange ditt gamla lösenord, för säkerhets skull, och ange därefter "
+"ditt nya lösenord två gånger så att vi kan kontrollera att du skrivit rätt."
 
 msgid "Change my password"
 msgstr "Ändra mitt lösenord"
@@ -615,19 +633,19 @@ msgstr ""
 "redan använts.  Var god skicka en ny nollställningsförfrågan."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Vi har skickat ett email till dig med instruktioner hur du återställer ditt "
-"lösenord om ett konto med mailadressen du fyllt i existerar. Det borde dyka "
-"upp i din inkorg inom kort."
+"Vi har via e-post skickat dig instruktioner för hur du ställer in ditt "
+"lösenord, om ett konto finns med e-posten du angav. Du borde få "
+"instruktionerna inom kort."
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"Om ni inte får ett e-brev, vänligen kontrollera att du har skrivit in "
-"adressen du registrerade dig med och kolla din skräppostmapp."
+"Om du inte fick ett e-postmeddelande; kontrollera att e-postadressen är "
+"densamma som du registrerade dig med, och kolla i din skräppost."
 
 #, python-format
 msgid ""
@@ -640,8 +658,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Var god gå till följande sida och välj ett nytt lösenord:"
 
-msgid "Your username, in case you've forgotten:"
-msgstr "Ditt användarnamn (i fall du skulle ha glömt det):"
+msgid "Your username, in case you’ve forgotten:"
+msgstr "Ditt användarnamn, utifall du glömt det:"
 
 msgid "Thanks for using our site!"
 msgstr "Tack för att du använder vår webbplats!"
@@ -651,11 +669,11 @@ msgid "The %(site_name)s team"
 msgstr "%(site_name)s-teamet"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"Glömt ditt lösenord? Fyll i din e-postadress nedan så skickar vi ett e-"
-"postmeddelande med instruktioner för hur du ställer in ett nytt."
+"Har du glömt ditt lösenord? Ange din e-postadress nedan, så skickar vi dig "
+"instruktioner för hur du ställer in ett nytt."
 
 msgid "Email address:"
 msgstr "E-postadress:"
@@ -673,6 +691,10 @@ msgstr "Välj %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Välj %s att ändra"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Välj 1%s för visning"
 
 msgid "Date:"
 msgstr "Datum:"

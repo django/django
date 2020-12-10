@@ -19,23 +19,27 @@ What are Django's prerequisites?
 
 Django requires Python. See the table in the next question for the versions of
 Python that work with each version of Django. Other Python libraries may be
-required for some uses, but you'll receive an error about it as they're needed.
+required for some use cases, but you'll receive an error about them as they're
+needed.
 
 For a development environment -- if you just want to experiment with Django --
-you don't need to have a separate Web server installed; Django comes with its
-own lightweight development server. For a production environment, Django follows
-the WSGI spec, :pep:`3333`, which means it can run on a variety of server
-platforms. See :doc:`Deploying Django </howto/deployment/index>` for some
-popular alternatives.
+you don't need to have a separate Web server installed or database server.
 
-If you want to use Django with a database, which is probably the case, you'll
-also need a database engine. PostgreSQL_ is recommended, because we're
-PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
+Django comes with its own :djadmin:`lightweight development server<runserver>`.
+For a production environment, Django follows the WSGI spec, :pep:`3333`, which
+means it can run on a variety of web servers. See :doc:`Deploying Django
+</howto/deployment/index>` for more information.
+
+Django runs `SQLite`_ by default, which is included in Python installations.
+For a production environment, we recommend PostgreSQL_; but we also officially
+support MariaDB_, MySQL_, `SQLite`_, and Oracle_. See :doc:`Supported Databases
+</ref/databases>` for more information.
 
 .. _Python: https://www.python.org/
 .. _PostgreSQL: https://www.postgresql.org/
+.. _MariaDB: https://mariadb.org/
 .. _MySQL: https://www.mysql.com/
-.. _`SQLite 3`: https://www.sqlite.org/
+.. _`SQLite`: https://www.sqlite.org/
 .. _Oracle: https://www.oracle.com/
 
 .. _faq-python-version-support:
@@ -46,11 +50,10 @@ What Python version can I use with Django?
 ============== ===============
 Django version Python versions
 ============== ===============
-1.8            2.7, 3.2 (until the end of 2016), 3.3, 3.4, 3.5
-1.9, 1.10      2.7, 3.4, 3.5
-1.11           2.7, 3.4, 3.5, 3.6
-2.0            3.4, 3.5, 3.6
-2.1            3.5, 3.6, 3.7
+2.2            3.5, 3.6, 3.7, 3.8 (added in 2.2.8), 3.9 (added in 2.2.17)
+3.0            3.6, 3.7, 3.8, 3.9 (added in 3.0.11)
+3.1            3.6, 3.7, 3.8, 3.9 (added in 3.1.3)
+3.2            3.6, 3.7, 3.8, 3.9
 ============== ===============
 
 For each version of Python, only the latest micro release (A.B.C) is officially
@@ -59,23 +62,20 @@ download page <https://www.python.org/downloads/>`_.
 
 Typically, we will support a Python version up to and including the first
 Django LTS release whose security support ends after security support for that
-version of Python ends. For example, Python 3.3 security support ends September
-2017 and Django 1.8 LTS security support ends April 2018. Therefore Django 1.8
-is the last version to support Python 3.3.
+version of Python ends. For example, Python 3.3 security support ended
+September 2017 and Django 1.8 LTS security support ended April 2018. Therefore
+Django 1.8 is the last version to support Python 3.3.
 
 What Python version should I use with Django?
 =============================================
-
-Python 3 is recommended. Django 1.11 is the last version to support Python 2.7.
-Support for Python 2.7 and Django 1.11 ends in 2020.
 
 Since newer versions of Python are often faster, have more features, and are
 better supported, the latest version of Python 3 is recommended.
 
 You don't lose anything in Django by using an older release, but you don't take
 advantage of the improvements and optimizations in newer Python releases.
-Third-party applications for use with Django are, of course, free to set their
-own version requirements.
+Third-party applications for use with Django are free to set their own version
+requirements.
 
 Should I use the stable version or development version?
 =======================================================

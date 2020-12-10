@@ -3,14 +3,15 @@
 # Translators:
 # András Veres-Szentkirályi, 2016
 # Attila Nagy <>, 2012
+# Istvan Farkas <istvan.farkas@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-19 07:40+0000\n"
-"Last-Translator: András Veres-Szentkirályi\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-11-18 09:08+0000\n"
+"Last-Translator: Istvan Farkas <istvan.farkas@gmail.com>\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -157,13 +158,13 @@ msgid "Template: %(name)s"
 msgstr "%(name)s sablon"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "%(name)s sablon"
+msgid "Template: <q>%(name)s</q>"
+msgstr "Sablon: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "\"%(name)s\" sablon keresési útvonala:"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "<q>%(name)s</q>sablon keresési útvonala:"
 
 msgid "(does not exist)"
 msgstr "(nem létezik)"
@@ -243,13 +244,6 @@ msgstr ""
 "\n"
 "    Nézet függvény: <code>%(full_name)s</code>. Név: <code>%(url_name)s</"
 "code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Logikai (True vagy False)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Mezőtípus: %(field_type)s"
 
 msgid "tag:"
 msgstr "címke:"

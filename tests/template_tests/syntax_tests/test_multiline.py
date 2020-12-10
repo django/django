@@ -2,7 +2,6 @@ from django.test import SimpleTestCase
 
 from ..utils import setup
 
-
 multiline_string = """
 Hello,
 boys.

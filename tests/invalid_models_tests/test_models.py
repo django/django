@@ -1,29 +1,27 @@
 import unittest
 
-from django.conf import settings
-from django.core.checks import Error
+from django.core.checks import Error, Warning
 from django.core.checks.model_checks import _check_lazy_references
-from django.core.exceptions import ImproperlyConfigured
-from django.db import connections, models
+from django.db import connection, connections, models
+from django.db.models.functions import Lower
 from django.db.models.signals import post_init
-from django.test import SimpleTestCase
-from django.test.utils import isolate_apps, override_settings
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test.utils import isolate_apps, override_settings, register_lookup
+
+
+class EmptyRouter:
+    pass
 
 
 def get_max_column_name_length():
     allowed_len = None
     db_alias = None
 
-    for db in settings.DATABASES:
+    for db in ('default', 'other'):
         connection = connections[db]
         max_name_length = connection.ops.max_name_length()
-        if max_name_length is None or connection.features.truncates_names:
-            continue
-        else:
-            if allowed_len is None:
-                allowed_len = max_name_length
-                db_alias = db
-            elif max_name_length < allowed_len:
+        if max_name_length is not None and not connection.features.truncates_names:
+            if allowed_len is None or max_name_length < allowed_len:
                 allowed_len = max_name_length
                 db_alias = db
 
@@ -75,9 +73,7 @@ class IndexTogetherTests(SimpleTestCase):
     def test_pointing_to_missing_field(self):
         class Model(models.Model):
             class Meta:
-                index_together = [
-                    ["missing_field"],
-                ]
+                index_together = [['missing_field']]
 
         self.assertEqual(Model.check(), [
             Error(
@@ -95,15 +91,13 @@ class IndexTogetherTests(SimpleTestCase):
             field2 = models.IntegerField()
 
             class Meta:
-                index_together = [
-                    ["field2", "field1"],
-                ]
+                index_together = [['field2', 'field1']]
 
         self.assertEqual(Bar.check(), [
             Error(
                 "'index_together' refers to field 'field1' which is not "
                 "local to model 'Bar'.",
-                hint=("This issue may be caused by multi-table inheritance."),
+                hint='This issue may be caused by multi-table inheritance.',
                 obj=Bar,
                 id='models.E016',
             ),
@@ -114,9 +108,7 @@ class IndexTogetherTests(SimpleTestCase):
             m2m = models.ManyToManyField('self')
 
             class Meta:
-                index_together = [
-                    ["m2m"],
-                ]
+                index_together = [['m2m']]
 
         self.assertEqual(Model.check(), [
             Error(
@@ -126,6 +118,19 @@ class IndexTogetherTests(SimpleTestCase):
                 id='models.E013',
             ),
         ])
+
+    def test_pointing_to_fk(self):
+        class Foo(models.Model):
+            pass
+
+        class Bar(models.Model):
+            foo_1 = models.ForeignKey(Foo, on_delete=models.CASCADE, related_name='bar_1')
+            foo_2 = models.ForeignKey(Foo, on_delete=models.CASCADE, related_name='bar_2')
+
+            class Meta:
+                index_together = [['foo_1_id', 'foo_2']]
+
+        self.assertEqual(Bar.check(), [])
 
 
 # unique_together tests are very similar to index_together tests.
@@ -188,9 +193,7 @@ class UniqueTogetherTests(SimpleTestCase):
     def test_pointing_to_missing_field(self):
         class Model(models.Model):
             class Meta:
-                unique_together = [
-                    ["missing_field"],
-                ]
+                unique_together = [['missing_field']]
 
         self.assertEqual(Model.check(), [
             Error(
@@ -205,9 +208,7 @@ class UniqueTogetherTests(SimpleTestCase):
             m2m = models.ManyToManyField('self')
 
             class Meta:
-                unique_together = [
-                    ["m2m"],
-                ]
+                unique_together = [['m2m']]
 
         self.assertEqual(Model.check(), [
             Error(
@@ -218,9 +219,286 @@ class UniqueTogetherTests(SimpleTestCase):
             ),
         ])
 
+    def test_pointing_to_fk(self):
+        class Foo(models.Model):
+            pass
+
+        class Bar(models.Model):
+            foo_1 = models.ForeignKey(Foo, on_delete=models.CASCADE, related_name='bar_1')
+            foo_2 = models.ForeignKey(Foo, on_delete=models.CASCADE, related_name='bar_2')
+
+            class Meta:
+                unique_together = [['foo_1_id', 'foo_2']]
+
+        self.assertEqual(Bar.check(), [])
+
 
 @isolate_apps('invalid_models_tests')
-class FieldNamesTests(SimpleTestCase):
+class IndexesTests(TestCase):
+
+    def test_pointing_to_missing_field(self):
+        class Model(models.Model):
+            class Meta:
+                indexes = [models.Index(fields=['missing_field'], name='name')]
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "'indexes' refers to the nonexistent field 'missing_field'.",
+                obj=Model,
+                id='models.E012',
+            ),
+        ])
+
+    def test_pointing_to_m2m_field(self):
+        class Model(models.Model):
+            m2m = models.ManyToManyField('self')
+
+            class Meta:
+                indexes = [models.Index(fields=['m2m'], name='name')]
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "'indexes' refers to a ManyToManyField 'm2m', but "
+                "ManyToManyFields are not permitted in 'indexes'.",
+                obj=Model,
+                id='models.E013',
+            ),
+        ])
+
+    def test_pointing_to_non_local_field(self):
+        class Foo(models.Model):
+            field1 = models.IntegerField()
+
+        class Bar(Foo):
+            field2 = models.IntegerField()
+
+            class Meta:
+                indexes = [models.Index(fields=['field2', 'field1'], name='name')]
+
+        self.assertEqual(Bar.check(), [
+            Error(
+                "'indexes' refers to field 'field1' which is not local to "
+                "model 'Bar'.",
+                hint='This issue may be caused by multi-table inheritance.',
+                obj=Bar,
+                id='models.E016',
+            ),
+        ])
+
+    def test_pointing_to_fk(self):
+        class Foo(models.Model):
+            pass
+
+        class Bar(models.Model):
+            foo_1 = models.ForeignKey(Foo, on_delete=models.CASCADE, related_name='bar_1')
+            foo_2 = models.ForeignKey(Foo, on_delete=models.CASCADE, related_name='bar_2')
+
+            class Meta:
+                indexes = [models.Index(fields=['foo_1_id', 'foo_2'], name='index_name')]
+
+        self.assertEqual(Bar.check(), [])
+
+    def test_name_constraints(self):
+        class Model(models.Model):
+            class Meta:
+                indexes = [
+                    models.Index(fields=['id'], name='_index_name'),
+                    models.Index(fields=['id'], name='5index_name'),
+                ]
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "The index name '%sindex_name' cannot start with an "
+                "underscore or a number." % prefix,
+                obj=Model,
+                id='models.E033',
+            ) for prefix in ('_', '5')
+        ])
+
+    def test_max_name_length(self):
+        index_name = 'x' * 31
+
+        class Model(models.Model):
+            class Meta:
+                indexes = [models.Index(fields=['id'], name=index_name)]
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "The index name '%s' cannot be longer than 30 characters."
+                % index_name,
+                obj=Model,
+                id='models.E034',
+            ),
+        ])
+
+    def test_index_with_condition(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                indexes = [
+                    models.Index(
+                        fields=['age'],
+                        name='index_age_gte_10',
+                        condition=models.Q(age__gte=10),
+                    ),
+                ]
+
+        errors = Model.check(databases=self.databases)
+        expected = [] if connection.features.supports_partial_indexes else [
+            Warning(
+                '%s does not support indexes with conditions.'
+                % connection.display_name,
+                hint=(
+                    "Conditions will be ignored. Silence this warning if you "
+                    "don't care about it."
+                ),
+                obj=Model,
+                id='models.W037',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_index_with_condition_required_db_features(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                required_db_features = {'supports_partial_indexes'}
+                indexes = [
+                    models.Index(
+                        fields=['age'],
+                        name='index_age_gte_10',
+                        condition=models.Q(age__gte=10),
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+    def test_index_with_include(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                indexes = [
+                    models.Index(
+                        fields=['age'],
+                        name='index_age_include_id',
+                        include=['id'],
+                    ),
+                ]
+
+        errors = Model.check(databases=self.databases)
+        expected = [] if connection.features.supports_covering_indexes else [
+            Warning(
+                '%s does not support indexes with non-key columns.'
+                % connection.display_name,
+                hint=(
+                    "Non-key columns will be ignored. Silence this warning if "
+                    "you don't care about it."
+                ),
+                obj=Model,
+                id='models.W040',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_index_with_include_required_db_features(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                required_db_features = {'supports_covering_indexes'}
+                indexes = [
+                    models.Index(
+                        fields=['age'],
+                        name='index_age_include_id',
+                        include=['id'],
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+    @skipUnlessDBFeature('supports_covering_indexes')
+    def test_index_include_pointing_to_missing_field(self):
+        class Model(models.Model):
+            class Meta:
+                indexes = [
+                    models.Index(fields=['id'], include=['missing_field'], name='name'),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [
+            Error(
+                "'indexes' refers to the nonexistent field 'missing_field'.",
+                obj=Model,
+                id='models.E012',
+            ),
+        ])
+
+    @skipUnlessDBFeature('supports_covering_indexes')
+    def test_index_include_pointing_to_m2m_field(self):
+        class Model(models.Model):
+            m2m = models.ManyToManyField('self')
+
+            class Meta:
+                indexes = [models.Index(fields=['id'], include=['m2m'], name='name')]
+
+        self.assertEqual(Model.check(databases=self.databases), [
+            Error(
+                "'indexes' refers to a ManyToManyField 'm2m', but "
+                "ManyToManyFields are not permitted in 'indexes'.",
+                obj=Model,
+                id='models.E013',
+            ),
+        ])
+
+    @skipUnlessDBFeature('supports_covering_indexes')
+    def test_index_include_pointing_to_non_local_field(self):
+        class Parent(models.Model):
+            field1 = models.IntegerField()
+
+        class Child(Parent):
+            field2 = models.IntegerField()
+
+            class Meta:
+                indexes = [
+                    models.Index(fields=['field2'], include=['field1'], name='name'),
+                ]
+
+        self.assertEqual(Child.check(databases=self.databases), [
+            Error(
+                "'indexes' refers to field 'field1' which is not local to "
+                "model 'Child'.",
+                hint='This issue may be caused by multi-table inheritance.',
+                obj=Child,
+                id='models.E016',
+            ),
+        ])
+
+    @skipUnlessDBFeature('supports_covering_indexes')
+    def test_index_include_pointing_to_fk(self):
+        class Target(models.Model):
+            pass
+
+        class Model(models.Model):
+            fk_1 = models.ForeignKey(Target, models.CASCADE, related_name='target_1')
+            fk_2 = models.ForeignKey(Target, models.CASCADE, related_name='target_2')
+
+            class Meta:
+                constraints = [
+                    models.Index(
+                        fields=['id'],
+                        include=['fk_1_id', 'fk_2'],
+                        name='name',
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+
+@isolate_apps('invalid_models_tests')
+class FieldNamesTests(TestCase):
+    databases = {'default', 'other'}
 
     def test_ending_with_underscore(self):
         class Model(models.Model):
@@ -248,8 +526,6 @@ class FieldNamesTests(SimpleTestCase):
         #13711 -- Model check for long M2M column names when database has
         column name length limits.
         """
-        allowed_len, db_alias = get_max_column_name_length()
-
         # A model with very long name which will be used to set relations to.
         class VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz(models.Model):
             title = models.CharField(max_length=11)
@@ -258,21 +534,21 @@ class FieldNamesTests(SimpleTestCase):
         class ModelWithLongField(models.Model):
             m2m_field = models.ManyToManyField(
                 VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz,
-                related_name="rn1"
+                related_name='rn1',
             )
             m2m_field2 = models.ManyToManyField(
                 VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz,
-                related_name="rn2", through='m2msimple'
+                related_name='rn2', through='m2msimple',
             )
             m2m_field3 = models.ManyToManyField(
                 VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz,
-                related_name="rn3",
-                through='m2mcomplex'
+                related_name='rn3',
+                through='m2mcomplex',
             )
             fk = models.ForeignKey(
                 VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz,
                 models.CASCADE,
-                related_name="rn4",
+                related_name='rn4',
             )
 
         # Models used for setting `through` in M2M field.
@@ -294,7 +570,7 @@ class FieldNamesTests(SimpleTestCase):
             db_column=long_field_name
         ).contribute_to_class(m2mcomplex, long_field_name)
 
-        errors = ModelWithLongField.check()
+        errors = ModelWithLongField.check(databases=('default', 'other'))
 
         # First error because of M2M field set on the model with long name.
         m2m_long_name = "verylongmodelnamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_id"
@@ -332,6 +608,9 @@ class FieldNamesTests(SimpleTestCase):
         )
 
         self.assertEqual(errors, expected)
+        # Check for long column names is called only for specified database
+        # aliases.
+        self.assertEqual(ModelWithLongField.check(databases=None), [])
 
     @unittest.skipIf(max_column_name_length is None, "The database doesn't have a column name length limit.")
     def test_local_field_long_column_name(self):
@@ -339,8 +618,6 @@ class FieldNamesTests(SimpleTestCase):
         #13711 -- Model check for long column names
         when database does not support long names.
         """
-        allowed_len, db_alias = get_max_column_name_length()
-
         class ModelWithLongField(models.Model):
             title = models.CharField(max_length=11)
 
@@ -348,7 +625,7 @@ class FieldNamesTests(SimpleTestCase):
         long_field_name2 = 'b' * (self.max_column_name_length + 1)
         models.CharField(max_length=11).contribute_to_class(ModelWithLongField, long_field_name)
         models.CharField(max_length=11, db_column='vlmn').contribute_to_class(ModelWithLongField, long_field_name2)
-        self.assertEqual(ModelWithLongField.check(), [
+        self.assertEqual(ModelWithLongField.check(databases=('default', 'other')), [
             Error(
                 'Autogenerated column name too long for field "%s". '
                 'Maximum length is "%s" for database "%s".'
@@ -358,6 +635,9 @@ class FieldNamesTests(SimpleTestCase):
                 id='models.E018',
             )
         ])
+        # Check for long column names is called only for specified database
+        # aliases.
+        self.assertEqual(ModelWithLongField.check(databases=None), [])
 
     def test_including_separator(self):
         class Model(models.Model):
@@ -380,6 +660,21 @@ class FieldNamesTests(SimpleTestCase):
                 "'pk' is a reserved word that cannot be used as a field name.",
                 obj=Model._meta.get_field('pk'),
                 id='fields.E003',
+            )
+        ])
+
+    def test_db_column_clash(self):
+        class Model(models.Model):
+            foo = models.IntegerField()
+            bar = models.IntegerField(db_column='foo')
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "Field 'bar' has column name 'foo' that is used by "
+                "another field.",
+                hint="Specify a 'db_column' for the field.",
+                obj=Model,
+                id='models.E007',
             )
         ])
 
@@ -514,7 +809,7 @@ class OtherModelTests(SimpleTestCase):
     def test_ordering_non_iterable(self):
         class Model(models.Model):
             class Meta:
-                ordering = "missing_field"
+                ordering = 'missing_field'
 
         self.assertEqual(Model.check(), [
             Error(
@@ -578,7 +873,8 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertEqual(Model.check(), [
             Error(
-                "'ordering' refers to the nonexistent field 'relation'.",
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'relation'.",
                 obj=Model,
                 id='models.E015',
             ),
@@ -587,36 +883,50 @@ class OtherModelTests(SimpleTestCase):
     def test_ordering_pointing_to_missing_field(self):
         class Model(models.Model):
             class Meta:
-                ordering = ("missing_field",)
+                ordering = ('missing_field',)
 
         self.assertEqual(Model.check(), [
             Error(
-                "'ordering' refers to the nonexistent field 'missing_field'.",
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'missing_field'.",
                 obj=Model,
                 id='models.E015',
             )
         ])
 
     def test_ordering_pointing_to_missing_foreignkey_field(self):
-        # refs #22711
-
         class Model(models.Model):
             missing_fk_field = models.IntegerField()
 
             class Meta:
-                ordering = ("missing_fk_field_id",)
+                ordering = ('missing_fk_field_id',)
 
         self.assertEqual(Model.check(), [
             Error(
-                "'ordering' refers to the nonexistent field 'missing_fk_field_id'.",
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'missing_fk_field_id'.",
                 obj=Model,
                 id='models.E015',
             )
         ])
 
-    def test_ordering_pointing_to_existing_foreignkey_field(self):
-        # refs #22711
+    def test_ordering_pointing_to_missing_related_field(self):
+        class Model(models.Model):
+            test = models.IntegerField()
 
+            class Meta:
+                ordering = ('missing_related__id',)
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'missing_related__id'.",
+                obj=Model,
+                id='models.E015',
+            )
+        ])
+
+    def test_ordering_pointing_to_missing_related_model_field(self):
         class Parent(models.Model):
             pass
 
@@ -624,7 +934,115 @@ class OtherModelTests(SimpleTestCase):
             parent = models.ForeignKey(Parent, models.CASCADE)
 
             class Meta:
-                ordering = ("parent_id",)
+                ordering = ('parent__missing_field',)
+
+        self.assertEqual(Child.check(), [
+            Error(
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'parent__missing_field'.",
+                obj=Child,
+                id='models.E015',
+            )
+        ])
+
+    def test_ordering_pointing_to_non_related_field(self):
+        class Child(models.Model):
+            parent = models.IntegerField()
+
+            class Meta:
+                ordering = ('parent__missing_field',)
+
+        self.assertEqual(Child.check(), [
+            Error(
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'parent__missing_field'.",
+                obj=Child,
+                id='models.E015',
+            )
+        ])
+
+    def test_ordering_pointing_to_two_related_model_field(self):
+        class Parent2(models.Model):
+            pass
+
+        class Parent1(models.Model):
+            parent2 = models.ForeignKey(Parent2, models.CASCADE)
+
+        class Child(models.Model):
+            parent1 = models.ForeignKey(Parent1, models.CASCADE)
+
+            class Meta:
+                ordering = ('parent1__parent2__missing_field',)
+
+        self.assertEqual(Child.check(), [
+            Error(
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'parent1__parent2__missing_field'.",
+                obj=Child,
+                id='models.E015',
+            )
+        ])
+
+    def test_ordering_pointing_multiple_times_to_model_fields(self):
+        class Parent(models.Model):
+            field1 = models.CharField(max_length=100)
+            field2 = models.CharField(max_length=100)
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.CASCADE)
+
+            class Meta:
+                ordering = ('parent__field1__field2',)
+
+        self.assertEqual(Child.check(), [
+            Error(
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'parent__field1__field2'.",
+                obj=Child,
+                id='models.E015',
+            )
+        ])
+
+    def test_ordering_allows_registered_lookups(self):
+        class Model(models.Model):
+            test = models.CharField(max_length=100)
+
+            class Meta:
+                ordering = ('test__lower',)
+
+        with register_lookup(models.CharField, Lower):
+            self.assertEqual(Model.check(), [])
+
+    def test_ordering_pointing_to_lookup_not_transform(self):
+        class Model(models.Model):
+            test = models.CharField(max_length=100)
+
+            class Meta:
+                ordering = ('test__isnull',)
+
+        self.assertEqual(Model.check(), [])
+
+    def test_ordering_pointing_to_related_model_pk(self):
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.CASCADE)
+
+            class Meta:
+                ordering = ('parent__pk',)
+
+        self.assertEqual(Child.check(), [])
+
+    def test_ordering_pointing_to_foreignkey_field(self):
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.CASCADE)
+
+            class Meta:
+                ordering = ('parent_id',)
 
         self.assertFalse(Child.check())
 
@@ -667,6 +1085,35 @@ class OtherModelTests(SimpleTestCase):
             )
         ])
 
+    def test_property_and_related_field_accessor_clash(self):
+        class Model(models.Model):
+            fk = models.ForeignKey('self', models.CASCADE)
+
+            @property
+            def fk_id(self):
+                pass
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "The property 'fk_id' clashes with a related field accessor.",
+                obj=Model,
+                id='models.E025',
+            )
+        ])
+
+    def test_single_primary_key(self):
+        class Model(models.Model):
+            foo = models.IntegerField(primary_key=True)
+            bar = models.IntegerField(primary_key=True)
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "The model cannot have more than one field with 'primary_key=True'.",
+                obj=Model,
+                id='models.E026',
+            )
+        ])
+
     @override_settings(TEST_SWAPPED_MODEL_BAD_VALUE='not-a-model')
     def test_swappable_missing_app_name(self):
         class Model(models.Model):
@@ -699,8 +1146,8 @@ class OtherModelTests(SimpleTestCase):
             pass
 
         class Group(models.Model):
-            primary = models.ManyToManyField(Person, through="Membership", related_name="primary")
-            secondary = models.ManyToManyField(Person, through="Membership", related_name="secondary")
+            primary = models.ManyToManyField(Person, through='Membership', related_name='primary')
+            secondary = models.ManyToManyField(Person, through='Membership', related_name='secondary')
 
         class Membership(models.Model):
             person = models.ForeignKey(Person, models.CASCADE)
@@ -708,21 +1155,53 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertEqual(Group.check(), [
             Error(
-                "The model has two many-to-many relations through "
+                "The model has two identical many-to-many relations through "
                 "the intermediate model 'invalid_models_tests.Membership'.",
                 obj=Group,
                 id='models.E003',
             )
         ])
 
-    def test_missing_parent_link(self):
-        msg = 'Add parent_link=True to invalid_models_tests.ParkingLot.parent.'
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            class Place(models.Model):
-                pass
+    def test_two_m2m_through_same_model_with_different_through_fields(self):
+        class Country(models.Model):
+            pass
 
-            class ParkingLot(Place):
-                parent = models.OneToOneField(Place, models.CASCADE)
+        class ShippingMethod(models.Model):
+            to_countries = models.ManyToManyField(
+                Country, through='ShippingMethodPrice',
+                through_fields=('method', 'to_country'),
+            )
+            from_countries = models.ManyToManyField(
+                Country, through='ShippingMethodPrice',
+                through_fields=('method', 'from_country'),
+                related_name='+',
+            )
+
+        class ShippingMethodPrice(models.Model):
+            method = models.ForeignKey(ShippingMethod, models.CASCADE)
+            to_country = models.ForeignKey(Country, models.CASCADE)
+            from_country = models.ForeignKey(Country, models.CASCADE)
+
+        self.assertEqual(ShippingMethod.check(), [])
+
+    def test_onetoone_with_parent_model(self):
+        class Place(models.Model):
+            pass
+
+        class ParkingLot(Place):
+            other_place = models.OneToOneField(Place, models.CASCADE, related_name='other_parking')
+
+        self.assertEqual(ParkingLot.check(), [])
+
+    def test_onetoone_with_explicit_parent_link_parent_model(self):
+        class Place(models.Model):
+            pass
+
+        class ParkingLot(Place):
+            place = models.OneToOneField(Place, models.CASCADE, parent_link=True, primary_key=True)
+            other_place = models.OneToOneField(Place, models.CASCADE, related_name='other_parking')
+
+        self.assertEqual(ParkingLot.check(), [])
 
     def test_m2m_table_name_clash(self):
         class Foo(models.Model):
@@ -742,6 +1221,32 @@ class OtherModelTests(SimpleTestCase):
                 obj=Foo._meta.get_field('bar'),
                 id='fields.E340',
             )
+        ])
+
+    @override_settings(DATABASE_ROUTERS=['invalid_models_tests.test_models.EmptyRouter'])
+    def test_m2m_table_name_clash_database_routers_installed(self):
+        class Foo(models.Model):
+            bar = models.ManyToManyField('Bar', db_table='myapp_bar')
+
+            class Meta:
+                db_table = 'myapp_foo'
+
+        class Bar(models.Model):
+            class Meta:
+                db_table = 'myapp_bar'
+
+        self.assertEqual(Foo.check(), [
+            Warning(
+                "The field's intermediary table 'myapp_bar' clashes with the "
+                "table name of 'invalid_models_tests.Bar'.",
+                obj=Foo._meta.get_field('bar'),
+                hint=(
+                    "You have configured settings.DATABASE_ROUTERS. Verify "
+                    "that the table of 'invalid_models_tests.Bar' is "
+                    "correctly routed to a separate database."
+                ),
+                id='fields.W344',
+            ),
         ])
 
     def test_m2m_field_table_name_clash(self):
@@ -769,6 +1274,32 @@ class OtherModelTests(SimpleTestCase):
             )
         ])
 
+    @override_settings(DATABASE_ROUTERS=['invalid_models_tests.test_models.EmptyRouter'])
+    def test_m2m_field_table_name_clash_database_routers_installed(self):
+        class Foo(models.Model):
+            pass
+
+        class Bar(models.Model):
+            foos = models.ManyToManyField(Foo, db_table='clash')
+
+        class Baz(models.Model):
+            foos = models.ManyToManyField(Foo, db_table='clash')
+
+        self.assertEqual(Bar.check() + Baz.check(), [
+            Warning(
+                "The field's intermediary table 'clash' clashes with the "
+                "table name of 'invalid_models_tests.%s.foos'."
+                % clashing_model,
+                obj=model_cls._meta.get_field('foos'),
+                hint=(
+                    "You have configured settings.DATABASE_ROUTERS. Verify "
+                    "that the table of 'invalid_models_tests.%s.foos' is "
+                    "correctly routed to a separate database." % clashing_model
+                ),
+                id='fields.W344',
+            ) for model_cls, clashing_model in [(Bar, 'Baz'), (Baz, 'Bar')]
+        ])
+
     def test_m2m_autogenerated_table_name_clash(self):
         class Foo(models.Model):
             class Meta:
@@ -788,6 +1319,33 @@ class OtherModelTests(SimpleTestCase):
                 obj=Bar._meta.get_field('foos'),
                 id='fields.E340',
             )
+        ])
+
+    @override_settings(DATABASE_ROUTERS=['invalid_models_tests.test_models.EmptyRouter'])
+    def test_m2m_autogenerated_table_name_clash_database_routers_installed(self):
+        class Foo(models.Model):
+            class Meta:
+                db_table = 'bar_foos'
+
+        class Bar(models.Model):
+            # The autogenerated db_table is bar_foos.
+            foos = models.ManyToManyField(Foo)
+
+            class Meta:
+                db_table = 'bar'
+
+        self.assertEqual(Bar.check(), [
+            Warning(
+                "The field's intermediary table 'bar_foos' clashes with the "
+                "table name of 'invalid_models_tests.Foo'.",
+                obj=Bar._meta.get_field('foos'),
+                hint=(
+                    "You have configured settings.DATABASE_ROUTERS. Verify "
+                    "that the table of 'invalid_models_tests.Foo' is "
+                    "correctly routed to a separate database."
+                ),
+                id='fields.W344',
+            ),
         ])
 
     def test_m2m_unmanaged_shadow_models_not_checked(self):
@@ -909,3 +1467,591 @@ class OtherModelTests(SimpleTestCase):
                 id='signals.E001',
             ),
         ])
+
+
+@isolate_apps('invalid_models_tests')
+class JSONFieldTests(TestCase):
+    @skipUnlessDBFeature('supports_json_field')
+    def test_ordering_pointing_to_json_field_value(self):
+        class Model(models.Model):
+            field = models.JSONField()
+
+            class Meta:
+                ordering = ['field__value']
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+    def test_check_jsonfield(self):
+        class Model(models.Model):
+            field = models.JSONField()
+
+        error = Error(
+            '%s does not support JSONFields.' % connection.display_name,
+            obj=Model,
+            id='fields.E180',
+        )
+        expected = [] if connection.features.supports_json_field else [error]
+        self.assertEqual(Model.check(databases=self.databases), expected)
+
+    def test_check_jsonfield_required_db_features(self):
+        class Model(models.Model):
+            field = models.JSONField()
+
+            class Meta:
+                required_db_features = {'supports_json_field'}
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+
+@isolate_apps('invalid_models_tests')
+class ConstraintsTests(TestCase):
+    def test_check_constraints(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                constraints = [models.CheckConstraint(check=models.Q(age__gte=18), name='is_adult')]
+
+        errors = Model.check(databases=self.databases)
+        warn = Warning(
+            '%s does not support check constraints.' % connection.display_name,
+            hint=(
+                "A constraint won't be created. Silence this warning if you "
+                "don't care about it."
+            ),
+            obj=Model,
+            id='models.W027',
+        )
+        expected = [] if connection.features.supports_table_check_constraints else [warn]
+        self.assertCountEqual(errors, expected)
+
+    def test_check_constraints_required_db_features(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                required_db_features = {'supports_table_check_constraints'}
+                constraints = [models.CheckConstraint(check=models.Q(age__gte=18), name='is_adult')]
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+    def test_check_constraint_pointing_to_missing_field(self):
+        class Model(models.Model):
+            class Meta:
+                required_db_features = {'supports_table_check_constraints'}
+                constraints = [
+                    models.CheckConstraint(
+                        name='name', check=models.Q(missing_field=2),
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to the nonexistent field "
+                "'missing_field'.",
+                obj=Model,
+                id='models.E012',
+            ),
+        ] if connection.features.supports_table_check_constraints else [])
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_check_constraint_pointing_to_reverse_fk(self):
+        class Model(models.Model):
+            parent = models.ForeignKey('self', models.CASCADE, related_name='parents')
+
+            class Meta:
+                constraints = [
+                    models.CheckConstraint(name='name', check=models.Q(parents=3)),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to the nonexistent field 'parents'.",
+                obj=Model,
+                id='models.E012',
+            ),
+        ])
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_check_constraint_pointing_to_m2m_field(self):
+        class Model(models.Model):
+            m2m = models.ManyToManyField('self')
+
+            class Meta:
+                constraints = [
+                    models.CheckConstraint(name='name', check=models.Q(m2m=2)),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to a ManyToManyField 'm2m', but "
+                "ManyToManyFields are not permitted in 'constraints'.",
+                obj=Model,
+                id='models.E013',
+            ),
+        ])
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_check_constraint_pointing_to_fk(self):
+        class Target(models.Model):
+            pass
+
+        class Model(models.Model):
+            fk_1 = models.ForeignKey(Target, models.CASCADE, related_name='target_1')
+            fk_2 = models.ForeignKey(Target, models.CASCADE, related_name='target_2')
+
+            class Meta:
+                constraints = [
+                    models.CheckConstraint(
+                        name='name',
+                        check=models.Q(fk_1_id=2) | models.Q(fk_2=2),
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_check_constraint_pointing_to_pk(self):
+        class Model(models.Model):
+            age = models.SmallIntegerField()
+
+            class Meta:
+                constraints = [
+                    models.CheckConstraint(
+                        name='name',
+                        check=models.Q(pk__gt=5) & models.Q(age__gt=models.F('pk')),
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_check_constraint_pointing_to_non_local_field(self):
+        class Parent(models.Model):
+            field1 = models.IntegerField()
+
+        class Child(Parent):
+            pass
+
+            class Meta:
+                constraints = [
+                    models.CheckConstraint(name='name', check=models.Q(field1=1)),
+                ]
+
+        self.assertEqual(Child.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to field 'field1' which is not local to "
+                "model 'Child'.",
+                hint='This issue may be caused by multi-table inheritance.',
+                obj=Child,
+                id='models.E016',
+            ),
+        ])
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_check_constraint_pointing_to_joined_fields(self):
+        class Model(models.Model):
+            name = models.CharField(max_length=10)
+            field1 = models.PositiveSmallIntegerField()
+            field2 = models.PositiveSmallIntegerField()
+            field3 = models.PositiveSmallIntegerField()
+            parent = models.ForeignKey('self', models.CASCADE)
+
+            class Meta:
+                constraints = [
+                    models.CheckConstraint(
+                        name='name1', check=models.Q(
+                            field1__lt=models.F('parent__field1') + models.F('parent__field2')
+                        )
+                    ),
+                    models.CheckConstraint(
+                        name='name2', check=models.Q(name=Lower('parent__name'))
+                    ),
+                    models.CheckConstraint(
+                        name='name3', check=models.Q(parent__field3=models.F('field1'))
+                    ),
+                ]
+
+        joined_fields = ['parent__field1', 'parent__field2', 'parent__field3', 'parent__name']
+        errors = Model.check(databases=self.databases)
+        expected_errors = [
+            Error(
+                "'constraints' refers to the joined field '%s'." % field_name,
+                obj=Model,
+                id='models.E041',
+            ) for field_name in joined_fields
+        ]
+        self.assertCountEqual(errors, expected_errors)
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_check_constraint_pointing_to_joined_fields_complex_check(self):
+        class Model(models.Model):
+            name = models.PositiveSmallIntegerField()
+            field1 = models.PositiveSmallIntegerField()
+            field2 = models.PositiveSmallIntegerField()
+            parent = models.ForeignKey('self', models.CASCADE)
+
+            class Meta:
+                constraints = [
+                    models.CheckConstraint(
+                        name='name',
+                        check=models.Q(
+                            (
+                                models.Q(name='test') &
+                                models.Q(field1__lt=models.F('parent__field1'))
+                            ) |
+                            (
+                                models.Q(name__startswith=Lower('parent__name')) &
+                                models.Q(field1__gte=(
+                                    models.F('parent__field1') + models.F('parent__field2')
+                                ))
+                            )
+                        ) | (models.Q(name='test1'))
+                    ),
+                ]
+
+        joined_fields = ['parent__field1', 'parent__field2', 'parent__name']
+        errors = Model.check(databases=self.databases)
+        expected_errors = [
+            Error(
+                "'constraints' refers to the joined field '%s'." % field_name,
+                obj=Model,
+                id='models.E041',
+            ) for field_name in joined_fields
+        ]
+        self.assertCountEqual(errors, expected_errors)
+
+    def test_unique_constraint_with_condition(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['age'],
+                        name='unique_age_gte_100',
+                        condition=models.Q(age__gte=100),
+                    ),
+                ]
+
+        errors = Model.check(databases=self.databases)
+        expected = [] if connection.features.supports_partial_indexes else [
+            Warning(
+                '%s does not support unique constraints with conditions.'
+                % connection.display_name,
+                hint=(
+                    "A constraint won't be created. Silence this warning if "
+                    "you don't care about it."
+                ),
+                obj=Model,
+                id='models.W036',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_unique_constraint_with_condition_required_db_features(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                required_db_features = {'supports_partial_indexes'}
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['age'],
+                        name='unique_age_gte_100',
+                        condition=models.Q(age__gte=100),
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+    def test_unique_constraint_condition_pointing_to_missing_field(self):
+        class Model(models.Model):
+            age = models.SmallIntegerField()
+
+            class Meta:
+                required_db_features = {'supports_partial_indexes'}
+                constraints = [
+                    models.UniqueConstraint(
+                        name='name',
+                        fields=['age'],
+                        condition=models.Q(missing_field=2),
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to the nonexistent field "
+                "'missing_field'.",
+                obj=Model,
+                id='models.E012',
+            ),
+        ] if connection.features.supports_partial_indexes else [])
+
+    def test_unique_constraint_condition_pointing_to_joined_fields(self):
+        class Model(models.Model):
+            age = models.SmallIntegerField()
+            parent = models.ForeignKey('self', models.CASCADE)
+
+            class Meta:
+                required_db_features = {'supports_partial_indexes'}
+                constraints = [
+                    models.UniqueConstraint(
+                        name='name',
+                        fields=['age'],
+                        condition=models.Q(parent__age__lt=2),
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to the joined field 'parent__age__lt'.",
+                obj=Model,
+                id='models.E041',
+            )
+        ] if connection.features.supports_partial_indexes else [])
+
+    def test_deferrable_unique_constraint(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['age'],
+                        name='unique_age_deferrable',
+                        deferrable=models.Deferrable.DEFERRED,
+                    ),
+                ]
+
+        errors = Model.check(databases=self.databases)
+        expected = [] if connection.features.supports_deferrable_unique_constraints else [
+            Warning(
+                '%s does not support deferrable unique constraints.'
+                % connection.display_name,
+                hint=(
+                    "A constraint won't be created. Silence this warning if "
+                    "you don't care about it."
+                ),
+                obj=Model,
+                id='models.W038',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_deferrable_unique_constraint_required_db_features(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                required_db_features = {'supports_deferrable_unique_constraints'}
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['age'],
+                        name='unique_age_deferrable',
+                        deferrable=models.Deferrable.IMMEDIATE,
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+    def test_unique_constraint_pointing_to_missing_field(self):
+        class Model(models.Model):
+            class Meta:
+                constraints = [models.UniqueConstraint(fields=['missing_field'], name='name')]
+
+        self.assertEqual(Model.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to the nonexistent field "
+                "'missing_field'.",
+                obj=Model,
+                id='models.E012',
+            ),
+        ])
+
+    def test_unique_constraint_pointing_to_m2m_field(self):
+        class Model(models.Model):
+            m2m = models.ManyToManyField('self')
+
+            class Meta:
+                constraints = [models.UniqueConstraint(fields=['m2m'], name='name')]
+
+        self.assertEqual(Model.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to a ManyToManyField 'm2m', but "
+                "ManyToManyFields are not permitted in 'constraints'.",
+                obj=Model,
+                id='models.E013',
+            ),
+        ])
+
+    def test_unique_constraint_pointing_to_non_local_field(self):
+        class Parent(models.Model):
+            field1 = models.IntegerField()
+
+        class Child(Parent):
+            field2 = models.IntegerField()
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(fields=['field2', 'field1'], name='name'),
+                ]
+
+        self.assertEqual(Child.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to field 'field1' which is not local to "
+                "model 'Child'.",
+                hint='This issue may be caused by multi-table inheritance.',
+                obj=Child,
+                id='models.E016',
+            ),
+        ])
+
+    def test_unique_constraint_pointing_to_fk(self):
+        class Target(models.Model):
+            pass
+
+        class Model(models.Model):
+            fk_1 = models.ForeignKey(Target, models.CASCADE, related_name='target_1')
+            fk_2 = models.ForeignKey(Target, models.CASCADE, related_name='target_2')
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(fields=['fk_1_id', 'fk_2'], name='name'),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+    def test_unique_constraint_with_include(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['age'],
+                        name='unique_age_include_id',
+                        include=['id'],
+                    ),
+                ]
+
+        errors = Model.check(databases=self.databases)
+        expected = [] if connection.features.supports_covering_indexes else [
+            Warning(
+                '%s does not support unique constraints with non-key columns.'
+                % connection.display_name,
+                hint=(
+                    "A constraint won't be created. Silence this warning if "
+                    "you don't care about it."
+                ),
+                obj=Model,
+                id='models.W039',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_unique_constraint_with_include_required_db_features(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                required_db_features = {'supports_covering_indexes'}
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['age'],
+                        name='unique_age_include_id',
+                        include=['id'],
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+    @skipUnlessDBFeature('supports_covering_indexes')
+    def test_unique_constraint_include_pointing_to_missing_field(self):
+        class Model(models.Model):
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['id'],
+                        include=['missing_field'],
+                        name='name',
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to the nonexistent field "
+                "'missing_field'.",
+                obj=Model,
+                id='models.E012',
+            ),
+        ])
+
+    @skipUnlessDBFeature('supports_covering_indexes')
+    def test_unique_constraint_include_pointing_to_m2m_field(self):
+        class Model(models.Model):
+            m2m = models.ManyToManyField('self')
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['id'],
+                        include=['m2m'],
+                        name='name',
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to a ManyToManyField 'm2m', but "
+                "ManyToManyFields are not permitted in 'constraints'.",
+                obj=Model,
+                id='models.E013',
+            ),
+        ])
+
+    @skipUnlessDBFeature('supports_covering_indexes')
+    def test_unique_constraint_include_pointing_to_non_local_field(self):
+        class Parent(models.Model):
+            field1 = models.IntegerField()
+
+        class Child(Parent):
+            field2 = models.IntegerField()
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['field2'],
+                        include=['field1'],
+                        name='name',
+                    ),
+                ]
+
+        self.assertEqual(Child.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to field 'field1' which is not local to "
+                "model 'Child'.",
+                hint='This issue may be caused by multi-table inheritance.',
+                obj=Child,
+                id='models.E016',
+            ),
+        ])
+
+    @skipUnlessDBFeature('supports_covering_indexes')
+    def test_unique_constraint_include_pointing_to_fk(self):
+        class Target(models.Model):
+            pass
+
+        class Model(models.Model):
+            fk_1 = models.ForeignKey(Target, models.CASCADE, related_name='target_1')
+            fk_2 = models.ForeignKey(Target, models.CASCADE, related_name='target_2')
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['id'],
+                        include=['fk_1_id', 'fk_2'],
+                        name='name',
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [])

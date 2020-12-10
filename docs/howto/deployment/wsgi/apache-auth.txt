@@ -22,7 +22,7 @@ version >= 2.2 and mod_wsgi >= 2.0. For example, you could:
     a 'name' field. You can also specify your own custom mod_wsgi
     auth handler if your custom cannot conform to these requirements.
 
-.. _Subversion: http://subversion.apache.org/
+.. _Subversion: https://subversion.apache.org/
 .. _mod_dav: https://httpd.apache.org/docs/2.2/mod/mod_dav.html
 
 Authentication with ``mod_wsgi``

@@ -14,6 +14,10 @@ class CacheKeyWarning(RuntimeWarning):
     pass
 
 
+class InvalidCacheKey(ValueError):
+    pass
+
+
 # Stub class to ensure not passing in a `timeout` argument results in
 # the default timeout
 DEFAULT_TIMEOUT = object()
@@ -97,8 +101,7 @@ class BaseCache:
         if version is None:
             version = self.version
 
-        new_key = self.key_func(key, self.key_prefix, version)
-        return new_key
+        return self.key_func(key, self.key_prefix, version)
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         """
@@ -124,9 +127,17 @@ class BaseCache:
         """
         raise NotImplementedError('subclasses of BaseCache must provide a set() method')
 
+    def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
+        """
+        Update the key's expiry time using timeout. Return True if successful
+        or False if the key does not exist.
+        """
+        raise NotImplementedError('subclasses of BaseCache must provide a touch() method')
+
     def delete(self, key, version=None):
         """
-        Delete a key from the cache, failing silently.
+        Delete a key from the cache and return whether it succeeded, failing
+        silently.
         """
         raise NotImplementedError('subclasses of BaseCache must provide a delete() method')
 
@@ -155,13 +166,15 @@ class BaseCache:
         Return the value of the key stored or retrieved.
         """
         val = self.get(key, version=version)
-        if val is None and default is not None:
+        if val is None:
             if callable(default):
                 default = default()
-            self.add(key, default, timeout=timeout, version=version)
-            # Fetch the value again to avoid a race condition if another caller
-            # added a value between the first get() and the add() above.
-            return self.get(key, default, version=version)
+            if default is not None:
+                self.add(key, default, timeout=timeout, version=version)
+                # Fetch the value again to avoid a race condition if another
+                # caller added a value between the first get() and the add()
+                # above.
+                return self.get(key, default, version=version)
         return val
 
     def has_key(self, key, version=None):
@@ -206,9 +219,13 @@ class BaseCache:
 
         If timeout is given, use that timeout for the key; otherwise use the
         default cache timeout.
+
+        On backends that support it, return a list of keys that failed
+        insertion, or an empty list if all keys were inserted successfully.
         """
         for key, value in data.items():
             self.set(key, value, timeout=timeout, version=version)
+        return []
 
     def delete_many(self, keys, version=None):
         """
@@ -229,18 +246,8 @@ class BaseCache:
         backend. This encourages (but does not force) writing backend-portable
         cache code.
         """
-        if len(key) > MEMCACHE_MAX_KEY_LENGTH:
-            warnings.warn(
-                'Cache key will cause errors if used with memcached: %r '
-                '(longer than %s)' % (key, MEMCACHE_MAX_KEY_LENGTH), CacheKeyWarning
-            )
-        for char in key:
-            if ord(char) < 33 or ord(char) == 127:
-                warnings.warn(
-                    'Cache key contains characters that will cause errors if '
-                    'used with memcached: %r' % key, CacheKeyWarning
-                )
-                break
+        for warning in memcache_key_warnings(key):
+            warnings.warn(warning, CacheKeyWarning)
 
     def incr_version(self, key, delta=1, version=None):
         """
@@ -268,3 +275,18 @@ class BaseCache:
     def close(self, **kwargs):
         """Close the cache connection"""
         pass
+
+
+def memcache_key_warnings(key):
+    if len(key) > MEMCACHE_MAX_KEY_LENGTH:
+        yield (
+            'Cache key will cause errors if used with memcached: %r '
+            '(longer than %s)' % (key, MEMCACHE_MAX_KEY_LENGTH)
+        )
+    for char in key:
+        if ord(char) < 33 or ord(char) == 127:
+            yield (
+                'Cache key contains characters that will cause errors if '
+                'used with memcached: %r' % key
+            )
+            break

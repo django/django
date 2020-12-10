@@ -14,7 +14,7 @@ and cultures.
 
 * `GitHub <https://github.com/django/django-localflavor>`__
 * `Documentation <https://django-localflavor.readthedocs.io/>`__
-* `PyPI <https://pypi.python.org/pypi/django-localflavor>`__
+* `PyPI <https://pypi.org/project/django-localflavor/>`__
 
 Comments
 ========
@@ -26,7 +26,7 @@ product like Disqus.
 
 * `GitHub <https://github.com/django/django-contrib-comments>`__
 * `Documentation <https://django-contrib-comments.readthedocs.io/>`__
-* `PyPI <https://pypi.python.org/pypi/django-contrib-comments>`__
+* `PyPI <https://pypi.org/project/django-contrib-comments/>`__
 
 Formtools
 =========
@@ -35,4 +35,4 @@ Formtools
 
 * `GitHub <https://github.com/django/django-formtools>`__
 * `Documentation <https://django-formtools.readthedocs.io/>`__
-* `PyPI <https://pypi.python.org/pypi/django-formtools>`__
+* `PyPI <https://pypi.org/project/django-formtools/>`__

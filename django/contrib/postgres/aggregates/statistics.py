@@ -1,5 +1,4 @@
-from django.db.models import FloatField, IntegerField
-from django.db.models.aggregates import Aggregate
+from django.db.models import Aggregate, FloatField, IntegerField
 
 __all__ = [
     'CovarPop', 'Corr', 'RegrAvgX', 'RegrAvgY', 'RegrCount', 'RegrIntercept',
@@ -8,13 +7,12 @@ __all__ = [
 
 
 class StatAggregate(Aggregate):
-    def __init__(self, y, x, output_field=FloatField(), filter=None):
+    output_field = FloatField()
+
+    def __init__(self, y, x, output_field=None, filter=None):
         if not x or not y:
             raise ValueError('Both y and x must be provided.')
         super().__init__(y, x, output_field=output_field, filter=filter)
-
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        return super().resolve_expression(query, allow_joins, reuse, summarize)
 
 
 class Corr(StatAggregate):
@@ -37,14 +35,10 @@ class RegrAvgY(StatAggregate):
 
 class RegrCount(StatAggregate):
     function = 'REGR_COUNT'
-
-    def __init__(self, y, x, filter=None):
-        super().__init__(y=y, x=x, output_field=IntegerField(), filter=filter)
+    output_field = IntegerField()
 
     def convert_value(self, value, expression, connection):
-        if value is None:
-            return 0
-        return int(value)
+        return 0 if value is None else value
 
 
 class RegrIntercept(StatAggregate):

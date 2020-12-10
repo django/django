@@ -1,12 +1,11 @@
 from django.db import models
 
-CHOICES = (
-    (1, 'first'),
-    (2, 'second'),
-)
-
 
 class Article(models.Model):
+    CHOICES = (
+        (1, 'first'),
+        (2, 'second'),
+    )
     headline = models.CharField(max_length=100, default='Default headline')
     pub_date = models.DateTimeField()
     status = models.IntegerField(blank=True, null=True, choices=CHOICES)
@@ -17,9 +16,6 @@ class Article(models.Model):
         ordering = ('pub_date', 'headline')
         # A utf-8 verbose name (Ångström's Articles) to test they are valid.
         verbose_name = "\xc3\x85ngstr\xc3\xb6m's Articles"
-
-    def __str__(self):
-        return self.headline
 
 
 class Movie(models.Model):
@@ -39,9 +35,6 @@ class Event(models.Model):
 class Department(models.Model):
     id = models.PositiveIntegerField(primary_key=True)
     name = models.CharField(max_length=200)
-
-    def __str__(self):
-        return self.name
 
 
 class Worker(models.Model):

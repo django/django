@@ -15,10 +15,9 @@ except ImproperlyConfigured:
 
 if Image:
     from .models import (
-        Person, PersonWithHeight, PersonWithHeightAndWidth,
-        PersonDimensionsFirst, PersonTwoImages, TestImageFieldFile,
+        Person, PersonDimensionsFirst, PersonTwoImages, PersonWithHeight,
+        PersonWithHeightAndWidth, TestImageFieldFile, temp_storage_dir,
     )
-    from .models import temp_storage_dir
 else:
     # Pillow not available, create dummy classes (tests will be skipped anyway)
     class Person:
@@ -64,8 +63,7 @@ class ImageFieldTestMixin(SerializeMixin):
         self.file2.close()
         shutil.rmtree(temp_storage_dir)
 
-    def check_dimensions(self, instance, width, height,
-                         field_name='mugshot'):
+    def check_dimensions(self, instance, width, height, field_name='mugshot'):
         """
         Asserts that the given width and height values match both the
         field's height and width attributes and the height and width fields
@@ -179,11 +177,20 @@ class ImageFieldTests(ImageFieldTestMixin, TestCase):
         p.mugshot.save("mug", self.file1)
         dump = pickle.dumps(p)
 
-        p2 = Person(name="Bob")
-        p2.mugshot = self.file1
-
         loaded_p = pickle.loads(dump)
         self.assertEqual(p.mugshot, loaded_p.mugshot)
+        self.assertEqual(p.mugshot.url, loaded_p.mugshot.url)
+        self.assertEqual(p.mugshot.storage, loaded_p.mugshot.storage)
+        self.assertEqual(p.mugshot.instance, loaded_p.mugshot.instance)
+        self.assertEqual(p.mugshot.field, loaded_p.mugshot.field)
+
+        mugshot_dump = pickle.dumps(p.mugshot)
+        loaded_mugshot = pickle.loads(mugshot_dump)
+        self.assertEqual(p.mugshot, loaded_mugshot)
+        self.assertEqual(p.mugshot.url, loaded_mugshot.url)
+        self.assertEqual(p.mugshot.storage, loaded_mugshot.storage)
+        self.assertEqual(p.mugshot.instance, loaded_mugshot.instance)
+        self.assertEqual(p.mugshot.field, loaded_mugshot.field)
 
     def test_defer(self):
         self.PersonModel.objects.create(name='Joe', mugshot=self.file1)
@@ -270,7 +277,7 @@ class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
 
         # Field and dimensions should be cleared after a delete.
         p.mugshot.delete(save=False)
-        self.assertEqual(p.mugshot, None)
+        self.assertIsNone(p.mugshot.name)
         self.check_dimensions(p, None, None)
 
     def test_dimensions(self):
@@ -363,8 +370,7 @@ class TwoImageFieldTests(ImageFieldTestMixin, TestCase):
         self.check_dimensions(p, 8, 4, 'headshot')
 
     def test_create(self):
-        p = self.PersonModel.objects.create(mugshot=self.file1,
-                                            headshot=self.file2)
+        p = self.PersonModel.objects.create(mugshot=self.file1, headshot=self.file2)
         self.check_dimensions(p, 4, 8)
         self.check_dimensions(p, 8, 4, 'headshot')
 

@@ -10,32 +10,20 @@ class Place(models.Model):
     class Meta:
         ordering = ('name',)
 
-    def __str__(self):
-        return "%s the place" % self.name
-
 
 class Restaurant(Place):
     serves_hot_dogs = models.BooleanField(default=False)
     serves_pizza = models.BooleanField(default=False)
 
-    def __str__(self):
-        return "%s the restaurant" % self.name
-
 
 class ItalianRestaurant(Restaurant):
     serves_gnocchi = models.BooleanField(default=False)
-
-    def __str__(self):
-        return "%s the italian restaurant" % self.name
 
 
 class ParkingLot(Place):
     # An explicit link to the parent (we can control the attribute name).
     parent = models.OneToOneField(Place, models.CASCADE, primary_key=True, parent_link=True)
     capacity = models.IntegerField()
-
-    def __str__(self):
-        return "%s the parking lot" % self.name
 
 
 class ParkingLot3(Place):
@@ -63,9 +51,6 @@ class ParkingLot4B(Place, ParkingLot4):
 class Supplier(models.Model):
     name = models.CharField(max_length=50)
     restaurant = models.ForeignKey(Restaurant, models.CASCADE)
-
-    def __str__(self):
-        return self.name
 
 
 class Wholesaler(Supplier):
@@ -96,9 +81,6 @@ class Article(models.Model):
     class Meta:
         ordering = ('-pub_date', 'headline')
 
-    def __str__(self):
-        return self.headline
-
 
 class ArticleWithAuthor(Article):
     author = models.CharField(max_length=100)
@@ -126,17 +108,10 @@ class QualityControl(Evaluation):
 class BaseM(models.Model):
     base_name = models.CharField(max_length=100)
 
-    def __str__(self):
-        return self.base_name
-
 
 class DerivedM(BaseM):
     customPK = models.IntegerField(primary_key=True)
     derived_name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return "PK = %d, base_name = %s, derived_name = %s" % (
-            self.customPK, self.base_name, self.derived_name)
 
 
 class AuditBase(models.Model):
@@ -163,9 +138,6 @@ class Person(models.Model):
     class Meta:
         ordering = ('name',)
 
-    def __str__(self):
-        return self.name
-
 
 class AbstractEvent(models.Model):
     name = models.CharField(max_length=100)
@@ -174,9 +146,6 @@ class AbstractEvent(models.Model):
     class Meta:
         abstract = True
         ordering = ('name',)
-
-    def __str__(self):
-        return self.name
 
 
 class BirthdayParty(AbstractEvent):

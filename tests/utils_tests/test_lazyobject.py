@@ -66,6 +66,16 @@ class LazyObjectTestCase(TestCase):
         self.assertNotEqual(obj1, obj2)
         self.assertNotEqual(obj1, 'bar')
 
+    def test_lt(self):
+        obj1 = self.lazy_wrap(1)
+        obj2 = self.lazy_wrap(2)
+        self.assertLess(obj1, obj2)
+
+    def test_gt(self):
+        obj1 = self.lazy_wrap(1)
+        obj2 = self.lazy_wrap(2)
+        self.assertGreater(obj2, obj1)
+
     def test_bytes(self):
         obj = self.lazy_wrap(b'foo')
         self.assertEqual(bytes(obj), b'foo')

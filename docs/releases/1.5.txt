@@ -260,8 +260,8 @@ Django 1.5 also includes several smaller improvements worth noting:
   ``self.stderr.write('error')`` (see the note on
   :ref:`management commands output <management-commands-output>`).
 
-* The dumpdata management command outputs one row at a time, preventing
-  out-of-memory errors when dumping large datasets.
+* The :djadmin:`dumpdata` management command outputs one row at a time,
+  preventing out-of-memory errors when dumping large datasets.
 
 * In the localflavor for Canada, "pq" was added to the acceptable codes for
   Quebec. It's an old abbreviation.
@@ -304,9 +304,9 @@ Django 1.5 also includes several smaller improvements worth noting:
 
 * It's not required any more to have ``404.html`` and ``500.html`` templates in
   the root templates directory. Django will output some basic error messages for
-  both situations when those templates are not found. Of course, it's still
-  recommended as good practice to provide those templates in order to present
-  pretty error pages to the user.
+  both situations when those templates are not found. It's still recommended as
+  good practice to provide those templates in order to present pretty error
+  pages to the user.
 
 * :mod:`django.contrib.auth` provides a new signal that is emitted
   whenever a user fails to login successfully. See
@@ -424,11 +424,11 @@ Non-form data in HTTP requests
 :attr:`request.POST <django.http.HttpRequest.POST>` will no longer include data
 posted via HTTP requests with non form-specific content-types in the header.
 In prior versions, data posted with content-types other than
-``multipart/form-data`` or ``application/x-www-form-urlencoded`` would still
-end up represented in the :attr:`request.POST <django.http.HttpRequest.POST>`
-attribute. Developers wishing to access the raw POST data for these cases,
-should use the :attr:`request.body <django.http.HttpRequest.body>` attribute
-instead.
+:mimetype:`multipart/form-data` or
+:mimetype:`application/x-www-form-urlencoded` would still end up represented in
+the :attr:`request.POST <django.http.HttpRequest.POST>` attribute. Developers
+wishing to access the raw POST data for these cases, should use the
+:attr:`request.body <django.http.HttpRequest.body>` attribute instead.
 
 :data:`~django.core.signals.request_finished` signal
 ----------------------------------------------------
@@ -499,13 +499,14 @@ There are no known incompatibilities between Django's copy of version 2.0.7 and
 Python's copy of version 2.0.9. However, there are some incompatibilities
 between other versions of ``simplejson``:
 
-- While the ``simplejson`` API is documented as always returning unicode
-  strings, the optional C implementation can return a byte string. This was
+- While the ``simplejson`` API is documented as always returning Unicode
+  strings, the optional C implementation can return a bytestring. This was
   fixed in Python 2.7.
 - ``simplejson.JSONEncoder`` gained a ``namedtuple_as_object`` keyword
   argument in version 2.2.
 
-More information on these incompatibilities is available in `ticket #18023`_.
+More information on these incompatibilities is available in
+:ticket:`ticket #18023 <18023#comment:10>`.
 
 The net result is that, if you have installed ``simplejson`` and your code
 uses Django's serialization internals directly -- for instance
@@ -517,15 +518,13 @@ At this point, the maintainers of Django believe that using :mod:`json` from
 the standard library offers the strongest guarantee of backwards-compatibility.
 They recommend to use it from now on.
 
-.. _ticket #18023: https://code.djangoproject.com/ticket/18023#comment:10
-
 String types of hasher method parameters
 ----------------------------------------
 
 If you have written a :ref:`custom password hasher <auth_password_storage>`,
 your ``encode()``, ``verify()`` or ``safe_summary()`` methods should accept
 Unicode parameters (``password``, ``salt`` or ``encoded``). If any of the
-hashing methods need byte strings, you can use the
+hashing methods need bytestrings, you can use the
 :func:`~django.utils.encoding.force_bytes` utility to encode the strings.
 
 Validation of previous_page_number and next_page_number
@@ -602,7 +601,7 @@ Ordering of tests
 In order to make sure all ``TestCase`` code starts with a clean database,
 tests are now executed in the following order:
 
-* First, all unittests (including :class:`unittest.TestCase`,
+* First, all unit tests (including :class:`unittest.TestCase`,
   :class:`~django.test.SimpleTestCase`, :class:`~django.test.TestCase` and
   :class:`~django.test.TransactionTestCase`) are run with no particular ordering
   guaranteed nor enforced among them.
@@ -616,8 +615,8 @@ database state behind or unit tests that rely on some form of state being
 preserved after the execution of other tests. Such tests are already very
 fragile, and must now be changed to be able to run independently.
 
-`cleaned_data` dictionary kept for invalid forms
-------------------------------------------------
+``cleaned_data`` dictionary kept for invalid forms
+--------------------------------------------------
 
 The :attr:`~django.forms.Form.cleaned_data` dictionary is now always present
 after form validation. When the form doesn't validate, it contains only the
@@ -668,7 +667,7 @@ Miscellaneous
 * :func:`~django.utils.http.int_to_base36` properly raises a
   :exc:`TypeError` instead of :exc:`ValueError` for non-integer inputs.
 
-* The ``slugify`` template filter is now available as a standard python
+* The ``slugify`` template filter is now available as a standard Python
   function at :func:`django.utils.text.slugify`. Similarly, ``remove_tags`` is
   available at ``django.utils.html.remove_tags()``.
 
@@ -783,7 +782,7 @@ If you rely on features added to ``simplejson`` after it became Python's
 
 The ``django.utils.encoding.StrAndUnicode`` mix-in has been deprecated.
 Define a ``__str__`` method and apply the
-:func:`~django.utils.encoding.python_2_unicode_compatible` decorator instead.
+``django.utils.encoding.python_2_unicode_compatible`` decorator instead.
 
 ``django.utils.itercompat.product``
 -----------------------------------

@@ -114,6 +114,13 @@ class QueryDictTests(SimpleTestCase):
         self.assertEqual(q.urlencode(), 'next=%2Ft%C3%ABst%26key%2F')
         self.assertEqual(q.urlencode(safe='/'), 'next=/t%C3%ABst%26key/')
 
+    def test_urlencode_int(self):
+        # Normally QueryDict doesn't contain non-string values but lazily
+        # written tests may make that mistake.
+        q = QueryDict(mutable=True)
+        q['a'] = 1
+        self.assertEqual(q.urlencode(), 'a=1')
+
     def test_mutable_copy(self):
         """A copy of a QueryDict is mutable."""
         q = QueryDict().copy()
@@ -279,68 +286,69 @@ class QueryDictTests(SimpleTestCase):
             QueryDict.fromkeys(0)
 
 
-class HttpResponseTests(unittest.TestCase):
+class HttpResponseTests(SimpleTestCase):
 
     def test_headers_type(self):
         r = HttpResponse()
 
         # ASCII strings or bytes values are converted to strings.
-        r['key'] = 'test'
-        self.assertEqual(r['key'], 'test')
-        r['key'] = 'test'.encode('ascii')
-        self.assertEqual(r['key'], 'test')
+        r.headers['key'] = 'test'
+        self.assertEqual(r.headers['key'], 'test')
+        r.headers['key'] = b'test'
+        self.assertEqual(r.headers['key'], 'test')
         self.assertIn(b'test', r.serialize_headers())
 
         # Non-ASCII values are serialized to Latin-1.
-        r['key'] = 'café'
+        r.headers['key'] = 'café'
         self.assertIn('café'.encode('latin-1'), r.serialize_headers())
 
-        # Other unicode values are MIME-encoded (there's no way to pass them as bytes).
-        r['key'] = '†'
-        self.assertEqual(r['key'], '=?utf-8?b?4oCg?=')
+        # Other Unicode values are MIME-encoded (there's no way to pass them as
+        # bytes).
+        r.headers['key'] = '†'
+        self.assertEqual(r.headers['key'], '=?utf-8?b?4oCg?=')
         self.assertIn(b'=?utf-8?b?4oCg?=', r.serialize_headers())
 
         # The response also converts string or bytes keys to strings, but requires
         # them to contain ASCII
         r = HttpResponse()
-        del r['Content-Type']
-        r['foo'] = 'bar'
-        headers = list(r.items())
+        del r.headers['Content-Type']
+        r.headers['foo'] = 'bar'
+        headers = list(r.headers.items())
         self.assertEqual(len(headers), 1)
         self.assertEqual(headers[0], ('foo', 'bar'))
 
         r = HttpResponse()
-        del r['Content-Type']
-        r[b'foo'] = 'bar'
-        headers = list(r.items())
+        del r.headers['Content-Type']
+        r.headers[b'foo'] = 'bar'
+        headers = list(r.headers.items())
         self.assertEqual(len(headers), 1)
         self.assertEqual(headers[0], ('foo', 'bar'))
         self.assertIsInstance(headers[0][0], str)
 
         r = HttpResponse()
         with self.assertRaises(UnicodeError):
-            r.__setitem__('føø', 'bar')
+            r.headers.__setitem__('føø', 'bar')
         with self.assertRaises(UnicodeError):
-            r.__setitem__('føø'.encode(), 'bar')
+            r.headers.__setitem__('føø'.encode(), 'bar')
 
     def test_long_line(self):
         # Bug #20889: long lines trigger newlines to be added to headers
         # (which is not allowed due to bug #10188)
         h = HttpResponse()
-        f = 'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz a\xcc\x88'.encode('latin-1')
+        f = b'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz a\xcc\x88'
         f = f.decode('utf-8')
-        h['Content-Disposition'] = 'attachment; filename="%s"' % f
-        # This one is triggering http://bugs.python.org/issue20747, that is Python
+        h.headers['Content-Disposition'] = 'attachment; filename="%s"' % f
+        # This one is triggering https://bugs.python.org/issue20747, that is Python
         # will itself insert a newline in the header
-        h['Content-Disposition'] = 'attachment; filename="EdelRot_Blu\u0308te (3)-0.JPG"'
+        h.headers['Content-Disposition'] = 'attachment; filename="EdelRot_Blu\u0308te (3)-0.JPG"'
 
     def test_newlines_in_headers(self):
         # Bug #10188: Do not allow newlines in headers (CR or LF)
         r = HttpResponse()
         with self.assertRaises(BadHeaderError):
-            r.__setitem__('test\rstr', 'test')
+            r.headers.__setitem__('test\rstr', 'test')
         with self.assertRaises(BadHeaderError):
-            r.__setitem__('test\nstr', 'test')
+            r.headers.__setitem__('test\nstr', 'test')
 
     def test_dict_behavior(self):
         """
@@ -358,6 +366,10 @@ class HttpResponseTests(unittest.TestCase):
         r = HttpResponse()
         r.content = 12345
         self.assertEqual(r.content, b'12345')
+
+    def test_memoryview_content(self):
+        r = HttpResponse(memoryview(b'memoryview'))
+        self.assertEqual(r.content, b'memoryview')
 
     def test_iter_content(self):
         r = HttpResponse(['abc', 'def', 'ghi'])
@@ -424,7 +436,7 @@ class HttpResponseTests(unittest.TestCase):
 
         # with Content-Encoding header
         r = HttpResponse()
-        r['Content-Encoding'] = 'winning'
+        r.headers['Content-Encoding'] = 'winning'
         r.write(b'abc')
         r.write(b'def')
         self.assertEqual(r.content, b'abcdef')
@@ -450,6 +462,39 @@ class HttpResponseTests(unittest.TestCase):
             with self.assertRaises(DisallowedRedirect):
                 HttpResponsePermanentRedirect(url)
 
+    def test_header_deletion(self):
+        r = HttpResponse('hello')
+        r.headers['X-Foo'] = 'foo'
+        del r.headers['X-Foo']
+        self.assertNotIn('X-Foo', r.headers)
+        # del doesn't raise a KeyError on nonexistent headers.
+        del r.headers['X-Foo']
+
+    def test_instantiate_with_headers(self):
+        r = HttpResponse('hello', headers={'X-Foo': 'foo'})
+        self.assertEqual(r.headers['X-Foo'], 'foo')
+        self.assertEqual(r.headers['x-foo'], 'foo')
+
+    def test_content_type(self):
+        r = HttpResponse('hello', content_type='application/json')
+        self.assertEqual(r.headers['Content-Type'], 'application/json')
+
+    def test_content_type_headers(self):
+        r = HttpResponse('hello', headers={'Content-Type': 'application/json'})
+        self.assertEqual(r.headers['Content-Type'], 'application/json')
+
+    def test_content_type_mutually_exclusive(self):
+        msg = (
+            "'headers' must not contain 'Content-Type' when the "
+            "'content_type' parameter is provided."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            HttpResponse(
+                'hello',
+                content_type='application/json',
+                headers={'Content-Type': 'text/csv'},
+            )
+
 
 class HttpResponseSubclassesTests(SimpleTestCase):
     def test_redirect(self):
@@ -462,7 +507,7 @@ class HttpResponseSubclassesTests(SimpleTestCase):
             content_type='text/html',
         )
         self.assertContains(response, 'The resource has temporarily moved', status_code=302)
-        self.assertEqual(response.url, response['Location'])
+        self.assertEqual(response.url, response.headers['Location'])
 
     def test_redirect_lazy(self):
         """Make sure HttpResponseRedirect works with lazy strings."""
@@ -511,7 +556,7 @@ class HttpResponseSubclassesTests(SimpleTestCase):
 
     def test_not_allowed_repr_no_content_type(self):
         response = HttpResponseNotAllowed(('GET', 'POST'))
-        del response['Content-Type']
+        del response.headers['Content-Type']
         self.assertEqual(repr(response), '<HttpResponseNotAllowed [GET, POST] status_code=405>')
 
 
@@ -733,7 +778,7 @@ class CookieTests(unittest.TestCase):
         # Chunks without an equals sign appear as unnamed values per
         # https://bugzilla.mozilla.org/show_bug.cgi?id=169091
         self.assertIn('django_language', parse_cookie('abc=def; unnamed; django_language=en'))
-        # Even a double quote may be an unamed value.
+        # Even a double quote may be an unnamed value.
         self.assertEqual(parse_cookie('a=b; "; c=d'), {'a': 'b', '': '"', 'c': 'd'})
         # Spaces in names and values, and an equals sign in values.
         self.assertEqual(parse_cookie('a b c=d e = f; gh=i'), {'a b c': 'd e = f', 'gh': 'i'})
@@ -745,6 +790,11 @@ class CookieTests(unittest.TestCase):
         # but parse_cookie() should parse whitespace the same way
         # document.cookie parses whitespace.
         self.assertEqual(parse_cookie('  =  b  ;  ;  =  ;   c  =  ;  '), {'': 'b', 'c': ''})
+
+    def test_samesite(self):
+        c = SimpleCookie('name=value; samesite=lax; httponly')
+        self.assertEqual(c['name']['samesite'], 'lax')
+        self.assertIn('SameSite=lax', c.output())
 
     def test_httponly_after_load(self):
         c = SimpleCookie()
@@ -768,3 +818,32 @@ class CookieTests(unittest.TestCase):
         for proto in range(pickle.HIGHEST_PROTOCOL + 1):
             C1 = pickle.loads(pickle.dumps(C, protocol=proto))
             self.assertEqual(C1.output(), expected_output)
+
+
+class HttpResponseHeadersTestCase(SimpleTestCase):
+    """Headers by treating HttpResponse like a dictionary."""
+    def test_headers(self):
+        response = HttpResponse()
+        response['X-Foo'] = 'bar'
+        self.assertEqual(response['X-Foo'], 'bar')
+        self.assertEqual(response.headers['X-Foo'], 'bar')
+        self.assertIn('X-Foo', response)
+        self.assertIs(response.has_header('X-Foo'), True)
+        del response['X-Foo']
+        self.assertNotIn('X-Foo', response)
+        self.assertNotIn('X-Foo', response.headers)
+        # del doesn't raise a KeyError on nonexistent headers.
+        del response['X-Foo']
+
+    def test_headers_bytestring(self):
+        response = HttpResponse()
+        response['X-Foo'] = b'bar'
+        self.assertEqual(response['X-Foo'], 'bar')
+        self.assertEqual(response.headers['X-Foo'], 'bar')
+
+    def test_newlines_in_headers(self):
+        response = HttpResponse()
+        with self.assertRaises(BadHeaderError):
+            response['test\rstr'] = 'test'
+        with self.assertRaises(BadHeaderError):
+            response['test\nstr'] = 'test'

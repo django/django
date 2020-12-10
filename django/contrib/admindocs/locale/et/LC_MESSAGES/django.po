@@ -5,13 +5,14 @@
 # Janno Liivak <jannolii@gmail.com>, 2013,2015
 # Martin Pajuste <martinpajuste@gmail.com>, 2016
 # Marti Raudsepp <marti@juffo.org>, 2014
+# Ragnar Rebase <rrebase@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-29 10:28+0000\n"
-"Last-Translator: Martin Pajuste <martinpajuste@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-12-28 01:40+0000\n"
+"Last-Translator: Ragnar Rebase <rrebase@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -156,13 +157,13 @@ msgid "Template: %(name)s"
 msgstr "Mall: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Mall: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Mall: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Otsinguteekond mallile \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Otsinguteekond mallile <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(pole olemas)"
@@ -242,13 +243,6 @@ msgstr ""
 "\n"
 "Vaate funktsioon: <code>%(full_name)s</code>. Nimi: <code>%(url_name)s</"
 "code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Tõeväärtus (Kas tõene või väär)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Lahter tüüpi: %(field_type)s"
 
 msgid "tag:"
 msgstr "lipik:"

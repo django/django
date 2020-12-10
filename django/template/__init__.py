@@ -53,16 +53,19 @@ __all__ = ('Engine', 'engines')
 
 # Public exceptions
 from .base import VariableDoesNotExist                                  # NOQA isort:skip
-from .context import ContextPopException                                # NOQA isort:skip
+from .context import Context, ContextPopException, RequestContext       # NOQA isort:skip
 from .exceptions import TemplateDoesNotExist, TemplateSyntaxError       # NOQA isort:skip
 
 # Template parts
 from .base import (                                                     # NOQA isort:skip
-    Context, Node, NodeList, Origin, RequestContext, Template, Variable,
+    Node, NodeList, Origin, Template, Variable,
 )
 
 # Library management
 from .library import Library                                            # NOQA isort:skip
+
+# Import the .autoreload module to trigger the registrations of signals.
+from . import autoreload                                                # NOQA isort:skip
 
 
 __all__ += ('Template', 'Context', 'RequestContext')

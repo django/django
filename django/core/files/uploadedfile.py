@@ -15,13 +15,12 @@ __all__ = ('UploadedFile', 'TemporaryUploadedFile', 'InMemoryUploadedFile',
 
 class UploadedFile(File):
     """
-    A abstract uploaded file (``TemporaryUploadedFile`` and
+    An abstract uploaded file (``TemporaryUploadedFile`` and
     ``InMemoryUploadedFile`` are the built-in concrete subclasses).
 
     An ``UploadedFile`` object behaves somewhat like a file object and
     represents some file data that the user submitted with a form.
     """
-    DEFAULT_CHUNK_SIZE = 64 * 2 ** 10
 
     def __init__(self, file=None, name=None, content_type=None, size=None, charset=None, content_type_extra=None):
         super().__init__(file, name)

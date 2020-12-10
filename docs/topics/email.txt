@@ -5,11 +5,10 @@ Sending email
 .. module:: django.core.mail
    :synopsis: Helpers to easily send email.
 
-Although Python makes sending email relatively easy via the :mod:`smtplib`
+Although Python provides a mail sending interface via the :mod:`smtplib`
 module, Django provides a couple of light wrappers over it. These wrappers are
-provided to make sending email extra quick, to make it easy to test email
-sending during development, and to provide support for platforms that can't use
-SMTP.
+provided to make sending email extra quick, to help test email sending during
+development, and to provide support for platforms that can't use SMTP.
 
 The code lives in the ``django.core.mail`` module.
 
@@ -45,21 +44,21 @@ a secure connection is used.
 
 .. function:: send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None, connection=None, html_message=None)
 
-The simplest way to send email is using
-``django.core.mail.send_mail()``.
+In most cases, you can send email using ``django.core.mail.send_mail()``.
 
 The ``subject``, ``message``, ``from_email`` and ``recipient_list`` parameters
 are required.
 
 * ``subject``: A string.
 * ``message``: A string.
-* ``from_email``: A string.
+* ``from_email``: A string. If ``None``, Django will use the value of the
+  :setting:`DEFAULT_FROM_EMAIL` setting.
 * ``recipient_list``: A list of strings, each an email address. Each
   member of ``recipient_list`` will see the other recipients in the "To:"
   field of the email message.
-* ``fail_silently``: A boolean. If it's ``False``, ``send_mail`` will raise
-  an :exc:`smtplib.SMTPException`. See the :mod:`smtplib` docs for a list of
-  possible exceptions, all of which are subclasses of
+* ``fail_silently``: A boolean. When it's ``False``, ``send_mail()`` will raise
+  an :exc:`smtplib.SMTPException` if an error occurs. See the :mod:`smtplib`
+  docs for a list of possible exceptions, all of which are subclasses of
   :exc:`~smtplib.SMTPException`.
 * ``auth_user``: The optional username to use to authenticate to the SMTP
   server. If this isn't provided, Django will use the value of the
@@ -186,13 +185,13 @@ will not send the email. It's your responsibility to validate all data before
 passing it to the email functions.
 
 If a ``message`` contains headers at the start of the string, the headers will
-simply be printed as the first bit of the email message.
+be printed as the first bit of the email message.
 
 Here's an example view that takes a ``subject``, ``message`` and ``from_email``
 from the request's POST data, sends that to admin@example.com and redirects to
 "/contact/thanks/" when it's done::
 
-    from django.core.mail import send_mail, BadHeaderError
+    from django.core.mail import BadHeaderError, send_mail
     from django.http import HttpResponse, HttpResponseRedirect
 
     def send_email(request):
@@ -239,9 +238,9 @@ recipients, file attachments, or multi-part email, you'll need to create
 message itself. The :ref:`email backend <topic-email-backends>` is then
 responsible for sending the email.
 
-For convenience, :class:`~django.core.mail.EmailMessage` provides a simple
-``send()`` method for sending a single email. If you need to send multiple
-messages, the email backend API :ref:`provides an alternative
+For convenience, :class:`~django.core.mail.EmailMessage` provides a ``send()``
+method for sending a single email. If you need to send multiple messages, the
+email backend API :ref:`provides an alternative
 <topics-sending-multiple-emails>`.
 
 ``EmailMessage`` Objects
@@ -259,7 +258,7 @@ All parameters are optional and can be set at any time prior to calling the
 * ``body``: The body text. This should be a plain text message.
 
 * ``from_email``: The sender's address. Both ``fred@example.com`` and
-  ``Fred <fred@example.com>`` forms are legal. If omitted, the
+  ``"Fred" <fred@example.com>`` forms are legal. If omitted, the
   :setting:`DEFAULT_FROM_EMAIL` setting is used.
 
 * ``to``: A list or tuple of recipient addresses.
@@ -272,7 +271,7 @@ All parameters are optional and can be set at any time prior to calling the
   new connection is created when ``send()`` is called.
 
 * ``attachments``: A list of attachments to put on the message. These can
-  be either ``email.MIMEBase.MIMEBase`` instances, or ``(filename,
+  be either :class:`~email.mime.base.MIMEBase` instances, or ``(filename,
   content, mimetype)`` triples.
 
 * ``headers``: A dictionary of extra headers to put on the message. The
@@ -310,7 +309,7 @@ The class has the following methods:
   recipients will not raise an exception.
 
 * ``message()`` constructs a ``django.core.mail.SafeMIMEText`` object (a
-  subclass of Python's ``email.MIMEText.MIMEText`` class) or a
+  subclass of Python's :class:`~email.mime.text.MIMEText` class) or a
   ``django.core.mail.SafeMIMEMultipart`` object holding the message to be
   sent. If you ever need to extend the
   :class:`~django.core.mail.EmailMessage` class, you'll probably want to
@@ -326,8 +325,8 @@ The class has the following methods:
 * ``attach()`` creates a new file attachment and adds it to the message.
   There are two ways to call ``attach()``:
 
-  * You can pass it a single argument that is an
-    ``email.MIMEBase.MIMEBase`` instance. This will be inserted directly
+  * You can pass it a single argument that is a
+    :class:`~email.mime.base.MIMEBase` instance. This will be inserted directly
     into the resulting message.
 
   * Alternatively, you can pass ``attach()`` three arguments:
@@ -342,15 +341,16 @@ The class has the following methods:
 
        message.attach('design.png', img_data, 'image/png')
 
-    If you specify a ``mimetype`` of ``message/rfc822``, it will also accept
-    :class:`django.core.mail.EmailMessage` and :py:class:`email.message.Message`.
+    If you specify a ``mimetype`` of :mimetype:`message/rfc822`, it will also
+    accept :class:`django.core.mail.EmailMessage` and
+    :py:class:`email.message.Message`.
 
-    For a ``mimetype`` starting with ``text/``, content is expected to be a
-    string. Binary data will be decoded using UTF-8, and if that fails, the
-    MIME type will be changed to ``application/octet-stream`` and the data will
-    be attached unchanged.
+    For a ``mimetype`` starting with :mimetype:`text/`, content is expected to
+    be a string. Binary data will be decoded using UTF-8, and if that fails,
+    the MIME type will be changed to :mimetype:`application/octet-stream` and
+    the data will be attached unchanged.
 
-    In addition, ``message/rfc822`` attachments will no longer be
+    In addition, :mimetype:`message/rfc822` attachments will no longer be
     base64-encoded in violation of :rfc:`2046#section-5.2.1`, which can cause
     issues with displaying the attachments in `Evolution`__ and `Thunderbird`__.
 
@@ -360,17 +360,12 @@ The class has the following methods:
 * ``attach_file()`` creates a new attachment using a file from your
   filesystem. Call it with the path of the file to attach and, optionally,
   the MIME type to use for the attachment. If the MIME type is omitted, it
-  will be guessed from the filename. The simplest use would be::
+  will be guessed from the filename. You can use it like this::
 
     message.attach_file('/images/weather_map.png')
 
-  For MIME types starting with ``text/``, binary data is handled as in
+  For MIME types starting with :mimetype:`text/`, binary data is handled as in
   ``attach()``.
-
-.. versionchanged:: 1.11
-
-    Added the fallback to MIME type ``application/octet-stream`` when binary
-    data for a ``text/*`` attachment cannot be decoded.
 
 Sending alternative content types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -534,6 +529,10 @@ To specify this backend, put the following in your settings::
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
 
+.. versionchanged:: 3.1
+
+    Support for :class:`pathlib.Path` was added.
+
 .. _topic-email-memory-backend:
 
 In-memory backend
@@ -551,6 +550,9 @@ To specify this backend, put the following in your settings::
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development and testing.
+
+Django's test runner :ref:`automatically uses this backend for testing
+<topics-testing-email>`.
 
 .. _topic-email-dummy-backend:
 
@@ -677,9 +679,9 @@ anything. Python has a built-in way to accomplish this with a single command::
 
     python -m smtpd -n -c DebuggingServer localhost:1025
 
-This command will start a simple SMTP server listening on port 1025 of
-localhost. This server simply prints to standard output all email headers and
-the email body. You then only need to set the :setting:`EMAIL_HOST` and
+This command will start a minimal SMTP server listening on port 1025 of
+localhost. This server prints to standard output all email headers and the
+email body. You then only need to set the :setting:`EMAIL_HOST` and
 :setting:`EMAIL_PORT` accordingly. For a more detailed discussion of SMTP
 server options, see the Python documentation for the :mod:`smtpd` module.
 

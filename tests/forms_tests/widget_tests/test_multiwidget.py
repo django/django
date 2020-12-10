@@ -79,6 +79,19 @@ class DeepCopyWidget(MultiWidget):
 
 
 class MultiWidgetTest(WidgetTest):
+    def test_subwidgets_name(self):
+        widget = MultiWidget(
+            widgets={
+                '': TextInput(),
+                'big': TextInput(attrs={'class': 'big'}),
+                'small': TextInput(attrs={'class': 'small'}),
+            },
+        )
+        self.check_html(widget, 'name', ['John', 'George', 'Paul'], html=(
+            '<input type="text" name="name" value="John">'
+            '<input type="text" name="name_big" value="George" class="big">'
+            '<input type="text" name="name_small" value="Paul" class="small">'
+        ))
 
     def test_text_inputs(self):
         widget = MyMultiWidget(
@@ -88,16 +101,16 @@ class MultiWidgetTest(WidgetTest):
             )
         )
         self.check_html(widget, 'name', ['john', 'lennon'], html=(
-            '<input type="text" class="big" value="john" name="name_0" />'
-            '<input type="text" class="small" value="lennon" name="name_1" />'
+            '<input type="text" class="big" value="john" name="name_0">'
+            '<input type="text" class="small" value="lennon" name="name_1">'
         ))
         self.check_html(widget, 'name', 'john__lennon', html=(
-            '<input type="text" class="big" value="john" name="name_0" />'
-            '<input type="text" class="small" value="lennon" name="name_1" />'
+            '<input type="text" class="big" value="john" name="name_0">'
+            '<input type="text" class="small" value="lennon" name="name_1">'
         ))
         self.check_html(widget, 'name', 'john__lennon', attrs={'id': 'foo'}, html=(
-            '<input id="foo_0" type="text" class="big" value="john" name="name_0" />'
-            '<input id="foo_1" type="text" class="small" value="lennon" name="name_1" />'
+            '<input id="foo_0" type="text" class="big" value="john" name="name_0">'
+            '<input id="foo_1" type="text" class="small" value="lennon" name="name_1">'
         ))
 
     def test_constructor_attrs(self):
@@ -109,21 +122,21 @@ class MultiWidgetTest(WidgetTest):
             attrs={'id': 'bar'},
         )
         self.check_html(widget, 'name', ['john', 'lennon'], html=(
-            '<input id="bar_0" type="text" class="big" value="john" name="name_0" />'
-            '<input id="bar_1" type="text" class="small" value="lennon" name="name_1" />'
+            '<input id="bar_0" type="text" class="big" value="john" name="name_0">'
+            '<input id="bar_1" type="text" class="small" value="lennon" name="name_1">'
         ))
 
     def test_constructor_attrs_with_type(self):
         attrs = {'type': 'number'}
         widget = MyMultiWidget(widgets=(TextInput, TextInput()), attrs=attrs)
         self.check_html(widget, 'code', ['1', '2'], html=(
-            '<input type="number" value="1" name="code_0" />'
-            '<input type="number" value="2" name="code_1" />'
+            '<input type="number" value="1" name="code_0">'
+            '<input type="number" value="2" name="code_1">'
         ))
         widget = MyMultiWidget(widgets=(TextInput(attrs), TextInput(attrs)), attrs={'class': 'bar'})
         self.check_html(widget, 'code', ['1', '2'], html=(
-            '<input type="number" value="1" name="code_0" class="bar" />'
-            '<input type="number" value="2" name="code_1" class="bar" />'
+            '<input type="number" value="1" name="code_0" class="bar">'
+            '<input type="number" value="2" name="code_1" class="bar">'
         ))
 
     def test_value_omitted_from_data(self):
@@ -132,6 +145,36 @@ class MultiWidgetTest(WidgetTest):
         self.assertIs(widget.value_omitted_from_data({'field_0': 'x'}, {}, 'field'), False)
         self.assertIs(widget.value_omitted_from_data({'field_1': 'y'}, {}, 'field'), False)
         self.assertIs(widget.value_omitted_from_data({'field_0': 'x', 'field_1': 'y'}, {}, 'field'), False)
+
+    def test_value_from_datadict_subwidgets_name(self):
+        widget = MultiWidget(widgets={'x': TextInput(), '': TextInput()})
+        tests = [
+            ({}, [None, None]),
+            ({'field': 'x'}, [None, 'x']),
+            ({'field_x': 'y'}, ['y', None]),
+            ({'field': 'x', 'field_x': 'y'}, ['y', 'x']),
+        ]
+        for data, expected in tests:
+            with self.subTest(data):
+                self.assertEqual(
+                    widget.value_from_datadict(data, {}, 'field'),
+                    expected,
+                )
+
+    def test_value_omitted_from_data_subwidgets_name(self):
+        widget = MultiWidget(widgets={'x': TextInput(), '': TextInput()})
+        tests = [
+            ({}, True),
+            ({'field': 'x'}, False),
+            ({'field_x': 'y'}, False),
+            ({'field': 'x', 'field_x': 'y'}, False),
+        ]
+        for data, expected in tests:
+            with self.subTest(data):
+                self.assertIs(
+                    widget.value_omitted_from_data(data, {}, 'field'),
+                    expected,
+                )
 
     def test_needs_multipart_true(self):
         """
@@ -154,17 +197,24 @@ class MultiWidgetTest(WidgetTest):
         widget = ComplexMultiWidget()
         self.check_html(widget, 'name', 'some text,JP,2007-04-25 06:24:00', html=(
             """
-            <input type="text" name="name_0" value="some text" />
-            <select multiple="multiple" name="name_1">
+            <input type="text" name="name_0" value="some text">
+            <select multiple name="name_1">
                 <option value="J" selected>John</option>
                 <option value="P" selected>Paul</option>
                 <option value="G">George</option>
                 <option value="R">Ringo</option>
             </select>
-            <input type="text" name="name_2_0" value="2007-04-25" />
-            <input type="text" name="name_2_1" value="06:24:00" />
+            <input type="text" name="name_2_0" value="2007-04-25">
+            <input type="text" name="name_2_1" value="06:24:00">
             """
         ))
+
+    def test_no_whitespace_between_widgets(self):
+        widget = MyMultiWidget(widgets=(TextInput, TextInput()))
+        self.check_html(widget, 'code', None, html=(
+            '<input type="text" name="code_0">'
+            '<input type="text" name="code_1">'
+        ), strict=True)
 
     def test_deepcopy(self):
         """

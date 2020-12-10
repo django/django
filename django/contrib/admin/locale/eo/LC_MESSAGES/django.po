@@ -2,7 +2,7 @@
 #
 # Translators:
 # Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2012-2013
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2016
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2019
 # Claude Paroz <claude@2xlibre.net>, 2016
 # Dinu Gherman <gherman@darwin.in-berlin.de>, 2011
 # kristjan <kristjan.schmidt@googlemail.com>, 2012
@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-03-20 12:56+0000\n"
-"Last-Translator: Nikolay Korotkiy <sikmir@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 12:48+0000\n"
+"Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
 "MIME-Version: 1.0\n"
@@ -92,6 +92,15 @@ msgstr "Aldoni alian %(verbose_name)sn"
 msgid "Remove"
 msgstr "Forigu"
 
+msgid "Addition"
+msgstr "Aldono"
+
+msgid "Change"
+msgstr "Ŝanĝi"
+
+msgid "Deletion"
+msgstr "Forviŝo"
+
 msgid "action time"
 msgstr "aga tempo"
 
@@ -105,7 +114,7 @@ msgid "object id"
 msgstr "objekta identigaĵo"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "objekta prezento"
 
@@ -170,11 +179,11 @@ msgstr ""
 "Premadu la stirklavon, aŭ Komando-klavon ĉe Mac, por elekti pli ol unu."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"La {name} \"{obj}\" estis aldonita sukcese. Vi rajtas ĝin redakti denove "
-"sube."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "La {name} \"{obj}\" estis aldonita sukcese."
+
+msgid "You may edit it again below."
+msgstr "Eblas redakti ĝin sube."
 
 #, python-brace-format
 msgid ""
@@ -185,14 +194,17 @@ msgstr ""
 "n."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "La {name} \"{obj}\" estis aldonita sukcese."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "La {name} \"{obj}\" estis sukcese ŝanĝita. Vi povas sube redakti ĝin denove."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"La {name} \"{obj}\" estis aldonita sukcese. Vi rajtas ĝin redakti denove "
+"sube."
 
 #, python-brace-format
 msgid ""
@@ -231,6 +243,10 @@ msgstr "Aldoni %sn"
 #, python-format
 msgid "Change %s"
 msgstr "Ŝanĝi %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Vidi %sn"
 
 msgid "Database error"
 msgstr "Datumbaza eraro"
@@ -340,7 +356,7 @@ msgid "Change password"
 msgstr "Ŝanĝi pasvorton"
 
 msgid "Please correct the error below."
-msgstr "Bonvolu ĝustigi la erarojn sube."
+msgstr "Bonvolu ĝustigi la eraron sube."
 
 msgid "Please correct the errors below."
 msgstr "Bonvolu ĝustigi la erarojn sube."
@@ -450,8 +466,8 @@ msgstr ""
 "Ĉu vi certas, ke vi volas forigi la elektitajn %(objects_name)s? Ĉiuj el la "
 "sekvaj objektoj kaj iliaj rilataj eroj estos forigita:"
 
-msgid "Change"
-msgstr "Ŝanĝi"
+msgid "View"
+msgstr "Vidi"
 
 msgid "Delete?"
 msgstr "Forviŝi?"
@@ -470,8 +486,8 @@ msgstr "Modeloj en la %(name)s aplikaĵo"
 msgid "Add"
 msgstr "Aldoni"
 
-msgid "You don't have permission to edit anything."
-msgstr "Vi ne havas permeson por redakti ĉion ajn."
+msgid "You don't have permission to view or edit anything."
+msgstr "Vi havas nenian permeson por vidi aŭ redakti."
 
 msgid "Recent actions"
 msgstr "Lastaj agoj"
@@ -527,20 +543,8 @@ msgstr "Montri ĉion"
 msgid "Save"
 msgstr "Konservi"
 
-msgid "Popup closing..."
-msgstr "Ŝprucfenestro fermante…"
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Redaktu elektitan %(model)sn"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Aldoni alian %(model)sn"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Forigi elektitan %(model)sn"
+msgid "Popup closing…"
+msgstr "Ŝprucfenesto fermiĝas…"
 
 msgid "Search"
 msgstr "Serĉu"
@@ -563,6 +567,24 @@ msgstr "Konservi kaj aldoni alian"
 
 msgid "Save and continue editing"
 msgstr "Konservi kaj daŭre redakti"
+
+msgid "Save and view"
+msgstr "Konservi kaj vidi"
+
+msgid "Close"
+msgstr "Fermi"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Redaktu elektitan %(model)sn"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Aldoni alian %(model)sn"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Forigi elektitan %(model)sn"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Dankon pro pasigo de kvalita tempon kun la retejo hodiaŭ."
@@ -619,15 +641,16 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Ni retpoŝte sendis al vi instrukciojn por agordi la pasvorton, se konto "
-"ekzistas, al la retpoŝto kiun vi sendis. Vi baldaŭ devus ĝin ricevi."
+"Ni retpoŝte sendis al vi instrukciojn por agordi la pasvorton, se la "
+"koncerna konto ekzistas, al la retpoŝta adreso kiun vi sendis. Vi baldaŭ "
+"devus ĝin ricevi."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"Se vi ne ricevas retpoŝton, bonvolu certigi vin eniris la adreson kun kiu vi "
-"registris, kaj kontroli vian spaman dosierujon."
+"Se vi ne ricevas retpoŝton, bonvolu certigi ke vi metis la adreson per kiu "
+"vi registris, kaj kontroli vian spaman dosierujon."
 
 #, python-format
 msgid ""
@@ -673,6 +696,10 @@ msgstr "Elekti %sn"
 #, python-format
 msgid "Select %s to change"
 msgstr "Elekti %sn por ŝanĝi"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Elektu %sn por vidi"
 
 msgid "Date:"
 msgstr "Dato:"

@@ -3,20 +3,22 @@
 # Translators:
 # Alex Gaynor <inactive+Alex@transifex.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Meir Kriheli <mkriheli@gmail.com>, 2012-2015,2017
+# Meir Kriheli <mkriheli@gmail.com>, 2012-2015,2017,2019
+# אורי רודברג <uri@speedy.net>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-04-01 14:48+0000\n"
-"Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-19 11:14+0000\n"
+"Last-Translator: אורי רודברג <uri@speedy.net>\n"
 "Language-Team: Hebrew (http://www.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: he\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
+"1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
 
 msgid "Personal info"
 msgstr "מידע אישי"
@@ -53,7 +55,7 @@ msgstr "לא נקבעה סיסמה."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "תחביר סיסמה בלתי-חוקי או אלגוריתם גיבוב לא ידוע."
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "שני שדות הסיסמה אינם זהים."
 
 msgid "Password"
@@ -66,12 +68,11 @@ msgid "Enter the same password as before, for verification."
 msgstr "יש להזין את אותה סיסמה כמו קודם, לאימות."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"הסיסמאות אינן נשמרות באופן חשוף, כך שאין דרך לראות את סיסמת המשתמש, אך ניתן "
-"לשנות את הסיסמה בעזרת <a href=\"../password/\">טופס זה</a>."
+"הסיסמאות אינן נשמרות באופן חשוף, כך שאין דרך לראות את סיסמת המשתמש, אבל ניתן "
+"לשנות את הסיסמה בעזרת <a href=\"{}\">טופס זה</a>."
 
 #, python-format
 msgid ""
@@ -227,32 +228,36 @@ msgid ""
 msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
-msgstr[0] "סיסמה זו קצרה מדי. היא חייבת להכיל לפחות תו %(min_length)d ."
+msgstr[0] "סיסמה זו קצרה מדי. היא חייבת להכיל לפחות תו %(min_length)d."
 msgstr[1] "סיסמה זו קצרה מדי. היא חייבת להכיל לפחות %(min_length)d תווים."
+msgstr[2] "סיסמה זו קצרה מדי. היא חייבת להכיל לפחות %(min_length)d תווים."
+msgstr[3] "סיסמה זו קצרה מדי. היא חייבת להכיל לפחות %(min_length)d תווים."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "הסיסמה שלך חייבת להכיל לפחות תו %(min_length)d."
 msgstr[1] "הסיסמה שלך חייבת להכיל לפחות %(min_length)d תווים."
+msgstr[2] "הסיסמה שלך חייבת להכיל לפחות %(min_length)d תווים."
+msgstr[3] "הסיסמה שלך חייבת להכיל לפחות %(min_length)d תווים."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "סיסמה זו דומה מדי ל-%(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr "הסיסמה שלך לא יכולה להיות דומה מדי למידע אישי אחר שלך."
 
 msgid "This password is too common."
 msgstr "סיסמה זו נפוצה מדי."
 
-msgid "Your password can't be a commonly used password."
-msgstr "הסיסמה שלך לא יכול להיות סיסמה שכיחה."
+msgid "Your password can’t be a commonly used password."
+msgstr "הסיסמה שלך לא יכולה להיות סיסמה שכיחה."
 
 msgid "This password is entirely numeric."
 msgstr "סיסמה זו מכילה רק ספרות."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "הסיסמה שלך לא יכולה להכיל רק ספרות."
 
 #, python-format

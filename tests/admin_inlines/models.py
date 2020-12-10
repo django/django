@@ -37,6 +37,9 @@ class Child(models.Model):
 class Book(models.Model):
     name = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.name
+
 
 class Author(models.Model):
     name = models.CharField(max_length=50)
@@ -107,10 +110,43 @@ class Inner4Stacked(models.Model):
     dummy = models.IntegerField(help_text="Awesome stacked help text is awesome.")
     holder = models.ForeignKey(Holder4, models.CASCADE)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['dummy', 'holder'], name='unique_stacked_dummy_per_holder')
+        ]
+
 
 class Inner4Tabular(models.Model):
     dummy = models.IntegerField(help_text="Awesome tabular help text is awesome.")
     holder = models.ForeignKey(Holder4, models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['dummy', 'holder'], name='unique_tabular_dummy_per_holder')
+        ]
+
+# Models for ticket #31441
+
+
+class Holder5(models.Model):
+    dummy = models.IntegerField()
+
+
+class Inner5Stacked(models.Model):
+    name = models.CharField(max_length=10)
+    select = models.CharField(choices=(('1', 'One'), ('2', 'Two')), max_length=10)
+    text = models.TextField()
+    dummy = models.IntegerField()
+    holder = models.ForeignKey(Holder5, models.CASCADE)
+
+
+class Inner5Tabular(models.Model):
+    name = models.CharField(max_length=10)
+    select = models.CharField(choices=(('1', 'One'), ('2', 'Two')), max_length=10)
+    text = models.TextField()
+    dummy = models.IntegerField()
+    holder = models.ForeignKey(Holder5, models.CASCADE)
+
 
 # Models for #12749
 
@@ -152,11 +188,18 @@ class Poll(models.Model):
 
 
 class Question(models.Model):
+    text = models.CharField(max_length=40)
     poll = models.ForeignKey(Poll, models.CASCADE)
 
 
 class Novel(models.Model):
     name = models.CharField(max_length=40)
+
+
+class NovelReadonlyChapter(Novel):
+
+    class Meta:
+        proxy = True
 
 
 class Chapter(models.Model):
@@ -248,6 +291,7 @@ class SomeChildModel(models.Model):
     name = models.CharField(max_length=1)
     position = models.PositiveIntegerField()
     parent = models.ForeignKey(SomeParentModel, models.CASCADE)
+    readonly_field = models.CharField(max_length=1)
 
 # Other models
 

@@ -3,14 +3,15 @@
 # Translators:
 # Ali Ismayilov <ali@ismailov.info>, 2011
 # Dimitris Glezos <glezos@transifex.com>, 2012
+# Emin Mastizada <emin@linux.com>, 2018,2020
 # Emin Mastizada <emin@linux.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-12 07:27+0000\n"
+"Last-Translator: Emin Mastizada <emin@linux.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -29,10 +30,10 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"Məsələn, \"/about/contact/\". Əvvəldə və sondakı kəsr xəttinin olmasına "
-"diqqət edin."
+"Məsələn, “/about/contact/”. Əvvəldə və sondakı kəsr xəttinin olmasına diqqət "
+"edin."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
@@ -40,6 +41,10 @@ msgid ""
 msgstr ""
 "Burada yalnız hərf, rəqəm, nöqtə, altdan xətt, defis, kəsr xətti və ya "
 "tildadan istifadə etmək olar."
+
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr ""
+"Məsələn, “/about/contact”. Əvvəldəki kəsr xəttinin olmasına diqqət edin."
 
 msgid "URL is missing a leading slash."
 msgstr "Ünvan başlanğıcında çəp xətt əksikdir."
@@ -64,11 +69,11 @@ msgid "template name"
 msgstr "şablonun adı"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"Məsələn, \"flatpages/contact_page.html\". Əgər göstərməsəniz, biz "
-"\"flatpages/default.html\" şablonundan istifadə edəcəyik."
+"Məsələn, “flatpages/contact_page.html”. Əgər təchiz edilməsə, sistem "
+"“flatpages/default.html” işlədəcək."
 
 msgid "registration required"
 msgstr "ancaq qeydiyyatlılar üçün"
@@ -79,7 +84,7 @@ msgstr ""
 "istifadəçilər bu səhifəni görə biləcəklər."
 
 msgid "sites"
-msgstr ""
+msgstr "saytlar"
 
 msgid "flat page"
 msgstr "adi səhifə"

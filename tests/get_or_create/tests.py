@@ -5,9 +5,8 @@ from threading import Thread
 
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, IntegrityError, connection
-from django.test import (
-    SimpleTestCase, TestCase, TransactionTestCase, skipUnlessDBFeature,
-)
+from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.utils.functional import lazy
 
 from .models import (
     Author, Book, DefaultPerson, ManualPrimaryKeyTest, Person, Profile,
@@ -17,8 +16,9 @@ from .models import (
 
 class GetOrCreateTests(TestCase):
 
-    def setUp(self):
-        self.lennon = Person.objects.create(
+    @classmethod
+    def setUpTestData(cls):
+        Person.objects.create(
             first_name='John', last_name='Lennon', birthday=date(1940, 10, 9)
         )
 
@@ -178,11 +178,21 @@ class GetOrCreateTests(TestCase):
             defaults={"birthday": lambda: raise_exception()},
         )
 
+    def test_defaults_not_evaluated_unless_needed(self):
+        """`defaults` aren't evaluated if the instance isn't created."""
+        def raise_exception():
+            raise AssertionError
+        obj, created = Person.objects.get_or_create(
+            first_name='John', defaults=lazy(raise_exception, object)(),
+        )
+        self.assertFalse(created)
+
 
 class GetOrCreateTestsWithManualPKs(TestCase):
 
-    def setUp(self):
-        self.first_pk = ManualPrimaryKeyTest.objects.create(id=1, data="Original")
+    @classmethod
+    def setUpTestData(cls):
+        ManualPrimaryKeyTest.objects.create(id=1, data="Original")
 
     def test_create_with_duplicate_primary_key(self):
         """
@@ -443,6 +453,32 @@ class UpdateOrCreateTests(TestCase):
         self.assertIs(created, False)
         self.assertEqual(obj.last_name, 'NotHarrison')
 
+    def test_defaults_not_evaluated_unless_needed(self):
+        """`defaults` aren't evaluated if the instance isn't created."""
+        Person.objects.create(
+            first_name='John', last_name='Lennon', birthday=date(1940, 10, 9)
+        )
+
+        def raise_exception():
+            raise AssertionError
+        obj, created = Person.objects.get_or_create(
+            first_name='John', defaults=lazy(raise_exception, object)(),
+        )
+        self.assertFalse(created)
+
+
+class UpdateOrCreateTestsWithManualPKs(TestCase):
+
+    def test_create_with_duplicate_primary_key(self):
+        """
+        If an existing primary key is specified with different values for other
+        fields, then IntegrityError is raised and data isn't updated.
+        """
+        ManualPrimaryKeyTest.objects.create(id=1, data='Original')
+        with self.assertRaises(IntegrityError):
+            ManualPrimaryKeyTest.objects.update_or_create(id=1, data='Different')
+        self.assertEqual(ManualPrimaryKeyTest.objects.get(id=1).data, 'Original')
+
 
 class UpdateOrCreateTransactionTests(TransactionTestCase):
     available_apps = ['get_or_create']
@@ -501,16 +537,76 @@ class UpdateOrCreateTransactionTests(TransactionTestCase):
         self.assertGreater(after_update - before_start, timedelta(seconds=0.5))
         self.assertEqual(updated_person.last_name, 'NotLennon')
 
+    @skipUnlessDBFeature('has_select_for_update')
+    @skipUnlessDBFeature('supports_transactions')
+    def test_creation_in_transaction(self):
+        """
+        Objects are selected and updated in a transaction to avoid race
+        conditions. This test checks the behavior of update_or_create() when
+        the object doesn't already exist, but another thread creates the
+        object before update_or_create() does and then attempts to update the
+        object, also before update_or_create(). It forces update_or_create() to
+        hold the lock in another thread for a relatively long time so that it
+        can update while it holds the lock. The updated field isn't a field in
+        'defaults', so update_or_create() shouldn't have an effect on it.
+        """
+        lock_status = {'lock_count': 0}
 
-class InvalidCreateArgumentsTests(SimpleTestCase):
+        def birthday_sleep():
+            lock_status['lock_count'] += 1
+            time.sleep(0.5)
+            return date(1940, 10, 10)
+
+        def update_birthday_slowly():
+            try:
+                Person.objects.update_or_create(first_name='John', defaults={'birthday': birthday_sleep})
+            finally:
+                # Avoid leaking connection for Oracle
+                connection.close()
+
+        def lock_wait(expected_lock_count):
+            # timeout after ~0.5 seconds
+            for i in range(20):
+                time.sleep(0.025)
+                if lock_status['lock_count'] == expected_lock_count:
+                    return True
+            self.skipTest('Database took too long to lock the row')
+
+        # update_or_create in a separate thread.
+        t = Thread(target=update_birthday_slowly)
+        before_start = datetime.now()
+        t.start()
+        lock_wait(1)
+        # Create object *after* initial attempt by update_or_create to get obj
+        # but before creation attempt.
+        Person.objects.create(first_name='John', last_name='Lennon', birthday=date(1940, 10, 9))
+        lock_wait(2)
+        # At this point, the thread is pausing for 0.5 seconds, so now attempt
+        # to modify object before update_or_create() calls save(). This should
+        # be blocked until after the save().
+        Person.objects.filter(first_name='John').update(last_name='NotLennon')
+        after_update = datetime.now()
+        # Wait for thread to finish
+        t.join()
+        # Check call to update_or_create() succeeded and the subsequent
+        # (blocked) call to update().
+        updated_person = Person.objects.get(first_name='John')
+        self.assertEqual(updated_person.birthday, date(1940, 10, 10))  # set by update_or_create()
+        self.assertEqual(updated_person.last_name, 'NotLennon')        # set by update()
+        self.assertGreater(after_update - before_start, timedelta(seconds=1))
+
+
+class InvalidCreateArgumentsTests(TransactionTestCase):
+    available_apps = ['get_or_create']
     msg = "Invalid field name(s) for model Thing: 'nonexistent'."
+    bad_field_msg = "Cannot resolve keyword 'nonexistent' into field. Choices are: id, name, tags"
 
     def test_get_or_create_with_invalid_defaults(self):
         with self.assertRaisesMessage(FieldError, self.msg):
             Thing.objects.get_or_create(name='a', defaults={'nonexistent': 'b'})
 
     def test_get_or_create_with_invalid_kwargs(self):
-        with self.assertRaisesMessage(FieldError, self.msg):
+        with self.assertRaisesMessage(FieldError, self.bad_field_msg):
             Thing.objects.get_or_create(name='a', nonexistent='b')
 
     def test_update_or_create_with_invalid_defaults(self):
@@ -518,11 +614,11 @@ class InvalidCreateArgumentsTests(SimpleTestCase):
             Thing.objects.update_or_create(name='a', defaults={'nonexistent': 'b'})
 
     def test_update_or_create_with_invalid_kwargs(self):
-        with self.assertRaisesMessage(FieldError, self.msg):
+        with self.assertRaisesMessage(FieldError, self.bad_field_msg):
             Thing.objects.update_or_create(name='a', nonexistent='b')
 
     def test_multiple_invalid_fields(self):
-        with self.assertRaisesMessage(FieldError, "Invalid field name(s) for model Thing: 'invalid', 'nonexistent'"):
+        with self.assertRaisesMessage(FieldError, self.bad_field_msg):
             Thing.objects.update_or_create(name='a', nonexistent='b', defaults={'invalid': 'c'})
 
     def test_property_attribute_without_setter_defaults(self):
@@ -530,5 +626,6 @@ class InvalidCreateArgumentsTests(SimpleTestCase):
             Thing.objects.update_or_create(name='a', defaults={'name_in_all_caps': 'FRANK'})
 
     def test_property_attribute_without_setter_kwargs(self):
-        with self.assertRaisesMessage(FieldError, "Invalid field name(s) for model Thing: 'name_in_all_caps'"):
+        msg = "Cannot resolve keyword 'name_in_all_caps' into field. Choices are: id, name, tags"
+        with self.assertRaisesMessage(FieldError, msg):
             Thing.objects.update_or_create(name_in_all_caps='FRANK', defaults={'name': 'Frank'})

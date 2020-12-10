@@ -5,7 +5,7 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.db.models.query import ModelIterable, QuerySet
+from django.db.models.query import ModelIterable
 from django.utils.functional import cached_property
 
 
@@ -15,11 +15,11 @@ class Author(models.Model):
     favorite_authors = models.ManyToManyField(
         'self', through='FavoriteAuthors', symmetrical=False, related_name='favors_me')
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return self.name
 
 
 class AuthorWithAge(Author):
@@ -42,16 +42,10 @@ class AuthorAddress(models.Model):
     class Meta:
         ordering = ['id']
 
-    def __str__(self):
-        return self.address
-
 
 class Book(models.Model):
     title = models.CharField(max_length=255)
     authors = models.ManyToManyField(Author, related_name='books')
-
-    def __str__(self):
-        return self.title
 
     class Meta:
         ordering = ['id']
@@ -78,15 +72,16 @@ class Reader(models.Model):
     name = models.CharField(max_length=50)
     books_read = models.ManyToManyField(Book, related_name='read_by')
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ['id']
 
+    def __str__(self):
+        return self.name
+
 
 class BookReview(models.Model):
-    book = models.ForeignKey(BookWithYear, models.CASCADE)
+    # Intentionally does not have a related name.
+    book = models.ForeignKey(BookWithYear, models.CASCADE, null=True)
     notes = models.TextField(null=True, blank=True)
 
 
@@ -103,7 +98,7 @@ class ModelIterableSubclass(ModelIterable):
     pass
 
 
-class TeacherQuerySet(QuerySet):
+class TeacherQuerySet(models.QuerySet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._iterable_class = ModelIterableSubclass
@@ -121,11 +116,11 @@ class Teacher(models.Model):
     objects = TeacherManager()
     objects_custom = TeacherQuerySet.as_manager()
 
-    def __str__(self):
-        return "%s (%s)" % (self.name, ", ".join(q.name for q in self.qualifications.all()))
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return "%s (%s)" % (self.name, ", ".join(q.name for q in self.qualifications.all()))
 
 
 class Department(models.Model):
@@ -164,11 +159,13 @@ class TaggedItem(models.Model):
     favorite_fkey = models.CharField(max_length=64, null=True)
     favorite = GenericForeignKey('favorite_ct', 'favorite_fkey')
 
-    def __str__(self):
-        return self.tag
-
     class Meta:
         ordering = ['id']
+
+
+class Article(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=20)
 
 
 class Bookmark(models.Model):
@@ -187,9 +184,12 @@ class Comment(models.Model):
     comment = models.TextField()
 
     # Content-object field
-    content_type = models.ForeignKey(ContentType, models.CASCADE)
+    content_type = models.ForeignKey(ContentType, models.CASCADE, null=True)
     object_pk = models.TextField()
     content_object = GenericForeignKey(ct_field="content_type", fk_field="object_pk")
+    content_type_uuid = models.ForeignKey(ContentType, models.CASCADE, related_name='comments', null=True)
+    object_pk_uuid = models.TextField()
+    content_object_uuid = GenericForeignKey(ct_field='content_type_uuid', fk_field='object_pk_uuid')
 
     class Meta:
         ordering = ['id']
@@ -242,9 +242,6 @@ class Employee(models.Model):
     name = models.CharField(max_length=50)
     boss = models.ForeignKey('self', models.SET_NULL, null=True, related_name='serfs')
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ['id']
 
@@ -255,16 +252,10 @@ class LessonEntry(models.Model):
     name1 = models.CharField(max_length=200)
     name2 = models.CharField(max_length=200)
 
-    def __str__(self):
-        return "%s %s" % (self.name1, self.name2)
-
 
 class WordEntry(models.Model):
     lesson_entry = models.ForeignKey(LessonEntry, models.CASCADE)
     name = models.CharField(max_length=200)
-
-    def __str__(self):
-        return "%s (%s)" % (self.name, self.id)
 
 
 # Ticket #21410: Regression when related_name="+"
@@ -273,9 +264,6 @@ class Author2(models.Model):
     name = models.CharField(max_length=50, unique=True)
     first_book = models.ForeignKey('Book', models.CASCADE, related_name='first_time_authors+')
     favorite_books = models.ManyToManyField('Book', related_name='+')
-
-    def __str__(self):
-        return self.name
 
     class Meta:
         ordering = ['id']

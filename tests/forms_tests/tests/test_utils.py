@@ -59,7 +59,7 @@ class FormsUtilsTestCase(SimpleTestCase):
             str(ErrorList(ValidationError("There was an error.").messages)),
             '<ul class="errorlist"><li>There was an error.</li></ul>'
         )
-        # Can take a unicode string.
+        # Can take a Unicode string.
         self.assertHTMLEqual(
             str(ErrorList(ValidationError("Not \u03C0.").messages)),
             '<ul class="errorlist"><li>Not π.</li></ul>'
@@ -151,7 +151,6 @@ class FormsUtilsTestCase(SimpleTestCase):
 
         e_deepcopy = copy.deepcopy(e)
         self.assertEqual(e, e_deepcopy)
-        self.assertEqual(e.as_data(), e_copy.as_data())
 
     def test_error_dict_html_safe(self):
         e = ErrorDict()

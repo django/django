@@ -1,7 +1,7 @@
 from unittest import mock
 
 from django.db import connections, models
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import isolate_apps, override_settings
 
 
@@ -15,8 +15,7 @@ class TestRouter:
 
 @override_settings(DATABASE_ROUTERS=[TestRouter()])
 @isolate_apps('check_framework')
-class TestMultiDBChecks(TestCase):
-    multi_db = True
+class TestMultiDBChecks(SimpleTestCase):
 
     def _patch_check_field_on(self, db):
         return mock.patch.object(connections[db].validation, 'check_field')
@@ -28,7 +27,7 @@ class TestMultiDBChecks(TestCase):
         model = Model()
         with self._patch_check_field_on('default') as mock_check_field_default:
             with self._patch_check_field_on('other') as mock_check_field_other:
-                model.check()
+                model.check(databases={'default', 'other'})
                 self.assertTrue(mock_check_field_default.called)
                 self.assertFalse(mock_check_field_other.called)
 
@@ -39,6 +38,6 @@ class TestMultiDBChecks(TestCase):
         model = OtherModel()
         with self._patch_check_field_on('other') as mock_check_field_other:
             with self._patch_check_field_on('default') as mock_check_field_default:
-                model.check()
+                model.check(databases={'default', 'other'})
                 self.assertTrue(mock_check_field_other.called)
                 self.assertFalse(mock_check_field_default.called)

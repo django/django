@@ -5,6 +5,7 @@ This demonstrates features of the database API.
 """
 
 from django.db import models
+from django.db.models.lookups import IsNull
 
 
 class Alarm(models.Model):
@@ -17,9 +18,10 @@ class Alarm(models.Model):
 
 class Author(models.Model):
     name = models.CharField(max_length=100)
+    alias = models.CharField(max_length=50, null=True, blank=True)
 
     class Meta:
-        ordering = ('name', )
+        ordering = ('name',)
 
 
 class Article(models.Model):
@@ -40,7 +42,7 @@ class Tag(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
-        ordering = ('name', )
+        ordering = ('name',)
 
 
 class NulledTextField(models.TextField):
@@ -54,10 +56,21 @@ class NulledTransform(models.Transform):
     template = 'NULL'
 
 
+@NulledTextField.register_lookup
+class IsNullWithNoneAsRHS(IsNull):
+    lookup_name = 'isnull_none_rhs'
+    can_use_none_as_rhs = True
+
+
 class Season(models.Model):
     year = models.PositiveSmallIntegerField()
     gt = models.IntegerField(null=True, blank=True)
     nulled_text_field = NulledTextField(null=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['year'], name='season_year_unique'),
+        ]
 
     def __str__(self):
         return str(self.year)
@@ -68,16 +81,10 @@ class Game(models.Model):
     home = models.CharField(max_length=100)
     away = models.CharField(max_length=100)
 
-    def __str__(self):
-        return "%s at %s" % (self.away, self.home)
-
 
 class Player(models.Model):
     name = models.CharField(max_length=100)
     games = models.ManyToManyField(Game, related_name='players')
-
-    def __str__(self):
-        return self.name
 
 
 class Product(models.Model):
@@ -88,3 +95,15 @@ class Product(models.Model):
 class Stock(models.Model):
     product = models.ForeignKey(Product, models.CASCADE)
     qty_available = models.DecimalField(max_digits=6, decimal_places=2)
+
+
+class Freebie(models.Model):
+    gift_product = models.ForeignKey(Product, models.CASCADE)
+    stock_id = models.IntegerField(blank=True, null=True)
+
+    stock = models.ForeignObject(
+        Stock,
+        from_fields=['stock_id', 'gift_product'],
+        to_fields=['id', 'product'],
+        on_delete=models.CASCADE,
+    )

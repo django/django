@@ -3,7 +3,6 @@ from operator import attrgetter
 
 from django.core.exceptions import FieldError
 from django.db import models
-from django.db.models.fields.related import ForeignObject
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils import translation
@@ -18,28 +17,25 @@ from .models import (
 
 
 class MultiColumnFKTests(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         # Creating countries
-        self.usa = Country.objects.create(name="United States of America")
-        self.soviet_union = Country.objects.create(name="Soviet Union")
-        Person()
+        cls.usa = Country.objects.create(name="United States of America")
+        cls.soviet_union = Country.objects.create(name="Soviet Union")
         # Creating People
-        self.bob = Person()
-        self.bob.name = 'Bob'
-        self.bob.person_country = self.usa
-        self.bob.save()
-        self.jim = Person.objects.create(name='Jim', person_country=self.usa)
-        self.george = Person.objects.create(name='George', person_country=self.usa)
+        cls.bob = Person.objects.create(name='Bob', person_country=cls.usa)
+        cls.jim = Person.objects.create(name='Jim', person_country=cls.usa)
+        cls.george = Person.objects.create(name='George', person_country=cls.usa)
 
-        self.jane = Person.objects.create(name='Jane', person_country=self.soviet_union)
-        self.mark = Person.objects.create(name='Mark', person_country=self.soviet_union)
-        self.sam = Person.objects.create(name='Sam', person_country=self.soviet_union)
+        cls.jane = Person.objects.create(name='Jane', person_country=cls.soviet_union)
+        cls.mark = Person.objects.create(name='Mark', person_country=cls.soviet_union)
+        cls.sam = Person.objects.create(name='Sam', person_country=cls.soviet_union)
 
         # Creating Groups
-        self.kgb = Group.objects.create(name='KGB', group_country=self.soviet_union)
-        self.cia = Group.objects.create(name='CIA', group_country=self.usa)
-        self.republican = Group.objects.create(name='Republican', group_country=self.usa)
-        self.democrat = Group.objects.create(name='Democrat', group_country=self.usa)
+        cls.kgb = Group.objects.create(name='KGB', group_country=cls.soviet_union)
+        cls.cia = Group.objects.create(name='CIA', group_country=cls.usa)
+        cls.republican = Group.objects.create(name='Republican', group_country=cls.usa)
+        cls.democrat = Group.objects.create(name='Democrat', group_country=cls.usa)
 
     def test_get_succeeds_on_multicolumn_match(self):
         # Membership objects have access to their related Person if both
@@ -51,7 +47,7 @@ class MultiColumnFKTests(TestCase):
         self.assertEqual((person.id, person.name), (self.bob.id, "Bob"))
 
     def test_get_fails_on_multicolumn_mismatch(self):
-        # Membership objects returns DoesNotExist error when the there is no
+        # Membership objects returns DoesNotExist error when there is no
         # Person with the same id and country_id
         membership = Membership.objects.create(
             membership_country_id=self.usa.id, person_id=self.jane.id, group_id=self.cia.id)
@@ -69,12 +65,10 @@ class MultiColumnFKTests(TestCase):
             membership_country_id=self.soviet_union.id, person_id=self.bob.id,
             group_id=self.republican.id)
 
-        self.assertQuerysetEqual(
-            self.bob.membership_set.all(), [
-                self.cia.id
-            ],
-            attrgetter("group_id")
-        )
+        with self.assertNumQueries(1):
+            membership = self.bob.membership_set.get()
+            self.assertEqual(membership.group_id, self.cia.id)
+            self.assertIs(membership.person, self.bob)
 
     def test_query_filters_correctly(self):
 
@@ -198,8 +192,11 @@ class MultiColumnFKTests(TestCase):
                 list(p.membership_set.all())
                 for p in Person.objects.prefetch_related('membership_set').order_by('pk')]
 
-        normal_membership_sets = [list(p.membership_set.all())
-                                  for p in Person.objects.order_by('pk')]
+        with self.assertNumQueries(7):
+            normal_membership_sets = [
+                list(p.membership_set.all())
+                for p in Person.objects.order_by('pk')
+            ]
         self.assertEqual(membership_sets, normal_membership_sets)
 
     def test_m2m_through_forward_returns_valid_members(self):
@@ -411,15 +408,15 @@ class MultiColumnFKTests(TestCase):
         Person.objects.bulk_create(objs, 10)
 
     def test_isnull_lookup(self):
-        Membership.objects.create(membership_country=self.usa, person=self.bob, group_id=None)
-        Membership.objects.create(membership_country=self.usa, person=self.bob, group=self.cia)
-        self.assertQuerysetEqual(
+        m1 = Membership.objects.create(membership_country=self.usa, person=self.bob, group_id=None)
+        m2 = Membership.objects.create(membership_country=self.usa, person=self.bob, group=self.cia)
+        self.assertSequenceEqual(
             Membership.objects.filter(group__isnull=True),
-            ['<Membership: Bob is a member of NULL>']
+            [m1],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Membership.objects.filter(group__isnull=False),
-            ['<Membership: Bob is a member of CIA>']
+            [m2],
         )
 
 
@@ -438,7 +435,7 @@ class TestModelCheckTests(SimpleTestCase):
             a = models.PositiveIntegerField()
             b = models.PositiveIntegerField()
             value = models.CharField(max_length=255)
-            parent = ForeignObject(
+            parent = models.ForeignObject(
                 Parent,
                 on_delete=models.SET_NULL,
                 from_fields=('a', 'b'),
@@ -463,7 +460,7 @@ class TestModelCheckTests(SimpleTestCase):
             b = models.PositiveIntegerField()
             c = models.PositiveIntegerField()
             d = models.CharField(max_length=255)
-            parent = ForeignObject(
+            parent = models.ForeignObject(
                 Parent,
                 on_delete=models.SET_NULL,
                 from_fields=('a', 'b', 'c'),

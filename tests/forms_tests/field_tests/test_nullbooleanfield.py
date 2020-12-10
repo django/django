@@ -27,8 +27,8 @@ class NullBooleanFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             hidden_nullbool2 = NullBooleanField(widget=HiddenInput, initial=False)
         f = HiddenNullBooleanForm()
         self.assertHTMLEqual(
-            '<input type="hidden" name="hidden_nullbool1" value="True" id="id_hidden_nullbool1" />'
-            '<input type="hidden" name="hidden_nullbool2" value="False" id="id_hidden_nullbool2" />',
+            '<input type="hidden" name="hidden_nullbool1" value="True" id="id_hidden_nullbool1">'
+            '<input type="hidden" name="hidden_nullbool2" value="False" id="id_hidden_nullbool2">',
             str(f)
         )
 

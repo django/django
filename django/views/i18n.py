@@ -10,7 +10,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template import Context, Engine
 from django.urls import translate_url
 from django.utils.formats import get_format
-from django.utils.http import is_safe_url
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, check_for_language, get_language,
 )
@@ -22,40 +22,54 @@ LANGUAGE_QUERY_PARAMETER = 'language'
 
 def set_language(request):
     """
-    Redirect to a given URL while setting the chosen language in the session or
-    cookie. The URL and the language code need to be specified in the request
-    parameters.
+    Redirect to a given URL while setting the chosen language in the session
+    (if enabled) and in a cookie. The URL and the language code need to be
+    specified in the request parameters.
 
     Since this view changes how the user will see the rest of the site, it must
     only be accessed as a POST request. If called as a GET request, it will
     redirect to the page in the request (the 'next' parameter) without changing
     any state.
     """
-    next = request.POST.get('next', request.GET.get('next'))
-    if ((next or not request.is_ajax()) and
-            not is_safe_url(url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure())):
-        next = request.META.get('HTTP_REFERER')
-        if next:
-            next = unquote(next)  # HTTP_REFERER may be encoded.
-        if not is_safe_url(url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
-            next = '/'
-    response = HttpResponseRedirect(next) if next else HttpResponse(status=204)
+    next_url = request.POST.get('next', request.GET.get('next'))
+    if (
+        (next_url or request.accepts('text/html')) and
+        not url_has_allowed_host_and_scheme(
+            url=next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        )
+    ):
+        next_url = request.META.get('HTTP_REFERER')
+        # HTTP_REFERER may be encoded.
+        next_url = next_url and unquote(next_url)
+        if not url_has_allowed_host_and_scheme(
+            url=next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        ):
+            next_url = '/'
+    response = HttpResponseRedirect(next_url) if next_url else HttpResponse(status=204)
     if request.method == 'POST':
         lang_code = request.POST.get(LANGUAGE_QUERY_PARAMETER)
         if lang_code and check_for_language(lang_code):
-            if next:
-                next_trans = translate_url(next, lang_code)
-                if next_trans != next:
+            if next_url:
+                next_trans = translate_url(next_url, lang_code)
+                if next_trans != next_url:
                     response = HttpResponseRedirect(next_trans)
             if hasattr(request, 'session'):
+                # Storing the language in the session is deprecated.
+                # (RemovedInDjango40Warning)
                 request.session[LANGUAGE_SESSION_KEY] = lang_code
-            else:
-                response.set_cookie(
-                    settings.LANGUAGE_COOKIE_NAME, lang_code,
-                    max_age=settings.LANGUAGE_COOKIE_AGE,
-                    path=settings.LANGUAGE_COOKIE_PATH,
-                    domain=settings.LANGUAGE_COOKIE_DOMAIN,
-                )
+            response.set_cookie(
+                settings.LANGUAGE_COOKIE_NAME, lang_code,
+                max_age=settings.LANGUAGE_COOKIE_AGE,
+                path=settings.LANGUAGE_COOKIE_PATH,
+                domain=settings.LANGUAGE_COOKIE_DOMAIN,
+                secure=settings.LANGUAGE_COOKIE_SECURE,
+                httponly=settings.LANGUAGE_COOKIE_HTTPONLY,
+                samesite=settings.LANGUAGE_COOKIE_SAMESITE,
+            )
     return response
 
 
@@ -73,14 +87,15 @@ def get_formats():
 
 js_catalog_template = r"""
 {% autoescape off %}
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   {% if plural %}
   django.pluralidx = function(n) {
-    var v={{ plural }};
-    if (typeof(v) == 'boolean') {
+    const v = {{ plural }};
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -94,44 +109,44 @@ js_catalog_template = r"""
 
   django.catalog = django.catalog || {};
   {% if catalog_str %}
-  var newcatalog = {{ catalog_str }};
-  for (var key in newcatalog) {
+  const newcatalog = {{ catalog_str }};
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   {% endif %}
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -151,8 +166,8 @@ js_catalog_template = r"""
     django.formats = {{ formats_str }};
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -171,35 +186,9 @@ js_catalog_template = r"""
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 {% endautoescape %}
 """
-
-
-def render_javascript_catalog(catalog=None, plural=None):
-    template = Engine().from_string(js_catalog_template)
-
-    def indent(s):
-        return s.replace('\n', '\n  ')
-
-    context = Context({
-        'catalog_str': indent(json.dumps(
-            catalog, sort_keys=True, indent=2)) if catalog else None,
-        'formats_str': indent(json.dumps(
-            get_formats(), sort_keys=True, indent=2)),
-        'plural': plural,
-    })
-
-    return HttpResponse(template.render(context), 'text/javascript')
-
-
-def null_javascript_catalog(request, domain=None, packages=None):
-    """
-    Return "identity" versions of the JavaScript i18n functions -- i.e.,
-    versions that don't actually do anything.
-    """
-    return render_javascript_catalog()
 
 
 class JavaScriptCatalog(View):
@@ -207,8 +196,8 @@ class JavaScriptCatalog(View):
     Return the selected language catalog as a JavaScript library.
 
     Receive the list of packages to check for translations in the `packages`
-    kwarg either from the extra dictionary passed to the url() function or as a
-    plus-sign delimited string from the request. Default is 'django.conf'.
+    kwarg either from the extra dictionary passed to the path() function or as
+    a plus-sign delimited string from the request. Default is 'django.conf'.
 
     You can override the gettext domain for this view, but usually you don't
     want to do that as JavaScript messages go to the djangojs domain. This
@@ -248,7 +237,7 @@ class JavaScriptCatalog(View):
         """
         match = re.search(r'nplurals=\s*(\d+)', self._plural_string or '')
         if match:
-            return int(match.groups()[0])
+            return int(match[1])
         return 2
 
     @property
@@ -311,7 +300,7 @@ class JavaScriptCatalog(View):
         ) if context['catalog'] else None
         context['formats_str'] = indent(json.dumps(context['formats'], sort_keys=True, indent=2))
 
-        return HttpResponse(template.render(Context(context)), 'text/javascript')
+        return HttpResponse(template.render(Context(context)), 'text/javascript; charset="utf-8"')
 
 
 class JSONCatalog(JavaScriptCatalog):

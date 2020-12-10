@@ -2,16 +2,17 @@
 #
 # Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2013,2016
-# Eneko Illarramendi <eneko@illarra.com>, 2017
+# Eneko Illarramendi <eneko@illarra.com>, 2017-2019
 # Jannis Leidel <jannis@leidel.info>, 2011
-# julen <julenx@gmail.com>, 2012-2013
-# julen <julenx@gmail.com>, 2013
+# julen, 2012-2013
+# julen, 2013
+# Urtzi Odriozola <urtzi.odriozola@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-04-04 12:38+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-22 09:57+0000\n"
 "Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
@@ -89,6 +90,15 @@ msgstr "Gehitu beste %(verbose_name)s bat"
 msgid "Remove"
 msgstr "Kendu"
 
+msgid "Addition"
+msgstr "Gehitzea"
+
+msgid "Change"
+msgstr "Aldatu"
+
+msgid "Deletion"
+msgstr "Ezabatzea"
+
 msgid "action time"
 msgstr "Ekintza hordua"
 
@@ -102,7 +112,7 @@ msgid "object id"
 msgstr "objetuaren id-a"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "objeturaren adierazpena"
 
@@ -145,15 +155,15 @@ msgstr "eta"
 
 #, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgstr "{fields}-(e)tik {name} \"{object}\" aldatatuta."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "{fields} aldatuta."
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
-msgstr ""
+msgstr "{name} \"{object}\" ezabatuta."
 
 msgid "No fields changed."
 msgstr "Ez da eremurik aldatu."
@@ -164,36 +174,45 @@ msgstr "Bat ere ez"
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
+"Bat baino gehiago hautatzeko, sakatu \"Kontrol\" tekla edo \"Command\" Mac "
+"batean."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" ondo gehitu da."
+
+msgid "You may edit it again below."
+msgstr "Aldaketa gehiago egin ditzazkezu jarraian."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
+"{name} \"{obj}\" ondo gehitu da. Beste {name} bat gehitu dezakezu jarraian."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
+"{name} \"{obj}\" ondo aldatu da. Aldaketa gehiago egin ditzazkezu jarraian."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"{name} \"{obj}\" ondo gehitu da. Aldaketa gehiago egin ditzazkezu jarraian."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
 msgstr ""
+"{name} \"{obj}\" ondo aldatu da. Beste {name} bat gehitu dezakezu jarraian."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
-msgstr ""
+msgstr "{name} \"{obj}\" ondo aldatu da."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -212,6 +231,7 @@ msgstr "%(name)s \"%(obj)s\" ondo ezabatu da."
 #, python-format
 msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
 msgstr ""
+"\"%(key)s\" ID dun %(name)s ez dira existitzen. Agian ezabatua izan da?"
 
 #, python-format
 msgid "Add %s"
@@ -220,6 +240,10 @@ msgstr "Gehitu %s"
 #, python-format
 msgid "Change %s"
 msgstr "Aldatu %s"
+
+#, python-format
+msgid "View %s"
+msgstr "%s ikusi"
 
 msgid "Database error"
 msgstr "Errorea datu-basean"
@@ -273,7 +297,7 @@ msgstr "Sartu"
 
 #, python-format
 msgid "%(app)s administration"
-msgstr ""
+msgstr "%(app)s kudeaketa"
 
 msgid "Page not found"
 msgstr "Ez da orririk aurkitu"
@@ -301,7 +325,7 @@ msgstr ""
 "bidez eta laster egon beharko luke konponduta. Barkatu eragozpenak."
 
 msgid "Run the selected action"
-msgstr "Burutu hautatutako ekintza"
+msgstr "Burutu aukeratutako ekintza"
 
 msgid "Go"
 msgstr "Joan"
@@ -330,10 +354,10 @@ msgid "Change password"
 msgstr "Aldatu pasahitza"
 
 msgid "Please correct the error below."
-msgstr "Zuzendu azpiko erroreak."
+msgstr "Mesedez zuzendu erroreak behean."
 
 msgid "Please correct the errors below."
-msgstr ""
+msgstr "Mesedez zuzendu erroreak behean."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
@@ -360,7 +384,7 @@ msgid "History"
 msgstr "Historia"
 
 msgid "View on site"
-msgstr "Ikusi gunean"
+msgstr "Webgunean ikusi"
 
 msgid "Filter"
 msgstr "Iragazkia"
@@ -410,7 +434,7 @@ msgid "Yes, I'm sure"
 msgstr "Bai, ziur nago"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "Ez, itzuli atzera"
 
 msgid "Delete multiple objects"
 msgstr "Ezabatu hainbat objektu"
@@ -421,7 +445,7 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Hautatutako %(objects_name)s ezabatzeak erlazionatutako objektuak ezabatzea "
+"Aukeratutako %(objects_name)s ezabatzeak erlazionatutako objektuak ezabatzea "
 "eskatzen du baina zure kontuak ez dauka baimen nahikorik objektu mota hauek "
 "ezabatzeko: "
 
@@ -430,7 +454,7 @@ msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
-"Hautatutako %(objects_name)s ezabatzeak erlazionatutako objektu babestu "
+"Aukeratutako %(objects_name)s ezabatzeak erlazionatutako objektu babestu "
 "hauek ezabatzea eskatzen du:"
 
 #, python-format
@@ -438,11 +462,11 @@ msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"Ziur zaude hautatutako %(objects_name)s ezabatu nahi duzula? Objektu guzti "
+"Ziur zaude aukeratutako %(objects_name)s ezabatu nahi duzula? Objektu guzti "
 "hauek eta erlazionatutako elementu guztiak ezabatuko dira:"
 
-msgid "Change"
-msgstr "Aldatu"
+msgid "View"
+msgstr "Ikusi"
 
 msgid "Delete?"
 msgstr "Ezabatu?"
@@ -461,8 +485,8 @@ msgstr "%(name)s aplikazioaren modeloak"
 msgid "Add"
 msgstr "Gehitu"
 
-msgid "You don't have permission to edit anything."
-msgstr "Ez daukazu ezer aldatzeko baimenik."
+msgid "You don't have permission to view or edit anything."
+msgstr "Ez duzu ezer ikusi edo ezabatzeko baimenik."
 
 msgid "Recent actions"
 msgstr "Azken ekintzak"
@@ -489,6 +513,8 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
+"%(username)s bezala autentikatu zara, baina ez daukazu orrialde honetara "
+"sarbidea. Nahi al duzu kontu ezberdin batez sartu?"
 
 msgid "Forgotten your password or username?"
 msgstr "Pasahitza edo erabiltzaile-izena ahaztu duzu?"
@@ -515,20 +541,8 @@ msgstr "Erakutsi dena"
 msgid "Save"
 msgstr "Gorde"
 
-msgid "Popup closing..."
-msgstr ""
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr ""
+msgid "Popup closing…"
+msgstr "Popup leihoa ixten..."
 
 msgid "Search"
 msgstr "Bilatu"
@@ -547,10 +561,28 @@ msgid "Save as new"
 msgstr "Gorde berri gisa"
 
 msgid "Save and add another"
-msgstr "Gorde eta gehitu beste bat"
+msgstr "Gorde eta beste bat gehitu"
 
 msgid "Save and continue editing"
-msgstr "Gorde eta jarraitu editatzen"
+msgstr "Gorde eta editatzen jarraitu"
+
+msgid "Save and view"
+msgstr "Gorde eta ikusi"
+
+msgid "Close"
+msgstr "Itxi"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Aldatu aukeratutako %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Gehitu beste %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Ezabatu aukeratutako %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Eskerrik asko webguneari zure probetxuzko denbora eskaintzeagatik."
@@ -572,7 +604,7 @@ msgstr ""
 "bi aldiz, akatsik egiten ez duzula ziurta dezagun."
 
 msgid "Change my password"
-msgstr "Aldatu nire pasahitza"
+msgstr "Nire pasahitza aldatu"
 
 msgid "Password reset"
 msgstr "Berrezarri pasahitza"
@@ -655,11 +687,15 @@ msgstr "Data guztiak"
 
 #, python-format
 msgid "Select %s"
-msgstr "Hautatu %s"
+msgstr "Aukeratu %s"
 
 #, python-format
 msgid "Select %s to change"
-msgstr "Hautatu %s aldatzeko"
+msgstr "Aukeratu %s aldatzeko"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Aukeratu %s ikusteko"
 
 msgid "Date:"
 msgstr "Data:"

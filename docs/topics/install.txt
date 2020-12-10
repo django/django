@@ -7,18 +7,11 @@ This document will get you up and running with Django.
 Install Python
 ==============
 
-Being a Python Web framework, Django requires Python. See
-:ref:`faq-python-version-support` for details.
+Django is a Python Web framework. See :ref:`faq-python-version-support` for
+details.
 
 Get the latest version of Python at https://www.python.org/downloads/ or with
 your operating system's package manager.
-
-.. admonition:: Django on Jython
-
-    If you use Jython_ (a Python implementation for the Java platform), you'll
-    need to follow a few additional steps. See :doc:`/howto/jython` for details.
-
-.. _jython: http://jython.org/
 
 .. admonition:: Python on Windows
 
@@ -34,19 +27,19 @@ testing, so you won't need to set up Apache until you're ready to
 deploy Django in production.
 
 If you want to use Django on a production site, use `Apache`_ with
-`mod_wsgi`_. mod_wsgi can operate in one of two modes: an embedded
-mode and a daemon mode. In embedded mode, mod_wsgi is similar to
+`mod_wsgi`_. mod_wsgi operates in one of two modes: embedded
+mode or daemon mode. In embedded mode, mod_wsgi is similar to
 mod_perl -- it embeds Python within Apache and loads Python code into
 memory when the server starts. Code stays in memory throughout the
 life of an Apache process, which leads to significant performance
 gains over other server arrangements. In daemon mode, mod_wsgi spawns
 an independent daemon process that handles requests. The daemon
 process can run as a different user than the Web server, possibly
-leading to improved security, and the daemon process can be restarted
+leading to improved security. The daemon process can be restarted
 without restarting the entire Apache Web server, possibly making
 refreshing your codebase more seamless. Consult the mod_wsgi
 documentation to determine which mode is right for your setup. Make
-sure you have Apache installed, with the mod_wsgi module activated.
+sure you have Apache installed with the mod_wsgi module activated.
 Django will work with any version of Apache that supports mod_wsgi.
 
 See :doc:`How to use Django with mod_wsgi </howto/deployment/wsgi/modwsgi>`
@@ -59,8 +52,8 @@ very well with `nginx`_. Additionally, Django follows the WSGI spec
 (:pep:`3333`), which allows it to run on a variety of server platforms.
 
 .. _Apache: https://httpd.apache.org/
-.. _nginx: http://nginx.org/
-.. _mod_wsgi: http://www.modwsgi.org/
+.. _nginx: https://nginx.org/
+.. _mod_wsgi: https://modwsgi.readthedocs.io/en/develop/
 
 .. _database-installation:
 
@@ -69,14 +62,14 @@ Get your database running
 
 If you plan to use Django's database API functionality, you'll need to make
 sure a database server is running. Django supports many different database
-servers and is officially supported with PostgreSQL_, MySQL_, Oracle_ and
-SQLite_.
+servers and is officially supported with PostgreSQL_, MariaDB_, MySQL_, Oracle_
+and SQLite_.
 
-If you are developing a simple project or something you don't plan to deploy
-in a production environment, SQLite is generally the simplest option as it
-doesn't require running a separate server. However, SQLite has many differences
-from other databases, so if you are working on something substantial, it's
-recommended to develop with the same database as you plan on using in
+If you are developing a small project or something you don't plan to deploy in
+a production environment, SQLite is generally the best option as it doesn't
+require running a separate server. However, SQLite has many differences from
+other databases, so if you are working on something substantial, it's
+recommended to develop with the same database that you plan on using in
 production.
 
 In addition to the officially supported databases, there are :ref:`backends
@@ -89,7 +82,7 @@ database bindings are installed.
 * If you're using PostgreSQL, you'll need the `psycopg2`_ package. Refer to the
   :ref:`PostgreSQL notes <postgresql-notes>` for further details.
 
-* If you're using MySQL, you'll need a :ref:`DB API driver
+* If you're using MySQL or MariaDB, you'll need a :ref:`DB API driver
   <mysql-db-api-drivers>` like ``mysqlclient``. See :ref:`notes for the MySQL
   backend <mysql-notes>` for details.
 
@@ -107,42 +100,21 @@ If you plan to use Django's ``manage.py migrate`` command to automatically
 create database tables for your models (after first installing Django and
 creating a project), you'll need to ensure that Django has permission to create
 and alter tables in the database you're using; if you plan to manually create
-the tables, you can simply grant Django ``SELECT``, ``INSERT``, ``UPDATE`` and
-``DELETE`` permissions. After creating a database user with these
-permissions, you'll specify the details in your project's settings file,
-see :setting:`DATABASES` for details.
+the tables, you can grant Django ``SELECT``, ``INSERT``, ``UPDATE`` and
+``DELETE`` permissions. After creating a database user with these permissions,
+you'll specify the details in your project's settings file, see
+:setting:`DATABASES` for details.
 
 If you're using Django's :doc:`testing framework</topics/testing/index>` to test
 database queries, Django will need permission to create a test database.
 
 .. _PostgreSQL: https://www.postgresql.org/
+.. _MariaDB: https://mariadb.org/
 .. _MySQL: https://www.mysql.com/
-.. _psycopg2: http://initd.org/psycopg/
+.. _psycopg2: https://www.psycopg.org/
 .. _SQLite: https://www.sqlite.org/
 .. _cx_Oracle: https://oracle.github.io/python-cx_Oracle/
 .. _Oracle: https://www.oracle.com/
-
-.. _removing-old-versions-of-django:
-
-Remove any old versions of Django
-=================================
-
-If you are upgrading your installation of Django from a previous version,
-you will need to uninstall the old Django version before installing the
-new version.
-
-If you installed Django using pip_ or ``easy_install`` previously, installing
-with pip_ or ``easy_install`` again will automatically take care of the old
-version, so you don't need to do it yourself.
-
-If you previously installed Django using ``python setup.py install``,
-uninstalling is as simple as deleting the ``django`` directory from your Python
-``site-packages``. To find the directory you need to remove, you can run the
-following at your shell prompt (not the interactive Python prompt):
-
-.. code-block:: console
-
-    $ python -c "import django; print(django.__path__)"
 
 .. _install-django-code:
 
@@ -153,8 +125,6 @@ Installation instructions are slightly different depending on whether you're
 installing a distribution-specific package, downloading the latest official
 release, or fetching the latest development version.
 
-It's easy, no matter which way you choose.
-
 .. _installing-official-release:
 
 Installing an official release with ``pip``
@@ -162,23 +132,24 @@ Installing an official release with ``pip``
 
 This is the recommended way to install Django.
 
-1. Install pip_. The easiest is to use the `standalone pip installer`_. If your
+#. Install pip_. The easiest is to use the `standalone pip installer`_. If your
    distribution already has ``pip`` installed, you might need to update it if
    it's outdated. If it's outdated, you'll know because installation won't
    work.
 
-2. Take a look at virtualenv_ and virtualenvwrapper_. These tools provide
+#. Take a look at :doc:`venv <python:tutorial/venv>`. This tool provides
    isolated Python environments, which are more practical than installing
-   packages systemwide. They also allow installing packages without
+   packages systemwide. It also allows installing packages without
    administrator privileges. The :doc:`contributing tutorial
-   </intro/contributing>` walks through how to create a virtualenv.
+   </intro/contributing>` walks through how to create a virtual environment.
 
-3. After you've created and activated a virtual environment, enter the command
-   ``pip install Django`` at the shell prompt.
+#. After you've created and activated a virtual environment, enter the command:
+
+   .. console::
+
+        $ python -m pip install Django
 
 .. _pip: https://pip.pypa.io/
-.. _virtualenv: https://virtualenv.pypa.io/
-.. _virtualenvwrapper: https://virtualenvwrapper.readthedocs.io/en/latest/
 .. _standalone pip installer: https://pip.pypa.io/en/latest/installing/#installing-with-get-pip-py
 
 .. _installing-distribution-package:
@@ -189,7 +160,7 @@ Installing a distribution-specific package
 Check the :doc:`distribution specific notes </misc/distributions>` to see if
 your platform/distribution provides official Django packages/installers.
 Distribution-provided packages will typically allow for automatic installation
-of dependencies and easy upgrade paths; however, these packages will rarely
+of dependencies and supported upgrade paths; however, these packages will rarely
 contain the latest release of Django.
 
 .. _installing-development-version:
@@ -213,34 +184,35 @@ Installing the development version
 If you'd like to be able to update your Django code occasionally with the
 latest bug fixes and improvements, follow these instructions:
 
-1. Make sure that you have Git_ installed and that you can run its commands
+#. Make sure that you have Git_ installed and that you can run its commands
    from a shell. (Enter ``git help`` at a shell prompt to test this.)
 
-2. Check out Django's main development branch like so:
+#. Check out Django's main development branch like so:
 
-   .. code-block:: console
+   .. console::
 
         $ git clone https://github.com/django/django.git
 
    This will create a directory ``django`` in your current directory.
 
-3. Make sure that the Python interpreter can load Django's code. The most
-   convenient way to do this is to use virtualenv_, virtualenvwrapper_, and
-   pip_. The :doc:`contributing tutorial </intro/contributing>` walks through
-   how to create a virtualenv.
+#. Make sure that the Python interpreter can load Django's code. The most
+   convenient way to do this is to use a virtual environment and pip_. The
+   :doc:`contributing tutorial </intro/contributing>` walks through how to
+   create a virtual environment.
 
-4. After setting up and activating the virtualenv, run the following command:
+#. After setting up and activating the virtual environment, run the following
+   command:
 
-   .. code-block:: console
+   .. console::
 
-        $ pip install -e django/
+        $ python -m pip install -e django/
 
    This will make Django's code importable, and will also make the
    ``django-admin`` utility command available. In other words, you're all
    set!
 
-When you want to update your copy of the Django source code, just run the
-command ``git pull`` from within the ``django`` directory. When you do this,
-Git will automatically download any changes.
+When you want to update your copy of the Django source code, run the command
+``git pull`` from within the ``django`` directory. When you do this, Git will
+download any changes.
 
 .. _Git: https://git-scm.com/

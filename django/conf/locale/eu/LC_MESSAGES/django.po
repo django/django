@@ -3,20 +3,21 @@
 # Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2013,2016
 # Ander Martínez <ander.basaundi@gmail.com>, 2013-2014
-# Eneko Illarramendi <eneko@illarra.com>, 2017
+# Eneko Illarramendi <eneko@illarra.com>, 2017-2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jazpillaga <jazpillaga@codesyntax.com>, 2011
-# julen <julenx@gmail.com>, 2011-2012
-# julen <julenx@gmail.com>, 2013,2015
+# julen, 2011-2012
+# julen, 2013,2015
 # totorika93 <totorika93@gmail.com>, 2012
 # Unai Zalakain <inactive+unaizalakain@transifex.com>, 2013
+# Urtzi Odriozola <urtzi.odriozola@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-03-22 15:06+0000\n"
-"Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
+"POT-Creation-Date: 2019-09-27 22:40+0200\n"
+"PO-Revision-Date: 2019-11-05 00:38+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -144,6 +145,9 @@ msgstr "Goi-sorbiera"
 msgid "Hungarian"
 msgstr "Hungariera"
 
+msgid "Armenian"
+msgstr "Armeniera"
+
 msgid "Interlingua"
 msgstr "Interlingua"
 
@@ -164,6 +168,9 @@ msgstr "Japoniera"
 
 msgid "Georgian"
 msgstr "Georgiera"
+
+msgid "Kabyle"
+msgstr "Kabylera"
 
 msgid "Kazakh"
 msgstr "Kazakhera"
@@ -279,6 +286,9 @@ msgstr "Ukrainera"
 msgid "Urdu"
 msgstr "Urdua"
 
+msgid "Uzbek"
+msgstr ""
+
 msgid "Vietnamese"
 msgstr "Vietnamera"
 
@@ -321,17 +331,15 @@ msgstr "Idatzi baleko zenbaki bat."
 msgid "Enter a valid email address."
 msgstr "Idatzi baleko helbide elektroniko bat."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Idatzi hizki, zenbaki, azpimarra edo marratxoz osatutako baleko 'slug' bat."
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Idatzi Unicode hizki, zenbaki, azpimarra edo marratxoz osatutako baleko "
-"'slug' bat."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Idatzi baleko IPv4 sare-helbide bat."
@@ -386,6 +394,9 @@ msgstr[1] ""
 "Ziurtatu balio honek gehienez %(limit_value)d karaktere dituela "
 "(%(show_value)d ditu)."
 
+msgid "Enter a number."
+msgstr "Idatzi zenbaki bat."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -408,11 +419,12 @@ msgstr[1] "Ziurtatu ez dagoela %(max)s digitu baino gehiago komaren aurretik."
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
-"'%(extension)s' fitxategi-luzapena ez da balekoa. Hauek dira onartutako "
-"fitxategi-luzapenak: '%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Null karaktereak ez daude baimenduta."
 
 msgid "and"
 msgstr "eta"
@@ -447,19 +459,13 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr "Eremuaren mota: %(field_type)s"
 
-msgid "Integer"
-msgstr "Zenbaki osoa"
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr ""
 
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr "'%(value)s' balioak integer bat izan behar du."
-
-msgid "Big (8 byte) integer"
-msgstr "Zenbaki osoa (handia 8 byte)"
-
-#, python-format
-msgid "'%(value)s' value must be either True or False."
-msgstr "'%(value)s' balioak True edo False izan behar du."
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolearra (True edo False)"
@@ -473,57 +479,46 @@ msgstr "Komaz bereiztutako zenbaki osoak"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"'%(value)s' balioak ez dauka data formatu zuzena. Formatu zuzena UUUU-HH-EE "
-"da."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"'%(value)s' balioak formatu zuzena (UUUU-HH-EE) dauka, baina ez da data "
-"zuzen bat."
 
 msgid "Date (without time)"
 msgstr "Data (ordurik gabe)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"'%(value)s' balioak ez dauka formatu zuzena. Formatu zuzena UUUU-HH-EE OO:"
-"MM[:ss[.uuuuuu]][TZ] da."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"'%(value)s' balioak formatu zuzena dauka (UUUU-HH-EE OO:MM[:ss[.uuuuuu]]"
-"[TZ]),\n"
-"baina ez da data/ordu zuzena."
 
 msgid "Date (with time)"
 msgstr "Data (orduarekin)"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
-msgstr "'%(value)s' balioak zenbaki hamartarra izan behar du."
+msgid "“%(value)s” value must be a decimal number."
+msgstr ""
 
 msgid "Decimal number"
 msgstr "Zenbaki hamartarra"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"'%(value)s' balioak ez dauka foramtu zuzena.  [EE] [OO:[MM:]]ss[.uuuuuu] "
-"formatuan egon behar da."
 
 msgid "Duration"
 msgstr "Iraupena"
@@ -535,11 +530,21 @@ msgid "File path"
 msgstr "Fitxategiaren bidea"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
-msgstr "'%(value)s' balioak float bat izan behar du."
+msgid "“%(value)s” value must be a float."
+msgstr ""
 
 msgid "Floating point number"
 msgstr "Koma higikorreko zenbakia (float)"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr ""
+
+msgid "Integer"
+msgstr "Zenbaki osoa"
+
+msgid "Big (8 byte) integer"
+msgstr "Zenbaki osoa (handia 8 byte)"
 
 msgid "IPv4 address"
 msgstr "IPv4 sare-helbidea"
@@ -548,8 +553,8 @@ msgid "IP address"
 msgstr "IP helbidea"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
-msgstr "'%(value)s' balioak True, False edo None izan behar du."
+msgid "“%(value)s” value must be either None, True or False."
+msgstr ""
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolearra (True, False edo None)"
@@ -572,20 +577,15 @@ msgstr "Testua"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"'%(value)s' balioak ez dauka formatu zuzena. OO:MM[:ss[.uuuuuu]] formatuan "
-"egon behar du."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"'%(value)s' balioak formatu zuzena dauka (OO:MM[:ss[.uuuuuu]]) baina ez da "
-"ordu \n"
-"zuzena"
 
 msgid "Time"
 msgstr "Ordua"
@@ -597,8 +597,11 @@ msgid "Raw binary data"
 msgstr "Datu bitar gordinak"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
-msgstr "'%(value)s' ez da baleko UUID bat."
+msgid "“%(value)s” is not a valid UUID."
+msgstr ""
+
+msgid "Universally unique identifier"
+msgstr "\"Universally unique identifier\""
 
 msgid "File"
 msgstr "Fitxategia"
@@ -641,9 +644,6 @@ msgstr "Eremu hau beharrezkoa da."
 msgid "Enter a whole number."
 msgstr "Idatzi zenbaki oso bat."
 
-msgid "Enter a number."
-msgstr "Idatzi zenbaki bat."
-
 msgid "Enter a valid date."
 msgstr "Idatzi baleko data bat."
 
@@ -655,6 +655,10 @@ msgstr "Idatzi baleko data/ordu bat."
 
 msgid "Enter a valid duration."
 msgstr "Idatzi baleko iraupen bat."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Egun kopuruak {min_days} eta {max_days} artean egon behar du."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Ez da fitxategirik bidali. Egiaztatu formularioaren kodeketa-mota."
@@ -747,23 +751,21 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Zuzendu hurrengo balio bikoiztuak."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "Barneko gakoa eta gurasoaren gakoa ez datoz bat."
+msgid "The inline value did not match the parent instance."
+msgstr "Barneko balioa eta gurasoaren instantzia ez datoz bat."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Hautatu aukera zuzen bat. Hautatutakoa ez da zuzena."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" ez da balio egokia lehen mailako gakoentzat."
+msgid "“%(pk)s” is not a valid value."
+msgstr ""
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
-"%(datetime)s ezin da interpretatu %(current_timezone)s ordu-eremuan;\n"
-"baliteke ez existitzea edo anbiguoa izatea"
 
 msgid "Clear"
 msgstr "Garbitu"
@@ -782,6 +784,15 @@ msgstr "Bai"
 
 msgid "No"
 msgstr "Ez"
+
+msgid "Year"
+msgstr ""
+
+msgid "Month"
+msgstr ""
+
+msgid "Day"
+msgstr ""
 
 msgid "yes,no,maybe"
 msgstr "bai,ez,agian"
@@ -1045,8 +1056,8 @@ msgstr "Hau ez da baleko IPv6 helbide bat."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "edo"
@@ -1101,24 +1112,25 @@ msgid "CSRF verification failed. Request aborted."
 msgstr "CSRF egiaztapenak huts egin du. Eskaera abortatu da."
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Mezu hau ikusten ari zara HTTPS gune honek, zure nabigatzaileak 'Referer "
-"header' bat bidaltzea behar duelako, baina ez du batere bidali. Goiburuko "
-"hau zure nabigatzailea beste norbaitek ordeztu ez duela ziurtatzeko eskatzen "
-"da."
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
 msgstr ""
-"Zure nabigatzailera 'Refere' goiburukoak desgaitzeko konfiguratu baldin "
-"baduzu, mesedez, gune honetarako, HTTPS konexio edo 'same-origin' "
-"eskaeretarako  gaitu berriro."
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
+msgstr ""
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1131,39 +1143,17 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
-"Nabigatzailea cookiak desgaitzeko konfiguratu baldin baduzu, mesedez "
-"aktibatu behintzat gune honetarako, edo 'same-origin' eskaeretarako."
 
 msgid "More information is available with DEBUG=True."
 msgstr "Informazio gehiago erabilgarri dago DEBUG=True ezarrita."
 
-msgid "Welcome to Django"
-msgstr "Ongi etorri Djangora"
-
-msgid "It worked!"
-msgstr "Badabil!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Zorionak Djangorekin egindako zure lehen orrian."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Jarraian sortu zure lehen aplikazioa <code>python manage.py startapp "
-"[aplikazioaren_etiketa]</code> exekutatuz."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Mezu hay Djangoren settings fitxategian code>DEBUG = True</code> jarrita "
-"daukazulako eta oraindik URLrik gehitu ez duzulako agertzen da. Lanera!"
-
 msgid "No year specified"
 msgstr "Ez da urterik zehaztu"
+
+msgid "Date out of range"
+msgstr "Data baliozko tartetik kanpo"
 
 msgid "No month specified"
 msgstr "Ez da hilabeterik zehaztu"
@@ -1187,31 +1177,76 @@ msgstr ""
 "allow_future False delako"
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
-msgstr "%(datestr)s data string okerra '%(format)s' formaturako"
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr ""
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "Bilaketarekin bat datorren %(verbose_name)s-rik ez dago"
 
-msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "Orria ez da azkena, hortaz ezin da osokora (int) biurtu."
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr ""
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "Orri baliogabea (%(page_number)s):%(message)s"
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr "Zerrenda hutsa eta '%(class_name)s.allow_empty' False da"
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr ""
 
 msgid "Directory indexes are not allowed here."
 msgstr "Direktorio zerrendak ez daude baimenduak."
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" ez da existitzen"
+msgid "“%(path)s” does not exist"
+msgstr ""
 
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "%(directory)s zerrenda"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: epeekin perfekzionistak direnentzat Web frameworka."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Ikusi Django %(version)s-ren <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/releases/\" target=\"_blank\" rel=\"noopener\">argitaratze "
+"oharrak</a>"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Instalazioak arrakastaz funtzionatu du! Zorionak!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Zure settings fitxategian <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> jarrita eta URLrik konfiguratu gabe duzulako ari zara "
+"ikusten orrialde hau."
+
+msgid "Django Documentation"
+msgstr "Django dokumentazioa"
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr "Tutoriala: Galdetegi aplikazioa"
+
+msgid "Get started with Django"
+msgstr "Hasi Djangorekin"
+
+msgid "Django Community"
+msgstr "Django Komunitatea"
+
+msgid "Connect, get help, or contribute"
+msgstr "Konektatu, lortu laguntza edo lagundu"

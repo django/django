@@ -2,22 +2,33 @@
 #
 # Translators:
 # BJ Jang <qgis.tr.kr@gmail.com>, 2014
+# JunGu Kang <chr0m3.kr@gmail.com>, 2017
 # Jiyoon, Ha <cryptography@konkuk.ac.kr>, 2016
+# DONGHO JEONG <nearermg@gmail.com>, 2020
+# Park Hyunwoo <ez.amiryo@gmail.com>, 2017
+# Geonho Kim / Leo Kim <gh.leokim@gmail.com>, 2019
+# hoseung2 <ghyutjik123@gmail.com>, 2017
 # Ian Y. Choi <ianyrchoi@gmail.com>, 2015
 # Jaehong Kim <mixe@korea.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jay Oh <theanswer.jay@gmail.com>, 2020
 # Le Tartuffe <magno79@gmail.com>, 2014,2016
+# Jonghwa Seo <dev@pincoin.co.kr>, 2019
+# Jubeen Lee <ljb7977@gmail.com>, 2020
 # JuneHyeon Bae <devunt@gmail.com>, 2014
-# Chr0m3 <chr0m3.kr@gmail.com>, 2015
+# JunGu Kang <chr0m3.kr@gmail.com>, 2015
+# JunGu Kang <chr0m3.kr@gmail.com>, 2019
+# Kagami Sascha Rosylight <saschanaz@outlook.com>, 2017
+# Seho Noh <iam@sehonoh.kr>, 2018
 # Subin Choi <os1742@gmail.com>, 2016
 # Taesik Yoon <xotlr43@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 09:03+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-09-05 12:57+0000\n"
+"Last-Translator: DONGHO JEONG <nearermg@gmail.com>\n"
 "Language-Team: Korean (http://www.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,6 +41,9 @@ msgstr "아프리칸스어"
 
 msgid "Arabic"
 msgstr "아랍어"
+
+msgid "Algerian Arabic"
+msgstr "알제리 아랍어"
 
 msgid "Asturian"
 msgstr "호주어"
@@ -145,11 +159,17 @@ msgstr "고지 소르브어"
 msgid "Hungarian"
 msgstr "헝가리어"
 
+msgid "Armenian"
+msgstr "아르메니아어"
+
 msgid "Interlingua"
 msgstr "인테르링구아어"
 
 msgid "Indonesian"
 msgstr "인도네시아어"
+
+msgid "Igbo"
+msgstr "이그보어"
 
 msgid "Ido"
 msgstr "이도어"
@@ -166,6 +186,9 @@ msgstr "일본어"
 msgid "Georgian"
 msgstr "조지아어"
 
+msgid "Kabyle"
+msgstr "커바일어"
+
 msgid "Kazakh"
 msgstr "카자흐어"
 
@@ -177,6 +200,9 @@ msgstr "칸나다어"
 
 msgid "Korean"
 msgstr "한국어"
+
+msgid "Kyrgyz"
+msgstr "키르키즈 공화국어"
 
 msgid "Luxembourgish"
 msgstr "룩셈부르크"
@@ -262,8 +288,14 @@ msgstr "타밀어"
 msgid "Telugu"
 msgstr "텔루구어"
 
+msgid "Tajik"
+msgstr "타지크어"
+
 msgid "Thai"
 msgstr "태국어"
+
+msgid "Turkmen"
+msgstr "튀르크멘어"
 
 msgid "Turkish"
 msgstr "터키어"
@@ -279,6 +311,9 @@ msgstr "우크라이나어"
 
 msgid "Urdu"
 msgstr "우르드어"
+
+msgid "Uzbek"
+msgstr "우즈베크어"
 
 msgid "Vietnamese"
 msgstr "베트남어"
@@ -302,13 +337,13 @@ msgid "Syndication"
 msgstr "신디케이션"
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "페이지 번호가 정수가 아닙니다."
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "페이지 번호가 1보다 작습니다."
 
 msgid "That page contains no results"
-msgstr ""
+msgstr "해당 페이지에 결과가 없습니다."
 
 msgid "Enter a valid value."
 msgstr "올바른 값을 입력하세요."
@@ -322,12 +357,13 @@ msgstr "올바른 정수를 입력하세요."
 msgid "Enter a valid email address."
 msgstr "올바른 이메일 주소를 입력하세요."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr "문자, 숫자, '_', '-'만 가능합니다."
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
 "유니코드 문자, 숫자, 언더스코어 또는 하이픈으로 구성된 올바른 내용을 입력하세"
@@ -381,6 +417,9 @@ msgstr[0] ""
 "이 값이 최대 %(limit_value)d 개의 글자인지 확인하세요(입력값 %(show_value)d "
 "자)."
 
+msgid "Enter a number."
+msgstr "숫자를 입력하세요."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -400,9 +439,14 @@ msgstr[0] "전체 유효자리 개수가 %(max)s 개를 넘지 않도록 해주�
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
+"파일 확장자 '%(extension)s'는 허용되지 않습니다. 허용된 확장자: "
+"'%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "null 문자는 사용할 수 없습니다. "
 
 msgid "and"
 msgstr "또한"
@@ -438,22 +482,16 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr "%(field_type)s 형식 필드"
 
-msgid "Integer"
-msgstr "정수"
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr "'%(value)s' 값은 반드시 True 또는 False 중 하나여야만 합니다."
 
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr "'%(value)s' 값은 정수를 입력 하여야 합니다."
-
-msgid "Big (8 byte) integer"
-msgstr "큰 정수 (8 byte)"
-
-#, python-format
-msgid "'%(value)s' value must be either True or False."
-msgstr "'%(value)s' 값은 값이 없거나, 참 또는 거짓 중 하나 여야 합니다."
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr "'%(value)s'값은 반드시 True, False, None 중 하나여야만 합니다."
 
 msgid "Boolean (Either True or False)"
-msgstr "boolean(참 또는 거짓)"
+msgstr "boolean(True 또는 False)"
 
 #, python-format
 msgid "String (up to %(max_length)s)"
@@ -464,23 +502,23 @@ msgstr "정수(콤마로 구분)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
-msgstr ""
-"'%(value)s' 값은  날짜 형식이 아닙니다. YYYY-MM-DD 형식이 되어야 합니다."
+msgstr "'%(value)s' 값은  날짜 형식이 아닙니다. YYYY-MM-DD 형식이어야 합니다."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
-msgstr "'%(value)s' 값은 올바른 형식(YYYY-MM-DD)이나 유효하지 않은 날자입니다."
+msgstr ""
+"'%(value)s' 값은 올바른 형식(YYYY-MM-DD)이지만 유효하지 않은 날짜입니다."
 
 msgid "Date (without time)"
 msgstr "날짜(시간 제외)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
 "'%(value)s' 값은 올바르지 않은 형식입니다. YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
@@ -488,17 +526,17 @@ msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"'%(value)s' 값은 맞는 포맷이지만 (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) 유효하"
-"지 않은 date/time입니다."
+"'%(value)s' 값은 올바른 형식이지만 (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) 유효"
+"하지 않은 날짜/시간입니다."
 
 msgid "Date (with time)"
 msgstr "날짜(시간 포함)"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
+msgid "“%(value)s” value must be a decimal number."
 msgstr "'%(value)s' 값은 10진수를 입력하여야 합니다."
 
 msgid "Decimal number"
@@ -506,7 +544,7 @@ msgstr "10진수"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
 "'%(value)s' 값은 올바르지 않은 형식입니다. [DD] [HH:[MM:]]ss[.uuuuuu] 형식이"
@@ -522,11 +560,21 @@ msgid "File path"
 msgstr "파일 경로"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
-msgstr "'%(value)s' 값은 실수를 입력하여야 합니다."
+msgid "“%(value)s” value must be a float."
+msgstr "\"%(value)s\" 값은 실수를 입력하여야 합니다."
 
 msgid "Floating point number"
 msgstr "부동소수점 숫자"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr "\"%(value)s\" 값은 정수를 입력하여야 합니다."
+
+msgid "Integer"
+msgstr "정수"
+
+msgid "Big (8 byte) integer"
+msgstr "큰 정수 (8 byte)"
 
 msgid "IPv4 address"
 msgstr "IPv4 주소"
@@ -535,11 +583,14 @@ msgid "IP address"
 msgstr "IP 주소"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
-msgstr "'%(value)s' 값은 값이 없거나, 참 또는 거짓 중 하나 이어야 합니다."
+msgid "“%(value)s” value must be either None, True or False."
+msgstr "\"%(value)s\" 값은 반드시 None, True 또는 False이어야 합니다."
 
 msgid "Boolean (Either True, False or None)"
-msgstr "boolean (참, 거짓 또는 none)"
+msgstr "boolean (True, False 또는 None)"
+
+msgid "Positive big integer"
+msgstr "큰 양의 정수"
 
 msgid "Positive integer"
 msgstr "양의 정수"
@@ -559,19 +610,19 @@ msgstr "텍스트"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"'%(value)s' 값은 올바르지 않은 형식입니다. HH:MM[:ss[.uuuuuu]] 형식이어야 합"
-"니다."
+"\"%(value)s\" 값의 형식이 올바르지 않습니다. HH:MM[:ss[.uuuuuu]] 형식이어야 "
+"합니다."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"'%(value)s' 값은 올바른 형식(HH:MM[:ss[.uuuuuu]])이나, 유효하지 않은 시간입니"
-"다."
+"\"%(value)s\" 값이 올바른 형식(HH:MM[:ss[.uuuuuu]])이나, 유효하지 않은 시간 "
+"값입니다."
 
 msgid "Time"
 msgstr "시각"
@@ -583,14 +634,23 @@ msgid "Raw binary data"
 msgstr "Raw binary data"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
-msgstr "'%(value)s' 은 유효하지 않은 UUID 입니다."
+msgid "“%(value)s” is not a valid UUID."
+msgstr "\"%(value)s\"은 유효하지 않은 UUID입니다."
+
+msgid "Universally unique identifier"
+msgstr "범용 고유 식별 수단(UUID)"
 
 msgid "File"
 msgstr "파일"
 
 msgid "Image"
 msgstr "이미지"
+
+msgid "A JSON object"
+msgstr "JSON 객체"
+
+msgid "Value must be valid JSON."
+msgstr "올바른 JSON 형식이여야 합니다."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -625,9 +685,6 @@ msgstr "필수 항목입니다."
 msgid "Enter a whole number."
 msgstr "정수를 입력하세요."
 
-msgid "Enter a number."
-msgstr "숫자를 입력하세요."
-
 msgid "Enter a valid date."
 msgstr "올바른 날짜를 입력하세요."
 
@@ -639,6 +696,10 @@ msgstr "올바른 날짜/시각을 입력하세요."
 
 msgid "Enter a valid duration."
 msgstr "올바른 기간을 입력하세요."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "날짜는 {min_days}와 {max_days} 사이여야 합니다."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "등록된 파일이 없습니다. 인코딩 형식을 확인하세요."
@@ -656,7 +717,8 @@ msgid_plural ""
 msgstr[0] "파일이름의 길이가 최대 %(max)d 자인지 확인하세요(%(length)d 자)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
-msgstr "파일을 보내거나 취소 체크박스를 체크하세요. 또는 둘다 비워두세요."
+msgstr ""
+"파일 업로드 또는 삭제 체크박스를 선택하세요. 동시에 둘 다 할 수는 없습니다."
 
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
@@ -677,6 +739,9 @@ msgstr "완전한 값을 입력하세요."
 
 msgid "Enter a valid UUID."
 msgstr "올바른 UUID를 입력하세요."
+
+msgid "Enter a valid JSON."
+msgstr "올바른 JSON을 입력하세요."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -724,19 +789,19 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "아래의 중복된 값들을 고쳐주세요."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "부모 오브젝트의 primary key와 inline foreign key가 맞지 않습니다."
+msgid "The inline value did not match the parent instance."
+msgstr "Inline 값이 부모 인스턴스와 일치하지 않습니다."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "올바르게 선택해 주세요. 선택하신 것이 선택가능항목에 없습니다."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\"은/는 primary key로 적합하지 않습니다."
+msgid "“%(pk)s” is not a valid value."
+msgstr "\"%(pk)s\" 은/는 유효한 값이 아닙니다."
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
 "%(datetime)s 은/는 %(current_timezone)s 시간대에서 해석될 수 없습니다; 정보"
@@ -760,6 +825,7 @@ msgstr "예"
 msgid "No"
 msgstr "아니오"
 
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "예,아니오,아마도"
 
@@ -1021,8 +1087,8 @@ msgstr "올바른 IPv6 주소가 아닙니다."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s ..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s..."
 
 msgid "or"
 msgstr "또는"
@@ -1061,9 +1127,6 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d분"
 
-msgid "0 minutes"
-msgstr "0분"
-
 msgid "Forbidden"
 msgstr "Forbidden"
 
@@ -1071,23 +1134,36 @@ msgid "CSRF verification failed. Request aborted."
 msgstr "CSRF 검증에 실패했습니다. 요청을 중단하였습니다."
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"이 메세지가 보이는 이유는 이 HTTPS 사이트가 당신의 브라우저로부터 '참조 헤"
+"이 메세지가 보이는 이유는 이 HTTPS 사이트가 당신의 웹 브라우저로부터 '참조 헤"
 "더'를 요구하지만, 아무것도 받기 못하였기 때문입니다. 이 헤더는 보안상의 문제"
-"로 필요하며, 제3자에 의해 당신의 브라우저가 해킹당하고 있지 않다는 것을 보장"
-"합니다."
+"로 필요하며, 제3자에 의해 당신의 웹 브라우저가 해킹당하고 있지 않다는 것을 보"
+"장합니다."
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
 msgstr ""
 "만약 브라우저 설정에서 '참조' 헤더를 비활성화 시켰을 경우, 적어도 이 사이트"
 "나 HTTPS 연결, '동일-출처' 요청에 대해서는 이를 다시 활성화 시키십시오. "
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
+msgstr ""
+"<meta name=\"referrer\" content=\"no-referrer\">태그나  'Referrer-Policy: no-"
+"referrer' 헤더를 포함하고 있다면, 제거해주시기 바랍니다. CSRF 방지를 위한 리"
+"퍼러 검사를 위해 'Referer' 헤더가 필요합니다. 개인 정보에 대해 우려가 있는 경"
+"우, 서드 파티 사이트에 대한 링크에 <a rel=\"noreferrer\" …>와 같은 대안을 사"
+"용할 수 있습니다."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1100,7 +1176,7 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
 "만약 브라우저 설정에서 쿠키를 비활성화 시켰을 경우, 적어도 이 사이트나 '동일-"
 "출처' 요청에 대해서는 활성화 시키십시오."
@@ -1108,29 +1184,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "DEBUG=True 로 더 많은 정보를 확인할 수 있습니다."
 
-msgid "Welcome to Django"
-msgstr "Django에 오신 것을 환영합니다!"
-
-msgid "It worked!"
-msgstr "작동중!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "첫 번째 Django 페이지를 만든 것을 축하드립니다."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"이 메세지가 보이는 이유는 당신의 Django 설정 파일에 <code>DEBUG = True</code>"
-"가 있고, 아직 아무런 URL을 설정하지 않았기 때문입니다."
-
 msgid "No year specified"
 msgstr "년도가 없습니다."
+
+msgid "Date out of range"
+msgstr "유효 범위 밖의 날짜"
 
 msgid "No month specified"
 msgstr "월이 없습니다."
@@ -1154,14 +1212,14 @@ msgstr ""
 "allow_future가 False 입니다."
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
 msgstr "날짜 문자열 '%(datestr)s'이 표준 형식 '%(format)s'과 다릅니다."
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "쿼리 결과에 %(verbose_name)s가 없습니다."
 
-msgid "Page is not 'last', nor can it be converted to an int."
+msgid "Page is not “last”, nor can it be converted to an int."
 msgstr "'마지막' 페이지가 아니거나, 정수형으로 변환할 수 없습니다."
 
 #, python-format
@@ -1169,16 +1227,59 @@ msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "Invalid page (%(page_number)s): %(message)s"
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
 msgstr "빈 리스트이고 '%(class_name)s.allow_empty'가 False입니다."
 
 msgid "Directory indexes are not allowed here."
 msgstr "디렉토리 인덱스는 이곳에 사용할 수 없습니다."
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" 가 존재하지 않습니다."
+msgid "“%(path)s” does not exist"
+msgstr "\"%(path)s\" 이/가 존재하지 않습니다."
 
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Index of %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: 마감에 쫓기는 완벽주의자를 위한 웹 프레임워크"
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Django %(version)s<a href=\"https://docs.djangoproject.com/en/%(version)s/"
+"releases/\" target=\"_blank\" rel=\"noopener\">릴리스 노트</a> 보기"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "성공적으로 설치되었습니다! 축하합니다!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"이 페이지는 어떤 URL도 지정되지 않았고, settings 파일에 <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank"
+"\" rel=\"noopener\">DEBUG=True</a>가 설정되어 있을 때 표시됩니다."
+
+msgid "Django Documentation"
+msgstr "Django 문서"
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr "주제, 레퍼런스, &amp; 입문참조하다"
+
+msgid "Tutorial: A Polling App"
+msgstr "튜토리얼: 폴링 애플리케이션"
+
+msgid "Get started with Django"
+msgstr "Django와 함께 시작하기"
+
+msgid "Django Community"
+msgstr "Django 커뮤니티"
+
+msgid "Connect, get help, or contribute"
+msgstr "연결하고, 도움을 받거나 기여하기"

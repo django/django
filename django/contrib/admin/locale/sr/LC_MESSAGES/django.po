@@ -1,15 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Branko Kokanovic <branko@kokanovic.org>, 2018
+# Igor Jerosimić, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-06-27 19:30+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -35,7 +37,7 @@ msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Бриши означене објекте класе %(verbose_name_plural)s"
 
 msgid "Administration"
-msgstr ""
+msgstr "Администрација"
 
 msgid "All"
 msgstr "Сви"
@@ -65,16 +67,18 @@ msgid "This year"
 msgstr "Ова година"
 
 msgid "No date"
-msgstr ""
+msgstr "Нема датума"
 
 msgid "Has date"
-msgstr ""
+msgstr "Има датум"
 
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
+"Молим вас унесите исправно %(username)s и лозинку. Обратите пажњу да мала и "
+"велика слова представљају различите карактере."
 
 msgid "Action:"
 msgstr "Радња:"
@@ -86,20 +90,29 @@ msgstr "Додај још један објекат класе %(verbose_name)s.
 msgid "Remove"
 msgstr "Обриши"
 
+msgid "Addition"
+msgstr "Додавања"
+
+msgid "Change"
+msgstr "Измени"
+
+msgid "Deletion"
+msgstr "Брисања"
+
 msgid "action time"
 msgstr "време радње"
 
 msgid "user"
-msgstr ""
+msgstr "корисник"
 
 msgid "content type"
-msgstr ""
+msgstr "тип садржаја"
 
 msgid "object id"
 msgstr "id објекта"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "опис објекта"
 
@@ -132,25 +145,25 @@ msgstr "Објекат уноса лога"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr ""
+msgstr "Додат објекат {name} \"{object}\"."
 
 msgid "Added."
-msgstr ""
+msgstr "Додато."
 
 msgid "and"
 msgstr "и"
 
 #, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgstr "Измењена поља {fields} за {name} \"{object}\"."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "Измењена поља {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
-msgstr ""
+msgstr "Обрисан објекат {name} \"{object}\"."
 
 msgid "No fields changed."
 msgstr "Без измена у пољима."
@@ -161,36 +174,45 @@ msgstr "Ништа"
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
+"Држите „Control“, или „Command“ на Mac-у да бисте обележили више од једне "
+"ставке."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "Објекат {name} \"{obj}\" успешно додат."
+
+msgid "You may edit it again below."
+msgstr "Можете га изменити опет испод"
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
+"Објекат {name} \"{obj}\" успешно додат. Можете додати још један {name} испод."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
+"Објекат {name} \"{obj}\" успешно измењен. Можете га опет изменити испод."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "Објекат {name} \"{obj}\" успешно додат. Испод га можете изменити."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
 msgstr ""
+"Објекат {name} \"{obj}\" успешно измењен. Можете додати још један {name} "
+"испод."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
-msgstr ""
+msgstr "Објекат {name} \"{obj}\" успешно измењен."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -207,8 +229,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Објекат „%(obj)s“ класе %(name)s успешно је обрисан."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Објекат класе %(name)s са примарним кључем %(key)r не постоји."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s са идентификацијом \"%(key)s\" не постоји. Можда је избрисан?"
 
 #, python-format
 msgid "Add %s"
@@ -217,6 +239,10 @@ msgstr "Додај објекат класе %s"
 #, python-format
 msgid "Change %s"
 msgstr "Измени објекат класе %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Преглед %s"
 
 msgid "Database error"
 msgstr "Грешка у бази података"
@@ -247,13 +273,15 @@ msgstr "Историјат измена: %s"
 #. suitable to be an item in a list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
-msgstr ""
+msgstr "%(class_name)s %(instance)s"
 
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
+"Да би избрисали %(class_name)s%(instance)s потребно је брисати и следеће "
+"заштићене повезане објекте: %(related_objects)s"
 
 msgid "Django site admin"
 msgstr "Django администрација сајта"
@@ -269,7 +297,7 @@ msgstr "Пријава"
 
 #, python-format
 msgid "%(app)s administration"
-msgstr ""
+msgstr "%(app)s администрација"
 
 msgid "Page not found"
 msgstr "Страница није пронађена"
@@ -293,6 +321,8 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"Десила се грешка. Пријављена је администраторима сајта преко е-поште и "
+"требало би да ускоро буде исправљена. Хвала Вам на стрпљењу."
 
 msgid "Run the selected action"
 msgstr "Покрени одабрану радњу"
@@ -324,10 +354,10 @@ msgid "Change password"
 msgstr "Промена лозинке"
 
 msgid "Please correct the error below."
-msgstr "Исправите наведене грешке."
+msgstr "Молимо исправите грешку испод."
 
 msgid "Please correct the errors below."
-msgstr ""
+msgstr "Исправите грешке испод."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
@@ -337,7 +367,7 @@ msgid "Welcome,"
 msgstr "Добродошли,"
 
 msgid "View site"
-msgstr ""
+msgstr "Погледај сајт"
 
 msgid "Documentation"
 msgstr "Документација"
@@ -398,13 +428,13 @@ msgstr ""
 "Следећи објекти који су у вези са овим објектом ће такође бити обрисани:"
 
 msgid "Objects"
-msgstr ""
+msgstr "Објекти"
 
 msgid "Yes, I'm sure"
 msgstr "Да, сигуран сам"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "Не, хоћу назад"
 
 msgid "Delete multiple objects"
 msgstr "Брисање више објеката"
@@ -435,8 +465,8 @@ msgstr ""
 "Да ли сте сигурни да желите да избришете изабране %(objects_name)s? Сви "
 "следећи објекти и објекти са њима повезани ће бити избрисани:"
 
-msgid "Change"
-msgstr "Измени"
+msgid "View"
+msgstr "Преглед"
 
 msgid "Delete?"
 msgstr "Брисање?"
@@ -446,23 +476,23 @@ msgid " By %(filter_title)s "
 msgstr " %(filter_title)s "
 
 msgid "Summary"
-msgstr ""
+msgstr "Сумарно"
 
 #, python-format
 msgid "Models in the %(name)s application"
-msgstr ""
+msgstr "Модели у апликацији %(name)s"
 
 msgid "Add"
 msgstr "Додај"
 
-msgid "You don't have permission to edit anything."
-msgstr "Немате дозволе да уносите било какве измене."
+msgid "You don't have permission to view or edit anything."
+msgstr "Немате дозвола да погледате или измените ништа."
 
 msgid "Recent actions"
-msgstr ""
+msgstr "Скорашње акције"
 
 msgid "My actions"
-msgstr ""
+msgstr "Моје акције"
 
 msgid "None available"
 msgstr "Нема података"
@@ -483,6 +513,8 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
+"Пријављени сте као %(username)s, али немате овлашћења да приступите овој "
+"страни. Да ли желите да се пријавите под неким другим налогом?"
 
 msgid "Forgotten your password or username?"
 msgstr "Заборавили сте лозинку или корисничко име?"
@@ -509,20 +541,8 @@ msgstr "Прикажи све"
 msgid "Save"
 msgstr "Сачувај"
 
-msgid "Popup closing..."
-msgstr ""
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr ""
+msgid "Popup closing…"
+msgstr "Попуп се затвара..."
 
 msgid "Search"
 msgstr "Претрага"
@@ -546,6 +566,24 @@ msgstr "Сачувај и додај следећи"
 
 msgid "Save and continue editing"
 msgstr "Сачувај и настави са изменама"
+
+msgid "Save and view"
+msgstr "Сними и погледај"
+
+msgid "Close"
+msgstr "Затвори"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Измени одабрани модел %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Додај још један модел %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Обриши одабрани модел %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Хвала што сте данас провели време на овом сајту."
@@ -602,17 +640,23 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Послали смо Вам упутства за постављање лозинке, уколико налог са овом "
+"адресом постоји. Требало би да их добијете ускоро."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+"Ако не добијете поруку, проверите да ли сте унели добру адресу са којом сте "
+"се и регистровали и проверите спам фасциклу."
 
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
+"Примате ову поруку зато што сте затражили ресетовање лозинке за кориснички "
+"налог на сајту %(site_name)s."
 
 msgid "Please go to the following page and choose a new password:"
 msgstr "Идите на следећу страницу и поставите нову лозинку."
@@ -631,9 +675,11 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
 msgstr ""
+"Заборавили сте лозинку? Унесите адресу е-поште испод и послаћемо Вам на њу "
+"упутства за постављање нове лозинке."
 
 msgid "Email address:"
-msgstr ""
+msgstr "Адреса е-поште:"
 
 msgid "Reset my password"
 msgstr "Ресетуј моју лозинку"
@@ -649,6 +695,10 @@ msgstr "Одабери објекат класе %s"
 msgid "Select %s to change"
 msgstr "Одабери објекат класе %s за измену"
 
+#, python-format
+msgid "Select %s to view"
+msgstr "Одабери %s за преглед"
+
 msgid "Date:"
 msgstr "Датум:"
 
@@ -659,7 +709,7 @@ msgid "Lookup"
 msgstr "Претражи"
 
 msgid "Currently:"
-msgstr ""
+msgstr "Тренутно:"
 
 msgid "Change:"
-msgstr ""
+msgstr "Измена:"

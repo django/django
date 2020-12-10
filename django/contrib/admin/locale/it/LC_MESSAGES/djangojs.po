@@ -5,6 +5,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Luciano De Falco Alfano, 2016
 # Marco Bonetti, 2014
+# Mirco Grillo <mirco.grillomg@gmail.com>, 2020
 # Nicola Larosa <transifex@teknico.net>, 2011-2012
 # palmux <palmux@gmail.com>, 2015
 # Stefano Brentegani <sbrentegani@gmail.com>, 2015
@@ -12,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-18 09:36+0000\n"
-"Last-Translator: palmux <palmux@gmail.com>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-07-23 08:40+0000\n"
+"Last-Translator: Mirco Grillo <mirco.grillomg@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -89,20 +90,35 @@ msgstr ""
 "un'azione, le modifiche non salvate andranno perse."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
 "Hai selezionato un'azione, ma non hai ancora salvato le modifiche apportate "
 "a campi singoli. Fai clic su OK per salvare. Poi dovrai ri-eseguire l'azione."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 "Hai selezionato un'azione, e non hai ancora apportato alcuna modifica a "
-"campi singoli. Probabilmente stai cercando il pulsante Go, invece di Save."
+"campi singoli. Probabilmente stai cercando il pulsante Vai, invece di Salva."
+
+msgid "Now"
+msgstr "Adesso"
+
+msgid "Midnight"
+msgstr "Mezzanotte"
+
+msgid "6 a.m."
+msgstr "6 del mattino"
+
+msgid "Noon"
+msgstr "Mezzogiorno"
+
+msgid "6 p.m."
+msgstr "6 del pomeriggio"
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
@@ -116,26 +132,11 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Nota: Sei %s ora in ritardo rispetto al server."
 msgstr[1] "Nota: Sei %s ore in ritardo rispetto al server."
 
-msgid "Now"
-msgstr "Adesso"
-
 msgid "Choose a Time"
 msgstr "Scegli un orario"
 
 msgid "Choose a time"
 msgstr "Scegli un orario"
-
-msgid "Midnight"
-msgstr "Mezzanotte"
-
-msgid "6 a.m."
-msgstr "6 del mattino"
-
-msgid "Noon"
-msgstr "Mezzogiorno"
-
-msgid "6 p.m."
-msgstr "6 del pomeriggio"
 
 msgid "Cancel"
 msgstr "Annulla"

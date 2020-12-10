@@ -1,4 +1,5 @@
 import datetime
+from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, override_settings, skipUnlessDBFeature
@@ -155,6 +156,11 @@ class ArchiveIndexViewTests(TestDataMixin, TestCase):
         self.assertEqual(list(res.context['latest']), list(Book.objects.order_by('-name').all()))
         self.assertTemplateUsed(res, 'generic_views/book_archive.html')
 
+    def test_archive_view_without_date_field(self):
+        msg = 'BookArchiveWithoutDateField.date_field is required.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            self.client.get('/dates/books/without_date_field/')
+
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
 class YearArchiveViewTests(TestDataMixin, TestCase):
@@ -274,6 +280,27 @@ class YearArchiveViewTests(TestDataMixin, TestCase):
         res = self.client.get('/dates/books/2011/')
         self.assertEqual(list(res.context['date_list']), list(sorted(res.context['date_list'])))
 
+    @mock.patch('django.views.generic.list.MultipleObjectMixin.get_context_data')
+    def test_get_context_data_receives_extra_context(self, mock):
+        """
+        MultipleObjectMixin.get_context_data() receives the context set by
+        BaseYearArchiveView.get_dated_items(). This behavior is implemented in
+        BaseDateListView.get().
+        """
+        BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
+        with self.assertRaisesMessage(TypeError, 'context must be a dict rather than MagicMock.'):
+            self.client.get('/dates/booksignings/2008/')
+        args, kwargs = mock.call_args
+        # These are context values from get_dated_items().
+        self.assertEqual(kwargs['year'], datetime.date(2008, 1, 1))
+        self.assertIsNone(kwargs['previous_year'])
+        self.assertIsNone(kwargs['next_year'])
+
+    def test_get_dated_items_not_implemented(self):
+        msg = 'A DateView must provide an implementation of get_dated_items()'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.client.get('/BaseDateListViewTest/')
+
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
 class MonthArchiveViewTests(TestDataMixin, TestCase):
@@ -391,6 +418,20 @@ class MonthArchiveViewTests(TestDataMixin, TestCase):
         res = self.client.get('/dates/booksignings/2008/apr/')
         self.assertEqual(res.status_code, 200)
 
+    def test_month_view_get_month_from_request(self):
+        oct1 = datetime.date(2008, 10, 1)
+        res = self.client.get('/dates/books/without_month/2008/?month=oct')
+        self.assertEqual(res.status_code, 200)
+        self.assertTemplateUsed(res, 'generic_views/book_archive_month.html')
+        self.assertEqual(list(res.context['date_list']), [oct1])
+        self.assertEqual(list(res.context['book_list']), list(Book.objects.filter(pubdate=oct1)))
+        self.assertEqual(res.context['month'], oct1)
+
+    def test_month_view_without_month_in_url(self):
+        res = self.client.get('/dates/books/without_month/2008/')
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(res.context['exception'], 'No month specified')
+
     @skipUnlessDBFeature('has_zoneinfo_database')
     @override_settings(USE_TZ=True, TIME_ZONE='Africa/Nairobi')
     def test_aware_datetime_month_view(self):
@@ -496,6 +537,29 @@ class WeekArchiveViewTests(TestDataMixin, TestCase):
         res = self.client.get('/dates/books/2008/week/39/monday/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['week'], datetime.date(2008, 9, 29))
+
+    def test_week_iso_format(self):
+        res = self.client.get('/dates/books/2008/week/40/iso_format/')
+        self.assertEqual(res.status_code, 200)
+        self.assertTemplateUsed(res, 'generic_views/book_archive_week.html')
+        self.assertEqual(
+            list(res.context['book_list']),
+            [Book.objects.get(pubdate=datetime.date(2008, 10, 1))],
+        )
+        self.assertEqual(res.context['week'], datetime.date(2008, 9, 29))
+
+    def test_unknown_week_format(self):
+        msg = "Unknown week format '%T'. Choices are: %U, %V, %W"
+        with self.assertRaisesMessage(ValueError, msg):
+            self.client.get('/dates/books/2008/week/39/unknown_week_format/')
+
+    def test_incompatible_iso_week_format_view(self):
+        msg = (
+            "ISO week directive '%V' is incompatible with the year directive "
+            "'%Y'. Use the ISO year '%G' instead."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            self.client.get('/dates/books/2008/week/40/invalid_iso_week_year_format/')
 
     def test_datetime_week_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
@@ -678,7 +742,11 @@ class DateDetailViewTests(TestDataMixin, TestCase):
                 self.assertEqual(res.context['exception'], 'Date out of range')
 
     def test_invalid_url(self):
-        with self.assertRaises(AttributeError):
+        msg = (
+            'Generic detail view BookDetail must be called with either an '
+            'object pk or a slug in the URLconf.'
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
             self.client.get("/dates/books/2008/oct/01/nopk/")
 
     def test_get_object_custom_queryset(self):

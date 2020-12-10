@@ -1,4 +1,3 @@
-import sys
 import unittest
 from io import StringIO
 
@@ -25,6 +24,14 @@ class TestDebugSQL(unittest.TestCase):
         def runTest(self):
             Person.objects.filter(first_name='error').count()
             raise Exception
+
+    class ErrorSetUpTestDataTest(TestCase):
+        @classmethod
+        def setUpTestData(cls):
+            raise Exception
+
+        def runTest(self):
+            pass
 
     class PassingSubTest(TestCase):
         def runTest(self):
@@ -94,18 +101,13 @@ class TestDebugSQL(unittest.TestCase):
     ]
 
     verbose_expected_outputs = [
-        # Output format changed in Python 3.5+
-        x.format('' if sys.version_info < (3, 5) else 'TestDebugSQL.') for x in [
-            'runTest (test_runner.test_debug_sql.{}FailingTest) ... FAIL',
-            'runTest (test_runner.test_debug_sql.{}ErrorTest) ... ERROR',
-            'runTest (test_runner.test_debug_sql.{}PassingTest) ... ok',
-            'runTest (test_runner.test_debug_sql.{}PassingSubTest) ... ok',
-            # If there are errors/failures in subtests but not in test itself,
-            # the status is not written. That behavior comes from Python.
-            'runTest (test_runner.test_debug_sql.{}FailingSubTest) ...',
-            'runTest (test_runner.test_debug_sql.{}ErrorSubTest) ...',
-        ]
-    ] + [
+        'runTest (test_runner.test_debug_sql.TestDebugSQL.FailingTest) ... FAIL',
+        'runTest (test_runner.test_debug_sql.TestDebugSQL.ErrorTest) ... ERROR',
+        'runTest (test_runner.test_debug_sql.TestDebugSQL.PassingTest) ... ok',
+        # If there are errors/failures in subtests but not in test itself,
+        # the status is not written. That behavior comes from Python.
+        'runTest (test_runner.test_debug_sql.TestDebugSQL.FailingSubTest) ...',
+        'runTest (test_runner.test_debug_sql.TestDebugSQL.ErrorSubTest) ...',
         ('''SELECT COUNT(*) AS "__count" '''
             '''FROM "test_runner_person" WHERE '''
             '''"test_runner_person"."first_name" = 'pass';'''),
@@ -113,3 +115,22 @@ class TestDebugSQL(unittest.TestCase):
             '''FROM "test_runner_person" WHERE '''
             '''"test_runner_person"."first_name" = 'subtest-pass';'''),
     ]
+
+    def test_setupclass_exception(self):
+        runner = DiscoverRunner(debug_sql=True, verbosity=0)
+        suite = runner.test_suite()
+        suite.addTest(self.ErrorSetUpTestDataTest())
+        old_config = runner.setup_databases()
+        stream = StringIO()
+        runner.test_runner(
+            verbosity=0,
+            stream=stream,
+            resultclass=runner.get_resultclass(),
+        ).run(suite)
+        runner.teardown_databases(old_config)
+        output = stream.getvalue()
+        self.assertIn(
+            'ERROR: setUpClass '
+            '(test_runner.test_debug_sql.TestDebugSQL.ErrorSetUpTestDataTest)',
+            output,
+        )

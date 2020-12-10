@@ -1,22 +1,23 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Alex Gaynor <inactive+Alex@transifex.com>, 2011
+# 534b44a19bf18d20b71ecc4eb77c572f_db336e9 <f8268c65f822ec11a3a2e5d482cd7ead_175>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Meir Kriheli <mkriheli@gmail.com>, 2011-2015,2017
+# Meir Kriheli <mkriheli@gmail.com>, 2011-2015,2017,2019-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-04-01 14:34+0000\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-08-02 13:48+0000\n"
 "Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: he\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
+"1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -69,6 +70,12 @@ msgstr "ללא תאריך"
 msgid "Has date"
 msgstr "עם תאריך"
 
+msgid "Empty"
+msgstr "ריק"
+
+msgid "Not empty"
+msgstr "לא ריק"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -87,6 +94,15 @@ msgstr "הוספת %(verbose_name)s"
 msgid "Remove"
 msgstr "להסיר"
 
+msgid "Addition"
+msgstr "הוספה"
+
+msgid "Change"
+msgstr "שינוי"
+
+msgid "Deletion"
+msgstr "מחיקה"
+
 msgid "action time"
 msgstr "זמן פעולה"
 
@@ -100,7 +116,7 @@ msgid "object id"
 msgstr "מזהה אובייקט"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "ייצוג אובייקט"
 
@@ -117,23 +133,23 @@ msgid "log entries"
 msgstr "רישומי יומן"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "בוצעה הוספת \"%(object)s\"."
+msgid "Added “%(object)s”."
+msgstr ""
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "בוצע שינוי \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr ""
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "בוצעה מחיקת \"%(object)s\"."
+msgid "Deleted “%(object)s.”"
+msgstr ""
 
 msgid "LogEntry Object"
 msgstr "אובייקט LogEntry"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "בוצעה הוספת {name} \"{object}\"."
+msgid "Added {name} “{object}”."
+msgstr ""
 
 msgid "Added."
 msgstr "נוסף."
@@ -142,16 +158,16 @@ msgid "and"
 msgstr "ו"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "בוצע שינוי {fields} עבור {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr ""
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr " {fields} שונו."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr "בוצעה מחיקת {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
+msgstr ""
 
 msgid "No fields changed."
 msgstr "אף שדה לא השתנה."
@@ -159,40 +175,39 @@ msgstr "אף שדה לא השתנה."
 msgid "None"
 msgstr "ללא"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr "יש להחזיק \"Control\" או \"Command\" במק, כדי לבחור יותר מאחד."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
 msgstr ""
-"יש להחזיק את \"Control\", או \"Command\" על מק, לחוץ כדי לבחור יותר מאחד."
+
+msgid "You may edit it again below."
+msgstr "ניתן לערוך שוב מתחת."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "הוספת {name} \"{obj}\" בוצעה בהצלחה. ניתן לערוך שוב מתחת."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
-msgstr "הוספת {name} \"{obj}\" בוצעה בהצלחה. ניתן להוסיף עוד {name} מתחת.."
+msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "הוספת {name} \"{obj}\" בוצעה בהצלחה."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr "עדכון {name} \"{obj}\" "
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr "עדכון {name} \"{obj}\" בוצע בהצלחה. ניתן להוסיף עוד {name} מתחת."
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "שינוי {name} \"{obj}\" בוצע בהצלחה."
+msgid "The {name} “{obj}” was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -203,12 +218,12 @@ msgid "No action selected."
 msgstr "לא נבחרה פעולה."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "מחיקת %(name)s \"%(obj)s\" בוצעה בהצלחה."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr ""
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
-msgstr "%(name)s עם ID \"%(key)s\" לא במצאי. אולי זה נמחק?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr ""
 
 #, python-format
 msgid "Add %s"
@@ -218,6 +233,10 @@ msgstr "הוספת %s"
 msgid "Change %s"
 msgstr "שינוי %s"
 
+#, python-format
+msgid "View %s"
+msgstr "צפיה ב%s"
+
 msgid "Database error"
 msgstr "שגיאת בסיס נתונים"
 
@@ -226,12 +245,16 @@ msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "שינוי %(count)s %(name)s בוצע בהצלחה."
 msgstr[1] "שינוי %(count)s %(name)s בוצע בהצלחה."
+msgstr[2] "שינוי %(count)s %(name)s בוצע בהצלחה."
+msgstr[3] "שינוי %(count)s %(name)s בוצע בהצלחה."
 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s נבחר"
 msgstr[1] "כל ה־%(total_count)s נבחרו"
+msgstr[2] "כל ה־%(total_count)s נבחרו"
+msgstr[3] "כל ה־%(total_count)s נבחרו"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -274,8 +297,8 @@ msgstr "ניהול %(app)s"
 msgid "Page not found"
 msgstr "דף לא קיים"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "אנו מצטערים, לא ניתן למצוא את הדף המבוקש."
+msgid "We’re sorry, but the requested page could not be found."
+msgstr "אנו מתנצלים, העמוד המבוקש אינו קיים."
 
 msgid "Home"
 msgstr "דף הבית"
@@ -290,10 +313,9 @@ msgid "Server Error <em>(500)</em>"
 msgstr "שגיאת שרת <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"התרחשה שגיאה. היא דווחה למנהלי האתר בדוא\"ל ותתוקן בקרוב. תודה על סבלנותך."
 
 msgid "Run the selected action"
 msgstr "הפעל את הפעולה שבחרת בה."
@@ -311,12 +333,25 @@ msgstr "בחירת כל %(total_count)s ה־%(module_name)s"
 msgid "Clear selection"
 msgstr "איפוס בחירה"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "מודלים ביישום %(name)s"
+
+msgid "Add"
+msgstr "הוספה"
+
+msgid "View"
+msgstr "צפיה"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "אין לך כלל הרשאות צפיה או עריכה."
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
-"ראשית יש להזין שם משתמש וסיסמה. לאחר מכן יהיה ביכולתך לערוך אפשרויות נוספות "
-"עבור המשתמש."
+"ראשית יש להזין שם משתמש וססמה. לאחר מכן ניתן יהיה לערוך אפשרויות משתמש "
+"נוספות."
 
 msgid "Enter a username and password."
 msgstr "נא לשים שם משתמש וסיסמה."
@@ -325,7 +360,7 @@ msgid "Change password"
 msgstr "שינוי סיסמה"
 
 msgid "Please correct the error below."
-msgstr "נא לתקן את השגיאות המופיעות מתחת."
+msgstr "נא לתקן את השגיאה מתחת."
 
 msgid "Please correct the errors below."
 msgstr "נא לתקן את השגיאות מתחת."
@@ -358,6 +393,9 @@ msgstr "צפיה באתר"
 
 msgid "Filter"
 msgstr "סינון"
+
+msgid "Clear all filters"
+msgstr "ניקוי כל הסינונים"
 
 msgid "Remove from sorting"
 msgstr "הסרה ממיון"
@@ -400,8 +438,8 @@ msgstr ""
 msgid "Objects"
 msgstr "אובייקטים"
 
-msgid "Yes, I'm sure"
-msgstr "כן, אני בטוח/ה"
+msgid "Yes, I’m sure"
+msgstr ""
 
 msgid "No, take me back"
 msgstr "לא, קח אותי חזרה."
@@ -434,9 +472,6 @@ msgstr ""
 "האם אתה בטוח שאתה רוצה למחוק את ה%(objects_name)s הנבחר? כל האובייקטים הבאים "
 "ופריטים הקשורים להם יימחקו:"
 
-msgid "Change"
-msgstr "שינוי"
-
 msgid "Delete?"
 msgstr "מחיקה ?"
 
@@ -446,16 +481,6 @@ msgstr " לפי %(filter_title)s "
 
 msgid "Summary"
 msgstr "סיכום"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "מודלים ביישום %(name)s"
-
-msgid "Add"
-msgstr "הוספה"
-
-msgid "You don't have permission to edit anything."
-msgstr "אין לך הרשאות לעריכה."
 
 msgid "Recent actions"
 msgstr "פעולות אחרונות"
@@ -470,12 +495,12 @@ msgid "Unknown content"
 msgstr "תוכן לא ידוע"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"משהו שגוי בהתקנת בסיס הנתונים שלך. נא לוודא שנוצרו טבלאות בסיס הנתונים "
-"המתאימות, ובסיס הנתונים ניתן לקריאה על ידי המשתמש המתאים."
+"משהו שגוי בהתקנת בסיס הנתונים שלך. יש לוודא יצירת הטבלאות המתאימות וקיום "
+"הרשאות קריאה על בסיס הנתונים עבור המשתמש המתאים."
 
 #, python-format
 msgid ""
@@ -488,6 +513,9 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "שכחת את שם המשתמש והסיסמה שלך ?"
 
+msgid "Toggle navigation"
+msgstr ""
+
 msgid "Date/time"
 msgstr "תאריך/שעה"
 
@@ -498,10 +526,9 @@ msgid "Action"
 msgstr "פעולה"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
-msgstr ""
-"לאובייקט זה אין היסטוריית שינוי. כנראה לא השתמשו בממשק הניהול הזה להוספתו."
+msgstr "לאובייקט זה אין היסטוריית שינויים. כנראה לא נוסף דרך ממשק הניהול."
 
 msgid "Show all"
 msgstr "הצג הכל"
@@ -509,20 +536,8 @@ msgstr "הצג הכל"
 msgid "Save"
 msgstr "שמירה"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "חלון צץ נסגר..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "שינוי  %(model)s הנבחר."
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "הוספת %(model)s נוסף."
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "מחיקת %(model)s הנבחר."
 
 msgid "Search"
 msgstr "חיפוש"
@@ -532,6 +547,8 @@ msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "תוצאה %(counter)s"
 msgstr[1] "%(counter)s תוצאות"
+msgstr[2] "%(counter)s תוצאות"
+msgstr[3] "%(counter)s תוצאות"
 
 #, python-format
 msgid "%(full_result_count)s total"
@@ -546,6 +563,24 @@ msgstr "שמירה והוספת אחר"
 msgid "Save and continue editing"
 msgstr "שמירה והמשך עריכה"
 
+msgid "Save and view"
+msgstr "שמירה וצפיה"
+
+msgid "Close"
+msgstr "סגירה"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "שינוי  %(model)s הנבחר."
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "הוספת %(model)s נוסף."
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "מחיקת %(model)s הנבחר."
+
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "תודה על בילוי זמן איכות עם האתר."
 
@@ -559,11 +594,11 @@ msgid "Your password was changed."
 msgstr "סיסמתך שונתה."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"נא להזין את סיסמתך הישנה, לצרכי אבטחה, ולאחר מכן את סיסמתך החדשה פעמיים כדי "
-"שנוכל לוודא שהקלדת אותה כראוי."
+"נא להזין את הססמה הישנה שלך, למען האבטחה, ולאחר מכן את הססמה החדשה שלך "
+"פעמיים כדי שנוכל לוודא שהקלדת אותה נכון."
 
 msgid "Change my password"
 msgstr "שנה את סיסמתי"
@@ -596,18 +631,18 @@ msgstr ""
 "חדש."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"שלחנו אליך דואר אלקטרוני עם הוראות לקביעת הסיסמה, אם קיים חשבון עם כתובת "
-"הדואר שהזנת. ההודעה אמור להגיע בקרוב."
+"שלחנו לך הוראות לקביעת הססמה, בהנחה שקיים חשבון עם כתובת הדואר האלקטרוני "
+"שהזנת. ההוראות אמורות להתקבל בקרוב."
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"אם הדוא\"ל לא הגיע, נא לוודא שהזנת כתובת נכונה בעת הרישום ולבדוק את תיקיית "
-"דואר הזבל."
+"אם לא קיבלת דואר אלקטרוני, נא לוודא שהזנת את הכתובת שנרשמת עימה ושההודעה לא "
+"נחתה בתיקיית דואר הזבל."
 
 #, python-format
 msgid ""
@@ -620,8 +655,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "נא להגיע לעמוד הבא ולבחור סיסמה חדשה:"
 
-msgid "Your username, in case you've forgotten:"
-msgstr "שם המשתמש שלך, במקרה ששכחת:"
+msgid "Your username, in case you’ve forgotten:"
+msgstr "שם המשתמש שלך במקרה ושכחת:"
 
 msgid "Thanks for using our site!"
 msgstr "תודה על השימוש באתר שלנו!"
@@ -631,11 +666,11 @@ msgid "The %(site_name)s team"
 msgstr "צוות %(site_name)s"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"שכחת את סיסמתך ? נא להזין את כתובת הדוא\"ל מתחת, ואנו נשלח הוראות לקביעת "
-"סיסמה חדשה."
+"שכחת את הססמה שלך? נא להזין את כתובת הדואר האלקטרוני מתחת ואנו נשלח הוראות "
+"לקביעת ססמה חדשה."
 
 msgid "Email address:"
 msgstr "כתובת דוא\"ל:"
@@ -653,6 +688,10 @@ msgstr "בחירת %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "בחירת %s לשינוי"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "בחירת %s לצפיה"
 
 msgid "Date:"
 msgstr "תאריך:"

@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections, migrations
@@ -17,7 +18,7 @@ class Command(BaseCommand):
             help='App label of the application to squash migrations for.',
         )
         parser.add_argument(
-            'start_migration_name', default=None, nargs='?',
+            'start_migration_name', nargs='?',
             help='Migrations will be squashed starting from and including this migration.',
         )
         parser.add_argument(
@@ -25,7 +26,7 @@ class Command(BaseCommand):
             help='Migrations will be squashed until and including this migration.',
         )
         parser.add_argument(
-            '--no-optimize', action='store_true', dest='no_optimize',
+            '--no-optimize', action='store_true',
             help='Do not try to optimize the squashed operations.',
         )
         parser.add_argument(
@@ -33,8 +34,12 @@ class Command(BaseCommand):
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
         parser.add_argument(
-            '--squashed-name', dest='squashed_name',
+            '--squashed-name',
             help='Sets the name of the new squashed migration.',
+        )
+        parser.add_argument(
+            '--no-header', action='store_false', dest='include_header',
+            help='Do not add a header comment to the new squashed migration.',
         )
 
     def handle(self, **options):
@@ -46,7 +51,12 @@ class Command(BaseCommand):
         migration_name = options['migration_name']
         no_optimize = options['no_optimize']
         squashed_name = options['squashed_name']
-
+        include_header = options['include_header']
+        # Validate app_label.
+        try:
+            apps.get_app_config(app_label)
+        except LookupError as err:
+            raise CommandError(str(err))
         # Load the current graph state, check the app and migration they asked for exists
         loader = MigrationLoader(connections[DEFAULT_DB_ALIAS])
         if app_label not in loader.migrated_apps:
@@ -153,7 +163,7 @@ class Command(BaseCommand):
                 replaces.append((migration.app_label, migration.name))
 
         # Make a new migration with those operations
-        subclass = type("Migration", (migrations.Migration, ), {
+        subclass = type("Migration", (migrations.Migration,), {
             "dependencies": dependencies,
             "operations": new_operations,
             "replaces": replaces,
@@ -173,21 +183,25 @@ class Command(BaseCommand):
             new_migration.initial = True
 
         # Write out the new migration file
-        writer = MigrationWriter(new_migration)
+        writer = MigrationWriter(new_migration, include_header)
         with open(writer.path, "w", encoding='utf-8') as fh:
             fh.write(writer.as_string())
 
         if self.verbosity > 0:
-            self.stdout.write(self.style.MIGRATE_HEADING("Created new squashed migration %s" % writer.path))
-            self.stdout.write("  You should commit this migration but leave the old ones in place;")
-            self.stdout.write("  the new migration will be used for new installs. Once you are sure")
-            self.stdout.write("  all instances of the codebase have applied the migrations you squashed,")
-            self.stdout.write("  you can delete them.")
+            self.stdout.write(
+                self.style.MIGRATE_HEADING('Created new squashed migration %s' % writer.path) + '\n'
+                '  You should commit this migration but leave the old ones in place;\n'
+                '  the new migration will be used for new installs. Once you are sure\n'
+                '  all instances of the codebase have applied the migrations you squashed,\n'
+                '  you can delete them.'
+            )
             if writer.needs_manual_porting:
-                self.stdout.write(self.style.MIGRATE_HEADING("Manual porting required"))
-                self.stdout.write("  Your migrations contained functions that must be manually copied over,")
-                self.stdout.write("  as we could not safely copy their implementation.")
-                self.stdout.write("  See the comment at the top of the squashed migration for details.")
+                self.stdout.write(
+                    self.style.MIGRATE_HEADING('Manual porting required') + '\n'
+                    '  Your migrations contained functions that must be manually copied over,\n'
+                    '  as we could not safely copy their implementation.\n'
+                    '  See the comment at the top of the squashed migration for details.'
+                )
 
     def find_migration(self, loader, app_label, name):
         try:

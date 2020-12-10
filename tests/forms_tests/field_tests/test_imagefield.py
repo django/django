@@ -1,9 +1,14 @@
 import os
 import unittest
 
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import ImageField, ValidationError
+from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import (
+    SimpleUploadedFile, TemporaryUploadedFile,
+)
+from django.forms import ClearableFileInput, FileInput, ImageField, Widget
 from django.test import SimpleTestCase
+
+from . import FormFieldAssertionsMixin
 
 try:
     from PIL import Image
@@ -16,7 +21,7 @@ def get_img_path(path):
 
 
 @unittest.skipUnless(Image, "Pillow is required to test ImageField")
-class ImageFieldTest(SimpleTestCase):
+class ImageFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_imagefield_annotate_with_image_after_clean(self):
         f = ImageField()
@@ -62,5 +67,36 @@ class ImageFieldTest(SimpleTestCase):
         with open(img_path, 'rb') as img_file:
             img_data = img_file.read()
         img_file = SimpleUploadedFile('1x1.txt', img_data)
-        with self.assertRaisesMessage(ValidationError, "File extension 'txt' is not allowed."):
+        with self.assertRaisesMessage(ValidationError, 'File extension “txt” is not allowed.'):
             f.clean(img_file)
+
+    def test_corrupted_image(self):
+        f = ImageField()
+        img_file = SimpleUploadedFile('not_an_image.jpg', b'not an image')
+        msg = (
+            'Upload a valid image. The file you uploaded was either not an '
+            'image or a corrupted image.'
+        )
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean(img_file)
+        with TemporaryUploadedFile('not_an_image_tmp.png', 'text/plain', 1, 'utf-8') as tmp_file:
+            with self.assertRaisesMessage(ValidationError, msg):
+                f.clean(tmp_file)
+
+    def test_widget_attrs_default_accept(self):
+        f = ImageField()
+        # Nothing added for non-FileInput widgets.
+        self.assertEqual(f.widget_attrs(Widget()), {})
+        self.assertEqual(f.widget_attrs(FileInput()), {'accept': 'image/*'})
+        self.assertEqual(f.widget_attrs(ClearableFileInput()), {'accept': 'image/*'})
+        self.assertWidgetRendersTo(f, '<input type="file" name="f" accept="image/*" required id="id_f" />')
+
+    def test_widget_attrs_accept_specified(self):
+        f = ImageField(widget=FileInput(attrs={'accept': 'image/png'}))
+        self.assertEqual(f.widget_attrs(f.widget), {})
+        self.assertWidgetRendersTo(f, '<input type="file" name="f" accept="image/png" required id="id_f" />')
+
+    def test_widget_attrs_accept_false(self):
+        f = ImageField(widget=FileInput(attrs={'accept': False}))
+        self.assertEqual(f.widget_attrs(f.widget), {})
+        self.assertWidgetRendersTo(f, '<input type="file" name="f" required id="id_f" />')

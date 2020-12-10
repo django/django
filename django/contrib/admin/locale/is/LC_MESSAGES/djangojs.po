@@ -4,13 +4,14 @@
 # gudbergur <gudbergur@gmail.com>, 2012
 # Hafsteinn Einarsson <haffi67@gmail.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Thordur Sigurdsson <thordur@ja.is>, 2016-2017
+# Matt R, 2018
+# Thordur Sigurdsson <thordur@ja.is>, 2016-2017,2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-04-05 03:24+0000\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-07-07 22:53+0000\n"
 "Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
@@ -84,20 +85,35 @@ msgstr ""
 "ekki verða vistaðar."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
 "Þú hefur valið aðgerð en hefur ekki vistað breytingar á reitum. Vinsamlegast "
 "veldu 'Í lagi' til að vista. Þú þarft að endurkeyra aðgerðina."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 "Þú hefur valið aðgerð en hefur ekki gert breytingar á reitum. Þú ert líklega "
 "að leita að 'Fara' hnappnum frekar en 'Vista' hnappnum."
+
+msgid "Now"
+msgstr "Núna"
+
+msgid "Midnight"
+msgstr "Miðnætti"
+
+msgid "6 a.m."
+msgstr "6 f.h."
+
+msgid "Noon"
+msgstr "Hádegi"
+
+msgid "6 p.m."
+msgstr "6 e.h."
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
@@ -111,26 +127,11 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Athugaðu að þú ert %s klukkustund á eftir tíma vefþjóns."
 msgstr[1] "Athugaðu að þú ert %s klukkustundum á eftir tíma vefþjóns."
 
-msgid "Now"
-msgstr "Núna"
-
 msgid "Choose a Time"
 msgstr "Veldu tíma"
 
 msgid "Choose a time"
 msgstr "Veldu tíma"
-
-msgid "Midnight"
-msgstr "Miðnætti"
-
-msgid "6 a.m."
-msgstr "6 f.h."
-
-msgid "Noon"
-msgstr "Hádegi"
-
-msgid "6 p.m."
-msgstr "6 e.h."
 
 msgid "Cancel"
 msgstr "Hætta við"
@@ -148,40 +149,40 @@ msgid "Tomorrow"
 msgstr "Á morgun"
 
 msgid "January"
-msgstr "Janúar"
+msgstr "janúar"
 
 msgid "February"
-msgstr "Febrúar"
+msgstr "febrúar"
 
 msgid "March"
-msgstr "Mars"
+msgstr "mars"
 
 msgid "April"
-msgstr "Apríl"
+msgstr "apríl"
 
 msgid "May"
-msgstr "Maí"
+msgstr "maí"
 
 msgid "June"
-msgstr "Júní"
+msgstr "júní"
 
 msgid "July"
-msgstr "Júlí"
+msgstr "júlí"
 
 msgid "August"
-msgstr "Ágúst"
+msgstr "ágúst"
 
 msgid "September"
-msgstr "September"
+msgstr "september"
 
 msgid "October"
-msgstr "Október"
+msgstr "október"
 
 msgid "November"
-msgstr "Nóvember"
+msgstr "nóvember"
 
 msgid "December"
-msgstr "Desember"
+msgstr "desember"
 
 msgctxt "one letter Sunday"
 msgid "S"

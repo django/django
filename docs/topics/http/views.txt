@@ -2,7 +2,7 @@
 Writing views
 =============
 
-A view function, or *view* for short, is simply a Python function that takes a
+A view function, or *view* for short, is a Python function that takes a
 Web request and returns a Web response. This response can be the HTML contents
 of a Web page, or a redirect, or a 404 error, or an XML document, or an image .
 . . or anything, really. The view itself contains whatever arbitrary logic is
@@ -60,12 +60,12 @@ date and time. To display this view at a particular URL, you'll need to create a
 Returning errors
 ================
 
-Returning HTTP error codes in Django is easy. There are subclasses of
+Django provides help for returning HTTP error codes. There are subclasses of
 :class:`~django.http.HttpResponse` for a number of common HTTP status codes
 other than 200 (which means *"OK"*). You can find the full list of available
 subclasses in the :ref:`request/response <ref-httpresponse-subclasses>`
-documentation.  Just return an instance of one of those subclasses instead of
-a normal :class:`~django.http.HttpResponse` in order to signify an error. For
+documentation. Return an instance of one of those subclasses instead of a
+normal :class:`~django.http.HttpResponse` in order to signify an error. For
 example::
 
     from django.http import HttpResponse, HttpResponseNotFound
@@ -138,9 +138,9 @@ Customizing error views
 =======================
 
 The default error views in Django should suffice for most Web applications,
-but can easily be overridden if you need any custom behavior. Simply specify
-the handlers as seen below in your URLconf (setting them anywhere else will
-have no effect).
+but can easily be overridden if you need any custom behavior. Specify the
+handlers as seen below in your URLconf (setting them anywhere else will have no
+effect).
 
 The :func:`~django.views.defaults.page_not_found` view is overridden by
 :data:`~django.conf.urls.handler404`::
@@ -166,3 +166,65 @@ The :func:`~django.views.defaults.bad_request` view is overridden by
 
     Use the :setting:`CSRF_FAILURE_VIEW` setting to override the CSRF error
     view.
+
+Testing custom error views
+--------------------------
+
+To test the response of a custom error handler, raise the appropriate exception
+in a test view. For example::
+
+    from django.core.exceptions import PermissionDenied
+    from django.http import HttpResponse
+    from django.test import SimpleTestCase, override_settings
+    from django.urls import path
+
+
+    def response_error_handler(request, exception=None):
+        return HttpResponse('Error handler content', status=403)
+
+
+    def permission_denied_view(request):
+        raise PermissionDenied
+
+
+    urlpatterns = [
+        path('403/', permission_denied_view),
+    ]
+
+    handler403 = response_error_handler
+
+
+    # ROOT_URLCONF must specify the module that contains handler403 = ...
+    @override_settings(ROOT_URLCONF=__name__)
+    class CustomErrorHandlerTests(SimpleTestCase):
+
+        def test_handler_renders_template_response(self):
+            response = self.client.get('/403/')
+            # Make assertions on the response here. For example:
+            self.assertContains(response, 'Error handler content', status_code=403)
+
+.. _async-views:
+
+Async views
+===========
+
+.. versionadded:: 3.1
+
+As well as being synchronous functions, views can also be asynchronous
+("async") functions, normally defined using Python's ``async def`` syntax.
+Django will automatically detect these and run them in an async context.
+However, you will need to use an async server based on ASGI to get their
+performance benefits.
+
+Here's an example of an async view::
+
+    import datetime
+    from django.http import HttpResponse
+
+    async def current_datetime(request):
+        now = datetime.datetime.now()
+        html = '<html><body>It is now %s.</body></html>' % now
+        return HttpResponse(html)
+
+You can read more about Django's async support, and how to best use async
+views, in :doc:`/topics/async`.

@@ -44,7 +44,7 @@ class BasicTestCase(TestCase):
     def test_unicode_username(self):
         User.objects.create_user('jörg')
         User.objects.create_user('Григорий')
-        # Two equivalent unicode normalized usernames should be duplicates
+        # Two equivalent Unicode normalized usernames are duplicates.
         omega_username = 'iamtheΩ'  # U+03A9 GREEK CAPITAL LETTER OMEGA
         ohm_username = 'iamtheΩ'  # U+2126 OHM SIGN
         User.objects.create_user(ohm_username)
@@ -53,28 +53,18 @@ class BasicTestCase(TestCase):
 
     def test_user_no_email(self):
         "Users can be created without an email"
-        u = User.objects.create_user('testuser1')
-        self.assertEqual(u.email, '')
-
-        u2 = User.objects.create_user('testuser2', email='')
-        self.assertEqual(u2.email, '')
-
-        u3 = User.objects.create_user('testuser3', email=None)
-        self.assertEqual(u3.email, '')
-
-    def test_anonymous_user(self):
-        "Check the properties of the anonymous user"
-        a = AnonymousUser()
-        self.assertIsNone(a.pk)
-        self.assertEqual(a.username, '')
-        self.assertEqual(a.get_username(), '')
-        self.assertTrue(a.is_anonymous)
-        self.assertFalse(a.is_authenticated)
-        self.assertFalse(a.is_staff)
-        self.assertFalse(a.is_active)
-        self.assertFalse(a.is_superuser)
-        self.assertEqual(a.groups.all().count(), 0)
-        self.assertEqual(a.user_permissions.all().count(), 0)
+        cases = [
+            {},
+            {'email': ''},
+            {'email': None},
+        ]
+        for i, kwargs in enumerate(cases):
+            with self.subTest(**kwargs):
+                u = User.objects.create_user(
+                    'testuser{}'.format(i),
+                    **kwargs
+                )
+                self.assertEqual(u.email, '')
 
     def test_superuser(self):
         "Check the creation and properties of a superuser"
@@ -82,6 +72,22 @@ class BasicTestCase(TestCase):
         self.assertTrue(super.is_superuser)
         self.assertTrue(super.is_active)
         self.assertTrue(super.is_staff)
+
+    def test_superuser_no_email_or_password(self):
+        cases = [
+            {},
+            {'email': ''},
+            {'email': None},
+            {'password': None},
+        ]
+        for i, kwargs in enumerate(cases):
+            with self.subTest(**kwargs):
+                superuser = User.objects.create_superuser(
+                    'super{}'.format(i),
+                    **kwargs
+                )
+                self.assertEqual(superuser.email, '')
+                self.assertFalse(superuser.has_usable_password())
 
     def test_get_user_model(self):
         "The current user model can be retrieved"

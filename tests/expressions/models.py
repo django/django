@@ -6,13 +6,22 @@ import uuid
 from django.db import models
 
 
+class Manager(models.Model):
+    name = models.CharField(max_length=50)
+
+
 class Employee(models.Model):
     firstname = models.CharField(max_length=50)
     lastname = models.CharField(max_length=50)
     salary = models.IntegerField(blank=True, null=True)
+    manager = models.ForeignKey(Manager, models.CASCADE, null=True)
 
     def __str__(self):
         return '%s %s' % (self.firstname, self.lastname)
+
+
+class RemoteEmployee(Employee):
+    adjusted_salary = models.IntegerField()
 
 
 class Company(models.Model):
@@ -22,12 +31,15 @@ class Company(models.Model):
     ceo = models.ForeignKey(
         Employee,
         models.CASCADE,
-        related_name='company_ceo_set')
+        related_name='company_ceo_set',
+    )
     point_of_contact = models.ForeignKey(
         Employee,
         models.SET_NULL,
         related_name='company_point_of_contact_set',
-        null=True)
+        null=True,
+    )
+    based_in_eu = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -50,6 +62,7 @@ class Experiment(models.Model):
     end = models.DateTimeField()
 
     class Meta:
+        db_table = 'expressions_ExPeRiMeNt'
         ordering = ('name',)
 
     def duration(self):
@@ -68,7 +81,7 @@ class Time(models.Model):
     time = models.TimeField(null=True)
 
     def __str__(self):
-        return "%s" % self.time
+        return str(self.time)
 
 
 class SimulationRun(models.Model):
@@ -87,6 +100,3 @@ class UUIDPK(models.Model):
 class UUID(models.Model):
     uuid = models.UUIDField(null=True)
     uuid_fk = models.ForeignKey(UUIDPK, models.CASCADE, null=True)
-
-    def __str__(self):
-        return "%s" % self.uuid

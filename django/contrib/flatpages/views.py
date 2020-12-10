@@ -66,5 +66,4 @@ def render_flatpage(request, f):
     f.title = mark_safe(f.title)
     f.content = mark_safe(f.content)
 
-    response = HttpResponse(template.render({'flatpage': f}, request))
-    return response
+    return HttpResponse(template.render({'flatpage': f}, request))

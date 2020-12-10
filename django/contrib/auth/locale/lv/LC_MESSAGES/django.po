@@ -1,15 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# NullIsNot0 <nullisnot0@inbox.lv>, 2017
+# NullIsNot0 <nullisnot0@inbox.lv>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
+# NullIsNot0 <nullisnot0@inbox.lv>, 2019
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-10-13 09:29+0000\n"
-"Last-Translator: peterisb <pb@sungis.lv>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-11-07 07:27+0000\n"
+"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -33,7 +36,7 @@ msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s objekts ar primāro atslēgu %(key)r neeksistē."
 
 msgid "Password changed successfully."
-msgstr "Paroles nomainīta sekmīgi."
+msgstr "Parole nomainīta sekmīgi."
 
 #, python-format
 msgid "Change password: %s"
@@ -54,7 +57,7 @@ msgstr "Nav norādīta parole"
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Nederīgs paroles formāts vai nezināms hash algoritms."
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "Paroles lauki nesakrita."
 
 msgid "Password"
@@ -67,13 +70,11 @@ msgid "Enter the same password as before, for verification."
 msgstr "Ievadi iepriekš norādīto paroli verifikācijai."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Neapstrādātas paroles sistēmā netiek glabātas, līdz ar to nav iespējams "
-"redzēt lietotāja paroli, bet tu vari nomainīt paroli lietojot <a href=\"../"
-"password/\">šo formu</a>."
+"Paroles netiek glabātas brīvā tekstā, tāpēc nav iespējams apskatīt lietotāja "
+"paroli, bet jūs varat to nomainīt, izmantojot <a href=\"{}\">šo formu</a>."
 
 #, python-format
 msgid ""
@@ -130,10 +131,10 @@ msgid "time cost"
 msgstr "laika izmaksas"
 
 msgid "parallelism"
-msgstr ""
+msgstr "paralēlisms"
 
 msgid "work factor"
-msgstr ""
+msgstr "darba faktors"
 
 msgid "checksum"
 msgstr "kontrolsumma"
@@ -234,7 +235,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Šī parole ir pārāk īsa. Tai ir jābūt vismaz %(min_length)d zīmi garai.."
 msgstr[2] ""
-"Šī parole ir pārāk īsa. Tai ir jābūt vismaz %(min_length)d zīmju garai."
+"Šī parole ir pārāk īsa. Tai ir jābūt vismaz %(min_length)d zīmēm garai."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -247,20 +248,20 @@ msgstr[2] "Parolei ir jābūt vismaz %(min_length)d zīmēm garai."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Parole ir pārāk līdzīga %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr "Tava parole nedrīkst būt pārāk līdzīga pārējiem personālajiem datiem."
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Parole nedrīkst būt pārāk līdzīga pārējai personīgajai informācijai."
 
 msgid "This password is too common."
 msgstr "Parole ir pārāk bieži lietota."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Tava parole nedrīkst būt bieži lietota."
+msgid "Your password can’t be a commonly used password."
+msgstr "Parole nedrīkst būt no bieži lietotu paroļu saraksta."
 
 msgid "This password is entirely numeric."
 msgstr "Parole sastāv tikai no cipariem."
 
-msgid "Your password can't be entirely numeric."
-msgstr "Parole nevar sastāvēt tikai no cipariem."
+msgid "Your password can’t be entirely numeric."
+msgstr "Parole nedrīkst sastāvēt tikai no cipariem."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
@@ -284,7 +285,7 @@ msgid "Logged out"
 msgstr "Atslēdzies"
 
 msgid "Password reset"
-msgstr "Paroles pārstādīšana"
+msgstr "Paroles pārstatīšana"
 
 msgid "Password reset sent"
 msgstr "Paroles pārstatīšana nosūtīta"

@@ -5,6 +5,7 @@ from .messages import (
 from .registry import Tags, register, run_checks, tag_exists
 
 # Import these to force registration of checks
+import django.core.checks.async_checks  # NOQA isort:skip
 import django.core.checks.caches  # NOQA isort:skip
 import django.core.checks.database  # NOQA isort:skip
 import django.core.checks.model_checks  # NOQA isort:skip
@@ -12,6 +13,7 @@ import django.core.checks.security.base  # NOQA isort:skip
 import django.core.checks.security.csrf  # NOQA isort:skip
 import django.core.checks.security.sessions  # NOQA isort:skip
 import django.core.checks.templates  # NOQA isort:skip
+import django.core.checks.translation  # NOQA isort:skip
 import django.core.checks.urls  # NOQA isort:skip
 
 

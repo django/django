@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from template_tests.test_response import test_processor_name
 
 from django.template import Context, EngineHandler, RequestContext
@@ -12,6 +14,7 @@ class DjangoTemplatesTests(TemplateStringsTests):
 
     engine_class = DjangoTemplates
     backend_name = 'django'
+    request_factory = RequestFactory()
 
     def test_context_has_priority_over_template_context_processors(self):
         # See ticket #23789.
@@ -25,7 +28,7 @@ class DjangoTemplatesTests(TemplateStringsTests):
         })
 
         template = engine.from_string('{{ processors }}')
-        request = RequestFactory().get('/')
+        request = self.request_factory.get('/')
 
         # Context processors run
         content = template.render({}, request)
@@ -45,7 +48,7 @@ class DjangoTemplatesTests(TemplateStringsTests):
         })
         template = engine.from_string('')
         context = Context()
-        request_context = RequestContext(RequestFactory().get('/'), {})
+        request_context = RequestContext(self.request_factory.get('/'), {})
         msg = 'context must be a dict rather than Context.'
         with self.assertRaisesMessage(TypeError, msg):
             template.render(context)
@@ -163,3 +166,13 @@ class DjangoTemplatesTests(TemplateStringsTests):
     def test_debug_default_template_loaders(self):
         engine = DjangoTemplates({'DIRS': [], 'APP_DIRS': True, 'NAME': 'django', 'OPTIONS': {}})
         self.assertEqual(engine.engine.loaders, self.default_loaders)
+
+    def test_dirs_pathlib(self):
+        engine = DjangoTemplates({
+            'DIRS': [Path(__file__).parent / 'templates' / 'template_backends'],
+            'APP_DIRS': False,
+            'NAME': 'django',
+            'OPTIONS': {},
+        })
+        template = engine.get_template('hello.html')
+        self.assertEqual(template.render({'name': 'Joe'}), 'Hello Joe!\n')

@@ -6,13 +6,15 @@ import sys
 import tempfile as sys_tempfile
 import unittest
 from io import BytesIO, StringIO
+from unittest import mock
 from urllib.parse import quote
 
 from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.http.multipartparser import MultiPartParser, parse_header
+from django.http.multipartparser import (
+    FILE, MultiPartParser, MultiPartParserError, Parser, parse_header,
+)
 from django.test import SimpleTestCase, TestCase, client, override_settings
-from django.utils.encoding import force_bytes
 
 from . import uploadhandler
 from .models import FileModel
@@ -28,8 +30,7 @@ class FileUploadTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if not os.path.isdir(MEDIA_ROOT):
-            os.makedirs(MEDIA_ROOT)
+        os.makedirs(MEDIA_ROOT, exist_ok=True)
 
     @classmethod
     def tearDownClass(cls):
@@ -65,7 +66,7 @@ class FileUploadTests(TestCase):
                     post_data[key + '_hash'] = hashlib.sha1(post_data[key].read()).hexdigest()
                     post_data[key].seek(0)
                 except AttributeError:
-                    post_data[key + '_hash'] = hashlib.sha1(force_bytes(post_data[key])).hexdigest()
+                    post_data[key + '_hash'] = hashlib.sha1(post_data[key].encode()).hexdigest()
 
             response = self.client.post('/verify/', post_data)
 
@@ -78,7 +79,7 @@ class FileUploadTests(TestCase):
             'Content-Type: application/octet-stream',
             'Content-Transfer-Encoding: base64',
             '']))
-        payload.write(b"\r\n" + encode(force_bytes(content)) + b"\r\n")
+        payload.write(b'\r\n' + encode(content.encode()) + b'\r\n')
         payload.write('--' + client.BOUNDARY + '--\r\n')
         r = {
             'CONTENT_LENGTH': len(payload),
@@ -162,15 +163,61 @@ class FileUploadTests(TestCase):
         response = self.client.request(**r)
         self.assertEqual(response.status_code, 200)
 
+    def test_unicode_file_name_rfc2231_with_double_quotes(self):
+        payload = client.FakePayload()
+        payload.write('\r\n'.join([
+            '--' + client.BOUNDARY,
+            'Content-Disposition: form-data; name="file_unicode"; '
+            'filename*="UTF-8\'\'%s"' % quote(UNICODE_FILENAME),
+            'Content-Type: application/octet-stream',
+            '',
+            'You got pwnd.\r\n',
+            '\r\n--' + client.BOUNDARY + '--\r\n',
+        ]))
+        r = {
+            'CONTENT_LENGTH': len(payload),
+            'CONTENT_TYPE': client.MULTIPART_CONTENT,
+            'PATH_INFO': '/unicode_name/',
+            'REQUEST_METHOD': 'POST',
+            'wsgi.input': payload,
+        }
+        response = self.client.request(**r)
+        self.assertEqual(response.status_code, 200)
+
+    def test_unicode_name_rfc2231_with_double_quotes(self):
+        payload = client.FakePayload()
+        payload.write('\r\n'.join([
+            '--' + client.BOUNDARY,
+            'Content-Disposition: form-data; name*="UTF-8\'\'file_unicode"; '
+            'filename*="UTF-8\'\'%s"' % quote(UNICODE_FILENAME),
+            'Content-Type: application/octet-stream',
+            '',
+            'You got pwnd.\r\n',
+            '\r\n--' + client.BOUNDARY + '--\r\n'
+        ]))
+        r = {
+            'CONTENT_LENGTH': len(payload),
+            'CONTENT_TYPE': client.MULTIPART_CONTENT,
+            'PATH_INFO': '/unicode_name/',
+            'REQUEST_METHOD': 'POST',
+            'wsgi.input': payload,
+        }
+        response = self.client.request(**r)
+        self.assertEqual(response.status_code, 200)
+
     def test_blank_filenames(self):
         """
         Receiving file upload when filename is blank (before and after
         sanitization) should be okay.
         """
-        # The second value is normalized to an empty name by
-        # MultiPartParser.IE_sanitize()
-        filenames = ['', 'C:\\Windows\\']
-
+        filenames = [
+            '',
+            # Normalized by MultiPartParser.IE_sanitize().
+            'C:\\Windows\\',
+            # Normalized by os.path.basename().
+            '/',
+            'ends-with-slash/',
+        ]
         payload = client.FakePayload()
         for i, name in enumerate(filenames):
             payload.write('\r\n'.join([
@@ -385,9 +432,41 @@ class FileUploadTests(TestCase):
             file.write(b'a' * (2 ** 21))
             file.seek(0)
 
-            # AttributeError: You cannot alter upload handlers after the upload has been processed.
-            with self.assertRaises(AttributeError):
+            msg = 'You cannot alter upload handlers after the upload has been processed.'
+            with self.assertRaisesMessage(AttributeError, msg):
                 self.client.post('/quota/broken/', {'f': file})
+
+    def test_stop_upload_temporary_file_handler(self):
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write(b'a')
+            temp_file.seek(0)
+            response = self.client.post('/temp_file/stop_upload/', {'file': temp_file})
+            temp_path = response.json()['temp_path']
+            self.assertIs(os.path.exists(temp_path), False)
+
+    def test_upload_interrupted_temporary_file_handler(self):
+        # Simulate an interrupted upload by omitting the closing boundary.
+        class MockedParser(Parser):
+            def __iter__(self):
+                for item in super().__iter__():
+                    item_type, meta_data, field_stream = item
+                    yield item_type, meta_data, field_stream
+                    if item_type == FILE:
+                        return
+
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write(b'a')
+            temp_file.seek(0)
+            with mock.patch(
+                'django.http.multipartparser.Parser',
+                MockedParser,
+            ):
+                response = self.client.post(
+                    '/temp_file/upload_interrupted/',
+                    {'file': temp_file},
+                )
+            temp_path = response.json()['temp_path']
+            self.assertIs(os.path.exists(temp_path), False)
 
     def test_fileupload_getlist(self):
         file = tempfile.NamedTemporaryFile
@@ -479,8 +558,9 @@ class FileUploadTests(TestCase):
             try:
                 self.client.post('/upload_errors/', post_data)
             except reference_error.__class__ as err:
-                self.assertFalse(
-                    str(err) == str(reference_error),
+                self.assertNotEqual(
+                    str(err),
+                    str(reference_error),
                     "Caught a repeated exception that'll cause an infinite loop in file uploads."
                 )
             except Exception as err:
@@ -527,8 +607,7 @@ class DirectoryCreationTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if not os.path.isdir(MEDIA_ROOT):
-            os.makedirs(MEDIA_ROOT)
+        os.makedirs(MEDIA_ROOT, exist_ok=True)
 
     @classmethod
     def tearDownClass(cls):
@@ -547,19 +626,16 @@ class DirectoryCreationTests(SimpleTestCase):
             self.obj.testfile.save('foo.txt', SimpleUploadedFile('foo.txt', b'x'), save=False)
 
     def test_not_a_directory(self):
-        """The correct IOError is raised when the upload directory name exists but isn't a directory"""
         # Create a file with the upload directory name
         open(UPLOAD_TO, 'wb').close()
         self.addCleanup(os.remove, UPLOAD_TO)
-        with self.assertRaises(IOError) as exc_info:
+        msg = '%s exists and is not a directory.' % UPLOAD_TO
+        with self.assertRaisesMessage(FileExistsError, msg):
             with SimpleUploadedFile('foo.txt', b'x') as file:
                 self.obj.testfile.save('foo.txt', file, save=False)
-        # The test needs to be done on a specific string as IOError
-        # is raised even without the patch (just not early enough)
-        self.assertEqual(exc_info.exception.args[0], "%s exists and is not a directory." % UPLOAD_TO)
 
 
-class MultiParserTests(unittest.TestCase):
+class MultiParserTests(SimpleTestCase):
 
     def test_empty_upload_handlers(self):
         # We're not actually parsing here; just checking if the parser properly
@@ -568,6 +644,27 @@ class MultiParserTests(unittest.TestCase):
             'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
             'CONTENT_LENGTH': '1'
         }, StringIO('x'), [], 'utf-8')
+
+    def test_invalid_content_type(self):
+        with self.assertRaisesMessage(MultiPartParserError, 'Invalid Content-Type: text/plain'):
+            MultiPartParser({
+                'CONTENT_TYPE': 'text/plain',
+                'CONTENT_LENGTH': '1',
+            }, StringIO('x'), [], 'utf-8')
+
+    def test_negative_content_length(self):
+        with self.assertRaisesMessage(MultiPartParserError, 'Invalid content length: -1'):
+            MultiPartParser({
+                'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
+                'CONTENT_LENGTH': -1,
+            }, StringIO('x'), [], 'utf-8')
+
+    def test_bad_type_content_length(self):
+        multipart_parser = MultiPartParser({
+            'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
+            'CONTENT_LENGTH': 'a',
+        }, StringIO('x'), [], 'utf-8')
+        self.assertEqual(multipart_parser._content_length, 0)
 
     def test_rfc2231_parsing(self):
         test_data = (

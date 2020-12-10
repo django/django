@@ -6,13 +6,14 @@
 # Bashar Al-Abdulhadi, 2014
 # Eyad Toma <d.eyad.t@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Omar Lajam, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:39+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-03-28 17:26+0000\n"
+"Last-Translator: Omar Lajam\n"
 "Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -56,8 +57,8 @@ msgstr "لا يوجد كلمة سر حتى الآن."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "تنسيق كلمة المرور غير صالح أو خوارزمية التجزئة غير معروفة."
 
-msgid "The two password fields didn't match."
-msgstr "حقلا كلمتي المرور غير متطابقين."
+msgid "The two password fields didn’t match."
+msgstr "كلمات المرور غير متطابقة"
 
 msgid "Password"
 msgstr "كلمة المرور"
@@ -69,12 +70,11 @@ msgid "Enter the same password as before, for verification."
 msgstr "أدخل كلمة المرور أعلاه مرة أخرى لتأكيدها."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"لا يتم حفظ كلمات المرور كما هي، لذلك لا يمكن عرض كلمة السر هذه، ولكن يمكن "
-"تغييرها باستخدام <a href=\"../password/\">هذا النموذج</a>."
+"لا يتم حفظ كلمات المرور بصورتها الأصلية، لذلك لا يمكنك عرض كلمة مرور "
+"المستخدم، لكن يمكنك تغييرها باستخدام <a href=\"{}\">هذا النموذج</a>"
 
 #, python-format
 msgid ""
@@ -116,19 +116,19 @@ msgid "hash"
 msgstr "hash"
 
 msgid "variety"
-msgstr ""
+msgstr "منوّع"
 
 msgid "version"
-msgstr ""
+msgstr "إصدار"
 
 msgid "memory cost"
-msgstr ""
+msgstr "استهلاك الذاكرة"
 
 msgid "time cost"
-msgstr ""
+msgstr "المدة المطلوبة"
 
 msgid "parallelism"
-msgstr ""
+msgstr "التوازي"
 
 msgid "work factor"
 msgstr "عامل العمل"
@@ -183,7 +183,7 @@ msgid "username"
 msgstr "اسم المستخدم"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
+msgstr "مطلوب. أدخل 150 رمز أو أقل، مكونة من حروف، أرقام، أو (@/./+/-/_) فقط"
 
 msgid "A user with that username already exists."
 msgstr "هناك مستخدم موجود مسبقاً بهذا الاسم."
@@ -257,22 +257,20 @@ msgstr[5] "كلمة المرور الخاصة بك يجب أن تتضمن %(min_
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "كلمة المرور هذه مشابة جدا لـ %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr ""
-"كلمة المرور الخاصة بكم لا يمكن أن تكون مشابة لأي من المعلومات الشخصية الأخرى "
-"الخاصة بك."
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "كلمة المرور لا يمكن أن تكون مشابهة للمعلومات الشخصية الأخرى."
 
 msgid "This password is too common."
 msgstr "كلمة المرور هذه شائعة جدا."
 
-msgid "Your password can't be a commonly used password."
-msgstr "كلمة المرور الخاصة بك لا يمكن أن تكون كلمة مرور مستخدمة بشكل شائع."
+msgid "Your password can’t be a commonly used password."
+msgstr "كلمة المرور لا يمكن أن تكون سهلة شائعة الاستخدام."
 
 msgid "This password is entirely numeric."
 msgstr "كلمة المرور هذه تتكون من أرقام فقط."
 
-msgid "Your password can't be entirely numeric."
-msgstr "كلمة المرور الخاصة بك لا يمكن أن تكون أرقام فقط."
+msgid "Your password can’t be entirely numeric."
+msgstr "كلمة المرور لا يمكن أن تحتوي على أرقام فقط."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
@@ -282,11 +280,12 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"يجب أن يتكون اسم المستخدم من أحرف إنجليزية، أرقام، أو الرموز (@/./+/-/_) فقط."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
-msgstr ""
+msgstr "يجب أن يتكون اسم المستخدم من حروف، أرقام، أو الرموز (@/./+/-/_) فقط."
 
 msgid "Logged out"
 msgstr "تم الخروج"

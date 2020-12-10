@@ -4,7 +4,11 @@ from collections import namedtuple
 TableInfo = namedtuple('TableInfo', ['name', 'type'])
 
 # Structure returned by the DB-API cursor.description interface (PEP 249)
-FieldInfo = namedtuple('FieldInfo', 'name type_code display_size internal_size precision scale null_ok default')
+FieldInfo = namedtuple(
+    'FieldInfo',
+    'name type_code display_size internal_size precision scale null_ok '
+    'default collation'
+)
 
 
 class BaseDatabaseIntrospection:
@@ -24,21 +28,13 @@ class BaseDatabaseIntrospection:
         """
         return self.data_types_reverse[data_type]
 
-    def table_name_converter(self, name):
+    def identifier_converter(self, name):
         """
-        Apply a conversion to the name for the purposes of comparison.
+        Apply a conversion to the identifier for the purposes of comparison.
 
-        The default table name converter is for case sensitive comparison.
+        The default identifier converter is for case sensitive comparison.
         """
         return name
-
-    def column_name_converter(self, name):
-        """
-        Apply a conversion to the column name for the purposes of comparison.
-
-        Use table_name_converter() by default.
-        """
-        return self.table_name_converter(name)
 
     def table_names(self, cursor=None, include_views=False):
         """
@@ -62,6 +58,26 @@ class BaseDatabaseIntrospection:
         """
         raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_table_list() method')
 
+    def get_table_description(self, cursor, table_name):
+        """
+        Return a description of the table with the DB-API cursor.description
+        interface.
+        """
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseIntrospection may require a '
+            'get_table_description() method.'
+        )
+
+    def get_migratable_models(self):
+        from django.apps import apps
+        from django.db import router
+        return (
+            model
+            for app_config in apps.get_app_configs()
+            for model in router.get_migratable_models(app_config, self.connection.alias)
+            if model._meta.can_migrate(self.connection)
+        )
+
     def django_table_names(self, only_existing=False, include_views=True):
         """
         Return a list of all table names that have associated Django models and
@@ -69,25 +85,22 @@ class BaseDatabaseIntrospection:
 
         If only_existing is True, include only the tables in the database.
         """
-        from django.apps import apps
-        from django.db import router
         tables = set()
-        for app_config in apps.get_app_configs():
-            for model in router.get_migratable_models(app_config, self.connection.alias):
-                if not model._meta.managed:
-                    continue
-                tables.add(model._meta.db_table)
-                tables.update(
-                    f.m2m_db_table() for f in model._meta.local_many_to_many
-                    if f.remote_field.through._meta.managed
-                )
+        for model in self.get_migratable_models():
+            if not model._meta.managed:
+                continue
+            tables.add(model._meta.db_table)
+            tables.update(
+                f.m2m_db_table() for f in model._meta.local_many_to_many
+                if f.remote_field.through._meta.managed
+            )
         tables = list(tables)
         if only_existing:
-            existing_tables = self.table_names(include_views=include_views)
+            existing_tables = set(self.table_names(include_views=include_views))
             tables = [
                 t
                 for t in tables
-                if self.table_name_converter(t) in existing_tables
+                if self.identifier_converter(t) in existing_tables
             ]
         return tables
 
@@ -96,15 +109,10 @@ class BaseDatabaseIntrospection:
         Return a set of all models represented by the provided list of table
         names.
         """
-        from django.apps import apps
-        from django.db import router
-        all_models = []
-        for app_config in apps.get_app_configs():
-            all_models.extend(router.get_migratable_models(app_config, self.connection.alias))
-        tables = list(map(self.table_name_converter, tables))
+        tables = set(map(self.identifier_converter, tables))
         return {
-            m for m in all_models
-            if self.table_name_converter(m._meta.db_table) in tables
+            m for m in self.get_migratable_models()
+            if self.identifier_converter(m._meta.db_table) in tables
         }
 
     def sequence_list(self):
@@ -112,29 +120,40 @@ class BaseDatabaseIntrospection:
         Return a list of information about all DB sequences for all models in
         all apps.
         """
-        from django.apps import apps
-        from django.db import models, router
-
         sequence_list = []
-
-        for app_config in apps.get_app_configs():
-            for model in router.get_migratable_models(app_config, self.connection.alias):
+        with self.connection.cursor() as cursor:
+            for model in self.get_migratable_models():
                 if not model._meta.managed:
                     continue
                 if model._meta.swapped:
                     continue
-                for f in model._meta.local_fields:
-                    if isinstance(f, models.AutoField):
-                        sequence_list.append({'table': model._meta.db_table, 'column': f.column})
-                        break  # Only one AutoField is allowed per model, so don't bother continuing.
-
+                sequence_list.extend(self.get_sequences(cursor, model._meta.db_table, model._meta.local_fields))
                 for f in model._meta.local_many_to_many:
                     # If this is an m2m using an intermediate table,
                     # we don't need to reset the sequence.
-                    if f.remote_field.through is None:
-                        sequence_list.append({'table': f.m2m_db_table(), 'column': None})
-
+                    if f.remote_field.through._meta.auto_created:
+                        sequence = self.get_sequences(cursor, f.m2m_db_table())
+                        sequence_list.extend(sequence or [{'table': f.m2m_db_table(), 'column': None}])
         return sequence_list
+
+    def get_sequences(self, cursor, table_name, table_fields=()):
+        """
+        Return a list of introspected sequences for table_name. Each sequence
+        is a dict: {'table': <table_name>, 'column': <column_name>}. An optional
+        'name' key can be added if the backend supports named sequences.
+        """
+        raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_sequences() method')
+
+    def get_relations(self, cursor, table_name):
+        """
+        Return a dictionary of
+        {field_name: (field_name_other_table, other_table)} representing all
+        relationships to the given table.
+        """
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseIntrospection may require a '
+            'get_relations() method.'
+        )
 
     def get_key_columns(self, cursor, table_name):
         """
@@ -152,18 +171,6 @@ class BaseDatabaseIntrospection:
             if constraint['primary_key']:
                 return constraint['columns'][0]
         return None
-
-    def get_indexes(self, cursor, table_name):
-        """
-        Deprecated in Django 1.11, use get_constraints instead.
-        Return a dictionary of indexed fieldname -> infodict for the given
-        table, where each infodict is in the format:
-            {'primary_key': boolean representing whether it's the primary key,
-             'unique': boolean representing whether it's a unique index}
-
-        Only single-column indexes are introspected.
-        """
-        raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_indexes() method')
 
     def get_constraints(self, cursor, table_name):
         """

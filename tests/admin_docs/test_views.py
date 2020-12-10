@@ -28,7 +28,7 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         self.client.logout()
         response = self.client.get(reverse('django-admindocs-docroot'), follow=True)
         # Should display the login screen
-        self.assertContains(response, '<input type="hidden" name="next" value="/admindocs/" />', html=True)
+        self.assertContains(response, '<input type="hidden" name="next" value="/admindocs/">', html=True)
 
     def test_bookmarklets(self):
         response = self.client.get(reverse('django-admindocs-bookmarklets'))
@@ -51,6 +51,12 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         )
         self.assertContains(response, 'Views by namespace test')
         self.assertContains(response, 'Name: <code>test:func</code>.')
+        self.assertContains(
+            response,
+            '<h3><a href="/admindocs/views/admin_docs.views.XViewCallableObject/">'
+            '/xview/callable_object_without_xview/</a></h3>',
+            html=True,
+        )
 
     def test_view_index_with_method(self):
         """
@@ -99,7 +105,7 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
 
     def test_template_detail(self):
         response = self.client.get(reverse('django-admindocs-templates', args=['admin_doc/template_detail.html']))
-        self.assertContains(response, '<h1>Template: "admin_doc/template_detail.html"</h1>', html=True)
+        self.assertContains(response, '<h1>Template: <q>admin_doc/template_detail.html</q></h1>', html=True)
 
     def test_missing_docutils(self):
         utils.docutils_is_available = False
@@ -107,8 +113,11 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
             response = self.client.get(reverse('django-admindocs-docroot'))
             self.assertContains(
                 response,
-                '<h3>The admin documentation system requires Python\'s '
-                '<a href="http://docutils.sf.net/">docutils</a> library.</h3>',
+                '<h3>The admin documentation system requires Python’s '
+                '<a href="https://docutils.sourceforge.io/">docutils</a> '
+                'library.</h3>'
+                '<p>Please ask your administrators to install '
+                '<a href="https://docutils.sourceforge.io/">docutils</a>.</p>',
                 html=True
             )
             self.assertContains(response, '<h1 id="site-name"><a href="/admin/">Django administration</a></h1>')
@@ -193,7 +202,7 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         """
         Methods with keyword arguments should have their arguments displayed.
         """
-        self.assertContains(self.response, "<td>suffix=&#39;ltd&#39;</td>")
+        self.assertContains(self.response, '<td>suffix=&#x27;ltd&#x27;</td>')
 
     def test_methods_with_multiple_arguments_display_arguments(self):
         """
@@ -201,6 +210,10 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         displayed, but omitting 'self'.
         """
         self.assertContains(self.response, "<td>baz, rox, *some_args, **some_kwargs</td>")
+
+    def test_instance_of_property_methods_are_displayed(self):
+        """Model properties are displayed as fields."""
+        self.assertContains(self.response, '<td>a_property</td>')
 
     def test_method_data_types(self):
         company = Company.objects.create(name="Django")
@@ -293,6 +306,16 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
     def test_model_detail_title(self):
         self.assertContains(self.response, '<h1>admin_docs.Person</h1>', html=True)
 
+    def test_app_not_found(self):
+        response = self.client.get(reverse('django-admindocs-models-detail', args=['doesnotexist', 'Person']))
+        self.assertEqual(response.context['exception'], "App 'doesnotexist' not found")
+        self.assertEqual(response.status_code, 404)
+
+    def test_model_not_found(self):
+        response = self.client.get(reverse('django-admindocs-models-detail', args=['admin_docs', 'doesnotexist']))
+        self.assertEqual(response.context['exception'], "Model 'doesnotexist' not found in app 'admin_docs'")
+        self.assertEqual(response.status_code, 404)
+
 
 class CustomField(models.Field):
     description = "A custom field type"
@@ -303,9 +326,6 @@ class DescriptionLackingField(models.Field):
 
 
 class TestFieldType(unittest.TestCase):
-    def setUp(self):
-        pass
-
     def test_field_name(self):
         with self.assertRaises(AttributeError):
             views.get_readable_field_data_type("NotAField")
@@ -331,9 +351,13 @@ class AdminDocViewFunctionsTests(SimpleTestCase):
             (r'^a', '/a'),
             (r'^(?P<a>\w+)/b/(?P<c>\w+)/$', '/<a>/b/<c>/'),
             (r'^(?P<a>\w+)/b/(?P<c>\w+)$', '/<a>/b/<c>'),
+            (r'^(?P<a>\w+)/b/(?P<c>\w+)', '/<a>/b/<c>'),
             (r'^(?P<a>\w+)/b/(\w+)$', '/<a>/b/<var>'),
+            (r'^(?P<a>\w+)/b/(\w+)', '/<a>/b/<var>'),
             (r'^(?P<a>\w+)/b/((x|y)\w+)$', '/<a>/b/<var>'),
+            (r'^(?P<a>\w+)/b/((x|y)\w+)', '/<a>/b/<var>'),
             (r'^(?P<a>(x|y))/b/(?P<c>\w+)$', '/<a>/b/<c>'),
+            (r'^(?P<a>(x|y))/b/(?P<c>\w+)', '/<a>/b/<c>'),
             (r'^(?P<a>(x|y))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
             (r'^(?P<a>(x|y)(\(|\)))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
             (r'^a/?$', '/a/'),

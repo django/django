@@ -2,55 +2,47 @@
 #
 # Translators:
 # Ali Nikneshan <ali@nikneshan.com>, 2015
+# MJafar Mashhadi <raindigital2007@gmail.com>, 2018
 # Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2016
 # Pouya Abbassi, 2016
+# rahim agh <rahim.aghareb@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-08-16 14:19+0000\n"
-"Last-Translator: Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-27 09:32+0000\n"
+"Last-Translator: rahim agh <rahim.aghareb@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fa\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "PostgreSQL extensions"
 msgstr "ملحقات Postgres"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "مورد %(nth)s ام در آرایه معتبر نیست: "
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "عضو %(nth)sم آرایه معتبر نیست:"
 
 msgid "Nested arrays must have the same length."
 msgstr "آرایه های تو در تو باید هم سایز باشند"
 
-msgid "Map of strings to strings"
-msgstr "نقشه از رشته به رشته"
+msgid "Map of strings to strings/nulls"
+msgstr "نگاشتی از رشته به رشته/هیچمقدار"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "مقدار %(key)s رشته نیست."
-
-msgid "A JSON object"
-msgstr "یک شیء JSON"
-
-msgid "Value must be valid JSON."
-msgstr "مقدار باید JSON معتبر باشد."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "مقدار \"%(key)s\" یک رشته حرفی یا null نیست."
 
 msgid "Could not load JSON data."
 msgstr "امکان بارگزاری  داده های JSON  نیست."
 
 msgid "Input must be a JSON dictionary."
 msgstr "مقدار ورودی باید یک دیکشنری JSON باشد."
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "مقدار  %(value)s باید JSON معتبر باشد."
 
 msgid "Enter two valid values."
 msgstr "دو مقدار معتبر وارد کنید"
@@ -80,6 +72,9 @@ msgid_plural ""
 msgstr[0] ""
 "لیست شامل %(show_value)d مورد است. ولی باید حداکثر شامل %(limit_value)d مورد "
 "باشد."
+msgstr[1] ""
+"لیست شامل %(show_value)d مورد است. ولی باید حداکثر شامل %(limit_value)d مورد "
+"باشد."
 
 #, python-format
 msgid ""
@@ -89,6 +84,8 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no fewer than "
 "%(limit_value)d."
 msgstr[0] ""
+"لیست شامل %(show_value)d است، نباید کمتر از %(limit_value)d را شامل شود."
+msgstr[1] ""
 "لیست شامل %(show_value)d است، نباید کمتر از %(limit_value)d را شامل شود."
 
 #, python-format
