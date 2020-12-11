@@ -188,16 +188,16 @@ If a ``message`` contains headers at the start of the string, the headers will
 be printed as the first bit of the email message.
 
 Here's an example view that takes a ``subject``, ``message`` and ``from_email``
-from the request's POST data, sends that to admin@example.com and redirects to
-"/contact/thanks/" when it's done::
+from the POST request's form data, sends that to admin@example.com and
+redirects to "/contact/thanks/" when it's done::
 
     from django.core.mail import BadHeaderError, send_mail
     from django.http import HttpResponse, HttpResponseRedirect
 
     def send_email(request):
-        subject = request.POST.get('subject', '')
-        message = request.POST.get('message', '')
-        from_email = request.POST.get('from_email', '')
+        subject = request.form_data.get('subject', '')
+        message = request.form_data.get('message', '')
+        from_email = request.form_data.get('from_email', '')
         if subject and message and from_email:
             try:
                 send_mail(subject, message, from_email, ['admin@example.com'])

@@ -96,7 +96,7 @@ is validated against ``['.localhost', '127.0.0.1', '[::1]']``.
 <topics-testing-advanced-multiple-hosts>`.
 
 This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
-if your code accesses the ``Host`` header directly from ``request.META`` you
+if your code accesses the ``Host`` header directly from ``request.meta`` you
 are bypassing this security protection.
 
 .. setting:: APPEND_SLASH
@@ -444,7 +444,7 @@ Default: ``'HTTP_X_CSRFTOKEN'``
 
 The name of the request header used for CSRF authentication.
 
-As with other HTTP headers in ``request.META``, the header name received from
+As with other HTTP headers in ``request.meta``, the header name received from
 the server is normalized by converting all characters to uppercase, replacing
 any hyphens with underscores, and adding an ``'HTTP_'`` prefix to the name.
 For example, if your client sends a ``'X-XSRF-TOKEN'`` header, the setting
@@ -1038,13 +1038,16 @@ Default: ``2621440`` (i.e. 2.5 MB).
 
 The maximum size in bytes that a request body may be before a
 :exc:`~django.core.exceptions.SuspiciousOperation` (``RequestDataTooBig``) is
-raised. The check is done when accessing ``request.body`` or ``request.POST``
-and is calculated against the total request size excluding any file upload
-data. You can set this to ``None`` to disable the check. Applications that are
-expected to receive unusually large form posts should tune this setting.
+raised. The check is done when accessing ``request.body`` or
+``request.form_data`` and is calculated against the total request size
+excluding any file upload data. You can set this to ``None`` to disable the
+check. Applications that are expected to receive unusually large form posts
+should tune this setting.
 
 The amount of request data is correlated to the amount of memory needed to
-process the request and populate the GET and POST dictionaries. Large requests
+process the request and populate the
+:attr:`request.query_params <.HttpRequest.query_params>` and
+:attr:`request.form_data <.HttpRequest.form_data>` dictionaries. Large requests
 could be used as a denial-of-service attack vector if left unchecked. Since web
 servers don't typically perform deep request inspection, it's not possible to
 perform a similar check at that level.
@@ -1058,14 +1061,18 @@ See also :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`.
 
 Default: ``1000``
 
-The maximum number of parameters that may be received via GET or POST before a
+The maximum number of parameters that may be received in
+:attr:`request.query_params <.HttpRequest.query_params>` or
+:attr:`request.form_data <.HttpRequest.form_data>` before a
 :exc:`~django.core.exceptions.SuspiciousOperation` (``TooManyFields``) is
 raised. You can set this to ``None`` to disable the check. Applications that
 are expected to receive an unusually large number of form fields should tune
 this setting.
 
 The number of request parameters is correlated to the amount of time needed to
-process the request and populate the GET and POST dictionaries. Large requests
+process the request and populate the
+:attr:`request.query_params <.HttpRequest.query_params>` and
+:attr:`request.form_data <.HttpRequest.form_data>` dictionaries. Large requests
 could be used as a denial-of-service attack vector if left unchecked. Since web
 servers don't typically perform deep request inspection, it's not possible to
 perform a similar check at that level.
@@ -2346,10 +2353,10 @@ be secure (i.e., it originally came in via HTTPS).
 You should *only* set this setting if you control your proxy or have some other
 guarantee that it sets/strips this header appropriately.
 
-Note that the header needs to be in the format as used by ``request.META`` --
+Note that the header needs to be in the format as used by ``request.meta`` --
 all caps and likely starting with ``HTTP_``. (Remember, Django automatically
 adds ``'HTTP_'`` to the start of x-header names before making the header
-available in ``request.META``.)
+available in ``request.meta``.)
 
 .. warning::
 
@@ -2822,8 +2829,9 @@ number, in which case you shouldn't use :setting:`USE_X_FORWARDED_PORT`.
 Default: ``False``
 
 A boolean that specifies whether to use the ``X-Forwarded-Port`` header in
-preference to the ``SERVER_PORT`` ``META`` variable. This should only be
-enabled if a proxy which sets this header is in use.
+preference to the ``SERVER_PORT`` :attr:`request.meta <.HttpRequest.meta>`
+variable. This should only be enabled if a proxy which sets this header is in
+use.
 
 :setting:`USE_X_FORWARDED_HOST` takes priority over this setting.
 
@@ -2920,7 +2928,7 @@ Default: ``'/accounts/profile/'``
 
 The URL or :ref:`named URL pattern <naming-url-patterns>` where requests are
 redirected after login when the :class:`~django.contrib.auth.views.LoginView`
-doesn't get a ``next`` GET parameter.
+doesn't get a ``next`` query parameter.
 
 .. setting:: LOGIN_URL
 

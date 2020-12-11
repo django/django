@@ -390,8 +390,8 @@ __ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Opti
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Some browsers have the ability to block content that appears to be an `XSS
-attack`_. They work by looking for JavaScript content in the GET or POST
-parameters of a page. If the JavaScript is replayed in the server's response,
+attack`_. They work by looking for JavaScript content in the query parameters
+or form post data. If the JavaScript is replayed in the server's response,
 the page is blocked from rendering and an error page is shown instead.
 
 The `X-XSS-Protection header`__ is used to control the operation of the

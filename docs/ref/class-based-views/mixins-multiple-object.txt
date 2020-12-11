@@ -82,8 +82,9 @@ Multiple object mixins
         An integer specifying how many objects should be displayed per page. If
         this is given, the view will paginate objects with
         ``paginate_by`` objects per page. The view will
-        expect either a ``page`` query string parameter (via ``request.GET``)
-        or a ``page`` variable specified in the URLconf.
+        expect either a ``page`` query string parameter (via
+        ``request.query_params``) or a ``page`` variable specified in the
+        URLconf.
 
     .. attribute:: paginate_orphans
 
@@ -96,8 +97,8 @@ Multiple object mixins
 
         A string specifying the name to use for the page parameter.
         The view will expect this parameter to be available either as a query
-        string parameter (via ``request.GET``) or as a kwarg variable specified
-        in the URLconf. Defaults to ``page``.
+        string parameter (via ``request.query_params``) or as a kwarg variable
+        specified in the URLconf. Defaults to ``page``.
 
     .. attribute:: paginator_class
 
@@ -130,8 +131,8 @@ Multiple object mixins
 
         Constructed by paginating ``queryset`` into pages of size ``page_size``.
         If the request contains a ``page`` argument, either as a captured URL
-        argument or as a GET argument, ``object_list`` will correspond to the
-        objects from that page.
+        argument or as a query parameter, ``object_list`` will correspond to
+        the objects from that page.
 
     .. method:: get_paginate_by(queryset)
 

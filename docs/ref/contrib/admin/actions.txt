@@ -246,7 +246,7 @@ dump some selected objects as JSON::
 Generally, something like the above isn't considered a great idea. Most of the
 time, the best practice will be to return an
 :class:`~django.http.HttpResponseRedirect` and redirect the user to a view
-you've written, passing the list of selected objects in the GET query string.
+you've written, passing the list of selected objects in the query parameters.
 This allows you to provide complex interaction logic on the intermediary
 pages. For example, if you wanted to provide a more complete export function,
 you'd want to let the user choose a format, and possibly a list of fields to

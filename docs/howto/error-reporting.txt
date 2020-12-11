@@ -194,7 +194,7 @@ filtered out of error reports in a production environment (that is, where
 .. function:: sensitive_post_parameters(*parameters)
 
     If one of your views receives an :class:`~django.http.HttpRequest` object
-    with :attr:`POST parameters<django.http.HttpRequest.POST>` susceptible to
+    with :attr:`form_data<django.http.HttpRequest.form_data>` susceptible to
     contain sensitive information, you may prevent the values of those
     parameters from being included in the error reports using the
     ``sensitive_post_parameters`` decorator::
@@ -205,26 +205,26 @@ filtered out of error reports in a production environment (that is, where
         def record_user_profile(request):
             UserProfile.create(
                 user=request.user,
-                password=request.POST['pass_word'],
-                credit_card=request.POST['credit_card_number'],
-                name=request.POST['name'],
+                password=request.form_data['pass_word'],
+                credit_card=request.form_data['credit_card_number'],
+                name=request.form_data['name'],
             )
             ...
 
     In the above example, the values for the ``pass_word`` and
-    ``credit_card_number`` POST parameters will be hidden and replaced with
+    ``credit_card_number`` form data will be hidden and replaced with
     stars (``**********``) in the request's representation inside the
     error reports, whereas the value of the ``name`` parameter will be
     disclosed.
 
-    To systematically hide all POST parameters of a request in error reports,
+    To systematically hide all form data of a request in error reports,
     do not provide any argument to the ``sensitive_post_parameters`` decorator::
 
         @sensitive_post_parameters()
         def my_view(request):
             ...
 
-    All POST parameters are systematically filtered out of error reports for
+    All form data is systematically filtered out of error reports for
     certain :mod:`django.contrib.auth.views` views (``login``,
     ``password_reset_confirm``, ``password_change``, and ``add_view`` and
     ``user_change_password`` in the ``auth`` admin) to prevent the leaking of
@@ -238,7 +238,7 @@ Custom error reports
 All :func:`sensitive_variables` and :func:`sensitive_post_parameters` do is,
 respectively, annotate the decorated function with the names of sensitive
 variables and annotate the ``HttpRequest`` object with the names of sensitive
-POST parameters, so that this sensitive information can later be filtered out
+form data, so that this sensitive information can later be filtered out
 of reports when an error occurs. The actual filtering is done by Django's
 default error reporter filter:
 :class:`django.views.debug.SafeExceptionReporterFilter`. This filter uses the
@@ -276,7 +276,7 @@ following attributes and methods:
     .. attribute:: hidden_settings
 
         A compiled regular expression object used to match settings and
-        ``request.META`` values considered as sensitive. By default equivalent
+        ``request.meta`` values considered as sensitive. By default equivalent
         to::
 
             import re
@@ -288,13 +288,13 @@ following attributes and methods:
         Returns ``True`` to activate the filtering in
         :meth:`get_post_parameters` and :meth:`get_traceback_frame_variables`.
         By default the filter is active if :setting:`DEBUG` is ``False``. Note
-        that sensitive ``request.META`` values are always filtered along with
+        that sensitive ``request.meta`` values are always filtered along with
         sensitive setting values, as described in the :setting:`DEBUG`
         documentation.
 
     .. method:: get_post_parameters(request)
 
-        Returns the filtered dictionary of POST parameters. Sensitive values
+        Returns the filtered dictionary of form data. Sensitive values
         are replaced with :attr:`cleansed_substitute`.
 
     .. method:: get_traceback_frame_variables(request, tb_frame)

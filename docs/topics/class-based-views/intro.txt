@@ -187,7 +187,7 @@ A basic function-based view that handles forms may look something like this::
 
     def myview(request):
         if request.method == "POST":
-            form = MyForm(request.POST)
+            form = MyForm(request.form_data)
             if form.is_valid():
                 # <process form cleaned data>
                 return HttpResponseRedirect('/success/')
@@ -214,7 +214,7 @@ A similar class-based view might look like::
             return render(request, self.template_name, {'form': form})
 
         def post(self, request, *args, **kwargs):
-            form = self.form_class(request.POST)
+            form = self.form_class(request.form_data)
             if form.is_valid():
                 # <process form cleaned data>
                 return HttpResponseRedirect('/success/')

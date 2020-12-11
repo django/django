@@ -17,8 +17,8 @@ Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `Cosign`_,
 
 When the Web server takes care of authentication it typically sets the
 ``REMOTE_USER`` environment variable for use in the underlying application.  In
-Django, ``REMOTE_USER`` is made available in the :attr:`request.META
-<django.http.HttpRequest.META>` attribute.  Django can be configured to make
+Django, ``REMOTE_USER`` is made available in the :attr:`request.meta
+<django.http.HttpRequest.meta>` attribute.  Django can be configured to make
 use of the ``REMOTE_USER`` value using the ``RemoteUserMiddleware``
 or ``PersistentRemoteUserMiddleware``, and
 :class:`~django.contrib.auth.backends.RemoteUserBackend` classes found in
@@ -48,7 +48,7 @@ with :class:`~django.contrib.auth.backends.RemoteUserBackend` in the
     ]
 
 With this setup, ``RemoteUserMiddleware`` will detect the username in
-``request.META['REMOTE_USER']`` and will authenticate and auto-login that user
+``request.meta['REMOTE_USER']`` and will authenticate and auto-login that user
 using the :class:`~django.contrib.auth.backends.RemoteUserBackend`.
 
 Be aware that this particular setup disables authentication with the default
@@ -77,7 +77,7 @@ regardless of ``AUTHENTICATION_BACKENDS``.
 
 If your authentication mechanism uses a custom HTTP header and not
 ``REMOTE_USER``, you can subclass ``RemoteUserMiddleware`` and set the
-``header`` attribute to the desired ``request.META`` key.  For example::
+``header`` attribute to the desired ``request.meta`` key.  For example::
 
     from django.contrib.auth.middleware import RemoteUserMiddleware
 
@@ -91,13 +91,13 @@ If your authentication mechanism uses a custom HTTP header and not
     strips that header based on the appropriate authentication checks, never
     permitting an end-user to submit a fake (or "spoofed") header value. Since
     the HTTP headers ``X-Auth-User`` and ``X-Auth_User`` (for example) both
-    normalize to the ``HTTP_X_AUTH_USER`` key in ``request.META``, you must
+    normalize to the ``HTTP_X_AUTH_USER`` key in ``request.meta``, you must
     also check that your web server doesn't allow a spoofed header using
     underscores in place of dashes.
 
     This warning doesn't apply to ``RemoteUserMiddleware`` in its default
     configuration with ``header = 'REMOTE_USER'``, since a key that doesn't
-    start with ``HTTP_`` in ``request.META`` can only be set by your WSGI
+    start with ``HTTP_`` in ``request.meta`` can only be set by your WSGI
     server, not directly from an HTTP request header.
 
 If you need more control, you can create your own authentication backend

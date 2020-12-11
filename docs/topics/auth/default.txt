@@ -395,8 +395,8 @@ If you have an authenticated user you want to attach to the current session
         from django.contrib.auth import authenticate, login
 
         def my_view(request):
-            username = request.POST['username']
-            password = request.POST['password']
+            username = request.form_data['username']
+            password = request.form_data['password']
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
@@ -901,7 +901,7 @@ function.
 
         def password_change(request):
             if request.method == 'POST':
-                form = PasswordChangeForm(user=request.user, data=request.POST)
+                form = PasswordChangeForm(user=request.user, data=request.form_data)
                 if form.is_valid():
                     form.save()
                     update_session_auth_hash(request, form.user)
@@ -1012,9 +1012,9 @@ implementation details see :ref:`using-the-views`.
 
     .. attribute:: redirect_field_name
 
-        The name of a ``GET`` field containing the URL to redirect to after
+        The name of a query parameter containing the URL to redirect to after
         login. Defaults to ``next``. Overrides the
-        :meth:`get_default_redirect_url` URL if the given ``GET`` parameter is
+        :meth:`get_default_redirect_url` URL if the given query parameter is
         passed.
 
     .. attribute:: authentication_form
@@ -1091,7 +1091,7 @@ implementation details see :ref:`using-the-views`.
 
     * ``site_name``: An alias for ``site.name``. If you don't have the site
       framework installed, this will be set to the value of
-      :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
+      :attr:`request.meta['SERVER_NAME'] <django.http.HttpRequest.meta>`.
       For more on sites, see :doc:`/ref/contrib/sites`.
 
     If you'd prefer not to call the template :file:`registration/login.html`,
@@ -1101,7 +1101,7 @@ implementation details see :ref:`using-the-views`.
 
         path('accounts/login/', auth_views.LoginView.as_view(template_name='myapp/login.html')),
 
-    You can also specify the name of the ``GET`` field which contains the URL
+    You can also specify the name of the query parameter which contains the URL
     to redirect to after login using ``redirect_field_name``. By default, the
     field is called ``next``.
 
@@ -1177,10 +1177,9 @@ implementation details see :ref:`using-the-views`.
 
     .. attribute:: redirect_field_name
 
-        The name of a ``GET`` field containing the URL to redirect to after log
-        out. Defaults to ``'next'``. Overrides the
-        :attr:`next_page` URL if the given ``GET`` parameter is
-        passed.
+        The name of a query parameter containing the URL to redirect to after
+        log out. Defaults to ``'next'``. Overrides the
+        :attr:`next_page` URL if the given query parameter is passed.
 
     .. attribute:: extra_context
 
@@ -1206,7 +1205,7 @@ implementation details see :ref:`using-the-views`.
 
     * ``site_name``: An alias for ``site.name``. If you don't have the site
       framework installed, this will be set to the value of
-      :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
+      :attr:`request.meta['SERVER_NAME'] <django.http.HttpRequest.meta>`.
       For more on sites, see :doc:`/ref/contrib/sites`.
 
 .. function:: logout_then_login(request, login_url=None)
@@ -1379,7 +1378,7 @@ implementation details see :ref:`using-the-views`.
 
     * ``site_name``: An alias for ``site.name``. If you don't have the site
       framework installed, this will be set to the value of
-      :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
+      :attr:`request.meta['SERVER_NAME'] <django.http.HttpRequest.meta>`.
       For more on sites, see :doc:`/ref/contrib/sites`.
 
     * ``domain``: An alias for ``site.domain``. If you don't have the site
@@ -1531,9 +1530,9 @@ Helper functions
     * ``login_url``: The URL of the login page to redirect to.
       Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
 
-    * ``redirect_field_name``: The name of a ``GET`` field containing the
+    * ``redirect_field_name``: The name of a query parameter containing the
       URL to redirect to after log out. Overrides ``next`` if the given
-      ``GET`` parameter is passed.
+      query parameter is passed.
 
 .. _built-in-auth-forms:
 

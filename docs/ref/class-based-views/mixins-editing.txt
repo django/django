@@ -64,8 +64,8 @@ The following mixins are used to construct Django's editing views:
         Build the keyword arguments required to instantiate the form.
 
         The ``initial`` argument is set to :meth:`.get_initial`. If the
-        request is a ``POST`` or ``PUT``, the request data (``request.POST``
-        and ``request.FILES``) will also be provided.
+        request is a ``POST`` or ``PUT``, the request data
+        (``request.form_data`` and ``request.files``) will also be provided.
 
     .. method:: get_prefix()
 

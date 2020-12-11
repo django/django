@@ -342,10 +342,10 @@ Django starts at the first pattern in ``urlpatterns`` and makes its way down
 the list, comparing the requested URL against each pattern until it finds one
 that matches.
 
-Patterns don't search GET and POST parameters, or the domain name. For example,
-in a request to ``https://www.example.com/myapp/``, the URLconf will look for
-``myapp/``. In a request to ``https://www.example.com/myapp/?page=3``, the
-URLconf will also look for ``myapp/``.
+Patterns don't search query parameters, form data, or the domain name. For
+example, in a request to ``https://www.example.com/myapp/``, the URLconf will
+look for ``myapp/``. In a request to ``https://www.example.com/myapp/?page=3``,
+the URLconf will also look for ``myapp/``.
 
 :func:`~django.urls.path` argument: ``view``
 --------------------------------------------

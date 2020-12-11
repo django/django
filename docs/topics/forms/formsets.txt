@@ -82,7 +82,7 @@ list of dictionaries as the initial data.
 If you use an ``initial`` for displaying a formset, you should pass the same
 ``initial`` when processing that formset's submission so that the formset can
 detect which forms were changed by the user. For example, you might have
-something like: ``ArticleFormSet(request.POST, initial=[...])``.
+something like: ``ArticleFormSet(request.form_data, initial=[...])``.
 
 .. seealso::
 
@@ -134,8 +134,9 @@ Limiting the maximum number of instantiated forms
 .. versionadded:: 3.2
 
 The ``absolute_max`` parameter to :func:`.formset_factory` allows limiting the
-number of forms that can be instantiated when supplying ``POST`` data. This
-protects against memory exhaustion attacks using forged ``POST`` requests::
+number of forms that can be instantiated when supplying
+:attr:`request.form_data <.HttpRequest.form_data>`. This protects against memory
+exhaustion attacks using forged ``POST`` requests::
 
     >>> from django.forms.formsets import formset_factory
     >>> from myapp.forms import ArticleForm
@@ -251,8 +252,9 @@ It is used to keep track of how many form instances are being displayed. If
 you are adding new forms via JavaScript, you should increment the count fields
 in this form as well. On the other hand, if you are using JavaScript to allow
 deletion of existing objects, then you need to ensure the ones being removed
-are properly marked for deletion by including ``form-#-DELETE`` in the ``POST``
-data. It is expected that all forms are present in the ``POST`` data regardless.
+are properly marked for deletion by including ``form-#-DELETE`` in
+:attr:`request.form_data <.HttpRequest.form_data>`. It is expected that all
+forms are present in ``request.form_data`` regardless.
 
 The management form is available as an attribute of the formset
 itself. When rendering a formset in a template, you can include all
@@ -732,7 +734,7 @@ use the management form inside the template. Let's look at a sample view::
     def manage_articles(request):
         ArticleFormSet = formset_factory(ArticleForm)
         if request.method == 'POST':
-            formset = ArticleFormSet(request.POST, request.FILES)
+            formset = ArticleFormSet(request.form_data, request.files)
             if formset.is_valid():
                 # do something with the formset.cleaned_data
                 pass
@@ -812,8 +814,8 @@ a look at how this might be accomplished::
         ArticleFormSet = formset_factory(ArticleForm)
         BookFormSet = formset_factory(BookForm)
         if request.method == 'POST':
-            article_formset = ArticleFormSet(request.POST, request.FILES, prefix='articles')
-            book_formset = BookFormSet(request.POST, request.FILES, prefix='books')
+            article_formset = ArticleFormSet(request.form_data, request.files, prefix='articles')
+            book_formset = BookFormSet(request.form_data, request.files, prefix='books')
             if article_formset.is_valid() and book_formset.is_valid():
                 # do something with the cleaned_data on the formsets.
                 pass

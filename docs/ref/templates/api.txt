@@ -633,7 +633,7 @@ example, the :class:`RequestContext` instance gets an ``ip_address`` variable::
     from django.template import RequestContext, Template
 
     def ip_address_processor(request):
-        return {'ip_address': request.META['REMOTE_ADDR']}
+        return {'ip_address': request.meta['REMOTE_ADDR']}
 
     def client_ip_view(request):
         template = Template('{{ title }}: {{ ip_address }}')
@@ -676,7 +676,7 @@ variables:
 
 If this processor is enabled, every ``RequestContext`` will contain these two
 variables -- but only if your :setting:`DEBUG` setting is set to ``True`` and
-the request's IP address (``request.META['REMOTE_ADDR']``) is in the
+the request's IP address (``request.meta['REMOTE_ADDR']``) is in the
 :setting:`INTERNAL_IPS` setting:
 
 * ``debug`` -- ``True``. You can use this in templates to test whether

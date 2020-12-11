@@ -10,8 +10,8 @@ Uploaded files
 
 .. class:: UploadedFile
 
-During file uploads, the actual file data is stored in :attr:`request.FILES
-<django.http.HttpRequest.FILES>`. Each entry in this dictionary is an
+During file uploads, the actual file data is stored in :attr:`request.files
+<django.http.HttpRequest.files>`. Each entry in this dictionary is an
 ``UploadedFile`` object (or a subclass) -- a wrapper around an uploaded file.
 You'll usually use one of these methods to access the uploaded content:
 
@@ -161,7 +161,7 @@ Custom file upload handlers **must** define the following methods:
     Called when a file has finished uploading.
 
     The handler should return an ``UploadedFile`` object that will be stored
-    in ``request.FILES``. Handlers may also return ``None`` to indicate that
+    in ``request.files``. Handlers may also return ``None`` to indicate that
     the ``UploadedFile`` object should come from subsequent upload handlers.
 
 Optional methods
@@ -226,7 +226,7 @@ attributes:
 
     ``input_data`` is a file-like object that supports ``read()``-ing.
 
-    ``META`` is the same object as ``request.META``.
+    ``META`` is the same object as ``request.meta``.
 
     ``content_length`` is the length of the data in ``input_data``. Don't
     read more than ``content_length`` bytes from ``input_data``.
@@ -236,5 +236,5 @@ attributes:
     ``encoding`` is the encoding of the request.
 
     Return ``None`` if you want upload handling to continue, or a tuple of
-    ``(POST, FILES)`` if you want to return the new data structures suitable
-    for the request directly.
+    ``(form_data, files)`` if you want to return the new data structures
+    suitable for the request directly.

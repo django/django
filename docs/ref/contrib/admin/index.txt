@@ -2107,7 +2107,7 @@ templates used by the :class:`ModelAdmin` views:
 .. method:: ModelAdmin.get_changeform_initial_data(request)
 
     A hook for the initial data on admin change forms. By default, fields are
-    given initial values from ``GET`` parameters. For instance,
+    given initial values from query parameters. For instance,
     ``?name=initial_value`` will set the ``name`` field's initial value to be
     ``initial_value``.
 
@@ -2931,7 +2931,7 @@ Templates can override or extend base admin templates as described in
     ``site_url`` is ``/``. Set it to ``None`` to remove the link.
 
     For sites running on a subpath, the :meth:`each_context` method checks if
-    the current request has ``request.META['SCRIPT_NAME']`` set and uses that
+    the current request has ``request.meta['SCRIPT_NAME']`` set and uses that
     value if ``site_url`` isn't set to something other than ``/``.
 
 .. attribute:: AdminSite.index_title

@@ -183,7 +183,7 @@ Because even seemingly-secure web server configurations are susceptible to fake
 :meth:`django.http.HttpRequest.get_host()` method.
 
 This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
-if your code accesses the ``Host`` header directly from ``request.META`` you
+if your code accesses the ``Host`` header directly from ``request.meta`` you
 are bypassing this security protection.
 
 For more details see the full :setting:`ALLOWED_HOSTS` documentation.

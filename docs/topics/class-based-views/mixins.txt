@@ -665,8 +665,8 @@ that the user requested::
 
     class HybridDetailView(JSONResponseMixin, SingleObjectTemplateResponseMixin, BaseDetailView):
         def render_to_response(self, context):
-            # Look for a 'format=json' GET argument
-            if self.request.GET.get('format') == 'json':
+            # Look for a 'format=json' query parameter
+            if self.request.query_params.get('format') == 'json':
                 return self.render_to_json_response(context)
             else:
                 return super().render_to_response(context)

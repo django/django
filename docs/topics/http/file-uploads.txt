@@ -5,7 +5,7 @@ File Uploads
 .. currentmodule:: django.core.files.uploadedfile
 
 When Django handles a file upload, the file data ends up placed in
-:attr:`request.FILES <django.http.HttpRequest.FILES>` (for more on the
+:attr:`request.files <django.http.HttpRequest.files>` (for more on the
 ``request`` object see the documentation for :doc:`request and response objects
 </ref/request-response>`). This document explains how files are stored on disk
 and in memory, and how to customize the default behavior.
@@ -31,16 +31,16 @@ Consider a form containing a :class:`~django.forms.FileField`:
         file = forms.FileField()
 
 A view handling this form will receive the file data in
-:attr:`request.FILES <django.http.HttpRequest.FILES>`, which is a dictionary
+:attr:`request.files <django.http.HttpRequest.files>`, which is a dictionary
 containing a key for each :class:`~django.forms.FileField` (or
 :class:`~django.forms.ImageField`, or other :class:`~django.forms.FileField`
 subclass) in the form. So the data from the above form would
-be accessible as ``request.FILES['file']``.
+be accessible as ``request.files['file']``.
 
-Note that :attr:`request.FILES <django.http.HttpRequest.FILES>` will only
+Note that :attr:`request.files <django.http.HttpRequest.files>` will only
 contain data if the request method was ``POST``, at least one file field was
 actually posted, and the ``<form>`` that posted the request has the attribute
-``enctype="multipart/form-data"``. Otherwise, ``request.FILES`` will be empty.
+``enctype="multipart/form-data"``. Otherwise, ``request.files`` will be empty.
 
 Most of the time, you'll pass the file data from ``request`` into the form as
 described in :ref:`binding-uploaded-files`. This would look something like:
@@ -57,15 +57,15 @@ described in :ref:`binding-uploaded-files`. This would look something like:
 
     def upload_file(request):
         if request.method == 'POST':
-            form = UploadFileForm(request.POST, request.FILES)
+            form = UploadFileForm(request.form_data, request.files)
             if form.is_valid():
-                handle_uploaded_file(request.FILES['file'])
+                handle_uploaded_file(request.files['file'])
                 return HttpResponseRedirect('/success/url/')
         else:
             form = UploadFileForm()
         return render(request, 'upload.html', {'form': form})
 
-Notice that we have to pass :attr:`request.FILES <django.http.HttpRequest.FILES>`
+Notice that we have to pass :attr:`request.files <django.http.HttpRequest.files>`
 into the form's constructor; this is how file data gets bound into a form.
 
 Here's a common way you might handle an uploaded file::
@@ -97,7 +97,7 @@ corresponding :class:`~django.db.models.FileField` when calling
 
     def upload_file(request):
         if request.method == 'POST':
-            form = ModelFormWithFileField(request.POST, request.FILES)
+            form = ModelFormWithFileField(request.form_data, request.files)
             if form.is_valid():
                 # file is saved
                 form.save()
@@ -107,7 +107,7 @@ corresponding :class:`~django.db.models.FileField` when calling
         return render(request, 'upload.html', {'form': form})
 
 If you are constructing an object manually, you can assign the file object from
-:attr:`request.FILES <django.http.HttpRequest.FILES>` to the file field in the
+:attr:`request.files <django.http.HttpRequest.files>` to the file field in the
 model::
 
     from django.http import HttpResponseRedirect
@@ -117,9 +117,9 @@ model::
 
     def upload_file(request):
         if request.method == 'POST':
-            form = UploadFileForm(request.POST, request.FILES)
+            form = UploadFileForm(request.form_data, request.files)
             if form.is_valid():
-                instance = ModelWithFileField(file_field=request.FILES['file'])
+                instance = ModelWithFileField(file_field=request.files['file'])
                 instance.save()
                 return HttpResponseRedirect('/success/url/')
         else:
@@ -158,7 +158,7 @@ uploads:
         def post(self, request, *args, **kwargs):
             form_class = self.get_form_class()
             form = self.get_form(form_class)
-            files = request.FILES.getlist('file_field')
+            files = request.files.getlist('file_field')
             if form.is_valid():
                 for f in files:
                     ...  # Do something with each file.
@@ -242,16 +242,16 @@ list::
 .. note::
 
     You can only modify upload handlers *before* accessing
-    ``request.POST`` or ``request.FILES`` -- it doesn't make sense to
+    ``request.form_data`` or ``request.files`` -- it doesn't make sense to
     change upload handlers after upload handling has already
     started. If you try to modify ``request.upload_handlers`` after
-    reading from ``request.POST`` or ``request.FILES`` Django will
+    reading from ``request.form_data`` or ``request.files`` Django will
     throw an error.
 
     Thus, you should always modify uploading handlers as early in your view as
     possible.
 
-    Also, ``request.POST`` is accessed by
+    Also, ``request.form_data`` is accessed by
     :class:`~django.middleware.csrf.CsrfViewMiddleware` which is enabled by
     default. This means you will need to use
     :func:`~django.views.decorators.csrf.csrf_exempt` on your view to allow you

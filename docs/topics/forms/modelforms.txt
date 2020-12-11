@@ -325,16 +325,16 @@ this is supplied, ``save()`` will update that instance. If it's not supplied,
     >>> from myapp.models import Article
     >>> from myapp.forms import ArticleForm
 
-    # Create a form instance from POST data.
-    >>> f = ArticleForm(request.POST)
+    # Create a form instance from POSTed form data.
+    >>> f = ArticleForm(request.form_data)
 
     # Save a new Article object from the form's data.
     >>> new_article = f.save()
 
     # Create a form to edit an existing Article, but use
-    # POST data to populate the form.
+    # POSTed form data to populate the form.
     >>> a = Article.objects.get(pk=1)
-    >>> f = ArticleForm(request.POST, instance=a)
+    >>> f = ArticleForm(request.form_data, instance=a)
     >>> f.save()
 
 Note that if the form :ref:`hasn't been validated
@@ -375,8 +375,8 @@ Django adds a ``save_m2m()`` method to your ``ModelForm`` subclass. After
 you've manually saved the instance produced by the form, you can invoke
 ``save_m2m()`` to save the many-to-many form data. For example::
 
-    # Create a form instance with POST data.
-    >>> f = AuthorForm(request.POST)
+    # Create a form instance with POSTed form data.
+    >>> f = AuthorForm(request.form_data)
 
     # Create, but don't save the new author instance.
     >>> new_author = f.save(commit=False)
@@ -394,9 +394,9 @@ Calling ``save_m2m()`` is only required if you use ``save(commit=False)``.
 When you use a ``save()`` on a form, all data -- including many-to-many data --
 is saved without the need for any additional method calls.  For example::
 
-    # Create a form instance with POST data.
+    # Create a form instance with POSTed form data.
     >>> a = Author()
-    >>> f = AuthorForm(request.POST, instance=a)
+    >>> f = AuthorForm(request.form_data, instance=a)
 
     # Create and save the new author instance. There's no need to do anything else.
     >>> new_author = f.save()
@@ -405,7 +405,7 @@ Other than the ``save()`` and ``save_m2m()`` methods, a ``ModelForm`` works
 exactly the same way as any other ``forms`` form. For example, the
 ``is_valid()`` method is used to check for validity, the ``is_multipart()``
 method is used to determine whether a form requires multipart file upload (and
-hence whether ``request.FILES`` must be passed to the form), etc. See
+hence whether ``request.files`` must be passed to the form), etc. See
 :ref:`binding-uploaded-files` for more information.
 
 .. _modelforms-selecting-fields:
@@ -474,13 +474,13 @@ include that field.
     values for the missing, but required fields::
 
         author = Author(title='Mr')
-        form = PartialAuthorForm(request.POST, instance=author)
+        form = PartialAuthorForm(request.form_data, instance=author)
         form.save()
 
     Alternatively, you can use ``save(commit=False)`` and manually set
     any extra required fields::
 
-        form = PartialAuthorForm(request.POST)
+        form = PartialAuthorForm(request.form_data)
         author = form.save(commit=False)
         author.title = 'Mr'
         author.save()
@@ -896,8 +896,8 @@ Saving objects in the formset
 As with a ``ModelForm``, you can save the data as a model object. This is done
 with the formset's ``save()`` method::
 
-    # Create a formset instance with POST data.
-    >>> formset = AuthorFormSet(request.POST)
+    # Create a formset instance with POSTed form data.
+    >>> formset = AuthorFormSet(request.form_data)
 
     # Assuming all is valid, save the data.
     >>> instances = formset.save()
@@ -953,7 +953,7 @@ extra forms displayed.
 
 Also, ``extra=0`` doesn't prevent creation of new model instances as you can
 :ref:`add additional forms with JavaScript <understanding-the-managementform>`
-or send additional POST data. Formsets :ticket:`don't yet provide functionality
+or send additional form data. Formsets :ticket:`don't yet provide functionality
 <26142>` for an "edit only" view that prevents creation of new instances.
 
 If the value of ``max_num`` is greater than the number of existing related
@@ -985,7 +985,7 @@ formset to edit ``Author`` model instances::
     def manage_authors(request):
         AuthorFormSet = modelformset_factory(Author, fields=('name', 'title'))
         if request.method == 'POST':
-            formset = AuthorFormSet(request.POST, request.FILES)
+            formset = AuthorFormSet(request.form_data, request.files)
             if formset.is_valid():
                 formset.save()
                 # do something.
@@ -1052,7 +1052,7 @@ formset::
         AuthorFormSet = modelformset_factory(Author, fields=('name', 'title'))
         if request.method == "POST":
             formset = AuthorFormSet(
-                request.POST, request.FILES,
+                request.form_data, request.files,
                 queryset=Author.objects.filter(name__startswith='O'),
             )
             if formset.is_valid():
@@ -1233,7 +1233,7 @@ of a model. Here's how you can do that::
         author = Author.objects.get(pk=author_id)
         BookInlineFormSet = inlineformset_factory(Author, Book, fields=('title',))
         if request.method == "POST":
-            formset = BookInlineFormSet(request.POST, request.FILES, instance=author)
+            formset = BookInlineFormSet(request.form_data, request.files, instance=author)
             if formset.is_valid():
                 formset.save()
                 # Do something. Should generally end with a redirect. For example:

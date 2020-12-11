@@ -140,8 +140,8 @@ Use the ``django.test.Client`` class to make requests.
         Makes a GET request on the provided ``path`` and returns a ``Response``
         object, which is documented below.
 
-        The key-value pairs in the ``data`` dictionary are used to create a GET
-        data payload. For example::
+        The key-value pairs in the ``data`` dictionary are used to create the
+        query parameters. For example::
 
             >>> c = Client()
             >>> c.get('/customers/details/', {'name': 'fred', 'age': 7})
@@ -170,15 +170,15 @@ Use the ``django.test.Client`` class to make requests.
 
             .. _CGI: https://www.w3.org/CGI/
 
-        If you already have the GET arguments in URL-encoded form, you can
+        If you already have the query parameters in URL-encoded form, you can
         use that encoding instead of using the data argument. For example,
         the previous GET request could also be posed as::
 
         >>> c = Client()
         >>> c.get('/customers/details/?name=fred&age=7')
 
-        If you provide a URL with both an encoded GET data and a data argument,
-        the data argument will take precedence.
+        If you provide a URL with both encoded query parameters and a data
+        argument, the data argument will take precedence.
 
         If you set ``follow`` to ``True`` the client will follow any redirects
         and a ``redirect_chain`` attribute will be set in the response object
@@ -275,14 +275,17 @@ Use the ``django.test.Client`` class to make requests.
         The ``extra`` argument acts the same as for :meth:`Client.get`.
 
         If the URL you request with a POST contains encoded parameters, these
-        parameters will be made available in the request.GET data. For example,
-        if you were to make the request::
+        parameters will be made available in :attr:`request.query_params
+        <.HttpRequest.query_params>`. For example, if you were to make the
+        request::
 
         >>> c.post('/login/?visitor=true', {'name': 'fred', 'passwd': 'secret'})
 
-        ... the view handling this request could interrogate request.POST
-        to retrieve the username and password, and could interrogate request.GET
-        to determine if the user was a visitor.
+        ... the view handling this request could interrogate
+        :attr:`request.form_data <.HttpRequest.form_data>` to retrieve the
+        username and password, and could interrogate
+        :attr:`request.query_params <.HttpRequest.query_params>` to determine
+        if the user was a visitor.
 
         If you set ``follow`` to ``True`` the client will follow any redirects
         and a ``redirect_chain`` attribute will be set in the response object

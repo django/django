@@ -41,7 +41,7 @@ All attributes should be considered read-only, unless stated otherwise.
     The raw HTTP request body as a bytestring. This is useful for processing
     data in different ways than conventional HTML forms: binary images,
     XML payload etc. For processing conventional form data, use
-    :attr:`HttpRequest.POST`.
+    :attr:`HttpRequest.form_data`.
 
     You can also read from an ``HttpRequest`` using a file-like interface with
     :meth:`HttpRequest.read` or :meth:`HttpRequest.readline`. Accessing
@@ -84,9 +84,9 @@ All attributes should be considered read-only, unless stated otherwise.
     data (or ``None``, which means the :setting:`DEFAULT_CHARSET` setting is
     used). You can write to this attribute to change the encoding used when
     accessing the form data. Any subsequent attribute accesses (such as reading
-    from :attr:`GET` or :attr:`POST`) will use the new ``encoding`` value.
-    Useful if you know the form data is not in the :setting:`DEFAULT_CHARSET`
-    encoding.
+    from :attr:`query_params` or :attr:`form_data`) will use the new
+    ``encoding`` value. Useful if you know the form data is not in the
+    :setting:`DEFAULT_CHARSET` encoding.
 
 .. attribute:: HttpRequest.content_type
 
@@ -98,12 +98,20 @@ All attributes should be considered read-only, unless stated otherwise.
     A dictionary of key/value parameters included in the ``CONTENT_TYPE``
     header.
 
-.. attribute:: HttpRequest.GET
+.. attribute:: HttpRequest.query_params
 
-    A dictionary-like object containing all given HTTP GET parameters. See the
+    .. versionadded:: 3.2
+
+        This is the new name for :attr:`HttpRequest.GET`.
+
+    A dictionary-like object containing all given query parameters. See the
     :class:`QueryDict` documentation below.
 
-.. attribute:: HttpRequest.POST
+.. attribute:: HttpRequest.form_data
+
+    .. versionadded:: 3.2
+
+        This is the new name for :attr:`HttpRequest.POST`.
 
     A dictionary-like object containing all given HTTP POST parameters,
     providing that the request contains form data. See the
@@ -111,31 +119,44 @@ All attributes should be considered read-only, unless stated otherwise.
     non-form data posted in the request, access this through the
     :attr:`HttpRequest.body` attribute instead.
 
-    It's possible that a request can come in via POST with an empty ``POST``
-    dictionary -- if, say, a form is requested via the POST HTTP method but
-    does not include form data. Therefore, you shouldn't use ``if request.POST``
-    to check for use of the POST method; instead, use ``if request.method ==
-    "POST"`` (see :attr:`HttpRequest.method`).
+    It's possible that a request can come in via POST with an empty
+    ``form_data`` dictionary -- if, say, a form is requested via the POST HTTP
+    method but does not include form data. Therefore, you shouldn't use
+    ``if request.form_data`` to check for use of the POST method; instead, use
+    ``if request.method == "POST"`` (see :attr:`HttpRequest.method`).
 
-    ``POST`` does *not* include file-upload information. See :attr:`FILES`.
+    ``form_data`` does *not* include file-upload information. See
+    :attr:`files`.
 
-.. attribute:: HttpRequest.COOKIES
+.. attribute:: HttpRequest.cookies
+
+    .. versionadded:: 3.2
+
+        This is the new name for :attr:`HttpRequest.COOKIES`.
 
     A dictionary containing all cookies. Keys and values are strings.
 
-.. attribute:: HttpRequest.FILES
+.. attribute:: HttpRequest.files
+
+    .. versionadded:: 3.2
+
+        This is the new name for :attr:`HttpRequest.FILES`.
 
     A dictionary-like object containing all uploaded files. Each key in
-    ``FILES`` is the ``name`` from the ``<input type="file" name="">``. Each
-    value in ``FILES`` is an :class:`~django.core.files.uploadedfile.UploadedFile`.
+    ``files`` is the ``name`` from the ``<input type="file" name="">``. Each
+    value in ``files`` is an :class:`~django.core.files.uploadedfile.UploadedFile`.
 
     See :doc:`/topics/files` for more information.
 
-    ``FILES`` will only contain data if the request method was POST and the
+    ``files`` will only contain data if the request method was POST and the
     ``<form>`` that posted to the request had ``enctype="multipart/form-data"``.
-    Otherwise, ``FILES`` will be a blank dictionary-like object.
+    Otherwise, ``files`` will be a blank dictionary-like object.
 
-.. attribute:: HttpRequest.META
+.. attribute:: HttpRequest.meta
+
+    .. versionadded:: 3.2
+
+        This is the new name for :attr:`HttpRequest.META`.
 
     A dictionary containing all available HTTP headers. Available headers
     depend on the client and server, but here are some examples:
@@ -277,6 +298,32 @@ middleware class is listed in :setting:`MIDDLEWARE`.
         else:
             ... # Do something for anonymous users.
 
+Alias attributes
+----------------
+
+These attributes are the old names for other attributes, and are preserved as
+aliases for backwards compatibility.
+
+.. attribute:: HttpRequest.GET
+
+    An alias of :attr:`HttpRequest.query_params`.
+
+.. attribute:: HttpRequest.POST
+
+    An alias of :attr:`HttpRequest.form_data`.
+
+.. attribute:: HttpRequest.COOKIES
+
+    An alias of :attr:`HttpRequest.cookies`.
+
+.. attribute:: HttpRequest.META
+
+    An alias of :attr:`HttpRequest.meta`.
+
+.. attribute:: HttpRequest.FILES
+
+    An alias of :attr:`HttpRequest.files`.
+
 Methods
 -------
 
@@ -314,10 +361,10 @@ Methods
                     recent proxy is used.
                     """
                     for field in self.FORWARDED_FOR_FIELDS:
-                        if field in request.META:
-                            if ',' in request.META[field]:
-                                parts = request.META[field].split(',')
-                                request.META[field] = parts[-1].strip()
+                        if field in request.meta:
+                            if ',' in request.meta[field]:
+                                parts = request.meta[field].split(',')
+                                request.meta[field] = parts[-1].strip()
                     return self.get_response(request)
 
         This middleware should be positioned before any other middleware that
@@ -329,7 +376,7 @@ Methods
 
     Returns the originating port of the request using information from the
     ``HTTP_X_FORWARDED_PORT`` (if :setting:`USE_X_FORWARDED_PORT` is enabled)
-    and ``SERVER_PORT`` ``META`` variables, in that order.
+    and ``SERVER_PORT`` :attr:`HttpRequest.meta` variables, in that order.
 
 .. method:: HttpRequest.get_full_path()
 
@@ -454,15 +501,15 @@ Methods
 
 .. class:: QueryDict
 
-In an :class:`HttpRequest` object, the :attr:`~HttpRequest.GET` and
-:attr:`~HttpRequest.POST` attributes are instances of ``django.http.QueryDict``,
-a dictionary-like class customized to deal with multiple values for the same
-key. This is necessary because some HTML form elements, notably
-``<select multiple>``, pass multiple values for the same key.
+In an :class:`HttpRequest` object, the :attr:`~HttpRequest.query_params` and
+:attr:`~HttpRequest.form_data` attributes are instances of
+``django.http.QueryDict``, a dictionary-like class customized to deal with
+multiple values for the same key. This is necessary because some HTML form
+elements, notably ``<select multiple>``, pass multiple values for the same key.
 
-The ``QueryDict``\ s at ``request.POST`` and ``request.GET`` will be immutable
-when accessed in a normal request/response cycle. To get a mutable version you
-need to use :meth:`QueryDict.copy`.
+The ``QueryDict``\ s at ``request.form_data`` and ``request.query_params`` will
+be immutable when accessed in a normal request/response cycle. To get a mutable
+version you need to use :meth:`QueryDict.copy`.
 
 Methods
 -------
@@ -481,8 +528,8 @@ a subclass of dictionary. Exceptions are outlined here:
     empty (it will have no keys or values).
 
     Most ``QueryDict``\ s you encounter, and in particular those at
-    ``request.POST`` and ``request.GET``, will be immutable. If you are
-    instantiating one yourself, you can make it mutable by passing
+    ``request.form_data`` and ``request.query_params``, will be immutable. If
+    you are instantiating one yourself, you can make it mutable by passing
     ``mutable=True`` to its ``__init__()``.
 
     Strings for setting both keys and values will be converted from ``encoding``
@@ -515,7 +562,7 @@ a subclass of dictionary. Exceptions are outlined here:
 .. method:: QueryDict.__contains__(key)
 
     Returns ``True`` if the given key is set. This lets you do, e.g., ``if "foo"
-    in request.GET``.
+    in request.query_params``.
 
 .. method:: QueryDict.get(key, default=None)
 

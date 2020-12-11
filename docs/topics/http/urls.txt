@@ -275,7 +275,7 @@ What the URLconf searches against
 =================================
 
 The URLconf searches against the requested URL, as a normal Python string. This
-does not include GET or POST parameters, or the domain name.
+does not include query parameters, posted form data, or the domain name.
 
 For example, in a request to ``https://www.example.com/myapp/``, the URLconf
 will look for ``myapp/``.

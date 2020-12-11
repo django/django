@@ -182,11 +182,11 @@ bother calling the appropriate view; it'll apply response middleware to that
 
 .. note::
 
-    Accessing :attr:`request.POST <django.http.HttpRequest.POST>` inside
-    middleware before the view runs or in ``process_view()`` will prevent any
-    view running after the middleware from being able to :ref:`modify the
-    upload handlers for the request <modifying_upload_handlers_on_the_fly>`,
-    and should normally be avoided.
+    Accessing :attr:`request.form_data <django.http.HttpRequest.form_data>`
+    inside middleware before the view runs or in ``process_view()`` will
+    prevent any view running after the middleware from being able to
+    :ref:`modify the upload handlers for the request
+    <modifying_upload_handlers_on_the_fly>`, and should normally be avoided.
 
     The :class:`~django.middleware.csrf.CsrfViewMiddleware` class can be
     considered an exception, as it provides the

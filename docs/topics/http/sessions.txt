@@ -417,8 +417,8 @@ posts a comment. It doesn't let a user post a comment more than once::
 This simplistic view logs in a "member" of the site::
 
     def login(request):
-        m = Member.objects.get(username=request.POST['username'])
-        if m.password == request.POST['password']:
+        m = Member.objects.get(username=request.form_data['username'])
+        if m.password == request.form_data['password']:
             request.session['member_id'] = m.id
             return HttpResponse("You're logged in.")
         else:

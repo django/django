@@ -283,21 +283,22 @@ form data has been changed from the initial data.
 When the form is submitted, we reconstruct it and provide the original data
 so that the comparison can be done:
 
-    >>> f = ContactForm(request.POST, initial=data)
+    >>> f = ContactForm(request.form_data, initial=data)
     >>> f.has_changed()
 
-``has_changed()`` will be ``True`` if the data from ``request.POST`` differs
-from what was provided in :attr:`~Form.initial` or ``False`` otherwise. The
-result is computed by calling :meth:`Field.has_changed` for each field in the
-form.
+``has_changed()`` will be ``True`` if the data from ``request.form_data``
+differs from what was provided in :attr:`~Form.initial` or ``False`` otherwise.
+The result is computed by calling :meth:`Field.has_changed` for each field in
+the form.
 
 .. attribute:: Form.changed_data
 
 The ``changed_data`` attribute returns a list of the names of the fields whose
-values in the form's bound data (usually ``request.POST``) differ from what was
-provided in :attr:`~Form.initial`. It returns an empty list if no data differs.
+values in the form's bound data (usually ``request.form_data``) differ from
+what was provided in :attr:`~Form.initial`. It returns an empty list if no data
+differs.
 
-    >>> f = ContactForm(request.POST, initial=data)
+    >>> f = ContactForm(request.form_data, initial=data)
     >>> if f.has_changed():
     ...     print("The following fields changed: %s" % ", ".join(f.changed_data))
     >>> f.changed_data
@@ -1130,12 +1131,12 @@ need to bind the file data containing the mugshot image::
     >>> file_data = {'mugshot': SimpleUploadedFile('face.jpg', <file data>)}
     >>> f = ContactFormWithMugshot(data, file_data)
 
-In practice, you will usually specify ``request.FILES`` as the source
-of file data (just like you use ``request.POST`` as the source of
+In practice, you will usually specify ``request.files`` as the source
+of file data (just like you use ``request.form_data`` as the source of
 form data)::
 
     # Bound form with an image field, data from the request
-    >>> f = ContactFormWithMugshot(request.POST, request.FILES)
+    >>> f = ContactFormWithMugshot(request.form_data, request.files)
 
 Constructing an unbound form is the same as always -- omit both form data *and*
 file data::

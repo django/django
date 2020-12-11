@@ -1790,11 +1790,12 @@ cookie that is named ``django_language`` by default. (The name can be changed
 through the :setting:`LANGUAGE_COOKIE_NAME` setting.)
 
 After setting the language choice, Django looks for a ``next`` parameter in the
-``POST`` or ``GET`` data. If that is found and Django considers it to be a safe
-URL (i.e. it doesn't point to a different host and uses a safe scheme), a
-redirect to that URL will be performed. Otherwise, Django may fall back to
-redirecting the user to the URL from the ``Referer`` header or, if it is not
-set, to ``/``, depending on the nature of the request:
+:attr:`request.form_data <.HttpRequest.form_data>` and
+:attr:`request.query_params <.HttpRequest.query_params>`. If that is found and
+Django considers it to be a safe URL (i.e. it doesn't point to a different host
+and uses a safe scheme), a redirect to that URL will be performed. Otherwise,
+Django may fall back to redirecting the user to the URL from the ``Referer``
+header or, if it is not set, to ``/``, depending on the nature of the request:
 
 * If the request accepts HTML content (based on its ``Accept`` HTTP header),
   the fallback will always be performed.

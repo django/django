@@ -62,11 +62,11 @@ Django's login form is returned using the ``POST`` method, in which the browser
 bundles up the form data, encodes it for transmission, sends it to the server,
 and then receives back its response.
 
-``GET``, by contrast, bundles the submitted data into a string, and uses this
-to compose a URL. The URL contains the address where the data must be sent, as
-well as the data keys and values. You can see this in action if you do a search
-in the Django documentation, which will produce a URL of the form
-``https://docs.djangoproject.com/search/?q=forms&release=1``.
+``GET``, by contrast, bundles the submitted data into the query string, which
+is part of the URL. The URL contains the address where the data must be sent,
+as well as the data keys and values. You can see this in action if you do a
+search in the Django documentation, which will produce a URL of the form
+``https://docs.djangoproject.com/en/dev/search/?q=forms``.
 
 ``GET`` and ``POST`` are typically used for different purposes.
 
@@ -288,7 +288,7 @@ want it to be published:
         # if this is a POST request we need to process the form data
         if request.method == 'POST':
             # create a form instance and populate it with data from the request:
-            form = NameForm(request.POST)
+            form = NameForm(request.form_data)
             # check whether it's valid:
             if form.is_valid():
                 # process the data in form.cleaned_data as required
@@ -308,8 +308,8 @@ can expect to happen the first time we visit the URL.
 
 If the form is submitted using a ``POST`` request, the view will once again
 create a form instance and populate it with data from the request: ``form =
-NameForm(request.POST)`` This is called "binding data to the form" (it is now
-a *bound* form).
+NameForm(request.form_data)`` This is called "binding data to the form" (it is
+now a *bound* form).
 
 We call the form's ``is_valid()`` method; if it's not ``True``, we go back to
 the template with the form. This time the form is no longer empty (*unbound*)
@@ -443,8 +443,8 @@ data will have been nicely converted into Python types for you.
 
 .. note::
 
-    You can still access the unvalidated data directly from ``request.POST`` at
-    this point, but the validated data is better.
+    You can still access the unvalidated data directly from
+    ``request.form_data`` at this point, but the validated data is better.
 
 In the contact form example above, ``cc_myself`` will be a boolean value.
 Likewise, fields such as :class:`IntegerField` and :class:`FloatField` convert
@@ -476,8 +476,8 @@ Here's how the form data could be processed in the view that handles this form:
 
 Some field types need some extra handling. For example, files that are uploaded
 using a form need to be handled differently (they can be retrieved from
-``request.FILES``, rather than ``request.POST``). For details of how to handle
-file uploads with your form, see :ref:`binding-uploaded-files`.
+``request.files``, rather than ``request.form_data``). For details of how to
+handle file uploads with your form, see :ref:`binding-uploaded-files`.
 
 Working with form templates
 ===========================

@@ -39,7 +39,7 @@ A quick rundown:
   ``value`` of each radio button is the associated question choice's ID. The
   ``name`` of each radio button is ``"choice"``. That means, when somebody
   selects one of the radio buttons and submits the form, it'll send the
-  POST data ``choice=#`` where # is the ID of the selected choice. This is the
+  form data ``choice=#`` where # is the ID of the selected choice. This is the
   basic concept of HTML forms.
 
 * We set the form's ``action`` to ``{% url 'polls:vote' question.id %}``, and we
@@ -83,7 +83,7 @@ create a real version. Add the following to ``polls/views.py``:
     def vote(request, question_id):
         question = get_object_or_404(Question, pk=question_id)
         try:
-            selected_choice = question.choice_set.get(pk=request.POST['choice'])
+            selected_choice = question.choice_set.get(pk=request.form_data['choice'])
         except (KeyError, Choice.DoesNotExist):
             # Redisplay the question voting form.
             return render(request, 'polls/detail.html', {
@@ -94,28 +94,21 @@ create a real version. Add the following to ``polls/views.py``:
             selected_choice.votes += 1
             selected_choice.save()
             # Always return an HttpResponseRedirect after successfully dealing
-            # with POST data. This prevents data from being posted twice if a
-            # user hits the Back button.
+            # with POSTed form data. This prevents data from being posted twice
+            # if a user hits the Back button.
             return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
 
 This code includes a few things we haven't covered yet in this tutorial:
 
-* :attr:`request.POST <django.http.HttpRequest.POST>` is a dictionary-like
-  object that lets you access submitted data by key name. In this case,
-  ``request.POST['choice']`` returns the ID of the selected choice, as a
-  string. :attr:`request.POST <django.http.HttpRequest.POST>` values are
-  always strings.
+* :attr:`request.form_data <django.http.HttpRequest.form_data>` is a
+  dictionary-like object that lets you access data submitted in a form by key
+  name. In this case, ``request.form_data['choice']`` returns the ID of the
+  selected choice, as a string. :attr:`request.form_data
+  <django.http.HttpRequest.form_data>` values are always strings.
 
-  Note that Django also provides :attr:`request.GET
-  <django.http.HttpRequest.GET>` for accessing GET data in the same way --
-  but we're explicitly using :attr:`request.POST
-  <django.http.HttpRequest.POST>` in our code, to ensure that data is only
-  altered via a POST call.
-
-* ``request.POST['choice']`` will raise :exc:`KeyError` if
-  ``choice`` wasn't provided in POST data. The above code checks for
-  :exc:`KeyError` and redisplays the question form with an error
-  message if ``choice`` isn't given.
+* ``request.form_data['choice']`` will raise :exc:`KeyError` if ``choice``
+  wasn't provided. The above code checks for :exc:`KeyError` and redisplays the
+  question form with an error message if ``choice`` isn't given.
 
 * After incrementing the choice count, the code returns an
   :class:`~django.http.HttpResponseRedirect` rather than a normal
@@ -126,7 +119,7 @@ This code includes a few things we haven't covered yet in this tutorial:
 
   As the Python comment above points out, you should always return an
   :class:`~django.http.HttpResponseRedirect` after successfully dealing with
-  POST data. This tip isn't specific to Django; it's good Web development
+  a POST form. This tip isn't specific to Django; it's good Web development
   practice in general.
 
 * We are using the :func:`~django.urls.reverse` function in the
