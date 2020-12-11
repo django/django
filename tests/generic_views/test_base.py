@@ -172,12 +172,16 @@ class ViewTest(SimpleTestCase):
 
     def test_class_attributes(self):
         """
-        The callable returned from as_view() has proper
-        docstring, name and module.
+        The callable returned from as_view() has proper special attributes.
         """
-        self.assertEqual(SimpleView.__doc__, SimpleView.as_view().__doc__)
-        self.assertEqual(SimpleView.__name__, SimpleView.as_view().__name__)
-        self.assertEqual(SimpleView.__module__, SimpleView.as_view().__module__)
+        cls = SimpleView
+        view = cls.as_view()
+        self.assertEqual(view.__doc__, cls.__doc__)
+        self.assertEqual(view.__name__, 'view')
+        self.assertEqual(view.__module__, cls.__module__)
+        self.assertEqual(view.__qualname__, f'{cls.as_view.__qualname__}.<locals>.view')
+        self.assertEqual(view.__annotations__, cls.dispatch.__annotations__)
+        self.assertFalse(hasattr(view, '__wrapped__'))
 
     def test_dispatch_decoration(self):
         """
