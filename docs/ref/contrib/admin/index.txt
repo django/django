@@ -59,8 +59,7 @@ visiting the URL you hooked it into (``/admin/``, by default).
 
 If you need to create a user to login with, use the :djadmin:`createsuperuser`
 command. By default, logging in to the admin requires that the user has the
-:attr:`~.User.is_superuser` or :attr:`~.User.is_staff` attribute set to
-``True``.
+:attr:`~.User.is_staff` attribute set to ``True``.
 
 Finally, determine which of your application's models should be editable in the
 admin interface. For each of those models, register them with the admin as
