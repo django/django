@@ -963,7 +963,7 @@ class RequestFactoryTest(SimpleTestCase):
         url_path = '/somewhere/'
         request = self.request_factory.trace(url_path)
         response = trace_view(request)
-        protocol = request.META["SERVER_PROTOCOL"]
+        protocol = request.meta["SERVER_PROTOCOL"]
         echoed_request_line = "TRACE {} {}".format(url_path, protocol)
         self.assertContains(response, echoed_request_line)
 
@@ -1050,6 +1050,6 @@ class AsyncRequestFactoryTest(SimpleTestCase):
             X_ANOTHER_HEADER='some other value',
         )
         self.assertEqual(request.headers['authorization'], 'Bearer faketoken')
-        self.assertIn('HTTP_AUTHORIZATION', request.META)
+        self.assertIn('HTTP_AUTHORIZATION', request.meta)
         self.assertEqual(request.headers['x-another-header'], 'some other value')
-        self.assertIn('HTTP_X_ANOTHER_HEADER', request.META)
+        self.assertIn('HTTP_X_ANOTHER_HEADER', request.meta)

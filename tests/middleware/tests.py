@@ -330,14 +330,14 @@ class CommonMiddlewareTest(SimpleTestCase):
     @override_settings(DISALLOWED_USER_AGENTS=[re.compile(r'foo')])
     def test_disallowed_user_agents(self):
         request = self.rf.get('/slash')
-        request.META['HTTP_USER_AGENT'] = 'foo'
+        request.meta['HTTP_USER_AGENT'] = 'foo'
         with self.assertRaisesMessage(PermissionDenied, 'Forbidden user agent'):
             CommonMiddleware(get_response_empty).process_request(request)
 
     def test_non_ascii_query_string_does_not_crash(self):
         """Regression test for #15152"""
         request = self.rf.get('/slash')
-        request.META['QUERY_STRING'] = 'drink=café'
+        request.meta['QUERY_STRING'] = 'drink=café'
         r = CommonMiddleware(get_response_empty).process_request(request)
         self.assertEqual(r.status_code, 301)
 
@@ -396,7 +396,7 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
                 '''Check user-agent in addition to normal checks.'''
                 if super().is_ignorable_request(request, uri, domain, referer):
                     return True
-                user_agent = request.META['HTTP_USER_AGENT']
+                user_agent = request.meta['HTTP_USER_AGENT']
                 return any(pattern.search(user_agent) for pattern in self.ignored_user_agent_patterns)
 
         self.req.META['HTTP_REFERER'] = '/another/url/'

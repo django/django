@@ -527,7 +527,7 @@ def get_language_from_request(request, check_path=False):
         if lang_code is not None:
             return lang_code
 
-    lang_code = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
+    lang_code = request.cookies.get(settings.LANGUAGE_COOKIE_NAME)
     if lang_code is not None and lang_code in get_languages() and check_for_language(lang_code):
         return lang_code
 
@@ -536,7 +536,7 @@ def get_language_from_request(request, check_path=False):
     except LookupError:
         pass
 
-    accept = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
+    accept = request.meta.get('HTTP_ACCEPT_LANGUAGE', '')
     for accept_lang, unused in parse_accept_lang_header(accept):
         if accept_lang == '*':
             break

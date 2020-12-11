@@ -23,7 +23,7 @@ class XViewMiddleware(MiddlewareMixin):
                 "be installed. Edit your MIDDLEWARE setting to insert "
                 "'django.contrib.auth.middleware.AuthenticationMiddleware'."
             )
-        if request.method == 'HEAD' and (request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS or
+        if request.method == 'HEAD' and (request.meta.get('REMOTE_ADDR') in settings.INTERNAL_IPS or
                                          (request.user.is_active and request.user.is_staff)):
             response = HttpResponse()
             response.headers['X-View'] = get_view_name(view_func)

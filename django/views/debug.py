@@ -124,11 +124,11 @@ class SafeExceptionReporterFilter:
 
     def get_safe_request_meta(self, request):
         """
-        Return a dictionary of request.META with sensitive values redacted.
+        Return a dictionary of request.meta with sensitive values redacted.
         """
-        if not hasattr(request, 'META'):
+        if not hasattr(request, 'meta'):
             return {}
-        return {k: self.cleanse_setting(k, v) for k, v in request.META.items()}
+        return {k: self.cleanse_setting(k, v) for k, v in request.meta.items()}
 
     def is_active(self, request):
         """
@@ -143,7 +143,7 @@ class SafeExceptionReporterFilter:
         """
         Replace the keys in a MultiValueDict marked as sensitive with stars.
         This mitigates leaking sensitive POST parameters if something like
-        request.POST['nonexistent_key'] throws an exception (#21098).
+        request.form_data['nonexistent_key'] throws an exception (#21098).
         """
         sensitive_post_parameters = getattr(request, 'sensitive_post_parameters', [])
         if self.is_active(request) and sensitive_post_parameters:
@@ -163,7 +163,7 @@ class SafeExceptionReporterFilter:
         else:
             sensitive_post_parameters = getattr(request, 'sensitive_post_parameters', [])
             if self.is_active(request) and sensitive_post_parameters:
-                cleansed = request.POST.copy()
+                cleansed = request.form_data.copy()
                 if sensitive_post_parameters == '__ALL__':
                     # Cleanse all parameters.
                     for k in cleansed:
@@ -176,7 +176,7 @@ class SafeExceptionReporterFilter:
                             cleansed[param] = self.cleansed_substitute
                     return cleansed
             else:
-                return request.POST
+                return request.form_data
 
     def cleanse_special_types(self, request, value):
         try:
@@ -188,7 +188,7 @@ class SafeExceptionReporterFilter:
             return '{!r} while evaluating {!r}'.format(e, value)
 
         if is_multivalue_dict:
-            # Cleanse MultiValueDicts (request.POST is the one we usually care about)
+            # Cleanse MultiValueDicts (request.form_data is the one we usually care about)
             value = self.get_cleansed_multivaluedict(request, value)
         return value
 
@@ -320,9 +320,9 @@ class ExceptionReporter:
             'postmortem': self.postmortem,
         }
         if self.request is not None:
-            c['request_GET_items'] = self.request.GET.items()
-            c['request_FILES_items'] = self.request.FILES.items()
-            c['request_COOKIES_items'] = self.request.COOKIES.items()
+            c['request_GET_items'] = self.request.query_params.items()
+            c['request_FILES_items'] = self.request.files.items()
+            c['request_COOKIES_items'] = self.request.cookies.items()
         # Check whether exception info is available
         if self.exc_type:
             c['exception_type'] = self.exc_type.__name__

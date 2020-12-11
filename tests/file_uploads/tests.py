@@ -535,7 +535,7 @@ class FileUploadTests(TestCase):
             """A handler that'll access POST during an exception."""
             def handle_uncaught_exception(self, request, resolver, exc_info):
                 ret = super().handle_uncaught_exception(request, resolver, exc_info)
-                request.POST  # evaluate
+                request.form_data  # evaluate
                 return ret
 
         # Maybe this is a little more complicated that it needs to be; but if
@@ -547,7 +547,7 @@ class FileUploadTests(TestCase):
         except Exception as err:
             reference_error = err
 
-        # install the custom handler that tries to access request.POST
+        # install the custom handler that tries to access request.form_data
         self.client.handler = POSTAccessingHandler()
 
         with open(__file__, 'rb') as fp:

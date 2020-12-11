@@ -21,7 +21,7 @@ from django.utils.decorators import method_decorator
 def get_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
     t = Template('This is a test. {{ var }} is the value.', name='GET Template')
-    c = Context({'var': request.GET.get('var', 42)})
+    c = Context({'var': request.query_params.get('var', 42)})
 
     return HttpResponse(t.render(c))
 
@@ -42,7 +42,7 @@ def trace_view(request):
     elif request.body:
         return HttpResponseBadRequest("TRACE requests MUST NOT include an entity")
     else:
-        protocol = request.META["SERVER_PROTOCOL"]
+        protocol = request.meta["SERVER_PROTOCOL"]
         t = Template(
             '{{ method }} {{ uri }} {{ version }}',
             name="TRACE Template",
@@ -59,7 +59,7 @@ def put_view(request):
     if request.method == 'PUT':
         t = Template('Data received: {{ data }} is the body.', name='PUT Template')
         c = Context({
-            'Content-Length': request.META['CONTENT_LENGTH'],
+            'Content-Length': request.meta['CONTENT_LENGTH'],
             'data': request.body.decode(),
         })
     else:
@@ -73,9 +73,9 @@ def post_view(request):
     on whether any POST data is available
     """
     if request.method == 'POST':
-        if request.POST:
+        if request.form_data:
             t = Template('Data received: {{ data }} is the value.', name='POST Template')
-            c = Context({'data': request.POST['value']})
+            c = Context({'data': request.form_data['value']})
         else:
             t = Template('Viewing POST page.', name='Empty POST Template')
             c = Context()
@@ -90,7 +90,7 @@ def json_view(request):
     A view that expects a request with the header 'application/json' and JSON
     data, which is deserialized and included in the context.
     """
-    if request.META.get('CONTENT_TYPE') != 'application/json':
+    if request.meta.get('CONTENT_TYPE') != 'application/json':
         return HttpResponse()
 
     t = Template('Viewing {} page. With data {{ data }}.'.format(request.method))
@@ -124,8 +124,8 @@ def raw_post_view(request):
 
 def redirect_view(request):
     "A view that redirects all requests to the GET view"
-    if request.GET:
-        query = '?' + urlencode(request.GET, True)
+    if request.query_params:
+        query = '?' + urlencode(request.query_params, True)
     else:
         query = ''
     return HttpResponseRedirect('/get_view/' + query)
@@ -141,7 +141,7 @@ def method_saving_308_redirect_query_string_view(request):
 
 def _post_view_redirect(request, status_code):
     """Redirect to /post_view/ using the status code."""
-    redirect_to = request.GET.get('to', '/post_view/')
+    redirect_to = request.query_params.get('to', '/post_view/')
     return HttpResponseRedirect(redirect_to, status=status_code)
 
 
@@ -157,7 +157,7 @@ def view_with_secure(request):
     "A view that indicates if the request was secure"
     response = HttpResponse()
     response.test_was_secure_request = request.is_secure()
-    response.test_server_port = request.META.get('SERVER_PORT', 80)
+    response.test_server_port = request.meta.get('SERVER_PORT', 80)
     return response
 
 
@@ -197,7 +197,7 @@ class TestForm(Form):
 def form_view(request):
     "A view that tests a simple form"
     if request.method == 'POST':
-        form = TestForm(request.POST)
+        form = TestForm(request.form_data)
         if form.is_valid():
             t = Template('Valid POST data.', name='Valid POST Template')
             c = Context()
@@ -205,7 +205,7 @@ def form_view(request):
             t = Template('Invalid POST data. {{ form.errors }}', name='Invalid POST Template')
             c = Context({'form': form})
     else:
-        form = TestForm(request.GET)
+        form = TestForm(request.query_params)
         t = Template('Viewing base form. {{ form }}.', name='Form GET Template')
         c = Context({'form': form})
 
@@ -215,7 +215,7 @@ def form_view(request):
 def form_view_with_template(request):
     "A view that tests a simple form"
     if request.method == 'POST':
-        form = TestForm(request.POST)
+        form = TestForm(request.form_data)
         if form.is_valid():
             message = 'POST data OK'
         else:
@@ -252,7 +252,7 @@ TestFormSet = formset_factory(TestForm, BaseTestFormSet)
 def formset_view(request):
     "A view that tests a simple formset"
     if request.method == 'POST':
-        formset = TestFormSet(request.POST)
+        formset = TestFormSet(request.form_data)
         if formset.is_valid():
             t = Template('Valid POST data.', name='Valid POST Template')
             c = Context()
@@ -261,7 +261,7 @@ def formset_view(request):
                          name='Invalid POST Template')
             c = Context({'my_formset': formset})
     else:
-        formset = TestForm(request.GET)
+        formset = TestForm(request.query_params)
         t = Template('Viewing base formset. {{ my_formset }}.',
                      name='Formset GET Template')
         c = Context({'my_formset': formset})
@@ -382,8 +382,8 @@ def django_project_redirect(request):
 
 
 def upload_view(request):
-    """Prints keys of request.FILES to the response."""
-    return HttpResponse(', '.join(request.FILES))
+    """Prints keys of request.files to the response."""
+    return HttpResponse(', '.join(request.files))
 
 
 class TwoArgException(Exception):

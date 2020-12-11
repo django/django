@@ -170,7 +170,7 @@ class ShortcutViewTests(TestCase):
 
     def setUp(self):
         self.request = HttpRequest()
-        self.request.META = {'SERVER_NAME': 'Example.com', 'SERVER_PORT': '80'}
+        self.request.meta = {'SERVER_NAME': 'Example.com', 'SERVER_PORT': '80'}
 
     @override_settings(ALLOWED_HOSTS=['example.com'])
     def test_not_dependent_on_sites_app(self):

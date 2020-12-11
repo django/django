@@ -43,7 +43,7 @@ def suspicious(request):
 
 @csrf_exempt
 def malformed_post(request):
-    request.POST
+    request.form_data
     return HttpResponse()
 
 

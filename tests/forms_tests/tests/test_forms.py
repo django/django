@@ -2435,8 +2435,8 @@ Password: <input type="password" name="password" required>
 </select>""")
 
     def test_forms_with_file_fields(self):
-        # FileFields are a special case because they take their data from the request.FILES,
-        # not request.POST.
+        # FileFields are a special case because they take their data from the request.files,
+        # not request.form_data.
         class FileForm(Form):
             file1 = FileField()
 

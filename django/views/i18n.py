@@ -28,7 +28,7 @@ def set_language(request):
     redirect to the page in the request (the 'next' parameter) without changing
     any state.
     """
-    next_url = request.POST.get('next', request.GET.get('next'))
+    next_url = request.form_data.get('next', request.query_params.get('next'))
     if (
         (next_url or request.accepts('text/html')) and
         not url_has_allowed_host_and_scheme(
@@ -37,7 +37,7 @@ def set_language(request):
             require_https=request.is_secure(),
         )
     ):
-        next_url = request.META.get('HTTP_REFERER')
+        next_url = request.meta.get('HTTP_REFERER')
         if not url_has_allowed_host_and_scheme(
             url=next_url,
             allowed_hosts={request.get_host()},
@@ -46,7 +46,7 @@ def set_language(request):
             next_url = '/'
     response = HttpResponseRedirect(next_url) if next_url else HttpResponse(status=204)
     if request.method == 'POST':
-        lang_code = request.POST.get(LANGUAGE_QUERY_PARAMETER)
+        lang_code = request.form_data.get(LANGUAGE_QUERY_PARAMETER)
         if lang_code and check_for_language(lang_code):
             if next_url:
                 next_trans = translate_url(next_url, lang_code)

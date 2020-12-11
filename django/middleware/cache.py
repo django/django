@@ -83,7 +83,7 @@ class UpdateCacheMiddleware(MiddlewareMixin):
 
         # Don't cache responses that set a user-specific (and maybe security
         # sensitive) cookie in response to a cookie-less request.
-        if not request.COOKIES and response.cookies and has_vary_header(response, 'Cookie'):
+        if not request.cookies and response.cookies and has_vary_header(response, 'Cookie'):
             return response
 
         # Don't cache a response with 'Cache-Control: private'

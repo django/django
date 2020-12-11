@@ -41,8 +41,8 @@ class FormMixin(ContextMixin):
 
         if self.request.method in ('POST', 'PUT'):
             kwargs.update({
-                'data': self.request.POST,
-                'files': self.request.FILES,
+                'data': self.request.form_data,
+                'files': self.request.files,
             })
         return kwargs
 

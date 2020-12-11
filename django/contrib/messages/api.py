@@ -20,7 +20,7 @@ def add_message(request, level, message, extra_tags='', fail_silently=False):
     try:
         messages = request._messages
     except AttributeError:
-        if not hasattr(request, 'META'):
+        if not hasattr(request, 'meta'):
             raise TypeError(
                 "add_message() argument must be an HttpRequest object, not "
                 "'%s'." % request.__class__.__name__

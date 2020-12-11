@@ -72,7 +72,7 @@ class RemoteUserTest(TestCase):
 
         # This request will call django.contrib.auth.login() which will call
         # django.middleware.csrf.rotate_token() thus changing the value of
-        # request.META['CSRF_COOKIE'] from the user submitted value set by
+        # request.meta['CSRF_COOKIE'] from the user submitted value set by
         # CsrfViewMiddleware.process_request() to the new csrftoken value set
         # by rotate_token(). Csrf validation should still pass when the view is
         # later processed by CsrfViewMiddleware.process_view()
@@ -227,7 +227,7 @@ class CustomRemoteUserBackend(RemoteUserBackend):
         """
         Sets user's email address using the email specified in an HTTP header.
         """
-        user.email = request.META.get(RemoteUserTest.email_header, '')
+        user.email = request.meta.get(RemoteUserTest.email_header, '')
         user.save()
         return user
 

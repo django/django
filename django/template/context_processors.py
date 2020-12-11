@@ -37,7 +37,7 @@ def debug(request):
     Return context variables helpful for debugging.
     """
     context_extras = {}
-    if settings.DEBUG and request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS:
+    if settings.DEBUG and request.meta.get('REMOTE_ADDR') in settings.INTERNAL_IPS:
         context_extras['debug'] = True
         from django.db import connections
 

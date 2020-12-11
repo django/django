@@ -213,7 +213,7 @@ class UnsafeExceptionReporterFilter(SafeExceptionReporterFilter):
     """
 
     def get_post_parameters(self, request):
-        return request.POST
+        return request.form_data
 
     def get_traceback_frame_variables(self, request, tb_frame):
         return tb_frame.f_locals.items()
@@ -284,7 +284,7 @@ def multivalue_dict_key_error(request):
     cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])  # NOQA
     sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])  # NOQA
     try:
-        request.POST['bar']
+        request.form_data['bar']
     except Exception:
         exc_info = sys.exc_info()
         send_log(request, exc_info)

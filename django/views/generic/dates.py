@@ -36,7 +36,7 @@ class YearMixin:
                 year = self.kwargs['year']
             except KeyError:
                 try:
-                    year = self.request.GET['year']
+                    year = self.request.query_params['year']
                 except KeyError:
                     raise Http404(_("No year specified"))
         return year
@@ -85,7 +85,7 @@ class MonthMixin:
                 month = self.kwargs['month']
             except KeyError:
                 try:
-                    month = self.request.GET['month']
+                    month = self.request.query_params['month']
                 except KeyError:
                     raise Http404(_("No month specified"))
         return month
@@ -137,7 +137,7 @@ class DayMixin:
                 day = self.kwargs['day']
             except KeyError:
                 try:
-                    day = self.request.GET['day']
+                    day = self.request.query_params['day']
                 except KeyError:
                     raise Http404(_("No day specified"))
         return day
@@ -183,7 +183,7 @@ class WeekMixin:
                 week = self.kwargs['week']
             except KeyError:
                 try:
-                    week = self.request.GET['week']
+                    week = self.request.query_params['week']
                 except KeyError:
                     raise Http404(_("No week specified"))
         return week

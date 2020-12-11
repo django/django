@@ -33,5 +33,5 @@ def render_view_with_status(request):
 
 
 def render_view_with_using(request):
-    using = request.GET.get('using')
+    using = request.query_params.get('using')
     return render(request, 'shortcuts/using.html', using=using)

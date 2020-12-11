@@ -136,7 +136,7 @@ class UserAdmin(admin.ModelAdmin):
                 'key': escape(id),
             })
         if request.method == 'POST':
-            form = self.change_password_form(user, request.POST)
+            form = self.change_password_form(user, request.form_data)
             if form.is_valid():
                 form.save()
                 change_message = self.construct_change_message(request, form, None)
@@ -165,8 +165,8 @@ class UserAdmin(admin.ModelAdmin):
             'adminForm': adminForm,
             'form_url': form_url,
             'form': form,
-            'is_popup': (IS_POPUP_VAR in request.POST or
-                         IS_POPUP_VAR in request.GET),
+            'is_popup': (IS_POPUP_VAR in request.form_data or
+                         IS_POPUP_VAR in request.query_params),
             'add': True,
             'change': False,
             'has_delete_permission': False,
@@ -199,7 +199,7 @@ class UserAdmin(admin.ModelAdmin):
         # button except in two scenarios:
         # * The user has pressed the 'Save and add another' button
         # * We are adding a user in a popup
-        if '_addanother' not in request.POST and IS_POPUP_VAR not in request.POST:
-            request.POST = request.POST.copy()
-            request.POST['_continue'] = 1
+        if '_addanother' not in request.form_data and IS_POPUP_VAR not in request.form_data:
+            request.form_data = request.form_data.copy()
+            request.form_data['_continue'] = 1
         return super().response_add(request, obj, post_url_continue)

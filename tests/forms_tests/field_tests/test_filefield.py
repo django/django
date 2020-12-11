@@ -56,7 +56,7 @@ class FileFieldTest(SimpleTestCase):
 
     def test_filefield_changed(self):
         """
-        The value of data will more than likely come from request.FILES. The
+        The value of data will more than likely come from request.files. The
         value of initial data will likely be a filename stored in the database.
         Since its value is of no use to a FileField it is ignored.
         """

@@ -48,7 +48,7 @@ class HandlerTests(SimpleTestCase):
             # Simulate http.server.BaseHTTPRequestHandler.parse_request handling of raw request
             environ['QUERY_STRING'] = str(raw_query_string, 'iso-8859-1')
             request = WSGIRequest(environ)
-            got.append(request.GET['want'])
+            got.append(request.query_params['want'])
         # %E9 is converted to the Unicode replacement character by parse_qsl
         self.assertEqual(got, ['café', 'café', 'caf\ufffd', 'café'])
 
@@ -58,7 +58,7 @@ class HandlerTests(SimpleTestCase):
         raw_cookie = 'want="café"'.encode('utf-8').decode('iso-8859-1')
         environ['HTTP_COOKIE'] = raw_cookie
         request = WSGIRequest(environ)
-        self.assertEqual(request.COOKIES['want'], "café")
+        self.assertEqual(request.cookies['want'], "café")
 
     def test_invalid_unicode_cookie(self):
         """
@@ -71,7 +71,7 @@ class HandlerTests(SimpleTestCase):
         # We don't test COOKIES content, as the result might differ between
         # Python version because parsing invalid content became stricter in
         # latest versions.
-        self.assertIsInstance(request.COOKIES, dict)
+        self.assertIsInstance(request.cookies, dict)
 
     @override_settings(ROOT_URLCONF='handlers.urls')
     def test_invalid_multipart_boundary(self):

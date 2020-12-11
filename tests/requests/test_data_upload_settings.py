@@ -5,7 +5,9 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.test import SimpleTestCase
 from django.test.client import FakePayload
 
-TOO_MANY_FIELDS_MSG = 'The number of query_params/form_data parameters exceeded settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.'
+TOO_MANY_FIELDS_MSG = (
+    'The number of query_params/form_data parameters exceeded settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.'
+)
 TOO_MUCH_DATA_MSG = 'Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.'
 
 
@@ -80,7 +82,7 @@ class DataUploadMaxMemorySizeMultipartPostTests(SimpleTestCase):
         })
         with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=1):
             request._load_form_data_and_files()
-            self.assertIn('file1', request.FILES, "Upload file not present")
+            self.assertIn('file1', request.files, "Upload file not present")
 
 
 class DataUploadMaxMemorySizeGetTests(SimpleTestCase):
@@ -119,7 +121,7 @@ class DataUploadMaxNumberOfFieldsGet(SimpleTestCase):
                     'wsgi.input': BytesIO(b''),
                     'QUERY_STRING': 'a=1&a=2&a=3',
                 })
-                request.GET['a']
+                request.query_params['a']
 
     def test_get_max_fields_not_exceeded(self):
         with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=3):
@@ -128,7 +130,7 @@ class DataUploadMaxNumberOfFieldsGet(SimpleTestCase):
                 'wsgi.input': BytesIO(b''),
                 'QUERY_STRING': 'a=1&a=2&a=3',
             })
-            request.GET['a']
+            request.query_params['a']
 
 
 class DataUploadMaxNumberOfFieldsMultipartPost(SimpleTestCase):

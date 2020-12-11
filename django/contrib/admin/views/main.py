@@ -71,22 +71,22 @@ class ChangeList:
         self.sortable_by = sortable_by
 
         # Get search parameters from the query string.
-        _search_form = self.search_form_class(request.GET)
+        _search_form = self.search_form_class(request.query_params)
         if not _search_form.is_valid():
             for error in _search_form.errors.values():
                 messages.error(request, ', '.join(error))
         self.query = _search_form.cleaned_data.get(SEARCH_VAR) or ''
         try:
-            self.page_num = int(request.GET.get(PAGE_VAR, 1))
+            self.page_num = int(request.query_params.get(PAGE_VAR, 1))
         except ValueError:
             self.page_num = 1
-        self.show_all = ALL_VAR in request.GET
-        self.is_popup = IS_POPUP_VAR in request.GET
-        to_field = request.GET.get(TO_FIELD_VAR)
+        self.show_all = ALL_VAR in request.query_params
+        self.is_popup = IS_POPUP_VAR in request.query_params
+        to_field = request.query_params.get(TO_FIELD_VAR)
         if to_field and not model_admin.to_field_allowed(request, to_field):
             raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
         self.to_field = to_field
-        self.params = dict(request.GET.items())
+        self.params = dict(request.query_params.items())
         if PAGE_VAR in self.params:
             del self.params[PAGE_VAR]
         if ERROR_FLAG in self.params:

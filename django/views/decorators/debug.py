@@ -56,8 +56,8 @@ def sensitive_post_parameters(*parameters):
 
         @sensitive_post_parameters('password', 'credit_card')
         def my_view(request):
-            pw = request.POST['password']
-            cc = request.POST['credit_card']
+            pw = request.form_data['password']
+            cc = request.form_data['credit_card']
             ...
 
     * without any specified parameters, in which case consider all

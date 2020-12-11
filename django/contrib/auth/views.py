@@ -68,9 +68,9 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
 
     def get_redirect_url(self):
         """Return the user-originating redirect URL if it's safe."""
-        redirect_to = self.request.POST.get(
+        redirect_to = self.request.form_data.get(
             self.redirect_field_name,
-            self.request.GET.get(self.redirect_field_name, '')
+            self.request.query_params.get(self.redirect_field_name, '')
         )
         url_is_safe = url_has_allowed_host_and_scheme(
             url=redirect_to,
@@ -138,11 +138,11 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
         else:
             next_page = self.next_page
 
-        if (self.redirect_field_name in self.request.POST or
-                self.redirect_field_name in self.request.GET):
-            next_page = self.request.POST.get(
+        if (self.redirect_field_name in self.request.form_data or
+                self.redirect_field_name in self.request.query_params):
+            next_page = self.request.form_data.get(
                 self.redirect_field_name,
-                self.request.GET.get(self.redirect_field_name)
+                self.request.query_params.get(self.redirect_field_name)
             )
             url_is_safe = url_has_allowed_host_and_scheme(
                 url=next_page,

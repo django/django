@@ -307,7 +307,7 @@ class AdminSite:
         For sites running on a subpath, use the SCRIPT_NAME value if site_url
         hasn't been customized.
         """
-        script_name = request.META['SCRIPT_NAME']
+        script_name = request.meta['SCRIPT_NAME']
         site_url = script_name if self.site_url == '/' and script_name else self.site_url
         return {
             'site_title': self.site_title,
@@ -400,8 +400,8 @@ class AdminSite:
             'app_path': request.get_full_path(),
             'username': request.user.get_username(),
         }
-        if (REDIRECT_FIELD_NAME not in request.GET and
-                REDIRECT_FIELD_NAME not in request.POST):
+        if (REDIRECT_FIELD_NAME not in request.query_params and
+                REDIRECT_FIELD_NAME not in request.form_data):
             context[REDIRECT_FIELD_NAME] = reverse('admin:index', current_app=self.name)
         context.update(extra_context or {})
 

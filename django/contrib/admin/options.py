@@ -901,7 +901,7 @@ class ModelAdmin(BaseModelAdmin):
         """
         # If self.actions is set to None that means actions are disabled on
         # this page.
-        if self.actions is None or IS_POPUP_VAR in request.GET:
+        if self.actions is None or IS_POPUP_VAR in request.query_params:
             return {}
         actions = self._filter_actions_by_permissions(request, self._get_base_actions())
         return {name: (func, name, desc) for func, name, desc in actions}
@@ -1044,9 +1044,9 @@ class ModelAdmin(BaseModelAdmin):
             current_url = '%s:%s' % (match.app_name, match.url_name)
             changelist_url = 'admin:%s_%s_changelist' % (opts.app_label, opts.model_name)
             if current_url == changelist_url:
-                preserved_filters = request.GET.urlencode()
+                preserved_filters = request.query_params.urlencode()
             else:
-                preserved_filters = request.GET.get('_changelist_filters')
+                preserved_filters = request.query_params.get('_changelist_filters')
 
             if preserved_filters:
                 return urlencode({'_changelist_filters': preserved_filters})
@@ -1192,10 +1192,10 @@ class ModelAdmin(BaseModelAdmin):
             'obj': obj_repr,
         }
         # Here, we distinguish between different save types by checking for
-        # the presence of keys in request.POST.
+        # the presence of keys in request.form_data.
 
-        if IS_POPUP_VAR in request.POST:
-            to_field = request.POST.get(TO_FIELD_VAR)
+        if IS_POPUP_VAR in request.form_data:
+            to_field = request.form_data.get(TO_FIELD_VAR)
             if to_field:
                 attr = str(to_field)
             else:
@@ -1213,9 +1213,9 @@ class ModelAdmin(BaseModelAdmin):
                 'popup_response_data': popup_response_data,
             })
 
-        elif "_continue" in request.POST or (
+        elif "_continue" in request.form_data or (
                 # Redirecting after "Save as new".
-                "_saveasnew" in request.POST and self.save_as_continue and
+                "_saveasnew" in request.form_data and self.save_as_continue and
                 self.has_change_permission(request, obj)
         ):
             msg = _('The {name} “{obj}” was added successfully.')
@@ -1230,7 +1230,7 @@ class ModelAdmin(BaseModelAdmin):
             )
             return HttpResponseRedirect(post_url_continue)
 
-        elif "_addanother" in request.POST:
+        elif "_addanother" in request.form_data:
             msg = format_html(
                 _('The {name} “{obj}” was added successfully. You may add another {name} below.'),
                 **msg_dict
@@ -1253,9 +1253,9 @@ class ModelAdmin(BaseModelAdmin):
         Determine the HttpResponse for the change_view stage.
         """
 
-        if IS_POPUP_VAR in request.POST:
+        if IS_POPUP_VAR in request.form_data:
             opts = obj._meta
-            to_field = request.POST.get(TO_FIELD_VAR)
+            to_field = request.form_data.get(TO_FIELD_VAR)
             attr = str(to_field) if to_field else opts.pk.attname
             value = request.resolver_match.kwargs['object_id']
             new_value = obj.serializable_value(attr)
@@ -1280,7 +1280,7 @@ class ModelAdmin(BaseModelAdmin):
             'name': opts.verbose_name,
             'obj': format_html('<a href="{}">{}</a>', urlquote(request.path), obj),
         }
-        if "_continue" in request.POST:
+        if "_continue" in request.form_data:
             msg = format_html(
                 _('The {name} “{obj}” was changed successfully. You may edit it again below.'),
                 **msg_dict
@@ -1290,7 +1290,7 @@ class ModelAdmin(BaseModelAdmin):
             redirect_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, redirect_url)
             return HttpResponseRedirect(redirect_url)
 
-        elif "_saveasnew" in request.POST:
+        elif "_saveasnew" in request.form_data:
             msg = format_html(
                 _('The {name} “{obj}” was added successfully. You may edit it again below.'),
                 **msg_dict
@@ -1303,7 +1303,7 @@ class ModelAdmin(BaseModelAdmin):
             redirect_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, redirect_url)
             return HttpResponseRedirect(redirect_url)
 
-        elif "_addanother" in request.POST:
+        elif "_addanother" in request.form_data:
             msg = format_html(
                 _('The {name} “{obj}” was changed successfully. You may add another {name} below.'),
                 **msg_dict
@@ -1361,12 +1361,12 @@ class ModelAdmin(BaseModelAdmin):
         # and bottom of the change list, for example). Get the action
         # whose button was pushed.
         try:
-            action_index = int(request.POST.get('index', 0))
+            action_index = int(request.form_data.get('index', 0))
         except ValueError:
             action_index = 0
 
         # Construct the action form.
-        data = request.POST.copy()
+        data = request.form_data.copy()
         data.pop(helpers.ACTION_CHECKBOX_NAME, None)
         data.pop("index", None)
 
@@ -1391,7 +1391,7 @@ class ModelAdmin(BaseModelAdmin):
             # Get the list of selected PKs. If nothing's selected, we can't
             # perform an action on it, so bail. Except we want to perform
             # the action explicitly on all objects.
-            selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
+            selected = request.form_data.getlist(helpers.ACTION_CHECKBOX_NAME)
             if not selected and not select_across:
                 # Reminder that something needs to be selected or nothing will happen
                 msg = _("Items must be selected in order to perform "
@@ -1423,7 +1423,7 @@ class ModelAdmin(BaseModelAdmin):
         """
         opts = self.model._meta
 
-        if IS_POPUP_VAR in request.POST:
+        if IS_POPUP_VAR in request.form_data:
             popup_response_data = json.dumps({
                 'action': 'delete',
                 'value': str(obj_id),
@@ -1506,9 +1506,9 @@ class ModelAdmin(BaseModelAdmin):
 
     def get_changeform_initial_data(self, request):
         """
-        Get the initial form data from the request's GET params.
+        Get the initial form data from the request's query params.
         """
-        initial = dict(request.GET.items())
+        initial = dict(request.query_params.items())
         for k in initial:
             try:
                 f = self.model._meta.get_field(k)
@@ -1538,14 +1538,14 @@ class ModelAdmin(BaseModelAdmin):
             return self._changeform_view(request, object_id, form_url, extra_context)
 
     def _changeform_view(self, request, object_id, form_url, extra_context):
-        to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
+        to_field = request.form_data.get(TO_FIELD_VAR, request.query_params.get(TO_FIELD_VAR))
         if to_field and not self.to_field_allowed(request, to_field):
             raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
 
         model = self.model
         opts = model._meta
 
-        if request.method == 'POST' and '_saveasnew' in request.POST:
+        if request.method == 'POST' and '_saveasnew' in request.form_data:
             object_id = None
 
         add = object_id is None
@@ -1573,7 +1573,7 @@ class ModelAdmin(BaseModelAdmin):
             request, obj, change=not add, fields=flatten_fieldsets(fieldsets)
         )
         if request.method == 'POST':
-            form = ModelForm(request.POST, request.FILES, instance=obj)
+            form = ModelForm(request.form_data, request.files, instance=obj)
             form_validated = form.is_valid()
             if form_validated:
                 new_object = self.save_form(request, form, change=not add)
@@ -1631,7 +1631,7 @@ class ModelAdmin(BaseModelAdmin):
             'adminform': adminForm,
             'object_id': object_id,
             'original': obj,
-            'is_popup': IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET,
+            'is_popup': IS_POPUP_VAR in request.form_data or IS_POPUP_VAR in request.query_params,
             'to_field': to_field,
             'media': media,
             'inline_admin_formsets': inline_formsets,
@@ -1641,7 +1641,7 @@ class ModelAdmin(BaseModelAdmin):
 
         # Hide the "Save" and "Save and continue" buttons if "Save as New" was
         # previously chosen to prevent the interface from getting confusing.
-        if request.method == 'POST' and not form_validated and "_saveasnew" in request.POST:
+        if request.method == 'POST' and not form_validated and "_saveasnew" in request.form_data:
             context['show_save'] = False
             context['show_save_and_continue'] = False
             # Use the change template instead of the add template.
@@ -1662,7 +1662,7 @@ class ModelAdmin(BaseModelAdmin):
         pk_pattern = re.compile(
             r'{}-\d+-{}$'.format(re.escape(prefix), self.model._meta.pk.name)
         )
-        return [value for key, value in request.POST.items() if pk_pattern.match(key)]
+        return [value for key, value in request.form_data.items() if pk_pattern.match(key)]
 
     def _get_list_editable_queryset(self, request, prefix):
         """
@@ -1700,7 +1700,7 @@ class ModelAdmin(BaseModelAdmin):
             # and the 'invalid=1' parameter was already in the query string,
             # something is screwed up with the database, so display an error
             # page.
-            if ERROR_FLAG in request.GET:
+            if ERROR_FLAG in request.query_params:
                 return SimpleTemplateResponse('admin/invalid_setup.html', {
                     'title': _('Database error'),
                 })
@@ -1711,12 +1711,12 @@ class ModelAdmin(BaseModelAdmin):
         # isn't an action the POST will fall through to the bulk edit check,
         # below.
         action_failed = False
-        selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
+        selected = request.form_data.getlist(helpers.ACTION_CHECKBOX_NAME)
 
         actions = self.get_actions(request)
         # Actions with no confirmation
         if (actions and request.method == 'POST' and
-                'index' in request.POST and '_save' not in request.POST):
+                'index' in request.form_data and '_save' not in request.form_data):
             if selected:
                 response = self.response_action(request, queryset=cl.get_queryset(request))
                 if response:
@@ -1731,8 +1731,8 @@ class ModelAdmin(BaseModelAdmin):
 
         # Actions with confirmation
         if (actions and request.method == 'POST' and
-                helpers.ACTION_CHECKBOX_NAME in request.POST and
-                'index' not in request.POST and '_save' not in request.POST):
+                helpers.ACTION_CHECKBOX_NAME in request.form_data and
+                'index' not in request.form_data and '_save' not in request.form_data):
             if selected:
                 response = self.response_action(request, queryset=cl.get_queryset(request))
                 if response:
@@ -1752,12 +1752,12 @@ class ModelAdmin(BaseModelAdmin):
         formset = cl.formset = None
 
         # Handle POSTed bulk-edit data.
-        if request.method == 'POST' and cl.list_editable and '_save' in request.POST:
+        if request.method == 'POST' and cl.list_editable and '_save' in request.form_data:
             if not self.has_change_permission(request):
                 raise PermissionDenied
             FormSet = self.get_changelist_formset(request)
             modified_objects = self._get_list_editable_queryset(request, FormSet.get_default_prefix())
-            formset = cl.formset = FormSet(request.POST, request.FILES, queryset=modified_objects)
+            formset = cl.formset = FormSet(request.form_data, request.files, queryset=modified_objects)
             if formset.is_valid():
                 changecount = 0
                 for form in formset.forms:
@@ -1853,7 +1853,7 @@ class ModelAdmin(BaseModelAdmin):
         opts = self.model._meta
         app_label = opts.app_label
 
-        to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
+        to_field = request.form_data.get(TO_FIELD_VAR, request.query_params.get(TO_FIELD_VAR))
         if to_field and not self.to_field_allowed(request, to_field):
             raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
 
@@ -1869,7 +1869,7 @@ class ModelAdmin(BaseModelAdmin):
         # will also be deleted.
         deleted_objects, model_count, perms_needed, protected = self.get_deleted_objects([obj], request)
 
-        if request.POST and not protected:  # The user has confirmed the deletion.
+        if request.form_data and not protected:  # The user has confirmed the deletion.
             if perms_needed:
                 raise PermissionDenied
             obj_display = str(obj)
@@ -1899,7 +1899,7 @@ class ModelAdmin(BaseModelAdmin):
             'opts': opts,
             'app_label': app_label,
             'preserved_filters': self.get_preserved_filters(request),
-            'is_popup': IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET,
+            'is_popup': IS_POPUP_VAR in request.form_data or IS_POPUP_VAR in request.query_params,
             'to_field': to_field,
             **(extra_context or {}),
         }
@@ -1954,9 +1954,9 @@ class ModelAdmin(BaseModelAdmin):
         }
         if request.method == 'POST':
             formset_params.update({
-                'data': request.POST.copy(),
-                'files': request.FILES,
-                'save_as_new': '_saveasnew' in request.POST
+                'data': request.form_data.copy(),
+                'files': request.files,
+                'save_as_new': '_saveasnew' in request.form_data
             })
         return formset_params
 
@@ -1980,11 +1980,11 @@ class ModelAdmin(BaseModelAdmin):
                 """Return whether or not the user deleted the form."""
                 return (
                     inline.has_delete_permission(request, obj) and
-                    '{}-{}-DELETE'.format(formset.prefix, index) in request.POST
+                    '{}-{}-DELETE'.format(formset.prefix, index) in request.form_data
                 )
 
             # Bypass validation of each view-only inline form (since the form's
-            # data won't be in request.POST), unless the form was deleted.
+            # data won't be in request.form_data), unless the form was deleted.
             if not inline.has_change_permission(request, obj if change else None):
                 for index, form in enumerate(formset.initial_forms):
                     if user_deleted_form(request, obj, formset, index):

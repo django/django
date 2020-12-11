@@ -57,7 +57,7 @@ class MultipleObjectMixin(ContextMixin):
             queryset, page_size, orphans=self.get_paginate_orphans(),
             allow_empty_first_page=self.get_allow_empty())
         page_kwarg = self.page_kwarg
-        page = self.kwargs.get(page_kwarg) or self.request.GET.get(page_kwarg) or 1
+        page = self.kwargs.get(page_kwarg) or self.request.query_params.get(page_kwarg) or 1
         try:
             page_number = int(page)
         except ValueError:

@@ -35,10 +35,10 @@ def get_view(request):
 def request_data(request, template='base.html', data='sausage'):
     "A simple view that returns the request data in the context"
     return render(request, template, {
-        'get-foo': request.GET.get('foo'),
-        'get-bar': request.GET.get('bar'),
-        'post-foo': request.POST.get('foo'),
-        'post-bar': request.POST.get('bar'),
+        'get-foo': request.query_params.get('foo'),
+        'get-bar': request.query_params.get('bar'),
+        'post-foo': request.form_data.get('foo'),
+        'post-bar': request.form_data.get('bar'),
         'data': data,
     })
 
@@ -72,7 +72,7 @@ def login_protected_redirect_view(request):
 
 
 def redirect_to_self_with_changing_query_view(request):
-    query = request.GET.copy()
+    query = request.query_params.copy()
     query['counter'] += '0'
     return HttpResponseRedirect('/redirect_to_self_with_changing_query_view/?%s' % urlencode(query))
 
@@ -104,7 +104,7 @@ def return_undecodable_binary(request):
 
 
 def return_json_response(request):
-    content_type = request.GET.get('content_type')
+    content_type = request.query_params.get('content_type')
     kwargs = {'content_type': content_type} if content_type else {}
     return JsonResponse({'key': 'value'}, **kwargs)
 
@@ -115,7 +115,7 @@ def return_json_response_latin1(request):
 
 def return_text_file(request):
     "A view that parses and returns text as a file."
-    match = CONTENT_TYPE_RE.match(request.META['CONTENT_TYPE'])
+    match = CONTENT_TYPE_RE.match(request.meta['CONTENT_TYPE'])
     if match:
         charset = match[1]
     else:
@@ -126,7 +126,7 @@ def return_text_file(request):
 
 def check_headers(request):
     "A view that responds with value of the X-ARG-CHECK header"
-    return HttpResponse('HTTP_X_ARG_CHECK: %s' % request.META.get('HTTP_X_ARG_CHECK', 'Undefined'))
+    return HttpResponse('HTTP_X_ARG_CHECK: %s' % request.meta.get('HTTP_X_ARG_CHECK', 'Undefined'))
 
 
 def body(request):
@@ -157,12 +157,12 @@ def render_template_multiple_times(request):
 
 
 def redirect_based_on_extra_headers_1_view(request):
-    if 'HTTP_REDIRECT' in request.META:
+    if 'HTTP_REDIRECT' in request.meta:
         return HttpResponseRedirect('/redirect_based_on_extra_headers_2/')
     return HttpResponse()
 
 
 def redirect_based_on_extra_headers_2_view(request):
-    if 'HTTP_REDIRECT' in request.META:
+    if 'HTTP_REDIRECT' in request.meta:
         return HttpResponseRedirect('/redirects/further/more/')
     return HttpResponse()

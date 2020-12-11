@@ -683,7 +683,7 @@ class ModelFormsetTest(TestCase):
         AuthorBooksFormSet = inlineformset_factory(Author, Book, can_delete=False, extra=2, fields="__all__")
         Author.objects.create(name='Charles Baudelaire')
 
-        # An immutable QueryDict simulates request.POST.
+        # An immutable QueryDict simulates request.form_data.
         data = QueryDict(mutable=True)
         data.update({
             'book_set-TOTAL_FORMS': '3',  # the number of forms rendered

@@ -58,7 +58,7 @@ def sitemap(request, sitemaps, section=None,
         maps = [sitemaps[section]]
     else:
         maps = sitemaps.values()
-    page = request.GET.get("p", 1)
+    page = request.query_params.get("p", 1)
 
     lastmod = None
     all_sites_lastmod = True

@@ -180,7 +180,7 @@ class RedirectView(View):
         else:
             return None
 
-        args = self.request.META.get('QUERY_STRING', '')
+        args = self.request.meta.get('QUERY_STRING', '')
         if args and self.query_string:
             url = "%s?%s" % (url, args)
         return url

@@ -93,7 +93,7 @@ class AdminEmailHandler(logging.Handler):
             request = record.request
             subject = '%s (%s IP): %s' % (
                 record.levelname,
-                ('internal' if request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS
+                ('internal' if request.meta.get('REMOTE_ADDR') in settings.INTERNAL_IPS
                  else 'EXTERNAL'),
                 record.getMessage()
             )

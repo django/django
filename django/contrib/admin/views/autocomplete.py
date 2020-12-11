@@ -56,11 +56,11 @@ class AutocompleteJsonView(BaseListView):
         Raise Http404 if the target model admin is not configured properly with
         search_fields.
         """
-        term = request.GET.get('term', '')
+        term = request.query_params.get('term', '')
         try:
-            app_label = request.GET['app_label']
-            model_name = request.GET['model_name']
-            field_name = request.GET['field_name']
+            app_label = request.query_params['app_label']
+            model_name = request.query_params['model_name']
+            field_name = request.query_params['field_name']
         except KeyError as e:
             raise PermissionDenied from e
 

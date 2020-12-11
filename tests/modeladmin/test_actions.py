@@ -36,7 +36,7 @@ class AdminActionsTests(TestCase):
 
         ma = BandAdmin(Band, admin.AdminSite())
         mock_request = MockRequest()
-        mock_request.GET = {}
+        mock_request.query_params = {}
         cases = [
             (None, self.viewuser, ['custom_action']),
             ('view', self.superuser, ['delete_selected', 'custom_action']),

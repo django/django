@@ -40,7 +40,7 @@ class RemoteUserMiddleware(MiddlewareMixin):
     """
 
     # Name of request header to grab username from.  This will be the key as
-    # used in the request.META dictionary, i.e. the normalization of headers to
+    # used in the request.meta dictionary, i.e. the normalization of headers to
     # all uppercase and the addition of "HTTP_" prefix apply.
     header = "REMOTE_USER"
     force_logout_if_no_header = True
@@ -55,7 +55,7 @@ class RemoteUserMiddleware(MiddlewareMixin):
                 " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
                 " before the RemoteUserMiddleware class.")
         try:
-            username = request.META[self.header]
+            username = request.meta[self.header]
         except KeyError:
             # If specified header doesn't exist then remove any existing
             # authenticated remote-user, or return (leaving request.user set to

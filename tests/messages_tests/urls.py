@@ -24,8 +24,8 @@ TEMPLATE = """{% if messages %}
 def add(request, message_type):
     # Don't default to False here to test that it defaults to False if
     # unspecified.
-    fail_silently = request.POST.get('fail_silently', None)
-    for msg in request.POST.getlist('messages'):
+    fail_silently = request.form_data.get('fail_silently', None)
+    for msg in request.form_data.getlist('messages'):
         if fail_silently is not None:
             getattr(messages, message_type)(request, msg, fail_silently=fail_silently)
         else:
@@ -35,7 +35,7 @@ def add(request, message_type):
 
 @never_cache
 def add_template_response(request, message_type):
-    for msg in request.POST.getlist('messages'):
+    for msg in request.form_data.getlist('messages'):
         getattr(messages, message_type)(request, msg)
     return HttpResponseRedirect(reverse('show_template_response'))
 

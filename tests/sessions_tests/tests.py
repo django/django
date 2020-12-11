@@ -749,7 +749,7 @@ class SessionMiddlewareTests(TestCase):
         middleware = SessionMiddleware(response_ending_session)
 
         # Before deleting, there has to be an existing cookie
-        request.COOKIES[settings.SESSION_COOKIE_NAME] = 'abc'
+        request.cookies[settings.SESSION_COOKIE_NAME] = 'abc'
 
         # Handle the response through the middleware
         response = middleware(request)
@@ -779,7 +779,7 @@ class SessionMiddlewareTests(TestCase):
         middleware = SessionMiddleware(response_ending_session)
 
         # Before deleting, there has to be an existing cookie
-        request.COOKIES[settings.SESSION_COOKIE_NAME] = 'abc'
+        request.cookies[settings.SESSION_COOKIE_NAME] = 'abc'
 
         # Handle the response through the middleware
         response = middleware(request)

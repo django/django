@@ -12,7 +12,7 @@ class SignedCookieTest(SimpleTestCase):
         self.assertIn('c', response.cookies)
         self.assertTrue(response.cookies['c'].value.startswith('hello:'))
         request = HttpRequest()
-        request.COOKIES['c'] = response.cookies['c'].value
+        request.cookies['c'] = response.cookies['c'].value
         value = request.get_signed_cookie('c')
         self.assertEqual(value, 'hello')
 
@@ -20,7 +20,7 @@ class SignedCookieTest(SimpleTestCase):
         response = HttpResponse()
         response.set_signed_cookie('a', 'hello', salt='one')
         request = HttpRequest()
-        request.COOKIES['a'] = response.cookies['a'].value
+        request.cookies['a'] = response.cookies['a'].value
         value = request.get_signed_cookie('a', salt='one')
         self.assertEqual(value, 'hello')
         with self.assertRaises(signing.BadSignature):
@@ -30,7 +30,7 @@ class SignedCookieTest(SimpleTestCase):
         response = HttpResponse()
         response.set_signed_cookie('c', 'hello')
         request = HttpRequest()
-        request.COOKIES['c'] = response.cookies['c'].value[:-2] + '$$'
+        request.cookies['c'] = response.cookies['c'].value[:-2] + '$$'
         with self.assertRaises(signing.BadSignature):
             request.get_signed_cookie('c')
 
@@ -38,7 +38,7 @@ class SignedCookieTest(SimpleTestCase):
         response = HttpResponse()
         response.set_signed_cookie('c', 'hello')
         request = HttpRequest()
-        request.COOKIES['c'] = response.cookies['c'].value[:-2] + '$$'
+        request.cookies['c'] = response.cookies['c'].value[:-2] + '$$'
         self.assertIsNone(request.get_signed_cookie('c', default=None))
 
     def test_max_age_argument(self):
@@ -47,7 +47,7 @@ class SignedCookieTest(SimpleTestCase):
             response = HttpResponse()
             response.set_signed_cookie('c', value)
             request = HttpRequest()
-            request.COOKIES['c'] = response.cookies['c'].value
+            request.cookies['c'] = response.cookies['c'].value
             self.assertEqual(request.get_signed_cookie('c'), value)
 
         with freeze_time(123456800):
@@ -62,5 +62,5 @@ class SignedCookieTest(SimpleTestCase):
         response.set_signed_cookie('c', 'hello')
 
         request = HttpRequest()
-        request.COOKIES['c'] = response.cookies['c'].value
+        request.cookies['c'] = response.cookies['c'].value
         self.assertEqual(request.get_signed_cookie('c'), 'hello')

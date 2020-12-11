@@ -1416,14 +1416,14 @@ class RequestFactoryEnvironmentTests(SimpleTestCase):
     def test_should_set_correct_env_variables(self):
         request = RequestFactory().get('/path/')
 
-        self.assertEqual(request.META.get('REMOTE_ADDR'), '127.0.0.1')
-        self.assertEqual(request.META.get('SERVER_NAME'), 'testserver')
-        self.assertEqual(request.META.get('SERVER_PORT'), '80')
-        self.assertEqual(request.META.get('SERVER_PROTOCOL'), 'HTTP/1.1')
-        self.assertEqual(request.META.get('SCRIPT_NAME') + request.META.get('PATH_INFO'), '/path/')
+        self.assertEqual(request.meta.get('REMOTE_ADDR'), '127.0.0.1')
+        self.assertEqual(request.meta.get('SERVER_NAME'), 'testserver')
+        self.assertEqual(request.meta.get('SERVER_PORT'), '80')
+        self.assertEqual(request.meta.get('SERVER_PROTOCOL'), 'HTTP/1.1')
+        self.assertEqual(request.meta.get('SCRIPT_NAME') + request.meta.get('PATH_INFO'), '/path/')
 
     def test_cookies(self):
         factory = RequestFactory()
         factory.cookies.load('A="B"; C="D"; Path=/; Version=1')
         request = factory.get('/')
-        self.assertEqual(request.META['HTTP_COOKIE'], 'A="B"; C="D"')
+        self.assertEqual(request.meta['HTTP_COOKIE'], 'A="B"; C="D"')
