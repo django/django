@@ -416,8 +416,9 @@ class URLResolver:
 
     def _check_custom_error_handlers(self):
         messages = []
-        # All handlers take (request, exception) arguments except handler500
+        # All function based handlers take (request, exception) arguments except handler500
         # which takes (request).
+        # All class based handlers take (self, request) arguments.
         for status_code, num_parameters in [(400, 2), (403, 2), (404, 2), (500, 1)]:
             try:
                 handler = self.resolve_error_handler(status_code)
@@ -429,7 +430,12 @@ class URLResolver:
                 messages.append(Error(msg, hint=str(e), id='urls.E008'))
                 continue
             signature = inspect.signature(handler)
-            args = [None] * num_parameters
+            if signature.parameters.get('self'):
+                args = [None] * 2  # Class based views always take two arguements, (self, request).
+                arguement_string = 'self, request'
+            else:
+                args = [None] * num_parameters
+                arguement_string = 'request, exception' if status_code != 500 else 'request'
             try:
                 signature.bind(*args)
             except TypeError:
@@ -439,7 +445,7 @@ class URLResolver:
                 ).format(
                     status_code=status_code,
                     path=handler.__module__ + '.' + handler.__qualname__,
-                    args='request, exception' if num_parameters == 2 else 'request',
+                    args=arguement_string
                 )
                 messages.append(Error(msg, id='urls.E007'))
         return messages
