@@ -1,9 +1,10 @@
 from io import BytesIO
 
 from django.core.handlers.wsgi import WSGIRequest
-from django.core.servers.basehttp import WSGIRequestHandler
+from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
 from django.test import SimpleTestCase
 from django.test.client import RequestFactory
+from django.test.utils import captured_stderr
 
 
 class Stub:
@@ -102,3 +103,25 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
         body = list(wfile.readlines())[-1]
 
         self.assertEqual(body, b'HTTP_SOME_HEADER:good')
+
+
+class WSGIServerTestCase(SimpleTestCase):
+    request_factory = RequestFactory()
+
+    def test_broken_pipe_errors(self):
+        """WSGIServer handles broken pipe errors."""
+        request = WSGIRequest(self.request_factory.get('/').environ)
+        client_address = ('192.168.2.0', 8080)
+        msg = f'- Broken pipe from {client_address}\n'
+        try:
+            server = WSGIServer(('localhost', 0), WSGIRequestHandler)
+            try:
+                raise BrokenPipeError()
+            except Exception:
+                with captured_stderr() as err:
+                    with self.assertLogs('django.server', 'INFO') as cm:
+                        server.handle_error(request, client_address)
+                self.assertEqual(err.getvalue(), '')
+                self.assertEqual(cm.records[0].getMessage(), msg)
+        finally:
+            server.server_close()
