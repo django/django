@@ -81,7 +81,7 @@ class FileUploadHandler:
             :input_data:
                 An object that supports reading via .read().
             :META:
-                ``request.META``.
+                ``request.meta``.
             :content_length:
                 The (integer) value of the Content-Length header from the
                 client.

@@ -477,8 +477,8 @@ class CsrfViewMiddlewareTestMixin:
 
     def test_post_data_read_failure(self):
         """
-        OSErrors during POST data reading are caught and treated as if the
-        POST data wasn't there (#20128).
+        OSErrors during form_data reading are caught and treated as if the
+        form data wasn't there (#20128).
         """
         class CsrfPostRequest(HttpRequest):
             """
@@ -489,28 +489,28 @@ class CsrfViewMiddlewareTestMixin:
                 self.method = 'POST'
 
                 self.raise_error = False
-                self.COOKIES[settings.CSRF_COOKIE_NAME] = token
+                self.cookies[settings.CSRF_COOKIE_NAME] = token
 
                 # Handle both cases here to prevent duplicate code in the
                 # session tests.
                 self.session = {}
                 self.session[CSRF_SESSION_KEY] = token
 
-                self.POST['csrfmiddlewaretoken'] = token
+                self.form_data['csrfmiddlewaretoken'] = token
                 self.raise_error = raise_error
 
-            def _load_post_and_files(self):
+            def _load_form_data_and_files(self):
                 raise OSError('error reading input data')
 
-            def _get_post(self):
+            @property
+            def form_data(self):
                 if self.raise_error:
-                    self._load_post_and_files()
-                return self._post
+                    self._load_form_data_and_files()
+                return self._form_data
 
-            def _set_post(self, post):
-                self._post = post
-
-            POST = property(_get_post, _set_post)
+            @form_data.setter
+            def form_data(self, value):
+                self._form_data = value
 
         token = ('ABC' + self._csrf_id)[:CSRF_TOKEN_LENGTH]
 

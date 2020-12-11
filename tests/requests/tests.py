@@ -6,7 +6,7 @@ from django.core.exceptions import DisallowedHost
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.http import HttpRequest, RawPostDataException, UnreadablePostError
 from django.http.multipartparser import MultiPartParserError
-from django.http.request import HttpHeaders, split_domain_port
+from django.http.request import HttpHeaders, QueryDict, split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
 
@@ -14,20 +14,55 @@ from django.test.client import FakePayload
 class RequestsTests(SimpleTestCase):
     def test_httprequest(self):
         request = HttpRequest()
-        self.assertEqual(list(request.GET), [])
-        self.assertEqual(list(request.POST), [])
-        self.assertEqual(list(request.COOKIES), [])
-        self.assertEqual(list(request.META), [])
+        self.assertEqual(list(request.query_params), [])
+        self.assertEqual(list(request.form_data), [])
+        self.assertEqual(list(request.cookies), [])
+        self.assertEqual(list(request.meta), [])
 
-        # .GET and .POST should be QueryDicts
-        self.assertEqual(request.GET.urlencode(), '')
-        self.assertEqual(request.POST.urlencode(), '')
+        # .query_params and .form_data be QueryDicts
+        self.assertEqual(request.query_params.urlencode(), '')
+        self.assertEqual(request.form_data.urlencode(), '')
 
-        # and FILES should be MultiValueDict
-        self.assertEqual(request.FILES.getlist('foo'), [])
+        # and files should be a MultiValueDict
+        self.assertEqual(request.files.getlist('foo'), [])
 
         self.assertIsNone(request.content_type)
         self.assertIsNone(request.content_params)
+
+    def test_httprequest_GET_alias(self):
+        request = HttpRequest()
+        self.assertIs(request.GET, request.query_params)
+        new_dict = QueryDict()
+        request.GET = new_dict
+        self.assertIs(request.query_params, new_dict)
+
+    def test_httprequest_POST_alias(self):
+        request = HttpRequest()
+        self.assertIs(request.POST, request.form_data)
+        new_dict = QueryDict()
+        request.POST = new_dict
+        self.assertIs(request.form_data, new_dict)
+
+    def test_httprequest_COOKIES_alias(self):
+        request = HttpRequest()
+        self.assertIs(request.COOKIES, request.cookies)
+        new_dict = {}
+        request.COOKIES = new_dict
+        self.assertIs(request.cookies, new_dict)
+
+    def test_httprequest_META_alias(self):
+        request = HttpRequest()
+        self.assertIs(request.META, request.meta)
+        new_dict = {}
+        request.META = new_dict
+        self.assertIs(request.meta, new_dict)
+
+    def test_httprequest_FILES_alias(self):
+        request = HttpRequest()
+        self.assertIs(request.FILES, request.files)
+        new_dict = {}
+        request.FILES = new_dict
+        self.assertIs(request.files, new_dict)
 
     def test_httprequest_full_path(self):
         request = HttpRequest()

@@ -54,7 +54,7 @@ class ASGIRequest(HttpRequest):
         query_string = self.scope.get('query_string', '')
         if isinstance(query_string, bytes):
             query_string = query_string.decode()
-        self.META = {
+        self.meta = {
             'REQUEST_METHOD': self.method,
             'QUERY_STRING': query_string,
             'SCRIPT_NAME': self.script_name,
@@ -64,16 +64,16 @@ class ASGIRequest(HttpRequest):
             'wsgi.multiprocess': True,
         }
         if self.scope.get('client'):
-            self.META['REMOTE_ADDR'] = self.scope['client'][0]
-            self.META['REMOTE_HOST'] = self.META['REMOTE_ADDR']
-            self.META['REMOTE_PORT'] = self.scope['client'][1]
+            self.meta['REMOTE_ADDR'] = self.scope['client'][0]
+            self.meta['REMOTE_HOST'] = self.meta['REMOTE_ADDR']
+            self.meta['REMOTE_PORT'] = self.scope['client'][1]
         if self.scope.get('server'):
-            self.META['SERVER_NAME'] = self.scope['server'][0]
-            self.META['SERVER_PORT'] = str(self.scope['server'][1])
+            self.meta['SERVER_NAME'] = self.scope['server'][0]
+            self.meta['SERVER_PORT'] = str(self.scope['server'][1])
         else:
-            self.META['SERVER_NAME'] = 'unknown'
-            self.META['SERVER_PORT'] = '0'
-        # Headers go into META.
+            self.meta['SERVER_NAME'] = 'unknown'
+            self.meta['SERVER_PORT'] = '0'
+        # Headers go into meta.
         for name, value in self.scope.get('headers', []):
             name = name.decode('latin1')
             if name == 'content-length':
@@ -85,42 +85,42 @@ class ASGIRequest(HttpRequest):
             # HTTP/2 say only ASCII chars are allowed in headers, but decode
             # latin1 just in case.
             value = value.decode('latin1')
-            if corrected_name in self.META:
-                value = self.META[corrected_name] + ',' + value
-            self.META[corrected_name] = value
+            if corrected_name in self.meta:
+                value = self.meta[corrected_name] + ',' + value
+            self.meta[corrected_name] = value
         # Pull out request encoding, if provided.
-        self._set_content_type_params(self.META)
+        self._set_content_type_params(self.meta)
         # Directly assign the body file to be our stream.
         self._stream = body_file
         # Other bits.
         self.resolver_match = None
 
-    @cached_property
-    def GET(self):
-        return QueryDict(self.META['QUERY_STRING'])
-
     def _get_scheme(self):
         return self.scope.get('scheme') or super()._get_scheme()
 
-    def _get_post(self):
-        if not hasattr(self, '_post'):
-            self._load_post_and_files()
-        return self._post
+    @cached_property
+    def query_params(self):
+        return QueryDict(self.meta['QUERY_STRING'])
 
-    def _set_post(self, post):
-        self._post = post
+    @property
+    def form_data(self):
+        if not hasattr(self, '_form_data'):
+            self._load_form_data_and_files()
+        return self._form_data
 
-    def _get_files(self):
-        if not hasattr(self, '_files'):
-            self._load_post_and_files()
-        return self._files
-
-    POST = property(_get_post, _set_post)
-    FILES = property(_get_files)
+    @form_data.setter
+    def form_data(self, value):
+        self._form_data = value
 
     @cached_property
-    def COOKIES(self):
-        return parse_cookie(self.META.get('HTTP_COOKIE', ''))
+    def cookies(self):
+        return parse_cookie(self.meta.get('HTTP_COOKIE', ''))
+
+    @property
+    def files(self):
+        if not hasattr(self, '_files'):
+            self._load_form_data_and_files()
+        return self._files
 
 
 class ASGIHandler(base.BaseHandler):

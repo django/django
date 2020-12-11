@@ -46,14 +46,14 @@ class MultiPartParser:
     A rfc2388 multipart/form-data parser.
 
     ``MultiValueDict.parse()`` reads the input stream in ``chunk_size`` chunks
-    and returns a tuple of ``(MultiValueDict(POST), MultiValueDict(FILES))``.
+    and returns a tuple of ``(MultiValueDict(form_data), MultiValueDict(files))``.
     """
-    def __init__(self, META, input_data, upload_handlers, encoding=None):
+    def __init__(self, meta, input_data, upload_handlers, encoding=None):
         """
         Initialize the MultiPartParser object.
 
-        :META:
-            The standard ``META`` dictionary in Django request objects.
+        :meta:
+            The standard ``meta`` dictionary in Django request objects.
         :input_data:
             The raw post data, as a file-like object.
         :upload_handlers:
@@ -63,7 +63,7 @@ class MultiPartParser:
             The encoding with which to treat the incoming data.
         """
         # Content-Type should contain multipart and the boundary information.
-        content_type = META.get('CONTENT_TYPE', '')
+        content_type = meta.get('CONTENT_TYPE', '')
         if not content_type.startswith('multipart/'):
             raise MultiPartParserError('Invalid Content-Type: %s' % content_type)
 
@@ -79,7 +79,7 @@ class MultiPartParser:
         # Content-Length should contain the length of the body we are about
         # to receive.
         try:
-            content_length = int(META.get('CONTENT_LENGTH', 0))
+            content_length = int(meta.get('CONTENT_LENGTH', 0))
         except (ValueError, TypeError):
             content_length = 0
 
@@ -97,17 +97,18 @@ class MultiPartParser:
         possible_sizes = [x.chunk_size for x in upload_handlers if x.chunk_size]
         self._chunk_size = min([2 ** 31 - 4] + possible_sizes)
 
-        self._meta = META
+        self._meta = meta
         self._encoding = encoding or settings.DEFAULT_CHARSET
         self._content_length = content_length
         self._upload_handlers = upload_handlers
 
     def parse(self):
         """
-        Parse the POST data and break it into a FILES MultiValueDict and a POST
-        MultiValueDict.
+        Parse the form_data data and break it into a files MultiValueDict and a
+        form_data MultiValueDict.
 
-        Return a tuple containing the POST and FILES dictionary, respectively.
+        Return a tuple containing the form_data and files dictionaries,
+        respectively.
         """
         from django.http import QueryDict
 
@@ -180,8 +181,8 @@ class MultiPartParser:
                     if (settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None and
                             settings.DATA_UPLOAD_MAX_NUMBER_FIELDS < num_post_keys):
                         raise TooManyFieldsSent(
-                            'The number of GET/POST parameters exceeded '
-                            'settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.'
+                            'The number of query_params/form_data parameters '
+                            'exceeded settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.'
                         )
 
                     # Avoid reading more than DATA_UPLOAD_MAX_MEMORY_SIZE.

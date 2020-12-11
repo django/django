@@ -225,7 +225,16 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Some request attributes have been renamed:
+
+  * :attr:`.HttpRequest.GET` is now :attr:`.HttpRequest.query_params`.
+  * :attr:`.HttpRequest.POST` is now :attr:`.HttpRequest.form_data`.
+  * :attr:`.HttpRequest.FILES` is now :attr:`.HttpRequest.files`.
+  * :attr:`.HttpRequest.COOKIES` is now :attr:`.HttpRequest.cookies`.
+  * :attr:`.HttpRequest.META` is now :attr:`.HttpRequest.meta`.
+
+  The old names remain as aliases for backwards compatibility and will not be
+  removed.
 
 Security
 ~~~~~~~~

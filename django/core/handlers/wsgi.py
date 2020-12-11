@@ -74,9 +74,9 @@ class WSGIRequest(HttpRequest):
         # stated in https://www.ietf.org/rfc/rfc2396.txt
         self.path = '%s/%s' % (script_name.rstrip('/'),
                                path_info.replace('/', '', 1))
-        self.META = environ
-        self.META['PATH_INFO'] = path_info
-        self.META['SCRIPT_NAME'] = script_name
+        self.meta = environ
+        self.meta['PATH_INFO'] = path_info
+        self.meta['SCRIPT_NAME'] = script_name
         self.method = environ['REQUEST_METHOD'].upper()
         # Set content_type, content_params, and encoding.
         self._set_content_type_params(environ)
@@ -92,31 +92,31 @@ class WSGIRequest(HttpRequest):
         return self.environ.get('wsgi.url_scheme')
 
     @cached_property
-    def GET(self):
+    def query_params(self):
         # The WSGI spec says 'QUERY_STRING' may be absent.
         raw_query_string = get_bytes_from_wsgi(self.environ, 'QUERY_STRING', '')
         return QueryDict(raw_query_string, encoding=self._encoding)
 
-    def _get_post(self):
-        if not hasattr(self, '_post'):
-            self._load_post_and_files()
-        return self._post
+    @property
+    def form_data(self):
+        if not hasattr(self, '_form_data'):
+            self._load_form_data_and_files()
+        return self._form_data
 
-    def _set_post(self, post):
-        self._post = post
+    @form_data.setter
+    def form_data(self, value):
+        self._form_data = value
 
     @cached_property
-    def COOKIES(self):
+    def cookies(self):
         raw_cookie = get_str_from_wsgi(self.environ, 'HTTP_COOKIE', '')
         return parse_cookie(raw_cookie)
 
     @property
-    def FILES(self):
+    def files(self):
         if not hasattr(self, '_files'):
-            self._load_post_and_files()
+            self._load_form_data_and_files()
         return self._files
-
-    POST = property(_get_post, _set_post)
 
 
 class WSGIHandler(base.BaseHandler):

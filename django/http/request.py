@@ -32,9 +32,8 @@ class UnreadablePostError(OSError):
 
 class RawPostDataException(Exception):
     """
-    You cannot access raw_post_data from a request that has
-    multipart/* POST data if it has been accessed via POST,
-    FILES, etc..
+    You cannot access raw_post_data from a POST request that has a multipart/*
+    body if it has been accessed via form_data, files, etc.
     """
     pass
 
@@ -42,7 +41,8 @@ class RawPostDataException(Exception):
 class HttpRequest:
     """A basic HTTP request."""
 
-    # The encoding used in GET/POST dicts. None means use default setting.
+    # The encoding used in query_params and form_data dicts. None means use
+    # default setting.
     _encoding = None
     _upload_handlers = []
 
@@ -51,11 +51,11 @@ class HttpRequest:
         # Any variable assignment made here should also happen in
         # `WSGIRequest.__init__()`.
 
-        self.GET = QueryDict(mutable=True)
-        self.POST = QueryDict(mutable=True)
-        self.COOKIES = {}
-        self.META = {}
-        self.FILES = MultiValueDict()
+        self.query_params = QueryDict(mutable=True)
+        self.form_data = QueryDict(mutable=True)
+        self.cookies = {}
+        self.meta = {}
+        self.files = MultiValueDict()
 
         self.path = ''
         self.path_info = ''
@@ -71,7 +71,7 @@ class HttpRequest:
 
     @cached_property
     def headers(self):
-        return HttpHeaders(self.META)
+        return HttpHeaders(self.meta)
 
     @cached_property
     def accepted_types(self):
@@ -102,13 +102,13 @@ class HttpRequest:
         """
         # We try three options, in order of decreasing preference.
         if settings.USE_X_FORWARDED_HOST and (
-                'HTTP_X_FORWARDED_HOST' in self.META):
-            host = self.META['HTTP_X_FORWARDED_HOST']
-        elif 'HTTP_HOST' in self.META:
-            host = self.META['HTTP_HOST']
+                'HTTP_X_FORWARDED_HOST' in self.meta):
+            host = self.meta['HTTP_X_FORWARDED_HOST']
+        elif 'HTTP_HOST' in self.meta:
+            host = self.meta['HTTP_HOST']
         else:
             # Reconstruct the host using the algorithm from PEP 333.
-            host = self.META['SERVER_NAME']
+            host = self.meta['SERVER_NAME']
             server_port = self.get_port()
             if server_port != ('443' if self.is_secure() else '80'):
                 host = '%s:%s' % (host, server_port)
@@ -136,10 +136,10 @@ class HttpRequest:
 
     def get_port(self):
         """Return the port number for the request as a string."""
-        if settings.USE_X_FORWARDED_PORT and 'HTTP_X_FORWARDED_PORT' in self.META:
-            port = self.META['HTTP_X_FORWARDED_PORT']
+        if settings.USE_X_FORWARDED_PORT and 'HTTP_X_FORWARDED_PORT' in self.meta:
+            port = self.meta['HTTP_X_FORWARDED_PORT']
         else:
-            port = self.META['SERVER_PORT']
+            port = self.meta['SERVER_PORT']
         return str(port)
 
     def get_full_path(self, force_append_slash=False):
@@ -154,7 +154,7 @@ class HttpRequest:
         return '%s%s%s' % (
             escape_uri_path(path),
             '/' if force_append_slash and not path.endswith('/') else '',
-            ('?' + iri_to_uri(self.META.get('QUERY_STRING', ''))) if self.META.get('QUERY_STRING', '') else ''
+            ('?' + iri_to_uri(self.meta.get('QUERY_STRING', ''))) if self.meta.get('QUERY_STRING', '') else ''
         )
 
     def get_signed_cookie(self, key, default=RAISE_ERROR, salt='', max_age=None):
@@ -164,7 +164,7 @@ class HttpRequest:
         is provided,  in which case return that value.
         """
         try:
-            cookie_value = self.COOKIES[key]
+            cookie_value = self.cookies[key]
         except KeyError:
             if default is not RAISE_ERROR:
                 return default
@@ -247,7 +247,7 @@ class HttpRequest:
                 raise ImproperlyConfigured(
                     'The SECURE_PROXY_SSL_HEADER setting must be a tuple containing two values.'
                 )
-            header_value = self.META.get(header)
+            header_value = self.meta.get(header)
             if header_value is not None:
                 return 'https' if header_value == secure_value else 'http'
         return self._get_scheme()
@@ -262,15 +262,16 @@ class HttpRequest:
     @encoding.setter
     def encoding(self, val):
         """
-        Set the encoding used for GET/POST accesses. If the GET or POST
-        dictionary has already been created, remove and recreate it on the
-        next access (so that it is decoded correctly).
+        Set the encoding used for query_params/form_data accesses. If the
+        query_params or form_data dictionaries have already been created,
+        remove and recreate them on the next access (so that they are decoded
+        correctly).
         """
         self._encoding = val
-        if hasattr(self, 'GET'):
-            del self.GET
-        if hasattr(self, '_post'):
-            del self._post
+        if hasattr(self, 'query_params'):
+            del self.query_params
+        if hasattr(self, '_form_data'):
+            del self._form_data
 
     def _initialize_handlers(self):
         self._upload_handlers = [uploadhandler.load_handler(handler, self)
@@ -289,13 +290,13 @@ class HttpRequest:
             raise AttributeError("You cannot set the upload handlers after the upload has been processed.")
         self._upload_handlers = upload_handlers
 
-    def parse_file_upload(self, META, post_data):
-        """Return a tuple of (POST QueryDict, FILES MultiValueDict)."""
+    def parse_file_upload(self, meta, post_data):
+        """Return a tuple of (form_data QueryDict, files MultiValueDict)."""
         self.upload_handlers = ImmutableList(
             self.upload_handlers,
             warning="You cannot alter upload handlers after the upload has been processed."
         )
-        parser = MultiPartParser(META, post_data, self.upload_handlers, self.encoding)
+        parser = MultiPartParser(meta, post_data, self.upload_handlers, self.encoding)
         return parser.parse()
 
     @property
@@ -306,7 +307,7 @@ class HttpRequest:
 
             # Limit the maximum request data size that will be handled in-memory.
             if (settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None and
-                    int(self.META.get('CONTENT_LENGTH') or 0) > settings.DATA_UPLOAD_MAX_MEMORY_SIZE):
+                    int(self.meta.get('CONTENT_LENGTH') or 0) > settings.DATA_UPLOAD_MAX_MEMORY_SIZE):
                 raise RequestDataTooBig('Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.')
 
             try:
@@ -317,13 +318,14 @@ class HttpRequest:
         return self._body
 
     def _mark_post_parse_error(self):
-        self._post = QueryDict()
+        self._form_data = QueryDict()
         self._files = MultiValueDict()
 
-    def _load_post_and_files(self):
-        """Populate self._post and self._files if the content-type is a form type"""
+    def _load_form_data_and_files(self):
+        """Populate self._form_data and self._files if the content-type is a form type"""
         if self.method != 'POST':
-            self._post, self._files = QueryDict(encoding=self._encoding), MultiValueDict()
+            self._form_data = QueryDict(encoding=self._encoding)
+            self._files = MultiValueDict()
             return
         if self._read_started and not hasattr(self, '_body'):
             self._mark_post_parse_error()
@@ -336,18 +338,18 @@ class HttpRequest:
             else:
                 data = self
             try:
-                self._post, self._files = self.parse_file_upload(self.META, data)
+                self._form_data, self._files = self.parse_file_upload(self.meta, data)
             except MultiPartParserError:
-                # An error occurred while parsing POST data. Since when
+                # An error occurred while parsing form_data. Since when
                 # formatting the error the request handler might access
-                # self.POST, set self._post and self._file to prevent
-                # attempts to parse POST data again.
+                # self.form_data, set self._form_data and self._file to prevent
+                # attempts to parse form_data again.
                 self._mark_post_parse_error()
                 raise
         elif self.content_type == 'application/x-www-form-urlencoded':
-            self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()
+            self._form_data, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()
         else:
-            self._post, self._files = QueryDict(encoding=self._encoding), MultiValueDict()
+            self._form_data, self._files = QueryDict(encoding=self._encoding), MultiValueDict()
 
     def close(self):
         if hasattr(self, '_files'):
@@ -358,7 +360,7 @@ class HttpRequest:
     #
     # Expects self._stream to be set to an appropriate source of bytes by
     # a corresponding request subclass (e.g. WSGIRequest).
-    # Also when request data has already been read by request.POST or
+    # Also when request data has already been read by request.form_data or
     # request.body, self._stream points to a BytesIO instance
     # containing that data.
 
@@ -381,6 +383,48 @@ class HttpRequest:
 
     def readlines(self):
         return list(self)
+
+    # Alias properties
+
+    @property
+    def GET(self):
+        return self.query_params
+
+    @GET.setter
+    def GET(self, value):
+        self.query_params = value
+
+    @property
+    def POST(self):
+        return self.form_data
+
+    @POST.setter
+    def POST(self, value):
+        self.form_data = value
+
+    @property
+    def COOKIES(self):
+        return self.cookies
+
+    @COOKIES.setter
+    def COOKIES(self, value):
+        self.cookies = value
+
+    @property
+    def META(self):
+        return self.meta
+
+    @META.setter
+    def META(self, value):
+        self.meta = value
+
+    @property
+    def FILES(self):
+        return self.files
+
+    @FILES.setter
+    def FILES(self, value):
+        self.files = value
 
 
 class HttpHeaders(CaseInsensitiveMapping):
@@ -413,9 +457,9 @@ class QueryDict(MultiValueDict):
     """
     A specialized MultiValueDict which represents a query string.
 
-    A QueryDict can be used to represent GET or POST data. It subclasses
-    MultiValueDict since keys in such data can be repeated, for instance
-    in the data from a form with a <select multiple> field.
+    A QueryDict can be used to represent query_params or form_data. It
+    subclasses MultiValueDict since keys in such data can be repeated, for
+    instance in the data from a form with a <select multiple> field.
 
     By default QueryDicts are immutable, though the copy() method
     will always return a mutable copy.
@@ -454,7 +498,7 @@ class QueryDict(MultiValueDict):
             # the exception was raised by exceeding the value of max_num_fields
             # instead of fragile checks of exception message strings.
             raise TooManyFieldsSent(
-                'The number of GET/POST parameters exceeded '
+                'The number of query_params/form_data parameters exceeded '
                 'settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.'
             ) from e
         self._mutable = mutable
