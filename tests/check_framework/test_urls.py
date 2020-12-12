@@ -166,6 +166,7 @@ class UpdatedToPathTests(SimpleTestCase):
 
 
 class CheckCustomErrorHandlersTests(SimpleTestCase):
+
     @override_settings(ROOT_URLCONF='check_framework.urls.bad_function_based_error_handlers')
     def test_bad_function_based_handlers(self):
         result = check_url_config(None)
