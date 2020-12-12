@@ -1,9 +1,12 @@
+import logging
 import threading
 import warnings
 import weakref
 
 from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.inspect import func_accepts_kwargs
+
+logger = logging.getLogger('django.dispatch')
 
 
 def _make_id(target):
@@ -208,6 +211,12 @@ class Signal:
             try:
                 response = receiver(signal=self, sender=sender, **named)
             except Exception as err:
+                logger.error(
+                    'Error calling %s in Signal.send_robust() (%s)',
+                    receiver.__qualname__,
+                    err,
+                    exc_info=err,
+                )
                 responses.append((receiver, err))
             else:
                 responses.append((receiver, response))

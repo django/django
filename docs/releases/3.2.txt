@@ -420,7 +420,8 @@ Serialization
 Signals
 ~~~~~~~
 
-* ...
+* :meth:`Signal.send_robust() <django.dispatch.Signal.send_robust>` now logs
+  exceptions.
 
 Templates
 ~~~~~~~~~
