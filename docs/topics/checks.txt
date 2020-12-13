@@ -48,8 +48,14 @@ check function::
 
 The check function *must* accept an ``app_configs`` argument; this argument is
 the list of applications that should be inspected. If ``None``, the check must
-be run on *all* installed apps in the project. The ``**kwargs`` argument is
-required for future expansion.
+be run on *all* installed apps in the project.
+
+The check will receive a ``databases`` keyword argument. This is a list of
+database aliases whose connections may be used to inspect database level
+configuration. If ``databases`` is ``None``, the check must not use any
+database connections.
+
+The ``**kwargs`` argument is required for future expansion.
 
 Messages
 --------
