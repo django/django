@@ -1,5 +1,6 @@
 from itertools import chain
 
+from django.utils.inspect import func_accepts_kwargs
 from django.utils.itercompat import is_iterable
 
 
@@ -38,13 +39,17 @@ class CheckRegistry:
 
             registry = CheckRegistry()
             @registry.register('mytag', 'anothertag')
-            def my_check(apps, **kwargs):
+            def my_check(app_configs, **kwargs):
                 # ... perform checks and collect `errors` ...
                 return errors
             # or
             registry.register(my_check, 'mytag', 'anothertag')
         """
         def inner(check):
+            if not func_accepts_kwargs(check):
+                raise TypeError(
+                    'Check functions must accept keyword arguments (**kwargs).'
+                )
             check.tags = tags
             checks = self.deployment_checks if kwargs.get('deploy') else self.registered_checks
             checks.add(check)
