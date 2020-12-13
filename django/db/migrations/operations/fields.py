@@ -392,8 +392,11 @@ class RenameField(FieldOperation):
                 ),
             ]
         # Skip `FieldOperation.reduce` as we want to run `references_field`
-        # against self.new_name.
+        # against self.old_name and self.new_name.
         return (
             super(FieldOperation, self).reduce(operation, app_label) or
-            not operation.references_field(self.model_name, self.new_name, app_label)
+            not (
+                operation.references_field(self.model_name, self.old_name, app_label) or
+                operation.references_field(self.model_name, self.new_name, app_label)
+            )
         )
