@@ -221,6 +221,9 @@ this. For a small app like polls, this process isn't too difficult.
         [options]
         include_package_data = true
         packages = find:
+        python_requires = >=3.6
+        install_requires =
+            Django >= X.Y  # Replace "X.Y" as appropriate
 
    .. code-block:: python
         :caption: django-polls/setup.py
