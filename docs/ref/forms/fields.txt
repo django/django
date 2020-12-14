@@ -1323,7 +1323,7 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
 .. class:: ModelMultipleChoiceField(**kwargs)
 
     * Default widget: :class:`SelectMultiple`
-    * Empty value: An empty ``QuerySet`` (self.queryset.none())
+    * Empty value: An empty ``QuerySet`` (``self.queryset.none()``)
     * Normalizes to: A ``QuerySet`` of model instances.
     * Validates that every id in the given list of values exists in the
       queryset.
