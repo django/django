@@ -266,8 +266,8 @@ class LiveServerPort(LiveServerBase):
             TestCase.tearDownClass()
 
 
-class LiverServerThreadedTests(LiveServerBase):
-    """If LiverServerTestCase isn't threaded, these tests will hang."""
+class LiveServerThreadedTests(LiveServerBase):
+    """If LiveServerTestCase isn't threaded, these tests will hang."""
 
     def test_view_calls_subview(self):
         url = '/subview_calling_view/?%s' % urlencode({'url': self.live_server_url})
