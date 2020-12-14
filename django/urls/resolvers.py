@@ -431,11 +431,11 @@ class URLResolver:
                 continue
             signature = inspect.signature(handler)
             if signature.parameters.get('self'):
-                args = [None] * 2  # Class based views always take two arguements, (self, request).
-                arguement_string = 'self, request'
+                args = [None] * 2  # Class based views always take two arguments, (self, request).
+                argument_string = 'self, request'
             else:
                 args = [None] * num_parameters
-                arguement_string = 'request, exception' if status_code != 500 else 'request'
+                argument_string = 'request, exception' if status_code != 500 else 'request'
             try:
                 signature.bind(*args)
             except TypeError:
@@ -445,7 +445,7 @@ class URLResolver:
                 ).format(
                     status_code=status_code,
                     path=handler.__module__ + '.' + handler.__qualname__,
-                    args=arguement_string
+                    args=argument_string
                 )
                 messages.append(Error(msg, id='urls.E007'))
         return messages
