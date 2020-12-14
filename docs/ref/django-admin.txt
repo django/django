@@ -95,8 +95,6 @@ providing a list of app labels as arguments::
 
     django-admin check auth admin myapp
 
-If you do not specify any app, all apps will be checked.
-
 .. django-admin-option:: --tag TAGS, -t TAGS
 
 The system check framework performs many different types of checks that are
