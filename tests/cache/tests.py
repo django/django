@@ -278,6 +278,14 @@ class BaseCacheTests:
     # A common set of tests to apply to all cache backends
     factory = RequestFactory()
 
+    # RemovedInDjango41Warning: python-memcached doesn't support .get() with
+    # default.
+    supports_get_with_default = True
+
+    # Some clients raise custom exceptions when .incr() or .decr() are called
+    # with a non-integer value.
+    incr_decr_type_error = TypeError
+
     def tearDown(self):
         cache.clear()
 
@@ -320,6 +328,8 @@ class BaseCacheTests:
         self.assertEqual(cache.get_many(['a', 'c', 'd']), {'a': 'a', 'c': 'c', 'd': 'd'})
         self.assertEqual(cache.get_many(['a', 'b', 'e']), {'a': 'a', 'b': 'b'})
         self.assertEqual(cache.get_many(iter(['a', 'b', 'e'])), {'a': 'a', 'b': 'b'})
+        cache.set_many({'x': None, 'y': 1})
+        self.assertEqual(cache.get_many(['x', 'y']), {'x': None, 'y': 1})
 
     def test_delete(self):
         # Cache keys can be deleted
@@ -339,12 +349,22 @@ class BaseCacheTests:
         self.assertIs(cache.has_key("goodbye1"), False)
         cache.set("no_expiry", "here", None)
         self.assertIs(cache.has_key("no_expiry"), True)
+        cache.set('null', None)
+        self.assertIs(
+            cache.has_key('null'),
+            True if self.supports_get_with_default else False,
+        )
 
     def test_in(self):
         # The in operator can be used to inspect cache contents
         cache.set("hello2", "goodbye2")
         self.assertIn("hello2", cache)
         self.assertNotIn("goodbye2", cache)
+        cache.set('null', None)
+        if self.supports_get_with_default:
+            self.assertIn('null', cache)
+        else:
+            self.assertNotIn('null', cache)
 
     def test_incr(self):
         # Cache values can be incremented
@@ -356,6 +376,9 @@ class BaseCacheTests:
         self.assertEqual(cache.incr('answer', -10), 42)
         with self.assertRaises(ValueError):
             cache.incr('does_not_exist')
+        cache.set('null', None)
+        with self.assertRaises(self.incr_decr_type_error):
+            cache.incr('null')
 
     def test_decr(self):
         # Cache values can be decremented
@@ -367,6 +390,9 @@ class BaseCacheTests:
         self.assertEqual(cache.decr('answer', -10), 42)
         with self.assertRaises(ValueError):
             cache.decr('does_not_exist')
+        cache.set('null', None)
+        with self.assertRaises(self.incr_decr_type_error):
+            cache.decr('null')
 
     def test_close(self):
         self.assertTrue(hasattr(cache, 'close'))
@@ -914,6 +940,13 @@ class BaseCacheTests:
         with self.assertRaises(ValueError):
             cache.incr_version('does_not_exist')
 
+        cache.set('null', None)
+        if self.supports_get_with_default:
+            self.assertEqual(cache.incr_version('null'), 2)
+        else:
+            with self.assertRaises(self.incr_decr_type_error):
+                cache.incr_version('null')
+
     def test_decr_version(self):
         cache.set('answer', 42, version=2)
         self.assertIsNone(cache.get('answer'))
@@ -937,6 +970,13 @@ class BaseCacheTests:
 
         with self.assertRaises(ValueError):
             cache.decr_version('does_not_exist', version=2)
+
+        cache.set('null', None, version=2)
+        if self.supports_get_with_default:
+            self.assertEqual(cache.decr_version('null', version=2), 1)
+        else:
+            with self.assertRaises(self.incr_decr_type_error):
+                cache.decr_version('null', version=2)
 
     def test_custom_key_func(self):
         # Two caches with different key functions aren't visible to each other
@@ -995,6 +1035,11 @@ class BaseCacheTests:
         self.assertEqual(cache.get_or_set('projector', 42), 42)
         self.assertEqual(cache.get('projector'), 42)
         self.assertIsNone(cache.get_or_set('null', None))
+        if self.supports_get_with_default:
+            # Previous get_or_set() stores None in the cache.
+            self.assertIsNone(cache.get('null', 'default'))
+        else:
+            self.assertEqual(cache.get('null', 'default'), 'default')
 
     def test_get_or_set_callable(self):
         def my_callable():
@@ -1003,10 +1048,12 @@ class BaseCacheTests:
         self.assertEqual(cache.get_or_set('mykey', my_callable), 'value')
         self.assertEqual(cache.get_or_set('mykey', my_callable()), 'value')
 
-    def test_get_or_set_callable_returning_none(self):
-        self.assertIsNone(cache.get_or_set('mykey', lambda: None))
-        # Previous get_or_set() doesn't store None in the cache.
-        self.assertEqual(cache.get('mykey', 'default'), 'default')
+        self.assertIsNone(cache.get_or_set('null', lambda: None))
+        if self.supports_get_with_default:
+            # Previous get_or_set() stores None in the cache.
+            self.assertIsNone(cache.get('null', 'default'))
+        else:
+            self.assertEqual(cache.get('null', 'default'), 'default')
 
     def test_get_or_set_version(self):
         msg = "get_or_set() missing 1 required positional argument: 'default'"
@@ -1399,6 +1446,8 @@ MemcachedCache_params = configured_caches.get('django.core.cache.backends.memcac
 ))
 class MemcachedCacheTests(BaseMemcachedTests, TestCase):
     base_params = MemcachedCache_params
+    supports_get_with_default = False
+    incr_decr_type_error = ValueError
 
     def test_memcached_uses_highest_pickle_version(self):
         # Regression test for #19810
@@ -1459,6 +1508,10 @@ class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
     # libmemcached manages its own connections.
     should_disconnect_on_close = False
 
+    @property
+    def incr_decr_type_error(self):
+        return cache._lib.ClientError
+
     @override_settings(CACHES=caches_setting_for_tests(
         base=PyLibMCCache_params,
         exclude=memcached_excluded_caches,
@@ -1496,6 +1549,10 @@ class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
 ))
 class PyMemcacheCacheTests(BaseMemcachedTests, TestCase):
     base_params = PyMemcacheCache_params
+
+    @property
+    def incr_decr_type_error(self):
+        return cache._lib.exceptions.MemcacheClientError
 
     def test_pymemcache_highest_pickle_version(self):
         self.assertEqual(

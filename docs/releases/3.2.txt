@@ -681,6 +681,14 @@ Miscellaneous
   ``UserChangeForm.clean_password()`` is no longer required to return the
   initial value.
 
+* The ``cache.get_many()``, ``get_or_set()``, ``has_key()``, ``incr()``,
+  ``decr()``, ``incr_version()``, and ``decr_version()`` cache operations now
+  correctly handle ``None`` stored in the cache, in the same way as any other
+  value, instead of behaving as though the key didn't exist.
+
+  Due to a ``python-memcached`` limitation, the previous behavior is kept for
+  the deprecated ``MemcachedCache`` backend.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2

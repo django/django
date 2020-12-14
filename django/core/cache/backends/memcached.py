@@ -165,6 +165,11 @@ class BaseMemcachedCache(BaseCache):
 
 class MemcachedCache(BaseMemcachedCache):
     "An implementation of a cache binding using python-memcached"
+
+    # python-memcached doesn't support default values in get().
+    # https://github.com/linsomniac/python-memcached/issues/159
+    _missing_key = None
+
     def __init__(self, server, params):
         warnings.warn(
             'MemcachedCache is deprecated in favor of PyMemcacheCache and '
