@@ -153,7 +153,7 @@ protects against memory exhaustion attacks using forged ``POST`` requests::
     >>> formset.non_form_errors()
     ['Please submit at most 1000 forms.']
 
-When ``absolute_max`` is None, it defaults to ``max_num + 1000``. (If
+When ``absolute_max`` is ``None``, it defaults to ``max_num + 1000``. (If
 ``max_num`` is ``None``, it defaults to ``2000``).
 
 If ``absolute_max`` is less than ``max_num``, a ``ValueError`` will be raised.

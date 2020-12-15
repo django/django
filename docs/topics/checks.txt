@@ -47,9 +47,9 @@ check function::
         return errors
 
 The check function *must* accept an ``app_configs`` argument; this argument is
-the list of applications that should be inspected. If None, the check must be
-run on *all* installed apps in the project. The ``**kwargs`` argument is required
-for future expansion.
+the list of applications that should be inspected. If ``None``, the check must
+be run on *all* installed apps in the project. The ``**kwargs`` argument is
+required for future expansion.
 
 Messages
 --------

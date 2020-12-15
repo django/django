@@ -562,7 +562,7 @@ all of the model fields from being updated in the database. For example::
     product.save(update_fields=['name'])
 
 The ``update_fields`` argument can be any iterable containing strings. An
-empty ``update_fields`` iterable will skip the save. A value of None will
+empty ``update_fields`` iterable will skip the save. A value of ``None`` will
 perform an update on all fields.
 
 Specifying ``update_fields`` will force an update.
