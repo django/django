@@ -1,12 +1,10 @@
 import datetime
-import pickle
 from unittest import mock
 
 import pytz
 
-from django.test import SimpleTestCase, ignore_warnings, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango31Warning
 
 CET = pytz.timezone("Europe/Paris")
 EAT = timezone.get_fixed_timezone(180)      # Africa/Nairobi
@@ -202,24 +200,3 @@ class TimezoneTests(SimpleTestCase):
     def test_fixedoffset_negative_timedelta(self):
         delta = datetime.timedelta(hours=-2)
         self.assertEqual(timezone.get_fixed_timezone(delta).utcoffset(None), delta)
-
-    @ignore_warnings(category=RemovedInDjango31Warning)
-    def test_fixedoffset_pickle(self):
-        self.assertEqual(pickle.loads(pickle.dumps(timezone.FixedOffset(0, 'tzname'))).tzname(''), 'tzname')
-
-    def test_fixedoffset_deprecation(self):
-        msg = 'FixedOffset is deprecated in favor of datetime.timezone'
-        with self.assertWarnsMessage(RemovedInDjango31Warning, msg) as cm:
-            timezone.FixedOffset()
-        self.assertEqual(cm.filename, __file__)
-
-    @ignore_warnings(category=RemovedInDjango31Warning)
-    def test_fixedoffset_utcoffset(self):
-        delta = datetime.timedelta(minutes=1)
-        self.assertEqual(timezone.FixedOffset(1).utcoffset(None), delta)
-
-    @ignore_warnings(category=RemovedInDjango31Warning)
-    def test_fixedoffset_dst(self):
-        ZERO = datetime.timedelta(minutes=0)
-        delta = datetime.timedelta(hours=0)
-        self.assertEqual(timezone.FixedOffset().dst(delta), ZERO)

@@ -51,6 +51,7 @@ LANGUAGE_CODE = 'en-us'
 LANGUAGES = [
     ('af', gettext_noop('Afrikaans')),
     ('ar', gettext_noop('Arabic')),
+    ('ar-dz', gettext_noop('Algerian Arabic')),
     ('ast', gettext_noop('Asturian')),
     ('az', gettext_noop('Azerbaijani')),
     ('bg', gettext_noop('Bulgarian')),
@@ -92,6 +93,7 @@ LANGUAGES = [
     ('hy', gettext_noop('Armenian')),
     ('ia', gettext_noop('Interlingua')),
     ('id', gettext_noop('Indonesian')),
+    ('ig', gettext_noop('Igbo')),
     ('io', gettext_noop('Ido')),
     ('is', gettext_noop('Icelandic')),
     ('it', gettext_noop('Italian')),
@@ -102,6 +104,7 @@ LANGUAGES = [
     ('km', gettext_noop('Khmer')),
     ('kn', gettext_noop('Kannada')),
     ('ko', gettext_noop('Korean')),
+    ('ky', gettext_noop('Kyrgyz')),
     ('lb', gettext_noop('Luxembourgish')),
     ('lt', gettext_noop('Lithuanian')),
     ('lv', gettext_noop('Latvian')),
@@ -130,19 +133,22 @@ LANGUAGES = [
     ('sw', gettext_noop('Swahili')),
     ('ta', gettext_noop('Tamil')),
     ('te', gettext_noop('Telugu')),
+    ('tg', gettext_noop('Tajik')),
     ('th', gettext_noop('Thai')),
+    ('tk', gettext_noop('Turkmen')),
     ('tr', gettext_noop('Turkish')),
     ('tt', gettext_noop('Tatar')),
     ('udm', gettext_noop('Udmurt')),
     ('uk', gettext_noop('Ukrainian')),
     ('ur', gettext_noop('Urdu')),
+    ('uz', gettext_noop('Uzbek')),
     ('vi', gettext_noop('Vietnamese')),
     ('zh-hans', gettext_noop('Simplified Chinese')),
     ('zh-hant', gettext_noop('Traditional Chinese')),
 ]
 
 # Languages using BiDi (right-to-left) layout
-LANGUAGES_BIDI = ["he", "ar", "fa", "ur"]
+LANGUAGES_BIDI = ["he", "ar", "ar-dz", "fa", "ur"]
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -170,9 +176,6 @@ MANAGERS = ADMINS
 # Default charset to use for all HttpResponse objects, if a MIME type isn't
 # manually specified. It's used to construct the Content-Type header.
 DEFAULT_CHARSET = 'utf-8'
-
-# Encoding of files read from disk (template and initial SQL files).
-FILE_CHARSET = 'utf-8'
 
 # Email address that error messages come from.
 SERVER_EMAIL = 'root@localhost'
@@ -382,15 +385,12 @@ DATETIME_INPUT_FORMATS = [
     '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
     '%Y-%m-%d %H:%M:%S.%f',  # '2006-10-25 14:30:59.000200'
     '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
-    '%Y-%m-%d',              # '2006-10-25'
     '%m/%d/%Y %H:%M:%S',     # '10/25/2006 14:30:59'
     '%m/%d/%Y %H:%M:%S.%f',  # '10/25/2006 14:30:59.000200'
     '%m/%d/%Y %H:%M',        # '10/25/2006 14:30'
-    '%m/%d/%Y',              # '10/25/2006'
     '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
     '%m/%d/%y %H:%M:%S.%f',  # '10/25/06 14:30:59.000200'
     '%m/%d/%y %H:%M',        # '10/25/06 14:30'
-    '%m/%d/%y',              # '10/25/06'
 ]
 
 # First day of week, to be used on calendars
@@ -415,7 +415,7 @@ DEFAULT_TABLESPACE = ''
 DEFAULT_INDEX_TABLESPACE = ''
 
 # Default X-Frame-Options header value
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+X_FRAME_OPTIONS = 'DENY'
 
 USE_X_FORWARDED_HOST = False
 USE_X_FORWARDED_PORT = False
@@ -435,6 +435,12 @@ WSGI_APPLICATION = None
 # WARNING! Only set this if you fully understand what you're doing. Otherwise,
 # you may be opening yourself up to a security risk.
 SECURE_PROXY_SSL_HEADER = None
+
+# Default hashing algorithm to use for encoding cookies, password reset tokens
+# in the admin site, user sessions, and signatures. It's a transitional setting
+# helpful in migrating multiple instance of the same project to Django 3.1+.
+# Algorithm must be 'sha1' or 'sha256'.
+DEFAULT_HASHING_ALGORITHM = 'sha256'
 
 ##############
 # MIDDLEWARE #
@@ -464,7 +470,7 @@ SESSION_COOKIE_PATH = '/'
 # Whether to use the HttpOnly flag.
 SESSION_COOKIE_HTTPONLY = True
 # Whether to set the flag restricting cookie leaks on cross-site requests.
-# This can be 'Lax', 'Strict', or None to disable the flag.
+# This can be 'Lax', 'Strict', 'None', or False to disable the flag.
 SESSION_COOKIE_SAMESITE = 'Lax'
 # Whether to save the session data on every request.
 SESSION_SAVE_EVERY_REQUEST = False
@@ -508,6 +514,9 @@ LOGOUT_REDIRECT_URL = None
 
 # The number of days a password reset link is valid for
 PASSWORD_RESET_TIMEOUT_DAYS = 3
+
+# The number of seconds a password reset link is valid for (default: 3 days).
+PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 3
 
 # the first hasher in this list is the preferred algorithm.  any
 # password using different algorithms will be converted automatically
@@ -566,6 +575,10 @@ LOGGING_CONFIG = 'logging.config.dictConfig'
 
 # Custom logging configuration.
 LOGGING = {}
+
+# Default exception reporter class used in case none has been
+# specifically assigned to the HttpRequest instance.
+DEFAULT_EXCEPTION_REPORTER = 'django.views.debug.ExceptionReporter'
 
 # Default exception reporter filter class used in case none has been
 # specifically assigned to the HttpRequest instance.
@@ -633,5 +646,6 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 SECURE_HSTS_PRELOAD = False
 SECURE_HSTS_SECONDS = 0
 SECURE_REDIRECT_EXEMPT = []
+SECURE_REFERRER_POLICY = 'same-origin'
 SECURE_SSL_HOST = None
 SECURE_SSL_REDIRECT = False

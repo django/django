@@ -1,45 +1,45 @@
 import asyncio
 import sys
+import threading
+from pathlib import Path
+from unittest import skipIf
 
-from asgiref.sync import async_to_sync
+from asgiref.sync import SyncToAsync
 from asgiref.testing import ApplicationCommunicator
 
+from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
 from django.core.asgi import get_asgi_application
-from django.core.signals import request_started
+from django.core.signals import request_finished, request_started
 from django.db import close_old_connections
-from django.test import SimpleTestCase, override_settings
+from django.test import (
+    AsyncRequestFactory, SimpleTestCase, modify_settings, override_settings,
+)
+from django.utils.http import http_date
 
 from .urls import test_filename
 
+TEST_STATIC_ROOT = Path(__file__).parent / 'project' / 'static'
 
+
+@skipIf(sys.platform == 'win32' and (3, 8, 0) < sys.version_info < (3, 8, 1), 'https://bugs.python.org/issue38563')
 @override_settings(ROOT_URLCONF='asgi.urls')
 class ASGITest(SimpleTestCase):
+    async_request_factory = AsyncRequestFactory()
 
     def setUp(self):
         request_started.disconnect(close_old_connections)
 
-    def _get_scope(self, **kwargs):
-        return {
-            'type': 'http',
-            'asgi': {'version': '3.0', 'spec_version': '2.1'},
-            'http_version': '1.1',
-            'method': 'GET',
-            'query_string': b'',
-            'server': ('testserver', 80),
-            **kwargs,
-        }
-
     def tearDown(self):
         request_started.connect(close_old_connections)
 
-    @async_to_sync
     async def test_get_asgi_application(self):
         """
         get_asgi_application() returns a functioning ASGI callable.
         """
         application = get_asgi_application()
         # Construct HTTP request.
-        communicator = ApplicationCommunicator(application, self._get_scope(path='/'))
+        scope = self.async_request_factory._base_scope(path='/')
+        communicator = ApplicationCommunicator(application, scope)
         await communicator.send_input({'type': 'http.request'})
         # Read the response.
         response_start = await communicator.receive_output()
@@ -56,14 +56,14 @@ class ASGITest(SimpleTestCase):
         self.assertEqual(response_body['type'], 'http.response.body')
         self.assertEqual(response_body['body'], b'Hello World!')
 
-    @async_to_sync
     async def test_file_response(self):
         """
         Makes sure that FileResponse works over ASGI.
         """
         application = get_asgi_application()
         # Construct HTTP request.
-        communicator = ApplicationCommunicator(application, self._get_scope(path='/file/'))
+        scope = self.async_request_factory._base_scope(path='/file/')
+        communicator = ApplicationCommunicator(application, scope)
         await communicator.send_input({'type': 'http.request'})
         # Get the file content.
         with open(test_filename, 'rb') as test_file:
@@ -72,24 +72,73 @@ class ASGITest(SimpleTestCase):
         response_start = await communicator.receive_output()
         self.assertEqual(response_start['type'], 'http.response.start')
         self.assertEqual(response_start['status'], 200)
+        headers = response_start['headers']
+        self.assertEqual(len(headers), 3)
+        expected_headers = {
+            b'Content-Length': str(len(test_file_contents)).encode('ascii'),
+            b'Content-Type': b'text/x-python',
+            b'Content-Disposition': b'inline; filename="urls.py"',
+        }
+        for key, value in headers:
+            try:
+                self.assertEqual(value, expected_headers[key])
+            except AssertionError:
+                # Windows registry may not be configured with correct
+                # mimetypes.
+                if sys.platform == 'win32' and key == b'Content-Type':
+                    self.assertEqual(value, b'text/plain')
+                else:
+                    raise
+        response_body = await communicator.receive_output()
+        self.assertEqual(response_body['type'], 'http.response.body')
+        self.assertEqual(response_body['body'], test_file_contents)
+        # Allow response.close() to finish.
+        await communicator.wait()
+
+    @modify_settings(INSTALLED_APPS={'append': 'django.contrib.staticfiles'})
+    @override_settings(
+        STATIC_URL='/static/',
+        STATIC_ROOT=TEST_STATIC_ROOT,
+        STATICFILES_DIRS=[TEST_STATIC_ROOT],
+        STATICFILES_FINDERS=[
+            'django.contrib.staticfiles.finders.FileSystemFinder',
+        ],
+    )
+    async def test_static_file_response(self):
+        application = ASGIStaticFilesHandler(get_asgi_application())
+        # Construct HTTP request.
+        scope = self.async_request_factory._base_scope(path='/static/file.txt')
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({'type': 'http.request'})
+        # Get the file content.
+        file_path = TEST_STATIC_ROOT / 'file.txt'
+        with open(file_path, 'rb') as test_file:
+            test_file_contents = test_file.read()
+        # Read the response.
+        stat = file_path.stat()
+        response_start = await communicator.receive_output()
+        self.assertEqual(response_start['type'], 'http.response.start')
+        self.assertEqual(response_start['status'], 200)
         self.assertEqual(
             set(response_start['headers']),
             {
                 (b'Content-Length', str(len(test_file_contents)).encode('ascii')),
-                (b'Content-Type', b'text/plain' if sys.platform.startswith('win') else b'text/x-python'),
-                (b'Content-Disposition', b'inline; filename="urls.py"'),
+                (b'Content-Type', b'text/plain'),
+                (b'Content-Disposition', b'inline; filename="file.txt"'),
+                (b'Last-Modified', http_date(stat.st_mtime).encode('ascii')),
             },
         )
         response_body = await communicator.receive_output()
         self.assertEqual(response_body['type'], 'http.response.body')
         self.assertEqual(response_body['body'], test_file_contents)
+        # Allow response.close() to finish.
+        await communicator.wait()
 
-    @async_to_sync
     async def test_headers(self):
         application = get_asgi_application()
         communicator = ApplicationCommunicator(
             application,
-            self._get_scope(
+            self.async_request_factory._base_scope(
                 path='/meta/',
                 headers=[
                     [b'content-type', b'text/plain; charset=utf-8'],
@@ -114,15 +163,15 @@ class ASGITest(SimpleTestCase):
         self.assertEqual(response_body['type'], 'http.response.body')
         self.assertEqual(response_body['body'], b'From Scotland,Wales')
 
-    @async_to_sync
     async def test_get_query_string(self):
         application = get_asgi_application()
         for query_string in (b'name=Andrew', 'name=Andrew'):
             with self.subTest(query_string=query_string):
-                communicator = ApplicationCommunicator(
-                    application,
-                    self._get_scope(path='/', query_string=query_string),
+                scope = self.async_request_factory._base_scope(
+                    path='/',
+                    query_string=query_string,
                 )
+                communicator = ApplicationCommunicator(application, scope)
                 await communicator.send_input({'type': 'http.request'})
                 response_start = await communicator.receive_output()
                 self.assertEqual(response_start['type'], 'http.response.start')
@@ -131,33 +180,27 @@ class ASGITest(SimpleTestCase):
                 self.assertEqual(response_body['type'], 'http.response.body')
                 self.assertEqual(response_body['body'], b'Hello Andrew!')
 
-    @async_to_sync
     async def test_disconnect(self):
         application = get_asgi_application()
-        communicator = ApplicationCommunicator(application, self._get_scope(path='/'))
+        scope = self.async_request_factory._base_scope(path='/')
+        communicator = ApplicationCommunicator(application, scope)
         await communicator.send_input({'type': 'http.disconnect'})
         with self.assertRaises(asyncio.TimeoutError):
             await communicator.receive_output()
 
-    @async_to_sync
     async def test_wrong_connection_type(self):
         application = get_asgi_application()
-        communicator = ApplicationCommunicator(
-            application,
-            self._get_scope(path='/', type='other'),
-        )
+        scope = self.async_request_factory._base_scope(path='/', type='other')
+        communicator = ApplicationCommunicator(application, scope)
         await communicator.send_input({'type': 'http.request'})
         msg = 'Django can only handle ASGI/HTTP connections, not other.'
         with self.assertRaisesMessage(ValueError, msg):
             await communicator.receive_output()
 
-    @async_to_sync
     async def test_non_unicode_query_string(self):
         application = get_asgi_application()
-        communicator = ApplicationCommunicator(
-            application,
-            self._get_scope(path='/', query_string=b'\xff'),
-        )
+        scope = self.async_request_factory._base_scope(path='/', query_string=b'\xff')
+        communicator = ApplicationCommunicator(application, scope)
         await communicator.send_input({'type': 'http.request'})
         response_start = await communicator.receive_output()
         self.assertEqual(response_start['type'], 'http.response.start')
@@ -165,3 +208,38 @@ class ASGITest(SimpleTestCase):
         response_body = await communicator.receive_output()
         self.assertEqual(response_body['type'], 'http.response.body')
         self.assertEqual(response_body['body'], b'')
+
+    async def test_request_lifecycle_signals_dispatched_with_thread_sensitive(self):
+        class SignalHandler:
+            """Track threads handler is dispatched on."""
+            threads = []
+
+            def __call__(self, **kwargs):
+                self.threads.append(threading.current_thread())
+
+        signal_handler = SignalHandler()
+        request_started.connect(signal_handler)
+        request_finished.connect(signal_handler)
+
+        # Perform a basic request.
+        application = get_asgi_application()
+        scope = self.async_request_factory._base_scope(path='/')
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({'type': 'http.request'})
+        response_start = await communicator.receive_output()
+        self.assertEqual(response_start['type'], 'http.response.start')
+        self.assertEqual(response_start['status'], 200)
+        response_body = await communicator.receive_output()
+        self.assertEqual(response_body['type'], 'http.response.body')
+        self.assertEqual(response_body['body'], b'Hello World!')
+        # Give response.close() time to finish.
+        await communicator.wait()
+
+        # At this point, AsyncToSync does not have a current executor. Thus
+        # SyncToAsync falls-back to .single_thread_executor.
+        target_thread = next(iter(SyncToAsync.single_thread_executor._threads))
+        request_started_thread, request_finished_thread = signal_handler.threads
+        self.assertEqual(request_started_thread, target_thread)
+        self.assertEqual(request_finished_thread, target_thread)
+        request_started.disconnect(signal_handler)
+        request_finished.disconnect(signal_handler)

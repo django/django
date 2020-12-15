@@ -157,7 +157,7 @@ _hextobyte = {
     for fmt in ['%02x', '%02X']
 }
 # And then everything above 128, because bytes ≥ 128 are part of multibyte
-# unicode characters.
+# Unicode characters.
 _hexdig = '0123456789ABCDEFabcdef'
 _hextobyte.update({
     (a + b).encode(): bytes.fromhex(a + b)
@@ -236,7 +236,7 @@ def repercent_broken_unicode(path):
             # CVE-2019-14235: A recursion shouldn't be used since the exception
             # handling uses massive amounts of memory
             repercent = quote(path[e.start:e.end], safe=b"/#%[]=:;$&()+,!?*@'~")
-            path = path[:e.start] + force_bytes(repercent) + path[e.end:]
+            path = path[:e.start] + repercent.encode() + path[e.end:]
         else:
             return path
 
@@ -253,7 +253,7 @@ def filepath_to_uri(path):
         return path
     # I know about `os.sep` and `os.altsep` but I want to leave
     # some flexibility for hardcoding separators.
-    return quote(path.replace("\\", "/"), safe="/~!*()'")
+    return quote(str(path).replace("\\", "/"), safe="/~!*()'")
 
 
 def get_system_encoding():

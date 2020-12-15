@@ -42,9 +42,11 @@ We'll be using the following model in the subsequent examples::
 A ``When()`` object is used to encapsulate a condition and its result for use
 in the conditional expression. Using a ``When()`` object is similar to using
 the :meth:`~django.db.models.query.QuerySet.filter` method. The condition can
-be specified using :ref:`field lookups <field-lookups>` or
-:class:`~django.db.models.Q` objects. The result is provided using the ``then``
-keyword.
+be specified using :ref:`field lookups <field-lookups>`,
+:class:`~django.db.models.Q` objects, or :class:`~django.db.models.Expression`
+objects that have an ``output_field`` that is a
+:class:`~django.db.models.BooleanField`. The result is provided using the
+``then`` keyword.
 
 Some examples::
 
@@ -60,6 +62,12 @@ Some examples::
     >>> # Complex conditions can be created using Q objects
     >>> When(Q(name__startswith="John") | Q(name__startswith="Paul"),
     ...      then='name')
+    >>> # Condition can be created using boolean expressions.
+    >>> from django.db.models import Exists, OuterRef
+    >>> non_unique_account_type = Client.objects.filter(
+    ...     account_type=OuterRef('account_type'),
+    ... ).exclude(pk=OuterRef('pk')).values('pk')
+    >>> When(Exists(non_unique_account_type), then=Value('non unique'))
 
 Keep in mind that each of these values can be an expression.
 
@@ -73,6 +81,10 @@ Keep in mind that each of these values can be an expression.
         >>> When(then__exact=0, then=1)
         >>> When(Q(then=0), then=1)
 
+.. versionchanged:: 3.2
+
+    Support for using the ``condition`` argument with ``lookups`` was added.
+
 ``Case``
 --------
 
@@ -84,11 +96,11 @@ A ``Case()`` expression is like the :keyword:`if` ... :keyword:`elif` ...
 truthful value. The ``result`` expression from the matching ``When()`` object
 is returned.
 
-A simple example::
+An example::
 
     >>>
     >>> from datetime import date, timedelta
-    >>> from django.db.models import Case, CharField, Value, When
+    >>> from django.db.models import Case, Value, When
     >>> Client.objects.create(
     ...     name='Jane Doe',
     ...     account_type=Client.REGULAR,
@@ -107,7 +119,6 @@ A simple example::
     ...         When(account_type=Client.GOLD, then=Value('5%')),
     ...         When(account_type=Client.PLATINUM, then=Value('10%')),
     ...         default=Value('0%'),
-    ...         output_field=CharField(),
     ...     ),
     ... ).values_list('name', 'discount')
     <QuerySet [('Jane Doe', '0%'), ('James Smith', '5%'), ('Jack Black', '10%')]>
@@ -129,7 +140,6 @@ the ``Client`` has been with us, we could do so using lookups::
     ...         When(registered_on__lte=a_year_ago, then=Value('10%')),
     ...         When(registered_on__lte=a_month_ago, then=Value('5%')),
     ...         default=Value('0%'),
-    ...         output_field=CharField(),
     ...     )
     ... ).values_list('name', 'discount')
     <QuerySet [('Jane Doe', '5%'), ('James Smith', '0%'), ('Jack Black', '10%')]>
@@ -158,9 +168,9 @@ registered more than a year ago::
 Advanced queries
 ================
 
-Conditional expressions can be used in annotations, aggregations, lookups, and
-updates. They can also be combined and nested with other expressions. This
-allows you to make powerful conditional queries.
+Conditional expressions can be used in annotations, aggregations, filters,
+lookups, and updates. They can also be combined and nested with other
+expressions. This allows you to make powerful conditional queries.
 
 Conditional update
 ------------------
@@ -236,3 +246,27 @@ On other databases, this is emulated using a ``CASE`` statement:
 
 The two SQL statements are functionally equivalent but the more explicit
 ``FILTER`` may perform better.
+
+Conditional filter
+------------------
+
+When a conditional expression returns a boolean value, it is possible to use it
+directly in filters. This means that it will not be added to the ``SELECT``
+columns, but you can still use it to filter results::
+
+    >>> non_unique_account_type = Client.objects.filter(
+    ...     account_type=OuterRef('account_type'),
+    ... ).exclude(pk=OuterRef('pk')).values('pk')
+    >>> Client.objects.filter(~Exists(non_unique_account_type))
+
+In SQL terms, that evaluates to:
+
+.. code-block:: sql
+
+    SELECT ...
+    FROM client c0
+    WHERE NOT EXISTS (
+      SELECT c1.id
+      FROM client c1
+      WHERE c1.account_type = c0.account_type AND NOT c1.id = c0.id
+    )

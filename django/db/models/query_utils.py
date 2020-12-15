@@ -8,10 +8,13 @@ circular import difficulties.
 import copy
 import functools
 import inspect
+import warnings
 from collections import namedtuple
 
+from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
+from django.utils.deprecation import RemovedInDjango40Warning
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
@@ -19,8 +22,29 @@ from django.utils import tree
 PathInfo = namedtuple('PathInfo', 'from_opts to_opts target_fields join_field m2m direct filtered_relation')
 
 
-class InvalidQuery(Exception):
-    """The query passed to raw() isn't a safe query to use with raw()."""
+class InvalidQueryType(type):
+    @property
+    def _subclasses(self):
+        return (FieldDoesNotExist, FieldError)
+
+    def __warn(self):
+        warnings.warn(
+            'The InvalidQuery exception class is deprecated. Use '
+            'FieldDoesNotExist or FieldError instead.',
+            category=RemovedInDjango40Warning,
+            stacklevel=4,
+        )
+
+    def __instancecheck__(self, instance):
+        self.__warn()
+        return isinstance(instance, self._subclasses) or super().__instancecheck__(instance)
+
+    def __subclasscheck__(self, subclass):
+        self.__warn()
+        return issubclass(subclass, self._subclasses) or super().__subclasscheck__(subclass)
+
+
+class InvalidQuery(Exception, metaclass=InvalidQueryType):
     pass
 
 
@@ -28,20 +52,6 @@ def subclasses(cls):
     yield cls
     for subclass in cls.__subclasses__():
         yield from subclasses(subclass)
-
-
-class QueryWrapper:
-    """
-    A type that indicates the contents are an SQL fragment and the associate
-    parameters. Can be used to pass opaque data to a where-clause, for example.
-    """
-    contains_aggregate = False
-
-    def __init__(self, sql, params):
-        self.data = sql, list(params)
-
-    def as_sql(self, compiler=None, connection=None):
-        return self.data
 
 
 class Q(tree.Node):
@@ -90,7 +100,10 @@ class Q(tree.Node):
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         # We must promote any new joins to left outer joins so that when Q is
         # used as an expression, rows aren't filtered due to joins.
-        clause, joins = query._add_q(self, reuse, allow_joins=allow_joins, split_subq=False)
+        clause, joins = query._add_q(
+            self, reuse, allow_joins=allow_joins, split_subq=False,
+            check_filterable=False,
+        )
         query.promote_joins(joins)
         return clause
 
@@ -128,14 +141,14 @@ class DeferredAttribute:
             return self
         data = instance.__dict__
         field_name = self.field.attname
-        if data.get(field_name, self) is self:
+        if field_name not in data:
             # Let's see if the field is part of the parent chain. If so we
             # might be able to reuse the already loaded value. Refs #18343.
             val = self._check_parent_chain(instance)
             if val is None:
                 instance.refresh_from_db(fields=[field_name])
-                val = getattr(instance, field_name)
-            data[field_name] = val
+            else:
+                data[field_name] = val
         return data[field_name]
 
     def _check_parent_chain(self, instance):
@@ -247,10 +260,11 @@ def select_related_descend(field, restricted, requested, load_fields, reverse=Fa
     if load_fields:
         if field.attname not in load_fields:
             if restricted and field.name in requested:
-                raise InvalidQuery("Field %s.%s cannot be both deferred"
-                                   " and traversed using select_related"
-                                   " at the same time." %
-                                   (field.model._meta.object_name, field.name))
+                msg = (
+                    'Field %s.%s cannot be both deferred and traversed using '
+                    'select_related at the same time.'
+                ) % (field.model._meta.object_name, field.name)
+                raise FieldError(msg)
     return True
 
 
@@ -309,8 +323,9 @@ class FilteredRelation:
         self.path = []
 
     def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return (
-            isinstance(other, self.__class__) and
             self.relation_name == other.relation_name and
             self.alias == other.alias and
             self.condition == other.condition

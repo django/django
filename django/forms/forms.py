@@ -5,11 +5,8 @@ Form classes
 import copy
 
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
-# BoundField is imported for backwards compatibility in Django 1.9
-from django.forms.boundfield import BoundField  # NOQA
 from django.forms.fields import Field, FileField
-# pretty_name is imported for backwards compatibility in Django 1.9
-from django.forms.utils import ErrorDict, ErrorList, pretty_name  # NOQA
+from django.forms.utils import ErrorDict, ErrorList
 from django.forms.widgets import Media, MediaDefiningClass
 from django.utils.datastructures import MultiValueDict
 from django.utils.functional import cached_property
@@ -25,15 +22,13 @@ __all__ = ('BaseForm', 'Form')
 class DeclarativeFieldsMetaclass(MediaDefiningClass):
     """Collect Fields declared on the base classes."""
     def __new__(mcs, name, bases, attrs):
-        # Collect fields from current class.
-        current_fields = []
-        for key, value in list(attrs.items()):
-            if isinstance(value, Field):
-                current_fields.append((key, value))
-                attrs.pop(key)
-        attrs['declared_fields'] = dict(current_fields)
+        # Collect fields from current class and remove them from attrs.
+        attrs['declared_fields'] = {
+            key: attrs.pop(key) for key, value in list(attrs.items())
+            if isinstance(value, Field)
+        }
 
-        new_class = super(DeclarativeFieldsMetaclass, mcs).__new__(mcs, name, bases, attrs)
+        new_class = super().__new__(mcs, name, bases, attrs)
 
         # Walk through the MRO.
         declared_fields = {}
@@ -194,7 +189,8 @@ class BaseForm:
 
     def _html_output(self, normal_row, error_row, row_ender, help_text_html, errors_on_separate_row):
         "Output HTML. Used by as_table(), as_ul(), as_p()."
-        top_errors = self.non_field_errors()  # Errors that should be displayed above all fields.
+        # Errors that should be displayed above all fields.
+        top_errors = self.non_field_errors().copy()
         output, hidden_fields = [], []
 
         for name, field in self.fields.items():

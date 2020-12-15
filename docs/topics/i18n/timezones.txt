@@ -62,8 +62,8 @@ You can use :func:`~django.utils.timezone.is_aware` and
 aware or naive.
 
 When time zone support is disabled, Django uses naive datetime objects in local
-time. This is simple and sufficient for many use cases. In this mode, to obtain
-the current time, you would write::
+time. This is sufficient for many use cases. In this mode, to obtain the
+current time, you would write::
 
     import datetime
 
@@ -155,11 +155,11 @@ time zone automatically. Instead, Django provides :ref:`time zone selection
 functions <time-zone-selection-functions>`. Use them to build the time zone
 selection logic that makes sense for you.
 
-Most websites that care about time zones just ask users in which time zone they
-live and store this information in the user's profile. For anonymous users,
-they use the time zone of their primary audience or UTC. pytz_ provides
-helpers_, like a list of time zones per country, that you can use to pre-select
-the most likely choices.
+Most websites that care about time zones ask users in which time zone they live
+and store this information in the user's profile. For anonymous users, they use
+the time zone of their primary audience or UTC. pytz_ provides helpers_, like a
+list of time zones per country, that you can use to pre-select the most likely
+choices.
 
 Here's an example that stores the current timezone in the session. (It skips
 error handling entirely for the sake of simplicity.)
@@ -169,15 +169,18 @@ Add the following middleware to :setting:`MIDDLEWARE`::
     import pytz
 
     from django.utils import timezone
-    from django.utils.deprecation import MiddlewareMixin
 
-    class TimezoneMiddleware(MiddlewareMixin):
-        def process_request(self, request):
+    class TimezoneMiddleware:
+        def __init__(self, get_response):
+            self.get_response = get_response
+
+        def __call__(self, request):
             tzname = request.session.get('django_timezone')
             if tzname:
                 timezone.activate(pytz.timezone(tzname))
             else:
                 timezone.deactivate()
+            return self.get_response(request)
 
 Create a view that can set the current timezone::
 
@@ -437,7 +440,7 @@ When serializing an aware datetime, the UTC offset is included, like this::
 
     "2011-09-01T13:20:30+03:00"
 
-For a naive datetime, it obviously isn't::
+While for a naive datetime, it isn't::
 
     "2011-09-01T13:20:30"
 
@@ -451,8 +454,8 @@ zone support, you'll see :exc:`RuntimeWarning`\ s when you load them. To get
 rid of the warnings, you must convert your fixtures to the "aware" format.
 
 You can regenerate fixtures with :djadmin:`loaddata` then :djadmin:`dumpdata`.
-Or, if they're small enough, you can simply edit them to add the UTC offset
-that matches your :setting:`TIME_ZONE` to each serialized datetime.
+Or, if they're small enough, you can edit them to add the UTC offset that
+matches your :setting:`TIME_ZONE` to each serialized datetime.
 
 .. _time-zones-faq:
 
@@ -470,8 +473,8 @@ Setup
 
    When you enable time zone support, you'll encounter some errors because
    you're using naive datetimes where Django expects aware datetimes. Such
-   errors show up when running tests and they're easy to fix. You'll quickly
-   learn how to avoid invalid operations.
+   errors show up when running tests. You'll quickly learn how to avoid invalid
+   operations.
 
    On the other hand, bugs caused by the lack of time zone support are much
    harder to prevent, diagnose and fix. Anything that involves scheduled tasks
@@ -492,10 +495,11 @@ Setup
    datetimes safely, their representation should include the UTC offset, or
    their values should be in UTC (or both!).
 
-   Finally, our calendar system contains interesting traps for computers::
+   Finally, our calendar system contains interesting edge cases. For example,
+   you can't always subtract one year directly from a given date::
 
        >>> import datetime
-       >>> def one_year_before(value):       # DON'T DO THAT!
+       >>> def one_year_before(value):  # Wrong example.
        ...     return value.replace(year=value.year - 1)
        >>> one_year_before(datetime.datetime(2012, 3, 1, 10, 0))
        datetime.datetime(2011, 3, 1, 10, 0)
@@ -504,9 +508,9 @@ Setup
        ...
        ValueError: day is out of range for month
 
-   (To implement this function, you must decide whether 2012-02-29 minus
-   one year is 2011-02-28 or 2011-03-01, which depends on your business
-   requirements.)
+   To implement such a function correctly, you must decide whether 2012-02-29
+   minus one year is 2011-02-28 or 2011-03-01, which depends on your business
+   requirements.
 
 #. **How do I interact with a database that stores datetimes in local time?**
 
@@ -613,7 +617,7 @@ Troubleshooting
 
        >>> from django.utils import timezone
        >>> timezone.activate(pytz.timezone("Asia/Singapore"))
-       # For this example, we just set the time zone to Singapore, but here's how
+       # For this example, we set the time zone to Singapore, but here's how
        # you would obtain the current time zone in the general case.
        >>> current_tz = timezone.get_current_timezone()
        # Again, this is the correct way to convert between time zones with pytz.

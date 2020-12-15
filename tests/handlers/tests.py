@@ -50,7 +50,7 @@ class HandlerTests(SimpleTestCase):
             environ['QUERY_STRING'] = str(raw_query_string, 'iso-8859-1')
             request = WSGIRequest(environ)
             got.append(request.GET['want'])
-        # %E9 is converted to the unicode replacement character by parse_qsl
+        # %E9 is converted to the Unicode replacement character by parse_qsl
         self.assertEqual(got, ['café', 'café', 'caf\ufffd', 'café'])
 
     def test_non_ascii_cookie(self):
@@ -106,6 +106,16 @@ class TransactionsPerRequestTests(TransactionTestCase):
             connection.settings_dict['ATOMIC_REQUESTS'] = old_atomic_requests
         self.assertContains(response, 'True')
 
+    async def test_auto_transaction_async_view(self):
+        old_atomic_requests = connection.settings_dict['ATOMIC_REQUESTS']
+        try:
+            connection.settings_dict['ATOMIC_REQUESTS'] = True
+            msg = 'You cannot use ATOMIC_REQUESTS with async views.'
+            with self.assertRaisesMessage(RuntimeError, msg):
+                await self.async_client.get('/async_regular/')
+        finally:
+            connection.settings_dict['ATOMIC_REQUESTS'] = old_atomic_requests
+
     def test_no_auto_transaction(self):
         old_atomic_requests = connection.settings_dict['ATOMIC_REQUESTS']
         try:
@@ -157,8 +167,17 @@ def empty_middleware(get_response):
 class HandlerRequestTests(SimpleTestCase):
     request_factory = RequestFactory()
 
+    def test_async_view(self):
+        """Calling an async view down the normal synchronous path."""
+        response = self.client.get('/async_regular/')
+        self.assertEqual(response.status_code, 200)
+
     def test_suspiciousop_in_view_returns_400(self):
         response = self.client.get('/suspicious/')
+        self.assertEqual(response.status_code, 400)
+
+    def test_bad_request_in_view_returns_400(self):
+        response = self.client.get('/bad_request/')
         self.assertEqual(response.status_code, 400)
 
     def test_invalid_urls(self):
@@ -224,3 +243,44 @@ class ScriptNameTests(SimpleTestCase):
             'PATH_INFO': '/milestones/accounts/login/help',
         })
         self.assertEqual(script_name, '/mst')
+
+
+@override_settings(ROOT_URLCONF='handlers.urls')
+class AsyncHandlerRequestTests(SimpleTestCase):
+    """Async variants of the normal handler request tests."""
+
+    async def test_sync_view(self):
+        """Calling a sync view down the asynchronous path."""
+        response = await self.async_client.get('/regular/')
+        self.assertEqual(response.status_code, 200)
+
+    async def test_async_view(self):
+        """Calling an async view down the asynchronous path."""
+        response = await self.async_client.get('/async_regular/')
+        self.assertEqual(response.status_code, 200)
+
+    async def test_suspiciousop_in_view_returns_400(self):
+        response = await self.async_client.get('/suspicious/')
+        self.assertEqual(response.status_code, 400)
+
+    async def test_bad_request_in_view_returns_400(self):
+        response = await self.async_client.get('/bad_request/')
+        self.assertEqual(response.status_code, 400)
+
+    async def test_no_response(self):
+        msg = (
+            "The view handlers.views.no_response didn't return an "
+            "HttpResponse object. It returned None instead."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            await self.async_client.get('/no_response_fbv/')
+
+    async def test_unawaited_response(self):
+        msg = (
+            "The view handlers.views.CoroutineClearingView.__call__ didn't"
+            " return an HttpResponse object. It returned an unawaited"
+            " coroutine instead. You may need to add an 'await'"
+            " into your view."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            await self.async_client.get('/unawaited/')

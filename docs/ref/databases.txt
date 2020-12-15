@@ -2,14 +2,25 @@
 Databases
 =========
 
+Django officially supports the following databases:
+
+* :ref:`PostgreSQL <postgresql-notes>`
+* :ref:`MariaDB <mariadb-notes>`
+* :ref:`MySQL <mysql-notes>`
+* :ref:`Oracle <oracle-notes>`
+* :ref:`SQLite <sqlite-notes>`
+
+There are also a number of :ref:`database backends provided by third parties
+<third-party-notes>`.
+
 Django attempts to support as many features as possible on all database
 backends. However, not all database backends are alike, and we've had to make
 design decisions on which features to support and which assumptions we can make
 safely.
 
 This file describes some of the features that might be relevant to Django
-usage. Of course, it is not intended as a replacement for server-specific
-documentation or reference manuals.
+usage. It is not intended as a replacement for server-specific documentation or
+reference manuals.
 
 General notes
 =============
@@ -26,7 +37,7 @@ connection. It can be set independently for each database.
 
 The default value is ``0``, preserving the historical behavior of closing the
 database connection at the end of each request. To enable persistent
-connections, set :setting:`CONN_MAX_AGE` to a positive number of seconds. For
+connections, set :setting:`CONN_MAX_AGE` to a positive integer of seconds. For
 unlimited persistent connections, set it to ``None``.
 
 Connection management
@@ -92,10 +103,10 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 9.5 and higher. `psycopg2`_ 2.5.4 or higher is
+Django supports PostgreSQL 9.6 and higher. `psycopg2`_ 2.5.4 or higher is
 required, though the latest release is recommended.
 
-.. _psycopg2: http://initd.org/psycopg/
+.. _psycopg2: https://www.psycopg.org/
 
 PostgreSQL connection settings
 -------------------------------
@@ -110,8 +121,11 @@ Django needs the following parameters for its database connections:
 - ``client_encoding``: ``'UTF8'``,
 - ``default_transaction_isolation``: ``'read committed'`` by default,
   or the value set in the connection options (see below),
-- ``timezone``: ``'UTC'`` when :setting:`USE_TZ` is ``True``, value of
-  :setting:`TIME_ZONE` otherwise.
+- ``timezone``:
+    - when :setting:`USE_TZ` is ``True``, ``'UTC'`` by default, or the
+      :setting:`TIME_ZONE <DATABASE-TIME_ZONE>` value set for the connection,
+    - when :setting:`USE_TZ` is ``False``, the value of the global
+      :setting:`TIME_ZONE` setting.
 
 If these parameters already have the correct values, Django won't set them for
 every new connection, which improves performance slightly. You can configure
@@ -192,7 +206,7 @@ cursor query is controlled with the `cursor_tuple_fraction`_ option.
 Transaction pooling and server-side cursors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Using a connection pooler in transaction pooling mode (e.g. `pgBouncer`_)
+Using a connection pooler in transaction pooling mode (e.g. `PgBouncer`_)
 requires disabling server-side cursors for that connection.
 
 Server-side cursors are local to a connection and remain open at the end of a
@@ -218,7 +232,7 @@ Another option is to wrap each ``QuerySet`` using server-side cursors in an
 for the duration of the transaction. This way, the server-side cursor will only
 live for the duration of the transaction.
 
-.. _pgBouncer: https://pgbouncer.github.io/
+.. _PgBouncer: https://pgbouncer.github.io/
 
 .. _manually-specified-autoincrement-pk:
 
@@ -273,9 +287,7 @@ non-durable <https://www.postgresql.org/docs/current/non-durability.html>`_.
 MariaDB notes
 =============
 
-.. versionadded:: 3.0
-
-Django supports MariaDB 10.1 and higher.
+Django supports MariaDB 10.2 and higher.
 
 To use MariaDB, use the MySQL backend, which is shared between the two. See the
 :ref:`MySQL notes <mysql-notes>` for more details.
@@ -288,7 +300,7 @@ MySQL notes
 Version support
 ---------------
 
-Django supports MySQL 5.6 and higher.
+Django supports MySQL 5.7 and higher.
 
 Django's ``inspectdb`` feature uses the ``information_schema`` database, which
 contains detailed data on all database schemas.
@@ -347,7 +359,7 @@ Connector/Python includes `its own`_.
 mysqlclient
 ~~~~~~~~~~~
 
-Django requires `mysqlclient`_ 1.3.13 or later.
+Django requires `mysqlclient`_ 1.4.0 or later.
 
 MySQL Connector/Python
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -386,11 +398,15 @@ Collation settings
 ~~~~~~~~~~~~~~~~~~
 
 The collation setting for a column controls the order in which data is sorted
-as well as what strings compare as equal. It can be set on a database-wide
-level and also per-table and per-column. This is `documented thoroughly`_ in
-the MySQL documentation. In all cases, you set the collation by directly
-manipulating the database tables; Django doesn't provide a way to set this on
-the model definition.
+as well as what strings compare as equal. You can specify the ``db_collation``
+parameter to set the collation name of the column for
+:attr:`CharField <django.db.models.CharField.db_collation>` and
+:attr:`TextField <django.db.models.TextField.db_collation>`.
+
+The collation can also be set on a database-wide level and per-table. This is
+`documented thoroughly`_ in the MySQL documentation. In such cases, you must
+set the collation by directly manipulating the database settings or tables.
+Django doesn't provide an API to change them.
 
 .. _documented thoroughly: https://dev.mysql.com/doc/refman/en/charset.html
 
@@ -419,6 +435,10 @@ because it is more accurate.
     using a case-insensitive collation, a formset with unique field values that
     differ only by case will pass validation, but upon calling ``save()``, an
     ``IntegrityError`` will be raised.
+
+.. versionchanged:: 3.2
+
+    Support for setting a database collation for the field was added.
 
 Connecting to the database
 --------------------------
@@ -467,11 +487,11 @@ Several other `MySQLdb connection options`_ may be useful, such as ``ssl``,
 Setting ``sql_mode``
 ~~~~~~~~~~~~~~~~~~~~
 
-From MySQL 5.7 onwards and on fresh installs of MySQL 5.6, the default value of
-the ``sql_mode`` option contains ``STRICT_TRANS_TABLES``. That option escalates
-warnings into errors when data are truncated upon insertion, so Django highly
-recommends activating a `strict mode`_ for MySQL to prevent data loss (either
-``STRICT_TRANS_TABLES`` or ``STRICT_ALL_TABLES``).
+From MySQL 5.7 onwards, the default value of the ``sql_mode`` option contains
+``STRICT_TRANS_TABLES``. That option escalates warnings into errors when data
+are truncated upon insertion, so Django highly recommends activating a
+`strict mode`_ for MySQL to prevent data loss (either ``STRICT_TRANS_TABLES``
+or ``STRICT_ALL_TABLES``).
 
 .. _strict mode: https://dev.mysql.com/doc/refman/en/sql-mode.html#sql-mode-strict
 
@@ -567,13 +587,18 @@ these methods in no-op's based in the results of such detection.
 Notes on specific fields
 ------------------------
 
+.. _mysql-character-fields:
+
 Character fields
 ~~~~~~~~~~~~~~~~
 
-Any fields that are stored with ``VARCHAR`` column types have their
+Any fields that are stored with ``VARCHAR`` column types may have their
 ``max_length`` restricted to 255 characters if you are using ``unique=True``
 for the field. This affects :class:`~django.db.models.CharField`,
-:class:`~django.db.models.SlugField`.
+:class:`~django.db.models.SlugField`. See `the MySQL documentation`_ for more
+details.
+
+.. _the MySQL documentation: https://dev.mysql.com/doc/refman/en/create-index.html#create-index-column-prefixes
 
 ``TextField`` limitations
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -588,9 +613,8 @@ specification without a key length".
 Fractional seconds support for Time and DateTime fields
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-MySQL 5.6.4 and later can store fractional seconds, provided that the
-column definition includes a fractional indication (e.g. ``DATETIME(6)``).
-Earlier versions do not support them at all.
+MySQL can store fractional seconds, provided that the column definition
+includes a fractional indication (e.g. ``DATETIME(6)``).
 
 Django will not upgrade existing columns to include fractional seconds if the
 database server supports it. If you want to enable them on an existing database,
@@ -614,10 +638,23 @@ both MySQL and Django will attempt to convert the values from UTC to local time.
 Row locking with ``QuerySet.select_for_update()``
 -------------------------------------------------
 
-MySQL does not support the ``NOWAIT``, ``SKIP LOCKED``, and ``OF`` options to
-the ``SELECT ... FOR UPDATE`` statement. If ``select_for_update()`` is used
-with ``nowait=True``, ``skip_locked=True``, or ``of`` then a
-:exc:`~django.db.NotSupportedError` is raised.
+MySQL and MariaDB do not support some options to the ``SELECT ... FOR UPDATE``
+statement. If ``select_for_update()`` is used with an unsupported option, then
+a :exc:`~django.db.NotSupportedError` is raised.
+
+=============== ========= ==========
+Option          MariaDB   MySQL
+=============== ========= ==========
+``SKIP LOCKED``           X (≥8.0.1)
+``NOWAIT``      X (≥10.3) X (≥8.0.1)
+``OF``                    X (≥8.0.1)
+``NO KEY``
+=============== ========= ==========
+
+When using ``select_for_update()`` on MySQL, make sure you filter a queryset
+against at least set of fields contained in unique constraints or only against
+fields covered by indexes. Otherwise, an exclusive write lock will be acquired
+over the full table for the duration of the transaction.
 
 Automatic typecasting can cause unexpected results
 --------------------------------------------------
@@ -677,6 +714,18 @@ substring filtering.
 
 .. _documented at sqlite.org: https://www.sqlite.org/faq.html#q18
 
+.. _sqlite-decimal-handling:
+
+Decimal handling
+----------------
+
+SQLite has no real decimal internal type. Decimal values are internally
+converted to the ``REAL`` data type (8-byte IEEE floating point number), as
+explained in the `SQLite datatypes documentation`__, so they don't support
+correctly-rounded decimal floating point arithmetic.
+
+__ https://www.sqlite.org/datatype3.html#storage_classes_and_datatypes
+
 "Database is locked" errors
 ---------------------------
 
@@ -710,8 +759,8 @@ If you're getting this error, you can solve it by:
           # ...
       }
 
-  This will simply make SQLite wait a bit longer before throwing "database
-  is locked" errors; it won't really do anything to solve them.
+  This will make SQLite wait a bit longer before throwing "database is locked"
+  errors; it won't really do anything to solve them.
 
 ``QuerySet.select_for_update()`` not supported
 ----------------------------------------------
@@ -739,6 +788,22 @@ not appear, or may appear twice, in subsequent results fetched from the
 iterator. Your code must handle this.
 
 .. _`Isolation in SQLite`: https://sqlite.org/isolation.html
+
+.. _sqlite-json1:
+
+Enabling JSON1 extension on SQLite
+----------------------------------
+
+To use :class:`~django.db.models.JSONField` on SQLite, you need to enable the
+`JSON1 extension`_ on Python's :py:mod:`sqlite3` library. If the extension is
+not enabled on your installation, a system error (``fields.E180``) will be
+raised.
+
+To enable the JSON1 extension you can follow the instruction on
+`the wiki page`_.
+
+.. _JSON1 extension: https://www.sqlite.org/json1.html
+.. _the wiki page: https://code.djangoproject.com/wiki/JSON1Extension
 
 .. _oracle-notes:
 
@@ -944,6 +1009,54 @@ some limitations on the usage of such LOB columns in general:
   conjunction with ``distinct()`` to prevent ``TextField`` columns from being
   included in the ``SELECT DISTINCT`` list.
 
+.. _subclassing-database-backends:
+
+Subclassing the built-in database backends
+==========================================
+
+Django comes with built-in database backends. You may subclass an existing
+database backends to modify its behavior, features, or configuration.
+
+Consider, for example, that you need to change a single database feature.
+First, you have to create a new directory with a ``base`` module in it. For
+example::
+
+    mysite/
+        ...
+        mydbengine/
+            __init__.py
+            base.py
+
+The ``base.py`` module must contain a class named ``DatabaseWrapper`` that
+subclasses an existing engine from the ``django.db.backends`` module. Here's an
+example of subclassing the PostgreSQL engine to change a feature class
+``allows_group_by_selected_pks_on_model``:
+
+.. code-block:: python
+    :caption: mysite/mydbengine/base.py
+
+    from django.db.backends.postgresql import base, features
+
+    class DatabaseFeatures(features.DatabaseFeatures):
+        def allows_group_by_selected_pks_on_model(self, model):
+            return True
+
+    class DatabaseWrapper(base.DatabaseWrapper):
+        features_class = DatabaseFeatures
+
+Finally, you must specify a :setting:`DATABASE-ENGINE` in your ``settings.py``
+file::
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'mydbengine',
+            ...
+        },
+    }
+
+You can see the current list of database engines by looking in
+:source:`django/db/backends`.
+
 .. _third-party-notes:
 
 Using a 3rd-party database backend
@@ -952,17 +1065,15 @@ Using a 3rd-party database backend
 In addition to the officially supported databases, there are backends provided
 by 3rd parties that allow you to use other databases with Django:
 
-* `IBM DB2`_
+* `CockroachDB`_
+* `Firebird`_
 * `Microsoft SQL Server`_
-* Firebird_
-* ODBC_
 
 The Django versions and ORM features supported by these unofficial backends
 vary considerably. Queries regarding the specific capabilities of these
 unofficial backends, along with any support queries, should be directed to
 the support channels provided by each 3rd party project.
 
-.. _IBM DB2: https://pypi.org/project/ibm_db/
-.. _Microsoft SQL Server: https://pypi.org/project/django-pyodbc-azure/
-.. _Firebird: https://github.com/maxirobaina/django-firebird
-.. _ODBC: https://github.com/lionheart/django-pyodbc/
+.. _CockroachDB: https://pypi.org/project/django-cockroachdb/
+.. _Firebird: https://pypi.org/project/django-firebird/
+.. _Microsoft SQL Server: https://pypi.org/project/django-mssql-backend/

@@ -1,9 +1,9 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Topolino_Hackerino <claudiu.andrei.roman@gmail.com>, 2017
+# 0d21a39e384d88c2313b89b5042c04cb, 2017
 # Flavio Curella <flavio.curella@gmail.com>, 2016
-# Mirco Grillo <mirco.grillomg@gmail.com>, 2018
+# Mirco Grillo <mirco.grillomg@gmail.com>, 2018,2020
 # palmux <palmux@gmail.com>, 2015
 # Mattia Procopio <promat85@gmail.com>, 2015
 # Stefano Brentegani <sbrentegani@gmail.com>, 2015-2016
@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-07-30 21:04+0000\n"
-"Last-Translator: Carlo Miron <C8E@miron.it>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-07-23 08:40+0000\n"
+"Last-Translator: Mirco Grillo <mirco.grillomg@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -36,24 +36,14 @@ msgid "Map of strings to strings/nulls"
 msgstr "Mappa di stringhe a stringhe/null"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
+msgid "The value of “%(key)s” is not a string or null."
 msgstr "Il valore di \"%(key)s\" non è una stringa o nullo."
-
-msgid "A JSON object"
-msgstr "Un oggetto JSON"
-
-msgid "Value must be valid JSON."
-msgstr "Il valore deve essere un JSON valido."
 
 msgid "Could not load JSON data."
 msgstr "Caricamento dati JSON fallito."
 
 msgid "Input must be a JSON dictionary."
 msgstr "L'input deve essere un dizionario JSON."
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "Il valore di '%(value)s' deve essere un JSON valido."
 
 msgid "Enter two valid values."
 msgstr "Inserisci due valori validi."

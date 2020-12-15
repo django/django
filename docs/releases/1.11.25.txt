@@ -1,0 +1,14 @@
+============================
+Django 1.11.25 release notes
+============================
+
+*October 1, 2019*
+
+Django 1.11.25 fixes a regression in 1.11.23.
+
+Bugfixes
+========
+
+* Fixed a crash when filtering with a ``Subquery()`` annotation of a queryset
+  containing :class:`~django.contrib.postgres.fields.JSONField` or
+  :class:`~django.contrib.postgres.fields.HStoreField` (:ticket:`30769`).

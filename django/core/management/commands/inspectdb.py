@@ -8,7 +8,7 @@ from django.db.models.constants import LOOKUP_SEP
 
 class Command(BaseCommand):
     help = "Introspects the database tables in the given database and outputs a Django model module."
-    requires_system_checks = False
+    requires_system_checks = []
     stealth_options = ('table_name_filter',)
     db_module = 'django.db'
 
@@ -31,7 +31,7 @@ class Command(BaseCommand):
     def handle(self, **options):
         try:
             for line in self.handle_inspection(options):
-                self.stdout.write("%s\n" % line)
+                self.stdout.write(line)
         except NotImplementedError:
             raise CommandError("Database inspection isn't supported for the currently selected database backend.")
 
@@ -142,7 +142,7 @@ class Command(BaseCommand):
                     if att_name == 'id' and extra_params == {'primary_key': True}:
                         if field_type == 'AutoField(':
                             continue
-                        elif field_type == 'IntegerField(' and not connection.features.can_introspect_autofield:
+                        elif field_type == connection.features.introspected_field_types['AutoField'] + '(':
                             comment_notes.append('AutoField?')
 
                     # Add 'null' and 'blank', if the 'null_ok' flag was present in the
@@ -170,8 +170,7 @@ class Command(BaseCommand):
                     yield '    %s' % field_desc
                 is_view = any(info.name == table_name and info.type == 'v' for info in table_info)
                 is_partition = any(info.name == table_name and info.type == 'p' for info in table_info)
-                for meta_line in self.get_meta(table_name, constraints, column_to_field_name, is_view, is_partition):
-                    yield meta_line
+                yield from self.get_meta(table_name, constraints, column_to_field_name, is_view, is_partition)
 
     def normalize_col_name(self, col_name, used_column_names, is_relation):
         """
@@ -247,6 +246,9 @@ class Command(BaseCommand):
         # Add max_length for all CharFields.
         if field_type == 'CharField' and row.internal_size:
             field_params['max_length'] = int(row.internal_size)
+
+        if field_type in {'CharField', 'TextField'} and row.collation:
+            field_params['db_collation'] = row.collation
 
         if field_type == 'DecimalField':
             if row.precision is None or row.scale is None:

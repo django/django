@@ -93,16 +93,14 @@ input[type="submit"], button {
 
     /* Changelist */
 
-    #changelist #toolbar {
+    #toolbar {
         border: none;
         padding: 15px;
     }
 
     #changelist-search > div {
-        display: -webkit-flex;
         display: flex;
-        -webkit-flex-wrap: wrap;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         max-width: 480px;
     }
 
@@ -110,16 +108,20 @@ input[type="submit"], button {
         line-height: 22px;
     }
 
-    #changelist #toolbar form #searchbar {
-        -webkit-flex: 1 0 auto;
+    #toolbar form #searchbar {
         flex: 1 0 auto;
         width: 0;
         height: 22px;
         margin: 0 10px 0 6px;
     }
 
+    #toolbar form input[type=submit] {
+        flex: 0 1 auto;
+    }
+
     #changelist-search .quiet {
-        width: 100%;
+        width: 0;
+        flex: 1 0 auto;
         margin: 5px 0 0 25px;
     }
 
@@ -162,9 +164,6 @@ input[type="submit"], button {
     .change-list .filtered .paginator,
     .filtered #toolbar,
     .filtered .actions,
-    .filtered div.xfull {
-        margin-right: 230px;
-    }
 
     #changelist .paginator {
         border-top-color: #eee;
@@ -218,7 +217,7 @@ input[type="submit"], button {
     }
 
     textarea {
-        max-width: 518px;
+        max-width: 100%;
         max-height: 120px;
     }
 
@@ -226,7 +225,6 @@ input[type="submit"], button {
         padding-top: 6px;
     }
 
-    .aligned .add-another,
     .aligned .related-lookup,
     .aligned .datetimeshortcuts,
     .aligned .related-lookup + strong {
@@ -354,6 +352,14 @@ input[type="submit"], button {
     }
 
     .stacked .active.selector-add {
+        background-position: 0 -40px;
+    }
+
+    .active.selector-add:focus, .active.selector-add:hover {
+        background-position: 0 -140px;
+    }
+
+    .stacked .active.selector-add:focus, .stacked .active.selector-add:hover {
         background-position: 0 -60px;
     }
 
@@ -362,6 +368,14 @@ input[type="submit"], button {
     }
 
     .stacked .active.selector-remove {
+        background-position: 0 0;
+    }
+
+    .active.selector-remove:focus, .active.selector-remove:hover {
+        background-position: 0 -100px;
+    }
+
+    .stacked .active.selector-remove:focus, .stacked .active.selector-remove:hover {
         background-position: 0 -20px;
     }
 
@@ -390,6 +404,10 @@ input[type="submit"], button {
 
     .datetimeshortcuts {
         color: #ccc;
+    }
+
+    .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
+        width: 75%;
     }
 
     .inline-group {
@@ -484,25 +502,16 @@ input[type="submit"], button {
     /* Changelist */
 
     #changelist {
-        display: flex;
+        align-items: stretch;
         flex-direction: column;
     }
 
-    #changelist #toolbar {
-        order: 1;
+    #toolbar {
         padding: 10px;
     }
 
-    #changelist .xfull {
-        order: 2;
-    }
-
-    #changelist-form {
-        order: 3;
-    }
-
     #changelist-filter {
-        order: 4;
+        margin-left: 0;
     }
 
     #changelist .actions label {
@@ -516,11 +525,6 @@ input[type="submit"], button {
 
     #changelist .actions span {
         flex: 1 0 100%;
-    }
-
-    .change-list .filtered .results, .change-list .filtered .paginator,
-    .filtered #toolbar, .filtered .actions, .filtered div.xfull {
-        margin-right: 0;
     }
 
     #changelist-filter {
@@ -651,7 +655,7 @@ input[type="submit"], button {
         margin-bottom: -3px;
     }
 
-    form .aligned ul.radiolist li + li {
+    form .aligned ul.radiolist:not(.inline) li + li {
         margin-top: 5px;
     }
 
@@ -721,8 +725,16 @@ input[type="submit"], button {
         background-position: 0 0;
     }
 
+    .active.selector-remove:focus, .active.selector-remove:hover {
+        background-position: 0 -20px;
+    }
+
     .selector-add  {
         background-position: 0 -40px;
+    }
+
+    .active.selector-add:focus, .active.selector-add:hover {
+        background-position: 0 -60px;
     }
 
     /* Inlines */
@@ -873,9 +885,7 @@ input[type="submit"], button {
     }
 
     .login .form-row label {
-        display: block;
         margin: 0 0 5px;
-        padding: 0;
         line-height: 1.2;
     }
 
@@ -883,7 +893,7 @@ input[type="submit"], button {
         padding: 15px 0 0;
     }
 
-    .login br, .login .submit-row label {
+    .login br {
         display: none;
     }
 

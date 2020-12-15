@@ -2,7 +2,7 @@
 Django 1.11.24 release notes
 ============================
 
-*Expected September 2, 2019*
+*September 2, 2019*
 
 Django 1.11.24 fixes a regression in 1.11.23.
 

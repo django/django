@@ -4,8 +4,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
-from .base import Context, Template
-from .context import _builtin_context_processors
+from .base import Template
+from .context import Context, _builtin_context_processors
 from .exceptions import TemplateDoesNotExist
 from .library import import_library
 

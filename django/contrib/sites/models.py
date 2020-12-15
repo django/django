@@ -91,7 +91,7 @@ class Site(models.Model):
         db_table = 'django_site'
         verbose_name = _('site')
         verbose_name_plural = _('sites')
-        ordering = ('domain',)
+        ordering = ['domain']
 
     def __str__(self):
         return self.domain

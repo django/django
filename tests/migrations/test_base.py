@@ -13,8 +13,6 @@ from django.test import TransactionTestCase
 from django.test.utils import extend_sys_path
 from django.utils.module_loading import module_dir
 
-from .models import FoodManager, FoodQuerySet
-
 
 class MigrationTestBase(TransactionTestCase):
     """
@@ -26,7 +24,7 @@ class MigrationTestBase(TransactionTestCase):
 
     def tearDown(self):
         # Reset applied-migrations state.
-        for db in connections:
+        for db in self.databases:
             recorder = MigrationRecorder(connections[db])
             recorder.migration_qs.filter(app='migrations').delete()
 
@@ -52,19 +50,23 @@ class MigrationTestBase(TransactionTestCase):
         return [c.null_ok for c in self.get_table_description(table, using=using) if c.name == column][0]
 
     def assertColumnNull(self, table, column, using='default'):
-        self.assertEqual(self._get_column_allows_null(table, column, using), True)
+        self.assertTrue(self._get_column_allows_null(table, column, using))
 
     def assertColumnNotNull(self, table, column, using='default'):
-        self.assertEqual(self._get_column_allows_null(table, column, using), False)
+        self.assertFalse(self._get_column_allows_null(table, column, using))
 
-    def assertIndexExists(self, table, columns, value=True, using='default'):
+    def assertIndexExists(self, table, columns, value=True, using='default', index_type=None):
         with connections[using].cursor() as cursor:
             self.assertEqual(
                 value,
                 any(
                     c["index"]
                     for c in connections[using].introspection.get_constraints(cursor, table).values()
-                    if c['columns'] == list(columns)
+                    if (
+                        c['columns'] == list(columns) and
+                        (index_type is None or c['type'] == index_type) and
+                        not c['unique']
+                    )
                 ),
             )
 
@@ -81,6 +83,14 @@ class MigrationTestBase(TransactionTestCase):
 
     def assertConstraintNotExists(self, table, name):
         return self.assertConstraintExists(table, name, False)
+
+    def assertUniqueConstraintExists(self, table, columns, value=True, using='default'):
+        with connections[using].cursor() as cursor:
+            constraints = connections[using].introspection.get_constraints(cursor, table).values()
+            self.assertEqual(
+                value,
+                any(c['unique'] for c in constraints if c['columns'] == list(columns)),
+            )
 
     def assertFKExists(self, table, columns, to, value=True, using='default'):
         with connections[using].cursor() as cursor:
@@ -238,7 +248,7 @@ class OperationTestBase(MigrationTestBase):
                 [
                     ('id', models.AutoField(primary_key=True)),
                     ('pony', models.ForeignKey('Pony', models.CASCADE)),
-                    ('friend', models.ForeignKey('self', models.CASCADE))
+                    ('friend', models.ForeignKey('self', models.CASCADE, null=True))
                 ],
             ))
         if mti_model:
@@ -266,6 +276,7 @@ class OperationTestBase(MigrationTestBase):
                 bases=['%s.Pony' % app_label],
             ))
         if manager_model:
+            from .models import FoodManager, FoodQuerySet
             operations.append(migrations.CreateModel(
                 'Food',
                 fields=[

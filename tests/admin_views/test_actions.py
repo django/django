@@ -135,9 +135,8 @@ class AdminActionsTest(TestCase):
             'index': '0',
         }
         response = self.client.post(reverse('admin:admin_views_unchangeableobject_changelist'), action_data)
-        # No 500 caused by NoReverseMatch
-        self.assertEqual(response.status_code, 200)
-        # The page doesn't display a link to the nonexistent change page.
+        # No 500 caused by NoReverseMatch. The page doesn't display a link to
+        # the nonexistent change page.
         self.assertContains(response, '<li>Unchangeable object: %s</li>' % obj, 1, html=True)
 
     def test_delete_queryset_hook(self):

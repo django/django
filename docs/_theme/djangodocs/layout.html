@@ -21,8 +21,8 @@
 {# as it causes problems in compiled CHM files.                  #}
 {% if builder != "htmlhelp" %}
 {{ super() }}
-<script type="text/javascript" src="{{ pathto('templatebuiltins.js', 1) }}"></script>
-<script type="text/javascript">
+<script src="{{ pathto('templatebuiltins.js', 1) }}"></script>
+<script>
 (function($) {
     if (!django_template_builtins) {
        // templatebuiltins.js missing, do nothing.

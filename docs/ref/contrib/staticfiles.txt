@@ -96,10 +96,6 @@ Some commonly used options are:
     multiple times to ignore more. When specifying a path, always use forward
     slashes, even on Windows.
 
-    .. versionchanged:: 2.2
-
-        Path matching was added.
-
 .. django-admin-option:: --dry-run, -n
 
     Do everything except modify the filesystem.
@@ -139,9 +135,7 @@ a more persistent way than providing the ``--ignore`` command option at each
 ``collectstatic`` invocation. Provide a custom :class:`~django.apps.AppConfig`
 class, override the ``ignore_patterns`` attribute of this class and replace
 ``'django.contrib.staticfiles'`` with that class path in your
-:setting:`INSTALLED_APPS` setting:
-
-.. code-block:: python
+:setting:`INSTALLED_APPS` setting::
 
     from django.contrib.staticfiles.apps import StaticFilesConfig
 
@@ -209,6 +203,7 @@ the directories which were searched:
 -------------
 
 .. django-admin:: runserver [addrport]
+    :noindex:
 
 Overrides the core :djadmin:`runserver` command if the ``staticfiles`` app
 is :setting:`installed<INSTALLED_APPS>` and adds automatic serving of static
@@ -367,39 +362,6 @@ hashing algorithm.
 .. _`url()`: https://www.w3.org/TR/CSS2/syndata.html#uri
 .. _`Cascading Style Sheets`: https://www.w3.org/Style/CSS/
 
-``CachedStaticFilesStorage``
-----------------------------
-
-.. class:: storage.CachedStaticFilesStorage
-
-.. deprecated:: 2.2
-
-    ``CachedStaticFilesStorage`` is deprecated as it has some intractable
-    problems, some of which are outlined below. Use
-    :class:`~storage.ManifestStaticFilesStorage` or a third-party cloud storage
-    instead.
-
-``CachedStaticFilesStorage`` is a similar class like the
-:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` class
-but uses Django's :doc:`caching framework</topics/cache>` for storing the
-hashed names of processed files instead of a static manifest file called
-``staticfiles.json``. This is mostly useful for situations in which you don't
-have access to the file system.
-
-If you want to override certain options of the cache backend the storage uses,
-simply specify a custom entry in the :setting:`CACHES` setting named
-``'staticfiles'``. It falls back to using the ``'default'`` cache backend.
-
-.. warning::
-
-    ``CachedStaticFilesStorage`` isn't recommended --  in almost all cases
-    ``ManifestStaticFilesStorage`` is a better choice. There are several
-    performance penalties when using ``CachedStaticFilesStorage`` since a cache
-    miss requires hashing files at runtime. Remote file storage require several
-    round-trips to hash a file on a cache miss, as several file accesses are
-    required to ensure that the file hash is correct in the case of nested file
-    paths.
-
 ``ManifestFilesMixin``
 ----------------------
 
@@ -474,9 +436,10 @@ This view function serves static files in development.
     :py:mod:`mimetypes` module from the Python standard library, which itself
     relies on the underlying platform's map files. If you find that this view
     doesn't return proper content types for certain files, it is most likely
-    that the platform's map files need to be updated. This can be achieved, for
-    example, by installing or updating the ``mailcap`` package on a Red Hat
-    distribution, or ``mime-support`` on a Debian distribution.
+    that the platform's map files are incorrect or need to be updated. This can
+    be achieved, for example, by installing or updating the ``mailcap`` package
+    on a Red Hat distribution, ``mime-support`` on a Debian distribution, or by
+    editing the keys under ``HKEY_CLASSES_ROOT`` in the Windows registry.
 
 This view is automatically enabled by :djadmin:`runserver` (with a
 :setting:`DEBUG` setting set to ``True``). To use the view with a different

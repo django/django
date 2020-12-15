@@ -11,7 +11,16 @@ class Index:
     # cross-database compatibility with Oracle)
     max_name_length = 30
 
-    def __init__(self, *, fields=(), name=None, db_tablespace=None, opclasses=(), condition=None):
+    def __init__(
+        self,
+        *,
+        fields=(),
+        name=None,
+        db_tablespace=None,
+        opclasses=(),
+        condition=None,
+        include=None,
+    ):
         if opclasses and not name:
             raise ValueError('An index must be named to use opclasses.')
         if not isinstance(condition, (type(None), Q)):
@@ -26,6 +35,10 @@ class Index:
             raise ValueError('Index.fields and Index.opclasses must have the same number of elements.')
         if not fields:
             raise ValueError('At least one field is required to define an index.')
+        if include and not name:
+            raise ValueError('A covering index must be named.')
+        if not isinstance(include, (type(None), list, tuple)):
+            raise ValueError('Index.include must be a list or tuple.')
         self.fields = list(fields)
         # A list of 2-tuple with the field name and ordering ('' or 'DESC').
         self.fields_orders = [
@@ -36,30 +49,30 @@ class Index:
         self.db_tablespace = db_tablespace
         self.opclasses = opclasses
         self.condition = condition
+        self.include = tuple(include) if include else ()
 
     def _get_condition_sql(self, model, schema_editor):
         if self.condition is None:
             return None
-        query = Query(model=model)
-        query.add_q(self.condition)
+        query = Query(model=model, alias_cols=False)
+        where = query.build_where(self.condition)
         compiler = query.get_compiler(connection=schema_editor.connection)
-        # Only the WhereNode is of interest for the partial index.
-        sql, params = query.where.as_sql(compiler=compiler, connection=schema_editor.connection)
-        # BaseDatabaseSchemaEditor does the same map on the params, but since
-        # it's handled outside of that class, the work is done here.
-        return sql % tuple(map(schema_editor.quote_value, params))
+        sql, params = where.as_sql(compiler, schema_editor.connection)
+        return sql % tuple(schema_editor.quote_value(p) for p in params)
 
-    def create_sql(self, model, schema_editor, using=''):
+    def create_sql(self, model, schema_editor, using='', **kwargs):
         fields = [model._meta.get_field(field_name) for field_name, _ in self.fields_orders]
+        include = [model._meta.get_field(field_name).column for field_name in self.include]
         col_suffixes = [order[1] for order in self.fields_orders]
         condition = self._get_condition_sql(model, schema_editor)
         return schema_editor._create_index_sql(
             model, fields, name=self.name, using=using, db_tablespace=self.db_tablespace,
             col_suffixes=col_suffixes, opclasses=self.opclasses, condition=condition,
+            include=include, **kwargs,
         )
 
-    def remove_sql(self, model, schema_editor):
-        return schema_editor._delete_index_sql(model, self.name)
+    def remove_sql(self, model, schema_editor, **kwargs):
+        return schema_editor._delete_index_sql(model, self.name, **kwargs)
 
     def deconstruct(self):
         path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
@@ -71,6 +84,8 @@ class Index:
             kwargs['opclasses'] = self.opclasses
         if self.condition:
             kwargs['condition'] = self.condition
+        if self.include:
+            kwargs['include'] = self.include
         return (path, (), kwargs)
 
     def clone(self):
@@ -108,10 +123,14 @@ class Index:
             self.name = 'D%s' % self.name[1:]
 
     def __repr__(self):
-        return "<%s: fields='%s'%s>" % (
+        return "<%s: fields='%s'%s%s%s>" % (
             self.__class__.__name__, ', '.join(self.fields),
-            '' if self.condition is None else ', condition=%s' % self.condition,
+            '' if self.condition is None else ' condition=%s' % self.condition,
+            '' if not self.include else " include='%s'" % ', '.join(self.include),
+            '' if not self.opclasses else " opclasses='%s'" % ', '.join(self.opclasses),
         )
 
     def __eq__(self, other):
-        return (self.__class__ == other.__class__) and (self.deconstruct() == other.deconstruct())
+        if self.__class__ == other.__class__:
+            return self.deconstruct() == other.deconstruct()
+        return NotImplemented

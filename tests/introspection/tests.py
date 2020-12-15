@@ -1,8 +1,7 @@
 from unittest import mock, skipUnless
 
-from django.db import connection
+from django.db import DatabaseError, connection
 from django.db.models import Index
-from django.db.utils import DatabaseError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
 from .models import (
@@ -81,15 +80,12 @@ class IntrospectionTests(TransactionTestCase):
         self.assertEqual(
             [connection.introspection.get_field_type(r[1], r) for r in desc],
             [
-                'AutoField' if connection.features.can_introspect_autofield else 'IntegerField',
-                'CharField',
-                'CharField',
-                'CharField',
-                'BigIntegerField' if connection.features.can_introspect_big_integer_field else 'IntegerField',
-                'BinaryField' if connection.features.can_introspect_binary_field else 'TextField',
-                'SmallIntegerField' if connection.features.can_introspect_small_integer_field else 'IntegerField',
-                'DurationField' if connection.features.can_introspect_duration_field else 'BigIntegerField',
-            ]
+                connection.features.introspected_field_types[field] for field in (
+                    'AutoField', 'CharField', 'CharField', 'CharField',
+                    'BigIntegerField', 'BinaryField', 'SmallIntegerField',
+                    'DurationField',
+                )
+            ],
         )
 
     def test_get_table_description_col_lengths(self):
@@ -109,21 +105,19 @@ class IntrospectionTests(TransactionTestCase):
             [False, nullable_by_backend, nullable_by_backend, nullable_by_backend, True, True, False, False]
         )
 
-    @skipUnlessDBFeature('can_introspect_autofield')
     def test_bigautofield(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, City._meta.db_table)
         self.assertIn(
-            connection.features.introspected_big_auto_field_type,
+            connection.features.introspected_field_types['BigAutoField'],
             [connection.introspection.get_field_type(r[1], r) for r in desc],
         )
 
-    @skipUnlessDBFeature('can_introspect_autofield')
     def test_smallautofield(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Country._meta.db_table)
         self.assertIn(
-            connection.features.introspected_small_auto_field_type,
+            connection.features.introspected_field_types['SmallAutoField'],
             [connection.introspection.get_field_type(r[1], r) for r in desc],
         )
 
@@ -212,17 +206,20 @@ class IntrospectionTests(TransactionTestCase):
             constraints = connection.introspection.get_constraints(cursor, Article._meta.db_table)
         indexes_verified = 0
         expected_columns = [
-            ['reporter_id'],
             ['headline', 'pub_date'],
-            ['response_to_id'],
             ['headline', 'response_to_id', 'pub_date', 'reporter_id'],
         ]
+        if connection.features.indexes_foreign_keys:
+            expected_columns += [
+                ['reporter_id'],
+                ['response_to_id'],
+            ]
         for val in constraints.values():
             if val['index'] and not (val['primary_key'] or val['unique']):
                 self.assertIn(val['columns'], expected_columns)
                 self.assertEqual(val['orders'], ['ASC'] * len(val['columns']))
                 indexes_verified += 1
-        self.assertEqual(indexes_verified, 4)
+        self.assertEqual(indexes_verified, len(expected_columns))
 
     def test_get_constraints(self):
         def assertDetails(details, cols, primary_key=False, unique=False, index=False, check=False, foreign_key=None):
@@ -268,8 +265,14 @@ class IntrospectionTests(TransactionTestCase):
             elif details['columns'] == ['up_votes'] and details['check']:
                 assertDetails(details, ['up_votes'], check=True)
                 field_constraints.add(name)
+            elif details['columns'] == ['voting_number'] and details['check']:
+                assertDetails(details, ['voting_number'], check=True)
+                field_constraints.add(name)
             elif details['columns'] == ['ref'] and details['unique']:
                 assertDetails(details, ['ref'], unique=True)
+                field_constraints.add(name)
+            elif details['columns'] == ['voting_number'] and details['unique']:
+                assertDetails(details, ['voting_number'], unique=True)
                 field_constraints.add(name)
             elif details['columns'] == ['article_id'] and details['index']:
                 assertDetails(details, ['article_id'], index=True)

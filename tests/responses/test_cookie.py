@@ -65,6 +65,11 @@ class SetCookieTests(SimpleTestCase):
         self.assertEqual(max_age_cookie['max-age'], 10)
         self.assertEqual(max_age_cookie['expires'], http_date(set_cookie_time + 10))
 
+    def test_max_age_int(self):
+        response = HttpResponse()
+        response.set_cookie('max_age', max_age=10.6)
+        self.assertEqual(response.cookies['max_age']['max-age'], 10)
+
     def test_httponly_cookie(self):
         response = HttpResponse()
         response.set_cookie('example', httponly=True)
@@ -73,7 +78,7 @@ class SetCookieTests(SimpleTestCase):
         self.assertIs(example_cookie['httponly'], True)
 
     def test_unicode_cookie(self):
-        """HttpResponse.set_cookie() works with unicode data."""
+        """HttpResponse.set_cookie() works with Unicode data."""
         response = HttpResponse()
         cookie_value = '清風'
         response.set_cookie('test', cookie_value)
@@ -81,13 +86,16 @@ class SetCookieTests(SimpleTestCase):
 
     def test_samesite(self):
         response = HttpResponse()
+        response.set_cookie('example', samesite='None')
+        self.assertEqual(response.cookies['example']['samesite'], 'None')
         response.set_cookie('example', samesite='Lax')
         self.assertEqual(response.cookies['example']['samesite'], 'Lax')
         response.set_cookie('example', samesite='strict')
         self.assertEqual(response.cookies['example']['samesite'], 'strict')
 
     def test_invalid_samesite(self):
-        with self.assertRaisesMessage(ValueError, 'samesite must be "lax" or "strict".'):
+        msg = 'samesite must be "lax", "none", or "strict".'
+        with self.assertRaisesMessage(ValueError, msg):
             HttpResponse().set_cookie('example', samesite='invalid')
 
 
@@ -102,6 +110,7 @@ class DeleteCookieTests(SimpleTestCase):
         self.assertEqual(cookie['path'], '/')
         self.assertEqual(cookie['secure'], '')
         self.assertEqual(cookie['domain'], '')
+        self.assertEqual(cookie['samesite'], '')
 
     def test_delete_cookie_secure_prefix(self):
         """
@@ -114,4 +123,15 @@ class DeleteCookieTests(SimpleTestCase):
             with self.subTest(prefix=prefix):
                 cookie_name = '__%s-c' % prefix
                 response.delete_cookie(cookie_name)
-                self.assertEqual(response.cookies[cookie_name]['secure'], True)
+                self.assertIs(response.cookies[cookie_name]['secure'], True)
+
+    def test_delete_cookie_secure_samesite_none(self):
+        # delete_cookie() sets the secure flag if samesite='none'.
+        response = HttpResponse()
+        response.delete_cookie('c', samesite='none')
+        self.assertIs(response.cookies['c']['secure'], True)
+
+    def test_delete_cookie_samesite(self):
+        response = HttpResponse()
+        response.delete_cookie('c', samesite='lax')
+        self.assertEqual(response.cookies['c']['samesite'], 'lax')

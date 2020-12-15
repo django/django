@@ -2,12 +2,12 @@
 SQL functions reference lists:
 https://www.gaia-gis.it/gaia-sins/spatialite-sql-4.3.0.html
 """
+from django.contrib.gis.db import models
 from django.contrib.gis.db.backends.base.operations import (
     BaseSpatialOperations,
 )
 from django.contrib.gis.db.backends.spatialite.adapter import SpatiaLiteAdapter
 from django.contrib.gis.db.backends.utils import SpatialOperator
-from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.geos.geometry import GEOSGeometry, GEOSGeometryBase
 from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
@@ -62,11 +62,12 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         'dwithin': SpatialOperator(func='PtDistWithin'),
     }
 
-    disallowed_aggregates = (aggregates.Extent3D,)
+    disallowed_aggregates = (models.Extent3D,)
 
     select = 'CAST (AsEWKB(%s) AS BLOB)'
 
     function_names = {
+        'AsWKB': 'St_AsBinary',
         'ForcePolygonCW': 'ST_ForceLHR',
         'Length': 'ST_Length',
         'LineLocatePoint': 'ST_Line_Locate_Point',
@@ -158,8 +159,8 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         "Return the version of GEOS used by SpatiaLite as a string."
         return self._get_spatialite_func('geos_version()')
 
-    def proj4_version(self):
-        "Return the version of the PROJ.4 library used by SpatiaLite."
+    def proj_version(self):
+        """Return the version of the PROJ library used by SpatiaLite."""
         return self._get_spatialite_func('proj4_version()')
 
     def lwgeom_version(self):
@@ -188,11 +189,15 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     # Routines for getting the OGC-compliant models.
     def geometry_columns(self):
-        from django.contrib.gis.db.backends.spatialite.models import SpatialiteGeometryColumns
+        from django.contrib.gis.db.backends.spatialite.models import (
+            SpatialiteGeometryColumns,
+        )
         return SpatialiteGeometryColumns
 
     def spatial_ref_sys(self):
-        from django.contrib.gis.db.backends.spatialite.models import SpatialiteSpatialRefSys
+        from django.contrib.gis.db.backends.spatialite.models import (
+            SpatialiteSpatialRefSys,
+        )
         return SpatialiteSpatialRefSys
 
     def get_geometry_converter(self, expression):

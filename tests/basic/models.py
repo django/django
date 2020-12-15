@@ -46,3 +46,7 @@ class SelfRef(models.Model):
 
 class PrimaryKeyWithDefault(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
+
+class ChildPrimaryKeyWithDefault(PrimaryKeyWithDefault):
+    pass

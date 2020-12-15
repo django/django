@@ -12,13 +12,13 @@ from urllib.parse import (
     urlencode as original_urlencode, uses_params,
 )
 
-from django.core.exceptions import TooManyFieldsSent
 from django.utils.datastructures import MultiValueDict
 from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import keep_lazy_text
+from django.utils.regex_helper import _lazy_re_compile
 
 # based on RFC 7232, Appendix C
-ETAG_MATCH = re.compile(r'''
+ETAG_MATCH = _lazy_re_compile(r'''
     \A(      # start of string and capture group
     (?:W/)?  # optional weak indicator
     "        # opening quote
@@ -34,14 +34,12 @@ __M = r'(?P<mon>\w{3})'
 __Y = r'(?P<year>\d{4})'
 __Y2 = r'(?P<year>\d{2})'
 __T = r'(?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})'
-RFC1123_DATE = re.compile(r'^\w{3}, %s %s %s %s GMT$' % (__D, __M, __Y, __T))
-RFC850_DATE = re.compile(r'^\w{6,9}, %s-%s-%s %s GMT$' % (__D, __M, __Y2, __T))
-ASCTIME_DATE = re.compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
+RFC1123_DATE = _lazy_re_compile(r'^\w{3}, %s %s %s %s GMT$' % (__D, __M, __Y, __T))
+RFC850_DATE = _lazy_re_compile(r'^\w{6,9}, %s-%s-%s %s GMT$' % (__D, __M, __Y2, __T))
+ASCTIME_DATE = _lazy_re_compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
 
 RFC3986_GENDELIMS = ":/?#[]@"
 RFC3986_SUBDELIMS = "!$&'()*+,;="
-
-FIELDS_MATCH = re.compile('[&;]')
 
 
 @keep_lazy_text
@@ -174,17 +172,21 @@ def parse_http_date(date):
     else:
         raise ValueError("%r is not in a valid HTTP date format" % date)
     try:
-        year = int(m.group('year'))
+        year = int(m['year'])
         if year < 100:
-            if year < 70:
-                year += 2000
+            current_year = datetime.datetime.utcnow().year
+            current_century = current_year - (current_year % 100)
+            if year - (current_year % 100) > 50:
+                # year that appears to be more than 50 years in the future are
+                # interpreted as representing the past.
+                year += current_century - 100
             else:
-                year += 1900
-        month = MONTHS.index(m.group('mon').lower()) + 1
-        day = int(m.group('day'))
-        hour = int(m.group('hour'))
-        min = int(m.group('min'))
-        sec = int(m.group('sec'))
+                year += current_century
+        month = MONTHS.index(m['mon'].lower()) + 1
+        day = int(m['day'])
+        hour = int(m['hour'])
+        min = int(m['min'])
+        sec = int(m['sec'])
         result = datetime.datetime(year, month, day, hour, min, sec)
         return calendar.timegm(result.utctimetuple())
     except Exception as exc:
@@ -261,7 +263,7 @@ def parse_etags(etag_str):
     else:
         # Parse each ETag individually, and return any that are valid.
         etag_matches = (ETAG_MATCH.match(etag.strip()) for etag in etag_str.split(','))
-        return [match.group(1) for match in etag_matches if match]
+        return [match[1] for match in etag_matches if match]
 
 
 def quote_etag(etag_str):
@@ -294,15 +296,18 @@ def is_same_domain(host, pattern):
     )
 
 
-def is_safe_url(url, allowed_hosts, require_https=False):
+def url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
     """
-    Return ``True`` if the url is a safe redirection (i.e. it doesn't point to
-    a different host and uses a safe scheme).
+    Return ``True`` if the url uses an allowed host and a safe scheme.
 
     Always return ``False`` on an empty url.
 
     If ``require_https`` is ``True``, only 'https' will be considered a valid
     scheme, as opposed to 'http' and 'https' with the default, ``False``.
+
+    Note: "True" doesn't entail that a URL is "safe". It may still be e.g.
+    quoted incorrectly. Ensure to also use django.utils.encoding.iri_to_uri()
+    on the path component of untrusted URLs.
     """
     if url is not None:
         url = url.strip()
@@ -314,8 +319,19 @@ def is_safe_url(url, allowed_hosts, require_https=False):
         allowed_hosts = {allowed_hosts}
     # Chrome treats \ completely as / in paths but it could be part of some
     # basic auth credentials so we need to check both URLs.
-    return (_is_safe_url(url, allowed_hosts, require_https=require_https) and
-            _is_safe_url(url.replace('\\', '/'), allowed_hosts, require_https=require_https))
+    return (
+        _url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=require_https) and
+        _url_has_allowed_host_and_scheme(url.replace('\\', '/'), allowed_hosts, require_https=require_https)
+    )
+
+
+def is_safe_url(url, allowed_hosts, require_https=False):
+    warnings.warn(
+        'django.utils.http.is_safe_url() is deprecated in favor of '
+        'url_has_allowed_host_and_scheme().',
+        RemovedInDjango40Warning, stacklevel=2,
+    )
+    return url_has_allowed_host_and_scheme(url, allowed_hosts, require_https)
 
 
 # Copied from urllib.parse.urlparse() but uses fixed urlsplit() function.
@@ -367,7 +383,7 @@ def _urlsplit(url, scheme='', allow_fragments=True):
     return _coerce_result(v)
 
 
-def _is_safe_url(url, allowed_hosts, require_https=False):
+def _url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
     # Chrome considers any URL with more than two slashes to be absolute, but
     # urlparse is not so flexible. Treat any url with three slashes as unsafe.
     if url.startswith('///'):
@@ -396,13 +412,20 @@ def _is_safe_url(url, allowed_hosts, require_https=False):
             (not scheme or scheme in valid_schemes))
 
 
-def limited_parse_qsl(qs, keep_blank_values=False, encoding='utf-8',
-                      errors='replace', fields_limit=None):
+# TODO: Remove when dropping support for PY37.
+def parse_qsl(
+    qs, keep_blank_values=False, strict_parsing=False, encoding='utf-8',
+    errors='replace', max_num_fields=None,
+):
     """
     Return a list of key/value tuples parsed from query string.
 
-    Copied from urlparse with an additional "fields_limit" argument.
-    Copyright (C) 2013 Python Software Foundation (see LICENSE.python).
+    Backport of urllib.parse.parse_qsl() from Python 3.8.
+    Copyright (C) 2020 Python Software Foundation (see LICENSE.python).
+
+    ----
+
+    Parse a query given as a string argument.
 
     Arguments:
 
@@ -414,37 +437,49 @@ def limited_parse_qsl(qs, keep_blank_values=False, encoding='utf-8',
         strings. The default false value indicates that blank values
         are to be ignored and treated as if they were  not included.
 
+    strict_parsing: flag indicating what to do with parsing errors. If false
+        (the default), errors are silently ignored. If true, errors raise a
+        ValueError exception.
+
     encoding and errors: specify how to decode percent-encoded sequences
         into Unicode characters, as accepted by the bytes.decode() method.
 
-    fields_limit: maximum number of fields parsed or an exception
-        is raised. None means no limit and is the default.
+    max_num_fields: int. If set, then throws a ValueError if there are more
+        than n fields read by parse_qsl().
+
+    Returns a list, as G-d intended.
     """
-    if fields_limit:
-        pairs = FIELDS_MATCH.split(qs, fields_limit)
-        if len(pairs) > fields_limit:
-            raise TooManyFieldsSent(
-                'The number of GET/POST parameters exceeded '
-                'settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.'
-            )
-    else:
-        pairs = FIELDS_MATCH.split(qs)
+    qs, _coerce_result = _coerce_args(qs)
+
+    # If max_num_fields is defined then check that the number of fields is less
+    # than max_num_fields. This prevents a memory exhaustion DOS attack via
+    # post bodies with many fields.
+    if max_num_fields is not None:
+        num_fields = 1 + qs.count('&') + qs.count(';')
+        if max_num_fields < num_fields:
+            raise ValueError('Max number of fields exceeded')
+
+    pairs = [s2 for s1 in qs.split('&') for s2 in s1.split(';')]
     r = []
     for name_value in pairs:
-        if not name_value:
+        if not name_value and not strict_parsing:
             continue
         nv = name_value.split('=', 1)
         if len(nv) != 2:
-            # Handle case of a control-name with no equal sign
+            if strict_parsing:
+                raise ValueError("bad query field: %r" % (name_value,))
+            # Handle case of a control-name with no equal sign.
             if keep_blank_values:
                 nv.append('')
             else:
                 continue
-        if nv[1] or keep_blank_values:
+        if len(nv[1]) or keep_blank_values:
             name = nv[0].replace('+', ' ')
             name = unquote(name, encoding=encoding, errors=errors)
+            name = _coerce_result(name)
             value = nv[1].replace('+', ' ')
             value = unquote(value, encoding=encoding, errors=errors)
+            value = _coerce_result(value)
             r.append((name, value))
     return r
 

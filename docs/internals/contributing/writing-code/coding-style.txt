@@ -52,6 +52,37 @@ Python style
   single quote. Don't waste time doing unrelated refactoring of existing code
   to conform to this style.
 
+* String variable interpolation may use
+  :py:ref:`%-formatting <old-string-formatting>`, :py:ref:`f-strings
+  <f-strings>`, or :py:meth:`str.format` as appropriate, with the goal of
+  maximizing code readability.
+
+  Final judgments of readability are left to the Merger's discretion. As a
+  guide, f-strings should use only plain variable and property access, with
+  prior local variable assignment for more complex cases::
+
+    # Allowed
+    f'hello {user}'
+    f'hello {user.name}'
+    f'hello {self.user.name}'
+
+    # Disallowed
+    f'hello {get_user()}'
+    f'you are {user.age * 365.25} days old'
+
+    # Allowed with local variable assignment
+    user = get_user()
+    f'hello {user}'
+    user_days_old = user.age * 365.25
+    f'you are {user_days_old} days old'
+
+  f-strings should not be used for any string that may require translation,
+  including error and logging messages. In general ``format()`` is more
+  verbose, so the other formatting methods are preferred.
+
+  Don't waste time doing unrelated refactoring of existing code to adjust the
+  formatting method.
+
 * Avoid use of "we" in comments, e.g. "Loop over" rather than "We loop over".
 
 * Use underscores, not camelCase, for variable, function and method names
@@ -70,6 +101,11 @@ Python style
   exception or warning message. Use :meth:`~unittest.TestCase.assertRaisesRegex`
   and :meth:`~unittest.TestCase.assertWarnsRegex` only if you need regular
   expression matching.
+
+  Use :meth:`assertIs(…, True/False)<unittest.TestCase.assertIs>` for testing
+  boolean values, rather than :meth:`~unittest.TestCase.assertTrue` and
+  :meth:`~unittest.TestCase.assertFalse`, so you can check the actual boolean
+  value, not the truthiness of the expression.
 
 * In test docstrings, state the expected behavior that each test demonstrates.
   Don't include preambles such as "Tests that" or "Ensures that".
@@ -96,7 +132,7 @@ Imports
 
   .. console::
 
-      $ python -m pip install isort
+      $ python -m pip install isort >= 5.1.0
       $ isort -rc .
 
   This runs ``isort`` recursively from your current directory, modifying any
@@ -278,8 +314,8 @@ at the top level (i.e. evaluated when the module is imported). The explanation
 for this is as follows:
 
 Manual configuration of settings (i.e. not relying on the
-``DJANGO_SETTINGS_MODULE`` environment variable) is allowed and possible as
-follows::
+:envvar:`DJANGO_SETTINGS_MODULE` environment variable) is allowed and possible
+as follows::
 
     from django.conf import settings
 

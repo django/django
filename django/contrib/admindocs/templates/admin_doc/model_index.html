@@ -5,17 +5,17 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% trans 'Documentation' %}</a>
-&rsaquo; {% trans 'Models' %}
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% translate 'Documentation' %}</a>
+&rsaquo; {% translate 'Models' %}
 </div>
 {% endblock %}
 
-{% block title %}{% trans 'Models' %}{% endblock %}
+{% block title %}{% translate 'Models' %}{% endblock %}
 
 {% block content %}
 
-<h1>{% trans 'Model documentation' %}</h1>
+<h1>{% translate 'Model documentation' %}</h1>
 
 {% regroup models by app_config as grouped_models %}
 
@@ -40,7 +40,7 @@
 {% block sidebar %}
 <div id="content-related" class="sidebar">
 <div class="module">
-<h2>{% trans 'Model groups' %}</h2>
+<h2>{% translate 'Model groups' %}</h2>
 <ul>
 {% regroup models by app_config as grouped_models %}
 {% for group in grouped_models %}

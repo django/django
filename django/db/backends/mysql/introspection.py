@@ -6,11 +6,15 @@ from MySQLdb.constants import FIELD_TYPE
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo as BaseFieldInfo, TableInfo,
 )
-from django.db.models.indexes import Index
+from django.db.models import Index
 from django.utils.datastructures import OrderedSet
 
-FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('extra', 'is_unsigned'))
-InfoLine = namedtuple('InfoLine', 'col_name data_type max_len num_prec num_scale extra column_default is_unsigned')
+FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('extra', 'is_unsigned', 'has_json_constraint'))
+InfoLine = namedtuple(
+    'InfoLine',
+    'col_name data_type max_len num_prec num_scale extra column_default '
+    'collation is_unsigned'
+)
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -24,6 +28,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         FIELD_TYPE.DOUBLE: 'FloatField',
         FIELD_TYPE.FLOAT: 'FloatField',
         FIELD_TYPE.INT24: 'IntegerField',
+        FIELD_TYPE.JSON: 'JSONField',
         FIELD_TYPE.LONG: 'IntegerField',
         FIELD_TYPE.LONGLONG: 'BigIntegerField',
         FIELD_TYPE.SHORT: 'SmallIntegerField',
@@ -47,10 +52,16 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             elif field_type == 'SmallIntegerField':
                 return 'SmallAutoField'
         if description.is_unsigned:
-            if field_type == 'IntegerField':
+            if field_type == 'BigIntegerField':
+                return 'PositiveBigIntegerField'
+            elif field_type == 'IntegerField':
                 return 'PositiveIntegerField'
             elif field_type == 'SmallIntegerField':
                 return 'PositiveSmallIntegerField'
+        # JSON data type is an alias for LONGTEXT in MariaDB, use check
+        # constraints clauses to introspect JSONField.
+        if description.has_json_constraint:
+            return 'JSONField'
         return field_type
 
     def get_table_list(self, cursor):
@@ -64,6 +75,28 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Return a description of the table with the DB-API cursor.description
         interface."
         """
+        json_constraints = {}
+        if self.connection.mysql_is_mariadb and self.connection.features.can_introspect_json_field:
+            # JSON data type is an alias for LONGTEXT in MariaDB, select
+            # JSON_VALID() constraints to introspect JSONField.
+            cursor.execute("""
+                SELECT c.constraint_name AS column_name
+                FROM information_schema.check_constraints AS c
+                WHERE
+                    c.table_name = %s AND
+                    LOWER(c.check_clause) = 'json_valid(`' + LOWER(c.constraint_name) + '`)' AND
+                    c.constraint_schema = DATABASE()
+            """, [table_name])
+            json_constraints = {row[0] for row in cursor.fetchall()}
+        # A default collation for the given table.
+        cursor.execute("""
+            SELECT  table_collation
+            FROM    information_schema.tables
+            WHERE   table_schema = DATABASE()
+            AND     table_name = %s
+        """, [table_name])
+        row = cursor.fetchone()
+        default_column_collation = row[0] if row else ''
         # information_schema database gives more accurate results for some figures:
         # - varchar length returned by cursor.description is an internal length,
         #   not visible length (#5725)
@@ -74,11 +107,16 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 column_name, data_type, character_maximum_length,
                 numeric_precision, numeric_scale, extra, column_default,
                 CASE
+                    WHEN collation_name = %s THEN NULL
+                    ELSE collation_name
+                END AS collation_name,
+                CASE
                     WHEN column_type LIKE '%% unsigned' THEN 1
                     ELSE 0
                 END AS is_unsigned
             FROM information_schema.columns
-            WHERE table_name = %s AND table_schema = DATABASE()""", [table_name])
+            WHERE table_name = %s AND table_schema = DATABASE()
+        """, [default_column_collation, table_name])
         field_info = {line[0]: InfoLine(*line) for line in cursor.fetchall()}
 
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
@@ -96,8 +134,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 to_int(info.num_scale) or line[5],
                 line[6],
                 info.column_default,
+                info.collation,
                 info.extra,
                 info.is_unsigned,
+                line[0] in json_constraints,
             ))
         return fields
 
@@ -207,18 +247,40 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 constraints[constraint]['unique'] = True
         # Add check constraints.
         if self.connection.features.can_introspect_check_constraints:
+            unnamed_constraints_index = 0
             columns = {info.name for info in self.get_table_description(cursor, table_name)}
-            type_query = """
-                SELECT c.constraint_name, c.check_clause
-                FROM information_schema.check_constraints AS c
-                WHERE
-                    c.constraint_schema = DATABASE() AND
-                    c.table_name = %s
-            """
+            if self.connection.mysql_is_mariadb:
+                type_query = """
+                    SELECT c.constraint_name, c.check_clause
+                    FROM information_schema.check_constraints AS c
+                    WHERE
+                        c.constraint_schema = DATABASE() AND
+                        c.table_name = %s
+                """
+            else:
+                type_query = """
+                    SELECT cc.constraint_name, cc.check_clause
+                    FROM
+                        information_schema.check_constraints AS cc,
+                        information_schema.table_constraints AS tc
+                    WHERE
+                        cc.constraint_schema = DATABASE() AND
+                        tc.table_schema = cc.constraint_schema AND
+                        cc.constraint_name = tc.constraint_name AND
+                        tc.constraint_type = 'CHECK' AND
+                        tc.table_name = %s
+                """
             cursor.execute(type_query, [table_name])
             for constraint, check_clause in cursor.fetchall():
+                constraint_columns = self._parse_constraint_columns(check_clause, columns)
+                # Ensure uniqueness of unnamed constraints. Unnamed unique
+                # and check columns constraints have the same name as
+                # a column.
+                if set(constraint_columns) == {constraint}:
+                    unnamed_constraints_index += 1
+                    constraint = '__unnamed_constraint_%s__' % unnamed_constraints_index
                 constraints[constraint] = {
-                    'columns': self._parse_constraint_columns(check_clause, columns),
+                    'columns': constraint_columns,
                     'primary_key': False,
                     'unique': False,
                     'index': False,

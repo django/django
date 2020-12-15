@@ -1,9 +1,9 @@
+from django.contrib.gis.db import models
 from django.contrib.gis.db.backends.base.adapter import WKTAdapter
 from django.contrib.gis.db.backends.base.operations import (
     BaseSpatialOperations,
 )
 from django.contrib.gis.db.backends.utils import SpatialOperator
-from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.geos.geometry import GEOSGeometryBase
 from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
@@ -29,7 +29,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def gis_operators(self):
-        return {
+        operators = {
             'bbcontains': SpatialOperator(func='MBRContains'),  # For consistency w/PostGIS API
             'bboverlaps': SpatialOperator(func='MBROverlaps'),  # ...
             'contained': SpatialOperator(func='MBRWithin'),  # ...
@@ -44,10 +44,13 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             'touches': SpatialOperator(func='ST_Touches'),
             'within': SpatialOperator(func='ST_Within'),
         }
+        if self.connection.mysql_is_mariadb:
+            operators['relate'] = SpatialOperator(func='ST_Relate')
+        return operators
 
     disallowed_aggregates = (
-        aggregates.Collect, aggregates.Extent, aggregates.Extent3D,
-        aggregates.MakeLine, aggregates.Union,
+        models.Collect, models.Extent, models.Extent3D, models.MakeLine,
+        models.Union,
     )
 
     @cached_property

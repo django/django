@@ -104,7 +104,7 @@ class ContentTypeManager(models.Manager):
     def get_for_id(self, id):
         """
         Lookup a ContentType by ID. Use the same shared cache as get_for_model
-        (though ContentTypes are obviously not created on-the-fly by get_by_id).
+        (though ContentTypes are not created on-the-fly by get_by_id).
         """
         try:
             ct = self._cache[self.db][id]
@@ -139,7 +139,7 @@ class ContentType(models.Model):
         verbose_name = _('content type')
         verbose_name_plural = _('content types')
         db_table = 'django_content_type'
-        unique_together = (('app_label', 'model'),)
+        unique_together = [['app_label', 'model']]
 
     def __str__(self):
         return self.app_labeled_name

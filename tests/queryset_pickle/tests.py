@@ -1,17 +1,17 @@
 import datetime
 import pickle
 
+import django
 from django.db import models
 from django.test import TestCase
-from django.utils.version import get_version
 
-from .models import Container, Event, Group, Happening, M2MModel
+from .models import Container, Event, Group, Happening, M2MModel, MyEvent
 
 
 class PickleabilityTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        Happening.objects.create()  # make sure the defaults are working (#20158)
+        cls.happening = Happening.objects.create()  # make sure the defaults are working (#20158)
 
     def assert_pickles(self, qs):
         self.assertEqual(list(pickle.loads(pickle.dumps(qs))), list(qs))
@@ -172,9 +172,118 @@ class PickleabilityTestCase(TestCase):
         m2ms = pickle.loads(pickle.dumps(m2ms))
         self.assertSequenceEqual(m2ms, [m2m])
 
+    def test_pickle_exists_queryset_still_usable(self):
+        group = Group.objects.create(name='group')
+        Event.objects.create(title='event', group=group)
+        groups = Group.objects.annotate(
+            has_event=models.Exists(
+                Event.objects.filter(group_id=models.OuterRef('id')),
+            ),
+        )
+        groups2 = pickle.loads(pickle.dumps(groups))
+        self.assertSequenceEqual(groups2.filter(has_event=True), [group])
+
+    def test_pickle_exists_queryset_not_evaluated(self):
+        group = Group.objects.create(name='group')
+        Event.objects.create(title='event', group=group)
+        groups = Group.objects.annotate(
+            has_event=models.Exists(
+                Event.objects.filter(group_id=models.OuterRef('id')),
+            ),
+        )
+        list(groups)  # evaluate QuerySet.
+        with self.assertNumQueries(0):
+            self.assert_pickles(groups)
+
+    def test_pickle_exists_kwargs_queryset_not_evaluated(self):
+        group = Group.objects.create(name='group')
+        Event.objects.create(title='event', group=group)
+        groups = Group.objects.annotate(
+            has_event=models.Exists(
+                queryset=Event.objects.filter(group_id=models.OuterRef('id')),
+            ),
+        )
+        list(groups)  # evaluate QuerySet.
+        with self.assertNumQueries(0):
+            self.assert_pickles(groups)
+
+    def test_pickle_subquery_queryset_not_evaluated(self):
+        group = Group.objects.create(name='group')
+        Event.objects.create(title='event', group=group)
+        groups = Group.objects.annotate(
+            event_title=models.Subquery(
+                Event.objects.filter(group_id=models.OuterRef('id')).values('title'),
+            ),
+        )
+        list(groups)  # evaluate QuerySet.
+        with self.assertNumQueries(0):
+            self.assert_pickles(groups)
+
+    def test_pickle_filteredrelation(self):
+        group = Group.objects.create(name='group')
+        event_1 = Event.objects.create(title='Big event', group=group)
+        event_2 = Event.objects.create(title='Small event', group=group)
+        Happening.objects.bulk_create([
+            Happening(event=event_1, number1=5),
+            Happening(event=event_2, number1=3),
+        ])
+        groups = Group.objects.annotate(
+            big_events=models.FilteredRelation(
+                'event',
+                condition=models.Q(event__title__startswith='Big'),
+            ),
+        ).annotate(sum_number=models.Sum('big_events__happening__number1'))
+        groups_query = pickle.loads(pickle.dumps(groups.query))
+        groups = Group.objects.all()
+        groups.query = groups_query
+        self.assertEqual(groups.get().sum_number, 5)
+
+    def test_pickle_filteredrelation_m2m(self):
+        group = Group.objects.create(name='group')
+        m2mmodel = M2MModel.objects.create(added=datetime.date(2020, 1, 1))
+        m2mmodel.groups.add(group)
+        groups = Group.objects.annotate(
+            first_m2mmodels=models.FilteredRelation(
+                'm2mmodel',
+                condition=models.Q(m2mmodel__added__year=2020),
+            ),
+        ).annotate(count_groups=models.Count('first_m2mmodels__groups'))
+        groups_query = pickle.loads(pickle.dumps(groups.query))
+        groups = Group.objects.all()
+        groups.query = groups_query
+        self.assertEqual(groups.get().count_groups, 1)
+
     def test_annotation_with_callable_default(self):
         # Happening.when has a callable default of datetime.datetime.now.
         qs = Happening.objects.annotate(latest_time=models.Max('when'))
+        self.assert_pickles(qs)
+
+    def test_annotation_values(self):
+        qs = Happening.objects.values('name').annotate(latest_time=models.Max('when'))
+        reloaded = Happening.objects.all()
+        reloaded.query = pickle.loads(pickle.dumps(qs.query))
+        self.assertEqual(
+            reloaded.get(),
+            {'name': 'test', 'latest_time': self.happening.when},
+        )
+
+    def test_annotation_values_list(self):
+        # values_list() is reloaded to values() when using a pickled query.
+        tests = [
+            Happening.objects.values_list('name'),
+            Happening.objects.values_list('name', flat=True),
+            Happening.objects.values_list('name', named=True),
+        ]
+        for qs in tests:
+            with self.subTest(qs._iterable_class.__name__):
+                reloaded = Happening.objects.all()
+                reloaded.query = pickle.loads(pickle.dumps(qs.query))
+                self.assertEqual(reloaded.get(), {'name': 'test'})
+
+    def test_filter_deferred(self):
+        qs = Happening.objects.all()
+        qs._defer_next_filter = True
+        qs = qs.filter(id=0)
         self.assert_pickles(qs)
 
     def test_missing_django_version_unpickling(self):
@@ -193,9 +302,18 @@ class PickleabilityTestCase(TestCase):
         unpickled with a different Django version than the current
         """
         qs = Group.previous_django_version_objects.all()
-        msg = "Pickled queryset instance's Django version 1.0 does not match the current version %s." % get_version()
+        msg = (
+            "Pickled queryset instance's Django version 1.0 does not match "
+            "the current version %s." % django.__version__
+        )
         with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(qs))
+
+    def test_order_by_model_with_abstract_inheritance_and_meta_ordering(self):
+        group = Group.objects.create(name='test')
+        event = MyEvent.objects.create(title='test event', group=group)
+        event.edition_set.create()
+        self.assert_pickles(event.edition_set.order_by('event'))
 
 
 class InLookupTests(TestCase):

@@ -4,13 +4,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2015
 # Marti Raudsepp <marti@juffo.org>, 2014
+# Ragnar Rebase <rrebase@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Janno Liivak <jannolii@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-12-28 02:30+0000\n"
+"Last-Translator: Ragnar Rebase <rrebase@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -29,21 +30,21 @@ msgid "redirect from"
 msgstr "ümbersuunatav asukoht"
 
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
 msgstr ""
-"See peaks olema absoluutne asukoht, v.a. domeeninimi. Näide: '/events/"
-"search/'."
+"See peaks olema absoluutne asukoht, v.a. domeeninimi. Näide: “/events/"
+"search/”."
 
 msgid "redirect to"
 msgstr "suuna aadressile"
 
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+"“http://”."
 msgstr ""
 "See võib olla kas absoluutne asukoht (nagu ülemine) või täielik URL algusega "
-"'http://'."
+"“http://”."
 
 msgid "redirect"
 msgstr "suunamine"

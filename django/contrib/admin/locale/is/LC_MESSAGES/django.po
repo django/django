@@ -4,15 +4,15 @@
 # Dagur Ammendrup <dagurp@gmail.com>, 2019
 # Hafsteinn Einarsson <haffi67@gmail.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Kári Tristan Helgason <inactive+einherji@transifex.com>, 2013
-# Thordur Sigurdsson <thordur@ja.is>, 2016-2019
+# 479d446b5da12875beba10cac54e9faf_a7ca1e7 <fdc140c3760f65c48c895bd61a47665c_99067>, 2013
+# Thordur Sigurdsson <thordur@ja.is>, 2016-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-06-05 12:48+0000\n"
-"Last-Translator: Dagur Ammendrup <dagurp@gmail.com>\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-07-14 22:38+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
 "MIME-Version: 1.0\n"
@@ -72,6 +72,12 @@ msgstr "Engin dagsetning"
 msgid "Has date"
 msgstr "Hefur dagsetningu"
 
+msgid "Empty"
+msgstr "Tómt"
+
+msgid "Not empty"
+msgstr "Ekki tómt"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -129,22 +135,22 @@ msgid "log entries"
 msgstr "kladdafærslur"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "„%(object)s“ bætt við."
+msgid "Added “%(object)s”."
+msgstr "Bætti við „%(object)s“."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "Breytti „%(object)s“ - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "Breytti „%(object)s“ — %(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
+msgid "Deleted “%(object)s.”"
 msgstr "Eyddi „%(object)s.“"
 
 msgid "LogEntry Object"
 msgstr "LogEntry hlutur"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
+msgid "Added {name} “{object}”."
 msgstr "Bætti við {name}  „{object}“."
 
 msgid "Added."
@@ -154,7 +160,7 @@ msgid "and"
 msgstr "og"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
 msgstr "Breytti {fields} fyrir {name} „{object}“."
 
 #, python-brace-format
@@ -162,7 +168,7 @@ msgid "Changed {fields}."
 msgstr "Breytti {fields}."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
 msgstr "Eyddi {name} „{object}“."
 
 msgid "No fields changed."
@@ -171,13 +177,12 @@ msgstr "Engum reitum breytt."
 msgid "None"
 msgstr "Ekkert"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
 "Haltu inni „Control“, eða „Command“ á Mac til þess að velja fleira en eitt."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} „{obj}“ var bætt við."
 
 msgid "You may edit it again below."
@@ -185,31 +190,29 @@ msgstr "Þú mátt breyta þessu aftur hér að neðan."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
-"below."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
-"{name} „{obj}“ hefur verið breytt. Þú getur bætt við öðru {name} að neðan."
+"{name} „{obj}“ hefur verið bætt við. Þú getur bætt við öðru {name} að neðan."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr "{name} „{obj}“ hefur verið breytt. Þú getur breytt því aftur að neðan."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
 "{name} „{obj}“ hefur verið bætt við. Þú getur breytt því aftur að neðan."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
 "{name} \"{obj}\" hefur verið breytt. Þú getur bætt við öðru {name} að neðan."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
+msgid "The {name} “{obj}” was changed successfully."
 msgstr "{name} „{obj}“ hefur verið breytt."
 
 msgid ""
@@ -223,11 +226,11 @@ msgid "No action selected."
 msgstr "Engin aðgerð valin."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
 msgstr "%(name)s „%(obj)s“ var eytt."
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr "%(name)s með ID \"%(key)s\" er ekki til. Var því mögulega eytt?"
 
 #, python-format
@@ -298,7 +301,7 @@ msgstr "%(app)s vefstjórn"
 msgid "Page not found"
 msgstr "Síða fannst ekki"
 
-msgid "We're sorry, but the requested page could not be found."
+msgid "We’re sorry, but the requested page could not be found."
 msgstr "Því miður fannst umbeðin síða ekki."
 
 msgid "Home"
@@ -314,7 +317,7 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Kerfisvilla <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 "Villa kom upp. Hún hefur verið tilkynnt til vefstjóra með tölvupósti og ætti "
@@ -336,8 +339,21 @@ msgstr "Velja alla %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Hreinsa val"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Módel í appinu %(name)s"
+
+msgid "Add"
+msgstr "Bæta við"
+
+msgid "View"
+msgstr "Skoða"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Þú hefur ekki réttindi til að skoða eða breyta neinu."
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
 "Fyrst, settu inn notendanafn og lykilorð. Svo geturðu breytt öðrum "
@@ -384,6 +400,9 @@ msgstr "Skoða á vef"
 msgid "Filter"
 msgstr "Sía"
 
+msgid "Clear all filters"
+msgstr "Hreinsa allar síur"
+
 msgid "Remove from sorting"
 msgstr "Taka úr röðun"
 
@@ -425,7 +444,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Hlutir"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Já ég er viss."
 
 msgid "No, take me back"
@@ -459,9 +478,6 @@ msgstr ""
 "Ertu viss um að þú viljir eyða völdum %(objects_name)s? Öllum eftirtöldum "
 "hlutum og skyldum hlutum verður eytt:"
 
-msgid "View"
-msgstr "Skoða"
-
 msgid "Delete?"
 msgstr "Eyða?"
 
@@ -471,16 +487,6 @@ msgstr " Eftir %(filter_title)s "
 
 msgid "Summary"
 msgstr "Samantekt"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Módel í appinu %(name)s"
-
-msgid "Add"
-msgstr "Bæta við"
-
-msgid "You don't have permission to view or edit anything."
-msgstr "Þú hefur ekki réttindi til að skoða eða breyta neinu."
 
 msgid "Recent actions"
 msgstr "Nýlegar aðgerðir"
@@ -495,7 +501,7 @@ msgid "Unknown content"
 msgstr "Óþekkt innihald"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
@@ -513,6 +519,9 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "Gleymt notandanafn eða lykilorð?"
 
+msgid "Toggle navigation"
+msgstr ""
+
 msgid "Date/time"
 msgstr "Dagsetning/tími"
 
@@ -523,7 +532,7 @@ msgid "Action"
 msgstr "Aðgerð"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
 "Þessi hlutur hefur enga breytingasögu. Hann var líklega ekki búinn til á "
@@ -591,7 +600,7 @@ msgid "Your password was changed."
 msgstr "Lykilorði þínu var breytt"
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
 "Vinsamlegast skrifaðu gamla lykilorðið þitt til öryggis. Sláðu svo nýja "
@@ -631,7 +640,7 @@ msgstr ""
 "nú þegar verið notuð. Vinsamlegast biddu um nýja endurstillingu."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
 "Við höfum sent þér tölvupóst með leiðbeiningum til að endurstilla lykilorðið "
@@ -639,7 +648,7 @@ msgstr ""
 "leiðbeiningarnar fljótlega. "
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
 "Ef þú færð ekki tölvupóstinn, gakktu úr skugga um að netfangið sem þú slóst "
@@ -657,7 +666,7 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Vinsamlegast farðu á eftirfarandi síðu og veldu nýtt lykilorð:"
 
-msgid "Your username, in case you've forgotten:"
+msgid "Your username, in case you’ve forgotten:"
 msgstr "Notandanafnið þitt ef þú skyldir hafa gleymt því:"
 
 msgid "Thanks for using our site!"
@@ -668,7 +677,7 @@ msgid "The %(site_name)s team"
 msgstr "%(site_name)s hópurinn"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
 "Hefurðu gleymt lykilorðinu þínu? Sláðu inn netfangið þitt hér að neðan og "

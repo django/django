@@ -22,10 +22,6 @@ form .form-row p {
     padding-left: 0;
 }
 
-.hidden {
-    display: none;
-}
-
 /* FORM LABELS */
 
 label {
@@ -430,6 +426,7 @@ body.popup .submit-row {
 
 .inline-related.tabular fieldset.module table {
     width: 100%;
+    overflow-x: scroll;
 }
 
 .last-related fieldset {
@@ -501,18 +498,12 @@ body.popup .submit-row {
 
 /* RELATED FIELD ADD ONE / LOOKUP */
 
-.add-another, .related-lookup {
+.related-lookup {
     margin-left: 5px;
     display: inline-block;
     vertical-align: middle;
     background-repeat: no-repeat;
     background-size: 14px;
-}
-
-.add-another {
-    width: 16px;
-    height: 16px;
-    background-image: url(../img/icon-addlink.svg);
 }
 
 .related-lookup {

@@ -1029,3 +1029,108 @@ Versions affected
 * Django 2.2 :commit:`(patch) <cf694e6852b0da7799f8b53f1fb2f7d20cf17534>`
 * Django 2.1 :commit:`(patch) <5d50a2e5fa36ad23ab532fc54cf4073de84b3306>`
 * Django 1.11 :commit:`(patch) <869b34e9b3be3a4cfcb3a145f218ffd3f5e3fd79>`
+
+December 2, 2019 - :cve:`2019-19118`
+------------------------------------
+
+Privilege escalation in the Django admin. `Full description
+<https://www.djangoproject.com/weblog/2019/dec/02/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.0 :commit:`(patch) <092cd66cf3c3e175acce698d6ca2012068d878fa>`
+* Django 2.2 :commit:`(patch) <36f580a17f0b3cb087deadf3b65eea024f479c21>`
+* Django 2.1 :commit:`(patch) <103ebe2b5ff1b2614b85a52c239f471904d26244>`
+
+December 18, 2019 - :cve:`2019-19844`
+-------------------------------------
+
+Potential account hijack via password reset form. `Full description
+<https://www.djangoproject.com/weblog/2019/dec/18/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.0 :commit:`(patch) <302a4ff1e8b1c798aab97673909c7a3dfda42c26>`
+* Django 2.2 :commit:`(patch) <4d334bea06cac63dc1272abcec545b85136cca0e>`
+* Django 1.11 :commit:`(patch) <f4cff43bf921fcea6a29b726eb66767f67753fa2>`
+
+February 3, 2020 - :cve:`2020-7471`
+-----------------------------------
+
+Potential SQL injection via ``StringAgg(delimiter)``. `Full description
+<https://www.djangoproject.com/weblog/2020/feb/03/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.0 :commit:`(patch) <505826b469b16ab36693360da9e11fd13213421b>`
+* Django 2.2 :commit:`(patch) <c67a368c16e4680b324b4f385398d638db4d8147>`
+* Django 1.11 :commit:`(patch) <001b0634cd309e372edb6d7d95d083d02b8e37bd>`
+
+March 4, 2020 - :cve:`2020-9402`
+--------------------------------
+
+Potential SQL injection via ``tolerance`` parameter in GIS functions and
+aggregates on Oracle. `Full description
+<https://www.djangoproject.com/weblog/2020/mar/04/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.0 :commit:`(patch) <26a5cf834526e291db00385dd33d319b8271fc4c>`
+* Django 2.2 :commit:`(patch) <fe886a3b58a93cfbe8864b485f93cb6d426cd1f2>`
+* Django 1.11 :commit:`(patch) <02d97f3c9a88adc890047996e5606180bd1c6166>`
+
+June 3, 2020 - :cve:`2020-13254`
+--------------------------------
+
+Potential data leakage via malformed memcached keys. `Full description
+<https://www.djangoproject.com/weblog/2020/jun/03/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.0 :commit:`(patch) <84b2da5552e100ae3294f564f6c862fef8d0e693>`
+* Django 2.2 :commit:`(patch) <07e59caa02831c4569bbebb9eb773bdd9cb4b206>`
+
+June 3, 2020 - :cve:`2020-13596`
+--------------------------------
+
+Possible XSS via admin ``ForeignKeyRawIdWidget``. `Full description
+<https://www.djangoproject.com/weblog/2020/jun/03/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.0 :commit:`(patch) <1f2dd37f6fcefdd10ed44cb233b2e62b520afb38>`
+* Django 2.2 :commit:`(patch) <6d61860b22875f358fac83d903dc629897934815>`
+
+September 1, 2020 - :cve:`2020-24583`
+-------------------------------------
+
+Incorrect permissions on intermediate-level directories on Python 3.7+. `Full
+description
+<https://www.djangoproject.com/weblog/2020/sep/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.1 :commit:`(patch) <934430d22aa5d90c2ba33495ff69a6a1d997d584>`
+* Django 3.0 :commit:`(patch) <08892bffd275c79ee1f8f67639eb170aaaf1181e>`
+* Django 2.2 :commit:`(patch) <375657a71c889c588f723469bd868bd1d40c369f>`
+
+September 1, 2020 - :cve:`2020-24584`
+-------------------------------------
+
+Permission escalation in intermediate-level directories of the file system
+cache on Python 3.7+. `Full description
+<https://www.djangoproject.com/weblog/2020/sep/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.1 :commit:`(patch) <2b099caa5923afa8cfb5f1e8c0d56b6e0e81915b>`
+* Django 3.0 :commit:`(patch) <cdb367c92a0ba72ddc0cbd13ff42b0e6df709554>`
+* Django 2.2 :commit:`(patch) <a3aebfdc8153dc230686b6d2454ccd32ed4c9e6f>`

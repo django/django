@@ -10,7 +10,7 @@ from email.mime.base import MIMEBase
 from email.mime.message import MIMEMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.utils import formatdate, getaddresses, make_msgid
+from email.utils import formataddr, formatdate, getaddresses, make_msgid
 from io import BytesIO, StringIO
 from pathlib import Path
 
@@ -96,16 +96,24 @@ def sanitize_address(addr, encoding):
         nm, address = addr
         localpart, domain = address.rsplit('@', 1)
 
-    nm = Header(nm, encoding).encode()
+    address_parts = nm + localpart + domain
+    if '\n' in address_parts or '\r' in address_parts:
+        raise ValueError('Invalid address; address parts cannot contain newlines.')
+
     # Avoid UTF-8 encode, if it's possible.
+    try:
+        nm.encode('ascii')
+        nm = Header(nm).encode()
+    except UnicodeEncodeError:
+        nm = Header(nm, encoding).encode()
     try:
         localpart.encode('ascii')
     except UnicodeEncodeError:
         localpart = Header(localpart, encoding).encode()
     domain = punycode(domain)
 
-    parsed_address = Address(nm, username=localpart, domain=domain)
-    return str(parsed_address)
+    parsed_address = Address(username=localpart, domain=domain)
+    return formataddr((nm, parsed_address.addr_spec))
 
 
 class MIMEMixin:
@@ -157,8 +165,8 @@ class SafeMIMEText(MIMEMixin, MIMEText):
     def set_payload(self, payload, charset=None):
         if charset == 'utf-8' and not isinstance(charset, Charset.Charset):
             has_long_lines = any(
-                len(l.encode()) > RFC5322_EMAIL_LINE_LENGTH_LIMIT
-                for l in payload.splitlines()
+                len(line.encode()) > RFC5322_EMAIL_LINE_LENGTH_LIMIT
+                for line in payload.splitlines()
             )
             # Quoted-Printable encoding has the side effect of shortening long
             # lines, if any (#22561).

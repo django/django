@@ -1,3 +1,4 @@
+import _thread
 import copy
 import threading
 import time
@@ -5,17 +6,16 @@ import warnings
 from collections import deque
 from contextlib import contextmanager
 
-import _thread
 import pytz
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.db import DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS, DatabaseError
 from django.db.backends import utils
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.signals import connection_created
 from django.db.transaction import TransactionManagementError
-from django.db.utils import DatabaseError, DatabaseErrorWrapper
+from django.db.utils import DatabaseErrorWrapper
 from django.utils import timezone
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
@@ -117,17 +117,20 @@ class BaseDatabaseWrapper:
     @cached_property
     def timezone(self):
         """
-        Time zone for datetimes stored as naive values in the database.
+        Return a tzinfo of the database connection time zone.
 
-        Return a tzinfo object or None.
+        This is only used when time zone support is enabled. When a datetime is
+        read from the database, it is always returned in this time zone.
 
-        This is only needed when time zone support is enabled and the database
-        doesn't support time zones. (When the database supports time zones,
-        the adapter handles aware datetimes so Django doesn't need to.)
+        When the database backend supports time zones, it doesn't matter which
+        time zone Django uses, as long as aware datetimes are used everywhere.
+        Other users connecting to the database can choose their own time zone.
+
+        When the database backend doesn't support time zones, the time zone
+        Django uses may be constrained by the requirements of other users of
+        the database.
         """
         if not settings.USE_TZ:
-            return None
-        elif self.features.supports_timezones:
             return None
         elif self.settings_dict['TIME_ZONE'] is None:
             return timezone.utc
@@ -202,15 +205,11 @@ class BaseDatabaseWrapper:
         self.run_on_commit = []
 
     def check_settings(self):
-        if self.settings_dict['TIME_ZONE'] is not None:
-            if not settings.USE_TZ:
-                raise ImproperlyConfigured(
-                    "Connection '%s' cannot set TIME_ZONE because USE_TZ is "
-                    "False." % self.alias)
-            elif self.features.supports_timezones:
-                raise ImproperlyConfigured(
-                    "Connection '%s' cannot set TIME_ZONE because its engine "
-                    "handles time zones conversions natively." % self.alias)
+        if self.settings_dict['TIME_ZONE'] is not None and not settings.USE_TZ:
+            raise ImproperlyConfigured(
+                "Connection '%s' cannot set TIME_ZONE because USE_TZ is False."
+                % self.alias
+            )
 
     @async_unsafe
     def ensure_connection(self):
@@ -607,16 +606,21 @@ class BaseDatabaseWrapper:
             if must_close:
                 self.close()
 
-    @property
-    def _nodb_connection(self):
+    @contextmanager
+    def _nodb_cursor(self):
         """
-        Return an alternative connection to be used when there is no need to
-        access the main database, specifically for test db creation/deletion.
-        This also prevents the production database from being exposed to
-        potential child threads while (or after) the test database is destroyed.
-        Refs #10868, #17786, #16969.
+        Return a cursor from an alternative connection to be used when there is
+        no need to access the main database, specifically for test db
+        creation/deletion. This also prevents the production database from
+        being exposed to potential child threads while (or after) the test
+        database is destroyed. Refs #10868, #17786, #16969.
         """
-        return self.__class__({**self.settings_dict, 'NAME': None}, alias=NO_DB_ALIAS)
+        conn = self.__class__({**self.settings_dict, 'NAME': None}, alias=NO_DB_ALIAS)
+        try:
+            with conn.cursor() as cursor:
+                yield cursor
+        finally:
+            conn.close()
 
     def schema_editor(self, *args, **kwargs):
         """
@@ -628,6 +632,8 @@ class BaseDatabaseWrapper:
         return self.SchemaEditorClass(self, *args, **kwargs)
 
     def on_commit(self, func):
+        if not callable(func):
+            raise TypeError("on_commit()'s callback must be a callable.")
         if self.in_atomic_block:
             # Transaction in progress; save for execution on commit.
             self.run_on_commit.append((set(self.savepoint_ids), func))

@@ -1,16 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Edgars Voroboks <nullisnot0@inbox.lv>, 2017
+# NullIsNot0 <nullisnot0@inbox.lv>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Māris Nartišs <maris.gis@gmail.com>, 2016
+# NullIsNot0 <nullisnot0@inbox.lv>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-11-18 11:29+0000\n"
-"Last-Translator: Edgars Voroboks <nullisnot0@inbox.lv>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-11-07 07:29+0000\n"
+"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -155,13 +156,13 @@ msgid "Template: %(name)s"
 msgstr "Šablons: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Šablona: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Šablons: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Šablona \"%(name)s\" meklēšanas ceļš:"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Šablona <q>%(name)s</q> ceļš:"
 
 msgid "(does not exist)"
 msgstr "(neeksistē)"

@@ -44,4 +44,4 @@ class TestArchive(unittest.TestCase):
                 self.assertEqual(os.stat(filepath).st_mode & mask, 0o775)
                 # A file is readable even if permission data is missing.
                 filepath = os.path.join(tmpdir, 'no_permissions')
-                self.assertEqual(os.stat(filepath).st_mode & mask, 0o664 & ~umask)
+                self.assertEqual(os.stat(filepath).st_mode & mask, 0o666 & ~umask)

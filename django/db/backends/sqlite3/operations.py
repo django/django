@@ -6,13 +6,11 @@ from itertools import chain
 
 from django.conf import settings
 from django.core.exceptions import FieldError
-from django.db import utils
+from django.db import DatabaseError, NotSupportedError, models
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.models import aggregates, fields
 from django.db.models.expressions import Col
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
-from django.utils.duration import duration_microseconds
 from django.utils.functional import cached_property
 
 
@@ -40,25 +38,29 @@ class DatabaseOperations(BaseDatabaseOperations):
             return len(objs)
 
     def check_expression_support(self, expression):
-        bad_fields = (fields.DateField, fields.DateTimeField, fields.TimeField)
-        bad_aggregates = (aggregates.Sum, aggregates.Avg, aggregates.Variance, aggregates.StdDev)
+        bad_fields = (models.DateField, models.DateTimeField, models.TimeField)
+        bad_aggregates = (models.Sum, models.Avg, models.Variance, models.StdDev)
         if isinstance(expression, bad_aggregates):
             for expr in expression.get_source_expressions():
                 try:
                     output_field = expr.output_field
-                except FieldError:
+                except (AttributeError, FieldError):
                     # Not every subexpression has an output_field which is fine
                     # to ignore.
                     pass
                 else:
                     if isinstance(output_field, bad_fields):
-                        raise utils.NotSupportedError(
+                        raise NotSupportedError(
                             'You cannot use Sum, Avg, StdDev, and Variance '
                             'aggregations on date/time fields in sqlite3 '
                             'since date/time is saved as text.'
                         )
-        if isinstance(expression, aggregates.Aggregate) and len(expression.source_expressions) > 1:
-            raise utils.NotSupportedError(
+        if (
+            isinstance(expression, models.Aggregate) and
+            expression.distinct and
+            len(expression.source_expressions) > 1
+        ):
+            raise NotSupportedError(
                 "SQLite doesn't support DISTINCT on aggregate functions "
                 "accepting multiple arguments."
             )
@@ -71,21 +73,26 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         return "django_date_extract('%s', %s)" % (lookup_type.lower(), field_name)
 
-    def date_interval_sql(self, timedelta):
-        return str(duration_microseconds(timedelta))
-
     def format_for_duration_arithmetic(self, sql):
         """Do nothing since formatting is handled in the custom function."""
         return sql
 
-    def date_trunc_sql(self, lookup_type, field_name):
-        return "django_date_trunc('%s', %s)" % (lookup_type.lower(), field_name)
+    def date_trunc_sql(self, lookup_type, field_name, tzname=None):
+        return "django_date_trunc('%s', %s, %s, %s)" % (
+            lookup_type.lower(),
+            field_name,
+            *self._convert_tznames_to_sql(tzname),
+        )
 
-    def time_trunc_sql(self, lookup_type, field_name):
-        return "django_time_trunc('%s', %s)" % (lookup_type.lower(), field_name)
+    def time_trunc_sql(self, lookup_type, field_name, tzname=None):
+        return "django_time_trunc('%s', %s, %s, %s)" % (
+            lookup_type.lower(),
+            field_name,
+            *self._convert_tznames_to_sql(tzname),
+        )
 
     def _convert_tznames_to_sql(self, tzname):
-        if settings.USE_TZ:
+        if tzname and settings.USE_TZ:
             return "'%s'" % tzname, "'%s'" % self.connection.timezone_name
         return 'NULL', 'NULL'
 
@@ -193,18 +200,38 @@ class DatabaseOperations(BaseDatabaseOperations):
         # Django's test suite.
         return lru_cache(maxsize=512)(self.__references_graph)
 
-    def sql_flush(self, style, tables, sequences, allow_cascade=False):
+    def sql_flush(self, style, tables, *, reset_sequences=False, allow_cascade=False):
         if tables and allow_cascade:
             # Simulate TRUNCATE CASCADE by recursively collecting the tables
             # referencing the tables to be flushed.
             tables = set(chain.from_iterable(self._references_graph(table) for table in tables))
-        # Note: No requirement for reset of auto-incremented indices (cf. other
-        # sql_flush() implementations). Just return SQL at this point
-        return ['%s %s %s;' % (
+        sql = ['%s %s %s;' % (
             style.SQL_KEYWORD('DELETE'),
             style.SQL_KEYWORD('FROM'),
             style.SQL_FIELD(self.quote_name(table))
         ) for table in tables]
+        if reset_sequences:
+            sequences = [{'table': table} for table in tables]
+            sql.extend(self.sequence_reset_by_name_sql(style, sequences))
+        return sql
+
+    def sequence_reset_by_name_sql(self, style, sequences):
+        if not sequences:
+            return []
+        return [
+            '%s %s %s %s = 0 %s %s %s (%s);' % (
+                style.SQL_KEYWORD('UPDATE'),
+                style.SQL_TABLE(self.quote_name('sqlite_sequence')),
+                style.SQL_KEYWORD('SET'),
+                style.SQL_FIELD(self.quote_name('seq')),
+                style.SQL_KEYWORD('WHERE'),
+                style.SQL_FIELD(self.quote_name('name')),
+                style.SQL_KEYWORD('IN'),
+                ', '.join([
+                    "'%s'" % sequence_info['table'] for sequence_info in sequences
+                ]),
+            ),
+        ]
 
     def adapt_datetimefield_value(self, value):
         if value is None:
@@ -309,11 +336,13 @@ class DatabaseOperations(BaseDatabaseOperations):
         # function that's registered in connect().
         if connector == '^':
             return 'POWER(%s)' % ','.join(sub_expressions)
+        elif connector == '#':
+            return 'BITXOR(%s)' % ','.join(sub_expressions)
         return super().combine_expression(connector, sub_expressions)
 
     def combine_duration_expression(self, connector, sub_expressions):
         if connector not in ['+', '-']:
-            raise utils.DatabaseError('Invalid connector for timedelta: %s.' % connector)
+            raise DatabaseError('Invalid connector for timedelta: %s.' % connector)
         fn_params = ["'%s'" % connector] + sub_expressions
         if len(fn_params) > 3:
             raise ValueError('Too many params for timedelta operations.')
@@ -326,9 +355,10 @@ class DatabaseOperations(BaseDatabaseOperations):
     def subtract_temporals(self, internal_type, lhs, rhs):
         lhs_sql, lhs_params = lhs
         rhs_sql, rhs_params = rhs
+        params = (*lhs_params, *rhs_params)
         if internal_type == 'TimeField':
-            return "django_time_diff(%s, %s)" % (lhs_sql, rhs_sql), lhs_params + rhs_params
-        return "django_timestamp_diff(%s, %s)" % (lhs_sql, rhs_sql), lhs_params + rhs_params
+            return 'django_time_diff(%s, %s)' % (lhs_sql, rhs_sql), params
+        return 'django_timestamp_diff(%s, %s)' % (lhs_sql, rhs_sql), params
 
     def insert_statement(self, ignore_conflicts=False):
         return 'INSERT OR IGNORE INTO' if ignore_conflicts else super().insert_statement(ignore_conflicts)

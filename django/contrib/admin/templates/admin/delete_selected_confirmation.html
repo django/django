@@ -4,39 +4,39 @@
 {% block extrahead %}
     {{ block.super }}
     {{ media }}
-    <script type="text/javascript" src="{% static 'admin/js/cancel.js' %}"></script>
+    <script src="{% static 'admin/js/cancel.js' %}" async></script>
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation delete-selected-confirmation{% endblock %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
 &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
 &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
-&rsaquo; {% trans 'Delete multiple objects' %}
+&rsaquo; {% translate 'Delete multiple objects' %}
 </div>
 {% endblock %}
 
 {% block content %}
 {% if perms_lacking %}
-    <p>{% blocktrans %}Deleting the selected {{ objects_name }} would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktrans %}</p>
+    <p>{% blocktranslate %}Deleting the selected {{ objects_name }} would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktranslate %}</p>
     <ul>
     {% for obj in perms_lacking %}
         <li>{{ obj }}</li>
     {% endfor %}
     </ul>
 {% elif protected %}
-    <p>{% blocktrans %}Deleting the selected {{ objects_name }} would require deleting the following protected related objects:{% endblocktrans %}</p>
+    <p>{% blocktranslate %}Deleting the selected {{ objects_name }} would require deleting the following protected related objects:{% endblocktranslate %}</p>
     <ul>
     {% for obj in protected %}
         <li>{{ obj }}</li>
     {% endfor %}
     </ul>
 {% else %}
-    <p>{% blocktrans %}Are you sure you want to delete the selected {{ objects_name }}? All of the following objects and their related items will be deleted:{% endblocktrans %}</p>
+    <p>{% blocktranslate %}Are you sure you want to delete the selected {{ objects_name }}? All of the following objects and their related items will be deleted:{% endblocktranslate %}</p>
     {% include "admin/includes/object_delete_summary.html" %}
-    <h2>{% trans "Objects" %}</h2>
+    <h2>{% translate "Objects" %}</h2>
     {% for deletable_object in deletable_objects %}
         <ul>{{ deletable_object|unordered_list }}</ul>
     {% endfor %}
@@ -47,8 +47,8 @@
     {% endfor %}
     <input type="hidden" name="action" value="delete_selected">
     <input type="hidden" name="post" value="yes">
-    <input type="submit" value="{% trans 'Yes, I’m sure' %}">
-    <a href="#" class="button cancel-link">{% trans "No, take me back" %}</a>
+    <input type="submit" value="{% translate 'Yes, I’m sure' %}">
+    <a href="#" class="button cancel-link">{% translate "No, take me back" %}</a>
     </div>
     </form>
 {% endif %}

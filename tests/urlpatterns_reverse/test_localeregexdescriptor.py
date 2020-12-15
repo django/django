@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
@@ -52,3 +53,8 @@ class LocaleRegexDescriptorTests(SimpleTestCase):
 
     def test_access_locale_regex_descriptor(self):
         self.assertIsInstance(RegexPattern.regex, LocaleRegexDescriptor)
+
+
+@override_settings(LOCALE_PATHS=[Path(here) / 'translations' / 'locale'])
+class LocaleRegexDescriptorPathLibTests(LocaleRegexDescriptorTests):
+    pass

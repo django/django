@@ -1,3 +1,4 @@
+import asyncio
 import difflib
 import json
 import posixpath
@@ -7,14 +8,17 @@ import unittest
 import warnings
 from collections import Counter
 from contextlib import contextmanager
-from copy import copy
+from copy import copy, deepcopy
 from difflib import get_close_matches
 from functools import wraps
+from unittest.suite import _DebugResult
 from unittest.util import safe_repr
 from urllib.parse import (
     parse_qsl, unquote, urlencode, urljoin, urlparse, urlsplit, urlunparse,
 )
 from urllib.request import url2pathname
+
+from asgiref.sync import async_to_sync
 
 from django.apps import apps
 from django.conf import settings
@@ -30,15 +34,15 @@ from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
 from django.forms.fields import CharField
 from django.http import QueryDict
 from django.http.request import split_domain_port, validate_host
-from django.test.client import Client
+from django.test.client import AsyncClient, Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import setting_changed, template_rendered
 from django.test.utils import (
     CaptureQueriesContext, ContextList, compare_xml, modify_settings,
     override_settings,
 )
-from django.utils.decorators import classproperty
-from django.utils.deprecation import RemovedInDjango31Warning
+from django.utils.deprecation import RemovedInDjango41Warning
+from django.utils.functional import classproperty
 from django.views.static import serve
 
 __all__ = ('TestCase', 'TransactionTestCase',
@@ -144,34 +148,16 @@ class _DatabaseFailure:
         raise AssertionError(self.message)
 
 
-class _SimpleTestCaseDatabasesDescriptor:
-    """Descriptor for SimpleTestCase.allow_database_queries deprecation."""
-    def __get__(self, instance, cls=None):
-        try:
-            allow_database_queries = cls.allow_database_queries
-        except AttributeError:
-            pass
-        else:
-            msg = (
-                '`SimpleTestCase.allow_database_queries` is deprecated. '
-                'Restrict the databases available during the execution of '
-                '%s.%s with the `databases` attribute instead.'
-            ) % (cls.__module__, cls.__qualname__)
-            warnings.warn(msg, RemovedInDjango31Warning)
-            if allow_database_queries:
-                return {DEFAULT_DB_ALIAS}
-        return set()
-
-
 class SimpleTestCase(unittest.TestCase):
 
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
     client_class = Client
+    async_client_class = AsyncClient
     _overridden_settings = None
     _modified_settings = None
 
-    databases = _SimpleTestCaseDatabasesDescriptor()
+    databases = set()
     _disallowed_database_msg = (
         'Database %(operation)s to %(alias)r are not allowed in SimpleTestCase '
         'subclasses. Either subclass TestCase or TransactionTestCase to ensure '
@@ -256,23 +242,49 @@ class SimpleTestCase(unittest.TestCase):
         set up. This means that user-defined Test Cases aren't required to
         include a call to super().setUp().
         """
+        self._setup_and_call(result)
+
+    def debug(self):
+        """Perform the same as __call__(), without catching the exception."""
+        debug_result = _DebugResult()
+        self._setup_and_call(debug_result, debug=True)
+
+    def _setup_and_call(self, result, debug=False):
+        """
+        Perform the following in order: pre-setup, run test, post-teardown,
+        skipping pre/post hooks if test is set to be skipped.
+
+        If debug=True, reraise any errors in setup and use super().debug()
+        instead of __call__() to run the test.
+        """
         testMethod = getattr(self, self._testMethodName)
         skipped = (
             getattr(self.__class__, "__unittest_skip__", False) or
             getattr(testMethod, "__unittest_skip__", False)
         )
 
+        # Convert async test methods.
+        if asyncio.iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
+
         if not skipped:
             try:
                 self._pre_setup()
             except Exception:
+                if debug:
+                    raise
                 result.addError(self, sys.exc_info())
                 return
-        super().__call__(result)
+        if debug:
+            super().debug()
+        else:
+            super().__call__(result)
         if not skipped:
             try:
                 self._post_teardown()
             except Exception:
+                if debug:
+                    raise
                 result.addError(self, sys.exc_info())
                 return
 
@@ -283,6 +295,7 @@ class SimpleTestCase(unittest.TestCase):
         * Clear the mail test outbox.
         """
         self.client = self.client_class()
+        self.async_client = self.async_client_class()
         mail.outbox = []
 
     def _post_teardown(self):
@@ -332,7 +345,6 @@ class SimpleTestCase(unittest.TestCase):
             )
 
             url, status_code = response.redirect_chain[-1]
-            scheme, netloc, path, query, fragment = urlsplit(url)
 
             self.assertEqual(
                 response.status_code, target_status_code,
@@ -368,10 +380,15 @@ class SimpleTestCase(unittest.TestCase):
                         "Otherwise, use assertRedirects(..., fetch_redirect_response=False)."
                         % (url, domain)
                     )
-                redirect_response = response.client.get(path, QueryDict(query), secure=(scheme == 'https'))
-
                 # Get the redirection page, using the same client that was used
                 # to obtain the original response.
+                extra = response.client.extra or {}
+                redirect_response = response.client.get(
+                    path,
+                    QueryDict(query),
+                    secure=(scheme == 'https'),
+                    **extra,
+                )
                 self.assertEqual(
                     redirect_response.status_code, target_status_code,
                     msg_prefix + "Couldn't retrieve redirection page '%s': response code was %d (expected %d)"
@@ -870,26 +887,6 @@ class SimpleTestCase(unittest.TestCase):
                 self.fail(self._formatMessage(msg, standardMsg))
 
 
-class _TransactionTestCaseDatabasesDescriptor:
-    """Descriptor for TransactionTestCase.multi_db deprecation."""
-    msg = (
-        '`TransactionTestCase.multi_db` is deprecated. Databases available '
-        'during this test can be defined using %s.%s.databases.'
-    )
-
-    def __get__(self, instance, cls=None):
-        try:
-            multi_db = cls.multi_db
-        except AttributeError:
-            pass
-        else:
-            msg = self.msg % (cls.__module__, cls.__qualname__)
-            warnings.warn(msg, RemovedInDjango31Warning)
-            if multi_db:
-                return set(connections)
-        return {DEFAULT_DB_ALIAS}
-
-
 class TransactionTestCase(SimpleTestCase):
 
     # Subclasses can ask for resetting of auto increment sequence before each
@@ -902,7 +899,7 @@ class TransactionTestCase(SimpleTestCase):
     # Subclasses can define fixtures which will be automatically installed.
     fixtures = None
 
-    databases = _TransactionTestCaseDatabasesDescriptor()
+    databases = {DEFAULT_DB_ALIAS}
     _disallowed_database_msg = (
         'Database %(operation)s to %(alias)r are not allowed in this test. '
         'Add %(alias)r to %(test)s.databases to ensure proper test isolation '
@@ -1043,11 +1040,29 @@ class TransactionTestCase(SimpleTestCase):
                          allow_cascade=self.available_apps is not None,
                          inhibit_post_migrate=inhibit_post_migrate)
 
-    def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True, msg=None):
-        items = map(transform, qs)
+    def assertQuerysetEqual(self, qs, values, transform=None, ordered=True, msg=None):
+        values = list(values)
+        # RemovedInDjango41Warning.
+        if transform is None:
+            if (
+                values and isinstance(values[0], str) and
+                qs and not isinstance(qs[0], str)
+            ):
+                # Transform qs using repr() if the first element of values is a
+                # string and the first element of qs is not (which would be the
+                # case if qs is a flattened values_list).
+                warnings.warn(
+                    "In Django 4.1, repr() will not be called automatically "
+                    "on a queryset when compared to string values. Set an "
+                    "explicit 'transform' to silence this warning.",
+                    category=RemovedInDjango41Warning,
+                )
+                transform = repr
+        items = qs
+        if transform is not None:
+            items = map(transform, items)
         if not ordered:
             return self.assertEqual(Counter(items), Counter(values), msg=msg)
-        values = list(values)
         # For example qs.iterator() could be passed as qs, but it does not
         # have 'ordered' attribute.
         if len(values) > 1 and hasattr(qs, 'ordered') and not qs.ordered:
@@ -1075,12 +1090,57 @@ def connections_support_transactions(aliases=None):
     return all(conn.features.supports_transactions for conn in conns)
 
 
-class _TestCaseDatabasesDescriptor(_TransactionTestCaseDatabasesDescriptor):
-    """Descriptor for TestCase.multi_db deprecation."""
-    msg = (
-        '`TestCase.multi_db` is deprecated. Databases available during this '
-        'test can be defined using %s.%s.databases.'
-    )
+class TestData:
+    """
+    Descriptor to provide TestCase instance isolation for attributes assigned
+    during the setUpTestData() phase.
+
+    Allow safe alteration of objects assigned in setUpTestData() by test
+    methods by exposing deep copies instead of the original objects.
+
+    Objects are deep copied using a memo kept on the test case instance in
+    order to maintain their original relationships.
+    """
+    memo_attr = '_testdata_memo'
+
+    def __init__(self, name, data):
+        self.name = name
+        self.data = data
+
+    def get_memo(self, testcase):
+        try:
+            memo = getattr(testcase, self.memo_attr)
+        except AttributeError:
+            memo = {}
+            setattr(testcase, self.memo_attr, memo)
+        return memo
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self.data
+        memo = self.get_memo(instance)
+        try:
+            data = deepcopy(self.data, memo)
+        except TypeError:
+            # RemovedInDjango41Warning.
+            msg = (
+                "Assigning objects which don't support copy.deepcopy() during "
+                "setUpTestData() is deprecated. Either assign the %s "
+                "attribute during setUpClass() or setUp(), or add support for "
+                "deepcopy() to %s.%s.%s."
+            ) % (
+                self.name,
+                owner.__module__,
+                owner.__qualname__,
+                self.name,
+            )
+            warnings.warn(msg, category=RemovedInDjango41Warning, stacklevel=2)
+            data = self.data
+        setattr(instance, self.name, data)
+        return data
+
+    def __repr__(self):
+        return '<TestData: name=%r, data=%r>' % (self.name, self.data)
 
 
 class TestCase(TransactionTestCase):
@@ -1096,8 +1156,6 @@ class TestCase(TransactionTestCase):
     On database backends with no transaction support, TestCase behaves as
     TransactionTestCase.
     """
-    databases = _TestCaseDatabasesDescriptor()
-
     @classmethod
     def _enter_atomics(cls):
         """Open atomic blocks for multiple databases."""
@@ -1123,25 +1181,37 @@ class TestCase(TransactionTestCase):
         super().setUpClass()
         if not cls._databases_support_transactions():
             return
-        cls.cls_atomics = cls._enter_atomics()
-
-        if cls.fixtures:
-            for db_name in cls._databases_names(include_mirrors=False):
-                try:
-                    call_command('loaddata', *cls.fixtures, **{'verbosity': 0, 'database': db_name})
-                except Exception:
-                    cls._rollback_atomics(cls.cls_atomics)
-                    cls._remove_databases_failures()
-                    raise
+        # Disable the durability check to allow testing durable atomic blocks
+        # in a transaction for performance reasons.
+        transaction.Atomic._ensure_durability = False
         try:
-            cls.setUpTestData()
+            cls.cls_atomics = cls._enter_atomics()
+
+            if cls.fixtures:
+                for db_name in cls._databases_names(include_mirrors=False):
+                    try:
+                        call_command('loaddata', *cls.fixtures, **{'verbosity': 0, 'database': db_name})
+                    except Exception:
+                        cls._rollback_atomics(cls.cls_atomics)
+                        cls._remove_databases_failures()
+                        raise
+            pre_attrs = cls.__dict__.copy()
+            try:
+                cls.setUpTestData()
+            except Exception:
+                cls._rollback_atomics(cls.cls_atomics)
+                cls._remove_databases_failures()
+                raise
+            for name, value in cls.__dict__.items():
+                if value is not pre_attrs.get(name):
+                    setattr(cls, name, TestData(name, value))
         except Exception:
-            cls._rollback_atomics(cls.cls_atomics)
-            cls._remove_databases_failures()
+            transaction.Atomic._ensure_durability = True
             raise
 
     @classmethod
     def tearDownClass(cls):
+        transaction.Atomic._ensure_durability = True
         if cls._databases_support_transactions():
             cls._rollback_atomics(cls.cls_atomics)
             for conn in connections.all():
@@ -1183,6 +1253,21 @@ class TestCase(TransactionTestCase):
             connection.features.can_defer_constraint_checks and
             not connection.needs_rollback and connection.is_usable()
         )
+
+    @classmethod
+    @contextmanager
+    def captureOnCommitCallbacks(cls, *, using=DEFAULT_DB_ALIAS, execute=False):
+        """Context manager to capture transaction.on_commit() callbacks."""
+        callbacks = []
+        start_count = len(connections[using].run_on_commit)
+        try:
+            yield callbacks
+        finally:
+            run_on_commit = connections[using].run_on_commit[start_count:]
+            callbacks[:] = [func for sids, func in run_on_commit]
+            if execute:
+                for callback in callbacks:
+                    callback()
 
 
 class CheckCondition:

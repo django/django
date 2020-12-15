@@ -21,7 +21,7 @@ options`_.
 ``Index`` options
 =================
 
-.. class:: Index(fields=(), name=None, db_tablespace=None, opclasses=(), condition=None)
+.. class:: Index(fields=(), name=None, db_tablespace=None, opclasses=(), condition=None, include=None)
 
     Creates an index (B-Tree) in the database.
 
@@ -61,10 +61,6 @@ than 30 characters and shouldn't start with a number (0-9) or underscore (_).
     concrete model. For example ``Index(fields=['title'],
     name='%(app_label)s_%(class)s_title_index')``.
 
-.. versionchanged:: 3.0
-
-    Interpolation of  ``'%(app_label)s'`` and ``'%(class)s'`` was added.
-
 ``db_tablespace``
 -----------------
 
@@ -90,8 +86,6 @@ in the same tablespace as the table.
 
 .. attribute:: Index.opclasses
 
-.. versionadded:: 2.2
-
 The names of the `PostgreSQL operator classes
 <https://www.postgresql.org/docs/current/indexes-opclass.html>`_ to use for
 this index. If you require a custom operator class, you must provide one for
@@ -109,8 +103,6 @@ opclasses=['jsonb_path_ops'])`` creates a gin index on ``jsonfield`` using
 -------------
 
 .. attribute:: Index.condition
-
-.. versionadded:: 2.2
 
 If the table is very large and your queries mostly target a subset of rows,
 it may be useful to restrict an index to that subset. Specify a condition as a
@@ -145,3 +137,40 @@ indexes records with more than 400 pages.
 
     The ``condition`` argument is ignored with MySQL and MariaDB as neither
     supports conditional indexes.
+
+``include``
+-----------
+
+.. attribute:: Index.include
+
+.. versionadded:: 3.2
+
+A list or tuple of the names of the fields to be included in the covering index
+as non-key columns. This allows index-only scans to be used for queries that
+select only included fields (:attr:`~Index.include`) and filter only by indexed
+fields (:attr:`~Index.fields`).
+
+For example::
+
+    Index(name='covering_index', fields=['headline'], include=['pub_date'])
+
+will allow filtering on ``headline``, also selecting ``pub_date``, while
+fetching data only from the index.
+
+Using ``include`` will produce a smaller index than using a multiple column
+index but with the drawback that non-key columns can not be used for sorting or
+filtering.
+
+``include`` is ignored for databases besides PostgreSQL.
+
+:attr:`Index.name` is required when using ``include``.
+
+See the PostgreSQL documentation for more details about `covering indexes`_.
+
+.. admonition:: Restrictions on PostgreSQL
+
+    PostgreSQL 11+ only supports covering B-Tree indexes, and PostgreSQL 12+
+    also supports covering :class:`GiST indexes
+    <django.contrib.postgres.indexes.GistIndex>`.
+
+.. _covering indexes: https://www.postgresql.org/docs/current/indexes-index-only-scans.html

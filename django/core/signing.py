@@ -36,7 +36,6 @@ These functions make use of all of them.
 import base64
 import datetime
 import json
-import re
 import time
 import zlib
 
@@ -45,8 +44,9 @@ from django.utils import baseconv
 from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.encoding import force_bytes
 from django.utils.module_loading import import_string
+from django.utils.regex_helper import _lazy_re_compile
 
-_SEP_UNSAFE = re.compile(r'^[A-z0-9-_=]*$')
+_SEP_UNSAFE = _lazy_re_compile(r'^[A-z0-9-_=]*$')
 
 
 class BadSignature(Exception):
@@ -68,8 +68,8 @@ def b64_decode(s):
     return base64.urlsafe_b64decode(s + pad)
 
 
-def base64_hmac(salt, value, key):
-    return b64_encode(salted_hmac(salt, value, key).digest()).decode()
+def base64_hmac(salt, value, key, algorithm='sha1'):
+    return b64_encode(salted_hmac(salt, value, key, algorithm=algorithm).digest()).decode()
 
 
 def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
@@ -92,8 +92,9 @@ class JSONSerializer:
 
 def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False):
     """
-    Return URL-safe, hmac/SHA1 signed base64 compressed JSON string. If key is
-    None, use settings.SECRET_KEY instead.
+    Return URL-safe, hmac signed base64 compressed JSON string. If key is
+    None, use settings.SECRET_KEY instead. The hmac algorithm is the default
+    Signer algorithm.
 
     If compress is True (not the default), check if compressing using zlib can
     save some space. Prepend a '.' to signify compression. This is included
@@ -143,9 +144,10 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
 
 
 class Signer:
+    # RemovedInDjango40Warning.
+    legacy_algorithm = 'sha1'
 
-    def __init__(self, key=None, sep=':', salt=None):
-        # Use of native strings in all versions of Python
+    def __init__(self, key=None, sep=':', salt=None, algorithm=None):
         self.key = key or settings.SECRET_KEY
         self.sep = sep
         if _SEP_UNSAFE.match(self.sep):
@@ -154,9 +156,16 @@ class Signer:
                 'only A-z0-9-_=)' % sep,
             )
         self.salt = salt or '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
+        # RemovedInDjango40Warning: when the deprecation ends, replace with:
+        # self.algorithm = algorithm or 'sha256'
+        self.algorithm = algorithm or settings.DEFAULT_HASHING_ALGORITHM
 
     def signature(self, value):
-        return base64_hmac(self.salt + 'signer', value, self.key)
+        return base64_hmac(self.salt + 'signer', value, self.key, algorithm=self.algorithm)
+
+    def _legacy_signature(self, value):
+        # RemovedInDjango40Warning.
+        return base64_hmac(self.salt + 'signer', value, self.key, algorithm=self.legacy_algorithm)
 
     def sign(self, value):
         return '%s%s%s' % (value, self.sep, self.signature(value))
@@ -165,7 +174,12 @@ class Signer:
         if self.sep not in signed_value:
             raise BadSignature('No "%s" found in value' % self.sep)
         value, sig = signed_value.rsplit(self.sep, 1)
-        if constant_time_compare(sig, self.signature(value)):
+        if (
+            constant_time_compare(sig, self.signature(value)) or (
+                self.legacy_algorithm and
+                constant_time_compare(sig, self._legacy_signature(value))
+            )
+        ):
             return value
         raise BadSignature('Signature "%s" does not match' % sig)
 

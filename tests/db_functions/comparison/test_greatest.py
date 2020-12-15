@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
-from unittest import skipIf, skipUnless
+from unittest import skipUnless
 
 from django.db import connection
 from django.db.models.expressions import RawSQL
@@ -33,7 +33,6 @@ class GreatestTests(TestCase):
         articles = Article.objects.annotate(last_updated=Greatest('written', 'published'))
         self.assertIsNone(articles.first().last_updated)
 
-    @skipIf(connection.vendor == 'mysql', "This doesn't work on MySQL")
     def test_coalesce_workaround(self):
         past = datetime(1900, 1, 1)
         now = timezone.now()

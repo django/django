@@ -240,7 +240,7 @@ to go one step further and use
 :class:`~django.contrib.contenttypes.models.ContentType` to enable truly
 generic (sometimes called "polymorphic") relationships between models.
 
-A simple example is a tagging system, which might look like this::
+For example, it could be used for a tagging system like so::
 
     from django.contrib.contenttypes.fields import GenericForeignKey
     from django.contrib.contenttypes.models import ContentType
@@ -391,6 +391,36 @@ be used to retrieve their associated ``TaggedItems``::
     >>> b.tags.all()
     <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
 
+You can also use ``add()``, ``create()``, or ``set()`` to create
+relationships::
+
+    >>> t3 = TaggedItem(tag='Web development')
+    >>> b.tags.add(t3, bulk=False)
+    >>> b.tags.create(tag='Web framework')
+    <TaggedItem: Web framework>
+    >>> b.tags.all()
+    <QuerySet [<TaggedItem: django>, <TaggedItem: python>, <TaggedItem: Web development>, <TaggedItem: Web framework>]>
+    >>> b.tags.set([t1, t3])
+    >>> b.tags.all()
+    <QuerySet [<TaggedItem: django>, <TaggedItem: Web development>]>
+
+The ``remove()`` call will bulk delete the specified model objects::
+
+    >>> b.tags.remove(t3)
+    >>> b.tags.all()
+    <QuerySet [<TaggedItem: django>]>
+    >>> TaggedItem.objects.all()
+    <QuerySet [<TaggedItem: django>]>
+
+The ``clear()`` method can be used to bulk delete all related objects for an
+instance::
+
+    >>> b.tags.clear()
+    >>> b.tags.all()
+    <QuerySet []>
+    >>> TaggedItem.objects.all()
+    <QuerySet []>
+
 Defining :class:`~django.contrib.contenttypes.fields.GenericRelation` with
 ``related_query_name`` set allows querying from the related object::
 
@@ -403,8 +433,8 @@ from ``TaggedItem``::
     >>> TaggedItem.objects.filter(bookmark__url__contains='django')
     <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
 
-Of course, if you don't add the ``related_query_name``, you can do the
-same types of lookups manually::
+If you don't add the ``related_query_name``, you can do the same types of
+lookups manually::
 
     >>> bookmarks = Bookmark.objects.filter(url__contains='django')
     >>> bookmark_type = ContentType.objects.get_for_model(Bookmark)
@@ -438,7 +468,7 @@ it would be deleted at the same time.
 Unlike :class:`~django.db.models.ForeignKey`,
 :class:`~django.contrib.contenttypes.fields.GenericForeignKey` does not accept
 an :attr:`~django.db.models.ForeignKey.on_delete` argument to customize this
-behavior; if desired, you can avoid the cascade-deletion simply by not using
+behavior; if desired, you can avoid the cascade-deletion by not using
 :class:`~django.contrib.contenttypes.fields.GenericRelation`, and alternate
 behavior can be provided via the :data:`~django.db.models.signals.pre_delete`
 signal.
@@ -466,7 +496,7 @@ The :mod:`django.contrib.contenttypes.forms` module provides:
 
 .. class:: BaseGenericInlineFormSet
 
-.. function:: generic_inlineformset_factory(model, form=ModelForm, formset=BaseGenericInlineFormSet, ct_field="content_type", fk_field="object_id", fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, validate_max=False, for_concrete_model=True, min_num=None, validate_min=False)
+.. function:: generic_inlineformset_factory(model, form=ModelForm, formset=BaseGenericInlineFormSet, ct_field="content_type", fk_field="object_id", fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, validate_max=False, for_concrete_model=True, min_num=None, validate_min=False, absolute_max=None, can_delete_extra=True)
 
     Returns a ``GenericInlineFormSet`` using
     :func:`~django.forms.models.modelformset_factory`.
@@ -480,6 +510,10 @@ The :mod:`django.contrib.contenttypes.forms` module provides:
     The ``for_concrete_model`` argument corresponds to the
     :class:`~django.contrib.contenttypes.fields.GenericForeignKey.for_concrete_model`
     argument on ``GenericForeignKey``.
+
+    .. versionchanged:: 3.2
+
+        The ``absolute_max`` and ``can_delete_extra`` arguments were added.
 
 .. module:: django.contrib.contenttypes.admin
 

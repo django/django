@@ -1,5 +1,6 @@
 import asyncio
 import functools
+import os
 
 from django.core.exceptions import SynchronousOnlyOperation
 
@@ -12,14 +13,15 @@ def async_unsafe(message):
     def decorator(func):
         @functools.wraps(func)
         def inner(*args, **kwargs):
-            # Detect a running event loop in this thread.
-            try:
-                event_loop = asyncio.get_event_loop()
-            except RuntimeError:
-                pass
-            else:
-                if event_loop.is_running():
-                    raise SynchronousOnlyOperation(message)
+            if not os.environ.get('DJANGO_ALLOW_ASYNC_UNSAFE'):
+                # Detect a running event loop in this thread.
+                try:
+                    event_loop = asyncio.get_event_loop()
+                except RuntimeError:
+                    pass
+                else:
+                    if event_loop.is_running():
+                        raise SynchronousOnlyOperation(message)
             # Pass onwards.
             return func(*args, **kwargs)
         return inner

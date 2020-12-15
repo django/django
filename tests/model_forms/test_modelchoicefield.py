@@ -1,7 +1,7 @@
 import datetime
 
 from django import forms
-from django.core.validators import ValidationError
+from django.core.exceptions import ValidationError
 from django.forms.models import ModelChoiceIterator
 from django.forms.widgets import CheckboxSelectMultiple
 from django.template import Context, Template
@@ -54,6 +54,19 @@ class ModelChoiceFieldTests(TestCase):
         msg = "['Select a valid choice. That choice is not one of the available choices.']"
         with self.assertRaisesMessage(ValidationError, msg):
             f.clean(c4.id)
+
+    def test_clean_model_instance(self):
+        f = forms.ModelChoiceField(Category.objects.all())
+        self.assertEqual(f.clean(self.c1), self.c1)
+        # An instance of incorrect model.
+        msg = "['Select a valid choice. That choice is not one of the available choices.']"
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean(Book.objects.create())
+
+    def test_clean_to_field_name(self):
+        f = forms.ModelChoiceField(Category.objects.all(), to_field_name='slug')
+        self.assertEqual(f.clean(self.c1.slug), self.c1)
+        self.assertEqual(f.clean(self.c1), self.c1)
 
     def test_choices(self):
         f = forms.ModelChoiceField(Category.objects.filter(pk=self.c1.id), required=False)
@@ -126,6 +139,26 @@ class ModelChoiceFieldTests(TestCase):
         Category.objects.all().delete()
         self.assertIs(bool(f.choices), True)
 
+    def test_choices_radio_blank(self):
+        choices = [
+            (self.c1.pk, 'Entertainment'),
+            (self.c2.pk, 'A test'),
+            (self.c3.pk, 'Third'),
+        ]
+        categories = Category.objects.all()
+        for widget in [forms.RadioSelect, forms.RadioSelect()]:
+            for blank in [True, False]:
+                with self.subTest(widget=widget, blank=blank):
+                    f = forms.ModelChoiceField(
+                        categories,
+                        widget=widget,
+                        blank=blank,
+                    )
+                    self.assertEqual(
+                        list(f.choices),
+                        [('', '---------')] + choices if blank else choices,
+                    )
+
     def test_deepcopies_widget(self):
         class ModelChoiceForm(forms.Form):
             category = forms.ModelChoiceField(Category.objects.all())
@@ -190,6 +223,16 @@ class ModelChoiceFieldTests(TestCase):
         field = forms.ModelChoiceField(Author.objects.all(), disabled=True)
         self.assertIs(field.has_changed('x', 'y'), False)
 
+    def test_disabled_modelchoicefield_initial_model_instance(self):
+        class ModelChoiceForm(forms.Form):
+            categories = forms.ModelChoiceField(
+                Category.objects.all(),
+                disabled=True,
+                initial=self.c1,
+            )
+
+        self.assertTrue(ModelChoiceForm(data={'categories': self.c1.pk}).is_valid())
+
     def test_disabled_multiplemodelchoicefield(self):
         class ArticleForm(forms.ModelForm):
             categories = forms.ModelMultipleChoiceField(Category.objects.all(), required=False)
@@ -237,6 +280,32 @@ class ModelChoiceFieldTests(TestCase):
         self.assertIsInstance(field.choices, CustomModelChoiceIterator)
 
     def test_choice_iterator_passes_model_to_widget(self):
+        class CustomCheckboxSelectMultiple(CheckboxSelectMultiple):
+            def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+                option = super().create_option(name, value, label, selected, index, subindex, attrs)
+                # Modify the HTML based on the object being rendered.
+                c = value.instance
+                option['attrs']['data-slug'] = c.slug
+                return option
+
+        class CustomModelMultipleChoiceField(forms.ModelMultipleChoiceField):
+            widget = CustomCheckboxSelectMultiple
+
+        field = CustomModelMultipleChoiceField(Category.objects.all())
+        self.assertHTMLEqual(
+            field.widget.render('name', []), (
+                '<ul>'
+                '<li><label><input type="checkbox" name="name" value="%d" '
+                'data-slug="entertainment">Entertainment</label></li>'
+                '<li><label><input type="checkbox" name="name" value="%d" '
+                'data-slug="test">A test</label></li>'
+                '<li><label><input type="checkbox" name="name" value="%d" '
+                'data-slug="third-test">Third</label></li>'
+                '</ul>'
+            ) % (self.c1.pk, self.c2.pk, self.c3.pk),
+        )
+
+    def test_custom_choice_iterator_passes_model_to_widget(self):
         class CustomModelChoiceValue:
             def __init__(self, value, obj):
                 self.value = value
@@ -252,7 +321,7 @@ class ModelChoiceFieldTests(TestCase):
 
         class CustomCheckboxSelectMultiple(CheckboxSelectMultiple):
             def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-                option = super().create_option(name, value, label, selected, index, subindex=None, attrs=None)
+                option = super().create_option(name, value, label, selected, index, subindex, attrs)
                 # Modify the HTML based on the object being rendered.
                 c = value.obj
                 option['attrs']['data-slug'] = c.slug

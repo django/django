@@ -2,8 +2,8 @@ from functools import partial
 
 from django.db import models
 from django.db.models.fields.related import (
-    RECURSIVE_RELATIONSHIP_CONSTANT, ManyToManyDescriptor, ManyToManyField,
-    ManyToManyRel, RelatedField, create_many_to_many_intermediary_model,
+    RECURSIVE_RELATIONSHIP_CONSTANT, ManyToManyDescriptor, RelatedField,
+    create_many_to_many_intermediary_model,
 )
 
 
@@ -20,7 +20,7 @@ class CustomManyToManyField(RelatedField):
             to._meta
         except AttributeError:
             to = str(to)
-        kwargs['rel'] = ManyToManyRel(
+        kwargs['rel'] = models.ManyToManyRel(
             self, to,
             related_name=related_name,
             related_query_name=related_query_name,
@@ -50,13 +50,13 @@ class CustomManyToManyField(RelatedField):
         return 'ManyToManyField'
 
     # Copy those methods from ManyToManyField because they don't call super() internally
-    contribute_to_related_class = ManyToManyField.__dict__['contribute_to_related_class']
-    _get_m2m_attr = ManyToManyField.__dict__['_get_m2m_attr']
-    _get_m2m_reverse_attr = ManyToManyField.__dict__['_get_m2m_reverse_attr']
-    _get_m2m_db_table = ManyToManyField.__dict__['_get_m2m_db_table']
+    contribute_to_related_class = models.ManyToManyField.__dict__['contribute_to_related_class']
+    _get_m2m_attr = models.ManyToManyField.__dict__['_get_m2m_attr']
+    _get_m2m_reverse_attr = models.ManyToManyField.__dict__['_get_m2m_reverse_attr']
+    _get_m2m_db_table = models.ManyToManyField.__dict__['_get_m2m_db_table']
 
 
-class InheritedManyToManyField(ManyToManyField):
+class InheritedManyToManyField(models.ManyToManyField):
     pass
 
 

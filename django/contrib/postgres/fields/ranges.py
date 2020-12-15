@@ -5,13 +5,13 @@ from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range
 
 from django.contrib.postgres import forms, lookups
 from django.db import models
+from django.db.models.lookups import PostgresOperatorLookup
 
 from .utils import AttributeSetter
 
 __all__ = [
     'RangeField', 'IntegerRangeField', 'BigIntegerRangeField',
     'DecimalRangeField', 'DateTimeRangeField', 'DateRangeField',
-    'FloatRangeField',
     'RangeBoundary', 'RangeOperators',
 ]
 
@@ -60,6 +60,10 @@ class RangeField(models.Field):
     def model(self, model):
         self.__dict__['model'] = model
         self.base_field.model = model
+
+    @classmethod
+    def _choices_is_value(cls, value):
+        return isinstance(value, (list, tuple)) or super()._choices_is_value(value)
 
     def get_prep_value(self, value):
         if value is None:
@@ -135,22 +139,6 @@ class DecimalRangeField(RangeField):
         return 'numrange'
 
 
-class FloatRangeField(RangeField):
-    system_check_deprecated_details = {
-        'msg': (
-            'FloatRangeField is deprecated and will be removed in Django 3.1.'
-        ),
-        'hint': 'Use DecimalRangeField instead.',
-        'id': 'fields.W902',
-    }
-    base_field = models.FloatField
-    range_type = NumericRange
-    form_field = forms.FloatRangeField
-
-    def db_type(self, connection):
-        return 'numrange'
-
-
 class DateTimeRangeField(RangeField):
     base_field = models.DateTimeField
     range_type = DateTimeTZRange
@@ -174,24 +162,23 @@ RangeField.register_lookup(lookups.ContainedBy)
 RangeField.register_lookup(lookups.Overlap)
 
 
-class DateTimeRangeContains(lookups.PostgresSimpleLookup):
+class DateTimeRangeContains(PostgresOperatorLookup):
     """
     Lookup for Date/DateTimeRange containment to cast the rhs to the correct
     type.
     """
     lookup_name = 'contains'
-    operator = RangeOperators.CONTAINS
+    postgres_operator = RangeOperators.CONTAINS
 
     def process_rhs(self, compiler, connection):
         # Transform rhs value for db lookup.
         if isinstance(self.rhs, datetime.date):
-            output_field = models.DateTimeField() if isinstance(self.rhs, datetime.datetime) else models.DateField()
-            value = models.Value(self.rhs, output_field=output_field)
+            value = models.Value(self.rhs)
             self.rhs = value.resolve_expression(compiler.query)
         return super().process_rhs(compiler, connection)
 
-    def as_sql(self, compiler, connection):
-        sql, params = super().as_sql(compiler, connection)
+    def as_postgresql(self, compiler, connection):
+        sql, params = super().as_postgresql(compiler, connection)
         # Cast the rhs if needed.
         cast_sql = ''
         if (
@@ -209,26 +196,32 @@ DateRangeField.register_lookup(DateTimeRangeContains)
 DateTimeRangeField.register_lookup(DateTimeRangeContains)
 
 
-class RangeContainedBy(lookups.PostgresSimpleLookup):
+class RangeContainedBy(PostgresOperatorLookup):
     lookup_name = 'contained_by'
     type_mapping = {
+        'smallint': 'int4range',
         'integer': 'int4range',
         'bigint': 'int8range',
         'double precision': 'numrange',
+        'numeric': 'numrange',
         'date': 'daterange',
         'timestamp with time zone': 'tstzrange',
     }
-    operator = RangeOperators.CONTAINED_BY
+    postgres_operator = RangeOperators.CONTAINED_BY
 
     def process_rhs(self, compiler, connection):
         rhs, rhs_params = super().process_rhs(compiler, connection)
-        cast_type = self.type_mapping[self.lhs.output_field.db_type(connection)]
+        # Ignore precision for DecimalFields.
+        db_type = self.lhs.output_field.cast_db_type(connection).split('(')[0]
+        cast_type = self.type_mapping[db_type]
         return '%s::%s' % (rhs, cast_type), rhs_params
 
     def process_lhs(self, compiler, connection):
         lhs, lhs_params = super().process_lhs(compiler, connection)
         if isinstance(self.lhs.output_field, models.FloatField):
             lhs = '%s::numeric' % lhs
+        elif isinstance(self.lhs.output_field, models.SmallIntegerField):
+            lhs = '%s::integer' % lhs
         return lhs, lhs_params
 
     def get_prep_lookup(self):
@@ -238,38 +231,38 @@ class RangeContainedBy(lookups.PostgresSimpleLookup):
 models.DateField.register_lookup(RangeContainedBy)
 models.DateTimeField.register_lookup(RangeContainedBy)
 models.IntegerField.register_lookup(RangeContainedBy)
-models.BigIntegerField.register_lookup(RangeContainedBy)
 models.FloatField.register_lookup(RangeContainedBy)
+models.DecimalField.register_lookup(RangeContainedBy)
 
 
 @RangeField.register_lookup
-class FullyLessThan(lookups.PostgresSimpleLookup):
+class FullyLessThan(PostgresOperatorLookup):
     lookup_name = 'fully_lt'
-    operator = RangeOperators.FULLY_LT
+    postgres_operator = RangeOperators.FULLY_LT
 
 
 @RangeField.register_lookup
-class FullGreaterThan(lookups.PostgresSimpleLookup):
+class FullGreaterThan(PostgresOperatorLookup):
     lookup_name = 'fully_gt'
-    operator = RangeOperators.FULLY_GT
+    postgres_operator = RangeOperators.FULLY_GT
 
 
 @RangeField.register_lookup
-class NotLessThan(lookups.PostgresSimpleLookup):
+class NotLessThan(PostgresOperatorLookup):
     lookup_name = 'not_lt'
-    operator = RangeOperators.NOT_LT
+    postgres_operator = RangeOperators.NOT_LT
 
 
 @RangeField.register_lookup
-class NotGreaterThan(lookups.PostgresSimpleLookup):
+class NotGreaterThan(PostgresOperatorLookup):
     lookup_name = 'not_gt'
-    operator = RangeOperators.NOT_GT
+    postgres_operator = RangeOperators.NOT_GT
 
 
 @RangeField.register_lookup
-class AdjacentToLookup(lookups.PostgresSimpleLookup):
+class AdjacentToLookup(PostgresOperatorLookup):
     lookup_name = 'adjacent_to'
-    operator = RangeOperators.ADJACENT_TO
+    postgres_operator = RangeOperators.ADJACENT_TO
 
 
 @RangeField.register_lookup
@@ -296,4 +289,32 @@ class RangeEndsWith(models.Transform):
 class IsEmpty(models.Transform):
     lookup_name = 'isempty'
     function = 'isempty'
+    output_field = models.BooleanField()
+
+
+@RangeField.register_lookup
+class LowerInclusive(models.Transform):
+    lookup_name = 'lower_inc'
+    function = 'LOWER_INC'
+    output_field = models.BooleanField()
+
+
+@RangeField.register_lookup
+class LowerInfinite(models.Transform):
+    lookup_name = 'lower_inf'
+    function = 'LOWER_INF'
+    output_field = models.BooleanField()
+
+
+@RangeField.register_lookup
+class UpperInclusive(models.Transform):
+    lookup_name = 'upper_inc'
+    function = 'UPPER_INC'
+    output_field = models.BooleanField()
+
+
+@RangeField.register_lookup
+class UpperInfinite(models.Transform):
+    lookup_name = 'upper_inf'
+    function = 'UPPER_INF'
     output_field = models.BooleanField()

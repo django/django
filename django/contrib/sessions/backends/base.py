@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib.sessions.exceptions import SuspiciousSession
+from django.core import signing
 from django.core.exceptions import SuspiciousOperation
 from django.utils import timezone
 from django.utils.crypto import (
@@ -71,6 +72,10 @@ class SessionBase:
         del self._session[key]
         self.modified = True
 
+    @property
+    def key_salt(self):
+        return 'django.contrib.sessions.' + self.__class__.__qualname__
+
     def get(self, key, default=None):
         return self._session.get(key, default)
 
@@ -97,16 +102,45 @@ class SessionBase:
         del self[self.TEST_COOKIE_NAME]
 
     def _hash(self, value):
+        # RemovedInDjango40Warning: pre-Django 3.1 format will be invalid.
         key_salt = "django.contrib.sessions" + self.__class__.__name__
         return salted_hmac(key_salt, value).hexdigest()
 
     def encode(self, session_dict):
         "Return the given session dictionary serialized and encoded as a string."
-        serialized = self.serializer().dumps(session_dict)
-        hash = self._hash(serialized)
-        return base64.b64encode(hash.encode() + b":" + serialized).decode('ascii')
+        # RemovedInDjango40Warning: DEFAULT_HASHING_ALGORITHM will be removed.
+        if settings.DEFAULT_HASHING_ALGORITHM == 'sha1':
+            return self._legacy_encode(session_dict)
+        return signing.dumps(
+            session_dict, salt=self.key_salt, serializer=self.serializer,
+            compress=True,
+        )
 
     def decode(self, session_data):
+        try:
+            return signing.loads(session_data, salt=self.key_salt, serializer=self.serializer)
+        # RemovedInDjango40Warning: when the deprecation ends, handle here
+        # exceptions similar to what _legacy_decode() does now.
+        except signing.BadSignature:
+            try:
+                # Return an empty session if data is not in the pre-Django 3.1
+                # format.
+                return self._legacy_decode(session_data)
+            except Exception:
+                logger = logging.getLogger('django.security.SuspiciousSession')
+                logger.warning('Session data corrupted')
+                return {}
+        except Exception:
+            return self._legacy_decode(session_data)
+
+    def _legacy_encode(self, session_dict):
+        # RemovedInDjango40Warning.
+        serialized = self.serializer().dumps(session_dict)
+        hash = self._hash(serialized)
+        return base64.b64encode(hash.encode() + b':' + serialized).decode('ascii')
+
+    def _legacy_decode(self, session_data):
+        # RemovedInDjango40Warning: pre-Django 3.1 format will be invalid.
         encoded_data = base64.b64decode(session_data.encode('ascii'))
         try:
             # could produce ValueError if there is no ':'

@@ -1,8 +1,8 @@
-============================================
-Django 3.0 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 3.0 release notes
+========================
 
-*Expected December 2019*
+*December 2, 2019*
 
 Welcome to Django 3.0!
 
@@ -19,8 +19,8 @@ project.
 Python compatibility
 ====================
 
-Django 3.0 supports Python 3.6, 3.7, and 3.8. We **highly recommend** and only
-officially support the latest release of each series.
+Django 3.0 supports Python 3.6, 3.7, 3.8, and 3.9 (as of 3.0.11). We **highly
+recommend** and only officially support the latest release of each series.
 
 The Django 2.2.x series is the last to support Python 3.5.
 
@@ -54,6 +54,11 @@ This is in addition to our existing WSGI support. Django intends to support
 both for the foreseeable future. Async features will only be available to
 applications that run under ASGI, however.
 
+At this stage async support only applies to the outer ASGI application.
+Internally everything remains synchronous. Asynchronous middleware, views, etc.
+are not yet supported. You can, however, use ASGI middleware around Django's
+application, allowing you to combine Django with other ASGI frameworks.
+
 There is no need to switch your applications over unless you want to start
 experimenting with asynchronous code, but we have
 :doc:`documentation on deploying with ASGI </howto/deployment/asgi/index>` if
@@ -74,6 +79,25 @@ enable adding exclusion constraints on PostgreSQL. Constraints are added to
 models using the
 :attr:`Meta.constraints <django.db.models.Options.constraints>` option.
 
+Filter expressions
+------------------
+
+Expressions that output :class:`~django.db.models.BooleanField` may now be
+used directly in ``QuerySet`` filters, without having to first annotate and
+then filter against the annotation.
+
+Enumerations for model field choices
+------------------------------------
+
+Custom enumeration types ``TextChoices``, ``IntegerChoices``, and ``Choices``
+are now available as a way to define :attr:`.Field.choices`. ``TextChoices``
+and ``IntegerChoices`` types are provided for text and integer fields. The
+``Choices`` class allows defining a compatible enumeration for other concrete
+data types. These custom enumeration types support human-readable labels that
+can be translated and accessed via a property on the enumeration or its
+members. See :ref:`Enumeration types <field-choices-enum-types>` for more
+details and examples.
+
 Minor features
 --------------
 
@@ -89,17 +113,15 @@ Minor features
 
 * Select2 library is upgraded from version 4.0.3 to 4.0.7.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
+* jQuery is upgraded from version 3.3.1 to 3.4.1.
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new ``reset_url_token`` attribute in
-  :class:`~django.contrib.auth.views.PasswordResetConfirmView` allows specifying
-  a token parameter displayed as a component of password reset URLs.
+  :class:`~django.contrib.auth.views.PasswordResetConfirmView` allows
+  specifying a token parameter displayed as a component of password reset
+  URLs.
 
 * Added :class:`~django.contrib.auth.backends.BaseBackend` class to ease
   customization of authentication backends.
@@ -116,10 +138,14 @@ Minor features
   password and required fields, when a corresponding command line argument
   isn't provided in non-interactive mode.
 
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* :attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS` now supports
+  :class:`~django.db.models.ManyToManyField`\s.
 
-* ...
+* The new :meth:`.UserManager.with_perm` method returns users that have the
+  specified permission.
+
+* The default iteration count for the PBKDF2 password hasher is increased from
+  150,000 to 180,000.
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -138,11 +164,6 @@ Minor features
 * The :class:`~django.contrib.gis.geoip2.GeoIP2` class now accepts
   :class:`pathlib.Path` ``path``.
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -153,32 +174,16 @@ Minor features
 * The new :class:`~django.contrib.postgres.fields.RangeBoundary` expression
   represents the range boundaries.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
+* The new :class:`~django.contrib.postgres.operations.AddIndexConcurrently`
+  and :class:`~django.contrib.postgres.operations.RemoveIndexConcurrently`
+  classes allow creating and dropping indexes ``CONCURRENTLY`` on PostgreSQL.
 
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new
   :meth:`~django.contrib.sessions.backends.base.SessionBase.get_session_cookie_age()`
-  methods allows dynamically specifying the session cookie age.
-
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.staticfiles`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
+  method allows dynamically specifying the session cookie age.
 
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -192,29 +197,15 @@ Cache
 ~~~~~
 
 * :func:`~django.utils.cache.add_never_cache_headers` and
-  :func:`~django.views.decorators.cache.never_cache` now adds ``private``
-  directive to a ``Cache-Control`` header.
-
-CSRF
-~~~~
-
-* ...
-
-Email
-~~~~~
-
-* ...
+  :func:`~django.views.decorators.cache.never_cache` now add the ``private``
+  directive to ``Cache-Control`` headers.
 
 File Storage
 ~~~~~~~~~~~~
 
-* ...
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
-
+* The new :meth:`.Storage.get_alternative_name` method allows customizing the
+  algorithm for generating filenames if a file with the uploaded name already
+  exists.
 
 Forms
 ~~~~~
@@ -224,11 +215,6 @@ Forms
   :attr:`~django.forms.formsets.BaseFormSet.ordering_widget` attribute or
   overriding :attr:`~django.forms.formsets.BaseFormSet.get_ordering_widget()`.
 
-Generic Views
-~~~~~~~~~~~~~
-
-* ...
-
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -237,6 +223,16 @@ Internationalization
   settings to set the ``HttpOnly``, ``SameSite``, and ``Secure`` flags on
   language cookies. The default values of these settings preserve the previous
   behavior.
+
+* Added support and translations for the Uzbek language.
+
+Logging
+~~~~~~~
+
+* The new ``reporter_class`` parameter of
+  :class:`~django.utils.log.AdminEmailHandler` allows providing an
+  ``django.views.debug.ExceptionReporter`` subclass to customize the traceback
+  text sent to site :setting:`ADMINS` when :setting:`DEBUG` is ``False``.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -259,11 +255,6 @@ Management Commands
   options now support templates stored in XZ archives (``.tar.xz``, ``.txz``)
   and LZMA archives (``.tar.lzma``, ``.tlz``).
 
-Migrations
-~~~~~~~~~~
-
-* ...
-
 Models
 ~~~~~~
 
@@ -282,7 +273,7 @@ Models
 
 * ``connection.queries`` now shows ``COPY … TO`` statements on PostgreSQL.
 
-* :class:`~django.db.models.FilePathField` now accepts a callable ``path``.
+* :class:`~django.db.models.FilePathField` now accepts a callable for ``path``.
 
 * Allowed symmetrical intermediate table for self-referential
   :class:`~django.db.models.ManyToManyField`.
@@ -312,6 +303,19 @@ Models
 
 * :attr:`.FileField.upload_to` now supports :class:`pathlib.Path`.
 
+* :class:`~django.db.models.CheckConstraint` is now supported on MySQL 8.0.16+.
+
+* The new ``allows_group_by_selected_pks_on_model()`` method of
+  ``django.db.backends.base.BaseDatabaseFeatures`` allows optimization of
+  ``GROUP BY`` clauses to require only the selected models' primary keys. By
+  default, it's supported only for managed models on PostgreSQL.
+
+  To enable the ``GROUP BY`` primary key-only optimization for unmanaged
+  models, you have to subclass the PostgreSQL database engine, overriding the
+  features class ``allows_group_by_selected_pks_on_model()`` method as you
+  require. See :ref:`Subclassing the built-in database backends
+  <subclassing-database-backends>` for an example.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -319,22 +323,25 @@ Requests and Responses
   :class:`memoryview` content.
 
 * For use in, for example, Django templates, :attr:`.HttpRequest.headers` now
-  allows look ups using underscores (e.g. ``user_agent``) in place of hyphens.
+  allows lookups using underscores (e.g. ``user_agent``) in place of hyphens.
 
-Serialization
-~~~~~~~~~~~~~
+.. _whats-new-security-3.0:
 
-* ...
+Security
+~~~~~~~~
 
-Signals
-~~~~~~~
+* :setting:`X_FRAME_OPTIONS` now defaults to ``'DENY'``. In older versions, the
+  :setting:`X_FRAME_OPTIONS` setting defaults to ``'SAMEORIGIN'``. If your site
+  uses frames of itself, you will need to explicitly set ``X_FRAME_OPTIONS =
+  'SAMEORIGIN'`` for them to continue working.
 
-* ...
+* :setting:`SECURE_CONTENT_TYPE_NOSNIFF` now defaults to ``True``. With this
+  enabled, :class:`~django.middleware.security.SecurityMiddleware` sets the
+  :ref:`x-content-type-options` header on all responses that do not already
+  have it.
 
-Templates
-~~~~~~~~~
-
-* ...
+* :class:`~django.middleware.security.SecurityMiddleware` can now send the
+  :ref:`Referrer-Policy <referrer-policy>` header.
 
 Tests
 ~~~~~
@@ -364,20 +371,31 @@ Tests
 * Django test runner now supports a ``--pdb`` option to spawn a debugger at
   each error or failure.
 
-URLs
-~~~~
-
-* ...
-
-Validators
-~~~~~~~~~~
-
-* ...
-
 .. _backwards-incompatible-3.0:
 
 Backwards incompatible changes in 3.0
 =====================================
+
+``Model.save()`` when providing a default for the primary key
+-------------------------------------------------------------
+
+:meth:`.Model.save` no longer attempts to find a row when saving a new
+``Model`` instance and a default value for the primary key is provided, and
+always performs a single ``INSERT`` query. In older Django versions,
+``Model.save()`` performed either an ``INSERT`` or an ``UPDATE`` based on
+whether or not the row exists.
+
+This makes calling ``Model.save()`` while providing a default primary key value
+equivalent to passing :ref:`force_insert=True <ref-models-force-insert>` to
+model's ``save()``. Attempts to use a new ``Model`` instance to update an
+existing row will result in an ``IntegrityError``.
+
+In order to update an existing model for a specific primary key value, use the
+:meth:`~django.db.models.query.QuerySet.update_or_create` method or
+``QuerySet.filter(pk=…).update(…)`` instead. For example::
+
+    >>> MyModel.objects.update_or_create(pk=existing_pk, defaults={'name': 'new name'})
+    >>> MyModel.objects.filter(pk=existing_pk).update(name='new name')
 
 Database backend API
 --------------------
@@ -405,13 +423,19 @@ backends.
   :class:`~django.db.models.DateTimeField` in ``datetime_cast_date_sql()``,
   ``datetime_extract_sql()``, etc.
 
-* ``DatabaseOperations.return_insert_id()`` now requires an additional
-  ``field`` argument with the model field.
-
 * Entries for ``AutoField``, ``BigAutoField``, and ``SmallAutoField`` are added
   to  ``DatabaseOperations.integer_field_ranges`` to support the integer range
   validators on these field types. Third-party backends may need to customize
   the default entries.
+
+* ``DatabaseOperations.fetch_returned_insert_id()`` is replaced by
+  ``fetch_returned_insert_columns()`` which returns a list of values returned
+  by the ``INSERT … RETURNING`` statement, instead of a single value.
+
+* ``DatabaseOperations.return_insert_id()`` is replaced by
+  ``return_insert_columns()`` that accepts a ``fields``
+  argument, which is an iterable of fields to be returned after insert. Usually
+  this is only the auto-generated primary key.
 
 :mod:`django.contrib.admin`
 ---------------------------
@@ -489,14 +513,27 @@ In older versions, the :setting:`FILE_UPLOAD_PERMISSIONS` setting defaults to
 uploaded files having different permissions depending on their size and which
 upload handler is used.
 
-``FILE_UPLOAD_PERMISSION`` now defaults to ``0o644`` to avoid this
+``FILE_UPLOAD_PERMISSIONS`` now defaults to ``0o644`` to avoid this
 inconsistency.
+
+New default values for security settings
+----------------------------------------
+
+To make Django projects more secure by default, some security settings now have
+more secure default values:
+
+* :setting:`X_FRAME_OPTIONS` now defaults to ``'DENY'``.
+
+* :setting:`SECURE_CONTENT_TYPE_NOSNIFF` now defaults to ``True``.
+
+See the *What's New* :ref:`Security section <whats-new-security-3.0>` above for
+more details on these changes.
 
 Miscellaneous
 -------------
 
 * ``ContentType.__str__()`` now includes the model's ``app_label`` to
-  disambiguate model's with the same name in different apps.
+  disambiguate models with the same name in different apps.
 
 * Because accessing the language in the session rather than in the cookie is
   deprecated, ``LocaleMiddleware`` no longer looks for the user's language in
@@ -511,10 +548,6 @@ Miscellaneous
   -k<unittest.-k>` option rather than as a shortcut for ``--keepdb``.
 
 * Support for ``pywatchman`` < 1.2.0 is removed.
-
-* HTML rendered by :class:`~django.forms.SelectDateWidget` for required fields
-  now have the ``placeholder`` attribute, which mainly may require some
-  adjustments in tests that compare HTML.
 
 * :func:`~django.utils.http.urlencode` now encodes iterable values as they are
   when ``doseq=False``, rather than iterating them, bringing it into line with
@@ -532,11 +565,15 @@ Miscellaneous
   field names contains an asterisk, then the ``Vary`` header will consist of a
   single asterisk ``'*'``.
 
-* :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting now defaults to ``True``. With
-  the enabled :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, the
-  :class:`~django.middleware.security.SecurityMiddleware` sets the
-  :ref:`x-content-type-options` header on all responses that do not already
-  have it.
+* On MySQL 8.0.16+, ``PositiveIntegerField`` and ``PositiveSmallIntegerField``
+  now include a check constraint to prevent negative values in the database.
+
+* ``alias=None`` is added to the signature of
+  :meth:`.Expression.get_group_by_cols`.
+
+* ``RegexPattern``, used by :func:`~django.urls.re_path`, no longer returns
+  keyword arguments with ``None`` values to be passed to the view for the
+  optional named groups that are missing.
 
 .. _deprecated-features-3.0:
 
@@ -573,12 +610,17 @@ Miscellaneous
   in the session in Django 4.0. Since Django 2.1, the language is always stored
   in the :setting:`LANGUAGE_COOKIE_NAME` cookie.
 
-* ``alias=None`` is added to the signature of
-  :meth:`.Expression.get_group_by_cols`.
-
 * ``django.utils.text.unescape_entities()`` is deprecated in favor of
   :func:`html.unescape`. Note that unlike ``unescape_entities()``,
   ``html.unescape()`` evaluates lazy strings immediately.
+
+* To avoid possible confusion as to effective scope, the private internal
+  utility ``is_safe_url()`` is renamed to
+  ``url_has_allowed_host_and_scheme()``. That a URL has an allowed host and
+  scheme doesn't in general imply that it's "safe". It may still be quoted
+  incorrectly, for example. Ensure to also use
+  :func:`~django.utils.encoding.iri_to_uri` on the path component of untrusted
+  URLs.
 
 .. _removed-features-3.0:
 

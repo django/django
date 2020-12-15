@@ -122,6 +122,17 @@ client-side caching.
     must-revalidate, private`` header to a response to indicate that a page
     should never be cached.
 
-    .. versionchanged:: 3.0
+.. module:: django.views.decorators.common
 
-        ``private`` directive was added.
+Common
+======
+
+.. versionadded:: 3.2
+
+The decorators in :mod:`django.views.decorators.common` allow per-view
+customization of :class:`~django.middleware.common.CommonMiddleware` behavior.
+
+.. function:: no_append_slash()
+
+    This decorator allows individual views to be excluded from
+    :setting:`APPEND_SLASH` URL normalization.

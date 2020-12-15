@@ -19,9 +19,9 @@ class FormsMediaTestCase(SimpleTestCase):
             str(m),
             """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script src="/path/to/js1"></script>
+<script src="http://media.other.com/path/to/js2"></script>
+<script src="https://secure.other.com/path/to/js3"></script>"""
         )
         self.assertEqual(
             repr(m),
@@ -40,9 +40,9 @@ class FormsMediaTestCase(SimpleTestCase):
             str(m3),
             """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script src="/path/to/js1"></script>
+<script src="http://media.other.com/path/to/js2"></script>
+<script src="https://secure.other.com/path/to/js3"></script>"""
         )
 
         # A widget can exist without a media definition
@@ -72,9 +72,9 @@ class FormsMediaTestCase(SimpleTestCase):
             str(w1.media),
             """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script src="/path/to/js1"></script>
+<script src="http://media.other.com/path/to/js2"></script>
+<script src="https://secure.other.com/path/to/js3"></script>"""
         )
 
         # Media objects can be interrogated by media type
@@ -86,9 +86,9 @@ class FormsMediaTestCase(SimpleTestCase):
 
         self.assertEqual(
             str(w1.media['js']),
-            """<script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+            """<script src="/path/to/js1"></script>
+<script src="http://media.other.com/path/to/js2"></script>
+<script src="https://secure.other.com/path/to/js3"></script>"""
         )
 
     def test_combine_media(self):
@@ -123,10 +123,10 @@ class FormsMediaTestCase(SimpleTestCase):
             """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css3" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="/path/to/js4"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script src="/path/to/js1"></script>
+<script src="http://media.other.com/path/to/js2"></script>
+<script src="/path/to/js4"></script>
+<script src="https://secure.other.com/path/to/js3"></script>"""
         )
 
         # media addition hasn't affected the original objects
@@ -134,9 +134,9 @@ class FormsMediaTestCase(SimpleTestCase):
             str(w1.media),
             """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script src="/path/to/js1"></script>
+<script src="http://media.other.com/path/to/js2"></script>
+<script src="https://secure.other.com/path/to/js3"></script>"""
         )
 
         # Regression check for #12879: specifying the same CSS or JS file
@@ -149,7 +149,7 @@ class FormsMediaTestCase(SimpleTestCase):
 
         w4 = MyWidget4()
         self.assertEqual(str(w4.media), """<link href="/path/to/css1" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>""")
+<script src="/path/to/js1"></script>""")
 
     def test_media_deduplication(self):
         # A deduplication test applied directly to a Media object, to confirm
@@ -160,7 +160,7 @@ class FormsMediaTestCase(SimpleTestCase):
             js=('/path/to/js1', '/path/to/js1'),
         )
         self.assertEqual(str(media), """<link href="/path/to/css1" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>""")
+<script src="/path/to/js1"></script>""")
 
     def test_media_property(self):
         ###############################################################
@@ -175,7 +175,7 @@ class FormsMediaTestCase(SimpleTestCase):
 
         w4 = MyWidget4()
         self.assertEqual(str(w4.media), """<link href="/some/path" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/some/js"></script>""")
+<script src="/some/js"></script>""")
 
         # Media properties can reference the media of their parents
         class MyWidget5(MyWidget4):
@@ -186,8 +186,8 @@ class FormsMediaTestCase(SimpleTestCase):
         w5 = MyWidget5()
         self.assertEqual(str(w5.media), """<link href="/some/path" type="text/css" media="all" rel="stylesheet">
 <link href="/other/path" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/some/js"></script>
-<script type="text/javascript" src="/other/js"></script>""")
+<script src="/some/js"></script>
+<script src="/other/js"></script>""")
 
     def test_media_property_parent_references(self):
         # Media properties can reference the media of their parents,
@@ -210,10 +210,10 @@ class FormsMediaTestCase(SimpleTestCase):
             """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
 <link href="/other/path" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="/other/js"></script>
-<script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script src="/path/to/js1"></script>
+<script src="/other/js"></script>
+<script src="http://media.other.com/path/to/js2"></script>
+<script src="https://secure.other.com/path/to/js3"></script>"""
         )
 
     def test_media_inheritance(self):
@@ -237,9 +237,9 @@ class FormsMediaTestCase(SimpleTestCase):
             str(w7.media),
             """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script src="/path/to/js1"></script>
+<script src="http://media.other.com/path/to/js2"></script>
+<script src="https://secure.other.com/path/to/js3"></script>"""
         )
 
         # If a widget extends another but defines media, it extends the parent widget's media by default
@@ -256,10 +256,10 @@ class FormsMediaTestCase(SimpleTestCase):
             """<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet">
 <link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="/path/to/js4"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script src="/path/to/js1"></script>
+<script src="http://media.other.com/path/to/js2"></script>
+<script src="/path/to/js4"></script>
+<script src="https://secure.other.com/path/to/js3"></script>"""
         )
 
     def test_media_inheritance_from_property(self):
@@ -289,8 +289,8 @@ class FormsMediaTestCase(SimpleTestCase):
             str(w9.media),
             """<link href="/some/path" type="text/css" media="all" rel="stylesheet">
 <link href="/other/path" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/some/js"></script>
-<script type="text/javascript" src="/other/js"></script>"""
+<script src="/some/js"></script>
+<script src="/other/js"></script>"""
         )
 
         # A widget can disable media inheritance by specifying 'extend=False'
@@ -305,8 +305,8 @@ class FormsMediaTestCase(SimpleTestCase):
         w10 = MyWidget10()
         self.assertEqual(str(w10.media), """<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet">
 <link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="/path/to/js4"></script>""")
+<script src="/path/to/js1"></script>
+<script src="/path/to/js4"></script>""")
 
     def test_media_inheritance_extends(self):
         # A widget can explicitly enable full media inheritance by specifying 'extend=True'
@@ -331,10 +331,10 @@ class FormsMediaTestCase(SimpleTestCase):
             """<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet">
 <link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="/path/to/js4"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script src="/path/to/js1"></script>
+<script src="http://media.other.com/path/to/js2"></script>
+<script src="/path/to/js4"></script>
+<script src="https://secure.other.com/path/to/js3"></script>"""
         )
 
     def test_media_inheritance_single_type(self):
@@ -360,8 +360,8 @@ class FormsMediaTestCase(SimpleTestCase):
             """<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet">
 <link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="/path/to/js4"></script>"""
+<script src="/path/to/js1"></script>
+<script src="/path/to/js4"></script>"""
         )
 
     def test_multi_media(self):
@@ -386,8 +386,8 @@ class FormsMediaTestCase(SimpleTestCase):
 <link href="/file3" type="text/css" media="screen" rel="stylesheet">
 <link href="/file1" type="text/css" media="screen, print" rel="stylesheet">
 <link href="/file2" type="text/css" media="screen, print" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="/path/to/js4"></script>"""
+<script src="/path/to/js1"></script>
+<script src="/path/to/js4"></script>"""
         )
 
     def test_multi_widget(self):
@@ -429,10 +429,10 @@ class FormsMediaTestCase(SimpleTestCase):
             """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css3" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="/path/to/js4"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script src="/path/to/js1"></script>
+<script src="http://media.other.com/path/to/js2"></script>
+<script src="/path/to/js4"></script>
+<script src="https://secure.other.com/path/to/js3"></script>"""
         )
 
     def test_form_media(self):
@@ -471,10 +471,10 @@ class FormsMediaTestCase(SimpleTestCase):
             """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css3" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="/path/to/js4"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script src="/path/to/js1"></script>
+<script src="http://media.other.com/path/to/js2"></script>
+<script src="/path/to/js4"></script>
+<script src="https://secure.other.com/path/to/js3"></script>"""
         )
 
         # Form media can be combined to produce a single media definition.
@@ -486,10 +486,10 @@ class FormsMediaTestCase(SimpleTestCase):
             """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css3" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="/path/to/js4"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script src="/path/to/js1"></script>
+<script src="http://media.other.com/path/to/js2"></script>
+<script src="/path/to/js4"></script>
+<script src="https://secure.other.com/path/to/js3"></script>"""
         )
 
         # Forms can also define media, following the same rules as widgets.
@@ -509,21 +509,21 @@ class FormsMediaTestCase(SimpleTestCase):
 <link href="/some/form/css" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css3" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="/some/form/javascript"></script>
-<script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="/path/to/js4"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+<script src="/path/to/js1"></script>
+<script src="/some/form/javascript"></script>
+<script src="http://media.other.com/path/to/js2"></script>
+<script src="/path/to/js4"></script>
+<script src="https://secure.other.com/path/to/js3"></script>"""
         )
 
         # Media works in templates
         self.assertEqual(
             Template("{{ form.media.js }}{{ form.media.css }}").render(Context({'form': f3})),
-            """<script type="text/javascript" src="/path/to/js1"></script>
-<script type="text/javascript" src="/some/form/javascript"></script>
-<script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
-<script type="text/javascript" src="/path/to/js4"></script>
-<script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
+            """<script src="/path/to/js1"></script>
+<script src="/some/form/javascript"></script>
+<script src="http://media.other.com/path/to/js2"></script>
+<script src="/path/to/js4"></script>
+<script src="https://secure.other.com/path/to/js3"></script>"""
             """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet">
 <link href="/some/form/css" type="text/css" media="all" rel="stylesheet">
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet">
@@ -581,6 +581,7 @@ class FormsMediaTestCase(SimpleTestCase):
         widget1 = Media(css={'screen': ['c.css'], 'all': ['d.css', 'e.css']})
         widget2 = Media(css={'screen': ['a.css']})
         widget3 = Media(css={'screen': ['a.css', 'b.css', 'c.css'], 'all': ['e.css']})
+        widget4 = Media(css={'all': ['d.css', 'e.css'], 'screen': ['c.css']})
         merged = widget1 + widget2
         # c.css comes before a.css because widget1 + widget2 establishes this
         # order.
@@ -588,3 +589,60 @@ class FormsMediaTestCase(SimpleTestCase):
         merged = merged + widget3
         # widget3 contains an explicit ordering of c.css and a.css.
         self.assertEqual(merged._css, {'screen': ['a.css', 'b.css', 'c.css'], 'all': ['d.css', 'e.css']})
+        # Media ordering does not matter.
+        merged = widget1 + widget4
+        self.assertEqual(merged._css, {'screen': ['c.css'], 'all': ['d.css', 'e.css']})
+
+    def test_add_js_deduplication(self):
+        widget1 = Media(js=['a', 'b', 'c'])
+        widget2 = Media(js=['a', 'b'])
+        widget3 = Media(js=['a', 'c', 'b'])
+        merged = widget1 + widget1
+        self.assertEqual(merged._js_lists, [['a', 'b', 'c']])
+        self.assertEqual(merged._js, ['a', 'b', 'c'])
+        merged = widget1 + widget2
+        self.assertEqual(merged._js_lists, [['a', 'b', 'c'], ['a', 'b']])
+        self.assertEqual(merged._js, ['a', 'b', 'c'])
+        # Lists with items in a different order are preserved when added.
+        merged = widget1 + widget3
+        self.assertEqual(merged._js_lists, [['a', 'b', 'c'], ['a', 'c', 'b']])
+        msg = (
+            "Detected duplicate Media files in an opposite order: "
+            "['a', 'b', 'c'], ['a', 'c', 'b']"
+        )
+        with self.assertWarnsMessage(RuntimeWarning, msg):
+            merged._js
+
+    def test_add_css_deduplication(self):
+        widget1 = Media(css={'screen': ['a.css'], 'all': ['b.css']})
+        widget2 = Media(css={'screen': ['c.css']})
+        widget3 = Media(css={'screen': ['a.css'], 'all': ['b.css', 'c.css']})
+        widget4 = Media(css={'screen': ['a.css'], 'all': ['c.css', 'b.css']})
+        merged = widget1 + widget1
+        self.assertEqual(merged._css_lists, [{'screen': ['a.css'], 'all': ['b.css']}])
+        self.assertEqual(merged._css, {'screen': ['a.css'], 'all': ['b.css']})
+        merged = widget1 + widget2
+        self.assertEqual(merged._css_lists, [
+            {'screen': ['a.css'], 'all': ['b.css']},
+            {'screen': ['c.css']},
+        ])
+        self.assertEqual(merged._css, {'screen': ['a.css', 'c.css'], 'all': ['b.css']})
+        merged = widget3 + widget4
+        # Ordering within lists is preserved.
+        self.assertEqual(merged._css_lists, [
+            {'screen': ['a.css'], 'all': ['b.css', 'c.css']},
+            {'screen': ['a.css'], 'all': ['c.css', 'b.css']}
+        ])
+        msg = (
+            "Detected duplicate Media files in an opposite order: "
+            "['b.css', 'c.css'], ['c.css', 'b.css']"
+        )
+        with self.assertWarnsMessage(RuntimeWarning, msg):
+            merged._css
+
+    def test_add_empty(self):
+        media = Media(css={'screen': ['a.css']}, js=['a'])
+        empty_media = Media()
+        merged = media + empty_media
+        self.assertEqual(merged._css_lists, [{'screen': ['a.css']}])
+        self.assertEqual(merged._js_lists, [['a']])

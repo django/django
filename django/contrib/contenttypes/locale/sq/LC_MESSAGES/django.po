@@ -2,12 +2,13 @@
 #
 # Translators:
 # Besnik <besnik@programeshqip.org>, 2011
+# Besnik <besnik@programeshqip.org>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2017-11-29 22:27+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-18 09:52+0000\n"
 "Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
@@ -34,9 +35,9 @@ msgid "Content type %(ct_id)s object has no associated model"
 msgstr "Objekti për lloj lënde %(ct_id)s s’ka model të përshoqëruar"
 
 #, python-format
-msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
+msgid "Content type %(ct_id)s object %(obj_id)s doesn’t exist"
 msgstr "Objekti %(obj_id)s për lloj lënde %(ct_id)s s’ekziston"
 
 #, python-format
-msgid "%(ct_name)s objects don't have a get_absolute_url() method"
+msgid "%(ct_name)s objects don’t have a get_absolute_url() method"
 msgstr "Objektet %(ct_name)s s’përmbajnë ndonjë metodë get_absolute_url()"

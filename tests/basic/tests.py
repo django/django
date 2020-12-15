@@ -1,18 +1,19 @@
 import threading
 from datetime import datetime, timedelta
+from unittest import mock
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections, models
 from django.db.models.manager import BaseManager
-from django.db.models.query import MAX_GET_RESULTS, EmptyQuerySet, QuerySet
+from django.db.models.query import MAX_GET_RESULTS, EmptyQuerySet
 from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, skipUnlessDBFeature,
 )
 from django.utils.translation import gettext_lazy
 
 from .models import (
-    Article, ArticleSelectOnSave, FeaturedArticle, PrimaryKeyWithDefault,
-    SelfRef,
+    Article, ArticleSelectOnSave, ChildPrimaryKeyWithDefault, FeaturedArticle,
+    PrimaryKeyWithDefault, SelfRef,
 )
 
 
@@ -138,6 +139,12 @@ class ModelInstanceCreationTests(TestCase):
         with self.assertNumQueries(1):
             PrimaryKeyWithDefault().save()
 
+    def test_save_parent_primary_with_default(self):
+        # An UPDATE attempt is skipped when an inherited primary key has
+        # default.
+        with self.assertNumQueries(2):
+            ChildPrimaryKeyWithDefault().save()
+
 
 class ModelTest(TestCase):
     def test_objects_attribute_is_only_available_on_the_class_itself(self):
@@ -154,13 +161,11 @@ class ModelTest(TestCase):
             Article(headline=headline, pub_date=some_pub_date).save()
         self.assertQuerysetEqual(
             Article.objects.all().order_by('headline'),
-            ["<Article: Amazing article>",
-             "<Article: An article>",
-             "<Article: Article One>",
-             "<Article: Boring article>"]
+            sorted(headlines),
+            transform=lambda a: a.headline,
         )
         Article.objects.filter(headline__startswith='A').delete()
-        self.assertQuerysetEqual(Article.objects.all().order_by('headline'), ["<Article: Boring article>"])
+        self.assertEqual(Article.objects.get().headline, 'Boring article')
 
     def test_not_equal_and_equal_operators_behave_as_expected_on_instances(self):
         some_pub_date = datetime(2014, 5, 16, 12, 1)
@@ -201,17 +206,17 @@ class ModelTest(TestCase):
     def test_year_lookup_edge_case(self):
         # Edge-case test: A year lookup should retrieve all objects in
         # the given year, including Jan. 1 and Dec. 31.
-        Article.objects.create(
+        a11 = Article.objects.create(
             headline='Article 11',
             pub_date=datetime(2008, 1, 1),
         )
-        Article.objects.create(
+        a12 = Article.objects.create(
             headline='Article 12',
             pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999),
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(pub_date__year=2008),
-            ["<Article: Article 11>", "<Article: Article 12>"]
+            [a11, a12],
         )
 
     def test_unicode_data(self):
@@ -315,7 +320,7 @@ class ModelTest(TestCase):
         # A hacky test for custom QuerySet subclass - refs #17271
         Article.objects.create(headline='foo', pub_date=datetime.now())
 
-        class CustomQuerySet(QuerySet):
+        class CustomQuerySet(models.QuerySet):
             def do_something(self):
                 return 'did something'
 
@@ -354,6 +359,7 @@ class ModelTest(TestCase):
         self.assertNotEqual(object(), Article(id=1))
         a = Article()
         self.assertEqual(a, a)
+        self.assertEqual(a, mock.ANY)
         self.assertNotEqual(Article(), a)
 
     def test_hash(self):
@@ -434,7 +440,7 @@ class ModelLookupTest(TestCase):
         self.a.save()
 
         # Article.objects.all() returns all the articles in the database.
-        self.assertQuerysetEqual(Article.objects.all(), ['<Article: Parrot programs in Python>'])
+        self.assertSequenceEqual(Article.objects.all(), [self.a])
 
     def test_rich_lookup(self):
         # Django provides a rich database lookup API.
@@ -450,24 +456,24 @@ class ModelLookupTest(TestCase):
         self.assertEqual(Article.objects.get(id=self.a.id), self.a)
         self.assertEqual(Article.objects.get(headline='Swallow programs in Python'), self.a)
 
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(pub_date__year=2005),
-            ['<Article: Swallow programs in Python>'],
+            [self.a],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(pub_date__year=2004),
             [],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(pub_date__year=2005, pub_date__month=7),
-            ['<Article: Swallow programs in Python>'],
+            [self.a],
         )
 
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(pub_date__week_day=5),
-            ['<Article: Swallow programs in Python>'],
+            [self.a],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(pub_date__week_day=6),
             [],
         )
@@ -491,7 +497,7 @@ class ModelLookupTest(TestCase):
         self.assertEqual(Article.objects.get(pk=self.a.id), self.a)
 
         # pk can be used as a shortcut for the primary key name in any query.
-        self.assertQuerysetEqual(Article.objects.filter(pk__in=[self.a.id]), ["<Article: Swallow programs in Python>"])
+        self.assertSequenceEqual(Article.objects.filter(pk__in=[self.a.id]), [self.a])
 
         # Model instances of the same type and same ID are considered equal.
         a = Article.objects.get(pk=self.a.id)
@@ -566,6 +572,7 @@ class ManagerTest(SimpleTestCase):
         'filter',
         'aggregate',
         'annotate',
+        'alias',
         'complex_filter',
         'exclude',
         'in_bulk',
@@ -605,7 +612,7 @@ class ManagerTest(SimpleTestCase):
         `Manager` will need to be added to `ManagerTest.QUERYSET_PROXY_METHODS`.
         """
         self.assertEqual(
-            sorted(BaseManager._get_queryset_methods(QuerySet)),
+            sorted(BaseManager._get_queryset_methods(models.QuerySet)),
             sorted(self.QUERYSET_PROXY_METHODS),
         )
 
@@ -638,7 +645,7 @@ class SelectOnSaveTests(TestCase):
 
         orig_class = Article._base_manager._queryset_class
 
-        class FakeQuerySet(QuerySet):
+        class FakeQuerySet(models.QuerySet):
             # Make sure the _update method below is in fact called.
             called = False
 

@@ -23,6 +23,16 @@ temp_storage_location = tempfile.mkdtemp()
 temp_storage = FileSystemStorage(location=temp_storage_location)
 
 
+def callable_storage():
+    return temp_storage
+
+
+class CallableStorage(FileSystemStorage):
+    def __call__(self):
+        # no-op implementation.
+        return self
+
+
 class Storage(models.Model):
     def custom_upload_to(self, filename):
         return 'foo'
@@ -44,6 +54,8 @@ class Storage(models.Model):
         storage=CustomValidNameStorage(location=temp_storage_location),
         upload_to=random_upload_to,
     )
+    storage_callable = models.FileField(storage=callable_storage, upload_to='storage_callable')
+    storage_callable_class = models.FileField(storage=CallableStorage, upload_to='storage_callable_class')
     default = models.FileField(storage=temp_storage, upload_to='tests', default='tests/default.txt')
     empty = models.FileField(storage=temp_storage)
     limited_length = models.FileField(storage=temp_storage, upload_to='tests', max_length=20)

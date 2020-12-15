@@ -49,7 +49,8 @@ Listening to signals
 
 To receive a signal, register a *receiver* function using the
 :meth:`Signal.connect` method. The receiver function is called when the signal
-is sent.
+is sent. All of the signal's receiver functions are called one at a time, in
+the order they were registered.
 
 .. method:: Signal.connect(receiver, sender=None, weak=True, dispatch_uid=None)
 
@@ -138,7 +139,7 @@ Now, our ``my_callback`` function will be called each time a request finishes.
     submodule of the application they relate to. Signal receivers are
     connected in the :meth:`~django.apps.AppConfig.ready` method of your
     application configuration class. If you're using the :func:`receiver`
-    decorator, simply import the ``signals`` submodule inside
+    decorator, import the ``signals`` submodule inside
     :meth:`~django.apps.AppConfig.ready`.
 
 .. note::
@@ -187,7 +188,11 @@ Preventing duplicate signals
 
 In some circumstances, the code connecting receivers to signals may run
 multiple times. This can cause your receiver function to be registered more
-than once, and thus called multiple times for a single signal event.
+than once, and thus called as many times for a signal event. For example, the
+:meth:`~django.apps.AppConfig.ready` method may be executed more than once
+during testing. More generally, this occurs everywhere your project imports the
+module where you define the signals, because signal registration runs as many
+times as it is imported.
 
 If this behavior is problematic (such as when using signals to
 send an email whenever a model is saved), pass a unique identifier as
@@ -206,27 +211,26 @@ Defining and sending signals
 Your applications can take advantage of the signal infrastructure and provide
 its own signals.
 
+.. admonition:: When to use custom signals
+
+    Signals are implicit function calls which make debugging harder. If the
+    sender and receiver of your custom signal are both within your project,
+    you're better off using an explicit function call.
+
 Defining signals
 ----------------
 
-.. class:: Signal(providing_args=list)
+.. class:: Signal()
 
-All signals are :class:`django.dispatch.Signal` instances. The
-``providing_args`` is a list of the names of arguments the signal will provide
-to listeners. This is purely documentational, however, as there is nothing that
-checks that the signal actually provides these arguments to its listeners.
+All signals are :class:`django.dispatch.Signal` instances.
 
 For example::
 
     import django.dispatch
 
-    pizza_done = django.dispatch.Signal(providing_args=["toppings", "size"])
+    pizza_done = django.dispatch.Signal()
 
-This declares a ``pizza_done`` signal that will provide receivers with
-``toppings`` and ``size`` arguments.
-
-Remember that you're allowed to change this list of arguments at any time, so
-getting the API right on the first try isn't necessary.
+This declares a ``pizza_done`` signal.
 
 Sending signals
 ---------------

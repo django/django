@@ -1,5 +1,5 @@
 from django.db import connection
-from django.db.models import CharField, Value
+from django.db.models import Value
 from django.db.models.functions import Length, Repeat
 from django.test import TestCase
 
@@ -13,8 +13,8 @@ class RepeatTests(TestCase):
         tests = (
             (Repeat('name', 0), ''),
             (Repeat('name', 2), 'JohnJohn'),
-            (Repeat('name', Length('alias'), output_field=CharField()), 'JohnJohnJohn'),
-            (Repeat(Value('x'), 3, output_field=CharField()), 'xxx'),
+            (Repeat('name', Length('alias')), 'JohnJohnJohn'),
+            (Repeat(Value('x'), 3), 'xxx'),
             (Repeat('name', None), none_value),
             (Repeat('goes_by', 1), none_value),
         )

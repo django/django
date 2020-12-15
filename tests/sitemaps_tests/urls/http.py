@@ -34,6 +34,18 @@ class SimpleI18nSitemap(Sitemap):
         return I18nTestModel.objects.order_by('pk').all()
 
 
+class AlternatesI18nSitemap(SimpleI18nSitemap):
+    alternates = True
+
+
+class LimitedI18nSitemap(AlternatesI18nSitemap):
+    languages = ['en', 'es']
+
+
+class XDefaultI18nSitemap(AlternatesI18nSitemap):
+    x_default = True
+
+
 class EmptySitemap(Sitemap):
     changefreq = "never"
     priority = 0.5
@@ -77,8 +89,20 @@ simple_sitemaps = {
     'simple': SimpleSitemap,
 }
 
-simple_i18nsitemaps = {
-    'simple': SimpleI18nSitemap,
+simple_i18n_sitemaps = {
+    'i18n': SimpleI18nSitemap,
+}
+
+alternates_i18n_sitemaps = {
+    'i18n-alternates': AlternatesI18nSitemap,
+}
+
+limited_i18n_sitemaps = {
+    'i18n-limited': LimitedI18nSitemap,
+}
+
+xdefault_i18n_sitemaps = {
+    'i18n-xdefault': XDefaultI18nSitemap,
 }
 
 simple_sitemaps_not_callable = {
@@ -97,7 +121,7 @@ fixed_lastmod_sitemaps = {
     'fixed-lastmod': FixedLastmodSitemap,
 }
 
-fixed_lastmod__mixed_sitemaps = {
+fixed_lastmod_mixed_sitemaps = {
     'fixed-lastmod-mixed': FixedLastmodMixedSitemap,
 }
 
@@ -151,7 +175,19 @@ urlpatterns = [
         name='django.contrib.sitemaps.views.sitemap'),
     path(
         'simple/i18n.xml', views.sitemap,
-        {'sitemaps': simple_i18nsitemaps},
+        {'sitemaps': simple_i18n_sitemaps},
+        name='django.contrib.sitemaps.views.sitemap'),
+    path(
+        'alternates/i18n.xml', views.sitemap,
+        {'sitemaps': alternates_i18n_sitemaps},
+        name='django.contrib.sitemaps.views.sitemap'),
+    path(
+        'limited/i18n.xml', views.sitemap,
+        {'sitemaps': limited_i18n_sitemaps},
+        name='django.contrib.sitemaps.views.sitemap'),
+    path(
+        'x-default/i18n.xml', views.sitemap,
+        {'sitemaps': xdefault_i18n_sitemaps},
         name='django.contrib.sitemaps.views.sitemap'),
     path(
         'simple/custom-sitemap.xml', views.sitemap,
@@ -167,7 +203,7 @@ urlpatterns = [
         name='django.contrib.sitemaps.views.sitemap'),
     path(
         'lastmod-mixed/sitemap.xml', views.sitemap,
-        {'sitemaps': fixed_lastmod__mixed_sitemaps},
+        {'sitemaps': fixed_lastmod_mixed_sitemaps},
         name='django.contrib.sitemaps.views.sitemap'),
     path(
         'lastmod/date-sitemap.xml', views.sitemap,

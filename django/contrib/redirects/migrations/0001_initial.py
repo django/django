@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 )),
             ],
             options={
-                'ordering': ('old_path',),
+                'ordering': ['old_path'],
                 'unique_together': {('site', 'old_path')},
                 'db_table': 'django_redirect',
                 'verbose_name': 'redirect',

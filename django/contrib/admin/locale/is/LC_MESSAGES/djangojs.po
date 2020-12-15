@@ -5,14 +5,14 @@
 # Hafsteinn Einarsson <haffi67@gmail.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Matt R, 2018
-# Thordur Sigurdsson <thordur@ja.is>, 2016-2017
+# Thordur Sigurdsson <thordur@ja.is>, 2016-2017,2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2018-05-18 14:09+0000\n"
-"Last-Translator: Matt R\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-07-07 22:53+0000\n"
+"Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
 "MIME-Version: 1.0\n"
@@ -85,16 +85,16 @@ msgstr ""
 "ekki verða vistaðar."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
 "Þú hefur valið aðgerð en hefur ekki vistað breytingar á reitum. Vinsamlegast "
 "veldu 'Í lagi' til að vista. Þú þarft að endurkeyra aðgerðina."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 "Þú hefur valið aðgerð en hefur ekki gert breytingar á reitum. Þú ert líklega "

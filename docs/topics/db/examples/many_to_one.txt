@@ -23,7 +23,7 @@ To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`:
             return self.headline
 
         class Meta:
-            ordering = ('headline',)
+            ordering = ['headline']
 
 What follows are examples of operations that can be performed using the Python
 API facilities.
@@ -185,7 +185,7 @@ Queries can go round in circles::
     >>> Reporter.objects.filter(article__reporter=r).distinct()
     <QuerySet [<Reporter: John Smith>]>
 
-If you delete a reporter, his articles will be deleted (assuming that the
+If you delete a reporter, their articles will be deleted (assuming that the
 ForeignKey was defined with :attr:`django.db.models.ForeignKey.on_delete` set to
 ``CASCADE``, which is the default)::
 

@@ -11,9 +11,9 @@ from django.contrib.gis.geos.geometry import GEOSGeometryBase
 from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
+from django.db import NotSupportedError, ProgrammingError
 from django.db.backends.postgresql.operations import DatabaseOperations
 from django.db.models import Func, Value
-from django.db.utils import NotSupportedError, ProgrammingError
 from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
 
@@ -98,7 +98,6 @@ class ST_Polygon(Func):
 class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     name = 'postgis'
     postgis = True
-    geography = True
     geom_func_prefix = 'ST_'
 
     Adapter = PostGISAdapter
@@ -148,6 +147,8 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     @cached_property
     def function_names(self):
         function_names = {
+            'AsWKB': 'ST_AsBinary',
+            'AsWKT': 'ST_AsText',
             'BoundingCircle': 'ST_MinimumBoundingCircle',
             'NumPoints': 'ST_NPoints',
         }
@@ -178,7 +179,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
                 raise ImproperlyConfigured(
                     'Cannot determine PostGIS version for database "%s" '
                     'using command "SELECT postgis_lib_version()". '
-                    'GeoDjango requires at least PostGIS version 2.2. '
+                    'GeoDjango requires at least PostGIS version 2.3. '
                     'Was the database created from a spatial database '
                     'template?' % self.connection.settings_dict['NAME']
                 )
@@ -312,7 +313,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         return self._get_postgis_func('postgis_lib_version')
 
     def postgis_proj_version(self):
-        "Return the version of the PROJ.4 library used with PostGIS."
+        """Return the version of the PROJ library used with PostGIS."""
         return self._get_postgis_func('postgis_proj_version')
 
     def postgis_version(self):
@@ -333,16 +334,16 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     def proj_version_tuple(self):
         """
-        Return the version of PROJ.4 used by PostGIS as a tuple of the
+        Return the version of PROJ used by PostGIS as a tuple of the
         major, minor, and subminor release numbers.
         """
         proj_regex = re.compile(r'(\d+)\.(\d+)\.(\d+)')
         proj_ver_str = self.postgis_proj_version()
         m = proj_regex.search(proj_ver_str)
         if m:
-            return tuple(map(int, [m.group(1), m.group(2), m.group(3)]))
+            return tuple(map(int, m.groups()))
         else:
-            raise Exception('Could not determine PROJ.4 version from PostGIS.')
+            raise Exception('Could not determine PROJ version from PostGIS.')
 
     def spatial_aggregate_name(self, agg_name):
         if agg_name == 'Extent3D':

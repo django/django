@@ -4,6 +4,7 @@
 # hoseung2 <ghyutjik123@gmail.com>, 2017
 # Gihun Ham <progh2@gmail.com>, 2018
 # JunGu Kang <chr0m3.kr@gmail.com>, 2015
+# Kwangho Kim <rhkd865@gmail.com>, 2019
 # 조민권 <minkwon007@gmail.com>, 2016
 # minsung kang, 2015
 # Subin Choi <os1742@gmail.com>, 2016
@@ -11,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-10-07 03:06+0000\n"
-"Last-Translator: Gihun Ham <progh2@gmail.com>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Korean (http://www.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,24 +36,14 @@ msgid "Map of strings to strings/nulls"
 msgstr "문자열을 문자열/null 에 매핑"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "\"%(key)s\"의 값은 문자열 또는 null이 아닙니다."
-
-msgid "A JSON object"
-msgstr "JSON 객체"
-
-msgid "Value must be valid JSON."
-msgstr "올바른 JSON 형식이여야 합니다."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "\"%(key)s\"의 값은 문자열 또는 널이 아닙니다."
 
 msgid "Could not load JSON data."
 msgstr "JSON 데이터를 불러오지 못했습니다."
 
 msgid "Input must be a JSON dictionary."
 msgstr "입력은 JSON 사전이어야만 합니다."
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' 값은 올바른 JSON 형식이여야 합니다."
 
 msgid "Enter two valid values."
 msgstr "유효한 두 값을 입력하세요."

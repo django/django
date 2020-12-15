@@ -119,9 +119,20 @@ def floatformat(text, arg=-1):
     * {{ num2|floatformat:"-3" }} displays "34"
     * {{ num3|floatformat:"-3" }} displays "34.260"
 
+    If arg has the 'g' suffix, force the result to be grouped by the
+    THOUSAND_SEPARATOR for the active locale. When the active locale is
+    en (English):
+
+    * {{ 6666.6666|floatformat:"2g" }} displays "6,666.67"
+    * {{ 10000|floatformat:"g" }} displays "10,000"
+
     If the input float is infinity or NaN, display the string representation
     of that value.
     """
+    force_grouping = False
+    if isinstance(arg, str) and arg.endswith('g'):
+        force_grouping = True
+        arg = arg[:-1] or -1
     try:
         input_val = repr(text)
         d = Decimal(input_val)
@@ -141,7 +152,9 @@ def floatformat(text, arg=-1):
         return input_val
 
     if not m and p < 0:
-        return mark_safe(formats.number_format('%d' % (int(d)), 0))
+        return mark_safe(
+            formats.number_format('%d' % (int(d)), 0, force_grouping=force_grouping),
+        )
 
     exp = Decimal(1).scaleb(-abs(p))
     # Set the precision high enough to avoid an exception (#15789).
@@ -152,15 +165,18 @@ def floatformat(text, arg=-1):
 
     # Avoid conversion to scientific notation by accessing `sign`, `digits`,
     # and `exponent` from Decimal.as_tuple() directly.
-    sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP, Context(prec=prec)).as_tuple()
+    rounded_d = d.quantize(exp, ROUND_HALF_UP, Context(prec=prec))
+    sign, digits, exponent = rounded_d.as_tuple()
     digits = [str(digit) for digit in reversed(digits)]
     while len(digits) <= abs(exponent):
         digits.append('0')
     digits.insert(-exponent, '.')
-    if sign:
+    if sign and rounded_d:
         digits.append('-')
     number = ''.join(reversed(digits))
-    return mark_safe(formats.number_format(number, abs(p)))
+    return mark_safe(
+        formats.number_format(number, abs(p), force_grouping=force_grouping),
+    )
 
 
 @register.filter(is_safe=True)
@@ -240,8 +256,8 @@ def stringformat(value, arg):
 @stringfilter
 def title(value):
     """Convert a string into titlecase."""
-    t = re.sub("([a-z])'([A-Z])", lambda m: m.group(0).lower(), value.title())
-    return re.sub(r"\d([A-Z])", lambda m: m.group(0).lower(), t)
+    t = re.sub("([a-z])'([A-Z])", lambda m: m[0].lower(), value.title())
+    return re.sub(r'\d([A-Z])', lambda m: m[0].lower(), t)
 
 
 @register.filter(is_safe=True)
@@ -785,6 +801,7 @@ def yesno(value, arg=None):
     ==========  ======================  ==================================
     """
     if arg is None:
+        # Translators: Please do not add spaces around commas.
         arg = gettext('yes,no,maybe')
     bits = arg.split(',')
     if len(bits) < 2:

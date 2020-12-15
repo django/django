@@ -15,15 +15,22 @@ from pathlib import Path
 
 import django
 from django.conf import global_settings
-from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import RemovedInDjango31Warning
+from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.validators import URLValidator
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 
-FILE_CHARSET_DEPRECATED_MSG = (
-    'The FILE_CHARSET setting is deprecated. Starting with Django 3.1, all '
-    'files read from disk must be UTF-8 encoded.'
+PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG = (
+    'The PASSWORD_RESET_TIMEOUT_DAYS setting is deprecated. Use '
+    'PASSWORD_RESET_TIMEOUT instead.'
+)
+
+DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG = (
+    'The DEFAULT_HASHING_ALGORITHM transitional setting is deprecated. '
+    'Support for it and tokens, cookies, sessions, and signatures that use '
+    'SHA-1 hashing algorithm will be removed in Django 4.0.'
 )
 
 
@@ -75,6 +82,14 @@ class LazySettings(LazyObject):
         if self._wrapped is empty:
             self._setup(name)
         val = getattr(self._wrapped, name)
+
+        # Special case some settings which require further modification.
+        # This is done here for performance reasons so the modified value is cached.
+        if name in {'MEDIA_URL', 'STATIC_URL'} and val is not None:
+            val = self._add_script_prefix(val)
+        elif name == 'SECRET_KEY' and not val:
+            raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
+
         self.__dict__[name] = val
         return val
 
@@ -109,24 +124,44 @@ class LazySettings(LazyObject):
             setattr(holder, name, value)
         self._wrapped = holder
 
+    @staticmethod
+    def _add_script_prefix(value):
+        """
+        Add SCRIPT_NAME prefix to relative paths.
+
+        Useful when the app is being served at a subpath and manually prefixing
+        subpath to STATIC_URL and MEDIA_URL in settings is inconvenient.
+        """
+        # Don't apply prefix to valid URLs.
+        try:
+            URLValidator()(value)
+            return value
+        except (ValidationError, AttributeError):
+            pass
+        # Don't apply prefix to absolute paths.
+        if value.startswith('/'):
+            return value
+        from django.urls import get_script_prefix
+        return '%s%s' % (get_script_prefix(), value)
+
     @property
     def configured(self):
         """Return True if the settings have already been configured."""
         return self._wrapped is not empty
 
     @property
-    def FILE_CHARSET(self):
+    def PASSWORD_RESET_TIMEOUT_DAYS(self):
         stack = traceback.extract_stack()
         # Show a warning if the setting is used outside of Django.
         # Stack index: -1 this line, -2 the caller.
-        filename, _line_number, _function_name, _text = stack[-2]
+        filename, _, _, _ = stack[-2]
         if not filename.startswith(os.path.dirname(django.__file__)):
             warnings.warn(
-                FILE_CHARSET_DEPRECATED_MSG,
-                RemovedInDjango31Warning,
+                PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG,
+                RemovedInDjango40Warning,
                 stacklevel=2,
             )
-        return self.__getattr__('FILE_CHARSET')
+        return self.__getattr__('PASSWORD_RESET_TIMEOUT_DAYS')
 
 
 class Settings:
@@ -157,11 +192,17 @@ class Settings:
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
-        if not self.SECRET_KEY:
-            raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
+        if self.is_overridden('PASSWORD_RESET_TIMEOUT_DAYS'):
+            if self.is_overridden('PASSWORD_RESET_TIMEOUT'):
+                raise ImproperlyConfigured(
+                    'PASSWORD_RESET_TIMEOUT_DAYS/PASSWORD_RESET_TIMEOUT are '
+                    'mutually exclusive.'
+                )
+            setattr(self, 'PASSWORD_RESET_TIMEOUT', self.PASSWORD_RESET_TIMEOUT_DAYS * 60 * 60 * 24)
+            warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
 
-        if self.is_overridden('FILE_CHARSET'):
-            warnings.warn(FILE_CHARSET_DEPRECATED_MSG, RemovedInDjango31Warning)
+        if self.is_overridden('DEFAULT_HASHING_ALGORITHM'):
+            warnings.warn(DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG, RemovedInDjango40Warning)
 
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
@@ -206,8 +247,11 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        if name == 'FILE_CHARSET':
-            warnings.warn(FILE_CHARSET_DEPRECATED_MSG, RemovedInDjango31Warning)
+        if name == 'PASSWORD_RESET_TIMEOUT_DAYS':
+            setattr(self, 'PASSWORD_RESET_TIMEOUT', value * 60 * 60 * 24)
+            warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
+        if name == 'DEFAULT_HASHING_ALGORITHM':
+            warnings.warn(DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG, RemovedInDjango40Warning)
         super().__setattr__(name, value)
 
     def __delattr__(self, name):

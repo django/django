@@ -2,10 +2,13 @@ from django.http import HttpResponse
 from django.template import engines
 from django.template.response import TemplateResponse
 from django.test import RequestFactory, SimpleTestCase
-from django.utils.decorators import classproperty, decorator_from_middleware
+from django.utils.decorators import decorator_from_middleware
 
 
 class ProcessViewMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
     def process_view(self, request, view_func, view_args, view_kwargs):
         pass
 
@@ -27,6 +30,9 @@ class_process_view = process_view_dec(ClassProcessView())
 
 
 class FullMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
     def process_request(self, request):
         request.process_request_reached = True
 
@@ -108,41 +114,3 @@ class DecoratorFromMiddlewareTests(SimpleTestCase):
         self.assertTrue(getattr(request, 'process_response_reached', False))
         # process_response saw the rendered content
         self.assertEqual(request.process_response_content, b"Hello world")
-
-
-class ClassPropertyTest(SimpleTestCase):
-    def test_getter(self):
-        class Foo:
-            foo_attr = 123
-
-            def __init__(self):
-                self.foo_attr = 456
-
-            @classproperty
-            def foo(cls):
-                return cls.foo_attr
-
-        class Bar:
-            bar = classproperty()
-
-            @bar.getter
-            def bar(cls):
-                return 123
-
-        self.assertEqual(Foo.foo, 123)
-        self.assertEqual(Foo().foo, 123)
-        self.assertEqual(Bar.bar, 123)
-        self.assertEqual(Bar().bar, 123)
-
-    def test_override_getter(self):
-        class Foo:
-            @classproperty
-            def foo(cls):
-                return 123
-
-            @foo.getter
-            def foo(cls):
-                return 456
-
-        self.assertEqual(Foo.foo, 456)
-        self.assertEqual(Foo().foo, 456)

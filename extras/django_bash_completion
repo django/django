@@ -1,6 +1,5 @@
-# #########################################################################
-# This bash script adds tab-completion feature to django-admin.py and
-# manage.py.
+# #############################################################################
+# This bash script adds tab-completion feature to django-admin and manage.py.
 #
 # Testing it out without installing
 # =================================
@@ -37,6 +36,7 @@ _django_completion()
                    COMP_CWORD=$COMP_CWORD \
                    DJANGO_AUTO_COMPLETE=1 $1 ) )
 }
+# When the django-admin.py deprecation ends, remove django-admin.py.
 complete -F _django_completion -o default django-admin.py manage.py django-admin
 
 _python_django_completion()

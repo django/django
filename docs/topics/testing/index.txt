@@ -20,10 +20,8 @@ framework and assorted utilities, you can simulate requests, insert test data,
 inspect your application's output and generally verify your code is doing what
 it should be doing.
 
-The best part is, it's really easy.
-
 The preferred way to write tests in Django is using the :mod:`unittest` module
-built in to the Python standard library. This is covered in detail in the
+built-in to the Python standard library. This is covered in detail in the
 :doc:`overview` document.
 
 You can also use any *other* Python test framework; Django provides an API and

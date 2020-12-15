@@ -1,9 +1,12 @@
+import string
 import uuid
 
+from django.conf.urls import url as conf_url
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
-from django.urls import Resolver404, path, resolve, reverse
+from django.urls import NoReverseMatch, Resolver404, path, resolve, reverse
+from django.utils.deprecation import RemovedInDjango40Warning
 
 from .converters import DynamicConverter
 from .views import empty_view
@@ -68,6 +71,16 @@ class SimplifiedURLTests(SimpleTestCase):
                     r'^regex_optional/(?P<arg1>\d+)/(?:(?P<arg2>\d+)/)?',
                 )
 
+    def test_re_path_with_missing_optional_parameter(self):
+        match = resolve('/regex_only_optional/')
+        self.assertEqual(match.url_name, 'regex_only_optional')
+        self.assertEqual(match.kwargs, {})
+        self.assertEqual(match.args, ())
+        self.assertEqual(
+            match.route,
+            r'^regex_only_optional/(?:(?P<arg1>\d+)/)?',
+        )
+
     def test_path_lookup_with_inclusion(self):
         match = resolve('/included_urls/extra/something/')
         self.assertEqual(match.url_name, 'inner-extra')
@@ -130,10 +143,19 @@ class SimplifiedURLTests(SimpleTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             path('foo/<nonexistent:var>/', empty_view)
 
-    def test_space_in_route(self):
-        msg = "URL route 'space/<int: num>' cannot contain whitespace."
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            path('space/<int: num>', empty_view)
+    def test_whitespace_in_route(self):
+        msg = (
+            "URL route 'space/<int:num>/extra/<str:%stest>' cannot contain "
+            "whitespace in angle brackets <…>"
+        )
+        for whitespace in string.whitespace:
+            with self.subTest(repr(whitespace)):
+                with self.assertRaisesMessage(ImproperlyConfigured, msg % whitespace):
+                    path('space/<int:num>/extra/<str:%stest>' % whitespace, empty_view)
+        # Whitespaces are valid in paths.
+        p = path('space%s/<int:num>/' % string.whitespace, empty_view)
+        match = p.resolve('space%s/1/' % string.whitespace)
+        self.assertEqual(match.kwargs, {'num': 1})
 
 
 @override_settings(ROOT_URLCONF='urlpatterns.converter_urls')
@@ -190,14 +212,70 @@ class ConverterTests(SimpleTestCase):
                     resolve(url)
 
 
+@override_settings(ROOT_URLCONF='urlpatterns.path_same_name_urls')
+class SameNameTests(SimpleTestCase):
+    def test_matching_urls_same_name(self):
+        @DynamicConverter.register_to_url
+        def requires_tiny_int(value):
+            if value > 5:
+                raise ValueError
+            return value
+
+        tests = [
+            ('number_of_args', [
+                ([], {}, '0/'),
+                ([1], {}, '1/1/'),
+            ]),
+            ('kwargs_names', [
+                ([], {'a': 1}, 'a/1/'),
+                ([], {'b': 1}, 'b/1/'),
+            ]),
+            ('converter', [
+                (['a/b'], {}, 'path/a/b/'),
+                (['a b'], {}, 'str/a%20b/'),
+                (['a-b'], {}, 'slug/a-b/'),
+                (['2'], {}, 'int/2/'),
+                (
+                    ['39da9369-838e-4750-91a5-f7805cd82839'],
+                    {},
+                    'uuid/39da9369-838e-4750-91a5-f7805cd82839/'
+                ),
+            ]),
+            ('regex', [
+                (['ABC'], {}, 'uppercase/ABC/'),
+                (['abc'], {}, 'lowercase/abc/'),
+            ]),
+            ('converter_to_url', [
+                ([6], {}, 'int/6/'),
+                ([1], {}, 'tiny_int/1/'),
+            ]),
+        ]
+        for url_name, cases in tests:
+            for args, kwargs, url_suffix in cases:
+                expected_url = '/%s/%s' % (url_name, url_suffix)
+                with self.subTest(url=expected_url):
+                    self.assertEqual(
+                        reverse(url_name, args=args, kwargs=kwargs),
+                        expected_url,
+                    )
+
+
 class ParameterRestrictionTests(SimpleTestCase):
-    def test_non_identifier_parameter_name_causes_exception(self):
+    def test_integer_parameter_name_causes_exception(self):
         msg = (
             "URL route 'hello/<int:1>/' uses parameter name '1' which isn't "
             "a valid Python identifier."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             path(r'hello/<int:1>/', lambda r: None)
+
+    def test_non_identifier_parameter_name_causes_exception(self):
+        msg = (
+            "URL route 'b/<int:book.id>/' uses parameter name 'book.id' which "
+            "isn't a valid Python identifier."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            path(r'b/<int:book.id>/', lambda r: None)
 
     def test_allows_non_ascii_but_valid_identifiers(self):
         # \u0394 is "GREEK CAPITAL LETTER DELTA", a valid identifier.
@@ -224,9 +302,26 @@ class ConversionExceptionTests(SimpleTestCase):
         with self.assertRaisesMessage(TypeError, 'This type error propagates.'):
             resolve('/dynamic/abc/')
 
-    def test_reverse_value_error_propagates(self):
+    def test_reverse_value_error_means_no_match(self):
         @DynamicConverter.register_to_url
         def raises_value_error(value):
-            raise ValueError('This value error propagates.')
-        with self.assertRaisesMessage(ValueError, 'This value error propagates.'):
+            raise ValueError
+        with self.assertRaises(NoReverseMatch):
             reverse('dynamic', kwargs={'value': object()})
+
+    def test_reverse_type_error_propagates(self):
+        @DynamicConverter.register_to_url
+        def raises_type_error(value):
+            raise TypeError('This type error propagates.')
+        with self.assertRaisesMessage(TypeError, 'This type error propagates.'):
+            reverse('dynamic', kwargs={'value': object()})
+
+
+class DeprecationTests(SimpleTestCase):
+    def test_url_warning(self):
+        msg = (
+            'django.conf.urls.url() is deprecated in favor of '
+            'django.urls.re_path().'
+        )
+        with self.assertRaisesMessage(RemovedInDjango40Warning, msg):
+            conf_url(r'^regex/(?P<pk>[0-9]+)/$', empty_view, name='regex')

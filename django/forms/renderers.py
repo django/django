@@ -7,12 +7,6 @@ from django.template.loader import get_template
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
-try:
-    from django.template.backends.jinja2 import Jinja2
-except ImportError:
-    def Jinja2(params):
-        raise ImportError("jinja2 isn't installed")
-
 ROOT = Path(__file__).parent
 
 
@@ -39,7 +33,7 @@ class EngineMixin:
     def engine(self):
         return self.backend({
             'APP_DIRS': True,
-            'DIRS': [str(ROOT / self.backend.app_dirname)],
+            'DIRS': [ROOT / self.backend.app_dirname],
             'NAME': 'djangoforms',
             'OPTIONS': {},
         })
@@ -58,7 +52,10 @@ class Jinja2(EngineMixin, BaseRenderer):
     Load Jinja2 templates from the built-in widget templates in
     django/forms/jinja2 and from apps' 'jinja2' directory.
     """
-    backend = Jinja2
+    @cached_property
+    def backend(self):
+        from django.template.backends.jinja2 import Jinja2
+        return Jinja2
 
 
 class TemplatesSetting(BaseRenderer):

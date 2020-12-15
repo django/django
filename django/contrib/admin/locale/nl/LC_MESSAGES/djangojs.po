@@ -7,15 +7,16 @@
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012
-# Sander Steffann <inactive+steffann@transifex.com>, 2015
-# Tonnes <tonnes.mb@gmail.com>, 2019
+# Meteor0id, 2019-2020
+# 8de006b1b0894aab6aef71979dcd8bd6_5c6b207 <ff2658a8d8dbebbd9cc240b8c133a515_234097>, 2015
+# Tonnes <tonnes.mb@gmail.com>, 2019-2020
 # wunki <petar@wunki.org>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2019-02-24 20:42+0000\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-13 11:10+0000\n"
 "Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -71,7 +72,7 @@ msgstr ""
 "twee vakken te klikken."
 
 msgid "Remove all"
-msgstr "Verwijder alles"
+msgstr "Alle verwijderen"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
@@ -90,17 +91,17 @@ msgstr ""
 "een actie uitvoert, gaan uw wijzigingen verloren."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
 "U hebt een actie geselecteerd, maar uw wijzigingen in afzonderlijke velden "
-"nog niet opgeslagen. Klik op OK om op te slaan. U dient de actie opnieuw uit "
-"te voeren."
+"nog niet opgeslagen. Klik op OK om deze op te slaan. U dient de actie "
+"opnieuw uit te voeren."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 "U hebt een actie geselecteerd, en geen wijzigingen in afzonderlijke velden "
@@ -193,7 +194,7 @@ msgstr "december"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr "S"
+msgstr "Z"
 
 msgctxt "one letter Monday"
 msgid "M"
@@ -201,7 +202,7 @@ msgstr "M"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr "T"
+msgstr "D"
 
 msgctxt "one letter Wednesday"
 msgid "W"
@@ -209,15 +210,15 @@ msgstr "W"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr "T"
+msgstr "D"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr "F"
+msgstr "V"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr "S"
+msgstr "Z"
 
 msgid "Show"
 msgstr "Tonen"

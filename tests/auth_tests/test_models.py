@@ -2,18 +2,22 @@ from unittest import mock
 
 from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth import get_user_model
+from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.hashers import get_hasher
 from django.contrib.auth.models import (
-    AbstractUser, AnonymousUser, Group, Permission, User, UserManager,
+    AnonymousUser, Group, Permission, User, UserManager,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
+from django.db import connection, migrations
+from django.db.migrations.state import ModelState, ProjectState
 from django.db.models.signals import post_save
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import (
+    SimpleTestCase, TestCase, TransactionTestCase, override_settings,
+)
 
-from .models import IntegerUsernameUser
-from .models.with_custom_email_field import CustomEmailField
+from .models import CustomEmailField, IntegerUsernameUser
 
 
 class NaturalKeysTestCase(TestCase):
@@ -100,7 +104,12 @@ class LoadDataWithNaturalKeysAndMultipleDatabasesTestCase(TestCase):
         self.assertEqual(perm_other.content_type_id, other_objects[0].id)
 
 
-class UserManagerTestCase(TestCase):
+class UserManagerTestCase(TransactionTestCase):
+    available_apps = [
+        'auth_tests',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+    ]
 
     def test_create_user(self):
         email_lowercase = 'normal@normal.com'
@@ -155,6 +164,30 @@ class UserManagerTestCase(TestCase):
         for char in password:
             self.assertIn(char, allowed_chars)
 
+    def test_runpython_manager_methods(self):
+        def forwards(apps, schema_editor):
+            UserModel = apps.get_model('auth', 'User')
+            user = UserModel.objects.create_user('user1', password='secure')
+            self.assertIsInstance(user, UserModel)
+
+        operation = migrations.RunPython(forwards, migrations.RunPython.noop)
+        project_state = ProjectState()
+        project_state.add_model(ModelState.from_model(User))
+        project_state.add_model(ModelState.from_model(Group))
+        project_state.add_model(ModelState.from_model(Permission))
+        project_state.add_model(ModelState.from_model(ContentType))
+        new_state = project_state.clone()
+        with connection.schema_editor() as editor:
+            operation.state_forwards('test_manager_methods', new_state)
+            operation.database_forwards(
+                'test_manager_methods',
+                editor,
+                project_state,
+                new_state,
+            )
+        user = User.objects.get(username='user1')
+        self.assertTrue(user.check_password('secure'))
+
 
 class AbstractBaseUserTests(SimpleTestCase):
 
@@ -181,8 +214,7 @@ class AbstractBaseUserTests(SimpleTestCase):
                 self.assertEqual(username, 'iamtheΩ')  # U+03A9 GREEK CAPITAL LETTER OMEGA
 
     def test_default_email(self):
-        user = AbstractBaseUser()
-        self.assertEqual(user.get_email_field_name(), 'email')
+        self.assertEqual(AbstractBaseUser.get_email_field_name(), 'email')
 
     def test_custom_email(self):
         user = CustomEmailField()
@@ -199,8 +231,8 @@ class AbstractUserTestCase(TestCase):
             "connection": None,
             "html_message": None,
         }
-        abstract_user = AbstractUser(email='foo@bar.com')
-        abstract_user.email_user(
+        user = User(email='foo@bar.com')
+        user.email_user(
             subject="Subject here",
             message="This is a message",
             from_email="from@domain.com",
@@ -211,7 +243,7 @@ class AbstractUserTestCase(TestCase):
         self.assertEqual(message.subject, "Subject here")
         self.assertEqual(message.body, "This is a message")
         self.assertEqual(message.from_email, "from@domain.com")
-        self.assertEqual(message.to, [abstract_user.email])
+        self.assertEqual(message.to, [user.email])
 
     def test_last_login_default(self):
         user1 = User.objects.create(username='user1')
@@ -259,6 +291,142 @@ class AbstractUserTestCase(TestCase):
             self.assertNotEqual(initial_password, user.password)
         finally:
             hasher.iterations = old_iterations
+
+
+class CustomModelBackend(ModelBackend):
+    def with_perm(self, perm, is_active=True, include_superusers=True, backend=None, obj=None):
+        if obj is not None and obj.username == 'charliebrown':
+            return User.objects.filter(pk=obj.pk)
+        return User.objects.filter(username__startswith='charlie')
+
+
+class UserWithPermTestCase(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        content_type = ContentType.objects.get_for_model(Group)
+        cls.permission = Permission.objects.create(
+            name='test', content_type=content_type, codename='test',
+        )
+        # User with permission.
+        cls.user1 = User.objects.create_user('user 1', 'foo@example.com')
+        cls.user1.user_permissions.add(cls.permission)
+        # User with group permission.
+        group1 = Group.objects.create(name='group 1')
+        group1.permissions.add(cls.permission)
+        group2 = Group.objects.create(name='group 2')
+        group2.permissions.add(cls.permission)
+        cls.user2 = User.objects.create_user('user 2', 'bar@example.com')
+        cls.user2.groups.add(group1, group2)
+        # Users without permissions.
+        cls.user_charlie = User.objects.create_user('charlie', 'charlie@example.com')
+        cls.user_charlie_b = User.objects.create_user('charliebrown', 'charlie@brown.com')
+        # Superuser.
+        cls.superuser = User.objects.create_superuser(
+            'superuser', 'superuser@example.com', 'superpassword',
+        )
+        # Inactive user with permission.
+        cls.inactive_user = User.objects.create_user(
+            'inactive_user', 'baz@example.com', is_active=False,
+        )
+        cls.inactive_user.user_permissions.add(cls.permission)
+
+    def test_invalid_permission_name(self):
+        msg = 'Permission name should be in the form app_label.permission_codename.'
+        for perm in ('nodots', 'too.many.dots', '...', ''):
+            with self.subTest(perm), self.assertRaisesMessage(ValueError, msg):
+                User.objects.with_perm(perm)
+
+    def test_invalid_permission_type(self):
+        msg = 'The `perm` argument must be a string or a permission instance.'
+        for perm in (b'auth.test', object(), None):
+            with self.subTest(perm), self.assertRaisesMessage(TypeError, msg):
+                User.objects.with_perm(perm)
+
+    def test_invalid_backend_type(self):
+        msg = 'backend must be a dotted import path string (got %r).'
+        for backend in (b'auth_tests.CustomModelBackend', object()):
+            with self.subTest(backend):
+                with self.assertRaisesMessage(TypeError, msg % backend):
+                    User.objects.with_perm('auth.test', backend=backend)
+
+    def test_basic(self):
+        active_users = [self.user1, self.user2]
+        tests = [
+            ({}, [*active_users, self.superuser]),
+            ({'obj': self.user1}, []),
+            # Only inactive users.
+            ({'is_active': False}, [self.inactive_user]),
+            # All users.
+            ({'is_active': None}, [*active_users, self.superuser, self.inactive_user]),
+            # Exclude superusers.
+            ({'include_superusers': False}, active_users),
+            (
+                {'include_superusers': False, 'is_active': False},
+                [self.inactive_user],
+            ),
+            (
+                {'include_superusers': False, 'is_active': None},
+                [*active_users, self.inactive_user],
+            ),
+        ]
+        for kwargs, expected_users in tests:
+            for perm in ('auth.test', self.permission):
+                with self.subTest(perm=perm, **kwargs):
+                    self.assertCountEqual(
+                        User.objects.with_perm(perm, **kwargs),
+                        expected_users,
+                    )
+
+    @override_settings(AUTHENTICATION_BACKENDS=['django.contrib.auth.backends.BaseBackend'])
+    def test_backend_without_with_perm(self):
+        self.assertSequenceEqual(User.objects.with_perm('auth.test'), [])
+
+    def test_nonexistent_permission(self):
+        self.assertSequenceEqual(User.objects.with_perm('auth.perm'), [self.superuser])
+
+    def test_nonexistent_backend(self):
+        with self.assertRaises(ImportError):
+            User.objects.with_perm(
+                'auth.test',
+                backend='invalid.backend.CustomModelBackend',
+            )
+
+    @override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_models.CustomModelBackend'])
+    def test_custom_backend(self):
+        for perm in ('auth.test', self.permission):
+            with self.subTest(perm):
+                self.assertCountEqual(
+                    User.objects.with_perm(perm),
+                    [self.user_charlie, self.user_charlie_b],
+                )
+
+    @override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_models.CustomModelBackend'])
+    def test_custom_backend_pass_obj(self):
+        for perm in ('auth.test', self.permission):
+            with self.subTest(perm):
+                self.assertSequenceEqual(
+                    User.objects.with_perm(perm, obj=self.user_charlie_b),
+                    [self.user_charlie_b],
+                )
+
+    @override_settings(AUTHENTICATION_BACKENDS=[
+        'auth_tests.test_models.CustomModelBackend',
+        'django.contrib.auth.backends.ModelBackend',
+    ])
+    def test_multiple_backends(self):
+        msg = (
+            'You have multiple authentication backends configured and '
+            'therefore must provide the `backend` argument.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            User.objects.with_perm('auth.test')
+
+        backend = 'auth_tests.test_models.CustomModelBackend'
+        self.assertCountEqual(
+            User.objects.with_perm('auth.test', backend=backend),
+            [self.user_charlie, self.user_charlie_b],
+        )
 
 
 class IsActiveTestCase(TestCase):

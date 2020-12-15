@@ -1,0 +1,16 @@
+==========================
+Django 3.0.9 release notes
+==========================
+
+*August 3, 2020*
+
+Django 3.0.9 fixes several bugs in 3.0.8.
+
+Bugfixes
+========
+
+* Allowed setting the ``SameSite`` cookie flag in
+  :meth:`.HttpResponse.delete_cookie` (:ticket:`31790`).
+
+* Fixed crash when sending emails to addresses with display names longer than
+  75 chars on Python 3.6.11+, 3.7.8+, and 3.8.4+ (:ticket:`31784`).

@@ -132,10 +132,6 @@ Use the ``django.test.Client`` class to make requests.
     exceptions raised during the request should also be raised in the test.
     Defaults to ``True``.
 
-    .. versionadded:: 3.0
-
-        The ``raise_request_exception`` argument was added.
-
     Once you have a ``Client`` instance, you can call any of the following
     methods:
 
@@ -159,11 +155,11 @@ Use the ``django.test.Client`` class to make requests.
 
             >>> c = Client()
             >>> c.get('/customers/details/', {'name': 'fred', 'age': 7},
-            ...       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+            ...       HTTP_ACCEPT='application/json')
 
-        ...will send the HTTP header ``HTTP_X_REQUESTED_WITH`` to the
-        details view, which is a good way to test code paths that use the
-        :meth:`django.http.HttpRequest.is_ajax()` method.
+        ...will send the HTTP header ``HTTP_ACCEPT`` to the details view, which
+        is a good way to test code paths that use the
+        :meth:`django.http.HttpRequest.accepts()` method.
 
         .. admonition:: CGI specification
 
@@ -224,11 +220,6 @@ Use the ``django.test.Client`` class to make requests.
         and can be overridden by providing a ``json_encoder`` argument to
         :class:`Client`. This serialization also happens for :meth:`put`,
         :meth:`patch`, and :meth:`delete` requests.
-
-        .. versionchanged:: 2.2
-
-            The JSON serialization was extended to support lists and tuples. In
-            older versions, only dicts are serialized.
 
         If you provide any other ``content_type`` (e.g. :mimetype:`text/xml`
         for an XML payload), the contents of ``data`` are sent as-is in the
@@ -486,8 +477,6 @@ Specifically, a ``Response`` object has the following attributes:
 
     .. attribute:: exc_info
 
-        .. versionadded:: 3.0
-
         A tuple of three values that provides information about the unhandled
         exception, if any, that occurred during the view.
 
@@ -562,9 +551,9 @@ Specifically, a ``Response`` object has the following attributes:
         If the given URL is not found, accessing this attribute will raise a
         :exc:`~django.urls.Resolver404` exception.
 
-You can also use dictionary syntax on the response object to query the value
-of any settings in the HTTP headers. For example, you could determine the
-content type of a response using ``response['Content-Type']``.
+As with a normal response, you can also access the headers through
+:attr:`.HttpResponse.headers`. For example, you could determine the content
+type of a response using ``response.headers['Content-Type']``.
 
 Exceptions
 ----------
@@ -661,7 +650,7 @@ More details are in :ref:`explicitly-setting-the-active-language`.
 Example
 -------
 
-The following is a simple unit test using the test client::
+The following is a unit test using the test client::
 
     import unittest
     from django.test import Client
@@ -702,11 +691,11 @@ Normal Python unit test classes extend a base class of
 
    Hierarchy of Django unit testing classes
 
-Converting a normal :class:`unittest.TestCase` to any of the subclasses is
-easy: change the base class of your test from ``unittest.TestCase`` to the
-subclass. All of the standard Python unit test functionality will be available,
-and it will be augmented with some useful additions as described in each
-section below.
+You can convert a normal :class:`unittest.TestCase` to any of the subclasses:
+change the base class of your test from ``unittest.TestCase`` to the subclass.
+All of the standard Python unit test functionality will be available, and it
+will be augmented with some useful additions as described in each section
+below.
 
 ``SimpleTestCase``
 ------------------
@@ -745,22 +734,12 @@ If your tests make any database queries, use subclasses
 
 .. attribute:: SimpleTestCase.databases
 
-    .. versionadded:: 2.2
-
     :class:`~SimpleTestCase` disallows database queries by default. This
     helps to avoid executing write queries which will affect other tests
     since each ``SimpleTestCase`` test isn't run in a transaction. If you
     aren't concerned about this problem, you can disable this behavior by
     setting the ``databases`` class attribute to ``'__all__'`` on your test
     class.
-
-.. attribute:: SimpleTestCase.allow_database_queries
-
-    .. deprecated:: 2.2
-
-    This attribute is deprecated in favor of :attr:`databases`. The previous
-    behavior of ``allow_database_queries = True`` can be achieved by setting
-    ``databases = '__all__'``.
 
 .. warning::
 
@@ -789,6 +768,11 @@ If your tests make any database queries, use subclasses
     on macOS). If you want to intentionally raise an exception such as
     :exc:`unittest.SkipTest` in ``setUpClass()``, be sure to do it before
     calling ``super()`` to avoid this.
+
+.. versionchanged:: 3.1
+
+    The ``debug()`` method was implemented to allow running a test without
+    collecting the result and catching exceptions.
 
 ``TransactionTestCase``
 -----------------------
@@ -889,11 +873,49 @@ It also provides an additional method:
     (for instance, MySQL with the MyISAM engine), ``setUpTestData()`` will be
     called before each test, negating the speed benefits.
 
-    Be careful not to modify any objects created in ``setUpTestData()`` in
-    your test methods. Modifications to in-memory objects from setup work done
-    at the class level will persist between test methods. If you do need to
-    modify them, you could reload them in the ``setUp()`` method with
-    :meth:`~django.db.models.Model.refresh_from_db`, for example.
+    .. versionchanged:: 3.2
+
+        Objects assigned to class attributes in ``setUpTestData()`` must
+        support creating deep copies with :py:func:`copy.deepcopy` in order to
+        isolate them from alterations performed by each test methods. In
+        previous versions of Django these objects were reused and changes made
+        to them were persisted between test methods.
+
+.. classmethod:: TestCase.captureOnCommitCallbacks(using=DEFAULT_DB_ALIAS, execute=False)
+
+    .. versionadded:: 3.2
+
+    Returns a context manager that captures :func:`transaction.on_commit()
+    <django.db.transaction.on_commit>` callbacks for the given database
+    connection. It returns a list that contains, on exit of the context, the
+    captured callback functions. From this list you can make assertions on the
+    callbacks or call them to invoke their side effects, emulating a commit.
+
+    ``using`` is the alias of the database connection to capture callbacks for.
+
+    If ``execute`` is ``True``, all the callbacks will be called as the context
+    manager exits, if no exception occurred. This emulates a commit after the
+    wrapped block of code.
+
+    For example::
+
+        from django.core import mail
+        from django.test import TestCase
+
+
+        class ContactTests(TestCase):
+            def test_post(self):
+                with self.captureOnCommitCallbacks(execute=True) as callbacks:
+                    response = self.client.post(
+                        '/contact/',
+                        {'message': 'I like your site'},
+                    )
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(callbacks), 1)
+                self.assertEqual(len(mail.outbox), 1)
+                self.assertEqual(mail.outbox[0].subject, 'Contact Form')
+                self.assertEqual(mail.outbox[0].body, 'I like your site')
 
 .. _live-test-server:
 
@@ -914,9 +936,9 @@ The live server listens on ``localhost`` and binds to port 0 which uses a free
 port assigned by the operating system. The server's URL can be accessed with
 ``self.live_server_url`` during the tests.
 
-To demonstrate how to use ``LiveServerTestCase``, let's write a simple Selenium
-test. First of all, you need to install the `selenium package`_ into your
-Python path:
+To demonstrate how to use ``LiveServerTestCase``, let's write a Selenium test.
+First of all, you need to install the `selenium package`_ into your Python
+path:
 
 .. console::
 
@@ -1002,13 +1024,13 @@ out the `full reference`_ for more details.
 
     The tricky thing here is that there's really no such thing as a "page load,"
     especially in modern Web apps that generate HTML dynamically after the
-    server generates the initial document. So, simply checking for the presence
-    of ``<body>`` in the response might not necessarily be appropriate for all
-    use cases. Please refer to the `Selenium FAQ`_ and
-    `Selenium documentation`_ for more information.
+    server generates the initial document. So, checking for the presence of
+    ``<body>`` in the response might not necessarily be appropriate for all use
+    cases. Please refer to the `Selenium FAQ`_ and `Selenium documentation`_
+    for more information.
 
     .. _Selenium FAQ: https://web.archive.org/web/20160129132110/http://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions#Q:_WebDriver_fails_to_find_elements_/_Does_not_block_on_page_loa
-    .. _Selenium documentation: http://seleniumhq.org/docs/04_webdriver_advanced.html#explicit-waits
+    .. _Selenium documentation: https://www.selenium.dev/documentation/en/webdriver/waits/#explicit-wait
 
 Test cases features
 ===================
@@ -1039,7 +1061,7 @@ This means, instead of instantiating a ``Client`` in each test::
             response = client.get('/customer/index/')
             self.assertEqual(response.status_code, 200)
 
-...you can just refer to ``self.client``, like so::
+...you can refer to ``self.client``, like so::
 
     from django.test import TestCase
 
@@ -1152,8 +1174,6 @@ Multi-database support
 
 .. attribute:: TransactionTestCase.databases
 
-.. versionadded:: 2.2
-
 Django sets up a test database corresponding to every database that is
 defined in the :setting:`DATABASES` definition in your settings and referred to
 by at least one test through ``databases``.
@@ -1189,17 +1209,7 @@ only loaded into the ``default`` database.
 Queries against databases not in ``databases`` will give assertion errors to
 prevent state leaking between tests.
 
-.. attribute:: TransactionTestCase.multi_db
-
-.. deprecated:: 2.2
-
-This attribute is deprecated in favor of :attr:`~TransactionTestCase.databases`.
-The previous behavior of ``multi_db = True`` can be achieved by setting
-``databases = '__all__'``.
-
 .. attribute:: TestCase.databases
-
-.. versionadded:: 2.2
 
 By default, only the ``default`` database will be wrapped in a transaction
 during a ``TestCase``'s execution and attempts to query other databases will
@@ -1220,14 +1230,6 @@ This test will only allow queries against the ``other`` database. Just like for
 :attr:`SimpleTestCase.databases` and :attr:`TransactionTestCase.databases`, the
 ``'__all__'`` constant can be used to specify that the test should allow
 queries to all databases.
-
-.. attribute:: TestCase.multi_db
-
-.. deprecated:: 2.2
-
-This attribute is deprecated in favor of :attr:`~TestCase.databases`. The
-previous behavior of ``multi_db = True`` can be achieved by setting
-``databases = '__all__'``.
 
 .. _overriding-settings:
 
@@ -1268,9 +1270,9 @@ in the ``with`` block and reset its value to the previous state afterwards.
 .. method:: SimpleTestCase.modify_settings()
 
 It can prove unwieldy to redefine settings that contain a list of values. In
-practice, adding or removing values is often sufficient. The
-:meth:`~django.test.SimpleTestCase.modify_settings` context manager makes it
-easy::
+practice, adding or removing values is often sufficient. Django provides the
+:meth:`~django.test.SimpleTestCase.modify_settings` context manager for easier
+settings changes::
 
     from django.test import TestCase
 
@@ -1563,8 +1565,6 @@ your test suite.
 
 .. method:: SimpleTestCase.assertURLEqual(url1, url2, msg_prefix='')
 
-    .. versionadded:: 2.2
-
     Asserts that two URLs are the same, ignoring the order of query string
     parameters except for parameters with the same name. For example,
     ``/path/?x=1&y=2`` is equal to ``/path/?y=2&x=1``, but
@@ -1643,10 +1643,10 @@ your test suite.
     :meth:`~SimpleTestCase.assertHTMLEqual`, the comparison is
     made on parsed content, hence only semantic differences are considered, not
     syntax differences. When invalid XML is passed in any parameter, an
-    ``AssertionError`` is always raised, even if both string are identical.
+    ``AssertionError`` is always raised, even if both strings are identical.
 
-    XML declaration, document type, and comments are ignored. Only the root
-    element and its children are compared.
+    XML declaration, document type, processing instructions, and comments are
+    ignored. Only the root element and its children are compared.
 
     Output in case of error can be customized with the ``msg`` argument.
 
@@ -1683,14 +1683,13 @@ your test suite.
 
     Output in case of error can be customized with the ``msg`` argument.
 
-.. method:: TransactionTestCase.assertQuerysetEqual(qs, values, transform=repr, ordered=True, msg=None)
+.. method:: TransactionTestCase.assertQuerysetEqual(qs, values, transform=None, ordered=True, msg=None)
 
-    Asserts that a queryset ``qs`` returns a particular list of values ``values``.
+    Asserts that a queryset ``qs`` matches a particular iterable of values
+    ``values``.
 
-    The comparison of the contents of ``qs`` and ``values`` is performed using
-    the function ``transform``; by default, this means that the ``repr()`` of
-    each value is compared. Any other callable can be used if ``repr()`` doesn't
-    provide a unique or helpful comparison.
+    If ``transform`` is provided, ``values`` is compared to a list produced by
+    applying ``transform`` to each member of ``qs``.
 
     By default, the comparison is also ordering dependent. If ``qs`` doesn't
     provide an implicit ordering, you can set the ``ordered`` parameter to
@@ -1701,15 +1700,33 @@ your test suite.
 
     Output in case of error can be customized with the ``msg`` argument.
 
+    .. versionchanged:: 3.2
+
+        The default value of ``transform`` argument was changed to ``None``.
+
+    .. versionadded:: 3.2
+
+        Support for direct comparison between querysets was added.
+
+    .. deprecated:: 3.2
+
+        If ``transform`` is not provided and ``values`` is a list of strings,
+        it's compared to a list produced by applying ``repr()`` to each member
+        of ``qs``. This behavior is deprecated and will be removed in Django
+        4.1. If you need it, explicitly set ``transform`` to ``repr``.
+
 .. method:: TransactionTestCase.assertNumQueries(num, func, *args, **kwargs)
 
     Asserts that when ``func`` is called with ``*args`` and ``**kwargs`` that
     ``num`` database queries are executed.
 
     If a ``"using"`` key is present in ``kwargs`` it is used as the database
-    alias for which to check the number of queries.  If you wish to call a
-    function with a ``using`` parameter you can do it by wrapping the call with
-    a ``lambda`` to add an extra parameter::
+    alias for which to check the number of queries::
+
+        self.assertNumQueries(7, using='non_default_db')
+
+    If you wish to call a function with a ``using`` parameter you can do it by
+    wrapping the call with a ``lambda`` to add an extra parameter::
 
         self.assertNumQueries(7, lambda: my_function(using=7))
 
@@ -1784,6 +1801,75 @@ You can also exclude tests by tag. To run core tests if they are not slow:
 test has two tags and you select one of them and exclude the other, the test
 won't be run.
 
+.. _async-tests:
+
+Testing asynchronous code
+=========================
+
+.. versionadded:: 3.1
+
+If you merely want to test the output of your asynchronous views, the standard
+test client will run them inside their own asynchronous loop without any extra
+work needed on your part.
+
+However, if you want to write fully-asynchronous tests for a Django project,
+you will need to take several things into account.
+
+Firstly, your tests must be ``async def`` methods on the test class (in order
+to give them an asynchronous context). Django will automatically detect
+any ``async def`` tests and wrap them so they run in their own event loop.
+
+If you are testing from an asynchronous function, you must also use the
+asynchronous test client. This is available as ``django.test.AsyncClient``,
+or as ``self.async_client`` on any test.
+
+``AsyncClient`` has the same methods and signatures as the synchronous (normal)
+test client, with two exceptions:
+
+* The ``follow`` parameter is not supported.
+* Headers passed as ``extra`` keyword arguments should not have the ``HTTP_``
+  prefix required by the synchronous client (see :meth:`Client.get`). For
+  example, here is how to set an HTTP ``Accept`` header::
+
+    >>> c = AsyncClient()
+    >>> c.get(
+    ...     '/customers/details/',
+    ...     {'name': 'fred', 'age': 7},
+    ...     ACCEPT='application/json'
+    ... )
+
+Using ``AsyncClient`` any method that makes a request must be awaited::
+
+    async def test_my_thing(self):
+        response = await self.async_client.get('/some-url/')
+        self.assertEqual(response.status_code, 200)
+
+The asynchronous client can also call synchronous views; it runs through
+Django's :doc:`asynchronous request path </topics/async>`, which supports both.
+Any view called through the ``AsyncClient`` will get an ``ASGIRequest`` object
+for its ``request`` rather than the ``WSGIRequest`` that the normal client
+creates.
+
+.. warning::
+
+    If you are using test decorators, they must be async-compatible to ensure
+    they work correctly. Django's built-in decorators will behave correctly, but
+    third-party ones may appear to not execute (they will "wrap" the wrong part
+    of the execution flow and not your test).
+
+    If you need to use these decorators, then you should decorate your test
+    methods with :func:`~asgiref.sync.async_to_sync` *inside* of them instead::
+
+        from asgiref.sync import async_to_sync
+        from django.test import TestCase
+
+        class MyTests(TestCase):
+
+            @mock.patch(...)
+            @async_to_sync
+            async def test_my_thing(self):
+                ...
+
 .. _topics-testing-email:
 
 Email services
@@ -1806,12 +1892,12 @@ Django, such as your machine's mail server, if you're running one.)
 .. data:: django.core.mail.outbox
 
 During test running, each outgoing email is saved in
-``django.core.mail.outbox``. This is a simple list of all
-:class:`~django.core.mail.EmailMessage` instances that have been sent.
-The ``outbox`` attribute is a special attribute that is created *only* when
-the ``locmem`` email backend is used. It doesn't normally exist as part of the
-:mod:`django.core.mail` module and you can't import it directly. The code
-below shows how to access this attribute correctly.
+``django.core.mail.outbox``. This is a list of all
+:class:`~django.core.mail.EmailMessage` instances that have been sent.  The
+``outbox`` attribute is a special attribute that is created *only* when the
+``locmem`` email backend is used. It doesn't normally exist as part of the
+:mod:`django.core.mail` module and you can't import it directly. The code below
+shows how to access this attribute correctly.
 
 Here's an example test that examines ``django.core.mail.outbox`` for length
 and contents::

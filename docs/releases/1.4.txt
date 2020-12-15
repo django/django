@@ -115,7 +115,7 @@ comprehensively. See the
 :class:`documentation<django.test.LiveServerTestCase>` for more details and
 concrete examples.
 
-.. _Selenium: http://seleniumhq.org/
+.. _Selenium: https://selenium.dev/
 
 Updated default project layout and ``manage.py``
 ------------------------------------------------
@@ -609,7 +609,7 @@ Django 1.4 also includes several smaller improvements worth noting:
 * A new, plain-text, version of the HTTP 500 status code internal error page
   served when :setting:`DEBUG` is ``True`` is now sent to the client when
   Django detects that the request has originated in JavaScript code.
-  (:meth:`~django.http.HttpRequest.is_ajax` is used for this.)
+  (``is_ajax()`` is used for this.)
 
   Like its HTML counterpart, it contains a collection of different
   pieces of information about the state of the application.
@@ -634,9 +634,9 @@ Django 1.4 also includes several smaller improvements worth noting:
   :meth:`~django.db.models.query.QuerySet.distinct`.
 
 * The admin login page will add a password reset link if you include a URL with
-  the name `'admin_password_reset'` in your urls.py, so plugging in the built-in
-  password reset mechanism and making it available is now much easier. For
-  details, see :ref:`auth_password_reset`.
+  the name ``'admin_password_reset'`` in your urls.py, so plugging in the
+  built-in password reset mechanism and making it available is now much easier.
+  For details, see :ref:`auth_password_reset`.
 
 * The MySQL database backend can now make use of the savepoint feature
   implemented by MySQL version 5.0.3 or newer with the InnoDB storage engine.
@@ -671,9 +671,9 @@ vulnerabilities. No Django site should ever be run without a
 :setting:`SECRET_KEY`.
 
 In Django 1.4, starting Django with an empty :setting:`SECRET_KEY` will raise a
-`DeprecationWarning`. In Django 1.5, it will raise an exception and Django will
-refuse to start. This is slightly accelerated from the usual deprecation path
-due to the severity of the consequences of running Django with no
+``DeprecationWarning``. In Django 1.5, it will raise an exception and Django
+will refuse to start. This is slightly accelerated from the usual deprecation
+path due to the severity of the consequences of running Django with no
 :setting:`SECRET_KEY`.
 
 ``django.contrib.admin``
@@ -723,9 +723,9 @@ Released over 10 years ago, IE6 imposes many limitations on modern Web
 development. The practical implications of this policy are that contributors
 are free to improve the admin without consideration for these limitations.
 
-Obviously, this new policy **has no impact** on sites you develop using Django.
-It only applies to the Django admin. Feel free to develop apps compatible with
-any range of browsers.
+This new policy **has no impact** on sites you develop using Django. It only
+applies to the Django admin. Feel free to develop apps compatible with any
+range of browsers.
 
 .. _YUI's A-grade: https://github.com/yui/yui3/wiki/Graded-Browser-Support
 
@@ -909,8 +909,8 @@ doesn't make any effort to synchronize access to the underlying backend.
 Concurrency behavior is defined by the underlying backend implementation.
 Check their documentation for details.
 
-`COMMENTS_BANNED_USERS_GROUP` setting
--------------------------------------
+``COMMENTS_BANNED_USERS_GROUP`` setting
+---------------------------------------
 
 Django's comments has historically
 supported excluding the comments of a special user group, but we've never
@@ -946,8 +946,8 @@ Save this model manager in your custom comment app (e.g., in
 
         objects = BanningCommentManager()
 
-`IGNORABLE_404_STARTS` and `IGNORABLE_404_ENDS` settings
---------------------------------------------------------
+``IGNORABLE_404_STARTS`` and ``IGNORABLE_404_ENDS`` settings
+------------------------------------------------------------
 
 Until Django 1.3, it was possible to exclude some URLs from Django's
 :doc:`404 error reporting</howto/error-reporting>` by adding prefixes to
@@ -1257,7 +1257,7 @@ needed with the new ``manage.py`` and default project layout.
 
 This function was never documented or part of the public API, but it was widely
 recommended for use in setting up a "Django environment" for a user script.
-These uses should be replaced by setting the ``DJANGO_SETTINGS_MODULE``
+These uses should be replaced by setting the :envvar:`DJANGO_SETTINGS_MODULE`
 environment variable or using :func:`django.conf.settings.configure`.
 
 ``django.core.management.execute_manager``
@@ -1294,17 +1294,17 @@ Now, the flags are keyword arguments of :meth:`@register.filter
 
 See :ref:`filters and auto-escaping <filters-auto-escaping>` for more information.
 
-Wildcard expansion of application names in `INSTALLED_APPS`
------------------------------------------------------------
+Wildcard expansion of application names in ``INSTALLED_APPS``
+-------------------------------------------------------------
 
 Until Django 1.3, :setting:`INSTALLED_APPS` accepted wildcards in application
 names, like ``django.contrib.*``. The expansion was performed by a
 filesystem-based implementation of ``from <package> import *``. Unfortunately,
 this can't be done reliably.
 
-This behavior was never documented. Since it is unpythonic and not obviously
-useful, it was removed in Django 1.4. If you relied on it, you must edit your
-settings file to list all your applications explicitly.
+This behavior was never documented. Since it is unpythonic, it was removed in
+Django 1.4. If you relied on it, you must edit your settings file to list all
+your applications explicitly.
 
 ``HttpRequest.raw_post_data`` renamed to ``HttpRequest.body``
 -------------------------------------------------------------

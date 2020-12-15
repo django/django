@@ -1,7 +1,7 @@
 """
 XML serializer.
 """
-
+import json
 from xml.dom import pulldom
 from xml.sax import handler
 from xml.sax.expatreader import ExpatParser as _ExpatParser
@@ -75,8 +75,13 @@ class Serializer(base.Serializer):
 
         # Get a "string version" of the object's data.
         if getattr(obj, field.name) is not None:
+            value = field.value_to_string(obj)
+            if field.get_internal_type() == 'JSONField':
+                # Dump value since JSONField.value_to_string() doesn't output
+                # strings.
+                value = json.dumps(value, cls=field.encoder)
             try:
-                self.xml.characters(field.value_to_string(obj))
+                self.xml.characters(value)
             except UnserializableContentError:
                 raise ValueError("%s.%s (pk:%s) contains unserializable characters" % (
                     obj.__class__.__name__, field.name, obj.pk))
@@ -132,7 +137,11 @@ class Serializer(base.Serializer):
                     self.xml.addQuickElement("object", attrs={
                         'pk': str(value.pk)
                     })
-            for relobj in getattr(obj, field.name).iterator():
+            m2m_iter = getattr(obj, '_prefetched_objects_cache', {}).get(
+                field.name,
+                getattr(obj, field.name).iterator(),
+            )
+            for relobj in m2m_iter:
                 handle_m2m(relobj)
 
             self.xml.endElement("field")
@@ -228,6 +237,9 @@ class Deserializer(base.Deserializer):
                     value = None
                 else:
                     value = field.to_python(getInnerText(field_node).strip())
+                    # Load value since JSONField.to_python() outputs strings.
+                    if field.get_internal_type() == 'JSONField':
+                        value = json.loads(value, cls=field.decoder)
                 data[field.name] = value
 
         obj = base.build_instance(Model, data, self.db)

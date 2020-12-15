@@ -8,7 +8,7 @@ from django.contrib.gis.geos import (
     MultiLineString, MultiPoint, MultiPolygon, Point, Polygon,
 )
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models.fields import Field
+from django.db.models import Field
 from django.utils.translation import gettext_lazy as _
 
 # Local cache of the spatial_ref_sys table, which holds SRID data for each
@@ -145,7 +145,11 @@ class BaseSpatialField(Field):
             return None
         return connection.ops.Adapter(
             super().get_db_prep_value(value, connection, *args, **kwargs),
-            **({'geography': True} if self.geography and connection.ops.geography else {})
+            **(
+                {'geography': True}
+                if self.geography and connection.features.supports_geography
+                else {}
+            )
         )
 
     def get_raster_prep_value(self, value, is_candidate):

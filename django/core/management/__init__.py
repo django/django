@@ -2,7 +2,9 @@ import functools
 import os
 import pkgutil
 import sys
-from argparse import _SubParsersAction
+from argparse import (
+    _AppendConstAction, _CountAction, _StoreConstAction, _SubParsersAction,
+)
 from collections import defaultdict
 from difflib import get_close_matches
 from importlib import import_module
@@ -118,7 +120,12 @@ def call_command(command_name, *args, **options):
         for s_opt in parser._actions if s_opt.option_strings
     }
     arg_options = {opt_mapping.get(key, key): value for key, value in options.items()}
-    parse_args = [str(a) for a in args]
+    parse_args = []
+    for arg in args:
+        if isinstance(arg, (list, tuple)):
+            parse_args += map(str, arg)
+        else:
+            parse_args.append(str(arg))
 
     def get_actions(parser):
         # Parser actions and actions from sub-parser choices.
@@ -130,12 +137,26 @@ def call_command(command_name, *args, **options):
                 yield opt
 
     parser_actions = list(get_actions(parser))
+    mutually_exclusive_required_options = {
+        opt
+        for group in parser._mutually_exclusive_groups
+        for opt in group._group_actions if group.required
+    }
     # Any required arguments which are passed in via **options must be passed
     # to parse_args().
-    parse_args += [
-        '{}={}'.format(min(opt.option_strings), arg_options[opt.dest])
-        for opt in parser_actions if opt.required and opt.dest in options
-    ]
+    for opt in parser_actions:
+        if (
+            opt.dest in options and
+            (opt.required or opt in mutually_exclusive_required_options)
+        ):
+            parse_args.append(min(opt.option_strings))
+            if isinstance(opt, (_AppendConstAction, _CountAction, _StoreConstAction)):
+                continue
+            value = arg_options[opt.dest]
+            if isinstance(value, (list, tuple)):
+                parse_args += map(str, value)
+            else:
+                parse_args.append(str(value))
     defaults = parser.parse_args(args=parse_args)
     defaults = dict(defaults._get_kwargs(), **arg_options)
     # Raise an error if any unknown options were passed.
@@ -221,7 +242,7 @@ class ManagementUtility:
                 # (get_commands() swallows the original one) so the user is
                 # informed about it.
                 settings.INSTALLED_APPS
-            else:
+            elif not settings.configured:
                 sys.stderr.write("No Django settings specified.\n")
             possible_matches = get_close_matches(subcommand, commands)
             sys.stderr.write('Unknown command: %r' % subcommand)
@@ -323,7 +344,12 @@ class ManagementUtility:
         # Preprocess options to extract --settings and --pythonpath.
         # These options could affect the commands that are available, so they
         # must be processed early.
-        parser = CommandParser(usage='%(prog)s subcommand [options] [args]', add_help=False, allow_abbrev=False)
+        parser = CommandParser(
+            prog=self.prog_name,
+            usage='%(prog)s subcommand [options] [args]',
+            add_help=False,
+            allow_abbrev=False,
+        )
         parser.add_argument('--settings')
         parser.add_argument('--pythonpath')
         parser.add_argument('args', nargs='*')  # catch-all

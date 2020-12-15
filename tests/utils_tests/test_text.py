@@ -52,7 +52,8 @@ class TestUtilsText(SimpleTestCase):
                 ['a', 'b', 'c', 'd']),
         ]
         for test, expected in testdata:
-            self.assertEqual(list(text.smart_split(test)), expected)
+            with self.subTest(value=test):
+                self.assertEqual(list(text.smart_split(test)), expected)
 
     def test_truncate_chars(self):
         truncator = text.Truncator('The quick brown fox jumped over the lazy dog.')
@@ -189,18 +190,28 @@ class TestUtilsText(SimpleTestCase):
 
     def test_slugify(self):
         items = (
-            # given - expected - unicode?
+            # given - expected - Unicode?
             ('Hello, World!', 'hello-world', False),
             ('spam & eggs', 'spam-eggs', False),
+            (' multiple---dash and  space ', 'multiple-dash-and-space', False),
+            ('\t whitespace-in-value \n', 'whitespace-in-value', False),
+            ('underscore_in-value', 'underscore_in-value', False),
+            ('__strip__underscore-value___', 'strip__underscore-value', False),
+            ('--strip-dash-value---', 'strip-dash-value', False),
+            ('__strip-mixed-value---', 'strip-mixed-value', False),
+            ('_ -strip-mixed-value _-', 'strip-mixed-value', False),
             ('spam & ıçüş', 'spam-ıçüş', True),
             ('foo ıç bar', 'foo-ıç-bar', True),
             ('    foo ıç bar', 'foo-ıç-bar', True),
             ('你好', '你好', True),
+            ('İstanbul', 'istanbul', True),
         )
         for value, output, is_unicode in items:
-            self.assertEqual(text.slugify(value, allow_unicode=is_unicode), output)
-        # interning the result may be useful, e.g. when fed to Path.
-        self.assertEqual(sys.intern(text.slugify('a')), 'a')
+            with self.subTest(value=value):
+                self.assertEqual(text.slugify(value, allow_unicode=is_unicode), output)
+        # Interning the result may be useful, e.g. when fed to Path.
+        with self.subTest('intern'):
+            self.assertEqual(sys.intern(text.slugify('a')), 'a')
 
     @ignore_warnings(category=RemovedInDjango40Warning)
     def test_unescape_entities(self):
@@ -216,8 +227,9 @@ class TestUtilsText(SimpleTestCase):
             ('foo & bar', 'foo & bar'),
         ]
         for value, output in items:
-            self.assertEqual(text.unescape_entities(value), output)
-            self.assertEqual(text.unescape_entities(lazystr(value)), output)
+            with self.subTest(value=value):
+                self.assertEqual(text.unescape_entities(value), output)
+                self.assertEqual(text.unescape_entities(lazystr(value)), output)
 
     def test_unescape_entities_deprecated(self):
         msg = (
@@ -235,8 +247,9 @@ class TestUtilsText(SimpleTestCase):
             ("'\'ab\' c'", "'ab' c"),
         ]
         for value, output in items:
-            self.assertEqual(text.unescape_string_literal(value), output)
-            self.assertEqual(text.unescape_string_literal(lazystr(value)), output)
+            with self.subTest(value=value):
+                self.assertEqual(text.unescape_string_literal(value), output)
+                self.assertEqual(text.unescape_string_literal(lazystr(value)), output)
 
     def test_get_valid_filename(self):
         filename = "^&'@{}[],$=!-#()%+~_123.txt"
@@ -250,7 +263,7 @@ class TestUtilsText(SimpleTestCase):
         actual_length = len(b''.join(seq))
         out = text.compress_sequence(seq)
         compressed_length = len(b''.join(out))
-        self.assertTrue(compressed_length < actual_length)
+        self.assertLess(compressed_length, actual_length)
 
     def test_format_lazy(self):
         self.assertEqual('django/test', format_lazy('{}/{}', 'django', lazystr('test')))

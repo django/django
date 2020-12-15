@@ -1,7 +1,6 @@
 """
 Internationalization support.
 """
-import re
 import warnings
 from contextlib import ContextDecorator
 from decimal import ROUND_UP, Decimal
@@ -9,6 +8,7 @@ from decimal import ROUND_UP, Decimal
 from django.utils.autoreload import autoreload_started, file_changed
 from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import lazy
+from django.utils.regex_helper import _lazy_re_compile
 
 __all__ = [
     'activate', 'deactivate', 'override', 'deactivate_all',
@@ -56,7 +56,9 @@ class Trans:
         from django.conf import settings
         if settings.USE_I18N:
             from django.utils.translation import trans_real as trans
-            from django.utils.translation.reloader import watch_for_translation_changes, translation_file_changed
+            from django.utils.translation.reloader import (
+                translation_file_changed, watch_for_translation_changes,
+            )
             autoreload_started.connect(watch_for_translation_changes, dispatch_uid='translation_file_changed')
             file_changed.connect(translation_file_changed, dispatch_uid='translation_file_changed')
         else:
@@ -328,7 +330,7 @@ def get_language_info(lang_code):
     return info
 
 
-trim_whitespace_re = re.compile(r'\s*\n\s*')
+trim_whitespace_re = _lazy_re_compile(r'\s*\n\s*')
 
 
 def trim_whitespace(s):

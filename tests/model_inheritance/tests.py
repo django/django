@@ -1,13 +1,15 @@
 from operator import attrgetter
+from unittest import skipUnless
 
 from django.core.exceptions import FieldError, ValidationError
 from django.db import connection, models
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import CaptureQueriesContext, isolate_apps
+from django.utils.version import PY37
 
 from .models import (
     Base, Chef, CommonInfo, GrandChild, GrandParent, ItalianRestaurant,
-    MixinModel, ParkingLot, Place, Post, Restaurant, Student, SubBase,
+    MixinModel, Parent, ParkingLot, Place, Post, Restaurant, Student, SubBase,
     Supplier, Title, Worker,
 )
 
@@ -204,6 +206,25 @@ class ModelInheritanceTests(TestCase):
 
         self.assertEqual(A.attr.called, (A, 'attr'))
 
+    def test_inherited_ordering_pk_desc(self):
+        p1 = Parent.objects.create(first_name='Joe', email='joe@email.com')
+        p2 = Parent.objects.create(first_name='Jon', email='jon@email.com')
+        expected_order_by_sql = 'ORDER BY %s.%s DESC' % (
+            connection.ops.quote_name(Parent._meta.db_table),
+            connection.ops.quote_name(
+                Parent._meta.get_field('grandparent_ptr').column
+            ),
+        )
+        qs = Parent.objects.all()
+        self.assertSequenceEqual(qs, [p2, p1])
+        self.assertIn(expected_order_by_sql, str(qs.query))
+
+    @skipUnless(PY37, '__class_getitem__() was added in Python 3.7')
+    def test_queryset_class_getitem(self):
+        self.assertIs(models.QuerySet[Post], models.QuerySet)
+        self.assertIs(models.QuerySet[Post, Post], models.QuerySet)
+        self.assertIs(models.QuerySet[Post, int, str], models.QuerySet)
+
 
 class ModelInheritanceDataTests(TestCase):
     @classmethod
@@ -302,7 +323,7 @@ class ModelInheritanceDataTests(TestCase):
     def test_related_objects_for_inherited_models(self):
         # Related objects work just as they normally do.
         s1 = Supplier.objects.create(name="Joe's Chickens", address="123 Sesame St")
-        s1.customers .set([self.restaurant, self.italian_restaurant])
+        s1.customers.set([self.restaurant, self.italian_restaurant])
         s2 = Supplier.objects.create(name="Luigi's Pasta", address="456 Sesame St")
         s2.customers.set([self.italian_restaurant])
 

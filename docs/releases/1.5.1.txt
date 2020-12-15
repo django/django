@@ -10,9 +10,9 @@ compatible with Django 1.5, but includes a handful of fixes.
 The biggest fix is for a memory leak introduced in Django 1.5. Under certain
 circumstances, repeated iteration over querysets could leak memory - sometimes
 quite a bit of it. If you'd like more information, the details are in
-`our ticket tracker`__ (and in `a related issue`__ in Python itself).
+:ticket:`our ticket tracker <19895>` (and in `a related issue`__ in Python
+itself).
 
-__ https://code.djangoproject.com/ticket/19895
 __ https://bugs.python.org/issue17468
 
 If you've noticed memory problems under Django 1.5, upgrading to 1.5.1 should

@@ -17,7 +17,7 @@ Alternately, you can `build from source`_. Consult the platform-specific
 instructions if you are on :ref:`macos` or :ref:`windows`.
 
 .. _PostGIS: https://postgis.net/
-.. _psycopg2: http://initd.org/psycopg/
+.. _psycopg2: https://www.psycopg.org/
 .. _PostGIS requirements: https://postgis.net/docs/postgis_installation.html#install_requirements
 .. _build from source: https://postgis.net/docs/postgis_installation.html#install_short_version
 
@@ -49,6 +49,11 @@ process. An alternative is to use a migration operation in your project::
             CreateExtension('postgis'),
             ...
         ]
+
+If you plan to use PostGIS raster functionality on PostGIS 3+, you should also
+activate the ``postgis_raster`` extension. You can install the extension using
+the :class:`~django.contrib.postgres.operations.CreateExtension` migration
+operation, or directly by running ``CREATE EXTENSION postgis_raster;``.
 
 GeoDjango does not currently leverage any `PostGIS topology functionality`__.
 If you plan to use those features at some point, you can also install the

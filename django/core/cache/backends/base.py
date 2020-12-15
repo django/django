@@ -14,6 +14,10 @@ class CacheKeyWarning(RuntimeWarning):
     pass
 
 
+class InvalidCacheKey(ValueError):
+    pass
+
+
 # Stub class to ensure not passing in a `timeout` argument results in
 # the default timeout
 DEFAULT_TIMEOUT = object()
@@ -27,7 +31,7 @@ def default_key_func(key, key_prefix, version):
     Default function to generate keys.
 
     Construct the key used by all other methods. By default, prepend
-    the `key_prefix'. KEY_FUNCTION can be used to specify an alternate
+    the `key_prefix`. KEY_FUNCTION can be used to specify an alternate
     function with custom key making behavior.
     """
     return '%s:%s:%s' % (key_prefix, version, key)
@@ -132,7 +136,8 @@ class BaseCache:
 
     def delete(self, key, version=None):
         """
-        Delete a key from the cache, failing silently.
+        Delete a key from the cache and return whether it succeeded, failing
+        silently.
         """
         raise NotImplementedError('subclasses of BaseCache must provide a delete() method')
 
@@ -241,18 +246,8 @@ class BaseCache:
         backend. This encourages (but does not force) writing backend-portable
         cache code.
         """
-        if len(key) > MEMCACHE_MAX_KEY_LENGTH:
-            warnings.warn(
-                'Cache key will cause errors if used with memcached: %r '
-                '(longer than %s)' % (key, MEMCACHE_MAX_KEY_LENGTH), CacheKeyWarning
-            )
-        for char in key:
-            if ord(char) < 33 or ord(char) == 127:
-                warnings.warn(
-                    'Cache key contains characters that will cause errors if '
-                    'used with memcached: %r' % key, CacheKeyWarning
-                )
-                break
+        for warning in memcache_key_warnings(key):
+            warnings.warn(warning, CacheKeyWarning)
 
     def incr_version(self, key, delta=1, version=None):
         """
@@ -280,3 +275,18 @@ class BaseCache:
     def close(self, **kwargs):
         """Close the cache connection"""
         pass
+
+
+def memcache_key_warnings(key):
+    if len(key) > MEMCACHE_MAX_KEY_LENGTH:
+        yield (
+            'Cache key will cause errors if used with memcached: %r '
+            '(longer than %s)' % (key, MEMCACHE_MAX_KEY_LENGTH)
+        )
+    for char in key:
+        if ord(char) < 33 or ord(char) == 127:
+            yield (
+                'Cache key contains characters that will cause errors if '
+                'used with memcached: %r' % key
+            )
+            break

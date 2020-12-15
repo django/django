@@ -14,11 +14,11 @@ undefined -- not random, just undefined.
 """
 
 from django.db import models
-from django.db.models.expressions import OrderBy
 
 
 class Author(models.Model):
     name = models.CharField(max_length=63, null=True, blank=True)
+    editor = models.ForeignKey('self', models.CASCADE, null=True)
 
     class Meta:
         ordering = ('-pk',)
@@ -35,11 +35,8 @@ class Article(models.Model):
             '-pub_date',
             models.F('headline'),
             models.F('author__name').asc(),
-            OrderBy(models.F('second_author__name')),
+            models.OrderBy(models.F('second_author__name')),
         )
-
-    def __str__(self):
-        return self.headline
 
 
 class OrderedByAuthorArticle(Article):

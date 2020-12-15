@@ -34,17 +34,24 @@ If you're not using the default project template, here are the requirements:
 
 #. Configure a :class:`~django.template.backends.django.DjangoTemplates`
    backend in your :setting:`TEMPLATES` setting with
-   ``django.contrib.auth.context_processors.auth`` and
+   ``django.template.context_processors.request``,
+   ``django.contrib.auth.context_processors.auth``, and
    ``django.contrib.messages.context_processors.messages`` in
    the ``'context_processors'`` option of :setting:`OPTIONS
    <TEMPLATES-OPTIONS>`.
+
+   .. versionchanged:: 3.1
+
+       ``django.template.context_processors.request`` was added as a
+       requirement in the ``'context_processors'`` option to support the new
+       :attr:`.AdminSite.enable_nav_sidebar`.
 
 #. If you've customized the :setting:`MIDDLEWARE` setting,
    :class:`django.contrib.auth.middleware.AuthenticationMiddleware` and
    :class:`django.contrib.messages.middleware.MessageMiddleware` must be
    included.
 
-5. :ref:`Hook the admin's URLs into your URLconf
+#. :ref:`Hook the admin's URLs into your URLconf
    <hooking-adminsite-to-urlconf>`.
 
 After you've taken these steps, you'll be able to use the admin site by
@@ -52,8 +59,7 @@ visiting the URL you hooked it into (``/admin/``, by default).
 
 If you need to create a user to login with, use the :djadmin:`createsuperuser`
 command. By default, logging in to the admin requires that the user has the
-:attr:`~.User.is_superuser` or :attr:`~.User.is_staff` attribute set to
-``True``.
+:attr:`~.User.is_staff` attribute set to ``True``.
 
 Finally, determine which of your application's models should be editable in the
 admin interface. For each of those models, register them with the admin as
@@ -83,8 +89,7 @@ Other topics
 
     The ``ModelAdmin`` class is the representation of a model in the admin
     interface. Usually, these are stored in a file named ``admin.py`` in your
-    application. Let's take a look at a very simple example of
-    the ``ModelAdmin``::
+    application. Let's take a look at an example of the ``ModelAdmin``::
 
         from django.contrib import admin
         from myproject.myapp.models import Author
@@ -110,7 +115,7 @@ Other topics
 The ``register`` decorator
 --------------------------
 
-.. function:: register(*models, site=django.admin.sites.site)
+.. function:: register(*models, site=django.contrib.admin.sites.site)
 
     There is also a decorator for registering your ``ModelAdmin`` classes::
 
@@ -583,7 +588,7 @@ subclass::
               birthday = models.DateField()
 
               def decade_born_in(self):
-                  return self.birthday.strftime('%Y')[:3] + "0's"
+                  return '%d’s' % (self.birthday.year // 10 * 10)
               decade_born_in.short_description = 'Birth decade'
 
           class PersonAdmin(admin.ModelAdmin):
@@ -600,8 +605,8 @@ subclass::
       and add that method's name to ``list_display``. (See below for more
       on custom methods in ``list_display``.)
 
-    * If the field is a ``BooleanField``, Django will display a pretty "on" or
-      "off" icon instead of ``True`` or ``False``.
+    * If the field is a ``BooleanField``, Django will display a pretty "yes",
+      "no", or "unknown" icon instead of ``True``, ``False``, or ``None``.
 
     * If the string given is a method of the model, ``ModelAdmin`` or a
       callable, Django will HTML-escape the output by default. To escape
@@ -658,9 +663,9 @@ subclass::
               birth_date_view.empty_value_display = 'unknown'
 
     * If the string given is a method of the model, ``ModelAdmin`` or a
-      callable that returns True or False Django will display a pretty
-      "on" or "off" icon if you give the method a ``boolean`` attribute
-      whose value is ``True``.
+      callable that returns ``True``, ``False``, or ``None``, Django will
+      display a pretty "yes", "no", or "unknown" icon if you give the method a
+      ``boolean`` attribute whose value is ``True``.
 
       Here's a full example model::
 
@@ -672,7 +677,7 @@ subclass::
               birthday = models.DateField()
 
               def born_in_fifties(self):
-                  return self.birthday.strftime('%Y')[:3] == '195'
+                  return 1950 <= self.birthday.year < 1960
               born_in_fifties.boolean = True
 
           class PersonAdmin(admin.ModelAdmin):
@@ -972,10 +977,28 @@ subclass::
       limit the ``list_filter`` choices to the users who have written a book
       instead of listing all users.
 
+      You can filter empty values using ``EmptyFieldListFilter``, which can
+      filter on both empty strings and nulls, depending on what the field
+      allows to store::
+
+          class BookAdmin(admin.ModelAdmin):
+              list_filter = (
+                  ('title', admin.EmptyFieldListFilter),
+              )
+
       .. note::
 
         The ``FieldListFilter`` API is considered internal and might be
         changed.
+
+      .. note::
+
+        The :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
+        field is not supported.
+
+      .. versionadded:: 3.1
+
+          The ``EmptyFieldListFilter`` class was added.
 
     List filter's typically appear only if the filter has more than one choice.
     A filter's ``has_output()`` method controls whether or not it appears.
@@ -1027,6 +1050,12 @@ subclass::
     If you need to specify a dynamic value based on the request, you can
     implement a :meth:`~ModelAdmin.get_list_select_related` method.
 
+    .. note::
+
+        ``ModelAdmin`` ignores this attribute when
+        :meth:`~django.db.models.query.QuerySet.select_related` was already
+        called on the changelist's ``QuerySet``.
+
 .. attribute:: ModelAdmin.ordering
 
     Set ``ordering`` to specify how lists of objects should be ordered in the
@@ -1071,8 +1100,7 @@ subclass::
     automatically generate the value for ``SlugField`` fields from one or more
     other fields. The generated value is produced by concatenating the values
     of the source fields, and then by transforming that result into a valid
-    slug (e.g. substituting dashes for spaces; lowercasing ASCII letters; and
-    removing various English stop words such as 'a', 'an', 'as', and similar).
+    slug (e.g. substituting dashes for spaces and lowercasing ASCII letters).
 
     Prepopulated fields aren't modified by JavaScript after a value has been
     saved. It's usually undesired that slugs change (which would cause an
@@ -1081,11 +1109,16 @@ subclass::
     ``prepopulated_fields`` doesn't accept ``DateTimeField``, ``ForeignKey``,
     ``OneToOneField``, and ``ManyToManyField`` fields.
 
+    .. versionchanged:: 3.2
+
+        In older versions, various English stop words are removed from
+        generated values.
+
 .. attribute:: ModelAdmin.preserve_filters
 
-    The admin now preserves filters on the list view after creating, editing
-    or deleting an object. You can restore the previous behavior of clearing
-    filters by setting this attribute to ``False``.
+    By default, applied filters are preserved on the list view after creating,
+    editing, or deleting an object. You can have filters cleared by setting
+    this attribute to ``False``.
 
 .. attribute:: ModelAdmin.radio_fields
 
@@ -1195,8 +1228,8 @@ subclass::
     A read-only field can not only display data from a model's field, it can
     also display the output of a model's method or a method of the
     ``ModelAdmin`` class itself. This is very similar to the way
-    :attr:`ModelAdmin.list_display` behaves. This provides an easy way to use
-    the admin interface to provide feedback on the status of the objects being
+    :attr:`ModelAdmin.list_display` behaves. This provides a way to use the
+    admin interface to provide feedback on the status of the objects being
     edited, for example::
 
         from django.contrib import admin
@@ -1280,13 +1313,17 @@ subclass::
         WHERE (first_name ILIKE '%john%' OR last_name ILIKE '%john%')
         AND (first_name ILIKE '%lennon%' OR last_name ILIKE '%lennon%')
 
+    The search query can contain quoted phrases with spaces. For example, if a
+    user searches for ``"john winston"`` or ``'john winston'``, Django will do
+    the equivalent of this SQL ``WHERE`` clause:
+
+    .. code-block:: sql
+
+        WHERE (first_name ILIKE '%john winston%' OR last_name ILIKE '%john winston%')
+
     If you don't want to use ``icontains`` as the lookup, you can use any
     lookup by appending it the field. For example, you could use :lookup:`exact`
     by setting ``search_fields`` to ``['first_name__exact']``.
-
-    Beware that because query terms are split and ANDed as described earlier,
-    searching with :lookup:`exact` only works with a single search word since
-    two or more words can't all be an exact match unless all words are the same.
 
     Some (older) shortcuts for specifying a field lookup are also available.
     You can prefix a field in ``search_fields`` with the following characters
@@ -1304,6 +1341,10 @@ subclass::
     If you need to customize search you can use
     :meth:`ModelAdmin.get_search_results` to provide additional or alternate
     search behavior.
+
+    .. versionchanged:: 3.2
+
+        Support for searching against quoted phrases with spaces was added.
 
 .. attribute:: ModelAdmin.show_full_result_count
 
@@ -1631,8 +1672,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_inlines(request, obj)
 
-    .. versionadded:: 3.0
-
     The ``get_inlines`` method is given the ``HttpRequest`` and the
     ``obj`` being edited (or ``None`` on an add form) and is expected to return
     an iterable of inlines. You can override this method to dynamically add
@@ -1742,7 +1781,7 @@ templates used by the :class:`ModelAdmin` views:
                     kwargs['form'] = MySuperuserForm
                 return super().get_form(request, obj, **kwargs)
 
-    You may also simply return a custom :class:`~django.forms.ModelForm` class
+    You may also return a custom :class:`~django.forms.ModelForm` class
     directly.
 
 .. method:: ModelAdmin.get_formsets_with_inlines(request, obj=None)
@@ -1776,6 +1815,18 @@ templates used by the :class:`ModelAdmin` views:
 
     This uses the ``HttpRequest`` instance to filter the ``Car`` foreign key
     field to only display the cars owned by the ``User`` instance.
+
+    For more complex filters, you can use ``ModelForm.__init__()`` method to
+    filter based on an ``instance`` of your model (see
+    :ref:`fields-which-handle-relationships`). For example::
+
+        class CountryAdminForm(forms.ModelForm):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.fields['capital'].queryset = self.instance.cities.all()
+
+        class CountryAdmin(admin.ModelAdmin):
+            form = CountryAdminForm
 
 .. method:: ModelAdmin.formfield_for_manytomany(db_field, request, **kwargs)
 
@@ -2129,9 +2180,13 @@ jQuery
 Django admin JavaScript makes use of the `jQuery`_ library.
 
 To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
-(version 3.3.1) is namespaced as ``django.jQuery``. If you want to use jQuery
+(version 3.5.1) is namespaced as ``django.jQuery``. If you want to use jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
+
+.. versionchanged:: 3.1
+
+    jQuery was upgraded from 3.4.1 to 3.5.1.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
@@ -2155,9 +2210,9 @@ return the uncompressed versions of the various JavaScript files, including
 Adding custom validation to the admin
 -------------------------------------
 
-Adding custom validation of data in the admin is quite easy. The automatic
-admin interface reuses :mod:`django.forms`, and the ``ModelAdmin`` class gives
-you the ability define your own form::
+You can also add custom validation of data in the admin. The automatic admin
+interface reuses :mod:`django.forms`, and the ``ModelAdmin`` class gives you
+the ability define your own form::
 
     class ArticleAdmin(admin.ModelAdmin):
         form = MyArticleAdminForm
@@ -2286,7 +2341,7 @@ The ``InlineModelAdmin`` class adds or customizes:
 .. attribute:: InlineModelAdmin.extra
 
     This controls the number of extra forms the formset will display in
-    addition to the initial forms. See the
+    addition to the initial forms. Defaults to 3. See the
     :doc:`formsets documentation </topics/forms/formsets>` for more
     information.
 
@@ -2531,8 +2586,7 @@ layout required for multiple widgets will vary depending on the intermediate
 model.
 
 However, we still want to be able to edit that information inline. Fortunately,
-this is easy to do with inline admin models. Suppose we have the following
-models::
+we can do this with inline admin models. Suppose we have the following models::
 
     from django.db import models
 
@@ -2556,7 +2610,7 @@ define an inline class for the ``Membership`` model::
         model = Membership
         extra = 1
 
-This simple example uses the default ``InlineModelAdmin`` values for the
+This example uses the default ``InlineModelAdmin`` values for the
 ``Membership`` model, and limits the extra add forms to one. This could be
 customized using any of the options available to ``InlineModelAdmin`` classes.
 
@@ -2629,9 +2683,9 @@ specific information.
 Overriding admin templates
 ==========================
 
-It is relatively easy to override many of the templates which the admin module
-uses to generate the various pages of an admin site. You can even override a
-few of these templates for a specific app, or a specific model.
+You can override many of the templates which the admin module uses to generate
+the various pages of an admin site. You can even override a few of these
+templates for a specific app, or a specific model.
 
 Set up your projects admin template directories
 -----------------------------------------------
@@ -2687,14 +2741,14 @@ Therefore here is our new ``change_form.html`` :
     {% load i18n admin_urls %}
     {% block object-tools-items %}
         <li>
-            <a href="{% url opts|admin_urlname:'history' original.pk|admin_urlquote %}" class="historylink">{% trans "History" %}</a>
+            <a href="{% url opts|admin_urlname:'history' original.pk|admin_urlquote %}" class="historylink">{% translate "History" %}</a>
         </li>
         <li>
             <a href="mylink/" class="historylink">My Link</a>
         </li>
         {% if has_absolute_url %}
             <li>
-                <a href="{% url 'admin:view_on_site' content_type_id original.pk %}" class="viewsitelink">{% trans "View on site" %}</a>
+                <a href="{% url 'admin:view_on_site' content_type_id original.pk %}" class="viewsitelink">{% translate "View on site" %}</a>
             </li>
         {% endif %}
     {% endblock %}
@@ -2728,7 +2782,7 @@ app or per model. The following can:
 * ``submit_line.html``
 
 For those templates that cannot be overridden in this way, you may still
-override them for your entire project. Just place the new version in your
+override them for your entire project by placing the new version in your
 ``templates/admin`` directory. This is particularly useful to create custom 404
 and 500 pages.
 
@@ -2815,6 +2869,13 @@ Templates can override or extend base admin templates as described in
     ``ModelAdmin`` basis and on a custom field within a ``ModelAdmin`` by
     setting an ``empty_value_display`` attribute on the field. See
     :attr:`ModelAdmin.empty_value_display` for examples.
+
+.. attribute:: AdminSite.enable_nav_sidebar
+
+    .. versionadded:: 3.1
+
+    A boolean value that determines whether to show the navigation sidebar
+    on larger screens. By default, it is set to ``True``.
 
 .. attribute:: AdminSite.login_template
 
@@ -2919,11 +2980,11 @@ Customizing the :class:`AdminSite` class
 ----------------------------------------
 
 If you'd like to set up your own admin site with custom behavior, you're free
-to subclass ``AdminSite`` and override or add anything you like. Then, simply
-create an instance of your ``AdminSite`` subclass (the same way you'd
-instantiate any other Python class) and register your models and
-``ModelAdmin`` subclasses with it instead of with the default site. Finally,
-update :file:`myproject/urls.py` to reference your :class:`AdminSite` subclass.
+to subclass ``AdminSite`` and override or add anything you like. Then, create
+an instance of your ``AdminSite`` subclass (the same way you'd instantiate any
+other Python class) and register your models and ``ModelAdmin`` subclasses with
+it instead of with the default site. Finally, update :file:`myproject/urls.py`
+to reference your :class:`AdminSite` subclass.
 
 .. code-block:: python
     :caption: myapp/admin.py
@@ -2996,9 +3057,9 @@ returns a site instance.
 Multiple admin sites in the same URLconf
 ----------------------------------------
 
-It's easy to create multiple instances of the admin site on the same
-Django-powered website. Just create multiple instances of ``AdminSite`` and
-root each one at a different URL.
+You can create multiple instances of the admin site on the same Django-powered
+website. Create multiple instances of ``AdminSite`` and place each one at a
+different URL.
 
 In this example, the URLs ``/basic-admin/`` and ``/advanced-admin/`` feature
 separate versions of the admin site -- using the ``AdminSite`` instances

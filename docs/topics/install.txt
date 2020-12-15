@@ -13,13 +13,6 @@ details.
 Get the latest version of Python at https://www.python.org/downloads/ or with
 your operating system's package manager.
 
-.. admonition:: Django on Jython
-
-    Jython_ (a Python implementation for the Java platform) is not compatible
-    with Python 3, so Django ≥ 2.0 cannot run on Jython.
-
-.. _jython: http://www.jython.org/
-
 .. admonition:: Python on Windows
 
     If you are just starting with Django and using Windows, you may find
@@ -72,10 +65,10 @@ sure a database server is running. Django supports many different database
 servers and is officially supported with PostgreSQL_, MariaDB_, MySQL_, Oracle_
 and SQLite_.
 
-If you are developing a simple project or something you don't plan to deploy
-in a production environment, SQLite is generally the simplest option as it
-doesn't require running a separate server. However, SQLite has many differences
-from other databases, so if you are working on something substantial, it's
+If you are developing a small project or something you don't plan to deploy in
+a production environment, SQLite is generally the best option as it doesn't
+require running a separate server. However, SQLite has many differences from
+other databases, so if you are working on something substantial, it's
 recommended to develop with the same database that you plan on using in
 production.
 
@@ -107,10 +100,10 @@ If you plan to use Django's ``manage.py migrate`` command to automatically
 create database tables for your models (after first installing Django and
 creating a project), you'll need to ensure that Django has permission to create
 and alter tables in the database you're using; if you plan to manually create
-the tables, you can simply grant Django ``SELECT``, ``INSERT``, ``UPDATE`` and
-``DELETE`` permissions. After creating a database user with these
-permissions, you'll specify the details in your project's settings file,
-see :setting:`DATABASES` for details.
+the tables, you can grant Django ``SELECT``, ``INSERT``, ``UPDATE`` and
+``DELETE`` permissions. After creating a database user with these permissions,
+you'll specify the details in your project's settings file, see
+:setting:`DATABASES` for details.
 
 If you're using Django's :doc:`testing framework</topics/testing/index>` to test
 database queries, Django will need permission to create a test database.
@@ -118,7 +111,7 @@ database queries, Django will need permission to create a test database.
 .. _PostgreSQL: https://www.postgresql.org/
 .. _MariaDB: https://mariadb.org/
 .. _MySQL: https://www.mysql.com/
-.. _psycopg2: http://initd.org/psycopg/
+.. _psycopg2: https://www.psycopg.org/
 .. _SQLite: https://www.sqlite.org/
 .. _cx_Oracle: https://oracle.github.io/python-cx_Oracle/
 .. _Oracle: https://www.oracle.com/
@@ -132,8 +125,6 @@ Installation instructions are slightly different depending on whether you're
 installing a distribution-specific package, downloading the latest official
 release, or fetching the latest development version.
 
-It's easy, no matter which way you choose.
-
 .. _installing-official-release:
 
 Installing an official release with ``pip``
@@ -146,11 +137,11 @@ This is the recommended way to install Django.
    it's outdated. If it's outdated, you'll know because installation won't
    work.
 
-#. Take a look at virtualenv_ and virtualenvwrapper_. These tools provide
+#. Take a look at :doc:`venv <python:tutorial/venv>`. This tool provides
    isolated Python environments, which are more practical than installing
-   packages systemwide. They also allow installing packages without
+   packages systemwide. It also allows installing packages without
    administrator privileges. The :doc:`contributing tutorial
-   </intro/contributing>` walks through how to create a virtualenv.
+   </intro/contributing>` walks through how to create a virtual environment.
 
 #. After you've created and activated a virtual environment, enter the command:
 
@@ -159,8 +150,6 @@ This is the recommended way to install Django.
         $ python -m pip install Django
 
 .. _pip: https://pip.pypa.io/
-.. _virtualenv: https://virtualenv.pypa.io/
-.. _virtualenvwrapper: https://virtualenvwrapper.readthedocs.io/en/latest/
 .. _standalone pip installer: https://pip.pypa.io/en/latest/installing/#installing-with-get-pip-py
 
 .. _installing-distribution-package:
@@ -171,7 +160,7 @@ Installing a distribution-specific package
 Check the :doc:`distribution specific notes </misc/distributions>` to see if
 your platform/distribution provides official Django packages/installers.
 Distribution-provided packages will typically allow for automatic installation
-of dependencies and easy upgrade paths; however, these packages will rarely
+of dependencies and supported upgrade paths; however, these packages will rarely
 contain the latest release of Django.
 
 .. _installing-development-version:
@@ -207,11 +196,12 @@ latest bug fixes and improvements, follow these instructions:
    This will create a directory ``django`` in your current directory.
 
 #. Make sure that the Python interpreter can load Django's code. The most
-   convenient way to do this is to use virtualenv_, virtualenvwrapper_, and
-   pip_. The :doc:`contributing tutorial </intro/contributing>` walks through
-   how to create a virtualenv.
+   convenient way to do this is to use a virtual environment and pip_. The
+   :doc:`contributing tutorial </intro/contributing>` walks through how to
+   create a virtual environment.
 
-#. After setting up and activating the virtualenv, run the following command:
+#. After setting up and activating the virtual environment, run the following
+   command:
 
    .. console::
 
@@ -221,8 +211,8 @@ latest bug fixes and improvements, follow these instructions:
    ``django-admin`` utility command available. In other words, you're all
    set!
 
-When you want to update your copy of the Django source code, just run the
-command ``git pull`` from within the ``django`` directory. When you do this,
-Git will automatically download any changes.
+When you want to update your copy of the Django source code, run the command
+``git pull`` from within the ``django`` directory. When you do this, Git will
+download any changes.
 
 .. _Git: https://git-scm.com/

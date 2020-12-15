@@ -26,8 +26,8 @@ instantiated in units of kilometers (``km``) and miles (``mi``)::
     >>> print(d2)
     5.0 mi
 
-Conversions are easy, just access the preferred unit attribute to get a
-converted distance quantity::
+For conversions, access the preferred unit attribute to get a converted
+distance quantity::
 
     >>> print(d1.mi) # Converting 5 kilometers to miles
     3.10685596119

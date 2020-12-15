@@ -18,8 +18,9 @@ other hooks.
 Although the primary way you'll use ``Field`` classes is in ``Form`` classes,
 you can also instantiate them and use them directly to get a better idea of
 how they work. Each ``Field`` instance has a ``clean()`` method, which takes
-a single argument and either raises a ``django.forms.ValidationError``
-exception or returns the clean value::
+a single argument and either raises a
+``django.core.exceptions.ValidationError`` exception or returns the clean
+value::
 
     >>> from django import forms
     >>> f = forms.EmailField()
@@ -88,7 +89,8 @@ To specify that a field is *not* required, pass ``required=False`` to the
 
 If a ``Field`` has ``required=False`` and you pass ``clean()`` an empty value,
 then ``clean()`` will return a *normalized* empty value rather than raising
-``ValidationError``. For ``CharField``, this will be an empty string. For other
+``ValidationError``. For ``CharField``, this will return
+:attr:`~CharField.empty_value` which defaults to an empty string. For other
 ``Field`` classes, it might be ``None``. (This varies from field to field.)
 
 Widgets of required form fields have the ``required`` HTML attribute. Set the
@@ -372,13 +374,13 @@ For each field, we describe the default widget used if you don't specify
       ``min_length`` are provided. Otherwise, all inputs are valid.
     * Error message keys: ``required``, ``max_length``, ``min_length``
 
-    Has three optional arguments for validation:
+    Has four optional arguments for validation:
 
     .. attribute:: max_length
     .. attribute:: min_length
 
-    If provided, these arguments ensure that the string is at most or at least
-    the given length.
+        If provided, these arguments ensure that the string is at most or at
+        least the given length.
 
     .. attribute:: strip
 
@@ -408,12 +410,13 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: choices
 
         Either an :term:`iterable` of 2-tuples to use as choices for this
-        field, or a callable that returns such an iterable. This argument
-        accepts the same formats as the ``choices`` argument to a model field.
-        See the :ref:`model field reference documentation on choices
-        <field-choices>` for more details. If the argument is a callable, it is
-        evaluated each time the field's form is initialized. Defaults to an
-        empty list.
+        field, :ref:`enumeration <field-choices-enum-types>` choices, or a
+        callable that returns such an iterable. This argument accepts the same
+        formats as the ``choices`` argument to a model field. See the
+        :ref:`model field reference documentation on choices <field-choices>`
+        for more details. If the argument is a callable, it is evaluated each
+        time the field's form is initialized, in addition to during rendering.
+        Defaults to an empty list.
 
 ``TypedChoiceField``
 --------------------
@@ -467,25 +470,11 @@ For each field, we describe the default widget used if you don't specify
         A list of formats used to attempt to convert a string to a valid
         ``datetime.date`` object.
 
-    If no ``input_formats`` argument is provided, the default input formats are::
-
-        ['%Y-%m-%d',      # '2006-10-25'
-         '%m/%d/%Y',      # '10/25/2006'
-         '%m/%d/%y']      # '10/25/06'
-
-    Additionally, if you specify :setting:`USE_L10N=False<USE_L10N>` in your settings, the
-    following will also be included in the default input formats::
-
-        ['%b %d %Y',      # 'Oct 25 2006'
-         '%b %d, %Y',     # 'Oct 25, 2006'
-         '%d %b %Y',      # '25 Oct 2006'
-         '%d %b, %Y',     # '25 Oct, 2006'
-         '%B %d %Y',      # 'October 25 2006'
-         '%B %d, %Y',     # 'October 25, 2006'
-         '%d %B %Y',      # '25 October 2006'
-         '%d %B, %Y']     # '25 October, 2006'
-
-    See also :doc:`format localization </topics/i18n/formatting>`.
+    If no ``input_formats`` argument is provided, the default input formats are
+    taken from :setting:`DATE_INPUT_FORMATS` if :setting:`USE_L10N` is
+    ``False``, or from the active locale format ``DATE_INPUT_FORMATS`` key if
+    localization is enabled. See also :doc:`format localization
+    </topics/i18n/formatting>`.
 
 ``DateTimeField``
 -----------------
@@ -504,21 +493,34 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: input_formats
 
         A list of formats used to attempt to convert a string to a valid
-        ``datetime.datetime`` object.
+        ``datetime.datetime`` object, in addition to ISO 8601 formats.
 
-    If no ``input_formats`` argument is provided, the default input formats are::
+    The field always accepts strings in ISO 8601 formatted dates or similar
+    recognized by :func:`~django.utils.dateparse.parse_datetime`. Some examples
+    are::
 
-        ['%Y-%m-%d %H:%M:%S',    # '2006-10-25 14:30:59'
-         '%Y-%m-%d %H:%M',       # '2006-10-25 14:30'
-         '%Y-%m-%d',             # '2006-10-25'
-         '%m/%d/%Y %H:%M:%S',    # '10/25/2006 14:30:59'
-         '%m/%d/%Y %H:%M',       # '10/25/2006 14:30'
-         '%m/%d/%Y',             # '10/25/2006'
-         '%m/%d/%y %H:%M:%S',    # '10/25/06 14:30:59'
-         '%m/%d/%y %H:%M',       # '10/25/06 14:30'
-         '%m/%d/%y']             # '10/25/06'
+        * '2006-10-25 14:30:59'
+        * '2006-10-25T14:30:59'
+        * '2006-10-25 14:30'
+        * '2006-10-25T14:30'
+        * '2006-10-25T14:30Z'
+        * '2006-10-25T14:30+02:00'
+        * '2006-10-25'
 
-    See also :doc:`format localization </topics/i18n/formatting>`.
+    If no ``input_formats`` argument is provided, the default input formats are
+    taken from :setting:`DATETIME_INPUT_FORMATS` and
+    :setting:`DATE_INPUT_FORMATS` if :setting:`USE_L10N` is ``False``, or from
+    the active locale format ``DATETIME_INPUT_FORMATS`` and
+    ``DATE_INPUT_FORMATS`` keys if localization is enabled. See also
+    :doc:`format localization </topics/i18n/formatting>`.
+
+    .. versionchanged:: 3.1
+
+        Support for ISO 8601 date string parsing (including optional timezone)
+        was added.
+
+        The fallback on ``DATE_INPUT_FORMATS`` in the default ``input_formats``
+        was added.
 
 ``DecimalField``
 ----------------
@@ -582,16 +584,15 @@ For each field, we describe the default widget used if you don't specify
 .. class:: EmailField(**kwargs)
 
     * Default widget: :class:`EmailInput`
-    * Empty value: ``''`` (an empty string)
+    * Empty value: Whatever you've given as ``empty_value``.
     * Normalizes to: A string.
     * Uses :class:`~django.core.validators.EmailValidator` to validate that
       the given value is a valid email address, using a moderately complex
       regular expression.
     * Error message keys: ``required``, ``invalid``
 
-    Has two optional arguments for validation, ``max_length`` and ``min_length``.
-    If provided, these arguments ensure that the string is at most or at least the
-    given length.
+    Has three optional arguments ``max_length``, ``min_length``, and
+    ``empty_value`` which work just as they do for :class:`CharField`.
 
 ``FileField``
 -------------
@@ -627,7 +628,7 @@ For each field, we describe the default widget used if you don't specify
 .. class:: FilePathField(**kwargs)
 
     * Default widget: :class:`Select`
-    * Empty value: ``None``
+    * Empty value: ``''`` (an empty string)
     * Normalizes to: A string.
     * Validates that the selected choice exists in the list of choices.
     * Error message keys: ``required``, ``invalid_choice``
@@ -710,9 +711,41 @@ For each field, we describe the default widget used if you don't specify
 
     After the field has been cleaned and validated, the ``UploadedFile``
     object will have an additional ``image`` attribute containing the Pillow
-    `Image`_ instance used to check if the file was a valid image. Also,
-    ``UploadedFile.content_type`` will be updated with the image's content type
-    if Pillow can determine it, otherwise it will be set to ``None``.
+    `Image`_ instance used to check if the file was a valid image. Pillow
+    closes the underlying file descriptor after verifying an image, so while
+    non-image data attributes, such as ``format``, ``height``, and ``width``,
+    are available, methods that access the underlying image data, such as
+    ``getdata()`` or ``getpixel()``, cannot be used without reopening the file.
+    For example::
+
+        >>> from PIL import Image
+        >>> from django import forms
+        >>> from django.core.files.uploadedfile import SimpleUploadedFile
+        >>> class ImageForm(forms.Form):
+        ...     img = forms.ImageField()
+        >>> file_data = {'img': SimpleUploadedFile('test.png', <file data>)}
+        >>> form = ImageForm({}, file_data)
+        # Pillow closes the underlying file descriptor.
+        >>> form.is_valid()
+        True
+        >>> image_field = form.cleaned_data['img']
+        >>> image_field.image
+        <PIL.PngImagePlugin.PngImageFile image mode=RGBA size=191x287 at 0x7F5985045C18>
+        >>> image_field.image.width
+        191
+        >>> image_field.image.height
+        287
+        >>> image_field.image.format
+        'PNG'
+        >>> image_field.image.getdata()
+        # Raises AttributeError: 'NoneType' object has no attribute 'seek'.
+        >>> image = Image.open(image_field)
+        >>> image.getdata()
+        <ImagingCore object at 0x7f5984f874b0>
+
+    Additionally, ``UploadedFile.content_type`` will be updated with the
+    image's content type if Pillow can determine it, otherwise it will be set
+    to ``None``.
 
 .. _Pillow: https://pillow.readthedocs.io/en/latest/
 .. _Image: https://pillow.readthedocs.io/en/latest/reference/Image.html
@@ -742,7 +775,61 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: max_value
     .. attribute:: min_value
 
-    These control the range of values permitted in the field.
+        These control the range of values permitted in the field.
+
+``JSONField``
+-------------
+
+.. class:: JSONField(encoder=None, decoder=None, **kwargs)
+
+    .. versionadded:: 3.1
+
+    A field which accepts JSON encoded data for a
+    :class:`~django.db.models.JSONField`.
+
+    * Default widget: :class:`Textarea`
+    * Empty value: ``None``
+    * Normalizes to: A Python representation of the JSON value (usually as a
+      ``dict``, ``list``, or ``None``), depending on :attr:`JSONField.decoder`.
+    * Validates that the given value is a valid JSON.
+    * Error message keys: ``required``, ``invalid``
+
+    Takes two optional arguments:
+
+    .. attribute:: encoder
+
+        A :py:class:`json.JSONEncoder` subclass to serialize data types not
+        supported by the standard JSON serializer (e.g. ``datetime.datetime``
+        or :class:`~python:uuid.UUID`). For example, you can use the
+        :class:`~django.core.serializers.json.DjangoJSONEncoder` class.
+
+        Defaults to ``json.JSONEncoder``.
+
+    .. attribute:: decoder
+
+        A :py:class:`json.JSONDecoder` subclass to deserialize the input. Your
+        deserialization may need to account for the fact that you can't be
+        certain of the input type. For example, you run the risk of returning a
+        ``datetime`` that was actually a string that just happened to be in the
+        same format chosen for ``datetime``\s.
+
+        The ``decoder`` can be used to validate the input. If
+        :py:class:`json.JSONDecodeError` is raised during the deserialization,
+        a ``ValidationError`` will be raised.
+
+        Defaults to ``json.JSONDecoder``.
+
+    .. note::
+
+        If you use a :class:`ModelForm <django.forms.ModelForm>`, the
+        ``encoder`` and ``decoder`` from :class:`~django.db.models.JSONField`
+        will be used.
+
+    .. admonition:: User friendly forms
+
+        ``JSONField`` is not particularly user friendly in most cases. However,
+        it is a useful way to format data from a client-side widget for
+        submission to the server.
 
 ``GenericIPAddressField``
 -------------------------
@@ -827,13 +914,27 @@ For each field, we describe the default widget used if you don't specify
     * Normalizes to: A Python ``True``, ``False`` or ``None`` value.
     * Validates nothing (i.e., it never raises a ``ValidationError``).
 
+    ``NullBooleanField`` may be used with widgets such as
+    :class:`~django.forms.Select` or :class:`~django.forms.RadioSelect`
+    by providing the widget ``choices``::
+
+        NullBooleanField(
+            widget=Select(
+                choices=[
+                    ('', 'Unknown'),
+                    (True, 'Yes'),
+                    (False, 'No'),
+                ]
+            )
+        )
+
 ``RegexField``
 --------------
 
 .. class:: RegexField(**kwargs)
 
     * Default widget: :class:`TextInput`
-    * Empty value: ``''`` (an empty string)
+    * Empty value: Whatever you've given as ``empty_value``.
     * Normalizes to: A string.
     * Uses :class:`~django.core.validators.RegexValidator` to validate that
       the given value matches a certain regular expression.
@@ -846,8 +947,8 @@ For each field, we describe the default widget used if you don't specify
         A regular expression specified either as a string or a compiled regular
         expression object.
 
-    Also takes ``max_length``, ``min_length``, and ``strip``, which work just
-    as they do for :class:`CharField`.
+    Also takes ``max_length``, ``min_length``, ``strip``, and ``empty_value``
+    which work just as they do for :class:`CharField`.
 
     .. attribute:: strip
 
@@ -860,7 +961,7 @@ For each field, we describe the default widget used if you don't specify
 .. class:: SlugField(**kwargs)
 
    * Default widget: :class:`TextInput`
-   * Empty value: ``''`` (an empty string)
+   * Empty value: Whatever you've given as :attr:`empty_value`.
    * Normalizes to: A string.
    * Uses :class:`~django.core.validators.validate_slug` or
      :class:`~django.core.validators.validate_unicode_slug` to validate that
@@ -870,12 +971,16 @@ For each field, we describe the default widget used if you don't specify
    This field is intended for use in representing a model
    :class:`~django.db.models.SlugField` in forms.
 
-   Takes an optional parameter:
+   Takes two optional parameters:
 
    .. attribute:: allow_unicode
 
        A boolean instructing the field to accept Unicode letters in addition
        to ASCII letters. Defaults to ``False``.
+
+   .. attribute:: empty_value
+
+       The value to use to represent "empty". Defaults to an empty string.
 
 ``TimeField``
 -------------
@@ -896,10 +1001,11 @@ For each field, we describe the default widget used if you don't specify
         A list of formats used to attempt to convert a string to a valid
         ``datetime.time`` object.
 
-    If no ``input_formats`` argument is provided, the default input formats are::
-
-        '%H:%M:%S',     # '14:30:59'
-        '%H:%M',        # '14:30'
+    If no ``input_formats`` argument is provided, the default input formats are
+    taken from :setting:`TIME_INPUT_FORMATS` if :setting:`USE_L10N` is
+    ``False``, or from the active locale format ``TIME_INPUT_FORMATS`` key if
+    localization is enabled. See also :doc:`format localization
+    </topics/i18n/formatting>`.
 
 ``URLField``
 ------------
@@ -907,18 +1013,14 @@ For each field, we describe the default widget used if you don't specify
 .. class:: URLField(**kwargs)
 
     * Default widget: :class:`URLInput`
-    * Empty value: ``''`` (an empty string)
+    * Empty value: Whatever you've given as ``empty_value``.
     * Normalizes to: A string.
     * Uses :class:`~django.core.validators.URLValidator` to validate that the
       given value is a valid URL.
     * Error message keys: ``required``, ``invalid``
 
-    Takes the following optional arguments:
-
-    .. attribute:: max_length
-    .. attribute:: min_length
-
-    These are the same as ``CharField.max_length`` and ``CharField.min_length``.
+    Has three optional arguments ``max_length``, ``min_length``, and
+    ``empty_value`` which work just as they do for :class:`CharField`.
 
 ``UUIDField``
 -------------
@@ -926,7 +1028,7 @@ For each field, we describe the default widget used if you don't specify
 .. class:: UUIDField(**kwargs)
 
     * Default widget: :class:`TextInput`
-    * Empty value: ``''`` (an empty string)
+    * Empty value: ``None``
     * Normalizes to: A :class:`~python:uuid.UUID` object.
     * Error message keys: ``required``, ``invalid``
 
@@ -1087,6 +1189,8 @@ Slightly complex built-in ``Field`` classes
     If no ``input_time_formats`` argument is provided, the default input formats
     for :class:`TimeField` are used.
 
+.. _fields-which-handle-relationships:
+
 Fields which handle relationships
 =================================
 
@@ -1109,6 +1213,10 @@ method::
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
             self.fields['foo_select'].queryset = ...
+
+Both ``ModelChoiceField`` and ``ModelMultipleChoiceField`` have an ``iterator``
+attribute which specifies the class used to iterate over the queryset when
+generating choices. See :ref:`iterating-relationship-choices` for details.
 
 ``ModelChoiceField``
 --------------------
@@ -1190,6 +1298,13 @@ method::
             ...
             </select>
 
+    ``ModelChoiceField`` also has the attribute:
+
+    .. attribute:: iterator
+
+        The iterator class used to generate field choices from ``queryset``. By
+        default, :class:`ModelChoiceIterator`.
+
     The ``__str__()`` method of the model will be called to generate string
     representations of the objects for use in the field's choices. To provide
     customized representations, subclass ``ModelChoiceField`` and override
@@ -1208,11 +1323,11 @@ method::
 .. class:: ModelMultipleChoiceField(**kwargs)
 
     * Default widget: :class:`SelectMultiple`
-    * Empty value: An empty ``QuerySet`` (self.queryset.none())
+    * Empty value: An empty ``QuerySet`` (``self.queryset.none()``)
     * Normalizes to: A ``QuerySet`` of model instances.
     * Validates that every id in the given list of values exists in the
       queryset.
-    * Error message keys: ``required``, ``list``, ``invalid_choice``,
+    * Error message keys: ``required``, ``invalid_list``, ``invalid_choice``,
       ``invalid_pk_value``
 
     The ``invalid_choice`` message may contain ``%(value)s`` and the
@@ -1236,15 +1351,147 @@ method::
 
         Same as :class:`ModelChoiceField.to_field_name`.
 
+    ``ModelMultipleChoiceField`` also has the attribute:
+
+    .. attribute:: iterator
+
+        Same as :class:`ModelChoiceField.iterator`.
+
+.. deprecated:: 3.1
+
+    The ``list`` message is deprecated, use ``invalid_list`` instead.
+
+.. _iterating-relationship-choices:
+
+Iterating relationship choices
+------------------------------
+
+By default, :class:`ModelChoiceField` and :class:`ModelMultipleChoiceField` use
+:class:`ModelChoiceIterator` to generate their field ``choices``.
+
+When iterated, ``ModelChoiceIterator`` yields 2-tuple choices containing
+:class:`ModelChoiceIteratorValue` instances as the first ``value`` element in
+each choice. ``ModelChoiceIteratorValue`` wraps the choice value while
+maintaining a reference to the source model instance that can be used in custom
+widget implementations, for example, to add `data-* attributes`_ to
+``<option>`` elements.
+
+.. _`data-* attributes`: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*
+
+For example, consider the following models::
+
+    from django.db import models
+
+    class Topping(models.Model):
+        name = models.CharField(max_length=100)
+        price = models.DecimalField(decimal_places=2, max_digits=6)
+
+        def __str__(self):
+            return self.name
+
+    class Pizza(models.Model):
+        topping = models.ForeignKey(Topping, on_delete=models.CASCADE)
+
+You can use a :class:`~django.forms.Select` widget subclass to include
+the value of ``Topping.price`` as the HTML attribute ``data-price`` for each
+``<option>`` element::
+
+    from django import forms
+
+    class ToppingSelect(forms.Select):
+        def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+            option = super().create_option(name, value, label, selected, index, subindex, attrs)
+            if value:
+                option['attrs']['data-price'] = value.instance.price
+            return option
+
+    class PizzaForm(forms.ModelForm):
+        class Meta:
+            model = Pizza
+            fields = ['topping']
+            widgets = {'topping': ToppingSelect}
+
+This will render the ``Pizza.topping`` select as:
+
+.. code-block:: html
+
+    <select id="id_topping" name="topping" required>
+    <option value="" selected>---------</option>
+    <option value="1" data-price="1.50">mushrooms</option>
+    <option value="2" data-price="1.25">onions</option>
+    <option value="3" data-price="1.75">peppers</option>
+    <option value="4" data-price="2.00">pineapple</option>
+    </select>
+
+For more advanced usage you may subclass ``ModelChoiceIterator`` in order to
+customize the yielded 2-tuple choices.
+
+``ModelChoiceIterator``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: ModelChoiceIterator(field)
+
+    The default class assigned to the ``iterator`` attribute of
+    :class:`ModelChoiceField` and :class:`ModelMultipleChoiceField`. An
+    iterable that yields 2-tuple choices from the queryset.
+
+    A single argument is required:
+
+    .. attribute:: field
+
+        The instance of ``ModelChoiceField`` or ``ModelMultipleChoiceField`` to
+        iterate and yield choices.
+
+    ``ModelChoiceIterator`` has the following method:
+
+    .. method:: __iter__()
+
+        Yields 2-tuple choices, in the ``(value, label)`` format used by
+        :attr:`ChoiceField.choices`. The first ``value`` element is a
+        :class:`ModelChoiceIteratorValue` instance.
+
+        .. versionchanged:: 3.1
+
+            In older versions, the first ``value`` element in the choice tuple
+            is the ``field`` value itself, rather than a
+            ``ModelChoiceIteratorValue`` instance. In most cases this proxies
+            transparently but, if you need the ``field`` value itself, use the
+            :attr:`ModelChoiceIteratorValue.value` attribute instead.
+
+``ModelChoiceIteratorValue``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: ModelChoiceIteratorValue(value, instance)
+
+    .. versionadded:: 3.1
+
+    Two arguments are required:
+
+    .. attribute:: value
+
+        The value of the choice. This value is used to render the ``value``
+        attribute of an HTML ``<option>`` element.
+
+    .. attribute:: instance
+
+        The model instance from the queryset. The instance can be accessed in
+        custom ``ChoiceWidget.create_option()`` implementations to adjust the
+        rendered HTML.
+
+    ``ModelChoiceIteratorValue`` has the following method:
+
+    .. method:: __str__()
+
+        Return ``value`` as a string to be rendered in HTML.
+
 Creating custom fields
 ======================
 
-If the built-in ``Field`` classes don't meet your needs, you can easily create
-custom ``Field`` classes. To do this, just create a subclass of
-``django.forms.Field``. Its only requirements are that it implement a
-``clean()`` method and that its ``__init__()`` method accept the core arguments
-mentioned above (``required``, ``label``, ``initial``, ``widget``,
-``help_text``).
+If the built-in ``Field`` classes don't meet your needs, you can create custom
+``Field`` classes. To do this, create a subclass of ``django.forms.Field``. Its
+only requirements are that it implement a ``clean()`` method and that its
+``__init__()`` method accept the core arguments mentioned above (``required``,
+``label``, ``initial``, ``widget``, ``help_text``).
 
 You can also customize how a field will be accessed by overriding
 :meth:`~django.forms.Field.get_bound_field()`.

@@ -168,12 +168,16 @@ class IncludeNode(Node):
         template = self.template.resolve(context)
         # Does this quack like a Template?
         if not callable(getattr(template, 'render', None)):
-            # If not, try the cache and get_template().
-            template_name = template
+            # If not, try the cache and select_template().
+            template_name = template or ()
+            if isinstance(template_name, str):
+                template_name = (template_name,)
+            else:
+                template_name = tuple(template_name)
             cache = context.render_context.dicts[0].setdefault(self, {})
             template = cache.get(template_name)
             if template is None:
-                template = context.template.engine.get_template(template_name)
+                template = context.template.engine.select_template(template_name)
                 cache[template_name] = template
         # Use the base.Template of a backends.django.Template.
         elif hasattr(template, 'template'):

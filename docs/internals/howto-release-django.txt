@@ -134,6 +134,12 @@ any time leading up to the actual release:
 
    and then commit the changed man page.
 
+#. If this is the alpha release of a new series, create a new stable branch
+   from master. For example, when releasing Django 3.1::
+
+    $ git checkout -b stable/3.1.x origin/master
+    $ git push origin -u stable/3.1.x:stable/3.1.x
+
 #. If this is the "dot zero" release of a new series, create a new branch from
    the current stable branch in the `django-docs-translations
    <https://github.com/django/django-docs-translations>`_ repository. For
@@ -172,7 +178,7 @@ OK, this is the fun part, where we actually push out a release!
 
 #. If this is a security release, merge the appropriate patches from
    ``django-security``. Rebase these patches as necessary to make each one a
-   simple commit on the release branch rather than a merge commit. To ensure
+   plain commit on the release branch rather than a merge commit. To ensure
    this, merge them with the ``--ff-only`` flag; for example::
 
         $ git checkout stable/1.5.x
@@ -200,7 +206,7 @@ OK, this is the fun part, where we actually push out a release!
    on ``VERSION``.
 
 #. If this is a pre-release package, update the "Development Status" trove
-   classifier in ``setup.py`` to reflect this. Otherwise, make sure the
+   classifier in ``setup.cfg`` to reflect this. Otherwise, make sure the
    classifier is set to ``Development Status :: 5 - Production/Stable``.
 
 #. Tag the release using ``git tag``. For example::
@@ -226,7 +232,8 @@ OK, this is the fun part, where we actually push out a release!
 #. Create a "checksums" file, ``Django-<<VERSION>>.checksum.txt`` containing
    the hashes and release information. Start with this template and insert the
    correct version, date, GPG key ID (from
-   ``gpg --list-keys --keyid-format LONG``), release URL, and checksums:
+   ``gpg --list-keys --keyid-format LONG``), release manager's GitHub username,
+   release URL, and checksums:
 
    .. code-block:: text
 
@@ -235,14 +242,18 @@ OK, this is the fun part, where we actually push out a release!
 
     To use this file, you will need a working install of PGP or other
     compatible public-key encryption software. You will also need to have
-    the Django release manager's public key in your keyring; this key has
+    the Django release manager's public key in your keyring. This key has
     the ID ``XXXXXXXXXXXXXXXX`` and can be imported from the MIT
-    keyserver. For example, if using the open-source GNU Privacy Guard
+    keyserver, for example, if using the open-source GNU Privacy Guard
     implementation of PGP:
 
         gpg --keyserver pgp.mit.edu --recv-key XXXXXXXXXXXXXXXX
 
-    Once the key is imported, verify this file::
+    or via the GitHub API:
+
+        curl https://github.com/<<RELEASE MANAGER GITHUB USERNAME>>.gpg | gpg --import -
+
+    Once the key is imported, verify this file:
 
         gpg --verify <<THIS FILENAME>>
 
@@ -291,30 +302,34 @@ Now you're ready to actually put the release out there. To do this:
 
         $ scp Django-* djangoproject.com:/home/www/www/media/releases/A.B
 
+   If this is the alpha release of a new series, you will need to create the
+   directory A.B.
+
 #. Upload the checksum file(s)::
 
         $ scp Django-A.B.C.checksum.txt.asc djangoproject.com:/home/www/www/media/pgp/Django-A.B.C.checksum.txt
 
 #. Test that the release packages install correctly using ``easy_install``
-   and ``pip``. Here's one method (which requires `virtualenvwrapper`__)::
+   and ``pip``. Here's one method::
 
         $ RELEASE_VERSION='1.7.2'
         $ MAJOR_VERSION=`echo $RELEASE_VERSION| cut -c 1-3`
 
-        $ mktmpenv
+        $ python -m venv django-easy-install
+        $ . django-easy-install/bin/activate
         $ easy_install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
         $ deactivate
-        $ mktmpenv
+        $ python -m venv django-pip
+        $ . django-pip/bin/activate
         $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
         $ deactivate
-        $ mktmpenv
+        $ python -m venv django-pip-wheel
+        $ . django-pip-wheel/bin/activate
         $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION-py3-none-any.whl
         $ deactivate
 
    This just tests that the tarballs are available (i.e. redirects are up) and
    that they install correctly, but it'll catch silly mistakes.
-
-   __ https://pypi.org/project/virtualenvwrapper/
 
 #. Ask a few people on IRC to verify the checksums by visiting the checksums
    file (e.g. https://www.djangoproject.com/m/pgp/Django-1.5b1.checksum.txt)
@@ -334,6 +349,11 @@ Now you're ready to actually put the release out there. To do this:
    an LTS branch, mark it so.
 
    __ https://www.djangoproject.com/admin/releases/release/add/
+
+   If this is the alpha release of a new series, also create a Release object
+   for the *final* release, ensuring that the *Release date* field is blank,
+   thus marking it as *unreleased*. For example, when creating the Release
+   object for ``3.1a1``, also create ``3.1`` with the Release date field blank.
 
 #. Make the blog post announcing the release live.
 
@@ -365,7 +385,7 @@ Now you're ready to actually put the release out there. To do this:
    message body should include the vulnerability details, for example, the
    announcement blog post text. Include a link to the announcement blog post.
 
-#. Add a link to the blog post in the topic of the `#django` IRC channel:
+#. Add a link to the blog post in the topic of the ``#django`` IRC channel:
    ``/msg chanserv TOPIC #django new topic goes here``.
 
 Post-release
@@ -428,6 +448,10 @@ need to be done by the releaser.
    used in Read the Docs ("A.B.x"), `create a ticket
    <https://github.com/rtfd/readthedocs.org/issues/5537>`_ requesting the new
    version.
+
+#. `Request the new classifier on PyPI
+   <https://github.com/pypa/trove-classifiers/issues/29>`_. For example
+   ``Framework :: Django :: 3.1``.
 
 Notes on setting the VERSION tuple
 ==================================

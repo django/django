@@ -21,9 +21,9 @@ a formset out of an ``ArticleForm`` you would do::
     >>> from django.forms import formset_factory
     >>> ArticleFormSet = formset_factory(ArticleForm)
 
-You now have created a formset named ``ArticleFormSet``. The formset gives you
-the ability to iterate over the forms in the formset and display them as you
-would with a regular form::
+You now have created a formset class named ``ArticleFormSet``.
+Instantiating the formset gives you the ability to iterate over the forms
+in the formset and display them as you would with a regular form::
 
     >>> formset = ArticleFormSet()
     >>> for form in formset:
@@ -34,11 +34,11 @@ would with a regular form::
 As you can see it only displayed one empty form. The number of empty forms
 that is displayed is controlled by the ``extra`` parameter. By default,
 :func:`~django.forms.formsets.formset_factory` defines one extra form; the
-following example will display two blank forms::
+following example will create a formset class to display two blank forms::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
 
-Iterating over the ``formset`` will render the forms in the order they were
+Iterating over a formset will render the forms in the order they were
 created. You can change this order by providing an alternate implementation for
 the ``__iter__()`` method.
 
@@ -126,6 +126,38 @@ affect validation.  If ``validate_max=True`` is passed to the
 :func:`~django.forms.formsets.formset_factory`, then ``max_num`` will affect
 validation.  See :ref:`validate_max`.
 
+.. _formsets-absolute-max:
+
+Limiting the maximum number of instantiated forms
+=================================================
+
+.. versionadded:: 3.2
+
+The ``absolute_max`` parameter to :func:`.formset_factory` allows limiting the
+number of forms that can be instantiated when supplying ``POST`` data. This
+protects against memory exhaustion attacks using forged ``POST`` requests::
+
+    >>> from django.forms.formsets import formset_factory
+    >>> from myapp.forms import ArticleForm
+    >>> ArticleFormSet = formset_factory(ArticleForm, absolute_max=1500)
+    >>> data = {
+    ...     'form-TOTAL_FORMS': '1501',
+    ...     'form-INITIAL_FORMS': '0',
+    ...     'form-MAX_NUM_FORMS': '',
+    ... }
+    >>> formset = ArticleFormSet(data)
+    >>> len(formset.forms)
+    1500
+    >>> formset.is_valid()
+    False
+    >>> formset.non_form_errors()
+    ['Please submit at most 1000 forms.']
+
+When ``absolute_max`` is ``None``, it defaults to ``max_num + 1000``. (If
+``max_num`` is ``None``, it defaults to ``2000``).
+
+If ``absolute_max`` is less than ``max_num``, a ``ValueError`` will be raised.
+
 Formset validation
 ==================
 
@@ -210,7 +242,7 @@ You may have noticed the additional data (``form-TOTAL_FORMS``,
 in the formset's data above. This data is required for the
 ``ManagementForm``. This form is used by the formset to manage the
 collection of forms contained in the formset. If you don't provide
-this management data, an exception will be raised::
+this management data, the formset will be invalid::
 
     >>> data = {
     ...     'form-0-title': 'Test',
@@ -218,9 +250,7 @@ this management data, an exception will be raised::
     ... }
     >>> formset = ArticleFormSet(data)
     >>> formset.is_valid()
-    Traceback (most recent call last):
-    ...
-    django.forms.utils.ValidationError: ['ManagementForm data is missing or has been tampered with']
+    False
 
 It is used to keep track of how many form instances are being displayed. If
 you are adding new forms via JavaScript, you should increment the count fields
@@ -233,6 +263,11 @@ The management form is available as an attribute of the formset
 itself. When rendering a formset in a template, you can include all
 the management data by rendering ``{{ my_formset.management_form }}``
 (substituting the name of your formset as appropriate).
+
+.. versionchanged:: 3.2
+
+    ``formset.is_valid()`` now returns ``False`` rather than raising an
+    exception when the management form is missing or has been tampered with.
 
 ``total_form_count`` and ``initial_form_count``
 -----------------------------------------------
@@ -255,12 +290,37 @@ sure you understand what they do before doing so.
 a form instance with a prefix of ``__prefix__`` for easier use in dynamic
 forms with JavaScript.
 
+``error_messages``
+------------------
+
+.. versionadded:: 3.2
+
+The ``error_messages`` argument lets you override the default messages that the
+formset will raise. Pass in a dictionary with keys matching the error messages
+you want to override. For example, here is the default error message when the
+management form is missing::
+
+    >>> formset = ArticleFormSet({})
+    >>> formset.is_valid()
+    False
+    >>> formset.non_form_errors()
+    ['ManagementForm data is missing or has been tampered with. Missing fields: form-TOTAL_FORMS, form-INITIAL_FORMS. You may need to file a bug report if the issue persists.']
+
+And here is a custom error message::
+
+    >>> formset = ArticleFormSet({}, error_messages={'missing_management_form': 'Sorry, something went wrong.'})
+    >>> formset.is_valid()
+    False
+    >>> formset.non_form_errors()
+    ['Sorry, something went wrong.']
+
 Custom formset validation
 -------------------------
 
 A formset has a ``clean`` method similar to the one on a ``Form`` class. This
 is where you define your own validation that works at the formset level::
 
+    >>> from django.core.exceptions import ValidationError
     >>> from django.forms import BaseFormSet
     >>> from django.forms import formset_factory
     >>> from myapp.forms import ArticleForm
@@ -277,7 +337,7 @@ is where you define your own validation that works at the formset level::
     ...                 continue
     ...             title = form.cleaned_data.get('title')
     ...             if title in titles:
-    ...                 raise forms.ValidationError("Articles in a set must have distinct titles.")
+    ...                 raise ValidationError("Articles in a set must have distinct titles.")
     ...             titles.append(title)
 
     >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)
@@ -338,7 +398,7 @@ deletion, is less than or equal to ``max_num``.
     >>> formset.errors
     [{}, {}]
     >>> formset.non_form_errors()
-    ['Please submit 1 or fewer forms.']
+    ['Please submit at most 1 form.']
 
 ``validate_max=True`` validates against ``max_num`` strictly even if
 ``max_num`` was exceeded because the amount of initial data supplied was
@@ -347,11 +407,11 @@ excessive.
 .. note::
 
     Regardless of ``validate_max``, if the number of forms in a data set
-    exceeds ``max_num`` by more than 1000, then the form will fail to validate
-    as if ``validate_max`` were set, and additionally only the first 1000
-    forms above ``max_num`` will be validated.  The remainder will be
-    truncated entirely.  This is to protect against memory exhaustion attacks
-    using forged POST requests.
+    exceeds ``absolute_max``, then the form will fail to validate as if
+    ``validate_max`` were set, and additionally only the first ``absolute_max``
+    forms will be validated. The remainder will be truncated entirely. This is
+    to protect against memory exhaustion attacks using forged POST requests.
+    See :ref:`formsets-absolute-max`.
 
 ``validate_min``
 ----------------
@@ -380,7 +440,12 @@ deletion, is greater than or equal to ``min_num``.
     >>> formset.errors
     [{}, {}]
     >>> formset.non_form_errors()
-    ['Please submit 3 or more forms.']
+    ['Please submit at least 3 forms.']
+
+.. note::
+
+    Regardless of ``validate_min``, if a formset contains no data, then
+    ``extra + min_num`` empty forms will be displayed.
 
 Dealing with ordering and deletion of forms
 ===========================================
@@ -458,8 +523,6 @@ control the widget used with
 ``ordering_widget``
 ^^^^^^^^^^^^^^^^^^^
 
-.. versionadded:: 3.0
-
 .. attribute:: BaseFormSet.ordering_widget
 
 Default: :class:`~django.forms.NumberInput`
@@ -476,8 +539,6 @@ Set ``ordering_widget`` to specify the widget class to be used with
 
 ``get_ordering_widget``
 ^^^^^^^^^^^^^^^^^^^^^^^
-
-.. versionadded:: 3.0
 
 .. method:: BaseFormSet.get_ordering_widget()
 
@@ -564,13 +625,25 @@ On the other hand, if you are using a plain ``FormSet``, it's up to you to
 handle ``formset.deleted_forms``, perhaps in your formset's ``save()`` method,
 as there's no general notion of what it means to delete a form.
 
+``can_delete_extra``
+--------------------
+
+.. versionadded:: 3.2
+
+.. attribute:: BaseFormSet.can_delete_extra
+
+Default: ``True``
+
+While setting ``can_delete=True``, specifying ``can_delete_extra=False`` will
+remove the option to delete extra forms.
+
 Adding additional fields to a formset
 =====================================
 
 If you need to add additional fields to the formset this can be easily
 accomplished. The formset base class provides an ``add_fields`` method. You
-can simply override this method to add your own fields or even redefine the
-default fields/attributes of the order and deletion fields::
+can override this method to add your own fields or even redefine the default
+fields/attributes of the order and deletion fields::
 
     >>> from django.forms import BaseFormSet
     >>> from django.forms import formset_factory
@@ -651,9 +724,9 @@ This is useful if you want to :ref:`use more than one formset in a view
 Using a formset in views and templates
 ======================================
 
-Using a formset inside a view is as easy as using a regular ``Form`` class.
-The only thing you will want to be aware of is making sure to use the
-management form inside the template. Let's look at a sample view::
+Using a formset inside a view is not very different from using a regular
+``Form`` class. The only thing you will want to be aware of is making sure to
+use the management form inside the template. Let's look at a sample view::
 
     from django.forms import formset_factory
     from django.shortcuts import render

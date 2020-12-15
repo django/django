@@ -73,8 +73,8 @@ is done from an existing superuser account)::
 Windows
 -------
 
-On Windows platforms the pgAdmin III utility may also be used as
-a simple way to add superuser privileges to your database user.
+On Windows platforms you can use the pgAdmin III utility to add superuser
+privileges to your database user.
 
 By default, the PostGIS installer on Windows includes a template
 spatial database entitled ``template_postgis``.

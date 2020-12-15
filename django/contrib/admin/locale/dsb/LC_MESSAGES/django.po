@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2019
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-02-19 10:13+0000\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-07-21 12:54+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -69,6 +69,12 @@ msgstr "Žeden datum"
 msgid "Has date"
 msgstr "Ma datum"
 
+msgid "Empty"
+msgstr "Prozny"
+
+msgid "Not empty"
+msgstr "Njeprozny"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -126,23 +132,23 @@ msgid "log entries"
 msgstr "protokolowe zapiski"
 
 #, python-format
-msgid "Added \"%(object)s\"."
+msgid "Added “%(object)s”."
 msgstr "„%(object)s“ pśidane."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
 msgstr "„%(object)s“ změnjone - %(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
+msgid "Deleted “%(object)s.”"
 msgstr "„%(object)s“ wulašowane."
 
 msgid "LogEntry Object"
 msgstr "Objekt LogEntry"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "{name} „{object} pśidany."
+msgid "Added {name} “{object}”."
+msgstr "{name} „{object}“ pśidany."
 
 msgid "Added."
 msgstr "Pśidany."
@@ -151,16 +157,16 @@ msgid "and"
 msgstr "a"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "{fields} za {name} „{object} změnjone."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "{fields} za {name} „{object}“ změnjone."
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "{fields} změnjone."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr "Deleted {name} „{object} wulašowane."
+msgid "Deleted {name} “{object}”."
+msgstr "Deleted {name} „{object}“ wulašowane."
 
 msgid "No fields changed."
 msgstr "Žedne póla změnjone."
@@ -168,48 +174,43 @@ msgstr "Žedne póla změnjone."
 msgid "None"
 msgstr "Žeden"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr "´Źaržćo „ctrl“ abo „cmd“ na Mac tłocony, aby wusej jadnogo wubrał."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" jo se wuspěšnje pśidał."
+msgid "The {name} “{obj}” was added successfully."
+msgstr "{name} „{obj}“ jo se wuspěšnje pśidał."
 
 msgid "You may edit it again below."
 msgstr "Móźośo dołojce znowego wobźěłaś."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr ""
+"{name} „{obj}“ jo se wuspěšnje pśidał. Móžośo dołojce dalšne {name} pśidaś."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+"{name} „{obj}“ jo se wuspěšnje změnił. Móžośo jen dołojce znowego wobźěłowaś."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr ""
+"{name} „{obj}“ jo se wuspěšnje pśidał. Móžośo jen dołojce znowego wobźěłowaś."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
-"{name} \"{obj}\" jo se wuspěšnje pśidał. Móžośo dołojce dalšne {name} pśidaś."
+"{name} „{obj}“ jo se wuspěšnje změnił. Móžośo dołojce dalšne {name} pśidaś."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
-"{name} \"{obj}\" jo se wuspěšnje změnił. Móžośo jen dołojce znowego "
-"wobźěłowaś."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"{name} \"{obj}\" jo se wuspěšnje pśidał. Móžośo jen dołojce znowego "
-"wobźěłowaś."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-"{name} \"{obj}\" jo se wuspěšnje změnił. Móžośo dołojce dalšne {name} pśidaś."
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "{name} \"{obj}\" jo se wuspěšnje změnił."
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "{name} „{obj}“ jo se wuspěšnje změnił."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -222,12 +223,12 @@ msgid "No action selected."
 msgstr "Žedna akcija wubrana."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" jo se wuspěšnje wulašował."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "%(name)s „%(obj)s“ jo se wuspěšnje wulašował."
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
-msgstr "%(name)s z ID \" %(key)s\" njeeksistěrujo. Jo se snaź wulašowało?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr "%(name)s z ID „%(key)s“ njeeksistěrujo. Jo se snaź wulašowało?"
 
 #, python-format
 msgid "Add %s"
@@ -301,7 +302,7 @@ msgstr "Administracija %(app)s"
 msgid "Page not found"
 msgstr "Bok njejo se namakał"
 
-msgid "We're sorry, but the requested page could not be found."
+msgid "We’re sorry, but the requested page could not be found."
 msgstr "Jo nam luto, ale pominany bok njedajo se namakaś."
 
 msgid "Home"
@@ -317,11 +318,11 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Serwerowa zmólka <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 "Zmólka jo nastała. Jo se sedłowym administratoram pśez e-mail k wěsći dała a "
-"by dejała se skóro wótpóraś. Źěkujomse za wašu sćerpmosć."
+"by dejała se skóro wótpóraś. Źěkujom se za wašu sćerpmosć."
 
 msgid "Run the selected action"
 msgstr "Wubranu akciju wuwjasć"
@@ -339,8 +340,21 @@ msgstr "Wubjeŕśo wšykne %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Wuběrk lašowaś"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modele w nałoženju %(name)s"
+
+msgid "Add"
+msgstr "Pśidaś"
+
+msgid "View"
+msgstr "Pokazaś"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Njamaśo pšawo něco pokazaś abo wobźěłaś"
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
 "Zapódajśo nejpjerwjej wužywarske mě a gronidło. Pótom móžośo dalšne "
@@ -387,6 +401,9 @@ msgstr "Na sedle pokazaś"
 msgid "Filter"
 msgstr "Filtrowaś"
 
+msgid "Clear all filters"
+msgstr "Wšykne filtry lašowaś"
+
 msgid "Remove from sorting"
 msgstr "Ze sortěrowanja wótpóraś"
 
@@ -428,7 +445,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Objekty"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Jo, som se wěsty"
 
 msgid "No, take me back"
@@ -462,9 +479,6 @@ msgstr ""
 "Cośo napšawdu wubrany %(objects_name)s lašowaś? Wšykne slědujuce objekty a "
 "jich pśisłušne zapiski se wulašuju:"
 
-msgid "View"
-msgstr "Pokazaś"
-
 msgid "Delete?"
 msgstr "Lašowaś?"
 
@@ -474,16 +488,6 @@ msgstr " Pó %(filter_title)s "
 
 msgid "Summary"
 msgstr "Zespominanje"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modele w nałoženju %(name)s"
-
-msgid "Add"
-msgstr "Pśidaś"
-
-msgid "You don't have permission to view or edit anything."
-msgstr "Njamaśo pšawo něco pokazaś abo wobźěłaś"
 
 msgid "Recent actions"
 msgstr "Nejnowše akcije"
@@ -498,7 +502,7 @@ msgid "Unknown content"
 msgstr "Njeznate wopśimjeśe"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
@@ -517,6 +521,9 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "Sćo swójo gronidło abo wužywarske mě zabył?"
 
+msgid "Toggle navigation"
+msgstr "Nawigaciju pśešaltowaś"
+
 msgid "Date/time"
 msgstr "Datum/cas"
 
@@ -527,7 +534,7 @@ msgid "Action"
 msgstr "Akcija"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
 "Toś ten objekt njama změnowu historiju. Jo se nejskerjej pśez toś to "
@@ -597,7 +604,7 @@ msgid "Your password was changed."
 msgstr "Wašo gronidło jo se změniło."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
 "Pšosym zapódajśo k swójej wěstośe swójo stare gronidło a pótom swójo nowe "
@@ -636,7 +643,7 @@ msgstr ""
 "wužył. Pšosym pšosćo wó nowe slědkstajenje gronidła."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
 "Smy wam instrukcije za nastajenje wašogo gronidła pśez e-mail pósłali, jolic "
@@ -644,7 +651,7 @@ msgstr ""
 "dostaś."
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
 "Jolic mejlku njedostawaśo, pśeznańśo se, až sćo adresu zapódał, z kótarejuž "
@@ -661,7 +668,7 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Pšosym źiśo k slědujucemu bokoju a wubjeŕśo nowe gronidło:"
 
-msgid "Your username, in case you've forgotten:"
+msgid "Your username, in case you’ve forgotten:"
 msgstr "Wašo wužywarske mě, jolic sćo jo zabył:"
 
 msgid "Thanks for using our site!"
@@ -672,7 +679,7 @@ msgid "The %(site_name)s team"
 msgstr "Team %(site_name)s"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
 "Sćo swójo gronidło zabył? Zapódajśo dołojce swóju e-mailowu adresu a "

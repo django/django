@@ -113,9 +113,8 @@ class Command(BaseCommand):
                     # We may have previously seen an "all-models" request for
                     # this app (no model qualifier was given). In this case
                     # there is no need adding specific models to the list.
-                    if app_list_value is not None:
-                        if model not in app_list_value:
-                            app_list_value.append(model)
+                    if app_list_value is not None and model not in app_list_value:
+                        app_list_value.append(model)
                 except ValueError:
                     if primary_keys:
                         raise CommandError("You can only use --pks option with one model")
@@ -144,7 +143,17 @@ class Command(BaseCommand):
             Collate the objects to be serialized. If count_only is True, just
             count the number of objects to be serialized.
             """
-            models = serializers.sort_dependencies(app_list.items())
+            if use_natural_foreign_keys:
+                models = serializers.sort_dependencies(app_list.items(), allow_cycles=True)
+            else:
+                # There is no need to sort dependencies when natural foreign
+                # keys are not used.
+                models = []
+                for (app_config, model_list) in app_list.items():
+                    if model_list is None:
+                        models.extend(app_config.get_models())
+                    else:
+                        models.extend(model_list)
             for model in models:
                 if model in excluded_models:
                     continue

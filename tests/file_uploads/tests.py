@@ -6,12 +6,13 @@ import sys
 import tempfile as sys_tempfile
 import unittest
 from io import BytesIO, StringIO
+from unittest import mock
 from urllib.parse import quote
 
 from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http.multipartparser import (
-    MultiPartParser, MultiPartParserError, parse_header,
+    FILE, MultiPartParser, MultiPartParserError, Parser, parse_header,
 )
 from django.test import SimpleTestCase, TestCase, client, override_settings
 
@@ -162,15 +163,61 @@ class FileUploadTests(TestCase):
         response = self.client.request(**r)
         self.assertEqual(response.status_code, 200)
 
+    def test_unicode_file_name_rfc2231_with_double_quotes(self):
+        payload = client.FakePayload()
+        payload.write('\r\n'.join([
+            '--' + client.BOUNDARY,
+            'Content-Disposition: form-data; name="file_unicode"; '
+            'filename*="UTF-8\'\'%s"' % quote(UNICODE_FILENAME),
+            'Content-Type: application/octet-stream',
+            '',
+            'You got pwnd.\r\n',
+            '\r\n--' + client.BOUNDARY + '--\r\n',
+        ]))
+        r = {
+            'CONTENT_LENGTH': len(payload),
+            'CONTENT_TYPE': client.MULTIPART_CONTENT,
+            'PATH_INFO': '/unicode_name/',
+            'REQUEST_METHOD': 'POST',
+            'wsgi.input': payload,
+        }
+        response = self.client.request(**r)
+        self.assertEqual(response.status_code, 200)
+
+    def test_unicode_name_rfc2231_with_double_quotes(self):
+        payload = client.FakePayload()
+        payload.write('\r\n'.join([
+            '--' + client.BOUNDARY,
+            'Content-Disposition: form-data; name*="UTF-8\'\'file_unicode"; '
+            'filename*="UTF-8\'\'%s"' % quote(UNICODE_FILENAME),
+            'Content-Type: application/octet-stream',
+            '',
+            'You got pwnd.\r\n',
+            '\r\n--' + client.BOUNDARY + '--\r\n'
+        ]))
+        r = {
+            'CONTENT_LENGTH': len(payload),
+            'CONTENT_TYPE': client.MULTIPART_CONTENT,
+            'PATH_INFO': '/unicode_name/',
+            'REQUEST_METHOD': 'POST',
+            'wsgi.input': payload,
+        }
+        response = self.client.request(**r)
+        self.assertEqual(response.status_code, 200)
+
     def test_blank_filenames(self):
         """
         Receiving file upload when filename is blank (before and after
         sanitization) should be okay.
         """
-        # The second value is normalized to an empty name by
-        # MultiPartParser.IE_sanitize()
-        filenames = ['', 'C:\\Windows\\']
-
+        filenames = [
+            '',
+            # Normalized by MultiPartParser.IE_sanitize().
+            'C:\\Windows\\',
+            # Normalized by os.path.basename().
+            '/',
+            'ends-with-slash/',
+        ]
         payload = client.FakePayload()
         for i, name in enumerate(filenames):
             payload.write('\r\n'.join([
@@ -389,6 +436,38 @@ class FileUploadTests(TestCase):
             with self.assertRaisesMessage(AttributeError, msg):
                 self.client.post('/quota/broken/', {'f': file})
 
+    def test_stop_upload_temporary_file_handler(self):
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write(b'a')
+            temp_file.seek(0)
+            response = self.client.post('/temp_file/stop_upload/', {'file': temp_file})
+            temp_path = response.json()['temp_path']
+            self.assertIs(os.path.exists(temp_path), False)
+
+    def test_upload_interrupted_temporary_file_handler(self):
+        # Simulate an interrupted upload by omitting the closing boundary.
+        class MockedParser(Parser):
+            def __iter__(self):
+                for item in super().__iter__():
+                    item_type, meta_data, field_stream = item
+                    yield item_type, meta_data, field_stream
+                    if item_type == FILE:
+                        return
+
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write(b'a')
+            temp_file.seek(0)
+            with mock.patch(
+                'django.http.multipartparser.Parser',
+                MockedParser,
+            ):
+                response = self.client.post(
+                    '/temp_file/upload_interrupted/',
+                    {'file': temp_file},
+                )
+            temp_path = response.json()['temp_path']
+            self.assertIs(os.path.exists(temp_path), False)
+
     def test_fileupload_getlist(self):
         file = tempfile.NamedTemporaryFile
         with file() as file1, file() as file2, file() as file2a:
@@ -479,8 +558,9 @@ class FileUploadTests(TestCase):
             try:
                 self.client.post('/upload_errors/', post_data)
             except reference_error.__class__ as err:
-                self.assertFalse(
-                    str(err) == str(reference_error),
+                self.assertNotEqual(
+                    str(err),
+                    str(reference_error),
                     "Caught a repeated exception that'll cause an infinite loop in file uploads."
                 )
             except Exception as err:

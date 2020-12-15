@@ -13,7 +13,9 @@ from django.http import (
     HttpRequest, HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
 from django.shortcuts import redirect
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import (
+    RequestFactory, SimpleTestCase, TestCase, override_settings,
+)
 from django.test.utils import override_script_prefix
 from django.urls import (
     NoReverseMatch, Resolver404, ResolverMatch, URLPattern, URLResolver,
@@ -527,6 +529,14 @@ class ReverseLazyTest(TestCase):
         self.assertEqual(
             'Some URL: %s' % reverse_lazy('some-login-page'),
             'Some URL: /login/'
+        )
+
+    def test_build_absolute_uri(self):
+        factory = RequestFactory()
+        request = factory.get('/')
+        self.assertEqual(
+            request.build_absolute_uri(reverse_lazy('some-login-page')),
+            'http://testserver/login/',
         )
 
 
@@ -1055,16 +1065,14 @@ class ErrorHandlerResolutionTests(SimpleTestCase):
         self.callable_resolver = URLResolver(RegexPattern(r'^$'), urlconf_callables)
 
     def test_named_handlers(self):
-        handler = (empty_view, {})
         for code in [400, 404, 500]:
             with self.subTest(code=code):
-                self.assertEqual(self.resolver.resolve_error_handler(code), handler)
+                self.assertEqual(self.resolver.resolve_error_handler(code), empty_view)
 
     def test_callable_handlers(self):
-        handler = (empty_view, {})
         for code in [400, 404, 500]:
             with self.subTest(code=code):
-                self.assertEqual(self.callable_resolver.resolve_error_handler(code), handler)
+                self.assertEqual(self.callable_resolver.resolve_error_handler(code), empty_view)
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls_without_handlers')

@@ -3,7 +3,7 @@ from django.core.checks.translation import (
     check_language_settings_consistent, check_setting_language_code,
     check_setting_languages, check_setting_languages_bidi,
 )
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 
 
 class TranslationCheckTests(SimpleTestCase):
@@ -75,12 +75,36 @@ class TranslationCheckTests(SimpleTestCase):
                     Error(msg % tag, id='translation.E003'),
                 ])
 
+    @override_settings(USE_I18N=True, LANGUAGES=[('en', 'English')])
     def test_inconsistent_language_settings(self):
         msg = (
             'You have provided a value for the LANGUAGE_CODE setting that is '
             'not in the LANGUAGES setting.'
         )
-        with self.settings(LANGUAGE_CODE='fr', LANGUAGES=[('en', 'English')]):
-            self.assertEqual(check_language_settings_consistent(None), [
-                Error(msg, id='translation.E004'),
-            ])
+        for tag in ['fr', 'fr-CA', 'fr-357']:
+            with self.subTest(tag), self.settings(LANGUAGE_CODE=tag):
+                self.assertEqual(check_language_settings_consistent(None), [
+                    Error(msg, id='translation.E004'),
+                ])
+
+    @override_settings(
+        USE_I18N=True,
+        LANGUAGES=[
+            ('de', 'German'),
+            ('es', 'Spanish'),
+            ('fr', 'French'),
+            ('ca', 'Catalan'),
+        ],
+    )
+    def test_valid_variant_consistent_language_settings(self):
+        tests = [
+            # language + region.
+            'fr-CA',
+            'es-419',
+            'de-at',
+            # language + region + variant.
+            'ca-ES-valencia',
+        ]
+        for tag in tests:
+            with self.subTest(tag), self.settings(LANGUAGE_CODE=tag):
+                self.assertEqual(check_language_settings_consistent(None), [])

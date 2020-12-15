@@ -14,7 +14,7 @@ def x_robots_tag(func):
     @wraps(func)
     def inner(request, *args, **kwargs):
         response = func(request, *args, **kwargs)
-        response['X-Robots-Tag'] = 'noindex, noodp, noarchive'
+        response.headers['X-Robots-Tag'] = 'noindex, noodp, noarchive'
         return response
     return inner
 
@@ -88,5 +88,5 @@ def sitemap(request, sitemaps, section=None,
     if all_sites_lastmod and lastmod is not None:
         # if lastmod is defined for all sites, set header so as
         # ConditionalGetMiddleware is able to send 304 NOT MODIFIED
-        response['Last-Modified'] = http_date(timegm(lastmod))
+        response.headers['Last-Modified'] = http_date(timegm(lastmod))
     return response

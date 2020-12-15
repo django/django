@@ -194,16 +194,15 @@ class MultiValueDict(dict):
         if len(args) > 1:
             raise TypeError("update expected at most 1 argument, got %d" % len(args))
         if args:
-            other_dict = args[0]
-            if isinstance(other_dict, MultiValueDict):
-                for key, value_list in other_dict.lists():
+            arg = args[0]
+            if isinstance(arg, MultiValueDict):
+                for key, value_list in arg.lists():
                     self.setlistdefault(key).extend(value_list)
             else:
-                try:
-                    for key, value in other_dict.items():
-                        self.setlistdefault(key).append(value)
-                except TypeError:
-                    raise ValueError("MultiValueDict.update() takes either a MultiValueDict or dictionary")
+                if isinstance(arg, Mapping):
+                    arg = arg.items()
+                for key, value in arg:
+                    self.setlistdefault(key).append(value)
         for key, value in kwargs.items():
             self.setlistdefault(key).append(value)
 
@@ -230,11 +229,8 @@ class ImmutableList(tuple):
         self.warning = warning
         return self
 
-    def complain(self, *wargs, **kwargs):
-        if isinstance(self.warning, Exception):
-            raise self.warning
-        else:
-            raise AttributeError(self.warning)
+    def complain(self, *args, **kwargs):
+        raise AttributeError(self.warning)
 
     # All list mutation functions complain.
     __delitem__ = complain

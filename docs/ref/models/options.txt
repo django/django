@@ -157,11 +157,12 @@ Django quotes column and table names behind the scenes.
     part of a :djadmin:`flush` management command. That is, Django
     *manages* the database tables' lifecycles.
 
-    If ``False``, no database table creation or deletion operations will be
-    performed for this model. This is useful if the model represents an existing
-    table or a database view that has been created by some other means. This is
-    the *only* difference when ``managed=False``. All other aspects of
-    model handling are exactly the same as normal. This includes
+    If ``False``, no database table creation, modification, or deletion
+    operations will be performed for this model. This is useful if the model
+    represents an existing table or a database view that has been created by
+    some other means. This is the *only* difference when ``managed=False``. All
+    other aspects of model handling are exactly the same as normal. This
+    includes
 
     #. Adding an automatic primary key field to the model if you don't
        declare it.  To avoid confusion for later code readers, it's
@@ -283,10 +284,6 @@ Django quotes column and table names behind the scenes.
         from django.db.models import F
 
         ordering = [F('author').asc(nulls_last=True)]
-
-    Default ordering also affects :ref:`aggregation queries
-    <aggregation-ordering-interaction>` but this won't be the case starting
-    in Django 3.1.
 
 .. warning::
 
@@ -458,8 +455,6 @@ Django quotes column and table names behind the scenes.
 ---------------
 
 .. attribute:: Options.constraints
-
-    .. versionadded:: 2.2
 
     A list of :doc:`constraints </ref/models/constraints>` that you want to
     define on the model::

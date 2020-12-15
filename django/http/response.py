@@ -5,6 +5,7 @@ import os
 import re
 import sys
 import time
+from collections.abc import Mapping
 from email.header import Header
 from http.client import responses
 from urllib.parse import quote, urlparse
@@ -15,10 +16,71 @@ from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import timezone
+from django.utils.datastructures import CaseInsensitiveMapping
 from django.utils.encoding import iri_to_uri
 from django.utils.http import http_date
+from django.utils.regex_helper import _lazy_re_compile
 
-_charset_from_content_type_re = re.compile(r';\s*charset=(?P<charset>[^\s;]+)', re.I)
+_charset_from_content_type_re = _lazy_re_compile(r';\s*charset=(?P<charset>[^\s;]+)', re.I)
+
+
+class ResponseHeaders(CaseInsensitiveMapping):
+    def __init__(self, data):
+        """
+        Populate the initial data using __setitem__ to ensure values are
+        correctly encoded.
+        """
+        if not isinstance(data, Mapping):
+            data = {
+                k: v
+                for k, v in CaseInsensitiveMapping._destruct_iterable_mapping_values(data)
+            }
+        self._store = {}
+        for header, value in data.items():
+            self[header] = value
+
+    def _convert_to_charset(self, value, charset, mime_encode=False):
+        """
+        Convert headers key/value to ascii/latin-1 native strings.
+        `charset` must be 'ascii' or 'latin-1'. If `mime_encode` is True and
+        `value` can't be represented in the given charset, apply MIME-encoding.
+        """
+        if not isinstance(value, (bytes, str)):
+            value = str(value)
+        if (
+            (isinstance(value, bytes) and (b'\n' in value or b'\r' in value)) or
+            (isinstance(value, str) and ('\n' in value or '\r' in value))
+        ):
+            raise BadHeaderError("Header values can't contain newlines (got %r)" % value)
+        try:
+            if isinstance(value, str):
+                # Ensure string is valid in given charset
+                value.encode(charset)
+            else:
+                # Convert bytestring using given charset
+                value = value.decode(charset)
+        except UnicodeError as e:
+            if mime_encode:
+                value = Header(value, 'utf-8', maxlinelen=sys.maxsize).encode()
+            else:
+                e.reason += ', HTTP response headers must be in %s format' % charset
+                raise
+        return value
+
+    def __delitem__(self, key):
+        self.pop(key)
+
+    def __setitem__(self, key, value):
+        key = self._convert_to_charset(key, 'ascii')
+        value = self._convert_to_charset(value, 'latin-1', mime_encode=True)
+        self._store[key.lower()] = (key, value)
+
+    def pop(self, key, default=None):
+        return self._store.pop(key.lower(), default)
+
+    def setdefault(self, key, value):
+        if key not in self:
+            self[key] = value
 
 
 class BadHeaderError(ValueError):
@@ -35,12 +97,19 @@ class HttpResponseBase:
 
     status_code = 200
 
-    def __init__(self, content_type=None, status=None, reason=None, charset=None):
-        # _headers is a mapping of the lowercase name to the original case of
-        # the header (required for working with legacy systems) and the header
-        # value. Both the name of the header and its value are ASCII strings.
-        self._headers = {}
-        self._closable_objects = []
+    def __init__(self, content_type=None, status=None, reason=None, charset=None, headers=None):
+        self.headers = ResponseHeaders(headers or {})
+        self._charset = charset
+        if content_type and 'Content-Type' in self.headers:
+            raise ValueError(
+                "'headers' must not contain 'Content-Type' when the "
+                "'content_type' parameter is provided."
+            )
+        if 'Content-Type' not in self.headers:
+            if content_type is None:
+                content_type = 'text/html; charset=%s' % self.charset
+            self.headers['Content-Type'] = content_type
+        self._resource_closers = []
         # This parameter is set by the handler. It's necessary to preserve the
         # historical behavior of request_finished.
         self._handler_class = None
@@ -55,10 +124,6 @@ class HttpResponseBase:
             if not 100 <= self.status_code <= 599:
                 raise ValueError('HTTP status code must be an integer from 100 to 599.')
         self._reason_phrase = reason
-        self._charset = charset
-        if content_type is None:
-            content_type = 'text/html; charset=%s' % self.charset
-        self['Content-Type'] = content_type
 
     @property
     def reason_phrase(self):
@@ -80,7 +145,7 @@ class HttpResponseBase:
         matched = _charset_from_content_type_re.search(content_type)
         if matched:
             # Extract the charset and strip its double quotes
-            return matched.group('charset').replace('"', '')
+            return matched['charset'].replace('"', '')
         return settings.DEFAULT_CHARSET
 
     @charset.setter
@@ -94,7 +159,7 @@ class HttpResponseBase:
 
         headers = [
             (to_bytes(key, 'ascii') + b': ' + to_bytes(value, 'latin-1'))
-            for key, value in self._headers.values()
+            for key, value in self.headers.items()
         ]
         return b'\r\n'.join(headers)
 
@@ -102,57 +167,28 @@ class HttpResponseBase:
 
     @property
     def _content_type_for_repr(self):
-        return ', "%s"' % self['Content-Type'] if 'Content-Type' in self else ''
-
-    def _convert_to_charset(self, value, charset, mime_encode=False):
-        """
-        Convert headers key/value to ascii/latin-1 native strings.
-
-        `charset` must be 'ascii' or 'latin-1'. If `mime_encode` is True and
-        `value` can't be represented in the given charset, apply MIME-encoding.
-        """
-        if not isinstance(value, (bytes, str)):
-            value = str(value)
-        if ((isinstance(value, bytes) and (b'\n' in value or b'\r' in value)) or
-                isinstance(value, str) and ('\n' in value or '\r' in value)):
-            raise BadHeaderError("Header values can't contain newlines (got %r)" % value)
-        try:
-            if isinstance(value, str):
-                # Ensure string is valid in given charset
-                value.encode(charset)
-            else:
-                # Convert bytestring using given charset
-                value = value.decode(charset)
-        except UnicodeError as e:
-            if mime_encode:
-                value = Header(value, 'utf-8', maxlinelen=sys.maxsize).encode()
-            else:
-                e.reason += ', HTTP response headers must be in %s format' % charset
-                raise
-        return value
+        return ', "%s"' % self.headers['Content-Type'] if 'Content-Type' in self.headers else ''
 
     def __setitem__(self, header, value):
-        header = self._convert_to_charset(header, 'ascii')
-        value = self._convert_to_charset(value, 'latin-1', mime_encode=True)
-        self._headers[header.lower()] = (header, value)
+        self.headers[header] = value
 
     def __delitem__(self, header):
-        self._headers.pop(header.lower(), False)
+        del self.headers[header]
 
     def __getitem__(self, header):
-        return self._headers[header.lower()][1]
+        return self.headers[header]
 
     def has_header(self, header):
         """Case-insensitive check for a header."""
-        return header.lower() in self._headers
+        return header in self.headers
 
     __contains__ = has_header
 
     def items(self):
-        return self._headers.values()
+        return self.headers.items()
 
     def get(self, header, alternate=None):
-        return self._headers.get(header.lower(), (None, alternate))[1]
+        return self.headers.get(header, alternate)
 
     def set_cookie(self, key, value='', max_age=None, expires=None, path='/',
                    domain=None, secure=False, httponly=False, samesite=None):
@@ -183,7 +219,7 @@ class HttpResponseBase:
         else:
             self.cookies[key]['expires'] = ''
         if max_age is not None:
-            self.cookies[key]['max-age'] = max_age
+            self.cookies[key]['max-age'] = int(max_age)
             # IE requires expires, so set it if hasn't been already.
             if not expires:
                 self.cookies[key]['expires'] = http_date(time.time() + max_age)
@@ -196,26 +232,30 @@ class HttpResponseBase:
         if httponly:
             self.cookies[key]['httponly'] = True
         if samesite:
-            if samesite.lower() not in ('lax', 'strict'):
-                raise ValueError('samesite must be "lax" or "strict".')
+            if samesite.lower() not in ('lax', 'none', 'strict'):
+                raise ValueError('samesite must be "lax", "none", or "strict".')
             self.cookies[key]['samesite'] = samesite
 
     def setdefault(self, key, value):
         """Set a header unless it has already been set."""
-        if key not in self:
-            self[key] = value
+        self.headers.setdefault(key, value)
 
     def set_signed_cookie(self, key, value, salt='', **kwargs):
         value = signing.get_cookie_signer(salt=key + salt).sign(value)
         return self.set_cookie(key, value, **kwargs)
 
-    def delete_cookie(self, key, path='/', domain=None):
-        # Most browsers ignore the Set-Cookie header if the cookie name starts
-        # with __Host- or __Secure- and the cookie doesn't use the secure flag.
-        secure = key.startswith(('__Secure-', '__Host-'))
+    def delete_cookie(self, key, path='/', domain=None, samesite=None):
+        # Browsers can ignore the Set-Cookie header if the cookie doesn't use
+        # the secure flag and:
+        # - the cookie name starts with "__Host-" or "__Secure-", or
+        # - the samesite is "none".
+        secure = (
+            key.startswith(('__Secure-', '__Host-')) or
+            (samesite and samesite.lower() == 'none')
+        )
         self.set_cookie(
             key, max_age=0, path=path, domain=domain, secure=secure,
-            expires='Thu, 01 Jan 1970 00:00:00 GMT',
+            expires='Thu, 01 Jan 1970 00:00:00 GMT', samesite=samesite,
         )
 
     # Common methods used by subclasses
@@ -241,15 +281,14 @@ class HttpResponseBase:
 
     # The WSGI server must call this method upon completion of the request.
     # See http://blog.dscpl.com.au/2012/10/obligations-for-calling-close-on.html
-    # When wsgi.file_wrapper is used, the WSGI server instead calls close()
-    # on the file-like object. Django ensures this method is called in this
-    # case by replacing self.file_to_stream.close() with a wrapped version.
     def close(self):
-        for closable in self._closable_objects:
+        for closer in self._resource_closers:
             try:
-                closable.close()
+                closer()
             except Exception:
                 pass
+        # Free resources that were still referenced.
+        self._resource_closers.clear()
         self.closed = True
         signals.request_finished.send(sender=self._handler_class)
 
@@ -282,7 +321,7 @@ class HttpResponse(HttpResponseBase):
     """
     An HTTP response class with a string as content.
 
-    This content that can be read, appended to, or replaced.
+    This content can be read, appended to, or replaced.
     """
 
     streaming = False
@@ -312,7 +351,10 @@ class HttpResponse(HttpResponseBase):
     @content.setter
     def content(self, value):
         # Consume iterators upon assignment to allow repeated iteration.
-        if hasattr(value, '__iter__') and not isinstance(value, (bytes, str)):
+        if (
+            hasattr(value, '__iter__') and
+            not isinstance(value, (bytes, memoryview, str))
+        ):
             content = b''.join(self.make_bytes(chunk) for chunk in value)
             if hasattr(value, 'close'):
                 try:
@@ -380,7 +422,7 @@ class StreamingHttpResponse(HttpResponseBase):
         # Ensure we can never iterate on "value" more than once.
         self._iterator = iter(value)
         if hasattr(value, 'close'):
-            self._closable_objects.append(value)
+            self._resource_closers.append(value.close)
 
     def __iter__(self):
         return self.streaming_content
@@ -400,39 +442,14 @@ class FileResponse(StreamingHttpResponse):
         self.filename = filename
         super().__init__(*args, **kwargs)
 
-    def _wrap_file_to_stream_close(self, filelike):
-        """
-        Wrap the file-like close() with a version that calls
-        FileResponse.close().
-        """
-        closing = False
-        filelike_close = getattr(filelike, 'close', lambda: None)
-
-        def file_wrapper_close():
-            nonlocal closing
-            # Prevent an infinite loop since FileResponse.close() tries to
-            # close the objects in self._closable_objects.
-            if closing:
-                return
-            closing = True
-            try:
-                filelike_close()
-            finally:
-                self.close()
-
-        filelike.close = file_wrapper_close
-
     def _set_streaming_content(self, value):
         if not hasattr(value, 'read'):
             self.file_to_stream = None
             return super()._set_streaming_content(value)
 
         self.file_to_stream = filelike = value
-        # Add to closable objects before wrapping close(), since the filelike
-        # might not have close().
         if hasattr(filelike, 'close'):
-            self._closable_objects.append(filelike)
-        self._wrap_file_to_stream_close(filelike)
+            self._resource_closers.append(filelike.close)
         value = iter(lambda: filelike.read(self.block_size), b'')
         self.set_headers(filelike)
         super()._set_streaming_content(value)
@@ -450,19 +467,19 @@ class FileResponse(StreamingHttpResponse):
         filename = getattr(filelike, 'name', None)
         filename = filename if (isinstance(filename, str) and filename) else self.filename
         if os.path.isabs(filename):
-            self['Content-Length'] = os.path.getsize(filelike.name)
+            self.headers['Content-Length'] = os.path.getsize(filelike.name)
         elif hasattr(filelike, 'getbuffer'):
-            self['Content-Length'] = filelike.getbuffer().nbytes
+            self.headers['Content-Length'] = filelike.getbuffer().nbytes
 
-        if self.get('Content-Type', '').startswith('text/html'):
+        if self.headers.get('Content-Type', '').startswith('text/html'):
             if filename:
                 content_type, encoding = mimetypes.guess_type(filename)
                 # Encoding isn't set to prevent browsers from automatically
                 # uncompressing files.
                 content_type = encoding_map.get(encoding, content_type)
-                self['Content-Type'] = content_type or 'application/octet-stream'
+                self.headers['Content-Type'] = content_type or 'application/octet-stream'
             else:
-                self['Content-Type'] = 'application/octet-stream'
+                self.headers['Content-Type'] = 'application/octet-stream'
 
         filename = self.filename or os.path.basename(filename)
         if filename:
@@ -472,9 +489,9 @@ class FileResponse(StreamingHttpResponse):
                 file_expr = 'filename="{}"'.format(filename)
             except UnicodeEncodeError:
                 file_expr = "filename*=utf-8''{}".format(quote(filename))
-            self['Content-Disposition'] = '{}; {}'.format(disposition, file_expr)
+            self.headers['Content-Disposition'] = '{}; {}'.format(disposition, file_expr)
         elif self.as_attachment:
-            self['Content-Disposition'] = 'attachment'
+            self.headers['Content-Disposition'] = 'attachment'
 
 
 class HttpResponseRedirectBase(HttpResponse):

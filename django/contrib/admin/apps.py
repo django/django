@@ -19,6 +19,8 @@ class SimpleAdminConfig(AppConfig):
 class AdminConfig(SimpleAdminConfig):
     """The default AppConfig for admin which does autodiscovery."""
 
+    default = True
+
     def ready(self):
         super().ready()
         self.module.autodiscover()

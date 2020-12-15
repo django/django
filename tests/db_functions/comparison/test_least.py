@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
-from unittest import skipIf, skipUnless
+from unittest import skipUnless
 
 from django.db import connection
 from django.db.models.expressions import RawSQL
@@ -35,7 +35,6 @@ class LeastTests(TestCase):
         articles = Article.objects.annotate(first_updated=Least('written', 'published'))
         self.assertIsNone(articles.first().first_updated)
 
-    @skipIf(connection.vendor == 'mysql', "This doesn't work on MySQL")
     def test_coalesce_workaround(self):
         future = datetime(2100, 1, 1)
         now = timezone.now()

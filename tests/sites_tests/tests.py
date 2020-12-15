@@ -2,11 +2,13 @@ from django.apps import apps
 from django.apps.registry import Apps
 from django.conf import settings
 from django.contrib.sites import models
+from django.contrib.sites.checks import check_site_id
 from django.contrib.sites.management import create_default_site
 from django.contrib.sites.middleware import CurrentSiteMiddleware
 from django.contrib.sites.models import Site, clear_site_cache
 from django.contrib.sites.requests import RequestSite
 from django.contrib.sites.shortcuts import get_current_site
+from django.core import checks
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models.signals import post_migrate
 from django.http import HttpRequest, HttpResponse
@@ -24,6 +26,9 @@ class SitesFrameworkTests(TestCase):
     def setUpTestData(cls):
         cls.site = Site(id=settings.SITE_ID, domain='example.com', name='example.com')
         cls.site.save()
+
+    def setUp(self):
+        Site.objects.clear_cache()
 
     def tearDown(self):
         Site.objects.clear_cache()
@@ -79,7 +84,7 @@ class SitesFrameworkTests(TestCase):
             self.assertIsInstance(site, RequestSite)
             self.assertEqual(site.name, "example.com")
 
-    @override_settings(SITE_ID='', ALLOWED_HOSTS=['example.com'])
+    @override_settings(SITE_ID=None, ALLOWED_HOSTS=['example.com'])
     def test_get_current_site_no_site_id(self):
         request = HttpRequest()
         request.META = {
@@ -90,7 +95,7 @@ class SitesFrameworkTests(TestCase):
         site = get_current_site(request)
         self.assertEqual(site.name, "example.com")
 
-    @override_settings(SITE_ID='', ALLOWED_HOSTS=['example.com'])
+    @override_settings(SITE_ID=None, ALLOWED_HOSTS=['example.com'])
     def test_get_current_site_host_with_trailing_dot(self):
         """
         The site is matched if the name in the request has a trailing dot.
@@ -103,7 +108,7 @@ class SitesFrameworkTests(TestCase):
         site = get_current_site(request)
         self.assertEqual(site.name, 'example.com')
 
-    @override_settings(SITE_ID='', ALLOWED_HOSTS=['example.com', 'example.net'])
+    @override_settings(SITE_ID=None, ALLOWED_HOSTS=['example.com', 'example.net'])
     def test_get_current_site_no_site_id_and_handle_port_fallback(self):
         request = HttpRequest()
         s1 = self.site
@@ -164,7 +169,7 @@ class SitesFrameworkTests(TestCase):
         expected_cache = {self.site.id: self.site}
         self.assertEqual(models.SITE_CACHE, expected_cache)
 
-        with self.settings(SITE_ID=''):
+        with self.settings(SITE_ID=None):
             get_current_site(request)
 
         expected_cache.update({self.site.domain: self.site})
@@ -173,7 +178,7 @@ class SitesFrameworkTests(TestCase):
         clear_site_cache(Site, instance=self.site, using='default')
         self.assertEqual(models.SITE_CACHE, {})
 
-    @override_settings(SITE_ID='', ALLOWED_HOSTS=['example2.com'])
+    @override_settings(SITE_ID=None, ALLOWED_HOSTS=['example2.com'])
     def test_clear_site_cache_domain(self):
         site = Site.objects.create(name='example2.com', domain='example2.com')
         request = HttpRequest()
@@ -201,6 +206,20 @@ class SitesFrameworkTests(TestCase):
     def test_site_natural_key(self):
         self.assertEqual(Site.objects.get_by_natural_key(self.site.domain), self.site)
         self.assertEqual(self.site.natural_key(), (self.site.domain,))
+
+    @override_settings(SITE_ID='1')
+    def test_check_site_id(self):
+        self.assertEqual(check_site_id(None), [
+            checks.Error(
+                msg='The SITE_ID setting must be an integer',
+                id='sites.E101',
+            ),
+        ])
+
+    def test_valid_site_id(self):
+        for site_id in [1, None]:
+            with self.subTest(site_id=site_id), self.settings(SITE_ID=site_id):
+                self.assertEqual(check_site_id(None), [])
 
 
 @override_settings(ALLOWED_HOSTS=['example.com'])
@@ -324,14 +343,6 @@ class CreateDefaultSiteTests(TestCase):
 
 
 class MiddlewareTest(TestCase):
-
-    def test_old_style_request(self):
-        """The request has correct `site` attribute."""
-        middleware = CurrentSiteMiddleware()
-        request = HttpRequest()
-        middleware.process_request(request)
-        self.assertEqual(request.site.id, settings.SITE_ID)
-
     def test_request(self):
         def get_response(request):
             return HttpResponse(str(request.site.id))

@@ -79,9 +79,8 @@ class SerializerRegistrationTests(SimpleTestCase):
             serializers.get_serializer("nonsense")
 
         # SerializerDoesNotExist is instantiated with the nonexistent format
-        with self.assertRaises(SerializerDoesNotExist) as cm:
+        with self.assertRaisesMessage(SerializerDoesNotExist, 'nonsense'):
             serializers.get_serializer("nonsense")
-        self.assertEqual(cm.exception.args, ("nonsense",))
 
     def test_get_unknown_deserializer(self):
         with self.assertRaises(SerializerDoesNotExist):
@@ -91,29 +90,30 @@ class SerializerRegistrationTests(SimpleTestCase):
 class SerializersTestBase:
     serializer_name = None  # Set by subclasses to the serialization format name
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         sports = Category.objects.create(name="Sports")
         music = Category.objects.create(name="Music")
         op_ed = Category.objects.create(name="Op-Ed")
 
-        self.joe = Author.objects.create(name="Joe")
-        self.jane = Author.objects.create(name="Jane")
+        cls.joe = Author.objects.create(name='Joe')
+        cls.jane = Author.objects.create(name='Jane')
 
-        self.a1 = Article(
-            author=self.jane,
+        cls.a1 = Article(
+            author=cls.jane,
             headline="Poker has no place on ESPN",
             pub_date=datetime(2006, 6, 16, 11, 00)
         )
-        self.a1.save()
-        self.a1.categories.set([sports, op_ed])
+        cls.a1.save()
+        cls.a1.categories.set([sports, op_ed])
 
-        self.a2 = Article(
-            author=self.joe,
+        cls.a2 = Article(
+            author=cls.joe,
             headline="Time to reform copyright",
             pub_date=datetime(2006, 6, 16, 13, 00, 11, 345)
         )
-        self.a2.save()
-        self.a2.categories.set([music, op_ed])
+        cls.a2.save()
+        cls.a2.categories.set([music, op_ed])
 
     def test_serialize(self):
         """Basic serialization works."""
@@ -203,7 +203,7 @@ class SerializersTestBase:
         for field_name in valid_fields:
             self.assertTrue(self._get_field_values(serial_str, field_name))
 
-    def test_serialize_unicode(self):
+    def test_serialize_unicode_roundtrip(self):
         """Unicode makes the roundtrip intact"""
         actor_name = "Za\u017c\u00f3\u0142\u0107"
         movie_title = 'G\u0119\u015bl\u0105 ja\u017a\u0144'
@@ -219,6 +219,13 @@ class SerializersTestBase:
         obj_list = list(serializers.deserialize(self.serializer_name, serial_str))
         mv_obj = obj_list[0].object
         self.assertEqual(mv_obj.title, movie_title)
+
+    def test_unicode_serialization(self):
+        unicode_name = 'יוניקוד'
+        data = serializers.serialize(self.serializer_name, [Author(name=unicode_name)])
+        self.assertIn(unicode_name, data)
+        objs = list(serializers.deserialize(self.serializer_name, data))
+        self.assertEqual(objs[0].object.name, unicode_name)
 
     def test_serialize_progressbar(self):
         fake_stdout = StringIO()
@@ -242,6 +249,19 @@ class SerializersTestBase:
 
         with self.assertNumQueries(0):
             serializers.serialize(self.serializer_name, [mv])
+
+    def test_serialize_prefetch_related_m2m(self):
+        # One query for the Article table and one for each prefetched m2m
+        # field.
+        with self.assertNumQueries(3):
+            serializers.serialize(
+                self.serializer_name,
+                Article.objects.all().prefetch_related('categories', 'meta_data'),
+            )
+        # One query for the Article table, and two m2m queries for each
+        # article.
+        with self.assertNumQueries(5):
+            serializers.serialize(self.serializer_name, Article.objects.all())
 
     def test_serialize_with_null_pk(self):
         """

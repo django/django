@@ -28,6 +28,7 @@ BUILTIN_SERIALIZERS = {
     "python": "django.core.serializers.python",
     "json": "django.core.serializers.json",
     "yaml": "django.core.serializers.pyyaml",
+    "jsonl": "django.core.serializers.jsonl",
 }
 
 _serializers = {}
@@ -156,12 +157,15 @@ def _load_serializers():
     _serializers = serializers
 
 
-def sort_dependencies(app_list):
+def sort_dependencies(app_list, allow_cycles=False):
     """Sort a list of (app_config, models) pairs into a single list of models.
 
     The single list of models is sorted so that any model with a natural key
     is serialized before a normal model, and any model with a natural key
     dependency has it's dependencies serialized first.
+
+    If allow_cycles is True, return the best-effort ordering that will respect
+    most of dependencies but ignore some of them to break the cycles.
     """
     # Process the list of models, and get the list of dependencies
     model_dependencies = []
@@ -222,13 +226,20 @@ def sort_dependencies(app_list):
             else:
                 skipped.append((model, deps))
         if not changed:
-            raise RuntimeError(
-                "Can't resolve dependencies for %s in serialized app list." %
-                ', '.join(
-                    '%s.%s' % (model._meta.app_label, model._meta.object_name)
-                    for model, deps in sorted(skipped, key=lambda obj: obj[0].__name__)
+            if allow_cycles:
+                # If cycles are allowed, add the last skipped model and ignore
+                # its dependencies. This could be improved by some graph
+                # analysis to ignore as few dependencies as possible.
+                model, _ = skipped.pop()
+                model_list.append(model)
+            else:
+                raise RuntimeError(
+                    "Can't resolve dependencies for %s in serialized app list."
+                    % ', '.join(
+                        model._meta.label
+                        for model, deps in sorted(skipped, key=lambda obj: obj[0].__name__)
+                    ),
                 )
-            )
         model_dependencies = skipped
 
     return model_list

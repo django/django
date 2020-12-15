@@ -2,11 +2,14 @@ import hashlib
 import os
 
 from django.core.files.uploadedfile import UploadedFile
+from django.core.files.uploadhandler import TemporaryFileUploadHandler
 from django.http import HttpResponse, HttpResponseServerError, JsonResponse
 
 from .models import FileModel
 from .tests import UNICODE_FILENAME, UPLOAD_TO
-from .uploadhandler import ErroringUploadHandler, QuotaUploadHandler
+from .uploadhandler import (
+    ErroringUploadHandler, QuotaUploadHandler, StopUploadTemporaryFileHandler,
+)
 
 
 def file_upload_view(request):
@@ -54,7 +57,7 @@ def file_upload_view_verify(request):
 
 
 def file_upload_unicode_name(request):
-    # Check to see if unicode name came through properly.
+    # Check to see if Unicode name came through properly.
     if not request.FILES['file_unicode'].name.endswith(UNICODE_FILENAME):
         return HttpResponseServerError()
     # Check to make sure the exotic characters are preserved even
@@ -99,6 +102,24 @@ def file_upload_quota_broken(request):
     response = file_upload_echo(request)
     request.upload_handlers.insert(0, QuotaUploadHandler())
     return response
+
+
+def file_stop_upload_temporary_file(request):
+    request.upload_handlers.insert(0, StopUploadTemporaryFileHandler())
+    request.upload_handlers.pop(2)
+    request.FILES  # Trigger file parsing.
+    return JsonResponse(
+        {'temp_path': request.upload_handlers[0].file.temporary_file_path()},
+    )
+
+
+def file_upload_interrupted_temporary_file(request):
+    request.upload_handlers.insert(0, TemporaryFileUploadHandler())
+    request.upload_handlers.pop(2)
+    request.FILES  # Trigger file parsing.
+    return JsonResponse(
+        {'temp_path': request.upload_handlers[0].file.temporary_file_path()},
+    )
 
 
 def file_upload_getlist_count(request):

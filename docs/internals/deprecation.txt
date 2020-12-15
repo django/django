@@ -7,6 +7,30 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
+.. _deprecation-removed-in-4.1:
+
+4.1
+---
+
+See the :ref:`Django 3.2 release notes <deprecated-features-3.2>` for more
+details on these changes.
+
+* Support for assigning objects which don't support creating deep copies with
+  ``copy.deepcopy()`` to class attributes in ``TestCase.setUpTestData()`` will
+  be removed.
+
+* ``BaseCommand.requires_system_checks`` won't support boolean values.
+
+* The ``whitelist`` argument and ``domain_whitelist`` attribute of
+  ``django.core.validators.EmailValidator`` will be removed.
+
+* The ``default_app_config`` module variable will be removed.
+
+* ``TransactionTestCase.assertQuerysetEqual()` will no longer automatically
+  call ``repr()`` on a queryset when compared to string values.
+
+* ``django.core.cache.backends.memcached.MemcachedCache`` will be removed.
+
 .. _deprecation-removed-in-4.0:
 
 4.0
@@ -31,6 +55,72 @@ details on these changes.
   ``django.db.models.Expression.get_group_by_cols()`` subclasses.
 
 * ``django.utils.text.unescape_entities()`` will be removed.
+
+* ``django.utils.http.is_safe_url()`` will be removed.
+
+See the :ref:`Django 3.1 release notes <deprecated-features-3.1>` for more
+details on these changes.
+
+* The ``PASSWORD_RESET_TIMEOUT_DAYS`` setting will be removed.
+
+* The undocumented usage of the :lookup:`isnull` lookup with non-boolean values
+  as the right-hand side will no longer be allowed.
+
+* The ``django.db.models.query_utils.InvalidQuery`` exception class will be
+  removed.
+
+* The ``django-admin.py`` entry point will be removed.
+
+* The ``HttpRequest.is_ajax()`` method will be removed.
+
+* Support for the pre-Django 3.1 encoding format of cookies values used by
+  ``django.contrib.messages.storage.cookie.CookieStorage`` will be removed.
+
+* Support for the pre-Django 3.1 password reset tokens in the admin site (that
+  use the SHA-1 hashing algorithm) will be removed.
+
+* Support for the pre-Django 3.1 encoding format of sessions will be removed.
+
+* Support for the pre-Django 3.1 ``django.core.signing.Signer`` signatures
+  (encoded with the SHA-1 algorithm) will be removed.
+
+* Support for the pre-Django 3.1 ``django.core.signing.dumps()`` signatures
+  (encoded with the SHA-1 algorithm) in ``django.core.signing.loads()`` will be
+  removed.
+
+* Support for the pre-Django 3.1 user sessions (that use the SHA-1 algorithm)
+  will be removed.
+
+* The ``get_request`` argument for
+  ``django.utils.deprecation.MiddlewareMixin.__init__()`` will be required and
+  won't accept ``None``.
+
+* The ``providing_args`` argument for ``django.dispatch.Signal`` will be
+  removed.
+
+* The ``length`` argument for ``django.utils.crypto.get_random_string()`` will
+  be required.
+
+* The ``list`` message for ``ModelMultipleChoiceField`` will be removed.
+
+* Support for passing raw column aliases to ``QuerySet.order_by()`` will be
+  removed.
+
+* The model ``NullBooleanField`` will be removed. A stub field will remain for
+  compatibility with historical migrations.
+
+* ``django.conf.urls.url()`` will be removed.
+
+* The model ``django.contrib.postgres.fields.JSONField`` will be removed. A
+  stub field will remain for compatibility with historical migrations.
+
+* ``django.contrib.postgres.forms.JSONField``,
+  ``django.contrib.postgres.fields.jsonb.KeyTransform``, and
+  ``django.contrib.postgres.fields.jsonb.KeyTextTransform`` will be removed.
+
+* The ``{% ifequal %}`` and ``{% ifnotequal %}`` template tags will be removed.
+
+* The ``DEFAULT_HASHING_ALGORITHM`` transitional setting will be removed.
 
 .. _deprecation-removed-in-3.1:
 
@@ -619,7 +709,7 @@ details on these changes.
 * Database test settings as independent entries in the database settings,
   prefixed by ``TEST_``, will no longer be supported.
 
-* The `cache_choices` option to :class:`~django.forms.ModelChoiceField` and
+* The ``cache_choices`` option to :class:`~django.forms.ModelChoiceField` and
   :class:`~django.forms.ModelMultipleChoiceField` will be removed.
 
 * The default value of the

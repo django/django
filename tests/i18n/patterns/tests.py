@@ -2,7 +2,7 @@ import os
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponsePermanentRedirect
+from django.http import HttpResponse, HttpResponsePermanentRedirect
 from django.middleware.locale import LocaleMiddleware
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
@@ -100,7 +100,7 @@ class RequestURLConfTests(SimpleTestCase):
     def test_request_urlconf_considered(self):
         request = RequestFactory().get('/nl/')
         request.urlconf = 'i18n.patterns.urls.default'
-        middleware = LocaleMiddleware()
+        middleware = LocaleMiddleware(lambda req: HttpResponse())
         with translation.override('nl'):
             middleware.process_request(request)
         self.assertEqual(request.LANGUAGE_CODE, 'nl')
@@ -116,7 +116,7 @@ class PathUnusedTests(URLTestCaseBase):
     def test_no_lang_activate(self):
         response = self.client.get('/nl/foo/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['content-language'], 'en')
+        self.assertEqual(response.headers['content-language'], 'en')
         self.assertEqual(response.context['LANGUAGE_CODE'], 'en')
 
 
@@ -200,7 +200,7 @@ class URLRedirectTests(URLTestCaseBase):
         response = self.client.get('/account/register/', HTTP_ACCEPT_LANGUAGE='en')
         self.assertRedirects(response, '/en/account/register/')
 
-        response = self.client.get(response['location'])
+        response = self.client.get(response.headers['location'])
         self.assertEqual(response.status_code, 200)
 
     def test_en_redirect_wrong_url(self):
@@ -211,7 +211,7 @@ class URLRedirectTests(URLTestCaseBase):
         response = self.client.get('/profiel/registreren/', HTTP_ACCEPT_LANGUAGE='nl')
         self.assertRedirects(response, '/nl/profiel/registreren/')
 
-        response = self.client.get(response['location'])
+        response = self.client.get(response.headers['location'])
         self.assertEqual(response.status_code, 200)
 
     def test_nl_redirect_wrong_url(self):
@@ -222,7 +222,7 @@ class URLRedirectTests(URLTestCaseBase):
         response = self.client.get('/conta/registre-se/', HTTP_ACCEPT_LANGUAGE='pt-br')
         self.assertRedirects(response, '/pt-br/conta/registre-se/')
 
-        response = self.client.get(response['location'])
+        response = self.client.get(response.headers['location'])
         self.assertEqual(response.status_code, 200)
 
     def test_pl_pl_redirect(self):
@@ -230,7 +230,7 @@ class URLRedirectTests(URLTestCaseBase):
         response = self.client.get('/account/register/', HTTP_ACCEPT_LANGUAGE='pl-pl')
         self.assertRedirects(response, '/en/account/register/')
 
-        response = self.client.get(response['location'])
+        response = self.client.get(response.headers['location'])
         self.assertEqual(response.status_code, 200)
 
     @override_settings(
@@ -258,7 +258,7 @@ class URLVaryAcceptLanguageTests(URLTestCaseBase):
         self.assertRedirects(response, '/en/account/register/')
         self.assertFalse(response.get('Vary'))
 
-        response = self.client.get(response['location'])
+        response = self.client.get(response.headers['location'])
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.get('Vary'))
 
@@ -297,7 +297,7 @@ class URLRedirectWithoutTrailingSlashSettingTests(URLTestCaseBase):
         response = self.client.get('/account/register-without-slash', HTTP_ACCEPT_LANGUAGE='en')
         self.assertRedirects(response, '/en/account/register-without-slash', 302)
 
-        response = self.client.get(response['location'])
+        response = self.client.get(response.headers['location'])
         self.assertEqual(response.status_code, 200)
 
 
@@ -310,13 +310,13 @@ class URLResponseTests(URLTestCaseBase):
     def test_en_url(self):
         response = self.client.get('/en/account/register/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['content-language'], 'en')
+        self.assertEqual(response.headers['content-language'], 'en')
         self.assertEqual(response.context['LANGUAGE_CODE'], 'en')
 
     def test_nl_url(self):
         response = self.client.get('/nl/profiel/registreren/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['content-language'], 'nl')
+        self.assertEqual(response.headers['content-language'], 'nl')
         self.assertEqual(response.context['LANGUAGE_CODE'], 'nl')
 
     def test_wrong_en_prefix(self):
@@ -330,19 +330,19 @@ class URLResponseTests(URLTestCaseBase):
     def test_pt_br_url(self):
         response = self.client.get('/pt-br/conta/registre-se/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['content-language'], 'pt-br')
+        self.assertEqual(response.headers['content-language'], 'pt-br')
         self.assertEqual(response.context['LANGUAGE_CODE'], 'pt-br')
 
     def test_en_path(self):
         response = self.client.get('/en/account/register-as-path/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['content-language'], 'en')
+        self.assertEqual(response.headers['content-language'], 'en')
         self.assertEqual(response.context['LANGUAGE_CODE'], 'en')
 
     def test_nl_path(self):
         response = self.client.get('/nl/profiel/registreren-als-pad/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['content-language'], 'nl')
+        self.assertEqual(response.headers['content-language'], 'nl')
         self.assertEqual(response.context['LANGUAGE_CODE'], 'nl')
 
 

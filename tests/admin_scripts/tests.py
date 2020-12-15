@@ -14,11 +14,10 @@ import unittest
 from io import StringIO
 from unittest import mock
 
-import django
 from django import conf, get_version
 from django.conf import settings
 from django.core.management import (
-    BaseCommand, CommandError, call_command, color,
+    BaseCommand, CommandError, call_command, color, execute_from_command_line,
 )
 from django.core.management.commands.loaddata import Command as LoaddataCommand
 from django.core.management.commands.runserver import (
@@ -32,6 +31,7 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
 )
+from django.test.utils import captured_stderr, captured_stdout
 
 custom_templates_dir = os.path.join(os.path.dirname(__file__), 'custom_templates')
 
@@ -46,8 +46,6 @@ class AdminScriptTestCase(SimpleTestCase):
         # where `/var` is a symlink to `/private/var`.
         self.test_dir = os.path.realpath(os.path.join(tmpdir.name, 'test_project'))
         os.mkdir(self.test_dir)
-        with open(os.path.join(self.test_dir, '__init__.py'), 'w'):
-            pass
 
     def write_settings(self, filename, apps=None, is_dir=False, sdict=None, extra=None):
         if is_dir:
@@ -95,7 +93,7 @@ class AdminScriptTestCase(SimpleTestCase):
                 paths.append(os.path.dirname(backend_dir))
         return paths
 
-    def run_test(self, script, args, settings_file=None, apps=None):
+    def run_test(self, args, settings_file=None, apps=None):
         base_dir = os.path.dirname(self.test_dir)
         # The base dir for Django's tests is one level up.
         tests_dir = os.path.dirname(os.path.dirname(__file__))
@@ -118,16 +116,16 @@ class AdminScriptTestCase(SimpleTestCase):
         test_environ['PYTHONPATH'] = os.pathsep.join(python_path)
         test_environ['PYTHONWARNINGS'] = ''
 
-        return subprocess.Popen(
-            [sys.executable, script] + args,
+        p = subprocess.run(
+            [sys.executable, *args],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             cwd=self.test_dir,
             env=test_environ, universal_newlines=True,
-        ).communicate()
+        )
+        return p.stdout, p.stderr
 
     def run_django_admin(self, args, settings_file=None):
-        script_dir = os.path.abspath(os.path.join(os.path.dirname(django.__file__), 'bin'))
-        return self.run_test(os.path.join(script_dir, 'django-admin.py'), args, settings_file)
+        return self.run_test(['-m', 'django', *args], settings_file)
 
     def run_manage(self, args, settings_file=None, manage_py=None):
         template_manage_py = (
@@ -145,7 +143,7 @@ class AdminScriptTestCase(SimpleTestCase):
         with open(test_manage_py, 'w') as fp:
             fp.write(manage_py_contents)
 
-        return self.run_test('./manage.py', args, settings_file)
+        return self.run_test(['./manage.py', *args], settings_file)
 
     def assertNoOutput(self, stream):
         "Utility assertion: assert that the given stream is empty"
@@ -197,7 +195,7 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_commands_with_invalid_settings(self):
-        """"
+        """
         Commands that don't require settings succeed if the settings file
         doesn't exist.
         """
@@ -573,7 +571,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         self.assertTrue(os.path.exists(os.path.join(app_path, 'api.py')))
 
     def test_startapp_unicode_name(self):
-        "directory: startapp creates the correct directory with unicode characters"
+        """startapp creates the correct directory with Unicode characters."""
         args = ['startapp', 'こんにちは']
         app_path = os.path.join(self.test_dir, 'こんにちは')
         out, err = self.run_django_admin(args, 'test_project.settings')
@@ -632,6 +630,15 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
 # This next series of test classes checks the environment processing
 # of the generated manage.py script
 ##########################################################################
+
+class ManageManuallyConfiguredSettings(AdminScriptTestCase):
+    """Customized manage.py calling settings.configure()."""
+    def test_non_existent_command_output(self):
+        out, err = self.run_manage(['invalid_command'], manage_py='configured_settings_manage.py')
+        self.assertNoOutput(out)
+        self.assertOutput(err, "Unknown command: 'invalid_command'")
+        self.assertNotInOutput(err, 'No Django settings specified')
+
 
 class ManageNoSettings(AdminScriptTestCase):
     "A series of tests for manage.py when there is no settings.py file."
@@ -1118,6 +1125,7 @@ class ManageCheck(AdminScriptTestCase):
                         'APP_DIRS': True,
                         'OPTIONS': {
                             'context_processors': [
+                                'django.template.context_processors.request',
                                 'django.contrib.auth.context_processors.auth',
                                 'django.contrib.messages.context_processors.messages',
                             ],
@@ -1360,8 +1368,7 @@ class ManageTestserver(SimpleTestCase):
     @mock.patch.object(LoaddataCommand, 'handle', return_value='')
     @mock.patch.object(RunserverCommand, 'handle', return_value='')
     def test_params_to_runserver(self, mock_runserver_handle, mock_loaddata_handle, mock_create_test_db):
-        out = StringIO()
-        call_command('testserver', 'blah.json', stdout=out)
+        call_command('testserver', 'blah.json')
         mock_runserver_handle.assert_called_with(
             addrport='',
             force_color=False,
@@ -1389,7 +1396,7 @@ class ManageTestserver(SimpleTestCase):
 # the commands are correctly parsed and processed.
 ##########################################################################
 class ColorCommand(BaseCommand):
-    requires_system_checks = False
+    requires_system_checks = []
 
     def handle(self, *args, **options):
         self.stdout.write('Hello, world!', self.style.ERROR)
@@ -1535,7 +1542,7 @@ class CommandTypes(AdminScriptTestCase):
 
     def test_custom_stdout(self):
         class Command(BaseCommand):
-            requires_system_checks = False
+            requires_system_checks = []
 
             def handle(self, *args, **options):
                 self.stdout.write("Hello, World!")
@@ -1552,7 +1559,7 @@ class CommandTypes(AdminScriptTestCase):
 
     def test_custom_stderr(self):
         class Command(BaseCommand):
-            requires_system_checks = False
+            requires_system_checks = []
 
             def handle(self, *args, **options):
                 self.stderr.write("Hello, World!")
@@ -1672,7 +1679,7 @@ class CommandTypes(AdminScriptTestCase):
         A command called from the command line should close connections after
         being executed (#21255).
         """
-        command = BaseCommand(stderr=StringIO())
+        command = BaseCommand()
         command.check = lambda: []
         command.handle = lambda *args, **kwargs: args
         with mock.patch('django.core.management.base.connections') as mock_connections:
@@ -1861,6 +1868,20 @@ class ArgumentOrder(AdminScriptTestCase):
         )
 
 
+class ExecuteFromCommandLine(SimpleTestCase):
+    def test_program_name_from_argv(self):
+        """
+        Program name is computed from the execute_from_command_line()'s argv
+        argument, not sys.argv.
+        """
+        args = ['help', 'shell']
+        with captured_stdout() as out, captured_stderr() as err:
+            with mock.patch('sys.argv', [None] + args):
+                execute_from_command_line(['django-admin'] + args)
+        self.assertIn('usage: django-admin shell', out.getvalue())
+        self.assertEqual(err.getvalue(), '')
+
+
 @override_settings(ROOT_URLCONF='admin_scripts.urls')
 class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
@@ -1890,7 +1911,12 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         # running again..
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "already exists")
+        self.assertOutput(
+            err,
+            "CommandError: 'testproject' conflicts with the name of an "
+            "existing Python module and cannot be used as a project name. "
+            "Please try another name.",
+        )
 
     def test_invalid_project_name(self):
         "Make sure the startproject management command validates a project name"
@@ -2152,8 +2178,10 @@ class StartApp(AdminScriptTestCase):
         )
 
     def test_overlaying_app(self):
-        self.run_django_admin(['startapp', 'app1'])
-        out, err = self.run_django_admin(['startapp', 'app2', 'app1'])
+        # Use a subdirectory so it is outside the PYTHONPATH.
+        os.makedirs(os.path.join(self.test_dir, 'apps/app1'))
+        self.run_django_admin(['startapp', 'app1', 'apps/app1'])
+        out, err = self.run_django_admin(['startapp', 'app2', 'apps/app1'])
         self.assertOutput(
             err,
             "already exists. Overlaying an app into an existing directory "
@@ -2253,13 +2281,8 @@ class Dumpdata(AdminScriptTestCase):
 class MainModule(AdminScriptTestCase):
     """python -m django works like django-admin."""
 
-    def test_runs_django_admin(self):
-        cmd_out, _ = self.run_django_admin(['--version'])
-        mod_out, _ = self.run_test('-m', ['django', '--version'])
-        self.assertEqual(mod_out, cmd_out)
-
     def test_program_name_in_help(self):
-        out, err = self.run_test('-m', ['django', 'help'])
+        out, err = self.run_test(['-m', 'django', 'help'])
         self.assertOutput(out, "Type 'python -m django help <subcommand>' for help on a specific subcommand.")
 
 

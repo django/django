@@ -1,20 +1,21 @@
 import datetime
-from unittest import mock, skipIf, skipUnless
+from decimal import Decimal
+from unittest import mock
 
 from django.core.exceptions import FieldError
 from django.db import NotSupportedError, connection
 from django.db.models import (
-    F, Func, OuterRef, Q, RowRange, Subquery, Value, ValueRange, Window,
-    WindowFrame,
+    Avg, BooleanField, Case, F, Func, IntegerField, Max, Min, OuterRef, Q,
+    RowRange, Subquery, Sum, Value, ValueRange, When, Window, WindowFrame,
 )
-from django.db.models.aggregates import Avg, Max, Min, Sum
+from django.db.models.fields.json import KeyTextTransform, KeyTransform
 from django.db.models.functions import (
-    CumeDist, DenseRank, ExtractYear, FirstValue, Lag, LastValue, Lead,
+    Cast, CumeDist, DenseRank, ExtractYear, FirstValue, Lag, LastValue, Lead,
     NthValue, Ntile, PercentRank, Rank, RowNumber, Upper,
 )
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
-from .models import Employee
+from .models import Detail, Employee
 
 
 @skipUnlessDBFeature('supports_over_clause')
@@ -22,7 +23,14 @@ class WindowFunctionTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         Employee.objects.bulk_create([
-            Employee(name=e[0], salary=e[1], department=e[2], hire_date=e[3], age=e[4])
+            Employee(
+                name=e[0],
+                salary=e[1],
+                department=e[2],
+                hire_date=e[3],
+                age=e[4],
+                bonus=Decimal(e[1]) / 400,
+            )
             for e in [
                 ('Jones', 45000, 'Accounting', datetime.datetime(2005, 11, 1), 20),
                 ('Williams', 37000, 'Accounting', datetime.datetime(2009, 6, 1), 20),
@@ -40,24 +48,35 @@ class WindowFunctionTests(TestCase):
         ])
 
     def test_dense_rank(self):
-        qs = Employee.objects.annotate(rank=Window(
-            expression=DenseRank(),
-            order_by=ExtractYear(F('hire_date')).asc(),
-        ))
-        self.assertQuerysetEqual(qs, [
-            ('Jones', 45000, 'Accounting', datetime.date(2005, 11, 1), 1),
-            ('Miller', 100000, 'Management', datetime.date(2005, 6, 1), 1),
-            ('Johnson', 80000, 'Management', datetime.date(2005, 7, 1), 1),
-            ('Smith', 55000, 'Sales', datetime.date(2007, 6, 1), 2),
-            ('Jenson', 45000, 'Accounting', datetime.date(2008, 4, 1), 3),
-            ('Smith', 38000, 'Marketing', datetime.date(2009, 10, 1), 4),
-            ('Brown', 53000, 'Sales', datetime.date(2009, 9, 1), 4),
-            ('Williams', 37000, 'Accounting', datetime.date(2009, 6, 1), 4),
-            ('Wilkinson', 60000, 'IT', datetime.date(2011, 3, 1), 5),
-            ('Johnson', 40000, 'Marketing', datetime.date(2012, 3, 1), 6),
-            ('Moore', 34000, 'IT', datetime.date(2013, 8, 1), 7),
-            ('Adams', 50000, 'Accounting', datetime.date(2013, 7, 1), 7),
-        ], lambda entry: (entry.name, entry.salary, entry.department, entry.hire_date, entry.rank), ordered=False)
+        tests = [
+            ExtractYear(F('hire_date')).asc(),
+            F('hire_date__year').asc(),
+        ]
+        for order_by in tests:
+            with self.subTest(order_by=order_by):
+                qs = Employee.objects.annotate(
+                    rank=Window(expression=DenseRank(), order_by=order_by),
+                )
+                self.assertQuerysetEqual(qs, [
+                    ('Jones', 45000, 'Accounting', datetime.date(2005, 11, 1), 1),
+                    ('Miller', 100000, 'Management', datetime.date(2005, 6, 1), 1),
+                    ('Johnson', 80000, 'Management', datetime.date(2005, 7, 1), 1),
+                    ('Smith', 55000, 'Sales', datetime.date(2007, 6, 1), 2),
+                    ('Jenson', 45000, 'Accounting', datetime.date(2008, 4, 1), 3),
+                    ('Smith', 38000, 'Marketing', datetime.date(2009, 10, 1), 4),
+                    ('Brown', 53000, 'Sales', datetime.date(2009, 9, 1), 4),
+                    ('Williams', 37000, 'Accounting', datetime.date(2009, 6, 1), 4),
+                    ('Wilkinson', 60000, 'IT', datetime.date(2011, 3, 1), 5),
+                    ('Johnson', 40000, 'Marketing', datetime.date(2012, 3, 1), 6),
+                    ('Moore', 34000, 'IT', datetime.date(2013, 8, 1), 7),
+                    ('Adams', 50000, 'Accounting', datetime.date(2013, 7, 1), 7),
+                ], lambda entry: (
+                    entry.name,
+                    entry.salary,
+                    entry.department,
+                    entry.hire_date,
+                    entry.rank,
+                ), ordered=False)
 
     def test_department_salary(self):
         qs = Employee.objects.annotate(department_sum=Window(
@@ -88,7 +107,7 @@ class WindowFunctionTests(TestCase):
         """
         qs = Employee.objects.annotate(rank=Window(
             expression=Rank(),
-            order_by=ExtractYear(F('hire_date')).asc(),
+            order_by=F('hire_date__year').asc(),
         ))
         self.assertQuerysetEqual(qs, [
             ('Jones', 45000, 'Accounting', datetime.date(2005, 11, 1), 1),
@@ -131,7 +150,6 @@ class WindowFunctionTests(TestCase):
             ('Johnson', 'Management', 12),
         ], lambda entry: (entry.name, entry.department, entry.row_number))
 
-    @skipIf(connection.vendor == 'oracle', "Oracle requires ORDER BY in row_number, ANSI:SQL doesn't")
     def test_row_number_no_ordering(self):
         """
         The row number window function computes the number based on the order
@@ -202,6 +220,27 @@ class WindowFunctionTests(TestCase):
             ('Brown', 53000, 'Sales', None),
             ('Smith', 55000, 'Sales', 53000),
         ], transform=lambda row: (row.name, row.salary, row.department, row.lag))
+
+    def test_lag_decimalfield(self):
+        qs = Employee.objects.annotate(lag=Window(
+            expression=Lag(expression='bonus', offset=1),
+            partition_by=F('department'),
+            order_by=[F('bonus').asc(), F('name').asc()],
+        )).order_by('department', F('bonus').asc(), F('name').asc())
+        self.assertQuerysetEqual(qs, [
+            ('Williams', 92.5, 'Accounting', None),
+            ('Jenson', 112.5, 'Accounting', 92.5),
+            ('Jones', 112.5, 'Accounting', 112.5),
+            ('Adams', 125, 'Accounting', 112.5),
+            ('Moore', 85, 'IT', None),
+            ('Wilkinson', 150, 'IT', 85),
+            ('Johnson', 200, 'Management', None),
+            ('Miller', 250, 'Management', 200),
+            ('Smith', 95, 'Marketing', None),
+            ('Johnson', 100, 'Marketing', 95),
+            ('Brown', 132.5, 'Sales', None),
+            ('Smith', 137.5, 'Sales', 132.5),
+        ], transform=lambda row: (row.name, row.bonus, row.department, row.lag))
 
     def test_first_value(self):
         qs = Employee.objects.annotate(first_value=Window(
@@ -494,7 +533,7 @@ class WindowFunctionTests(TestCase):
         """
         qs = Employee.objects.annotate(max=Window(
             expression=Max('salary'),
-            partition_by=[F('department'), ExtractYear(F('hire_date'))],
+            partition_by=[F('department'), F('hire_date__year')],
         )).order_by('department', 'hire_date', 'name')
         self.assertQuerysetEqual(qs, [
             ('Jones', 45000, 'Accounting', datetime.date(2005, 11, 1), 45000),
@@ -536,6 +575,14 @@ class WindowFunctionTests(TestCase):
             ('Smith', 55000, 'Sales', datetime.date(2007, 6, 1), 55000),
             ('Brown', 53000, 'Sales', datetime.date(2009, 9, 1), 108000),
         ], transform=lambda row: (row.name, row.salary, row.department, row.hire_date, row.sum))
+
+    def test_related_ordering_with_count(self):
+        qs = Employee.objects.annotate(department_sum=Window(
+            expression=Sum('salary'),
+            partition_by=F('department'),
+            order_by=['classification__code'],
+        ))
+        self.assertEqual(qs.count(), 12)
 
     @skipUnlessDBFeature('supports_frame_range_fixed_distance')
     def test_range_n_preceding_and_following(self):
@@ -585,10 +632,6 @@ class WindowFunctionTests(TestCase):
             ('Brown', 'Sales', 53000, datetime.date(2009, 9, 1), 148000)
         ], transform=lambda row: (row.name, row.department, row.salary, row.hire_date, row.sum))
 
-    @skipIf(
-        connection.vendor == 'sqlite' and connection.Database.sqlite_version_info < (3, 27),
-        'Nondeterministic failure on SQLite < 3.27.'
-    )
     def test_subquery_row_range_rank(self):
         qs = Employee.objects.annotate(
             highest_avg_salary_date=Subquery(
@@ -699,13 +742,49 @@ class WindowFunctionTests(TestCase):
             highest=Window(FirstValue('id'), partition_by=F('department'), order_by=F('salary').desc())
         ).values('highest')
         highest_salary = Employee.objects.filter(pk__in=subquery_qs)
-        self.assertSequenceEqual(highest_salary.values('department', 'salary'), [
+        self.assertCountEqual(highest_salary.values('department', 'salary'), [
             {'department': 'Accounting', 'salary': 50000},
             {'department': 'Sales', 'salary': 55000},
             {'department': 'Marketing', 'salary': 40000},
             {'department': 'IT', 'salary': 60000},
             {'department': 'Management', 'salary': 100000}
         ])
+
+    @skipUnlessDBFeature('supports_json_field')
+    def test_key_transform(self):
+        Detail.objects.bulk_create([
+            Detail(value={'department': 'IT', 'name': 'Smith', 'salary': 37000}),
+            Detail(value={'department': 'IT', 'name': 'Nowak', 'salary': 32000}),
+            Detail(value={'department': 'HR', 'name': 'Brown', 'salary': 50000}),
+            Detail(value={'department': 'HR', 'name': 'Smith', 'salary': 55000}),
+            Detail(value={'department': 'PR', 'name': 'Moore', 'salary': 90000}),
+        ])
+        tests = [
+            (KeyTransform('department', 'value'), KeyTransform('name', 'value')),
+            (F('value__department'), F('value__name')),
+        ]
+        for partition_by, order_by in tests:
+            with self.subTest(partition_by=partition_by, order_by=order_by):
+                qs = Detail.objects.annotate(department_sum=Window(
+                    expression=Sum(Cast(
+                        KeyTextTransform('salary', 'value'),
+                        output_field=IntegerField(),
+                    )),
+                    partition_by=[partition_by],
+                    order_by=[order_by],
+                )).order_by('value__department', 'department_sum')
+                self.assertQuerysetEqual(qs, [
+                    ('Brown', 'HR', 50000, 50000),
+                    ('Smith', 'HR', 55000, 105000),
+                    ('Nowak', 'IT', 32000, 32000),
+                    ('Smith', 'IT', 37000, 69000),
+                    ('Moore', 'PR', 90000, 90000),
+                ], lambda entry: (
+                    entry.value['name'],
+                    entry.value['department'],
+                    entry.value['salary'],
+                    entry.department_sum,
+                ))
 
     def test_invalid_start_value_range(self):
         msg = "start argument must be a negative integer, zero, or None, but got '3'."
@@ -750,9 +829,9 @@ class WindowFunctionTests(TestCase):
                 frame=RowRange(end='a'),
             )))
 
-    @skipUnless(connection.vendor == 'postgresql', 'Frame construction not allowed on PostgreSQL')
-    def test_postgresql_illegal_range_frame_start(self):
-        msg = 'PostgreSQL only supports UNBOUNDED together with PRECEDING and FOLLOWING.'
+    @skipUnlessDBFeature('only_supports_unbounded_with_preceding_and_following')
+    def test_unsupported_range_frame_start(self):
+        msg = '%s only supports UNBOUNDED together with PRECEDING and FOLLOWING.' % connection.display_name
         with self.assertRaisesMessage(NotSupportedError, msg):
             list(Employee.objects.annotate(test=Window(
                 expression=Sum('salary'),
@@ -760,9 +839,9 @@ class WindowFunctionTests(TestCase):
                 frame=ValueRange(start=-1),
             )))
 
-    @skipUnless(connection.vendor == 'postgresql', 'Frame construction not allowed on PostgreSQL')
-    def test_postgresql_illegal_range_frame_end(self):
-        msg = 'PostgreSQL only supports UNBOUNDED together with PRECEDING and FOLLOWING.'
+    @skipUnlessDBFeature('only_supports_unbounded_with_preceding_and_following')
+    def test_unsupported_range_frame_end(self):
+        msg = '%s only supports UNBOUNDED together with PRECEDING and FOLLOWING.' % connection.display_name
         with self.assertRaisesMessage(NotSupportedError, msg):
             list(Employee.objects.annotate(test=Window(
                 expression=Sum('salary'),
@@ -845,6 +924,22 @@ class NonQueryWindowTests(SimpleTestCase):
             qs.filter(id=Func('dense_rank', 2, function='div'))
         with self.assertRaisesMessage(NotSupportedError, msg):
             qs.annotate(total=Sum('dense_rank', filter=Q(name='Jones'))).filter(total=1)
+
+    def test_conditional_annotation(self):
+        qs = Employee.objects.annotate(
+            dense_rank=Window(expression=DenseRank()),
+        ).annotate(
+            equal=Case(
+                When(id=F('dense_rank'), then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField(),
+            ),
+        )
+        # The SQL standard disallows referencing window functions in the WHERE
+        # clause.
+        msg = 'Window is disallowed in the filter clause'
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            qs.filter(equal=True)
 
     def test_invalid_order_by(self):
         msg = 'order_by must be either an Expression or a sequence of expressions'

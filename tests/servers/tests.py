@@ -250,7 +250,7 @@ class LiveServerPort(LiveServerBase):
 
     def test_specified_port_bind(self):
         """LiveServerTestCase.port customizes the server's port."""
-        TestCase = type(str('TestCase'), (LiveServerBase,), {})
+        TestCase = type('TestCase', (LiveServerBase,), {})
         # Find an open port and tell TestCase to use it.
         s = socket.socket()
         s.bind(('', 0))
@@ -266,8 +266,8 @@ class LiveServerPort(LiveServerBase):
             TestCase.tearDownClass()
 
 
-class LiverServerThreadedTests(LiveServerBase):
-    """If LiverServerTestCase isn't threaded, these tests will hang."""
+class LiveServerThreadedTests(LiveServerBase):
+    """If LiveServerTestCase isn't threaded, these tests will hang."""
 
     def test_view_calls_subview(self):
         url = '/subview_calling_view/?%s' % urlencode({'url': self.live_server_url})

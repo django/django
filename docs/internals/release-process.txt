@@ -116,6 +116,8 @@ A more generic example:
   LTS to LTS upgrades).
 * Z.0: Drop deprecation shims added in Y.0 and Y.1.
 
+See also the :ref:`deprecating-a-feature` guide.
+
 .. _supported-versions-policy:
 
 Supported versions
@@ -141,7 +143,8 @@ page for the current state of support for each version.
 
   * Major functionality bugs in new features of the latest stable release.
 
-  * Regressions from older versions of Django.
+  * Regressions from older versions of Django introduced in the current release
+    series.
 
   The rule of thumb is that fixes will be backported to the last feature
   release for bugs that would have prevented a release in the first place

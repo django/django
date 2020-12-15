@@ -7,6 +7,7 @@ from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.middleware.csrf import rotate_token
 from django.utils.crypto import constant_time_compare
 from django.utils.module_loading import import_string
+from django.views.decorators.debug import sensitive_variables
 
 from .signals import user_logged_in, user_logged_out, user_login_failed
 
@@ -37,6 +38,7 @@ def get_backends():
     return _get_backends(return_tuples=False)
 
 
+@sensitive_variables('credentials')
 def _clean_credentials(credentials):
     """
     Clean a dictionary of credentials of potentially sensitive info before
@@ -58,13 +60,15 @@ def _get_user_session_key(request):
     return get_user_model()._meta.pk.to_python(request.session[SESSION_KEY])
 
 
+@sensitive_variables('credentials')
 def authenticate(request=None, **credentials):
     """
     If the given credentials are valid, return a User object.
     """
     for backend, backend_path in _get_backends(return_tuples=True):
+        backend_signature = inspect.signature(backend.authenticate)
         try:
-            inspect.getcallargs(backend.authenticate, request, **credentials)
+            backend_signature.bind(request, **credentials)
         except TypeError:
             # This backend doesn't accept these credentials as arguments. Try the next one.
             continue
@@ -186,8 +190,13 @@ def get_user(request):
                     user.get_session_auth_hash()
                 )
                 if not session_hash_verified:
-                    request.session.flush()
-                    user = None
+                    if not (
+                        session_hash and
+                        hasattr(user, '_legacy_get_session_auth_hash') and
+                        constant_time_compare(session_hash, user._legacy_get_session_auth_hash())
+                    ):
+                        request.session.flush()
+                        user = None
 
     return user or AnonymousUser()
 
@@ -211,6 +220,3 @@ def update_session_auth_hash(request, user):
     request.session.cycle_key()
     if hasattr(user, 'get_session_auth_hash') and request.user == user:
         request.session[HASH_SESSION_KEY] = user.get_session_auth_hash()
-
-
-default_app_config = 'django.contrib.auth.apps.AuthConfig'

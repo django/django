@@ -1,0 +1,14 @@
+==========================
+Django 3.1.5 release notes
+==========================
+
+*Expected January 4, 2021*
+
+Django 3.1.5 fixes several bugs in 3.1.4.
+
+Bugfixes
+========
+
+* Fixed ``__isnull=True`` lookup on key transforms for
+  :class:`~django.db.models.JSONField` with Oracle and SQLite
+  (:ticket:`32252`).

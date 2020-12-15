@@ -15,7 +15,9 @@ from django.test import (
 )
 from django.test.utils import CaptureQueriesContext
 
-from .models import City, Country, Person, PersonProfile
+from .models import (
+    City, CityCountryProxy, Country, EUCity, EUCountry, Person, PersonProfile,
+)
 
 
 class SelectForUpdateTests(TransactionTestCase):
@@ -97,6 +99,16 @@ class SelectForUpdateTests(TransactionTestCase):
             list(Person.objects.all().select_for_update(skip_locked=True))
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, skip_locked=True))
 
+    @skipUnlessDBFeature('has_select_for_no_key_update')
+    def test_update_sql_generated_no_key(self):
+        """
+        The backend's FOR NO KEY UPDATE variant appears in generated SQL when
+        select_for_update() is invoked.
+        """
+        with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
+            list(Person.objects.all().select_for_update(no_key=True))
+        self.assertIs(self.has_for_update_sql(ctx.captured_queries, no_key=True), True)
+
     @skipUnlessDBFeature('has_select_for_update_of')
     def test_for_update_sql_generated_of(self):
         """
@@ -113,9 +125,100 @@ class SelectForUpdateTests(TransactionTestCase):
             ))
         features = connections['default'].features
         if features.select_for_update_of_column:
-            expected = ['select_for_update_person"."id', 'select_for_update_country"."id']
+            expected = [
+                'select_for_update_person"."id',
+                'select_for_update_country"."entity_ptr_id',
+            ]
         else:
             expected = ['select_for_update_person', 'select_for_update_country']
+        expected = [connection.ops.quote_name(value) for value in expected]
+        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
+
+    @skipUnlessDBFeature('has_select_for_update_of')
+    def test_for_update_sql_model_inheritance_generated_of(self):
+        with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
+            list(EUCountry.objects.select_for_update(of=('self',)))
+        if connection.features.select_for_update_of_column:
+            expected = ['select_for_update_eucountry"."country_ptr_id']
+        else:
+            expected = ['select_for_update_eucountry']
+        expected = [connection.ops.quote_name(value) for value in expected]
+        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
+
+    @skipUnlessDBFeature('has_select_for_update_of')
+    def test_for_update_sql_model_inheritance_ptr_generated_of(self):
+        with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
+            list(EUCountry.objects.select_for_update(of=('self', 'country_ptr',)))
+        if connection.features.select_for_update_of_column:
+            expected = [
+                'select_for_update_eucountry"."country_ptr_id',
+                'select_for_update_country"."entity_ptr_id',
+            ]
+        else:
+            expected = ['select_for_update_eucountry', 'select_for_update_country']
+        expected = [connection.ops.quote_name(value) for value in expected]
+        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
+
+    @skipUnlessDBFeature('has_select_for_update_of')
+    def test_for_update_sql_related_model_inheritance_generated_of(self):
+        with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
+            list(EUCity.objects.select_related('country').select_for_update(
+                of=('self', 'country'),
+            ))
+        if connection.features.select_for_update_of_column:
+            expected = [
+                'select_for_update_eucity"."id',
+                'select_for_update_eucountry"."country_ptr_id',
+            ]
+        else:
+            expected = ['select_for_update_eucity', 'select_for_update_eucountry']
+        expected = [connection.ops.quote_name(value) for value in expected]
+        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
+
+    @skipUnlessDBFeature('has_select_for_update_of')
+    def test_for_update_sql_model_inheritance_nested_ptr_generated_of(self):
+        with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
+            list(EUCity.objects.select_related('country').select_for_update(
+                of=('self', 'country__country_ptr',),
+            ))
+        if connection.features.select_for_update_of_column:
+            expected = [
+                'select_for_update_eucity"."id',
+                'select_for_update_country"."entity_ptr_id',
+            ]
+        else:
+            expected = ['select_for_update_eucity', 'select_for_update_country']
+        expected = [connection.ops.quote_name(value) for value in expected]
+        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
+
+    @skipUnlessDBFeature('has_select_for_update_of')
+    def test_for_update_sql_multilevel_model_inheritance_ptr_generated_of(self):
+        with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
+            list(EUCountry.objects.select_for_update(
+                of=('country_ptr', 'country_ptr__entity_ptr'),
+            ))
+        if connection.features.select_for_update_of_column:
+            expected = [
+                'select_for_update_country"."entity_ptr_id',
+                'select_for_update_entity"."id',
+            ]
+        else:
+            expected = ['select_for_update_country', 'select_for_update_entity']
+        expected = [connection.ops.quote_name(value) for value in expected]
+        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
+
+    @skipUnlessDBFeature('has_select_for_update_of')
+    def test_for_update_sql_model_proxy_generated_of(self):
+        with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
+            list(CityCountryProxy.objects.select_related(
+                'country',
+            ).select_for_update(
+                of=('country',),
+            ))
+        if connection.features.select_for_update_of_column:
+            expected = ['select_for_update_country"."entity_ptr_id']
+        else:
+            expected = ['select_for_update_country']
         expected = [connection.ops.quote_name(value) for value in expected]
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
 
@@ -215,6 +318,18 @@ class SelectForUpdateTests(TransactionTestCase):
             with transaction.atomic():
                 Person.objects.select_for_update(of=('self',)).get()
 
+    @skipIfDBFeature('has_select_for_no_key_update')
+    @skipUnlessDBFeature('has_select_for_update')
+    def test_unsuported_no_key_raises_error(self):
+        """
+        NotSupportedError is raised if a SELECT...FOR NO KEY UPDATE... is run
+        on a database backend that supports FOR UPDATE but not NO KEY.
+        """
+        msg = 'FOR NO KEY UPDATE is not supported on this database backend.'
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            with transaction.atomic():
+                Person.objects.select_for_update(no_key=True).get()
+
     @skipUnlessDBFeature('has_select_for_update', 'has_select_for_update_of')
     def test_unrelated_of_argument_raises_error(self):
         """
@@ -223,7 +338,8 @@ class SelectForUpdateTests(TransactionTestCase):
         msg = (
             'Invalid field name(s) given in select_for_update(of=(...)): %s. '
             'Only relational fields followed in the query are allowed. '
-            'Choices are: self, born, born__country.'
+            'Choices are: self, born, born__country, '
+            'born__country__entity_ptr.'
         )
         invalid_of = [
             ('nonexistent',),
@@ -256,6 +372,38 @@ class SelectForUpdateTests(TransactionTestCase):
                         Person.objects.select_related(
                             'born', 'profile',
                         ).exclude(profile=None).select_for_update(of=(name,)).get()
+
+    @skipUnlessDBFeature('has_select_for_update', 'has_select_for_update_of')
+    def test_model_inheritance_of_argument_raises_error_ptr_in_choices(self):
+        msg = (
+            'Invalid field name(s) given in select_for_update(of=(...)): '
+            'name. Only relational fields followed in the query are allowed. '
+            'Choices are: self, %s.'
+        )
+        with self.assertRaisesMessage(
+            FieldError,
+            msg % 'country, country__country_ptr, country__country_ptr__entity_ptr',
+        ):
+            with transaction.atomic():
+                EUCity.objects.select_related(
+                    'country',
+                ).select_for_update(of=('name',)).get()
+        with self.assertRaisesMessage(FieldError, msg % 'country_ptr, country_ptr__entity_ptr'):
+            with transaction.atomic():
+                EUCountry.objects.select_for_update(of=('name',)).get()
+
+    @skipUnlessDBFeature('has_select_for_update', 'has_select_for_update_of')
+    def test_model_proxy_of_argument_raises_error_proxy_field_in_choices(self):
+        msg = (
+            'Invalid field name(s) given in select_for_update(of=(...)): '
+            'name. Only relational fields followed in the query are allowed. '
+            'Choices are: self, country, country__entity_ptr.'
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            with transaction.atomic():
+                CityCountryProxy.objects.select_related(
+                    'country',
+                ).select_for_update(of=('name',)).get()
 
     @skipUnlessDBFeature('has_select_for_update', 'has_select_for_update_of')
     def test_reverse_one_to_one_of_arguments(self):

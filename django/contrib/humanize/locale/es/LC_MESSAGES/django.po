@@ -2,20 +2,21 @@
 #
 # Translators:
 # Antoni Aloy <aaloy@apsl.net>, 2012
-# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2014
+# Ernesto Avilés, 2014
 # Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011
 # Luigy, 2019
 # ntrrgc <ntrrgc@gmail.com>, 2014
+# Uriel Medina <urimeba511@gmail.com>, 2020
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-02-19 08:55+0000\n"
-"Last-Translator: Ignacio José Lizarán Rus <ilizaran@gmail.com>\n"
+"PO-Revision-Date: 2020-09-29 18:51+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -86,7 +87,7 @@ msgstr "{}º"
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
 msgstr[0] "%(value).1f millón"
-msgstr[1] "%(value).1f millón"
+msgstr[1] "%(value).1f millones"
 
 #, python-format
 msgid "%(value)s million"
@@ -110,7 +111,7 @@ msgstr[1] "%(value)s millardos"
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
 msgstr[0] "%(value).1f billón"
-msgstr[1] "%(value).1f billón"
+msgstr[1] "%(value).1f billones"
 
 #, python-format
 msgid "%(value)s trillion"
@@ -206,13 +207,13 @@ msgstr[1] "%(value)s quintillardos"
 msgid "%(value).1f googol"
 msgid_plural "%(value).1f googol"
 msgstr[0] "%(value).1f googol"
-msgstr[1] "%(value).1f googol"
+msgstr[1] "%(value).1f gúgoles"
 
 #, python-format
 msgid "%(value)s googol"
 msgid_plural "%(value)s googol"
 msgstr[0] " %(value)s  googol"
-msgstr[1] " %(value)s  googol"
+msgstr[1] " %(value)s  gúgoles"
 
 msgid "one"
 msgstr "uno"

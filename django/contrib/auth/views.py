@@ -17,7 +17,9 @@ from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import resolve_url
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.utils.http import is_safe_url, urlsafe_base64_decode
+from django.utils.http import (
+    url_has_allowed_host_and_scheme, urlsafe_base64_decode,
+)
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
@@ -70,7 +72,7 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
             self.redirect_field_name,
             self.request.GET.get(self.redirect_field_name, '')
         )
-        url_is_safe = is_safe_url(
+        url_is_safe = url_has_allowed_host_and_scheme(
             url=redirect_to,
             allowed_hosts=self.get_success_url_allowed_hosts(),
             require_https=self.request.is_secure(),
@@ -138,7 +140,7 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
                 self.redirect_field_name,
                 self.request.GET.get(self.redirect_field_name)
             )
-            url_is_safe = is_safe_url(
+            url_is_safe = url_has_allowed_host_and_scheme(
                 url=next_page,
                 allowed_hosts=self.get_success_url_allowed_hosts(),
                 require_https=self.request.is_secure(),

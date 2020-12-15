@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015-2019
+# BouRock, 2015-2020
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@protonmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
@@ -10,12 +10,13 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Mesut Can Gürle <mesutcang@gmail.com>, 2013
 # Murat Sahin <martinamca@gmail.com>, 2011
+# Yigit Guler <yigit@hipo.biz>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-01-18 16:09+0000\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-07-15 08:30+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -76,6 +77,12 @@ msgstr "Tarih yok"
 msgid "Has date"
 msgstr "Tarih var"
 
+msgid "Empty"
+msgstr "Boş"
+
+msgid "Not empty"
+msgstr "Boş değil"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -133,23 +140,23 @@ msgid "log entries"
 msgstr "günlük girdisi"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "\"%(object)s\" eklendi."
+msgid "Added “%(object)s”."
+msgstr "“%(object)s” eklendi."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "\"%(object)s\" değiştirildi - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "“%(object)s” değiştirildi — %(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "\"%(object)s\" silindi."
+msgid "Deleted “%(object)s.”"
+msgstr "“%(object)s” silindi."
 
 msgid "LogEntry Object"
 msgstr "LogEntry Nesnesi"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "{name} \"{object}\" eklendi."
+msgid "Added {name} “{object}”."
+msgstr "{name} “{object}” eklendi."
 
 msgid "Added."
 msgstr "Eklendi."
@@ -158,16 +165,16 @@ msgid "and"
 msgstr "ve"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "{name} \"{object}\" için {fields} değiştirildi."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "{name} “{object}” için {fields} değiştirildi."
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "{fields} değiştirildi."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr "{name} \"{object}\" silindi."
+msgid "Deleted {name} “{object}”."
+msgstr "{name} “{object}” silindi."
 
 msgid "No fields changed."
 msgstr "Değiştirilen alanlar yok."
@@ -175,51 +182,47 @@ msgstr "Değiştirilen alanlar yok."
 msgid "None"
 msgstr "Hiçbiri"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
-"Birden fazla seçmek için \"Control (Ctrl)\" veya Mac'deki \"Command\" tuşuna "
-"basılı tutun."
+"Birden fazla seçmek için “Ctrl” veya Mac’teki “Command” tuşuna basılı tutun."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" başarılı olarak eklendi."
+msgid "The {name} “{obj}” was added successfully."
+msgstr "{name} “{obj}” başarılı olarak eklendi."
 
 msgid "You may edit it again below."
 msgstr "Aşağıdan bunu tekrar düzenleyebilirsiniz."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
-"below."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
-"{name} \"{obj}\" başarılı olarak eklendi. Aşağıda başka bir {name} "
+"{name} “{obj}” başarılı olarak eklendi. Aşağıda başka bir {name} "
 "ekleyebilirsiniz."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
-"{name} \"{obj}\" başarılı olarak değiştirildi. Aşağıda tekrar "
+"{name} “{obj}” başarılı olarak değiştirildi. Aşağıda tekrar "
 "düzenleyebilirsiniz."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
-"{name} \"{obj}\" başarılı olarak eklendi. Aşağıda tekrar düzenleyebilirsiniz."
+"{name} “{obj}” başarılı olarak eklendi. Aşağıda tekrar düzenleyebilirsiniz."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
-"{name} \"{obj}\" başarılı olarak değiştirildi. Aşağıda başka bir {name} "
+"{name} “{obj}” başarılı olarak değiştirildi. Aşağıda başka bir {name} "
 "ekleyebilirsiniz."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "{name} \"{obj}\" başarılı olarak değiştirildi."
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "{name} “{obj}” başarılı olarak değiştirildi."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -232,12 +235,12 @@ msgid "No action selected."
 msgstr "Seçilen eylem yok."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" başarılı olarak silindi."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "%(name)s “%(obj)s” başarılı olarak silindi."
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
-msgstr "\"%(key)s\" Kimliği ile %(name)s mevcut değil. Belki silinmiş midir?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr "“%(key)s” kimliği olan %(name)s mevcut değil. Belki silinmiş midir?"
 
 #, python-format
 msgid "Add %s"
@@ -307,7 +310,7 @@ msgstr "%(app)s yönetimi"
 msgid "Page not found"
 msgstr "Sayfa bulunamadı"
 
-msgid "We're sorry, but the requested page could not be found."
+msgid "We’re sorry, but the requested page could not be found."
 msgstr "Üzgünüz, istediğiniz sayfa bulunamadı."
 
 msgid "Home"
@@ -323,11 +326,11 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Sunucu Hatası <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 "Bir hata oluştu. Site yöneticilerine e-posta yoluyla bildirildi ve kısa süre "
-"içinde düzeltilmelidir. Sabrınız için teşekkür ederiz."
+"içinde düzeltilecektir. Sabrınız için teşekkür ederiz."
 
 msgid "Run the selected action"
 msgstr "Seçilen eylemi çalıştır"
@@ -345,8 +348,21 @@ msgstr "Tüm %(total_count)s %(module_name)s nesnelerini seç"
 msgid "Clear selection"
 msgstr "Seçimi temizle"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "%(name)s uygulamasındaki modeller"
+
+msgid "Add"
+msgstr "Ekle"
+
+msgid "View"
+msgstr "Göster"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Hiçbir şeyi düzenlemek ve göstermek için izne sahip değilsiniz."
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
 "Önce, bir kullanıcı adı ve parola girin. Ondan sonra, daha fazla kullanıcı "
@@ -393,6 +409,9 @@ msgstr "Sitede görüntüle"
 msgid "Filter"
 msgstr "Süz"
 
+msgid "Clear all filters"
+msgstr "Tüm süzgeçleri temizle"
+
 msgid "Remove from sorting"
 msgstr "Sıralamadan kaldır"
 
@@ -435,7 +454,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Nesneler"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Evet, eminim"
 
 msgid "No, take me back"
@@ -470,9 +489,6 @@ msgstr ""
 "Seçilen %(objects_name)s nesnelerini silmek istediğinize emin misiniz? "
 "Aşağıdaki nesnelerin tümü ve onların ilgili öğeleri silinecektir:"
 
-msgid "View"
-msgstr "Göster"
-
 msgid "Delete?"
 msgstr "Silinsin mi?"
 
@@ -482,16 +498,6 @@ msgstr " %(filter_title)s süzgecine göre"
 
 msgid "Summary"
 msgstr "Özet"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s uygulamasındaki modeller"
-
-msgid "Add"
-msgstr "Ekle"
-
-msgid "You don't have permission to view or edit anything."
-msgstr "Hiçbir şeyi düzenlemek ve göstermek için izne sahip değilsiniz."
 
 msgid "Recent actions"
 msgstr "Son eylemler"
@@ -506,7 +512,7 @@ msgid "Unknown content"
 msgstr "Bilinmeyen içerik"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
@@ -525,6 +531,9 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "Kullanıcı adınızı veya parolanızı mı unuttunuz?"
 
+msgid "Toggle navigation"
+msgstr "Gezinmeyi aç/kapat"
+
 msgid "Date/time"
 msgstr "Tarih/saat"
 
@@ -535,7 +544,7 @@ msgid "Action"
 msgstr "Eylem"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
 "Bu nesne değişme geçmişine sahip değil. Muhtemelen bu yönetici sitesi "
@@ -591,8 +600,7 @@ msgid "Delete selected %(model)s"
 msgstr "Seçilen %(model)s sil"
 
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr ""
-"Bugün Web sitesinde biraz güzel zaman geçirdiğiniz için teşekkür ederiz."
+msgstr "Bugün Web sitesine ayırdığınız kaliteli zaman için teşekkür ederiz."
 
 msgid "Log in again"
 msgstr "Tekrar oturum aç"
@@ -604,7 +612,7 @@ msgid "Your password was changed."
 msgstr "Parolanız değiştirildi."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
 "Güvenliğiniz için, lütfen eski parolanızı girin, ve ondan sonra yeni "
@@ -643,14 +651,14 @@ msgstr ""
 "yeni bir parola sıfırlama isteyin."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
 "Eğer girdiğiniz e-posta ile bir hesabınız varsa, parolanızın ayarlanması "
 "için size talimatları e-posta ile gönderdik. En kısa sürede almalısınız."
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
 "Eğer bir e-posta almadıysanız, lütfen kayıt olurken girdiğiniz adresi "
@@ -667,7 +675,7 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Lütfen şurada belirtilen sayfaya gidin ve yeni bir parola seçin:"
 
-msgid "Your username, in case you've forgotten:"
+msgid "Your username, in case you’ve forgotten:"
 msgstr "Unutma ihtimalinize karşı, kullanıcı adınız:"
 
 msgid "Thanks for using our site!"
@@ -678,7 +686,7 @@ msgid "The %(site_name)s team"
 msgstr "%(site_name)s ekibi"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
 "Parolanızı mı unuttunuz? Aşağıya e-posta adresinizi girin ve yeni bir tane "

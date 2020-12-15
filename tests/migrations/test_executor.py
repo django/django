@@ -1,12 +1,11 @@
 from unittest import mock
 
 from django.apps.registry import apps as global_apps
-from django.db import connection
+from django.db import DatabaseError, connection
 from django.db.migrations.exceptions import InvalidMigrationPlan
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
-from django.db.utils import DatabaseError
 from django.test import (
     SimpleTestCase, modify_settings, override_settings, skipUnlessDBFeature,
 )
@@ -517,13 +516,13 @@ class ExecutorTests(MigrationTestBase):
         state = executor.migrate([
             ('mutate_state_a', '0001_initial'),
         ])
-        self.assertIn('added', dict(state.models['mutate_state_b', 'b'].fields))
+        self.assertIn('added', state.models['mutate_state_b', 'b'].fields)
         executor.loader.build_graph()
         # Migrate backward.
         state = executor.migrate([
             ('mutate_state_a', None),
         ])
-        self.assertIn('added', dict(state.models['mutate_state_b', 'b'].fields))
+        self.assertIn('added', state.models['mutate_state_b', 'b'].fields)
         executor.migrate([
             ('mutate_state_b', None),
         ])

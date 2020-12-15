@@ -91,7 +91,8 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 
     def __iter__(self):
         "Allow iteration over this LineString."
-        return iter(self._cs)
+        for i in range(len(self)):
+            yield self[i]
 
     def __len__(self):
         "Return the number of points in this LineString."
@@ -176,3 +177,11 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 class LinearRing(LineString):
     _minlength = 4
     _init_func = capi.create_linearring
+
+    @property
+    def is_counterclockwise(self):
+        if self.empty:
+            raise ValueError(
+                'Orientation of an empty LinearRing cannot be determined.'
+            )
+        return self._cs.is_counterclockwise

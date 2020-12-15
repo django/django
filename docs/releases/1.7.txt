@@ -127,7 +127,8 @@ composite keys in future releases of Django, the
 
 This method takes no arguments, and returns a tuple of four items:
 
-* ``name``: The field's attribute name on its parent model, or None if it is not part of a model
+* ``name``: The field's attribute name on its parent model, or ``None`` if it
+  is not part of a model
 * ``path``: A dotted, Python path to the class of this field, including the class name.
 * ``args``: Positional arguments, as a list
 * ``kwargs``: Keyword arguments, as a dict
@@ -479,7 +480,7 @@ Minor features
 
 * The ``"django.contrib.sessions.backends.cached_db"`` session backend now
   respects :setting:`SESSION_CACHE_ALIAS`. In previous versions, it always used
-  the `default` cache.
+  the ``default`` cache.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -557,7 +558,9 @@ Email
 ~~~~~
 
 * :func:`~django.core.mail.send_mail` now accepts an ``html_message``
-  parameter for sending a multipart ``text/plain`` and ``text/html`` email.
+  parameter for sending a multipart :mimetype:`text/plain` and
+  :mimetype:`text/html` email.
+
 * The SMTP :class:`~django.core.mail.backends.smtp.EmailBackend` now accepts a
   ``timeout`` parameter.
 
@@ -1121,9 +1124,9 @@ as ``error_list``; ``error_dict``; or the return value of
 would have previously found strings.
 
 Also if you directly assigned the return value of ``update_error_dict()``
-to ``Form._errors`` you may inadvertently add `list` instances where
+to ``Form._errors`` you may inadvertently add ``list`` instances where
 ``ErrorList`` instances are expected. This is a problem because unlike a
-simple `list`, an ``ErrorList`` knows how to handle instances of
+simple ``list``, an ``ErrorList`` knows how to handle instances of
 ``ValidationError``.
 
 Most use-cases that warranted using these private APIs are now covered by

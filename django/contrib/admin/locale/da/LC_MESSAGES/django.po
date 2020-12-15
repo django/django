@@ -3,7 +3,8 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Erik Wognsen <r4mses@gmail.com>, 2013,2015-2019
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2013,2015-2020
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # valberg <valberg@orn.li>, 2014-2015
@@ -11,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-01-18 07:26+0000\n"
-"Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-07-15 08:56+0000\n"
+"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -72,6 +73,12 @@ msgstr "Ingen dato"
 msgid "Has date"
 msgstr "Har dato"
 
+msgid "Empty"
+msgstr "Tom"
+
+msgid "Not empty"
+msgstr "Ikke tom"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -129,23 +136,23 @@ msgid "log entries"
 msgstr "logmeddelelser"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "Tilføjede \"%(object)s\"."
+msgid "Added “%(object)s”."
+msgstr "Tilføjede “%(object)s”."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "Ændrede \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "Ændrede “%(object)s” — %(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "Slettede \"%(object)s\"."
+msgid "Deleted “%(object)s.”"
+msgstr "Slettede “%(object)s”."
 
 msgid "LogEntry Object"
 msgstr "LogEntry-objekt"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "Tilføjede {name} \"{object}\"."
+msgid "Added {name} “{object}”."
+msgstr "Tilføjede {name} “{object}”."
 
 msgid "Added."
 msgstr "Tilføjet."
@@ -154,16 +161,16 @@ msgid "and"
 msgstr "og"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "Ændrede {fields} for {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "Ændrede {fields} for {name} “{object}”."
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "Ændrede {fields}."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr "Slettede {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
+msgstr "Slettede {name} “{object}”."
 
 msgid "No fields changed."
 msgstr "Ingen felter ændret."
@@ -171,45 +178,41 @@ msgstr "Ingen felter ændret."
 msgid "None"
 msgstr "Ingen"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
-"Hold \"Ctrl\" (eller \"Æbletasten\" på Mac) nede for at vælge mere end en."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr "Hold “Ctrl”, eller “Æbletasten” på Mac, nede for at vælge mere end én."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" blev tilføjet."
+msgid "The {name} “{obj}” was added successfully."
+msgstr "{name} “{obj}” blev tilføjet."
 
 msgid "You may edit it again below."
 msgstr "Du kan redigere den/det igen herunder."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr ""
+"{name} “{obj}” blev tilføjet. Du kan tilføje endnu en/et {name} herunder."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr "{name} “{obj}” blev ændret. Du kan redigere den/det igen herunder."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr "{name} “{obj}” blev tilføjet. Du kan redigere den/det igen herunder."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
-"{name} \"{obj}\" blev tilføjet. Du kan tilføje endnu en/et {name} herunder."
+"{name} “{obj}” blev ændret. Du kan tilføje endnu en/et {name} herunder."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" blev ændret. Du kan redigere den/det igen herunder."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" blev tilføjet. Du kan redigere den/det igen herunder."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-"{name} \"{obj}\" blev ændret. Du kan tilføje endnu en/et {name} herunder."
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "{name} \"{obj}\" blev ændret."
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "{name} “{obj}” blev ændret."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -222,13 +225,13 @@ msgid "No action selected."
 msgstr "Ingen handling valgt."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" blev slettet."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "%(name)s “%(obj)s” blev slettet."
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
-"%(name)s med ID \"%(key)s\" findes ikke. Måske er objektet blevet slettet?"
+"%(name)s med ID “%(key)s” findes ikke. Måske er objektet blevet slettet?"
 
 #, python-format
 msgid "Add %s"
@@ -298,7 +301,7 @@ msgstr "%(app)s administration"
 msgid "Page not found"
 msgstr "Siden blev ikke fundet"
 
-msgid "We're sorry, but the requested page could not be found."
+msgid "We’re sorry, but the requested page could not be found."
 msgstr "Vi beklager, men den ønskede side kunne ikke findes"
 
 msgid "Home"
@@ -314,7 +317,7 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Serverfejl <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 "Der opstod en fejl. Fejlen er rapporteret til website-administratoren via e-"
@@ -336,8 +339,21 @@ msgstr "Vælg alle %(total_count)s  %(module_name)s "
 msgid "Clear selection"
 msgstr "Ryd valg"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modeller i applikationen %(name)s"
+
+msgid "Add"
+msgstr "Tilføj"
+
+msgid "View"
+msgstr "Vis"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Du har ikke rettigheder til at se eller redigere noget."
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
 "Indtast først et brugernavn og en adgangskode. Derefter får du yderligere "
@@ -384,6 +400,9 @@ msgstr "Se på website"
 msgid "Filter"
 msgstr "Filtrer"
 
+msgid "Clear all filters"
+msgstr "Nulstil alle filtre"
+
 msgid "Remove from sorting"
 msgstr "Fjern fra sortering"
 
@@ -426,7 +445,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Objekter"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Ja, jeg er sikker"
 
 msgid "No, take me back"
@@ -461,9 +480,6 @@ msgstr ""
 "Er du sikker på du vil slette de valgte %(objects_name)s? Alle de følgende "
 "objekter og deres relaterede emner vil blive slettet:"
 
-msgid "View"
-msgstr "Vis"
-
 msgid "Delete?"
 msgstr "Slet?"
 
@@ -473,16 +489,6 @@ msgstr " Efter %(filter_title)s "
 
 msgid "Summary"
 msgstr "Sammendrag"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modeller i applikationen %(name)s"
-
-msgid "Add"
-msgstr "Tilføj"
-
-msgid "You don't have permission to view or edit anything."
-msgstr "Du har ikke rettigheder til at se eller redigere noget."
 
 msgid "Recent actions"
 msgstr "Seneste handlinger"
@@ -497,7 +503,7 @@ msgid "Unknown content"
 msgstr "Ukendt indhold"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
@@ -516,6 +522,9 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "Har du glemt dit password eller brugernavn?"
 
+msgid "Toggle navigation"
+msgstr "Vis/skjul navigation"
+
 msgid "Date/time"
 msgstr "Dato/tid"
 
@@ -526,7 +535,7 @@ msgid "Action"
 msgstr "Funktion"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
 "Dette objekt har ingen ændringshistorik. Det blev formentlig ikke tilføjet "
@@ -594,7 +603,7 @@ msgid "Your password was changed."
 msgstr "Din adgangskode blev ændret."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
 "Indtast venligst din gamle adgangskode for en sikkerheds skyld og indtast så "
@@ -634,14 +643,15 @@ msgstr ""
 "har været brugt. Anmod venligst påny om nulstilling af adgangskoden."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Vi har sendt dig en email med instruktioner for at sætte dit kodeord, hvis "
-"en konto med den angivne email findes. Du burde modtage dem snarest."
+"Vi har sendt dig en e-mail med instruktioner for at indstille din "
+"adgangskode, hvis en konto med den angivne e-mail-adresse findes. Du burde "
+"modtage den snarest."
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
 "Hvis du ikke modtager en e-mail, så tjek venligst, at du har indtastet den e-"
@@ -658,8 +668,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Gå venligst til denne side og vælg en ny adgangskode:"
 
-msgid "Your username, in case you've forgotten:"
-msgstr "For det tilfælde at du skulle have glemt dit brugernavn er det:"
+msgid "Your username, in case you’ve forgotten:"
+msgstr "Hvis du skulle have glemt dit brugernavn er det:"
 
 msgid "Thanks for using our site!"
 msgstr "Tak fordi du brugte vores website!"
@@ -669,7 +679,7 @@ msgid "The %(site_name)s team"
 msgstr "Med venlig hilsen %(site_name)s"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
 "Har du glemt din adgangskode? Skriv din e-mail-adresse herunder, så sender "

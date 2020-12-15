@@ -11,8 +11,12 @@ import weakref
 import zipfile
 from importlib import import_module
 from pathlib import Path
+from subprocess import CompletedProcess
 from unittest import mock, skip, skipIf
 
+import pytz
+
+import django.__main__
 from django.apps.registry import Apps
 from django.test import SimpleTestCase
 from django.test.utils import extend_sys_path
@@ -34,7 +38,7 @@ class TestIterModulesAndFiles(SimpleTestCase):
     def assertFileFound(self, filename):
         # Some temp directories are symlinks. Python resolves these fully while
         # importing.
-        resolved_filename = filename.resolve()
+        resolved_filename = filename.resolve(strict=True)
         self.clear_autoreload_caches()
         # Test uncached access
         self.assertIn(resolved_filename, list(autoreload.iter_all_python_module_files()))
@@ -43,7 +47,7 @@ class TestIterModulesAndFiles(SimpleTestCase):
         self.assertEqual(autoreload.iter_modules_and_files.cache_info().hits, 1)
 
     def assertFileNotFound(self, filename):
-        resolved_filename = filename.resolve()
+        resolved_filename = filename.resolve(strict=True)
         self.clear_autoreload_caches()
         # Test uncached access
         self.assertNotIn(resolved_filename, list(autoreload.iter_all_python_module_files()))
@@ -152,6 +156,73 @@ class TestIterModulesAndFiles(SimpleTestCase):
                 )
 
 
+class TestChildArguments(SimpleTestCase):
+    @mock.patch('sys.argv', [django.__main__.__file__, 'runserver'])
+    @mock.patch('sys.warnoptions', [])
+    def test_run_as_module(self):
+        self.assertEqual(
+            autoreload.get_child_arguments(),
+            [sys.executable, '-m', 'django', 'runserver']
+        )
+
+    @mock.patch('sys.argv', [__file__, 'runserver'])
+    @mock.patch('sys.warnoptions', ['error'])
+    def test_warnoptions(self):
+        self.assertEqual(
+            autoreload.get_child_arguments(),
+            [sys.executable, '-Werror', __file__, 'runserver']
+        )
+
+    @mock.patch('sys.warnoptions', [])
+    def test_exe_fallback(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            exe_path = Path(tmpdir) / 'django-admin.exe'
+            exe_path.touch()
+            with mock.patch('sys.argv', [str(exe_path.with_suffix('')), 'runserver']):
+                self.assertEqual(
+                    autoreload.get_child_arguments(),
+                    [str(exe_path), 'runserver']
+                )
+
+    @mock.patch('sys.warnoptions', [])
+    def test_entrypoint_fallback(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            script_path = Path(tmpdir) / 'django-admin-script.py'
+            script_path.touch()
+            with mock.patch('sys.argv', [str(script_path.with_name('django-admin')), 'runserver']):
+                self.assertEqual(
+                    autoreload.get_child_arguments(),
+                    [sys.executable, str(script_path), 'runserver']
+                )
+
+    @mock.patch('sys.argv', ['does-not-exist', 'runserver'])
+    @mock.patch('sys.warnoptions', [])
+    def test_raises_runtimeerror(self):
+        msg = 'Script does-not-exist does not exist.'
+        with self.assertRaisesMessage(RuntimeError, msg):
+            autoreload.get_child_arguments()
+
+
+class TestUtilities(SimpleTestCase):
+    def test_is_django_module(self):
+        for module, expected in (
+            (pytz, False),
+            (sys, False),
+            (autoreload, True)
+        ):
+            with self.subTest(module=module):
+                self.assertIs(autoreload.is_django_module(module), expected)
+
+    def test_is_django_path(self):
+        for module, expected in (
+            (pytz.__file__, False),
+            (contextlib.__file__, False),
+            (autoreload.__file__, True)
+        ):
+            with self.subTest(module=module):
+                self.assertIs(autoreload.is_django_path(module), expected)
+
+
 class TestCommonRoots(SimpleTestCase):
     def test_common_roots(self):
         paths = (
@@ -167,7 +238,7 @@ class TestCommonRoots(SimpleTestCase):
 class TestSysPathDirectories(SimpleTestCase):
     def setUp(self):
         self._directory = tempfile.TemporaryDirectory()
-        self.directory = Path(self._directory.name).resolve().absolute()
+        self.directory = Path(self._directory.name).resolve(strict=True).absolute()
         self.file = self.directory / 'test'
         self.file.touch()
 
@@ -345,7 +416,7 @@ class RestartWithReloaderTests(SimpleTestCase):
     executable = '/usr/bin/python'
 
     def patch_autoreload(self, argv):
-        patch_call = mock.patch('django.utils.autoreload.subprocess.call', return_value=0)
+        patch_call = mock.patch('django.utils.autoreload.subprocess.run', return_value=CompletedProcess(argv, 0))
         patches = [
             mock.patch('django.utils.autoreload.sys.argv', argv),
             mock.patch('django.utils.autoreload.sys.executable', self.executable),
@@ -359,11 +430,17 @@ class RestartWithReloaderTests(SimpleTestCase):
         return mock_call
 
     def test_manage_py(self):
-        argv = ['./manage.py', 'runserver']
-        mock_call = self.patch_autoreload(argv)
-        autoreload.restart_with_reloader()
-        self.assertEqual(mock_call.call_count, 1)
-        self.assertEqual(mock_call.call_args[0][0], [self.executable, '-Wall'] + argv)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            script = Path(temp_dir) / 'manage.py'
+            script.touch()
+            argv = [str(script), 'runserver']
+            mock_call = self.patch_autoreload(argv)
+            autoreload.restart_with_reloader()
+            self.assertEqual(mock_call.call_count, 1)
+            self.assertEqual(
+                mock_call.call_args[0][0],
+                [self.executable, '-Wall'] + argv,
+            )
 
     def test_python_m_django(self):
         main = '/usr/lib/pythonX.Y/site-packages/django/__main__.py'
@@ -380,7 +457,7 @@ class ReloaderTests(SimpleTestCase):
 
     def setUp(self):
         self._tempdir = tempfile.TemporaryDirectory()
-        self.tempdir = Path(self._tempdir.name).resolve().absolute()
+        self.tempdir = Path(self._tempdir.name).resolve(strict=True).absolute()
         self.existing_file = self.ensure_file(self.tempdir / 'test.py')
         self.nonexistent_file = (self.tempdir / 'does_not_exist.py').absolute()
         self.reloader = self.RELOADER_CLS()
@@ -650,7 +727,7 @@ class WatchmanReloaderTests(ReloaderTests, IntegrationTests):
 
     @mock.patch.dict(os.environ, {'DJANGO_WATCHMAN_TIMEOUT': '10'})
     def test_setting_timeout_from_environment_variable(self):
-        self.assertEqual(self.RELOADER_CLS.client_timeout, 10)
+        self.assertEqual(self.RELOADER_CLS().client_timeout, 10)
 
 
 @skipIf(on_macos_with_hfs(), "These tests do not work with HFS+ as a filesystem")

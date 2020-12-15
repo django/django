@@ -66,7 +66,7 @@ class LogEntry(models.Model):
         verbose_name = _('log entry')
         verbose_name_plural = _('log entries')
         db_table = 'django_admin_log'
-        ordering = ('-action_time',)
+        ordering = ['-action_time']
 
     def __repr__(self):
         return str(self.action_time)

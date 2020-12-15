@@ -29,6 +29,25 @@ class AdminTemplateTagsTest(AdminViewBasicTestCase):
         self.assertIs(template_context['extra'], True)
         self.assertIs(template_context['show_save'], True)
 
+    def test_override_show_save_and_add_another(self):
+        request = self.request_factory.get(
+            reverse('admin:auth_user_change', args=[self.superuser.pk]),
+        )
+        request.user = self.superuser
+        admin = UserAdmin(User, site)
+        for extra_context, expected_flag in (
+            ({}, True),  # Default.
+            ({'show_save_and_add_another': False}, False),
+        ):
+            with self.subTest(show_save_and_add_another=expected_flag):
+                response = admin.change_view(
+                    request,
+                    str(self.superuser.pk),
+                    extra_context=extra_context,
+                )
+                template_context = submit_row(response.context_data)
+                self.assertIs(template_context['show_save_and_add_another'], expected_flag)
+
     def test_override_change_form_template_tags(self):
         """
         admin_modify template tags follow the standard search pattern
@@ -108,4 +127,46 @@ class DateHierarchyTests(TestCase):
                     '&'.join('posted__%s' % c for c in choice) for choice in expected_choices
                 ]
                 expected_choices = [('?' + choice) if choice else '' for choice in expected_choices]
+                self.assertEqual(choices, expected_choices)
+
+    def test_choice_links_datetime(self):
+        modeladmin = ModelAdmin(Question, site)
+        modeladmin.date_hierarchy = 'expires'
+        Question.objects.bulk_create([
+            Question(question='q1', expires=datetime.datetime(2017, 10, 1)),
+            Question(question='q2', expires=datetime.datetime(2017, 10, 1)),
+            Question(question='q3', expires=datetime.datetime(2017, 12, 15)),
+            Question(question='q4', expires=datetime.datetime(2017, 12, 15)),
+            Question(question='q5', expires=datetime.datetime(2017, 12, 31)),
+            Question(question='q6', expires=datetime.datetime(2018, 2, 1)),
+        ])
+        tests = [
+            ({}, [['year=2017'], ['year=2018']]),
+            ({'year': 2016}, []),
+            (
+                {'year': 2017}, [
+                    ['month=10', 'year=2017'],
+                    ['month=12', 'year=2017'],
+                ],
+            ),
+            ({'year': 2017, 'month': 9}, []),
+            (
+                {'year': 2017, 'month': 12}, [
+                    ['day=15', 'month=12', 'year=2017'],
+                    ['day=31', 'month=12', 'year=2017'],
+                ],
+            ),
+        ]
+        for query, expected_choices in tests:
+            with self.subTest(query=query):
+                query = {'expires__%s' % q: val for q, val in query.items()}
+                request = self.factory.get('/', query)
+                request.user = self.superuser
+                changelist = modeladmin.get_changelist_instance(request)
+                spec = date_hierarchy(changelist)
+                choices = [choice['link'] for choice in spec['choices']]
+                expected_choices = [
+                    '?' + '&'.join('expires__%s' % c for c in choice)
+                    for choice in expected_choices
+                ]
                 self.assertEqual(choices, expected_choices)

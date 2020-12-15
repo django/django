@@ -1,6 +1,7 @@
 import os
 import shutil
 import sys
+from pathlib import Path
 
 from django.db.backends.base.creation import BaseDatabaseCreation
 
@@ -9,7 +10,9 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     @staticmethod
     def is_in_memory_db(database_name):
-        return database_name == ':memory:' or 'mode=memory' in database_name
+        return not isinstance(database_name, Path) and (
+            database_name == ':memory:' or 'mode=memory' in database_name
+        )
 
     def _get_test_db_name(self):
         test_database_name = self.connection.settings_dict['TEST']['NAME'] or ':memory:'
@@ -95,4 +98,6 @@ class DatabaseCreation(BaseDatabaseCreation):
         sig = [self.connection.settings_dict['NAME']]
         if self.is_in_memory_db(test_database_name):
             sig.append(self.connection.alias)
+        else:
+            sig.append(test_database_name)
         return tuple(sig)

@@ -37,12 +37,12 @@ from .models import (
     Person, Persona, Picture, Pizza, Plot, PlotDetails, PlotProxy,
     PluggableSearchPerson, Podcast, Post, PrePopulatedPost,
     PrePopulatedPostLargeSlug, PrePopulatedSubPost, Promo, Question,
-    ReadablePizza, ReadOnlyPizza, Recipe, Recommendation, Recommender,
-    ReferencedByGenRel, ReferencedByInline, ReferencedByParent,
+    ReadablePizza, ReadOnlyPizza, ReadOnlyRelatedField, Recipe, Recommendation,
+    Recommender, ReferencedByGenRel, ReferencedByInline, ReferencedByParent,
     RelatedPrepopulated, RelatedWithUUIDPKModel, Report, Reservation,
     Restaurant, RowLevelChangePermissionModel, Section, ShortMessage, Simple,
-    Sketch, State, Story, StumpJoke, Subscriber, SuperVillain, Telegram, Thing,
-    Topping, UnchangeableObject, UndeletableObject, UnorderedObject,
+    Sketch, Song, State, Story, StumpJoke, Subscriber, SuperVillain, Telegram,
+    Thing, Topping, UnchangeableObject, UndeletableObject, UnorderedObject,
     UserMessenger, UserProxy, Villain, Vodcast, Whatsit, Widget, Worker,
     WorkHour,
 )
@@ -105,6 +105,7 @@ class ArticleAdmin(admin.ModelAdmin):
         'content', 'date', callable_year, 'model_year', 'modeladmin_year',
         'model_year_reversed', 'section', lambda obj: obj.title,
         'order_by_expression', 'model_property_year', 'model_month',
+        'order_by_f_expression', 'order_by_orderby_expression',
     )
     list_editable = ('section',)
     list_filter = ('date', 'section')
@@ -122,11 +123,19 @@ class ArticleAdmin(admin.ModelAdmin):
         })
     )
 
+    # These orderings aren't particularly useful but show that expressions can
+    # be used for admin_order_field.
     def order_by_expression(self, obj):
         return obj.model_year
-    # This ordering isn't particularly useful but shows that expressions can
-    # be used for admin_order_field.
     order_by_expression.admin_order_field = models.F('date') + datetime.timedelta(days=3)
+
+    def order_by_f_expression(self, obj):
+        return obj.model_year
+    order_by_f_expression.admin_order_field = models.F('date')
+
+    def order_by_orderby_expression(self, obj):
+        return obj.model_year
+    order_by_orderby_expression.admin_order_field = models.F('date').asc(nulls_last=True)
 
     def changelist_view(self, request):
         return super().changelist_view(request, extra_context={'extra_var': 'Hello!'})
@@ -214,7 +223,7 @@ class BasePersonModelFormSet(BaseModelFormSet):
             person = person_dict.get('id')
             alive = person_dict.get('alive')
             if person and alive and person.name == "Grace Hopper":
-                raise forms.ValidationError("Grace is not a Zombie")
+                raise ValidationError("Grace is not a Zombie")
 
 
 class PersonAdmin(admin.ModelAdmin):
@@ -528,6 +537,10 @@ class ToppingAdmin(admin.ModelAdmin):
 
 class PizzaAdmin(admin.ModelAdmin):
     readonly_fields = ('toppings',)
+
+
+class ReadOnlyRelatedFieldAdmin(admin.ModelAdmin):
+    readonly_fields = ('chapter', 'language', 'user')
 
 
 class StudentAdmin(admin.ModelAdmin):
@@ -1052,6 +1065,7 @@ site.register(GenRelReference)
 site.register(ParentWithUUIDPK)
 site.register(RelatedPrepopulated, search_fields=['name'])
 site.register(RelatedWithUUIDPKModel)
+site.register(ReadOnlyRelatedField, ReadOnlyRelatedFieldAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
@@ -1069,6 +1083,7 @@ site.register(ReadOnlyPizza, ReadOnlyPizzaAdmin)
 site.register(ReadablePizza)
 site.register(Topping, ToppingAdmin)
 site.register(Album, AlbumAdmin)
+site.register(Song)
 site.register(Question, QuestionAdmin)
 site.register(Answer, AnswerAdmin, date_hierarchy='question__posted')
 site.register(Answer2, date_hierarchy='question__expires')
@@ -1168,12 +1183,3 @@ class ArticleAdmin9(admin.ModelAdmin):
 
 site9 = admin.AdminSite(name='admin9')
 site9.register(Article, ArticleAdmin9)
-
-
-class ArticleAdmin10(admin.ModelAdmin):
-    def has_change_permission(self, request, obj=None):
-        return False
-
-
-site10 = admin.AdminSite(name='admin10')
-site10.register(Article, ArticleAdmin10)

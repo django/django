@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('sites', models.ManyToManyField(to='sites.Site', verbose_name='sites')),
             ],
             options={
-                'ordering': ('url',),
+                'ordering': ['url'],
                 'db_table': 'django_flatpage',
                 'verbose_name': 'flat page',
                 'verbose_name_plural': 'flat pages',

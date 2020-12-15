@@ -194,9 +194,9 @@ If you're using the context processor, your template should be rendered with a
 ``RequestContext``. Otherwise, ensure ``messages`` is available to
 the template context.
 
-Even if you know there is only just one message, you should still iterate over
-the ``messages`` sequence, because otherwise the message storage will not be cleared
-for the next request.
+Even if you know there is only one message, you should still iterate over the
+``messages`` sequence, because otherwise the message storage will not be
+cleared for the next request.
 
 The context processor also provides a ``DEFAULT_MESSAGE_LEVELS`` variable which
 is a mapping of the message level names to their numeric value::
@@ -235,8 +235,7 @@ The ``Message`` class
 .. class:: storage.base.Message
 
     When you loop over the list of messages in a template, what you get are
-    instances of the ``Message`` class. It's quite a simple object, with only a
-    few attributes:
+    instances of the ``Message`` class. They have only a few attributes:
 
     * ``message``: The actual text of the message.
 

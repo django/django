@@ -136,8 +136,7 @@ Multiple object mixins
     .. method:: get_paginate_by(queryset)
 
         Returns the number of items to paginate by, or ``None`` for no
-        pagination. By default this simply returns the value of
-        :attr:`paginate_by`.
+        pagination. By default this returns the value of :attr:`paginate_by`.
 
     .. method:: get_paginator(queryset, per_page, orphans=0, allow_empty_first_page=True)
 
@@ -147,7 +146,7 @@ Multiple object mixins
     .. method:: get_paginate_orphans()
 
         An integer specifying the number of "overflow" objects the last page
-        can contain. By default this simply returns the value of
+        can contain. By default this returns the value of
         :attr:`paginate_orphans`.
 
     .. method:: get_allow_empty()

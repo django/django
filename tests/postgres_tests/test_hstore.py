@@ -2,6 +2,7 @@ import json
 
 from django.core import checks, exceptions, serializers
 from django.db import connection
+from django.db.models import F, OuterRef, Subquery
 from django.db.models.expressions import RawSQL
 from django.forms import Form
 from django.test.utils import CaptureQueriesContext, isolate_apps
@@ -136,6 +137,13 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[:2]
         )
 
+    def test_key_transform_annotation(self):
+        qs = HStoreModel.objects.annotate(a=F('field__a'))
+        self.assertCountEqual(
+            qs.values_list('a', flat=True),
+            ['b', 'b', None, None, None],
+        )
+
     def test_keys(self):
         self.assertSequenceEqual(
             HStoreModel.objects.filter(field__keys=['a']),
@@ -207,6 +215,12 @@ class TestQuerying(PostgreSQLTestCase):
             queries[0]['sql'],
         )
 
+    def test_obj_subquery_lookup(self):
+        qs = HStoreModel.objects.annotate(
+            value=Subquery(HStoreModel.objects.filter(pk=OuterRef('pk')).values('field')),
+        ).filter(value__a='b')
+        self.assertSequenceEqual(qs, self.objs[:2])
+
 
 @isolate_apps('postgres_tests')
 class TestChecks(PostgreSQLSimpleTestCase):
@@ -225,7 +239,7 @@ class TestChecks(PostgreSQLSimpleTestCase):
                 ),
                 hint='Use a callable instead, e.g., use `dict` instead of `{}`.',
                 obj=MyModel._meta.get_field('field'),
-                id='postgres.E003',
+                id='fields.E010',
             )
         ])
 

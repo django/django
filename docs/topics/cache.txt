@@ -10,9 +10,9 @@ processing-overhead perspective, than your standard
 read-a-file-off-the-filesystem server arrangement.
 
 For most Web applications, this overhead isn't a big deal. Most Web
-applications aren't ``washingtonpost.com`` or ``slashdot.org``; they're simply
-small- to medium-sized sites with so-so traffic. But for medium- to
-high-traffic sites, it's essential to cut as much overhead as possible.
+applications aren't ``washingtonpost.com`` or ``slashdot.org``; they're small-
+to medium-sized sites with so-so traffic. But for medium- to high-traffic
+sites, it's essential to cut as much overhead as possible.
 
 That's where caching comes in.
 
@@ -77,17 +77,17 @@ database or filesystem usage.
 
 After installing Memcached itself, you'll need to install a Memcached
 binding. There are several Python Memcached bindings available; the
-two most common are `python-memcached`_ and `pylibmc`_.
+two supported by Django are `pylibmc`_ and `pymemcache`_.
 
-.. _`python-memcached`: https://pypi.org/project/python-memcached/
 .. _`pylibmc`: https://pypi.org/project/pylibmc/
+.. _`pymemcache`: https://pypi.org/project/pymemcache/
 
 To use Memcached with Django:
 
 * Set :setting:`BACKEND <CACHES-BACKEND>` to
-  ``django.core.cache.backends.memcached.MemcachedCache`` or
-  ``django.core.cache.backends.memcached.PyLibMCCache`` (depending
-  on your chosen memcached binding)
+  ``django.core.cache.backends.memcached.PyMemcacheCache`` or
+  ``django.core.cache.backends.memcached.PyLibMCCache`` (depending on your
+  chosen memcached binding)
 
 * Set :setting:`LOCATION <CACHES-LOCATION>` to ``ip:port`` values,
   where ``ip`` is the IP address of the Memcached daemon and ``port`` is the
@@ -95,31 +95,22 @@ To use Memcached with Django:
   ``path`` is the path to a Memcached Unix socket file.
 
 In this example, Memcached is running on localhost (127.0.0.1) port 11211, using
-the ``python-memcached`` binding::
+the ``pymemcache`` binding::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
             'LOCATION': '127.0.0.1:11211',
         }
     }
 
 In this example, Memcached is available through a local Unix socket file
-:file:`/tmp/memcached.sock` using the ``python-memcached`` binding::
+:file:`/tmp/memcached.sock` using the ``pymemcache`` binding::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
             'LOCATION': 'unix:/tmp/memcached.sock',
-        }
-    }
-
-When using the ``pylibmc`` binding, do not include the ``unix:/`` prefix::
-
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
-            'LOCATION': '/tmp/memcached.sock',
         }
     }
 
@@ -136,7 +127,7 @@ address 172.19.26.240 and 172.19.26.242, both on port 11211::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
             'LOCATION': [
                 '172.19.26.240:11211',
                 '172.19.26.242:11211',
@@ -150,7 +141,7 @@ on the IP addresses 172.19.26.240 (port 11211), 172.19.26.242 (port 11212), and
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
             'LOCATION': [
                 '172.19.26.240:11211',
                 '172.19.26.242:11212',
@@ -167,6 +158,16 @@ Without a doubt, *none* of the Django caching backends should be used for
 permanent storage -- they're all intended to be solutions for caching, not
 storage -- but we point this out here because memory-based caching is
 particularly temporary.
+
+.. versionchanged:: 3.2
+
+    The ``PyMemcacheCache`` backend was added.
+
+.. deprecated:: 3.2
+
+    The ``MemcachedCache`` backend is deprecated as ``python-memcached`` has
+    some problems and seems to be unmaintained. Use ``PyMemcacheCache`` or
+    ``PyLibMCCache`` instead.
 
 .. _database-caching:
 
@@ -257,9 +258,8 @@ operations to ``cache_replica``, and all write operations to
 If you don't specify routing directions for the database cache model,
 the cache backend will use the ``default`` database.
 
-Of course, if you don't use the database cache backend, you don't need
-to worry about providing routing instructions for the database cache
-model.
+And if you don't use the database cache backend, you don't need to worry about
+providing routing instructions for the database cache model.
 
 Filesystem caching
 ------------------
@@ -291,11 +291,22 @@ The directory path should be absolute -- that is, it should start at the root
 of your filesystem. It doesn't matter whether you put a slash at the end of the
 setting.
 
-Make sure the directory pointed-to by this setting exists and is readable and
-writable by the system user under which your Web server runs. Continuing the
-above example, if your server runs as the user ``apache``, make sure the
-directory ``/var/tmp/django_cache`` exists and is readable and writable by the
-user ``apache``.
+Make sure the directory pointed-to by this setting either exists and is
+readable and writable, or that it can be created by the system user under which
+your Web server runs. Continuing the above example, if your server runs as the
+user ``apache``, make sure the directory ``/var/tmp/django_cache`` exists and
+is readable and writable by the user ``apache``, or that it can be created by
+the user ``apache``.
+
+.. warning::
+
+    When the cache :setting:`LOCATION <CACHES-LOCATION>` is contained within
+    :setting:`MEDIA_ROOT`, :setting:`STATIC_ROOT`, or
+    :setting:`STATICFILES_FINDERS`, sensitive data may be exposed.
+
+    An attacker who gains access to the cache file can not only falsify HTML
+    content, which your site will trust, but also remotely execute arbitrary
+    code, as the data is serialized using :mod:`pickle`.
 
 .. _local-memory-caching:
 
@@ -325,9 +336,9 @@ order to keep them separate.
 The cache uses a least-recently-used (LRU) culling strategy.
 
 Note that each process will have its own private cache instance, which means no
-cross-process caching is possible. This obviously also means the local memory
-cache isn't particularly memory-efficient, so it's probably not a good choice
-for production environments. It's nice for development.
+cross-process caching is possible. This also means the local memory cache isn't
+particularly memory-efficient, so it's probably not a good choice for
+production environments. It's nice for development.
 
 Dummy caching (for development)
 -------------------------------
@@ -366,7 +377,7 @@ as reference implementations. You'll find the code in the
 
 Note: Without a really compelling reason, such as a host that doesn't support
 them, you should stick to the cache backends included with Django. They've
-been well-tested and are easy to use.
+been well-tested and are well-documented.
 
 .. _cache_arguments:
 
@@ -445,19 +456,6 @@ of 60 seconds, and a maximum capacity of 1000 items::
         }
     }
 
-Here's an example configuration for a ``python-memcached`` based backend with
-an object size limit of 2MB::
-
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-            'LOCATION': '127.0.0.1:11211',
-            'OPTIONS': {
-                'server_max_value_length': 1024 * 1024 * 2,
-            }
-        }
-    }
-
 Here's an example configuration for a ``pylibmc`` based backend that enables
 the binary protocol, SASL authentication, and the ``ketama`` behavior mode::
 
@@ -472,6 +470,24 @@ the binary protocol, SASL authentication, and the ``ketama`` behavior mode::
                 'behaviors': {
                     'ketama': True,
                 }
+            }
+        }
+    }
+
+Here's an example configuration for a ``pymemcache`` based backend that enables
+client pooling (which may improve performance by keeping clients connected),
+treats memcache/network errors as cache misses, and sets the ``TCP_NODELAY``
+flag on the connection's socket::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+            'LOCATION': '127.0.0.1:11211',
+            'OPTIONS': {
+                'no_delay': True,
+                'ignore_exc': True,
+                'max_pool_size': 4,
+                'use_pooling': True,
             }
         }
     }
@@ -516,8 +532,9 @@ cached separately. This middleware expects that a HEAD request is answered with
 the same response headers as the corresponding GET request; in which case it can
 return a cached GET response for HEAD request.
 
-Additionally, ``UpdateCacheMiddleware`` automatically sets a few headers in each
-:class:`~django.http.HttpResponse`:
+Additionally, ``UpdateCacheMiddleware`` automatically sets a few headers in
+each :class:`~django.http.HttpResponse` which affect :ref:`downstream caches
+<downstream-caches>`:
 
 * Sets the ``Expires`` header to the current date/time plus the defined
   :setting:`CACHE_MIDDLEWARE_SECONDS`.
@@ -543,8 +560,7 @@ include the name of the active :term:`language<language code>` -- see also
 :ref:`how-django-discovers-language-preference`). This allows you to easily
 cache multilingual sites without having to create the cache key yourself.
 
-Cache keys also include the active :term:`language <language code>` when
-:setting:`USE_L10N` is set to ``True`` and the :ref:`current time zone
+Cache keys also include the :ref:`current time zone
 <default-current-time-zone>` when :setting:`USE_TZ` is set to ``True``.
 
 __ `Controlling cache: Using other headers`_
@@ -556,8 +572,7 @@ The per-view cache
 
 A more granular way to use the caching framework is by caching the output of
 individual views. ``django.views.decorators.cache`` defines a ``cache_page``
-decorator that will automatically cache the view's response for you. It's easy
-to use::
+decorator that will automatically cache the view's response for you::
 
     from django.views.decorators.cache import cache_page
 
@@ -570,6 +585,9 @@ above example, the result of the ``my_view()`` view will be cached for 15
 minutes. (Note that we've written it as ``60 * 15`` for the purpose of
 readability. ``60 * 15`` will be evaluated to ``900`` -- that is, 15 minutes
 multiplied by 60 seconds per minute.)
+
+The cache timeout set by ``cache_page`` takes precedence over the ``max-age``
+directive from the ``Cache-Control`` header.
 
 The per-view cache, like the per-site cache, is keyed off of the URL. If
 multiple URLs point at the same view, each URL will be cached separately.
@@ -606,6 +624,15 @@ The ``key_prefix`` and ``cache`` arguments may be specified together. The
 ``key_prefix`` argument and the :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`
 specified under :setting:`CACHES` will be concatenated.
 
+Additionally, ``cache_page`` automatically sets ``Cache-Control`` and
+``Expires`` headers in the response which affect :ref:`downstream caches
+<downstream-caches>`.
+
+.. versionchanged:: 3.1
+
+    In older versions, the ``max-age`` directive from the ``Cache-Control``
+    header had precedence over the cache timeout set by ``cache_page``.
+
 Specifying per-view cache in the URLconf
 ----------------------------------------
 
@@ -618,8 +645,8 @@ want to use them without being cached. The solution to these problems is to
 specify the per-view cache in the URLconf rather than next to the view functions
 themselves.
 
-Doing so is easy: simply wrap the view function with ``cache_page`` when you
-refer to it in the URLconf. Here's the old URLconf from earlier::
+You can do so by wrapping the view function with ``cache_page`` when you refer
+to it in the URLconf. Here's the old URLconf from earlier::
 
     urlpatterns = [
         path('foo/<int:code>/', my_view),
@@ -683,7 +710,7 @@ templates to achieve the same result:
     {% get_current_language as LANGUAGE_CODE %}
 
     {% cache 600 welcome LANGUAGE_CODE %}
-        {% trans "Welcome to example.com" %}
+        {% translate "Welcome to example.com" %}
     {% endcache %}
 
 The cache timeout can be a template variable, as long as the template variable
@@ -697,7 +724,7 @@ equivalent:
     {% cache my_timeout sidebar %} ... {% endcache %}
 
 This feature is useful in avoiding repetition in templates. You can set the
-timeout in a variable, in one place, and just reuse that value.
+timeout in a variable, in one place, and reuse that value.
 
 By default, the cache tag will try to use the cache called "template_fragments".
 If no such cache exists, it will fall back to using the default cache. You may
@@ -725,6 +752,7 @@ a cached item, for example:
     # cache key for {% cache 500 sidebar username %}
     >>> key = make_template_fragment_key('sidebar', [username])
     >>> cache.delete(key) # invalidates cached template fragment
+    True
 
 .. _low-level-cache-api:
 
@@ -743,11 +771,11 @@ per-site or per-view cache strategies offer, because you wouldn't want to
 cache the entire result (since some of the data changes often), but you'd still
 want to cache the results that rarely change.
 
-For cases like this, Django exposes a simple, low-level cache API. You can use
-this API to store objects in the cache with any level of granularity you like.
-You can cache any Python object that can be pickled safely: strings,
-dictionaries, lists of model objects, and so forth. (Most common Python objects
-can be pickled; refer to the Python documentation for more information about
+For cases like this, Django exposes a low-level cache API. You can use this API
+to store objects in the cache with any level of granularity you like.  You can
+cache any Python object that can be pickled safely: strings, dictionaries,
+lists of model objects, and so forth. (Most common Python objects can be
+pickled; refer to the Python documentation for more information about
 pickling.)
 
 Accessing the cache
@@ -840,7 +868,7 @@ check the return value. It will return ``True`` if the value was stored,
 
 If you want to get a key's value or set a value if the key isn't in the cache,
 there is the ``get_or_set()`` method. It takes the same parameters as ``get()``
-but the default is set as the new cache value for that key, rather than simply
+but the default is set as the new cache value for that key, rather than
 returned::
 
     >>> cache.get('my_new_key')  # returns None
@@ -881,10 +909,18 @@ failed to be inserted.
 
 .. method:: cache.delete(key, version=None)
 
-You can delete keys explicitly with ``delete()``. This is an easy way of
-clearing the cache for a particular object::
+You can delete keys explicitly with ``delete()`` to clear the cache for a
+particular object::
 
     >>> cache.delete('a')
+    True
+
+``delete()`` returns ``True`` if the key was successfully deleted, ``False``
+otherwise.
+
+.. versionchanged:: 3.1
+
+    The boolean return value was added.
 
 .. method:: cache.delete_many(keys, version=None)
 
@@ -1032,7 +1068,7 @@ key version to provide a final cache key. By default, the three parts
 are joined using colons to produce a final string::
 
     def make_key(key, key_prefix, version):
-        return ':'.join([key_prefix, str(version), key])
+        return '%s:%s:%s' % (key_prefix, version, key)
 
 If you want to combine the parts in different ways, or apply other
 processing to the final key (e.g., taking a hash digest of the key
@@ -1080,6 +1116,8 @@ instance, to do this for the ``locmem`` backend, put this code in a module::
 ...and use the dotted Python path to this class in the
 :setting:`BACKEND <CACHES-BACKEND>` portion of your :setting:`CACHES` setting.
 
+.. _downstream-caches:
+
 Downstream caches
 =================
 
@@ -1111,11 +1149,11 @@ Many Web pages' contents differ based on authentication and a host of other
 variables, and cache systems that blindly save pages based purely on URLs could
 expose incorrect or sensitive data to subsequent visitors to those pages.
 
-For example, say you operate a Web email system, and the contents of the
-"inbox" page obviously depend on which user is logged in. If an ISP blindly
-cached your site, then the first user who logged in through that ISP would have
-their user-specific inbox page cached for subsequent visitors to the site.
-That's not cool.
+For example, if you operate a Web email system, then the contents of the
+"inbox" page depend on which user is logged in. If an ISP blindly cached your
+site, then the first user who logged in through that ISP would have their
+user-specific inbox page cached for subsequent visitors to the site.  That's
+not cool.
 
 Fortunately, HTTP provides a solution to this problem. A number of HTTP headers
 exist to instruct downstream caches to differ their cache contents depending on
@@ -1154,10 +1192,10 @@ In this case, a caching mechanism (such as Django's own cache middleware) will
 cache a separate version of the page for each unique user-agent.
 
 The advantage to using the ``vary_on_headers`` decorator rather than manually
-setting the ``Vary`` header (using something like
-``response['Vary'] = 'user-agent'``) is that the decorator *adds* to the
-``Vary`` header (which may already exist), rather than setting it from scratch
-and potentially overriding anything that was already in there.
+setting the ``Vary`` header (using something like ``response.headers['Vary'] =
+'user-agent'``) is that the decorator *adds* to the ``Vary`` header (which may
+already exist), rather than setting it from scratch and potentially overriding
+anything that was already in there.
 
 You can pass multiple headers to ``vary_on_headers()``::
 
@@ -1278,6 +1316,7 @@ Here are some more examples:
 * ``no_transform=True``
 * ``must_revalidate=True``
 * ``stale_while_revalidate=num_seconds``
+* ``no_cache=True``
 
 The full list of known directives can be found in the `IANA registry`_
 (note that not all of them apply to responses).

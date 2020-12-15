@@ -24,7 +24,7 @@ class FKDataNaturalKey(models.Model):
 
 
 class NaturalKeyThing(models.Model):
-    key = models.CharField(max_length=100)
+    key = models.CharField(max_length=100, unique=True)
     other_thing = models.ForeignKey('NaturalKeyThing', on_delete=models.CASCADE, null=True)
     other_things = models.ManyToManyField('NaturalKeyThing', related_name='thing_m2m_set')
 

@@ -61,7 +61,7 @@ either all or none of the changes will be committed.
     generating a streaming response, since there's no sensible way to handle
     errors after starting to send the response.
 
-In practice, this feature simply wraps every view function in the :func:`atomic`
+In practice, this feature wraps every view function in the :func:`atomic`
 decorator described below.
 
 Note that only the execution of your view is enclosed in the transactions.
@@ -93,7 +93,7 @@ Controlling transactions explicitly
 
 Django provides a single API to control database transactions.
 
-.. function:: atomic(using=None, savepoint=True)
+.. function:: atomic(using=None, savepoint=True, durable=False)
 
     Atomicity is the defining property of database transactions. ``atomic``
     allows us to create a block of code within which the atomicity on the
@@ -104,6 +104,12 @@ Django provides a single API to control database transactions.
     ``atomic`` blocks can be nested. In this case, when an inner block
     completes successfully, its effects can still be rolled back if an
     exception is raised in the outer block at a later point.
+
+    It is sometimes useful to ensure an ``atomic`` block is always the
+    outermost ``atomic`` block, ensuring that any database changes are
+    committed when the block is exited without errors. This is known as
+    durability and can be achieved by setting ``durable=True``. If the
+    ``atomic`` block is nested within another it raises a ``RuntimeError``.
 
     ``atomic`` is usable both as a :py:term:`decorator`::
 
@@ -146,10 +152,10 @@ Django provides a single API to control database transactions.
     In this example, even if ``generate_relationships()`` causes a database
     error by breaking an integrity constraint, you can execute queries in
     ``add_children()``, and the changes from ``create_parent()`` are still
-    there. Note that any operations attempted in ``generate_relationships()``
-    will already have been rolled back safely when ``handle_exception()`` is
-    called, so the exception handler can also operate on the database if
-    necessary.
+    there and bound to the same transaction. Note that any operations attempted
+    in ``generate_relationships()`` will already have been rolled back safely
+    when ``handle_exception()`` is called, so the exception handler can also
+    operate on the database if necessary.
 
     .. admonition:: Avoid catching exceptions inside ``atomic``!
 
@@ -232,6 +238,16 @@ Django provides a single API to control database transactions.
     is especially important if you're using :func:`atomic` in long-running
     processes, outside of Django's request / response cycle.
 
+.. warning::
+
+    :class:`django.test.TestCase` disables the durability check to allow
+    testing durable atomic blocks in a transaction for performance reasons. Use
+    :class:`django.test.TransactionTestCase` for testing durability.
+
+.. versionchanged:: 3.2
+
+    The ``durable`` argument was added.
+
 Autocommit
 ==========
 
@@ -281,7 +297,7 @@ Sometimes you need to perform an action related to the current database
 transaction, but only if the transaction successfully commits. Examples might
 include a `Celery`_ task, an email notification, or a cache invalidation.
 
-.. _Celery: http://www.celeryproject.org/
+.. _Celery: https://pypi.org/project/celery/
 
 Django provides the :func:`on_commit` function to register callback functions
 that should be executed after a transaction is successfully committed:
@@ -355,8 +371,8 @@ Exception handling
 
 If one on-commit function within a given transaction raises an uncaught
 exception, no later registered functions in that same transaction will run.
-This is, of course, the same behavior as if you'd executed the functions
-sequentially yourself without :func:`on_commit`.
+This is the same behavior as if you'd executed the functions sequentially
+yourself without :func:`on_commit`.
 
 Timing of execution
 -------------------
@@ -368,9 +384,9 @@ the transaction. For the intended use cases (mail notifications, Celery tasks,
 etc.), this should be fine. If it's not (if your follow-up action is so
 critical that its failure should mean the failure of the transaction itself),
 then you don't want to use the :func:`on_commit` hook. Instead, you may want
-`two-phase commit`_ such as the `psycopg Two-Phase Commit protocol support`_
-and the `optional Two-Phase Commit Extensions in the Python DB-API
-specification`_.
+`two-phase commit`_ such as the :ref:`psycopg Two-Phase Commit protocol support
+<psycopg2:tpc>` and the :pep:`optional Two-Phase Commit Extensions in the
+Python DB-API specification <249#optional-two-phase-commit-extensions>`.
 
 Callbacks are not run until autocommit is restored on the connection following
 the commit (because otherwise any queries done in a callback would open an
@@ -387,8 +403,6 @@ autocommit is disabled and you are not within an atomic block will result in an
 error.
 
 .. _two-phase commit: https://en.wikipedia.org/wiki/Two-phase_commit_protocol
-.. _psycopg Two-Phase Commit protocol support: http://initd.org/psycopg/docs/usage.html#tpc
-.. _optional Two-Phase Commit Extensions in the Python DB-API specification: https://www.python.org/dev/peps/pep-0249/#optional-two-phase-commit-extensions
 
 Use in tests
 ------------
@@ -396,9 +410,19 @@ Use in tests
 Django's :class:`~django.test.TestCase` class wraps each test in a transaction
 and rolls back that transaction after each test, in order to provide test
 isolation. This means that no transaction is ever actually committed, thus your
-:func:`on_commit` callbacks will never be run. If you need to test the results
-of an :func:`on_commit` callback, use a
-:class:`~django.test.TransactionTestCase` instead.
+:func:`on_commit` callbacks will never be run.
+
+You can overcome this limitation by using
+:meth:`.TestCase.captureOnCommitCallbacks`. This captures your
+:func:`on_commit` callbacks in a list, allowing you to make assertions on them,
+or emulate the transaction committing by calling them.
+
+Another way to overcome the limitation is to use
+:class:`~django.test.TransactionTestCase` instead of
+:class:`~django.test.TestCase`. This will mean your transactions are committed,
+and the callbacks will run. However
+:class:`~django.test.TransactionTestCase` flushes the database between tests,
+which is significantly slower than :class:`~django.test.TestCase`\'s isolation.
 
 Why no rollback hook?
 ---------------------
@@ -410,7 +434,7 @@ For instance, if your database connection is dropped because your process was
 killed without a chance to shut down gracefully, your rollback hook will never
 run.
 
-The solution is simple: instead of doing something during the atomic block
+But there is a solution: instead of doing something during the atomic block
 (transaction) and then undoing it if the transaction fails, use
 :func:`on_commit` to delay doing it in the first place until after the
 transaction succeeds. It's a lot easier to undo something you never did in the
@@ -432,8 +456,8 @@ Low-level APIs
 Autocommit
 ----------
 
-Django provides a straightforward API in the :mod:`django.db.transaction`
-module to manage the autocommit state of each database connection.
+Django provides an API in the :mod:`django.db.transaction` module to manage the
+autocommit state of each database connection.
 
 .. function:: get_autocommit(using=None)
 
@@ -622,7 +646,7 @@ Handling exceptions within PostgreSQL transactions
 Inside a transaction, when a call to a PostgreSQL cursor raises an exception
 (typically ``IntegrityError``), all subsequent SQL in the same transaction
 will fail with the error "current transaction is aborted, queries ignored
-until end of transaction block". While simple use of ``save()`` is unlikely
+until end of transaction block". While the basic use of ``save()`` is unlikely
 to raise an exception in PostgreSQL, there are more advanced usage patterns
 which might, such as saving objects with unique fields, saving using the
 force_insert/force_update flag, or invoking custom SQL.

@@ -1,9 +1,8 @@
 import unittest
 
-from django.db import connection
+from django.db import NotSupportedError, connection
 from django.db.models import CharField
 from django.db.models.functions import SHA224
-from django.db.utils import NotSupportedError
 from django.test import TestCase
 from django.test.utils import register_lookup
 
@@ -21,7 +20,6 @@ class SHA224Tests(TestCase):
             Author(alias=None),
         ])
 
-    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support SHA224.")
     def test_basic(self):
         authors = Author.objects.annotate(
             sha224_alias=SHA224('alias'),
@@ -38,7 +36,6 @@ class SHA224Tests(TestCase):
             ],
         )
 
-    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support SHA224.")
     def test_transform(self):
         with register_lookup(CharField, SHA224):
             authors = Author.objects.filter(

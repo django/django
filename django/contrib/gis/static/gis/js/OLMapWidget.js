@@ -1,18 +1,17 @@
 /* global ol */
-
-var GeometryTypeControl = function(opt_options) {
-    'use strict';
+'use strict';
+function GeometryTypeControl(opt_options) {
     // Map control to switch type when geometry type is unknown
-    var options = opt_options || {};
+    const options = opt_options || {};
 
-    var element = document.createElement('div');
+    const element = document.createElement('div');
     element.className = 'switch-type type-' + options.type + ' ol-control ol-unselectable';
     if (options.active) {
-        element.className += " type-active";
+        element.classList.add("type-active");
     }
 
-    var self = this;
-    var switchType = function(e) {
+    const self = this;
+    const switchType = function(e) {
         e.preventDefault();
         if (options.widget.currentGeometryType !== self) {
             options.widget.map.removeInteraction(options.widget.interactions.draw);
@@ -21,10 +20,9 @@ var GeometryTypeControl = function(opt_options) {
                 type: options.type
             });
             options.widget.map.addInteraction(options.widget.interactions.draw);
-            var className = options.widget.currentGeometryType.element.className.replace(/ type-active/g, '');
-            options.widget.currentGeometryType.element.className = className;
+            options.widget.currentGeometryType.element.classList.remove('type-active');
             options.widget.currentGeometryType = self;
-            element.className += " type-active";
+            element.classList.add("type-active");
         }
     };
 
@@ -38,9 +36,8 @@ var GeometryTypeControl = function(opt_options) {
 ol.inherits(GeometryTypeControl, ol.control.Control);
 
 // TODO: allow deleting individual features (#8972)
-(function() {
-    'use strict';
-    var jsonFormat = new ol.format.GeoJSON();
+{
+    const jsonFormat = new ol.format.GeoJSON();
 
     function MapWidget(options) {
         this.map = null;
@@ -53,11 +50,11 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
             default_lat: 0,
             default_lon: 0,
             default_zoom: 12,
-            is_collection: options.geom_name.indexOf('Multi') > -1 || options.geom_name.indexOf('Collection') > -1
+            is_collection: options.geom_name.includes('Multi') || options.geom_name.includes('Collection')
         };
 
         // Altering using user-provided options
-        for (var property in options) {
+        for (const property in options) {
             if (options.hasOwnProperty(property)) {
                 this.options[property] = options[property];
             }
@@ -79,9 +76,9 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
         });
 
         // Populate and set handlers for the feature container
-        var self = this;
+        const self = this;
         this.featureCollection.on('add', function(event) {
-            var feature = event.element;
+            const feature = event.element;
             feature.on('change', function() {
                 self.serializeFeatures();
             });
@@ -93,10 +90,10 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
             }
         });
 
-        var initial_value = document.getElementById(this.options.id).value;
+        const initial_value = document.getElementById(this.options.id).value;
         if (initial_value) {
-            var features = jsonFormat.readFeatures('{"type": "Feature", "geometry": ' + initial_value + '}');
-            var extent = ol.extent.createEmpty();
+            const features = jsonFormat.readFeatures('{"type": "Feature", "geometry": ' + initial_value + '}');
+            const extent = ol.extent.createEmpty();
             features.forEach(function(feature) {
                 this.featureOverlay.getSource().addFeature(feature);
                 ol.extent.extend(extent, feature.getGeometry().getExtent());
@@ -114,7 +111,7 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
     }
 
     MapWidget.prototype.createMap = function() {
-        var map = new ol.Map({
+        const map = new ol.Map({
             target: this.options.map_id,
             layers: [this.options.base_layer],
             view: new ol.View({
@@ -135,8 +132,8 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
         });
 
         // Initialize the draw interaction
-        var geomType = this.options.geom_name;
-        if (geomType === "Unknown" || geomType === "GeometryCollection") {
+        let geomType = this.options.geom_name;
+        if (geomType === "Geometry" || geomType === "GeometryCollection") {
             // Default to Point, but create icons to switch type
             geomType = "Point";
             this.currentGeometryType = new GeometryTypeControl({widget: this, type: "Point", active: true});
@@ -155,7 +152,7 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
     };
 
     MapWidget.prototype.defaultCenter = function() {
-        var center = [this.options.default_lon, this.options.default_lat];
+        const center = [this.options.default_lon, this.options.default_lat];
         if (this.options.map_srid) {
             return ol.proj.transform(center, 'EPSG:4326', this.map.getView().getProjection());
         }
@@ -166,8 +163,8 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
         this.interactions.draw.setActive(true);
         if (this.typeChoices) {
             // Show geometry type icons
-            var divs = document.getElementsByClassName("switch-type");
-            for (var i = 0; i !== divs.length; i++) {
+            const divs = document.getElementsByClassName("switch-type");
+            for (let i = 0; i !== divs.length; i++) {
                 divs[i].style.visibility = "visible";
             }
         }
@@ -178,8 +175,8 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
             this.interactions.draw.setActive(false);
             if (this.typeChoices) {
                 // Hide geometry type icons
-                var divs = document.getElementsByClassName("switch-type");
-                for (var i = 0; i !== divs.length; i++) {
+                const divs = document.getElementsByClassName("switch-type");
+                for (let i = 0; i !== divs.length; i++) {
                     divs[i].style.visibility = "hidden";
                 }
             }
@@ -195,18 +192,18 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
 
     MapWidget.prototype.serializeFeatures = function() {
         // Three use cases: GeometryCollection, multigeometries, and single geometry
-        var geometry = null;
-        var features = this.featureOverlay.getSource().getFeatures();
+        let geometry = null;
+        const features = this.featureOverlay.getSource().getFeatures();
         if (this.options.is_collection) {
             if (this.options.geom_name === "GeometryCollection") {
-                var geometries = [];
-                for (var i = 0; i < features.length; i++) {
+                const geometries = [];
+                for (let i = 0; i < features.length; i++) {
                     geometries.push(features[i].getGeometry());
                 }
                 geometry = new ol.geom.GeometryCollection(geometries);
             } else {
                 geometry = features[0].getGeometry().clone();
-                for (var j = 1; j < features.length; j++) {
+                for (let j = 1; j < features.length; j++) {
                     switch (geometry.getType()) {
                     case "MultiPoint":
                         geometry.appendPoint(features[j].getGeometry().getPoint(0));
@@ -228,4 +225,4 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
     };
 
     window.MapWidget = MapWidget;
-})();
+}

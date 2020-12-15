@@ -5,7 +5,6 @@ from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
 from django.utils import timezone
 
-from ..utils import no_oracle
 from .models import (
     Article, Author, Book, City, DirectoryEntry, Event, Location, Parcel,
 )
@@ -208,8 +207,6 @@ class RelatedGeoModelTest(TestCase):
             self.assertEqual(val_dict['id'], c_id)
             self.assertEqual(val_dict['location__id'], l_id)
 
-    # TODO: fix on Oracle -- qs2 returns an empty result for an unknown reason
-    @no_oracle
     def test10_combine(self):
         "Testing the combination of two QuerySets (#10807)."
         buf1 = City.objects.get(name='Aurora').location.point.buffer(0.1)
@@ -222,10 +219,7 @@ class RelatedGeoModelTest(TestCase):
         self.assertIn('Aurora', names)
         self.assertIn('Kecksburg', names)
 
-    # TODO: fix on Oracle -- get the following error because the SQL is ordered
-    # by a geometry object, which Oracle apparently doesn't like:
-    #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type
-    @no_oracle
+    @skipUnlessDBFeature('allows_group_by_lob')
     def test12a_count(self):
         "Testing `Count` aggregate on geo-fields."
         # The City, 'Fort Worth' uses the same location as Dallas.
@@ -247,10 +241,7 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(1, len(vqs))
         self.assertEqual(3, vqs[0]['num_books'])
 
-    # TODO: fix on Oracle -- get the following error because the SQL is ordered
-    # by a geometry object, which Oracle apparently doesn't like:
-    #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type
-    @no_oracle
+    @skipUnlessDBFeature('allows_group_by_lob')
     def test13c_count(self):
         "Testing `Count` aggregate with `.values()`.  See #15305."
         qs = Location.objects.filter(id=5).annotate(num_cities=Count('city')).values('id', 'point', 'num_cities')
@@ -258,8 +249,6 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(2, qs[0]['num_cities'])
         self.assertIsInstance(qs[0]['point'], GEOSGeometry)
 
-    # TODO: The phantom model does appear on Oracle.
-    @no_oracle
     def test13_select_related_null_fk(self):
         "Testing `select_related` on a nullable ForeignKey."
         Book.objects.create(title='Without Author')

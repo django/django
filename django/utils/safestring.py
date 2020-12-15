@@ -5,7 +5,7 @@ that the producer of the string has already turned characters that should not
 be interpreted by the HTML engine (e.g. '<') into the appropriate entities.
 """
 
-from django.utils.functional import wraps
+from functools import wraps
 
 
 class SafeData:

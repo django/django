@@ -143,7 +143,7 @@ class UpdatedToPathTests(SimpleTestCase):
         self.assertEqual(len(result), 1)
         warning = result[0]
         self.assertEqual(warning.id, '2_0.W001')
-        expected_msg = "Your URL pattern '(?P<named-group>\\d+)' has a route"
+        expected_msg = "Your URL pattern '(?P<named_group>\\d+)' has a route"
         self.assertIn(expected_msg, warning.msg)
 
     @override_settings(ROOT_URLCONF='check_framework.urls.path_compatibility.beginning_with_caret')

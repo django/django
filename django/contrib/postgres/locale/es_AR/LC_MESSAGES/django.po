@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Ramiro Morales, 2015-2018
+# Ramiro Morales, 2015-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-07-31 16:47+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
 "MIME-Version: 1.0\n"
@@ -31,24 +31,14 @@ msgid "Map of strings to strings/nulls"
 msgstr "Mapa de cadenas a cadenas/nulos"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "El valor de \"%(key)s\" no es una cadena o nulo."
-
-msgid "A JSON object"
-msgstr "Un objeto JSON"
-
-msgid "Value must be valid JSON."
-msgstr "El valor debe ser JSON válido."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "El valor de \"%(key)s” no es una cadena o nulo."
 
 msgid "Could not load JSON data."
 msgstr "No se han podido cargar los datos JSON."
 
 msgid "Input must be a JSON dictionary."
 msgstr "debe ser un diccionario JSON."
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "El valor de '%(value)s' debe ser JSON válido."
 
 msgid "Enter two valid values."
 msgstr "Introduzca dos valores válidos."

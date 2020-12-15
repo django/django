@@ -1,6 +1,6 @@
 import datetime
 import decimal
-import re
+import json
 from collections import defaultdict
 
 from django.core.exceptions import FieldDoesNotExist
@@ -11,12 +11,13 @@ from django.forms.utils import pretty_name
 from django.urls import NoReverseMatch, reverse
 from django.utils import formats, timezone
 from django.utils.html import format_html
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.text import capfirst
 from django.utils.translation import ngettext, override as translation_override
 
 QUOTE_MAP = {i: '_%02X' % i for i in b'":/_#?;@&=+$,"[]<>%\n\\'}
 UNQUOTE_MAP = {v: chr(k) for k, v in QUOTE_MAP.items()}
-UNQUOTE_RE = re.compile('_(?:%s)' % '|'.join([x[1:] for x in UNQUOTE_MAP]))
+UNQUOTE_RE = _lazy_re_compile('_(?:%s)' % '|'.join([x[1:] for x in UNQUOTE_MAP]))
 
 
 class FieldIsAForeignKeyColumnName(Exception):
@@ -74,7 +75,7 @@ def quote(s):
 
 def unquote(s):
     """Undo the effects of quote()."""
-    return UNQUOTE_RE.sub(lambda m: UNQUOTE_MAP[m.group(0)], s)
+    return UNQUOTE_RE.sub(lambda m: UNQUOTE_MAP[m[0]], s)
 
 
 def flatten(fields):
@@ -181,10 +182,12 @@ class NestedObjects(Collector):
             return super().collect(objs, source_attr=source_attr, **kwargs)
         except models.ProtectedError as e:
             self.protected.update(e.protected_objects)
+        except models.RestrictedError as e:
+            self.protected.update(e.restricted_objects)
 
-    def related_objects(self, related, objs):
-        qs = super().related_objects(related, objs)
-        return qs.select_related(related.field.name)
+    def related_objects(self, related_model, related_fields, objs):
+        qs = super().related_objects(related_model, related_fields, objs)
+        return qs.select_related(*[related_field.name for related_field in related_fields])
 
     def _nested(self, obj, seen, format_callback):
         if obj in seen:
@@ -335,7 +338,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
             else:
                 message = "Unable to lookup '%s' on %s" % (name, model._meta.object_name)
                 if model_admin:
-                    message += " or %s" % (model_admin.__class__.__name__,)
+                    message += " or %s" % model_admin.__class__.__name__
                 if form:
                     message += " or %s" % form.__class__.__name__
                 raise AttributeError(message)
@@ -396,6 +399,11 @@ def display_for_field(value, field, empty_value_display):
         return formats.number_format(value)
     elif isinstance(field, models.FileField) and value:
         return format_html('<a href="{}">{}</a>', value.url, value)
+    elif isinstance(field, models.JSONField) and value:
+        try:
+            return json.dumps(value, ensure_ascii=False, cls=field.encoder)
+        except TypeError:
+            return display_for_value(value, empty_value_display)
     else:
         return display_for_value(value, empty_value_display)
 

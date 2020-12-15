@@ -2,16 +2,16 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Kowit Charoenratchatabhan <kowit.s.c@gmail.com>, 2013-2014,2017-2018
+# Kowit Charoenratchatabhan <kowit.s.c@gmail.com>, 2013-2014,2017-2019
 # piti118 <piti118@gmail.com>, 2012
 # Suteepat Damrongyingsupab <tianissimo@hotmail.com>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-05-28 01:29+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-17 01:31+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Thai (http://www.transifex.com/django/django/language/th/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -65,10 +65,10 @@ msgid "This year"
 msgstr "ปีนี้"
 
 msgid "No date"
-msgstr ""
+msgstr "ไม่รวมวันที่"
 
 msgid "Has date"
-msgstr ""
+msgstr "รวมวันที่"
 
 #, python-format
 msgid ""
@@ -87,13 +87,13 @@ msgid "Remove"
 msgstr "ถอดออก"
 
 msgid "Addition"
-msgstr ""
+msgstr "เพิ่ม"
 
 msgid "Change"
 msgstr "เปลี่ยนแปลง"
 
 msgid "Deletion"
-msgstr ""
+msgstr "ลบ"
 
 msgid "action time"
 msgstr "เวลาลงมือ"
@@ -102,13 +102,13 @@ msgid "user"
 msgstr "ผู้ใช้"
 
 msgid "content type"
-msgstr ""
+msgstr "content type"
 
 msgid "object id"
 msgstr "อ็อบเจ็กต์ไอดี"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "object repr"
 
@@ -125,22 +125,22 @@ msgid "log entries"
 msgstr "log entries"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "\"%(object)s\" ถูกเพิ่ม"
+msgid "Added “%(object)s”."
+msgstr ""
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "\"%(object)s\" ถูกเปลี่ยน - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr ""
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "\"%(object)s\" ถูกลบ"
+msgid "Deleted “%(object)s.”"
+msgstr ""
 
 msgid "LogEntry Object"
 msgstr "อ็อบเจ็กต์ LogEntry"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
+msgid "Added {name} “{object}”."
 msgstr ""
 
 msgid "Added."
@@ -150,7 +150,7 @@ msgid "and"
 msgstr "และ"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
 msgstr ""
 
 #, python-brace-format
@@ -158,7 +158,7 @@ msgid "Changed {fields}."
 msgstr "เปลี่ยน {fields}."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
 msgstr ""
 
 msgid "No fields changed."
@@ -167,41 +167,38 @@ msgstr "ไม่มีฟิลด์ใดถูกเปลี่ยน"
 msgid "None"
 msgstr "ไม่มี"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid "The {name} “{obj}” was added successfully."
 msgstr ""
 
 msgid "You may edit it again below."
+msgstr "คุณสามารถแก้ไขได้อีกครั้งด้านล่าง"
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
+msgid "The {name} “{obj}” was changed successfully."
 msgstr ""
 
 msgid ""
@@ -215,11 +212,11 @@ msgid "No action selected."
 msgstr "ไม่มีคำสั่งที่ถูกเลือก"
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "ลบ %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr ""
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
 
 #, python-format
@@ -232,7 +229,7 @@ msgstr "เปลี่ยน %s"
 
 #, python-format
 msgid "View %s"
-msgstr ""
+msgstr "ดู %s"
 
 msgid "Database error"
 msgstr "เกิดความผิดพลาดที่ฐานข้อมูล"
@@ -288,8 +285,8 @@ msgstr "การจัดการ %(app)s"
 msgid "Page not found"
 msgstr "ไม่พบหน้านี้"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "เสียใจด้วย ไม่พบหน้าที่ต้องการ"
+msgid "We’re sorry, but the requested page could not be found."
+msgstr ""
 
 msgid "Home"
 msgstr "หน้าหลัก"
@@ -304,11 +301,9 @@ msgid "Server Error <em>(500)</em>"
 msgstr "เซิร์ฟเวอร์ขัดข้อง <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"เกิดเหตุขัดข้องขี้น ทางเราได้รายงานไปยังผู้ดูแลระบบแล้ว และจะดำเนินการแก้ไขอย่างเร่งด่วน "
-"ขอบคุณสำหรับการรายงานความผิดพลาด"
 
 msgid "Run the selected action"
 msgstr "รันคำสั่งที่ถูกเลือก"
@@ -327,9 +322,9 @@ msgid "Clear selection"
 msgstr "เคลียร์ตัวเลือก"
 
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
-msgstr "ขั้นตอนแรก ใส่ชื่อผู้ใช้และรหัสผ่าน หลังจากนั้นคุณจะสามารถแก้ไขข้อมูลผู้ใช้ได้มากขึ้น"
+msgstr ""
 
 msgid "Enter a username and password."
 msgstr "กรุณาใส่ชื่อผู้ใช้และรหัสผ่าน"
@@ -338,7 +333,7 @@ msgid "Change password"
 msgstr "เปลี่ยนรหัสผ่าน"
 
 msgid "Please correct the error below."
-msgstr ""
+msgstr "กรุณาแก้ไขข้อผิดพลาดด้านล่าง"
 
 msgid "Please correct the errors below."
 msgstr "กรุณาแก้ไขข้อผิดพลาดด้านล่าง"
@@ -351,7 +346,7 @@ msgid "Welcome,"
 msgstr "ยินดีต้อนรับ,"
 
 msgid "View site"
-msgstr ""
+msgstr "ดูที่หน้าเว็บ"
 
 msgid "Documentation"
 msgstr "เอกสารประกอบ"
@@ -410,13 +405,13 @@ msgstr ""
 "ข้อมูลที่เกี่ยวข้องทั้งหมดจะถูกลบไปด้วย:"
 
 msgid "Objects"
-msgstr ""
+msgstr "อ็อบเจ็กต์"
 
-msgid "Yes, I'm sure"
-msgstr "ใช่, ฉันแน่ใจ"
+msgid "Yes, I’m sure"
+msgstr ""
 
 msgid "No, take me back"
-msgstr ""
+msgstr "ไม่ พาฉันกลับ"
 
 msgid "Delete multiple objects"
 msgstr "ลบหลายอ็อบเจ็กต์"
@@ -445,7 +440,7 @@ msgstr ""
 "และรายการที่เกี่ยวข้องทั้งหมดต่อไปนี้จะถูกลบด้วย"
 
 msgid "View"
-msgstr ""
+msgstr "ดู:"
 
 msgid "Delete?"
 msgstr "ลบ?"
@@ -455,7 +450,7 @@ msgid " By %(filter_title)s "
 msgstr " โดย %(filter_title)s "
 
 msgid "Summary"
-msgstr ""
+msgstr "สรุป"
 
 #, python-format
 msgid "Models in the %(name)s application"
@@ -464,14 +459,14 @@ msgstr "โมเดลในแอป %(name)s"
 msgid "Add"
 msgstr "เพิ่ม"
 
-msgid "You don't have permission to view or edit anything."
+msgid "You don’t have permission to view or edit anything."
 msgstr ""
 
 msgid "Recent actions"
-msgstr ""
+msgstr "การกระทำล่าสุด"
 
 msgid "My actions"
-msgstr ""
+msgstr "การกระทำของฉัน"
 
 msgid "None available"
 msgstr "ไม่ว่าง"
@@ -480,18 +475,18 @@ msgid "Unknown content"
 msgstr "ไม่ทราบเนื้อหา"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"มีสิ่งผิดปกติเกิดขึ้นกับการติดตั้งฐานข้อมูล กรุณาตรวจสอบอีกครั้งว่าฐานข้อมูลได้ถูกติดตั้งแล้ว "
-"หรือฐานข้อมูลสามารถอ่านและเขียนได้โคยผู้ใช้นี้"
 
 #, python-format
 msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
+"คุณได้ลงชื่อเป็น %(username)s แต่ไม่ได้รับอนุญาตให้เข้าถึงหน้านี้ "
+"คุณต้องการลงชื่อเข้าใช้บัญชีอื่นหรือไม่?"
 
 msgid "Forgotten your password or username?"
 msgstr "ลืมรหัสผ่านหรือชื่อผู้ใช้ของคุณหรือไม่"
@@ -506,9 +501,9 @@ msgid "Action"
 msgstr "คำสั่ง"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
-msgstr "อ็อบเจ็กต์นี้ไม่ได้แก้ไขประวัติ เป็นไปได้ว่ามันอาจจะไม่ได้ถูกเพิ่มเข้าไปโดยระบบ"
+msgstr ""
 
 msgid "Show all"
 msgstr "แสดงทั้งหมด"
@@ -516,24 +511,8 @@ msgstr "แสดงทั้งหมด"
 msgid "Save"
 msgstr "บันทึก"
 
-msgid "Popup closing..."
-msgstr ""
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr ""
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr ""
+msgid "Popup closing…"
+msgstr "ปิดป๊อปอัป ..."
 
 msgid "Search"
 msgstr "ค้นหา"
@@ -557,10 +536,22 @@ msgid "Save and continue editing"
 msgstr "บันทึกและกลับมาแก้ไข"
 
 msgid "Save and view"
-msgstr ""
+msgstr "บันทึกและดู"
 
 msgid "Close"
-msgstr ""
+msgstr "ปิด"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "เปลี่ยนแปลง %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "เพิ่ม %(model)sอีก"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "ลบ %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "ขอบคุณที่สละเวลาอันมีค่าให้กับเว็บไซต์ของเราในวันนี้"
@@ -575,11 +566,9 @@ msgid "Your password was changed."
 msgstr "รหัสผ่านของคุณถูกเปลี่ยนไปแล้ว"
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"กรุณาใส่รหัสผ่านเดิม ด้วยเหตุผลทางด้านการรักษาความปลอดภัย "
-"หลังจากนั้นให้ใส่รหัสผ่านใหม่อีกสองครั้ง เพื่อตรวจสอบว่าคุณได้พิมพ์รหัสอย่างถูกต้อง"
 
 msgid "Change my password"
 msgstr "เปลี่ยนรหัสผ่านของฉัน"
@@ -611,16 +600,14 @@ msgstr ""
 "การตั้งรหัสผ่านใหม่ไม่สำเร็จ เป็นเพราะว่าหน้านี้ได้ถูกใช้งานไปแล้ว กรุณาทำการตั้งรหัสผ่านใหม่อีกครั้ง"
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
-msgstr "เราได้ส่งอีเมลวิธีการตั้งรหัสผ่าน ไปที่อีเมลที่คุณให้ไว้เรียบร้อยแล้ว และคุณจะได้รับเร็วๆ นี้"
+msgstr ""
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"หากคุณไม่ได้รับอีเมล โปรดให้แน่ใจว่าคุณได้ป้อนอีเมลที่คุณลงทะเบียน "
-"และตรวจสอบโฟลเดอร์สแปมของคุณแล้ว"
 
 #, python-format
 msgid ""
@@ -632,8 +619,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "กรุณาไปที่หน้านี้และเลือกรหัสผ่านใหม่:"
 
-msgid "Your username, in case you've forgotten:"
-msgstr "ชื่อผู้ใช้ของคุณ ในกรณีที่คุณถูกลืม:"
+msgid "Your username, in case you’ve forgotten:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "ขอบคุณสำหรับการใช้งานเว็บไซต์ของเรา"
@@ -643,9 +630,9 @@ msgid "The %(site_name)s team"
 msgstr "%(site_name)s ทีม"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
-msgstr "ลืมรหัสผ่าน? กรุณาใส่อีเมลด้านล่าง เราจะส่งวิธีการในการตั้งรหัสผ่านใหม่ไปให้คุณทางอีเมล"
+msgstr ""
 
 msgid "Email address:"
 msgstr "อีเมล:"
@@ -666,7 +653,7 @@ msgstr "เลือก %s เพื่อเปลี่ยนแปลง"
 
 #, python-format
 msgid "Select %s to view"
-msgstr ""
+msgstr "เลือก %s เพื่อดู"
 
 msgid "Date:"
 msgstr "วันที่ :"
