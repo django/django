@@ -1024,8 +1024,8 @@ The amount by which the DATAFILE_TMP is extended when more space is required.
 
 .. setting:: DATA_UPLOAD_MAX_MEMORY_SIZE
 
-DATA_UPLOAD_MAX_MEMORY_SIZE
----------------------------
+``DATA_UPLOAD_MAX_MEMORY_SIZE``
+-------------------------------
 
 Default: ``2621440`` (i.e. 2.5 MB).
 
@@ -1046,8 +1046,8 @@ See also :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`.
 
 .. setting:: DATA_UPLOAD_MAX_NUMBER_FIELDS
 
-DATA_UPLOAD_MAX_NUMBER_FIELDS
------------------------------
+``DATA_UPLOAD_MAX_NUMBER_FIELDS``
+---------------------------------
 
 Default: ``1000``
 
