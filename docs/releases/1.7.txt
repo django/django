@@ -127,7 +127,8 @@ composite keys in future releases of Django, the
 
 This method takes no arguments, and returns a tuple of four items:
 
-* ``name``: The field's attribute name on its parent model, or None if it is not part of a model
+* ``name``: The field's attribute name on its parent model, or ``None`` if it
+  is not part of a model
 * ``path``: A dotted, Python path to the class of this field, including the class name.
 * ``args``: Positional arguments, as a list
 * ``kwargs``: Keyword arguments, as a dict
