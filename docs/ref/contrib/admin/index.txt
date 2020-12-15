@@ -2953,6 +2953,13 @@ Templates can override or extend base admin templates as described in
     abstract. and ``django.contrib.admin.sites.AlreadyRegistered`` if a model
     is already registered.
 
+.. method:: AdminSite.unregister(model_or_iterable)
+
+    Unregisters the given model class (or iterable of classes).
+
+    Raises ``django.contrib.admin.sites.NotRegistered`` if a model isn't
+    already registered.
+
 .. _hooking-adminsite-to-urlconf:
 
 Hooking ``AdminSite`` instances into your URLconf
