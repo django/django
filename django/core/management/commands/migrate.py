@@ -37,6 +37,10 @@ class Command(BaseCommand):
                  'migration. Use the name "zero" to unapply all migrations.',
         )
         parser.add_argument(
+            '--before', action='store_true',
+            help='Migrate backwards to the specified migration and unapply it as well.',
+        )
+        parser.add_argument(
             '--noinput', '--no-input', action='store_false', dest='interactive',
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
@@ -109,6 +113,9 @@ class Command(BaseCommand):
             )
 
         # If they supplied command line arguments, work out what they mean.
+        if options['before'] and not options['migration_name']:
+            raise CommandError("Can't use '--before' without specifying a migration.")
+
         run_syncdb = options['run_syncdb']
         target_app_labels_only = True
         if options['app_label']:
@@ -147,7 +154,7 @@ class Command(BaseCommand):
         else:
             targets = executor.loader.graph.leaf_nodes()
 
-        plan = executor.migration_plan(targets)
+        plan = executor.migration_plan(targets, before=options['before'])
         exit_dry = plan and options['check_unapplied']
 
         if options['plan']:

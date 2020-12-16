@@ -19,7 +19,7 @@ class MigrationExecutor:
         self.recorder = MigrationRecorder(self.connection)
         self.progress_callback = progress_callback
 
-    def migration_plan(self, targets, clean_start=False):
+    def migration_plan(self, targets, clean_start=False, before=False):
         """
         Given a set of targets, return a list of (Migration instance, backwards?).
         """
@@ -40,21 +40,29 @@ class MigrationExecutor:
             # If the migration is already applied, do backwards mode,
             # otherwise do forwards mode.
             elif target in applied:
-                # Don't migrate backwards all the way to the target node (that
-                # may roll back dependencies in other apps that don't need to
-                # be rolled back); instead roll back through target's immediate
-                # child(ren) in the same app, and no further.
-                next_in_app = sorted(
-                    n for n in
-                    self.loader.graph.node_map[target].children
-                    if n[0] == target[0]
-                )
-                for node in next_in_app:
+                if before:
+                    nodes_to_unapply = [target]
+                else:
+                    # Don't migrate backwards all the way to the target node (that
+                    # may roll back dependencies in other apps that don't need to
+                    # be rolled back); instead roll back through target's immediate
+                    # child(ren) in the same app, and no further.
+                    nodes_to_unapply = sorted(
+                        n for n in
+                        self.loader.graph.node_map[target].children
+                        if n[0] == target[0]
+                    )
+                for node in nodes_to_unapply:
                     for migration in self.loader.graph.backwards_plan(node):
                         if migration in applied:
                             plan.append((self.loader.graph.nodes[migration], True))
                             applied.pop(migration)
             else:
+                if before:
+                    raise InvalidMigrationPlan(
+                        'Migrating before a specified migration is only '
+                        'supported in the backwards direction.'
+                    )
                 for migration in self.loader.graph.forwards_plan(target):
                     if migration not in applied:
                         plan.append((self.loader.graph.nodes[migration], False))

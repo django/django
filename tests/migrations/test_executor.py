@@ -724,10 +724,11 @@ class ExecutorUnitTests(SimpleTestCase):
         r"""
         Minimize rollbacks when target has multiple in-app children.
 
-        a: 1 <---- 3 <--\
-              \ \- 2 <--- 4
-               \       \
-        b:      \- 1 <--- 2
+           a3---a4
+          /    /
+        a1---a2
+          \    \
+           b1---b2
         """
         a1_impl = FakeMigration('a1')
         a1 = ('a', '1')
@@ -766,11 +767,17 @@ class ExecutorUnitTests(SimpleTestCase):
             a4: a4_impl,
         })
 
-        plan = executor.migration_plan({a1})
+        plan_to_a1 = executor.migration_plan({a1})
 
         should_be_rolled_back = [b2_impl, a4_impl, a2_impl, a3_impl]
         exp = [(m, True) for m in should_be_rolled_back]
-        self.assertEqual(plan, exp)
+        self.assertEqual(plan_to_a1, exp)
+
+        plan_to_before_a2 = executor.migration_plan({a2}, before=True)
+
+        should_be_rolled_back = [b2_impl, a4_impl, a2_impl]
+        exp = [(m, True) for m in should_be_rolled_back]
+        self.assertEqual(plan_to_before_a2, exp)
 
     def test_backwards_nothing_to_do(self):
         r"""
