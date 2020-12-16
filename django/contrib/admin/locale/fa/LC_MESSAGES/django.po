@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Mahdi Firouzjaah <mh.firouzjah@gmail.com>, 2020
 # Ahmad Hosseini <ahmadly.com@gmail.com>, 2020
 # Ali Nikneshan <ali@nikneshan.com>, 2015
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
@@ -14,74 +15,92 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-08-20 15:46+0000\n"
-"Last-Translator: Ahmad Hosseini <ahmadly.com@gmail.com>\n"
-"Language-Team: Persian (http://www.transifex.com/django/django/language/"
-"fa/)\n"
+"POT-Creation-Date: 19:47:06 Wed Dec 16 2020\n"
+"PO-Revision-Date: 19:47:06 Wed Dec 16 2020\n"
+"Last-Translator: Mahdi Firouzjaah <mh.firouzjah@gmail.com>\n"
+"Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fa\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
+#: actions.py:41
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d تا %(items)s با موفقیت حذف شدند."
 
+#: actions.py:50 options.py:1883
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "امکان حذف %(name)s نیست."
 
+#: actions.py:52 options.py:1885
 msgid "Are you sure?"
 msgstr "آیا مطمئن هستید؟"
 
+#: actions.py:79
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "حذف  %(verbose_name_plural)s های انتخاب شده"
 
+#: apps.py:12
 msgid "Administration"
 msgstr "مدیریت"
 
+#: filters.py:108 filters.py:213 filters.py:248 filters.py:282 filters.py:401
+#: filters.py:466
 msgid "All"
 msgstr "همه"
 
+#: filters.py:249
 msgid "Yes"
 msgstr "بله"
 
+#: filters.py:250
 msgid "No"
 msgstr "خیر"
 
+#: filters.py:260
 msgid "Unknown"
 msgstr "ناشناخته"
 
+#: filters.py:330
 msgid "Any date"
 msgstr "هر تاریخی"
 
+#: filters.py:331
 msgid "Today"
 msgstr "امروز"
 
+#: filters.py:335
 msgid "Past 7 days"
 msgstr "۷ روز اخیر"
 
+#: filters.py:339
 msgid "This month"
 msgstr "این ماه"
 
+#: filters.py:343
 msgid "This year"
 msgstr "امسال"
 
+#: filters.py:351
 msgid "No date"
 msgstr "بدون تاریخ"
 
+#: filters.py:352
 msgid "Has date"
 msgstr "دارای تاریخ"
 
+#: filters.py:467
 msgid "Empty"
-msgstr ""
+msgstr "خالی"
 
+#: filters.py:468
 msgid "Not empty"
-msgstr ""
+msgstr "پُر"
 
+#: forms.py:13
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -90,131 +109,178 @@ msgstr ""
 "لطفا %(username)s و گذرواژه را برای یک حساب کارمند وارد کنید.\n"
 "توجه داشته باشید که ممکن است هر دو به کوچکی و بزرگی حروف حساس باشند."
 
+#: helpers.py:21
 msgid "Action:"
 msgstr "اقدام:"
 
+#: helpers.py:312
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "افزودن یک %(verbose_name)s دیگر"
 
+#: helpers.py:315
 msgid "Remove"
 msgstr "حذف"
 
+#: models.py:17
 msgid "Addition"
 msgstr "افزودن"
 
+#: models.py:18 templates/admin/app_list.html:28
+#: templates/admin/edit_inline/stacked.html:12
+#: templates/admin/edit_inline/tabular.html:34
+#: templates/admin/widgets/related_widget_wrapper.html:11
 msgid "Change"
 msgstr "تغییر"
 
+#: models.py:19
 msgid "Deletion"
 msgstr "کاستن"
 
+#: models.py:41
 msgid "action time"
 msgstr "زمان اقدام"
 
+#: models.py:48
 msgid "user"
 msgstr "کاربر"
 
+#: models.py:53
 msgid "content type"
 msgstr "نوع محتوی"
 
+#: models.py:56
 msgid "object id"
 msgstr "شناسهٔ شیء"
 
-#. Translators: 'repr' means representation
-#. (https://docs.python.org/library/functions.html#repr)
+#. Translators: 'repr' means representation (https://docs.python.org/library/functions.html#repr)
+#: models.py:58
 msgid "object repr"
 msgstr "صورت شیء"
 
+#: models.py:59
 msgid "action flag"
 msgstr "نشانه عمل"
 
+#: models.py:61
 msgid "change message"
 msgstr "پیغام تغییر"
 
+#: models.py:66
 msgid "log entry"
 msgstr "مورد اتفاقات"
 
+#: models.py:67
 msgid "log entries"
 msgstr "موارد اتفاقات"
 
+#: models.py:76
 #, python-format
 msgid "Added “%(object)s”."
-msgstr ""
+msgstr "“%(object)s” اضافه شد."
 
+#: models.py:78
 #, python-format
 msgid "Changed “%(object)s” — %(changes)s"
-msgstr ""
+msgstr "“%(object)s” تغییر کرد: %(changes)s"
 
+#: models.py:83
 #, python-format
 msgid "Deleted “%(object)s.”"
-msgstr ""
+msgstr "“%(object)s.” حذف شد."
 
+#: models.py:85
 msgid "LogEntry Object"
 msgstr "شئ LogEntry"
 
+#: models.py:111
 #, python-brace-format
 msgid "Added {name} “{object}”."
-msgstr ""
+msgstr "{name} “{object}” اضافه شد."
 
+#: models.py:113
 msgid "Added."
 msgstr "اضافه شد"
 
+#: models.py:117 options.py:2110
 msgid "and"
 msgstr "و"
 
+#: models.py:121
 #, python-brace-format
 msgid "Changed {fields} for {name} “{object}”."
-msgstr ""
+msgstr "فیلدهای {fields} از {name} “{object}” تغییر یافتند."
 
+#: models.py:125
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "{fields} تغییر یافتند."
 
+#: models.py:129
 #, python-brace-format
 msgid "Deleted {name} “{object}”."
-msgstr ""
+msgstr "{name} “{object}” حذف شد."
 
+#: models.py:132
 msgid "No fields changed."
 msgstr "فیلدی تغییر نیافته است."
 
+#: options.py:201 options.py:233
 msgid "None"
 msgstr "هیچ"
 
+#: options.py:279
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
+"«کنترل» یا «کامند(در مک)» را نگهداید، تا بیشتر از یک مورد را انتخاب کنید."
 
+#: options.py:1217 options.py:1241
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
-msgstr ""
+msgstr "{name} “{obj}” با موفقیت اضافه شد."
 
+#: options.py:1219
 msgid "You may edit it again below."
 msgstr "می‌توانید مجدداً ویرایش کنید."
 
+#: options.py:1231
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
+"{name} “{obj}” با موفقیت اضافه شد. شما همچنین می‌توانید تعداد بیشتری {name} "
+"را در پایین اضافه کنید."
 
+#: options.py:1281
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
+"{name} “{obj}” با موفقیت تغییر کرد. شما همچنین می‌توانید دوباره در پایین آن‌را "
+"ویرایش کنید."
 
+#: options.py:1291
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
+"{name} “{obj}” با موفقیت اضافه شد. شما همچنین می‌توانید آن‌را در پایین ویرایش "
+"کنید."
 
+#: options.py:1304
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
+"{name} “{obj}” با موفقیت تغییر کرد. شما همچنین می‌توانید یک {name} دیگر در "
+"پایین اضافه کنید."
 
+#: options.py:1316
 #, python-brace-format
 msgid "The {name} “{obj}” was changed successfully."
-msgstr ""
+msgstr "{name} “{obj}” با موفقیت تغییر کرد."
 
+#: options.py:1393 options.py:1725
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -222,58 +288,71 @@ msgstr ""
 "آیتم ها باید به منظور انجام عملیات بر روی آنها انتخاب شوند. هیچ آیتمی با "
 "تغییر نیافته است."
 
+#: options.py:1412
 msgid "No action selected."
 msgstr "فعالیتی انتخاب نشده"
 
+#: options.py:1437
 #, python-format
 msgid "The %(name)s “%(obj)s” was deleted successfully."
-msgstr ""
+msgstr "%(name)s “%(obj)s” با موفقیت حذف شد."
 
+#: options.py:1523
 #, python-format
 msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
-msgstr ""
+msgstr "%(name)s با آی‌دی “%(key)s” وجود ندارد. شاید حذف شده است؟"
 
+#: options.py:1618
 #, python-format
 msgid "Add %s"
 msgstr "اضافه کردن %s"
 
+#: options.py:1620
 #, python-format
 msgid "Change %s"
 msgstr "تغییر %s"
 
+#: options.py:1622
 #, python-format
 msgid "View %s"
 msgstr "مشاهده %s"
 
+#: options.py:1703
 msgid "Database error"
 msgstr "خطا در بانک اطلاعاتی"
 
+#: options.py:1772
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s با موفقیت تغییر کرد."
 msgstr[1] "%(count)s %(name)s با موفقیت تغییر کرد."
 
+#: options.py:1803
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "همه موارد %(total_count)s انتخاب شده"
 msgstr[1] "همه موارد %(total_count)s انتخاب شده"
 
+#: options.py:1811
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 از %(cnt)s انتخاب شده‌اند"
 
+#: options.py:1929
 #, python-format
 msgid "Change history: %s"
 msgstr "تاریخچهٔ تغییر: %s"
 
 #. Translators: Model verbose name and instance representation,
 #. suitable to be an item in a list.
+#: options.py:2103
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
 
+#: options.py:2112
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
@@ -282,74 +361,114 @@ msgstr ""
 "برای حذف %(class_name)s %(instance)s لازم است اشیای حفاظت شدهٔ زیر هم حذف "
 "شوند: %(related_objects)s"
 
+#: sites.py:42 templates/admin/base_site.html:3
 msgid "Django site admin"
-msgstr "مدیریت وب‌گاه Django"
+msgstr "مدیریت سایت Django"
 
+#: sites.py:45 templates/admin/base_site.html:6
 msgid "Django administration"
 msgstr "مدیریت Django"
 
+#: sites.py:48
 msgid "Site administration"
-msgstr "مدیریت وب‌گاه"
+msgstr "مدیریت سایت"
 
+#: sites.py:395 templates/admin/login.html:63
+#: templates/registration/password_reset_complete.html:18 tests.py:135
 msgid "Log in"
 msgstr "ورود"
 
+#: sites.py:524
 #, python-format
 msgid "%(app)s administration"
 msgstr "مدیریت ‎%(app)s‎"
 
+#: templates/admin/404.html:4 templates/admin/404.html:8
 msgid "Page not found"
 msgstr "صفحه یافت نشد"
 
+#: templates/admin/404.html:10
 msgid "We’re sorry, but the requested page could not be found."
-msgstr ""
+msgstr "متاسفیم؛ اما صفحه‌ی درخواستی پیدا نشد."
 
+#: templates/admin/500.html:6 templates/admin/app_index.html:9
+#: templates/admin/auth/user/change_password.html:13
+#: templates/admin/base.html:65 templates/admin/change_form.html:18
+#: templates/admin/change_list.html:31
+#: templates/admin/delete_confirmation.html:14
+#: templates/admin/delete_selected_confirmation.html:14
+#: templates/admin/invalid_setup.html:6 templates/admin/object_history.html:6
+#: templates/registration/logged_out.html:4
+#: templates/registration/password_change_done.html:6
+#: templates/registration/password_change_form.html:7
+#: templates/registration/password_reset_complete.html:6
+#: templates/registration/password_reset_confirm.html:7
+#: templates/registration/password_reset_done.html:6
+#: templates/registration/password_reset_form.html:7
 msgid "Home"
-msgstr "شروع"
+msgstr "خانه"
 
+#: templates/admin/500.html:7
 msgid "Server error"
 msgstr "خطای سرور"
 
+#: templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "خطای سرور (500)"
 
+#: templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "خطای سرور <em>(500)</em>"
 
+#: templates/admin/500.html:15
 msgid ""
 "There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"خطایی رخ داده‌است. این مورد طی ایمیل به سرپرستان سایت اطلاع رسانی شده‌است و در "
+"اسرع وقت برطرف خواهد شد. از شکیبایی شما سپاس‌گزاریم."
 
+#: templates/admin/actions.html:8
 msgid "Run the selected action"
-msgstr "اجرای حرکت انتخاب شده"
+msgstr "اجرای عملیات انتخاب شده"
 
+#: templates/admin/actions.html:8
 msgid "Go"
 msgstr "برو"
 
+#: templates/admin/actions.html:16
 msgid "Click here to select the objects across all pages"
 msgstr "برای انتخاب موجودیت‌ها در تمام صفحات اینجا را کلیک کنید"
 
+#: templates/admin/actions.html:16
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "انتخاب تمامی %(total_count)s %(module_name)s"
 
+#: templates/admin/actions.html:18
 msgid "Clear selection"
 msgstr "لغو انتخاب‌ها"
 
+#: templates/admin/app_list.html:8
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "مدلها در برنامه %(name)s "
 
+#: templates/admin/app_list.html:19
+#: templates/admin/widgets/related_widget_wrapper.html:18
 msgid "Add"
 msgstr "اضافه کردن"
 
+#: templates/admin/app_list.html:26 templates/admin/edit_inline/stacked.html:12
+#: templates/admin/edit_inline/tabular.html:34
 msgid "View"
 msgstr "مشاهده"
 
+#: templates/admin/app_list.html:39
 msgid "You don’t have permission to view or edit anything."
 msgstr "شما اجازهٔ مشاهده یا ویرایش چیزی را ندارید."
 
+#: templates/admin/auth/user/add_form.html:6
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
@@ -357,63 +476,102 @@ msgstr ""
 "ابتدا یک نام کاربری و گذرواژه وارد کنید. سپس می توانید مشخصات دیگر کاربر را "
 "ویرایش کنید."
 
+#: templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
 msgstr "یک نام کاربری و رمز عبور را وارد کنید."
 
+#: templates/admin/auth/user/change_password.html:17
+#: templates/admin/auth/user/change_password.html:55
+#: templates/admin/base.html:53
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "تغییر گذرواژه"
 
+#: templates/admin/auth/user/change_password.html:28
+#: templates/admin/change_form.html:43 templates/admin/change_list.html:51
+#: templates/admin/login.html:23
+#: templates/registration/password_change_form.html:21
 msgid "Please correct the error below."
 msgstr "لطفاً خطای زیر را تصحیح کنید."
 
+#: templates/admin/auth/user/change_password.html:28
+#: templates/admin/change_form.html:43 templates/admin/change_list.html:51
+#: templates/admin/login.html:23
+#: templates/registration/password_change_form.html:21
 msgid "Please correct the errors below."
 msgstr "لطفاً خطاهای زیر را تصحیح کنید."
 
+#: templates/admin/auth/user/change_password.html:32
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "برای کابر <strong>%(username)s</strong> یک گذرنامهٔ جدید وارد کنید."
 
+#: templates/admin/base.html:39
 msgid "Welcome,"
 msgstr "خوش آمدید،"
 
+#: templates/admin/base.html:44
 msgid "View site"
-msgstr "نمایش وبگاه"
+msgstr "نمایش سایت"
 
+#: templates/admin/base.html:49
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
 msgid "Documentation"
 msgstr "مستندات"
 
+#: templates/admin/base.html:55
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "خروج"
 
+#: templates/admin/change_form.html:21
+#: templates/admin/change_list_object_tools.html:8
 #, python-format
 msgid "Add %(name)s"
 msgstr "اضافه‌کردن %(name)s"
 
+#: templates/admin/change_form_object_tools.html:5
+#: templates/admin/object_history.html:10
 msgid "History"
 msgstr "تاریخچه"
 
+#: templates/admin/change_form_object_tools.html:7
+#: templates/admin/edit_inline/stacked.html:14
+#: templates/admin/edit_inline/tabular.html:36
 msgid "View on site"
-msgstr "مشاهده در وب‌گاه"
+msgstr "مشاهده در سایت"
 
+#: templates/admin/change_list.html:76
 msgid "Filter"
 msgstr "فیلتر"
 
+#: templates/admin/change_list.html:78
 msgid "Clear all filters"
 msgstr "پاک کردن همه فیلترها"
 
+#: templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
 msgstr "حذف از مرتب سازی"
 
+#: templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
 msgstr "اولویت مرتب‌سازی: %(priority_number)s"
 
+#: templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
 msgstr "تعویض مرتب سازی"
 
+#: templates/admin/delete_confirmation.html:18
+#: templates/admin/submit_line.html:7
+#: templates/admin/widgets/related_widget_wrapper.html:25
 msgid "Delete"
 msgstr "حذف"
 
+#: templates/admin/delete_confirmation.html:24
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -423,6 +581,7 @@ msgstr ""
 "حذف %(object_name)s·'%(escaped_object)s' می تواند باعث حذف اشیاء مرتبط شود. "
 "اما حساب شما دسترسی لازم برای حذف اشیای از انواع زیر را ندارد:"
 
+#: templates/admin/delete_confirmation.html:31
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -431,6 +590,7 @@ msgstr ""
 "حذف %(object_name)s '%(escaped_object)s' نیاز به حذف موجودیت‌های مرتبط محافظت "
 "شده ذیل دارد:"
 
+#: templates/admin/delete_confirmation.html:38
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -439,18 +599,26 @@ msgstr ""
 "آیا مطمئنید که می‌خواهید %(object_name)s·\"%(escaped_object)s\" را حذف کنید؟ "
 "کلیهٔ اشیای مرتبط زیر حذف خواهند شد:"
 
+#: templates/admin/delete_confirmation.html:40
+#: templates/admin/delete_selected_confirmation.html:39
 msgid "Objects"
 msgstr "اشیاء"
 
+#: templates/admin/delete_confirmation.html:47
+#: templates/admin/delete_selected_confirmation.html:50
 msgid "Yes, I’m sure"
 msgstr "بله، مطمئن هستم."
 
+#: templates/admin/delete_confirmation.html:48
+#: templates/admin/delete_selected_confirmation.html:51
 msgid "No, take me back"
-msgstr "نه، من را برگردان"
+msgstr "نه، مرا برگردان"
 
+#: templates/admin/delete_selected_confirmation.html:17
 msgid "Delete multiple objects"
 msgstr "حذف اشیاء متعدد"
 
+#: templates/admin/delete_selected_confirmation.html:23
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -460,6 +628,7 @@ msgstr ""
 "حذف %(objects_name)s انتخاب شده منجر به حذف موجودیت‌های مرتبط خواهد شد، ولی "
 "شناسه شما اجازه حذف اینگونه از موجودیت‌های ذیل را ندارد:"
 
+#: templates/admin/delete_selected_confirmation.html:30
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -468,6 +637,7 @@ msgstr ""
 "حذف %(objects_name)s انتخاب شده نیاز به حذف موجودیت‌های مرتبط محافظت شده ذیل "
 "دارد:"
 
+#: templates/admin/delete_selected_confirmation.html:37
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -476,34 +646,45 @@ msgstr ""
 "آیا در خصوص حذف %(objects_name)s انتخاب شده اطمینان دارید؟ تمام موجودیت‌های "
 "ذیل به همراه موارد مرتبط با آنها حذف خواهند شد:"
 
+#: templates/admin/edit_inline/tabular.html:20
 msgid "Delete?"
 msgstr "حذف؟"
 
+#: templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
 msgstr "براساس %(filter_title)s "
 
+#: templates/admin/includes/object_delete_summary.html:2
 msgid "Summary"
 msgstr "خلاصه"
 
+#: templates/admin/index.html:23
 msgid "Recent actions"
-msgstr "فعالیتهای اخیر"
+msgstr "فعالیت‌های اخیر"
 
+#: templates/admin/index.html:24
 msgid "My actions"
-msgstr "فعالیتهای من"
+msgstr "فعالیت‌های من"
 
+#: templates/admin/index.html:28
 msgid "None available"
 msgstr "چیزی در دسترس نیست"
 
+#: templates/admin/index.html:42
 msgid "Unknown content"
-msgstr "محتوا ناشناخته"
+msgstr "محتوای ناشناخته"
 
+#: templates/admin/invalid_setup.html:12
 msgid ""
 "Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
+"در اتصال به دیتابیس شما خطایی رخ داده‌است.اطمینان حاصل کنید که جدول‌های مقضی "
+"ایجاد شده‌اند؛ و نیز آن‌ها به وسیله‌ی کاربر مقضی قابل خواندن هستند."
 
+#: templates/admin/login.html:39
 #, python-format
 msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
@@ -512,136 +693,183 @@ msgstr ""
 "شما به عنوان %(username)sوارد شده اید. ولی اجازه مشاهده صفحه فوق را نداریدو "
 "آیا مایلید با کاربر دیگری وارد شوید؟"
 
+#: templates/admin/login.html:59
 msgid "Forgotten your password or username?"
 msgstr "گذرواژه یا نام کاربری خود را فراموش کرده‌اید؟"
 
+#: templates/admin/nav_sidebar.html:2
 msgid "Toggle navigation"
-msgstr ""
+msgstr "ضامن ناوبری"
 
+#: templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "تاریخ/ساعت"
 
+#: templates/admin/object_history.html:23
 msgid "User"
 msgstr "کاربر"
 
+#: templates/admin/object_history.html:24
 msgid "Action"
 msgstr "عمل"
 
+#: templates/admin/object_history.html:38
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
+"این شیء تاریخچه‌ی تغییرات ندارد.احتمالا این شیء از طریق این پنل ادمین ایجاد "
+"نشده است."
 
+#: templates/admin/pagination.html:10 templates/admin/search_form.html:9
 msgid "Show all"
 msgstr "نمایش همه"
 
+#: templates/admin/pagination.html:11 templates/admin/submit_line.html:4
 msgid "Save"
 msgstr "ذخیره"
 
+#: templates/admin/popup_response.html:3
 msgid "Popup closing…"
 msgstr "در حال بستن پنجره..."
 
+#: templates/admin/search_form.html:7
 msgid "Search"
 msgstr "جستجو"
 
+#: templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s نتیجه"
 msgstr[1] "%(counter)s نتیجه"
 
+#: templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "در مجموع %(full_result_count)s تا"
 
+#: templates/admin/submit_line.html:9
 msgid "Save as new"
 msgstr "ذخیره به عنوان جدید"
 
+#: templates/admin/submit_line.html:10
 msgid "Save and add another"
 msgstr "ذخیره و ایجاد یکی دیگر"
 
+#: templates/admin/submit_line.html:11
 msgid "Save and continue editing"
 msgstr "ذخیره و ادامهٔ ویرایش"
 
+#: templates/admin/submit_line.html:11
 msgid "Save and view"
 msgstr "ذخیره و نمایش"
 
+#: templates/admin/submit_line.html:12
 msgid "Close"
 msgstr "بستن"
 
+#: templates/admin/widgets/related_widget_wrapper.html:10
 #, python-format
 msgid "Change selected %(model)s"
 msgstr "تغییر دادن %(model)s انتخاب شده"
 
+#: templates/admin/widgets/related_widget_wrapper.html:17
 #, python-format
 msgid "Add another %(model)s"
 msgstr "افزدون %(model)s دیگر"
 
+#: templates/admin/widgets/related_widget_wrapper.html:24
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "حذف کردن %(model)s انتخاب شده"
 
+#: templates/registration/logged_out.html:10
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "متشکر از اینکه مدتی از وقت خود را به ما اختصاص دادید."
 
+#: templates/registration/logged_out.html:12
 msgid "Log in again"
 msgstr "ورود دوباره"
 
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_form.html:8
 msgid "Password change"
 msgstr "تغییر گذرواژه"
 
+#: templates/registration/password_change_done.html:14
 msgid "Your password was changed."
-msgstr "گذرواژهٔ شما تغییر یافت."
+msgstr "گذرواژه‌ی شما تغییر یافت."
 
+#: templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
 "برای امنیت بیشتر٬ لطفا گذرواژه قدیمی خود را وارد کنید٬ سپس گذرواژه جدیدتان "
-"را دوبار وارد کنید تا ما بتوانیم چک کنیم که به درستی تایپ کرده‌اید. "
+"را دو بار وارد کنید تا ما بتوانیم چک کنیم که به درستی تایپ کرده‌اید. "
 
+#: templates/registration/password_change_form.html:54
+#: templates/registration/password_reset_confirm.html:32
 msgid "Change my password"
-msgstr "تغییر گذرواژهٔ من"
+msgstr "تغییر گذرواژه‌ی من"
 
+#: templates/registration/password_reset_complete.html:7
+#: templates/registration/password_reset_done.html:7
+#: templates/registration/password_reset_form.html:8
 msgid "Password reset"
-msgstr "ایجاد گذرواژهٔ جدید"
+msgstr "ایجاد گذرواژه‌ی جدید"
 
+#: templates/registration/password_reset_complete.html:16
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "گذرواژهٔ جدیدتان تنظیم شد. اکنون می‌توانید وارد وب‌گاه شوید."
+msgstr "گذرواژه‌ی جدیدتان تنظیم شد. اکنون می‌توانید وارد سایت شوید."
 
+#: templates/registration/password_reset_confirm.html:8
 msgid "Password reset confirmation"
-msgstr "تأیید گذرواژهٔ جدید"
+msgstr "تأیید گذرواژه‌ی جدید"
 
+#: templates/registration/password_reset_confirm.html:18
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
-"گذرواژهٔ جدیدتان را دوبار وارد کنید تا ما بتوانیم چک کنیم که به درستی تایپ "
+"گذرواژه‌ی جدیدتان را دو بار وارد کنید تا ما بتوانیم چک کنیم که به درستی تایپ "
 "کرده‌اید."
 
+#: templates/registration/password_reset_confirm.html:24
 msgid "New password:"
-msgstr "گذرواژهٔ جدید:"
+msgstr "گذرواژه‌ی جدید:"
 
+#: templates/registration/password_reset_confirm.html:29
 msgid "Confirm password:"
 msgstr "تکرار گذرواژه:"
 
+#: templates/registration/password_reset_confirm.html:38
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
-"پیوند ایجاد گذرواژهٔ جدید نامعتبر بود، احتمالاً به این علت که قبلاً از آن "
-"استفاده شده است. لطفاً برای یک گذرواژهٔ جدید درخواست دهید."
+"پیوند ایجاد گذرواژه‌ی جدید نامعتبر بود، احتمالاً به این علت که قبلاً از آن "
+"استفاده شده است. لطفاً برای یک گذرواژه‌ی جدید درخواست دهید."
 
+#: templates/registration/password_reset_done.html:15
 msgid ""
 "We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"ما دستورالعمل‌های لازم برای تنظیم گذرواژه را به رایانامه‌ی شما ارسال کردیم.اگر "
+"حساب کاربری‌ای با رایانامه‌ای که وارد کرده‌اید موجود باشد، شما به زودی آن‌ها را "
+"دریافت خواهید کرد."
 
+#: templates/registration/password_reset_done.html:17
 msgid ""
 "If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+"اگر شما پیغامی در رایانامه‌ی خود دریافت نکردید؛ لطفا اطمینان حاصل کنید "
+"رایانامه‌ای که وارد کردید، همان است که با آن در سایت نام‌نویسی شده‌اید."
 
+#: templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
@@ -650,56 +878,74 @@ msgstr ""
 "شما این ایمیل را بخاطر تقاضای تغییر رمز حساب در  %(site_name)s. دریافت کرده "
 "اید."
 
+#: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
-msgstr "لطفاً به صفحهٔ زیر بروید و یک گذرواژهٔ جدید انتخاب کنید:"
+msgstr "لطفاً به صفحهٔ زیر بروید و یک گذرواژه‌ی جدید انتخاب کنید:"
 
+#: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you’ve forgotten:"
 msgstr "نام کاربری‌تان، چنانچه احیاناً یادتان رفته است:"
 
+#: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
-msgstr "ممنون از استفادهٔ شما از وب‌گاه ما"
+msgstr "ممنون از استفادهٔ شما از سایت ما"
 
+#: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "گروه %(site_name)s"
 
+#: templates/registration/password_reset_form.html:16
 msgid ""
 "Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
+"گذرواژه‌تان را فراموش کرده‌اید؟ رایانامه‌ی خود را وارد کنید، و ما دستورالعمل‌های "
+"لازم برای ساختن یک گذرواژه‌ی جدید را برایتان ارسال خواهیم کرد."
 
+#: templates/registration/password_reset_form.html:22
 msgid "Email address:"
-msgstr "آدرس ایمیل:"
+msgstr "آدرس رایانامه‌:"
 
+#: templates/registration/password_reset_form.html:25
 msgid "Reset my password"
-msgstr "ایجاد گذرواژهٔ جدید"
+msgstr "ایجاد گذرواژه‌ی جدید"
 
+#: templatetags/admin_list.py:423
 msgid "All dates"
 msgstr "همهٔ تاریخ‌ها"
 
+#: views/main.py:102
 #, python-format
 msgid "Select %s"
 msgstr "%s انتخاب کنید"
 
+#: views/main.py:104
 #, python-format
 msgid "Select %s to change"
 msgstr "%s را برای تغییر انتخاب کنید"
 
+#: views/main.py:106
 #, python-format
 msgid "Select %s to view"
 msgstr "%s را برای مشاهده انتخاب کنید"
 
+#: widgets.py:87
 msgid "Date:"
 msgstr "تاریخ:"
 
+#: widgets.py:88
 msgid "Time:"
 msgstr "زمان:"
 
+#: widgets.py:150
 msgid "Lookup"
 msgstr "جستجو"
 
+#: widgets.py:340
 msgid "Currently:"
 msgstr "در حال حاضر:"
 
+#: widgets.py:341
 msgid "Change:"
 msgstr "تغییر یافته:"
