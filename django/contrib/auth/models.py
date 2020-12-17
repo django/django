@@ -199,7 +199,7 @@ def _user_get_permissions(user, obj, from_name):
     return permissions
 
 
-def _user_has_perm(user, perm, obj):
+def _user_has_perm(user, perm, obj, **kwargs):
     """
     A backend can raise `PermissionDenied` to short-circuit permission checking.
     """
@@ -207,7 +207,7 @@ def _user_has_perm(user, perm, obj):
         if not hasattr(backend, 'has_perm'):
             continue
         try:
-            if backend.has_perm(user, perm, obj):
+            if backend.has_perm(user, perm, obj, **kwargs):
                 return True
         except PermissionDenied:
             return False
@@ -284,7 +284,7 @@ class PermissionsMixin(models.Model):
     def get_all_permissions(self, obj=None):
         return _user_get_permissions(self, obj, 'all')
 
-    def has_perm(self, perm, obj=None):
+    def has_perm(self, perm, obj=None, **kwargs):
         """
         Return True if the user has the specified permission. Query all
         available auth backends, but return immediately if any backend returns
@@ -297,14 +297,14 @@ class PermissionsMixin(models.Model):
             return True
 
         # Otherwise we need to check the backends.
-        return _user_has_perm(self, perm, obj)
+        return _user_has_perm(self, perm, obj, **kwargs)
 
-    def has_perms(self, perm_list, obj=None):
+    def has_perms(self, perm_list, obj=None, **kwargs):
         """
         Return True if the user has each of the specified permissions. If
         object is passed, check if the user has all required perms for it.
         """
-        return all(self.has_perm(perm, obj) for perm in perm_list)
+        return all(self.has_perm(perm, obj, **kwargs) for perm in perm_list)
 
     def has_module_perms(self, app_label):
         """
@@ -448,11 +448,11 @@ class AnonymousUser:
     def get_all_permissions(self, obj=None):
         return _user_get_permissions(self, obj, 'all')
 
-    def has_perm(self, perm, obj=None):
-        return _user_has_perm(self, perm, obj=obj)
+    def has_perm(self, perm, obj=None, **kwargs):
+        return _user_has_perm(self, perm, obj=obj, **kwargs)
 
-    def has_perms(self, perm_list, obj=None):
-        return all(self.has_perm(perm, obj) for perm in perm_list)
+    def has_perms(self, perm_list, obj=None, **kwargs):
+        return all(self.has_perm(perm, obj, **kwargs) for perm in perm_list)
 
     def has_module_perms(self, module):
         return _user_has_module_perms(self, module)

@@ -24,7 +24,7 @@ class BaseBackend:
             *self.get_group_permissions(user_obj, obj=obj),
         }
 
-    def has_perm(self, user_obj, perm, obj=None):
+    def has_perm(self, user_obj, perm, obj=None, **kwargs):
         return perm in self.get_all_permissions(user_obj, obj=obj)
 
 
@@ -104,8 +104,8 @@ class ModelBackend(BaseBackend):
             user_obj._perm_cache = super().get_all_permissions(user_obj)
         return user_obj._perm_cache
 
-    def has_perm(self, user_obj, perm, obj=None):
-        return user_obj.is_active and super().has_perm(user_obj, perm, obj=obj)
+    def has_perm(self, user_obj, perm, obj=None, **kwargs):
+        return user_obj.is_active and super().has_perm(user_obj, perm, obj=obj, **kwargs)
 
     def has_module_perms(self, user_obj, app_label):
         """
