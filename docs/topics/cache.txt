@@ -839,9 +839,21 @@ If the object doesn't exist in the cache, ``cache.get()`` returns ``None``::
     >>> cache.get('my_key')
     None
 
-We advise against storing the literal value ``None`` in the cache, because you
-won't be able to distinguish between your stored ``None`` value and a cache
-miss signified by a return value of ``None``.
+If you need to determine whether the object exists in the cache and you have
+stored a literal value ``None``, use a sentinel object as the default::
+
+    >>> sentinel = object()
+    >>> cache.get('my_key', sentinel) is sentinel
+    False
+    >>> # Wait 30 seconds for 'my_key' to expire...
+    >>> cache.get('my_key', sentinel) is sentinel
+    True
+
+.. admonition:: ``MemcachedCache``
+
+    Due to a ``python-memcached`` limitation, it's not possible to distinguish
+    between stored ``None`` value and a cache miss signified by a return value
+    of ``None`` on the deprecated ``MemcachedCache`` backend.
 
 ``cache.get()`` can take a ``default`` argument. This specifies which value to
 return if the object doesn't exist in the cache::
