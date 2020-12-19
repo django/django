@@ -62,6 +62,18 @@ value::
     >>> original
     '2.5'
 
+If you wish to protect a list, tuple, or dictionary you can do so using the
+``sign_object()`` and ``unsign_object()`` methods::
+
+    >>> signed_obj = signer.sign_object({'message': 'Hello!'})
+    >>> signed_obj
+    'eyJtZXNzYWdlIjoiSGVsbG8hIn0:Xdc-mOFDjs22KsQAqfVfi8PQSPdo3ckWJxPWwQOFhR4'
+    >>> obj = signer.unsign_object(signed_obj)
+    >>> obj
+    {'message': 'Hello!'}
+
+See :ref:`signing-complex-data` for more details.
+
 If the signature or value have been altered in any way, a
 ``django.core.signing.BadSignature`` exception will be raised::
 
@@ -93,6 +105,10 @@ generate signatures. You can use a different secret by passing it to the
 
         The ``algorithm`` parameter was added.
 
+.. versionchanged:: 3.2
+
+    The ``sign_object()`` and ``unsign_object()`` methods were added.
+
 Using the ``salt`` argument
 ---------------------------
 
@@ -104,11 +120,17 @@ your :setting:`SECRET_KEY`::
     >>> signer = Signer()
     >>> signer.sign('My string')
     'My string:GdMGD6HNQ_qdgxYP8yBZAdAIV1w'
+    >>> signer.sign_object({'message': 'Hello!'})
+    'eyJtZXNzYWdlIjoiSGVsbG8hIn0:Xdc-mOFDjs22KsQAqfVfi8PQSPdo3ckWJxPWwQOFhR4'
     >>> signer = Signer(salt='extra')
     >>> signer.sign('My string')
     'My string:Ee7vGi-ING6n02gkcJ-QLHg6vFw'
     >>> signer.unsign('My string:Ee7vGi-ING6n02gkcJ-QLHg6vFw')
     'My string'
+    >>> signer.sign_object({'message': 'Hello!'})
+    'eyJtZXNzYWdlIjoiSGVsbG8hIn0:-UWSLCE-oUAHzhkHviYz3SOZYBjFKllEOyVZNuUtM-I'
+    >>> signer.unsign_object('eyJtZXNzYWdlIjoiSGVsbG8hIn0:-UWSLCE-oUAHzhkHviYz3SOZYBjFKllEOyVZNuUtM-I')
+    {'message': 'Hello!'}
 
 Using salt in this way puts the different signatures into different
 namespaces.  A signature that comes from one namespace (a particular salt
@@ -120,6 +142,10 @@ different salt.
 
 Unlike your :setting:`SECRET_KEY`, your salt argument does not need to stay
 secret.
+
+.. versionchanged:: 3.2
+
+    The ``sign_object()`` and ``unsign_object()`` methods were added.
 
 Verifying timestamped values
 ----------------------------
@@ -156,23 +182,48 @@ created within a specified period of time::
         otherwise raises ``SignatureExpired``. The ``max_age`` parameter can
         accept an integer or a :py:class:`datetime.timedelta` object.
 
+    .. method:: sign_object(obj, serializer=JSONSerializer, compress=False)
+
+        .. versionadded:: 3.2
+
+        Encode, optionally compress, append current timestamp, and sign complex
+        data structure (e.g. list, tuple, or dictionary).
+
+    .. method:: unsign_object(signed_obj, serializer=JSONSerializer, max_age=None)
+
+        .. versionadded:: 3.2
+
+        Checks if ``signed_obj`` was signed less than ``max_age`` seconds ago,
+        otherwise raises ``SignatureExpired``. The ``max_age`` parameter can
+        accept an integer or a :py:class:`datetime.timedelta` object.
+
     .. versionchanged:: 3.1
 
         The ``algorithm`` parameter was added.
+
+.. _signing-complex-data:
 
 Protecting complex data structures
 ----------------------------------
 
 If you wish to protect a list, tuple or dictionary you can do so using the
-signing module's ``dumps`` and ``loads`` functions. These imitate Python's
-pickle module, but use JSON serialization under the hood. JSON ensures that
-even if your :setting:`SECRET_KEY` is stolen an attacker will not be able
-to execute arbitrary commands by exploiting the pickle format::
+``Signer.sign_object()`` and ``unsign_object()`` methods, or signing module's
+``dumps()`` or ``loads()`` functions (which are shortcuts for
+``TimestampSigner(salt='django.core.signing').sign_object()/unsign_object()``).
+These use JSON serialization under the hood. JSON ensures that even if your
+:setting:`SECRET_KEY` is stolen an attacker will not be able to execute
+arbitrary commands by exploiting the pickle format::
 
     >>> from django.core import signing
-    >>> value = signing.dumps({"foo": "bar"})
+    >>> signer = signing.TimestampSigner()
+    >>> value = signer.sign_object({'foo': 'bar'})
     >>> value
-    'eyJmb28iOiJiYXIifQ:1NMg1b:zGcDE4-TCkaeGzLeW9UQwZesciI'
+    'eyJmb28iOiJiYXIifQ:1kx6R3:D4qGKiptAqo5QW9iv4eNLc6xl4RwiFfes6oOcYhkYnc'
+    >>> signer.unsign_object(value)
+    {'foo': 'bar'}
+    >>> value = signing.dumps({'foo': 'bar'})
+    >>> value
+    'eyJmb28iOiJiYXIifQ:1kx6Rf:LBB39RQmME-SRvilheUe5EmPYRbuDBgQp2tCAi7KGLk'
     >>> signing.loads(value)
     {'foo': 'bar'}
 
@@ -194,3 +245,7 @@ and tuples) if you pass in a tuple, you will get a list from
 
     Reverse of ``dumps()``, raises ``BadSignature`` if signature fails.
     Checks ``max_age`` (in seconds) if given.
+
+.. versionchanged:: 3.2
+
+    The ``sign_object()`` and ``unsign_object()`` methods were added.

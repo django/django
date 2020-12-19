@@ -451,6 +451,15 @@ Security
   ``SECRET_KEY``, and then going on to access ``settings.SECRET_KEY`` will now
   raise an :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
+* The new ``Signer.sign_object()`` and ``Signer.unsign_object()`` methods allow
+  signing complex data structures. See :ref:`signing-complex-data` for more
+  details.
+
+  Also, :func:`signing.dumps() <django.core.signing.dumps>` and
+  :func:`~django.core.signing.loads` become shortcuts for
+  :meth:`.TimestampSigner.sign_object` and
+  :meth:`~.TimestampSigner.unsign_object`.
+
 Serialization
 ~~~~~~~~~~~~~
 
