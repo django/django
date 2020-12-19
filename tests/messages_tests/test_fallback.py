@@ -1,3 +1,6 @@
+import random
+import string
+
 from django.contrib.messages import constants
 from django.contrib.messages.storage.fallback import (
     CookieStorage, FallbackStorage,
@@ -129,7 +132,8 @@ class FallbackTests(BaseTests, SimpleTestCase):
         # see comment in CookieTests.test_cookie_max_length()
         msg_size = int((CookieStorage.max_cookie_size - 54) / 4.5 - 37)
         for i in range(5):
-            storage.add(constants.INFO, str(i) * msg_size)
+            s = str(i) + ''.join(random.choice(string.ascii_letters) for _ in range(msg_size - 1))
+            storage.add(constants.INFO, s)
         storage.update(response)
         cookie_storing = self.stored_cookie_messages_count(storage, response)
         self.assertEqual(cookie_storing, 4)
@@ -143,7 +147,7 @@ class FallbackTests(BaseTests, SimpleTestCase):
         """
         storage = self.get_storage()
         response = self.get_response()
-        storage.add(constants.INFO, 'x' * 5000)
+        storage.add(constants.INFO, ''.join(random.choice(string.ascii_letters) for _ in range(5000)))
         storage.update(response)
         cookie_storing = self.stored_cookie_messages_count(storage, response)
         self.assertEqual(cookie_storing, 0)

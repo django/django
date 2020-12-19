@@ -1,4 +1,6 @@
 import json
+import random
+import string
 
 from django.conf import settings
 from django.contrib.messages import constants
@@ -6,6 +8,7 @@ from django.contrib.messages.storage.base import Message
 from django.contrib.messages.storage.cookie import (
     CookieStorage, MessageDecoder, MessageEncoder,
 )
+from django.core.signing import b64_decode, get_cookie_signer
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import ignore_warnings
 from django.utils.deprecation import RemovedInDjango40Warning
@@ -71,7 +74,8 @@ class CookieTests(BaseTests, SimpleTestCase):
         response = self.get_response()
         storage.add(constants.INFO, 'test')
         storage.update(response)
-        self.assertIn('test', response.cookies['messages'].value)
+        value = b64_decode(response.cookies['messages'].value.split(":")[0].encode())
+        self.assertIn(b'test', value)
         self.assertEqual(response.cookies['messages']['domain'], '.example.com')
         self.assertEqual(response.cookies['messages']['expires'], '')
         self.assertIs(response.cookies['messages']['secure'], True)
@@ -116,15 +120,20 @@ class CookieTests(BaseTests, SimpleTestCase):
         # size which will fit 4 messages into the cookie, but not 5.
         # See also FallbackTest.test_session_fallback
         msg_size = int((CookieStorage.max_cookie_size - 54) / 4.5 - 37)
+        first_msg = None
         for i in range(5):
-            storage.add(constants.INFO, str(i) * msg_size)
+            # TODO: Can we fix the randomness here somehow? This test might get flacky :/
+            s = str(i) + ''.join(random.choice(string.ascii_letters) for _ in range(msg_size - 1))
+            storage.add(constants.INFO, s)
+            if i == 0:
+                first_msg = s
         unstored_messages = storage.update(response)
 
         cookie_storing = self.stored_messages_count(storage, response)
         self.assertEqual(cookie_storing, 4)
 
         self.assertEqual(len(unstored_messages), 1)
-        self.assertEqual(unstored_messages[0].message, '0' * msg_size)
+        self.assertEqual(unstored_messages[0].message, first_msg)
 
     def test_json_encoder_decoder(self):
         """
@@ -169,6 +178,18 @@ class CookieTests(BaseTests, SimpleTestCase):
         encoder = MessageEncoder()
         value = encoder.encode(messages)
         encoded_messages = '%s$%s' % (storage._legacy_hash(value), value)
+        decoded_messages = storage._decode(encoded_messages)
+        self.assertEqual(messages, decoded_messages)
+
+    def test_legacy2_hash_decode(self):
+        # RemovedInDjango40Warning: pre-Django 3.X hashes will be invalid.
+        storage = self.storage_class(self.get_request())
+        messages = ['this', 'that']
+        # Encode/decode a message using the pre-Django 3.1 hash.
+        encoder = MessageEncoder()
+        value = encoder.encode(messages)
+        signer = get_cookie_signer(salt=storage.key_salt)
+        encoded_messages = signer.sign(value)
         decoded_messages = storage._decode(encoded_messages)
         self.assertEqual(messages, decoded_messages)
 
