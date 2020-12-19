@@ -31,6 +31,9 @@ details on these changes.
 
 * ``django.core.cache.backends.memcached.MemcachedCache`` will be removed.
 
+* Support for the pre-Django 3.2 format of messages used by
+  ``django.contrib.messages.storage.cookie.CookieStorage`` will be removed.
+
 .. _deprecation-removed-in-4.0:
 
 4.0

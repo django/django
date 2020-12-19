@@ -14,10 +14,6 @@ class MessageEncoder(json.JSONEncoder):
     """
     message_key = '__json_message'
 
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault('separators', (',', ':'))
-        super().__init__(*args, **kwargs)
-
     def default(self, obj):
         if isinstance(obj, Message):
             # Using 0/1 here instead of False/True to produce more compact json
@@ -49,6 +45,18 @@ class MessageDecoder(json.JSONDecoder):
     def decode(self, s, **kwargs):
         decoded = super().decode(s, **kwargs)
         return self.process_messages(decoded)
+
+
+class MessageSerializer:
+    def dumps(self, obj):
+        return json.dumps(
+            obj,
+            separators=(',', ':'),
+            cls=MessageEncoder,
+        ).encode('latin-1')
+
+    def loads(self, data):
+        return json.loads(data.decode('latin-1'), cls=MessageDecoder)
 
 
 class CookieStorage(BaseStorage):
@@ -152,9 +160,7 @@ class CookieStorage(BaseStorage):
         also contains a hash to ensure that the data was not tampered with.
         """
         if messages or encode_empty:
-            encoder = MessageEncoder()
-            value = encoder.encode(messages)
-            return self.signer.sign(value)
+            return self.signer.sign_object(messages, serializer=MessageSerializer, compress=True)
 
     def _decode(self, data):
         """
@@ -166,13 +172,21 @@ class CookieStorage(BaseStorage):
         if not data:
             return None
         try:
-            decoded = self.signer.unsign(data)
+            return self.signer.unsign_object(data, serializer=MessageSerializer)
+        # RemovedInDjango41Warning: when the deprecation ends, replace with:
+        #
+        # except (signing.BadSignature, json.JSONDecodeError):
+        #     pass
         except signing.BadSignature:
             # RemovedInDjango40Warning: when the deprecation ends, replace
             # with:
             #   decoded = None.
             decoded = self._legacy_decode(data)
+        except json.JSONDecodeError:
+            decoded = self.signer.unsign(data)
+
         if decoded:
+            # RemovedInDjango41Warning.
             try:
                 return json.loads(decoded, cls=MessageDecoder)
             except json.JSONDecodeError:
