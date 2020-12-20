@@ -125,8 +125,8 @@ Python style
 Imports
 =======
 
-* Use `isort <https://github.com/timothycrosley/isort#readme>`_ to automate
-  import sorting using the guidelines below.
+* Use `isort <https://github.com/PyCQA/isort#readme>`_ to automate import
+  sorting using the guidelines below.
 
   Quick start:
 
