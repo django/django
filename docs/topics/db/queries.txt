@@ -1110,6 +1110,8 @@ that combine both a normal query and a negated (``NOT``) query::
 
     Q(question__startswith='Who') | ~Q(pub_date__year=2005)
 
+You may also create a ``Q`` with no arguments, which applies no lookups.
+
 Each lookup function that takes keyword-arguments
 (e.g. :meth:`~django.db.models.query.QuerySet.filter`,
 :meth:`~django.db.models.query.QuerySet.exclude`,

@@ -184,9 +184,9 @@ executed.
 Returns a new ``QuerySet`` containing objects that match the given lookup
 parameters.
 
-The lookup parameters (``**kwargs``) should be in the format described in
-`Field lookups`_ below. Multiple parameters are joined via ``AND`` in the
-underlying SQL statement.
+The zero or more lookup parameters (``**kwargs``) should be in the format
+described in `Field lookups`_ below. Multiple parameters are joined via ``AND``
+in the underlying SQL statement.
 
 If you need to execute more complex queries (for example, queries with ``OR`` statements),
 you can use :class:`Q objects <django.db.models.Q>`.
