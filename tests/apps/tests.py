@@ -436,6 +436,14 @@ class AppConfigTests(SimpleTestCase):
         ac = AppConfig('label', Stub(__path__=['a']))
         self.assertEqual(repr(ac), '<AppConfig: label>')
 
+    def test_invalid_label(self):
+        class MyAppConfig(AppConfig):
+            label = 'invalid.label'
+
+        msg = "The app label 'invalid.label' is not a valid Python identifier."
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            MyAppConfig('test_app', Stub())
+
     @override_settings(
         INSTALLED_APPS=['apps.apps.ModelPKAppsConfig'],
         DEFAULT_AUTO_FIELD='django.db.models.SmallAutoField',
