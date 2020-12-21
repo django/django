@@ -131,6 +131,7 @@ class FallbackTests(BaseTests, SimpleTestCase):
         response = self.get_response()
         # see comment in CookieTests.test_cookie_max_length()
         msg_size = int((CookieStorage.max_cookie_size - 54) / 4.5 - 37)
+        random.seed(42)
         for i in range(5):
             s = str(i) + ''.join(random.choice(string.ascii_letters) for _ in range(msg_size - 1))
             storage.add(constants.INFO, s)
@@ -147,6 +148,7 @@ class FallbackTests(BaseTests, SimpleTestCase):
         """
         storage = self.get_storage()
         response = self.get_response()
+        random.seed(42)
         storage.add(constants.INFO, ''.join(random.choice(string.ascii_letters) for _ in range(5000)))
         storage.update(response)
         cookie_storing = self.stored_cookie_messages_count(storage, response)

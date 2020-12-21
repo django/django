@@ -119,6 +119,7 @@ class CookieTests(BaseTests, SimpleTestCase):
         # size which will fit 4 messages into the cookie, but not 5.
         # See also FallbackTest.test_session_fallback
         msg_size = int((CookieStorage.max_cookie_size - 54) / 4.5 - 37)
+        random.seed(42)
         for i in range(5):
             s = str(i) + ''.join(random.choice(string.ascii_letters) for _ in range(msg_size - 1))
             storage.add(constants.INFO, s)
