@@ -11,7 +11,7 @@ TOO_MUCH_DATA_MSG = 'Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.
 
 class DataUploadMaxMemorySizeFormPostTests(SimpleTestCase):
     def setUp(self):
-        payload = FakePayload('a=1&a=2;a=3\r\n')
+        payload = FakePayload(b'a=1&a=2;a=3\r\n')
         self.request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
             'CONTENT_TYPE': 'application/x-www-form-urlencoded',
@@ -35,13 +35,13 @@ class DataUploadMaxMemorySizeFormPostTests(SimpleTestCase):
 
 class DataUploadMaxMemorySizeMultipartPostTests(SimpleTestCase):
     def setUp(self):
-        payload = FakePayload("\r\n".join([
-            '--boundary',
-            'Content-Disposition: form-data; name="name"',
-            '',
-            'value',
-            '--boundary--'
-            ''
+        payload = FakePayload(b"\r\n".join([
+            b'--boundary',
+            b'Content-Disposition: form-data; name="name"',
+            b'',
+            b'value',
+            b'--boundary--',
+            b'',
         ]))
         self.request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
@@ -64,13 +64,13 @@ class DataUploadMaxMemorySizeMultipartPostTests(SimpleTestCase):
             self.request._load_post_and_files()
 
     def test_file_passes(self):
-        payload = FakePayload("\r\n".join([
-            '--boundary',
-            'Content-Disposition: form-data; name="file1"; filename="test.file"',
-            '',
-            'value',
-            '--boundary--'
-            ''
+        payload = FakePayload(b"\r\n".join([
+            b'--boundary',
+            b'Content-Disposition: form-data; name="file1"; filename="test.file"',
+            b'',
+            b'value',
+            b'--boundary--',
+            b'',
         ]))
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
@@ -133,17 +133,17 @@ class DataUploadMaxNumberOfFieldsGet(SimpleTestCase):
 
 class DataUploadMaxNumberOfFieldsMultipartPost(SimpleTestCase):
     def setUp(self):
-        payload = FakePayload("\r\n".join([
-            '--boundary',
-            'Content-Disposition: form-data; name="name1"',
-            '',
-            'value1',
-            '--boundary',
-            'Content-Disposition: form-data; name="name2"',
-            '',
-            'value2',
-            '--boundary--'
-            ''
+        payload = FakePayload(b"\r\n".join([
+            b'--boundary',
+            b'Content-Disposition: form-data; name="name1"',
+            b'',
+            b'value1',
+            b'--boundary',
+            b'Content-Disposition: form-data; name="name2"',
+            b'',
+            b'value2',
+            b'--boundary--',
+            b'',
         ]))
         self.request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
@@ -168,7 +168,7 @@ class DataUploadMaxNumberOfFieldsMultipartPost(SimpleTestCase):
 
 class DataUploadMaxNumberOfFieldsFormPost(SimpleTestCase):
     def setUp(self):
-        payload = FakePayload("\r\n".join(['a=1&a=2;a=3', '']))
+        payload = FakePayload(b'a=1&a=2;a=3\r\n')
         self.request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
             'CONTENT_TYPE': 'application/x-www-form-urlencoded',

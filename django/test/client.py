@@ -178,7 +178,7 @@ class AsyncClientHandler(BaseHandler):
         if '_body_file' in scope:
             body_file = scope.pop('_body_file')
         else:
-            body_file = FakePayload('')
+            body_file = FakePayload(b'')
 
         request_started.disconnect(close_old_connections)
         await sync_to_async(request_started.send, thread_sensitive=False)(sender=self.__class__, scope=scope)
@@ -521,7 +521,7 @@ class AsyncRequestFactory(RequestFactory):
         if '_body_file' in request:
             body_file = request.pop('_body_file')
         else:
-            body_file = FakePayload('')
+            body_file = FakePayload(b'')
         return ASGIRequest(self._base_scope(**request), body_file)
 
     def generic(

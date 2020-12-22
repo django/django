@@ -238,7 +238,7 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(stream.read(), b'')
 
     def test_stream(self):
-        payload = FakePayload('name=value')
+        payload = FakePayload(b'name=value')
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
             'CONTENT_TYPE': 'application/x-www-form-urlencoded',
@@ -252,7 +252,7 @@ class RequestsTests(SimpleTestCase):
         Reading from request is allowed after accessing request contents as
         POST or body.
         """
-        payload = FakePayload('name=value')
+        payload = FakePayload(b'name=value')
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
             'CONTENT_TYPE': 'application/x-www-form-urlencoded',
@@ -268,7 +268,7 @@ class RequestsTests(SimpleTestCase):
         Construction of POST or body is not allowed after reading
         from request.
         """
-        payload = FakePayload('name=value')
+        payload = FakePayload(b'name=value')
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
             'CONTENT_TYPE': 'application/x-www-form-urlencoded',
@@ -310,13 +310,14 @@ class RequestsTests(SimpleTestCase):
         # Because multipart is used for large amounts of data i.e. file uploads,
         # we don't want the data held in memory twice, and we don't want to
         # silence the error by setting body = '' either.
-        payload = FakePayload("\r\n".join([
-            '--boundary',
-            'Content-Disposition: form-data; name="name"',
-            '',
-            'value',
-            '--boundary--'
-            '']))
+        payload = FakePayload(b"\r\n".join([
+            b'--boundary',
+            b'Content-Disposition: form-data; name="name"',
+            b'',
+            b'value',
+            b'--boundary--',
+            b'',
+        ]))
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
             'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
@@ -360,13 +361,14 @@ class RequestsTests(SimpleTestCase):
         # https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.13
         # Every request.POST with Content-Length >= 0 is a valid request,
         # this test ensures that we handle Content-Length == 0.
-        payload = FakePayload("\r\n".join([
-            '--boundary',
-            'Content-Disposition: form-data; name="name"',
-            '',
-            'value',
-            '--boundary--'
-            '']))
+        payload = FakePayload(b"\r\n".join([
+            b'--boundary',
+            b'Content-Disposition: form-data; name="name"',
+            b'',
+            b'value',
+            b'--boundary--',
+            b'',
+        ]))
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
             'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
@@ -396,7 +398,7 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(request.body, payload)
 
     def test_read_by_lines(self):
-        payload = FakePayload('name=value')
+        payload = FakePayload(b'name=value')
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
             'CONTENT_TYPE': 'application/x-www-form-urlencoded',
@@ -409,7 +411,7 @@ class RequestsTests(SimpleTestCase):
         """
         POST should be populated even if body is read first
         """
-        payload = FakePayload('name=value')
+        payload = FakePayload(b'name=value')
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
             'CONTENT_TYPE': 'application/x-www-form-urlencoded',
@@ -424,7 +426,7 @@ class RequestsTests(SimpleTestCase):
         POST should be populated even if body is read first, and then
         the stream is read second.
         """
-        payload = FakePayload('name=value')
+        payload = FakePayload(b'name=value')
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
             'CONTENT_TYPE': 'application/x-www-form-urlencoded',
@@ -440,13 +442,14 @@ class RequestsTests(SimpleTestCase):
         POST should be populated even if body is read first, and then
         the stream is read second. Using multipart/form-data instead of urlencoded.
         """
-        payload = FakePayload("\r\n".join([
-            '--boundary',
-            'Content-Disposition: form-data; name="name"',
-            '',
-            'value',
-            '--boundary--'
-            '']))
+        payload = FakePayload(b"\r\n".join([
+            b'--boundary',
+            b'Content-Disposition: form-data; name="name"',
+            b'',
+            b'value',
+            b'--boundary--',
+            b'',
+        ]))
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
             'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
@@ -462,12 +465,12 @@ class RequestsTests(SimpleTestCase):
         """
         MultiPartParser.parse() leaves request.POST immutable.
         """
-        payload = FakePayload("\r\n".join([
-            '--boundary',
-            'Content-Disposition: form-data; name="name"',
-            '',
-            'value',
-            '--boundary--',
+        payload = FakePayload(b"\r\n".join([
+            b'--boundary',
+            b'Content-Disposition: form-data; name="name"',
+            b'',
+            b'value',
+            b'--boundary--',
         ]))
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
