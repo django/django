@@ -12,6 +12,8 @@ logger = logging.getLogger('django.contrib.gis')
 # Custom library path set?
 try:
     from django.conf import settings
+    if not settings.configured:
+        settings.configure()
     lib_path = settings.GDAL_LIBRARY_PATH
 except (AttributeError, ImportError, ImproperlyConfigured, OSError):
     lib_path = None
