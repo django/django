@@ -64,7 +64,8 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The PostgreSQL backend now supports connecting by a service name. See
+  :ref:`postgresql-connection-settings` for more details.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -68,6 +68,36 @@ class Tests(TestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             DatabaseWrapper(settings).get_connection_params()
 
+    def test_database_name_empty(self):
+        from django.db.backends.postgresql.base import DatabaseWrapper
+        settings = connection.settings_dict.copy()
+        settings['NAME'] = ''
+        msg = (
+            "settings.DATABASES is improperly configured. Please supply the "
+            "NAME or OPTIONS['service'] value."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            DatabaseWrapper(settings).get_connection_params()
+
+    def test_service_name(self):
+        from django.db.backends.postgresql.base import DatabaseWrapper
+        settings = connection.settings_dict.copy()
+        settings['OPTIONS'] = {'service': 'my_service'}
+        settings['NAME'] = ''
+        params = DatabaseWrapper(settings).get_connection_params()
+        self.assertEqual(params['service'], 'my_service')
+        self.assertNotIn('database', params)
+
+    def test_service_name_default_db(self):
+        # None is used to connect to the default 'postgres' db.
+        from django.db.backends.postgresql.base import DatabaseWrapper
+        settings = connection.settings_dict.copy()
+        settings['NAME'] = None
+        settings['OPTIONS'] = {'service': 'django_test'}
+        params = DatabaseWrapper(settings).get_connection_params()
+        self.assertEqual(params['database'], 'postgres')
+        self.assertNotIn('service', params)
+
     def test_connect_and_rollback(self):
         """
         PostgreSQL shouldn't roll back SET TIME ZONE, even if the first
