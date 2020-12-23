@@ -36,7 +36,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
                 # Incorrect levels don't have any messages.
                 for wrong_level in level_status_codes:
                     if wrong_level != level:
-                        with self.assertLogs('django.server', 'INFO') as cm:
+                        with self.assertLogs('django.server') as cm:
                             handler.log_message('GET %s %s', 'A', str(status_code))
                         self.assertNotEqual(cm.records[0].levelname, wrong_level.upper())
 
@@ -95,7 +95,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
         server = Stub(base_environ={}, get_app=lambda: test_app)
 
         # Prevent logging from appearing in test output.
-        with self.assertLogs('django.server', 'INFO'):
+        with self.assertLogs('django.server'):
             # instantiating a handler runs the request as side effect
             WSGIRequestHandler(request, '192.168.0.2', server)
 
@@ -126,7 +126,7 @@ class WSGIServerTestCase(SimpleTestCase):
                         raise exception()
                     except Exception:
                         with captured_stderr() as err:
-                            with self.assertLogs('django.server', 'INFO') as cm:
+                            with self.assertLogs('django.server') as cm:
                                 server.handle_error(request, client_address)
                         self.assertEqual(err.getvalue(), '')
                         self.assertEqual(cm.records[0].getMessage(), msg)

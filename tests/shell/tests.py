@@ -18,7 +18,7 @@ class ShellCommandTestCase(SimpleTestCase):
     )
 
     def test_command_option(self):
-        with self.assertLogs('test', 'INFO') as cm:
+        with self.assertLogs('test') as cm:
             call_command(
                 'shell',
                 command=(
