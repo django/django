@@ -19,7 +19,7 @@ To use the tool, first install ``pre-commit`` and then the git hooks::
 
 .. console::
 
-    $ pip install pre-commit
+    $ python -m pip install pre-commit
     $ pre-commit install
 
 On the first commit ``pre-commit`` will install the hooks, these are
