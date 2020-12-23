@@ -93,7 +93,7 @@ The ``Storage`` class
 
         Deletes the file referenced by ``name``. If deletion is not supported
         on the target storage system this will raise ``NotImplementedError``
-        instead
+        instead.
 
     .. method:: exists(name)
 
