@@ -153,7 +153,8 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :djadmin:`runserver` management command now supports the
+  :option:`--skip-checks` option.
 
 Migrations
 ~~~~~~~~~~

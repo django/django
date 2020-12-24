@@ -1313,6 +1313,29 @@ class ManageRunserver(SimpleTestCase):
         # You have # ...
         self.assertIn('unapplied migration(s)', self.output.getvalue())
 
+    @mock.patch('django.core.management.commands.runserver.run')
+    @mock.patch('django.core.management.base.BaseCommand.check_migrations')
+    @mock.patch('django.core.management.base.BaseCommand.check')
+    def test_skip_checks(self, mocked_check, *mocked_objects):
+        call_command(
+            'runserver',
+            use_reloader=False,
+            skip_checks=True,
+            stdout=self.output,
+        )
+        self.assertNotIn('Performing system checks...', self.output.getvalue())
+        mocked_check.assert_not_called()
+
+        self.output.truncate(0)
+        call_command(
+            'runserver',
+            use_reloader=False,
+            skip_checks=False,
+            stdout=self.output,
+        )
+        self.assertIn('Performing system checks...', self.output.getvalue())
+        mocked_check.assert_called()
+
 
 class ManageRunserverMigrationWarning(TestCase):
 

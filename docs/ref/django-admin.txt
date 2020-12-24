@@ -968,7 +968,8 @@ more robust change detection, and a reduction in power usage. Django supports
 When you start the server, and each time you change Python code while the
 server is running, the system check framework will check your entire Django
 project for some common errors (see the :djadmin:`check` command). If any
-errors are found, they will be printed to standard output.
+errors are found, they will be printed to standard output. You can use the
+``--skip-checks`` option to skip running system checks.
 
 You can run as many concurrent servers as you want, as long as they're on
 separate ports by executing ``django-admin runserver`` more than once.
@@ -1005,6 +1006,10 @@ multithreaded by default.
 
 Uses IPv6 for the development server. This changes the default IP address from
 ``127.0.0.1`` to ``::1``.
+
+.. versionchanged:: 4.0
+
+    Support for the ``--skip-checks`` option was added.
 
 Examples of using different ports and addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
