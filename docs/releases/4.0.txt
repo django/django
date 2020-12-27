@@ -58,6 +58,13 @@ For example::
 Functional unique constraints are added to models using the
 :attr:`Meta.constraints <django.db.models.Options.constraints>` option.
 
+``scrypt`` password hasher
+--------------------------
+
+The new :ref:`scrypt password hasher <scrypt-usage>` is more secure and
+recommended over PBKDF2. However, it's not the default as it requires OpenSSL
+1.1+ and more memory.
+
 Minor features
 --------------
 
