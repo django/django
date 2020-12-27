@@ -16,6 +16,12 @@ class ExtendsRelativeBehaviorTests(SimpleTestCase):
         output = template.render(Context({}))
         self.assertEqual(output.strip(), 'three two one')
 
+    def test_normal_extend_variable(self):
+        engine = Engine(dirs=[RELATIVE])
+        template = engine.get_template('one_var.html')
+        output = template.render(Context({'tmpl': './two.html'}))
+        self.assertEqual(output.strip(), 'three two one')
+
     def test_dir1_extend(self):
         engine = Engine(dirs=[RELATIVE])
         template = engine.get_template('dir1/one.html')
