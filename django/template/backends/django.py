@@ -123,7 +123,7 @@ def get_package_libraries(pkg):
             raise InvalidTemplateLibrary(
                 "Invalid template library specified. ImportError raised when "
                 "trying to load '%s': %s" % (entry[1], e)
-            )
+            ) from e
 
         if hasattr(module, 'register'):
             yield entry[1]
