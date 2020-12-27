@@ -354,6 +354,7 @@ class Argon2PasswordHasher(BasePasswordHasher):
             'time_cost': params.time_cost,
             'variety': variety,
             'version': params.version,
+            'params': params,
         }
 
     def verify(self, password, encoded):
@@ -379,10 +380,7 @@ class Argon2PasswordHasher(BasePasswordHasher):
         }
 
     def must_update(self, encoded):
-        algorithm, rest = encoded.split('$', 1)
-        assert algorithm == self.algorithm
-        argon2 = self._load_library()
-        current_params = argon2.extract_parameters('$' + rest)
+        current_params = self.decode(encoded)['params']
         new_params = self.params()
         # Set salt_len to the salt_len of the current parameters because salt
         # is explicitly passed to argon2.
