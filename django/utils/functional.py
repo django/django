@@ -49,6 +49,24 @@ class cached_property:
         return res
 
 
+class cached_classproperty:
+    """
+    Decorator that converts a method with a single cls argument into a
+    property cached that can be accessed directly from the class.
+    """
+
+    def __init__(self, fget):
+        self.obj = {}
+        self.fget = fget
+        self.__doc__ = getattr(fget, '__doc__')
+
+    def __get__(self, instance, cls):
+        if cls in self.obj:
+            return self.obj[cls]
+        self.obj[cls] = self.fget(cls)
+        return self.obj[cls]
+    
+    
 class classproperty:
     """
     Decorator that converts a method with a single cls argument into a property
