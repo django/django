@@ -11,6 +11,7 @@ LANGUAGE      ?=
 
 # Convert something like "en_US" to "en", because Sphinx does not recognize
 # underscores. Country codes should be passed using a dash, e.g. "pt-BR".
+# Testing
 LANGUAGEOPT = $(firstword $(subst _, ,$(LANGUAGE)))
 
 # Internal variables.
