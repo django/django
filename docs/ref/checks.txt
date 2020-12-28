@@ -237,16 +237,16 @@ Related fields
 
 * **fields.E300**: Field defines a relation with model ``<model>``, which is
   either not installed, or is abstract.
-* **fields.E301**: Field defines a relation with the model ``<model>`` which
-  has been swapped out.
-* **fields.E302**: Accessor for field ``<field name>`` clashes with field
-  ``<field name>``.
-* **fields.E303**: Reverse query name for field ``<field name>`` clashes with
-  field ``<field name>``.
-* **fields.E304**: Field name ``<field name>`` clashes with accessor for
-  ``<field name>``.
-* **fields.E305**: Field name ``<field name>`` clashes with reverse query name
-  for ``<field name>``.
+* **fields.E301**: Field defines a relation with the model
+  ``<app_label>.<model>`` which has been swapped out.
+* **fields.E302**: Accessor for field ``<model>.<field name>`` clashes with
+  field ``<model>.<field name>``.
+* **fields.E303**: Reverse query name for field ``<model>.<field name>``
+  clashes with field ``<model>.<field name>``.
+* **fields.E304**: Field name ``<model>.<field name>`` clashes with accessor
+  for ``<model>.<field name>``.
+* **fields.E305**: Field name ``<model>.<field name>`` clashes with reverse
+  query name for ``<model>.<field name>``.
 * **fields.E306**: Related name must be a valid Python identifier or end with
   a ``'+'``.
 * **fields.E307**: The field ``<app label>.<model>.<field name>`` was declared
