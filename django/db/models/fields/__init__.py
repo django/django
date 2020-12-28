@@ -183,8 +183,7 @@ class Field(RegisterLookupMixin):
         if not hasattr(self, 'model'):
             return super().__str__()
         model = self.model
-        app = model._meta.app_label
-        return '%s.%s.%s' % (app, model._meta.object_name, self.name)
+        return '%s.%s' % (model._meta.label, self.name)
 
     def __repr__(self):
         """Display the module, class, and name of the field."""
