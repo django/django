@@ -172,14 +172,10 @@ class RelatedField(FieldCacheMixin, Field):
         if (self.remote_field.model not in self.opts.apps.get_models() and
                 not isinstance(self.remote_field.model, str) and
                 self.remote_field.model._meta.swapped):
-            model = "%s.%s" % (
-                self.remote_field.model._meta.app_label,
-                self.remote_field.model._meta.object_name
-            )
             return [
                 checks.Error(
                     "Field defines a relation with the model '%s', which has "
-                    "been swapped out." % model,
+                    "been swapped out." % self.remote_field.model._meta.label,
                     hint="Update the relation to point at 'settings.%s'." % self.remote_field.model._meta.swappable,
                     obj=self,
                     id='fields.E301',
@@ -1479,18 +1475,12 @@ class ManyToManyField(RelatedField):
         if isinstance(self.remote_field.model, str):
             kwargs['to'] = self.remote_field.model
         else:
-            kwargs['to'] = "%s.%s" % (
-                self.remote_field.model._meta.app_label,
-                self.remote_field.model._meta.object_name,
-            )
+            kwargs['to'] = self.remote_field.model._meta.label
         if getattr(self.remote_field, 'through', None) is not None:
             if isinstance(self.remote_field.through, str):
                 kwargs['through'] = self.remote_field.through
             elif not self.remote_field.through._meta.auto_created:
-                kwargs['through'] = "%s.%s" % (
-                    self.remote_field.through._meta.app_label,
-                    self.remote_field.through._meta.object_name,
-                )
+                kwargs['through'] = self.remote_field.through._meta.label
         # If swappable is True, then see if we're actually pointing to the target
         # of a swap.
         swappable_setting = self.swappable_setting

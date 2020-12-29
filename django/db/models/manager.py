@@ -185,9 +185,8 @@ class ManagerDescriptor:
 
         if cls._meta.swapped:
             raise AttributeError(
-                "Manager isn't available; '%s.%s' has been swapped for '%s'" % (
-                    cls._meta.app_label,
-                    cls._meta.object_name,
+                "Manager isn't available; '%s' has been swapped for '%s'" % (
+                    cls._meta.label,
                     cls._meta.swapped,
                 )
             )
