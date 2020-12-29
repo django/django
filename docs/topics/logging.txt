@@ -568,6 +568,9 @@ Messages to this logger have the following extra context:
 * ``duration``: The time taken to execute the SQL statement.
 * ``sql``: The SQL statement that was executed.
 * ``params``: The parameters that were used in the SQL call.
+* ``alias``: The alias of the database used in the SQL call.
+  
+  .. versionchanged:: 3.2
 
 For performance reasons, SQL logging is only enabled when
 ``settings.DEBUG`` is set to ``True``, regardless of the logging

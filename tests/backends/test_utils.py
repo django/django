@@ -3,7 +3,7 @@ from decimal import Decimal, Rounded
 
 from django.db import NotSupportedError, connection
 from django.db.backends.utils import (
-    format_number, split_identifier, truncate_name,
+    DebugWrapper, format_number, split_identifier, truncate_name,
 )
 from django.test import (
     SimpleTestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
