@@ -654,6 +654,25 @@ Dropped support for MySQL 5.6
 The end of upstream support for MySQL 5.6 is April 2021. Django 3.2 supports
 MySQL 5.7 and higher.
 
+Unified behaviour of ForeignKey and ManyToManyField
+---------------------------------------------------
+
+The behavior of nullable related ``QuerySet`` has changed.
+
+Before, querying a nullable many-to-many relation was an error. For foreign
+key relations there was no error.
+
+Now it has changed:
+
+* Nullable many-to-many relations now return an empty queryset when the
+  relation field is null (no change for foreign keys).
+
+* For a foreign key relation, trying to add/remove/clear objects when the
+  relation field is null is now an error (no change for m2m).
+
+* For a foreign key relation, trying to use a relation of any kind when the
+  object isn't saved is now an error (no change for m2m).
+
 Miscellaneous
 -------------
 

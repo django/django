@@ -368,6 +368,75 @@ want. For example::
         )
         # ...
 
+.. versionchanged:: 3.2
+
+    Unified behaviour of ``ForeignKey`` and ``ManyToManyField``.
+
+    The behavior of nullable related ``QuerySet`` has changed.
+
+    Nullable related ``QuerySet`` means a ``QuerySet`` for reverse relation
+    to a field which can be set to null.
+
+    Before, querying a nullable many-to-many relation was an error. For foreign
+    key relations there was no error. To make the nullable relations consistent
+    the following changes were made:
+
+    * Nullable many-to-many relations now return an empty queryset when the
+      relation field is null (no change for foreign keys).
+      For example::
+
+        from django.db import models
+
+        class Car(models.Model):
+          drivers = models.ManyToManyField('Driver')
+
+        class Driver(models.Model):
+          name = models.CharField()
+
+        Car.objects.create().drivers.all()
+
+      returns ``EmptyQuerySet``.
+      Previously it would raise ``ValueError``.
+
+    * For a foreign key relation, trying to add/remove/clear objects when the
+      relation field is null is now an error (no change for m2m).
+      For example, given these related models::
+
+        from django.db import models
+
+        class Poll(models.Model):
+            question = models.CharField(max_length=200, unique=True, null=True)
+
+        class Choice(models.Model):
+            poll = models.ForeignKey(Poll, models.SET_NULL, to_field='question', null=True)
+            choice = models.CharField(max_length=200)
+
+        empty_poll = Poll.objects.create(question=None)
+        choice = Choice.objects.create(choice='B')
+
+      All the below statements now raise a ``ValueError`` ::
+
+        # Previously created a Choice object with ``poll_id=None``
+        empty_poll.choice_set.create()
+        empty_poll.choice_set.get_or_create()
+
+        # Previously the ``choice.poll_id`` remained to None
+        empty_poll.choice_set.add(choice)
+
+        # Previously did nothing
+        empty_poll.choice_set.remove(choice)
+        empty_poll.choice_set.clear()
+
+
+    * For a foreign key relation, trying to use a relation of any kind when the
+      object isn't saved is now an error (no change for m2m).
+      For example invoking::
+
+        Poll(question="How?").choice_set
+
+      now raises a ``ValueError``.
+      Previously it would return a ``RelatedManager``.
+
 .. seealso::
 
     :class:`~django.db.models.ForeignKey` fields accept a number of extra

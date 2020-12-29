@@ -564,6 +564,12 @@ def create_reverse_many_to_one_manager(superclass, rel):
             self.model = rel.related_model
             self.field = rel.field
 
+            if self.instance.pk is None:
+                raise ValueError(
+                    '"%r" needs to have a primary key value before '
+                    'this relationship can be used.' % self.instance
+                )
+
             self.core_filters = {self.field.name: instance}
 
         def __call__(self, *, manager):
@@ -571,6 +577,14 @@ def create_reverse_many_to_one_manager(superclass, rel):
             manager_class = create_reverse_many_to_one_manager(manager.__class__, rel)
             return manager_class(self.instance)
         do_not_call_in_templates = True
+
+        def _check_fk_val(self):
+            for field in self.field.foreign_related_fields:
+                if getattr(self.instance, field.attname) is None:
+                    raise ValueError(
+                        '"%r" needs to have a value for field "%s" before '
+                        'this relationship can be used.' % (self.instance, field.attname)
+                    )
 
         def _apply_rel_filters(self, queryset):
             """
@@ -641,6 +655,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             return queryset, rel_obj_attr, instance_attr, False, cache_name, False
 
         def add(self, *objs, bulk=True):
+            self._check_fk_val()
             self._remove_prefetched_objects()
             db = router.db_for_write(self.model, instance=self.instance)
 
@@ -672,18 +687,21 @@ def create_reverse_many_to_one_manager(superclass, rel):
         add.alters_data = True
 
         def create(self, **kwargs):
+            self._check_fk_val()
             kwargs[self.field.name] = self.instance
             db = router.db_for_write(self.model, instance=self.instance)
             return super(RelatedManager, self.db_manager(db)).create(**kwargs)
         create.alters_data = True
 
         def get_or_create(self, **kwargs):
+            self._check_fk_val()
             kwargs[self.field.name] = self.instance
             db = router.db_for_write(self.model, instance=self.instance)
             return super(RelatedManager, self.db_manager(db)).get_or_create(**kwargs)
         get_or_create.alters_data = True
 
         def update_or_create(self, **kwargs):
+            self._check_fk_val()
             kwargs[self.field.name] = self.instance
             db = router.db_for_write(self.model, instance=self.instance)
             return super(RelatedManager, self.db_manager(db)).update_or_create(**kwargs)
@@ -716,6 +734,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             clear.alters_data = True
 
             def _clear(self, queryset, bulk):
+                self._check_fk_val()
                 self._remove_prefetched_objects()
                 db = router.db_for_write(self.model, instance=self.instance)
                 queryset = queryset.using(db)
@@ -902,7 +921,17 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
             except (AttributeError, KeyError):
                 queryset = super().get_queryset()
+                if None in self.related_val:
+                    return queryset.none()
                 return self._apply_rel_filters(queryset)
+
+        def _check_has_fk_val(self):
+            if None in self.related_val:
+                raise ValueError(
+                    '"%r" needs to have a value for field "%s" before '
+                    'this many-to-many relationship can be used.' %
+                    (self.instance, self.pk_field_names[self.source_field_name])
+                )
 
         def get_prefetch_queryset(self, instances, queryset=None):
             if queryset is None:
@@ -944,6 +973,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             )
 
         def add(self, *objs, through_defaults=None):
+            self._check_has_fk_val()
             self._remove_prefetched_objects()
             db = router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
@@ -963,11 +993,13 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
         add.alters_data = True
 
         def remove(self, *objs):
+            self._check_has_fk_val()
             self._remove_prefetched_objects()
             self._remove_items(self.source_field_name, self.target_field_name, *objs)
         remove.alters_data = True
 
         def clear(self):
+            self._check_has_fk_val()
             db = router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
                 signals.m2m_changed.send(

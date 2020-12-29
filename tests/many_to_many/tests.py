@@ -5,6 +5,7 @@ from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import (
     Article, InheritedArticleA, InheritedArticleB, Publication, User,
+    UserArticle,
 )
 
 
@@ -29,6 +30,8 @@ class ManyToManyTests(TestCase):
 
         cls.a4 = Article.objects.create(headline='Oxygen-free diet works wonders')
         cls.a4.publications.add(cls.p2)
+
+        cls.unused_user = User.objects.create(username='django_reinhardt')
 
     def test_add(self):
         # Create an Article.
@@ -501,3 +504,47 @@ class ManyToManyTests(TestCase):
         a5.publications.add(self.p2)
         self.assertEqual(self.p2.article_set.count(), self.p2.article_set.all().count())
         self.assertEqual(self.p3.article_set.exists(), self.p3.article_set.all().exists())
+
+    def test_add_null(self):
+        null_article = Article.objects.create(headline=None)
+        msg = (
+            '"<Article: None>" needs to have a value for field "headline"'
+            ' before this many-to-many relationship can be used.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            null_article.authors._add_items('article', 'authors', self.unused_user)
+
+    def test_remove_empty(self):
+        null_article = Article.objects.create(headline=None)
+        msg = (
+            '"<Article: None>" needs to have a value for field "headline" '
+            'before this many-to-many relationship can be used.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            null_article.authors._remove_items('article', 'authors', self.unused_user)
+
+    def test_clear_empty(self):
+        null_article = Article.objects.create(headline=None)
+        msg = (
+            '"<Article: None>" needs to have a value for field "headline" '
+            'before this many-to-many relationship can be used.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            null_article.authors.clear()
+
+    def test_null_query(self):
+        user_article = UserArticle(user=self.unused_user)
+        new_article = Article()
+        msg = (
+            '"<Article: None>" needs to have a value for field "headline" '
+            'before this many-to-many relationship can be used.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            new_article.authors
+
+        new_article.headline = "Monty Python's Flying Circus"
+        new_article.save()
+        self.assertQuerysetEqual(new_article.authors.all(), [])
+        user_article.article = new_article
+        user_article.save()
+        self.assertEqual(list(new_article.authors.all()), [self.unused_user])

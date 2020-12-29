@@ -606,10 +606,9 @@ class ManyToOneTests(TestCase):
         Third.objects.create(name='Third 1')
         Third.objects.create(name='Third 2')
         th = Third(name="testing")
-        # The object isn't saved and thus the relation field is null - we won't even
-        # execute a query in this case.
-        with self.assertNumQueries(0):
-            self.assertEqual(th.child_set.count(), 0)
+        # The object isn't saved and thus the relation cannot be used.
+        with self.assertRaises(ValueError):
+            th.child_set
         th.save()
         # Now the model is saved, so we will need to execute a query.
         with self.assertNumQueries(1):

@@ -33,7 +33,7 @@ class NoDeletedArticleManager(models.Manager):
 
 
 class Article(models.Model):
-    headline = models.CharField(max_length=100)
+    headline = models.CharField(max_length=100, null=True)
     # Assign a string as name to make sure the intermediary model is
     # correctly created. Refs #20207
     publications = models.ManyToManyField(Publication, name='publications')
