@@ -12,3 +12,7 @@ Bugfixes
 * Fixed ``__isnull=True`` lookup on key transforms for
   :class:`~django.db.models.JSONField` with Oracle and SQLite
   (:ticket:`32252`).
+
+* Fixed a bug in Django 3.1 that caused a crash when processing middlewares in
+  an async context with a middleware that raises a ``MiddlewareNotUsed``
+  exception (:ticket:`32299`).
