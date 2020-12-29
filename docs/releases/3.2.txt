@@ -689,6 +689,8 @@ Miscellaneous
   Due to a ``python-memcached`` limitation, the previous behavior is kept for
   the deprecated ``MemcachedCache`` backend.
 
+* The minimum supported version of SQLite is increased from 3.8.3 to 3.9.0.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2
