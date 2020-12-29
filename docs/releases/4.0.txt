@@ -226,7 +226,8 @@ Internationalization
 Logging
 ~~~~~~~
 
-* ...
+* The alias of the database used in an SQL call is now passed as extra context
+  along with each message to the :ref:`django-db-logger` logger.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
