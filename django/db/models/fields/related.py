@@ -1614,7 +1614,11 @@ class ManyToManyField(RelatedField):
             # related_name with one generated from the m2m field name. Django
             # still uses backwards relations internally and we need to avoid
             # clashes between multiple m2m fields with related_name == '+'.
-            self.remote_field.related_name = "_%s_%s_+" % (cls.__name__.lower(), name)
+            self.remote_field.related_name = '_%s_%s_%s_+' % (
+                cls._meta.app_label,
+                cls.__name__.lower(),
+                name,
+            )
 
         super().contribute_to_class(cls, name, **kwargs)
 

@@ -3,7 +3,7 @@ from unittest import mock
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import connection, models
 from django.test.testcases import SimpleTestCase
-from django.test.utils import isolate_apps, override_settings
+from django.test.utils import isolate_apps, modify_settings, override_settings
 
 
 @isolate_apps('invalid_models_tests')
@@ -1024,6 +1024,32 @@ class ReverseQueryNameClashTests(SimpleTestCase):
                 id='fields.E303',
             ),
         ])
+
+    @modify_settings(INSTALLED_APPS={'append': 'basic'})
+    @isolate_apps('basic', 'invalid_models_tests')
+    def test_no_clash_across_apps_without_accessor(self):
+        class Target(models.Model):
+            class Meta:
+                app_label = 'invalid_models_tests'
+
+        class Model(models.Model):
+            m2m = models.ManyToManyField(Target, related_name='+')
+
+            class Meta:
+                app_label = 'basic'
+
+        def _test():
+            # Define model with the same name.
+            class Model(models.Model):
+                m2m = models.ManyToManyField(Target, related_name='+')
+
+                class Meta:
+                    app_label = 'invalid_models_tests'
+
+            self.assertEqual(Model.check(), [])
+
+        _test()
+        self.assertEqual(Model.check(), [])
 
 
 @isolate_apps('invalid_models_tests')
