@@ -14,13 +14,15 @@ class SimpleSitemap(Sitemap):
     changefreq = "never"
     priority = 0.5
     location = '/location/'
-    lastmod = datetime.now()
+    lastmod = date.today()
 
     def items(self):
         return [object()]
 
 
 class SimplePagedSitemap(Sitemap):
+    lastmod = date.today()
+
     def items(self):
         return [object() for x in range(Sitemap.limit + 1)]
 
@@ -110,6 +112,26 @@ class CallableLastmodFullSitemap(Sitemap):
         return obj.lastmod
 
 
+class GetLatestLastmodNoneSiteMap(Sitemap):
+    changefreq = "never"
+    priority = 0.5
+    location = '/location/'
+
+    def items(self):
+        return [object()]
+
+    def lastmod(self, obj):
+        return datetime(2013, 3, 13, 10, 0, 0)
+
+    def get_latest_lastmod(self):
+        return None
+
+
+class GetLatestLastmodSiteMap(SimpleSitemap):
+    def get_latest_lastmod(self):
+        return datetime(2013, 3, 13, 10, 0, 0)
+
+
 def testmodelview(request, id):
     return HttpResponse()
 
@@ -180,6 +202,18 @@ generic_sitemaps = {
     'generic': GenericSitemap({'queryset': TestModel.objects.order_by('pk').all()}),
 }
 
+get_latest_lastmod_none_sitemaps = {
+    'get-latest-lastmod-none': GetLatestLastmodNoneSiteMap,
+}
+
+get_latest_lastmod_sitemaps = {
+    'get-latest-lastmod': GetLatestLastmodSiteMap,
+}
+
+latest_lastmod_timezone_sitemaps = {
+    'latest-lastmod-timezone': TimezoneSiteMap,
+}
+
 generic_sitemaps_lastmod = {
     'generic': GenericSitemap({
         'queryset': TestModel.objects.order_by('pk').all(),
@@ -202,6 +236,10 @@ urlpatterns = [
     path(
         'simple/custom-index.xml', views.index,
         {'sitemaps': simple_sitemaps, 'template_name': 'custom_sitemap_index.xml'}),
+    path(
+        'simple/custom-lastmod-index.xml', views.index,
+        {'sitemaps': simple_sitemaps, 'template_name': 'custom_sitemap_lastmod_index.xml'},
+    ),
     path(
         'simple/sitemap-<section>.xml', views.sitemap,
         {'sitemaps': simple_sitemaps},
@@ -267,6 +305,21 @@ urlpatterns = [
         {'sitemaps': sitemaps_lastmod_descending},
         name='django.contrib.sitemaps.views.sitemap'),
     path(
+        'lastmod/get-latest-lastmod-none-sitemap.xml', views.index,
+        {'sitemaps': get_latest_lastmod_none_sitemaps},
+        name='django.contrib.sitemaps.views.index',
+    ),
+    path(
+        'lastmod/get-latest-lastmod-sitemap.xml', views.index,
+        {'sitemaps': get_latest_lastmod_sitemaps},
+        name='django.contrib.sitemaps.views.index',
+    ),
+    path(
+        'lastmod/latest-lastmod-timezone-sitemap.xml', views.index,
+        {'sitemaps': latest_lastmod_timezone_sitemaps},
+        name='django.contrib.sitemaps.views.index',
+    ),
+    path(
         'generic/sitemap.xml', views.sitemap,
         {'sitemaps': generic_sitemaps},
         name='django.contrib.sitemaps.views.sitemap'),
@@ -287,6 +340,11 @@ urlpatterns = [
     path('callable-lastmod-partial/sitemap.xml', views.sitemap, {'sitemaps': callable_lastmod_partial_sitemap}),
     path('callable-lastmod-full/index.xml', views.index, {'sitemaps': callable_lastmod_full_sitemap}),
     path('callable-lastmod-full/sitemap.xml', views.sitemap, {'sitemaps': callable_lastmod_full_sitemap}),
+    path(
+        'generic-lastmod/index.xml', views.index,
+        {'sitemaps': generic_sitemaps_lastmod},
+        name='django.contrib.sitemaps.views.index',
+    ),
 ]
 
 urlpatterns += i18n_patterns(

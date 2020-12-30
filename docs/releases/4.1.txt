@@ -88,7 +88,11 @@ Minor features
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The default sitemap index template ``<sitemapindex>`` now includes the
+  ``<lastmod>`` timestamp where available, through the new
+  :meth:`~django.contrib.sitemaps.Sitemap.get_latest_lastmod` method. Custom
+  sitemap index templates should be updated for the adjusted :ref:`context
+  variables <sitemap-index-context-variables>`.
 
 :mod:`django.contrib.sites`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -253,7 +257,10 @@ Features deprecated in 4.1
 Miscellaneous
 -------------
 
-* ...
+* The context for sitemap index templates of a flat list of URLs is deprecated.
+  Custom sitemap index templates should be updated for the adjusted
+  :ref:`context variables <sitemap-index-context-variables>`, expecting a list
+  of objects with ``location`` and optional ``lastmod`` attributes.
 
 Features removed in 4.1
 =======================

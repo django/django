@@ -65,6 +65,8 @@ details on these changes.
 See the :ref:`Django 4.1 release notes <deprecated-features-4.1>` for more
 details on these changes.
 
+* The ``SitemapIndexItem.__str__()`` method will be removed.
+
 .. _deprecation-removed-in-4.1:
 
 4.1
