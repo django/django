@@ -61,7 +61,7 @@ Database            Library Requirements            Supported Versions  Notes
 PostgreSQL          GEOS, GDAL, PROJ, PostGIS       9.6+                Requires PostGIS.
 MySQL               GEOS, GDAL                      5.7+                :ref:`Limited functionality <mysql-spatial-limitations>`.
 Oracle              GEOS, GDAL                      12.2+               XE not supported.
-SQLite              GEOS, GDAL, PROJ, SpatiaLite    3.8.3+              Requires SpatiaLite 4.3+
+SQLite              GEOS, GDAL, PROJ, SpatiaLite    3.9.0+              Requires SpatiaLite 4.3+
 ==================  ==============================  ==================  =========================================
 
 See also `this comparison matrix`__ on the OSGeo Wiki for
