@@ -577,6 +577,7 @@ class MediaURLStaticURLPrefixTest(SimpleTestCase):
         tests = (
             '/path/',
             'http://myhost.com/path/',
+            'http://server/',
             None,
         )
         for setting in ('MEDIA_URL', 'STATIC_URL'):
