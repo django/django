@@ -459,13 +459,18 @@ Default: ``[]`` (Empty list)
 
 A list of trusted origins for unsafe requests (e.g. ``POST``).
 
+For requests that include the ``Origin`` header, Django's CSRF protection
+requires that header match the origin present in the ``Host`` header.
+
 For a :meth:`secure <django.http.HttpRequest.is_secure>` unsafe
-request, Django's CSRF protection requires that the request have a ``Referer``
-header that matches the origin present in the ``Host`` header. This prevents,
-for example, a ``POST`` request from ``subdomain.example.com`` from succeeding
-against ``api.example.com``. If you need cross-origin unsafe requests over
-HTTPS, continuing the example, add ``'https://subdomain.example.com'`` to this
-list (and/or ``http://...`` if requests originate from an insecure page).
+request that doesn't include the ``Origin`` header, the request must have a
+``Referer`` header that matches the origin present in the ``Host`` header.
+
+These checks prevent, for example, a ``POST`` request from
+``subdomain.example.com`` from succeeding against ``api.example.com``. If you
+need cross-origin unsafe requests, continuing the example, add
+``'https://subdomain.example.com'`` to this list (and/or ``http://...`` if
+requests originate from an insecure page).
 
 The setting also supports subdomains, so you could add
 ``'https://*.example.com'``, for example, to allow access from all subdomains
@@ -475,6 +480,8 @@ of ``example.com``.
 
     The values in older versions must only include the hostname (possibly with
     a leading dot) and not the scheme or an asterisk.
+
+    Also, ``Origin`` header checking isn't performed in older versions.
 
 .. setting:: DATABASES
 

@@ -149,7 +149,9 @@ Cache
 CSRF
 ~~~~
 
-* ...
+* CSRF protection now consults the ``Origin`` header, if present. To facilitate
+  this, :ref:`some changes <csrf-trusted-origins-changes-4.0>` to the
+  :setting:`CSRF_TRUSTED_ORIGINS` setting are required.
 
 Decorators
 ~~~~~~~~~~
@@ -322,6 +324,15 @@ Also, values that started with a dot, must now also include an asterisk before
 the dot. For example, change ``'.example.com'`` to ``'https://*.example.com'``.
 
 A system check detects any required changes.
+
+Configuring it may now be required
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As CSRF protection now consults the ``Origin`` header, you may need to set
+:setting:`CSRF_TRUSTED_ORIGINS`, particularly if you allow requests from
+subdomains by setting :setting:`CSRF_COOKIE_DOMAIN` (or
+:setting:`SESSION_COOKIE_DOMAIN` if :setting:`CSRF_USE_SESSIONS` is enabled) to
+a value starting with a dot.
 
 Miscellaneous
 -------------

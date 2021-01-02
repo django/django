@@ -7,6 +7,7 @@ against request forgeries from other sites.
 import logging
 import re
 import string
+from collections import defaultdict
 from urllib.parse import urlparse
 
 from django.conf import settings
@@ -21,6 +22,7 @@ from django.utils.log import log_response
 
 logger = logging.getLogger('django.security.csrf')
 
+REASON_BAD_ORIGIN = "Origin checking failed - %s does not match any trusted origins."
 REASON_NO_REFERER = "Referer checking failed - no Referer."
 REASON_BAD_REFERER = "Referer checking failed - %s does not match any trusted origins."
 REASON_NO_CSRF_COOKIE = "CSRF cookie not set."
@@ -144,6 +146,24 @@ class CsrfViewMiddleware(MiddlewareMixin):
             for origin in settings.CSRF_TRUSTED_ORIGINS
         ]
 
+    @cached_property
+    def allowed_origins_exact(self):
+        return {
+            origin for origin in settings.CSRF_TRUSTED_ORIGINS
+            if '*' not in origin
+        }
+
+    @cached_property
+    def allowed_origin_subdomains(self):
+        """
+        A mapping of allowed schemes to list of allowed netlocs, where all
+        subdomains of the netloc are allowed.
+        """
+        allowed_origin_subdomains = defaultdict(list)
+        for parsed in (urlparse(origin) for origin in settings.CSRF_TRUSTED_ORIGINS if '*' in origin):
+            allowed_origin_subdomains[parsed.scheme].append(parsed.netloc.lstrip('*'))
+        return allowed_origin_subdomains
+
     # The _accept and _reject methods currently only exist for the sake of the
     # requires_csrf_token decorator.
     def _accept(self, request):
@@ -204,6 +224,27 @@ class CsrfViewMiddleware(MiddlewareMixin):
             # Set the Vary header since content varies with the CSRF cookie.
             patch_vary_headers(response, ('Cookie',))
 
+    def _origin_verified(self, request):
+        request_origin = request.META['HTTP_ORIGIN']
+        good_origin = '%s://%s' % (
+            'https' if request.is_secure() else 'http',
+            request.get_host(),
+        )
+        if request_origin == good_origin:
+            return True
+        if request_origin in self.allowed_origins_exact:
+            return True
+        try:
+            parsed_origin = urlparse(request_origin)
+        except ValueError:
+            return False
+        request_scheme = parsed_origin.scheme
+        request_netloc = parsed_origin.netloc
+        return any(
+            is_same_domain(request_netloc, host)
+            for host in self.allowed_origin_subdomains.get(request_scheme, ())
+        )
+
     def process_request(self, request):
         csrf_token = self._get_token(request)
         if csrf_token is not None:
@@ -229,7 +270,15 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 # branches that call reject().
                 return self._accept(request)
 
-            if request.is_secure():
+            # Reject the request if the Origin header doesn't match an allowed
+            # value.
+            if 'HTTP_ORIGIN' in request.META:
+                if not self._origin_verified(request):
+                    return self._reject(request, REASON_BAD_ORIGIN % request.META['HTTP_ORIGIN'])
+            elif request.is_secure():
+                # If the Origin header wasn't provided, reject HTTPS requests
+                # if the Referer header doesn't match an allowed value.
+                #
                 # Suppose user visits http://example.com/
                 # An active network attacker (man-in-the-middle, MITM) sends a
                 # POST form that targets https://example.com/detonate-bomb/ and
