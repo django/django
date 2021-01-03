@@ -91,9 +91,8 @@ class DebugViewTests(SimpleTestCase):
         with self.assertLogs('django.request', 'WARNING') as cm:
             response = self.client.get('/raises400_bad_request/')
         self.assertContains(response, '<div class="context" id="', status_code=400)
-        self.assertEqual(
-            cm.records[0].getMessage(),
-            'Malformed request syntax: /raises400_bad_request/',
+        self.assertLogRecords(
+            cm, [('WARNING', '%s: %s', ('Malformed request syntax', '/raises400_bad_request/'))],
         )
 
     # Ensure no 403.html template exists to test the default case.
@@ -349,9 +348,8 @@ class NonDjangoTemplatesDebugViewTests(SimpleTestCase):
         with self.assertLogs('django.request', 'WARNING') as cm:
             response = self.client.get('/raises400_bad_request/')
         self.assertContains(response, '<div class="context" id="', status_code=400)
-        self.assertEqual(
-            cm.records[0].getMessage(),
-            'Malformed request syntax: /raises400_bad_request/',
+        self.assertLogRecords(
+            cm, [('WARNING', '%s: %s', ('Malformed request syntax', '/raises400_bad_request/'))],
         )
 
     def test_403(self):

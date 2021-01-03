@@ -158,9 +158,8 @@ class MiddlewareNotUsedTests(SimpleTestCase):
     def test_log(self):
         with self.assertLogs('django.request', 'DEBUG') as cm:
             self.client.get('/middleware_exceptions/view/')
-        self.assertEqual(
-            cm.records[0].getMessage(),
-            "MiddlewareNotUsed: 'middleware_exceptions.tests.MyMiddleware'"
+        self.assertLogRecords(
+            cm, [('DEBUG', 'MiddlewareNotUsed: %r', ('middleware_exceptions.tests.MyMiddleware',))],
         )
 
     @override_settings(MIDDLEWARE=['middleware_exceptions.tests.MyMiddlewareWithExceptionMessage'])
@@ -189,14 +188,16 @@ class MiddlewareNotUsedTests(SimpleTestCase):
             response = await self.async_client.get('/middleware_exceptions/view/')
         self.assertEqual(response.content, b'OK')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            cm.records[0].getMessage(),
-            'Asynchronous middleware middleware_exceptions.tests.MyMiddleware '
-            'adapted.',
-        )
-        self.assertEqual(
-            cm.records[1].getMessage(),
-            "MiddlewareNotUsed: 'middleware_exceptions.tests.MyMiddleware'",
+        self.assertLogRecords(
+            cm,
+            [
+                ('DEBUG',
+                 'Asynchronous %s adapted.',
+                 ('middleware middleware_exceptions.tests.MyMiddleware',)),
+                ('DEBUG',
+                 'MiddlewareNotUsed: %r',
+                 ('middleware_exceptions.tests.MyMiddleware',)),
+            ],
         )
 
 
@@ -226,11 +227,16 @@ class MiddlewareSyncAsyncTests(SimpleTestCase):
         with self.assertLogs('django.request', 'DEBUG') as cm:
             response = self.client.get('/middleware_exceptions/view/')
         self.assertEqual(response.status_code, 402)
-        self.assertEqual(
-            cm.records[0].getMessage(),
-            "Synchronous middleware "
-            "middleware_exceptions.middleware.async_payment_middleware "
-            "adapted.",
+        self.assertLogRecords(
+            cm,
+            [
+                ('DEBUG',
+                 'Synchronous %s adapted.',
+                 ('middleware middleware_exceptions.middleware.async_payment_middleware',)),
+                ('WARNING',
+                 '%s: %s',
+                 ('Payment Required', '/middleware_exceptions/view/')),
+            ],
         )
 
     @override_settings(MIDDLEWARE=[
@@ -252,6 +258,15 @@ class MiddlewareSyncAsyncTests(SimpleTestCase):
         with self.assertLogs('django.request', 'DEBUG') as cm:
             response = await self.async_client.get('/middleware_exceptions/view/')
         self.assertEqual(response.status_code, 402)
+        self.assertLogRecords(
+            cm,
+            [
+                ('DEBUG',
+                 'Asynchronous %s adapted.',
+                 ('middleware middleware_exceptions.middleware.PaymentMiddleware',)),
+                ('WARNING', '%s: %s', ('Payment Required', '/middleware_exceptions/view/'))
+            ],
+        )
         self.assertEqual(
             cm.records[0].getMessage(),
             "Asynchronous middleware "
@@ -265,9 +280,8 @@ class MiddlewareSyncAsyncTests(SimpleTestCase):
         with self.assertLogs('django.request', 'WARNING') as cm:
             response = await self.async_client.get('/middleware_exceptions/view/')
         self.assertEqual(response.status_code, 402)
-        self.assertEqual(
-            cm.records[0].getMessage(),
-            'Payment Required: /middleware_exceptions/view/',
+        self.assertLogRecords(
+            cm, [('WARNING', '%s: %s', ('Payment Required', '/middleware_exceptions/view/'))],
         )
 
     @override_settings(

@@ -325,7 +325,7 @@ class SessionTestsMixin:
                 with self.assertLogs('django.security.SuspiciousSession', 'WARNING') as cm:
                     self.assertEqual(self.session.decode(encoded), {})
                 # The failed decode is logged.
-                self.assertIn('Session data corrupted', cm.output[0])
+                self.assertLogRecords(cm, [('WARNING', 'Session data corrupted', ())])
 
     def test_decode_serializer_exception(self):
         signer = TimestampSigner(salt=self.session.key_salt)

@@ -26,7 +26,7 @@ class ShellCommandTestCase(SimpleTestCase):
                     'getLogger("test").info(django.__version__)'
                 ),
             )
-        self.assertEqual(cm.records[0].getMessage(), __version__)
+        self.assertLogRecords(cm, [('INFO', __version__, ())])
 
     def test_command_option_globals(self):
         with captured_stdout() as stdout:

@@ -101,7 +101,9 @@ class CsrfViewMiddlewareTestMixin:
         with self.assertLogs('django.security.csrf', 'WARNING') as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(403, resp.status_code)
-        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE)
+        self.assertLogRecords(
+            cm, [('WARNING', 'Forbidden (%s): %s', (REASON_NO_CSRF_COOKIE, ''))],
+        )
 
     def test_process_request_csrf_cookie_no_token(self):
         """
@@ -114,7 +116,9 @@ class CsrfViewMiddlewareTestMixin:
         with self.assertLogs('django.security.csrf', 'WARNING') as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(403, resp.status_code)
-        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % REASON_BAD_TOKEN)
+        self.assertLogRecords(
+            cm, [('WARNING', 'Forbidden (%s): %s', (REASON_BAD_TOKEN, ''))],
+        )
 
     def test_process_request_csrf_cookie_and_token(self):
         """
@@ -170,14 +174,18 @@ class CsrfViewMiddlewareTestMixin:
         with self.assertLogs('django.security.csrf', 'WARNING') as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(403, resp.status_code)
-        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE)
+        self.assertLogRecords(
+            cm, [('WARNING', 'Forbidden (%s): %s', (REASON_NO_CSRF_COOKIE, ''))],
+        )
 
         req = TestingHttpRequest()
         req.method = 'DELETE'
         with self.assertLogs('django.security.csrf', 'WARNING') as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(403, resp.status_code)
-        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE)
+        self.assertLogRecords(
+            cm, [('WARNING', 'Forbidden (%s): %s', (REASON_NO_CSRF_COOKIE, ''))],
+        )
 
     def test_put_and_delete_allowed(self):
         """
@@ -508,7 +516,9 @@ class CsrfViewMiddlewareTestMixin:
         with self.assertLogs('django.security.csrf', 'WARNING') as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(resp.status_code, 403)
-        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % REASON_BAD_TOKEN)
+        self.assertLogRecords(
+            cm, [('WARNING', 'Forbidden (%s): %s', (REASON_BAD_TOKEN, ''))],
+        )
 
 
 class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):

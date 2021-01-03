@@ -32,7 +32,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
                 # The correct level gets the message.
                 with self.assertLogs('django.server', level.upper()) as cm:
                     handler.log_message('GET %s %s', 'A', str(status_code))
-                self.assertIn('GET A %d' % status_code, cm.output[0])
+                self.assertLogRecords(cm, [(level.upper(), 'GET %s %s', ('A', str(status_code)))])
                 # Incorrect levels don't have any messages.
                 for wrong_level in level_status_codes:
                     if wrong_level != level:
@@ -48,10 +48,12 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
 
         with self.assertLogs('django.server', 'ERROR') as cm:
             handler.log_message("GET %s %s", '\x16\x03', "4")
-        self.assertIn(
-            "You're accessing the development server over HTTPS, "
-            "but it only supports HTTP.",
-            cm.records[0].getMessage()
+        self.assertLogRecords(
+            cm,
+            [('ERROR',
+              "You're accessing the development server over HTTPS, "
+              "but it only supports HTTP.\n",
+              ())],
         )
 
     def test_strips_underscore_headers(self):
@@ -112,7 +114,6 @@ class WSGIServerTestCase(SimpleTestCase):
         """WSGIServer handles broken pipe errors."""
         request = WSGIRequest(self.request_factory.get('/').environ)
         client_address = ('192.168.2.0', 8080)
-        msg = f'- Broken pipe from {client_address}\n'
         tests = [
             BrokenPipeError,
             ConnectionAbortedError,
@@ -129,6 +130,8 @@ class WSGIServerTestCase(SimpleTestCase):
                             with self.assertLogs('django.server', 'INFO') as cm:
                                 server.handle_error(request, client_address)
                         self.assertEqual(err.getvalue(), '')
-                        self.assertEqual(cm.records[0].getMessage(), msg)
+                        self.assertLogRecords(
+                            cm, [('INFO', '- Broken pipe from %s\n', (client_address,))],
+                        )
                 finally:
                     server.server_close()

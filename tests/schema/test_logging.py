@@ -12,7 +12,4 @@ class SchemaLoggerTests(TestCase):
             editor.execute(sql, params)
         self.assertEqual(cm.records[0].sql, sql)
         self.assertEqual(cm.records[0].params, params)
-        self.assertEqual(
-            cm.records[0].getMessage(),
-            'SELECT * FROM foo WHERE id in (%s, %s); (params [42, 1337])',
-        )
+        self.assertLogRecords(cm, [('DEBUG', '%s; (params %r)', (sql, params))])

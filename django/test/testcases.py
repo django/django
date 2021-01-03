@@ -755,6 +755,10 @@ class SimpleTestCase(unittest.TestCase):
             else:
                 self.fail(f'Unexpected logs found: {cm.output!r}')
 
+    def assertLogRecords(self, logs, expected):
+        records = [(log.levelname, log.msg, log.args) for log in logs.records]
+        self.assertEqual(records, expected)
+
     def assertFieldOutput(self, fieldclass, valid, invalid, field_args=None,
                           field_kwargs=None, empty_value=''):
         """
