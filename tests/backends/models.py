@@ -140,3 +140,11 @@ class Author(models.Model):
 
 class Book(models.Model):
     author = models.ForeignKey(Author, models.CASCADE, to_field='name')
+
+
+class SQLKeywordsModel(models.Model):
+    id = models.AutoField(primary_key=True, db_column='select')
+    reporter = models.ForeignKey(Reporter, models.CASCADE, db_column='where')
+
+    class Meta:
+        db_table = 'order'

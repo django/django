@@ -34,6 +34,10 @@ class AppConfig:
         # This value must be unique across a Django project.
         if not hasattr(self, 'label'):
             self.label = app_name.rpartition(".")[2]
+        if not self.label.isidentifier():
+            raise ImproperlyConfigured(
+                "The app label '%s' is not a valid Python identifier." % self.label
+            )
 
         # Human-readable name for the application e.g. "Admin".
         if not hasattr(self, 'verbose_name'):

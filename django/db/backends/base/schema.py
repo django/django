@@ -407,7 +407,7 @@ class BaseDatabaseSchemaEditor:
         # Created indexes
         for field_names in news.difference(olds):
             fields = [model._meta.get_field(field) for field in field_names]
-            self.execute(self._create_index_sql(model, fields, suffix="_idx"))
+            self.execute(self._create_index_sql(model, fields=fields, suffix='_idx'))
 
     def _delete_composed_index(self, model, fields, constraint_kwargs, sql):
         meta_constraint_names = {constraint.name for constraint in model._meta.constraints}
@@ -778,7 +778,7 @@ class BaseDatabaseSchemaEditor:
         # False              | True             | True               | False
         # True               | True             | True               | False
         if (not old_field.db_index or old_field.unique) and new_field.db_index and not new_field.unique:
-            self.execute(self._create_index_sql(model, [new_field]))
+            self.execute(self._create_index_sql(model, fields=[new_field]))
         # Type alteration on primary key? Then we need to alter the column
         # referring to us.
         rels_to_update = []
@@ -990,7 +990,7 @@ class BaseDatabaseSchemaEditor:
             columns=Columns(model._meta.db_table, columns, self.quote_name),
         )
 
-    def _create_index_sql(self, model, fields, *, name=None, suffix='', using='',
+    def _create_index_sql(self, model, *, fields=None, name=None, suffix='', using='',
                           db_tablespace=None, col_suffixes=(), sql=None, opclasses=(),
                           condition=None, include=None):
         """
@@ -1043,7 +1043,7 @@ class BaseDatabaseSchemaEditor:
 
         for field_names in model._meta.index_together:
             fields = [model._meta.get_field(field) for field in field_names]
-            output.append(self._create_index_sql(model, fields, suffix="_idx"))
+            output.append(self._create_index_sql(model, fields=fields, suffix='_idx'))
 
         for index in model._meta.indexes:
             output.append(index.create_sql(model, self))
@@ -1055,7 +1055,7 @@ class BaseDatabaseSchemaEditor:
         """
         output = []
         if self._field_should_be_indexed(model, field):
-            output.append(self._create_index_sql(model, [field]))
+            output.append(self._create_index_sql(model, fields=[field]))
         return output
 
     def _field_should_be_altered(self, old_field, new_field):

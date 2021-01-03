@@ -1199,7 +1199,7 @@ Python native format: dictionaries, lists, strings, numbers, booleans and
 ``None``.
 
 ``JSONField`` is supported on MariaDB 10.2.7+, MySQL 5.7.8+, Oracle,
-PostgreSQL, and SQLite 3.9.0+ (with the :ref:`JSON1 extension enabled
+PostgreSQL, and SQLite (with the :ref:`JSON1 extension enabled
 <sqlite-json1>`).
 
 .. attribute:: JSONField.encoder

@@ -573,10 +573,12 @@ class MediaURLStaticURLPrefixTest(SimpleTestCase):
             set_script_prefix(val)
 
     def test_not_prefixed(self):
-        # Don't add SCRIPT_NAME prefix to valid URLs, absolute paths or None.
+        # Don't add SCRIPT_NAME prefix to absolute paths, URLs, or None.
         tests = (
             '/path/',
             'http://myhost.com/path/',
+            'http://myhost/path/',
+            'https://myhost/path/',
             None,
         )
         for setting in ('MEDIA_URL', 'STATIC_URL'):

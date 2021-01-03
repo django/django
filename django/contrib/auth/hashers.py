@@ -344,7 +344,10 @@ class Argon2PasswordHasher(BasePasswordHasher):
         algorithm, rest = encoded.split('$', 1)
         assert algorithm == self.algorithm
         params = argon2.extract_parameters('$' + rest)
-        variety, *_, salt, hash = rest.split('$')
+        variety, *_, b64salt, hash = rest.split('$')
+        # Add padding.
+        b64salt += '=' * (-len(b64salt) % 4)
+        salt = base64.b64decode(b64salt).decode('latin1')
         return {
             'algorithm': algorithm,
             'hash': hash,
@@ -354,6 +357,7 @@ class Argon2PasswordHasher(BasePasswordHasher):
             'time_cost': params.time_cost,
             'variety': variety,
             'version': params.version,
+            'params': params,
         }
 
     def verify(self, password, encoded):
@@ -379,10 +383,7 @@ class Argon2PasswordHasher(BasePasswordHasher):
         }
 
     def must_update(self, encoded):
-        algorithm, rest = encoded.split('$', 1)
-        assert algorithm == self.algorithm
-        argon2 = self._load_library()
-        current_params = argon2.extract_parameters('$' + rest)
+        current_params = self.decode(encoded)['params']
         new_params = self.params()
         # Set salt_len to the salt_len of the current parameters because salt
         # is explicitly passed to argon2.

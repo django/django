@@ -126,7 +126,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if first_field.get_internal_type() == 'ForeignKey':
             constraint_names = self._constraint_names(model, [first_field.column], index=True)
             if not constraint_names:
-                self.execute(self._create_index_sql(model, [first_field], suffix=""))
+                self.execute(
+                    self._create_index_sql(model, fields=[first_field], suffix='')
+                )
         return super()._delete_composed_index(model, fields, *args)
 
     def _set_field_new_type_null_status(self, field, new_type):

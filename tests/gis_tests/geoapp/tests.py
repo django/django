@@ -308,7 +308,7 @@ class GeoLookupTest(TestCase):
         self.assertEqual(qs.filter(poly__isvalid=False).count(), 1)
         self.assertEqual(qs.filter(poly__isvalid=True).count(), qs.count() - 1)
 
-    @skipUnlessDBFeature("supports_left_right_lookups")
+    @skipUnlessGISLookup('left', 'right')
     def test_left_right_lookups(self):
         "Testing the 'left' and 'right' lookup types."
         # Left: A << B => true if xmax(A) < xmin(B)

@@ -15,8 +15,7 @@ from pathlib import Path
 
 import django
 from django.conf import global_settings
-from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.core.validators import URLValidator
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import LazyObject, empty
 
@@ -132,14 +131,8 @@ class LazySettings(LazyObject):
         Useful when the app is being served at a subpath and manually prefixing
         subpath to STATIC_URL and MEDIA_URL in settings is inconvenient.
         """
-        # Don't apply prefix to valid URLs.
-        try:
-            URLValidator()(value)
-            return value
-        except (ValidationError, AttributeError):
-            pass
-        # Don't apply prefix to absolute paths.
-        if value.startswith('/'):
+        # Don't apply prefix to absolute paths and URLs.
+        if value.startswith(('http://', 'https://', '/')):
             return value
         from django.urls import get_script_prefix
         return '%s%s' % (get_script_prefix(), value)
