@@ -3167,6 +3167,10 @@ The domain to use for session cookies. Set this to a string such as
 ``"example.com"`` for cross-domain cookies, or use ``None`` for a standard
 domain cookie.
 
+To use cross-domain cookies with :setting:`CSRF_USE_SESSIONS`, you must include
+a leading dot (e.g. ``".example.com"``) to accommodate the CSRF middleware's
+referer checking.
+
 Be cautious when updating this setting on a production site. If you update
 this setting to enable cross-domain cookies on a site that previously used
 standard domain cookies, existing user cookies will be set to the old
