@@ -945,6 +945,12 @@ The name of the file including the relative path from the root of the
 :class:`~django.core.files.storage.Storage` of the associated
 :class:`~django.db.models.FileField`.
 
+.. attribute:: FieldFile.path
+
+A read-only property to access the file's local filesystem path by calling the
+:meth:`~django.core.files.storage.Storage.path` method of the underlying
+:class:`~django.core.files.storage.Storage` class.
+
 .. attribute:: FieldFile.size
 
 The result of the underlying :attr:`Storage.size()
