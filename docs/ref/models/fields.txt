@@ -1866,11 +1866,9 @@ that control how the relationship functions.
 
     .. note::
 
-        Recursive relationships using an intermediary model and defined as
-        symmetrical (that is, with :attr:`symmetrical=True
-        <ManyToManyField.symmetrical>`, which is the default) can't determine
-        the reverse accessors names, as they would be the same. You need to set
-        a :attr:`~ForeignKey.related_name` to at least one of them. If you'd
+        Recursive relationships using an intermediary model can't determine the
+        reverse accessors names, as they would be the same. You need to set a
+        :attr:`~ForeignKey.related_name` to at least one of them. If you'd
         prefer Django not to create a backwards relation, set ``related_name``
         to ``'+'``.
 
