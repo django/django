@@ -115,7 +115,7 @@ def load_backend(backend_name):
         import django.db.backends
         builtin_backends = [
             name for _, name, ispkg in pkgutil.iter_modules(django.db.backends.__path__)
-            if ispkg and name not in {'base', 'dummy', 'postgresql_psycopg2'}
+            if ispkg and name not in {'base', 'dummy'}
         ]
         if backend_name not in ['django.db.backends.%s' % b for b in builtin_backends]:
             backend_reprs = map(repr, sorted(builtin_backends))
