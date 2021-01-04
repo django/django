@@ -188,7 +188,7 @@ class FileDescriptor(DeferredAttribute):
         # the FieldFile interface added to them. Thus, we wrap any other type of
         # File inside a FieldFile (well, the field's attr_class, which is
         # usually FieldFile).
-        elif isinstance(file, File) and not isinstance(file, FieldFile):
+        elif isinstance(file, File) and not isinstance(file, self.field.attr_class):
             file_copy = self.field.attr_class(instance, self.field, file.name)
             file_copy.file = file
             file_copy._committed = False
@@ -197,13 +197,13 @@ class FileDescriptor(DeferredAttribute):
         # Finally, because of the (some would say boneheaded) way pickle works,
         # the underlying FieldFile might not actually itself have an associated
         # file. So we need to reset the details of the FieldFile in those cases.
-        elif isinstance(file, FieldFile) and not hasattr(file, 'field'):
+        elif isinstance(file, self.field.attr_class) and not hasattr(file, 'field'):
             file.instance = instance
             file.field = self.field
             file.storage = self.field.storage
 
         # Make sure that the instance is correct.
-        elif isinstance(file, FieldFile) and instance is not file.instance:
+        elif isinstance(file, self.field.attr_class) and instance is not file.instance:
             file.instance = instance
 
         # That was fun, wasn't it?
