@@ -11,6 +11,26 @@ on:
       - 'docs/**'
 
 jobs:
+  windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version:
+          - '3.10'
+    name: Windows, SQLite, Python ${{ matrix.python-version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          cache-dependency-path: 'tests/requirements/py3.txt'
+      - run: pip install -r tests/requirements/py3.txt -e .
+      - name: Run tests
+        run: python tests/runtests.py -v2
+
   javascript-tests:
     runs-on: ubuntu-latest
     name: JavaScript tests
