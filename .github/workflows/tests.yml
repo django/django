@@ -7,6 +7,62 @@ on:
       - main
 
 jobs:
+  windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python: [ "3.8" ]
+    name: sqlite-${{ matrix.python }}-windows
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Get pip cache dir
+        id: pip-cache
+        run: echo "::set-output name=dir::$(pip cache dir)"
+      - uses: actions/cache@v2
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('tests/requirements/py3.txt') }}
+      - run: pip install -r tests/requirements/py3.txt -e .
+      - id: run-tests
+        run: python tests/runtests.py --timing -v2
+
+  macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python: [ "3.8" ]
+        sqlite: [ "latest", "3.34.0" ]
+    name: sqlite-${{ matrix.python }}-macos-${{ matrix.sqlite }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Get pip cache dir
+        id: pip-cache
+        run: echo "::set-output name=dir::$(pip cache dir)"
+      - uses: actions/cache@v2
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('tests/requirements/py3.txt') }}
+
+      - run: |
+          brew uninstall --ignore-dependencies sqlite
+          brew tap-new $USER/local-sqlite
+          brew extract sqlite --version=${{ matrix.sqlite }} $USER/local-sqlite
+          brew install sqlite@${{ matrix.sqlite }}
+          ln -s /usr/local/opt/sqlite@${{ matrix.sqlite }}/ /usr/local/opt/sqlite
+        if: ${{ matrix.sqlite != 'latest' }}
+        id: install-sqlite
+      - run: brew install libmemcached
+      - run: python3 -c "import sqlite3; print(sqlite3.sqlite_version)"
+      - run: pip install -r tests/requirements/py3.txt -e .
+      - id: run-tests
+        run: python tests/runtests.py --timing -v2
+
   javascript-tests:
     runs-on: ubuntu-latest
     name: JavaScript tests
