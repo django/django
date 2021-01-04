@@ -7,8 +7,6 @@ from django.template.loader import get_template
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
-ROOT = Path(__file__).parent
-
 
 @functools.lru_cache()
 def get_default_renderer():
@@ -33,7 +31,7 @@ class EngineMixin:
     def engine(self):
         return self.backend({
             'APP_DIRS': True,
-            'DIRS': [ROOT / self.backend.app_dirname],
+            'DIRS': [Path(__file__).parent / self.backend.app_dirname],
             'NAME': 'djangoforms',
             'OPTIONS': {},
         })

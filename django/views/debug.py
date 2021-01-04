@@ -26,7 +26,15 @@ DEBUG_ENGINE = Engine(
     libraries={'i18n': 'django.templatetags.i18n'},
 )
 
-CURRENT_DIR = Path(__file__).parent
+
+def builtin_template_path(name):
+    """
+    Return a path to a builtin template.
+
+    Avoid calling this function at the module level or in a class-definition
+    because __file__ may not exist, e.g. in frozen environments.
+    """
+    return Path(__file__).parent / 'templates' / name
 
 
 class ExceptionCycleWarning(UserWarning):
@@ -248,11 +256,11 @@ class ExceptionReporter:
 
     @property
     def html_template_path(self):
-        return CURRENT_DIR / 'templates' / 'technical_500.html'
+        return builtin_template_path('technical_500.html')
 
     @property
     def text_template_path(self):
-        return CURRENT_DIR / 'templates' / 'technical_500.txt'
+        return builtin_template_path('technical_500.txt')
 
     def __init__(self, request, exc_type, exc_value, tb, is_email=False):
         self.request = request
@@ -534,7 +542,7 @@ def technical_404_response(request, exception):
             module = obj.__module__
             caller = '%s.%s' % (module, caller)
 
-    with Path(CURRENT_DIR, 'templates', 'technical_404.html').open(encoding='utf-8') as fh:
+    with builtin_template_path('technical_404.html').open(encoding='utf-8') as fh:
         t = DEBUG_ENGINE.from_string(fh.read())
     reporter_filter = get_default_exception_reporter_filter()
     c = Context({
@@ -553,7 +561,7 @@ def technical_404_response(request, exception):
 
 def default_urlconf(request):
     """Create an empty URLconf 404 error response."""
-    with Path(CURRENT_DIR, 'templates', 'default_urlconf.html').open(encoding='utf-8') as fh:
+    with builtin_template_path('default_urlconf.html').open(encoding='utf-8') as fh:
         t = DEBUG_ENGINE.from_string(fh.read())
     c = Context({
         'version': get_docs_version(),
