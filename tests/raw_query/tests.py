@@ -180,6 +180,11 @@ class RawQueryTests(TestCase):
         self.assertEqual(len(results), 1)
         self.assertIsInstance(repr(qset), str)
 
+    def test_escaped_percent(self):
+        query = "SELECT * FROM raw_query_author WHERE first_name like 'J%%'"
+        qset = Author.objects.raw(query)
+        self.assertEqual(len(qset), 2)
+
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_pyformat_params(self):
         """
