@@ -1,0 +1,12 @@
+==========================
+Django 3.1.6 release notes
+==========================
+
+*Expected February 1, 2021*
+
+Django 3.1.6 fixes several bugs in 3.1.5.
+
+Bugfixes
+========
+
+* ...
