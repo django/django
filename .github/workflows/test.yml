@@ -1,0 +1,19 @@
+name: Add Label
+
+on:
+    issue_comment:
+
+jobs:
+    add_label:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - name: Dump GitHub context
+              env:
+                GITHUB_CONTEXT: ${{ toJson(github) }}
+              run: echo "$GITHUB_CONTEXT"
+#            - uses: actions-ecosystem/action-add-labels@v1
+#              if: ${{ startsWith(github.event.comment.body, '/add-labels') }}
+#              with:
+#                  github_token: ${{ secrets.GITHUB_TOKEN }}
+#                  labels: bug
