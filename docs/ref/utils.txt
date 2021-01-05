@@ -248,20 +248,6 @@ The functions defined in this module share the following properties:
     If ``strings_only`` is ``True``, don't convert (some) non-string-like
     objects.
 
-.. function:: smart_text(s, encoding='utf-8', strings_only=False, errors='strict')
-
-    .. deprecated:: 3.0
-
-    Alias of :func:`force_str` for backwards compatibility, especially in code
-    that supports Python 2.
-
-.. function:: force_text(s, encoding='utf-8', strings_only=False, errors='strict')
-
-    .. deprecated:: 3.0
-
-    Alias of :func:`force_str` for backwards compatibility, especially in code
-    that supports Python 2.
-
 .. function:: iri_to_uri(iri)
 
     Convert an Internationalized Resource Identifier (IRI) portion to a URI
