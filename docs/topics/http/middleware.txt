@@ -291,8 +291,6 @@ object with a :attr:`~django.http.HttpResponse.status_code` of 404.
 Asynchronous support
 ====================
 
-.. versionadded:: 3.1
-
 Middleware can support any combination of synchronous and asynchronous
 requests. Django will adapt requests to fit the middleware's requirements if it
 cannot support both, but at a performance penalty.
@@ -423,7 +421,3 @@ These are the behavioral differences between using :setting:`MIDDLEWARE` and
    HTTP response, and then the next middleware in line will see that
    response. Middleware are never skipped due to a middleware raising an
    exception.
-
-.. versionchanged:: 3.1
-
-    Support for asynchronous requests was added to the ``MiddlewareMixin``.

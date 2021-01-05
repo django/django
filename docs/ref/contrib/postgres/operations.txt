@@ -61,8 +61,6 @@ them. In that case, connect to your Django database and run the query
 
 .. class:: BloomExtension()
 
-    .. versionadded:: 3.1
-
     Installs the ``bloom`` extension.
 
 ``BtreeGinExtension``

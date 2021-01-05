@@ -269,15 +269,11 @@ following attributes and methods:
 
     .. attribute:: cleansed_substitute
 
-        .. versionadded:: 3.1
-
         The string value to replace sensitive value with. By default it
         replaces the values of sensitive variables with stars
         (``**********``).
 
     .. attribute:: hidden_settings
-
-        .. versionadded:: 3.1
 
         A compiled regular expression object used to match settings and
         ``request.META`` values considered as sensitive. By default equivalent
@@ -306,8 +302,6 @@ following attributes and methods:
         Returns the filtered dictionary of local variables for the given
         traceback frame. Sensitive values are replaced with
         :attr:`cleansed_substitute`.
-
-.. versionadded:: 3.1
 
 If you need to customize error reports beyond filtering you may specify a
 custom error reporter class by defining the

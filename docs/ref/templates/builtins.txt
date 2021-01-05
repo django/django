@@ -729,10 +729,6 @@ available to the included template::
     been evaluated and rendered* - not blocks that can be overridden by, for
     example, an extending template.
 
-.. versionchanged:: 3.1
-
-    Support for iterables of template names was added.
-
 .. templatetag:: load
 
 ``load``
@@ -1746,11 +1742,6 @@ example, when the active locale is ``en`` (English):
 
 Using ``floatformat`` with no argument is equivalent to using ``floatformat``
 with an argument of ``-1``.
-
-.. versionchanged:: 3.1
-
-    In older versions, a negative zero ``-0`` was returned for negative numbers
-    which round to zero.
 
 .. versionchanged:: 3.2
 

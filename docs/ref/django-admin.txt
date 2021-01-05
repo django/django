@@ -106,8 +106,6 @@ For example, to perform only models and compatibility checks, run::
 
 .. django-admin-option:: --database DATABASE
 
-.. versionadded:: 3.1
-
 Specifies the database to run checks requiring database access::
 
     django-admin check --database default --database other
@@ -225,8 +223,6 @@ program manually.
 Specifies the database onto which to open a shell. Defaults to ``default``.
 
 .. django-admin-option:: -- ARGUMENTS
-
-.. versionadded:: 3.1
 
 Any arguments following a ``--`` divider will be passed on to the underlying
 command-line client. For example, with PostgreSQL you can use the ``psql``
@@ -914,8 +910,6 @@ content types.
 
 .. django-admin-option:: --check
 
-.. versionadded:: 3.1
-
 Makes ``migrate`` exit with a non-zero status when unapplied migrations are
 detected.
 
@@ -1519,8 +1513,6 @@ installed, ``ipdb`` is used instead.
 
 .. django-admin-option:: --buffer, -b
 
-.. versionadded:: 3.1
-
 Discards output (``stdout`` and ``stderr``) for passing tests, in the same way
 as :option:`unittest's --buffer option<unittest.-b>`.
 
@@ -1708,8 +1700,6 @@ the deletion.
 Specifies the database to use. Defaults to ``default``.
 
 .. django-admin-option:: --include-stale-apps
-
-.. versionadded:: 3.1
 
 Deletes stale content types including ones from previously installed apps that
 have been removed from :setting:`INSTALLED_APPS`. Defaults to ``False``.

@@ -628,11 +628,6 @@ Additionally, ``cache_page`` automatically sets ``Cache-Control`` and
 ``Expires`` headers in the response which affect :ref:`downstream caches
 <downstream-caches>`.
 
-.. versionchanged:: 3.1
-
-    In older versions, the ``max-age`` directive from the ``Cache-Control``
-    header had precedence over the cache timeout set by ``cache_page``.
-
 Specifying per-view cache in the URLconf
 ----------------------------------------
 
@@ -929,10 +924,6 @@ particular object::
 
 ``delete()`` returns ``True`` if the key was successfully deleted, ``False``
 otherwise.
-
-.. versionchanged:: 3.1
-
-    The boolean return value was added.
 
 .. method:: cache.delete_many(keys, version=None)
 

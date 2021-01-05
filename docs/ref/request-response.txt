@@ -406,8 +406,6 @@ Methods
 
 .. method:: HttpRequest.accepts(mime_type)
 
-    .. versionadded:: 3.1
-
     Returns ``True`` if the request ``Accept`` header matches the ``mime_type``
     argument::
 
@@ -911,10 +909,6 @@ Methods
     .. _HttpOnly: https://owasp.org/www-community/HttpOnly
     .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
 
-    .. versionchanged:: 3.1
-
-        Using ``samesite='None'`` (string) was allowed.
-
     .. warning::
 
         :rfc:`RFC 6265 <6265#section-6.1>` states that user agents should
@@ -932,10 +926,6 @@ Methods
     you will need to remember to pass it to the corresponding
     :meth:`HttpRequest.get_signed_cookie` call.
 
-    .. versionchanged:: 3.1
-
-        Using ``samesite='None'`` (string) was allowed.
-
 .. method:: HttpResponse.delete_cookie(key, path='/', domain=None, samesite=None)
 
     Deletes the cookie with the given key. Fails silently if the key doesn't
@@ -944,10 +934,6 @@ Methods
     Due to the way cookies work, ``path`` and ``domain`` should be the same
     values you used in ``set_cookie()`` -- otherwise the cookie may not be
     deleted.
-
-    .. versionchanged:: 2.2.15
-
-        The ``samesite`` argument was added.
 
 .. method:: HttpResponse.close()
 

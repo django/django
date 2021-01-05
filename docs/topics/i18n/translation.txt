@@ -272,10 +272,6 @@ In a case like this, consider something like the following::
 
         a format specification for argument 'name', as in 'msgstr[0]', doesn't exist in 'msgid'
 
-.. versionchanged: 2.2.12
-
-    Added support for different plural equations in ``.po`` files.
-
 .. _contextual-markers:
 
 Contextual markers
@@ -626,11 +622,6 @@ using the ``context`` keyword:
 
     {% translate "May" context "month name" %}
 
-.. versionchanged:: 3.1
-
-   The ``trans`` tag was renamed to ``translate``.  The ``trans``
-   tag is still supported as an alias for backwards compatibility.
-
 .. templatetag:: blocktrans
 .. templatetag:: blocktranslate
 
@@ -748,11 +739,6 @@ For instance, the following ``{% blocktranslate %}`` tag::
 will result in the entry ``"First sentence. Second paragraph."`` in the PO file,
 compared to ``"\n  First sentence.\n  Second paragraph.\n"``, if the
 ``trimmed`` option had not been specified.
-
-.. versionchanged:: 3.1
-
-   The ``blocktrans`` tag was renamed to ``blocktranslate``. The ``blocktrans``
-   tag is still supported as an alias for backwards compatibility.
 
 String literals passed to tags and filters
 ------------------------------------------
@@ -1816,12 +1802,6 @@ set, to ``/``, depending on the nature of the request:
 * If the request doesn't accept HTML, the fallback will be performed only if
   the ``next`` parameter was set. Otherwise a 204 status code (No Content) will
   be returned.
-
-.. versionchanged:: 3.1
-
-    In older versions, the distinction for the fallback is based on whether the
-    ``X-Requested-With`` header is set to the value ``XMLHttpRequest``. This is
-    set by the jQuery ``ajax()`` method.
 
 Here's example HTML template code:
 

@@ -686,14 +686,6 @@ The ``contained_by`` lookup is also available on the non-range field types:
     ... )
     <QuerySet [<Event: Soft play>]>
 
-.. versionchanged:: 3.1
-
-    Support for :class:`~django.db.models.SmallAutoField`,
-    :class:`~django.db.models.AutoField`,
-    :class:`~django.db.models.BigAutoField`,
-    :class:`~django.db.models.SmallIntegerField`, and
-    :class:`~django.db.models.DecimalField` was added.
-
 .. fieldlookup:: rangefield.overlap
 
 ``overlap``
@@ -813,8 +805,6 @@ Returned objects are empty ranges. Can be chained to valid lookups for a
 ``lower_inc``
 ^^^^^^^^^^^^^
 
-.. versionadded:: 3.1
-
 Returns objects that have inclusive or exclusive lower bounds, depending on the
 boolean value passed. Can be chained to valid lookups for a
 :class:`~django.db.models.BooleanField`.
@@ -826,8 +816,6 @@ boolean value passed. Can be chained to valid lookups for a
 
 ``lower_inf``
 ^^^^^^^^^^^^^
-
-.. versionadded:: 3.1
 
 Returns objects that have unbounded (infinite) or bounded lower bound,
 depending on the boolean value passed. Can be chained to valid lookups for a
@@ -841,8 +829,6 @@ depending on the boolean value passed. Can be chained to valid lookups for a
 ``upper_inc``
 ^^^^^^^^^^^^^
 
-.. versionadded:: 3.1
-
 Returns objects that have inclusive or exclusive upper bounds, depending on the
 boolean value passed. Can be chained to valid lookups for a
 :class:`~django.db.models.BooleanField`.
@@ -854,8 +840,6 @@ boolean value passed. Can be chained to valid lookups for a
 
 ``upper_inf``
 ^^^^^^^^^^^^^
-
-.. versionadded:: 3.1
 
 Returns objects that have unbounded (infinite) or bounded upper bound,
 depending on the boolean value passed. Can be chained to valid lookups for a

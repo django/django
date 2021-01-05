@@ -99,11 +99,6 @@ This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
 
-.. versionchanged:: 3.1
-
-    If ``ALLOWED_HOSTS`` is empty and ``DEBUG=True``, subdomains of localhost
-    were allowed.
-
 .. setting:: APPEND_SLASH
 
 ``APPEND_SLASH``
@@ -386,10 +381,6 @@ The value of the `SameSite`_ flag on the CSRF cookie. This flag prevents the
 cookie from being sent in cross-site requests.
 
 See :setting:`SESSION_COOKIE_SAMESITE` for details about ``SameSite``.
-
-.. versionchanged:: 3.1
-
-    Setting ``CSRF_COOKIE_SAMESITE = 'None'`` was allowed.
 
 .. setting:: CSRF_COOKIE_SECURE
 
@@ -688,10 +679,6 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
   Consider converting to local time explicitly with ``AT TIME ZONE`` in raw SQL
   queries instead of setting the ``TIME_ZONE`` option.
 
-.. versionchanged:: 3.1
-
-  Using this option when the database backend supports time zones was allowed.
-
 .. setting:: DATABASE-DISABLE_SERVER_SIDE_CURSORS
 
 ``DISABLE_SERVER_SIDE_CURSORS``
@@ -785,8 +772,6 @@ on :ref:`controlling the creation order of test databases
 
 ``MIGRATE``
 ^^^^^^^^^^^
-
-.. versionadded:: 3.1
 
 Default: ``True``
 
@@ -1161,10 +1146,6 @@ precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 
-.. versionchanged:: 3.1
-
-    In older versions, the default is a list containing also date-only formats.
-
 .. setting:: DEBUG
 
 ``DEBUG``
@@ -1272,8 +1253,6 @@ manually specified. Used when constructing the ``Content-Type`` header.
 ``DEFAULT_EXCEPTION_REPORTER``
 ------------------------------
 
-.. versionadded:: 3.1
-
 Default: ``'``:class:`django.views.debug.ExceptionReporter`\ ``'``
 
 Default exception reporter class to be used if none has been assigned to the
@@ -1316,8 +1295,6 @@ and :setting:`MANAGERS`; for that, see :setting:`SERVER_EMAIL`.
 
 ``DEFAULT_HASHING_ALGORITHM``
 -----------------------------
-
-.. versionadded:: 3.1
 
 Default: ``'sha256'``
 
@@ -1384,10 +1361,6 @@ Default: Not defined
 
 The directory used by the :ref:`file email backend <topic-email-file-backend>`
 to store output files.
-
-.. versionchanged:: 3.1
-
-    Support for :class:`pathlib.Path` was added.
 
 .. setting:: EMAIL_HOST
 
@@ -1910,10 +1883,6 @@ cookie from being sent in cross-site requests.
 
 See :setting:`SESSION_COOKIE_SAMESITE` for details about ``SameSite``.
 
-.. versionchanged:: 3.1
-
-    Setting ``LANGUAGE_COOKIE_SAMESITE = 'None'`` was allowed.
-
 .. setting:: LANGUAGE_COOKIE_SECURE
 
 ``LANGUAGE_COOKIE_SECURE``
@@ -2421,10 +2390,6 @@ Default: ``'same-origin'``
 If configured, the :class:`~django.middleware.security.SecurityMiddleware` sets
 the :ref:`referrer-policy` header on all responses that do not already have it
 to the value provided.
-
-.. versionchanged:: 3.1
-
-    In older versions, the default value is ``None``.
 
 .. setting:: SECURE_SSL_HOST
 
@@ -2986,8 +2951,6 @@ rendered.
 ``PASSWORD_RESET_TIMEOUT``
 --------------------------
 
-.. versionadded:: 3.1
-
 Default: ``259200`` (3 days, in seconds)
 
 The number of seconds a password reset link is valid for.
@@ -3266,10 +3229,6 @@ Possible values for the setting are:
 
     Modern browsers provide a more secure default policy for the ``SameSite``
     flag and will assume ``Lax`` for cookies without an explicit value set.
-
-.. versionchanged:: 3.1
-
-    Setting ``SESSION_COOKIE_SAMESITE = 'None'`` was allowed.
 
 .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
 

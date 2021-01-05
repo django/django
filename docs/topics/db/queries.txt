@@ -665,10 +665,6 @@ The ``F()`` objects support bitwise operations by ``.bitand()``, ``.bitor()``,
 
     Oracle doesn't support bitwise XOR operation.
 
-.. versionchanged:: 3.1
-
-    Support for ``.bitxor()`` was added.
-
 .. _using-transforms-in-expressions:
 
 Expressions can reference transforms

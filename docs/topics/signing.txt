@@ -101,10 +101,6 @@ generate signatures. You can use a different secret by passing it to the
     and underscores. ``algorithm`` must be an algorithm supported by
     :py:mod:`hashlib`, it defaults to ``'sha256'``.
 
-    .. versionchanged:: 3.1
-
-        The ``algorithm`` parameter was added.
-
 .. versionchanged:: 3.2
 
     The ``sign_object()`` and ``unsign_object()`` methods were added.
@@ -196,10 +192,6 @@ created within a specified period of time::
         Checks if ``signed_obj`` was signed less than ``max_age`` seconds ago,
         otherwise raises ``SignatureExpired``. The ``max_age`` parameter can
         accept an integer or a :py:class:`datetime.timedelta` object.
-
-    .. versionchanged:: 3.1
-
-        The ``algorithm`` parameter was added.
 
 .. _signing-complex-data:
 

@@ -43,11 +43,6 @@ need to distinguish caches by the ``Accept-language`` header.
     * All other parameters are added with their value, after applying
       ``str()`` to it.
 
-    .. versionchanged:: 3.1
-
-        Support for multiple field names in the ``no-cache`` directive was
-        added.
-
 .. function:: get_max_age(response)
 
     Returns the max-age from the response Cache-Control header as an integer
@@ -131,20 +126,12 @@ The functions defined in this module share the following properties:
     UTC offsets aren't supported; if ``value`` describes one, the result is
     ``None``.
 
-    .. versionchanged:: 3.1
-
-        Support for comma separators for milliseconds was added.
-
 .. function:: parse_datetime(value)
 
     Parses a string and returns a :class:`datetime.datetime`.
 
     UTC offsets are supported; if ``value`` describes one, the result's
     ``tzinfo`` attribute is a :class:`datetime.timezone` instance.
-
-    .. versionchanged:: 3.1
-
-        Support for comma separators for milliseconds was added.
 
 .. function:: parse_duration(value)
 
@@ -154,11 +141,6 @@ The functions defined in this module share the following properties:
     ``"DD HH:MM:SS,uuuuuu"``,  or as specified by ISO 8601 (e.g.
     ``P4DT1H15M20S`` which is equivalent to ``4 1:15:20``) or PostgreSQL's
     day-time interval format (e.g. ``3 days 04:05:06``).
-
-    .. versionchanged:: 3.1
-
-        Support for comma separators for decimal fractions in the ISO 8601
-        format and for the format ``"DD HH:MM:SS,uuuuuu"`` was added.
 
 ``django.utils.decorators``
 ===========================
@@ -204,23 +186,17 @@ The functions defined in this module share the following properties:
 
 .. function:: sync_only_middleware(middleware)
 
-    .. versionadded:: 3.1
-
     Marks a middleware as :ref:`synchronous-only <async-middleware>`. (The
     default in Django, but this allows you to future-proof if the default ever
     changes in a future release.)
 
 .. function:: async_only_middleware(middleware)
 
-    .. versionadded:: 3.1
-
     Marks a middleware as :ref:`asynchronous-only <async-middleware>`. Django
     will wrap it in an asynchronous event loop when it is called from the WSGI
     request path.
 
 .. function:: sync_and_async_middleware(middleware)
-
-    .. versionadded:: 3.1
 
     Marks a middleware as :ref:`sync and async compatible <async-middleware>`,
     this allows to avoid converting requests. You must implement detection of
@@ -320,10 +296,6 @@ The functions defined in this module share the following properties:
     ``encodeURIComponent()`` JavaScript function for more details.
 
     Returns an ASCII string containing the encoded result.
-
-    .. versionchanged:: 3.1
-
-        Support for :class:`pathlib.Path` ``path`` was added.
 
 .. function:: escape_uri_path(path)
 
@@ -549,8 +521,6 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
         x is z                     # is True
 
 .. class:: classproperty(method=None)
-
-    .. versionadded:: 3.1
 
     Similar to :py:func:`@classmethod <classmethod>`, the ``@classproperty``
     decorator converts the result of a method with a single ``cls`` argument

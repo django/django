@@ -514,14 +514,6 @@ For each field, we describe the default widget used if you don't specify
     ``DATE_INPUT_FORMATS`` keys if localization is enabled. See also
     :doc:`format localization </topics/i18n/formatting>`.
 
-    .. versionchanged:: 3.1
-
-        Support for ISO 8601 date string parsing (including optional timezone)
-        was added.
-
-        The fallback on ``DATE_INPUT_FORMATS`` in the default ``input_formats``
-        was added.
-
 ``DecimalField``
 ----------------
 
@@ -781,8 +773,6 @@ For each field, we describe the default widget used if you don't specify
 -------------
 
 .. class:: JSONField(encoder=None, decoder=None, **kwargs)
-
-    .. versionadded:: 3.1
 
     A field which accepts JSON encoded data for a
     :class:`~django.db.models.JSONField`.
@@ -1450,20 +1440,10 @@ customize the yielded 2-tuple choices.
         :attr:`ChoiceField.choices`. The first ``value`` element is a
         :class:`ModelChoiceIteratorValue` instance.
 
-        .. versionchanged:: 3.1
-
-            In older versions, the first ``value`` element in the choice tuple
-            is the ``field`` value itself, rather than a
-            ``ModelChoiceIteratorValue`` instance. In most cases this proxies
-            transparently but, if you need the ``field`` value itself, use the
-            :attr:`ModelChoiceIteratorValue.value` attribute instead.
-
 ``ModelChoiceIteratorValue``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: ModelChoiceIteratorValue(value, instance)
-
-    .. versionadded:: 3.1
 
     Two arguments are required:
 

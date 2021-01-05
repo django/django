@@ -842,10 +842,6 @@ Has two optional arguments:
     handles the storage and retrieval of your files. See :doc:`/topics/files`
     for details on how to provide this object.
 
-    .. versionchanged:: 3.1
-
-        The ability to provide a callable was added.
-
 The default form widget for this field is a
 :class:`~django.forms.ClearableFileInput`.
 
@@ -1198,8 +1194,6 @@ values are stored as null.
 
 .. class:: JSONField(encoder=None, decoder=None, **options)
 
-.. versionadded:: 3.1
-
 A field for storing JSON encoded data. In Python the data is represented in its
 Python native format: dictionaries, lists, strings, numbers, booleans and
 ``None``.
@@ -1275,8 +1269,6 @@ Like :class:`BooleanField` with ``null=True``.
 ---------------------------
 
 .. class:: PositiveBigIntegerField(**options)
-
-.. versionadded:: 3.1
 
 Like a :class:`PositiveIntegerField`, but only allows values under a certain
 (database-dependent) point. Values from ``0`` to ``9223372036854775807`` are
@@ -1578,8 +1570,6 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     :exc:`django.db.IntegrityError`.
 
 * .. attribute:: RESTRICT
-
-    .. versionadded:: 3.1
 
     Prevent deletion of the referenced object by raising
     :exc:`~django.db.models.RestrictedError` (a subclass of

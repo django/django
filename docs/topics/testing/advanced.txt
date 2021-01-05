@@ -573,10 +573,6 @@ execute and tear down the test suite.
     custom arguments by calling ``parser.add_argument()`` inside the method, so
     that the :djadmin:`test` command will be able to use those arguments.
 
-    .. versionadded:: 3.1
-
-        The ``buffer`` argument was added.
-
     .. versionadded:: 3.2
 
         The ``enable_faulthandler`` and ``timing`` arguments were added.
@@ -670,10 +666,6 @@ Methods
 .. method:: DiscoverRunner.run_checks(databases)
 
     Runs the :doc:`system checks </topics/checks>` on the test ``databases``.
-
-    .. versionadded:: 3.1
-
-        The ``databases`` parameter was added.
 
 .. method:: DiscoverRunner.run_suite(suite, **kwargs)
 

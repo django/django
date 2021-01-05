@@ -834,10 +834,6 @@ object. If it's ``None``, Django uses the :ref:`current time zone
 ambiguous datetimes in daylight saving time. By default (when ``is_dst=None``),
 ``pytz`` raises an exception for such datetimes.
 
-.. versionadded:: 3.1
-
-    The ``is_dst`` parameter was added.
-
 .. _database-time-zone-definitions:
 
 .. note::
@@ -2216,10 +2212,6 @@ normally supports it).
 
 Returns ``objs`` as cast to a list, in the same order as provided.
 
-.. versionchanged:: 3.1
-
-    Support for the fetching primary key attributes on MariaDB 10.5+ was added.
-
 ``bulk_update()``
 ~~~~~~~~~~~~~~~~~
 
@@ -2741,11 +2733,6 @@ On some databases, flags may cause the query to be executed which could have
 adverse effects on your database. For example, the ``ANALYZE`` flag supported
 by MariaDB, MySQL 8.0.18+, and PostgreSQL could result in changes to data if
 there are triggers or if a function is called, even for a ``SELECT`` query.
-
-.. versionchanged:: 3.1
-
-    Support for the ``'TREE'`` format on MySQL 8.0.16+ and ``analyze`` option
-    on MariaDB and MySQL 8.0.18+ were added.
 
 .. _field-lookups:
 
@@ -3272,8 +3259,6 @@ in the database <database-time-zone-definitions>`.
 
 ``iso_week_day``
 ~~~~~~~~~~~~~~~~
-
-.. versionadded:: 3.1
 
 For date and datetime fields, an exact ISO 8601 day of the week match. Allows
 chaining additional field lookups.

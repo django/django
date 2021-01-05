@@ -769,11 +769,6 @@ If your tests make any database queries, use subclasses
     :exc:`unittest.SkipTest` in ``setUpClass()``, be sure to do it before
     calling ``super()`` to avoid this.
 
-.. versionchanged:: 3.1
-
-    The ``debug()`` method was implemented to allow running a test without
-    collecting the result and catching exceptions.
-
 ``TransactionTestCase``
 -----------------------
 
@@ -1805,8 +1800,6 @@ won't be run.
 
 Testing asynchronous code
 =========================
-
-.. versionadded:: 3.1
 
 If you merely want to test the output of your asynchronous views, the standard
 test client will run them inside their own asynchronous loop without any extra

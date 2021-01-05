@@ -336,11 +336,6 @@ foundation for custom widgets.
         a hidden ``textarea`` element may want to always return ``False`` to
         avoid browser validation on the hidden field.
 
-        .. versionchanged:: 3.1
-
-            In older versions, ``True`` was returned for
-            :class:`~django.forms.FileInput` when ``initial`` was set.
-
 ``MultiWidget``
 ---------------
 
@@ -371,10 +366,6 @@ foundation for custom widgets.
             >>> widget = MultiWidget(widgets={'': TextInput, 'last': TextInput})
             >>> widget.render('name', ['john', 'paul'])
             '<input type="text" name="name" value="john"><input type="text" name="name_last" value="paul">'
-
-        .. versionchanged::3.1
-
-            Support for using a dictionary was added.
 
     And one required method:
 

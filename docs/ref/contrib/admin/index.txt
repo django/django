@@ -40,12 +40,6 @@ If you're not using the default project template, here are the requirements:
    the ``'context_processors'`` option of :setting:`OPTIONS
    <TEMPLATES-OPTIONS>`.
 
-   .. versionchanged:: 3.1
-
-       ``django.template.context_processors.request`` was added as a
-       requirement in the ``'context_processors'`` option to support the new
-       :attr:`.AdminSite.enable_nav_sidebar`.
-
 #. If you've customized the :setting:`MIDDLEWARE` setting,
    :class:`django.contrib.auth.middleware.AuthenticationMiddleware` and
    :class:`django.contrib.messages.middleware.MessageMiddleware` must be
@@ -1041,10 +1035,6 @@ subclass::
 
         The :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
         field is not supported.
-
-      .. versionadded:: 3.1
-
-          The ``EmptyFieldListFilter`` class was added.
 
     List filter's typically appear only if the filter has more than one choice.
     A filter's ``has_output()`` method controls whether or not it appears.
@@ -2230,10 +2220,6 @@ To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
 
-.. versionchanged:: 3.1
-
-    jQuery was upgraded from 3.4.1 to 3.5.1.
-
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
 a specific need. For example, if you require the jQuery library to be in the
@@ -2952,8 +2938,6 @@ Templates can override or extend base admin templates as described in
     :attr:`ModelAdmin.empty_value_display` for examples.
 
 .. attribute:: AdminSite.enable_nav_sidebar
-
-    .. versionadded:: 3.1
 
     A boolean value that determines whether to show the navigation sidebar
     on larger screens. By default, it is set to ``True``.

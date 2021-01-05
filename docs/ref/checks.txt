@@ -93,15 +93,6 @@ Django's system checks are organized using the following tags:
 
 Some checks may be registered with multiple tags.
 
-.. versionchanged:: 3.1
-
-    The ``async_support`` tag was added.
-
-.. versionchanged:: 3.1
-
-    The ``database`` checks are now run only for database aliases specified
-    using the :option:`check --database` option.
-
 .. versionchanged:: 3.2
 
     The ``sites`` tag was added.
@@ -111,8 +102,6 @@ Core system checks
 
 Asynchronous support
 --------------------
-
-.. versionadded:: 3.1
 
 The following checks verify your setup for :doc:`/topics/async`:
 

@@ -974,8 +974,6 @@ Attributes of ``BoundField``
 
 .. attribute:: BoundField.widget_type
 
-    .. versionadded:: 3.1
-
     Returns the lowercased class name of the wrapped field's widget, with any
     trailing ``input`` or ``widget`` removed. This may be used when building
     forms where the layout is dependent upon the widget type. For example::
