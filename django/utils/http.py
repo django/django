@@ -7,14 +7,12 @@ import warnings
 from binascii import Error as BinasciiError
 from email.utils import formatdate
 from urllib.parse import (
-    ParseResult, SplitResult, _coerce_args, _splitnetloc, _splitparams, quote,
-    quote_plus, scheme_chars, unquote, unquote_plus,
-    urlencode as original_urlencode, uses_params,
+    ParseResult, SplitResult, _coerce_args, _splitnetloc, _splitparams,
+    scheme_chars, unquote, urlencode as original_urlencode, uses_params,
 )
 
 from django.utils.datastructures import MultiValueDict
 from django.utils.deprecation import RemovedInDjango40Warning
-from django.utils.functional import keep_lazy_text
 from django.utils.regex_helper import _lazy_re_compile
 
 # based on RFC 7232, Appendix C
@@ -40,62 +38,6 @@ ASCTIME_DATE = _lazy_re_compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
 
 RFC3986_GENDELIMS = ":/?#[]@"
 RFC3986_SUBDELIMS = "!$&'()*+,;="
-
-
-@keep_lazy_text
-def urlquote(url, safe='/'):
-    """
-    A legacy compatibility wrapper to Python's urllib.parse.quote() function.
-    (was used for unicode handling on Python 2)
-    """
-    warnings.warn(
-        'django.utils.http.urlquote() is deprecated in favor of '
-        'urllib.parse.quote().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return quote(url, safe)
-
-
-@keep_lazy_text
-def urlquote_plus(url, safe=''):
-    """
-    A legacy compatibility wrapper to Python's urllib.parse.quote_plus()
-    function. (was used for unicode handling on Python 2)
-    """
-    warnings.warn(
-        'django.utils.http.urlquote_plus() is deprecated in favor of '
-        'urllib.parse.quote_plus(),',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return quote_plus(url, safe)
-
-
-@keep_lazy_text
-def urlunquote(quoted_url):
-    """
-    A legacy compatibility wrapper to Python's urllib.parse.unquote() function.
-    (was used for unicode handling on Python 2)
-    """
-    warnings.warn(
-        'django.utils.http.urlunquote() is deprecated in favor of '
-        'urllib.parse.unquote().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return unquote(quoted_url)
-
-
-@keep_lazy_text
-def urlunquote_plus(quoted_url):
-    """
-    A legacy compatibility wrapper to Python's urllib.parse.unquote_plus()
-    function. (was used for unicode handling on Python 2)
-    """
-    warnings.warn(
-        'django.utils.http.urlunquote_plus() is deprecated in favor of '
-        'urllib.parse.unquote_plus().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return unquote_plus(quoted_url)
 
 
 def urlencode(query, doseq=False):

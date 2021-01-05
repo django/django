@@ -246,7 +246,8 @@ in Django 4.0.
 See :ref:`deprecated-features-3.0` for details on these changes, including how
 to remove usage of these features.
 
-* ...
+* ``django.utils.http.urlquote()``, ``urlquote_plus()``, ``urlunquote()``, and
+  ``urlunquote_plus()`` are removed.
 
 See :ref:`deprecated-features-3.1` for details on these changes, including how
 to remove usage of these features.
