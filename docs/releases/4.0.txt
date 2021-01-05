@@ -251,6 +251,9 @@ to remove usage of these features.
 
 * ``django.utils.encoding.force_text()`` and ``smart_text()`` are removed.
 
+* ``django.utils.translation.ugettext()``, ``ugettext_lazy()``,
+  ``ugettext_noop()``, ``ungettext()``, and ``ungettext_lazy()`` are removed.
+
 See :ref:`deprecated-features-3.1` for details on these changes, including how
 to remove usage of these features.
 
