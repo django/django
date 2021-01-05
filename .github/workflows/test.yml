@@ -12,8 +12,8 @@ jobs:
               env:
                 GITHUB_CONTEXT: ${{ toJson(github) }}
               run: echo "$GITHUB_CONTEXT"
-#            - uses: actions-ecosystem/action-add-labels@v1
-#              if: ${{ startsWith(github.event.comment.body, '/add-labels') }}
-#              with:
-#                  github_token: ${{ secrets.GITHUB_TOKEN }}
-#                  labels: bug
+            - uses: actions-ecosystem/action-add-labels@v1
+              if: ${{ startsWith(github.event.comment.body, '/add-labels') }}
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  labels: bug
