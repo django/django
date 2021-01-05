@@ -3,3 +3,6 @@ __pycache__
 /.vscode
 /.idea
 *.pyc
+/venv
+/.venv
+/.env
