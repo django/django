@@ -57,6 +57,15 @@ class HashedFilesMixin:
                 r'(?P<matched>)^(//# (?-i:sourceMappingURL)=(?P<url>.*))$',
                 '//# sourceMappingURL=%(url)s',
             ),
+            (
+                r"""(?P<matched>import\s+(?s:(?P<imports>.*?))\s*from\s*["'](?P<url>.*?)["'])""",
+                'import %(imports)s from "%(url)s"',
+            ),
+            (
+                r"""(?P<matched>export\s+(?s:(?P<exports>.*?))\s*from\s*["'](?P<url>.*?)["'])""",
+                'export %(exports)s from "%(url)s"',
+            ),
+            (r"""(?P<matched>import\(["'](?P<url>.*?)["']\))""", 'import("%(url)s")'),
         )),
     )
     keep_intermediate_files = True
