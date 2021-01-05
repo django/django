@@ -1250,6 +1250,8 @@ class JSONField(CharField):
     def bound_data(self, data, initial):
         if self.disabled:
             return initial
+        if data is None:
+            return InvalidJSONInput()
         try:
             return json.loads(data, cls=self.decoder)
         except json.JSONDecodeError:

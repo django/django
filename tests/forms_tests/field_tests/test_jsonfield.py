@@ -5,6 +5,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.forms import (
     CharField, Form, JSONField, Textarea, TextInput, ValidationError,
 )
+from django.forms.fields import InvalidJSONInput
 from django.test import SimpleTestCase
 
 
@@ -114,3 +115,10 @@ class JSONFieldTest(SimpleTestCase):
         form = JSONForm({'name': 'xy', 'json_field': '{"foo"}'})
         self.assertEqual(form.errors['json_field'], ['Enter a valid JSON.'])
         self.assertIn('{&quot;foo&quot;}</textarea>', form.as_p())
+
+    def test_bound_data_none(self):
+        class JSONForm(Form):
+            json_field = JSONField(required=True)
+        form = JSONForm({'name': 'xyz'})
+        self.assertEqual(form["json_field"].value(), InvalidJSONInput())
+        self.assertEqual(form.errors['json_field'], ['This field is required.'])
