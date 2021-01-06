@@ -1099,13 +1099,3 @@ For a complete discussion on the usage of the following see the
     Turns a Django template into something that is understood by ``xgettext``.
     It does so by translating the Django translation tags into standard
     ``gettext`` function invocations.
-
-.. data:: LANGUAGE_SESSION_KEY
-
-    Session key under which the active language for the current session is
-    stored.
-
-    .. deprecated:: 3.0
-
-        The language won't be stored in the session in Django 4.0. Use the
-        :setting:`LANGUAGE_COOKIE_NAME` cookie instead.

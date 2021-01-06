@@ -17,10 +17,7 @@ __all__ = [
     'ngettext', 'ngettext_lazy',
     'pgettext', 'pgettext_lazy',
     'npgettext', 'npgettext_lazy',
-    'LANGUAGE_SESSION_KEY',
 ]
-
-LANGUAGE_SESSION_KEY = '_language'
 
 
 class TranslatorCommentWarning(SyntaxWarning):

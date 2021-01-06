@@ -29,11 +29,10 @@ from django.utils.formats import (
 from django.utils.numberformat import format as nformat
 from django.utils.safestring import SafeString, mark_safe
 from django.utils.translation import (
-    LANGUAGE_SESSION_KEY, activate, check_for_language, deactivate,
-    get_language, get_language_bidi, get_language_from_request,
-    get_language_info, gettext, gettext_lazy, ngettext, ngettext_lazy,
-    npgettext, npgettext_lazy, pgettext, round_away_from_one, to_language,
-    to_locale, trans_null, trans_real,
+    activate, check_for_language, deactivate, get_language, get_language_bidi,
+    get_language_from_request, get_language_info, gettext, gettext_lazy,
+    ngettext, ngettext_lazy, npgettext, npgettext_lazy, pgettext,
+    round_away_from_one, to_language, to_locale, trans_null, trans_real,
 )
 from django.utils.translation.reloader import (
     translation_file_changed, watch_for_translation_changes,
@@ -1683,21 +1682,6 @@ class LocaleMiddlewareTests(TestCase):
         self.assertContains(response, "Oui/Non")
         response = self.client.get('/en/streaming/')
         self.assertContains(response, "Yes/No")
-
-    @override_settings(
-        MIDDLEWARE=[
-            'django.contrib.sessions.middleware.SessionMiddleware',
-            'django.middleware.locale.LocaleMiddleware',
-            'django.middleware.common.CommonMiddleware',
-        ],
-    )
-    def test_language_not_saved_to_session(self):
-        """
-        The Current language isno' automatically saved to the session on every
-        request (#21473).
-        """
-        self.client.get('/fr/simple/')
-        self.assertNotIn(LANGUAGE_SESSION_KEY, self.client.session)
 
 
 @override_settings(

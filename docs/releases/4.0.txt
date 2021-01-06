@@ -254,6 +254,9 @@ to remove usage of these features.
 * ``django.utils.translation.ugettext()``, ``ugettext_lazy()``,
   ``ugettext_noop()``, ``ungettext()``, and ``ungettext_lazy()`` are removed.
 
+* ``django.views.i18n.set_language()`` doesn't set the user language in
+  ``request.session`` (key ``_language``).
+
 See :ref:`deprecated-features-3.1` for details on these changes, including how
 to remove usage of these features.
 
