@@ -80,19 +80,50 @@ the assembly and transmission of a large CSV file::
             """Write the value by returning it, instead of storing in a buffer."""
             return value
 
-    def some_streaming_csv_view(request):
-        """A view that streams a large CSV file."""
+
+    def some_large_csv():
+        pseudo_buffer = Echo()
+        writer = csv.writer(pseudo_buffer)
         # Generate a sequence of rows. The range is based on the maximum number of
         # rows that can be handled by a single sheet in most spreadsheet
         # applications.
-        rows = (["Row {}".format(idx), str(idx)] for idx in range(65536))
-        pseudo_buffer = Echo()
-        writer = csv.writer(pseudo_buffer)
+        for idx in range(65536):
+            row = ["Row {}".format(idx), str(idx)]
+            yield writer.writerow(row)
+
+    def some_streaming_csv_view(request):
+        csv_object = some_large_csv()
         return StreamingHttpResponse(
-            (writer.writerow(row) for row in rows),
+            csv_object,
             content_type="text/csv",
             headers={'Content-Disposition': 'attachment; filename="somefilename.csv"'},
         )
+
+There are a few things different from :class:`~django.http.HttpResponse` here:
+
+* :class:`~django.http.StreamingHttpResponse` takes an :term:`iterable` as parameter.
+  In this example, by calling ``some_large_csv``, a :term:`generator` object is created and
+  used as the iterable needed.
+
+* Unlike :class:`~django.http.HttpResponse`, which itself can be taken as the file-like object
+  that :func:`csv.writer` needs, :class:`~django.http.StreamingHttpResponse`, without a ``write``
+  method, cannot be taken as the file-like object.
+  Therefore, another file-like interface ``Echo`` is needed. The written CSV content is passed through the ``Echo`` object.
+
+* The return value of ``writer.writerow`` is defined as:
+
+    "Return the return value of the call to the write method of the underlying file object."
+
+  With the ``Echo`` object, ``writer.writerow`` returns the actual line of string written
+  into the final CSV file.
+  
+* Note that in Python version lower than 3.8, :meth:`~csv.DictWriter.writeheader` method has no
+  return value, cause a empty line written in the final CSV file. Use the following workaround instead::
+
+    writer = csv.DictWriter(file, fieldnames=['foo', 'bar', 'baz'])
+    header = dict(zip(writer.fieldnames, writer.fieldnames))
+    yield writer.writerow(header)
+
 
 Using the template system
 =========================
