@@ -104,8 +104,10 @@ select.admin-autocomplete {
     box-sizing: border-box;
     list-style: none;
     margin: 0;
-    padding: 0 5px;
+    padding: 0 10px 5px 5px;
     width: 100%;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .select2-container--admin-autocomplete .select2-selection--multiple .select2-selection__rendered li {
@@ -123,6 +125,8 @@ select.admin-autocomplete {
     float: right;
     font-weight: bold;
     margin: 5px;
+    position: absolute;
+    right: 0;
 }
 
 .select2-container--admin-autocomplete .select2-selection--multiple .select2-selection__choice {
