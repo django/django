@@ -10,16 +10,16 @@ Reporting bugs and requesting features
     not public. For further details, please see :doc:`our security
     policies </internals/security>`.
 
-Otherwise, before reporting a bug or requesting a new feature on the
+Before reporting a bug or requesting a new feature on the
 `ticket tracker <https://code.djangoproject.com/>`_, consider these points:
 
-* Check that someone hasn't already filed the bug or feature request by
+* Confirm the bug or feature has not been reported or requested by
   `searching`_ or running `custom queries`_ in the ticket tracker.
 
-* Don't use the ticket system to ask support questions. Use the
-  |django-users| list or the `#django`_ IRC channel for that.
+* Support questions should be asked on the |django-users| list or the
+  `#django`_ IRC channel *not the ticket system*.
 
-* Don't reopen issues that have been marked "wontfix" without finding consensus
+* Don't reopen issues marked "wontfix" without finding consensus
   to do so on |django-developers|.
 
 * Don't use the ticket tracker for lengthy discussions, because they're
@@ -56,31 +56,6 @@ particular:
 
 To understand the lifecycle of your ticket once you have created it, refer to
 :doc:`triaging-tickets`.
-
-Reporting user interface bugs and features
-==========================================
-
-If your bug or feature request touches on anything visual in nature, there
-are a few additional guidelines to follow:
-
-* Include screenshots in your ticket which are the visual equivalent of a
-  minimal testcase. Show off the issue, not the crazy customizations
-  you've made to your browser.
-
-* If the issue is difficult to show off using a still image, consider
-  capturing a *brief* screencast. If your software permits it, capture only
-  the relevant area of the screen.
-
-* If you're offering a patch which changes the look or behavior of Django's
-  UI, you **must** attach before *and* after screenshots/screencasts.
-  Tickets lacking these are difficult for triagers to assess quickly.
-
-* Screenshots don't absolve you of other good reporting practices. Make sure
-  to include URLs, code snippets, and step-by-step instructions on how to
-  reproduce the behavior visible in the screenshots.
-
-* Make sure to set the UI/UX flag on the ticket so interested parties can
-  find your ticket.
 
 Requesting features
 ===================
@@ -119,48 +94,30 @@ branch, and show us your work!
 
 See also: :ref:`documenting-new-features`.
 
-.. _how-we-make-decisions:
+Reporting user interface bugs and features
+==========================================
 
-How we make decisions
-=====================
+If your bug or feature request touches on anything visual in nature, there
+are a few additional guidelines to follow:
 
-Whenever possible, we strive for a rough consensus. To that end, we'll often
-have informal votes on |django-developers| about a feature. In these votes we
-follow the voting style invented by Apache and used on Python itself, where
-votes are given as +1, +0, -0, or -1. Roughly translated, these votes mean:
+* Include screenshots in your ticket which are the visual equivalent of a
+  minimal testcase. Show off the issue, not the crazy customizations
+  you've made to your browser.
 
-* +1: "I love the idea and I'm strongly committed to it."
+* If the issue is difficult to show off using a still image, consider
+  capturing a *brief* screencast. If your software permits it, capture only
+  the relevant area of the screen.
 
-* +0: "Sounds OK to me."
+* If you're offering a patch which changes the look or behavior of Django's
+  UI, you **must** attach before *and* after screenshots/screencasts.
+  Tickets lacking these are difficult for triagers to assess quickly.
 
-* -0: "I'm not thrilled, but I won't stand in the way."
+* Screenshots don't absolve you of other good reporting practices. Make sure
+  to include URLs, code snippets, and step-by-step instructions on how to
+  reproduce the behavior visible in the screenshots.
 
-* -1: "I strongly disagree and would be very unhappy to see the idea turn
-  into reality."
-
-Although these votes on |django-developers| are informal, they'll be taken very
-seriously. After a suitable voting period, if an obvious consensus arises we'll
-follow the votes.
-
-However, consensus is not always possible. If consensus cannot be reached, or
-if the discussion towards a consensus fizzles out without a concrete decision,
-the decision may be deferred to the :ref:`technical board <technical-board>`.
-
-Internally, the technical board will use the same voting mechanism. A
-proposition will be considered carried if:
-
-* There are at least three "+1" votes from members of the technical board.
-
-* There is no "-1" vote from any member of the technical board.
-
-Votes should be submitted within a week.
-
-Since this process allows any technical board member to veto a proposal, a
-"-1" vote should be accompanied by an explanation of what it would take to
-convert that "-1" into at least a "+0".
-
-Votes on technical matters should be announced and held in public on the
-|django-developers| mailing list.
+* Make sure to set the UI/UX flag on the ticket so interested parties can
+  find your ticket.
 
 .. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query
