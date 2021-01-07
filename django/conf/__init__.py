@@ -9,22 +9,15 @@ for a list of all possible variables.
 import importlib
 import os
 import time
-import traceback
 import warnings
 from pathlib import Path
 
-import django
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
-
-PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG = (
-    'The PASSWORD_RESET_TIMEOUT_DAYS setting is deprecated. Use '
-    'PASSWORD_RESET_TIMEOUT instead.'
-)
 
 DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG = (
     'The DEFAULT_HASHING_ALGORITHM transitional setting is deprecated. '
@@ -142,20 +135,6 @@ class LazySettings(LazyObject):
         """Return True if the settings have already been configured."""
         return self._wrapped is not empty
 
-    @property
-    def PASSWORD_RESET_TIMEOUT_DAYS(self):
-        stack = traceback.extract_stack()
-        # Show a warning if the setting is used outside of Django.
-        # Stack index: -1 this line, -2 the caller.
-        filename, _, _, _ = stack[-2]
-        if not filename.startswith(os.path.dirname(django.__file__)):
-            warnings.warn(
-                PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG,
-                RemovedInDjango40Warning,
-                stacklevel=2,
-            )
-        return self.__getattr__('PASSWORD_RESET_TIMEOUT_DAYS')
-
 
 class Settings:
     def __init__(self, settings_module):
@@ -184,15 +163,6 @@ class Settings:
                     raise ImproperlyConfigured("The %s setting must be a list or a tuple. " % setting)
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
-
-        if self.is_overridden('PASSWORD_RESET_TIMEOUT_DAYS'):
-            if self.is_overridden('PASSWORD_RESET_TIMEOUT'):
-                raise ImproperlyConfigured(
-                    'PASSWORD_RESET_TIMEOUT_DAYS/PASSWORD_RESET_TIMEOUT are '
-                    'mutually exclusive.'
-                )
-            setattr(self, 'PASSWORD_RESET_TIMEOUT', self.PASSWORD_RESET_TIMEOUT_DAYS * 60 * 60 * 24)
-            warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
 
         if self.is_overridden('DEFAULT_HASHING_ALGORITHM'):
             warnings.warn(DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG, RemovedInDjango40Warning)
@@ -240,9 +210,6 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        if name == 'PASSWORD_RESET_TIMEOUT_DAYS':
-            setattr(self, 'PASSWORD_RESET_TIMEOUT', value * 60 * 60 * 24)
-            warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
         if name == 'DEFAULT_HASHING_ALGORITHM':
             warnings.warn(DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG, RemovedInDjango40Warning)
         super().__setattr__(name, value)

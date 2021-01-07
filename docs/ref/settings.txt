@@ -2967,21 +2967,6 @@ Used by the :class:`~django.contrib.auth.views.PasswordResetConfirmView`.
    as someone gaining access to email archives that may contain old, unused
    password reset tokens.
 
-.. setting:: PASSWORD_RESET_TIMEOUT_DAYS
-
-``PASSWORD_RESET_TIMEOUT_DAYS``
--------------------------------
-
-Default: ``3``
-
-The number of days a password reset link is valid for.
-
-Used by the :class:`~django.contrib.auth.views.PasswordResetConfirmView`.
-
-.. deprecated:: 3.1
-
-    This setting is deprecated. Use :setting:`PASSWORD_RESET_TIMEOUT` instead.
-
 .. setting:: PASSWORD_HASHERS
 
 ``PASSWORD_HASHERS``
