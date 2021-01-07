@@ -260,6 +260,8 @@ to remove usage of these features.
 * ``alias=None`` is required in the signature of
   ``django.db.models.Expression.get_group_by_cols()`` subclasses.
 
+* ``django.utils.text.unescape_entities()`` is removed.
+
 See :ref:`deprecated-features-3.1` for details on these changes, including how
 to remove usage of these features.
 
