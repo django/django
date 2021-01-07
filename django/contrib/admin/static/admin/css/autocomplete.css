@@ -14,7 +14,7 @@ select.admin-autocomplete {
 
 .select2-container--admin-autocomplete.select2-container--focus .select2-selection,
 .select2-container--admin-autocomplete.select2-container--open .select2-selection {
-    border-color: #999;
+    border-color: var(--body-quiet-color);
     min-height: 30px;
 }
 
@@ -29,13 +29,13 @@ select.admin-autocomplete {
 }
 
 .select2-container--admin-autocomplete .select2-selection--single {
-    background-color: #fff;
-    border: 1px solid #ccc;
+    background-color: var(--body-bg);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
 }
 
 .select2-container--admin-autocomplete .select2-selection--single .select2-selection__rendered {
-    color: #444;
+    color: var(--body-fg);
     line-height: 30px;
 }
 
@@ -46,7 +46,7 @@ select.admin-autocomplete {
 }
 
 .select2-container--admin-autocomplete .select2-selection--single .select2-selection__placeholder {
-    color: #999;
+    color: var(--body-quiet-color);
 }
 
 .select2-container--admin-autocomplete .select2-selection--single .select2-selection__arrow {
@@ -95,7 +95,7 @@ select.admin-autocomplete {
 
 .select2-container--admin-autocomplete .select2-selection--multiple {
     background-color: white;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     cursor: text;
 }
@@ -115,7 +115,7 @@ select.admin-autocomplete {
 }
 
 .select2-container--admin-autocomplete .select2-selection--multiple .select2-selection__placeholder {
-    color: #999;
+    color: var(--body-quiet-color);
     margin-top: 5px;
     float: left;
 }
@@ -131,7 +131,7 @@ select.admin-autocomplete {
 
 .select2-container--admin-autocomplete .select2-selection--multiple .select2-selection__choice {
     background-color: #e4e4e4;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     cursor: default;
     float: left;
@@ -141,7 +141,7 @@ select.admin-autocomplete {
 }
 
 .select2-container--admin-autocomplete .select2-selection--multiple .select2-selection__choice__remove {
-    color: #999;
+    color: var(--body-quiet-color);
     cursor: pointer;
     display: inline-block;
     font-weight: bold;
@@ -149,7 +149,7 @@ select.admin-autocomplete {
 }
 
 .select2-container--admin-autocomplete .select2-selection--multiple .select2-selection__choice__remove:hover {
-    color: #333;
+    color: var(--body-fg);
 }
 
 .select2-container--admin-autocomplete[dir="rtl"] .select2-selection--multiple .select2-selection__choice, .select2-container--admin-autocomplete[dir="rtl"] .select2-selection--multiple .select2-selection__placeholder, .select2-container--admin-autocomplete[dir="rtl"] .select2-selection--multiple .select2-search--inline {
@@ -167,7 +167,7 @@ select.admin-autocomplete {
 }
 
 .select2-container--admin-autocomplete.select2-container--focus .select2-selection--multiple {
-    border: solid #999 1px;
+    border: solid var(--body-quiet-color) 1px;
     outline: 0;
 }
 
@@ -191,7 +191,7 @@ select.admin-autocomplete {
 }
 
 .select2-container--admin-autocomplete .select2-search--dropdown .select2-search__field {
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
 }
 
 .select2-container--admin-autocomplete .select2-search--inline .select2-search__field {
@@ -205,6 +205,8 @@ select.admin-autocomplete {
 .select2-container--admin-autocomplete .select2-results > .select2-results__options {
     max-height: 200px;
     overflow-y: auto;
+    color: var(--body-fg);
+    background: var(--body-bg);
 }
 
 .select2-container--admin-autocomplete .select2-results__option[role=group] {
@@ -212,11 +214,12 @@ select.admin-autocomplete {
 }
 
 .select2-container--admin-autocomplete .select2-results__option[aria-disabled=true] {
-    color: #999;
+    color: var(--body-quiet-color);
 }
 
 .select2-container--admin-autocomplete .select2-results__option[aria-selected=true] {
-    background-color: #ddd;
+    background-color: var(--selected-bg);
+    color: var(--body-fg);
 }
 
 .select2-container--admin-autocomplete .select2-results__option .select2-results__option {
@@ -253,8 +256,8 @@ select.admin-autocomplete {
 }
 
 .select2-container--admin-autocomplete .select2-results__option--highlighted[aria-selected] {
-    background-color: #79aec8;
-    color: white;
+    background-color: var(--primary);
+    color: var(--body-bg);
 }
 
 .select2-container--admin-autocomplete .select2-results__group {
