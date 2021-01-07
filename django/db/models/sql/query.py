@@ -12,6 +12,7 @@ import functools
 import inspect
 import sys
 import warnings
+import json,ast
 from collections import Counter, namedtuple
 from collections.abc import Iterator, Mapping
 from itertools import chain, count, product
@@ -551,6 +552,8 @@ class Query(BaseExpression):
         q.explain_format = format
         q.explain_options = options
         compiler = q.get_compiler(using=using)
+        if format=='json':
+            return json.loads(json.dumps(ast.literal_eval('\n'.join(compiler.explain_query()))))[0]
         return '\n'.join(compiler.explain_query())
 
     def combine(self, rhs, connector):
