@@ -4,6 +4,7 @@ from weakref import WeakSet
 
 from django.apps import apps
 from django.contrib.admin import ModelAdmin, actions
+from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.base import ModelBase
@@ -255,6 +256,7 @@ class AdminSite:
                 wrap(self.password_change_done, cacheable=True),
                 name='password_change_done',
             ),
+            path('autocomplete/', wrap(self.autocomplete_view), name='autocomplete'),
             path('jsi18n/', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
             path(
                 'r/<int:content_type_id>/<path:object_id>/',
@@ -400,6 +402,9 @@ class AdminSite:
         }
         request.current_app = self.name
         return LoginView.as_view(**defaults)(request)
+
+    def autocomplete_view(self, request):
+        return AutocompleteJsonView.as_view(admin_site=self)(request)
 
     def _build_app_dict(self, request, label=None):
         """

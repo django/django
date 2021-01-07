@@ -6,6 +6,7 @@ from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.test import RequestFactory, override_settings
 from django.urls import reverse, reverse_lazy
@@ -38,10 +39,28 @@ site.register(Author, AuthorAdmin)
 site.register(Book, BookAdmin)
 
 
+@contextmanager
+def model_admin(model, model_admin, admin_site=site):
+    org_admin = admin_site._registry.get(model)
+    if org_admin:
+        admin_site.unregister(model)
+    admin_site.register(model, model_admin)
+    try:
+        yield
+    finally:
+        if org_admin:
+            admin_site._registry[model] = org_admin
+
+
 class AutocompleteJsonViewTests(AdminViewBasicTestCase):
-    as_view_args = {'model_admin': QuestionAdmin(Question, site)}
+    as_view_args = {'admin_site': site}
+    opts = {
+        'app_label': Answer._meta.app_label,
+        'model_name': Answer._meta.model_name,
+        'field_name': 'question'
+    }
     factory = RequestFactory()
-    url = reverse_lazy('autocomplete_admin:admin_views_question_autocomplete')
+    url = reverse_lazy('autocomplete_admin:autocomplete')
 
     @classmethod
     def setUpTestData(cls):
@@ -53,7 +72,7 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
 
     def test_success(self):
         q = Question.objects.create(question='Is this a question?')
-        request = self.factory.get(self.url, {'term': 'is'})
+        request = self.factory.get(self.url, {'term': 'is', **self.opts})
         request.user = self.superuser
         response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
         self.assertEqual(response.status_code, 200)
@@ -63,11 +82,56 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
             'pagination': {'more': False},
         })
 
+    def test_custom_to_field(self):
+        q = Question.objects.create(question='Is this a question?')
+        request = self.factory.get(self.url, {'term': 'is', **self.opts, 'field_name': 'question_with_to_field'})
+        request.user = self.superuser
+        response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(data, {
+            'results': [{'id': str(q.uuid), 'text': q.question}],
+            'pagination': {'more': False},
+        })
+
+    def test_field_does_not_exist(self):
+        request = self.factory.get(self.url, {'term': 'is', **self.opts, 'field_name': 'does_not_exist'})
+        request.user = self.superuser
+        with self.assertRaises(PermissionDenied):
+            AutocompleteJsonView.as_view(**self.as_view_args)(request)
+
+    def test_field_no_related_field(self):
+        request = self.factory.get(self.url, {'term': 'is', **self.opts, 'field_name': 'answer'})
+        request.user = self.superuser
+        with self.assertRaises(PermissionDenied):
+            AutocompleteJsonView.as_view(**self.as_view_args)(request)
+
+    def test_field_does_not_allowed(self):
+        request = self.factory.get(self.url, {'term': 'is', **self.opts, 'field_name': 'related_questions'})
+        request.user = self.superuser
+        with self.assertRaises(PermissionDenied):
+            AutocompleteJsonView.as_view(**self.as_view_args)(request)
+
+    def test_limit_choices_to(self):
+        # Answer.question_with_to_field defines limit_choices_to to "those not
+        # starting with 'not'".
+        q = Question.objects.create(question='Is this a question?')
+        Question.objects.create(question='Not a question.')
+        request = self.factory.get(self.url, {'term': 'is', **self.opts, 'field_name': 'question_with_to_field'})
+        request.user = self.superuser
+        response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(data, {
+            'results': [{'id': str(q.uuid), 'text': q.question}],
+            'pagination': {'more': False},
+        })
+
     def test_must_be_logged_in(self):
-        response = self.client.get(self.url, {'term': ''})
+        response = self.client.get(self.url, {'term': '', **self.opts})
         self.assertEqual(response.status_code, 200)
         self.client.logout()
-        response = self.client.get(self.url, {'term': ''})
+        response = self.client.get(self.url, {'term': '', **self.opts})
         self.assertEqual(response.status_code, 302)
 
     def test_has_view_or_change_permission_required(self):
@@ -75,13 +139,12 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
         Users require the change permission for the related model to the
         autocomplete view for it.
         """
-        request = self.factory.get(self.url, {'term': 'is'})
+        request = self.factory.get(self.url, {'term': 'is', **self.opts})
         self.user.is_staff = True
         self.user.save()
         request.user = self.user
-        response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
-        self.assertEqual(response.status_code, 403)
-        self.assertJSONEqual(response.content.decode('utf-8'), {'error': '403 Forbidden'})
+        with self.assertRaises(PermissionDenied):
+            AutocompleteJsonView.as_view(**self.as_view_args)(request)
         for permission in ('view', 'change'):
             with self.subTest(permission=permission):
                 self.user.user_permissions.clear()
@@ -104,14 +167,14 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
         q2.related_questions.add(q1)
         q3 = Question.objects.create(question='question 3')
         q3.related_questions.add(q1)
-        request = self.factory.get(self.url, {'term': 'question'})
+        request = self.factory.get(self.url, {'term': 'question', **self.opts})
         request.user = self.superuser
 
         class DistinctQuestionAdmin(QuestionAdmin):
             search_fields = ['related_questions__question', 'question']
 
-        model_admin = DistinctQuestionAdmin(Question, site)
-        response = AutocompleteJsonView.as_view(model_admin=model_admin)(request)
+        with model_admin(Question, DistinctQuestionAdmin):
+            response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(data['results']), 3)
@@ -120,20 +183,22 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
         class EmptySearchAdmin(QuestionAdmin):
             search_fields = []
 
-        model_admin = EmptySearchAdmin(Question, site)
-        msg = 'EmptySearchAdmin must have search_fields for the autocomplete_view.'
-        with self.assertRaisesMessage(Http404, msg):
-            model_admin.autocomplete_view(self.factory.get(self.url))
+        with model_admin(Question, EmptySearchAdmin):
+            msg = 'EmptySearchAdmin must have search_fields for the autocomplete_view.'
+            with self.assertRaisesMessage(Http404, msg):
+                site.autocomplete_view(self.factory.get(self.url, {'term': '', **self.opts}))
 
     def test_get_paginator(self):
         """Search results are paginated."""
+        class PKOrderingQuestionAdmin(QuestionAdmin):
+            ordering = ['pk']
+
         Question.objects.bulk_create(Question(question=str(i)) for i in range(PAGINATOR_SIZE + 10))
-        model_admin = QuestionAdmin(Question, site)
-        model_admin.ordering = ['pk']
         # The first page of results.
-        request = self.factory.get(self.url, {'term': ''})
+        request = self.factory.get(self.url, {'term': '', **self.opts})
         request.user = self.superuser
-        response = AutocompleteJsonView.as_view(model_admin=model_admin)(request)
+        with model_admin(Question, PKOrderingQuestionAdmin):
+            response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
@@ -141,9 +206,10 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
             'pagination': {'more': True},
         })
         # The second page of results.
-        request = self.factory.get(self.url, {'term': '', 'page': '2'})
+        request = self.factory.get(self.url, {'term': '', 'page': '2', **self.opts})
         request.user = self.superuser
-        response = AutocompleteJsonView.as_view(model_admin=model_admin)(request)
+        with model_admin(Question, PKOrderingQuestionAdmin):
+            response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
