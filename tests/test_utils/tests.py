@@ -1,3 +1,4 @@
+import logging
 import os
 import unittest
 import warnings
@@ -26,6 +27,7 @@ from django.test.utils import (
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
 from django.utils.deprecation import RemovedInDjango41Warning
+from django.utils.log import DEFAULT_LOGGING
 
 from .models import Car, Person, PossessedCar
 from .views import empty_response
@@ -1103,6 +1105,47 @@ class AssertWarnsMessageTests(SimpleTestCase):
             warnings.warn('[.*x+]y?', UserWarning)
         with self.assertWarnsMessage(UserWarning, '[.*x+]y?'):
             func1()
+
+
+# TODO: Remove when dropping support for PY39.
+class AssertNoLogsTest(SimpleTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        logging.config.dictConfig(DEFAULT_LOGGING)
+        cls.addClassCleanup(logging.config.dictConfig, settings.LOGGING)
+
+    def setUp(self):
+        self.logger = logging.getLogger('django')
+
+    @override_settings(DEBUG=True)
+    def test_fails_when_log_emitted(self):
+        msg = "Unexpected logs found: ['INFO:django:FAIL!']"
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertNoLogs('django', 'INFO'):
+                self.logger.info('FAIL!')
+
+    @override_settings(DEBUG=True)
+    def test_text_level(self):
+        with self.assertNoLogs('django', 'INFO'):
+            self.logger.debug('DEBUG logs are ignored.')
+
+    @override_settings(DEBUG=True)
+    def test_int_level(self):
+        with self.assertNoLogs('django', logging.INFO):
+            self.logger.debug('DEBUG logs are ignored.')
+
+    @override_settings(DEBUG=True)
+    def test_default_level(self):
+        with self.assertNoLogs('django'):
+            self.logger.debug('DEBUG logs are ignored.')
+
+    @override_settings(DEBUG=True)
+    def test_does_not_hide_other_failures(self):
+        msg = '1 != 2'
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertNoLogs('django'):
+                self.assertEqual(1, 2)
 
 
 class AssertFieldOutputTests(SimpleTestCase):

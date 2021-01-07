@@ -1,6 +1,7 @@
 import asyncio
 import difflib
 import json
+import logging
 import posixpath
 import sys
 import threading
@@ -43,6 +44,7 @@ from django.test.utils import (
 )
 from django.utils.deprecation import RemovedInDjango41Warning
 from django.utils.functional import classproperty
+from django.utils.version import PY310
 from django.views.static import serve
 
 __all__ = ('TestCase', 'TransactionTestCase',
@@ -729,6 +731,29 @@ class SimpleTestCase(unittest.TestCase):
             self.assertWarns, 'warning', expected_warning, expected_message,
             *args, **kwargs
         )
+
+    # A similar method is available in Python 3.10+.
+    if not PY310:
+        @contextmanager
+        def assertNoLogs(self, logger, level=None):
+            """
+            Assert no messages are logged on the logger, with at least the
+            given level.
+            """
+            if isinstance(level, int):
+                level = logging.getLevelName(level)
+            elif level is None:
+                level = 'INFO'
+            try:
+                with self.assertLogs(logger, level) as cm:
+                    yield
+            except AssertionError as e:
+                msg = e.args[0]
+                expected_msg = f'no logs of level {level} or higher triggered on {logger}'
+                if msg != expected_msg:
+                    raise e
+            else:
+                self.fail(f'Unexpected logs found: {cm.output!r}')
 
     def assertFieldOutput(self, fieldclass, valid, invalid, field_args=None,
                           field_kwargs=None, empty_value=''):

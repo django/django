@@ -177,9 +177,8 @@ class MiddlewareNotUsedTests(SimpleTestCase):
         MIDDLEWARE=['middleware_exceptions.tests.MyMiddleware'],
     )
     def test_do_not_log_when_debug_is_false(self):
-        with self.assertRaisesMessage(AssertionError, 'no logs'):
-            with self.assertLogs('django.request', 'DEBUG'):
-                self.client.get('/middleware_exceptions/view/')
+        with self.assertNoLogs('django.request', 'DEBUG'):
+            self.client.get('/middleware_exceptions/view/')
 
     @override_settings(MIDDLEWARE=[
         'middleware_exceptions.middleware.SyncAndAsyncMiddleware',

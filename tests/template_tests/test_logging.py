@@ -62,6 +62,5 @@ class VariableResolveLoggingTests(SimpleTestCase):
         )
 
     def test_no_log_when_variable_exists(self):
-        with self.assertRaisesMessage(AssertionError, 'no logs'):
-            with self.assertLogs('django.template', self.loglevel):
-                Variable('article.section').resolve({'article': {'section': 'News'}})
+        with self.assertNoLogs('django.template', self.loglevel):
+            Variable('article.section').resolve({'article': {'section': 'News'}})

@@ -454,10 +454,9 @@ class CsrfViewMiddlewareTestMixin:
         """
         ensure_csrf_cookie() doesn't log warnings (#19436).
         """
-        with self.assertRaisesMessage(AssertionError, 'no logs'):
-            with self.assertLogs('django.request', 'WARNING'):
-                req = self._get_GET_no_csrf_cookie_request()
-                ensure_csrf_cookie_view(req)
+        with self.assertNoLogs('django.request', 'WARNING'):
+            req = self._get_GET_no_csrf_cookie_request()
+            ensure_csrf_cookie_view(req)
 
     def test_post_data_read_failure(self):
         """
