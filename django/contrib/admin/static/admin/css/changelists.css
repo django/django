@@ -40,13 +40,13 @@
 }
 
 #changelist .toplinks {
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--hairline-color);
 }
 
 #changelist .paginator {
-    color: #666;
-    border-bottom: 1px solid #eee;
-    background: #fff;
+    color: var(--body-quiet-color);
+    border-bottom: 1px solid var(--hairline-color);
+    background: var(--body-bg);
     overflow: hidden;
 }
 
@@ -68,7 +68,7 @@
 }
 
 #changelist table tfoot {
-    color: #666;
+    color: var(--body-quiet-color);
 }
 
 /* TOOLBAR */
@@ -76,22 +76,22 @@
 #toolbar {
     padding: 8px 10px;
     margin-bottom: 15px;
-    border-top: 1px solid #eee;
-    border-bottom: 1px solid #eee;
-    background: #f8f8f8;
-    color: #666;
+    border-top: 1px solid var(--hairline-color);
+    border-bottom: 1px solid var(--hairline-color);
+    background: var(--darkened-bg);
+    color: var(--body-quiet-color);
 }
 
 #toolbar form input {
     border-radius: 4px;
     font-size: 14px;
     padding: 5px;
-    color: #333;
+    color: var(--body-fg);
 }
 
 #toolbar #searchbar {
     height: 19px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     padding: 2px 5px;
     margin: 0;
     vertical-align: top;
@@ -100,24 +100,24 @@
 }
 
 #toolbar #searchbar:focus {
-    border-color: #999;
+    border-color: var(--body-quiet-color);
 }
 
 #toolbar form input[type="submit"] {
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     font-size: 13px;
     padding: 4px 8px;
     margin: 0;
     vertical-align: middle;
-    background: #fff;
+    background: var(--body-bg);
     box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;
     cursor: pointer;
-    color: #333;
+    color: var(--body-fg);
 }
 
 #toolbar form input[type="submit"]:focus,
 #toolbar form input[type="submit"]:hover {
-    border-color: #999;
+    border-color: var(--body-quiet-color);
 }
 
 #changelist-search img {
@@ -130,7 +130,7 @@
 #changelist-filter {
     order: 1;
     width: 240px;
-    background: #f8f8f8;
+    background: var(--darkened-bg);
     border-left: none;
     margin: 0 0 0 30px;
 }
@@ -153,7 +153,7 @@
 #changelist-filter ul {
     margin: 5px 0;
     padding: 0 15px 15px;
-    border-bottom: 1px solid #eaeaea;
+    border-bottom: 1px solid var(--hairline-color);
 }
 
 #changelist-filter ul:last-child {
@@ -168,31 +168,31 @@
 
 #changelist-filter a {
     display: block;
-    color: #999;
+    color: var(--body-quiet-color);
     text-overflow: ellipsis;
     overflow-x: hidden;
 }
 
 #changelist-filter li.selected {
-    border-left: 5px solid #eaeaea;
+    border-left: 5px solid var(--hairline-color);
     padding-left: 10px;
     margin-left: -15px;
 }
 
 #changelist-filter li.selected a {
-    color: #5b80b2;
+    color: var(--link-selected-fg);
 }
 
 #changelist-filter a:focus, #changelist-filter a:hover,
 #changelist-filter li.selected a:focus,
 #changelist-filter li.selected a:hover {
-    color: #036;
+    color: var(--link-hover-color);
 }
 
 #changelist-filter #changelist-filter-clear a {
     font-size: 13px;
     padding-bottom: 10px;
-    border-bottom: 1px solid #eaeaea;
+    border-bottom: 1px solid var(--hairline-color);
 }
 
 /* DATE DRILLDOWN */
@@ -213,12 +213,12 @@
 }
 
 .change-list ul.toplinks .date-back a {
-    color: #999;
+    color: var(--body-quiet-color);
 }
 
 .change-list ul.toplinks .date-back a:focus,
 .change-list ul.toplinks .date-back a:hover {
-    color: #036;
+    color: var(--link-hover-color);
 }
 
 /* PAGINATOR */
@@ -229,26 +229,26 @@
     padding-bottom: 10px;
     line-height: 22px;
     margin: 0;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid var(--hairline-color);
     width: 100%;
 }
 
 .paginator a:link, .paginator a:visited {
     padding: 2px 6px;
-    background: #79aec8;
+    background: var(--primary);
     text-decoration: none;
-    color: #fff;
+    color: var(--body-bg);
 }
 
 .paginator a.showall {
     border: none;
     background: none;
-    color: #5b80b2;
+    color: var(--link-fg);
 }
 
 .paginator a.showall:focus, .paginator a.showall:hover {
     background: none;
-    color: #036;
+    color: var(--link-hover-color);
 }
 
 .paginator .end {
@@ -264,7 +264,7 @@
 
 .paginator a:focus, .paginator a:hover {
     color: white;
-    background: #036;
+    background: var(--link-hover-color);
 }
 
 /* ACTIONS */
@@ -279,22 +279,22 @@
 }
 
 #changelist table tbody tr.selected {
-    background-color: #FFFFCC;
+    background-color: var(--selected-row);
 }
 
 #changelist .actions {
     padding: 10px;
-    background: #fff;
+    background: var(--body-bg);
     border-top: none;
     border-bottom: none;
     line-height: 24px;
-    color: #999;
+    color: var(--body-quiet-color);
     width: 100%;
 }
 
-#changelist .actions.selected {
-    background: #fffccf;
-    border-top: 1px solid #fffee8;
+#changelist .actions.selected { /* XXX Probably unused? */
+    background: var(--body-bg);
+    border-top: 1px solid var(--body-bg);
     border-bottom: 1px solid #edecd6;
 }
 
@@ -314,8 +314,8 @@
     vertical-align: top;
     height: 24px;
     background: none;
-    color: #000;
-    border: 1px solid #ccc;
+    color: var(--body-fg);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 14px;
     padding: 0 0 0 4px;
@@ -324,7 +324,7 @@
 }
 
 #changelist .actions select:focus {
-    border-color: #999;
+    border-color: var(--body-quiet-color);
 }
 
 #changelist .actions label {
@@ -335,18 +335,18 @@
 
 #changelist .actions .button {
     font-size: 13px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
-    background: #fff;
+    background: var(--body-bg);
     box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;
     cursor: pointer;
     height: 24px;
     line-height: 1;
     padding: 4px 8px;
     margin: 0;
-    color: #333;
+    color: var(--body-fg);
 }
 
 #changelist .actions .button:focus, #changelist .actions .button:hover {
-    border-color: #999;
+    border-color: var(--body-quiet-color);
 }

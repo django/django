@@ -1,7 +1,7 @@
 /* LOGIN FORM */
 
 .login {
-    background: #f8f8f8;
+    background: var(--darkened-bg);
     height: auto;
 }
 
@@ -16,7 +16,7 @@
 }
 
 .login #header h1 a {
-    color: #fff;
+    color: var(--body-bg);
 }
 
 .login #content {
@@ -24,8 +24,8 @@
 }
 
 .login #container {
-    background: #fff;
-    border: 1px solid #eaeaea;
+    background: var(--body-bg);
+    border: 1px solid var(--hairline-color);
     border-radius: 4px;
     overflow: hidden;
     width: 28em;

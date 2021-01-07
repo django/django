@@ -117,6 +117,8 @@ Minor features
 * Read-only related fields are now rendered as navigable links if target models
   are registered in the admin.
 
+* The admin now supports theming. See :ref:`admin-theming` for more details.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

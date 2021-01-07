@@ -140,7 +140,7 @@ input[type="submit"], button {
     }
 
     #changelist .actions select {
-        background: #fff;
+        background: var(--body-bg);
     }
 
     #changelist .actions .button {
@@ -166,7 +166,7 @@ input[type="submit"], button {
     .filtered .actions,
 
     #changelist .paginator {
-        border-top-color: #eee;
+        border-top-color: var(--hairline-color); /* XXX Is this used at all? */
     }
 
     #changelist .results + .paginator {
@@ -213,7 +213,7 @@ input[type="submit"], button {
     fieldset .fieldBox + .fieldBox {
         margin-top: 10px;
         padding-top: 10px;
-        border-top: 1px solid #eee;
+        border-top: 1px solid var(--hairline-color);
     }
 
     textarea {
@@ -399,11 +399,11 @@ input[type="submit"], button {
     .datetime .timezonewarning {
         display: block;
         font-size: 11px;
-        color: #999;
+        color: var(--body-quiet-color);
     }
 
     .datetimeshortcuts {
-        color: #ccc;
+        color: var(--border-color); /* XXX Redundant, .datetime span also sets #ccc */
     }
 
     .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
@@ -740,7 +740,7 @@ input[type="submit"], button {
     /* Inlines */
 
     .inline-group[data-inline-type="stacked"] .inline-related {
-        border: 2px solid #eee;
+        border: 1px solid var(--hairline-color);
         border-radius: 4px;
         margin-top: 15px;
         overflow: auto;
@@ -750,16 +750,17 @@ input[type="submit"], button {
         box-sizing: border-box;
     }
 
-    .inline-group[data-inline-type="stacked"] .inline-related + .inline-related {
-        margin-top: 30px;
-    }
-
     .inline-group[data-inline-type="stacked"] .inline-related .module {
         padding: 0 10px;
     }
 
-    .inline-group[data-inline-type="stacked"] .inline-related .module .form-row:last-child {
+    .inline-group[data-inline-type="stacked"] .inline-related .module .form-row {
+        border-top: 1px solid var(--hairline-color);
         border-bottom: none;
+    }
+
+    .inline-group[data-inline-type="stacked"] .inline-related .module .form-row:first-child {
+        border-top: none;
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related h3 {
@@ -791,7 +792,7 @@ input[type="submit"], button {
 
     .inline-group[data-inline-type="stacked"] div.add-row {
         margin-top: 15px;
-        border: 1px solid #eee;
+        border: 1px solid var(--hairline-color);
         border-radius: 4px;
     }
 
@@ -961,7 +962,7 @@ input[type="submit"], button {
     }
 
     .timelist a {
-        background: #fff;
+        background: var(--body-bg);
         padding: 4px;
     }
 

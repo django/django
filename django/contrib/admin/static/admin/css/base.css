@@ -4,6 +4,58 @@
 
 @import url(fonts.css);
 
+/* VARIABLE DEFINITIONS */
+:root {
+  --primary: #79aec8;
+  --secondary: #417690;
+  --accent: #f5dd5d;
+
+  --body-fg: #333;
+  --body-bg: #fff;
+  --body-quiet-color: #666;
+  --body-loud-color: #000;
+
+  --header-color: #ffc;
+  --header-branding-color: var(--accent);
+  --header-bg: var(--secondary);
+  --header-link-color: #fff;
+
+  --breadcrumbs-fg: #c4dce8;
+  --breadcrumbs-link-fg: var(--body-bg);
+  --breadcrumbs-bg: var(--primary);
+
+  --link-fg: #447e9b;
+  --link-hover-color: #036;
+  --link-selected-fg: #5b80b2;
+
+  --hairline-color: #e8e8e8;
+  --border-color: #ccc;
+
+  --error-fg: #ba2121;
+
+  --message-success-bg: #dfd;
+  --message-warning-bg: #ffc;
+  --message-error-bg: #ffefef;
+
+  --darkened-bg: #f8f8f8; /* A bit darker than --body-bg */
+  --selected-bg: #e4e4e4; /* E.g. selected table cells */
+  --selected-row: #ffc;
+
+  --button-fg: #fff;
+  --button-bg: var(--primary);
+  --button-hover-bg: #609ab6;
+  --default-button-bg: var(--secondary);
+  --default-button-hover-bg: #205067;
+  --close-button-bg: #888; /* Previously #bbb, contrast 1.92 */
+  --close-button-hover-bg: #747474;
+  --delete-button-bg: #ba2121;
+  --delete-button-hover-bg: #a41515;
+
+  --object-tools-fg: var(--button-fg);
+  --object-tools-bg: var(--close-button-bg);
+  --object-tools-hover-bg: var(--close-button-hover-bg);
+}
+
 html, body {
     height: 100%;
 }
@@ -13,19 +65,20 @@ body {
     padding: 0;
     font-size: 14px;
     font-family: "Roboto","Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
-    color: #333;
-    background: #fff;
+    color: var(--body-fg);
+    background: var(--body-bg);
 }
 
 /* LINKS */
 
 a:link, a:visited {
-    color: #447e9b;
+    color: var(--link-fg);
     text-decoration: none;
+    transition: color 0.15s, background 0.15s;
 }
 
 a:focus, a:hover {
-    color: #036;
+    color: var(--link-hover-color);
 }
 
 a:focus {
@@ -37,7 +90,7 @@ a img {
 }
 
 a.section:link, a.section:visited {
-    color: #fff;
+    color: var(--body-bg);
     text-decoration: none;
 }
 
@@ -64,7 +117,7 @@ h1 {
     margin: 0 0 20px;
     font-weight: 300;
     font-size: 20px;
-    color: #666;
+    color: var(--body-quiet-color);
 }
 
 h2 {
@@ -80,7 +133,7 @@ h2.subhead {
 h3 {
     font-size: 14px;
     margin: .8em 0 .3em 0;
-    color: #666;
+    color: var(--body-quiet-color);
     font-weight: bold;
 }
 
@@ -93,7 +146,7 @@ h4 {
 h5 {
     font-size: 10px;
     margin: 1.5em 0 .5em 0;
-    color: #666;
+    color: var(--body-quiet-color);
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -131,7 +184,7 @@ fieldset {
     min-width: 0;
     padding: 0;
     border: none;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--hairline-color);
 }
 
 blockquote {
@@ -144,7 +197,7 @@ blockquote {
 
 code, pre {
     font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
-    color: #666;
+    color: var(--body-quiet-color);
     font-size: 12px;
     overflow-x: auto;
 }
@@ -161,8 +214,8 @@ code strong {
 
 hr {
     clear: both;
-    color: #eee;
-    background-color: #eee;
+    color: var(--hairline-color);
+    background-color: var(--hairline-color);
     height: 1px;
     border: none;
     margin: 0;
@@ -183,7 +236,7 @@ hr {
 
 .help, p.help, form p.help, div.help, form div.help, div.help li {
     font-size: 11px;
-    color: #999;
+    color: var(--body-quiet-color);
 }
 
 div.help ul {
@@ -199,7 +252,7 @@ p img, h1 img, h2 img, h3 img, h4 img, td img {
 }
 
 .quiet, a.quiet:link, a.quiet:visited {
-    color: #999;
+    color: var(--body-quiet-color);
     font-weight: normal;
 }
 
@@ -219,13 +272,13 @@ p img, h1 img, h2 img, h3 img, h4 img, td img {
 
 table {
     border-collapse: collapse;
-    border-color: #ccc;
+    border-color: var(--border-color);
 }
 
 td, th {
     font-size: 13px;
     line-height: 16px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--hairline-color);
     vertical-align: top;
     padding: 8px;
 }
@@ -237,37 +290,37 @@ th {
 
 thead th,
 tfoot td {
-    color: #666;
+    color: var(--body-quiet-color);
     padding: 5px 10px;
     font-size: 11px;
-    background: #fff;
+    background: var(--body-bg);
     border: none;
-    border-top: 1px solid #eee;
-    border-bottom: 1px solid #eee;
+    border-top: 1px solid var(--hairline-color);
+    border-bottom: 1px solid var(--hairline-color);
 }
 
 tfoot td {
     border-bottom: none;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--hairline-color);
 }
 
 thead th.required {
-    color: #000;
+    color: var(--body-loud-color);
 }
 
 tr.alt {
-    background: #f6f6f6;
+    background: var(--darkened-bg);
 }
 
 tr:nth-child(odd), .row-form-errors {
-    background: #fff;
+    background: var(--body-bg);
 }
 
 tr:nth-child(even),
 tr:nth-child(even) .errorlist,
 tr:nth-child(odd) + .row-form-errors,
 tr:nth-child(odd) + .row-form-errors .errorlist {
-    background: #f9f9f9;
+    background: var(--darkened-bg);
 }
 
 /* SORTABLE TABLES */
@@ -276,15 +329,15 @@ thead th {
     padding: 5px 10px;
     line-height: normal;
     text-transform: uppercase;
-    background: #f6f6f6;
+    background: var(--darkened-bg);
 }
 
 thead th a:link, thead th a:visited {
-    color: #666;
+    color: var(--body-quiet-color);
 }
 
 thead th.sorted {
-    background: #eee;
+    background: var(--selected-bg);
 }
 
 thead th.sorted .text {
@@ -303,7 +356,7 @@ table thead th .text a {
 }
 
 table thead th .text a:focus, table thead th .text a:hover {
-    background: #eee;
+    background: var(--selected-bg);
 }
 
 thead th.sorted a.sortremove {
@@ -350,12 +403,12 @@ table thead th.sorted .sortoptions a.sortremove:after {
     left: 3px;
     font-weight: 200;
     font-size: 18px;
-    color: #999;
+    color: var(--body-quiet-color);
 }
 
 table thead th.sorted .sortoptions a.sortremove:focus:after,
 table thead th.sorted .sortoptions a.sortremove:hover:after {
-    color: #447e9b;
+    color: var(--link-fg);
 }
 
 table thead th.sorted .sortoptions a.sortremove:focus,
@@ -402,16 +455,18 @@ textarea {
 
 input[type=text], input[type=password], input[type=email], input[type=url],
 input[type=number], input[type=tel], textarea, select, .vTextField {
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     padding: 5px 6px;
     margin-top: 0;
+    color: var(--body-fg);
+    background-color: var(--body-bg);
 }
 
 input[type=text]:focus, input[type=password]:focus, input[type=email]:focus,
 input[type=url]:focus, input[type=number]:focus, input[type=tel]:focus,
 textarea:focus, select:focus, .vTextField:focus {
-    border-color: #999;
+    border-color: var(--body-quiet-color);
 }
 
 select {
@@ -427,12 +482,13 @@ select[multiple] {
 /* FORM BUTTONS */
 
 .button, input[type=submit], input[type=button], .submit-row input, a.button {
-    background: #79aec8;
+    background: var(--button-bg);
     padding: 10px 15px;
     border: none;
     border-radius: 4px;
-    color: #fff;
+    color: var(--button-fg);
     cursor: pointer;
+    transition: background 0.15s;
 }
 
 a.button {
@@ -442,7 +498,7 @@ a.button {
 .button:active, input[type=submit]:active, input[type=button]:active,
 .button:focus, input[type=submit]:focus, input[type=button]:focus,
 .button:hover, input[type=submit]:hover, input[type=button]:hover {
-    background: #609ab6;
+    background: var(--button-hover-bg);
 }
 
 .button[disabled], input[type=submit][disabled], input[type=button][disabled] {
@@ -453,13 +509,13 @@ a.button {
     float: right;
     border: none;
     font-weight: 400;
-    background: #417690;
+    background: var(--default-button-bg);
 }
 
 .button.default:active, input[type=submit].default:active,
 .button.default:focus, input[type=submit].default:focus,
 .button.default:hover, input[type=submit].default:hover {
-    background: #205067;
+    background: var(--default-button-hover-bg);
 }
 
 .button[disabled].default,
@@ -474,7 +530,7 @@ input[type=button][disabled].default {
 .module {
     border: none;
     margin-bottom: 30px;
-    background: #fff;
+    background: var(--body-bg);
 }
 
 .module p, .module ul, .module h3, .module h4, .module dl, .module pre {
@@ -500,8 +556,8 @@ input[type=button][disabled].default {
     font-weight: 400;
     font-size: 13px;
     text-align: left;
-    background: #79aec8;
-    color: #fff;
+    background: var(--primary);
+    color: var(--body-bg);
 }
 
 .module caption,
@@ -528,18 +584,18 @@ ul.messagelist li {
     font-size: 13px;
     padding: 10px 10px 10px 65px;
     margin: 0 0 10px 0;
-    background: #dfd url(../img/icon-yes.svg) 40px 12px no-repeat;
+    background: var(--message-success-bg) url(../img/icon-yes.svg) 40px 12px no-repeat;
     background-size: 16px auto;
-    color: #333;
+    color: var(--body-fg);
 }
 
 ul.messagelist li.warning {
-    background: #ffc url(../img/icon-alert.svg) 40px 14px no-repeat;
+    background: var(--message-warning-bg) url(../img/icon-alert.svg) 40px 14px no-repeat;
     background-size: 14px auto;
 }
 
 ul.messagelist li.error {
-    background: #ffefef url(../img/icon-no.svg) 40px 12px no-repeat;
+    background: var(--message-error-bg) url(../img/icon-no.svg) 40px 12px no-repeat;
     background-size: 16px auto;
 }
 
@@ -549,10 +605,10 @@ ul.messagelist li.error {
     display: block;
     padding: 10px 12px;
     margin: 0 0 10px 0;
-    color: #ba2121;
-    border: 1px solid #ba2121;
+    color: var(--error-fg);
+    border: 1px solid var(--error-fg);
     border-radius: 4px;
-    background-color: #fff;
+    background-color: var(--body-bg);
     background-position: 5px 12px;
     overflow-wrap: break-word;
 }
@@ -560,8 +616,8 @@ ul.messagelist li.error {
 ul.errorlist {
     margin: 0 0 4px;
     padding: 0;
-    color: #ba2121;
-    background: #fff;
+    color: var(--error-fg);
+    background: var(--body-bg);
 }
 
 ul.errorlist li {
@@ -592,7 +648,7 @@ td ul.errorlist li {
 .form-row.errors {
     margin: 0;
     border: none;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--hairline-color);
     background: none;
 }
 
@@ -602,7 +658,7 @@ td ul.errorlist li {
 
 .errors input, .errors select, .errors textarea,
 td ul.errorlist + input, td ul.errorlist + select, td ul.errorlist + textarea {
-    border: 1px solid #ba2121;
+    border: 1px solid var(--error-fg);
 }
 
 .description {
@@ -613,19 +669,19 @@ td ul.errorlist + input, td ul.errorlist + select, td ul.errorlist + textarea {
 /* BREADCRUMBS */
 
 div.breadcrumbs {
-    background: #79aec8;
+    background: var(--breadcrumbs-bg);
     padding: 10px 40px;
     border: none;
-    color: #c4dce8;
+    color: var(--breadcrumbs-fg);
     text-align: left;
 }
 
 div.breadcrumbs a {
-    color: #fff;
+    color: var(--breadcrumbs-link-fg);
 }
 
 div.breadcrumbs a:focus, div.breadcrumbs a:hover {
-    color: #c4dce8;
+    color: var(--breadcrumbs-fg);
 }
 
 /* ACTION ICONS */
@@ -651,11 +707,11 @@ div.breadcrumbs a:focus, div.breadcrumbs a:hover {
 }
 
 a.deletelink:link, a.deletelink:visited {
-    color: #CC3434;
+    color: #CC3434; /* XXX Probably unused? */
 }
 
 a.deletelink:focus, a.deletelink:hover {
-    color: #993333;
+    color: #993333; /* XXX Probably unused? */
     text-decoration: none;
 }
 
@@ -685,16 +741,16 @@ a.deletelink:focus, a.deletelink:hover {
     display: block;
     float: left;
     padding: 3px 12px;
-    background: #999;
+    background: var(--object-tools-bg);
+    color: var(--object-tools-fg);
     font-weight: 400;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #fff;
 }
 
 .object-tools a:focus, .object-tools a:hover {
-    background-color: #417690;
+    background-color: var(--object-tools-hover-bg);
 }
 
 .object-tools a:focus{
@@ -809,13 +865,13 @@ table#change-history tbody th {
     justify-content: space-between;
     align-items: center;
     padding: 10px 40px;
-    background: #417690;
-    color: #ffc;
+    background: var(--header-bg);
+    color: var(--header-color);
     overflow: hidden;
 }
 
 #header a:link, #header a:visited {
-    color: #fff;
+    color: var(--header-link-color);
 }
 
 #header a:focus , #header a:hover {
@@ -831,11 +887,11 @@ table#change-history tbody th {
     margin: 0 20px 0 0;
     font-weight: 300;
     font-size: 24px;
-    color: #f5dd5d;
+    color: var(--accent);
 }
 
 #branding h1, #branding h1 a:link, #branding h1 a:visited {
-    color: #f5dd5d;
+    color: var(--accent);
 }
 
 #branding h2 {
@@ -843,7 +899,7 @@ table#change-history tbody th {
     font-size: 14px;
     margin: -8px 0 8px 0;
     font-weight: normal;
-    color: #ffc;
+    color: var(--header-color);
 }
 
 #branding a:hover {
@@ -867,14 +923,14 @@ table#change-history tbody th {
 
 #user-tools a:focus, #user-tools a:hover {
     text-decoration: none;
-    border-bottom-color: #79aec8;
-    color: #79aec8;
+    border-bottom-color: var(--primary);
+    color: var(--primary);
 }
 
 /* SIDEBAR */
 
 #content-related {
-    background: #f8f8f8;
+    background: var(--darkened-bg);
 }
 
 #content-related .module {
@@ -882,7 +938,7 @@ table#change-history tbody th {
 }
 
 #content-related h3 {
-    color: #666;
+    color: var(--body-quiet-color);
     padding: 0 16px;
     margin: 0 0 16px;
 }
@@ -911,22 +967,22 @@ table#change-history tbody th {
     background: none;
     padding: 16px;
     margin-bottom: 16px;
-    border-bottom: 1px solid #eaeaea;
+    border-bottom: 1px solid var(--hairline-color);
     font-size: 18px;
-    color: #333;
+    color: var(--body-fg);
 }
 
 .delete-confirmation form input[type="submit"] {
-    background: #ba2121;
+    background: var(--delete-button-bg);
     border-radius: 4px;
     padding: 10px 15px;
-    color: #fff;
+    color: var(--button-fg);
 }
 
 .delete-confirmation form input[type="submit"]:active,
 .delete-confirmation form input[type="submit"]:focus,
 .delete-confirmation form input[type="submit"]:hover {
-    background: #a41515;
+    background: var(--delete-button-hover-bg);
 }
 
 .delete-confirmation form .cancel-link {
@@ -934,17 +990,17 @@ table#change-history tbody th {
     vertical-align: middle;
     height: 15px;
     line-height: 15px;
-    background: #ddd;
     border-radius: 4px;
     padding: 10px 15px;
-    color: #333;
+    color: var(--button-fg);
+    background: var(--close-button-bg);
     margin: 0 0 0 10px;
 }
 
 .delete-confirmation form .cancel-link:active,
 .delete-confirmation form .cancel-link:focus,
 .delete-confirmation form .cancel-link:hover {
-    background: #ccc;
+    background: var(--close-button-hover-bg);
 }
 
 /* POPUP */
