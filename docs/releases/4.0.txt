@@ -257,6 +257,9 @@ to remove usage of these features.
 * ``django.views.i18n.set_language()`` doesn't set the user language in
   ``request.session`` (key ``_language``).
 
+* ``alias=None`` is required in the signature of
+  ``django.db.models.Expression.get_group_by_cols()`` subclasses.
+
 See :ref:`deprecated-features-3.1` for details on these changes, including how
 to remove usage of these features.
 

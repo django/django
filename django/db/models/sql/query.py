@@ -9,7 +9,6 @@ all about the internals of models in order to get the information it needs.
 import copy
 import difflib
 import functools
-import inspect
 import sys
 import warnings
 from collections import Counter, namedtuple
@@ -2038,19 +2037,9 @@ class Query(BaseExpression):
         group_by = list(self.select)
         if self.annotation_select:
             for alias, annotation in self.annotation_select.items():
-                signature = inspect.signature(annotation.get_group_by_cols)
-                if 'alias' not in signature.parameters:
-                    annotation_class = annotation.__class__
-                    msg = (
-                        '`alias=None` must be added to the signature of '
-                        '%s.%s.get_group_by_cols().'
-                    ) % (annotation_class.__module__, annotation_class.__qualname__)
-                    warnings.warn(msg, category=RemovedInDjango40Warning)
-                    group_by_cols = annotation.get_group_by_cols()
-                else:
-                    if not allow_aliases or alias in column_names:
-                        alias = None
-                    group_by_cols = annotation.get_group_by_cols(alias=alias)
+                if not allow_aliases or alias in column_names:
+                    alias = None
+                group_by_cols = annotation.get_group_by_cols(alias=alias)
                 group_by.extend(group_by_cols)
         self.group_by = tuple(group_by)
 
