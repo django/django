@@ -271,3 +271,5 @@ to remove usage of these features.
 
 * The :lookup:`isnull` lookup no longer allows using non-boolean values as the
   right-hand side.
+
+* The ``django.db.models.query_utils.InvalidQuery`` exception class is removed.
