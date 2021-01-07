@@ -262,6 +262,8 @@ to remove usage of these features.
 
 * ``django.utils.text.unescape_entities()`` is removed.
 
+* ``django.utils.http.is_safe_url()`` is removed.
+
 See :ref:`deprecated-features-3.1` for details on these changes, including how
 to remove usage of these features.
 

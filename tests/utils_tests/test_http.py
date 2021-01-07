@@ -5,12 +5,11 @@ from unittest import mock
 
 from django.test import SimpleTestCase
 from django.utils.datastructures import MultiValueDict
-from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.http import (
     base36_to_int, escape_leading_slashes, http_date, int_to_base36,
-    is_safe_url, is_same_domain, parse_etags, parse_http_date, parse_qsl,
-    quote_etag, url_has_allowed_host_and_scheme, urlencode,
-    urlsafe_base64_decode, urlsafe_base64_encode,
+    is_same_domain, parse_etags, parse_http_date, parse_qsl, quote_etag,
+    url_has_allowed_host_and_scheme, urlencode, urlsafe_base64_decode,
+    urlsafe_base64_encode,
 )
 
 
@@ -130,7 +129,7 @@ class Base36IntTests(SimpleTestCase):
             self.assertEqual(base36_to_int(b36), n)
 
 
-class IsSafeURLTests(SimpleTestCase):
+class URLHasAllowedHostAndSchemeTests(unittest.TestCase):
     def test_bad_urls(self):
         bad_urls = (
             'http://example.com',
@@ -233,14 +232,6 @@ class IsSafeURLTests(SimpleTestCase):
                     url_has_allowed_host_and_scheme(url, allowed_hosts={'example.com'}, require_https=True),
                     False,
                 )
-
-    def test_is_safe_url_deprecated(self):
-        msg = (
-            'django.utils.http.is_safe_url() is deprecated in favor of '
-            'url_has_allowed_host_and_scheme().'
-        )
-        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
-            is_safe_url('https://example.com', allowed_hosts={'example.com'})
 
 
 class URLSafeBase64Tests(unittest.TestCase):

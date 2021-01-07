@@ -3,7 +3,6 @@ import calendar
 import datetime
 import re
 import unicodedata
-import warnings
 from binascii import Error as BinasciiError
 from email.utils import formatdate
 from urllib.parse import (
@@ -12,7 +11,6 @@ from urllib.parse import (
 )
 
 from django.utils.datastructures import MultiValueDict
-from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.regex_helper import _lazy_re_compile
 
 # based on RFC 7232, Appendix C
@@ -265,15 +263,6 @@ def url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
         _url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=require_https) and
         _url_has_allowed_host_and_scheme(url.replace('\\', '/'), allowed_hosts, require_https=require_https)
     )
-
-
-def is_safe_url(url, allowed_hosts, require_https=False):
-    warnings.warn(
-        'django.utils.http.is_safe_url() is deprecated in favor of '
-        'url_has_allowed_host_and_scheme().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return url_has_allowed_host_and_scheme(url, allowed_hosts, require_https)
 
 
 # Copied from urllib.parse.urlparse() but uses fixed urlsplit() function.
