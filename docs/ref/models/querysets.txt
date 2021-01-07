@@ -3424,11 +3424,6 @@ SQL equivalent:
 
     SELECT ... WHERE pub_date IS NULL;
 
-.. deprecated:: 3.1
-
-    Using non-boolean values as the right-hand side is deprecated, use ``True``
-    or ``False`` instead. In Django 4.0, the exception will be raised.
-
 .. fieldlookup:: regex
 
 ``regex``

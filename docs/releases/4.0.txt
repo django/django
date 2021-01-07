@@ -268,3 +268,6 @@ See :ref:`deprecated-features-3.1` for details on these changes, including how
 to remove usage of these features.
 
 * The ``PASSWORD_RESET_TIMEOUT_DAYS`` setting is removed.
+
+* The :lookup:`isnull` lookup no longer allows using non-boolean values as the
+  right-hand side.
