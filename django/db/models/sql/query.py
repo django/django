@@ -6,20 +6,21 @@ themselves do not have to (and could be backed by things other than SQL
 databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
+import ast
 import copy
 import difflib
 import functools
 import inspect
+import json
 import sys
 import warnings
-import json,ast
 from collections import Counter, namedtuple
 from collections.abc import Iterator, Mapping
 from itertools import chain, count, product
 from string import ascii_uppercase
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
-from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
+from django.db import connection, DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import (
@@ -552,9 +553,14 @@ class Query(BaseExpression):
         q.explain_format = format
         q.explain_options = options
         compiler = q.get_compiler(using=using)
-        if format=='json':
-            return json.loads(json.dumps(ast.literal_eval('\n'.join(compiler.explain_query()))))[0]
-        return '\n'.join(compiler.explain_query())
+        if connection.vendor == 'postgresql':
+            if format == 'json':
+                return json.loads(json.dumps(ast.literal_eval('\n'.join(compiler.explain_query()))))[0]
+            else:
+                return '\n'.join(compiler.explain_query())
+
+        else:
+            return '\n'.join(compiler.explain_query())
 
     def combine(self, rhs, connector):
         """

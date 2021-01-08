@@ -29,12 +29,14 @@ class ExplainTests(TestCase):
                     with self.assertNumQueries(1), CaptureQueriesContext(connection) as captured_queries:
                         result = queryset.explain(format=format)
                         self.assertTrue(captured_queries[0]['sql'].startswith(connection.ops.explain_prefix))
-                        if(format=='json'):
-                            self.assertIsInstance(result, dict)
+                        if connection.vendor == 'postgresql':
+                            if format == 'json':
+                                self.assertIsInstance(result, dict)
+                            else:
+                                self.assertIsInstance(result, str)
                         else:
                             self.assertIsInstance(result, str)
                         self.assertTrue(result)
-                    
 
     @skipUnlessDBFeature('validates_explain_options')
     def test_unknown_options(self):
