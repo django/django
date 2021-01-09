@@ -15,7 +15,7 @@ review. By checking for these issues before code review it allows the reviewer
 to focus on the change itself, and it can also help to reduce the number CI
 runs.
 
-To use the tool, first install ``pre-commit`` and then the git hooks::
+To use the tool, first install ``pre-commit`` and then the git hooks:
 
 .. console::
 
