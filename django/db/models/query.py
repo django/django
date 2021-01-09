@@ -310,7 +310,11 @@ class QuerySet:
             else:
                 stop = None
             qs.query.set_limits(start, stop)
-            return list(qs)[::k.step] if k.step and k.step != 1 else qs
+            if k.step == -1:
+                return qs.reverse()
+            if k.step and k.step != 1:
+                return list(qs)[::k.step]
+            return qs
 
         qs = self._chain()
         qs.query.set_limits(k, k + 1)
