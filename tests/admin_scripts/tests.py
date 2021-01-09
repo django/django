@@ -167,12 +167,12 @@ class AdminScriptTestCase(SimpleTestCase):
 ##########################################################################
 # DJANGO ADMIN TESTS
 # This first series of test classes checks the environment processing
-# of the django-admin.py script
+# of the django-admin.
 ##########################################################################
 
 
 class DjangoAdminNoSettings(AdminScriptTestCase):
-    "A series of tests for django-admin.py when there is no settings.py file."
+    "A series of tests for django-admin when there is no settings.py file."
 
     def test_builtin_command(self):
         "no settings: django-admin builtin commands fail with an error when no settings provided"
@@ -207,7 +207,8 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
 
 
 class DjangoAdminDefaultSettings(AdminScriptTestCase):
-    """A series of tests for django-admin.py when using a settings.py file that
+    """
+    A series of tests for django-admin when using a settings.py file that
     contains the test application.
     """
     def setUp(self):
@@ -273,7 +274,8 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
 
 
 class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
-    """A series of tests for django-admin.py when using a settings.py file that
+    """
+    A series of tests for django-admin when using a settings.py file that
     contains the test application specified using a full path.
     """
     def setUp(self):
@@ -340,7 +342,8 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
 
 
 class DjangoAdminMinimalSettings(AdminScriptTestCase):
-    """A series of tests for django-admin.py when using a settings.py file that
+    """
+    A series of tests for django-admin when using a settings.py file that
     doesn't contain the test application.
     """
     def setUp(self):
@@ -406,8 +409,9 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
 
 
 class DjangoAdminAlternateSettings(AdminScriptTestCase):
-    """A series of tests for django-admin.py when using a settings file
-    with a name other than 'settings.py'.
+    """
+    A series of tests for django-admin when using a settings file with a name
+    other than 'settings.py'.
     """
     def setUp(self):
         super().setUp()
@@ -472,7 +476,8 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
 
 
 class DjangoAdminMultipleSettings(AdminScriptTestCase):
-    """A series of tests for django-admin.py when multiple settings files
+    """
+    A series of tests for django-admin when multiple settings files
     (including the default 'settings.py') are available. The default settings
     file is insufficient for performing the operations described, so the
     alternate settings must be used by the running script.
@@ -541,7 +546,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
 
 class DjangoAdminSettingsDirectory(AdminScriptTestCase):
     """
-    A series of tests for django-admin.py when the settings file is in a
+    A series of tests for django-admin when the settings file is in a
     directory. (see #9751).
     """
 

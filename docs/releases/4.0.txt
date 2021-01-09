@@ -273,3 +273,5 @@ to remove usage of these features.
   right-hand side.
 
 * The ``django.db.models.query_utils.InvalidQuery`` exception class is removed.
+
+* The ``django-admin.py`` entry point is removed.
