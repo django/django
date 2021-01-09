@@ -785,7 +785,7 @@ displaying polls.
 
     app_name = 'polls'
     urlpatterns = [
-        path('', views.IndexView.as_view(), name='index'),
+        path('', views.IndexListView.as_view(), name='index'),
         path('<int:pk>/', views.DetailView.as_view(), name='detail'),
         ...
     ]
@@ -844,7 +844,7 @@ not the list of ``urlpatterns`` itself.
 
     app_name = 'polls'
     urlpatterns = [
-        path('', views.IndexView.as_view(), name='index'),
+        path('', views.IndexListView.as_view(), name='index'),
         path('<int:pk>/', views.DetailView.as_view(), name='detail'),
         ...
     ]
@@ -875,7 +875,7 @@ For example::
     from . import views
 
     polls_patterns = ([
-        path('', views.IndexView.as_view(), name='index'),
+        path('', views.IndexListView.as_view(), name='index'),
         path('<int:pk>/', views.DetailView.as_view(), name='detail'),
     ], 'polls')
 

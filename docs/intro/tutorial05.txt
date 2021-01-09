@@ -415,7 +415,7 @@ based on :class:`~django.views.generic.list.ListView`:
 .. code-block:: python
     :caption: polls/views.py
 
-    class IndexView(generic.ListView):
+    class IndexListView(generic.ListView):
         template_name = 'polls/index.html'
         context_object_name = 'latest_question_list'
 
@@ -483,7 +483,7 @@ class:
         return Question.objects.create(question_text=question_text, pub_date=time)
 
 
-    class QuestionIndexViewTests(TestCase):
+    class QuestionIndexListViewTests(TestCase):
         def test_no_questions(self):
             """
             If no questions exist, an appropriate message is displayed.
@@ -613,7 +613,7 @@ is not:
 Ideas for more tests
 --------------------
 
-We ought to add a similar ``get_queryset`` method to ``ResultsView`` and
+We ought to add a similar ``get_queryset`` method to ``ResultsDetailView`` and
 create a new test class for that view. It'll be very similar to what we have
 just created; in fact there will be a lot of repetition.
 

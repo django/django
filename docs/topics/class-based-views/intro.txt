@@ -273,7 +273,7 @@ instance method. For example::
     from django.utils.decorators import method_decorator
     from django.views.generic import TemplateView
 
-    class ProtectedView(TemplateView):
+    class ProtectedTemplateView(TemplateView):
         template_name = 'secret.html'
 
         @method_decorator(login_required)
@@ -284,7 +284,7 @@ Or, more succinctly, you can decorate the class instead and pass the name
 of the method to be decorated as the keyword argument ``name``::
 
     @method_decorator(login_required, name='dispatch')
-    class ProtectedView(TemplateView):
+    class ProtectedTemplateView(TemplateView):
         template_name = 'secret.html'
 
 If you have a set of common decorators used in several places, you can define
@@ -294,19 +294,19 @@ a list or tuple of decorators and use this instead of invoking
     decorators = [never_cache, login_required]
 
     @method_decorator(decorators, name='dispatch')
-    class ProtectedView(TemplateView):
+    class ProtectedTemplateView(TemplateView):
         template_name = 'secret.html'
 
     @method_decorator(never_cache, name='dispatch')
     @method_decorator(login_required, name='dispatch')
-    class ProtectedView(TemplateView):
+    class ProtectedTemplateView(TemplateView):
         template_name = 'secret.html'
 
 The decorators will process a request in the order they are passed to the
 decorator. In the example, ``never_cache()`` will process the request before
 ``login_required()``.
 
-In this example, every instance of ``ProtectedView`` will have login
+In this example, every instance of ``ProtectedTemplateView`` will have login
 protection. These examples use ``login_required``, however, the same behavior
 can be obtained by using
 :class:`~django.contrib.auth.mixins.LoginRequiredMixin`.

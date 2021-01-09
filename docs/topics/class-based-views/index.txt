@@ -65,7 +65,7 @@ override the template name::
     # some_app/views.py
     from django.views.generic import TemplateView
 
-    class AboutView(TemplateView):
+    class AboutTemplateView(TemplateView):
         template_name = "about.html"
 
 Then we need to add this new view into our URLconf.
@@ -75,10 +75,10 @@ method instead, which provides a function-like entry to class-based views::
 
     # urls.py
     from django.urls import path
-    from some_app.views import AboutView
+    from some_app.views import AboutTemplateView
 
     urlpatterns = [
-        path('about/', AboutView.as_view()),
+        path('about/', AboutTemplateView.as_view()),
     ]
 
 

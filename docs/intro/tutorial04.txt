@@ -248,9 +248,9 @@ First, open the ``polls/urls.py`` URLconf and change it like so:
 
     app_name = 'polls'
     urlpatterns = [
-        path('', views.IndexView.as_view(), name='index'),
+        path('', views.IndexListView.as_view(), name='index'),
         path('<int:pk>/', views.DetailView.as_view(), name='detail'),
-        path('<int:pk>/results/', views.ResultsView.as_view(), name='results'),
+        path('<int:pk>/results/', views.ResultsDetailView.as_view(), name='results'),
         path('<int:question_id>/vote/', views.vote, name='vote'),
     ]
 
@@ -275,7 +275,7 @@ views and use Django's generic views instead. To do so, open the
     from .models import Choice, Question
 
 
-    class IndexView(generic.ListView):
+    class IndexListView(generic.ListView):
         template_name = 'polls/index.html'
         context_object_name = 'latest_question_list'
 
@@ -289,7 +289,7 @@ views and use Django's generic views instead. To do so, open the
         template_name = 'polls/detail.html'
 
 
-    class ResultsView(generic.DetailView):
+    class ResultsDetailView(generic.DetailView):
         model = Question
         template_name = 'polls/results.html'
 
