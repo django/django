@@ -21,7 +21,7 @@ from string import ascii_uppercase
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import (
-    DEFAULT_DB_ALIAS, NotSupportedError, connections, connection,
+    DEFAULT_DB_ALIAS, NotSupportedError, connection, connections,
 )    
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
