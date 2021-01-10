@@ -8,6 +8,7 @@ from django.http import (
 )
 from django.template.response import TemplateResponse
 from django.urls import reverse
+from django.utils.datastructures import OrderedSet
 from django.utils.decorators import classonlymethod
 
 logger = logging.getLogger('django.request')
@@ -33,7 +34,7 @@ class View:
     dispatch-by-method and simple sanity checking.
     """
 
-    http_method_names = {'get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'}
+    http_method_names = OrderedSet(['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'])
 
     def __init__(self, **kwargs):
         """
