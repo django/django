@@ -124,6 +124,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     def __init__(self):
         # Merge FORMFIELD_FOR_DBFIELD_DEFAULTS with the formfield_overrides
         # rather than simply overwriting.
+        self._readonly_fields_cache = {}
         overrides = copy.deepcopy(FORMFIELD_FOR_DBFIELD_DEFAULTS)
         for k, v in self.formfield_overrides.items():
             overrides.setdefault(k, {}).update(v)
@@ -326,7 +327,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             return self.fields
         # _get_form_for_get_fields() is implemented in subclasses.
         form = self._get_form_for_get_fields(request, obj)
-        return [*form.base_fields, *self.get_readonly_fields(request, obj)]
+        return [*form.base_fields, *self._get_readonly_fields(request, obj)]
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -345,6 +346,16 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         Hook for specifying field ordering.
         """
         return self.ordering or ()  # otherwise we might try to *None, which is bad ;)
+
+    def _get_readonly_fields(self, request, obj=None):
+        """
+        Cache and then return the value of get_readonly_fields
+        """
+        try:
+            return self._readonly_fields_cache[request]
+        except KeyError:
+            self._readonly_fields_cache[request] = self.get_readonly_fields(request, obj)
+            return self._readonly_fields_cache[request]
 
     def get_readonly_fields(self, request, obj=None):
         """
@@ -678,7 +689,7 @@ class ModelAdmin(BaseModelAdmin):
             fields = flatten_fieldsets(self.get_fieldsets(request, obj))
         excluded = self.get_exclude(request, obj)
         exclude = [] if excluded is None else list(excluded)
-        readonly_fields = self.get_readonly_fields(request, obj)
+        readonly_fields = self._get_readonly_fields(request, obj)
         exclude.extend(readonly_fields)
         # Exclude all fields if it's a change form and the user doesn't have
         # the change permission.
@@ -1486,7 +1497,7 @@ class ModelAdmin(BaseModelAdmin):
         inline_admin_formsets = []
         for inline, formset in zip(inline_instances, formsets):
             fieldsets = list(inline.get_fieldsets(request, obj))
-            readonly = list(inline.get_readonly_fields(request, obj))
+            readonly = list(inline._get_readonly_fields(request, obj))
             if can_edit_parent:
                 has_add_permission = inline.has_add_permission(request, obj)
                 has_change_permission = inline.has_change_permission(request, obj)
@@ -1536,7 +1547,10 @@ class ModelAdmin(BaseModelAdmin):
     @csrf_protect_m
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
         with transaction.atomic(using=router.db_for_write(self.model)):
-            return self._changeform_view(request, object_id, form_url, extra_context)
+            response = self._changeform_view(request, object_id, form_url, extra_context)
+            if request in self._readonly_fields_cache:
+                del self._readonly_fields_cache[request]
+            return response
 
     def _changeform_view(self, request, object_id, form_url, extra_context):
         to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
@@ -1605,7 +1619,7 @@ class ModelAdmin(BaseModelAdmin):
         if not add and not self.has_change_permission(request, obj):
             readonly_fields = flatten_fieldsets(fieldsets)
         else:
-            readonly_fields = self.get_readonly_fields(request, obj)
+            readonly_fields = self._get_readonly_fields(request, obj)
         adminForm = helpers.AdminForm(
             form,
             list(fieldsets),
@@ -2023,6 +2037,7 @@ class InlineModelAdmin(BaseModelAdmin):
         self.parent_model = parent_model
         self.opts = self.model._meta
         self.has_registered_model = admin_site.is_registered(self.model)
+        self._readonly_fields_cache = {}
         super().__init__()
         if self.verbose_name is None:
             self.verbose_name = self.model._meta.verbose_name
@@ -2059,7 +2074,7 @@ class InlineModelAdmin(BaseModelAdmin):
             fields = flatten_fieldsets(self.get_fieldsets(request, obj))
         excluded = self.get_exclude(request, obj)
         exclude = [] if excluded is None else list(excluded)
-        exclude.extend(self.get_readonly_fields(request, obj))
+        exclude.extend(self._get_readonly_fields(request, obj))
         if excluded is None and hasattr(self.form, '_meta') and self.form._meta.exclude:
             # Take the custom ModelForm's Meta.exclude into account only if the
             # InlineModelAdmin doesn't define its own.

@@ -480,13 +480,18 @@ class PostAdmin(admin.ModelAdmin):
     list_display = ['title', 'public']
     readonly_fields = (
         'posted', 'awesomeness_level', 'coolness', 'value',
-        'multiline', 'multiline_html', lambda obj: "foo",
+        'multiline_html', lambda obj: "foo",
         'readonly_content',
     )
 
     inlines = [
         LinkInline
     ]
+
+    def get_readonly_fields(self, request, obj):
+        def multiline(instance):
+            return "Multiline\ntest\nstring"
+        return self.readonly_fields + (multiline,)
 
     def coolness(self, instance):
         if instance.pk:
@@ -497,9 +502,6 @@ class PostAdmin(admin.ModelAdmin):
     def value(self, instance):
         return 1000
     value.short_description = 'Value in $US'
-
-    def multiline(self, instance):
-        return "Multiline\ntest\nstring"
 
     def multiline_html(self, instance):
         return mark_safe("Multiline<br>\nhtml<br>\ncontent")
