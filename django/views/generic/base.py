@@ -33,7 +33,7 @@ class View:
     dispatch-by-method and simple sanity checking.
     """
 
-    http_method_names = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']
+    http_method_names = {'get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'}
 
     def __init__(self, **kwargs):
         """
