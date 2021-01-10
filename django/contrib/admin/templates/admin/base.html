@@ -28,6 +28,7 @@
 
     {% if not is_popup %}
     <!-- Header -->
+    {% block header %}
     <div id="header">
         <div id="branding">
         {% block branding %}{% endblock %}
@@ -59,6 +60,7 @@
         {% endblock %}
         {% block nav-global %}{% endblock %}
     </div>
+    {% endblock %}
     <!-- END Header -->
     {% block breadcrumbs %}
     <div class="breadcrumbs">
