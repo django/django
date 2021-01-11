@@ -11,7 +11,6 @@ from itertools import chain
 from django.forms.utils import to_current_timezone
 from django.templatetags.static import static
 from django.utils import datetime_safe, formats
-from django.utils.datastructures import OrderedSet
 from django.utils.dates import MONTHS
 from django.utils.formats import get_format
 from django.utils.html import format_html, html_safe
@@ -122,18 +121,19 @@ class Media:
         global or in CSS you might want to override a style.
         """
         dependency_graph = defaultdict(set)
-        all_items = OrderedSet()
+        all_items = []
         for list_ in filter(None, lists):
             head = list_[0]
             # The first items depend on nothing but have to be part of the
             # dependency graph to be included in the result.
             dependency_graph.setdefault(head, set())
             for item in list_:
-                all_items.add(item)
+                all_items.append(item)
                 # No self dependencies
                 if head != item:
                     dependency_graph[item].add(head)
                 head = item
+        all_items = list(dict.fromkeys(all_items))
         try:
             return stable_topological_sort(all_items, dependency_graph)
         except CyclicDependencyError:
