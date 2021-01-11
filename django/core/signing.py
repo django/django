@@ -120,9 +120,6 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
 
 
 class Signer:
-    # RemovedInDjango40Warning.
-    legacy_algorithm = 'sha1'
-
     def __init__(self, key=None, sep=':', salt=None, algorithm=None):
         self.key = key or settings.SECRET_KEY
         self.sep = sep
@@ -139,10 +136,6 @@ class Signer:
     def signature(self, value):
         return base64_hmac(self.salt + 'signer', value, self.key, algorithm=self.algorithm)
 
-    def _legacy_signature(self, value):
-        # RemovedInDjango40Warning.
-        return base64_hmac(self.salt + 'signer', value, self.key, algorithm=self.legacy_algorithm)
-
     def sign(self, value):
         return '%s%s%s' % (value, self.sep, self.signature(value))
 
@@ -150,12 +143,7 @@ class Signer:
         if self.sep not in signed_value:
             raise BadSignature('No "%s" found in value' % self.sep)
         value, sig = signed_value.rsplit(self.sep, 1)
-        if (
-            constant_time_compare(sig, self.signature(value)) or (
-                self.legacy_algorithm and
-                constant_time_compare(sig, self._legacy_signature(value))
-            )
-        ):
+        if constant_time_compare(sig, self.signature(value)):
             return value
         raise BadSignature('Signature "%s" does not match' % sig)
 

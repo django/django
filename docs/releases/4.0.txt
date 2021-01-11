@@ -285,3 +285,10 @@ to remove usage of these features.
   use the SHA-1 hashing algorithm) is removed.
 
 * Support for the pre-Django 3.1 encoding format of sessions is removed.
+
+* Support for the pre-Django 3.1 ``django.core.signing.Signer`` signatures
+  (encoded with the SHA-1 algorithm) is removed.
+
+* Support for the pre-Django 3.1 ``django.core.signing.dumps()`` signatures
+  (encoded with the SHA-1 algorithm) in ``django.core.signing.loads()`` is
+  removed.
