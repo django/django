@@ -14,7 +14,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_forward_references = False
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
-    supports_index_column_ordering = False
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
     can_release_savepoints = True
@@ -219,3 +218,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.mysql_is_mariadb:
             return self.supports_json_field and self.can_introspect_check_constraints
         return self.supports_json_field
+
+    @cached_property
+    def supports_index_column_ordering(self):
+        return (
+            not self.connection.mysql_is_mariadb and
+            self.connection.mysql_version >= (8, 0, 1)
+        )
