@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -86,27 +86,6 @@ class TokenGeneratorTest(TestCase):
             )
             self.assertIs(p4.check_token(user, tk1), False)
 
-    def test_legacy_days_timeout(self):
-        # RemovedInDjango40Warning: pre-Django 3.1 tokens will be invalid.
-        class LegacyPasswordResetTokenGenerator(MockedPasswordResetTokenGenerator):
-            """Pre-Django 3.1 tokens generator."""
-            def _num_seconds(self, dt):
-                # Pre-Django 3.1 tokens use days instead of seconds.
-                return (dt.date() - date(2001, 1, 1)).days
-
-        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
-        now = datetime.now()
-        p0 = LegacyPasswordResetTokenGenerator(now)
-        tk1 = p0.make_token(user)
-        p1 = MockedPasswordResetTokenGenerator(
-            now + timedelta(seconds=settings.PASSWORD_RESET_TIMEOUT),
-        )
-        self.assertIs(p1.check_token(user, tk1), True)
-        p2 = MockedPasswordResetTokenGenerator(
-            now + timedelta(seconds=(settings.PASSWORD_RESET_TIMEOUT + 24 * 60 * 60)),
-        )
-        self.assertIs(p2.check_token(user, tk1), False)
-
     def test_check_token_with_nonexistent_token_and_user(self):
         user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
         p0 = PasswordResetTokenGenerator()
@@ -143,14 +122,3 @@ class TokenGeneratorTest(TestCase):
             self.assertEqual(generator.algorithm, 'sha1')
             token = generator.make_token(user)
             self.assertIs(generator.check_token(user, token), True)
-
-    def test_legacy_token_validation(self):
-        # RemovedInDjango40Warning: pre-Django 3.1 tokens will be invalid.
-        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
-        p_old_generator = PasswordResetTokenGenerator()
-        p_old_generator.algorithm = 'sha1'
-        p_new_generator = PasswordResetTokenGenerator()
-
-        legacy_token = p_old_generator.make_token(user)
-        self.assertIs(p_old_generator.check_token(user, legacy_token), True)
-        self.assertIs(p_new_generator.check_token(user, legacy_token), True)
