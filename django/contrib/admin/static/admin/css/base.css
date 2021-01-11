@@ -90,7 +90,7 @@ a img {
 }
 
 a.section:link, a.section:visited {
-    color: var(--body-bg);
+    color: var(--header-link-color);
     text-decoration: none;
 }
 

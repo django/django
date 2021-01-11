@@ -16,7 +16,7 @@
 }
 
 .login #header h1 a {
-    color: var(--body-bg);
+    color: var(--header-link-color);
 }
 
 .login #content {

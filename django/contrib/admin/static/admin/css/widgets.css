@@ -28,7 +28,7 @@
 
 .selector-chosen h2 {
     background: var(--primary);
-    color: var(--body-bg);
+    color: var(--header-link-color);
 }
 
 .selector .selector-available h2 {
