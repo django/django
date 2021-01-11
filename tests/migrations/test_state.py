@@ -427,6 +427,7 @@ class StateTests(SimpleTestCase):
 
         apps = Apps(["migrations"])
         ModelState.from_model(Success).render(apps)
+        self.assertEqual(ModelState.from_model(Success).bases, (Alpha, models.Model))
 
     def test_render_model_with_multiple_inheritance(self):
         class Foo(models.Model):
