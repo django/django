@@ -1,7 +1,6 @@
 import cgi
 import codecs
 import copy
-import warnings
 from io import BytesIO
 from itertools import chain
 from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
@@ -16,7 +15,6 @@ from django.http.multipartparser import MultiPartParser, MultiPartParserError
 from django.utils.datastructures import (
     CaseInsensitiveMapping, ImmutableList, MultiValueDict,
 )
-from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.encoding import escape_uri_path, iri_to_uri
 from django.utils.functional import cached_property
 from django.utils.http import is_same_domain
@@ -265,15 +263,6 @@ class HttpRequest:
 
     def is_secure(self):
         return self.scheme == 'https'
-
-    def is_ajax(self):
-        warnings.warn(
-            'request.is_ajax() is deprecated. See Django 3.1 release notes '
-            'for more details about this deprecation.',
-            RemovedInDjango40Warning,
-            stacklevel=2,
-        )
-        return self.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
     @property
     def encoding(self):

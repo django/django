@@ -275,3 +275,5 @@ to remove usage of these features.
 * The ``django.db.models.query_utils.InvalidQuery`` exception class is removed.
 
 * The ``django-admin.py`` entry point is removed.
+
+* The ``HttpRequest.is_ajax()`` method is removed.
