@@ -421,8 +421,6 @@ class StateTests(SimpleTestCase):
             pass
 
         class Success(Alpha, models.Model, metaclass=SuccessBase):
-            a_id = models.AutoField(primary_key=True)
-
             class Meta:
                 app_label = "migrations"
                 apps = Apps()
