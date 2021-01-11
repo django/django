@@ -235,9 +235,9 @@
 
 .paginator a:link, .paginator a:visited {
     padding: 2px 6px;
-    background: var(--primary);
+    background: var(--button-bg);
     text-decoration: none;
-    color: var(--body-bg);
+    color: var(--button-fg);
 }
 
 .paginator a.showall {
