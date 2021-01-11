@@ -571,10 +571,11 @@ class ModelState:
 
         # resolve metaclass conflicts
         base_types = [type(base) for base in bases]
-        metaclass_bases = tuple(dict.fromkeys((
-            base for base in base_types if all((b == base or not issubclass(b, base) for b in base_types))
-        )))
-        metaclass = type(f'{self.name}FakeMeta', metaclass_bases, {})
+        metaclass_bases = []
+        for base in base_types:
+            if not any(b != base and issubclass(b, base) for b in base_types):
+                metaclass_bases.append(base)
+        metaclass = type(f'{self.name}FakeMeta', tuple(metaclass_bases), {})
 
         # Restore managers
         body.update(self.construct_managers())
