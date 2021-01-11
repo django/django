@@ -277,3 +277,6 @@ to remove usage of these features.
 * The ``django-admin.py`` entry point is removed.
 
 * The ``HttpRequest.is_ajax()`` method is removed.
+
+* Support for the pre-Django 3.1 encoding format of cookies values used by
+  ``django.contrib.messages.storage.cookie.CookieStorage`` is removed.

@@ -181,17 +181,6 @@ class CookieTests(BaseTests, SimpleTestCase):
         self.assertIsInstance(encode_decode(mark_safe("<b>Hello Django!</b>")), SafeData)
         self.assertNotIsInstance(encode_decode("<b>Hello Django!</b>"), SafeData)
 
-    def test_legacy_hash_decode(self):
-        # RemovedInDjango40Warning: pre-Django 3.1 hashes will be invalid.
-        storage = self.storage_class(self.get_request())
-        messages = ['this', 'that']
-        # Encode/decode a message using the pre-Django 3.1 hash.
-        encoder = MessageEncoder()
-        value = encoder.encode(messages)
-        encoded_messages = '%s$%s' % (storage._legacy_hash(value), value)
-        decoded_messages = storage._decode(encoded_messages)
-        self.assertEqual(messages, decoded_messages)
-
     def test_legacy_encode_decode(self):
         # RemovedInDjango41Warning: pre-Django 3.2 encoded messages will be
         # invalid.

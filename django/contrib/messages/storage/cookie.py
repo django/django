@@ -4,7 +4,6 @@ from django.conf import settings
 from django.contrib.messages.storage.base import BaseStorage, Message
 from django.core import signing
 from django.http import SimpleCookie
-from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.safestring import SafeData, mark_safe
 
 
@@ -139,18 +138,6 @@ class CookieStorage(BaseStorage):
         self._update_cookie(encoded_data, response)
         return unstored_messages
 
-    def _legacy_hash(self, value):
-        """
-        # RemovedInDjango40Warning: pre-Django 3.1 hashes will be invalid.
-        Create an HMAC/SHA1 hash based on the value and the project setting's
-        SECRET_KEY, modified to make it unique for the present purpose.
-        """
-        # The class wide key salt is not reused here since older Django
-        # versions had it fixed and making it dynamic would break old hashes if
-        # self.key_salt is changed.
-        key_salt = 'django.contrib.messages'
-        return salted_hmac(key_salt, value).hexdigest()
-
     def _encode(self, messages, encode_empty=False):
         """
         Return an encoded version of the messages list which can be stored as
@@ -178,10 +165,7 @@ class CookieStorage(BaseStorage):
         # except (signing.BadSignature, json.JSONDecodeError):
         #     pass
         except signing.BadSignature:
-            # RemovedInDjango40Warning: when the deprecation ends, replace
-            # with:
-            #   decoded = None.
-            decoded = self._legacy_decode(data)
+            decoded = None
         except json.JSONDecodeError:
             decoded = self.signer.unsign(data)
 
@@ -194,13 +178,4 @@ class CookieStorage(BaseStorage):
         # Mark the data as used (so it gets removed) since something was wrong
         # with the data.
         self.used = True
-        return None
-
-    def _legacy_decode(self, data):
-        # RemovedInDjango40Warning: pre-Django 3.1 hashes will be invalid.
-        bits = data.split('$', 1)
-        if len(bits) == 2:
-            hash_, value = bits
-            if constant_time_compare(hash_, self._legacy_hash(value)):
-                return value
         return None
