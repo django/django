@@ -292,3 +292,6 @@ to remove usage of these features.
 * Support for the pre-Django 3.1 ``django.core.signing.dumps()`` signatures
   (encoded with the SHA-1 algorithm) in ``django.core.signing.loads()`` is
   removed.
+
+* Support for the pre-Django 3.1 user sessions (that use the SHA-1 algorithm)
+  is removed.

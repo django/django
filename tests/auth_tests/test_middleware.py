@@ -24,16 +24,6 @@ class TestAuthenticationMiddleware(TestCase):
         self.assertIsNotNone(self.request.user)
         self.assertFalse(self.request.user.is_anonymous)
 
-    def test_no_password_change_does_not_invalidate_legacy_session(self):
-        # RemovedInDjango40Warning: pre-Django 3.1 hashes will be invalid.
-        session = self.client.session
-        session[HASH_SESSION_KEY] = self.user._legacy_get_session_auth_hash()
-        session.save()
-        self.request.session = session
-        self.middleware(self.request)
-        self.assertIsNotNone(self.request.user)
-        self.assertFalse(self.request.user.is_anonymous)
-
     @ignore_warnings(category=RemovedInDjango40Warning)
     def test_session_default_hashing_algorithm(self):
         hash_session = self.client.session[HASH_SESSION_KEY]
