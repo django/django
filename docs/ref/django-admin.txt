@@ -364,6 +364,17 @@ standard output.
 When this option is set and ``--verbosity`` is greater than 0 (the default), a
 progress bar is shown in the terminal.
 
+Fixtures compression
+~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 3.2
+
+The output file can be compressed with one of the ``bz2``, ``gz``, ``lzma``, or
+``xz`` formats by ending the filename with the corresponding extension.
+For example, to output the data as a compressed JSON file::
+
+    django-admin dumpdata -o mydata.json.gz
+
 ``flush``
 ---------
 

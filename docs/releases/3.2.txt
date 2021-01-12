@@ -338,6 +338,9 @@ Management Commands
 * :djadmin:`loaddata` now supports fixtures stored in XZ archives (``.xz``) and
   LZMA archives (``.lzma``).
 
+* :djadmin:`dumpdata` now can compress data in the ``bz2``, ``gz``, ``lzma``,
+  or ``xz`` formats.
+
 * :djadmin:`makemigrations` can now be called without an active database
   connection. In that case, check for a consistent migration history is
   skipped.
