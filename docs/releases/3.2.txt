@@ -119,6 +119,12 @@ Minor features
 
 * The admin now supports theming. See :ref:`admin-theming` for more details.
 
+* :attr:`.ModelAdmin.autocomplete_fields` now respects
+  :attr:`ForeignKey.to_field <django.db.models.ForeignKey.to_field>` and
+  :attr:`ForeignKey.limit_choices_to
+  <django.db.models.ForeignKey.limit_choices_to>` when searching a related
+  model.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

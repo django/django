@@ -629,6 +629,7 @@ class Question(models.Model):
     posted = models.DateField(default=datetime.date.today)
     expires = models.DateTimeField(null=True, blank=True)
     related_questions = models.ManyToManyField('self')
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
 
     def __str__(self):
         return self.question
@@ -636,6 +637,13 @@ class Question(models.Model):
 
 class Answer(models.Model):
     question = models.ForeignKey(Question, models.PROTECT)
+    question_with_to_field = models.ForeignKey(
+        Question, models.SET_NULL,
+        blank=True, null=True, to_field='uuid',
+        related_name='uuid_answers',
+        limit_choices_to=~models.Q(question__istartswith='not'),
+    )
+    related_answers = models.ManyToManyField('self')
     answer = models.CharField(max_length=20)
 
     def __str__(self):
