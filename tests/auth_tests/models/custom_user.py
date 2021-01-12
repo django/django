@@ -17,7 +17,7 @@ class CustomUserManager(BaseUserManager):
             raise ValueError('Users must have an email address')
 
         user = self.model(
-            email=self.normalize_email(email),
+            email=AbstractBaseUser.normalize_email(email),
             date_of_birth=date_of_birth,
             **fields
         )
@@ -110,3 +110,14 @@ with RemoveGroupsAndPermissions():
         custom_objects = UserManager()
 
         REQUIRED_FIELDS = AbstractUser.REQUIRED_FIELDS + ['date_of_birth']
+
+
+class CustomEmailNormalizationManager(UserManager):
+    @classmethod
+    def normalize_email(cls, email):
+        return email
+
+
+with RemoveGroupsAndPermissions():
+    class CustomEmailNormalization(AbstractUser):
+        objects = CustomEmailNormalizationManager()

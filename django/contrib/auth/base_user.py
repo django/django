@@ -3,6 +3,7 @@ This module allows importing AbstractBaseUser even when django.contrib.auth is
 not in INSTALLED_APPS.
 """
 import unicodedata
+import warnings
 
 from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import (
@@ -10,6 +11,7 @@ from django.contrib.auth.hashers import (
 )
 from django.db import models
 from django.utils.crypto import get_random_string, salted_hmac
+from django.utils.deprecation import RemovedInDjango41Warning
 from django.utils.translation import gettext_lazy as _
 
 
@@ -20,14 +22,13 @@ class BaseUserManager(models.Manager):
         """
         Normalize the email address by lowercasing the domain part of it.
         """
-        email = email or ''
-        try:
-            email_name, domain_part = email.strip().rsplit('@', 1)
-        except ValueError:
-            pass
-        else:
-            email = email_name + '@' + domain_part.lower()
-        return email
+        warnings.warn(
+            'BaseUserManager.normalize_email() is deprecated in favor of '
+            'AbstractBaseUser.normalize_email() and will be removed in Django 4.1.',
+            RemovedInDjango41Warning,
+            stacklevel=2
+        )
+        return AbstractBaseUser.normalize_email(email)
 
     def make_random_password(self, length=10,
                              allowed_chars='abcdefghjkmnpqrstuvwxyz'
@@ -141,3 +142,17 @@ class AbstractBaseUser(models.Model):
     @classmethod
     def normalize_username(cls, username):
         return unicodedata.normalize('NFKC', username) if isinstance(username, str) else username
+
+    @classmethod
+    def normalize_email(cls, email):
+        """
+        Normalize the email address by lowercasing the domain part of it.
+        """
+        email = email or ''
+        try:
+            email_name, domain_part = email.strip().rsplit('@', 1)
+        except ValueError:
+            pass
+        else:
+            email = email_name + '@' + domain_part.lower()
+        return email

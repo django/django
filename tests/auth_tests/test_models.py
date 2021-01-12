@@ -16,8 +16,10 @@ from django.db.models.signals import post_save
 from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, override_settings,
 )
+from django.utils.deprecation import RemovedInDjango41Warning
 
 from .models import CustomEmailField, IntegerUsernameUser
+from .models.custom_user import CustomEmailNormalization
 
 
 class NaturalKeysTestCase(TestCase):
@@ -121,15 +123,15 @@ class UserManagerTestCase(TransactionTestCase):
     def test_create_user_email_domain_normalize_rfc3696(self):
         # According to https://tools.ietf.org/html/rfc3696#section-3
         # the "@" symbol can be part of the local part of an email address
-        returned = UserManager.normalize_email(r'Abc\@DEF@EXAMPLE.com')
+        returned = User.normalize_email(r'Abc\@DEF@EXAMPLE.com')
         self.assertEqual(returned, r'Abc\@DEF@example.com')
 
     def test_create_user_email_domain_normalize(self):
-        returned = UserManager.normalize_email('normal@DOMAIN.COM')
+        returned = User.normalize_email('normal@DOMAIN.COM')
         self.assertEqual(returned, 'normal@domain.com')
 
     def test_create_user_email_domain_normalize_with_whitespace(self):
-        returned = UserManager.normalize_email(r'email\ with_whitespace@D.COM')
+        returned = User.normalize_email(r'email\ with_whitespace@D.COM')
         self.assertEqual(returned, r'email\ with_whitespace@d.com')
 
     def test_empty_username(self):
@@ -187,6 +189,22 @@ class UserManagerTestCase(TransactionTestCase):
             )
         user = User.objects.get(username='user1')
         self.assertTrue(user.check_password('secure'))
+
+    def test_normalize_email_deprecation(self):
+        msg = (
+            'BaseUserManager.normalize_email() is deprecated in favor of '
+            'AbstractBaseUser.normalize_email() and will be removed in Django 4.1.'
+        )
+        with self.assertWarnsMessage(RemovedInDjango41Warning, msg):
+            new_user = CustomEmailNormalization.objects.create_user(
+                'new_user',
+                email='foo@BAR.com',
+                password='pw'
+            )
+        with self.assertWarnsMessage(RemovedInDjango41Warning, msg):
+            new_user.clean()
+        # Use overridden method during deprecation (here, doing nothing).
+        self.assertEqual(new_user.email, 'foo@BAR.com')
 
 
 class AbstractBaseUserTests(SimpleTestCase):

@@ -1,3 +1,5 @@
+import warnings
+
 from django.apps import apps
 from django.contrib import auth
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
@@ -8,6 +10,7 @@ from django.core.mail import send_mail
 from django.db import models
 from django.db.models.manager import EmptyManager
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango41Warning
 from django.utils.translation import gettext_lazy as _
 
 from .validators import UnicodeUsernameValidator
@@ -135,12 +138,21 @@ class UserManager(BaseUserManager):
         """
         if not username:
             raise ValueError('The given username must be set')
-        email = self.normalize_email(email)
         # Lookup the real model class from the global app registry so this
         # manager method can be used in migrations. This is fine because
         # managers are by definition working on the real model.
         GlobalUserModel = apps.get_model(self.model._meta.app_label, self.model._meta.object_name)
         username = GlobalUserModel.normalize_username(username)
+        if self.normalize_email.__func__ is BaseUserManager.normalize_email.__func__:
+            email = GlobalUserModel.normalize_email(email)
+        else:
+            warnings.warn(
+                'BaseUserManager.normalize_email() is deprecated in favor of '
+                'AbstractBaseUser.normalize_email() and will be removed in Django 4.1.',
+                RemovedInDjango41Warning,
+                stacklevel=2
+            )
+            email = self.normalize_email(email)
         user = self.model(username=username, email=email, **extra_fields)
         user.password = make_password(password)
         user.save(using=self._db)
@@ -368,7 +380,16 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
 
     def clean(self):
         super().clean()
-        self.email = self.__class__.objects.normalize_email(self.email)
+        if self.__class__.objects.normalize_email.__func__ is BaseUserManager.normalize_email.__func__:
+            self.email = self.normalize_email(self.email)
+        else:
+            warnings.warn(
+                'BaseUserManager.normalize_email() is deprecated in favor of '
+                'AbstractBaseUser.normalize_email() and will be removed in Django 4.1.',
+                RemovedInDjango41Warning,
+                stacklevel=2
+            )
+            self.email = self.__class__.objects.normalize_email(self.email)
 
     def get_full_name(self):
         """

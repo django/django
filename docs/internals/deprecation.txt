@@ -42,6 +42,10 @@ details on these changes.
 * Support for the pre-Django 3.2 format of messages used by
   ``django.contrib.messages.storage.cookie.CookieStorage`` will be removed.
 
+* :meth:`~django.contrib.auth.models.BaseUserManager.normalize_email` will be
+  moved from :class:`~django.contrib.auth.models.BaseUserManager` to
+  :class:`~django.contrib.auth.models.AbstractBaseUser`.
+
 .. _deprecation-removed-in-4.0:
 
 4.0

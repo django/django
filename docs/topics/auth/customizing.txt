@@ -647,6 +647,15 @@ The following attributes and methods are available on any subclass of
         identical characters with different Unicode code points are considered
         identical.
 
+    .. classmethod:: normalize_email(email)
+
+        Normalizes email addresses by lowercasing the domain portion of the
+        email address.
+
+        .. versionchanged:: 3.2
+
+            Relocated here from :class:`~django.contrib.auth.models.BaseUserManager`.
+
     .. attribute:: models.AbstractBaseUser.is_authenticated
 
         Read-only attribute which is always ``True`` (as opposed to
@@ -712,8 +721,9 @@ The following attributes and methods are available on any subclass of
     .. method:: clean()
 
         Normalizes the email by calling
-        :meth:`.BaseUserManager.normalize_email`. If you override this method,
+        :meth:`.AbstractBaseUser.normalize_email`. If you override this method,
         be sure to call ``super()`` to retain the normalization.
+
 
 Writing a manager for a custom user model
 -----------------------------------------
@@ -764,6 +774,10 @@ utility methods:
 
         Normalizes email addresses by lowercasing the domain portion of the
         email address.
+
+        .. deprecated:: 3.2
+            Custom email normalization methods should override
+            :meth:`.AbstractBaseUser.normalize_email` instead.
 
     .. method:: models.BaseUserManager.get_by_natural_key(username)
 
@@ -1025,7 +1039,7 @@ authentication app::
                 raise ValueError('Users must have an email address')
 
             user = self.model(
-                email=self.normalize_email(email),
+                email=AbstractBaseUser.normalize_email(email),
                 date_of_birth=date_of_birth,
             )
 
