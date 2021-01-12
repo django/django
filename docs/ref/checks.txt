@@ -495,6 +495,10 @@ The following checks are run if you use the :option:`check --deploy` option:
   should consider enabling this header to protect user privacy.
 * **security.E023**: You have set the :setting:`SECURE_REFERRER_POLICY` setting
   to an invalid value.
+* **security.E024**: The CSRF failure view ``'path.to.view'`` does not take the
+  correct number of arguments.
+* **security.E025**: The CSRF failure view ``'path.to.view'`` could not be
+  imported.
 
 The following checks verify that your security-related settings are correctly
 configured:
