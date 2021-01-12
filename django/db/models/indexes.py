@@ -35,6 +35,8 @@ class Index:
             raise ValueError('Index.fields and Index.opclasses must have the same number of elements.')
         if not fields:
             raise ValueError('At least one field is required to define an index.')
+        if not all(isinstance(field, str) for field in fields):
+            raise ValueError('Index.fields must contain only strings with field names.')
         if include and not name:
             raise ValueError('A covering index must be named.')
         if not isinstance(include, (type(None), list, tuple)):

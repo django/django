@@ -55,6 +55,11 @@ class SimpleIndexesTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, 'Index.fields must be a list or tuple.'):
             models.Index(fields='title')
 
+    def test_index_fields_strings(self):
+        msg = 'Index.fields must contain only strings with field names.'
+        with self.assertRaisesMessage(ValueError, msg):
+            models.Index(fields=[models.F('title')])
+
     def test_fields_tuple(self):
         self.assertEqual(models.Index(fields=('title',)).fields, ['title'])
 
