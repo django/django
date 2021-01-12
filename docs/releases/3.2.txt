@@ -125,6 +125,14 @@ Minor features
   <django.db.models.ForeignKey.limit_choices_to>` when searching a related
   model.
 
+* The admin now installs a final catch-all view that redirects unauthenticated
+  users to the login page, regardless or whether the URLs is otherwise valid.
+  This protects against a potential model enumeration privacy issue.
+
+  Although not recommended, you may set the new
+  :attr:`.AdminSite.final_catch_all_view` to ``False`` to disable the
+  catch-all view.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -599,6 +607,12 @@ backends.
 
 * Pagination links in the admin are now 1-indexed instead of 0-indexed, i.e.
   the query string for the first page is ``?p=1`` instead of ``?p=0``.
+
+* The new admin catch-all view will break URL patterns routed after the admin
+  URLs and matching the admin URL prefix. You can either adjust your URL
+  ordering or, if necessary, set :attr:`AdminSite.final_catch_all_view
+  <django.contrib.admin.AdminSite.final_catch_all_view>` to ``False``,
+  disabling the catch-all view. See :ref:`whats-new-3.2` for more details.
 
 :mod:`django.contrib.gis`
 -------------------------

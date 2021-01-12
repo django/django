@@ -2905,6 +2905,19 @@ Templates can override or extend base admin templates as described in
     A boolean value that determines whether to show the navigation sidebar
     on larger screens. By default, it is set to ``True``.
 
+.. attribute:: AdminSite.final_catch_all_view
+
+    .. versionadded:: 3.2
+
+    A boolean value that determines whether to add a final catch-all view to
+    the admin that redirects unauthenticated users to the login page. By
+    default, it is set to ``True``.
+
+    .. warning::
+
+        Setting this to ``False`` is not recommended as the view protects
+        against a potential model enumeration privacy issue.
+
 .. attribute:: AdminSite.login_template
 
     Path to a custom template that will be used by the admin site login view.
