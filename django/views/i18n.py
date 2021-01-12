@@ -2,7 +2,6 @@ import itertools
 import json
 import os
 import re
-from urllib.parse import unquote
 
 from django.apps import apps
 from django.conf import settings
@@ -39,8 +38,6 @@ def set_language(request):
         )
     ):
         next_url = request.META.get('HTTP_REFERER')
-        # HTTP_REFERER may be encoded.
-        next_url = next_url and unquote(next_url)
         if not url_has_allowed_host_and_scheme(
             url=next_url,
             allowed_hosts={request.get_host()},
