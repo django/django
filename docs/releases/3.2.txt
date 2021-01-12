@@ -175,7 +175,8 @@ Minor features
 * Read-only related fields are now rendered as navigable links if target models
   are registered in the admin.
 
-* The admin now supports theming. See :ref:`admin-theming` for more details.
+* The admin now supports theming, and includes a dark theme that is enabled
+  according to browser settings. See :ref:`admin-theming` for more details.
 
 * :attr:`.ModelAdmin.autocomplete_fields` now respects
   :attr:`ForeignKey.to_field <django.db.models.ForeignKey.to_field>` and

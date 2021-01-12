@@ -2853,6 +2853,8 @@ creating your own ``AdminSite`` instance (see below), and changing the
 Theming support
 ===============
 
+.. versionadded:: 3.2
+
 The admin uses CSS variables to define colors. This allows changing colors
 without having to override many individual CSS rules. For example, if you
 preferred purple instead of blue you could add a ``admin/base.html`` template
@@ -2873,7 +2875,12 @@ override to your project:
     </style>
     {% endblock %}
 
-An up-to-date list of CSS variables is at
+A dark theme is defined, and applied respecting the `prefers-color-scheme`_
+media query.
+
+.. _prefers-color-scheme: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme
+
+The list of CSS variables are defined at
 :file:`django/contrib/admin/static/admin/css/base.css`.
 
 ``AdminSite`` objects
