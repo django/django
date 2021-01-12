@@ -890,7 +890,7 @@ values of an expression in the partition. If the ``released`` field of the
 example annotates each movie with the average rating of a movie's peers
 released between twelve months before and twelve months after the each movie.
 
-    >>> from django.db.models import Avg, ExpressionList, F, ValueRange, Window
+    >>> from django.db.models import Avg, F, ValueRange, Window
     >>> Movie.objects.annotate(
     >>>     avg_rating=Window(
     >>>         expression=Avg('rating'),
