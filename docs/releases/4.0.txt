@@ -295,3 +295,7 @@ to remove usage of these features.
 
 * Support for the pre-Django 3.1 user sessions (that use the SHA-1 algorithm)
   is removed.
+
+* The ``get_request`` argument for
+  ``django.utils.deprecation.MiddlewareMixin.__init__()`` is required and
+  doesn't accept ``None``.

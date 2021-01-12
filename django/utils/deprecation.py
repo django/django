@@ -89,10 +89,9 @@ class MiddlewareMixin:
     sync_capable = True
     async_capable = True
 
-    # RemovedInDjango40Warning: when the deprecation ends, replace with:
-    #   def __init__(self, get_response):
-    def __init__(self, get_response=None):
-        self._get_response_none_deprecation(get_response)
+    def __init__(self, get_response):
+        if get_response is None:
+            raise ValueError('get_response must be provided.')
         self.get_response = get_response
         self._async_check()
         super().__init__()
@@ -137,11 +136,3 @@ class MiddlewareMixin:
                 thread_sensitive=True,
             )(request, response)
         return response
-
-    def _get_response_none_deprecation(self, get_response):
-        if get_response is None:
-            warnings.warn(
-                'Passing None for the middleware get_response argument is '
-                'deprecated.',
-                RemovedInDjango40Warning, stacklevel=3,
-            )
