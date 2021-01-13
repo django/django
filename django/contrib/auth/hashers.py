@@ -10,7 +10,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.signals import setting_changed
 from django.dispatch import receiver
 from django.utils.crypto import (
-    constant_time_compare, get_random_string, pbkdf2,
+    RANDOM_STRING_CHARS, constant_time_compare, get_random_string, pbkdf2,
 )
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_noop as _
@@ -190,8 +190,8 @@ class BasePasswordHasher:
 
     def salt(self):
         """Generate a cryptographically secure nonce salt in ASCII."""
-        # 12 returns a 71-bit value, log_2((26+26+10)^12) =~ 71 bits
-        return get_random_string(12)
+        # 12 returns a 71-bit value, log_2(len(RANDOM_STRING_CHARS)^12) =~ 71 bits
+        return get_random_string(12, RANDOM_STRING_CHARS)
 
     def verify(self, password, encoded):
         """Check if the given password is correct."""

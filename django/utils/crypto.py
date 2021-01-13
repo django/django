@@ -47,14 +47,12 @@ def salted_hmac(key_salt, value, secret=None, *, algorithm='sha1'):
 
 
 NOT_PROVIDED = object()  # RemovedInDjango40Warning.
+RANDOM_STRING_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 
 
 # RemovedInDjango40Warning: when the deprecation ends, replace with:
-#   def get_random_string(length, allowed_chars='...'):
-def get_random_string(length=NOT_PROVIDED, allowed_chars=(
-    'abcdefghijklmnopqrstuvwxyz'
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-)):
+#   def get_random_string(length, allowed_chars=RANDOM_STRING_CHARS):
+def get_random_string(length=NOT_PROVIDED, allowed_chars=RANDOM_STRING_CHARS):
     """
     Return a securely generated random string.
 
