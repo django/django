@@ -15,6 +15,7 @@ from django.urls import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.crypto import constant_time_compare, get_random_string
 from django.utils.deprecation import MiddlewareMixin
+from django.utils.functional import cached_property
 from django.utils.http import is_same_domain
 from django.utils.log import log_response
 
@@ -136,6 +137,13 @@ class CsrfViewMiddleware(MiddlewareMixin):
     This middleware should be used in conjunction with the {% csrf_token %}
     template tag.
     """
+    @cached_property
+    def csrf_trusted_origins_hosts(self):
+        return [
+            urlparse(origin).netloc.lstrip('*')
+            for origin in settings.CSRF_TRUSTED_ORIGINS
+        ]
+
     # The _accept and _reject methods currently only exist for the sake of the
     # requires_csrf_token decorator.
     def _accept(self, request):
@@ -272,7 +280,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
 
                 # Create a list of all acceptable HTTP referers, including the
                 # current host if it's permitted by ALLOWED_HOSTS.
-                good_hosts = list(settings.CSRF_TRUSTED_ORIGINS)
+                good_hosts = list(self.csrf_trusted_origins_hosts)
                 if good_referer is not None:
                     good_hosts.append(good_referer)
 

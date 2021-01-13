@@ -307,6 +307,22 @@ Upstream support for Oracle 12.2 ends in March 2022 and for Oracle 18c it ends
 in June 2021. Django 3.2 will be supported until April 2024. Django 4.0
 officially supports Oracle 19c.
 
+.. _csrf-trusted-origins-changes-4.0:
+
+``CSRF_TRUSTED_ORIGINS`` changes
+--------------------------------
+
+Format change
+~~~~~~~~~~~~~
+
+Values in the :setting:`CSRF_TRUSTED_ORIGINS` setting must include the scheme
+(e.g. ``'http://'`` or ``'https://'``) instead of only the hostname.
+
+Also, values that started with a dot, must now also include an asterisk before
+the dot. For example, change ``'.example.com'`` to ``'https://*.example.com'``.
+
+A system check detects any required changes.
+
 Miscellaneous
 -------------
 

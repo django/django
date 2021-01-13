@@ -399,7 +399,7 @@ class CsrfViewMiddlewareTestMixin:
         resp = mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(resp)
 
-    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_TRUSTED_ORIGINS=['dashboard.example.com'])
+    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_TRUSTED_ORIGINS=['https://dashboard.example.com'])
     def test_https_csrf_trusted_origin_allowed(self):
         """
         A POST HTTPS request with a referer added to the CSRF_TRUSTED_ORIGINS
@@ -414,7 +414,7 @@ class CsrfViewMiddlewareTestMixin:
         resp = mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(resp)
 
-    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_TRUSTED_ORIGINS=['.example.com'])
+    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_TRUSTED_ORIGINS=['https://*.example.com'])
     def test_https_csrf_wildcard_trusted_origin_allowed(self):
         """
         A POST HTTPS request with a referer that matches a CSRF_TRUSTED_ORIGINS

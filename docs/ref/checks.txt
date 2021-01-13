@@ -123,6 +123,9 @@ upgrading Django.
 * **2_0.W001**: Your URL pattern ``<pattern>`` has a ``route`` that contains
   ``(?P<``, begins with a ``^``, or ends with a ``$``. This was likely an
   oversight when migrating from ``url()`` to :func:`~django.urls.path`.
+* **4_0.E001**: As of Django 4.0, the values in the
+  :setting:`CSRF_TRUSTED_ORIGINS` setting must start with a scheme (usually
+  ``http://`` or ``https://``) but found ``<hostname>``.
 
 Caches
 ------
