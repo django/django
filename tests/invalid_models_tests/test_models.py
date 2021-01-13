@@ -3,7 +3,7 @@ import unittest
 from django.core.checks import Error, Warning
 from django.core.checks.model_checks import _check_lazy_references
 from django.db import connection, connections, models
-from django.db.models.functions import Lower
+from django.db.models.functions import Abs, Lower, Round
 from django.db.models.signals import post_init
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps, override_settings, register_lookup
@@ -524,6 +524,99 @@ class IndexesTests(TestCase):
                 required_db_features = {'supports_expression_indexes'}
 
         self.assertEqual(Model.check(databases=self.databases), [])
+
+    def test_func_index_complex_expression_custom_lookup(self):
+        class Model(models.Model):
+            height = models.IntegerField()
+            weight = models.IntegerField()
+
+            class Meta:
+                indexes = [
+                    models.Index(
+                        models.F('height') / (models.F('weight__abs') + models.Value(5)),
+                        name='name',
+                    ),
+                ]
+
+        with register_lookup(models.IntegerField, Abs):
+            self.assertEqual(Model.check(), [])
+
+    def test_func_index_pointing_to_missing_field(self):
+        class Model(models.Model):
+            class Meta:
+                indexes = [models.Index(Lower('missing_field').desc(), name='name')]
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "'indexes' refers to the nonexistent field 'missing_field'.",
+                obj=Model,
+                id='models.E012',
+            ),
+        ])
+
+    def test_func_index_pointing_to_missing_field_nested(self):
+        class Model(models.Model):
+            class Meta:
+                indexes = [
+                    models.Index(Abs(Round('missing_field')), name='name'),
+                ]
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "'indexes' refers to the nonexistent field 'missing_field'.",
+                obj=Model,
+                id='models.E012',
+            ),
+        ])
+
+    def test_func_index_pointing_to_m2m_field(self):
+        class Model(models.Model):
+            m2m = models.ManyToManyField('self')
+
+            class Meta:
+                indexes = [models.Index(Lower('m2m'), name='name')]
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "'indexes' refers to a ManyToManyField 'm2m', but "
+                "ManyToManyFields are not permitted in 'indexes'.",
+                obj=Model,
+                id='models.E013',
+            ),
+        ])
+
+    def test_func_index_pointing_to_non_local_field(self):
+        class Foo(models.Model):
+            field1 = models.CharField(max_length=15)
+
+        class Bar(Foo):
+            class Meta:
+                indexes = [models.Index(Lower('field1'), name='name')]
+
+        self.assertEqual(Bar.check(), [
+            Error(
+                "'indexes' refers to field 'field1' which is not local to "
+                "model 'Bar'.",
+                hint='This issue may be caused by multi-table inheritance.',
+                obj=Bar,
+                id='models.E016',
+            ),
+        ])
+
+    def test_func_index_pointing_to_fk(self):
+        class Foo(models.Model):
+            pass
+
+        class Bar(models.Model):
+            foo_1 = models.ForeignKey(Foo, models.CASCADE, related_name='bar_1')
+            foo_2 = models.ForeignKey(Foo, models.CASCADE, related_name='bar_2')
+
+            class Meta:
+                indexes = [
+                    models.Index(Lower('foo_1_id'), Lower('foo_2'), name='index_name'),
+                ]
+
+        self.assertEqual(Bar.check(), [])
 
 
 @isolate_apps('invalid_models_tests')

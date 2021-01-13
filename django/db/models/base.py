@@ -1624,6 +1624,7 @@ class Model(metaclass=ModelBase):
     def _check_indexes(cls, databases):
         """Check fields, names, and conditions of indexes."""
         errors = []
+        references = set()
         for index in cls._meta.indexes:
             # Index name can't start with an underscore or a number, restricted
             # for cross-database compatibility with Oracle.
@@ -1645,6 +1646,11 @@ class Model(metaclass=ModelBase):
                         id='models.E034',
                     ),
                 )
+            if index.contains_expressions:
+                for expression in index.expressions:
+                    references.update(
+                        ref[0] for ref in cls._get_expr_references(expression)
+                    )
         for db in databases:
             if not router.allow_migrate_model(db, cls):
                 continue
@@ -1699,6 +1705,7 @@ class Model(metaclass=ModelBase):
                 )
         fields = [field for index in cls._meta.indexes for field, _ in index.fields_orders]
         fields += [include for index in cls._meta.indexes for include in index.include]
+        fields += references
         errors.extend(cls._check_local_fields(fields, 'indexes'))
         return errors
 
