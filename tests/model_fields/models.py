@@ -135,7 +135,6 @@ class Post(models.Model):
 
 class NullBooleanModel(models.Model):
     nbfield = models.BooleanField(null=True, blank=True)
-    nbfield_old = models.NullBooleanField()
 
 
 class BooleanModel(models.Model):
@@ -192,16 +191,15 @@ class VerboseNameField(models.Model):
     # field_image = models.ImageField("verbose field")
     field11 = models.IntegerField("verbose field11")
     field12 = models.GenericIPAddressField("verbose field12", protocol="ipv4")
-    field13 = models.NullBooleanField("verbose field13")
-    field14 = models.PositiveIntegerField("verbose field14")
-    field15 = models.PositiveSmallIntegerField("verbose field15")
-    field16 = models.SlugField("verbose field16")
-    field17 = models.SmallIntegerField("verbose field17")
-    field18 = models.TextField("verbose field18")
-    field19 = models.TimeField("verbose field19")
-    field20 = models.URLField("verbose field20")
-    field21 = models.UUIDField("verbose field21")
-    field22 = models.DurationField("verbose field22")
+    field13 = models.PositiveIntegerField("verbose field13")
+    field14 = models.PositiveSmallIntegerField("verbose field14")
+    field15 = models.SlugField("verbose field15")
+    field16 = models.SmallIntegerField("verbose field16")
+    field17 = models.TextField("verbose field17")
+    field18 = models.TimeField("verbose field18")
+    field19 = models.URLField("verbose field19")
+    field20 = models.UUIDField("verbose field20")
+    field21 = models.DurationField("verbose field21")
 
 
 class GenericIPAddress(models.Model):
@@ -385,7 +383,6 @@ class AllFieldsModel(models.Model):
     floatf = models.FloatField()
     integer = models.IntegerField()
     generic_ip = models.GenericIPAddressField()
-    null_boolean = models.NullBooleanField()
     positive_integer = models.PositiveIntegerField()
     positive_small_integer = models.PositiveSmallIntegerField()
     slug = models.SlugField()

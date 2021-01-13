@@ -163,12 +163,6 @@ class UtilsTests(SimpleTestCase):
         display_value = display_for_field(None, models.TimeField(), self.empty_value)
         self.assertEqual(display_value, self.empty_value)
 
-        # Regression test for #13071: NullBooleanField has special
-        # handling.
-        display_value = display_for_field(None, models.NullBooleanField(), self.empty_value)
-        expected = '<img src="%sadmin/img/icon-unknown.svg" alt="None">' % settings.STATIC_URL
-        self.assertHTMLEqual(display_value, expected)
-
         display_value = display_for_field(None, models.BooleanField(null=True), self.empty_value)
         expected = '<img src="%sadmin/img/icon-unknown.svg" alt="None" />' % settings.STATIC_URL
         self.assertHTMLEqual(display_value, expected)

@@ -44,11 +44,11 @@ class DeprecatedFieldsTests(SimpleTestCase):
 
         model = NullBooleanFieldModel()
         self.assertEqual(model.check(), [
-            checks.Warning(
-                'NullBooleanField is deprecated. Support for it (except in '
-                'historical migrations) will be removed in Django 4.0.',
+            checks.Error(
+                'NullBooleanField is removed except for support in historical '
+                'migrations.',
                 hint='Use BooleanField(null=True) instead.',
                 obj=NullBooleanFieldModel._meta.get_field('nb'),
-                id='fields.W903',
+                id='fields.E903',
             ),
         ])

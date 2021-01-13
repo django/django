@@ -1254,17 +1254,6 @@ To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
     objects and arrays (represented in Python using :py:class:`dict` and
     :py:class:`list`) are supported.
 
-``NullBooleanField``
---------------------
-
-.. class:: NullBooleanField(**options)
-
-Like :class:`BooleanField` with ``null=True``.
-
-.. deprecated:: 3.1
-
-    ``NullBooleanField`` is deprecated in favor of ``BooleanField(null=True)``.
-
 ``PositiveBigIntegerField``
 ---------------------------
 
