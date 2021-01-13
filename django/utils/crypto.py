@@ -4,10 +4,8 @@ Django's standard crypto functions and utilities.
 import hashlib
 import hmac
 import secrets
-import warnings
 
 from django.conf import settings
-from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.encoding import force_bytes
 
 
@@ -46,13 +44,10 @@ def salted_hmac(key_salt, value, secret=None, *, algorithm='sha1'):
     return hmac.new(key, msg=force_bytes(value), digestmod=hasher)
 
 
-NOT_PROVIDED = object()  # RemovedInDjango40Warning.
 RANDOM_STRING_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 
 
-# RemovedInDjango40Warning: when the deprecation ends, replace with:
-#   def get_random_string(length, allowed_chars=RANDOM_STRING_CHARS):
-def get_random_string(length=NOT_PROVIDED, allowed_chars=RANDOM_STRING_CHARS):
+def get_random_string(length, allowed_chars=RANDOM_STRING_CHARS):
     """
     Return a securely generated random string.
 
@@ -63,12 +58,6 @@ def get_random_string(length=NOT_PROVIDED, allowed_chars=RANDOM_STRING_CHARS):
       * length: 12, bit length =~ 71 bits
       * length: 22, bit length =~ 131 bits
     """
-    if length is NOT_PROVIDED:
-        warnings.warn(
-            'Not providing a length argument is deprecated.',
-            RemovedInDjango40Warning,
-        )
-        length = 12
     return ''.join(secrets.choice(allowed_chars) for i in range(length))
 
 
