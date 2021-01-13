@@ -303,3 +303,5 @@ to remove usage of these features.
 * The ``providing_args`` argument for ``django.dispatch.Signal`` is removed.
 
 * The ``list`` message for ``ModelMultipleChoiceField`` is removed.
+
+* Support for passing raw column aliases to ``QuerySet.order_by()`` is removed.
