@@ -995,10 +995,10 @@ class SeleniumTests(AdminSeleniumTestCase):
         add_button.click()
 
         self.assertEqual(rows_length(), 5, msg="sanity check")
-        for delete_link in self.selenium.find_elements_by_css_selector('%s .inline-deletelink' % inline_id):
+        for delete_link in self.selenium.find_elements_by_css_selector('%s .inline-deletelink' % inline_id)[: 2]:
             delete_link.click()
         with self.disable_implicit_wait():
-            self.assertEqual(rows_length(), 0)
+            self.assertEqual(rows_length(), 3)
 
     def test_delete_invalid_stacked_inlines(self):
         from selenium.common.exceptions import NoSuchElementException
@@ -1346,3 +1346,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(
             len(self.selenium.find_elements_by_css_selector(tabular_inline_formset_selector)), 1
         )
+
+    def test_inline_with_extra_remove_button(self):
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_teacher_add'))
+        remove_button = self.selenium.find_elements_by_css_selector('a.inline-deletelink')[0]
+        self.assertEqual(remove_button.value_of_css_property('display'), 'none')

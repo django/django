@@ -37,6 +37,8 @@
         };
         const totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS").prop("autocomplete", "off");
         let nextIndex = parseInt(totalForms.val(), 10);
+        const extraForms = $("#id_" + options.prefix + "-EXTRA_FORMS").prop("autocomplete", "off");
+        const initialForms = $("#id_" + options.prefix + "-INITIAL_FORMS").prop("autocomplete", "off");
         const maxForms = $("#id_" + options.prefix + "-MAX_NUM_FORMS").prop("autocomplete", "off");
         const minForms = $("#id_" + options.prefix + "-MIN_NUM_FORMS").prop("autocomplete", "off");
         let addButton;
@@ -153,10 +155,14 @@
         };
 
         const toggleDeleteButtonVisibility = function(inlineGroup) {
-            if ((minForms.val() !== '') && (minForms.val() - totalForms.val()) >= 0) {
-                inlineGroup.find('.inline-deletelink').hide();
-            } else {
+            let limit = minForms.val();
+            if (limit === '0' || limit === '') {
+                limit = extraForms.val();
+            }
+            if (totalForms.val() - initialForms.val() > limit) {
                 inlineGroup.find('.inline-deletelink').show();
+            } else {
+                inlineGroup.find('.inline-deletelink').hide();
             }
         };
 
