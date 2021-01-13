@@ -668,6 +668,12 @@ backends.
   backends must implement ``DatabaseClient.settings_to_cmd_args_env()`` or
   override ``DatabaseClient.runshell()``.
 
+* Third-party database backends must implement support for functional indexes
+  (:attr:`.Index.expressions`) or set
+  ``DatabaseFeatures.supports_expression_indexes`` to ``False``. If ``COLLATE``
+  is not a part of the ``CREATE INDEX`` statement, set
+  ``DatabaseFeatures.collate_as_index_expression`` to ``True``.
+
 :mod:`django.contrib.admin`
 ---------------------------
 

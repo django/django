@@ -282,7 +282,7 @@ class BaseDatabaseFeatures:
     # Does the backend support covering indexes (CREATE INDEX ... INCLUDE ...)?
     supports_covering_indexes = False
     # Does the backend support indexes on expressions?
-    supports_expression_indexes = False
+    supports_expression_indexes = True
     # Does the backend treat COLLATE as an indexed expression?
     collate_as_index_expression = False
 
