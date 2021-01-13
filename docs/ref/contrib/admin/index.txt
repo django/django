@@ -256,10 +256,17 @@ subclass::
         class AuthorAdmin(admin.ModelAdmin):
             fields = ('name', 'title', 'view_birth_date')
 
+            @admin.display(empty_value='???')
             def view_birth_date(self, obj):
                 return obj.birth_date
 
-            view_birth_date.empty_value_display = '???'
+    .. versionchanged:: 3.2
+
+        The ``empty_value`` argument to the
+        :func:`~django.contrib.admin.display` decorator is equivalent to
+        setting the ``empty_value_display`` attribute on the display function
+        directly in previous versions. Setting the attribute directly is still
+        supported for backward compatibility.
 
 .. attribute:: ModelAdmin.exclude
 
@@ -551,7 +558,9 @@ subclass::
     If you don't set ``list_display``, the admin site will display a single
     column that displays the ``__str__()`` representation of each object.
 
-    There are four types of values that can be used in ``list_display``:
+    There are four types of values that can be used in ``list_display``. All
+    but the simplest may use the  :func:`~django.contrib.admin.display`
+    decorator is used to customize how the field is presented:
 
     * The name of a model field. For example::
 
@@ -560,9 +569,9 @@ subclass::
 
     * A callable that accepts one argument, the model instance. For example::
 
+          @admin.display(description='Name')
           def upper_case_name(obj):
               return ("%s %s" % (obj.first_name, obj.last_name)).upper()
-          upper_case_name.short_description = 'Name'
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = (upper_case_name,)
@@ -573,9 +582,9 @@ subclass::
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('upper_case_name',)
 
+              @admin.display(description='Name')
               def upper_case_name(self, obj):
                   return ("%s %s" % (obj.first_name, obj.last_name)).upper()
-              upper_case_name.short_description = 'Name'
 
     * A string representing a model attribute or method (without any required
       arguments). For example::
@@ -587,9 +596,9 @@ subclass::
               name = models.CharField(max_length=50)
               birthday = models.DateField()
 
+              @admin.display(description='Birth decade')
               def decade_born_in(self):
                   return '%d’s' % (self.birthday.year // 10 * 10)
-              decade_born_in.short_description = 'Birth decade'
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('name', 'decade_born_in')
@@ -624,6 +633,7 @@ subclass::
               last_name = models.CharField(max_length=50)
               color_code = models.CharField(max_length=6)
 
+              @admin.display
               def colored_name(self):
                   return format_html(
                       '<span style="color: #{};">{} {}</span>',
@@ -637,7 +647,17 @@ subclass::
 
     * As some examples have already demonstrated, when using a callable, a
       model method, or a ``ModelAdmin`` method, you can customize the column's
-      title by adding a ``short_description`` attribute to the callable.
+      title by wrapping the callable with the
+      :func:`~django.contrib.admin.display` decorator and passing the
+      ``description`` argument.
+
+      .. versionchanged:: 3.2
+
+          The ``description`` argument to the
+          :func:`~django.contrib.admin.display` decorator is equivalent to
+          setting the ``short_description`` attribute on the display function
+          directly in previous versions. Setting the attribute directly is
+          still supported for backward compatibility.
 
     * If the value of a field is ``None``, an empty string, or an iterable
       without elements, Django will display ``-`` (a dash). You can override
@@ -657,17 +677,23 @@ subclass::
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('name', 'birth_date_view')
 
+              @admin.display(empty_value='unknown')
               def birth_date_view(self, obj):
                    return obj.birth_date
 
-              birth_date_view.empty_value_display = 'unknown'
+      .. versionchanged:: 3.2
+
+          The ``empty_value`` argument to the
+          :func:`~django.contrib.admin.display` decorator is equivalent to
+          setting the ``empty_value_display`` attribute on the display function
+          directly in previous versions. Setting the attribute directly is
+          still supported for backward compatibility.
 
     * If the string given is a method of the model, ``ModelAdmin`` or a
       callable that returns ``True``, ``False``, or ``None``, Django will
-      display a pretty "yes", "no", or "unknown" icon if you give the method a
-      ``boolean`` attribute whose value is ``True``.
-
-      Here's a full example model::
+      display a pretty "yes", "no", or "unknown" icon if you wrap the method
+      with the :func:`~django.contrib.admin.display` decorator passing the
+      ``boolean`` argument with the value set to ``True``::
 
           from django.contrib import admin
           from django.db import models
@@ -676,12 +702,20 @@ subclass::
               first_name = models.CharField(max_length=50)
               birthday = models.DateField()
 
+              @admin.display(boolean=True)
               def born_in_fifties(self):
                   return 1950 <= self.birthday.year < 1960
-              born_in_fifties.boolean = True
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('name', 'born_in_fifties')
+
+      .. versionchanged:: 3.2
+
+          The ``boolean`` argument to the
+          :func:`~django.contrib.admin.display` decorator is equivalent to
+          setting the ``boolean`` attribute on the display function directly in
+          previous versions. Setting the attribute directly is still supported
+          for backward compatibility.
 
     * The ``__str__()`` method is just as valid in ``list_display`` as any
       other model method, so it's perfectly OK to do this::
@@ -692,44 +726,42 @@ subclass::
       fields can't be used in sorting (because Django does all the sorting
       at the database level).
 
-      However, if an element of ``list_display`` represents a certain
-      database field, you can indicate this fact by setting the
-      ``admin_order_field`` attribute of the item.
+      However, if an element of ``list_display`` represents a certain database
+      field, you can indicate this fact by using the
+      :func:`~django.contrib.admin.display` decorator on the method, passing
+      the ``ordering`` argument::
 
-      For example::
+          from django.contrib import admin
+          from django.db import models
+          from django.utils.html import format_html
 
-        from django.contrib import admin
-        from django.db import models
-        from django.utils.html import format_html
+          class Person(models.Model):
+              first_name = models.CharField(max_length=50)
+              color_code = models.CharField(max_length=6)
 
-        class Person(models.Model):
-            first_name = models.CharField(max_length=50)
-            color_code = models.CharField(max_length=6)
+              @admin.display(ordering='first_name')
+              def colored_first_name(self):
+                  return format_html(
+                      '<span style="color: #{};">{}</span>',
+                      self.color_code,
+                      self.first_name,
+                  )
 
-            def colored_first_name(self):
-                return format_html(
-                    '<span style="color: #{};">{}</span>',
-                    self.color_code,
-                    self.first_name,
-                )
-
-            colored_first_name.admin_order_field = 'first_name'
-
-        class PersonAdmin(admin.ModelAdmin):
-            list_display = ('first_name', 'colored_first_name')
+          class PersonAdmin(admin.ModelAdmin):
+              list_display = ('first_name', 'colored_first_name')
 
       The above will tell Django to order by the ``first_name`` field when
       trying to sort by ``colored_first_name`` in the admin.
 
-      To indicate descending order with ``admin_order_field`` you can use a
-      hyphen prefix on the field name. Using the above example, this would
-      look like::
+      To indicate descending order with the ``ordering`` argument you can use a
+      hyphen prefix on the field name. Using the above example, this would look
+      like::
 
-          colored_first_name.admin_order_field = '-first_name'
+          @admin.display(ordering='-first_name')
 
-      ``admin_order_field`` supports query lookups to sort by values on related
-      models. This example includes an "author first name" column in the list
-      display and allows sorting it by first name::
+      The ``ordering`` argument supports query lookups to sort by values on
+      related models. This example includes an "author first name" column in
+      the list display and allows sorting it by first name::
 
           class Blog(models.Model):
               title = models.CharField(max_length=255)
@@ -738,13 +770,12 @@ subclass::
           class BlogAdmin(admin.ModelAdmin):
               list_display = ('title', 'author', 'author_first_name')
 
+              @admin.display(ordering='author__first_name')
               def author_first_name(self, obj):
                   return obj.author.first_name
 
-              author_first_name.admin_order_field = 'author__first_name'
-
-      :doc:`Query expressions </ref/models/expressions>` may be used in
-      ``admin_order_field``. For example::
+      :doc:`Query expressions </ref/models/expressions>` may be used with the
+      ``ordering`` argument::
 
           from django.db.models import Value
           from django.db.models.functions import Concat
@@ -753,32 +784,47 @@ subclass::
               first_name = models.CharField(max_length=50)
               last_name = models.CharField(max_length=50)
 
+              @admin.display(ordering=Concat('first_name', Value(' '), 'last_name'))
               def full_name(self):
                   return self.first_name + ' ' + self.last_name
-              full_name.admin_order_field = Concat('first_name', Value(' '), 'last_name')
 
-    * Elements of ``list_display`` can also be properties. Please note however,
-      that due to the way properties work in Python, setting
-      ``short_description`` or ``admin_order_field`` on a property is only
-      possible when using the ``property()`` function and **not** with the
-      ``@property`` decorator.
+      .. versionchanged:: 3.2
 
-      For example::
+          The ``ordering`` argument to the
+          :func:`~django.contrib.admin.display` decorator is equivalent to
+          setting the ``admin_order_field`` attribute on the display function
+          directly in previous versions. Setting the attribute directly is
+          still supported for backward compatibility.
+
+    * Elements of ``list_display`` can also be properties::
 
           class Person(models.Model):
               first_name = models.CharField(max_length=50)
               last_name = models.CharField(max_length=50)
 
-              def my_property(self):
+              @property
+              @admin.display(
+                  ordering='last_name',
+                  description='Full name of the person',
+              )
+              def full_name(self):
                   return self.first_name + ' ' + self.last_name
-              my_property.short_description = "Full name of the person"
-              my_property.admin_order_field = 'last_name'
-
-              full_name = property(my_property)
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('full_name',)
 
+      Note that ``@property`` must be above ``@display``. If you're using the
+      old way -- setting the display-related attributes directly rather than
+      using the :func:`~django.contrib.admin.display` decorator --  be aware
+      that the ``property()`` function and **not** the ``@property`` decorator
+      must be used::
+
+          def my_property(self):
+              return self.first_name + ' ' + self.last_name
+          my_property.short_description = "Full name of the person"
+          my_property.admin_order_field = 'last_name'
+
+          full_name = property(my_property)
 
     * The field names in ``list_display`` will also appear as CSS classes in
       the HTML output, in the form of ``column-<field_name>`` on each ``<th>``
@@ -1239,6 +1285,8 @@ subclass::
         class PersonAdmin(admin.ModelAdmin):
             readonly_fields = ('address_report',)
 
+            # description functions like a model field's verbose_name
+            @admin.display(description='Address')
             def address_report(self, instance):
                 # assuming get_full_address() returns a list of strings
                 # for each line of the address and you want to separate each
@@ -1248,9 +1296,6 @@ subclass::
                     '{}',
                     ((line,) for line in instance.get_full_address()),
                 ) or mark_safe("<span class='errors'>I can't determine this address.</span>")
-
-            # short_description functions like a model field's verbose_name
-            address_report.short_description = "Address"
 
 .. attribute:: ModelAdmin.save_as
 
@@ -1360,8 +1405,9 @@ subclass::
 .. attribute:: ModelAdmin.sortable_by
 
     By default, the change list page allows sorting by all model fields (and
-    callables that have the ``admin_order_field`` property) specified in
-    :attr:`list_display`.
+    callables that use the ``ordering`` argument to the
+    :func:`~django.contrib.admin.display` decorator or have the
+    ``admin_order_field`` attribute) specified in :attr:`list_display`.
 
     If you want to disable sorting for some columns, set ``sortable_by`` to
     a collection (e.g. ``list``, ``tuple``, or ``set``) of the subset of
@@ -3336,6 +3382,50 @@ The action in the examples above match the last part of the URL names for
 :class:`ModelAdmin` instances described above. The ``opts`` variable can be any
 object which has an ``app_label`` and ``model_name`` attributes and is usually
 supplied by the admin views for the current model.
+
+The ``display`` decorator
+=========================
+
+.. function:: display(*, boolean=None, ordering=None, description=None, empty_value=None)
+
+    .. versionadded:: 3.2
+
+    This decorator can be used for setting specific attributes on custom
+    display functions that can be used with
+    :attr:`~django.contrib.admin.ModelAdmin.list_display` or
+    :attr:`~django.contrib.admin.ModelAdmin.readonly_fields`::
+
+        @admin.display(
+            boolean=True,
+            ordering='-publish_date',
+            description='Is Published?',
+        )
+        def is_published(self, obj):
+            return obj.publish_date is not None
+
+    This is equivalent to setting some attributes (with the original, longer
+    names) on the function directly::
+
+        def is_published(self, obj):
+            return obj.publish_date is not None
+        is_published.boolean = True
+        is_published.admin_order_field = '-publish_date'
+        is_published.short_description = 'Is Published?'
+
+    Also note that the ``empty_value`` decorator parameter maps to the
+    ``empty_value_display`` attribute assigned directly to the function. It
+    cannot be used in conjunction with ``boolean`` -- they are mutually
+    exclusive.
+
+    Use of this decorator is not compulsory to make a display function, but it
+    can be useful to use it without arguments as a marker in your source to
+    identify the purpose of the function::
+
+        @admin.display
+        def published_year(self, obj):
+            return obj.publish_date.year
+
+    In this case it will add no attributes to the function.
 
 .. currentmodule:: django.contrib.admin.views.decorators
 

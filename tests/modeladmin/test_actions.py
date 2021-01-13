@@ -27,6 +27,7 @@ class AdminActionsTests(TestCase):
         class BandAdmin(admin.ModelAdmin):
             actions = ['custom_action']
 
+            @admin.action
             def custom_action(modeladmin, request, queryset):
                 pass
 
@@ -60,6 +61,7 @@ class AdminActionsTests(TestCase):
         class AdminBase(admin.ModelAdmin):
             actions = ['custom_action']
 
+            @admin.action
             def custom_action(modeladmin, request, queryset):
                 pass
 
@@ -78,13 +80,14 @@ class AdminActionsTests(TestCase):
         self.assertEqual(action_names, ['delete_selected'])
 
     def test_global_actions_description(self):
+        @admin.action(description='Site-wide admin action 1.')
         def global_action_1(modeladmin, request, queryset):
             pass
 
+        @admin.action
         def global_action_2(modeladmin, request, queryset):
             pass
 
-        global_action_1.short_description = 'Site-wide admin action 1.'
         admin_site = admin.AdminSite()
         admin_site.add_action(global_action_1)
         admin_site.add_action(global_action_2)
@@ -103,29 +106,27 @@ class AdminActionsTests(TestCase):
         )
 
     def test_actions_replace_global_action(self):
+        @admin.action(description='Site-wide admin action 1.')
         def global_action_1(modeladmin, request, queryset):
             pass
 
+        @admin.action(description='Site-wide admin action 2.')
         def global_action_2(modeladmin, request, queryset):
             pass
 
-        global_action_1.short_description = 'Site-wide admin action 1.'
-        global_action_2.short_description = 'Site-wide admin action 2.'
         admin.site.add_action(global_action_1, name='custom_action_1')
         admin.site.add_action(global_action_2, name='custom_action_2')
 
+        @admin.action(description='Local admin action 1.')
         def custom_action_1(modeladmin, request, queryset):
             pass
-
-        custom_action_1.short_description = 'Local admin action 1.'
 
         class BandAdmin(admin.ModelAdmin):
             actions = [custom_action_1, 'custom_action_2']
 
+            @admin.action(description='Local admin action 2.')
             def custom_action_2(self, request, queryset):
                 pass
-
-            custom_action_2.short_description = 'Local admin action 2.'
 
         ma = BandAdmin(Band, admin.site)
         self.assertEqual(ma.check(), [])

@@ -7,6 +7,7 @@ from urllib.parse import parse_qsl, urljoin, urlparse
 
 import pytz
 
+from django.contrib import admin
 from django.contrib.admin import AdminSite, ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import ADDITION, DELETION, LogEntry
@@ -750,6 +751,17 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         Post.objects.create(public=None)
         response = self.client.get(reverse('admin:admin_views_post_changelist'))
         self.assertContains(response, 'icon-unknown.svg')
+
+    def test_display_decorator_with_boolean_and_empty_value(self):
+        msg = (
+            'The boolean and empty_value arguments to the @display decorator '
+            'are mutually exclusive.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            class BookAdmin(admin.ModelAdmin):
+                @admin.display(boolean=True, empty_value='(Missing)')
+                def is_published(self, obj):
+                    return obj.publish_date is not None
 
     def test_i18n_language_non_english_default(self):
         """

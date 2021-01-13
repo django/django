@@ -692,6 +692,7 @@ class SystemChecksTestCase(SimpleTestCase):
         self.assertEqual(errors, [])
 
     def test_readonly_on_method(self):
+        @admin.display
         def my_function(obj):
             pass
 
@@ -705,6 +706,7 @@ class SystemChecksTestCase(SimpleTestCase):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = ("readonly_method_on_modeladmin",)
 
+            @admin.display
             def readonly_method_on_modeladmin(self, obj):
                 pass
 
@@ -717,6 +719,7 @@ class SystemChecksTestCase(SimpleTestCase):
 
             def __getattr__(self, item):
                 if item == "dynamic_method":
+                    @admin.display
                     def method(obj):
                         pass
                     return method
@@ -777,6 +780,7 @@ class SystemChecksTestCase(SimpleTestCase):
 
     def test_extra(self):
         class SongAdmin(admin.ModelAdmin):
+            @admin.display
             def awesome_song(self, instance):
                 if instance.title == "Born to Run":
                     return "Best Ever!"
