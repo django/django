@@ -299,3 +299,5 @@ to remove usage of these features.
 * The ``get_request`` argument for
   ``django.utils.deprecation.MiddlewareMixin.__init__()`` is required and
   doesn't accept ``None``.
+
+* The ``providing_args`` argument for ``django.dispatch.Signal`` is removed.
