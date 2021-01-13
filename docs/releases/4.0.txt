@@ -301,3 +301,5 @@ to remove usage of these features.
   doesn't accept ``None``.
 
 * The ``providing_args`` argument for ``django.dispatch.Signal`` is removed.
+
+* The ``list`` message for ``ModelMultipleChoiceField`` is removed.

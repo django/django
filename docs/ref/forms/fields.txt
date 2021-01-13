@@ -1347,10 +1347,6 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
 
         Same as :class:`ModelChoiceField.iterator`.
 
-.. deprecated:: 3.1
-
-    The ``list`` message is deprecated, use ``invalid_list`` instead.
-
 .. _iterating-relationship-choices:
 
 Iterating relationship choices
