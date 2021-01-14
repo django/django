@@ -316,3 +316,6 @@ to remove usage of these features.
 
 * The ``django.contrib.postgres.fields.JSONField`` model field is removed,
   except for support in historical migrations.
+
+* ``django.contrib.postgres.fields.jsonb.KeyTransform`` and
+  ``django.contrib.postgres.fields.jsonb.KeyTextTransform`` are removed.
