@@ -319,3 +319,5 @@ to remove usage of these features.
 
 * ``django.contrib.postgres.fields.jsonb.KeyTransform`` and
   ``django.contrib.postgres.fields.jsonb.KeyTextTransform`` are removed.
+
+* ``django.contrib.postgres.forms.JSONField`` is removed.
