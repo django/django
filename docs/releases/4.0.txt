@@ -321,3 +321,5 @@ to remove usage of these features.
   ``django.contrib.postgres.fields.jsonb.KeyTextTransform`` are removed.
 
 * ``django.contrib.postgres.forms.JSONField`` is removed.
+
+* The ``{% ifequal %}`` and ``{% ifnotequal %}`` template tags are removed.

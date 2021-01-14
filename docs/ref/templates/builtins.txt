@@ -608,15 +608,6 @@ you should use::
 
     {% if a > b and b > c %}
 
-``ifequal`` and ``ifnotequal``
-------------------------------
-
-.. deprecated:: 3.1
-
-``{% ifequal a b %} ... {% endifequal %}`` is an obsolete way to write
-``{% if a == b %} ... {% endif %}``. Likewise, ``{% ifnotequal a b %} ...
-{% endifnotequal %}`` is superseded by ``{% if a != b %} ... {% endif %}``.
-
 .. templatetag:: ifchanged
 
 ``ifchanged``
