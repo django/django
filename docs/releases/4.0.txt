@@ -311,3 +311,5 @@ to remove usage of these features.
 
 * The ``NullBooleanField`` model field is removed, except for support in
   historical migrations.
+
+* ``django.conf.urls.url()`` is removed.
