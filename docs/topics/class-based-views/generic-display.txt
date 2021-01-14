@@ -427,6 +427,6 @@ object -- so we override it and wrap the call::
     name that ``DetailView`` uses to find the value of the primary key used to
     filter the queryset.
 
-    If you want to call the group something else, you can set ``pk_url_kwarg``
-    on the view. More details can be found in the reference for
-    :class:`~django.views.generic.detail.DetailView`
+    If you want to call the group something else, you can set
+    :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
+    on the view.
