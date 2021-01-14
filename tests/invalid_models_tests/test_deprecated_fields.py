@@ -1,5 +1,7 @@
+from unittest import skipUnless
+
 from django.core import checks
-from django.db import models
+from django.db import connection, models
 from django.test import SimpleTestCase
 from django.test.utils import isolate_apps
 
@@ -50,5 +52,22 @@ class DeprecatedFieldsTests(SimpleTestCase):
                 hint='Use BooleanField(null=True) instead.',
                 obj=NullBooleanFieldModel._meta.get_field('nb'),
                 id='fields.E903',
+            ),
+        ])
+
+    @skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific SQL')
+    def test_postgres_jsonfield_deprecated(self):
+        from django.contrib.postgres.fields import JSONField
+
+        class PostgresJSONFieldModel(models.Model):
+            field = JSONField()
+
+        self.assertEqual(PostgresJSONFieldModel.check(), [
+            checks.Error(
+                'django.contrib.postgres.fields.JSONField is removed except '
+                'for support in historical migrations.',
+                hint='Use django.db.models.JSONField instead.',
+                obj=PostgresJSONFieldModel._meta.get_field('field'),
+                id='fields.E904',
             ),
         ])

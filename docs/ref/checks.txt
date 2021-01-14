@@ -212,7 +212,9 @@ Model fields
   historical migrations.
 * **fields.W904**: ``django.contrib.postgres.fields.JSONField`` is deprecated.
   Support for it (except in historical migrations) will be removed in Django
-  4.0.
+  4.0. *This check appeared in Django 3.1 and 3.2*.
+* **fields.E904**: ``django.contrib.postgres.fields.JSONField`` is removed
+  except for support in historical migrations.
 
 File fields
 ~~~~~~~~~~~

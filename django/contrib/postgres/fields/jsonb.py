@@ -11,14 +11,13 @@ __all__ = ['JSONField']
 
 
 class JSONField(BuiltinJSONField):
-    system_check_deprecated_details = {
+    system_check_removed_details = {
         'msg': (
-            'django.contrib.postgres.fields.JSONField is deprecated. Support '
-            'for it (except in historical migrations) will be removed in '
-            'Django 4.0.'
+            'django.contrib.postgres.fields.JSONField is removed except for '
+            'support in historical migrations.'
         ),
         'hint': 'Use django.db.models.JSONField instead.',
-        'id': 'fields.W904',
+        'id': 'fields.E904',
     }
 
 
