@@ -3,9 +3,9 @@ from unittest import mock, skipUnless
 from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth.hashers import (
     UNUSABLE_PASSWORD_PREFIX, UNUSABLE_PASSWORD_SUFFIX_LENGTH,
-    BasePasswordHasher, PBKDF2PasswordHasher, PBKDF2SHA1PasswordHasher,
-    check_password, get_hasher, identify_hasher, is_password_usable,
-    make_password,
+    BasePasswordHasher, BCryptPasswordHasher, BCryptSHA256PasswordHasher,
+    PBKDF2PasswordHasher, PBKDF2SHA1PasswordHasher, check_password, get_hasher,
+    identify_hasher, is_password_usable, make_password,
 )
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
@@ -304,6 +304,18 @@ class TestUtilsHashPass(SimpleTestCase):
         encoded = hasher.encode('lètmein', 'seasalt2')
         self.assertEqual(encoded, 'pbkdf2_sha1$260000$seasalt2$wAibXvW6jgvatCdONi6SMJ6q7mI=')
         self.assertTrue(hasher.verify('lètmein', encoded))
+
+    @skipUnless(bcrypt, 'bcrypt not installed')
+    def test_bcrypt_salt_check(self):
+        hasher = BCryptPasswordHasher()
+        encoded = hasher.encode('lètmein', hasher.salt())
+        self.assertIs(hasher.must_update(encoded), False)
+
+    @skipUnless(bcrypt, 'bcrypt not installed')
+    def test_bcryptsha256_salt_check(self):
+        hasher = BCryptSHA256PasswordHasher()
+        encoded = hasher.encode('lètmein', hasher.salt())
+        self.assertIs(hasher.must_update(encoded), False)
 
     @override_settings(
         PASSWORD_HASHERS=[
