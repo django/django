@@ -192,11 +192,6 @@ Minor features
   :attr:`.AdminSite.final_catch_all_view` to ``False`` to disable the
   catch-all view.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -240,11 +235,6 @@ Minor features
 * The :class:`~django.contrib.gis.utils.LayerMapping` class now supports
   :class:`pathlib.Path`.
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -276,16 +266,6 @@ Minor features
   expression allows creating functional indexes on expressions with a custom
   operator class. See :ref:`new_functional_indexes` for more details.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sessions`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -295,31 +275,11 @@ Minor features
   :attr:`~django.contrib.sitemaps.Sitemap.x_default` allow
   generating sitemap *alternates* to localized versions of your pages.
 
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.staticfiles`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new ``item_comments`` hook allows specifying a comments URL per feed
   item.
-
-Cache
-~~~~~
-
-* ...
-
-CSRF
-~~~~
-
-* ...
 
 Database backends
 ~~~~~~~~~~~~~~~~~
@@ -336,11 +296,6 @@ Decorators
   allows individual views to be excluded from :setting:`APPEND_SLASH` URL
   normalization.
 
-Email
-~~~~~
-
-* ...
-
 Error Reporting
 ~~~~~~~~~~~~~~~
 
@@ -348,11 +303,6 @@ Error Reporting
   the :attr:`~django.views.debug.ExceptionReporter.html_template_path` and
   :attr:`~django.views.debug.ExceptionReporter.text_template_path` class
   attributes to override the templates used to render exception reports.
-
-File Storage
-~~~~~~~~~~~~
-
-* ...
 
 File Uploads
 ~~~~~~~~~~~~
@@ -387,16 +337,6 @@ Generic Views
   :class:`~django.views.generic.dates.WeekMixin` and
   :class:`~django.views.generic.dates.WeekArchiveView` now support the
   ``'%V'`` ISO 8601 week format.
-
-Internationalization
-~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Logging
-~~~~~~~
-
-* ...
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -598,11 +538,6 @@ Tests
   comparison against a list of string representations of objects when using the
   default value for the ``transform`` argument.
 
-URLs
-~~~~
-
-* ...
-
 Utilities
 ~~~~~~~~~
 
@@ -689,6 +624,14 @@ backends.
   <django.contrib.admin.AdminSite.final_catch_all_view>` to ``False``,
   disabling the catch-all view. See :ref:`whats-new-3.2` for more details.
 
+* Minified JavaScript files are no longer included with the admin. If you
+  require these files to be minified, consider using a third party app or
+  external build tool. The minified vendored JavaScript files packaged with the
+  admin (e.g. :ref:`jquery.min.js <contrib-admin-jquery>`) are still included.
+
+* :attr:`.ModelAdmin.prepopulated_fields` no longer strips English stop words,
+  such as ``'a'`` or ``'an'``.
+
 :mod:`django.contrib.gis`
 -------------------------
 
@@ -716,14 +659,6 @@ Miscellaneous
 
 * The undocumented ``SpatiaLiteOperations.proj4_version()`` method is renamed
   to ``proj_version()``.
-
-* Minified JavaScript files are no longer included with the admin. If you
-  require these files to be minified, consider using a third party app or
-  external build tool. The minified vendored JavaScript files packaged with the
-  admin (e.g. :ref:`jquery.min.js <contrib-admin-jquery>`) are still included.
-
-* :attr:`.ModelAdmin.prepopulated_fields` no longer strips English stop words,
-  such as ``'a'`` or ``'an'``.
 
 * :func:`~django.utils.text.slugify` now removes leading and trailing dashes
   and underscores.
