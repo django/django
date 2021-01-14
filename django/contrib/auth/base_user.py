@@ -4,7 +4,6 @@ not in INSTALLED_APPS.
 """
 import unicodedata
 
-from django.conf import settings
 from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import (
     check_password, is_password_usable, make_password,
@@ -129,10 +128,7 @@ class AbstractBaseUser(models.Model):
         return salted_hmac(
             key_salt,
             self.password,
-            # RemovedInDjango40Warning: when the deprecation ends, replace
-            # with:
-            # algorithm='sha256',
-            algorithm=settings.DEFAULT_HASHING_ALGORITHM,
+            algorithm='sha256',
         ).hexdigest()
 
     @classmethod

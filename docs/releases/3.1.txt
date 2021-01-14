@@ -101,17 +101,17 @@ of this release <deprecated-jsonfield>`.
 ``DEFAULT_HASHING_ALGORITHM`` settings
 --------------------------------------
 
-The new :setting:`DEFAULT_HASHING_ALGORITHM` transitional setting allows
-specifying the default hashing algorithm to use for encoding cookies, password
-reset tokens in the admin site, user sessions, and signatures created by
+The new ``DEFAULT_HASHING_ALGORITHM`` transitional setting allows specifying
+the default hashing algorithm to use for encoding cookies, password reset
+tokens in the admin site, user sessions, and signatures created by
 :class:`django.core.signing.Signer` and :meth:`django.core.signing.dumps`.
 
 Support for SHA-256 was added in Django 3.1. If you are upgrading multiple
 instances of the same project to Django 3.1, you should set
-:setting:`DEFAULT_HASHING_ALGORITHM` to ``'sha1'`` during the transition, in
-order to allow compatibility with the older versions of Django. Note that this
-requires Django 3.1.1+. Once the transition to 3.1 is complete you can stop
-overriding :setting:`DEFAULT_HASHING_ALGORITHM`.
+``DEFAULT_HASHING_ALGORITHM`` to ``'sha1'`` during the transition, in order to
+allow compatibility with the older versions of Django. Note that this requires
+Django 3.1.1+. Once the transition to 3.1 is complete you can stop overriding
+``DEFAULT_HASHING_ALGORITHM``.
 
 This setting is deprecated as of this release, because support for tokens,
 cookies, sessions, and signatures that use SHA-1 algorithm will be removed in

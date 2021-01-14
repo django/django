@@ -16,9 +16,7 @@ class PasswordResetTokenGenerator:
 
     def __init__(self):
         self.secret = self.secret or settings.SECRET_KEY
-        # RemovedInDjango40Warning: when the deprecation ends, replace with:
-        # self.algorithm = self.algorithm or 'sha256'
-        self.algorithm = self.algorithm or settings.DEFAULT_HASHING_ALGORITHM
+        self.algorithm = self.algorithm or 'sha256'
 
     def make_token(self, user):
         """

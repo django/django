@@ -1291,25 +1291,6 @@ Default email address to use for various automated correspondence from the
 site manager(s). This doesn't include error messages sent to :setting:`ADMINS`
 and :setting:`MANAGERS`; for that, see :setting:`SERVER_EMAIL`.
 
-.. setting:: DEFAULT_HASHING_ALGORITHM
-
-``DEFAULT_HASHING_ALGORITHM``
------------------------------
-
-Default: ``'sha256'``
-
-Default hashing algorithm to use for encoding cookies, password reset tokens in
-the admin site, user sessions, and signatures created by
-:class:`django.core.signing.Signer` and :meth:`django.core.signing.dumps`.
-Algorithm must be ``'sha1'`` or ``'sha256'``. See
-:ref:`release notes <default-hashing-algorithm-usage>` for usage details.
-
-.. deprecated:: 3.1
-
-    This transitional setting is deprecated. Support for it and tokens,
-    cookies, sessions, and signatures that use SHA-1 hashing algorithm will be
-    removed in Django 4.0.
-
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
 ``DEFAULT_INDEX_TABLESPACE``

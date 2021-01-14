@@ -439,12 +439,6 @@ WSGI_APPLICATION = None
 # you may be opening yourself up to a security risk.
 SECURE_PROXY_SSL_HEADER = None
 
-# Default hashing algorithm to use for encoding cookies, password reset tokens
-# in the admin site, user sessions, and signatures. It's a transitional setting
-# helpful in migrating multiple instance of the same project to Django 3.1+.
-# Algorithm must be 'sha1' or 'sha256'.
-DEFAULT_HASHING_ALGORITHM = 'sha256'
-
 ##############
 # MIDDLEWARE #
 ##############

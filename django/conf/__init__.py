@@ -9,21 +9,13 @@ for a list of all possible variables.
 import importlib
 import os
 import time
-import warnings
 from pathlib import Path
 
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
-
-DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG = (
-    'The DEFAULT_HASHING_ALGORITHM transitional setting is deprecated. '
-    'Support for it and tokens, cookies, sessions, and signatures that use '
-    'SHA-1 hashing algorithm will be removed in Django 4.0.'
-)
 
 
 class SettingsReference(str):
@@ -164,9 +156,6 @@ class Settings:
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
-        if self.is_overridden('DEFAULT_HASHING_ALGORITHM'):
-            warnings.warn(DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG, RemovedInDjango40Warning)
-
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
             # this file, no check happens and it's harmless.
@@ -210,8 +199,6 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        if name == 'DEFAULT_HASHING_ALGORITHM':
-            warnings.warn(DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG, RemovedInDjango40Warning)
         super().__setattr__(name, value)
 
     def __delattr__(self, name):

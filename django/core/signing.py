@@ -129,9 +129,7 @@ class Signer:
                 'only A-z0-9-_=)' % sep,
             )
         self.salt = salt or '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
-        # RemovedInDjango40Warning: when the deprecation ends, replace with:
-        # self.algorithm = algorithm or 'sha256'
-        self.algorithm = algorithm or settings.DEFAULT_HASHING_ALGORITHM
+        self.algorithm = algorithm or 'sha256'
 
     def signature(self, value):
         return base64_hmac(self.salt + 'signer', value, self.key, algorithm=self.algorithm)

@@ -494,8 +494,8 @@ The following checks are run if you use the :option:`check --deploy` option:
 The following checks verify that your security-related settings are correctly
 configured:
 
-* **security.E100**: :setting:`DEFAULT_HASHING_ALGORITHM` must be ``'sha1'`` or
-  ``'sha256'``.
+* **security.E100**: ``DEFAULT_HASHING_ALGORITHM`` must be ``'sha1'`` or
+  ``'sha256'``. *This check appeared in Django 3.1 and 3.2*.
 * **security.E101**: The CSRF failure view ``'path.to.view'`` does not take the
   correct number of arguments.
 * **security.E102**: The CSRF failure view ``'path.to.view'`` could not be

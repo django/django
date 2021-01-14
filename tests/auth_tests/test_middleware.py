@@ -1,10 +1,7 @@
-from django.contrib.auth import HASH_SESSION_KEY
 from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse
-from django.test import TestCase, override_settings
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango40Warning
+from django.test import TestCase
 
 
 class TestAuthenticationMiddleware(TestCase):
@@ -23,12 +20,6 @@ class TestAuthenticationMiddleware(TestCase):
         self.middleware(self.request)
         self.assertIsNotNone(self.request.user)
         self.assertFalse(self.request.user.is_anonymous)
-
-    @ignore_warnings(category=RemovedInDjango40Warning)
-    def test_session_default_hashing_algorithm(self):
-        hash_session = self.client.session[HASH_SESSION_KEY]
-        with override_settings(DEFAULT_HASHING_ALGORITHM='sha1'):
-            self.assertNotEqual(hash_session, self.user.get_session_auth_hash())
 
     def test_changed_password_invalidates_session(self):
         # After password change, user should be anonymous

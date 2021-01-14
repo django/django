@@ -4,8 +4,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.test import TestCase
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango40Warning
 
 from .models import CustomEmailField
 
@@ -113,12 +111,3 @@ class TokenGeneratorTest(TestCase):
         # Tokens created with a different secret don't validate.
         self.assertIs(p0.check_token(user, tk1), False)
         self.assertIs(p1.check_token(user, tk0), False)
-
-    @ignore_warnings(category=RemovedInDjango40Warning)
-    def test_token_default_hashing_algorithm(self):
-        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
-        with self.settings(DEFAULT_HASHING_ALGORITHM='sha1'):
-            generator = PasswordResetTokenGenerator()
-            self.assertEqual(generator.algorithm, 'sha1')
-            token = generator.make_token(user)
-            self.assertIs(generator.check_token(user, token), True)

@@ -9,9 +9,7 @@ from django.contrib.messages.storage.cookie import (
 )
 from django.core.signing import get_cookie_signer
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import ignore_warnings
 from django.utils.crypto import get_random_string
-from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.safestring import SafeData, mark_safe
 
 from .base import BaseTests
@@ -193,14 +191,3 @@ class CookieTests(BaseTests, SimpleTestCase):
         encoded_messages = signer.sign(value)
         decoded_messages = storage._decode(encoded_messages)
         self.assertEqual(messages, decoded_messages)
-
-    @ignore_warnings(category=RemovedInDjango40Warning)
-    def test_default_hashing_algorithm(self):
-        messages = Message(constants.DEBUG, ['this', 'that'])
-        with self.settings(DEFAULT_HASHING_ALGORITHM='sha1'):
-            storage = self.get_storage()
-            encoded = storage._encode(messages)
-            decoded = storage._decode(encoded)
-            self.assertEqual(decoded, messages)
-        storage_default = self.get_storage()
-        self.assertNotEqual(encoded, storage_default._encode(messages))
