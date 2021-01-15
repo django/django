@@ -44,6 +44,7 @@ class Book(models.Model):
 class Author(models.Model):
     name = models.CharField(max_length=50)
     books = models.ManyToManyField(Book)
+    person = models.OneToOneField('Person', models.CASCADE, null=True)
 
 
 class NonAutoPKBook(models.Model):
