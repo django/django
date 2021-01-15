@@ -236,7 +236,9 @@ Features deprecated in 4.0
 Miscellaneous
 -------------
 
-* ...
+* ``normalize_email()`` is now implemented in
+  :class:`~django.contrib.auth.models.AbstractBaseUser` instead of
+  :class:`~django.contrib.auth.models.BaseUserManager`.
 
 Features removed in 4.0
 =======================

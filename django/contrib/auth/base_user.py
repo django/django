@@ -11,7 +11,7 @@ from django.contrib.auth.hashers import (
 )
 from django.db import models
 from django.utils.crypto import get_random_string, salted_hmac
-from django.utils.deprecation import RemovedInDjango41Warning
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.translation import gettext_lazy as _
 
 
@@ -24,8 +24,8 @@ class BaseUserManager(models.Manager):
         """
         warnings.warn(
             'BaseUserManager.normalize_email() is deprecated in favor of '
-            'AbstractBaseUser.normalize_email() and will be removed in Django 4.1.',
-            RemovedInDjango41Warning,
+            'AbstractBaseUser.normalize_email() and will be removed in Django 5.0.',
+            RemovedInDjango50Warning,
             stacklevel=2
         )
         return AbstractBaseUser.normalize_email(email)

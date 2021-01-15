@@ -652,7 +652,7 @@ The following attributes and methods are available on any subclass of
         Normalizes email addresses by lowercasing the domain portion of the
         email address.
 
-        .. versionchanged:: 3.2
+        .. versionchanged:: 4.0
 
             Relocated here from :class:`~django.contrib.auth.models.BaseUserManager`.
 
@@ -775,7 +775,7 @@ utility methods:
         Normalizes email addresses by lowercasing the domain portion of the
         email address.
 
-        .. deprecated:: 3.2
+        .. deprecated:: 4.0
             Custom email normalization methods should override
             :meth:`.AbstractBaseUser.normalize_email` instead.
 

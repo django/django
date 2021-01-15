@@ -10,7 +10,7 @@ from django.core.mail import send_mail
 from django.db import models
 from django.db.models.manager import EmptyManager
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango41Warning
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.translation import gettext_lazy as _
 
 from .validators import UnicodeUsernameValidator
@@ -148,8 +148,8 @@ class UserManager(BaseUserManager):
         else:
             warnings.warn(
                 'BaseUserManager.normalize_email() is deprecated in favor of '
-                'AbstractBaseUser.normalize_email() and will be removed in Django 4.1.',
-                RemovedInDjango41Warning,
+                'AbstractBaseUser.normalize_email() and will be removed in Django 5.0.',
+                RemovedInDjango50Warning,
                 stacklevel=2
             )
             email = self.normalize_email(email)
@@ -385,8 +385,8 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         else:
             warnings.warn(
                 'BaseUserManager.normalize_email() is deprecated in favor of '
-                'AbstractBaseUser.normalize_email() and will be removed in Django 4.1.',
-                RemovedInDjango41Warning,
+                'AbstractBaseUser.normalize_email() and will be removed in Django 5.0.',
+                RemovedInDjango50Warning,
                 stacklevel=2
             )
             self.email = self.__class__.objects.normalize_email(self.email)

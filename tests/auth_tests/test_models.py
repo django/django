@@ -16,7 +16,7 @@ from django.db.models.signals import post_save
 from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, override_settings,
 )
-from django.utils.deprecation import RemovedInDjango41Warning
+from django.utils.deprecation import RemovedInDjango50Warning
 
 from .models import CustomEmailField, IntegerUsernameUser
 from .models.custom_user import CustomEmailNormalization
@@ -193,15 +193,15 @@ class UserManagerTestCase(TransactionTestCase):
     def test_normalize_email_deprecation(self):
         msg = (
             'BaseUserManager.normalize_email() is deprecated in favor of '
-            'AbstractBaseUser.normalize_email() and will be removed in Django 4.1.'
+            'AbstractBaseUser.normalize_email() and will be removed in Django 5.0.'
         )
-        with self.assertWarnsMessage(RemovedInDjango41Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
             new_user = CustomEmailNormalization.objects.create_user(
                 'new_user',
                 email='foo@BAR.com',
                 password='pw'
             )
-        with self.assertWarnsMessage(RemovedInDjango41Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
             new_user.clean()
         # Use overridden method during deprecation (here, doing nothing).
         self.assertEqual(new_user.email, 'foo@BAR.com')
