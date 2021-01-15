@@ -343,9 +343,8 @@ class DecimalField(IntegerField):
             return None
         if self.localize:
             value = formats.sanitize_separators(value)
-        value = str(value).strip()
         try:
-            value = Decimal(value)
+            value = Decimal(str(value))
         except DecimalException:
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         return value
