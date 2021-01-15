@@ -98,10 +98,6 @@ class BrinIndex(PostgresIndex):
             kwargs['pages_per_range'] = self.pages_per_range
         return path, args, kwargs
 
-    def check_supported(self, schema_editor):
-        if self.autosummarize and not schema_editor.connection.features.has_brin_autosummarize:
-            raise NotSupportedError('BRIN option autosummarize requires PostgreSQL 10+.')
-
     def get_with_params(self):
         with_params = []
         if self.autosummarize is not None:

@@ -66,10 +66,10 @@ Managing the database
 ---------------------
 
 To administer the database, you can either use the pgAdmin III program
-(:menuselection:`Start --> PostgreSQL 9.x --> pgAdmin III`) or the
-SQL Shell (:menuselection:`Start --> PostgreSQL 9.x --> SQL Shell`).
-For example, to create a ``geodjango`` spatial database and user, the following
-may be executed from the SQL Shell as the ``postgres`` user::
+(:menuselection:`Start --> PostgreSQL X --> pgAdmin III`) or the SQL Shell
+(:menuselection:`Start --> PostgreSQL X --> SQL Shell`). For example, to create
+a ``geodjango`` spatial database and user, the following may be executed from
+the SQL Shell as the ``postgres`` user::
 
     postgres# CREATE USER geodjango PASSWORD 'my_passwd';
     postgres# CREATE DATABASE geodjango OWNER geodjango;

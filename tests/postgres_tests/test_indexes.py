@@ -345,7 +345,6 @@ class SchemaTests(PostgreSQLTestCase):
             editor.remove_index(CharFieldModel, index)
         self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
 
-    @skipUnlessDBFeature('has_brin_autosummarize')
     def test_brin_parameters(self):
         index_name = 'char_field_brin_params'
         index = BrinIndex(fields=['field'], name=index_name, autosummarize=True)
@@ -356,15 +355,6 @@ class SchemaTests(PostgreSQLTestCase):
         self.assertEqual(constraints[index_name]['options'], ['autosummarize=on'])
         with connection.schema_editor() as editor:
             editor.remove_index(CharFieldModel, index)
-        self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
-
-    def test_brin_autosummarize_not_supported(self):
-        index_name = 'brin_options_exception'
-        index = BrinIndex(fields=['field'], name=index_name, autosummarize=True)
-        with self.assertRaisesMessage(NotSupportedError, 'BRIN option autosummarize requires PostgreSQL 10+.'):
-            with mock.patch('django.db.backends.postgresql.features.DatabaseFeatures.has_brin_autosummarize', False):
-                with connection.schema_editor() as editor:
-                    editor.add_index(CharFieldModel, index)
         self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
 
     def test_btree_index(self):
