@@ -140,7 +140,25 @@
             if ((maxForms.val() === '') || (maxForms.val() - forms.length) > 0) {
                 addButton.parent().show();
             }
-            // Hide the remove buttons if at min_num.
+
+            const isFormNotEnough = function() {
+                const totalFormNum = ~~totalForms.val();
+                const initialFormNum = ~~initialForms.val();
+                const minFormNum = ~~minForms.val();
+                const extraFormNum = ~~extraForms.val();
+
+                const emptyFormNum = totalFormNum - initialFormNum;
+                if (initialFormNum >= emptyFormNum) {
+                    return emptyFormNum < extraFormNum;
+                }
+                return emptyFormNum < extraFormNum + minFormNum - initialFormNum;
+            }
+            // Auto add form when forms are not enough
+            if (isFormNotEnough()) {
+                $('.' + options.addCssClass +' a').click();
+            }
+
+            // Hide the remove buttons if forms overload.
             toggleDeleteButtonVisibility(inlineGroup);
             // Also, update names and ids for all remaining form controls so
             // they remain in sequence:
@@ -155,15 +173,41 @@
         };
 
         const toggleDeleteButtonVisibility = function(inlineGroup) {
-            let limit = minForms.val();
-            if (limit === '0' || limit === '') {
-                limit = extraForms.val();
+            /**
+             * Calculation:
+             *
+             * 1. **extra** form could not be removed.
+             * ref: https://docs.djangoproject.com/en/3.1/intro/tutorial07/
+             *
+             * 2. if a formset contains no data, then extra + min_num empty forms will be displayed.
+             * ref: https://docs.djangoproject.com/en/3.1/topics/forms/formsets/
+             *
+             */
+            const isFormOverload = function() {
+                const totalFormNum = ~~totalForms.val();
+                const initialFormNum = ~~initialForms.val();
+                const minFormNum = ~~minForms.val();
+                const extraFormNum = ~~extraForms.val();
+
+                const emptyFormNum = totalFormNum - initialFormNum;
+                if (initialFormNum >= emptyFormNum) {
+                    return emptyFormNum > extraFormNum;
+                }
+                return emptyFormNum > extraFormNum + minFormNum - initialFormNum;
             }
-            if (totalForms.val() - initialForms.val() > limit) {
+
+            if (isFormOverload()) {
                 inlineGroup.find('.inline-deletelink').show();
             } else {
                 inlineGroup.find('.inline-deletelink').hide();
             }
+
+            // If ValidationError is raised, the form would show "X"
+            $('.inline-related').each(function(_, inline) {
+                if ($(inline).find(".errors").length != 0) {
+                    $(inline).find('.inline-deletelink').show();
+                }
+            });
         };
 
         $this.each(function(i) {
