@@ -152,10 +152,10 @@
                     return emptyFormNum < extraFormNum;
                 }
                 return emptyFormNum < extraFormNum + minFormNum - initialFormNum;
-            }
+            };
             // Auto add form when forms are not enough
             if (isFormNotEnough()) {
-                $('.' + options.addCssClass +' a').click();
+                $('.' + options.addCssClass + ' a').click();
             }
 
             // Hide the remove buttons if forms overload.
@@ -194,7 +194,7 @@
                     return emptyFormNum > extraFormNum;
                 }
                 return emptyFormNum > extraFormNum + minFormNum - initialFormNum;
-            }
+            };
 
             if (isFormOverload()) {
                 inlineGroup.find('.inline-deletelink').show();
@@ -204,7 +204,7 @@
 
             // If ValidationError is raised, the form would show "X"
             $('.inline-related').each(function(_, inline) {
-                if ($(inline).find(".errors").length != 0) {
+                if ($(inline).find('.errors').length !== 0) {
                     $(inline).find('.inline-deletelink').show();
                 }
             });
