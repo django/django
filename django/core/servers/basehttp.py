@@ -117,11 +117,6 @@ class ServerHandler(simple_server.ServerHandler):
         self.get_stdin()._read_limited()
         super().close()
 
-    def handle_error(self):
-        # Ignore broken pipe errors, otherwise pass on
-        if not is_broken_pipe_error():
-            super().handle_error()
-
 
 class WSGIRequestHandler(simple_server.WSGIRequestHandler):
     protocol_version = 'HTTP/1.1'
