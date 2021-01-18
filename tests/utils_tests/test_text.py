@@ -258,3 +258,17 @@ class TestUtilsText(SimpleTestCase):
         )
         with override('fr'):
             self.assertEqual('Ajout de article «\xa0My first try\xa0».', s)
+
+    def test_capfirst(self):
+        self.assertEqual('', text.capfirst(''))
+        self.assertEqual('Ding kai hui', text.capfirst('ding kai hui'))
+        self.assertEqual('DING KAI hui', text.capfirst('DING KAI hui'))
+
+        # Note: `str.capitalize()` doesn't work like `capfirst()`
+        # Ref: https://github.com/django/django/pull/13905
+        self.assertEqual(
+            'ding kai hui'.capitalize(), text.capfirst('ding kai hui'),
+        )
+        self.assertNotEqual(
+            'DING KAI hui'.capitalize(), text.capfirst('DING KAI hui'),
+        )
