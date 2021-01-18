@@ -6,7 +6,9 @@ from admin_scripts.tests import AdminScriptTestCase
 
 from django.conf import settings
 from django.core import mail
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import (
+    DisallowedHost, PermissionDenied, SuspiciousOperation,
+)
 from django.core.files.temp import NamedTemporaryFile
 from django.core.management import color
 from django.http.multipartparser import MultiPartParserError
@@ -498,6 +500,7 @@ class SecurityLoggerTest(LoggingAssertionMixin, SimpleTestCase):
             msg='dubious',
             status_code=400,
             logger='django.security.SuspiciousOperation',
+            exc_class=SuspiciousOperation,
         )
 
     def test_suspicious_operation_uses_sublogger(self):
@@ -507,6 +510,7 @@ class SecurityLoggerTest(LoggingAssertionMixin, SimpleTestCase):
             msg='dubious',
             status_code=400,
             logger='django.security.DisallowedHost',
+            exc_class=DisallowedHost,
         )
 
     @override_settings(
@@ -516,7 +520,7 @@ class SecurityLoggerTest(LoggingAssertionMixin, SimpleTestCase):
     def test_suspicious_email_admins(self):
         self.client.get('/suspicious/')
         self.assertEqual(len(mail.outbox), 1)
-        self.assertIn('Report at /suspicious/', mail.outbox[0].body)
+        self.assertIn('SuspiciousOperation at /suspicious/', mail.outbox[0].body)
 
 
 class SettingsCustomLoggingTest(AdminScriptTestCase):
