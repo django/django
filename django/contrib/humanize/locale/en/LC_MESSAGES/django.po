@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"POT-Creation-Date: 2021-04-07 14:40+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -283,48 +283,48 @@ msgstr ""
 #: contrib/humanize/templatetags/humanize.py:205
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d year"
-msgid_plural "%d years"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
 msgstr[0] ""
 msgstr[1] ""
 
 #: contrib/humanize/templatetags/humanize.py:206
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d month"
-msgid_plural "%d months"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
 msgstr[0] ""
 msgstr[1] ""
 
 #: contrib/humanize/templatetags/humanize.py:207
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d week"
-msgid_plural "%d weeks"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
 msgstr[0] ""
 msgstr[1] ""
 
 #: contrib/humanize/templatetags/humanize.py:208
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d day"
-msgid_plural "%d days"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
 msgstr[0] ""
 msgstr[1] ""
 
 #: contrib/humanize/templatetags/humanize.py:209
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d hour"
-msgid_plural "%d hours"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
 msgstr[0] ""
 msgstr[1] ""
 
 #: contrib/humanize/templatetags/humanize.py:210
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d minute"
-msgid_plural "%d minutes"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -332,47 +332,47 @@ msgstr[1] ""
 #: contrib/humanize/templatetags/humanize.py:214
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d year"
-msgid_plural "%d years"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
 msgstr[0] ""
 msgstr[1] ""
 
 #: contrib/humanize/templatetags/humanize.py:215
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d month"
-msgid_plural "%d months"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
 msgstr[0] ""
 msgstr[1] ""
 
 #: contrib/humanize/templatetags/humanize.py:216
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d week"
-msgid_plural "%d weeks"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
 msgstr[0] ""
 msgstr[1] ""
 
 #: contrib/humanize/templatetags/humanize.py:217
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d day"
-msgid_plural "%d days"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
 msgstr[0] ""
 msgstr[1] ""
 
 #: contrib/humanize/templatetags/humanize.py:218
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d hour"
-msgid_plural "%d hours"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
 msgstr[0] ""
 msgstr[1] ""
 
 #: contrib/humanize/templatetags/humanize.py:219
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d minute"
-msgid_plural "%d minutes"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
 msgstr[0] ""
 msgstr[1] ""

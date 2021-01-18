@@ -6,12 +6,12 @@ from django.utils.timezone import is_aware, utc
 from django.utils.translation import gettext, ngettext_lazy
 
 TIME_STRINGS = {
-    'year': ngettext_lazy('%d year', '%d years'),
-    'month': ngettext_lazy('%d month', '%d months'),
-    'week': ngettext_lazy('%d week', '%d weeks'),
-    'day': ngettext_lazy('%d day', '%d days'),
-    'hour': ngettext_lazy('%d hour', '%d hours'),
-    'minute': ngettext_lazy('%d minute', '%d minutes'),
+    'year': ngettext_lazy('%(num)d year', '%(num)d years', 'num'),
+    'month': ngettext_lazy('%(num)d month', '%(num)d months', 'num'),
+    'week': ngettext_lazy('%(num)d week', '%(num)d weeks', 'num'),
+    'day': ngettext_lazy('%(num)d day', '%(num)d days', 'num'),
+    'hour': ngettext_lazy('%(num)d hour', '%(num)d hours', 'num'),
+    'minute': ngettext_lazy('%(num)d minute', '%(num)d minutes', 'num'),
 }
 
 TIMESINCE_CHUNKS = (
@@ -73,13 +73,13 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
     since = delta.days * 24 * 60 * 60 + delta.seconds
     if since <= 0:
         # d is in the future compared to now, stop processing.
-        return avoid_wrapping(time_strings['minute'] % 0)
+        return avoid_wrapping(time_strings['minute'] % {'num': 0})
     for i, (seconds, name) in enumerate(TIMESINCE_CHUNKS):
         count = since // seconds
         if count != 0:
             break
     else:
-        return avoid_wrapping(time_strings['minute'] % 0)
+        return avoid_wrapping(time_strings['minute'] % {'num': 0})
     result = []
     current_depth = 0
     while i < len(TIMESINCE_CHUNKS) and current_depth < depth:
@@ -87,7 +87,7 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
         count = since // seconds
         if count == 0:
             break
-        result.append(avoid_wrapping(time_strings[name] % count))
+        result.append(avoid_wrapping(time_strings[name] % {'num': count}))
         since -= seconds * count
         current_depth += 1
         i += 1

@@ -77,7 +77,12 @@ class TimesinceTests(TestCase):
 
     def test_second_before_equal_first_humanize_time_strings(self):
         time_strings = {
-            'minute': npgettext_lazy('naturaltime-future', '%d minute', '%d minutes'),
+            'minute': npgettext_lazy(
+                'naturaltime-future',
+                '%(num)d minute',
+                '%(num)d minutes',
+                'num',
+            ),
         }
         with translation.override('cs'):
             for now in [self.t, self.t - self.onemicrosecond, self.t - self.oneday]:
