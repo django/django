@@ -98,8 +98,11 @@ class TestIterModulesAndFiles(SimpleTestCase):
         filename = self.temporary_file('test_exception.py')
         filename.write_text('raise Exception')
         with extend_sys_path(str(filename.parent)):
-            with self.assertRaises(Exception):
-                autoreload.check_errors(import_module)('test_exception')
+            try:
+                with self.assertRaises(Exception):
+                    autoreload.check_errors(import_module)('test_exception')
+            finally:
+                autoreload._exception = None
         self.assertFileFound(filename)
 
     def test_zip_reload(self):
