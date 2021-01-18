@@ -236,6 +236,11 @@ Management Commands
 
 * On PostgreSQL, :djadmin:`dbshell` now supports specifying a password file.
 
+* The :djadmin:`shell` command now respects :py:data:`sys.__interactivehook__`
+  at startup. This allows loading shell history between interactive sessions.
+  As a consequence, ``readline`` is no longer loaded if running in *isolated*
+  mode.
+
 Migrations
 ~~~~~~~~~~
 
