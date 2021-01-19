@@ -7,6 +7,14 @@ from urllib.parse import parse_qsl, urljoin, urlparse
 
 import pytz
 
+try:
+    import zoneinfo
+except ImportError:
+    try:
+        from backports import zoneinfo
+    except ImportError:
+        zoneinfo = None
+
 from django.contrib import admin
 from django.contrib.admin import AdminSite, ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
@@ -61,6 +69,14 @@ ERROR_MESSAGE = "Please enter the correct username and password \
 for a staff account. Note that both fields may be case-sensitive."
 
 MULTIPART_ENCTYPE = 'enctype="multipart/form-data"'
+
+
+def make_aware_datetimes(dt, iana_key):
+    """Makes one aware datetime for each supported time zone provider."""
+    yield pytz.timezone(iana_key).localize(dt, is_dst=None)
+
+    if zoneinfo is not None:
+        yield dt.replace(tzinfo=zoneinfo.ZoneInfo(iana_key))
 
 
 class AdminFieldExtractionMixin:
@@ -995,24 +1011,26 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
     @override_settings(TIME_ZONE='America/Sao_Paulo', USE_TZ=True)
     def test_date_hierarchy_timezone_dst(self):
         # This datetime doesn't exist in this timezone due to DST.
-        date = pytz.timezone('America/Sao_Paulo').localize(datetime.datetime(2016, 10, 16, 15), is_dst=None)
-        q = Question.objects.create(question='Why?', expires=date)
-        Answer2.objects.create(question=q, answer='Because.')
-        response = self.client.get(reverse('admin:admin_views_answer2_changelist'))
-        self.assertContains(response, 'question__expires__day=16')
-        self.assertContains(response, 'question__expires__month=10')
-        self.assertContains(response, 'question__expires__year=2016')
+        for date in make_aware_datetimes(datetime.datetime(2016, 10, 16, 15), 'America/Sao_Paulo'):
+            with self.subTest(repr(date.tzinfo)):
+                q = Question.objects.create(question='Why?', expires=date)
+                Answer2.objects.create(question=q, answer='Because.')
+                response = self.client.get(reverse('admin:admin_views_answer2_changelist'))
+                self.assertContains(response, 'question__expires__day=16')
+                self.assertContains(response, 'question__expires__month=10')
+                self.assertContains(response, 'question__expires__year=2016')
 
     @override_settings(TIME_ZONE='America/Los_Angeles', USE_TZ=True)
     def test_date_hierarchy_local_date_differ_from_utc(self):
         # This datetime is 2017-01-01 in UTC.
-        date = pytz.timezone('America/Los_Angeles').localize(datetime.datetime(2016, 12, 31, 16))
-        q = Question.objects.create(question='Why?', expires=date)
-        Answer2.objects.create(question=q, answer='Because.')
-        response = self.client.get(reverse('admin:admin_views_answer2_changelist'))
-        self.assertContains(response, 'question__expires__day=31')
-        self.assertContains(response, 'question__expires__month=12')
-        self.assertContains(response, 'question__expires__year=2016')
+        for date in make_aware_datetimes(datetime.datetime(2016, 12, 31, 16), 'America/Los_Angeles'):
+            with self.subTest(repr(date.tzinfo)):
+                q = Question.objects.create(question='Why?', expires=date)
+                Answer2.objects.create(question=q, answer='Because.')
+                response = self.client.get(reverse('admin:admin_views_answer2_changelist'))
+                self.assertContains(response, 'question__expires__day=31')
+                self.assertContains(response, 'question__expires__month=12')
+                self.assertContains(response, 'question__expires__year=2016')
 
     def test_sortable_by_columns_subset(self):
         expected_sortable_fields = ('date', 'callable_year')
