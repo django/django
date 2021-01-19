@@ -7,6 +7,14 @@ from xml.dom.minidom import parseString
 
 import pytz
 
+try:
+    import zoneinfo
+except ImportError:
+    try:
+        from backports import zoneinfo
+    except ImportError:
+        zoneinfo = None
+
 from django.contrib.auth.models import User
 from django.core import serializers
 from django.db import connection
@@ -50,6 +58,14 @@ except ImportError:
 UTC = timezone.utc
 EAT = timezone.get_fixed_timezone(180)      # Africa/Nairobi
 ICT = timezone.get_fixed_timezone(420)      # Asia/Bangkok
+
+ZONE_CONSTRUCTORS = (pytz.timezone,)
+if zoneinfo is not None:
+    ZONE_CONSTRUCTORS += (zoneinfo.ZoneInfo,)
+
+
+def get_timezones(key):
+    return [constructor(key) for constructor in ZONE_CONSTRUCTORS]
 
 
 @contextmanager
@@ -326,16 +342,17 @@ class NewDatabaseTests(TestCase):
         self.assertEqual(Event.objects.filter(dt__gt=dt2).count(), 0)
 
     def test_query_filter_with_pytz_timezones(self):
-        tz = pytz.timezone('Europe/Paris')
-        dt = datetime.datetime(2011, 9, 1, 12, 20, 30, tzinfo=tz)
-        Event.objects.create(dt=dt)
-        next = dt + datetime.timedelta(seconds=3)
-        prev = dt - datetime.timedelta(seconds=3)
-        self.assertEqual(Event.objects.filter(dt__exact=dt).count(), 1)
-        self.assertEqual(Event.objects.filter(dt__exact=next).count(), 0)
-        self.assertEqual(Event.objects.filter(dt__in=(prev, next)).count(), 0)
-        self.assertEqual(Event.objects.filter(dt__in=(prev, dt, next)).count(), 1)
-        self.assertEqual(Event.objects.filter(dt__range=(prev, next)).count(), 1)
+        for tz in get_timezones('Europe/Paris'):
+            with self.subTest(repr(tz)):
+                dt = datetime.datetime(2011, 9, 1, 12, 20, 30, tzinfo=tz)
+                Event.objects.create(dt=dt)
+                next = dt + datetime.timedelta(seconds=3)
+                prev = dt - datetime.timedelta(seconds=3)
+                self.assertEqual(Event.objects.filter(dt__exact=dt).count(), 1)
+                self.assertEqual(Event.objects.filter(dt__exact=next).count(), 0)
+                self.assertEqual(Event.objects.filter(dt__in=(prev, next)).count(), 0)
+                self.assertEqual(Event.objects.filter(dt__in=(prev, dt, next)).count(), 1)
+                self.assertEqual(Event.objects.filter(dt__range=(prev, next)).count(), 1)
 
     def test_query_convert_timezones(self):
         # Connection timezone is equal to the current timezone, datetime
@@ -543,7 +560,7 @@ class NewDatabaseTests(TestCase):
             with connection.cursor() as cursor:
                 cursor.execute('SELECT CURRENT_TIMESTAMP')
                 now = cursor.fetchone()[0]
-                self.assertEqual(now.tzinfo.zone, 'Europe/Paris')
+                self.assertEqual(str(now.tzinfo), 'Europe/Paris')
 
     @requires_tz_support
     def test_filter_date_field_with_aware_datetime(self):
@@ -871,32 +888,26 @@ class TemplateTests(SimpleTestCase):
                     expected = results[k1][k2]
                     self.assertEqual(actual, expected, '%s / %s: %r != %r' % (k1, k2, actual, expected))
 
-    def test_localtime_filters_with_pytz(self):
+    def test_localtime_filters_with_iana(self):
         """
-        Test the |localtime, |utc, and |timezone filters with pytz.
+        Test the |localtime, |utc, and |timezone filters with iana zones.
         """
-        # Use a pytz timezone as local time
+        # Use an IANA timezone as local time
         tpl = Template("{% load tz %}{{ dt|localtime }}|{{ dt|utc }}")
         ctx = Context({'dt': datetime.datetime(2011, 9, 1, 12, 20, 30)})
 
         with self.settings(TIME_ZONE='Europe/Paris'):
             self.assertEqual(tpl.render(ctx), "2011-09-01T12:20:30+02:00|2011-09-01T10:20:30+00:00")
 
-        # Use a pytz timezone as argument
-        tpl = Template("{% load tz %}{{ dt|timezone:tz }}")
-        ctx = Context({
-            'dt': datetime.datetime(2011, 9, 1, 13, 20, 30),
-            'tz': pytz.timezone('Europe/Paris'),
-        })
-        self.assertEqual(tpl.render(ctx), "2011-09-01T12:20:30+02:00")
-
-        # Use a pytz timezone name as argument
-        tpl = Template("{% load tz %}{{ dt|timezone:'Europe/Paris' }}")
-        ctx = Context({
-            'dt': datetime.datetime(2011, 9, 1, 13, 20, 30),
-            'tz': pytz.timezone('Europe/Paris'),
-        })
-        self.assertEqual(tpl.render(ctx), "2011-09-01T12:20:30+02:00")
+        # Use an IANA timezone as argument
+        for tz in get_timezones('Europe/Paris'):
+            with self.subTest(repr(tz)):
+                tpl = Template("{% load tz %}{{ dt|timezone:tz }}")
+                ctx = Context({
+                    'dt': datetime.datetime(2011, 9, 1, 13, 20, 30),
+                    'tz': pytz.timezone('Europe/Paris'),
+                })
+                self.assertEqual(tpl.render(ctx), "2011-09-01T12:20:30+02:00")
 
     def test_localtime_templatetag_invalid_argument(self):
         with self.assertRaises(TemplateSyntaxError):
@@ -945,20 +956,22 @@ class TemplateTests(SimpleTestCase):
             "2011-09-01T13:20:30+03:00|2011-09-01T17:20:30+07:00|2011-09-01T13:20:30+03:00"
         )
 
-    def test_timezone_templatetag_with_pytz(self):
+    def test_timezone_templatetag_with_iana(self):
         """
-        Test the {% timezone %} templatetag with pytz.
+        Test the {% timezone %} templatetag with IANA time zone providers.
         """
         tpl = Template("{% load tz %}{% timezone tz %}{{ dt }}{% endtimezone %}")
 
-        # Use a pytz timezone as argument
-        ctx = Context({
-            'dt': datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT),
-            'tz': pytz.timezone('Europe/Paris'),
-        })
-        self.assertEqual(tpl.render(ctx), "2011-09-01T12:20:30+02:00")
+        # Use a IANA timezone as argument
+        for tz in get_timezones('Europe/Paris'):
+            with self.subTest(repr(tz)):
+                ctx = Context({
+                    'dt': datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT),
+                    'tz': tz,
+                })
+                self.assertEqual(tpl.render(ctx), "2011-09-01T12:20:30+02:00")
 
-        # Use a pytz timezone name as argument
+        # Use a IANA timezone name as argument
         ctx = Context({
             'dt': datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT),
             'tz': 'Europe/Paris',
@@ -991,13 +1004,15 @@ class TemplateTests(SimpleTestCase):
         with timezone.override(UTC):
             self.assertEqual(tpl.render(Context({'tz': ICT})), "+0700")
 
-    def test_get_current_timezone_templatetag_with_pytz(self):
+    def test_get_current_timezone_templatetag_with_iana(self):
         """
         Test the {% get_current_timezone %} templatetag with pytz.
         """
         tpl = Template("{% load tz %}{% get_current_timezone as time_zone %}{{ time_zone }}")
-        with timezone.override(pytz.timezone('Europe/Paris')):
-            self.assertEqual(tpl.render(Context()), "Europe/Paris")
+        for tz in get_timezones('Europe/Paris'):
+            with self.subTest(repr(tz)):
+                with timezone.override(tz):
+                    self.assertEqual(tpl.render(Context()), "Europe/Paris")
 
         tpl = Template(
             "{% load tz %}{% timezone 'Europe/Paris' %}"
@@ -1059,17 +1074,21 @@ class LegacyFormsTests(TestCase):
 
     def test_form_with_non_existent_time(self):
         form = EventForm({'dt': '2011-03-27 02:30:00'})
-        with timezone.override(pytz.timezone('Europe/Paris')):
-            # This is a bug.
-            self.assertTrue(form.is_valid())
-            self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 3, 27, 2, 30, 0))
+        for tz in get_timezones('Europe/Paris'):
+            with self.subTest(repr(tz)):
+                with timezone.override(tz):
+                    # This is a bug.
+                    self.assertTrue(form.is_valid())
+                    self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 3, 27, 2, 30, 0))
 
     def test_form_with_ambiguous_time(self):
         form = EventForm({'dt': '2011-10-30 02:30:00'})
-        with timezone.override(pytz.timezone('Europe/Paris')):
-            # This is a bug.
-            self.assertTrue(form.is_valid())
-            self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 10, 30, 2, 30, 0))
+        for tz in get_timezones('Europe/Paris'):
+            with self.subTest(repr(tz)):
+                with timezone.override(tz):
+                    # This is a bug.
+                    self.assertTrue(form.is_valid())
+                    self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 10, 30, 2, 30, 0))
 
     def test_split_form(self):
         form = EventSplitForm({'dt_0': '2011-09-01', 'dt_1': '13:20:30'})
@@ -1098,26 +1117,30 @@ class NewFormsTests(TestCase):
             self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
 
     def test_form_with_non_existent_time(self):
-        with timezone.override(pytz.timezone('Europe/Paris')):
-            form = EventForm({'dt': '2011-03-27 02:30:00'})
-            self.assertFalse(form.is_valid())
-            self.assertEqual(
-                form.errors['dt'], [
-                    '2011-03-27 02:30:00 couldn’t be interpreted in time zone '
-                    'Europe/Paris; it may be ambiguous or it may not exist.'
-                ]
-            )
+        for tz in get_timezones('Europe/Paris'):
+            with self.subTest(repr(tz)):
+                with timezone.override(tz):
+                    form = EventForm({'dt': '2011-03-27 02:30:00'})
+                    self.assertFalse(form.is_valid())
+                    self.assertEqual(
+                        form.errors['dt'], [
+                            '2011-03-27 02:30:00 couldn’t be interpreted in time zone '
+                            'Europe/Paris; it may be ambiguous or it may not exist.'
+                        ]
+                    )
 
     def test_form_with_ambiguous_time(self):
-        with timezone.override(pytz.timezone('Europe/Paris')):
-            form = EventForm({'dt': '2011-10-30 02:30:00'})
-            self.assertFalse(form.is_valid())
-            self.assertEqual(
-                form.errors['dt'], [
-                    '2011-10-30 02:30:00 couldn’t be interpreted in time zone '
-                    'Europe/Paris; it may be ambiguous or it may not exist.'
-                ]
-            )
+        for tz in get_timezones('Europe/Paris'):
+            with self.subTest(repr(tz)):
+                with timezone.override(tz):
+                    form = EventForm({'dt': '2011-10-30 02:30:00'})
+                    self.assertFalse(form.is_valid())
+                    self.assertEqual(
+                        form.errors['dt'], [
+                            '2011-10-30 02:30:00 couldn’t be interpreted in time zone '
+                            'Europe/Paris; it may be ambiguous or it may not exist.'
+                        ]
+                    )
 
     @requires_tz_support
     def test_split_form(self):
