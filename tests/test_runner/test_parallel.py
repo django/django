@@ -2,7 +2,6 @@ import unittest
 
 from django.test import SimpleTestCase
 from django.test.runner import RemoteTestResult
-from django.utils.version import PY37
 
 try:
     import tblib
@@ -80,8 +79,7 @@ class RemoteTestResultTest(SimpleTestCase):
         event = events[1]
         self.assertEqual(event[0], 'addSubTest')
         self.assertEqual(str(event[2]), 'dummy_test (test_runner.test_parallel.SampleFailingSubtest) (index=0)')
-        trailing_comma = '' if PY37 else ','
-        self.assertEqual(repr(event[3][1]), "AssertionError('0 != 1'%s)" % trailing_comma)
+        self.assertEqual(repr(event[3][1]), "AssertionError('0 != 1')")
 
         event = events[2]
-        self.assertEqual(repr(event[3][1]), "AssertionError('2 != 1'%s)" % trailing_comma)
+        self.assertEqual(repr(event[3][1]), "AssertionError('2 != 1')")

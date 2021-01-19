@@ -1507,10 +1507,6 @@ May be specified multiple times and combined with :option:`test --tag`.
 Runs test methods and classes matching test name patterns, in the same way as
 :option:`unittest's -k option<unittest.-k>`. Can be specified multiple times.
 
-.. admonition:: Python 3.7 and later
-
-    This feature is only available for Python 3.7 and later.
-
 .. django-admin-option:: --pdb
 
 Spawns a ``pdb`` debugger at each test error or failure. If you have it

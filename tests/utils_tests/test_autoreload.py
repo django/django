@@ -195,10 +195,10 @@ class TestChildArguments(SimpleTestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             exe_path = Path(tmpdir) / 'django-admin.exe'
             exe_path.touch()
-            with mock.patch('sys.argv', [str(exe_path.with_suffix('')), 'runserver']):
+            with mock.patch('sys.argv', [exe_path.with_suffix(''), 'runserver']):
                 self.assertEqual(
                     autoreload.get_child_arguments(),
-                    [str(exe_path), 'runserver']
+                    [exe_path, 'runserver']
                 )
 
     @mock.patch('sys.warnoptions', [])
@@ -206,10 +206,10 @@ class TestChildArguments(SimpleTestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             script_path = Path(tmpdir) / 'django-admin-script.py'
             script_path.touch()
-            with mock.patch('sys.argv', [str(script_path.with_name('django-admin')), 'runserver']):
+            with mock.patch('sys.argv', [script_path.with_name('django-admin'), 'runserver']):
                 self.assertEqual(
                     autoreload.get_child_arguments(),
-                    [sys.executable, str(script_path), 'runserver']
+                    [sys.executable, script_path, 'runserver']
                 )
 
     @mock.patch('sys.argv', ['does-not-exist', 'runserver'])
