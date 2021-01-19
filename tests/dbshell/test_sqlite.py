@@ -13,7 +13,7 @@ class SqliteDbshellCommandTestCase(SimpleTestCase):
     def test_path_name(self):
         self.assertEqual(
             self.settings_to_cmd_args_env({'NAME': Path('test.db.sqlite3')}),
-            (['sqlite3', 'test.db.sqlite3'], None),
+            (['sqlite3', Path('test.db.sqlite3')], None),
         )
 
     def test_parameters(self):

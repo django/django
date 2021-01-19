@@ -7,7 +7,7 @@ from django.test import SimpleTestCase
 from django.utils.datastructures import MultiValueDict
 from django.utils.http import (
     base36_to_int, escape_leading_slashes, http_date, int_to_base36,
-    is_same_domain, parse_etags, parse_http_date, parse_qsl, quote_etag,
+    is_same_domain, parse_etags, parse_http_date, quote_etag,
     url_has_allowed_host_and_scheme, urlencode, urlsafe_base64_decode,
     urlsafe_base64_encode,
 )
@@ -331,68 +331,3 @@ class EscapeLeadingSlashesTests(unittest.TestCase):
         for url, expected in tests:
             with self.subTest(url=url):
                 self.assertEqual(escape_leading_slashes(url), expected)
-
-
-# TODO: Remove when dropping support for PY37. Backport of unit tests for
-# urllib.parse.parse_qsl() from Python 3.8. Copyright (C) 2020 Python Software
-# Foundation (see LICENSE.python).
-class ParseQSLBackportTests(unittest.TestCase):
-    def test_parse_qsl(self):
-        tests = [
-            ('', []),
-            ('&', []),
-            ('&&', []),
-            ('=', [('', '')]),
-            ('=a', [('', 'a')]),
-            ('a', [('a', '')]),
-            ('a=', [('a', '')]),
-            ('&a=b', [('a', 'b')]),
-            ('a=a+b&b=b+c', [('a', 'a b'), ('b', 'b c')]),
-            ('a=1&a=2', [('a', '1'), ('a', '2')]),
-            (b'', []),
-            (b'&', []),
-            (b'&&', []),
-            (b'=', [(b'', b'')]),
-            (b'=a', [(b'', b'a')]),
-            (b'a', [(b'a', b'')]),
-            (b'a=', [(b'a', b'')]),
-            (b'&a=b', [(b'a', b'b')]),
-            (b'a=a+b&b=b+c', [(b'a', b'a b'), (b'b', b'b c')]),
-            (b'a=1&a=2', [(b'a', b'1'), (b'a', b'2')]),
-            (';', []),
-            (';;', []),
-            (';a=b', [('a', 'b')]),
-            ('a=a+b;b=b+c', [('a', 'a b'), ('b', 'b c')]),
-            ('a=1;a=2', [('a', '1'), ('a', '2')]),
-            (b';', []),
-            (b';;', []),
-            (b';a=b', [(b'a', b'b')]),
-            (b'a=a+b;b=b+c', [(b'a', b'a b'), (b'b', b'b c')]),
-            (b'a=1;a=2', [(b'a', b'1'), (b'a', b'2')]),
-        ]
-        for original, expected in tests:
-            with self.subTest(original):
-                result = parse_qsl(original, keep_blank_values=True)
-                self.assertEqual(result, expected, 'Error parsing %r' % original)
-                expect_without_blanks = [v for v in expected if len(v[1])]
-                result = parse_qsl(original, keep_blank_values=False)
-                self.assertEqual(result, expect_without_blanks, 'Error parsing %r' % original)
-
-    def test_parse_qsl_encoding(self):
-        result = parse_qsl('key=\u0141%E9', encoding='latin-1')
-        self.assertEqual(result, [('key', '\u0141\xE9')])
-        result = parse_qsl('key=\u0141%C3%A9', encoding='utf-8')
-        self.assertEqual(result, [('key', '\u0141\xE9')])
-        result = parse_qsl('key=\u0141%C3%A9', encoding='ascii')
-        self.assertEqual(result, [('key', '\u0141\ufffd\ufffd')])
-        result = parse_qsl('key=\u0141%E9-', encoding='ascii')
-        self.assertEqual(result, [('key', '\u0141\ufffd-')])
-        result = parse_qsl('key=\u0141%E9-', encoding='ascii', errors='ignore')
-        self.assertEqual(result, [('key', '\u0141-')])
-
-    def test_parse_qsl_max_num_fields(self):
-        with self.assertRaises(ValueError):
-            parse_qsl('&'.join(['a=a'] * 11), max_num_fields=10)
-        with self.assertRaises(ValueError):
-            parse_qsl(';'.join(['a=a'] * 11), max_num_fields=10)
-        parse_qsl('&'.join(['a=a'] * 10), max_num_fields=10)

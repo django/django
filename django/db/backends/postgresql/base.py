@@ -261,12 +261,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # For now, it's here so that every use of "threading" is
         # also async-compatible.
         try:
-            if hasattr(asyncio, 'current_task'):
-                # Python 3.7 and up
-                current_task = asyncio.current_task()
-            else:
-                # Python 3.6
-                current_task = asyncio.Task.current_task()
+            current_task = asyncio.current_task()
         except RuntimeError:
             current_task = None
         # Current task can be none even if the current_task call didn't error

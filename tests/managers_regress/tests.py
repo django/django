@@ -1,10 +1,7 @@
-from unittest import skipUnless
-
 from django.db import models
 from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import isolate_apps
-from django.utils.version import PY37
 
 from .models import (
     AbstractBase1, AbstractBase2, AbstractBase3, Child1, Child2, Child3,
@@ -287,6 +284,5 @@ class TestManagerInheritance(SimpleTestCase):
         self.assertEqual(TestModel._meta.managers, (TestModel.custom_manager,))
         self.assertEqual(TestModel._meta.managers_map, {'custom_manager': TestModel.custom_manager})
 
-    @skipUnless(PY37, '__class_getitem__() was added in Python 3.7')
     def test_manager_class_getitem(self):
         self.assertIs(models.Manager[Child1], models.Manager)

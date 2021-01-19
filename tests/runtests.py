@@ -28,7 +28,6 @@ else:
         RemovedInDjango41Warning, RemovedInDjango50Warning,
     )
     from django.utils.log import DEFAULT_LOGGING
-    from django.utils.version import PY37
 
 try:
     import MySQLdb
@@ -521,14 +520,13 @@ if __name__ == "__main__":
         '--timing', action='store_true',
         help='Output timings, including database set up and total run time.',
     )
-    if PY37:
-        parser.add_argument(
-            '-k', dest='test_name_patterns', action='append',
-            help=(
-                'Only run test methods and classes matching test name pattern. '
-                'Same as unittest -k option. Can be used multiple times.'
-            ),
-        )
+    parser.add_argument(
+        '-k', dest='test_name_patterns', action='append',
+        help=(
+            'Only run test methods and classes matching test name pattern. '
+            'Same as unittest -k option. Can be used multiple times.'
+        ),
+    )
 
     options = parser.parse_args()
 

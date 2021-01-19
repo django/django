@@ -21,6 +21,8 @@ Python compatibility
 Django 4.0 supports Python 3.8, 3.9, and 3.10. We **highly recommend** and only
 officially support the latest release of each series.
 
+The Django 3.2.x series is the last to support Python 3.6 and 3.7.
+
 .. _whats-new-4.0:
 
 What's new in Django 4.0

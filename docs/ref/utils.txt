@@ -493,9 +493,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
     expensive ``get_friends()`` method and wanted to allow calling it without
     retrieving the cached value, you could write::
 
-        friends = cached_property(get_friends, name='friends')
-
-    You only need the ``name`` argument for Python < 3.6 support.
+        friends = cached_property(get_friends)
 
     While ``person.get_friends()`` will recompute the friends on each call, the
     value of the cached property will persist until you delete it as described
