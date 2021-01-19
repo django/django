@@ -90,7 +90,7 @@
     text-indent: -3000px;
     overflow: hidden;
     cursor: default;
-    opacity: 0.3;
+    opacity: 0.55;
 }
 
 .active.selector-add, .active.selector-remove {
@@ -127,7 +127,7 @@ a.selector-chooseall, a.selector-clearall {
     line-height: 16px;
     color: var(--body-quiet-color);
     text-decoration: none;
-    opacity: 0.3;
+    opacity: 0.55;
 }
 
 a.active.selector-chooseall:focus, a.active.selector-clearall:focus,
@@ -268,7 +268,7 @@ p.datetime {
     white-space: nowrap;
     font-weight: normal;
     font-size: 11px;
-    color: var(--border-color);
+    color: var(--body-quiet-color);
 }
 
 .datetime input, .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {

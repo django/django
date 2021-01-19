@@ -313,7 +313,6 @@
 #changelist .actions select {
     vertical-align: top;
     height: 24px;
-    background: none;
     color: var(--body-fg);
     border: 1px solid var(--border-color);
     border-radius: 4px;
