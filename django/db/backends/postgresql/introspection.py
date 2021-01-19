@@ -48,13 +48,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """Return a list of table and view names in the current database."""
         cursor.execute("""
             SELECT c.relname,
-            CASE WHEN {} THEN 'p' WHEN c.relkind IN ('m', 'v') THEN 'v' ELSE 't' END
+            CASE WHEN c.relispartition THEN 'p' WHEN c.relkind IN ('m', 'v') THEN 'v' ELSE 't' END
             FROM pg_catalog.pg_class c
             LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
             WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
                 AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
                 AND pg_catalog.pg_table_is_visible(c.oid)
-        """.format('c.relispartition' if self.connection.features.supports_table_partitions else 'FALSE'))
+        """)
         return [TableInfo(*row) for row in cursor.fetchall() if row[0] not in self.ignored_tables]
 
     def get_table_description(self, cursor, table_name):

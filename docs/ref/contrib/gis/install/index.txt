@@ -58,7 +58,7 @@ supported versions, and any notes for each of the supported database backends:
 ==================  ==============================  ==================  =========================================
 Database            Library Requirements            Supported Versions  Notes
 ==================  ==============================  ==================  =========================================
-PostgreSQL          GEOS, GDAL, PROJ, PostGIS       9.6+                Requires PostGIS.
+PostgreSQL          GEOS, GDAL, PROJ, PostGIS       10+                 Requires PostGIS.
 MySQL               GEOS, GDAL                      5.7+                :ref:`Limited functionality <mysql-spatial-limitations>`.
 Oracle              GEOS, GDAL                      12.2+               XE not supported.
 SQLite              GEOS, GDAL, PROJ, SpatiaLite    3.9.0+              Requires SpatiaLite 4.3+
@@ -347,11 +347,11 @@ running macOS.  Because MacPorts still builds the software from source,
 
 Summary::
 
-    $ sudo port install postgresql93-server
+    $ sudo port install postgresql13-server
     $ sudo port install geos
-    $ sudo port install proj
-    $ sudo port install postgis
-    $ sudo port install gdal +geos
+    $ sudo port install proj6
+    $ sudo port install postgis3
+    $ sudo port install gdal
     $ sudo port install libgeoip
 
 .. note::
@@ -359,12 +359,12 @@ Summary::
     You will also have to modify the ``PATH`` in your ``.profile`` so
     that the MacPorts programs are accessible from the command-line::
 
-        export PATH=/opt/local/bin:/opt/local/lib/postgresql93/bin
+        export PATH=/opt/local/bin:/opt/local/lib/postgresql13/bin
 
     In addition, add the ``DYLD_FALLBACK_LIBRARY_PATH`` setting so that
     the libraries can be found by Python::
 
-        export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql93
+        export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql13
 
 __ https://www.macports.org/
 

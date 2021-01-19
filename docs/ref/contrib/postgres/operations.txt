@@ -159,8 +159,6 @@ For example, to create a collation for German phone book ordering::
 
 .. admonition:: Restrictions
 
-    PostgreSQL 9.6 only supports the ``'libc'`` provider.
-
     Non-deterministic collations are supported only on PostgreSQL 12+.
 
 Concurrent index operations

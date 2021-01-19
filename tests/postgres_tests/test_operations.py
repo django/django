@@ -298,7 +298,6 @@ class CreateCollationTests(PostgreSQLTestCase):
             'deterministic': False,
         })
 
-    @skipUnlessDBFeature('supports_alternate_collation_providers')
     def test_create_collation_alternate_provider(self):
         operation = CreateCollation(
             'german_phonebook_test',
@@ -334,24 +333,6 @@ class CreateCollationTests(PostgreSQLTestCase):
             with mock.patch(
                 'django.db.backends.postgresql.features.DatabaseFeatures.'
                 'supports_non_deterministic_collations',
-                False,
-            ):
-                with self.assertRaisesMessage(NotSupportedError, msg):
-                    operation.database_forwards(self.app_label, editor, project_state, new_state)
-
-    def test_collation_with_icu_provider_raises_error(self):
-        operation = CreateCollation(
-            'german_phonebook',
-            provider='icu',
-            locale='de-u-co-phonebk',
-        )
-        project_state = ProjectState()
-        new_state = project_state.clone()
-        msg = 'Non-libc providers require PostgreSQL 10+.'
-        with connection.schema_editor(atomic=False) as editor:
-            with mock.patch(
-                'django.db.backends.postgresql.features.DatabaseFeatures.'
-                'supports_alternate_collation_providers',
                 False,
             ):
                 with self.assertRaisesMessage(NotSupportedError, msg):
