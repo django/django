@@ -657,6 +657,9 @@ MySQL 5.7 and higher.
 Miscellaneous
 -------------
 
+* Django now supports non-``pytz`` time zones, such as Python 3.9+'s
+  :mod:`zoneinfo` module and its backport.
+
 * The undocumented ``SpatiaLiteOperations.proj4_version()`` method is renamed
   to ``proj_version()``.
 

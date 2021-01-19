@@ -1,5 +1,6 @@
 asgiref >= 3.2.10
 argon2-cffi >= 16.1.0
+backports.zoneinfo; python_version < '3.9'
 bcrypt
 docutils
 geoip2
@@ -17,4 +18,5 @@ PyYAML
 selenium
 sqlparse >= 0.2.2
 tblib >= 1.5.0
+tzdata
 colorama; sys.platform == 'win32'
