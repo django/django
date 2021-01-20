@@ -82,6 +82,7 @@ Django's system checks are organized using the following tags:
   regular checks do. They are only run by the :djadmin:`migrate` command or if
   you specify configured database aliases using the ``--database`` option when
   calling the :djadmin:`check` command.
+* ``files``: Checks files related configuration.
 * ``models``: Checks of model, field, and manager definitions.
 * ``security``: Checks security related configuration.
 * ``signals``: Checks on signal declarations and handler registrations.
@@ -96,6 +97,10 @@ Some checks may be registered with multiple tags.
 .. versionchanged:: 3.2
 
     The ``sites`` tag was added.
+
+.. versionchanged:: 4.0
+
+    The ``files`` tag was added.
 
 Core system checks
 ==================
@@ -149,6 +154,16 @@ If you're using MySQL or MariaDB, the following checks will be performed:
   ``<alias>``. See also :ref:`mysql-sql-mode`.
 * **mysql.W003**: MySQL/MariaDB may not allow unique ``CharField``\s to have a
   ``max_length`` > 255.
+
+Managing files
+--------------
+
+.. versionadded:: 4.0
+
+The following checks verify your setup for :doc:`/topics/files`:
+
+* **files.E001**: The :setting:`FILE_UPLOAD_TEMP_DIR` setting refers to the
+  nonexistent directory ``<path>``.
 
 Model fields
 ------------

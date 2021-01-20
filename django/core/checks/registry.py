@@ -13,6 +13,7 @@ class Tags:
     caches = 'caches'
     compatibility = 'compatibility'
     database = 'database'
+    files = 'files'
     models = 'models'
     security = 'security'
     signals = 'signals'
