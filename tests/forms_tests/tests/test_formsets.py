@@ -91,7 +91,6 @@ class FormsFormsetTestCase(SimpleTestCase):
             str(formset),
             """<input type="hidden" name="choices-TOTAL_FORMS" value="1">
 <input type="hidden" name="choices-INITIAL_FORMS" value="0">
-<input type="hidden" name="choices-EXTRA_FORMS" value="1">
 <input type="hidden" name="choices-MIN_NUM_FORMS" value="0">
 <input type="hidden" name="choices-MAX_NUM_FORMS" value="1000">
 <tr><th>Choice:</th><td><input type="text" name="choices-0-choice"></td></tr>
@@ -1249,7 +1248,6 @@ class FormsetAsTagTests(SimpleTestCase):
         data = {
             'choices-TOTAL_FORMS': '1',
             'choices-INITIAL_FORMS': '0',
-            'choices-EXTRA_FORMS': '1',
             'choices-MIN_NUM_FORMS': '0',
             'choices-MAX_NUM_FORMS': '0',
             'choices-0-choice': 'Calexico',
@@ -1259,7 +1257,6 @@ class FormsetAsTagTests(SimpleTestCase):
         self.management_form_html = (
             '<input type="hidden" name="choices-TOTAL_FORMS" value="1">'
             '<input type="hidden" name="choices-INITIAL_FORMS" value="0">'
-            '<input type="hidden" name="choices-EXTRA_FORMS" value="1">'
             '<input type="hidden" name="choices-MIN_NUM_FORMS" value="0">'
             '<input type="hidden" name="choices-MAX_NUM_FORMS" value="0">'
         )
@@ -1325,7 +1322,6 @@ class TestIsBoundBehavior(SimpleTestCase):
             '</ul>'
             '<input type="hidden" name="form-TOTAL_FORMS" id="id_form-TOTAL_FORMS">'
             '<input type="hidden" name="form-INITIAL_FORMS" id="id_form-INITIAL_FORMS">'
-            '<input type="hidden" name="form-EXTRA_FORMS" id="id_form-EXTRA_FORMS">'
             '<input type="hidden" name="form-MIN_NUM_FORMS" id="id_form-MIN_NUM_FORMS">'
             '<input type="hidden" name="form-MAX_NUM_FORMS" id="id_form-MAX_NUM_FORMS">'
             '</td></tr>\n'
@@ -1357,7 +1353,6 @@ class TestIsBoundBehavior(SimpleTestCase):
             '</ul>'
             '<input type="hidden" name="form-TOTAL_FORMS" value="two" id="id_form-TOTAL_FORMS">'
             '<input type="hidden" name="form-INITIAL_FORMS" value="one" id="id_form-INITIAL_FORMS">'
-            '<input type="hidden" name="form-EXTRA_FORMS" id="id_form-EXTRA_FORMS">'
             '<input type="hidden" name="form-MIN_NUM_FORMS" id="id_form-MIN_NUM_FORMS">'
             '<input type="hidden" name="form-MAX_NUM_FORMS" id="id_form-MAX_NUM_FORMS">'
             '</td></tr>\n',

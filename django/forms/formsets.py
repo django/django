@@ -15,7 +15,6 @@ TOTAL_FORM_COUNT = 'TOTAL_FORMS'
 INITIAL_FORM_COUNT = 'INITIAL_FORMS'
 MIN_NUM_FORM_COUNT = 'MIN_NUM_FORMS'
 MAX_NUM_FORM_COUNT = 'MAX_NUM_FORMS'
-EXTRA_FORM_COUNT = 'EXTRA_FORMS'
 ORDERING_FIELD_NAME = 'ORDER'
 DELETION_FIELD_NAME = 'DELETE'
 
@@ -35,7 +34,6 @@ class ManagementForm(Form):
     def __init__(self, *args, **kwargs):
         self.base_fields[TOTAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
         self.base_fields[INITIAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
-        self.base_fields[EXTRA_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         # MIN_NUM_FORM_COUNT and MAX_NUM_FORM_COUNT are output with the rest of
         # the management form, but only for the convenience of client-side
         # code. The POST value of them returned from the client is not checked.
@@ -118,8 +116,7 @@ class BaseFormSet:
                 TOTAL_FORM_COUNT: self.total_form_count(),
                 INITIAL_FORM_COUNT: self.initial_form_count(),
                 MIN_NUM_FORM_COUNT: self.min_num,
-                MAX_NUM_FORM_COUNT: self.max_num,
-                EXTRA_FORM_COUNT: self.extra,
+                MAX_NUM_FORM_COUNT: self.max_num
             })
         return form
 

@@ -37,10 +37,10 @@
         };
         const totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS").prop("autocomplete", "off");
         let nextIndex = parseInt(totalForms.val(), 10);
-        const extraForms = $("#id_" + options.prefix + "-EXTRA_FORMS").prop("autocomplete", "off");
         const initialForms = $("#id_" + options.prefix + "-INITIAL_FORMS").prop("autocomplete", "off");
         const maxForms = $("#id_" + options.prefix + "-MAX_NUM_FORMS").prop("autocomplete", "off");
         const minForms = $("#id_" + options.prefix + "-MIN_NUM_FORMS").prop("autocomplete", "off");
+        const extraForms = totalForms.val() - Math.max(initialForms.val(), minForms.val());
         let addButton;
 
         /**
@@ -141,24 +141,7 @@
                 addButton.parent().show();
             }
 
-            const isFormNotEnough = function() {
-                const totalFormNum = ~~totalForms.val();
-                const initialFormNum = ~~initialForms.val();
-                const minFormNum = ~~minForms.val();
-                const extraFormNum = ~~extraForms.val();
-
-                const emptyFormNum = totalFormNum - initialFormNum;
-                if (initialFormNum >= emptyFormNum) {
-                    return emptyFormNum < extraFormNum;
-                }
-                return emptyFormNum < extraFormNum + minFormNum - initialFormNum;
-            }
-            // Auto add form when forms are not enough
-            if (isFormNotEnough()) {
-                $('.' + options.addCssClass +' a').click();
-            }
-
-            // Hide the remove buttons if forms overload.
+            // Hide the remove buttons if at min_num.
             toggleDeleteButtonVisibility(inlineGroup);
             // Also, update names and ids for all remaining form controls so
             // they remain in sequence:
@@ -184,17 +167,16 @@
              *
              */
             const isFormOverload = function() {
-                const totalFormNum = ~~totalForms.val();
-                const initialFormNum = ~~initialForms.val();
-                const minFormNum = ~~minForms.val();
-                const extraFormNum = ~~extraForms.val();
+                const totalFormNum = parseInt(totalForms.val());
+                const initialFormNum = parseInt(initialForms.val());
+                const minFormNum = parseInt(minForms.val());
 
                 const emptyFormNum = totalFormNum - initialFormNum;
                 if (initialFormNum >= emptyFormNum) {
-                    return emptyFormNum > extraFormNum;
+                    return emptyFormNum > extraForms;
                 }
-                return emptyFormNum > extraFormNum + minFormNum - initialFormNum;
-            }
+                return emptyFormNum > extraForms + minFormNum - initialFormNum;
+            };
 
             if (isFormOverload()) {
                 inlineGroup.find('.inline-deletelink').show();
@@ -204,7 +186,7 @@
 
             // If ValidationError is raised, the form would show "X"
             $('.inline-related').each(function(_, inline) {
-                if ($(inline).find(".errors").length != 0) {
+                if ($(inline).find(".errorlist").length !== 0) {
                     $(inline).find('.inline-deletelink').show();
                 }
             });
