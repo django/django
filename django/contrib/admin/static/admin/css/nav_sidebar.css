@@ -12,6 +12,7 @@
     justify-content: center;
     flex: 0 0 23px;
     width: 23px;
+    border: 0;
     border-right: 1px solid var(--hairline-color);
     background-color: var(--body-bg);
     cursor: pointer;

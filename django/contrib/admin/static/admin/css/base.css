@@ -72,6 +72,7 @@
 
     --link-fg: #81d4fa;
     --link-hover-color: #4ac1f7;
+    --link-selected-fg: #6f94c6;
 
     --hairline-color: #272727;
     --border-color: #353535;
@@ -84,6 +85,9 @@
     --darkened-bg: #212121;
     --selected-bg: #1b1b1b;
     --selected-row: #00363a;
+
+    --close-button-bg: #333333;
+    --close-button-hover-bg: #666666;
   }
 }
 
