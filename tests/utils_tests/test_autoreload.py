@@ -86,8 +86,11 @@ class TestIterModulesAndFiles(SimpleTestCase):
         filename.write_text("Ceci n'est pas du Python.")
 
         with extend_sys_path(str(filename.parent)):
-            with self.assertRaises(SyntaxError):
-                autoreload.check_errors(import_module)('test_syntax_error')
+            try:
+                with self.assertRaises(SyntaxError):
+                    autoreload.check_errors(import_module)('test_syntax_error')
+            finally:
+                autoreload._exception = None
         self.assertFileFound(filename)
 
     def test_check_errors_catches_all_exceptions(self):
@@ -370,8 +373,11 @@ class TestCheckErrors(SimpleTestCase):
         fake_method = mock.MagicMock(side_effect=RuntimeError())
         wrapped = autoreload.check_errors(fake_method)
         with mock.patch.object(autoreload, '_error_files') as mocked_error_files:
-            with self.assertRaises(RuntimeError):
-                wrapped()
+            try:
+                with self.assertRaises(RuntimeError):
+                    wrapped()
+            finally:
+                autoreload._exception = None
         self.assertEqual(mocked_error_files.append.call_count, 1)
 
 
