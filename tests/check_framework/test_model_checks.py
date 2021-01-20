@@ -395,6 +395,15 @@ class ModelDefaultAutoFieldTests(SimpleTestCase):
             ),
         ])
 
+    def test_inherited_pk(self):
+        class Parent(models.Model):
+            id = models.AutoField(primary_key=True)
+
+        class Child(Parent):
+            pass
+
+        self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [])
+
     @override_settings(DEFAULT_AUTO_FIELD='django.db.models.BigAutoField')
     def test_default_auto_field_setting(self):
         class Model(models.Model):

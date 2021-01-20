@@ -280,6 +280,10 @@ class Options:
                 if already_created:
                     field = already_created[0]
                 field.primary_key = True
+                try:
+                    field.auto_created = field.reverse_related_fields[0][0].auto_created
+                except ValueError:
+                    pass
                 self.setup_pk(field)
             else:
                 pk_class = self._get_default_pk_class()
