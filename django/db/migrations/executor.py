@@ -225,8 +225,9 @@ class MigrationExecutor:
                 # Alright, do it normally
                 with self.connection.schema_editor(atomic=migration.atomic) as schema_editor:
                     state = migration.apply(state, schema_editor)
-                    self.record_migration(migration)
-                    migration_recorded = True
+                    if not schema_editor.deferred_sql:
+                        self.record_migration(migration)
+                        migration_recorded = True
         if not migration_recorded:
             self.record_migration(migration)
         # Report progress
