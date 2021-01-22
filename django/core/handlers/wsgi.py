@@ -8,6 +8,7 @@ from django.urls import set_script_prefix
 from django.utils.encoding import repercent_broken_unicode
 from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
+from urllib.parse import unquote
 
 _slashes_re = _lazy_re_compile(br'/+')
 
@@ -152,8 +153,7 @@ class WSGIHandler(base.BaseHandler):
 def get_path_info(environ):
     """Return the HTTP request's PATH_INFO as a string."""
     path_info = get_bytes_from_wsgi(environ, 'PATH_INFO', '/')
-
-    return repercent_broken_unicode(path_info).decode()
+    return unquote(repercent_broken_unicode(path_info).decode())
 
 
 def get_script_name(environ):
@@ -197,7 +197,10 @@ def get_bytes_from_wsgi(environ, key, default):
     # Non-ASCII values in the WSGI environ are arbitrarily decoded with
     # ISO-8859-1. This is wrong for Django websites where UTF-8 is the default.
     # Re-encode to recover the original bytestring.
-    return value.encode('iso-8859-1')
+    try:
+        return value.encode('utf-8')
+    except:
+        return value.encode('iso-8859-1')
 
 
 def get_str_from_wsgi(environ, key, default):
