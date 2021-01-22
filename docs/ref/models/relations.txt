@@ -14,12 +14,12 @@ Related objects reference
 
             from django.db import models
 
-            class Reporter(models.Model):
+            class Blog(models.Model):
                 # ...
                 pass
 
-            class Article(models.Model):
-                reporter = models.ForeignKey(Reporter, on_delete=models.CASCADE)
+            class Entry(models.Model):
+                blog = models.ForeignKey(Blog, on_delete=models.CASCADE, null=True)
 
       In the above example, the methods below will be available on
       the manager ``reporter.article_set``.
