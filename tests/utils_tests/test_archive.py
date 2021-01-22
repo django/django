@@ -4,6 +4,8 @@ import sys
 import tempfile
 import unittest
 
+from django.core.exceptions import SuspiciousOperation
+from django.test import SimpleTestCase
 from django.utils import archive
 
 
@@ -45,3 +47,22 @@ class TestArchive(unittest.TestCase):
                 # A file is readable even if permission data is missing.
                 filepath = os.path.join(tmpdir, 'no_permissions')
                 self.assertEqual(os.stat(filepath).st_mode & mask, 0o666 & ~umask)
+
+
+class TestArchiveInvalid(SimpleTestCase):
+    def test_extract_function_traversal(self):
+        archives_dir = os.path.join(os.path.dirname(__file__), 'traversal_archives')
+        tests = [
+            ('traversal.tar', '..'),
+            ('traversal_absolute.tar', '/tmp/evil.py'),
+        ]
+        if sys.platform == 'win32':
+            tests += [
+                ('traversal_disk_win.tar', 'd:evil.py'),
+                ('traversal_disk_win.zip', 'd:evil.py'),
+            ]
+        msg = "Archive contains invalid path: '%s'"
+        for entry, invalid_path in tests:
+            with self.subTest(entry), tempfile.TemporaryDirectory() as tmpdir:
+                with self.assertRaisesMessage(SuspiciousOperation, msg % invalid_path):
+                    archive.extract(os.path.join(archives_dir, entry), tmpdir)
