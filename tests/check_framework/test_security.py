@@ -504,3 +504,17 @@ class CSRFFailureViewTest(SimpleTestCase):
             csrf.check_csrf_failure_view(None),
             [Error(msg, id='security.E101')],
         )
+
+
+class CheckTypeOfAllowedHostsTest(SimpleTestCase):
+    @property
+    def func(self):
+        return base.check_type_of_allowed_hosts
+
+    @override_settings(ALLOWED_HOSTS="example.com")
+    def test_allowed_hosts_is_string(self):
+        self.assertEqual(self.func(None), [base.W023])
+
+    @override_settings(ALLOWED_HOSTS=["example.com", 1])
+    def test_allowed_hosts_is_list_with_nonstring(self):
+        self.assertEqual(self.func(None), [base.W023])

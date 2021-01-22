@@ -113,6 +113,11 @@ W022 = Warning(
     id='security.W022',
 )
 
+W023 = Warning(
+    'ALLOWED_HOSTS has to be list or tuple of string(s), not string.',
+    id='security.W023',
+)
+
 E023 = Error(
     'You have set the SECURE_REFERRER_POLICY setting to an invalid value.',
     hint='Valid values are: {}.'.format(', '.join(sorted(REFERRER_POLICY_VALUES))),
@@ -217,6 +222,16 @@ def check_xframe_deny(app_configs, **kwargs):
 @register(Tags.security, deploy=True)
 def check_allowed_hosts(app_configs, **kwargs):
     return [] if settings.ALLOWED_HOSTS else [W020]
+
+
+@register(Tags.security, deploy=True)
+def check_type_of_allowed_hosts(app_configs, **kwargs):
+    passed_check = (
+        all(isinstance(element, str) for element in settings.ALLOWED_HOSTS)
+        if isinstance(settings.ALLOWED_HOSTS, (list, tuple))
+        else False
+    )
+    return [] if passed_check else [W023]
 
 
 @register(Tags.security, deploy=True)
