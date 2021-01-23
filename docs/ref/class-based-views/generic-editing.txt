@@ -226,7 +226,7 @@ editing content:
 
     .. versionchanged:: 3.3
 
-    ``DeleteView`` now inherts from 
+    ``DeleteView`` now inherits from 
     ``django.views.generic.edit.ProcessFormView`` and
     ``django.views.generic.detail.SingleObjectMixin`` were added to inherited
     methods. The ``django.views.generic.detail.BaseDetailView`` was removed.
