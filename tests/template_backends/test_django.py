@@ -104,13 +104,14 @@ class DjangoTemplatesTests(TemplateStringsTests):
             InvalidTemplateLibrary,
             "ImportError raised when trying to load "
             "'template_backends.apps.importerror.templatetags.broken_tags'"
-        ):
+        ) as cm:
             DjangoTemplates({
                 'DIRS': [],
                 'APP_DIRS': False,
                 'NAME': 'django',
                 'OPTIONS': {},
             })
+        self.assertIsInstance(cm.exception.__cause__, ImportError)
 
     def test_builtins_discovery(self):
         engine = DjangoTemplates({

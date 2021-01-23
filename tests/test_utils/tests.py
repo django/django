@@ -16,8 +16,8 @@ from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import (
-    SimpleTestCase, TestCase, TransactionTestCase, skipIfDBFeature,
-    skipUnlessDBFeature,
+    SimpleTestCase, TestCase, TransactionTestCase, ignore_warnings,
+    skipIfDBFeature, skipUnlessDBFeature,
 )
 from django.test.html import HTMLParseError, parse_html
 from django.test.utils import (
@@ -25,6 +25,7 @@ from django.test.utils import (
     override_settings, setup_test_environment,
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
+from django.utils.deprecation import RemovedInDjango41Warning
 
 from .models import Car, Person, PossessedCar
 from .views import empty_response
@@ -243,17 +244,32 @@ class AssertQuerysetEqualTests(TestCase):
         cls.p1 = Person.objects.create(name='p1')
         cls.p2 = Person.objects.create(name='p2')
 
+    def test_empty(self):
+        self.assertQuerysetEqual(Person.objects.filter(name='p3'), [])
+
     def test_ordered(self):
         self.assertQuerysetEqual(
             Person.objects.all().order_by('name'),
-            [repr(self.p1), repr(self.p2)]
+            [self.p1, self.p2],
         )
 
     def test_unordered(self):
         self.assertQuerysetEqual(
             Person.objects.all().order_by('name'),
-            [repr(self.p2), repr(self.p1)],
+            [self.p2, self.p1],
             ordered=False
+        )
+
+    def test_queryset(self):
+        self.assertQuerysetEqual(
+            Person.objects.all().order_by('name'),
+            Person.objects.all().order_by('name'),
+        )
+
+    def test_flat_values_list(self):
+        self.assertQuerysetEqual(
+            Person.objects.all().order_by('name').values_list('name', flat=True),
+            ['p1', 'p2'],
         )
 
     def test_transform(self):
@@ -263,6 +279,13 @@ class AssertQuerysetEqualTests(TestCase):
             transform=lambda x: x.pk
         )
 
+    def test_repr_transform(self):
+        self.assertQuerysetEqual(
+            Person.objects.all().order_by('name'),
+            [repr(self.p1), repr(self.p2)],
+            transform=repr,
+        )
+
     def test_undefined_order(self):
         # Using an unordered queryset with more than one ordered value
         # is an error.
@@ -270,13 +293,10 @@ class AssertQuerysetEqualTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             self.assertQuerysetEqual(
                 Person.objects.all(),
-                [repr(self.p1), repr(self.p2)]
+                [self.p1, self.p2],
             )
         # No error for one value.
-        self.assertQuerysetEqual(
-            Person.objects.filter(name='p1'),
-            [repr(self.p1)]
-        )
+        self.assertQuerysetEqual(Person.objects.filter(name='p1'), [self.p1])
 
     def test_repeated_values(self):
         """
@@ -296,14 +316,40 @@ class AssertQuerysetEqualTests(TestCase):
         with self.assertRaises(AssertionError):
             self.assertQuerysetEqual(
                 self.p1.cars.all(),
-                [repr(batmobile), repr(k2000)],
+                [batmobile, k2000],
                 ordered=False
             )
         self.assertQuerysetEqual(
             self.p1.cars.all(),
-            [repr(batmobile)] * 2 + [repr(k2000)] * 4,
+            [batmobile] * 2 + [k2000] * 4,
             ordered=False
         )
+
+
+class AssertQuerysetEqualDeprecationTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.p1 = Person.objects.create(name='p1')
+        cls.p2 = Person.objects.create(name='p2')
+
+    @ignore_warnings(category=RemovedInDjango41Warning)
+    def test_str_values(self):
+        self.assertQuerysetEqual(
+            Person.objects.all().order_by('name'),
+            [repr(self.p1), repr(self.p2)],
+        )
+
+    def test_str_values_warning(self):
+        msg = (
+            "In Django 4.1, repr() will not be called automatically on a "
+            "queryset when compared to string values. Set an explicit "
+            "'transform' to silence this warning."
+        )
+        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
+            self.assertQuerysetEqual(
+                Person.objects.all().order_by('name'),
+                [repr(self.p1), repr(self.p2)],
+            )
 
 
 @override_settings(ROOT_URLCONF='test_utils.urls')
@@ -768,10 +814,29 @@ class HTMLEqualTests(SimpleTestCase):
         dom2 = parse_html('<p>foo<p>bar</p></p>')
         self.assertEqual(dom2.count(dom1), 0)
 
-        # html with a root element contains the same html with no root element
+        # HTML with a root element contains the same HTML with no root element.
         dom1 = parse_html('<p>foo</p><p>bar</p>')
         dom2 = parse_html('<div><p>foo</p><p>bar</p></div>')
         self.assertEqual(dom2.count(dom1), 1)
+
+        # Target of search is a sequence of child elements and appears more
+        # than once.
+        dom2 = parse_html('<div><p>foo</p><p>bar</p><p>foo</p><p>bar</p></div>')
+        self.assertEqual(dom2.count(dom1), 2)
+
+        # Searched HTML has additional children.
+        dom1 = parse_html('<a/><b/>')
+        dom2 = parse_html('<a/><b/><c/>')
+        self.assertEqual(dom2.count(dom1), 1)
+
+        # No match found in children.
+        dom1 = parse_html('<b/><a/>')
+        self.assertEqual(dom2.count(dom1), 0)
+
+        # Target of search found among children and grandchildren.
+        dom1 = parse_html('<b/><b/>')
+        dom2 = parse_html('<a><b/><b/></a><b/><b/>')
+        self.assertEqual(dom2.count(dom1), 2)
 
     def test_parsing_errors(self):
         with self.assertRaises(AssertionError):
@@ -1477,4 +1542,27 @@ class TestContextDecoratorTests(SimpleTestCase):
         self.assertFalse(mock_disable.called)
         with self.assertRaisesMessage(NotImplementedError, 'reraised'):
             decorated_test_class.setUp()
+        decorated_test_class.doCleanups()
         self.assertTrue(mock_disable.called)
+
+    def test_cleanups_run_after_tearDown(self):
+        calls = []
+
+        class SaveCallsDecorator(TestContextDecorator):
+            def enable(self):
+                calls.append('enable')
+
+            def disable(self):
+                calls.append('disable')
+
+        class AddCleanupInSetUp(unittest.TestCase):
+            def setUp(self):
+                calls.append('setUp')
+                self.addCleanup(lambda: calls.append('cleanup'))
+
+        decorator = SaveCallsDecorator()
+        decorated_test_class = decorator.__call__(AddCleanupInSetUp)()
+        decorated_test_class.setUp()
+        decorated_test_class.tearDown()
+        decorated_test_class.doCleanups()
+        self.assertEqual(calls, ['enable', 'setUp', 'cleanup', 'disable'])

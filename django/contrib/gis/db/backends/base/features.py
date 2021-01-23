@@ -14,6 +14,8 @@ class BaseSpatialFeatures:
     # Does the backend introspect GeometryField to its subtypes?
     supports_geometry_field_introspection = True
 
+    # Does the database have a geography type?
+    supports_geography = False
     # Does the backend support storing 3D geometries?
     supports_3d_storage = False
     # Reference implementation of 3D functions is:
@@ -33,9 +35,6 @@ class BaseSpatialFeatures:
     # Is the database able to count vertices on polygons (with `num_points`)?
     supports_num_points_poly = True
 
-    # The following properties indicate if the database backend support
-    # certain lookups (dwithin, left and right, relate, ...)
-    supports_left_right_lookups = False
     # Does the backend support expressions for specifying distance in the
     # dwithin lookup?
     supports_dwithin_distance_expr = True
@@ -45,6 +44,19 @@ class BaseSpatialFeatures:
 
     # Does the database support a unique index on geometry fields?
     supports_geometry_field_unique_index = True
+
+    # Can SchemaEditor alter geometry fields?
+    can_alter_geometry_field = True
+
+    # Do the database functions/aggregates support the tolerance parameter?
+    supports_tolerance_parameter = False
+
+    # Set of options that AsGeoJSON() doesn't support.
+    unsupported_geojson_options = {}
+
+    # Does Intersection() return None (rather than an empty GeometryCollection)
+    # for empty results?
+    empty_intersection_returns_none = True
 
     @property
     def supports_bbcontains_lookup(self):

@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-01-21 12:21+0000\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-09-04 13:37+0000\n"
 "Last-Translator: Jon <jon@kolonial.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
@@ -74,6 +74,12 @@ msgstr "Ingen dato"
 
 msgid "Has date"
 msgstr "Har dato"
+
+msgid "Empty"
+msgstr "Tom"
+
+msgid "Not empty"
+msgstr "Ikke tom"
 
 #, python-format
 msgid ""
@@ -334,6 +340,19 @@ msgstr "Velg alle %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Nullstill valg"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modeller i %(name)s-applikasjonen"
+
+msgid "Add"
+msgstr "Legg til"
+
+msgid "View"
+msgstr "Se"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Du har ikke tillatelse til å vise eller endre noe."
+
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
@@ -381,6 +400,9 @@ msgstr "Vis på nettsted"
 
 msgid "Filter"
 msgstr "Filtrering"
+
+msgid "Clear all filters"
+msgstr "Fjern alle filtre"
 
 msgid "Remove from sorting"
 msgstr "Fjern fra sortering"
@@ -459,9 +481,6 @@ msgstr ""
 "Er du sikker på vil slette det valgte %(objects_name)s? De følgende "
 "objektene og deres relaterte objekter vil bli slettet:"
 
-msgid "View"
-msgstr "Se"
-
 msgid "Delete?"
 msgstr "Slette?"
 
@@ -471,16 +490,6 @@ msgstr "Etter %(filter_title)s "
 
 msgid "Summary"
 msgstr "Oppsummering"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modeller i %(name)s-applikasjonen"
-
-msgid "Add"
-msgstr "Legg til"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr "Du har ikke tillatelse til å vise eller endre noe."
 
 msgid "Recent actions"
 msgstr "Siste handlinger"
@@ -512,6 +521,9 @@ msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "Glemt brukernavnet eller passordet ditt?"
+
+msgid "Toggle navigation"
+msgstr "Veksle navigasjon"
 
 msgid "Date/time"
 msgstr "Dato/tid"

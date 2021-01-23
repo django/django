@@ -679,38 +679,7 @@ class Model(metaclass=ModelBase):
         that the "save" must be an SQL insert or update (or equivalent for
         non-SQL backends), respectively. Normally, they should not be set.
         """
-        # Ensure that a model instance without a PK hasn't been assigned to
-        # a ForeignKey or OneToOneField on this model. If the field is
-        # nullable, allowing the save() would result in silent data loss.
-        for field in self._meta.concrete_fields:
-            # If the related field isn't cached, then an instance hasn't
-            # been assigned and there's no need to worry about this check.
-            if field.is_relation and field.is_cached(self):
-                obj = getattr(self, field.name, None)
-                if not obj:
-                    continue
-                # A pk may have been assigned manually to a model instance not
-                # saved to the database (or auto-generated in a case like
-                # UUIDField), but we allow the save to proceed and rely on the
-                # database to raise an IntegrityError if applicable. If
-                # constraints aren't supported by the database, there's the
-                # unavoidable risk of data corruption.
-                if obj.pk is None:
-                    # Remove the object from a related instance cache.
-                    if not field.remote_field.multiple:
-                        field.remote_field.delete_cached_value(obj)
-                    raise ValueError(
-                        "save() prohibited to prevent data loss due to "
-                        "unsaved related object '%s'." % field.name
-                    )
-                elif getattr(self, field.attname) is None:
-                    # Use pk from related object if it has been saved after
-                    # an assignment.
-                    setattr(self, field.attname, obj.pk)
-                # If the relationship's pk/to_field was changed, clear the
-                # cached relationship.
-                if getattr(obj, field.target_field.attname) != getattr(self, field.attname):
-                    field.delete_cached_value(self)
+        self._prepare_related_fields_for_save(operation_name='save')
 
         using = using or router.db_for_write(self.__class__, instance=self)
         if force_insert and (force_update or update_fields):
@@ -938,6 +907,40 @@ class Model(metaclass=ModelBase):
             [self], fields=fields, returning_fields=returning_fields,
             using=using, raw=raw,
         )
+
+    def _prepare_related_fields_for_save(self, operation_name):
+        # Ensure that a model instance without a PK hasn't been assigned to
+        # a ForeignKey or OneToOneField on this model. If the field is
+        # nullable, allowing the save would result in silent data loss.
+        for field in self._meta.concrete_fields:
+            # If the related field isn't cached, then an instance hasn't been
+            # assigned and there's no need to worry about this check.
+            if field.is_relation and field.is_cached(self):
+                obj = getattr(self, field.name, None)
+                if not obj:
+                    continue
+                # A pk may have been assigned manually to a model instance not
+                # saved to the database (or auto-generated in a case like
+                # UUIDField), but we allow the save to proceed and rely on the
+                # database to raise an IntegrityError if applicable. If
+                # constraints aren't supported by the database, there's the
+                # unavoidable risk of data corruption.
+                if obj.pk is None:
+                    # Remove the object from a related instance cache.
+                    if not field.remote_field.multiple:
+                        field.remote_field.delete_cached_value(obj)
+                    raise ValueError(
+                        "%s() prohibited to prevent data loss due to unsaved "
+                        "related object '%s'." % (operation_name, field.name)
+                    )
+                elif getattr(self, field.attname) is None:
+                    # Use pk from related object if it has been saved after
+                    # an assignment.
+                    setattr(self, field.attname, obj.pk)
+                # If the relationship's pk/to_field was changed, clear the
+                # cached relationship.
+                if getattr(obj, field.target_field.attname) != getattr(self, field.attname):
+                    field.delete_cached_value(self)
 
     def delete(self, using=None, keep_parents=False):
         using = using or router.db_for_write(self.__class__, instance=self)
@@ -1287,9 +1290,39 @@ class Model(metaclass=ModelBase):
                 *cls._check_indexes(databases),
                 *cls._check_ordering(),
                 *cls._check_constraints(databases),
+                *cls._check_default_pk(),
             ]
 
         return errors
+
+    @classmethod
+    def _check_default_pk(cls):
+        if (
+            cls._meta.pk.auto_created and
+            # Inherited PKs are checked in parents models.
+            not (
+                isinstance(cls._meta.pk, OneToOneField) and
+                cls._meta.pk.remote_field.parent_link
+            ) and
+            not settings.is_overridden('DEFAULT_AUTO_FIELD') and
+            not cls._meta.app_config._is_default_auto_field_overridden
+        ):
+            return [
+                checks.Warning(
+                    f"Auto-created primary key used when not defining a "
+                    f"primary key type, by default "
+                    f"'{settings.DEFAULT_AUTO_FIELD}'.",
+                    hint=(
+                        f"Configure the DEFAULT_AUTO_FIELD setting or the "
+                        f"{cls._meta.app_config.__class__.__qualname__}."
+                        f"default_auto_field attribute to point to a subclass "
+                        f"of AutoField, e.g. 'django.db.models.BigAutoField'."
+                    ),
+                    obj=cls,
+                    id='models.W042',
+                ),
+            ]
+        return []
 
     @classmethod
     def _check_swappable(cls):
@@ -1596,6 +1629,7 @@ class Model(metaclass=ModelBase):
     def _check_indexes(cls, databases):
         """Check fields, names, and conditions of indexes."""
         errors = []
+        references = set()
         for index in cls._meta.indexes:
             # Index name can't start with an underscore or a number, restricted
             # for cross-database compatibility with Oracle.
@@ -1617,6 +1651,11 @@ class Model(metaclass=ModelBase):
                         id='models.E034',
                     ),
                 )
+            if index.contains_expressions:
+                for expression in index.expressions:
+                    references.update(
+                        ref[0] for ref in cls._get_expr_references(expression)
+                    )
         for db in databases:
             if not router.allow_migrate_model(db, cls):
                 continue
@@ -1653,8 +1692,25 @@ class Model(metaclass=ModelBase):
                         id='models.W040',
                     )
                 )
+            if not (
+                connection.features.supports_expression_indexes or
+                'supports_expression_indexes' in cls._meta.required_db_features
+            ) and any(index.contains_expressions for index in cls._meta.indexes):
+                errors.append(
+                    checks.Warning(
+                        '%s does not support indexes on expressions.'
+                        % connection.display_name,
+                        hint=(
+                            "An index won't be created. Silence this warning "
+                            "if you don't care about it."
+                        ),
+                        obj=cls,
+                        id='models.W043',
+                    )
+                )
         fields = [field for index in cls._meta.indexes for field, _ in index.fields_orders]
         fields += [include for index in cls._meta.indexes for include in index.include]
+        fields += references
         errors.extend(cls._check_local_fields(fields, 'indexes'))
         return errors
 

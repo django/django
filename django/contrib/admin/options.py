@@ -12,6 +12,7 @@ from django.contrib.admin import helpers, widgets
 from django.contrib.admin.checks import (
     BaseModelAdminChecks, InlineModelAdminChecks, ModelAdminChecks,
 )
+from django.contrib.admin.decorators import display
 from django.contrib.admin.exceptions import DisallowedModelAdminToField
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
@@ -19,7 +20,6 @@ from django.contrib.admin.utils import (
     get_deleted_objects, lookup_needs_distinct, model_format_dict,
     model_ngettext, quote, unquote,
 )
-from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.admin.widgets import (
     AutocompleteSelect, AutocompleteSelectMultiple,
 )
@@ -225,7 +225,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
         if 'widget' not in kwargs:
             if db_field.name in self.get_autocomplete_fields(request):
-                kwargs['widget'] = AutocompleteSelect(db_field.remote_field, self.admin_site, using=db)
+                kwargs['widget'] = AutocompleteSelect(db_field, self.admin_site, using=db)
             elif db_field.name in self.raw_id_fields:
                 kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.remote_field, self.admin_site, using=db)
             elif db_field.name in self.radio_fields:
@@ -255,7 +255,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             autocomplete_fields = self.get_autocomplete_fields(request)
             if db_field.name in autocomplete_fields:
                 kwargs['widget'] = AutocompleteSelectMultiple(
-                    db_field.remote_field,
+                    db_field,
                     self.admin_site,
                     using=db,
                 )
@@ -296,7 +296,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
         if callable(self.view_on_site):
             return self.view_on_site(obj)
-        elif self.view_on_site and hasattr(obj, 'get_absolute_url'):
+        elif hasattr(obj, 'get_absolute_url'):
             # use the ContentType lookup if view_on_site is True
             return reverse('admin:view_on_site', kwargs={
                 'content_type_id': get_content_type_for_model(obj).pk,
@@ -622,7 +622,6 @@ class ModelAdmin(BaseModelAdmin):
         return [
             path('', wrap(self.changelist_view), name='%s_%s_changelist' % info),
             path('add/', wrap(self.add_view), name='%s_%s_add' % info),
-            path('autocomplete/', wrap(self.autocomplete_view), name='%s_%s_autocomplete' % info),
             path('<path:object_id>/history/', wrap(self.history_view), name='%s_%s_history' % info),
             path('<path:object_id>/delete/', wrap(self.delete_view), name='%s_%s_delete' % info),
             path('<path:object_id>/change/', wrap(self.change_view), name='%s_%s_change' % info),
@@ -850,12 +849,16 @@ class ModelAdmin(BaseModelAdmin):
             action_flag=DELETION,
         )
 
+    @display(description=mark_safe('<input type="checkbox" id="action-toggle">'))
     def action_checkbox(self, obj):
         """
         A list_display column containing a checkbox widget.
         """
         return helpers.checkbox.render(helpers.ACTION_CHECKBOX_NAME, str(obj.pk))
-    action_checkbox.short_description = mark_safe('<input type="checkbox" id="action-toggle">')
+
+    @staticmethod
+    def _get_action_description(func, name):
+        return getattr(func, 'short_description', capfirst(name.replace('_', ' ')))
 
     def _get_base_actions(self):
         """Return the list of actions, prior to any request-based filtering."""
@@ -869,7 +872,7 @@ class ModelAdmin(BaseModelAdmin):
         for (name, func) in self.admin_site.actions:
             if name in base_action_names:
                 continue
-            description = getattr(func, 'short_description', name.replace('_', ' '))
+            description = self._get_action_description(func, name)
             actions.append((func, name, description))
         # Add actions from this ModelAdmin.
         actions.extend(base_actions)
@@ -938,10 +941,7 @@ class ModelAdmin(BaseModelAdmin):
             except KeyError:
                 return None
 
-        if hasattr(func, 'short_description'):
-            description = func.short_description
-        else:
-            description = capfirst(action.replace('_', ' '))
+        description = self._get_action_description(func, action)
         return func, action, description
 
     def get_list_display(self, request):
@@ -1627,6 +1627,7 @@ class ModelAdmin(BaseModelAdmin):
         context = {
             **self.admin_site.each_context(request),
             'title': title % opts.verbose_name,
+            'subtitle': str(obj) if obj else None,
             'adminform': adminForm,
             'object_id': object_id,
             'original': obj,
@@ -1649,9 +1650,6 @@ class ModelAdmin(BaseModelAdmin):
         context.update(extra_context or {})
 
         return self.render_change_form(request, context, add=add, change=not add, obj=obj, form_url=form_url)
-
-    def autocomplete_view(self, request):
-        return AutocompleteJsonView.as_view(model_admin=self)(request)
 
     def add_view(self, request, form_url='', extra_context=None):
         return self.changeform_view(request, None, form_url, extra_context)
@@ -1815,6 +1813,7 @@ class ModelAdmin(BaseModelAdmin):
             'selection_note': _('0 of %(cnt)s selected') % {'cnt': len(cl.result_list)},
             'selection_note_all': selection_note_all % {'total_count': cl.result_count},
             'title': cl.title,
+            'subtitle': None,
             'is_popup': cl.is_popup,
             'to_field': cl.to_field,
             'cl': cl,

@@ -276,10 +276,10 @@ The CSRF protection is based on the following things:
    enough under HTTP.)
 
    If the :setting:`CSRF_COOKIE_DOMAIN` setting is set, the referer is compared
-   against it. This setting supports subdomains. For example,
-   ``CSRF_COOKIE_DOMAIN = '.example.com'`` will allow POST requests from
-   ``www.example.com`` and ``api.example.com``. If the setting is not set, then
-   the referer must match the HTTP ``Host`` header.
+   against it. You can allow cross-subdomain requests by including a leading
+   dot. For example, ``CSRF_COOKIE_DOMAIN = '.example.com'`` will allow POST
+   requests from ``www.example.com`` and ``api.example.com``. If the setting is
+   not set, then the referer must match the HTTP ``Host`` header.
 
    Expanding the accepted referers beyond the current host or cookie domain can
    be done with the :setting:`CSRF_TRUSTED_ORIGINS` setting.

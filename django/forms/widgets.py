@@ -146,8 +146,14 @@ class Media:
 
     def __add__(self, other):
         combined = Media()
-        combined._css_lists = self._css_lists + other._css_lists
-        combined._js_lists = self._js_lists + other._js_lists
+        combined._css_lists = self._css_lists[:]
+        combined._js_lists = self._js_lists[:]
+        for item in other._css_lists:
+            if item and item not in self._css_lists:
+                combined._css_lists.append(item)
+        for item in other._js_lists:
+            if item and item not in self._js_lists:
+                combined._js_lists.append(item)
         return combined
 
 
@@ -614,8 +620,6 @@ class ChoiceWidget(Widget):
 
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         index = str(index) if subindex is None else "%s_%s" % (index, subindex)
-        if attrs is None:
-            attrs = {}
         option_attrs = self.build_attrs(self.attrs, attrs) if self.option_inherits_attrs else {}
         if selected:
             option_attrs.update(self.checked_attribute)
@@ -776,7 +780,7 @@ class CheckboxSelectMultiple(ChoiceWidget):
         return False
 
     def id_for_label(self, id_, index=None):
-        """"
+        """
         Don't include for="field_0" in <label> because clicking such a label
         would toggle the first checkbox.
         """

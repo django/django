@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.core.management.base import SystemCheckError
-from django.test import TransactionTestCase, skipUnlessDBFeature, testcases
+from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.test.runner import DiscoverRunner
 from django.test.testcases import connections_support_transactions
 from django.test.utils import captured_stderr, dependency_ordered
@@ -413,10 +413,11 @@ class EmptyDefaultDatabaseTest(unittest.TestCase):
         An empty default database in settings does not raise an ImproperlyConfigured
         error when running a unit test that does not use a database.
         """
-        testcases.connections = db.ConnectionHandler({'default': {}})
-        connection = testcases.connections[db.utils.DEFAULT_DB_ALIAS]
-        self.assertEqual(connection.settings_dict['ENGINE'], 'django.db.backends.dummy')
-        connections_support_transactions()
+        tested_connections = db.ConnectionHandler({'default': {}})
+        with mock.patch('django.db.connections', new=tested_connections):
+            connection = tested_connections[db.utils.DEFAULT_DB_ALIAS]
+            self.assertEqual(connection.settings_dict['ENGINE'], 'django.db.backends.dummy')
+            connections_support_transactions()
 
 
 class RunTestsExceptionHandlingTests(unittest.TestCase):

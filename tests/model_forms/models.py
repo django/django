@@ -411,9 +411,14 @@ class StumpJoke(models.Model):
         Character,
         models.CASCADE,
         limit_choices_to=today_callable_dict,
-        related_name="+",
+        related_name='jokes',
     )
-    has_fooled_today = models.ManyToManyField(Character, limit_choices_to=today_callable_q, related_name="+")
+    has_fooled_today = models.ManyToManyField(
+        Character,
+        limit_choices_to=today_callable_q,
+        related_name='jokes_today',
+    )
+    funny = models.BooleanField(default=False)
 
 
 # Model for #13776
@@ -472,3 +477,6 @@ class Award(models.Model):
 
 class NullableUniqueCharFieldModel(models.Model):
     codename = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    email = models.EmailField(blank=True, null=True)
+    slug = models.SlugField(blank=True, null=True)
+    url = models.URLField(blank=True, null=True)

@@ -56,7 +56,7 @@ class BasicFieldTests(SimpleTestCase):
 
     def test_field_verbose_name(self):
         m = VerboseNameField
-        for i in range(1, 23):
+        for i in range(1, 22):
             self.assertEqual(m._meta.get_field('field%d' % i).verbose_name, 'verbose field%d' % i)
 
         self.assertEqual(m._meta.get_field('id').verbose_name, 'verbose pk')
@@ -101,6 +101,36 @@ class BasicFieldTests(SimpleTestCase):
         """deconstruct() uses __qualname__ for nested class support."""
         name, path, args, kwargs = Nested.Field().deconstruct()
         self.assertEqual(path, 'model_fields.tests.Nested.Field')
+
+    def test_abstract_inherited_fields(self):
+        """Field instances from abstract models are not equal."""
+        class AbstractModel(models.Model):
+            field = models.IntegerField()
+
+            class Meta:
+                abstract = True
+
+        class InheritAbstractModel1(AbstractModel):
+            pass
+
+        class InheritAbstractModel2(AbstractModel):
+            pass
+
+        abstract_model_field = AbstractModel._meta.get_field('field')
+        inherit1_model_field = InheritAbstractModel1._meta.get_field('field')
+        inherit2_model_field = InheritAbstractModel2._meta.get_field('field')
+
+        self.assertNotEqual(abstract_model_field, inherit1_model_field)
+        self.assertNotEqual(abstract_model_field, inherit2_model_field)
+        self.assertNotEqual(inherit1_model_field, inherit2_model_field)
+
+        self.assertLess(abstract_model_field, inherit1_model_field)
+        self.assertLess(abstract_model_field, inherit2_model_field)
+        self.assertLess(inherit1_model_field, inherit2_model_field)
+
+        self.assertNotEqual(hash(abstract_model_field), hash(inherit1_model_field))
+        self.assertNotEqual(hash(abstract_model_field), hash(inherit2_model_field))
+        self.assertNotEqual(hash(inherit1_model_field), hash(inherit2_model_field))
 
 
 class ChoicesTests(SimpleTestCase):

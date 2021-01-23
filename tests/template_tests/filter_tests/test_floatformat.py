@@ -2,6 +2,8 @@ from decimal import Decimal, localcontext
 
 from django.template.defaultfilters import floatformat
 from django.test import SimpleTestCase
+from django.test.utils import override_settings
+from django.utils import translation
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -57,6 +59,19 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(floatformat(1.5e-15, 20), '0.00000000000000150000')
         self.assertEqual(floatformat(1.5e-15, -20), '0.00000000000000150000')
         self.assertEqual(floatformat(1.00000000000000015, 16), '1.0000000000000002')
+
+    @override_settings(USE_L10N=True)
+    def test_force_grouping(self):
+        with translation.override('en'):
+            self.assertEqual(floatformat(10000, 'g'), '10,000')
+            self.assertEqual(floatformat(66666.666, '1g'), '66,666.7')
+            # Invalid suffix.
+            self.assertEqual(floatformat(10000, 'g2'), '10000')
+        with translation.override('de', deactivate=True):
+            self.assertEqual(floatformat(10000, 'g'), '10.000')
+            self.assertEqual(floatformat(66666.666, '1g'), '66.666,7')
+            # Invalid suffix.
+            self.assertEqual(floatformat(10000, 'g2'), '10000')
 
     def test_zero_values(self):
         self.assertEqual(floatformat(0, 6), '0.000000')

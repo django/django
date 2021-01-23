@@ -1,12 +1,14 @@
 import os
 import sys
 from io import StringIO
+from unittest import expectedFailure, skip
 
 from django.apps import apps
 from django.conf import settings
 from django.core import serializers
 from django.db import router
 from django.db.transaction import atomic
+from django.utils.module_loading import import_string
 
 # The prefix to put on the default database name when creating
 # the test database.
@@ -58,7 +60,14 @@ class BaseDatabaseCreation:
         settings.DATABASES[self.connection.alias]["NAME"] = test_database_name
         self.connection.settings_dict["NAME"] = test_database_name
 
-        if self.connection.settings_dict['TEST']['MIGRATE']:
+        try:
+            if self.connection.settings_dict['TEST']['MIGRATE'] is False:
+                # Disable migrations for all apps.
+                old_migration_modules = settings.MIGRATION_MODULES
+                settings.MIGRATION_MODULES = {
+                    app.label: None
+                    for app in apps.get_app_configs()
+                }
             # We report migrate messages at one level lower than that
             # requested. This ensures we don't get flooded with messages during
             # testing (unless you really ask to be flooded).
@@ -69,6 +78,9 @@ class BaseDatabaseCreation:
                 database=self.connection.alias,
                 run_syncdb=True,
             )
+        finally:
+            if self.connection.settings_dict['TEST']['MIGRATE'] is False:
+                settings.MIGRATION_MODULES = old_migration_modules
 
         # We then serialize the current state of the database into a string
         # and store it on the connection. This slightly horrific process is so people
@@ -81,6 +93,9 @@ class BaseDatabaseCreation:
 
         # Ensure a connection for the side effect of initializing the test database.
         self.connection.ensure_connection()
+
+        if os.environ.get('RUNNING_DJANGOS_TEST_SUITE') == 'true':
+            self.mark_expected_failures_and_skips()
 
         return test_database_name
 
@@ -112,7 +127,7 @@ class BaseDatabaseCreation:
                             model._meta.can_migrate(self.connection) and
                             router.allow_migrate_model(self.connection.alias, model)
                         ):
-                            queryset = model._default_manager.using(
+                            queryset = model._base_manager.using(
                                 self.connection.alias,
                             ).order_by(model._meta.pk.name)
                             yield from queryset.iterator()
@@ -282,6 +297,29 @@ class BaseDatabaseCreation:
         with self._nodb_cursor() as cursor:
             cursor.execute("DROP DATABASE %s"
                            % self.connection.ops.quote_name(test_database_name))
+
+    def mark_expected_failures_and_skips(self):
+        """
+        Mark tests in Django's test suite which are expected failures on this
+        database and test which should be skipped on this database.
+        """
+        for test_name in self.connection.features.django_test_expected_failures:
+            test_case_name, _, test_method_name = test_name.rpartition('.')
+            test_app = test_name.split('.')[0]
+            # Importing a test app that isn't installed raises RuntimeError.
+            if test_app in settings.INSTALLED_APPS:
+                test_case = import_string(test_case_name)
+                test_method = getattr(test_case, test_method_name)
+                setattr(test_case, test_method_name, expectedFailure(test_method))
+        for reason, tests in self.connection.features.django_test_skips.items():
+            for test_name in tests:
+                test_case_name, _, test_method_name = test_name.rpartition('.')
+                test_app = test_name.split('.')[0]
+                # Importing a test app that isn't installed raises RuntimeError.
+                if test_app in settings.INSTALLED_APPS:
+                    test_case = import_string(test_case_name)
+                    test_method = getattr(test_case, test_method_name)
+                    setattr(test_case, test_method_name, skip(reason)(test_method))
 
     def sql_table_creation_suffix(self):
         """

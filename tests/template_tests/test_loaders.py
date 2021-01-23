@@ -93,6 +93,10 @@ class CachedLoaderTests(SimpleTestCase):
         """
         self.assertEqual(self.engine.template_loaders[0].cache_key(lazystr('template.html'), []), 'template.html')
 
+    def test_get_dirs(self):
+        inner_dirs = self.engine.template_loaders[0].loaders[0].get_dirs()
+        self.assertSequenceEqual(list(self.engine.template_loaders[0].get_dirs()), list(inner_dirs))
+
 
 class FileSystemLoaderTests(SimpleTestCase):
 

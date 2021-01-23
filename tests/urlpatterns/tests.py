@@ -1,11 +1,10 @@
+import string
 import uuid
 
-from django.conf.urls import url as conf_url
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, Resolver404, path, resolve, reverse
-from django.utils.deprecation import RemovedInDjango40Warning
 
 from .converters import DynamicConverter
 from .views import empty_view
@@ -142,10 +141,19 @@ class SimplifiedURLTests(SimpleTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             path('foo/<nonexistent:var>/', empty_view)
 
-    def test_space_in_route(self):
-        msg = "URL route 'space/<int: num>' cannot contain whitespace."
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            path('space/<int: num>', empty_view)
+    def test_whitespace_in_route(self):
+        msg = (
+            "URL route 'space/<int:num>/extra/<str:%stest>' cannot contain "
+            "whitespace in angle brackets <…>"
+        )
+        for whitespace in string.whitespace:
+            with self.subTest(repr(whitespace)):
+                with self.assertRaisesMessage(ImproperlyConfigured, msg % whitespace):
+                    path('space/<int:num>/extra/<str:%stest>' % whitespace, empty_view)
+        # Whitespaces are valid in paths.
+        p = path('space%s/<int:num>/' % string.whitespace, empty_view)
+        match = p.resolve('space%s/1/' % string.whitespace)
+        self.assertEqual(match.kwargs, {'num': 1})
 
 
 @override_settings(ROOT_URLCONF='urlpatterns.converter_urls')
@@ -305,13 +313,3 @@ class ConversionExceptionTests(SimpleTestCase):
             raise TypeError('This type error propagates.')
         with self.assertRaisesMessage(TypeError, 'This type error propagates.'):
             reverse('dynamic', kwargs={'value': object()})
-
-
-class DeprecationTests(SimpleTestCase):
-    def test_url_warning(self):
-        msg = (
-            'django.conf.urls.url() is deprecated in favor of '
-            'django.urls.re_path().'
-        )
-        with self.assertRaisesMessage(RemovedInDjango40Warning, msg):
-            conf_url(r'^regex/(?P<pk>[0-9]+)/$', empty_view, name='regex')

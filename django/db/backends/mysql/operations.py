@@ -29,6 +29,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         'PositiveBigIntegerField': 'unsigned integer',
         'PositiveIntegerField': 'unsigned integer',
         'PositiveSmallIntegerField': 'unsigned integer',
+        'DurationField': 'signed integer',
     }
     cast_char_field_without_max_length = 'char'
     explain_prefix = 'EXPLAIN'
@@ -54,7 +55,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             # EXTRACT returns 1-53 based on ISO-8601 for the week number.
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
-    def date_trunc_sql(self, lookup_type, field_name):
+    def date_trunc_sql(self, lookup_type, field_name, tzname=None):
+        field_name = self._convert_field_to_tz(field_name, tzname)
         fields = {
             'year': '%%Y-01-01',
             'month': '%%Y-%%m-01',
@@ -81,7 +83,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return tzname
 
     def _convert_field_to_tz(self, field_name, tzname):
-        if settings.USE_TZ and self.connection.timezone_name != tzname:
+        if tzname and settings.USE_TZ and self.connection.timezone_name != tzname:
             field_name = "CONVERT_TZ(%s, '%s', '%s')" % (
                 field_name,
                 self.connection.timezone_name,
@@ -127,7 +129,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
         return sql
 
-    def time_trunc_sql(self, lookup_type, field_name):
+    def time_trunc_sql(self, lookup_type, field_name, tzname=None):
+        field_name = self._convert_field_to_tz(field_name, tzname)
         fields = {
             'hour': '%%H:00:00',
             'minute': '%%H:%%i:00',
@@ -172,9 +175,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         if name.startswith("`") and name.endswith("`"):
             return name  # Quoting once is enough.
         return "`%s`" % name
-
-    def random_function_sql(self):
-        return 'RAND()'
 
     def return_insert_columns(self, fields):
         # MySQL and MariaDB < 10.5.0 don't support an INSERT...RETURNING
@@ -291,7 +291,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def get_db_converters(self, expression):
         converters = super().get_db_converters(expression)
         internal_type = expression.output_field.get_internal_type()
-        if internal_type in ['BooleanField', 'NullBooleanField']:
+        if internal_type == 'BooleanField':
             converters.append(self.convert_booleanfield_value)
         elif internal_type == 'DateTimeField':
             if settings.USE_TZ:

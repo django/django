@@ -13,7 +13,7 @@ class XViewMiddlewareTest(TestDataMixin, AdminDocsTestCase):
         self.client.force_login(self.superuser)
         response = self.client.head('/xview/func/')
         self.assertIn('X-View', response)
-        self.assertEqual(response['X-View'], 'admin_docs.views.xview')
+        self.assertEqual(response.headers['X-View'], 'admin_docs.views.xview')
         user.is_staff = False
         user.save()
         response = self.client.head('/xview/func/')
@@ -31,7 +31,7 @@ class XViewMiddlewareTest(TestDataMixin, AdminDocsTestCase):
         self.client.force_login(self.superuser)
         response = self.client.head('/xview/class/')
         self.assertIn('X-View', response)
-        self.assertEqual(response['X-View'], 'admin_docs.views.XViewClass')
+        self.assertEqual(response.headers['X-View'], 'admin_docs.views.XViewClass')
         user.is_staff = False
         user.save()
         response = self.client.head('/xview/class/')
@@ -45,7 +45,7 @@ class XViewMiddlewareTest(TestDataMixin, AdminDocsTestCase):
     def test_callable_object_view(self):
         self.client.force_login(self.superuser)
         response = self.client.head('/xview/callable_object/')
-        self.assertEqual(response['X-View'], 'admin_docs.views.XViewCallableObject')
+        self.assertEqual(response.headers['X-View'], 'admin_docs.views.XViewCallableObject')
 
     @override_settings(MIDDLEWARE=[])
     def test_no_auth_middleware(self):

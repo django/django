@@ -137,11 +137,15 @@ class CreateModel(ModelOperation):
                 ),
             ]
         elif isinstance(operation, AlterModelOptions) and self.name_lower == operation.name_lower:
+            options = {**self.options, **operation.options}
+            for key in operation.ALTER_OPTION_KEYS:
+                if key not in operation.options:
+                    options.pop(key, None)
             return [
                 CreateModel(
                     self.name,
                     fields=self.fields,
-                    options={**self.options, **operation.options},
+                    options=options,
                     bases=self.bases,
                     managers=self.managers,
                 ),
@@ -773,6 +777,12 @@ class AddIndex(IndexOperation):
         )
 
     def describe(self):
+        if self.index.expressions:
+            return 'Create index %s on %s on model %s' % (
+                self.index.name,
+                ', '.join([str(expression) for expression in self.index.expressions]),
+                self.model_name,
+            )
         return 'Create index %s on field(s) %s of model %s' % (
             self.index.name,
             ', '.join(self.index.fields),

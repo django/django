@@ -157,10 +157,6 @@ A converter is a class that includes the following:
   and as a consequence :func:`~django.urls.reverse` will raise
   :class:`~django.urls.NoReverseMatch` unless another URL pattern matches.
 
-  .. versionchanged:: 3.1
-
-    Support for raising ``ValueError`` to indicate no match was added.
-
 For example::
 
     class FourDigitYearConverter:

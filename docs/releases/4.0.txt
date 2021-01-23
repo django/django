@@ -1,0 +1,342 @@
+============================================
+Django 4.0 release notes - UNDER DEVELOPMENT
+============================================
+
+*Expected December 2021*
+
+Welcome to Django 4.0!
+
+These release notes cover the :ref:`new features <whats-new-4.0>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-4.0>` you'll
+want to be aware of when upgrading from Django 3.2 or earlier. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-4.0>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Python compatibility
+====================
+
+Django 4.0 supports Python 3.8, 3.9, and 3.10. We **highly recommend** and only
+officially support the latest release of each series.
+
+.. _whats-new-4.0:
+
+What's new in Django 4.0
+========================
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The ``admin/base.html`` template now has a new block ``header`` which
+  contains the admin site header.
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The default iteration count for the PBKDF2 password hasher is increased from
+  260,000 to 320,000.
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The PostgreSQL backend now supports connecting by a service name. See
+  :ref:`postgresql-connection-settings` for more details.
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Decorators
+~~~~~~~~~~
+
+* ...
+
+Email
+~~~~~
+
+* ...
+
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* ...
+
+File Storage
+~~~~~~~~~~~~
+
+* ...
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+Forms
+~~~~~
+
+* ...
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Logging
+~~~~~~~
+
+* ...
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* The :djadmin:`runserver` management command now supports the
+  :option:`--skip-checks` option.
+
+Migrations
+~~~~~~~~~~
+
+* ...
+
+Models
+~~~~~~
+
+* ...
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Security
+~~~~~~~~
+
+* ...
+
+Serialization
+~~~~~~~~~~~~~
+
+* ...
+
+Signals
+~~~~~~~
+
+* ...
+
+Templates
+~~~~~~~~~
+
+* ...
+
+Tests
+~~~~~
+
+* ...
+
+URLs
+~~~~
+
+* ...
+
+Utilities
+~~~~~~~~~
+
+* ...
+
+Validators
+~~~~~~~~~~
+
+* ...
+
+.. _backwards-incompatible-4.0:
+
+Backwards incompatible changes in 4.0
+=====================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* ...
+
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for PostGIS 2.3 is removed.
+
+Dropped support for PostgreSQL 9.6
+----------------------------------
+
+Upstream support for PostgreSQL 9.6 ends in November 2021. Django 4.0 supports
+PostgreSQL 10 and higher.
+
+Miscellaneous
+-------------
+
+* ...
+
+.. _deprecated-features-4.0:
+
+Features deprecated in 4.0
+==========================
+
+Miscellaneous
+-------------
+
+* ...
+
+Features removed in 4.0
+=======================
+
+These features have reached the end of their deprecation cycle and are removed
+in Django 4.0.
+
+See :ref:`deprecated-features-3.0` for details on these changes, including how
+to remove usage of these features.
+
+* ``django.utils.http.urlquote()``, ``urlquote_plus()``, ``urlunquote()``, and
+  ``urlunquote_plus()`` are removed.
+
+* ``django.utils.encoding.force_text()`` and ``smart_text()`` are removed.
+
+* ``django.utils.translation.ugettext()``, ``ugettext_lazy()``,
+  ``ugettext_noop()``, ``ungettext()``, and ``ungettext_lazy()`` are removed.
+
+* ``django.views.i18n.set_language()`` doesn't set the user language in
+  ``request.session`` (key ``_language``).
+
+* ``alias=None`` is required in the signature of
+  ``django.db.models.Expression.get_group_by_cols()`` subclasses.
+
+* ``django.utils.text.unescape_entities()`` is removed.
+
+* ``django.utils.http.is_safe_url()`` is removed.
+
+See :ref:`deprecated-features-3.1` for details on these changes, including how
+to remove usage of these features.
+
+* The ``PASSWORD_RESET_TIMEOUT_DAYS`` setting is removed.
+
+* The :lookup:`isnull` lookup no longer allows using non-boolean values as the
+  right-hand side.
+
+* The ``django.db.models.query_utils.InvalidQuery`` exception class is removed.
+
+* The ``django-admin.py`` entry point is removed.
+
+* The ``HttpRequest.is_ajax()`` method is removed.
+
+* Support for the pre-Django 3.1 encoding format of cookies values used by
+  ``django.contrib.messages.storage.cookie.CookieStorage`` is removed.
+
+* Support for the pre-Django 3.1 password reset tokens in the admin site (that
+  use the SHA-1 hashing algorithm) is removed.
+
+* Support for the pre-Django 3.1 encoding format of sessions is removed.
+
+* Support for the pre-Django 3.1 ``django.core.signing.Signer`` signatures
+  (encoded with the SHA-1 algorithm) is removed.
+
+* Support for the pre-Django 3.1 ``django.core.signing.dumps()`` signatures
+  (encoded with the SHA-1 algorithm) in ``django.core.signing.loads()`` is
+  removed.
+
+* Support for the pre-Django 3.1 user sessions (that use the SHA-1 algorithm)
+  is removed.
+
+* The ``get_request`` argument for
+  ``django.utils.deprecation.MiddlewareMixin.__init__()`` is required and
+  doesn't accept ``None``.
+
+* The ``providing_args`` argument for ``django.dispatch.Signal`` is removed.
+
+* The ``length`` argument for ``django.utils.crypto.get_random_string()`` is
+  required.
+
+* The ``list`` message for ``ModelMultipleChoiceField`` is removed.
+
+* Support for passing raw column aliases to ``QuerySet.order_by()`` is removed.
+
+* The ``NullBooleanField`` model field is removed, except for support in
+  historical migrations.
+
+* ``django.conf.urls.url()`` is removed.
+
+* The ``django.contrib.postgres.fields.JSONField`` model field is removed,
+  except for support in historical migrations.
+
+* ``django.contrib.postgres.fields.jsonb.KeyTransform`` and
+  ``django.contrib.postgres.fields.jsonb.KeyTextTransform`` are removed.
+
+* ``django.contrib.postgres.forms.JSONField`` is removed.
+
+* The ``{% ifequal %}`` and ``{% ifnotequal %}`` template tags are removed.
+
+* The ``DEFAULT_HASHING_ALGORITHM`` transitional setting is removed.

@@ -468,8 +468,15 @@ If you don't want to configure logging at all (or you want to manually
 configure logging using your own approach), you can set
 :setting:`LOGGING_CONFIG` to ``None``. This will disable the
 configuration process for :ref:`Django's default logging
-<default-logging-configuration>`. Here's an example that disables Django's
-logging configuration and then manually configures logging:
+<default-logging-configuration>`.
+
+Setting :setting:`LOGGING_CONFIG` to ``None`` only means that the automatic
+configuration process is disabled, not logging itself. If you disable the
+configuration process, Django will still make logging calls, falling back to
+whatever default logging behavior is defined.
+
+Here's an example that disables Django's logging configuration and then
+manually configures logging:
 
 .. code-block:: python
     :caption: settings.py
@@ -479,10 +486,11 @@ logging configuration and then manually configures logging:
     import logging.config
     logging.config.dictConfig(...)
 
-Setting :setting:`LOGGING_CONFIG` to ``None`` only means that the automatic
-configuration process is disabled, not logging itself. If you disable the
-configuration process, Django will still make logging calls, falling back to
-whatever default logging behavior is defined.
+Note that the default configuration process only calls
+:setting:`LOGGING_CONFIG` once settings are fully-loaded. In contrast, manually
+configuring the logging in your settings file will load your logging config
+immediately. As such, your logging config must appear *after* any settings on
+which it depends.
 
 Django's logging extensions
 ===========================

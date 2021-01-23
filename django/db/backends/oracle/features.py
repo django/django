@@ -1,9 +1,12 @@
-from django.db import InterfaceError
+from django.db import DatabaseError, InterfaceError
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
+    # Oracle crashes with "ORA-00932: inconsistent datatypes: expected - got
+    # BLOB" when grouping by LOBs (#24096).
+    allows_group_by_lob = False
     interprets_empty_strings_as_nulls = True
     has_select_for_update = True
     has_select_for_update_nowait = True
@@ -61,10 +64,34 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_boolean_expr_in_select_clause = False
     supports_primitives_in_json_field = False
     supports_json_field_contains = False
+    supports_collation_on_textfield = False
     test_collations = {
         'ci': 'BINARY_CI',
         'cs': 'BINARY',
+        'non_default': 'SWEDISH_CI',
         'swedish_ci': 'SWEDISH_CI',
+    }
+
+    django_test_skips = {
+        "Oracle doesn't support SHA224.": {
+            'db_functions.text.test_sha224.SHA224Tests.test_basic',
+            'db_functions.text.test_sha224.SHA224Tests.test_transform',
+        },
+        "Oracle doesn't support bitwise XOR.": {
+            'expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor',
+            'expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor_null',
+        },
+        "Oracle requires ORDER BY in row_number, ANSI:SQL doesn't.": {
+            'expressions_window.tests.WindowFunctionTests.test_row_number_no_ordering',
+        },
+        'Raises ORA-00600: internal error code on Oracle 18.': {
+            'model_fields.test_jsonfield.TestQuerying.test_usage_in_subquery',
+        },
+    }
+    django_test_expected_failures = {
+        # A bug in Django/cx_Oracle with respect to string handling (#23843).
+        'annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions',
+        'annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions_can_ref_other_functions',
     }
 
     @cached_property
@@ -78,3 +105,19 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             'SmallIntegerField': 'IntegerField',
             'TimeField': 'DateTimeField',
         }
+
+    @cached_property
+    def supports_collation_on_charfield(self):
+        with self.connection.cursor() as cursor:
+            try:
+                cursor.execute("SELECT CAST('a' AS VARCHAR2(4001)) FROM dual")
+            except DatabaseError as e:
+                if e.args[0].code == 910:
+                    return False
+                raise
+            return True
+
+    @cached_property
+    def has_json_object_function(self):
+        # Oracle < 18 supports JSON_OBJECT() but it's not fully functional.
+        return self.connection.oracle_version >= (18,)

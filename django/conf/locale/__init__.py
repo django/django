@@ -372,7 +372,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'ml',
         'name': 'Malayalam',
-        'name_local': 'Malayalam',
+        'name_local': 'മലയാളം',
     },
     'mn': {
         'bidi': False,

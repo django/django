@@ -195,9 +195,8 @@ class Command(BaseCommand):
                                 )
                         # psycopg2 raises ValueError if data contains NUL chars.
                         except (DatabaseError, IntegrityError, ValueError) as e:
-                            e.args = ("Could not load %(app_label)s.%(object_name)s(pk=%(pk)s): %(error_msg)s" % {
-                                'app_label': obj.object._meta.app_label,
-                                'object_name': obj.object._meta.object_name,
+                            e.args = ("Could not load %(object_label)s(pk=%(pk)s): %(error_msg)s" % {
+                                'object_label': obj.object._meta.label,
                                 'pk': obj.object.pk,
                                 'error_msg': e,
                             },)
@@ -232,7 +231,7 @@ class Command(BaseCommand):
         fixture_name, ser_fmt, cmp_fmt = self.parse_name(fixture_label)
         databases = [self.using, None]
         cmp_fmts = list(self.compression_formats) if cmp_fmt is None else [cmp_fmt]
-        ser_fmts = serializers.get_public_serializer_formats() if ser_fmt is None else [ser_fmt]
+        ser_fmts = self.serialization_formats if ser_fmt is None else [ser_fmt]
 
         if self.verbosity >= 2:
             self.stdout.write("Loading '%s' fixtures..." % fixture_name)

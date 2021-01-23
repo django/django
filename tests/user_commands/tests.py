@@ -243,9 +243,80 @@ class CommandTests(SimpleTestCase):
         self.assertIn('foo_id', out.getvalue())
         management.call_command('mutually_exclusive_required', foo_name='foo', stdout=out)
         self.assertIn('foo_name', out.getvalue())
-        msg = 'Error: one of the arguments --foo-id --foo-name is required'
+        msg = (
+            'Error: one of the arguments --foo-id --foo-name --foo-list '
+            '--append_const --const --count --flag_false --flag_true is '
+            'required'
+        )
         with self.assertRaisesMessage(CommandError, msg):
             management.call_command('mutually_exclusive_required', stdout=out)
+
+    def test_mutually_exclusive_group_required_const_options(self):
+        tests = [
+            ('append_const', [42]),
+            ('const', 31),
+            ('count', 1),
+            ('flag_false', False),
+            ('flag_true', True),
+        ]
+        for arg, value in tests:
+            out = StringIO()
+            expected_output = '%s=%s' % (arg, value)
+            with self.subTest(arg=arg):
+                management.call_command(
+                    'mutually_exclusive_required',
+                    '--%s' % arg,
+                    stdout=out,
+                )
+                self.assertIn(expected_output, out.getvalue())
+                out.truncate(0)
+                management.call_command(
+                    'mutually_exclusive_required',
+                    **{arg: value, 'stdout': out},
+                )
+                self.assertIn(expected_output, out.getvalue())
+
+    def test_required_list_option(self):
+        tests = [
+            (('--foo-list', [1, 2]), {}),
+            ((), {'foo_list': [1, 2]}),
+        ]
+        for command in ['mutually_exclusive_required', 'required_list_option']:
+            for args, kwargs in tests:
+                with self.subTest(command=command, args=args, kwargs=kwargs):
+                    out = StringIO()
+                    management.call_command(
+                        command,
+                        *args,
+                        **{**kwargs, 'stdout': out},
+                    )
+                    self.assertIn('foo_list=[1, 2]', out.getvalue())
+
+    def test_required_const_options(self):
+        args = {
+            'append_const': [42],
+            'const': 31,
+            'count': 1,
+            'flag_false': False,
+            'flag_true': True,
+        }
+        expected_output = '\n'.join(
+            '%s=%s' % (arg, value) for arg, value in args.items()
+        )
+        out = StringIO()
+        management.call_command(
+            'required_constant_option',
+            '--append_const',
+            '--const',
+            '--count',
+            '--flag_false',
+            '--flag_true',
+            stdout=out,
+        )
+        self.assertIn(expected_output, out.getvalue())
+        out.truncate(0)
+        management.call_command('required_constant_option', **{**args, 'stdout': out})
+        self.assertIn(expected_output, out.getvalue())
 
     def test_subparser(self):
         out = StringIO()
@@ -286,6 +357,13 @@ class CommandTests(SimpleTestCase):
         epilog = 'some epilog text'
         parser = BaseCommand().create_parser('prog_name', 'subcommand', epilog=epilog)
         self.assertEqual(parser.epilog, epilog)
+
+    def test_outputwrapper_flush(self):
+        out = StringIO()
+        with mock.patch.object(out, 'flush') as mocked_flush:
+            management.call_command('outputwrapper', stdout=out)
+        self.assertIn('Working...', out.getvalue())
+        self.assertIs(mocked_flush.called, True)
 
 
 class CommandRunTests(AdminScriptTestCase):

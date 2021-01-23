@@ -21,10 +21,17 @@ class Person(models.Model):
         return '%s %s' % (self.first_name, self.last_name)
 
 
+class SchoolClassManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().exclude(year=1000)
+
+
 class SchoolClass(models.Model):
     year = models.PositiveIntegerField()
     day = models.CharField(max_length=9, blank=True)
     last_updated = models.DateTimeField()
+
+    objects = SchoolClassManager()
 
 
 class VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ(models.Model):
@@ -133,3 +140,11 @@ class Author(models.Model):
 
 class Book(models.Model):
     author = models.ForeignKey(Author, models.CASCADE, to_field='name')
+
+
+class SQLKeywordsModel(models.Model):
+    id = models.AutoField(primary_key=True, db_column='select')
+    reporter = models.ForeignKey(Reporter, models.CASCADE, db_column='where')
+
+    class Meta:
+        db_table = 'order'

@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Ahmad Hosseini <ahmadly.com@gmail.com>, 2020
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Arash Fazeli <a.fazeli@gmail.com>, 2012
 # Eric Hamiter <ehamiter@gmail.com>, 2019
@@ -19,8 +20,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-05-19 20:23+0200\n"
-"PO-Revision-Date: 2020-07-14 21:42+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2020-08-20 15:48+0000\n"
+"Last-Translator: Ahmad Hosseini <ahmadly.com@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -162,7 +163,7 @@ msgid "Indonesian"
 msgstr "اندونزیایی"
 
 msgid "Igbo"
-msgstr ""
+msgstr "ایگبو"
 
 msgid "Ido"
 msgstr "ایدو"
@@ -282,13 +283,13 @@ msgid "Telugu"
 msgstr "تلوگویی"
 
 msgid "Tajik"
-msgstr ""
+msgstr "تاجیک"
 
 msgid "Thai"
 msgstr "تایلندی"
 
 msgid "Turkmen"
-msgstr ""
+msgstr "ترکمن"
 
 msgid "Turkish"
 msgstr "ترکی"

@@ -38,7 +38,7 @@ class SessionStorage(BaseStorage):
         return []
 
     def serialize_messages(self, messages):
-        encoder = MessageEncoder(separators=(',', ':'))
+        encoder = MessageEncoder()
         return encoder.encode(messages)
 
     def deserialize_messages(self, data):

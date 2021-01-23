@@ -415,9 +415,12 @@ cross-site scripting attack.
 If ``True``, this field is the primary key for the model.
 
 If you don't specify ``primary_key=True`` for any field in your model, Django
-will automatically add an :class:`AutoField` to hold the primary key, so you
-don't need to set ``primary_key=True`` on any of your fields unless you want to
-override the default primary-key behavior. For more, see
+will automatically add a field to hold the primary key, so you don't need to
+set ``primary_key=True`` on any of your fields unless you want to override the
+default primary-key behavior. The type of auto-created primary key fields can
+be specified per app in :attr:`AppConfig.default_auto_field
+<django.apps.AppConfig.default_auto_field>` or globally in the
+:setting:`DEFAULT_AUTO_FIELD` setting. For more, see
 :ref:`automatic-primary-key-fields`.
 
 ``primary_key=True`` implies :attr:`null=False <Field.null>` and
@@ -427,6 +430,11 @@ object.
 The primary key field is read-only. If you change the value of the primary
 key on an existing object and then save it, a new object will be created
 alongside the old one.
+
+.. versionchanged:: 3.2
+
+    In older versions, auto-created primary key fields were always
+    :class:`AutoField`\s.
 
 ``unique``
 ----------
@@ -593,20 +601,36 @@ For large amounts of text, use :class:`~django.db.models.TextField`.
 
 The default form widget for this field is a :class:`~django.forms.TextInput`.
 
-:class:`CharField` has one extra required argument:
+:class:`CharField` has two extra arguments:
 
 .. attribute:: CharField.max_length
 
-    The maximum length (in characters) of the field. The max_length is enforced
-    at the database level and in Django's validation using
+    Required. The maximum length (in characters) of the field. The max_length
+    is enforced at the database level and in Django's validation using
     :class:`~django.core.validators.MaxLengthValidator`.
 
-.. note::
+    .. note::
 
-    If you are writing an application that must be portable to multiple
-    database backends, you should be aware that there are restrictions on
-    ``max_length`` for some backends. Refer to the :doc:`database backend
-    notes </ref/databases>` for details.
+        If you are writing an application that must be portable to multiple
+        database backends, you should be aware that there are restrictions on
+        ``max_length`` for some backends. Refer to the :doc:`database backend
+        notes </ref/databases>` for details.
+
+.. attribute:: CharField.db_collation
+
+    .. versionadded:: 3.2
+
+    Optional. The database collation name of the field.
+
+    .. note::
+
+        Collation names are not standardized. As such, this will not be
+        portable across multiple database backends.
+
+    .. admonition:: Oracle
+
+        Oracle supports collations only when the ``MAX_STRING_SIZE`` database
+        initialization parameter is set to ``EXTENDED``.
 
 ``DateField``
 -------------
@@ -818,10 +842,6 @@ Has two optional arguments:
     handles the storage and retrieval of your files. See :doc:`/topics/files`
     for details on how to provide this object.
 
-    .. versionchanged:: 3.1
-
-        The ability to provide a callable was added.
-
 The default form widget for this field is a
 :class:`~django.forms.ClearableFileInput`.
 
@@ -920,6 +940,12 @@ can be used to interact with the underlying file:
 The name of the file including the relative path from the root of the
 :class:`~django.core.files.storage.Storage` of the associated
 :class:`~django.db.models.FileField`.
+
+.. attribute:: FieldFile.path
+
+A read-only property to access the file's local filesystem path by calling the
+:meth:`~django.core.files.storage.Storage.path` method of the underlying
+:class:`~django.core.files.storage.Storage` class.
 
 .. attribute:: FieldFile.size
 
@@ -1168,14 +1194,12 @@ values are stored as null.
 
 .. class:: JSONField(encoder=None, decoder=None, **options)
 
-.. versionadded:: 3.1
-
 A field for storing JSON encoded data. In Python the data is represented in its
 Python native format: dictionaries, lists, strings, numbers, booleans and
 ``None``.
 
 ``JSONField`` is supported on MariaDB 10.2.7+, MySQL 5.7.8+, Oracle,
-PostgreSQL, and SQLite 3.9.0+ (with the :ref:`JSON1 extension enabled
+PostgreSQL, and SQLite (with the :ref:`JSON1 extension enabled
 <sqlite-json1>`).
 
 .. attribute:: JSONField.encoder
@@ -1230,23 +1254,10 @@ To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
     objects and arrays (represented in Python using :py:class:`dict` and
     :py:class:`list`) are supported.
 
-``NullBooleanField``
---------------------
-
-.. class:: NullBooleanField(**options)
-
-Like :class:`BooleanField` with ``null=True``.
-
-.. deprecated:: 3.1
-
-    ``NullBooleanField`` is deprecated in favor of ``BooleanField(null=True)``.
-
 ``PositiveBigIntegerField``
 ---------------------------
 
 .. class:: PositiveBigIntegerField(**options)
-
-.. versionadded:: 3.1
 
 Like a :class:`PositiveIntegerField`, but only allows values under a certain
 (database-dependent) point. Values from ``0`` to ``9223372036854775807`` are
@@ -1328,6 +1339,21 @@ If you specify a ``max_length`` attribute, it will be reflected in the
 :class:`~django.forms.Textarea` widget of the auto-generated form field.
 However it is not enforced at the model or database level. Use a
 :class:`CharField` for that.
+
+.. attribute:: TextField.db_collation
+
+    .. versionadded:: 3.2
+
+    The database collation name of the field.
+
+    .. note::
+
+        Collation names are not standardized. As such, this will not be
+        portable across multiple database backends.
+
+    .. admonition:: Oracle
+
+        Oracle does not support collations for a ``TextField``.
 
 ``TimeField``
 -------------
@@ -1533,8 +1559,6 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     :exc:`django.db.IntegrityError`.
 
 * .. attribute:: RESTRICT
-
-    .. versionadded:: 3.1
 
     Prevent deletion of the referenced object by raising
     :exc:`~django.db.models.RestrictedError` (a subclass of
@@ -1827,11 +1851,9 @@ that control how the relationship functions.
 
     .. note::
 
-        Recursive relationships using an intermediary model and defined as
-        symmetrical (that is, with :attr:`symmetrical=True
-        <ManyToManyField.symmetrical>`, which is the default) can't determine
-        the reverse accessors names, as they would be the same. You need to set
-        a :attr:`~ForeignKey.related_name` to at least one of them. If you'd
+        Recursive relationships using an intermediary model can't determine the
+        reverse accessors names, as they would be the same. You need to set a
+        :attr:`~ForeignKey.related_name` to at least one of them. If you'd
         prefer Django not to create a backwards relation, set ``related_name``
         to ``'+'``.
 

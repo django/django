@@ -18,7 +18,7 @@ class AdminHistoryViewTests(TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-    def test_changed_message_uses_form_lables(self):
+    def test_changed_message_uses_form_labels(self):
         """
         Admin's model history change messages use form labels instead of
         field names.

@@ -180,9 +180,8 @@ following methods:
     The notation to use a lookup in an expression is
     ``<lhs>__<lookup_name>=<rhs>``.
 
-    This class doesn't follow the :ref:`Query Expression API <query-expression>`
-    since it has ``=<rhs>`` on its construction: lookups are always the end of
-    a lookup expression.
+    This class acts as a query expression, but, since it has ``=<rhs>`` on its
+    construction, lookups must always be the end of a lookup expression.
 
     .. attribute:: lhs
 

@@ -383,6 +383,14 @@ class Command(BaseCommand):
 
             # Build po files for each selected locale
             for locale in locales:
+                if '-' in locale:
+                    self.stdout.write(
+                        'invalid locale %s, did you mean %s?' % (
+                            locale,
+                            locale.replace('-', '_'),
+                        ),
+                    )
+                    continue
                 if self.verbosity > 0:
                     self.stdout.write('processing locale %s' % locale)
                 for potfile in potfiles:
@@ -542,9 +550,6 @@ class Command(BaseCommand):
                 '--keyword=gettext_noop',
                 '--keyword=gettext_lazy',
                 '--keyword=ngettext_lazy:1,2',
-                '--keyword=ugettext_noop',
-                '--keyword=ugettext_lazy',
-                '--keyword=ungettext_lazy:1,2',
                 '--keyword=pgettext:1c,2',
                 '--keyword=npgettext:1c,2,3',
                 '--keyword=pgettext_lazy:1c,2',

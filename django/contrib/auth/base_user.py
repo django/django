@@ -4,7 +4,6 @@ not in INSTALLED_APPS.
 """
 import unicodedata
 
-from django.conf import settings
 from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import (
     check_password, is_password_usable, make_password,
@@ -121,11 +120,6 @@ class AbstractBaseUser(models.Model):
         """
         return is_password_usable(self.password)
 
-    def _legacy_get_session_auth_hash(self):
-        # RemovedInDjango40Warning: pre-Django 3.1 hashes will be invalid.
-        key_salt = 'django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash'
-        return salted_hmac(key_salt, self.password, algorithm='sha1').hexdigest()
-
     def get_session_auth_hash(self):
         """
         Return an HMAC of the password field.
@@ -134,10 +128,7 @@ class AbstractBaseUser(models.Model):
         return salted_hmac(
             key_salt,
             self.password,
-            # RemovedInDjango40Warning: when the deprecation ends, replace
-            # with:
-            # algorithm='sha256',
-            algorithm=settings.DEFAULT_HASHING_ALGORITHM,
+            algorithm='sha256',
         ).hexdigest()
 
     @classmethod

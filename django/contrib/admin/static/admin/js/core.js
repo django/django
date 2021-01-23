@@ -85,6 +85,12 @@ function findPosY(obj) {
         return (this.getSeconds() < 10) ? '0' + this.getSeconds() : this.getSeconds();
     };
 
+    Date.prototype.getAbbrevMonthName = function() {
+        return typeof window.CalendarNamespace === "undefined"
+            ? this.getTwoDigitMonth()
+            : window.CalendarNamespace.monthsOfYearAbbrev[this.getMonth()];
+    };
+
     Date.prototype.getFullMonthName = function() {
         return typeof window.CalendarNamespace === "undefined"
             ? this.getTwoDigitMonth()
@@ -93,6 +99,7 @@ function findPosY(obj) {
 
     Date.prototype.strftime = function(format) {
         const fields = {
+            b: this.getAbbrevMonthName(),
             B: this.getFullMonthName(),
             c: this.toString(),
             d: this.getTwoDigitDate(),

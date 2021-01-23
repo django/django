@@ -315,10 +315,9 @@ class OrderingTests(TestCase):
         """
         'pk' works as an ordering option in Meta.
         """
-        self.assertQuerysetEqual(
-            Author.objects.all(),
-            list(reversed(range(1, Author.objects.count() + 1))),
-            attrgetter("pk"),
+        self.assertEqual(
+            [a.pk for a in Author.objects.all()],
+            [a.pk for a in Author.objects.order_by('-pk')],
         )
 
     def test_order_by_fk_attname(self):
@@ -326,8 +325,9 @@ class OrderingTests(TestCase):
         ordering by a foreign key by its attribute name prevents the query
         from inheriting its related model ordering option (#19195).
         """
+        authors = list(Author.objects.order_by('id'))
         for i in range(1, 5):
-            author = Author.objects.get(pk=i)
+            author = authors[i - 1]
             article = getattr(self, "a%d" % (5 - i))
             article.author = author
             article.save(update_fields={'author'})

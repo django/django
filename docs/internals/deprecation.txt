@@ -7,6 +7,14 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
+.. _deprecation-removed-in-5.0:
+
+5.0
+---
+
+See the :ref:`Django 4.0 release notes <deprecated-features-4.0>` for more
+details on these changes.
+
 .. _deprecation-removed-in-4.1:
 
 4.1
@@ -25,6 +33,14 @@ details on these changes.
   ``django.core.validators.EmailValidator`` will be removed.
 
 * The ``default_app_config`` module variable will be removed.
+
+* ``TransactionTestCase.assertQuerysetEqual()` will no longer automatically
+  call ``repr()`` on a queryset when compared to string values.
+
+* ``django.core.cache.backends.memcached.MemcachedCache`` will be removed.
+
+* Support for the pre-Django 3.2 format of messages used by
+  ``django.contrib.messages.storage.cookie.CookieStorage`` will be removed.
 
 .. _deprecation-removed-in-4.0:
 
@@ -868,8 +884,8 @@ details on these changes.
   supports base36 encoded user IDs
   (``django.contrib.auth.views.password_reset_confirm_uidb36``) will be
   removed. If your site has been running Django 1.6 for more than
-  :setting:`PASSWORD_RESET_TIMEOUT_DAYS`, this change will have no effect. If
-  not, then any password reset links generated before you upgrade to Django 1.7
+  ``PASSWORD_RESET_TIMEOUT_DAYS``, this change will have no effect. If not,
+  then any password reset links generated before you upgrade to Django 1.7
   won't work after the upgrade.
 
 * The ``django.utils.encoding.StrAndUnicode`` mix-in will be removed.

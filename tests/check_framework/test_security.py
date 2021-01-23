@@ -1,5 +1,7 @@
 from django.conf import settings
+from django.core.checks.messages import Error
 from django.core.checks.security import base, csrf, sessions
+from django.core.management.utils import get_random_secret_key
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 
@@ -394,6 +396,12 @@ class CheckSecretKeyTest(SimpleTestCase):
     def test_none_secret_key(self):
         self.assertEqual(base.check_secret_key(None), [base.W009])
 
+    @override_settings(
+        SECRET_KEY=base.SECRET_KEY_INSECURE_PREFIX + get_random_secret_key()
+    )
+    def test_insecure_secret_key(self):
+        self.assertEqual(base.check_secret_key(None), [base.W009])
+
     @override_settings(SECRET_KEY=('abcdefghijklmnopqrstuvwx' * 2) + 'a')
     def test_low_length_secret_key(self):
         self.assertEqual(len(settings.SECRET_KEY), base.SECRET_KEY_MIN_LENGTH - 1)
@@ -464,3 +472,35 @@ class CheckReferrerPolicyTest(SimpleTestCase):
     )
     def test_with_invalid_referrer_policy(self):
         self.assertEqual(base.check_referrer_policy(None), [base.E023])
+
+
+def failure_view_with_invalid_signature():
+    pass
+
+
+class CSRFFailureViewTest(SimpleTestCase):
+    @override_settings(CSRF_FAILURE_VIEW='')
+    def test_failure_view_import_error(self):
+        self.assertEqual(
+            csrf.check_csrf_failure_view(None),
+            [
+                Error(
+                    "The CSRF failure view '' could not be imported.",
+                    id='security.E102',
+                )
+            ],
+        )
+
+    @override_settings(
+        CSRF_FAILURE_VIEW='check_framework.test_security.failure_view_with_invalid_signature',
+    )
+    def test_failure_view_invalid_signature(self):
+        msg = (
+            "The CSRF failure view "
+            "'check_framework.test_security.failure_view_with_invalid_signature' "
+            "does not take the correct number of arguments."
+        )
+        self.assertEqual(
+            csrf.check_csrf_failure_view(None),
+            [Error(msg, id='security.E101')],
+        )

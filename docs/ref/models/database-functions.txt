@@ -148,6 +148,29 @@ and ``comment.modified``.
     The PostgreSQL behavior can be emulated using ``Coalesce`` if you know
     a sensible minimum value to provide as a default.
 
+``JSONObject``
+--------------
+
+.. class:: JSONObject(**fields)
+
+.. versionadded:: 3.2
+
+Takes a list of key-value pairs and returns a JSON object containing those
+pairs.
+
+Usage example::
+
+    >>> from django.db.models import F
+    >>> from django.db.models.functions import JSONObject, Lower
+    >>> Author.objects.create(name='Margaret Smith', alias='msmith', age=25)
+    >>> author = Author.objects.annotate(json_object=JSONObject(
+    ...     name=Lower('name'),
+    ...     alias='alias',
+    ...     age=F('age') * 2,
+    ... )).get()
+    >>> author.json_object
+    {'name': 'margaret smith', 'alias': 'msmith', 'age': 50}
+
 ``Least``
 ---------
 
@@ -312,8 +335,6 @@ Usage example::
     .. attribute:: lookup_name = 'week_day'
 
 .. class:: ExtractIsoWeekDay(expression, tzinfo=None, **extra)
-
-    .. versionadded:: 3.1
 
     Returns the ISO-8601 week day with day 1 being Monday and day 7 being
     Sunday.
@@ -623,19 +644,27 @@ that deal with date-parts can be used with ``DateField``::
 ``DateTimeField`` truncation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. class:: TruncDate(expression, **extra)
+.. class:: TruncDate(expression, tzinfo=None, **extra)
 
     .. attribute:: lookup_name = 'date'
     .. attribute:: output_field = DateField()
+
+    .. versionchanged:: 3.2
+
+        The ``tzinfo`` parameter was added.
 
 ``TruncDate`` casts ``expression`` to a date rather than using the built-in SQL
 truncate function. It's also registered as a transform on  ``DateTimeField`` as
 ``__date``.
 
-.. class:: TruncTime(expression, **extra)
+.. class:: TruncTime(expression, tzinfo=None, **extra)
 
     .. attribute:: lookup_name = 'time'
     .. attribute:: output_field = TimeField()
+
+    .. versionchanged:: 3.2
+
+        The ``tzinfo`` parameter was added.
 
 ``TruncTime`` casts ``expression`` to a time rather than using the built-in SQL
 truncate function. It's also registered as a transform on ``DateTimeField`` as
@@ -1105,6 +1134,15 @@ It can also be registered as a transform. For example::
     >>> FloatField.register_lookup(Radians)
     >>> # Get vectors whose radians are less than 1
     >>> vectors = Vector.objects.filter(x__radians__lt=1, y__radians__lt=1)
+
+``Random``
+----------
+
+.. class:: Random(**extra)
+
+.. versionadded:: 3.2
+
+Returns a random value in the range ``0.0 ≤ x < 1.0``.
 
 ``Round``
 ---------

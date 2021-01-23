@@ -2,6 +2,7 @@
 #
 # Translators:
 # eallik <eallik@gmail.com>, 2011
+# Erlend Eelmets <debcf78e@opayq.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
 # Martin Pajuste <martinpajuste@gmail.com>, 2015
@@ -13,8 +14,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-14 22:38+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2020-09-03 15:38+0000\n"
+"Last-Translator: Erlend Eelmets <debcf78e@opayq.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -521,7 +522,7 @@ msgid "Forgotten your password or username?"
 msgstr "Unustasite oma parooli või kasutajanime?"
 
 msgid "Toggle navigation"
-msgstr ""
+msgstr "Lülita navigeerimine sisse"
 
 msgid "Date/time"
 msgstr "Kuupäev/kellaaeg"

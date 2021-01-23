@@ -608,15 +608,6 @@ you should use::
 
     {% if a > b and b > c %}
 
-``ifequal`` and ``ifnotequal``
-------------------------------
-
-.. deprecated:: 3.1
-
-``{% ifequal a b %} ... {% endifequal %}`` is an obsolete way to write
-``{% if a == b %} ... {% endif %}``. Likewise, ``{% ifnotequal a b %} ...
-{% endifnotequal %}`` is superseded by ``{% if a != b %} ... {% endif %}``.
-
 .. templatetag:: ifchanged
 
 ``ifchanged``
@@ -728,10 +719,6 @@ available to the included template::
     that includes blocks from another will contain blocks that have *already
     been evaluated and rendered* - not blocks that can be overridden by, for
     example, an extending template.
-
-.. versionchanged:: 3.1
-
-    Support for iterables of template names was added.
 
 .. templatetag:: load
 
@@ -1379,7 +1366,7 @@ Format character  Description                               Example output
                   style. Proprietary extension.
 ``t``             Number of days in the given month.        ``28`` to ``31``
 **Year**
-``y``             Year, 2 digits.                           ``'99'``
+``y``             Year, 2 digits with leading zeros.        ``'00'`` to ``'99'``
 ``Y``             Year, 4 digits.                           ``'1999'``
 ``L``             Boolean for whether it's a leap year.     ``True`` or ``False``
 ``o``             ISO-8601 week-numbering year,             ``'1999'``
@@ -1422,7 +1409,7 @@ Format character  Description                               Example output
                   always negative, and for those east of
                   UTC is always positive.
 **Date/Time**
-``c``             ISO 8601 format. (Note: unlike others     ``2008-01-02T10:30:00.000123+02:00``,
+``c``             ISO 8601 format. (Note: unlike other      ``2008-01-02T10:30:00.000123+02:00``,
                   formatters, such as "Z", "O" or "r",      or ``2008-01-02T10:30:00.000123`` if the datetime is naive
                   the "c" formatter will not add timezone
                   offset if value is a naive datetime
@@ -1732,13 +1719,24 @@ displayed. For example:
 ``34.26000``  ``{{ value|floatformat:"-3" }}``  ``34.260``
 ============  ================================  ==========
 
+If the argument passed to ``floatformat`` has the ``g`` suffix, it will force
+grouping by the :setting:`THOUSAND_SEPARATOR` for the active locale. For
+example, when the active locale is ``en`` (English):
+
+============ ================================= =============
+``value``    Template                          Output
+============ ================================= =============
+``34232.34`` ``{{ value|floatformat:"2g" }}``  ``34,232.34``
+``34232.06`` ``{{ value|floatformat:"g" }}``   ``34,232.1``
+``34232.00`` ``{{ value|floatformat:"-3g" }}`` ``34,232``
+============ ================================= =============
+
 Using ``floatformat`` with no argument is equivalent to using ``floatformat``
 with an argument of ``-1``.
 
-.. versionchanged:: 3.1
+.. versionchanged:: 3.2
 
-    In older versions, a negative zero ``-0`` was returned for negative numbers
-    which round to zero.
+    The ``g`` suffix to force grouping by thousand separators was added.
 
 .. templatefilter:: force_escape
 
@@ -2602,7 +2600,7 @@ app is installed, the tag will serve files using ``url()`` method of the
 storage specified by :setting:`STATICFILES_STORAGE`. For example::
 
     {% load static %}
-    <img src="{% static "images/hi.jpg" %}" alt="Hi!">
+    <img src="{% static 'images/hi.jpg' %}" alt="Hi!">
 
 It is also able to consume standard context variables, e.g. assuming a
 ``user_stylesheet`` variable is passed to the template::

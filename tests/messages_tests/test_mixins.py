@@ -1,3 +1,4 @@
+from django.core.signing import b64_decode
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
@@ -12,10 +13,17 @@ class SuccessMessageMixinTests(TestCase):
         author = {'name': 'John Doe', 'slug': 'success-msg'}
         add_url = reverse('add_success_msg')
         req = self.client.post(add_url, author)
-        self.assertIn(ContactFormViewWithMsg.success_message % author, req.cookies['messages'].value)
+        # Uncompressed message is stored in the cookie.
+        value = b64_decode(
+            req.cookies['messages'].value.split(":")[0].encode(),
+        ).decode()
+        self.assertIn(ContactFormViewWithMsg.success_message % author, value)
 
     def test_set_messages_success_on_delete(self):
         object_to_delete = SomeObject.objects.create(name="MyObject")
         delete_url = reverse('success_msg_on_delete', args=[object_to_delete.pk])
         req = self.client.post(delete_url)
-        self.assertIn(DeleteFormViewWithMsg.success_message, req.cookies['messages'].value)
+        value = b64_decode(
+            req.cookies['messages'].value.split(":")[0].encode(),
+        ).decode()
+        self.assertIn(DeleteFormViewWithMsg.success_message, value)

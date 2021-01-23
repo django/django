@@ -156,9 +156,12 @@ def teardown_test_environment():
     del mail.outbox
 
 
-def setup_databases(verbosity, interactive, *, time_keeper, keepdb=False, debug_sql=False, parallel=0,
+def setup_databases(verbosity, interactive, *, time_keeper=None, keepdb=False, debug_sql=False, parallel=0,
                     aliases=None):
     """Create the test databases."""
+    if time_keeper is None:
+        time_keeper = NullTimeKeeper()
+
     test_databases, mirrored_aliases = get_unique_databases_and_mirrors(aliases)
 
     old_names = []
@@ -348,24 +351,15 @@ class TestContextDecorator:
     def decorate_class(self, cls):
         if issubclass(cls, TestCase):
             decorated_setUp = cls.setUp
-            decorated_tearDown = cls.tearDown
 
             def setUp(inner_self):
                 context = self.enable()
+                inner_self.addCleanup(self.disable)
                 if self.attr_name:
                     setattr(inner_self, self.attr_name, context)
-                try:
-                    decorated_setUp(inner_self)
-                except Exception:
-                    self.disable()
-                    raise
-
-            def tearDown(inner_self):
-                decorated_tearDown(inner_self)
-                self.disable()
+                decorated_setUp(inner_self)
 
             cls.setUp = setUp
-            cls.tearDown = tearDown
             return cls
         raise TypeError('Can only decorate subclasses of unittest.TestCase')
 

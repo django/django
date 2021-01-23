@@ -23,29 +23,26 @@ class Element:
     def append(self, element):
         if isinstance(element, str):
             element = normalize_whitespace(element)
-            if self.children:
-                if isinstance(self.children[-1], str):
-                    self.children[-1] += element
-                    self.children[-1] = normalize_whitespace(self.children[-1])
-                    return
+            if self.children and isinstance(self.children[-1], str):
+                self.children[-1] += element
+                self.children[-1] = normalize_whitespace(self.children[-1])
+                return
         elif self.children:
             # removing last children if it is only whitespace
             # this can result in incorrect dom representations since
             # whitespace between inline tags like <span> is significant
-            if isinstance(self.children[-1], str):
-                if self.children[-1].isspace():
-                    self.children.pop()
+            if isinstance(self.children[-1], str) and self.children[-1].isspace():
+                self.children.pop()
         if element:
             self.children.append(element)
 
     def finalize(self):
         def rstrip_last_element(children):
-            if children:
-                if isinstance(children[-1], str):
-                    children[-1] = children[-1].rstrip()
-                    if not children[-1]:
-                        children.pop()
-                        children = rstrip_last_element(children)
+            if children and isinstance(children[-1], str):
+                children[-1] = children[-1].rstrip()
+                if not children[-1]:
+                    children.pop()
+                    children = rstrip_last_element(children)
             return children
 
         rstrip_last_element(self.children)
@@ -79,13 +76,12 @@ class Element:
         return hash((self.name, *self.attributes))
 
     def _count(self, element, count=True):
-        if not isinstance(element, str):
-            if self == element:
-                return 1
-        if isinstance(element, RootElement):
-            if self.children == element.children:
-                return 1
+        if not isinstance(element, str) and self == element:
+            return 1
+        if isinstance(element, RootElement) and self.children == element.children:
+            return 1
         i = 0
+        elem_child_idx = 0
         for child in self.children:
             # child is text content and element is also text content, then
             # make a simple "text" in "text"
@@ -96,9 +92,26 @@ class Element:
                     elif element in child:
                         return 1
             else:
+                # Look for element wholly within this child.
                 i += child._count(element, count=count)
                 if not count and i:
                     return i
+                # Also look for a sequence of element's children among self's
+                # children. self.children == element.children is tested above,
+                # but will fail if self has additional children. Ex: '<a/><b/>'
+                # is contained in '<a/><b/><c/>'.
+                if isinstance(element, RootElement) and element.children:
+                    elem_child = element.children[elem_child_idx]
+                    # Start or continue match, advance index.
+                    if elem_child == child:
+                        elem_child_idx += 1
+                        # Match found, reset index.
+                        if elem_child_idx == len(element.children):
+                            i += 1
+                            elem_child_idx = 0
+                    # No match, reset index.
+                    else:
+                        elem_child_idx = 0
         return i
 
     def __contains__(self, element):
@@ -223,7 +236,6 @@ def parse_html(html):
     document = parser.root
     document.finalize()
     # Removing ROOT element if it's not necessary
-    if len(document.children) == 1:
-        if not isinstance(document.children[0], str):
-            document = document.children[0]
+    if len(document.children) == 1 and not isinstance(document.children[0], str):
+        document = document.children[0]
     return document

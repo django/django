@@ -5,10 +5,10 @@ from decimal import Decimal
 from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models import (
-    Avg, Case, Count, DecimalField, DurationField, Exists, F, FloatField, Func,
+    Avg, Case, Count, DecimalField, DurationField, Exists, F, FloatField,
     IntegerField, Max, Min, OuterRef, Subquery, Sum, Value, When,
 )
-from django.db.models.functions import Coalesce
+from django.db.models.functions import Coalesce, Greatest
 from django.test import TestCase
 from django.test.testcases import skipUnlessDBFeature
 from django.test.utils import Approximate, CaptureQueriesContext
@@ -150,6 +150,14 @@ class AggregateTestCase(TestCase):
     def test_aggregate_alias(self):
         vals = Store.objects.filter(name="Amazon.com").aggregate(amazon_mean=Avg("books__rating"))
         self.assertEqual(vals, {'amazon_mean': Approximate(4.08, places=2)})
+
+    def test_aggregate_transform(self):
+        vals = Store.objects.aggregate(min_month=Min('original_opening__month'))
+        self.assertEqual(vals, {'min_month': 3})
+
+    def test_aggregate_join_transform(self):
+        vals = Publisher.objects.aggregate(min_year=Min('book__pubdate__year'))
+        self.assertEqual(vals, {'min_year': 1991})
 
     def test_annotate_basic(self):
         self.assertQuerysetEqual(
@@ -750,13 +758,13 @@ class AggregateTestCase(TestCase):
         number of authors.
         """
         dates = Book.objects.annotate(num_authors=Count("authors")).dates('pubdate', 'year')
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             dates, [
-                "datetime.date(1991, 1, 1)",
-                "datetime.date(1995, 1, 1)",
-                "datetime.date(2007, 1, 1)",
-                "datetime.date(2008, 1, 1)"
-            ]
+                datetime.date(1991, 1, 1),
+                datetime.date(1995, 1, 1),
+                datetime.date(2007, 1, 1),
+                datetime.date(2008, 1, 1),
+            ],
         )
 
     def test_values_aggregation(self):
@@ -1004,6 +1012,16 @@ class AggregateTestCase(TestCase):
 
         self.assertEqual(author.sum_age, other_author.sum_age)
 
+    def test_aggregate_over_aggregate(self):
+        msg = "Cannot compute Avg('age'): 'age' is an aggregate"
+        with self.assertRaisesMessage(FieldError, msg):
+            Author.objects.annotate(
+                age_alias=F('age'),
+            ).aggregate(
+                age=Sum(F('age')),
+                avg_age=Avg(F('age')),
+            )
+
     def test_annotated_aggregate_over_annotated_aggregate(self):
         with self.assertRaisesMessage(FieldError, "Cannot compute Sum('id__max'): 'id__max' is an aggregate"):
             Book.objects.annotate(Max('id')).annotate(Sum('id__max'))
@@ -1092,14 +1110,6 @@ class AggregateTestCase(TestCase):
             {'books_per_rating__max': 3 + 5})
 
     def test_expression_on_aggregation(self):
-
-        # Create a plain expression
-        class Greatest(Func):
-            function = 'GREATEST'
-
-            def as_sqlite(self, compiler, connection, **extra_context):
-                return super().as_sql(compiler, connection, function='MAX', **extra_context)
-
         qs = Publisher.objects.annotate(
             price_or_median=Greatest(Avg('book__rating', output_field=DecimalField()), Avg('book__price'))
         ).filter(price_or_median__gte=F('num_awards')).order_by('num_awards')
@@ -1208,11 +1218,6 @@ class AggregateTestCase(TestCase):
         Subquery annotations must be included in the GROUP BY if they use
         potentially multivalued relations (contain the LOOKUP_SEP).
         """
-        if connection.vendor == 'mysql' and 'ONLY_FULL_GROUP_BY' in connection.sql_mode:
-            self.skipTest(
-                'GROUP BY optimization does not work properly when '
-                'ONLY_FULL_GROUP_BY mode is enabled on MySQL, see #31331.'
-            )
         subquery_qs = Author.objects.filter(
             pk=OuterRef('pk'),
             book__name=OuterRef('book__name'),
@@ -1305,3 +1310,18 @@ class AggregateTestCase(TestCase):
         # with self.assertNumQueries(1) as ctx:
         #     self.assertSequenceEqual(books_qs, [book])
         # self.assertEqual(ctx[0]['sql'].count('SELECT'), 2)
+
+    def test_aggregation_random_ordering(self):
+        """Random() is not included in the GROUP BY when used for ordering."""
+        authors = Author.objects.annotate(contact_count=Count('book')).order_by('?')
+        self.assertQuerysetEqual(authors, [
+            ('Adrian Holovaty', 1),
+            ('Jacob Kaplan-Moss', 1),
+            ('Brad Dayley', 1),
+            ('James Bennett', 1),
+            ('Jeffrey Forcier', 1),
+            ('Paul Bissex', 1),
+            ('Wesley J. Chun', 1),
+            ('Stuart Russell', 1),
+            ('Peter Norvig', 2),
+        ], lambda a: (a.name, a.contact_count), ordered=False)

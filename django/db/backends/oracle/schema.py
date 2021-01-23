@@ -14,6 +14,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_not_null = "MODIFY %(column)s NOT NULL"
     sql_alter_column_default = "MODIFY %(column)s DEFAULT %(default)s"
     sql_alter_column_no_default = "MODIFY %(column)s DEFAULT NULL"
+    sql_alter_column_collate = "MODIFY %(column)s %(type)s%(collation)s"
+
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
     sql_create_column_inline_fk = 'CONSTRAINT %(name)s REFERENCES %(to_table)s(%(to_column)s)%(deferrable)s'
     sql_delete_table = "DROP TABLE %(table)s CASCADE CONSTRAINTS"
@@ -181,3 +183,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             'table': self.quote_name(table_name),
             'column': self.quote_name(column_name),
         })
+
+    def _get_default_collation(self, table_name):
+        with self.connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT default_collation FROM user_tables WHERE table_name = %s
+            """, [self.normalize_name(table_name)])
+            return cursor.fetchone()[0]
+
+    def _alter_column_collation_sql(self, model, new_field, new_type, new_collation):
+        if new_collation is None:
+            new_collation = self._get_default_collation(model._meta.db_table)
+        return super()._alter_column_collation_sql(model, new_field, new_type, new_collation)

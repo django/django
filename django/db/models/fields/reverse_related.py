@@ -11,6 +11,7 @@ they're the closest concept currently available.
 
 from django.core import exceptions
 from django.utils.functional import cached_property
+from django.utils.hashable import make_hashable
 
 from . import BLANK_CHOICE_DASH
 from .mixins import FieldCacheMixin
@@ -33,6 +34,7 @@ class ForeignObjectRel(FieldCacheMixin):
     # Reverse relations are always nullable (Django can't enforce that a
     # foreign key on the related model points to this model).
     null = True
+    empty_strings_allowed = False
 
     def __init__(self, field, to, related_name=None, related_query_name=None,
                  limit_choices_to=None, parent_link=False, on_delete=None):
@@ -113,6 +115,28 @@ class ForeignObjectRel(FieldCacheMixin):
             self.related_model._meta.app_label,
             self.related_model._meta.model_name,
         )
+
+    @property
+    def identity(self):
+        return (
+            self.field,
+            self.model,
+            self.related_name,
+            self.related_query_name,
+            make_hashable(self.limit_choices_to),
+            self.parent_link,
+            self.on_delete,
+            self.symmetrical,
+            self.multiple,
+        )
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.identity == other.identity
+
+    def __hash__(self):
+        return hash(self.identity)
 
     def get_choices(
         self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
@@ -214,6 +238,10 @@ class ManyToOneRel(ForeignObjectRel):
         state.pop('related_model', None)
         return state
 
+    @property
+    def identity(self):
+        return super().identity + (self.field_name,)
+
     def get_related_field(self):
         """
         Return the Field in the 'to' object to which this relationship is tied.
@@ -277,6 +305,14 @@ class ManyToManyRel(ForeignObjectRel):
 
         self.symmetrical = symmetrical
         self.db_constraint = db_constraint
+
+    @property
+    def identity(self):
+        return super().identity + (
+            self.through,
+            self.through_fields,
+            self.db_constraint,
+        )
 
     def get_related_field(self):
         """

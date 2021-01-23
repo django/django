@@ -5,8 +5,6 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
-from collections import namedtuple
-from functools import lru_cache
 from itertools import chain
 
 import django
@@ -19,11 +17,11 @@ from django.db import (
 from django.db.models import AutoField, DateField, DateTimeField, sql
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
-from django.db.models.expressions import Case, Expression, F, Value, When
+from django.db.models.expressions import Case, Expression, F, Ref, Value, When
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
-from django.db.models.utils import resolve_callables
+from django.db.models.utils import create_namedtuple_class, resolve_callables
 from django.utils import timezone
 from django.utils.functional import cached_property, partition
 
@@ -148,13 +146,6 @@ class NamedValuesListIterable(ValuesListIterable):
     namedtuple for each row.
     """
 
-    @staticmethod
-    @lru_cache()
-    def create_namedtuple_class(*names):
-        # Cache namedtuple() with @lru_cache() since it's too slow to be
-        # called for every QuerySet evaluation.
-        return namedtuple('Row', names)
-
     def __iter__(self):
         queryset = self.queryset
         if queryset._fields:
@@ -162,7 +153,7 @@ class NamedValuesListIterable(ValuesListIterable):
         else:
             query = queryset.query
             names = [*query.extra_select, *query.values_select, *query.annotation_select]
-        tuple_class = self.create_namedtuple_class(*names)
+        tuple_class = create_namedtuple_class(*names)
         new = tuple.__new__
         for row in super().__iter__():
             yield new(tuple_class, row)
@@ -210,6 +201,8 @@ class QuerySet:
 
     @query.setter
     def query(self, value):
+        if value.values_select:
+            self._iterable_class = ValuesIterable
         self._query = value
 
     def as_manager(cls):
@@ -393,8 +386,16 @@ class QuerySet:
         query = self.query.chain()
         for (alias, aggregate_expr) in kwargs.items():
             query.add_annotation(aggregate_expr, alias, is_summary=True)
-            if not query.annotations[alias].contains_aggregate:
+            annotation = query.annotations[alias]
+            if not annotation.contains_aggregate:
                 raise TypeError("%s is not an aggregate expression" % alias)
+            for expr in annotation.get_source_expressions():
+                if expr.contains_aggregate and isinstance(expr, Ref) and expr.refs in kwargs:
+                    name = expr.refs
+                    raise exceptions.FieldError(
+                        "Cannot compute %s('%s'): '%s' is an aggregate"
+                        % (annotation.name, name, name)
+                    )
         return query.get_aggregation(self.db, kwargs)
 
     def count(self):
@@ -415,6 +416,11 @@ class QuerySet:
         Perform the query and return a single object matching the given
         keyword arguments.
         """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                'Calling QuerySet.get(...) with filters after %s() is not '
+                'supported.' % self.query.combinator
+            )
         clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
         if self.query.can_filter() and not self.query.distinct_fields:
             clone = clone.order_by()
@@ -447,10 +453,12 @@ class QuerySet:
         obj.save(force_insert=True, using=self.db)
         return obj
 
-    def _populate_pk_values(self, objs):
+    def _prepare_for_bulk_create(self, objs):
         for obj in objs:
             if obj.pk is None:
+                # Populate new PK values.
                 obj.pk = obj._meta.pk.get_pk_value_on_save(obj)
+            obj._prepare_related_fields_for_save(operation_name='bulk_create')
 
     def bulk_create(self, objs, batch_size=None, ignore_conflicts=False):
         """
@@ -487,7 +495,7 @@ class QuerySet:
         opts = self.model._meta
         fields = opts.concrete_fields
         objs = list(objs)
-        self._populate_pk_values(objs)
+        self._prepare_for_bulk_create(objs)
         with transaction.atomic(using=self.db, savepoint=False):
             objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
             if objs_with_pk:
@@ -688,7 +696,7 @@ class QuerySet:
             field_name != 'pk' and
             not opts.get_field(field_name).unique and
             field_name not in unique_fields and
-            not self.query.distinct_fields == (field_name,)
+            self.query.distinct_fields != (field_name,)
         ):
             raise ValueError("in_bulk()'s field_name must be a unique field but %r isn't." % field_name)
         if id_list is not None:
@@ -810,7 +818,7 @@ class QuerySet:
     # PUBLIC METHODS THAT RETURN A QUERYSET SUBCLASS #
     ##################################################
 
-    def raw(self, raw_query, params=None, translations=None, using=None):
+    def raw(self, raw_query, params=(), translations=None, using=None):
         if using is None:
             using = self.db
         qs = RawQuerySet(raw_query, model=self.model, params=params, translations=translations, using=using)
@@ -989,7 +997,11 @@ class QuerySet:
         # If the query is an EmptyQuerySet, combine all nonempty querysets.
         if isinstance(self, EmptyQuerySet):
             qs = [q for q in other_qs if not isinstance(q, EmptyQuerySet)]
-            return qs[0]._combinator_query('union', *qs[1:], all=all) if qs else self
+            if not qs:
+                return self
+            if len(qs) == 1:
+                return qs[0]
+            return qs[0]._combinator_query('union', *qs[1:], all=all)
         return self._combinator_query('union', *other_qs, all=all)
 
     def intersection(self, *other_qs):
@@ -1222,7 +1234,12 @@ class QuerySet:
             return True
         if self.query.extra_order_by or self.query.order_by:
             return True
-        elif self.query.default_ordering and self.query.get_meta().ordering:
+        elif (
+            self.query.default_ordering and
+            self.query.get_meta().ordering and
+            # A default ordering doesn't affect GROUP BY queries.
+            not self.query.group_by
+        ):
             return True
         else:
             return False
@@ -1402,14 +1419,14 @@ class RawQuerySet:
     Provide an iterator which converts the results of raw SQL queries into
     annotated model instances.
     """
-    def __init__(self, raw_query, model=None, query=None, params=None,
+    def __init__(self, raw_query, model=None, query=None, params=(),
                  translations=None, using=None, hints=None):
         self.raw_query = raw_query
         self.model = model
         self._db = using
         self._hints = hints or {}
         self.query = query or sql.RawQuery(sql=raw_query, using=self.db, params=params)
-        self.params = params or ()
+        self.params = params
         self.translations = translations or {}
         self._result_cache = None
         self._prefetch_related_lookups = ()
@@ -1703,8 +1720,17 @@ def prefetch_related_objects(model_instances, *related_lookups):
                                  "prefetching - this is an invalid parameter to "
                                  "prefetch_related()." % lookup.prefetch_through)
 
-            if prefetcher is not None and not is_fetched:
-                obj_list, additional_lookups = prefetch_one_level(obj_list, prefetcher, lookup, level)
+            obj_to_fetch = None
+            if prefetcher is not None:
+                obj_to_fetch = [obj for obj in obj_list if not is_fetched(obj)]
+
+            if obj_to_fetch:
+                obj_list, additional_lookups = prefetch_one_level(
+                    obj_to_fetch,
+                    prefetcher,
+                    lookup,
+                    level,
+                )
                 # We need to ensure we don't keep adding lookups from the
                 # same relationships to stop infinite recursion. So, if we
                 # are already on an automatically added lookup, don't add
@@ -1754,10 +1780,14 @@ def get_prefetcher(instance, through_attr, to_attr):
     (the object with get_prefetch_queryset (or None),
      the descriptor object representing this relationship (or None),
      a boolean that is False if the attribute was not found at all,
-     a boolean that is True if the attribute has already been fetched)
+     a function that takes an instance and returns a boolean that is True if
+     the attribute has already been fetched for that instance)
     """
+    def has_to_attr_attribute(instance):
+        return hasattr(instance, to_attr)
+
     prefetcher = None
-    is_fetched = False
+    is_fetched = has_to_attr_attribute
 
     # For singly related objects, we have to avoid getting the attribute
     # from the object, as this will trigger the query. So we first try
@@ -1772,8 +1802,7 @@ def get_prefetcher(instance, through_attr, to_attr):
             # get_prefetch_queryset() method.
             if hasattr(rel_obj_descriptor, 'get_prefetch_queryset'):
                 prefetcher = rel_obj_descriptor
-                if rel_obj_descriptor.is_cached(instance):
-                    is_fetched = True
+                is_fetched = rel_obj_descriptor.is_cached
             else:
                 # descriptor doesn't support prefetching, so we go ahead and get
                 # the attribute on the instance rather than the class to
@@ -1785,11 +1814,15 @@ def get_prefetcher(instance, through_attr, to_attr):
                     # Special case cached_property instances because hasattr
                     # triggers attribute computation and assignment.
                     if isinstance(getattr(instance.__class__, to_attr, None), cached_property):
-                        is_fetched = to_attr in instance.__dict__
-                    else:
-                        is_fetched = hasattr(instance, to_attr)
+                        def has_cached_property(instance):
+                            return to_attr in instance.__dict__
+
+                        is_fetched = has_cached_property
                 else:
-                    is_fetched = through_attr in instance._prefetched_objects_cache
+                    def in_prefetched_cache(instance):
+                        return through_attr in instance._prefetched_objects_cache
+
+                    is_fetched = in_prefetched_cache
     return prefetcher, rel_obj_descriptor, attr_found, is_fetched
 
 

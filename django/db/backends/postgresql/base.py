@@ -41,12 +41,12 @@ if PSYCOPG2_VERSION < (2, 5, 4):
 
 
 # Some of these import psycopg2, so import them after checking if it's installed.
-from .client import DatabaseClient                          # NOQA isort:skip
-from .creation import DatabaseCreation                      # NOQA isort:skip
-from .features import DatabaseFeatures                      # NOQA isort:skip
-from .introspection import DatabaseIntrospection            # NOQA isort:skip
-from .operations import DatabaseOperations                  # NOQA isort:skip
-from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
+from .client import DatabaseClient  # NOQA
+from .creation import DatabaseCreation  # NOQA
+from .features import DatabaseFeatures  # NOQA
+from .introspection import DatabaseIntrospection  # NOQA
+from .operations import DatabaseOperations  # NOQA
+from .schema import DatabaseSchemaEditor  # NOQA
 
 psycopg2.extensions.register_adapter(SafeString, psycopg2.extensions.QuotedString)
 psycopg2.extras.register_uuid()
@@ -87,7 +87,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'IPAddressField': 'inet',
         'GenericIPAddressField': 'inet',
         'JSONField': 'jsonb',
-        'NullBooleanField': 'boolean',
         'OneToOneField': 'integer',
         'PositiveBigIntegerField': 'bigint',
         'PositiveIntegerField': 'integer',
@@ -153,10 +152,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def get_connection_params(self):
         settings_dict = self.settings_dict
         # None may be used to connect to the default 'postgres' db
-        if settings_dict['NAME'] == '':
+        if (
+            settings_dict['NAME'] == '' and
+            not settings_dict.get('OPTIONS', {}).get('service')
+        ):
             raise ImproperlyConfigured(
                 "settings.DATABASES is improperly configured. "
-                "Please supply the NAME value.")
+                "Please supply the NAME or OPTIONS['service'] value."
+            )
         if len(settings_dict['NAME'] or '') > self.ops.max_name_length():
             raise ImproperlyConfigured(
                 "The database name '%s' (%d characters) is longer than "
@@ -167,10 +170,19 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     self.ops.max_name_length(),
                 )
             )
-        conn_params = {
-            'database': settings_dict['NAME'] or 'postgres',
-            **settings_dict['OPTIONS'],
-        }
+        conn_params = {}
+        if settings_dict['NAME']:
+            conn_params = {
+                'database': settings_dict['NAME'],
+                **settings_dict['OPTIONS'],
+            }
+        elif settings_dict['NAME'] is None:
+            # Connect to the default 'postgres' db.
+            settings_dict.get('OPTIONS', {}).pop('service', None)
+            conn_params = {'database': 'postgres', **settings_dict['OPTIONS']}
+        else:
+            conn_params = {**settings_dict['OPTIONS']}
+
         conn_params.pop('isolation_level', None)
         if settings_dict['USER']:
             conn_params['user'] = settings_dict['USER']

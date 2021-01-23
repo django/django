@@ -52,6 +52,7 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_emailfield_strip_on_none_value(self):
         f = EmailField(required=False, empty_value=None)
+        self.assertIsNone(f.clean(''))
         self.assertIsNone(f.clean(None))
 
     def test_emailfield_unable_to_set_strip_kwarg(self):

@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2020-01-21 12:28+0000\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-09-04 13:36+0000\n"
 "Last-Translator: Jon <jon@kolonial.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
@@ -32,6 +32,9 @@ msgstr "Afrikaans"
 
 msgid "Arabic"
 msgstr "Arabisk"
+
+msgid "Algerian Arabic"
+msgstr "Algerisk arabisk"
 
 msgid "Asturian"
 msgstr "Asturiansk"
@@ -156,6 +159,9 @@ msgstr "Interlingua"
 msgid "Indonesian"
 msgstr "Indonesisk"
 
+msgid "Igbo"
+msgstr "Ibo"
+
 msgid "Ido"
 msgstr "Ido"
 
@@ -185,6 +191,9 @@ msgstr "Kannada"
 
 msgid "Korean"
 msgstr "Koreansk"
+
+msgid "Kyrgyz"
+msgstr "Kirgisisk"
 
 msgid "Luxembourgish"
 msgstr "Luxembourgsk"
@@ -270,8 +279,14 @@ msgstr "Tamil"
 msgid "Telugu"
 msgstr "Telugu"
 
+msgid "Tajik"
+msgstr "Tadsjikisk"
+
 msgid "Thai"
 msgstr "Thai"
+
+msgid "Turkmen"
+msgstr "Turkmensk"
 
 msgid "Turkish"
 msgstr "Tyrkisk"
@@ -574,6 +589,9 @@ msgstr "Verdien \"%(value)s\" må være enten None, True eller False."
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolsk (True, False eller None)"
 
+msgid "Positive big integer"
+msgstr "Positivt stort heltall"
+
 msgid "Positive integer"
 msgstr "Positivt heltall"
 
@@ -627,6 +645,12 @@ msgstr "Fil"
 
 msgid "Image"
 msgstr "Bilde"
+
+msgid "A JSON object"
+msgstr "Et JSON-objekt"
+
+msgid "Value must be valid JSON."
+msgstr "Verdi må være gyldig JSON."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -717,6 +741,9 @@ msgstr "Skriv inn en fullstendig verdi."
 msgid "Enter a valid UUID."
 msgstr "Oppgi en gyldig UUID."
 
+msgid "Enter a valid JSON."
+msgstr "Oppgi gyldig JSON."
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -801,15 +828,7 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nei"
 
-msgid "Year"
-msgstr "År"
-
-msgid "Month"
-msgstr "Måned"
-
-msgid "Day"
-msgstr "Dag"
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "ja,nei,kanskje"
 
@@ -1117,9 +1136,6 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minutt"
 msgstr[1] "%d minutter"
-
-msgid "0 minutes"
-msgstr "0 minutter"
 
 msgid "Forbidden"
 msgstr "Forbudt"

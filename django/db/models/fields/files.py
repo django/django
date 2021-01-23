@@ -86,7 +86,7 @@ class FieldFile(File):
     def save(self, name, content, save=True):
         name = self.field.generate_filename(self.instance, name)
         self.name = self.storage.save(name, content, max_length=self.field.max_length)
-        setattr(self.instance, self.field.name, self.name)
+        setattr(self.instance, self.field.attname, self.name)
         self._committed = True
 
         # Save the object because it has changed, unless save is False
@@ -106,7 +106,7 @@ class FieldFile(File):
         self.storage.delete(self.name)
 
         self.name = None
-        setattr(self.instance, self.field.name, self.name)
+        setattr(self.instance, self.field.attname, self.name)
         self._committed = False
 
         if save:
@@ -229,6 +229,8 @@ class FileField(Field):
 
         self.storage = storage or default_storage
         if callable(self.storage):
+            # Hold a reference to the callable for deconstruct().
+            self._storage_callable = self.storage
             self.storage = self.storage()
             if not isinstance(self.storage, Storage):
                 raise TypeError(
@@ -279,7 +281,7 @@ class FileField(Field):
             del kwargs["max_length"]
         kwargs['upload_to'] = self.upload_to
         if self.storage is not default_storage:
-            kwargs['storage'] = self.storage
+            kwargs['storage'] = getattr(self, '_storage_callable', self.storage)
         return name, path, args, kwargs
 
     def get_internal_type(self):

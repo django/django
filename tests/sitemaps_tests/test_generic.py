@@ -56,4 +56,4 @@ class GenericViewsSitemapTests(SitemapTestsBase):
 </urlset>
 """ % (self.base_url, test_model.pk)
         self.assertXMLEqual(response.content.decode(), expected_content)
-        self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 10:00:00 GMT')
+        self.assertEqual(response.headers['Last-Modified'], 'Wed, 13 Mar 2013 10:00:00 GMT')

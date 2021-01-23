@@ -154,7 +154,6 @@ class TestInline(TestDataMixin, TestCase):
         # Identically named callable isn't present in the parent ModelAdmin,
         # rendering of the add view shouldn't explode
         response = self.client.get(reverse('admin:admin_inlines_novel_add'))
-        self.assertEqual(response.status_code, 200)
         # View should have the child inlines section
         self.assertContains(
             response,
@@ -164,7 +163,6 @@ class TestInline(TestDataMixin, TestCase):
     def test_callable_lookup(self):
         """Admin inline should invoke local callable when its name is listed in readonly_fields"""
         response = self.client.get(reverse('admin:admin_inlines_poll_add'))
-        self.assertEqual(response.status_code, 200)
         # Add parent object view should have the child inlines section
         self.assertContains(
             response,
@@ -481,6 +479,16 @@ class TestInline(TestDataMixin, TestCase):
             'class="vTextField" maxlength="40" id="id_chapter_set-0-name">',
             html=True
         )
+
+    def test_inlines_plural_heading_foreign_key(self):
+        response = self.client.get(reverse('admin:admin_inlines_holder4_add'))
+        self.assertContains(response, '<h2>Inner4 stackeds</h2>', html=True)
+        self.assertContains(response, '<h2>Inner4 tabulars</h2>', html=True)
+
+    def test_inlines_singular_heading_one_to_one(self):
+        response = self.client.get(reverse('admin:admin_inlines_person_add'))
+        self.assertContains(response, '<h2>Author</h2>', html=True)  # Tabular.
+        self.assertContains(response, '<h2>Fashionista</h2>', html=True)  # Stacked.
 
 
 @override_settings(ROOT_URLCONF='admin_inlines.urls')

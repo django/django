@@ -89,7 +89,8 @@ To specify that a field is *not* required, pass ``required=False`` to the
 
 If a ``Field`` has ``required=False`` and you pass ``clean()`` an empty value,
 then ``clean()`` will return a *normalized* empty value rather than raising
-``ValidationError``. For ``CharField``, this will be an empty string. For other
+``ValidationError``. For ``CharField``, this will return
+:attr:`~CharField.empty_value` which defaults to an empty string. For other
 ``Field`` classes, it might be ``None``. (This varies from field to field.)
 
 Widgets of required form fields have the ``required`` HTML attribute. Set the
@@ -373,13 +374,13 @@ For each field, we describe the default widget used if you don't specify
       ``min_length`` are provided. Otherwise, all inputs are valid.
     * Error message keys: ``required``, ``max_length``, ``min_length``
 
-    Has three optional arguments for validation:
+    Has four optional arguments for validation:
 
     .. attribute:: max_length
     .. attribute:: min_length
 
-    If provided, these arguments ensure that the string is at most or at least
-    the given length.
+        If provided, these arguments ensure that the string is at most or at
+        least the given length.
 
     .. attribute:: strip
 
@@ -409,12 +410,13 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: choices
 
         Either an :term:`iterable` of 2-tuples to use as choices for this
-        field, or a callable that returns such an iterable. This argument
-        accepts the same formats as the ``choices`` argument to a model field.
-        See the :ref:`model field reference documentation on choices
-        <field-choices>` for more details. If the argument is a callable, it is
-        evaluated each time the field's form is initialized. Defaults to an
-        empty list.
+        field, :ref:`enumeration <field-choices-enum-types>` choices, or a
+        callable that returns such an iterable. This argument accepts the same
+        formats as the ``choices`` argument to a model field. See the
+        :ref:`model field reference documentation on choices <field-choices>`
+        for more details. If the argument is a callable, it is evaluated each
+        time the field's form is initialized, in addition to during rendering.
+        Defaults to an empty list.
 
 ``TypedChoiceField``
 --------------------
@@ -512,14 +514,6 @@ For each field, we describe the default widget used if you don't specify
     ``DATE_INPUT_FORMATS`` keys if localization is enabled. See also
     :doc:`format localization </topics/i18n/formatting>`.
 
-    .. versionchanged:: 3.1
-
-        Support for ISO 8601 date string parsing (including optional timezone)
-        was added.
-
-        The fallback on ``DATE_INPUT_FORMATS`` in the default ``input_formats``
-        was added.
-
 ``DecimalField``
 ----------------
 
@@ -582,16 +576,15 @@ For each field, we describe the default widget used if you don't specify
 .. class:: EmailField(**kwargs)
 
     * Default widget: :class:`EmailInput`
-    * Empty value: ``''`` (an empty string)
+    * Empty value: Whatever you've given as ``empty_value``.
     * Normalizes to: A string.
     * Uses :class:`~django.core.validators.EmailValidator` to validate that
       the given value is a valid email address, using a moderately complex
       regular expression.
     * Error message keys: ``required``, ``invalid``
 
-    Has two optional arguments for validation, ``max_length`` and ``min_length``.
-    If provided, these arguments ensure that the string is at most or at least the
-    given length.
+    Has three optional arguments ``max_length``, ``min_length``, and
+    ``empty_value`` which work just as they do for :class:`CharField`.
 
 ``FileField``
 -------------
@@ -774,20 +767,18 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: max_value
     .. attribute:: min_value
 
-    These control the range of values permitted in the field.
+        These control the range of values permitted in the field.
 
 ``JSONField``
 -------------
 
 .. class:: JSONField(encoder=None, decoder=None, **kwargs)
 
-    .. versionadded:: 3.1
-
     A field which accepts JSON encoded data for a
     :class:`~django.db.models.JSONField`.
 
     * Default widget: :class:`Textarea`
-    * Empty value: ``''`` (an empty string)
+    * Empty value: ``None``
     * Normalizes to: A Python representation of the JSON value (usually as a
       ``dict``, ``list``, or ``None``), depending on :attr:`JSONField.decoder`.
     * Validates that the given value is a valid JSON.
@@ -913,13 +904,27 @@ For each field, we describe the default widget used if you don't specify
     * Normalizes to: A Python ``True``, ``False`` or ``None`` value.
     * Validates nothing (i.e., it never raises a ``ValidationError``).
 
+    ``NullBooleanField`` may be used with widgets such as
+    :class:`~django.forms.Select` or :class:`~django.forms.RadioSelect`
+    by providing the widget ``choices``::
+
+        NullBooleanField(
+            widget=Select(
+                choices=[
+                    ('', 'Unknown'),
+                    (True, 'Yes'),
+                    (False, 'No'),
+                ]
+            )
+        )
+
 ``RegexField``
 --------------
 
 .. class:: RegexField(**kwargs)
 
     * Default widget: :class:`TextInput`
-    * Empty value: ``''`` (an empty string)
+    * Empty value: Whatever you've given as ``empty_value``.
     * Normalizes to: A string.
     * Uses :class:`~django.core.validators.RegexValidator` to validate that
       the given value matches a certain regular expression.
@@ -932,8 +937,8 @@ For each field, we describe the default widget used if you don't specify
         A regular expression specified either as a string or a compiled regular
         expression object.
 
-    Also takes ``max_length``, ``min_length``, and ``strip``, which work just
-    as they do for :class:`CharField`.
+    Also takes ``max_length``, ``min_length``, ``strip``, and ``empty_value``
+    which work just as they do for :class:`CharField`.
 
     .. attribute:: strip
 
@@ -946,7 +951,7 @@ For each field, we describe the default widget used if you don't specify
 .. class:: SlugField(**kwargs)
 
    * Default widget: :class:`TextInput`
-   * Empty value: ``''`` (an empty string)
+   * Empty value: Whatever you've given as :attr:`empty_value`.
    * Normalizes to: A string.
    * Uses :class:`~django.core.validators.validate_slug` or
      :class:`~django.core.validators.validate_unicode_slug` to validate that
@@ -956,12 +961,16 @@ For each field, we describe the default widget used if you don't specify
    This field is intended for use in representing a model
    :class:`~django.db.models.SlugField` in forms.
 
-   Takes an optional parameter:
+   Takes two optional parameters:
 
    .. attribute:: allow_unicode
 
        A boolean instructing the field to accept Unicode letters in addition
        to ASCII letters. Defaults to ``False``.
+
+   .. attribute:: empty_value
+
+       The value to use to represent "empty". Defaults to an empty string.
 
 ``TimeField``
 -------------
@@ -994,18 +1003,14 @@ For each field, we describe the default widget used if you don't specify
 .. class:: URLField(**kwargs)
 
     * Default widget: :class:`URLInput`
-    * Empty value: ``''`` (an empty string)
+    * Empty value: Whatever you've given as ``empty_value``.
     * Normalizes to: A string.
     * Uses :class:`~django.core.validators.URLValidator` to validate that the
       given value is a valid URL.
     * Error message keys: ``required``, ``invalid``
 
-    Takes the following optional arguments:
-
-    .. attribute:: max_length
-    .. attribute:: min_length
-
-    These are the same as ``CharField.max_length`` and ``CharField.min_length``.
+    Has three optional arguments ``max_length``, ``min_length``, and
+    ``empty_value`` which work just as they do for :class:`CharField`.
 
 ``UUIDField``
 -------------
@@ -1013,7 +1018,7 @@ For each field, we describe the default widget used if you don't specify
 .. class:: UUIDField(**kwargs)
 
     * Default widget: :class:`TextInput`
-    * Empty value: ``''`` (an empty string)
+    * Empty value: ``None``
     * Normalizes to: A :class:`~python:uuid.UUID` object.
     * Error message keys: ``required``, ``invalid``
 
@@ -1308,7 +1313,7 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
 .. class:: ModelMultipleChoiceField(**kwargs)
 
     * Default widget: :class:`SelectMultiple`
-    * Empty value: An empty ``QuerySet`` (self.queryset.none())
+    * Empty value: An empty ``QuerySet`` (``self.queryset.none()``)
     * Normalizes to: A ``QuerySet`` of model instances.
     * Validates that every id in the given list of values exists in the
       queryset.
@@ -1341,10 +1346,6 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
     .. attribute:: iterator
 
         Same as :class:`ModelChoiceField.iterator`.
-
-.. deprecated:: 3.1
-
-    The ``list`` message is deprecated, use ``invalid_list`` instead.
 
 .. _iterating-relationship-choices:
 
@@ -1435,18 +1436,10 @@ customize the yielded 2-tuple choices.
         :attr:`ChoiceField.choices`. The first ``value`` element is a
         :class:`ModelChoiceIteratorValue` instance.
 
-        .. versionchanged:: 3.1
-
-            In older versions, the first ``value`` element in the choice tuple
-            is the ``field`` value itself, rather than a
-            ``ModelChoiceIteratorValue`` instance.
-
 ``ModelChoiceIteratorValue``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: ModelChoiceIteratorValue(value, instance)
-
-    .. versionadded:: 3.1
 
     Two arguments are required:
 

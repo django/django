@@ -99,11 +99,6 @@ This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
 
-.. versionchanged:: 3.1
-
-    If ``ALLOWED_HOSTS`` is empty and ``DEBUG=True``, subdomains of localhost
-    were allowed.
-
 .. setting:: APPEND_SLASH
 
 ``APPEND_SLASH``
@@ -156,12 +151,16 @@ The cache backend to use. The built-in cache backends are:
 * ``'django.core.cache.backends.dummy.DummyCache'``
 * ``'django.core.cache.backends.filebased.FileBasedCache'``
 * ``'django.core.cache.backends.locmem.LocMemCache'``
-* ``'django.core.cache.backends.memcached.MemcachedCache'``
+* ``'django.core.cache.backends.memcached.PyMemcacheCache'``
 * ``'django.core.cache.backends.memcached.PyLibMCCache'``
 
 You can use a cache backend that doesn't ship with Django by setting
 :setting:`BACKEND <CACHES-BACKEND>` to a fully-qualified path of a cache
 backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
+
+.. versionchanged:: 3.2
+
+    The ``PyMemcacheCache`` backend was added.
 
 .. setting:: CACHES-KEY_FUNCTION
 
@@ -313,7 +312,7 @@ Default: ``None``
 The domain to be used when setting the CSRF cookie.  This can be useful for
 easily allowing cross-subdomain requests to be excluded from the normal cross
 site request forgery protection.  It should be set to a string such as
-``"example.com"`` to allow a POST request from a form on one subdomain to be
+``".example.com"`` to allow a POST request from a form on one subdomain to be
 accepted by a view served from another subdomain.
 
 Please note that the presence of this setting does not imply that Django's CSRF
@@ -382,10 +381,6 @@ The value of the `SameSite`_ flag on the CSRF cookie. This flag prevents the
 cookie from being sent in cross-site requests.
 
 See :setting:`SESSION_COOKIE_SAMESITE` for details about ``SameSite``.
-
-.. versionchanged:: 3.1
-
-    Setting ``CSRF_COOKIE_SAMESITE = 'None'`` was allowed.
 
 .. setting:: CSRF_COOKIE_SECURE
 
@@ -684,10 +679,6 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
   Consider converting to local time explicitly with ``AT TIME ZONE`` in raw SQL
   queries instead of setting the ``TIME_ZONE`` option.
 
-.. versionchanged:: 3.1
-
-  Using this option when the database backend supports time zones was allowed.
-
 .. setting:: DATABASE-DISABLE_SERVER_SIDE_CURSORS
 
 ``DISABLE_SERVER_SIDE_CURSORS``
@@ -782,11 +773,11 @@ on :ref:`controlling the creation order of test databases
 ``MIGRATE``
 ^^^^^^^^^^^
 
-.. versionadded:: 3.1
-
 Default: ``True``
 
 When set to ``False``, migrations won't run when creating the test database.
+This is similar to setting ``None`` as a value in :setting:`MIGRATION_MODULES`,
+but for all apps.
 
 .. setting:: TEST_MIRROR
 
@@ -1018,8 +1009,8 @@ The amount by which the DATAFILE_TMP is extended when more space is required.
 
 .. setting:: DATA_UPLOAD_MAX_MEMORY_SIZE
 
-DATA_UPLOAD_MAX_MEMORY_SIZE
----------------------------
+``DATA_UPLOAD_MAX_MEMORY_SIZE``
+-------------------------------
 
 Default: ``2621440`` (i.e. 2.5 MB).
 
@@ -1040,8 +1031,8 @@ See also :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`.
 
 .. setting:: DATA_UPLOAD_MAX_NUMBER_FIELDS
 
-DATA_UPLOAD_MAX_NUMBER_FIELDS
------------------------------
+``DATA_UPLOAD_MAX_NUMBER_FIELDS``
+---------------------------------
 
 Default: ``1000``
 
@@ -1155,10 +1146,6 @@ precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 
-.. versionchanged:: 3.1
-
-    In older versions, the default is a list containing also date-only formats.
-
 .. setting:: DEBUG
 
 ``DEBUG``
@@ -1239,6 +1226,17 @@ format has higher precedence and will be applied instead.
 See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
 
+.. setting:: DEFAULT_AUTO_FIELD
+
+``DEFAULT_AUTO_FIELD``
+----------------------
+
+.. versionadded:: 3.2
+
+Default: ``'``:class:`django.db.models.AutoField`\ ``'``
+
+Default primary key field type to use for models that don't have a field with
+:attr:`primary_key=True <django.db.models.Field.primary_key>`.
 
 .. setting:: DEFAULT_CHARSET
 
@@ -1254,8 +1252,6 @@ manually specified. Used when constructing the ``Content-Type`` header.
 
 ``DEFAULT_EXCEPTION_REPORTER``
 ------------------------------
-
-.. versionadded:: 3.1
 
 Default: ``'``:class:`django.views.debug.ExceptionReporter`\ ``'``
 
@@ -1294,27 +1290,6 @@ Default: ``'webmaster@localhost'``
 Default email address to use for various automated correspondence from the
 site manager(s). This doesn't include error messages sent to :setting:`ADMINS`
 and :setting:`MANAGERS`; for that, see :setting:`SERVER_EMAIL`.
-
-.. setting:: DEFAULT_HASHING_ALGORITHM
-
-``DEFAULT_HASHING_ALGORITHM``
------------------------------
-
-.. versionadded:: 3.1
-
-Default: ``'sha256'``
-
-Default hashing algorithm to use for encoding cookies, password reset tokens in
-the admin site, user sessions, and signatures created by
-:class:`django.core.signing.Signer` and :meth:`django.core.signing.dumps`.
-Algorithm must be ``'sha1'`` or ``'sha256'``. See
-:ref:`release notes <default-hashing-algorithm-usage>` for usage details.
-
-.. deprecated:: 3.1
-
-    This transitional setting is deprecated. Support for it and tokens,
-    cookies, sessions, and signatures that use SHA-1 hashing algorithm will be
-    removed in Django 4.0.
 
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
@@ -1367,10 +1342,6 @@ Default: Not defined
 
 The directory used by the :ref:`file email backend <topic-email-file-backend>`
 to store output files.
-
-.. versionchanged:: 3.1
-
-    Support for :class:`pathlib.Path` was added.
 
 .. setting:: EMAIL_HOST
 
@@ -1893,10 +1864,6 @@ cookie from being sent in cross-site requests.
 
 See :setting:`SESSION_COOKIE_SAMESITE` for details about ``SameSite``.
 
-.. versionchanged:: 3.1
-
-    Setting ``LANGUAGE_COOKIE_SAMESITE = 'None'`` was allowed.
-
 .. setting:: LANGUAGE_COOKIE_SECURE
 
 ``LANGUAGE_COOKIE_SECURE``
@@ -2404,10 +2371,6 @@ Default: ``'same-origin'``
 If configured, the :class:`~django.middleware.security.SecurityMiddleware` sets
 the :ref:`referrer-policy` header on all responses that do not already have it
 to the value provided.
-
-.. versionchanged:: 3.1
-
-    In older versions, the default value is ``None``.
 
 .. setting:: SECURE_SSL_HOST
 
@@ -2969,8 +2932,6 @@ rendered.
 ``PASSWORD_RESET_TIMEOUT``
 --------------------------
 
-.. versionadded:: 3.1
-
 Default: ``259200`` (3 days, in seconds)
 
 The number of seconds a password reset link is valid for.
@@ -2986,21 +2947,6 @@ Used by the :class:`~django.contrib.auth.views.PasswordResetConfirmView`.
    This timeout exists to protect against some unlikely attack scenarios, such
    as someone gaining access to email archives that may contain old, unused
    password reset tokens.
-
-.. setting:: PASSWORD_RESET_TIMEOUT_DAYS
-
-``PASSWORD_RESET_TIMEOUT_DAYS``
--------------------------------
-
-Default: ``3``
-
-The number of days a password reset link is valid for.
-
-Used by the :class:`~django.contrib.auth.views.PasswordResetConfirmView`.
-
-.. deprecated:: 3.1
-
-    This setting is deprecated. Use :setting:`PASSWORD_RESET_TIMEOUT` instead.
 
 .. setting:: PASSWORD_HASHERS
 
@@ -3150,6 +3096,10 @@ The domain to use for session cookies. Set this to a string such as
 ``"example.com"`` for cross-domain cookies, or use ``None`` for a standard
 domain cookie.
 
+To use cross-domain cookies with :setting:`CSRF_USE_SESSIONS`, you must include
+a leading dot (e.g. ``".example.com"``) to accommodate the CSRF middleware's
+referer checking.
+
 Be cautious when updating this setting on a production site. If you update
 this setting to enable cross-domain cookies on a site that previously used
 standard domain cookies, existing user cookies will be set to the old
@@ -3241,9 +3191,10 @@ Possible values for the setting are:
 
 * ``False``: disables the flag.
 
-.. versionchanged:: 3.1
+.. note::
 
-    Setting ``SESSION_COOKIE_SAMESITE = 'None'`` was allowed.
+    Modern browsers provide a more secure default policy for the ``SameSite``
+    flag and will assume ``Lax`` for cookies without an explicit value set.
 
 .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
 
@@ -3459,7 +3410,7 @@ This would allow you to refer to the local file
 
 .. code-block:: html+django
 
-    <a href="{% static "downloads/polls_20101022.tar.gz" %}">
+    <a href="{% static 'downloads/polls_20101022.tar.gz' %}">
 
 .. setting:: STATICFILES_STORAGE
 

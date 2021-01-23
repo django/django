@@ -4,7 +4,11 @@
      data-inline-type="stacked"
      data-inline-formset="{{ inline_admin_formset.inline_formset_data }}">
 <fieldset class="module {{ inline_admin_formset.classes }}">
-  <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2>
+  {% if inline_admin_formset.formset.max_num == 1 %}
+    <h2>{{ inline_admin_formset.opts.verbose_name|capfirst }}</h2>
+  {% else %}
+    <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2>
+  {% endif %}
 {{ inline_admin_formset.formset.management_form }}
 {{ inline_admin_formset.formset.non_form_errors }}
 

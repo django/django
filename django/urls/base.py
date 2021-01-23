@@ -2,7 +2,6 @@ from urllib.parse import urlsplit, urlunsplit
 
 from asgiref.local import Local
 
-from django.utils.encoding import iri_to_uri
 from django.utils.functional import lazy
 from django.utils.translation import override
 
@@ -84,7 +83,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
         if ns_pattern:
             resolver = get_ns_resolver(ns_pattern, resolver, tuple(ns_converters.items()))
 
-    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
 
 
 reverse_lazy = lazy(reverse, str)
@@ -146,13 +145,12 @@ def get_urlconf(default=None):
 
 def is_valid_path(path, urlconf=None):
     """
-    Return True if the given path resolves against the default URL resolver,
-    False otherwise. This is a convenience method to make working with "is
-    this a match?" cases easier, avoiding try...except blocks.
+    Return the ResolverMatch if the given path resolves against the default URL
+    resolver, False otherwise. This is a convenience method to make working
+    with "is this a match?" cases easier, avoiding try...except blocks.
     """
     try:
-        resolve(path, urlconf)
-        return True
+        return resolve(path, urlconf)
     except Resolver404:
         return False
 

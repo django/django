@@ -77,17 +77,17 @@ database or filesystem usage.
 
 After installing Memcached itself, you'll need to install a Memcached
 binding. There are several Python Memcached bindings available; the
-two most common are `python-memcached`_ and `pylibmc`_.
+two supported by Django are `pylibmc`_ and `pymemcache`_.
 
-.. _`python-memcached`: https://pypi.org/project/python-memcached/
 .. _`pylibmc`: https://pypi.org/project/pylibmc/
+.. _`pymemcache`: https://pypi.org/project/pymemcache/
 
 To use Memcached with Django:
 
 * Set :setting:`BACKEND <CACHES-BACKEND>` to
-  ``django.core.cache.backends.memcached.MemcachedCache`` or
-  ``django.core.cache.backends.memcached.PyLibMCCache`` (depending
-  on your chosen memcached binding)
+  ``django.core.cache.backends.memcached.PyMemcacheCache`` or
+  ``django.core.cache.backends.memcached.PyLibMCCache`` (depending on your
+  chosen memcached binding)
 
 * Set :setting:`LOCATION <CACHES-LOCATION>` to ``ip:port`` values,
   where ``ip`` is the IP address of the Memcached daemon and ``port`` is the
@@ -95,31 +95,22 @@ To use Memcached with Django:
   ``path`` is the path to a Memcached Unix socket file.
 
 In this example, Memcached is running on localhost (127.0.0.1) port 11211, using
-the ``python-memcached`` binding::
+the ``pymemcache`` binding::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
             'LOCATION': '127.0.0.1:11211',
         }
     }
 
 In this example, Memcached is available through a local Unix socket file
-:file:`/tmp/memcached.sock` using the ``python-memcached`` binding::
+:file:`/tmp/memcached.sock` using the ``pymemcache`` binding::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
             'LOCATION': 'unix:/tmp/memcached.sock',
-        }
-    }
-
-When using the ``pylibmc`` binding, do not include the ``unix:/`` prefix::
-
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
-            'LOCATION': '/tmp/memcached.sock',
         }
     }
 
@@ -136,7 +127,7 @@ address 172.19.26.240 and 172.19.26.242, both on port 11211::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
             'LOCATION': [
                 '172.19.26.240:11211',
                 '172.19.26.242:11211',
@@ -150,7 +141,7 @@ on the IP addresses 172.19.26.240 (port 11211), 172.19.26.242 (port 11212), and
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
             'LOCATION': [
                 '172.19.26.240:11211',
                 '172.19.26.242:11212',
@@ -167,6 +158,16 @@ Without a doubt, *none* of the Django caching backends should be used for
 permanent storage -- they're all intended to be solutions for caching, not
 storage -- but we point this out here because memory-based caching is
 particularly temporary.
+
+.. versionchanged:: 3.2
+
+    The ``PyMemcacheCache`` backend was added.
+
+.. deprecated:: 3.2
+
+    The ``MemcachedCache`` backend is deprecated as ``python-memcached`` has
+    some problems and seems to be unmaintained. Use ``PyMemcacheCache`` or
+    ``PyLibMCCache`` instead.
 
 .. _database-caching:
 
@@ -290,11 +291,22 @@ The directory path should be absolute -- that is, it should start at the root
 of your filesystem. It doesn't matter whether you put a slash at the end of the
 setting.
 
-Make sure the directory pointed-to by this setting exists and is readable and
-writable by the system user under which your Web server runs. Continuing the
-above example, if your server runs as the user ``apache``, make sure the
-directory ``/var/tmp/django_cache`` exists and is readable and writable by the
-user ``apache``.
+Make sure the directory pointed-to by this setting either exists and is
+readable and writable, or that it can be created by the system user under which
+your Web server runs. Continuing the above example, if your server runs as the
+user ``apache``, make sure the directory ``/var/tmp/django_cache`` exists and
+is readable and writable by the user ``apache``, or that it can be created by
+the user ``apache``.
+
+.. warning::
+
+    When the cache :setting:`LOCATION <CACHES-LOCATION>` is contained within
+    :setting:`MEDIA_ROOT`, :setting:`STATIC_ROOT`, or
+    :setting:`STATICFILES_FINDERS`, sensitive data may be exposed.
+
+    An attacker who gains access to the cache file can not only falsify HTML
+    content, which your site will trust, but also remotely execute arbitrary
+    code, as the data is serialized using :mod:`pickle`.
 
 .. _local-memory-caching:
 
@@ -444,19 +456,6 @@ of 60 seconds, and a maximum capacity of 1000 items::
         }
     }
 
-Here's an example configuration for a ``python-memcached`` based backend with
-an object size limit of 2MB::
-
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-            'LOCATION': '127.0.0.1:11211',
-            'OPTIONS': {
-                'server_max_value_length': 1024 * 1024 * 2,
-            }
-        }
-    }
-
 Here's an example configuration for a ``pylibmc`` based backend that enables
 the binary protocol, SASL authentication, and the ``ketama`` behavior mode::
 
@@ -471,6 +470,24 @@ the binary protocol, SASL authentication, and the ``ketama`` behavior mode::
                 'behaviors': {
                     'ketama': True,
                 }
+            }
+        }
+    }
+
+Here's an example configuration for a ``pymemcache`` based backend that enables
+client pooling (which may improve performance by keeping clients connected),
+treats memcache/network errors as cache misses, and sets the ``TCP_NODELAY``
+flag on the connection's socket::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+            'LOCATION': '127.0.0.1:11211',
+            'OPTIONS': {
+                'no_delay': True,
+                'ignore_exc': True,
+                'max_pool_size': 4,
+                'use_pooling': True,
             }
         }
     }
@@ -515,8 +532,9 @@ cached separately. This middleware expects that a HEAD request is answered with
 the same response headers as the corresponding GET request; in which case it can
 return a cached GET response for HEAD request.
 
-Additionally, ``UpdateCacheMiddleware`` automatically sets a few headers in each
-:class:`~django.http.HttpResponse`:
+Additionally, ``UpdateCacheMiddleware`` automatically sets a few headers in
+each :class:`~django.http.HttpResponse` which affect :ref:`downstream caches
+<downstream-caches>`:
 
 * Sets the ``Expires`` header to the current date/time plus the defined
   :setting:`CACHE_MIDDLEWARE_SECONDS`.
@@ -606,10 +624,9 @@ The ``key_prefix`` and ``cache`` arguments may be specified together. The
 ``key_prefix`` argument and the :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`
 specified under :setting:`CACHES` will be concatenated.
 
-.. versionchanged:: 3.1
-
-    In older versions, the ``max-age`` directive from the ``Cache-Control``
-    header had precedence over the cache timeout set by ``cache_page``.
+Additionally, ``cache_page`` automatically sets ``Cache-Control`` and
+``Expires`` headers in the response which affect :ref:`downstream caches
+<downstream-caches>`.
 
 Specifying per-view cache in the URLconf
 ----------------------------------------
@@ -817,9 +834,21 @@ If the object doesn't exist in the cache, ``cache.get()`` returns ``None``::
     >>> cache.get('my_key')
     None
 
-We advise against storing the literal value ``None`` in the cache, because you
-won't be able to distinguish between your stored ``None`` value and a cache
-miss signified by a return value of ``None``.
+If you need to determine whether the object exists in the cache and you have
+stored a literal value ``None``, use a sentinel object as the default::
+
+    >>> sentinel = object()
+    >>> cache.get('my_key', sentinel) is sentinel
+    False
+    >>> # Wait 30 seconds for 'my_key' to expire...
+    >>> cache.get('my_key', sentinel) is sentinel
+    True
+
+.. admonition:: ``MemcachedCache``
+
+    Due to a ``python-memcached`` limitation, it's not possible to distinguish
+    between stored ``None`` value and a cache miss signified by a return value
+    of ``None`` on the deprecated ``MemcachedCache`` backend.
 
 ``cache.get()`` can take a ``default`` argument. This specifies which value to
 return if the object doesn't exist in the cache::
@@ -895,10 +924,6 @@ particular object::
 
 ``delete()`` returns ``True`` if the key was successfully deleted, ``False``
 otherwise.
-
-.. versionchanged:: 3.1
-
-    The boolean return value was added.
 
 .. method:: cache.delete_many(keys, version=None)
 
@@ -1094,6 +1119,8 @@ instance, to do this for the ``locmem`` backend, put this code in a module::
 ...and use the dotted Python path to this class in the
 :setting:`BACKEND <CACHES-BACKEND>` portion of your :setting:`CACHES` setting.
 
+.. _downstream-caches:
+
 Downstream caches
 =================
 
@@ -1168,10 +1195,10 @@ In this case, a caching mechanism (such as Django's own cache middleware) will
 cache a separate version of the page for each unique user-agent.
 
 The advantage to using the ``vary_on_headers`` decorator rather than manually
-setting the ``Vary`` header (using something like
-``response['Vary'] = 'user-agent'``) is that the decorator *adds* to the
-``Vary`` header (which may already exist), rather than setting it from scratch
-and potentially overriding anything that was already in there.
+setting the ``Vary`` header (using something like ``response.headers['Vary'] =
+'user-agent'``) is that the decorator *adds* to the ``Vary`` header (which may
+already exist), rather than setting it from scratch and potentially overriding
+anything that was already in there.
 
 You can pass multiple headers to ``vary_on_headers()``::
 

@@ -93,14 +93,14 @@ input[type="submit"], button {
 
     /* Changelist */
 
-    #changelist #toolbar {
+    #toolbar {
         border: none;
         padding: 15px;
     }
 
     #changelist-search > div {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         max-width: 480px;
     }
 
@@ -108,15 +108,20 @@ input[type="submit"], button {
         line-height: 22px;
     }
 
-    #changelist #toolbar form #searchbar {
+    #toolbar form #searchbar {
         flex: 1 0 auto;
         width: 0;
         height: 22px;
         margin: 0 10px 0 6px;
     }
 
+    #toolbar form input[type=submit] {
+        flex: 0 1 auto;
+    }
+
     #changelist-search .quiet {
-        width: 100%;
+        width: 0;
+        flex: 1 0 auto;
         margin: 5px 0 0 25px;
     }
 
@@ -135,7 +140,7 @@ input[type="submit"], button {
     }
 
     #changelist .actions select {
-        background: #fff;
+        background: var(--body-bg);
     }
 
     #changelist .actions .button {
@@ -159,12 +164,9 @@ input[type="submit"], button {
     .change-list .filtered .paginator,
     .filtered #toolbar,
     .filtered .actions,
-    .filtered div.xfull {
-        margin-right: 230px;
-    }
 
     #changelist .paginator {
-        border-top-color: #eee;
+        border-top-color: var(--hairline-color); /* XXX Is this used at all? */
     }
 
     #changelist .results + .paginator {
@@ -211,11 +213,11 @@ input[type="submit"], button {
     fieldset .fieldBox + .fieldBox {
         margin-top: 10px;
         padding-top: 10px;
-        border-top: 1px solid #eee;
+        border-top: 1px solid var(--hairline-color);
     }
 
     textarea {
-        max-width: 518px;
+        max-width: 100%;
         max-height: 120px;
     }
 
@@ -397,11 +399,11 @@ input[type="submit"], button {
     .datetime .timezonewarning {
         display: block;
         font-size: 11px;
-        color: #999;
+        color: var(--body-quiet-color);
     }
 
     .datetimeshortcuts {
-        color: #ccc;
+        color: var(--border-color); /* XXX Redundant, .datetime span also sets #ccc */
     }
 
     .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
@@ -500,25 +502,16 @@ input[type="submit"], button {
     /* Changelist */
 
     #changelist {
-        display: flex;
+        align-items: stretch;
         flex-direction: column;
     }
 
-    #changelist #toolbar {
-        order: 1;
+    #toolbar {
         padding: 10px;
     }
 
-    #changelist .xfull {
-        order: 2;
-    }
-
-    #changelist-form {
-        order: 3;
-    }
-
     #changelist-filter {
-        order: 4;
+        margin-left: 0;
     }
 
     #changelist .actions label {
@@ -532,11 +525,6 @@ input[type="submit"], button {
 
     #changelist .actions span {
         flex: 1 0 100%;
-    }
-
-    .change-list .filtered .results, .change-list .filtered .paginator,
-    .filtered #toolbar, .filtered .actions, .filtered div.xfull {
-        margin-right: 0;
     }
 
     #changelist-filter {
@@ -667,7 +655,7 @@ input[type="submit"], button {
         margin-bottom: -3px;
     }
 
-    form .aligned ul.radiolist li + li {
+    form .aligned ul.radiolist:not(.inline) li + li {
         margin-top: 5px;
     }
 
@@ -752,7 +740,7 @@ input[type="submit"], button {
     /* Inlines */
 
     .inline-group[data-inline-type="stacked"] .inline-related {
-        border: 2px solid #eee;
+        border: 1px solid var(--hairline-color);
         border-radius: 4px;
         margin-top: 15px;
         overflow: auto;
@@ -762,16 +750,17 @@ input[type="submit"], button {
         box-sizing: border-box;
     }
 
-    .inline-group[data-inline-type="stacked"] .inline-related + .inline-related {
-        margin-top: 30px;
-    }
-
     .inline-group[data-inline-type="stacked"] .inline-related .module {
         padding: 0 10px;
     }
 
-    .inline-group[data-inline-type="stacked"] .inline-related .module .form-row:last-child {
+    .inline-group[data-inline-type="stacked"] .inline-related .module .form-row {
+        border-top: 1px solid var(--hairline-color);
         border-bottom: none;
+    }
+
+    .inline-group[data-inline-type="stacked"] .inline-related .module .form-row:first-child {
+        border-top: none;
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related h3 {
@@ -803,7 +792,7 @@ input[type="submit"], button {
 
     .inline-group[data-inline-type="stacked"] div.add-row {
         margin-top: 15px;
-        border: 1px solid #eee;
+        border: 1px solid var(--hairline-color);
         border-radius: 4px;
     }
 
@@ -973,7 +962,7 @@ input[type="submit"], button {
     }
 
     .timelist a {
-        background: #fff;
+        background: var(--body-bg);
         padding: 4px;
     }
 

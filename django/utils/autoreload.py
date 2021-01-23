@@ -14,6 +14,7 @@ from pathlib import Path
 from types import ModuleType
 from zipimport import zipimporter
 
+import django
 from django.apps import apps
 from django.core.signals import request_finished
 from django.dispatch import Signal
@@ -43,6 +44,16 @@ try:
     import pywatchman
 except ImportError:
     pywatchman = None
+
+
+def is_django_module(module):
+    """Return True if the given module is nested under Django."""
+    return module.__name__.startswith('django.')
+
+
+def is_django_path(path):
+    """Return True if the given file path is nested under Django."""
+    return Path(django.__file__).parent in Path(path).parents
 
 
 def check_errors(fn):
@@ -138,15 +149,15 @@ def iter_modules_and_files(modules, extra_files):
             continue
         path = Path(filename)
         try:
-            resolved_path = path.resolve(strict=True).absolute()
-        except FileNotFoundError:
-            # The module could have been removed, don't fail loudly if this
-            # is the case.
-            continue
+            if not path.exists():
+                # The module could have been removed, don't fail loudly if this
+                # is the case.
+                continue
         except ValueError as e:
             # Network filesystems may return null bytes in file paths.
             logger.debug('"%s" raised when resolving path: "%s"', e, path)
             continue
+        resolved_path = path.resolve().absolute()
         results.add(resolved_path)
     return frozenset(results)
 
@@ -189,10 +200,9 @@ def sys_path_directories():
     """
     for path in sys.path:
         path = Path(path)
-        try:
-            resolved_path = path.resolve(strict=True).absolute()
-        except FileNotFoundError:
+        if not path.exists():
             continue
+        resolved_path = path.resolve().absolute()
         # If the path is a file (like a zip file), watch the parent directory.
         if resolved_path.is_file():
             yield resolved_path.parent
@@ -206,14 +216,14 @@ def get_child_arguments():
     executable is reported to not have the .exe extension which can cause bugs
     on reloading.
     """
-    import django.__main__
-    django_main_path = Path(django.__main__.__file__)
+    import __main__
     py_script = Path(sys.argv[0])
 
     args = [sys.executable] + ['-W%s' % o for o in sys.warnoptions]
-    if py_script == django_main_path:
-        # The server was started with `python -m django runserver`.
-        args += ['-m', 'django']
+    # __spec__ is set when the server was started with the `-m` option,
+    # see https://docs.python.org/3/reference/import.html#main-spec
+    if __main__.__spec__ is not None and __main__.__spec__.parent:
+        args += ['-m', __main__.__spec__.parent]
         args += sys.argv[1:]
     elif not py_script.exists():
         # sys.argv[0] may not exist for several reasons on Windows.
@@ -221,11 +231,15 @@ def get_child_arguments():
         exe_entrypoint = py_script.with_suffix('.exe')
         if exe_entrypoint.exists():
             # Should be executed directly, ignoring sys.executable.
-            return [exe_entrypoint, *sys.argv[1:]]
+            # TODO: Remove str() when dropping support for PY37.
+            # args parameter accepts path-like on Windows from Python 3.8.
+            return [str(exe_entrypoint), *sys.argv[1:]]
         script_entrypoint = py_script.with_name('%s-script.py' % py_script.name)
         if script_entrypoint.exists():
             # Should be executed as usual.
-            return [*args, script_entrypoint, *sys.argv[1:]]
+            # TODO: Remove str() when dropping support for PY37.
+            # args parameter accepts path-like on Windows from Python 3.8.
+            return [*args, str(script_entrypoint), *sys.argv[1:]]
         raise RuntimeError('Script %s does not exist.' % py_script)
     else:
         args += sys.argv
@@ -431,8 +445,15 @@ class WatchmanReloader(BaseReloader):
 
     def _subscribe(self, directory, name, expression):
         root, rel_path = self._watch_root(directory)
+        # Only receive notifications of files changing, filtering out other types
+        # like special files: https://facebook.github.io/watchman/docs/type
+        only_files_expression = [
+            'allof',
+            ['anyof', ['type', 'f'], ['type', 'l']],
+            expression
+        ]
         query = {
-            'expression': expression,
+            'expression': only_files_expression,
             'fields': ['name'],
             'since': self._get_clock(root),
             'dedup_results': True,
@@ -546,6 +567,8 @@ class WatchmanReloader(BaseReloader):
                 for sub in list(self.client.subs.keys()):
                     self._check_subscription(sub)
             yield
+            # Protect against busy loops.
+            time.sleep(0.1)
 
     def stop(self):
         self.client.close()

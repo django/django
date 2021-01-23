@@ -247,6 +247,9 @@ class Command(BaseCommand):
         if field_type == 'CharField' and row.internal_size:
             field_params['max_length'] = int(row.internal_size)
 
+        if field_type in {'CharField', 'TextField'} and row.collation:
+            field_params['db_collation'] = row.collation
+
         if field_type == 'DecimalField':
             if row.precision is None or row.scale is None:
                 field_notes.append(

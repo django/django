@@ -6,7 +6,7 @@ from django.forms.widgets import HiddenInput, NumberInput
 from django.utils.functional import cached_property
 from django.utils.html import html_safe
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext as _, ngettext
+from django.utils.translation import gettext_lazy as _, ngettext
 
 __all__ = ('BaseFormSet', 'formset_factory', 'all_valid')
 
@@ -41,6 +41,14 @@ class ManagementForm(Form):
         self.base_fields[MAX_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         super().__init__(*args, **kwargs)
 
+    def clean(self):
+        cleaned_data = super().clean()
+        # When the management form is invalid, we don't know how many forms
+        # were submitted.
+        cleaned_data.setdefault(TOTAL_FORM_COUNT, 0)
+        cleaned_data.setdefault(INITIAL_FORM_COUNT, 0)
+        return cleaned_data
+
 
 @html_safe
 class BaseFormSet:
@@ -48,9 +56,16 @@ class BaseFormSet:
     A collection of instances of the same Form class.
     """
     ordering_widget = NumberInput
+    default_error_messages = {
+        'missing_management_form': _(
+            'ManagementForm data is missing or has been tampered with. Missing fields: '
+            '%(field_names)s. You may need to file a bug report if the issue persists.'
+        ),
+    }
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList, form_kwargs=None):
+                 initial=None, error_class=ErrorList, form_kwargs=None,
+                 error_messages=None):
         self.is_bound = data is not None or files is not None
         self.prefix = prefix or self.get_default_prefix()
         self.auto_id = auto_id
@@ -61,6 +76,13 @@ class BaseFormSet:
         self.error_class = error_class
         self._errors = None
         self._non_form_errors = None
+
+        messages = {}
+        for cls in reversed(type(self).__mro__):
+            messages.update(getattr(cls, 'default_error_messages', {}))
+        if error_messages is not None:
+            messages.update(error_messages)
+        self.error_messages = messages
 
     def __str__(self):
         return self.as_table()
@@ -88,11 +110,7 @@ class BaseFormSet:
         """Return the ManagementForm instance for this FormSet."""
         if self.is_bound:
             form = ManagementForm(self.data, auto_id=self.auto_id, prefix=self.prefix)
-            if not form.is_valid():
-                raise ValidationError(
-                    _('ManagementForm data is missing or has been tampered with'),
-                    code='missing_management_form',
-                )
+            form.full_clean()
         else:
             form = ManagementForm(auto_id=self.auto_id, prefix=self.prefix, initial={
                 TOTAL_FORM_COUNT: self.total_form_count(),
@@ -216,8 +234,7 @@ class BaseFormSet:
         # that have had their deletion widget set to True
         if not hasattr(self, '_deleted_form_indexes'):
             self._deleted_form_indexes = []
-            for i in range(0, self.total_form_count()):
-                form = self.forms[i]
+            for i, form in enumerate(self.forms):
                 # if this is an extra form and hasn't changed, don't consider it
                 if i >= self.initial_form_count() and not form.has_changed():
                     continue
@@ -239,8 +256,7 @@ class BaseFormSet:
         # by the form data.
         if not hasattr(self, '_ordering'):
             self._ordering = []
-            for i in range(0, self.total_form_count()):
-                form = self.forms[i]
+            for i, form in enumerate(self.forms):
                 # if this is an extra form and hasn't changed, don't consider it
                 if i >= self.initial_form_count() and not form.has_changed():
                     continue
@@ -301,18 +317,14 @@ class BaseFormSet:
         """Return True if every form in self.forms is valid."""
         if not self.is_bound:
             return False
-        # We loop over every form.errors here rather than short circuiting on the
-        # first failure to make sure validation gets triggered for every form.
-        forms_valid = True
-        # This triggers a full clean.
+        # Accessing errors triggers a full clean the first time only.
         self.errors
-        for i in range(0, self.total_form_count()):
-            form = self.forms[i]
-            if self.can_delete and self._should_delete_form(form):
-                # This form is going to be deleted so any of its errors
-                # shouldn't cause the entire formset to be invalid.
-                continue
-            forms_valid &= form.is_valid()
+        # List comprehension ensures is_valid() is called for all forms.
+        # Forms due to be deleted shouldn't cause the formset to be invalid.
+        forms_valid = all([
+            form.is_valid() for form in self.forms
+            if not (self.can_delete and self._should_delete_form(form))
+        ])
         return forms_valid and not self.non_form_errors()
 
     def full_clean(self):
@@ -326,8 +338,21 @@ class BaseFormSet:
 
         if not self.is_bound:  # Stop further processing.
             return
-        for i in range(0, self.total_form_count()):
-            form = self.forms[i]
+
+        if not self.management_form.is_valid():
+            error = ValidationError(
+                self.error_messages['missing_management_form'],
+                params={
+                    'field_names': ', '.join(
+                        self.management_form.add_prefix(field_name)
+                        for field_name in self.management_form.errors
+                    ),
+                },
+                code='missing_management_form',
+            )
+            self._non_form_errors.append(error)
+
+        for i, form in enumerate(self.forms):
             # Empty forms are unchanged forms beyond those with initial data.
             if not form.has_changed() and i >= self.initial_form_count():
                 empty_forms_count += 1
@@ -342,15 +367,15 @@ class BaseFormSet:
                     self.total_form_count() - len(self.deleted_forms) > self.max_num) or \
                     self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
                 raise ValidationError(ngettext(
-                    "Please submit %d or fewer forms.",
-                    "Please submit %d or fewer forms.", self.max_num) % self.max_num,
+                    "Please submit at most %d form.",
+                    "Please submit at most %d forms.", self.max_num) % self.max_num,
                     code='too_many_forms',
                 )
             if (self.validate_min and
                     self.total_form_count() - len(self.deleted_forms) - empty_forms_count < self.min_num):
                 raise ValidationError(ngettext(
-                    "Please submit %d or more forms.",
-                    "Please submit %d or more forms.", self.min_num) % self.min_num,
+                    "Please submit at least %d form.",
+                    "Please submit at least %d forms.", self.min_num) % self.min_num,
                     code='too_few_forms')
             # Give self.clean() a chance to do cross-form validation.
             self.clean()
@@ -467,7 +492,5 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
 
 def all_valid(formsets):
     """Validate every formset and return True if all are valid."""
-    valid = True
-    for formset in formsets:
-        valid &= formset.is_valid()
-    return valid
+    # List comprehension ensures is_valid() is called for all formsets.
+    return all([formset.is_valid() for formset in formsets])

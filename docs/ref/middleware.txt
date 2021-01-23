@@ -61,6 +61,22 @@ Adds a few conveniences for perfectionists:
   indexer would treat them as separate URLs -- so it's best practice to
   normalize URLs.
 
+  If necessary, individual views may be excluded from the ``APPEND_SLASH``
+  behavior using the :func:`~django.views.decorators.common.no_append_slash`
+  decorator::
+
+    from django.views.decorators.common import no_append_slash
+
+    @no_append_slash
+    def sensitive_fbv(request, *args, **kwargs):
+        """View to be excluded from APPEND_SLASH."""
+        return HttpResponse()
+
+  .. versionchanged:: 3.2
+
+    Support for the :func:`~django.views.decorators.common.no_append_slash`
+    decorator was added.
+
 * Sets the ``Content-Length`` header for non-streaming responses.
 
 .. attribute:: CommonMiddleware.response_redirect_class

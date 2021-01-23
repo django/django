@@ -72,7 +72,7 @@ class ExclusionConstraint(BaseConstraint):
             if isinstance(expression, str):
                 expression = F(expression)
             expression = expression.resolve_expression(query=query)
-            sql, params = expression.as_sql(compiler, schema_editor.connection)
+            sql, params = compiler.compile(expression)
             try:
                 opclass = self.opclasses[idx]
                 if opclass:

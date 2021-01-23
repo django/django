@@ -35,10 +35,6 @@ query and the vector.
 To use the ``search`` lookup, ``'django.contrib.postgres'`` must be in your
 :setting:`INSTALLED_APPS`.
 
-.. versionchanged:: 3.1
-
-    Support for query expressions was added.
-
 ``SearchVector``
 ================
 
@@ -110,11 +106,6 @@ Examples:
 See :ref:`postgresql-fts-search-configuration` for an explanation of the
 ``config`` parameter.
 
-.. versionchanged:: 3.1
-
-    Support for ``'websearch'`` search type and query expressions in
-    ``SearchQuery.value`` were added.
-
 ``SearchRank``
 ==============
 
@@ -159,14 +150,8 @@ normalization options`_.
 
 .. _different rank normalization options: https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-RANKING
 
-.. versionadded:: 3.1
-
-    The ``normalization`` and ``cover_density`` parameters were added.
-
 ``SearchHeadline``
 ==================
-
-.. versionadded:: 3.1
 
 .. class:: SearchHeadline(expression, query, config=None, start_sel=None, stop_sel=None, max_words=None, min_words=None, short_word=None, highlight_all=None, max_fragments=None, fragment_delimiter=None)
 

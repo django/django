@@ -28,9 +28,7 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
         if not gfks:
             return [
                 checks.Error(
-                    "'%s.%s' has no GenericForeignKey." % (
-                        obj.model._meta.app_label, obj.model._meta.object_name
-                    ),
+                    "'%s' has no GenericForeignKey." % obj.model._meta.label,
                     obj=obj.__class__,
                     id='admin.E301'
                 )
@@ -42,8 +40,8 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
             except FieldDoesNotExist:
                 return [
                     checks.Error(
-                        "'ct_field' references '%s', which is not a field on '%s.%s'." % (
-                            obj.ct_field, obj.model._meta.app_label, obj.model._meta.object_name
+                        "'ct_field' references '%s', which is not a field on '%s'." % (
+                            obj.ct_field, obj.model._meta.label,
                         ),
                         obj=obj.__class__,
                         id='admin.E302'
@@ -55,8 +53,8 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
             except FieldDoesNotExist:
                 return [
                     checks.Error(
-                        "'ct_fk_field' references '%s', which is not a field on '%s.%s'." % (
-                            obj.ct_fk_field, obj.model._meta.app_label, obj.model._meta.object_name
+                        "'ct_fk_field' references '%s', which is not a field on '%s'." % (
+                            obj.ct_fk_field, obj.model._meta.label,
                         ),
                         obj=obj.__class__,
                         id='admin.E303'
@@ -71,8 +69,8 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
 
             return [
                 checks.Error(
-                    "'%s.%s' has no GenericForeignKey using content type field '%s' and object ID field '%s'." % (
-                        obj.model._meta.app_label, obj.model._meta.object_name, obj.ct_field, obj.ct_fk_field
+                    "'%s' has no GenericForeignKey using content type field '%s' and object ID field '%s'." % (
+                        obj.model._meta.label, obj.ct_field, obj.ct_fk_field,
                     ),
                     obj=obj.__class__,
                     id='admin.E304'

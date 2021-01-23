@@ -665,9 +665,35 @@ The ``F()`` objects support bitwise operations by ``.bitand()``, ``.bitor()``,
 
     Oracle doesn't support bitwise XOR operation.
 
-.. versionchanged:: 3.1
+.. _using-transforms-in-expressions:
 
-    Support for ``.bitxor()`` was added.
+Expressions can reference transforms
+------------------------------------
+
+.. versionadded:: 3.2
+
+Django supports using transforms in expressions.
+
+For example, to find all ``Entry`` objects published in the same year as they
+were last modified::
+
+    >>> Entry.objects.filter(pub_date__year=F('mod_date__year'))
+
+To find the earliest year an entry was published, we can issue the query::
+
+    >>> Entry.objects.aggregate(first_published_year=Min('pub_date__year'))
+
+This example finds the value of the highest rated entry and the total number
+of comments on all entries for each year::
+
+    >>> Entry.objects.values('pub_date__year').annotate(
+    ...     top_rating=Subquery(
+    ...         Entry.objects.filter(
+    ...             pub_date__year=OuterRef('pub_date__year'),
+    ...         ).order_by('-rating').values('rating')[:1]
+    ...     ),
+    ...     total_comments=Sum('number_of_comments'),
+    ... )
 
 The ``pk`` lookup shortcut
 --------------------------
@@ -909,6 +935,14 @@ To query for missing keys, use the ``isnull`` lookup::
     :lookup:`iexact`, :lookup:`regex`, :lookup:`iregex`, :lookup:`startswith`,
     :lookup:`istartswith`, :lookup:`lt`, :lookup:`lte`, :lookup:`gt`, and
     :lookup:`gte`, as well as with :ref:`containment-and-key-lookups`.
+
+.. note::
+
+    Due to the way in which key-path queries work,
+    :meth:`~django.db.models.query.QuerySet.exclude` and
+    :meth:`~django.db.models.query.QuerySet.filter` are not guaranteed to
+    produce exhaustive sets. If you want to include objects that do not have
+    the path, add the ``isnull`` lookup.
 
 .. warning::
 
@@ -1216,7 +1250,8 @@ Things get more complicated if you use inheritance. Consider a subclass of
     django_blog = ThemeBlog(name='Django', tagline='Django is easy', theme='python')
     django_blog.save() # django_blog.pk == 3
 
-Due to how inheritance works, you have to set both ``pk`` and ``id`` to None::
+Due to how inheritance works, you have to set both ``pk`` and ``id`` to
+``None``::
 
     django_blog.pk = None
     django_blog.id = None
@@ -1275,7 +1310,7 @@ table. Example::
     >>> b = Blog.objects.get(pk=1)
 
     # Update all the headlines belonging to this Blog.
-    >>> Entry.objects.select_related().filter(blog=b).update(headline='Everything is the same')
+    >>> Entry.objects.filter(blog=b).update(headline='Everything is the same')
 
 Be aware that the ``update()`` method is converted directly to an SQL
 statement. It is a bulk operation for direct updates. It doesn't run any

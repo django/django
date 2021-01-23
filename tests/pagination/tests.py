@@ -433,21 +433,17 @@ class ModelPaginationTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         # Prepare a list of objects for pagination.
-        for x in range(1, 10):
-            a = Article(headline='Article %s' % x, pub_date=datetime(2005, 7, 29))
-            a.save()
+        pub_date = datetime(2005, 7, 29)
+        cls.articles = [
+            Article.objects.create(headline=f'Article {x}', pub_date=pub_date)
+            for x in range(1, 10)
+        ]
 
     def test_first_page(self):
         paginator = Paginator(Article.objects.order_by('id'), 5)
         p = paginator.page(1)
         self.assertEqual("<Page 1 of 2>", str(p))
-        self.assertQuerysetEqual(p.object_list, [
-            "<Article: Article 1>",
-            "<Article: Article 2>",
-            "<Article: Article 3>",
-            "<Article: Article 4>",
-            "<Article: Article 5>"
-        ])
+        self.assertSequenceEqual(p.object_list, self.articles[:5])
         self.assertTrue(p.has_next())
         self.assertFalse(p.has_previous())
         self.assertTrue(p.has_other_pages())
@@ -461,12 +457,7 @@ class ModelPaginationTests(TestCase):
         paginator = Paginator(Article.objects.order_by('id'), 5)
         p = paginator.page(2)
         self.assertEqual("<Page 2 of 2>", str(p))
-        self.assertQuerysetEqual(p.object_list, [
-            "<Article: Article 6>",
-            "<Article: Article 7>",
-            "<Article: Article 8>",
-            "<Article: Article 9>"
-        ])
+        self.assertSequenceEqual(p.object_list, self.articles[5:])
         self.assertFalse(p.has_next())
         self.assertTrue(p.has_previous())
         self.assertTrue(p.has_other_pages())
@@ -494,12 +485,8 @@ class ModelPaginationTests(TestCase):
         self.assertNotIsInstance(p.object_list, list)
 
         # Make sure slicing the Page object with numbers and slice objects work.
-        self.assertEqual(p[0], Article.objects.get(headline='Article 1'))
-        self.assertQuerysetEqual(p[slice(2)], [
-            "<Article: Article 1>",
-            "<Article: Article 2>",
-        ]
-        )
+        self.assertEqual(p[0], self.articles[0])
+        self.assertSequenceEqual(p[slice(2)], self.articles[:2])
         # After __getitem__ is called, object_list is a list
         self.assertIsInstance(p.object_list, list)
 

@@ -29,7 +29,7 @@ class StaticTests(SimpleTestCase):
             file_path = path.join(media_dir, filename)
             with open(file_path, 'rb') as fp:
                 self.assertEqual(fp.read(), response_content)
-            self.assertEqual(len(response_content), int(response['Content-Length']))
+            self.assertEqual(len(response_content), int(response.headers['Content-Length']))
             self.assertEqual(mimetypes.guess_type(file_path)[1], response.get('Content-Encoding', None))
 
     def test_chunked(self):
@@ -44,7 +44,7 @@ class StaticTests(SimpleTestCase):
 
     def test_unknown_mime_type(self):
         response = self.client.get('/%s/file.unknown' % self.prefix)
-        self.assertEqual('application/octet-stream', response['Content-Type'])
+        self.assertEqual('application/octet-stream', response.headers['Content-Type'])
         response.close()
 
     def test_copes_with_empty_path_component(self):
@@ -87,7 +87,7 @@ class StaticTests(SimpleTestCase):
         response_content = b''.join(response)
         with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response_content)
-        self.assertEqual(len(response_content), int(response['Content-Length']))
+        self.assertEqual(len(response_content), int(response.headers['Content-Length']))
 
     def test_invalid_if_modified_since2(self):
         """Handle even more bogus If-Modified-Since values gracefully
@@ -102,7 +102,7 @@ class StaticTests(SimpleTestCase):
         response_content = b''.join(response)
         with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response_content)
-        self.assertEqual(len(response_content), int(response['Content-Length']))
+        self.assertEqual(len(response_content), int(response.headers['Content-Length']))
 
     def test_404(self):
         response = self.client.get('/%s/nonexistent_resource' % self.prefix)

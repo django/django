@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from django import forms
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.admin.utils import (
     NestedObjects, display_for_field, display_for_value, flatten,
@@ -162,12 +163,6 @@ class UtilsTests(SimpleTestCase):
         display_value = display_for_field(None, models.TimeField(), self.empty_value)
         self.assertEqual(display_value, self.empty_value)
 
-        # Regression test for #13071: NullBooleanField has special
-        # handling.
-        display_value = display_for_field(None, models.NullBooleanField(), self.empty_value)
-        expected = '<img src="%sadmin/img/icon-unknown.svg" alt="None">' % settings.STATIC_URL
-        self.assertHTMLEqual(display_value, expected)
-
         display_value = display_for_field(None, models.BooleanField(null=True), self.empty_value)
         expected = '<img src="%sadmin/img/icon-unknown.svg" alt="None" />' % settings.STATIC_URL
         self.assertHTMLEqual(display_value, expected)
@@ -186,6 +181,7 @@ class UtilsTests(SimpleTestCase):
             ({'a': {'b': 'c'}}, '{"a": {"b": "c"}}'),
             (['a', 'b'], '["a", "b"]'),
             ('a', '"a"'),
+            ({'a': '你好 世界'}, '{"a": "你好 世界"}'),
             ({('a', 'b'): 'c'}, "{('a', 'b'): 'c'}"),  # Invalid JSON.
         ]
         for value, display_value in tests:
@@ -292,9 +288,9 @@ class UtilsTests(SimpleTestCase):
         self.assertEqual(label_for_field('site_id', Article), 'Site id')
 
         class MockModelAdmin:
+            @admin.display(description='not Really the Model')
             def test_from_model(self, obj):
                 return "nothing"
-            test_from_model.short_description = "not Really the Model"
 
         self.assertEqual(
             label_for_field("test_from_model", Article, model_admin=MockModelAdmin),
@@ -322,13 +318,11 @@ class UtilsTests(SimpleTestCase):
             label_for_field('nonexistent', Article, form=ArticleForm()),
 
     def test_label_for_property(self):
-        # NOTE: cannot use @property decorator, because of
-        # AttributeError: 'property' object has no attribute 'short_description'
         class MockModelAdmin:
-            def my_property(self):
+            @property
+            @admin.display(description='property short description')
+            def test_from_property(self):
                 return "this if from property"
-            my_property.short_description = 'property short description'
-            test_from_property = property(my_property)
 
         self.assertEqual(
             label_for_field("test_from_property", Article, model_admin=MockModelAdmin),

@@ -133,7 +133,7 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
 
         // Initialize the draw interaction
         let geomType = this.options.geom_name;
-        if (geomType === "Unknown" || geomType === "GeometryCollection") {
+        if (geomType === "Geometry" || geomType === "GeometryCollection") {
             // Default to Point, but create icons to switch type
             geomType = "Point";
             this.currentGeometryType = new GeometryTypeControl({widget: this, type: "Point", active: true});

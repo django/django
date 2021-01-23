@@ -632,6 +632,8 @@ class BaseDatabaseWrapper:
         return self.SchemaEditorClass(self, *args, **kwargs)
 
     def on_commit(self, func):
+        if not callable(func):
+            raise TypeError("on_commit()'s callback must be a callable.")
         if self.in_atomic_block:
             # Transaction in progress; save for execution on commit.
             self.run_on_commit.append((set(self.savepoint_ids), func))

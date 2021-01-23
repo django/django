@@ -701,10 +701,10 @@ class AggregationTests(TestCase):
         qs = Book.objects.extra(select={'pub': 'publisher_id'}).values('pub').annotate(Count('id')).order_by('pub')
         self.assertSequenceEqual(
             qs, [
-                {'pub': self.b1.id, 'id__count': 2},
-                {'pub': self.b2.id, 'id__count': 1},
-                {'pub': self.b3.id, 'id__count': 2},
-                {'pub': self.b4.id, 'id__count': 1}
+                {'pub': self.p1.id, 'id__count': 2},
+                {'pub': self.p2.id, 'id__count': 1},
+                {'pub': self.p3.id, 'id__count': 2},
+                {'pub': self.p4.id, 'id__count': 1},
             ],
         )
 
@@ -876,7 +876,7 @@ class AggregationTests(TestCase):
         )
 
         # Note: intentionally no order_by(), that case needs tests, too.
-        publishers = Publisher.objects.filter(id__in=[1, 2])
+        publishers = Publisher.objects.filter(id__in=[self.p1.id, self.p2.id])
         self.assertEqual(
             sorted(p.name for p in publishers),
             [
@@ -974,7 +974,7 @@ class AggregationTests(TestCase):
     def test_empty_filter_aggregate(self):
         self.assertEqual(
             Author.objects.filter(id__in=[]).annotate(Count("friends")).aggregate(Count("pk")),
-            {"pk__count": None}
+            {"pk__count": 0}
         )
 
     def test_none_call_before_aggregate(self):
@@ -1450,8 +1450,10 @@ class AggregationTests(TestCase):
         query = Book.objects.annotate(Count('authors')).filter(
             q1 | q2).order_by('pk')
         self.assertQuerysetEqual(
-            query, [1, 4, 5, 6],
-            lambda b: b.pk)
+            query,
+            [self.b1.pk, self.b4.pk, self.b5.pk, self.b6.pk],
+            attrgetter('pk'),
+        )
 
     def test_ticket_11293_q_immutable(self):
         """

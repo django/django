@@ -9,6 +9,7 @@ REFERRER_POLICY_VALUES = {
     'strict-origin-when-cross-origin', 'unsafe-url',
 }
 
+SECRET_KEY_INSECURE_PREFIX = 'django-insecure-'
 SECRET_KEY_MIN_LENGTH = 50
 SECRET_KEY_MIN_UNIQUE_CHARACTERS = 5
 
@@ -68,12 +69,14 @@ W008 = Warning(
 )
 
 W009 = Warning(
-    "Your SECRET_KEY has less than %(min_length)s characters or less than "
-    "%(min_unique_chars)s unique characters. Please generate a long and random "
-    "SECRET_KEY, otherwise many of Django's security-critical features will be "
-    "vulnerable to attack." % {
+    "Your SECRET_KEY has less than %(min_length)s characters, less than "
+    "%(min_unique_chars)s unique characters, or it's prefixed with "
+    "'%(insecure_prefix)s' indicating that it was generated automatically by "
+    "Django. Please generate a long and random SECRET_KEY, otherwise many of "
+    "Django's security-critical features will be vulnerable to attack." % {
         'min_length': SECRET_KEY_MIN_LENGTH,
         'min_unique_chars': SECRET_KEY_MIN_UNIQUE_CHARACTERS,
+        'insecure_prefix': SECRET_KEY_INSECURE_PREFIX,
     },
     id='security.W009',
 )
@@ -114,11 +117,6 @@ E023 = Error(
     'You have set the SECURE_REFERRER_POLICY setting to an invalid value.',
     hint='Valid values are: {}.'.format(', '.join(sorted(REFERRER_POLICY_VALUES))),
     id='security.E023',
-)
-
-E100 = Error(
-    "DEFAULT_HASHING_ALGORITHM must be 'sha1' or 'sha256'.",
-    id='security.E100',
 )
 
 
@@ -195,7 +193,8 @@ def check_secret_key(app_configs, **kwargs):
     else:
         passed_check = (
             len(set(secret_key)) >= SECRET_KEY_MIN_UNIQUE_CHARACTERS and
-            len(secret_key) >= SECRET_KEY_MIN_LENGTH
+            len(secret_key) >= SECRET_KEY_MIN_LENGTH and
+            not secret_key.startswith(SECRET_KEY_INSECURE_PREFIX)
         )
     return [] if passed_check else [W009]
 
@@ -232,12 +231,4 @@ def check_referrer_policy(app_configs, **kwargs):
             values = set(settings.SECURE_REFERRER_POLICY)
         if not values <= REFERRER_POLICY_VALUES:
             return [E023]
-    return []
-
-
-# RemovedInDjango40Warning
-@register(Tags.security)
-def check_default_hashing_algorithm(app_configs, **kwargs):
-    if settings.DEFAULT_HASHING_ALGORITHM not in {'sha1', 'sha256'}:
-        return [E100]
     return []

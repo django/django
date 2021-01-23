@@ -14,46 +14,44 @@ from .models import (
 
 class ManagersRegressionTests(TestCase):
     def test_managers(self):
-        Child1.objects.create(name='fred', data='a1')
-        Child1.objects.create(name='barney', data='a2')
-        Child2.objects.create(name='fred', data='b1', value=1)
-        Child2.objects.create(name='barney', data='b2', value=42)
-        Child3.objects.create(name='fred', data='c1', comment='yes')
-        Child3.objects.create(name='barney', data='c2', comment='no')
-        Child4.objects.create(name='fred', data='d1')
-        Child4.objects.create(name='barney', data='d2')
-        Child5.objects.create(name='fred', comment='yes')
+        a1 = Child1.objects.create(name='fred', data='a1')
+        a2 = Child1.objects.create(name='barney', data='a2')
+        b1 = Child2.objects.create(name='fred', data='b1', value=1)
+        b2 = Child2.objects.create(name='barney', data='b2', value=42)
+        c1 = Child3.objects.create(name='fred', data='c1', comment='yes')
+        c2 = Child3.objects.create(name='barney', data='c2', comment='no')
+        d1 = Child4.objects.create(name='fred', data='d1')
+        d2 = Child4.objects.create(name='barney', data='d2')
+        fred1 = Child5.objects.create(name='fred', comment='yes')
         Child5.objects.create(name='barney', comment='no')
-        Child6.objects.create(name='fred', data='f1', value=42)
-        Child6.objects.create(name='barney', data='f2', value=42)
-        Child7.objects.create(name='fred')
-        Child7.objects.create(name='barney')
+        f1 = Child6.objects.create(name='fred', data='f1', value=42)
+        f2 = Child6.objects.create(name='barney', data='f2', value=42)
+        fred2 = Child7.objects.create(name='fred')
+        barney = Child7.objects.create(name='barney')
 
-        self.assertQuerysetEqual(Child1.manager1.all(), ["<Child1: a1>"])
-        self.assertQuerysetEqual(Child1.manager2.all(), ["<Child1: a2>"])
-        self.assertQuerysetEqual(Child1._default_manager.all(), ["<Child1: a1>"])
+        self.assertSequenceEqual(Child1.manager1.all(), [a1])
+        self.assertSequenceEqual(Child1.manager2.all(), [a2])
+        self.assertSequenceEqual(Child1._default_manager.all(), [a1])
 
-        self.assertQuerysetEqual(Child2._default_manager.all(), ["<Child2: b1>"])
-        self.assertQuerysetEqual(Child2.restricted.all(), ["<Child2: b2>"])
+        self.assertSequenceEqual(Child2._default_manager.all(), [b1])
+        self.assertSequenceEqual(Child2.restricted.all(), [b2])
 
-        self.assertQuerysetEqual(Child3._default_manager.all(), ["<Child3: c1>"])
-        self.assertQuerysetEqual(Child3.manager1.all(), ["<Child3: c1>"])
-        self.assertQuerysetEqual(Child3.manager2.all(), ["<Child3: c2>"])
+        self.assertSequenceEqual(Child3._default_manager.all(), [c1])
+        self.assertSequenceEqual(Child3.manager1.all(), [c1])
+        self.assertSequenceEqual(Child3.manager2.all(), [c2])
 
         # Since Child6 inherits from Child4, the corresponding rows from f1 and
         # f2 also appear here. This is the expected result.
-        self.assertQuerysetEqual(Child4._default_manager.order_by('data'), [
-            "<Child4: d1>",
-            "<Child4: d2>",
-            "<Child4: f1>",
-            "<Child4: f2>",
-        ])
-        self.assertQuerysetEqual(Child4.manager1.all(), ["<Child4: d1>", "<Child4: f1>"], ordered=False)
-        self.assertQuerysetEqual(Child5._default_manager.all(), ["<Child5: fred>"])
-        self.assertQuerysetEqual(Child6._default_manager.all(), ["<Child6: f1>", "<Child6: f2>"], ordered=False)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
+            Child4._default_manager.order_by('data'),
+            [d1, d2, f1.child4_ptr, f2.child4_ptr],
+        )
+        self.assertCountEqual(Child4.manager1.all(), [d1, f1.child4_ptr])
+        self.assertCountEqual(Child5._default_manager.all(), [fred1])
+        self.assertCountEqual(Child6._default_manager.all(), [f1, f2])
+        self.assertSequenceEqual(
             Child7._default_manager.order_by('name'),
-            ["<Child7: barney>", "<Child7: fred>"]
+            [barney, fred2],
         )
 
     def test_abstract_manager(self):

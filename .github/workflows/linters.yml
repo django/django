@@ -1,0 +1,38 @@
+name: Linters
+
+on:
+  pull_request:
+
+jobs:
+  flake8:
+    name: flake8
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - run: pip3 install flake8
+      - name: flake8
+        uses: liskin/gh-problem-matcher-wrap@v1
+        with:
+          linters: flake8
+          run: flake8
+
+  isort:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - run: pip3 install isort
+      - name: isort
+        uses: liskin/gh-problem-matcher-wrap@v1
+        with:
+          linters: isort
+          run: isort --check --diff django tests scripts

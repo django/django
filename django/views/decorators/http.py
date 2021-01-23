@@ -102,9 +102,9 @@ def condition(etag_func=None, last_modified_func=None):
             # and if the request method is safe.
             if request.method in ('GET', 'HEAD'):
                 if res_last_modified and not response.has_header('Last-Modified'):
-                    response['Last-Modified'] = http_date(res_last_modified)
+                    response.headers['Last-Modified'] = http_date(res_last_modified)
                 if res_etag:
-                    response.setdefault('ETag', res_etag)
+                    response.headers.setdefault('ETag', res_etag)
 
             return response
 

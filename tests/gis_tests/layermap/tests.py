@@ -1,8 +1,8 @@
 import datetime
-import os
 import unittest
 from copy import copy
 from decimal import Decimal
+from pathlib import Path
 
 from django.conf import settings
 from django.contrib.gis.gdal import DataSource
@@ -19,12 +19,12 @@ from .models import (
     has_nulls_mapping, inter_mapping,
 )
 
-shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), os.pardir, 'data'))
-city_shp = os.path.join(shp_path, 'cities', 'cities.shp')
-co_shp = os.path.join(shp_path, 'counties', 'counties.shp')
-inter_shp = os.path.join(shp_path, 'interstates', 'interstates.shp')
-invalid_shp = os.path.join(shp_path, 'invalid', 'emptypoints.shp')
-has_nulls_geojson = os.path.join(shp_path, 'has_nulls', 'has_nulls.geojson')
+shp_path = Path(__file__).resolve().parent.parent / 'data'
+city_shp = shp_path / 'cities' / 'cities.shp'
+co_shp = shp_path / 'counties' / 'counties.shp'
+inter_shp = shp_path / 'interstates' / 'interstates.shp'
+invalid_shp = shp_path / 'invalid' / 'emptypoints.shp'
+has_nulls_geojson = shp_path / 'has_nulls' / 'has_nulls.geojson'
 
 # Dictionaries to hold what's expected in the county shapefile.
 NAMES = ['Bexar', 'Galveston', 'Harris', 'Honolulu', 'Pueblo']
@@ -82,6 +82,11 @@ class LayerMapTest(TestCase):
             pnt1, pnt2 = feat.geom, city.point
             self.assertAlmostEqual(pnt1.x, pnt2.x, 5)
             self.assertAlmostEqual(pnt1.y, pnt2.y, 5)
+
+    def test_data_source_str(self):
+        lm = LayerMapping(City, str(city_shp), city_mapping)
+        lm.save()
+        self.assertEqual(City.objects.count(), 3)
 
     def test_layermap_strict(self):
         "Testing the `strict` keyword, and import of a LineString shapefile."
@@ -307,7 +312,7 @@ class LayerMapTest(TestCase):
 
     def test_encoded_name(self):
         """ Test a layer containing utf-8-encoded name """
-        city_shp = os.path.join(shp_path, 'ch-city', 'ch-city.shp')
+        city_shp = shp_path / 'ch-city' / 'ch-city.shp'
         lm = LayerMapping(City, city_shp, city_mapping)
         lm.save(silent=True, strict=True)
         self.assertEqual(City.objects.count(), 1)

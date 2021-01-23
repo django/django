@@ -265,7 +265,7 @@ Minor features
 * Added support for the :lookup:`rangefield.contained_by` lookup for some built
   in fields which correspond to the range fields.
 
-* Added :class:`~django.contrib.postgres.fields.JSONField`.
+* Added ``django.contrib.postgres.fields.JSONField``.
 
 * Added :doc:`/ref/contrib/postgres/aggregates`.
 

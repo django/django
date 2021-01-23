@@ -46,15 +46,10 @@ class OneToOneTests(TestCase):
 
     def test_manager_all(self):
         # Restaurant.objects.all() just returns the Restaurants, not the Places.
-        self.assertQuerysetEqual(Restaurant.objects.all(), [
-            '<Restaurant: Demon Dogs the restaurant>',
-        ])
+        self.assertSequenceEqual(Restaurant.objects.all(), [self.r1])
         # Place.objects.all() returns all Places, regardless of whether they
         # have Restaurants.
-        self.assertQuerysetEqual(Place.objects.order_by('name'), [
-            '<Place: Ace Hardware the place>',
-            '<Place: Demon Dogs the place>',
-        ])
+        self.assertSequenceEqual(Place.objects.order_by('name'), [self.p2, self.p1])
 
     def test_manager_get(self):
         def assert_get_restaurant(**params):
@@ -92,9 +87,7 @@ class OneToOneTests(TestCase):
 
         # Query the waiters
         def assert_filter_waiters(**params):
-            self.assertQuerysetEqual(Waiter.objects.filter(**params), [
-                '<Waiter: Joe the waiter at Demon Dogs the restaurant>'
-            ])
+            self.assertSequenceEqual(Waiter.objects.filter(**params), [w])
         assert_filter_waiters(restaurant__place__exact=self.p1.pk)
         assert_filter_waiters(restaurant__place__exact=self.p1)
         assert_filter_waiters(restaurant__place__pk=self.p1.pk)
@@ -169,10 +162,7 @@ class OneToOneTests(TestCase):
         f = Favorites(name='Fred')
         f.save()
         f.restaurants.set([self.r1])
-        self.assertQuerysetEqual(
-            f.restaurants.all(),
-            ['<Restaurant: Demon Dogs the restaurant>']
-        )
+        self.assertSequenceEqual(f.restaurants.all(), [self.r1])
 
     def test_reverse_object_cache(self):
         """

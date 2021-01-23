@@ -228,22 +228,26 @@ of an arbitrary method is not supported. Also note that the column header for
 underscores replaced with spaces), and that each line contains the string
 representation of the output.
 
-You can improve that by giving that method (in :file:`polls/models.py`) a few
-attributes, as follows:
+You can improve that by using the :func:`~django.contrib.admin.display`
+decorator on that method (in :file:`polls/models.py`), as follows:
 
 .. code-block:: python
     :caption: polls/models.py
 
+    from django.contrib import admin
+
     class Question(models.Model):
         # ...
+        @admin.display(
+            boolean=True,
+            ordering='pub_date',
+            description='Published recently?',
+        )
         def was_published_recently(self):
             now = timezone.now()
             return now - datetime.timedelta(days=1) <= self.pub_date <= now
-        was_published_recently.admin_order_field = 'pub_date'
-        was_published_recently.boolean = True
-        was_published_recently.short_description = 'Published recently?'
 
-For more information on these method properties, see
+For more information on the properties configurable via the decorator, see
 :attr:`~django.contrib.admin.ModelAdmin.list_display`.
 
 Edit your :file:`polls/admin.py` file again and add an improvement to the

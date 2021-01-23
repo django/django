@@ -3,7 +3,9 @@ from django.contrib.redirects.middleware import RedirectFallbackMiddleware
 from django.contrib.redirects.models import Redirect
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponseForbidden, HttpResponseRedirect
+from django.http import (
+    HttpResponse, HttpResponseForbidden, HttpResponseRedirect,
+)
 from django.test import TestCase, modify_settings, override_settings
 
 
@@ -58,12 +60,15 @@ class RedirectTests(TestCase):
 
     @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
     def test_sites_not_installed(self):
+        def get_response(request):
+            return HttpResponse()
+
         msg = (
             'You cannot use RedirectFallbackMiddleware when '
             'django.contrib.sites is not installed.'
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            RedirectFallbackMiddleware()
+            RedirectFallbackMiddleware(get_response)
 
 
 class OverriddenRedirectFallbackMiddleware(RedirectFallbackMiddleware):

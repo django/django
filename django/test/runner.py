@@ -38,6 +38,7 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
     def __init__(self, stream, descriptions, verbosity):
         self.logger = logging.getLogger('django.db.backends')
         self.logger.setLevel(logging.DEBUG)
+        self.debug_sql_stream = None
         super().__init__(stream, descriptions, verbosity)
 
     def startTest(self, test):
@@ -56,8 +57,13 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
 
     def addError(self, test, err):
         super().addError(test, err)
-        self.debug_sql_stream.seek(0)
-        self.errors[-1] = self.errors[-1] + (self.debug_sql_stream.read(),)
+        if self.debug_sql_stream is None:
+            # Error before tests e.g. in setUpTestData().
+            sql = ''
+        else:
+            self.debug_sql_stream.seek(0)
+            sql = self.debug_sql_stream.read()
+        self.errors[-1] = self.errors[-1] + (sql,)
 
     def addFailure(self, test, err):
         super().addFailure(test, err)

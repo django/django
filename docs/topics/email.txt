@@ -529,10 +529,6 @@ To specify this backend, put the following in your settings::
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
 
-.. versionchanged:: 3.1
-
-    Support for :class:`pathlib.Path` was added.
-
 .. _topic-email-memory-backend:
 
 In-memory backend

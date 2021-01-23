@@ -150,3 +150,31 @@ class TestQuery(SimpleTestCase):
         msg = 'Cannot filter against a non-conditional expression.'
         with self.assertRaisesMessage(TypeError, msg):
             query.build_where(Func(output_field=CharField()))
+
+    def test_equality(self):
+        self.assertNotEqual(
+            Author.objects.all().query,
+            Author.objects.filter(item__name='foo').query,
+        )
+        self.assertEqual(
+            Author.objects.filter(item__name='foo').query,
+            Author.objects.filter(item__name='foo').query,
+        )
+        self.assertEqual(
+            Author.objects.filter(item__name='foo').query,
+            Author.objects.filter(Q(item__name='foo')).query,
+        )
+
+    def test_hash(self):
+        self.assertNotEqual(
+            hash(Author.objects.all().query),
+            hash(Author.objects.filter(item__name='foo').query)
+        )
+        self.assertEqual(
+            hash(Author.objects.filter(item__name='foo').query),
+            hash(Author.objects.filter(item__name='foo').query),
+        )
+        self.assertEqual(
+            hash(Author.objects.filter(item__name='foo').query),
+            hash(Author.objects.filter(Q(item__name='foo')).query),
+        )

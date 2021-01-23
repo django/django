@@ -3,10 +3,12 @@
 import pickle
 import re
 import time
+import warnings
 
 from django.core.cache.backends.base import (
     DEFAULT_TIMEOUT, BaseCache, InvalidCacheKey, memcache_key_warnings,
 )
+from django.utils.deprecation import RemovedInDjango41Warning
 from django.utils.functional import cached_property
 
 
@@ -23,17 +25,19 @@ class BaseMemcachedCache(BaseCache):
         self.LibraryValueNotFoundException = value_not_found_exception
 
         self._lib = library
+        self._class = library.Client
         self._options = params.get('OPTIONS') or {}
 
     @property
+    def client_servers(self):
+        return self._servers
+
+    @cached_property
     def _cache(self):
         """
         Implement transparent thread-safe access to a memcached client.
         """
-        if getattr(self, '_client', None) is None:
-            self._client = self._lib.Client(self._servers, **self._options)
-
-        return self._client
+        return self._class(self.client_servers, **self._options)
 
     def get_backend_timeout(self, timeout=DEFAULT_TIMEOUT):
         """
@@ -161,19 +165,22 @@ class BaseMemcachedCache(BaseCache):
 
 class MemcachedCache(BaseMemcachedCache):
     "An implementation of a cache binding using python-memcached"
+
+    # python-memcached doesn't support default values in get().
+    # https://github.com/linsomniac/python-memcached/issues/159
+    _missing_key = None
+
     def __init__(self, server, params):
+        warnings.warn(
+            'MemcachedCache is deprecated in favor of PyMemcacheCache and '
+            'PyLibMCCache.',
+            RemovedInDjango41Warning, stacklevel=2,
+        )
         # python-memcached ≥ 1.45 returns None for a nonexistent key in
         # incr/decr(), python-memcached < 1.45 raises ValueError.
         import memcache
         super().__init__(server, params, library=memcache, value_not_found_exception=ValueError)
-
-    @property
-    def _cache(self):
-        if getattr(self, '_client', None) is None:
-            client_kwargs = {'pickleProtocol': pickle.HIGHEST_PROTOCOL}
-            client_kwargs.update(self._options)
-            self._client = self._lib.Client(self._servers, **client_kwargs)
-        return self._client
+        self._options = {'pickleProtocol': pickle.HIGHEST_PROTOCOL, **self._options}
 
     def get(self, key, default=None, version=None):
         key = self.make_key(key, version=version)
@@ -201,9 +208,12 @@ class PyLibMCCache(BaseMemcachedCache):
         import pylibmc
         super().__init__(server, params, library=pylibmc, value_not_found_exception=pylibmc.NotFound)
 
-    @cached_property
-    def _cache(self):
-        return self._lib.Client(self._servers, **self._options)
+    @property
+    def client_servers(self):
+        output = []
+        for server in self._servers:
+            output.append(server[5:] if server.startswith('unix:') else server)
+        return output
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
@@ -216,3 +226,17 @@ class PyLibMCCache(BaseMemcachedCache):
         # libmemcached manages its own connections. Don't call disconnect_all()
         # as it resets the failover state and creates unnecessary reconnects.
         pass
+
+
+class PyMemcacheCache(BaseMemcachedCache):
+    """An implementation of a cache binding using pymemcache."""
+    def __init__(self, server, params):
+        import pymemcache.serde
+        super().__init__(server, params, library=pymemcache, value_not_found_exception=KeyError)
+        self._class = self._lib.HashClient
+        self._options = {
+            'allow_unicode_keys': True,
+            'default_noreply': False,
+            'serde': pymemcache.serde.pickle_serde,
+            **self._options,
+        }

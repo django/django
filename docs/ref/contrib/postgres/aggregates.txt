@@ -114,9 +114,16 @@ General-purpose aggregation functions
 ``JSONBAgg``
 ------------
 
-.. class:: JSONBAgg(expressions, filter=None, ordering=(), **extra)
+.. class:: JSONBAgg(expressions, distinct=False, filter=None, ordering=(), **extra)
 
     Returns the input values as a ``JSON`` array.
+
+    .. attribute:: distinct
+
+        .. versionadded:: 3.2
+
+        An optional boolean argument that determines if array values will be
+        distinct. Defaults to ``False``.
 
     .. attribute:: ordering
 
