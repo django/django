@@ -204,9 +204,12 @@ editing content:
 .. class:: django.views.generic.edit.DeleteView
 
     A view that displays a confirmation page and deletes an existing object.
-    The given object will only be deleted if the request method is ``POST`` or
-    ``DELETE``. If this view is fetched via ``GET``, it will display a
-    confirmation page that should contain a form that POSTs to the same URL.
+    The given object will only be deleted if the request method is ``POST``.
+    If this view is fetched via ``GET``, it will display a confirmation page
+    that should contain a form that POSTs to the same URL. The form class
+    defaults to a no-op form but can be overridden to load a custom form. This
+    allows adding extra confirmation from the user e.g. a check-box, for
+    deleting the object.
 
     **Ancestors (MRO)**
 
@@ -221,6 +224,13 @@ editing content:
     * :class:`django.views.generic.detail.SingleObjectMixin`
     * :class:`django.views.generic.base.View`
 
+    .. versionchanged:: 3.3
+
+    ``DeleteView`` now inherts from 
+    ``django.views.generic.edit.ProcessFormView`` and
+    ``django.views.generic.detail.SingleObjectMixin`` were added to inherited
+    methods. The ``django.views.generic.detail.BaseDetailView`` was removed.
+    
     **Attributes**
 
     .. attribute:: template_name_suffix
@@ -247,5 +257,6 @@ editing content:
 
         <form method="post">{% csrf_token %}
             <p>Are you sure you want to delete "{{ object }}"?</p>
+            {{ form }}
             <input type="submit" value="Confirm">
         </form>
