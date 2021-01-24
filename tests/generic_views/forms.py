@@ -21,7 +21,7 @@ class ConfirmDeleteForm(forms.Form):
     confirm = forms.BooleanField()
 
     def clean(self):
-        cleaned_data = super(ConfirmDeleteForm, self).clean()
+        cleaned_data = super().clean()
         delete_confirmed = cleaned_data.get("confirm")
 
         if not delete_confirmed:

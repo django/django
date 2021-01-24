@@ -224,7 +224,7 @@ editing content:
     * :class:`django.views.generic.detail.SingleObjectMixin`
     * :class:`django.views.generic.base.View`
 
-    .. versionchanged:: 3.3
+    .. versionchanged:: 4.0
 
     ``DeleteView`` now inherits from 
     ``django.views.generic.edit.ProcessFormView`` and
