@@ -190,7 +190,10 @@ available from the ``django.contrib.postgres.indexes`` module.
 
     For example::
 
-        Index(OpClass(Lower('username'), name='varchar_pattern_ops'))
+        Index(
+            OpClass(Lower('username'), name='varchar_pattern_ops'),
+            name='lower_username_idx',
+        )
 
     creates an index on ``Lower('username')`` using ``varchar_pattern_ops``.
 
