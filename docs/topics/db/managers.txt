@@ -55,47 +55,34 @@ functionality to your models. (For "row-level" functionality -- i.e., functions
 that act on a single instance of a model object -- use :ref:`Model methods
 <model-methods>`, not custom ``Manager`` methods.)
 
-A custom ``Manager`` method can return anything you want. It doesn't have to
-return a ``QuerySet``.
-
-For example, this custom ``Manager`` offers a method ``with_counts()``, which
-returns a list of all ``OpinionPoll`` objects, each with an extra
-``num_responses`` attribute that is the result of an aggregate query::
+For example, this custom ``Manager`` adds a method ``with_counts()``::
 
     from django.db import models
+    from django.db.models.functions import Coalesce
 
     class PollManager(models.Manager):
         def with_counts(self):
-            from django.db import connection
-            with connection.cursor() as cursor:
-                cursor.execute("""
-                    SELECT p.id, p.question, p.poll_date, COUNT(*)
-                    FROM polls_opinionpoll p, polls_response r
-                    WHERE p.id = r.poll_id
-                    GROUP BY p.id, p.question, p.poll_date
-                    ORDER BY p.poll_date DESC""")
-                result_list = []
-                for row in cursor.fetchall():
-                    p = self.model(id=row[0], question=row[1], poll_date=row[2])
-                    p.num_responses = row[3]
-                    result_list.append(p)
-            return result_list
+            return self.annotate(
+                num_responses=Coalesce(models.Count("response"), 0)
+            )
 
     class OpinionPoll(models.Model):
         question = models.CharField(max_length=200)
-        poll_date = models.DateField()
         objects = PollManager()
 
     class Response(models.Model):
         poll = models.ForeignKey(OpinionPoll, on_delete=models.CASCADE)
-        person_name = models.CharField(max_length=50)
-        response = models.TextField()
+        # ...
 
-With this example, you'd use ``OpinionPoll.objects.with_counts()`` to return
-that list of ``OpinionPoll`` objects with ``num_responses`` attributes.
+With this example, you'd use ``OpinionPoll.objects.with_counts()`` to get a
+``QuerySet`` of ``OpinionPoll`` objects with the extra ``num_responses``
+attribute attached.
 
-Another thing to note about this example is that ``Manager`` methods can
-access ``self.model`` to get the model class to which they're attached.
+A custom ``Manager`` method can return anything you want. It doesn't have to
+return a ``QuerySet``.
+
+Another thing to note is that ``Manager`` methods can access ``self.model`` to
+get the model class to which they're attached.
 
 Modifying a manager's initial ``QuerySet``
 ------------------------------------------
