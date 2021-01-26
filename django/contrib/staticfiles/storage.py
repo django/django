@@ -49,6 +49,9 @@ class HashedFilesMixin:
             r"""(url\(['"]{0,1}\s*(.*?)["']{0,1}\))""",
             (r"""(@import\s*["']\s*(.*?)["'])""", """@import url("%s")"""),
         )),
+        ('*.js', (
+            (r'(?m)^(//# (?-i:sourceMappingURL)=(.*))$', '//# sourceMappingURL=%s'),
+        )),
     )
     keep_intermediate_files = True
 

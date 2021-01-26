@@ -291,23 +291,29 @@ The storage backend automatically replaces the paths found in the saved
 files matching other saved files with the path of the cached copy (using
 the :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
 method). The regular expressions used to find those paths
-(``django.contrib.staticfiles.storage.HashedFilesMixin.patterns``)
-by default covers the `@import`_ rule and `url()`_ statement of `Cascading
-Style Sheets`_. For example, the ``'css/styles.css'`` file with the
-content
+(``django.contrib.staticfiles.storage.HashedFilesMixin.patterns``) cover:
+
+* The `@import`_ rule and `url()`_ statement of `Cascading Style Sheets`_.
+* The `source map`_ comment in JavaScript.
+
+For example, the ``'css/styles.css'`` file with this content:
 
 .. code-block:: css
 
     @import url("../admin/css/base.css");
 
-would be replaced by calling the :meth:`~django.core.files.storage.Storage.url`
-method of the ``ManifestStaticFilesStorage`` storage backend, ultimately
-saving a ``'css/styles.55e7cbb9ba48.css'`` file with the following
-content:
+...would be replaced by calling the
+:meth:`~django.core.files.storage.Storage.url` method of the
+``ManifestStaticFilesStorage`` storage backend, ultimately saving a
+``'css/styles.55e7cbb9ba48.css'`` file with the following content:
 
 .. code-block:: css
 
     @import url("../admin/css/base.27e20196a850.css");
+
+.. versionchanged:: 4.0
+
+    Support for finding paths in the source map comments was added.
 
 .. attribute:: storage.ManifestStaticFilesStorage.max_post_process_passes
 
@@ -361,6 +367,7 @@ hashing algorithm.
 .. _`@import`: https://www.w3.org/TR/CSS2/cascade.html#at-import
 .. _`url()`: https://www.w3.org/TR/CSS2/syndata.html#uri
 .. _`Cascading Style Sheets`: https://www.w3.org/Style/CSS/
+.. _`source map`: https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map
 
 ``ManifestFilesMixin``
 ----------------------
