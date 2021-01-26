@@ -1219,6 +1219,9 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
     * Validates that the given id exists in the queryset.
     * Error message keys: ``required``, ``invalid_choice``
 
+    The ``invalid_choice`` error message may contain ``%(value)s``, which will
+    be replaced with the selected choice.
+
     Allows the selection of a single model object, suitable for representing a
     foreign key. Note that the default widget for ``ModelChoiceField`` becomes
     impractical when the number of entries increases. You should avoid using it
@@ -1306,6 +1309,11 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
         class MyModelChoiceField(ModelChoiceField):
             def label_from_instance(self, obj):
                 return "My Object #%i" % obj.id
+
+    .. versionchanged:: 4.0
+
+        Support for containing ``%(value)s`` in the ``invalid_choice`` error
+        message was added.
 
 ``ModelMultipleChoiceField``
 ----------------------------

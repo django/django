@@ -135,7 +135,11 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* :class:`~django.forms.ModelChoiceField` now includes the provided value in
+  the ``params`` argument of a raised
+  :exc:`~django.core.exceptions.ValidationError` for the ``invalid_choice``
+  error message. This allows custom error messages to use the ``%(value)s``
+  placeholder.
 
 Generic Views
 ~~~~~~~~~~~~~
