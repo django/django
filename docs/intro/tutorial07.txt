@@ -156,8 +156,8 @@ already-created object, you get another three extra slots.
 
 At the end of the three current slots you will find an "Add another Choice"
 link.  If you click on it, a new slot will be added. If you want to remove the
-added slot, you can click on the X to the top right of the added slot. Note
-that you can't remove the original three slots. This image shows an added slot:
+added slot, you can click on the X to the top right of the added slot. This
+image shows an added slot:
 
 .. image:: _images/admin14t.png
    :alt: Additional slot added dynamically
