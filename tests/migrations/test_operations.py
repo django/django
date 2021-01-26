@@ -2145,6 +2145,7 @@ class OperationTests(OperationTestBase):
                 fields=[
                     ('id', models.AutoField(primary_key=True)),
                     ('name', models.CharField(max_length=100)),
+                    ('surname', models.CharField(max_length=100, default='')),
                     ('rebate', models.CharField(max_length=100)),
                 ],
             ),
@@ -2178,6 +2179,19 @@ class OperationTests(OperationTestBase):
             Author.objects.create(name='Albert', rebate='10$')
         author = Author.objects.create(name='Albert', rebate='10%')
         self.assertEqual(Author.objects.get(), author)
+        # Right-hand-side baked "%" literals should not be used for parameters
+        # interpolation.
+        check = ~models.Q(surname__startswith=models.F('name'))
+        constraint = models.CheckConstraint(check=check, name='name_constraint_rhs')
+        operation = migrations.AddConstraint('Author', constraint)
+        from_state = to_state
+        to_state = from_state.clone()
+        operation.state_forwards(app_label, to_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, from_state, to_state)
+        Author = to_state.apps.get_model(app_label, 'Author')
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Author.objects.create(name='Albert', surname='Alberto')
 
     @skipUnlessDBFeature('supports_table_check_constraints')
     def test_add_or_constraint(self):
