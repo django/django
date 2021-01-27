@@ -606,8 +606,8 @@ class ChoiceWidget(Widget):
 
             for subvalue, sublabel in choices:
                 selected = (
-                    str(subvalue) in value and
-                    (not has_selected or self.allow_multiple_selected)
+                    (not has_selected or self.allow_multiple_selected) and
+                    str(subvalue) in value
                 )
                 has_selected |= selected
                 subgroup.append(self.create_option(
