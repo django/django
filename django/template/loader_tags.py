@@ -174,7 +174,7 @@ class IncludeNode(Node):
                 template_name = (template_name,)
             else:
                 template_name = tuple(template_name)
-            cache = context.render_context.dicts[0].setdefault(self, {})
+            cache = context.render_context.dicts[-1].setdefault(self, {})
             template = cache.get(template_name)
             if template is None:
                 template = context.template.engine.select_template(template_name)

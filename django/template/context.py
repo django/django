@@ -1,3 +1,4 @@
+from collections import ChainMap
 from contextlib import contextmanager
 from copy import copy
 
@@ -14,7 +15,7 @@ class ContextDict(dict):
     def __init__(self, context, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        context.dicts.append(self)
+        context.maps.insert(0, self)
         self.context = context
 
     def __enter__(self):
@@ -24,99 +25,75 @@ class ContextDict(dict):
         self.context.pop()
 
 
-class BaseContext:
-    def __init__(self, dict_=None):
-        self._reset_dicts(dict_)
-
-    def _reset_dicts(self, value=None):
+class BaseContext(ChainMap):
+    def __init__(self, dict_=None, *args):
         builtins = {'True': True, 'False': False, 'None': None}
-        self.dicts = [builtins]
-        if value is not None:
-            self.dicts.append(value)
+        if dict_ is not None:
+            if builtins in args:
+                super().__init__(dict_, *args)
+            else:
+                super().__init__(dict_, *args, builtins)
+        else:
+            if builtins in args:
+                super().__init__(*args)
+            else:
+                super().__init__(*args, builtins)
+
+    @property
+    def dicts(self):
+        return self.maps
+
+    @dicts.setter
+    def dicts(self, key, value):
+        self.maps[key] = value
 
     def __copy__(self):
         duplicate = copy(super())
-        duplicate.dicts = self.dicts[:]
+        duplicate.maps = self.maps[:]
         return duplicate
 
-    def __repr__(self):
-        return repr(self.dicts)
-
     def __iter__(self):
-        return reversed(self.dicts)
+        for item in self.maps:
+            yield item
 
     def push(self, *args, **kwargs):
         dicts = []
         for d in args:
             if isinstance(d, BaseContext):
-                dicts += d.dicts[1:]
+                dicts += d.maps[0:-1]
             else:
                 dicts.append(d)
         return ContextDict(self, *dicts, **kwargs)
 
     def pop(self):
-        if len(self.dicts) == 1:
+        if len(self.maps) == 1:
             raise ContextPopException
-        return self.dicts.pop()
-
-    def __setitem__(self, key, value):
-        "Set a variable in the current context"
-        self.dicts[-1][key] = value
+        return self.maps.pop(0)
 
     def set_upward(self, key, value):
         """
         Set a variable in one of the higher contexts if it exists there,
         otherwise in the current context.
         """
-        context = self.dicts[-1]
-        for d in reversed(self.dicts):
+        context = self.maps[0]
+        for d in self.maps:
             if key in d:
                 context = d
                 break
         context[key] = value
 
-    def __getitem__(self, key):
-        "Get a variable's value, starting at the current context and going upward"
-        for d in reversed(self.dicts):
-            if key in d:
-                return d[key]
-        raise KeyError(key)
-
-    def __delitem__(self, key):
-        "Delete a variable from the current context"
-        del self.dicts[-1][key]
-
-    def __contains__(self, key):
-        return any(key in d for d in self.dicts)
-
-    def get(self, key, otherwise=None):
-        for d in reversed(self.dicts):
-            if key in d:
-                return d[key]
-        return otherwise
-
-    def setdefault(self, key, default=None):
-        try:
-            return self[key]
-        except KeyError:
-            self[key] = default
-        return default
-
     def new(self, values=None):
-        """
-        Return a new context with the same properties, but with only the
-        values given in 'values' stored.
-        """
+        builtins = {'True': True, 'False': False, 'None': None}
         new_context = copy(self)
-        new_context._reset_dicts(values)
+        new_context.maps = [values, builtins] if values else [builtins]
         return new_context
 
     def flatten(self):
         """
-        Return self.dicts as one dictionary.
+        Return self.maps as one dictionary.
         """
         flat = {}
-        for d in self.dicts:
+        for d in self.maps:
             flat.update(d)
         return flat
 
@@ -163,7 +140,7 @@ class Context(BaseContext):
         if not hasattr(other_dict, '__getitem__'):
             raise TypeError('other_dict must be a mapping (dictionary-like) object.')
         if isinstance(other_dict, BaseContext):
-            other_dict = other_dict.dicts[1:].pop()
+            other_dict = other_dict.dicts[:-1].pop()
         return ContextDict(self, other_dict)
 
 
@@ -185,16 +162,16 @@ class RenderContext(BaseContext):
     template = None
 
     def __iter__(self):
-        yield from self.dicts[-1]
+        yield from self.dicts[0]
 
     def __contains__(self, key):
-        return key in self.dicts[-1]
+        return key in self.dicts[0]
 
     def get(self, key, otherwise=None):
-        return self.dicts[-1].get(key, otherwise)
+        return self.dicts[0].get(key, otherwise)
 
     def __getitem__(self, key):
-        return self.dicts[-1][key]
+        return self.dicts[0][key]
 
     @contextmanager
     def push_state(self, template, isolated_context=True):
@@ -221,7 +198,7 @@ class RequestContext(Context):
         super().__init__(dict_, use_l10n=use_l10n, use_tz=use_tz, autoescape=autoescape)
         self.request = request
         self._processors = () if processors is None else tuple(processors)
-        self._processors_index = len(self.dicts)
+        self._processors_index = -len(self.dicts) - 1
 
         # placeholder for context processors output
         self.update({})
