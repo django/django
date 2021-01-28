@@ -128,8 +128,8 @@
 /* FILTER COLUMN */
 
 #changelist-filter {
+    flex: 0 0 240px;
     order: 1;
-    width: 240px;
     background: var(--darkened-bg);
     border-left: none;
     margin: 0 0 0 30px;
