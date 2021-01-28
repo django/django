@@ -274,7 +274,7 @@ class TemplateCommand(BaseCommand):
         used_name = the_path.split('/')[-1]
 
         # Trying to get better name from response headers
-        content_disposition = response.info.get('content-disposition')
+        content_disposition = response.info.getheader('content-disposition')
         if content_disposition:
             _, params = cgi.parse_header(content_disposition)
             guessed_filename = params.get('filename') or used_name
@@ -283,7 +283,7 @@ class TemplateCommand(BaseCommand):
 
         # Falling back to content type guessing
         ext = self.splitext(guessed_filename)[1]
-        content_type = response.info.get('content-type')
+        content_type = response.info.getheader('content-type')
         if not ext and content_type:
             ext = mimetypes.guess_extension(content_type)
             if ext:
