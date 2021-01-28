@@ -2,11 +2,12 @@ import cgi
 import mimetypes
 import os
 import posixpath
-import requests
 import shutil
 import stat
 import tempfile
 from importlib import import_module
+
+import requests
 
 import django
 from django.conf import settings
