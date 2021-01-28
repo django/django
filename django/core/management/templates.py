@@ -6,7 +6,7 @@ import shutil
 import stat
 import tempfile
 from importlib import import_module
-from urllib.request import urlretrieve
+import requests
 
 import django
 from django.conf import settings
@@ -262,24 +262,26 @@ class TemplateCommand(BaseCommand):
         if self.verbosity >= 2:
             self.stdout.write('Downloading %s' % display_url)
         try:
-            the_path, info = urlretrieve(url, os.path.join(tempdir, filename))
+            headers = {'User-Agent': 'Django/django-admin'}
+            response = requests.get(url, headers=headers)
+            file_data = response.read()
+            the_path = os.path.join(tempdir, filename)
+            with open(the_path) as f:
+                f.write(file_data)
+
         except OSError as e:
             raise CommandError("couldn't download URL %s to %s: %s" %
                                (url, filename, e))
 
-        used_name = the_path.split('/')[-1]
-
         # Trying to get better name from response headers
-        content_disposition = info.get('content-disposition')
+        content_disposition = response.headers.get('content-disposition')
         if content_disposition:
             _, params = cgi.parse_header(content_disposition)
-            guessed_filename = params.get('filename') or used_name
-        else:
-            guessed_filename = used_name
+            guessed_filename = params.get('filename') or filename
 
         # Falling back to content type guessing
         ext = self.splitext(guessed_filename)[1]
-        content_type = info.get('content-type')
+        content_type = response.headers.get('content-type')
         if not ext and content_type:
             ext = mimetypes.guess_extension(content_type)
             if ext:
@@ -287,7 +289,7 @@ class TemplateCommand(BaseCommand):
 
         # Move the temporary file to a filename that has better
         # chances of being recognized by the archive utils
-        if used_name != guessed_filename:
+        if filename != guessed_filename:
             guessed_path = os.path.join(tempdir, guessed_filename)
             shutil.move(the_path, guessed_path)
             return guessed_path
