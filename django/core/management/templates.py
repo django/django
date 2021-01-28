@@ -265,10 +265,9 @@ class TemplateCommand(BaseCommand):
         try:
             headers = {'User-Agent': 'Django/django-admin'}
             response = requests.get(url, headers=headers)
-            file_data = response.read()
             the_path = os.path.join(tempdir, filename)
             with open(the_path) as f:
-                f.write(file_data)
+                f.write(response.content)
 
         except OSError as e:
             raise CommandError("couldn't download URL %s to %s: %s" %
