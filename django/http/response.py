@@ -16,7 +16,9 @@ from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import timezone
-from django.utils.datastructures import CaseInsensitiveMapping
+from django.utils.datastructures import (
+    CaseInsensitiveMapping, _destruct_iterable_mapping_values,
+)
 from django.utils.encoding import iri_to_uri
 from django.utils.http import http_date
 from django.utils.regex_helper import _lazy_re_compile
@@ -31,10 +33,7 @@ class ResponseHeaders(CaseInsensitiveMapping):
         correctly encoded.
         """
         if not isinstance(data, Mapping):
-            data = {
-                k: v
-                for k, v in CaseInsensitiveMapping._destruct_iterable_mapping_values(data)
-            }
+            data = {k: v for k, v in _destruct_iterable_mapping_values(data)}
         self._store = {}
         for header, value in data.items():
             self[header] = value
