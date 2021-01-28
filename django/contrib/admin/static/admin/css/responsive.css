@@ -157,7 +157,7 @@ input[type="submit"], button {
     }
 
     #changelist-filter {
-        width: 200px;
+        flex-basis: 200px;
     }
 
     .change-list .filtered .results,

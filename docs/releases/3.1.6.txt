@@ -9,4 +9,5 @@ Django 3.1.6 fixes several bugs in 3.1.5.
 Bugfixes
 ========
 
-* ...
+* Fixed an admin layout issue in Django 3.1 where changelist filter controls 
+  would become squashed (:ticket:`32391`).
