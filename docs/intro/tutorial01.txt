@@ -90,7 +90,7 @@ Let's look at what :djadmin:`startproject` created::
 These files are:
 
 * The outer :file:`mysite/` root directory is a container for your project. Its
-  name doesn't matter to Django; you can rename it to anything you like.
+  name does not affect Django; you can rename it as your project's name.
 
 * :file:`manage.py`: A command-line utility that lets you interact with this
   Django project in various ways. You can read all the details about
