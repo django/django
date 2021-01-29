@@ -191,7 +191,11 @@ Serialization
 Signals
 ~~~~~~~
 
-* ...
+* The new ``stdout`` argument for :func:`~django.db.models.signals.pre_migrate`
+  and :func:`~django.db.models.signals.post_migrate` signals allows redirecting
+  output to a stream-like object. It should be preferred over
+  :py:data:`sys.stdout` and :py:func:`print` when emitting verbose output in
+  order to allow proper capture when testing.
 
 Templates
 ~~~~~~~~~

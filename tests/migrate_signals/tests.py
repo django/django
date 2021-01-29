@@ -1,3 +1,5 @@
+from io import StringIO
+
 from django.apps import apps
 from django.core import management
 from django.db import migrations
@@ -5,7 +7,7 @@ from django.db.models import signals
 from django.test import TransactionTestCase, override_settings
 
 APP_CONFIG = apps.get_app_config('migrate_signals')
-SIGNAL_ARGS = ['app_config', 'verbosity', 'interactive', 'using', 'plan', 'apps']
+SIGNAL_ARGS = ['app_config', 'verbosity', 'interactive', 'using', 'stdout', 'plan', 'apps']
 MIGRATE_DATABASE = 'default'
 MIGRATE_VERBOSITY = 0
 MIGRATE_INTERACTIVE = False
@@ -69,7 +71,7 @@ class MigrateSignalTests(TransactionTestCase):
         post_migrate_receiver = Receiver(signals.post_migrate)
         management.call_command(
             'migrate', database=MIGRATE_DATABASE, verbosity=MIGRATE_VERBOSITY,
-            interactive=MIGRATE_INTERACTIVE,
+            interactive=MIGRATE_INTERACTIVE, stdout=StringIO('test_args'),
         )
 
         for receiver in [pre_migrate_receiver, post_migrate_receiver]:
@@ -81,6 +83,7 @@ class MigrateSignalTests(TransactionTestCase):
                 self.assertEqual(args['verbosity'], MIGRATE_VERBOSITY)
                 self.assertEqual(args['interactive'], MIGRATE_INTERACTIVE)
                 self.assertEqual(args['using'], 'default')
+                self.assertIn('test_args', args['stdout'].getvalue())
                 self.assertEqual(args['plan'], [])
                 self.assertIsInstance(args['apps'], migrations.state.StateApps)
 

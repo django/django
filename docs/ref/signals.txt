@@ -424,6 +424,11 @@ Arguments sent with this signal:
     For example, the :mod:`django.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
 
+``stdout``
+    .. versionadded:: 4.0
+
+    A stream-like object where verbose output should be redirected.
+
 ``using``
     The alias of database on which a command will operate.
 
@@ -477,6 +482,11 @@ Arguments sent with this signal:
 
     For example, the :mod:`django.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
+
+``stdout``
+    .. versionadded:: 4.0
+
+    A stream-like object where verbose output should be redirected.
 
 ``using``
     The database alias used for synchronization. Defaults to the ``default``
