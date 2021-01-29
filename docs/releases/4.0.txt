@@ -258,6 +258,10 @@ Miscellaneous
 
 * Support for ``cx_Oracle`` < 7.0 is removed.
 
+* Starting with 4.0, new projects are generated with :setting:`STATIC_URL` set
+  to the relative path ``'static/'``. This allows for the ``SCRIPT_NAME`` to be
+  prepended as necessary.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0
