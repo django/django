@@ -84,7 +84,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         "Oracle requires ORDER BY in row_number, ANSI:SQL doesn't.": {
             'expressions_window.tests.WindowFunctionTests.test_row_number_no_ordering',
         },
-        'Raises ORA-00600: internal error code on Oracle 18.': {
+        'Raises ORA-00600: internal error code.': {
             'model_fields.test_jsonfield.TestQuerying.test_usage_in_subquery',
         },
     }
@@ -116,8 +116,3 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     return False
                 raise
             return True
-
-    @cached_property
-    def has_json_object_function(self):
-        # Oracle < 18 supports JSON_OBJECT() but it's not fully functional.
-        return self.connection.oracle_version >= (18,)
