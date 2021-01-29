@@ -251,7 +251,7 @@ officially supports Oracle 19c.
 Miscellaneous
 -------------
 
-* ...
+* Support for ``cx_Oracle`` < 7.0 is removed.
 
 .. _deprecated-features-4.0:
 
