@@ -367,7 +367,7 @@ class MinLengthValidator(BaseValidator):
         return a < b
 
     def clean(self, x):
-        return len(x)
+        return len(str(x))
 
 
 @deconstructible
@@ -382,7 +382,7 @@ class MaxLengthValidator(BaseValidator):
         return a > b
 
     def clean(self, x):
-        return len(x)
+        return len(str(x))
 
 
 @deconstructible
