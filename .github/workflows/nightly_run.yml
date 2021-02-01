@@ -1,0 +1,48 @@
+name: Nightly Run
+
+on:
+  schedule:
+    # Run all tests at 2:30am
+    - cron: "30 2 * * *"
+  # Allow triggering this build to test
+  workflow_dispatch:
+
+
+jobs:
+  trigger-runs:
+    runs-on: ubuntu-latest
+    name: Trigger Full Build
+    # Only trigger on the main Django repository
+    if: (github.event_name == 'schedule' && github.repository == 'django/django') || (github.event_name != 'schedule')
+    strategy:
+      matrix:
+        branch:
+          - master
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ matrix.branch }}
+      # Detect if there are any changes within the last 1 day
+      - id: git_log
+        run: echo "::set-output name=total_lines::$(git log --since '1 day ago' --format=oneline master | wc -l)"
+      # Trigger the 'Tests' workflow. This involves converting the name to a workflow ID, then
+      # invoking createWorkflowDispatch on that ID.
+      - uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.NIGHTLY_WORKFLOW_TOKEN}}
+          script: |
+            const {owner, repo} = context.repo;
+            const workflows = await github.actions.listRepoWorkflows({
+              owner,
+              repo,
+            });
+            const workflow_id = workflows.data.workflows.find((workflow) => workflow.name === "Tests").id;
+            await github.actions.createWorkflowDispatch({
+              owner,
+              repo,
+              workflow_id,
+              ref: "${{ matrix.branch }}",
+            });
+            console.log(`Triggered workflow ID ${workflow_id}`);
+        if: steps.git_log.outputs.total_lines != '0'

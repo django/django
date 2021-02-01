@@ -1,0 +1,18 @@
+name: Cancel redundant builds
+
+on:
+  # pull_request_target runs in the context of the repository,
+  # and does *not* include any code present in the merge request.
+  # We can perform privileged actions like creating comments and
+  # cancelling runs on pull request events.
+  pull_request_target:
+
+jobs:
+  cancel-runs:
+    runs-on: ubuntu-latest
+    steps:
+      # This is pinned to 0.8.0
+      - uses: styfle/cancel-workflow-action@3d86a7cc43670094ac248017207be0295edbc31d
+        with:
+          workflow_id: 'tests.yml'
+          access_token: ${{ github.token }}
