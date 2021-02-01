@@ -227,9 +227,8 @@ def check_allowed_hosts(app_configs, **kwargs):
 @register(Tags.security, deploy=True)
 def check_type_of_allowed_hosts(app_configs, **kwargs):
     passed_check = (
+        isinstance(settings.ALLOWED_HOSTS, (list, tuple)) and
         all(isinstance(element, str) for element in settings.ALLOWED_HOSTS)
-        if isinstance(settings.ALLOWED_HOSTS, (list, tuple))
-        else False
     )
     return [] if passed_check else [W023]
 
