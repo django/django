@@ -1134,3 +1134,16 @@ Versions affected
 * Django 3.1 :commit:`(patch) <2b099caa5923afa8cfb5f1e8c0d56b6e0e81915b>`
 * Django 3.0 :commit:`(patch) <cdb367c92a0ba72ddc0cbd13ff42b0e6df709554>`
 * Django 2.2 :commit:`(patch) <a3aebfdc8153dc230686b6d2454ccd32ed4c9e6f>`
+
+February 1, 2021 - :cve:`2021-3281`
+-----------------------------------
+
+Potential directory-traversal via ``archive.extract()``. `Full description
+<https://www.djangoproject.com/weblog/2021/feb/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.1 :commit:`(patch) <02e6592835b4559909aa3aaaf67988fef435f624>`
+* Django 3.0 :commit:`(patch) <52e409ed17287e9aabda847b6afe58be2fa9f86a>`
+* Django 2.2 :commit:`(patch) <21e7622dec1f8612c85c2fc37fe8efbfd3311e37>`
