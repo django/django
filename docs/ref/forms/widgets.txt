@@ -408,7 +408,7 @@ foundation for custom widgets.
     .. method:: get_context(name, value, attrs)
 
         In addition to the ``'widget'`` key described in
-        :meth:`Widget.get_context`, ``MultiValueWidget`` adds a
+        :meth:`Widget.get_context`, ``MultiWidget`` adds a
         ``widget['subwidgets']`` key.
 
         These can be looped over in the widget template:
