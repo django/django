@@ -94,4 +94,39 @@ class PasswordResetTokenGenerator:
         return datetime.now()
 
 
+class EmailVerifyTokenGenerator(PasswordResetTokenGenerator):
+    """
+    Strategy object used to generate and check tokens for email verification
+    mechanisms. Identicial to PasswordResetTokenGenerator, but does not
+    invalidate the token on user login or password change.
+    """
+
+    def make_token(self, user):
+        """
+        Return a token that can be used to verify a user's email for the given
+        user.
+        """
+        return super().make_token(user)
+
+    def check_token(self, user, token):
+        """
+        Check that an email verification token is correct for a given user.
+        """
+        return super().check_token(user, token)
+
+    def _make_hash_value(self, user, timestamp):
+        """
+        Hash the user's primary key and email. The validation token will be
+        invalidated if:
+        1. The user changes their email
+        2. The token expires due to settings.PASSWORD_RESET_TIMEOUT
+
+        Running this data through salted_hmac() prevents password cracking
+        attempts using the reset token, provided the secret isn't compromised.
+        """
+        email_field = user.get_email_field_name()
+        email = getattr(user, email_field, '') or ''
+        return f'{user.pk}{timestamp}{email}'
+
+
 default_token_generator = PasswordResetTokenGenerator()
