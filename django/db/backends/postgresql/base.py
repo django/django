@@ -320,6 +320,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                             yield cursor
                     finally:
                         conn.close()
+                    break
+            else:
+                raise
 
     @cached_property
     def pg_version(self):
