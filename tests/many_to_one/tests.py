@@ -7,9 +7,9 @@ from django.test import TestCase
 from django.utils.translation import gettext_lazy
 
 from .models import (
-    Article, Category, Child, ChildNullableParent, City, Country, District,
-    First, Parent, Record, Relation, Reporter, School, Student, Third,
-    ToFieldChild,
+    Article, Category, Child, ChildNullableParent, ChildStringPrimaryKeyParent,
+    City, Country, District, First, Parent, ParentStringPrimaryKey, Record,
+    Relation, Reporter, School, Student, Third, ToFieldChild,
 )
 
 
@@ -543,6 +543,16 @@ class ManyToOneTests(TestCase):
     def test_save_nullable_fk_after_parent_with_to_field(self):
         parent = Parent(name='jeff')
         child = ToFieldChild(parent=parent)
+        parent.save()
+        child.save()
+        child.refresh_from_db()
+        self.assertEqual(child.parent, parent)
+        self.assertEqual(child.parent_id, parent.name)
+
+    def test_save_fk_after_parent_with_non_numeric_pk_set_on_child(self):
+        parent = ParentStringPrimaryKey()
+        child = ChildStringPrimaryKeyParent(parent=parent)
+        child.parent.name = 'jeff'
         parent.save()
         child.save()
         child.refresh_from_db()
