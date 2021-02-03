@@ -4,7 +4,6 @@ from inspect import cleandoc
 from pathlib import Path
 
 from django.apps import apps
-from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admindocs import utils
@@ -120,8 +119,11 @@ class ViewIndexView(BaseAdminDocsView):
 
     def get_context_data(self, **kwargs):
         views = []
-        urlconf = import_module(settings.ROOT_URLCONF)
-        view_functions = extract_views_from_urlpatterns(urlconf.urlpatterns)
+        url_resolver = get_resolver(get_urlconf())
+        try:
+            view_functions = extract_views_from_urlpatterns(url_resolver.url_patterns)
+        except ImproperlyConfigured:
+            view_functions = []
         for (func, regex, namespace, name) in view_functions:
             views.append({
                 'full_name': get_view_name(func),

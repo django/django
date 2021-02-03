@@ -38,7 +38,8 @@ Minor features
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The admindocs now allows esoteric setups where :setting:`ROOT_URLCONF` is not
+  a string.
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
