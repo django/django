@@ -1864,6 +1864,9 @@ creates.
             async def test_my_thing(self):
                 ...
 
+Note that ``async def`` test cases calling into the ORM via ``sync_to_async``
+are not currently supported.
+
 .. _topics-testing-email:
 
 Email services
