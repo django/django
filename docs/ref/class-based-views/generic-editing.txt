@@ -216,7 +216,7 @@ editing content:
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * ``django.views.generic.edit.BaseDeleteView``
     * :class:`django.views.generic.edit.DeletionMixin`
-    * ``django.views.generic.detail.BaseDetailView``
+    * :class:`django.views.generic.detail.BaseDetailView`
     * :class:`django.views.generic.detail.SingleObjectMixin`
     * :class:`django.views.generic.base.View`
 
