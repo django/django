@@ -185,7 +185,7 @@ Minor features
   model.
 
 * The admin now installs a final catch-all view that redirects unauthenticated
-  users to the login page, regardless or whether the URLs is otherwise valid.
+  users to the login page, regardless of whether the URL is otherwise valid.
   This protects against a potential model enumeration privacy issue.
 
   Although not recommended, you may set the new
