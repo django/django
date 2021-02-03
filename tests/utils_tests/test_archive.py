@@ -8,6 +8,18 @@ from django.core.exceptions import SuspiciousOperation
 from django.test import SimpleTestCase
 from django.utils import archive
 
+try:
+    import bz2  # NOQA
+    HAS_BZ2 = True
+except ImportError:
+    HAS_BZ2 = False
+
+try:
+    import lzma  # NOQA
+    HAS_LZMA = True
+except ImportError:
+    HAS_LZMA = False
+
 
 class TestArchive(unittest.TestCase):
 
@@ -22,6 +34,11 @@ class TestArchive(unittest.TestCase):
     def test_extract_function(self):
         for entry in os.scandir(self.testdir):
             with self.subTest(entry.name), tempfile.TemporaryDirectory() as tmpdir:
+                if (
+                    (entry.name.endswith('.bz2') and not HAS_BZ2) or
+                    (entry.name.endswith(('.lzma', '.xz')) and not HAS_LZMA)
+                ):
+                    continue
                 archive.extract(entry.path, tmpdir)
                 self.assertTrue(os.path.isfile(os.path.join(tmpdir, '1')))
                 self.assertTrue(os.path.isfile(os.path.join(tmpdir, '2')))
@@ -37,7 +54,11 @@ class TestArchive(unittest.TestCase):
         umask = os.umask(0)
         os.umask(umask)  # Restore the original umask.
         for entry in os.scandir(self.testdir):
-            if entry.name.startswith('leadpath_'):
+            if (
+                entry.name.startswith('leadpath_') or
+                (entry.name.endswith('.bz2') and not HAS_BZ2) or
+                (entry.name.endswith(('.lzma', '.xz')) and not HAS_LZMA)
+            ):
                 continue
             with self.subTest(entry.name), tempfile.TemporaryDirectory() as tmpdir:
                 archive.extract(entry.path, tmpdir)
