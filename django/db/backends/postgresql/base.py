@@ -192,11 +192,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             conn_params['host'] = settings_dict['HOST']
         if settings_dict['PORT']:
             conn_params['port'] = settings_dict['PORT']
+        if settings_dict['AUTOCOMMIT']:
+            conn_params['AUTOCOMMIT'] = settings_dict['AUTOCOMMIT']
         return conn_params
 
     @async_unsafe
     def get_new_connection(self, conn_params):
+        _autocommit = conn_params.pop('AUTOCOMMIT', None)
         connection = Database.connect(**conn_params)
+        if _autocommit:
+            connection.autocommit = True
 
         # self.isolation_level must be set:
         # - after connecting to the database in order to obtain the database's
