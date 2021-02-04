@@ -10,8 +10,8 @@ to get started? This is the section for you.
     If you are new to contributing to Django, the :doc:`/intro/contributing`
     tutorial will give you an introduction to the tools and the workflow.
 
-This page contains more general advice ways you can contribute to Django, and
-how to approach that.
+This page contains more general advice on ways you can contribute to Django,
+and how to approach that.
 
 If you are looking for a reference on the details of making code contributions,
 see the :doc:`/internals/contributing/writing-code/index` documentation.
