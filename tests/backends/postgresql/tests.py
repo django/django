@@ -89,7 +89,7 @@ class Tests(TestCase):
         )
         with self.assertWarnsMessage(RuntimeWarning, msg):
             mocker_connections_all = mock.patch(
-                'django.utils.connection.BaseConnectionHandler.all',
+                'django.db.utils.ConnectionHandler.all',
                 side_effect=mocked_all,
                 autospec=True,
             )
