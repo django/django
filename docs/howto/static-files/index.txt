@@ -120,7 +120,7 @@ This is not suitable for production use! For some common deployment
 strategies, see :doc:`/howto/static-files/deployment`.
 
 For example, if your :setting:`MEDIA_URL` is defined as ``/media/``, you can do
-this by adding the following snippet to your urls.py::
+this by adding the following snippet to your :setting:`ROOT_URLCONF`::
 
     from django.conf import settings
     from django.conf.urls.static import static
