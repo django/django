@@ -16,7 +16,7 @@ Configuring static files
 
 #. In your settings file, define :setting:`STATIC_URL`, for example::
 
-      STATIC_URL = '/static/'
+      STATIC_URL = 'static/'
 
 #. In your templates, use the :ttag:`static` template tag to build the URL for
    the given relative path using the configured :setting:`STATICFILES_STORAGE`.
@@ -88,8 +88,8 @@ to ``True``. If you don't have ``django.contrib.staticfiles`` in
 This is not suitable for production use! For some common deployment
 strategies, see :doc:`/howto/static-files/deployment`.
 
-For example, if your :setting:`STATIC_URL` is defined as ``/static/``, you can do
-this by adding the following snippet to your urls.py::
+For example, if your :setting:`STATIC_URL` is defined as ``static/``, you can
+do this by adding the following snippet to your urls.py::
 
     from django.conf import settings
     from django.conf.urls.static import static
@@ -101,7 +101,7 @@ this by adding the following snippet to your urls.py::
 .. note::
 
     This helper function works only in debug mode and only if
-    the given prefix is local (e.g. ``/static/``) and not a URL (e.g.
+    the given prefix is local (e.g. ``static/``) and not a URL (e.g.
     ``http://static.example.com/``).
 
     Also this helper function only serves the actual :setting:`STATIC_ROOT`
@@ -119,7 +119,7 @@ During development, you can serve user-uploaded media files from
 This is not suitable for production use! For some common deployment
 strategies, see :doc:`/howto/static-files/deployment`.
 
-For example, if your :setting:`MEDIA_URL` is defined as ``/media/``, you can do
+For example, if your :setting:`MEDIA_URL` is defined as ``media/``, you can do
 this by adding the following snippet to your :setting:`ROOT_URLCONF`::
 
     from django.conf import settings
@@ -132,7 +132,7 @@ this by adding the following snippet to your :setting:`ROOT_URLCONF`::
 .. note::
 
     This helper function works only in debug mode and only if
-    the given prefix is local (e.g. ``/media/``) and not a URL (e.g.
+    the given prefix is local (e.g. ``media/``) and not a URL (e.g.
     ``http://media.example.com/``).
 
 .. _staticfiles-testing-support:

@@ -17,9 +17,9 @@ from .models import Person
 
 TEST_ROOT = os.path.dirname(__file__)
 TEST_SETTINGS = {
-    'MEDIA_URL': '/media/',
+    'MEDIA_URL': 'media/',
     'MEDIA_ROOT': os.path.join(TEST_ROOT, 'media'),
-    'STATIC_URL': '/static/',
+    'STATIC_URL': 'static/',
     'STATIC_ROOT': os.path.join(TEST_ROOT, 'static'),
 }
 

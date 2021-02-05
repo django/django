@@ -7,7 +7,7 @@ from django.test import SimpleTestCase, override_settings
 from ..utils import setup
 
 
-@override_settings(INSTALLED_APPS=[], MEDIA_URL='/media/', STATIC_URL='/static/')
+@override_settings(INSTALLED_APPS=[], MEDIA_URL='media/', STATIC_URL='static/')
 class StaticTagTests(SimpleTestCase):
     libraries = {'static': 'django.templatetags.static'}
 

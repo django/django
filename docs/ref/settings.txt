@@ -3343,7 +3343,7 @@ Default: ``None``
 
 URL to use when referring to static files located in :setting:`STATIC_ROOT`.
 
-Example: ``"/static/"`` or ``"http://static.example.com/"``
+Example: ``"static/"`` or ``"http://static.example.com/"``
 
 If not ``None``, this will be used as the base path for
 :ref:`asset definitions<form-asset-paths>` (the ``Media`` class) and the
@@ -3400,7 +3400,7 @@ tuples, e.g.::
         ("downloads", "/opt/webfiles/stats"),
     ]
 
-For example, assuming you have :setting:`STATIC_URL` set to ``'/static/'``, the
+For example, assuming you have :setting:`STATIC_URL` set to ``'static/'``, the
 :djadmin:`collectstatic` management command would collect the "stats" files
 in a ``'downloads'`` subdirectory of :setting:`STATIC_ROOT`.
 
