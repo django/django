@@ -237,6 +237,26 @@ class HasAnyKeys(HasKeys):
     logical_operator = ' OR '
 
 
+class CaseInsensitiveMixin:
+    """
+    Mixin to allow case-insensitive comparison of JSON values on MySQL.
+    MySQL handles strings used in JSON context using the utf8mb4_bin collation.
+    Because utf8mb4_bin is a binary collation, comparison of JSON values is
+    case-sensitive.
+    """
+    def process_lhs(self, compiler, connection):
+        lhs, lhs_params = super().process_lhs(compiler, connection)
+        if connection.vendor == 'mysql':
+            return 'LOWER(%s)' % lhs, lhs_params
+        return lhs, lhs_params
+
+    def process_rhs(self, compiler, connection):
+        rhs, rhs_params = super().process_rhs(compiler, connection)
+        if connection.vendor == 'mysql':
+            return 'LOWER(%s)' % rhs, rhs_params
+        return rhs, rhs_params
+
+
 class JSONExact(lookups.Exact):
     can_use_none_as_rhs = True
 
@@ -260,12 +280,17 @@ class JSONExact(lookups.Exact):
         return rhs, rhs_params
 
 
+class JSONIContains(CaseInsensitiveMixin, lookups.IContains):
+    pass
+
+
 JSONField.register_lookup(DataContains)
 JSONField.register_lookup(ContainedBy)
 JSONField.register_lookup(HasKey)
 JSONField.register_lookup(HasKeys)
 JSONField.register_lookup(HasAnyKeys)
 JSONField.register_lookup(JSONExact)
+JSONField.register_lookup(JSONIContains)
 
 
 class KeyTransform(Transform):
@@ -341,26 +366,6 @@ class KeyTransformTextLookupMixin:
             **key_transform.extra,
         )
         super().__init__(key_text_transform, *args, **kwargs)
-
-
-class CaseInsensitiveMixin:
-    """
-    Mixin to allow case-insensitive comparison of JSON values on MySQL.
-    MySQL handles strings used in JSON context using the utf8mb4_bin collation.
-    Because utf8mb4_bin is a binary collation, comparison of JSON values is
-    case-sensitive.
-    """
-    def process_lhs(self, compiler, connection):
-        lhs, lhs_params = super().process_lhs(compiler, connection)
-        if connection.vendor == 'mysql':
-            return 'LOWER(%s)' % lhs, lhs_params
-        return lhs, lhs_params
-
-    def process_rhs(self, compiler, connection):
-        rhs, rhs_params = super().process_rhs(compiler, connection)
-        if connection.vendor == 'mysql':
-            return 'LOWER(%s)' % rhs, rhs_params
-        return rhs, rhs_params
 
 
 class KeyTransformIsNull(lookups.IsNull):
