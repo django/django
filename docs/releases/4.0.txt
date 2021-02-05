@@ -28,6 +28,10 @@ What's new in Django 4.0
 
 Minor features
 --------------
+:mod:`django.shortcuts`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :func:`django.shortcuts.make_toast` function returns ``'toast'``.
 
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -356,3 +360,4 @@ to remove usage of these features.
 * The ``{% ifequal %}`` and ``{% ifnotequal %}`` template tags are removed.
 
 * The ``DEFAULT_HASHING_ALGORITHM`` transitional setting is removed.
+
