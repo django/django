@@ -62,6 +62,7 @@ class BaseDatabaseSchemaEditor:
     sql_alter_column_not_null = "ALTER COLUMN %(column)s SET NOT NULL"
     sql_alter_column_default = "ALTER COLUMN %(column)s SET DEFAULT %(default)s"
     sql_alter_column_no_default = "ALTER COLUMN %(column)s DROP DEFAULT"
+    sql_alter_column_no_default_null = sql_alter_column_no_default
     sql_alter_column_collate = "ALTER COLUMN %(column)s TYPE %(type)s%(collation)s"
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s CASCADE"
     sql_rename_column = "ALTER TABLE %(table)s RENAME COLUMN %(old_column)s TO %(new_column)s"
@@ -891,7 +892,13 @@ class BaseDatabaseSchemaEditor:
             params = []
 
         new_db_params = new_field.db_parameters(connection=self.connection)
-        sql = self.sql_alter_column_no_default if drop else self.sql_alter_column_default
+        if drop:
+            if new_field.null:
+                sql = self.sql_alter_column_no_default_null
+            else:
+                sql = self.sql_alter_column_no_default
+        else:
+            sql = self.sql_alter_column_default
         return (
             sql % {
                 'column': self.quote_name(new_field.column),
