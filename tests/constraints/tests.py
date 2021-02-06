@@ -2,7 +2,9 @@ from unittest import mock
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection, models
+from django.db.models import F
 from django.db.models.constraints import BaseConstraint
+from django.db.models.functions import Lower
 from django.db.transaction import atomic
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
@@ -24,6 +26,10 @@ class BaseConstraintTests(SimpleTestCase):
         msg = 'This method must be implemented by a subclass.'
         with self.assertRaisesMessage(NotImplementedError, msg):
             c.constraint_sql(None, None)
+
+    def test_contains_expressions(self):
+        c = BaseConstraint('name')
+        self.assertIs(c.contains_expressions, False)
 
     def test_create_sql(self):
         c = BaseConstraint('name')
@@ -218,6 +224,25 @@ class UniqueConstraintTests(TestCase):
         self.assertEqual(constraint_1, constraint_1)
         self.assertNotEqual(constraint_1, constraint_2)
 
+    def test_eq_with_expressions(self):
+        constraint = models.UniqueConstraint(
+            Lower('title'),
+            F('author'),
+            name='book_func_uq',
+        )
+        same_constraint = models.UniqueConstraint(
+            Lower('title'),
+            'author',
+            name='book_func_uq',
+        )
+        another_constraint = models.UniqueConstraint(
+            Lower('title'),
+            name='book_func_uq',
+        )
+        self.assertEqual(constraint, same_constraint)
+        self.assertEqual(constraint, mock.ANY)
+        self.assertNotEqual(constraint, another_constraint)
+
     def test_repr(self):
         fields = ['foo', 'bar']
         name = 'unique_fields'
@@ -273,6 +298,18 @@ class UniqueConstraintTests(TestCase):
             repr(constraint),
             "<UniqueConstraint: fields=('foo', 'bar') name='opclasses_fields' "
             "opclasses=['text_pattern_ops', 'varchar_pattern_ops']>",
+        )
+
+    def test_repr_with_expressions(self):
+        constraint = models.UniqueConstraint(
+            Lower('title'),
+            F('author'),
+            name='book_func_uq',
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<UniqueConstraint: expressions=(Lower(F(title)), F(author)) "
+            "name='book_func_uq'>",
         )
 
     def test_deconstruction(self):
@@ -338,6 +375,14 @@ class UniqueConstraintTests(TestCase):
             'name': name,
             'opclasses': opclasses,
         })
+
+    def test_deconstruction_with_expressions(self):
+        name = 'unique_fields'
+        constraint = models.UniqueConstraint(Lower('title'), name=name)
+        path, args, kwargs = constraint.deconstruct()
+        self.assertEqual(path, 'django.db.models.UniqueConstraint')
+        self.assertEqual(args, (Lower('title'),))
+        self.assertEqual(kwargs, {'name': name})
 
     def test_database_constraint(self):
         with self.assertRaises(IntegrityError):
@@ -434,6 +479,15 @@ class UniqueConstraintTests(TestCase):
                 deferrable=models.Deferrable.DEFERRED,
             )
 
+    def test_deferrable_with_expressions(self):
+        message = 'UniqueConstraint with expressions cannot be deferred.'
+        with self.assertRaisesMessage(ValueError, message):
+            models.UniqueConstraint(
+                Lower('name'),
+                name='deferred_expression_unique',
+                deferrable=models.Deferrable.DEFERRED,
+            )
+
     def test_invalid_defer_argument(self):
         message = 'UniqueConstraint.deferrable must be a Deferrable instance.'
         with self.assertRaisesMessage(ValueError, message):
@@ -481,3 +535,33 @@ class UniqueConstraintTests(TestCase):
                 fields=['field'],
                 opclasses=['foo', 'bar'],
             )
+
+    def test_requires_field_or_expression(self):
+        msg = (
+            'At least one field or expression is required to define a unique '
+            'constraint.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            models.UniqueConstraint(name='name')
+
+    def test_expressions_and_fields_mutually_exclusive(self):
+        msg = 'UniqueConstraint.fields and expressions are mutually exclusive.'
+        with self.assertRaisesMessage(ValueError, msg):
+            models.UniqueConstraint(Lower('field_1'), fields=['field_2'], name='name')
+
+    def test_expressions_with_opclasses(self):
+        msg = (
+            'UniqueConstraint.opclasses cannot be used with expressions. Use '
+            'django.contrib.postgres.indexes.OpClass() instead.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            models.UniqueConstraint(
+                Lower('field'),
+                name='test_func_opclass',
+                opclasses=['jsonb_path_ops'],
+            )
+
+    def test_requires_name(self):
+        msg = 'A unique constraint must be named.'
+        with self.assertRaisesMessage(ValueError, msg):
+            models.UniqueConstraint(fields=['field'])

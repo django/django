@@ -183,10 +183,10 @@ available from the ``django.contrib.postgres.indexes`` module.
 .. class:: OpClass(expression, name)
 
     An ``OpClass()`` expression represents the ``expression`` with a custom
-    `operator class`_ that can be used to define functional indexes. To use it,
-    you need to add ``'django.contrib.postgres'`` in your
-    :setting:`INSTALLED_APPS`. Set the ``name`` parameter to the name of the
-    `operator class`_.
+    `operator class`_ that can be used to define functional indexes or unique
+    constraints. To use it, you need to add ``'django.contrib.postgres'`` in
+    your :setting:`INSTALLED_APPS`. Set the ``name`` parameter to the name of
+    the `operator class`_.
 
     For example::
 
@@ -196,5 +196,19 @@ available from the ``django.contrib.postgres.indexes`` module.
         )
 
     creates an index on ``Lower('username')`` using ``varchar_pattern_ops``.
+
+    Another example::
+
+        UniqueConstraint(
+            OpClass(Upper('description'), name='text_pattern_ops'),
+            name='upper_description_unique',
+        )
+
+    creates a unique constraint on ``Upper('description')`` using
+    ``text_pattern_ops``.
+
+    .. versionchanged:: 4.0
+
+        Support for functional unique constraints was added.
 
     .. _operator class: https://www.postgresql.org/docs/current/indexes-opclass.html

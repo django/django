@@ -289,7 +289,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 constraints[index] = {
                     'columns': OrderedSet(),
                     'primary_key': False,
-                    'unique': False,
+                    'unique': not non_unique,
                     'check': False,
                     'foreign_key': None,
                 }

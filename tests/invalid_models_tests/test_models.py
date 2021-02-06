@@ -2178,3 +2178,144 @@ class ConstraintsTests(TestCase):
                 ]
 
         self.assertEqual(Model.check(databases=self.databases), [])
+
+    def test_func_unique_constraint(self):
+        class Model(models.Model):
+            name = models.CharField(max_length=10)
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(Lower('name'), name='lower_name_uq'),
+                ]
+
+        warn = Warning(
+            '%s does not support unique constraints on expressions.'
+            % connection.display_name,
+            hint=(
+                "A constraint won't be created. Silence this warning if you "
+                "don't care about it."
+            ),
+            obj=Model,
+            id='models.W044',
+        )
+        expected = [] if connection.features.supports_expression_indexes else [warn]
+        self.assertEqual(Model.check(databases=self.databases), expected)
+
+    def test_func_unique_constraint_required_db_features(self):
+        class Model(models.Model):
+            name = models.CharField(max_length=10)
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(Lower('name'), name='lower_name_unq'),
+                ]
+                required_db_features = {'supports_expression_indexes'}
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_unique_constraint_expression_custom_lookup(self):
+        class Model(models.Model):
+            height = models.IntegerField()
+            weight = models.IntegerField()
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        models.F('height') / (models.F('weight__abs') + models.Value(5)),
+                        name='name',
+                    ),
+                ]
+
+        with register_lookup(models.IntegerField, Abs):
+            self.assertEqual(Model.check(databases=self.databases), [])
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_unique_constraint_pointing_to_missing_field(self):
+        class Model(models.Model):
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(Lower('missing_field').desc(), name='name'),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to the nonexistent field "
+                "'missing_field'.",
+                obj=Model,
+                id='models.E012',
+            ),
+        ])
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_unique_constraint_pointing_to_missing_field_nested(self):
+        class Model(models.Model):
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(Abs(Round('missing_field')), name='name'),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to the nonexistent field "
+                "'missing_field'.",
+                obj=Model,
+                id='models.E012',
+            ),
+        ])
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_unique_constraint_pointing_to_m2m_field(self):
+        class Model(models.Model):
+            m2m = models.ManyToManyField('self')
+
+            class Meta:
+                constraints = [models.UniqueConstraint(Lower('m2m'), name='name')]
+
+        self.assertEqual(Model.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to a ManyToManyField 'm2m', but "
+                "ManyToManyFields are not permitted in 'constraints'.",
+                obj=Model,
+                id='models.E013',
+            ),
+        ])
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_unique_constraint_pointing_to_non_local_field(self):
+        class Foo(models.Model):
+            field1 = models.CharField(max_length=15)
+
+        class Bar(Foo):
+            class Meta:
+                constraints = [models.UniqueConstraint(Lower('field1'), name='name')]
+
+        self.assertEqual(Bar.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to field 'field1' which is not local to "
+                "model 'Bar'.",
+                hint='This issue may be caused by multi-table inheritance.',
+                obj=Bar,
+                id='models.E016',
+            ),
+        ])
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_unique_constraint_pointing_to_fk(self):
+        class Foo(models.Model):
+            id = models.CharField(primary_key=True, max_length=255)
+
+        class Bar(models.Model):
+            foo_1 = models.ForeignKey(Foo, models.CASCADE, related_name='bar_1')
+            foo_2 = models.ForeignKey(Foo, models.CASCADE, related_name='bar_2')
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        Lower('foo_1_id'),
+                        Lower('foo_2'),
+                        name='name',
+                    ),
+                ]
+
+        self.assertEqual(Bar.check(databases=self.databases), [])

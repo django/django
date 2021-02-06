@@ -28,6 +28,36 @@ The Django 3.2.x series is the last to support Python 3.6 and 3.7.
 What's new in Django 4.0
 ========================
 
+Functional unique constraints
+-----------------------------
+
+The new :attr:`*expressions <django.db.models.UniqueConstraint.expressions>`
+positional argument of
+:class:`UniqueConstraint() <django.db.models.UniqueConstraint>` enables
+creating functional unique constraints on expressions and database functions.
+For example::
+
+    from django.db import models
+    from django.db.models import UniqueConstraint
+    from django.db.models.functions import Lower
+
+
+    class MyModel(models.Model):
+        first_name = models.CharField(max_length=255)
+        last_name = models.CharField(max_length=255)
+
+        class Meta:
+            indexes = [
+                UniqueConstraint(
+                    Lower('first_name'),
+                    Lower('last_name').desc(),
+                    name='first_last_name_unique',
+                ),
+            ]
+
+Functional unique constraints are added to models using the
+:attr:`Meta.constraints <django.db.models.Options.constraints>` option.
+
 Minor features
 --------------
 

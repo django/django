@@ -69,9 +69,29 @@ constraint.
 ``UniqueConstraint``
 ====================
 
-.. class:: UniqueConstraint(*, fields, name, condition=None, deferrable=None, include=None, opclasses=())
+.. class:: UniqueConstraint(*expressions, fields=(), name=None, condition=None, deferrable=None, include=None, opclasses=())
 
     Creates a unique constraint in the database.
+
+``expressions``
+---------------
+
+.. attribute:: UniqueConstraint.expressions
+
+.. versionadded:: 4.0
+
+Positional argument ``*expressions`` allows creating functional unique
+constraints on expressions and database functions.
+
+For example::
+
+    UniqueConstraint(Lower('name').desc(), 'category', name='unique_lower_name_category')
+
+creates a unique constraint on the lowercased value of the ``name`` field in
+descending order and the ``category`` field in the default ascending order.
+
+Functional unique constraints have the same database restrictions as
+:attr:`Index.expressions`.
 
 ``fields``
 ----------

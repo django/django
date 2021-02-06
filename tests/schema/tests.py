@@ -2189,6 +2189,246 @@ class SchemaTests(TransactionTestCase):
             AuthorWithUniqueNameAndBirthday._meta.constraints = []
             editor.remove_constraint(AuthorWithUniqueNameAndBirthday, constraint)
 
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_unique_constraint(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        constraint = UniqueConstraint(Upper('name').desc(), name='func_upper_uq')
+        # Add constraint.
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Author, constraint)
+            sql = constraint.create_sql(Author, editor)
+        table = Author._meta.db_table
+        constraints = self.get_constraints(table)
+        if connection.features.supports_index_column_ordering:
+            self.assertIndexOrder(table, constraint.name, ['DESC'])
+        self.assertIn(constraint.name, constraints)
+        self.assertIs(constraints[constraint.name]['unique'], True)
+        # SQL contains a database function.
+        self.assertIs(sql.references_column(table, 'name'), True)
+        self.assertIn('UPPER(%s)' % editor.quote_name('name'), str(sql))
+        # Remove constraint.
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(Author, constraint)
+        self.assertNotIn(constraint.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_composite_func_unique_constraint(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(BookWithSlug)
+        constraint = UniqueConstraint(
+            Upper('title'),
+            Lower('slug'),
+            name='func_upper_lower_unq',
+        )
+        # Add constraint.
+        with connection.schema_editor() as editor:
+            editor.add_constraint(BookWithSlug, constraint)
+            sql = constraint.create_sql(BookWithSlug, editor)
+        table = BookWithSlug._meta.db_table
+        constraints = self.get_constraints(table)
+        self.assertIn(constraint.name, constraints)
+        self.assertIs(constraints[constraint.name]['unique'], True)
+        # SQL contains database functions.
+        self.assertIs(sql.references_column(table, 'title'), True)
+        self.assertIs(sql.references_column(table, 'slug'), True)
+        sql = str(sql)
+        self.assertIn('UPPER(%s)' % editor.quote_name('title'), sql)
+        self.assertIn('LOWER(%s)' % editor.quote_name('slug'), sql)
+        self.assertLess(sql.index('UPPER'), sql.index('LOWER'))
+        # Remove constraint.
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(BookWithSlug, constraint)
+        self.assertNotIn(constraint.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_unique_constraint_field_and_expression(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        constraint = UniqueConstraint(
+            F('height').desc(),
+            'uuid',
+            Lower('name').asc(),
+            name='func_f_lower_field_unq',
+        )
+        # Add constraint.
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Author, constraint)
+            sql = constraint.create_sql(Author, editor)
+        table = Author._meta.db_table
+        if connection.features.supports_index_column_ordering:
+            self.assertIndexOrder(table, constraint.name, ['DESC', 'ASC', 'ASC'])
+        constraints = self.get_constraints(table)
+        self.assertIs(constraints[constraint.name]['unique'], True)
+        self.assertEqual(len(constraints[constraint.name]['columns']), 3)
+        self.assertEqual(constraints[constraint.name]['columns'][1], 'uuid')
+        # SQL contains database functions and columns.
+        self.assertIs(sql.references_column(table, 'height'), True)
+        self.assertIs(sql.references_column(table, 'name'), True)
+        self.assertIs(sql.references_column(table, 'uuid'), True)
+        self.assertIn('LOWER(%s)' % editor.quote_name('name'), str(sql))
+        # Remove constraint.
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(Author, constraint)
+        self.assertNotIn(constraint.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature('supports_expression_indexes', 'supports_partial_indexes')
+    def test_func_unique_constraint_partial(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        constraint = UniqueConstraint(
+            Upper('name'),
+            name='func_upper_cond_weight_uq',
+            condition=Q(weight__isnull=False),
+        )
+        # Add constraint.
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Author, constraint)
+            sql = constraint.create_sql(Author, editor)
+        table = Author._meta.db_table
+        constraints = self.get_constraints(table)
+        self.assertIn(constraint.name, constraints)
+        self.assertIs(constraints[constraint.name]['unique'], True)
+        self.assertIs(sql.references_column(table, 'name'), True)
+        self.assertIn('UPPER(%s)' % editor.quote_name('name'), str(sql))
+        self.assertIn(
+            'WHERE %s IS NOT NULL' % editor.quote_name('weight'),
+            str(sql),
+        )
+        # Remove constraint.
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(Author, constraint)
+        self.assertNotIn(constraint.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature('supports_expression_indexes', 'supports_covering_indexes')
+    def test_func_unique_constraint_covering(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        constraint = UniqueConstraint(
+            Upper('name'),
+            name='func_upper_covering_uq',
+            include=['weight', 'height'],
+        )
+        # Add constraint.
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Author, constraint)
+            sql = constraint.create_sql(Author, editor)
+        table = Author._meta.db_table
+        constraints = self.get_constraints(table)
+        self.assertIn(constraint.name, constraints)
+        self.assertIs(constraints[constraint.name]['unique'], True)
+        self.assertEqual(
+            constraints[constraint.name]['columns'],
+            [None, 'weight', 'height'],
+        )
+        self.assertIs(sql.references_column(table, 'name'), True)
+        self.assertIs(sql.references_column(table, 'weight'), True)
+        self.assertIs(sql.references_column(table, 'height'), True)
+        self.assertIn('UPPER(%s)' % editor.quote_name('name'), str(sql))
+        self.assertIn(
+            'INCLUDE (%s, %s)' % (
+                editor.quote_name('weight'),
+                editor.quote_name('height'),
+            ),
+            str(sql),
+        )
+        # Remove constraint.
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(Author, constraint)
+        self.assertNotIn(constraint.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_unique_constraint_lookups(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        with register_lookup(CharField, Lower), register_lookup(IntegerField, Abs):
+            constraint = UniqueConstraint(
+                F('name__lower'),
+                F('weight__abs'),
+                name='func_lower_abs_lookup_uq',
+            )
+            # Add constraint.
+            with connection.schema_editor() as editor:
+                editor.add_constraint(Author, constraint)
+                sql = constraint.create_sql(Author, editor)
+        table = Author._meta.db_table
+        constraints = self.get_constraints(table)
+        self.assertIn(constraint.name, constraints)
+        self.assertIs(constraints[constraint.name]['unique'], True)
+        # SQL contains columns.
+        self.assertIs(sql.references_column(table, 'name'), True)
+        self.assertIs(sql.references_column(table, 'weight'), True)
+        # Remove constraint.
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(Author, constraint)
+        self.assertNotIn(constraint.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_unique_constraint_collate(self):
+        collation = connection.features.test_collations.get('non_default')
+        if not collation:
+            self.skipTest(
+                'This backend does not support case-insensitive collations.'
+            )
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(BookWithSlug)
+        constraint = UniqueConstraint(
+            Collate(F('title'), collation=collation).desc(),
+            Collate('slug', collation=collation),
+            name='func_collate_uq',
+        )
+        # Add constraint.
+        with connection.schema_editor() as editor:
+            editor.add_constraint(BookWithSlug, constraint)
+            sql = constraint.create_sql(BookWithSlug, editor)
+        table = BookWithSlug._meta.db_table
+        constraints = self.get_constraints(table)
+        self.assertIn(constraint.name, constraints)
+        self.assertIs(constraints[constraint.name]['unique'], True)
+        if connection.features.supports_index_column_ordering:
+            self.assertIndexOrder(table, constraint.name, ['DESC', 'ASC'])
+        # SQL contains columns and a collation.
+        self.assertIs(sql.references_column(table, 'title'), True)
+        self.assertIs(sql.references_column(table, 'slug'), True)
+        self.assertIn('COLLATE %s' % editor.quote_name(collation), str(sql))
+        # Remove constraint.
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(BookWithSlug, constraint)
+        self.assertNotIn(constraint.name, self.get_constraints(table))
+
+    @skipIfDBFeature('supports_expression_indexes')
+    def test_func_unique_constraint_unsupported(self):
+        # UniqueConstraint is ignored on databases that don't support indexes on
+        # expressions.
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        constraint = UniqueConstraint(F('name'), name='func_name_uq')
+        with connection.schema_editor() as editor, self.assertNumQueries(0):
+            self.assertIsNone(editor.add_constraint(Author, constraint))
+            self.assertIsNone(editor.remove_constraint(Author, constraint))
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_unique_constraint_nonexistent_field(self):
+        constraint = UniqueConstraint(Lower('nonexistent'), name='func_nonexistent_uq')
+        msg = (
+            "Cannot resolve keyword 'nonexistent' into field. Choices are: "
+            "height, id, name, uuid, weight"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            with connection.schema_editor() as editor:
+                editor.add_constraint(Author, constraint)
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_unique_constraint_nondeterministic(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        constraint = UniqueConstraint(Random(), name='func_random_uq')
+        with connection.schema_editor() as editor:
+            with self.assertRaises(DatabaseError):
+                editor.add_constraint(Author, constraint)
+
     def test_index_together(self):
         """
         Tests removing and adding index_together constraints on a model.

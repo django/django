@@ -391,6 +391,8 @@ Models
 * **models.W042**: Auto-created primary key used when not defining a primary
   key type, by default ``django.db.models.AutoField``.
 * **models.W043**: ``<database>`` does not support indexes on expressions.
+* **models.W044**: ``<database>`` does not support unique constraints on
+  expressions.
 
 Security
 --------
