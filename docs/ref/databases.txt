@@ -418,7 +418,7 @@ Creating your database
 
 You can `create your database`_ using the command-line tools and this SQL::
 
-  CREATE DATABASE <dbname> CHARACTER SET utf8;
+  CREATE DATABASE <dbname> CHARACTER SET utf8mb4;
 
 This ensures all tables and columns will use UTF-8 by default.
 
