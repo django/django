@@ -967,7 +967,7 @@ class Query(BaseExpression):
         if reuse_with_filtered_relation and reuse:
             reuse_aliases = [
                 a for a, j in self.alias_map.items()
-                if a in reuse and j.equals(join, with_filtered_relation=False)
+                if a in reuse and j.equals(join)
             ]
         else:
             reuse_aliases = [
