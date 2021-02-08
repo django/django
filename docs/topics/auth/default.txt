@@ -998,39 +998,50 @@ implementation details see :ref:`using-the-views`.
 
     **Attributes:**
 
-    * ``template_name``: The name of a template to display for the view used to
-      log the user in. Defaults to :file:`registration/login.html`.
+    .. attribute:: template_name
 
-    * ``redirect_field_name``: The name of a ``GET`` field containing the
-      URL to redirect to after login. Defaults to ``next``.
+        The name of a template to display for the view used to log the user in.
+        Defaults to :file:`registration/login.html`.
 
-    * ``authentication_form``: A callable (typically a form class) to use for
-      authentication. Defaults to
-      :class:`~django.contrib.auth.forms.AuthenticationForm`.
+    .. attribute:: redirect_field_name
 
-    * ``extra_context``: A dictionary of context data that will be added to the
-      default context data passed to the template.
+        The name of a ``GET`` field containing the URL to redirect to after
+        login. Defaults to ``next``.
 
-    * ``redirect_authenticated_user``: A boolean that controls whether or not
-      authenticated users accessing the login page will be redirected as if
-      they had just successfully logged in. Defaults to ``False``.
+    .. attribute:: authentication_form
 
-      .. warning::
+        A callable (typically a form class) to use for authentication. Defaults
+        to :class:`~django.contrib.auth.forms.AuthenticationForm`.
 
-        If you enable ``redirect_authenticated_user``, other websites will be
-        able to determine if their visitors are authenticated on your site by
-        requesting redirect URLs to image files on your website. To avoid
-        this "`social media fingerprinting
-        <https://robinlinus.github.io/socialmedia-leak/>`_" information
-        leakage, host all images and your favicon on a separate domain.
+    .. attribute:: extra_context
 
-        Enabling ``redirect_authenticated_user`` can also result in a redirect
-        loop when using the :func:`.permission_required` decorator
-        unless the ``raise_exception`` parameter is used.
+        A dictionary of context data that will be added to the default context
+        data passed to the template.
 
-    * ``success_url_allowed_hosts``: A :class:`set` of hosts, in addition to
-      :meth:`request.get_host() <django.http.HttpRequest.get_host>`, that are
-      safe for redirecting after login. Defaults to an empty :class:`set`.
+    .. attribute:: redirect_authenticated_user
+
+        A boolean that controls whether or not authenticated users accessing
+        the login page will be redirected as if they had just successfully
+        logged in. Defaults to ``False``.
+
+        .. warning::
+
+            If you enable ``redirect_authenticated_user``, other websites will
+            be able to determine if their visitors are authenticated on your
+            site by requesting redirect URLs to image files on your website. To
+            avoid this "`social media fingerprinting
+            <https://robinlinus.github.io/socialmedia-leak/>`_" information
+            leakage, host all images and your favicon on a separate domain.
+
+            Enabling ``redirect_authenticated_user`` can also result in a
+            redirect loop when using the :func:`.permission_required` decorator
+            unless the ``raise_exception`` parameter is used.
+
+    .. attribute:: success_url_allowed_hosts
+
+        A :class:`set` of hosts, in addition to :meth:`request.get_host()
+        <django.http.HttpRequest.get_host>`, that are safe for redirecting
+        after login. Defaults to an empty :class:`set`.
 
     Here's what ``LoginView`` does:
 
@@ -1137,22 +1148,33 @@ implementation details see :ref:`using-the-views`.
 
     **Attributes:**
 
-    * ``next_page``: The URL to redirect to after logout. Defaults to
-      :setting:`settings.LOGOUT_REDIRECT_URL <LOGOUT_REDIRECT_URL>`.
+    .. attribute:: next_page
 
-    * ``template_name``: The full name of a template to display after
-      logging the user out. Defaults to :file:`registration/logged_out.html`.
+        The URL to redirect to after logout. Defaults to
+        :setting:`LOGOUT_REDIRECT_URL`.
 
-    * ``redirect_field_name``: The name of a ``GET`` field containing the
-      URL to redirect to after log out. Defaults to ``next``. Overrides the
-      ``next_page`` URL if the given ``GET`` parameter is passed.
+    .. attribute:: template_name
 
-    * ``extra_context``: A dictionary of context data that will be added to the
-      default context data passed to the template.
+        The full name of a template to display after logging the user out.
+        Defaults to :file:`registration/logged_out.html`.
 
-    * ``success_url_allowed_hosts``: A :class:`set` of hosts, in addition to
-      :meth:`request.get_host() <django.http.HttpRequest.get_host>`, that are
-      safe for redirecting after logout. Defaults to an empty :class:`set`.
+    .. attribute:: redirect_field_name
+
+        The name of a ``GET`` field containing the URL to redirect to after log
+        out. Defaults to ``'next'``. Overrides the
+        :attr:`next_page` URL if the given ``GET`` parameter is
+        passed.
+
+    .. attribute:: extra_context
+
+        A dictionary of context data that will be added to the default context
+        data passed to the template.
+
+    .. attribute:: success_url_allowed_hosts
+
+        A :class:`set` of hosts, in addition to :meth:`request.get_host()
+        <django.http.HttpRequest.get_host>`, that are safe for redirecting
+        after logout. Defaults to an empty :class:`set`.
 
     **Template context:**
 
@@ -1189,20 +1211,28 @@ implementation details see :ref:`using-the-views`.
 
     **Attributes:**
 
-    * ``template_name``: The full name of a template to use for
-      displaying the password change form. Defaults to
-      :file:`registration/password_change_form.html` if not supplied.
+    .. attribute: template_name
 
-    * ``success_url``: The URL to redirect to after a successful password
-      change. Defaults to ``'password_change_done'``.
+        The full name of a template to use for displaying the password change
+        form. Defaults to :file:`registration/password_change_form.html` if not
+        supplied.
 
-    * ``form_class``: A custom "change password" form which must accept a
-      ``user`` keyword argument. The form is responsible for actually changing
-      the user's password. Defaults to
-      :class:`~django.contrib.auth.forms.PasswordChangeForm`.
+    .. attribute:: success_url
 
-    * ``extra_context``: A dictionary of context data that will be added to the
-      default context data passed to the template.
+        The URL to redirect to after a successful password change. Defaults to
+        ``'password_change_done'``.
+
+    .. attribute:: form_class
+
+        A custom "change password" form which must accept a ``user`` keyword
+        argument. The form is responsible for actually changing the user's
+        password. Defaults to
+        :class:`~django.contrib.auth.forms.PasswordChangeForm`.
+
+    .. attribute:: extra_context
+
+        A dictionary of context data that will be added to the default context
+        data passed to the template.
 
     **Template context:**
 
@@ -1216,12 +1246,15 @@ implementation details see :ref:`using-the-views`.
 
     **Attributes:**
 
-    * ``template_name``: The full name of a template to use.
-      Defaults to :file:`registration/password_change_done.html` if not
-      supplied.
+    .. attribute:: template_name
 
-    * ``extra_context``: A dictionary of context data that will be added to the
-      default context data passed to the template.
+        The full name of a template to use. Defaults to
+        :file:`registration/password_change_done.html` if not supplied.
+
+    .. attribute:: extra_context
+
+        A dictionary of context data that will be added to the default context
+        data passed to the template.
 
 .. class:: PasswordResetView
 
@@ -1257,42 +1290,62 @@ implementation details see :ref:`using-the-views`.
 
     **Attributes:**
 
-    * ``template_name``: The full name of a template to use for
-      displaying the password reset form. Defaults to
-      :file:`registration/password_reset_form.html` if not supplied.
+    .. attribute:: template_name
 
-    * ``form_class``: Form that will be used to get the email of
-      the user to reset the password for. Defaults to
-      :class:`~django.contrib.auth.forms.PasswordResetForm`.
+        The full name of a template to use for displaying the password reset
+        form. Defaults to :file:`registration/password_reset_form.html` if not
+        supplied.
 
-    * ``email_template_name``: The full name of a template to use for
-      generating the email with the reset password link. Defaults to
-      :file:`registration/password_reset_email.html` if not supplied.
+    .. attribute:: form_class
 
-    * ``subject_template_name``: The full name of a template to use for
-      the subject of the email with the reset password link. Defaults
-      to :file:`registration/password_reset_subject.txt` if not supplied.
+        Form that will be used to get the email of the user to reset the
+        password for. Defaults to
+        :class:`~django.contrib.auth.forms.PasswordResetForm`.
 
-    * ``token_generator``: Instance of the class to check the one time link.
-      This will default to ``default_token_generator``, it's an instance of
-      ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
+    .. attribute:: email_template_name
 
-    * ``success_url``: The URL to redirect to after a successful password reset
-      request. Defaults to ``'password_reset_done'``.
+        The full name of a template to use for generating the email with the
+        reset password link. Defaults to
+        :file:`registration/password_reset_email.html` if not supplied.
 
-    * ``from_email``: A valid email address. By default Django uses
-      the :setting:`DEFAULT_FROM_EMAIL`.
+    .. attribute:: subject_template_name
 
-    * ``extra_context``: A dictionary of context data that will be added to the
-      default context data passed to the template.
+        The full name of a template to use for the subject of the email with
+        the reset password link. Defaults to
+        :file:`registration/password_reset_subject.txt` if not supplied.
 
-    * ``html_email_template_name``: The full name of a template to use
-      for generating a :mimetype:`text/html` multipart email with the password
-      reset link. By default, HTML email is not sent.
+    .. attribute:: token_generator
 
-    * ``extra_email_context``: A dictionary of context data that will be
-      available in the email template. It can be used to override default
-      template context values listed below e.g. ``domain``.
+        Instance of the class to check the one time link. This will default to
+        ``default_token_generator``, it's an instance of
+        ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
+
+    .. attribute:: success_url
+
+        The URL to redirect to after a successful password reset request.
+        Defaults to ``'password_reset_done'``.
+
+    .. attribute:: from_email
+
+        A valid email address. By default Django uses the
+        :setting:`DEFAULT_FROM_EMAIL`.
+
+    .. attribute:: extra_context
+
+        A dictionary of context data that will be added to the default context
+        data passed to the template.
+
+    .. attribute:: html_email_template_name
+
+        The full name of a template to use for generating a
+        :mimetype:`text/html` multipart email with the password reset link. By
+        default, HTML email is not sent.
+
+    .. attribute:: extra_email_context
+
+        A dictionary of context data that will be available in the email
+        template. It can be used to override default template context values
+        listed below e.g. ``domain``.
 
     **Template context:**
 
@@ -1348,12 +1401,15 @@ implementation details see :ref:`using-the-views`.
 
     **Attributes:**
 
-    * ``template_name``: The full name of a template to use.
-      Defaults to :file:`registration/password_reset_done.html` if not
-      supplied.
+    .. attribute:: template_name
 
-    * ``extra_context``: A dictionary of context data that will be added to the
-      default context data passed to the template.
+        The full name of a template to use. Defaults to
+        :file:`registration/password_reset_done.html` if not supplied.
+
+    .. attribute:: extra_context
+
+        A dictionary of context data that will be added to the default context
+        data passed to the template.
 
 .. class:: PasswordResetConfirmView
 
@@ -1369,34 +1425,48 @@ implementation details see :ref:`using-the-views`.
 
     **Attributes:**
 
-    * ``template_name``: The full name of a template to display the confirm
-      password view. Default value is
-      :file:`registration/password_reset_confirm.html`.
+    .. attribute:: template_name
 
-    * ``token_generator``: Instance of the class to check the password. This
-      will default to ``default_token_generator``, it's an instance of
-      ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
+        The full name of a template to display the confirm password view.
+        Default value is :file:`registration/password_reset_confirm.html`.
 
-    * ``post_reset_login``: A boolean indicating if the user should be
-      automatically authenticated after a successful password reset. Defaults
-      to ``False``.
+    .. attribute:: token_generator
 
-    * ``post_reset_login_backend``: A dotted path to the authentication
-      backend to use when authenticating a user if ``post_reset_login`` is
-      ``True``. Required only if you have multiple
-      :setting:`AUTHENTICATION_BACKENDS` configured. Defaults to ``None``.
+        Instance of the class to check the password. This will default to
+        ``default_token_generator``, it's an instance of
+        ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
 
-    * ``form_class``: Form that will be used to set the password. Defaults to
-      :class:`~django.contrib.auth.forms.SetPasswordForm`.
+    .. attribute:: post_reset_login
 
-    * ``success_url``: URL to redirect after the password reset done. Defaults
-      to ``'password_reset_complete'``.
+        A boolean indicating if the user should be automatically authenticated
+        after a successful password reset. Defaults to ``False``.
 
-    * ``extra_context``: A dictionary of context data that will be added to the
-      default context data passed to the template.
+    .. attribute:: post_reset_login_backend
 
-    * ``reset_url_token``: Token parameter displayed as a component of password
-      reset URLs. Defaults to ``'set-password'``.
+        A dotted path to the authentication backend to use when authenticating
+        a user if ``post_reset_login`` is ``True``. Required only if you have
+        multiple :setting:`AUTHENTICATION_BACKENDS` configured. Defaults to
+        ``None``.
+
+    .. attribute:: form_class
+
+        Form that will be used to set the password. Defaults to
+        :class:`~django.contrib.auth.forms.SetPasswordForm`.
+
+    .. attribute:: success_url
+
+        URL to redirect after the password reset done. Defaults to
+        ``'password_reset_complete'``.
+
+    .. attribute:: extra_context
+
+        A dictionary of context data that will be added to the default context
+        data passed to the template.
+
+    .. attribute:: reset_url_token
+
+        Token parameter displayed as a component of password reset URLs.
+        Defaults to ``'set-password'``.
 
     **Template context:**
 
@@ -1415,11 +1485,15 @@ implementation details see :ref:`using-the-views`.
 
     **Attributes:**
 
-    * ``template_name``: The full name of a template to display the view.
-      Defaults to :file:`registration/password_reset_complete.html`.
+    .. attribute:: template_name
 
-    * ``extra_context``: A dictionary of context data that will be added to the
-      default context data passed to the template.
+        The full name of a template to display the view. Defaults to
+        :file:`registration/password_reset_complete.html`.
+
+    .. attribute:: extra_context
+
+        A dictionary of context data that will be added to the default context
+        data passed to the template.
 
 Helper functions
 ----------------
