@@ -43,7 +43,7 @@ editing content:
     This view inherits methods and attributes from the following views:
 
     * :class:`django.views.generic.base.TemplateResponseMixin`
-    * ``django.views.generic.edit.BaseFormView``
+    * :class:`django.views.generic.edit.BaseFormView`
     * :class:`django.views.generic.edit.FormMixin`
     * :class:`django.views.generic.edit.ProcessFormView`
     * :class:`django.views.generic.base.View`
@@ -85,6 +85,19 @@ editing content:
             <input type="submit" value="Send message">
         </form>
 
+.. class:: django.views.generic.edit.BaseFormView
+
+    A base view for displaying a form. It is not intended to be used directly,
+    but rather as a parent class of the
+    :class:`django.views.generic.edit.FormView` or other views displaying a
+    form.
+
+    **Ancestors (MRO)**
+
+    This view inherits methods and attributes from the following views:
+
+    * :class:`django.views.generic.edit.FormMixin`
+    * :class:`django.views.generic.edit.ProcessFormView`
 
 ``CreateView``
 ==============
@@ -100,7 +113,7 @@ editing content:
 
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
-    * ``django.views.generic.edit.BaseCreateView``
+    * :class:`django.views.generic.edit.BaseCreateView`
     * :class:`django.views.generic.edit.ModelFormMixin`
     * :class:`django.views.generic.edit.FormMixin`
     * :class:`django.views.generic.detail.SingleObjectMixin`
@@ -141,6 +154,29 @@ editing content:
             <input type="submit" value="Save">
         </form>
 
+.. class:: django.views.generic.edit.BaseCreateView
+
+    A base view for creating a new object instance. It is not intended to be
+    used directly, but rather as a parent class of the
+    :class:`django.views.generic.edit.CreateView`.
+
+    **Ancestors (MRO)**
+
+    This view inherits methods and attributes from the following views:
+
+    * :class:`django.views.generic.edit.ModelFormMixin`
+    * :class:`django.views.generic.edit.ProcessFormView`
+
+    **Methods**
+
+    .. method:: get(request, *args, **kwargs)
+
+        Sets the current object instance (``self.object``) to ``None``.
+
+    .. method:: post(request, *args, **kwargs)
+
+        Sets the current object instance (``self.object``) to ``None``.
+
 ``UpdateView``
 ==============
 
@@ -157,7 +193,7 @@ editing content:
 
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
-    * ``django.views.generic.edit.BaseUpdateView``
+    * :class:`django.views.generic.edit.BaseUpdateView`
     * :class:`django.views.generic.edit.ModelFormMixin`
     * :class:`django.views.generic.edit.FormMixin`
     * :class:`django.views.generic.detail.SingleObjectMixin`
@@ -198,6 +234,29 @@ editing content:
             <input type="submit" value="Update">
         </form>
 
+.. class:: django.views.generic.edit.BaseUpdateView
+
+    A base view for updating an existing object instance. It is not intended to
+    be used directly, but rather as a parent class of the
+    :class:`django.views.generic.edit.UpdateView`.
+
+    **Ancestors (MRO)**
+
+    This view inherits methods and attributes from the following views:
+
+    * :class:`django.views.generic.edit.ModelFormMixin`
+    * :class:`django.views.generic.edit.ProcessFormView`
+
+    **Methods**
+
+    .. method:: get(request, *args, **kwargs)
+
+        Sets the current object instance (``self.object``).
+
+    .. method:: post(request, *args, **kwargs)
+
+        Sets the current object instance (``self.object``).
+
 ``DeleteView``
 ==============
 
@@ -214,7 +273,7 @@ editing content:
 
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
-    * ``django.views.generic.edit.BaseDeleteView``
+    * :class:`django.views.generic.edit.BaseDeleteView`
     * :class:`django.views.generic.edit.DeletionMixin`
     * :class:`django.views.generic.detail.BaseDetailView`
     * :class:`django.views.generic.detail.SingleObjectMixin`
@@ -248,3 +307,16 @@ editing content:
             <p>Are you sure you want to delete "{{ object }}"?</p>
             <input type="submit" value="Confirm">
         </form>
+
+.. class:: django.views.generic.edit.BaseDeleteView
+
+    A base view for deleting an object instance. It is not intended to be used
+    directly, but rather as a parent class of the
+    :class:`django.views.generic.edit.DeleteView`.
+
+    **Ancestors (MRO)**
+
+    This view inherits methods and attributes from the following views:
+
+    * :class:`django.views.generic.edit.DeletionMixin`
+    * :class:`django.views.generic.detail.BaseDetailView`
