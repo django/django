@@ -4,15 +4,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jon <jon@kolonial.no>, 2015-2016
 # Jon <jon@kolonial.no>, 2014
+# Jon <jon@kolonial.no>, 2020
 # Jon <jon@kolonial.no>, 2013
 # Jon <jon@kolonial.no>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-21 12:15+0000\n"
+"Last-Translator: Jon <jon@kolonial.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -156,13 +157,13 @@ msgid "Template: %(name)s"
 msgstr "Mal: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Mal: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Mal: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Søkebanen for mal \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Søkebane for mal <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(finnes ikke)"

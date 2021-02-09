@@ -1,7 +1,6 @@
 from psycopg2.extras import Inet
 
 from django.conf import settings
-from django.db import NotSupportedError
 from django.db.backends.base.operations import BaseDatabaseOperations
 
 
@@ -11,6 +10,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     cast_data_types = {
         'AutoField': 'integer',
         'BigAutoField': 'bigint',
+        'SmallAutoField': 'smallint',
     }
 
     def unification_cast_sql(self, output_field):
@@ -18,7 +18,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if internal_type in ("GenericIPAddressField", "IPAddressField", "TimeField", "UUIDField"):
             # PostgreSQL will resolve a union as type 'text' if input types are
             # 'unknown'.
-            # https://www.postgresql.org/docs/current/static/typeconv-union-case.html
+            # https://www.postgresql.org/docs/current/typeconv-union-case.html
             # These fields cannot be implicitly cast back in the default
             # PostgreSQL configuration so we need to explicitly cast them.
             # We must also remove components of the type within brackets:
@@ -27,22 +27,32 @@ class DatabaseOperations(BaseDatabaseOperations):
         return '%s'
 
     def date_extract_sql(self, lookup_type, field_name):
-        # https://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
+        # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
         if lookup_type == 'week_day':
             # For consistency across backends, we return Sunday=1, Saturday=7.
             return "EXTRACT('dow' FROM %s) + 1" % field_name
+        elif lookup_type == 'iso_week_day':
+            return "EXTRACT('isodow' FROM %s)" % field_name
         elif lookup_type == 'iso_year':
             return "EXTRACT('isoyear' FROM %s)" % field_name
         else:
             return "EXTRACT('%s' FROM %s)" % (lookup_type, field_name)
 
-    def date_trunc_sql(self, lookup_type, field_name):
-        # https://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+    def date_trunc_sql(self, lookup_type, field_name, tzname=None):
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
+    def _prepare_tzname_delta(self, tzname):
+        if '+' in tzname:
+            return tzname.replace('+', '-')
+        elif '-' in tzname:
+            return tzname.replace('-', '+')
+        return tzname
+
     def _convert_field_to_tz(self, field_name, tzname):
-        if settings.USE_TZ:
-            field_name = "%s AT TIME ZONE '%s'" % (field_name, tzname)
+        if tzname and settings.USE_TZ:
+            field_name = "%s AT TIME ZONE '%s'" % (field_name, self._prepare_tzname_delta(tzname))
         return field_name
 
     def datetime_cast_date_sql(self, field_name, tzname):
@@ -59,22 +69,22 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
-        # https://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+        # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
-    def time_trunc_sql(self, lookup_type, field_name):
+    def time_trunc_sql(self, lookup_type, field_name, tzname=None):
+        field_name = self._convert_field_to_tz(field_name, tzname)
         return "DATE_TRUNC('%s', %s)::time" % (lookup_type, field_name)
 
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
-    def fetch_returned_insert_ids(self, cursor):
+    def fetch_returned_insert_rows(self, cursor):
         """
         Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table that has an auto-incrementing ID, return the
-        list of newly created IDs.
+        statement into a table, return the tuple of returned data.
         """
-        return [item[0] for item in cursor.fetchall()]
+        return cursor.fetchall()
 
     def lookup_cast(self, lookup_type, internal_type=None):
         lookup = '%s'
@@ -109,28 +119,21 @@ class DatabaseOperations(BaseDatabaseOperations):
     def set_time_zone_sql(self):
         return "SET TIME ZONE %s"
 
-    def sql_flush(self, style, tables, sequences, allow_cascade=False):
-        if tables:
-            # Perform a single SQL 'TRUNCATE x, y, z...;' statement.  It allows
-            # us to truncate tables referenced by a foreign key in any other
-            # table.
-            tables_sql = ', '.join(
-                style.SQL_FIELD(self.quote_name(table)) for table in tables)
-            if allow_cascade:
-                sql = ['%s %s %s;' % (
-                    style.SQL_KEYWORD('TRUNCATE'),
-                    tables_sql,
-                    style.SQL_KEYWORD('CASCADE'),
-                )]
-            else:
-                sql = ['%s %s;' % (
-                    style.SQL_KEYWORD('TRUNCATE'),
-                    tables_sql,
-                )]
-            sql.extend(self.sequence_reset_by_name_sql(style, sequences))
-            return sql
-        else:
+    def sql_flush(self, style, tables, *, reset_sequences=False, allow_cascade=False):
+        if not tables:
             return []
+
+        # Perform a single SQL 'TRUNCATE x, y, z...;' statement. It allows us
+        # to truncate tables referenced by a foreign key in any other table.
+        sql_parts = [
+            style.SQL_KEYWORD('TRUNCATE'),
+            ', '.join(style.SQL_FIELD(self.quote_name(table)) for table in tables),
+        ]
+        if reset_sequences:
+            sql_parts.append(style.SQL_KEYWORD('RESTART IDENTITY'))
+        if allow_cascade:
+            sql_parts.append(style.SQL_KEYWORD('CASCADE'))
+        return ['%s;' % ' '.join(sql_parts)]
 
     def sequence_reset_by_name_sql(self, style, sequences):
         # 'ALTER SEQUENCE sequence_name RESTART WITH 1;'... style SQL statements
@@ -181,21 +184,6 @@ class DatabaseOperations(BaseDatabaseOperations):
                         )
                     )
                     break  # Only one AutoField is allowed per model, so don't bother continuing.
-            for f in model._meta.many_to_many:
-                if not f.remote_field.through:
-                    output.append(
-                        "%s setval(pg_get_serial_sequence('%s','%s'), "
-                        "coalesce(max(%s), 1), max(%s) %s null) %s %s;" % (
-                            style.SQL_KEYWORD('SELECT'),
-                            style.SQL_TABLE(qn(f.m2m_db_table())),
-                            style.SQL_FIELD('id'),
-                            style.SQL_FIELD(qn('id')),
-                            style.SQL_FIELD(qn('id')),
-                            style.SQL_KEYWORD('IS NOT'),
-                            style.SQL_KEYWORD('FROM'),
-                            style.SQL_TABLE(qn(f.m2m_db_table()))
-                        )
-                    )
         return output
 
     def prep_for_iexact_query(self, x):
@@ -222,14 +210,22 @@ class DatabaseOperations(BaseDatabaseOperations):
             return ['DISTINCT'], []
 
     def last_executed_query(self, cursor, sql, params):
-        # http://initd.org/psycopg/docs/cursor.html#cursor.query
+        # https://www.psycopg.org/docs/cursor.html#cursor.query
         # The query attribute is a Psycopg extension to the DB API 2.0.
         if cursor.query is not None:
             return cursor.query.decode()
         return None
 
-    def return_insert_id(self):
-        return "RETURNING %s", ()
+    def return_insert_columns(self, fields):
+        if not fields:
+            return '', ()
+        columns = [
+            '%s.%s' % (
+                self.quote_name(field.model._meta.db_table),
+                self.quote_name(field.column),
+            ) for field in fields
+        ]
+        return 'RETURNING %s' % ', '.join(columns), ()
 
     def bulk_insert_sql(self, fields, placeholder_rows):
         placeholder_rows_sql = (", ".join(row) for row in placeholder_rows)
@@ -245,6 +241,9 @@ class DatabaseOperations(BaseDatabaseOperations):
     def adapt_timefield_value(self, value):
         return value
 
+    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
+        return value
+
     def adapt_ipaddressfield_value(self, value):
         if value:
             return Inet(value)
@@ -254,17 +253,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         if internal_type == 'DateField':
             lhs_sql, lhs_params = lhs
             rhs_sql, rhs_params = rhs
-            return "(interval '1 day' * (%s - %s))" % (lhs_sql, rhs_sql), lhs_params + rhs_params
+            params = (*lhs_params, *rhs_params)
+            return "(interval '1 day' * (%s - %s))" % (lhs_sql, rhs_sql), params
         return super().subtract_temporals(internal_type, lhs, rhs)
-
-    def window_frame_range_start_end(self, start=None, end=None):
-        start_, end_ = super().window_frame_range_start_end(start, end)
-        if (start and start < 0) or (end and end > 0):
-            raise NotSupportedError(
-                'PostgreSQL only supports UNBOUNDED together with PRECEDING '
-                'and FOLLOWING.'
-            )
-        return start_, end_
 
     def explain_query_prefix(self, format=None, **options):
         prefix = super().explain_query_prefix(format)

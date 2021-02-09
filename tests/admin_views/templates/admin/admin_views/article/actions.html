@@ -2,5 +2,5 @@
 {% load i18n %}
 
 {% block actions-submit %}
-<button type="submit" class="button override-actions" title="{% trans "Run the selected action" %}" name="index" value="{{ action_index|default:0 }}">{% trans "Go" %}</button>
+<button type="submit" class="button override-actions" title="{% translate "Run the selected action" %}" name="index" value="{{ action_index|default:0 }}">{% translate "Go" %}</button>
 {% endblock %}

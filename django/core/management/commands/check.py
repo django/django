@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand, CommandError
 class Command(BaseCommand):
     help = "Checks the entire Django project for potential problems."
 
-    requires_system_checks = False
+    requires_system_checks = []
 
     def add_arguments(self, parser):
         parser.add_argument('args', metavar='app_label', nargs='*')
@@ -31,6 +31,10 @@ class Command(BaseCommand):
                 'Message level that will cause the command to exit with a '
                 'non-zero status. Default is ERROR.'
             ),
+        )
+        parser.add_argument(
+            '--database', action='append', dest='databases',
+            help='Run database related checks against these aliases.',
         )
 
     def handle(self, *app_labels, **options):
@@ -62,4 +66,5 @@ class Command(BaseCommand):
             display_num_errors=True,
             include_deployment_checks=include_deployment_checks,
             fail_level=getattr(checks, options['fail_level']),
+            databases=options['databases'],
         )

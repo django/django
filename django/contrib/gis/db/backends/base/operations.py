@@ -3,7 +3,7 @@ from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import (
     Area as AreaMeasure, Distance as DistanceMeasure,
 )
-from django.db.utils import NotSupportedError
+from django.db import NotSupportedError
 from django.utils.functional import cached_property
 
 
@@ -12,6 +12,7 @@ class BaseSpatialOperations:
     # an attribute for the spatial database version tuple (if applicable)
     postgis = False
     spatialite = False
+    mariadb = False
     mysql = False
     oracle = False
     spatial_version = None
@@ -23,10 +24,6 @@ class BaseSpatialOperations:
     def select_extent(self):
         return self.select
 
-    # Does the spatial database have a geometry or geography type?
-    geography = False
-    geometry = False
-
     # Aggregates
     disallowed_aggregates = ()
 
@@ -36,14 +33,14 @@ class BaseSpatialOperations:
     # match; used in spatial_function_name().
     function_names = {}
 
-    # Blacklist/set of known unsupported functions of the backend
+    # Set of known unsupported functions of the backend
     unsupported_functions = {
         'Area', 'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG', 'Azimuth',
         'BoundingCircle', 'Centroid', 'Difference', 'Distance', 'Envelope',
-        'GeoHash', 'Intersection', 'IsValid', 'Length', 'LineLocatePoint',
-        'MakeValid', 'MemSize', 'NumGeometries', 'NumPoints', 'Perimeter',
-        'PointOnSurface', 'Reverse', 'Scale', 'SnapToGrid', 'SymDifference',
-        'Transform', 'Translate', 'Union',
+        'GeoHash', 'GeometryDistance', 'Intersection', 'IsValid', 'Length',
+        'LineLocatePoint', 'MakeValid', 'MemSize', 'NumGeometries',
+        'NumPoints', 'Perimeter', 'PointOnSurface', 'Reverse', 'Scale',
+        'SnapToGrid', 'SymDifference', 'Transform', 'Translate', 'Union',
     }
 
     # Constructors

@@ -8,6 +8,7 @@
 """
 import sys
 from decimal import Decimal, InvalidOperation as DecimalInvalidOperation
+from pathlib import Path
 
 from django.contrib.gis.db.models import GeometryField
 from django.contrib.gis.gdal import (
@@ -20,7 +21,7 @@ from django.contrib.gis.gdal.field import (
 )
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import connections, models, router, transaction
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 
 # LayerMapping exceptions.
@@ -61,6 +62,8 @@ class LayerMapping:
     FIELD_TYPES = {
         models.AutoField: OFTInteger,
         models.BigAutoField: OFTInteger64,
+        models.SmallAutoField: OFTInteger,
+        models.BooleanField: (OFTInteger, OFTReal, OFTString),
         models.IntegerField: (OFTInteger, OFTReal, OFTString),
         models.FloatField: (OFTInteger, OFTReal),
         models.DateField: OFTDate,
@@ -72,8 +75,11 @@ class LayerMapping:
         models.SlugField: OFTString,
         models.TextField: OFTString,
         models.URLField: OFTString,
+        models.UUIDField: OFTString,
         models.BigIntegerField: (OFTInteger, OFTReal, OFTString),
         models.SmallIntegerField: (OFTInteger, OFTReal, OFTString),
+        models.PositiveBigIntegerField: (OFTInteger, OFTReal, OFTString),
+        models.PositiveIntegerField: (OFTInteger, OFTReal, OFTString),
         models.PositiveSmallIntegerField: (OFTInteger, OFTReal, OFTString),
     }
 
@@ -88,7 +94,7 @@ class LayerMapping:
         argument usage.
         """
         # Getting the DataSource and the associated Layer.
-        if isinstance(data, str):
+        if isinstance(data, (str, Path)):
             self.ds = DataSource(data, encoding=encoding)
         else:
             self.ds = data
@@ -343,13 +349,13 @@ class LayerMapping:
         """
         if (isinstance(ogr_field, OFTString) and
                 isinstance(model_field, (models.CharField, models.TextField))):
-            if self.encoding:
+            if self.encoding and ogr_field.value is not None:
                 # The encoding for OGR data sources may be specified here
                 # (e.g., 'cp437' for Census Bureau boundary files).
-                val = force_text(ogr_field.value, self.encoding)
+                val = force_str(ogr_field.value, self.encoding)
             else:
                 val = ogr_field.value
-            if model_field.max_length and len(val) > model_field.max_length:
+            if model_field.max_length and val is not None and len(val) > model_field.max_length:
                 raise InvalidString('%s model field maximum string length is %s, given %s characters.' %
                                     (model_field.name, model_field.max_length, len(val)))
         elif isinstance(ogr_field, OFTReal) and isinstance(model_field, models.DecimalField):
@@ -594,7 +600,7 @@ class LayerMapping:
 
                 # Printing progress information, if requested.
                 if progress and num_feat % progress_interval == 0:
-                    stream.write('Processed %d features, saved %d …\n' % (num_feat, num_saved))
+                    stream.write('Processed %d features, saved %d ...\n' % (num_feat, num_saved))
 
             # Only used for status output purposes -- incremental saving uses the
             # values returned here.

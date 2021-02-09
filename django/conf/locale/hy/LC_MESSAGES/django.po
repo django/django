@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-11-01 20:32+0000\n"
-"Last-Translator: Ruben Harutyunov <rharutyunov@mail.ru>\n"
+"POT-Creation-Date: 2019-09-27 22:40+0200\n"
+"PO-Revision-Date: 2019-11-05 00:38+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Armenian (http://www.transifex.com/django/django/language/"
 "hy/)\n"
 "MIME-Version: 1.0\n"
@@ -136,6 +136,9 @@ msgstr ""
 
 msgid "Hungarian"
 msgstr "Հունգարերեն"
+
+msgid "Armenian"
+msgstr ""
 
 msgid "Interlingua"
 msgstr "Ինտերլինգուա"
@@ -275,6 +278,9 @@ msgstr "Ուկրաիներեն"
 msgid "Urdu"
 msgstr "Ուրդու"
 
+msgid "Uzbek"
+msgstr ""
+
 msgid "Vietnamese"
 msgstr "Վիետնամերեն"
 
@@ -319,16 +325,13 @@ msgstr "Մուտքագրեք ճիշտ էլեկտրոնային փոստի հաս
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Արժեքը պետք է բաղկացած լինի տառերից, թվերից, ընդգծումներից կամ դեֆիսներից"
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Արժեքը պետք է բաղկացած լինի Unicode ստանդարտի տառերից, թվերից, ընդգծումներից "
-"կամ դեֆիսներից"
 
 msgid "Enter a valid IPv4 address."
 msgstr "Մուտքագրեք ճիշտ IPv4 հասցե"
@@ -407,8 +410,8 @@ msgstr[1] "Համոզվեք, որ ստորակետից առաջ թվերի քա�
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
 
 msgid "Null characters are not allowed."
@@ -449,22 +452,12 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr "%(field_type)s տիպի դաշտ"
 
-msgid "Integer"
-msgstr "Ամբողջ"
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr ""
 
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr "'%(value)s' արժեքը պետք է լինի ամբողջ թիվ"
-
-msgid "Big (8 byte) integer"
-msgstr "Մեծ (8 բայթ) ամբողջ թիվ"
-
-#, python-format
-msgid "'%(value)s' value must be either True or False."
-msgstr "'%(value)s' արժեքը պետք է լինի True կամ False"
-
-#, python-format
-msgid "'%(value)s' value must be either True, False, or None."
+msgid "“%(value)s” value must be either True, False, or None."
 msgstr ""
 
 msgid "Boolean (Either True or False)"
@@ -479,53 +472,46 @@ msgstr "Ստորակետով բաժանված ամբողջ թվեր"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
-msgstr "'%(value)s'  արժեքը սխալ է։ Այն պետք է լինի  YYYY-MM-DD ֆորմատի"
+msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"'%(value)s'  արժեքը ունի ճիշտ YYYY-MM-DD ֆորմատ, բայց այն սխալ ամսաթիվ է"
 
 msgid "Date (without time)"
 msgstr "Ամսաթիվ (առանց ժամանակի)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"'%(value)s' արժեքի ֆորմատը սխալ է։ Այն պետք է լինիYYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] ֆորմատի"
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"'%(value)s'  արժեքը ունի ճիշտ YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) ֆորմատ, "
-"բայց այն սխալ ամսաթիվ/ժամանակ է"
 
 msgid "Date (with time)"
 msgstr "Ամսաթիվ (և ժամանակ)"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
-msgstr "'%(value)s' արժեքը պետք է լինի տասնորդական թիվ"
+msgid "“%(value)s” value must be a decimal number."
+msgstr ""
 
 msgid "Decimal number"
 msgstr "Տասնորդական թիվ"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"'%(value)s'  արժեքը սխալ է։ Այն պետք է լինի  [DD] [HH:[MM:]]ss[.uuuuuu] "
-"ֆորմատի"
 
 msgid "Duration"
 msgstr "Տևողություն"
@@ -537,11 +523,21 @@ msgid "File path"
 msgstr "Ֆայլի ճանապարհ"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
-msgstr "'%(value)s' արժեքը պետք է լինի float"
+msgid "“%(value)s” value must be a float."
+msgstr ""
 
 msgid "Floating point number"
 msgstr "Floating point թիվ"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr ""
+
+msgid "Integer"
+msgstr "Ամբողջ"
+
+msgid "Big (8 byte) integer"
+msgstr "Մեծ (8 բայթ) ամբողջ թիվ"
 
 msgid "IPv4 address"
 msgstr "IPv4 հասցե"
@@ -550,8 +546,8 @@ msgid "IP address"
 msgstr "IP հասցե"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
-msgstr "'%(value)s' արժեքը պետք է լինի None, True կամ False"
+msgid "“%(value)s” value must be either None, True or False."
+msgstr ""
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Տրամաբանական (Either True, False կամ None)"
@@ -574,19 +570,15 @@ msgstr "Տեքստ"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"'%(value)s' արժեքի ֆորմատը սխալ է։ Այն պետք է լինի HH:MM[:ss[.uuuuuu]] "
-"ֆորմատի"
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"'%(value)s'  արժեքը ունի ճիշտ HH:MM[:ss[.uuuuuu]] ֆորմատ, բայց այն սխալ "
-"ժամանակ է"
 
 msgid "Time"
 msgstr "Ժամանակ"
@@ -598,8 +590,11 @@ msgid "Raw binary data"
 msgstr "Երկուական տվյալներ"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
-msgstr "'%(value)s' արժեքը սխալ UUID է"
+msgid "“%(value)s” is not a valid UUID."
+msgstr ""
+
+msgid "Universally unique identifier"
+msgstr ""
 
 msgid "File"
 msgstr "Ֆայլ"
@@ -754,16 +749,14 @@ msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Ընտրեք ճիշտ տարբերակ։ Այս արժեքը չի մտնում ճիշտ արժեքների մեջ"
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value."
+msgid "“%(pk)s” is not a valid value."
 msgstr ""
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
-"%(datetime)s-ը չի կարող ընդունվել %(current_timezone)s ժամային գոտում։ Այն "
-"կարող է լինել ոչ միանշանակ կամ գոյություն չունենալ"
 
 msgid "Clear"
 msgstr "Մաքրել"
@@ -782,6 +775,15 @@ msgstr "Այո"
 
 msgid "No"
 msgstr "Ոչ"
+
+msgid "Year"
+msgstr ""
+
+msgid "Month"
+msgstr ""
+
+msgid "Day"
+msgstr ""
 
 msgid "yes,no,maybe"
 msgstr "այո,ոչ,միգուցե"
@@ -1045,8 +1047,8 @@ msgstr "Սա ճիշտ IPv6 հասցե չէ"
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr ""
 
 msgid "or"
 msgstr "կամ"
@@ -1101,30 +1103,24 @@ msgid "CSRF verification failed. Request aborted."
 msgstr "CSRF ստուգման սխալ․ Հարցումն ընդհատված է"
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Դուք տեսնում եք այս հաղորդագրությունը, քանի որ այս HTTPS կայքը պահանջում է, "
-"որպեսզի ձեր բրաուզերը ուղարկի 'Referer header', բայց այն չի ուղարկվել։ Այս "
-"վերնագիրը անհրաժեշտ է անվտանգության նկատառումներից ելնելով, համոզվելու "
-"համար, որ ձեր բրաուզերը չի գտնվում երրորդ անձանց կառավարման տակ։"
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
 msgstr ""
-"Դուք անջատել եք ձեր բրաուզերի 'Referer' վերնագիրը։ Միացրեք այն այս կայքի,  "
-"HTTPS միացումների կամ 'same-origin' հարցումների համար։"
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
-"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
-"CSRF protection requires the 'Referer' header to do strict referer checking. "
-"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" ...> for links to third-party sites."
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
 msgstr ""
 
 msgid ""
@@ -1139,10 +1135,8 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
-"Դուք անջատել եք cookies֊ների օգտագործումը ձեր բրաուզերից։ Միացրեք այն այս "
-"կայքի կամ 'same-origin' հարցումների համար"
 
 msgid "More information is available with DEBUG=True."
 msgstr "Ավելի մանրամասն տեղեկությունը հասանելի է DEBUG=True֊ի ժամանակ"
@@ -1175,30 +1169,30 @@ msgstr ""
 "allow_future ունի False արժեք"
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
-msgstr "Սխալ ամսաթվի տող '%(datestr)s' '%(format)s' ֆորմատով "
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr ""
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "Հարցմանը համապատասխանող ոչ մի %(verbose_name)s չի գտնվել"
 
-msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "Եջը չի պարունակում 'last' և չի կարող վերափոխվել int֊ի"
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr ""
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "Սխալ էջ (%(page_number)s): %(message)s"
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr "Դատարկ ցուցակ և '%(class_name)s.allow_empty'֊ն ունի False արժեք"
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr ""
 
 msgid "Directory indexes are not allowed here."
 msgstr "Կատալոգների ինդեքսավորումը թույլատրված չէ այստեղ"
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" գոյություն չունի"
+msgid "“%(path)s” does not exist"
+msgstr ""
 
 #, python-format
 msgid "Index of %(directory)s"
@@ -1227,7 +1221,7 @@ msgstr ""
 msgid "Django Documentation"
 msgstr ""
 
-msgid "Topics, references, &amp; how-to's"
+msgid "Topics, references, &amp; how-to’s"
 msgstr ""
 
 msgid "Tutorial: A Polling App"

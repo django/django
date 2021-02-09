@@ -17,7 +17,9 @@ from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import resolve_url
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.utils.http import is_safe_url, urlsafe_base64_decode
+from django.utils.http import (
+    url_has_allowed_host_and_scheme, urlsafe_base64_decode,
+)
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
@@ -41,6 +43,7 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
     """
     form_class = AuthenticationForm
     authentication_form = None
+    next_page = None
     redirect_field_name = REDIRECT_FIELD_NAME
     template_name = 'registration/login.html'
     redirect_authenticated_user = False
@@ -61,8 +64,7 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        url = self.get_redirect_url()
-        return url or resolve_url(settings.LOGIN_REDIRECT_URL)
+        return self.get_redirect_url() or self.get_default_redirect_url()
 
     def get_redirect_url(self):
         """Return the user-originating redirect URL if it's safe."""
@@ -70,12 +72,16 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
             self.redirect_field_name,
             self.request.GET.get(self.redirect_field_name, '')
         )
-        url_is_safe = is_safe_url(
+        url_is_safe = url_has_allowed_host_and_scheme(
             url=redirect_to,
             allowed_hosts=self.get_success_url_allowed_hosts(),
             require_https=self.request.is_secure(),
         )
         return redirect_to if url_is_safe else ''
+
+    def get_default_redirect_url(self):
+        """Return the default redirect URL."""
+        return resolve_url(self.next_page or settings.LOGIN_REDIRECT_URL)
 
     def get_form_class(self):
         return self.authentication_form or self.form_class
@@ -138,7 +144,7 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
                 self.redirect_field_name,
                 self.request.GET.get(self.redirect_field_name)
             )
-            url_is_safe = is_safe_url(
+            url_is_safe = url_has_allowed_host_and_scheme(
                 url=next_page,
                 allowed_hosts=self.get_success_url_allowed_hosts(),
                 require_https=self.request.is_secure(),
@@ -234,7 +240,6 @@ class PasswordResetView(PasswordContextMixin, FormView):
         return super().form_valid(form)
 
 
-INTERNAL_RESET_URL_TOKEN = 'set-password'
 INTERNAL_RESET_SESSION_TOKEN = '_password_reset_token'
 
 
@@ -247,6 +252,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
     form_class = SetPasswordForm
     post_reset_login = False
     post_reset_login_backend = None
+    reset_url_token = 'set-password'
     success_url = reverse_lazy('password_reset_complete')
     template_name = 'registration/password_reset_confirm.html'
     title = _('Enter new password')
@@ -262,7 +268,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
 
         if self.user is not None:
             token = kwargs['token']
-            if token == INTERNAL_RESET_URL_TOKEN:
+            if token == self.reset_url_token:
                 session_token = self.request.session.get(INTERNAL_RESET_SESSION_TOKEN)
                 if self.token_generator.check_token(self.user, session_token):
                     # If the token is valid, display the password reset form.
@@ -275,7 +281,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
                     # avoids the possibility of leaking the token in the
                     # HTTP Referer header.
                     self.request.session[INTERNAL_RESET_SESSION_TOKEN] = token
-                    redirect_url = self.request.path.replace(token, INTERNAL_RESET_URL_TOKEN)
+                    redirect_url = self.request.path.replace(token, self.reset_url_token)
                     return HttpResponseRedirect(redirect_url)
 
         # Display the "Password reset unsuccessful" page.

@@ -5,10 +5,9 @@ from unittest import mock, skipUnless
 
 from django import forms
 from django.core.exceptions import (
-    NON_FIELD_ERRORS, FieldError, ImproperlyConfigured,
+    NON_FIELD_ERRORS, FieldError, ImproperlyConfigured, ValidationError,
 )
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.validators import ValidationError
 from django.db import connection, models
 from django.db.models.query import EmptyQuerySet
 from django.forms.models import (
@@ -17,6 +16,7 @@ from django.forms.models import (
 )
 from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test.utils import isolate_apps
 
 from .models import (
     Article, ArticleStatus, Author, Author1, Award, BetterWriter, BigInt, Book,
@@ -31,7 +31,7 @@ from .models import (
 )
 
 if test_images:
-    from .models import ImageFile, OptionalImageFile, NoExtensionImageFile
+    from .models import ImageFile, NoExtensionImageFile, OptionalImageFile
 
     class ImageFileForm(forms.ModelForm):
         class Meta:
@@ -259,6 +259,37 @@ class ModelFormBaseTest(TestCase):
         award = form.save()
         self.assertIsNone(award.character)
 
+    def test_blank_foreign_key_with_radio(self):
+        class BookForm(forms.ModelForm):
+            class Meta:
+                model = Book
+                fields = ['author']
+                widgets = {'author': forms.RadioSelect()}
+
+        writer = Writer.objects.create(name='Joe Doe')
+        form = BookForm()
+        self.assertEqual(list(form.fields['author'].choices), [
+            ('', '---------'),
+            (writer.pk, 'Joe Doe'),
+        ])
+
+    def test_non_blank_foreign_key_with_radio(self):
+        class AwardForm(forms.ModelForm):
+            class Meta:
+                model = Award
+                fields = ['character']
+                widgets = {'character': forms.RadioSelect()}
+
+        character = Character.objects.create(
+            username='user',
+            last_action=datetime.datetime.today(),
+        )
+        form = AwardForm()
+        self.assertEqual(
+            list(form.fields['character'].choices),
+            [(character.pk, 'user')],
+        )
+
     def test_save_blank_false_with_required_false(self):
         """
         A ModelForm with a model with a field set to blank=False and the form
@@ -271,19 +302,30 @@ class ModelFormBaseTest(TestCase):
         self.assertEqual(obj.name, '')
 
     def test_save_blank_null_unique_charfield_saves_null(self):
-        form_class = modelform_factory(model=NullableUniqueCharFieldModel, fields=['codename'])
+        form_class = modelform_factory(model=NullableUniqueCharFieldModel, fields='__all__')
         empty_value = '' if connection.features.interprets_empty_strings_as_nulls else None
-
-        form = form_class(data={'codename': ''})
+        data = {
+            'codename': '',
+            'email': '',
+            'slug': '',
+            'url': '',
+        }
+        form = form_class(data=data)
         self.assertTrue(form.is_valid())
         form.save()
         self.assertEqual(form.instance.codename, empty_value)
+        self.assertEqual(form.instance.email, empty_value)
+        self.assertEqual(form.instance.slug, empty_value)
+        self.assertEqual(form.instance.url, empty_value)
 
         # Save a second form to verify there isn't a unique constraint violation.
-        form = form_class(data={'codename': ''})
+        form = form_class(data=data)
         self.assertTrue(form.is_valid())
         form.save()
         self.assertEqual(form.instance.codename, empty_value)
+        self.assertEqual(form.instance.email, empty_value)
+        self.assertEqual(form.instance.slug, empty_value)
+        self.assertEqual(form.instance.url, empty_value)
 
     def test_missing_fields_attribute(self):
         message = (
@@ -585,6 +627,32 @@ class ModelFormBaseTest(TestCase):
         m2 = mf2.save(commit=False)
         self.assertEqual(m2.mode, '')
 
+    def test_default_not_populated_on_non_empty_value_in_cleaned_data(self):
+        class PubForm(forms.ModelForm):
+            mode = forms.CharField(max_length=255, required=False)
+            mocked_mode = None
+
+            def clean(self):
+                self.cleaned_data['mode'] = self.mocked_mode
+                return self.cleaned_data
+
+            class Meta:
+                model = PublicationDefaults
+                fields = ('mode',)
+
+        pub_form = PubForm({})
+        pub_form.mocked_mode = 'de'
+        pub = pub_form.save(commit=False)
+        self.assertEqual(pub.mode, 'de')
+        # Default should be populated on an empty value in cleaned_data.
+        default_mode = 'di'
+        for empty_value in pub_form.fields['mode'].empty_values:
+            with self.subTest(empty_value=empty_value):
+                pub_form = PubForm({})
+                pub_form.mocked_mode = empty_value
+                pub = pub_form.save(commit=False)
+                self.assertEqual(pub.mode, default_mode)
+
     def test_default_not_populated_on_optional_checkbox_input(self):
         class PubForm(forms.ModelForm):
             class Meta:
@@ -817,15 +885,15 @@ class IncompleteCategoryFormWithExclude(forms.ModelForm):
 class ValidationTest(SimpleTestCase):
     def test_validates_with_replaced_field_not_specified(self):
         form = IncompleteCategoryFormWithFields(data={'name': 'some name', 'slug': 'some-slug'})
-        assert form.is_valid()
+        self.assertIs(form.is_valid(), True)
 
     def test_validates_with_replaced_field_excluded(self):
         form = IncompleteCategoryFormWithExclude(data={'name': 'some name', 'slug': 'some-slug'})
-        assert form.is_valid()
+        self.assertIs(form.is_valid(), True)
 
     def test_notrequired_overrides_notblank(self):
         form = CustomWriterForm({})
-        assert form.is_valid()
+        self.assertIs(form.is_valid(), True)
 
 
 class UniqueTest(TestCase):
@@ -1197,7 +1265,7 @@ class ModelFormBasicTests(TestCase):
 <li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
 <li>Categories: <select multiple name="categories">
 <option value="%s" selected>Entertainment</option>
-<option value="%s" selected>It&#39;s a test</option>
+<option value="%s" selected>It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select></li>
 <li>Status: <select name="status">
@@ -1239,7 +1307,7 @@ class ModelFormBasicTests(TestCase):
 <li>Article: <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
 <li>Categories: <select multiple name="categories">
 <option value="%s">Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select></li>
 <li>Status: <select name="status">
@@ -1290,7 +1358,7 @@ class ModelFormBasicTests(TestCase):
 <li><label for="id_categories">Categories:</label>
 <select multiple name="categories" id="id_categories">
 <option value="%d" selected>Entertainment</option>
-<option value="%d" selected>It&39;s a test</option>
+<option value="%d" selected>It&#x27;s a test</option>
 <option value="%d">Third test</option>
 </select></li>"""
             % (self.c1.pk, self.c2.pk, self.c3.pk))
@@ -1332,7 +1400,7 @@ class ModelFormBasicTests(TestCase):
         self.assertEqual(f.errors['name'], ['This field is required.'])
         self.assertEqual(
             f.errors['slug'],
-            ["Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."]
+            ['Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.']
         )
         self.assertEqual(f.cleaned_data, {'url': 'foo'})
         msg = "The Category could not be created because the data didn't validate."
@@ -1361,7 +1429,7 @@ class ModelFormBasicTests(TestCase):
 <tr><th>Article:</th><td><textarea rows="10" cols="40" name="article" required></textarea></td></tr>
 <tr><th>Categories:</th><td><select multiple name="categories">
 <option value="%s">Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select></td></tr>
 <tr><th>Status:</th><td><select name="status">
@@ -1376,7 +1444,7 @@ class ModelFormBasicTests(TestCase):
             article="Hello.", headline="New headline", slug="new-headline",
             pub_date=datetime.date(1988, 1, 4), writer=self.w_royko)
         new_art.categories.add(Category.objects.get(name='Entertainment'))
-        self.assertQuerysetEqual(new_art.categories.all(), ["Entertainment"])
+        self.assertSequenceEqual(new_art.categories.all(), [self.c1])
         f = ArticleForm(auto_id=False, instance=new_art)
         self.assertHTMLEqual(
             f.as_ul(),
@@ -1391,7 +1459,7 @@ class ModelFormBasicTests(TestCase):
 <li>Article: <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
 <li>Categories: <select multiple name="categories">
 <option value="%s" selected>Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select></li>
 <li>Status: <select name="status">
@@ -1460,7 +1528,7 @@ class ModelFormBasicTests(TestCase):
         new_art = f.save()
         new_art = Article.objects.get(id=new_art.id)
         art_id_1 = new_art.id
-        self.assertQuerysetEqual(new_art.categories.order_by('name'), ["Entertainment", "It's a test"])
+        self.assertSequenceEqual(new_art.categories.order_by('name'), [self.c1, self.c2])
 
         # Now, submit form data with no categories. This deletes the existing categories.
         form_data['categories'] = []
@@ -1468,7 +1536,7 @@ class ModelFormBasicTests(TestCase):
         new_art = f.save()
         self.assertEqual(new_art.id, art_id_1)
         new_art = Article.objects.get(id=art_id_1)
-        self.assertQuerysetEqual(new_art.categories.all(), [])
+        self.assertSequenceEqual(new_art.categories.all(), [])
 
         # Create a new article, with no categories, via the form.
         f = ArticleForm(form_data)
@@ -1476,7 +1544,7 @@ class ModelFormBasicTests(TestCase):
         art_id_2 = new_art.id
         self.assertNotIn(art_id_2, (None, art_id_1))
         new_art = Article.objects.get(id=art_id_2)
-        self.assertQuerysetEqual(new_art.categories.all(), [])
+        self.assertSequenceEqual(new_art.categories.all(), [])
 
         # Create a new article, with categories, via the form, but use commit=False.
         # The m2m data won't be saved until save_m2m() is invoked on the form.
@@ -1491,11 +1559,11 @@ class ModelFormBasicTests(TestCase):
 
         # The instance doesn't have m2m data yet
         new_art = Article.objects.get(id=art_id_3)
-        self.assertQuerysetEqual(new_art.categories.all(), [])
+        self.assertSequenceEqual(new_art.categories.all(), [])
 
         # Save the m2m data on the form
         f.save_m2m()
-        self.assertQuerysetEqual(new_art.categories.order_by('name'), ["Entertainment", "It's a test"])
+        self.assertSequenceEqual(new_art.categories.order_by('name'), [self.c1, self.c2])
 
     def test_custom_form_fields(self):
         # Here, we define a custom ModelForm. Because it happens to have the same fields as
@@ -1535,7 +1603,7 @@ class ModelFormBasicTests(TestCase):
 <li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
 <li>Categories: <select multiple name="categories">
 <option value="%s">Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select> </li>
 <li>Status: <select name="status">
@@ -1561,7 +1629,7 @@ class ModelFormBasicTests(TestCase):
 <li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
 <li>Categories: <select multiple name="categories">
 <option value="%s">Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 <option value="%s">Fourth</option>
 </select></li>
@@ -1588,6 +1656,52 @@ class ModelFormBasicTests(TestCase):
         obj.name = 'Alice'
         obj.full_clean()
 
+    def test_validate_foreign_key_uses_default_manager(self):
+        class MyForm(forms.ModelForm):
+            class Meta:
+                model = Article
+                fields = '__all__'
+
+        # Archived writers are filtered out by the default manager.
+        w = Writer.objects.create(name='Randy', archived=True)
+        data = {
+            'headline': 'My Article',
+            'slug': 'my-article',
+            'pub_date': datetime.date.today(),
+            'writer': w.pk,
+            'article': 'lorem ipsum',
+        }
+        form = MyForm(data)
+        self.assertIs(form.is_valid(), False)
+        self.assertEqual(
+            form.errors,
+            {'writer': ['Select a valid choice. That choice is not one of the available choices.']},
+        )
+
+    def test_validate_foreign_key_to_model_with_overridden_manager(self):
+        class MyForm(forms.ModelForm):
+            class Meta:
+                model = Article
+                fields = '__all__'
+
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                # Allow archived authors.
+                self.fields['writer'].queryset = Writer._base_manager.all()
+
+        w = Writer.objects.create(name='Randy', archived=True)
+        data = {
+            'headline': 'My Article',
+            'slug': 'my-article',
+            'pub_date': datetime.date.today(),
+            'writer': w.pk,
+            'article': 'lorem ipsum',
+        }
+        form = MyForm(data)
+        self.assertIs(form.is_valid(), True)
+        article = form.save()
+        self.assertEqual(article.writer, w)
+
 
 class ModelMultipleChoiceFieldTests(TestCase):
     @classmethod
@@ -1606,20 +1720,20 @@ class ModelMultipleChoiceFieldTests(TestCase):
             f.clean(None)
         with self.assertRaises(ValidationError):
             f.clean([])
-        self.assertQuerysetEqual(f.clean([self.c1.id]), ["Entertainment"])
-        self.assertQuerysetEqual(f.clean([self.c2.id]), ["It's a test"])
-        self.assertQuerysetEqual(f.clean([str(self.c1.id)]), ["Entertainment"])
-        self.assertQuerysetEqual(
+        self.assertCountEqual(f.clean([self.c1.id]), [self.c1])
+        self.assertCountEqual(f.clean([self.c2.id]), [self.c2])
+        self.assertCountEqual(f.clean([str(self.c1.id)]), [self.c1])
+        self.assertCountEqual(
             f.clean([str(self.c1.id), str(self.c2.id)]),
-            ["Entertainment", "It's a test"], ordered=False
+            [self.c1, self.c2],
         )
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             f.clean([self.c1.id, str(self.c2.id)]),
-            ["Entertainment", "It's a test"], ordered=False
+            [self.c1, self.c2],
         )
-        self.assertQuerysetEqual(
+        self.assertCountEqual(
             f.clean((self.c1.id, str(self.c2.id))),
-            ["Entertainment", "It's a test"], ordered=False
+            [self.c1, self.c2],
         )
         with self.assertRaises(ValidationError):
             f.clean(['100'])
@@ -1641,7 +1755,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
         # this may create categories with primary keys up to 6. Use
         # a number that will not conflict.
         c6 = Category.objects.create(id=1006, name='Sixth', url='6th')
-        self.assertQuerysetEqual(f.clean([c6.id]), ["Sixth"])
+        self.assertCountEqual(f.clean([c6.id]), [c6])
 
         # Delete a Category object *after* the ModelMultipleChoiceField has already been
         # instantiated. This proves clean() checks the database during clean() rather
@@ -1666,7 +1780,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
         self.assertEqual(list(f.choices), [
             (self.c1.pk, 'Entertainment'),
             (self.c2.pk, "It's a test")])
-        self.assertQuerysetEqual(f.clean([self.c2.id]), ["It's a test"])
+        self.assertSequenceEqual(f.clean([self.c2.id]), [self.c2])
         with self.assertRaises(ValidationError):
             f.clean([self.c3.id])
         with self.assertRaises(ValidationError):
@@ -1761,11 +1875,11 @@ class ModelMultipleChoiceFieldTests(TestCase):
             self.assertTrue(form.has_changed())
 
     def test_clean_does_deduplicate_values(self):
-        class WriterForm(forms.Form):
-            persons = forms.ModelMultipleChoiceField(queryset=Writer.objects.all())
+        class PersonForm(forms.Form):
+            persons = forms.ModelMultipleChoiceField(queryset=Person.objects.all())
 
-        person1 = Writer.objects.create(name="Person 1")
-        form = WriterForm(data={})
+        person1 = Person.objects.create(name='Person 1')
+        form = PersonForm(data={})
         queryset = form.fields['persons'].clean([str(person1.pk)] * 50)
         sql, params = queryset.query.sql_with_params()
         self.assertEqual(len(params), 1)
@@ -1814,6 +1928,10 @@ class ModelOneToOneFieldTests(TestCase):
 
         bw = BetterWriter.objects.create(name='Joe Better', score=10)
         self.assertEqual(sorted(model_to_dict(bw)), ['id', 'name', 'score', 'writer_ptr'])
+        self.assertEqual(sorted(model_to_dict(bw, fields=[])), [])
+        self.assertEqual(sorted(model_to_dict(bw, fields=['id', 'name'])), ['id', 'name'])
+        self.assertEqual(sorted(model_to_dict(bw, exclude=[])), ['id', 'name', 'score', 'writer_ptr'])
+        self.assertEqual(sorted(model_to_dict(bw, exclude=['id', 'name'])), ['score', 'writer_ptr'])
 
         form = BetterWriterForm({'name': 'Some Name', 'score': 12})
         self.assertTrue(form.is_valid())
@@ -2356,7 +2474,7 @@ class OtherModelFormTests(TestCase):
         self.assertHTMLEqual(
             str(f.media),
             '''<link href="/some/form/css" type="text/css" media="all" rel="stylesheet">
-<script type="text/javascript" src="/some/form/javascript"></script>'''
+<script src="/some/form/javascript"></script>'''
         )
 
     def test_choices_type(self):
@@ -2394,7 +2512,7 @@ class OtherModelFormTests(TestCase):
 
     def test_foreignkeys_which_use_to_field(self):
         apple = Inventory.objects.create(barcode=86, name='Apple')
-        Inventory.objects.create(barcode=22, name='Pear')
+        pear = Inventory.objects.create(barcode=22, name='Pear')
         core = Inventory.objects.create(barcode=87, name='Core', parent=apple)
 
         field = forms.ModelChoiceField(Inventory.objects.all(), to_field_name='barcode')
@@ -2437,12 +2555,12 @@ class OtherModelFormTests(TestCase):
 
         field = forms.ModelMultipleChoiceField(Inventory.objects.all(), to_field_name='barcode')
         self.assertEqual(tuple(field.choices), ((86, 'Apple'), (87, 'Core'), (22, 'Pear')))
-        self.assertQuerysetEqual(field.clean([86]), ['Apple'])
+        self.assertSequenceEqual(field.clean([86]), [apple])
 
         form = SelectInventoryForm({'items': [87, 22]})
         self.assertTrue(form.is_valid())
         self.assertEqual(len(form.cleaned_data), 1)
-        self.assertQuerysetEqual(form.cleaned_data['items'], ['Core', 'Pear'])
+        self.assertSequenceEqual(form.cleaned_data['items'], [core, pear])
 
     def test_model_field_that_returns_none_to_exclude_itself_with_explicit_fields(self):
         self.assertEqual(list(CustomFieldForExclusionForm.base_fields), ['name'])
@@ -2558,7 +2676,7 @@ class CustomCleanTests(TestCase):
 
             def clean(self):
                 if not self.cleaned_data['left'] == self.cleaned_data['right']:
-                    raise forms.ValidationError('Left and right should be equal')
+                    raise ValidationError('Left and right should be equal')
                 return self.cleaned_data
 
         form = TripleFormWithCleanOverride({'left': 1, 'middle': 2, 'right': 1})
@@ -2711,6 +2829,72 @@ class LimitChoicesToTests(TestCase):
             self.assertEqual(today_callable_dict.call_count, 2)
             StumpJokeForm()
             self.assertEqual(today_callable_dict.call_count, 3)
+
+    @isolate_apps('model_forms')
+    def test_limit_choices_to_no_duplicates(self):
+        joke1 = StumpJoke.objects.create(
+            funny=True,
+            most_recently_fooled=self.threepwood,
+        )
+        joke2 = StumpJoke.objects.create(
+            funny=True,
+            most_recently_fooled=self.threepwood,
+        )
+        joke3 = StumpJoke.objects.create(
+            funny=True,
+            most_recently_fooled=self.marley,
+        )
+        StumpJoke.objects.create(funny=False, most_recently_fooled=self.marley)
+        joke1.has_fooled_today.add(self.marley, self.threepwood)
+        joke2.has_fooled_today.add(self.marley)
+        joke3.has_fooled_today.add(self.marley, self.threepwood)
+
+        class CharacterDetails(models.Model):
+            character1 = models.ForeignKey(
+                Character,
+                models.CASCADE,
+                limit_choices_to=models.Q(
+                    jokes__funny=True,
+                    jokes_today__funny=True,
+                ),
+                related_name='details_fk_1',
+            )
+            character2 = models.ForeignKey(
+                Character,
+                models.CASCADE,
+                limit_choices_to={
+                    'jokes__funny': True,
+                    'jokes_today__funny': True,
+                },
+                related_name='details_fk_2',
+            )
+            character3 = models.ManyToManyField(
+                Character,
+                limit_choices_to=models.Q(
+                    jokes__funny=True,
+                    jokes_today__funny=True,
+                ),
+                related_name='details_m2m_1',
+            )
+
+        class CharacterDetailsForm(forms.ModelForm):
+            class Meta:
+                model = CharacterDetails
+                fields = '__all__'
+
+        form = CharacterDetailsForm()
+        self.assertCountEqual(
+            form.fields['character1'].queryset,
+            [self.marley, self.threepwood],
+        )
+        self.assertCountEqual(
+            form.fields['character2'].queryset,
+            [self.marley, self.threepwood],
+        )
+        self.assertCountEqual(
+            form.fields['character3'].queryset,
+            [self.marley, self.threepwood],
+        )
 
 
 class FormFieldCallbackTests(SimpleTestCase):

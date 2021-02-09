@@ -64,7 +64,7 @@ class Aggregate(Func):
             return '%s__%s' % (expressions[0].name, self.name.lower())
         raise TypeError("Complex expressions require an alias")
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         return []
 
     def as_sql(self, compiler, connection, **extra_context):
@@ -99,6 +99,7 @@ class Aggregate(Func):
 class Avg(FixDurationInputMixin, NumericOutputFieldMixin, Aggregate):
     function = 'AVG'
     name = 'Avg'
+    allow_distinct = True
 
 
 class Count(Aggregate):
@@ -142,6 +143,7 @@ class StdDev(NumericOutputFieldMixin, Aggregate):
 class Sum(FixDurationInputMixin, Aggregate):
     function = 'SUM'
     name = 'Sum'
+    allow_distinct = True
 
 
 class Variance(NumericOutputFieldMixin, Aggregate):

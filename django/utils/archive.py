@@ -27,6 +27,8 @@ import stat
 import tarfile
 import zipfile
 
+from django.core.exceptions import SuspiciousOperation
+
 
 class ArchiveException(Exception):
     """
@@ -40,7 +42,7 @@ class UnrecognizedArchiveFormat(ArchiveException):
     """
 
 
-def extract(path, to_path=''):
+def extract(path, to_path):
     """
     Unpack the tar or zip file at the specified path to the directory
     specified by to_path.
@@ -83,7 +85,7 @@ class Archive:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def extract(self, to_path=''):
+    def extract(self, to_path):
         self._archive.extract(to_path)
 
     def list(self):
@@ -133,6 +135,13 @@ class BaseArchive:
                 return False
         return True
 
+    def target_filename(self, to_path, name):
+        target_path = os.path.abspath(to_path)
+        filename = os.path.abspath(os.path.join(target_path, name))
+        if not filename.startswith(target_path):
+            raise SuspiciousOperation("Archive contains invalid path: '%s'" % name)
+        return filename
+
     def extract(self):
         raise NotImplementedError('subclasses of BaseArchive must provide an extract() method')
 
@@ -155,10 +164,10 @@ class TarArchive(BaseArchive):
             name = member.name
             if leading:
                 name = self.split_leading_dir(name)[1]
-            filename = os.path.join(to_path, name)
+            filename = self.target_filename(to_path, name)
             if member.isdir():
-                if filename and not os.path.exists(filename):
-                    os.makedirs(filename)
+                if filename:
+                    os.makedirs(filename, exist_ok=True)
             else:
                 try:
                     extracted = self._archive.extractfile(member)
@@ -169,8 +178,8 @@ class TarArchive(BaseArchive):
                           (name, member.name, exc))
                 else:
                     dirname = os.path.dirname(filename)
-                    if dirname and not os.path.exists(dirname):
-                        os.makedirs(dirname)
+                    if dirname:
+                        os.makedirs(dirname, exist_ok=True)
                     with open(filename, 'wb') as outfile:
                         shutil.copyfileobj(extracted, outfile)
                         self._copy_permissions(member.mode, filename)
@@ -198,15 +207,16 @@ class ZipArchive(BaseArchive):
             info = self._archive.getinfo(name)
             if leading:
                 name = self.split_leading_dir(name)[1]
-            filename = os.path.join(to_path, name)
-            dirname = os.path.dirname(filename)
-            if dirname and not os.path.exists(dirname):
-                os.makedirs(dirname)
-            if filename.endswith(('/', '\\')):
+            if not name:
+                continue
+            filename = self.target_filename(to_path, name)
+            if name.endswith(('/', '\\')):
                 # A directory
-                if not os.path.exists(filename):
-                    os.makedirs(filename)
+                os.makedirs(filename, exist_ok=True)
             else:
+                dirname = os.path.dirname(filename)
+                if dirname:
+                    os.makedirs(dirname, exist_ok=True)
                 with open(filename, 'wb') as outfile:
                     outfile.write(data)
                 # Convert ZipInfo.external_attr to mode
@@ -217,11 +227,11 @@ class ZipArchive(BaseArchive):
         self._archive.close()
 
 
-extension_map = {
-    '.tar': TarArchive,
-    '.tar.bz2': TarArchive,
-    '.tar.gz': TarArchive,
-    '.tgz': TarArchive,
-    '.tz2': TarArchive,
-    '.zip': ZipArchive,
-}
+extension_map = dict.fromkeys((
+    '.tar',
+    '.tar.bz2', '.tbz2', '.tbz', '.tz2',
+    '.tar.gz', '.tgz', '.taz',
+    '.tar.lzma', '.tlz',
+    '.tar.xz', '.txz',
+), TarArchive)
+extension_map['.zip'] = ZipArchive

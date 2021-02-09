@@ -18,10 +18,9 @@ from django.db import models
 
 # Use the C (faster) implementation if possible
 try:
-    from yaml import CSafeLoader as SafeLoader
-    from yaml import CSafeDumper as SafeDumper
+    from yaml import CSafeDumper as SafeDumper, CSafeLoader as SafeLoader
 except ImportError:
-    from yaml import SafeLoader, SafeDumper
+    from yaml import SafeDumper, SafeLoader
 
 
 class DjangoSafeDumper(SafeDumper):
@@ -34,6 +33,9 @@ class DjangoSafeDumper(SafeDumper):
 
 DjangoSafeDumper.add_representer(decimal.Decimal, DjangoSafeDumper.represent_decimal)
 DjangoSafeDumper.add_representer(collections.OrderedDict, DjangoSafeDumper.represent_ordered_dict)
+# Workaround to represent dictionaries in insertion order.
+# See https://github.com/yaml/pyyaml/pull/143.
+DjangoSafeDumper.add_representer(dict, DjangoSafeDumper.represent_ordered_dict)
 
 
 class Serializer(PythonSerializer):
@@ -54,6 +56,7 @@ class Serializer(PythonSerializer):
             super().handle_field(obj, field)
 
     def end_serialization(self):
+        self.options.setdefault('allow_unicode', True)
         yaml.dump(self.objects, self.stream, Dumper=DjangoSafeDumper, **self.options)
 
     def getvalue(self):

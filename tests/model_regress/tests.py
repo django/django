@@ -1,10 +1,12 @@
+import copy
 import datetime
 from operator import attrgetter
 
 from django.core.exceptions import ValidationError
-from django.db import router
+from django.db import models, router
 from django.db.models.sql import InsertQuery
 from django.test import TestCase, skipUnlessDBFeature
+from django.test.utils import isolate_apps
 from django.utils.timezone import get_fixed_timezone
 
 from .models import (
@@ -217,6 +219,23 @@ class ModelTests(TestCase):
         m3 = Model3.objects.get(model2=1000)
         m3.model2
 
+    @isolate_apps('model_regress')
+    def test_metaclass_can_access_attribute_dict(self):
+        """
+        Model metaclasses have access to the class attribute dict in
+        __init__() (#30254).
+        """
+        class HorseBase(models.base.ModelBase):
+            def __init__(cls, name, bases, attrs):
+                super().__init__(name, bases, attrs)
+                cls.horns = (1 if 'magic' in attrs else 0)
+
+        class Horse(models.Model, metaclass=HorseBase):
+            name = models.CharField(max_length=255)
+            magic = True
+
+        self.assertEqual(Horse.horns, 1)
+
 
 class ModelValidationTest(TestCase):
     def test_pk_validation(self):
@@ -238,3 +257,17 @@ class EvaluateMethodTest(TestCase):
         dept = Department.objects.create(pk=1, name='abc')
         dept.evaluate = 'abc'
         Worker.objects.filter(department=dept)
+
+
+class ModelFieldsCacheTest(TestCase):
+    def test_fields_cache_reset_on_copy(self):
+        department1 = Department.objects.create(id=1, name='department1')
+        department2 = Department.objects.create(id=2, name='department2')
+        worker1 = Worker.objects.create(name='worker', department=department1)
+        worker2 = copy.copy(worker1)
+
+        self.assertEqual(worker2.department, department1)
+        # Changing related fields doesn't mutate the base object.
+        worker2.department = department2
+        self.assertEqual(worker2.department, department2)
+        self.assertEqual(worker1.department, department1)

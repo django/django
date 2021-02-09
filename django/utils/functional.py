@@ -3,17 +3,6 @@ import itertools
 import operator
 from functools import total_ordering, wraps
 
-from django.utils.version import PY36, get_docs_version
-
-
-# You can't trivially replace this with `functools.partial` because this binds
-# to classes and returns bound instances, whereas functools.partial (on
-# CPython) is a type and its instances don't bind.
-def curry(_curried_func, *args, **kwargs):
-    def _curried(*moreargs, **morekwargs):
-        return _curried_func(*args, *moreargs, **{**kwargs, **morekwargs})
-    return _curried
-
 
 class cached_property:
     """
@@ -22,8 +11,8 @@ class cached_property:
 
     A cached property can be made out of an existing method:
     (e.g. ``url = cached_property(get_absolute_url)``).
-    On Python < 3.6, the optional ``name`` argument must be provided, e.g.
-    ``url = cached_property(get_absolute_url, name='url')``.
+    The optional ``name`` argument is obsolete as of Python 3.6 and will be
+    deprecated in Django 4.0 (#30127).
     """
     name = None
 
@@ -34,29 +23,8 @@ class cached_property:
             '__set_name__() on it.'
         )
 
-    @staticmethod
-    def _is_mangled(name):
-        return name.startswith('__') and not name.endswith('__')
-
     def __init__(self, func, name=None):
-        if PY36:
-            self.real_func = func
-        else:
-            func_name = func.__name__
-            name = name or func_name
-            if not (isinstance(name, str) and name.isidentifier()):
-                raise ValueError(
-                    "%r can't be used as the name of a cached_property." % name,
-                )
-            if self._is_mangled(name):
-                raise ValueError(
-                    'cached_property does not work with mangled methods on '
-                    'Python < 3.6 without the appropriate `name` argument. See '
-                    'https://docs.djangoproject.com/en/%s/ref/utils/'
-                    '#cached-property-mangled-name' % get_docs_version(),
-                )
-            self.name = name
-            self.func = func
+        self.real_func = func
         self.__doc__ = getattr(func, '__doc__')
 
     def __set_name__(self, owner, name):
@@ -79,6 +47,22 @@ class cached_property:
             return self
         res = instance.__dict__[self.name] = self.func(instance)
         return res
+
+
+class classproperty:
+    """
+    Decorator that converts a method with a single cls argument into a property
+    that can be accessed directly from the class.
+    """
+    def __init__(self, method=None):
+        self.fget = method
+
+    def __get__(self, instance, cls=None):
+        return self.fget(cls)
+
+    def getter(self, method):
+        self.fget = method
+        return self
 
 
 class Promise:
@@ -111,7 +95,7 @@ def lazy(func, *resultclasses):
             self.__kw = kw
             if not self.__prepared:
                 self.__prepare_class__()
-            self.__prepared = True
+            self.__class__.__prepared = True
 
         def __reduce__(self):
             return (
@@ -191,6 +175,12 @@ def lazy(func, *resultclasses):
             if self._delegate_text:
                 return str(self) % rhs
             return self.__cast() % rhs
+
+        def __add__(self, other):
+            return self.__cast() + other
+
+        def __radd__(self, other):
+            return other + self.__cast()
 
         def __deepcopy__(self, memo):
             # Instances of this class are effectively immutable. It's just a

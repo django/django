@@ -1,15 +1,11 @@
-import base64
 import logging
 import string
 from datetime import datetime, timedelta
 
 from django.conf import settings
-from django.contrib.sessions.exceptions import SuspiciousSession
-from django.core.exceptions import SuspiciousOperation
+from django.core import signing
 from django.utils import timezone
-from django.utils.crypto import (
-    constant_time_compare, get_random_string, salted_hmac,
-)
+from django.utils.crypto import get_random_string
 from django.utils.module_loading import import_string
 
 # session_key should not be case sensitive because some backends can store it
@@ -61,6 +57,10 @@ class SessionBase:
         del self._session[key]
         self.modified = True
 
+    @property
+    def key_salt(self):
+        return 'django.contrib.sessions.' + self.__class__.__qualname__
+
     def get(self, key, default=None):
         return self._session.get(key, default)
 
@@ -86,33 +86,24 @@ class SessionBase:
     def delete_test_cookie(self):
         del self[self.TEST_COOKIE_NAME]
 
-    def _hash(self, value):
-        key_salt = "django.contrib.sessions" + self.__class__.__name__
-        return salted_hmac(key_salt, value).hexdigest()
-
     def encode(self, session_dict):
         "Return the given session dictionary serialized and encoded as a string."
-        serialized = self.serializer().dumps(session_dict)
-        hash = self._hash(serialized)
-        return base64.b64encode(hash.encode() + b":" + serialized).decode('ascii')
+        return signing.dumps(
+            session_dict, salt=self.key_salt, serializer=self.serializer,
+            compress=True,
+        )
 
     def decode(self, session_data):
-        encoded_data = base64.b64decode(session_data.encode('ascii'))
         try:
-            # could produce ValueError if there is no ':'
-            hash, serialized = encoded_data.split(b':', 1)
-            expected_hash = self._hash(serialized)
-            if not constant_time_compare(hash.decode(), expected_hash):
-                raise SuspiciousSession("Session data corrupted")
-            else:
-                return self.serializer().loads(serialized)
-        except Exception as e:
-            # ValueError, SuspiciousOperation, unpickling exceptions. If any of
-            # these happen, just return an empty dictionary (an empty session).
-            if isinstance(e, SuspiciousOperation):
-                logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
-                logger.warning(str(e))
-            return {}
+            return signing.loads(session_data, salt=self.key_salt, serializer=self.serializer)
+        except signing.BadSignature:
+            logger = logging.getLogger('django.security.SuspiciousSession')
+            logger.warning('Session data corrupted')
+        except Exception:
+            # ValueError, unpickling exceptions. If any of these happen, just
+            # return an empty dictionary (an empty session).
+            pass
+        return {}
 
     def update(self, dict_):
         self._session.update(dict_)
@@ -196,6 +187,9 @@ class SessionBase:
 
     _session = property(_get_session)
 
+    def get_session_cookie_age(self):
+        return settings.SESSION_COOKIE_AGE
+
     def get_expiry_age(self, **kwargs):
         """Get the number of seconds until the session expires.
 
@@ -215,7 +209,7 @@ class SessionBase:
             expiry = self.get('_session_expiry')
 
         if not expiry:   # Checks both None and 0 cases
-            return settings.SESSION_COOKIE_AGE
+            return self.get_session_cookie_age()
         if not isinstance(expiry, datetime):
             return expiry
         delta = expiry - modification
@@ -239,7 +233,7 @@ class SessionBase:
 
         if isinstance(expiry, datetime):
             return expiry
-        expiry = expiry or settings.SESSION_COOKIE_AGE   # Checks both None and 0 cases
+        expiry = expiry or self.get_session_cookie_age()
         return modification + timedelta(seconds=expiry)
 
     def set_expiry(self, value):

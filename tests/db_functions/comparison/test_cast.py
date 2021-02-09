@@ -1,14 +1,9 @@
 import datetime
 import decimal
-import unittest
 
 from django.db import connection, models
-from django.db.models import Avg
-from django.db.models.expressions import Value
 from django.db.models.functions import Cast
-from django.test import (
-    TestCase, ignore_warnings, override_settings, skipUnlessDBFeature,
-)
+from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 
 from ..models import Author, DTModel, Fan, FloatModel
 
@@ -19,7 +14,7 @@ class CastTests(TestCase):
         Author.objects.create(name='Bob', age=1, alias='1')
 
     def test_cast_from_value(self):
-        numbers = Author.objects.annotate(cast_integer=Cast(Value('0'), models.IntegerField()))
+        numbers = Author.objects.annotate(cast_integer=Cast(models.Value('0'), models.IntegerField()))
         self.assertEqual(numbers.get().cast_integer, 0)
 
     def test_cast_from_field(self):
@@ -55,15 +50,27 @@ class CastTests(TestCase):
         for field_class in (
             models.AutoField,
             models.BigAutoField,
+            models.SmallAutoField,
             models.IntegerField,
             models.BigIntegerField,
             models.SmallIntegerField,
+            models.PositiveBigIntegerField,
             models.PositiveIntegerField,
             models.PositiveSmallIntegerField,
         ):
             with self.subTest(field_class=field_class):
                 numbers = Author.objects.annotate(cast_int=Cast('alias', field_class()))
                 self.assertEqual(numbers.get().cast_int, 1)
+
+    def test_cast_to_duration(self):
+        duration = datetime.timedelta(days=1, seconds=2, microseconds=3)
+        DTModel.objects.create(duration=duration)
+        dtm = DTModel.objects.annotate(
+            cast_duration=Cast('duration', models.DurationField()),
+            cast_neg_duration=Cast(-duration, models.DurationField()),
+        ).get()
+        self.assertEqual(dtm.cast_duration, duration)
+        self.assertEqual(dtm.cast_neg_duration, -duration)
 
     def test_cast_from_db_datetime_to_date(self):
         dt_value = datetime.datetime(2018, 9, 28, 12, 42, 10, 234567)
@@ -117,16 +124,6 @@ class CastTests(TestCase):
         cast_float = numbers.get().cast_float
         self.assertIsInstance(cast_float, float)
         self.assertEqual(cast_float, 0.125)
-
-    @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL test')
-    @override_settings(DEBUG=True)
-    def test_expression_wrapped_with_parentheses_on_postgresql(self):
-        """
-        The SQL for the Cast expression is wrapped with parentheses in case
-        it's a complex expression.
-        """
-        list(Author.objects.annotate(cast_float=Cast(Avg('age'), models.FloatField())))
-        self.assertIn('(AVG("db_functions_author"."age"))::double precision', connection.queries[-1]['sql'])
 
     def test_cast_to_text_field(self):
         self.assertEqual(Author.objects.values_list(Cast('age', models.TextField()), flat=True).get(), '1')

@@ -32,7 +32,9 @@ class FixDurationInputMixin:
         if self.output_field.get_internal_type() == 'DurationField':
             expression = self.get_source_expressions()[0]
             options = self._get_repr_options()
-            from django.db.backends.oracle.functions import IntervalToSeconds, SecondsToInterval
+            from django.db.backends.oracle.functions import (
+                IntervalToSeconds, SecondsToInterval,
+            )
             return compiler.compile(
                 SecondsToInterval(self.__class__(IntervalToSeconds(expression), **options))
             )
@@ -42,9 +44,9 @@ class FixDurationInputMixin:
 class NumericOutputFieldMixin:
 
     def _resolve_output_field(self):
-        source_expressions = self.get_source_expressions()
-        if any(isinstance(s.output_field, DecimalField) for s in source_expressions):
+        source_fields = self.get_source_fields()
+        if any(isinstance(s, DecimalField) for s in source_fields):
             return DecimalField()
-        if any(isinstance(s.output_field, IntegerField) for s in source_expressions):
+        if any(isinstance(s, IntegerField) for s in source_fields):
             return FloatField()
-        return super()._resolve_output_field() if source_expressions else FloatField()
+        return super()._resolve_output_field() if source_fields else FloatField()

@@ -1,23 +1,42 @@
+from django.db import NotSupportedError
 from django.db.models.expressions import Func, Value
-from django.db.models.fields import IntegerField
+from django.db.models.fields import CharField, IntegerField
 from django.db.models.functions import Coalesce
 from django.db.models.lookups import Transform
 
 
-class BytesToCharFieldConversionMixin:
-    """
-    Convert CharField results from bytes to str.
+class MySQLSHA2Mixin:
+    def as_mysql(self, compiler, connection, **extra_content):
+        return super().as_sql(
+            compiler,
+            connection,
+            template='SHA2(%%(expressions)s, %s)' % self.function[3:],
+            **extra_content,
+        )
 
-    MySQL returns long data types (bytes) instead of chars when it can't
-    determine the length of the result string. For example:
-        LPAD(column1, CHAR_LENGTH(column2), ' ')
-    returns the LONGTEXT (bytes) instead of VARCHAR.
-    """
-    def convert_value(self, value, expression, connection):
-        if connection.features.db_functions_convert_bytes_to_str:
-            if self.output_field.get_internal_type() == 'CharField' and isinstance(value, bytes):
-                return value.decode()
-        return super().convert_value(value, expression, connection)
+
+class OracleHashMixin:
+    def as_oracle(self, compiler, connection, **extra_context):
+        return super().as_sql(
+            compiler,
+            connection,
+            template=(
+                "LOWER(RAWTOHEX(STANDARD_HASH(UTL_I18N.STRING_TO_RAW("
+                "%(expressions)s, 'AL32UTF8'), '%(function)s')))"
+            ),
+            **extra_context,
+        )
+
+
+class PostgreSQLSHAMixin:
+    def as_postgresql(self, compiler, connection, **extra_content):
+        return super().as_sql(
+            compiler,
+            connection,
+            template="ENCODE(DIGEST(%(expressions)s, '%(function)s'), 'hex')",
+            function=self.function.lower(),
+            **extra_content,
+        )
 
 
 class Chr(Transform):
@@ -100,6 +119,7 @@ class Concat(Func):
 class Left(Func):
     function = 'LEFT'
     arity = 2
+    output_field = CharField()
 
     def __init__(self, expression, length, **extra):
         """
@@ -136,8 +156,9 @@ class Lower(Transform):
     lookup_name = 'lower'
 
 
-class LPad(BytesToCharFieldConversionMixin, Func):
+class LPad(Func):
     function = 'LPAD'
+    output_field = CharField()
 
     def __init__(self, expression, length, fill_text=Value(' '), **extra):
         if not hasattr(length, 'resolve_expression') and length is not None and length < 0:
@@ -148,6 +169,11 @@ class LPad(BytesToCharFieldConversionMixin, Func):
 class LTrim(Transform):
     function = 'LTRIM'
     lookup_name = 'ltrim'
+
+
+class MD5(OracleHashMixin, Transform):
+    function = 'MD5'
+    lookup_name = 'md5'
 
 
 class Ord(Transform):
@@ -162,8 +188,9 @@ class Ord(Transform):
         return super().as_sql(compiler, connection, function='UNICODE', **extra_context)
 
 
-class Repeat(BytesToCharFieldConversionMixin, Func):
+class Repeat(Func):
     function = 'REPEAT'
+    output_field = CharField()
 
     def __init__(self, expression, number, **extra):
         if not hasattr(number, 'resolve_expression') and number is not None and number < 0:
@@ -219,6 +246,34 @@ class RTrim(Transform):
     lookup_name = 'rtrim'
 
 
+class SHA1(OracleHashMixin, PostgreSQLSHAMixin, Transform):
+    function = 'SHA1'
+    lookup_name = 'sha1'
+
+
+class SHA224(MySQLSHA2Mixin, PostgreSQLSHAMixin, Transform):
+    function = 'SHA224'
+    lookup_name = 'sha224'
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        raise NotSupportedError('SHA224 is not supported on Oracle.')
+
+
+class SHA256(MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, Transform):
+    function = 'SHA256'
+    lookup_name = 'sha256'
+
+
+class SHA384(MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, Transform):
+    function = 'SHA384'
+    lookup_name = 'sha384'
+
+
+class SHA512(MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, Transform):
+    function = 'SHA512'
+    lookup_name = 'sha512'
+
+
 class StrIndex(Func):
     """
     Return a positive integer corresponding to the 1-indexed position of the
@@ -235,6 +290,7 @@ class StrIndex(Func):
 
 class Substr(Func):
     function = 'SUBSTRING'
+    output_field = CharField()
 
     def __init__(self, expression, pos, length=None, **extra):
         """

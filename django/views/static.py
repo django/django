@@ -24,7 +24,7 @@ def serve(request, path, document_root=None, show_indexes=False):
 
         from django.views.static import serve
 
-        url(r'^(?P<path>.*)$', serve, {'document_root': '/path/to/my/files/'})
+        path('<path:path>', serve, {'document_root': '/path/to/my/files/'})
 
     in your URLconf. You must provide the ``document_root`` param. You may
     also set ``show_indexes`` to ``True`` if you'd like to serve a basic index
@@ -39,7 +39,7 @@ def serve(request, path, document_root=None, show_indexes=False):
             return directory_index(path, fullpath)
         raise Http404(_("Directory indexes are not allowed here."))
     if not fullpath.exists():
-        raise Http404(_('"%(path)s" does not exist') % {'path': fullpath})
+        raise Http404(_('“%(path)s” does not exist') % {'path': fullpath})
     # Respect the If-Modified-Since header.
     statobj = fullpath.stat()
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
@@ -48,9 +48,9 @@ def serve(request, path, document_root=None, show_indexes=False):
     content_type, encoding = mimetypes.guess_type(str(fullpath))
     content_type = content_type or 'application/octet-stream'
     response = FileResponse(fullpath.open('rb'), content_type=content_type)
-    response["Last-Modified"] = http_date(statobj.st_mtime)
+    response.headers["Last-Modified"] = http_date(statobj.st_mtime)
     if encoding:
-        response["Content-Encoding"] = encoding
+        response.headers["Content-Encoding"] = encoding
     return response
 
 
@@ -62,10 +62,10 @@ DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
     <meta http-equiv="Content-Language" content="en-us">
     <meta name="robots" content="NONE,NOARCHIVE">
-    <title>{% blocktrans %}Index of {{ directory }}{% endblocktrans %}</title>
+    <title>{% blocktranslate %}Index of {{ directory }}{% endblocktranslate %}</title>
   </head>
   <body>
-    <h1>{% blocktrans %}Index of {{ directory }}{% endblocktrans %}</h1>
+    <h1>{% blocktranslate %}Index of {{ directory }}{% endblocktranslate %}</h1>
     <ul>
       {% if directory != "/" %}
       <li><a href="../">../</a></li>
@@ -124,8 +124,8 @@ def was_modified_since(header=None, mtime=0, size=0):
             raise ValueError
         matches = re.match(r"^([^;]+)(; length=([0-9]+))?$", header,
                            re.IGNORECASE)
-        header_mtime = parse_http_date(matches.group(1))
-        header_len = matches.group(3)
+        header_mtime = parse_http_date(matches[1])
+        header_len = matches[3]
         if header_len and int(header_len) != size:
             raise ValueError
         if int(mtime) > header_mtime:

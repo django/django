@@ -27,7 +27,7 @@ class TestUtilsHtml(SimpleTestCase):
             ('<', '&lt;'),
             ('>', '&gt;'),
             ('"', '&quot;'),
-            ("'", '&#39;'),
+            ("'", '&#x27;'),
         )
         # Substitution patterns for testing the above items.
         patterns = ("%s", "asdf%sfdsa", "%s1", "1%sb")
@@ -70,6 +70,8 @@ class TestUtilsHtml(SimpleTestCase):
         items = (
             ('<p>See: &#39;&eacute; is an apostrophe followed by e acute</p>',
              'See: &#39;&eacute; is an apostrophe followed by e acute'),
+            ('<p>See: &#x27;&eacute; is an apostrophe followed by e acute</p>',
+             'See: &#x27;&eacute; is an apostrophe followed by e acute'),
             ('<adf>a', 'a'),
             ('</adf>a', 'a'),
             ('<asdf><asdf>e', 'e'),
@@ -88,6 +90,8 @@ class TestUtilsHtml(SimpleTestCase):
             ('&gotcha&#;<>', '&gotcha&#;<>'),
             ('<sc<!-- -->ript>test<<!-- -->/script>', 'ript>test'),
             ('<script>alert()</script>&h', 'alert()h'),
+            ('><!' + ('&' * 16000) + 'D', '><!' + ('&' * 16000) + 'D'),
+            ('X<<<<br>br>br>br>X', 'XX'),
         )
         for value, output in items:
             with self.subTest(value=value, output=output):
@@ -99,7 +103,7 @@ class TestUtilsHtml(SimpleTestCase):
         for filename in ('strip_tags1.html', 'strip_tags2.txt'):
             with self.subTest(filename=filename):
                 path = os.path.join(os.path.dirname(__file__), 'files', filename)
-                with open(path, 'r') as fp:
+                with open(path) as fp:
                     content = fp.read()
                     start = datetime.now()
                     stripped = strip_tags(content)

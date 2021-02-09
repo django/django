@@ -4,7 +4,7 @@ from functools import partial
 
 from django import forms
 from django.apps import apps
-from django.conf import SettingsReference
+from django.conf import SettingsReference, settings
 from django.core import checks, exceptions
 from django.db import connection, router
 from django.db.backends import utils
@@ -19,9 +19,9 @@ from django.utils.translation import gettext_lazy as _
 from . import Field
 from .mixins import FieldCacheMixin
 from .related_descriptors import (
-    ForwardManyToOneDescriptor, ForwardOneToOneDescriptor,
-    ManyToManyDescriptor, ReverseManyToOneDescriptor,
-    ReverseOneToOneDescriptor,
+    ForeignKeyDeferredAttribute, ForwardManyToOneDescriptor,
+    ForwardOneToOneDescriptor, ManyToManyDescriptor,
+    ReverseManyToOneDescriptor, ReverseOneToOneDescriptor,
 )
 from .related_lookups import (
     RelatedExact, RelatedGreaterThan, RelatedGreaterThanOrEqual, RelatedIn,
@@ -133,7 +133,7 @@ class RelatedField(FieldCacheMixin, Field):
             errors.append(
                 checks.Error(
                     "Reverse query name '%s' must not end with an underscore."
-                    % (rel_query_name,),
+                    % rel_query_name,
                     hint=("Add or change a related_name or related_query_name "
                           "argument for this field."),
                     obj=self,
@@ -172,14 +172,10 @@ class RelatedField(FieldCacheMixin, Field):
         if (self.remote_field.model not in self.opts.apps.get_models() and
                 not isinstance(self.remote_field.model, str) and
                 self.remote_field.model._meta.swapped):
-            model = "%s.%s" % (
-                self.remote_field.model._meta.app_label,
-                self.remote_field.model._meta.object_name
-            )
             return [
                 checks.Error(
                     "Field defines a relation with the model '%s', which has "
-                    "been swapped out." % model,
+                    "been swapped out." % self.remote_field.model._meta.label,
                     hint="Update the relation to point at 'settings.%s'." % self.remote_field.model._meta.swappable,
                     obj=self,
                     id='fields.E301',
@@ -218,14 +214,16 @@ class RelatedField(FieldCacheMixin, Field):
         rel_is_hidden = self.remote_field.is_hidden()
         rel_name = self.remote_field.get_accessor_name()  # i. e. "model_set"
         rel_query_name = self.related_query_name()  # i. e. "model"
-        field_name = "%s.%s" % (opts.object_name, self.name)  # i. e. "Model.field"
+        # i.e. "app_label.Model.field".
+        field_name = '%s.%s' % (opts.label, self.name)
 
         # Check clashes between accessor or reverse query name of `field`
         # and any other field name -- i.e. accessor for Model.foreign is
         # model_set and it clashes with Target.model_set.
         potential_clashes = rel_opts.fields + rel_opts.many_to_many
         for clash_field in potential_clashes:
-            clash_name = "%s.%s" % (rel_opts.object_name, clash_field.name)  # i.e. "Target.model_set"
+            # i.e. "app_label.Target.model_set".
+            clash_name = '%s.%s' % (rel_opts.label, clash_field.name)
             if not rel_is_hidden and clash_field.name == rel_name:
                 errors.append(
                     checks.Error(
@@ -253,9 +251,11 @@ class RelatedField(FieldCacheMixin, Field):
         # Model.m2m accessor.
         potential_clashes = (r for r in rel_opts.related_objects if r.field is not self)
         for clash_field in potential_clashes:
-            clash_name = "%s.%s" % (  # i. e. "Model.m2m"
-                clash_field.related_model._meta.object_name,
-                clash_field.field.name)
+            # i.e. "app_label.Model.m2m".
+            clash_name = '%s.%s' % (
+                clash_field.related_model._meta.label,
+                clash_field.field.name,
+            )
             if not rel_is_hidden and clash_field.get_accessor_name() == rel_name:
                 errors.append(
                     checks.Error(
@@ -528,6 +528,10 @@ class ForeignObject(RelatedField):
             frozenset(ut)
             for ut in self.remote_field.model._meta.unique_together
         })
+        unique_foreign_fields.update({
+            frozenset(uc.fields)
+            for uc in self.remote_field.model._meta.total_unique_constraints
+        })
         foreign_fields = {f.name for f in self.foreign_related_fields}
         has_unique_constraint = any(u <= foreign_fields for u in unique_foreign_fields)
 
@@ -541,8 +545,10 @@ class ForeignObject(RelatedField):
                     "No subset of the fields %s on model '%s' is unique."
                     % (field_combination, model_name),
                     hint=(
-                        "Add unique=True on any of those fields or add at "
-                        "least a subset of them to a unique_together constraint."
+                        'Mark a single field as unique=True or add a set of '
+                        'fields to a unique constraint (via unique_together '
+                        'or a UniqueConstraint (without condition) in the '
+                        'model Meta.constraints).'
                     ),
                     obj=self,
                     id='fields.E310',
@@ -553,8 +559,13 @@ class ForeignObject(RelatedField):
             model_name = self.remote_field.model.__name__
             return [
                 checks.Error(
-                    "'%s.%s' must set unique=True because it is referenced by "
+                    "'%s.%s' must be unique because it is referenced by "
                     "a foreign key." % (model_name, field_name),
+                    hint=(
+                        'Add unique=True to this field or add a '
+                        'UniqueConstraint (without condition) in the model '
+                        'Meta.constraints.'
+                    ),
                     obj=self,
                     id='fields.E311',
                 )
@@ -570,14 +581,14 @@ class ForeignObject(RelatedField):
 
         if self.remote_field.parent_link:
             kwargs['parent_link'] = self.remote_field.parent_link
-        # Work out string form of "to"
         if isinstance(self.remote_field.model, str):
-            kwargs['to'] = self.remote_field.model
+            if '.' in self.remote_field.model:
+                app_label, model_name = self.remote_field.model.split('.')
+                kwargs['to'] = '%s.%s' % (app_label, model_name.lower())
+            else:
+                kwargs['to'] = self.remote_field.model.lower()
         else:
-            kwargs['to'] = "%s.%s" % (
-                self.remote_field.model._meta.app_label,
-                self.remote_field.model._meta.object_name,
-            )
+            kwargs['to'] = self.remote_field.model._meta.label_lower
         # If swappable is True, then see if we're actually pointing to the target
         # of a swap.
         swappable_setting = self.swappable_setting
@@ -606,28 +617,29 @@ class ForeignObject(RelatedField):
         for index in range(len(self.from_fields)):
             from_field_name = self.from_fields[index]
             to_field_name = self.to_fields[index]
-            from_field = (self if from_field_name == 'self'
-                          else self.opts.get_field(from_field_name))
+            from_field = (
+                self
+                if from_field_name == RECURSIVE_RELATIONSHIP_CONSTANT
+                else self.opts.get_field(from_field_name)
+            )
             to_field = (self.remote_field.model._meta.pk if to_field_name is None
                         else self.remote_field.model._meta.get_field(to_field_name))
             related_fields.append((from_field, to_field))
         return related_fields
 
-    @property
+    @cached_property
     def related_fields(self):
-        if not hasattr(self, '_related_fields'):
-            self._related_fields = self.resolve_related_fields()
-        return self._related_fields
+        return self.resolve_related_fields()
 
-    @property
+    @cached_property
     def reverse_related_fields(self):
         return [(rhs_field, lhs_field) for lhs_field, rhs_field in self.related_fields]
 
-    @property
+    @cached_property
     def local_related_fields(self):
         return tuple(lhs_field for lhs_field, rhs_field in self.related_fields)
 
-    @property
+    @cached_property
     def foreign_related_fields(self):
         return tuple(rhs_field for lhs_field, rhs_field in self.related_fields if rhs_field)
 
@@ -764,7 +776,7 @@ class ForeignKey(ForeignObject):
     By default ForeignKey will target the pk of the remote model but this
     behavior can be changed by using the ``to_field`` argument.
     """
-
+    descriptor_class = ForeignKeyDeferredAttribute
     # Field flags
     many_to_many = False
     many_to_one = True
@@ -797,6 +809,8 @@ class ForeignKey(ForeignObject):
             # the to_field during FK construction. It won't be guaranteed to
             # be correct until contribute_to_class is called. Refs #12190.
             to_field = to_field or (to._meta.pk and to._meta.pk.name)
+        if not callable(on_delete):
+            raise TypeError('on_delete must be callable.')
 
         kwargs['rel'] = self.rel_class(
             self, to, to_field,
@@ -808,8 +822,13 @@ class ForeignKey(ForeignObject):
         )
         kwargs.setdefault('db_index', True)
 
-        super().__init__(to, on_delete, from_fields=['self'], to_fields=[to_field], **kwargs)
-
+        super().__init__(
+            to,
+            on_delete,
+            from_fields=[RECURSIVE_RELATIONSHIP_CONSTANT],
+            to_fields=[to_field],
+            **kwargs,
+        )
         self.db_constraint = db_constraint
 
     def check(self, **kwargs):
@@ -899,7 +918,7 @@ class ForeignKey(ForeignObject):
             return
 
         using = router.db_for_read(self.remote_field.model, instance=model_instance)
-        qs = self.remote_field.model._default_manager.using(using).filter(
+        qs = self.remote_field.model._base_manager.using(using).filter(
             **{self.remote_field.field_name: value}
         )
         qs = qs.complex_filter(self.get_limit_choices_to())
@@ -912,6 +931,21 @@ class ForeignKey(ForeignObject):
                     'field': self.remote_field.field_name, 'value': value,
                 },  # 'pk' is included for backwards compatibility
             )
+
+    def resolve_related_fields(self):
+        related_fields = super().resolve_related_fields()
+        for from_field, to_field in related_fields:
+            if to_field and to_field.model != self.remote_field.model._meta.concrete_model:
+                raise exceptions.FieldError(
+                    "'%s.%s' refers to field '%s' which is not local to model "
+                    "'%s'." % (
+                        self.model._meta.label,
+                        self.name,
+                        to_field.name,
+                        self.remote_field.model._meta.concrete_model._meta.label,
+                    )
+                )
+        return related_fields
 
     def get_attname(self):
         return '%s_id' % self.name
@@ -939,6 +973,9 @@ class ForeignKey(ForeignObject):
     def get_db_prep_value(self, value, connection, prepared=False):
         return self.target_field.get_db_prep_value(value, connection, prepared)
 
+    def get_prep_value(self, value):
+        return self.target_field.get_prep_value(value)
+
     def contribute_to_related_class(self, cls, related):
         super().contribute_to_related_class(cls, related)
         if self.remote_field.field_name is None:
@@ -954,6 +991,7 @@ class ForeignKey(ForeignObject):
             'queryset': self.remote_field.model._default_manager.using(using),
             'to_field_name': self.remote_field.field_name,
             **kwargs,
+            'blank': self.blank,
         })
 
     def db_check(self, connection):
@@ -1026,6 +1064,10 @@ class OneToOneField(ForeignKey):
             setattr(instance, self.name, data)
         else:
             setattr(instance, self.attname, data)
+            # Remote field object must be cleared otherwise Model.save()
+            # will reassign attname using the related object pk.
+            if data is None:
+                setattr(instance, self.name, data)
 
     def _check_unique(self, **kwargs):
         # Override ForeignKey since check isn't applicable here.
@@ -1225,18 +1267,6 @@ class ManyToManyField(RelatedField):
                 to_model_name = to_model._meta.object_name
             relationship_model_name = self.remote_field.through._meta.object_name
             self_referential = from_model == to_model
-
-            # Check symmetrical attribute.
-            if (self_referential and self.remote_field.symmetrical and
-                    not self.remote_field.through._meta.auto_created):
-                errors.append(
-                    checks.Error(
-                        'Many-to-many fields with intermediate tables must not be symmetrical.',
-                        obj=self,
-                        id='fields.E332',
-                    )
-                )
-
             # Count foreign keys in intermediate model
             if self_referential:
                 seen_self = sum(
@@ -1279,8 +1309,11 @@ class ManyToManyField(RelatedField):
                              "through_fields keyword argument.") % (self, from_model_name),
                             hint=(
                                 'If you want to create a recursive relationship, '
-                                'use ForeignKey("self", symmetrical=False, through="%s").'
-                            ) % relationship_model_name,
+                                'use ManyToManyField("%s", through="%s").'
+                            ) % (
+                                RECURSIVE_RELATIONSHIP_CONSTANT,
+                                relationship_model_name,
+                            ),
                             obj=self,
                             id='fields.E334',
                         )
@@ -1296,8 +1329,11 @@ class ManyToManyField(RelatedField):
                             "through_fields keyword argument." % (self, to_model_name),
                             hint=(
                                 'If you want to create a recursive relationship, '
-                                'use ForeignKey("self", symmetrical=False, through="%s").'
-                            ) % relationship_model_name,
+                                'use ManyToManyField("%s", through="%s").'
+                            ) % (
+                                RECURSIVE_RELATIONSHIP_CONSTANT,
+                                relationship_model_name,
+                            ),
                             obj=self,
                             id='fields.E335',
                         )
@@ -1411,12 +1447,23 @@ class ManyToManyField(RelatedField):
                 clashing_obj = '%s.%s' % (opts.label, _get_field_name(model))
             else:
                 clashing_obj = model._meta.label
+            if settings.DATABASE_ROUTERS:
+                error_class, error_id = checks.Warning, 'fields.W344'
+                error_hint = (
+                    'You have configured settings.DATABASE_ROUTERS. Verify '
+                    'that the table of %r is correctly routed to a separate '
+                    'database.' % clashing_obj
+                )
+            else:
+                error_class, error_id = checks.Error, 'fields.E340'
+                error_hint = None
             return [
-                checks.Error(
+                error_class(
                     "The field's intermediary table '%s' clashes with the "
                     "table name of '%s'." % (m2m_db_table, clashing_obj),
                     obj=self,
-                    id='fields.E340',
+                    hint=error_hint,
+                    id=error_id,
                 )
             ]
         return []
@@ -1432,18 +1479,12 @@ class ManyToManyField(RelatedField):
         if isinstance(self.remote_field.model, str):
             kwargs['to'] = self.remote_field.model
         else:
-            kwargs['to'] = "%s.%s" % (
-                self.remote_field.model._meta.app_label,
-                self.remote_field.model._meta.object_name,
-            )
+            kwargs['to'] = self.remote_field.model._meta.label
         if getattr(self.remote_field, 'through', None) is not None:
             if isinstance(self.remote_field.through, str):
                 kwargs['through'] = self.remote_field.through
             elif not self.remote_field.through._meta.auto_created:
-                kwargs['through'] = "%s.%s" % (
-                    self.remote_field.through._meta.app_label,
-                    self.remote_field.through._meta.object_name,
-                )
+                kwargs['through'] = self.remote_field.through._meta.label
         # If swappable is True, then see if we're actually pointing to the target
         # of a swap.
         swappable_setting = self.swappable_setting
@@ -1564,14 +1605,20 @@ class ManyToManyField(RelatedField):
         # automatically. The funky name reduces the chance of an accidental
         # clash.
         if self.remote_field.symmetrical and (
-                self.remote_field.model == "self" or self.remote_field.model == cls._meta.object_name):
+            self.remote_field.model == RECURSIVE_RELATIONSHIP_CONSTANT or
+            self.remote_field.model == cls._meta.object_name
+        ):
             self.remote_field.related_name = "%s_rel_+" % name
         elif self.remote_field.is_hidden():
             # If the backwards relation is disabled, replace the original
             # related_name with one generated from the m2m field name. Django
             # still uses backwards relations internally and we need to avoid
             # clashes between multiple m2m fields with related_name == '+'.
-            self.remote_field.related_name = "_%s_%s_+" % (cls.__name__.lower(), name)
+            self.remote_field.related_name = '_%s_%s_%s_+' % (
+                cls._meta.app_label,
+                cls.__name__.lower(),
+                name,
+            )
 
         super().contribute_to_class(cls, name, **kwargs)
 

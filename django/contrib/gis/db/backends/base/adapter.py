@@ -17,3 +17,8 @@ class WKTAdapter:
 
     def __str__(self):
         return self.wkt
+
+    @classmethod
+    def _fix_polygon(cls, poly):
+        # Hook for Oracle.
+        return poly

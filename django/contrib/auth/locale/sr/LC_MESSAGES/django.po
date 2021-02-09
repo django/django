@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Igor Jerosimić, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-10-19 14:35+0000\n"
-"Last-Translator: mPyth <oostoya2@yahoo.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-21 20:38+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -54,8 +55,8 @@ msgstr "Лозинка није унета."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Инвалидан формат лозинке или непознат hashing алгоритам."
 
-msgid "The two password fields didn't match."
-msgstr "Два поља за лозинке се нису поклопила."
+msgid "The two password fields didn’t match."
+msgstr "Два поља за лозинке се не поклапају."
 
 msgid "Password"
 msgstr "Лозинка"
@@ -67,12 +68,12 @@ msgid "Enter the same password as before, for verification."
 msgstr "Унесите исту лозинку као малопре ради верификације."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Лозинке се не чувају у изворном облику па не постоји могућност приказа "
-"лозинке овог корисника, али можете променити лозинку коришћењем <a href=\"../"
-"password/\">ове форме</a>."
+"лозинке овог корисника, али можете променити лозинку коришћењем <a href="
+"\"{}\">ове форме</a>."
 
 #, python-format
 msgid ""
@@ -251,19 +252,19 @@ msgstr[2] "Ваша лозинка мора садржати најмање %(mi
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Лозинка је превише слична пољу '%(verbose_name)s'."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr "Ваша лозинка не може бити слична вашим личним подацима."
 
 msgid "This password is too common."
 msgstr "Ова лозинка је међу најчешће коришћеним лозинкама."
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr "Ваша лозинка не може бити међу најчешће коришћеним лозинкама."
 
 msgid "This password is entirely numeric."
 msgstr "Ова лозинка садржи само цифре."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Ваша лозинка не може садржати само цифре."
 
 #, python-format

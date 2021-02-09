@@ -89,6 +89,9 @@ class MeasureBase:
         else:
             return NotImplemented
 
+    def __hash__(self):
+        return hash(self.standard)
+
     def __lt__(self, other):
         if isinstance(other, self.__class__):
             return self.standard < other.standard
@@ -233,6 +236,7 @@ class Distance(MeasureBase):
         'clarke_link': 0.201166195164,
         'fathom': 1.8288,
         'ft': 0.3048,
+        'furlong': 201.168,
         'german_m': 1.0000135965,
         'gold_coast_ft': 0.304799710181508,
         'indian_yd': 0.914398530744,
@@ -280,6 +284,7 @@ class Distance(MeasureBase):
         'Chain (Benoit)': 'chain_benoit',
         'Chain (Sears)': 'chain_sears',
         'Foot (International)': 'ft',
+        'Furrow Long': 'furlong',
         'German legal metre': 'german_m',
         'Gold Coast foot': 'gold_coast_ft',
         'Indian yard': 'indian_yd',

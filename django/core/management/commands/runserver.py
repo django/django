@@ -11,8 +11,9 @@ from django.core.servers.basehttp import (
     WSGIServer, get_internal_wsgi_application, run,
 )
 from django.utils import autoreload
+from django.utils.regex_helper import _lazy_re_compile
 
-naiveip_re = re.compile(r"""^(?:
+naiveip_re = _lazy_re_compile(r"""^(?:
 (?P<addr>
     (?P<ipv4>\d{1,3}(?:\.\d{1,3}){3}) |         # IPv4 address
     (?P<ipv6>\[[a-fA-F0-9:]+\]) |               # IPv6 address
@@ -24,7 +25,7 @@ class Command(BaseCommand):
     help = "Starts a lightweight Web server for development."
 
     # Validation is called explicitly each time the server is reloaded.
-    requires_system_checks = False
+    requires_system_checks = []
     stealth_options = ('shutdown_message',)
 
     default_addr = '127.0.0.1'
@@ -49,6 +50,10 @@ class Command(BaseCommand):
         parser.add_argument(
             '--noreload', action='store_false', dest='use_reloader',
             help='Tells Django to NOT use the auto-reloader.',
+        )
+        parser.add_argument(
+            '--skip-checks', action='store_true',
+            help='Skip system checks.',
         )
 
     def execute(self, *args, **options):
@@ -113,8 +118,9 @@ class Command(BaseCommand):
         shutdown_message = options.get('shutdown_message', '')
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
 
-        self.stdout.write("Performing system checks…\n\n")
-        self.check(display_num_errors=True)
+        if not options['skip_checks']:
+            self.stdout.write('Performing system checks...\n\n')
+            self.check(display_num_errors=True)
         # Need to check migrations here, so can't use the
         # requires_migrations_check attribute.
         self.check_migrations()
@@ -123,7 +129,7 @@ class Command(BaseCommand):
         self.stdout.write((
             "Django version %(version)s, using settings %(settings)r\n"
             "Starting development server at %(protocol)s://%(addr)s:%(port)s/\n"
-            "Quit the server with %(quit_command)s.\n"
+            "Quit the server with %(quit_command)s."
         ) % {
             "version": self.get_version(),
             "settings": settings.SETTINGS_MODULE,
@@ -137,7 +143,7 @@ class Command(BaseCommand):
             handler = self.get_handler(*args, **options)
             run(self.addr, int(self.port), handler,
                 ipv6=self.use_ipv6, threading=threading, server_cls=self.server_cls)
-        except socket.error as e:
+        except OSError as e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {
                 errno.EACCES: "You don't have permission to access that port.",
@@ -155,7 +161,3 @@ class Command(BaseCommand):
             if shutdown_message:
                 self.stdout.write(shutdown_message)
             sys.exit(0)
-
-
-# Kept for backward compatibility
-BaseRunserverCommand = Command

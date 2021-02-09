@@ -20,6 +20,20 @@ class DurationFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             datetime.timedelta(days=1, hours=1, minutes=15, seconds=30, milliseconds=300),
             f.clean('1 1:15:30.3')
         )
+        self.assertEqual(
+            datetime.timedelta(0, 10800),
+            f.clean(datetime.timedelta(0, 10800)),
+        )
+        msg = 'This field is required.'
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean('')
+        msg = 'Enter a valid duration.'
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean('not_a_time')
+
+    def test_durationfield_clean_not_required(self):
+        f = DurationField(required=False)
+        self.assertIsNone(f.clean(''))
 
     def test_overflow(self):
         msg = "The number of days must be between {min_days} and {max_days}.".format(

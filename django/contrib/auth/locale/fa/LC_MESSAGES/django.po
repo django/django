@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Ahmad Hosseini <ahmadly.com@gmail.com>, 2020
 # Ali Nikneshan <ali@nikneshan.com>, 2015
 # Eric Hamiter <ehamiter@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -12,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2018-06-23 23:12+0000\n"
-"Last-Translator: MJafar Mashhadi <raindigital2007@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-08-20 15:54+0000\n"
+"Last-Translator: Ahmad Hosseini <ahmadly.com@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -58,7 +59,7 @@ msgstr "هیچ رمزی انتخاب نشده است."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "رمز نامعتبر یا الگوریتم رمزنگاری ناشناس"
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "دو فیلد گذرواژه با هم مطابقت ندارند."
 
 msgid "Password"
@@ -71,7 +72,7 @@ msgid "Enter the same password as before, for verification."
 msgstr "برای تائید، رمز عبور قبلی را وارد کنید."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "گذرواژه‌ها به صورت خام نگهداری نمی‌شوند لذا راهی برای مشاهدهٔ گذرواژهٔ این کاربر "
@@ -250,20 +251,20 @@ msgstr[1] "رمز عبور شما می‌بایست حداقل از %(min_length
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "این رمز عبور بسیار شبیه %(verbose_name)s می‌باشد."
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr "رمز عبور شما نمی‌تواند شبیه سایر اطلاعات شخصی شما باشد."
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "گذرواژه شما نمی‌تواند شبیه سایر اطلاعات شخصی شما باشد."
 
 msgid "This password is too common."
 msgstr "این رمز عبور بسیار رایج است."
 
-msgid "Your password can't be a commonly used password."
-msgstr "رمز شما نمی تواند از عبارات معروف باشد."
+msgid "Your password can’t be a commonly used password."
+msgstr "گذرواژه شما نمی تواند یک گذرواژه معمول باشد."
 
 msgid "This password is entirely numeric."
 msgstr "رمز شما کلا عدد است"
 
-msgid "Your password can't be entirely numeric."
-msgstr "رمز شما نمی تواند کلا عدد باشد"
+msgid "Your password can’t be entirely numeric."
+msgstr "گذرواژه شما نمی تواند کلا عدد باشد"
 
 #, python-format
 msgid "Password reset on %(site_name)s"

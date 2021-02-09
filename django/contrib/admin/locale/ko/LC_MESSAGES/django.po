@@ -2,21 +2,27 @@
 #
 # Translators:
 # Jiyoon, Ha <cryptography@konkuk.ac.kr>, 2016
+# DONGHO JEONG <nearermg@gmail.com>, 2020
+# Geonho Kim / Leo Kim <gh.leokim@gmail.com>, 2019
+# Gihun Ham <progh2@gmail.com>, 2018
+# Hang Park <hangpark@kaist.ac.kr>, 2019
 # Hoseok Lee <ihooi77@gmail.com>, 2016
-# Ian Y. Choi <ianyrchoi@gmail.com>, 2015
+# Ian Y. Choi <ianyrchoi@gmail.com>, 2015,2019
 # Jaehong Kim <mixe@korea.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jay Oh <theanswer.jay@gmail.com>, 2020
 # Le Tartuffe <magno79@gmail.com>, 2014,2016
-# Noh Seho <iam@sehonoh.kr>, 2018
+# Seho Noh <iam@sehonoh.kr>, 2018
 # Seacbyul Lee <femizkim@gmail.com>, 2017
 # Taesik Yoon <xotlr43@gmail.com>, 2015
+# Yang Chan Woo <oizys18@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-07-18 09:00+0000\n"
-"Last-Translator: Noh Seho <iam@sehonoh.kr>\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-09-05 05:57+0000\n"
+"Last-Translator: DONGHO JEONG <nearermg@gmail.com>\n"
 "Language-Team: Korean (http://www.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -75,6 +81,12 @@ msgstr "날짜 없음"
 msgid "Has date"
 msgstr "날짜 있음"
 
+msgid "Empty"
+msgstr "비어 있음"
+
+msgid "Not empty"
+msgstr "비어 있지 않음"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -115,7 +127,7 @@ msgid "object id"
 msgstr "오브젝트 아이디"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "오브젝트 표현"
 
@@ -132,23 +144,23 @@ msgid "log entries"
 msgstr "로그 엔트리"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "\"%(object)s\"가 추가하였습니다."
+msgid "Added “%(object)s”."
+msgstr "\"%(object)s\"이/가 추가되었습니다."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "\"%(object)s\" 를 %(changes)s 개 변경"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "\"%(object)s\"이/가 \"%(changes)s\"(으)로 변경되었습니다."
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "\"%(object)s.\"를 삭제하였습니다."
+msgid "Deleted “%(object)s.”"
+msgstr "%(object)s를 삭제했습니다."
 
 msgid "LogEntry Object"
 msgstr "로그 엔트리 객체"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "{name} \"{object}\"를 추가하였습니다."
+msgid "Added {name} “{object}”."
+msgstr "{name} “{object}개체”를 추가했습니다."
 
 msgid "Added."
 msgstr "추가되었습니다."
@@ -157,16 +169,16 @@ msgid "and"
 msgstr "또한"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "{name} \"{object}\"의 {fields}가 변경되었습니다."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "{name} “{object}개체”의 {fields}필드를 변경했습니다."
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "{fields}가 변경되었습니다."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr "{name} \"{object}\"가 삭제되었습니다."
+msgid "Deleted {name} “{object}”."
+msgstr "{name} “{object}개체”를 삭제했습니다."
 
 msgid "No fields changed."
 msgstr "변경된 필드가 없습니다."
@@ -174,12 +186,13 @@ msgstr "변경된 필드가 없습니다."
 msgid "None"
 msgstr "없음"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr "하나 이상을 선택하려면 \"Control\" 키, Mac은 \"Command\"키를 누르세요."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr ""
+"하나 이상을 선택하려면 \"Control\" 키를 누른 채로 선택해주세요. Mac의 경우에"
+"는 \"Command\" 키를 눌러주세요."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} \"{obj}\"가 성공적으로 추가되었습니다."
 
 msgid "You may edit it again below."
@@ -187,37 +200,35 @@ msgstr "아래 내용을 수정해야 합니다."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
-"below."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
 "{name} \"{obj}\"가 성공적으로 추가되었습니다.  아래에서 다른 {name}을 추가할 "
 "수 있습니다."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+"{name} \"{obj}\"가 성공적으로 변경되었습니다. 아래에서 다시 수정할 수 있습니"
+"다."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
 "{name} \"{obj}\"가 성공적으로 추가되었습니다. 아래에서 다시 수정할 수 있습니"
 "다."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"{name} \"{obj}\"가 성공적으로 추가되었습니다. 아래에서 다시 수정할 수 있습니"
-"다."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
-"{name} \"{obj}\"가 성공적으로 추가되었습니다.  아래에서 다른 {name}을 추가할 "
+"{name} \"{obj}\"가 성공적으로 변경되었습니다. 아래에서 다른 {name}을 추가할 "
 "수 있습니다."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "{name} \"{obj}\"가 성공적으로 추가되었습니다."
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "{name} \"{obj}\"가 성공적으로 변경되었습니다."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -230,14 +241,14 @@ msgid "No action selected."
 msgstr "액션이 선택되지 않았습니다."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\"이/가 삭제되었습니다."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "%(name)s \"%(obj)s\"이/가 성공적으로 삭제되었습니다."
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
-"ID \"%(key)s\" 을/를 지닌  %(name)s 이/가 존재하지 않습니다. 이전에 삭제된 값"
-"이 아닌지 확인해주세요."
+"ID \"%(key)s\"을/를 지닌%(name)s이/가 존재하지 않습니다. 삭제된 값이 아닌지 "
+"확인해주세요."
 
 #, python-format
 msgid "Add %s"
@@ -305,8 +316,8 @@ msgstr "%(app)s 관리"
 msgid "Page not found"
 msgstr "페이지를 찾을 수 없습니다."
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "죄송합니다, 요청하신 페이지를 찾을 수 없습니다."
+msgid "We’re sorry, but the requested page could not be found."
+msgstr "죄송합니다, 요청한 페이지를 찾을 수 없습니다."
 
 msgid "Home"
 msgstr "홈"
@@ -321,11 +332,11 @@ msgid "Server Error <em>(500)</em>"
 msgstr "서버 오류 <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"오류가 있었습니다. 사이트 관리자에게 이메일로 보고 되었고, 곧 수정될 것입니"
-"다. 이해해주셔서 고맙습니다."
+"오류가 발생했습니다. 사이트 관리자들에게 이메일로 보고되었고 단시일 내에 수정"
+"될 것입니다. 기다려주셔서 감사합니다."
 
 msgid "Run the selected action"
 msgstr "선택한 액션을 실행합니다."
@@ -343,12 +354,25 @@ msgstr "%(total_count)s개의 %(module_name)s 모두를 선택합니다."
 msgid "Clear selection"
 msgstr "선택 해제"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "%(name)s 애플리케이션의 모델"
+
+msgid "Add"
+msgstr "추가"
+
+msgid "View"
+msgstr "보기"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "독자는 뷰 및 수정 권한이 없습니다."
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
-"사용자 이름과 비밀번호를 입력하세요. 더 많은 사용자 옵션을 사용하실 수 있습니"
-"다."
+"첫 번째로, 사용자명과 비밀번호를 입력하세요. 그 후, 독자는 더 많은 사용자 옵"
+"션을 수정할 수 있습니다. "
 
 msgid "Enter a username and password."
 msgstr "사용자 이름과 비밀번호를 입력하세요."
@@ -390,6 +414,9 @@ msgstr "사이트에서 보기"
 
 msgid "Filter"
 msgstr "필터"
+
+msgid "Clear all filters"
+msgstr "모든 필터 삭제"
 
 msgid "Remove from sorting"
 msgstr "정렬에서 "
@@ -433,8 +460,8 @@ msgstr ""
 msgid "Objects"
 msgstr "오브젝트"
 
-msgid "Yes, I'm sure"
-msgstr "네, 확실합니다."
+msgid "Yes, I’m sure"
+msgstr "네, 확신합니다. "
 
 msgid "No, take me back"
 msgstr "아뇨, 돌려주세요."
@@ -467,9 +494,6 @@ msgstr ""
 "선택한 %(objects_name)s를 정말 삭제하시겠습니까? 다음의 오브젝트와 연관 아이"
 "템들이 모두 삭제됩니다:"
 
-msgid "View"
-msgstr ""
-
 msgid "Delete?"
 msgstr "삭제"
 
@@ -479,16 +503,6 @@ msgstr "%(filter_title)s (으)로"
 
 msgid "Summary"
 msgstr "개요"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s 애플리케이션의 모델"
-
-msgid "Add"
-msgstr "추가"
-
-msgid "You don't have permission to view or edit anything."
-msgstr "조회하거나 수정할 수 있는 권한이 없습니다."
 
 msgid "Recent actions"
 msgstr "최근 활동"
@@ -503,12 +517,13 @@ msgid "Unknown content"
 msgstr "알 수 없는 형식입니다."
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"데이터베이스 설정에 문제가 발생했습니다. 해당 데이터베이스 테이블이 생성되었"
-"는지, 해당 유저가 데이터베이스를 읽어 들일 수 있는지 확인하세요."
+"당신의 데이터베이스 설치, 설치본에 오류가 있습니다. \n"
+"적합한 데이터베이스 테이블이 생성되었는지 확인하고, 데이터베이스가 적합한 사"
+"용자가 열람할 수 있는 지 확인하십시오. "
 
 #, python-format
 msgid ""
@@ -521,6 +536,9 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "아이디 또는 비밀번호를 분실하였습니까?"
 
+msgid "Toggle navigation"
+msgstr "토글 메뉴"
+
 msgid "Date/time"
 msgstr "날짜/시간"
 
@@ -531,11 +549,11 @@ msgid "Action"
 msgstr "액션"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"오브젝트에 변경사항이 없습니다. 이 관리자 사이트를 통해 추가된 것이 아닐 수 "
-"있습니다."
+"이 개체는 변경 기록이 없습니다. 아마도 이 관리자 사이트를 통해 추가되지 않았"
+"을 것입니다. "
 
 msgid "Show all"
 msgstr "모두 표시"
@@ -543,24 +561,8 @@ msgstr "모두 표시"
 msgid "Save"
 msgstr "저장"
 
-msgid "Popup closing..."
-msgstr "팝업 닫는 중..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "선택된 %(model)s 변경"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "%(model)s 추가"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "선택된 %(model)s 제거"
+msgid "Popup closing…"
+msgstr "팝업 닫는중..."
 
 msgid "Search"
 msgstr "검색"
@@ -584,10 +586,22 @@ msgid "Save and continue editing"
 msgstr "저장 및 편집 계속"
 
 msgid "Save and view"
-msgstr "저정하고 조회하기"
+msgstr "저장하고 조회하기"
 
 msgid "Close"
 msgstr "닫기"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "선택된 %(model)s 변경"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "%(model)s 추가"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "선택된 %(model)s 제거"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "사이트를 이용해 주셔서 고맙습니다."
@@ -602,11 +616,11 @@ msgid "Your password was changed."
 msgstr "비밀번호가 변경되었습니다."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"보안상 필요하오니 기존에 사용하시던 비밀번호를 입력해 주세요. 새로운 비밀번호"
-"는 정확히 입력했는지 확인할 수 있도록 두 번 입력하시기 바랍니다."
+"독자의 과거 비밀번호를 입력한 후, 보안을 위해 새로운 비밀번호을 두 번 입력하"
+"여 옳은 입력인 지 확인할 수 있도록 하십시오."
 
 msgid "Change my password"
 msgstr "비밀번호 변경"
@@ -641,14 +655,14 @@ msgstr ""
 "시 해주세요."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"계정에 등록된 이메일로 비밀번호를 설정하기 위한 안내 사항을 보냈습니다. 곧 메"
-"일을 받으실 것입니다."
+"계정이 존재한다면, 독자가 입력한 이메일로 비밀번호 설정 안내문을 발송했습니"
+"다. 곧 수신할 수 있을 것입니다. "
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
 "만약 이메일을 받지 못하였다면, 등록하신 이메일을 다시 확인하시거나 스팸 메일"
@@ -665,8 +679,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "다음 페이지에서 새 비밀번호를 선택하세요."
 
-msgid "Your username, in case you've forgotten:"
-msgstr "사용자 이름:"
+msgid "Your username, in case you’ve forgotten:"
+msgstr "사용자명:"
 
 msgid "Thanks for using our site!"
 msgstr "사이트를 이용해 주셔서 고맙습니다."
@@ -676,11 +690,11 @@ msgid "The %(site_name)s team"
 msgstr "%(site_name)s 팀"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"비밀번호를 분실하셨습니까? 아래에 이메일 주소를 입력해주십시오. 새로운 비밀번"
-"호를 설정하는 이메일을 보내드리겠습니다."
+"비밀번호를 잊어버렸나요? 이메일 주소를 아래에 입력하시면 새로운 비밀번호를 설"
+"정하는 절차를 이메일로 보내드리겠습니다."
 
 msgid "Email address:"
 msgstr "이메일 주소:"
@@ -701,7 +715,7 @@ msgstr "변경할 %s 선택"
 
 #, python-format
 msgid "Select %s to view"
-msgstr ""
+msgstr "보기위한 1%s 를(을) 선택"
 
 msgid "Date:"
 msgstr "날짜:"

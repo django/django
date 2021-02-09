@@ -1,6 +1,5 @@
 from calendar import timegm
 
-from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http import Http404, HttpResponse
@@ -10,6 +9,7 @@ from django.utils.encoding import iri_to_uri
 from django.utils.html import escape
 from django.utils.http import http_date
 from django.utils.timezone import get_default_timezone, is_naive, make_aware
+from django.utils.translation import get_language
 
 
 def add_domain(domain, url, secure=False):
@@ -30,6 +30,7 @@ class Feed:
     feed_type = feedgenerator.DefaultFeed
     title_template = None
     description_template = None
+    language = None
 
     def __call__(self, request, *args, **kwargs):
         try:
@@ -41,7 +42,7 @@ class Feed:
         if hasattr(self, 'item_pubdate') or hasattr(self, 'item_updateddate'):
             # if item_pubdate or item_updateddate is defined for the feed, set
             # header so as ConditionalGetMiddleware is able to send 304 NOT MODIFIED
-            response['Last-Modified'] = http_date(
+            response.headers['Last-Modified'] = http_date(
                 timegm(feedgen.latest_post_date().utctimetuple()))
         feedgen.write(response, 'utf-8')
         return response
@@ -134,7 +135,7 @@ class Feed:
             subtitle=self._get_dynamic_attr('subtitle', obj),
             link=link,
             description=self._get_dynamic_attr('description', obj),
-            language=settings.LANGUAGE_CODE,
+            language=self.language or get_language(),
             feed_url=add_domain(
                 current_site.domain,
                 self._get_dynamic_attr('feed_url', obj) or request.path,
@@ -211,6 +212,7 @@ class Feed:
                 author_name=author_name,
                 author_email=author_email,
                 author_link=author_link,
+                comments=self._get_dynamic_attr('item_comments', item),
                 categories=self._get_dynamic_attr('item_categories', item),
                 item_copyright=self._get_dynamic_attr('item_copyright', item),
                 **self.item_extra_kwargs(item)

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
 "PO-Revision-Date: 2018-05-18 20:01+0000\n"
 "Last-Translator: Branko Kokanovic <branko@kokanovic.org>\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
@@ -272,8 +272,70 @@ msgstr "јуче"
 msgid "%(delta)s ago"
 msgstr "пре %(delta)s"
 
-#. Translators: 'naturaltime-past' strings will be included in
-#. '%(delta)s ago'
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "an hour ago"
+msgid_plural "%(count)s hours ago"
+msgstr[0] "пре %(count)s сата"
+msgstr[1] "пре %(count)s сата"
+msgstr[2] "пре %(count)s сати"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a minute ago"
+msgid_plural "%(count)s minutes ago"
+msgstr[0] "пре %(count)s минута"
+msgstr[1] "пре %(count)s минута"
+msgstr[2] "пре %(count)s минута"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a second ago"
+msgid_plural "%(count)s seconds ago"
+msgstr[0] "пре %(count)s секунде"
+msgstr[1] "пре %(count)s секунде"
+msgstr[2] "пре %(count)s секунди"
+
+msgid "now"
+msgstr "сада"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a second from now"
+msgid_plural "%(count)s seconds from now"
+msgstr[0] "%(count)s секунда од сад"
+msgstr[1] "%(count)s секунде од сада"
+msgstr[2] "%(count)s секунди од сада"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s minutes from now"
+msgstr[0] "%(count)s минут од сад"
+msgstr[1] "%(count)s минута од сада"
+msgstr[2] "%(count)s минута од сада"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "an hour from now"
+msgid_plural "%(count)s hours from now"
+msgstr[0] "%(count)s сат од сад"
+msgstr[1] "%(count)s сата од сада"
+msgstr[2] "%(count)s сати од сада"
+
+#. Translators: delta will contain a string like '2 months' or '1 month, 2
+#. weeks'
+#, python-format
+msgid "%(delta)s from now"
+msgstr "%(delta)s од сад"
+
+#. Translators: 'naturaltime-past' strings will be included in '%(delta)s ago'
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%d year"
@@ -322,44 +384,8 @@ msgstr[0] "%d минута"
 msgstr[1] "%d минута"
 msgstr[2] "%d минута"
 
-msgid "now"
-msgstr "сада"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a second ago"
-msgid_plural "%(count)s seconds ago"
-msgstr[0] "пре %(count)s секунде"
-msgstr[1] "пре %(count)s секунде"
-msgstr[2] "пре %(count)s секунди"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a minute ago"
-msgid_plural "%(count)s minutes ago"
-msgstr[0] "пре %(count)s минута"
-msgstr[1] "пре %(count)s минута"
-msgstr[2] "пре %(count)s минута"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "an hour ago"
-msgid_plural "%(count)s hours ago"
-msgstr[0] "пре %(count)s сата"
-msgstr[1] "пре %(count)s сата"
-msgstr[2] "пре %(count)s сати"
-
-#. Translators: delta will contain a string like '2 months' or '1 month, 2
-#. weeks'
-#, python-format
-msgid "%(delta)s from now"
-msgstr "%(delta)s од сад"
-
-#. Translators: 'naturaltime-future' strings will be included in
-#. '%(delta)s from now'
+#. Translators: 'naturaltime-future' strings will be included in '%(delta)s
+#. from now'
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d year"
@@ -407,30 +433,3 @@ msgid_plural "%d minutes"
 msgstr[0] "%d минут"
 msgstr[1] "%d минута"
 msgstr[2] "%d минута"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a second from now"
-msgid_plural "%(count)s seconds from now"
-msgstr[0] "%(count)s секунда од сад"
-msgstr[1] "%(count)s секунде од сада"
-msgstr[2] "%(count)s секунди од сада"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a minute from now"
-msgid_plural "%(count)s minutes from now"
-msgstr[0] "%(count)s минут од сад"
-msgstr[1] "%(count)s минута од сада"
-msgstr[2] "%(count)s минута од сада"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "an hour from now"
-msgid_plural "%(count)s hours from now"
-msgstr[0] "%(count)s сат од сад"
-msgstr[1] "%(count)s сата од сада"
-msgstr[2] "%(count)s сати од сада"

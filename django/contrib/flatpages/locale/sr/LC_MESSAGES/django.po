@@ -2,15 +2,16 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018
+# Igor Jerosimić, 2019-2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2018-01-30 10:09+0000\n"
-"Last-Translator: Branko Kokanovic <branko@kokanovic.org>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-21 20:41+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -30,9 +31,9 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"Пример: '/about/contact/'. Пазите на то да постоје и почетне и завршне косе "
+"Пример: \"/about/contact/\". Пазите на то да постоје почетне и завршне косе "
 "црте."
 
 msgid ""
@@ -41,6 +42,9 @@ msgid ""
 msgstr ""
 "Унета вредност може садржати само слова, бројке, тачке, доње црте, црте, "
 "знаке разломка или тилде."
+
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr "Пример: '/about/contact/'. Пазите на то да постоји почетна коса црта."
 
 msgid "URL is missing a leading slash."
 msgstr "Недостаје коса црта на почетку URL-а."
@@ -65,11 +69,11 @@ msgid "template name"
 msgstr "назив темплејта"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"Пример: 'flatpages/contact_page.html'. Ако ово оставите празним, систем ће "
-"користити 'flatpages/default.html'."
+"Пример: \"flatpages/contact_page.html\". Ако ово оставите празним, систем ће "
+"користити \"flatpages/default.html\"."
 
 msgid "registration required"
 msgstr "потребна регистрација"

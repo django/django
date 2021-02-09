@@ -1,7 +1,8 @@
-from collections import OrderedDict
 from datetime import datetime, timedelta
 
+from django import forms
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.admin import FieldListFilter
 from django.contrib.admin.exceptions import (
     DisallowedModelAdminLookup, DisallowedModelAdminToField,
@@ -16,8 +17,8 @@ from django.core.exceptions import (
     FieldDoesNotExist, ImproperlyConfigured, SuspiciousOperation,
 )
 from django.core.paginator import InvalidPage
-from django.db import models
-from django.db.models.expressions import Combinable, F, OrderBy
+from django.db.models import F, Field, ManyToOneRel, OrderBy
+from django.db.models.expressions import Combinable
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.timezone import make_aware
@@ -35,7 +36,18 @@ IGNORED_PARAMS = (
     ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR)
 
 
+class ChangeListSearchForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Populate "fields" dynamically because SEARCH_VAR is a variable:
+        self.fields = {
+            SEARCH_VAR: forms.CharField(required=False, strip=False),
+        }
+
+
 class ChangeList:
+    search_form_class = ChangeListSearchForm
+
     def __init__(self, request, model, list_display, list_display_links,
                  list_filter, date_hierarchy, search_fields, list_select_related,
                  list_per_page, list_max_show_all, list_editable, model_admin, sortable_by):
@@ -47,6 +59,8 @@ class ChangeList:
         self.list_display_links = list_display_links
         self.list_filter = list_filter
         self.has_filters = None
+        self.has_active_filters = None
+        self.clear_all_filters_qs = None
         self.date_hierarchy = date_hierarchy
         self.search_fields = search_fields
         self.list_select_related = list_select_related
@@ -57,10 +71,15 @@ class ChangeList:
         self.sortable_by = sortable_by
 
         # Get search parameters from the query string.
+        _search_form = self.search_form_class(request.GET)
+        if not _search_form.is_valid():
+            for error in _search_form.errors.values():
+                messages.error(request, ', '.join(error))
+        self.query = _search_form.cleaned_data.get(SEARCH_VAR) or ''
         try:
-            self.page_num = int(request.GET.get(PAGE_VAR, 0))
+            self.page_num = int(request.GET.get(PAGE_VAR, 1))
         except ValueError:
-            self.page_num = 0
+            self.page_num = 1
         self.show_all = ALL_VAR in request.GET
         self.is_popup = IS_POPUP_VAR in request.GET
         to_field = request.GET.get(TO_FIELD_VAR)
@@ -77,7 +96,6 @@ class ChangeList:
             self.list_editable = ()
         else:
             self.list_editable = list_editable
-        self.query = request.GET.get(SEARCH_VAR, '')
         self.queryset = self.get_queryset(request)
         self.get_results(request)
         if self.is_popup:
@@ -105,6 +123,7 @@ class ChangeList:
     def get_filters(self, request):
         lookup_params = self.get_filters_params()
         use_distinct = False
+        has_active_filters = False
 
         for key, value in lookup_params.items():
             if not self.model_admin.lookup_allowed(key, value):
@@ -112,6 +131,7 @@ class ChangeList:
 
         filter_specs = []
         for list_filter in self.list_filter:
+            lookup_params_count = len(lookup_params)
             if callable(list_filter):
                 # This is simply a custom list filter class.
                 spec = list_filter(request, lookup_params, self.model, self.model_admin)
@@ -125,11 +145,10 @@ class ChangeList:
                     # FieldListFilter class that has been registered for the
                     # type of the given field.
                     field, field_list_filter_class = list_filter, FieldListFilter.create
-                if not isinstance(field, models.Field):
+                if not isinstance(field, Field):
                     field_path = field
                     field = get_fields_from_path(self.model, field_path)[-1]
 
-                lookup_params_count = len(lookup_params)
                 spec = field_list_filter_class(
                     field, request, lookup_params,
                     self.model, self.model_admin, field_path=field_path,
@@ -141,6 +160,8 @@ class ChangeList:
                     use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, field_path)
             if spec and spec.has_output():
                 filter_specs.append(spec)
+                if lookup_params_count > len(lookup_params):
+                    has_active_filters = True
 
         if self.date_hierarchy:
             # Create bounded lookup parameters so that the query is more
@@ -157,8 +178,6 @@ class ChangeList:
                     )
                 except ValueError as e:
                     raise IncorrectLookupParameters(e) from e
-                if settings.USE_TZ:
-                    from_date = make_aware(from_date)
                 if day:
                     to_date = from_date + timedelta(days=1)
                 elif month:
@@ -167,6 +186,9 @@ class ChangeList:
                     to_date = (from_date + timedelta(days=32)).replace(day=1)
                 else:
                     to_date = from_date.replace(year=from_date.year + 1)
+                if settings.USE_TZ:
+                    from_date = make_aware(from_date)
+                    to_date = make_aware(to_date)
                 lookup_params.update({
                     '%s__gte' % self.date_hierarchy: from_date,
                     '%s__lt' % self.date_hierarchy: to_date,
@@ -182,7 +204,10 @@ class ChangeList:
             for key, value in lookup_params.items():
                 lookup_params[key] = prepare_lookup_value(key, value)
                 use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, key)
-            return filter_specs, bool(filter_specs), lookup_params, use_distinct
+            return (
+                filter_specs, bool(filter_specs), lookup_params, use_distinct,
+                has_active_filters,
+            )
         except FieldDoesNotExist as e:
             raise IncorrectLookupParameters(e) from e
 
@@ -222,7 +247,7 @@ class ChangeList:
             result_list = self.queryset._clone()
         else:
             try:
-                result_list = paginator.page(self.page_num + 1).object_list
+                result_list = paginator.page(self.page_num).object_list
             except InvalidPage:
                 raise IncorrectLookupParameters
 
@@ -265,6 +290,8 @@ class ChangeList:
                 attr = getattr(self.model_admin, field_name)
             else:
                 attr = getattr(self.model, field_name)
+            if isinstance(attr, property) and hasattr(attr, 'fget'):
+                attr = attr.fget
             return getattr(attr, 'admin_order_field', None)
 
     def get_ordering(self, request, queryset):
@@ -289,7 +316,12 @@ class ChangeList:
                     order_field = self.get_ordering_field(field_name)
                     if not order_field:
                         continue  # No 'admin_order_field', skip it
-                    if hasattr(order_field, 'as_sql'):
+                    if isinstance(order_field, OrderBy):
+                        if pfx == '-':
+                            order_field = order_field.copy()
+                            order_field.reverse_ordering()
+                        ordering.append(order_field)
+                    elif hasattr(order_field, 'resolve_expression'):
                         # order_field is an expression.
                         ordering.append(order_field.desc() if pfx == '-' else order_field.asc())
                     # reverse order if order_field has already "-" as prefix
@@ -343,8 +375,16 @@ class ChangeList:
                     break
                 ordering_fields.add(field.attname)
         else:
-            # No single total ordering field, try unique_together.
-            for field_names in self.lookup_opts.unique_together:
+            # No single total ordering field, try unique_together and total
+            # unique constraints.
+            constraint_field_names = (
+                *self.lookup_opts.unique_together,
+                *(
+                    constraint.fields
+                    for constraint in self.lookup_opts.total_unique_constraints
+                ),
+            )
+            for field_names in constraint_field_names:
                 # Normalize attname references by using get_field().
                 fields = [self.lookup_opts.get_field(field_name) for field_name in field_names]
                 # Composite unique constraints containing a nullable column
@@ -361,12 +401,12 @@ class ChangeList:
 
     def get_ordering_field_columns(self):
         """
-        Return an OrderedDict of ordering field column numbers and asc/desc.
+        Return a dictionary of ordering field column numbers and asc/desc.
         """
         # We must cope with more than one column having the same underlying sort
         # field, so we base things on column numbers.
         ordering = self._get_default_ordering()
-        ordering_fields = OrderedDict()
+        ordering_fields = {}
         if ORDER_VAR not in self.params:
             # for ordering specified on ModelAdmin or model Meta, we don't know
             # the right column numbers absolutely, because there might be more
@@ -401,9 +441,13 @@ class ChangeList:
 
     def get_queryset(self, request):
         # First, we collect all the declared list filters.
-        (self.filter_specs, self.has_filters, remaining_lookup_params,
-         filters_use_distinct) = self.get_filters(request)
-
+        (
+            self.filter_specs,
+            self.has_filters,
+            remaining_lookup_params,
+            filters_use_distinct,
+            self.has_active_filters,
+        ) = self.get_filters(request)
         # Then, we let every list filter modify the queryset to its liking.
         qs = self.root_queryset
         for filter_spec in self.filter_specs:
@@ -438,6 +482,11 @@ class ChangeList:
         # Apply search results
         qs, search_use_distinct = self.model_admin.get_search_results(request, qs, self.query)
 
+        # Set query string for clearing all filters.
+        self.clear_all_filters_qs = self.get_query_string(
+            new_params=remaining_lookup_params,
+            remove=self.get_filters_params(),
+        )
         # Remove duplicates from results, if necessary
         if filters_use_distinct | search_use_distinct:
             return qs.distinct()
@@ -463,7 +512,7 @@ class ChangeList:
             except FieldDoesNotExist:
                 pass
             else:
-                if isinstance(field.remote_field, models.ManyToOneRel):
+                if isinstance(field.remote_field, ManyToOneRel):
                     # <FK>_id field names don't require a join.
                     if field_name != field.get_attname():
                         return True

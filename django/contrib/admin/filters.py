@@ -193,11 +193,17 @@ class RelatedFieldListFilter(FieldListFilter):
     def expected_parameters(self):
         return [self.lookup_kwarg, self.lookup_kwarg_isnull]
 
-    def field_choices(self, field, request, model_admin):
-        ordering = ()
+    def field_admin_ordering(self, field, request, model_admin):
+        """
+        Return the model admin's ordering for related field, if provided.
+        """
         related_admin = model_admin.admin_site._registry.get(field.remote_field.model)
         if related_admin is not None:
-            ordering = related_admin.get_ordering(request)
+            return related_admin.get_ordering(request)
+        return ()
+
+    def field_choices(self, field, request, model_admin):
+        ordering = self.field_admin_ordering(field, request, model_admin)
         return field.get_choices(include_blank=False, ordering=ordering)
 
     def choices(self, changelist):
@@ -238,10 +244,12 @@ class BooleanFieldListFilter(FieldListFilter):
         return [self.lookup_kwarg, self.lookup_kwarg2]
 
     def choices(self, changelist):
+        field_choices = dict(self.field.flatchoices)
         for lookup, title in (
-                (None, _('All')),
-                ('1', _('Yes')),
-                ('0', _('No'))):
+            (None, _('All')),
+            ('1', field_choices.get(True, _('Yes'))),
+            ('0', field_choices.get(False, _('No'))),
+        ):
             yield {
                 'selected': self.lookup_val == lookup and not self.lookup_val2,
                 'query_string': changelist.get_query_string({self.lookup_kwarg: lookup}, [self.lookup_kwarg2]),
@@ -251,7 +259,7 @@ class BooleanFieldListFilter(FieldListFilter):
             yield {
                 'selected': self.lookup_val2 == 'True',
                 'query_string': changelist.get_query_string({self.lookup_kwarg2: 'True'}, [self.lookup_kwarg]),
-                'display': _('Unknown'),
+                'display': field_choices.get(None, _('Unknown')),
             }
 
 
@@ -419,4 +427,50 @@ FieldListFilter.register(lambda f: True, AllValuesFieldListFilter)
 class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
     def field_choices(self, field, request, model_admin):
         pk_qs = model_admin.get_queryset(request).distinct().values_list('%s__pk' % self.field_path, flat=True)
-        return field.get_choices(include_blank=False, limit_choices_to={'pk__in': pk_qs})
+        ordering = self.field_admin_ordering(field, request, model_admin)
+        return field.get_choices(include_blank=False, limit_choices_to={'pk__in': pk_qs}, ordering=ordering)
+
+
+class EmptyFieldListFilter(FieldListFilter):
+    def __init__(self, field, request, params, model, model_admin, field_path):
+        if not field.empty_strings_allowed and not field.null:
+            raise ImproperlyConfigured(
+                "The list filter '%s' cannot be used with field '%s' which "
+                "doesn't allow empty strings and nulls." % (
+                    self.__class__.__name__,
+                    field.name,
+                )
+            )
+        self.lookup_kwarg = '%s__isempty' % field_path
+        self.lookup_val = params.get(self.lookup_kwarg)
+        super().__init__(field, request, params, model, model_admin, field_path)
+
+    def queryset(self, request, queryset):
+        if self.lookup_kwarg not in self.used_parameters:
+            return queryset
+        if self.lookup_val not in ('0', '1'):
+            raise IncorrectLookupParameters
+
+        lookup_condition = models.Q()
+        if self.field.empty_strings_allowed:
+            lookup_condition |= models.Q(**{self.field_path: ''})
+        if self.field.null:
+            lookup_condition |= models.Q(**{'%s__isnull' % self.field_path: True})
+        if self.lookup_val == '1':
+            return queryset.filter(lookup_condition)
+        return queryset.exclude(lookup_condition)
+
+    def expected_parameters(self):
+        return [self.lookup_kwarg]
+
+    def choices(self, changelist):
+        for lookup, title in (
+            (None, _('All')),
+            ('1', _('Empty')),
+            ('0', _('Not empty')),
+        ):
+            yield {
+                'selected': self.lookup_val == lookup,
+                'query_string': changelist.get_query_string({self.lookup_kwarg: lookup}),
+                'display': title,
+            }

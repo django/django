@@ -2,7 +2,7 @@
 #
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
-# Erik Wognsen <r4mses@gmail.com>, 2013-2017
+# Erik Wognsen <r4mses@gmail.com>, 2013-2017,2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Stevenn, 2013
 # tiktuk <tiktuk@gmail.com>, 2018
@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2018-08-23 08:30+0000\n"
-"Last-Translator: tiktuk <tiktuk@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-17 18:07+0000\n"
+"Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -56,7 +56,7 @@ msgstr "Ingen adgangskode valgt."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Ugyldigt adgangskodeformat eller hashing-algoritme."
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "De to adgangskoder var ikke identiske."
 
 msgid "Password"
@@ -69,7 +69,7 @@ msgid "Enter the same password as before, for verification."
 msgstr "Indtast den samme adgangskode som før, for bekræftelse."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Rå adgangskoder gemmes ikke, så det er ikke muligt at se denne brugers "
@@ -247,19 +247,19 @@ msgstr[1] "Din adgangskode skal indeholde mindst %(min_length)d tegn."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Din adgangskode minder for meget om din/dit %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr "Din adgangskode må ikke minde om dine andre personlige oplysninger."
 
 msgid "This password is too common."
 msgstr "Denne adgangskode er for almindelig."
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr "Din adgangskode må ikke være en ofte anvendt adgangskode."
 
 msgid "This password is entirely numeric."
 msgstr "Denne adgangskode er udelukkende numerisk."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Din adgangskode må ikke være udelukkende numerisk."
 
 #, python-format

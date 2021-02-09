@@ -3,15 +3,15 @@
 # Translators:
 # Tsolmon <mnts26@gmail.com>, 2012
 # Zorig, 2014,2018
-# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011-2012,2015
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011-2012,2015,2019
 # Ганзориг БП <ganzo.bp@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2018-02-21 00:38+0000\n"
-"Last-Translator: Zorig\n"
+"PO-Revision-Date: 2019-02-13 09:19+0000\n"
+"Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -106,13 +106,13 @@ msgid "Midnight"
 msgstr "Шөнө дунд"
 
 msgid "6 a.m."
-msgstr "6 цаг"
+msgstr "06 цаг"
 
 msgid "Noon"
 msgstr "Үд дунд"
 
 msgid "6 p.m."
-msgstr "Оройн 6 цаг"
+msgstr "18 цаг"
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."

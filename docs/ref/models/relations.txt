@@ -14,15 +14,15 @@ Related objects reference
 
             from django.db import models
 
-            class Reporter(models.Model):
+            class Blog(models.Model):
                 # ...
                 pass
 
-            class Article(models.Model):
-                reporter = models.ForeignKey(Reporter, on_delete=models.CASCADE)
+            class Entry(models.Model):
+                blog = models.ForeignKey(Blog, on_delete=models.CASCADE, null=True)
 
       In the above example, the methods below will be available on
-      the manager ``reporter.article_set``.
+      the manager ``blog.entry_set``.
 
     * Both sides of a :class:`~django.db.models.ManyToManyField` relation::
 
@@ -66,13 +66,14 @@ Related objects reference
         Using ``add()`` on a relation that already exists won't duplicate the
         relation, but it will still trigger signals.
 
+        For many-to-many relationships ``add()`` accepts either model instances
+        or field values, normally primary keys, as the ``*objs`` argument.
+
         Use the ``through_defaults`` argument to specify values for the new
         :ref:`intermediate model <intermediary-manytomany>` instance(s), if
-        needed.
-
-        .. versionchanged:: 2.2
-
-            The ``through_defaults`` argument was added.
+        needed. You can use callables as values in the ``through_defaults``
+        dictionary and they will be evaluated once before creating any
+        intermediate instance(s).
 
     .. method:: create(through_defaults=None, **kwargs)
 
@@ -88,7 +89,7 @@ Related objects reference
 
             # No need to call e.save() at this point -- it's already been saved.
 
-        This is equivalent to (but much simpler than)::
+        This is equivalent to (but simpler than)::
 
             >>> b = Blog.objects.get(id=1)
             >>> e = Entry(
@@ -106,11 +107,8 @@ Related objects reference
 
         Use the ``through_defaults`` argument to specify values for the new
         :ref:`intermediate model <intermediary-manytomany>` instance, if
-        needed.
-
-        .. versionchanged:: 2.2
-
-            The ``through_defaults`` argument was added.
+        needed. You can use callables as values in the ``through_defaults``
+        dictionary.
 
     .. method:: remove(*objs, bulk=True)
 
@@ -127,6 +125,10 @@ Related objects reference
         means no model ``save()`` methods are called; listen to the
         :data:`~django.db.models.signals.m2m_changed` signal if you wish to
         execute custom code when a relationship is deleted.
+
+        For many-to-many relationships ``remove()`` accepts either model
+        instances or field values, normally primary keys, as the ``*objs``
+        argument.
 
         For :class:`~django.db.models.ForeignKey` objects, this method only
         exists if ``null=True``. If the related field can't be set to ``None``
@@ -188,13 +190,15 @@ Related objects reference
         race conditions. For instance, new objects may be added to the database
         in between the call to ``clear()`` and the call to ``add()``.
 
+        For many-to-many relationships ``set()`` accepts a list of either model
+        instances or field values, normally primary keys, as the ``objs``
+        argument.
+
         Use the ``through_defaults`` argument to specify values for the new
         :ref:`intermediate model <intermediary-manytomany>` instance(s), if
-        needed.
-
-        .. versionchanged:: 2.2
-
-            The ``through_defaults`` argument was added.
+        needed. You can use callables as values in the ``through_defaults``
+        dictionary and they will be evaluated once before creating any
+        intermediate instance(s).
 
     .. note::
 

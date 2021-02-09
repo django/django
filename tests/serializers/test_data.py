@@ -23,10 +23,10 @@ from .models import (
     GenericData, GenericIPAddressData, GenericIPAddressPKData,
     InheritAbstractModel, InheritBaseModel, IntegerData, IntegerPKData,
     Intermediate, LengthModel, M2MData, M2MIntermediateData, M2MSelfData,
-    ModifyingSaveData, NullBooleanData, O2OData, PositiveIntegerData,
+    ModifyingSaveData, O2OData, PositiveBigIntegerData, PositiveIntegerData,
     PositiveIntegerPKData, PositiveSmallIntegerData,
     PositiveSmallIntegerPKData, SlugData, SlugPKData, SmallData, SmallPKData,
-    Tag, TextData, TimeData, UniqueAnchor, UUIDData,
+    Tag, TextData, TimeData, UniqueAnchor, UUIDData, UUIDDefaultData,
 )
 from .tests import register_tests
 
@@ -238,9 +238,8 @@ test_data = [
     # (XX, ImageData
     (data_obj, 95, GenericIPAddressData, "fe80:1424:2223:6cff:fe8a:2e8a:2151:abcd"),
     (data_obj, 96, GenericIPAddressData, None),
-    (data_obj, 100, NullBooleanData, True),
-    (data_obj, 101, NullBooleanData, False),
-    (data_obj, 102, NullBooleanData, None),
+    (data_obj, 110, PositiveBigIntegerData, 9223372036854775807),
+    (data_obj, 111, PositiveBigIntegerData, None),
     (data_obj, 120, PositiveIntegerData, 123456789),
     (data_obj, 121, PositiveIntegerData, None),
     (data_obj, 130, PositiveSmallIntegerData, 12),
@@ -349,6 +348,7 @@ The end."""),
     # (pk_obj, 790, XMLPKData, "<foo></foo>"),
     (pk_obj, 791, UUIDData, uuid_obj),
     (fk_obj, 792, FKToUUID, uuid_obj),
+    (pk_obj, 793, UUIDDefaultData, uuid_obj),
 
     (data_obj, 800, AutoNowDateTimeData, datetime.datetime(2006, 6, 16, 10, 42, 37)),
     (data_obj, 810, ModifyingSaveData, 42),
@@ -375,21 +375,20 @@ if connection.features.interprets_empty_strings_as_nulls:
                          data[2]._meta.get_field('data').empty_strings_allowed and
                          data[3] is None)]
 
-# Regression test for #8651 -- a FK to an object with PK of 0
-# This won't work on MySQL since it won't let you create an object
-# with an autoincrement primary key of 0,
-if connection.features.allows_auto_pk_0:
-    test_data.extend([
-        (data_obj, 0, Anchor, "Anchor 0"),
-        (fk_obj, 465, FKData, 0),
-    ])
-
 
 class SerializerDataTests(TestCase):
     pass
 
 
 def serializerTest(self, format):
+    # FK to an object with PK of 0. This won't work on MySQL without the
+    # NO_AUTO_VALUE_ON_ZERO SQL mode since it won't let you create an object
+    # with an autoincrement primary key of 0.
+    if connection.features.allows_auto_pk_0:
+        test_data.extend([
+            (data_obj, 0, Anchor, 'Anchor 0'),
+            (fk_obj, 465, FKData, 0),
+        ])
 
     # Create all the objects defined in the test data
     objects = []

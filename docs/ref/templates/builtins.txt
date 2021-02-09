@@ -123,7 +123,7 @@ You can mix variables and strings::
 
 In some cases you might want to refer to the current value of a cycle
 without advancing to the next value. To do this,
-just give the ``{% cycle %}`` tag a name, using "as", like this::
+give the ``{% cycle %}`` tag a name, using "as", like this::
 
     {% cycle 'row1' 'row2' as rowcolors %}
 
@@ -261,8 +261,9 @@ Sample usage::
 ``firstof``
 -----------
 
-Outputs the first argument variable that is not ``False``. Outputs nothing if
-all the passed variables are ``False``.
+Outputs the first argument variable that is not "false" (i.e. exists, is not
+empty, is not a false boolean value, and is not a zero numeric value). Outputs
+nothing if all the passed variables are "false".
 
 Sample usage::
 
@@ -607,14 +608,6 @@ you should use::
 
     {% if a > b and b > c %}
 
-``ifequal`` and ``ifnotequal``
-------------------------------
-
-``{% ifequal a b %} ... {% endifequal %}`` is an obsolete way to write
-``{% if a == b %} ... {% endif %}``. Likewise, ``{% ifnotequal a b %} ...
-{% endifnotequal %}`` is superseded by ``{% if a != b %} ... {% endif %}``.
-The ``ifequal`` and ``ifnotequal`` tags will be deprecated in a future release.
-
 .. templatetag:: ifchanged
 
 ``ifchanged``
@@ -686,6 +679,10 @@ the variable ``template_name``::
 
 The variable may also be any object with a ``render()`` method that accepts a
 context. This allows you to reference a compiled ``Template`` in your context.
+
+Additionally, the variable may be an iterable of template names, in which case
+the first that can be loaded will be used, as per
+:func:`~django.template.loader.select_template`.
 
 An included template is rendered within the context of the template that
 includes it. This example produces the output ``"Hello, John!"``:
@@ -813,10 +810,10 @@ This would display as "It is the 4th of September".
 
 You can also use the syntax ``{% now "Y" as current_year %}`` to store the
 output (as a string) inside a variable. This is useful if you want to use
-``{% now %}`` inside a template tag like :ttag:`blocktrans` for example::
+``{% now %}`` inside a template tag like :ttag:`blocktranslate` for example::
 
     {% now "Y" as current_year %}
-    {% blocktrans %}Copyright {{ current_year }}{% endblocktrans %}
+    {% blocktranslate %}Copyright {{ current_year }}{% endblocktranslate %}
 
 .. templatetag:: regroup
 
@@ -1199,10 +1196,10 @@ image in the above example will be 88 pixels wide
 (because 175/200 = .875; .875 * 100 = 87.5 which is rounded up to 88).
 
 In some cases you might want to capture the result of ``widthratio`` in a
-variable. It can be useful, for instance, in a :ttag:`blocktrans` like this::
+variable. It can be useful, for instance, in a :ttag:`blocktranslate` like this::
 
     {% widthratio this_value max_value max_width as width %}
-    {% blocktrans %}The width is: {{ width }}{% endblocktrans %}
+    {% blocktranslate %}The width is: {{ width }}{% endblocktranslate %}
 
 .. templatetag:: with
 
@@ -1342,83 +1339,84 @@ Available format strings:
 Format character  Description                               Example output
 ================  ========================================  =====================
 **Day**
-d                 Day of the month, 2 digits with           ``'01'`` to ``'31'``
+``d``             Day of the month, 2 digits with           ``'01'`` to ``'31'``
                   leading zeros.
-j                 Day of the month without leading          ``'1'`` to ``'31'``
+``j``             Day of the month without leading          ``'1'`` to ``'31'``
                   zeros.
-D                 Day of the week, textual, 3 letters.      ``'Fri'``
-l                 Day of the week, textual, long.           ``'Friday'``
-S                 English ordinal suffix for day of the     ``'st'``, ``'nd'``, ``'rd'`` or ``'th'``
+``D``             Day of the week, textual, 3 letters.      ``'Fri'``
+``l``             Day of the week, textual, long.           ``'Friday'``
+``S``             English ordinal suffix for day of the     ``'st'``, ``'nd'``, ``'rd'`` or ``'th'``
                   month, 2 characters.
-w                 Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
+``w``             Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
                   leading zeros.
-z                 Day of the year.                          ``0`` to ``365``
+``z``             Day of the year.                          ``1`` to ``366``
 **Week**
-W                 ISO-8601 week number of year, with        ``1``, ``53``
+``W``             ISO-8601 week number of year, with        ``1``, ``53``
                   weeks starting on Monday.
 **Month**
-m                 Month, 2 digits with leading zeros.       ``'01'`` to ``'12'``
-n                 Month without leading zeros.              ``'1'`` to ``'12'``
-M                 Month, textual, 3 letters.                ``'Jan'``
-b                 Month, textual, 3 letters, lowercase.     ``'jan'``
-E                 Month, locale specific alternative
+``m``             Month, 2 digits with leading zeros.       ``'01'`` to ``'12'``
+``n``             Month without leading zeros.              ``'1'`` to ``'12'``
+``M``             Month, textual, 3 letters.                ``'Jan'``
+``b``             Month, textual, 3 letters, lowercase.     ``'jan'``
+``E``             Month, locale specific alternative
                   representation usually used for long
                   date representation.                      ``'listopada'`` (for Polish locale, as opposed to ``'Listopad'``)
-F                 Month, textual, long.                     ``'January'``
-N                 Month abbreviation in Associated Press    ``'Jan.'``, ``'Feb.'``, ``'March'``, ``'May'``
+``F``             Month, textual, long.                     ``'January'``
+``N``             Month abbreviation in Associated Press    ``'Jan.'``, ``'Feb.'``, ``'March'``, ``'May'``
                   style. Proprietary extension.
-t                 Number of days in the given month.        ``28`` to ``31``
+``t``             Number of days in the given month.        ``28`` to ``31``
 **Year**
-y                 Year, 2 digits.                           ``'99'``
-Y                 Year, 4 digits.                           ``'1999'``
-L                 Boolean for whether it's a leap year.     ``True`` or ``False``
-o                 ISO-8601 week-numbering year,             ``'1999'``
+``y``             Year, 2 digits with leading zeros.        ``'00'`` to ``'99'``
+``Y``             Year, 4 digits.                           ``'1999'``
+``L``             Boolean for whether it's a leap year.     ``True`` or ``False``
+``o``             ISO-8601 week-numbering year,             ``'1999'``
                   corresponding to the ISO-8601 week
                   number (W) which uses leap weeks. See Y
                   for the more common year format.
 **Time**
-g                 Hour, 12-hour format without leading      ``'1'`` to ``'12'``
+``g``             Hour, 12-hour format without leading      ``'1'`` to ``'12'``
                   zeros.
-G                 Hour, 24-hour format without leading      ``'0'`` to ``'23'``
+``G``             Hour, 24-hour format without leading      ``'0'`` to ``'23'``
                   zeros.
-h                 Hour, 12-hour format.                     ``'01'`` to ``'12'``
-H                 Hour, 24-hour format.                     ``'00'`` to ``'23'``
-i                 Minutes.                                  ``'00'`` to ``'59'``
-s                 Seconds, 2 digits with leading zeros.     ``'00'`` to ``'59'``
-u                 Microseconds.                             ``000000`` to ``999999``
-a                 ``'a.m.'`` or ``'p.m.'`` (Note that       ``'a.m.'``
+``h``             Hour, 12-hour format.                     ``'01'`` to ``'12'``
+``H``             Hour, 24-hour format.                     ``'00'`` to ``'23'``
+``i``             Minutes.                                  ``'00'`` to ``'59'``
+``s``             Seconds, 2 digits with leading zeros.     ``'00'`` to ``'59'``
+``u``             Microseconds.                             ``000000`` to ``999999``
+``a``             ``'a.m.'`` or ``'p.m.'`` (Note that       ``'a.m.'``
                   this is slightly different than PHP's
                   output, because this includes periods
                   to match Associated Press style.)
-A                 ``'AM'`` or ``'PM'``.                     ``'AM'``
-f                 Time, in 12-hour hours and minutes,       ``'1'``, ``'1:30'``
+``A``             ``'AM'`` or ``'PM'``.                     ``'AM'``
+``f``             Time, in 12-hour hours and minutes,       ``'1'``, ``'1:30'``
                   with minutes left off if they're zero.
                   Proprietary extension.
-P                 Time, in 12-hour hours, minutes and       ``'1 a.m.'``, ``'1:30 p.m.'``, ``'midnight'``, ``'noon'``, ``'12:30 p.m.'``
+``P``             Time, in 12-hour hours, minutes and       ``'1 a.m.'``, ``'1:30 p.m.'``, ``'midnight'``, ``'noon'``, ``'12:30 p.m.'``
                   'a.m.'/'p.m.', with minutes left off
                   if they're zero and the special-case
                   strings 'midnight' and 'noon' if
                   appropriate. Proprietary extension.
 **Timezone**
-e                 Timezone name. Could be in any format,
+``e``             Timezone name. Could be in any format,
                   or might return an empty string,          ``''``, ``'GMT'``, ``'-500'``, ``'US/Eastern'``, etc.
                   depending on the datetime.
-I                 Daylight Savings Time, whether it's       ``'1'`` or ``'0'``
+``I``             Daylight Savings Time, whether it's       ``'1'`` or ``'0'``
                   in effect or not.
-O                 Difference to Greenwich time in hours.    ``'+0200'``
-T                 Time zone of this machine.                ``'EST'``, ``'MDT'``
-Z                 Time zone offset in seconds. The          ``-43200`` to ``43200``
+``O``             Difference to Greenwich time in hours.    ``'+0200'``
+``T``             Time zone of this machine.                ``'EST'``, ``'MDT'``
+``Z``             Time zone offset in seconds. The          ``-43200`` to ``43200``
                   offset for timezones west of UTC is
                   always negative, and for those east of
                   UTC is always positive.
 **Date/Time**
-c                 ISO 8601 format. (Note: unlike others     ``2008-01-02T10:30:00.000123+02:00``,
+``c``             ISO 8601 format. (Note: unlike other      ``2008-01-02T10:30:00.000123+02:00``,
                   formatters, such as "Z", "O" or "r",      or ``2008-01-02T10:30:00.000123`` if the datetime is naive
                   the "c" formatter will not add timezone
                   offset if value is a naive datetime
                   (see :class:`datetime.tzinfo`).
-r                 :rfc:`5322` formatted date.               ``'Thu, 21 Dec 2000 16:01:07 +0200'``
-U                 Seconds since the Unix Epoch
+``r``             :rfc:`RFC 5322 <5322#section-3.3>`        ``'Thu, 21 Dec 2000 16:01:07 +0200'``
+                  formatted date.
+``U``             Seconds since the Unix Epoch
                   (January 1 1970 00:00:00 UTC).
 ================  ========================================  =====================
 
@@ -1450,7 +1448,9 @@ used. Assuming the same settings as the previous example::
     {{ value|date }}
 
 outputs ``9 de Enero de 2008`` (the ``DATE_FORMAT`` format specifier for the
-``es`` locale is ``r'j \d\e F \d\e Y'``.
+``es`` locale is ``r'j \d\e F \d\e Y'``). Both "d" and "e" are
+backslash-escaped, because otherwise each is a format string that displays the
+day and the timezone name, respectively.
 
 You can combine ``date`` with the :tfilter:`time` filter to render a full
 representation of a ``datetime`` value. E.g.::
@@ -1603,7 +1603,7 @@ Escapes a string's HTML. Specifically, it makes these replacements:
 
 * ``<`` is converted to ``&lt;``
 * ``>`` is converted to ``&gt;``
-* ``'`` (single quote) is converted to ``&#39;``
+* ``'`` (single quote) is converted to ``&#x27;``
 * ``"`` (double quote) is converted to ``&quot;``
 * ``&`` is converted to ``&amp;``
 
@@ -1631,7 +1631,7 @@ For example::
 
     {{ value|escapejs }}
 
-If ``value`` is ``"testing\r\njavascript \'string" <b>escaping</b>"``,
+If ``value`` is ``"testing\r\njavascript 'string\" <b>escaping</b>"``,
 the output will be ``"testing\\u000D\\u000Ajavascript \\u0027string\\u0022 \\u003Cb\\u003Eescaping\\u003C/b\\u003E"``.
 
 .. templatefilter:: filesizeformat
@@ -1719,8 +1719,24 @@ displayed. For example:
 ``34.26000``  ``{{ value|floatformat:"-3" }}``  ``34.260``
 ============  ================================  ==========
 
+If the argument passed to ``floatformat`` has the ``g`` suffix, it will force
+grouping by the :setting:`THOUSAND_SEPARATOR` for the active locale. For
+example, when the active locale is ``en`` (English):
+
+============ ================================= =============
+``value``    Template                          Output
+============ ================================= =============
+``34232.34`` ``{{ value|floatformat:"2g" }}``  ``34,232.34``
+``34232.06`` ``{{ value|floatformat:"g" }}``   ``34,232.1``
+``34232.00`` ``{{ value|floatformat:"-3g" }}`` ``34,232``
+============ ================================= =============
+
 Using ``floatformat`` with no argument is equivalent to using ``floatformat``
 with an argument of ``-1``.
+
+.. versionchanged:: 3.2
+
+    The ``g`` suffix to force grouping by thousand separators was added.
 
 .. templatefilter:: force_escape
 
@@ -1812,7 +1828,7 @@ The resulting data can be accessed in JavaScript like this:
 
 .. code-block:: javascript
 
-    var value = JSON.parse(document.getElementById('hello-data').textContent);
+    const value = JSON.parse(document.getElementById('hello-data').textContent);
 
 XSS attacks are mitigated by escaping the characters "<", ">" and "&". For
 example if ``value`` is ``{'hello': 'world</script>&amp;'}``, the output is:
@@ -1990,8 +2006,8 @@ If ``value`` is ``800-COLLECT``, the output will be ``800-2655328``.
 ``pluralize``
 -------------
 
-Returns a plural suffix if the value is not 1. By default, this suffix is
-``'s'``.
+Returns a plural suffix if the value is not ``1``, ``'1'``, or an object of
+length 1. By default, this suffix is ``'s'``.
 
 Example::
 
@@ -2014,7 +2030,7 @@ Example::
 
     You have {{ num_cherries }} cherr{{ num_cherries|pluralize:"y,ies" }}.
 
-.. note:: Use :ttag:`blocktrans` to pluralize translated strings.
+.. note:: Use :ttag:`blocktranslate` to pluralize translated strings.
 
 .. templatefilter:: pprint
 
@@ -2171,6 +2187,15 @@ For example::
 If ``value`` is equivalent to ``datetime.datetime.now()``, the output will be
 the string ``"01:23"``.
 
+Note that you can backslash-escape a format string if you want to use the
+"raw" value. In this example, both "h" and "m" are backslash-escaped, because
+otherwise each is a format string that displays the hour and the month,
+respectively::
+
+    {% value|time:"H\h i\m" %}
+
+This would display as "01h 23m".
+
 Another example:
 
 Assuming that :setting:`USE_L10N` is ``True`` and :setting:`LANGUAGE_CODE` is,
@@ -2182,9 +2207,9 @@ the output will be the string ``"01:23"`` (The ``"TIME_FORMAT"`` format
 specifier for the ``de`` locale as shipped with Django is ``"H:i"``).
 
 The ``time`` filter will only accept parameters in the format string that
-relate to the time of day, not the date (for obvious reasons). If you need to
-format a ``date`` value, use the :tfilter:`date` filter instead (or along
-``time`` if you need to render a full :py:class:`~datetime.datetime` value).
+relate to the time of day, not the date. If you need to format a ``date``
+value, use the :tfilter:`date` filter instead (or along with :tfilter:`time` if
+you need to render a full :py:class:`~datetime.datetime` value).
 
 There is one exception the above rule: When passed a ``datetime`` value with
 attached timezone information (a :ref:`time-zone-aware
@@ -2432,8 +2457,9 @@ Django's built-in :tfilter:`escape` filter. The default value for
 
 .. note::
 
-    If ``urlize`` is applied to text that already contains HTML markup,
-    things won't work as expected. Apply this filter only to plain text.
+    If ``urlize`` is applied to text that already contains HTML markup, or to
+    email addresses that contain single quotes (``'``), things won't work as
+    expected. Apply this filter only to plain text.
 
 .. templatefilter:: urlizetrunc
 
@@ -2574,7 +2600,7 @@ app is installed, the tag will serve files using ``url()`` method of the
 storage specified by :setting:`STATICFILES_STORAGE`. For example::
 
     {% load static %}
-    <img src="{% static "images/hi.jpg" %}" alt="Hi!">
+    <img src="{% static 'images/hi.jpg' %}" alt="Hi!">
 
 It is also able to consume standard context variables, e.g. assuming a
 ``user_stylesheet`` variable is passed to the template::

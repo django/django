@@ -1,19 +1,18 @@
-import unittest
-
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection, models
 from django.test import SimpleTestCase, TestCase
 
 from .models import (
-    BigIntegerModel, IntegerModel, PositiveIntegerModel,
-    PositiveSmallIntegerModel, SmallIntegerModel,
+    BigIntegerModel, IntegerModel, PositiveBigIntegerModel,
+    PositiveIntegerModel, PositiveSmallIntegerModel, SmallIntegerModel,
 )
 
 
 class IntegerFieldTests(TestCase):
     model = IntegerModel
     documented_range = (-2147483648, 2147483647)
+    rel_db_type_class = models.IntegerField
 
     @property
     def backend_range(self):
@@ -98,30 +97,34 @@ class IntegerFieldTests(TestCase):
         """
         min_backend_value, max_backend_value = self.backend_range
 
-        if min_backend_value is not None:
-            min_custom_value = min_backend_value + 1
-            ranged_value_field = self.model._meta.get_field('value').__class__(
-                validators=[validators.MinValueValidator(min_custom_value)]
-            )
-            field_range_message = validators.MinValueValidator.message % {
-                'limit_value': min_custom_value,
-            }
-            with self.assertRaisesMessage(ValidationError, "[%r]" % field_range_message):
-                ranged_value_field.run_validators(min_backend_value - 1)
+        for callable_limit in (True, False):
+            with self.subTest(callable_limit=callable_limit):
+                if min_backend_value is not None:
+                    min_custom_value = min_backend_value + 1
+                    limit_value = (lambda: min_custom_value) if callable_limit else min_custom_value
+                    ranged_value_field = self.model._meta.get_field('value').__class__(
+                        validators=[validators.MinValueValidator(limit_value)]
+                    )
+                    field_range_message = validators.MinValueValidator.message % {
+                        'limit_value': min_custom_value,
+                    }
+                    with self.assertRaisesMessage(ValidationError, '[%r]' % field_range_message):
+                        ranged_value_field.run_validators(min_backend_value - 1)
 
-        if max_backend_value is not None:
-            max_custom_value = max_backend_value - 1
-            ranged_value_field = self.model._meta.get_field('value').__class__(
-                validators=[validators.MaxValueValidator(max_custom_value)]
-            )
-            field_range_message = validators.MaxValueValidator.message % {
-                'limit_value': max_custom_value,
-            }
-            with self.assertRaisesMessage(ValidationError, "[%r]" % field_range_message):
-                ranged_value_field.run_validators(max_backend_value + 1)
+                if max_backend_value is not None:
+                    max_custom_value = max_backend_value - 1
+                    limit_value = (lambda: max_custom_value) if callable_limit else max_custom_value
+                    ranged_value_field = self.model._meta.get_field('value').__class__(
+                        validators=[validators.MaxValueValidator(limit_value)]
+                    )
+                    field_range_message = validators.MaxValueValidator.message % {
+                        'limit_value': max_custom_value,
+                    }
+                    with self.assertRaisesMessage(ValidationError, '[%r]' % field_range_message):
+                        ranged_value_field.run_validators(max_backend_value + 1)
 
     def test_types(self):
-        instance = self.model(value=0)
+        instance = self.model(value=1)
         self.assertIsInstance(instance.value, int)
         instance.save()
         self.assertIsInstance(instance.value, int)
@@ -133,27 +136,60 @@ class IntegerFieldTests(TestCase):
         instance = self.model.objects.get(value='10')
         self.assertEqual(instance.value, 10)
 
+    def test_invalid_value(self):
+        tests = [
+            (TypeError, ()),
+            (TypeError, []),
+            (TypeError, {}),
+            (TypeError, set()),
+            (TypeError, object()),
+            (TypeError, complex()),
+            (ValueError, 'non-numeric string'),
+            (ValueError, b'non-numeric byte-string'),
+        ]
+        for exception, value in tests:
+            with self.subTest(value):
+                msg = "Field 'value' expected a number but got %r." % (value,)
+                with self.assertRaisesMessage(exception, msg):
+                    self.model.objects.create(value=value)
+
+    def test_rel_db_type(self):
+        field = self.model._meta.get_field('value')
+        rel_db_type = field.rel_db_type(connection)
+        self.assertEqual(rel_db_type, self.rel_db_type_class().db_type(connection))
+
 
 class SmallIntegerFieldTests(IntegerFieldTests):
     model = SmallIntegerModel
     documented_range = (-32768, 32767)
+    rel_db_type_class = models.SmallIntegerField
 
 
 class BigIntegerFieldTests(IntegerFieldTests):
     model = BigIntegerModel
     documented_range = (-9223372036854775808, 9223372036854775807)
+    rel_db_type_class = models.BigIntegerField
 
 
 class PositiveSmallIntegerFieldTests(IntegerFieldTests):
     model = PositiveSmallIntegerModel
     documented_range = (0, 32767)
+    rel_db_type_class = (
+        models.PositiveSmallIntegerField
+        if connection.features.related_fields_match_type
+        else models.SmallIntegerField
+    )
 
 
 class PositiveIntegerFieldTests(IntegerFieldTests):
     model = PositiveIntegerModel
     documented_range = (0, 2147483647)
+    rel_db_type_class = (
+        models.PositiveIntegerField
+        if connection.features.related_fields_match_type
+        else models.IntegerField
+    )
 
-    @unittest.skipIf(connection.vendor == 'sqlite', "SQLite doesn't have a constraint.")
     def test_negative_values(self):
         p = PositiveIntegerModel.objects.create(value=0)
         p.value = models.F('value') - 1
@@ -161,7 +197,20 @@ class PositiveIntegerFieldTests(IntegerFieldTests):
             p.save()
 
 
+class PositiveBigIntegerFieldTests(IntegerFieldTests):
+    model = PositiveBigIntegerModel
+    documented_range = (0, 9223372036854775807)
+    rel_db_type_class = (
+        models.PositiveBigIntegerField
+        if connection.features.related_fields_match_type
+        else models.BigIntegerField
+    )
+
+
 class ValidationTests(SimpleTestCase):
+
+    class Choices(models.IntegerChoices):
+        A = 1
 
     def test_integerfield_cleans_valid_string(self):
         f = models.IntegerField()
@@ -196,3 +245,14 @@ class ValidationTests(SimpleTestCase):
         f = models.IntegerField(choices=((1, 1),))
         with self.assertRaises(ValidationError):
             f.clean('0', None)
+
+    def test_enum_choices_cleans_valid_string(self):
+        f = models.IntegerField(choices=self.Choices.choices)
+        self.assertEqual(f.clean('1', None), 1)
+
+    def test_enum_choices_invalid_input(self):
+        f = models.IntegerField(choices=self.Choices.choices)
+        with self.assertRaises(ValidationError):
+            f.clean('A', None)
+        with self.assertRaises(ValidationError):
+            f.clean('3', None)

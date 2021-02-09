@@ -7,26 +7,31 @@
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015
 # Le Yang <youngleocn@qq.com>, 2018
+# li beite <lbt012345@gmail.com>, 2020
 # Liping Wang <lynn.config@gmail.com>, 2016-2017
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
-# Ronald White <ouyanghongyu@gmail.com>, 2013-2014
+# Ronald White <tkliuxing@me.com>, 2013-2014
 # Sean Lee <iseansay@gmail.com>, 2013
 # Sean Lee <iseansay@gmail.com>, 2013
 # slene <vslene@gmail.com>, 2011
-# Wentao Han <wentao.han@gmail.com>, 2018
+# Suntravel Chris <chrisfromcn@gmail.com>, 2019
+# Wentao Han <wentao.han@gmail.com>, 2018,2020
 # xuyi wang <xuyi.wg@gmail.com>, 2018
 # yf zhan <daxian12345@gmail.com>, 2018
-# Ziang Song <songziang@gmail.com>, 2012
+# dykai <yingkaidang@gmail.com>, 2019
+# ced773123cfad7b4e8b79ca80f736af9, 2012
+# 嘉琪 方 <370358679@qq.com>, 2020
 # Kevin Sze <leiarix@gmail.com>, 2012
+# 考证 李 <likaozheng@gmail.com>, 2020
 # 雨翌 <yumendy@163.com>, 2016
-# Ronald White <ouyanghongyu@gmail.com>, 2013
+# Ronald White <tkliuxing@me.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-09-28 07:44+0000\n"
-"Last-Translator: Wentao Han <wentao.han@gmail.com>\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-09-11 01:47+0000\n"
+"Last-Translator: 嘉琪 方 <370358679@qq.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -86,6 +91,12 @@ msgstr "没有日期"
 msgid "Has date"
 msgstr "具有日期"
 
+msgid "Empty"
+msgstr "空"
+
+msgid "Not empty"
+msgstr "非空"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -112,7 +123,7 @@ msgid "Deletion"
 msgstr "删除"
 
 msgid "action time"
-msgstr "动作时间"
+msgstr "操作时间"
 
 msgid "user"
 msgstr "用户"
@@ -124,7 +135,7 @@ msgid "object id"
 msgstr "对象id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "对象表示"
 
@@ -141,23 +152,23 @@ msgid "log entries"
 msgstr "日志记录"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "已经添加了 \"%(object)s\"."
+msgid "Added “%(object)s”."
+msgstr "添加了“%(object)s”。"
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "修改了 \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "修改了“%(object)s”—%(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "删除了 \"%(object)s.\""
+msgid "Deleted “%(object)s.”"
+msgstr "删除了“%(object)s”。"
 
 msgid "LogEntry Object"
 msgstr "LogEntry对象"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "已添加{name}\"{object}\"。"
+msgid "Added {name} “{object}”."
+msgstr "添加了 {name}“{object}”。"
 
 msgid "Added."
 msgstr "已添加。"
@@ -166,16 +177,16 @@ msgid "and"
 msgstr "和"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "已修改{name} \"{object}\"的{fields}。"
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "修改了 {name}“{object}”的 {fields}。"
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "已修改{fields}。"
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr "已删除{name}\"{object}\"。"
+msgid "Deleted {name} “{object}”."
+msgstr "删除了 {name}“{object}”。"
 
 msgid "No fields changed."
 msgstr "没有字段被修改。"
@@ -183,42 +194,39 @@ msgstr "没有字段被修改。"
 msgid "None"
 msgstr "无"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr "按住 ”Control“，或者Mac上的 “Command”，可以选择多个。"
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr "按住 Control 键或 Mac 上的 Command 键来选择多项。"
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name}\"{obj}\"添加成功。"
+msgid "The {name} “{obj}” was added successfully."
+msgstr "成功添加了 {name}“{obj}”。"
 
 msgid "You may edit it again below."
 msgstr "您可以在下面再次编辑它."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr "成功添加了 {name}“{obj}”。你可以在下面添加另一个 {name}。"
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr "成功修改了 {name}“{obj}”。你可以在下面再次编辑它。"
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr "成功添加了 {name}“{obj}”。你可以在下面再次编辑它。"
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
-msgstr "{name} \"{obj}\" 已经添加成功。你可以在下面添加其它的{name}。"
+msgstr "成功修改了 {name}“{obj}”。你可以在下面添加另一个 {name}。"
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" 添加成功。你可以在下面再次编辑它。"
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" 已经添加成功。你可以在下面再次编辑它。"
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr "{name} \"{obj}\" 已经成功进行变更。你可以在下面添加其它的{name}。"
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "{name}\"{obj}\"修改成功。"
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "成功修改了 {name}“{obj}”。"
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -229,12 +237,12 @@ msgid "No action selected."
 msgstr "未选择动作"
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" 删除成功。"
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "成功删除了 %(name)s“%(obj)s”。"
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
-msgstr "ID为“%(key)s”的%(name)s不存在。也许它被删除了？ "
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr "ID 为“%(key)s”的 %(name)s 不存在。可能已经被删除了？"
 
 #, python-format
 msgid "Add %s"
@@ -302,8 +310,8 @@ msgstr "%(app)s 管理"
 msgid "Page not found"
 msgstr "页面没有找到"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "很报歉，请求页面无法找到。"
+msgid "We’re sorry, but the requested page could not be found."
+msgstr "非常抱歉，请求的页面不存在。"
 
 msgid "Home"
 msgstr "首页"
@@ -318,11 +326,11 @@ msgid "Server Error <em>(500)</em>"
 msgstr "服务器错误 <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"有一个错误。已经通过电子邮件通知网站管理员，不久以后应该可以修复。谢谢你的参"
-"与。"
+"发生了错误，已经通过电子邮件报告给了网站管理员。我们会尽快修复，感谢您的耐心"
+"等待。"
 
 msgid "Run the selected action"
 msgstr "运行选中的动作"
@@ -340,10 +348,23 @@ msgstr "选中所有的 %(total_count)s 个 %(module_name)s"
 msgid "Clear selection"
 msgstr "清除选中"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "在应用程序 %(name)s 中的模型"
+
+msgid "Add"
+msgstr "增加"
+
+msgid "View"
+msgstr "查看"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "你没有查看或编辑的权限。"
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
-msgstr "首先，输入一个用户名和密码。然后，你就可以编辑更多的用户选项。"
+msgstr "输入用户名和密码后，你将能够编辑更多的用户选项。"
 
 msgid "Enter a username and password."
 msgstr "输入用户名和密码"
@@ -386,6 +407,9 @@ msgstr "在站点上查看"
 msgid "Filter"
 msgstr "过滤器"
 
+msgid "Clear all filters"
+msgstr "清除所有过滤器"
+
 msgid "Remove from sorting"
 msgstr "删除排序"
 
@@ -426,7 +450,7 @@ msgstr ""
 msgid "Objects"
 msgstr "对象"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "是的，我确定"
 
 msgid "No, take me back"
@@ -458,9 +482,6 @@ msgstr ""
 "请确认要删除选中的 %(objects_name)s 吗？以下所有对象和余它们相关的条目将都会"
 "被删除："
 
-msgid "View"
-msgstr "查看"
-
 msgid "Delete?"
 msgstr "删除？"
 
@@ -470,16 +491,6 @@ msgstr " 以 %(filter_title)s"
 
 msgid "Summary"
 msgstr "概览"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "在应用程序 %(name)s 中的模型"
-
-msgid "Add"
-msgstr "增加"
-
-msgid "You don't have permission to view or edit anything."
-msgstr "无权查看或修改。"
 
 msgid "Recent actions"
 msgstr "最近动作"
@@ -494,12 +505,12 @@ msgid "Unknown content"
 msgstr "未知内容"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"你的数据库安装有误。确保已经创建了相应的数据库表，并确保数据库可被相关的用户"
-"读取。"
+"数据库设置有误。请检查所需的数据库表格是否已经创建，以及数据库用户是否具有正"
+"确的权限。"
 
 #, python-format
 msgid ""
@@ -512,6 +523,9 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "忘记了您的密码或用户名？"
 
+msgid "Toggle navigation"
+msgstr "切换导航"
+
 msgid "Date/time"
 msgstr "日期/时间"
 
@@ -522,9 +536,9 @@ msgid "Action"
 msgstr "动作"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
-msgstr "该对象没有变更历史记录。可能从未通过这个管理站点添加。"
+msgstr "此对象没有修改历史。它可能不是通过管理站点添加的。"
 
 msgid "Show all"
 msgstr "显示全部"
@@ -532,24 +546,8 @@ msgstr "显示全部"
 msgid "Save"
 msgstr "保存"
 
-msgid "Popup closing..."
-msgstr "弹窗关闭中。。。"
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "更改选中的%(model)s"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "查看已选的%(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "增加另一个 %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "取消选中 %(model)s"
+msgid "Popup closing…"
+msgstr "弹窗关闭中..."
 
 msgid "Search"
 msgstr "搜索"
@@ -578,6 +576,18 @@ msgstr "保存并查看"
 msgid "Close"
 msgstr "关闭"
 
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "更改选中的%(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "增加另一个 %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "取消选中 %(model)s"
+
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "感谢您今天在本站花费了一些宝贵时间。"
 
@@ -591,11 +601,9 @@ msgid "Your password was changed."
 msgstr "你的密码已修改。"
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
-msgstr ""
-"请输入你的旧密码，为了安全起见，接着要输入两遍新密码，以便我们校验你输入的是"
-"否正确。"
+msgstr "安全起见请输入你的旧密码。然后输入两次你的新密码以确保输入正确。"
 
 msgid "Change my password"
 msgstr "修改我的密码"
@@ -626,17 +634,18 @@ msgid ""
 msgstr "密码重置链接无效，可能是因为它已使用。可以请求一次新的密码重置。"
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"如果您输入的邮件地址所对应的账户存在，设置密码的提示已经发送邮件给您，您将很"
-"快收到。"
+"如果你所输入的电子邮箱存在对应的用户，我们将通过电子邮件向你发送设置密码的操"
+"作步骤说明。你应该很快就会收到。"
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"如果你没有收到邮件, 请确保您所输入的地址是正确的, 并检查您的垃圾邮件文件夹."
+"如果你没有收到电子邮件，请检查输入的是你注册的电子邮箱地址。另外，也请检查你"
+"的垃圾邮件文件夹。"
 
 #, python-format
 msgid ""
@@ -647,8 +656,8 @@ msgstr "你收到这封邮件是因为你请求重置你在网站 %(site_name)s�
 msgid "Please go to the following page and choose a new password:"
 msgstr "请访问该页面并选择一个新密码："
 
-msgid "Your username, in case you've forgotten:"
-msgstr "你的用户名，如果已忘记的话："
+msgid "Your username, in case you’ve forgotten:"
+msgstr "提醒一下，你的用户名是："
 
 msgid "Thanks for using our site!"
 msgstr "感谢使用我们的站点！"
@@ -658,11 +667,11 @@ msgid "The %(site_name)s team"
 msgstr "%(site_name)s 团队"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"忘记你的密码了？在下面输入你的电子邮件地址，我们将发送一封设置新密码的邮件给"
-"你。"
+"忘记密码？在下面输入你的电子邮箱地址，我们将会把设置新密码的操作步骤说明通过"
+"电子邮件发送给你。"
 
 msgid "Email address:"
 msgstr "电子邮件地址："

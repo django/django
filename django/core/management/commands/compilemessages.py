@@ -2,13 +2,16 @@ import codecs
 import concurrent.futures
 import glob
 import os
+from pathlib import Path
 
 from django.core.management.base import BaseCommand, CommandError
-from django.core.management.utils import find_command, popen_wrapper
+from django.core.management.utils import (
+    find_command, is_ignored_path, popen_wrapper,
+)
 
 
 def has_bom(fn):
-    with open(fn, 'rb') as f:
+    with fn.open('rb') as f:
         sample = f.read(4)
     return sample.startswith((codecs.BOM_UTF8, codecs.BOM_UTF16_LE, codecs.BOM_UTF16_BE))
 
@@ -19,7 +22,7 @@ def is_writable(path):
     try:
         with open(path, 'a'):
             os.utime(path, None)
-    except (IOError, OSError):
+    except OSError:
         return False
     return True
 
@@ -27,7 +30,7 @@ def is_writable(path):
 class Command(BaseCommand):
     help = 'Compiles .po files to .mo files for use with builtin gettext support.'
 
-    requires_system_checks = False
+    requires_system_checks = []
 
     program = 'msgfmt'
     program_options = ['--check-format']
@@ -46,10 +49,17 @@ class Command(BaseCommand):
             '--use-fuzzy', '-f', dest='fuzzy', action='store_true',
             help='Use fuzzy translations.',
         )
+        parser.add_argument(
+            '--ignore', '-i', action='append', dest='ignore_patterns',
+            default=[], metavar='PATTERN',
+            help='Ignore directories matching this glob-style pattern. '
+                 'Use multiple times to ignore more.',
+        )
 
     def handle(self, **options):
         locale = options['locale']
         exclude = options['exclude']
+        ignore_patterns = set(options['ignore_patterns'])
         self.verbosity = options['verbosity']
         if options['fuzzy']:
             self.program_options = self.program_options + ['-f']
@@ -66,7 +76,9 @@ class Command(BaseCommand):
         # Walk entire tree, looking for locale directories
         for dirpath, dirnames, filenames in os.walk('.', topdown=True):
             for dirname in dirnames:
-                if dirname == 'locale':
+                if is_ignored_path(os.path.normpath(os.path.join(dirpath, dirname)), ignore_patterns):
+                    dirnames.remove(dirname)
+                elif dirname == 'locale':
                     basedirs.append(os.path.join(dirpath, dirname))
 
         # Gather existing directories.
@@ -90,7 +102,7 @@ class Command(BaseCommand):
         self.has_errors = False
         for basedir in basedirs:
             if locales:
-                dirs = [os.path.join(basedir, l, 'LC_MESSAGES') for l in locales]
+                dirs = [os.path.join(basedir, locale, 'LC_MESSAGES') for locale in locales]
             else:
                 dirs = [basedir]
             locations = []
@@ -110,9 +122,21 @@ class Command(BaseCommand):
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = []
             for i, (dirpath, f) in enumerate(locations):
+                po_path = Path(dirpath) / f
+                mo_path = po_path.with_suffix('.mo')
+                try:
+                    if mo_path.stat().st_mtime >= po_path.stat().st_mtime:
+                        if self.verbosity > 0:
+                            self.stdout.write(
+                                'File “%s” is already compiled and up to date.'
+                                % po_path
+                            )
+                        continue
+                except FileNotFoundError:
+                    pass
                 if self.verbosity > 0:
-                    self.stdout.write('processing file %s in %s\n' % (f, dirpath))
-                po_path = os.path.join(dirpath, f)
+                    self.stdout.write('processing file %s in %s' % (f, dirpath))
+
                 if has_bom(po_path):
                     self.stderr.write(
                         'The %s file has a BOM (Byte Order Mark). Django only '
@@ -120,10 +144,9 @@ class Command(BaseCommand):
                     )
                     self.has_errors = True
                     continue
-                base_path = os.path.splitext(po_path)[0]
 
                 # Check writability on first location
-                if i == 0 and not is_writable(base_path + '.mo'):
+                if i == 0 and not is_writable(mo_path):
                     self.stderr.write(
                         'The po files under %s are in a seemingly not writable location. '
                         'mo files will not be updated/created.' % dirpath
@@ -131,9 +154,9 @@ class Command(BaseCommand):
                     self.has_errors = True
                     return
 
-                args = [self.program] + self.program_options + [
-                    '-o', base_path + '.mo', base_path + '.po'
-                ]
+                # PY37: Remove str() when dropping support for PY37.
+                # https://bugs.python.org/issue31961
+                args = [self.program, *self.program_options, '-o', str(mo_path), str(po_path)]
                 futures.append(executor.submit(popen_wrapper, args))
 
             for future in concurrent.futures.as_completed(futures):

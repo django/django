@@ -14,7 +14,7 @@ class Command(BaseCommand):
         "as code."
     )
 
-    requires_system_checks = False
+    requires_system_checks = []
     shells = ['ipython', 'bpython', 'python']
 
     def add_arguments(self, parser):
@@ -41,6 +41,7 @@ class Command(BaseCommand):
 
     def python(self, options):
         import code
+
         # Set up a dictionary to serve as the environment for the shell, so
         # that tab completion works on objects that are imported at runtime.
         imported_objects = {}
@@ -83,13 +84,13 @@ class Command(BaseCommand):
     def handle(self, **options):
         # Execute the command and exit.
         if options['command']:
-            exec(options['command'])
+            exec(options['command'], globals())
             return
 
         # Execute stdin if it has anything to read and exit.
         # Not supported on Windows due to select.select() limitations.
         if sys.platform != 'win32' and not sys.stdin.isatty() and select.select([sys.stdin], [], [], 0)[0]:
-            exec(sys.stdin.read())
+            exec(sys.stdin.read(), globals())
             return
 
         available_shells = [options['interface']] if options['interface'] else self.shells

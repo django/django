@@ -20,7 +20,7 @@ class DjangoTemplates(BaseEngine):
         options = params.pop('OPTIONS').copy()
         options.setdefault('autoescape', True)
         options.setdefault('debug', settings.DEBUG)
-        options.setdefault('file_charset', settings.FILE_CHARSET)
+        options.setdefault('file_charset', 'utf-8')
         libraries = options.get('libraries', {})
         options['libraries'] = self.get_templatetag_libraries(libraries)
         super().__init__(params)
@@ -123,7 +123,7 @@ def get_package_libraries(pkg):
             raise InvalidTemplateLibrary(
                 "Invalid template library specified. ImportError raised when "
                 "trying to load '%s': %s" % (entry[1], e)
-            )
+            ) from e
 
         if hasattr(module, 'register'):
             yield entry[1]

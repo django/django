@@ -27,18 +27,38 @@ class Tag(models.Model):
         return self.name
 
 
+class NoDeletedArticleManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().exclude(headline='deleted')
+
+
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     # Assign a string as name to make sure the intermediary model is
     # correctly created. Refs #20207
     publications = models.ManyToManyField(Publication, name='publications')
     tags = models.ManyToManyField(Tag, related_name='tags')
+    authors = models.ManyToManyField('User', through='UserArticle')
+
+    objects = NoDeletedArticleManager()
 
     class Meta:
         ordering = ('headline',)
 
     def __str__(self):
         return self.headline
+
+
+class User(models.Model):
+    username = models.CharField(max_length=20, unique=True)
+
+    def __str__(self):
+        return self.username
+
+
+class UserArticle(models.Model):
+    user = models.ForeignKey(User, models.CASCADE, to_field='username')
+    article = models.ForeignKey(Article, models.CASCADE)
 
 
 # Models to test correct related_name inheritance
@@ -55,13 +75,3 @@ class InheritedArticleA(AbstractArticle):
 
 class InheritedArticleB(AbstractArticle):
     pass
-
-
-class NullableTargetArticle(models.Model):
-    headline = models.CharField(max_length=100)
-    publications = models.ManyToManyField(Publication, through='NullablePublicationThrough')
-
-
-class NullablePublicationThrough(models.Model):
-    article = models.ForeignKey(NullableTargetArticle, models.CASCADE)
-    publication = models.ForeignKey(Publication, models.CASCADE, null=True)

@@ -3,7 +3,7 @@ from functools import partial
 from django.db.models.utils import make_model_tuple
 from django.dispatch import Signal
 
-class_prepared = Signal(providing_args=["class"])
+class_prepared = Signal()
 
 
 class ModelSignal(Signal):
@@ -34,20 +34,16 @@ class ModelSignal(Signal):
         )
 
 
-pre_init = ModelSignal(providing_args=["instance", "args", "kwargs"], use_caching=True)
-post_init = ModelSignal(providing_args=["instance"], use_caching=True)
+pre_init = ModelSignal(use_caching=True)
+post_init = ModelSignal(use_caching=True)
 
-pre_save = ModelSignal(providing_args=["instance", "raw", "using", "update_fields"],
-                       use_caching=True)
-post_save = ModelSignal(providing_args=["instance", "raw", "created", "using", "update_fields"], use_caching=True)
+pre_save = ModelSignal(use_caching=True)
+post_save = ModelSignal(use_caching=True)
 
-pre_delete = ModelSignal(providing_args=["instance", "using"], use_caching=True)
-post_delete = ModelSignal(providing_args=["instance", "using"], use_caching=True)
+pre_delete = ModelSignal(use_caching=True)
+post_delete = ModelSignal(use_caching=True)
 
-m2m_changed = ModelSignal(
-    providing_args=["action", "instance", "reverse", "model", "pk_set", "using"],
-    use_caching=True,
-)
+m2m_changed = ModelSignal(use_caching=True)
 
-pre_migrate = Signal(providing_args=["app_config", "verbosity", "interactive", "using", "apps", "plan"])
-post_migrate = Signal(providing_args=["app_config", "verbosity", "interactive", "using", "apps", "plan"])
+pre_migrate = Signal()
+post_migrate = Signal()

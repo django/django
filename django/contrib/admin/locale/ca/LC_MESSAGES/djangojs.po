@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-09-19 16:41+0000\n"
 "Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
@@ -102,26 +102,8 @@ msgstr ""
 "Heu seleccionat una acció i no heu fet cap canvi a camps individuals. "
 "Probablement esteu cercant el botó 'Anar' enlloc de 'Desar'."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Nota: Aneu %s hora avançats respecte la hora del servidor."
-msgstr[1] "Nota: Aneu %s hores avançats respecte la hora del servidor."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Nota: Aneu %s hora endarrerits respecte la hora del servidor."
-msgstr[1] "Nota: Aneu %s hores endarrerits respecte la hora del servidor."
-
 msgid "Now"
 msgstr "Ara"
-
-msgid "Choose a Time"
-msgstr "Escolliu una hora"
-
-msgid "Choose a time"
-msgstr "Escolliu una hora"
 
 msgid "Midnight"
 msgstr "Mitjanit"
@@ -134,6 +116,24 @@ msgstr "Migdia"
 
 msgid "6 p.m."
 msgstr "6 p.m."
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Nota: Aneu %s hora avançats respecte la hora del servidor."
+msgstr[1] "Nota: Aneu %s hores avançats respecte la hora del servidor."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Nota: Aneu %s hora endarrerits respecte la hora del servidor."
+msgstr[1] "Nota: Aneu %s hores endarrerits respecte la hora del servidor."
+
+msgid "Choose a Time"
+msgstr "Escolliu una hora"
+
+msgid "Choose a time"
+msgstr "Escolliu una hora"
 
 msgid "Cancel"
 msgstr "Cancel·lar"

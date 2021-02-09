@@ -1,3 +1,4 @@
+from django.db.backends.ddl_references import Statement
 from django.db.backends.postgresql.schema import DatabaseSchemaEditor
 
 
@@ -17,9 +18,9 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
             return True
         return super()._field_should_be_indexed(model, field)
 
-    def _create_index_sql(self, model, fields, **kwargs):
-        if len(fields) != 1 or not hasattr(fields[0], 'geodetic'):
-            return super()._create_index_sql(model, fields, **kwargs)
+    def _create_index_sql(self, model, *, fields=None, **kwargs):
+        if fields is None or len(fields) != 1 or not hasattr(fields[0], 'geodetic'):
+            return super()._create_index_sql(model, fields=fields, **kwargs)
 
         field = fields[0]
         field_column = self.quote_name(field.column)
@@ -31,15 +32,21 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         elif field.dim > 2 and not field.geography:
             # Use "nd" ops which are fast on multidimensional cases
             field_column = "%s %s" % (field_column, self.geom_index_ops_nd)
+        if kwargs.get('name') is None:
+            index_name = '%s_%s_id' % (model._meta.db_table, field.column)
+        else:
+            index_name = kwargs['name']
 
-        return self.sql_create_index % {
-            "name": self.quote_name('%s_%s_id' % (model._meta.db_table, field.column)),
-            "table": self.quote_name(model._meta.db_table),
-            "using": "USING %s" % self.geom_index_type,
-            "columns": field_column,
-            "extra": '',
-            "condition": '',
-        }
+        return Statement(
+            self.sql_create_index,
+            name=self.quote_name(index_name),
+            table=self.quote_name(model._meta.db_table),
+            using=' USING %s' % self.geom_index_type,
+            columns=field_column,
+            extra='',
+            condition='',
+            include='',
+        )
 
     def _alter_column_type_sql(self, table, old_field, new_field, new_type):
         """

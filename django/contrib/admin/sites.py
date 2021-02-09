@@ -1,19 +1,25 @@
+import re
 from functools import update_wrapper
 from weakref import WeakSet
 
 from django.apps import apps
+from django.conf import settings
 from django.contrib.admin import ModelAdmin, actions
+from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.base import ModelBase
-from django.http import Http404, HttpResponseRedirect
+from django.http import (
+    Http404, HttpResponsePermanentRedirect, HttpResponseRedirect,
+)
 from django.template.response import TemplateResponse
-from django.urls import NoReverseMatch, reverse
+from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 from django.utils.functional import LazyObject
 from django.utils.module_loading import import_string
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _, gettext_lazy
 from django.views.decorators.cache import never_cache
+from django.views.decorators.common import no_append_slash
 from django.views.decorators.csrf import csrf_protect
 from django.views.i18n import JavaScriptCatalog
 
@@ -49,7 +55,9 @@ class AdminSite:
     # URL for the "View site" link at the top of each admin page.
     site_url = '/'
 
-    _empty_value_display = '-'
+    enable_nav_sidebar = True
+
+    empty_value_display = '-'
 
     login_form = None
     index_template = None
@@ -58,6 +66,8 @@ class AdminSite:
     logout_template = None
     password_change_template = None
     password_change_done_template = None
+
+    final_catch_all_view = True
 
     def __init__(self, name='admin'):
         self._registry = {}  # model_class class -> admin_class instance
@@ -106,7 +116,14 @@ class AdminSite:
                 )
 
             if model in self._registry:
-                raise AlreadyRegistered('The model %s is already registered' % model.__name__)
+                registered_admin = str(self._registry[model])
+                msg = 'The model %s is already registered ' % model.__name__
+                if registered_admin.endswith('.ModelAdmin'):
+                    # Most likely registered without a ModelAdmin subclass.
+                    msg += 'in app %r.' % re.sub(r'\.ModelAdmin$', '', registered_admin)
+                else:
+                    msg += 'with %r.' % registered_admin
+                raise AlreadyRegistered(msg)
 
             # Ignore the registration if the model has been
             # swapped out.
@@ -170,14 +187,6 @@ class AdminSite:
         """
         return self._actions.items()
 
-    @property
-    def empty_value_display(self):
-        return self._empty_value_display
-
-    @empty_value_display.setter
-    def empty_value_display(self, empty_value_display):
-        self._empty_value_display = empty_value_display
-
     def has_permission(self, request):
         """
         Return True if the given HttpRequest has permission to view
@@ -230,11 +239,11 @@ class AdminSite:
         return update_wrapper(inner, view)
 
     def get_urls(self):
-        from django.urls import include, path, re_path
         # Since this module gets imported in the application's root package,
         # it cannot import models from other applications at the module level,
         # and django.contrib.contenttypes.views imports ContentType.
         from django.contrib.contenttypes import views as contenttype_views
+        from django.urls import include, path, re_path
 
         def wrap(view, cacheable=False):
             def wrapper(*args, **kwargs):
@@ -253,6 +262,7 @@ class AdminSite:
                 wrap(self.password_change_done, cacheable=True),
                 name='password_change_done',
             ),
+            path('autocomplete/', wrap(self.autocomplete_view), name='autocomplete'),
             path('jsi18n/', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
             path(
                 'r/<int:content_type_id>/<path:object_id>/',
@@ -278,6 +288,10 @@ class AdminSite:
             urlpatterns += [
                 re_path(regex, wrap(self.app_index), name='app_list'),
             ]
+
+        if self.final_catch_all_view:
+            urlpatterns.append(re_path(r'(?P<url>.*)$', wrap(self.catch_all_view)))
+
         return urlpatterns
 
     @property
@@ -301,6 +315,7 @@ class AdminSite:
             'has_permission': self.has_permission(request),
             'available_apps': self.get_app_list(request),
             'is_popup': False,
+            'is_nav_sidebar_enabled': self.enable_nav_sidebar,
         }
 
     def password_change(self, request, extra_context=None):
@@ -374,11 +389,11 @@ class AdminSite:
             index_path = reverse('admin:index', current_app=self.name)
             return HttpResponseRedirect(index_path)
 
-        from django.contrib.auth.views import LoginView
         # Since this module gets imported in the application's root package,
         # it cannot import models from other applications at the module level,
         # and django.contrib.admin.forms eventually imports User.
         from django.contrib.admin.forms import AdminAuthenticationForm
+        from django.contrib.auth.views import LoginView
         context = {
             **self.each_context(request),
             'title': _('Log in'),
@@ -397,6 +412,23 @@ class AdminSite:
         }
         request.current_app = self.name
         return LoginView.as_view(**defaults)(request)
+
+    def autocomplete_view(self, request):
+        return AutocompleteJsonView.as_view(admin_site=self)(request)
+
+    @no_append_slash
+    def catch_all_view(self, request, url):
+        if settings.APPEND_SLASH and not url.endswith('/'):
+            urlconf = getattr(request, 'urlconf', None)
+            path = '%s/' % request.path_info
+            try:
+                match = resolve(path, urlconf)
+            except Resolver404:
+                pass
+            else:
+                if getattr(match.func, 'should_append_slash', True):
+                    return HttpResponsePermanentRedirect(path)
+        raise Http404
 
     def _build_app_dict(self, request, label=None):
         """
@@ -507,10 +539,9 @@ class AdminSite:
             raise Http404('The requested admin page does not exist.')
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(key=lambda x: x['name'])
-        app_name = apps.get_app_config(app_label).verbose_name
         context = {
             **self.each_context(request),
-            'title': _('%(app)s administration') % {'app': app_name},
+            'title': _('%(app)s administration') % {'app': app_dict['name']},
             'app_list': [app_dict],
             'app_label': app_label,
             **(extra_context or {}),

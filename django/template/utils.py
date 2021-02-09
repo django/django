@@ -1,5 +1,5 @@
 import functools
-from collections import Counter, OrderedDict
+from collections import Counter
 from pathlib import Path
 
 from django.apps import apps
@@ -27,7 +27,7 @@ class EngineHandler:
         if self._templates is None:
             self._templates = settings.TEMPLATES
 
-        templates = OrderedDict()
+        templates = {}
         backend_names = []
         for tpl in self._templates:
             try:
@@ -99,7 +99,7 @@ def get_app_template_dirs(dirname):
     installed applications.
     """
     template_dirs = [
-        str(Path(app_config.path) / dirname)
+        Path(app_config.path) / dirname
         for app_config in apps.get_app_configs()
         if app_config.path and (Path(app_config.path) / dirname).is_dir()
     ]

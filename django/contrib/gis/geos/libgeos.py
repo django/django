@@ -23,8 +23,7 @@ def load_geos():
     try:
         from django.conf import settings
         lib_path = settings.GEOS_LIBRARY_PATH
-    except (AttributeError, EnvironmentError,
-            ImportError, ImproperlyConfigured):
+    except (AttributeError, ImportError, ImproperlyConfigured, OSError):
         lib_path = None
 
     # Setting the appropriate names for the GEOS-C library.
@@ -58,7 +57,7 @@ def load_geos():
     # Getting the GEOS C library.  The C interface (CDLL) is used for
     # both *NIX and Windows.
     # See the GEOS C API source code for more details on the library function calls:
-    #  http://geos.refractions.net/ro/doxygen_docs/html/geos__c_8h-source.html
+    # https://geos.osgeo.org/doxygen/geos__c_8h_source.html
     _lgeos = CDLL(lib_path)
     # Here we set up the prototypes for the initGEOS_r and finishGEOS_r
     # routines.  These functions aren't actually called until they are
@@ -140,7 +139,7 @@ class GEOSFuncFactory:
     restype = None
     errcheck = None
 
-    def __init__(self, func_name, *args, restype=None, errcheck=None, argtypes=None, **kwargs):
+    def __init__(self, func_name, *, restype=None, errcheck=None, argtypes=None):
         self.func_name = func_name
         if restype is not None:
             self.restype = restype
@@ -148,11 +147,9 @@ class GEOSFuncFactory:
             self.errcheck = errcheck
         if argtypes is not None:
             self.argtypes = argtypes
-        self.args = args
-        self.kwargs = kwargs
 
-    def __call__(self, *args, **kwargs):
-        return self.func(*args, **kwargs)
+    def __call__(self, *args):
+        return self.func(*args)
 
     @cached_property
     def func(self):

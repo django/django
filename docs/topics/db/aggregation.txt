@@ -43,9 +43,8 @@ used to track the inventory for a series of online bookstores:
 Cheat sheet
 ===========
 
-In a hurry? Here's how to do common aggregate queries, assuming the models above:
-
-.. code-block:: python
+In a hurry? Here's how to do common aggregate queries, assuming the models
+above::
 
     # Total number of books.
     >>> Book.objects.count()
@@ -135,9 +134,9 @@ by providing that name when you specify the aggregate clause::
     >>> Book.objects.aggregate(average_price=Avg('price'))
     {'average_price': 34.35}
 
-If you want to generate more than one aggregate, you just add another
-argument to the ``aggregate()`` clause. So, if we also wanted to know
-the maximum and minimum price of all books, we would issue the query::
+If you want to generate more than one aggregate, you add another argument to
+the ``aggregate()`` clause. So, if we also wanted to know the maximum and
+minimum price of all books, we would issue the query::
 
     >>> from django.db.models import Avg, Max, Min
     >>> Book.objects.aggregate(Avg('price'), Max('price'), Min('price'))
@@ -160,9 +159,7 @@ specified values.
 The syntax for these annotations is identical to that used for the
 :meth:`~.QuerySet.aggregate` clause. Each argument to ``annotate()`` describes
 an aggregate that is to be calculated. For example, to annotate books with the
-number of authors:
-
-.. code-block:: python
+number of authors::
 
     # Build an annotated queryset
     >>> from django.db.models import Count
@@ -199,9 +196,8 @@ modified using any other ``QuerySet`` operation, including ``filter()``,
 Combining multiple aggregations
 -------------------------------
 
-Combining multiple aggregations with ``annotate()`` will `yield the wrong
-results <https://code.djangoproject.com/ticket/10060>`_ because joins are used
-instead of subqueries:
+Combining multiple aggregations with ``annotate()`` will :ticket:`yield the
+wrong results <10060>` because joins are used instead of subqueries:
 
     >>> book = Book.objects.first()
     >>> book.authors.count()
@@ -354,8 +350,8 @@ If you need two annotations with two separate filters you can use the
 ``filter`` argument with any aggregate. For example, to generate a list of
 authors with a count of highly rated books::
 
-    >>> highly_rated = Count('books', filter=Q(books__rating__gte=7))
-    >>> Author.objects.annotate(num_books=Count('books'), highly_rated_books=highly_rated)
+    >>> highly_rated = Count('book', filter=Q(book__rating__gte=7))
+    >>> Author.objects.annotate(num_books=Count('book'), highly_rated_books=highly_rated)
 
 Each ``Author`` in the result set will have the ``num_books`` and
 ``highly_rated_books`` attributes.
@@ -511,13 +507,6 @@ include the aggregate column.
 
 Interaction with default ordering or ``order_by()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. deprecated:: 2.2
-
-    Starting in Django 3.1, the ordering from a model's ``Meta.ordering`` won't
-    be used in ``GROUP BY`` queries, such as ``.annotate().values()``. Since
-    Django 2.2, these queries issue a deprecation warning indicating to add an
-    explicit ``order_by()`` to the queryset to silence the warning.
 
 Fields that are mentioned in the ``order_by()`` part of a queryset (or which
 are used in the default ordering on a model) are used when selecting the

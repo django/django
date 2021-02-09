@@ -98,7 +98,7 @@ class TestManager(models.Manager):
 
 
 class Store(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     main = models.ForeignKey('self', models.SET_NULL, null=True)
 
     objects = TestManager()
@@ -114,7 +114,7 @@ class Store(models.Model):
 
 
 class Person(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     objects = TestManager()
 
@@ -178,7 +178,7 @@ class RefToNKChild(models.Model):
 
 # ome models with pathological circular dependencies
 class Circle1(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     def natural_key(self):
         return (self.name,)
@@ -186,7 +186,7 @@ class Circle1(models.Model):
 
 
 class Circle2(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     def natural_key(self):
         return (self.name,)
@@ -194,7 +194,7 @@ class Circle2(models.Model):
 
 
 class Circle3(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     def natural_key(self):
         return (self.name,)
@@ -202,7 +202,7 @@ class Circle3(models.Model):
 
 
 class Circle4(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     def natural_key(self):
         return (self.name,)
@@ -210,7 +210,7 @@ class Circle4(models.Model):
 
 
 class Circle5(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     def natural_key(self):
         return (self.name,)
@@ -218,7 +218,7 @@ class Circle5(models.Model):
 
 
 class Circle6(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     def natural_key(self):
         return (self.name,)
@@ -226,7 +226,7 @@ class Circle6(models.Model):
 
 
 class ExternalDependency(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     def natural_key(self):
         return (self.name,)

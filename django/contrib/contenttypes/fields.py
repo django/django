@@ -1,15 +1,17 @@
+import functools
+import itertools
+import operator
 from collections import defaultdict
 
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import DEFAULT_DB_ALIAS, models, router, transaction
-from django.db.models import DO_NOTHING
+from django.db.models import DO_NOTHING, ForeignObject, ForeignObjectRel
 from django.db.models.base import ModelBase, make_foreign_order_accessors
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related import (
-    ForeignObject, ForeignObjectRel, ReverseManyToOneDescriptor,
-    lazy_related_operation,
+    ReverseManyToOneDescriptor, lazy_related_operation,
 )
 from django.db.models.query_utils import PathInfo
 from django.utils.functional import cached_property
@@ -68,8 +70,7 @@ class GenericForeignKey(FieldCacheMixin):
 
     def __str__(self):
         model = self.model
-        app = model._meta.app_label
-        return '%s.%s.%s' % (app, model._meta.object_name, self.name)
+        return '%s.%s' % (model._meta.label, self.name)
 
     def check(self, **kwargs):
         return [
@@ -275,6 +276,7 @@ class GenericRelation(ForeignObject):
 
     # Field flags
     auto_created = False
+    empty_strings_allowed = False
 
     many_to_many = False
     many_to_one = False
@@ -293,6 +295,9 @@ class GenericRelation(ForeignObject):
             limit_choices_to=limit_choices_to,
         )
 
+        # Reverse relations are always nullable (Django can't enforce that a
+        # foreign key on the related model points to this model).
+        kwargs['null'] = True
         kwargs['blank'] = True
         kwargs['on_delete'] = models.CASCADE
         kwargs['editable'] = False
@@ -337,9 +342,8 @@ class GenericRelation(ForeignObject):
                 return [
                     checks.Error(
                         "The GenericRelation defines a relation with the model "
-                        "'%s.%s', but that model does not have a GenericForeignKey." % (
-                            target._meta.app_label, target._meta.object_name
-                        ),
+                        "'%s', but that model does not have a GenericForeignKey."
+                        % target._meta.label,
                         obj=self,
                         id='contenttypes.E004',
                     )
@@ -515,17 +519,18 @@ def create_generic_related_manager(superclass, rel):
             self.instance = instance
 
             self.model = rel.model
-
-            content_type = ContentType.objects.db_manager(instance._state.db).get_for_model(
-                instance, for_concrete_model=rel.field.for_concrete_model)
-            self.content_type = content_type
+            self.get_content_type = functools.partial(
+                ContentType.objects.db_manager(instance._state.db).get_for_model,
+                for_concrete_model=rel.field.for_concrete_model,
+            )
+            self.content_type = self.get_content_type(instance)
             self.content_type_field_name = rel.field.content_type_field_name
             self.object_id_field_name = rel.field.object_id_field_name
             self.prefetch_cache_name = rel.field.attname
             self.pk_val = instance.pk
 
             self.core_filters = {
-                '%s__pk' % self.content_type_field_name: content_type.id,
+                '%s__pk' % self.content_type_field_name: self.content_type.id,
                 self.object_id_field_name: self.pk_val,
             }
 
@@ -564,19 +569,29 @@ def create_generic_related_manager(superclass, rel):
 
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
-
-            query = {
-                '%s__pk' % self.content_type_field_name: self.content_type.id,
-                '%s__in' % self.object_id_field_name: {obj.pk for obj in instances}
-            }
-
+            # Group instances by content types.
+            content_type_queries = (
+                models.Q(**{
+                    '%s__pk' % self.content_type_field_name: content_type_id,
+                    '%s__in' % self.object_id_field_name: {obj.pk for obj in objs}
+                })
+                for content_type_id, objs in itertools.groupby(
+                    sorted(instances, key=lambda obj: self.get_content_type(obj).pk),
+                    lambda obj: self.get_content_type(obj).pk,
+                )
+            )
+            query = functools.reduce(operator.or_, content_type_queries)
             # We (possibly) need to convert object IDs to the type of the
             # instances' PK in order to match up instances:
             object_id_converter = instances[0]._meta.pk.to_python
+            content_type_id_field_name = '%s_id' % self.content_type_field_name
             return (
-                queryset.filter(**query),
-                lambda relobj: object_id_converter(getattr(relobj, self.object_id_field_name)),
-                lambda obj: obj.pk,
+                queryset.filter(query),
+                lambda relobj: (
+                    object_id_converter(getattr(relobj, self.object_id_field_name)),
+                    getattr(relobj, content_type_id_field_name),
+                ),
+                lambda obj: (obj.pk, self.get_content_type(obj).pk),
                 False,
                 self.prefetch_cache_name,
                 False,

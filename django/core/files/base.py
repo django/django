@@ -146,15 +146,15 @@ class ContentFile(File):
 
 
 def endswith_cr(line):
-    """Return True if line (a text or byte string) ends with '\r'."""
+    """Return True if line (a text or bytestring) ends with '\r'."""
     return line.endswith('\r' if isinstance(line, str) else b'\r')
 
 
 def endswith_lf(line):
-    """Return True if line (a text or byte string) ends with '\n'."""
+    """Return True if line (a text or bytestring) ends with '\n'."""
     return line.endswith('\n' if isinstance(line, str) else b'\n')
 
 
 def equals_lf(line):
-    """Return True if line (a text or byte string) equals '\n'."""
+    """Return True if line (a text or bytestring) equals '\n'."""
     return line == ('\n' if isinstance(line, str) else b'\n')

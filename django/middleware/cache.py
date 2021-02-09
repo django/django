@@ -61,12 +61,13 @@ class UpdateCacheMiddleware(MiddlewareMixin):
     UpdateCacheMiddleware must be the first piece of middleware in MIDDLEWARE
     so that it'll get called last during the response phase.
     """
-    def __init__(self, get_response=None):
+    def __init__(self, get_response):
+        super().__init__(get_response)
         self.cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
+        self.page_timeout = None
         self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
         self.cache = caches[self.cache_alias]
-        self.get_response = get_response
 
     def _should_update_cache(self, request, response):
         return hasattr(request, '_cache_update_cache') and request._cache_update_cache
@@ -89,15 +90,18 @@ class UpdateCacheMiddleware(MiddlewareMixin):
         if 'private' in response.get('Cache-Control', ()):
             return response
 
-        # Try to get the timeout from the "max-age" section of the "Cache-
-        # Control" header before reverting to using the default cache_timeout
-        # length.
-        timeout = get_max_age(response)
+        # Page timeout takes precedence over the "max-age" and the default
+        # cache timeout.
+        timeout = self.page_timeout
         if timeout is None:
-            timeout = self.cache_timeout
-        elif timeout == 0:
-            # max-age was set to 0, don't bother caching.
-            return response
+            # The timeout from the "max-age" section of the "Cache-Control"
+            # header takes precedence over the default cache timeout.
+            timeout = get_max_age(response)
+            if timeout is None:
+                timeout = self.cache_timeout
+            elif timeout == 0:
+                # max-age was set to 0, don't cache.
+                return response
         patch_response_headers(response, timeout)
         if timeout and response.status_code == 200:
             cache_key = learn_cache_key(request, response, timeout, self.key_prefix, cache=self.cache)
@@ -118,11 +122,11 @@ class FetchFromCacheMiddleware(MiddlewareMixin):
     FetchFromCacheMiddleware must be the last piece of middleware in MIDDLEWARE
     so that it'll get called last during the request phase.
     """
-    def __init__(self, get_response=None):
+    def __init__(self, get_response):
+        super().__init__(get_response)
         self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
         self.cache = caches[self.cache_alias]
-        self.get_response = get_response
 
     def process_request(self, request):
         """
@@ -160,8 +164,8 @@ class CacheMiddleware(UpdateCacheMiddleware, FetchFromCacheMiddleware):
     Also used as the hook point for the cache decorator, which is generated
     using the decorator-from-middleware utility.
     """
-    def __init__(self, get_response=None, cache_timeout=None, **kwargs):
-        self.get_response = get_response
+    def __init__(self, get_response, cache_timeout=None, page_timeout=None, **kwargs):
+        super().__init__(get_response)
         # We need to differentiate between "provided, but using default value",
         # and "not provided". If the value is provided using a default, then
         # we fall back to system defaults. If it is not provided at all,
@@ -171,19 +175,18 @@ class CacheMiddleware(UpdateCacheMiddleware, FetchFromCacheMiddleware):
             key_prefix = kwargs['key_prefix']
             if key_prefix is None:
                 key_prefix = ''
+            self.key_prefix = key_prefix
         except KeyError:
-            key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
-        self.key_prefix = key_prefix
-
+            pass
         try:
             cache_alias = kwargs['cache_alias']
             if cache_alias is None:
                 cache_alias = DEFAULT_CACHE_ALIAS
+            self.cache_alias = cache_alias
+            self.cache = caches[self.cache_alias]
         except KeyError:
-            cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
-        self.cache_alias = cache_alias
+            pass
 
-        if cache_timeout is None:
-            cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
-        self.cache_timeout = cache_timeout
-        self.cache = caches[self.cache_alias]
+        if cache_timeout is not None:
+            self.cache_timeout = cache_timeout
+        self.page_timeout = page_timeout

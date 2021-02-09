@@ -10,9 +10,6 @@ class Person(models.Model):
     class Meta:
         ordering = ('name',)
 
-    def __str__(self):
-        return self.name
-
 
 class Group(models.Model):
     name = models.CharField(max_length=128)
@@ -26,9 +23,6 @@ class Group(models.Model):
 
     class Meta:
         ordering = ('name',)
-
-    def __str__(self):
-        return self.name
 
 
 class Membership(models.Model):
@@ -72,15 +66,19 @@ class TestNoDefaultsOrNulls(models.Model):
 class PersonSelfRefM2M(models.Model):
     name = models.CharField(max_length=5)
     friends = models.ManyToManyField('self', through="Friendship", symmetrical=False)
-
-    def __str__(self):
-        return self.name
+    sym_friends = models.ManyToManyField('self', through='SymmetricalFriendship', symmetrical=True)
 
 
 class Friendship(models.Model):
     first = models.ForeignKey(PersonSelfRefM2M, models.CASCADE, related_name="rel_from_set")
     second = models.ForeignKey(PersonSelfRefM2M, models.CASCADE, related_name="rel_to_set")
     date_friended = models.DateTimeField()
+
+
+class SymmetricalFriendship(models.Model):
+    first = models.ForeignKey(PersonSelfRefM2M, models.CASCADE)
+    second = models.ForeignKey(PersonSelfRefM2M, models.CASCADE, related_name='+')
+    date_friended = models.DateField()
 
 
 # Custom through link fields
@@ -91,9 +89,6 @@ class Event(models.Model):
         through_fields=('event', 'invitee'),
         related_name='events_invited',
     )
-
-    def __str__(self):
-        return self.title
 
 
 class Invitation(models.Model):
@@ -114,9 +109,6 @@ class Employee(models.Model):
 
     class Meta:
         ordering = ('pk',)
-
-    def __str__(self):
-        return self.name
 
 
 class Relationship(models.Model):

@@ -40,11 +40,15 @@ class MigrationLoader:
     in memory.
     """
 
-    def __init__(self, connection, load=True, ignore_no_migrations=False):
+    def __init__(
+        self, connection, load=True, ignore_no_migrations=False,
+        replace_migrations=True,
+    ):
         self.connection = connection
         self.disk_migrations = None
         self.applied_migrations = None
         self.ignore_no_migrations = ignore_no_migrations
+        self.replace_migrations = replace_migrations
         if load:
             self.build_graph()
 
@@ -75,22 +79,26 @@ class MigrationLoader:
             was_loaded = module_name in sys.modules
             try:
                 module = import_module(module_name)
-            except ImportError as e:
-                # I hate doing this, but I don't want to squash other import errors.
-                # Might be better to try a directory check directly.
-                if ((explicit and self.ignore_no_migrations) or (
-                        not explicit and "No module named" in str(e) and MIGRATIONS_MODULE_NAME in str(e))):
+            except ModuleNotFoundError as e:
+                if (
+                    (explicit and self.ignore_no_migrations) or
+                    (not explicit and MIGRATIONS_MODULE_NAME in e.name.split('.'))
+                ):
                     self.unmigrated_apps.add(app_config.label)
                     continue
                 raise
             else:
-                # Empty directories are namespaces.
-                # getattr() needed on PY36 and older (replace w/attribute access).
-                if getattr(module, '__file__', None) is None:
-                    self.unmigrated_apps.add(app_config.label)
-                    continue
                 # Module is not a package (e.g. migrations.py).
                 if not hasattr(module, '__path__'):
+                    self.unmigrated_apps.add(app_config.label)
+                    continue
+                # Empty directories are namespaces. Namespace packages have no
+                # __file__ and don't use a list for __path__. See
+                # https://docs.python.org/3/reference/import.html#namespace-packages
+                if (
+                    getattr(module, '__file__', None) is None and
+                    not isinstance(module.__path__, list)
+                ):
                     self.unmigrated_apps.add(app_config.label)
                     continue
                 # Force a reload if it's already loaded (tests need this)
@@ -206,7 +214,7 @@ class MigrationLoader:
         self.load_disk()
         # Load database data
         if self.connection is None:
-            self.applied_migrations = set()
+            self.applied_migrations = {}
         else:
             recorder = MigrationRecorder(self.connection)
             self.applied_migrations = recorder.applied_migrations()
@@ -225,24 +233,27 @@ class MigrationLoader:
         # Add external dependencies now that the internal ones have been resolved.
         for key, migration in self.disk_migrations.items():
             self.add_external_dependencies(key, migration)
-        # Carry out replacements where possible.
-        for key, migration in self.replacements.items():
-            # Get applied status of each of this migration's replacement targets.
-            applied_statuses = [(target in self.applied_migrations) for target in migration.replaces]
-            # Ensure the replacing migration is only marked as applied if all of
-            # its replacement targets are.
-            if all(applied_statuses):
-                self.applied_migrations.add(key)
-            else:
-                self.applied_migrations.discard(key)
-            # A replacing migration can be used if either all or none of its
-            # replacement targets have been applied.
-            if all(applied_statuses) or (not any(applied_statuses)):
-                self.graph.remove_replaced_nodes(key, migration.replaces)
-            else:
-                # This replacing migration cannot be used because it is partially applied.
-                # Remove it from the graph and remap dependencies to it (#25945).
-                self.graph.remove_replacement_node(key, migration.replaces)
+        # Carry out replacements where possible and if enabled.
+        if self.replace_migrations:
+            for key, migration in self.replacements.items():
+                # Get applied status of each of this migration's replacement
+                # targets.
+                applied_statuses = [(target in self.applied_migrations) for target in migration.replaces]
+                # The replacing migration is only marked as applied if all of
+                # its replacement targets are.
+                if all(applied_statuses):
+                    self.applied_migrations[key] = migration
+                else:
+                    self.applied_migrations.pop(key, None)
+                # A replacing migration can be used if either all or none of
+                # its replacement targets have been applied.
+                if all(applied_statuses) or (not any(applied_statuses)):
+                    self.graph.remove_replaced_nodes(key, migration.replaces)
+                else:
+                    # This replacing migration cannot be used because it is
+                    # partially applied. Remove it from the graph and remap
+                    # dependencies to it (#25945).
+                    self.graph.remove_replacement_node(key, migration.replaces)
         # Ensure the graph is consistent.
         try:
             self.graph.validate_consistency()
@@ -271,7 +282,7 @@ class MigrationLoader:
                         ),
                         exc.node
                     ) from exc
-            raise exc
+            raise
         self.graph.ensure_not_cyclic()
 
     def check_consistent_history(self, connection):
@@ -312,7 +323,7 @@ class MigrationLoader:
             if app_label in seen_apps:
                 conflicting_apps.add(app_label)
             seen_apps.setdefault(app_label, set()).add(migration_name)
-        return {app_label: seen_apps[app_label] for app_label in conflicting_apps}
+        return {app_label: sorted(seen_apps[app_label]) for app_label in conflicting_apps}
 
     def project_state(self, nodes=None, at_end=True):
         """
@@ -322,3 +333,21 @@ class MigrationLoader:
         See graph.make_state() for the meaning of "nodes" and "at_end".
         """
         return self.graph.make_state(nodes=nodes, at_end=at_end, real_apps=list(self.unmigrated_apps))
+
+    def collect_sql(self, plan):
+        """
+        Take a migration plan and return a list of collected SQL statements
+        that represent the best-efforts version of that plan.
+        """
+        statements = []
+        state = None
+        for migration, backwards in plan:
+            with self.connection.schema_editor(collect_sql=True, atomic=migration.atomic) as schema_editor:
+                if state is None:
+                    state = self.project_state((migration.app_label, migration.name), at_end=False)
+                if not backwards:
+                    state = migration.apply(state, schema_editor, collect_sql=True)
+                else:
+                    state = migration.unapply(state, schema_editor, collect_sql=True)
+            statements.extend(schema_editor.collected_sql)
+        return statements

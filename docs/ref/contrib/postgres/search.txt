@@ -4,7 +4,7 @@ Full text search
 
 The database functions in the ``django.contrib.postgres.search`` module ease
 the use of PostgreSQL's `full text search engine
-<https://www.postgresql.org/docs/current/static/textsearch.html>`_.
+<https://www.postgresql.org/docs/current/textsearch.html>`_.
 
 For the examples in this document, we'll use the models defined in
 :doc:`/topics/db/queries`.
@@ -21,7 +21,7 @@ The ``search`` lookup
 
 .. fieldlookup:: search
 
-The simplest way to use full text search is to search a single term against a
+A common way to use full text search is to search a single term against a
 single column in the database. For example::
 
     >>> Entry.objects.filter(body_text__search='Cheese')
@@ -38,7 +38,7 @@ To use the ``search`` lookup, ``'django.contrib.postgres'`` must be in your
 ``SearchVector``
 ================
 
-.. class:: SearchVector(\*expressions, config=None, weight=None)
+.. class:: SearchVector(*expressions, config=None, weight=None)
 
 Searching against a single field is great but rather limiting. The ``Entry``
 instances we're searching belong to a ``Blog``, which has a ``tagline`` field.
@@ -80,10 +80,13 @@ looks for matches for all of the resulting terms.
 If ``search_type`` is ``'plain'``, which is the default, the terms are treated
 as separate keywords. If ``search_type`` is ``'phrase'``, the terms are treated
 as a single phrase. If ``search_type`` is ``'raw'``, then you can provide a
-formatted search query with terms and operators. Read PostgreSQL's `Full Text
-Search docs`_ to learn about differences and syntax. Examples:
+formatted search query with terms and operators. If ``search_type`` is
+``'websearch'``, then you can provide a formatted search query, similar to the
+one used by web search engines. ``'websearch'`` requires PostgreSQL ≥ 11. Read
+PostgreSQL's `Full Text Search docs`_ to learn about differences and syntax.
+Examples:
 
-.. _Full Text Search docs: https://www.postgresql.org/docs/current/static/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
+.. _Full Text Search docs: https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
 
     >>> from django.contrib.postgres.search import SearchQuery
     >>> SearchQuery('red tomato')  # two keywords
@@ -91,6 +94,7 @@ Search docs`_ to learn about differences and syntax. Examples:
     >>> SearchQuery('red tomato', search_type='phrase')  # a phrase
     >>> SearchQuery('tomato red', search_type='phrase')  # a different phrase
     >>> SearchQuery("'tomato' & ('red' | 'green')", search_type='raw')  # boolean operators
+    >>> SearchQuery("'tomato' ('red' OR 'green')", search_type='websearch')  # websearch operators
 
 ``SearchQuery`` terms can be combined logically to provide more flexibility::
 
@@ -102,18 +106,14 @@ Search docs`_ to learn about differences and syntax. Examples:
 See :ref:`postgresql-fts-search-configuration` for an explanation of the
 ``config`` parameter.
 
-.. versionadded:: 2.2
-
-    The `search_type` parameter was added.
-
 ``SearchRank``
 ==============
 
-.. class:: SearchRank(vector, query, weights=None)
+.. class:: SearchRank(vector, query, weights=None, normalization=None, cover_density=False)
 
-So far, we've just returned the results for which any match between the vector
-and the query are possible. It's likely you may wish to order the results by
-some sort of relevancy. PostgreSQL provides a ranking function which takes into
+So far, we've returned the results for which any match between the vector and
+the query are possible. It's likely you may wish to order the results by some
+sort of relevancy. PostgreSQL provides a ranking function which takes into
 account how often the query terms appear in the document, how close together
 the terms are in the document, and how important the part of the document is
 where they occur. The better the match, the higher the value of the rank. To
@@ -127,6 +127,80 @@ order by relevancy::
 
 See :ref:`postgresql-fts-weighting-queries` for an explanation of the
 ``weights`` parameter.
+
+Set the ``cover_density`` parameter to ``True`` to enable the cover density
+ranking, which means that the proximity of matching query terms is taken into
+account.
+
+Provide an integer to the ``normalization`` parameter to control rank
+normalization. This integer is a bit mask, so you can combine multiple
+behaviors::
+
+    >>> from django.db.models import Value
+    >>> Entry.objects.annotate(
+    ...     rank=SearchRank(
+    ...         vector,
+    ...         query,
+    ...         normalization=Value(2).bitor(Value(4)),
+    ...     )
+    ... )
+
+The PostgreSQL documentation has more details about `different rank
+normalization options`_.
+
+.. _different rank normalization options: https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-RANKING
+
+``SearchHeadline``
+==================
+
+.. class:: SearchHeadline(expression, query, config=None, start_sel=None, stop_sel=None, max_words=None, min_words=None, short_word=None, highlight_all=None, max_fragments=None, fragment_delimiter=None)
+
+Accepts a single text field or an expression, a query, a config, and a set of
+options. Returns highlighted search results.
+
+Set the ``start_sel`` and ``stop_sel`` parameters to the string values to be
+used to wrap highlighted query terms in the document. PostgreSQL's defaults are
+``<b>`` and ``</b>``.
+
+Provide integer values to the ``max_words`` and ``min_words`` parameters to
+determine the longest and shortest headlines. PostgreSQL's defaults are 35 and
+15.
+
+Provide an integer value to the ``short_word`` parameter to discard words of
+this length or less in each headline. PostgreSQL's default is 3.
+
+Set the ``highlight_all`` parameter to ``True`` to use the whole document in
+place of a fragment and ignore ``max_words``, ``min_words``, and ``short_word``
+parameters. That's disabled by default in PostgreSQL.
+
+Provide a non-zero integer value to the ``max_fragments`` to set the maximum
+number of fragments to display. That's disabled by default in PostgreSQL.
+
+Set the ``fragment_delimiter`` string parameter to configure the delimiter
+between fragments. PostgreSQL's default is ``" ... "``.
+
+The PostgreSQL documentation has more details on `highlighting search
+results`_.
+
+Usage example::
+
+    >>> from django.contrib.postgres.search import SearchHeadline, SearchQuery
+    >>> query = SearchQuery('red tomato')
+    >>> entry = Entry.objects.annotate(
+    ...     headline=SearchHeadline(
+    ...         'body_text',
+    ...         query,
+    ...         start_sel='<span>',
+    ...         stop_sel='</span>',
+    ...     ),
+    ... ).get()
+    >>> print(entry.headline)
+    Sandwich with <span>tomato</span> and <span>red</span> cheese.
+
+See :ref:`postgresql-fts-search-configuration` for an explanation of the
+``config`` parameter.
+
+.. _highlighting search results: https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-HEADLINE
 
 .. _postgresql-fts-search-configuration:
 
@@ -184,7 +258,7 @@ In the event that all the fields you're querying on are contained within one
 particular model, you can create a functional index which matches the search
 vector you wish to use. The PostgreSQL documentation has details on
 `creating indexes for full text search
-<https://www.postgresql.org/docs/current/static/textsearch-tables.html#TEXTSEARCH-TABLES-INDEX>`_.
+<https://www.postgresql.org/docs/current/textsearch-tables.html#TEXTSEARCH-TABLES-INDEX>`_.
 
 ``SearchVectorField``
 ---------------------
@@ -200,7 +274,7 @@ if it were an annotated ``SearchVector``::
     >>> Entry.objects.filter(search_vector='cheese')
     [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]
 
-.. _PostgreSQL documentation: https://www.postgresql.org/docs/current/static/textsearch-features.html#TEXTSEARCH-UPDATE-TRIGGERS
+.. _PostgreSQL documentation: https://www.postgresql.org/docs/current/textsearch-features.html#TEXTSEARCH-UPDATE-TRIGGERS
 
 Trigram similarity
 ==================
@@ -210,8 +284,8 @@ three consecutive characters. In addition to the :lookup:`trigram_similar`
 lookup, you can use a couple of other expressions.
 
 To use them, you need to activate the `pg_trgm extension
-<https://www.postgresql.org/docs/current/static/pgtrgm.html>`_ on
-PostgreSQL. You can install it using the
+<https://www.postgresql.org/docs/current/pgtrgm.html>`_ on PostgreSQL. You can
+install it using the
 :class:`~django.contrib.postgres.operations.TrigramExtension` migration
 operation.
 

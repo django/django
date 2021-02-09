@@ -4,7 +4,6 @@ import locale
 from decimal import Decimal
 from urllib.parse import quote
 
-from django.utils import six
 from django.utils.functional import Promise
 
 
@@ -17,11 +16,7 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
         return '%s. You passed in %r (%s)' % (super().__str__(), self.obj, type(self.obj))
 
 
-# For backwards compatibility. (originally in Django, then added to six 1.9)
-python_2_unicode_compatible = six.python_2_unicode_compatible
-
-
-def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
+def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
     Return a string representing 's'. Treat bytestrings using the 'encoding'
     codec.
@@ -31,7 +26,7 @@ def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
     if isinstance(s, Promise):
         # The input is the result of a gettext_lazy() call.
         return s
-    return force_text(s, encoding, strings_only, errors)
+    return force_str(s, encoding, strings_only, errors)
 
 
 _PROTECTED_TYPES = (
@@ -43,14 +38,14 @@ def is_protected_type(obj):
     """Determine if the object instance is of a protected type.
 
     Objects of protected types are preserved as-is when passed to
-    force_text(strings_only=True).
+    force_str(strings_only=True).
     """
     return isinstance(obj, _PROTECTED_TYPES)
 
 
-def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
+def force_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
-    Similar to smart_text, except that lazy instances are resolved to
+    Similar to smart_str(), except that lazy instances are resolved to
     strings, rather than kept as lazy objects.
 
     If strings_only is True, don't convert (some) non-string-like objects.
@@ -102,20 +97,6 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     return str(s).encode(encoding, errors)
 
 
-smart_str = smart_text
-force_str = force_text
-
-smart_str.__doc__ = """
-Apply smart_text in Python 3 and smart_bytes in Python 2.
-
-This is suitable for writing to sys.stdout (for instance).
-"""
-
-force_str.__doc__ = """
-Apply force_text in Python 3 and force_bytes in Python 2.
-"""
-
-
 def iri_to_uri(iri):
     """
     Convert an Internationalized Resource Identifier (IRI) portion to a URI
@@ -158,7 +139,7 @@ _hextobyte = {
     for fmt in ['%02x', '%02X']
 }
 # And then everything above 128, because bytes ≥ 128 are part of multibyte
-# unicode characters.
+# Unicode characters.
 _hexdig = '0123456789ABCDEFabcdef'
 _hextobyte.update({
     (a + b).encode(): bytes.fromhex(a + b)
@@ -219,19 +200,27 @@ def escape_uri_path(path):
     return quote(path, safe="/:@&+$,-_.!~*'()")
 
 
+def punycode(domain):
+    """Return the Punycode of the given domain if it's non-ASCII."""
+    return domain.encode('idna').decode('ascii')
+
+
 def repercent_broken_unicode(path):
     """
     As per section 3.2 of RFC 3987, step three of converting a URI into an IRI,
     repercent-encode any octet produced that is not part of a strictly legal
     UTF-8 octet sequence.
     """
-    try:
-        path.decode()
-    except UnicodeDecodeError as e:
-        repercent = quote(path[e.start:e.end], safe=b"/#%[]=:;$&()+,!?*@'~")
-        path = repercent_broken_unicode(
-            path[:e.start] + force_bytes(repercent) + path[e.end:])
-    return path
+    while True:
+        try:
+            path.decode()
+        except UnicodeDecodeError as e:
+            # CVE-2019-14235: A recursion shouldn't be used since the exception
+            # handling uses massive amounts of memory
+            repercent = quote(path[e.start:e.end], safe=b"/#%[]=:;$&()+,!?*@'~")
+            path = path[:e.start] + repercent.encode() + path[e.end:]
+        else:
+            return path
 
 
 def filepath_to_uri(path):
@@ -246,7 +235,7 @@ def filepath_to_uri(path):
         return path
     # I know about `os.sep` and `os.altsep` but I want to leave
     # some flexibility for hardcoding separators.
-    return quote(path.replace("\\", "/"), safe="/~!*()'")
+    return quote(str(path).replace("\\", "/"), safe="/~!*()'")
 
 
 def get_system_encoding():

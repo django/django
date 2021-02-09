@@ -4,12 +4,12 @@ from django.contrib.postgres import lookups
 from django.contrib.postgres.forms import SimpleArrayField
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
-from django.db.models import Field, IntegerField, Transform
+from django.db.models import Field, Func, IntegerField, Transform, Value
+from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import Exact, In
 from django.utils.translation import gettext_lazy as _
 
 from ..utils import prefix_validation_error
-from .mixins import CheckFieldDefaultMixin
 from .utils import AttributeSetter
 
 __all__ = ['ArrayField']
@@ -46,6 +46,10 @@ class ArrayField(CheckFieldDefaultMixin, Field):
         self.__dict__['model'] = model
         self.base_field.model = model
 
+    @classmethod
+    def _choices_is_value(cls, value):
+        return isinstance(value, (list, tuple)) or super()._choices_is_value(value)
+
     def check(self, **kwargs):
         errors = super().check(**kwargs)
         if self.base_field.remote_field:
@@ -81,6 +85,10 @@ class ArrayField(CheckFieldDefaultMixin, Field):
     def db_type(self, connection):
         size = self.size or ''
         return '%s[%s]' % (self.base_field.db_type(connection), size)
+
+    def cast_db_type(self, connection):
+        size = self.size or ''
+        return '%s[%s]' % (self.base_field.cast_db_type(connection), size)
 
     def get_placeholder(self, value, compiler, connection):
         return '%s::{}'.format(self.db_type(connection))
@@ -190,36 +198,46 @@ class ArrayField(CheckFieldDefaultMixin, Field):
         })
 
 
-@ArrayField.register_lookup
-class ArrayContains(lookups.DataContains):
-    def as_sql(self, qn, connection):
-        sql, params = super().as_sql(qn, connection)
-        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
-        return sql, params
+class ArrayRHSMixin:
+    def __init__(self, lhs, rhs):
+        if isinstance(rhs, (tuple, list)):
+            expressions = []
+            for value in rhs:
+                if not hasattr(value, 'resolve_expression'):
+                    field = lhs.output_field
+                    value = Value(field.base_field.get_prep_value(value))
+                expressions.append(value)
+            rhs = Func(
+                *expressions,
+                function='ARRAY',
+                template='%(function)s[%(expressions)s]',
+            )
+        super().__init__(lhs, rhs)
+
+    def process_rhs(self, compiler, connection):
+        rhs, rhs_params = super().process_rhs(compiler, connection)
+        cast_type = self.lhs.output_field.cast_db_type(connection)
+        return '%s::%s' % (rhs, cast_type), rhs_params
 
 
 @ArrayField.register_lookup
-class ArrayContainedBy(lookups.ContainedBy):
-    def as_sql(self, qn, connection):
-        sql, params = super().as_sql(qn, connection)
-        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
-        return sql, params
+class ArrayContains(ArrayRHSMixin, lookups.DataContains):
+    pass
 
 
 @ArrayField.register_lookup
-class ArrayExact(Exact):
-    def as_sql(self, qn, connection):
-        sql, params = super().as_sql(qn, connection)
-        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
-        return sql, params
+class ArrayContainedBy(ArrayRHSMixin, lookups.ContainedBy):
+    pass
 
 
 @ArrayField.register_lookup
-class ArrayOverlap(lookups.Overlap):
-    def as_sql(self, qn, connection):
-        sql, params = super().as_sql(qn, connection)
-        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
-        return sql, params
+class ArrayExact(ArrayRHSMixin, Exact):
+    pass
+
+
+@ArrayField.register_lookup
+class ArrayOverlap(ArrayRHSMixin, lookups.Overlap):
+    pass
 
 
 @ArrayField.register_lookup
@@ -240,8 +258,7 @@ class ArrayLenTransform(Transform):
 class ArrayInLookup(In):
     def get_prep_lookup(self):
         values = super().get_prep_lookup()
-        if hasattr(self.rhs, '_prepare'):
-            # Subqueries don't need further preparation.
+        if hasattr(values, 'resolve_expression'):
             return values
         # In.process_rhs() expects values to be hashable, so convert lists
         # to tuples.
@@ -263,7 +280,7 @@ class IndexTransform(Transform):
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        return '%s[%s]' % (lhs, self.index), params
+        return '%s[%%s]' % lhs, params + [self.index]
 
     @property
     def output_field(self):
@@ -289,7 +306,7 @@ class SliceTransform(Transform):
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        return '%s[%s:%s]' % (lhs, self.start, self.end), params
+        return '%s[%%s:%%s]' % lhs, params + [self.start, self.end]
 
 
 class SliceTransformFactory:

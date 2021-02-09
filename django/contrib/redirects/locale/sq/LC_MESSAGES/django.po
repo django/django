@@ -2,13 +2,13 @@
 #
 # Translators:
 # Besnik <besnik@programeshqip.org>, 2011
-# Besnik <besnik@programeshqip.org>, 2015
+# Besnik <besnik@programeshqip.org>, 2015,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-18 09:49+0000\n"
 "Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
@@ -28,21 +28,21 @@ msgid "redirect from"
 msgstr "ridrejtim prej"
 
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
 msgstr ""
 "Ky do të duhej të ishte shteg absolut, pa emrin e përkatësisë. Për shembull: "
-"'/ngjarje/kërkim/'."
+"“/ngjarje/kërkim/”."
 
 msgid "redirect to"
 msgstr "ridrejtim te"
 
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+"“http://”."
 msgstr ""
 "Ky mund të jetë shteg absolut (si më sipër) ose URL e plotë që fillon me "
-"'http://'."
+"“http://”."
 
 msgid "redirect"
 msgstr "ridrejtim"

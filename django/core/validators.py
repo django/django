@@ -1,28 +1,19 @@
 import ipaddress
 import re
+import warnings
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
-from django.utils.functional import SimpleLazyObject
+from django.utils.deprecation import RemovedInDjango41Warning
+from django.utils.encoding import punycode
 from django.utils.ipv6 import is_valid_ipv6_address
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
 # These values, if given to validate(), will trigger the self.required check.
 EMPTY_VALUES = (None, '', [], (), {})
-
-
-def _lazy_re_compile(regex, flags=0):
-    """Lazily compile a regex with flags."""
-    def _compile():
-        # Compile the regex if it was not passed pre-compiled.
-        if isinstance(regex, str):
-            return re.compile(regex, flags)
-        else:
-            assert not flags, "flags must be empty if regex is passed pre-compiled"
-            return regex
-    return SimpleLazyObject(_compile)
 
 
 @deconstructible
@@ -57,7 +48,7 @@ class RegexValidator:
         regex_matches = self.regex.search(str(value))
         invalid_input = regex_matches if self.inverse_match else not regex_matches
         if invalid_input:
-            raise ValidationError(self.message, code=self.code)
+            raise ValidationError(self.message, code=self.code, params={'value': value})
 
     def __eq__(self, other):
         return (
@@ -72,11 +63,11 @@ class RegexValidator:
 
 @deconstructible
 class URLValidator(RegexValidator):
-    ul = '\u00a1-\uffff'  # unicode letters range (must not be a raw string)
+    ul = '\u00a1-\uffff'  # Unicode letters range (must not be a raw string).
 
     # IP patterns
     ipv4_re = r'(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}'
-    ipv6_re = r'\[[0-9a-f:\.]+\]'  # (simple regex, validated later)
+    ipv6_re = r'\[[0-9a-f:.]+\]'  # (simple regex, validated later)
 
     # Host patterns
     hostname_re = r'[a-z' + ul + r'0-9](?:[a-z' + ul + r'0-9-]{0,61}[a-z' + ul + r'0-9])?'
@@ -93,7 +84,7 @@ class URLValidator(RegexValidator):
     host_re = '(' + hostname_re + domain_re + tld_re + '|localhost)'
 
     regex = _lazy_re_compile(
-        r'^(?:[a-z0-9\.\-\+]*)://'  # scheme is validated separately
+        r'^(?:[a-z0-9.+-]*)://'  # scheme is validated separately
         r'(?:[^\s:@/]+(?::[^\s:@/]*)?@)?'  # user:pass authentication
         r'(?:' + ipv4_re + '|' + ipv6_re + '|' + host_re + ')'
         r'(?::\d{2,5})?'  # port
@@ -108,10 +99,12 @@ class URLValidator(RegexValidator):
             self.schemes = schemes
 
     def __call__(self, value):
-        # Check first if the scheme is valid
+        if not isinstance(value, str):
+            raise ValidationError(self.message, code=self.code, params={'value': value})
+        # Check if the scheme is valid.
         scheme = value.split('://')[0].lower()
         if scheme not in self.schemes:
-            raise ValidationError(self.message, code=self.code)
+            raise ValidationError(self.message, code=self.code, params={'value': value})
 
         # Then check full URL
         try:
@@ -122,9 +115,9 @@ class URLValidator(RegexValidator):
                 try:
                     scheme, netloc, path, query, fragment = urlsplit(value)
                 except ValueError:  # for example, "Invalid IPv6 URL"
-                    raise ValidationError(self.message, code=self.code)
+                    raise ValidationError(self.message, code=self.code, params={'value': value})
                 try:
-                    netloc = netloc.encode('idna').decode('ascii')  # IDN -> ACE
+                    netloc = punycode(netloc)  # IDN -> ACE
                 except UnicodeError:  # invalid domain part
                     raise e
                 url = urlunsplit((scheme, netloc, path, query, fragment))
@@ -135,18 +128,18 @@ class URLValidator(RegexValidator):
             # Now verify IPv6 in the netloc part
             host_match = re.search(r'^\[(.+)\](?::\d{2,5})?$', urlsplit(value).netloc)
             if host_match:
-                potential_ip = host_match.groups()[0]
+                potential_ip = host_match[1]
                 try:
                     validate_ipv6_address(potential_ip)
                 except ValidationError:
-                    raise ValidationError(self.message, code=self.code)
+                    raise ValidationError(self.message, code=self.code, params={'value': value})
 
         # The maximum length of a full host name is 253 characters per RFC 1034
         # section 3.1. It's defined to be 255 bytes or less, but this includes
         # one byte for the length of the name and one byte for the trailing dot
         # that's used to indicate absolute names in DNS.
-        if len(urlsplit(value).netloc) > 253:
-            raise ValidationError(self.message, code=self.code)
+        if len(urlsplit(value).hostname) > 253:
+            raise ValidationError(self.message, code=self.code, params={'value': value})
 
 
 integer_validator = RegexValidator(
@@ -174,38 +167,65 @@ class EmailValidator:
         re.IGNORECASE)
     literal_regex = _lazy_re_compile(
         # literal form, ipv4 or ipv6 address (SMTP 4.1.3)
-        r'\[([A-f0-9:\.]+)\]\Z',
+        r'\[([A-f0-9:.]+)\]\Z',
         re.IGNORECASE)
-    domain_whitelist = ['localhost']
+    domain_allowlist = ['localhost']
 
-    def __init__(self, message=None, code=None, whitelist=None):
+    @property
+    def domain_whitelist(self):
+        warnings.warn(
+            'The domain_whitelist attribute is deprecated in favor of '
+            'domain_allowlist.',
+            RemovedInDjango41Warning,
+            stacklevel=2,
+        )
+        return self.domain_allowlist
+
+    @domain_whitelist.setter
+    def domain_whitelist(self, allowlist):
+        warnings.warn(
+            'The domain_whitelist attribute is deprecated in favor of '
+            'domain_allowlist.',
+            RemovedInDjango41Warning,
+            stacklevel=2,
+        )
+        self.domain_allowlist = allowlist
+
+    def __init__(self, message=None, code=None, allowlist=None, *, whitelist=None):
+        if whitelist is not None:
+            allowlist = whitelist
+            warnings.warn(
+                'The whitelist argument is deprecated in favor of allowlist.',
+                RemovedInDjango41Warning,
+                stacklevel=2,
+            )
         if message is not None:
             self.message = message
         if code is not None:
             self.code = code
-        if whitelist is not None:
-            self.domain_whitelist = whitelist
+        if allowlist is not None:
+            self.domain_allowlist = allowlist
 
     def __call__(self, value):
         if not value or '@' not in value:
-            raise ValidationError(self.message, code=self.code)
+            raise ValidationError(self.message, code=self.code, params={'value': value})
 
         user_part, domain_part = value.rsplit('@', 1)
 
         if not self.user_regex.match(user_part):
-            raise ValidationError(self.message, code=self.code)
+            raise ValidationError(self.message, code=self.code, params={'value': value})
 
-        if (domain_part not in self.domain_whitelist and
+        if (domain_part not in self.domain_allowlist and
                 not self.validate_domain_part(domain_part)):
             # Try for possible IDN domain-part
             try:
-                domain_part = domain_part.encode('idna').decode('ascii')
+                domain_part = punycode(domain_part)
             except UnicodeError:
                 pass
             else:
                 if self.validate_domain_part(domain_part):
                     return
-            raise ValidationError(self.message, code=self.code)
+            raise ValidationError(self.message, code=self.code, params={'value': value})
 
     def validate_domain_part(self, domain_part):
         if self.domain_regex.match(domain_part):
@@ -213,7 +233,7 @@ class EmailValidator:
 
         literal_match = self.literal_regex.match(domain_part)
         if literal_match:
-            ip_address = literal_match.group(1)
+            ip_address = literal_match[1]
             try:
                 validate_ipv46_address(ip_address)
                 return True
@@ -224,7 +244,7 @@ class EmailValidator:
     def __eq__(self, other):
         return (
             isinstance(other, EmailValidator) and
-            (self.domain_whitelist == other.domain_whitelist) and
+            (self.domain_allowlist == other.domain_allowlist) and
             (self.message == other.message) and
             (self.code == other.code)
         )
@@ -236,14 +256,14 @@ slug_re = _lazy_re_compile(r'^[-a-zA-Z0-9_]+\Z')
 validate_slug = RegexValidator(
     slug_re,
     # Translators: "letters" means latin letters: a-z and A-Z.
-    _("Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."),
+    _('Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.'),
     'invalid'
 )
 
 slug_unicode_re = _lazy_re_compile(r'^[-\w]+\Z')
 validate_unicode_slug = RegexValidator(
     slug_unicode_re,
-    _("Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or hyphens."),
+    _('Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or hyphens.'),
     'invalid'
 )
 
@@ -252,12 +272,12 @@ def validate_ipv4_address(value):
     try:
         ipaddress.IPv4Address(value)
     except ValueError:
-        raise ValidationError(_('Enter a valid IPv4 address.'), code='invalid')
+        raise ValidationError(_('Enter a valid IPv4 address.'), code='invalid', params={'value': value})
 
 
 def validate_ipv6_address(value):
     if not is_valid_ipv6_address(value):
-        raise ValidationError(_('Enter a valid IPv6 address.'), code='invalid')
+        raise ValidationError(_('Enter a valid IPv6 address.'), code='invalid', params={'value': value})
 
 
 def validate_ipv46_address(value):
@@ -267,7 +287,7 @@ def validate_ipv46_address(value):
         try:
             validate_ipv6_address(value)
         except ValidationError:
-            raise ValidationError(_('Enter a valid IPv4 or IPv6 address.'), code='invalid')
+            raise ValidationError(_('Enter a valid IPv4 or IPv6 address.'), code='invalid', params={'value': value})
 
 
 ip_address_validator_map = {
@@ -323,8 +343,9 @@ class BaseValidator:
             raise ValidationError(self.message, code=self.code, params=params)
 
     def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return (
-            isinstance(other, self.__class__) and
             self.limit_value == other.limit_value and
             self.message == other.message and
             self.code == other.code
@@ -417,7 +438,7 @@ class DecimalValidator:
     def __call__(self, value):
         digit_tuple, exponent = value.as_tuple()[1:]
         if exponent in {'F', 'n', 'N'}:
-            raise ValidationError(self.messages['invalid'])
+            raise ValidationError(self.messages['invalid'], code='invalid', params={'value': value})
         if exponent >= 0:
             # A positive exponent adds that many trailing zeros.
             digits = len(digit_tuple) + exponent
@@ -439,20 +460,20 @@ class DecimalValidator:
             raise ValidationError(
                 self.messages['max_digits'],
                 code='max_digits',
-                params={'max': self.max_digits},
+                params={'max': self.max_digits, 'value': value},
             )
         if self.decimal_places is not None and decimals > self.decimal_places:
             raise ValidationError(
                 self.messages['max_decimal_places'],
                 code='max_decimal_places',
-                params={'max': self.decimal_places},
+                params={'max': self.decimal_places, 'value': value},
             )
         if (self.max_digits is not None and self.decimal_places is not None and
                 whole_digits > (self.max_digits - self.decimal_places)):
             raise ValidationError(
                 self.messages['max_whole_digits'],
                 code='max_whole_digits',
-                params={'max': (self.max_digits - self.decimal_places)},
+                params={'max': (self.max_digits - self.decimal_places), 'value': value},
             )
 
     def __eq__(self, other):
@@ -466,8 +487,8 @@ class DecimalValidator:
 @deconstructible
 class FileExtensionValidator:
     message = _(
-        "File extension '%(extension)s' is not allowed. "
-        "Allowed extensions are: '%(allowed_extensions)s'."
+        'File extension “%(extension)s” is not allowed. '
+        'Allowed extensions are: %(allowed_extensions)s.'
     )
     code = 'invalid_extension'
 
@@ -488,7 +509,8 @@ class FileExtensionValidator:
                 code=self.code,
                 params={
                     'extension': extension,
-                    'allowed_extensions': ', '.join(self.allowed_extensions)
+                    'allowed_extensions': ', '.join(self.allowed_extensions),
+                    'value': value,
                 }
             )
 
@@ -529,7 +551,7 @@ class ProhibitNullCharactersValidator:
 
     def __call__(self, value):
         if '\x00' in str(value):
-            raise ValidationError(self.message, code=self.code)
+            raise ValidationError(self.message, code=self.code, params={'value': value})
 
     def __eq__(self, other):
         return (

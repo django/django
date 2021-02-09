@@ -64,8 +64,13 @@ class ExtendsBehaviorTests(SimpleTestCase):
         """
         engine = Engine(dirs=[os.path.join(RECURSIVE, 'fs')])
         template = engine.get_template('self.html')
-        with self.assertRaises(TemplateDoesNotExist):
+        with self.assertRaises(TemplateDoesNotExist) as e:
             template.render(Context({}))
+        tried = e.exception.tried
+        self.assertEqual(len(tried), 1)
+        origin, message = tried[0]
+        self.assertEqual(origin.template_name, 'self.html')
+        self.assertEqual(message, 'Skipped to avoid recursion')
 
     def test_extend_cached(self):
         engine = Engine(

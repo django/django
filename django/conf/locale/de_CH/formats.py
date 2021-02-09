@@ -21,14 +21,13 @@ DATETIME_INPUT_FORMATS = [
     '%d.%m.%Y %H:%M:%S',    # '25.10.2006 14:30:59'
     '%d.%m.%Y %H:%M:%S.%f',  # '25.10.2006 14:30:59.000200'
     '%d.%m.%Y %H:%M',       # '25.10.2006 14:30'
-    '%d.%m.%Y',             # '25.10.2006'
 ]
 
 # these are the separators for non-monetary numbers. For monetary numbers,
 # the DECIMAL_SEPARATOR is a . (decimal point) and the THOUSAND_SEPARATOR is a
 # ' (single quote).
-# For details, please refer to http://www.bk.admin.ch/dokumentation/sprachen/04915/05016/index.html?lang=de
-# (in German) and the documentation
+# For details, please refer to the documentation and the following link:
+# https://www.bk.admin.ch/bk/de/home/dokumentation/sprachen/hilfsmittel-textredaktion/schreibweisungen.html
 DECIMAL_SEPARATOR = ','
 THOUSAND_SEPARATOR = '\xa0'  # non-breaking space
 NUMBER_GROUPING = 3

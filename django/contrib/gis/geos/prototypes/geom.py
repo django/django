@@ -1,8 +1,8 @@
-from ctypes import POINTER, c_char_p, c_int, c_size_t, c_ubyte
+from ctypes import POINTER, c_char_p, c_int, c_ubyte
 
 from django.contrib.gis.geos.libgeos import CS_PTR, GEOM_PTR, GEOSFuncFactory
 from django.contrib.gis.geos.prototypes.errcheck import (
-    check_geom, check_minus_one, check_sized_string, check_string,
+    check_geom, check_minus_one, check_string,
 )
 
 # This is the return type used by binary output (WKB, HEX) routines.
@@ -21,21 +21,6 @@ class geos_char_p(c_char_p):
 
 
 # ### ctypes factory classes ###
-class BinConstructor(GEOSFuncFactory):
-    "Generate a prototype for binary construction (HEX, WKB) GEOS routines."
-    argtypes = [c_char_p, c_size_t]
-    restype = GEOM_PTR
-    errcheck = staticmethod(check_geom)
-
-
-# HEX & WKB output
-class BinOutput(GEOSFuncFactory):
-    "Generate a prototype for the routines that return a sized string."
-    argtypes = [GEOM_PTR, POINTER(c_size_t)]
-    restype = c_uchar_p
-    errcheck = staticmethod(check_sized_string)
-
-
 class GeomOutput(GEOSFuncFactory):
     "For GEOS routines that return a geometry."
     restype = GEOM_PTR

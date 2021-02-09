@@ -67,7 +67,16 @@ from django.core.exceptions import FieldError
 from django.db import connections, router, transaction
 from django.db.models import Q, signals
 from django.db.models.query import QuerySet
+from django.db.models.query_utils import DeferredAttribute
+from django.db.models.utils import resolve_callables
 from django.utils.functional import cached_property
+
+
+class ForeignKeyDeferredAttribute(DeferredAttribute):
+    def __set__(self, instance, value):
+        if instance.__dict__.get(self.field.attname) != value and self.field.is_cached(instance):
+            self.field.delete_cached_value(instance)
+        instance.__dict__[self.field.attname] = value
 
 
 class ForwardManyToOneDescriptor:
@@ -572,6 +581,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             queryset._add_hints(instance=self.instance)
             if self._db:
                 queryset = queryset.using(self._db)
+            queryset._defer_next_filter = True
             queryset = queryset.filter(**self.core_filters)
             for field in self.field.foreign_related_fields:
                 val = getattr(self.instance, field.attname)
@@ -632,7 +642,6 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
         def add(self, *objs, bulk=True):
             self._remove_prefetched_objects()
-            objs = list(objs)
             db = router.db_for_write(self.model, instance=self.instance)
 
             def check_and_update_obj(obj):
@@ -688,6 +697,10 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 val = self.field.get_foreign_related_value(self.instance)
                 old_ids = set()
                 for obj in objs:
+                    if not isinstance(obj, self.model):
+                        raise TypeError("'%s' instance expected, got %r" % (
+                            self.model._meta.object_name, obj,
+                        ))
                     # Is obj actually part of this descriptor set?
                     if self.field.get_local_related_value(obj) == val:
                         old_ids.add(obj.pk)
@@ -875,6 +888,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             queryset._add_hints(instance=self.instance)
             if self._db:
                 queryset = queryset.using(self._db)
+            queryset._defer_next_filter = True
             return queryset._next_is_sticky().filter(**self.core_filters)
 
         def _remove_prefetched_objects(self):
@@ -929,33 +943,6 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 False,
             )
 
-        @property
-        def constrained_target(self):
-            # If the through relation's target field's foreign integrity is
-            # enforced, the query can be performed solely against the through
-            # table as the INNER JOIN'ing against target table is unnecessary.
-            if not self.target_field.db_constraint:
-                return None
-            db = router.db_for_read(self.through, instance=self.instance)
-            if not connections[db].features.supports_foreign_keys:
-                return None
-            hints = {'instance': self.instance}
-            manager = self.through._base_manager.db_manager(db, hints=hints)
-            filters = {self.source_field_name: self.instance.pk}
-            # Nullable target rows must be excluded as well as they would have
-            # been filtered out from an INNER JOIN.
-            if self.target_field.null:
-                filters['%s__isnull' % self.target_field_name] = False
-            return manager.filter(**filters)
-
-        def exists(self):
-            constrained_target = self.constrained_target
-            return constrained_target.exists() if constrained_target else super().exists()
-
-        def count(self):
-            constrained_target = self.constrained_target
-            return constrained_target.count() if constrained_target else super().count()
-
         def add(self, *objs, through_defaults=None):
             self._remove_prefetched_objects()
             db = router.db_for_write(self.through, instance=self.instance)
@@ -965,11 +952,14 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     through_defaults=through_defaults,
                 )
                 # If this is a symmetrical m2m relation to self, add the mirror
-                # entry in the m2m table. `through_defaults` aren't used here
-                # because of the system check error fields.E332: Many-to-many
-                # fields with intermediate tables must not be symmetrical.
+                # entry in the m2m table.
                 if self.symmetrical:
-                    self._add_items(self.target_field_name, self.source_field_name, *objs)
+                    self._add_items(
+                        self.target_field_name,
+                        self.source_field_name,
+                        *objs,
+                        through_defaults=through_defaults,
+                    )
         add.alters_data = True
 
         def remove(self, *objs):
@@ -1013,7 +1003,8 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     for obj in objs:
                         fk_val = (
                             self.target_field.get_foreign_related_value(obj)[0]
-                            if isinstance(obj, self.model) else obj
+                            if isinstance(obj, self.model)
+                            else self.target_field.get_prep_value(obj)
                         )
                         if fk_val in old_ids:
                             old_ids.remove(fk_val)
@@ -1051,80 +1042,131 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             return obj, created
         update_or_create.alters_data = True
 
+        def _get_target_ids(self, target_field_name, objs):
+            """
+            Return the set of ids of `objs` that the target field references.
+            """
+            from django.db.models import Model
+            target_ids = set()
+            target_field = self.through._meta.get_field(target_field_name)
+            for obj in objs:
+                if isinstance(obj, self.model):
+                    if not router.allow_relation(obj, self.instance):
+                        raise ValueError(
+                            'Cannot add "%r": instance is on database "%s", '
+                            'value is on database "%s"' %
+                            (obj, self.instance._state.db, obj._state.db)
+                        )
+                    target_id = target_field.get_foreign_related_value(obj)[0]
+                    if target_id is None:
+                        raise ValueError(
+                            'Cannot add "%r": the value for field "%s" is None' %
+                            (obj, target_field_name)
+                        )
+                    target_ids.add(target_id)
+                elif isinstance(obj, Model):
+                    raise TypeError(
+                        "'%s' instance expected, got %r" %
+                        (self.model._meta.object_name, obj)
+                    )
+                else:
+                    target_ids.add(target_field.get_prep_value(obj))
+            return target_ids
+
+        def _get_missing_target_ids(self, source_field_name, target_field_name, db, target_ids):
+            """
+            Return the subset of ids of `objs` that aren't already assigned to
+            this relationship.
+            """
+            vals = self.through._default_manager.using(db).values_list(
+                target_field_name, flat=True
+            ).filter(**{
+                source_field_name: self.related_val[0],
+                '%s__in' % target_field_name: target_ids,
+            })
+            return target_ids.difference(vals)
+
+        def _get_add_plan(self, db, source_field_name):
+            """
+            Return a boolean triple of the way the add should be performed.
+
+            The first element is whether or not bulk_create(ignore_conflicts)
+            can be used, the second whether or not signals must be sent, and
+            the third element is whether or not the immediate bulk insertion
+            with conflicts ignored can be performed.
+            """
+            # Conflicts can be ignored when the intermediary model is
+            # auto-created as the only possible collision is on the
+            # (source_id, target_id) tuple. The same assertion doesn't hold for
+            # user-defined intermediary models as they could have other fields
+            # causing conflicts which must be surfaced.
+            can_ignore_conflicts = (
+                connections[db].features.supports_ignore_conflicts and
+                self.through._meta.auto_created is not False
+            )
+            # Don't send the signal when inserting duplicate data row
+            # for symmetrical reverse entries.
+            must_send_signals = (self.reverse or source_field_name == self.source_field_name) and (
+                signals.m2m_changed.has_listeners(self.through)
+            )
+            # Fast addition through bulk insertion can only be performed
+            # if no m2m_changed listeners are connected for self.through
+            # as they require the added set of ids to be provided via
+            # pk_set.
+            return can_ignore_conflicts, must_send_signals, (can_ignore_conflicts and not must_send_signals)
+
         def _add_items(self, source_field_name, target_field_name, *objs, through_defaults=None):
             # source_field_name: the PK fieldname in join table for the source object
             # target_field_name: the PK fieldname in join table for the target object
             # *objs - objects to add. Either object instances, or primary keys of object instances.
-            through_defaults = through_defaults or {}
+            if not objs:
+                return
 
-            # If there aren't any objects, there is nothing to do.
-            from django.db.models import Model
-            if objs:
-                new_ids = set()
-                for obj in objs:
-                    if isinstance(obj, self.model):
-                        if not router.allow_relation(obj, self.instance):
-                            raise ValueError(
-                                'Cannot add "%r": instance is on database "%s", value is on database "%s"' %
-                                (obj, self.instance._state.db, obj._state.db)
-                            )
-                        fk_val = self.through._meta.get_field(
-                            target_field_name).get_foreign_related_value(obj)[0]
-                        if fk_val is None:
-                            raise ValueError(
-                                'Cannot add "%r": the value for field "%s" is None' %
-                                (obj, target_field_name)
-                            )
-                        new_ids.add(fk_val)
-                    elif isinstance(obj, Model):
-                        raise TypeError(
-                            "'%s' instance expected, got %r" %
-                            (self.model._meta.object_name, obj)
-                        )
-                    else:
-                        new_ids.add(obj)
+            through_defaults = dict(resolve_callables(through_defaults or {}))
+            target_ids = self._get_target_ids(target_field_name, objs)
+            db = router.db_for_write(self.through, instance=self.instance)
+            can_ignore_conflicts, must_send_signals, can_fast_add = self._get_add_plan(db, source_field_name)
+            if can_fast_add:
+                self.through._default_manager.using(db).bulk_create([
+                    self.through(**{
+                        '%s_id' % source_field_name: self.related_val[0],
+                        '%s_id' % target_field_name: target_id,
+                    })
+                    for target_id in target_ids
+                ], ignore_conflicts=True)
+                return
 
-                db = router.db_for_write(self.through, instance=self.instance)
-                vals = (self.through._default_manager.using(db)
-                        .values_list(target_field_name, flat=True)
-                        .filter(**{
-                            source_field_name: self.related_val[0],
-                            '%s__in' % target_field_name: new_ids,
-                        }))
-                new_ids.difference_update(vals)
+            missing_target_ids = self._get_missing_target_ids(
+                source_field_name, target_field_name, db, target_ids
+            )
+            with transaction.atomic(using=db, savepoint=False):
+                if must_send_signals:
+                    signals.m2m_changed.send(
+                        sender=self.through, action='pre_add',
+                        instance=self.instance, reverse=self.reverse,
+                        model=self.model, pk_set=missing_target_ids, using=db,
+                    )
+                # Add the ones that aren't there already.
+                self.through._default_manager.using(db).bulk_create([
+                    self.through(**through_defaults, **{
+                        '%s_id' % source_field_name: self.related_val[0],
+                        '%s_id' % target_field_name: target_id,
+                    })
+                    for target_id in missing_target_ids
+                ], ignore_conflicts=can_ignore_conflicts)
 
-                with transaction.atomic(using=db, savepoint=False):
-                    if self.reverse or source_field_name == self.source_field_name:
-                        # Don't send the signal when we are inserting the
-                        # duplicate data row for symmetrical reverse entries.
-                        signals.m2m_changed.send(
-                            sender=self.through, action='pre_add',
-                            instance=self.instance, reverse=self.reverse,
-                            model=self.model, pk_set=new_ids, using=db,
-                        )
-
-                    # Add the ones that aren't there already
-                    self.through._default_manager.using(db).bulk_create([
-                        self.through(**through_defaults, **{
-                            '%s_id' % source_field_name: self.related_val[0],
-                            '%s_id' % target_field_name: obj_id,
-                        })
-                        for obj_id in new_ids
-                    ])
-
-                    if self.reverse or source_field_name == self.source_field_name:
-                        # Don't send the signal when we are inserting the
-                        # duplicate data row for symmetrical reverse entries.
-                        signals.m2m_changed.send(
-                            sender=self.through, action='post_add',
-                            instance=self.instance, reverse=self.reverse,
-                            model=self.model, pk_set=new_ids, using=db,
-                        )
+                if must_send_signals:
+                    signals.m2m_changed.send(
+                        sender=self.through, action='post_add',
+                        instance=self.instance, reverse=self.reverse,
+                        model=self.model, pk_set=missing_target_ids, using=db,
+                    )
 
         def _remove_items(self, source_field_name, target_field_name, *objs):
             # source_field_name: the PK colname in join table for the source object
             # target_field_name: the PK colname in join table for the target object
-            # *objs - objects to remove
+            # *objs - objects to remove. Either object instances, or primary
+            # keys of object instances.
             if not objs:
                 return
 

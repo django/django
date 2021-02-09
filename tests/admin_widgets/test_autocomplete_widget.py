@@ -14,12 +14,12 @@ class AlbumForm(forms.ModelForm):
         fields = ['band', 'featuring']
         widgets = {
             'band': AutocompleteSelect(
-                Album._meta.get_field('band').remote_field,
+                Album._meta.get_field('band'),
                 admin.site,
                 attrs={'class': 'my-class'},
             ),
             'featuring': AutocompleteSelect(
-                Album._meta.get_field('featuring').remote_field,
+                Album._meta.get_field('featuring'),
                 admin.site,
             )
         }
@@ -52,10 +52,14 @@ class AutocompleteMixinTests(TestCase):
         self.assertEqual(attrs, {
             'class': 'my-class admin-autocomplete',
             'data-ajax--cache': 'true',
+            'data-ajax--delay': 250,
             'data-ajax--type': 'GET',
-            'data-ajax--url': '/admin_widgets/band/autocomplete/',
+            'data-ajax--url': '/autocomplete/',
             'data-theme': 'admin-autocomplete',
             'data-allow-clear': 'false',
+            'data-app-label': 'admin_widgets',
+            'data-field-name': 'band',
+            'data-model-name': 'album',
             'data-placeholder': ''
         })
 
@@ -75,19 +79,19 @@ class AutocompleteMixinTests(TestCase):
         self.assertJSONEqual(attrs['data-allow-clear'], False)
 
     def test_get_url(self):
-        rel = Album._meta.get_field('band').remote_field
+        rel = Album._meta.get_field('band')
         w = AutocompleteSelect(rel, admin.site)
         url = w.get_url()
-        self.assertEqual(url, '/admin_widgets/band/autocomplete/')
+        self.assertEqual(url, '/autocomplete/')
 
     def test_render_options(self):
         beatles = Band.objects.create(name='The Beatles', style='rock')
         who = Band.objects.create(name='The Who', style='rock')
         # With 'band', a ForeignKey.
-        form = AlbumForm(initial={'band': beatles.pk})
+        form = AlbumForm(initial={'band': beatles.uuid})
         output = form.as_table()
-        selected_option = '<option value="%s" selected>The Beatles</option>' % beatles.pk
-        option = '<option value="%s">The Who</option>' % who.pk
+        selected_option = '<option value="%s" selected>The Beatles</option>' % beatles.uuid
+        option = '<option value="%s">The Who</option>' % who.uuid
         self.assertIn(selected_option, output)
         self.assertNotIn(option, output)
         # With 'featuring', a ManyToManyField.
@@ -139,4 +143,4 @@ class AutocompleteMixinTests(TestCase):
                 else:
                     expected_files = base_files
                 with translation.override(lang):
-                    self.assertEqual(AutocompleteSelect(rel, admin.site).media._js, expected_files)
+                    self.assertEqual(AutocompleteSelect(rel, admin.site).media._js, list(expected_files))

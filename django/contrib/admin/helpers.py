@@ -1,15 +1,17 @@
 import json
 
 from django import forms
-from django.conf import settings
 from django.contrib.admin.utils import (
     display_for_field, flatten_fieldsets, help_text_for_field, label_for_field,
-    lookup_field,
+    lookup_field, quote,
 )
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.fields.related import ManyToManyRel
+from django.db.models.fields.related import (
+    ForeignObjectRel, ManyToManyRel, OneToOneField,
+)
 from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst, linebreaksbr
+from django.urls import NoReverseMatch, reverse
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext, gettext_lazy as _
@@ -80,8 +82,7 @@ class Fieldset:
     @property
     def media(self):
         if 'collapse' in self.classes:
-            extra = '' if settings.DEBUG else '.min'
-            return forms.Media(js=['admin/js/collapse%s.js' % extra])
+            return forms.Media(js=['admin/js/collapse.js'])
         return forms.Media()
 
     def __iter__(self):
@@ -187,7 +188,18 @@ class AdminReadonlyField:
         if not self.is_first:
             attrs["class"] = "inline"
         label = self.field['label']
-        return format_html('<label{}>{}:</label>', flatatt(attrs), capfirst(label))
+        return format_html('<label{}>{}{}</label>', flatatt(attrs), capfirst(label), self.form.label_suffix)
+
+    def get_admin_url(self, remote_field, remote_obj):
+        url_name = 'admin:%s_%s_change' % (
+            remote_field.model._meta.app_label,
+            remote_field.model._meta.model_name,
+        )
+        try:
+            url = reverse(url_name, args=[quote(remote_obj.pk)])
+            return format_html('<a href="{}">{}</a>', url, remote_obj)
+        except NoReverseMatch:
+            return str(remote_obj)
 
     def contents(self):
         from django.contrib.admin.templatetags.admin_list import _boolean_icon
@@ -214,6 +226,11 @@ class AdminReadonlyField:
             else:
                 if isinstance(f.remote_field, ManyToManyRel) and value is not None:
                     result_repr = ", ".join(map(str, value.all()))
+                elif (
+                    isinstance(f.remote_field, (ForeignObjectRel, OneToOneField)) and
+                    value is not None
+                ):
+                    result_repr = self.get_admin_url(f.remote_field, value)
                 else:
                     result_repr = display_for_field(value, f, self.empty_value_display)
                 result_repr = linebreaksbr(result_repr)
@@ -280,7 +297,12 @@ class InlineAdminFormSet:
             if not self.has_change_permission or field_name in self.readonly_fields:
                 yield {
                     'name': field_name,
-                    'label': meta_labels.get(field_name) or label_for_field(field_name, self.opts.model, self.opts),
+                    'label': meta_labels.get(field_name) or label_for_field(
+                        field_name,
+                        self.opts.model,
+                        self.opts,
+                        form=empty_form,
+                    ),
                     'widget': {'is_hidden': False},
                     'required': False,
                     'help_text': meta_help_texts.get(field_name) or help_text_for_field(field_name, self.opts.model),
@@ -289,7 +311,7 @@ class InlineAdminFormSet:
                 form_field = empty_form.fields[field_name]
                 label = form_field.label
                 if label is None:
-                    label = label_for_field(field_name, self.opts.model, self.opts)
+                    label = label_for_field(field_name, self.opts.model, self.opts, form=empty_form)
                 yield {
                     'name': field_name,
                     'label': label,

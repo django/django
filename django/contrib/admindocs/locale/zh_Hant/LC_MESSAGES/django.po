@@ -4,16 +4,16 @@
 # Chen Chun-Chia <ccc.larc@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # mail6543210 <mail6543210@yahoo.com.tw>, 2013
-# quantum9876 <quantum9876@gmail.com>, 2011
-# Tzu-ping Chung <uranusjr@gmail.com>, 2016
+# 619e61dbdb61c57213f62815aaf60e01, 2011
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016,2019
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-18 09:05+0000\n"
+"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -144,13 +144,13 @@ msgid "Template: %(name)s"
 msgstr "模版：%(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "模版：\"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "模板：<q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "搜尋模板「%(name)s」的路徑："
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "搜尋模板 <q>%(name)s</q> 的路徑："
 
 msgid "(does not exist)"
 msgstr "(不存在)"

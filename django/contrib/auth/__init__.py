@@ -7,7 +7,7 @@ from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.middleware.csrf import rotate_token
 from django.utils.crypto import constant_time_compare
 from django.utils.module_loading import import_string
-from django.utils.translation import LANGUAGE_SESSION_KEY
+from django.views.decorators.debug import sensitive_variables
 
 from .signals import user_logged_in, user_logged_out, user_login_failed
 
@@ -38,6 +38,7 @@ def get_backends():
     return _get_backends(return_tuples=False)
 
 
+@sensitive_variables('credentials')
 def _clean_credentials(credentials):
     """
     Clean a dictionary of credentials of potentially sensitive info before
@@ -59,13 +60,15 @@ def _get_user_session_key(request):
     return get_user_model()._meta.pk.to_python(request.session[SESSION_KEY])
 
 
+@sensitive_variables('credentials')
 def authenticate(request=None, **credentials):
     """
     If the given credentials are valid, return a User object.
     """
     for backend, backend_path in _get_backends(return_tuples=True):
+        backend_signature = inspect.signature(backend.authenticate)
         try:
-            inspect.getcallargs(backend.authenticate, request, **credentials)
+            backend_signature.bind(request, **credentials)
         except TypeError:
             # This backend doesn't accept these credentials as arguments. Try the next one.
             continue
@@ -143,15 +146,7 @@ def logout(request):
     if not getattr(user, 'is_authenticated', True):
         user = None
     user_logged_out.send(sender=user.__class__, request=request, user=user)
-
-    # remember language choice saved to session
-    language = request.session.get(LANGUAGE_SESSION_KEY)
-
     request.session.flush()
-
-    if language is not None:
-        request.session[LANGUAGE_SESSION_KEY] = language
-
     if hasattr(request, 'user'):
         from django.contrib.auth.models import AnonymousUser
         request.user = AnonymousUser()
@@ -220,6 +215,3 @@ def update_session_auth_hash(request, user):
     request.session.cycle_key()
     if hasattr(user, 'get_session_auth_hash') and request.user == user:
         request.session[HASH_SESSION_KEY] = user.get_session_auth_hash()
-
-
-default_app_config = 'django.contrib.auth.apps.AuthConfig'

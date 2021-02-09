@@ -2,11 +2,12 @@ import copy
 from decimal import Decimal
 
 from django.apps.registry import Apps
+from django.db import NotSupportedError
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.ddl_references import Statement
+from django.db.backends.utils import strip_quotes
 from django.db.models import UniqueConstraint
 from django.db.transaction import atomic
-from django.db.utils import NotSupportedError
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -98,6 +99,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             super().alter_db_table(model, old_db_table, new_db_table)
 
     def alter_field(self, model, old_field, new_field, strict=False):
+        if not self._field_should_be_altered(old_field, new_field):
+            return
         old_field_name = old_field.name
         table_name = model._meta.db_table
         _, old_column_name = old_field.get_attname_column()
@@ -263,7 +266,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         body_copy = copy.deepcopy(body)
         meta_contents = {
             'app_label': model._meta.app_label,
-            'db_table': 'new__%s' % model._meta.db_table,
+            'db_table': 'new__%s' % strip_quotes(model._meta.db_table),
             'unique_together': unique_together,
             'index_together': index_together,
             'indexes': indexes,
@@ -357,11 +360,28 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return self.execute(self._rename_field_sql(model._meta.db_table, old_field, new_field, new_type))
         # Alter by remaking table
         self._remake_table(model, alter_field=(old_field, new_field))
-        # Rebuild tables with FKs pointing to this field if the PK type changed.
-        if old_field.primary_key and new_field.primary_key and old_type != new_type:
-            for rel in new_field.model._meta.related_objects:
-                if not rel.many_to_many:
-                    self._remake_table(rel.related_model)
+        # Rebuild tables with FKs pointing to this field.
+        if new_field.unique and old_type != new_type:
+            related_models = set()
+            opts = new_field.model._meta
+            for remote_field in opts.related_objects:
+                # Ignore self-relationship since the table was already rebuilt.
+                if remote_field.related_model == model:
+                    continue
+                if not remote_field.many_to_many:
+                    if remote_field.field_name == new_field.name:
+                        related_models.add(remote_field.related_model)
+                elif new_field.primary_key and remote_field.through._meta.auto_created:
+                    related_models.add(remote_field.through)
+            if new_field.primary_key:
+                for many_to_many in opts.many_to_many:
+                    # Ignore self-relationship since the table was already rebuilt.
+                    if many_to_many.related_model == model:
+                        continue
+                    if many_to_many.remote_field.through._meta.auto_created:
+                        related_models.add(many_to_many.remote_field.through)
+            for related_model in related_models:
+                self._remake_table(related_model)
 
     def _alter_many_to_many(self, model, old_field, new_field, strict):
         """Alter M2Ms to repoint their to= endpoints."""
@@ -409,3 +429,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             super().remove_constraint(model, constraint)
         else:
             self._remake_table(model)
+
+    def _collate_sql(self, collation):
+        return ' COLLATE ' + collation

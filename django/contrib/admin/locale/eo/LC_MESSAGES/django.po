@@ -2,7 +2,7 @@
 #
 # Translators:
 # Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2012-2013
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2018
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2019
 # Claude Paroz <claude@2xlibre.net>, 2016
 # Dinu Gherman <gherman@darwin.in-berlin.de>, 2011
 # kristjan <kristjan.schmidt@googlemail.com>, 2012
@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-07-30 21:41+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 12:48+0000\n"
 "Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
@@ -114,7 +114,7 @@ msgid "object id"
 msgstr "objekta identigaĵo"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "objekta prezento"
 
@@ -543,24 +543,8 @@ msgstr "Montri ĉion"
 msgid "Save"
 msgstr "Konservi"
 
-msgid "Popup closing..."
-msgstr "Ŝprucfenestro fermante…"
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Redaktu elektitan %(model)sn"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Vidi elektitan %(model)sn"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Aldoni alian %(model)sn"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Forigi elektitan %(model)sn"
+msgid "Popup closing…"
+msgstr "Ŝprucfenesto fermiĝas…"
 
 msgid "Search"
 msgstr "Serĉu"
@@ -589,6 +573,18 @@ msgstr "Konservi kaj vidi"
 
 msgid "Close"
 msgstr "Fermi"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Redaktu elektitan %(model)sn"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Aldoni alian %(model)sn"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Forigi elektitan %(model)sn"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Dankon pro pasigo de kvalita tempon kun la retejo hodiaŭ."

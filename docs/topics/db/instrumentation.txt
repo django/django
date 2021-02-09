@@ -69,7 +69,7 @@ For a more complete example, a query logger could look like this::
 
         def __call__(self, execute, sql, params, many, context):
             current_query = {'sql': sql, 'params': params, 'many': many}
-            start = time.time()
+            start = time.monotonic()
             try:
                 result = execute(sql, params, many, context)
             except Exception as e:
@@ -80,7 +80,7 @@ For a more complete example, a query logger could look like this::
                 current_query['status'] = 'ok'
                 return result
             finally:
-                duration = time.time() - start
+                duration = time.monotonic() - start
                 current_query['duration'] = duration
                 self.queries.append(current_query)
 

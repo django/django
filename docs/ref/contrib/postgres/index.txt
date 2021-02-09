@@ -29,6 +29,7 @@ a number of PostgreSQL specific data types.
     :maxdepth: 2
 
     aggregates
+    constraints
     fields
     forms
     functions

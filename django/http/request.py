@@ -1,13 +1,14 @@
+import cgi
+import codecs
 import copy
-import re
 from io import BytesIO
 from itertools import chain
-from urllib.parse import quote, urlencode, urljoin, urlsplit
+from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
 
 from django.conf import settings
 from django.core import signing
 from django.core.exceptions import (
-    DisallowedHost, ImproperlyConfigured, RequestDataTooBig,
+    DisallowedHost, ImproperlyConfigured, RequestDataTooBig, TooManyFieldsSent,
 )
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
@@ -16,13 +17,25 @@ from django.utils.datastructures import (
 )
 from django.utils.encoding import escape_uri_path, iri_to_uri
 from django.utils.functional import cached_property
-from django.utils.http import is_same_domain, limited_parse_qsl
+from django.utils.http import is_same_domain
+from django.utils.inspect import func_supports_parameter
+from django.utils.regex_helper import _lazy_re_compile
+
+from .multipartparser import parse_header
+
+# TODO: Remove when dropping support for PY37. inspect.signature() is used to
+# detect whether the max_num_fields argument is available as this security fix
+# was backported to Python 3.6.8 and 3.7.2, and may also have been applied by
+# downstream package maintainers to other versions in their repositories.
+if not func_supports_parameter(parse_qsl, 'max_num_fields'):
+    from django.utils.http import parse_qsl
+
 
 RAISE_ERROR = object()
-host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$")
+host_validation_re = _lazy_re_compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$")
 
 
-class UnreadablePostError(IOError):
+class UnreadablePostError(OSError):
     pass
 
 
@@ -69,6 +82,28 @@ class HttpRequest:
     def headers(self):
         return HttpHeaders(self.META)
 
+    @cached_property
+    def accepted_types(self):
+        """Return a list of MediaType instances."""
+        return parse_accept_header(self.headers.get('Accept', '*/*'))
+
+    def accepts(self, media_type):
+        return any(
+            accepted_type.match(media_type)
+            for accepted_type in self.accepted_types
+        )
+
+    def _set_content_type_params(self, meta):
+        """Set content_type, content_params, and encoding."""
+        self.content_type, self.content_params = cgi.parse_header(meta.get('CONTENT_TYPE', ''))
+        if 'charset' in self.content_params:
+            try:
+                codecs.lookup(self.content_params['charset'])
+            except LookupError:
+                pass
+            else:
+                self.encoding = self.content_params['charset']
+
     def _get_raw_host(self):
         """
         Return the HTTP host using the environment or request headers. Skip
@@ -95,7 +130,7 @@ class HttpRequest:
         # Allow variants of localhost if ALLOWED_HOSTS is empty and DEBUG=True.
         allowed_hosts = settings.ALLOWED_HOSTS
         if settings.DEBUG and not allowed_hosts:
-            allowed_hosts = ['localhost', '127.0.0.1', '[::1]']
+            allowed_hosts = ['.localhost', '127.0.0.1', '[::1]']
 
         domain, port = split_domain_port(host)
         if domain and validate_host(domain, allowed_hosts):
@@ -178,6 +213,9 @@ class HttpRequest:
             # Make it an absolute url (but schemeless and domainless) for the
             # edge case that the path starts with '//'.
             location = '//%s' % self.get_full_path()
+        else:
+            # Coerce lazy locations.
+            location = str(location)
         bits = urlsplit(location)
         if not (bits.scheme and bits.netloc):
             # Handle the simple, most common case. If the location is absolute
@@ -213,20 +251,18 @@ class HttpRequest:
     def scheme(self):
         if settings.SECURE_PROXY_SSL_HEADER:
             try:
-                header, value = settings.SECURE_PROXY_SSL_HEADER
+                header, secure_value = settings.SECURE_PROXY_SSL_HEADER
             except ValueError:
                 raise ImproperlyConfigured(
                     'The SECURE_PROXY_SSL_HEADER setting must be a tuple containing two values.'
                 )
-            if self.META.get(header) == value:
-                return 'https'
+            header_value = self.META.get(header)
+            if header_value is not None:
+                return 'https' if header_value == secure_value else 'http'
         return self._get_scheme()
 
     def is_secure(self):
         return self.scheme == 'https'
-
-    def is_ajax(self):
-        return self.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
     @property
     def encoding(self):
@@ -284,7 +320,7 @@ class HttpRequest:
 
             try:
                 self._body = self.read()
-            except IOError as e:
+            except OSError as e:
                 raise UnreadablePostError(*e.args) from e
             self._stream = BytesIO(self._body)
         return self._body
@@ -324,7 +360,7 @@ class HttpRequest:
 
     def close(self):
         if hasattr(self, '_files'):
-            for f in chain.from_iterable(l[1] for l in self._files.lists()):
+            for f in chain.from_iterable(list_[1] for list_ in self._files.lists()):
                 f.close()
 
     # File-like and iterator interface.
@@ -339,14 +375,14 @@ class HttpRequest:
         self._read_started = True
         try:
             return self._stream.read(*args, **kwargs)
-        except IOError as e:
+        except OSError as e:
             raise UnreadablePostError(*e.args) from e
 
     def readline(self, *args, **kwargs):
         self._read_started = True
         try:
             return self._stream.readline(*args, **kwargs)
-        except IOError as e:
+        except OSError as e:
             raise UnreadablePostError(*e.args) from e
 
     def __iter__(self):
@@ -368,6 +404,10 @@ class HttpHeaders(CaseInsensitiveMapping):
             if name:
                 headers[name] = value
         super().__init__(headers)
+
+    def __getitem__(self, key):
+        """Allow header lookup using underscores in place of hyphens."""
+        return super().__getitem__(key.replace('_', '-'))
 
     @classmethod
     def parse_header_name(cls, header):
@@ -404,8 +444,8 @@ class QueryDict(MultiValueDict):
         query_string = query_string or ''
         parse_qsl_kwargs = {
             'keep_blank_values': True,
-            'fields_limit': settings.DATA_UPLOAD_MAX_NUMBER_FIELDS,
             'encoding': self.encoding,
+            'max_num_fields': settings.DATA_UPLOAD_MAX_NUMBER_FIELDS,
         }
         if isinstance(query_string, bytes):
             # query_string normally contains URL-encoded data, a subset of ASCII.
@@ -414,8 +454,18 @@ class QueryDict(MultiValueDict):
             except UnicodeDecodeError:
                 # ... but some user agents are misbehaving :-(
                 query_string = query_string.decode('iso-8859-1')
-        for key, value in limited_parse_qsl(query_string, **parse_qsl_kwargs):
-            self.appendlist(key, value)
+        try:
+            for key, value in parse_qsl(query_string, **parse_qsl_kwargs):
+                self.appendlist(key, value)
+        except ValueError as e:
+            # ValueError can also be raised if the strict_parsing argument to
+            # parse_qsl() is True. As that is not used by Django, assume that
+            # the exception was raised by exceeding the value of max_num_fields
+            # instead of fragile checks of exception message strings.
+            raise TooManyFieldsSent(
+                'The number of GET/POST parameters exceeded '
+                'settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.'
+            ) from e
         self._mutable = mutable
 
     @classmethod
@@ -536,8 +586,42 @@ class QueryDict(MultiValueDict):
         return '&'.join(output)
 
 
+class MediaType:
+    def __init__(self, media_type_raw_line):
+        full_type, self.params = parse_header(
+            media_type_raw_line.encode('ascii') if media_type_raw_line else b''
+        )
+        self.main_type, _, self.sub_type = full_type.partition('/')
+
+    def __str__(self):
+        params_str = ''.join(
+            '; %s=%s' % (k, v.decode('ascii'))
+            for k, v in self.params.items()
+        )
+        return '%s%s%s' % (
+            self.main_type,
+            ('/%s' % self.sub_type) if self.sub_type else '',
+            params_str,
+        )
+
+    def __repr__(self):
+        return '<%s: %s>' % (self.__class__.__qualname__, self)
+
+    @property
+    def is_all_types(self):
+        return self.main_type == '*' and self.sub_type == '*'
+
+    def match(self, other):
+        if self.is_all_types:
+            return True
+        other = MediaType(other)
+        if self.main_type == other.main_type and self.sub_type in {'*', other.sub_type}:
+            return True
+        return False
+
+
 # It's neither necessary nor appropriate to use
-# django.utils.encoding.force_text for parsing URLs and form inputs. Thus,
+# django.utils.encoding.force_str() for parsing URLs and form inputs. Thus,
 # this slightly more restricted function, used by QueryDict.
 def bytes_to_text(s, encoding):
     """
@@ -591,3 +675,7 @@ def validate_host(host, allowed_hosts):
     Return ``True`` for a valid host, ``False`` otherwise.
     """
     return any(pattern == '*' or is_same_domain(host, pattern) for pattern in allowed_hosts)
+
+
+def parse_accept_header(header):
+    return [MediaType(token) for token in header.split(',') if token.strip()]

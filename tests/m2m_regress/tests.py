@@ -25,20 +25,20 @@ class M2MRegressionTests(TestCase):
         e1.topics.add(t1)
         e1.related.add(t2)
 
-        self.assertQuerysetEqual(s1.references.all(), ["<SelfRefer: s2>"])
-        self.assertQuerysetEqual(s1.related.all(), ["<SelfRefer: s3>"])
+        self.assertSequenceEqual(s1.references.all(), [s2])
+        self.assertSequenceEqual(s1.related.all(), [s3])
 
-        self.assertQuerysetEqual(e1.topics.all(), ["<Tag: t1>"])
-        self.assertQuerysetEqual(e1.related.all(), ["<Tag: t2>"])
+        self.assertSequenceEqual(e1.topics.all(), [t1])
+        self.assertSequenceEqual(e1.related.all(), [t2])
 
     def test_internal_related_name_not_in_error_msg(self):
         # The secret internal related names for self-referential many-to-many
         # fields shouldn't appear in the list when an error is made.
-        self.assertRaisesMessage(
+        with self.assertRaisesMessage(
             FieldError,
             "Choices are: id, name, references, related, selfreferchild, selfreferchildsibling",
-            lambda: SelfRefer.objects.filter(porcupine='fred')
-        )
+        ):
+            SelfRefer.objects.filter(porcupine='fred')
 
     def test_m2m_inheritance_symmetry(self):
         # Test to ensure that the relationship between two inherited models
@@ -51,8 +51,8 @@ class M2MRegressionTests(TestCase):
         sr_sibling.save()
         sr_child.related.add(sr_sibling)
 
-        self.assertQuerysetEqual(sr_child.related.all(), ["<SelfRefer: Beth>"])
-        self.assertQuerysetEqual(sr_sibling.related.all(), ["<SelfRefer: Hanna>"])
+        self.assertSequenceEqual(sr_child.related.all(), [sr_sibling.selfrefer_ptr])
+        self.assertSequenceEqual(sr_sibling.related.all(), [sr_child.selfrefer_ptr])
 
     def test_m2m_pk_field_type(self):
         # Regression for #11311 - The primary key for models in a m2m relation
@@ -73,8 +73,8 @@ class M2MRegressionTests(TestCase):
         c1.tags.set([t1, t2])
         c1 = TagCollection.objects.get(name='c1')
 
-        self.assertQuerysetEqual(c1.tags.all(), ["<Tag: t1>", "<Tag: t2>"], ordered=False)
-        self.assertQuerysetEqual(t1.tag_collections.all(), ["<TagCollection: c1>"])
+        self.assertCountEqual(c1.tags.all(), [t1, t2])
+        self.assertCountEqual(t1.tag_collections.all(), [c1])
 
     def test_manager_class_caching(self):
         e1 = Entry.objects.create()
@@ -106,7 +106,7 @@ class M2MRegressionTests(TestCase):
             c1.tags.set(7)
 
         c1.refresh_from_db()
-        self.assertQuerysetEqual(c1.tags.order_by('name'), ["<Tag: t1>", "<Tag: t2>"])
+        self.assertSequenceEqual(c1.tags.order_by('name'), [t1, t2])
 
     def test_multiple_forwards_only_m2m(self):
         # Regression for #24505 - Multiple ManyToManyFields to same "to"
@@ -116,5 +116,5 @@ class M2MRegressionTests(TestCase):
         post = Post.objects.create()
         post.primary_lines.add(foo)
         post.secondary_lines.add(bar)
-        self.assertQuerysetEqual(post.primary_lines.all(), ['<Line: foo>'])
-        self.assertQuerysetEqual(post.secondary_lines.all(), ['<Line: bar>'])
+        self.assertSequenceEqual(post.primary_lines.all(), [foo])
+        self.assertSequenceEqual(post.secondary_lines.all(), [bar])

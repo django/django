@@ -1,4 +1,3 @@
-import fnmatch
 import glob
 import os
 import re
@@ -12,15 +11,16 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.files.temp import NamedTemporaryFile
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import (
-    find_command, handle_extensions, popen_wrapper,
+    find_command, handle_extensions, is_ignored_path, popen_wrapper,
 )
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 from django.utils.functional import cached_property
 from django.utils.jslex import prepare_js_for_gettext
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.text import get_text_list
 from django.utils.translation import templatize
 
-plural_forms_re = re.compile(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL)
+plural_forms_re = _lazy_re_compile(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL)
 STATUS_OK = 0
 NO_LOCALE_DIR = object()
 
@@ -103,8 +103,7 @@ class BuildFile:
         if not self.is_templatized:
             return
 
-        encoding = settings.FILE_CHARSET if self.command.settings_available else 'utf-8'
-        with open(self.path, 'r', encoding=encoding) as fp:
+        with open(self.path, encoding='utf-8') as fp:
             src_data = fp.read()
 
         if self.domain == 'djangojs':
@@ -136,7 +135,7 @@ class BuildFile:
 
         return re.sub(
             r'^(#: .*)(' + re.escape(old_path) + r')',
-            lambda match: match.group().replace(old_path, new_path),
+            lambda match: match[0].replace(old_path, new_path),
             msgs,
             flags=re.MULTILINE
         )
@@ -207,7 +206,7 @@ class Command(BaseCommand):
     translatable_file_class = TranslatableFile
     build_file_class = BuildFile
 
-    requires_system_checks = False
+    requires_system_checks = []
 
     msgmerge_options = ['-q', '--previous']
     msguniq_options = ['--to-code=utf-8']
@@ -330,7 +329,7 @@ class Command(BaseCommand):
             exts = extensions or ['html', 'txt', 'py']
         self.extensions = handle_extensions(exts)
 
-        if (locale is None and not exclude and not process_all) or self.domain is None:
+        if (not locale and not exclude and not process_all) or self.domain is None:
             raise CommandError(
                 "Type '%s help %s' for usage information."
                 % (os.path.basename(sys.argv[0]), sys.argv[1])
@@ -338,7 +337,7 @@ class Command(BaseCommand):
 
         if self.verbosity > 1:
             self.stdout.write(
-                'examining files with the extensions: %s\n'
+                'examining files with the extensions: %s'
                 % get_text_list(list(self.extensions), 'and')
             )
 
@@ -357,8 +356,7 @@ class Command(BaseCommand):
                 self.locale_paths.append(os.path.abspath('locale'))
             if self.locale_paths:
                 self.default_locale_path = self.locale_paths[0]
-                if not os.path.exists(self.default_locale_path):
-                    os.makedirs(self.default_locale_path)
+                os.makedirs(self.default_locale_path, exist_ok=True)
 
         # Build locale list
         looks_like_locale = re.compile(r'[a-z]{2}')
@@ -385,8 +383,16 @@ class Command(BaseCommand):
 
             # Build po files for each selected locale
             for locale in locales:
+                if '-' in locale:
+                    self.stdout.write(
+                        'invalid locale %s, did you mean %s?' % (
+                            locale,
+                            locale.replace('-', '_'),
+                        ),
+                    )
+                    continue
                 if self.verbosity > 0:
-                    self.stdout.write("processing locale %s\n" % locale)
+                    self.stdout.write('processing locale %s' % locale)
                 for potfile in potfiles:
                     self.write_po_file(potfile, locale)
         finally:
@@ -454,48 +460,26 @@ class Command(BaseCommand):
         Get all files in the given root. Also check that there is a matching
         locale dir for each file.
         """
-        def is_ignored(path, ignore_patterns):
-            """
-            Check if the given path should be ignored or not.
-            """
-            filename = os.path.basename(path)
-
-            def ignore(pattern):
-                return fnmatch.fnmatchcase(filename, pattern) or fnmatch.fnmatchcase(path, pattern)
-
-            return any(ignore(pattern) for pattern in ignore_patterns)
-
-        ignore_patterns = [os.path.normcase(p) for p in self.ignore_patterns]
-        dir_suffixes = {'%s*' % path_sep for path_sep in {'/', os.sep}}
-        norm_patterns = []
-        for p in ignore_patterns:
-            for dir_suffix in dir_suffixes:
-                if p.endswith(dir_suffix):
-                    norm_patterns.append(p[:-len(dir_suffix)])
-                    break
-            else:
-                norm_patterns.append(p)
-
         all_files = []
         ignored_roots = []
         if self.settings_available:
             ignored_roots = [os.path.normpath(p) for p in (settings.MEDIA_ROOT, settings.STATIC_ROOT) if p]
         for dirpath, dirnames, filenames in os.walk(root, topdown=True, followlinks=self.symlinks):
             for dirname in dirnames[:]:
-                if (is_ignored(os.path.normpath(os.path.join(dirpath, dirname)), norm_patterns) or
+                if (is_ignored_path(os.path.normpath(os.path.join(dirpath, dirname)), self.ignore_patterns) or
                         os.path.join(os.path.abspath(dirpath), dirname) in ignored_roots):
                     dirnames.remove(dirname)
                     if self.verbosity > 1:
-                        self.stdout.write('ignoring directory %s\n' % dirname)
+                        self.stdout.write('ignoring directory %s' % dirname)
                 elif dirname == 'locale':
                     dirnames.remove(dirname)
                     self.locale_paths.insert(0, os.path.join(os.path.abspath(dirpath), dirname))
             for filename in filenames:
                 file_path = os.path.normpath(os.path.join(dirpath, filename))
                 file_ext = os.path.splitext(filename)[1]
-                if file_ext not in self.extensions or is_ignored(file_path, self.ignore_patterns):
+                if file_ext not in self.extensions or is_ignored_path(file_path, self.ignore_patterns):
                     if self.verbosity > 1:
-                        self.stdout.write('ignoring file %s in %s\n' % (filename, dirpath))
+                        self.stdout.write('ignoring file %s in %s' % (filename, dirpath))
                 else:
                     locale_dir = None
                     for path in self.locale_paths:
@@ -528,7 +512,7 @@ class Command(BaseCommand):
         build_files = []
         for translatable in files:
             if self.verbosity > 1:
-                self.stdout.write('processing file %s in %s\n' % (
+                self.stdout.write('processing file %s in %s' % (
                     translatable.file, translatable.dirpath
                 ))
             if self.domain not in ('djangojs', 'django'):
@@ -566,9 +550,6 @@ class Command(BaseCommand):
                 '--keyword=gettext_noop',
                 '--keyword=gettext_lazy',
                 '--keyword=ngettext_lazy:1,2',
-                '--keyword=ugettext_noop',
-                '--keyword=ugettext_lazy',
-                '--keyword=ungettext_lazy:1,2',
                 '--keyword=pgettext:1c,2',
                 '--keyword=npgettext:1c,2,3',
                 '--keyword=pgettext_lazy:1c,2',
@@ -580,7 +561,7 @@ class Command(BaseCommand):
 
         input_files = [bf.work_path for bf in build_files]
         with NamedTemporaryFile(mode='w+') as input_files_list:
-            input_files_list.write(('\n'.join(input_files)))
+            input_files_list.write('\n'.join(input_files))
             input_files_list.flush()
             args.extend(['--files-from', input_files_list.name])
             args.extend(self.xgettext_options)
@@ -602,8 +583,9 @@ class Command(BaseCommand):
             if locale_dir is NO_LOCALE_DIR:
                 file_path = os.path.normpath(build_files[0].path)
                 raise CommandError(
-                    'Unable to find a locale path to store translations for '
-                    'file %s' % file_path
+                    "Unable to find a locale path to store translations for "
+                    "file %s. Make sure the 'locale' directory exist in an "
+                    "app or LOCALE_PATHS setting is set." % file_path
                 )
             for build_file in build_files:
                 msgs = build_file.postprocess_messages(msgs)
@@ -621,8 +603,7 @@ class Command(BaseCommand):
         Use msgmerge and msgattrib GNU gettext utilities.
         """
         basedir = os.path.join(os.path.dirname(potfile), locale, 'LC_MESSAGES')
-        if not os.path.isdir(basedir):
-            os.makedirs(basedir)
+        os.makedirs(basedir, exist_ok=True)
         pofile = os.path.join(basedir, '%s.po' % self.domain)
 
         if os.path.exists(pofile):
@@ -635,7 +616,7 @@ class Command(BaseCommand):
                 elif self.verbosity > 0:
                     self.stdout.write(errors)
         else:
-            with open(potfile, 'r', encoding='utf-8') as fp:
+            with open(potfile, encoding='utf-8') as fp:
                 msgs = fp.read()
             if not self.invoked_for_django:
                 msgs = self.copy_plural_forms(msgs, locale)
@@ -669,12 +650,12 @@ class Command(BaseCommand):
         for domain in domains:
             django_po = os.path.join(django_dir, 'conf', 'locale', locale, 'LC_MESSAGES', '%s.po' % domain)
             if os.path.exists(django_po):
-                with open(django_po, 'r', encoding='utf-8') as fp:
+                with open(django_po, encoding='utf-8') as fp:
                     m = plural_forms_re.search(fp.read())
                 if m:
-                    plural_form_line = m.group('value')
+                    plural_form_line = m['value']
                     if self.verbosity > 1:
-                        self.stdout.write("copying plural forms: %s\n" % plural_form_line)
+                        self.stdout.write('copying plural forms: %s' % plural_form_line)
                     lines = []
                     found = False
                     for line in msgs.splitlines():

@@ -3,17 +3,18 @@ import datetime
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models import F
 from django.db.models.functions import Lower
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 
 from .models import (
-    Article, CustomDbColumn, CustomPk, Detail, Individual, Member, Note,
-    Number, Order, Paragraph, SpecialCategory, Tag, Valid,
+    Article, CustomDbColumn, CustomPk, Detail, Individual, JSONFieldNullable,
+    Member, Note, Number, Order, Paragraph, SpecialCategory, Tag, Valid,
 )
 
 
 class BulkUpdateNoteTests(TestCase):
-    def setUp(self):
-        self.notes = [
+    @classmethod
+    def setUpTestData(cls):
+        cls.notes = [
             Note.objects.create(note=str(i), misc=str(i))
             for i in range(10)
         ]
@@ -228,3 +229,14 @@ class BulkUpdateTests(TestCase):
             article.created = point_in_time
         Article.objects.bulk_update(articles, ['created'])
         self.assertCountEqual(Article.objects.filter(created=point_in_time), articles)
+
+    @skipUnlessDBFeature('supports_json_field')
+    def test_json_field(self):
+        JSONFieldNullable.objects.bulk_create([
+            JSONFieldNullable(json_field={'a': i}) for i in range(10)
+        ])
+        objs = JSONFieldNullable.objects.all()
+        for obj in objs:
+            obj.json_field = {'c': obj.json_field['a'] + 1}
+        JSONFieldNullable.objects.bulk_update(objs, ['json_field'])
+        self.assertCountEqual(JSONFieldNullable.objects.filter(json_field__has_key='c'), objs)

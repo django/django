@@ -133,7 +133,7 @@ class Exactly(models.lookups.Exact):
 
 class SQLFuncMixin:
     def as_sql(self, compiler, connection):
-        return '%s()', [self.name]
+        return '%s()' % self.name, []
 
     @property
     def output_field(self):
@@ -234,17 +234,14 @@ class LookupTests(TestCase):
         __exact=None is transformed to __isnull=True if a custom lookup class
         with lookup_name != 'exact' is registered as the `exact` lookup.
         """
-        class CustomExactLookup(models.Lookup):
-            lookup_name = 'somecustomlookup'
-
         field = Author._meta.get_field('birthdate')
         OldExactLookup = field.get_lookup('exact')
         author = Author.objects.create(name='author', birthdate=None)
         try:
-            type(field).register_lookup(Exactly, 'exact')
+            field.register_lookup(Exactly, 'exact')
             self.assertEqual(Author.objects.get(birthdate__exact=None), author)
         finally:
-            type(field).register_lookup(OldExactLookup, 'exact')
+            field.register_lookup(OldExactLookup, 'exact')
 
     def test_basic_lookup(self):
         a1 = Author.objects.create(name='a1', age=1)
@@ -311,17 +308,17 @@ class BilateralTransformTests(TestCase):
 
     def test_bilateral_upper(self):
         with register_lookup(models.CharField, UpperBilateralTransform):
-            Author.objects.bulk_create([
-                Author(name='Doe'),
-                Author(name='doe'),
-                Author(name='Foo'),
-            ])
-            self.assertQuerysetEqual(
+            author1 = Author.objects.create(name='Doe')
+            author2 = Author.objects.create(name='doe')
+            author3 = Author.objects.create(name='Foo')
+            self.assertCountEqual(
                 Author.objects.filter(name__upper='doe'),
-                ["<Author: Doe>", "<Author: doe>"], ordered=False)
-            self.assertQuerysetEqual(
+                [author1, author2],
+            )
+            self.assertSequenceEqual(
                 Author.objects.filter(name__upper__contains='f'),
-                ["<Author: Foo>"], ordered=False)
+                [author3],
+            )
 
     def test_bilateral_inner_qs(self):
         with register_lookup(models.CharField, UpperBilateralTransform):

@@ -1,9 +1,10 @@
 from django import forms
+from django.contrib import admin
 from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
 from django.contrib.admin.options import VERTICAL, ModelAdmin, TabularInline
 from django.contrib.admin.sites import AdminSite
 from django.core.checks import Error
-from django.db.models import F
+from django.db.models import F, Field, Model
 from django.db.models.functions import Upper
 from django.forms.models import BaseModelFormSet
 from django.test import SimpleTestCase
@@ -499,15 +500,36 @@ class ListDisplayTests(CheckTestCase):
         )
 
     def test_valid_case(self):
+        @admin.display
         def a_callable(obj):
             pass
 
         class TestModelAdmin(ModelAdmin):
+            @admin.display
             def a_method(self, obj):
                 pass
             list_display = ('name', 'decade_published_in', 'a_method', a_callable)
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+    def test_valid_field_accessible_via_instance(self):
+        class PositionField(Field):
+            """Custom field accessible only via instance."""
+            def contribute_to_class(self, cls, name):
+                super().contribute_to_class(cls, name)
+                setattr(cls, self.name, self)
+
+            def __get__(self, instance, owner):
+                if instance is None:
+                    raise AttributeError()
+
+        class TestModel(Model):
+            field = PositionField()
+
+        class TestModelAdmin(ModelAdmin):
+            list_display = ('field',)
+
+        self.assertIsValid(TestModelAdmin, TestModel)
 
 
 class ListDisplayLinksCheckTests(CheckTestCase):
@@ -544,10 +566,12 @@ class ListDisplayLinksCheckTests(CheckTestCase):
         )
 
     def test_valid_case(self):
+        @admin.display
         def a_callable(obj):
             pass
 
         class TestModelAdmin(ModelAdmin):
+            @admin.display
             def a_method(self, obj):
                 pass
             list_display = ('name', 'decade_published_in', 'a_method', a_callable)
@@ -1398,10 +1422,9 @@ class AutocompleteFieldsTests(CheckTestCase):
 class ActionsCheckTests(CheckTestCase):
 
     def test_custom_permissions_require_matching_has_method(self):
+        @admin.action(permissions=['custom'])
         def custom_permission_action(modeladmin, request, queryset):
             pass
-
-        custom_permission_action.allowed_permissions = ('custom',)
 
         class BandAdmin(ModelAdmin):
             actions = (custom_permission_action,)
@@ -1414,6 +1437,7 @@ class ActionsCheckTests(CheckTestCase):
         )
 
     def test_actions_not_unique(self):
+        @admin.action
         def action(modeladmin, request, queryset):
             pass
 
@@ -1422,16 +1446,17 @@ class ActionsCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             BandAdmin, Band,
-            "__name__ attributes of actions defined in "
-            "<class 'modeladmin.test_checks.ActionsCheckTests."
-            "test_actions_not_unique.<locals>.BandAdmin'> must be unique.",
+            "__name__ attributes of actions defined in BandAdmin must be "
+            "unique. Name 'action' is not unique.",
             id='admin.E130',
         )
 
     def test_actions_unique(self):
+        @admin.action
         def action1(modeladmin, request, queryset):
             pass
 
+        @admin.action
         def action2(modeladmin, request, queryset):
             pass
 

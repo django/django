@@ -3,22 +3,22 @@
 # Translators:
 # angularcircle, 2011,2013
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Janusz Harkot <jh@blueice.pl>, 2015
+# Janusz Harkot <jh@trilab.pl>, 2015
 # Karol <kfuks2@o2.pl>, 2012
 # m_aciek <maciej.olko@gmail.com>, 2014
-# m_aciek <maciej.olko@gmail.com>, 2016-2017
+# m_aciek <maciej.olko@gmail.com>, 2016-2017,2019
 # m_aciek <maciej.olko@gmail.com>, 2014-2015
 # muszalski <m.muszalski@gmail.com>, 2016
 # p <inactive+poczciwiec@transifex.com>, 2014
 # Mattia Procopio <promat85@gmail.com>, 2014
-# Roman Barczyński <rombar@gmail.com>, 2012
+# Roman Barczyński, 2012
 # Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-09-25 18:09+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-11-06 20:03+0000\n"
 "Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -66,8 +66,8 @@ msgstr ""
 "Format hasła jest niewłaściwy, bądź zastosowana została nieznana funkcja "
 "skrótu (hash)."
 
-msgid "The two password fields didn't match."
-msgstr "Hasła nie są zgodne."
+msgid "The two password fields didn’t match."
+msgstr "Hasła w obu polach nie są zgodne."
 
 msgid "Password"
 msgstr "Hasło"
@@ -79,7 +79,7 @@ msgid "Enter the same password as before, for verification."
 msgstr "Wprowadź to samo hasło ponownie, dla weryfikacji."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Nie przechowujemy surowych haseł, więc nie da się zobaczyć hasła tego "
@@ -176,7 +176,7 @@ msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
-"Oznacza, że ten użytkownik ma wszystkie uprawnienia bez jawnego ich "
+"Oznacza, że ten użytkownik ma wszystkie uprawnienia bez ich jawnego "
 "przypisywania."
 
 msgid ""
@@ -184,7 +184,7 @@ msgid ""
 "each of their groups."
 msgstr ""
 "Grupy do których należy użytkownik. Użytkownik otrzyma wszystkie uprawnienia "
-"przypisane do każdej z jego/jej grup."
+"przypisane do każdej z jego grup."
 
 msgid "user permissions"
 msgstr "uprawnienia użytkownika"
@@ -214,7 +214,7 @@ msgid "staff status"
 msgstr "w zespole"
 
 msgid "Designates whether the user can log into this admin site."
-msgstr "Określa czy użytkownik może zalogować się do panelu admina."
+msgstr "Określa czy użytkownik może zalogować się do panelu administracyjnego."
 
 msgid "active"
 msgstr "aktywny"
@@ -263,20 +263,20 @@ msgstr[3] "Twoje hasło musi zawierać co najmniej %(min_length)d znaków."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Hasło jest zbyt podobne do %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
 "Twoje hasło nie może być zbyt podobne do twoich innych danych osobistych."
 
 msgid "This password is too common."
 msgstr "To hasło jest zbyt powszechne."
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr "Twoje hasło nie może być powszechnie używanym hasłem."
 
 msgid "This password is entirely numeric."
 msgstr "Hasło składa się wyłącznie z cyfr."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Twoje hasło nie może składać się tylko z cyfr."
 
 #, python-format

@@ -27,12 +27,15 @@ class Article(models.Model):
         return self.headline
 
 
-class City(models.Model):
-    id = models.BigAutoField(primary_key=True)
+class Country(models.Model):
+    id = models.SmallAutoField(primary_key=True)
     name = models.CharField(max_length=50)
 
-    def __str__(self):
-        return self.name
+
+class City(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    country = models.ForeignKey(Country, models.CASCADE, related_name='cities', null=True)
+    name = models.CharField(max_length=50)
 
 
 class District(models.Model):
@@ -65,9 +68,21 @@ class Parent(models.Model):
     bestchild = models.ForeignKey('Child', models.SET_NULL, null=True, related_name='favored_by')
 
 
+class ParentStringPrimaryKey(models.Model):
+    name = models.CharField(primary_key=True, max_length=15)
+
+
 class Child(models.Model):
     name = models.CharField(max_length=20)
     parent = models.ForeignKey(Parent, models.CASCADE)
+
+
+class ChildNullableParent(models.Model):
+    parent = models.ForeignKey(Parent, models.CASCADE, null=True)
+
+
+class ChildStringPrimaryKeyParent(models.Model):
+    parent = models.ForeignKey(ParentStringPrimaryKey, on_delete=models.CASCADE)
 
 
 class ToFieldChild(models.Model):

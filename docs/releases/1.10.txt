@@ -60,12 +60,11 @@ wasn't a deliberate choice, Unicode characters have always been accepted when
 using Python 3.
 
 The username validator now explicitly accepts Unicode characters by
-default on Python 3 only. This default behavior can be overridden by changing
-the :attr:`~django.contrib.auth.models.User.username_validator` attribute of
-the ``User`` model, or to any proxy of that model, using either
+default on Python 3 only.
+
+Custom user models may use the new
 :class:`~django.contrib.auth.validators.ASCIIUsernameValidator` or
-:class:`~django.contrib.auth.validators.UnicodeUsernameValidator`. Custom user
-models may also use those validators.
+:class:`~django.contrib.auth.validators.UnicodeUsernameValidator`.
 
 Minor features
 --------------
@@ -89,8 +88,8 @@ Minor features
   initially collapsed and their header will have a small "show" link.
 
 * If a user doesn't have the add permission, the ``object-tools`` block on a
-  model's changelist will now be rendered (without the add button, of course).
-  This makes it easier to add custom tools in this case.
+  model's changelist will now be rendered (without the add button). This makes
+  it easier to add custom tools in this case.
 
 * The :class:`~django.contrib.admin.models.LogEntry` model now stores change
   messages in a JSON structure so that the message can be dynamically translated

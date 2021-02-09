@@ -2,13 +2,13 @@
 #
 # Translators:
 # André Bouatchidzé <a@anbz.net>, 2013,2015
-# avsd05 <avsd05@gmail.com>, 2011
+# David A. <avsd05@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-09-19 16:41+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Georgian (http://www.transifex.com/django/django/language/"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ka\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -74,6 +74,7 @@ msgstr "დააწკაპუნეთ ყველა არჩეული 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(cnt)s-დან არჩეულია %(sel)s"
+msgstr[1] "%(cnt)s-დან არჩეულია %(sel)s"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -98,24 +99,8 @@ msgstr ""
 "აგირჩევიათ მოქმედება, მაგრამ ცალკეულ ველებში ცვლილებები არ გაგიკეთებიათ! "
 "სავარაუდოდ, ეძებთ ღილაკს \"Go\", და არა \"შენახვა\""
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "შენიშვნა: თქვენ ხართ %s საათით წინ სერვერის დროზე."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "შენიშვნა: თქვენ ხართ %s საათით უკან სერვერის დროზე."
-
 msgid "Now"
 msgstr "ახლა"
-
-msgid "Choose a Time"
-msgstr ""
-
-msgid "Choose a time"
-msgstr "ავირჩიოთ დრო"
 
 msgid "Midnight"
 msgstr "შუაღამე"
@@ -128,6 +113,24 @@ msgstr "შუადღე"
 
 msgid "6 p.m."
 msgstr ""
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "შენიშვნა: თქვენ ხართ %s საათით წინ სერვერის დროზე."
+msgstr[1] "შენიშვნა: თქვენ ხართ %s საათით წინ სერვერის დროზე."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "შენიშვნა: თქვენ ხართ %s საათით უკან სერვერის დროზე."
+msgstr[1] "შენიშვნა: თქვენ ხართ %s საათით უკან სერვერის დროზე."
+
+msgid "Choose a Time"
+msgstr ""
+
+msgid "Choose a time"
+msgstr "ავირჩიოთ დრო"
 
 msgid "Cancel"
 msgstr "უარი"

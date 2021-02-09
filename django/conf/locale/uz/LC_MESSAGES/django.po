@@ -1,0 +1,1295 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Abdulaminkhon Khaydarov <webdasturuz@gmail.com>, 2020
+# Bedilbek Khamidov <bedilbek@gmail.com>, 2019
+# Claude Paroz <claude@2xlibre.net>, 2020
+# Sukhrobbek Ismatov <isukhrobbek@gmail.com>, 2019
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-25 17:08+0000\n"
+"Last-Translator: Abdulaminkhon Khaydarov <webdasturuz@gmail.com>\n"
+"Language-Team: Uzbek (http://www.transifex.com/django/django/language/uz/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: uz\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Afrikaans"
+msgstr "Afrika tili"
+
+msgid "Arabic"
+msgstr "Arab tili"
+
+msgid "Algerian Arabic"
+msgstr "Jazoir arab tili"
+
+msgid "Asturian"
+msgstr "Asturiya tili"
+
+msgid "Azerbaijani"
+msgstr "Ozarbayjon tili"
+
+msgid "Bulgarian"
+msgstr "Bolgar tili"
+
+msgid "Belarusian"
+msgstr "Belorus tili"
+
+msgid "Bengali"
+msgstr "Bengal tili"
+
+msgid "Breton"
+msgstr "Breton tili"
+
+msgid "Bosnian"
+msgstr "Bosniya tili"
+
+msgid "Catalan"
+msgstr "Katalon tili"
+
+msgid "Czech"
+msgstr "Chex tili"
+
+msgid "Welsh"
+msgstr "Uels tili"
+
+msgid "Danish"
+msgstr "Daniya tili"
+
+msgid "German"
+msgstr "Nemis tili"
+
+msgid "Lower Sorbian"
+msgstr "Quyi sorbiya tili"
+
+msgid "Greek"
+msgstr "Yunon tili"
+
+msgid "English"
+msgstr "Ingliz tili"
+
+msgid "Australian English"
+msgstr "Avstraliya ingliz tili"
+
+msgid "British English"
+msgstr "Britan Ingliz tili"
+
+msgid "Esperanto"
+msgstr "Esperanto tili"
+
+msgid "Spanish"
+msgstr "Ispan tili"
+
+msgid "Argentinian Spanish"
+msgstr "Argentina Ispan tili"
+
+msgid "Colombian Spanish"
+msgstr "Kolumbiya Ispan tili"
+
+msgid "Mexican Spanish"
+msgstr "Meksika Ispan tili "
+
+msgid "Nicaraguan Spanish"
+msgstr "Nikaragua Ispan tili"
+
+msgid "Venezuelan Spanish"
+msgstr "Venesuela Ispan tili"
+
+msgid "Estonian"
+msgstr "Estoniya tili"
+
+msgid "Basque"
+msgstr "Bask tili"
+
+msgid "Persian"
+msgstr "Fors tili"
+
+msgid "Finnish"
+msgstr "Fin tili"
+
+msgid "French"
+msgstr "Fransuz tili"
+
+msgid "Frisian"
+msgstr "Friziya tili"
+
+msgid "Irish"
+msgstr "Irland tili"
+
+msgid "Scottish Gaelic"
+msgstr "Shotland Gal tili"
+
+msgid "Galician"
+msgstr "Galisiya tili"
+
+msgid "Hebrew"
+msgstr "Ibroniy tili"
+
+msgid "Hindi"
+msgstr "Hind tili"
+
+msgid "Croatian"
+msgstr "Xorvat tili"
+
+msgid "Upper Sorbian"
+msgstr "Yuqori Sorbiya tili"
+
+msgid "Hungarian"
+msgstr "Vengriya tili"
+
+msgid "Armenian"
+msgstr "Arman tili"
+
+msgid "Interlingua"
+msgstr "Interlingua tili"
+
+msgid "Indonesian"
+msgstr "Indoneziya tili"
+
+msgid "Igbo"
+msgstr "Igbo tili"
+
+msgid "Ido"
+msgstr "Ido tili"
+
+msgid "Icelandic"
+msgstr "Island tili"
+
+msgid "Italian"
+msgstr "Italyan tili"
+
+msgid "Japanese"
+msgstr "Yapon tili"
+
+msgid "Georgian"
+msgstr "Gruzin tili"
+
+msgid "Kabyle"
+msgstr "Kabil tili"
+
+msgid "Kazakh"
+msgstr "Qozoq tili"
+
+msgid "Khmer"
+msgstr "Xmer tili"
+
+msgid "Kannada"
+msgstr "Kannada tili"
+
+msgid "Korean"
+msgstr "Koreys tili"
+
+msgid "Kyrgyz"
+msgstr "Qirg'iz tili"
+
+msgid "Luxembourgish"
+msgstr "Lyuksemburg tili"
+
+msgid "Lithuanian"
+msgstr "Litva tili"
+
+msgid "Latvian"
+msgstr "Latviya tili"
+
+msgid "Macedonian"
+msgstr "Makedoniya tili"
+
+msgid "Malayalam"
+msgstr "Malayalam tili"
+
+msgid "Mongolian"
+msgstr "Mo'g'ul tili"
+
+msgid "Marathi"
+msgstr "Marati tili"
+
+msgid "Burmese"
+msgstr "Birma tili"
+
+msgid "Norwegian Bokmål"
+msgstr "Norvegiya Bokmal tili"
+
+msgid "Nepali"
+msgstr "Nepal tili"
+
+msgid "Dutch"
+msgstr "Golland tili"
+
+msgid "Norwegian Nynorsk"
+msgstr "Norvegiya Ninorsk tili"
+
+msgid "Ossetic"
+msgstr "Osetik tili"
+
+msgid "Punjabi"
+msgstr "Panjob tili"
+
+msgid "Polish"
+msgstr "Polyak tili"
+
+msgid "Portuguese"
+msgstr "Portugal tili"
+
+msgid "Brazilian Portuguese"
+msgstr "Braziliya Portugal tili"
+
+msgid "Romanian"
+msgstr "Rumin tili"
+
+msgid "Russian"
+msgstr "Rus tili"
+
+msgid "Slovak"
+msgstr "Slovak tili"
+
+msgid "Slovenian"
+msgstr "Slovan tili"
+
+msgid "Albanian"
+msgstr "Alban tili"
+
+msgid "Serbian"
+msgstr "Serb tili"
+
+msgid "Serbian Latin"
+msgstr "Serbiya Lotin tili"
+
+msgid "Swedish"
+msgstr "Shved tili"
+
+msgid "Swahili"
+msgstr "Suaxili tili"
+
+msgid "Tamil"
+msgstr "Tamil tili"
+
+msgid "Telugu"
+msgstr "Telugu tili"
+
+msgid "Tajik"
+msgstr "Tojik tili"
+
+msgid "Thai"
+msgstr "Tay tili"
+
+msgid "Turkmen"
+msgstr "Turkman tili"
+
+msgid "Turkish"
+msgstr "Turk tili"
+
+msgid "Tatar"
+msgstr "Tatar tili"
+
+msgid "Udmurt"
+msgstr "Udmurt tili"
+
+msgid "Ukrainian"
+msgstr "Ukrain tili"
+
+msgid "Urdu"
+msgstr "Urdu tili"
+
+msgid "Uzbek"
+msgstr "O'zbek tili"
+
+msgid "Vietnamese"
+msgstr "Vetnam tili"
+
+msgid "Simplified Chinese"
+msgstr "Soddalashtirilgan xitoy tili"
+
+msgid "Traditional Chinese"
+msgstr "An'anaviy xitoy tili"
+
+msgid "Messages"
+msgstr "Xabarlar"
+
+msgid "Site Maps"
+msgstr "Sayt xaritalari"
+
+msgid "Static Files"
+msgstr "Statik fayllar"
+
+msgid "Syndication"
+msgstr "Sindikatsiya"
+
+msgid "That page number is not an integer"
+msgstr "Bu sahifa raqami butun son emas"
+
+msgid "That page number is less than 1"
+msgstr "Bu sahifa raqami 1 dan kichik"
+
+msgid "That page contains no results"
+msgstr "Ushbu sahifada hech qanday natija yo'q"
+
+msgid "Enter a valid value."
+msgstr "To'g'ri qiymatni kiriting."
+
+msgid "Enter a valid URL."
+msgstr "To'g'ri URL manzilini kiriting."
+
+msgid "Enter a valid integer."
+msgstr "To'g'ri butun sonni kiriting."
+
+msgid "Enter a valid email address."
+msgstr "To'g'ri elektron pochta manzilini kiriting."
+
+#. Translators: "letters" means latin letters: a-z and A-Z.
+msgid ""
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"Harflar, raqamlar, pastki chiziqlar yoki chiziqlardan iborat to'g'ri \"slug"
+"\" ni kiriting."
+
+msgid ""
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Unicode harflari, raqamlari, pastki chiziqlari yoki chiziqlardan iborat "
+"to'g'ri \"slug\" ni kiriting."
+
+msgid "Enter a valid IPv4 address."
+msgstr "To'g'ri IPv4 manzilini kiriting."
+
+msgid "Enter a valid IPv6 address."
+msgstr "To'g'ri IPv6 manzilini kiriting."
+
+msgid "Enter a valid IPv4 or IPv6 address."
+msgstr "To'g'ri IPv4 yoki IPv6 manzilini kiriting."
+
+msgid "Enter only digits separated by commas."
+msgstr "Faqat vergul bilan ajratilgan raqamlarni kiriting."
+
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr ""
+"Ushbu qiymat %(limit_value)s ekanligiga ishonch hosil qiling (Hozir u "
+"%(show_value)s)."
+
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr ""
+"Ushbu qiymat %(limit_value)s dan kichik yoki unga teng ekanligini tekshiring."
+
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr ""
+"Ushbu qiymat %(limit_value)s dan katta yoki unga teng ekanligini tekshiring."
+
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+"Ushbu qiymat kamida %(limit_value)dga ega ekanligiga ishonch hosil qiling "
+"(unda bor %(show_value)d)"
+
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+"Ushbu qiymat eng ko'pi bilan %(limit_value)d ta belgidan iboratligiga "
+"ishonch hosil qiling (hozir, %(show_value)d tadan iborat)."
+
+msgid "Enter a number."
+msgstr "Raqamni kiriting."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] ""
+"Umumiy raqamlar soni %(max)s tadan ko'p bo'lmasligiga ishonch hosil qiling."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] ""
+"O'nlik kasr xonalari %(max)s tadan ko'p bo'lmasligiga ishonch hosil qiling."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"O'nli kasr nuqtasidan oldin %(max)s tadan ko'p raqam bo'lmasligiga ishonch "
+"hosil qiling."
+
+#, python-format
+msgid ""
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
+msgstr ""
+"\"%(extension)s\" fayl kengaytmasiga ruxsat berilmagan Ruxsat berilgan "
+"kengaytmalar: %(allowed_extensions)s."
+
+msgid "Null characters are not allowed."
+msgstr "Bo'shliq belgilaridan foydalanish mumkin emas."
+
+msgid "and"
+msgstr "va"
+
+#, python-format
+msgid "%(model_name)s with this %(field_labels)s already exists."
+msgstr "%(field_labels)s bilan %(model_name)s allaqachon mavjud."
+
+#, python-format
+msgid "Value %(value)r is not a valid choice."
+msgstr "%(value)r qiymati to'g'ri tanlov emas."
+
+msgid "This field cannot be null."
+msgstr "Bu maydon bo‘shliq belgisidan iborat bo'lishi mumkin emas."
+
+msgid "This field cannot be blank."
+msgstr "Bu maydon bo‘sh bo‘lishi mumkin emas."
+
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "\"%(field_label)s\" %(model_name)s allaqachon mavjud."
+
+#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
+#. Eg: "Title must be unique for pub_date year"
+#, python-format
+msgid ""
+"%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
+msgstr ""
+"%(field_label)s %(date_field_label)s %(lookup_type)s uchun noyob bo'lishi "
+"kerak."
+
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "Maydon turi: %(field_type)s"
+
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr "\"%(value)s\" qiymati rost yoki yolg'on bo'lishi kerak."
+
+#, python-format
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr ""
+"\"%(value)s\" qiymati Rost, Yolg'on yoki Bo'shliq belgisidan iborat bo'lishi "
+"kerak."
+
+msgid "Boolean (Either True or False)"
+msgstr "Mantiqiy (Rost yoki Yolg'on)"
+
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "Birikma uzunligi (%(max_length)s gacha)"
+
+msgid "Comma-separated integers"
+msgstr "Vergul bilan ajratilgan butun sonlar"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
+"format."
+msgstr ""
+"\"%(value)s\" qiymati yaroqsiz sana formatiga ega. U YYYY-MM-DD formatida "
+"bo'lishi kerak."
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
+"date."
+msgstr ""
+"\"%(value)s\" qiymati to'g'ri formatga (YYYY-MM-DD) ega, ammo bu noto'g'ri "
+"sana."
+
+msgid "Date (without time)"
+msgstr "Sana (vaqtsiz)"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
+msgstr ""
+"\"%(value)s\" qiymati noto'g'ri formatga ega. U YYYY-MM-DD HH: MM [: ss [."
+"uuuuuu]] [TZ] formatida bo'lishi kerak."
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) but it is an invalid date/time."
+msgstr ""
+"\"%(value)s\" qiymati to'g'ri formatga ega (YYYY-MM-DD HH: MM [: ss [."
+"uuuuuu]] [TZ]), lekin u noto'g'ri sana / vaqt."
+
+msgid "Date (with time)"
+msgstr "Sana (vaqt bilan)"
+
+#, python-format
+msgid "“%(value)s” value must be a decimal number."
+msgstr "\"%(value)s\" qiymati o'nlik kasr sonlardan iborat bo'lishi kerak."
+
+msgid "Decimal number"
+msgstr "O'nli kasr son"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
+"uuuuuu] format."
+msgstr ""
+"\"%(value)s\" qiymati noto'g'ri formatga ega. U [DD] [[HH:] MM:] ss [."
+"uuuuuu] formatida bo'lishi kerak."
+
+msgid "Duration"
+msgstr "Davomiyligi"
+
+msgid "Email address"
+msgstr "Elektron pochta manzili"
+
+msgid "File path"
+msgstr "Fayl manzili"
+
+#, python-format
+msgid "“%(value)s” value must be a float."
+msgstr "\"%(value)s\" qiymati haqiqiy son bo'lishi kerak."
+
+msgid "Floating point number"
+msgstr "Haqiqiy son"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr "\"%(value)s\" qiymati butun son bo'lishi kerak."
+
+msgid "Integer"
+msgstr "Butun son"
+
+msgid "Big (8 byte) integer"
+msgstr "Katta (8 bayt) butun son"
+
+msgid "IPv4 address"
+msgstr "IPv4 manzili"
+
+msgid "IP address"
+msgstr "IP manzili"
+
+#, python-format
+msgid "“%(value)s” value must be either None, True or False."
+msgstr "\"%(value)s\" qiymati Yo‘q, To‘g‘ri yoki Noto'g'ri bo'lishi kerak."
+
+msgid "Boolean (Either True, False or None)"
+msgstr "Boolean (To'g'ri, Yolg'on yoki Hech biri)"
+
+msgid "Positive big integer"
+msgstr "Musbat katta butun son"
+
+msgid "Positive integer"
+msgstr "Ijobiy butun son"
+
+msgid "Positive small integer"
+msgstr "Musbat kichik butun son"
+
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr "Slug uzunligi (%(max_length)s gacha)"
+
+msgid "Small integer"
+msgstr "Kichik butun son"
+
+msgid "Text"
+msgstr "Matn"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"format."
+msgstr ""
+"\"%(value)s\" qiymati noto'g'ri formatga ega. U HH: MM [: ss [.uuuuuu]] "
+"formatida bo'lishi kerak."
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"invalid time."
+msgstr ""
+"\"%(value)s\" qiymati to'g'ri formatga ega (HH: MM [: ss [.uuuuuu]]), lekin "
+"bu noto'g'ri vaqt."
+
+msgid "Time"
+msgstr "Vaqt"
+
+msgid "URL"
+msgstr "URL manzili"
+
+msgid "Raw binary data"
+msgstr "Tartibsiz Ikkilik ma'lumotlar"
+
+#, python-format
+msgid "“%(value)s” is not a valid UUID."
+msgstr "\"%(value)s\" to'g'ri UUID emas."
+
+msgid "Universally unique identifier"
+msgstr "Umum noyob aniqlovchi"
+
+msgid "File"
+msgstr "Fayl"
+
+msgid "Image"
+msgstr "Rasm"
+
+msgid "A JSON object"
+msgstr "JSON ob'ekti"
+
+msgid "Value must be valid JSON."
+msgstr "Qiymat yaroqli JSON bo'lishi kerak."
+
+#, python-format
+msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgstr "%(field)s %(value)r lari bilan %(model)s namunasi uchun mavjud emas."
+
+msgid "Foreign Key (type determined by related field)"
+msgstr "Tashqi kalit (turi aloqador maydon tomonidan belgilanadi)"
+
+msgid "One-to-one relationship"
+msgstr "Birga-bir yago munosabat"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s -%(to)s gacha bo'lgan munosabat"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s -%(to)s gacha bo'lgan munosabatlar"
+
+msgid "Many-to-many relationship"
+msgstr "Ko'pchilikka-ko'pchilik munosabatlar"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
+msgid "This field is required."
+msgstr "Ushbu maydon to'ldirilishi shart."
+
+msgid "Enter a whole number."
+msgstr "Butun raqamni kiriting."
+
+msgid "Enter a valid date."
+msgstr "Sanani to‘g‘ri kiriting."
+
+msgid "Enter a valid time."
+msgstr "Vaqtni to‘g‘ri kiriting."
+
+msgid "Enter a valid date/time."
+msgstr "Sana/vaqtni to‘g‘ri kiriting."
+
+msgid "Enter a valid duration."
+msgstr "Muddatni to'g'ri kiriting."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Kunlar soni {min_days} va {max_days} orasida bo'lishi kerak."
+
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "Hech qanday fayl yuborilmadi. Formadagi kodlash turini tekshiring."
+
+msgid "No file was submitted."
+msgstr "Hech qanday fayl yuborilmadi."
+
+msgid "The submitted file is empty."
+msgstr "Yuborilgan etilgan fayl bo'sh."
+
+#, python-format
+msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
+msgid_plural ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr[0] ""
+"Fayl nomi maksimum %(max)d belgilardan ko'p emasligiga ishonch hosil qiling "
+"(hozir %(length)d belgi ishlatilgan)."
+
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+"Iltimos, faylni yuboring yoki katachani belgilang, lekin ikkalasinimas."
+
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"To'g'ri rasmni yuklang. Siz yuklagan fayl yoki rasm emas yoki buzilgan rasm "
+"edi."
+
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr "To'g'ri tanlovni tanlang. %(value)s mavjud tanlovlardan biri emas."
+
+msgid "Enter a list of values."
+msgstr "Qiymatlar ro'yxatini kiriting."
+
+msgid "Enter a complete value."
+msgstr "To'liq qiymatni kiriting."
+
+msgid "Enter a valid UUID."
+msgstr "To'g'ri UUID kiriting."
+
+msgid "Enter a valid JSON."
+msgstr "Yaroqli JSONni kiriting."
+
+#. Translators: This is the default suffix added to form field labels
+msgid ":"
+msgstr ":"
+
+#, python-format
+msgid "(Hidden field %(name)s) %(error)s"
+msgstr "(Yashirilgan maydon %(name)s) %(error)s"
+
+msgid "ManagementForm data is missing or has been tampered with"
+msgstr "ManagementForm ma'lumotlari yo'q yoki o'zgartirilgan"
+
+#, python-format
+msgid "Please submit %d or fewer forms."
+msgid_plural "Please submit %d or fewer forms."
+msgstr[0] "Iltimos, %d ta yoki kamroq forma topshiring."
+
+#, python-format
+msgid "Please submit %d or more forms."
+msgid_plural "Please submit %d or more forms."
+msgstr[0] "Iltimos, %d ta yoki ko'proq forma topshiring."
+
+msgid "Order"
+msgstr "Buyurtma"
+
+msgid "Delete"
+msgstr "Yo'q qilish"
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Iltimos,  %(field)s uchun takroriy ma'lumotni tuzating."
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr ""
+"Iltimos, noyob bo'lishi kerak bo'lgan %(field)s uchun takroriy ma'lumotlarni "
+"to'g'rilang."
+
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+"Iltimos, %(field_name)s uchun takroriy ma'lumotlarni %(date_field)s ga noyob "
+"bo'la oladigan %(lookup)s ichidagi ma'lumotlarni moslab to'g'rilang."
+
+msgid "Please correct the duplicate values below."
+msgstr "Iltimos, quyidagi takroriy qiymatlarni to'g'irlang."
+
+msgid "The inline value did not match the parent instance."
+msgstr "Kiritilgan ichki qiymat ajdod misoliga mos kelmaydi."
+
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "To'g'ri tanlovni tanlang. Bu tanlov mavjud tanlovlardan biri emas."
+
+#, python-format
+msgid "“%(pk)s” is not a valid value."
+msgstr "\"%(pk)s\" to'g'ri qiymat emas."
+
+#, python-format
+msgid ""
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+"%(datetime)s vaqtni %(current_timezone)s mintaqa talqinida ifodalab "
+"bo'lmadi; u noaniq yoki mavjud bo'lmasligi mumkin."
+
+msgid "Clear"
+msgstr "Aniq"
+
+msgid "Currently"
+msgstr "Hozirda"
+
+msgid "Change"
+msgstr "O'zgartirish"
+
+msgid "Unknown"
+msgstr "Noma'lum"
+
+msgid "Yes"
+msgstr "Ha"
+
+msgid "No"
+msgstr "Yo'q"
+
+#. Translators: Please do not add spaces around commas.
+msgid "yes,no,maybe"
+msgstr "ha,yo'q,ehtimol"
+
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] "%(size)dbayt"
+
+#, python-format
+msgid "%s KB"
+msgstr "%s KB"
+
+#, python-format
+msgid "%s MB"
+msgstr "%s MB"
+
+#, python-format
+msgid "%s GB"
+msgstr "%s GB"
+
+#, python-format
+msgid "%s TB"
+msgstr "%s TB"
+
+#, python-format
+msgid "%s PB"
+msgstr "%s PB"
+
+msgid "p.m."
+msgstr "kechqurun"
+
+msgid "a.m."
+msgstr "ertalab"
+
+msgid "PM"
+msgstr "Kechqurun"
+
+msgid "AM"
+msgstr "Ertalab"
+
+msgid "midnight"
+msgstr "yarim tunda"
+
+msgid "noon"
+msgstr "peshin"
+
+msgid "Monday"
+msgstr "Dushanba"
+
+msgid "Tuesday"
+msgstr "Seshanba"
+
+msgid "Wednesday"
+msgstr "Chorshanba"
+
+msgid "Thursday"
+msgstr "Payshanba"
+
+msgid "Friday"
+msgstr "Juma"
+
+msgid "Saturday"
+msgstr "Shanba"
+
+msgid "Sunday"
+msgstr "Yakshanba"
+
+msgid "Mon"
+msgstr "Dush"
+
+msgid "Tue"
+msgstr "Sesh"
+
+msgid "Wed"
+msgstr "Chor"
+
+msgid "Thu"
+msgstr "Pay"
+
+msgid "Fri"
+msgstr "Jum"
+
+msgid "Sat"
+msgstr "Shan"
+
+msgid "Sun"
+msgstr "Yak"
+
+msgid "January"
+msgstr "Yanvar"
+
+msgid "February"
+msgstr "Fevral"
+
+msgid "March"
+msgstr "Mart"
+
+msgid "April"
+msgstr "Aprel"
+
+msgid "May"
+msgstr "May"
+
+msgid "June"
+msgstr "Iyun"
+
+msgid "July"
+msgstr "Iyul"
+
+msgid "August"
+msgstr "Avgust"
+
+msgid "September"
+msgstr "Sentabr"
+
+msgid "October"
+msgstr "Oktabr"
+
+msgid "November"
+msgstr "Noyabr"
+
+msgid "December"
+msgstr "Dekabr"
+
+msgid "jan"
+msgstr "yan"
+
+msgid "feb"
+msgstr "fev"
+
+msgid "mar"
+msgstr "mar"
+
+msgid "apr"
+msgstr "apr"
+
+msgid "may"
+msgstr "may"
+
+msgid "jun"
+msgstr "iyn"
+
+msgid "jul"
+msgstr "iyl"
+
+msgid "aug"
+msgstr "avg"
+
+msgid "sep"
+msgstr "sen"
+
+msgid "oct"
+msgstr "okt"
+
+msgid "nov"
+msgstr "noy"
+
+msgid "dec"
+msgstr "dek"
+
+msgctxt "abbrev. month"
+msgid "Jan."
+msgstr "Yan,"
+
+msgctxt "abbrev. month"
+msgid "Feb."
+msgstr "Fev."
+
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "Mart"
+
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "Aprel"
+
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "May"
+
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "Iyun"
+
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "Iyul"
+
+msgctxt "abbrev. month"
+msgid "Aug."
+msgstr "Avg."
+
+msgctxt "abbrev. month"
+msgid "Sept."
+msgstr "Sen."
+
+msgctxt "abbrev. month"
+msgid "Oct."
+msgstr "Okt."
+
+msgctxt "abbrev. month"
+msgid "Nov."
+msgstr "Noy."
+
+msgctxt "abbrev. month"
+msgid "Dec."
+msgstr "Dek."
+
+msgctxt "alt. month"
+msgid "January"
+msgstr "Yanvar"
+
+msgctxt "alt. month"
+msgid "February"
+msgstr "Fevral"
+
+msgctxt "alt. month"
+msgid "March"
+msgstr "Mart"
+
+msgctxt "alt. month"
+msgid "April"
+msgstr "Aprel"
+
+msgctxt "alt. month"
+msgid "May"
+msgstr "May"
+
+msgctxt "alt. month"
+msgid "June"
+msgstr "Iyun"
+
+msgctxt "alt. month"
+msgid "July"
+msgstr "Iyul"
+
+msgctxt "alt. month"
+msgid "August"
+msgstr "Avgust"
+
+msgctxt "alt. month"
+msgid "September"
+msgstr "Sentabr"
+
+msgctxt "alt. month"
+msgid "October"
+msgstr "Oktabr"
+
+msgctxt "alt. month"
+msgid "November"
+msgstr "Noyabr"
+
+msgctxt "alt. month"
+msgid "December"
+msgstr "Dekabr"
+
+msgid "This is not a valid IPv6 address."
+msgstr "Bu to'g'ri IPv6 manzili emas."
+
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
+
+msgid "or"
+msgstr "yoki"
+
+#. Translators: This string is used as a separator between list elements
+msgid ", "
+msgstr ","
+
+#, python-format
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%dyil"
+
+#, python-format
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "%doy"
+
+#, python-format
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] "%dhafta"
+
+#, python-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%dkun"
+
+#, python-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%dsoat"
+
+#, python-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%dminut"
+
+msgid "Forbidden"
+msgstr "Taqiqlangan"
+
+msgid "CSRF verification failed. Request aborted."
+msgstr "CSRF tekshiruvi amalga oshmadi. So‘rov bekor qilindi."
+
+msgid ""
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
+"required for security reasons, to ensure that your browser is not being "
+"hijacked by third parties."
+msgstr ""
+"Siz ushbu xabarni ko'rmoqdasiz, chunki bu HTTPS saytida veb-brauzeringiz "
+"tomonidan \"Referer header\" yuborilishi talab qilinadi, ammo hech biri "
+"yuborilmadi. Ushbu sarlavha xavfsizlik nuqtai nazaridan, brauzeringizni "
+"uchinchi shaxslar tomonidan o'g'irlanmasligini ta'minlash uchun talab "
+"qilinadi."
+
+msgid ""
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
+msgstr ""
+"Agar siz \"Referer\" sarlavhalarini o'chirib qo'yish uchun brauzeringizni "
+"sozlagan bo'lsangiz, iltimos, hech bo'lmasa ushbu sayt uchun, HTTPS "
+"ulanishlari, yoki \"same-origin\" so'rovlari uchun ularni qayta yoqib "
+"qo'ying."
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
+msgstr ""
+"Agar siz <meta name=\"referrer\" content=\"no-referrer\"> yorlig'idan yoki "
+"\"Referrer-Policy: no-referer\" sarlavhasidan  foydalanayotgan bo'lsangiz, "
+"iltimos ularni olib tashlang. CSRF himoyasi \"Referer\" sarlavhasini "
+"havolalarni qat'iy tekshirishni talab qiladi. Agar maxfiyligingiz haqida "
+"xavotirda bo'lsangiz, uchinchi tomon saytlari <a rel=\"noreferrer\" …> kabi "
+"havola alternativalaridan foydalaning."
+
+msgid ""
+"You are seeing this message because this site requires a CSRF cookie when "
+"submitting forms. This cookie is required for security reasons, to ensure "
+"that your browser is not being hijacked by third parties."
+msgstr ""
+"Siz ushbu xabarni ko'rmoqdasiz, chunki ushbu sayt formalarni yuborishda CSRF "
+"cookie ma'lumotlarini talab qiladi. Ushbu cookie ma'lumotlari xavfsizlik "
+"nuqtai nazaridan, brauzeringizni uchinchi shaxslar tomonidan "
+"o'g'irlanmasligini ta'minlash uchun xizmat qilinadi."
+
+msgid ""
+"If you have configured your browser to disable cookies, please re-enable "
+"them, at least for this site, or for “same-origin” requests."
+msgstr ""
+"Agar siz cookie ma'lumotlarni o'chirib qo'yish uchun brauzeringizni "
+"konfiguratsiya qilgan bo'lsangiz, iltimos, ushbu sayt yoki \"same-origin\" "
+"so'rovlari uchun ularni qayta yoqib qo'ying."
+
+msgid "More information is available with DEBUG=True."
+msgstr "Qo'shimcha ma'lumotlarni DEBUG = True ifodasi bilan ko'rish mumkin."
+
+msgid "No year specified"
+msgstr "Yil ko‘rsatilmagan"
+
+msgid "Date out of range"
+msgstr "Sana chegaradan tashqarida"
+
+msgid "No month specified"
+msgstr "Oy ko'rsatilmagan"
+
+msgid "No day specified"
+msgstr "Hech qanday kun ko‘rsatilmagan"
+
+msgid "No week specified"
+msgstr "Hech qanday hafta belgilanmagan"
+
+#, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "Hech qanday %(verbose_name_plural)s lar mavjud emas"
+
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+"Kelajak %(verbose_name_plural)s lari mavjud emas, chunki %(class_name)s."
+"allow_future yolg'ondur."
+
+#, python-format
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr ""
+"\"%(datestr)s\" sana birikmasi noto'g'ri berilgan. \"%(format)s\" formati "
+"tavsiya etilgan"
+
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "So'rovga mos keladigan %(verbose_name)s topilmadi"
+
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr "Sahifa \"oxirgi\" emas va uni butun songa aylantirish mumkin emas."
+
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr "Noto'g'ri sahifa (%(page_number)s): %(message)s"
+
+#, python-format
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr "Bo'sh ro'yxat va \"%(class_name)s.allow_empty\" yolg'on."
+
+msgid "Directory indexes are not allowed here."
+msgstr "Bu yerda katalog indekslaridan foydalanib bo'lmaydi."
+
+#, python-format
+msgid "“%(path)s” does not exist"
+msgstr "\"%(path)s\" mavjud emas"
+
+#, python-format
+msgid "Index of %(directory)s"
+msgstr "%(directory)s indeksi"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: muddati chegaralangan perfektsionistlar uchun veb freymvork."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Django %(version)s uchun  chiqarilgan<a href=\"https://docs.djangoproject."
+"com/en/%(version)s/releases/\" target=\"_blank\" rel=\"noopener\"> "
+"nashrlarni</a> ko'rish"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "O'rnatish muvaffaqiyatli amalga oshdi! Tabriklaymiz!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Siz ushbu sahifani ko'rmoqdasiz, chunki <a href=\"https://docs.djangoproject."
+"com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG = True ifodasi</a> sizning sozlamalar faylingizda ko'rsatilgan va "
+"siz biron bir URL manzilini to'gri sozlamagansiz."
+
+msgid "Django Documentation"
+msgstr "Django Hujjatlari"
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr "Mavzular, havolalar va qanday qilish yo'llari"
+
+msgid "Tutorial: A Polling App"
+msgstr "Qo'llanma: So'rovnoma"
+
+msgid "Get started with Django"
+msgstr "Django bilan boshlang"
+
+msgid "Django Community"
+msgstr "Django hamjamiyati"
+
+msgid "Connect, get help, or contribute"
+msgstr "Bog'laning, yordam oling yoki hissa qo'shing"

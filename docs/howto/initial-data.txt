@@ -32,8 +32,8 @@ Or, you can write fixtures by hand; fixtures can be written as JSON, XML or YAML
 
 .. _PyYAML: https://pyyaml.org/
 
-As an example, though, here's what a fixture for a simple ``Person`` model might
-look like in JSON:
+As an example, though, here's what a fixture for a ``Person`` model might look
+like in JSON:
 
 .. code-block:: js
 
@@ -73,7 +73,7 @@ And here's that same fixture as YAML:
 
 You'll store this data in a ``fixtures`` directory inside your app.
 
-Loading data is easy: just call :djadmin:`manage.py loaddata <loaddata>`
+You can load data by calling :djadmin:`manage.py loaddata <loaddata>`
 ``<fixturename>``, where ``<fixturename>`` is the name of the fixture file
 you've created. Each time you run :djadmin:`loaddata`, the data will be read
 from the fixture and re-loaded into the database. Note this means that if you

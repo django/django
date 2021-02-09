@@ -1,5 +1,6 @@
 import os
 import sys
+import warnings
 from itertools import takewhile
 
 from django.apps import apps
@@ -7,7 +8,7 @@ from django.conf import settings
 from django.core.management.base import (
     BaseCommand, CommandError, no_translations,
 )
-from django.db import DEFAULT_DB_ALIAS, connections, router
+from django.db import DEFAULT_DB_ALIAS, OperationalError, connections, router
 from django.db.migrations import Migration
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.loader import MigrationLoader
@@ -98,8 +99,15 @@ class Command(BaseCommand):
                     for app_label in consistency_check_labels
                     for model in apps.get_app_config(app_label).get_models()
             )):
-                loader.check_consistent_history(connection)
-
+                try:
+                    loader.check_consistent_history(connection)
+                except OperationalError as error:
+                    warnings.warn(
+                        "Got an error checking a consistent migration history "
+                        "performed for database connection '%s': %s"
+                        % (alias, error),
+                        RuntimeWarning,
+                    )
         # Before anything else, see if there's conflicting apps and drop out
         # hard if there are any and they don't want to merge
         conflicts = loader.detect_conflicts()
@@ -190,7 +198,7 @@ class Command(BaseCommand):
         directory_created = {}
         for app_label, app_migrations in changes.items():
             if self.verbosity >= 1:
-                self.stdout.write(self.style.MIGRATE_HEADING("Migrations for '%s':" % app_label) + "\n")
+                self.stdout.write(self.style.MIGRATE_HEADING("Migrations for '%s':" % app_label))
             for migration in app_migrations:
                 # Describe the migration
                 writer = MigrationWriter(migration, self.include_header)
@@ -203,15 +211,14 @@ class Command(BaseCommand):
                         migration_string = writer.path
                     if migration_string.startswith('..'):
                         migration_string = writer.path
-                    self.stdout.write("  %s\n" % (self.style.MIGRATE_LABEL(migration_string),))
+                    self.stdout.write('  %s\n' % self.style.MIGRATE_LABEL(migration_string))
                     for operation in migration.operations:
-                        self.stdout.write("    - %s\n" % operation.describe())
+                        self.stdout.write('    - %s' % operation.describe())
                 if not self.dry_run:
                     # Write the migrations file to the disk.
                     migrations_directory = os.path.dirname(writer.path)
                     if not directory_created.get(app_label):
-                        if not os.path.isdir(migrations_directory):
-                            os.mkdir(migrations_directory)
+                        os.makedirs(migrations_directory, exist_ok=True)
                         init_path = os.path.join(migrations_directory, "__init__.py")
                         if not os.path.isfile(init_path):
                             open(init_path, "w").close()
@@ -225,9 +232,9 @@ class Command(BaseCommand):
                     # will output the migrations to stdout rather than saving
                     # the file to the disk.
                     self.stdout.write(self.style.MIGRATE_HEADING(
-                        "Full migrations file '%s':" % writer.filename) + "\n"
-                    )
-                    self.stdout.write("%s\n" % writer.as_string())
+                        "Full migrations file '%s':" % writer.filename
+                    ))
+                    self.stdout.write(writer.as_string())
 
     def handle_merge(self, loader, conflicts):
         """
@@ -273,7 +280,7 @@ class Command(BaseCommand):
                 for migration in merge_migrations:
                     self.stdout.write(self.style.MIGRATE_LABEL("  Branch %s" % migration.name))
                     for operation in migration.merged_operations:
-                        self.stdout.write("    - %s\n" % operation.describe())
+                        self.stdout.write('    - %s' % operation.describe())
             if questioner.ask_merge(app_label):
                 # If they still want to merge it, then write out an empty
                 # file depending on the migrations needing merging.
@@ -288,10 +295,17 @@ class Command(BaseCommand):
                 subclass = type("Migration", (Migration,), {
                     "dependencies": [(app_label, migration.name) for migration in merge_migrations],
                 })
-                migration_name = "%04i_%s" % (
-                    biggest_number + 1,
-                    self.migration_name or ("merge_%s" % get_migration_name_timestamp())
-                )
+                parts = ['%04i' % (biggest_number + 1)]
+                if self.migration_name:
+                    parts.append(self.migration_name)
+                else:
+                    parts.append('merge')
+                    leaf_names = '_'.join(sorted(migration.name for migration in merge_migrations))
+                    if len(leaf_names) > 47:
+                        parts.append(get_migration_name_timestamp())
+                    else:
+                        parts.append(leaf_names)
+                migration_name = '_'.join(parts)
                 new_migration = subclass(migration_name, app_label)
                 writer = MigrationWriter(new_migration, self.include_header)
 
@@ -306,6 +320,6 @@ class Command(BaseCommand):
                     # will output the merge migrations to stdout rather than saving
                     # the file to the disk.
                     self.stdout.write(self.style.MIGRATE_HEADING(
-                        "Full merge migrations file '%s':" % writer.filename) + "\n"
-                    )
-                    self.stdout.write("%s\n" % writer.as_string())
+                        "Full merge migrations file '%s':" % writer.filename
+                    ))
+                    self.stdout.write(writer.as_string())

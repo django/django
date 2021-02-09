@@ -62,7 +62,7 @@ each table's creation, modification, and deletion::
 
 If you do want to allow Django to manage the table's lifecycle, you'll need to
 change the :attr:`~django.db.models.Options.managed` option above to ``True``
-(or simply remove it because ``True`` is its default value).
+(or remove it because ``True`` is its default value).
 
 Install the core Django tables
 ==============================

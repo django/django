@@ -5,29 +5,48 @@ from django.db.backends.oracle.client import DatabaseClient
 from django.test import SimpleTestCase
 
 
-@skipUnless(connection.vendor == 'oracle', 'Oracle tests')
+@skipUnless(connection.vendor == 'oracle', 'Requires cx_Oracle to be installed')
 class OracleDbshellTests(SimpleTestCase):
-    def _run_dbshell(self, rlwrap=False):
-        """Run runshell command and capture its arguments."""
-        def _mock_subprocess_call(*args):
-            self.subprocess_args = tuple(*args)
-            return 0
-
-        client = DatabaseClient(connection)
-        self.subprocess_args = None
-        with mock.patch('subprocess.call', new=_mock_subprocess_call):
-            with mock.patch('shutil.which', return_value='/usr/bin/rlwrap' if rlwrap else None):
-                client.runshell()
-        return self.subprocess_args
+    def settings_to_cmd_args_env(self, settings_dict, parameters=None, rlwrap=False):
+        if parameters is None:
+            parameters = []
+        with mock.patch('shutil.which', return_value='/usr/bin/rlwrap' if rlwrap else None):
+            return DatabaseClient.settings_to_cmd_args_env(settings_dict, parameters)
 
     def test_without_rlwrap(self):
+        expected_args = [
+            'sqlplus',
+            '-L',
+            connection.client.connect_string(connection.settings_dict),
+        ]
         self.assertEqual(
-            self._run_dbshell(rlwrap=False),
-            ('sqlplus', '-L', connection._connect_string()),
+            self.settings_to_cmd_args_env(connection.settings_dict, rlwrap=False),
+            (expected_args, None),
         )
 
     def test_with_rlwrap(self):
+        expected_args = [
+            '/usr/bin/rlwrap',
+            'sqlplus',
+            '-L',
+            connection.client.connect_string(connection.settings_dict),
+        ]
         self.assertEqual(
-            self._run_dbshell(rlwrap=True),
-            ('/usr/bin/rlwrap', 'sqlplus', '-L', connection._connect_string()),
+            self.settings_to_cmd_args_env(connection.settings_dict, rlwrap=True),
+            (expected_args, None),
+        )
+
+    def test_parameters(self):
+        expected_args = [
+            'sqlplus',
+            '-L',
+            connection.client.connect_string(connection.settings_dict),
+            '-HELP',
+        ]
+        self.assertEqual(
+            self.settings_to_cmd_args_env(
+                connection.settings_dict,
+                parameters=['-HELP'],
+            ),
+            (expected_args, None),
         )

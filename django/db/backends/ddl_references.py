@@ -2,6 +2,7 @@
 Helpers to manipulate deferred DDL statements that might need to be adjusted or
 discarded within when executing a migration.
 """
+from copy import deepcopy
 
 
 class Reference:
@@ -83,10 +84,14 @@ class Columns(TableColumns):
 
     def __str__(self):
         def col_str(column, idx):
+            col = self.quote_name(column)
             try:
-                return self.quote_name(column) + self.col_suffixes[idx]
+                suffix = self.col_suffixes[idx]
+                if suffix:
+                    col = '{} {}'.format(col, suffix)
             except IndexError:
-                return self.quote_name(column)
+                pass
+            return col
 
         return ', '.join(col_str(column, idx) for idx, column in enumerate(self.columns))
 
@@ -110,13 +115,16 @@ class IndexColumns(Columns):
 
     def __str__(self):
         def col_str(column, idx):
-            try:
-                col = self.quote_name(column) + self.col_suffixes[idx]
-            except IndexError:
-                col = self.quote_name(column)
             # Index.__init__() guarantees that self.opclasses is the same
             # length as self.columns.
-            return '{} {}'.format(col, self.opclasses[idx])
+            col = '{} {}'.format(self.quote_name(column), self.opclasses[idx])
+            try:
+                suffix = self.col_suffixes[idx]
+                if suffix:
+                    col = '{} {}'.format(col, suffix)
+            except IndexError:
+                pass
+            return col
 
         return ', '.join(col_str(column, idx) for idx, column in enumerate(self.columns))
 
@@ -191,3 +199,38 @@ class Statement(Reference):
 
     def __str__(self):
         return self.template % self.parts
+
+
+class Expressions(TableColumns):
+    def __init__(self, table, expressions, compiler, quote_value):
+        self.compiler = compiler
+        self.expressions = expressions
+        self.quote_value = quote_value
+        columns = [col.target.column for col in self.compiler.query._gen_cols([self.expressions])]
+        super().__init__(table, columns)
+
+    def rename_table_references(self, old_table, new_table):
+        if self.table != old_table:
+            return
+        expressions = deepcopy(self.expressions)
+        self.columns = []
+        for col in self.compiler.query._gen_cols([expressions]):
+            col.alias = new_table
+        self.expressions = expressions
+        super().rename_table_references(old_table, new_table)
+
+    def rename_column_references(self, table, old_column, new_column):
+        if self.table != table:
+            return
+        expressions = deepcopy(self.expressions)
+        self.columns = []
+        for col in self.compiler.query._gen_cols([expressions]):
+            if col.target.column == old_column:
+                col.target.column = new_column
+            self.columns.append(col.target.column)
+        self.expressions = expressions
+
+    def __str__(self):
+        sql, params = self.compiler.compile(self.expressions)
+        params = map(self.quote_value, params)
+        return sql % tuple(params)

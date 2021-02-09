@@ -2,16 +2,41 @@
 Deploying Django
 ================
 
-Django's chock-full of shortcuts to make Web developer's lives easier, but all
+Django is full of shortcuts to make Web developers' lives easier, but all
 those tools are of no use if you can't easily deploy your sites. Since Django's
 inception, ease of deployment has been a major goal.
 
+There are many options for deploying your Django application, based on your
+architecture or your particular business needs, but that discussion is outside
+the scope of what Django can give you as guidance.
+
+Django, being a web framework, needs a web server in order to operate. And
+since most web servers don't natively speak Python, we need an interface to
+make that communication happen.
+
+Django currently supports two interfaces: WSGI and ASGI.
+
+* `WSGI`_ is the main Python standard for communicating between Web servers and
+  applications, but it only supports synchronous code.
+
+* `ASGI`_ is the new, asynchronous-friendly standard that will allow your
+  Django site to use asynchronous Python features, and asynchronous Django
+  features as they are developed.
+
+You should also consider how you will handle :doc:`static files
+</howto/static-files/deployment>` for your application, and how to handle
+:doc:`error reporting</howto/error-reporting>`.
+
+Finally, before you deploy your application to production, you should run
+through our :doc:`deployment checklist<checklist>` to ensure that your
+configurations are suitable.
+
+.. _WSGI: https://wsgi.readthedocs.io/en/latest/
+.. _ASGI: https://asgi.readthedocs.io/en/latest/
+
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    wsgi/index
+   asgi/index
    checklist
-
-If you're new to deploying Django and/or Python, we'd recommend you try
-:doc:`mod_wsgi </howto/deployment/wsgi/modwsgi>` first. In most cases it'll be
-the easiest, fastest, and most stable deployment choice.

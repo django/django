@@ -2,13 +2,13 @@
 #
 # Translators:
 # Besnik <besnik@programeshqip.org>, 2011,2015
-# Besnik <besnik@programeshqip.org>, 2015
+# Besnik <besnik@programeshqip.org>, 2015,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-11-29 22:56+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-18 10:20+0000\n"
 "Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
@@ -25,9 +25,8 @@ msgid "The base GIS field."
 msgstr "Fusha GIS bazë."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
-"Fusha bazë Gjeometri -- skicon sipas llojit Gjeometri me Specifikime OpenGIS."
 
 msgid "Point"
 msgstr "Pikë"
@@ -85,5 +84,5 @@ msgid "No feeds are registered."
 msgstr "S’ka prurje të regjistruara."
 
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr "Identifikuesi %r s’është i regjistruar."

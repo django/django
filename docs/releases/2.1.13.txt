@@ -1,0 +1,14 @@
+===========================
+Django 2.1.13 release notes
+===========================
+
+*October 1, 2019*
+
+Django 2.1.13 fixes a regression in 2.1.11.
+
+Bugfixes
+========
+
+* Fixed a crash when filtering with a ``Subquery()`` annotation of a queryset
+  containing ``django.contrib.postgres.fields.JSONField`` or
+  :class:`~django.contrib.postgres.fields.HStoreField` (:ticket:`30769`).

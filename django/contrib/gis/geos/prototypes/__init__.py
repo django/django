@@ -6,7 +6,8 @@
 
 from django.contrib.gis.geos.prototypes.coordseq import (  # NOQA
     create_cs, cs_clone, cs_getdims, cs_getordinate, cs_getsize, cs_getx,
-    cs_gety, cs_getz, cs_setordinate, cs_setx, cs_sety, cs_setz, get_cs,
+    cs_gety, cs_getz, cs_is_ccw, cs_setordinate, cs_setx, cs_sety, cs_setz,
+    get_cs,
 )
 from django.contrib.gis.geos.prototypes.geom import (  # NOQA
     create_collection, create_empty_polygon, create_linearring,

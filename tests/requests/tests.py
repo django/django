@@ -5,6 +5,7 @@ from urllib.parse import urlencode
 from django.core.exceptions import DisallowedHost
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.http import HttpRequest, RawPostDataException, UnreadablePostError
+from django.http.multipartparser import MultiPartParserError
 from django.http.request import HttpHeaders, split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
@@ -457,7 +458,7 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(request.read(13), b'--boundary\r\nC')
         self.assertEqual(request.POST, {'name': ['value']})
 
-    def test_POST_immutable_for_mutipart(self):
+    def test_POST_immutable_for_multipart(self):
         """
         MultiPartParser.parse() leaves request.POST immutable.
         """
@@ -476,14 +477,35 @@ class RequestsTests(SimpleTestCase):
         })
         self.assertFalse(request.POST._mutable)
 
+    def test_multipart_without_boundary(self):
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data;',
+            'CONTENT_LENGTH': 0,
+            'wsgi.input': FakePayload(),
+        })
+        with self.assertRaisesMessage(MultiPartParserError, 'Invalid boundary in multipart: None'):
+            request.POST
+
+    def test_multipart_non_ascii_content_type(self):
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data; boundary = \xe0',
+            'CONTENT_LENGTH': 0,
+            'wsgi.input': FakePayload(),
+        })
+        msg = 'Invalid non-ASCII Content-Type in multipart: multipart/form-data; boundary = à'
+        with self.assertRaisesMessage(MultiPartParserError, msg):
+            request.POST
+
     def test_POST_connection_error(self):
         """
         If wsgi.input.read() raises an exception while trying to read() the
-        POST, the exception should be identifiable (not a generic IOError).
+        POST, the exception is identifiable (not a generic OSError).
         """
         class ExplodingBytesIO(BytesIO):
             def read(self, len=0):
-                raise IOError("kaboom!")
+                raise OSError('kaboom!')
 
         payload = b'name=value'
         request = WSGIRequest({
@@ -520,11 +542,11 @@ class RequestsTests(SimpleTestCase):
     def test_FILES_connection_error(self):
         """
         If wsgi.input.read() raises an exception while trying to read() the
-        FILES, the exception should be identifiable (not a generic IOError).
+        FILES, the exception is identifiable (not a generic OSError).
         """
         class ExplodingBytesIO(BytesIO):
             def read(self, len=0):
-                raise IOError("kaboom!")
+                raise OSError('kaboom!')
 
         payload = b'x'
         request = WSGIRequest({
@@ -736,7 +758,7 @@ class HostValidationTests(SimpleTestCase):
         If ALLOWED_HOSTS is empty and DEBUG is True, variants of localhost are
         allowed.
         """
-        valid_hosts = ['localhost', '127.0.0.1', '[::1]']
+        valid_hosts = ['localhost', 'subdomain.localhost', '127.0.0.1', '[::1]']
         for host in valid_hosts:
             request = HttpRequest()
             request.META = {'HTTP_HOST': host}
@@ -874,6 +896,7 @@ class RequestHeadersTests(SimpleTestCase):
         request = WSGIRequest(self.ENVIRON)
         self.assertEqual(request.headers['User-Agent'], 'python-requests/1.2.0')
         self.assertEqual(request.headers['user-agent'], 'python-requests/1.2.0')
+        self.assertEqual(request.headers['user_agent'], 'python-requests/1.2.0')
         self.assertEqual(request.headers['Content-Type'], 'text/html')
         self.assertEqual(request.headers['Content-Length'], '100')
 

@@ -1,6 +1,5 @@
 import keyword
 import re
-from collections import OrderedDict
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
@@ -9,7 +8,7 @@ from django.db.models.constants import LOOKUP_SEP
 
 class Command(BaseCommand):
     help = "Introspects the database tables in the given database and outputs a Django model module."
-    requires_system_checks = False
+    requires_system_checks = []
     stealth_options = ('table_name_filter',)
     db_module = 'django.db'
 
@@ -32,7 +31,7 @@ class Command(BaseCommand):
     def handle(self, **options):
         try:
             for line in self.handle_inspection(options):
-                self.stdout.write("%s\n" % line)
+                self.stdout.write(line)
         except NotImplementedError:
             raise CommandError("Database inspection isn't supported for the currently selected database backend.")
 
@@ -49,7 +48,7 @@ class Command(BaseCommand):
             yield "# You'll have to do the following manually to clean this up:"
             yield "#   * Rearrange models' order"
             yield "#   * Make sure each model has one field with primary_key=True"
-            yield "#   * Make sure each ForeignKey has `on_delete` set to the desired behavior."
+            yield "#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior"
             yield (
                 "#   * Remove `managed = False` lines if you wish to allow "
                 "Django to create, modify, and delete the table"
@@ -98,7 +97,7 @@ class Command(BaseCommand):
                 column_to_field_name = {}  # Maps column names to names of model fields
                 for row in table_description:
                     comment_notes = []  # Holds Field notes, to be displayed in a Python comment.
-                    extra_params = OrderedDict()  # Holds Field parameters such as 'db_column'.
+                    extra_params = {}  # Holds Field parameters such as 'db_column'.
                     column_name = row.name
                     is_relation = column_name in relations
 
@@ -117,14 +116,18 @@ class Command(BaseCommand):
                         extra_params['unique'] = True
 
                     if is_relation:
+                        if extra_params.pop('unique', False) or extra_params.get('primary_key'):
+                            rel_type = 'OneToOneField'
+                        else:
+                            rel_type = 'ForeignKey'
                         rel_to = (
                             "self" if relations[column_name][1] == table_name
                             else table2model(relations[column_name][1])
                         )
                         if rel_to in known_models:
-                            field_type = 'ForeignKey(%s' % rel_to
+                            field_type = '%s(%s' % (rel_type, rel_to)
                         else:
-                            field_type = "ForeignKey('%s'" % rel_to
+                            field_type = "%s('%s'" % (rel_type, rel_to)
                     else:
                         # Calling `get_field_type` to get the field type string and any
                         # additional parameters and notes.
@@ -139,7 +142,7 @@ class Command(BaseCommand):
                     if att_name == 'id' and extra_params == {'primary_key': True}:
                         if field_type == 'AutoField(':
                             continue
-                        elif field_type == 'IntegerField(' and not connection.features.can_introspect_autofield:
+                        elif field_type == connection.features.introspected_field_types['AutoField'] + '(':
                             comment_notes.append('AutoField?')
 
                     # Add 'null' and 'blank', if the 'null_ok' flag was present in the
@@ -154,7 +157,7 @@ class Command(BaseCommand):
                         '' if '.' in field_type else 'models.',
                         field_type,
                     )
-                    if field_type.startswith('ForeignKey('):
+                    if field_type.startswith(('ForeignKey(', 'OneToOneField(')):
                         field_desc += ', models.DO_NOTHING'
 
                     if extra_params:
@@ -167,8 +170,7 @@ class Command(BaseCommand):
                     yield '    %s' % field_desc
                 is_view = any(info.name == table_name and info.type == 'v' for info in table_info)
                 is_partition = any(info.name == table_name and info.type == 'p' for info in table_info)
-                for meta_line in self.get_meta(table_name, constraints, column_to_field_name, is_view, is_partition):
-                    yield meta_line
+                yield from self.get_meta(table_name, constraints, column_to_field_name, is_view, is_partition)
 
     def normalize_col_name(self, col_name, used_column_names, is_relation):
         """
@@ -232,7 +234,7 @@ class Command(BaseCommand):
         description, this routine will return the given field type name, as
         well as any additional keyword parameters and notes for the field.
         """
-        field_params = OrderedDict()
+        field_params = {}
         field_notes = []
 
         try:
@@ -244,6 +246,9 @@ class Command(BaseCommand):
         # Add max_length for all CharFields.
         if field_type == 'CharField' and row.internal_size:
             field_params['max_length'] = int(row.internal_size)
+
+        if field_type in {'CharField', 'TextField'} and row.collation:
+            field_params['db_collation'] = row.collation
 
         if field_type == 'DecimalField':
             if row.precision is None or row.scale is None:

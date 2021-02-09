@@ -24,7 +24,7 @@ class FKDataNaturalKey(models.Model):
 
 
 class NaturalKeyThing(models.Model):
-    key = models.CharField(max_length=100)
+    key = models.CharField(max_length=100, unique=True)
     other_thing = models.ForeignKey('NaturalKeyThing', on_delete=models.CASCADE, null=True)
     other_things = models.ManyToManyField('NaturalKeyThing', related_name='thing_m2m_set')
 
@@ -53,3 +53,17 @@ class NaturalPKWithDefault(models.Model):
 
     def natural_key(self):
         return (self.name,)
+
+
+class FKAsPKNoNaturalKeyManager(models.Manager):
+    def get_by_natural_key(self, *args, **kwargs):
+        return super().get_by_natural_key(*args, **kwargs)
+
+
+class FKAsPKNoNaturalKey(models.Model):
+    pk_fk = models.ForeignKey(NaturalKeyAnchor, on_delete=models.CASCADE, primary_key=True)
+
+    objects = FKAsPKNoNaturalKeyManager()
+
+    def natural_key(self):
+        raise NotImplementedError('This method was not expected to be called.')

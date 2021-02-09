@@ -1,8 +1,8 @@
-============================================
-Django 2.2 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 2.2 release notes
+========================
 
-*Expected April 2019*
+*April 1, 2019*
 
 Welcome to Django 2.2!
 
@@ -15,15 +15,17 @@ want to be aware of when upgrading from Django 2.1 or earlier. We've
 See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
 
-Django 2.2 is designated as a :term:`long-term support release`. It will
-receive security updates for at least three years after its release. Support
-for the previous LTS, Django 1.11, will end in April 2020.
+Django 2.2 is designated as a :term:`long-term support release
+<Long-term support release>`. It will receive security updates for at least
+three years after its release. Support for the previous LTS, Django 1.11, will
+end in April 2020.
 
 Python compatibility
 ====================
 
-Django 2.2 supports Python 3.5, 3.6, and 3.7. We **highly recommend** and only
-officially support the latest release of each series.
+Django 2.2 supports Python 3.5, 3.6, 3.7, 3.8 (as of 2.2.8), and 3.9 (as of
+2.2.17). We **highly recommend** and only officially support the latest release
+of each series.
 
 .. _whats-new-2.2:
 
@@ -286,6 +288,9 @@ backends.
   * ``_delete_fk_sql()`` (to pair with ``_create_fk_sql()``)
   * ``_create_check_sql()`` and ``_delete_check_sql()``
 
+* The third argument of ``DatabaseWrapper.__init__()``,
+  ``allow_thread_sharing``, is removed.
+
 Admin actions are no longer collected from base ``ModelAdmin`` classes
 ----------------------------------------------------------------------
 
@@ -299,7 +304,7 @@ For example, in older versions of Django::
     class SubAdmin(BaseAdmin):
         actions = ['b']
 
-``SubAdmin`` will have actions ``'a'`` and ``'b'``.
+``SubAdmin`` would have actions ``'a'`` and ``'b'``.
 
 Now ``actions`` follows standard Python inheritance. To get the same result as
 before::
@@ -326,7 +331,7 @@ change shouldn't have an impact on your tests unless you've customized
 ``sqlparse`` is required dependency
 -----------------------------------
 
-To simplify a few parts of Django's database handling, `sqlparse
+To simplify a few parts of Django's database handling, `sqlparse 0.2.2+
 <https://pypi.org/project/sqlparse/>`_ is now a required dependency. It's
 automatically installed along with Django.
 
@@ -345,9 +350,9 @@ In usage like::
 
         alias = base
 
-``alias`` is not cached. Such usage now raises ``TypeError: Cannot assign the
-same cached_property to two different names ('base' and 'alias').`` on Python
-3.6 and later.
+``alias`` is not cached. Where the problem can be detected (Python 3.6 and
+later), such usage now raises ``TypeError: Cannot assign the same
+cached_property to two different names ('base' and 'alias').``
 
 Use this instead::
 
@@ -380,6 +385,20 @@ Finally, proxy model permission strings must be updated to use their own
 ``other_app.ConcreteModel``, update
 ``user.has_perm('other_app.add_myproxymodel')`` to
 ``user.has_perm('app.add_myproxymodel')``.
+
+Merging of form ``Media`` assets
+--------------------------------
+
+Form ``Media`` assets are now merged using a topological sort algorithm, as the
+old pairwise merging algorithm is insufficient for some cases. CSS and
+JavaScript files which don't include their dependencies may now be sorted
+incorrectly (where the old algorithm produced results correctly by
+coincidence).
+
+Audit all ``Media`` classes for any missing dependencies. For example,
+widgets depending on ``django.jQuery`` must specify
+``js=['admin/js/jquery.init.js', ...]`` when :ref:`declaring form media assets
+<assets-as-a-static-definition>`.
 
 Miscellaneous
 -------------
@@ -440,11 +459,29 @@ Miscellaneous
   :func:`~django.contrib.sitemaps.ping_google` function, set the new
   ``sitemap_uses_https`` argument to ``False``.
 
-* :djadmin:`runserver` no longer supports `pyinotify` (replaced by Watchman).
+* :djadmin:`runserver` no longer supports ``pyinotify`` (replaced by Watchman).
 
 * The :class:`~django.db.models.Avg`, :class:`~django.db.models.StdDev`, and
   :class:`~django.db.models.Variance` aggregate functions now return a
   ``Decimal`` instead of a ``float`` when the input is ``Decimal``.
+
+* Tests will fail on SQLite if apps without migrations have relations to apps
+  with migrations. This has been a documented restriction since migrations were
+  added in Django 1.7, but it fails more reliably now. You'll see tests failing
+  with errors like ``no such table: <app_label>_<model>``. This was observed
+  with several third-party apps that had models in tests without migrations.
+  You must add migrations for such models.
+
+* Providing an integer in the ``key`` argument of the :meth:`.cache.delete` or
+  :meth:`.cache.get` now raises :exc:`ValueError`.
+
+* Plural equations for some languages are changed, because the latest versions
+  from Transifex are incorporated.
+
+  .. note::
+
+    The ability to handle ``.po`` files containing different plural equations
+    for the same language was added in Django 2.2.12.
 
 .. _deprecated-features-2.2:
 
@@ -477,15 +514,15 @@ Miscellaneous
   read from disk must be UTF-8 encoded.
 
 * ``django.contrib.staticfiles.storage.CachedStaticFilesStorage`` is
-  deprecated due to the intractable problems that is has. Use
+  deprecated due to the intractable problems that it has. Use
   :class:`.ManifestStaticFilesStorage` or a third-party cloud storage instead.
 
 * :meth:`.RemoteUserBackend.configure_user` is now passed ``request`` as the
   first positional argument, if it accepts it. Support for overrides that don't
   accept it will be removed in Django 3.1.
 
-* The :attr:`.SimpleTestCase.allow_database_queries`,
-  :attr:`.TransactionTestCase.multi_db`, and :attr:`.TestCase.multi_db`
+* The ``SimpleTestCase.allow_database_queries``,
+  ``TransactionTestCase.multi_db``, and ``TestCase.multi_db``
   attributes are deprecated in favor of :attr:`.SimpleTestCase.databases`,
   :attr:`.TransactionTestCase.databases`, and :attr:`.TestCase.databases`.
   These new attributes allow databases dependencies to be declared in order to

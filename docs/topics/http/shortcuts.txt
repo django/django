@@ -84,7 +84,7 @@ This example is equivalent to::
 ``redirect()``
 ==============
 
-.. function:: redirect(to, permanent=False, *args, **kwargs)
+.. function:: redirect(to, *args, permanent=False, **kwargs)
 
    Returns an :class:`~django.http.HttpResponseRedirect` to the appropriate URL
    for the arguments passed.

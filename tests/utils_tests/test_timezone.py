@@ -1,16 +1,38 @@
 import datetime
-import pickle
+import unittest
 from unittest import mock
 
 import pytz
 
-from django.test import SimpleTestCase, ignore_warnings, override_settings
+try:
+    import zoneinfo
+except ImportError:
+    try:
+        from backports import zoneinfo
+    except ImportError:
+        zoneinfo = None
+
+from django.test import SimpleTestCase, override_settings
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango31Warning
 
 CET = pytz.timezone("Europe/Paris")
 EAT = timezone.get_fixed_timezone(180)      # Africa/Nairobi
 ICT = timezone.get_fixed_timezone(420)      # Asia/Bangkok
+UTC = datetime.timezone.utc
+
+HAS_ZONEINFO = zoneinfo is not None
+
+if not HAS_ZONEINFO:
+    PARIS_ZI = None
+    PARIS_IMPLS = (CET,)
+
+    needs_zoneinfo = unittest.skip("Test requires zoneinfo")
+else:
+    PARIS_ZI = zoneinfo.ZoneInfo('Europe/Paris')
+    PARIS_IMPLS = (CET, PARIS_ZI)
+
+    def needs_zoneinfo(f):
+        return f
 
 
 class TimezoneTests(SimpleTestCase):
@@ -144,13 +166,21 @@ class TimezoneTests(SimpleTestCase):
         )
 
     def test_make_aware2(self):
-        self.assertEqual(
-            timezone.make_aware(datetime.datetime(2011, 9, 1, 12, 20, 30), CET),
-            CET.localize(datetime.datetime(2011, 9, 1, 12, 20, 30)))
+        CEST = datetime.timezone(datetime.timedelta(hours=2), 'CEST')
+        for tz in PARIS_IMPLS:
+            with self.subTest(repr(tz)):
+                self.assertEqual(
+                    timezone.make_aware(datetime.datetime(2011, 9, 1, 12, 20, 30), tz),
+                    datetime.datetime(2011, 9, 1, 12, 20, 30, tzinfo=CEST))
+
         with self.assertRaises(ValueError):
             timezone.make_aware(CET.localize(datetime.datetime(2011, 9, 1, 12, 20, 30)), CET)
 
-    def test_make_aware_pytz(self):
+        if HAS_ZONEINFO:
+            with self.assertRaises(ValueError):
+                timezone.make_aware(datetime.datetime(2011, 9, 1, 12, 20, 30, tzinfo=PARIS_ZI), PARIS_ZI)
+
+    def test_make_naive_pytz(self):
         self.assertEqual(
             timezone.make_naive(CET.localize(datetime.datetime(2011, 9, 1, 12, 20, 30)), CET),
             datetime.datetime(2011, 9, 1, 12, 20, 30))
@@ -161,6 +191,18 @@ class TimezoneTests(SimpleTestCase):
             datetime.datetime(2011, 9, 1, 12, 20, 30))
         with self.assertRaisesMessage(ValueError, 'make_naive() cannot be applied to a naive datetime'):
             timezone.make_naive(datetime.datetime(2011, 9, 1, 12, 20, 30), CET)
+
+    @needs_zoneinfo
+    def test_make_naive_zoneinfo(self):
+        self.assertEqual(
+            timezone.make_naive(datetime.datetime(2011, 9, 1, 12, 20, 30, tzinfo=PARIS_ZI), PARIS_ZI),
+            datetime.datetime(2011, 9, 1, 12, 20, 30)
+        )
+
+        self.assertEqual(
+            timezone.make_naive(datetime.datetime(2011, 9, 1, 12, 20, 30, fold=1, tzinfo=PARIS_ZI), PARIS_ZI),
+            datetime.datetime(2011, 9, 1, 12, 20, 30, fold=1)
+        )
 
     def test_make_aware_pytz_ambiguous(self):
         # 2:30 happens twice, once before DST ends and once after
@@ -175,6 +217,21 @@ class TimezoneTests(SimpleTestCase):
         self.assertEqual(std.tzinfo.utcoffset(std), datetime.timedelta(hours=1))
         self.assertEqual(dst.tzinfo.utcoffset(dst), datetime.timedelta(hours=2))
 
+    @needs_zoneinfo
+    def test_make_aware_zoneinfo_ambiguous(self):
+        # 2:30 happens twice, once before DST ends and once after
+        ambiguous = datetime.datetime(2015, 10, 25, 2, 30)
+
+        std = timezone.make_aware(ambiguous.replace(fold=1), timezone=PARIS_ZI)
+        dst = timezone.make_aware(ambiguous, timezone=PARIS_ZI)
+
+        self.assertEqual(
+            std.astimezone(UTC) - dst.astimezone(UTC),
+            datetime.timedelta(hours=1)
+        )
+        self.assertEqual(std.utcoffset(), datetime.timedelta(hours=1))
+        self.assertEqual(dst.utcoffset(), datetime.timedelta(hours=2))
+
     def test_make_aware_pytz_non_existent(self):
         # 2:30 never happened due to DST
         non_existent = datetime.datetime(2015, 3, 29, 2, 30)
@@ -187,6 +244,21 @@ class TimezoneTests(SimpleTestCase):
         self.assertEqual(std - dst, datetime.timedelta(hours=1))
         self.assertEqual(std.tzinfo.utcoffset(std), datetime.timedelta(hours=1))
         self.assertEqual(dst.tzinfo.utcoffset(dst), datetime.timedelta(hours=2))
+
+    @needs_zoneinfo
+    def test_make_aware_zoneinfo_non_existent(self):
+        # 2:30 never happened due to DST
+        non_existent = datetime.datetime(2015, 3, 29, 2, 30)
+
+        std = timezone.make_aware(non_existent, PARIS_ZI)
+        dst = timezone.make_aware(non_existent.replace(fold=1), PARIS_ZI)
+
+        self.assertEqual(
+            std.astimezone(UTC) - dst.astimezone(UTC),
+            datetime.timedelta(hours=1)
+        )
+        self.assertEqual(std.utcoffset(), datetime.timedelta(hours=1))
+        self.assertEqual(dst.utcoffset(), datetime.timedelta(hours=2))
 
     def test_get_default_timezone(self):
         self.assertEqual(timezone.get_default_timezone_name(), 'America/Chicago')
@@ -202,24 +274,3 @@ class TimezoneTests(SimpleTestCase):
     def test_fixedoffset_negative_timedelta(self):
         delta = datetime.timedelta(hours=-2)
         self.assertEqual(timezone.get_fixed_timezone(delta).utcoffset(None), delta)
-
-    @ignore_warnings(category=RemovedInDjango31Warning)
-    def test_fixedoffset_pickle(self):
-        self.assertEqual(pickle.loads(pickle.dumps(timezone.FixedOffset(0, 'tzname'))).tzname(''), 'tzname')
-
-    def test_fixedoffset_deprecation(self):
-        msg = 'FixedOffset is deprecated in favor of datetime.timezone'
-        with self.assertWarnsMessage(RemovedInDjango31Warning, msg) as cm:
-            timezone.FixedOffset()
-        self.assertEqual(cm.filename, __file__)
-
-    @ignore_warnings(category=RemovedInDjango31Warning)
-    def test_fixedoffset_utcoffset(self):
-        delta = datetime.timedelta(minutes=1)
-        self.assertEqual(timezone.FixedOffset(1).utcoffset(None), delta)
-
-    @ignore_warnings(category=RemovedInDjango31Warning)
-    def test_fixedoffset_dst(self):
-        ZERO = datetime.timedelta(minutes=0)
-        delta = datetime.timedelta(hours=0)
-        self.assertEqual(timezone.FixedOffset().dst(delta), ZERO)

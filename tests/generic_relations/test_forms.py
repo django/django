@@ -237,3 +237,61 @@ id="id_generic_relations-taggeditem-content_type-object_id-1-id"></p>""" % tagge
         self.assertEqual([tag.tag for tag in tags], ['hunts', 'roars'])
         hunts, roars = tags
         self.assertSequenceEqual(lion.tags.order_by('tag'), [hairy, hunts, roars, yellow])
+
+    def test_absolute_max(self):
+        GenericFormSet = generic_inlineformset_factory(TaggedItem, absolute_max=1500)
+        data = {
+            'form-TOTAL_FORMS': '1501',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '0',
+        }
+        formset = GenericFormSet(data=data, prefix='form')
+        self.assertIs(formset.is_valid(), False)
+        self.assertEqual(len(formset.forms), 1500)
+        self.assertEqual(
+            formset.non_form_errors(),
+            ['Please submit at most 1000 forms.'],
+        )
+
+    def test_absolute_max_with_max_num(self):
+        GenericFormSet = generic_inlineformset_factory(
+            TaggedItem,
+            max_num=20,
+            absolute_max=100,
+        )
+        data = {
+            'form-TOTAL_FORMS': '101',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '0',
+        }
+        formset = GenericFormSet(data=data, prefix='form')
+        self.assertIs(formset.is_valid(), False)
+        self.assertEqual(len(formset.forms), 100)
+        self.assertEqual(
+            formset.non_form_errors(),
+            ['Please submit at most 20 forms.'],
+        )
+
+    def test_can_delete_extra(self):
+        GenericFormSet = generic_inlineformset_factory(
+            TaggedItem,
+            can_delete=True,
+            can_delete_extra=True,
+            extra=2,
+        )
+        formset = GenericFormSet()
+        self.assertEqual(len(formset), 2)
+        self.assertIn('DELETE', formset.forms[0].fields)
+        self.assertIn('DELETE', formset.forms[1].fields)
+
+    def test_disable_delete_extra(self):
+        GenericFormSet = generic_inlineformset_factory(
+            TaggedItem,
+            can_delete=True,
+            can_delete_extra=False,
+            extra=2,
+        )
+        formset = GenericFormSet()
+        self.assertEqual(len(formset), 2)
+        self.assertNotIn('DELETE', formset.forms[0].fields)
+        self.assertNotIn('DELETE', formset.forms[1].fields)

@@ -26,8 +26,32 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
         return mark_safe(number)
     # sign
     sign = ''
+    # Treat potentially very large/small floats as Decimals.
+    if isinstance(number, float) and 'e' in str(number).lower():
+        number = Decimal(str(number))
     if isinstance(number, Decimal):
-        str_number = '{:f}'.format(number)
+
+        if decimal_pos is not None:
+            # If the provided number is too small to affect any of the visible
+            # decimal places, consider it equal to '0'.
+            cutoff = Decimal('0.' + '1'.rjust(decimal_pos, '0'))
+            if abs(number) < cutoff:
+                number = Decimal('0')
+
+        # Format values with more than 200 digits (an arbitrary cutoff) using
+        # scientific notation to avoid high memory usage in {:f}'.format().
+        _, digits, exponent = number.as_tuple()
+        if abs(exponent) + len(digits) > 200:
+            number = '{:e}'.format(number)
+            coefficient, exponent = number.split('e')
+            # Format the coefficient.
+            coefficient = format(
+                coefficient, decimal_sep, decimal_pos, grouping,
+                thousand_sep, force_grouping, use_l10n,
+            )
+            return '{}e{}'.format(coefficient, exponent)
+        else:
+            str_number = '{:f}'.format(number)
     else:
         str_number = str(number)
     if str_number[0] == '-':

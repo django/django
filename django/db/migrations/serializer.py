@@ -5,10 +5,11 @@ import decimal
 import enum
 import functools
 import math
+import os
+import pathlib
 import re
 import types
 import uuid
-from collections import OrderedDict
 
 from django.conf import SettingsReference
 from django.db import models
@@ -45,6 +46,11 @@ class BaseSequenceSerializer(BaseSerializer):
 class BaseSimpleSerializer(BaseSerializer):
     def serialize(self):
         return repr(self.value), set()
+
+
+class ChoicesSerializer(BaseSerializer):
+    def serialize(self):
+        return serializer_factory(self.value.value).serialize()
 
 
 class DateTimeSerializer(BaseSerializer):
@@ -116,9 +122,10 @@ class EnumSerializer(BaseSerializer):
     def serialize(self):
         enum_class = self.value.__class__
         module = enum_class.__module__
-        v_string, v_imports = serializer_factory(self.value.value).serialize()
-        imports = {'import %s' % module, *v_imports}
-        return "%s.%s(%s)" % (module, enum_class.__name__, v_string), imports
+        return (
+            '%s.%s[%r]' % (module, enum_class.__qualname__, self.value.name),
+            {'import %s' % module},
+        )
 
 
 class FloatSerializer(BaseSimpleSerializer):
@@ -212,6 +219,19 @@ class OperationSerializer(BaseSerializer):
         return string.rstrip(','), imports
 
 
+class PathLikeSerializer(BaseSerializer):
+    def serialize(self):
+        return repr(os.fspath(self.value)), {}
+
+
+class PathSerializer(BaseSerializer):
+    def serialize(self):
+        # Convert concrete paths to pure paths to avoid issues with migrations
+        # generated on one platform being used on a different platform.
+        prefix = 'Pure' if isinstance(self.value, pathlib.Path) else ''
+        return 'pathlib.%s%r' % (prefix, self.value), {'import pathlib'}
+
+
 class RegexSerializer(BaseSerializer):
     def serialize(self):
         regex_pattern, pattern_imports = serializer_factory(self.value.pattern).serialize()
@@ -264,7 +284,7 @@ class TypeSerializer(BaseSerializer):
             if module == builtins.__name__:
                 return self.value.__name__, set()
             else:
-                return "%s.%s" % (module, self.value.__name__), {"import %s" % module}
+                return "%s.%s" % (module, self.value.__qualname__), {"import %s" % module}
 
 
 class UUIDSerializer(BaseSerializer):
@@ -273,25 +293,29 @@ class UUIDSerializer(BaseSerializer):
 
 
 class Serializer:
-    _registry = OrderedDict([
-        (frozenset, FrozensetSerializer),
-        (list, SequenceSerializer),
-        (set, SetSerializer),
-        (tuple, TupleSerializer),
-        (dict, DictionarySerializer),
-        (enum.Enum, EnumSerializer),
-        (datetime.datetime, DatetimeDatetimeSerializer),
-        ((datetime.date, datetime.timedelta, datetime.time), DateTimeSerializer),
-        (SettingsReference, SettingsReferenceSerializer),
-        (float, FloatSerializer),
-        ((bool, int, type(None), bytes, str), BaseSimpleSerializer),
-        (decimal.Decimal, DecimalSerializer),
-        ((functools.partial, functools.partialmethod), FunctoolsPartialSerializer),
-        ((types.FunctionType, types.BuiltinFunctionType, types.MethodType), FunctionTypeSerializer),
-        (collections.abc.Iterable, IterableSerializer),
-        ((COMPILED_REGEX_TYPE, RegexObject), RegexSerializer),
-        (uuid.UUID, UUIDSerializer),
-    ])
+    _registry = {
+        # Some of these are order-dependent.
+        frozenset: FrozensetSerializer,
+        list: SequenceSerializer,
+        set: SetSerializer,
+        tuple: TupleSerializer,
+        dict: DictionarySerializer,
+        models.Choices: ChoicesSerializer,
+        enum.Enum: EnumSerializer,
+        datetime.datetime: DatetimeDatetimeSerializer,
+        (datetime.date, datetime.timedelta, datetime.time): DateTimeSerializer,
+        SettingsReference: SettingsReferenceSerializer,
+        float: FloatSerializer,
+        (bool, int, type(None), bytes, str, range): BaseSimpleSerializer,
+        decimal.Decimal: DecimalSerializer,
+        (functools.partial, functools.partialmethod): FunctoolsPartialSerializer,
+        (types.FunctionType, types.BuiltinFunctionType, types.MethodType): FunctionTypeSerializer,
+        collections.abc.Iterable: IterableSerializer,
+        (COMPILED_REGEX_TYPE, RegexObject): RegexSerializer,
+        uuid.UUID: UUIDSerializer,
+        pathlib.PurePath: PathSerializer,
+        os.PathLike: PathLikeSerializer,
+    }
 
     @classmethod
     def register(cls, type_, serializer):

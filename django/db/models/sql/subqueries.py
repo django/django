@@ -3,7 +3,6 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 """
 
 from django.core.exceptions import FieldError
-from django.db import connections
 from django.db.models.query_utils import Q
 from django.db.models.sql.constants import (
     CURSOR, GET_ITERATOR_CHUNK_SIZE, NO_RESULTS,
@@ -22,7 +21,10 @@ class DeleteQuery(Query):
         self.alias_map = {table: self.alias_map[table]}
         self.where = where
         cursor = self.get_compiler(using).execute_sql(CURSOR)
-        return cursor.rowcount if cursor else 0
+        if cursor:
+            with cursor:
+                return cursor.rowcount
+        return 0
 
     def delete_batch(self, pk_list, using):
         """
@@ -40,40 +42,6 @@ class DeleteQuery(Query):
                 **{field.attname + '__in': pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]}))
             num_deleted += self.do_query(self.get_meta().db_table, self.where, using=using)
         return num_deleted
-
-    def delete_qs(self, query, using):
-        """
-        Delete the queryset in one SQL query (if possible). For simple queries
-        this is done by copying the query.query.where to self.query, for
-        complex queries by using subquery.
-        """
-        innerq = query.query
-        # Make sure the inner query has at least one table in use.
-        innerq.get_initial_alias()
-        # The same for our new query.
-        self.get_initial_alias()
-        innerq_used_tables = tuple([t for t in innerq.alias_map if innerq.alias_refcount[t]])
-        if not innerq_used_tables or innerq_used_tables == tuple(self.alias_map):
-            # There is only the base table in use in the query.
-            self.where = innerq.where
-        else:
-            pk = query.model._meta.pk
-            if not connections[using].features.update_can_self_select:
-                # We can't do the delete using subquery.
-                values = list(query.values_list('pk', flat=True))
-                if not values:
-                    return 0
-                return self.delete_batch(values, using)
-            else:
-                innerq.clear_select_clause()
-                innerq.select = [
-                    pk.get_col(self.get_initial_alias())
-                ]
-                values = innerq
-            self.where = self.where_class()
-            self.add_q(Q(pk__in=values))
-        cursor = self.get_compiler(using).execute_sql(CURSOR)
-        return cursor.rowcount if cursor else 0
 
 
 class UpdateQuery(Query):
@@ -189,6 +157,6 @@ class AggregateQuery(Query):
 
     compiler = 'SQLAggregateCompiler'
 
-    def add_subquery(self, query, using):
-        query.subquery = True
-        self.subquery, self.sub_params = query.get_compiler(using).as_sql(with_col_aliases=True)
+    def __init__(self, model, inner_query):
+        self.inner_query = inner_query
+        super().__init__(model)

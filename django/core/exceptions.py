@@ -1,6 +1,9 @@
 """
 Global Django exception and warning classes.
 """
+import operator
+
+from django.utils.hashable import make_hashable
 
 
 class FieldDoesNotExist(Exception):
@@ -60,6 +63,16 @@ class RequestDataTooBig(SuspiciousOperation):
     The size of the request (excluding any file uploads) exceeded
     settings.DATA_UPLOAD_MAX_MEMORY_SIZE.
     """
+    pass
+
+
+class RequestAborted(Exception):
+    """The request was closed before it was completed, or timed out."""
+    pass
+
+
+class BadRequest(Exception):
+    """The request is malformed and cannot be processed."""
     pass
 
 
@@ -177,7 +190,28 @@ class ValidationError(Exception):
     def __repr__(self):
         return 'ValidationError(%s)' % self
 
+    def __eq__(self, other):
+        if not isinstance(other, ValidationError):
+            return NotImplemented
+        return hash(self) == hash(other)
+
+    def __hash__(self):
+        if hasattr(self, 'message'):
+            return hash((
+                self.message,
+                self.code,
+                make_hashable(self.params),
+            ))
+        if hasattr(self, 'error_dict'):
+            return hash(make_hashable(self.error_dict))
+        return hash(tuple(sorted(self.error_list, key=operator.attrgetter('message'))))
+
 
 class EmptyResultSet(Exception):
     """A database query predicate is impossible."""
+    pass
+
+
+class SynchronousOnlyOperation(Exception):
+    """The user tried to call a sync-only function from an async context."""
     pass

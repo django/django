@@ -1,11 +1,9 @@
 import datetime
-from unittest import skipIf, skipUnless
+from unittest import skipUnless
 
 from django.db import connection
-from django.db.models import Index
-from django.db.models.deletion import CASCADE
-from django.db.models.fields.related import ForeignKey
-from django.db.models.query_utils import Q
+from django.db.models import CASCADE, ForeignKey, Index, Q
+from django.db.models.functions import Lower
 from django.test import (
     TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
@@ -75,8 +73,23 @@ class SchemaIndexesTests(TestCase):
         index_sql = connection.schema_editor()._model_indexes_sql(IndexTogetherSingleList)
         self.assertEqual(len(index_sql), 1)
 
+    def test_columns_list_sql(self):
+        index = Index(fields=['headline'], name='whitespace_idx')
+        editor = connection.schema_editor()
+        self.assertIn(
+            '(%s)' % editor.quote_name('headline'),
+            str(index.create_sql(Article, editor)),
+        )
 
-@skipIf(connection.vendor == 'postgresql', 'opclasses are PostgreSQL only')
+    def test_descending_columns_list_sql(self):
+        index = Index(fields=['-headline'], name='whitespace_idx')
+        editor = connection.schema_editor()
+        self.assertIn(
+            '(%s DESC)' % editor.quote_name('headline'),
+            str(index.create_sql(Article, editor)),
+        )
+
+
 class SchemaIndexesNotPostgreSQLTests(TransactionTestCase):
     available_apps = ['indexes']
 
@@ -108,7 +121,7 @@ class PartialIndexConditionIgnoredTests(TransactionTestCase):
             editor.add_index(Article, index)
 
         self.assertNotIn(
-            'WHERE %s.%s' % (editor.quote_name(Article._meta.db_table), 'published'),
+            'WHERE %s' % editor.quote_name('published'),
             str(index.create_sql(Article, editor))
         )
 
@@ -196,6 +209,92 @@ class SchemaIndexesPostgreSQLTests(TransactionTestCase):
             cursor.execute(self.get_opclass_query % indexname)
             self.assertCountEqual(cursor.fetchall(), [('text_pattern_ops', indexname)])
 
+    def test_ops_class_descending(self):
+        indexname = 'test_ops_class_ordered'
+        index = Index(
+            name=indexname,
+            fields=['-body'],
+            opclasses=['text_pattern_ops'],
+        )
+        with connection.schema_editor() as editor:
+            editor.add_index(IndexedArticle2, index)
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query % indexname)
+            self.assertCountEqual(cursor.fetchall(), [('text_pattern_ops', indexname)])
+
+    def test_ops_class_descending_partial(self):
+        indexname = 'test_ops_class_ordered_partial'
+        index = Index(
+            name=indexname,
+            fields=['-body'],
+            opclasses=['text_pattern_ops'],
+            condition=Q(headline__contains='China'),
+        )
+        with connection.schema_editor() as editor:
+            editor.add_index(IndexedArticle2, index)
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query % indexname)
+            self.assertCountEqual(cursor.fetchall(), [('text_pattern_ops', indexname)])
+
+    @skipUnlessDBFeature('supports_covering_indexes')
+    def test_ops_class_include(self):
+        index_name = 'test_ops_class_include'
+        index = Index(
+            name=index_name,
+            fields=['body'],
+            opclasses=['text_pattern_ops'],
+            include=['headline'],
+        )
+        with connection.schema_editor() as editor:
+            editor.add_index(IndexedArticle2, index)
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query % index_name)
+            self.assertCountEqual(cursor.fetchall(), [('text_pattern_ops', index_name)])
+
+    @skipUnlessDBFeature('supports_covering_indexes')
+    def test_ops_class_include_tablespace(self):
+        index_name = 'test_ops_class_include_tblspace'
+        index = Index(
+            name=index_name,
+            fields=['body'],
+            opclasses=['text_pattern_ops'],
+            include=['headline'],
+            db_tablespace='pg_default',
+        )
+        with connection.schema_editor() as editor:
+            editor.add_index(IndexedArticle2, index)
+            self.assertIn(
+                'TABLESPACE "pg_default"',
+                str(index.create_sql(IndexedArticle2, editor)),
+            )
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query % index_name)
+            self.assertCountEqual(cursor.fetchall(), [('text_pattern_ops', index_name)])
+
+    def test_ops_class_columns_lists_sql(self):
+        index = Index(
+            fields=['headline'],
+            name='whitespace_idx',
+            opclasses=['text_pattern_ops'],
+        )
+        with connection.schema_editor() as editor:
+            self.assertIn(
+                '(%s text_pattern_ops)' % editor.quote_name('headline'),
+                str(index.create_sql(Article, editor)),
+            )
+
+    def test_ops_class_descending_columns_list_sql(self):
+        index = Index(
+            fields=['-headline'],
+            name='whitespace_idx',
+            opclasses=['text_pattern_ops'],
+        )
+        with connection.schema_editor() as editor:
+            self.assertIn(
+                '(%s text_pattern_ops DESC)' % editor.quote_name('headline'),
+                str(index.create_sql(Article, editor)),
+            )
+
 
 @skipUnless(connection.vendor == 'mysql', 'MySQL tests')
 class SchemaIndexesMySQLTests(TransactionTestCase):
@@ -206,9 +305,10 @@ class SchemaIndexesMySQLTests(TransactionTestCase):
         MySQL on InnoDB already creates indexes automatically for foreign keys.
         (#14180). An index should be created if db_constraint=False (#26171).
         """
-        storage = connection.introspection.get_storage_engine(
-            connection.cursor(), ArticleTranslation._meta.db_table
-        )
+        with connection.cursor() as cursor:
+            storage = connection.introspection.get_storage_engine(
+                cursor, ArticleTranslation._meta.db_table,
+            )
         if storage != "InnoDB":
             self.skip("This test only applies to the InnoDB storage engine")
         index_sql = [str(statement) for statement in connection.schema_editor()._model_indexes_sql(ArticleTranslation)]
@@ -226,11 +326,9 @@ class SchemaIndexesMySQLTests(TransactionTestCase):
                 new_field.set_attributes_from_name('new_foreign_key')
                 editor.add_field(ArticleTranslation, new_field)
                 field_created = True
-                self.assertEqual([str(statement) for statement in editor.deferred_sql], [
-                    'ALTER TABLE `indexes_articletranslation` '
-                    'ADD CONSTRAINT `indexes_articletrans_new_foreign_key_id_d27a9146_fk_indexes_a` '
-                    'FOREIGN KEY (`new_foreign_key_id`) REFERENCES `indexes_article` (`id`)'
-                ])
+                # No deferred SQL. The FK constraint is included in the
+                # statement to add the field.
+                self.assertFalse(editor.deferred_sql)
         finally:
             if field_created:
                 with connection.schema_editor() as editor:
@@ -260,13 +358,14 @@ class PartialIndexTests(TransactionTestCase):
                 )
             )
             self.assertIn(
-                'WHERE %s.%s' % (editor.quote_name(Article._meta.db_table), editor.quote_name("pub_date")),
+                'WHERE %s' % editor.quote_name('pub_date'),
                 str(index.create_sql(Article, schema_editor=editor))
             )
             editor.add_index(index=index, model=Article)
-            self.assertIn(index.name, connection.introspection.get_constraints(
-                cursor=connection.cursor(), table_name=Article._meta.db_table,
-            ))
+            with connection.cursor() as cursor:
+                self.assertIn(index.name, connection.introspection.get_constraints(
+                    cursor=cursor, table_name=Article._meta.db_table,
+                ))
             editor.remove_index(index=index, model=Article)
 
     def test_integer_restriction_partial(self):
@@ -277,13 +376,14 @@ class PartialIndexTests(TransactionTestCase):
                 condition=Q(pk__gt=1),
             )
             self.assertIn(
-                'WHERE %s.%s' % (editor.quote_name(Article._meta.db_table), editor.quote_name('id')),
+                'WHERE %s' % editor.quote_name('id'),
                 str(index.create_sql(Article, schema_editor=editor))
             )
             editor.add_index(index=index, model=Article)
-            self.assertIn(index.name, connection.introspection.get_constraints(
-                cursor=connection.cursor(), table_name=Article._meta.db_table,
-            ))
+            with connection.cursor() as cursor:
+                self.assertIn(index.name, connection.introspection.get_constraints(
+                    cursor=cursor, table_name=Article._meta.db_table,
+                ))
             editor.remove_index(index=index, model=Article)
 
     def test_boolean_restriction_partial(self):
@@ -294,13 +394,14 @@ class PartialIndexTests(TransactionTestCase):
                 condition=Q(published=True),
             )
             self.assertIn(
-                'WHERE %s.%s' % (editor.quote_name(Article._meta.db_table), editor.quote_name('published')),
+                'WHERE %s' % editor.quote_name('published'),
                 str(index.create_sql(Article, schema_editor=editor))
             )
             editor.add_index(index=index, model=Article)
-            self.assertIn(index.name, connection.introspection.get_constraints(
-                cursor=connection.cursor(), table_name=Article._meta.db_table,
-            ))
+            with connection.cursor() as cursor:
+                self.assertIn(index.name, connection.introspection.get_constraints(
+                    cursor=cursor, table_name=Article._meta.db_table,
+                ))
             editor.remove_index(index=index, model=Article)
 
     @skipUnlessDBFeature('supports_functions_in_partial_indexes')
@@ -321,16 +422,17 @@ class PartialIndexTests(TransactionTestCase):
             sql = str(index.create_sql(Article, schema_editor=editor))
             where = sql.find('WHERE')
             self.assertIn(
-                'WHERE (%s.%s' % (editor.quote_name(Article._meta.db_table), editor.quote_name("pub_date")),
+                'WHERE (%s' % editor.quote_name('pub_date'),
                 sql
             )
             # Because each backend has different syntax for the operators,
             # check ONLY the occurrence of headline in the SQL.
             self.assertGreater(sql.rfind('headline'), where)
             editor.add_index(index=index, model=Article)
-            self.assertIn(index.name, connection.introspection.get_constraints(
-                cursor=connection.cursor(), table_name=Article._meta.db_table,
-            ))
+            with connection.cursor() as cursor:
+                self.assertIn(index.name, connection.introspection.get_constraints(
+                    cursor=cursor, table_name=Article._meta.db_table,
+                ))
             editor.remove_index(index=index, model=Article)
 
     def test_is_null_condition(self):
@@ -341,11 +443,157 @@ class PartialIndexTests(TransactionTestCase):
                 condition=Q(pub_date__isnull=False),
             )
             self.assertIn(
-                'WHERE %s.%s IS NOT NULL' % (editor.quote_name(Article._meta.db_table), editor.quote_name("pub_date")),
+                'WHERE %s IS NOT NULL' % editor.quote_name('pub_date'),
                 str(index.create_sql(Article, schema_editor=editor))
             )
             editor.add_index(index=index, model=Article)
-            self.assertIn(index.name, connection.introspection.get_constraints(
-                cursor=connection.cursor(), table_name=Article._meta.db_table,
-            ))
+            with connection.cursor() as cursor:
+                self.assertIn(index.name, connection.introspection.get_constraints(
+                    cursor=cursor, table_name=Article._meta.db_table,
+                ))
             editor.remove_index(index=index, model=Article)
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_partial_func_index(self):
+        index_name = 'partial_func_idx'
+        index = Index(
+            Lower('headline').desc(),
+            name=index_name,
+            condition=Q(pub_date__isnull=False),
+        )
+        with connection.schema_editor() as editor:
+            editor.add_index(index=index, model=Article)
+            sql = index.create_sql(Article, schema_editor=editor)
+        table = Article._meta.db_table
+        self.assertIs(sql.references_column(table, 'headline'), True)
+        sql = str(sql)
+        self.assertIn('LOWER(%s)' % editor.quote_name('headline'), sql)
+        self.assertIn(
+            'WHERE %s IS NOT NULL' % editor.quote_name('pub_date'),
+            sql,
+        )
+        self.assertGreater(sql.find('WHERE'), sql.find('LOWER'))
+        with connection.cursor() as cursor:
+            constraints = connection.introspection.get_constraints(
+                cursor=cursor, table_name=table,
+            )
+        self.assertIn(index_name, constraints)
+        if connection.features.supports_index_column_ordering:
+            self.assertEqual(constraints[index_name]['orders'], ['DESC'])
+        with connection.schema_editor() as editor:
+            editor.remove_index(Article, index)
+        with connection.cursor() as cursor:
+            self.assertNotIn(index_name, connection.introspection.get_constraints(
+                cursor=cursor, table_name=table,
+            ))
+
+
+@skipUnlessDBFeature('supports_covering_indexes')
+class CoveringIndexTests(TransactionTestCase):
+    available_apps = ['indexes']
+
+    def test_covering_index(self):
+        index = Index(
+            name='covering_headline_idx',
+            fields=['headline'],
+            include=['pub_date', 'published'],
+        )
+        with connection.schema_editor() as editor:
+            self.assertIn(
+                '(%s) INCLUDE (%s, %s)' % (
+                    editor.quote_name('headline'),
+                    editor.quote_name('pub_date'),
+                    editor.quote_name('published'),
+                ),
+                str(index.create_sql(Article, editor)),
+            )
+            editor.add_index(Article, index)
+            with connection.cursor() as cursor:
+                constraints = connection.introspection.get_constraints(
+                    cursor=cursor, table_name=Article._meta.db_table,
+                )
+                self.assertIn(index.name, constraints)
+                self.assertEqual(
+                    constraints[index.name]['columns'],
+                    ['headline', 'pub_date', 'published'],
+                )
+            editor.remove_index(Article, index)
+            with connection.cursor() as cursor:
+                self.assertNotIn(index.name, connection.introspection.get_constraints(
+                    cursor=cursor, table_name=Article._meta.db_table,
+                ))
+
+    def test_covering_partial_index(self):
+        index = Index(
+            name='covering_partial_headline_idx',
+            fields=['headline'],
+            include=['pub_date'],
+            condition=Q(pub_date__isnull=False),
+        )
+        with connection.schema_editor() as editor:
+            self.assertIn(
+                '(%s) INCLUDE (%s) WHERE %s ' % (
+                    editor.quote_name('headline'),
+                    editor.quote_name('pub_date'),
+                    editor.quote_name('pub_date'),
+                ),
+                str(index.create_sql(Article, editor)),
+            )
+            editor.add_index(Article, index)
+            with connection.cursor() as cursor:
+                constraints = connection.introspection.get_constraints(
+                    cursor=cursor, table_name=Article._meta.db_table,
+                )
+                self.assertIn(index.name, constraints)
+                self.assertEqual(
+                    constraints[index.name]['columns'],
+                    ['headline', 'pub_date'],
+                )
+            editor.remove_index(Article, index)
+            with connection.cursor() as cursor:
+                self.assertNotIn(index.name, connection.introspection.get_constraints(
+                    cursor=cursor, table_name=Article._meta.db_table,
+                ))
+
+    def test_covering_func_index(self):
+        index_name = 'covering_func_headline_idx'
+        index = Index(Lower('headline'), name=index_name, include=['pub_date'])
+        with connection.schema_editor() as editor:
+            editor.add_index(index=index, model=Article)
+            sql = index.create_sql(Article, schema_editor=editor)
+        table = Article._meta.db_table
+        self.assertIs(sql.references_column(table, 'headline'), True)
+        sql = str(sql)
+        self.assertIn('LOWER(%s)' % editor.quote_name('headline'), sql)
+        self.assertIn('INCLUDE (%s)' % editor.quote_name('pub_date'), sql)
+        self.assertGreater(sql.find('INCLUDE'), sql.find('LOWER'))
+        with connection.cursor() as cursor:
+            constraints = connection.introspection.get_constraints(
+                cursor=cursor, table_name=table,
+            )
+        self.assertIn(index_name, constraints)
+        self.assertIn('pub_date', constraints[index_name]['columns'])
+        with connection.schema_editor() as editor:
+            editor.remove_index(Article, index)
+        with connection.cursor() as cursor:
+            self.assertNotIn(index_name, connection.introspection.get_constraints(
+                cursor=cursor, table_name=table,
+            ))
+
+
+@skipIfDBFeature('supports_covering_indexes')
+class CoveringIndexIgnoredTests(TransactionTestCase):
+    available_apps = ['indexes']
+
+    def test_covering_ignored(self):
+        index = Index(
+            name='test_covering_ignored',
+            fields=['headline'],
+            include=['pub_date'],
+        )
+        with connection.schema_editor() as editor:
+            editor.add_index(Article, index)
+        self.assertNotIn(
+            'INCLUDE (%s)' % editor.quote_name('headline'),
+            str(index.create_sql(Article, editor)),
+        )

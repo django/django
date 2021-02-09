@@ -218,7 +218,7 @@ class WeekMixin:
         The first day according to the week format is 0 and the last day is 6.
         """
         week_format = self.get_week_format()
-        if week_format == '%W':                 # week starts on Monday
+        if week_format in {'%W', '%V'}:         # week starts on Monday
             return date.weekday()
         elif week_format == '%U':               # week starts on Sunday
             return (date.weekday() + 1) % 7
@@ -485,7 +485,7 @@ class BaseWeekArchiveView(YearMixin, WeekMixin, BaseDateListView):
 
         date_field = self.get_date_field()
         week_format = self.get_week_format()
-        week_choices = {'%W': '1', '%U': '0'}
+        week_choices = {'%W': '1', '%U': '0', '%V': '1'}
         try:
             week_start = week_choices[week_format]
         except KeyError:
@@ -493,10 +493,15 @@ class BaseWeekArchiveView(YearMixin, WeekMixin, BaseDateListView):
                 week_format,
                 ', '.join(sorted(week_choices)),
             ))
-        date = _date_from_string(year, self.get_year_format(),
-                                 week_start, '%w',
-                                 week, week_format)
-
+        year_format = self.get_year_format()
+        if week_format == '%V' and year_format != '%G':
+            raise ValueError(
+                "ISO week directive '%s' is incompatible with the year "
+                "directive '%s'. Use the ISO year '%%G' instead." % (
+                    week_format, year_format,
+                )
+            )
+        date = _date_from_string(year, year_format, week_start, '%w', week, week_format)
         since = self._make_date_lookup_arg(date)
         until = self._make_date_lookup_arg(self._get_next_week(date))
         lookup_kwargs = {
@@ -620,7 +625,7 @@ def _date_from_string(year, year_format, month='', month_format='', day='', day_
     try:
         return datetime.datetime.strptime(datestr, format).date()
     except ValueError:
-        raise Http404(_("Invalid date string '%(datestr)s' given format '%(format)s'") % {
+        raise Http404(_('Invalid date string “%(datestr)s” given format “%(format)s”') % {
             'datestr': datestr,
             'format': format,
         })

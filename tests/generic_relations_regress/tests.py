@@ -1,6 +1,5 @@
-from django.db.models import Q, Sum
-from django.db.models.deletion import ProtectedError
-from django.db.utils import IntegrityError
+from django.db import IntegrityError
+from django.db.models import ProtectedError, Q, Sum
 from django.forms.models import modelform_factory
 from django.test import TestCase, skipIfDBFeature
 

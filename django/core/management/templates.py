@@ -6,7 +6,6 @@ import shutil
 import stat
 import tempfile
 from importlib import import_module
-from os import path
 from urllib.request import urlretrieve
 
 import django
@@ -29,7 +28,7 @@ class TemplateCommand(BaseCommand):
     :param directory: The directory to which the template should be copied.
     :param options: The additional variables passed to project or app templates
     """
-    requires_system_checks = False
+    requires_system_checks = []
     # The supported URL schemes
     url_schemes = ['http', 'https', 'ftp']
     # Rewrite the following suffixes when determining the target filename.
@@ -58,14 +57,15 @@ class TemplateCommand(BaseCommand):
 
     def handle(self, app_or_project, name, target=None, **options):
         self.app_or_project = app_or_project
+        self.a_or_an = 'an' if app_or_project == 'app' else 'a'
         self.paths_to_remove = []
         self.verbosity = options['verbosity']
 
-        self.validate_name(name, app_or_project)
+        self.validate_name(name)
 
         # if some directory is given, make sure it's nicely expanded
         if target is None:
-            top_dir = path.join(os.getcwd(), name)
+            top_dir = os.path.join(os.getcwd(), name)
             try:
                 os.makedirs(top_dir)
             except FileExistsError:
@@ -73,7 +73,9 @@ class TemplateCommand(BaseCommand):
             except OSError as e:
                 raise CommandError(e)
         else:
-            top_dir = os.path.abspath(path.expanduser(target))
+            if app_or_project == 'app':
+                self.validate_name(os.path.basename(target), 'directory')
+            top_dir = os.path.abspath(os.path.expanduser(target))
             if not os.path.exists(top_dir):
                 raise CommandError("Destination directory '%s' does not "
                                    "exist, please create it first." % top_dir)
@@ -83,13 +85,14 @@ class TemplateCommand(BaseCommand):
         for file in options['files']:
             extra_files.extend(map(lambda x: x.strip(), file.split(',')))
         if self.verbosity >= 2:
-            self.stdout.write("Rendering %s template files with "
-                              "extensions: %s\n" %
-                              (app_or_project, ', '.join(extensions)))
-            self.stdout.write("Rendering %s template files with "
-                              "filenames: %s\n" %
-                              (app_or_project, ', '.join(extra_files)))
-
+            self.stdout.write(
+                'Rendering %s template files with extensions: %s'
+                % (app_or_project, ', '.join(extensions))
+            )
+            self.stdout.write(
+                'Rendering %s template files with filenames: %s'
+                % (app_or_project, ', '.join(extra_files))
+            )
         base_name = '%s_name' % app_or_project
         base_subdir = '%s_template' % app_or_project
         base_directory = '%s_directory' % app_or_project
@@ -119,9 +122,8 @@ class TemplateCommand(BaseCommand):
             path_rest = root[prefix_length:]
             relative_dir = path_rest.replace(base_name, name)
             if relative_dir:
-                target_dir = path.join(top_dir, relative_dir)
-                if not path.exists(target_dir):
-                    os.mkdir(target_dir)
+                target_dir = os.path.join(top_dir, relative_dir)
+                os.makedirs(target_dir, exist_ok=True)
 
             for dirname in dirs[:]:
                 if dirname.startswith('.') or dirname == '__pycache__':
@@ -131,24 +133,27 @@ class TemplateCommand(BaseCommand):
                 if filename.endswith(('.pyo', '.pyc', '.py.class')):
                     # Ignore some files as they cause various breakages.
                     continue
-                old_path = path.join(root, filename)
-                new_path = path.join(top_dir, relative_dir,
-                                     filename.replace(base_name, name))
+                old_path = os.path.join(root, filename)
+                new_path = os.path.join(
+                    top_dir, relative_dir, filename.replace(base_name, name)
+                )
                 for old_suffix, new_suffix in self.rewrite_template_suffixes:
                     if new_path.endswith(old_suffix):
                         new_path = new_path[:-len(old_suffix)] + new_suffix
                         break  # Only rewrite once
 
-                if path.exists(new_path):
-                    raise CommandError("%s already exists, overlaying a "
-                                       "project or app into an existing "
-                                       "directory won't replace conflicting "
-                                       "files" % new_path)
+                if os.path.exists(new_path):
+                    raise CommandError(
+                        "%s already exists. Overlaying %s %s into an existing "
+                        "directory won't replace conflicting files." % (
+                            new_path, self.a_or_an, app_or_project,
+                        )
+                    )
 
                 # Only render the Python files, as we don't want to
                 # accidentally render Django templates files
                 if new_path.endswith(extensions) or filename in extra_files:
-                    with open(old_path, 'r', encoding='utf-8') as template_file:
+                    with open(old_path, encoding='utf-8') as template_file:
                         content = template_file.read()
                     template = Engine().from_string(content)
                     content = template.render(context)
@@ -158,7 +163,7 @@ class TemplateCommand(BaseCommand):
                     shutil.copyfile(old_path, new_path)
 
                 if self.verbosity >= 2:
-                    self.stdout.write("Creating %s\n" % new_path)
+                    self.stdout.write('Creating %s' % new_path)
                 try:
                     shutil.copymode(old_path, new_path)
                     self.make_writeable(new_path)
@@ -170,9 +175,9 @@ class TemplateCommand(BaseCommand):
 
         if self.paths_to_remove:
             if self.verbosity >= 2:
-                self.stdout.write("Cleaning up temporary files.\n")
+                self.stdout.write('Cleaning up temporary files.')
             for path_to_remove in self.paths_to_remove:
-                if path.isfile(path_to_remove):
+                if os.path.isfile(path_to_remove):
                     os.remove(path_to_remove)
                 else:
                     shutil.rmtree(path_to_remove)
@@ -184,39 +189,39 @@ class TemplateCommand(BaseCommand):
         directory isn't known.
         """
         if template is None:
-            return path.join(django.__path__[0], 'conf', subdir)
+            return os.path.join(django.__path__[0], 'conf', subdir)
         else:
             if template.startswith('file://'):
                 template = template[7:]
-            expanded_template = path.expanduser(template)
-            expanded_template = path.normpath(expanded_template)
-            if path.isdir(expanded_template):
+            expanded_template = os.path.expanduser(template)
+            expanded_template = os.path.normpath(expanded_template)
+            if os.path.isdir(expanded_template):
                 return expanded_template
             if self.is_url(template):
                 # downloads the file and returns the path
                 absolute_path = self.download(template)
             else:
-                absolute_path = path.abspath(expanded_template)
-            if path.exists(absolute_path):
+                absolute_path = os.path.abspath(expanded_template)
+            if os.path.exists(absolute_path):
                 return self.extract(absolute_path)
 
         raise CommandError("couldn't handle %s template %s." %
                            (self.app_or_project, template))
 
-    def validate_name(self, name, app_or_project):
-        a_or_an = 'an' if app_or_project == 'app' else 'a'
+    def validate_name(self, name, name_or_dir='name'):
         if name is None:
             raise CommandError('you must provide {an} {app} name'.format(
-                an=a_or_an,
-                app=app_or_project,
+                an=self.a_or_an,
+                app=self.app_or_project,
             ))
         # Check it's a valid directory name.
         if not name.isidentifier():
             raise CommandError(
-                "'{name}' is not a valid {app} name. Please make sure the "
-                "name is a valid identifier.".format(
+                "'{name}' is not a valid {app} {type}. Please make sure the "
+                "{type} is a valid identifier.".format(
                     name=name,
-                    app=app_or_project,
+                    app=self.app_or_project,
+                    type=name_or_dir,
                 )
             )
         # Check it cannot be imported.
@@ -227,11 +232,12 @@ class TemplateCommand(BaseCommand):
         else:
             raise CommandError(
                 "'{name}' conflicts with the name of an existing Python "
-                "module and cannot be used as {an} {app} name. Please try "
-                "another name.".format(
+                "module and cannot be used as {an} {app} {type}. Please try "
+                "another {type}.".format(
                     name=name,
-                    an=a_or_an,
-                    app=app_or_project,
+                    an=self.a_or_an,
+                    app=self.app_or_project,
+                    type=name_or_dir,
                 )
             )
 
@@ -254,10 +260,10 @@ class TemplateCommand(BaseCommand):
         filename, display_url = cleanup_url(url)
 
         if self.verbosity >= 2:
-            self.stdout.write("Downloading %s\n" % display_url)
+            self.stdout.write('Downloading %s' % display_url)
         try:
-            the_path, info = urlretrieve(url, path.join(tempdir, filename))
-        except IOError as e:
+            the_path, info = urlretrieve(url, os.path.join(tempdir, filename))
+        except OSError as e:
             raise CommandError("couldn't download URL %s to %s: %s" %
                                (url, filename, e))
 
@@ -282,7 +288,7 @@ class TemplateCommand(BaseCommand):
         # Move the temporary file to a filename that has better
         # chances of being recognized by the archive utils
         if used_name != guessed_filename:
-            guessed_path = path.join(tempdir, guessed_filename)
+            guessed_path = os.path.join(tempdir, guessed_filename)
             shutil.move(the_path, guessed_path)
             return guessed_path
 
@@ -301,18 +307,18 @@ class TemplateCommand(BaseCommand):
 
     def extract(self, filename):
         """
-        Extract the given file to a temporarily and return
+        Extract the given file to a temporary directory and return
         the path of the directory with the extracted content.
         """
         prefix = 'django_%s_template_' % self.app_or_project
         tempdir = tempfile.mkdtemp(prefix=prefix, suffix='_extract')
         self.paths_to_remove.append(tempdir)
         if self.verbosity >= 2:
-            self.stdout.write("Extracting %s\n" % filename)
+            self.stdout.write('Extracting %s' % filename)
         try:
             archive.extract(filename, tempdir)
             return tempdir
-        except (archive.ArchiveException, IOError) as e:
+        except (archive.ArchiveException, OSError) as e:
             raise CommandError("couldn't extract file %s to %s: %s" %
                                (filename, tempdir, e))
 

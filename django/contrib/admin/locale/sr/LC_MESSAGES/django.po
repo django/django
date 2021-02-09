@@ -2,15 +2,16 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018
+# Igor Jerosimić, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-07-04 19:52+0000\n"
-"Last-Translator: Branko Kokanovic <branko@kokanovic.org>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-06-27 19:30+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -111,7 +112,7 @@ msgid "object id"
 msgstr "id објекта"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "опис објекта"
 
@@ -540,24 +541,8 @@ msgstr "Прикажи све"
 msgid "Save"
 msgstr "Сачувај"
 
-msgid "Popup closing..."
-msgstr "Искачући прозор се затвара..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Измени одабрани модел %(model)s"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Погледај означени %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Додај још један модел %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Обриши одабрани модел %(model)s"
+msgid "Popup closing…"
+msgstr "Попуп се затвара..."
 
 msgid "Search"
 msgstr "Претрага"
@@ -587,6 +572,18 @@ msgstr "Сними и погледај"
 
 msgid "Close"
 msgstr "Затвори"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Измени одабрани модел %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Додај још један модел %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Обриши одабрани модел %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Хвала што сте данас провели време на овом сајту."

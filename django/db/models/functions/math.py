@@ -34,12 +34,10 @@ class ATan2(NumericOutputFieldMixin, Func):
     arity = 2
 
     def as_sqlite(self, compiler, connection, **extra_context):
-        if not getattr(connection.ops, 'spatialite', False) or not (
-            (4, 3, 0) <= connection.ops.spatial_version < (5, 0, 0)
-        ):
+        if not getattr(connection.ops, 'spatialite', False) or connection.ops.spatial_version >= (5, 0, 0):
             return self.as_sql(compiler, connection)
         # This function is usually ATan2(y, x), returning the inverse tangent
-        # of y / x, but it's ATan2(x, y) on SpatiaLite >= 4.3.0, < 5.0.0.
+        # of y / x, but it's ATan2(x, y) on SpatiaLite < 5.0.0.
         # Cast integers to float to avoid inconsistent/buggy behavior if the
         # arguments are mixed between integer and float or decimal.
         # https://www.gaia-gis.it/fossil/libspatialite/tktview?name=0f72cca3a2
@@ -143,9 +141,31 @@ class Radians(NumericOutputFieldMixin, Transform):
         )
 
 
+class Random(NumericOutputFieldMixin, Func):
+    function = 'RANDOM'
+    arity = 0
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, function='RAND', **extra_context)
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, function='DBMS_RANDOM.VALUE', **extra_context)
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, function='RAND', **extra_context)
+
+    def get_group_by_cols(self, alias=None):
+        return []
+
+
 class Round(Transform):
     function = 'ROUND'
     lookup_name = 'round'
+
+
+class Sign(Transform):
+    function = 'SIGN'
+    lookup_name = 'sign'
 
 
 class Sin(NumericOutputFieldMixin, Transform):

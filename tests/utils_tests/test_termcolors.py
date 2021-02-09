@@ -181,5 +181,29 @@ class TermColorTests(unittest.TestCase):
         self.assertEqual(colorize(text=None), '\x1b[m\x1b[0m')
         self.assertEqual(colorize(text=''), '\x1b[m\x1b[0m')
 
-        self.assertEqual(colorize(text=None, opts=('noreset')), '\x1b[m')
-        self.assertEqual(colorize(text='', opts=('noreset')), '\x1b[m')
+        self.assertEqual(colorize(text=None, opts=('noreset',)), '\x1b[m')
+        self.assertEqual(colorize(text='', opts=('noreset',)), '\x1b[m')
+
+    def test_colorize_reset(self):
+        self.assertEqual(colorize(text='', opts=('reset',)), '\x1b[0m')
+
+    def test_colorize_fg_bg(self):
+        self.assertEqual(colorize(text='Test', fg='red'), '\x1b[31mTest\x1b[0m')
+        self.assertEqual(colorize(text='Test', bg='red'), '\x1b[41mTest\x1b[0m')
+        # Ignored kwarg.
+        self.assertEqual(colorize(text='Test', other='red'), '\x1b[mTest\x1b[0m')
+
+    def test_colorize_opts(self):
+        self.assertEqual(
+            colorize(text='Test', opts=('bold', 'underscore')),
+            '\x1b[1;4mTest\x1b[0m',
+        )
+        self.assertEqual(
+            colorize(text='Test', opts=('blink',)),
+            '\x1b[5mTest\x1b[0m',
+        )
+        # Ignored opts.
+        self.assertEqual(
+            colorize(text='Test', opts=('not_an_option',)),
+            '\x1b[mTest\x1b[0m',
+        )

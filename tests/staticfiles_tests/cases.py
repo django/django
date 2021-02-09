@@ -1,4 +1,3 @@
-import codecs
 import os
 import shutil
 import tempfile
@@ -24,7 +23,7 @@ class BaseStaticFilesMixin:
         )
 
     def assertFileNotFound(self, filepath):
-        with self.assertRaises(IOError):
+        with self.assertRaises(OSError):
             self._get_file(filepath)
 
     def render_template(self, template, **kwargs):
@@ -65,7 +64,7 @@ class CollectionTestCase(BaseStaticFilesMixin, SimpleTestCase):
 
     def setUp(self):
         super().setUp()
-        temp_dir = tempfile.mkdtemp()
+        temp_dir = self.mkdtemp()
         # Override the STATIC_ROOT for all tests from setUp to tearDown
         # rather than as a context manager
         self.patched_settings = self.settings(STATIC_ROOT=temp_dir)
@@ -79,6 +78,9 @@ class CollectionTestCase(BaseStaticFilesMixin, SimpleTestCase):
         self.patched_settings.disable()
         super().tearDown()
 
+    def mkdtemp(self):
+        return tempfile.mkdtemp()
+
     def run_collectstatic(self, *, verbosity=0, **kwargs):
         call_command('collectstatic', interactive=False, verbosity=verbosity,
                      ignore_patterns=['*.ignoreme'], **kwargs)
@@ -86,7 +88,7 @@ class CollectionTestCase(BaseStaticFilesMixin, SimpleTestCase):
     def _get_file(self, filepath):
         assert filepath, 'filepath is empty.'
         filepath = os.path.join(settings.STATIC_ROOT, filepath)
-        with codecs.open(filepath, "r", "utf-8") as f:
+        with open(filepath, encoding='utf-8') as f:
             return f.read()
 
 

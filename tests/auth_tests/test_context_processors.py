@@ -12,7 +12,7 @@ class MockUser:
     def has_module_perms(self, perm):
         return perm == 'mockapp'
 
-    def has_perm(self, perm):
+    def has_perm(self, perm, obj=None):
         return perm == 'mockapp.someperm'
 
 

@@ -168,12 +168,19 @@ class IncludeNode(Node):
         template = self.template.resolve(context)
         # Does this quack like a Template?
         if not callable(getattr(template, 'render', None)):
-            # If not, try the cache and get_template().
-            template_name = template
+            # If not, try the cache and select_template().
+            template_name = template or ()
+            if isinstance(template_name, str):
+                template_name = (construct_relative_path(
+                    self.origin.template_name,
+                    template_name,
+                ),)
+            else:
+                template_name = tuple(template_name)
             cache = context.render_context.dicts[0].setdefault(self, {})
             template = cache.get(template_name)
             if template is None:
-                template = context.template.engine.get_template(template_name)
+                template = context.template.engine.select_template(template_name)
                 cache[template_name] = template
         # Use the base.Template of a backends.django.Template.
         elif hasattr(template, 'template'):
@@ -222,7 +229,12 @@ def construct_relative_path(current_template_name, relative_name):
     Convert a relative path (starting with './' or '../') to the full template
     name based on the current_template_name.
     """
-    if not relative_name.startswith(("'./", "'../", '"./', '"../')):
+    has_quotes = (
+        (relative_name.startswith('"') and relative_name.endswith('"')) or
+        (relative_name.startswith("'") and relative_name.endswith("'"))
+    )
+    new_name = relative_name.strip('\'"')
+    if not new_name.startswith(('./', '../')):
         # relative_name is a variable or a literal that doesn't contain a
         # relative path.
         return relative_name
@@ -230,7 +242,7 @@ def construct_relative_path(current_template_name, relative_name):
     new_name = posixpath.normpath(
         posixpath.join(
             posixpath.dirname(current_template_name.lstrip('/')),
-            relative_name.strip('\'"')
+            new_name,
         )
     )
     if new_name.startswith('../'):
@@ -244,7 +256,7 @@ def construct_relative_path(current_template_name, relative_name):
             "same template in which the tag appears."
             % (relative_name, current_template_name)
         )
-    return '"%s"' % new_name
+    return f'"{new_name}"' if has_quotes else new_name
 
 
 @register.tag('extends')

@@ -29,15 +29,9 @@ class Business(models.Model):
     class Meta:
         verbose_name_plural = 'businesses'
 
-    def __str__(self):
-        return self.name
-
 
 class Bar(models.Model):
     id = MyAutoField(primary_key=True, db_index=True)
-
-    def __str__(self):
-        return repr(self.pk)
 
 
 class Foo(models.Model):

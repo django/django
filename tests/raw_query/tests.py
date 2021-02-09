@@ -1,8 +1,8 @@
 from datetime import date
 from decimal import Decimal
 
+from django.core.exceptions import FieldDoesNotExist
 from django.db.models.query import RawQuerySet
-from django.db.models.query_utils import InvalidQuery
 from django.test import TestCase, skipUnlessDBFeature
 
 from .models import (
@@ -180,6 +180,16 @@ class RawQueryTests(TestCase):
         self.assertEqual(len(results), 1)
         self.assertIsInstance(repr(qset), str)
 
+    def test_params_none(self):
+        query = "SELECT * FROM raw_query_author WHERE first_name like 'J%'"
+        qset = Author.objects.raw(query, params=None)
+        self.assertEqual(len(qset), 2)
+
+    def test_escaped_percent(self):
+        query = "SELECT * FROM raw_query_author WHERE first_name like 'J%%'"
+        qset = Author.objects.raw(query)
+        self.assertEqual(len(qset), 2)
+
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_pyformat_params(self):
         """
@@ -235,7 +245,8 @@ class RawQueryTests(TestCase):
 
     def test_missing_fields_without_PK(self):
         query = "SELECT first_name, dob FROM raw_query_author"
-        with self.assertRaisesMessage(InvalidQuery, 'Raw query must include the primary key'):
+        msg = 'Raw query must include the primary key'
+        with self.assertRaisesMessage(FieldDoesNotExist, msg):
             list(Author.objects.raw(query))
 
     def test_annotations(self):

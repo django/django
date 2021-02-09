@@ -3,7 +3,7 @@ import unittest
 from contextlib import contextmanager
 
 from django.test import LiveServerTestCase, tag
-from django.utils.decorators import classproperty
+from django.utils.functional import classproperty
 from django.utils.module_loading import import_string
 from django.utils.text import capfirst
 
@@ -17,6 +17,8 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
     external_host = None
     # Sentinel value to differentiate browser-specific instances.
     browser = None
+    # Run browsers in headless mode.
+    headless = False
 
     def __new__(cls, name, bases, attrs):
         """
@@ -63,9 +65,24 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
         return import_string("selenium.webdriver.%s.webdriver.WebDriver" % browser)
 
     @classmethod
+    def import_options(cls, browser):
+        return import_string('selenium.webdriver.%s.options.Options' % browser)
+
+    @classmethod
     def get_capability(cls, browser):
-        from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+        from selenium.webdriver.common.desired_capabilities import (
+            DesiredCapabilities,
+        )
         return getattr(DesiredCapabilities, browser.upper())
+
+    def create_options(self):
+        options = self.import_options(self.browser)()
+        if self.headless:
+            try:
+                options.headless = True
+            except AttributeError:
+                pass  # Only Chrome and Firefox support the headless mode.
+        return options
 
     def create_webdriver(self):
         if self.selenium_hub:
@@ -74,7 +91,7 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
                 command_executor=self.selenium_hub,
                 desired_capabilities=self.get_capability(self.browser),
             )
-        return self.import_webdriver(self.browser)()
+        return self.import_webdriver(self.browser)(options=self.create_options())
 
 
 @tag('selenium')

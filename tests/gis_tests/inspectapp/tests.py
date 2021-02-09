@@ -10,7 +10,6 @@ from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import modify_settings
 
 from ..test_data import TEST_DATA
-from ..utils import postgis
 from .models import AllOGRFields
 
 
@@ -44,9 +43,10 @@ class InspectDbTests(TestCase):
         output = out.getvalue()
         if connection.features.supports_geometry_field_introspection:
             self.assertIn('point = models.PointField(dim=3)', output)
-            if postgis:
-                # Geography type is specific to PostGIS
+            if connection.features.supports_geography:
                 self.assertIn('pointg = models.PointField(geography=True, dim=3)', output)
+            else:
+                self.assertIn('pointg = models.PointField(dim=3)', output)
             self.assertIn('line = models.LineStringField(dim=3)', output)
             self.assertIn('poly = models.PolygonField(dim=3)', output)
         else:
@@ -74,7 +74,7 @@ class OGRInspectTest(SimpleTestCase):
             '',
             'class MyModel(models.Model):',
             '    float = models.FloatField()',
-            '    int = models.{}()'.format('BigIntegerField' if GDAL_VERSION >= (2, 0) else 'FloatField'),
+            '    int = models.BigIntegerField()',
             '    str = models.CharField(max_length=80)',
             '    geom = models.PolygonField(%s)' % self.expected_srid,
         ]
@@ -102,7 +102,7 @@ class OGRInspectTest(SimpleTestCase):
             '',
             'class City(models.Model):',
             '    name = models.CharField(max_length=80)',
-            '    population = models.{}()'.format('BigIntegerField' if GDAL_VERSION >= (2, 0) else 'FloatField'),
+            '    population = models.BigIntegerField()',
             '    density = models.FloatField()',
             '    created = models.DateField()',
             '    geom = models.PointField(%s)' % self.expected_srid,
@@ -141,7 +141,7 @@ class OGRInspectTest(SimpleTestCase):
         else:
             self.assertIn('    f_decimal = models.DecimalField(max_digits=0, decimal_places=0)', model_def)
         self.assertIn('    f_int = models.IntegerField()', model_def)
-        if connection.vendor != 'mysql' or not connection.mysql_is_mariadb:
+        if not connection.ops.mariadb:
             # Probably a bug between GDAL and MariaDB on time fields.
             self.assertIn('    f_datetime = models.DateTimeField()', model_def)
             self.assertIn('    f_time = models.TimeField()', model_def)

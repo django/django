@@ -1,0 +1,57 @@
+===========================
+Django 2.1.11 release notes
+===========================
+
+*August 1, 2019*
+
+Django 2.1.11 fixes security issues in 2.1.10.
+
+CVE-2019-14232: Denial-of-service possibility in ``django.utils.text.Truncator``
+================================================================================
+
+If ``django.utils.text.Truncator``'s ``chars()`` and ``words()`` methods
+were passed the ``html=True`` argument, they were extremely slow to evaluate
+certain inputs due to a catastrophic backtracking vulnerability in a regular
+expression. The ``chars()`` and ``words()`` methods are used to implement the
+:tfilter:`truncatechars_html` and :tfilter:`truncatewords_html` template
+filters, which were thus vulnerable.
+
+The regular expressions used by ``Truncator`` have been simplified in order to
+avoid potential backtracking issues. As a consequence, trailing punctuation may
+now at times be included in the truncated output.
+
+CVE-2019-14233: Denial-of-service possibility in ``strip_tags()``
+=================================================================
+
+Due to the behavior of the underlying ``HTMLParser``,
+:func:`django.utils.html.strip_tags` would be extremely slow to evaluate
+certain inputs containing large sequences of nested incomplete HTML entities.
+The ``strip_tags()`` method is used to implement the corresponding
+:tfilter:`striptags` template filter, which was thus also vulnerable.
+
+``strip_tags()`` now avoids recursive calls to ``HTMLParser`` when progress
+removing tags, but necessarily incomplete HTML entities, stops being made.
+
+Remember that absolutely NO guarantee is provided about the results of
+``strip_tags()`` being HTML safe. So NEVER mark safe the result of a
+``strip_tags()`` call without escaping it first, for example with
+:func:`django.utils.html.escape`.
+
+CVE-2019-14234: SQL injection possibility in key and index lookups for ``JSONField``/``HStoreField``
+====================================================================================================
+
+:lookup:`Key and index lookups <jsonfield.key>` for
+``django.contrib.postgres.fields.JSONField`` and :lookup:`key lookups
+<hstorefield.key>` for :class:`~django.contrib.postgres.fields.HStoreField`
+were subject to SQL injection, using a suitably crafted dictionary, with
+dictionary expansion, as the ``**kwargs`` passed to ``QuerySet.filter()``.
+
+CVE-2019-14235: Potential memory exhaustion in ``django.utils.encoding.uri_to_iri()``
+=====================================================================================
+
+If passed certain inputs, :func:`django.utils.encoding.uri_to_iri` could lead
+to significant memory usage due to excessive recursion when re-percent-encoding
+invalid UTF-8 octet sequences.
+
+``uri_to_iri()`` now avoids recursion when re-percent-encoding invalid UTF-8
+octet sequences.

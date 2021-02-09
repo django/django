@@ -18,7 +18,7 @@ from django.contrib.gis.geos.prototypes.io import (
     ewkb_w, wkb_r, wkb_w, wkt_r, wkt_w,
 )
 from django.utils.deconstruct import deconstructible
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes, force_str
 
 
 class GEOSGeometryBase(GEOSBase):
@@ -37,12 +37,13 @@ class GEOSGeometryBase(GEOSBase):
             if cls is None:
                 if GEOSGeometryBase._GEOS_CLASSES is None:
                     # Inner imports avoid import conflicts with GEOSGeometry.
-                    from .linestring import LineString, LinearRing
+                    from .collections import (
+                        GeometryCollection, MultiLineString, MultiPoint,
+                        MultiPolygon,
+                    )
+                    from .linestring import LinearRing, LineString
                     from .point import Point
                     from .polygon import Polygon
-                    from .collections import (
-                        GeometryCollection, MultiPoint, MultiLineString, MultiPolygon,
-                    )
                     GEOSGeometryBase._GEOS_CLASSES = {
                         0: Point,
                         1: LineString,
@@ -122,7 +123,7 @@ class GEOSGeometryBase(GEOSBase):
             match = re.match(br'SRID=(?P<srid>\-?\d+)', srid_part)
             if not match:
                 raise ValueError('EWKT has invalid SRID part.')
-            srid = int(match.group('srid'))
+            srid = int(match['srid'])
         else:
             wkt = ewkt
         if not wkt:
@@ -434,7 +435,7 @@ class GEOSGeometryBase(GEOSBase):
         if self.srid:
             try:
                 return gdal.SpatialReference(self.srid)
-            except gdal.SRSException:
+            except (gdal.GDALException, gdal.SRSException):
                 pass
         return None
 
@@ -447,7 +448,7 @@ class GEOSGeometryBase(GEOSBase):
         """
         Requires GDAL. Transform the geometry according to the given
         transformation object, which may be an integer SRID, and WKT or
-        PROJ.4 string. By default, transform the geometry in-place and return
+        PROJ string. By default, transform the geometry in-place and return
         nothing. However if the `clone` keyword is set, don't modify the
         geometry and return a transformed clone instead.
         """
@@ -695,14 +696,14 @@ class GEOSGeometry(GEOSGeometryBase, ListMixin):
         """
         input_srid = None
         if isinstance(geo_input, bytes):
-            geo_input = force_text(geo_input)
+            geo_input = force_str(geo_input)
         if isinstance(geo_input, str):
             wkt_m = wkt_regex.match(geo_input)
             if wkt_m:
                 # Handle WKT input.
-                if wkt_m.group('srid'):
-                    input_srid = int(wkt_m.group('srid'))
-                g = self._from_wkt(force_bytes(wkt_m.group('wkt')))
+                if wkt_m['srid']:
+                    input_srid = int(wkt_m['srid'])
+                g = self._from_wkt(force_bytes(wkt_m['wkt']))
             elif hex_regex.match(geo_input):
                 # Handle HEXEWKB input.
                 g = wkb_r().read(force_bytes(geo_input))

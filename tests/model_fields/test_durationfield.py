@@ -74,8 +74,8 @@ class TestValidation(SimpleTestCase):
         self.assertEqual(cm.exception.code, 'invalid')
         self.assertEqual(
             cm.exception.message % cm.exception.params,
-            "'not a datetime' value has an invalid format. "
-            "It must be in [DD] [HH:[MM:]]ss[.uuuuuu] format."
+            '“not a datetime” value has an invalid format. '
+            'It must be in [DD] [[HH:]MM:]ss[.uuuuuu] format.'
         )
 
 

@@ -1,9 +1,9 @@
 import os
-from collections import OrderedDict
 
 from django.apps import apps
 from django.contrib.staticfiles.finders import get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.checks import Tags
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
@@ -16,7 +16,7 @@ class Command(BaseCommand):
     settings.STATIC_ROOT.
     """
     help = "Collect static files in a single location."
-    requires_system_checks = False
+    requires_system_checks = [Tags.staticfiles]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -80,7 +80,7 @@ class Command(BaseCommand):
         ignore_patterns = options['ignore_patterns']
         if options['use_default_ignore_patterns']:
             ignore_patterns += apps.get_app_config('staticfiles').ignore_patterns
-        self.ignore_patterns = list(set(os.path.normpath(p) for p in ignore_patterns))
+        self.ignore_patterns = list({os.path.normpath(p) for p in ignore_patterns})
         self.post_process = options['post_process']
 
     def collect(self):
@@ -100,7 +100,7 @@ class Command(BaseCommand):
         else:
             handler = self.copy_file
 
-        found_files = OrderedDict()
+        found_files = {}
         for finder in get_finders():
             for path, storage in finder.list(self.ignore_patterns):
                 # Prefix the relative path if the source storage contains it
@@ -130,7 +130,7 @@ class Command(BaseCommand):
                     self.stderr.write("Post-processing '%s' failed!" % original_path)
                     # Add a blank line before the traceback, otherwise it's
                     # too easy to miss the relevant part of the error message.
-                    self.stderr.write("")
+                    self.stderr.write()
                     raise processed
                 if processed:
                     self.log("Post-processed '%s' as '%s'" %
@@ -147,7 +147,6 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         self.set_options(**options)
-
         message = ['\n']
         if self.dry_run:
             message.append(
@@ -186,14 +185,15 @@ class Command(BaseCommand):
                 raise CommandError("Collecting static files cancelled.")
 
         collected = self.collect()
-        modified_count = len(collected['modified'])
-        unmodified_count = len(collected['unmodified'])
-        post_processed_count = len(collected['post_processed'])
 
         if self.verbosity >= 1:
-            template = ("\n%(modified_count)s %(identifier)s %(action)s"
-                        "%(destination)s%(unmodified)s%(post_processed)s.\n")
-            summary = template % {
+            modified_count = len(collected['modified'])
+            unmodified_count = len(collected['unmodified'])
+            post_processed_count = len(collected['post_processed'])
+            return (
+                "\n%(modified_count)s %(identifier)s %(action)s"
+                "%(destination)s%(unmodified)s%(post_processed)s."
+            ) % {
                 'modified_count': modified_count,
                 'identifier': 'static file' + ('' if modified_count == 1 else 's'),
                 'action': 'symlinked' if self.symlink else 'copied',
@@ -203,7 +203,6 @@ class Command(BaseCommand):
                                    ', %s post-processed'
                                    % post_processed_count or ''),
             }
-            return summary
 
     def log(self, msg, level=2):
         """
@@ -310,10 +309,7 @@ class Command(BaseCommand):
         else:
             self.log("Linking '%s'" % source_path, level=2)
             full_path = self.storage.path(prefixed_path)
-            try:
-                os.makedirs(os.path.dirname(full_path))
-            except OSError:
-                pass
+            os.makedirs(os.path.dirname(full_path), exist_ok=True)
             try:
                 if os.path.lexists(full_path):
                     os.unlink(full_path)

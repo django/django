@@ -28,6 +28,7 @@ class DummyCache(BaseCache):
     def delete(self, key, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
+        return False
 
     def has_key(self, key, version=None):
         key = self.make_key(key, version=version)

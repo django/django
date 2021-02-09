@@ -5,7 +5,7 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.db.models.query import ModelIterable, QuerySet
+from django.db.models.query import ModelIterable
 from django.utils.functional import cached_property
 
 
@@ -42,9 +42,6 @@ class AuthorAddress(models.Model):
     class Meta:
         ordering = ['id']
 
-    def __str__(self):
-        return self.address
-
 
 class Book(models.Model):
     title = models.CharField(max_length=255)
@@ -52,9 +49,6 @@ class Book(models.Model):
 
     class Meta:
         ordering = ['id']
-
-    def __str__(self):
-        return self.title
 
 
 class BookWithYear(Book):
@@ -104,7 +98,7 @@ class ModelIterableSubclass(ModelIterable):
     pass
 
 
-class TeacherQuerySet(QuerySet):
+class TeacherQuerySet(models.QuerySet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._iterable_class = ModelIterableSubclass
@@ -168,8 +162,10 @@ class TaggedItem(models.Model):
     class Meta:
         ordering = ['id']
 
-    def __str__(self):
-        return self.tag
+
+class Article(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=20)
 
 
 class Bookmark(models.Model):
@@ -188,9 +184,12 @@ class Comment(models.Model):
     comment = models.TextField()
 
     # Content-object field
-    content_type = models.ForeignKey(ContentType, models.CASCADE)
+    content_type = models.ForeignKey(ContentType, models.CASCADE, null=True)
     object_pk = models.TextField()
     content_object = GenericForeignKey(ct_field="content_type", fk_field="object_pk")
+    content_type_uuid = models.ForeignKey(ContentType, models.CASCADE, related_name='comments', null=True)
+    object_pk_uuid = models.TextField()
+    content_object_uuid = GenericForeignKey(ct_field='content_type_uuid', fk_field='object_pk_uuid')
 
     class Meta:
         ordering = ['id']
@@ -246,9 +245,6 @@ class Employee(models.Model):
     class Meta:
         ordering = ['id']
 
-    def __str__(self):
-        return self.name
-
 
 # Ticket #19607
 
@@ -256,16 +252,10 @@ class LessonEntry(models.Model):
     name1 = models.CharField(max_length=200)
     name2 = models.CharField(max_length=200)
 
-    def __str__(self):
-        return "%s %s" % (self.name1, self.name2)
-
 
 class WordEntry(models.Model):
     lesson_entry = models.ForeignKey(LessonEntry, models.CASCADE)
     name = models.CharField(max_length=200)
-
-    def __str__(self):
-        return "%s (%s)" % (self.name, self.id)
 
 
 # Ticket #21410: Regression when related_name="+"
@@ -277,9 +267,6 @@ class Author2(models.Model):
 
     class Meta:
         ordering = ['id']
-
-    def __str__(self):
-        return self.name
 
 
 # Models for many-to-many with UUID pk test:

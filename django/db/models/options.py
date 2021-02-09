@@ -1,18 +1,17 @@
+import bisect
 import copy
 import inspect
-from bisect import bisect
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
 from django.db import connections
-from django.db.models import Manager
-from django.db.models.fields import AutoField
-from django.db.models.fields.proxy import OrderWrt
+from django.db.models import AutoField, Manager, OrderWrt, UniqueConstraint
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.functional import cached_property
+from django.utils.module_loading import import_string
 from django.utils.text import camel_case_to_spaces, format_lazy
 from django.utils.translation import override
 
@@ -117,7 +116,7 @@ class Options:
         # concrete models, the concrete_model is always the class itself.
         self.concrete_model = None
         self.swappable = None
-        self.parents = OrderedDict()
+        self.parents = {}
         self.auto_created = False
 
         # List of all lookups defined in ForeignKey 'limit_choices_to' options
@@ -180,6 +179,12 @@ class Options:
 
             self.unique_together = normalize_together(self.unique_together)
             self.index_together = normalize_together(self.index_together)
+            # App label/class name interpolation for names of constraints and
+            # indexes.
+            if not getattr(cls._meta, 'abstract', False):
+                for attr_name in {'constraints', 'indexes'}:
+                    objs = getattr(self, attr_name, [])
+                    setattr(self, attr_name, self._format_names_with_class(cls, objs))
 
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
@@ -200,6 +205,49 @@ class Options:
         if not self.db_table:
             self.db_table = "%s_%s" % (self.app_label, self.model_name)
             self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
+
+    def _format_names_with_class(self, cls, objs):
+        """App label/class name interpolation for object names."""
+        new_objs = []
+        for obj in objs:
+            obj = obj.clone()
+            obj.name = obj.name % {
+                'app_label': cls._meta.app_label.lower(),
+                'class': cls.__name__.lower(),
+            }
+            new_objs.append(obj)
+        return new_objs
+
+    def _get_default_pk_class(self):
+        pk_class_path = getattr(
+            self.app_config,
+            'default_auto_field',
+            settings.DEFAULT_AUTO_FIELD,
+        )
+        if self.app_config and self.app_config._is_default_auto_field_overridden:
+            app_config_class = type(self.app_config)
+            source = (
+                f'{app_config_class.__module__}.'
+                f'{app_config_class.__qualname__}.default_auto_field'
+            )
+        else:
+            source = 'DEFAULT_AUTO_FIELD'
+        if not pk_class_path:
+            raise ImproperlyConfigured(f'{source} must not be empty.')
+        try:
+            pk_class = import_string(pk_class_path)
+        except ImportError as e:
+            msg = (
+                f"{source} refers to the module '{pk_class_path}' that could "
+                f"not be imported."
+            )
+            raise ImproperlyConfigured(msg) from e
+        if not issubclass(pk_class, AutoField):
+            raise ValueError(
+                f"Primary key '{pk_class_path}' referred by {source} must "
+                f"subclass AutoField."
+            )
+        return pk_class
 
     def _prepare(self, model):
         if self.order_with_respect_to:
@@ -233,12 +281,9 @@ class Options:
                     field = already_created[0]
                 field.primary_key = True
                 self.setup_pk(field)
-                if not field.remote_field.parent_link:
-                    raise ImproperlyConfigured(
-                        'Add parent_link=True to %s.' % field,
-                    )
             else:
-                auto = AutoField(verbose_name='ID', primary_key=True, auto_created=True)
+                pk_class = self._get_default_pk_class()
+                auto = pk_class(verbose_name='ID', primary_key=True, auto_created=True)
                 model.add_to_class('id', auto)
 
     def add_manager(self, manager):
@@ -253,9 +298,9 @@ class Options:
         if private:
             self.private_fields.append(field)
         elif field.is_relation and field.many_to_many:
-            self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
+            bisect.insort(self.local_many_to_many, field)
         else:
-            self.local_fields.insert(bisect(self.local_fields, field), field)
+            bisect.insort(self.local_fields, field)
             self.setup_pk(field)
 
         # If the field being added is a relation to another known field,
@@ -293,7 +338,7 @@ class Options:
         return '<Options for %s>' % self.object_name
 
     def __str__(self):
-        return "%s.%s" % (self.app_label, self.model_name)
+        return self.label_lower
 
     def can_migrate(self, connection):
         """
@@ -686,7 +731,8 @@ class Options:
             )
             for f in fields_with_relations:
                 if not isinstance(f.remote_field.model, str):
-                    related_objects_graph[f.remote_field.model._meta.concrete_model._meta].append(f)
+                    remote_label = f.remote_field.model._meta.concrete_model._meta.label
+                    related_objects_graph[remote_label].append(f)
 
         for model in all_models:
             # Set the relation_tree using the internal __dict__. In this way
@@ -694,7 +740,7 @@ class Options:
             # __dict__ takes precedence over a data descriptor (such as
             # @cached_property). This means that the _meta._relation_tree is
             # only called if related_objects is not in __dict__.
-            related_objects = related_objects_graph[model._meta.concrete_model._meta]
+            related_objects = related_objects_graph[model._meta.concrete_model._meta.label]
             model._meta.__dict__['_relation_tree'] = related_objects
         # It seems it is possible that self is not in all_models, so guard
         # against that with default for get().
@@ -816,6 +862,18 @@ class Options:
         return fields
 
     @cached_property
+    def total_unique_constraints(self):
+        """
+        Return a list of total unique constraints. Useful for determining set
+        of fields guaranteed to be unique for all rows.
+        """
+        return [
+            constraint
+            for constraint in self.constraints
+            if isinstance(constraint, UniqueConstraint) and constraint.condition is None
+        ]
+
+    @cached_property
     def _property_names(self):
         """Return a set of the names of the properties defined on the model."""
         names = []
@@ -824,3 +882,14 @@ class Options:
             if isinstance(attr, property):
                 names.append(name)
         return frozenset(names)
+
+    @cached_property
+    def db_returning_fields(self):
+        """
+        Private API intended only to be used by Django itself.
+        Fields to be returned after a database insert.
+        """
+        return [
+            field for field in self._get_fields(forward=True, reverse=False, include_parents=PROXY_PARENTS)
+            if getattr(field, 'db_returning', False)
+        ]

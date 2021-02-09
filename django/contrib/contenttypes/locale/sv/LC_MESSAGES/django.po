@@ -4,13 +4,14 @@
 # Andreas Pelme <andreas@pelme.se>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2014
+# Thomas Lundqvist, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jonathan Lindén\n"
+"PO-Revision-Date: 2019-02-26 11:20+0000\n"
+"Last-Translator: Thomas Lundqvist\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +27,7 @@ msgid "python model class name"
 msgstr "klassnamn för Python-modell"
 
 msgid "content type"
-msgstr "innehålls typ"
+msgstr "innehållstyp"
 
 msgid "content types"
 msgstr "innehållstyper"

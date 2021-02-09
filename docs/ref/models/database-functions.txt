@@ -39,10 +39,12 @@ Usage example::
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Cast
-    >>> Value.objects.create(integer=4)
-    >>> value = Value.objects.annotate(as_float=Cast('integer', FloatField())).get()
-    >>> print(value.as_float)
-    4.0
+    >>> Author.objects.create(age=25, name='Margaret Smith')
+    >>> author = Author.objects.annotate(
+    ...    age_as_float=Cast('age', output_field=FloatField()),
+    ... ).get()
+    >>> print(author.age_as_float)
+    25.0
 
 ``Coalesce``
 ------------
@@ -84,6 +86,25 @@ Usage examples::
     >>> from django.utils import timezone
     >>> now = timezone.now()
     >>> Coalesce('updated', Cast(now, DateTimeField()))
+
+``Collate``
+-----------
+
+.. class:: Collate(expression, collation)
+
+.. versionadded:: 3.2
+
+Takes an expression and a collation name to query against.
+
+For example, to filter case-insensitively in SQLite::
+
+    >>> Author.objects.filter(name=Collate(Value('john'), 'nocase'))
+    <QuerySet [<Author: John>, <Author: john>]>
+
+It can also be used when ordering, for example with PostgreSQL::
+
+    >>> Author.objects.order_by(Collate('name', 'et-x-icu'))
+    <QuerySet [<Author: Ursula>, <Author: Veronika>, <Author: Ülle>]>
 
 ``Greatest``
 ------------
@@ -127,6 +148,29 @@ and ``comment.modified``.
     The PostgreSQL behavior can be emulated using ``Coalesce`` if you know
     a sensible minimum value to provide as a default.
 
+``JSONObject``
+--------------
+
+.. class:: JSONObject(**fields)
+
+.. versionadded:: 3.2
+
+Takes a list of key-value pairs and returns a JSON object containing those
+pairs.
+
+Usage example::
+
+    >>> from django.db.models import F
+    >>> from django.db.models.functions import JSONObject, Lower
+    >>> Author.objects.create(name='Margaret Smith', alias='msmith', age=25)
+    >>> author = Author.objects.annotate(json_object=JSONObject(
+    ...     name=Lower('name'),
+    ...     alias='alias',
+    ...     age=F('age') * 2,
+    ... )).get()
+    >>> author.json_object
+    {'name': 'margaret smith', 'alias': 'msmith', 'age': 50}
+
 ``Least``
 ---------
 
@@ -153,8 +197,6 @@ will result in a database error.
 ----------
 
 .. class:: NullIf(expression1, expression2)
-
-.. versionadded:: 2.2
 
 Accepts two expressions and returns ``None`` if they are equal, otherwise
 returns ``expression1``.
@@ -207,6 +249,7 @@ Given the datetime ``2015-06-15 23:30:01.000321+00:00``, the built-in
 * "day": 15
 * "week": 25
 * "week_day": 2
+* "iso_week_day": 1
 * "hour": 23
 * "minute": 30
 * "second": 1
@@ -218,6 +261,7 @@ returned when this timezone is active will be the same as above except for:
 
 * "day": 16
 * "week_day": 3
+* "iso_week_day": 2
 * "hour": 9
 
 .. admonition:: ``week_day`` values
@@ -274,8 +318,6 @@ Usage example::
 
 .. class:: ExtractIsoYear(expression, tzinfo=None, **extra)
 
-    .. versionadded:: 2.2
-
     Returns the ISO-8601 week-numbering year.
 
     .. attribute:: lookup_name = 'iso_year'
@@ -291,6 +333,13 @@ Usage example::
 .. class:: ExtractWeekDay(expression, tzinfo=None, **extra)
 
     .. attribute:: lookup_name = 'week_day'
+
+.. class:: ExtractIsoWeekDay(expression, tzinfo=None, **extra)
+
+    Returns the ISO-8601 week day with day 1 being Monday and day 7 being
+    Sunday.
+
+    .. attribute:: lookup_name = 'iso_week_day'
 
 .. class:: ExtractWeek(expression, tzinfo=None, **extra)
 
@@ -311,7 +360,7 @@ that deal with date-parts can be used with ``DateField``::
     >>> from django.utils import timezone
     >>> from django.db.models.functions import (
     ...     ExtractDay, ExtractMonth, ExtractQuarter, ExtractWeek,
-    ...     ExtractWeekDay, ExtractIsoYear, ExtractYear,
+    ...     ExtractIsoWeekDay, ExtractWeekDay, ExtractIsoYear, ExtractYear,
     ... )
     >>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=timezone.utc)
     >>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=timezone.utc)
@@ -326,11 +375,13 @@ that deal with date-parts can be used with ``DateField``::
     ...     week=ExtractWeek('start_date'),
     ...     day=ExtractDay('start_date'),
     ...     weekday=ExtractWeekDay('start_date'),
-    ... ).values('year', 'isoyear', 'quarter', 'month', 'week', 'day', 'weekday').get(
-    ...     end_date__year=ExtractYear('start_date'),
-    ... )
+    ...     isoweekday=ExtractIsoWeekDay('start_date'),
+    ... ).values(
+    ...     'year', 'isoyear', 'quarter', 'month', 'week', 'day', 'weekday',
+    ...     'isoweekday',
+    ... ).get(end_date__year=ExtractYear('start_date'))
     {'year': 2015, 'isoyear': 2015, 'quarter': 2, 'month': 6, 'week': 25,
-     'day': 15, 'weekday': 2}
+     'day': 15, 'weekday': 2, 'isoweekday': 1}
 
 ``DateTimeField`` extracts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -360,8 +411,8 @@ Each class is also a ``Transform`` registered on ``DateTimeField`` as
     >>> from django.utils import timezone
     >>> from django.db.models.functions import (
     ...     ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
-    ...     ExtractQuarter, ExtractSecond, ExtractWeek, ExtractWeekDay,
-    ...     ExtractYear,
+    ...     ExtractQuarter, ExtractSecond, ExtractWeek, ExtractIsoWeekDay,
+    ...     ExtractWeekDay, ExtractIsoYear, ExtractYear,
     ... )
     >>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=timezone.utc)
     >>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=timezone.utc)
@@ -376,15 +427,17 @@ Each class is also a ``Transform`` registered on ``DateTimeField`` as
     ...     week=ExtractWeek('start_datetime'),
     ...     day=ExtractDay('start_datetime'),
     ...     weekday=ExtractWeekDay('start_datetime'),
+    ...     isoweekday=ExtractIsoWeekDay('start_datetime'),
     ...     hour=ExtractHour('start_datetime'),
     ...     minute=ExtractMinute('start_datetime'),
     ...     second=ExtractSecond('start_datetime'),
     ... ).values(
     ...     'year', 'isoyear', 'month', 'week', 'day',
-    ...     'weekday', 'hour', 'minute', 'second',
+    ...     'weekday', 'isoweekday', 'hour', 'minute', 'second',
     ... ).get(end_datetime__year=ExtractYear('start_datetime'))
     {'year': 2015, 'isoyear': 2015, 'quarter': 2, 'month': 6, 'week': 25,
-     'day': 15, 'weekday': 2, 'hour': 23, 'minute': 30, 'second': 1}
+     'day': 15, 'weekday': 2, 'isoweekday': 1, 'hour': 23, 'minute': 30,
+     'second': 1}
 
 When :setting:`USE_TZ` is ``True`` then datetimes are stored in the database
 in UTC. If a different timezone is active in Django, the datetime is converted
@@ -398,11 +451,12 @@ values that are returned::
     ...    Experiment.objects.annotate(
     ...        day=ExtractDay('start_datetime'),
     ...        weekday=ExtractWeekDay('start_datetime'),
+    ...        isoweekday=ExtractIsoWeekDay('start_datetime'),
     ...        hour=ExtractHour('start_datetime'),
-    ...    ).values('day', 'weekday', 'hour').get(
+    ...    ).values('day', 'weekday', 'isoweekday', 'hour').get(
     ...        end_datetime__year=ExtractYear('start_datetime'),
     ...    )
-    {'day': 16, 'weekday': 3, 'hour': 9}
+    {'day': 16, 'weekday': 3, 'isoweekday': 2, 'hour': 9}
 
 Explicitly passing the timezone to the ``Extract`` function behaves in the same
 way, and takes priority over an active timezone::
@@ -412,11 +466,12 @@ way, and takes priority over an active timezone::
     >>> Experiment.objects.annotate(
     ...     day=ExtractDay('start_datetime', tzinfo=melb),
     ...     weekday=ExtractWeekDay('start_datetime', tzinfo=melb),
+    ...     isoweekday=ExtractIsoWeekDay('start_datetime', tzinfo=melb),
     ...     hour=ExtractHour('start_datetime', tzinfo=melb),
-    ... ).values('day', 'weekday', 'hour').get(
+    ... ).values('day', 'weekday', 'isoweekday', 'hour').get(
     ...     end_datetime__year=ExtractYear('start_datetime'),
     ... )
-    {'day': 16, 'weekday': 3, 'hour': 9}
+    {'day': 16, 'weekday': 3, 'isoweekday': 2, 'hour': 9}
 
 ``Now``
 -------
@@ -442,7 +497,7 @@ Usage example::
 ``Trunc``
 ---------
 
-.. class:: Trunc(expression, kind, output_field=None, tzinfo=None, **extra)
+.. class:: Trunc(expression, kind, output_field=None, tzinfo=None, is_dst=None, **extra)
 
 Truncates a date up to a significant component.
 
@@ -459,6 +514,10 @@ depending on ``output_field``, with fields up to ``kind`` set to their minimum
 value. If ``output_field`` is omitted, it will default to the ``output_field``
 of ``expression``. A ``tzinfo`` subclass, usually provided by ``pytz``, can be
 passed to truncate a value in a specific timezone.
+
+The ``is_dst`` parameter indicates whether or not ``pytz`` should interpret
+nonexistent and ambiguous datetimes in daylight saving time. By default (when
+``is_dst=None``), ``pytz`` raises an exception for such datetimes.
 
 Given the datetime ``2015-06-15 14:30:50.000321+00:00``, the built-in ``kind``\s
 return:
@@ -494,8 +553,8 @@ should typically be used instead of the more verbose equivalent,
 e.g. use ``TruncYear(...)`` rather than ``Trunc(..., kind='year')``.
 
 The subclasses are all defined as transforms, but they aren't registered with
-any fields, because the obvious lookup names are already reserved by the
-``Extract`` subclasses.
+any fields, because the lookup names are already reserved by the ``Extract``
+subclasses.
 
 Usage example::
 
@@ -525,21 +584,21 @@ Usage example::
 ``DateField`` truncation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. class:: TruncYear(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncYear(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'year'
 
-.. class:: TruncMonth(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncMonth(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'month'
 
-.. class:: TruncWeek(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncWeek(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     Truncates to midnight on the Monday of the week.
 
     .. attribute:: kind = 'week'
 
-.. class:: TruncQuarter(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncQuarter(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'quarter'
 
@@ -585,37 +644,45 @@ that deal with date-parts can be used with ``DateField``::
 ``DateTimeField`` truncation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. class:: TruncDate(expression, **extra)
+.. class:: TruncDate(expression, tzinfo=None, **extra)
 
     .. attribute:: lookup_name = 'date'
     .. attribute:: output_field = DateField()
+
+    .. versionchanged:: 3.2
+
+        The ``tzinfo`` parameter was added.
 
 ``TruncDate`` casts ``expression`` to a date rather than using the built-in SQL
 truncate function. It's also registered as a transform on  ``DateTimeField`` as
 ``__date``.
 
-.. class:: TruncTime(expression, **extra)
+.. class:: TruncTime(expression, tzinfo=None, **extra)
 
     .. attribute:: lookup_name = 'time'
     .. attribute:: output_field = TimeField()
+
+    .. versionchanged:: 3.2
+
+        The ``tzinfo`` parameter was added.
 
 ``TruncTime`` casts ``expression`` to a time rather than using the built-in SQL
 truncate function. It's also registered as a transform on ``DateTimeField`` as
 ``__time``.
 
-.. class:: TruncDay(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncDay(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'day'
 
-.. class:: TruncHour(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncHour(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'hour'
 
-.. class:: TruncMinute(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncMinute(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'minute'
 
-.. class:: TruncSecond(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncSecond(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
 
     .. attribute:: kind = 'second'
 
@@ -653,15 +720,18 @@ Usage example::
 ``TimeField`` truncation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. class:: TruncHour(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncHour(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
+    :noindex:
 
     .. attribute:: kind = 'hour'
 
-.. class:: TruncMinute(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncMinute(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
+    :noindex:
 
     .. attribute:: kind = 'minute'
 
-.. class:: TruncSecond(expression, output_field=None, tzinfo=None, **extra)
+.. class:: TruncSecond(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
+    :noindex:
 
     .. attribute:: kind = 'second'
 
@@ -707,8 +777,6 @@ that deal with time-parts can be used with ``TimeField``::
 
 Math Functions
 ==============
-
-.. versionadded:: 2.2
 
 We'll be using the following model in math function examples::
 
@@ -1067,6 +1135,15 @@ It can also be registered as a transform. For example::
     >>> # Get vectors whose radians are less than 1
     >>> vectors = Vector.objects.filter(x__radians__lt=1, y__radians__lt=1)
 
+``Random``
+----------
+
+.. class:: Random(**extra)
+
+.. versionadded:: 3.2
+
+Returns a random value in the range ``0.0 ≤ x < 1.0``.
+
 ``Round``
 ---------
 
@@ -1090,6 +1167,29 @@ It can also be registered as a transform. For example::
     >>> FloatField.register_lookup(Round)
     >>> # Get vectors whose round() is less than 20
     >>> vectors = Vector.objects.filter(x__round__lt=20, y__round__lt=20)
+
+``Sign``
+--------
+
+.. class:: Sign(expression, **extra)
+
+Returns the sign (-1, 0, 1) of a numeric field or expression.
+
+Usage example::
+
+    >>> from django.db.models.functions import Sign
+    >>> Vector.objects.create(x=5.4, y=-2.3)
+    >>> vector = Vector.objects.annotate(x_sign=Sign('x'), y_sign=Sign('y')).get()
+    >>> vector.x_sign, vector.y_sign
+    (1, -1)
+
+It can also be registered as a transform. For example::
+
+    >>> from django.db.models import FloatField
+    >>> from django.db.models.functions import Sign
+    >>> FloatField.register_lookup(Sign)
+    >>> # Get vectors whose signs of components are less than 0.
+    >>> vectors = Vector.objects.filter(x__sign__lt=0, y__sign__lt=0)
 
 ``Sin``
 -------
@@ -1303,6 +1403,24 @@ Usage example::
 Similar to :class:`~django.db.models.functions.Trim`, but removes only leading
 spaces.
 
+``MD5``
+-------
+
+.. class:: MD5(expression, **extra)
+
+Accepts a single text field or expression and returns the MD5 hash of the
+string.
+
+It can also be registered as a transform as described in :class:`Length`.
+
+Usage example::
+
+    >>> from django.db.models.functions import MD5
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(name_md5=MD5('name')).get()
+    >>> print(author.name_md5)
+    749fb689816b2db85f5b169c2055b247
+
 ``Ord``
 -------
 
@@ -1366,8 +1484,6 @@ Usage example::
 
 .. class:: Reverse(expression, **extra)
 
-.. versionadded:: 2.2
-
 Accepts a single text field or expression and returns the characters of that
 expression in reverse order.
 
@@ -1412,6 +1528,39 @@ side.
 
 Similar to :class:`~django.db.models.functions.Trim`, but removes only trailing
 spaces.
+
+``SHA1``, ``SHA224``, ``SHA256``, ``SHA384``, and ``SHA512``
+------------------------------------------------------------
+
+.. class:: SHA1(expression, **extra)
+.. class:: SHA224(expression, **extra)
+.. class:: SHA256(expression, **extra)
+.. class:: SHA384(expression, **extra)
+.. class:: SHA512(expression, **extra)
+
+Accepts a single text field or expression and returns the particular hash of
+the string.
+
+They can also be registered as transforms as described in :class:`Length`.
+
+Usage example::
+
+    >>> from django.db.models.functions import SHA1
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(name_sha1=SHA1('name')).get()
+    >>> print(author.name_sha1)
+    b87efd8a6c991c390be5a68e8a7945a7851c7e5c
+
+.. admonition:: PostgreSQL
+
+    The `pgcrypto extension <https://www.postgresql.org/docs/current/
+    pgcrypto.html>`_ must be installed. You can use the
+    :class:`~django.contrib.postgres.operations.CryptoExtension` migration
+    operation to install it.
+
+.. admonition:: Oracle
+
+    Oracle doesn't support the ``SHA224`` function.
 
 ``StrIndex``
 ------------

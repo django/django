@@ -1,16 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Abraham Estrada, 2011
+# Abe Estrada, 2011
 # Alex Dzul <alexexc2@gmail.com>, 2015
+# Jesús Bautista <jesbam98@gmail.com>, 2019
 # zodman <zodman@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Alex Dzul <alexexc2@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-12-26 16:57+0000\n"
+"Last-Translator: Jesús Bautista <jesbam98@gmail.com>\n"
 "Language-Team: Spanish (Mexico) (http://www.transifex.com/django/django/"
 "language/es_MX/)\n"
 "MIME-Version: 1.0\n"
@@ -29,21 +30,21 @@ msgid "redirect from"
 msgstr "redirigir desde"
 
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
 msgstr ""
-"Esta ruta debe ser absoluta, excluyendo el nombre del dominio. Ejemplo: '/"
-"events/search/'."
+"Esta debería ser una ruta absoluta, excluyendo el nombre de dominio. Por "
+"ejemplo: \"/events/search/\"."
 
 msgid "redirect to"
 msgstr "redirigir a"
 
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+"“http://”."
 msgstr ""
-"Esto puede ser bien una ruta absoluta (como arriba) o una URL completa que "
-"empiece con 'http://'."
+"Esto puede ser una ruta absoluta (como arriba) o una URL completa que "
+"comience con \"http://\"."
 
 msgid "redirect"
 msgstr "redirigir"

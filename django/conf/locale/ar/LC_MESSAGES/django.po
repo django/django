@@ -1,18 +1,22 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bashar Al-Abdulhadi, 2015-2016
+# Bashar Al-Abdulhadi, 2015-2016,2020
 # Bashar Al-Abdulhadi, 2014
 # Eyad Toma <d.eyad.t@gmail.com>, 2013-2014
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Muaaz Alsaied, 2020
+# Omar Al-Ithawi <omar.al.dolaimy@gmail.com>, 2020
 # Ossama Khayat <okhayat@gmail.com>, 2011
+# Tony xD <tony23dz@gmail.com>, 2020
+# صفا الفليج <safaalfulaij@hotmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-15 00:40+0000\n"
+"Last-Translator: Bashar Al-Abdulhadi\n"
 "Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,6 +30,9 @@ msgstr "الإفريقية"
 
 msgid "Arabic"
 msgstr "العربيّة"
+
+msgid "Algerian Arabic"
+msgstr "عربي جزائري"
 
 msgid "Asturian"
 msgstr "الأسترية"
@@ -141,11 +148,17 @@ msgstr "الصربية العليا"
 msgid "Hungarian"
 msgstr "الهنغاريّة"
 
+msgid "Armenian"
+msgstr "الأرمنية"
+
 msgid "Interlingua"
 msgstr "اللغة الوسيطة"
 
 msgid "Indonesian"
 msgstr "الإندونيسيّة"
+
+msgid "Igbo"
+msgstr "الإيبو"
 
 msgid "Ido"
 msgstr "ايدو"
@@ -162,6 +175,9 @@ msgstr "اليابانيّة"
 msgid "Georgian"
 msgstr "الجورجيّة"
 
+msgid "Kabyle"
+msgstr "القبائل"
+
 msgid "Kazakh"
 msgstr "الكازاخستانية"
 
@@ -173,6 +189,9 @@ msgstr "الهنديّة (كنّادا)"
 
 msgid "Korean"
 msgstr "الكوريّة"
+
+msgid "Kyrgyz"
+msgstr "قيرغيز"
 
 msgid "Luxembourgish"
 msgstr "اللوكسمبرجية"
@@ -258,8 +277,14 @@ msgstr "التاميل"
 msgid "Telugu"
 msgstr "التيلوغو"
 
+msgid "Tajik"
+msgstr "طاجيك"
+
 msgid "Thai"
 msgstr "التايلنديّة"
+
+msgid "Turkmen"
+msgstr "تركمان"
 
 msgid "Turkish"
 msgstr "التركيّة"
@@ -275,6 +300,9 @@ msgstr "الأكرانيّة"
 
 msgid "Urdu"
 msgstr "الأوردو"
+
+msgid "Uzbek"
+msgstr "الأوزبكي"
 
 msgid "Vietnamese"
 msgstr "الفيتناميّة"
@@ -298,47 +326,49 @@ msgid "Syndication"
 msgstr "توظيف النشر"
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "رقم الصفحة هذا ليس عدداً طبيعياً"
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "رقم الصفحة أقل من 1"
 
 msgid "That page contains no results"
-msgstr ""
+msgstr "هذه الصفحة لا تحتوي على نتائج"
 
 msgid "Enter a valid value."
-msgstr "أدخل قيمة صحيحة."
+msgstr "أدخِل قيمة صحيحة."
 
 msgid "Enter a valid URL."
-msgstr "أدخل رابطاً صحيحاً."
+msgstr "أدخِل رابطًا صحيحًا."
 
 msgid "Enter a valid integer."
-msgstr "أدخل رقم صالح."
+msgstr "أدخِل عدداً طبيعياً."
 
 msgid "Enter a valid email address."
-msgstr "أدخل عنوان بريد إلكتروني صحيح."
+msgstr "أدخِل عنوان بريد إلكتروني صحيح."
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr "أدخل اختصار 'slug' صحيح يتكوّن من أحرف، أرقام، شرطات سفلية وعاديّة."
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
-msgstr "أدخل اختصار 'slug' صحيح يتكوّن من أحرف، أرقام، شرطات سفلية وعاديّة."
+msgstr ""
+"أدخل اختصار 'slug' صحيح يتكون من أحرف Unicode أو أرقام أو شرطات سفلية أو "
+"واصلات."
 
 msgid "Enter a valid IPv4 address."
-msgstr "أدخل عنوان IPv4 صحيح."
+msgstr "أدخِل عنوان IPv4 صحيح."
 
 msgid "Enter a valid IPv6 address."
-msgstr "أدخل عنوان IPv6 صحيح."
+msgstr "أدخِل عنوان IPv6 صحيح."
 
 msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "أدخل عنوان IPv4 أو عنوان IPv6 صحيح."
+msgstr "أدخِل عنوان IPv4 أو عنوان IPv6 صحيح."
 
 msgid "Enter only digits separated by commas."
-msgstr "أدخل أرقاما فقط مفصول بينها بفواصل."
+msgstr "أدخِل فقط أرقامًا تفصلها الفواصل."
 
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
@@ -404,6 +434,9 @@ msgstr[5] ""
 "تأكد أن هذه القيمة تحتوي على %(limit_value)d حرف أو رمز على الأكثر (هي تحتوي "
 "حالياً على %(show_value)d)."
 
+msgid "Enter a number."
+msgstr "أدخل رقماً."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -438,12 +471,14 @@ msgstr[5] "تحقق من أن تدخل %(max)s أرقام قبل الفاصل ا
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
+"امتداد الملف “%(extension)s” غير مسموح به. الامتدادات المسموح بها هي:"
+"%(allowed_extensions)s."
 
 msgid "Null characters are not allowed."
-msgstr ""
+msgstr "الأحرف الخالية غير مسموح بها."
 
 msgid "and"
 msgstr "و"
@@ -478,19 +513,13 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr "حقل نوع: %(field_type)s"
 
-msgid "Integer"
-msgstr "عدد صحيح"
-
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr "قيمة '%(value)s' يجب ان تكون عدد صحيح."
-
-msgid "Big (8 byte) integer"
-msgstr "عدد صحيح كبير (8 بايت)"
-
-#, python-format
-msgid "'%(value)s' value must be either True or False."
+msgid "“%(value)s” value must be either True or False."
 msgstr "قيمة '%(value)s' يجب أن تكون True أو False."
+
+#, python-format
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr "قيمة “%(value)s” يجب أن تكون True , False أو None."
 
 msgid "Boolean (Either True or False)"
 msgstr "ثنائي (إما True أو False)"
@@ -504,7 +533,7 @@ msgstr "أرقام صحيحة مفصولة بفواصل"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
 "قيمة '%(value)s' ليست من بُنية تاريخ صحيحة. القيمة يجب ان تكون من البُنية YYYY-"
@@ -512,7 +541,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr "قيمة '%(value)s' من بُنية صحيحة (YYYY-MM-DD) لكنها تحوي تاريخ غير صحيح."
 
@@ -521,7 +550,7 @@ msgstr "التاريخ (دون الوقت)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
 "قيمة '%(value)s' ليست من بُنية صحيحة. القيمة يجب ان تكون من البُنية YYYY-MM-DD "
@@ -529,7 +558,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
 "قيمة '%(value)s' من بُنية صحيحة (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) لكنها "
@@ -539,7 +568,7 @@ msgid "Date (with time)"
 msgstr "التاريخ (مع الوقت)"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
+msgid "“%(value)s” value must be a decimal number."
 msgstr "قيمة '%(value)s' يجب ان تكون عدد عشري."
 
 msgid "Decimal number"
@@ -547,11 +576,11 @@ msgstr "رقم عشري"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"قيمة '%(value)s' ليست بنسق صحيح. القيمة يجب ان تكون من التنسيق [DD] [HH:"
-"[MM:]]ss[.uuuuuu]."
+"قيمة '%(value)s' ليست بنسق صحيح. القيمة يجب ان تكون من التنسيق ([DD] "
+"[[HH:]MM:]ss[.uuuuuu])"
 
 msgid "Duration"
 msgstr "المدّة"
@@ -563,11 +592,21 @@ msgid "File path"
 msgstr "مسار الملف"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
-msgstr "قيمة '%(value)s' يجب ان تكون عدد فاصل عائم."
+msgid "“%(value)s” value must be a float."
+msgstr "قيمة '%(value)s' يجب ان تكون عدد تعويم."
 
 msgid "Floating point number"
 msgstr "رقم فاصلة عائمة"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr "قيمة '%(value)s' يجب ان تكون عدد طبيعي."
+
+msgid "Integer"
+msgstr "عدد صحيح"
+
+msgid "Big (8 byte) integer"
+msgstr "عدد صحيح كبير (8 بايت)"
 
 msgid "IPv4 address"
 msgstr "عنوان IPv4"
@@ -576,11 +615,14 @@ msgid "IP address"
 msgstr "عنوان IP"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
+msgid "“%(value)s” value must be either None, True or False."
 msgstr "قيمة '%(value)s' يجب ان تكون None أو True أو False."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "ثنائي (إما True أو False أو None)"
+
+msgid "Positive big integer"
+msgstr "عدد صحيح موجب كبير"
 
 msgid "Positive integer"
 msgstr "عدد صحيح موجب"
@@ -600,15 +642,15 @@ msgstr "نص"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"قيمة '%(value)s' ليست من بُنية صحيحة. القيمة يجب ان تكون من البُنية HH:MM[:ss[."
-"uuuuuu]]."
+"قيمة '%(value)s' ليست بنسق صحيح. القيمة يجب ان تكون من التنسيق\n"
+"HH:MM[:ss[.uuuuuu]]"
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
 "قيمة '%(value)s' من بُنية صحيحة (HH:MM[:ss[.uuuuuu]]) لكنها تحوي وقت غير صحيح."
@@ -623,14 +665,23 @@ msgid "Raw binary data"
 msgstr "البيانات الثنائية الخام"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
-msgstr "'%(value)s' ليست قيمة UUID صحيحة."
+msgid "“%(value)s” is not a valid UUID."
+msgstr "القيمة \"%(value)s\" ليست UUID صالح."
+
+msgid "Universally unique identifier"
+msgstr "معرّف فريد عالمياً"
 
 msgid "File"
 msgstr "ملف"
 
 msgid "Image"
 msgstr "صورة"
+
+msgid "A JSON object"
+msgstr "كائن JSON"
+
+msgid "Value must be valid JSON."
+msgstr "يجب أن تكون قيمة JSON صالحة."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -665,9 +716,6 @@ msgstr "هذا الحقل مطلوب."
 msgid "Enter a whole number."
 msgstr "أدخل رقما صحيحا."
 
-msgid "Enter a number."
-msgstr "أدخل رقماً."
-
 msgid "Enter a valid date."
 msgstr "أدخل تاريخاً صحيحاً."
 
@@ -679,6 +727,10 @@ msgstr "أدخل تاريخاً/وقتاً صحيحاً."
 
 msgid "Enter a valid duration."
 msgstr "أدخل مدّة صحيحة"
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "يجب أن يكون عدد الأيام بين {min_days} و {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "لم يتم ارسال ملف، الرجاء التأكد من نوع ترميز الاستمارة."
@@ -734,6 +786,9 @@ msgstr "إدخال قيمة كاملة."
 
 msgid "Enter a valid UUID."
 msgstr "أدخل قيمة UUID صحيحة."
+
+msgid "Enter a valid JSON."
+msgstr "أدخل مدخل JSON صالح."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -792,18 +847,18 @@ msgid "Please correct the duplicate values below."
 msgstr "رجاءً صحّح القيم المُكرّرة أدناه."
 
 msgid "The inline value did not match the parent instance."
-msgstr ""
+msgstr "لا تتطابق القيمة المضمنة مع المثيل الأصلي."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "انتق خياراً صحيحاً. اختيارك ليس أحد الخيارات المتاحة."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value."
-msgstr ""
+msgid "“%(pk)s” is not a valid value."
+msgstr "\"%(pk)s\" ليست قيمة صالحة."
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
 "%(datetime)s لا يمكن تفسيرها في المنطقة الزمنية %(current_timezone)s; قد "
@@ -827,6 +882,7 @@ msgstr "نعم"
 msgid "No"
 msgstr "لا"
 
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "نعم,لا,ربما"
 
@@ -1093,7 +1149,7 @@ msgstr "هذا ليس عنوان IPv6 صحيح."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
 msgstr "%(truncated_text)s..."
 
 msgid "or"
@@ -1163,9 +1219,6 @@ msgstr[3] "%d دقائق"
 msgstr[4] "%d دقيقة"
 msgstr[5] "%d دقيقة"
 
-msgid "0 minutes"
-msgstr "0 دقيقة"
-
 msgid "Forbidden"
 msgstr "ممنوع"
 
@@ -1173,31 +1226,34 @@ msgid "CSRF verification failed. Request aborted."
 msgstr "تم الفشل للتحقق من CSRF. تم إنهاء الطلب."
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"أنت ترى هذه الرسالة لأن هذا الموقع HTTPS يتطلب إرسال 'Referer header'  من "
-"قبل المتصفح، ولكن لم تم إرسال أي شيء. هذا الـheader مطلوب لأسباب أمنية، "
-"لضمان أن متصفحك لم يتم اختطافه من قبل أطراف أخرى."
+"تظهر لك هذه الرسالة لأن موقع HTTPS يتطلب \"رأس مرجعي\" ليتم إرساله بواسطة "
+"مستعرض الويب الخاص بك ، ولكن لم يتم إرسال أي منها. هذا العنوان مطلوب لأسباب "
+"أمنية ، للتأكد من أن متصفحك لا يتم اختراقه من قبل أطراف ثالثة."
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
 msgstr ""
-"إذا قمت بضبط متصفحك لتعطيل 'Referer headers'، يرجى إعادة تفعيلها، على الأقل "
-"بالنسبة لهذا الموقع، أو لاتصالات HTTPS، أو للطلبات من نفس المنشأ 'same-"
-"origin'."
+"إذا قمت بتكوين المستعرض لتعطيل رؤوس “Referer” ، فيرجى إعادة تمكينها ، على "
+"الأقل لهذا الموقع ، أو لاتصالات HTTPS ، أو لطلبات “same-origin”."
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
-"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
-"CSRF protection requires the 'Referer' header to do strict referer checking. "
-"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" ...> for links to third-party sites."
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
 msgstr ""
+"إذا كنت تستخدم العلامة <meta name=\"referrer\" content=\"no-referrer\"> أو "
+"تضمين رأس “Referrer-Policy: no-referrer”، يرجى إزالتها. تتطلب حماية CSRF أن "
+"يقوم رأس “Referer” بإجراء فحص صارم للمراجع. إذا كنت قلقًا بشأن الخصوصية ، "
+"فاستخدم بدائل مثل <a rel=\"noreferrer\" …> للروابط إلى مواقع الجهات الخارجية."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1210,10 +1266,10 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
 "إذا قمت بضبط المتصفح لتعطيل الكوكيز الرجاء إعادة تغعيلها، على الأقل بالنسبة "
-"لهذا الموقع، أو للطلبات من نفس المنشأ 'same-origin'."
+"لهذا الموقع، أو للطلبات من “same-origin”."
 
 msgid "More information is available with DEBUG=True."
 msgstr "يتوفر مزيد من المعلومات عند ضبط الخيار DEBUG=True."
@@ -1222,7 +1278,7 @@ msgid "No year specified"
 msgstr "لم تحدد السنة"
 
 msgid "Date out of range"
-msgstr ""
+msgstr "التاريخ خارج النطاق"
 
 msgid "No month specified"
 msgstr "لم تحدد الشهر"
@@ -1246,46 +1302,51 @@ msgstr ""
 "allow_future هي False."
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
-msgstr "نسق تاريخ غير صحيح '%(datestr)s' محدد بالشكل '%(format)s'"
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr "نسق تاريخ غير صحيح \"%(datestr)s\" محدد بالشكل ''%(format)s\""
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "لم يعثر على أي %(verbose_name)s مطابقة لهذا الإستعلام"
 
-msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "الصفحة ليست 'الأخيرة'، ولا يمكن تحويل القيمة إلى رقم صحيح."
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr "الصفحة ليست \"الأخيرة\"، كما لا يمكن تحويل القيمة إلى رقم طبيعي."
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "صفحة خاطئة (%(page_number)s): %(message)s"
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr "قائمة فارغة و '%(class_name)s.allow_empty' قيمته False."
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr ""
+"قائمة فارغة و\n"
+"\"%(class_name)s.allow_empty\"\n"
+"قيمته False."
 
 msgid "Directory indexes are not allowed here."
 msgstr "لا يسمح لفهارس الدليل هنا."
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "المسار \"%(path)s\" غير موجود."
+msgid "“%(path)s” does not exist"
+msgstr "”%(path)s“ غير موجود"
 
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "فهرس لـ %(directory)s"
 
 msgid "Django: the Web framework for perfectionists with deadlines."
-msgstr ""
+msgstr "جانغو: إطار الويب للمهتمين بالكمال و لديهم مواعيد تسليم نهائية."
 
 #, python-format
 msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
+"استعراض <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">ملاحظات الإصدار</a> لجانغو %(version)s"
 
 msgid "The install worked successfully! Congratulations!"
-msgstr ""
+msgstr "تمت عملية التنصيب بنجاح! تهانينا!"
 
 #, python-format
 msgid ""
@@ -1294,21 +1355,24 @@ msgid ""
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
+"تظهر لك هذه الصفحة لأن <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> في ملف settings خاصتك كما أنك لم تقم بإعداد الروابط URLs."
 
 msgid "Django Documentation"
-msgstr ""
+msgstr "وثائق تعليمات جانغو"
 
-msgid "Topics, references, &amp; how-to's"
-msgstr ""
+msgid "Topics, references, &amp; how-to’s"
+msgstr "المواضيع و المراجع و التعليمات"
 
 msgid "Tutorial: A Polling App"
-msgstr ""
+msgstr "برنامج تعليمي: تطبيق تصويت"
 
 msgid "Get started with Django"
-msgstr ""
+msgstr "إبدأ مع جانغو"
 
 msgid "Django Community"
-msgstr ""
+msgstr "مجتمع جانغو"
 
 msgid "Connect, get help, or contribute"
-msgstr ""
+msgstr "اتصل بنا أو احصل على مساعدة أو ساهم"

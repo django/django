@@ -1,12 +1,12 @@
 from unittest import mock
 
 from django.apps.registry import apps as global_apps
-from django.db import connection
+from django.db import DatabaseError, connection, migrations, models
 from django.db.migrations.exceptions import InvalidMigrationPlan
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
-from django.db.utils import DatabaseError
+from django.db.migrations.state import ProjectState
 from django.test import (
     SimpleTestCase, modify_settings, override_settings, skipUnlessDBFeature,
 )
@@ -517,13 +517,13 @@ class ExecutorTests(MigrationTestBase):
         state = executor.migrate([
             ('mutate_state_a', '0001_initial'),
         ])
-        self.assertIn('added', dict(state.models['mutate_state_b', 'b'].fields))
+        self.assertIn('added', state.models['mutate_state_b', 'b'].fields)
         executor.loader.build_graph()
         # Migrate backward.
         state = executor.migrate([
             ('mutate_state_a', None),
         ])
-        self.assertIn('added', dict(state.models['mutate_state_b', 'b'].fields))
+        self.assertIn('added', state.models['mutate_state_b', 'b'].fields)
         executor.migrate([
             ('mutate_state_b', None),
         ])
@@ -656,18 +656,60 @@ class ExecutorTests(MigrationTestBase):
     # When the feature is False, the operation and the record won't be
     # performed in a transaction and the test will systematically pass.
     @skipUnlessDBFeature('can_rollback_ddl')
-    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations'})
     def test_migrations_applied_and_recorded_atomically(self):
         """Migrations are applied and recorded atomically."""
+        class Migration(migrations.Migration):
+            operations = [
+                migrations.CreateModel('model', [
+                    ('id', models.AutoField(primary_key=True)),
+                ]),
+            ]
+
         executor = MigrationExecutor(connection)
         with mock.patch('django.db.migrations.executor.MigrationExecutor.record_migration') as record_migration:
             record_migration.side_effect = RuntimeError('Recording migration failed.')
             with self.assertRaisesMessage(RuntimeError, 'Recording migration failed.'):
+                executor.apply_migration(
+                    ProjectState(),
+                    Migration('0001_initial', 'record_migration'),
+                )
                 executor.migrate([('migrations', '0001_initial')])
         # The migration isn't recorded as applied since it failed.
         migration_recorder = MigrationRecorder(connection)
-        self.assertFalse(migration_recorder.migration_qs.filter(app='migrations', name='0001_initial').exists())
-        self.assertTableNotExists('migrations_author')
+        self.assertIs(
+            migration_recorder.migration_qs.filter(
+                app='record_migration', name='0001_initial',
+            ).exists(),
+            False,
+        )
+        self.assertTableNotExists('record_migration_model')
+
+    def test_migrations_not_applied_on_deferred_sql_failure(self):
+        """Migrations are not recorded if deferred SQL application fails."""
+        class DeferredSQL:
+            def __str__(self):
+                raise DatabaseError('Failed to apply deferred SQL')
+
+        class Migration(migrations.Migration):
+            atomic = False
+
+            def apply(self, project_state, schema_editor, collect_sql=False):
+                schema_editor.deferred_sql.append(DeferredSQL())
+
+        executor = MigrationExecutor(connection)
+        with self.assertRaisesMessage(DatabaseError, 'Failed to apply deferred SQL'):
+            executor.apply_migration(
+                ProjectState(),
+                Migration('0001_initial', 'deferred_sql'),
+            )
+        # The migration isn't recorded as applied since it failed.
+        migration_recorder = MigrationRecorder(connection)
+        self.assertIs(
+            migration_recorder.migration_qs.filter(
+                app='deferred_sql', name='0001_initial',
+            ).exists(),
+            False,
+        )
 
 
 class FakeLoader:
@@ -711,7 +753,11 @@ class ExecutorUnitTests(SimpleTestCase):
         graph.add_dependency(None, a2, a1)
 
         executor = MigrationExecutor(None)
-        executor.loader = FakeLoader(graph, {a1, b1, a2})
+        executor.loader = FakeLoader(graph, {
+            a1: a1_impl,
+            b1: b1_impl,
+            a2: a2_impl,
+        })
 
         plan = executor.migration_plan({a1})
 
@@ -754,7 +800,14 @@ class ExecutorUnitTests(SimpleTestCase):
         graph.add_dependency(None, b2, a2)
 
         executor = MigrationExecutor(None)
-        executor.loader = FakeLoader(graph, {a1, b1, a2, b2, a3, a4})
+        executor.loader = FakeLoader(graph, {
+            a1: a1_impl,
+            b1: b1_impl,
+            a2: a2_impl,
+            b2: b2_impl,
+            a3: a3_impl,
+            a4: a4_impl,
+        })
 
         plan = executor.migration_plan({a1})
 
@@ -791,7 +844,10 @@ class ExecutorUnitTests(SimpleTestCase):
         graph.add_dependency(None, c1, a1)
 
         executor = MigrationExecutor(None)
-        executor.loader = FakeLoader(graph, {a1, b1})
+        executor.loader = FakeLoader(graph, {
+            a1: a1_impl,
+            b1: b1_impl,
+        })
 
         plan = executor.migration_plan({a1})
 

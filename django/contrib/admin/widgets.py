@@ -7,11 +7,12 @@ import json
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db.models.deletion import CASCADE
+from django.core.validators import URLValidator
+from django.db.models import CASCADE
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import smart_urlquote
-from django.utils.safestring import mark_safe
+from django.utils.http import urlencode
 from django.utils.text import Truncator
 from django.utils.translation import get_language, gettext as _
 
@@ -23,17 +24,12 @@ class FilteredSelectMultiple(forms.SelectMultiple):
     Note that the resulting JavaScript assumes that the jsi18n
     catalog has been loaded in the page
     """
-    @property
-    def media(self):
-        extra = '' if settings.DEBUG else '.min'
+    class Media:
         js = [
-            'vendor/jquery/jquery%s.js' % extra,
-            'jquery.init.js',
-            'core.js',
-            'SelectBox.js',
-            'SelectFilter2.js',
+            'admin/js/core.js',
+            'admin/js/SelectBox.js',
+            'admin/js/SelectFilter2.js',
         ]
-        return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, verbose_name, is_stacked, attrs=None, choices=()):
         self.verbose_name = verbose_name
@@ -149,8 +145,8 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
             params = self.url_parameters()
             if params:
-                related_url += '?' + '&amp;'.join('%s=%s' % (k, v) for k, v in params.items())
-            context['related_url'] = mark_safe(related_url)
+                related_url += '?' + urlencode(params)
+            context['related_url'] = related_url
             context['link_title'] = _('Lookup')
             # The JavaScript code looks for this class.
             context['widget']['attrs'].setdefault('class', 'vForeignKeyRawIdAdminField')
@@ -330,14 +326,21 @@ class AdminEmailInputWidget(forms.EmailInput):
 class AdminURLFieldWidget(forms.URLInput):
     template_name = 'admin/widgets/url.html'
 
-    def __init__(self, attrs=None):
+    def __init__(self, attrs=None, validator_class=URLValidator):
         super().__init__(attrs={'class': 'vURLField', **(attrs or {})})
+        self.validator = validator_class()
 
     def get_context(self, name, value, attrs):
+        try:
+            self.validator(value if value else '')
+            url_valid = True
+        except ValidationError:
+            url_valid = False
         context = super().get_context(name, value, attrs)
         context['current_label'] = _('Currently:')
         context['change_label'] = _('Change:')
         context['widget']['href'] = smart_urlquote(context['widget']['value']) if value else ''
+        context['url_valid'] = url_valid
         return context
 
 
@@ -377,18 +380,17 @@ class AutocompleteMixin:
     Renders the necessary data attributes for select2 and adds the static form
     media.
     """
-    url_name = '%s:%s_%s_autocomplete'
+    url_name = '%s:autocomplete'
 
-    def __init__(self, rel, admin_site, attrs=None, choices=(), using=None):
-        self.rel = rel
+    def __init__(self, field, admin_site, attrs=None, choices=(), using=None):
+        self.field = field
         self.admin_site = admin_site
         self.db = using
         self.choices = choices
         self.attrs = {} if attrs is None else attrs.copy()
 
     def get_url(self):
-        model = self.rel.model
-        return reverse(self.url_name % (self.admin_site.name, model._meta.app_label, model._meta.model_name))
+        return reverse(self.url_name % self.admin_site.name)
 
     def build_attrs(self, base_attrs, extra_attrs=None):
         """
@@ -402,8 +404,12 @@ class AutocompleteMixin:
         attrs.setdefault('class', '')
         attrs.update({
             'data-ajax--cache': 'true',
+            'data-ajax--delay': 250,
             'data-ajax--type': 'GET',
             'data-ajax--url': self.get_url(),
+            'data-app-label': self.field.model._meta.app_label,
+            'data-model-name': self.field.model._meta.model_name,
+            'data-field-name': self.field.name,
             'data-theme': 'admin-autocomplete',
             'data-allow-clear': json.dumps(not self.is_required),
             'data-placeholder': '',  # Allows clearing of the input.
@@ -422,9 +428,10 @@ class AutocompleteMixin:
         }
         if not self.is_required and not self.allow_multiple_selected:
             default[1].append(self.create_option(name, '', '', False, 0))
+        to_field_name = getattr(self.field.remote_field, 'field_name', self.field.model._meta.pk.name)
         choices = (
-            (obj.pk, self.choices.field.label_from_instance(obj))
-            for obj in self.choices.queryset.using(self.db).filter(pk__in=selected_choices)
+            (getattr(obj, to_field_name), self.choices.field.label_from_instance(obj))
+            for obj in self.choices.queryset.using(self.db).filter(**{'%s__in' % to_field_name: selected_choices})
         )
         for option_value, option_label in choices:
             selected = (

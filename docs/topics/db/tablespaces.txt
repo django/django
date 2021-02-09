@@ -69,7 +69,7 @@ stored in the model tablespace ``tables`` by default. The index for the
 Database support
 ================
 
-PostgreSQL and Oracle support tablespaces. SQLite and MySQL don't.
+PostgreSQL and Oracle support tablespaces. SQLite, MariaDB and MySQL don't.
 
 When you use a backend that lacks support for tablespaces, Django ignores all
 tablespace-related options.

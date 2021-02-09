@@ -9,59 +9,23 @@
 
 {% block breadcrumbs %}{% endblock %}
 
+{% block nav-sidebar %}{% endblock %}
+
 {% block content %}
 <div id="content-main">
-
-{% if app_list %}
-    {% for app in app_list %}
-        <div class="app-{{ app.app_label }} module">
-        <table>
-        <caption>
-            <a href="{{ app.app_url }}" class="section" title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">{{ app.name }}</a>
-        </caption>
-        {% for model in app.models %}
-            <tr class="model-{{ model.object_name|lower }}">
-            {% if model.admin_url %}
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-            {% else %}
-                <th scope="row">{{ model.name }}</th>
-            {% endif %}
-
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-
-            {% if model.admin_url %}
-                {% if model.view_only %}
-                <td><a href="{{ model.admin_url }}" class="viewlink">{% trans 'View' %}</a></td>
-                {% else %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-                {% endif %}
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endfor %}
-        </table>
-        </div>
-    {% endfor %}
-{% else %}
-    <p>{% trans "You don't have permission to view or edit anything." %}</p>
-{% endif %}
+  {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
 </div>
 {% endblock %}
 
 {% block sidebar %}
 <div id="content-related">
     <div class="module" id="recent-actions-module">
-        <h2>{% trans 'Recent actions' %}</h2>
-        <h3>{% trans 'My actions' %}</h3>
+        <h2>{% translate 'Recent actions' %}</h2>
+        <h3>{% translate 'My actions' %}</h3>
             {% load log %}
             {% get_admin_log 10 as admin_log for_user user %}
             {% if not admin_log %}
-            <p>{% trans 'None available' %}</p>
+            <p>{% translate 'None available' %}</p>
             {% else %}
             <ul class="actionlist">
             {% for entry in admin_log %}
@@ -73,9 +37,9 @@
                 {% endif %}
                 <br>
                 {% if entry.content_type %}
-                    <span class="mini quiet">{% filter capfirst %}{{ entry.content_type }}{% endfilter %}</span>
+                    <span class="mini quiet">{% filter capfirst %}{{ entry.content_type.name }}{% endfilter %}</span>
                 {% else %}
-                    <span class="mini quiet">{% trans 'Unknown content' %}</span>
+                    <span class="mini quiet">{% translate 'Unknown content' %}</span>
                 {% endif %}
             </li>
             {% endfor %}

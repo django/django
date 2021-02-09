@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Thordur Sigurdsson <thordur@ja.is>, 2016-2018
+# Thordur Sigurdsson <thordur@ja.is>, 2016-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-07-19 02:52+0000\n"
-"Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
 "MIME-Version: 1.0\n"
@@ -31,24 +31,14 @@ msgid "Map of strings to strings/nulls"
 msgstr "Möppun strengja í strengi/null"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
+msgid "The value of “%(key)s” is not a string or null."
 msgstr "Gildið á \"%(key)s\" er ekki strengur eða null."
-
-msgid "A JSON object"
-msgstr "JSON hlutur"
-
-msgid "Value must be valid JSON."
-msgstr "Gildi verður að vera gilt JSON."
 
 msgid "Could not load JSON data."
 msgstr "Gat ekki hlaðið inn JSON gögnum."
 
 msgid "Input must be a JSON dictionary."
 msgstr "Inntak verður að vera JSON hlutur (dictionary)."
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "Gildi '%(value)s' verður að vera gilt JSON."
 
 msgid "Enter two valid values."
 msgstr "Sláðu inn tvö gild gildi."

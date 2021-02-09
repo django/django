@@ -23,6 +23,7 @@ class DateParseTests(unittest.TestCase):
         self.assertEqual(parse_time('09:15:00'), time(9, 15))
         self.assertEqual(parse_time('10:10'), time(10, 10))
         self.assertEqual(parse_time('10:20:30.400'), time(10, 20, 30, 400000))
+        self.assertEqual(parse_time('10:20:30,400'), time(10, 20, 30, 400000))
         self.assertEqual(parse_time('4:8:16'), time(4, 8, 16))
         # Invalid inputs
         self.assertIsNone(parse_time('091500'))
@@ -38,6 +39,7 @@ class DateParseTests(unittest.TestCase):
             ('2012-04-23T10:20:30.400+02:30', datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(150))),
             ('2012-04-23T10:20:30.400+02', datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(120))),
             ('2012-04-23T10:20:30.400-02', datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(-120))),
+            ('2012-04-23T10:20:30,400-02', datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(-120))),
         )
         for source, expected in valid_inputs:
             with self.subTest(source=source):
@@ -68,6 +70,7 @@ class DurationParseTests(unittest.TestCase):
     def test_parse_postgresql_format(self):
         test_values = (
             ('1 day', timedelta(1)),
+            ('-1 day', timedelta(-1)),
             ('1 day 0:00:01', timedelta(days=1, seconds=1)),
             ('1 day -0:00:01', timedelta(days=1, seconds=-1)),
             ('-1 day -0:00:01', timedelta(days=-1, seconds=-1)),
@@ -104,6 +107,7 @@ class DurationParseTests(unittest.TestCase):
             ('15:30.0001', timedelta(minutes=15, seconds=30, microseconds=100)),
             ('15:30.00001', timedelta(minutes=15, seconds=30, microseconds=10)),
             ('15:30.000001', timedelta(minutes=15, seconds=30, microseconds=1)),
+            ('15:30,000001', timedelta(minutes=15, seconds=30, microseconds=1)),
         )
         for source, expected in test_values:
             with self.subTest(source=source):
@@ -113,9 +117,13 @@ class DurationParseTests(unittest.TestCase):
         test_values = (
             ('-4 15:30', timedelta(days=-4, minutes=15, seconds=30)),
             ('-172800', timedelta(days=-2)),
-            ('-15:30', timedelta(minutes=-15, seconds=30)),
-            ('-1:15:30', timedelta(hours=-1, minutes=15, seconds=30)),
+            ('-15:30', timedelta(minutes=-15, seconds=-30)),
+            ('-1:15:30', timedelta(hours=-1, minutes=-15, seconds=-30)),
             ('-30.1', timedelta(seconds=-30, milliseconds=-100)),
+            ('-30,1', timedelta(seconds=-30, milliseconds=-100)),
+            ('-00:01:01', timedelta(minutes=-1, seconds=-1)),
+            ('-01:01', timedelta(seconds=-61)),
+            ('-01:-01', None),
         )
         for source, expected in test_values:
             with self.subTest(source=source):
@@ -127,11 +135,22 @@ class DurationParseTests(unittest.TestCase):
             ('P4M', None),
             ('P4W', None),
             ('P4D', timedelta(days=4)),
+            ('-P1D', timedelta(days=-1)),
             ('P0.5D', timedelta(hours=12)),
+            ('P0,5D', timedelta(hours=12)),
+            ('-P0.5D', timedelta(hours=-12)),
+            ('-P0,5D', timedelta(hours=-12)),
             ('PT5H', timedelta(hours=5)),
+            ('-PT5H', timedelta(hours=-5)),
             ('PT5M', timedelta(minutes=5)),
+            ('-PT5M', timedelta(minutes=-5)),
             ('PT5S', timedelta(seconds=5)),
+            ('-PT5S', timedelta(seconds=-5)),
             ('PT0.000005S', timedelta(microseconds=5)),
+            ('PT0,000005S', timedelta(microseconds=5)),
+            ('-PT0.000005S', timedelta(microseconds=-5)),
+            ('-PT0,000005S', timedelta(microseconds=-5)),
+            ('-P4DT1H', timedelta(days=-4, hours=-1)),
         )
         for source, expected in test_values:
             with self.subTest(source=source):

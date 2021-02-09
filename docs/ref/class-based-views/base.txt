@@ -79,14 +79,9 @@ MRO is an acronym for Method Resolution Order.
 
     .. method:: setup(request, *args, **kwargs)
 
-        .. versionadded:: 2.2
+        Performs key view initialization prior to :meth:`dispatch`.
 
-        Initializes view instance attributes: ``self.request``, ``self.args``,
-        and ``self.kwargs`` prior to :meth:`dispatch`.
-
-        Overriding this method allows mixins to setup instance attributes for
-        reuse in child classes. When overriding this method, you must call
-        ``super()``.
+        If overriding this method, you must call ``super()``.
 
     .. method:: dispatch(request, *args, **kwargs)
 
@@ -264,6 +259,10 @@ MRO is an acronym for Method Resolution Order.
     .. method:: get_redirect_url(*args, **kwargs)
 
         Constructs the target URL for redirection.
+
+        The ``args`` and ``kwargs`` arguments are positional and/or keyword
+        arguments :ref:`captured from the URL pattern
+        <how-django-processes-a-request>`, respectively.
 
         The default implementation uses :attr:`url` as a starting
         string and performs expansion of ``%`` named parameters in that string

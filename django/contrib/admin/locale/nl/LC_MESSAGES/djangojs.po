@@ -7,15 +7,17 @@
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012
-# Sander Steffann <inactive+steffann@transifex.com>, 2015
+# Meteor0id, 2019-2020
+# 8de006b1b0894aab6aef71979dcd8bd6_5c6b207 <ff2658a8d8dbebbd9cc240b8c133a515_234097>, 2015
+# Tonnes <tonnes.mb@gmail.com>, 2019-2020
 # wunki <petar@wunki.org>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Evelijn Saaltink <evelijnsaaltink@gmail.com>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-13 11:10+0000\n"
+"Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -32,19 +34,19 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
-"Dit is de lijst met beschikbare %s. U kunt kiezen uit een aantal door ze te "
-"selecteren in het vak hieronder en vervolgens op de \"Kiezen\" pijl tussen "
-"de twee lijsten te klikken."
+"Dit is de lijst met beschikbare %s. U kunt er een aantal kiezen door ze in "
+"het vak hieronder te selecteren en daarna op de pijl 'Kiezen' tussen de twee "
+"vakken te klikken."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr "Type in dit vak om te filteren in de lijst met beschikbare %s."
+msgstr "Typ in dit vak om de lijst met beschikbare %s te filteren."
 
 msgid "Filter"
 msgstr "Filter"
 
 msgid "Choose all"
-msgstr "Kies alle"
+msgstr "Alle kiezen"
 
 #, javascript-format
 msgid "Click to choose all %s at once."
@@ -65,12 +67,12 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
-"Dit is de lijst van de gekozen %s. Je kunt ze verwijderen door ze te "
-"selecteren in het vak hieronder en vervolgens op de \"Verwijderen\" pijl "
-"tussen de twee lijsten te klikken."
+"Dit is de lijst met gekozen %s. U kunt er een aantal verwijderen door ze in "
+"het vak hieronder te selecteren en daarna op de pijl 'Verwijderen' tussen de "
+"twee vakken te klikken."
 
 msgid "Remove all"
-msgstr "Verwijder alles"
+msgstr "Alle verwijderen"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
@@ -85,47 +87,29 @@ msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
-"U heeft niet opgeslagen wijzigingen op enkele indviduele velden. Als u nu "
-"een actie uitvoert zullen uw wijzigingen verloren gaan."
+"U hebt niet-opgeslagen wijzigingen op afzonderlijke bewerkbare velden. Als u "
+"een actie uitvoert, gaan uw wijzigingen verloren."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"U heeft een actie geselecteerd, maar heeft de wijzigingen op de individuele "
-"velden nog niet opgeslagen. Klik alstublieft op OK om op te slaan. U zult "
-"vervolgens de actie opnieuw moeten uitvoeren."
+"U hebt een actie geselecteerd, maar uw wijzigingen in afzonderlijke velden "
+"nog niet opgeslagen. Klik op OK om deze op te slaan. U dient de actie "
+"opnieuw uit te voeren."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"U heeft een actie geselecteerd en heeft geen wijzigingen gemaakt op de "
-"individuele velden. U zoekt waarschijnlijk naar de Gaan knop in plaats van "
-"de Opslaan knop."
-
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Let op: U ligt %s uur voor ten opzichte van de server-tijd."
-msgstr[1] "Let op: U ligt %s uren voor ten opzichte van de server-tijd."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Let op: U ligt %s uur achter ten opzichte van de server-tijd."
-msgstr[1] "Let op: U ligt %s uren achter ten opzichte van de server-tijd."
+"U hebt een actie geselecteerd, en geen wijzigingen in afzonderlijke velden "
+"aangebracht. Waarschijnlijk zoekt u de knop Gaan in plaats van de knop "
+"Opslaan."
 
 msgid "Now"
 msgstr "Nu"
-
-msgid "Choose a Time"
-msgstr "Kies een tijdstip"
-
-msgid "Choose a time"
-msgstr "Kies een tijd"
 
 msgid "Midnight"
 msgstr "Middernacht"
@@ -138,6 +122,24 @@ msgstr "12 uur 's middags"
 
 msgid "6 p.m."
 msgstr "6 uur 's avonds"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Let op: u ligt %s uur voor ten opzichte van de servertijd."
+msgstr[1] "Let op: u ligt %s uur voor ten opzichte van de servertijd."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Let op: u ligt %s uur achter ten opzichte van de servertijd."
+msgstr[1] "Let op: u ligt %s uur achter ten opzichte van de servertijd."
+
+msgid "Choose a Time"
+msgstr "Kies een tijdstip"
+
+msgid "Choose a time"
+msgstr "Kies een tijd"
 
 msgid "Cancel"
 msgstr "Annuleren"
@@ -192,7 +194,7 @@ msgstr "december"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr "S"
+msgstr "Z"
 
 msgctxt "one letter Monday"
 msgid "M"
@@ -200,7 +202,7 @@ msgstr "M"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr "T"
+msgstr "D"
 
 msgctxt "one letter Wednesday"
 msgid "W"
@@ -208,15 +210,15 @@ msgstr "W"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr "T"
+msgstr "D"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr "F"
+msgstr "V"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr "S"
+msgstr "Z"
 
 msgid "Show"
 msgstr "Tonen"

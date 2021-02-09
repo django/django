@@ -20,7 +20,7 @@ def cache_page(timeout, *, cache=None, key_prefix=None):
     into account on caching -- just like the middleware does.
     """
     return decorator_from_middleware_with_args(CacheMiddleware)(
-        cache_timeout=timeout, cache_alias=cache, key_prefix=key_prefix
+        page_timeout=timeout, cache_alias=cache, key_prefix=key_prefix,
     )
 
 

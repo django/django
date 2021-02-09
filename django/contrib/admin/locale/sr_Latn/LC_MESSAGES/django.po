@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Igor Jerosimić, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-06-27 12:37+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
-"language/sr%40latin/)\n"
+"language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -35,7 +36,7 @@ msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Briši označene objekte klase %(verbose_name_plural)s"
 
 msgid "Administration"
-msgstr ""
+msgstr "Administracija"
 
 msgid "All"
 msgstr "Svi"
@@ -65,16 +66,18 @@ msgid "This year"
 msgstr "Ova godina"
 
 msgid "No date"
-msgstr ""
+msgstr "Nema datuma"
 
 msgid "Has date"
-msgstr ""
+msgstr "Ima datum"
 
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
+"Molim vas unesite ispravno %(username)s i lozinku. Obratite pažnju da mala i "
+"velika slova predstavljaju različite karaktere."
 
 msgid "Action:"
 msgstr "Radnja:"
@@ -86,20 +89,29 @@ msgstr "Dodaj još jedan objekat klase %(verbose_name)s."
 msgid "Remove"
 msgstr "Obriši"
 
+msgid "Addition"
+msgstr "Dodavanja"
+
+msgid "Change"
+msgstr "Izmeni"
+
+msgid "Deletion"
+msgstr "Brisanja"
+
 msgid "action time"
 msgstr "vreme radnje"
 
 msgid "user"
-msgstr ""
+msgstr "korisnik"
 
 msgid "content type"
-msgstr ""
+msgstr "tip sadržaja"
 
 msgid "object id"
 msgstr "id objekta"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "opis objekta"
 
@@ -132,25 +144,25 @@ msgstr "Objekat unosa loga"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr ""
+msgstr "Dodat objekat {name} \"{object}\"."
 
 msgid "Added."
-msgstr ""
+msgstr "Dodato."
 
 msgid "and"
 msgstr "i"
 
 #, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgstr "Izmenjena polja {fields} za {name} \"{object}\"."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "Izmenjena polja {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
-msgstr ""
+msgstr "Obrisan objekat {name} \"{object}\"."
 
 msgid "No fields changed."
 msgstr "Bez izmena u poljima."
@@ -163,8 +175,10 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -174,12 +188,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -217,6 +232,10 @@ msgstr "Dodaj objekat klase %s"
 #, python-format
 msgid "Change %s"
 msgstr "Izmeni objekat klase %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Pregled %s"
 
 msgid "Database error"
 msgstr "Greška u bazi podataka"
@@ -324,7 +343,7 @@ msgid "Change password"
 msgstr "Promena lozinke"
 
 msgid "Please correct the error below."
-msgstr "Ispravite navedene greške."
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr ""
@@ -337,7 +356,7 @@ msgid "Welcome,"
 msgstr "Dobrodošli,"
 
 msgid "View site"
-msgstr ""
+msgstr "Pogledaj sajt"
 
 msgid "Documentation"
 msgstr "Dokumentacija"
@@ -435,8 +454,8 @@ msgstr ""
 "Da li ste sigurni da želite da izbrišete izabrane %(objects_name)s? Svi "
 "sledeći objekti i objekti sa njima povezani će biti izbrisani:"
 
-msgid "Change"
-msgstr "Izmeni"
+msgid "View"
+msgstr "Pregled"
 
 msgid "Delete?"
 msgstr "Brisanje?"
@@ -455,8 +474,8 @@ msgstr ""
 msgid "Add"
 msgstr "Dodaj"
 
-msgid "You don't have permission to edit anything."
-msgstr "Nemate dozvole da unosite bilo kakve izmene."
+msgid "You don't have permission to view or edit anything."
+msgstr "Nemate dozvolu da pogledate ili izmenite bilo šta."
 
 msgid "Recent actions"
 msgstr ""
@@ -509,19 +528,7 @@ msgstr "Prikaži sve"
 msgid "Save"
 msgstr "Sačuvaj"
 
-msgid "Popup closing..."
-msgstr ""
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Delete selected %(model)s"
+msgid "Popup closing…"
 msgstr ""
 
 msgid "Search"
@@ -546,6 +553,24 @@ msgstr "Sačuvaj i dodaj sledeći"
 
 msgid "Save and continue editing"
 msgstr "Sačuvaj i nastavi sa izmenama"
+
+msgid "Save and view"
+msgstr "Snimi i pogledaj"
+
+msgid "Close"
+msgstr ""
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Hvala što ste danas proveli vreme na ovom sajtu."
@@ -648,6 +673,10 @@ msgstr "Odaberi objekat klase %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Odaberi objekat klase %s za izmenu"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Odaberi %sza pregled"
 
 msgid "Date:"
 msgstr "Datum:"

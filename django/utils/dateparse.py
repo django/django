@@ -6,39 +6,40 @@
 # - The date/datetime/time constructors produce friendlier error messages.
 
 import datetime
-import re
 
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.timezone import get_fixed_timezone, utc
 
-date_re = re.compile(
+date_re = _lazy_re_compile(
     r'(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})$'
 )
 
-time_re = re.compile(
+time_re = _lazy_re_compile(
     r'(?P<hour>\d{1,2}):(?P<minute>\d{1,2})'
-    r'(?::(?P<second>\d{1,2})(?:\.(?P<microsecond>\d{1,6})\d{0,6})?)?'
+    r'(?::(?P<second>\d{1,2})(?:[\.,](?P<microsecond>\d{1,6})\d{0,6})?)?'
 )
 
-datetime_re = re.compile(
+datetime_re = _lazy_re_compile(
     r'(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})'
     r'[T ](?P<hour>\d{1,2}):(?P<minute>\d{1,2})'
-    r'(?::(?P<second>\d{1,2})(?:\.(?P<microsecond>\d{1,6})\d{0,6})?)?'
+    r'(?::(?P<second>\d{1,2})(?:[\.,](?P<microsecond>\d{1,6})\d{0,6})?)?'
     r'(?P<tzinfo>Z|[+-]\d{2}(?::?\d{2})?)?$'
 )
 
-standard_duration_re = re.compile(
+standard_duration_re = _lazy_re_compile(
     r'^'
     r'(?:(?P<days>-?\d+) (days?, )?)?'
-    r'((?:(?P<hours>-?\d+):)(?=\d+:\d+))?'
-    r'(?:(?P<minutes>-?\d+):)?'
-    r'(?P<seconds>-?\d+)'
-    r'(?:\.(?P<microseconds>\d{1,6})\d{0,6})?'
+    r'(?P<sign>-?)'
+    r'((?:(?P<hours>\d+):)(?=\d+:\d+))?'
+    r'(?:(?P<minutes>\d+):)?'
+    r'(?P<seconds>\d+)'
+    r'(?:[\.,](?P<microseconds>\d{1,6})\d{0,6})?'
     r'$'
 )
 
 # Support the sections of ISO 8601 date representation that are accepted by
 # timedelta
-iso8601_duration_re = re.compile(
+iso8601_duration_re = _lazy_re_compile(
     r'^(?P<sign>[-+]?)'
     r'P'
     r'(?:(?P<days>\d+(.\d+)?)D)?'
@@ -53,7 +54,7 @@ iso8601_duration_re = re.compile(
 # Support PostgreSQL's day-time interval format, e.g. "3 days 04:05:06". The
 # year-month and mixed intervals cannot be converted to a timedelta and thus
 # aren't accepted.
-postgres_interval_re = re.compile(
+postgres_interval_re = _lazy_re_compile(
     r'^'
     r'(?:(?P<days>-?\d+) (days? ?))?'
     r'(?:(?P<sign>[-+])?'
@@ -136,11 +137,13 @@ def parse_duration(value):
     )
     if match:
         kw = match.groupdict()
-        days = datetime.timedelta(float(kw.pop('days', 0) or 0))
         sign = -1 if kw.pop('sign', '+') == '-' else 1
         if kw.get('microseconds'):
             kw['microseconds'] = kw['microseconds'].ljust(6, '0')
         if kw.get('seconds') and kw.get('microseconds') and kw['seconds'].startswith('-'):
             kw['microseconds'] = '-' + kw['microseconds']
-        kw = {k: float(v) for k, v in kw.items() if v is not None}
+        kw = {k: float(v.replace(',', '.')) for k, v in kw.items() if v is not None}
+        days = datetime.timedelta(kw.pop('days', .0) or .0)
+        if match.re == iso8601_duration_re:
+            days *= sign
         return days + sign * datetime.timedelta(**kw)

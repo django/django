@@ -15,10 +15,11 @@ from django.utils.safestring import mark_safe
 from .base import (
     BLOCK_TAG_END, BLOCK_TAG_START, COMMENT_TAG_END, COMMENT_TAG_START,
     FILTER_SEPARATOR, SINGLE_BRACE_END, SINGLE_BRACE_START,
-    VARIABLE_ATTRIBUTE_SEPARATOR, VARIABLE_TAG_END, VARIABLE_TAG_START,
-    Context, Node, NodeList, TemplateSyntaxError, VariableDoesNotExist,
-    kwarg_re, render_value_in_context, token_kwargs,
+    VARIABLE_ATTRIBUTE_SEPARATOR, VARIABLE_TAG_END, VARIABLE_TAG_START, Node,
+    NodeList, TemplateSyntaxError, VariableDoesNotExist, kwarg_re,
+    render_value_in_context, token_kwargs,
 )
+from .context import Context
 from .defaultfilters import date
 from .library import Library
 from .smartif import IfParser, Literal
@@ -259,25 +260,6 @@ class IfChangedNode(Node):
             return context.render_context
 
 
-class IfEqualNode(Node):
-    child_nodelists = ('nodelist_true', 'nodelist_false')
-
-    def __init__(self, var1, var2, nodelist_true, nodelist_false, negate):
-        self.var1, self.var2 = var1, var2
-        self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
-        self.negate = negate
-
-    def __repr__(self):
-        return '<%s>' % self.__class__.__name__
-
-    def render(self, context):
-        val1 = self.var1.resolve(context, ignore_failures=True)
-        val2 = self.var2.resolve(context, ignore_failures=True)
-        if (self.negate and val1 != val2) or (not self.negate and val1 == val2):
-            return self.nodelist_true.render(context)
-        return self.nodelist_false.render(context)
-
-
 class IfNode(Node):
 
     def __init__(self, conditions_nodelists):
@@ -425,7 +407,7 @@ class URLNode(Node):
         self.asvar = asvar
 
     def render(self, context):
-        from django.urls import reverse, NoReverseMatch
+        from django.urls import NoReverseMatch, reverse
         args = [arg.resolve(context) for arg in self.args]
         kwargs = {k: v.resolve(context) for k, v in self.kwargs.items()}
         view_name = self.view_name.resolve(context)
@@ -698,7 +680,7 @@ def firstof(parser, token):
             {{ var3 }}
         {% endif %}
 
-    but obviously much cleaner!
+    but much cleaner!
 
     You can also use a literal string as a fallback value in case all
     passed variables are False::
@@ -818,52 +800,6 @@ def do_for(parser, token):
     return ForNode(loopvars, sequence, is_reversed, nodelist_loop, nodelist_empty)
 
 
-def do_ifequal(parser, token, negate):
-    bits = list(token.split_contents())
-    if len(bits) != 3:
-        raise TemplateSyntaxError("%r takes two arguments" % bits[0])
-    end_tag = 'end' + bits[0]
-    nodelist_true = parser.parse(('else', end_tag))
-    token = parser.next_token()
-    if token.contents == 'else':
-        nodelist_false = parser.parse((end_tag,))
-        parser.delete_first_token()
-    else:
-        nodelist_false = NodeList()
-    val1 = parser.compile_filter(bits[1])
-    val2 = parser.compile_filter(bits[2])
-    return IfEqualNode(val1, val2, nodelist_true, nodelist_false, negate)
-
-
-@register.tag
-def ifequal(parser, token):
-    """
-    Output the contents of the block if the two arguments equal each other.
-
-    Examples::
-
-        {% ifequal user.id comment.user_id %}
-            ...
-        {% endifequal %}
-
-        {% ifnotequal user.id comment.user_id %}
-            ...
-        {% else %}
-            ...
-        {% endifnotequal %}
-    """
-    return do_ifequal(parser, token, False)
-
-
-@register.tag
-def ifnotequal(parser, token):
-    """
-    Output the contents of the block if the two arguments are not equal.
-    See ifequal.
-    """
-    return do_ifequal(parser, token, True)
-
-
 class TemplateLiteral(Literal):
     def __init__(self, value, text):
         self.value = value
@@ -969,7 +905,7 @@ def do_if(parser, token):
 
     # {% endif %}
     if token.contents != 'endif':
-        raise TemplateSyntaxError('Malformed template tag at line {0}: "{1}"'.format(token.lineno, token.contents))
+        raise TemplateSyntaxError('Malformed template tag at line {}: "{}"'.format(token.lineno, token.contents))
 
     return IfNode(conditions_nodelists)
 
@@ -1417,10 +1353,10 @@ def widthratio(parser, token):
     (because 175/200 = .875; .875 * 100 = 87.5 which is rounded up to 88).
 
     In some cases you might want to capture the result of widthratio in a
-    variable. It can be useful for instance in a blocktrans like this::
+    variable. It can be useful for instance in a blocktranslate like this::
 
         {% widthratio this_value max_value max_width as width %}
-        {% blocktrans %}The width is: {{ width }}{% endblocktrans %}
+        {% blocktranslate %}The width is: {{ width }}{% endblocktranslate %}
     """
     bits = token.split_contents()
     if len(bits) == 4:

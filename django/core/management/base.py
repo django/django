@@ -4,6 +4,7 @@ be executed through ``django-admin`` or ``manage.py``).
 """
 import os
 import sys
+import warnings
 from argparse import ArgumentParser, HelpFormatter
 from io import TextIOBase
 
@@ -12,6 +13,9 @@ from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.db import DEFAULT_DB_ALIAS, connections
+from django.utils.deprecation import RemovedInDjango41Warning
+
+ALL_CHECKS = '__all__'
 
 
 class CommandError(Exception):
@@ -26,7 +30,9 @@ class CommandError(Exception):
     error) is the preferred way to indicate that something has gone
     wrong in the execution of a command.
     """
-    pass
+    def __init__(self, *args, returncode=1, **kwargs):
+        self.returncode = returncode
+        super().__init__(*args, **kwargs)
 
 
 class SystemCheckError(CommandError):
@@ -95,7 +101,7 @@ class DjangoHelpFormatter(HelpFormatter):
     """
     show_last = {
         '--version', '--verbosity', '--traceback', '--settings', '--pythonpath',
-        '--no-color', '--force-color',
+        '--no-color', '--force-color', '--skip-checks',
     }
 
     def _reordered_actions(self, actions):
@@ -126,7 +132,7 @@ class OutputWrapper(TextIOBase):
         else:
             self._style_func = lambda x: x
 
-    def __init__(self, out, style_func=None, ending='\n'):
+    def __init__(self, out, ending='\n'):
         self._out = out
         self.style_func = None
         self.ending = ending
@@ -134,10 +140,14 @@ class OutputWrapper(TextIOBase):
     def __getattr__(self, name):
         return getattr(self._out, name)
 
+    def flush(self):
+        if hasattr(self._out, 'flush'):
+            self._out.flush()
+
     def isatty(self):
         return hasattr(self._out, 'isatty') and self._out.isatty()
 
-    def write(self, msg, style_func=None, ending=None):
+    def write(self, msg='', style_func=None, ending=None):
         ending = self.ending if ending is None else ending
         if ending and not msg.endswith(ending):
             msg += ending
@@ -201,8 +211,11 @@ class BaseCommand:
         migrations on disk don't match the migrations in the database.
 
     ``requires_system_checks``
-        A boolean; if ``True``, entire Django project will be checked for errors
-        prior to executing the command. Default value is ``True``.
+        A list or tuple of tags, e.g. [Tags.staticfiles, Tags.models]. System
+        checks registered in the chosen tags will be checked for errors prior
+        to executing the command. The value '__all__' can be used to specify
+        that all system checks should be performed. Default value is '__all__'.
+
         To validate an individual application's models
         rather than all applications' models, call
         ``self.check(app_configs)`` from ``handle()``, where ``app_configs``
@@ -220,10 +233,10 @@ class BaseCommand:
     _called_from_command_line = False
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
     requires_migrations_checks = False
-    requires_system_checks = True
+    requires_system_checks = '__all__'
     # Arguments, common to all commands, which aren't defined by the argument
     # parser.
-    base_stealth_options = ('skip_checks', 'stderr', 'stdout')
+    base_stealth_options = ('stderr', 'stdout')
     # Command-specific options not defined by the argument parser.
     stealth_options = ()
 
@@ -237,6 +250,19 @@ class BaseCommand:
         else:
             self.style = color_style(force_color)
             self.stderr.style_func = self.style.ERROR
+        if self.requires_system_checks in [False, True]:
+            warnings.warn(
+                "Using a boolean value for requires_system_checks is "
+                "deprecated. Use '__all__' instead of True, and [] (an empty "
+                "list) instead of False.",
+                RemovedInDjango41Warning,
+            )
+            self.requires_system_checks = ALL_CHECKS if self.requires_system_checks else []
+        if (
+            not isinstance(self.requires_system_checks, (list, tuple)) and
+            self.requires_system_checks != ALL_CHECKS
+        ):
+            raise TypeError('requires_system_checks must be a list or tuple.')
 
     def get_version(self):
         """
@@ -286,6 +312,11 @@ class BaseCommand:
             '--force-color', action='store_true',
             help='Force colorization of the command output.',
         )
+        if self.requires_system_checks:
+            parser.add_argument(
+                '--skip-checks', action='store_true',
+                help='Skip system checks.',
+            )
         self.add_arguments(parser)
         return parser
 
@@ -321,8 +352,8 @@ class BaseCommand:
         handle_default_options(options)
         try:
             self.execute(*args, **cmd_options)
-        except Exception as e:
-            if options.traceback or not isinstance(e, CommandError):
+        except CommandError as e:
+            if options.traceback:
                 raise
 
             # SystemCheckError takes care of its own formatting.
@@ -330,7 +361,7 @@ class BaseCommand:
                 self.stderr.write(str(e), lambda x: x)
             else:
                 self.stderr.write('%s: %s' % (e.__class__.__name__, e))
-            sys.exit(1)
+            sys.exit(e.returncode)
         finally:
             try:
                 connections.close_all()
@@ -355,10 +386,13 @@ class BaseCommand:
         if options.get('stdout'):
             self.stdout = OutputWrapper(options['stdout'])
         if options.get('stderr'):
-            self.stderr = OutputWrapper(options['stderr'], self.stderr.style_func)
+            self.stderr = OutputWrapper(options['stderr'])
 
-        if self.requires_system_checks and not options.get('skip_checks'):
-            self.check()
+        if self.requires_system_checks and not options['skip_checks']:
+            if self.requires_system_checks == ALL_CHECKS:
+                self.check()
+            else:
+                self.check(tags=self.requires_system_checks)
         if self.requires_migrations_checks:
             self.check_migrations()
         output = self.handle(*args, **options)
@@ -373,21 +407,20 @@ class BaseCommand:
             self.stdout.write(output)
         return output
 
-    def _run_checks(self, **kwargs):
-        return checks.run_checks(**kwargs)
-
     def check(self, app_configs=None, tags=None, display_num_errors=False,
-              include_deployment_checks=False, fail_level=checks.ERROR):
+              include_deployment_checks=False, fail_level=checks.ERROR,
+              databases=None):
         """
         Use the system check framework to validate entire Django project.
         Raise CommandError for any serious message (error or critical errors).
         If there are only light messages (like warnings), print them to stderr
         and don't raise an exception.
         """
-        all_issues = self._run_checks(
+        all_issues = checks.run_checks(
             app_configs=app_configs,
             tags=tags,
             include_deployment_checks=include_deployment_checks,
+            databases=databases,
         )
 
         header, body, footer = "", "", ""
@@ -460,15 +493,15 @@ class BaseCommand:
             apps_waiting_migration = sorted({migration.app_label for migration, backwards in plan})
             self.stdout.write(
                 self.style.NOTICE(
-                    "\nYou have %(unpplied_migration_count)s unapplied migration(s). "
+                    "\nYou have %(unapplied_migration_count)s unapplied migration(s). "
                     "Your project may not work properly until you apply the "
                     "migrations for app(s): %(apps_waiting_migration)s." % {
-                        "unpplied_migration_count": len(plan),
+                        "unapplied_migration_count": len(plan),
                         "apps_waiting_migration": ", ".join(apps_waiting_migration),
                     }
                 )
             )
-            self.stdout.write(self.style.NOTICE("Run 'python manage.py migrate' to apply them.\n"))
+            self.stdout.write(self.style.NOTICE("Run 'python manage.py migrate' to apply them."))
 
     def handle(self, *args, **options):
         """

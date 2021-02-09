@@ -1,3 +1,4 @@
+from django.core.checks.security.base import SECRET_KEY_INSECURE_PREFIX
 from django.core.management.templates import TemplateCommand
 
 from ..utils import get_random_secret_key
@@ -15,6 +16,6 @@ class Command(TemplateCommand):
         target = options.pop('directory')
 
         # Create a random SECRET_KEY to put it in the main settings.
-        options['secret_key'] = get_random_secret_key()
+        options['secret_key'] = SECRET_KEY_INSECURE_PREFIX + get_random_secret_key()
 
         super().handle('project', project_name, target, **options)

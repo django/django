@@ -538,9 +538,28 @@ class WeekArchiveViewTests(TestDataMixin, TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['week'], datetime.date(2008, 9, 29))
 
+    def test_week_iso_format(self):
+        res = self.client.get('/dates/books/2008/week/40/iso_format/')
+        self.assertEqual(res.status_code, 200)
+        self.assertTemplateUsed(res, 'generic_views/book_archive_week.html')
+        self.assertEqual(
+            list(res.context['book_list']),
+            [Book.objects.get(pubdate=datetime.date(2008, 10, 1))],
+        )
+        self.assertEqual(res.context['week'], datetime.date(2008, 9, 29))
+
     def test_unknown_week_format(self):
-        with self.assertRaisesMessage(ValueError, "Unknown week format '%T'. Choices are: %U, %W"):
+        msg = "Unknown week format '%T'. Choices are: %U, %V, %W"
+        with self.assertRaisesMessage(ValueError, msg):
             self.client.get('/dates/books/2008/week/39/unknown_week_format/')
+
+    def test_incompatible_iso_week_format_view(self):
+        msg = (
+            "ISO week directive '%V' is incompatible with the year directive "
+            "'%Y'. Use the ISO year '%G' instead."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            self.client.get('/dates/books/2008/week/40/invalid_iso_week_year_format/')
 
     def test_datetime_week_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))

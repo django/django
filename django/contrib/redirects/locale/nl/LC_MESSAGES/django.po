@@ -4,13 +4,14 @@
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Sander Steffann <inactive+steffann@transifex.com>, 2015
+# Tonnes <tonnes.mb@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Ilja Maas <iljamaas@dreamsolution.nl>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-17 08:57+0000\n"
+"Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,27 +23,27 @@ msgid "Redirects"
 msgstr "Omleidingen"
 
 msgid "site"
-msgstr "site"
+msgstr "website"
 
 msgid "redirect from"
 msgstr "omgeleid via"
 
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
 msgstr ""
-"Dit moet een absoluut pad zijn, zonder de domeinnaam. Bijvoorbeeld: '/events/"
-"search/'."
+"Dit moet een absoluut pad zijn, zonder de domeinnaam. Voorbeeld: ‘/events/"
+"search/’."
 
 msgid "redirect to"
 msgstr "omleiden naar"
 
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+"“http://”."
 msgstr ""
-"Dit kan een absoluut pad (zoals hierboven) zijn of een volledige URL "
-"beginnend met 'http://'."
+"Dit kan een absoluut pad zijn (zoals hierboven) of een volledige URL "
+"beginnend met ‘http://’."
 
 msgid "redirect"
 msgstr "omleiding"

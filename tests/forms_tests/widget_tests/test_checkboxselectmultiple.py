@@ -196,7 +196,7 @@ class CheckboxSelectMultipleTest(WidgetTest):
         self.assertIs(widget.value_omitted_from_data({'field': 'value'}, {}, 'field'), False)
 
     def test_label(self):
-        """"
+        """
         CheckboxSelectMultiple doesn't contain 'for="field_0"' in the <label>
         because clicking that would toggle the first checkbox.
         """

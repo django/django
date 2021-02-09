@@ -1,8 +1,8 @@
 import logging
 
-from django.contrib.gis.db.models.fields import GeometryField
+from django.contrib.gis.db.models import GeometryField
+from django.db import OperationalError
 from django.db.backends.mysql.schema import DatabaseSchemaEditor
-from django.db.utils import OperationalError
 
 logger = logging.getLogger('django.contrib.gis')
 
@@ -16,11 +16,11 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
         self.geometry_sql = []
 
     def skip_default(self, field):
-        return (
-            super().skip_default(field) or
-            # Geometry fields are stored as BLOB/TEXT and can't have defaults.
-            isinstance(field, GeometryField)
-        )
+        # Geometry fields are stored as BLOB/TEXT, for which MySQL < 8.0.13 and
+        # MariaDB < 10.2.1 don't support defaults.
+        if isinstance(field, GeometryField) and not self._supports_limited_data_type_defaults:
+            return True
+        return super().skip_default(field)
 
     def column_sql(self, model, field, include_default=False):
         column_sql = super().column_sql(model, field, include_default)

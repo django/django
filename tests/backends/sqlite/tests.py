@@ -1,12 +1,16 @@
+import os
 import re
+import tempfile
 import threading
 import unittest
+from pathlib import Path
+from sqlite3 import dbapi2
+from unittest import mock
 
-from django.db import connection, transaction
-from django.db.models import Avg, StdDev, Sum, Variance
-from django.db.models.aggregates import Aggregate
-from django.db.models.fields import CharField
-from django.db.utils import NotSupportedError
+from django.core.exceptions import ImproperlyConfigured
+from django.db import NotSupportedError, connection, transaction
+from django.db.models import Aggregate, Avg, CharField, StdDev, Sum, Variance
+from django.db.utils import ConnectionHandler
 from django.test import (
     TestCase, TransactionTestCase, override_settings, skipIfDBFeature,
 )
@@ -14,15 +18,26 @@ from django.test.utils import isolate_apps
 
 from ..models import Author, Item, Object, Square
 
+try:
+    from django.db.backends.sqlite3.base import check_sqlite_version
+except ImproperlyConfigured:
+    # Ignore "SQLite is too old" when running tests on another database.
+    pass
+
 
 @unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests')
 class Tests(TestCase):
     longMessage = True
 
+    def test_check_sqlite_version(self):
+        msg = 'SQLite 3.9.0 or later is required (found 3.8.11.1).'
+        with mock.patch.object(dbapi2, 'sqlite_version_info', (3, 8, 11, 1)), \
+                mock.patch.object(dbapi2, 'sqlite_version', '3.8.11.1'), \
+                self.assertRaisesMessage(ImproperlyConfigured, msg):
+            check_sqlite_version()
+
     def test_aggregation(self):
-        """
-        Raise NotImplementedError when aggregating on date/time fields (#19360).
-        """
+        """Raise NotSupportedError when aggregating on date/time fields."""
         for aggregate in (Sum, Avg, Variance, StdDev):
             with self.assertRaises(NotSupportedError):
                 Item.objects.all().aggregate(aggregate('time'))
@@ -45,6 +60,15 @@ class Tests(TestCase):
         )
         with self.assertRaisesMessage(NotSupportedError, msg):
             connection.ops.check_expression_support(aggregate)
+
+    def test_distinct_aggregation_multiple_args_no_distinct(self):
+        # Aggregate functions accept multiple arguments when DISTINCT isn't
+        # used, e.g. GROUP_CONCAT().
+        class DistinctAggregate(Aggregate):
+            allow_distinct = True
+
+        aggregate = DistinctAggregate('first', 'second', distinct=False)
+        connection.ops.check_expression_support(aggregate)
 
     def test_memory_db_test_name(self):
         """A named in-memory db should be allowed where supported."""
@@ -73,6 +97,19 @@ class Tests(TestCase):
                 value = bool(value) if value in {0, 1} else value
                 self.assertIs(value, expected)
 
+    def test_pathlib_name(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            settings_dict = {
+                'default': {
+                    'ENGINE': 'django.db.backends.sqlite3',
+                    'NAME': Path(tmp) / 'test.db',
+                },
+            }
+            connections = ConnectionHandler(settings_dict)
+            connections['default'].ensure_connection()
+            connections['default'].close()
+            self.assertTrue(os.path.isfile(os.path.join(tmp, 'test.db')))
+
 
 @unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests')
 @isolate_apps('backends')
@@ -92,7 +129,7 @@ class SchemaTests(TransactionTestCase):
         self.assertIsNotNone(match)
         self.assertEqual(
             'integer NOT NULL PRIMARY KEY AUTOINCREMENT',
-            match.group(1),
+            match[1],
             'Wrong SQL used to create an auto-increment column on SQLite'
         )
 
@@ -167,7 +204,8 @@ class LastExecutedQueryTest(TestCase):
     def test_no_interpolation(self):
         # This shouldn't raise an exception (#17158)
         query = "SELECT strftime('%Y', 'now');"
-        connection.cursor().execute(query)
+        with connection.cursor() as cursor:
+            cursor.execute(query)
         self.assertEqual(connection.queries[-1]['sql'], query)
 
     def test_parameter_quoting(self):
@@ -175,7 +213,8 @@ class LastExecutedQueryTest(TestCase):
         # worth testing that parameters are quoted (#14091).
         query = "SELECT %s"
         params = ["\"'\\"]
-        connection.cursor().execute(query, params)
+        with connection.cursor() as cursor:
+            cursor.execute(query, params)
         # Note that the single quote is repeated
         substituted = "SELECT '\"''\\'"
         self.assertEqual(connection.queries[-1]['sql'], substituted)

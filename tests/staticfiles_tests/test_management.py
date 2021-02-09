@@ -1,10 +1,10 @@
-import codecs
 import datetime
 import os
 import shutil
 import tempfile
 import unittest
 from io import StringIO
+from pathlib import Path
 from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
@@ -16,6 +16,7 @@ from django.contrib.staticfiles.management.commands import (
 )
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import CommandError, call_command
+from django.core.management.base import SystemCheckError
 from django.test import RequestFactory, override_settings
 from django.test.utils import extend_sys_path
 from django.utils import timezone
@@ -63,7 +64,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
     """
     def _get_file(self, filepath):
         path = call_command('findstatic', filepath, all=False, verbosity=0, stdout=StringIO())
-        with codecs.open(path, "r", "utf-8") as f:
+        with open(path, encoding='utf-8') as f:
             return f.read()
 
     def test_all_files(self):
@@ -71,7 +72,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
         findstatic returns all candidate files if run without --first and -v1.
         """
         result = call_command('findstatic', 'test/file.txt', verbosity=1, stdout=StringIO())
-        lines = [l.strip() for l in result.split('\n')]
+        lines = [line.strip() for line in result.split('\n')]
         self.assertEqual(len(lines), 3)  # three because there is also the "Found <file> here" line
         self.assertIn('project', lines[1])
         self.assertIn('apps', lines[2])
@@ -81,7 +82,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
         findstatic returns all candidate files if run without --first and -v0.
         """
         result = call_command('findstatic', 'test/file.txt', verbosity=0, stdout=StringIO())
-        lines = [l.strip() for l in result.split('\n')]
+        lines = [line.strip() for line in result.split('\n')]
         self.assertEqual(len(lines), 2)
         self.assertIn('project', lines[0])
         self.assertIn('apps', lines[1])
@@ -92,7 +93,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
         Also, test that findstatic returns the searched locations with -v2.
         """
         result = call_command('findstatic', 'test/file.txt', verbosity=2, stdout=StringIO())
-        lines = [l.strip() for l in result.split('\n')]
+        lines = [line.strip() for line in result.split('\n')]
         self.assertIn('project', lines[1])
         self.assertIn('apps', lines[2])
         self.assertIn("Looking in the following locations:", lines[3])
@@ -103,6 +104,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
         # FileSystemFinder searched locations
         self.assertIn(TEST_SETTINGS['STATICFILES_DIRS'][1][1], searched_locations)
         self.assertIn(TEST_SETTINGS['STATICFILES_DIRS'][0], searched_locations)
+        self.assertIn(str(TEST_SETTINGS['STATICFILES_DIRS'][2]), searched_locations)
         # DefaultStorageFinder searched locations
         self.assertIn(
             os.path.join('staticfiles_tests', 'project', 'site_media', 'media'),
@@ -144,6 +146,12 @@ class TestConfiguration(StaticFilesTestCase):
             collectstatic.staticfiles_storage = staticfiles_storage
             storage.staticfiles_storage = staticfiles_storage
 
+    @override_settings(STATICFILES_DIRS=('test'))
+    def test_collectstatis_check(self):
+        msg = 'The STATICFILES_DIRS setting is not a tuple or list.'
+        with self.assertRaisesMessage(SystemCheckError, msg):
+            call_command('collectstatic', skip_checks=False)
+
 
 class TestCollectionHelpSubcommand(AdminScriptTestCase):
     @override_settings(STATIC_ROOT=None)
@@ -174,6 +182,15 @@ class TestCollection(TestDefaults, CollectionTestCase):
         self.assertFileNotFound('test/.hidden')
         self.assertFileNotFound('test/backup~')
         self.assertFileNotFound('test/CVS')
+
+    def test_pathlib(self):
+        self.assertFileContains('pathlib.txt', 'pathlib')
+
+
+class TestCollectionPathLib(TestCollection):
+    def mkdtemp(self):
+        tmp_dir = super().mkdtemp()
+        return Path(tmp_dir)
 
 
 class TestCollectionVerbosity(CollectionTestCase):
@@ -333,6 +350,11 @@ class TestCollectionDryRun(TestNoFilesCreated, CollectionTestCase):
     """
     def run_collectstatic(self):
         super().run_collectstatic(dry_run=True)
+
+
+@override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage')
+class TestCollectionDryRunManifestStaticFilesStorage(TestCollectionDryRun):
+    pass
 
 
 class TestCollectionFilesOverride(CollectionTestCase):

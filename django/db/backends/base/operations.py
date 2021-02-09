@@ -8,7 +8,7 @@ from django.conf import settings
 from django.db import NotSupportedError, transaction
 from django.db.backends import utils
 from django.utils import timezone
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 
 class BaseDatabaseOperations:
@@ -24,8 +24,12 @@ class BaseDatabaseOperations:
         'SmallIntegerField': (-32768, 32767),
         'IntegerField': (-2147483648, 2147483647),
         'BigIntegerField': (-9223372036854775808, 9223372036854775807),
+        'PositiveBigIntegerField': (0, 9223372036854775807),
         'PositiveSmallIntegerField': (0, 32767),
         'PositiveIntegerField': (0, 2147483647),
+        'SmallAutoField': (-32768, 32767),
+        'AutoField': (-2147483648, 2147483647),
+        'BigAutoField': (-9223372036854775808, 9223372036854775807),
     }
     set_operators = {
         'union': 'UNION',
@@ -95,17 +99,14 @@ class BaseDatabaseOperations:
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a date_extract_sql() method')
 
-    def date_interval_sql(self, timedelta):
-        """
-        Implement the date interval functionality for expressions.
-        """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a date_interval_sql() method')
-
-    def date_trunc_sql(self, lookup_type, field_name):
+    def date_trunc_sql(self, lookup_type, field_name, tzname=None):
         """
         Given a lookup_type of 'year', 'month', or 'day', return the SQL that
-        truncates the given date field field_name to a date object with only
-        the given specificity.
+        truncates the given date or datetime field field_name to a date object
+        with only the given specificity.
+
+        If `tzname` is provided, the given value is truncated in a specific
+        timezone.
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a date_trunc_sql() method.')
 
@@ -140,11 +141,14 @@ class BaseDatabaseOperations:
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_trunc_sql() method')
 
-    def time_trunc_sql(self, lookup_type, field_name):
+    def time_trunc_sql(self, lookup_type, field_name, tzname=None):
         """
         Given a lookup_type of 'hour', 'minute' or 'second', return the SQL
-        that truncates the given time field field_name to a time object with
-        only the given specificity.
+        that truncates the given time or datetime field field_name to a time
+        object with only the given specificity.
+
+        If `tzname` is provided, the given value is truncated in a specific
+        timezone.
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a time_trunc_sql() method')
 
@@ -173,13 +177,12 @@ class BaseDatabaseOperations:
         else:
             return ['DISTINCT'], []
 
-    def fetch_returned_insert_id(self, cursor):
+    def fetch_returned_insert_columns(self, cursor, returning_params):
         """
         Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table that has an auto-incrementing ID, return the
-        newly created ID.
+        statement into a table, return the newly created data.
         """
-        return cursor.fetchone()[0]
+        return cursor.fetchone()
 
     def field_cast_sql(self, db_type, internal_type):
         """
@@ -197,11 +200,12 @@ class BaseDatabaseOperations:
         """
         return []
 
-    def for_update_sql(self, nowait=False, skip_locked=False, of=()):
+    def for_update_sql(self, nowait=False, skip_locked=False, of=(), no_key=False):
         """
         Return the FOR UPDATE SQL clause to lock rows for an update operation.
         """
-        return 'FOR UPDATE%s%s%s' % (
+        return 'FOR%s UPDATE%s%s%s' % (
+            ' NO KEY' if no_key else '',
             ' OF %s' % ', '.join(of) if of else '',
             ' NOWAIT' if nowait else '',
             ' SKIP LOCKED' if skip_locked else '',
@@ -218,10 +222,10 @@ class BaseDatabaseOperations:
     def limit_offset_sql(self, low_mark, high_mark):
         """Return LIMIT/OFFSET SQL clause."""
         limit, offset = self._get_limit_offset_params(low_mark, high_mark)
-        return '%s%s' % (
-            (' LIMIT %d' % limit) if limit else '',
-            (' OFFSET %d' % offset) if offset else '',
-        )
+        return ' '.join(sql for sql in (
+            ('LIMIT %d' % limit) if limit else None,
+            ('OFFSET %d' % offset) if offset else None,
+        ) if sql)
 
     def last_executed_query(self, cursor, sql, params):
         """
@@ -235,7 +239,7 @@ class BaseDatabaseOperations:
         """
         # Convert params to contain string values.
         def to_string(s):
-            return force_text(s, strings_only=True, errors='replace')
+            return force_str(s, strings_only=True, errors='replace')
         if isinstance(params, (list, tuple)):
             u_params = tuple(to_string(val) for val in params)
         elif params is None:
@@ -311,12 +315,11 @@ class BaseDatabaseOperations:
         """
         return value
 
-    def return_insert_id(self):
+    def return_insert_columns(self, fields):
         """
-        For backends that support returning the last insert ID as part of an
-        insert query, return the SQL and params to append to the INSERT query.
-        The returned fragment should contain a format string to hold the
-        appropriate column.
+        For backends that support returning columns as part of an insert query,
+        return the SQL and params to append to the INSERT query. The returned
+        fragment should contain a format string to hold the appropriate column.
         """
         pass
 
@@ -336,10 +339,6 @@ class BaseDatabaseOperations:
         not quote the given name if it's already been quoted.
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a quote_name() method')
-
-    def random_function_sql(self):
-        """Return an SQL expression that returns a random value."""
-        return 'RANDOM()'
 
     def regex_lookup(self, lookup_type):
         """
@@ -380,15 +379,17 @@ class BaseDatabaseOperations:
         """
         return ''
 
-    def sql_flush(self, style, tables, sequences, allow_cascade=False):
+    def sql_flush(self, style, tables, *, reset_sequences=False, allow_cascade=False):
         """
         Return a list of SQL statements required to remove all data from
         the given database tables (without actually removing the tables
-        themselves) and the SQL statements required to reset the sequences
-        passed in `sequences`.
+        themselves).
 
         The `style` argument is a Style object as returned by either
         color_style() or no_style() in django.core.management.color.
+
+        If `reset_sequences` is True, the list includes SQL statements required
+        to reset the sequences.
 
         The `allow_cascade` argument determines whether truncation may cascade
         to tables with foreign keys pointing the tables being truncated.
@@ -396,9 +397,12 @@ class BaseDatabaseOperations:
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations must provide an sql_flush() method')
 
-    def execute_sql_flush(self, using, sql_list):
+    def execute_sql_flush(self, sql_list):
         """Execute a list of SQL statements to flush the database."""
-        with transaction.atomic(using=using, savepoint=self.connection.features.can_rollback_ddl):
+        with transaction.atomic(
+            using=self.connection.alias,
+            savepoint=self.connection.features.can_rollback_ddl,
+        ):
             with self.connection.cursor() as cursor:
                 for sql in sql_list:
                     cursor.execute(sql)
@@ -578,6 +582,13 @@ class BaseDatabaseOperations:
         """
         pass
 
+    def conditional_expression_supported_in_where_clause(self, expression):
+        """
+        Return True, if the conditional expression is supported in the WHERE
+        clause.
+        """
+        return True
+
     def combine_expression(self, connector, sub_expressions):
         """
         Combine a list of subexpressions into a single expression, using
@@ -617,7 +628,7 @@ class BaseDatabaseOperations:
         if self.connection.features.supports_temporal_subtraction:
             lhs_sql, lhs_params = lhs
             rhs_sql, rhs_params = rhs
-            return "(%s - %s)" % (lhs_sql, rhs_sql), lhs_params + rhs_params
+            return '(%s - %s)' % (lhs_sql, rhs_sql), (*lhs_params, *rhs_params)
         raise NotSupportedError("This backend does not support %s subtraction." % internal_type)
 
     def window_frame_start(self, start):
@@ -649,7 +660,16 @@ class BaseDatabaseOperations:
         return self.window_frame_start(start), self.window_frame_end(end)
 
     def window_frame_range_start_end(self, start=None, end=None):
-        return self.window_frame_rows_start_end(start, end)
+        start_, end_ = self.window_frame_rows_start_end(start, end)
+        if (
+            self.connection.features.only_supports_unbounded_with_preceding_and_following and
+            ((start and start < 0) or (end and end > 0))
+        ):
+            raise NotSupportedError(
+                '%s only supports UNBOUNDED together with PRECEDING and '
+                'FOLLOWING.' % self.connection.display_name
+            )
+        return start_, end_
 
     def explain_query_prefix(self, format=None, **options):
         if not self.connection.features.supports_explaining_query_execution:

@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.http import HttpRequest
 from django.template import (
     Context, Engine, RequestContext, Template, Variable, VariableDoesNotExist,
@@ -18,6 +20,7 @@ class ContextTests(SimpleTestCase):
         self.assertEqual(c.pop(), {"a": 2})
         self.assertEqual(c["a"], 1)
         self.assertEqual(c.get("foo", 42), 42)
+        self.assertEqual(c, mock.ANY)
 
     def test_push_context_manager(self):
         c = Context({"a": 1})
@@ -231,12 +234,10 @@ class RequestContextTests(SimpleTestCase):
         self.assertEqual(engine.from_string('{% include "child" only %}').render(ctx), 'none')
 
     def test_stack_size(self):
-        """
-        #7116 -- Optimize RequetsContext construction
-        """
+        """Optimized RequestContext construction (#7116)."""
         request = self.request_factory.get('/')
         ctx = RequestContext(request, {})
-        # The stack should now contain 3 items:
+        # The stack contains 4 items:
         # [builtins, supplied context, context processor, empty dict]
         self.assertEqual(len(ctx.dicts), 4)
 

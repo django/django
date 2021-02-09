@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2015-2017
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2015-2017,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-21 22:44+0000\n"
-"Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
 "MIME-Version: 1.0\n"
@@ -21,8 +21,8 @@ msgid "PostgreSQL extensions"
 msgstr "PostgreSQL kromaĵoj"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "Ero %(nth)s en la tabelo ne validiĝis:"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Elemento %(nth)s en la tabelo ne estas valida:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Ingitaj tabeloj devas havi la saman grandon."
@@ -31,24 +31,14 @@ msgid "Map of strings to strings/nulls"
 msgstr "Kongruo de signoĉenoj al signoĉenoj/nulvaloroj"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "La valoro de \"%(key)s\" ne estas signoĉeno nek nulvaloro."
-
-msgid "A JSON object"
-msgstr "JSON objekto"
-
-msgid "Value must be valid JSON."
-msgstr "Valoro devas esti valida JSON."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr ""
 
 msgid "Could not load JSON data."
 msgstr "Malsukcesis ŝarĝi la JSON datumojn."
 
 msgid "Input must be a JSON dictionary."
 msgstr "La enigo devas esti JSON vortaro."
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' devas esti valida JSON."
 
 msgid "Enter two valid values."
 msgstr "Enigu du validajn valorojn."

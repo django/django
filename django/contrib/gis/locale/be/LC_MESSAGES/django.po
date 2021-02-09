@@ -2,14 +2,14 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2014-2015
-# znotdead <zhirafchik@gmail.com>, 2016
+# znotdead <zhirafchik@gmail.com>, 2016,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-10-16 18:23+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -27,9 +27,9 @@ msgid "The base GIS field."
 msgstr "Галоўнае поле ГІС."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
-"Галоўнае геаметрычнае поле - адлюстроўвае геамэтрычныя віды паводле "
+"Галоўнае геаметрычнае поле — адлюстроўвае геамэтрычныя віды паводле "
 "спэцыфікацыі «OpenGIS»."
 
 msgid "Point"
@@ -86,5 +86,5 @@ msgid "No feeds are registered."
 msgstr "Няма запісаных стужак."
 
 #, python-format
-msgid "Slug %r isn't registered."
-msgstr "Біркі «%r» няма ў запісаных."
+msgid "Slug %r isn’t registered."
+msgstr "Біркі %r няма ў запісаных."

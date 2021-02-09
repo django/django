@@ -1,5 +1,7 @@
+import asyncio
 import collections
 import logging
+import os
 import re
 import sys
 import time
@@ -33,9 +35,11 @@ except ImportError:
 
 __all__ = (
     'Approximate', 'ContextList', 'isolate_lru_cache', 'get_runner',
-    'modify_settings', 'override_settings',
+    'CaptureQueriesContext',
+    'ignore_warnings', 'isolate_apps', 'modify_settings', 'override_settings',
+    'override_system_checks', 'tag',
     'requires_tz_support',
-    'setup_test_environment', 'teardown_test_environment',
+    'setup_databases', 'setup_test_environment', 'teardown_test_environment',
 )
 
 TZ_SUPPORT = hasattr(time, 'tzset')
@@ -152,8 +156,12 @@ def teardown_test_environment():
     del mail.outbox
 
 
-def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, aliases=None, **kwargs):
+def setup_databases(verbosity, interactive, *, time_keeper=None, keepdb=False, debug_sql=False, parallel=0,
+                    aliases=None):
     """Create the test databases."""
+    if time_keeper is None:
+        time_keeper = NullTimeKeeper()
+
     test_databases, mirrored_aliases = get_unique_databases_and_mirrors(aliases)
 
     old_names = []
@@ -167,19 +175,21 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
             # Actually create the database for the first connection
             if first_alias is None:
                 first_alias = alias
-                connection.creation.create_test_db(
-                    verbosity=verbosity,
-                    autoclobber=not interactive,
-                    keepdb=keepdb,
-                    serialize=connection.settings_dict.get('TEST', {}).get('SERIALIZE', True),
-                )
+                with time_keeper.timed("  Creating '%s'" % alias):
+                    connection.creation.create_test_db(
+                        verbosity=verbosity,
+                        autoclobber=not interactive,
+                        keepdb=keepdb,
+                        serialize=connection.settings_dict['TEST'].get('SERIALIZE', True),
+                    )
                 if parallel > 1:
                     for index in range(parallel):
-                        connection.creation.clone_test_db(
-                            suffix=str(index + 1),
-                            verbosity=verbosity,
-                            keepdb=keepdb,
-                        )
+                        with time_keeper.timed("  Cloning '%s'" % alias):
+                            connection.creation.clone_test_db(
+                                suffix=str(index + 1),
+                                verbosity=verbosity,
+                                keepdb=keepdb,
+                            )
             # Configure all other connections as mirrors of the first one
             else:
                 connections[alias].creation.set_as_test_mirror(connections[first_alias].settings_dict)
@@ -280,8 +290,7 @@ def get_unique_databases_and_mirrors(aliases=None):
                 if alias != DEFAULT_DB_ALIAS and connection.creation.test_db_signature() != default_sig:
                     dependencies[alias] = test_settings.get('DEPENDENCIES', [DEFAULT_DB_ALIAS])
 
-    test_databases = dependency_ordered(test_databases.items(), dependencies)
-    test_databases = collections.OrderedDict(test_databases)
+    test_databases = dict(dependency_ordered(test_databases.items(), dependencies))
     return test_databases, mirrored_aliases
 
 
@@ -308,8 +317,7 @@ def get_runner(settings, test_runner_class=None):
     else:
         test_module_name = '.'
     test_module = __import__(test_module_name, {}, {}, test_path[-1])
-    test_runner = getattr(test_module, test_path[-1])
-    return test_runner
+    return getattr(test_module, test_path[-1])
 
 
 class TestContextDecorator:
@@ -343,34 +351,35 @@ class TestContextDecorator:
     def decorate_class(self, cls):
         if issubclass(cls, TestCase):
             decorated_setUp = cls.setUp
-            decorated_tearDown = cls.tearDown
 
             def setUp(inner_self):
                 context = self.enable()
+                inner_self.addCleanup(self.disable)
                 if self.attr_name:
                     setattr(inner_self, self.attr_name, context)
-                try:
-                    decorated_setUp(inner_self)
-                except Exception:
-                    self.disable()
-                    raise
-
-            def tearDown(inner_self):
-                decorated_tearDown(inner_self)
-                self.disable()
+                decorated_setUp(inner_self)
 
             cls.setUp = setUp
-            cls.tearDown = tearDown
             return cls
         raise TypeError('Can only decorate subclasses of unittest.TestCase')
 
     def decorate_callable(self, func):
-        @wraps(func)
-        def inner(*args, **kwargs):
-            with self as context:
-                if self.kwarg_name:
-                    kwargs[self.kwarg_name] = context
-                return func(*args, **kwargs)
+        if asyncio.iscoroutinefunction(func):
+            # If the inner function is an async function, we must execute async
+            # as well so that the `with` statement executes at the right time.
+            @wraps(func)
+            async def inner(*args, **kwargs):
+                with self as context:
+                    if self.kwarg_name:
+                        kwargs[self.kwarg_name] = context
+                    return await func(*args, **kwargs)
+        else:
+            @wraps(func)
+            def inner(*args, **kwargs):
+                with self as context:
+                    if self.kwarg_name:
+                        kwargs[self.kwarg_name] = context
+                    return func(*args, **kwargs)
         return inner
 
     def __call__(self, decorated):
@@ -540,7 +549,8 @@ def compare_xml(want, got):
     """
     Try to do a 'xml-comparison' of want and got. Plain string comparison
     doesn't always work because, for example, attribute ordering should not be
-    important. Ignore comment nodes and leading and trailing whitespace.
+    important. Ignore comment nodes, processing instructions, document type
+    node, and leading and trailing whitespaces.
 
     Based on https://github.com/lxml/lxml/blob/master/src/lxml/doctestcompare.py
     """
@@ -578,7 +588,11 @@ def compare_xml(want, got):
 
     def first_node(document):
         for node in document.childNodes:
-            if node.nodeType != Node.COMMENT_NODE:
+            if node.nodeType not in (
+                Node.COMMENT_NODE,
+                Node.DOCUMENT_TYPE_NODE,
+                Node.PROCESSING_INSTRUCTION_NODE,
+            ):
                 return node
 
     want = want.strip().replace('\\n', '\n')
@@ -596,10 +610,6 @@ def compare_xml(want, got):
     got_root = first_node(parseString(got))
 
     return check_element(want_root, got_root)
-
-
-def str_prefix(s):
-    return s % {'_': ''}
 
 
 class CaptureQueriesContext:
@@ -657,29 +667,6 @@ class ignore_warnings(TestContextDecorator):
 
     def disable(self):
         self.catch_warnings.__exit__(*sys.exc_info())
-
-
-@contextmanager
-def patch_logger(logger_name, log_level, log_kwargs=False):
-    """
-    Context manager that takes a named logger and the logging level
-    and provides a simple mock-like list of messages received.
-
-    Use unittest.assertLogs() if you only need Python 3 support. This
-    private API will be removed after Python 2 EOL in 2020 (#27753).
-    """
-    calls = []
-
-    def replacement(msg, *args, **kwargs):
-        call = msg % args
-        calls.append((call, kwargs) if log_kwargs else call)
-    logger = logging.getLogger(logger_name)
-    orig = getattr(logger, log_level)
-    setattr(logger, log_level, replacement)
-    try:
-        yield calls
-    finally:
-        setattr(logger, log_level, orig)
 
 
 # On OSes that don't provide tzset (Windows), we can't set the timezone
@@ -786,7 +773,7 @@ def require_jinja2(test_func):
     Django template engine for a test or skip it if Jinja2 isn't available.
     """
     test_func = skipIf(jinja2 is None, "this test requires jinja2")(test_func)
-    test_func = override_settings(TEMPLATES=[{
+    return override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'APP_DIRS': True,
     }, {
@@ -794,7 +781,6 @@ def require_jinja2(test_func):
         'APP_DIRS': True,
         'OPTIONS': {'keep_trailing_newline': True},
     }])(test_func)
-    return test_func
 
 
 class override_script_prefix(TestContextDecorator):
@@ -854,6 +840,36 @@ class isolate_apps(TestContextDecorator):
 
     def disable(self):
         setattr(Options, 'default_apps', self.old_apps)
+
+
+class TimeKeeper:
+    def __init__(self):
+        self.records = collections.defaultdict(list)
+
+    @contextmanager
+    def timed(self, name):
+        self.records[name]
+        start_time = time.perf_counter()
+        try:
+            yield
+        finally:
+            end_time = time.perf_counter() - start_time
+            self.records[name].append(end_time)
+
+    def print_results(self):
+        for name, end_times in self.records.items():
+            for record_time in end_times:
+                record = '%s took %.3fs' % (name, record_time)
+                sys.stderr.write(record + os.linesep)
+
+
+class NullTimeKeeper:
+    @contextmanager
+    def timed(self, name):
+        yield
+
+    def print_results(self):
+        pass
 
 
 def tag(*tags):

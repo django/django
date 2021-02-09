@@ -1,11 +1,12 @@
 """
 Internationalization support.
 """
-import re
 from contextlib import ContextDecorator
+from decimal import ROUND_UP, Decimal
 
 from django.utils.autoreload import autoreload_started, file_changed
 from django.utils.functional import lazy
+from django.utils.regex_helper import _lazy_re_compile
 
 __all__ = [
     'activate', 'deactivate', 'override', 'deactivate_all',
@@ -13,15 +14,10 @@ __all__ = [
     'get_language_info', 'get_language_bidi',
     'check_for_language', 'to_language', 'to_locale', 'templatize',
     'gettext', 'gettext_lazy', 'gettext_noop',
-    'ugettext', 'ugettext_lazy', 'ugettext_noop',
     'ngettext', 'ngettext_lazy',
-    'ungettext', 'ungettext_lazy',
     'pgettext', 'pgettext_lazy',
     'npgettext', 'npgettext_lazy',
-    'LANGUAGE_SESSION_KEY',
 ]
-
-LANGUAGE_SESSION_KEY = '_language'
 
 
 class TranslatorCommentWarning(SyntaxWarning):
@@ -53,7 +49,9 @@ class Trans:
         from django.conf import settings
         if settings.USE_I18N:
             from django.utils.translation import trans_real as trans
-            from django.utils.translation.reloader import watch_for_translation_changes, translation_file_changed
+            from django.utils.translation.reloader import (
+                translation_file_changed, watch_for_translation_changes,
+            )
             autoreload_started.connect(watch_for_translation_changes, dispatch_uid='translation_file_changed')
             file_changed.connect(translation_file_changed, dispatch_uid='translation_file_changed')
         else:
@@ -72,23 +70,12 @@ def gettext_noop(message):
     return _trans.gettext_noop(message)
 
 
-ugettext_noop = gettext_noop
-
-
 def gettext(message):
     return _trans.gettext(message)
 
 
-# An alias since Django 2.0
-ugettext = gettext
-
-
 def ngettext(singular, plural, number):
     return _trans.ngettext(singular, plural, number)
-
-
-# An alias since Django 2.0
-ungettext = ngettext
 
 
 def pgettext(context, message):
@@ -99,7 +86,7 @@ def npgettext(context, singular, plural, number):
     return _trans.npgettext(context, singular, plural, number)
 
 
-gettext_lazy = ugettext_lazy = lazy(gettext, str)
+gettext_lazy = lazy(gettext, str)
 pgettext_lazy = lazy(pgettext, str)
 
 
@@ -156,10 +143,6 @@ def _lazy_number_unpickle(func, resultclass, number, kwargs):
 
 def ngettext_lazy(singular, plural, number=None):
     return lazy_number(ngettext, str, singular=singular, plural=plural, number=number)
-
-
-# An alias since Django 2.0
-ungettext_lazy = ngettext_lazy
 
 
 def npgettext_lazy(context, singular, plural, number=None):
@@ -275,8 +258,12 @@ def get_language_info(lang_code):
     return info
 
 
-trim_whitespace_re = re.compile(r'\s*\n\s*')
+trim_whitespace_re = _lazy_re_compile(r'\s*\n\s*')
 
 
 def trim_whitespace(s):
     return trim_whitespace_re.sub(' ', s.strip())
+
+
+def round_away_from_one(value):
+    return int(Decimal(value - 1).quantize(Decimal('0'), rounding=ROUND_UP)) + 1

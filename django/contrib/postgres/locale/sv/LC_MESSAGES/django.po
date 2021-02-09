@@ -3,14 +3,15 @@
 # Translators:
 # Gustaf Hansen <gustaf.hansen@gmail.com>, 2015
 # Jonathan Lindén, 2015
-# Thomas Lundqvist <thomas@biljettshop.se>, 2016
+# Petter Strandmark <petter.strandmark@gmail.com>, 2019
+# Thomas Lundqvist, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-21 22:44+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -23,34 +24,24 @@ msgid "PostgreSQL extensions"
 msgstr "PostgreSQL-tillägg"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "Objekt %(nth)s i arrayen validerade inte:"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Element %(nth)s i arrayen gick inte att validera:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Flerdimensionella arrayer måste vara av samma längd"
 
 msgid "Map of strings to strings/nulls"
-msgstr ""
+msgstr "Funktion från sträng till sträng/null"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
+msgid "The value of “%(key)s” is not a string or null."
 msgstr ""
-
-msgid "A JSON object"
-msgstr "Ett JSON-objekt"
-
-msgid "Value must be valid JSON."
-msgstr "Värdet måste vara giltig JSON."
 
 msgid "Could not load JSON data."
 msgstr "Kunde inte ladda JSON-data."
 
 msgid "Input must be a JSON dictionary."
-msgstr ""
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' måste vara giltig JSON."
+msgstr "Input måste vara en JSON-dictionary."
 
 msgid "Enter two valid values."
 msgstr "Fyll i två giltiga värden"

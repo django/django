@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from operator import attrgetter
 
 from django.db import IntegrityError
@@ -7,7 +7,7 @@ from django.test import TestCase
 from .models import (
     CustomMembership, Employee, Event, Friendship, Group, Ingredient,
     Invitation, Membership, Person, PersonSelfRefM2M, Recipe, RecipeIngredient,
-    Relationship,
+    Relationship, SymmetricalFriendship,
 )
 
 
@@ -42,25 +42,51 @@ class M2mThroughTests(TestCase):
         )
 
     def test_filter_on_intermediate_model(self):
-        Membership.objects.create(person=self.jim, group=self.rock)
-        Membership.objects.create(person=self.jane, group=self.rock)
+        m1 = Membership.objects.create(person=self.jim, group=self.rock)
+        m2 = Membership.objects.create(person=self.jane, group=self.rock)
 
         queryset = Membership.objects.filter(group=self.rock)
 
-        expected = [
-            '<Membership: Jim is a member of Rock>',
-            '<Membership: Jane is a member of Rock>',
-        ]
-
-        self.assertQuerysetEqual(
-            queryset,
-            expected
-        )
+        self.assertSequenceEqual(queryset, [m1, m2])
 
     def test_add_on_m2m_with_intermediate_model(self):
         self.rock.members.add(self.bob, through_defaults={'invite_reason': 'He is good.'})
         self.assertSequenceEqual(self.rock.members.all(), [self.bob])
         self.assertEqual(self.rock.membership_set.get().invite_reason, 'He is good.')
+
+    def test_add_on_m2m_with_intermediate_model_callable_through_default(self):
+        def invite_reason_callable():
+            return 'They were good at %s' % datetime.now()
+
+        self.rock.members.add(
+            self.bob, self.jane,
+            through_defaults={'invite_reason': invite_reason_callable},
+        )
+        self.assertSequenceEqual(self.rock.members.all(), [self.bob, self.jane])
+        self.assertEqual(
+            self.rock.membership_set.filter(
+                invite_reason__startswith='They were good at ',
+            ).count(),
+            2,
+        )
+        # invite_reason_callable() is called once.
+        self.assertEqual(
+            self.bob.membership_set.get().invite_reason,
+            self.jane.membership_set.get().invite_reason,
+        )
+
+    def test_set_on_m2m_with_intermediate_model_callable_through_default(self):
+        self.rock.members.set(
+            [self.bob, self.jane],
+            through_defaults={'invite_reason': lambda: 'Why not?'},
+        )
+        self.assertSequenceEqual(self.rock.members.all(), [self.bob, self.jane])
+        self.assertEqual(
+            self.rock.membership_set.filter(
+                invite_reason__startswith='Why not?',
+            ).count(),
+            2,
+        )
 
     def test_add_on_m2m_with_intermediate_model_value_required(self):
         self.rock.nodefaultsnonulls.add(self.jim, through_defaults={'nodefaultnonull': 1})
@@ -74,6 +100,17 @@ class M2mThroughTests(TestCase):
         annie = self.rock.members.create(name='Annie', through_defaults={'invite_reason': 'She was just awesome.'})
         self.assertSequenceEqual(self.rock.members.all(), [annie])
         self.assertEqual(self.rock.membership_set.get().invite_reason, 'She was just awesome.')
+
+    def test_create_on_m2m_with_intermediate_model_callable_through_default(self):
+        annie = self.rock.members.create(
+            name='Annie',
+            through_defaults={'invite_reason': lambda: 'She was just awesome.'},
+        )
+        self.assertSequenceEqual(self.rock.members.all(), [annie])
+        self.assertEqual(
+            self.rock.membership_set.get().invite_reason,
+            'She was just awesome.',
+        )
 
     def test_create_on_m2m_with_intermediate_model_value_required(self):
         self.rock.nodefaultsnonulls.create(name='Test', through_defaults={'nodefaultnonull': 1})
@@ -193,10 +230,12 @@ class M2mThroughTests(TestCase):
         )
 
     def test_order_by_relational_field_through_model(self):
-        CustomMembership.objects.create(person=self.jim, group=self.rock)
-        CustomMembership.objects.create(person=self.bob, group=self.rock)
-        CustomMembership.objects.create(person=self.jane, group=self.roll)
-        CustomMembership.objects.create(person=self.jim, group=self.roll)
+        today = datetime.now()
+        yesterday = today - timedelta(days=1)
+        CustomMembership.objects.create(person=self.jim, group=self.rock, date_joined=yesterday)
+        CustomMembership.objects.create(person=self.bob, group=self.rock, date_joined=today)
+        CustomMembership.objects.create(person=self.jane, group=self.roll, date_joined=yesterday)
+        CustomMembership.objects.create(person=self.jim, group=self.roll, date_joined=today)
         self.assertSequenceEqual(
             self.rock.custom_members.order_by('custom_person_related_name'),
             [self.jim, self.bob]
@@ -325,12 +364,8 @@ class M2mThroughTests(TestCase):
         )
 
     def test_custom_related_name_doesnt_conflict_with_fky_related_name(self):
-        CustomMembership.objects.create(person=self.bob, group=self.rock)
-
-        self.assertQuerysetEqual(
-            self.bob.custom_person_related_name.all(),
-            ['<CustomMembership: Bob is a member of Rock>']
-        )
+        c = CustomMembership.objects.create(person=self.bob, group=self.rock)
+        self.assertSequenceEqual(self.bob.custom_person_related_name.all(), [c])
 
     def test_through_fields(self):
         """
@@ -401,7 +436,7 @@ class M2mThroughReferentialTests(TestCase):
             attrgetter("name")
         )
 
-    def test_self_referential_symmetrical(self):
+    def test_self_referential_non_symmetrical_both(self):
         tony = PersonSelfRefM2M.objects.create(name="Tony")
         chris = PersonSelfRefM2M.objects.create(name="Chris")
         Friendship.objects.create(
@@ -437,6 +472,71 @@ class M2mThroughReferentialTests(TestCase):
             john.subordinates.all(),
             ['peter', 'mary', 'harry'],
             attrgetter('name')
+        )
+
+    def test_self_referential_symmetrical(self):
+        tony = PersonSelfRefM2M.objects.create(name='Tony')
+        chris = PersonSelfRefM2M.objects.create(name='Chris')
+        SymmetricalFriendship.objects.create(
+            first=tony, second=chris, date_friended=date.today(),
+        )
+        self.assertSequenceEqual(tony.sym_friends.all(), [chris])
+        # Manually created symmetrical m2m relation doesn't add mirror entry
+        # automatically.
+        self.assertSequenceEqual(chris.sym_friends.all(), [])
+        SymmetricalFriendship.objects.create(
+            first=chris, second=tony, date_friended=date.today()
+        )
+        self.assertSequenceEqual(chris.sym_friends.all(), [tony])
+
+    def test_add_on_symmetrical_m2m_with_intermediate_model(self):
+        tony = PersonSelfRefM2M.objects.create(name='Tony')
+        chris = PersonSelfRefM2M.objects.create(name='Chris')
+        date_friended = date(2017, 1, 3)
+        tony.sym_friends.add(chris, through_defaults={'date_friended': date_friended})
+        self.assertSequenceEqual(tony.sym_friends.all(), [chris])
+        self.assertSequenceEqual(chris.sym_friends.all(), [tony])
+        friendship = tony.symmetricalfriendship_set.get()
+        self.assertEqual(friendship.date_friended, date_friended)
+
+    def test_set_on_symmetrical_m2m_with_intermediate_model(self):
+        tony = PersonSelfRefM2M.objects.create(name='Tony')
+        chris = PersonSelfRefM2M.objects.create(name='Chris')
+        anne = PersonSelfRefM2M.objects.create(name='Anne')
+        kate = PersonSelfRefM2M.objects.create(name='Kate')
+        date_friended_add = date(2013, 1, 5)
+        date_friended_set = date.today()
+        tony.sym_friends.add(
+            anne, chris,
+            through_defaults={'date_friended': date_friended_add},
+        )
+        tony.sym_friends.set(
+            [anne, kate],
+            through_defaults={'date_friended': date_friended_set},
+        )
+        self.assertSequenceEqual(tony.sym_friends.all(), [anne, kate])
+        self.assertSequenceEqual(anne.sym_friends.all(), [tony])
+        self.assertSequenceEqual(kate.sym_friends.all(), [tony])
+        self.assertEqual(
+            kate.symmetricalfriendship_set.get().date_friended,
+            date_friended_set,
+        )
+        # Date is preserved.
+        self.assertEqual(
+            anne.symmetricalfriendship_set.get().date_friended,
+            date_friended_add,
+        )
+        # Recreate relationship.
+        tony.sym_friends.set(
+            [anne],
+            clear=True,
+            through_defaults={'date_friended': date_friended_set},
+        )
+        self.assertSequenceEqual(tony.sym_friends.all(), [anne])
+        self.assertSequenceEqual(anne.sym_friends.all(), [tony])
+        self.assertEqual(
+            anne.symmetricalfriendship_set.get().date_friended,
+            date_friended_set,
         )
 
 

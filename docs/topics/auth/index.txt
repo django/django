@@ -44,6 +44,7 @@ of these common problems have been implemented in third-party packages:
 * Password strength checking
 * Throttling of login attempts
 * Authentication against third-parties (OAuth, for example)
+* Object-level permissions
 
 Installation
 ============

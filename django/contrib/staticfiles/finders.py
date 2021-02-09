@@ -1,6 +1,5 @@
 import functools
 import os
-from collections import OrderedDict
 
 from django.apps import apps
 from django.conf import settings
@@ -54,7 +53,7 @@ class FileSystemFinder(BaseFinder):
         # List of locations with static files
         self.locations = []
         # Maps dir paths to an appropriate storage instance
-        self.storages = OrderedDict()
+        self.storages = {}
         for root in settings.STATICFILES_DIRS:
             if isinstance(root, (list, tuple)):
                 prefix, root = root
@@ -144,7 +143,7 @@ class AppDirectoriesFinder(BaseFinder):
         # The list of apps that are handled
         self.apps = []
         # Mapping of app names to storage instances
-        self.storages = OrderedDict()
+        self.storages = {}
         app_configs = apps.get_app_configs()
         if app_names:
             app_names = set(app_names)
@@ -188,12 +187,11 @@ class AppDirectoriesFinder(BaseFinder):
         Find a requested static file in an app's static locations.
         """
         storage = self.storages.get(app)
-        if storage:
-            # only try to find a file if the source dir actually exists
-            if storage.exists(path):
-                matched_path = storage.path(path)
-                if matched_path:
-                    return matched_path
+        # Only try to find a file if the source dir actually exists.
+        if storage and storage.exists(path):
+            matched_path = storage.path(path)
+            if matched_path:
+                return matched_path
 
 
 class BaseStorageFinder(BaseFinder):

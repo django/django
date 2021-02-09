@@ -4,7 +4,7 @@ from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.prototypes import raster as capi
 from django.contrib.gis.gdal.raster.base import GDALRasterBase
 from django.contrib.gis.shortcuts import numpy
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from .const import (
     GDAL_COLOR_TYPES, GDAL_INTEGER_TYPES, GDAL_PIXEL_TYPES, GDAL_TO_CTYPES,
@@ -32,7 +32,7 @@ class GDALBand(GDALRasterBase):
         """
         Return the description string of the band.
         """
-        return force_text(capi.get_band_description(self._ptr))
+        return force_str(capi.get_band_description(self._ptr))
 
     @property
     def width(self):

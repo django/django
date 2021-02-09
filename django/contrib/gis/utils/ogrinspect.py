@@ -116,7 +116,7 @@ def ogrinspect(*args, **kwargs):
 
     Note: Call the _ogrinspect() helper to do the heavy lifting.
     """
-    return '\n'.join(s for s in _ogrinspect(*args, **kwargs))
+    return '\n'.join(_ogrinspect(*args, **kwargs))
 
 
 def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=None,

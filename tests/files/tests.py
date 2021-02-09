@@ -5,9 +5,10 @@ import struct
 import tempfile
 import unittest
 from io import BytesIO, StringIO, TextIOWrapper
+from pathlib import Path
 from unittest import mock
 
-from django.core.files import File
+from django.core.files import File, locks
 from django.core.files.base import ContentFile
 from django.core.files.move import file_move_safe
 from django.core.files.temp import NamedTemporaryFile
@@ -15,11 +16,14 @@ from django.core.files.uploadedfile import (
     InMemoryUploadedFile, SimpleUploadedFile, TemporaryUploadedFile,
     UploadedFile,
 )
+from django.test import override_settings
 
 try:
-    from PIL import Image
+    from PIL import Image, features
+    HAS_WEBP = features.check('webp')
 except ImportError:
     Image = None
+    HAS_WEBP = False
 else:
     from django.core.files import images
 
@@ -167,6 +171,22 @@ class FileTests(unittest.TestCase):
             test_file.seek(0)
             self.assertEqual(test_file.read(), (content * 2).encode())
 
+    def test_exclusive_lock(self):
+        file_path = Path(__file__).parent / 'test.png'
+        with open(file_path) as f1, open(file_path) as f2:
+            self.assertIs(locks.lock(f1, locks.LOCK_EX), True)
+            self.assertIs(locks.lock(f2, locks.LOCK_EX | locks.LOCK_NB), False)
+            self.assertIs(locks.lock(f2, locks.LOCK_SH | locks.LOCK_NB), False)
+            self.assertIs(locks.unlock(f1), True)
+
+    def test_shared_lock(self):
+        file_path = Path(__file__).parent / 'test.png'
+        with open(file_path) as f1, open(file_path) as f2:
+            self.assertIs(locks.lock(f1, locks.LOCK_SH), True)
+            self.assertIs(locks.lock(f2, locks.LOCK_SH | locks.LOCK_NB), True)
+            self.assertIs(locks.unlock(f1), True)
+            self.assertIs(locks.unlock(f2), True)
+
 
 class NoNameFileTestCase(unittest.TestCase):
     """
@@ -230,6 +250,12 @@ class TemporaryUploadedFileTests(unittest.TestCase):
         """The temporary file name has the same suffix as the original file."""
         with TemporaryUploadedFile('test.txt', 'text/plain', 1, 'utf8') as temp_file:
             self.assertTrue(temp_file.file.name.endswith('.upload.txt'))
+
+    def test_file_upload_temp_dir_pathlib(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            with override_settings(FILE_UPLOAD_TEMP_DIR=Path(tmp_dir)):
+                with TemporaryUploadedFile('test.txt', 'text/plain', 1, 'utf-8') as temp_file:
+                    self.assertTrue(os.path.exists(temp_file.file.name))
 
 
 class DimensionClosingBug(unittest.TestCase):
@@ -343,6 +369,7 @@ class GetImageDimensionsTests(unittest.TestCase):
                 size = images.get_image_dimensions(fh)
                 self.assertEqual(size, (None, None))
 
+    @unittest.skipUnless(HAS_WEBP, 'WEBP not installed')
     def test_webp(self):
         img_path = os.path.join(os.path.dirname(__file__), 'test.webp')
         with open(img_path, 'rb') as fh:
@@ -355,8 +382,9 @@ class FileMoveSafeTests(unittest.TestCase):
         handle_a, self.file_a = tempfile.mkstemp()
         handle_b, self.file_b = tempfile.mkstemp()
 
-        # file_move_safe should raise an IOError exception if destination file exists and allow_overwrite is False
-        with self.assertRaises(IOError):
+        # file_move_safe() raises OSError if the destination file exists and
+        # allow_overwrite is False.
+        with self.assertRaises(FileExistsError):
             file_move_safe(self.file_a, self.file_b, allow_overwrite=False)
 
         # should allow it and continue on if allow_overwrite is True

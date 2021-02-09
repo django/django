@@ -1,9 +1,9 @@
 from datetime import datetime
 
+from django.core.exceptions import ValidationError
 from django.forms import (
     CharField, Form, MultipleChoiceField, MultiValueField, MultiWidget,
     SelectMultiple, SplitDateTimeField, SplitDateTimeWidget, TextInput,
-    ValidationError,
 )
 from django.test import SimpleTestCase
 

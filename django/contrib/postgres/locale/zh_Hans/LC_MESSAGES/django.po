@@ -4,13 +4,15 @@
 # Lele Long <schemacs@gmail.com>, 2015,2017
 # Liping Wang <lynn.config@gmail.com>, 2016
 # Liping Wang <lynn.config@gmail.com>, 2016
+# wang zhao <672565116@qq.com>, 2018
+# wolf ice <warwolf7677@163.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-21 22:44+0000\n"
-"Last-Translator: Lele Long <schemacs@gmail.com>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -23,8 +25,8 @@ msgid "PostgreSQL extensions"
 msgstr "PostgreSQL 扩展。"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "数组中的第 %(nth)s 项无法校验。"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "数组中的%(nth)s项目没有验证："
 
 msgid "Nested arrays must have the same length."
 msgstr "嵌套数组必须是相同长度。"
@@ -33,24 +35,14 @@ msgid "Map of strings to strings/nulls"
 msgstr "字符串到字符串/空的映射"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "\"%(key)s\" 的值不是字符串或者为空。"
-
-msgid "A JSON object"
-msgstr "一个JSON对象"
-
-msgid "Value must be valid JSON."
-msgstr "值必须是有效的JSON格式"
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "“%(key)s”的值不是一个字符串或null"
 
 msgid "Could not load JSON data."
 msgstr "不能加载JSON数据。"
 
 msgid "Input must be a JSON dictionary."
 msgstr "输入必须是JSON字典。"
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' 值必须是有效的JSON格式"
 
 msgid "Enter two valid values."
 msgstr "输入两个有效的值。"

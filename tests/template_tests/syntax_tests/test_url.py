@@ -78,7 +78,7 @@ class UrlTagTests(SimpleTestCase):
     @setup({'url12': '{% url "client_action" id=client.id action="!$&\'()*+,;=~:@," %}'})
     def test_url12(self):
         output = self.engine.render_to_string('url12', {'client': {'id': 1}})
-        self.assertEqual(output, '/client/1/!$&amp;&#39;()*+,;=~:@,/')
+        self.assertEqual(output, '/client/1/!$&amp;&#x27;()*+,;=~:@,/')
 
     @setup({'url13': '{% url "client_action" id=client.id action=arg|join:"-" %}'})
     def test_url13(self):

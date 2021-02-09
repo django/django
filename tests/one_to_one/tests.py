@@ -10,11 +10,12 @@ from .models import (
 
 class OneToOneTests(TestCase):
 
-    def setUp(self):
-        self.p1 = Place.objects.create(name='Demon Dogs', address='944 W. Fullerton')
-        self.p2 = Place.objects.create(name='Ace Hardware', address='1013 N. Ashland')
-        self.r1 = Restaurant.objects.create(place=self.p1, serves_hot_dogs=True, serves_pizza=False)
-        self.b1 = Bar.objects.create(place=self.p1, serves_cocktails=False)
+    @classmethod
+    def setUpTestData(cls):
+        cls.p1 = Place.objects.create(name='Demon Dogs', address='944 W. Fullerton')
+        cls.p2 = Place.objects.create(name='Ace Hardware', address='1013 N. Ashland')
+        cls.r1 = Restaurant.objects.create(place=cls.p1, serves_hot_dogs=True, serves_pizza=False)
+        cls.b1 = Bar.objects.create(place=cls.p1, serves_cocktails=False)
 
     def test_getter(self):
         # A Restaurant can access its place.
@@ -45,15 +46,10 @@ class OneToOneTests(TestCase):
 
     def test_manager_all(self):
         # Restaurant.objects.all() just returns the Restaurants, not the Places.
-        self.assertQuerysetEqual(Restaurant.objects.all(), [
-            '<Restaurant: Demon Dogs the restaurant>',
-        ])
+        self.assertSequenceEqual(Restaurant.objects.all(), [self.r1])
         # Place.objects.all() returns all Places, regardless of whether they
         # have Restaurants.
-        self.assertQuerysetEqual(Place.objects.order_by('name'), [
-            '<Place: Ace Hardware the place>',
-            '<Place: Demon Dogs the place>',
-        ])
+        self.assertSequenceEqual(Place.objects.order_by('name'), [self.p2, self.p1])
 
     def test_manager_get(self):
         def assert_get_restaurant(**params):
@@ -91,9 +87,7 @@ class OneToOneTests(TestCase):
 
         # Query the waiters
         def assert_filter_waiters(**params):
-            self.assertQuerysetEqual(Waiter.objects.filter(**params), [
-                '<Waiter: Joe the waiter at Demon Dogs the restaurant>'
-            ])
+            self.assertSequenceEqual(Waiter.objects.filter(**params), [w])
         assert_filter_waiters(restaurant__place__exact=self.p1.pk)
         assert_filter_waiters(restaurant__place__exact=self.p1)
         assert_filter_waiters(restaurant__place__pk=self.p1.pk)
@@ -168,10 +162,7 @@ class OneToOneTests(TestCase):
         f = Favorites(name='Fred')
         f.save()
         f.restaurants.set([self.r1])
-        self.assertQuerysetEqual(
-            f.restaurants.all(),
-            ['<Restaurant: Demon Dogs the restaurant>']
-        )
+        self.assertSequenceEqual(f.restaurants.all(), [self.r1])
 
     def test_reverse_object_cache(self):
         """
@@ -204,6 +195,27 @@ class OneToOneTests(TestCase):
         # Assigning None works if there isn't a related UndergroundBar and the
         # reverse cache has a value of None.
         p.undergroundbar = None
+
+    def test_assign_o2o_id_value(self):
+        b = UndergroundBar.objects.create(place=self.p1)
+        b.place_id = self.p2.pk
+        b.save()
+        self.assertEqual(b.place_id, self.p2.pk)
+        self.assertFalse(UndergroundBar.place.is_cached(b))
+        self.assertEqual(b.place, self.p2)
+        self.assertTrue(UndergroundBar.place.is_cached(b))
+        # Reassigning the same value doesn't clear a cached instance.
+        b.place_id = self.p2.pk
+        self.assertTrue(UndergroundBar.place.is_cached(b))
+
+    def test_assign_o2o_id_none(self):
+        b = UndergroundBar.objects.create(place=self.p1)
+        b.place_id = None
+        b.save()
+        self.assertIsNone(b.place_id)
+        self.assertFalse(UndergroundBar.place.is_cached(b))
+        self.assertIsNone(b.place)
+        self.assertTrue(UndergroundBar.place.is_cached(b))
 
     def test_related_object_cache(self):
         """ Regression test for #6886 (the related-object cache) """
@@ -250,7 +262,7 @@ class OneToOneTests(TestCase):
         # Creation using keyword argument and unsaved related instance (#8070).
         p = Place()
         r = Restaurant(place=p)
-        self.assertTrue(r.place is p)
+        self.assertIs(r.place, p)
 
         # Creation using attname keyword argument and an id will cause the related
         # object to be fetched.
@@ -279,6 +291,14 @@ class OneToOneTests(TestCase):
         num_deleted, objs = Pointer.objects.filter(other__name='name').delete()
         self.assertEqual(num_deleted, 1)
         self.assertEqual(objs, {'one_to_one.Pointer': 1})
+
+    def test_save_nullable_o2o_after_parent(self):
+        place = Place(name='Rose tattoo')
+        bar = UndergroundBar(place=place)
+        place.save()
+        bar.save()
+        bar.refresh_from_db()
+        self.assertEqual(bar.place, place)
 
     def test_reverse_object_does_not_exist_cache(self):
         """

@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Igor Jerosimić, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2019-06-27 19:12+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
-"language/sr%40latin/)\n"
+"language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -94,28 +95,8 @@ msgid ""
 "button."
 msgstr "Izabrali ste akciju ali niste izmenili ni jedno polje."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
 msgid "Now"
 msgstr "Trenutno vreme"
-
-msgid "Choose a Time"
-msgstr ""
-
-msgid "Choose a time"
-msgstr "Odabir vremena"
 
 msgid "Midnight"
 msgstr "Ponoć"
@@ -127,7 +108,27 @@ msgid "Noon"
 msgstr "Podne"
 
 msgid "6 p.m."
-msgstr ""
+msgstr "18č"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Obaveštenje: Vi ste %s sat ispred serverskog vremena."
+msgstr[1] "Obaveštenje: Vi ste %s sata ispred serverskog vremena."
+msgstr[2] "Obaveštenje: Vi ste %s sati ispred serverskog vremena."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Obaveštenje: Vi ste %s sat iza serverskog vremena."
+msgstr[1] "Obaveštenje: Vi ste %s sata iza serverskog vremena."
+msgstr[2] "Obaveštenje: Vi ste %s sati iza serverskog vremena."
+
+msgid "Choose a Time"
+msgstr "Odaberite vreme"
+
+msgid "Choose a time"
+msgstr "Odabir vremena"
 
 msgid "Cancel"
 msgstr "Poništi"
@@ -136,7 +137,7 @@ msgid "Today"
 msgstr "Danas"
 
 msgid "Choose a Date"
-msgstr ""
+msgstr "Odaberite datum"
 
 msgid "Yesterday"
 msgstr "Juče"
@@ -145,68 +146,68 @@ msgid "Tomorrow"
 msgstr "Sutra"
 
 msgid "January"
-msgstr ""
+msgstr "Januar"
 
 msgid "February"
-msgstr ""
+msgstr "Februar"
 
 msgid "March"
-msgstr ""
+msgstr "Mart"
 
 msgid "April"
-msgstr ""
+msgstr "April"
 
 msgid "May"
-msgstr ""
+msgstr "Maj"
 
 msgid "June"
-msgstr ""
+msgstr "Jun"
 
 msgid "July"
-msgstr ""
+msgstr "Jul"
 
 msgid "August"
-msgstr ""
+msgstr "Avgust"
 
 msgid "September"
-msgstr ""
+msgstr "Septembar"
 
 msgid "October"
-msgstr ""
+msgstr "Oktobar"
 
 msgid "November"
-msgstr ""
+msgstr "Novembar"
 
 msgid "December"
-msgstr ""
+msgstr "Decembar"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "N"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "P"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "U"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "S"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "Č"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "P"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 msgid "Show"
 msgstr "Pokaži"

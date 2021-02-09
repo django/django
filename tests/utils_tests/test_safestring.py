@@ -7,8 +7,8 @@ from django.utils.safestring import SafeData, mark_safe
 
 class customescape(str):
     def __html__(self):
-        # implement specific and obviously wrong escaping
-        # in order to be able to tell for sure when it runs
+        # Implement specific and wrong escaping in order to be able to detect
+        # when it runs.
         return self.replace('<', '<<').replace('>', '>>')
 
 
@@ -26,7 +26,7 @@ class SafeStringTest(SimpleTestCase):
 
     def test_mark_safe_str(self):
         """
-        Calling str() on a SafeText instance doesn't lose the safe status.
+        Calling str() on a SafeString instance doesn't lose the safe status.
         """
         s = mark_safe('a&b')
         self.assertIsInstance(str(s), type(s))

@@ -4,14 +4,15 @@
 # Akos Zsolt Hochrein <hoch.akos@gmail.com>, 2018
 # András Veres-Szentkirályi, 2016
 # Dóra Szendrei <szendrgigi@gmail.com>, 2017
-# János R (Hangya), 2017
+# Istvan Farkas <istvan.farkas@gmail.com>, 2019
+# János R, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-26 09:51+0000\n"
-"Last-Translator: Akos Zsolt Hochrein <hoch.akos@gmail.com>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -34,24 +35,14 @@ msgid "Map of strings to strings/nulls"
 msgstr "String-string/null leképezés"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "\"%(key)s\" értéke nem karakterlánc vagy null."
-
-msgid "A JSON object"
-msgstr "Egy JSON objektum"
-
-msgid "Value must be valid JSON."
-msgstr "Az érték érvényes JSON kell legyen."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "A(z) \"%(key)s\" nem karakterlánc, vagy null."
 
 msgid "Could not load JSON data."
 msgstr "JSON adat betöltése sikertelen."
 
 msgid "Input must be a JSON dictionary."
 msgstr "A bemenetnek JSON szótárnak kell lennie."
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' értéknek érvényes JSON-nek kell lennie."
 
 msgid "Enter two valid values."
 msgstr "Adjon meg két érvényes értéket."

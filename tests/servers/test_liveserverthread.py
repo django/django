@@ -13,16 +13,13 @@ class LiveServerThreadTest(TestCase):
 
     def test_closes_connections(self):
         conn = connections[DEFAULT_DB_ALIAS]
-        if conn.vendor == 'sqlite' and conn.is_in_memory_db():
-            self.skipTest("the sqlite backend's close() method is a no-op when using an in-memory database")
         # Pass a connection to the thread to check they are being closed.
         connections_override = {DEFAULT_DB_ALIAS: conn}
 
-        saved_sharing = conn.allow_thread_sharing
+        conn.inc_thread_sharing()
         try:
-            conn.allow_thread_sharing = True
             self.assertTrue(conn.is_usable())
             self.run_live_server_thread(connections_override)
             self.assertFalse(conn.is_usable())
         finally:
-            conn.allow_thread_sharing = saved_sharing
+            conn.dec_thread_sharing()

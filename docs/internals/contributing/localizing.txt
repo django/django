@@ -32,9 +32,8 @@ translating or add a language that isn't yet translated, here's what to do:
 
 * Then, click the "Join this Team" button to become a member of this team.
   Every team has at least one coordinator who is responsible to review
-  your membership request. You can of course also contact the team
-  coordinator to clarify procedural problems and handle the actual
-  translation process.
+  your membership request. You can also contact the team coordinator to clarify
+  procedural problems and handle the actual translation process.
 
 * Once you are a member of a team choose the translation resource you
   want to update on the team page. For example the "core" resource refers
@@ -46,11 +45,12 @@ translating or add a language that isn't yet translated, here's what to do:
      `Transifex User Guide`_.
 
 Translations from Transifex are only integrated into the Django repository at
-the time of a new :term:`feature release`. We try to update them a second time
-during one of the following :term:`patch release`\s, but that depends on the
-translation manager's availability. So don't miss the string freeze period
-(between the release candidate and the feature release) to take the opportunity
-to complete and fix the translations for your language!
+the time of a new :term:`feature release <Feature release>`. We try to update
+them a second time during one of the following :term:`patch release
+<Patch release>`\s, but that depends on the translation manager's availability.
+So don't miss the string freeze period (between the release candidate and the
+feature release) to take the opportunity to complete and fix the translations
+for your language!
 
 Formats
 =======
@@ -82,3 +82,9 @@ huge undertaking to complete entirely (you have been warned!). We use the same
 `Transifex tool <https://www.transifex.com/django/django-docs/>`_. The
 translations will appear at ``https://docs.djangoproject.com/<language_code>/``
 when at least the ``docs/intro/*`` files are fully translated in your language.
+
+Once translations are published, updated versions from Transifex will be
+irregularly ported to the `django/django-docs-translations
+<https://github.com/django/django-docs-translations>`_ repository and to the
+documentation website. Only translations for the latest stable Django release
+are updated.

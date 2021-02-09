@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-08-25 06:21+0000\n"
-"Last-Translator: Marian Andre <marian@andre.sk>\n"
+"POT-Creation-Date: 2019-09-27 22:40+0200\n"
+"PO-Revision-Date: 2019-11-05 00:38+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Slovak (http://www.transifex.com/django/django/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -140,6 +140,9 @@ msgstr "hornolužická srbčina"
 
 msgid "Hungarian"
 msgstr "maďarsky"
+
+msgid "Armenian"
+msgstr ""
 
 msgid "Interlingua"
 msgstr "interlinguánsky"
@@ -279,6 +282,9 @@ msgstr "ukrajinsky"
 msgid "Urdu"
 msgstr "urdsky"
 
+msgid "Uzbek"
+msgstr ""
+
 msgid "Vietnamese"
 msgstr "vietnamsky"
 
@@ -323,17 +329,13 @@ msgstr "Zadajte platnú e-mailovú adresu."
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Zadajte platný 'slug' pozostávajúci z písmen, čísel, podčiarkovníkov alebo "
-"pomlčiek."
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Zadajte platný 'slug' pozostávajúci z písmen (Unicode), čísel, "
-"podčiarkovníkov alebo pomlčiek."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Zadajte platnú IPv4 adresu."
@@ -438,11 +440,9 @@ msgstr[3] ""
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
-"Prípona súboru '%(extension)s' nie je povolená. Povolené prípony sú: "
-"'%(allowed_extensions)s'."
 
 msgid "Null characters are not allowed."
 msgstr "Znaky NULL nie sú povolené."
@@ -480,23 +480,13 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr "Pole typu: %(field_type)s"
 
-msgid "Integer"
-msgstr "Celé číslo"
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr ""
 
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr "'%(value)s' musí byť celé číslo."
-
-msgid "Big (8 byte) integer"
-msgstr "Veľké celé číslo (8 bajtov)"
-
-#, python-format
-msgid "'%(value)s' value must be either True or False."
-msgstr "'%(value)s' value musí byť True alebo False."
-
-#, python-format
-msgid "'%(value)s' value must be either True, False, or None."
-msgstr "'%(value)s' musí byť True, False alebo None."
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "Logická hodnota (buď True alebo False)"
@@ -510,52 +500,46 @@ msgstr "Celé čísla oddelené čiarkou"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
-msgstr "'%(value)s' má neplatný tvar dátumu. Musí byť v tvare YYYY-MM-DD."
+msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"'%(value)s' je v správnom tvare (YYYY-MM-DD), ale je to neplatný dátum."
 
 msgid "Date (without time)"
 msgstr "Dátum (bez času)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"'%(value)s' má neplatný tvar.  Musí byť v tvare YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"'%(value)s' je v správnom tvare (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]), ale je "
-"to neplatný dátum/čas."
 
 msgid "Date (with time)"
 msgstr "Dátum (a čas)"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
-msgstr "'%(value)s' musí byť desatinné číslo."
+msgid "“%(value)s” value must be a decimal number."
+msgstr ""
 
 msgid "Decimal number"
 msgstr "Desatinné číslo"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"'%(value)s' má neplatný tvar. Musí byť v tvare [DD] [HH:[MM]]ss[.uuuuuu]."
 
 msgid "Duration"
 msgstr "Doba trvania"
@@ -567,11 +551,21 @@ msgid "File path"
 msgstr "Cesta k súboru"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
-msgstr "'%(value)s' musí byť desatinné číslo."
+msgid "“%(value)s” value must be a float."
+msgstr ""
 
 msgid "Floating point number"
 msgstr "Číslo s plávajúcou desatinnou čiarkou"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr ""
+
+msgid "Integer"
+msgstr "Celé číslo"
+
+msgid "Big (8 byte) integer"
+msgstr "Veľké celé číslo (8 bajtov)"
 
 msgid "IPv4 address"
 msgstr "IPv4 adresa"
@@ -580,8 +574,8 @@ msgid "IP address"
 msgstr "IP adresa"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
-msgstr "'%(value)s' musí byť buď None, True alebo False."
+msgid "“%(value)s” value must be either None, True or False."
+msgstr ""
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Logická hodnota (buď True, False alebo None)"
@@ -604,17 +598,15 @@ msgstr "Text"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
-msgstr "'%(value)s' má neplatný tvar. Musí byť v tvare HH:MM[:ss[.uuuuuu]]."
+msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"'%(value)s' je v správnom tvare (HH:MM[:ss[.uuuuuu]]), ale je to neplatný "
-"čas."
 
 msgid "Time"
 msgstr "Čas"
@@ -626,8 +618,11 @@ msgid "Raw binary data"
 msgstr "Binárne údaje"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
-msgstr "'%(value)s' nie je platné UUID."
+msgid "“%(value)s” is not a valid UUID."
+msgstr ""
+
+msgid "Universally unique identifier"
+msgstr ""
 
 msgid "File"
 msgstr "Súbor"
@@ -791,16 +786,14 @@ msgstr ""
 "Vyberte platnú možnosť. Vybraná položka nepatrí medzi dostupné možnosti."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value."
-msgstr "\"%(pk)s\" nie je platná hodnota."
+msgid "“%(pk)s” is not a valid value."
+msgstr ""
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
-"Hodnota %(datetime)s v časovej zóne %(current_timezone)s sa nedá "
-"interpretovať; môže byť nejednoznačná alebo nemusí existovať."
 
 msgid "Clear"
 msgstr "Vymazať"
@@ -819,6 +812,15 @@ msgstr "Áno"
 
 msgid "No"
 msgstr "Nie"
+
+msgid "Year"
+msgstr ""
+
+msgid "Month"
+msgstr ""
+
+msgid "Day"
+msgstr ""
 
 msgid "yes,no,maybe"
 msgstr "áno,nie,možno"
@@ -1084,8 +1086,8 @@ msgstr "Toto nieje platná IPv6 adresa."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr ""
 
 msgid "or"
 msgstr "alebo"
@@ -1152,37 +1154,25 @@ msgid "CSRF verification failed. Request aborted."
 msgstr "CSRF verifikázia zlyhala. Požiadavka bola prerušená."
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Túto správu vidíte, pretože táto HTTPS lokalita vyžaduje, aby prehliadač "
-"poslal 'Referer' hlavičku a browser takúto hlavičku v požiadavke neodoslal. "
-"Hlavička je potrebná na zabezpečenie toho, že váš prehliadač nie je zneužitý "
-"\"hijack\"."
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
 msgstr ""
-"Ak máte v prehliadači zakázané odosielanie hlavičky Referer, povoľte ho "
-"znovu prosím - minimálne pre túto stránku, pre HTTPS spojenia alebo "
-"požiadavky s politikou same-origin."
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
-"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
-"CSRF protection requires the 'Referer' header to do strict referer checking. "
-"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" ...> for links to third-party sites."
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
 msgstr ""
-"Ak používate tag <meta name=\"referrer\" content=\"no-referrer\"> alebo "
-"vkladáte hlavičku 'Referrer-Policy: no-referrer', prosím odstránte ich. "
-"Ochrana CSRF vyžaduje hlavičku 'Referer' na striktnú kontrolu. Ak máte obavy "
-"o súkromie, použite alternatívy ako napríklad <a rel=\"noreferrer\" ...> pre "
-"linky na iné stránky."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1195,10 +1185,8 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
-"Ak máte v prehliadači zakázané cookies, povoľte ich znovu prosím - minimálne "
-"pre túto stránku, alebo požiadavky s politikou same-origin."
 
 msgid "More information is available with DEBUG=True."
 msgstr "Viac informácií bude dostupných s DEBUG=True."
@@ -1231,34 +1219,31 @@ msgstr ""
 "allow_future má hodnotu False. "
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
-msgstr "Neplatný dátumový reťazec  '%(datestr)s' pre formát '%(format)s'"
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr ""
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr ""
 "Nebol nájdený žiadny %(verbose_name)s zodpovedajúci databázovému dopytu"
 
-msgid "Page is not 'last', nor can it be converted to an int."
+msgid "Page is not “last”, nor can it be converted to an int."
 msgstr ""
-"Stránka nemá hodnotu 'last' a taktiež nie je možné prekonvertovať hodnotu na "
-"celé číslo."
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "Nesprávna stránka (%(page_number)s): %(message)s"
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
 msgstr ""
-"Zoznam je prázdny a zároveň má '%(class_name)s.allow_empty' hodnotu False."
 
 msgid "Directory indexes are not allowed here."
 msgstr "Výpis adresárov tu nieje povolený."
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" neexistuje"
+msgid "“%(path)s” does not exist"
+msgstr ""
 
 #, python-format
 msgid "Index of %(directory)s"
@@ -1294,8 +1279,8 @@ msgstr ""
 msgid "Django Documentation"
 msgstr "Dokumentácia Django"
 
-msgid "Topics, references, &amp; how-to's"
-msgstr "Témy, referencie, &amp; návody"
+msgid "Topics, references, &amp; how-to’s"
+msgstr ""
 
 msgid "Tutorial: A Polling App"
 msgstr "Tutoriál: Aplikácia \"Hlasovania\""

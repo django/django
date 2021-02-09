@@ -1,0 +1,13 @@
+===========================
+Django 2.2.10 release notes
+===========================
+
+*February 3, 2020*
+
+Django 2.2.10 fixes a security issue in 2.2.9.
+
+CVE-2020-7471: Potential SQL injection via ``StringAgg(delimiter)``
+===================================================================
+
+:class:`~django.contrib.postgres.aggregates.StringAgg` aggregation function was
+subject to SQL injection, using a suitably crafted ``delimiter``.

@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Hrishikesh <hrishi.kb@gmail.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Rajeesh Nair <rajeeshrnair@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2020-05-13 21:29+0000\n"
+"Last-Translator: Hrishikesh <hrishi.kb@gmail.com>\n"
 "Language-Team: Malayalam (http://www.transifex.com/django/django/language/"
 "ml/)\n"
 "MIME-Version: 1.0\n"
@@ -19,25 +20,68 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Humanize"
+msgstr "ഹ്യൂമനൈസ്"
+
+#. Translators: Ordinal format for 11 (11th), 12 (12th), and 13 (13th).
+msgctxt "ordinal 11, 12, 13"
+msgid "{}th"
 msgstr ""
 
-msgid "th"
-msgstr "ആം"
+#. Translators: Ordinal format when value ends with 0, e.g. 80th.
+msgctxt "ordinal 0"
+msgid "{}th"
+msgstr ""
 
-msgid "st"
-msgstr "ആം"
+#. Translators: Ordinal format when value ends with 1, e.g. 81st, except 11.
+msgctxt "ordinal 1"
+msgid "{}st"
+msgstr ""
 
-msgid "nd"
-msgstr "ആം"
+#. Translators: Ordinal format when value ends with 2, e.g. 82nd, except 12.
+msgctxt "ordinal 2"
+msgid "{}nd"
+msgstr ""
 
-msgid "rd"
-msgstr "ആം"
+#. Translators: Ordinal format when value ends with 3, e.g. 83th, except 13.
+msgctxt "ordinal 3"
+msgid "{}rd"
+msgstr ""
+
+#. Translators: Ordinal format when value ends with 4, e.g. 84th.
+msgctxt "ordinal 4"
+msgid "{}th"
+msgstr ""
+
+#. Translators: Ordinal format when value ends with 5, e.g. 85th.
+msgctxt "ordinal 5"
+msgid "{}th"
+msgstr ""
+
+#. Translators: Ordinal format when value ends with 6, e.g. 86th.
+msgctxt "ordinal 6"
+msgid "{}th"
+msgstr ""
+
+#. Translators: Ordinal format when value ends with 7, e.g. 87th.
+msgctxt "ordinal 7"
+msgid "{}th"
+msgstr ""
+
+#. Translators: Ordinal format when value ends with 8, e.g. 88th.
+msgctxt "ordinal 8"
+msgid "{}th"
+msgstr ""
+
+#. Translators: Ordinal format when value ends with 9, e.g. 89th.
+msgctxt "ordinal 9"
+msgid "{}th"
+msgstr ""
 
 #, python-format
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
-msgstr[0] "%(value).1f മില്ല്യണ്‍ (ദശലക്ഷം)"
-msgstr[1] "%(value).1f മില്ല്യണ്‍ (ദശലക്ഷം)"
+msgstr[0] "%(value).1f ദശലക്ഷം"
+msgstr[1] "%(value).1f ദശലക്ഷം"
 
 #, python-format
 msgid "%(value)s million"
@@ -48,8 +92,8 @@ msgstr[1] "%(value)s ദശലക്ഷം"
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
-msgstr[0] "%(value).1f ബില്ല്യണ്‍ (ശതകോടി)"
-msgstr[1] "%(value).1f ബില്ല്യണ്‍ (ശതകോടി)"
+msgstr[0] "%(value).1f ശതകോടി"
+msgstr[1] "%(value).1f ശതകോടി"
 
 #, python-format
 msgid "%(value)s billion"
@@ -201,63 +245,152 @@ msgstr "നാളെ"
 msgid "yesterday"
 msgstr "ഇന്നലെ"
 
+#. Translators: delta will contain a string like '2 months' or '1 month, 2
+#. weeks'
 #, python-format
-msgctxt "naturaltime"
 msgid "%(delta)s ago"
-msgstr "%(delta)s മുമ്പ്"
+msgstr ""
 
-msgid "now"
-msgstr "ഇപ്പോള്‍"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a second ago"
-msgid_plural "%(count)s seconds ago"
-msgstr[0] ""
-msgstr[1] ""
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a minute ago"
-msgid_plural "%(count)s minutes ago"
-msgstr[0] ""
-msgstr[1] ""
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
 msgstr[0] ""
 msgstr[1] ""
 
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
 #, python-format
-msgctxt "naturaltime"
-msgid "%(delta)s from now"
-msgstr "ഇപ്പോള്‍ മുതല്‍ %(delta)s"
+msgid "a minute ago"
+msgid_plural "%(count)s minutes ago"
+msgstr[0] ""
+msgstr[1] ""
 
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a second ago"
+msgid_plural "%(count)s seconds ago"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "now"
+msgstr "ഇപ്പോള്‍"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
 msgstr[0] ""
 msgstr[1] ""
 
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
 msgstr[0] ""
 msgstr[1] ""
 
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: delta will contain a string like '2 months' or '1 month, 2
+#. weeks'
+#, python-format
+msgid "%(delta)s from now"
+msgstr ""
+
+#. Translators: 'naturaltime-past' strings will be included in '%(delta)s ago'
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: 'naturaltime-future' strings will be included in '%(delta)s
+#. from now'
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d minute"
+msgid_plural "%d minutes"
 msgstr[0] ""
 msgstr[1] ""

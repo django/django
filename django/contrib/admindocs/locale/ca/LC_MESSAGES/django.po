@@ -4,15 +4,16 @@
 # abraham.martin <abraham.martin@gmail.com>, 2014
 # Antoni Aloy <aaloy@apsl.net>, 2014,2017
 # Carles Barrobés <carles@barrobes.com>, 2012
+# Gil Obradors Via <gil.obradors@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Roger Pons <rogerpons@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-11-03 20:47+0000\n"
+"Last-Translator: Gil Obradors Via <gil.obradors@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -159,12 +160,12 @@ msgid "Template: %(name)s"
 msgstr "Plantilla: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Plantilla: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Plantilla: %(name)s"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
 msgstr "Camí de cerca per la plantilla \"%(name)s\":"
 
 msgid "(does not exist)"

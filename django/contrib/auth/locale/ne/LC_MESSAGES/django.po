@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2018-02-10 13:00+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-12-15 05:39+0000\n"
 "Last-Translator: Sagar Chalise <chalisesagar@gmail.com>\n"
 "Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
@@ -51,8 +51,8 @@ msgstr "पासवर्ड राखिएको छैन ।"
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "अमान्य पासवर्ड स्वरूप वा अज्ञात ह्यासिङ अलगोरिदम ।"
 
-msgid "The two password fields didn't match."
-msgstr "दुई पासवर्ड मिलेन ।"
+msgid "The two password fields didn’t match."
+msgstr ""
 
 msgid "Password"
 msgstr "पासवर्ड"
@@ -64,11 +64,11 @@ msgid "Enter the same password as before, for verification."
 msgstr "प्रमाणित गर्न पुन: उही पासवर्ड राख्नु होस ।"
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"पासवर्ड जस्ताको त्यस्तै राखिँदैन, त्यसैले यो प्रयोगकर्ताको पासवर्ड हेर्न असम्भव छ । पासवर्ड "
-"फेर्न को लागि भने <a href=\"{}\">यो फारम</a> भर्न सकिन्छ ।"
+"पासवर्ड जस्ताको त्यस्तै राखेको हुँदैन, त्यसैले हेर्न मिल्दैन । पासवर्ड परिवर्तन गर्न <a href="
+"\"{}\">यो फारम</a> भर्नु होस ।"
 
 #, python-format
 msgid ""
@@ -231,20 +231,20 @@ msgstr[1] "पासवर्डमा कम्तीमा पनि %(min_len
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "%(verbose_name)s संग मिल्दो पासवर्ड भयो ।"
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr "व्यक्तिगत विवरणसँग मेल खाने पासवर्ड नराख्नु होस ।"
+msgid "Your password can’t be too similar to your other personal information."
+msgstr ""
 
 msgid "This password is too common."
 msgstr "यो पासवर्ड साधारण भयो ।"
 
-msgid "Your password can't be a commonly used password."
-msgstr "पासवर्डमा सजिलै अनुमान गर्न सकिने शब्दहरू नराख्नु होस ।"
+msgid "Your password can’t be a commonly used password."
+msgstr ""
 
 msgid "This password is entirely numeric."
 msgstr "यो पासवर्डमा अंक मात्र छ ।"
 
-msgid "Your password can't be entirely numeric."
-msgstr "पासवर्डमा अंक मात्र नराख्नु होस ।"
+msgid "Your password can’t be entirely numeric."
+msgstr ""
 
 #, python-format
 msgid "Password reset on %(site_name)s"

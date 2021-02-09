@@ -178,7 +178,7 @@ class UserAttributeSimilarityValidatorTest(TestCase):
     def test_help_text(self):
         self.assertEqual(
             UserAttributeSimilarityValidator().get_help_text(),
-            "Your password can't be too similar to your other personal information."
+            'Your password can’t be too similar to your other personal information.'
         )
 
 
@@ -210,7 +210,7 @@ class CommonPasswordValidatorTest(SimpleTestCase):
     def test_help_text(self):
         self.assertEqual(
             CommonPasswordValidator().get_help_text(),
-            "Your password can't be a commonly used password."
+            'Your password can’t be a commonly used password.'
         )
 
 
@@ -227,7 +227,7 @@ class NumericPasswordValidatorTest(SimpleTestCase):
     def test_help_text(self):
         self.assertEqual(
             NumericPasswordValidator().get_help_text(),
-            "Your password can't be entirely numeric."
+            'Your password can’t be entirely numeric.'
         )
 
 
@@ -237,7 +237,7 @@ class UsernameValidatorsTests(SimpleTestCase):
         invalid_usernames = [
             "o'connell", "عبد ال",
             "zerowidth\u200Bspace", "nonbreaking\u00A0space",
-            "en\u2013dash",
+            "en\u2013dash", 'trailingnewline\u000A',
         ]
         v = validators.UnicodeUsernameValidator()
         for valid in valid_usernames:
@@ -250,7 +250,7 @@ class UsernameValidatorsTests(SimpleTestCase):
 
     def test_ascii_validator(self):
         valid_usernames = ['glenn', 'GLEnN', 'jean-marc']
-        invalid_usernames = ["o'connell", 'Éric', 'jean marc', "أحمد"]
+        invalid_usernames = ["o'connell", 'Éric', 'jean marc', "أحمد", 'trailingnewline\n']
         v = validators.ASCIIUsernameValidator()
         for valid in valid_usernames:
             with self.subTest(valid=valid):

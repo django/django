@@ -36,7 +36,7 @@ class AutoescapeTagTests(SimpleTestCase):
         output = self.engine.render_to_string('autoescape-tag05', {'first': '<b>first</b>'})
         self.assertEqual(output, '&lt;b&gt;first&lt;/b&gt;')
 
-    # Strings (ASCII or unicode) already marked as "safe" are not
+    # Strings (ASCII or Unicode) already marked as "safe" are not
     # auto-escaped
     @setup({'autoescape-tag06': '{{ first }}'})
     def test_autoescape_tag06(self):
@@ -80,14 +80,6 @@ class AutoescapeTagTests(SimpleTestCase):
         """
         with self.assertRaises(TemplateSyntaxError):
             self.engine.render_to_string('autoescape-filtertag01', {'first': '<a>'})
-
-    @setup({'autoescape-ifequal01': '{% ifequal var "this & that" %}yes{% endifequal %}'})
-    def test_autoescape_ifequal01(self):
-        """
-        ifequal compares unescaped vales.
-        """
-        output = self.engine.render_to_string('autoescape-ifequal01', {'var': 'this & that'})
-        self.assertEqual(output, 'yes')
 
     # Arguments to filters are 'safe' and manipulate their input unescaped.
     @setup({'autoescape-filters01': '{{ var|cut:"&" }}'})

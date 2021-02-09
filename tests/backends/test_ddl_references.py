@@ -1,7 +1,13 @@
+from django.db import connection
 from django.db.backends.ddl_references import (
-    Columns, ForeignKeyName, IndexName, Statement, Table,
+    Columns, Expressions, ForeignKeyName, IndexName, Statement, Table,
 )
-from django.test import SimpleTestCase
+from django.db.models import ExpressionList, F
+from django.db.models.functions import Upper
+from django.db.models.indexes import IndexExpression
+from django.test import SimpleTestCase, TransactionTestCase
+
+from .models import Person
 
 
 class TableTests(SimpleTestCase):
@@ -181,3 +187,66 @@ class StatementTests(SimpleTestCase):
         reference = MockReference('reference', {}, {})
         statement = Statement("%(reference)s - %(non_reference)s", reference=reference, non_reference='non_reference')
         self.assertEqual(str(statement), 'reference - non_reference')
+
+
+class ExpressionsTests(TransactionTestCase):
+    available_apps = []
+
+    def setUp(self):
+        compiler = Person.objects.all().query.get_compiler(connection.alias)
+        self.editor = connection.schema_editor()
+        self.expressions = Expressions(
+            table=Person._meta.db_table,
+            expressions=ExpressionList(
+                IndexExpression(F('first_name')),
+                IndexExpression(F('last_name').desc()),
+                IndexExpression(Upper('last_name')),
+            ).resolve_expression(compiler.query),
+            compiler=compiler,
+            quote_value=self.editor.quote_value,
+        )
+
+    def test_references_table(self):
+        self.assertIs(self.expressions.references_table(Person._meta.db_table), True)
+        self.assertIs(self.expressions.references_table('other'), False)
+
+    def test_references_column(self):
+        table = Person._meta.db_table
+        self.assertIs(self.expressions.references_column(table, 'first_name'), True)
+        self.assertIs(self.expressions.references_column(table, 'last_name'), True)
+        self.assertIs(self.expressions.references_column(table, 'other'), False)
+
+    def test_rename_table_references(self):
+        table = Person._meta.db_table
+        self.expressions.rename_table_references(table, 'other')
+        self.assertIs(self.expressions.references_table(table), False)
+        self.assertIs(self.expressions.references_table('other'), True)
+        self.assertIn(
+            '%s.%s' % (
+                self.editor.quote_name('other'),
+                self.editor.quote_name('first_name'),
+            ),
+            str(self.expressions),
+        )
+
+    def test_rename_column_references(self):
+        table = Person._meta.db_table
+        self.expressions.rename_column_references(table, 'first_name', 'other')
+        self.assertIs(self.expressions.references_column(table, 'other'), True)
+        self.assertIs(self.expressions.references_column(table, 'first_name'), False)
+        self.assertIn(
+            '%s.%s' % (self.editor.quote_name(table), self.editor.quote_name('other')),
+            str(self.expressions),
+        )
+
+    def test_str(self):
+        table_name = self.editor.quote_name(Person._meta.db_table)
+        expected_str = '%s.%s, %s.%s DESC, (UPPER(%s.%s))' % (
+            table_name,
+            self.editor.quote_name('first_name'),
+            table_name,
+            self.editor.quote_name('last_name'),
+            table_name,
+            self.editor.quote_name('last_name'),
+        )
+        self.assertEqual(str(self.expressions), expected_str)

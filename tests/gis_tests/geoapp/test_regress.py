@@ -5,7 +5,6 @@ from django.contrib.gis.shortcuts import render_to_kmz
 from django.db.models import Count, Min
 from django.test import TestCase, skipUnlessDBFeature
 
-from ..utils import no_oracle
 from .models import City, PennsylvaniaCity, State, Truth
 
 
@@ -65,10 +64,7 @@ class GeoRegressionTests(TestCase):
         # .count() should not throw TypeError in __eq__
         self.assertEqual(cities_within_state.count(), 1)
 
-    # TODO: fix on Oracle -- get the following error because the SQL is ordered
-    # by a geometry object, which Oracle apparently doesn't like:
-    #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type
-    @no_oracle
+    @skipUnlessDBFeature('allows_group_by_lob')
     def test_defer_or_only_with_annotate(self):
         "Regression for #16409. Make sure defer() and only() work with annotate()"
         self.assertIsInstance(list(City.objects.annotate(Count('point')).defer('name')), list)

@@ -22,7 +22,7 @@ to raster (image) data.
     capabilities of OGR and GDAL's raster features at this time.
 
 __ https://www.gdal.org/
-__ https://www.gdal.org/ogr_arch.html
+__ https://gdal.org/user/vector_data_model.html
 
 Overview
 ========
@@ -36,7 +36,7 @@ The GDAL/OGR tools described here are designed to help you read in
 your geospatial data, in order for most of them to be useful you have
 to have some data to work with.  If you're starting out and don't yet
 have any data of your own to use, GeoDjango tests contain a number of
-simple data sets that you can use for testing. You can download them here::
+data sets that you can use for testing. You can download them here::
 
     $ wget https://raw.githubusercontent.com/django/django/master/tests/gis_tests/data/cities/cities.{shp,prj,shx,dbf}
     $ wget https://raw.githubusercontent.com/django/django/master/tests/gis_tests/data/rasters/raster.tif
@@ -49,7 +49,7 @@ Vector Data Source Objects
 
 :class:`DataSource` is a wrapper for the OGR data source object that
 supports reading data from a variety of OGR-supported geospatial file
-formats and data sources using a simple, consistent interface.  Each
+formats and data sources using a consistent interface.  Each
 data source is represented by a :class:`DataSource` object which contains
 one or more layers of data.  Each layer, represented by a :class:`Layer`
 object, contains some number of geographic features (:class:`Feature`),
@@ -92,7 +92,11 @@ each feature in that layer.
 
     Returns the name of the data source.
 
-__ https://www.gdal.org/ogr_formats.html
+    .. versionchanged:: 3.2
+
+        Support for :class:`pathlib.Path` ``ds_input`` was added.
+
+__ https://gdal.org/drivers/vector/
 
 ``Layer``
 ---------
@@ -446,7 +450,7 @@ coordinate transformation::
     :class:`Feature.geom` attribute, when reading vector data from
     :class:`Layer` (which is in turn a part of a :class:`DataSource`).
 
-    __ https://www.gdal.org/classOGRGeometry.html
+    __ https://gdal.org/api/ogrgeometry_cpp.html#ogrgeometry-class
 
     .. classmethod:: from_gml(gml_string)
 
@@ -628,7 +632,7 @@ coordinate transformation::
     Transforms this geometry to a different spatial reference system. May take
     a :class:`CoordTransform` object, a :class:`SpatialReference` object, or
     any other input accepted by :class:`SpatialReference` (including spatial
-    reference WKT and PROJ.4 strings, or an integer SRID).
+    reference WKT and PROJ strings, or an integer SRID).
 
     By default nothing is returned and the geometry is transformed in-place.
     However, if the ``clone`` keyword is set to ``True`` then a transformed
@@ -881,7 +885,7 @@ Coordinate System Objects
 
     * OGC Well Known Text (WKT) (a string)
     * EPSG code (integer or string)
-    * PROJ.4 string
+    * PROJ string
     * A shorthand string for well-known standards (``'WGS84'``, ``'WGS72'``,
       ``'NAD27'``, ``'NAD83'``)
 
@@ -890,8 +894,8 @@ Coordinate System Objects
         >>> wgs84 = SpatialReference('WGS84') # shorthand string
         >>> wgs84 = SpatialReference(4326) # EPSG code
         >>> wgs84 = SpatialReference('EPSG:4326') # EPSG string
-        >>> proj4 = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
-        >>> wgs84 = SpatialReference(proj4) # PROJ.4 string
+        >>> proj = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
+        >>> wgs84 = SpatialReference(proj) # PROJ string
         >>> wgs84 = SpatialReference("""GEOGCS["WGS 84",
         DATUM["WGS_1984",
              SPHEROID["WGS 84",6378137,298.257223563,
@@ -967,7 +971,7 @@ Coordinate System Objects
 
     .. method:: import_proj(proj)
 
-    Import spatial reference from PROJ.4 string.
+    Import spatial reference from PROJ string.
 
     .. method:: import_user_input(user_input)
 
@@ -1050,7 +1054,7 @@ Coordinate System Objects
 
     .. attribute:: proj
 
-    Returns the PROJ.4 representation for this spatial reference.
+    Returns the PROJ representation for this spatial reference.
 
     .. attribute:: proj4
 
@@ -1085,7 +1089,7 @@ Raster Data Objects
 
 :class:`GDALRaster` is a wrapper for the GDAL raster source object that
 supports reading data from a variety of GDAL-supported geospatial file
-formats and data sources using a simple, consistent interface.  Each
+formats and data sources using a consistent interface.  Each
 data source is represented by a :class:`GDALRaster` object which contains
 one or more layers of data named bands.  Each band, represented by a
 :class:`GDALBand` object, contains georeferenced image data. For example, an RGB
@@ -1172,11 +1176,11 @@ blue.
 
         The name of the GDAL driver used to handle the input file. For ``GDALRaster``\s created
         from a file, the driver type is detected automatically. The creation of rasters from
-        scratch is a in-memory raster by default (``'MEM'``), but can be altered as
-        needed. For instance, use ``GTiff`` for a ``GeoTiff`` file. For a list of file types,
-        see also the `GDAL Raster Formats`__ list.
+        scratch is an in-memory raster by default (``'MEM'``), but can be
+        altered as needed. For instance, use ``GTiff`` for a ``GeoTiff`` file.
+        For a list of file types, see also the `GDAL Raster Formats`__ list.
 
-        __ https://www.gdal.org/formats_list.html
+        __ https://gdal.org/drivers/raster/
 
         An in-memory raster is created through the following example:
 
@@ -1271,9 +1275,9 @@ blue.
 
     .. attribute:: scale
 
-        Pixel width and height used for georeferencing the raster, as a as a
-        point object with ``x`` and ``y``  members. See :attr:`geotransform`
-        for more information.
+        Pixel width and height used for georeferencing the raster, as a point
+        object with ``x`` and ``y``  members. See :attr:`geotransform` for more
+        information.
 
             >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
             >>> rst.scale
@@ -1368,14 +1372,16 @@ blue.
                    [ 19.,  21.,  23.],
                    [ 31.,  33.,  35.]], dtype=float32)
 
-    .. method:: transform(srid, driver=None, name=None, resampling='NearestNeighbour', max_error=0.0)
+    .. method:: transform(srs, driver=None, name=None, resampling='NearestNeighbour', max_error=0.0)
 
-        Returns a transformed version of this raster with the specified SRID.
+        Transforms this raster to a different spatial reference system
+        (``srs``), which may be a :class:`SpatialReference` object, or any
+        other input accepted by :class:`SpatialReference` (including spatial
+        reference WKT and PROJ strings, or an integer SRID).
 
-        This function transforms the current raster into a new spatial reference
-        system that can be specified with an ``srid``. It calculates the bounds
-        and scale of the current raster in the new spatial reference system and
-        warps the raster using the :attr:`~GDALRaster.warp` function.
+        It calculates the bounds and scale of the current raster in the new
+        spatial reference system and warps the raster using the
+        :attr:`~GDALRaster.warp` function.
 
         By default, the driver of the source raster is used and the name of the
         raster is the original name appended with
@@ -1394,16 +1400,21 @@ blue.
             ...     "scale": [100, -100],
             ...     "bands": [{"data": range(36), "nodata_value": 99}]
             ... })
-            >>> target = rst.transform(4326)
+            >>> target_srs = SpatialReference(4326)
+            >>> target = rst.transform(target_srs)
             >>> target.origin
             [-82.98492744885776, 27.601924753080144]
+
+        .. versionchanged:: 3.2
+
+            Support for :class:`SpatialReference` ``srs`` was added
 
     .. attribute:: info
 
         Returns a string with a summary of the raster. This is equivalent to
         the `gdalinfo`__ command line utility.
 
-        __ https://www.gdal.org/gdalinfo.html
+        __ https://gdal.org/programs/gdalinfo.html
 
     .. attribute:: metadata
 
@@ -1629,7 +1640,7 @@ Examples of using the different keys when creating rasters can be found in the
 documentation of the corresponding attributes and methods of the
 :class:`GDALRaster` and :class:`GDALBand` classes.
 
-__ http://geojson.org
+__ https://geojson.org
 
 The ``ds_input`` dictionary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1732,7 +1743,7 @@ Key               Default  Usage
         ...    }
         ... })
 
-__ https://www.gdal.org/frmt_gtiff.html
+__ https://gdal.org/drivers/raster/gtiff.html
 
 The ``band_input`` dictionary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

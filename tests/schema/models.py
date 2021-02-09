@@ -55,6 +55,31 @@ class AuthorWithIndexedName(models.Model):
         apps = new_apps
 
 
+class AuthorWithUniqueName(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    class Meta:
+        apps = new_apps
+
+
+class AuthorWithIndexedNameAndBirthday(models.Model):
+    name = models.CharField(max_length=255)
+    birthday = models.DateField()
+
+    class Meta:
+        apps = new_apps
+        index_together = [['name', 'birthday']]
+
+
+class AuthorWithUniqueNameAndBirthday(models.Model):
+    name = models.CharField(max_length=255)
+    birthday = models.DateField()
+
+    class Meta:
+        apps = new_apps
+        unique_together = [['name', 'birthday']]
+
+
 class Book(models.Model):
     author = models.ForeignKey(Author, models.CASCADE)
     title = models.CharField(max_length=100, db_index=True)
@@ -185,6 +210,7 @@ class Thing(models.Model):
     when = models.CharField(max_length=1, primary_key=True)
 
     class Meta:
+        apps = new_apps
         db_table = 'drop'
 
     def __str__(self):

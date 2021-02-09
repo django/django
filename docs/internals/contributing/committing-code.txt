@@ -11,8 +11,8 @@ contribute code to Django, look at :doc:`writing-code/working-with-git` instead.
 Handling pull requests
 ======================
 
-Since Django is now hosted at GitHub, most patches are provided in the form of
-pull requests.
+Since Django is hosted on GitHub, patches are provided in the form of pull
+requests.
 
 When committing a pull request, make sure each individual commit matches the
 commit guidelines described below. Contributors are expected to provide the
@@ -26,14 +26,14 @@ builders that doesn't run automatically, such as Oracle or Selenium. See the
 
 .. _Jenkins wiki page: https://code.djangoproject.com/wiki/Jenkins
 
-An easy way to checkout a pull request locally is to add an alias to your
-``~/.gitconfig`` (``upstream`` is assumed to be ``django/django``)::
+If you find yourself checking out pull requests locally more often, this git
+alias will be helpful::
 
     [alias]
         pr = !sh -c \"git fetch upstream pull/${1}/head:pr/${1} && git checkout pr/${1}\"
 
-Now you can simply run ``git pr ####`` to checkout the corresponding pull
-request.
+Add it to your ``~/.gitconfig``, and set ``upstream`` to be ``django/django``.
+Then you can run ``git pr ####`` to checkout the corresponding pull request.
 
 At this point, you can work on the code. Use ``git rebase -i`` and ``git
 commit --amend`` to make sure the commits have the expected level of quality.
@@ -129,15 +129,16 @@ Django's Git repository:
 
   .. code-block:: none
 
-      Fixed #18307 -- Added git workflow guidelines
+      Fixed #18307 -- Added git workflow guidelines.
 
       Refactored the Django's documentation to remove mentions of SVN
       specific tasks. Added guidelines of how to use Git, GitHub, and
       how to use pull request together with Trac instead.
 
-  If the patch wasn't a pull request, you should credit the contributors in
-  the commit message: "Thanks A for report, B for the patch and C for the
-  review."
+  Credit the contributors in the commit message: "Thanks A for the report and B
+  for review." Use git's `Co-Authored-By`_ as appropriate.
+
+  .. _Co-Authored-By: https://help.github.com/articles/creating-a-commit-with-multiple-authors/
 
 * For commits to a branch, prefix the commit message with the branch name.
   For example: "[1.4.x] Fixed #xxxxx -- Added support for mind reading."
@@ -242,8 +243,8 @@ When a mistaken commit is discovered, please follow these guidelines:
 * The release branch maintainer may back out commits to the release
   branch without permission if the commit breaks the release branch.
 
-* If you mistakenly push a topic branch to ``django/django``, just delete it.
+* If you mistakenly push a topic branch to ``django/django``, delete it.
   For instance, if you did: ``git push upstream feature_antigravity``,
-  just do a reverse push: ``git push upstream :feature_antigravity``.
+  do a reverse push: ``git push upstream :feature_antigravity``.
 
 .. _ticket tracker: https://code.djangoproject.com/

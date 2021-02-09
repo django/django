@@ -2,24 +2,26 @@
 #
 # Translators:
 # Bumsoo Kim <bskim45@gmail.com>, 2017
+# Churow Park <churow@naver.com>, 2020
 # Jiyoon, Ha <cryptography@konkuk.ac.kr>, 2016
 # DaHae Sung <sdh4513136@hanmail.net>, 2016
+# Geonho Kim / Leo Kim <gh.leokim@gmail.com>, 2019
 # Ian Y. Choi <ianyrchoi@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Le Tartuffe <magno79@gmail.com>, 2014,2016
 # Jiyoon, Ha <cryptography@konkuk.ac.kr>, 2016
-# Chr0m3 <chr0m3.kr@gmail.com>, 2015
+# JunGu Kang <chr0m3.kr@gmail.com>, 2015
 # Kagami Sascha Rosylight <saschanaz@outlook.com>, 2017
 # minsung kang, 2015
-# seok woojing <woojing.seok@gmail.com>, 2016
+# Woo-Jing, Seok <woojing.seok@gmail.com>, 2016
 # seungho, kim <raccoonyy@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-10-31 08:29+0000\n"
-"Last-Translator: Kagami Sascha Rosylight <saschanaz@outlook.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-05-07 08:17+0000\n"
+"Last-Translator: Churow Park <churow@naver.com>\n"
 "Language-Team: Korean (http://www.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -62,7 +64,7 @@ msgstr "비밀번호가 설정되지 않습니다."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "잘못된 비밀번호 형식이거나 알 수 없는 해싱 알고리즘 입니다."
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "비밀번호가 일치하지 않습니다."
 
 msgid "Password"
@@ -75,11 +77,11 @@ msgid "Enter the same password as before, for verification."
 msgstr "확인을 위해 이전과 동일한 비밀번호를 입력하세요. "
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"원본 비밀번호는 저장되지 않으므로 이 사용자의 비밀번호를 알 수 있는 방법은 없"
-"습니다. 다만 <a href=\"{}\">이 양식</a>으로 비밀번호를 변경할 수 있습니다."
+"원본 비밀번호는 저장되지 않으므로, 해당 사용자의 비밀번호를 확인할 수 없습니"
+"다. 다만 이 <a href=\"{}\">폼</a>을 사용하여 비밀번호를 변경할 수 있습니다."
 
 #, python-format
 msgid ""
@@ -96,16 +98,16 @@ msgid "Email"
 msgstr "이메일"
 
 msgid "New password"
-msgstr "새 비밀번호:"
+msgstr "새 비밀번호"
 
 msgid "New password confirmation"
-msgstr "새 비밀번호 (확인):"
+msgstr "새 비밀번호 (확인)"
 
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "기존 비밀번호를 잘못 입력하셨습니다. 다시 입력해 주세요."
 
 msgid "Old password"
-msgstr "기존 비밀번호:"
+msgstr "기존 비밀번호"
 
 msgid "Password (again)"
 msgstr "비밀번호 (확인)"
@@ -246,20 +248,20 @@ msgstr[0] "비밀번호는 최소 %(min_length)d자 이상이어야 합니다."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "비밀번호가 %(verbose_name)s와 너무 유사합니다."
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr "다른 개인정보와 비슷한 비밀번호는 사용할 수 없습니다."
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "다른 개인 정보와 유사한 비밀번호는 사용할 수 없습니다."
 
 msgid "This password is too common."
 msgstr "비밀번호가 너무 일상적인 단어입니다."
 
-msgid "Your password can't be a commonly used password."
-msgstr "비밀번호는 일상적으로 사용되는 비밀번호일 수 없습니다."
+msgid "Your password can’t be a commonly used password."
+msgstr "통상적으로 자주 사용되는 비밀번호는 사용할 수 없습니다."
 
 msgid "This password is entirely numeric."
 msgstr "비밀번호가 전부 숫자로 되어 있습니다."
 
-msgid "Your password can't be entirely numeric."
-msgstr "비밀번호는 전부 숫자로 할 수 없습니다."
+msgid "Your password can’t be entirely numeric."
+msgstr "숫자로만 이루어진 비밀번호는 사용할 수 없습니다."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

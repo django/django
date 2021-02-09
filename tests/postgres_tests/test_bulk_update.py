@@ -2,12 +2,12 @@ from datetime import date
 
 from . import PostgreSQLTestCase
 from .models import (
-    HStoreModel, IntegerArrayModel, JSONModel, NestedIntegerArrayModel,
+    HStoreModel, IntegerArrayModel, NestedIntegerArrayModel,
     NullableIntegerArrayModel, OtherTypesArrayModel, RangesModel,
 )
 
 try:
-    from psycopg2.extras import NumericRange, DateRange
+    from psycopg2.extras import DateRange, NumericRange
 except ImportError:
     pass  # psycopg2 isn't installed.
 
@@ -17,7 +17,6 @@ class BulkSaveTests(PostgreSQLTestCase):
         test_data = [
             (IntegerArrayModel, 'field', [], [1, 2, 3]),
             (NullableIntegerArrayModel, 'field', [1, 2, 3], None),
-            (JSONModel, 'field', {'a': 'b'}, {'c': 'd'}),
             (NestedIntegerArrayModel, 'field', [], [[1, 2, 3]]),
             (HStoreModel, 'field', {}, {1: 2}),
             (RangesModel, 'ints', None, NumericRange(lower=1, upper=10)),

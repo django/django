@@ -3,7 +3,7 @@ import re
 from django.contrib.gis import forms
 from django.contrib.gis.forms import BaseGeometryWidget, OpenLayersWidget
 from django.contrib.gis.geos import GEOSGeometry
-from django.forms import ValidationError
+from django.core.exceptions import ValidationError
 from django.test import SimpleTestCase, override_settings
 from django.utils.html import escape
 
@@ -28,7 +28,7 @@ class GeometryFieldTest(SimpleTestCase):
         # Making the field in a different SRID from that of the geometry, and
         # asserting it transforms.
         fld = forms.GeometryField(srid=32140)
-        tol = 0.0000001
+        tol = 0.0001
         xform_geom = GEOSGeometry('POINT (951640.547328465 4219369.26171664)', srid=32140)
         # The cleaned geometry is transformed to 32140 (the widget map_srid is 3857).
         cleaned_geom = fld.clean('SRID=3857;POINT (-10615777.40976205 3473169.895707852)')
@@ -39,7 +39,7 @@ class GeometryFieldTest(SimpleTestCase):
         "Testing GeometryField's handling of null (None) geometries."
         # Form fields, by default, are required (`required=True`)
         fld = forms.GeometryField()
-        with self.assertRaisesMessage(forms.ValidationError, "No geometry value provided."):
+        with self.assertRaisesMessage(ValidationError, "No geometry value provided."):
             fld.clean(None)
 
         # This will clean None as a geometry (See #10660).
@@ -64,7 +64,7 @@ class GeometryFieldTest(SimpleTestCase):
             pnt_fld.to_python('LINESTRING(0 0, 1 1)')
         )
         # but rejected by `clean`
-        with self.assertRaises(forms.ValidationError):
+        with self.assertRaises(ValidationError):
             pnt_fld.clean('LINESTRING(0 0, 1 1)')
 
     def test_to_python(self):
@@ -92,7 +92,7 @@ class GeometryFieldTest(SimpleTestCase):
         # but raises a ValidationError for any other string
         for geo_input in bad_inputs:
             with self.subTest(geo_input=geo_input):
-                with self.assertRaises(forms.ValidationError):
+                with self.assertRaises(ValidationError):
                     fld.to_python(geo_input)
 
     def test_to_python_different_map_srid(self):
@@ -136,7 +136,7 @@ class GeometryFieldTest(SimpleTestCase):
 
         # The first point can't use assertInHTML() due to non-deterministic
         # ordering of the rendered dictionary.
-        pt1_serialized = re.search(r'<textarea [^>]*>({[^<]+})<', output).groups()[0]
+        pt1_serialized = re.search(r'<textarea [^>]*>({[^<]+})<', output)[1]
         pt1_json = pt1_serialized.replace('&quot;', '"')
         pt1_expected = GEOSGeometry(form.data['pt1']).transform(3857, clone=True)
         self.assertJSONEqual(pt1_json, pt1_expected.json)
@@ -235,7 +235,7 @@ class SpecializedFieldTest(SimpleTestCase):
         ogr.transform(3857)
         self.assertIn(escape(ogr.json), rendered)
 
-    # map_srid in operlayers.html template must not be localized.
+    # map_srid in openlayers.html template must not be localized.
     @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
     def test_pointfield(self):
         class PointForm(forms.Form):
@@ -374,10 +374,18 @@ class OSMWidgetTest(SimpleTestCase):
 class GeometryWidgetTests(SimpleTestCase):
 
     def test_get_context_attrs(self):
-        """The Widget.get_context() attrs argument overrides self.attrs."""
+        # The Widget.get_context() attrs argument overrides self.attrs.
         widget = BaseGeometryWidget(attrs={'geom_type': 'POINT'})
         context = widget.get_context('point', None, attrs={'geom_type': 'POINT2'})
         self.assertEqual(context['geom_type'], 'POINT2')
+        # Widget.get_context() returns expected name for geom_type.
+        widget = BaseGeometryWidget(attrs={'geom_type': 'POLYGON'})
+        context = widget.get_context('polygon', None, None)
+        self.assertEqual(context['geom_type'], 'Polygon')
+        # Widget.get_context() returns 'Geometry' instead of 'Unknown'.
+        widget = BaseGeometryWidget(attrs={'geom_type': 'GEOMETRY'})
+        context = widget.get_context('geometry', None, None)
+        self.assertEqual(context['geom_type'], 'Geometry')
 
     def test_subwidgets(self):
         widget = forms.BaseGeometryWidget()

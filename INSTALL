@@ -1,10 +1,8 @@
 Thanks for downloading Django.
 
-To install it, make sure you have Python 3.5 or greater installed. Then run
+To install it, make sure you have Python 3.6 or greater installed. Then run
 this command from the command prompt:
 
-    python setup.py install
-
-If you're upgrading from a previous version, you need to remove it first.
+    python -m pip install .
 
 For more detailed instructions, see docs/intro/install.txt.

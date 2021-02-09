@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2018
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2018,2020
 # Jannis Leidel <jannis@leidel.info>, 2011
-# oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016
+# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011,2013
 # rodin <romihardiyanto@gmail.com>, 2013-2016
+# sage <laymonage@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2018-01-11 07:05+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-02-06 01:43+0000\n"
 "Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
@@ -56,8 +57,8 @@ msgstr "Belum ada sandi yang disetel."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Format sandi tidak valid atau algoritma hash yang tidak dikenal."
 
-msgid "The two password fields didn't match."
-msgstr "Kedua bidang sandi tidak cocok."
+msgid "The two password fields didn’t match."
+msgstr "Dua bidang sandi tidak cocok."
 
 msgid "Password"
 msgstr "Sandi"
@@ -69,11 +70,11 @@ msgid "Enter the same password as before, for verification."
 msgstr "Masukkan sandi yang sama seperti sebelumnya, untuk verifikasi."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Sandi mentah tidak disimpan, jadi tidak ada cara melihat sandi pengguna ini, "
-"tetapi anda dapat merubah sandi menggunakan <a href=\"{}\">this form</a>."
+"tetapi anda dapat merubah sandi menggunakan <a href=\"{}\">formulir ini</a>."
 
 #, python-format
 msgid ""
@@ -244,20 +245,20 @@ msgstr[0] "Kata sandi Anda harus memuat setidaknya %(min_length)d karakter."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Kata sandi terlalu mirip dengan %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr "Kata sandi tidak boleh terlalu mirip dengan informasi pribadi lainnya."
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Sandi anda tidak dapat terlalu mirip terhadap informasi pribadi anda."
 
 msgid "This password is too common."
 msgstr "Kata sandi ini terlalu umum."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Kata sandi Anda tidak boleh kata sandi yang umum digunakan."
+msgid "Your password can’t be a commonly used password."
+msgstr "Sandi anda tidak dapat berupa sandi umum digunakan."
 
 msgid "This password is entirely numeric."
 msgstr "Kata sandi ini seluruhnya terdiri dari angka."
 
-msgid "Your password can't be entirely numeric."
-msgstr "Kata sandi Anda tidak dapat seluruhnya numerik."
+msgid "Your password can’t be entirely numeric."
+msgstr "Sandi anda tidak bisa sepenuhnya numerik."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

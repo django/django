@@ -35,6 +35,9 @@ class BaseManager:
         """Return "app_label.model_label.manager_name"."""
         return '%s.%s' % (self.model._meta.label, self.name)
 
+    def __class_getitem__(cls, *args, **kwargs):
+        return cls
+
     def deconstruct(self):
         """
         Return a 5-tuple of the form (as_manager (True), manager_class,
@@ -106,13 +109,13 @@ class BaseManager:
             **cls._get_queryset_methods(queryset_class),
         })
 
-    def contribute_to_class(self, model, name):
+    def contribute_to_class(self, cls, name):
         self.name = self.name or name
-        self.model = model
+        self.model = cls
 
-        setattr(model, name, ManagerDescriptor(self))
+        setattr(cls, name, ManagerDescriptor(self))
 
-        model._meta.add_manager(self)
+        cls._meta.add_manager(self)
 
     def _set_creation_counter(self):
         """
@@ -182,9 +185,8 @@ class ManagerDescriptor:
 
         if cls._meta.swapped:
             raise AttributeError(
-                "Manager isn't available; '%s.%s' has been swapped for '%s'" % (
-                    cls._meta.app_label,
-                    cls._meta.object_name,
+                "Manager isn't available; '%s' has been swapped for '%s'" % (
+                    cls._meta.label,
                     cls._meta.swapped,
                 )
             )

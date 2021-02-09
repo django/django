@@ -1,5 +1,6 @@
 import compileall
 import os
+from importlib import import_module
 
 from django.db import connection, connections
 from django.db.migrations.exceptions import (
@@ -50,6 +51,19 @@ class LoaderTests(TestCase):
     Tests the disk and database loader, and running through migrations
     in memory.
     """
+    def setUp(self):
+        self.applied_records = []
+
+    def tearDown(self):
+        # Unapply records on databases that don't roll back changes after each
+        # test method.
+        if not connection.features.supports_transactions:
+            for recorder, app, name in self.applied_records:
+                recorder.record_unapplied(app, name)
+
+    def record_applied(self, recorder, app, name):
+        recorder.record_applied(app, name)
+        self.applied_records.append((recorder, app, name))
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     @modify_settings(INSTALLED_APPS={'append': 'basic'})
@@ -73,15 +87,12 @@ class LoaderTests(TestCase):
 
         author_state = project_state.models["migrations", "author"]
         self.assertEqual(
-            [x for x, y in author_state.fields],
+            list(author_state.fields),
             ["id", "name", "slug", "age", "rating"]
         )
 
         book_state = project_state.models["migrations", "book"]
-        self.assertEqual(
-            [x for x, y in book_state.fields],
-            ["id", "author"]
-        )
+        self.assertEqual(list(book_state.fields), ['id', 'author'])
 
         # Ensure we've included unmigrated apps in there too
         self.assertIn("basic", project_state.real_apps)
@@ -122,10 +133,7 @@ class LoaderTests(TestCase):
         self.assertEqual(len([m for a, m in project_state.models if a == "migrations"]), 1)
 
         book_state = project_state.models["migrations", "book"]
-        self.assertEqual(
-            [x for x, y in book_state.fields],
-            ["id", "user"]
-        )
+        self.assertEqual(list(book_state.fields), ['id', 'user'])
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_run_before"})
     def test_run_before(self):
@@ -248,7 +256,7 @@ class LoaderTests(TestCase):
             1,
         )
         # However, fake-apply one migration and it should now use the old two
-        recorder.record_applied("migrations", "0001_initial")
+        self.record_applied(recorder, 'migrations', '0001_initial')
         migration_loader.build_graph()
         self.assertEqual(
             len([x for x in migration_loader.graph.nodes if x[0] == "migrations"]),
@@ -265,40 +273,40 @@ class LoaderTests(TestCase):
 
         def num_nodes():
             plan = set(loader.graph.forwards_plan(('migrations', '7_auto')))
-            return len(plan - loader.applied_migrations)
+            return len(plan - loader.applied_migrations.keys())
 
         # Empty database: use squashed migration
         loader.build_graph()
         self.assertEqual(num_nodes(), 5)
 
         # Starting at 1 or 2 should use the squashed migration too
-        recorder.record_applied("migrations", "1_auto")
+        self.record_applied(recorder, 'migrations', '1_auto')
         loader.build_graph()
         self.assertEqual(num_nodes(), 4)
 
-        recorder.record_applied("migrations", "2_auto")
+        self.record_applied(recorder, 'migrations', '2_auto')
         loader.build_graph()
         self.assertEqual(num_nodes(), 3)
 
         # However, starting at 3 to 5 cannot use the squashed migration
-        recorder.record_applied("migrations", "3_auto")
+        self.record_applied(recorder, 'migrations', '3_auto')
         loader.build_graph()
         self.assertEqual(num_nodes(), 4)
 
-        recorder.record_applied("migrations", "4_auto")
+        self.record_applied(recorder, 'migrations', '4_auto')
         loader.build_graph()
         self.assertEqual(num_nodes(), 3)
 
         # Starting at 5 to 7 we are passed the squashed migrations
-        recorder.record_applied("migrations", "5_auto")
+        self.record_applied(recorder, 'migrations', '5_auto')
         loader.build_graph()
         self.assertEqual(num_nodes(), 2)
 
-        recorder.record_applied("migrations", "6_auto")
+        self.record_applied(recorder, 'migrations', '6_auto')
         loader.build_graph()
         self.assertEqual(num_nodes(), 1)
 
-        recorder.record_applied("migrations", "7_auto")
+        self.record_applied(recorder, 'migrations', '7_auto')
         loader.build_graph()
         self.assertEqual(num_nodes(), 0)
 
@@ -334,12 +342,12 @@ class LoaderTests(TestCase):
     def test_loading_squashed_complex_multi_apps_partially_applied(self):
         loader = MigrationLoader(connection)
         recorder = MigrationRecorder(connection)
-        recorder.record_applied('app1', '1_auto')
-        recorder.record_applied('app1', '2_auto')
+        self.record_applied(recorder, 'app1', '1_auto')
+        self.record_applied(recorder, 'app1', '2_auto')
         loader.build_graph()
 
         plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
-        plan = plan - loader.applied_migrations
+        plan = plan - loader.applied_migrations.keys()
         expected_plan = {
             ('app2', '1_squashed_2'),
             ('app1', '3_auto'),
@@ -358,18 +366,18 @@ class LoaderTests(TestCase):
 
         def num_nodes():
             plan = set(loader.graph.forwards_plan(('migrations', '7_auto')))
-            return len(plan - loader.applied_migrations)
+            return len(plan - loader.applied_migrations.keys())
 
         # Empty database: use squashed migration
         loader.build_graph()
         self.assertEqual(num_nodes(), 5)
 
         # Starting at 1 or 2 should use the squashed migration too
-        recorder.record_applied("migrations", "1_auto")
+        self.record_applied(recorder, 'migrations', '1_auto')
         loader.build_graph()
         self.assertEqual(num_nodes(), 4)
 
-        recorder.record_applied("migrations", "2_auto")
+        self.record_applied(recorder, 'migrations', '2_auto')
         loader.build_graph()
         self.assertEqual(num_nodes(), 3)
 
@@ -379,24 +387,24 @@ class LoaderTests(TestCase):
                "[migrations.3_squashed_5] but wasn't able to because some of the replaced "
                "migrations are already applied.")
 
-        recorder.record_applied("migrations", "3_auto")
+        self.record_applied(recorder, 'migrations', '3_auto')
         with self.assertRaisesMessage(NodeNotFoundError, msg):
             loader.build_graph()
 
-        recorder.record_applied("migrations", "4_auto")
+        self.record_applied(recorder, 'migrations', '4_auto')
         with self.assertRaisesMessage(NodeNotFoundError, msg):
             loader.build_graph()
 
         # Starting at 5 to 7 we are passed the squashed migrations
-        recorder.record_applied("migrations", "5_auto")
+        self.record_applied(recorder, 'migrations', '5_auto')
         loader.build_graph()
         self.assertEqual(num_nodes(), 2)
 
-        recorder.record_applied("migrations", "6_auto")
+        self.record_applied(recorder, 'migrations', '6_auto')
         loader.build_graph()
         self.assertEqual(num_nodes(), 1)
 
-        recorder.record_applied("migrations", "7_auto")
+        self.record_applied(recorder, 'migrations', '7_auto')
         loader.build_graph()
         self.assertEqual(num_nodes(), 0)
 
@@ -408,7 +416,7 @@ class LoaderTests(TestCase):
         loader = MigrationLoader(connection=None)
         loader.check_consistent_history(connection)
         recorder = MigrationRecorder(connection)
-        recorder.record_applied('migrations', '0002_second')
+        self.record_applied(recorder, 'migrations', '0002_second')
         msg = (
             "Migration migrations.0002_second is applied before its dependency "
             "migrations.0001_initial on database 'default'."
@@ -427,10 +435,10 @@ class LoaderTests(TestCase):
         """
         loader = MigrationLoader(connection=None)
         recorder = MigrationRecorder(connection)
-        recorder.record_applied('migrations', '0001_initial')
-        recorder.record_applied('migrations', '0002_second')
+        self.record_applied(recorder, 'migrations', '0001_initial')
+        self.record_applied(recorder, 'migrations', '0002_second')
         loader.check_consistent_history(connection)
-        recorder.record_applied('migrations', '0003_third')
+        self.record_applied(recorder, 'migrations', '0003_third')
         loader.check_consistent_history(connection)
 
     @override_settings(MIGRATION_MODULES={
@@ -466,7 +474,7 @@ class LoaderTests(TestCase):
         # Load with nothing applied: both migrations squashed.
         loader.build_graph()
         plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
-        plan = plan - loader.applied_migrations
+        plan = plan - loader.applied_migrations.keys()
         expected_plan = {
             ('app1', '1_auto'),
             ('app2', '1_squashed_2'),
@@ -476,11 +484,11 @@ class LoaderTests(TestCase):
         self.assertEqual(plan, expected_plan)
 
         # Fake-apply a few from app1: unsquashes migration in app1.
-        recorder.record_applied('app1', '1_auto')
-        recorder.record_applied('app1', '2_auto')
+        self.record_applied(recorder, 'app1', '1_auto')
+        self.record_applied(recorder, 'app1', '2_auto')
         loader.build_graph()
         plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
-        plan = plan - loader.applied_migrations
+        plan = plan - loader.applied_migrations.keys()
         expected_plan = {
             ('app2', '1_squashed_2'),
             ('app1', '3_auto'),
@@ -489,10 +497,10 @@ class LoaderTests(TestCase):
         self.assertEqual(plan, expected_plan)
 
         # Fake-apply one from app2: unsquashes migration in app2 too.
-        recorder.record_applied('app2', '1_auto')
+        self.record_applied(recorder, 'app2', '1_auto')
         loader.build_graph()
         plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
-        plan = plan - loader.applied_migrations
+        plan = plan - loader.applied_migrations.keys()
         expected_plan = {
             ('app2', '2_auto'),
             ('app1', '3_auto'),
@@ -507,6 +515,45 @@ class LoaderTests(TestCase):
         loader.load_disk()
         migrations = [name for app, name in loader.disk_migrations if app == 'migrations']
         self.assertEqual(migrations, ['0001_initial'])
+
+    @override_settings(
+        MIGRATION_MODULES={'migrations': 'migrations.test_migrations_namespace_package'},
+    )
+    def test_loading_namespace_package(self):
+        """Migration directories without an __init__.py file are ignored."""
+        loader = MigrationLoader(connection)
+        loader.load_disk()
+        migrations = [name for app, name in loader.disk_migrations if app == 'migrations']
+        self.assertEqual(migrations, [])
+
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations'})
+    def test_loading_package_without__file__(self):
+        """
+        To support frozen environments, MigrationLoader loads migrations from
+        regular packages with no __file__ attribute.
+        """
+        test_module = import_module('migrations.test_migrations')
+        loader = MigrationLoader(connection)
+        # __file__ == __spec__.origin or the latter is None and former is
+        # undefined.
+        module_file = test_module.__file__
+        module_origin = test_module.__spec__.origin
+        module_has_location = test_module.__spec__.has_location
+        try:
+            del test_module.__file__
+            test_module.__spec__.origin = None
+            test_module.__spec__.has_location = False
+            loader.load_disk()
+            migrations = [
+                name
+                for app, name in loader.disk_migrations
+                if app == 'migrations'
+            ]
+            self.assertCountEqual(migrations, ['0001_initial', '0002_second'])
+        finally:
+            test_module.__file__ = module_file
+            test_module.__spec__.origin = module_origin
+            test_module.__spec__.has_location = module_has_location
 
 
 class PycLoaderTests(MigrationTestBase):

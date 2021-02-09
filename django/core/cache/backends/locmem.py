@@ -59,6 +59,7 @@ class LocMemCache(BaseCache):
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
+        self.validate_key(key)
         with self._lock:
             if self._has_expired(key):
                 return False
@@ -108,13 +109,14 @@ class LocMemCache(BaseCache):
             del self._cache[key]
             del self._expire_info[key]
         except KeyError:
-            pass
+            return False
+        return True
 
     def delete(self, key, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         with self._lock:
-            self._delete(key)
+            return self._delete(key)
 
     def clear(self):
         with self._lock:

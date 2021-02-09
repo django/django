@@ -154,20 +154,22 @@ ones:
     <Field.blank>`, the field will be required.
 
 :attr:`~Field.choices`
-    An iterable (e.g., a list or tuple) of 2-tuples to use as choices for
-    this field. If this is given, the default form widget will be a select box
-    instead of the standard text field and will limit choices to the choices
-    given.
+    A :term:`sequence` of 2-tuples to use as choices for this field. If this
+    is given, the default form widget will be a select box instead of the
+    standard text field and will limit choices to the choices given.
 
     A choices list looks like this::
 
-        YEAR_IN_SCHOOL_CHOICES = (
+        YEAR_IN_SCHOOL_CHOICES = [
             ('FR', 'Freshman'),
             ('SO', 'Sophomore'),
             ('JR', 'Junior'),
             ('SR', 'Senior'),
             ('GR', 'Graduate'),
-        )
+        ]
+
+    .. note::
+        A new migration is created each time the order of ``choices`` changes.
 
     The first element in each tuple is the value that will be stored in the
     database. The second element is displayed by the field's form widget.
@@ -195,6 +197,19 @@ ones:
         'L'
         >>> p.get_shirt_size_display()
         'Large'
+
+    You can also use enumeration classes to define ``choices`` in a concise
+    way::
+
+        from django.db import models
+
+        class Runner(models.Model):
+            MedalType = models.TextChoices('MedalType', 'GOLD SILVER BRONZE')
+            name = models.CharField(max_length=60)
+            medal = models.CharField(blank=True, choices=MedalType.choices, max_length=10)
+
+    Further examples are available in the :ref:`model field reference
+    <field-choices>`.
 
 :attr:`~Field.default`
     The default value for the field. This can be a value or a callable
@@ -244,19 +259,25 @@ details can be found in the :ref:`common model field option reference
 Automatic primary key fields
 ----------------------------
 
-By default, Django gives each model the following field::
+By default, Django gives each model an auto-incrementing primary key with the
+type specified per app in :attr:`AppConfig.default_auto_field
+<django.apps.AppConfig.default_auto_field>` or globally in the
+:setting:`DEFAULT_AUTO_FIELD` setting. For example::
 
-    id = models.AutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
 
-This is an auto-incrementing primary key.
-
-If you'd like to specify a custom primary key, just specify
+If you'd like to specify a custom primary key, specify
 :attr:`primary_key=True <Field.primary_key>` on one of your fields. If Django
 sees you've explicitly set :attr:`Field.primary_key`, it won't add the automatic
 ``id`` column.
 
 Each model requires exactly one field to have :attr:`primary_key=True
 <Field.primary_key>` (either explicitly declared or automatically added).
+
+.. versionchanged:: 3.2
+
+    In older versions, auto-created primary key fields were always
+    :class:`AutoField`\s.
 
 .. _verbose-field-names:
 
@@ -337,8 +358,8 @@ reference <ref-foreignkey>` for details.
 
 It's suggested, but not required, that the name of a
 :class:`~django.db.models.ForeignKey` field (``manufacturer`` in the example
-above) be the name of the model, lowercase. You can, of course, call the field
-whatever you want. For example::
+above) be the name of the model, lowercase. You can call the field whatever you
+want. For example::
 
     class Car(models.Model):
         company_that_makes_it = models.ForeignKey(
@@ -421,8 +442,8 @@ should work; all are optional.
 Extra fields on many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When you're only dealing with simple many-to-many relationships such as
-mixing and matching pizzas and toppings, a standard
+When you're only dealing with many-to-many relationships such as mixing and
+matching pizzas and toppings, a standard
 :class:`~django.db.models.ManyToManyField` is all you need. However, sometimes
 you may need to associate data with the relationship between two models.
 
@@ -484,11 +505,6 @@ There are a few restrictions on the intermediate model:
   must also specify ``through_fields`` as above, or a validation error
   will be raised.
 
-* When defining a many-to-many relationship from a model to
-  itself, using an intermediary model, you *must* use
-  :attr:`symmetrical=False <ManyToManyField.symmetrical>` (see
-  :ref:`the model field reference <manytomany-arguments>`).
-
 Now that you have set up your :class:`~django.db.models.ManyToManyField` to use
 your intermediary model (``Membership``, in this case), you're ready to start
 creating some many-to-many relationships. You do this by creating instances of
@@ -511,8 +527,11 @@ the intermediate model::
     >>> beatles.members.all()
     <QuerySet [<Person: Ringo Starr>, <Person: Paul McCartney>]>
 
-You can also use ``add()``, ``create()``, or ``set()`` to create relationships,
-as long as your specify ``through_defaults`` for any required fields::
+You can also use :meth:`~django.db.models.fields.related.RelatedManager.add`,
+:meth:`~django.db.models.fields.related.RelatedManager.create`, or
+:meth:`~django.db.models.fields.related.RelatedManager.set` to create
+relationships, as long as you specify ``through_defaults`` for any required
+fields::
 
     >>> beatles.members.add(john, through_defaults={'date_joined': date(1960, 8, 1)})
     >>> beatles.members.create(name="George Harrison", through_defaults={'date_joined': date(1960, 8, 1)})
@@ -625,7 +644,7 @@ Models across files
 
 It's perfectly OK to relate a model to one from another app. To do this, import
 the related model at the top of the file where your model is defined. Then,
-just refer to the other model class wherever needed. For example::
+refer to the other model class wherever needed. For example::
 
     from django.db import models
     from geography.models import ZipCode
@@ -942,17 +961,44 @@ extend the parent's :ref:`Meta <meta-options>` class, it can subclass it. For ex
         class Meta(CommonInfo.Meta):
             db_table = 'student_info'
 
-Django does make one adjustment to the :ref:`Meta <meta-options>` class of an abstract base
-class: before installing the :ref:`Meta <meta-options>` attribute, it sets ``abstract=False``.
-This means that children of abstract base classes don't automatically become
-abstract classes themselves. Of course, you can make an abstract base class
-that inherits from another abstract base class. You just need to remember to
-explicitly set ``abstract=True`` each time.
+Django does make one adjustment to the :ref:`Meta <meta-options>` class of an
+abstract base class: before installing the :ref:`Meta <meta-options>`
+attribute, it sets ``abstract=False``. This means that children of abstract
+base classes don't automatically become abstract classes themselves. To make
+an abstract base class that inherits from another abstract base class, you need
+to explicitly set ``abstract=True`` on the child.
 
 Some attributes won't make sense to include in the :ref:`Meta <meta-options>` class of an
 abstract base class. For example, including ``db_table`` would mean that all
 the child classes (the ones that don't specify their own :ref:`Meta <meta-options>`) would use
 the same database table, which is almost certainly not what you want.
+
+Due to the way Python inheritance works, if a child class inherits from
+multiple abstract base classes, only the :ref:`Meta <meta-options>` options
+from the first listed class will be inherited by default. To inherit :ref:`Meta
+<meta-options>` options from multiple abstract base classes, you must
+explicitly declare the :ref:`Meta <meta-options>` inheritance. For example::
+
+    from django.db import models
+
+    class CommonInfo(models.Model):
+        name = models.CharField(max_length=100)
+        age = models.PositiveIntegerField()
+
+        class Meta:
+            abstract = True
+            ordering = ['name']
+
+    class Unmanaged(models.Model):
+        class Meta:
+            abstract = True
+            managed = False
+
+    class Student(CommonInfo, Unmanaged):
+        home_group = models.CharField(max_length=5)
+
+        class Meta(CommonInfo.Meta, Unmanaged.Meta):
+            pass
 
 .. _abstract-related-name:
 
@@ -1077,6 +1123,7 @@ The automatically-created :class:`~django.db.models.OneToOneField` on
     place_ptr = models.OneToOneField(
         Place, on_delete=models.CASCADE,
         parent_link=True,
+        primary_key=True,
     )
 
 You can override that field by declaring your own
@@ -1203,7 +1250,7 @@ accessible through ``MyPerson``, and vice-versa::
 
 You could also use a proxy model to define a different default ordering on
 a model. You might not always want to order the ``Person`` model, but regularly
-order by the ``last_name`` attribute when you use the proxy. This is easy::
+order by the ``last_name`` attribute when you use the proxy::
 
     class OrderedPerson(Person):
         class Meta:

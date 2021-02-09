@@ -8,7 +8,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.contrib.gis.shortcuts import numpy
 from django.db import connection
-from django.db.models import Q
+from django.db.models import F, Func, Q
 from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
@@ -50,6 +50,29 @@ class RasterFieldTest(TransactionTestCase):
         RasterModel.objects.create(rast=JSON_RASTER)
         qs = RasterModel.objects.all()
         qs[0].rast.bands[0].data()
+
+    def test_deserialize_with_pixeltype_flags(self):
+        no_data = 3
+        rast = GDALRaster({
+            'srid': 4326,
+            'origin': [0, 0],
+            'scale': [-1, 1],
+            'skew': [0, 0],
+            'width': 1,
+            'height': 1,
+            'nr_of_bands': 1,
+            'bands': [{'data': [no_data], 'nodata_value': no_data}],
+        })
+        r = RasterModel.objects.create(rast=rast)
+        RasterModel.objects.filter(pk=r.pk).update(
+            rast=Func(F('rast'), function='ST_SetBandIsNoData'),
+        )
+        r.refresh_from_db()
+        band = r.rast.bands[0].data()
+        if numpy:
+            band = band.flatten().tolist()
+        self.assertEqual(band, [no_data])
+        self.assertEqual(r.rast.bands[0].nodata_value, no_data)
 
     def test_model_creation(self):
         """
@@ -120,7 +143,9 @@ class RasterFieldTest(TransactionTestCase):
         unprojected coordinate systems. This test just checks that the lookup
         can be called, but doesn't check if the result makes logical sense.
         """
-        from django.contrib.gis.db.backends.postgis.operations import PostGISOperations
+        from django.contrib.gis.db.backends.postgis.operations import (
+            PostGISOperations,
+        )
 
         # Create test raster and geom.
         rast = GDALRaster(json.loads(JSON_RASTER))
@@ -204,7 +229,7 @@ class RasterFieldTest(TransactionTestCase):
             qs = RasterModel.objects.filter(Q(**combos[0]) & Q(**combos[1]))
             self.assertIn(qs.count(), [0, 1])
 
-    def test_dwithin_gis_lookup_ouptut_with_rasters(self):
+    def test_dwithin_gis_lookup_output_with_rasters(self):
         """
         Check the logical functionality of the dwithin lookup for different
         input parameters.

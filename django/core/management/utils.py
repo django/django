@@ -1,5 +1,7 @@
+import fnmatch
 import os
-from subprocess import PIPE, Popen
+from pathlib import Path
+from subprocess import PIPE, run
 
 from django.apps import apps as installed_apps
 from django.utils.crypto import get_random_string
@@ -15,13 +17,12 @@ def popen_wrapper(args, stdout_encoding='utf-8'):
     Return stdout output, stderr output, and OS status code.
     """
     try:
-        p = Popen(args, shell=False, stdout=PIPE, stderr=PIPE, close_fds=os.name != 'nt')
+        p = run(args, stdout=PIPE, stderr=PIPE, close_fds=os.name != 'nt')
     except OSError as err:
         raise CommandError('Error executing %s' % args[0]) from err
-    output, errors = p.communicate()
     return (
-        output.decode(stdout_encoding),
-        errors.decode(DEFAULT_LOCALE_ENCODING, errors='replace'),
+        p.stdout.decode(stdout_encoding),
+        p.stderr.decode(DEFAULT_LOCALE_ENCODING, errors='replace'),
         p.returncode
     )
 
@@ -111,7 +112,7 @@ def parse_apps_and_model_labels(labels):
 def get_command_line_option(argv, option):
     """
     Return the value of a command line option (which should include leading
-    dashes, e.g. '--testrunnner') from an argument list. Return None if the
+    dashes, e.g. '--testrunner') from an argument list. Return None if the
     option wasn't passed or if the argument list couldn't be parsed.
     """
     parser = CommandParser(add_help=False, allow_abbrev=False)
@@ -122,3 +123,31 @@ def get_command_line_option(argv, option):
         return None
     else:
         return options.value
+
+
+def normalize_path_patterns(patterns):
+    """Normalize an iterable of glob style patterns based on OS."""
+    patterns = [os.path.normcase(p) for p in patterns]
+    dir_suffixes = {'%s*' % path_sep for path_sep in {'/', os.sep}}
+    norm_patterns = []
+    for pattern in patterns:
+        for dir_suffix in dir_suffixes:
+            if pattern.endswith(dir_suffix):
+                norm_patterns.append(pattern[:-len(dir_suffix)])
+                break
+        else:
+            norm_patterns.append(pattern)
+    return norm_patterns
+
+
+def is_ignored_path(path, ignore_patterns):
+    """
+    Check if the given path should be ignored or not based on matching
+    one of the glob style `ignore_patterns`.
+    """
+    path = Path(path)
+
+    def ignore(pattern):
+        return fnmatch.fnmatchcase(path.name, pattern) or fnmatch.fnmatchcase(str(path), pattern)
+
+    return any(ignore(pattern) for pattern in normalize_path_patterns(ignore_patterns))

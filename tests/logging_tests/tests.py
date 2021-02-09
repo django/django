@@ -16,28 +16,10 @@ from django.utils.log import (
     DEFAULT_LOGGING, AdminEmailHandler, CallbackFilter, RequireDebugFalse,
     RequireDebugTrue, ServerFormatter,
 )
+from django.views.debug import ExceptionReporter
 
 from . import views
 from .logconfig import MyEmailBackend
-
-# logging config prior to using filter with mail_admins
-OLD_LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
-    },
-    'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-    }
-}
 
 
 class LoggingFiltersTest(SimpleTestCase):
@@ -228,8 +210,8 @@ class CallbackFilterTest(SimpleTestCase):
         f_false = CallbackFilter(lambda r: False)
         f_true = CallbackFilter(lambda r: True)
 
-        self.assertEqual(f_false.filter("record"), False)
-        self.assertEqual(f_true.filter("record"), True)
+        self.assertFalse(f_false.filter('record'))
+        self.assertTrue(f_true.filter('record'))
 
     def test_passes_on_record(self):
         collector = []
@@ -251,11 +233,10 @@ class AdminEmailHandlerTest(SimpleTestCase):
     def get_admin_email_handler(self, logger):
         # AdminEmailHandler does not get filtered out
         # even with DEBUG=True.
-        admin_email_handler = [
+        return [
             h for h in logger.handlers
             if h.__class__.__name__ == "AdminEmailHandler"
         ][0]
-        return admin_email_handler
 
     def test_fail_silently(self):
         admin_email_handler = self.get_admin_email_handler(self.logger)
@@ -432,6 +413,20 @@ class AdminEmailHandlerTest(SimpleTestCase):
         finally:
             admin_email_handler.include_html = old_include_html
 
+    def test_default_exception_reporter_class(self):
+        admin_email_handler = self.get_admin_email_handler(self.logger)
+        self.assertEqual(admin_email_handler.reporter_class, ExceptionReporter)
+
+    @override_settings(ADMINS=[('A.N.Admin', 'admin@example.com')])
+    def test_custom_exception_reporter_is_used(self):
+        record = self.logger.makeRecord('name', logging.ERROR, 'function', 'lno', 'message', None, None)
+        record.request = self.request_factory.get('/')
+        handler = AdminEmailHandler(reporter_class='logging_tests.logconfig.CustomExceptionReporter')
+        handler.emit(record)
+        self.assertEqual(len(mail.outbox), 1)
+        msg = mail.outbox[0]
+        self.assertEqual(msg.body, 'message\n\ncustom traceback text')
+
 
 class SettingsConfigTest(AdminScriptTestCase):
     """
@@ -439,6 +434,7 @@ class SettingsConfigTest(AdminScriptTestCase):
     a circular import error.
     """
     def setUp(self):
+        super().setUp()
         log_config = """{
     'version': 1,
     'handlers': {
@@ -449,9 +445,6 @@ class SettingsConfigTest(AdminScriptTestCase):
     }
 }"""
         self.write_settings('settings.py', sdict={'LOGGING': log_config})
-
-    def tearDown(self):
-        self.remove_settings('settings.py')
 
     def test_circular_dependency(self):
         # validate is just an example command to trigger settings configuration
@@ -471,13 +464,16 @@ class SetupConfigureLogging(SimpleTestCase):
     """
     Calling django.setup() initializes the logging configuration.
     """
-    @override_settings(
-        LOGGING_CONFIG='logging_tests.tests.dictConfig',
-        LOGGING=OLD_LOGGING,
-    )
     def test_configure_initializes_logging(self):
         from django import setup
-        setup()
+        try:
+            with override_settings(
+                LOGGING_CONFIG='logging_tests.tests.dictConfig',
+            ):
+                setup()
+        finally:
+            # Restore logging from settings.
+            setup()
         self.assertTrue(dictConfig.called)
 
 
@@ -518,6 +514,7 @@ class SettingsCustomLoggingTest(AdminScriptTestCase):
     callable in LOGGING_CONFIG (i.e., logging.config.fileConfig).
     """
     def setUp(self):
+        super().setUp()
         logging_conf = """
 [loggers]
 keys=root
@@ -544,7 +541,6 @@ format=%(message)s
 
     def tearDown(self):
         self.temp_file.close()
-        self.remove_settings('settings.py')
 
     def test_custom_logging(self):
         out, err = self.run_manage(['check'])
@@ -593,4 +589,4 @@ class LogFormattersTests(SimpleTestCase):
 
         with patch_django_server_logger() as logger_output:
             logger.info(log_msg)
-            self.assertRegex(logger_output.getvalue(), r'^\[[-:,.\s\d]+\] %s' % log_msg)
+            self.assertRegex(logger_output.getvalue(), r'^\[[/:,\w\s\d]+\] %s\n' % log_msg)

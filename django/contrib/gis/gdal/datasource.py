@@ -34,13 +34,14 @@
               val = field.value
 """
 from ctypes import byref
+from pathlib import Path
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.driver import Driver
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.layer import Layer
 from django.contrib.gis.gdal.prototypes import ds as capi
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes, force_str
 
 
 # For more information, see the OGR C API source code:
@@ -62,7 +63,7 @@ class DataSource(GDALBase):
 
         Driver.ensure_registered()
 
-        if isinstance(ds_input, str):
+        if isinstance(ds_input, (str, Path)):
             # The data source driver is a void pointer.
             ds_driver = Driver.ptr_type()
             try:
@@ -117,4 +118,4 @@ class DataSource(GDALBase):
     def name(self):
         "Return the name of the data source."
         name = capi.get_ds_name(self._ptr)
-        return force_text(name, self.encoding, strings_only=True)
+        return force_str(name, self.encoding, strings_only=True)

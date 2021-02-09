@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Igor Jerosimić, 2019-2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-21 20:48+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
-"language/sr%40latin/)\n"
+"language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -23,15 +24,15 @@ msgid "Advanced options"
 msgstr "Napredna podešavanja"
 
 msgid "Flat Pages"
-msgstr ""
+msgstr "Flet stranice"
 
 msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"Primer: '/about/contact/'. Pazite na to da postoje i početne i završne kose "
+"Primer: \"/about/contact/\". Pazite na to da postoje početne i završne kose "
 "crte."
 
 msgid ""
@@ -40,6 +41,10 @@ msgid ""
 msgstr ""
 "Uneta vrednost može sadržati samo slova, brojke, tačke, donje crte, crte, "
 "znake razlomka ili tilde."
+
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr ""
+"Primer: \"/about/contact/\". Pazite na to da postoji početna kosa crta."
 
 msgid "URL is missing a leading slash."
 msgstr "Nedostaje kosa crta na početku URL-a."
@@ -64,11 +69,11 @@ msgid "template name"
 msgstr "naziv templejta"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"Primer: 'flatpages/contact_page.html'. Ako ovo ostavite praznim, sistem će "
-"koristiti 'flatpages/default.html'."
+"Primer: \"flatpages/contact_page.html\". Ako ovo ostavite praznim, sistem će "
+"koristiti \"flatpages/contact_page.html\"."
 
 msgid "registration required"
 msgstr "potrebna registracija"
@@ -79,7 +84,7 @@ msgstr ""
 "stranicu."
 
 msgid "sites"
-msgstr ""
+msgstr "sajtovi"
 
 msgid "flat page"
 msgstr "flet stranica"

@@ -13,8 +13,8 @@ from django.test import modify_settings, override_settings
 
 TEST_ROOT = os.path.dirname(__file__)
 TEST_SETTINGS = {
-    'MEDIA_URL': '/media/',
-    'STATIC_URL': '/static/',
+    'MEDIA_URL': 'media/',
+    'STATIC_URL': 'static/',
     'MEDIA_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'media'),
     'STATIC_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'static'),
 }
@@ -64,6 +64,9 @@ class StaticLiveServerChecks(LiveServerBase):
             # app without having set the required STATIC_URL setting.")
             pass
         finally:
+            # Use del to avoid decrementing the database thread sharing count a
+            # second time.
+            del cls.server_thread
             super().tearDownClass()
 
     def test_test_test(self):

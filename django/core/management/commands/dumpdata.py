@@ -1,11 +1,24 @@
+import gzip
+import os
 import warnings
-from collections import OrderedDict
 
 from django.apps import apps
 from django.core import serializers
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import parse_apps_and_model_labels
 from django.db import DEFAULT_DB_ALIAS, router
+
+try:
+    import bz2
+    has_bz2 = True
+except ImportError:
+    has_bz2 = False
+
+try:
+    import lzma
+    has_lzma = True
+except ImportError:
+    has_lzma = False
 
 
 class ProxyModelWarning(Warning):
@@ -87,14 +100,14 @@ class Command(BaseCommand):
         if not app_labels:
             if primary_keys:
                 raise CommandError("You can only use --pks option with one model")
-            app_list = OrderedDict.fromkeys(
+            app_list = dict.fromkeys(
                 app_config for app_config in apps.get_app_configs()
                 if app_config.models_module is not None and app_config not in excluded_apps
             )
         else:
             if len(app_labels) > 1 and primary_keys:
                 raise CommandError("You can only use --pks option with one model")
-            app_list = OrderedDict()
+            app_list = {}
             for label in app_labels:
                 try:
                     app_label, model_label = label.split('.')
@@ -111,12 +124,11 @@ class Command(BaseCommand):
 
                     app_list_value = app_list.setdefault(app_config, [])
 
-                    # We may have previously seen a "all-models" request for
+                    # We may have previously seen an "all-models" request for
                     # this app (no model qualifier was given). In this case
                     # there is no need adding specific models to the list.
-                    if app_list_value is not None:
-                        if model not in app_list_value:
-                            app_list_value.append(model)
+                    if app_list_value is not None and model not in app_list_value:
+                        app_list_value.append(model)
                 except ValueError:
                     if primary_keys:
                         raise CommandError("You can only use --pks option with one model")
@@ -145,7 +157,17 @@ class Command(BaseCommand):
             Collate the objects to be serialized. If count_only is True, just
             count the number of objects to be serialized.
             """
-            models = serializers.sort_dependencies(app_list.items())
+            if use_natural_foreign_keys:
+                models = serializers.sort_dependencies(app_list.items(), allow_cycles=True)
+            else:
+                # There is no need to sort dependencies when natural foreign
+                # keys are not used.
+                models = []
+                for (app_config, model_list) in app_list.items():
+                    if model_list is None:
+                        models.extend(app_config.get_models())
+                    else:
+                        models.extend(model_list)
             for model in models:
                 if model in excluded_models:
                     continue
@@ -176,7 +198,36 @@ class Command(BaseCommand):
             if output and self.stdout.isatty() and options['verbosity'] > 0:
                 progress_output = self.stdout
                 object_count = sum(get_objects(count_only=True))
-            stream = open(output, 'w') if output else None
+            if output:
+                file_root, file_ext = os.path.splitext(output)
+                compression_formats = {
+                    '.bz2': (open, {}, file_root),
+                    '.gz': (gzip.open, {}, output),
+                    '.lzma': (open, {}, file_root),
+                    '.xz': (open, {}, file_root),
+                    '.zip': (open, {}, file_root),
+                }
+                if has_bz2:
+                    compression_formats['.bz2'] = (bz2.open, {}, output)
+                if has_lzma:
+                    compression_formats['.lzma'] = (
+                        lzma.open, {'format': lzma.FORMAT_ALONE}, output
+                    )
+                    compression_formats['.xz'] = (lzma.open, {}, output)
+                try:
+                    open_method, kwargs, file_path = compression_formats[file_ext]
+                except KeyError:
+                    open_method, kwargs, file_path = (open, {}, output)
+                if file_path != output:
+                    file_name = os.path.basename(file_path)
+                    warnings.warn(
+                        f"Unsupported file extension ({file_ext}). "
+                        f"Fixtures saved in '{file_name}'.",
+                        RuntimeWarning,
+                    )
+                stream = open_method(file_path, 'wt', **kwargs)
+            else:
+                stream = None
             try:
                 serializers.serialize(
                     format, get_objects(), indent=indent,

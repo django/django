@@ -20,11 +20,51 @@ versions of the documentation contain the release notes for any later releases.
 
 .. _development_release_notes:
 
+4.0 release
+-----------
+.. toctree::
+   :maxdepth: 1
+
+   4.0
+
+3.2 release
+-----------
+.. toctree::
+   :maxdepth: 1
+
+   3.2
+
+3.1 release
+-----------
+.. toctree::
+   :maxdepth: 1
+
+   3.1.7
+   3.1.6
+   3.1.5
+   3.1.4
+   3.1.3
+   3.1.2
+   3.1.1
+   3.1
+
 3.0 release
 -----------
 .. toctree::
    :maxdepth: 1
 
+   3.0.12
+   3.0.11
+   3.0.10
+   3.0.9
+   3.0.8
+   3.0.7
+   3.0.6
+   3.0.5
+   3.0.4
+   3.0.3
+   3.0.2
+   3.0.1
    3.0
 
 2.2 release
@@ -32,6 +72,24 @@ versions of the documentation contain the release notes for any later releases.
 .. toctree::
    :maxdepth: 1
 
+   2.2.18
+   2.2.17
+   2.2.16
+   2.2.15
+   2.2.14
+   2.2.13
+   2.2.12
+   2.2.11
+   2.2.10
+   2.2.9
+   2.2.8
+   2.2.7
+   2.2.6
+   2.2.5
+   2.2.4
+   2.2.3
+   2.2.2
+   2.2.1
    2.2
 
 2.1 release
@@ -39,6 +97,15 @@ versions of the documentation contain the release notes for any later releases.
 .. toctree::
    :maxdepth: 1
 
+   2.1.15
+   2.1.14
+   2.1.13
+   2.1.12
+   2.1.11
+   2.1.10
+   2.1.9
+   2.1.8
+   2.1.7
    2.1.6
    2.1.5
    2.1.4
@@ -52,6 +119,9 @@ versions of the documentation contain the release notes for any later releases.
 .. toctree::
    :maxdepth: 1
 
+   2.0.13
+   2.0.12
+   2.0.11
    2.0.10
    2.0.9
    2.0.8
@@ -69,6 +139,17 @@ versions of the documentation contain the release notes for any later releases.
 .. toctree::
    :maxdepth: 1
 
+   1.11.29
+   1.11.28
+   1.11.27
+   1.11.26
+   1.11.25
+   1.11.24
+   1.11.23
+   1.11.22
+   1.11.21
+   1.11.20
+   1.11.19
    1.11.18
    1.11.17
    1.11.16

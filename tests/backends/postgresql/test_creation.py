@@ -3,9 +3,8 @@ from contextlib import contextmanager
 from io import StringIO
 from unittest import mock
 
-from django.db import connection
+from django.db import DatabaseError, connection
 from django.db.backends.base.creation import BaseDatabaseCreation
-from django.db.utils import DatabaseError
 from django.test import SimpleTestCase
 
 try:
@@ -14,6 +13,7 @@ except ImportError:
     pass
 else:
     from psycopg2 import errorcodes
+
     from django.db.backends.postgresql.creation import DatabaseCreation
 
 

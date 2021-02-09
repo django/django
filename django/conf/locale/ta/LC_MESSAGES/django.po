@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Claude Paroz <claude@2xlibre.net>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-14 21:42+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Tamil (http://www.transifex.com/django/django/language/ta/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,6 +22,9 @@ msgstr ""
 
 msgid "Arabic"
 msgstr "அரபிக்"
+
+msgid "Algerian Arabic"
+msgstr ""
 
 msgid "Asturian"
 msgstr ""
@@ -136,10 +140,16 @@ msgstr ""
 msgid "Hungarian"
 msgstr "ஹங்கேரியன்"
 
+msgid "Armenian"
+msgstr ""
+
 msgid "Interlingua"
 msgstr ""
 
 msgid "Indonesian"
+msgstr ""
+
+msgid "Igbo"
 msgstr ""
 
 msgid "Ido"
@@ -157,6 +167,9 @@ msgstr "ஜப்பானிய"
 msgid "Georgian"
 msgstr ""
 
+msgid "Kabyle"
+msgstr ""
+
 msgid "Kazakh"
 msgstr ""
 
@@ -167,6 +180,9 @@ msgid "Kannada"
 msgstr ""
 
 msgid "Korean"
+msgstr ""
+
+msgid "Kyrgyz"
 msgstr ""
 
 msgid "Luxembourgish"
@@ -253,7 +269,13 @@ msgstr "தமிழ்"
 msgid "Telugu"
 msgstr ""
 
+msgid "Tajik"
+msgstr ""
+
 msgid "Thai"
+msgstr ""
+
+msgid "Turkmen"
 msgstr ""
 
 msgid "Turkish"
@@ -269,6 +291,9 @@ msgid "Ukrainian"
 msgstr "உக்ரேனியன்"
 
 msgid "Urdu"
+msgstr ""
+
+msgid "Uzbek"
 msgstr ""
 
 msgid "Vietnamese"
@@ -315,11 +340,11 @@ msgstr ""
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
 
@@ -367,6 +392,9 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Enter a number."
+msgstr ""
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -389,8 +417,8 @@ msgstr[1] ""
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
 
 msgid "Null characters are not allowed."
@@ -428,18 +456,12 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr ""
 
-msgid "Integer"
-msgstr "முழு எண்"
-
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr ""
-
-msgid "Big (8 byte) integer"
+msgid "“%(value)s” value must be either True or False."
 msgstr ""
 
 #, python-format
-msgid "'%(value)s' value must be either True or False."
+msgid "“%(value)s” value must be either True, False, or None."
 msgstr ""
 
 msgid "Boolean (Either True or False)"
@@ -454,13 +476,13 @@ msgstr "கமாவாள் பிரிக்கப்பட்ட முழ�
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
 
@@ -469,13 +491,13 @@ msgstr "தேதி (நேரமில்லாமல்)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
 
@@ -483,7 +505,7 @@ msgid "Date (with time)"
 msgstr "தேதி (நேரமுடன்)"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
+msgid "“%(value)s” value must be a decimal number."
 msgstr ""
 
 msgid "Decimal number"
@@ -491,7 +513,7 @@ msgstr "தசம எண்கள்"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
 
@@ -505,10 +527,20 @@ msgid "File path"
 msgstr "கோப்புப் பாதை"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
+msgid "“%(value)s” value must be a float."
 msgstr ""
 
 msgid "Floating point number"
+msgstr ""
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr ""
+
+msgid "Integer"
+msgstr "முழு எண்"
+
+msgid "Big (8 byte) integer"
 msgstr ""
 
 msgid "IPv4 address"
@@ -518,11 +550,14 @@ msgid "IP address"
 msgstr "IP விலாசம்"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
+msgid "“%(value)s” value must be either None, True or False."
 msgstr ""
 
 msgid "Boolean (Either True, False or None)"
 msgstr "இலக்கு முறை (சரி, தவறு அல்லது ஒன்றும் இல்லை)"
+
+msgid "Positive big integer"
+msgstr ""
 
 msgid "Positive integer"
 msgstr ""
@@ -542,13 +577,13 @@ msgstr "உரை"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
 
@@ -562,13 +597,22 @@ msgid "Raw binary data"
 msgstr ""
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
+msgid "“%(value)s” is not a valid UUID."
+msgstr ""
+
+msgid "Universally unique identifier"
 msgstr ""
 
 msgid "File"
 msgstr ""
 
 msgid "Image"
+msgstr ""
+
+msgid "A JSON object"
+msgstr ""
+
+msgid "Value must be valid JSON."
 msgstr ""
 
 #, python-format
@@ -604,9 +648,6 @@ msgstr "இந்த  புலத்தில் மதிப்பு தே�
 msgid "Enter a whole number."
 msgstr "முழு எண் மட்டுமே எழுதவும்"
 
-msgid "Enter a number."
-msgstr ""
-
 msgid "Enter a valid date."
 msgstr ""
 
@@ -617,6 +658,10 @@ msgid "Enter a valid date/time."
 msgstr ""
 
 msgid "Enter a valid duration."
+msgstr ""
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
 msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
@@ -656,6 +701,9 @@ msgid "Enter a complete value."
 msgstr ""
 
 msgid "Enter a valid UUID."
+msgstr ""
+
+msgid "Enter a valid JSON."
 msgstr ""
 
 #. Translators: This is the default suffix added to form field labels
@@ -711,12 +759,12 @@ msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value."
+msgid "“%(pk)s” is not a valid value."
 msgstr ""
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
 
@@ -738,8 +786,9 @@ msgstr "ஆம்"
 msgid "No"
 msgstr "இல்லை"
 
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
-msgstr "ஆம், இல்லை, இருக்கலாம்"
+msgstr "ஆம்,இல்லை,இருக்கலாம்"
 
 #, python-format
 msgid "%(size)d byte"
@@ -1000,7 +1049,7 @@ msgstr ""
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
 msgstr ""
 
 msgid "or"
@@ -1046,9 +1095,6 @@ msgid_plural "%d minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "0 minutes"
-msgstr ""
-
 msgid "Forbidden"
 msgstr ""
 
@@ -1056,24 +1102,24 @@ msgid "CSRF verification failed. Request aborted."
 msgstr ""
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
 msgstr ""
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
-"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
-"CSRF protection requires the 'Referer' header to do strict referer checking. "
-"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" ...> for links to third-party sites."
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
 msgstr ""
 
 msgid ""
@@ -1084,7 +1130,7 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
 
 msgid "More information is available with DEBUG=True."
@@ -1116,14 +1162,14 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
 msgstr ""
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr ""
 
-msgid "Page is not 'last', nor can it be converted to an int."
+msgid "Page is not “last”, nor can it be converted to an int."
 msgstr ""
 
 #, python-format
@@ -1131,14 +1177,14 @@ msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr ""
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
 msgstr ""
 
 msgid "Directory indexes are not allowed here."
 msgstr ""
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
+msgid "“%(path)s” does not exist"
 msgstr ""
 
 #, python-format
@@ -1168,7 +1214,7 @@ msgstr ""
 msgid "Django Documentation"
 msgstr ""
 
-msgid "Topics, references, &amp; how-to's"
+msgid "Topics, references, &amp; how-to’s"
 msgstr ""
 
 msgid "Tutorial: A Polling App"

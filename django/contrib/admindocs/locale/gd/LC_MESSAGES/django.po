@@ -3,13 +3,14 @@
 # Translators:
 # GunChleoc, 2015-2016
 # GunChleoc, 2015
+# GunChleoc, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-22 17:29+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-12-13 12:31+0000\n"
+"Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
 "language/gd/)\n"
 "MIME-Version: 1.0\n"
@@ -81,7 +82,7 @@ msgid ""
 msgstr ""
 "’S e tuairisgeulan air a h-uile oibseact san t-siostam ’s air na raointean "
 "co-cheangailte riutha-san a tha sna modailean. Tha liosta dhe raointean aig "
-"gach modail as urrainn dhut inntrigeadh mar chaochladairean teamplaide."
+"gach modail as urrainn dhut inntrigeadh mar chaochladairean teamplaide"
 
 msgid "Views"
 msgstr "Seallaidhean"
@@ -160,13 +161,13 @@ msgid "Template: %(name)s"
 msgstr "Teamplaid: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Teamplaid: “%(name)s”"
+msgid "Template: <q>%(name)s</q>"
+msgstr "Teamplaid: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Slighe-luirg airson teamplaid “%(name)s”:"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Lorg slighe airson teamplaid <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(chan eil e ann)"

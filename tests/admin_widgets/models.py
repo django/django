@@ -19,6 +19,7 @@ class Member(models.Model):
 
 
 class Band(models.Model):
+    uuid = models.UUIDField(unique=True, default=uuid.uuid4)
     name = models.CharField(max_length=100)
     style = models.CharField(max_length=20)
     members = models.ManyToManyField(Member)
@@ -27,8 +28,16 @@ class Band(models.Model):
         return self.name
 
 
+class UnsafeLimitChoicesTo(models.Model):
+    band = models.ForeignKey(
+        Band,
+        models.CASCADE,
+        limit_choices_to={'name': '"&><escapeme'},
+    )
+
+
 class Album(models.Model):
-    band = models.ForeignKey(Band, models.CASCADE)
+    band = models.ForeignKey(Band, models.CASCADE, to_field='uuid')
     featuring = models.ManyToManyField(Band, related_name='featured')
     name = models.CharField(max_length=100)
     cover_art = models.FileField(upload_to='albums')

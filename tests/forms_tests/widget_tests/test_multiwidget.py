@@ -79,6 +79,19 @@ class DeepCopyWidget(MultiWidget):
 
 
 class MultiWidgetTest(WidgetTest):
+    def test_subwidgets_name(self):
+        widget = MultiWidget(
+            widgets={
+                '': TextInput(),
+                'big': TextInput(attrs={'class': 'big'}),
+                'small': TextInput(attrs={'class': 'small'}),
+            },
+        )
+        self.check_html(widget, 'name', ['John', 'George', 'Paul'], html=(
+            '<input type="text" name="name" value="John">'
+            '<input type="text" name="name_big" value="George" class="big">'
+            '<input type="text" name="name_small" value="Paul" class="small">'
+        ))
 
     def test_text_inputs(self):
         widget = MyMultiWidget(
@@ -132,6 +145,36 @@ class MultiWidgetTest(WidgetTest):
         self.assertIs(widget.value_omitted_from_data({'field_0': 'x'}, {}, 'field'), False)
         self.assertIs(widget.value_omitted_from_data({'field_1': 'y'}, {}, 'field'), False)
         self.assertIs(widget.value_omitted_from_data({'field_0': 'x', 'field_1': 'y'}, {}, 'field'), False)
+
+    def test_value_from_datadict_subwidgets_name(self):
+        widget = MultiWidget(widgets={'x': TextInput(), '': TextInput()})
+        tests = [
+            ({}, [None, None]),
+            ({'field': 'x'}, [None, 'x']),
+            ({'field_x': 'y'}, ['y', None]),
+            ({'field': 'x', 'field_x': 'y'}, ['y', 'x']),
+        ]
+        for data, expected in tests:
+            with self.subTest(data):
+                self.assertEqual(
+                    widget.value_from_datadict(data, {}, 'field'),
+                    expected,
+                )
+
+    def test_value_omitted_from_data_subwidgets_name(self):
+        widget = MultiWidget(widgets={'x': TextInput(), '': TextInput()})
+        tests = [
+            ({}, True),
+            ({'field': 'x'}, False),
+            ({'field_x': 'y'}, False),
+            ({'field': 'x', 'field_x': 'y'}, False),
+        ]
+        for data, expected in tests:
+            with self.subTest(data):
+                self.assertIs(
+                    widget.value_omitted_from_data(data, {}, 'field'),
+                    expected,
+                )
 
     def test_needs_multipart_true(self):
         """

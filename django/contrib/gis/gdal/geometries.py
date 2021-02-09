@@ -46,7 +46,6 @@ from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
 from django.contrib.gis.gdal.error import GDALException, SRSException
 from django.contrib.gis.gdal.geomtype import OGRGeomType
-from django.contrib.gis.gdal.libgdal import GDAL_VERSION
 from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
 from django.contrib.gis.gdal.srs import CoordTransform, SpatialReference
 from django.contrib.gis.geometry import hex_regex, json_regex, wkt_regex
@@ -75,16 +74,16 @@ class OGRGeometry(GDALBase):
             wkt_m = wkt_regex.match(geom_input)
             json_m = json_regex.match(geom_input)
             if wkt_m:
-                if wkt_m.group('srid'):
+                if wkt_m['srid']:
                     # If there's EWKT, set the SRS w/value of the SRID.
-                    srs = int(wkt_m.group('srid'))
-                if wkt_m.group('type').upper() == 'LINEARRING':
+                    srs = int(wkt_m['srid'])
+                if wkt_m['type'].upper() == 'LINEARRING':
                     # OGR_G_CreateFromWkt doesn't work with LINEARRING WKT.
                     #  See https://trac.osgeo.org/gdal/ticket/1992.
-                    g = capi.create_geom(OGRGeomType(wkt_m.group('type')).num)
-                    capi.import_wkt(g, byref(c_char_p(wkt_m.group('wkt').encode())))
+                    g = capi.create_geom(OGRGeomType(wkt_m['type']).num)
+                    capi.import_wkt(g, byref(c_char_p(wkt_m['wkt'].encode())))
                 else:
-                    g = capi.from_wkt(byref(c_char_p(wkt_m.group('wkt').encode())), None, byref(c_void_p()))
+                    g = capi.from_wkt(byref(c_char_p(wkt_m['wkt'].encode())), None, byref(c_void_p()))
             elif json_m:
                 g = self._from_json(geom_input.encode())
             else:
@@ -140,14 +139,7 @@ class OGRGeometry(GDALBase):
 
     @staticmethod
     def _from_json(geom_input):
-        ptr = capi.from_json(geom_input)
-        if GDAL_VERSION < (2, 0):
-            try:
-                capi.get_geom_srs(ptr)
-            except SRSException:
-                srs = SpatialReference(4326)
-                capi.assign_srs(ptr, srs.ptr)
-        return ptr
+        return capi.from_json(geom_input)
 
     @classmethod
     def from_bbox(cls, bbox):
@@ -391,7 +383,7 @@ class OGRGeometry(GDALBase):
         """
         Transform this geometry to a different spatial reference system.
         May take a CoordTransform object, a SpatialReference object, string
-        WKT or PROJ.4, and/or an integer SRID.  By default, return nothing
+        WKT or PROJ, and/or an integer SRID.  By default, return nothing
         and transform the geometry in-place. However, if the `clone` keyword is
         set, return a transformed clone of this geometry.
         """

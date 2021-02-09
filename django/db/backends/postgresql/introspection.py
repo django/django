@@ -1,7 +1,7 @@
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
-from django.db.models.indexes import Index
+from django.db.models import Index
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -26,7 +26,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         1266: 'TimeField',
         1700: 'DecimalField',
         2950: 'UUIDField',
+        3802: 'JSONField',
     }
+    # A hook for subclasses.
+    index_default_access_method = 'btree'
 
     ignored_tables = []
 
@@ -37,19 +40,21 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 return 'AutoField'
             elif field_type == 'BigIntegerField':
                 return 'BigAutoField'
+            elif field_type == 'SmallIntegerField':
+                return 'SmallAutoField'
         return field_type
 
     def get_table_list(self, cursor):
         """Return a list of table and view names in the current database."""
         cursor.execute("""
             SELECT c.relname,
-            CASE WHEN {} THEN 'p' WHEN c.relkind IN ('m', 'v') THEN 'v' ELSE 't' END
+            CASE WHEN c.relispartition THEN 'p' WHEN c.relkind IN ('m', 'v') THEN 'v' ELSE 't' END
             FROM pg_catalog.pg_class c
             LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
             WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
                 AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
                 AND pg_catalog.pg_table_is_visible(c.oid)
-        """.format('c.relispartition' if self.connection.features.supports_table_partitions else 'FALSE'))
+        """)
         return [TableInfo(*row) for row in cursor.fetchall() if row[0] not in self.ignored_tables]
 
     def get_table_description(self, cursor, table_name):
@@ -64,9 +69,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             SELECT
                 a.attname AS column_name,
                 NOT (a.attnotnull OR (t.typtype = 'd' AND t.typnotnull)) AS is_nullable,
-                pg_get_expr(ad.adbin, ad.adrelid) AS column_default
+                pg_get_expr(ad.adbin, ad.adrelid) AS column_default,
+                CASE WHEN collname = 'default' THEN NULL ELSE collname END AS collation
             FROM pg_attribute a
             LEFT JOIN pg_attrdef ad ON a.attrelid = ad.adrelid AND a.attnum = ad.adnum
+            LEFT JOIN pg_collation co ON a.attcollation = co.oid
             JOIN pg_type t ON a.atttypid = t.oid
             JOIN pg_class c ON a.attrelid = c.oid
             JOIN pg_namespace n ON c.relnamespace = n.oid
@@ -77,7 +84,18 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """, [table_name])
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
-        return [FieldInfo(*line[0:6], *field_map[line.name]) for line in cursor.description]
+        return [
+            FieldInfo(
+                line.name,
+                line.type_code,
+                line.display_size,
+                line.internal_size,
+                line.precision,
+                line.scale,
+                *field_map[line.name],
+            )
+            for line in cursor.description
+        ]
 
     def get_sequences(self, cursor, table_name, table_fields=()):
         cursor.execute("""
@@ -88,10 +106,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 JOIN pg_attrdef ad ON ad.oid = d.objid AND d.classid = 'pg_attrdef'::regclass
                 JOIN pg_attribute col ON col.attrelid = ad.adrelid AND col.attnum = ad.adnum
                 JOIN pg_class tbl ON tbl.oid = ad.adrelid
-                JOIN pg_namespace n ON n.oid = tbl.relnamespace
             WHERE s.relkind = 'S'
               AND d.deptype in ('a', 'n')
-              AND n.nspname = 'public'
+              AND pg_catalog.pg_table_is_visible(tbl.oid)
               AND tbl.relname = %s
         """, [table_name])
         return [
@@ -104,30 +121,21 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Return a dictionary of {field_name: (field_name_other_table, other_table)}
         representing all relationships to the given table.
         """
+        return {row[0]: (row[2], row[1]) for row in self.get_key_columns(cursor, table_name)}
+
+    def get_key_columns(self, cursor, table_name):
         cursor.execute("""
-            SELECT c2.relname, a1.attname, a2.attname
+            SELECT a1.attname, c2.relname, a2.attname
             FROM pg_constraint con
             LEFT JOIN pg_class c1 ON con.conrelid = c1.oid
             LEFT JOIN pg_class c2 ON con.confrelid = c2.oid
             LEFT JOIN pg_attribute a1 ON c1.oid = a1.attrelid AND a1.attnum = con.conkey[1]
             LEFT JOIN pg_attribute a2 ON c2.oid = a2.attrelid AND a2.attnum = con.confkey[1]
-            WHERE c1.relname = %s AND con.contype = 'f'
-        """, [table_name])
-        return {row[1]: (row[2], row[0]) for row in cursor.fetchall()}
-
-    def get_key_columns(self, cursor, table_name):
-        cursor.execute("""
-            SELECT kcu.column_name, ccu.table_name AS referenced_table, ccu.column_name AS referenced_column
-            FROM information_schema.constraint_column_usage ccu
-            LEFT JOIN information_schema.key_column_usage kcu
-                ON ccu.constraint_catalog = kcu.constraint_catalog
-                    AND ccu.constraint_schema = kcu.constraint_schema
-                    AND ccu.constraint_name = kcu.constraint_name
-            LEFT JOIN information_schema.table_constraints tc
-                ON ccu.constraint_catalog = tc.constraint_catalog
-                    AND ccu.constraint_schema = tc.constraint_schema
-                    AND ccu.constraint_name = tc.constraint_name
-            WHERE kcu.table_name = %s AND tc.constraint_type = 'FOREIGN KEY'
+            WHERE
+                c1.relname = %s AND
+                con.contype = 'f' AND
+                c1.relnamespace = c2.relnamespace AND
+                pg_catalog.pg_table_is_visible(c1.oid)
         """, [table_name])
         return cursor.fetchall()
 
@@ -159,9 +167,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 cl.reloptions
             FROM pg_constraint AS c
             JOIN pg_class AS cl ON c.conrelid = cl.oid
-            JOIN pg_namespace AS ns ON cl.relnamespace = ns.oid
-            WHERE ns.nspname = %s AND cl.relname = %s
-        """, ["public", table_name])
+            WHERE cl.relname = %s AND pg_catalog.pg_table_is_visible(cl.oid)
+        """, [table_name])
         for constraint, columns, kind, used_cols, options in cursor.fetchall():
             constraints[constraint] = {
                 "columns": columns,
@@ -186,7 +193,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                             pg_get_indexdef(idx.indexrelid)
                     END AS exprdef,
                     CASE am.amname
-                        WHEN 'btree' THEN
+                        WHEN %s THEN
                             CASE (option & 1)
                                 WHEN 1 THEN 'DESC' ELSE 'ASC'
                             END
@@ -200,13 +207,18 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 LEFT JOIN pg_class c2 ON idx.indexrelid = c2.oid
                 LEFT JOIN pg_am am ON c2.relam = am.oid
                 LEFT JOIN pg_attribute attr ON attr.attrelid = c.oid AND attr.attnum = idx.key
-                WHERE c.relname = %s
+                WHERE c.relname = %s AND pg_catalog.pg_table_is_visible(c.oid)
             ) s2
             GROUP BY indexname, indisunique, indisprimary, amname, exprdef, attoptions;
-        """, [table_name])
+        """, [self.index_default_access_method, table_name])
         for index, columns, unique, primary, orders, type_, definition, options in cursor.fetchall():
             if index not in constraints:
-                basic_index = type_ == 'btree' and not index.endswith('_btree') and options is None
+                basic_index = (
+                    type_ == self.index_default_access_method and
+                    # '_btree' references
+                    # django.contrib.postgres.indexes.BTreeIndex.suffix.
+                    not index.endswith('_btree') and options is None
+                )
                 constraints[index] = {
                     "columns": columns if columns != [None] else [],
                     "orders": orders if orders != [None] else [],
