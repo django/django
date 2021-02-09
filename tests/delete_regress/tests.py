@@ -1,7 +1,9 @@
 import datetime
 
 from django.db import connection, models, transaction
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.test import (
+    SimpleTestCase, TestCase, TransactionTestCase, skipUnlessDBFeature,
+)
 
 from .models import (
     Award, AwardNote, Book, Child, Contact, Eaten, Email, File, Food, FooFile,
@@ -352,3 +354,12 @@ class DeleteTests(TestCase):
         self.assertEqual(researcher1.secondary_contact, contact2)
         self.assertEqual(researcher2.primary_contact, contact2)
         self.assertIsNone(researcher2.secondary_contact)
+
+
+class DeleteDistinct(SimpleTestCase):
+    def test_disallowed_delete_distinct(self):
+        msg = 'Cannot call delete() after .distinct().'
+        with self.assertRaisesMessage(TypeError, msg):
+            Book.objects.distinct().delete()
+        with self.assertRaisesMessage(TypeError, msg):
+            Book.objects.distinct('id').delete()
