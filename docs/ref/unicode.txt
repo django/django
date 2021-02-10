@@ -18,8 +18,8 @@ able to store certain characters in the database, and information will be lost.
 * MySQL users, refer to the `MySQL manual`_ for details on how to set or alter
   the database character set encoding.
 
-* PostgreSQL users, refer to the `PostgreSQL manual`_ (section 22.3.2 in
-  PostgreSQL 9) for details on creating databases with the correct encoding.
+* PostgreSQL users, refer to the `PostgreSQL manual`_ for details on creating
+  databases with the correct encoding.
 
 * Oracle users, refer to the `Oracle manual`_ for details on how to set
   (`section 2`_) or alter (`section 11`_) the database character set encoding.
@@ -28,7 +28,7 @@ able to store certain characters in the database, and information will be lost.
   for internal encoding.
 
 .. _MySQL manual: https://dev.mysql.com/doc/refman/en/charset-database.html
-.. _PostgreSQL manual: https://www.postgresql.org/docs/current/multibyte.html
+.. _PostgreSQL manual: https://www.postgresql.org/docs/current/multibyte.html#id-1.6.10.5.6
 .. _Oracle manual: https://docs.oracle.com/en/database/oracle/oracle-database/18/nlspg/index.html
 .. _section 2: https://docs.oracle.com/en/database/oracle/oracle-database/18/nlspg/choosing-character-set.html
 .. _section 11: https://docs.oracle.com/en/database/oracle/oracle-database/18/nlspg/character-set-migration.html

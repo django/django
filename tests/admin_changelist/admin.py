@@ -19,6 +19,7 @@ class EventAdmin(admin.ModelAdmin):
     date_hierarchy = 'date'
     list_display = ['event_date_func']
 
+    @admin.display
     def event_date_func(self, event):
         return event.date
 
@@ -171,6 +172,6 @@ class EmptyValueChildAdmin(admin.ModelAdmin):
     empty_value_display = '-empty-'
     list_display = ('name', 'age_display', 'age')
 
+    @admin.display(empty_value='&dagger;')
     def age_display(self, obj):
         return obj.age
-    age_display.empty_value_display = '&dagger;'

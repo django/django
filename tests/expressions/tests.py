@@ -25,7 +25,9 @@ from django.db.models.functions import (
 from django.db.models.sql import constants
 from django.db.models.sql.datastructures import Join
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import Approximate, CaptureQueriesContext, isolate_apps
+from django.test.utils import (
+    Approximate, CaptureQueriesContext, isolate_apps, register_lookup,
+)
 from django.utils.functional import SimpleLazyObject
 
 from .models import (
@@ -668,6 +670,18 @@ class BasicExpressionsTests(TestCase):
         # contain nested aggregates.
         self.assertNotIn('GROUP BY', sql)
 
+    @skipUnlessDBFeature('supports_over_clause')
+    def test_aggregate_rawsql_annotation(self):
+        with self.assertNumQueries(1) as ctx:
+            aggregate = Company.objects.annotate(
+                salary=RawSQL('SUM(num_chairs) OVER (ORDER BY num_employees)', []),
+            ).aggregate(
+                count=Count('pk'),
+            )
+            self.assertEqual(aggregate, {'count': 3})
+        sql = ctx.captured_queries[0]['sql']
+        self.assertNotIn('GROUP BY', sql)
+
     def test_explicit_output_field(self):
         class FuncA(Func):
             output_field = CharField()
@@ -1216,19 +1230,23 @@ class ExpressionOperatorTests(TestCase):
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 58)
         self.assertEqual(Number.objects.get(pk=self.n1.pk).integer, -10)
 
+    def test_lefthand_transformed_field_bitwise_or(self):
+        Employee.objects.create(firstname='Max', lastname='Mustermann')
+        with register_lookup(CharField, Length):
+            qs = Employee.objects.annotate(bitor=F('lastname__length').bitor(48))
+            self.assertEqual(qs.get().bitor, 58)
+
     def test_lefthand_power(self):
         # LH Power arithmetic operation on floats and integers
         Number.objects.filter(pk=self.n.pk).update(integer=F('integer') ** 2, float=F('float') ** 1.5)
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 1764)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(61.02, places=2))
 
-    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support bitwise XOR.")
     def test_lefthand_bitwise_xor(self):
         Number.objects.update(integer=F('integer').bitxor(48))
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 26)
         self.assertEqual(Number.objects.get(pk=self.n1.pk).integer, -26)
 
-    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support bitwise XOR.")
     def test_lefthand_bitwise_xor_null(self):
         employee = Employee.objects.create(firstname='John', lastname='Doe')
         Employee.objects.update(salary=F('salary').bitxor(48))

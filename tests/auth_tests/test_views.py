@@ -9,7 +9,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth import (
-    BACKEND_SESSION_KEY, HASH_SESSION_KEY, REDIRECT_FIELD_NAME, SESSION_KEY,
+    BACKEND_SESSION_KEY, REDIRECT_FIELD_NAME, SESSION_KEY,
 )
 from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, SetPasswordForm,
@@ -52,8 +52,8 @@ class AuthViewsTestCase(TestCase):
         cls.u1 = User.objects.create_user(username='testclient', password='password', email='testclient@example.com')
         cls.u3 = User.objects.create_user(username='staff', password='password', email='staffmember@example.com')
 
-    def login(self, username='testclient', password='password'):
-        response = self.client.post('/login/', {
+    def login(self, username='testclient', password='password', url='/login/'):
+        response = self.client.post(url, {
             'username': username,
             'password': password,
         })
@@ -710,27 +710,6 @@ class LoginTest(AuthViewsTestCase):
         self.login(password='foobar')
         self.assertNotEqual(original_session_key, self.client.session.session_key)
 
-    def test_legacy_session_key_flushed_on_login(self):
-        # RemovedInDjango40Warning.
-        user = User.objects.get(username='testclient')
-        engine = import_module(settings.SESSION_ENGINE)
-        session = engine.SessionStore()
-        session[SESSION_KEY] = user.id
-        session[HASH_SESSION_KEY] = user._legacy_get_session_auth_hash()
-        session.save()
-        original_session_key = session.session_key
-        self.client.cookies[settings.SESSION_COOKIE_NAME] = original_session_key
-        # Legacy session key is flushed on login.
-        self.login()
-        self.assertNotEqual(original_session_key, self.client.session.session_key)
-        # Legacy session key is flushed after a password change.
-        user.set_password('password_2')
-        user.save()
-        original_session_key = session.session_key
-        self.client.cookies[settings.SESSION_COOKIE_NAME] = original_session_key
-        self.login(password='password_2')
-        self.assertNotEqual(original_session_key, self.client.session.session_key)
-
     def test_login_session_without_hash_session_key(self):
         """
         Session without django.contrib.auth.HASH_SESSION_KEY should login
@@ -746,6 +725,31 @@ class LoginTest(AuthViewsTestCase):
 
         self.login()
         self.assertNotEqual(original_session_key, self.client.session.session_key)
+
+    def test_login_get_default_redirect_url(self):
+        response = self.login(url='/login/get_default_redirect_url/')
+        self.assertRedirects(response, '/custom/', fetch_redirect_response=False)
+
+    def test_login_next_page(self):
+        response = self.login(url='/login/next_page/')
+        self.assertRedirects(response, '/somewhere/', fetch_redirect_response=False)
+
+    def test_login_named_next_page_named(self):
+        response = self.login(url='/login/next_page/named/')
+        self.assertRedirects(response, '/password_reset/', fetch_redirect_response=False)
+
+    @override_settings(LOGIN_REDIRECT_URL='/custom/')
+    def test_login_next_page_overrides_login_redirect_url_setting(self):
+        response = self.login(url='/login/next_page/')
+        self.assertRedirects(response, '/somewhere/', fetch_redirect_response=False)
+
+    def test_login_redirect_url_overrides_next_page(self):
+        response = self.login(url='/login/next_page/?next=/test/')
+        self.assertRedirects(response, '/test/', fetch_redirect_response=False)
+
+    def test_login_redirect_url_overrides_get_default_redirect_url(self):
+        response = self.login(url='/login/get_default_redirect_url/?next=/test/')
+        self.assertRedirects(response, '/test/', fetch_redirect_response=False)
 
 
 class LoginURLSettings(AuthViewsTestCase):
@@ -1269,7 +1273,7 @@ class ChangelistTests(AuthViewsTestCase):
         self.assertContains(
             response,
             '<strong>algorithm</strong>: %s\n\n'
-            '<strong>salt</strong>: %s**********\n\n'
+            '<strong>salt</strong>: %s********************\n\n'
             '<strong>hash</strong>: %s**************************\n\n' % (
                 algo, salt[:2], hash_string[:6],
             ),

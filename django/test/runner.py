@@ -21,7 +21,6 @@ from django.test.utils import (
     teardown_test_environment,
 )
 from django.utils.datastructures import OrderedSet
-from django.utils.version import PY37
 
 try:
     import ipdb as pdb
@@ -38,6 +37,7 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
     def __init__(self, stream, descriptions, verbosity):
         self.logger = logging.getLogger('django.db.backends')
         self.logger.setLevel(logging.DEBUG)
+        self.debug_sql_stream = None
         super().__init__(stream, descriptions, verbosity)
 
     def startTest(self, test):
@@ -56,8 +56,13 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
 
     def addError(self, test, err):
         super().addError(test, err)
-        self.debug_sql_stream.seek(0)
-        self.errors[-1] = self.errors[-1] + (self.debug_sql_stream.read(),)
+        if self.debug_sql_stream is None:
+            # Error before tests e.g. in setUpTestData().
+            sql = ''
+        else:
+            self.debug_sql_stream.seek(0)
+            sql = self.debug_sql_stream.read()
+        self.errors[-1] = self.errors[-1] + (sql,)
 
     def addFailure(self, test, err):
         super().addFailure(test, err)
@@ -234,8 +239,8 @@ failure and get a correct traceback.
         self.stop_if_failfast()
 
     def addSubTest(self, test, subtest, err):
-        # Follow Python 3.5's implementation of unittest.TestResult.addSubTest()
-        # by not doing anything when a subtest is successful.
+        # Follow Python's implementation of unittest.TestResult.addSubTest() by
+        # not doing anything when a subtest is successful.
         if err is not None:
             # Call check_picklable() before check_subtest_picklable() since
             # check_picklable() performs the tblib check.
@@ -534,15 +539,14 @@ class DiscoverRunner:
                 'Output timings, including database set up and total run time.'
             ),
         )
-        if PY37:
-            parser.add_argument(
-                '-k', action='append', dest='test_name_patterns',
-                help=(
-                    'Only run test methods and classes that match the pattern '
-                    'or substring. Can be used multiple times. Same as '
-                    'unittest -k option.'
-                ),
-            )
+        parser.add_argument(
+            '-k', action='append', dest='test_name_patterns',
+            help=(
+                'Only run test methods and classes that match the pattern '
+                'or substring. Can be used multiple times. Same as '
+                'unittest -k option.'
+            ),
+        )
 
     def setup_test_environment(self, **kwargs):
         setup_test_environment(debug=self.debug_mode)

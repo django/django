@@ -281,6 +281,10 @@ class BaseDatabaseFeatures:
     supports_functions_in_partial_indexes = True
     # Does the backend support covering indexes (CREATE INDEX ... INCLUDE ...)?
     supports_covering_indexes = False
+    # Does the backend support indexes on expressions?
+    supports_expression_indexes = True
+    # Does the backend treat COLLATE as an indexed expression?
+    collate_as_index_expression = False
 
     # Does the database allow more than one constraint or index on the same
     # field(s)?
@@ -306,6 +310,8 @@ class BaseDatabaseFeatures:
     # Does value__d__contains={'f': 'g'} (without a list around the dict) match
     # {'d': [{'f': 'g'}]}?
     json_key_contains_list_matching_requires_list = False
+    # Does the backend support JSONObject() database function?
+    has_json_object_function = True
 
     # Does the backend support column collations?
     supports_collation_on_charfield = True
@@ -320,6 +326,13 @@ class BaseDatabaseFeatures:
         'non_default': None,  # Non-default.
         'swedish_ci': None  # Swedish case-insensitive.
     }
+
+    # A set of dotted paths to tests in Django's test suite that are expected
+    # to fail on this database.
+    django_test_expected_failures = set()
+    # A map of reasons to sets of dotted paths to tests in Django's test suite
+    # that should be skipped for this database.
+    django_test_skips = {}
 
     def __init__(self, connection):
         self.connection = connection

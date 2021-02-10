@@ -20,7 +20,7 @@ from django.test import (
 
 from .models import (
     Article, Object, ObjectReference, Person, Post, RawData, Reporter,
-    ReporterProxy, SchoolClass, Square,
+    ReporterProxy, SchoolClass, SQLKeywordsModel, Square,
     VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ,
 )
 
@@ -623,6 +623,17 @@ class FkConstraintsTests(TransactionTestCase):
                 a.save()
                 with self.assertRaises(IntegrityError):
                     connection.check_constraints()
+            transaction.set_rollback(True)
+
+    def test_check_constraints_sql_keywords(self):
+        with transaction.atomic():
+            obj = SQLKeywordsModel.objects.create(reporter=self.r)
+            obj.refresh_from_db()
+            obj.reporter_id = 30
+            with connection.constraint_checks_disabled():
+                obj.save()
+                with self.assertRaises(IntegrityError):
+                    connection.check_constraints(table_names=['order'])
             transaction.set_rollback(True)
 
 

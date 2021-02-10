@@ -182,7 +182,7 @@ END;
             converters.append(self.convert_textfield_value)
         elif internal_type == 'BinaryField':
             converters.append(self.convert_binaryfield_value)
-        elif internal_type in ['BooleanField', 'NullBooleanField']:
+        elif internal_type == 'BooleanField':
             converters.append(self.convert_booleanfield_value)
         elif internal_type == 'DateTimeField':
             if settings.USE_TZ:
@@ -258,16 +258,14 @@ END;
         columns = []
         for param in returning_params:
             value = param.get_value()
-            if value is None or value == []:
-                # cx_Oracle < 6.3 returns None, >= 6.3 returns empty list.
+            if value == []:
                 raise DatabaseError(
                     'The database did not return a new row id. Probably '
                     '"ORA-1403: no data found" was raised internally but was '
                     'hidden by the Oracle OCI library (see '
                     'https://code.djangoproject.com/ticket/28859).'
                 )
-            # cx_Oracle < 7 returns value, >= 7 returns list with single value.
-            columns.append(value[0] if isinstance(value, list) else value)
+            columns.append(value[0])
         return tuple(columns)
 
     def field_cast_sql(self, db_type, internal_type):

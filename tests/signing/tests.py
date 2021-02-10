@@ -2,9 +2,8 @@ import datetime
 
 from django.core import signing
 from django.test import SimpleTestCase
-from django.test.utils import freeze_time, ignore_warnings
+from django.test.utils import freeze_time
 from django.utils.crypto import InvalidAlgorithm
-from django.utils.deprecation import RemovedInDjango40Warning
 
 
 class TestSigner(SimpleTestCase):
@@ -53,27 +52,11 @@ class TestSigner(SimpleTestCase):
             'VzO9_jVu7R-VkqknHYNvw',
         )
 
-    @ignore_warnings(category=RemovedInDjango40Warning)
-    def test_default_hashing_algorithm(self):
-        signer = signing.Signer('predictable-secret', algorithm='sha1')
-        signature_sha1 = signer.signature('hello')
-        with self.settings(DEFAULT_HASHING_ALGORITHM='sha1'):
-            signer = signing.Signer('predictable-secret')
-            self.assertEqual(signer.signature('hello'), signature_sha1)
-
     def test_invalid_algorithm(self):
         signer = signing.Signer('predictable-secret', algorithm='whatever')
         msg = "'whatever' is not an algorithm accepted by the hashlib module."
         with self.assertRaisesMessage(InvalidAlgorithm, msg):
             signer.sign('hello')
-
-    def test_legacy_signature(self):
-        # RemovedInDjango40Warning: pre-Django 3.1 signatures won't be
-        # supported.
-        signer = signing.Signer()
-        sha1_sig = 'foo:l-EMM5FtewpcHMbKFeQodt3X9z8'
-        self.assertNotEqual(signer.sign('foo'), sha1_sig)
-        self.assertEqual(signer.unsign(sha1_sig), 'foo')
 
     def test_sign_unsign(self):
         "sign/unsign should be reversible"
@@ -122,6 +105,22 @@ class TestSigner(SimpleTestCase):
             with self.assertRaises(signing.BadSignature):
                 signer.unsign(transform(signed_value))
 
+    def test_sign_unsign_object(self):
+        signer = signing.Signer('predictable-secret')
+        tests = [
+            ['a', 'list'],
+            'a string \u2019',
+            {'a': 'dictionary'},
+        ]
+        for obj in tests:
+            with self.subTest(obj=obj):
+                signed_obj = signer.sign_object(obj)
+                self.assertNotEqual(obj, signed_obj)
+                self.assertEqual(obj, signer.unsign_object(signed_obj))
+                signed_obj = signer.sign_object(obj, compress=True)
+                self.assertNotEqual(obj, signed_obj)
+                self.assertEqual(obj, signer.unsign_object(signed_obj))
+
     def test_dumps_loads(self):
         "dumps and loads be reversible for any JSON serializable object"
         objects = [
@@ -134,21 +133,6 @@ class TestSigner(SimpleTestCase):
             self.assertEqual(o, signing.loads(signing.dumps(o)))
             self.assertNotEqual(o, signing.dumps(o, compress=True))
             self.assertEqual(o, signing.loads(signing.dumps(o, compress=True)))
-
-    def test_dumps_loads_legacy_signature(self):
-        # RemovedInDjango40Warning: pre-Django 3.1 signatures won't be
-        # supported.
-        value = 'a string \u2020'
-        # SHA-1 signed value.
-        signed = 'ImEgc3RyaW5nIFx1MjAyMCI:1k1beT:ZfNhN1kdws7KosUleOvuYroPHEc'
-        self.assertEqual(signing.loads(signed), value)
-
-    @ignore_warnings(category=RemovedInDjango40Warning)
-    def test_dumps_loads_default_hashing_algorithm_sha1(self):
-        value = 'a string \u2020'
-        with self.settings(DEFAULT_HASHING_ALGORITHM='sha1'):
-            signed = signing.dumps(value)
-        self.assertEqual(signing.loads(signed), value)
 
     def test_decode_detects_tampering(self):
         "loads should raise exception for tampered objects"

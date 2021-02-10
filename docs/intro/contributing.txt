@@ -19,8 +19,8 @@ Who's this tutorial for?
 
 .. seealso::
 
-    If you are looking for a reference on how to submit patches, see the
-    :doc:`/internals/contributing/writing-code/submitting-patches`
+    If you are looking for a reference on the details of making code
+    contributions, see the :doc:`/internals/contributing/writing-code/index`
     documentation.
 
 For this tutorial, we expect that you have at least a basic understanding of

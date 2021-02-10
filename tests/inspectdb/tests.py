@@ -399,7 +399,6 @@ class InspectDBTransactionalTests(TransactionTestCase):
                 cursor.execute('DROP MATERIALIZED VIEW inspectdb_people_materialized')
 
     @skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific SQL')
-    @skipUnlessDBFeature('supports_table_partitions')
     def test_include_partitions(self):
         """inspectdb --include-partitions creates models for partitions."""
         with connection.cursor() as cursor:

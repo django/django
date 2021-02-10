@@ -92,7 +92,7 @@ class Command(BaseCommand):
                         # Mark it as applied/unapplied
                         if applied_migration:
                             output = ' [X] %s' % title
-                            if self.verbosity >= 2:
+                            if self.verbosity >= 2 and hasattr(applied_migration, 'applied'):
                                 output += ' (applied at %s)' % applied_migration.applied.strftime('%Y-%m-%d %H:%M:%S')
                             self.stdout.write(output)
                         else:

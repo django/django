@@ -74,7 +74,7 @@ example ``settings.py`` snippet defining two non-default databases, with the
 
 If you attempt to access a database that you haven't defined in your
 :setting:`DATABASES` setting, Django will raise a
-``django.db.utils.ConnectionDoesNotExist`` exception.
+``django.utils.connection.ConnectionDoesNotExist`` exception.
 
 .. _synchronizing_multiple_databases:
 

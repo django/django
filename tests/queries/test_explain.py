@@ -52,9 +52,8 @@ class ExplainTests(TestCase):
             {'costs': False, 'buffers': True, 'analyze': True},
             {'verbose': True, 'timing': True, 'analyze': True},
             {'verbose': False, 'timing': False, 'analyze': True},
+            {'summary': True},
         ]
-        if connection.features.is_postgresql_10:
-            test_options.append({'summary': True})
         if connection.features.is_postgresql_12:
             test_options.append({'settings': True})
         if connection.features.is_postgresql_13:
@@ -80,9 +79,6 @@ class ExplainTests(TestCase):
 
     @unittest.skipUnless(connection.vendor == 'mysql', 'MariaDB and MySQL >= 8.0.18 specific.')
     def test_mysql_analyze(self):
-        # Inner skip to avoid module level query for MySQL version.
-        if not connection.features.supports_explain_analyze:
-            raise unittest.SkipTest('MariaDB and MySQL >= 8.0.18 specific.')
         qs = Tag.objects.filter(name='test')
         with CaptureQueriesContext(connection) as captured_queries:
             qs.explain(analyze=True)

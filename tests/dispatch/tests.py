@@ -165,13 +165,28 @@ class DispatcherTests(SimpleTestCase):
         def fails(val, **kwargs):
             raise ValueError('this')
         a_signal.connect(fails)
-        result = a_signal.send_robust(sender=self, val="test")
-        err = result[0][1]
-        self.assertIsInstance(err, ValueError)
-        self.assertEqual(err.args, ('this',))
-        self.assertTrue(hasattr(err, '__traceback__'))
-        self.assertIsInstance(err.__traceback__, TracebackType)
-        a_signal.disconnect(fails)
+        try:
+            with self.assertLogs('django.dispatch', 'ERROR') as cm:
+                result = a_signal.send_robust(sender=self, val='test')
+            err = result[0][1]
+            self.assertIsInstance(err, ValueError)
+            self.assertEqual(err.args, ('this',))
+            self.assertIs(hasattr(err, '__traceback__'), True)
+            self.assertIsInstance(err.__traceback__, TracebackType)
+
+            log_record = cm.records[0]
+            self.assertEqual(
+                log_record.getMessage(),
+                'Error calling '
+                'DispatcherTests.test_send_robust_fail.<locals>.fails in '
+                'Signal.send_robust() (this)',
+            )
+            self.assertIsNotNone(log_record.exc_info)
+            _, exc_value, _ = log_record.exc_info
+            self.assertIsInstance(exc_value, ValueError)
+            self.assertEqual(str(exc_value), 'this')
+        finally:
+            a_signal.disconnect(fails)
         self.assertTestIsClean(a_signal)
 
     def test_disconnection(self):

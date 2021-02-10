@@ -138,7 +138,7 @@ class URLValidator(RegexValidator):
         # section 3.1. It's defined to be 255 bytes or less, but this includes
         # one byte for the length of the name and one byte for the trailing dot
         # that's used to indicate absolute names in DNS.
-        if len(urlsplit(value).netloc) > 253:
+        if len(urlsplit(value).hostname) > 253:
             raise ValidationError(self.message, code=self.code, params={'value': value})
 
 

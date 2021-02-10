@@ -18,7 +18,6 @@
 {% endblock %}
 {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE">{% endblock %}
 </head>
-{% load i18n %}
 
 <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
   data-admin-utc-offset="{% now "Z" %}">
@@ -28,6 +27,7 @@
 
     {% if not is_popup %}
     <!-- Header -->
+    {% block header %}
     <div id="header">
         <div id="branding">
         {% block branding %}{% endblock %}
@@ -59,6 +59,7 @@
         {% endblock %}
         {% block nav-global %}{% endblock %}
     </div>
+    {% endblock %}
     <!-- END Header -->
     {% block breadcrumbs %}
     <div class="breadcrumbs">

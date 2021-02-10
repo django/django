@@ -2,7 +2,7 @@ import json
 
 from django.core import checks, exceptions, serializers
 from django.db import connection
-from django.db.models import OuterRef, Subquery
+from django.db.models import F, OuterRef, Subquery
 from django.db.models.expressions import RawSQL
 from django.forms import Form
 from django.test.utils import CaptureQueriesContext, isolate_apps
@@ -135,6 +135,13 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             HStoreModel.objects.filter(field__a=KeyTransform('x', expr)),
             self.objs[:2]
+        )
+
+    def test_key_transform_annotation(self):
+        qs = HStoreModel.objects.annotate(a=F('field__a'))
+        self.assertCountEqual(
+            qs.values_list('a', flat=True),
+            ['b', 'b', None, None, None],
         )
 
     def test_keys(self):

@@ -1,9 +1,8 @@
-import unittest
 from decimal import Decimal
 
 from django.core import validators
 from django.core.exceptions import ValidationError
-from django.db import connection, models
+from django.db import models
 from django.test import TestCase
 
 from .models import BigD, Foo
@@ -66,7 +65,6 @@ class DecimalFieldTests(TestCase):
         bd = BigD.objects.get(pk=bd.pk)
         self.assertEqual(bd.d, Decimal('12.9'))
 
-    @unittest.skipIf(connection.vendor == 'sqlite', 'SQLite stores values rounded to 15 significant digits.')
     def test_fetch_from_db_without_float_rounding(self):
         big_decimal = BigD.objects.create(d=Decimal('.100000000000000000000000000005'))
         big_decimal.refresh_from_db()

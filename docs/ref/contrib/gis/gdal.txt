@@ -92,6 +92,10 @@ each feature in that layer.
 
     Returns the name of the data source.
 
+    .. versionchanged:: 3.2
+
+        Support for :class:`pathlib.Path` ``ds_input`` was added.
+
 __ https://gdal.org/drivers/vector/
 
 ``Layer``

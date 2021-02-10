@@ -2,7 +2,6 @@ import itertools
 import json
 import os
 import re
-from urllib.parse import unquote
 
 from django.apps import apps
 from django.conf import settings
@@ -11,9 +10,7 @@ from django.template import Context, Engine
 from django.urls import translate_url
 from django.utils.formats import get_format
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.utils.translation import (
-    LANGUAGE_SESSION_KEY, check_for_language, get_language,
-)
+from django.utils.translation import check_for_language, get_language
 from django.utils.translation.trans_real import DjangoTranslation
 from django.views.generic import View
 
@@ -41,8 +38,6 @@ def set_language(request):
         )
     ):
         next_url = request.META.get('HTTP_REFERER')
-        # HTTP_REFERER may be encoded.
-        next_url = next_url and unquote(next_url)
         if not url_has_allowed_host_and_scheme(
             url=next_url,
             allowed_hosts={request.get_host()},
@@ -57,10 +52,6 @@ def set_language(request):
                 next_trans = translate_url(next_url, lang_code)
                 if next_trans != next_url:
                     response = HttpResponseRedirect(next_trans)
-            if hasattr(request, 'session'):
-                # Storing the language in the session is deprecated.
-                # (RemovedInDjango40Warning)
-                request.session[LANGUAGE_SESSION_KEY] = lang_code
             response.set_cookie(
                 settings.LANGUAGE_COOKIE_NAME, lang_code,
                 max_age=settings.LANGUAGE_COOKIE_AGE,

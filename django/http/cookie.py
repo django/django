@@ -3,9 +3,6 @@ from http import cookies
 # For backwards compatibility in Django 2.1.
 SimpleCookie = cookies.SimpleCookie
 
-# Add support for the SameSite attribute (obsolete when PY37 is unsupported).
-cookies.Morsel._reserved.setdefault('samesite', 'SameSite')
-
 
 def parse_cookie(cookie):
     """

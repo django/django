@@ -53,3 +53,17 @@ class NaturalPKWithDefault(models.Model):
 
     def natural_key(self):
         return (self.name,)
+
+
+class FKAsPKNoNaturalKeyManager(models.Manager):
+    def get_by_natural_key(self, *args, **kwargs):
+        return super().get_by_natural_key(*args, **kwargs)
+
+
+class FKAsPKNoNaturalKey(models.Model):
+    pk_fk = models.ForeignKey(NaturalKeyAnchor, on_delete=models.CASCADE, primary_key=True)
+
+    objects = FKAsPKNoNaturalKeyManager()
+
+    def natural_key(self):
+        raise NotImplementedError('This method was not expected to be called.')

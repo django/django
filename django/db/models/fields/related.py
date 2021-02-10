@@ -172,14 +172,10 @@ class RelatedField(FieldCacheMixin, Field):
         if (self.remote_field.model not in self.opts.apps.get_models() and
                 not isinstance(self.remote_field.model, str) and
                 self.remote_field.model._meta.swapped):
-            model = "%s.%s" % (
-                self.remote_field.model._meta.app_label,
-                self.remote_field.model._meta.object_name
-            )
             return [
                 checks.Error(
                     "Field defines a relation with the model '%s', which has "
-                    "been swapped out." % model,
+                    "been swapped out." % self.remote_field.model._meta.label,
                     hint="Update the relation to point at 'settings.%s'." % self.remote_field.model._meta.swappable,
                     obj=self,
                     id='fields.E301',
@@ -218,14 +214,16 @@ class RelatedField(FieldCacheMixin, Field):
         rel_is_hidden = self.remote_field.is_hidden()
         rel_name = self.remote_field.get_accessor_name()  # i. e. "model_set"
         rel_query_name = self.related_query_name()  # i. e. "model"
-        field_name = "%s.%s" % (opts.object_name, self.name)  # i. e. "Model.field"
+        # i.e. "app_label.Model.field".
+        field_name = '%s.%s' % (opts.label, self.name)
 
         # Check clashes between accessor or reverse query name of `field`
         # and any other field name -- i.e. accessor for Model.foreign is
         # model_set and it clashes with Target.model_set.
         potential_clashes = rel_opts.fields + rel_opts.many_to_many
         for clash_field in potential_clashes:
-            clash_name = "%s.%s" % (rel_opts.object_name, clash_field.name)  # i.e. "Target.model_set"
+            # i.e. "app_label.Target.model_set".
+            clash_name = '%s.%s' % (rel_opts.label, clash_field.name)
             if not rel_is_hidden and clash_field.name == rel_name:
                 errors.append(
                     checks.Error(
@@ -253,9 +251,11 @@ class RelatedField(FieldCacheMixin, Field):
         # Model.m2m accessor.
         potential_clashes = (r for r in rel_opts.related_objects if r.field is not self)
         for clash_field in potential_clashes:
-            clash_name = "%s.%s" % (  # i. e. "Model.m2m"
-                clash_field.related_model._meta.object_name,
-                clash_field.field.name)
+            # i.e. "app_label.Model.m2m".
+            clash_name = '%s.%s' % (
+                clash_field.related_model._meta.label,
+                clash_field.field.name,
+            )
             if not rel_is_hidden and clash_field.get_accessor_name() == rel_name:
                 errors.append(
                     checks.Error(
@@ -1479,18 +1479,12 @@ class ManyToManyField(RelatedField):
         if isinstance(self.remote_field.model, str):
             kwargs['to'] = self.remote_field.model
         else:
-            kwargs['to'] = "%s.%s" % (
-                self.remote_field.model._meta.app_label,
-                self.remote_field.model._meta.object_name,
-            )
+            kwargs['to'] = self.remote_field.model._meta.label
         if getattr(self.remote_field, 'through', None) is not None:
             if isinstance(self.remote_field.through, str):
                 kwargs['through'] = self.remote_field.through
             elif not self.remote_field.through._meta.auto_created:
-                kwargs['through'] = "%s.%s" % (
-                    self.remote_field.through._meta.app_label,
-                    self.remote_field.through._meta.object_name,
-                )
+                kwargs['through'] = self.remote_field.through._meta.label
         # If swappable is True, then see if we're actually pointing to the target
         # of a swap.
         swappable_setting = self.swappable_setting
@@ -1620,7 +1614,11 @@ class ManyToManyField(RelatedField):
             # related_name with one generated from the m2m field name. Django
             # still uses backwards relations internally and we need to avoid
             # clashes between multiple m2m fields with related_name == '+'.
-            self.remote_field.related_name = "_%s_%s_+" % (cls.__name__.lower(), name)
+            self.remote_field.related_name = '_%s_%s_%s_+' % (
+                cls._meta.app_label,
+                cls.__name__.lower(),
+                name,
+            )
 
         super().contribute_to_class(cls, name, **kwargs)
 

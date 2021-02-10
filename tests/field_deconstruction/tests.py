@@ -432,13 +432,6 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(kwargs, {"to": "auth.Permission"})
         self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
 
-    def test_null_boolean_field(self):
-        field = models.NullBooleanField()
-        name, path, args, kwargs = field.deconstruct()
-        self.assertEqual(path, "django.db.models.NullBooleanField")
-        self.assertEqual(args, [])
-        self.assertEqual(kwargs, {})
-
     def test_positive_integer_field(self):
         field = models.PositiveIntegerField()
         name, path, args, kwargs = field.deconstruct()

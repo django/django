@@ -1,3 +1,4 @@
+import gzip
 import os
 import sys
 import tempfile
@@ -80,9 +81,26 @@ class DumpDataAssertMixin:
             primary_keys=primary_keys,
         )
         if filename:
-            with open(filename) as f:
+            file_root, file_ext = os.path.splitext(filename)
+            compression_formats = {
+                '.bz2': (open, file_root),
+                '.gz': (gzip.open, filename),
+                '.lzma': (open, file_root),
+                '.xz': (open, file_root),
+                '.zip': (open, file_root),
+            }
+            if HAS_BZ2:
+                compression_formats['.bz2'] = (bz2.open, filename)
+            if HAS_LZMA:
+                compression_formats['.lzma'] = (lzma.open, filename)
+                compression_formats['.xz'] = (lzma.open, filename)
+            try:
+                open_method, file_path = compression_formats[file_ext]
+            except KeyError:
+                open_method, file_path = open, filename
+            with open_method(file_path, 'rt') as f:
                 command_output = f.read()
-            os.remove(filename)
+            os.remove(file_path)
         else:
             command_output = new_io.getvalue().strip()
         if format == "json":
@@ -491,6 +509,66 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '{"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}]',
             filename='dumpdata.json'
         )
+
+    def test_dumpdata_with_file_gzip_output(self):
+        management.call_command('loaddata', 'fixture1.json', verbosity=0)
+        self._dumpdata_assert(
+            ['fixtures'],
+            '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
+            '"News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place '
+            'on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
+            '{"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}]',
+            filename='dumpdata.json.gz',
+        )
+
+    @unittest.skipUnless(HAS_BZ2, 'No bz2 library detected.')
+    def test_dumpdata_with_file_bz2_output(self):
+        management.call_command('loaddata', 'fixture1.json', verbosity=0)
+        self._dumpdata_assert(
+            ['fixtures'],
+            '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
+            '"News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place '
+            'on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
+            '{"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}]',
+            filename='dumpdata.json.bz2',
+        )
+
+    @unittest.skipUnless(HAS_LZMA, 'No lzma library detected.')
+    def test_dumpdata_with_file_lzma_output(self):
+        management.call_command('loaddata', 'fixture1.json', verbosity=0)
+        self._dumpdata_assert(
+            ['fixtures'],
+            '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
+            '"News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place '
+            'on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
+            '{"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}]',
+            filename='dumpdata.json.lzma',
+        )
+
+    @unittest.skipUnless(HAS_LZMA, 'No lzma library detected.')
+    def test_dumpdata_with_file_xz_output(self):
+        management.call_command('loaddata', 'fixture1.json', verbosity=0)
+        self._dumpdata_assert(
+            ['fixtures'],
+            '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
+            '"News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place '
+            'on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
+            '{"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}]',
+            filename='dumpdata.json.xz',
+        )
+
+    def test_dumpdata_with_file_zip_output(self):
+        management.call_command('loaddata', 'fixture1.json', verbosity=0)
+        msg = "Unsupported file extension (.zip). Fixtures saved in 'dumpdata.json'."
+        with self.assertWarnsMessage(RuntimeWarning, msg):
+            self._dumpdata_assert(
+                ['fixtures'],
+                '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
+                '"News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place '
+                'on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
+                '{"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}]',
+                filename='dumpdata.json.zip',
+            )
 
     def test_dumpdata_progressbar(self):
         """

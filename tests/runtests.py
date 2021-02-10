@@ -25,10 +25,9 @@ else:
     from django.test.selenium import SeleniumTestCaseBase
     from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
     from django.utils.deprecation import (
-        RemovedInDjango40Warning, RemovedInDjango41Warning,
+        RemovedInDjango41Warning, RemovedInDjango50Warning,
     )
     from django.utils.log import DEFAULT_LOGGING
-    from django.utils.version import PY37
 
 try:
     import MySQLdb
@@ -39,7 +38,7 @@ else:
     warnings.filterwarnings('ignore', r'\(1003, *', category=MySQLdb.Warning)
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
-warnings.simplefilter("error", RemovedInDjango40Warning)
+warnings.simplefilter('error', RemovedInDjango50Warning)
 warnings.simplefilter('error', RemovedInDjango41Warning)
 # Make resource and runtime warning errors to ensure no usage of error prone
 # patterns.
@@ -47,6 +46,12 @@ warnings.simplefilter("error", ResourceWarning)
 warnings.simplefilter("error", RuntimeWarning)
 # Ignore known warnings in test dependencies.
 warnings.filterwarnings("ignore", "'U' mode is deprecated", DeprecationWarning, module='docutils.io')
+# RemovedInDjango41Warning: Ignore MemcachedCache deprecation warning.
+warnings.filterwarnings(
+    'ignore',
+    'MemcachedCache is deprecated',
+    category=RemovedInDjango41Warning,
+)
 
 RUNTESTS_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -153,7 +158,7 @@ def setup(verbosity, test_labels, parallel, start_at, start_after):
     # Redirect some settings for the duration of these tests.
     settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS
     settings.ROOT_URLCONF = 'urls'
-    settings.STATIC_URL = '/static/'
+    settings.STATIC_URL = 'static/'
     settings.STATIC_ROOT = os.path.join(TMPDIR, 'static')
     settings.TEMPLATES = [{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -185,7 +190,6 @@ def setup(verbosity, test_labels, parallel, start_at, start_after):
     settings.LOGGING = log_config
     settings.SILENCED_SYSTEM_CHECKS = [
         'fields.W342',  # ForeignKey(unique=True) -> OneToOneField
-        'fields.W903',  # NullBooleanField deprecated.
     ]
 
     # Load all the ALWAYS_INSTALLED_APPS.
@@ -248,6 +252,10 @@ def setup(verbosity, test_labels, parallel, start_at, start_after):
 
     apps.set_installed_apps(settings.INSTALLED_APPS)
 
+    # Set an environment variable that other code may consult to see if
+    # Django's own test suite is running.
+    os.environ['RUNNING_DJANGOS_TEST_SUITE'] = 'true'
+
     return state
 
 
@@ -261,6 +269,7 @@ def teardown(state):
     # FileNotFoundError at the end of a test run (#27890).
     from multiprocessing.util import _finalizer_registry
     _finalizer_registry.pop((-100, 0), None)
+    del os.environ['RUNNING_DJANGOS_TEST_SUITE']
 
 
 def actual_test_processes(parallel):
@@ -293,13 +302,10 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
                  test_name_patterns, start_at, start_after, pdb, buffer,
                  timing):
     state = setup(verbosity, test_labels, parallel, start_at, start_after)
-    extra_tests = []
-
     # Run the test suite, including the extra validation tests.
     if not hasattr(settings, 'TEST_RUNNER'):
         settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
     TestRunner = get_runner(settings)
-
     test_runner = TestRunner(
         verbosity=verbosity,
         interactive=interactive,
@@ -315,10 +321,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
         buffer=buffer,
         timing=timing,
     )
-    failures = test_runner.run_tests(
-        test_labels or get_installed(),
-        extra_tests=extra_tests,
-    )
+    failures = test_runner.run_tests(test_labels or get_installed())
     teardown(state)
     return failures
 
@@ -517,14 +520,13 @@ if __name__ == "__main__":
         '--timing', action='store_true',
         help='Output timings, including database set up and total run time.',
     )
-    if PY37:
-        parser.add_argument(
-            '-k', dest='test_name_patterns', action='append',
-            help=(
-                'Only run test methods and classes matching test name pattern. '
-                'Same as unittest -k option. Can be used multiple times.'
-            ),
-        )
+    parser.add_argument(
+        '-k', dest='test_name_patterns', action='append',
+        help=(
+            'Only run test methods and classes matching test name pattern. '
+            'Same as unittest -k option. Can be used multiple times.'
+        ),
+    )
 
     options = parser.parse_args()
 

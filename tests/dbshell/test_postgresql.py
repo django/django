@@ -67,6 +67,12 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
             )
         )
 
+    def test_service(self):
+        self.assertEqual(
+            self.settings_to_cmd_args_env({'OPTIONS': {'service': 'django_test'}}),
+            (['psql', 'postgres'], {'PGSERVICE': 'django_test'}),
+        )
+
     def test_column(self):
         self.assertEqual(
             self.settings_to_cmd_args_env({

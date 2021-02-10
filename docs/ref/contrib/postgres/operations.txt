@@ -61,8 +61,6 @@ them. In that case, connect to your Django database and run the query
 
 .. class:: BloomExtension()
 
-    .. versionadded:: 3.1
-
     Installs the ``bloom`` extension.
 
 ``BtreeGinExtension``
@@ -160,8 +158,6 @@ For example, to create a collation for German phone book ordering::
     required to make this operation reversible.
 
 .. admonition:: Restrictions
-
-    PostgreSQL 9.6 only supports the ``'libc'`` provider.
 
     Non-deterministic collations are supported only on PostgreSQL 12+.
 

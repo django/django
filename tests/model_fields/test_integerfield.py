@@ -1,5 +1,3 @@
-import unittest
-
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection, models
@@ -192,7 +190,6 @@ class PositiveIntegerFieldTests(IntegerFieldTests):
         else models.IntegerField
     )
 
-    @unittest.skipIf(connection.vendor == 'sqlite', "SQLite doesn't have a constraint.")
     def test_negative_values(self):
         p = PositiveIntegerModel.objects.create(value=0)
         p.value = models.F('value') - 1

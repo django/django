@@ -439,10 +439,6 @@ PostGIS SQL equivalent:
     SELECT ... WHERE ST_Relate(poly, ST_Polygon(rast, 1), 'T*T***FF*')
     SELECT ... WHERE ST_Relate(ST_Polygon(rast, 2), ST_Polygon(rast, 1), 'T*T***FF*')
 
-.. versionchanged:: 3.1
-
-    MariaDB support was added.
-
 Oracle
 ~~~~~~
 

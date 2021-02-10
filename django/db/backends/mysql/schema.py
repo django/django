@@ -10,6 +10,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_not_null = "MODIFY %(column)s %(type)s NOT NULL"
     sql_alter_column_type = "MODIFY %(column)s %(type)s"
     sql_alter_column_collate = "MODIFY %(column)s %(type)s%(collation)s"
+    sql_alter_column_no_default_null = 'ALTER COLUMN %(column)s SET DEFAULT NULL'
 
     # No 'CASCADE' which works as a no-op in MySQL but is undocumented
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
@@ -126,7 +127,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if first_field.get_internal_type() == 'ForeignKey':
             constraint_names = self._constraint_names(model, [first_field.column], index=True)
             if not constraint_names:
-                self.execute(self._create_index_sql(model, [first_field], suffix=""))
+                self.execute(
+                    self._create_index_sql(model, fields=[first_field], suffix='')
+                )
         return super()._delete_composed_index(model, fields, *args)
 
     def _set_field_new_type_null_status(self, field, new_type):

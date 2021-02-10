@@ -190,13 +190,8 @@ def get_user(request):
                     user.get_session_auth_hash()
                 )
                 if not session_hash_verified:
-                    if not (
-                        session_hash and
-                        hasattr(user, '_legacy_get_session_auth_hash') and
-                        constant_time_compare(session_hash, user._legacy_get_session_auth_hash())
-                    ):
-                        request.session.flush()
-                        user = None
+                    request.session.flush()
+                    user = None
 
     return user or AnonymousUser()
 

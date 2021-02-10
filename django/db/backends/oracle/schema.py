@@ -14,6 +14,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_not_null = "MODIFY %(column)s NOT NULL"
     sql_alter_column_default = "MODIFY %(column)s DEFAULT %(default)s"
     sql_alter_column_no_default = "MODIFY %(column)s DEFAULT NULL"
+    sql_alter_column_no_default_null = sql_alter_column_no_default
     sql_alter_column_collate = "MODIFY %(column)s %(type)s%(collation)s"
 
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"

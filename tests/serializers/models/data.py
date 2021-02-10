@@ -70,10 +70,6 @@ class GenericIPAddressData(models.Model):
     data = models.GenericIPAddressField(null=True)
 
 
-class NullBooleanData(models.Model):
-    data = models.NullBooleanField(null=True)
-
-
 class PositiveBigIntegerData(models.Model):
     data = models.PositiveBigIntegerField(null=True)
 

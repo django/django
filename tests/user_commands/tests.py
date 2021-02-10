@@ -17,7 +17,6 @@ from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, extend_sys_path, ignore_warnings
 from django.utils import translation
 from django.utils.deprecation import RemovedInDjango41Warning
-from django.utils.version import PY37
 
 from .management.commands import dance
 
@@ -337,20 +336,9 @@ class CommandTests(SimpleTestCase):
         msg = "Error: invalid choice: 'test' (choose from 'foo')"
         with self.assertRaisesMessage(CommandError, msg):
             management.call_command('subparser', 'test', 12)
-        if PY37:
-            # "required" option requires Python 3.7 and later.
-            msg = 'Error: the following arguments are required: subcommand'
-            with self.assertRaisesMessage(CommandError, msg):
-                management.call_command('subparser_dest', subcommand='foo', bar=12)
-        else:
-            msg = (
-                'Unknown option(s) for subparser_dest command: subcommand. '
-                'Valid options are: bar, force_color, help, no_color, '
-                'pythonpath, settings, skip_checks, stderr, stdout, '
-                'traceback, verbosity, version.'
-            )
-            with self.assertRaisesMessage(TypeError, msg):
-                management.call_command('subparser_dest', subcommand='foo', bar=12)
+        msg = 'Error: the following arguments are required: subcommand'
+        with self.assertRaisesMessage(CommandError, msg):
+            management.call_command('subparser_dest', subcommand='foo', bar=12)
 
     def test_create_parser_kwargs(self):
         """BaseCommand.create_parser() passes kwargs to CommandParser."""

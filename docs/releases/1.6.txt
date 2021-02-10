@@ -756,7 +756,7 @@ A temporary shim for ``django.contrib.auth.views.password_reset_confirm()``
 that will allow password reset links generated prior to Django 1.6 to continue
 to work has been added to provide backwards compatibility; this will be removed
 in Django 1.7. Thus, as long as your site has been running Django 1.6 for more
-than :setting:`PASSWORD_RESET_TIMEOUT_DAYS`, this change will have no effect.
+than ``PASSWORD_RESET_TIMEOUT_DAYS``, this change will have no effect.
 If not (for example, if you upgrade directly from Django 1.5 to Django 1.7),
 then any password reset links generated before you upgrade to Django 1.7 or
 later won't work after the upgrade.
@@ -788,7 +788,7 @@ the ``name`` argument so it doesn't conflict with the new url::
         'django.contrib.auth.views.password_reset_confirm_uidb36'),
 
 You can remove this URL pattern after your app has been deployed with Django
-1.6 for :setting:`PASSWORD_RESET_TIMEOUT_DAYS`.
+1.6 for ``PASSWORD_RESET_TIMEOUT_DAYS``.
 
 Default session serialization switched to JSON
 ----------------------------------------------

@@ -3,6 +3,7 @@ from django.contrib.auth import views
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.urls import urlpatterns as auth_urlpatterns
+from django.contrib.auth.views import LoginView
 from django.contrib.messages.api import info
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
@@ -78,6 +79,11 @@ def login_and_permission_required_exception(request):
     pass
 
 
+class CustomDefaultRedirectURLLoginView(LoginView):
+    def get_default_redirect_url(self):
+        return '/custom/'
+
+
 # special urls for auth test cases
 urlpatterns = auth_urlpatterns + [
     path('logout/custom_query/', views.LogoutView.as_view(redirect_field_name='follow')),
@@ -149,6 +155,9 @@ urlpatterns = auth_urlpatterns + [
          views.LoginView.as_view(redirect_authenticated_user=True)),
     path('login/allowed_hosts/',
          views.LoginView.as_view(success_url_allowed_hosts={'otherserver'})),
+    path('login/get_default_redirect_url/', CustomDefaultRedirectURLLoginView.as_view()),
+    path('login/next_page/', views.LoginView.as_view(next_page='/somewhere/')),
+    path('login/next_page/named/', views.LoginView.as_view(next_page='password_reset')),
 
     path('permission_required_redirect/', permission_required_redirect),
     path('permission_required_exception/', permission_required_exception),

@@ -480,6 +480,16 @@ class TestInline(TestDataMixin, TestCase):
             html=True
         )
 
+    def test_inlines_plural_heading_foreign_key(self):
+        response = self.client.get(reverse('admin:admin_inlines_holder4_add'))
+        self.assertContains(response, '<h2>Inner4 stackeds</h2>', html=True)
+        self.assertContains(response, '<h2>Inner4 tabulars</h2>', html=True)
+
+    def test_inlines_singular_heading_one_to_one(self):
+        response = self.client.get(reverse('admin:admin_inlines_person_add'))
+        self.assertContains(response, '<h2>Author</h2>', html=True)  # Tabular.
+        self.assertContains(response, '<h2>Fashionista</h2>', html=True)  # Stacked.
+
 
 @override_settings(ROOT_URLCONF='admin_inlines.urls')
 class TestInlineMedia(TestDataMixin, TestCase):
