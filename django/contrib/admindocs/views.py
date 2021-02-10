@@ -16,6 +16,7 @@ from django.http import Http404
 from django.template.engine import Engine
 from django.urls import get_mod_func, get_resolver, get_urlconf
 from django.utils.decorators import method_decorator
+from django.utils.functional import cached_property
 from django.utils.inspect import (
     func_accepts_kwargs, func_accepts_var_args, get_func_full_args,
     method_has_no_args,
@@ -250,7 +251,7 @@ class ModelDetailView(BaseAdminDocsView):
         methods = []
         # Gather model methods.
         for func_name, func in model.__dict__.items():
-            if inspect.isfunction(func) or isinstance(func, property):
+            if inspect.isfunction(func) or isinstance(func, (cached_property, property)):
                 try:
                     for exclude in MODEL_METHODS_EXCLUDE:
                         if func_name.startswith(exclude):
@@ -261,9 +262,10 @@ class ModelDetailView(BaseAdminDocsView):
                 verbose = verbose and (
                     utils.parse_rst(cleandoc(verbose), 'model', _('model:') + opts.model_name)
                 )
-                # Show properties and methods without arguments as fields.
-                # Otherwise, show as a 'method with arguments'.
-                if isinstance(func, property):
+                # Show properties, cached_properties, and methods without
+                # arguments as fields. Otherwise, show as a 'method with
+                # arguments'.
+                if isinstance(func, (cached_property, property)):
                     fields.append({
                         'name': func_name,
                         'data_type': get_return_data_type(func_name),

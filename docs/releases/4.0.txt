@@ -43,6 +43,8 @@ Minor features
 * The admindocs now allows esoteric setups where :setting:`ROOT_URLCONF` is not
   a string.
 
+* The model section of the ``admindocs`` now shows cached properties.
+
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
