@@ -1573,11 +1573,12 @@ class LiveServerTestCase(TransactionTestCase):
             for conn in cls.server_thread.connections_override.values():
                 conn.dec_thread_sharing()
 
+            cls._live_server_modified_settings.disable()
+            super().tearDownClass()
+
     @classmethod
     def tearDownClass(cls):
         cls._tearDownClassInternal()
-        cls._live_server_modified_settings.disable()
-        super().tearDownClass()
 
 
 class SerializeMixin:

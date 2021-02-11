@@ -9,6 +9,7 @@ from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
+from django.conf import settings
 from django.core.servers.basehttp import WSGIServer
 from django.test import LiveServerTestCase, override_settings
 from django.test.testcases import LiveServerThread, QuietWSGIRequestHandler
@@ -37,6 +38,42 @@ class LiveServerBase(LiveServerTestCase):
 
     def urlopen(self, url):
         return urlopen(self.live_server_url + url)
+
+
+class FailingLiveServerThread(LiveServerThread):
+    def _create_server(self):
+        raise RuntimeError('Error creating server.')
+
+
+class LiveServerTestCaseSetupTest(LiveServerBase):
+    server_thread_class = FailingLiveServerThread
+
+    @classmethod
+    def check_allowed_hosts(cls, expected):
+        if settings.ALLOWED_HOSTS != expected:
+            raise RuntimeError(f'{settings.ALLOWED_HOSTS} != {expected}')
+
+    @classmethod
+    def setUpClass(cls):
+        cls.check_allowed_hosts(['testserver'])
+        try:
+            super().setUpClass()
+        except RuntimeError:
+            # LiveServerTestCase's change to ALLOWED_HOSTS should be reverted.
+            cls.check_allowed_hosts(['testserver'])
+        else:
+            raise RuntimeError('Server did not fail.')
+        cls.set_up_called = True
+
+    @classmethod
+    def tearDownClass(cls):
+        # Make tearDownClass() a no-op because setUpClass() was already cleaned
+        # up, and because the error inside setUpClass() was handled, which will
+        # cause tearDownClass() to be called when it normally wouldn't.
+        pass
+
+    def test_set_up_class(self):
+        self.assertIs(self.set_up_called, True)
 
 
 class LiveServerAddress(LiveServerBase):
