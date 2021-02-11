@@ -5,9 +5,10 @@ from django.db import models
 
 from .models import (
     Author, BinaryTree, CapoFamiglia, Chapter, Child, ChildModel1, ChildModel2,
-    Consigliere, EditablePKBook, ExtraTerrestrial, Fashionista, FootNote,
-    Holder, Holder2, Holder3, Holder4, Holder5, Inner, Inner2, Inner3,
-    Inner4Stacked, Inner4Tabular, Inner5Stacked, Inner5Tabular, NonAutoPKBook,
+    Class, Consigliere, Course, CourseProxy, CourseProxy1, CourseProxy2,
+    EditablePKBook, ExtraTerrestrial, Fashionista, FootNote, Holder, Holder2,
+    Holder3, Holder4, Holder5, Inner, Inner2, Inner3, Inner4Stacked,
+    Inner4Tabular, Inner5Stacked, Inner5Tabular, NonAutoPKBook,
     NonAutoPKBookChild, Novel, NovelReadonlyChapter, OutfitItem,
     ParentModelWithCustomPk, Person, Poll, Profile, ProfileCollection,
     Question, ReadOnlyInline, ShoppingWeakness, Sighting, SomeChildModel,
@@ -300,6 +301,47 @@ class FashonistaStackedInline(admin.StackedInline):
     model = Fashionista
 
 
+# Admin for #30231
+class ClassStackedHorizontal(admin.StackedInline):
+    model = Class
+    extra = 1
+    filter_horizontal = ['person']
+
+
+class ClassAdminStackedHorizontal(admin.ModelAdmin):
+    inlines = [ClassStackedHorizontal]
+
+
+class ClassTabularHorizontal(admin.TabularInline):
+    model = Class
+    extra = 1
+    filter_horizontal = ['person']
+
+
+class ClassAdminTabularHorizontal(admin.ModelAdmin):
+    inlines = [ClassTabularHorizontal]
+
+
+class ClassTabularVertical(admin.TabularInline):
+    model = Class
+    extra = 1
+    filter_vertical = ['person']
+
+
+class ClassAdminTabularVertical(admin.ModelAdmin):
+    inlines = [ClassTabularVertical]
+
+
+class ClassStackedVertical(admin.StackedInline):
+    model = Class
+    extra = 1
+    filter_vertical = ['person']
+
+
+class ClassAdminStackedVertical(admin.ModelAdmin):
+    inlines = [ClassStackedVertical]
+
+
 site.register(TitleCollection, inlines=[TitleInline])
 # Test bug #12561 and #12778
 # only ModelAdmin media
@@ -327,3 +369,7 @@ site.register(Teacher, TeacherAdmin)
 site.register(Chapter, inlines=[FootNoteNonEditableInlineCustomForm])
 site.register(OutfitItem, inlines=[WeaknessInlineCustomForm])
 site.register(Person, inlines=[AuthorTabularInline, FashonistaStackedInline])
+site.register(Course, ClassAdminStackedHorizontal)
+site.register(CourseProxy, ClassAdminStackedVertical)
+site.register(CourseProxy1, ClassAdminTabularVertical)
+site.register(CourseProxy2, ClassAdminTabularHorizontal)
