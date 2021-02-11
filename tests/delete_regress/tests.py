@@ -292,20 +292,6 @@ class Ticket19102Tests(TestCase):
         self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
 
     @skipUnlessDBFeature("update_can_self_select")
-    @skipUnlessDBFeature('can_distinct_on_fields')
-    def test_ticket_19102_distinct_on(self):
-        # Both Login objs should have same description so that only the one
-        # having smaller PK will be deleted.
-        Login.objects.update(description='description')
-        with self.assertNumQueries(1):
-            Login.objects.distinct('description').order_by('pk').filter(
-                orgunit__name__isnull=False
-            ).delete()
-        # Assumed that l1 which is created first has smaller PK.
-        self.assertFalse(Login.objects.filter(pk=self.l1.pk).exists())
-        self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
-
-    @skipUnlessDBFeature("update_can_self_select")
     def test_ticket_19102_select_related(self):
         with self.assertNumQueries(1):
             Login.objects.filter(
