@@ -1563,18 +1563,14 @@ class LiveServerTestCase(TransactionTestCase):
 
     @classmethod
     def _tearDownClassInternal(cls):
-        # There may not be a 'server_thread' attribute if setUpClass() for some
-        # reasons has raised an exception.
-        if hasattr(cls, 'server_thread'):
-            # Terminate the live server's thread
-            cls.server_thread.terminate()
+        # Terminate the live server's thread.
+        cls.server_thread.terminate()
+        # Restore sqlite in-memory database connections' non-shareability.
+        for conn in cls.server_thread.connections_override.values():
+            conn.dec_thread_sharing()
 
-            # Restore sqlite in-memory database connections' non-shareability.
-            for conn in cls.server_thread.connections_override.values():
-                conn.dec_thread_sharing()
-
-            cls._live_server_modified_settings.disable()
-            super().tearDownClass()
+        cls._live_server_modified_settings.disable()
+        super().tearDownClass()
 
     @classmethod
     def tearDownClass(cls):
