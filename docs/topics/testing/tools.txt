@@ -112,12 +112,12 @@ Use the ``django.test.Client`` class to make requests.
 .. class:: Client(enforce_csrf_checks=False, json_encoder=DjangoJSONEncoder, **defaults)
 
     It requires no arguments at time of construction. However, you can use
-    keywords arguments to specify some default headers. For example, this will
+    keyword arguments to specify some default headers. For example, this will
     send a ``User-Agent`` HTTP header in each request::
 
         >>> c = Client(HTTP_USER_AGENT='Mozilla/5.0')
 
-    The values from the ``extra`` keywords arguments passed to
+    The values from the ``extra`` keyword arguments passed to
     :meth:`~django.test.Client.get()`,
     :meth:`~django.test.Client.post()`, etc. have precedence over
     the defaults passed to the class constructor.
