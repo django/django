@@ -1448,6 +1448,8 @@ class _MediaFilesHandler(FSFilesHandler):
 class LiveServerThread(threading.Thread):
     """Thread for running a live http server while the tests are running."""
 
+    server_class = ThreadedWSGIServer
+
     def __init__(self, host, static_handler, connections_override=None, port=0):
         self.host = host
         self.port = port
@@ -1484,7 +1486,11 @@ class LiveServerThread(threading.Thread):
             connections.close_all()
 
     def _create_server(self):
-        return ThreadedWSGIServer((self.host, self.port), QuietWSGIRequestHandler, allow_reuse_address=False)
+        return self.server_class(
+            (self.host, self.port),
+            QuietWSGIRequestHandler,
+            allow_reuse_address=False,
+        )
 
     def terminate(self):
         if hasattr(self, 'httpd'):
