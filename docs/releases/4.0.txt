@@ -268,9 +268,9 @@ Miscellaneous
 
 * Support for ``cx_Oracle`` < 7.0 is removed.
 
-* Starting with 4.0, new projects are generated with :setting:`STATIC_URL` set
-  to the relative path ``'static/'``. This allows for the ``SCRIPT_NAME`` to be
-  prepended as necessary.
+* To allow serving a Django site on a subpath without changing the value of
+  :setting:`STATIC_URL`, the leading slash is removed from that setting (now
+  ``'static/'``) in the default :djadmin:`startproject` template.
 
 .. _deprecated-features-4.0:
 
