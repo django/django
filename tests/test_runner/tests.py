@@ -14,7 +14,9 @@ from django.core.management.base import SystemCheckError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.test.runner import DiscoverRunner
 from django.test.testcases import connections_support_transactions
-from django.test.utils import captured_stderr, dependency_ordered
+from django.test.utils import (
+    captured_stderr, dependency_ordered, get_unique_databases_and_mirrors,
+)
 
 from .models import B, Person, Through
 
@@ -335,6 +337,33 @@ class SetupDatabasesTests(unittest.TestCase):
                 old_config = self.runner_instance.setup_databases()
                 self.runner_instance.teardown_databases(old_config)
         mocked_db_creation.return_value.destroy_test_db.assert_called_once_with('dbname', 0, False)
+
+    def test_setup_test_database_aliases(self):
+        """
+        The default database must be the first because data migrations
+        use the default alias by default.
+        """
+        tested_connections = db.ConnectionHandler({
+            'other': {
+                'ENGINE': 'django.db.backends.dummy',
+                'NAME': 'dbname',
+            },
+            'default': {
+                'ENGINE': 'django.db.backends.dummy',
+                'NAME': 'dbname',
+            }
+        })
+        with mock.patch('django.test.utils.connections', new=tested_connections):
+            test_databases, _ = get_unique_databases_and_mirrors()
+            self.assertEqual(
+                test_databases,
+                {
+                    ('', '', 'django.db.backends.dummy', 'test_dbname'): (
+                        'dbname',
+                        ['default', 'other'],
+                    ),
+                },
+            )
 
     def test_destroy_test_db_restores_db_name(self):
         tested_connections = db.ConnectionHandler({
