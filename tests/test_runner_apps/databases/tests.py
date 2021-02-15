@@ -10,6 +10,11 @@ class DefaultDatabaseTests(NoDatabaseTests):
     databases = {'default'}
 
 
+class DefaultDatabaseSerializedTests(NoDatabaseTests):
+    databases = {'default'}
+    serialized_rollback = True
+
+
 class OtherDatabaseTests(NoDatabaseTests):
     databases = {'other'}
 

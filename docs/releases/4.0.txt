@@ -248,7 +248,11 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* The new ``serialized_aliases`` argument of
+  :func:`django.test.utils.setup_databases` determines which
+  :setting:`DATABASES` aliases test databases should have their state
+  serialized to allow usage of the
+  :ref:`serialized_rollback <test-case-serialized-rollback>` feature.
 
 URLs
 ~~~~
@@ -313,7 +317,9 @@ Features deprecated in 4.0
 Miscellaneous
 -------------
 
-* ...
+* ``SERIALIZE`` test setting is deprecated as it can be inferred from the
+  :attr:`~django.test.TestCase.databases` with the
+  :ref:`serialized_rollback <test-case-serialized-rollback>` option enabled.
 
 Features removed in 4.0
 =======================

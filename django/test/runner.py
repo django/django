@@ -682,14 +682,18 @@ class DiscoverRunner:
         return len(result.failures) + len(result.errors)
 
     def _get_databases(self, suite):
-        databases = set()
+        databases = {}
         for test in suite:
             if isinstance(test, unittest.TestCase):
                 test_databases = getattr(test, 'databases', None)
                 if test_databases == '__all__':
-                    return set(connections)
+                    test_databases = connections
                 if test_databases:
-                    databases.update(test_databases)
+                    serialized_rollback = getattr(test, 'serialized_rollback', False)
+                    databases.update(
+                        (alias, serialized_rollback or databases.get(alias, False))
+                        for alias in test_databases
+                    )
             else:
                 databases.update(self._get_databases(test))
         return databases
@@ -717,8 +721,15 @@ class DiscoverRunner:
         self.setup_test_environment()
         suite = self.build_suite(test_labels, extra_tests)
         databases = self.get_databases(suite)
+        serialized_aliases = set(
+            alias
+            for alias, serialize in databases.items() if serialize
+        )
         with self.time_keeper.timed('Total database setup'):
-            old_config = self.setup_databases(aliases=databases)
+            old_config = self.setup_databases(
+                aliases=databases,
+                serialized_aliases=serialized_aliases,
+            )
         run_failed = False
         try:
             self.run_checks(databases)

@@ -11,12 +11,15 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.core.management.base import SystemCheckError
-from django.test import TransactionTestCase, skipUnlessDBFeature
+from django.test import (
+    SimpleTestCase, TransactionTestCase, skipUnlessDBFeature,
+)
 from django.test.runner import DiscoverRunner
 from django.test.testcases import connections_support_transactions
 from django.test.utils import (
     captured_stderr, dependency_ordered, get_unique_databases_and_mirrors,
 )
+from django.utils.deprecation import RemovedInDjango50Warning
 
 from .models import B, Person, Through
 
@@ -315,7 +318,7 @@ class AliasedDefaultTestSetupTest(unittest.TestCase):
             runner_instance.teardown_databases(old_config)
 
 
-class SetupDatabasesTests(unittest.TestCase):
+class SetupDatabasesTests(SimpleTestCase):
 
     def setUp(self):
         self.runner_instance = DiscoverRunner(verbosity=0)
@@ -398,9 +401,15 @@ class SetupDatabasesTests(unittest.TestCase):
                 'TEST': {'SERIALIZE': False},
             },
         })
+        msg = (
+            'The SERIALIZE test database setting is deprecated as it can be '
+            'inferred from the TestCase/TransactionTestCase.databases that '
+            'enable the serialized_rollback feature.'
+        )
         with mock.patch('django.db.backends.dummy.base.DatabaseWrapper.creation_class') as mocked_db_creation:
             with mock.patch('django.test.utils.connections', new=tested_connections):
-                self.runner_instance.setup_databases()
+                with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+                    self.runner_instance.setup_databases()
         mocked_db_creation.return_value.create_test_db.assert_called_once_with(
             verbosity=0, autoclobber=False, serialize=False, keepdb=False
         )

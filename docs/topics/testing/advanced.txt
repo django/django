@@ -718,7 +718,7 @@ utility methods in the ``django.test.utils`` module.
     Performs global post-test teardown, such as removing instrumentation from
     the template system and restoring normal email services.
 
-.. function:: setup_databases(verbosity, interactive, *, time_keeper=None, keepdb=False, debug_sql=False, parallel=0, aliases=None, **kwargs)
+.. function:: setup_databases(verbosity, interactive, *, time_keeper=None, keepdb=False, debug_sql=False, parallel=0, aliases=None, serialized_aliases=None, **kwargs)
 
     Creates the test databases.
 
@@ -730,10 +730,19 @@ utility methods in the ``django.test.utils`` module.
     databases should be setup for. If it's not provided, it defaults to all of
     :setting:`DATABASES` aliases.
 
+    The ``serialized_aliases`` argument determines what subset of ``aliases``
+    test databases should have their state serialized to allow usage of the
+    :ref:`serialized_rollback <test-case-serialized-rollback>` feature. If
+    it's not provided, it defaults to ``aliases``.
+
     .. versionchanged:: 3.2
 
         The ``time_keeper`` kwarg was added, and all kwargs were made
         keyword-only.
+
+    .. versionchanged:: 4.0
+
+        The ``serialized_aliases`` kwarg was added.
 
 .. function:: teardown_databases(old_config, parallel=0, keepdb=False)
 

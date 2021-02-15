@@ -354,7 +354,7 @@ class DiscoverRunnerGetDatabasesTests(SimpleTestCase):
     def assertSkippedDatabases(self, test_labels, expected_databases):
         databases, output = self.get_databases(test_labels)
         self.assertEqual(databases, expected_databases)
-        skipped_databases = set(connections) - expected_databases
+        skipped_databases = set(connections) - set(expected_databases)
         if skipped_databases:
             self.assertIn(self.skip_msg + ', '.join(sorted(skipped_databases)), output)
         else:
@@ -362,31 +362,37 @@ class DiscoverRunnerGetDatabasesTests(SimpleTestCase):
 
     def test_mixed(self):
         databases, output = self.get_databases(['test_runner_apps.databases.tests'])
-        self.assertEqual(databases, set(connections))
+        self.assertEqual(databases, {'default': True, 'other': False})
         self.assertNotIn(self.skip_msg, output)
 
     def test_all(self):
         databases, output = self.get_databases(['test_runner_apps.databases.tests.AllDatabasesTests'])
-        self.assertEqual(databases, set(connections))
+        self.assertEqual(databases, {alias: False for alias in connections})
         self.assertNotIn(self.skip_msg, output)
 
     def test_default_and_other(self):
         self.assertSkippedDatabases([
             'test_runner_apps.databases.tests.DefaultDatabaseTests',
             'test_runner_apps.databases.tests.OtherDatabaseTests',
-        ], {'default', 'other'})
+        ], {'default': False, 'other': False})
 
     def test_default_only(self):
         self.assertSkippedDatabases([
             'test_runner_apps.databases.tests.DefaultDatabaseTests',
-        ], {'default'})
+        ], {'default': False})
 
     def test_other_only(self):
         self.assertSkippedDatabases([
             'test_runner_apps.databases.tests.OtherDatabaseTests'
-        ], {'other'})
+        ], {'other': False})
 
     def test_no_databases_required(self):
         self.assertSkippedDatabases([
             'test_runner_apps.databases.tests.NoDatabaseTests'
-        ], set())
+        ], {})
+
+    def test_serialize(self):
+        databases, _ = self.get_databases([
+            'test_runner_apps.databases.tests.DefaultDatabaseSerializedTests'
+        ])
+        self.assertEqual(databases, {'default': True})
