@@ -363,8 +363,8 @@ class EscapeLeadingSlashesTests(unittest.TestCase):
 
 
 # TODO: Remove when dropping support for PY37. Backport of unit tests for
-# urllib.parse.parse_qsl() from Python 3.8. Copyright (C) 2020 Python Software
-# Foundation (see LICENSE.python).
+# urllib.parse.parse_qsl() from Python 3.8.8. Copyright (C) 2021 Python
+# Software Foundation (see LICENSE.python).
 class ParseQSLBackportTests(unittest.TestCase):
     def test_parse_qsl(self):
         tests = [
@@ -388,16 +388,10 @@ class ParseQSLBackportTests(unittest.TestCase):
             (b'&a=b', [(b'a', b'b')]),
             (b'a=a+b&b=b+c', [(b'a', b'a b'), (b'b', b'b c')]),
             (b'a=1&a=2', [(b'a', b'1'), (b'a', b'2')]),
-            (';', []),
-            (';;', []),
-            (';a=b', [('a', 'b')]),
-            ('a=a+b;b=b+c', [('a', 'a b'), ('b', 'b c')]),
-            ('a=1;a=2', [('a', '1'), ('a', '2')]),
-            (b';', []),
-            (b';;', []),
-            (b';a=b', [(b'a', b'b')]),
-            (b'a=a+b;b=b+c', [(b'a', b'a b'), (b'b', b'b c')]),
-            (b'a=1;a=2', [(b'a', b'1'), (b'a', b'2')]),
+            (';a=b', [(';a', 'b')]),
+            ('a=a+b;b=b+c', [('a', 'a b;b=b c')]),
+            (b';a=b', [(b';a', b'b')]),
+            (b'a=a+b;b=b+c', [(b'a', b'a b;b=b c')]),
         ]
         for original, expected in tests:
             with self.subTest(original):
@@ -422,6 +416,27 @@ class ParseQSLBackportTests(unittest.TestCase):
     def test_parse_qsl_max_num_fields(self):
         with self.assertRaises(ValueError):
             parse_qsl('&'.join(['a=a'] * 11), max_num_fields=10)
-        with self.assertRaises(ValueError):
-            parse_qsl(';'.join(['a=a'] * 11), max_num_fields=10)
         parse_qsl('&'.join(['a=a'] * 10), max_num_fields=10)
+
+    def test_parse_qsl_separator(self):
+        tests = [
+            (';', []),
+            (';;', []),
+            ('=;a', []),
+            (';a=b', [('a', 'b')]),
+            ('a=a+b;b=b+c', [('a', 'a b'), ('b', 'b c')]),
+            ('a=1;a=2', [('a', '1'), ('a', '2')]),
+            (b';', []),
+            (b';;', []),
+            (b';a=b', [(b'a', b'b')]),
+            (b'a=a+b;b=b+c', [(b'a', b'a b'), (b'b', b'b c')]),
+            (b'a=1;a=2', [(b'a', b'1'), (b'a', b'2')]),
+        ]
+        for original, expected in tests:
+            with self.subTest(original):
+                result = parse_qsl(original, separator=';')
+                self.assertEqual(result, expected, 'Error parsing %r' % original)
+
+    def test_parse_qsl_bad_separator(self):
+        with self.assertRaisesRegex(ValueError, 'Separator must be of type string or bytes.'):
+            parse_qsl('a=b0c=d', separator=0)

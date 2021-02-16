@@ -415,13 +415,13 @@ def _url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
 # TODO: Remove when dropping support for PY37.
 def parse_qsl(
     qs, keep_blank_values=False, strict_parsing=False, encoding='utf-8',
-    errors='replace', max_num_fields=None,
+    errors='replace', max_num_fields=None, separator='&',
 ):
     """
     Return a list of key/value tuples parsed from query string.
 
-    Backport of urllib.parse.parse_qsl() from Python 3.8.
-    Copyright (C) 2020 Python Software Foundation (see LICENSE.python).
+    Backport of urllib.parse.parse_qsl() from Python 3.8.8.
+    Copyright (C) 2021 Python Software Foundation (see LICENSE.python).
 
     ----
 
@@ -447,19 +447,25 @@ def parse_qsl(
     max_num_fields: int. If set, then throws a ValueError if there are more
         than n fields read by parse_qsl().
 
+    separator: str. The symbol to use for separating the query arguments.
+        Defaults to &.
+
     Returns a list, as G-d intended.
     """
     qs, _coerce_result = _coerce_args(qs)
+
+    if not separator or not isinstance(separator, (str, bytes)):
+        raise ValueError('Separator must be of type string or bytes.')
 
     # If max_num_fields is defined then check that the number of fields is less
     # than max_num_fields. This prevents a memory exhaustion DOS attack via
     # post bodies with many fields.
     if max_num_fields is not None:
-        num_fields = 1 + qs.count('&') + qs.count(';')
+        num_fields = 1 + qs.count(separator)
         if max_num_fields < num_fields:
             raise ValueError('Max number of fields exceeded')
 
-    pairs = [s2 for s1 in qs.split('&') for s2 in s1.split(';')]
+    pairs = [s1 for s1 in qs.split(separator)]
     r = []
     for name_value in pairs:
         if not name_value and not strict_parsing:
