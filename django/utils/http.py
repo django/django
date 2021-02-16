@@ -42,7 +42,7 @@ ASCTIME_DATE = _lazy_re_compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
 RFC3986_GENDELIMS = ":/?#[]@"
 RFC3986_SUBDELIMS = "!$&'()*+,;="
 
-FIELDS_MATCH = _lazy_re_compile('[&;]')
+FIELDS_MATCH = _lazy_re_compile('&')
 
 
 @keep_lazy_text

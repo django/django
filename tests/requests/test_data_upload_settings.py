@@ -11,7 +11,7 @@ TOO_MUCH_DATA_MSG = 'Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.
 
 class DataUploadMaxMemorySizeFormPostTests(SimpleTestCase):
     def setUp(self):
-        payload = FakePayload('a=1&a=2;a=3\r\n')
+        payload = FakePayload('a=1&a=2&a=3\r\n')
         self.request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
             'CONTENT_TYPE': 'application/x-www-form-urlencoded',
@@ -117,7 +117,7 @@ class DataUploadMaxNumberOfFieldsGet(SimpleTestCase):
                 request = WSGIRequest({
                     'REQUEST_METHOD': 'GET',
                     'wsgi.input': BytesIO(b''),
-                    'QUERY_STRING': 'a=1&a=2;a=3',
+                    'QUERY_STRING': 'a=1&a=2&a=3',
                 })
                 request.GET['a']
 
@@ -126,7 +126,7 @@ class DataUploadMaxNumberOfFieldsGet(SimpleTestCase):
             request = WSGIRequest({
                 'REQUEST_METHOD': 'GET',
                 'wsgi.input': BytesIO(b''),
-                'QUERY_STRING': 'a=1&a=2;a=3',
+                'QUERY_STRING': 'a=1&a=2&a=3',
             })
             request.GET['a']
 
@@ -168,7 +168,7 @@ class DataUploadMaxNumberOfFieldsMultipartPost(SimpleTestCase):
 
 class DataUploadMaxNumberOfFieldsFormPost(SimpleTestCase):
     def setUp(self):
-        payload = FakePayload("\r\n".join(['a=1&a=2;a=3', '']))
+        payload = FakePayload("\r\n".join(['a=1&a=2&a=3', '']))
         self.request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
             'CONTENT_TYPE': 'application/x-www-form-urlencoded',
