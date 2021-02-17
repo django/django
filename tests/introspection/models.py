@@ -80,3 +80,18 @@ class CheckConstraintModel(models.Model):
         constraints = [
             models.CheckConstraint(name='up_votes_gte_0_check', check=models.Q(up_votes__gte=0)),
         ]
+
+
+class UniqueConstraintConditionModel(models.Model):
+    name = models.CharField(max_length=255)
+    color = models.CharField(max_length=32, null=True)
+
+    class Meta:
+        required_db_features = {'supports_partial_indexes'}
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name'],
+                name='cond_name_without_color_uniq',
+                condition=models.Q(color__isnull=True),
+            ),
+        ]
