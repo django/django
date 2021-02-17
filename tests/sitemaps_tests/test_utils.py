@@ -12,6 +12,7 @@ from .base import SitemapTestsBase
 
 class PingGoogleTests(SitemapTestsBase):
 
+    @override_settings(ROOT_URLCONF='sitemaps_tests.urls.sitemap_only')
     @mock.patch('django.contrib.sitemaps.urlopen')
     def test_something(self, urlopen):
         ping_google()
@@ -19,6 +20,7 @@ class PingGoogleTests(SitemapTestsBase):
         full_url = 'https://www.google.com/webmasters/tools/ping?%s' % params
         urlopen.assert_called_with(full_url)
 
+    @override_settings(ROOT_URLCONF='sitemaps_tests.urls.sitemap_only')
     def test_get_sitemap_full_url_global(self):
         self.assertEqual(_get_sitemap_full_url(None), 'https://example.com/sitemap-without-entries/sitemap.xml')
 
