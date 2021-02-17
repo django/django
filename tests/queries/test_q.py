@@ -16,6 +16,10 @@ class QTests(SimpleTestCase):
         self.assertEqual(q | Q(), q)
         self.assertEqual(Q() | q, q)
 
+        q = Q(x__in={}.keys())
+        self.assertEqual(q | Q(), q)
+        self.assertEqual(Q() | q, q)
+
     def test_combine_or_both_empty(self):
         self.assertEqual(Q() | Q(), Q())
 
