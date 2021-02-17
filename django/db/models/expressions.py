@@ -375,7 +375,10 @@ class BaseExpression:
         yield self
         for expr in self.get_source_expressions():
             if expr:
-                yield from expr.flatten()
+                if hasattr(expr, 'flatten'):
+                    yield from expr.flatten()
+                else:
+                    yield expr
 
     def select_format(self, compiler, sql, params):
         """
@@ -896,6 +899,10 @@ class ExpressionList(Func):
 
     def __str__(self):
         return self.arg_joiner.join(str(arg) for arg in self.source_expressions)
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        # Casting to numeric is unnecessary.
+        return self.as_sql(compiler, connection, **extra_context)
 
 
 class ExpressionWrapper(Expression):

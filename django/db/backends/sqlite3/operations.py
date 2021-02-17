@@ -277,7 +277,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             converters.append(self.get_decimalfield_converter(expression))
         elif internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
-        elif internal_type in ('NullBooleanField', 'BooleanField'):
+        elif internal_type == 'BooleanField':
             converters.append(self.convert_booleanfield_value)
         return converters
 

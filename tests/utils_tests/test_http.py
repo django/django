@@ -3,15 +3,13 @@ import unittest
 from datetime import datetime
 from unittest import mock
 
-from django.test import SimpleTestCase, ignore_warnings
+from django.test import SimpleTestCase
 from django.utils.datastructures import MultiValueDict
-from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.http import (
     base36_to_int, escape_leading_slashes, http_date, int_to_base36,
-    is_safe_url, is_same_domain, parse_etags, parse_http_date, parse_qsl,
-    quote_etag, url_has_allowed_host_and_scheme, urlencode, urlquote,
-    urlquote_plus, urlsafe_base64_decode, urlsafe_base64_encode, urlunquote,
-    urlunquote_plus,
+    is_same_domain, parse_etags, parse_http_date, quote_etag,
+    url_has_allowed_host_and_scheme, urlencode, urlsafe_base64_decode,
+    urlsafe_base64_encode,
 )
 
 
@@ -131,7 +129,7 @@ class Base36IntTests(SimpleTestCase):
             self.assertEqual(base36_to_int(b36), n)
 
 
-class IsSafeURLTests(SimpleTestCase):
+class URLHasAllowedHostAndSchemeTests(unittest.TestCase):
     def test_bad_urls(self):
         bad_urls = (
             'http://example.com',
@@ -235,14 +233,6 @@ class IsSafeURLTests(SimpleTestCase):
                     False,
                 )
 
-    def test_is_safe_url_deprecated(self):
-        msg = (
-            'django.utils.http.is_safe_url() is deprecated in favor of '
-            'url_has_allowed_host_and_scheme().'
-        )
-        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
-            is_safe_url('https://example.com', allowed_hosts={'example.com'})
-
 
 class URLSafeBase64Tests(unittest.TestCase):
     def test_roundtrip(self):
@@ -250,25 +240,6 @@ class URLSafeBase64Tests(unittest.TestCase):
         encoded = urlsafe_base64_encode(bytestring)
         decoded = urlsafe_base64_decode(encoded)
         self.assertEqual(bytestring, decoded)
-
-
-@ignore_warnings(category=RemovedInDjango40Warning)
-class URLQuoteTests(unittest.TestCase):
-    def test_quote(self):
-        self.assertEqual(urlquote('Paris & Orl\xe9ans'), 'Paris%20%26%20Orl%C3%A9ans')
-        self.assertEqual(urlquote('Paris & Orl\xe9ans', safe="&"), 'Paris%20&%20Orl%C3%A9ans')
-
-    def test_unquote(self):
-        self.assertEqual(urlunquote('Paris%20%26%20Orl%C3%A9ans'), 'Paris & Orl\xe9ans')
-        self.assertEqual(urlunquote('Paris%20&%20Orl%C3%A9ans'), 'Paris & Orl\xe9ans')
-
-    def test_quote_plus(self):
-        self.assertEqual(urlquote_plus('Paris & Orl\xe9ans'), 'Paris+%26+Orl%C3%A9ans')
-        self.assertEqual(urlquote_plus('Paris & Orl\xe9ans', safe="&"), 'Paris+&+Orl%C3%A9ans')
-
-    def test_unquote_plus(self):
-        self.assertEqual(urlunquote_plus('Paris+%26+Orl%C3%A9ans'), 'Paris & Orl\xe9ans')
-        self.assertEqual(urlunquote_plus('Paris+&+Orl%C3%A9ans'), 'Paris & Orl\xe9ans')
 
 
 class IsSameDomainTests(unittest.TestCase):
@@ -360,68 +331,3 @@ class EscapeLeadingSlashesTests(unittest.TestCase):
         for url, expected in tests:
             with self.subTest(url=url):
                 self.assertEqual(escape_leading_slashes(url), expected)
-
-
-# TODO: Remove when dropping support for PY37. Backport of unit tests for
-# urllib.parse.parse_qsl() from Python 3.8. Copyright (C) 2020 Python Software
-# Foundation (see LICENSE.python).
-class ParseQSLBackportTests(unittest.TestCase):
-    def test_parse_qsl(self):
-        tests = [
-            ('', []),
-            ('&', []),
-            ('&&', []),
-            ('=', [('', '')]),
-            ('=a', [('', 'a')]),
-            ('a', [('a', '')]),
-            ('a=', [('a', '')]),
-            ('&a=b', [('a', 'b')]),
-            ('a=a+b&b=b+c', [('a', 'a b'), ('b', 'b c')]),
-            ('a=1&a=2', [('a', '1'), ('a', '2')]),
-            (b'', []),
-            (b'&', []),
-            (b'&&', []),
-            (b'=', [(b'', b'')]),
-            (b'=a', [(b'', b'a')]),
-            (b'a', [(b'a', b'')]),
-            (b'a=', [(b'a', b'')]),
-            (b'&a=b', [(b'a', b'b')]),
-            (b'a=a+b&b=b+c', [(b'a', b'a b'), (b'b', b'b c')]),
-            (b'a=1&a=2', [(b'a', b'1'), (b'a', b'2')]),
-            (';', []),
-            (';;', []),
-            (';a=b', [('a', 'b')]),
-            ('a=a+b;b=b+c', [('a', 'a b'), ('b', 'b c')]),
-            ('a=1;a=2', [('a', '1'), ('a', '2')]),
-            (b';', []),
-            (b';;', []),
-            (b';a=b', [(b'a', b'b')]),
-            (b'a=a+b;b=b+c', [(b'a', b'a b'), (b'b', b'b c')]),
-            (b'a=1;a=2', [(b'a', b'1'), (b'a', b'2')]),
-        ]
-        for original, expected in tests:
-            with self.subTest(original):
-                result = parse_qsl(original, keep_blank_values=True)
-                self.assertEqual(result, expected, 'Error parsing %r' % original)
-                expect_without_blanks = [v for v in expected if len(v[1])]
-                result = parse_qsl(original, keep_blank_values=False)
-                self.assertEqual(result, expect_without_blanks, 'Error parsing %r' % original)
-
-    def test_parse_qsl_encoding(self):
-        result = parse_qsl('key=\u0141%E9', encoding='latin-1')
-        self.assertEqual(result, [('key', '\u0141\xE9')])
-        result = parse_qsl('key=\u0141%C3%A9', encoding='utf-8')
-        self.assertEqual(result, [('key', '\u0141\xE9')])
-        result = parse_qsl('key=\u0141%C3%A9', encoding='ascii')
-        self.assertEqual(result, [('key', '\u0141\ufffd\ufffd')])
-        result = parse_qsl('key=\u0141%E9-', encoding='ascii')
-        self.assertEqual(result, [('key', '\u0141\ufffd-')])
-        result = parse_qsl('key=\u0141%E9-', encoding='ascii', errors='ignore')
-        self.assertEqual(result, [('key', '\u0141-')])
-
-    def test_parse_qsl_max_num_fields(self):
-        with self.assertRaises(ValueError):
-            parse_qsl('&'.join(['a=a'] * 11), max_num_fields=10)
-        with self.assertRaises(ValueError):
-            parse_qsl(';'.join(['a=a'] * 11), max_num_fields=10)
-        parse_qsl('&'.join(['a=a'] * 10), max_num_fields=10)

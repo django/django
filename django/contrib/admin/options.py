@@ -12,6 +12,7 @@ from django.contrib.admin import helpers, widgets
 from django.contrib.admin.checks import (
     BaseModelAdminChecks, InlineModelAdminChecks, ModelAdminChecks,
 )
+from django.contrib.admin.decorators import display
 from django.contrib.admin.exceptions import DisallowedModelAdminToField
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
@@ -19,7 +20,6 @@ from django.contrib.admin.utils import (
     get_deleted_objects, lookup_needs_distinct, model_format_dict,
     model_ngettext, quote, unquote,
 )
-from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.admin.widgets import (
     AutocompleteSelect, AutocompleteSelectMultiple,
 )
@@ -225,7 +225,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
         if 'widget' not in kwargs:
             if db_field.name in self.get_autocomplete_fields(request):
-                kwargs['widget'] = AutocompleteSelect(db_field.remote_field, self.admin_site, using=db)
+                kwargs['widget'] = AutocompleteSelect(db_field, self.admin_site, using=db)
             elif db_field.name in self.raw_id_fields:
                 kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.remote_field, self.admin_site, using=db)
             elif db_field.name in self.radio_fields:
@@ -255,7 +255,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             autocomplete_fields = self.get_autocomplete_fields(request)
             if db_field.name in autocomplete_fields:
                 kwargs['widget'] = AutocompleteSelectMultiple(
-                    db_field.remote_field,
+                    db_field,
                     self.admin_site,
                     using=db,
                 )
@@ -622,7 +622,6 @@ class ModelAdmin(BaseModelAdmin):
         return [
             path('', wrap(self.changelist_view), name='%s_%s_changelist' % info),
             path('add/', wrap(self.add_view), name='%s_%s_add' % info),
-            path('autocomplete/', wrap(self.autocomplete_view), name='%s_%s_autocomplete' % info),
             path('<path:object_id>/history/', wrap(self.history_view), name='%s_%s_history' % info),
             path('<path:object_id>/delete/', wrap(self.delete_view), name='%s_%s_delete' % info),
             path('<path:object_id>/change/', wrap(self.change_view), name='%s_%s_change' % info),
@@ -850,12 +849,12 @@ class ModelAdmin(BaseModelAdmin):
             action_flag=DELETION,
         )
 
+    @display(description=mark_safe('<input type="checkbox" id="action-toggle">'))
     def action_checkbox(self, obj):
         """
         A list_display column containing a checkbox widget.
         """
         return helpers.checkbox.render(helpers.ACTION_CHECKBOX_NAME, str(obj.pk))
-    action_checkbox.short_description = mark_safe('<input type="checkbox" id="action-toggle">')
 
     @staticmethod
     def _get_action_description(func, name):
@@ -1652,9 +1651,6 @@ class ModelAdmin(BaseModelAdmin):
 
         return self.render_change_form(request, context, add=add, change=not add, obj=obj, form_url=form_url)
 
-    def autocomplete_view(self, request):
-        return AutocompleteJsonView.as_view(model_admin=self)(request)
-
     def add_view(self, request, form_url='', extra_context=None):
         return self.changeform_view(request, None, form_url, extra_context)
 
@@ -1950,6 +1946,20 @@ class ModelAdmin(BaseModelAdmin):
             "admin/object_history.html"
         ], context)
 
+    def get_formset_kwargs(self, request, obj, inline, prefix):
+        formset_params = {
+            'instance': obj,
+            'prefix': prefix,
+            'queryset': inline.get_queryset(request),
+        }
+        if request.method == 'POST':
+            formset_params.update({
+                'data': request.POST.copy(),
+                'files': request.FILES,
+                'save_as_new': '_saveasnew' in request.POST
+            })
+        return formset_params
+
     def _create_formsets(self, request, obj, change):
         "Helper function to generate formsets for add/change_view."
         formsets = []
@@ -1963,17 +1973,7 @@ class ModelAdmin(BaseModelAdmin):
             prefixes[prefix] = prefixes.get(prefix, 0) + 1
             if prefixes[prefix] != 1 or not prefix:
                 prefix = "%s-%s" % (prefix, prefixes[prefix])
-            formset_params = {
-                'instance': obj,
-                'prefix': prefix,
-                'queryset': inline.get_queryset(request),
-            }
-            if request.method == 'POST':
-                formset_params.update({
-                    'data': request.POST.copy(),
-                    'files': request.FILES,
-                    'save_as_new': '_saveasnew' in request.POST
-                })
+            formset_params = self.get_formset_kwargs(request, obj, inline, prefix)
             formset = FormSet(**formset_params)
 
             def user_deleted_form(request, obj, formset, index):

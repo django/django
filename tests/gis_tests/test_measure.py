@@ -151,6 +151,14 @@ class DistanceTest(unittest.TestCase):
             with self.subTest(nm=nm):
                 self.assertEqual(att, D.unit_attname(nm))
 
+    def test_hash(self):
+        d1 = D(m=99)
+        d2 = D(m=100)
+        d3 = D(km=0.1)
+        self.assertEqual(hash(d2), hash(d3))
+        self.assertNotEqual(hash(d1), hash(d2))
+        self.assertNotEqual(hash(d1), hash(d3))
+
 
 class AreaTest(unittest.TestCase):
     "Testing the Area object"
@@ -271,6 +279,14 @@ class AreaTest(unittest.TestCase):
         self.assertEqual(str(a2), '3.5 sq_km')
         self.assertEqual(repr(a1), 'Area(sq_m=100.0)')
         self.assertEqual(repr(a2), 'Area(sq_km=3.5)')
+
+    def test_hash(self):
+        a1 = A(sq_m=100)
+        a2 = A(sq_m=1000000)
+        a3 = A(sq_km=1)
+        self.assertEqual(hash(a2), hash(a3))
+        self.assertNotEqual(hash(a1), hash(a2))
+        self.assertNotEqual(hash(a1), hash(a3))
 
 
 def suite():

@@ -95,6 +95,42 @@ or on a per-model basis::
 In anticipation of the changing default, a system check will provide a warning
 if you do not have an explicit setting for :setting:`DEFAULT_AUTO_FIELD`.
 
+.. _new_functional_indexes:
+
+Functional indexes
+------------------
+
+The new :attr:`*expressions <django.db.models.Index.expressions>` positional
+argument of :class:`Index() <django.db.models.Index>` enables creating
+functional indexes on expressions and database functions. For example::
+
+    from django.db import models
+    from django.db.models import F, Index, Value
+    from django.db.models.functions import Lower, Upper
+
+
+    class MyModel(models.Model):
+        first_name = models.CharField(max_length=255)
+        last_name = models.CharField(max_length=255)
+        height = models.IntegerField()
+        weight = models.IntegerField()
+
+        class Meta:
+            indexes = [
+                Index(
+                    Lower('first_name'),
+                    Upper('last_name').desc(),
+                    name='first_last_name_idx',
+                ),
+                Index(
+                    F('height') / (F('weight') + Value(5)),
+                    name='calc_idx',
+                ),
+            ]
+
+Functional indexes are added to models using the
+:attr:`Meta.indexes <django.db.models.Options.indexes>` option.
+
 ``pymemcache`` support
 ----------------------
 
@@ -104,6 +140,28 @@ higher is required. For more details, see the :doc:`documentation on caching in
 Django </topics/cache>`.
 
 .. _pymemcache: https://pypi.org/project/pymemcache/
+
+New decorators for the admin site
+---------------------------------
+
+The new :func:`~django.contrib.admin.display` decorator allows for easily
+adding options to custom display functions that can be used with
+:attr:`~django.contrib.admin.ModelAdmin.list_display` or
+:attr:`~django.contrib.admin.ModelAdmin.readonly_fields`.
+
+Likewise, the new :func:`~django.contrib.admin.action` decorator allows for
+easily adding options to action functions that can be used with
+:attr:`~django.contrib.admin.ModelAdmin.actions`.
+
+Using the ``@display`` decorator has the advantage that it is now
+possible to use the ``@property`` decorator when needing to specify attributes
+on the custom method. Prior to this it was necessary to use the ``property()``
+function instead after assigning the required attributes to the method.
+
+Using decorators has the advantage that these options are more discoverable as
+they can be suggested by completion utilities in code editors. They are merely
+a convenience and still set the same attributes on the functions under the
+hood.
 
 Minor features
 --------------
@@ -117,10 +175,22 @@ Minor features
 * Read-only related fields are now rendered as navigable links if target models
   are registered in the admin.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* The admin now supports theming, and includes a dark theme that is enabled
+  according to browser settings. See :ref:`admin-theming` for more details.
 
-* ...
+* :attr:`.ModelAdmin.autocomplete_fields` now respects
+  :attr:`ForeignKey.to_field <django.db.models.ForeignKey.to_field>` and
+  :attr:`ForeignKey.limit_choices_to
+  <django.db.models.ForeignKey.limit_choices_to>` when searching a related
+  model.
+
+* The admin now installs a final catch-all view that redirects unauthenticated
+  users to the login page, regardless of whether the URL is otherwise valid.
+  This protects against a potential model enumeration privacy issue.
+
+  Although not recommended, you may set the new
+  :attr:`.AdminSite.final_catch_all_view` to ``False`` to disable the
+  catch-all view.
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -136,6 +206,9 @@ Minor features
   MB. This is still rather conservative but can lead to problems in memory
   constrained environments. If this is the case, the existing hasher can be
   subclassed to override the defaults.
+
+* The default salt entropy for the Argon2, MD5, PBKDF2, SHA-1 password hashers
+  is increased from 71 to 128 bits.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -161,11 +234,6 @@ Minor features
 
 * The :class:`~django.contrib.gis.utils.LayerMapping` class now supports
   :class:`pathlib.Path`.
-
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -194,15 +262,9 @@ Minor features
 * Lookups for :class:`~django.contrib.postgres.fields.ArrayField` now allow
   (non-nested) arrays containing expressions as right-hand sides.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sessions`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
+* The new :class:`OpClass() <django.contrib.postgres.indexes.OpClass>`
+  expression allows creating functional indexes on expressions with a custom
+  operator class. See :ref:`new_functional_indexes` for more details.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -213,31 +275,11 @@ Minor features
   :attr:`~django.contrib.sitemaps.Sitemap.x_default` allow
   generating sitemap *alternates* to localized versions of your pages.
 
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.staticfiles`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new ``item_comments`` hook allows specifying a comments URL per feed
   item.
-
-Cache
-~~~~~
-
-* ...
-
-CSRF
-~~~~
-
-* ...
 
 Database backends
 ~~~~~~~~~~~~~~~~~
@@ -254,11 +296,6 @@ Decorators
   allows individual views to be excluded from :setting:`APPEND_SLASH` URL
   normalization.
 
-Email
-~~~~~
-
-* ...
-
 Error Reporting
 ~~~~~~~~~~~~~~~
 
@@ -266,11 +303,6 @@ Error Reporting
   the :attr:`~django.views.debug.ExceptionReporter.html_template_path` and
   :attr:`~django.views.debug.ExceptionReporter.text_template_path` class
   attributes to override the templates used to render exception reports.
-
-File Storage
-~~~~~~~~~~~~
-
-* ...
 
 File Uploads
 ~~~~~~~~~~~~
@@ -306,21 +338,14 @@ Generic Views
   :class:`~django.views.generic.dates.WeekArchiveView` now support the
   ``'%V'`` ISO 8601 week format.
 
-Internationalization
-~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Logging
-~~~~~~~
-
-* ...
-
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
 * :djadmin:`loaddata` now supports fixtures stored in XZ archives (``.xz``) and
   LZMA archives (``.lzma``).
+
+* :djadmin:`dumpdata` now can compress data in the ``bz2``, ``gz``, ``lzma``,
+  or ``xz`` formats.
 
 * :djadmin:`makemigrations` can now be called without an active database
   connection. In that case, check for a consistent migration history is
@@ -451,6 +476,15 @@ Security
   ``SECRET_KEY``, and then going on to access ``settings.SECRET_KEY`` will now
   raise an :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
+* The new ``Signer.sign_object()`` and ``Signer.unsign_object()`` methods allow
+  signing complex data structures. See :ref:`signing-complex-data` for more
+  details.
+
+  Also, :func:`signing.dumps() <django.core.signing.dumps>` and
+  :func:`~django.core.signing.loads` become shortcuts for
+  :meth:`.TimestampSigner.sign_object` and
+  :meth:`~.TimestampSigner.unsign_object`.
+
 Serialization
 ~~~~~~~~~~~~~
 
@@ -503,11 +537,6 @@ Tests
   comparison against another queryset rather than being restricted to
   comparison against a list of string representations of objects when using the
   default value for the ``transform`` argument.
-
-URLs
-~~~~
-
-* ...
 
 Utilities
 ~~~~~~~~~
@@ -577,11 +606,31 @@ backends.
   backends must implement ``DatabaseClient.settings_to_cmd_args_env()`` or
   override ``DatabaseClient.runshell()``.
 
+* Third-party database backends must implement support for functional indexes
+  (:attr:`.Index.expressions`) or set
+  ``DatabaseFeatures.supports_expression_indexes`` to ``False``. If ``COLLATE``
+  is not a part of the ``CREATE INDEX`` statement, set
+  ``DatabaseFeatures.collate_as_index_expression`` to ``True``.
+
 :mod:`django.contrib.admin`
 ---------------------------
 
 * Pagination links in the admin are now 1-indexed instead of 0-indexed, i.e.
   the query string for the first page is ``?p=1`` instead of ``?p=0``.
+
+* The new admin catch-all view will break URL patterns routed after the admin
+  URLs and matching the admin URL prefix. You can either adjust your URL
+  ordering or, if necessary, set :attr:`AdminSite.final_catch_all_view
+  <django.contrib.admin.AdminSite.final_catch_all_view>` to ``False``,
+  disabling the catch-all view. See :ref:`whats-new-3.2` for more details.
+
+* Minified JavaScript files are no longer included with the admin. If you
+  require these files to be minified, consider using a third party app or
+  external build tool. The minified vendored JavaScript files packaged with the
+  admin (e.g. :ref:`jquery.min.js <contrib-admin-jquery>`) are still included.
+
+* :attr:`.ModelAdmin.prepopulated_fields` no longer strips English stop words,
+  such as ``'a'`` or ``'an'``.
 
 :mod:`django.contrib.gis`
 -------------------------
@@ -608,16 +657,11 @@ MySQL 5.7 and higher.
 Miscellaneous
 -------------
 
+* Django now supports non-``pytz`` time zones, such as Python 3.9+'s
+  :mod:`zoneinfo` module and its backport.
+
 * The undocumented ``SpatiaLiteOperations.proj4_version()`` method is renamed
   to ``proj_version()``.
-
-* Minified JavaScript files are no longer included with the admin. If you
-  require these files to be minified, consider using a third party app or
-  external build tool. The minified vendored JavaScript files packaged with the
-  admin (e.g. :ref:`jquery.min.js <contrib-admin-jquery>`) are still included.
-
-* :attr:`.ModelAdmin.prepopulated_fields` no longer strips English stop words,
-  such as ``'a'`` or ``'an'``.
 
 * :func:`~django.utils.text.slugify` now removes leading and trailing dashes
   and underscores.
@@ -691,6 +735,10 @@ Miscellaneous
 
 * The minimum supported version of SQLite is increased from 3.8.3 to 3.9.0.
 
+* :class:`~django.contrib.messages.storage.cookie.CookieStorage` now stores
+  messages in the :rfc:`6265` compliant format. Support for cookies that use
+  the old format remains until Django 4.1.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2
@@ -726,3 +774,8 @@ Miscellaneous
   deprecated as ``python-memcached`` has some problems and seems to be
   unmaintained. Use ``django.core.cache.backends.memcached.PyMemcacheCache``
   or ``django.core.cache.backends.memcached.PyLibMCCache`` instead.
+
+* The format of messages used by
+  ``django.contrib.messages.storage.cookie.CookieStorage`` is different from
+  the format generated by older versions of Django. Support for the old format
+  remains until Django 4.1.

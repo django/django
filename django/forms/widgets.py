@@ -606,8 +606,8 @@ class ChoiceWidget(Widget):
 
             for subvalue, sublabel in choices:
                 selected = (
-                    str(subvalue) in value and
-                    (not has_selected or self.allow_multiple_selected)
+                    (not has_selected or self.allow_multiple_selected) and
+                    str(subvalue) in value
                 )
                 has_selected |= selected
                 subgroup.append(self.create_option(
@@ -620,8 +620,6 @@ class ChoiceWidget(Widget):
 
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         index = str(index) if subindex is None else "%s_%s" % (index, subindex)
-        if attrs is None:
-            attrs = {}
         option_attrs = self.build_attrs(self.attrs, attrs) if self.option_inherits_attrs else {}
         if selected:
             option_attrs.update(self.checked_attribute)

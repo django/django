@@ -97,7 +97,7 @@ thead th.sorted .text {
     border-left: none;
     padding-left: 10px;
     margin-left: 0;
-    border-right: 5px solid #eaeaea;
+    border-right: 5px solid var(--hairline-color);
     padding-right: 10px;
     margin-right: -15px;
 }

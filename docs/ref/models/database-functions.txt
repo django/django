@@ -336,8 +336,6 @@ Usage example::
 
 .. class:: ExtractIsoWeekDay(expression, tzinfo=None, **extra)
 
-    .. versionadded:: 3.1
-
     Returns the ISO-8601 week day with day 1 being Monday and day 7 being
     Sunday.
 

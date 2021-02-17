@@ -1,9 +1,7 @@
 import os
 from argparse import ArgumentParser
 from contextlib import contextmanager
-from unittest import (
-    TestSuite, TextTestRunner, defaultTestLoader, mock, skipUnless,
-)
+from unittest import TestSuite, TextTestRunner, defaultTestLoader, mock
 
 from django.db import connections
 from django.test import SimpleTestCase
@@ -11,7 +9,6 @@ from django.test.runner import DiscoverRunner
 from django.test.utils import (
     NullTimeKeeper, TimeKeeper, captured_stderr, captured_stdout,
 )
-from django.utils.version import PY37
 
 
 @contextmanager
@@ -83,7 +80,6 @@ class DiscoverRunnerTests(SimpleTestCase):
 
         self.assertEqual(count, 1)
 
-    @skipUnless(PY37, 'unittest -k option requires Python 3.7 and later')
     def test_name_patterns(self):
         all_test_1 = [
             'DjangoCase1.test_1', 'DjangoCase2.test_1',

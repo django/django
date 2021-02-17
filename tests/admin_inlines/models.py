@@ -44,6 +44,7 @@ class Book(models.Model):
 class Author(models.Model):
     name = models.CharField(max_length=50)
     books = models.ManyToManyField(Book)
+    person = models.OneToOneField('Person', models.CASCADE, null=True)
 
 
 class NonAutoPKBook(models.Model):
@@ -292,6 +293,38 @@ class SomeChildModel(models.Model):
     position = models.PositiveIntegerField()
     parent = models.ForeignKey(SomeParentModel, models.CASCADE)
     readonly_field = models.CharField(max_length=1)
+
+
+# Models for #30231
+class Course(models.Model):
+    name = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.name
+
+
+class Class(models.Model):
+    person = models.ManyToManyField(Person, verbose_name='attendant')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+
+
+class CourseProxy(Course):
+
+    class Meta:
+        proxy = True
+
+
+class CourseProxy1(Course):
+
+    class Meta:
+        proxy = True
+
+
+class CourseProxy2(Course):
+
+    class Meta:
+        proxy = True
+
 
 # Other models
 

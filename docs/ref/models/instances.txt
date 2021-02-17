@@ -803,11 +803,6 @@ For example::
     >>> p.get_shirt_size_display()
     'Large'
 
-.. versionchanged:: 3.1
-
-    Support for :class:`~django.contrib.postgres.fields.ArrayField` and
-    :class:`~django.contrib.postgres.fields.RangeField` was added.
-
 .. method:: Model.get_next_by_FOO(**kwargs)
 .. method:: Model.get_previous_by_FOO(**kwargs)
 

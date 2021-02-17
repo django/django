@@ -636,7 +636,7 @@ To use it, we need to mix it into a ``TemplateView`` for example, and override
 Equally we could use our mixin with one of the generic views. We can make our
 own version of :class:`~django.views.generic.detail.DetailView` by mixing
 ``JSONResponseMixin`` with the
-``django.views.generic.detail.BaseDetailView`` -- (the
+:class:`~django.views.generic.detail.BaseDetailView` -- (the
 :class:`~django.views.generic.detail.DetailView` before template
 rendering behavior has been mixed in)::
 

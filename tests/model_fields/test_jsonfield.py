@@ -313,6 +313,12 @@ class TestQuerying(TestCase):
             [self.objs[3]],
         )
 
+    def test_icontains(self):
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__icontains='BaX'),
+            self.objs[6:8],
+        )
+
     def test_isnull(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__isnull=True),

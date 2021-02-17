@@ -1,6 +1,5 @@
 import pkgutil
 from importlib import import_module
-from pathlib import Path
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -113,10 +112,10 @@ def load_backend(backend_name):
     except ImportError as e_user:
         # The database backend wasn't found. Display a helpful error message
         # listing all built-in database backends.
-        backend_dir = str(Path(__file__).parent / 'backends')
+        import django.db.backends
         builtin_backends = [
-            name for _, name, ispkg in pkgutil.iter_modules([backend_dir])
-            if ispkg and name not in {'base', 'dummy', 'postgresql_psycopg2'}
+            name for _, name, ispkg in pkgutil.iter_modules(django.db.backends.__path__)
+            if ispkg and name not in {'base', 'dummy'}
         ]
         if backend_name not in ['django.db.backends.%s' % b for b in builtin_backends]:
             backend_reprs = map(repr, sorted(builtin_backends))

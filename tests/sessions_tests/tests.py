@@ -31,13 +31,13 @@ from django.core import management
 from django.core.cache import caches
 from django.core.cache.backends.base import InvalidCacheBackendError
 from django.core.exceptions import ImproperlyConfigured
+from django.core.signing import TimestampSigner
 from django.http import HttpResponse
 from django.test import (
     RequestFactory, SimpleTestCase, TestCase, ignore_warnings,
     override_settings,
 )
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango40Warning
 
 from .models import SessionStore as CustomDatabaseSession
 
@@ -315,25 +315,6 @@ class SessionTestsMixin:
         encoded = self.session.encode(data)
         self.assertEqual(self.session.decode(encoded), data)
 
-    @override_settings(SECRET_KEY='django_tests_secret_key')
-    def test_decode_legacy(self):
-        # RemovedInDjango40Warning: pre-Django 3.1 sessions will be invalid.
-        legacy_encoded = (
-            'OWUzNTNmNWQxNTBjOWExZmM4MmQ3NzNhMDRmMjU4NmYwNDUyNGI2NDp7ImEgdGVzd'
-            'CBrZXkiOiJhIHRlc3QgdmFsdWUifQ=='
-        )
-        self.assertEqual(
-            self.session.decode(legacy_encoded),
-            {'a test key': 'a test value'},
-        )
-
-    @ignore_warnings(category=RemovedInDjango40Warning)
-    def test_default_hashing_algorith_legacy_decode(self):
-        with self.settings(DEFAULT_HASHING_ALGORITHM='sha1'):
-            data = {'a test key': 'a test value'}
-            encoded = self.session.encode(data)
-            self.assertEqual(self.session._legacy_decode(encoded), data)
-
     def test_decode_failure_logged_to_security(self):
         tests = [
             base64.b64encode(b'flaskdj:alkdjf').decode('ascii'),
@@ -345,6 +326,11 @@ class SessionTestsMixin:
                     self.assertEqual(self.session.decode(encoded), {})
                 # The failed decode is logged.
                 self.assertIn('Session data corrupted', cm.output[0])
+
+    def test_decode_serializer_exception(self):
+        signer = TimestampSigner(salt=self.session.key_salt)
+        encoded = signer.sign(b'invalid data')
+        self.assertEqual(self.session.decode(encoded), {})
 
     def test_actual_expiry(self):
         # this doesn't work with JSONSerializer (serializing timedelta)

@@ -514,14 +514,6 @@ For each field, we describe the default widget used if you don't specify
     ``DATE_INPUT_FORMATS`` keys if localization is enabled. See also
     :doc:`format localization </topics/i18n/formatting>`.
 
-    .. versionchanged:: 3.1
-
-        Support for ISO 8601 date string parsing (including optional timezone)
-        was added.
-
-        The fallback on ``DATE_INPUT_FORMATS`` in the default ``input_formats``
-        was added.
-
 ``DecimalField``
 ----------------
 
@@ -781,8 +773,6 @@ For each field, we describe the default widget used if you don't specify
 -------------
 
 .. class:: JSONField(encoder=None, decoder=None, **kwargs)
-
-    .. versionadded:: 3.1
 
     A field which accepts JSON encoded data for a
     :class:`~django.db.models.JSONField`.
@@ -1229,6 +1219,9 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
     * Validates that the given id exists in the queryset.
     * Error message keys: ``required``, ``invalid_choice``
 
+    The ``invalid_choice`` error message may contain ``%(value)s``, which will
+    be replaced with the selected choice.
+
     Allows the selection of a single model object, suitable for representing a
     foreign key. Note that the default widget for ``ModelChoiceField`` becomes
     impractical when the number of entries increases. You should avoid using it
@@ -1317,6 +1310,11 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
             def label_from_instance(self, obj):
                 return "My Object #%i" % obj.id
 
+    .. versionchanged:: 4.0
+
+        Support for containing ``%(value)s`` in the ``invalid_choice`` error
+        message was added.
+
 ``ModelMultipleChoiceField``
 ----------------------------
 
@@ -1356,10 +1354,6 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
     .. attribute:: iterator
 
         Same as :class:`ModelChoiceField.iterator`.
-
-.. deprecated:: 3.1
-
-    The ``list`` message is deprecated, use ``invalid_list`` instead.
 
 .. _iterating-relationship-choices:
 
@@ -1450,20 +1444,10 @@ customize the yielded 2-tuple choices.
         :attr:`ChoiceField.choices`. The first ``value`` element is a
         :class:`ModelChoiceIteratorValue` instance.
 
-        .. versionchanged:: 3.1
-
-            In older versions, the first ``value`` element in the choice tuple
-            is the ``field`` value itself, rather than a
-            ``ModelChoiceIteratorValue`` instance. In most cases this proxies
-            transparently but, if you need the ``field`` value itself, use the
-            :attr:`ModelChoiceIteratorValue.value` attribute instead.
-
 ``ModelChoiceIteratorValue``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: ModelChoiceIteratorValue(value, instance)
-
-    .. versionadded:: 3.1
 
     Two arguments are required:
 

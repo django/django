@@ -82,6 +82,7 @@ Django's system checks are organized using the following tags:
   regular checks do. They are only run by the :djadmin:`migrate` command or if
   you specify configured database aliases using the ``--database`` option when
   calling the :djadmin:`check` command.
+* ``files``: Checks files related configuration.
 * ``models``: Checks of model, field, and manager definitions.
 * ``security``: Checks security related configuration.
 * ``signals``: Checks on signal declarations and handler registrations.
@@ -93,26 +94,19 @@ Django's system checks are organized using the following tags:
 
 Some checks may be registered with multiple tags.
 
-.. versionchanged:: 3.1
-
-    The ``async_support`` tag was added.
-
-.. versionchanged:: 3.1
-
-    The ``database`` checks are now run only for database aliases specified
-    using the :option:`check --database` option.
-
 .. versionchanged:: 3.2
 
     The ``sites`` tag was added.
+
+.. versionchanged:: 4.0
+
+    The ``files`` tag was added.
 
 Core system checks
 ==================
 
 Asynchronous support
 --------------------
-
-.. versionadded:: 3.1
 
 The following checks verify your setup for :doc:`/topics/async`:
 
@@ -160,6 +154,16 @@ If you're using MySQL or MariaDB, the following checks will be performed:
   ``<alias>``. See also :ref:`mysql-sql-mode`.
 * **mysql.W003**: MySQL/MariaDB may not allow unique ``CharField``\s to have a
   ``max_length`` > 255.
+
+Managing files
+--------------
+
+.. versionadded:: 4.0
+
+The following checks verify your setup for :doc:`/topics/files`:
+
+* **files.E001**: The :setting:`FILE_UPLOAD_TEMP_DIR` setting refers to the
+  nonexistent directory ``<path>``.
 
 Model fields
 ------------
@@ -217,10 +221,15 @@ Model fields
 * **fields.W902**: ``FloatRangeField`` is deprecated and will be removed in
   Django 3.1. *This check appeared in Django 2.2 and 3.0*.
 * **fields.W903**: ``NullBooleanField`` is deprecated. Support for it (except
-  in historical migrations) will be removed in Django 4.0.
+  in historical migrations) will be removed in Django 4.0. *This check appeared
+  in Django 3.1 and 3.2*.
+* **fields.E903**: ``NullBooleanField`` is removed except for support in
+  historical migrations.
 * **fields.W904**: ``django.contrib.postgres.fields.JSONField`` is deprecated.
   Support for it (except in historical migrations) will be removed in Django
-  4.0.
+  4.0. *This check appeared in Django 3.1 and 3.2*.
+* **fields.E904**: ``django.contrib.postgres.fields.JSONField`` is removed
+  except for support in historical migrations.
 
 File fields
 ~~~~~~~~~~~
@@ -381,6 +390,7 @@ Models
 * **models.E041**: ``constraints`` refers to the joined field ``<field name>``.
 * **models.W042**: Auto-created primary key used when not defining a primary
   key type, by default ``django.db.models.AutoField``.
+* **models.W043**: ``<database>`` does not support indexes on expressions.
 
 Security
 --------
@@ -499,8 +509,12 @@ The following checks are run if you use the :option:`check --deploy` option:
 The following checks verify that your security-related settings are correctly
 configured:
 
-* **security.E100**: :setting:`DEFAULT_HASHING_ALGORITHM` must be ``'sha1'`` or
-  ``'sha256'``.
+* **security.E100**: ``DEFAULT_HASHING_ALGORITHM`` must be ``'sha1'`` or
+  ``'sha256'``. *This check appeared in Django 3.1 and 3.2*.
+* **security.E101**: The CSRF failure view ``'path.to.view'`` does not take the
+  correct number of arguments.
+* **security.E102**: The CSRF failure view ``'path.to.view'`` could not be
+  imported.
 
 Signals
 -------

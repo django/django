@@ -112,12 +112,12 @@ Use the ``django.test.Client`` class to make requests.
 .. class:: Client(enforce_csrf_checks=False, json_encoder=DjangoJSONEncoder, **defaults)
 
     It requires no arguments at time of construction. However, you can use
-    keywords arguments to specify some default headers. For example, this will
+    keyword arguments to specify some default headers. For example, this will
     send a ``User-Agent`` HTTP header in each request::
 
         >>> c = Client(HTTP_USER_AGENT='Mozilla/5.0')
 
-    The values from the ``extra`` keywords arguments passed to
+    The values from the ``extra`` keyword arguments passed to
     :meth:`~django.test.Client.get()`,
     :meth:`~django.test.Client.post()`, etc. have precedence over
     the defaults passed to the class constructor.
@@ -768,11 +768,6 @@ If your tests make any database queries, use subclasses
     on macOS). If you want to intentionally raise an exception such as
     :exc:`unittest.SkipTest` in ``setUpClass()``, be sure to do it before
     calling ``super()`` to avoid this.
-
-.. versionchanged:: 3.1
-
-    The ``debug()`` method was implemented to allow running a test without
-    collecting the result and catching exceptions.
 
 ``TransactionTestCase``
 -----------------------
@@ -1805,8 +1800,6 @@ won't be run.
 
 Testing asynchronous code
 =========================
-
-.. versionadded:: 3.1
 
 If you merely want to test the output of your asynchronous views, the standard
 test client will run them inside their own asynchronous loop without any extra

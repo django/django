@@ -4,8 +4,8 @@ from pathlib import Path
 TEST_ROOT = os.path.dirname(__file__)
 
 TEST_SETTINGS = {
-    'MEDIA_URL': '/media/',
-    'STATIC_URL': '/static/',
+    'MEDIA_URL': 'media/',
+    'STATIC_URL': 'static/',
     'MEDIA_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'media'),
     'STATIC_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'static'),
     'STATICFILES_DIRS': [

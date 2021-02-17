@@ -211,40 +211,33 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # Get the actual constraint names and columns
         name_query = """
             SELECT kc.`constraint_name`, kc.`column_name`,
-                kc.`referenced_table_name`, kc.`referenced_column_name`
-            FROM information_schema.key_column_usage AS kc
+                kc.`referenced_table_name`, kc.`referenced_column_name`,
+                c.`constraint_type`
+            FROM
+                information_schema.key_column_usage AS kc,
+                information_schema.table_constraints AS c
             WHERE
                 kc.table_schema = DATABASE() AND
+                c.table_schema = kc.table_schema AND
+                c.constraint_name = kc.constraint_name AND
+                c.constraint_type != 'CHECK' AND
                 kc.table_name = %s
             ORDER BY kc.`ordinal_position`
         """
         cursor.execute(name_query, [table_name])
-        for constraint, column, ref_table, ref_column in cursor.fetchall():
+        for constraint, column, ref_table, ref_column, kind in cursor.fetchall():
             if constraint not in constraints:
                 constraints[constraint] = {
                     'columns': OrderedSet(),
-                    'primary_key': False,
-                    'unique': False,
+                    'primary_key': kind == 'PRIMARY KEY',
+                    'unique': kind in {'PRIMARY KEY', 'UNIQUE'},
                     'index': False,
                     'check': False,
                     'foreign_key': (ref_table, ref_column) if ref_column else None,
                 }
+                if self.connection.features.supports_index_column_ordering:
+                    constraints[constraint]['orders'] = []
             constraints[constraint]['columns'].add(column)
-        # Now get the constraint types
-        type_query = """
-            SELECT c.constraint_name, c.constraint_type
-            FROM information_schema.table_constraints AS c
-            WHERE
-                c.table_schema = DATABASE() AND
-                c.table_name = %s
-        """
-        cursor.execute(type_query, [table_name])
-        for constraint, kind in cursor.fetchall():
-            if kind.lower() == "primary key":
-                constraints[constraint]['primary_key'] = True
-                constraints[constraint]['unique'] = True
-            elif kind.lower() == "unique":
-                constraints[constraint]['unique'] = True
         # Add check constraints.
         if self.connection.features.can_introspect_check_constraints:
             unnamed_constraints_index = 0
@@ -289,7 +282,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 }
         # Now add in the indexes
         cursor.execute("SHOW INDEX FROM %s" % self.connection.ops.quote_name(table_name))
-        for table, non_unique, index, colseq, column, type_ in [x[:5] + (x[10],) for x in cursor.fetchall()]:
+        for table, non_unique, index, colseq, column, order, type_ in [
+            x[:6] + (x[10],) for x in cursor.fetchall()
+        ]:
             if index not in constraints:
                 constraints[index] = {
                     'columns': OrderedSet(),
@@ -298,9 +293,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     'check': False,
                     'foreign_key': None,
                 }
+                if self.connection.features.supports_index_column_ordering:
+                    constraints[index]['orders'] = []
             constraints[index]['index'] = True
             constraints[index]['type'] = Index.suffix if type_ == 'BTREE' else type_.lower()
             constraints[index]['columns'].add(column)
+            if self.connection.features.supports_index_column_ordering:
+                constraints[index]['orders'].append('DESC' if order == 'D' else 'ASC')
         # Convert the sorted sets to lists
         for constraint in constraints.values():
             constraint['columns'] = list(constraint['columns'])

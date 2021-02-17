@@ -1,20 +1,12 @@
-import base64
 import logging
 import string
-import warnings
 from datetime import datetime, timedelta
 
 from django.conf import settings
-from django.contrib.sessions.exceptions import SuspiciousSession
 from django.core import signing
-from django.core.exceptions import SuspiciousOperation
 from django.utils import timezone
-from django.utils.crypto import (
-    constant_time_compare, get_random_string, salted_hmac,
-)
-from django.utils.deprecation import RemovedInDjango40Warning
+from django.utils.crypto import get_random_string
 from django.utils.module_loading import import_string
-from django.utils.translation import LANGUAGE_SESSION_KEY
 
 # session_key should not be case sensitive because some backends can store it
 # on case insensitive file systems.
@@ -55,13 +47,6 @@ class SessionBase:
         return key in self._session
 
     def __getitem__(self, key):
-        if key == LANGUAGE_SESSION_KEY:
-            warnings.warn(
-                'The user language will no longer be stored in '
-                'request.session in Django 4.0. Read it from '
-                'request.COOKIES[settings.LANGUAGE_COOKIE_NAME] instead.',
-                RemovedInDjango40Warning, stacklevel=2,
-            )
         return self._session[key]
 
     def __setitem__(self, key, value):
@@ -101,16 +86,8 @@ class SessionBase:
     def delete_test_cookie(self):
         del self[self.TEST_COOKIE_NAME]
 
-    def _hash(self, value):
-        # RemovedInDjango40Warning: pre-Django 3.1 format will be invalid.
-        key_salt = "django.contrib.sessions" + self.__class__.__name__
-        return salted_hmac(key_salt, value).hexdigest()
-
     def encode(self, session_dict):
         "Return the given session dictionary serialized and encoded as a string."
-        # RemovedInDjango40Warning: DEFAULT_HASHING_ALGORITHM will be removed.
-        if settings.DEFAULT_HASHING_ALGORITHM == 'sha1':
-            return self._legacy_encode(session_dict)
         return signing.dumps(
             session_dict, salt=self.key_salt, serializer=self.serializer,
             compress=True,
@@ -119,44 +96,14 @@ class SessionBase:
     def decode(self, session_data):
         try:
             return signing.loads(session_data, salt=self.key_salt, serializer=self.serializer)
-        # RemovedInDjango40Warning: when the deprecation ends, handle here
-        # exceptions similar to what _legacy_decode() does now.
         except signing.BadSignature:
-            try:
-                # Return an empty session if data is not in the pre-Django 3.1
-                # format.
-                return self._legacy_decode(session_data)
-            except Exception:
-                logger = logging.getLogger('django.security.SuspiciousSession')
-                logger.warning('Session data corrupted')
-                return {}
+            logger = logging.getLogger('django.security.SuspiciousSession')
+            logger.warning('Session data corrupted')
         except Exception:
-            return self._legacy_decode(session_data)
-
-    def _legacy_encode(self, session_dict):
-        # RemovedInDjango40Warning.
-        serialized = self.serializer().dumps(session_dict)
-        hash = self._hash(serialized)
-        return base64.b64encode(hash.encode() + b':' + serialized).decode('ascii')
-
-    def _legacy_decode(self, session_data):
-        # RemovedInDjango40Warning: pre-Django 3.1 format will be invalid.
-        encoded_data = base64.b64decode(session_data.encode('ascii'))
-        try:
-            # could produce ValueError if there is no ':'
-            hash, serialized = encoded_data.split(b':', 1)
-            expected_hash = self._hash(serialized)
-            if not constant_time_compare(hash.decode(), expected_hash):
-                raise SuspiciousSession("Session data corrupted")
-            else:
-                return self.serializer().loads(serialized)
-        except Exception as e:
-            # ValueError, SuspiciousOperation, unpickling exceptions. If any of
-            # these happen, just return an empty dictionary (an empty session).
-            if isinstance(e, SuspiciousOperation):
-                logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
-                logger.warning(str(e))
-            return {}
+            # ValueError, unpickling exceptions. If any of these happen, just
+            # return an empty dictionary (an empty session).
+            pass
+        return {}
 
     def update(self, dict_):
         self._session.update(dict_)

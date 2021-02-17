@@ -16,14 +16,8 @@ You can expect to see this in future releases. For now, you can use the
 There is also a whole range of async-native Python libraries that you can
 integrate with.
 
-.. versionchanged:: 3.1
-
-    Support for async views was added.
-
 Async views
 ===========
-
-.. versionadded:: 3.1
 
 Any view can be declared async by making the callable part of it return a
 coroutine - commonly, this is done using ``async def``. For a function-based

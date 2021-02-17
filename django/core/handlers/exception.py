@@ -105,10 +105,6 @@ def response_for_exception(request, exc):
         else:
             response = get_exception_response(request, get_resolver(get_urlconf()), 400, exc)
 
-    elif isinstance(exc, SystemExit):
-        # Allow sys.exit() to actually exit. See tickets #1023 and #4701
-        raise
-
     else:
         signals.got_request_exception.send(sender=None, request=request)
         response = handle_uncaught_exception(request, get_resolver(get_urlconf()), sys.exc_info())

@@ -89,6 +89,9 @@ class MeasureBase:
         else:
             return NotImplemented
 
+    def __hash__(self):
+        return hash(self.standard)
+
     def __lt__(self, other):
         if isinstance(other, self.__class__):
             return self.standard < other.standard

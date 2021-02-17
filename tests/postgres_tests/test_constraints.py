@@ -5,10 +5,10 @@ from django.db import (
     IntegrityError, NotSupportedError, connection, transaction,
 )
 from django.db.models import (
-    CheckConstraint, Deferrable, F, Func, Q, UniqueConstraint,
+    CheckConstraint, Deferrable, F, Func, IntegerField, Q, UniqueConstraint,
 )
 from django.db.models.fields.json import KeyTextTransform
-from django.db.models.functions import Left
+from django.db.models.functions import Cast, Left
 from django.test import skipUnlessDBFeature
 from django.utils import timezone
 
@@ -783,3 +783,14 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.add_constraint(RangesModel, constraint)
         self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+
+    def test_range_equal_cast(self):
+        constraint_name = 'exclusion_equal_room_cast'
+        self.assertNotIn(constraint_name, self.get_constraints(Room._meta.db_table))
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            expressions=[(Cast('number', IntegerField()), RangeOperators.EQUAL)],
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Room, constraint)
+        self.assertIn(constraint_name, self.get_constraints(Room._meta.db_table))

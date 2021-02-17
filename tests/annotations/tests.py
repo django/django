@@ -4,8 +4,8 @@ from decimal import Decimal
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models import (
     BooleanField, Case, CharField, Count, DateTimeField, DecimalField, Exists,
-    ExpressionWrapper, F, FloatField, Func, IntegerField, Max,
-    NullBooleanField, OuterRef, Q, Subquery, Sum, Value, When,
+    ExpressionWrapper, F, FloatField, Func, IntegerField, Max, OuterRef, Q,
+    Subquery, Sum, Value, When,
 )
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import (
@@ -641,14 +641,12 @@ class NonAggregateAnnotationTestCase(TestCase):
             is_book=Value(True, output_field=BooleanField()),
             is_pony=Value(False, output_field=BooleanField()),
             is_none=Value(None, output_field=BooleanField(null=True)),
-            is_none_old=Value(None, output_field=NullBooleanField()),
         )
         self.assertGreater(len(books), 0)
         for book in books:
             self.assertIs(book.is_book, True)
             self.assertIs(book.is_pony, False)
             self.assertIsNone(book.is_none)
-            self.assertIsNone(book.is_none_old)
 
     def test_annotation_in_f_grouped_by_annotation(self):
         qs = (

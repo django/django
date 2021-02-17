@@ -10,8 +10,6 @@ from django.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
 
-from ..utils import mysql, oracle
-
 try:
     GeometryColumns = connection.ops.geometry_columns()
     HAS_GEOMETRY_COLUMNS = True
@@ -30,7 +28,7 @@ class OperationTestCase(TransactionTestCase):
 
     @property
     def has_spatial_indexes(self):
-        if mysql:
+        if connection.ops.mysql:
             with connection.cursor() as cursor:
                 return connection.introspection.supports_spatial_index(cursor, 'gis_neighborhood')
         return True
@@ -120,7 +118,7 @@ class OperationTests(OperationTestCase):
     def test_geom_col_name(self):
         self.assertEqual(
             GeometryColumns.geom_col_name(),
-            'column_name' if oracle else 'f_geometry_column',
+            'column_name' if connection.ops.oracle else 'f_geometry_column',
         )
 
     @skipUnlessDBFeature('supports_raster')

@@ -1,6 +1,5 @@
 from django.template import TemplateSyntaxError
-from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango40Warning
+from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
 from ..utils import SafeClass, UnsafeClass, setup
@@ -81,15 +80,6 @@ class AutoescapeTagTests(SimpleTestCase):
         """
         with self.assertRaises(TemplateSyntaxError):
             self.engine.render_to_string('autoescape-filtertag01', {'first': '<a>'})
-
-    @ignore_warnings(category=RemovedInDjango40Warning)
-    @setup({'autoescape-ifequal01': '{% ifequal var "this & that" %}yes{% endifequal %}'})
-    def test_autoescape_ifequal01(self):
-        """
-        ifequal compares unescaped vales.
-        """
-        output = self.engine.render_to_string('autoescape-ifequal01', {'var': 'this & that'})
-        self.assertEqual(output, 'yes')
 
     # Arguments to filters are 'safe' and manipulate their input unescaped.
     @setup({'autoescape-filters01': '{{ var|cut:"&" }}'})

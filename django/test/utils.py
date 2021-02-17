@@ -280,9 +280,14 @@ def get_unique_databases_and_mirrors(aliases=None):
             # we only need to create the test database once.
             item = test_databases.setdefault(
                 connection.creation.test_db_signature(),
-                (connection.settings_dict['NAME'], set())
+                (connection.settings_dict['NAME'], []),
             )
-            item[1].add(alias)
+            # The default database must be the first because data migrations
+            # use the default alias by default.
+            if alias == DEFAULT_DB_ALIAS:
+                item[1].insert(0, alias)
+            else:
+                item[1].append(alias)
 
             if 'DEPENDENCIES' in test_settings:
                 dependencies[alias] = test_settings['DEPENDENCIES']

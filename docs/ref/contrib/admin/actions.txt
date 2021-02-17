@@ -99,18 +99,32 @@ That's actually all there is to writing an action! However, we'll take one
 more optional-but-useful step and give the action a "nice" title in the admin.
 By default, this action would appear in the action list as "Make published" --
 the function name, with underscores replaced by spaces. That's fine, but we
-can provide a better, more human-friendly name by giving the
-``make_published`` function a ``short_description`` attribute::
+can provide a better, more human-friendly name by using the
+:func:`~django.contrib.admin.action` decorator on the ``make_published``
+function::
 
+    from django.contrib import admin
+
+    ...
+
+    @admin.action(description='Mark selected stories as published')
     def make_published(modeladmin, request, queryset):
         queryset.update(status='p')
-    make_published.short_description = "Mark selected stories as published"
 
 .. note::
 
-    This might look familiar; the admin's ``list_display`` option uses the
-    same technique to provide human-readable descriptions for callback
-    functions registered there, too.
+    This might look familiar; the admin's
+    :attr:`~django.contrib.admin.ModelAdmin.list_display` option uses a similar
+    technique with the :func:`~django.contrib.admin.display` decorator to
+    provide human-readable descriptions for callback functions registered
+    there, too.
+
+.. versionchanged:: 3.2
+
+    The ``description`` argument to the :func:`~django.contrib.admin.action`
+    decorator is equivalent to setting the ``short_description`` attribute on
+    the action function directly in previous versions. Setting the attribute
+    directly is still supported for backward compatibility.
 
 Adding actions to the :class:`ModelAdmin`
 -----------------------------------------
@@ -122,9 +136,9 @@ the action and its registration would look like::
     from django.contrib import admin
     from myapp.models import Article
 
+    @admin.action(description='Mark selected stories as published')
     def make_published(modeladmin, request, queryset):
         queryset.update(status='p')
-    make_published.short_description = "Mark selected stories as published"
 
     class ArticleAdmin(admin.ModelAdmin):
         list_display = ['title', 'status']
@@ -171,9 +185,9 @@ You can do it like this::
 
         actions = ['make_published']
 
+        @admin.action(description='Mark selected stories as published')
         def make_published(self, request, queryset):
             queryset.update(status='p')
-        make_published.short_description = "Mark selected stories as published"
 
 Notice first that we've moved ``make_published`` into a method and renamed the
 ``modeladmin`` parameter to ``self``, and second that we've now put the string
@@ -364,20 +378,20 @@ Setting permissions for actions
 -------------------------------
 
 Actions may limit their availability to users with specific permissions by
-setting an ``allowed_permissions`` attribute on the action function::
+wrapping the action function with the :func:`~django.contrib.admin.action`
+decorator and passing the ``permissions`` argument::
 
+    @admin.action(permissions=['change'])
     def make_published(modeladmin, request, queryset):
         queryset.update(status='p')
-    make_published.allowed_permissions = ('change',)
 
 The ``make_published()`` action will only be available to users that pass the
 :meth:`.ModelAdmin.has_change_permission` check.
 
-If ``allowed_permissions`` has more than one permission, the action will be
-available as long as the user passes at least one of the checks.
+If ``permissions`` has more than one permission, the action will be available
+as long as the user passes at least one of the checks.
 
-Available values for ``allowed_permissions`` and the corresponding method
-checks are:
+Available values for ``permissions`` and the corresponding method checks are:
 
 - ``'add'``: :meth:`.ModelAdmin.has_add_permission`
 - ``'change'``: :meth:`.ModelAdmin.has_change_permission`
@@ -395,12 +409,55 @@ For example::
     class ArticleAdmin(admin.ModelAdmin):
         actions = ['make_published']
 
+        @admin.action(permissions=['publish'])
         def make_published(self, request, queryset):
             queryset.update(status='p')
-        make_published.allowed_permissions = ('publish',)
 
         def has_publish_permission(self, request):
             """Does the user have the publish permission?"""
             opts = self.opts
             codename = get_permission_codename('publish', opts)
             return request.user.has_perm('%s.%s' % (opts.app_label, codename))
+
+.. versionchanged:: 3.2
+
+    The ``permissions`` argument to the :func:`~django.contrib.admin.action`
+    decorator is equivalent to setting the ``allowed_permissions`` attribute on
+    the action function directly in previous versions. Setting the attribute
+    directly is still supported for backward compatibility.
+
+The ``action`` decorator
+========================
+
+.. function:: action(*, permissions=None, description=None)
+
+    .. versionadded:: 3.2
+
+    This decorator can be used for setting specific attributes on custom action
+    functions that can be used with
+    :attr:`~django.contrib.admin.ModelAdmin.actions`::
+
+        @admin.action(
+            permissions=['publish'],
+            description='Mark selected stories as published',
+        )
+        def make_published(self, request, queryset):
+            queryset.update(status='p')
+
+    This is equivalent to setting some attributes (with the original, longer
+    names) on the function directly::
+
+        def make_published(self, request, queryset):
+            queryset.update(status='p')
+        make_published.allowed_permissions = ['publish']
+        make_published.short_description = 'Mark selected stories as published'
+
+    Use of this decorator is not compulsory to make an action function, but it
+    can be useful to use it without arguments as a marker in your source to
+    identify the purpose of the function::
+
+        @admin.action
+        def make_inactive(self, request, queryset):
+            queryset.update(is_active=False)
+
+    In this case it will add no attributes to the function.

@@ -58,10 +58,6 @@ specifies the check you want the constraint to enforce.
 For example, ``CheckConstraint(check=Q(age__gte=18), name='age_gte_18')``
 ensures the age field is never less than 18.
 
-.. versionchanged:: 3.1
-
-    Support for boolean :class:`~django.db.models.Expression` was added.
-
 ``name``
 --------
 
@@ -118,8 +114,6 @@ These conditions have the same database restrictions as
 --------------
 
 .. attribute:: UniqueConstraint.deferrable
-
-.. versionadded:: 3.1
 
 Set this parameter to create a deferrable unique constraint. Accepted values
 are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::

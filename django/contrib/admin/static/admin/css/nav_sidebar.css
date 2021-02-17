@@ -12,22 +12,23 @@
     justify-content: center;
     flex: 0 0 23px;
     width: 23px;
-    border-right: 1px solid #eaeaea;
-    background-color: #ffffff;
+    border: 0;
+    border-right: 1px solid var(--hairline-color);
+    background-color: var(--body-bg);
     cursor: pointer;
     font-size: 20px;
-    color: #447e9b;
+    color: var(--link-fg);
     padding: 0;
 }
 
 [dir="rtl"] .toggle-nav-sidebar {
-    border-left: 1px solid #eaeaea;
+    border-left: 1px solid var(--hairline-color);
     border-right: 0;
 }
 
 .toggle-nav-sidebar:hover,
 .toggle-nav-sidebar:focus {
-    background-color: #f6f6f6;
+    background-color: var(--darkened-bg);
 }
 
 #nav-sidebar {
@@ -36,13 +37,13 @@
     left: -276px;
     margin-left: -276px;
     border-top: 1px solid transparent;
-    border-right: 1px solid #eaeaea;
-    background-color: #ffffff;
+    border-right: 1px solid var(--hairline-color);
+    background-color: var(--body-bg);
     overflow: auto;
 }
 
 [dir="rtl"] #nav-sidebar {
-    border-left: 1px solid #eaeaea;
+    border-left: 1px solid var(--hairline-color);
     border-right: 0;
     left: 0;
     margin-left: 0;
@@ -91,12 +92,12 @@
 
 #nav-sidebar .current-app .section:link,
 #nav-sidebar .current-app .section:visited {
-    color: #ffc;
+    color: var(--header-color);
     font-weight: bold;
 }
 
 #nav-sidebar .current-model {
-    background: #ffc;
+    background: var(--selected-row);
 }
 
 .main > #nav-sidebar + .content {

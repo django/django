@@ -663,12 +663,11 @@ Internationalization
 
 * The :class:`~django.middleware.locale.LocaleMiddleware` now stores the user's
   selected language with the session key ``_language``. This should only be
-  accessed using the :data:`~django.utils.translation.LANGUAGE_SESSION_KEY`
-  constant. Previously it was stored with the key ``django_language`` and the
-  ``LANGUAGE_SESSION_KEY`` constant did not exist, but keys reserved for Django
-  should start with an underscore. For backwards compatibility ``django_language``
-  is still read from in 1.7. Sessions will be migrated to the new key
-  as they are written.
+  accessed using the ``LANGUAGE_SESSION_KEY`` constant. Previously it was
+  stored with the key ``django_language`` and the ``LANGUAGE_SESSION_KEY``
+  constant did not exist, but keys reserved for Django should start with an
+  underscore. For backwards compatibility ``django_language`` is still read
+  from in 1.7. Sessions will be migrated to the new key as they are written.
 
 * The :ttag:`blocktrans` tag now supports a ``trimmed`` option. This
   option will remove newline characters from the beginning and the end of the

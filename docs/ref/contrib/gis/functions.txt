@@ -83,10 +83,6 @@ Keyword Argument       Description
                        Oracle.
 =====================  =====================================================
 
-.. versionchanged:: 3.1
-
-    Oracle support was added.
-
 ``AsGML``
 =========
 
@@ -144,10 +140,6 @@ Keyword Argument       Description
 
 __ https://developers.google.com/kml/documentation/
 
-.. versionchanged:: 3.1
-
-    The undocumented ``version`` parameter was removed.
-
 ``AsSVG``
 =========
 
@@ -177,8 +169,6 @@ __ https://www.w3.org/Graphics/SVG/
 
 .. class:: AsWKB(expression, **extra)
 
-.. versionadded:: 3.1
-
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-format-conversion-functions.html#function_st-asbinary>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_AsBinary.html>`__, SpatiaLite
@@ -197,8 +187,6 @@ __ https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry#Well
 =========
 
 .. class:: AsWKT(expression, **extra)
-
-.. versionadded:: 3.1
 
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-format-conversion-functions.html#function_st-astext>`__,

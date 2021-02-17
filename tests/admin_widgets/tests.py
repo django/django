@@ -539,13 +539,13 @@ class ForeignKeyRawIdWidgetTest(TestCase):
 
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
-            w.render('test', band.pk, attrs={}),
-            '<input type="text" name="test" value="%(bandpk)s" '
+            w.render('test', band.uuid, attrs={}),
+            '<input type="text" name="test" value="%(banduuid)s" '
             'class="vForeignKeyRawIdAdminField">'
-            '<a href="/admin_widgets/band/?_to_field=id" class="related-lookup" '
+            '<a href="/admin_widgets/band/?_to_field=uuid" class="related-lookup" '
             'id="lookup_id_test" title="Lookup"></a>&nbsp;<strong>'
             '<a href="/admin_widgets/band/%(bandpk)s/change/">Linkin Park</a>'
-            '</strong>' % {'bandpk': band.pk}
+            '</strong>' % {'banduuid': band.uuid, 'bandpk': band.pk}
         )
 
     def test_relations_to_non_primary_key(self):

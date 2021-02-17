@@ -482,59 +482,6 @@ using in conjunction with lookups on
     >>> Dog.objects.filter(data__values__contains=['collie'])
     <QuerySet [<Dog: Meg>]>
 
-``JSONField``
-=============
-
-.. class:: JSONField(encoder=None, **options)
-
-    A field for storing JSON encoded data. In Python the data is represented in
-    its Python native format: dictionaries, lists, strings, numbers, booleans
-    and ``None``.
-
-    .. attribute:: encoder
-
-        An optional JSON-encoding class to serialize data types not supported
-        by the standard JSON serializer (``datetime``, ``uuid``, etc.). For
-        example, you can use the
-        :class:`~django.core.serializers.json.DjangoJSONEncoder` class or any
-        other :py:class:`json.JSONEncoder` subclass.
-
-        When the value is retrieved from the database, it will be in the format
-        chosen by the custom encoder (most often a string), so you'll need to
-        take extra steps to convert the value back to the initial data type
-        (:meth:`Model.from_db() <django.db.models.Model.from_db>` and
-        :meth:`Field.from_db_value() <django.db.models.Field.from_db_value>`
-        are two possible hooks for that purpose). Your deserialization may need
-        to account for the fact that you can't be certain of the input type.
-        For example, you run the risk of returning a ``datetime`` that was
-        actually a string that just happened to be in the same format chosen
-        for ``datetime``\s.
-
-    If you give the field a :attr:`~django.db.models.Field.default`, ensure
-    it's a callable such as ``dict`` (for an empty default) or a callable that
-    returns a dict (such as a function). Incorrectly using ``default={}``
-    creates a mutable default that is shared between all instances of
-    ``JSONField``.
-
-.. note::
-
-    PostgreSQL has two native JSON based data types: ``json`` and ``jsonb``.
-    The main difference between them is how they are stored and how they can be
-    queried. PostgreSQL's ``json`` field is stored as the original string
-    representation of the JSON and must be decoded on the fly when queried
-    based on keys. The ``jsonb`` field is stored based on the actual structure
-    of the JSON which allows indexing. The trade-off is a small additional cost
-    on writing to the ``jsonb`` field. ``JSONField`` uses ``jsonb``.
-
-.. deprecated:: 3.1
-
-    Use :class:`django.db.models.JSONField` instead.
-
-Querying ``JSONField``
-----------------------
-
-See :ref:`querying-jsonfield` for details.
-
 .. _range-fields:
 
 Range Fields
@@ -686,14 +633,6 @@ The ``contained_by`` lookup is also available on the non-range field types:
     ... )
     <QuerySet [<Event: Soft play>]>
 
-.. versionchanged:: 3.1
-
-    Support for :class:`~django.db.models.SmallAutoField`,
-    :class:`~django.db.models.AutoField`,
-    :class:`~django.db.models.BigAutoField`,
-    :class:`~django.db.models.SmallIntegerField`, and
-    :class:`~django.db.models.DecimalField` was added.
-
 .. fieldlookup:: rangefield.overlap
 
 ``overlap``
@@ -813,8 +752,6 @@ Returned objects are empty ranges. Can be chained to valid lookups for a
 ``lower_inc``
 ^^^^^^^^^^^^^
 
-.. versionadded:: 3.1
-
 Returns objects that have inclusive or exclusive lower bounds, depending on the
 boolean value passed. Can be chained to valid lookups for a
 :class:`~django.db.models.BooleanField`.
@@ -826,8 +763,6 @@ boolean value passed. Can be chained to valid lookups for a
 
 ``lower_inf``
 ^^^^^^^^^^^^^
-
-.. versionadded:: 3.1
 
 Returns objects that have unbounded (infinite) or bounded lower bound,
 depending on the boolean value passed. Can be chained to valid lookups for a
@@ -841,8 +776,6 @@ depending on the boolean value passed. Can be chained to valid lookups for a
 ``upper_inc``
 ^^^^^^^^^^^^^
 
-.. versionadded:: 3.1
-
 Returns objects that have inclusive or exclusive upper bounds, depending on the
 boolean value passed. Can be chained to valid lookups for a
 :class:`~django.db.models.BooleanField`.
@@ -854,8 +787,6 @@ boolean value passed. Can be chained to valid lookups for a
 
 ``upper_inf``
 ^^^^^^^^^^^^^
-
-.. versionadded:: 3.1
 
 Returns objects that have unbounded (infinite) or bounded upper bound,
 depending on the boolean value passed. Can be chained to valid lookups for a

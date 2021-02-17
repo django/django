@@ -189,8 +189,8 @@ Models
   now support using field transforms.
 
 * :class:`~django.db.models.BooleanField` can now be ``null=True``. This is
-  encouraged instead of :class:`~django.db.models.NullBooleanField`, which will
-  likely be deprecated in the future.
+  encouraged instead of ``NullBooleanField``, which will likely be deprecated
+  in the future.
 
 * The new :meth:`.QuerySet.explain` method displays the database's execution
   plan of a queryset's query.
@@ -373,7 +373,7 @@ Miscellaneous
 * Since migrations are now loaded from ``.pyc`` files, you might need to delete
   them if you're working in a mixed Python 2 and Python 3 environment.
 
-* Using ``None`` as a :class:`~django.contrib.postgres.fields.JSONField` lookup
+* Using ``None`` as a ``django.contrib.postgres.fields.JSONField`` lookup
   value now matches objects that have the specified key and a null value rather
   than objects that don't have the key.
 

@@ -23,8 +23,8 @@ from .models import (
     GenericData, GenericIPAddressData, GenericIPAddressPKData,
     InheritAbstractModel, InheritBaseModel, IntegerData, IntegerPKData,
     Intermediate, LengthModel, M2MData, M2MIntermediateData, M2MSelfData,
-    ModifyingSaveData, NullBooleanData, O2OData, PositiveBigIntegerData,
-    PositiveIntegerData, PositiveIntegerPKData, PositiveSmallIntegerData,
+    ModifyingSaveData, O2OData, PositiveBigIntegerData, PositiveIntegerData,
+    PositiveIntegerPKData, PositiveSmallIntegerData,
     PositiveSmallIntegerPKData, SlugData, SlugPKData, SmallData, SmallPKData,
     Tag, TextData, TimeData, UniqueAnchor, UUIDData, UUIDDefaultData,
 )
@@ -238,9 +238,6 @@ test_data = [
     # (XX, ImageData
     (data_obj, 95, GenericIPAddressData, "fe80:1424:2223:6cff:fe8a:2e8a:2151:abcd"),
     (data_obj, 96, GenericIPAddressData, None),
-    (data_obj, 100, NullBooleanData, True),
-    (data_obj, 101, NullBooleanData, False),
-    (data_obj, 102, NullBooleanData, None),
     (data_obj, 110, PositiveBigIntegerData, 9223372036854775807),
     (data_obj, 111, PositiveBigIntegerData, None),
     (data_obj, 120, PositiveIntegerData, 123456789),

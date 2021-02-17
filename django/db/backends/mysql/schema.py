@@ -10,6 +10,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_not_null = "MODIFY %(column)s %(type)s NOT NULL"
     sql_alter_column_type = "MODIFY %(column)s %(type)s"
     sql_alter_column_collate = "MODIFY %(column)s %(type)s%(collation)s"
+    sql_alter_column_no_default_null = 'ALTER COLUMN %(column)s SET DEFAULT NULL'
 
     # No 'CASCADE' which works as a no-op in MySQL but is undocumented
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"

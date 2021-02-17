@@ -54,6 +54,10 @@ class BaseSpatialFeatures:
     # Set of options that AsGeoJSON() doesn't support.
     unsupported_geojson_options = {}
 
+    # Does Intersection() return None (rather than an empty GeometryCollection)
+    # for empty results?
+    empty_intersection_returns_none = True
+
     @property
     def supports_bbcontains_lookup(self):
         return 'bbcontains' in self.connection.ops.gis_operators
