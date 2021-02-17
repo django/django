@@ -46,10 +46,10 @@ class Q(tree.Node):
 
         # If the other Q() is empty, ignore it and just use `self`.
         if not other:
-            return copy.deepcopy(self)
+            return self
         # Or if this Q is empty, ignore it and just use `other`.
         elif not self:
-            return copy.deepcopy(other)
+            return other
 
         obj = type(self)()
         obj.connector = conn
