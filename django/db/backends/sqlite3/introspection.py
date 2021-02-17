@@ -413,7 +413,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     }
                 constraints[index]['columns'].append(column)
             # Add type and column orders for indexes
-            if constraints[index]['index'] and not constraints[index]['unique']:
+            if constraints[index]['index']:
                 # SQLite doesn't support any index type other than b-tree
                 constraints[index]['type'] = Index.suffix
                 orders = self._get_index_columns_orders(sql)
