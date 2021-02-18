@@ -816,6 +816,18 @@ class BasicExpressionsTests(TestCase):
             [self.example_inc.ceo, self.max],
         )
 
+    def test_boolean_expression_combined_with_empty_Q(self):
+        is_poc = Company.objects.filter(point_of_contact=OuterRef('pk'))
+        self.gmbh.point_of_contact = self.max
+        self.gmbh.save()
+        tests = [
+            Exists(is_poc) & Q(),
+            Exists(is_poc) | Q(),
+        ]
+        for conditions in tests:
+            with self.subTest(conditions):
+                self.assertCountEqual(Employee.objects.filter(conditions), [self.max])
+
 
 class IterableLookupInnerExpressionsTests(TestCase):
     @classmethod
