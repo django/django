@@ -1363,6 +1363,10 @@ class SeleniumTests(AdminSeleniumTestCase):
         verbose_name in the inline form.
         """
         self.admin_login(username='super', password='secret')
+        # Hide sidebar.
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_course_add'))
+        toggle_button = self.selenium.find_element_by_css_selector('#toggle-nav-sidebar')
+        toggle_button.click()
         # Each combination of horizontal/vertical fiter with stacked/tabular
         # inlines.
         tests = [
