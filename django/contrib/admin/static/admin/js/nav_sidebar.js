@@ -15,7 +15,6 @@
         }
 
         const main = document.getElementById('main');
-        const navSidebar = document.getElementById('nav-sidebar');
         let navSidebarIsOpen = localStorage.getItem('django.admin.navSidebarIsOpen');
         if (navSidebarIsOpen === null) {
             navSidebarIsOpen = 'true';
@@ -23,7 +22,7 @@
         if (navSidebarIsOpen === 'false') {
             disableNavLinkTabbing();
         }
-        main.classList.toggle('shifted', navSidebar && navSidebarIsOpen === 'true');
+        main.classList.toggle('shifted', navSidebarIsOpen === 'true');
 
         toggleNavSidebar.addEventListener('click', function() {
             if (navSidebarIsOpen === 'true') {
