@@ -90,6 +90,17 @@ caveats:
 * Unlike the ``__call__()`` method which is called once per request,
   ``__init__()`` is called only *once*, when the Web server starts.
 
+``__call__(request)``
+---------------------
+
+Middleware factories are made callable by implementing the ``__call__()``
+method and must accept a ``request`` argument and return a response. The
+response can be retrieved by calling its ``get_response``. If the
+``__call__()`` method returns a response without ever calling its
+``get_response``, none of the following middleware layers will see the request
+or the response. In this case the response will only return through the same
+middleware layers the request passed in through.
+
 Marking middleware as unused
 ----------------------------
 
