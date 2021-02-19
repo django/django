@@ -58,7 +58,11 @@ class CheckConstraint(BaseConstraint):
         return schema_editor._delete_check_sql(model, self.name)
 
     def __repr__(self):
-        return "<%s: check='%s' name=%r>" % (self.__class__.__name__, self.check, self.name)
+        return '<%s: check=%s name=%s>' % (
+            self.__class__.__qualname__,
+            self.check,
+            repr(self.name),
+        )
 
     def __eq__(self, other):
         if isinstance(other, CheckConstraint):
@@ -161,8 +165,10 @@ class UniqueConstraint(BaseConstraint):
         )
 
     def __repr__(self):
-        return '<%s: fields=%r name=%r%s%s%s%s>' % (
-            self.__class__.__name__, self.fields, self.name,
+        return '<%s: fields=%s name=%s%s%s%s%s>' % (
+            self.__class__.__qualname__,
+            repr(self.fields),
+            repr(self.name),
             '' if self.condition is None else ' condition=%s' % self.condition,
             '' if self.deferrable is None else ' deferrable=%s' % self.deferrable,
             '' if not self.include else ' include=%s' % repr(self.include),

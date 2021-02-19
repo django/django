@@ -58,12 +58,14 @@ class CheckConstraintTests(TestCase):
         self.assertNotEqual(models.CheckConstraint(check=check1, name='price'), 1)
 
     def test_repr(self):
-        check = models.Q(price__gt=models.F('discounted_price'))
-        name = 'price_gt_discounted_price'
-        constraint = models.CheckConstraint(check=check, name=name)
+        constraint = models.CheckConstraint(
+            check=models.Q(price__gt=models.F('discounted_price')),
+            name='price_gt_discounted_price',
+        )
         self.assertEqual(
             repr(constraint),
-            "<CheckConstraint: check='{}' name='{}'>".format(check, name),
+            "<CheckConstraint: check=(AND: ('price__gt', F(discounted_price))) "
+            "name='price_gt_discounted_price'>",
         )
 
     def test_invalid_check_types(self):

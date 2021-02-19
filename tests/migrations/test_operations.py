@@ -1840,7 +1840,7 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_adin")
         msg = (
             "Indexes passed to AddIndex operations require a name argument. "
-            "<Index: fields='pink'> doesn't have one."
+            "<Index: fields=['pink']> doesn't have one."
         )
         with self.assertRaisesMessage(ValueError, msg):
             migrations.AddIndex("Pony", models.Index(fields=["pink"]))

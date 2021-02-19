@@ -282,8 +282,8 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         )
         self.assertEqual(
             repr(constraint),
-            "<ExclusionConstraint: index_type=GIST, expressions=["
-            "(F(datespan), '&&'), (F(room), '=')]>",
+            "<ExclusionConstraint: index_type='GIST' expressions=["
+            "(F(datespan), '&&'), (F(room), '=')] name='exclude_overlapping'>",
         )
         constraint = ExclusionConstraint(
             name='exclude_overlapping',
@@ -293,8 +293,9 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         )
         self.assertEqual(
             repr(constraint),
-            "<ExclusionConstraint: index_type=SPGiST, expressions=["
-            "(F(datespan), '-|-')], condition=(AND: ('cancelled', False))>",
+            "<ExclusionConstraint: index_type='SPGiST' expressions=["
+            "(F(datespan), '-|-')] name='exclude_overlapping' "
+            "condition=(AND: ('cancelled', False))>",
         )
         constraint = ExclusionConstraint(
             name='exclude_overlapping',
@@ -303,8 +304,9 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         )
         self.assertEqual(
             repr(constraint),
-            "<ExclusionConstraint: index_type=GIST, expressions=["
-            "(F(datespan), '-|-')], deferrable=Deferrable.IMMEDIATE>",
+            "<ExclusionConstraint: index_type='GIST' expressions=["
+            "(F(datespan), '-|-')] name='exclude_overlapping' "
+            "deferrable=Deferrable.IMMEDIATE>",
         )
         constraint = ExclusionConstraint(
             name='exclude_overlapping',
@@ -313,8 +315,9 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         )
         self.assertEqual(
             repr(constraint),
-            "<ExclusionConstraint: index_type=GIST, expressions=["
-            "(F(datespan), '-|-')], include=('cancelled', 'room')>",
+            "<ExclusionConstraint: index_type='GIST' expressions=["
+            "(F(datespan), '-|-')] name='exclude_overlapping' "
+            "include=('cancelled', 'room')>",
         )
         constraint = ExclusionConstraint(
             name='exclude_overlapping',
@@ -323,8 +326,9 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         )
         self.assertEqual(
             repr(constraint),
-            "<ExclusionConstraint: index_type=GIST, expressions=["
-            "(F(datespan), '-|-')], opclasses=['range_ops']>",
+            "<ExclusionConstraint: index_type='GIST' expressions=["
+            "(F(datespan), '-|-')] name='exclude_overlapping' "
+            "opclasses=['range_ops']>",
         )
 
     def test_eq(self):
