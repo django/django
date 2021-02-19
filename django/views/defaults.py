@@ -24,9 +24,25 @@ ERROR_PAGE_TEMPLATE = """
 """
 
 
-# This can be called when CsrfViewMiddleware.process_view has not run,
+def get_readable_exception(exception):
+    exception_repr = exception.__class__.__name__
+    # Try to get an "interesting" exception message, if any (and not the ugly
+    # Resolver404 dictionary)
+    try:
+        message = exception.args[0]
+    except (AttributeError, IndexError):
+        pass
+    else:
+        if isinstance(message, str):
+            exception_repr = message
+    return exception_repr
+
+
+# These can be called when CsrfViewMiddleware.process_view has not run,
 # therefore need @requires_csrf_token in case the template needs
 # {% csrf_token %}.
+
+
 @requires_csrf_token
 def page_not_found(request, exception, template_name=ERROR_404_TEMPLATE_NAME):
     """
@@ -41,19 +57,9 @@ def page_not_found(request, exception, template_name=ERROR_404_TEMPLATE_NAME):
             The message from the exception which triggered the 404 (if one was
             supplied), or the exception class name
     """
-    exception_repr = exception.__class__.__name__
-    # Try to get an "interesting" exception message, if any (and not the ugly
-    # Resolver404 dictionary)
-    try:
-        message = exception.args[0]
-    except (AttributeError, IndexError):
-        pass
-    else:
-        if isinstance(message, str):
-            exception_repr = message
     context = {
         'request_path': quote(request.path),
-        'exception': exception_repr,
+        'exception': get_readable_exception(exception),
     }
     try:
         template = loader.get_template(template_name)
@@ -119,16 +125,16 @@ def bad_request(request, exception, template_name=ERROR_400_TEMPLATE_NAME):
     return HttpResponseBadRequest(template.render())
 
 
-# This can be called when CsrfViewMiddleware.process_view has not run,
-# therefore need @requires_csrf_token in case the template needs
-# {% csrf_token %}.
 @requires_csrf_token
 def permission_denied(request, exception, template_name=ERROR_403_TEMPLATE_NAME):
     """
     Permission denied (403) handler.
 
     Templates: :template:`403.html`
-    Context: None
+    Context:
+        exception
+            The message from the exception which triggered the 404 (if one was
+            supplied), or the exception class name
 
     If the template does not exist, an Http403 response containing the text
     "403 Forbidden" (as per RFC 7231) will be returned.
@@ -144,5 +150,5 @@ def permission_denied(request, exception, template_name=ERROR_403_TEMPLATE_NAME)
             content_type='text/html',
         )
     return HttpResponseForbidden(
-        template.render(request=request, context={'exception': str(exception)})
+        template.render(request=request, context={'exception': get_readable_exception(exception)})
     )
