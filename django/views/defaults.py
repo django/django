@@ -33,7 +33,7 @@ def get_readable_exception(exception):
     except (AttributeError, IndexError):
         pass
     else:
-        if isinstance(message, str):
+        if message and isinstance(message, str):
             exception_repr = message
     return exception_repr
 
