@@ -159,6 +159,26 @@ class ChoicesTests(SimpleTestCase):
         with self.assertRaises(AttributeError):
             models.TextChoices('Properties', 'choices labels names values')
 
+    def test_label_member(self):
+        # label can be used as a member.
+        Stationery = models.TextChoices('Stationery', 'label stamp sticker')
+        self.assertEqual(Stationery.label.label, 'Label')
+        self.assertEqual(Stationery.label.value, 'label')
+        self.assertEqual(Stationery.label.name, 'label')
+
+    def test_do_not_call_in_templates_member(self):
+        # do_not_call_in_templates is not implicitly treated as a member.
+        Special = models.IntegerChoices('Special', 'do_not_call_in_templates')
+        self.assertEqual(
+            Special.do_not_call_in_templates.label,
+            'Do Not Call In Templates',
+        )
+        self.assertEqual(Special.do_not_call_in_templates.value, 1)
+        self.assertEqual(
+            Special.do_not_call_in_templates.name,
+            'do_not_call_in_templates',
+        )
+
 
 class Separator(bytes, models.Choices):
     FS = b'\x1c', 'File Separator'

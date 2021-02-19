@@ -1,4 +1,5 @@
 import enum
+from types import DynamicClassAttribute
 
 from django.utils.functional import Promise
 
@@ -26,12 +27,8 @@ class ChoicesMeta(enum.EnumMeta):
             # assignment in enum's classdict.
             dict.__setitem__(classdict, key, value)
         cls = super().__new__(metacls, classname, bases, classdict, **kwds)
-        cls._value2label_map_ = dict(zip(cls._value2member_map_, labels))
-        # Add a label property to instances of enum which uses the enum member
-        # that is passed in as "self" as the value to use when looking up the
-        # label in the choices.
-        cls.label = property(lambda self: cls._value2label_map_.get(self.value))
-        cls.do_not_call_in_templates = True
+        for member, label in zip(cls.__members__.values(), labels):
+            member._label_ = label
         return enum.unique(cls)
 
     def __contains__(cls, member):
@@ -61,6 +58,14 @@ class ChoicesMeta(enum.EnumMeta):
 
 class Choices(enum.Enum, metaclass=ChoicesMeta):
     """Class for creating enumerated choices."""
+
+    @DynamicClassAttribute
+    def label(self):
+        return self._label_
+
+    @property
+    def do_not_call_in_templates(self):
+        return True
 
     def __str__(self):
         """
