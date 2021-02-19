@@ -36,6 +36,21 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+February 19, 2021 - :cve:`2021-23336`
+-------------------------------------
+
+Web cache poisoning via ``django.utils.http.limited_parse_qsl()``. `Full
+description
+<https://www.djangoproject.com/weblog/2021/feb/19/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.2 :commit:`(patch) <be8237c7cce24b06aabde0b97afce98ddabbe3b6>`
+* Django 3.1 :commit:`(patch) <8f6d431b08cbb418d9144b976e7b972546607851>`
+* Django 3.0 :commit:`(patch) <326a926beef869d3341bc9ef737887f0449b6b71>`
+* Django 2.2 :commit:`(patch) <fd6b6afd5959b638c62dbf4839ccff97e7f7dfda>`
+
 February 1, 2021 - :cve:`2021-3281`
 -----------------------------------
 
