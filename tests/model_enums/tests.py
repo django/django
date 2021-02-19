@@ -155,6 +155,17 @@ class ChoicesTests(SimpleTestCase):
         output = template.render(Context({'Suit': Suit}))
         self.assertEqual(output, 'Diamond|1')
 
+    def test_custom_label_name(self):
+        class C(models.Choices):
+            label = "label"
+
+            @classmethod
+            def get_label_name(cls):
+                return "custom_label_name"
+
+        self.assertEqual(C.label.custom_label_name, "Label")
+        self.assertEqual(C.label.value, "label")
+
 
 class Separator(bytes, models.Choices):
     FS = b'\x1c', 'File Separator'

@@ -30,7 +30,8 @@ class ChoicesMeta(enum.EnumMeta):
         # Add a label property to instances of enum which uses the enum member
         # that is passed in as "self" as the value to use when looking up the
         # label in the choices.
-        cls.label = property(lambda self: cls._value2label_map_.get(self.value))
+        label_name = cls.get_label_name()
+        setattr(cls, label_name, property(lambda self: cls._value2label_map_.get(self.value)))
         cls.do_not_call_in_templates = True
         return enum.unique(cls)
 
@@ -39,6 +40,10 @@ class ChoicesMeta(enum.EnumMeta):
             # Allow non-enums to match against member values.
             return any(x.value == member for x in cls)
         return super().__contains__(member)
+
+    @classmethod
+    def get_label_name(cls):
+        return 'label'
 
     @property
     def names(cls):
