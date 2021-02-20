@@ -10,7 +10,6 @@ import ast
 import copy
 import difflib
 import functools
-import inspect
 import json
 import sys
 import warnings
