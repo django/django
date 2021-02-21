@@ -490,16 +490,19 @@ class DateTimeBaseInput(TextInput):
 
 
 class DateInput(DateTimeBaseInput):
+    input_type = 'date'
     format_key = 'DATE_INPUT_FORMATS'
     template_name = 'django/forms/widgets/date.html'
 
 
 class DateTimeInput(DateTimeBaseInput):
+    input_type = 'datetime-local'
     format_key = 'DATETIME_INPUT_FORMATS'
     template_name = 'django/forms/widgets/datetime.html'
 
 
 class TimeInput(DateTimeBaseInput):
+    input_type = 'time'
     format_key = 'TIME_INPUT_FORMATS'
     template_name = 'django/forms/widgets/time.html'
 
