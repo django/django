@@ -510,6 +510,13 @@ class Command(BaseCommand):
         Use the xgettext GNU gettext utility.
         """
         build_files = []
+        try:
+            self._process_locale_dir(locale_dir, files, build_files)
+        finally:
+            for build_file in build_files:
+                build_file.cleanup()
+
+    def _process_locale_dir(self, locale_dir, files, build_files):
         for translatable in files:
             if self.verbosity > 1:
                 self.stdout.write('processing file %s in %s' % (
@@ -569,8 +576,6 @@ class Command(BaseCommand):
 
         if errors:
             if status != STATUS_OK:
-                for build_file in build_files:
-                    build_file.cleanup()
                 raise CommandError(
                     'errors happened while running xgettext on %s\n%s' %
                     ('\n'.join(input_files), errors)
@@ -591,9 +596,6 @@ class Command(BaseCommand):
                 msgs = build_file.postprocess_messages(msgs)
             potfile = os.path.join(locale_dir, '%s.pot' % self.domain)
             write_pot_file(potfile, msgs)
-
-        for build_file in build_files:
-            build_file.cleanup()
 
     def write_po_file(self, potfile, locale):
         """
