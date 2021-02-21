@@ -565,7 +565,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     * ``input_type``: ``'text'``
     * ``template_name``: ``'django/forms/widgets/date.html'``
-    * Renders as: ``<input type="text" ...>``
+    * Renders as: ``<input type="date" ...>``
 
     Takes same arguments as :class:`TextInput`, with one more optional argument:
 
@@ -584,7 +584,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     * ``input_type``: ``'text'``
     * ``template_name``: ``'django/forms/widgets/datetime.html'``
-    * Renders as: ``<input type="text" ...>``
+    * Renders as: ``<input type="datetime-local" ...>``
 
     Takes same arguments as :class:`TextInput`, with one more optional argument:
 
@@ -607,7 +607,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     * ``input_type``: ``'text'``
     * ``template_name``: ``'django/forms/widgets/time.html'``
-    * Renders as: ``<input type="text" ...>``
+    * Renders as: ``<input type="time" ...>``
 
     Takes same arguments as :class:`TextInput`, with one more optional argument:
 
