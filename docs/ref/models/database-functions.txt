@@ -59,7 +59,7 @@ will result in a database error.
 Usage examples::
 
     >>> # Get a screen name from least to most public
-    >>> from django.db.models import Sum, Value as V
+    >>> from django.db.models import Sum
     >>> from django.db.models.functions import Coalesce
     >>> Author.objects.create(name='Margaret Smith', goes_by='Maggie')
     >>> author = Author.objects.annotate(
@@ -68,13 +68,18 @@ Usage examples::
     Maggie
 
     >>> # Prevent an aggregate Sum() from returning None
+    >>> # The aggregate default argument uses Coalesce() under the hood.
     >>> aggregated = Author.objects.aggregate(
-    ...    combined_age=Coalesce(Sum('age'), V(0)),
-    ...    combined_age_default=Sum('age'))
+    ...    combined_age=Sum('age'),
+    ...    combined_age_default=Sum('age', default=0),
+    ...    combined_age_coalesce=Coalesce(Sum('age'), 0),
+    ... )
     >>> print(aggregated['combined_age'])
-    0
-    >>> print(aggregated['combined_age_default'])
     None
+    >>> print(aggregated['combined_age_default'])
+    0
+    >>> print(aggregated['combined_age_coalesce'])
+    0
 
 .. warning::
 

@@ -9,10 +9,10 @@ __all__ = [
 class StatAggregate(Aggregate):
     output_field = FloatField()
 
-    def __init__(self, y, x, output_field=None, filter=None):
+    def __init__(self, y, x, output_field=None, filter=None, default=None):
         if not x or not y:
             raise ValueError('Both y and x must be provided.')
-        super().__init__(y, x, output_field=output_field, filter=filter)
+        super().__init__(y, x, output_field=output_field, filter=filter, default=default)
 
 
 class Corr(StatAggregate):
@@ -20,9 +20,9 @@ class Corr(StatAggregate):
 
 
 class CovarPop(StatAggregate):
-    def __init__(self, y, x, sample=False, filter=None):
+    def __init__(self, y, x, sample=False, filter=None, default=None):
         self.function = 'COVAR_SAMP' if sample else 'COVAR_POP'
-        super().__init__(y, x, filter=filter)
+        super().__init__(y, x, filter=filter, default=default)
 
 
 class RegrAvgX(StatAggregate):

@@ -288,6 +288,10 @@ Models
 * :class:`~django.db.models.Lookup` expressions may now be used in ``QuerySet``
   annotations, aggregations, and directly in filters.
 
+* The new :ref:`default <aggregate-default>` argument for built-in aggregates
+  allows specifying a value to be returned when the queryset (or grouping)
+  contains no entries, rather than ``None``.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

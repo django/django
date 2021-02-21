@@ -72,6 +72,34 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                     )
                     self.assertEqual(values, {'aggregation': expected_result})
 
+    def test_default_argument(self):
+        AggregateTestModel.objects.all().delete()
+        tests = [
+            (ArrayAgg('char_field', default=['<empty>']), ['<empty>']),
+            (ArrayAgg('integer_field', default=[0]), [0]),
+            (ArrayAgg('boolean_field', default=[False]), [False]),
+            (BitAnd('integer_field', default=0), 0),
+            (BitOr('integer_field', default=0), 0),
+            (BoolAnd('boolean_field', default=False), False),
+            (BoolOr('boolean_field', default=False), False),
+            (JSONBAgg('integer_field', default=Value('["<empty>"]')), ['<empty>']),
+            (StringAgg('char_field', delimiter=';', default=Value('<empty>')), '<empty>'),
+        ]
+        for aggregation, expected_result in tests:
+            with self.subTest(aggregation=aggregation):
+                # Empty result with non-execution optimization.
+                with self.assertNumQueries(0):
+                    values = AggregateTestModel.objects.none().aggregate(
+                        aggregation=aggregation,
+                    )
+                    self.assertEqual(values, {'aggregation': expected_result})
+                # Empty result when query must be executed.
+                with self.assertNumQueries(1):
+                    values = AggregateTestModel.objects.aggregate(
+                        aggregation=aggregation,
+                    )
+                    self.assertEqual(values, {'aggregation': expected_result})
+
     def test_array_agg_charfield(self):
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('char_field'))
         self.assertEqual(values, {'arrayagg': ['Foo1', 'Foo2', 'Foo4', 'Foo3']})
@@ -515,6 +543,37 @@ class TestStatisticsAggregate(PostgreSQLTestCase):
                     )
                     self.assertEqual(values, {'aggregation': expected_result})
 
+    def test_default_argument(self):
+        StatTestModel.objects.all().delete()
+        tests = [
+            (Corr(y='int2', x='int1', default=0), 0),
+            (CovarPop(y='int2', x='int1', default=0), 0),
+            (CovarPop(y='int2', x='int1', sample=True, default=0), 0),
+            (RegrAvgX(y='int2', x='int1', default=0), 0),
+            (RegrAvgY(y='int2', x='int1', default=0), 0),
+            # RegrCount() doesn't support the default argument.
+            (RegrIntercept(y='int2', x='int1', default=0), 0),
+            (RegrR2(y='int2', x='int1', default=0), 0),
+            (RegrSlope(y='int2', x='int1', default=0), 0),
+            (RegrSXX(y='int2', x='int1', default=0), 0),
+            (RegrSXY(y='int2', x='int1', default=0), 0),
+            (RegrSYY(y='int2', x='int1', default=0), 0),
+        ]
+        for aggregation, expected_result in tests:
+            with self.subTest(aggregation=aggregation):
+                # Empty result with non-execution optimization.
+                with self.assertNumQueries(0):
+                    values = StatTestModel.objects.none().aggregate(
+                        aggregation=aggregation,
+                    )
+                    self.assertEqual(values, {'aggregation': expected_result})
+                # Empty result when query must be executed.
+                with self.assertNumQueries(1):
+                    values = StatTestModel.objects.aggregate(
+                        aggregation=aggregation,
+                    )
+                    self.assertEqual(values, {'aggregation': expected_result})
+
     def test_corr_general(self):
         values = StatTestModel.objects.aggregate(corr=Corr(y='int2', x='int1'))
         self.assertEqual(values, {'corr': -1.0})
@@ -538,6 +597,11 @@ class TestStatisticsAggregate(PostgreSQLTestCase):
     def test_regr_count_general(self):
         values = StatTestModel.objects.aggregate(regrcount=RegrCount(y='int2', x='int1'))
         self.assertEqual(values, {'regrcount': 3})
+
+    def test_regr_count_default(self):
+        msg = 'RegrCount does not allow default.'
+        with self.assertRaisesMessage(TypeError, msg):
+            RegrCount(y='int2', x='int1', default=0)
 
     def test_regr_intercept_general(self):
         values = StatTestModel.objects.aggregate(regrintercept=RegrIntercept(y='int2', x='int1'))

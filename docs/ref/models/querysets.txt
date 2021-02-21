@@ -3540,8 +3540,10 @@ documentation to learn how to create your aggregates.
 
     Aggregation functions return ``None`` when used with an empty
     ``QuerySet``. For example, the ``Sum`` aggregation function returns ``None``
-    instead of ``0`` if the ``QuerySet`` contains no entries. An exception is
-    ``Count``, which does return ``0`` if the ``QuerySet`` is empty.
+    instead of ``0`` if the ``QuerySet`` contains no entries. To return another
+    value instead, pass a value to the ``default`` argument. An exception is
+    ``Count``, which does return ``0`` if the ``QuerySet`` is empty. ``Count``
+    does not support the ``default`` argument.
 
 All aggregates have the following parameters in common:
 
@@ -3578,6 +3580,16 @@ rows that are aggregated.
 See :ref:`conditional-aggregation` and :ref:`filtering-on-annotations` for
 example usage.
 
+.. _aggregate-default:
+
+``default``
+~~~~~~~~~~~
+
+.. versionadded:: 4.0
+
+An optional argument that allows specifying a value to use as a default value
+when the queryset (or grouping) contains no entries.
+
 ``**extra``
 ~~~~~~~~~~~
 
@@ -3587,7 +3599,7 @@ by the aggregate.
 ``Avg``
 ~~~~~~~
 
-.. class:: Avg(expression, output_field=None, distinct=False, filter=None, **extra)
+.. class:: Avg(expression, output_field=None, distinct=False, filter=None, default=None, **extra)
 
     Returns the mean value of the given expression, which must be numeric
     unless you specify a different ``output_field``.
@@ -3623,10 +3635,14 @@ by the aggregate.
         This is the SQL equivalent of ``COUNT(DISTINCT <field>)``. The default
         value is ``False``.
 
+    .. note::
+
+        The ``default`` argument is not supported.
+
 ``Max``
 ~~~~~~~
 
-.. class:: Max(expression, output_field=None, filter=None, **extra)
+.. class:: Max(expression, output_field=None, filter=None, default=None, **extra)
 
     Returns the maximum value of the given expression.
 
@@ -3636,7 +3652,7 @@ by the aggregate.
 ``Min``
 ~~~~~~~
 
-.. class:: Min(expression, output_field=None, filter=None, **extra)
+.. class:: Min(expression, output_field=None, filter=None, default=None, **extra)
 
     Returns the minimum value of the given expression.
 
@@ -3646,7 +3662,7 @@ by the aggregate.
 ``StdDev``
 ~~~~~~~~~~
 
-.. class:: StdDev(expression, output_field=None, sample=False, filter=None, **extra)
+.. class:: StdDev(expression, output_field=None, sample=False, filter=None, default=None, **extra)
 
     Returns the standard deviation of the data in the provided expression.
 
@@ -3664,7 +3680,7 @@ by the aggregate.
 ``Sum``
 ~~~~~~~
 
-.. class:: Sum(expression, output_field=None, distinct=False, filter=None, **extra)
+.. class:: Sum(expression, output_field=None, distinct=False, filter=None, default=None, **extra)
 
     Computes the sum of all values of the given expression.
 
@@ -3682,7 +3698,7 @@ by the aggregate.
 ``Variance``
 ~~~~~~~~~~~~
 
-.. class:: Variance(expression, output_field=None, sample=False, filter=None, **extra)
+.. class:: Variance(expression, output_field=None, sample=False, filter=None, default=None, **extra)
 
     Returns the variance of the data in the provided expression.
 

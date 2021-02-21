@@ -88,6 +88,17 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     'annotations.tests.NonAggregateAnnotationTestCase.test_annotation_aggregate_with_m2o',
                 },
             })
+        if not self.connection.mysql_is_mariadb and self.connection.mysql_version < (8,):
+            skips.update({
+                'Casting to datetime/time is not supported by MySQL < 8.0. (#30224)': {
+                    'aggregation.tests.AggregateTestCase.test_aggregation_default_using_time_from_python',
+                    'aggregation.tests.AggregateTestCase.test_aggregation_default_using_datetime_from_python',
+                },
+                'MySQL < 8.0 returns string type instead of datetime/time. (#30224)': {
+                    'aggregation.tests.AggregateTestCase.test_aggregation_default_using_time_from_database',
+                    'aggregation.tests.AggregateTestCase.test_aggregation_default_using_datetime_from_database',
+                },
+            })
         if (
             self.connection.mysql_is_mariadb and
             (10, 4, 3) < self.connection.mysql_version < (10, 5, 2)

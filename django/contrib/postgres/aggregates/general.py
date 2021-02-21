@@ -18,7 +18,7 @@ class ArrayAgg(OrderableAggMixin, Aggregate):
         return ArrayField(self.source_expressions[0].output_field)
 
     def convert_value(self, value, expression, connection):
-        if not value:
+        if value is None and self.default is None:
             return []
         return value
 
@@ -48,7 +48,7 @@ class JSONBAgg(OrderableAggMixin, Aggregate):
     output_field = JSONField()
 
     def convert_value(self, value, expression, connection):
-        if not value:
+        if value is None and self.default is None:
             return '[]'
         return value
 
@@ -63,6 +63,6 @@ class StringAgg(OrderableAggMixin, Aggregate):
         super().__init__(expression, delimiter_expr, **extra)
 
     def convert_value(self, value, expression, connection):
-        if not value:
+        if value is None and self.default is None:
             return ''
         return value

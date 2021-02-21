@@ -393,7 +393,7 @@ some complex computations::
 
 The ``Aggregate`` API is as follows:
 
-.. class:: Aggregate(*expressions, output_field=None, distinct=False, filter=None, **extra)
+.. class:: Aggregate(*expressions, output_field=None, distinct=False, filter=None, default=None, **extra)
 
     .. attribute:: template
 
@@ -452,12 +452,21 @@ The ``filter`` argument takes a :class:`Q object <django.db.models.Q>` that's
 used to filter the rows that are aggregated. See :ref:`conditional-aggregation`
 and :ref:`filtering-on-annotations` for example usage.
 
+The ``default`` argument takes a value that will be passed along with the
+aggregate to :class:`~django.db.models.functions.Coalesce`. This is useful for
+specifying a value to be returned other than ``None`` when the queryset (or
+grouping) contains no entries.
+
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
 into the ``template`` attribute.
 
 .. versionchanged:: 3.2
 
     Support for transforms of the field was added.
+
+.. versionchanged:: 4.0
+
+    The ``default`` argument was added.
 
 Creating your own Aggregate Functions
 -------------------------------------
