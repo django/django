@@ -622,6 +622,7 @@ class WorkHour(models.Model):
 
 
 class Question(models.Model):
+    big_id = models.BigAutoField(primary_key=True)
     question = models.CharField(max_length=20)
     posted = models.DateField(default=datetime.date.today)
     expires = models.DateTimeField(null=True, blank=True)
