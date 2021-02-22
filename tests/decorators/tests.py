@@ -470,7 +470,7 @@ class XFrameOptionsDecoratorsTests(TestCase):
         self.assertIsNone(r.get('X-Frame-Options', None))
 
 
-class NeverCacheDecoratorTest(TestCase):
+class NeverCacheDecoratorTest(SimpleTestCase):
     def test_never_cache_decorator(self):
         @never_cache
         def a_view(request):
@@ -480,3 +480,30 @@ class NeverCacheDecoratorTest(TestCase):
             set(r.headers['Cache-Control'].split(', ')),
             {'max-age=0', 'no-cache', 'no-store', 'must-revalidate', 'private'},
         )
+
+    def test_never_cache_decorator_http_request(self):
+        class MyClass:
+            @never_cache
+            def a_view(self, request):
+                return HttpResponse()
+        msg = (
+            "never_cache didn't receive an HttpRequest. If you are decorating "
+            "a classmethod, be sure to use @method_decorator."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            MyClass().a_view(HttpRequest())
+
+
+class CacheControlDecoratorTest(SimpleTestCase):
+    def test_cache_control_decorator_http_request(self):
+        class MyClass:
+            @cache_control(a='b')
+            def a_view(self, request):
+                return HttpResponse()
+
+        msg = (
+            "cache_control didn't receive an HttpRequest. If you are "
+            "decorating a classmethod, be sure to use @method_decorator."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            MyClass().a_view(HttpRequest())
