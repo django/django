@@ -1764,6 +1764,31 @@ class ModelMultipleChoiceFieldTests(TestCase):
         with self.assertRaises(ValidationError):
             f.clean([c6.id])
 
+    def test_model_multiple_choice_field_validate_choices_called_properly(self):
+        c1 = self.c1
+
+        class CustomModelMultipleChoiceField(forms.ModelMultipleChoiceField, TestCase):
+            def validate_choices(self, queryset, field_name, selected_choices):
+                self.assertIsInstance(queryset, models.QuerySet)
+                self.assertSequenceEqual(queryset, [c1])
+                self.assertIsInstance(field_name, str)
+                self.assertEqual(field_name, 'pk')
+                self.assertIsInstance(selected_choices, frozenset)
+                self.assertEqual(selected_choices, frozenset([c1.id]))
+                raise ValidationError('custom_error')
+
+        with self.assertNumQueries(1):
+            field = CustomModelMultipleChoiceField(Category.objects.all())
+            with self.assertRaisesMessage(ValidationError, 'custom_error'):
+                field.clean([self.c1.id])
+
+    def test_model_multiple_choice_field_validate_choices(self):
+        with self.assertNumQueries(1):
+            field = forms.ModelMultipleChoiceField(Category.objects.all())
+            with self.assertRaises(ValidationError) as cm:
+                field.validate_choices(field.queryset, 'name', ['test'])
+        self.assertEqual(cm.exception.params, {'value': 'test'})
+
     def test_model_multiple_choice_required_false(self):
         f = forms.ModelMultipleChoiceField(Category.objects.all(), required=False)
         self.assertIsInstance(f.clean([]), EmptyQuerySet)

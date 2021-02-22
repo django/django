@@ -1355,6 +1355,15 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
 
         Same as :class:`ModelChoiceField.iterator`.
 
+.. method:: ModelMultipleChoiceField.validate_choices(queryset, field_name, selected_choices)
+
+``validate_choices`` gets called with the filtered ``queryset``, the name
+of the field, and the list of selected values. It should return the queryset.
+
+The default implementation raises a ``ValidationError`` in case any of the
+``values`` is not in the list of attribute lookups of ``field_name`` in ``queryset``
+(using the string representations for comparison).
+
 .. _iterating-relationship-choices:
 
 Iterating relationship choices

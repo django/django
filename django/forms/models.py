@@ -1364,16 +1364,19 @@ class ModelMultipleChoiceField(ModelChoiceField):
                     code='invalid_pk_value',
                     params={'pk': pk},
                 )
-        qs = self.queryset.filter(**{'%s__in' % key: value})
-        pks = {str(getattr(o, key)) for o in qs}
-        for val in value:
+        queryset = self.queryset.filter(**{'%s__in' % key: value})
+        return self.validate_choices(queryset, key, value)
+
+    def validate_choices(self, queryset, field_name, selected_choices):
+        pks = {str(getattr(o, field_name)) for o in queryset}
+        for val in selected_choices:
             if str(val) not in pks:
                 raise ValidationError(
                     self.error_messages['invalid_choice'],
                     code='invalid_choice',
                     params={'value': val},
                 )
-        return qs
+        return queryset
 
     def prepare_value(self, value):
         if (hasattr(value, '__iter__') and
