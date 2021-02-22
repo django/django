@@ -306,7 +306,8 @@ The class has the following methods:
   Otherwise, an instance of the default backend will be instantiated and
   used. If the keyword argument ``fail_silently`` is ``True``, exceptions
   raised while sending the message will be quashed. An empty list of
-  recipients will not raise an exception.
+  recipients will not raise an exception. It will return ``1`` if the message
+  was sent successfully, otherwise ``0``.
 
 * ``message()`` constructs a ``django.core.mail.SafeMIMEText`` object (a
   subclass of Python's :class:`~email.mime.text.MIMEText` class) or a
