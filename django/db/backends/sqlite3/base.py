@@ -251,7 +251,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         create_deterministic_function('SQRT', 1, none_guard(math.sqrt))
         create_deterministic_function('TAN', 1, none_guard(math.tan))
         # Don't use the built-in RANDOM() function because it returns a value
-        # in the range [2^63, 2^63 - 1] instead of [0, 1).
+        # in the range [-1 * 2^63, 2^63 - 1] instead of [0, 1).
         conn.create_function('RAND', 0, random.random)
         conn.create_aggregate('STDDEV_POP', 1, list_aggregate(statistics.pstdev))
         conn.create_aggregate('STDDEV_SAMP', 1, list_aggregate(statistics.stdev))
