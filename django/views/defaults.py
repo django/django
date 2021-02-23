@@ -133,7 +133,7 @@ def permission_denied(request, exception, template_name=ERROR_403_TEMPLATE_NAME)
     Templates: :template:`403.html`
     Context:
         exception
-            The message from the exception which triggered the 404 (if one was
+            The message from the exception which triggered the 403 (if one was
             supplied), or the exception class name
 
     If the template does not exist, an Http403 response containing the text
