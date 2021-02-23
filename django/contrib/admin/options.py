@@ -2,7 +2,7 @@ import copy
 import json
 import operator
 import re
-from functools import partial, reduce, update_wrapper
+from functools import partial, reduce
 from urllib.parse import quote as urlquote
 
 from django import forms
