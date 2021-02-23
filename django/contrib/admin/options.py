@@ -612,10 +612,9 @@ class ModelAdmin(BaseModelAdmin):
         from django.urls import path
 
         def wrap(view):
-            def wrapper(*args, **kwargs):
-                return self.admin_site.admin_view(view)(*args, **kwargs)
-            wrapper.model_admin = self
-            return update_wrapper(wrapper, view)
+            wrapped = self.admin_site.admin_view(view)
+            wrapped.model_admin = self
+            return wrapped
 
         info = self.model._meta.app_label, self.model._meta.model_name
 

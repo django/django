@@ -246,10 +246,9 @@ class AdminSite:
         from django.urls import include, path, re_path
 
         def wrap(view, cacheable=False):
-            def wrapper(*args, **kwargs):
-                return self.admin_view(view, cacheable)(*args, **kwargs)
-            wrapper.admin_site = self
-            return update_wrapper(wrapper, view)
+            wrapped = self.admin_view(view, cacheable)
+            wrapped.admin_site = self
+            return wrapped
 
         # Admin-site-wide views.
         urlpatterns = [
