@@ -206,6 +206,8 @@ Management Commands
 * The :djadmin:`runserver` management command now supports the
   :option:`--skip-checks` option.
 
+* On PostgreSQL, :djadmin:`dbshell` now supports specifying a password file.
+
 Migrations
 ~~~~~~~~~~
 

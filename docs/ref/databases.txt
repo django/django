@@ -115,9 +115,9 @@ PostgreSQL connection settings
 
 See :setting:`HOST` for details.
 
-To connect using a service name from the `connection service file`_, you must
-specify it in the :setting:`OPTIONS` part of your database configuration in
-:setting:`DATABASES`:
+To connect using a service name from the `connection service file`_ and a
+password from the `password file`_, you must specify them in the
+:setting:`OPTIONS` part of your database configuration in :setting:`DATABASES`:
 
 .. code-block:: python
     :caption: settings.py
@@ -125,7 +125,10 @@ specify it in the :setting:`OPTIONS` part of your database configuration in
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'OPTIONS': {'service': 'my_service'},
+            'OPTIONS': {
+                'service': 'my_service',
+                'passfile': '.my_pgpass',
+            },
         }
     }
 
@@ -136,14 +139,20 @@ specify it in the :setting:`OPTIONS` part of your database configuration in
     host=localhost
     user=USER
     dbname=NAME
-    password=PASSWORD
     port=5432
 
+.. code-block:: text
+    :caption: .my_pgpass
+
+    localhost:5432:NAME:USER:PASSWORD
+
 .. _connection service file: https://www.postgresql.org/docs/current/libpq-pgservice.html
+.. _password file: https://www.postgresql.org/docs/current/libpq-pgpass.html
 
 .. versionchanged:: 4.0
 
-    Support for connecting by a service name was added.
+    Support for connecting by a service name, and specifying a password file
+    was added.
 
 Optimizing PostgreSQL's configuration
 -------------------------------------

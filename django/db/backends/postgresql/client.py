@@ -16,6 +16,7 @@ class DatabaseClient(BaseDatabaseClient):
         dbname = settings_dict.get('NAME')
         user = settings_dict.get('USER')
         passwd = settings_dict.get('PASSWORD')
+        passfile = options.get('passfile')
         service = options.get('service')
         sslmode = options.get('sslmode')
         sslrootcert = options.get('sslrootcert')
@@ -48,6 +49,8 @@ class DatabaseClient(BaseDatabaseClient):
             env['PGSSLCERT'] = str(sslcert)
         if sslkey:
             env['PGSSLKEY'] = str(sslkey)
+        if passfile:
+            env['PGPASSFILE'] = str(passfile)
         return args, env
 
     def runshell(self, parameters):
