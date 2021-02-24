@@ -14,6 +14,7 @@ from django.http import (
 )
 from django.template.response import TemplateResponse
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
+from django.utils.decorators import method_decorator
 from django.utils.functional import LazyObject
 from django.utils.module_loading import import_string
 from django.utils.text import capfirst
@@ -357,7 +358,7 @@ class AdminSite:
         """
         return JavaScriptCatalog.as_view(packages=['django.contrib.admin'])(request)
 
-    @never_cache
+    @method_decorator(never_cache)
     def logout(self, request, extra_context=None):
         """
         Log out the user for the given HttpRequest.
@@ -379,7 +380,7 @@ class AdminSite:
         request.current_app = self.name
         return LogoutView.as_view(**defaults)(request)
 
-    @never_cache
+    @method_decorator(never_cache)
     def login(self, request, extra_context=None):
         """
         Display the login form for the given HttpRequest.
@@ -514,7 +515,7 @@ class AdminSite:
 
         return app_list
 
-    @never_cache
+    @method_decorator(never_cache)
     def index(self, request, extra_context=None):
         """
         Display the main admin index page, which lists all of the installed
