@@ -38,7 +38,7 @@ def get_readable_exception(exception):
     return exception_repr
 
 
-# These can be called when CsrfViewMiddleware.process_view has not run,
+# These views can be called when CsrfViewMiddleware.process_view() not run,
 # therefore need @requires_csrf_token in case the template needs
 # {% csrf_token %}.
 
@@ -134,7 +134,7 @@ def permission_denied(request, exception, template_name=ERROR_403_TEMPLATE_NAME)
     Context:
         exception
             The message from the exception which triggered the 403 (if one was
-            supplied), or the exception class name
+            supplied).
 
     If the template does not exist, an Http403 response containing the text
     "403 Forbidden" (as per RFC 7231) will be returned.
