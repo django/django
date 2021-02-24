@@ -157,7 +157,7 @@ def teardown_test_environment():
 
 
 def setup_databases(verbosity, interactive, *, time_keeper=None, keepdb=False, debug_sql=False, parallel=0,
-                    aliases=None):
+                    aliases=None, **kwargs):
     """Create the test databases."""
     if time_keeper is None:
         time_keeper = NullTimeKeeper()
