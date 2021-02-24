@@ -1127,6 +1127,9 @@ class Subquery(Expression):
     def external_aliases(self):
         return self.query.external_aliases
 
+    def get_external_cols(self):
+        return self.query.get_external_cols()
+
     def as_sql(self, compiler, connection, template=None, query=None, **extra_context):
         connection.ops.check_expression_support(self)
         template_params = {**self.extra, **extra_context}
@@ -1141,7 +1144,7 @@ class Subquery(Expression):
     def get_group_by_cols(self, alias=None):
         if alias:
             return [Ref(alias, self)]
-        external_cols = self.query.get_external_cols()
+        external_cols = self.get_external_cols()
         if any(col.possibly_multivalued for col in external_cols):
             return [self]
         return external_cols

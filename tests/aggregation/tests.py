@@ -1311,6 +1311,21 @@ class AggregateTestCase(TestCase):
         #     self.assertSequenceEqual(books_qs, [book])
         # self.assertEqual(ctx[0]['sql'].count('SELECT'), 2)
 
+    @skipUnlessDBFeature('supports_subqueries_in_group_by')
+    def test_aggregation_nested_subquery_outerref(self):
+        publisher_with_same_name = Publisher.objects.filter(
+            id__in=Subquery(
+                Publisher.objects.filter(
+                    name=OuterRef(OuterRef('publisher__name')),
+                ).values('id'),
+            ),
+        ).values(publisher_count=Count('id'))[:1]
+        books_breakdown = Book.objects.annotate(
+            publisher_count=Subquery(publisher_with_same_name),
+            authors_count=Count('authors'),
+        ).values_list('publisher_count', flat=True)
+        self.assertSequenceEqual(books_breakdown, [1] * 6)
+
     def test_aggregation_random_ordering(self):
         """Random() is not included in the GROUP BY when used for ordering."""
         authors = Author.objects.annotate(contact_count=Count('book')).order_by('?')

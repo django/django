@@ -1072,7 +1072,7 @@ class Query(BaseExpression):
     def get_external_cols(self):
         exprs = chain(self.annotations.values(), self.where.children)
         return [
-            col for col in self._gen_cols(exprs)
+            col for col in self._gen_cols(exprs, include_external=True)
             if col.alias in self.external_aliases
         ]
 
@@ -1707,12 +1707,17 @@ class Query(BaseExpression):
         return targets, joins[-1], joins
 
     @classmethod
-    def _gen_cols(cls, exprs):
+    def _gen_cols(cls, exprs, include_external=False):
         for expr in exprs:
             if isinstance(expr, Col):
                 yield expr
+            elif include_external and callable(getattr(expr, 'get_external_cols', None)):
+                yield from expr.get_external_cols()
             else:
-                yield from cls._gen_cols(expr.get_source_expressions())
+                yield from cls._gen_cols(
+                    expr.get_source_expressions(),
+                    include_external=include_external,
+                )
 
     @classmethod
     def _gen_col_aliases(cls, exprs):
