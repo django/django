@@ -658,7 +658,7 @@ Methods
 
     Returns a ``TestSuite`` instance ready to be run.
 
-.. method:: DiscoverRunner.setup_databases(verbosity, interactive, **kwargs)
+.. method:: DiscoverRunner.setup_databases(**kwargs)
 
     Creates the test databases by calling
     :func:`~django.test.utils.setup_databases`.
