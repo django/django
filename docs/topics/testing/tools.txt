@@ -1690,7 +1690,7 @@ your test suite.
     provide an implicit ordering, you can set the ``ordered`` parameter to
     ``False``, which turns the comparison into a ``collections.Counter`` comparison.
     If the order is undefined (if the given ``qs`` isn't ordered and the
-    comparison is against more than one ordered values), a ``ValueError`` is
+    comparison is against more than one ordered value), a ``ValueError`` is
     raised.
 
     Output in case of error can be customized with the ``msg`` argument.
