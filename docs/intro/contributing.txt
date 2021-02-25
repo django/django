@@ -243,12 +243,12 @@ to Django's code, the entire test suite **should** pass. If you get failures or
 errors make sure you've followed all of the previous steps properly. See
 :ref:`running-unit-tests` for more information.
 
-Note that the latest Django master may not always be stable. When developing
-against master, you can check `Django's continuous integration builds`__ to
-determine if the failures are specific to your machine or if they are also
-present in Django's official builds. If you click to view a particular build,
-you can view the "Configuration Matrix" which shows failures broken down by
-Python version and database backend.
+Note that the latest Django "main" branch may not always be stable. When
+developing against "main", you can check `Django's continuous integration
+builds`__ to determine if the failures are specific to your machine or if they
+are also present in Django's official builds. If you click to view a particular
+build, you can view the "Configuration Matrix" which shows failures broken down
+by Python version and database backend.
 
 __ https://djangoci.com
 
