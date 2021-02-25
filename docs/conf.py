@@ -108,7 +108,7 @@ extlinks = {
     'commit': ('https://github.com/django/django/commit/%s', ''),
     'cve': ('https://nvd.nist.gov/vuln/detail/CVE-%s', 'CVE-'),
     # A file or directory. GitHub redirects from blob to tree if needed.
-    'source': ('https://github.com/django/django/blob/master/%s', ''),
+    'source': ('https://github.com/django/django/blob/main/%s', ''),
     'ticket': ('https://code.djangoproject.com/ticket/%s', '#'),
 }
 

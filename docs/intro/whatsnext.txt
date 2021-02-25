@@ -139,7 +139,7 @@ If you're using an official release of Django, the zipped package (tarball) of
 the code includes a ``docs/`` directory, which contains all the documentation
 for that release.
 
-If you're using the development version of Django (aka the master branch), the
+If you're using the development version of Django (aka the main branch), the
 ``docs/`` directory contains all of the documentation. You can update your
 Git checkout to get the latest changes.
 
@@ -191,7 +191,7 @@ __ https://www.gnu.org/software/make/
 Differences between versions
 ============================
 
-The text documentation in the master branch of the Git repository contains the
+The text documentation in the main branch of the Git repository contains the
 "latest and greatest" changes and additions. These changes include
 documentation of new features targeted for Django's next :term:`feature
 release <Feature release>`. For that reason, it's worth pointing out our policy
@@ -200,7 +200,7 @@ to highlight recent changes and additions to Django.
 We follow this policy:
 
 * The development documentation at https://docs.djangoproject.com/en/dev/ is
-  from the master branch. These docs correspond to the latest feature release,
+  from the main branch. These docs correspond to the latest feature release,
   plus whatever features have been added/changed in the framework since then.
 
 * As we add features to Django's development version, we update the
