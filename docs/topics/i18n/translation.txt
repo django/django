@@ -2020,8 +2020,8 @@ Notes:
   set :setting:`LANGUAGES` to a list of languages. For example::
 
       LANGUAGES = [
-        ('de', _('German')),
-        ('en', _('English')),
+          ('de', _('German')),
+          ('en', _('English')),
       ]
 
   This example restricts languages that are available for automatic
