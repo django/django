@@ -169,5 +169,5 @@ creating an object that specifies the following attributes:
 * ``'loader_name'``: An optional string identifying the function or class used
   to load the template, e.g. ``django.template.loaders.filesystem.Loader``.
 
-.. _DEP 182: https://github.com/django/deps/blob/master/final/0182-multiple-template-engines.rst
+.. _DEP 182: https://github.com/django/deps/blob/main/final/0182-multiple-template-engines.rst
 .. _Django Debug Toolbar: https://github.com/jazzband/django-debug-toolbar
