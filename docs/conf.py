@@ -61,6 +61,8 @@ spelling_lang = 'en_US'
 # Location of word list.
 spelling_word_list_filename = 'spelling_wordlist'
 
+spelling_warning = True
+
 # Add any paths that contain templates here, relative to this directory.
 # templates_path = []
 
@@ -125,7 +127,7 @@ today_fmt = '%B %d, %Y'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build', '_theme']
+exclude_patterns = ['_build', '_theme', 'requirements.txt']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 default_role = "default-role-error"
