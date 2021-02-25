@@ -203,6 +203,8 @@ class TestHashedFiles:
         self.assertIn(os.path.join('cached', 'css', 'window.css'), stats['post_processed'])
         self.assertIn(os.path.join('cached', 'css', 'img', 'window.png'), stats['unmodified'])
         self.assertIn(os.path.join('test', 'nonascii.css'), stats['post_processed'])
+        # No file should be yielded twice.
+        self.assertCountEqual(stats['post_processed'], set(stats['post_processed']))
         self.assertPostCondition()
 
     def test_css_import_case_insensitive(self):
