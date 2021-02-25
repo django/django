@@ -1,4 +1,5 @@
 import os
+import unittest
 from argparse import ArgumentParser
 from contextlib import contextmanager
 from unittest import TestSuite, TextTestRunner, defaultTestLoader, mock
@@ -341,6 +342,10 @@ class DiscoverRunnerTests(SimpleTestCase):
         self.assertIn('test', stderr.getvalue())
 
 
+def get_suite():
+    return unittest.defaultTestLoader.loadTestsFromName('test_runner_apps.databases.tests')
+
+
 class DiscoverRunnerGetDatabasesTests(SimpleTestCase):
     runner = DiscoverRunner(verbosity=2)
     skip_msg = 'Skipping setup of unused database(s): '
@@ -396,3 +401,9 @@ class DiscoverRunnerGetDatabasesTests(SimpleTestCase):
             'test_runner_apps.databases.tests.DefaultDatabaseSerializedTests'
         ])
         self.assertEqual(databases, {'default': True})
+
+    def test_nested_suite(self):
+        databases, _ = self.get_databases([
+            'test_runner.test_discover_runner.get_suite',
+        ])
+        self.assertEqual(databases, {'default': True, 'other': False})

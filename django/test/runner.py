@@ -681,25 +681,20 @@ class DiscoverRunner:
     def suite_result(self, suite, result, **kwargs):
         return len(result.failures) + len(result.errors)
 
-    def _get_databases(self, suite):
+    def get_databases(self, suite):
         databases = {}
         for test in suite:
-            if isinstance(test, unittest.TestCase):
-                test_databases = getattr(test, 'databases', None)
-                if test_databases == '__all__':
-                    test_databases = connections
-                if test_databases:
-                    serialized_rollback = getattr(test, 'serialized_rollback', False)
-                    databases.update(
-                        (alias, serialized_rollback or databases.get(alias, False))
-                        for alias in test_databases
-                    )
-            else:
-                databases.update(self._get_databases(test))
-        return databases
-
-    def get_databases(self, suite):
-        databases = self._get_databases(suite)
+            if not isinstance(test, unittest.TestCase):
+                continue
+            test_databases = getattr(test, 'databases', None)
+            if test_databases == '__all__':
+                test_databases = connections
+            if test_databases:
+                serialized_rollback = getattr(test, 'serialized_rollback', False)
+                databases.update(
+                    (alias, serialized_rollback or databases.get(alias, False))
+                    for alias in test_databases
+                )
         if self.verbosity >= 2:
             unused_databases = [alias for alias in connections if alias not in databases]
             if unused_databases:
