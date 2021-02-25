@@ -1,0 +1,33 @@
+name: Docs
+
+on:
+  pull_request:
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    name: docs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - run: pip3 install sphinx pyenchant sphinxcontrib-spelling
+      - name: Build docs
+        run: |
+          WARNINGS_LOG=doc_warnings
+          SPELLING_LOG=_build/spelling
+          cd docs
+          sphinx-build -b spelling -n -q -w $WARNINGS_LOG -d _build/doctrees -D language=en_US . _build/spelling
+          RETURN_CODE=$?
+          if [ -s $WARNINGS_LOG ]; then
+            echo "Documentation build errors:"
+            cat $WARNINGS_LOG
+            echo "Spelling errors (please add real words to docs/spelling_wordlist):'"
+            find $SPELLING_LOG -type f -name *.spelling | xargs cat
+            # Warnings don't cause build to exit with error code
+            exit 1
+          fi
+          exit $RETURN_CODE
