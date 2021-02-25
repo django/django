@@ -578,7 +578,7 @@ class TemporalSubtraction(CombinedExpression):
         return connection.ops.subtract_temporals(self.lhs.output_field.get_internal_type(), lhs, rhs)
 
 
-@deconstructible
+@deconstructible(path='django.db.models.F')
 class F(Combinable):
     """An object capable of resolving references to existing query objects."""
 
