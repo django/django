@@ -406,6 +406,15 @@ class URLNode(Node):
         self.kwargs = kwargs
         self.asvar = asvar
 
+    def __repr__(self):
+        return "<%s view_name='%s' args=%s kwargs=%s as=%s>" % (
+            self.__class__.__qualname__,
+            self.view_name,
+            repr(self.args),
+            repr(self.kwargs),
+            repr(self.asvar),
+        )
+
     def render(self, context):
         from django.urls import NoReverseMatch, reverse
         args = [arg.resolve(context) for arg in self.args]
