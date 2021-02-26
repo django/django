@@ -695,12 +695,6 @@ You can also refer to fields on related models with reverse relations through
    pronounced if you include multiple such fields in your ``values()`` query,
    in which case all possible combinations will be returned.
 
-.. admonition:: Boolean values for ``JSONField`` on SQLite
-
-    Due to the way the ``JSON_EXTRACT`` SQL function is implemented on SQLite,
-    ``values()`` will return ``1`` and ``0`` instead of ``True`` and ``False``
-    for :class:`~django.db.models.JSONField` key transforms.
-
 ``values_list()``
 ~~~~~~~~~~~~~~~~~
 
@@ -770,12 +764,6 @@ not having any author::
 
     >>> Entry.objects.values_list('authors')
     <QuerySet [('Noam Chomsky',), ('George Orwell',), (None,)]>
-
-.. admonition:: Boolean values for ``JSONField`` on SQLite
-
-    Due to the way the ``JSON_EXTRACT`` SQL function is implemented on SQLite,
-    ``values_list()`` will return ``1`` and ``0`` instead of ``True`` and
-    ``False`` for :class:`~django.db.models.JSONField` key transforms.
 
 ``dates()``
 ~~~~~~~~~~~
