@@ -869,3 +869,5 @@ configured:
   contain the :setting:`STATIC_ROOT` setting.
 * **staticfiles.E003**: The prefix ``<prefix>`` in the
   :setting:`STATICFILES_DIRS` setting must not end with a slash.
+* **staticfiles.W004**: The directory ``<directory>`` in the
+  :setting:`STATICFILES_DIRS` does not exist.
