@@ -13,7 +13,7 @@ class DatabaseClient(BaseDatabaseClient):
 
         host = settings_dict.get('HOST')
         port = settings_dict.get('PORT')
-        dbname = settings_dict.get('NAME') or 'postgres'
+        dbname = settings_dict.get('NAME')
         user = settings_dict.get('USER')
         passwd = settings_dict.get('PASSWORD')
         service = options.get('service')
@@ -22,13 +22,17 @@ class DatabaseClient(BaseDatabaseClient):
         sslcert = options.get('sslcert')
         sslkey = options.get('sslkey')
 
+        if not dbname and not service:
+            # Connect to the default 'postgres' db.
+            dbname = 'postgres'
         if user:
             args += ['-U', user]
         if host:
             args += ['-h', host]
         if port:
             args += ['-p', str(port)]
-        args += [dbname]
+        if dbname:
+            args += [dbname]
         args.extend(parameters)
 
         env = {}
