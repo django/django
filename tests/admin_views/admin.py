@@ -1,6 +1,4 @@
 import datetime
-import os
-import tempfile
 from io import StringIO
 from wsgiref.util import FileWrapper
 
@@ -11,7 +9,6 @@ from django.contrib.admin.views.main import ChangeList
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
-from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMessage
 from django.db import models
 from django.forms.models import BaseModelFormSet
@@ -361,10 +358,6 @@ class EmptyModelAdmin(admin.ModelAdmin):
 
 class OldSubscriberAdmin(admin.ModelAdmin):
     actions = None
-
-
-temp_storage = FileSystemStorage(tempfile.mkdtemp())
-UPLOAD_TO = os.path.join(temp_storage.location, 'test_upload')
 
 
 class PictureInline(admin.TabularInline):
