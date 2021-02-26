@@ -1,5 +1,4 @@
 import datetime
-import os
 import tempfile
 import uuid
 
@@ -345,7 +344,6 @@ class EmptyModel(models.Model):
 
 
 temp_storage = FileSystemStorage(tempfile.mkdtemp())
-UPLOAD_TO = os.path.join(temp_storage.location, 'test_upload')
 
 
 class Gallery(models.Model):
