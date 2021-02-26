@@ -289,7 +289,10 @@ class AssertQuerysetEqualTests(TestCase):
     def test_undefined_order(self):
         # Using an unordered queryset with more than one ordered value
         # is an error.
-        msg = 'Trying to compare non-ordered queryset against more than one ordered values'
+        msg = (
+            'Trying to compare non-ordered queryset against more than one '
+            'ordered value.'
+        )
         with self.assertRaisesMessage(ValueError, msg):
             self.assertQuerysetEqual(
                 Person.objects.all(),

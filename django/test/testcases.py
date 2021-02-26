@@ -1066,8 +1066,10 @@ class TransactionTestCase(SimpleTestCase):
         # For example qs.iterator() could be passed as qs, but it does not
         # have 'ordered' attribute.
         if len(values) > 1 and hasattr(qs, 'ordered') and not qs.ordered:
-            raise ValueError("Trying to compare non-ordered queryset "
-                             "against more than one ordered values")
+            raise ValueError(
+                'Trying to compare non-ordered queryset against more than one '
+                'ordered value.'
+            )
         return self.assertEqual(list(items), values, msg=msg)
 
     def assertNumQueries(self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs):
