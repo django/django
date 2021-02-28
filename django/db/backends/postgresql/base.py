@@ -107,7 +107,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'exact': '= %s',
         'iexact': '= UPPER(%s)',
         'contains': 'LIKE %s',
-        'icontains': 'LIKE UPPER(%s)',
+        'icontains': 'ILIKE %s',
         'regex': '~ %s',
         'iregex': '~* %s',
         'gt': '> %s',
@@ -116,8 +116,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'lte': '<= %s',
         'startswith': 'LIKE %s',
         'endswith': 'LIKE %s',
-        'istartswith': 'LIKE UPPER(%s)',
-        'iendswith': 'LIKE UPPER(%s)',
+        'istartswith': 'ILIKE %s',
+        'iendswith': 'ILIKE %s',
     }
 
     # The patterns below are used to generate SQL pattern lookup clauses when
@@ -131,11 +131,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     pattern_esc = r"REPLACE(REPLACE(REPLACE({}, E'\\', E'\\\\'), E'%%', E'\\%%'), E'_', E'\\_')"
     pattern_ops = {
         'contains': "LIKE '%%' || {} || '%%'",
-        'icontains': "LIKE '%%' || UPPER({}) || '%%'",
+        'icontains': "ILIKE '%%' || {} || '%%'",
         'startswith': "LIKE {} || '%%'",
-        'istartswith': "LIKE UPPER({}) || '%%'",
+        'istartswith': "ILIKE {} || '%%'",
         'endswith': "LIKE '%%' || {}",
-        'iendswith': "LIKE '%%' || UPPER({})",
+        'iendswith': "ILIKE '%%' || {}",
     }
 
     Database = Database
