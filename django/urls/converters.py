@@ -1,6 +1,8 @@
 import uuid
 from functools import lru_cache
 
+from django.utils.http import base36_to_int, int_to_base36
+
 
 class IntConverter:
     regex = '[0-9]+'
@@ -10,6 +12,18 @@ class IntConverter:
 
     def to_url(self, value):
         return str(value)
+
+
+class Base36Converter:
+    regex = '[0-9a-z]+'
+
+    def to_python(self, value):
+        return base36_to_int(value)
+
+    def to_url(self, value):
+        if isinstance(value, str):
+            return value
+        return int_to_base36(value)
 
 
 class StringConverter:
@@ -42,6 +56,7 @@ class PathConverter(StringConverter):
 
 DEFAULT_CONVERTERS = {
     'int': IntConverter(),
+    'base36': Base36Converter(),
     'path': PathConverter(),
     'slug': SlugConverter(),
     'str': StringConverter(),

@@ -121,6 +121,11 @@ The following path converters are available by default:
 
 * ``int`` - Matches zero or any positive integer. Returns an ``int``.
 
+* ``base36`` - Matches zero or any positive integer, formatted as a base 36 string.
+  See :data:`django.utils.http.base36_to_int`. Returns an ``int``.
+
+  .. versionadded:: 4.0
+
 * ``slug`` - Matches any slug string consisting of ASCII letters or numbers,
   plus the hyphen and underscore characters. For example,
   ``building-your-1st-django-site``.
@@ -133,6 +138,7 @@ The following path converters are available by default:
 * ``path`` - Matches any non-empty string, including the path separator,
   ``'/'``. This allows you to match against a complete URL path rather than
   a segment of a URL path as with ``str``.
+
 
 .. _registering-custom-path-converters:
 
