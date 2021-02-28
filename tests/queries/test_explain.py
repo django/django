@@ -30,6 +30,14 @@ class ExplainTests(TestCase):
                         result = queryset.explain(format=format)
                         self.assertTrue(captured_queries[0]['sql'].startswith(connection.ops.explain_prefix))
                         self.assertIsInstance(result, str)
+                        if connection.vendor == 'postgresql':
+                            if format == 'json':
+                                self.assertIsInstance(result, dict)
+                            else:
+                                self.assertIsInstance(result, str)
+                        else:
+                            self.assertIsInstance(result, str)
+
                         self.assertTrue(result)
 
     @skipUnlessDBFeature('validates_explain_options')
