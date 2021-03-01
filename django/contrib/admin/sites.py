@@ -358,7 +358,6 @@ class AdminSite:
         """
         return JavaScriptCatalog.as_view(packages=['django.contrib.admin'])(request)
 
-    @method_decorator(never_cache)
     def logout(self, request, extra_context=None):
         """
         Log out the user for the given HttpRequest.
@@ -515,7 +514,6 @@ class AdminSite:
 
         return app_list
 
-    @method_decorator(never_cache)
     def index(self, request, extra_context=None):
         """
         Display the main admin index page, which lists all of the installed
