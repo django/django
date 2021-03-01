@@ -65,7 +65,7 @@ editing content:
         from myapp.forms import ContactForm
         from django.views.generic.edit import FormView
 
-        class ContactView(FormView):
+        class ContactFormView(FormView):
             template_name = 'contact.html'
             form_class = ContactForm
             success_url = '/thanks/'
@@ -141,7 +141,7 @@ editing content:
         from django.views.generic.edit import CreateView
         from myapp.models import Author
 
-        class AuthorCreate(CreateView):
+        class AuthorCreateView(CreateView):
             model = Author
             fields = ['name']
 
@@ -220,7 +220,7 @@ editing content:
         from django.views.generic.edit import UpdateView
         from myapp.models import Author
 
-        class AuthorUpdate(UpdateView):
+        class AuthorUpdateView(UpdateView):
             model = Author
             fields = ['name']
             template_name_suffix = '_update_form'
@@ -295,7 +295,7 @@ editing content:
         from django.views.generic.edit import DeleteView
         from myapp.models import Author
 
-        class AuthorDelete(DeleteView):
+        class AuthorDeleteView(DeleteView):
             model = Author
             success_url = reverse_lazy('author-list')
 
