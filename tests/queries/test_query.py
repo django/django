@@ -4,8 +4,8 @@ from django.core.exceptions import FieldError
 from django.db.models import BooleanField, CharField, F, Q
 from django.db.models.expressions import Col, Func
 from django.db.models.fields.related_lookups import RelatedIsNull
-from django.db.models.functions import Lower
-from django.db.models.lookups import Exact, GreaterThan, IsNull, LessThan
+from django.db.models.functions import Lower, ExtractYear
+from django.db.models.lookups import Exact, GreaterThan, IsNull, LessThan, YearExact
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import OR
 from django.test import SimpleTestCase
@@ -88,6 +88,35 @@ class TestQuery(SimpleTestCase):
         self.assertIsInstance(lookup, LessThan)
         self.assertEqual(lookup.lhs.target, Item._meta.get_field('modified'))
         lookup = where.children[1]
+        self.assertIsInstance(lookup, IsNull)
+        self.assertEqual(lookup.lhs.target, Item._meta.get_field('modified'))
+
+    def test_negated_annotation_nullable(self):
+        query = Query(Item.objects.annotate(year=ExtractYear('modified')).exclude(modified='2021'))
+        clause = query.build_filter(
+            ('year', '2021'),
+            branch_negated=True,
+            current_negated=True,
+            can_reuse=set()
+        )
+        lookup = clause.children[0]
+        self.assertIsInstance(lookup, YearExact)
+        self.assertEqual(lookup.lhs.target, Item._meta.get_field('modified'))
+        lookup = clause.children[1]
+        self.assertIsInstance(lookup, IsNull)
+        self.assertEqual(lookup.lhs.target, Item._meta.get_field('modified'))
+
+        query_with_lt = Query(Item.objects.annotate(year=ExtractYear('modified')).exclude(modified__lt='2021'))
+        clause = query_with_lt.build_filter(
+            ('year', '2021'),
+            branch_negated=True,
+            current_negated=True,
+            can_reuse=set()
+        )
+        lookup = clause.children[0]
+        self.assertIsInstance(lookup, LessThan)
+        self.assertEqual(lookup.lhs.target, Item._meta.get_field('modified'))
+        lookup = clause.children[1]
         self.assertIsInstance(lookup, IsNull)
         self.assertEqual(lookup.lhs.target, Item._meta.get_field('modified'))
 

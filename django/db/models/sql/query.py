@@ -1299,13 +1299,28 @@ class Query(BaseExpression):
             self.check_filterable(value)
 
         clause = self.where_class()
+        alias = self.get_initial_alias()
         if reffed_expression:
             condition = self.build_lookup(lookups, reffed_expression, value)
+            lookup_type = condition.lookup_name
+            target = reffed_expression.get_source_expressions()[0].target
             clause.add(condition, AND)
-            return clause, []
+            if current_negated and lookup_type != 'isnull' and condition.rhs is not None and self.is_nullable(target):
+                # The condition added here will be SQL like this:
+                # NOT (col IS NOT NULL), where the first NOT is added in
+                # upper layers of code. The reason for addition is that if col
+                # is null, then col != someval will result in SQL "unknown"
+                # which isn't the same as in Python. The Python None handling
+                # is wanted, and it can be gotten by
+                # (col IS NULL OR col != someval)
+                #   <=>
+                # NOT (col IS NOT NULL AND col = someval).
+                lookup_class = target.get_lookup('isnull')
+                col = self._get_col(target, target, alias)
+                clause.add(lookup_class(col, False), AND)
+            return clause, ()
 
         opts = self.get_meta()
-        alias = self.get_initial_alias()
         allow_many = not branch_negated or not split_subq
 
         try:
