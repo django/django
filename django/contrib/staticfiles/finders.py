@@ -75,6 +75,7 @@ class FileSystemFinder(BaseFinder):
                 hint='Perhaps you forgot a trailing comma?',
                 id='staticfiles.E001',
             ))
+            return errors
         for root in settings.STATICFILES_DIRS:
             if isinstance(root, (list, tuple)):
                 prefix, root = root
