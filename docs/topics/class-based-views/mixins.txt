@@ -229,7 +229,7 @@ We'll demonstrate this with the ``Author`` model we used in the
     from django.views.generic.detail import SingleObjectMixin
     from books.models import Author
 
-    class RecordInterest(SingleObjectMixin, View):
+    class RecordInterestView(SingleObjectMixin, View):
         """Records the current user's interest in an author."""
         model = Author
 
@@ -256,11 +256,11 @@ We can hook this into our URLs easily enough:
     :caption: urls.py
 
     from django.urls import path
-    from books.views import RecordInterest
+    from books.views import RecordInterestView
 
     urlpatterns = [
         #...
-        path('author/<int:pk>/interest/', RecordInterest.as_view(), name='author-interest'),
+        path('author/<int:pk>/interest/', RecordInterestView.as_view(), name='author-interest'),
     ]
 
 Note the ``pk`` named group, which
@@ -307,13 +307,13 @@ object. In order to do this, we need to have two different querysets:
     will add in the suitable ``page_obj`` and ``paginator`` for us
     providing we remember to call ``super()``.
 
-Now we can write a new ``PublisherDetail``::
+Now we can write a new ``PublisherDetailView``::
 
     from django.views.generic import ListView
     from django.views.generic.detail import SingleObjectMixin
     from books.models import Publisher
 
-    class PublisherDetail(SingleObjectMixin, ListView):
+    class PublisherDetailView(SingleObjectMixin, ListView):
         paginate_by = 2
         template_name = "books/publisher_detail.html"
 
@@ -434,7 +434,7 @@ code so that on ``POST`` the form gets called appropriately.
     both of the views implement ``get()``, and things would get much more
     confusing.
 
-Our new ``AuthorDetail`` looks like this::
+Our new ``AuthorDetailView`` looks like this::
 
     # CAUTION: you almost certainly do not want to do this.
     # It is provided as part of a discussion of problems you can
@@ -451,7 +451,7 @@ Our new ``AuthorDetail`` looks like this::
     class AuthorInterestForm(forms.Form):
         message = forms.CharField()
 
-    class AuthorDetail(FormMixin, DetailView):
+    class AuthorDetailView(FormMixin, DetailView):
         model = Author
         form_class = AuthorInterestForm
 
@@ -504,8 +504,8 @@ clear division here: ``GET`` requests should get the
 data), and ``POST`` requests should get the :class:`FormView`. Let's
 set up those views first.
 
-The ``AuthorDisplay`` view is almost the same as :ref:`when we
-first introduced AuthorDetail<generic-views-extra-work>`; we have to
+The ``AuthorDetailView`` view is almost the same as :ref:`when we
+first introduced AuthorDetailView<generic-views-extra-work>`; we have to
 write our own ``get_context_data()`` to make the
 ``AuthorInterestForm`` available to the template. We'll skip the
 ``get_object()`` override from before for clarity::
@@ -517,7 +517,7 @@ write our own ``get_context_data()`` to make the
     class AuthorInterestForm(forms.Form):
         message = forms.CharField()
 
-    class AuthorDisplay(DetailView):
+    class AuthorDetailView(DetailView):
         model = Author
 
         def get_context_data(self, **kwargs):
@@ -525,18 +525,18 @@ write our own ``get_context_data()`` to make the
             context['form'] = AuthorInterestForm()
             return context
 
-Then the ``AuthorInterest`` is a :class:`FormView`, but we have to bring in
+Then the ``AuthorInterestForm`` is a :class:`FormView`, but we have to bring in
 :class:`~django.views.generic.detail.SingleObjectMixin` so we can find the
 author we're talking about, and we have to remember to set ``template_name`` to
-ensure that form errors will render the same template as ``AuthorDisplay`` is
-using on ``GET``::
+ensure that form errors will render the same template as ``AuthorDetailView``
+is using on ``GET``::
 
     from django.http import HttpResponseForbidden
     from django.urls import reverse
     from django.views.generic import FormView
     from django.views.generic.detail import SingleObjectMixin
 
-    class AuthorInterest(SingleObjectMixin, FormView):
+    class AuthorInterestFormView(SingleObjectMixin, FormView):
         template_name = 'books/author_detail.html'
         form_class = AuthorInterestForm
         model = Author
@@ -550,26 +550,26 @@ using on ``GET``::
         def get_success_url(self):
             return reverse('author-detail', kwargs={'pk': self.object.pk})
 
-Finally we bring this together in a new ``AuthorDetail`` view. We
+Finally we bring this together in a new ``AuthorView`` view. We
 already know that calling :meth:`~django.views.generic.base.View.as_view()` on
 a class-based view gives us something that behaves exactly like a function
 based view, so we can do that at the point we choose between the two subviews.
 
 You can pass through keyword arguments to
 :meth:`~django.views.generic.base.View.as_view()` in the same way you
-would in your URLconf, such as if you wanted the ``AuthorInterest`` behavior
-to also appear at another URL but using a different template::
+would in your URLconf, such as if you wanted the ``AuthorInterestFormView``
+behavior to also appear at another URL but using a different template::
 
     from django.views import View
 
-    class AuthorDetail(View):
+    class AuthorView(View):
 
         def get(self, request, *args, **kwargs):
-            view = AuthorDisplay.as_view()
+            view = AuthorDetailView.as_view()
             return view(request, *args, **kwargs)
 
         def post(self, request, *args, **kwargs):
-            view = AuthorInterest.as_view()
+            view = AuthorInterestFormView.as_view()
             return view(request, *args, **kwargs)
 
 This approach can also be used with any other generic class-based

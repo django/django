@@ -369,7 +369,7 @@ Adding messages in class-based views
     from django.views.generic.edit import CreateView
     from myapp.models import Author
 
-    class AuthorCreate(SuccessMessageMixin, CreateView):
+    class AuthorCreateView(SuccessMessageMixin, CreateView):
         model = Author
         success_url = '/success/'
         success_message = "%(name)s was created successfully"
@@ -386,7 +386,7 @@ method.
     from django.views.generic.edit import CreateView
     from myapp.models import ComplicatedModel
 
-    class ComplicatedCreate(SuccessMessageMixin, CreateView):
+    class ComplicatedCreateView(SuccessMessageMixin, CreateView):
         model = ComplicatedModel
         success_url = '/success/'
         success_message = "%(calculated_field)s was created successfully"
