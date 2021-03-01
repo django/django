@@ -145,6 +145,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         one or more columns. Also retrieve the definition of expression-based
         indexes.
         """
+        cursor.execute("SELECT current_schema();")
+        current_schema = list(cursor.fetchall())[0][0]
         constraints = {}
         # Loop over the key table, collecting things as constraints. The column
         # array must return column names in the same order in which they were
@@ -207,10 +209,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 LEFT JOIN pg_class c2 ON idx.indexrelid = c2.oid
                 LEFT JOIN pg_am am ON c2.relam = am.oid
                 LEFT JOIN pg_attribute attr ON attr.attrelid = c.oid AND attr.attnum = idx.key
+                JOIN pg_namespace nsp ON nsp.oid = c.relnamespace AND nsp.nspname = %s
                 WHERE c.relname = %s AND pg_catalog.pg_table_is_visible(c.oid)
             ) s2
             GROUP BY indexname, indisunique, indisprimary, amname, exprdef, attoptions;
-        """, [self.index_default_access_method, table_name])
+        """, [self.index_default_access_method, current_schema, table_name])
         for index, columns, unique, primary, orders, type_, definition, options in cursor.fetchall():
             if index not in constraints:
                 basic_index = (
