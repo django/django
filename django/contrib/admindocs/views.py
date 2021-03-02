@@ -1,4 +1,5 @@
 import inspect
+import re
 from importlib import import_module
 from inspect import cleandoc
 from pathlib import Path
@@ -411,8 +412,7 @@ def simplify_regex(pattern):
     """
     pattern = replace_named_groups(pattern)
     pattern = replace_unnamed_groups(pattern)
-    # clean up any outstanding regex-y characters.
-    pattern = pattern.replace('^', '').replace('$', '').replace('?', '')
+    pattern = re.sub(r"(\\[bBAZ]|[\^\$\?])", "", pattern)
     if not pattern.startswith('/'):
         pattern = '/' + pattern
     return pattern
