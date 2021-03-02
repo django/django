@@ -382,6 +382,8 @@ class AdminDocViewFunctionsTests(SimpleTestCase):
             (r'^(?P<a>(x|y))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
             (r'^(?P<a>(x|y)(\(|\)))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
             (r'^a/?$', '/a/'),
+            (r'^\b(?P<slug>\w+)\B/(\w+)?', '/<slug>/<var>'),
+            (r'^\A(?P<slug>\w+)\Z', '/<slug>'),
         )
         for pattern, output in tests:
             with self.subTest(pattern=pattern):
