@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import json
 import mimetypes
@@ -8,7 +9,10 @@ import time
 from collections.abc import Mapping
 from email.header import Header
 from http.client import responses
+from typing import Any, Awaitable, Callable, Optional
 from urllib.parse import quote, urlparse
+
+from asgiref.sync import async_to_sync
 
 from django.conf import settings
 from django.core import signals, signing
@@ -16,9 +20,7 @@ from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import timezone
-from django.utils.datastructures import (
-    CaseInsensitiveMapping, _destruct_iterable_mapping_values,
-)
+from django.utils.datastructures import (_destruct_iterable_mapping_values, CaseInsensitiveMapping)
 from django.utils.encoding import iri_to_uri
 from django.utils.http import http_date
 from django.utils.regex_helper import _lazy_re_compile
@@ -283,7 +285,10 @@ class HttpResponseBase:
     def close(self):
         for closer in self._resource_closers:
             try:
-                closer()
+                if asyncio.iscoroutinefunction(closer):
+                    async_to_sync(closer)()
+                else:
+                    closer()
             except Exception:
                 pass
         # Free resources that were still referenced.
@@ -491,6 +496,71 @@ class FileResponse(StreamingHttpResponse):
             self.headers['Content-Disposition'] = '{}; {}'.format(disposition, file_expr)
         elif self.as_attachment:
             self.headers['Content-Disposition'] = 'attachment'
+
+
+class ServerSentEventsResponse(HttpResponseBase):
+    streaming = True
+
+    def __init__(self, receive: Callable[[], Awaitable[str]], *args,
+                 event_name: str = None, last_event_id: int = None, retry: int = None, **kwargs):
+        """
+        An event streaming (Server sent events - SSE) HTTP response class with a coroutine as a message generator.
+
+        :param receive: coroutine or awaitable generating messages.
+        :param event_name: event stream's event name.
+        :param last_event_id: event stream's last event id. Can be taken from the `Last-Event-ID` request header.
+        :param retry: event stream's reconnection time.
+        """
+        super().__init__(*args, **kwargs)
+        self._receive: Callable[[], Awaitable[str]] = receive
+
+        self.event_name: str = event_name
+        self.retry: int = retry
+        self.last_event_id: Optional[int] = None
+        if last_event_id is not None:
+            self.last_event_id = int(last_event_id)
+
+        # set SSE headers
+        self['Content-Type'] = 'text/event-stream'
+        self['Connection'] = 'keep-alive'
+        self['Cache-Control'] = 'no-cache'
+        self['Transfer-Encoding'] = 'chunked'
+
+    @property
+    def content(self):
+        raise AttributeError(
+            "This %s instance has no `content` attribute. "
+            "Use `receive` instead." % self.__class__.__name__
+        )
+
+    @property
+    def retry_message(self) -> bytes:
+        return b'retry: %s\n\n' % self.retry
+
+    def get_data_message(self, data) -> bytes:
+        message = b''
+        if self.event_name:
+            message += b'event: %s\n' % self.event_name
+        if self.last_event_id is not None:
+            message += b'id: %d\n' % self.last_event_id
+        message += b'data: %s\n\n' % data
+        return message
+
+    async def receive(self) -> bytes:
+        """
+        Receive event from coroutine
+        """
+        message = await self._receive()
+        if self.last_event_id is not None:
+            self.last_event_id += 1
+        message = self.make_bytes(message)
+        return self.get_data_message(message)
+
+    def add_resource_closer(self, closer: Callable[[], Any]):
+        """
+        Add resource close method to be called on completion of the request.
+        """
+        self._resource_closers.append(closer)
 
 
 class HttpResponseRedirectBase(HttpResponse):

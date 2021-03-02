@@ -7,7 +7,7 @@ from django.http.response import (
     HttpResponseBadRequest, HttpResponseForbidden, HttpResponseGone,
     HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseNotModified,
     HttpResponsePermanentRedirect, HttpResponseRedirect,
-    HttpResponseServerError, JsonResponse, StreamingHttpResponse,
+    HttpResponseServerError, JsonResponse, ServerSentEventsResponse, StreamingHttpResponse,
 )
 
 __all__ = [
@@ -17,5 +17,5 @@ __all__ = [
     'HttpResponsePermanentRedirect', 'HttpResponseNotModified',
     'HttpResponseBadRequest', 'HttpResponseForbidden', 'HttpResponseNotFound',
     'HttpResponseNotAllowed', 'HttpResponseGone', 'HttpResponseServerError',
-    'Http404', 'BadHeaderError', 'JsonResponse', 'FileResponse',
+    'Http404', 'BadHeaderError', 'JsonResponse', 'ServerSentEventsResponse', 'FileResponse',
 ]
