@@ -142,6 +142,11 @@ named_group_matcher = _lazy_re_compile(r'\(\?P(<\w+>)')
 unnamed_group_matcher = _lazy_re_compile(r'\(')
 
 
+def replace_metacharacters(pattern):
+    """Remove unescaped metacharacters from the pattern."""
+    return pattern.replace('^', '').replace('$', '').replace('?', '')
+
+
 def replace_named_groups(pattern):
     r"""
     Find named groups in `pattern` and replace them with the group name. E.g.,
