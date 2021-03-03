@@ -623,7 +623,8 @@ with the admin site:
 * **admin.E022**: The value of ``radio_fields`` refers to ``<field name>``,
   which is not an attribute of ``<model>``.
 * **admin.E023**: The value of ``radio_fields`` refers to ``<field name>``,
-  which is not a ``ForeignKey``, and does not have a ``choices`` definition.
+  which is not instance of ``ForeignKey``, and does not have a ``choices``
+  definition.
 * **admin.E024**: The value of ``radio_fields[<field name>]`` must be either
   ``admin.HORIZONTAL`` or ``admin.VERTICAL``.
 * **admin.E025**: The value of ``view_on_site`` must be either a callable or a
