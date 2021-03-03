@@ -3,8 +3,57 @@ Contributing to Django
 ======================
 
 Django is a community that lives on its volunteers. As it keeps growing, we
-always need more people to help others. As soon as you learn Django, you can
-contribute in many ways:
+always need more people to help others. You can contribute in many ways, either
+on the framework itself or in the wider ecosystem.
+
+Work on the Django framework
+============================
+
+The work on Django itself falls into three major areas:
+
+**Writing code** 💻
+    Fix a bug, or add a new feature. You can make a pull request and see **your
+    code** in the next version of Django!
+
+    Start from the :doc:`writing-code/index` docs.
+
+**Writing documentation** ✍️
+    Django's documentation is one of its key strengths. It's informative
+    and thorough. You can help to improve the documentation and keep it
+    relevant as the framework evolves.
+
+    See :doc:`writing-documentation` for more.
+
+**Localizing Django** 🗺️
+    Django is translated into over 100 languages - There's even some
+    translation for Klingon?! The i18n team are always looking for translators
+    to help maintain and increase language reach.
+
+    See :doc:`localizing` to help translate Django.
+
+If you think working *with* Django is fun, wait until you start working *on*
+it. Really, **ANYONE** can do something to help make Django better and greater!
+
+This contributing guide contains everything you need to know to help build the
+Django Web framework. Browse the following sections to find out how:
+
+.. toctree::
+   :maxdepth: 2
+
+   new-contributors
+   bugs-and-features
+   triaging-tickets
+   writing-code/index
+   writing-documentation
+   localizing
+   committing-code
+
+Join the Django community ❤️
+============================
+
+We're passionate about helping Django users make the jump to contributing
+members of the community. There are several other ways you can help the
+Django community and others to maintain a great ecosystem to work in:
 
 * Join the `Django forum`_. This forum is a place for discussing the Django
   framework and applications and projects that use it. This is also a good
@@ -29,49 +78,10 @@ contribute in many ways:
   ecosystem of pluggable applications is a big strength of Django, help us
   build it!
 
-If you think working *with* Django is fun, wait until you start working *on*
-it. We're passionate about helping Django users make the jump to contributing
-members of the community, so there are several ways you can help Django's
-development:
-
-* :doc:`Report bugs <bugs-and-features>` in our `ticket tracker`_.
-
-* Join the |django-developers| mailing list and share your ideas for how
-  to improve Django. We're always open to suggestions. You can also interact
-  on the `#django-dev IRC channel`_.
-
-* :doc:`Submit patches <writing-code/submitting-patches>` for new and/or
-  fixed behavior. If you're looking for a way to get started contributing
-  to Django read the :doc:`/intro/contributing` tutorial and have a look at the
-  `easy pickings`_ tickets. The :ref:`patch-review-checklist` will also be
-  helpful.
-
-* :doc:`Improve the documentation <writing-documentation>` or
-  :doc:`write unit tests <writing-code/unit-tests>`.
-
-* :doc:`Triage tickets and review patches <triaging-tickets>` created by
-  other users.
-
-Really, **ANYONE** can do something to help make Django better and greater!
-
-Browse the following sections to find out how:
-
-.. toctree::
-   :maxdepth: 2
-
-   new-contributors
-   bugs-and-features
-   triaging-tickets
-   writing-code/index
-   writing-documentation
-   localizing
-   committing-code
+We're looking forward to working with you. Welcome aboard! ⛵️
 
 .. _posting guidelines: https://code.djangoproject.com/wiki/UsingTheMailingList
 .. _#django IRC channel: https://webchat.freenode.net/#django
-.. _#django-dev IRC channel: https://webchat.freenode.net/#django-dev
 .. _community page: https://www.djangoproject.com/community/
 .. _Django forum: https://forum.djangoproject.com/
 .. _register it here: https://www.djangoproject.com/community/add/blogs/
-.. _ticket tracker: https://code.djangoproject.com/
-.. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
