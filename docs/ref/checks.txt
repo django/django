@@ -594,7 +594,7 @@ with the admin site:
 
 * **admin.E001**: The value of ``raw_id_fields`` must be a list or tuple.
 * **admin.E002**: The value of ``raw_id_fields[n]`` refers to ``<field name>``,
-  which is not an attribute of ``<model>``.
+  which is not a field of ``<model>``.
 * **admin.E003**: The value of ``raw_id_fields[n]`` must be a foreign key or
   a many-to-many field.
 * **admin.E004**: The value of ``fields`` must be a list or tuple.
@@ -616,12 +616,12 @@ with the admin site:
 * **admin.E017**: The value of ``filter_vertical`` must be a list or tuple.
 * **admin.E018**: The value of ``filter_horizontal`` must be a list or tuple.
 * **admin.E019**: The value of ``filter_vertical[n]/filter_horizontal[n]``
-  refers to ``<field name>``, which is not an attribute of ``<model>``.
+  refers to ``<field name>``, which is not a field of ``<model>``.
 * **admin.E020**: The value of ``filter_vertical[n]/filter_horizontal[n]``
   must be a many-to-many field.
 * **admin.E021**: The value of ``radio_fields`` must be a dictionary.
 * **admin.E022**: The value of ``radio_fields`` refers to ``<field name>``,
-  which is not an attribute of ``<model>``.
+  which is not a field of ``<model>``.
 * **admin.E023**: The value of ``radio_fields`` refers to ``<field name>``,
   which is not instance of ``ForeignKey``, and does not have a ``choices``
   definition.
@@ -631,25 +631,25 @@ with the admin site:
   boolean value.
 * **admin.E026**: The value of ``prepopulated_fields`` must be a dictionary.
 * **admin.E027**: The value of ``prepopulated_fields`` refers to
-  ``<field name>``, which is not an attribute of ``<model>``.
+  ``<field name>``, which is not a field of ``<model>``.
 * **admin.E028**: The value of ``prepopulated_fields`` refers to
   ``<field name>``, which must not be a ``DateTimeField``, a ``ForeignKey``,
   a ``OneToOneField``, or a ``ManyToManyField`` field.
 * **admin.E029**: The value of ``prepopulated_fields[<field name>]`` must be a
   list or tuple.
 * **admin.E030**: The value of ``prepopulated_fields`` refers to
-  ``<field name>``, which is not an attribute of ``<model>``.
+  ``<field name>``, which is not a field of ``<model>``.
 * **admin.E031**: The value of ``ordering`` must be a list or tuple.
 * **admin.E032**: The value of ``ordering`` has the random ordering marker
   ``?``, but contains other fields as well.
 * **admin.E033**: The value of ``ordering`` refers to ``<field name>``, which
-  is not an attribute of ``<model>``.
+  is not a field of ``<model>``.
 * **admin.E034**: The value of ``readonly_fields`` must be a list or tuple.
 * **admin.E035**: The value of ``readonly_fields[n]`` is not a callable, an
   attribute of ``<ModelAdmin class>``, or an attribute of ``<model>``.
 * **admin.E036**: The value of ``autocomplete_fields`` must be a list or tuple.
 * **admin.E037**: The value of ``autocomplete_fields[n]`` refers to
-  ``<field name>``, which is not an attribute of ``<model>``.
+  ``<field name>``, which is not a field of ``<model>``.
 * **admin.E038**: The value of ``autocomplete_fields[n]`` must be a foreign
   key or a many-to-many field.
 * **admin.E039**: An admin for model ``<model>`` has to be registered to be
@@ -697,7 +697,7 @@ with the admin site:
 * **admin.E119**: The value of ``list_max_show_all`` must be an integer.
 * **admin.E120**: The value of ``list_editable`` must be a list or tuple.
 * **admin.E121**: The value of ``list_editable[n]`` refers to ``<label>``,
-  which is not an attribute of ``<model>``.
+  which is not a field of ``<model>``.
 * **admin.E122**: The value of ``list_editable[n]`` refers to ``<label>``,
   which is not contained in ``list_display``.
 * **admin.E123**: The value of ``list_editable[n]`` cannot be in both

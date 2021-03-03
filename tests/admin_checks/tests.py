@@ -309,7 +309,7 @@ class SystemChecksTestCase(SimpleTestCase):
         self.assertEqual(SongAdmin(Song, AdminSite()).check(), [
             checks.Error(
                 "The value of 'list_editable[0]' refers to 'test', which is "
-                "not an attribute of 'admin_checks.Song'.",
+                "not a field of 'admin_checks.Song'.",
                 obj=SongAdmin,
                 id='admin.E121',
             )
@@ -618,7 +618,7 @@ class SystemChecksTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "The value of 'raw_id_fields[0]' refers to 'nonexistent', "
-                "which is not an attribute of 'admin_checks.Album'.",
+                "which is not a field of 'admin_checks.Album'.",
                 obj=RawIdNonexistentAdmin,
                 id='admin.E002',
             )

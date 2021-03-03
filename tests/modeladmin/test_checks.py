@@ -63,7 +63,7 @@ class RawIdCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'raw_id_fields[0]' refers to 'non_existent_field', "
-            "which is not an attribute of 'modeladmin.ValidationTestModel'.",
+            "which is not a field of 'modeladmin.ValidationTestModel'.",
             'admin.E002'
         )
 
@@ -278,7 +278,7 @@ class FilterVerticalCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'filter_vertical[0]' refers to 'non_existent_field', "
-            "which is not an attribute of 'modeladmin.ValidationTestModel'.",
+            "which is not a field of 'modeladmin.ValidationTestModel'.",
             'admin.E019'
         )
 
@@ -318,7 +318,7 @@ class FilterHorizontalCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'filter_horizontal[0]' refers to 'non_existent_field', "
-            "which is not an attribute of 'modeladmin.ValidationTestModel'.",
+            "which is not a field of 'modeladmin.ValidationTestModel'.",
             'admin.E019'
         )
 
@@ -359,7 +359,7 @@ class RadioFieldsCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'radio_fields' refers to 'non_existent_field', "
-            "which is not an attribute of 'modeladmin.ValidationTestModel'.",
+            "which is not a field of 'modeladmin.ValidationTestModel'.",
             'admin.E022'
         )
 
@@ -421,7 +421,7 @@ class PrepopulatedFieldsCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'prepopulated_fields' refers to 'non_existent_field', "
-            "which is not an attribute of 'modeladmin.ValidationTestModel'.",
+            "which is not a field of 'modeladmin.ValidationTestModel'.",
             'admin.E027'
         )
 
@@ -432,7 +432,7 @@ class PrepopulatedFieldsCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'prepopulated_fields[\"slug\"][0]' refers to 'non_existent_field', "
-            "which is not an attribute of 'modeladmin.ValidationTestModel'.",
+            "which is not a field of 'modeladmin.ValidationTestModel'.",
             'admin.E030'
         )
 
@@ -873,7 +873,7 @@ class OrderingCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'ordering[0]' refers to 'non_existent_field', "
-            "which is not an attribute of 'modeladmin.ValidationTestModel'.",
+            "which is not a field of 'modeladmin.ValidationTestModel'.",
             'admin.E033'
         )
 
@@ -914,7 +914,7 @@ class OrderingCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'ordering[0]' refers to 'nonexistent', which is not "
-            "an attribute of 'modeladmin.ValidationTestModel'.",
+            "a field of 'modeladmin.ValidationTestModel'.",
             'admin.E033'
         )
 
@@ -1342,7 +1342,7 @@ class AutocompleteFieldsTests(CheckTestCase):
             Admin, ValidationTestModel,
             msg=(
                 "The value of 'autocomplete_fields[0]' refers to 'nonexistent', "
-                "which is not an attribute of 'modeladmin.ValidationTestModel'."
+                "which is not a field of 'modeladmin.ValidationTestModel'."
             ),
             id='admin.E037',
             invalid_obj=Admin,
