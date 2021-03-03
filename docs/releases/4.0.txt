@@ -311,6 +311,11 @@ Miscellaneous
   :setting:`STATIC_URL`, the leading slash is removed from that setting (now
   ``'static/'``) in the default :djadmin:`startproject` template.
 
+* The :class:`~django.contrib.admin.AdminSite` method for the admin ``index``
+  view is no longer decorated with ``never_cache`` when accessed directly,
+  rather than via the recommended ``AdminSite.urls`` property, or
+  ``AdminSite.get_urls()`` method.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0
