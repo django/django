@@ -373,7 +373,7 @@ Now you're ready to actually put the release out there. To do this:
         $ git pull
         $ python manage_translations.py robots_txt
 
-   __ https://github.com/django/djangoproject.com/blob/master/djangoproject/static/robots.docs.txt
+   __ https://github.com/django/djangoproject.com/blob/main/djangoproject/static/robots.docs.txt
 
 #. Post the release announcement to the |django-announce|, |django-developers|,
    and |django-users| mailing lists. This should include a link to the
@@ -404,7 +404,7 @@ You're almost done! All that's left to do now is:
    version should be added after the alpha release and the default version
    should be updated after "dot zero" release.
 
-   __ https://github.com/django/code.djangoproject.com/blob/master/trac-env/conf/trac.ini
+   __ https://github.com/django/code.djangoproject.com/blob/main/trac-env/conf/trac.ini
 
 #. If this was a security release, update :doc:`/releases/security` with
    details of the issues addressed.
