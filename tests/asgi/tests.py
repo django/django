@@ -15,8 +15,7 @@ from django.test import (
     AsyncRequestFactory, SimpleTestCase, modify_settings, override_settings,
 )
 from django.utils.http import http_date
-
-from .urls import test_filename
+from .urls import message_broker, test_filename
 
 TEST_STATIC_ROOT = Path(__file__).parent / 'project' / 'static'
 
@@ -92,6 +91,60 @@ class ASGITest(SimpleTestCase):
         response_body = await communicator.receive_output()
         self.assertEqual(response_body['type'], 'http.response.body')
         self.assertEqual(response_body['body'], test_file_contents)
+        # Allow response.close() to finish.
+        await communicator.wait()
+
+    async def test_server_sent_events_response(self):
+        """
+        Makes sure that ServerSentEventsResponse works over ASGI.
+        """
+        _message_broker = asyncio.Queue()
+        message_broker.set(_message_broker)
+
+        application = get_asgi_application()
+        # Construct HTTP request.
+        scope = self.async_request_factory._base_scope(path='/sse/', headers=[
+            (b'Last-Event-ID', b'10'),
+        ])
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({'type': 'http.request'})
+
+        # Read the response.
+        response_start = await communicator.receive_output()
+        self.assertEqual(response_start['type'], 'http.response.start')
+        self.assertEqual(response_start['status'], 200)
+        self.assertEqual(
+            set(response_start['headers']), {
+                (b'Content-Type', b'text/event-stream'),
+                (b'Connection', b'keep-alive'),
+                (b'Cache-Control', b'no-cache'),
+                (b'Transfer-Encoding', b'chunked'),
+            })
+
+        # send 2 messages
+        await _message_broker.put('message1')
+        await _message_broker.put('message2')
+
+        response_body1 = await communicator.receive_output()
+        response_body2 = await communicator.receive_output()
+        self.assertEqual(response_body1['type'], 'http.response.body')
+        self.assertEqual(response_body2['type'], 'http.response.body')
+        self.assertEqual(response_body1['body'], b'id: 11\ndata: message1\n\n')
+        self.assertEqual(response_body2['body'], b'id: 12\ndata: message2\n\n')
+        self.assertEqual(response_body1['more_body'], True)
+        self.assertEqual(response_body2['more_body'], True)
+
+        # send disconnect message, i.e. connection dropped
+        await communicator.send_input({'type': 'http.disconnect'})
+
+        # Final closing message
+        response_body = await communicator.receive_output()
+        self.assertEqual(response_body['type'], 'http.response.body')
+        self.assertTrue('more_body' not in response_body)
+
+        nothing_to_receive = await communicator.receive_nothing()
+        self.assertTrue(nothing_to_receive)
+
         # Allow response.close() to finish.
         await communicator.wait()
 
