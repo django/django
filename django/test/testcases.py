@@ -476,7 +476,7 @@ class SimpleTestCase(unittest.TestCase):
         """
         Assert that a response indicates that some content was retrieved
         successfully, (i.e., the HTTP status code was as expected) and that
-        ``text`` doesn't occurs in the content of the response.
+        ``text`` doesn't occur in the content of the response.
         """
         text_repr, real_count, msg_prefix = self._assert_contains(
             response, text, status_code, msg_prefix, html)
