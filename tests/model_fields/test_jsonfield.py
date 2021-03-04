@@ -277,9 +277,10 @@ class TestQuerying(TestCase):
                 'i': False,
                 'j': None,
                 'k': {'l': 'm'},
-                'n': [None],
+                'n': [None, True, False],
                 'o': '"quoted"',
                 'p': 4.2,
+                'r': {'s': True, 't': False},
             },
             [1, [2]],
             {'k': True, 'l': False, 'foo': 'bax'},
@@ -538,7 +539,7 @@ class TestQuerying(TestCase):
             ([1, [2]], [self.objs[5]]),
             ([1], [self.objs[5]]),
             ([[2]], [self.objs[5]]),
-            ({'n': [None]}, [self.objs[4]]),
+            ({'n': [None, True, False]}, [self.objs[4]]),
             ({'j': None}, [self.objs[4]]),
         ]
         for value, expected in tests:
@@ -799,8 +800,9 @@ class TestQuerying(TestCase):
             ('value__i', False),
             ('value__j', None),
             ('value__k', {'l': 'm'}),
-            ('value__n', [None]),
+            ('value__n', [None, True, False]),
             ('value__p', 4.2),
+            ('value__r', {'s': True, 't': False}),
         ]
         for lookup, expected in tests:
             with self.subTest(lookup=lookup):
