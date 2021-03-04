@@ -474,7 +474,7 @@ Returns objects where the array of values is the given value. Note that the
 order is not guaranteed to be reliable, so this transform is mainly useful for
 using in conjunction with lookups on
 :class:`~django.contrib.postgres.fields.ArrayField`. Uses the SQL function
-``avalues()``. For example::
+``avals()``. For example::
 
     >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
     >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
