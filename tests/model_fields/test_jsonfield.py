@@ -779,6 +779,8 @@ class TestQuerying(TestCase):
             ('value__bar__in', [['foo', 'bar']], [self.objs[7]]),
             ('value__bar__in', [['foo', 'bar'], ['a']], [self.objs[7]]),
             ('value__bax__in', [{'foo': 'bar'}, {'a': 'b'}], [self.objs[7]]),
+            ('value__h__in', [True, 'foo'], [self.objs[4]]),
+            ('value__i__in', [False, 'foo'], [self.objs[4]]),
         ]
         for lookup, value, expected in tests:
             with self.subTest(lookup=lookup, value=value):
