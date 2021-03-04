@@ -784,8 +784,8 @@ def reorder_suite(suite, classes, reverse=False):
     bins = [OrderedSet() for i in range(class_count + 1)]
     partition_suite_by_type(suite, classes, bins, reverse=reverse)
     reordered_suite = suite_class()
-    for i in range(class_count + 1):
-        reordered_suite.addTests(bins[i])
+    for tests in bins:
+        reordered_suite.addTests(tests)
     return reordered_suite
 
 
