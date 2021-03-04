@@ -16,9 +16,9 @@ from django.core.management import call_command
 from django.db import connections
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import (
-    NullTimeKeeper, TimeKeeper, setup_databases as _setup_databases,
-    setup_test_environment, teardown_databases as _teardown_databases,
-    teardown_test_environment,
+    NullTimeKeeper, TimeKeeper, iter_test_cases,
+    setup_databases as _setup_databases, setup_test_environment,
+    teardown_databases as _teardown_databases, teardown_test_environment,
 )
 from django.utils.datastructures import OrderedSet
 
@@ -683,19 +683,16 @@ class DiscoverRunner:
 
     def _get_databases(self, suite):
         databases = {}
-        for test in suite:
-            if isinstance(test, unittest.TestCase):
-                test_databases = getattr(test, 'databases', None)
-                if test_databases == '__all__':
-                    test_databases = connections
-                if test_databases:
-                    serialized_rollback = getattr(test, 'serialized_rollback', False)
-                    databases.update(
-                        (alias, serialized_rollback or databases.get(alias, False))
-                        for alias in test_databases
-                    )
-            else:
-                databases.update(self._get_databases(test))
+        for test in iter_test_cases(suite):
+            test_databases = getattr(test, 'databases', None)
+            if test_databases == '__all__':
+                test_databases = connections
+            if test_databases:
+                serialized_rollback = getattr(test, 'serialized_rollback', False)
+                databases.update(
+                    (alias, serialized_rollback or databases.get(alias, False))
+                    for alias in test_databases
+                )
         return databases
 
     def get_databases(self, suite):
@@ -800,49 +797,39 @@ def partition_suite_by_type(suite, classes, bins, reverse=False):
     Tests of type classes[i] are added to bins[i],
     tests with no match found in classes are place in bins[-1]
     """
-    suite_class = type(suite)
-    if reverse:
-        suite = reversed(tuple(suite))
-    for test in suite:
-        if isinstance(test, suite_class):
-            partition_suite_by_type(test, classes, bins, reverse=reverse)
+    for test in iter_test_cases(suite, reverse=reverse):
+        for i in range(len(classes)):
+            if isinstance(test, classes[i]):
+                bins[i].add(test)
+                break
         else:
-            for i in range(len(classes)):
-                if isinstance(test, classes[i]):
-                    bins[i].add(test)
-                    break
-            else:
-                bins[-1].add(test)
+            bins[-1].add(test)
 
 
 def partition_suite_by_case(suite):
     """Partition a test suite by test case, preserving the order of tests."""
-    groups = []
+    subsuites = []
     suite_class = type(suite)
-    for test_type, test_group in itertools.groupby(suite, type):
-        if issubclass(test_type, unittest.TestCase):
-            groups.append(suite_class(test_group))
-        else:
-            for item in test_group:
-                groups.extend(partition_suite_by_case(item))
-    return groups
+    tests = iter_test_cases(suite)
+    for test_type, test_group in itertools.groupby(tests, type):
+        subsuite = suite_class(test_group)
+        subsuites.append(subsuite)
+
+    return subsuites
 
 
 def filter_tests_by_tags(suite, tags, exclude_tags):
     suite_class = type(suite)
     filtered_suite = suite_class()
 
-    for test in suite:
-        if isinstance(test, suite_class):
-            filtered_suite.addTests(filter_tests_by_tags(test, tags, exclude_tags))
-        else:
-            test_tags = set(getattr(test, 'tags', set()))
-            test_fn_name = getattr(test, '_testMethodName', str(test))
-            test_fn = getattr(test, test_fn_name, test)
-            test_fn_tags = set(getattr(test_fn, 'tags', set()))
-            all_tags = test_tags.union(test_fn_tags)
-            matched_tags = all_tags.intersection(tags)
-            if (matched_tags or not tags) and not all_tags.intersection(exclude_tags):
-                filtered_suite.addTest(test)
+    for test in iter_test_cases(suite):
+        test_tags = set(getattr(test, 'tags', set()))
+        test_fn_name = getattr(test, '_testMethodName', str(test))
+        test_fn = getattr(test, test_fn_name, test)
+        test_fn_tags = set(getattr(test_fn, 'tags', set()))
+        all_tags = test_tags.union(test_fn_tags)
+        matched_tags = all_tags.intersection(tags)
+        if (matched_tags or not tags) and not all_tags.intersection(exclude_tags):
+            filtered_suite.addTest(test)
 
     return filtered_suite

@@ -235,6 +235,18 @@ def setup_databases(
     return old_names
 
 
+def iter_test_cases(suite, reverse=False):
+    """Return an iterator over a test suite's unittest.TestCase objects."""
+    if reverse:
+        suite = reversed(tuple(suite))
+    for test in suite:
+        if isinstance(test, TestCase):
+            yield test
+        else:
+            # Otherwise, assume it is a test suite.
+            yield from iter_test_cases(test, reverse=reverse)
+
+
 def dependency_ordered(test_databases, dependencies):
     """
     Reorder test_databases into an order that honors the dependencies

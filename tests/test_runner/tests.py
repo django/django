@@ -18,10 +18,91 @@ from django.test.runner import DiscoverRunner
 from django.test.testcases import connections_support_transactions
 from django.test.utils import (
     captured_stderr, dependency_ordered, get_unique_databases_and_mirrors,
+    iter_test_cases,
 )
 from django.utils.deprecation import RemovedInDjango50Warning
 
 from .models import B, Person, Through
+
+
+class MySuite:
+    def __init__(self):
+        self.tests = []
+
+    def addTest(self, test):
+        self.tests.append(test)
+
+    def __iter__(self):
+        yield from self.tests
+
+
+class IterTestCasesTests(unittest.TestCase):
+    def make_test_suite(self, suite=None, suite_class=None):
+        if suite_class is None:
+            suite_class = unittest.TestSuite
+        if suite is None:
+            suite = suite_class()
+
+        class Tests1(unittest.TestCase):
+            def test1(self):
+                pass
+
+            def test2(self):
+                pass
+
+        class Tests2(unittest.TestCase):
+            def test1(self):
+                pass
+
+            def test2(self):
+                pass
+
+        loader = unittest.defaultTestLoader
+        for test_cls in (Tests1, Tests2):
+            tests = loader.loadTestsFromTestCase(test_cls)
+            subsuite = suite_class()
+            # Only use addTest() to simplify testing a custom TestSuite.
+            for test in tests:
+                subsuite.addTest(test)
+            suite.addTest(subsuite)
+
+        return suite
+
+    def assertTestNames(self, tests, expected):
+        # Each test.id() has a form like the following:
+        # "test_runner.tests.IterTestCasesTests.test_iter_test_cases.<locals>.Tests1.test1".
+        # It suffices to check only the last two parts.
+        names = ['.'.join(test.id().split('.')[-2:]) for test in tests]
+        self.assertEqual(names, expected)
+
+    def test_basic(self):
+        suite = self.make_test_suite()
+        tests = iter_test_cases(suite)
+        self.assertTestNames(tests, expected=[
+            'Tests1.test1', 'Tests1.test2', 'Tests2.test1', 'Tests2.test2',
+        ])
+
+    def test_reverse(self):
+        suite = self.make_test_suite()
+        tests = iter_test_cases(suite, reverse=True)
+        self.assertTestNames(tests, expected=[
+            'Tests2.test2', 'Tests2.test1', 'Tests1.test2', 'Tests1.test1',
+        ])
+
+    def test_custom_test_suite_class(self):
+        suite = self.make_test_suite(suite_class=MySuite)
+        tests = iter_test_cases(suite)
+        self.assertTestNames(tests, expected=[
+            'Tests1.test1', 'Tests1.test2', 'Tests2.test1', 'Tests2.test2',
+        ])
+
+    def test_mixed_test_suite_classes(self):
+        suite = self.make_test_suite(suite=MySuite())
+        child_suite = list(suite)[0]
+        self.assertNotIsInstance(child_suite, MySuite)
+        tests = list(iter_test_cases(suite))
+        self.assertEqual(len(tests), 4)
+        self.assertNotIsInstance(tests[0], unittest.TestSuite)
 
 
 class DependencyOrderingTests(unittest.TestCase):
