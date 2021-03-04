@@ -257,7 +257,7 @@ geometry B.
 ``Distance``
 ============
 
-.. class:: Distance(expr1, expr2, spheroid=None, **extra)
+.. class:: Distance(expr1, expr2, spheroid=None, radius=None, **extra)
 
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-relation-functions-object-shapes.html#function_st-distance>`__,
@@ -276,7 +276,10 @@ When distances are calculated with geodetic (angular) coordinates, as is the
 case with the default WGS84 (4326) SRID, you can set the ``spheroid`` keyword
 argument to decide if the calculation should be based on a simple sphere (less
 accurate, less resource-intensive) or on a spheroid (more accurate, more
-resource-intensive).
+resource-intensive). On MySQL, the spheroid keyword does not supported, but
+you can specify the radius of the sphere to use in the calculation with the
+``radius`` keyword argument (See `ST_Distance_Sphere
+<https://dev.mysql.com/doc/refman/en/spatial-convenience-functions.html#function_st-distance-sphere>`__).
 
 In the following example, the distance from the city of Hobart to every other
 :class:`~django.contrib.gis.db.models.PointField` in the ``AustraliaCity``
