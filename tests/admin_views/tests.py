@@ -5368,7 +5368,7 @@ class UserAdminTest(TestCase):
         })
         self.assertEqual(response.status_code, 200)
         self.assertFormError(response, 'adminform', 'password', [])
-        self.assertFormError(response, 'adminform', 'password2', ['The two password fields didn’t match.'])
+        self.assertFormError(response, 'adminform', 'password2', ["The two password fields didn't match."])
 
     def test_user_fk_add_popup(self):
         """User addition through a FK popup should return the appropriate JavaScript response."""
