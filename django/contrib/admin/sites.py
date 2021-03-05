@@ -58,6 +58,8 @@ class AdminSite:
 
     enable_nav_sidebar = True
 
+    enable_password_change_link = True
+
     empty_value_display = '-'
 
     login_form = None
@@ -317,6 +319,7 @@ class AdminSite:
             'available_apps': self.get_app_list(request),
             'is_popup': False,
             'is_nav_sidebar_enabled': self.enable_nav_sidebar,
+            'is_password_change_link_enabled': self.enable_password_change_link,
         }
 
     def password_change(self, request, extra_context=None):

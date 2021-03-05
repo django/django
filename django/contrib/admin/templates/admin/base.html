@@ -50,7 +50,9 @@
                     {% endif %}
                 {% endif %}
                 {% if user.has_usable_password %}
-                <a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a> /
+                  {% if is_password_change_link_enabled %}
+                    <a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a> /
+                  {% endif %}
                 {% endif %}
                 <a href="{% url 'admin:logout' %}">{% translate 'Log out' %}</a>
             {% endblock %}
