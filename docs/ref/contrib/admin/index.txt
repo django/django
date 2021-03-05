@@ -2961,6 +2961,13 @@ Templates can override or extend base admin templates as described in
     A boolean value that determines whether to show the navigation sidebar
     on larger screens. By default, it is set to ``True``.
 
+.. attribute:: AdminSite.enable_password_change_link
+
+    .. versionadded:: 4.0
+
+    A boolean value that determines whether to show the password change
+    link on the admin site. By default, it is set to ``True``.
+
 .. attribute:: AdminSite.final_catch_all_view
 
     .. versionadded:: 3.2
