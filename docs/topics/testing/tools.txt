@@ -1661,7 +1661,8 @@ your test suite.
     of ``needle`` occurrences will be strictly verified.
 
     Whitespace in most cases is ignored, and attribute ordering is not
-    significant. The passed-in arguments must be valid HTML.
+    significant. The passed-in arguments must be valid HTML. See
+    :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
 
 .. method:: SimpleTestCase.assertJSONEqual(raw, expected_data, msg=None)
 
