@@ -793,14 +793,11 @@ def reorder_suite(suite, classes, reverse=False):
 
 def partition_suite_by_case(suite):
     """Partition a test suite by test case, preserving the order of tests."""
-    subsuites = []
     suite_class = type(suite)
-    tests = iter_test_cases(suite)
-    for test_type, test_group in itertools.groupby(tests, type):
-        subsuite = suite_class(test_group)
-        subsuites.append(subsuite)
-
-    return subsuites
+    all_tests = iter_test_cases(suite)
+    return [
+        suite_class(tests) for _, tests in itertools.groupby(all_tests, type)
+    ]
 
 
 def filter_tests_by_tags(suite, tags, exclude_tags):
