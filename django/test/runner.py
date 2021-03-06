@@ -766,7 +766,7 @@ def is_discoverable(label):
 
 def reorder_suite(suite, classes, reverse=False):
     """
-    Reorder a test suite by test type.
+    Reorder a test suite by test type, removing any duplicates.
 
     `classes` is a sequence of types
 
@@ -776,34 +776,19 @@ def reorder_suite(suite, classes, reverse=False):
     If `reverse` is True, sort tests within classes in opposite order but
     don't reverse test classes.
     """
-    class_count = len(classes)
-    suite_class = type(suite)
-    bins = [OrderedSet() for i in range(class_count + 1)]
-    partition_suite_by_type(suite, classes, bins, reverse=reverse)
-    reordered_suite = suite_class()
-    for tests in bins:
-        reordered_suite.addTests(tests)
-    return reordered_suite
+    bins = [OrderedSet() for i in range(len(classes) + 1)]
+    *class_bins, last_bin = bins
 
-
-def partition_suite_by_type(suite, classes, bins, reverse=False):
-    """
-    Partition a test suite by test type. Also prevent duplicated tests.
-
-    classes is a sequence of types
-    bins is a sequence of TestSuites, one more than classes
-    reverse changes the ordering of tests within bins
-
-    Tests of type classes[i] are added to bins[i],
-    tests with no match found in classes are place in bins[-1]
-    """
     for test in iter_test_cases(suite, reverse=reverse):
-        for i in range(len(classes)):
-            if isinstance(test, classes[i]):
-                bins[i].add(test)
+        for test_bin, test_class in zip(class_bins, classes):
+            if isinstance(test, test_class):
                 break
         else:
-            bins[-1].add(test)
+            test_bin = last_bin
+        test_bin.add(test)
+
+    suite_class = type(suite)
+    return suite_class(itertools.chain(*bins))
 
 
 def partition_suite_by_case(suite):
