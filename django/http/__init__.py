@@ -7,7 +7,8 @@ from django.http.response import (
     HttpResponseBadRequest, HttpResponseForbidden, HttpResponseGone,
     HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseNotModified,
     HttpResponsePermanentRedirect, HttpResponseRedirect,
-    HttpResponseServerError, JsonResponse, ServerSentEventsResponse, StreamingHttpResponse,
+    HttpResponseServerError, JsonResponse, ServerSentEventsResponse,
+    StreamingHttpResponse,
 )
 
 __all__ = [

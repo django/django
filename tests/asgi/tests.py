@@ -15,6 +15,7 @@ from django.test import (
     AsyncRequestFactory, SimpleTestCase, modify_settings, override_settings,
 )
 from django.utils.http import http_date
+
 from .urls import message_broker, test_filename
 
 TEST_STATIC_ROOT = Path(__file__).parent / 'project' / 'static'

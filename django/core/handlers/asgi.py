@@ -12,7 +12,7 @@ from django.core.exceptions import RequestAborted, RequestDataTooBig
 from django.core.handlers import base
 from django.http import (
     FileResponse, HttpRequest, HttpResponse, HttpResponseBadRequest,
-    HttpResponseServerError, parse_cookie, QueryDict, ServerSentEventsResponse,
+    HttpResponseServerError, QueryDict, ServerSentEventsResponse, parse_cookie,
 )
 from django.urls import set_script_prefix
 from django.utils.functional import cached_property
