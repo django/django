@@ -9,6 +9,7 @@
   --primary: #79aec8;
   --secondary: #417690;
   --accent: #f5dd5d;
+  --primary-fg: #fff;
 
   --body-fg: #333;
   --body-bg: #fff;
@@ -18,7 +19,7 @@
   --header-color: #ffc;
   --header-branding-color: var(--accent);
   --header-bg: var(--secondary);
-  --header-link-color: #fff;
+  --header-link-color: var(--primary-fg);
 
   --breadcrumbs-fg: #c4dce8;
   --breadcrumbs-link-fg: var(--body-bg);
@@ -59,13 +60,12 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --primary: #264b5d;
+    --primary-fg: #eee;
 
     --body-fg: #eeeeee;
     --body-bg: #121212;
     --body-quiet-color: #e0e0e0;
     --body-loud-color: #ffffff;
-
-    --header-link-color: #eeeeee;
 
     --breadcrumbs-link-fg: #e0e0e0;
     --breadcrumbs-bg: var(--primary);
