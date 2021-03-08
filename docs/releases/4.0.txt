@@ -318,6 +318,9 @@ Miscellaneous
   rather than via the recommended ``AdminSite.urls`` property, or
   ``AdminSite.get_urls()`` method.
 
+* Unsupported operations on a sliced queryset now raise ``TypeError`` instead
+  of ``AssertionError``.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0
