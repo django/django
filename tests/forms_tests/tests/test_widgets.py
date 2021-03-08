@@ -1,5 +1,14 @@
+import warnings
+
 from django.contrib.admin.tests import AdminSeleniumTestCase
-from django.test import override_settings
+from django.forms import (
+    Form,
+    Textarea,
+)
+from django.test import (
+    override_settings,
+    SimpleTestCase,
+)
 from django.urls import reverse
 
 from ..models import Article
@@ -19,3 +28,18 @@ class LiveWidgetTests(AdminSeleniumTestCase):
         self.selenium.find_element_by_id('submit').click()
         article = Article.objects.get(pk=article.pk)
         self.assertEqual(article.content, "\r\nTst\r\n")
+
+
+class WarningOnWidgetTests(SimpleTestCase):
+    def test_warn_on_widget_instead_of_field(self):
+        with warnings.catch_warnings(record=True) as ws:
+            warnings.simplefilter('always')
+
+            class MyForm(Form):
+                foo = Textarea()
+
+            self.assertEqual(len(ws), 1)
+            self.assertIn(
+                "WARNING: You are declaring the widget",
+                str(ws[0].message),
+            )

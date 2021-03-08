@@ -3,11 +3,16 @@ Form classes
 """
 
 import copy
+import warnings
 
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.forms.fields import Field, FileField
 from django.forms.utils import ErrorDict, ErrorList
-from django.forms.widgets import Media, MediaDefiningClass
+from django.forms.widgets import (
+    Media,
+    MediaDefiningClass,
+    Widget,
+)
 from django.utils.datastructures import MultiValueDict
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, html_safe
@@ -27,6 +32,18 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
             key: attrs.pop(key) for key, value in list(attrs.items())
             if isinstance(value, Field)
         }
+
+        for key, value in list(attrs.items()):
+            if isinstance(value, Widget):
+                warnings.warn(
+                    (
+                        'WARNING: You are declaring the widget "%s" of type %s on a form.\n'
+                        'This is very likely not what you want! The most common such error is to do: \n'
+                        '   foo = Textarea()\n\n'
+                        'when what you wanted was:\n'
+                        '   foo = CharField(widget=Textarea)'
+                    ) % (key, type(value))
+                )
 
         new_class = super().__new__(mcs, name, bases, attrs)
 
