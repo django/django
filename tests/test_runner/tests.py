@@ -14,7 +14,7 @@ from django.core.management.base import SystemCheckError
 from django.test import (
     SimpleTestCase, TransactionTestCase, skipUnlessDBFeature,
 )
-from django.test.runner import DiscoverRunner, reorder_suite
+from django.test.runner import DiscoverRunner, reorder_tests
 from django.test.testcases import connections_support_transactions
 from django.test.utils import (
     captured_stderr, dependency_ordered, get_unique_databases_and_mirrors,
@@ -118,7 +118,7 @@ class TestSuiteTests(unittest.TestCase):
         self.assertEqual(len(tests), 4)
         self.assertNotIsInstance(tests[0], unittest.TestSuite)
 
-    def test_reorder_suite_reverse_with_duplicates(self):
+    def test_reorder_tests_reverse_with_duplicates(self):
         class Tests1(unittest.TestCase):
             def test1(self):
                 pass
@@ -133,15 +133,16 @@ class TestSuiteTests(unittest.TestCase):
         suite = self.build_test_suite((Tests1, Tests2))
         subsuite = list(suite)[0]
         suite.addTest(subsuite)
-        self.assertTestNames(iter_test_cases(suite), expected=[
+        tests = list(iter_test_cases(suite))
+        self.assertTestNames(tests, expected=[
             'Tests1.test1', 'Tests2.test2', 'Tests2.test3', 'Tests1.test1',
         ])
-        reordered_suite = reorder_suite(suite, classes=[])
-        self.assertTestNames(reordered_suite, expected=[
+        reordered_tests = reorder_tests(tests, classes=[])
+        self.assertTestNames(reordered_tests, expected=[
             'Tests1.test1', 'Tests2.test2', 'Tests2.test3',
         ])
-        reordered_suite = reorder_suite(suite, classes=[], reverse=True)
-        self.assertTestNames(reordered_suite, expected=[
+        reordered_tests = reorder_tests(tests, classes=[], reverse=True)
+        self.assertTestNames(reordered_tests, expected=[
             'Tests2.test3', 'Tests2.test2', 'Tests1.test1',
         ])
 

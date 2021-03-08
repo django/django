@@ -553,7 +553,6 @@ class DiscoverRunner:
         unittest.installHandler()
 
     def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
-        suite = self.test_suite()
         test_labels = test_labels or ['.']
         extra_tests = extra_tests or []
         self.test_loader.testNamePatterns = self.test_name_patterns
@@ -564,6 +563,7 @@ class DiscoverRunner:
         if self.top_level is not None:
             discover_kwargs['top_level_dir'] = self.top_level
 
+        all_tests = []
         for label in test_labels:
             kwargs = discover_kwargs.copy()
             tests = None
@@ -607,10 +607,9 @@ class DiscoverRunner:
                 # run, to support running tests from two different top-levels.
                 self.test_loader._top_level_dir = None
 
-            suite.addTests(tests)
+            all_tests.extend(iter_test_cases(tests))
 
-        for test in extra_tests:
-            suite.addTest(test)
+        all_tests.extend(iter_test_cases(extra_tests))
 
         if self.tags or self.exclude_tags:
             if self.verbosity >= 2:
@@ -618,8 +617,10 @@ class DiscoverRunner:
                     print('Including test tag(s): %s.' % ', '.join(sorted(self.tags)))
                 if self.exclude_tags:
                     print('Excluding test tag(s): %s.' % ', '.join(sorted(self.exclude_tags)))
-            suite = filter_tests_by_tags(suite, self.tags, self.exclude_tags)
-        suite = reorder_suite(suite, self.reorder_by, self.reverse)
+            all_tests = filter_tests_by_tags(all_tests, self.tags, self.exclude_tags)
+
+        all_tests = reorder_tests(all_tests, self.reorder_by, self.reverse)
+        suite = self.test_suite(all_tests)
 
         if self.parallel > 1:
             parallel_suite = self.parallel_test_suite(suite, self.parallel, self.failfast)
@@ -764,11 +765,11 @@ def is_discoverable(label):
     return os.path.isdir(os.path.abspath(label))
 
 
-def reorder_suite(suite, classes, reverse=False):
+def reorder_tests(tests, classes, reverse=False):
     """
-    Reorder a test suite by test type, removing any duplicates.
+    Reorder an iterable of tests by test type, removing any duplicates.
 
-    `classes` is a sequence of types
+    `classes` is a sequence of types. The result is returned as an iterator.
 
     All tests of type classes[0] are placed first, then tests of type
     classes[1], etc. Tests with no match in classes are placed last.
@@ -779,7 +780,7 @@ def reorder_suite(suite, classes, reverse=False):
     bins = [OrderedSet() for i in range(len(classes) + 1)]
     *class_bins, last_bin = bins
 
-    for test in iter_test_cases(suite):
+    for test in tests:
         for test_bin, test_class in zip(class_bins, classes):
             if isinstance(test, test_class):
                 break
@@ -789,8 +790,7 @@ def reorder_suite(suite, classes, reverse=False):
 
     if reverse:
         bins = (reversed(tests) for tests in bins)
-    suite_class = type(suite)
-    return suite_class(itertools.chain(*bins))
+    return itertools.chain(*bins)
 
 
 def partition_suite_by_case(suite):
@@ -813,9 +813,6 @@ def test_match_tags(test, tags, exclude_tags):
     return (matched_tags or not tags) and not test_tags.intersection(exclude_tags)
 
 
-def filter_tests_by_tags(suite, tags, exclude_tags):
-    suite_class = type(suite)
-    return suite_class(
-        test for test in iter_test_cases(suite)
-        if test_match_tags(test, tags, exclude_tags)
-    )
+def filter_tests_by_tags(tests, tags, exclude_tags):
+    """Return the matching tests as an iterator."""
+    return (test for test in tests if test_match_tags(test, tags, exclude_tags))
