@@ -555,6 +555,7 @@ class CoveringIndexTests(TransactionTestCase):
                     cursor=cursor, table_name=Article._meta.db_table,
                 ))
 
+    @skipUnlessDBFeature('supports_expression_indexes')
     def test_covering_func_index(self):
         index_name = 'covering_func_headline_idx'
         index = Index(Lower('headline'), name=index_name, include=['pub_date'])
