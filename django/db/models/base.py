@@ -979,7 +979,10 @@ class Model(metaclass=ModelBase):
         try:
             return qs[0]
         except IndexError:
-            raise self.DoesNotExist("%s matching query does not exist." % self.__class__._meta.object_name)
+            raise self.DoesNotExist(
+                "%s matching query does not exist.\n\nQuery was:\n    %s" %
+                (self.__class__._meta.object_name, q)
+            )
 
     def _get_next_or_previous_in_order(self, is_next):
         cachename = "__%s_order_cache" % is_next

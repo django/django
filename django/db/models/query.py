@@ -432,14 +432,21 @@ class QuerySet:
         if num == 1:
             return clone._result_cache[0]
         if not num:
+            # Calling repr directly on values isn't always safe for model instances
+            from django.db.models import Model
+            query = {
+                k: '<%s pk=%s>' % (type(v), v.pk) if isinstance(v, Model) else repr(v)
+                for k, v in kwargs.items()
+            }
             raise self.model.DoesNotExist(
-                "%s matching query does not exist." %
-                self.model._meta.object_name
+                "%s matching query does not exist.\n\nQuery was:\n    %s" %
+                (self.model._meta.object_name, query)
             )
         raise self.model.MultipleObjectsReturned(
-            'get() returned more than one %s -- it returned %s!' % (
+            'get() returned more than one %s -- it returned %s!\b\bQuery was:\n    %s' % (
                 self.model._meta.object_name,
                 num if not limit or num < limit else 'more than %s' % (limit - 1),
+                self.query.where,
             )
         )
 

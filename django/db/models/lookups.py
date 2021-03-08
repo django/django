@@ -35,6 +35,9 @@ class Lookup:
                 raise NotImplementedError("Bilateral transformations on nested querysets are not implemented.")
         self.bilateral_transforms = bilateral_transforms
 
+    def __repr__(self):
+        return '<%s %s=%s>' % (self.lookup_name, self.lhs.output_field, self.rhs)
+
     def apply_bilateral_transforms(self, value):
         for transform in self.bilateral_transforms:
             value = transform(value)
