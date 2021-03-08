@@ -1,14 +1,8 @@
 import warnings
 
 from django.contrib.admin.tests import AdminSeleniumTestCase
-from django.forms import (
-    Form,
-    Textarea,
-)
-from django.test import (
-    override_settings,
-    SimpleTestCase,
-)
+from django.forms import Form, Textarea
+from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 
 from ..models import Article
