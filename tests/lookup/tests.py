@@ -470,7 +470,13 @@ class LookupTests(TestCase):
         self.assertEqual(repr(self.a2.get_next_by_pub_date(headline__endswith='6')), '<Article: Article 6>')
         self.assertEqual(repr(self.a3.get_next_by_pub_date()), '<Article: Article 7>')
         self.assertEqual(repr(self.a4.get_next_by_pub_date()), '<Article: Article 6>')
-        with self.assertRaisesMessage(Article.DoesNotExist, "Article matching query does not exist.\n\nQuery was:\n    (OR: ('pub_date__gt', datetime.datetime(2005, 8, 1, 9, 0)), (AND: ('pk__gt', 5), ('pub_date', datetime.datetime(2005, 8, 1, 9, 0))))"):
+        with self.assertRaisesMessage(
+            Article.DoesNotExist,
+            "Article matching query does not exist.\n\n"
+            "Query was:\n"
+            "    (OR: ('pub_date__gt', datetime.datetime(2005, 8, 1, 9, 0)), "
+            "(AND: ('pk__gt', 5), ('pub_date', datetime.datetime(2005, 8, 1, 9, 0))))"
+        ):
             self.a5.get_next_by_pub_date()
         self.assertEqual(repr(self.a6.get_next_by_pub_date()), '<Article: Article 5>')
         self.assertEqual(repr(self.a7.get_next_by_pub_date()), '<Article: Article 4>')
