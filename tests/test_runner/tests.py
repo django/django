@@ -14,7 +14,7 @@ from django.core.management.base import SystemCheckError
 from django.test import (
     SimpleTestCase, TransactionTestCase, skipUnlessDBFeature,
 )
-from django.test.runner import DiscoverRunner
+from django.test.runner import DiscoverRunner, reorder_suite
 from django.test.testcases import connections_support_transactions
 from django.test.utils import (
     captured_stderr, dependency_ordered, get_unique_databases_and_mirrors,
@@ -36,13 +36,25 @@ class MySuite:
         yield from self.tests
 
 
-class IterTestCasesTests(unittest.TestCase):
-    def make_test_suite(self, suite=None, suite_class=None):
+class TestSuiteTests(unittest.TestCase):
+    def build_test_suite(self, test_classes, suite=None, suite_class=None):
         if suite_class is None:
             suite_class = unittest.TestSuite
         if suite is None:
             suite = suite_class()
 
+        loader = unittest.defaultTestLoader
+        for test_class in test_classes:
+            tests = loader.loadTestsFromTestCase(test_class)
+            subsuite = suite_class()
+            # Only use addTest() to simplify testing a custom TestSuite.
+            for test in tests:
+                subsuite.addTest(test)
+            suite.addTest(subsuite)
+
+        return suite
+
+    def make_test_suite(self, suite=None, suite_class=None):
         class Tests1(unittest.TestCase):
             def test1(self):
                 pass
@@ -57,16 +69,11 @@ class IterTestCasesTests(unittest.TestCase):
             def test2(self):
                 pass
 
-        loader = unittest.defaultTestLoader
-        for test_cls in (Tests1, Tests2):
-            tests = loader.loadTestsFromTestCase(test_cls)
-            subsuite = suite_class()
-            # Only use addTest() to simplify testing a custom TestSuite.
-            for test in tests:
-                subsuite.addTest(test)
-            suite.addTest(subsuite)
-
-        return suite
+        return self.build_test_suite(
+            (Tests1, Tests2),
+            suite=suite,
+            suite_class=suite_class,
+        )
 
     def assertTestNames(self, tests, expected):
         # Each test.id() has a form like the following:
@@ -75,34 +82,54 @@ class IterTestCasesTests(unittest.TestCase):
         names = ['.'.join(test.id().split('.')[-2:]) for test in tests]
         self.assertEqual(names, expected)
 
-    def test_basic(self):
+    def test_iter_test_cases_basic(self):
         suite = self.make_test_suite()
         tests = iter_test_cases(suite)
         self.assertTestNames(tests, expected=[
             'Tests1.test1', 'Tests1.test2', 'Tests2.test1', 'Tests2.test2',
         ])
 
-    def test_reverse(self):
-        suite = self.make_test_suite()
-        tests = iter_test_cases(suite, reverse=True)
-        self.assertTestNames(tests, expected=[
-            'Tests2.test2', 'Tests2.test1', 'Tests1.test2', 'Tests1.test1',
-        ])
-
-    def test_custom_test_suite_class(self):
+    def test_iter_test_cases_custom_test_suite_class(self):
         suite = self.make_test_suite(suite_class=MySuite)
         tests = iter_test_cases(suite)
         self.assertTestNames(tests, expected=[
             'Tests1.test1', 'Tests1.test2', 'Tests2.test1', 'Tests2.test2',
         ])
 
-    def test_mixed_test_suite_classes(self):
+    def test_iter_test_cases_mixed_test_suite_classes(self):
         suite = self.make_test_suite(suite=MySuite())
         child_suite = list(suite)[0]
         self.assertNotIsInstance(child_suite, MySuite)
         tests = list(iter_test_cases(suite))
         self.assertEqual(len(tests), 4)
         self.assertNotIsInstance(tests[0], unittest.TestSuite)
+
+    def test_reorder_suite_reverse_with_duplicates(self):
+        class Tests1(unittest.TestCase):
+            def test1(self):
+                pass
+
+        class Tests2(unittest.TestCase):
+            def test2(self):
+                pass
+
+            def test3(self):
+                pass
+
+        suite = self.build_test_suite((Tests1, Tests2))
+        subsuite = list(suite)[0]
+        suite.addTest(subsuite)
+        self.assertTestNames(iter_test_cases(suite), expected=[
+            'Tests1.test1', 'Tests2.test2', 'Tests2.test3', 'Tests1.test1',
+        ])
+        reordered_suite = reorder_suite(suite, classes=[])
+        self.assertTestNames(reordered_suite, expected=[
+            'Tests1.test1', 'Tests2.test2', 'Tests2.test3',
+        ])
+        reordered_suite = reorder_suite(suite, classes=[], reverse=True)
+        self.assertTestNames(reordered_suite, expected=[
+            'Tests2.test3', 'Tests2.test2', 'Tests1.test1',
+        ])
 
 
 class DependencyOrderingTests(unittest.TestCase):

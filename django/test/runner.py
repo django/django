@@ -779,7 +779,7 @@ def reorder_suite(suite, classes, reverse=False):
     bins = [OrderedSet() for i in range(len(classes) + 1)]
     *class_bins, last_bin = bins
 
-    for test in iter_test_cases(suite, reverse=reverse):
+    for test in iter_test_cases(suite):
         for test_bin, test_class in zip(class_bins, classes):
             if isinstance(test, test_class):
                 break
@@ -787,6 +787,8 @@ def reorder_suite(suite, classes, reverse=False):
             test_bin = last_bin
         test_bin.add(test)
 
+    if reverse:
+        bins = (reversed(tests) for tests in bins)
     suite_class = type(suite)
     return suite_class(itertools.chain(*bins))
 
