@@ -391,10 +391,9 @@ class MigrationAutodetector:
                     # Resolve intra-app dependencies to handle circular
                     # references involving a swappable model.
                     dep = self._resolve_dependency(dep)[0]
-                    if dep[0] == app_label:
-                        for op2 in ops:
-                            if self.check_dependency(op2, dep):
-                                ts.add(op, op2)
+                    if dep[0] != app_label:
+                        continue
+                    ts.add(op, *(x for x in ops if self.check_dependency(x, dep)))
             self.generated_operations[app_label] = list(ts.static_order())
 
     def _optimize_migrations(self):
