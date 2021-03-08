@@ -10,7 +10,11 @@ from django.db.migrations.operations.models import AlterModelOptions
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
-from django.utils.topological_sort import stable_topological_sort
+
+try:
+    from graphlib import TopologicalSorter  # PY39
+except ImportError:
+    from django.utils.graphlib import TopologicalSorter
 
 
 class MigrationAutodetector:
@@ -338,9 +342,9 @@ class MigrationAutodetector:
         nicely inside the same app.
         """
         for app_label, ops in sorted(self.generated_operations.items()):
-            # construct a dependency graph for intra-app dependencies
-            dependency_graph = {op: set() for op in ops}
+            ts = TopologicalSorter()
             for op in ops:
+                ts.add(op)
                 for dep in op._auto_deps:
                     # Resolve intra-app dependencies to handle circular
                     # references involving a swappable model.
@@ -348,10 +352,8 @@ class MigrationAutodetector:
                     if dep[0] == app_label:
                         for op2 in ops:
                             if self.check_dependency(op2, dep):
-                                dependency_graph[op].add(op2)
-
-            # we use a stable sort for deterministic tests & general behavior
-            self.generated_operations[app_label] = stable_topological_sort(ops, dependency_graph)
+                                ts.add(op, op2)
+            self.generated_operations[app_label] = list(ts.static_order())
 
     def _optimize_migrations(self):
         # Add in internal dependencies among the migrations
