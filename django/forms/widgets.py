@@ -12,7 +12,6 @@ from itertools import chain
 from django.forms.utils import to_current_timezone
 from django.templatetags.static import static
 from django.utils import formats
-from django.utils.datastructures import OrderedSet
 from django.utils.dates import MONTHS
 from django.utils.formats import get_format
 from django.utils.html import format_html, html_safe
@@ -152,16 +151,10 @@ class Media:
         global or in CSS you might want to override a style.
         """
         ts = TopologicalSorter()
-        all_items = OrderedSet()
-        for list_ in filter(None, lists):
-            head = list_[0]
-            # The first items depend on nothing but have to be part of the
-            # dependency graph to be included in the result.
-            ts.add(head)
-            for item in list_:
-                all_items.add(item)
-                # No self dependencies
-                if head != item:
+        for head, *tail in filter(None, lists):
+            ts.add(head)  # Ensure that the first items are included.
+            for item in tail:
+                if head != item:  # Avoid circular dependency to self.
                     ts.add(item, head)
                 head = item
         try:
@@ -173,7 +166,7 @@ class Media:
                 ),
                 MediaOrderConflictWarning,
             )
-            return list(all_items)
+            return list(dict.fromkeys(chain.from_iterable(filter(None, lists))))
 
     def __add__(self, other):
         combined = Media()
