@@ -21,6 +21,20 @@ def make_data_div(value):
     return '<div data-name="%s"></div>' % value
 
 
+class ClassFilter(object):
+    __name__ = 'custom_filter'
+
+    def __call__(self, value):
+        if not isinstance(value, str):
+            return value
+
+        return value
+
+
+class_filter = ClassFilter()
+register.filter('class_filter', class_filter)
+
+
 @register.filter
 def noop(value, param=None):
     """A noop filter that always return its first argument and does nothing with

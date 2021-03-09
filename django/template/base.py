@@ -720,6 +720,8 @@ class FilterExpression:
         func = inspect.unwrap(func)
 
         args, _, _, defaults, _, _, _ = inspect.getfullargspec(func)
+        if not inspect.isfunction(func):
+            args.pop(0)
         alen = len(args)
         dlen = len(defaults or [])
         # Not enough OR Too many
