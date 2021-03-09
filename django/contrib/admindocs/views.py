@@ -413,7 +413,7 @@ def simplify_regex(pattern):
     pattern = replace_named_groups(pattern)
     pattern = replace_unnamed_groups(pattern)
     # Remove any outstanding regex metacharacters.
-    pattern = re.sub(r"(\\[bBAZ]|[?^$+*])", "", pattern)
+    pattern = re.sub(r'(\\[bBAZ]|[?^$+*])', '', pattern)
     if not pattern.startswith('/'):
         pattern = '/' + pattern
     return pattern
