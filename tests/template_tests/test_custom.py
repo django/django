@@ -30,7 +30,7 @@ class CustomFilterTests(SimpleTestCase):
         t = engine.from_string('{% load custom %}{{ name|make_data_div }}')
         self.assertEqual(t.render(Context({'name': 'foo'})), '<div data-name="foo"></div>')
 
-    def test_custom_filter(self):
+    def test_class_filter(self):
         engine = Engine(libraries=LIBRARIES)
         t = engine.from_string('{% load custom %}{{ name|class_filter }}')
         self.assertEqual(t.render(Context({'name': 'foo'})), 'foo')
