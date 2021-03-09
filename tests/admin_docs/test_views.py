@@ -384,6 +384,7 @@ class AdminDocViewFunctionsTests(SimpleTestCase):
             (r'^a/?$', '/a/'),
             (r'^\b(?P<slug>\w+)\B/(\w+)?', '/<slug>/<var>'),
             (r'^\A(?P<slug>\w+)\Z', '/<slug>'),
+            (r'^hello*/world+', '/hello/world'),
         )
         for pattern, output in tests:
             with self.subTest(pattern=pattern):
