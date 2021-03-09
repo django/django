@@ -6,7 +6,7 @@ on:
       - 'docs/**'
   push:
     branches:
-      - master
+      - main
     paths:
       - 'docs/**'
 
