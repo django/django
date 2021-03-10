@@ -1081,6 +1081,7 @@ class TransactionTestCase(SimpleTestCase):
                     "on a queryset when compared to string values. Set an "
                     "explicit 'transform' to silence this warning.",
                     category=RemovedInDjango41Warning,
+                    stacklevel=2,
                 )
                 transform = repr
         items = qs
