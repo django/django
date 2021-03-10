@@ -691,6 +691,8 @@ class SQLCompiler:
                 continue
             if field.model in only_load and field.attname not in only_load[field.model]:
                 continue
+            if hasattr(field.model._meta, 'defer_fields') and field.attname in field.model._meta.defer_fields:
+                continue
             alias = self.query.join_parent_model(opts, model, start_alias,
                                                  seen_models)
             column = field.get_col(alias)
