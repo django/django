@@ -235,9 +235,13 @@ def setup_databases(
     return old_names
 
 
-def iter_test_cases(suite):
-    """Return an iterator over a test suite's unittest.TestCase objects."""
-    for test in suite:
+def iter_test_cases(tests):
+    """
+    Return an iterator over a test suite's unittest.TestCase objects.
+
+    The tests argument can also be an iterable of TestCase objects.
+    """
+    for test in tests:
         if isinstance(test, TestCase):
             yield test
         else:

@@ -89,6 +89,20 @@ class TestSuiteTests(unittest.TestCase):
             'Tests1.test1', 'Tests1.test2', 'Tests2.test1', 'Tests2.test2',
         ])
 
+    def test_iter_test_cases_iterable_of_tests(self):
+        class Tests(unittest.TestCase):
+            def test1(self):
+                pass
+
+            def test2(self):
+                pass
+
+        tests = list(unittest.defaultTestLoader.loadTestsFromTestCase(Tests))
+        actual_tests = iter_test_cases(tests)
+        self.assertTestNames(actual_tests, expected=[
+            'Tests.test1', 'Tests.test2',
+        ])
+
     def test_iter_test_cases_custom_test_suite_class(self):
         suite = self.make_test_suite(suite_class=MySuite)
         tests = iter_test_cases(suite)
