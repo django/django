@@ -1,5 +1,6 @@
 from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest, HttpResponse
 from django.test import TestCase
 
@@ -38,5 +39,5 @@ class TestAuthenticationMiddleware(TestCase):
             "'django.contrib.sessions.middleware.SessionMiddleware' before "
             "'django.contrib.auth.middleware.AuthenticationMiddleware'."
         )
-        with self.assertRaisesMessage(AssertionError, msg):
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.middleware(HttpRequest())
