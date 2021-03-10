@@ -164,15 +164,15 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
             print("Adding permission '%s'" % perm)
 
 
-class CreatePermission(migrations.RunPython):
-    def __init__(self, app_label, model, codename, name):
+class CreateOrDeletePermission(migrations.RunPython):
+    def __init__(self, app_label, model, codename, name, forward, backward):
         self.app_label = app_label
         self.model = model
         self.codename = codename
         self.name = name
-        super().__init__(self.create_forward, self.noop)
+        super().__init__(forward, backward)
 
-    def create_forward(self, apps, schema_editor):
+    def create(self, apps, schema_editor):
         try:
             ContentType = apps.get_model('contenttypes', 'ContentType')
             Permission = apps.get_model('auth', 'Permission')
@@ -195,6 +195,40 @@ class CreatePermission(migrations.RunPython):
             # ContentType and Permission are applied. It will be created via
             # the post_migrate signal.
             pass
+
+    def delete(self, apps, schema_editor):
+        try:
+            ContentType = apps.get_model('contenttypes', 'ContentType')
+            Permission = apps.get_model('auth', 'Permission')
+        except LookupError:
+            return
+
+        db = schema_editor.connection.alias
+        if not router.allow_migrate_model(db, Permission):
+            return
+
+        try:
+            content_type = ContentType.objects.get_for_model(self.model, for_concrete_model=False)
+            Permission.objects.using(db).filter(
+                content_type=content_type,
+                codename=self.codename,
+            ).delete()
+
+        except OperationalError:
+            # We are trying to create a permission before all the migrations for
+            # ContentType and Permission are applied. It will be created via
+            # the post_migrate signal.
+            pass
+
+
+class CreatePermission(CreateOrDeletePermission):
+    def __init__(self, app_label, model, codename, name):
+        super().__init__(app_label, model, codename, name, self.create, self.delete)
+
+
+class DeletePermission(CreateOrDeletePermission):
+    def __init__(self, app_label, model, codename, name):
+        super().__init__(app_label, model, codename, name, self.delete, self.create)
 
 
 def inject_create_permissions(migration, operation, from_state, to_state, model_name):
@@ -224,10 +258,6 @@ def inject_create_or_rename_permissions_for_altered_permissions(migration, opera
     if ('auth', 'permission') not in from_state.models:
         return
 
-    # Create permissions only for the permissions in the operation
-    if "permissions" not in operation.options and "default_permissions" not in operation.options:
-        return
-
     FromModel = from_state.apps.get_model(migration.app_label, operation.name)
     from_opts = FromModel._meta
     from_permissions = dict(_get_all_permissions(from_opts))
@@ -237,7 +267,7 @@ def inject_create_or_rename_permissions_for_altered_permissions(migration, opera
     to_permissions = _get_all_permissions(to_opts)
 
     for to_codename, to_name in to_permissions:
-        from_name = from_permissions.get(to_codename)
+        from_name = from_permissions.pop(to_codename, None)
         # Permission hasn't been altered
         if from_name == to_name:
             continue
@@ -249,6 +279,9 @@ def inject_create_or_rename_permissions_for_altered_permissions(migration, opera
             # Altered name
             print(to_codename, from_name, to_codename, to_name)
             yield RenamePermission(migration.app_label, to_codename, from_name, to_codename, to_name)
+
+    for from_codename, from_name in from_permissions.items():
+        yield DeletePermission(migration.app_label, ToModel, from_codename, from_name)
 
 
 def get_system_username():

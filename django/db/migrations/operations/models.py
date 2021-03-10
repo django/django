@@ -639,8 +639,7 @@ class AlterOrderWithRespectTo(ModelOptionOperation):
 class AlterModelOptions(ModelOptionOperation):
     """
     Set new model options that don't directly affect the database schema
-    (like verbose_name, permissions, ordering). Python code in migrations
-    may still need them.
+    (like verbose_name, permissions, ordering). Python code in migrations may still need them.
     """
 
     # Model options we want to compare and preserve in an AlterModelOptions op
