@@ -130,7 +130,7 @@ class AdvancedTests(TestCase):
         """
         method = DataPoint.objects.all()[:2].update
         msg = 'Cannot update a query once a slice has been taken.'
-        with self.assertRaisesMessage(AssertionError, msg):
+        with self.assertRaisesMessage(TypeError, msg):
             method(another_value='another thing')
 
     def test_update_respects_to_field(self):

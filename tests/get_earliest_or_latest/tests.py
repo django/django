@@ -81,6 +81,11 @@ class EarliestOrLatestTests(TestCase):
         Article.objects.model._meta.get_latest_by = ('pub_date', 'expire_date')
         self.assertEqual(Article.objects.filter(pub_date=datetime(2005, 7, 28)).earliest(), a4)
 
+    def test_earliest_sliced_queryset(self):
+        msg = 'Cannot change a query once a slice has been taken.'
+        with self.assertRaisesMessage(TypeError, msg):
+            Article.objects.all()[0:5].earliest()
+
     def test_latest(self):
         # Because no Articles exist yet, latest() raises ArticleDoesNotExist.
         with self.assertRaises(Article.DoesNotExist):
@@ -142,6 +147,11 @@ class EarliestOrLatestTests(TestCase):
         # Meta.get_latest_by may be a tuple.
         Article.objects.model._meta.get_latest_by = ('pub_date', 'expire_date')
         self.assertEqual(Article.objects.filter(pub_date=datetime(2005, 7, 27)).latest(), a3)
+
+    def test_latest_sliced_queryset(self):
+        msg = 'Cannot change a query once a slice has been taken.'
+        with self.assertRaisesMessage(TypeError, msg):
+            Article.objects.all()[0:5].latest()
 
     def test_latest_manual(self):
         # You can still use latest() with a model that doesn't have

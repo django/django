@@ -700,7 +700,8 @@ class Queries1Tests(TestCase):
             )
             self.assertQuerysetEqual(q.reverse(), [])
             q.query.low_mark = 1
-            with self.assertRaisesMessage(AssertionError, 'Cannot change a query once a slice has been taken'):
+            msg = 'Cannot change a query once a slice has been taken.'
+            with self.assertRaisesMessage(TypeError, msg):
                 q.extra(select={'foo': "1"})
             self.assertQuerysetEqual(q.defer('meal'), [])
             self.assertQuerysetEqual(q.only('meal'), [])
@@ -2359,15 +2360,18 @@ class QuerySetSupportsPythonIdioms(TestCase):
         )
 
     def test_slicing_cannot_filter_queryset_once_sliced(self):
-        with self.assertRaisesMessage(AssertionError, "Cannot filter a query once a slice has been taken."):
+        msg = 'Cannot filter a query once a slice has been taken.'
+        with self.assertRaisesMessage(TypeError, msg):
             Article.objects.all()[0:5].filter(id=1)
 
     def test_slicing_cannot_reorder_queryset_once_sliced(self):
-        with self.assertRaisesMessage(AssertionError, "Cannot reorder a query once a slice has been taken."):
+        msg = 'Cannot reorder a query once a slice has been taken.'
+        with self.assertRaisesMessage(TypeError, msg):
             Article.objects.all()[0:5].order_by('id')
 
     def test_slicing_cannot_combine_queries_once_sliced(self):
-        with self.assertRaisesMessage(AssertionError, "Cannot combine queries once a slice has been taken."):
+        msg = 'Cannot combine queries once a slice has been taken.'
+        with self.assertRaisesMessage(TypeError, msg):
             Article.objects.all()[0:1] & Article.objects.all()[4:5]
 
     def test_slicing_negative_indexing_not_supported_for_single_element(self):
@@ -2417,7 +2421,8 @@ class WeirdQuerysetSlicingTests(TestCase):
         self.assertQuerysetEqual(Article.objects.all()[0:0], [])
         self.assertQuerysetEqual(Article.objects.all()[0:0][:10], [])
         self.assertEqual(Article.objects.all()[:0].count(), 0)
-        with self.assertRaisesMessage(TypeError, 'Cannot reverse a query once a slice has been taken.'):
+        msg = 'Cannot change a query once a slice has been taken.'
+        with self.assertRaisesMessage(TypeError, msg):
             Article.objects.all()[:0].latest('created')
 
     def test_empty_resultset_sql(self):
