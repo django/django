@@ -2,8 +2,8 @@ from django.core.exceptions import FieldError
 from django.test import TestCase
 
 from .models import (
-    BigChild, Child, ChildProxy, Primary, Publication, RefreshPrimaryProxy, Secondary, User,
-
+    BigChild, Child, ChildProxy, Primary, Publication, RefreshPrimaryProxy,
+    Secondary, User,
 )
 
 
