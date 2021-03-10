@@ -140,8 +140,6 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
         autocomplete view for it.
         """
         request = self.factory.get(self.url, {'term': 'is', **self.opts})
-        self.user.is_staff = True
-        self.user.save()
         request.user = self.user
         with self.assertRaises(PermissionDenied):
             AutocompleteJsonView.as_view(**self.as_view_args)(request)
