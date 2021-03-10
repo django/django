@@ -96,6 +96,16 @@ class MiddlewareMixin:
         self._async_check()
         super().__init__()
 
+    def __repr__(self):
+        return '<%s get_response=%s>' % (
+            self.__class__.__qualname__,
+            getattr(
+                self.get_response,
+                '__qualname__',
+                self.get_response.__class__.__name__,
+            ),
+        )
+
     def _async_check(self):
         """
         If get_response is a coroutine function, turns us into async mode so
