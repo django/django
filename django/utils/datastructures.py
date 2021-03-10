@@ -37,6 +37,10 @@ class OrderedSet:
     def __len__(self):
         return len(self.dict)
 
+    def __repr__(self):
+        data = repr(list(self.dict)) if self.dict else ''
+        return f'{self.__class__.__qualname__}({data})'
+
 
 class MultiValueDictKeyError(KeyError):
     pass

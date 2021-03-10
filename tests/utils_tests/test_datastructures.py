@@ -60,6 +60,10 @@ class OrderedSetTests(SimpleTestCase):
         s.add(2)
         self.assertEqual(len(s), 2)
 
+    def test_repr(self):
+        self.assertEqual(repr(OrderedSet()), 'OrderedSet()')
+        self.assertEqual(repr(OrderedSet([2, 3, 2, 1])), 'OrderedSet([2, 3, 1])')
+
 
 class MultiValueDictTests(SimpleTestCase):
 
