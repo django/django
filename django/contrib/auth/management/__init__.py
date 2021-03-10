@@ -60,6 +60,12 @@ class RenamePermission(migrations.RunPython):
         except Permission.DoesNotExist:
             pass
         else:
+            # Make sure no other permission with the same name exists, which happens
+            # when contenttype post_operations happen before this one.
+            Permission.objects.db_manager(db).filter(
+                content_type__app_label=self.app_label,
+                codename=new_codename,
+            ).exclude(pk=permission.pk).delete()
             permission.codename = new_codename
             permission.name = new_name
             permission.save(update_fields={'codename', 'name'})
@@ -277,7 +283,6 @@ def inject_create_or_rename_permissions_for_altered_permissions(migration, opera
             yield CreatePermission(migration.app_label, ToModel, to_codename, to_name)
         else:
             # Altered name
-            print(to_codename, from_name, to_codename, to_name)
             yield RenamePermission(migration.app_label, to_codename, from_name, to_codename, to_name)
 
     for from_codename, from_name in from_permissions.items():

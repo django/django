@@ -9,14 +9,10 @@ def assert_model_named_mini_user(apps, schema_editor):
     except ContentType.DoesNotExist:
         pass
     else:
-        if (
-            not Permission.objects.filter(
-                content_type=content_type, name__endswith="mini user"
-            ).count() == 4
-        ):
-            raise AssertionError(
-                "The default permissions for MiniUser should have been renamed with MiniUser"
-            )
+        permission_queryset = Permission.objects.filter(
+            content_type=content_type, name__endswith="mini user"
+        )
+        assert permission_queryset.count() == 4, permission_queryset.values_list("codename", flat=True)
 
 
 def assert_model_named_minimal_user(apps, schema_editor):
@@ -29,27 +25,15 @@ def assert_model_named_minimal_user(apps, schema_editor):
     except ContentType.DoesNotExist:
         pass
     else:
-        print(
-            Permission.objects.filter(content_type=content_type).values_list(
-                "name", flat=True
-            )
+        permission_queryset = Permission.objects.filter(
+            content_type=content_type, name__endswith="minimal user"
         )
-        if (
-            not Permission.objects.filter(
-                content_type=content_type, name__endswith="minimal user"
-            ).count() == 4
-        ):
-            raise AssertionError(
-                "The default permissions for MinimalUser should have been reverted to MinimalUser"
-            )
+        assert permission_queryset.count() == 4, permission_queryset.values_list("codename", flat=True)
 
 
 class Migration(migrations.Migration):
-
     operations = [
-        migrations.RunPython(
-            migrations.RunPython.noop, assert_model_named_minimal_user
-        ),
+        migrations.RunPython(migrations.RunPython.noop, assert_model_named_minimal_user),
         migrations.RenameModel("MinimalUser", "MiniUser"),
         migrations.RunPython(
             assert_model_named_mini_user, assert_model_named_mini_user

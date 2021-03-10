@@ -54,8 +54,6 @@ def assert_permission_count(expected_number_of_permissions):
                 content_type=content_type,
             )
             # add + view + change + delete ("removed" permission) + test + eat == 6
-            print("COUNT", minimal_user_permissions_queryset.count())
-            print([(p.codename, p.name) for p in minimal_user_permissions_queryset])
             permission_count = minimal_user_permissions_queryset.count()
             assert permission_count == expected_number_of_permissions, "Expected {} permissions, got {}".format(
                 expected_number_of_permissions, permission_count

@@ -31,7 +31,6 @@ class Migration(migrations.Migration):
     ]
 
     dependencies = [
-        # TODO(arthurio): Update to latest
-        ("auth", "0011_update_proxy_permissions"),
+        ("auth", "0012_alter_user_first_name_max_length"),
         ("contenttypes", "0002_remove_content_type_name"),
     ]
