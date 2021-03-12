@@ -1,6 +1,6 @@
 from django import get_version
 from django.test import SimpleTestCase
-from django.utils.version import get_version_tuple
+from django.utils.version import get_complete_version, get_version_tuple
 
 
 class VersionTests(SimpleTestCase):
@@ -28,3 +28,14 @@ class VersionTests(SimpleTestCase):
         self.assertEqual(get_version_tuple('1.2.3'), (1, 2, 3))
         self.assertEqual(get_version_tuple('1.2.3b2'), (1, 2, 3))
         self.assertEqual(get_version_tuple('1.2.3b2.dev0'), (1, 2, 3))
+
+    def test_get_version_invalid_version(self):
+        tests = [
+            # Invalid length.
+            (3, 2, 0, 'alpha', 1, '20210315111111'),
+            # Invalid development status.
+            (3, 2, 0, 'gamma', 1, '20210315111111'),
+        ]
+        for version in tests:
+            with self.subTest(version=version), self.assertRaises(AssertionError):
+                get_complete_version(version)
