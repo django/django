@@ -559,6 +559,7 @@ class ModelAdmin(BaseModelAdmin):
     list_max_show_all = 200
     list_editable = ()
     search_fields = ()
+    search_help_text = None
     date_hierarchy = None
     save_as = False
     save_as_continue = True
@@ -741,6 +742,7 @@ class ModelAdmin(BaseModelAdmin):
             self.get_list_filter(request),
             self.date_hierarchy,
             self.get_search_fields(request),
+            self.search_help_text,
             self.get_list_select_related(request),
             self.list_per_page,
             self.list_max_show_all,
