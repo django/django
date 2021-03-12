@@ -11,6 +11,12 @@
 {% for pair in cl.params.items %}
     {% if pair.0 != search_var %}<input type="hidden" name="{{ pair.0 }}" value="{{ pair.1 }}">{% endif %}
 {% endfor %}
+{% if cl.search_help_text %}
+<br class="clear">
+<small class="quiet" style="margin-left: 23px;">
+    <i>{{ cl.search_help_text }}</i>
+</small>
+{% endif %}
 </div>
 </form></div>
 {% endif %}
