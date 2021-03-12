@@ -122,6 +122,9 @@ class Origin:
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        return '<%s name=%r>' % (self.__class__.__qualname__, self.name)
+
     def __eq__(self, other):
         return (
             isinstance(other, Origin) and
@@ -157,6 +160,12 @@ class Template:
     def __iter__(self):
         for node in self.nodelist:
             yield from node
+
+    def __repr__(self):
+        return '<%s template_string="%s...">' % (
+            self.__class__.__qualname__,
+            self.source[:20].replace('\n', ''),
+        )
 
     def _render(self, context):
         return self.nodelist.render(context)
