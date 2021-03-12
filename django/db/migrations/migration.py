@@ -183,6 +183,9 @@ class Migration:
         are not guaranteed to be unique, but put some effort into the fallback
         name to avoid VCS conflicts if possible.
         """
+        if self.initial:
+            return 'initial'
+
         name = None
         if len(self.operations) == 1:
             name = self.operations[0].migration_name_fragment
@@ -192,7 +195,7 @@ class Migration:
         ):
             name = '_'.join(sorted(o.migration_name_fragment for o in self.operations))
         if name is None:
-            name = 'initial' if self.initial else 'auto_%s' % get_migration_name_timestamp()
+            name = 'auto_%s' % get_migration_name_timestamp()
         return name
 
 

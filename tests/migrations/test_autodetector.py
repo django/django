@@ -600,8 +600,10 @@ class AutodetectorTests(TestCase):
         graph.add_dependency("testapp.0002_foobar", ("testapp", "0002_foobar"), ("testapp", "0001_initial"))
         graph.add_dependency("testapp.0002_foobar", ("testapp", "0002_foobar"), ("otherapp", "0001_initial"))
         # Use project state to make a new migration change set
-        before = self.make_project_state([])
-        after = self.make_project_state([self.author_empty, self.other_pony, self.other_stable])
+        before = self.make_project_state([self.publisher, self.other_pony])
+        after = self.make_project_state([
+            self.author_empty, self.publisher, self.other_pony, self.other_stable,
+        ])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Run through arrange_for_graph
@@ -609,7 +611,7 @@ class AutodetectorTests(TestCase):
         # Make sure there's a new name, deps match, etc.
         self.assertEqual(changes["testapp"][0].name, "0003_author")
         self.assertEqual(changes["testapp"][0].dependencies, [("testapp", "0002_foobar")])
-        self.assertEqual(changes["otherapp"][0].name, "0002_pony_stable")
+        self.assertEqual(changes["otherapp"][0].name, '0002_stable')
         self.assertEqual(changes["otherapp"][0].dependencies, [("otherapp", "0001_initial")])
 
     def test_arrange_for_graph_with_multiple_initial(self):
@@ -2663,7 +2665,7 @@ class MigrationSuggestNameTests(SimpleTestCase):
             ]
 
         migration = Migration('0001_initial', 'test_app')
-        self.assertEqual(migration.suggest_name(), 'animal_person')
+        self.assertEqual(migration.suggest_name(), 'initial')
 
     def test_none_name(self):
         class Migration(migrations.Migration):
