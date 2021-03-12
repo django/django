@@ -565,20 +565,19 @@ class DiscoverRunner:
 
         all_tests = []
         for label in test_labels:
-            kwargs = discover_kwargs.copy()
-            tests = None
-
             label_as_path = os.path.abspath(label)
+            tests = None
 
             # if a module, or "module.ClassName[.method_name]", just run those
             if not os.path.exists(label_as_path):
                 tests = self.test_loader.loadTestsFromName(label)
-            elif os.path.isdir(label_as_path) and not self.top_level:
-                top_level = find_top_level(label_as_path)
-                kwargs['top_level_dir'] = top_level
 
+            # Try discovery if "label" is a package or directory.
             if not (tests and tests.countTestCases()) and is_discoverable(label):
-                # Try discovery if path is a package or directory
+                kwargs = discover_kwargs.copy()
+                if os.path.isdir(label_as_path) and not self.top_level:
+                    kwargs['top_level_dir'] = find_top_level(label_as_path)
+
                 tests = self.test_loader.discover(start_dir=label, **kwargs)
 
                 # Make unittest forget the top-level dir it calculated from this
