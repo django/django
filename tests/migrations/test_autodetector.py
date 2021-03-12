@@ -2633,6 +2633,21 @@ class AutodetectorTests(TestCase):
 
 
 class MigrationSuggestNameTests(SimpleTestCase):
+    def test_no_operations(self):
+        class Migration(migrations.Migration):
+            operations = []
+
+        migration = Migration('some_migration', 'test_app')
+        self.assertIs(migration.suggest_name().startswith('auto_'), True)
+
+    def test_no_operations_initial(self):
+        class Migration(migrations.Migration):
+            initial = True
+            operations = []
+
+        migration = Migration('some_migration', 'test_app')
+        self.assertEqual(migration.suggest_name(), 'initial')
+
     def test_single_operation(self):
         class Migration(migrations.Migration):
             operations = [migrations.CreateModel('Person', fields=[])]
