@@ -49,7 +49,7 @@ class ChangeList:
     search_form_class = ChangeListSearchForm
 
     def __init__(self, request, model, list_display, list_display_links,
-                 list_filter, date_hierarchy, search_fields, list_select_related,
+                 list_filter, date_hierarchy, search_fields, search_help_text, list_select_related,
                  list_per_page, list_max_show_all, list_editable, model_admin, sortable_by):
         self.model = model
         self.opts = model._meta
@@ -63,6 +63,7 @@ class ChangeList:
         self.clear_all_filters_qs = None
         self.date_hierarchy = date_hierarchy
         self.search_fields = search_fields
+        self.search_help_text = search_help_text
         self.list_select_related = list_select_related
         self.list_per_page = list_per_page
         self.list_max_show_all = list_max_show_all
