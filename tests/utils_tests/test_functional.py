@@ -224,6 +224,12 @@ class FunctionalTests(SimpleTestCase):
             lazified()
             mocked.assert_not_called()
 
+    def test_lazy_bytes_and_str_result_classes(self):
+        lazy_obj = lazy(lambda: 'test', str, bytes)
+        msg = 'Cannot call lazy() with both bytes and text return types.'
+        with self.assertRaisesMessage(ValueError, msg):
+            lazy_obj()
+
     def test_classproperty_getter(self):
         class Foo:
             foo_attr = 123
