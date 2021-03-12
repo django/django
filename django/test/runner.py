@@ -589,14 +589,13 @@ class DiscoverRunner:
                 top_level = label_as_path
                 while True:
                     init_py = os.path.join(top_level, '__init__.py')
-                    if os.path.exists(init_py):
-                        try_next = os.path.dirname(top_level)
-                        if try_next == top_level:
-                            # __init__.py all the way down? give up.
-                            break
-                        top_level = try_next
-                        continue
-                    break
+                    if not os.path.exists(init_py):
+                        break
+                    try_next = os.path.dirname(top_level)
+                    if try_next == top_level:
+                        # __init__.py all the way down? give up.
+                        break
+                    top_level = try_next
                 kwargs['top_level_dir'] = top_level
 
             if not (tests and tests.countTestCases()) and is_discoverable(label):
