@@ -896,7 +896,7 @@ class Options:
 
     @cached_property
     def default_deferred_fields(self):
-        if hasattr(self, "defer_fields")    :
+        if hasattr(self, "defer_fields"):
             return {self.get_field(field_name).attname for field_name in self.defer_fields}
 
         return set()
