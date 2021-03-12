@@ -190,8 +190,6 @@ class QuerySet:
         self._fields = None
         self._defer_next_filter = False
         self._deferred_filter = None
-        if model is not None and hasattr(model._meta, 'defer_fields'):
-            self._query.add_deferred_loading(model._meta.defer_fields)
 
     @property
     def query(self):

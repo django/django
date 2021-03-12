@@ -272,20 +272,35 @@ class TestDefer2(AssertionMixin, TestCase):
             self.assertEqual(rf2.name, 'new foo')
             self.assertEqual(rf2.value, 'new bar')
 
-    def test_default_defer_fields(self):
+
+class TestDefaultDeferredFields(AssertionMixin, TestCase):
+    """
+    The model `Publication` has two default deferred fields:
+    `title` and `user`. The model `User` has one default deferred field.
+    Those fields must be deferred during getting object from DB
+    """
+    def test_default_deferred_fields(self):
+        user = User.objects.create()
+        Publication.objects.create(user=user)
+
+        publication = Publication.objects.get()
+        self.assertEqual(len(publication.get_deferred_fields()), 2)
+        self.assertEqual(publication.user, user)
+        self.assertEqual(publication.title, "Test Title")
+
+        more_deferred_publication = Publication.objects.defer("text").get()
+        self.assertEqual(len(more_deferred_publication.get_deferred_fields()), 3)
+        self.assertEqual(more_deferred_publication.text, "Test text")
+
+    def test_select_related_with_default_deferred_fields(self):
         """
-        The model `Publication` has two fields which are marked as deferred:
-        `title` and `user`. This two fields must be deferred during getting
-        object from DB
+        Default deferred fields should not be fetched in select_related calls
         """
-        u = User.objects.create()
-        p = Publication()
-        p.user = u
-        p.save()
-        p = Publication.objects.get()
-        publication = Publication.objects.defer('text').get()
-        self.assertEqual(len(p.get_deferred_fields()), 2)
-        self.assertEqual(len(publication.get_deferred_fields()), 3)
-        self.assertEqual(p.user, u)
-        self.assertEqual(publication.text, "Test text")
-        self.assertEqual(p.title, "Test Title")
+        user = User.objects.create()
+        Publication.objects.create(user=user)
+
+        publication = Publication.objects.select_related("user").get()
+        self.assertEqual(len(publication.get_deferred_fields()), 2)
+        self.assertEqual(len(publication.user.get_deferred_fields()), 1)
+        publication.user_id
+        self.assertEqual(len(publication.get_deferred_fields()), 1)

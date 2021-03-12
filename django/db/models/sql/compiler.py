@@ -669,6 +669,7 @@ class SQLCompiler:
         if opts is None:
             opts = self.query.get_meta()
         only_load = self.deferred_to_columns()
+        _, defer = self.query.deferred_loading
         start_alias = start_alias or self.query.get_initial_alias()
         # The 'seen_models' is used to optimize checking the needed parent
         # alias for a given field. This also includes None -> start_alias to
@@ -691,7 +692,10 @@ class SQLCompiler:
                 continue
             if field.model in only_load and field.attname not in only_load[field.model]:
                 continue
-            if hasattr(field.model._meta, 'defer_fields') and field.attname in field.model._meta.defer_fields:
+            if (
+                defer and
+                field.attname in field.model._meta.default_deferred_fields
+            ):
                 continue
             alias = self.query.join_parent_model(opts, model, start_alias,
                                                  seen_models)

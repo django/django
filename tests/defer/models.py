@@ -48,6 +48,10 @@ class RefreshPrimaryProxy(Primary):
 
 class User(models.Model):
     username = models.CharField(max_length=50)
+    nickname = models.CharField(max_length=50)
+
+    class Meta:
+        defer_fields = ('nickname',)
 
 
 class Publication(models.Model):
