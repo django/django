@@ -585,6 +585,30 @@ class DiscoverRunner:
         setup_test_environment(debug=self.debug_mode)
         unittest.installHandler()
 
+    def load_tests_for_label(self, label, discover_kwargs):
+        label_as_path = os.path.abspath(label)
+        tests = None
+
+        # If a module, or "module.ClassName[.method_name]", just run those.
+        if not os.path.exists(label_as_path):
+            tests = self.test_loader.loadTestsFromName(label)
+            if tests.countTestCases():
+                return tests
+        # Try discovery if "label" is a package or directory.
+        if not is_discoverable(label):
+            return tests
+
+        kwargs = discover_kwargs.copy()
+        if os.path.isdir(label_as_path) and not self.top_level:
+            kwargs['top_level_dir'] = find_top_level(label_as_path)
+
+        tests = self.test_loader.discover(start_dir=label, **kwargs)
+
+        # Make unittest forget the top-level dir it calculated from this run,
+        # to support running tests from two different top-levels.
+        self.test_loader._top_level_dir = None
+        return tests
+
     def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
         test_labels = test_labels or ['.']
         extra_tests = extra_tests or []
@@ -598,25 +622,7 @@ class DiscoverRunner:
 
         all_tests = []
         for label in test_labels:
-            label_as_path = os.path.abspath(label)
-            tests = None
-
-            # if a module, or "module.ClassName[.method_name]", just run those
-            if not os.path.exists(label_as_path):
-                tests = self.test_loader.loadTestsFromName(label)
-
-            # Try discovery if "label" is a package or directory.
-            if not (tests and tests.countTestCases()) and is_discoverable(label):
-                kwargs = discover_kwargs.copy()
-                if os.path.isdir(label_as_path) and not self.top_level:
-                    kwargs['top_level_dir'] = find_top_level(label_as_path)
-
-                tests = self.test_loader.discover(start_dir=label, **kwargs)
-
-                # Make unittest forget the top-level dir it calculated from this
-                # run, to support running tests from two different top-levels.
-                self.test_loader._top_level_dir = None
-
+            tests = self.load_tests_for_label(label, discover_kwargs)
             all_tests.extend(iter_test_cases(tests))
 
         all_tests.extend(iter_test_cases(extra_tests))
