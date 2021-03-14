@@ -156,10 +156,11 @@ First, download the PROJ source code and datum shifting files [#]_::
     $ wget https://download.osgeo.org/proj/proj-datumgrid-X.Y.tar.gz
 
 Next, untar the source code archive, and extract the datum shifting files in the
-``nad`` subdirectory.  This must be done *prior* to configuration::
+``data`` subdirectory (use ``nad`` subdirectory for PROJ < 6.x). This must be
+done *prior* to configuration::
 
     $ tar xzf proj-X.Y.Z.tar.gz
-    $ cd proj-X.Y.Z/nad
+    $ cd proj-X.Y.Z/data
     $ tar xzf ../../proj-datumgrid-X.Y.tar.gz
     $ cd ..
 
