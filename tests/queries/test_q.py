@@ -39,17 +39,14 @@ class QTests(SimpleTestCase):
         q = Q(price__gt=F('discounted_price'))
         path, args, kwargs = q.deconstruct()
         self.assertEqual(path, 'django.db.models.Q')
-        self.assertEqual(args, ())
-        self.assertEqual(kwargs, {'price__gt': F('discounted_price')})
+        self.assertEqual(args, (('price__gt', F('discounted_price')),))
+        self.assertEqual(kwargs, {})
 
     def test_deconstruct_negated(self):
         q = ~Q(price__gt=F('discounted_price'))
         path, args, kwargs = q.deconstruct()
-        self.assertEqual(args, ())
-        self.assertEqual(kwargs, {
-            'price__gt': F('discounted_price'),
-            '_negated': True,
-        })
+        self.assertEqual(args, (('price__gt', F('discounted_price')),))
+        self.assertEqual(kwargs, {'_negated': True})
 
     def test_deconstruct_or(self):
         q1 = Q(price__gt=F('discounted_price'))
@@ -86,6 +83,12 @@ class QTests(SimpleTestCase):
         q = Q(Q(price__gt=F('discounted_price')))
         path, args, kwargs = q.deconstruct()
         self.assertEqual(args, (Q(price__gt=F('discounted_price')),))
+        self.assertEqual(kwargs, {})
+
+    def test_deconstruct_not_subscriptable(self):
+        q = Q(False)
+        path, args, kwargs = q.deconstruct()
+        self.assertEqual(args, (False,))
         self.assertEqual(kwargs, {})
 
     def test_reconstruct(self):
