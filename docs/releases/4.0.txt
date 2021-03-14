@@ -220,6 +220,8 @@ Models
   whether the queryset contains the given object. This tries to perform the
   query in the simplest and fastest way possible.
 
+* :meth:`.QuerySet.bulk_update` now returns a count of updated objects.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
