@@ -821,6 +821,10 @@ class BasicExpressionsTests(TestCase):
             Q() & Exists(is_poc),
             Exists(is_poc) | Q(),
             Q() | Exists(is_poc),
+            Q(Exists(is_poc)) & Q(),
+            Q() & Q(Exists(is_poc)),
+            Q(Exists(is_poc)) | Q(),
+            Q() | Q(Exists(is_poc)),
         ]
         for conditions in tests:
             with self.subTest(conditions):

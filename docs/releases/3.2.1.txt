@@ -33,3 +33,6 @@ Bugfixes
 
 * Fixed a bug in Django 3.2 where variable lookup errors were logged rendering
   the sitemap template if alternates were not defined (:ticket:`32648`).
+
+* Fixed a regression in Django 3.2 that caused a crash when combining ``Q()``
+  objects which contains boolean expressions (:ticket:`32548`).
