@@ -85,6 +85,14 @@ class QTests(SimpleTestCase):
         self.assertEqual(args, (Q(price__gt=F('discounted_price')),))
         self.assertEqual(kwargs, {})
 
+    def test_nested_empty(self):
+        q = Q(Q(), ~Q(), Q(Q()))
+        self.assertEqual(q, Q())
+
+    def test_nested_empty_falsy(self):
+        q = Q(Q(), 0, ~Q(), False, Q(Q()), '')
+        self.assertEqual(q, Q(0, False, ''))
+
     def test_deconstruct_not_subscriptable(self):
         q = Q(False)
         path, args, kwargs = q.deconstruct()
