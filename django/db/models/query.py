@@ -564,8 +564,10 @@ class QuerySet:
                 update_kwargs[field.attname] = case_statement
             updates.append(([obj.pk for obj in batch_objs], update_kwargs))
         with transaction.atomic(using=self.db, savepoint=False):
+            rows = 0
             for pks, update_kwargs in updates:
-                self.filter(pk__in=pks).update(**update_kwargs)
+                rows += self.filter(pk__in=pks).update(**update_kwargs)
+        return rows
     bulk_update.alters_data = True
 
     def get_or_create(self, defaults=None, **kwargs):

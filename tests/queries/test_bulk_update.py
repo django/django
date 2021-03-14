@@ -200,6 +200,13 @@ class BulkUpdateTests(TestCase):
         Number.objects.bulk_update(numbers, ['num'])
         self.assertCountEqual(Number.objects.filter(num=1), numbers)
 
+    def test_row_count(self):
+        numbers = [Number.objects.create(num=0) for _ in range(10)]
+        for number in numbers:
+            number.num = F('num') + 1
+        rows = Number.objects.bulk_update(numbers, ['num'])
+        self.assertEqual(rows, 10)
+
     def test_booleanfield(self):
         individuals = [Individual.objects.create(alive=False) for _ in range(10)]
         for individual in individuals:
