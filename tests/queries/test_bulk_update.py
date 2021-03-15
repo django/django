@@ -125,7 +125,8 @@ class BulkUpdateTests(TestCase):
 
     def test_empty_objects(self):
         with self.assertNumQueries(0):
-            Note.objects.bulk_update([], ['note'])
+            count = Note.objects.bulk_update([], ['note'])
+            self.assertEqual(count, 0)
 
     def test_large_batch(self):
         Note.objects.bulk_create([
@@ -133,7 +134,8 @@ class BulkUpdateTests(TestCase):
             for i in range(0, 2000)
         ])
         notes = list(Note.objects.all())
-        Note.objects.bulk_update(notes, ['note'])
+        count = Note.objects.bulk_update(notes, ['note'])
+        self.assertEqual(count, 2000)
 
     def test_only_concrete_fields_allowed(self):
         obj = Valid.objects.create(valid='test')
@@ -151,7 +153,8 @@ class BulkUpdateTests(TestCase):
     def test_custom_db_columns(self):
         model = CustomDbColumn.objects.create(custom_column=1)
         model.custom_column = 2
-        CustomDbColumn.objects.bulk_update([model], fields=['custom_column'])
+        count = CustomDbColumn.objects.bulk_update([model], fields=['custom_column'])
+        self.assertEqual(count, 1)
         model.refresh_from_db()
         self.assertEqual(model.custom_column, 2)
 
@@ -199,13 +202,6 @@ class BulkUpdateTests(TestCase):
             number.num = F('num') + 1
         Number.objects.bulk_update(numbers, ['num'])
         self.assertCountEqual(Number.objects.filter(num=1), numbers)
-
-    def test_row_count(self):
-        numbers = [Number.objects.create(num=0) for _ in range(10)]
-        for number in numbers:
-            number.num = F('num') + 1
-        rows = Number.objects.bulk_update(numbers, ['num'])
-        self.assertEqual(rows, 10)
 
     def test_booleanfield(self):
         individuals = [Individual.objects.create(alive=False) for _ in range(10)]
