@@ -595,7 +595,11 @@ class DiscoverRunner:
             if tests.countTestCases():
                 return tests
         # Try discovery if "label" is a package or directory.
-        if not is_discoverable(label):
+        is_importable, is_package = try_importing(label)
+        if is_importable:
+            if not is_package:
+                return tests
+        elif not os.path.isdir(label_as_path):
             return tests
 
         kwargs = discover_kwargs.copy()
@@ -774,20 +778,18 @@ class DiscoverRunner:
         return self.suite_result(suite, result)
 
 
-def is_discoverable(label):
+def try_importing(label):
     """
-    Check if a test label points to a Python package or file directory.
+    Try importing a test label, and return (is_importable, is_package).
 
     Relative labels like "." and ".." are seen as directories.
     """
     try:
         mod = import_module(label)
     except (ImportError, TypeError):
-        pass
-    else:
-        return hasattr(mod, '__path__')
+        return (False, False)
 
-    return os.path.isdir(os.path.abspath(label))
+    return (True, hasattr(mod, '__path__'))
 
 
 def find_top_level(top_level):
