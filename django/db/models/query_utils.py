@@ -12,6 +12,7 @@ from collections import namedtuple
 from django.core.exceptions import FieldError
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
+from django.utils.functional import classproperty
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
@@ -91,6 +92,53 @@ class Q(tree.Node):
         if self.negated:
             kwargs['_negated'] = True
         return path, args, kwargs
+
+    def empty(self):
+        for child in self.children:
+            if not isinstance(child, Q) or not child.empty():
+                return False
+        return True
+
+    @classproperty
+    def FALSE(cls):
+        """
+        A Q object that will always filter out everything.
+        Note: `bool(Q.FALSE)` is still `True`
+        """
+        return cls(pk__in=[])
+
+    @classproperty
+    def TRUE(cls):
+        """
+        A Q object that will never filter out anything.
+        """
+        return ~cls(pk__in=[])
+
+    @classmethod
+    def all(cls, iterable):
+        """
+        Combines filters with a logical `&`. Defaults to Q.TRUE if the
+        iterable is empty or all elements are empty.
+        """
+        q = cls()
+        for element in iterable:
+            q &= element
+        if q.empty():
+            return cls.TRUE
+        return q
+
+    @classmethod
+    def any(cls, iterable):
+        """
+        Combines filters with a logical `&`. Defaults to Q.FALSE if the
+        iterable is empty or all elements are empty.
+        """
+        q = cls()
+        for element in iterable:
+            q |= element
+        if q.empty():
+            return cls.FALSE
+        return q
 
 
 class DeferredAttribute:
