@@ -255,6 +255,18 @@ class TestUtilsHtml(SimpleTestCase):
                 'Search for <a href="http://google.com/?q=">google.com/?q=</a>!'
             ),
             ('foo@example.com', '<a href="mailto:foo@example.com">foo@example.com</a>'),
+            (
+                'Escaped query string - https://google.com?q=%2Fs+meaning',
+                'Escaped query string - '
+                '<a href="https://google.com?q=%2Fs+meaning">https://google.com?q=%2Fs+meaning</a>'
+            ),
+            (
+                'Escaped fragment - https://example.com/login?u=1#redirect=http%3A%2F%2Fexample.com%2Fadmin',
+                'Escaped fragment - '
+                '<a href="https://example.com/login?u=1#redirect=http%3A%2F%2Fexample.com%2Fadmin">'
+                'https://example.com/login?u=1#redirect=http%3A%2F%2Fexample.com%2Fadmin'
+                '</a>'
+            ),
         )
         for value, output in tests:
             with self.subTest(value=value):
