@@ -34,7 +34,7 @@ many projects they are typically the most commonly used views.
     #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
     #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_object_name()`
     #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data()`
-    #. ``get()``
+    #. :meth:`~django.views.generic.detail.BaseDetailView.get`
     #. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
 
     **Example myapp/views.py**::
@@ -123,7 +123,7 @@ many projects they are typically the most commonly used views.
     #. :meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset()`
     #. :meth:`~django.views.generic.list.MultipleObjectMixin.get_context_object_name()`
     #. :meth:`~django.views.generic.list.MultipleObjectMixin.get_context_data()`
-    #. ``get()``
+    #. :meth:`~django.views.generic.list.BaseListView.get`
     #. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
 
     **Example views.py**::
