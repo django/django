@@ -29,6 +29,19 @@ class QTests(SimpleTestCase):
     def test_combine_or_both_empty(self):
         self.assertEqual(Q() | Q(), Q())
 
+    def test_combine_nested_empty(self):
+        q = Q(x=1)
+        self.assertEqual(q | Q(Q()), q)
+        self.assertEqual(Q(Q()) | q, q)
+        self.assertEqual(q & Q(Q()), q)
+        self.assertEqual(Q(Q()) & q, q)
+
+        q = Q(Q()) | Q(Q())
+        self.assertIs(q.empty(), True)
+
+        q = Q(Q()) & Q(Q())
+        self.assertIs(q.empty(), True)
+
     def test_combine_not_q_object(self):
         obj = object()
         q = Q(x=1)
@@ -93,6 +106,19 @@ class QTests(SimpleTestCase):
         path, args, kwargs = q.deconstruct()
         self.assertEqual(args, (Exists(tagged),))
         self.assertEqual(kwargs, {})
+
+    def test_empty(self):
+        q = Q()
+        self.assertIs(q.empty(), True)
+
+        q = Q(Q(), ~Q(), Q(Q()))
+        self.assertIs(q.empty(), True)
+
+        q = Q(x=1)
+        self.assertIs(q.empty(), False)
+
+        q = Q(Q(), ~Q(), Q(Q(x=1)))
+        self.assertIs(q.empty(), False)
 
     def test_reconstruct(self):
         q = Q(price__gt=F('discounted_price'))

@@ -44,11 +44,11 @@ class Q(tree.Node):
             raise TypeError(other)
 
         # If the other Q() is empty, ignore it and just use `self`.
-        if not other:
+        if isinstance(other, Q) and other.empty():
             _, args, kwargs = self.deconstruct()
             return type(self)(*args, **kwargs)
         # Or if this Q is empty, ignore it and just use `other`.
-        elif not self:
+        elif self.empty():
             _, args, kwargs = other.deconstruct()
             return type(other)(*args, **kwargs)
 
@@ -91,6 +91,12 @@ class Q(tree.Node):
         if self.negated:
             kwargs['_negated'] = True
         return path, args, kwargs
+
+    def empty(self):
+        for child in self.children:
+            if not isinstance(child, Q) or not child.empty():
+                return False
+        return True
 
 
 class DeferredAttribute:
