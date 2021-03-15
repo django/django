@@ -623,7 +623,7 @@ with the admin site:
 * **admin.E022**: The value of ``radio_fields`` refers to ``<field name>``,
   which is not a field of ``<model>``.
 * **admin.E023**: The value of ``radio_fields`` refers to ``<field name>``,
-  which is not instance of ``ForeignKey``, and does not have a ``choices``
+  which is not an instance of ``ForeignKey``, and does not have a ``choices``
   definition.
 * **admin.E024**: The value of ``radio_fields[<field name>]`` must be either
   ``admin.HORIZONTAL`` or ``admin.VERTICAL``.
