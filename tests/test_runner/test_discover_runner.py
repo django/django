@@ -269,14 +269,6 @@ class DiscoverRunnerTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             DiscoverRunner(pdb=True, parallel=2)
 
-    def test_buffer_with_parallel(self):
-        msg = (
-            'You cannot use -b/--buffer with parallel tests; pass '
-            '--parallel=1 to use it.'
-        )
-        with self.assertRaisesMessage(ValueError, msg):
-            DiscoverRunner(buffer=True, parallel=2)
-
     def test_buffer_mode_test_pass(self):
         runner = DiscoverRunner(buffer=True, verbose=0)
         with captured_stdout() as stdout, captured_stderr() as stderr:

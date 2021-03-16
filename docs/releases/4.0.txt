@@ -258,6 +258,9 @@ Tests
   serialized to allow usage of the
   :ref:`serialized_rollback <test-case-serialized-rollback>` feature.
 
+* Django test runner now supports a :option:`--buffer <test --buffer>` option
+  with parallel tests.
+
 URLs
 ~~~~
 

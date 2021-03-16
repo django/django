@@ -314,8 +314,9 @@ class RemoteTestRunner:
 
     resultclass = RemoteTestResult
 
-    def __init__(self, failfast=False, resultclass=None):
+    def __init__(self, failfast=False, resultclass=None, buffer=False):
         self.failfast = failfast
+        self.buffer = buffer
         if resultclass is not None:
             self.resultclass = resultclass
 
@@ -323,6 +324,7 @@ class RemoteTestRunner:
         result = self.resultclass()
         unittest.registerResult(result)
         result.failfast = self.failfast
+        result.buffer = self.buffer
         test(result)
         return result
 
@@ -374,8 +376,8 @@ def _run_subsuite(args):
     This helper lives at module-level and its arguments are wrapped in a tuple
     because of the multiprocessing module's requirements.
     """
-    runner_class, subsuite_index, subsuite, failfast = args
-    runner = runner_class(failfast=failfast)
+    runner_class, subsuite_index, subsuite, failfast, buffer = args
+    runner = runner_class(failfast=failfast, buffer=buffer)
     result = runner.run(subsuite)
     return subsuite_index, result.events
 
@@ -401,10 +403,11 @@ class ParallelTestSuite(unittest.TestSuite):
     run_subsuite = _run_subsuite
     runner_class = RemoteTestRunner
 
-    def __init__(self, suite, processes, failfast=False):
+    def __init__(self, suite, processes, failfast=False, buffer=False):
         self.subsuites = partition_suite_by_case(suite)
         self.processes = processes
         self.failfast = failfast
+        self.buffer = buffer
         super().__init__()
 
     def run(self, result):
@@ -429,7 +432,7 @@ class ParallelTestSuite(unittest.TestSuite):
             initargs=[counter],
         )
         args = [
-            (self.runner_class, index, subsuite, self.failfast)
+            (self.runner_class, index, subsuite, self.failfast, self.buffer)
             for index, subsuite in enumerate(self.subsuites)
         ]
         test_results = pool.imap_unordered(self.run_subsuite.__func__, args)
@@ -502,11 +505,6 @@ class DiscoverRunner:
         if self.pdb and self.parallel > 1:
             raise ValueError('You cannot use --pdb with parallel tests; pass --parallel=1 to use it.')
         self.buffer = buffer
-        if self.buffer and self.parallel > 1:
-            raise ValueError(
-                'You cannot use -b/--buffer with parallel tests; pass '
-                '--parallel=1 to use it.'
-            )
         self.test_name_patterns = None
         self.time_keeper = TimeKeeper() if timing else NullTimeKeeper()
         if test_name_patterns:
@@ -635,7 +633,12 @@ class DiscoverRunner:
         suite = self.test_suite(all_tests)
 
         if self.parallel > 1:
-            parallel_suite = self.parallel_test_suite(suite, self.parallel, self.failfast)
+            parallel_suite = self.parallel_test_suite(
+                suite,
+                self.parallel,
+                self.failfast,
+                self.buffer,
+            )
 
             # Since tests are distributed across processes on a per-TestCase
             # basis, there's no need for more processes than TestCases.
