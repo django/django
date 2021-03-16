@@ -9,7 +9,7 @@ geospatial libraries:
 Program                   Description                           Required                          Supported Versions
 ========================  ====================================  ================================  ===================================
 :doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.8, 3.7, 3.6, 3.5
-`PROJ`_                   Cartographic Projections library      Yes (PostgreSQL and SQLite only)  6.x, 5.x, 4.x
+`PROJ`_                   Cartographic Projections library      Yes (PostgreSQL and SQLite only)  7.x. 6.x, 5.x, 4.x
 :doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes                               3.1, 3.0, 2.4, 2.3, 2.2, 2.1, 2.0
 :doc:`GeoIP <../geoip2>`  IP-based geolocation library          No                                2
 `PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             3.0, 2.5, 2.4
@@ -150,10 +150,14 @@ PROJ
 `PROJ`_ is a library for converting geospatial data to different coordinate
 reference systems.
 
-First, download the PROJ source code and datum shifting files [#]_::
+First, download the PROJ source code::
 
     $ wget https://download.osgeo.org/proj/proj-X.Y.Z.tar.gz
-    $ wget https://download.osgeo.org/proj/proj-datumgrid-X.Y.tar.gz
+
+... and datum shifting files (download ``proj-datumgrid-X.Y.tar.gz`` for
+PROJ < 7.x) [#]_::
+
+    $ wget https://download.osgeo.org/proj/proj-data-X.Y.tar.gz
 
 Next, untar the source code archive, and extract the datum shifting files in the
 ``data`` subdirectory (use ``nad`` subdirectory for PROJ < 6.x). This must be
@@ -161,7 +165,7 @@ done *prior* to configuration::
 
     $ tar xzf proj-X.Y.Z.tar.gz
     $ cd proj-X.Y.Z/data
-    $ tar xzf ../../proj-datumgrid-X.Y.tar.gz
+    $ tar xzf ../../proj-data-X.Y.tar.gz
     $ cd ..
 
 Finally, configure, make and install PROJ::
