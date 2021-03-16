@@ -355,6 +355,13 @@ Miscellaneous
   to ``reorder_tests()``. It now accepts an iterable of tests rather than a
   test suite, and returns an iterator of tests.
 
+* Calling ``FileSystemStorage.delete()`` with an empty ``name`` now raises
+  ``ValueError`` instead of ``AssertionError``.
+
+* Calling ``EmailMultiAlternatives.attach_alternative()`` or
+  ``EmailMessage.attach()`` with an invalid ``content`` or ``mimetype``
+  arguments now raise ``ValueError`` instead of ``AssertionError``.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0

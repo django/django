@@ -294,7 +294,8 @@ class FileSystemStorage(Storage):
         return str(name).replace('\\', '/')
 
     def delete(self, name):
-        assert name, "The name argument is not allowed to be empty."
+        if not name:
+            raise ValueError('The name must be given to delete().')
         name = self.path(name)
         # If the file or directory exists, delete it from the filesystem.
         try:

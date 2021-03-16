@@ -75,9 +75,12 @@ class CheckRegistry:
 
         for check in checks:
             new_errors = check(app_configs=app_configs, databases=databases)
-            assert is_iterable(new_errors), (
-                "The function %r did not return a list. All functions registered "
-                "with the checks registry must return a list." % check)
+            if not is_iterable(new_errors):
+                raise TypeError(
+                    'The function %r did not return a list. All functions '
+                    'registered with the checks registry must return a list.'
+                    % check,
+                )
             errors.extend(new_errors)
         return errors
 

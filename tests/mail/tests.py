@@ -529,6 +529,24 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(content, b'\xff')
         self.assertEqual(mimetype, 'application/octet-stream')
 
+    def test_attach_mimetext_content_mimetype(self):
+        email_msg = EmailMessage()
+        txt = MIMEText('content')
+        msg = (
+            'content and mimetype must not be given when a MIMEBase instance '
+            'is provided.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            email_msg.attach(txt, content='content')
+        with self.assertRaisesMessage(ValueError, msg):
+            email_msg.attach(txt, mimetype='text/plain')
+
+    def test_attach_content_none(self):
+        email_msg = EmailMessage()
+        msg = 'content must be provided.'
+        with self.assertRaisesMessage(ValueError, msg):
+            email_msg.attach('file.txt', mimetype="application/pdf")
+
     def test_dummy_backend(self):
         """
         Make sure that dummy backends returns correct number of sent messages
@@ -834,6 +852,14 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             with self.subTest(email_address=email_address):
                 with self.assertRaisesMessage(ValueError, msg):
                     sanitize_address(email_address, encoding='utf-8')
+
+    def test_email_multi_alternatives_content_mimetype_none(self):
+        email_msg = EmailMultiAlternatives()
+        msg = 'Both content and mimetype must be provided.'
+        with self.assertRaisesMessage(ValueError, msg):
+            email_msg.attach_alternative(None, 'text/html')
+        with self.assertRaisesMessage(ValueError, msg):
+            email_msg.attach_alternative('<p>content</p>', None)
 
 
 @requires_tz_support

@@ -296,11 +296,15 @@ class EmailMessage:
         mimetype to DEFAULT_ATTACHMENT_MIME_TYPE and don't decode the content.
         """
         if isinstance(filename, MIMEBase):
-            assert content is None
-            assert mimetype is None
+            if content is not None or mimetype is not None:
+                raise ValueError(
+                    'content and mimetype must not be given when a MIMEBase '
+                    'instance is provided.'
+                )
             self.attachments.append(filename)
+        elif content is None:
+            raise ValueError('content must be provided.')
         else:
-            assert content is not None
             mimetype = mimetype or mimetypes.guess_type(filename)[0] or DEFAULT_ATTACHMENT_MIME_TYPE
             basetype, subtype = mimetype.split('/', 1)
 
@@ -428,8 +432,8 @@ class EmailMultiAlternatives(EmailMessage):
 
     def attach_alternative(self, content, mimetype):
         """Attach an alternative content representation."""
-        assert content is not None
-        assert mimetype is not None
+        if content is None or mimetype is None:
+            raise ValueError('Both content and mimetype must be provided.')
         self.alternatives.append((content, mimetype))
 
     def _create_message(self, msg):
