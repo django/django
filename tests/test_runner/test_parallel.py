@@ -1,3 +1,4 @@
+import pickle
 import unittest
 
 from django.test import SimpleTestCase
@@ -50,6 +51,11 @@ class SampleFailingSubtest(SimpleTestCase):
 
 
 class RemoteTestResultTest(SimpleTestCase):
+
+    def test_picklable(self):
+        result = RemoteTestResult()
+        loaded_result = pickle.loads(pickle.dumps(result))
+        self.assertEqual(result.events, loaded_result.events)
 
     def test_pickle_errors_detection(self):
         picklable_error = RuntimeError('This is fine')
