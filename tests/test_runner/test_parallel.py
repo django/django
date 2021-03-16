@@ -52,6 +52,35 @@ class SampleFailingSubtest(SimpleTestCase):
 
 class RemoteTestResultTest(SimpleTestCase):
 
+    def test_was_successful_no_events(self):
+        result = RemoteTestResult()
+        self.assertIs(result.wasSuccessful(), True)
+
+    def test_was_successful_one_success(self):
+        result = RemoteTestResult()
+        result.addSuccess(None)
+        self.assertIs(result.wasSuccessful(), True)
+
+    def test_was_successful_one_expected_failure(self):
+        result = RemoteTestResult()
+        result.addExpectedFailure(None, ValueError('woops'))
+        self.assertIs(result.wasSuccessful(), True)
+
+    def test_was_successful_one_skip(self):
+        result = RemoteTestResult()
+        result.addSkip(None, 'Skipped')
+        self.assertIs(result.wasSuccessful(), True)
+
+    def test_was_successful_one_error(self):
+        result = RemoteTestResult()
+        result.addError(None, ValueError('woops'))
+        self.assertIs(result.wasSuccessful(), False)
+
+    def test_was_successful_one_failure(self):
+        result = RemoteTestResult()
+        result.addFailure(None, ValueError('woops'))
+        self.assertIs(result.wasSuccessful(), False)
+
     def test_picklable(self):
         result = RemoteTestResult()
         loaded_result = pickle.loads(pickle.dumps(result))
@@ -81,6 +110,7 @@ class RemoteTestResultTest(SimpleTestCase):
 
         events = result.events
         self.assertEqual(len(events), 4)
+        self.assertIs(result.wasSuccessful(), False)
 
         event = events[1]
         self.assertEqual(event[0], 'addSubTest')

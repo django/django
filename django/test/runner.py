@@ -108,25 +108,48 @@ class PDBDebugResult(unittest.TextTestResult):
         pdb.post_mortem(traceback)
 
 
-class RemoteTestResult:
+class DummyList:
     """
-    Record information about which tests have succeeded and which have failed.
+    Dummy list class for faking storage of results in unittest.TestResult.
+    """
+    __slots__ = ()
 
-    The sole purpose of this class is to record events in the child processes
-    so they can be replayed in the master process. As a consequence it doesn't
-    inherit unittest.TestResult and doesn't attempt to implement all its API.
+    def append(self, item):
+        pass
 
-    The implementation matches the unpythonic coding style of unittest2.
+
+class RemoteTestResult(unittest.TestResult):
+    """
+    Extend unittest.TestResult to record events in the child processes so they
+    can be replayed in the parent process. Events include things like which
+    tests succeeded or failed.
     """
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Fake storage of results to reduce memory usage. These are used by the
+        # unittest default methods, but here 'events' is used instead.
+        dummy_list = DummyList()
+        self.failures = dummy_list
+        self.errors = dummy_list
+        self.skipped = dummy_list
+        self.expectedFailures = dummy_list
+        self.unexpectedSuccesses = dummy_list
+
         if tblib is not None:
             tblib.pickling_support.install()
-
         self.events = []
-        self.failfast = False
-        self.shouldStop = False
-        self.testsRun = 0
+
+    def __getstate__(self):
+        # Make this class picklable by removing the file-like buffer
+        # attributes. This is possible since they aren't used after unpickling
+        # after being sent to ParallelTestSuite.
+        state = self.__dict__.copy()
+        state.pop('_stdout_buffer', None)
+        state.pop('_stderr_buffer', None)
+        state.pop('_original_stdout', None)
+        state.pop('_original_stderr', None)
+        return state
 
     @property
     def test_index(self):
@@ -210,35 +233,31 @@ failure and get a correct traceback.
             self._print_unpicklable_subtest(test, subtest, exc)
             raise
 
-    def stop_if_failfast(self):
-        if self.failfast:
-            self.stop()
-
-    def stop(self):
-        self.shouldStop = True
-
     def startTestRun(self):
+        super().startTestRun()
         self.events.append(('startTestRun',))
 
     def stopTestRun(self):
+        super().stopTestRun()
         self.events.append(('stopTestRun',))
 
     def startTest(self, test):
-        self.testsRun += 1
+        super().startTest(test)
         self.events.append(('startTest', self.test_index))
 
     def stopTest(self, test):
+        super().stopTest(test)
         self.events.append(('stopTest', self.test_index))
 
     def addError(self, test, err):
         self.check_picklable(test, err)
         self.events.append(('addError', self.test_index, err))
-        self.stop_if_failfast()
+        super().addError(test, err)
 
     def addFailure(self, test, err):
         self.check_picklable(test, err)
         self.events.append(('addFailure', self.test_index, err))
-        self.stop_if_failfast()
+        super().addFailure(test, err)
 
     def addSubTest(self, test, subtest, err):
         # Follow Python's implementation of unittest.TestResult.addSubTest() by
@@ -249,13 +268,15 @@ failure and get a correct traceback.
             self.check_picklable(test, err)
             self.check_subtest_picklable(test, subtest)
             self.events.append(('addSubTest', self.test_index, subtest, err))
-            self.stop_if_failfast()
+        super().addSubTest(test, subtest, err)
 
     def addSuccess(self, test):
         self.events.append(('addSuccess', self.test_index))
+        super().addSuccess(test)
 
     def addSkip(self, test, reason):
         self.events.append(('addSkip', self.test_index, reason))
+        super().addSkip(test, reason)
 
     def addExpectedFailure(self, test, err):
         # If tblib isn't installed, pickling the traceback will always fail.
@@ -266,10 +287,22 @@ failure and get a correct traceback.
             err = err[0], err[1], None
         self.check_picklable(test, err)
         self.events.append(('addExpectedFailure', self.test_index, err))
+        super().addExpectedFailure(test, err)
 
     def addUnexpectedSuccess(self, test):
         self.events.append(('addUnexpectedSuccess', self.test_index))
-        self.stop_if_failfast()
+        super().addUnexpectedSuccess(test)
+
+    def wasSuccessful(self):
+        """Tells whether or not this result was a success."""
+        failure_types = {'addError', 'addFailure', 'addSubTest', 'addUnexpectedSuccess'}
+        return all(e[0] not in failure_types for e in self.events)
+
+    def _exc_info_to_string(self, err, test):
+        # Make this method no-op. It only powers the default unittest behavior
+        # for recording errors, but this class pickles errors into 'events'
+        # instead.
+        return ''
 
 
 class RemoteTestRunner:
