@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path('upload/', views.file_upload_view),
+    path('upload_traversal/', views.file_upload_traversal_view),
     path('verify/', views.file_upload_view_verify),
     path('unicode_name/', views.file_upload_unicode_name),
     path('echo/', views.file_upload_echo),

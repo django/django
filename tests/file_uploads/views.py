@@ -9,6 +9,7 @@ from .models import FileModel
 from .tests import UNICODE_FILENAME, UPLOAD_TO
 from .uploadhandler import (
     ErroringUploadHandler, QuotaUploadHandler, StopUploadTemporaryFileHandler,
+    TraversalUploadHandler,
 )
 
 
@@ -162,3 +163,11 @@ def file_upload_fd_closing(request, access):
     if access == 't':
         request.FILES  # Trigger file parsing.
     return HttpResponse()
+
+
+def file_upload_traversal_view(request):
+    request.upload_handlers.insert(0, TraversalUploadHandler())
+    request.FILES  # Trigger file parsing.
+    return JsonResponse(
+        {'file_name': request.upload_handlers[0].file_name},
+    )
