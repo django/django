@@ -2,9 +2,17 @@
 Django 3.1.8 release notes
 ==========================
 
-*Expected April 5, 2021*
+*April 6, 2021*
 
-Django 3.1.8 fixes several bugs in 3.1.7.
+Django 3.1.8 fixes a security issue with severity "low" and a bug in 3.1.7.
+
+CVE-2021-28658: Potential directory-traversal via uploaded files
+================================================================
+
+``MultiPartParser`` allowed directory-traversal via uploaded files with
+suitably crafted file names.
+
+Built-in upload handlers were not affected by this vulnerability.
 
 Bugfixes
 ========
