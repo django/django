@@ -225,10 +225,10 @@ class Parser(HTMLParser):
 
 def parse_html(html):
     """
-    Take a string that contains *valid* HTML and turn it into a Python object
-    structure that can be easily compared against other HTML on semantic
-    equivalence. Syntactical differences like which quotation is used on
-    arguments will be ignored.
+    Take a string that contains HTML and turn it into a Python object structure
+    that can be easily compared against other HTML on semantic equivalence.
+    Syntactical differences like which quotation is used on arguments will be
+    ignored.
     """
     parser = Parser()
     parser.feed(html)
