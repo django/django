@@ -507,8 +507,8 @@ Defining a test runner
 A test runner is a class defining a ``run_tests()`` method. Django ships
 with a ``DiscoverRunner`` class that defines the default Django testing
 behavior. This class defines the ``run_tests()`` entry point, plus a
-selection of other methods that are used to by ``run_tests()`` to set up,
-execute and tear down the test suite.
+selection of other methods that are used by ``run_tests()`` to set up, execute
+and tear down the test suite.
 
 .. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, test_name_patterns=None, pdb=False, buffer=False, enable_faulthandler=True, timing=True, **kwargs)
 
