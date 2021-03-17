@@ -244,6 +244,11 @@ class LookupTests(TestCase):
                 with self.assertRaisesMessage(ValueError, msg % field_name):
                     Model.objects.in_bulk(field_name=field_name)
 
+    def test_in_bulk_sliced_queryset(self):
+        msg = "Cannot use 'limit' or 'offset' with in_bulk()."
+        with self.assertRaisesMessage(TypeError, msg):
+            Article.objects.all()[0:5].in_bulk([self.a1.id, self.a2.id])
+
     def test_values(self):
         # values() returns a list of dictionaries instead of object instances --
         # and you can specify which fields you want to retrieve.

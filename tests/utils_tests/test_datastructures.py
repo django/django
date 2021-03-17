@@ -1,7 +1,7 @@
 """
 Tests for stuff in django.utils.datastructures.
 """
-
+import collections.abc
 import copy
 import pickle
 
@@ -34,6 +34,11 @@ class OrderedSetTests(SimpleTestCase):
         s.discard(2)
         self.assertEqual(len(s), 1)
 
+    def test_reversed(self):
+        s = reversed(OrderedSet([1, 2, 3]))
+        self.assertIsInstance(s, collections.abc.Iterator)
+        self.assertEqual(list(s), [3, 2, 1])
+
     def test_contains(self):
         s = OrderedSet()
         self.assertEqual(len(s), 0)
@@ -54,6 +59,10 @@ class OrderedSetTests(SimpleTestCase):
         s.add(2)
         s.add(2)
         self.assertEqual(len(s), 2)
+
+    def test_repr(self):
+        self.assertEqual(repr(OrderedSet()), 'OrderedSet()')
+        self.assertEqual(repr(OrderedSet([2, 3, 2, 1])), 'OrderedSet([2, 3, 1])')
 
 
 class MultiValueDictTests(SimpleTestCase):

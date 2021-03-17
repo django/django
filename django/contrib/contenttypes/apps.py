@@ -3,13 +3,15 @@ from django.contrib.contenttypes.checks import (
     check_generic_foreign_keys, check_model_name_lengths,
 )
 from django.core import checks
-from django.db.migrations.operations import CreateModel, RenameModel, DeleteModel
+from django.db.migrations.operations import (
+    CreateModel, DeleteModel, RenameModel,
+)
 from django.db.models.signals import post_migrate, post_operation
 from django.utils.translation import gettext_lazy as _
 
 from .management import (
     create_contenttypes, inject_create_contenttypes,
-    inject_rename_contenttypes, inject_delete_contenttypes
+    inject_delete_contenttypes, inject_rename_contenttypes,
 )
 
 

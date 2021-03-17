@@ -260,7 +260,7 @@ the tests that require selenium.
 Some browsers (e.g. Chrome or Firefox) support headless testing, which can be
 faster and more stable. Add the ``--headless`` option to enable this mode.
 
-.. _selenium.webdriver: https://github.com/SeleniumHQ/selenium/tree/master/py/selenium/webdriver
+.. _selenium.webdriver: https://github.com/SeleniumHQ/selenium/tree/trunk/py/selenium/webdriver
 
 .. _running-unit-tests-dependencies:
 
@@ -377,8 +377,8 @@ in ``tests/auth_tests``.
 Troubleshooting
 ===============
 
-Test suite hangs or shows failures on ``master`` branch
--------------------------------------------------------
+Test suite hangs or shows failures on ``main`` branch
+-----------------------------------------------------
 
 Ensure you have the latest point release of a :ref:`supported Python version
 <faq-python-version-support>`, since there are often bugs in earlier versions

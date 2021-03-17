@@ -69,9 +69,9 @@ Working on a ticket
 ===================
 
 When working on a ticket, create a new branch for the work, and base that work
-on upstream/master::
+on ``upstream/main``::
 
-    git checkout -b ticket_xxxxx upstream/master
+    git checkout -b ticket_xxxxx upstream/main
 
 The -b flag creates a new branch for you locally. Don't hesitate to create new
 branches even for the smallest things - that's what they are there for.
@@ -115,7 +115,7 @@ their clone would become corrupt when you edit commits.
 
 There are also "public branches". These are branches other people are supposed
 to fork, so the history of these branches should never change. Good examples
-of public branches are the ``master`` and ``stable/A.B.x`` branches in the
+of public branches are the ``main`` and ``stable/A.B.x`` branches in the
 ``django/django`` repository.
 
 When you think your work is ready to be pulled into Django, you should create
@@ -200,7 +200,7 @@ do this, use::
   git rebase
 
 The work is automatically rebased using the branch you forked on, in the
-example case using ``upstream/master``.
+example case using ``upstream/main``.
 
 The rebase command removes all your local commits temporarily, applies the
 upstream commits, and then applies your local commits again on the work.
@@ -255,7 +255,7 @@ One of the ways that developers can contribute to Django is by reviewing
 patches. Those patches will typically exist as pull requests on GitHub and
 can be easily integrated into your local repository::
 
-    git checkout -b pull_xxxxx upstream/master
+    git checkout -b pull_xxxxx upstream/main
     curl https://github.com/django/django/pull/xxxxx.patch | git am
 
 This will create a new branch and then apply the changes from the pull request

@@ -122,6 +122,7 @@ def inject_create_contenttypes(migration, operation, from_state, **kwargs):
         CreateContentType(migration.app_label, operation.name_lower),
     ]
 
+
 def inject_delete_contenttypes(migration, operation, from_state, **kwargs):
     # Determine whether or not the ContentType model is available.
     if ('contenttypes', 'contenttype') not in from_state.models:

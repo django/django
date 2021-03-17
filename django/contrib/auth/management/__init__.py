@@ -258,8 +258,10 @@ def inject_delete_permissions(migration, operation, from_state, to_state, model_
     for codename, name in _get_all_permissions(opts):
         yield DeletePermission(migration.app_label, Model, codename, name)
 
+
 def inject_create_permissions_for_created_model(migration, operation, from_state, to_state, **kwargs):
     return inject_create_permissions(migration, operation, from_state, to_state, operation.name_lower)
+
 
 def inject_delete_permissions_for_deleted_model(migration, operation, from_state, to_state, **kwargs):
     return inject_delete_permissions(migration, operation, from_state, to_state, operation.name_lower)

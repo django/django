@@ -553,7 +553,6 @@ class DiscoverRunner:
         unittest.installHandler()
 
     def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
-        suite = self.test_suite()
         test_labels = test_labels or ['.']
         extra_tests = extra_tests or []
         self.test_loader.testNamePatterns = self.test_name_patterns
@@ -564,53 +563,30 @@ class DiscoverRunner:
         if self.top_level is not None:
             discover_kwargs['top_level_dir'] = self.top_level
 
+        all_tests = []
         for label in test_labels:
-            kwargs = discover_kwargs.copy()
-            tests = None
-
             label_as_path = os.path.abspath(label)
+            tests = None
 
             # if a module, or "module.ClassName[.method_name]", just run those
             if not os.path.exists(label_as_path):
                 tests = self.test_loader.loadTestsFromName(label)
-            elif os.path.isdir(label_as_path) and not self.top_level:
-                # Try to be a bit smarter than unittest about finding the
-                # default top-level for a given directory path, to avoid
-                # breaking relative imports. (Unittest's default is to set
-                # top-level equal to the path, which means relative imports
-                # will result in "Attempted relative import in non-package.").
 
-                # We'd be happy to skip this and require dotted module paths
-                # (which don't cause this problem) instead of file paths (which
-                # do), but in the case of a directory in the cwd, which would
-                # be equally valid if considered as a top-level module or as a
-                # directory path, unittest unfortunately prefers the latter.
-
-                top_level = label_as_path
-                while True:
-                    init_py = os.path.join(top_level, '__init__.py')
-                    if os.path.exists(init_py):
-                        try_next = os.path.dirname(top_level)
-                        if try_next == top_level:
-                            # __init__.py all the way down? give up.
-                            break
-                        top_level = try_next
-                        continue
-                    break
-                kwargs['top_level_dir'] = top_level
-
+            # Try discovery if "label" is a package or directory.
             if not (tests and tests.countTestCases()) and is_discoverable(label):
-                # Try discovery if path is a package or directory
+                kwargs = discover_kwargs.copy()
+                if os.path.isdir(label_as_path) and not self.top_level:
+                    kwargs['top_level_dir'] = find_top_level(label_as_path)
+
                 tests = self.test_loader.discover(start_dir=label, **kwargs)
 
                 # Make unittest forget the top-level dir it calculated from this
                 # run, to support running tests from two different top-levels.
                 self.test_loader._top_level_dir = None
 
-            suite.addTests(tests)
+            all_tests.extend(iter_test_cases(tests))
 
-        for test in extra_tests:
-            suite.addTest(test)
+        all_tests.extend(iter_test_cases(extra_tests))
 
         if self.tags or self.exclude_tags:
             if self.verbosity >= 2:
@@ -618,8 +594,10 @@ class DiscoverRunner:
                     print('Including test tag(s): %s.' % ', '.join(sorted(self.tags)))
                 if self.exclude_tags:
                     print('Excluding test tag(s): %s.' % ', '.join(sorted(self.exclude_tags)))
-            suite = filter_tests_by_tags(suite, self.tags, self.exclude_tags)
-        suite = reorder_suite(suite, self.reorder_by, self.reverse)
+            all_tests = filter_tests_by_tags(all_tests, self.tags, self.exclude_tags)
+
+        all_tests = reorder_tests(all_tests, self.reorder_by, self.reverse)
+        suite = self.test_suite(all_tests)
 
         if self.parallel > 1:
             parallel_suite = self.parallel_test_suite(suite, self.parallel, self.failfast)
@@ -764,11 +742,35 @@ def is_discoverable(label):
     return os.path.isdir(os.path.abspath(label))
 
 
-def reorder_suite(suite, classes, reverse=False):
-    """
-    Reorder a test suite by test type.
+def find_top_level(top_level):
+    # Try to be a bit smarter than unittest about finding the default top-level
+    # for a given directory path, to avoid breaking relative imports.
+    # (Unittest's default is to set top-level equal to the path, which means
+    # relative imports will result in "Attempted relative import in
+    # non-package.").
 
-    `classes` is a sequence of types
+    # We'd be happy to skip this and require dotted module paths (which don't
+    # cause this problem) instead of file paths (which do), but in the case of
+    # a directory in the cwd, which would be equally valid if considered as a
+    # top-level module or as a directory path, unittest unfortunately prefers
+    # the latter.
+    while True:
+        init_py = os.path.join(top_level, '__init__.py')
+        if not os.path.exists(init_py):
+            break
+        try_next = os.path.dirname(top_level)
+        if try_next == top_level:
+            # __init__.py all the way down? give up.
+            break
+        top_level = try_next
+    return top_level
+
+
+def reorder_tests(tests, classes, reverse=False):
+    """
+    Reorder an iterable of tests by test type, removing any duplicates.
+
+    `classes` is a sequence of types. The result is returned as an iterator.
 
     All tests of type classes[0] are placed first, then tests of type
     classes[1], etc. Tests with no match in classes are placed last.
@@ -776,60 +778,42 @@ def reorder_suite(suite, classes, reverse=False):
     If `reverse` is True, sort tests within classes in opposite order but
     don't reverse test classes.
     """
-    class_count = len(classes)
-    suite_class = type(suite)
-    bins = [OrderedSet() for i in range(class_count + 1)]
-    partition_suite_by_type(suite, classes, bins, reverse=reverse)
-    reordered_suite = suite_class()
-    for tests in bins:
-        reordered_suite.addTests(tests)
-    return reordered_suite
+    bins = [OrderedSet() for i in range(len(classes) + 1)]
+    *class_bins, last_bin = bins
 
-
-def partition_suite_by_type(suite, classes, bins, reverse=False):
-    """
-    Partition a test suite by test type. Also prevent duplicated tests.
-
-    classes is a sequence of types
-    bins is a sequence of TestSuites, one more than classes
-    reverse changes the ordering of tests within bins
-
-    Tests of type classes[i] are added to bins[i],
-    tests with no match found in classes are place in bins[-1]
-    """
-    for test in iter_test_cases(suite, reverse=reverse):
-        for i in range(len(classes)):
-            if isinstance(test, classes[i]):
-                bins[i].add(test)
+    for test in tests:
+        for test_bin, test_class in zip(class_bins, classes):
+            if isinstance(test, test_class):
                 break
         else:
-            bins[-1].add(test)
+            test_bin = last_bin
+        test_bin.add(test)
+
+    if reverse:
+        bins = (reversed(tests) for tests in bins)
+    return itertools.chain(*bins)
 
 
 def partition_suite_by_case(suite):
     """Partition a test suite by test case, preserving the order of tests."""
-    subsuites = []
     suite_class = type(suite)
-    tests = iter_test_cases(suite)
-    for test_type, test_group in itertools.groupby(tests, type):
-        subsuite = suite_class(test_group)
-        subsuites.append(subsuite)
-
-    return subsuites
+    all_tests = iter_test_cases(suite)
+    return [
+        suite_class(tests) for _, tests in itertools.groupby(all_tests, type)
+    ]
 
 
-def filter_tests_by_tags(suite, tags, exclude_tags):
-    suite_class = type(suite)
-    filtered_suite = suite_class()
+def test_match_tags(test, tags, exclude_tags):
+    test_tags = set(getattr(test, 'tags', []))
+    test_fn_name = getattr(test, '_testMethodName', str(test))
+    if hasattr(test, test_fn_name):
+        test_fn = getattr(test, test_fn_name)
+        test_fn_tags = list(getattr(test_fn, 'tags', []))
+        test_tags = test_tags.union(test_fn_tags)
+    matched_tags = test_tags.intersection(tags)
+    return (matched_tags or not tags) and not test_tags.intersection(exclude_tags)
 
-    for test in iter_test_cases(suite):
-        test_tags = set(getattr(test, 'tags', set()))
-        test_fn_name = getattr(test, '_testMethodName', str(test))
-        test_fn = getattr(test, test_fn_name, test)
-        test_fn_tags = set(getattr(test_fn, 'tags', set()))
-        all_tags = test_tags.union(test_fn_tags)
-        matched_tags = all_tags.intersection(tags)
-        if (matched_tags or not tags) and not all_tags.intersection(exclude_tags):
-            filtered_suite.addTest(test)
 
-    return filtered_suite
+def filter_tests_by_tags(tests, tags, exclude_tags):
+    """Return the matching tests as an iterator."""
+    return (test for test in tests if test_match_tags(test, tags, exclude_tags))

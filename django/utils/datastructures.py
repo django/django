@@ -25,6 +25,9 @@ class OrderedSet:
     def __iter__(self):
         return iter(self.dict)
 
+    def __reversed__(self):
+        return reversed(self.dict)
+
     def __contains__(self, item):
         return item in self.dict
 
@@ -33,6 +36,10 @@ class OrderedSet:
 
     def __len__(self):
         return len(self.dict)
+
+    def __repr__(self):
+        data = repr(list(self.dict)) if self.dict else ''
+        return f'{self.__class__.__qualname__}({data})'
 
 
 class MultiValueDictKeyError(KeyError):

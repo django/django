@@ -135,9 +135,9 @@ any time leading up to the actual release:
    and then commit the changed man page.
 
 #. If this is the alpha release of a new series, create a new stable branch
-   from master. For example, when releasing Django 3.1::
+   from main. For example, when releasing Django 3.1::
 
-    $ git checkout -b stable/3.1.x origin/master
+    $ git checkout -b stable/3.1.x origin/main
     $ git push origin -u stable/3.1.x:stable/3.1.x
 
 #. If this is the "dot zero" release of a new series, create a new branch from

@@ -654,9 +654,6 @@ class QuerySet:
                 "earliest() and latest() require either fields as positional "
                 "arguments or 'get_latest_by' in the model's Meta."
             )
-
-        assert not self.query.is_sliced, \
-            "Cannot change a query once a slice has been taken."
         obj = self._chain()
         obj.query.set_limits(high=1)
         obj.query.clear_ordering(force_empty=True)
@@ -664,9 +661,13 @@ class QuerySet:
         return obj.get()
 
     def earliest(self, *fields):
+        if self.query.is_sliced:
+            raise TypeError('Cannot change a query once a slice has been taken.')
         return self._earliest(*fields)
 
     def latest(self, *fields):
+        if self.query.is_sliced:
+            raise TypeError('Cannot change a query once a slice has been taken.')
         return self.reverse()._earliest(*fields)
 
     def first(self):
@@ -684,8 +685,8 @@ class QuerySet:
         Return a dictionary mapping each of the given IDs to the object with
         that ID. If `id_list` isn't provided, evaluate the entire QuerySet.
         """
-        assert not self.query.is_sliced, \
-            "Cannot use 'limit' or 'offset' with in_bulk"
+        if self.query.is_sliced:
+            raise TypeError("Cannot use 'limit' or 'offset' with in_bulk().")
         opts = self.model._meta
         unique_fields = [
             constraint.fields[0]
@@ -721,9 +722,8 @@ class QuerySet:
     def delete(self):
         """Delete the records in the current QuerySet."""
         self._not_support_combined_queries('delete')
-        assert not self.query.is_sliced, \
-            "Cannot use 'limit' or 'offset' with delete."
-
+        if self.query.is_sliced:
+            raise TypeError("Cannot use 'limit' or 'offset' with delete().")
         if self.query.distinct or self.query.distinct_fields:
             raise TypeError('Cannot call delete() after .distinct().')
         if self._fields is not None:
@@ -772,8 +772,8 @@ class QuerySet:
         fields to the appropriate values.
         """
         self._not_support_combined_queries('update')
-        assert not self.query.is_sliced, \
-            "Cannot update a query once a slice has been taken."
+        if self.query.is_sliced:
+            raise TypeError('Cannot update a query once a slice has been taken.')
         self._for_write = True
         query = self.query.chain(sql.UpdateQuery)
         query.add_update_values(kwargs)
@@ -792,8 +792,8 @@ class QuerySet:
         code (it requires too much poking around at model internals to be
         useful at that level).
         """
-        assert not self.query.is_sliced, \
-            "Cannot update a query once a slice has been taken."
+        if self.query.is_sliced:
+            raise TypeError('Cannot update a query once a slice has been taken.')
         query = self.query.chain(sql.UpdateQuery)
         query.add_update_fields(values)
         # Clear any annotations so that they won't be present in subqueries.
@@ -970,10 +970,8 @@ class QuerySet:
         return self._filter_or_exclude(True, args, kwargs)
 
     def _filter_or_exclude(self, negate, args, kwargs):
-        if args or kwargs:
-            assert not self.query.is_sliced, \
-                "Cannot filter a query once a slice has been taken."
-
+        if (args or kwargs) and self.query.is_sliced:
+            raise TypeError('Cannot filter a query once a slice has been taken.')
         clone = self._chain()
         if self._defer_next_filter:
             self._defer_next_filter = False
@@ -1163,8 +1161,8 @@ class QuerySet:
 
     def order_by(self, *field_names):
         """Return a new QuerySet instance with the ordering changed."""
-        assert not self.query.is_sliced, \
-            "Cannot reorder a query once a slice has been taken."
+        if self.query.is_sliced:
+            raise TypeError('Cannot reorder a query once a slice has been taken.')
         obj = self._chain()
         obj.query.clear_ordering(force_empty=False)
         obj.query.add_ordering(*field_names)
@@ -1175,8 +1173,8 @@ class QuerySet:
         Return a new QuerySet instance that will select only distinct results.
         """
         self._not_support_combined_queries('distinct')
-        assert not self.query.is_sliced, \
-            "Cannot create distinct fields once a slice has been taken."
+        if self.query.is_sliced:
+            raise TypeError('Cannot create distinct fields once a slice has been taken.')
         obj = self._chain()
         obj.query.add_distinct_fields(*field_names)
         return obj
@@ -1185,8 +1183,8 @@ class QuerySet:
               order_by=None, select_params=None):
         """Add extra SQL fragments to the query."""
         self._not_support_combined_queries('extra')
-        assert not self.query.is_sliced, \
-            "Cannot change a query once a slice has been taken"
+        if self.query.is_sliced:
+            raise TypeError('Cannot change a query once a slice has been taken.')
         clone = self._chain()
         clone.query.add_extra(select, select_params, where, params, tables, order_by)
         return clone

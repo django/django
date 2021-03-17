@@ -420,9 +420,9 @@ inadvertent side-effect. Here's how you can determine this.
 
 Begin by writing a regression test for Django's test suite for the issue. For
 example, we'll pretend we're debugging a regression in migrations. After you've
-written the test and confirmed that it fails on the latest master, put it in a
-separate file that you can run standalone. For our example, we'll pretend we
-created ``tests/migrations/test_regression.py``, which can be run with::
+written the test and confirmed that it fails on the latest main branch, put it
+in a separate file that you can run standalone. For our example, we'll pretend
+we created ``tests/migrations/test_regression.py``, which can be run with::
 
     $ ./runtests.py migrations.test_regression
 

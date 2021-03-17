@@ -38,8 +38,8 @@ to have some data to work with.  If you're starting out and don't yet
 have any data of your own to use, GeoDjango tests contain a number of
 data sets that you can use for testing. You can download them here::
 
-    $ wget https://raw.githubusercontent.com/django/django/master/tests/gis_tests/data/cities/cities.{shp,prj,shx,dbf}
-    $ wget https://raw.githubusercontent.com/django/django/master/tests/gis_tests/data/rasters/raster.tif
+    $ wget https://raw.githubusercontent.com/django/django/main/tests/gis_tests/data/cities/cities.{shp,prj,shx,dbf}
+    $ wget https://raw.githubusercontent.com/django/django/main/tests/gis_tests/data/rasters/raster.tif
 
 Vector Data Source Objects
 ==========================

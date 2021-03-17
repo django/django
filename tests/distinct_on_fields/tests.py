@@ -98,6 +98,11 @@ class DistinctOnTests(TestCase):
         c2 = c1.distinct('pk')
         self.assertNotIn('OUTER JOIN', str(c2.query))
 
+    def test_sliced_queryset(self):
+        msg = 'Cannot create distinct fields once a slice has been taken.'
+        with self.assertRaisesMessage(TypeError, msg):
+            Staff.objects.all()[0:5].distinct('name')
+
     def test_transform(self):
         new_name = self.t1.name.upper()
         self.assertNotEqual(self.t1.name, new_name)

@@ -1,9 +1,8 @@
 from django.apps import AppConfig
-from django.contrib.contenttypes.management import (
-    CreateContentType, RenameContentType, DeleteContentType
-)
 from django.core import checks
-from django.db.migrations.operations import AlterModelOptions, RenameModel, CreateModel, DeleteModel
+from django.db.migrations.operations import (
+    AlterModelOptions, CreateModel, DeleteModel, RenameModel,
+)
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.signals import post_migrate, post_operation
 from django.utils.translation import gettext_lazy as _
@@ -14,9 +13,9 @@ from .management import (
     create_permissions,
     inject_create_or_rename_permissions_for_altered_permissions,
     inject_create_permissions_for_created_model,
+    inject_delete_permissions_for_deleted_model,
     inject_rename_default_permissions_for_renamed_model,
     inject_rename_permissions_for_altered_verbose_name,
-    inject_delete_permissions_for_deleted_model
 )
 from .signals import user_logged_in
 
