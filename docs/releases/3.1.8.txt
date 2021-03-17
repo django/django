@@ -9,4 +9,6 @@ Django 3.1.8 fixes several bugs in 3.1.7.
 Bugfixes
 ========
 
-* ...
+* Fixed a bug in Django 3.1 where the output was hidden on a test error or
+  failure when using :option:`test --pdb` with the
+  :option:`--buffer <test --buffer>` option (:ticket:`32560`).
