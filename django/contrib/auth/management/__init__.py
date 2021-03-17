@@ -248,12 +248,21 @@ def inject_create_permissions(migration, operation, from_state, to_state, model_
         yield CreatePermission(migration.app_label, Model, codename, name)
 
 
-def inject_create_permissions_for_created_contenttype(migration, operation, from_state, to_state, **kwargs):
-    return inject_create_permissions(migration, operation, from_state, to_state, operation.model)
+def inject_delete_permissions(migration, operation, from_state, to_state, model_name):
+    if ('auth', 'permission') not in from_state.models:
+        return
 
+    Model = from_state.apps.get_model(migration.app_label, model_name)
+    opts = Model._meta
 
-def inject_create_permissions_for_renamed_contenttype(migration, operation, from_state, to_state, **kwargs):
-    return inject_create_permissions(migration, operation, from_state, to_state, operation.new_model)
+    for codename, name in _get_all_permissions(opts):
+        yield DeletePermission(migration.app_label, Model, codename, name)
+
+def inject_create_permissions_for_created_model(migration, operation, from_state, to_state, **kwargs):
+    return inject_create_permissions(migration, operation, from_state, to_state, operation.name_lower)
+
+def inject_delete_permissions_for_deleted_model(migration, operation, from_state, to_state, **kwargs):
+    return inject_delete_permissions(migration, operation, from_state, to_state, operation.name_lower)
 
 
 def inject_create_or_rename_permissions_for_altered_permissions(migration, operation, from_state, to_state, **kwargs):

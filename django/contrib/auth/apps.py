@@ -1,9 +1,9 @@
 from django.apps import AppConfig
 from django.contrib.contenttypes.management import (
-    CreateContentType, RenameContentType,
+    CreateContentType, RenameContentType, DeleteContentType
 )
 from django.core import checks
-from django.db.migrations.operations import AlterModelOptions, RenameModel
+from django.db.migrations.operations import AlterModelOptions, RenameModel, CreateModel, DeleteModel
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.signals import post_migrate, post_operation
 from django.utils.translation import gettext_lazy as _
@@ -13,10 +13,10 @@ from .checks import check_models_permissions, check_user_model
 from .management import (
     create_permissions,
     inject_create_or_rename_permissions_for_altered_permissions,
-    inject_create_permissions_for_created_contenttype,
-    inject_create_permissions_for_renamed_contenttype,
+    inject_create_permissions_for_created_model,
     inject_rename_default_permissions_for_renamed_model,
     inject_rename_permissions_for_altered_verbose_name,
+    inject_delete_permissions_for_deleted_model
 )
 from .signals import user_logged_in
 
@@ -29,17 +29,13 @@ class AuthConfig(AppConfig):
     def ready(self):
         # Rename operations must come first so that we don't create unnecessary new permissions.
         post_operation.connect(inject_rename_default_permissions_for_renamed_model, sender=RenameModel)
+        post_operation.connect(inject_create_permissions_for_created_model, sender=CreateModel)
+        post_operation.connect(inject_delete_permissions_for_deleted_model, sender=DeleteModel)
         post_operation.connect(
             inject_rename_permissions_for_altered_verbose_name, sender=AlterModelOptions
         )
         post_operation.connect(
             inject_create_or_rename_permissions_for_altered_permissions, sender=AlterModelOptions
-        )
-        post_operation.connect(
-            inject_create_permissions_for_created_contenttype, sender=CreateContentType
-        )
-        post_operation.connect(
-            inject_create_permissions_for_renamed_contenttype, sender=RenameContentType
         )
         post_migrate.connect(
             create_permissions,

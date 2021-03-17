@@ -74,13 +74,24 @@ def get_contenttypes_and_models(app_config, using, ContentType):
     return content_types, app_models
 
 
-class CreateContentType(migrations.RunPython):
-    def __init__(self, app_label, model):
+class CreateOrDeleteContentType(migrations.RunPython):
+    def __init__(self, app_label, model, forward, backward):
         self.app_label = app_label
         self.model = model
-        super().__init__(self.create_forward, self.noop)
+        super().__init__(forward, backward)
 
-    def create_forward(self, apps, schema_editor):
+    def delete(self, apps, schema_editor):
+        ContentType = apps.get_model('contenttypes', 'ContentType')
+        db = schema_editor.connection.alias
+        if not router.allow_migrate_model(db, ContentType):
+            return
+
+        ContentType.objects.using(db).filter(
+            app_label=self.app_label,
+            model=self.model,
+        ).delete()
+
+    def create(self, apps, schema_editor):
         ContentType = apps.get_model('contenttypes', 'ContentType')
         db = schema_editor.connection.alias
         if not router.allow_migrate_model(db, ContentType):
@@ -92,6 +103,16 @@ class CreateContentType(migrations.RunPython):
         )
 
 
+class CreateContentType(CreateOrDeleteContentType):
+    def __init__(self, app_label, model):
+        super().__init__(app_label, model, self.create, self.delete)
+
+
+class DeleteContentType(CreateOrDeleteContentType):
+    def __init__(self, app_label, model):
+        super().__init__(app_label, model, self.delete, self.create)
+
+
 def inject_create_contenttypes(migration, operation, from_state, **kwargs):
     # Determine whether or not the ContentType model is available.
     if ('contenttypes', 'contenttype') not in from_state.models:
@@ -99,6 +120,19 @@ def inject_create_contenttypes(migration, operation, from_state, **kwargs):
 
     return [
         CreateContentType(migration.app_label, operation.name_lower),
+    ]
+
+def inject_delete_contenttypes(migration, operation, from_state, **kwargs):
+    # Determine whether or not the ContentType model is available.
+    if ('contenttypes', 'contenttype') not in from_state.models:
+        return
+
+    return [
+        DeleteContentType(
+            migration.app_label,
+            operation.old_name_lower,
+            operation.new_name_lower,
+        )
     ]
 
 
