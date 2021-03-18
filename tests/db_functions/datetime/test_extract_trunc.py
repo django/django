@@ -355,18 +355,26 @@ class DateFunctionTests(TestCase):
         week_1_day_2014_2015 = datetime(2014, 12, 31, 13, 0)  # Wednesday
         week_53_day_2015 = datetime(2015, 12, 31, 13, 0)  # Thursday
         if settings.USE_TZ:
-            week_1_day_2014_2015 = timezone.make_aware(week_1_day_2014_2015, is_dst=False)
             week_52_day_2014 = timezone.make_aware(week_52_day_2014, is_dst=False)
+            week_1_day_2014_2015 = timezone.make_aware(week_1_day_2014_2015, is_dst=False)
             week_53_day_2015 = timezone.make_aware(week_53_day_2015, is_dst=False)
         days = [week_52_day_2014, week_1_day_2014_2015, week_53_day_2015]
-        self.create_model(week_53_day_2015, end_datetime)
         self.create_model(week_52_day_2014, end_datetime)
         self.create_model(week_1_day_2014_2015, end_datetime)
+        self.create_model(week_53_day_2015, end_datetime)
         qs = DTModel.objects.filter(start_datetime__in=days).annotate(
             extracted=ExtractIsoYear('start_datetime'),
         ).order_by('start_datetime')
         self.assertQuerysetEqual(qs, [
             (week_52_day_2014, 2014),
+            (week_1_day_2014_2015, 2015),
+            (week_53_day_2015, 2015),
+        ], lambda m: (m.start_datetime, m.extracted))
+        # Lookup by iso_year includes date in 2014, when week is in 2015 according to ISO
+        qs = DTModel.objects.filter(start_datetime__iso_year=2015).annotate(
+            extracted=ExtractIsoYear('start_datetime'),
+        ).order_by('start_datetime')
+        self.assertQuerysetEqual(qs, [
             (week_1_day_2014_2015, 2015),
             (week_53_day_2015, 2015),
         ], lambda m: (m.start_datetime, m.extracted))
