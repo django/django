@@ -510,7 +510,7 @@ behavior. This class defines the ``run_tests()`` entry point, plus a
 selection of other methods that are used by ``run_tests()`` to set up, execute
 and tear down the test suite.
 
-.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, test_name_patterns=None, pdb=False, buffer=False, enable_faulthandler=True, timing=True, **kwargs)
+.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, parallel=0, test_name_patterns=None, pdb=False, buffer=False, enable_faulthandler=True, timing=True, **kwargs)
 
     ``DiscoverRunner`` will search for tests in any file matching ``pattern``.
 
@@ -543,6 +543,12 @@ and tear down the test suite.
 
     ``debug_mode`` specifies what the :setting:`DEBUG` setting should be
     set to prior to running tests.
+
+    ``parallel`` specifies the number of processes.  If ``parallel`` is greater
+    than ``1``, the test suite will run in ``parallel`` processes. If there are
+    fewer test cases than configured processes, Django will reduce the number
+    of processes accordingly. Each process gets its own database. This option
+    requires the third-party ``tblib`` package to display tracebacks correctly.
 
     If ``debug_sql`` is ``True``, failing test cases will output SQL queries
     logged to the :ref:`django.db.backends logger <django-db-logger>` as well
