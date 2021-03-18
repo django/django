@@ -18,7 +18,11 @@ class Member(models.Model):
         return self.name
 
 
-class Band(models.Model):
+class Artist(models.Model):
+    pass
+
+
+class Band(Artist):
     uuid = models.UUIDField(unique=True, default=uuid.uuid4)
     name = models.CharField(max_length=100)
     style = models.CharField(max_length=20)
@@ -45,6 +49,25 @@ class Album(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ReleaseEvent(models.Model):
+    """
+    Used to check that autocomplete widget correctly resolves attname for FK as
+    PK example.
+    """
+    album = models.ForeignKey(Album, models.CASCADE, primary_key=True)
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class VideoStream(models.Model):
+    release_event = models.ForeignKey(ReleaseEvent, models.CASCADE)
 
 
 class HiddenInventoryManager(models.Manager):

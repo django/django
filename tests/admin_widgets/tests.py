@@ -24,7 +24,7 @@ from django.utils import translation
 from .models import (
     Advisor, Album, Band, Bee, Car, Company, Event, Honeycomb, Individual,
     Inventory, Member, MyFileField, Profile, School, Student,
-    UnsafeLimitChoicesTo,
+    UnsafeLimitChoicesTo, VideoStream,
 )
 from .widgetadmin import site as widget_admin_site
 
@@ -624,7 +624,17 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         self.assertHTMLEqual(
             w.render('test', None),
             '<input type="text" name="test" class="vForeignKeyRawIdAdminField">\n'
-            '<a href="/admin_widgets/band/?name=%22%26%3E%3Cescapeme&amp;_to_field=id" '
+            '<a href="/admin_widgets/band/?name=%22%26%3E%3Cescapeme&amp;_to_field=artist_ptr" '
+            'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
+        )
+
+    def test_render_fk_as_pk_model(self):
+        rel = VideoStream._meta.get_field('release_event').remote_field
+        w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
+        self.assertHTMLEqual(
+            w.render('test', None),
+            '<input type="text" name="test" class="vForeignKeyRawIdAdminField">\n'
+            '<a href="/admin_widgets/releaseevent/?_to_field=album" '
             'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
         )
 
