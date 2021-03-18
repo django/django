@@ -632,7 +632,7 @@ Methods
     :func:`~django.test.utils.setup_test_environment` and setting
     :setting:`DEBUG` to ``self.debug_mode`` (defaults to ``False``).
 
-.. method:: DiscoverRunner.build_suite(test_labels, extra_tests=None, **kwargs)
+.. method:: DiscoverRunner.build_suite(test_labels=None, extra_tests=None, **kwargs)
 
     Constructs a test suite that matches the test labels provided.
 
