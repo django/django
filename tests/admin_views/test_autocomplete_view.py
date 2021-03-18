@@ -12,7 +12,10 @@ from django.test import RequestFactory, override_settings
 from django.urls import reverse, reverse_lazy
 
 from .admin import AnswerAdmin, QuestionAdmin
-from .models import Answer, Author, Authorship, Book, Question
+from .models import (
+    Answer, Author, Authorship, Bonus, Book, Employee, Manager, Parent,
+    PKChild, Question, Toy, WorkHour,
+)
 from .tests import AdminViewBasicTestCase
 
 PAGINATOR_SIZE = AutocompleteJsonView.paginate_by
@@ -37,6 +40,12 @@ site.register(Question, QuestionAdmin)
 site.register(Answer, AnswerAdmin)
 site.register(Author, AuthorAdmin)
 site.register(Book, BookAdmin)
+site.register(Employee, search_fields=['name'])
+site.register(WorkHour, autocomplete_fields=['employee'])
+site.register(Manager, search_fields=['name'])
+site.register(Bonus, autocomplete_fields=['recipient'])
+site.register(PKChild, search_fields=['name'])
+site.register(Toy, autocomplete_fields=['child'])
 
 
 @contextmanager
@@ -115,6 +124,51 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
         data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
             'results': [{'id': str(q.big_id), 'text': q.question}],
+            'pagination': {'more': False},
+        })
+
+    def test_to_field_resolution_with_mti(self):
+        """
+        to_field resolution should correctly resolve for target models using
+        MTI. Tests for single and multi-level cases.
+        """
+        tests = [
+            (Employee, WorkHour, 'employee'),
+            (Manager, Bonus, 'recipient'),
+        ]
+        for Target, Remote, related_name in tests:
+            with self.subTest(target_model=Target, remote_model=Remote, related_name=related_name):
+                o = Target.objects.create(name="Frida Kahlo", gender=2, code="painter", alive=False)
+                opts = {
+                    'app_label': Remote._meta.app_label,
+                    'model_name': Remote._meta.model_name,
+                    'field_name': related_name,
+                }
+                request = self.factory.get(self.url, {'term': 'frida', **opts})
+                request.user = self.superuser
+                response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
+                self.assertEqual(response.status_code, 200)
+                data = json.loads(response.content.decode('utf-8'))
+                self.assertEqual(data, {
+                    'results': [{'id': str(o.pk), 'text': o.name}],
+                    'pagination': {'more': False},
+                })
+
+    def test_to_field_resolution_with_fk_pk(self):
+        p = Parent.objects.create(name="Bertie")
+        c = PKChild.objects.create(parent=p, name="Anna")
+        opts = {
+            'app_label': Toy._meta.app_label,
+            'model_name': Toy._meta.model_name,
+            'field_name': 'child',
+        }
+        request = self.factory.get(self.url, {'term': 'anna', **opts})
+        request.user = self.superuser
+        response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(data, {
+            'results': [{'id': str(c.pk), 'text': c.name}],
             'pagination': {'more': False},
         })
 

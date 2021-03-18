@@ -338,6 +338,24 @@ class Child(models.Model):
             raise ValidationError('invalid')
 
 
+class PKChild(models.Model):
+    """
+    Used to check autocomplete to_field resolution when ForeignKey is PK.
+    """
+    parent = models.ForeignKey(Parent, models.CASCADE, primary_key=True)
+    name = models.CharField(max_length=128)
+
+    class Meta:
+        ordering = ['parent']
+
+    def __str__(self):
+        return self.name
+
+
+class Toy(models.Model):
+    child = models.ForeignKey(PKChild, models.CASCADE)
+
+
 class EmptyModel(models.Model):
     def __str__(self):
         return "Primary key = %s" % self.id
@@ -615,10 +633,24 @@ class Song(models.Model):
 class Employee(Person):
     code = models.CharField(max_length=20)
 
+    class Meta:
+        ordering = ['name']
+
 
 class WorkHour(models.Model):
     datum = models.DateField()
     employee = models.ForeignKey(Employee, models.CASCADE)
+
+
+class Manager(Employee):
+    """
+    A multi-layer MTI child.
+    """
+    pass
+
+
+class Bonus(models.Model):
+    recipient = models.ForeignKey(Manager, on_delete=models.CASCADE)
 
 
 class Question(models.Model):

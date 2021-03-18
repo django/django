@@ -5,7 +5,7 @@ from django.forms import ModelChoiceField
 from django.test import TestCase, override_settings
 from django.utils import translation
 
-from .models import Album, Band
+from .models import Album, Band, ReleaseEvent, VideoStream
 
 
 class AlbumForm(forms.ModelForm):
@@ -39,6 +39,18 @@ class RequiredBandForm(forms.Form):
         widget=AutocompleteSelect(Album._meta.get_field('band').remote_field, admin.site),
         required=True,
     )
+
+
+class VideoStreamForm(forms.ModelForm):
+    class Meta:
+        model = VideoStream
+        fields = ['release_event']
+        widgets = {
+            'release_event': AutocompleteSelect(
+                VideoStream._meta.get_field('release_event'),
+                admin.site,
+            ),
+        }
 
 
 @override_settings(ROOT_URLCONF='admin_widgets.urls')
@@ -113,6 +125,15 @@ class AutocompleteMixinTests(TestCase):
         form = RequiredBandForm()
         output = form.as_table()
         self.assertNotIn(self.empty_option, output)
+
+    def test_render_options_fk_as_pk(self):
+        beatles = Band.objects.create(name='The Beatles', style='rock')
+        rubber_soul = Album.objects.create(name='Rubber Soul', band=beatles)
+        release_event = ReleaseEvent.objects.create(name='Test Target', album=rubber_soul)
+        form = VideoStreamForm(initial={'release_event': release_event.pk})
+        output = form.as_table()
+        selected_option = '<option value="%s" selected>Test Target</option>' % release_event.pk
+        self.assertIn(selected_option, output)
 
     def test_media(self):
         rel = Album._meta.get_field('band').remote_field

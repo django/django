@@ -90,7 +90,8 @@ class AutocompleteJsonView(BaseListView):
                 type(model_admin).__qualname__
             )
 
-        to_field_name = getattr(source_field.remote_field, 'field_name', model_admin.model._meta.pk.name)
+        to_field_name = getattr(source_field.remote_field, 'field_name', remote_model._meta.pk.attname)
+        to_field_name = remote_model._meta.get_field(to_field_name).attname
         if not model_admin.to_field_allowed(request, to_field_name):
             raise PermissionDenied
 
