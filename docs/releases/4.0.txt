@@ -289,7 +289,10 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* ``DatabaseOperations.year_lookup_bounds_for_date_field()`` and
+  ``year_lookup_bounds_for_datetime_field()`` methods now take the optional
+  ``iso_year`` argument in order to support bounds for ISO-8601 week-numbering
+  years.
 
 :mod:`django.contrib.gis`
 -------------------------
