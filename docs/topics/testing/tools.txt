@@ -1596,8 +1596,8 @@ your test suite.
       closed or the HTML document ends.
     * Empty tags are equivalent to their self-closing version.
     * The ordering of attributes of an HTML element is not significant.
-    * Attributes without an argument are equal to attributes that equal in
-      name and value (see the examples).
+    * Boolean attributes (like ``checked``) without an argument are equal to
+      attributes that equal in name and value (see the examples).
     * Text, character references, and entity references that refer to the same
       character are equivalent.
 
@@ -1619,6 +1619,12 @@ your test suite.
     raised if one of them cannot be parsed.
 
     Output in case of error can be customized with the ``msg`` argument.
+
+    .. versionchanged:: 4.0
+
+        In older versions, any attribute (not only boolean attributes) without
+        a value was considered equal to an attribute with the same name and
+        value.
 
 .. method:: SimpleTestCase.assertHTMLNotEqual(html1, html2, msg=None)
 

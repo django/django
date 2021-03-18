@@ -362,6 +362,10 @@ Miscellaneous
   ``EmailMessage.attach()`` with an invalid ``content`` or ``mimetype``
   arguments now raise ``ValueError`` instead of ``AssertionError``.
 
+* :meth:`~django.test.SimpleTestCase.assertHTMLEqual` no longer considers a
+  non-boolean attribute without a value equal to an attribute with the same
+  name and value.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0

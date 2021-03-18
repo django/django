@@ -715,10 +715,25 @@ class HTMLEqualTests(SimpleTestCase):
                 self.assertHTMLEqual(html1, html2)
 
     def test_boolean_attribute(self):
-        html1 = '<input attr>'
-        html2 = '<input attr="">'
+        html1 = '<input checked>'
+        html2 = '<input checked="">'
+        html3 = '<input checked="checked">'
         self.assertHTMLEqual(html1, html2)
-        self.assertEqual(parse_html(html1), parse_html(html2))
+        self.assertHTMLEqual(html1, html3)
+        self.assertHTMLEqual(html2, html3)
+        self.assertHTMLNotEqual(html1, '<input checked="invalid">')
+        self.assertEqual(str(parse_html(html1)), '<input checked>')
+        self.assertEqual(str(parse_html(html2)), '<input checked>')
+        self.assertEqual(str(parse_html(html3)), '<input checked>')
+
+    def test_non_boolean_attibutes(self):
+        html1 = '<input value>'
+        html2 = '<input value="">'
+        html3 = '<input value="value">'
+        self.assertHTMLEqual(html1, html2)
+        self.assertHTMLNotEqual(html1, html3)
+        self.assertEqual(str(parse_html(html1)), '<input value="">')
+        self.assertEqual(str(parse_html(html2)), '<input value="">')
 
     def test_normalize_refs(self):
         pairs = [

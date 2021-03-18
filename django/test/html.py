@@ -9,6 +9,16 @@ from django.utils.regex_helper import _lazy_re_compile
 # https://infra.spec.whatwg.org/#ascii-whitespace
 ASCII_WHITESPACE = _lazy_re_compile(r'[\t\n\f\r ]+')
 
+# https://html.spec.whatwg.org/#attributes-3
+BOOLEAN_ATTRIBUTES = {
+    'allowfullscreen', 'async', 'autofocus', 'autoplay', 'checked', 'controls',
+    'default', 'defer ', 'disabled', 'formnovalidate', 'hidden', 'ismap',
+    'itemscope', 'loop', 'multiple', 'muted', 'nomodule', 'novalidate', 'open',
+    'playsinline', 'readonly', 'required', 'reversed', 'selected',
+    # Attributes for deprecated tags.
+    'truespeed',
+}
+
 
 def normalize_whitespace(string):
     return ASCII_WHITESPACE.sub(' ', string)
@@ -23,11 +33,14 @@ def normalize_attributes(attributes):
             value = ' '.join(sorted(
                 value for value in ASCII_WHITESPACE.split(value) if value
             ))
-        # Attributes without a value is same as attribute with value that
-        # equals the attributes name:
-        # <input checked> == <input checked="checked">
-        if not value or value == name:
-            value = None
+        # Boolean attributes without a value is same as attribute with value
+        # that equals the attributes name. For example:
+        #   <input checked> == <input checked="checked">
+        if name in BOOLEAN_ATTRIBUTES:
+            if not value or value == name:
+                value = None
+        elif value is None:
+            value = ''
         normalized.append((name, value))
     return normalized
 
@@ -131,7 +144,7 @@ class Element:
     def __str__(self):
         output = '<%s' % self.name
         for key, value in self.attributes:
-            if value:
+            if value is not None:
                 output += ' %s="%s"' % (key, value)
             else:
                 output += ' %s' % key
