@@ -714,6 +714,12 @@ class HTMLEqualTests(SimpleTestCase):
             with self.subTest(html1):
                 self.assertHTMLEqual(html1, html2)
 
+    def test_boolean_attribute(self):
+        html1 = '<input attr>'
+        html2 = '<input attr="">'
+        self.assertHTMLEqual(html1, html2)
+        self.assertEqual(parse_html(html1), parse_html(html2))
+
     def test_normalize_refs(self):
         pairs = [
             ('&#39;', '&#x27;'),

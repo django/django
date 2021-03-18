@@ -64,9 +64,9 @@ class Element:
             for i in range(len(self.attributes)):
                 attr, value = self.attributes[i]
                 other_attr, other_value = element.attributes[i]
-                if value is None:
+                if not value:
                     value = attr
-                if other_value is None:
+                if not other_value:
                     other_value = other_attr
                 if attr != other_attr or value != other_value:
                     return False
