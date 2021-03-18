@@ -510,7 +510,7 @@ behavior. This class defines the ``run_tests()`` entry point, plus a
 selection of other methods that are used by ``run_tests()`` to set up, execute
 and tear down the test suite.
 
-.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, parallel=0, test_name_patterns=None, pdb=False, buffer=False, enable_faulthandler=True, timing=True, **kwargs)
+.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, parallel=0, tags=None, exclude_tags=None, test_name_patterns=None, pdb=False, buffer=False, enable_faulthandler=True, timing=True, **kwargs)
 
     ``DiscoverRunner`` will search for tests in any file matching ``pattern``.
 
@@ -549,6 +549,13 @@ and tear down the test suite.
     fewer test cases than configured processes, Django will reduce the number
     of processes accordingly. Each process gets its own database. This option
     requires the third-party ``tblib`` package to display tracebacks correctly.
+
+    ``tags`` can be used to specify a set of :ref:`tags for filtering tests
+    <topics-tagging-tests>`. May be combined with ``exclude_tags``.
+
+    ``exclude_tags`` can be used to specify a set of
+    :ref:`tags for excluding tests <topics-tagging-tests>`. May be combined
+    with ``tags``.
 
     If ``debug_sql`` is ``True``, failing test cases will output SQL queries
     logged to the :ref:`django.db.backends logger <django-db-logger>` as well
