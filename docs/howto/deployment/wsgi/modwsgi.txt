@@ -98,7 +98,7 @@ should put in this file, and what else you can add to it.
 .. _daemon-mode:
 
 Installing ``mod_wsgi`` using Python
-==============================
+====================================
 
 To install ``mod_wsgi`` directly into your Python installation, from within the source directory of the ``mod_wsgi`` package you can run:
 
