@@ -164,12 +164,6 @@ ExtractYear.register_lookup(YearGte)
 ExtractYear.register_lookup(YearLt)
 ExtractYear.register_lookup(YearLte)
 
-ExtractIsoYear.register_lookup(YearExact)
-ExtractIsoYear.register_lookup(YearGt)
-ExtractIsoYear.register_lookup(YearGte)
-ExtractIsoYear.register_lookup(YearLt)
-ExtractIsoYear.register_lookup(YearLte)
-
 
 class Now(Func):
     template = 'CURRENT_TIMESTAMP'
