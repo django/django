@@ -90,7 +90,6 @@ would provide a proper name for the admin::
     from django.apps import AppConfig
 
     class RockNRollConfig(AppConfig):
-        default_auto_field = 'django.db.models.BigAutoField'
         name = 'rock_n_roll'
         verbose_name = "Rock ’n’ roll"
 
