@@ -22,6 +22,16 @@ class Person:
 
 
 class TestInspectMethods(unittest.TestCase):
+    def test_get_callable_parameters(self):
+        self.assertIs(
+            inspect._get_callable_parameters(Person.no_arguments),
+            inspect._get_callable_parameters(Person.no_arguments),
+        )
+        self.assertIs(
+            inspect._get_callable_parameters(Person().no_arguments),
+            inspect._get_callable_parameters(Person().no_arguments),
+        )
+
     def test_get_func_full_args_no_arguments(self):
         self.assertEqual(inspect.get_func_full_args(Person.no_arguments), [])
         self.assertEqual(inspect.get_func_full_args(Person().no_arguments), [])
