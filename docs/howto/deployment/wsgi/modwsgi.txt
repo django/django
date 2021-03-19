@@ -97,34 +97,72 @@ should put in this file, and what else you can add to it.
 
 .. _daemon-mode:
 
-Using ``mod_wsgi`` daemon mode
+Installing ``mod_wsgi`` using Python
 ==============================
 
-"Daemon mode" is the recommended mode for running mod_wsgi (on non-Windows
-platforms). To create the required daemon process group and delegate the
-Django instance to run in it, you will need to add appropriate
-``WSGIDaemonProcess`` and ``WSGIProcessGroup`` directives. A further change
-required to the above configuration if you use daemon mode is that you can't
-use ``WSGIPythonPath``; instead you should use the ``python-path`` option to
-``WSGIDaemonProcess``, for example:
+To install ``mod_wsgi`` directly into your Python installation, from within the source directory of the ``mod_wsgi`` package you can run:
 
 .. code-block:: apache
 
-    WSGIDaemonProcess example.com python-home=/path/to/venv python-path=/path/to/mysite.com
-    WSGIProcessGroup example.com
+    python setup.py install
 
-If you want to serve your project in a subdirectory
-(``https://example.com/mysite`` in this example), you can add ``WSGIScriptAlias``
-to the configuration above:
+
+This will compile ``mod_wsgi`` and install the resulting package into your Python installation.
+
+If wishing to install an official release direct from the Python Package Index ``(PyPi)``, you can instead run:
 
 .. code-block:: apache
 
-    WSGIScriptAlias /mysite /path/to/mysite.com/mysite/wsgi.py process-group=example.com
+    pip install mod_wsgi
 
-See the official mod_wsgi documentation for `details on setting up daemon
-mode`_.
+If you wish to use a version of ``Apache`` which is installed into a non standard location, you can set and export the APXS environment variable to the location of the Apache apxs script for your Apache installation before performing the installation.
 
-.. _details on setting up daemon mode: https://modwsgi.readthedocs.io/en/develop/user-guides/quick-configuration-guide.html#delegation-to-daemon-process
+If you are using ``Linux``, ``macOS`` or other ``UNIX`` type operating system, and you don't have Apache available, you can instead install ``mod_wsgi`` using:
+
+.. code-block:: apache
+
+    pip install mod_wsgi-standalone
+When installing mod_wsgi-standalone, it will also install a version of Apache into your Python distribution. You can only use mod_wsgi-express when using this variant of the package. The mod_wsgi-standalone package follows the same version numbering as the mod_wsgi package on PyPi.
+
+If you are on Windows and your Apache distribution is not installed into the directory C:/Apache24, first set the environment variable MOD_WSGI_APACHE_ROOTDIR to the directory containing the Apache distribution. Ensure you use forward slashes in the directory path. The directory path should not include path components with spaces in the name.
+
+Note that nothing will be copied into your Apache installation at this point. As a result, you do not need to run this as the root user unless installing it into a site wide Python installation rather than a Python virtual environment. It is recommended you always use Python virtual environments and never install any Python package directly into the system Python installation.
+
+On a UNIX type system, to verify that the installation was successful, run the mod_wsgi-express script with the start-server command:
+
+.. code-block:: apache
+
+    mod_wsgi-express start-server
+
+This will start up Apache/mod_wsgi on port 8000. You can then verify that the installation worked by pointing your browser at:
+
+.. code-block:: apache
+
+    http://localhost:8000/
+
+When started in this way, the Apache web server will stay in the foreground. To stop the Apache server, use CTRL-C.
+
+For a simple WSGI application contained in a WSGI script file called wsgi.py, in the current directory, you can now run:
+
+.. code-block:: apache
+    
+    mod_wsgi-express start-server wsgi.py
+
+This instance of the Apache web server will be completely independent of, and will not interfere with any existing instance of Apache you may have running on port 80.
+
+If you already have another web server running on port 8000, you can override the port to be used using the --port option:
+
+.. code-block:: apache
+
+    mod_wsgi-express start-server wsgi.py --port 8080
+
+For a complete list of options you can run:
+
+.. code-block:: apache
+
+    mod_wsgi-express start-server --help
+
+For further information related to using mod_wsgi-express see the main mod_wsgi documentation.
 
 .. _serving-files:
 
