@@ -72,10 +72,9 @@ def module_has_submodule(package, module_name):
     full_module_name = package_name + '.' + module_name
     try:
         return importlib_find(full_module_name, package_path) is not None
-    except (ModuleNotFoundError, AttributeError):
+    except ModuleNotFoundError:
         # When module_name is an invalid dotted path, Python raises
-        # ModuleNotFoundError. AttributeError is raised on PY36 (fixed in PY37)
-        # if the penultimate part of the path is not a package.
+        # ModuleNotFoundError.
         return False
 
 

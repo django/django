@@ -16,6 +16,7 @@ class DatabaseClient(BaseDatabaseClient):
         dbname = settings_dict.get('NAME') or 'postgres'
         user = settings_dict.get('USER')
         passwd = settings_dict.get('PASSWORD')
+        service = options.get('service')
         sslmode = options.get('sslmode')
         sslrootcert = options.get('sslrootcert')
         sslcert = options.get('sslcert')
@@ -33,6 +34,8 @@ class DatabaseClient(BaseDatabaseClient):
         env = {}
         if passwd:
             env['PGPASSWORD'] = str(passwd)
+        if service:
+            env['PGSERVICE'] = str(service)
         if sslmode:
             env['PGSSLMODE'] = str(sslmode)
         if sslrootcert:

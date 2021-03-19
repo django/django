@@ -1,6 +1,7 @@
 import os
 import re
 from datetime import datetime
+from pathlib import Path
 
 from django.contrib.gis.gdal import (
     DataSource, Envelope, GDALException, OGRGeometry,
@@ -119,6 +120,11 @@ class DataSourceTest(SimpleTestCase):
 
             with self.assertRaisesMessage(IndexError, 'Invalid OGR layer name given: invalid.'):
                 ds.__getitem__('invalid')
+
+    def test_ds_input_pathlib(self):
+        test_shp = Path(get_ds_file('test_point', 'shp'))
+        ds = DataSource(test_shp)
+        self.assertEqual(len(ds), 1)
 
     def test02_invalid_shp(self):
         "Testing invalid SHP files for the Data Source."

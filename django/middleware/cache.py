@@ -61,9 +61,7 @@ class UpdateCacheMiddleware(MiddlewareMixin):
     UpdateCacheMiddleware must be the first piece of middleware in MIDDLEWARE
     so that it'll get called last during the response phase.
     """
-    # RemovedInDjango40Warning: when the deprecation ends, replace with:
-    #   def __init__(self, get_response):
-    def __init__(self, get_response=None):
+    def __init__(self, get_response):
         super().__init__(get_response)
         self.cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
         self.page_timeout = None
@@ -124,9 +122,7 @@ class FetchFromCacheMiddleware(MiddlewareMixin):
     FetchFromCacheMiddleware must be the last piece of middleware in MIDDLEWARE
     so that it'll get called last during the request phase.
     """
-    # RemovedInDjango40Warning: when the deprecation ends, replace with:
-    #   def __init__(self, get_response):
-    def __init__(self, get_response=None):
+    def __init__(self, get_response):
         super().__init__(get_response)
         self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
@@ -168,9 +164,7 @@ class CacheMiddleware(UpdateCacheMiddleware, FetchFromCacheMiddleware):
     Also used as the hook point for the cache decorator, which is generated
     using the decorator-from-middleware utility.
     """
-    # RemovedInDjango40Warning: when the deprecation ends, replace with:
-    #   def __init__(self, get_response, cache_timeout=None, page_timeout=None, **kwargs):
-    def __init__(self, get_response=None, cache_timeout=None, page_timeout=None, **kwargs):
+    def __init__(self, get_response, cache_timeout=None, page_timeout=None, **kwargs):
         super().__init__(get_response)
         # We need to differentiate between "provided, but using default value",
         # and "not provided". If the value is provided using a default, then

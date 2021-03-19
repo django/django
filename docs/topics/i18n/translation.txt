@@ -204,7 +204,8 @@ For example::
         page = ngettext(
             'there is %(count)d object',
             'there are %(count)d objects',
-        count) % {
+            count,
+        ) % {
             'count': count,
         }
         return HttpResponse(page)
@@ -228,7 +229,7 @@ sophisticated, but will produce incorrect results for some languages::
     text = ngettext(
         'There is %(count)d %(name)s available.',
         'There are %(count)d %(name)s available.',
-        count
+        count,
     ) % {
         'count': count,
         'name': name
@@ -240,7 +241,7 @@ In a case like this, consider something like the following::
     text = ngettext(
         'There is %(count)d %(name)s object available.',
         'There are %(count)d %(name)s objects available.',
-        count
+        count,
     ) % {
         'count': count,
         'name': Report._meta.verbose_name,
@@ -259,21 +260,17 @@ In a case like this, consider something like the following::
         text = ngettext(
             'There is %(count)d %(name)s available.',
             'There are %(count)d %(plural_name)s available.',
-            count
+            count,
         ) % {
             'count': Report.objects.count(),
             'name': Report._meta.verbose_name,
-            'plural_name': Report._meta.verbose_name_plural
+            'plural_name': Report._meta.verbose_name_plural,
         }
 
     You would get an error when running :djadmin:`django-admin
     compilemessages <compilemessages>`::
 
         a format specification for argument 'name', as in 'msgstr[0]', doesn't exist in 'msgid'
-
-.. versionchanged: 2.2.12
-
-    Added support for different plural equations in ``.po`` files.
 
 .. _contextual-markers:
 
@@ -388,12 +385,14 @@ verbose names Django performs by looking at the model's class name::
             verbose_name = _('my thing')
             verbose_name_plural = _('my things')
 
-Model methods ``short_description`` attribute values
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Model methods ``description`` argument to the ``@display`` decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For model methods, you can provide translations to Django and the admin site
-with the ``short_description`` attribute::
+with the ``description`` argument to the :func:`~django.contrib.admin.display`
+decorator::
 
+    from django.contrib import admin
     from django.db import models
     from django.utils.translation import gettext_lazy as _
 
@@ -405,9 +404,9 @@ with the ``short_description`` attribute::
             verbose_name=_('kind'),
         )
 
+        @admin.display(description=_('Is it a mouse?'))
         def is_mouse(self):
             return self.kind.type == MOUSE_TYPE
-        is_mouse.short_description = _('Is it a mouse?')
 
 Working with lazy translation objects
 -------------------------------------
@@ -623,11 +622,6 @@ using the ``context`` keyword:
 
     {% translate "May" context "month name" %}
 
-.. versionchanged:: 3.1
-
-   The ``trans`` tag was renamed to ``translate``.  The ``trans``
-   tag is still supported as an alias for backwards compatibility.
-
 .. templatetag:: blocktrans
 .. templatetag:: blocktranslate
 
@@ -745,11 +739,6 @@ For instance, the following ``{% blocktranslate %}`` tag::
 will result in the entry ``"First sentence. Second paragraph."`` in the PO file,
 compared to ``"\n  First sentence.\n  Second paragraph.\n"``, if the
 ``trimmed`` option had not been specified.
-
-.. versionchanged:: 3.1
-
-   The ``blocktrans`` tag was renamed to ``blocktranslate``. The ``blocktrans``
-   tag is still supported as an alias for backwards compatibility.
 
 String literals passed to tags and filters
 ------------------------------------------
@@ -1813,12 +1802,6 @@ set, to ``/``, depending on the nature of the request:
 * If the request doesn't accept HTML, the fallback will be performed only if
   the ``next`` parameter was set. Otherwise a 204 status code (No Content) will
   be returned.
-
-.. versionchanged:: 3.1
-
-    In older versions, the distinction for the fallback is based on whether the
-    ``X-Requested-With`` header is set to the value ``XMLHttpRequest``. This is
-    set by the jQuery ``ajax()`` method.
 
 Here's example HTML template code:
 

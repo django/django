@@ -97,7 +97,7 @@ class ASGITest(SimpleTestCase):
 
     @modify_settings(INSTALLED_APPS={'append': 'django.contrib.staticfiles'})
     @override_settings(
-        STATIC_URL='/static/',
+        STATIC_URL='static/',
         STATIC_ROOT=TEST_STATIC_ROOT,
         STATICFILES_DIRS=[TEST_STATIC_ROOT],
         STATICFILES_FINDERS=[

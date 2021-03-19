@@ -12,7 +12,7 @@ try:
         CITextField, DateRangeField, DateTimeRangeField, DecimalRangeField,
         HStoreField, IntegerRangeField,
     )
-    from django.contrib.postgres.search import SearchVectorField
+    from django.contrib.postgres.search import SearchVector, SearchVectorField
 except ImportError:
     class DummyArrayField(models.Field):
         def __init__(self, base_field, size=None, **kwargs):
@@ -36,6 +36,7 @@ except ImportError:
     DecimalRangeField = models.Field
     HStoreField = models.Field
     IntegerRangeField = models.Field
+    SearchVector = models.Expression
     SearchVectorField = models.Field
 
 

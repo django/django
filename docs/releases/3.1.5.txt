@@ -1,0 +1,24 @@
+==========================
+Django 3.1.5 release notes
+==========================
+
+*January 4, 2021*
+
+Django 3.1.5 fixes several bugs in 3.1.4.
+
+Bugfixes
+========
+
+* Fixed ``__isnull=True`` lookup on key transforms for
+  :class:`~django.db.models.JSONField` with Oracle and SQLite
+  (:ticket:`32252`).
+
+* Fixed a bug in Django 3.1 that caused a crash when processing middlewares in
+  an async context with a middleware that raises a ``MiddlewareNotUsed``
+  exception (:ticket:`32299`).
+
+* Fixed a regression in Django 3.1 that caused the incorrect prefixing of
+  ``STATIC_URL`` and ``MEDIA_URL`` settings, by the server-provided value of
+  ``SCRIPT_NAME`` (or ``/`` if not set), when set to a URL specifying the
+  protocol but without a top-level domain, e.g. ``http://myhost/``
+  (:ticket:`32304`).

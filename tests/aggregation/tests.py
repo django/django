@@ -151,6 +151,14 @@ class AggregateTestCase(TestCase):
         vals = Store.objects.filter(name="Amazon.com").aggregate(amazon_mean=Avg("books__rating"))
         self.assertEqual(vals, {'amazon_mean': Approximate(4.08, places=2)})
 
+    def test_aggregate_transform(self):
+        vals = Store.objects.aggregate(min_month=Min('original_opening__month'))
+        self.assertEqual(vals, {'min_month': 3})
+
+    def test_aggregate_join_transform(self):
+        vals = Publisher.objects.aggregate(min_year=Min('book__pubdate__year'))
+        self.assertEqual(vals, {'min_year': 1991})
+
     def test_annotate_basic(self):
         self.assertQuerysetEqual(
             Book.objects.annotate().order_by('pk'), [
@@ -1210,11 +1218,6 @@ class AggregateTestCase(TestCase):
         Subquery annotations must be included in the GROUP BY if they use
         potentially multivalued relations (contain the LOOKUP_SEP).
         """
-        if connection.vendor == 'mysql' and 'ONLY_FULL_GROUP_BY' in connection.sql_mode:
-            self.skipTest(
-                'GROUP BY optimization does not work properly when '
-                'ONLY_FULL_GROUP_BY mode is enabled on MySQL, see #31331.'
-            )
         subquery_qs = Author.objects.filter(
             pk=OuterRef('pk'),
             book__name=OuterRef('book__name'),

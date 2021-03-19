@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib import admin
 from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
 from django.contrib.admin.options import VERTICAL, ModelAdmin, TabularInline
 from django.contrib.admin.sites import AdminSite
@@ -499,10 +500,12 @@ class ListDisplayTests(CheckTestCase):
         )
 
     def test_valid_case(self):
+        @admin.display
         def a_callable(obj):
             pass
 
         class TestModelAdmin(ModelAdmin):
+            @admin.display
             def a_method(self, obj):
                 pass
             list_display = ('name', 'decade_published_in', 'a_method', a_callable)
@@ -563,10 +566,12 @@ class ListDisplayLinksCheckTests(CheckTestCase):
         )
 
     def test_valid_case(self):
+        @admin.display
         def a_callable(obj):
             pass
 
         class TestModelAdmin(ModelAdmin):
+            @admin.display
             def a_method(self, obj):
                 pass
             list_display = ('name', 'decade_published_in', 'a_method', a_callable)
@@ -1417,10 +1422,9 @@ class AutocompleteFieldsTests(CheckTestCase):
 class ActionsCheckTests(CheckTestCase):
 
     def test_custom_permissions_require_matching_has_method(self):
+        @admin.action(permissions=['custom'])
         def custom_permission_action(modeladmin, request, queryset):
             pass
-
-        custom_permission_action.allowed_permissions = ('custom',)
 
         class BandAdmin(ModelAdmin):
             actions = (custom_permission_action,)
@@ -1433,6 +1437,7 @@ class ActionsCheckTests(CheckTestCase):
         )
 
     def test_actions_not_unique(self):
+        @admin.action
         def action(modeladmin, request, queryset):
             pass
 
@@ -1447,9 +1452,11 @@ class ActionsCheckTests(CheckTestCase):
         )
 
     def test_actions_unique(self):
+        @admin.action
         def action1(modeladmin, request, queryset):
             pass
 
+        @admin.action
         def action2(modeladmin, request, queryset):
             pass
 

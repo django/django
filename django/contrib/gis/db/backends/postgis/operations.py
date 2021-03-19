@@ -179,7 +179,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
                 raise ImproperlyConfigured(
                     'Cannot determine PostGIS version for database "%s" '
                     'using command "SELECT postgis_lib_version()". '
-                    'GeoDjango requires at least PostGIS version 2.3. '
+                    'GeoDjango requires at least PostGIS version 2.4. '
                     'Was the database created from a spatial database '
                     'template?' % self.connection.settings_dict['NAME']
                 )

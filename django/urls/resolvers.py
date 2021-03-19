@@ -581,7 +581,7 @@ class URLResolver:
                             self._join_route(current_route, sub_match.route),
                             tried,
                         )
-                    self._extend_tried(tried, pattern)
+                    tried.append([pattern])
             raise Resolver404({'tried': tried, 'path': new_path})
         raise Resolver404({'path': path})
 

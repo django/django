@@ -729,8 +729,6 @@ Other Properties & Methods
 
     .. attribute:: is_counterclockwise
 
-        .. versionadded:: 3.1
-
         Returns whether this ``LinearRing`` is counterclockwise.
 
 ``Polygon``

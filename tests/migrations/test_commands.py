@@ -39,10 +39,12 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_book")
         # Run the migrations to 0001 only
         stdout = io.StringIO()
-        call_command('migrate', 'migrations', '0001', verbosity=1, stdout=stdout, no_color=True)
+        call_command('migrate', 'migrations', '0001', verbosity=2, stdout=stdout, no_color=True)
         stdout = stdout.getvalue()
         self.assertIn('Target specific migration: 0001_initial, from migrations', stdout)
         self.assertIn('Applying migrations.0001_initial... OK', stdout)
+        self.assertIn('Running pre-migrate handlers for application migrations', stdout)
+        self.assertIn('Running post-migrate handlers for application migrations', stdout)
         # The correct tables exist
         self.assertTableExists("migrations_author")
         self.assertTableExists("migrations_tribble")
@@ -55,10 +57,12 @@ class MigrateTests(MigrationTestBase):
         self.assertTableExists("migrations_book")
         # Unmigrate everything
         stdout = io.StringIO()
-        call_command('migrate', 'migrations', 'zero', verbosity=1, stdout=stdout, no_color=True)
+        call_command('migrate', 'migrations', 'zero', verbosity=2, stdout=stdout, no_color=True)
         stdout = stdout.getvalue()
         self.assertIn('Unapply all migrations: migrations', stdout)
         self.assertIn('Unapplying migrations.0002_second... OK', stdout)
+        self.assertIn('Running pre-migrate handlers for application migrations', stdout)
+        self.assertIn('Running post-migrate handlers for application migrations', stdout)
         # Tables are gone
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
@@ -229,18 +233,20 @@ class MigrateTests(MigrationTestBase):
         """
         Split initial migrations can be faked with --fake-initial.
         """
-        call_command("migrate", "migrations", "0002", verbosity=0)
-        call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
-        out = io.StringIO()
-        with mock.patch('django.core.management.color.supports_color', lambda *args: False):
-            call_command("migrate", "migrations", "0002", fake_initial=True, stdout=out, verbosity=1)
-        value = out.getvalue().lower()
-        self.assertIn("migrations.0001_initial... faked", value)
-        self.assertIn("migrations.0002_second... faked", value)
-        # Fake an apply
-        call_command("migrate", "migrations", fake=True, verbosity=0)
-        # Unmigrate everything
-        call_command("migrate", "migrations", "zero", verbosity=0)
+        try:
+            call_command('migrate', 'migrations', '0002', verbosity=0)
+            call_command('migrate', 'migrations', 'zero', fake=True, verbosity=0)
+            out = io.StringIO()
+            with mock.patch('django.core.management.color.supports_color', lambda *args: False):
+                call_command('migrate', 'migrations', '0002', fake_initial=True, stdout=out, verbosity=1)
+            value = out.getvalue().lower()
+            self.assertIn('migrations.0001_initial... faked', value)
+            self.assertIn('migrations.0002_second... faked', value)
+        finally:
+            # Fake an apply.
+            call_command('migrate', 'migrations', fake=True, verbosity=0)
+            # Unmigrate everything.
+            call_command('migrate', 'migrations', 'zero', verbosity=0)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
     def test_migrate_conflict_exit(self):
@@ -328,6 +334,44 @@ class MigrateTests(MigrationTestBase):
         )
         # Cleanup by unmigrating everything
         call_command("migrate", "migrations", "zero", verbosity=0)
+
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed'})
+    def test_showmigrations_list_squashed(self):
+        out = io.StringIO()
+        call_command('showmigrations', format='list', stdout=out, verbosity=2, no_color=True)
+        self.assertEqual(
+            'migrations\n'
+            ' [ ] 0001_squashed_0002 (2 squashed migrations)\n',
+            out.getvalue().lower(),
+        )
+        out = io.StringIO()
+        call_command(
+            'migrate',
+            'migrations',
+            '0001_squashed_0002',
+            stdout=out,
+            verbosity=2,
+            no_color=True,
+        )
+        try:
+            self.assertIn(
+                'operations to perform:\n'
+                '  target specific migration: 0001_squashed_0002, from migrations\n'
+                'running pre-migrate handlers for application migrations\n'
+                'running migrations:\n'
+                '  applying migrations.0001_squashed_0002... ok (',
+                out.getvalue().lower(),
+            )
+            out = io.StringIO()
+            call_command('showmigrations', format='list', stdout=out, verbosity=2, no_color=True)
+            self.assertEqual(
+                'migrations\n'
+                ' [x] 0001_squashed_0002 (2 squashed migrations)\n',
+                out.getvalue().lower(),
+            )
+        finally:
+            # Unmigrate everything.
+            call_command('migrate', 'migrations', 'zero', verbosity=0)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_run_before"})
     def test_showmigrations_plan(self):

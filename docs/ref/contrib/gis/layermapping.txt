@@ -142,6 +142,10 @@ Keyword Arguments
                        Default is ``'default'``.
 =====================  =====================================================
 
+.. versionchanged:: 3.2
+
+    Support for :class:`pathlib.Path` ``data_source`` was added.
+
 ``save()`` Keyword Arguments
 ----------------------------
 

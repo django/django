@@ -416,9 +416,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             if constraints[index]['index'] and not constraints[index]['unique']:
                 # SQLite doesn't support any index type other than b-tree
                 constraints[index]['type'] = Index.suffix
-                order_info = sql.split('(')[-1].split(')')[0].split(',')
-                orders = ['DESC' if info.endswith('DESC') else 'ASC' for info in order_info]
-                constraints[index]['orders'] = orders
+                orders = self._get_index_columns_orders(sql)
+                if orders is not None:
+                    constraints[index]['orders'] = orders
         # Get the PK
         pk_column = self.get_primary_key_column(cursor, table_name)
         if pk_column:
@@ -436,6 +436,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             }
         constraints.update(self._get_foreign_key_constraints(cursor, table_name))
         return constraints
+
+    def _get_index_columns_orders(self, sql):
+        tokens = sqlparse.parse(sql)[0]
+        for token in tokens:
+            if isinstance(token, sqlparse.sql.Parenthesis):
+                columns = str(token).strip('()').split(', ')
+                return ['DESC' if info.endswith('DESC') else 'ASC' for info in columns]
+        return None
 
     def _get_column_collations(self, cursor, table_name):
         row = cursor.execute("""

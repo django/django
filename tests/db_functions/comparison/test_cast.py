@@ -1,12 +1,9 @@
 import datetime
 import decimal
-import unittest
 
 from django.db import connection, models
 from django.db.models.functions import Cast
-from django.test import (
-    TestCase, ignore_warnings, override_settings, skipUnlessDBFeature,
-)
+from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 
 from ..models import Author, DTModel, Fan, FloatModel
 
@@ -127,16 +124,6 @@ class CastTests(TestCase):
         cast_float = numbers.get().cast_float
         self.assertIsInstance(cast_float, float)
         self.assertEqual(cast_float, 0.125)
-
-    @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL test')
-    @override_settings(DEBUG=True)
-    def test_expression_wrapped_with_parentheses_on_postgresql(self):
-        """
-        The SQL for the Cast expression is wrapped with parentheses in case
-        it's a complex expression.
-        """
-        list(Author.objects.annotate(cast_float=Cast(models.Avg('age'), models.FloatField())))
-        self.assertIn('(AVG("db_functions_author"."age"))::double precision', connection.queries[-1]['sql'])
 
     def test_cast_to_text_field(self):
         self.assertEqual(Author.objects.values_list(Cast('age', models.TextField()), flat=True).get(), '1')

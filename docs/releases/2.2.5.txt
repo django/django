@@ -14,7 +14,7 @@ Bugfixes
   (:ticket:`30673`).
 
 * Fixed crash of ``KeyTransform()`` for
-  :class:`~django.contrib.postgres.fields.JSONField` and
+  ``django.contrib.postgres.fields.JSONField`` and
   :class:`~django.contrib.postgres.fields.HStoreField` when using on
   expressions with params (:ticket:`30672`).
 

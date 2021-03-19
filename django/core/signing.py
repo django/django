@@ -107,21 +107,7 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
 
     The serializer is expected to return a bytestring.
     """
-    data = serializer().dumps(obj)
-
-    # Flag for if it's been compressed or not
-    is_compressed = False
-
-    if compress:
-        # Avoid zlib dependency unless compress is being used
-        compressed = zlib.compress(data)
-        if len(compressed) < (len(data) - 1):
-            data = compressed
-            is_compressed = True
-    base64d = b64_encode(data).decode()
-    if is_compressed:
-        base64d = '.' + base64d
-    return TimestampSigner(key, salt=salt).sign(base64d)
+    return TimestampSigner(key, salt=salt).sign_object(obj, serializer=serializer, compress=compress)
 
 
 def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None):
@@ -130,23 +116,10 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
 
     The serializer is expected to accept a bytestring.
     """
-    # TimestampSigner.unsign() returns str but base64 and zlib compression
-    # operate on bytes.
-    base64d = TimestampSigner(key, salt=salt).unsign(s, max_age=max_age).encode()
-    decompress = base64d[:1] == b'.'
-    if decompress:
-        # It's compressed; uncompress it first
-        base64d = base64d[1:]
-    data = b64_decode(base64d)
-    if decompress:
-        data = zlib.decompress(data)
-    return serializer().loads(data)
+    return TimestampSigner(key, salt=salt).unsign_object(s, serializer=serializer, max_age=max_age)
 
 
 class Signer:
-    # RemovedInDjango40Warning.
-    legacy_algorithm = 'sha1'
-
     def __init__(self, key=None, sep=':', salt=None, algorithm=None):
         self.key = key or settings.SECRET_KEY
         self.sep = sep
@@ -156,16 +129,10 @@ class Signer:
                 'only A-z0-9-_=)' % sep,
             )
         self.salt = salt or '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
-        # RemovedInDjango40Warning: when the deprecation ends, replace with:
-        # self.algorithm = algorithm or 'sha256'
-        self.algorithm = algorithm or settings.DEFAULT_HASHING_ALGORITHM
+        self.algorithm = algorithm or 'sha256'
 
     def signature(self, value):
         return base64_hmac(self.salt + 'signer', value, self.key, algorithm=self.algorithm)
-
-    def _legacy_signature(self, value):
-        # RemovedInDjango40Warning.
-        return base64_hmac(self.salt + 'signer', value, self.key, algorithm=self.legacy_algorithm)
 
     def sign(self, value):
         return '%s%s%s' % (value, self.sep, self.signature(value))
@@ -174,14 +141,47 @@ class Signer:
         if self.sep not in signed_value:
             raise BadSignature('No "%s" found in value' % self.sep)
         value, sig = signed_value.rsplit(self.sep, 1)
-        if (
-            constant_time_compare(sig, self.signature(value)) or (
-                self.legacy_algorithm and
-                constant_time_compare(sig, self._legacy_signature(value))
-            )
-        ):
+        if constant_time_compare(sig, self.signature(value)):
             return value
         raise BadSignature('Signature "%s" does not match' % sig)
+
+    def sign_object(self, obj, serializer=JSONSerializer, compress=False):
+        """
+        Return URL-safe, hmac signed base64 compressed JSON string.
+
+        If compress is True (not the default), check if compressing using zlib
+        can save some space. Prepend a '.' to signify compression. This is
+        included in the signature, to protect against zip bombs.
+
+        The serializer is expected to return a bytestring.
+        """
+        data = serializer().dumps(obj)
+        # Flag for if it's been compressed or not.
+        is_compressed = False
+
+        if compress:
+            # Avoid zlib dependency unless compress is being used.
+            compressed = zlib.compress(data)
+            if len(compressed) < (len(data) - 1):
+                data = compressed
+                is_compressed = True
+        base64d = b64_encode(data).decode()
+        if is_compressed:
+            base64d = '.' + base64d
+        return self.sign(base64d)
+
+    def unsign_object(self, signed_obj, serializer=JSONSerializer, **kwargs):
+        # Signer.unsign() returns str but base64 and zlib compression operate
+        # on bytes.
+        base64d = self.unsign(signed_obj, **kwargs).encode()
+        decompress = base64d[:1] == b'.'
+        if decompress:
+            # It's compressed; uncompress it first.
+            base64d = base64d[1:]
+        data = b64_decode(base64d)
+        if decompress:
+            data = zlib.decompress(data)
+        return serializer().loads(data)
 
 
 class TimestampSigner(Signer):

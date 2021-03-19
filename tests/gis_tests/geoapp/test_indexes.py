@@ -1,10 +1,7 @@
-from unittest import skipUnless
-
 from django.db import connection
 from django.db.models import Index
 from django.test import TransactionTestCase
 
-from ..utils import mysql, oracle, postgis
 from .models import City
 
 
@@ -22,17 +19,18 @@ class SchemaIndexesTests(TransactionTestCase):
             }
 
     def has_spatial_indexes(self, table):
-        if mysql:
+        if connection.ops.mysql:
             with connection.cursor() as cursor:
                 return connection.introspection.supports_spatial_index(cursor, table)
-        elif oracle:
+        elif connection.ops.oracle:
             # Spatial indexes in Meta.indexes are not supported by the Oracle
             # backend (see #31252).
             return False
         return True
 
-    @skipUnless(postgis, 'This is a PostGIS-specific test.')
     def test_using_sql(self):
+        if not connection.ops.postgis:
+            self.skipTest('This is a PostGIS-specific test.')
         index = Index(fields=['point'])
         editor = connection.schema_editor()
         self.assertIn(

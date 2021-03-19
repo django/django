@@ -144,4 +144,6 @@ def parse_duration(value):
             kw['microseconds'] = '-' + kw['microseconds']
         kw = {k: float(v.replace(',', '.')) for k, v in kw.items() if v is not None}
         days = datetime.timedelta(kw.pop('days', .0) or .0)
+        if match.re == iso8601_duration_re:
+            days *= sign
         return days + sign * datetime.timedelta(**kw)

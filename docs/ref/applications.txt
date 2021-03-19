@@ -90,6 +90,7 @@ would provide a proper name for the admin::
     from django.apps import AppConfig
 
     class RockNRollConfig(AppConfig):
+        default_auto_field = 'django.db.models.BigAutoField'
         name = 'rock_n_roll'
         verbose_name = "Rock ’n’ roll"
 
@@ -218,6 +219,16 @@ Configurable attributes
     default.
 
     By default, this attribute isn't set.
+
+.. attribute:: AppConfig.default_auto_field
+
+    .. versionadded:: 3.2
+
+    The implicit primary key type to add to models within this app. You can
+    use this to keep :class:`~django.db.models.AutoField` as the primary key
+    type for third party applications.
+
+    By default, this is the value of :setting:`DEFAULT_AUTO_FIELD`.
 
 Read-only attributes
 --------------------

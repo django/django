@@ -1,9 +1,10 @@
+import copy
 import unittest
 from io import StringIO
 from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db import DatabaseError, connection, connections
+from django.db import DEFAULT_DB_ALIAS, DatabaseError, connection, connections
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.test import TestCase, override_settings
 
@@ -54,6 +55,53 @@ class Tests(TestCase):
         self.assertIsNone(cursor.db.connection)
         self.assertIsNotNone(cursor.db.settings_dict['NAME'])
         self.assertEqual(cursor.db.settings_dict['NAME'], connections['other'].settings_dict['NAME'])
+        # Cursor is yielded only for the first PostgreSQL database.
+        with self.assertWarnsMessage(RuntimeWarning, msg):
+            with mock.patch(
+                'django.db.backends.base.base.BaseDatabaseWrapper.connect',
+                side_effect=mocked_connect,
+                autospec=True,
+            ):
+                with connection._nodb_cursor() as cursor:
+                    self.assertIs(cursor.closed, False)
+                    self.assertIsNotNone(cursor.db.connection)
+
+    def test_nodb_cursor_raises_postgres_authentication_failure(self):
+        """
+        _nodb_cursor() re-raises authentication failure to the 'postgres' db
+        when other connection to the PostgreSQL database isn't available.
+        """
+        def mocked_connect(self):
+            raise DatabaseError()
+
+        def mocked_all(self):
+            test_connection = copy.copy(connections[DEFAULT_DB_ALIAS])
+            test_connection.settings_dict = copy.deepcopy(connection.settings_dict)
+            test_connection.settings_dict['NAME'] = 'postgres'
+            return [test_connection]
+
+        msg = (
+            "Normally Django will use a connection to the 'postgres' database "
+            "to avoid running initialization queries against the production "
+            "database when it's not needed (for example, when running tests). "
+            "Django was unable to create a connection to the 'postgres' "
+            "database and will use the first PostgreSQL database instead."
+        )
+        with self.assertWarnsMessage(RuntimeWarning, msg):
+            mocker_connections_all = mock.patch(
+                'django.utils.connection.BaseConnectionHandler.all',
+                side_effect=mocked_all,
+                autospec=True,
+            )
+            mocker_connect = mock.patch(
+                'django.db.backends.base.base.BaseDatabaseWrapper.connect',
+                side_effect=mocked_connect,
+                autospec=True,
+            )
+            with mocker_connections_all, mocker_connect:
+                with self.assertRaises(DatabaseError):
+                    with connection._nodb_cursor():
+                        pass
 
     def test_database_name_too_long(self):
         from django.db.backends.postgresql.base import DatabaseWrapper
@@ -67,6 +115,36 @@ class Tests(TestCase):
         ) % (settings['NAME'], max_name_length + 1, max_name_length)
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             DatabaseWrapper(settings).get_connection_params()
+
+    def test_database_name_empty(self):
+        from django.db.backends.postgresql.base import DatabaseWrapper
+        settings = connection.settings_dict.copy()
+        settings['NAME'] = ''
+        msg = (
+            "settings.DATABASES is improperly configured. Please supply the "
+            "NAME or OPTIONS['service'] value."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            DatabaseWrapper(settings).get_connection_params()
+
+    def test_service_name(self):
+        from django.db.backends.postgresql.base import DatabaseWrapper
+        settings = connection.settings_dict.copy()
+        settings['OPTIONS'] = {'service': 'my_service'}
+        settings['NAME'] = ''
+        params = DatabaseWrapper(settings).get_connection_params()
+        self.assertEqual(params['service'], 'my_service')
+        self.assertNotIn('database', params)
+
+    def test_service_name_default_db(self):
+        # None is used to connect to the default 'postgres' db.
+        from django.db.backends.postgresql.base import DatabaseWrapper
+        settings = connection.settings_dict.copy()
+        settings['NAME'] = None
+        settings['OPTIONS'] = {'service': 'django_test'}
+        params = DatabaseWrapper(settings).get_connection_params()
+        self.assertEqual(params['database'], 'postgres')
+        self.assertNotIn('service', params)
 
     def test_connect_and_rollback(self):
         """

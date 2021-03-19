@@ -201,7 +201,7 @@ class Command(BaseCommand):
         pre_migrate_state = executor._create_project_state(with_applied_migrations=True)
         pre_migrate_apps = pre_migrate_state.apps
         emit_pre_migrate_signal(
-            self.verbosity, self.interactive, connection.alias, apps=pre_migrate_apps, plan=plan,
+            self.verbosity, self.interactive, connection.alias, stdout=self.stdout, apps=pre_migrate_apps, plan=plan,
         )
 
         # Run the syncdb phase.
@@ -266,7 +266,7 @@ class Command(BaseCommand):
         # Send the post_migrate signal, so individual apps can do whatever they need
         # to do at this point.
         emit_post_migrate_signal(
-            self.verbosity, self.interactive, connection.alias, apps=post_migrate_apps, plan=plan,
+            self.verbosity, self.interactive, connection.alias, stdout=self.stdout, apps=post_migrate_apps, plan=plan,
         )
 
     def migration_progress_callback(self, action, migration=None, fake=False):

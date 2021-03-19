@@ -7,7 +7,10 @@
                 data: function(params) {
                     return {
                         term: params.term,
-                        page: params.page
+                        page: params.page,
+                        app_label: $element.data('app-label'),
+                        model_name: $element.data('model-name'),
+                        field_name: $element.data('field-name')
                     };
                 }
             }

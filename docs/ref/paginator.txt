@@ -17,10 +17,6 @@ classes live in :source:`django/core/paginator.py`.
     A paginator acts like a sequence of :class:`Page` when using ``len()`` or
     iterating it directly.
 
-    .. versionchanged:: 3.1
-
-        Support for iterating over ``Paginator`` was added.
-
 .. attribute:: Paginator.object_list
 
     Required. A list, tuple, ``QuerySet``, or other sliceable object with a

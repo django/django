@@ -73,6 +73,20 @@ class MigrationTestBase(TransactionTestCase):
     def assertIndexNotExists(self, table, columns):
         return self.assertIndexExists(table, columns, False)
 
+    def assertIndexNameExists(self, table, index, using='default'):
+        with connections[using].cursor() as cursor:
+            self.assertIn(
+                index,
+                connection.introspection.get_constraints(cursor, table),
+            )
+
+    def assertIndexNameNotExists(self, table, index, using='default'):
+        with connections[using].cursor() as cursor:
+            self.assertNotIn(
+                index,
+                connection.introspection.get_constraints(cursor, table),
+            )
+
     def assertConstraintExists(self, table, name, value=True, using='default'):
         with connections[using].cursor() as cursor:
             constraints = connections[using].introspection.get_constraints(cursor, table).items()
@@ -194,6 +208,7 @@ class OperationTestBase(MigrationTestBase):
         multicol_index=False, related_model=False, mti_model=False,
         proxy_model=False, manager_model=False, unique_together=False,
         options=False, db_table=None, index_together=False, constraints=None,
+        indexes=None,
     ):
         """Creates a test model state and database table."""
         # Make the "current" state.
@@ -225,6 +240,9 @@ class OperationTestBase(MigrationTestBase):
                 'Pony',
                 models.Index(fields=['pink', 'weight'], name='pony_test_idx'),
             ))
+        if indexes:
+            for index in indexes:
+                operations.append(migrations.AddIndex('Pony', index))
         if constraints:
             for constraint in constraints:
                 operations.append(migrations.AddConstraint('Pony', constraint))

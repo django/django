@@ -1,3 +1,4 @@
+from django.core.signing import b64_decode
 from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 
@@ -11,4 +12,8 @@ class SuccessMessageMixinTests(SimpleTestCase):
         author = {'name': 'John Doe', 'slug': 'success-msg'}
         add_url = reverse('add_success_msg')
         req = self.client.post(add_url, author)
-        self.assertIn(ContactFormViewWithMsg.success_message % author, req.cookies['messages'].value)
+        # Uncompressed message is stored in the cookie.
+        value = b64_decode(
+            req.cookies['messages'].value.split(":")[0].encode(),
+        ).decode()
+        self.assertIn(ContactFormViewWithMsg.success_message % author, value)

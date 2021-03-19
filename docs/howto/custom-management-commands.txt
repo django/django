@@ -364,7 +364,3 @@ the management command to exit with, using :func:`sys.exit`.
 If a management command is called from code through
 :func:`~django.core.management.call_command`, it's up to you to catch the
 exception when needed.
-
-.. versionchanged:: 3.1
-
-    The ``returncode`` argument was added.

@@ -582,7 +582,7 @@ views for displaying drilldown pages for date-based data.
     * :class:`django.views.generic.dates.MonthMixin`
     * :class:`django.views.generic.dates.DayMixin`
     * :class:`django.views.generic.dates.DateMixin`
-    * ``django.views.generic.detail.BaseDetailView``
+    * :class:`django.views.generic.detail.BaseDetailView`
     * :class:`django.views.generic.detail.SingleObjectMixin`
     * :class:`django.views.generic.base.View`
 

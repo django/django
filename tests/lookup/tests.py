@@ -9,7 +9,6 @@ from django.db.models import Exists, Max, OuterRef
 from django.db.models.functions import Substr
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
-from django.utils.deprecation import RemovedInDjango40Warning
 
 from .models import (
     Article, Author, Freebie, Game, IsNullWithNoneAsRHS, Player, Season, Tag,
@@ -985,15 +984,7 @@ class LookupTests(TestCase):
         self.assertEqual(authors.get(), newest_author)
 
     def test_isnull_non_boolean_value(self):
-        # These tests will catch ValueError in Django 4.0 when using
-        # non-boolean values for an isnull lookup becomes forbidden.
-        # msg = (
-        #     'The QuerySet value for an isnull lookup must be True or False.'
-        # )
-        msg = (
-            'Using a non-boolean value for an isnull lookup is deprecated, '
-            'use True or False instead.'
-        )
+        msg = 'The QuerySet value for an isnull lookup must be True or False.'
         tests = [
             Author.objects.filter(alias__isnull=1),
             Article.objects.filter(author__isnull=1),
@@ -1002,5 +993,5 @@ class LookupTests(TestCase):
         ]
         for qs in tests:
             with self.subTest(qs=qs):
-                with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+                with self.assertRaisesMessage(ValueError, msg):
                     qs.exists()

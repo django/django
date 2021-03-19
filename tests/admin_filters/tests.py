@@ -144,10 +144,6 @@ class BookAdmin(ModelAdmin):
     ordering = ('-id',)
 
 
-class BookAdmin2(ModelAdmin):
-    list_filter = ('year', 'author', 'contributors', 'is_best_seller2', 'date_registered', 'no')
-
-
 class BookAdminWithTupleBooleanFilter(BookAdmin):
     list_filter = (
         'year',
@@ -289,22 +285,22 @@ class ListFiltersTests(TestCase):
         cls.djangonaut_book = Book.objects.create(
             title='Djangonaut: an art of living', year=2009,
             author=cls.alfred, is_best_seller=True, date_registered=cls.today,
-            is_best_seller2=True, availability=True,
+            availability=True,
         )
         cls.bio_book = Book.objects.create(
             title='Django: a biography', year=1999, author=cls.alfred,
             is_best_seller=False, no=207,
-            is_best_seller2=False, availability=False,
+            availability=False,
         )
         cls.django_book = Book.objects.create(
             title='The Django Book', year=None, author=cls.bob,
             is_best_seller=None, date_registered=cls.today, no=103,
-            is_best_seller2=None, availability=True,
+            availability=True,
         )
         cls.guitar_book = Book.objects.create(
             title='Guitar for dummies', year=2002, is_best_seller=True,
             date_registered=cls.one_week_ago,
-            is_best_seller2=True, availability=None,
+            availability=None,
         )
         cls.guitar_book.contributors.set([cls.bob, cls.lisa])
 
@@ -1013,58 +1009,6 @@ class ListFiltersTests(TestCase):
         choice = select_by(filterspec.choices(changelist), 'display', 'All')
         self.assertIs(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?')
-
-    def test_booleanfieldlistfilter_nullbooleanfield(self):
-        modeladmin = BookAdmin2(Book, site)
-
-        request = self.request_factory.get('/')
-        request.user = self.alfred
-        changelist = modeladmin.get_changelist_instance(request)
-
-        request = self.request_factory.get('/', {'is_best_seller2__exact': 0})
-        request.user = self.alfred
-        changelist = modeladmin.get_changelist_instance(request)
-
-        # Make sure the correct queryset is returned
-        queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.bio_book])
-
-        # Make sure the correct choice is selected
-        filterspec = changelist.get_filters(request)[0][3]
-        self.assertEqual(filterspec.title, 'is best seller2')
-        choice = select_by(filterspec.choices(changelist), "display", "No")
-        self.assertIs(choice['selected'], True)
-        self.assertEqual(choice['query_string'], '?is_best_seller2__exact=0')
-
-        request = self.request_factory.get('/', {'is_best_seller2__exact': 1})
-        request.user = self.alfred
-        changelist = modeladmin.get_changelist_instance(request)
-
-        # Make sure the correct queryset is returned
-        queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.guitar_book, self.djangonaut_book])
-
-        # Make sure the correct choice is selected
-        filterspec = changelist.get_filters(request)[0][3]
-        self.assertEqual(filterspec.title, 'is best seller2')
-        choice = select_by(filterspec.choices(changelist), "display", "Yes")
-        self.assertIs(choice['selected'], True)
-        self.assertEqual(choice['query_string'], '?is_best_seller2__exact=1')
-
-        request = self.request_factory.get('/', {'is_best_seller2__isnull': 'True'})
-        request.user = self.alfred
-        changelist = modeladmin.get_changelist_instance(request)
-
-        # Make sure the correct queryset is returned
-        queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.django_book])
-
-        # Make sure the correct choice is selected
-        filterspec = changelist.get_filters(request)[0][3]
-        self.assertEqual(filterspec.title, 'is best seller2')
-        choice = select_by(filterspec.choices(changelist), "display", "Unknown")
-        self.assertIs(choice['selected'], True)
-        self.assertEqual(choice['query_string'], '?is_best_seller2__isnull=True')
 
     def test_fieldlistfilter_underscorelookup_tuple(self):
         """

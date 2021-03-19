@@ -25,7 +25,6 @@ from django.utils.asyncio import async_unsafe
 from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.duration import duration_microseconds
 from django.utils.regex_helper import _lazy_re_compile
-from django.utils.version import PY38
 
 from .client import DatabaseClient
 from .creation import DatabaseCreation
@@ -64,8 +63,10 @@ def list_aggregate(function):
 
 
 def check_sqlite_version():
-    if Database.sqlite_version_info < (3, 8, 3):
-        raise ImproperlyConfigured('SQLite 3.8.3 or later is required (found %s).' % Database.sqlite_version)
+    if Database.sqlite_version_info < (3, 9, 0):
+        raise ImproperlyConfigured(
+            'SQLite 3.9.0 or later is required (found %s).' % Database.sqlite_version
+        )
 
 
 check_sqlite_version()
@@ -102,7 +103,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'IPAddressField': 'char(15)',
         'GenericIPAddressField': 'char(39)',
         'JSONField': 'text',
-        'NullBooleanField': 'bool',
         'OneToOneField': 'integer',
         'PositiveBigIntegerField': 'bigint unsigned',
         'PositiveIntegerField': 'integer unsigned',
@@ -179,9 +179,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 "settings.DATABASES is improperly configured. "
                 "Please supply the NAME value.")
         kwargs = {
-            # TODO: Remove str() when dropping support for PY36.
-            # https://bugs.python.org/issue33496
-            'database': str(settings_dict['NAME']),
+            'database': settings_dict['NAME'],
             'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,
             **settings_dict['OPTIONS'],
         }
@@ -205,13 +203,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @async_unsafe
     def get_new_connection(self, conn_params):
         conn = Database.connect(**conn_params)
-        if PY38:
-            create_deterministic_function = functools.partial(
-                conn.create_function,
-                deterministic=True,
-            )
-        else:
-            create_deterministic_function = conn.create_function
+        create_deterministic_function = functools.partial(
+            conn.create_function,
+            deterministic=True,
+        )
         create_deterministic_function('django_date_extract', 2, _sqlite_datetime_extract)
         create_deterministic_function('django_date_trunc', 4, _sqlite_date_trunc)
         create_deterministic_function('django_datetime_cast_date', 3, _sqlite_datetime_cast_date)
@@ -327,19 +322,24 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     violations = cursor.execute('PRAGMA foreign_key_check').fetchall()
                 else:
                     violations = chain.from_iterable(
-                        cursor.execute('PRAGMA foreign_key_check(%s)' % table_name).fetchall()
+                        cursor.execute(
+                            'PRAGMA foreign_key_check(%s)'
+                            % self.ops.quote_name(table_name)
+                        ).fetchall()
                         for table_name in table_names
                     )
                 # See https://www.sqlite.org/pragma.html#pragma_foreign_key_check
                 for table_name, rowid, referenced_table_name, foreign_key_index in violations:
                     foreign_key = cursor.execute(
-                        'PRAGMA foreign_key_list(%s)' % table_name
+                        'PRAGMA foreign_key_list(%s)' % self.ops.quote_name(table_name)
                     ).fetchall()[foreign_key_index]
                     column_name, referenced_column_name = foreign_key[3:5]
                     primary_key_column_name = self.introspection.get_primary_key_column(cursor, table_name)
                     primary_key_value, bad_value = cursor.execute(
                         'SELECT %s, %s FROM %s WHERE rowid = %%s' % (
-                            primary_key_column_name, column_name, table_name
+                            self.ops.quote_name(primary_key_column_name),
+                            self.ops.quote_name(column_name),
+                            self.ops.quote_name(table_name),
                         ),
                         (rowid,),
                     ).fetchone()

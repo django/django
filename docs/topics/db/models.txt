@@ -259,11 +259,12 @@ details can be found in the :ref:`common model field option reference
 Automatic primary key fields
 ----------------------------
 
-By default, Django gives each model the following field::
+By default, Django gives each model an auto-incrementing primary key with the
+type specified per app in :attr:`AppConfig.default_auto_field
+<django.apps.AppConfig.default_auto_field>` or globally in the
+:setting:`DEFAULT_AUTO_FIELD` setting. For example::
 
-    id = models.AutoField(primary_key=True)
-
-This is an auto-incrementing primary key.
+    id = models.BigAutoField(primary_key=True)
 
 If you'd like to specify a custom primary key, specify
 :attr:`primary_key=True <Field.primary_key>` on one of your fields. If Django
@@ -272,6 +273,11 @@ sees you've explicitly set :attr:`Field.primary_key`, it won't add the automatic
 
 Each model requires exactly one field to have :attr:`primary_key=True
 <Field.primary_key>` (either explicitly declared or automatically added).
+
+.. versionchanged:: 3.2
+
+    In older versions, auto-created primary key fields were always
+    :class:`AutoField`\s.
 
 .. _verbose-field-names:
 

@@ -406,8 +406,6 @@ Methods
 
 .. method:: HttpRequest.accepts(mime_type)
 
-    .. versionadded:: 3.1
-
     Returns ``True`` if the request ``Accept`` header matches the ``mime_type``
     argument::
 
@@ -424,23 +422,6 @@ Methods
     you are using some form of caching like Django's :mod:`cache middleware
     <django.middleware.cache>`, you should decorate the view with
     :func:`vary_on_headers('Accept')
-    <django.views.decorators.vary.vary_on_headers>` so that the responses are
-    properly cached.
-
-.. method:: HttpRequest.is_ajax()
-
-    .. deprecated:: 3.1
-
-    Returns ``True`` if the request was made via an ``XMLHttpRequest``, by
-    checking the ``HTTP_X_REQUESTED_WITH`` header for the string
-    ``'XMLHttpRequest'``. Most modern JavaScript libraries send this header.
-    If you write your own ``XMLHttpRequest`` call (on the browser side), you'll
-    have to set this header manually if you want ``is_ajax()`` to work.
-
-    If a response varies on whether or not it's requested via AJAX and you are
-    using some form of caching like Django's :mod:`cache middleware
-    <django.middleware.cache>`, you should decorate the view with
-    :func:`vary_on_headers('X-Requested-With')
     <django.views.decorators.vary.vary_on_headers>` so that the responses are
     properly cached.
 
@@ -911,10 +892,6 @@ Methods
     .. _HttpOnly: https://owasp.org/www-community/HttpOnly
     .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
 
-    .. versionchanged:: 3.1
-
-        Using ``samesite='None'`` (string) was allowed.
-
     .. warning::
 
         :rfc:`RFC 6265 <6265#section-6.1>` states that user agents should
@@ -932,10 +909,6 @@ Methods
     you will need to remember to pass it to the corresponding
     :meth:`HttpRequest.get_signed_cookie` call.
 
-    .. versionchanged:: 3.1
-
-        Using ``samesite='None'`` (string) was allowed.
-
 .. method:: HttpResponse.delete_cookie(key, path='/', domain=None, samesite=None)
 
     Deletes the cookie with the given key. Fails silently if the key doesn't
@@ -944,10 +917,6 @@ Methods
     Due to the way cookies work, ``path`` and ``domain`` should be the same
     values you used in ``set_cookie()`` -- otherwise the cookie may not be
     deleted.
-
-    .. versionchanged:: 2.2.15
-
-        The ``samesite`` argument was added.
 
 .. method:: HttpResponse.close()
 

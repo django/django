@@ -227,15 +227,14 @@ class ProjectState:
 
 class AppConfigStub(AppConfig):
     """Stub of an AppConfig. Only provides a label and a dict of models."""
-    # Not used, but required by AppConfig.__init__
-    path = ''
-
     def __init__(self, label):
-        self.label = label
+        self.apps = None
+        self.models = {}
         # App-label and app-name are not the same thing, so technically passing
         # in the label here is wrong. In practice, migrations don't care about
         # the app name, but we need something unique, and the label works fine.
-        super().__init__(label, None)
+        self.label = label
+        self.name = label
 
     def import_models(self):
         self.models = self.apps.all_models[self.label]
@@ -332,7 +331,6 @@ class StateApps(Apps):
         if app_label not in self.app_configs:
             self.app_configs[app_label] = AppConfigStub(app_label)
             self.app_configs[app_label].apps = self
-            self.app_configs[app_label].models = {}
         self.app_configs[app_label].models[model._meta.model_name] = model
         self.do_pending_operations(model)
         self.clear_cache()

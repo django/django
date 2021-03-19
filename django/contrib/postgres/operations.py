@@ -196,11 +196,6 @@ class CollationOperation(Operation):
             raise NotSupportedError(
                 'Non-deterministic collations require PostgreSQL 12+.'
             )
-        if (
-            self.provider != 'libc' and
-            not schema_editor.connection.features.supports_alternate_collation_providers
-        ):
-            raise NotSupportedError('Non-libc providers require PostgreSQL 10+.')
         args = {'locale': schema_editor.quote_name(self.locale)}
         if self.provider != 'libc':
             args['provider'] = schema_editor.quote_name(self.provider)

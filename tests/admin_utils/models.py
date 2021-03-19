@@ -1,3 +1,4 @@
+from django.contrib import admin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -28,9 +29,9 @@ class Article(models.Model):
     def test_from_model(self):
         return "nothing"
 
+    @admin.display(description='not What you Expect')
     def test_from_model_with_override(self):
         return "nothing"
-    test_from_model_with_override.short_description = "not What you Expect"
 
 
 class ArticleProxy(Article):

@@ -8,7 +8,7 @@ from django.db import (
     transaction,
 )
 from django.test import (
-    TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
+    TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
 
 from .models import Reporter
@@ -498,3 +498,76 @@ class NonAutocommitTests(TransactionTestCase):
         finally:
             transaction.rollback()
             transaction.set_autocommit(True)
+
+
+class DurableTests(TransactionTestCase):
+    available_apps = ['transactions']
+
+    def test_commit(self):
+        with transaction.atomic(durable=True):
+            reporter = Reporter.objects.create(first_name='Tintin')
+        self.assertEqual(Reporter.objects.get(), reporter)
+
+    def test_nested_outer_durable(self):
+        with transaction.atomic(durable=True):
+            reporter1 = Reporter.objects.create(first_name='Tintin')
+            with transaction.atomic():
+                reporter2 = Reporter.objects.create(
+                    first_name='Archibald',
+                    last_name='Haddock',
+                )
+        self.assertSequenceEqual(Reporter.objects.all(), [reporter2, reporter1])
+
+    def test_nested_both_durable(self):
+        msg = 'A durable atomic block cannot be nested within another atomic block.'
+        with transaction.atomic(durable=True):
+            with self.assertRaisesMessage(RuntimeError, msg):
+                with transaction.atomic(durable=True):
+                    pass
+
+    def test_nested_inner_durable(self):
+        msg = 'A durable atomic block cannot be nested within another atomic block.'
+        with transaction.atomic():
+            with self.assertRaisesMessage(RuntimeError, msg):
+                with transaction.atomic(durable=True):
+                    pass
+
+
+class DisableDurabiltityCheckTests(TestCase):
+    """
+    TestCase runs all tests in a transaction by default. Code using
+    durable=True would always fail when run from TestCase. This would mean
+    these tests would be forced to use the slower TransactionTestCase even when
+    not testing durability. For this reason, TestCase disables the durability
+    check.
+    """
+    available_apps = ['transactions']
+
+    def test_commit(self):
+        with transaction.atomic(durable=True):
+            reporter = Reporter.objects.create(first_name='Tintin')
+        self.assertEqual(Reporter.objects.get(), reporter)
+
+    def test_nested_outer_durable(self):
+        with transaction.atomic(durable=True):
+            reporter1 = Reporter.objects.create(first_name='Tintin')
+            with transaction.atomic():
+                reporter2 = Reporter.objects.create(
+                    first_name='Archibald',
+                    last_name='Haddock',
+                )
+        self.assertSequenceEqual(Reporter.objects.all(), [reporter2, reporter1])
+
+    def test_nested_both_durable(self):
+        with transaction.atomic(durable=True):
+            # Error is not raised.
+            with transaction.atomic(durable=True):
+                reporter = Reporter.objects.create(first_name='Tintin')
+        self.assertEqual(Reporter.objects.get(), reporter)
+
+    def test_nested_inner_durable(self):
+        with transaction.atomic():
+            # Error is not raised.
+            with transaction.atomic(durable=True):
+                reporter = Reporter.objects.create(first_name='Tintin')
+        self.assertEqual(Reporter.objects.get(), reporter)

@@ -229,6 +229,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     'check': False,
                     'foreign_key': (ref_table, ref_column) if ref_column else None,
                 }
+                if self.connection.features.supports_index_column_ordering:
+                    constraints[constraint]['orders'] = []
             constraints[constraint]['columns'].add(column)
         # Now get the constraint types
         type_query = """
@@ -289,7 +291,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 }
         # Now add in the indexes
         cursor.execute("SHOW INDEX FROM %s" % self.connection.ops.quote_name(table_name))
-        for table, non_unique, index, colseq, column, type_ in [x[:5] + (x[10],) for x in cursor.fetchall()]:
+        for table, non_unique, index, colseq, column, order, type_ in [
+            x[:6] + (x[10],) for x in cursor.fetchall()
+        ]:
             if index not in constraints:
                 constraints[index] = {
                     'columns': OrderedSet(),
@@ -298,9 +302,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     'check': False,
                     'foreign_key': None,
                 }
+                if self.connection.features.supports_index_column_ordering:
+                    constraints[index]['orders'] = []
             constraints[index]['index'] = True
             constraints[index]['type'] = Index.suffix if type_ == 'BTREE' else type_.lower()
             constraints[index]['columns'].add(column)
+            if self.connection.features.supports_index_column_ordering:
+                constraints[index]['orders'].append('DESC' if order == 'D' else 'ASC')
         # Convert the sorted sets to lists
         for constraint in constraints.values():
             constraint['columns'] = list(constraint['columns'])

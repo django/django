@@ -1,4 +1,6 @@
-from .comparison import Cast, Coalesce, Collate, Greatest, Least, NullIf
+from .comparison import (
+    Cast, Coalesce, Collate, Greatest, JSONObject, Least, NullIf,
+)
 from .datetime import (
     Extract, ExtractDay, ExtractHour, ExtractIsoWeekDay, ExtractIsoYear,
     ExtractMinute, ExtractMonth, ExtractQuarter, ExtractSecond, ExtractWeek,
@@ -22,7 +24,7 @@ from .window import (
 
 __all__ = [
     # comparison and conversion
-    'Cast', 'Coalesce', 'Collate', 'Greatest', 'Least', 'NullIf',
+    'Cast', 'Coalesce', 'Collate', 'Greatest', 'JSONObject', 'Least', 'NullIf',
     # datetime
     'Extract', 'ExtractDay', 'ExtractHour', 'ExtractMinute', 'ExtractMonth',
     'ExtractQuarter', 'ExtractSecond', 'ExtractWeek', 'ExtractIsoWeekDay',
