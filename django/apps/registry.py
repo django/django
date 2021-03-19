@@ -81,7 +81,7 @@ class Apps:
                 # Prevent reentrant calls to avoid running AppConfig.ready()
                 # methods twice.
                 self.app_configs = {}
-                #collect exceptons
+                #collect exceptions 
             self.loading = True
 
             # Phase 1: initialize app configs and import app modules.
