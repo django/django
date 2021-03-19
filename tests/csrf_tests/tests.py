@@ -353,6 +353,12 @@ class CsrfViewMiddlewareTestMixin:
         req.META['HTTP_REFERER'] = 'https://'
         response = mw.process_view(req, post_form_view, (), {})
         self.assertContains(response, malformed_referer_msg, status_code=403)
+        # Invalid URL
+        # >>> urlparse('https://[')
+        # ValueError: Invalid IPv6 URL
+        req.META['HTTP_REFERER'] = 'https://['
+        response = mw.process_view(req, post_form_view, (), {})
+        self.assertContains(response, malformed_referer_msg, status_code=403)
 
     @override_settings(ALLOWED_HOSTS=['www.example.com'])
     def test_https_good_referer(self):

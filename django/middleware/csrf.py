@@ -298,7 +298,10 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 if referer is None:
                     return self._reject(request, REASON_NO_REFERER)
 
-                referer = urlparse(referer)
+                try:
+                    referer = urlparse(referer)
+                except ValueError:
+                    return self._reject(request, REASON_MALFORMED_REFERER)
 
                 # Make sure we have a valid URL for Referer.
                 if '' in (referer.scheme, referer.netloc):
