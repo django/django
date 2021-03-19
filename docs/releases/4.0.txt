@@ -294,6 +294,9 @@ Tests
 * Django test runner now supports a :option:`--buffer <test --buffer>` option
   with parallel tests.
 
+* The new :meth:`.DiscoverRunner.log` method allows customizing the way
+  messages are logged.
+
 URLs
 ~~~~
 

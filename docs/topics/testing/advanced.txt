@@ -705,6 +705,17 @@ Methods
     Computes and returns a return code based on a test suite, and the result
     from that test suite.
 
+.. method:: DiscoverRunner.log(msg, level=None)
+
+    .. versionadded:: 4.0
+
+    Prints to the console a message with the given integer `logging level`_
+    (e.g. ``logging.DEBUG``, ``logging.INFO``, or ``logging.WARNING``),
+    respecting the current ``verbosity``. For example, an ``INFO`` message will
+    be logged if the ``verbosity`` is at least 1, and ``DEBUG`` will be logged
+    if it is at least 2.
+
+.. _`logging level`: https://docs.python.org/3/library/logging.html#levels
 
 Testing utilities
 -----------------

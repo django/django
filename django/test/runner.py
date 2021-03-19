@@ -581,6 +581,19 @@ class DiscoverRunner:
             ),
         )
 
+    def log(self, msg, level=None):
+        """
+        Log the given message at the given logging level.
+
+        A verbosity of 1 logs INFO (the default level) or above, and verbosity
+        2 or higher logs all levels.
+        """
+        if self.verbosity <= 0 or (
+            self.verbosity == 1 and level is not None and level < logging.INFO
+        ):
+            return
+        print(msg)
+
     def setup_test_environment(self, **kwargs):
         setup_test_environment(debug=self.debug_mode)
         unittest.installHandler()
@@ -639,11 +652,16 @@ class DiscoverRunner:
         all_tests.extend(iter_test_cases(extra_tests))
 
         if self.tags or self.exclude_tags:
-            if self.verbosity >= 2:
-                if self.tags:
-                    print('Including test tag(s): %s.' % ', '.join(sorted(self.tags)))
-                if self.exclude_tags:
-                    print('Excluding test tag(s): %s.' % ', '.join(sorted(self.exclude_tags)))
+            if self.tags:
+                self.log(
+                    'Including test tag(s): %s.' % ', '.join(sorted(self.tags)),
+                    level=logging.DEBUG,
+                )
+            if self.exclude_tags:
+                self.log(
+                    'Excluding test tag(s): %s.' % ', '.join(sorted(self.exclude_tags)),
+                    level=logging.DEBUG,
+                )
             all_tests = filter_tests_by_tags(all_tests, self.tags, self.exclude_tags)
 
         # Put the failures detected at load time first for quicker feedback.
@@ -651,8 +669,7 @@ class DiscoverRunner:
         # found or that couldn't be loaded due to syntax errors.
         test_types = (unittest.loader._FailedTest, *self.reorder_by)
         all_tests = list(reorder_tests(all_tests, test_types, self.reverse))
-        if self.verbosity >= 1:
-            print('Found %d tests.' % len(all_tests))
+        self.log('Found %d tests.' % len(all_tests), level=logging.INFO)
         suite = self.test_suite(all_tests)
 
         if self.parallel > 1:
@@ -736,10 +753,12 @@ class DiscoverRunner:
 
     def get_databases(self, suite):
         databases = self._get_databases(suite)
-        if self.verbosity >= 2:
-            unused_databases = [alias for alias in connections if alias not in databases]
-            if unused_databases:
-                print('Skipping setup of unused database(s): %s.' % ', '.join(sorted(unused_databases)))
+        unused_databases = [alias for alias in connections if alias not in databases]
+        if unused_databases:
+            self.log(
+                'Skipping setup of unused database(s): %s.' % ', '.join(sorted(unused_databases)),
+                level=logging.DEBUG,
+            )
         return databases
 
     def run_tests(self, test_labels, extra_tests=None, **kwargs):
