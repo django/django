@@ -261,6 +261,28 @@ But:
 
 .. _overuse_of_count_and_exists:
 
+
+Don't overuse ``contains()``
+------------------------------------------
+
+If you need to check if an object is a member of a queryset then ``contains``
+can cause a new DB call for each usage. This is potentially 
+inefficient and can introduce an n+1 issue.
+
+For example::
+    for user in User.objects.all():
+        if not post.authors.contains(user):
+            print(f'{user.name} is not an author of this blog post')
+
+This implementation causes 1 call for all users, and then another
+for each time contains is called.
+
+A better implementation would be to manually do the contains filtering::
+    for user in User.objects.exclude(pk__in=post.authors.all())
+        print(f'{user.name} is not an author of this blog post')
+
+This implementation only requires 1 db call.
+
 Don't overuse ``count()`` and ``exists()``
 ------------------------------------------
 
