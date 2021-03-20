@@ -1,4 +1,5 @@
 import ipaddress
+import math
 import re
 import warnings
 from pathlib import Path
@@ -374,6 +375,15 @@ class MinValueValidator(BaseValidator):
 
     def compare(self, a, b):
         return a < b
+
+
+@deconstructible
+class StepValueValidator(BaseValidator):
+    message = _('Ensure this value is a multiple of step size %(limit_value)s.')
+    code = 'step_size'
+
+    def compare(self, a, b):
+        return not math.isclose(math.remainder(a, b), 0, abs_tol=1e-9)
 
 
 @deconstructible

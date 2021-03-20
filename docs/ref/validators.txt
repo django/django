@@ -262,6 +262,15 @@ to, or in lieu of custom ``field.clean()`` methods.
     ``'min_value'`` if ``value`` is less than ``limit_value``, which may be a
     callable.
 
+``StepValueValidator``
+----------------------
+
+.. class:: StepValueValidator(limit_value, message=None)
+
+    Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
+    ``'step_size'`` if ``value`` is not a step of ``limit_value``, which may be a
+    callable.
+
 ``MaxLengthValidator``
 ----------------------
 

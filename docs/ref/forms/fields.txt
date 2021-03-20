@@ -667,15 +667,24 @@ For each field, we describe the default widget used if you don't specify
     * Empty value: ``None``
     * Normalizes to: A Python float.
     * Validates that the given value is a float. Uses
-      :class:`~django.core.validators.MaxValueValidator` and
-      :class:`~django.core.validators.MinValueValidator` if ``max_value`` and
-      ``min_value`` are provided. Leading and trailing whitespace is allowed,
+      :class:`~django.core.validators.MaxValueValidator`, and
+      :class:`~django.core.validators.MinValueValidator`, and
+      :class:`~django.core.validators.StepValueValidator` if ``max_value``,
+      ``min_value`` and ``step_size`` are provided. Leading and trailing whitespace is allowed,
       as in Python's ``float()`` function.
     * Error message keys: ``required``, ``invalid``, ``max_value``,
-      ``min_value``
+      ``min_value``, ``step_size``
 
-    Takes two optional arguments for validation, ``max_value`` and ``min_value``.
-    These control the range of values permitted in the field.
+    Takes three optional arguments:
+
+    .. attribute:: max_value
+    .. attribute:: min_value``.
+
+        These control the range of values permitted in the field.
+
+    .. attribute:: step_size
+
+        step_size of float value permitted.
 
 ``ImageField``
 --------------
@@ -752,20 +761,22 @@ For each field, we describe the default widget used if you don't specify
     * Empty value: ``None``
     * Normalizes to: A Python integer.
     * Validates that the given value is an integer. Uses
-      :class:`~django.core.validators.MaxValueValidator` and
-      :class:`~django.core.validators.MinValueValidator` if ``max_value`` and
-      ``min_value`` are provided. Leading and trailing whitespace is allowed,
+      :class:`~django.core.validators.MaxValueValidator`,
+      :class:`~django.core.validators.MinValueValidator` and
+      :class:`~django.core.validators.StepValueValidator` if ``max_value``,
+      ``min_value`` and ``step_size` are provided. Leading and trailing whitespace is allowed,
       as in Python's ``int()`` function.
     * Error message keys: ``required``, ``invalid``, ``max_value``,
-      ``min_value``
+      ``min_value``, ``step_size``
 
-    The ``max_value`` and ``min_value`` error messages may contain
+    The ``max_value``, ``min_value`` and ``step_size`` error messages may contain
     ``%(limit_value)s``, which will be substituted by the appropriate limit.
 
     Takes two optional arguments for validation:
 
     .. attribute:: max_value
     .. attribute:: min_value
+    .. attribute:: step_size
 
         These control the range of values permitted in the field.
 
