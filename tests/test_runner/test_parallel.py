@@ -1,11 +1,12 @@
 import pickle
+import sys
 import unittest
 
 from django.test import SimpleTestCase
 from django.test.runner import RemoteTestResult
 
 try:
-    import tblib
+    import tblib.pickling_support
 except ImportError:
     tblib = None
 
@@ -52,6 +53,12 @@ class SampleFailingSubtest(SimpleTestCase):
 
 class RemoteTestResultTest(SimpleTestCase):
 
+    def _test_error_exc_info(self):
+        try:
+            raise ValueError('woops')
+        except ValueError:
+            return sys.exc_info()
+
     def test_was_successful_no_events(self):
         result = RemoteTestResult()
         self.assertIs(result.wasSuccessful(), True)
@@ -63,7 +70,7 @@ class RemoteTestResultTest(SimpleTestCase):
 
     def test_was_successful_one_expected_failure(self):
         result = RemoteTestResult()
-        result.addExpectedFailure(None, ValueError('woops'))
+        result.addExpectedFailure(None, self._test_error_exc_info())
         self.assertIs(result.wasSuccessful(), True)
 
     def test_was_successful_one_skip(self):
@@ -71,14 +78,16 @@ class RemoteTestResultTest(SimpleTestCase):
         result.addSkip(None, 'Skipped')
         self.assertIs(result.wasSuccessful(), True)
 
+    @unittest.skipUnless(tblib is not None, 'requires tblib to be installed')
     def test_was_successful_one_error(self):
         result = RemoteTestResult()
-        result.addError(None, ValueError('woops'))
+        result.addError(None, self._test_error_exc_info())
         self.assertIs(result.wasSuccessful(), False)
 
+    @unittest.skipUnless(tblib is not None, 'requires tblib to be installed')
     def test_was_successful_one_failure(self):
         result = RemoteTestResult()
-        result.addFailure(None, ValueError('woops'))
+        result.addFailure(None, self._test_error_exc_info())
         self.assertIs(result.wasSuccessful(), False)
 
     def test_picklable(self):
