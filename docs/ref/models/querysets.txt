@@ -2230,7 +2230,7 @@ Returns ``objs`` as cast to a list, in the same order as provided.
 .. method:: bulk_update(objs, fields, batch_size=None)
 
 This method efficiently updates the given fields on the provided model
-instances, generally with one query. It returns a count of updated objects.
+instances, generally with one query. It returns ``len(objs)``.
 For example::
 
     >>> objs = [
@@ -2262,13 +2262,9 @@ The ``batch_size`` parameter controls how many objects are saved in a single
 query. The default is to update all objects in one batch, except for SQLite
 and Oracle which have restrictions on the number of variables used in a query.
 
-Note that the count of updated objects does not necessarily match the number
-of objects passed to ``bulk_update()`` because there could be duplicates in an
-individual batch.
-
 .. versionchanged:: 4.0
 
-    The return value was changed from ``None`` to a count of updated objects.
+    The return value was changed from ``None`` to ``len(objs)``.
 
 ``count()``
 ~~~~~~~~~~~
