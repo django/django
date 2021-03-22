@@ -319,9 +319,9 @@ Specifies the number of indentation spaces to use in the output. Defaults to
 .. django-admin-option:: --exclude EXCLUDE, -e EXCLUDE
 
 Prevents specific applications or models (specified in the form of
-``app_label.ModelName``) from being dumped. If you specify a model name, the
-output will be restricted to that model, rather than the entire application.
-You can also mix application names and model names.
+``app_label.ModelName``) from being dumped. If you specify a model name, then
+only that model will be excluded, rather than the entire application. You can
+also mix application names and model names.
 
 If you want to exclude multiple applications, pass ``--exclude`` more than
 once::
