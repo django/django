@@ -316,6 +316,9 @@ class TranslationTests(SimpleTestCase):
             # With > 2 characters after the dash.
             ('sr-latn', 'sr_Latn'),
             ('sr-LATN', 'sr_Latn'),
+            # 3-char language codes.
+            ('ber-MA', 'ber_MA'),
+            ('BER-MA', 'ber_MA'),
             # With private use subtag (x-informal).
             ('nl-nl-x-informal', 'nl_NL-x-informal'),
             ('NL-NL-X-INFORMAL', 'nl_NL-x-informal'),
