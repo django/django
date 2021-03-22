@@ -39,7 +39,9 @@ class CsrfViewMiddlewareTestMixin:
     _csrf_id = _csrf_id_cookie = '1bcdefghij2bcdefghij3bcdefghij4bcdefghij5bcdefghij6bcdefghijABCD'
 
     def _get_GET_no_csrf_cookie_request(self):
-        return TestingHttpRequest()
+        req = TestingHttpRequest()
+        req.method = 'GET'
+        return req
 
     def _get_GET_csrf_cookie_request(self):
         raise NotImplementedError('This method must be implemented by a subclass.')
@@ -308,7 +310,7 @@ class CsrfViewMiddlewareTestMixin:
         CsrfViewMiddleware generates a 403 response if it receives an HTTPS
         request with a bad host.
         """
-        req = self._get_GET_no_csrf_cookie_request()
+        req = self._get_POST_no_csrf_cookie_request()
         req._is_secure_override = True
         req.META['HTTP_HOST'] = '@malformed'
         req.META['HTTP_REFERER'] = 'https://www.evil.org/somepage'
