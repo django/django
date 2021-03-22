@@ -314,6 +314,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             def converter(value, expression, connection):
                 if value is not None:
+                    if isinstance(value, str):
+                        return create_decimal(float(value))
                     return create_decimal(value)
         return converter
 
