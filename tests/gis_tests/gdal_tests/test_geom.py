@@ -350,7 +350,9 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(k1, orig)
         self.assertNotEqual(k1, k2)
 
-        prec = 3
+        # Different PROJ versions use different transformations, all are
+        # correct as having a 1 meter accuracy.
+        prec = -1
         for p in (t1, t2, t3, k2):
             self.assertAlmostEqual(trans.x, p.x, prec)
             self.assertAlmostEqual(trans.y, p.y, prec)
@@ -360,7 +362,9 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         ls_orig = OGRGeometry('LINESTRING(-104.609 38.255)', 4326)
         ls_trans = OGRGeometry('LINESTRING(992385.4472045 481455.4944650)', 2774)
 
-        prec = 3
+        # Different PROJ versions use different transformations, all are
+        # correct as having a 1 meter accuracy.
+        prec = -1
         ls_orig.transform(ls_trans.srs)
         # Making sure the coordinate dimension is still 2D.
         self.assertEqual(2, ls_orig.coord_dim)
