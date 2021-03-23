@@ -155,6 +155,10 @@ class ChoicesTests(SimpleTestCase):
         output = template.render(Context({'Suit': Suit}))
         self.assertEqual(output, 'Diamond|1')
 
+    def test_property_names_conflict_with_member_names(self):
+        with self.assertRaises(AttributeError):
+            models.TextChoices('Properties', 'choices labels names values')
+
 
 class Separator(bytes, models.Choices):
     FS = b'\x1c', 'File Separator'

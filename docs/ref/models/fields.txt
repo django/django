@@ -226,6 +226,11 @@ modifications:
   ``.choices``, ``.labels``, ``.values``, and ``.names`` -- to make it easier
   to access lists of those separate parts of the enumeration. Use ``.choices``
   as a suitable value to pass to :attr:`~Field.choices` in a field definition.
+
+  .. warning::
+
+    These property names cannot be used as member names as they would conflict.
+
 * The use of :func:`enum.unique()` is enforced to ensure that values cannot be
   defined multiple times. This is unlikely to be expected in choices for a
   field.
