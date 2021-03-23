@@ -699,11 +699,15 @@ Sometimes database expressions can't easily express a complex ``WHERE`` clause.
 In these edge cases, use the ``RawSQL`` expression. For example::
 
     >>> from django.db.models.expressions import RawSQL
-    >>> queryset.annotate(val=RawSQL("select col from sometable where othercol = %s", (someparam,)))
+    >>> queryset.annotate(val=RawSQL("select col from sometable where othercol = %s", (param,)))
 
 These extra lookups may not be portable to different database engines (because
 you're explicitly writing SQL code) and violate the DRY principle, so you
 should avoid them if possible.
+
+``RawSQL`` expressions can also be used as the target of ``__in`` filters::
+
+    >>> queryset.filter(id__in=RawSQL("select id from sometable where col = %s", (param,)))
 
 .. warning::
 
