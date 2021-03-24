@@ -21,6 +21,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         'DateTimeField': 'TEXT',
     }
     explain_prefix = 'EXPLAIN QUERY PLAN'
+    # List of datatypes to that cannot be extracted with JSON_EXTRACT() on
+    # SQLite. Use JSON_TYPE() instead.
+    jsonfield_datatype_values = frozenset(['null', 'false', 'true'])
 
     def bulk_batch_size(self, fields, objs):
         """

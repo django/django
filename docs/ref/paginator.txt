@@ -95,7 +95,7 @@ Methods
     For example, with the default values for ``on_each_side`` and ``on_ends``,
     if the current page is 10 and there are 50 pages, the page range will be
     ``[1, 2, '…', 7, 8, 9, 10, 11, 12, 13, '…', 49, 50]``. This will result in
-    pages 4, 5, and 6 to the left of and 8, 9, and 10 to the right of the
+    pages 7, 8, and 9 to the left of and 11, 12, and 13 to the right of the
     current page as well as pages 1 and 2 at the start and 49 and 50 at the
     end.
 
