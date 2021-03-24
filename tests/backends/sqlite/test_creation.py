@@ -1,6 +1,6 @@
 import copy
-import unittest
 import os
+import unittest
 from random import randint
 
 
