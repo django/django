@@ -815,13 +815,13 @@ class ForeignKey(ForeignObject):
         try:
             to._meta.model_name
         except AttributeError:
-            assert isinstance(to, str), (
-                "%s(%r) is invalid. First parameter to ForeignKey must be "
-                "either a model, a model name, or the string %r" % (
-                    self.__class__.__name__, to,
-                    RECURSIVE_RELATIONSHIP_CONSTANT,
+            if not isinstance(to, str):
+                raise TypeError(
+                    '%s(%r) is invalid. First parameter to ForeignKey must be '
+                    'either a model, a model name, or the string %r' % (
+                        self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT,
+                    )
                 )
-            )
         else:
             # For backwards compatibility purposes, we need to *try* and set
             # the to_field during FK construction. It won't be guaranteed to
@@ -1169,18 +1169,20 @@ class ManyToManyField(RelatedField):
         try:
             to._meta
         except AttributeError:
-            assert isinstance(to, str), (
-                "%s(%r) is invalid. First parameter to ManyToManyField must be "
-                "either a model, a model name, or the string %r" %
-                (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
-            )
+            if not isinstance(to, str):
+                raise TypeError(
+                    '%s(%r) is invalid. First parameter to ManyToManyField '
+                    'must be either a model, a model name, or the string %r' % (
+                        self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT,
+                    )
+                )
 
         if symmetrical is None:
             symmetrical = (to == RECURSIVE_RELATIONSHIP_CONSTANT)
 
-        if through is not None:
-            assert db_table is None, (
-                "Cannot specify a db_table if an intermediary model is used."
+        if through is not None and db_table is not None:
+            raise ValueError(
+                'Cannot specify a db_table if an intermediary model is used.'
             )
 
         kwargs['rel'] = self.rel_class(

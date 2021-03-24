@@ -32,8 +32,10 @@ class CustomManyToManyField(RelatedField):
         )
         self.swappable = swappable
         self.db_table = db_table
-        if kwargs['rel'].through is not None:
-            assert self.db_table is None, "Cannot specify a db_table if an intermediary model is used."
+        if kwargs['rel'].through is not None and self.db_table is not None:
+            raise ValueError(
+                'Cannot specify a db_table if an intermediary model is used.'
+            )
         super().__init__(
             related_name=related_name,
             related_query_name=related_query_name,

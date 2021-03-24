@@ -567,14 +567,14 @@ class Query(BaseExpression):
         The 'connector' parameter describes how to connect filters from the
         'rhs' query.
         """
-        assert self.model == rhs.model, \
-            "Cannot combine queries on two different base models."
+        if self.model != rhs.model:
+            raise TypeError('Cannot combine queries on two different base models.')
         if self.is_sliced:
             raise TypeError('Cannot combine queries once a slice has been taken.')
-        assert self.distinct == rhs.distinct, \
-            "Cannot combine a unique query with a non-unique query."
-        assert self.distinct_fields == rhs.distinct_fields, \
-            "Cannot combine queries with different distinct fields."
+        if self.distinct != rhs.distinct:
+            raise TypeError('Cannot combine a unique query with a non-unique query.')
+        if self.distinct_fields != rhs.distinct_fields:
+            raise TypeError('Cannot combine queries with different distinct fields.')
 
         # Work out how to relabel the rhs aliases, if necessary.
         change_map = {}

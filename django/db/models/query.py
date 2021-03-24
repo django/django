@@ -291,10 +291,14 @@ class QuerySet:
                 'QuerySet indices must be integers or slices, not %s.'
                 % type(k).__name__
             )
-        assert ((not isinstance(k, slice) and (k >= 0)) or
-                (isinstance(k, slice) and (k.start is None or k.start >= 0) and
-                 (k.stop is None or k.stop >= 0))), \
-            "Negative indexing is not supported."
+        if (
+            (isinstance(k, int) and k < 0) or
+            (isinstance(k, slice) and (
+                (k.start is not None and k.start < 0) or
+                (k.stop is not None and k.stop < 0)
+            ))
+        ):
+            raise ValueError('Negative indexing is not supported.')
 
         if self._result_cache is not None:
             return self._result_cache[k]
@@ -480,7 +484,8 @@ class QuerySet:
         # PostgreSQL via the RETURNING ID clause. It should be possible for
         # Oracle as well, but the semantics for extracting the primary keys is
         # trickier so it's not done yet.
-        assert batch_size is None or batch_size > 0
+        if batch_size is not None and batch_size <= 0:
+            raise ValueError('Batch size must be a positive integer.')
         # Check that the parents share the same concrete model with the our
         # model to detect the inheritance pattern ConcreteGrandParent ->
         # MultiTableParent -> ProxyChild. Simply checking self.model._meta.proxy
@@ -900,10 +905,10 @@ class QuerySet:
         Return a list of date objects representing all available dates for
         the given field_name, scoped to 'kind'.
         """
-        assert kind in ('year', 'month', 'week', 'day'), \
-            "'kind' must be one of 'year', 'month', 'week', or 'day'."
-        assert order in ('ASC', 'DESC'), \
-            "'order' must be either 'ASC' or 'DESC'."
+        if kind not in ('year', 'month', 'week', 'day'):
+            raise ValueError("'kind' must be one of 'year', 'month', 'week', or 'day'.")
+        if order not in ('ASC', 'DESC'):
+            raise ValueError("'order' must be either 'ASC' or 'DESC'.")
         return self.annotate(
             datefield=Trunc(field_name, kind, output_field=DateField()),
             plain_field=F(field_name)
@@ -916,10 +921,13 @@ class QuerySet:
         Return a list of datetime objects representing all available
         datetimes for the given field_name, scoped to 'kind'.
         """
-        assert kind in ('year', 'month', 'week', 'day', 'hour', 'minute', 'second'), \
-            "'kind' must be one of 'year', 'month', 'week', 'day', 'hour', 'minute', or 'second'."
-        assert order in ('ASC', 'DESC'), \
-            "'order' must be either 'ASC' or 'DESC'."
+        if kind not in ('year', 'month', 'week', 'day', 'hour', 'minute', 'second'):
+            raise ValueError(
+                "'kind' must be one of 'year', 'month', 'week', 'day', "
+                "'hour', 'minute', or 'second'."
+            )
+        if order not in ('ASC', 'DESC'):
+            raise ValueError("'order' must be either 'ASC' or 'DESC'.")
         if settings.USE_TZ:
             if tzinfo is None:
                 tzinfo = timezone.get_current_timezone()
