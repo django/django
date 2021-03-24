@@ -158,9 +158,17 @@ class Random(NumericOutputFieldMixin, Func):
         return []
 
 
-class Round(Transform):
+class Round(FixDecimalInputMixin, NumericOutputFieldMixin, Transform):
     function = 'ROUND'
     lookup_name = 'round'
+    arity = None  # Override arity=1 set by Transform to enable passing places.
+
+    def __init__(self, expression, places=None, **extra):
+        # If places is not provided, default to using the single argument form
+        # of the function as supported by all core database backends. All known
+        # backends default to 0 in this case.
+        args = () if places is None else (places,)
+        super().__init__(expression, *args, **extra)
 
 
 class Sign(Transform):

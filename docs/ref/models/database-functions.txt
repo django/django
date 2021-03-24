@@ -1147,10 +1147,13 @@ Returns a random value in the range ``0.0 ≤ x < 1.0``.
 ``Round``
 ---------
 
-.. class:: Round(expression, **extra)
+.. class:: Round(expression, places=None, **extra)
 
 Rounds a numeric field or expression to the nearest integer. Whether half
-values are rounded up or down depends on the database.
+values are rounded up or down depends on the database. If ``places`` is
+``None`` the default behavior of the database backend is used, typically
+assuming ``0``, otherwise it should be an integer specifying the number of
+decimal places to round to.
 
 Usage example::
 
@@ -1167,6 +1170,16 @@ It can also be registered as a transform. For example::
     >>> FloatField.register_lookup(Round)
     >>> # Get vectors whose round() is less than 20
     >>> vectors = Vector.objects.filter(x__round__lt=20, y__round__lt=20)
+
+.. admonition:: Negative values for ``places`` argument.
+
+    All core database backends, except for SQLite, support passing a negative
+    value for the ``places`` argument. This allows for digits to the left of
+    the decimal point to be rounded to zero.
+
+.. versionadded:: 4.0
+
+    Support for passing the number of decimal places was added.
 
 ``Sign``
 --------

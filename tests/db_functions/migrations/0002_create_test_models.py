@@ -55,8 +55,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='DecimalModel',
             fields=[
-                ('n1', models.DecimalField(decimal_places=2, max_digits=6)),
-                ('n2', models.DecimalField(decimal_places=2, max_digits=6)),
+                ('n1', models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)),
+                ('n2', models.DecimalField(decimal_places=7, max_digits=9, null=True, blank=True)),
             ],
         ),
         migrations.CreateModel(
