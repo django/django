@@ -600,6 +600,13 @@ class DiscoverRunner:
             if not is_package:
                 return tests
         elif not os.path.isdir(label_as_path):
+            if os.path.exists(label_as_path):
+                assert tests is None
+                raise RuntimeError(
+                    f'One of the test labels is a path to a file: {label!r}, '
+                    f'which is not supported. Use a dotted module name '
+                    f'instead.'
+                )
             return tests
 
         kwargs = discover_kwargs.copy()
