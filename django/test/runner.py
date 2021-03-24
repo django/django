@@ -531,7 +531,7 @@ class DiscoverRunner:
         )
         parser.add_argument(
             '-r', '--reverse', action='store_true',
-            help='Reverses test cases order.',
+            help='Reverses test case order.',
         )
         parser.add_argument(
             '--debug-mode', action='store_true',
