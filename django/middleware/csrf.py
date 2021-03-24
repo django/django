@@ -330,11 +330,10 @@ class CsrfViewMiddleware(MiddlewareMixin):
                     except DisallowedHost:
                         pass
 
-                # Create a list of all acceptable HTTP referers, including the
-                # current host if it's permitted by ALLOWED_HOSTS.
-                good_hosts = list(self.csrf_trusted_origins_hosts)
+                # Create an iterable of all acceptable HTTP referers.
+                good_hosts = self.csrf_trusted_origins_hosts
                 if good_referer is not None:
-                    good_hosts.append(good_referer)
+                    good_hosts = (*good_hosts, good_referer)
 
                 if not any(is_same_domain(referer.netloc, host) for host in good_hosts):
                     reason = REASON_BAD_REFERER % referer.geturl()
