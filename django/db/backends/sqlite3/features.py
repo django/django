@@ -65,6 +65,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "SQLite doesn't have a constraint.": {
                 'model_fields.test_integerfield.PositiveIntegerFieldTests.test_negative_values',
             },
+            "SQLite doesn't support negative precision for ROUND().": {
+                'db_functions.math.test_round.RoundTests.test_null_with_negative_precision',
+                'db_functions.math.test_round.RoundTests.test_decimal_with_negative_precision',
+                'db_functions.math.test_round.RoundTests.test_float_with_negative_precision',
+                'db_functions.math.test_round.RoundTests.test_integer_with_negative_precision',
+            },
         }
         if Database.sqlite_version_info < (3, 27):
             skips.update({

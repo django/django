@@ -222,6 +222,10 @@ Models
   whether the queryset contains the given object. This tries to perform the
   query in the simplest and fastest way possible.
 
+* The new ``precision`` argument of the
+  :class:`Round() <django.db.models.functions.Round>` database function allows
+  specifying the number of decimal places after rounding.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
