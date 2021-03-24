@@ -311,24 +311,24 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 if referer.scheme != 'https':
                     return self._reject(request, REASON_INSECURE_REFERER)
 
-                # If there isn't a CSRF_COOKIE_DOMAIN, require an exact match
-                # match on host:port. If not, obey the cookie rules (or those
-                # for the session cookie, if CSRF_USE_SESSIONS).
                 good_referer = (
                     settings.SESSION_COOKIE_DOMAIN
                     if settings.CSRF_USE_SESSIONS
                     else settings.CSRF_COOKIE_DOMAIN
                 )
-                if good_referer is not None:
-                    server_port = request.get_port()
-                    if server_port not in ('443', '80'):
-                        good_referer = '%s:%s' % (good_referer, server_port)
-                else:
+                if good_referer is None:
+                    # If no cookie domain is configured, allow matching the
+                    # current host:port exactly if it's permitted by
+                    # ALLOWED_HOSTS.
                     try:
                         # request.get_host() includes the port.
                         good_referer = request.get_host()
                     except DisallowedHost:
                         pass
+                else:
+                    server_port = request.get_port()
+                    if server_port not in ('443', '80'):
+                        good_referer = '%s:%s' % (good_referer, server_port)
 
                 # Create an iterable of all acceptable HTTP referers.
                 good_hosts = self.csrf_trusted_origins_hosts
