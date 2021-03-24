@@ -622,7 +622,7 @@ class FkConstraintsTests(TransactionTestCase):
             with connection.constraint_checks_disabled():
                 a.save()
                 with self.assertRaises(IntegrityError):
-                    connection.check_constraints()
+                    connection.check_constraints(table_names=[Article._meta.db_table])
             transaction.set_rollback(True)
 
     def test_check_constraints_sql_keywords(self):
