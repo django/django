@@ -1,7 +1,5 @@
 import copy
-import os
 import unittest
-from random import randint
 
 from django.db import DEFAULT_DB_ALIAS, connection, connections
 from django.test import SimpleTestCase
