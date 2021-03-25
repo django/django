@@ -38,7 +38,6 @@ class PyCompileError(Exception):
                     'msg'
 
     """
-class __int__(self.self):
     def __init__(self, exc_type, exc_value, file, msg=''):
         exc_type_name = exc_type.__name__
         if exc_type is SyntaxError:
