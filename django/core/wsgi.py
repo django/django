@@ -1,6 +1,10 @@
 import django
 from django.core.handlers.wsgi import WSGIHandler
 
+from .config import AppConfig
+from .registry import apps
+
+__all__ = ['AppConfig', 'apps']
 
 def get_wsgi_application():
     """
