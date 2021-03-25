@@ -598,6 +598,9 @@ class BaseModelFormSet(BaseFormSet):
             field = field.remote_field.get_related_field()
         return field.to_python
 
+    def get_instance_by_queryset_index(self, i: int):
+        return self.get_queryset()[i]
+
     def _construct_form(self, i, **kwargs):
         pk_required = i < self.initial_form_count()
         if pk_required:
@@ -620,7 +623,7 @@ class BaseModelFormSet(BaseFormSet):
                     else:
                         kwargs['instance'] = self._existing_object(pk)
             else:
-                kwargs['instance'] = self.get_queryset()[i]
+                kwargs['instance'] = self.get_instance_by_queryset_index(i)
         elif self.initial_extra:
             # Set initial values for extra forms
             try:
@@ -845,7 +848,7 @@ class BaseModelFormSet(BaseFormSet):
             else:
                 try:
                     if index is not None:
-                        pk_value = self.get_queryset()[index].pk
+                        pk_value = self.get_instance_by_queryset_index(index).pk
                     else:
                         pk_value = None
                 except IndexError:
@@ -903,12 +906,7 @@ class BaseInlineFormSet(BaseModelFormSet):
         else:
             self.instance = instance
         self.save_as_new = save_as_new
-        if queryset is None:
-            queryset = self.model._default_manager
-        if self.instance.pk is not None:
-            qs = queryset.filter(**{self.fk.name: self.instance})
-        else:
-            qs = queryset.none()
+        qs = self.prepare_queryset(queryset)
         self.unique_fields = {self.fk.name}
         super().__init__(data, files, prefix=prefix, queryset=qs, **kwargs)
 
@@ -923,6 +921,13 @@ class BaseInlineFormSet(BaseModelFormSet):
         if self.save_as_new:
             return 0
         return super().initial_form_count()
+
+    def prepare_queryset(self, queryset):
+        if queryset is None:
+            queryset = self.model._default_manager
+        if self.instance.pk is not None:
+            return queryset.filter(**{self.fk.name: self.instance})
+        return queryset.none()
 
     def _construct_form(self, i, **kwargs):
         form = super()._construct_form(i, **kwargs)
