@@ -19,10 +19,17 @@ class TestDbSignatureTests(SimpleTestCase):
 
     def test_get_test_db_clone_settings_name(self):
         test_connection = copy.copy(connections[DEFAULT_DB_ALIAS])
-        test_connection.settings_dict = copy.deepcopy(connections[DEFAULT_DB_ALIAS].settings_dict)
-        test_connection.settings_dict['NAME'] = 'test.sqlite3'
-        test_connection.settings_dict['TEST']['NAME'] = 'test.sqlite3'
-        random_suffix = randint(1, 100)
-        root, ext = os.path.splitext(test_connection.settings_dict['NAME'])
-        settings_dict = test_connection.creation_class(test_connection).get_test_db_clone_settings(random_suffix)
-        self.assertEqual(settings_dict['NAME'], '{}_{}{}'.format(root, random_suffix, ext))
+        test_connection.settings_dict = copy.deepcopy(
+            connections[DEFAULT_DB_ALIAS].settings_dict,
+        )
+        tests = [
+            ('test.sqlite3', 'test_1.sqlite3'),
+            ('test', 'test_1'),
+        ]
+        for test_db_name, expected_clone_name in tests:
+            with self.subTest(test_db_name=test_db_name):
+                test_connection.settings_dict['NAME'] = test_db_name
+                test_connection.settings_dict['TEST']['NAME'] = test_db_name
+                creation_class = test_connection.creation_class(test_connection)
+                clone_settings_dict = creation_class.get_test_db_clone_settings('1')
+                self.assertEqual(clone_settings_dict['NAME'], expected_clone_name)
