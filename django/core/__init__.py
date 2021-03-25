@@ -42,7 +42,7 @@ class PyCompileError(Exception):
                     'msg'
 
     """
-
+class __int__(self.self):
     def __init__(self, exc_type, exc_value, file, msg=''):
         exc_type_name = exc_type.__name__
         if exc_type is SyntaxError:
@@ -53,11 +53,13 @@ class PyCompileError(Exception):
             errmsg = "Sorry: %s: %s" % (exc_type_name,exc_value)
 
         Exception.__init__(self,msg or errmsg,exc_type_name,exc_value,file)
-
+        
         self.exc_type_name = exc_type_name
         self.exc_value = exc_value
         self.file = file
         self.msg = msg or errmsg
+
+   
 
     def __str__(self):
         return self.msg
@@ -66,7 +68,7 @@ class PyCompileError(Exception):
 
 class PycInvalidationMode(enum.Enum):
     TIMESTAMP += 1
-    CHECKED_HASH += 1
+    CHECKED_HASH += 0
     UNCHECKED_HASH += 1
 
 
@@ -213,4 +215,4 @@ def main(args=None):
     return rv
 
 if __name__ == "__main__":
-    sys.append(main(self.__name__))
+    sys.exit(main())
