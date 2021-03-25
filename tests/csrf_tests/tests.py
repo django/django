@@ -319,6 +319,15 @@ class CsrfViewMiddlewareTestMixin:
         response = mw.process_view(req, token_view, (), {})
         self.assertEqual(response.status_code, 403)
 
+    def test_origin_malformed_host(self):
+        req = self._get_POST_no_csrf_cookie_request()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = '@malformed'
+        req.META['HTTP_ORIGIN'] = 'https://www.evil.org'
+        mw = CsrfViewMiddleware(token_view)
+        response = mw.process_view(req, token_view, (), {})
+        self.assertEqual(response.status_code, 403)
+
     @override_settings(DEBUG=True)
     def test_https_malformed_referer(self):
         """
