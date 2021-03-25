@@ -290,6 +290,10 @@ Methods
 
     Example: ``"127.0.0.1:8000"``
 
+    Raises ``django.core.exceptions.DisallowedHost`` if the host is not in
+    :setting:`ALLOWED_HOSTS` or the domain name is invalid according to
+    :rfc:`1034`/:rfc:`1035 <1035>`.
+
     .. note:: The :meth:`~HttpRequest.get_host()` method fails when the host is
         behind multiple proxies. One solution is to use middleware to rewrite
         the proxy headers, as in the following example::
