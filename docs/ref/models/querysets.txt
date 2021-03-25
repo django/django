@@ -2157,9 +2157,9 @@ exists in the database, an :exc:`~django.db.IntegrityError` is raised.
 
 This method inserts the provided list of objects into the database in an
 efficient manner (generally only 1 query, no matter how many objects there
-are)::
+are), and returns created objects as a list, in the same order as provided::
 
-    >>> Entry.objects.bulk_create([
+    >>> objs = Entry.objects.bulk_create([
     ...     Entry(headline='This is a test'),
     ...     Entry(headline='This is only a test'),
     ... ])
@@ -2209,8 +2209,6 @@ normally supports it).
 
 .. _MySQL documentation: https://dev.mysql.com/doc/refman/en/sql-mode.html#ignore-strict-comparison
 .. _MariaDB documentation: https://mariadb.com/kb/en/ignore/
-
-Returns ``objs`` as cast to a list, in the same order as provided.
 
 ``bulk_update()``
 ~~~~~~~~~~~~~~~~~
