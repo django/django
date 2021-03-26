@@ -164,10 +164,9 @@ and the :setting:`SECRET_KEY` setting.
 
     **Performance**
 
-    Finally, the size of a cookie can have an impact on the `speed of your site`_.
+    Finally, the size of a cookie can have an impact on the speed of your site.
 
 .. _`replay attacks`: https://en.wikipedia.org/wiki/Replay_attack
-.. _`speed of your site`: https://yuiblog.com/blog/2007/03/01/performance-research-part-3/
 
 Using sessions in views
 =======================
