@@ -244,7 +244,7 @@ Use the ``django.test.Client`` class to make requests.
         wish to upload as a value. For example::
 
             >>> c = Client()
-            >>> with open('wishlist.doc') as fp:
+            >>> with open('wishlist.doc', 'rb') as fp:
             ...     c.post('/customers/wishes/', {'name': 'fred', 'attachment': fp})
 
         (The name ``attachment`` here is not relevant; use whatever name your
