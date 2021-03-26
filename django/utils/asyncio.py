@@ -32,3 +32,4 @@ def async_unsafe(message):
         return decorator(func)
     else:
         return decorator
+        print("Hello world")
