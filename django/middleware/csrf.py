@@ -132,6 +132,11 @@ def _compare_masked_tokens(request_csrf_token, csrf_token):
     )
 
 
+class RejectRequest(Exception):
+    def __init__(self, reason):
+        self.reason = reason
+
+
 class CsrfViewMiddleware(MiddlewareMixin):
     """
     Require a present and correct csrfmiddlewaretoken for POST requests that
@@ -251,6 +256,50 @@ class CsrfViewMiddleware(MiddlewareMixin):
             for host in self.allowed_origin_subdomains.get(request_scheme, ())
         )
 
+    def _check_referer(self, request):
+        referer = request.META.get('HTTP_REFERER')
+        if referer is None:
+            raise RejectRequest(REASON_NO_REFERER)
+
+        try:
+            referer = urlparse(referer)
+        except ValueError:
+            raise RejectRequest(REASON_MALFORMED_REFERER)
+
+        # Make sure we have a valid URL for Referer.
+        if '' in (referer.scheme, referer.netloc):
+            raise RejectRequest(REASON_MALFORMED_REFERER)
+
+        # Ensure that our Referer is also secure.
+        if referer.scheme != 'https':
+            raise RejectRequest(REASON_INSECURE_REFERER)
+
+        good_referer = (
+            settings.SESSION_COOKIE_DOMAIN
+            if settings.CSRF_USE_SESSIONS
+            else settings.CSRF_COOKIE_DOMAIN
+        )
+        if good_referer is None:
+            # If no cookie domain is configured, allow matching the current
+            # host:port exactly if it's permitted by ALLOWED_HOSTS.
+            try:
+                # request.get_host() includes the port.
+                good_referer = request.get_host()
+            except DisallowedHost:
+                pass
+        else:
+            server_port = request.get_port()
+            if server_port not in ('443', '80'):
+                good_referer = '%s:%s' % (good_referer, server_port)
+
+        # Create an iterable of all acceptable HTTP referers.
+        good_hosts = self.csrf_trusted_origins_hosts
+        if good_referer is not None:
+            good_hosts = (*good_hosts, good_referer)
+
+        if not any(is_same_domain(referer.netloc, host) for host in good_hosts):
+            raise RejectRequest(REASON_BAD_REFERER % referer.geturl())
+
     def process_request(self, request):
         csrf_token = self._get_token(request)
         if csrf_token is not None:
@@ -300,50 +349,10 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 # Barth et al. found that the Referer header is missing for
                 # same-domain requests in only about 0.2% of cases or less, so
                 # we can use strict Referer checking.
-                referer = request.META.get('HTTP_REFERER')
-                if referer is None:
-                    return self._reject(request, REASON_NO_REFERER)
-
                 try:
-                    referer = urlparse(referer)
-                except ValueError:
-                    return self._reject(request, REASON_MALFORMED_REFERER)
-
-                # Make sure we have a valid URL for Referer.
-                if '' in (referer.scheme, referer.netloc):
-                    return self._reject(request, REASON_MALFORMED_REFERER)
-
-                # Ensure that our Referer is also secure.
-                if referer.scheme != 'https':
-                    return self._reject(request, REASON_INSECURE_REFERER)
-
-                good_referer = (
-                    settings.SESSION_COOKIE_DOMAIN
-                    if settings.CSRF_USE_SESSIONS
-                    else settings.CSRF_COOKIE_DOMAIN
-                )
-                if good_referer is None:
-                    # If no cookie domain is configured, allow matching the
-                    # current host:port exactly if it's permitted by
-                    # ALLOWED_HOSTS.
-                    try:
-                        # request.get_host() includes the port.
-                        good_referer = request.get_host()
-                    except DisallowedHost:
-                        pass
-                else:
-                    server_port = request.get_port()
-                    if server_port not in ('443', '80'):
-                        good_referer = '%s:%s' % (good_referer, server_port)
-
-                # Create an iterable of all acceptable HTTP referers.
-                good_hosts = self.csrf_trusted_origins_hosts
-                if good_referer is not None:
-                    good_hosts = (*good_hosts, good_referer)
-
-                if not any(is_same_domain(referer.netloc, host) for host in good_hosts):
-                    reason = REASON_BAD_REFERER % referer.geturl()
-                    return self._reject(request, reason)
+                    self._check_referer(request)
+                except RejectRequest as exc:
+                    return self._reject(request, exc.reason)
 
             # Access csrf_token via self._get_token() as rotate_token() may
             # have been called by an authentication middleware during the
