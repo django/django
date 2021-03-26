@@ -120,6 +120,12 @@ class BaseDatabaseWrapper:
         self.ops = self.ops_class(self)
         self.validation = self.validation_class(self)
 
+    def __repr__(self):
+        return (
+            f'<{self.__class__.__qualname__} '
+            f'vendor={self.vendor!r} alias={self.alias!r}>'
+        )
+
     def ensure_timezone(self):
         """
         Ensure the connection's timezone is set to `self.timezone_name` and

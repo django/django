@@ -44,6 +44,13 @@ class SQLCompiler:
         self.klass_info = None
         self._meta_ordering = None
 
+    def __repr__(self):
+        return (
+            f'<{self.__class__.__qualname__} '
+            f'model={self.query.model.__qualname__} '
+            f'connection={self.connection!r} using={self.using!r}>'
+        )
+
     def setup_query(self):
         if all(self.query.alias_refcount[a] == 0 for a in self.query.alias_map):
             self.query.get_initial_alias()

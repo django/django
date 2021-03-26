@@ -6,7 +6,7 @@ from django.db.models.expressions import Col, Func
 from django.db.models.fields.related_lookups import RelatedIsNull
 from django.db.models.functions import Lower
 from django.db.models.lookups import Exact, GreaterThan, IsNull, LessThan
-from django.db.models.sql.query import Query
+from django.db.models.sql.query import JoinPromoter, Query
 from django.db.models.sql.where import OR
 from django.test import SimpleTestCase
 from django.test.utils import register_lookup
@@ -150,3 +150,11 @@ class TestQuery(SimpleTestCase):
         msg = 'Cannot filter against a non-conditional expression.'
         with self.assertRaisesMessage(TypeError, msg):
             query.build_where(Func(output_field=CharField()))
+
+
+class JoinPromoterTest(SimpleTestCase):
+    def test_repr(self):
+        self.assertEqual(
+            repr(JoinPromoter('AND', 3, True)),
+            "JoinPromoter(connector='AND', num_children=3, negated=True)",
+        )
