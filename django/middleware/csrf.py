@@ -274,6 +274,12 @@ class CsrfViewMiddleware(MiddlewareMixin):
         if referer.scheme != 'https':
             raise RejectRequest(REASON_INSECURE_REFERER)
 
+        if any(
+            is_same_domain(referer.netloc, host)
+            for host in self.csrf_trusted_origins_hosts
+        ):
+            return
+        # Allow matching the configured cookie domain.
         good_referer = (
             settings.SESSION_COOKIE_DOMAIN
             if settings.CSRF_USE_SESSIONS
@@ -286,18 +292,13 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 # request.get_host() includes the port.
                 good_referer = request.get_host()
             except DisallowedHost:
-                pass
+                raise RejectRequest(REASON_BAD_REFERER % referer.geturl())
         else:
             server_port = request.get_port()
             if server_port not in ('443', '80'):
                 good_referer = '%s:%s' % (good_referer, server_port)
 
-        # Create an iterable of all acceptable HTTP referers.
-        good_hosts = self.csrf_trusted_origins_hosts
-        if good_referer is not None:
-            good_hosts = (*good_hosts, good_referer)
-
-        if not any(is_same_domain(referer.netloc, host) for host in good_hosts):
+        if not is_same_domain(referer.netloc, good_referer):
             raise RejectRequest(REASON_BAD_REFERER % referer.geturl())
 
     def process_request(self, request):
