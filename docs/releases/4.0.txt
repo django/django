@@ -373,6 +373,9 @@ Miscellaneous
   non-boolean attribute without a value equal to an attribute with the same
   name and value.
 
+* Tests that fail to load, for example due to syntax errors, now always match
+  when using :option:`test --tag`.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0

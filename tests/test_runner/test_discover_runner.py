@@ -2,6 +2,7 @@ import os
 import unittest.loader
 from argparse import ArgumentParser
 from contextlib import contextmanager
+from importlib import import_module
 from unittest import TestSuite, TextTestRunner, defaultTestLoader, mock
 
 from django.db import connections
@@ -258,6 +259,18 @@ class DiscoverRunnerTests(SimpleTestCase):
         self.assertEqual(count_tests(tags=['foo'], exclude_tags=['bar']), 2)
         self.assertEqual(count_tests(tags=['foo'], exclude_tags=['bar', 'baz']), 1)
         self.assertEqual(count_tests(exclude_tags=['foo']), 0)
+
+    def test_tag_fail_to_load(self):
+        with self.assertRaises(SyntaxError):
+            import_module('test_runner_apps.tagged.tests_syntax_error')
+        runner = DiscoverRunner(tags=['syntax_error'])
+        # A label that doesn't exist or cannot be loaded due to syntax errors
+        # is always considered matching.
+        suite = runner.build_suite(['doesnotexist', 'test_runner_apps.tagged'])
+        self.assertEqual([test.id() for test in suite], [
+            'unittest.loader._FailedTest.doesnotexist',
+            'unittest.loader._FailedTest.test_runner_apps.tagged.tests_syntax_error',
+        ])
 
     def test_included_tags_displayed(self):
         runner = DiscoverRunner(tags=['foo', 'bar'], verbosity=2)

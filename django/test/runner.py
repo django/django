@@ -852,6 +852,10 @@ def partition_suite_by_case(suite):
 
 
 def test_match_tags(test, tags, exclude_tags):
+    if isinstance(test, unittest.loader._FailedTest):
+        # Tests that couldn't load always match to prevent tests from falsely
+        # passing due e.g. to syntax errors.
+        return True
     test_tags = set(getattr(test, 'tags', []))
     test_fn_name = getattr(test, '_testMethodName', str(test))
     if hasattr(test, test_fn_name):

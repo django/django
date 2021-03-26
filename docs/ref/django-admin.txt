@@ -1497,6 +1497,12 @@ don't.
 Runs only tests :ref:`marked with the specified tags <topics-tagging-tests>`.
 May be specified multiple times and combined with :option:`test --exclude-tag`.
 
+Tests that fail to load are always considered matching.
+
+.. versionchanged:: 4.0
+
+    In older versions, tests that failed to load did not match tags.
+
 .. option:: --exclude-tag EXCLUDE_TAGS
 
 Excludes tests :ref:`marked with the specified tags <topics-tagging-tests>`.
