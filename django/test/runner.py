@@ -635,7 +635,11 @@ class DiscoverRunner:
                     print('Excluding test tag(s): %s.' % ', '.join(sorted(self.exclude_tags)))
             all_tests = filter_tests_by_tags(all_tests, self.tags, self.exclude_tags)
 
-        all_tests = reorder_tests(all_tests, self.reorder_by, self.reverse)
+        # Put the failures detected at load time first for quicker feedback.
+        # _FailedTest objects include things like test modules that couldn't be
+        # found or that couldn't be loaded due to syntax errors.
+        test_types = (unittest.loader._FailedTest, *self.reorder_by)
+        all_tests = reorder_tests(all_tests, test_types, self.reverse)
         suite = self.test_suite(all_tests)
 
         if self.parallel > 1:

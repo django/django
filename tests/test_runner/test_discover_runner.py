@@ -1,4 +1,5 @@
 import os
+import unittest.loader
 from argparse import ArgumentParser
 from contextlib import contextmanager
 from unittest import TestSuite, TextTestRunner, defaultTestLoader, mock
@@ -208,6 +209,15 @@ class DiscoverRunnerTests(SimpleTestCase):
                       msg="Methods of simple cases should be reversed.")
         self.assertIn('test_2', suite[9].id(),
                       msg="Methods of unittest cases should be reversed.")
+
+    def test_build_suite_failed_tests_first(self):
+        # The "doesnotexist" label results in a _FailedTest instance.
+        suite = DiscoverRunner().build_suite(
+            test_labels=['test_runner_apps.sample', 'doesnotexist'],
+        )
+        tests = list(suite)
+        self.assertIsInstance(tests[0], unittest.loader._FailedTest)
+        self.assertNotIsInstance(tests[-1], unittest.loader._FailedTest)
 
     def test_overridable_get_test_runner_kwargs(self):
         self.assertIsInstance(DiscoverRunner().get_test_runner_kwargs(), dict)
