@@ -858,8 +858,9 @@ def test_match_tags(test, tags, exclude_tags):
         test_fn = getattr(test, test_fn_name)
         test_fn_tags = list(getattr(test_fn, 'tags', []))
         test_tags = test_tags.union(test_fn_tags)
-    matched_tags = test_tags.intersection(tags)
-    return (matched_tags or not tags) and not test_tags.intersection(exclude_tags)
+    if tags and test_tags.isdisjoint(tags):
+        return False
+    return test_tags.isdisjoint(exclude_tags)
 
 
 def filter_tests_by_tags(tests, tags, exclude_tags):
