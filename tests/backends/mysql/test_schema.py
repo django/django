@@ -11,6 +11,7 @@ class SchemaEditorTests(TestCase):
         editor = connection.schema_editor()
         tested_values = [
             ('string', "'string'"),
+            ('¿Tú hablas inglés?', "'¿Tú hablas inglés?'"),
             (42, '42'),
             (1.754, '1.754e0' if MySQLdb.version_info >= (1, 3, 14) else '1.754'),
             (False, b'0' if MySQLdb.version_info >= (1, 4, 0) else '0'),
