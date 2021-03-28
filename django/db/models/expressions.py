@@ -707,7 +707,7 @@ class Func(SQLiteNumericMixin, Expression):
         return copy
 
 
-class Value(Expression):
+class Value(SQLiteNumericMixin, Expression):
     """Represent a wrapped value as a node within an expression."""
     # Provide a default value for `for_save` in order to allow unresolved
     # instances to be compiled until a decision is taken in #25425.
