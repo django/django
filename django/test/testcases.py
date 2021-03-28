@@ -1436,7 +1436,11 @@ class FSFilesHandler(WSGIHandler):
 
     def serve(self, request):
         os_rel_path = self.file_path(request.path)
-        os_rel_path = posixpath.normpath(unquote(os_rel_path))
+        if ':' in os_rel_path or '|' in os_rel_path:
+            or_rel_path = urllib.parse.urlencode({os_rel_path},safe=":,|")
+        else:
+            os_rel_path = unquote(os_rel_path)
+        os_rel_path = posixpath.normpath(os_rel_path)
         # Emulate behavior of django.contrib.staticfiles.views.serve() when it
         # invokes staticfiles' finders functionality.
         # TODO: Modify if/when that internal API is refactored
