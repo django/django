@@ -115,7 +115,7 @@ If wishing to install an official release direct from the Python Package Index `
 
     pip install mod_wsgi
 
-If you wish to use a version of ``Apache`` which is installed into a non standard location, you can set and export the APXS environment variable to the location of the Apache apxs script for your Apache installation before performing the installation.
+If you wish to use a version of ``Apache`` which is installed into a non standard location, you can set and export the APXS environment variable to the location of the Apache APXS script for your Apache installation before performing the installation.
 
 If you are using ``Linux``, ``macOS`` or other ``UNIX`` type operating system, and you don't have Apache available, you can instead install ``mod_wsgi`` using:
 
