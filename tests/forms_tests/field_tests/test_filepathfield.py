@@ -1,6 +1,7 @@
 import os.path
 
-from django.forms import FilePathField, ValidationError
+from django.core.exceptions import ValidationError
+from django.forms import FilePathField
 from django.test import SimpleTestCase
 
 PATH = os.path.dirname(os.path.abspath(__file__))

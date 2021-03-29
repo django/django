@@ -4,7 +4,7 @@
 # André Hagenbruch, 2011-2012
 # Florian Apolloner <florian@apolloner.eu>, 2011
 # Daniel Roschka <dunedan@phoenitydawn.de>, 2016
-# Florian Apolloner <florian@apolloner.eu>, 2018
+# Florian Apolloner <florian@apolloner.eu>, 2018,2020
 # Jannis Vajen, 2011,2013
 # Jannis Leidel <jannis@leidel.info>, 2013-2018,2020
 # Jannis Vajen, 2016
@@ -13,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2020-01-17 22:58+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-17 07:52+0000\n"
+"Last-Translator: Florian Apolloner <florian@apolloner.eu>\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -28,6 +28,9 @@ msgstr "Afrikaans"
 
 msgid "Arabic"
 msgstr "Arabisch"
+
+msgid "Algerian Arabic"
+msgstr "Algerisches Arabisch"
 
 msgid "Asturian"
 msgstr "Asturisch"
@@ -152,6 +155,9 @@ msgstr "Interlingua"
 msgid "Indonesian"
 msgstr "Indonesisch"
 
+msgid "Igbo"
+msgstr "Igbo"
+
 msgid "Ido"
 msgstr "Ido"
 
@@ -181,6 +187,9 @@ msgstr "Kannada"
 
 msgid "Korean"
 msgstr "Koreanisch"
+
+msgid "Kyrgyz"
+msgstr "Kirgisisch"
 
 msgid "Luxembourgish"
 msgstr "Luxemburgisch"
@@ -266,8 +275,14 @@ msgstr "Tamilisch"
 msgid "Telugu"
 msgstr "Telugisch"
 
+msgid "Tajik"
+msgstr "Tadschikisch"
+
 msgid "Thai"
 msgstr "Thailändisch"
+
+msgid "Turkmen"
+msgstr "Turkmenisch"
 
 msgid "Turkish"
 msgstr "Türkisch"
@@ -582,6 +597,9 @@ msgstr "Wert „%(value)s“ muss entweder None, True oder False sein."
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolescher Wert (True, False oder None)"
 
+msgid "Positive big integer"
+msgstr "Positive große Ganzzahl"
+
 msgid "Positive integer"
 msgstr "Positive Ganzzahl"
 
@@ -635,6 +653,12 @@ msgstr "Datei"
 
 msgid "Image"
 msgstr "Bild"
+
+msgid "A JSON object"
+msgstr "Ein JSON-Objekt"
+
+msgid "Value must be valid JSON."
+msgstr "Wert muss gültiges JSON sein."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -708,7 +732,7 @@ msgstr[1] ""
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
-"Bitte wählen Sie entweder eine Datei aus oder wählen Sie \"Löschen\", nicht "
+"Bitte wählen Sie entweder eine Datei aus oder wählen Sie „Löschen“, nicht "
 "beides."
 
 msgid ""
@@ -731,6 +755,9 @@ msgstr "Bitte einen vollständigen Wert eingeben."
 
 msgid "Enter a valid UUID."
 msgstr "Bitte eine gültige UUID eingeben."
+
+msgid "Enter a valid JSON."
+msgstr "Bitte ein gültiges JSON-Objekt eingeben."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -817,15 +844,7 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nein"
 
-msgid "Year"
-msgstr "Jahr"
-
-msgid "Month"
-msgstr "Monat"
-
-msgid "Day"
-msgstr "Tag"
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "Ja,Nein,Vielleicht"
 
@@ -1133,9 +1152,6 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d Minute"
 msgstr[1] "%d Minuten"
-
-msgid "0 minutes"
-msgstr "0 Minuten"
 
 msgid "Forbidden"
 msgstr "Verboten"

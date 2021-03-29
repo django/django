@@ -85,11 +85,11 @@ You can acquire the token like this:
 .. code-block:: javascript
 
     function getCookie(name) {
-        var cookieValue = null;
+        let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = cookies[i].trim();
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
                 // Does this cookie string begin with the name we want?
                 if (cookie.substring(0, name.length + 1) === (name + '=')) {
                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
@@ -99,14 +99,14 @@ You can acquire the token like this:
         }
         return cookieValue;
     }
-    var csrftoken = getCookie('csrftoken');
+    const csrftoken = getCookie('csrftoken');
 
 The above code could be simplified by using the `JavaScript Cookie library
 <https://github.com/js-cookie/js-cookie/>`_ to replace ``getCookie``:
 
 .. code-block:: javascript
 
-    var csrftoken = Cookies.get('csrftoken');
+    const csrftoken = Cookies.get('csrftoken');
 
 .. note::
 
@@ -137,7 +137,7 @@ and read the token from the DOM with JavaScript:
 
     {% csrf_token %}
     <script>
-    var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     </script>
 
 Setting the token on the AJAX request
@@ -148,7 +148,7 @@ Finally, you'll need to set the header on your AJAX request. Using the
 
 .. code-block:: javascript
 
-    var request = new Request(
+    const request = new Request(
         /* URL */,
         {headers: {'X-CSRFToken': csrftoken}}
     );
@@ -263,10 +263,15 @@ The CSRF protection is based on the following things:
 
    This check is done by ``CsrfViewMiddleware``.
 
-#. In addition, for HTTPS requests, strict referer checking is done by
-   ``CsrfViewMiddleware``. This means that even if a subdomain can set or
-   modify cookies on your domain, it can't force a user to post to your
-   application since that request won't come from your own exact domain.
+#. ``CsrfViewMiddleware`` verifies the `Origin header`_, if provided by the
+   browser, against the current host and the :setting:`CSRF_TRUSTED_ORIGINS`
+   setting. This provides protection against cross-subdomain attacks.
+
+#. In addition, for HTTPS requests, if the ``Origin`` header isn't provided,
+   ``CsrfViewMiddleware`` performs strict referer checking. This means that
+   even if a subdomain can set or modify cookies on your domain, it can't force
+   a user to post to your application since that request won't come from your
+   own exact domain.
 
    This also addresses a man-in-the-middle attack that's possible under HTTPS
    when using a session independent secret, due to the fact that HTTP
@@ -276,13 +281,17 @@ The CSRF protection is based on the following things:
    enough under HTTP.)
 
    If the :setting:`CSRF_COOKIE_DOMAIN` setting is set, the referer is compared
-   against it. This setting supports subdomains. For example,
-   ``CSRF_COOKIE_DOMAIN = '.example.com'`` will allow POST requests from
-   ``www.example.com`` and ``api.example.com``. If the setting is not set, then
-   the referer must match the HTTP ``Host`` header.
+   against it. You can allow cross-subdomain requests by including a leading
+   dot. For example, ``CSRF_COOKIE_DOMAIN = '.example.com'`` will allow POST
+   requests from ``www.example.com`` and ``api.example.com``. If the setting is
+   not set, then the referer must match the HTTP ``Host`` header.
 
    Expanding the accepted referers beyond the current host or cookie domain can
    be done with the :setting:`CSRF_TRUSTED_ORIGINS` setting.
+
+.. versionadded:: 4.0
+
+    ``Origin`` checking was added, as described above.
 
 This ensures that only forms that have originated from trusted domains can be
 used to POST data back.
@@ -314,6 +323,7 @@ vulnerability allows and much worse).
     sites.
 
 .. _BREACH: http://breachattack.com/
+.. _Origin header: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin
 .. _disable the referer: https://www.w3.org/TR/referrer-policy/#referrer-policy-delivery
 
 Caching
@@ -531,7 +541,7 @@ Is it a problem that Django's CSRF protection isn't linked to a session by defau
 -----------------------------------------------------------------------------------
 
 No, this is by design. Not linking CSRF protection to a session allows using
-the protection on sites such as a `pastebin` that allow submissions from
+the protection on sites such as a *pastebin* that allow submissions from
 anonymous users which don't have a session.
 
 If you wish to store the CSRF token in the user's session, use the

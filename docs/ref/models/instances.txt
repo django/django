@@ -81,7 +81,7 @@ fields are present, then ``values`` are guaranteed to be in the order
 to each of the missing fields.
 
 In addition to creating the new model, the ``from_db()`` method must set the
-``adding`` and ``db`` flags in the new instance's ``_state`` attribute.
+``adding`` and ``db`` flags in the new instance's :attr:`~Model._state` attribute.
 
 Below is an example showing how to record the initial values of fields that
 are loaded from the database::
@@ -116,8 +116,8 @@ are loaded from the database::
         super().save(*args, **kwargs)
 
 The example above shows a full ``from_db()`` implementation to clarify how that
-is done. In this case it would of course be possible to use ``super()`` call in
-the ``from_db()`` method.
+is done. In this case it would be possible to use a ``super()`` call in the
+``from_db()`` method.
 
 Refreshing objects from database
 ================================
@@ -496,12 +496,6 @@ which returns ``NULL``. In such cases it is possible to revert to the old
 algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
 option to ``True``.
 
-.. versionchanged:: 3.0
-
-    ``Model.save()`` no longer attempts to find a row when saving a new
-    ``Model`` instance and a default value for the primary key is provided, and
-    always executes an ``INSERT``.
-
 .. _ref-models-force-insert:
 
 Forcing an INSERT or UPDATE
@@ -528,8 +522,8 @@ Updating attributes based on existing fields
 --------------------------------------------
 
 Sometimes you'll need to perform a simple arithmetic task on a field, such
-as incrementing or decrementing the current value. The obvious way to
-achieve this is to do something like::
+as incrementing or decrementing the current value. One way of achieving this is
+doing the arithmetic in Python like::
 
     >>> product = Product.objects.get(name='Venezuelan Beaver Cheese')
     >>> product.number_sold += 1
@@ -568,7 +562,7 @@ all of the model fields from being updated in the database. For example::
     product.save(update_fields=['name'])
 
 The ``update_fields`` argument can be any iterable containing strings. An
-empty ``update_fields`` iterable will skip the save. A value of None will
+empty ``update_fields`` iterable will skip the save. A value of ``None`` will
 perform an update on all fields.
 
 Specifying ``update_fields`` will force an update.
@@ -809,11 +803,6 @@ For example::
     >>> p.get_shirt_size_display()
     'Large'
 
-.. versionchanged:: 3.1
-
-    Support for :class:`~django.contrib.postgres.fields.ArrayField` and
-    :class:`~django.contrib.postgres.fields.RangeField` was added.
-
 .. method:: Model.get_next_by_FOO(**kwargs)
 .. method:: Model.get_previous_by_FOO(**kwargs)
 
@@ -846,16 +835,20 @@ duplicated. That also means you cannot use those methods on unsaved objects.
 Other attributes
 ================
 
-``DoesNotExist``
-----------------
+``_state``
+----------
 
-.. exception:: Model.DoesNotExist
+.. attribute:: Model._state
 
-    This exception is raised by the ORM in a couple places, for example by
-    :meth:`QuerySet.get() <django.db.models.query.QuerySet.get>` when an object
-    is not found for the given query parameters.
+    The ``_state`` attribute refers to a ``ModelState`` object that tracks
+    the lifecycle of the model instance.
 
-    Django provides a ``DoesNotExist`` exception as an attribute of each model
-    class to identify the class of object that could not be found and to allow
-    you to catch a particular model class with ``try/except``. The exception is
-    a subclass of :exc:`django.core.exceptions.ObjectDoesNotExist`.
+    The ``ModelState`` object has two attributes: ``adding``, a flag which is
+    ``True`` if the model has not been saved to the database yet, and ``db``,
+    a string referring to the database alias the instance was loaded from or
+    saved to.
+
+    Newly instantiated instances have ``adding=True`` and ``db=None``,
+    since they are yet to be saved. Instances fetched from a ``QuerySet``
+    will have ``adding=False`` and ``db`` set to the alias of the associated
+    database.

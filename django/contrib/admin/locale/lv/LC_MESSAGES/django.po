@@ -6,14 +6,14 @@
 # NullIsNot0 <nullisnot0@inbox.lv>, 2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Māris Nartišs <maris.gis@gmail.com>, 2016
-# NullIsNot0 <nullisnot0@inbox.lv>, 2019
+# NullIsNot0 <nullisnot0@inbox.lv>, 2019-2020
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-11-07 08:06+0000\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-07-22 17:27+0000\n"
 "Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
@@ -74,6 +74,12 @@ msgstr "Nav datums"
 
 msgid "Has date"
 msgstr "Ir datums"
+
+msgid "Empty"
+msgstr "Tukšs"
+
+msgid "Not empty"
+msgstr "Nav tukšs"
 
 #, python-format
 msgid ""
@@ -334,6 +340,19 @@ msgstr "Izvēlēties visus %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Atcelt iezīmēto"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modeļi %(name)s lietotnē"
+
+msgid "Add"
+msgstr "Pievienot"
+
+msgid "View"
+msgstr "Apskatīt"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Jums nav tiesību neko skatīt vai labot."
+
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
@@ -381,6 +400,9 @@ msgstr "Apskatīt lapā"
 
 msgid "Filter"
 msgstr "Filtrs"
+
+msgid "Clear all filters"
+msgstr "Notīrīt visus filtrus"
 
 msgid "Remove from sorting"
 msgstr "Izņemt no kārtošanas"
@@ -457,9 +479,6 @@ msgstr ""
 "Vai esat pārliecināts, ka vēlaties dzēst izvēlētos %(objects_name)s "
 "objektus? Visi sekojošie objekti un tiem piesaistītie objekti tiks izdzēsti:"
 
-msgid "View"
-msgstr "Apskatīt"
-
 msgid "Delete?"
 msgstr "Dzēst?"
 
@@ -469,16 +488,6 @@ msgstr " Pēc %(filter_title)s "
 
 msgid "Summary"
 msgstr "Kopsavilkums"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modeļi %(name)s lietotnē"
-
-msgid "Add"
-msgstr "Pievienot"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr "Jums nav tiesību neko skatīt vai labot."
 
 msgid "Recent actions"
 msgstr "Nesenās darbības"
@@ -510,6 +519,9 @@ msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "Aizmirsi paroli vai lietotājvārdu?"
+
+msgid "Toggle navigation"
+msgstr "Pārslēgt navigāciju"
 
 msgid "Date/time"
 msgstr "Datums/laiks"

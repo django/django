@@ -2,7 +2,7 @@
 #
 # Translators:
 # Aby Thomas <abyzthomas@gmail.com>, 2014
-# Hrishikesh <hrishi.kb@gmail.com>, 2019
+# Hrishikesh <hrishi.kb@gmail.com>, 2019-2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # JOMON THOMAS LOBO <jomonthomaslobo@gmail.com>, 2019
 # Junaid <junu.pv@gmail.com>, 2012
@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-03-26 07:56+0000\n"
-"Last-Translator: JOMON THOMAS LOBO <jomonthomaslobo@gmail.com>\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-07-14 22:38+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Malayalam (http://www.transifex.com/django/django/language/"
 "ml/)\n"
 "MIME-Version: 1.0\n"
@@ -74,6 +74,12 @@ msgstr "തിയ്യതിയില്ല "
 msgid "Has date"
 msgstr "തിയ്യതിയുണ്ട്"
 
+msgid "Empty"
+msgstr "കാലി"
+
+msgid "Not empty"
+msgstr "കാലിയല്ല"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -131,32 +137,32 @@ msgid "log entries"
 msgstr "ലോഗ് എൻട്രികള്‍"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "\"%(object)s\" ചേര്‍ത്തു."
+msgid "Added “%(object)s”."
+msgstr "“%(object)s” ചേർത്തു."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "\"%(object)s\"ല്‍ %(changes)s മാറ്റം വരുത്തി"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "“%(object)s” മാറ്റം വരുത്തി — %(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "\"%(object)s\" നീക്കം ചെയ്തു."
+msgid "Deleted “%(object)s.”"
+msgstr ""
 
 msgid "LogEntry Object"
 msgstr "ലോഗ്‌എന്‍ട്രി ഒബ്ജെക്റ്റ്"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr " {name} \"{object}\" ചേർത്തിരിക്കുന്നു ."
+msgid "Added {name} “{object}”."
+msgstr ""
 
 msgid "Added."
 msgstr "ചേര്‍ത്തു."
 
 msgid "and"
-msgstr "ഉം"
+msgstr "കൂടാതെ"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
 msgstr ""
 
 #, python-brace-format
@@ -164,8 +170,8 @@ msgid "Changed {fields}."
 msgstr ""
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr " {name} \"{object}\". ഡിലീറ്റ് ചെയ്തു "
+msgid "Deleted {name} “{object}”."
+msgstr ""
 
 msgid "No fields changed."
 msgstr "ഒരു മാറ്റവുമില്ല."
@@ -173,59 +179,54 @@ msgstr "ഒരു മാറ്റവുമില്ല."
 msgid "None"
 msgstr "ഒന്നുമില്ല"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" വിജയകരമായി ചേർത്തിരിക്കുന്നു "
+msgid "The {name} “{obj}” was added successfully."
+msgstr ""
 
 msgid "You may edit it again below."
 msgstr "താഴെ നിങ്ങൾക്കിത് വീണ്ടും എഡിറ്റുചെയ്യാം"
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
-"below."
-msgstr ""
-" {name} \"{obj}\" വിജയകരമായി ചേർത്തിരിക്കുന്നു . നിങ്ങൾക്ക് പുതിയ  ഒരു  {name} താഴെ "
-"ചേർക്കാവുന്നതാണ് "
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
+msgid "The {name} “{obj}” was changed successfully."
 msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr "ആക്ഷന്‍ നടപ്പിലാക്കേണ്ട വകകള്‍ തെരഞ്ഞെടുക്കണം. ഒന്നും മാറ്റിയിട്ടില്ല."
+msgstr "ആക്ഷന്‍ നടപ്പിലാക്കേണ്ട വകകള്‍ തെരഞ്ഞെടുക്കണം. ഒന്നിലും മാറ്റങ്ങൾ വരുത്തിയിട്ടില്ല."
 
 msgid "No action selected."
 msgstr "ആക്ഷനൊന്നും തെരഞ്ഞെടുത്തിട്ടില്ല."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" നീക്കം ചെയ്തു."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr ""
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
 
 #, python-format
@@ -247,7 +248,7 @@ msgstr "ഡേറ്റാബേസ് എറർ."
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s ല്‍ മാറ്റം വരുത്തി."
-msgstr[1] "%(count)s %(name)s ല്‍ മാറ്റം വരുത്തി."
+msgstr[1] "%(count)s %(name)s വിജയകരമായി മാറ്റി"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -296,7 +297,7 @@ msgstr "%(app)s കാര്യനിർവഹണം"
 msgid "Page not found"
 msgstr "പേജ് കണ്ടെത്താനായില്ല"
 
-msgid "We're sorry, but the requested page could not be found."
+msgid "We’re sorry, but the requested page could not be found."
 msgstr "ക്ഷമിക്കണം, ആവശ്യപ്പെട്ട പേജ് കണ്ടെത്താന്‍ കഴിഞ്ഞില്ല."
 
 msgid "Home"
@@ -312,11 +313,9 @@ msgid "Server Error <em>(500)</em>"
 msgstr "സെര്‍വറിൽ എന്തോ പ്രശ്നം <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"എന്തോ പ്രശ്നം സംഭവിച്ചിരിക്കുന്നു. സൈറ്റിന്റെ കാര്യനിർവാഹകരെ ഈമെയിൽ മുഖാന്തരം വിവരം "
-"അറിയിച്ചിട്ടുണ്ട്. ക്ഷമയോടെ കത്തിരിക്കുനതിന് നന്ദി."
 
 msgid "Run the selected action"
 msgstr "തെരഞ്ഞെടുത്ത ആക്ഷന്‍ നടപ്പിലാക്കുക"
@@ -334,10 +333,25 @@ msgstr "മുഴുവന്‍ %(total_count)s %(module_name)s ഉം തെ�
 msgid "Clear selection"
 msgstr "തെരഞ്ഞെടുത്തത് റദ്ദാക്കുക."
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "%(name)s മാതൃകയിലുള്ള"
+
+msgid "Add"
+msgstr "ചേര്‍ക്കുക"
+
+msgid "View"
+msgstr "കാണുക"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "നിങ്ങൾക്ക് ഒന്നും കാണാനോ തിരുത്താനോ ഉള്ള അനുമതിയില്ല."
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
-msgstr "ആദ്യം, യൂസര്‍ നാമവും പാസ് വേര്‍ഡും നല്കണം. പിന്നെ, കൂടുതല്‍ കാര്യങ്ങള്‍ മാറ്റാവുന്നതാണ്."
+msgstr ""
+"ആദ്യമായി ഒരു യൂസർനെയിമും  പാസ്‌‌വേഡും നൽകുക. തുടർന്ന്, നിങ്ങൾക്ക് കൂടുതൽ കാര്യങ്ങളിൽ മാറ്റം "
+"വരുത്താവുന്നതാണ്"
 
 msgid "Enter a username and password."
 msgstr "Enter a username and password."
@@ -379,6 +393,9 @@ msgstr "View on site"
 
 msgid "Filter"
 msgstr "അരിപ്പ"
+
+msgid "Clear all filters"
+msgstr "എല്ലാ ഫിൽറ്ററുകളും ഒഴിവാക്കുക"
 
 msgid "Remove from sorting"
 msgstr "ക്രമീകരണത്തില്‍ നിന്നും ഒഴിവാക്കുക"
@@ -422,8 +439,8 @@ msgstr ""
 msgid "Objects"
 msgstr "വസ്തുക്കൾ"
 
-msgid "Yes, I'm sure"
-msgstr "അതെ, തീര്‍ച്ചയാണ്"
+msgid "Yes, I’m sure"
+msgstr "അതെ, എനിക്കുറപ്പാണ്"
 
 msgid "No, take me back"
 msgstr "ഇല്ല, എന്നെ തിരിച്ചെടുക്കൂ"
@@ -456,9 +473,6 @@ msgstr ""
 "തിരഞ്ഞെടുക്കപ്പെട്ട  %(objects_name)s നീക്കം ചെയ്യണമെന്നു ഉറപ്പാണോ ? തിരഞ്ഞെടുക്കപ്പെട്ടതും "
 "അതിനോട് ബന്ധപ്പെട്ടതും ആയ എല്ലാ താഴെപ്പറയുന്ന വസ്തുക്കളും നീക്കം ചെയ്യുന്നതാണ്:"
 
-msgid "View"
-msgstr "കാണുക"
-
 msgid "Delete?"
 msgstr "ഡിലീറ്റ് ചെയ്യട്ടെ?"
 
@@ -469,18 +483,8 @@ msgstr "%(filter_title)s ആൽ"
 msgid "Summary"
 msgstr "ചുരുക്കം"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s മാതൃകയിലുള്ള"
-
-msgid "Add"
-msgstr "ചേര്‍ക്കുക"
-
-msgid "You don't have permission to view or edit anything."
-msgstr "നിങ്ങൾക്ക് ഒന്നും കാണാനോ എഡിറ്റുചെയ്യാനോ അനുമതിയില്ല"
-
 msgid "Recent actions"
-msgstr ""
+msgstr "സമീപകാല പ്രവൃത്തികൾ"
 
 msgid "My actions"
 msgstr "എന്റെ പ്രവർത്തനം"
@@ -492,12 +496,10 @@ msgid "Unknown content"
 msgstr "ഉള്ളടക്കം അറിയില്ല."
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"നിങ്ങളുടെ ഡേറ്റാബേസ് ഇന്‍സ്ടാലേഷനില്‍ എന്തോ പിശകുണ്ട്. ശരിയായ ടേബിളുകള്‍ ഉണ്ടെന്നും ഡേറ്റാബേസ് "
-"വായനായോഗ്യമാണെന്നും ഉറപ്പു വരുത്തുക."
 
 #, python-format
 msgid ""
@@ -510,6 +512,9 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "രഹസ്യവാക്കോ ഉപയോക്തൃനാമമോ മറന്നുപോയോ?"
 
+msgid "Toggle navigation"
+msgstr ""
+
 msgid "Date/time"
 msgstr "തീയതി/സമയം"
 
@@ -520,11 +525,9 @@ msgid "Action"
 msgstr "പ്രവർത്തി"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"ഈ വസ്തുവിന്റെ മാറ്റങ്ങളുടെ ചരിത്രം ലഭ്യമല്ല. ഒരുപക്ഷെ ഇത് അഡ്മിന്‍ സൈറ്റ് വഴി ചേര്‍"
-"ത്തതായിരിക്കില്ല."
 
 msgid "Show all"
 msgstr "എല്ലാം കാണട്ടെ"
@@ -588,11 +591,9 @@ msgid "Your password was changed."
 msgstr "നിങ്ങളുടെ പാസ് വേര്‍ഡ് മാറ്റിക്കഴിഞ്ഞു."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"സുരക്ഷയ്ക്കായി നിങ്ങളുടെ പഴയ പാസ് വേര്‍ഡ് നല്കുക. പിന്നെ, പുതിയ പാസ് വേര്‍ഡ് രണ്ട് തവണ നല്കുക. "
-"(ടയ്പ് ചെയ്തതു ശരിയാണെന്ന് ഉറപ്പാക്കാന്‍)"
 
 msgid "Change my password"
 msgstr "എന്റെ പാസ് വേര്‍ഡ് മാറ്റണം"
@@ -627,16 +628,14 @@ msgstr ""
 "കഴിഞ്ഞതാവാം. പുതിയ ഒരു ലിങ്കിന് അപേക്ഷിക്കൂ."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"ഞങ്ങളുടെ ഇമെയിൽ കിട്ടിയില്ലെങ്കിൽ രജിസ്റ്റർ ചെയ്യാൻ ഉപയോകിച്ച അതെ ഇമെയിൽ വിലാസം തന്നെ "
-"ആണോ എന്ന് ഉറപ്പ് വരുത്തുക. ശരിയാണെങ്കിൽ സ്പാം ഫോൾഡറിലും നോക്കുക "
 
 #, python-format
 msgid ""
@@ -649,8 +648,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "ദയവായി താഴെ പറയുന്ന പേജ് സന്ദര്‍ശിച്ച് പുതിയ പാസ് വേര്‍ഡ് തെരഞ്ഞെടുക്കുക:"
 
-msgid "Your username, in case you've forgotten:"
-msgstr "നിങ്ങള്‍ മറന്നെങ്കില്‍, നിങ്ങളുടെ യൂസര്‍ നാമം, :"
+msgid "Your username, in case you’ve forgotten:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "ഞങ്ങളുടെ സൈറ്റ് ഉപയോഗിച്ചതിന് നന്ദി!"
@@ -660,11 +659,9 @@ msgid "The %(site_name)s team"
 msgstr "%(site_name)s പക്ഷം"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"പാസ് വേര്‍ഡ് മറന്നു പോയോ? നിങ്ങളുടെ ഇമെയിൽ വിലാസം താഴെ എഴുതുക. പാസ് വേർഡ്‌ മാറ്റാനുള്ള "
-"നിർദേശങ്ങൾ ഇമെയിലിൽ അയച്ചു തരുന്നതായിരിക്കും."
 
 msgid "Email address:"
 msgstr "ഇമെയിൽ വിലാസം:"

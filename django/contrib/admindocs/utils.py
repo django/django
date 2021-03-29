@@ -148,7 +148,7 @@ def replace_named_groups(pattern):
     4. ^(?P<a>\w+)/b/(?P<c>\w+) ==> ^<a>/b/<c>
     """
     named_group_indices = [
-        (m.start(0), m.end(0), m.group(1))
+        (m.start(0), m.end(0), m[1])
         for m in named_group_matcher.finditer(pattern)
     ]
     # Tuples of (named capture group pattern, group name).

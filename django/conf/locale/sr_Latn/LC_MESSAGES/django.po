@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Aleksa Cukovic` <aleksacukovic1@gmail.com>, 2020
 # Igor Jerosimić, 2019-2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
@@ -8,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2020-01-23 22:15+0000\n"
-"Last-Translator: Igor Jerosimić\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-14 21:42+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
 "language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
@@ -25,6 +26,9 @@ msgstr "afrikanski"
 
 msgid "Arabic"
 msgstr "arapski"
+
+msgid "Algerian Arabic"
+msgstr "Alžirski arapski"
 
 msgid "Asturian"
 msgstr "asturijski"
@@ -149,6 +153,9 @@ msgstr "interlingva"
 msgid "Indonesian"
 msgstr "indonežanski"
 
+msgid "Igbo"
+msgstr ""
+
 msgid "Ido"
 msgstr "ido"
 
@@ -178,6 +185,9 @@ msgstr "kanada"
 
 msgid "Korean"
 msgstr "korejski"
+
+msgid "Kyrgyz"
+msgstr "Kirgiski"
 
 msgid "Luxembourgish"
 msgstr "luksemburški"
@@ -263,8 +273,14 @@ msgstr "tamilski"
 msgid "Telugu"
 msgstr "telugu"
 
+msgid "Tajik"
+msgstr ""
+
 msgid "Thai"
 msgstr "tajlandski"
+
+msgid "Turkmen"
+msgstr ""
 
 msgid "Turkish"
 msgstr "turski"
@@ -457,7 +473,7 @@ msgstr ""
 
 #, python-format
 msgid "Field of type: %(field_type)s"
-msgstr "Ponje tipa: %(field_type)s"
+msgstr "Polje tipa: %(field_type)s"
 
 #, python-format
 msgid "“%(value)s” value must be either True or False."
@@ -559,6 +575,9 @@ msgstr ""
 msgid "Boolean (Either True, False or None)"
 msgstr "Bulova vrednost (True, False ili None)"
 
+msgid "Positive big integer"
+msgstr "Velik pozitivan celi broj"
+
 msgid "Positive integer"
 msgstr "Pozitivan ceo broj"
 
@@ -609,6 +628,12 @@ msgstr "Fajl"
 msgid "Image"
 msgstr "Slika"
 
+msgid "A JSON object"
+msgstr "JSON objekat"
+
+msgid "Value must be valid JSON."
+msgstr "Vrednost mora biti ispravni JSON."
+
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
 msgstr ""
@@ -652,7 +677,7 @@ msgid "Enter a valid date/time."
 msgstr "Unesite ispravan datum/vreme."
 
 msgid "Enter a valid duration."
-msgstr ""
+msgstr "Unesite ispravno trajanje."
 
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
@@ -698,6 +723,9 @@ msgstr "Unesite kompletnu vrednost."
 
 msgid "Enter a valid UUID."
 msgstr "Unesite ispravan UUID."
+
+msgid "Enter a valid JSON."
+msgstr "Unesite ispravan JSON."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -784,15 +812,7 @@ msgstr "Da"
 msgid "No"
 msgstr "Ne"
 
-msgid "Year"
-msgstr "Godina"
-
-msgid "Month"
-msgstr "Mesec"
-
-msgid "Day"
-msgstr "Dan"
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "da,ne,možda"
 
@@ -1069,16 +1089,16 @@ msgstr ","
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d godina"
+msgstr[1] "%d godine"
+msgstr[2] "%d godina"
 
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d mesec"
+msgstr[1] "%d meseca"
+msgstr[2] "%d meseci"
 
 #, python-format
 msgid "%d week"
@@ -1107,9 +1127,6 @@ msgid_plural "%d minutes"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-
-msgid "0 minutes"
-msgstr "0 minuta"
 
 msgid "Forbidden"
 msgstr "Zabranjeno"

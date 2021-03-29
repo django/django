@@ -268,8 +268,8 @@ When a ticket has completed its useful lifecycle, it's time for it to be
 closed. Closing a ticket is a big responsibility, though. You have to be sure
 that the issue is really resolved, and you need to keep in mind that the
 reporter of the ticket may not be happy to have their ticket closed (unless
-it's fixed, of course). If you're not certain about closing a ticket, leave a
-comment with your thoughts instead.
+it's fixed!). If you're not certain about closing a ticket, leave a comment
+with your thoughts instead.
 
 If you do close a ticket, you should always make sure of the following:
 
@@ -420,9 +420,9 @@ inadvertent side-effect. Here's how you can determine this.
 
 Begin by writing a regression test for Django's test suite for the issue. For
 example, we'll pretend we're debugging a regression in migrations. After you've
-written the test and confirmed that it fails on the latest master, put it in a
-separate file that you can run standalone. For our example, we'll pretend we
-created ``tests/migrations/test_regression.py``, which can be run with::
+written the test and confirmed that it fails on the latest main branch, put it
+in a separate file that you can run standalone. For our example, we'll pretend
+we created ``tests/migrations/test_regression.py``, which can be run with::
 
     $ ./runtests.py migrations.test_regression
 

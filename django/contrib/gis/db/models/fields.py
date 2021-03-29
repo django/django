@@ -145,7 +145,11 @@ class BaseSpatialField(Field):
             return None
         return connection.ops.Adapter(
             super().get_db_prep_value(value, connection, *args, **kwargs),
-            **({'geography': True} if self.geography and connection.ops.geography else {})
+            **(
+                {'geography': True}
+                if self.geography and connection.features.supports_geography
+                else {}
+            )
         )
 
     def get_raster_prep_value(self, value, is_candidate):

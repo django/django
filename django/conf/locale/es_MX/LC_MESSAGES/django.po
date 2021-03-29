@@ -2,15 +2,16 @@
 #
 # Translators:
 # Abe Estrada, 2011-2013
+# Claude Paroz <claude@2xlibre.net>, 2020
 # Jesús Bautista <jesbam98@gmail.com>, 2019-2020
 # zodman <zodman@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2020-01-13 02:18+0000\n"
-"Last-Translator: Jesús Bautista <jesbam98@gmail.com>\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-14 21:42+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Spanish (Mexico) (http://www.transifex.com/django/django/"
 "language/es_MX/)\n"
 "MIME-Version: 1.0\n"
@@ -24,6 +25,9 @@ msgstr "afrikáans"
 
 msgid "Arabic"
 msgstr "Árabe"
+
+msgid "Algerian Arabic"
+msgstr ""
 
 msgid "Asturian"
 msgstr ""
@@ -148,6 +152,9 @@ msgstr "Interlingua"
 msgid "Indonesian"
 msgstr "Indonesio"
 
+msgid "Igbo"
+msgstr ""
+
 msgid "Ido"
 msgstr ""
 
@@ -177,6 +184,9 @@ msgstr "Kannada"
 
 msgid "Korean"
 msgstr "Coreano"
+
+msgid "Kyrgyz"
+msgstr ""
 
 msgid "Luxembourgish"
 msgstr "luxemburgués"
@@ -262,8 +272,14 @@ msgstr "Tamil"
 msgid "Telugu"
 msgstr "Telugu"
 
+msgid "Tajik"
+msgstr ""
+
 msgid "Thai"
 msgstr "Tailandés"
+
+msgid "Turkmen"
+msgstr ""
 
 msgid "Turkish"
 msgstr "Turco"
@@ -547,6 +563,9 @@ msgstr ""
 msgid "Boolean (Either True, False or None)"
 msgstr "Booleano (Verdadero, Falso o Nulo)"
 
+msgid "Positive big integer"
+msgstr ""
+
 msgid "Positive integer"
 msgstr "Entero positivo"
 
@@ -596,6 +615,12 @@ msgstr "Archivo"
 
 msgid "Image"
 msgstr "Imagen"
+
+msgid "A JSON object"
+msgstr ""
+
+msgid "Value must be valid JSON."
+msgstr ""
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -688,6 +713,9 @@ msgstr "Ingrese un valor completo."
 msgid "Enter a valid UUID."
 msgstr ""
 
+msgid "Enter a valid JSON."
+msgstr ""
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -773,17 +801,9 @@ msgstr "Sí"
 msgid "No"
 msgstr "No"
 
-msgid "Year"
-msgstr "Año"
-
-msgid "Month"
-msgstr "Mes"
-
-msgid "Day"
-msgstr "Día"
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
-msgstr "sí, no, tal vez"
+msgstr "sí,no,tal vez"
 
 #, python-format
 msgid "%(size)d byte"
@@ -1089,9 +1109,6 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minuto"
 msgstr[1] "%d minutos"
-
-msgid "0 minutes"
-msgstr "0 minutos"
 
 msgid "Forbidden"
 msgstr "Prohibido"

@@ -30,12 +30,13 @@ from .utils import get_callable
 
 
 class ResolverMatch:
-    def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None, route=None):
+    def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None, route=None, tried=None):
         self.func = func
         self.args = args
         self.kwargs = kwargs
         self.url_name = url_name
         self.route = route
+        self.tried = tried
 
         # If a URLRegexResolver doesn't have a namespace or app_name, it passes
         # in an empty value.
@@ -58,9 +59,16 @@ class ResolverMatch:
         return (self.func, self.args, self.kwargs)[index]
 
     def __repr__(self):
-        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name=%s, app_names=%s, namespaces=%s, route=%s)" % (
-            self._func_path, self.args, self.kwargs, self.url_name,
-            self.app_names, self.namespaces, self.route,
+        if isinstance(self.func, functools.partial):
+            func = repr(self.func)
+        else:
+            func = self._func_path
+        return (
+            'ResolverMatch(func=%s, args=%r, kwargs=%r, url_name=%r, '
+            'app_names=%r, namespaces=%r, route=%r)' % (
+                func, self.args, self.kwargs, self.url_name,
+                self.app_names, self.namespaces, self.route,
+            )
         )
 
 
@@ -197,7 +205,7 @@ class RegexPattern(CheckURLMixin):
 
 
 _PATH_PARAMETER_COMPONENT_RE = _lazy_re_compile(
-    r'<(?:(?P<converter>[^>:]+):)?(?P<parameter>\w+)>'
+    r'<(?:(?P<converter>[^>:]+):)?(?P<parameter>[^>]+)>'
 )
 
 
@@ -208,8 +216,6 @@ def _route_to_regex(route, is_endpoint=False):
     For example, 'foo/<int:pk>' returns '^foo\\/(?P<pk>[0-9]+)'
     and {'pk': <django.urls.converters.IntConverter>}.
     """
-    if not set(route).isdisjoint(string.whitespace):
-        raise ImproperlyConfigured("URL route '%s' cannot contain whitespace." % route)
     original_route = route
     parts = ['^']
     converters = {}
@@ -218,15 +224,20 @@ def _route_to_regex(route, is_endpoint=False):
         if not match:
             parts.append(re.escape(route))
             break
+        elif not set(match.group()).isdisjoint(string.whitespace):
+            raise ImproperlyConfigured(
+                "URL route '%s' cannot contain whitespace in angle brackets "
+                "<…>." % original_route
+            )
         parts.append(re.escape(route[:match.start()]))
         route = route[match.end():]
-        parameter = match.group('parameter')
+        parameter = match['parameter']
         if not parameter.isidentifier():
             raise ImproperlyConfigured(
                 "URL route '%s' uses parameter name %r which isn't a valid "
                 "Python identifier." % (original_route, parameter)
             )
-        raw_converter = match.group('converter')
+        raw_converter = match['converter']
         if raw_converter is None:
             # If a converter isn't specified, the default is `str`.
             raw_converter = 'str'
@@ -416,7 +427,7 @@ class URLResolver:
         # which takes (request).
         for status_code, num_parameters in [(400, 2), (403, 2), (404, 2), (500, 1)]:
             try:
-                handler, param_dict = self.resolve_error_handler(status_code)
+                handler = self.resolve_error_handler(status_code)
             except (ImportError, ViewDoesNotExist) as e:
                 path = getattr(self.urlconf_module, 'handler%s' % status_code)
                 msg = (
@@ -523,6 +534,13 @@ class URLResolver:
         return self._app_dict[language_code]
 
     @staticmethod
+    def _extend_tried(tried, pattern, sub_tried=None):
+        if sub_tried is None:
+            tried.append([pattern])
+        else:
+            tried.extend([pattern, *t] for t in sub_tried)
+
+    @staticmethod
     def _join_route(route1, route2):
         """Join two routes, without the starting ^ in the second route."""
         if not route1:
@@ -546,11 +564,7 @@ class URLResolver:
                 try:
                     sub_match = pattern.resolve(new_path)
                 except Resolver404 as e:
-                    sub_tried = e.args[0].get('tried')
-                    if sub_tried is not None:
-                        tried.extend([pattern] + t for t in sub_tried)
-                    else:
-                        tried.append([pattern])
+                    self._extend_tried(tried, pattern, e.args[0].get('tried'))
                 else:
                     if sub_match:
                         # Merge captured arguments in match with submatch
@@ -563,6 +577,7 @@ class URLResolver:
                         if not sub_match_dict:
                             sub_match_args = args + sub_match.args
                         current_route = '' if isinstance(pattern, URLPattern) else str(pattern.pattern)
+                        self._extend_tried(tried, pattern, sub_match.tried)
                         return ResolverMatch(
                             sub_match.func,
                             sub_match_args,
@@ -571,6 +586,7 @@ class URLResolver:
                             [self.app_name] + sub_match.app_names,
                             [self.namespace] + sub_match.namespaces,
                             self._join_route(current_route, sub_match.route),
+                            tried,
                         )
                     tried.append([pattern])
             raise Resolver404({'tried': tried, 'path': new_path})
@@ -605,7 +621,7 @@ class URLResolver:
             # django.conf.urls imports this file.
             from django.conf import urls
             callback = getattr(urls, 'handler%s' % view_type)
-        return get_callable(callback), {}
+        return get_callable(callback)
 
     def reverse(self, lookup_view, *args, **kwargs):
         return self._reverse_with_prefix(lookup_view, '', *args, **kwargs)
@@ -670,7 +686,7 @@ class URLResolver:
             if args:
                 arg_msg = "arguments '%s'" % (args,)
             elif kwargs:
-                arg_msg = "keyword arguments '%s'" % (kwargs,)
+                arg_msg = "keyword arguments '%s'" % kwargs
             else:
                 arg_msg = "no arguments"
             msg = (

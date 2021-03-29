@@ -3,7 +3,7 @@
 # Translators:
 # Ádám Krizsány <krizsany1302@gmail.com>, 2015
 # Akos Zsolt Hochrein <hoch.akos@gmail.com>, 2018
-# András Veres-Szentkirályi, 2016,2018-2019
+# András Veres-Szentkirályi, 2016,2018-2020
 # Istvan Farkas <istvan.farkas@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # János R, 2017
@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-11-18 09:25+0000\n"
-"Last-Translator: Istvan Farkas <istvan.farkas@gmail.com>\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-07-20 07:29+0000\n"
+"Last-Translator: András Veres-Szentkirályi\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -76,6 +76,12 @@ msgstr "Nincs dátuma"
 
 msgid "Has date"
 msgstr "Van dátuma"
+
+msgid "Empty"
+msgstr "Üres"
+
+msgid "Not empty"
+msgstr "Nem üres"
 
 #, python-format
 msgid ""
@@ -341,6 +347,19 @@ msgstr "Az összes %(module_name)s kiválasztása, összesen %(total_count)s db"
 msgid "Clear selection"
 msgstr "Kiválasztás törlése"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "%(name)s alkalmazásban elérhető modellek."
+
+msgid "Add"
+msgstr "Új"
+
+msgid "View"
+msgstr "Megtekintés"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Jelenleg nincs jogosultsága bármit megtekinteni vagy szerkeszteni."
+
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
@@ -389,6 +408,9 @@ msgstr "Megtekintés a honlapon"
 
 msgid "Filter"
 msgstr "Szűrő"
+
+msgid "Clear all filters"
+msgstr "Összes szűrő törlése"
 
 msgid "Remove from sorting"
 msgstr "Eltávolítás a rendezésből"
@@ -467,9 +489,6 @@ msgstr ""
 "Biztosan törölni akarja a kiválasztott %(objects_name)s objektumokat? Minden "
 "alábbi objektum, és a hozzájuk kapcsolódóak is törlésre kerülnek:"
 
-msgid "View"
-msgstr "Megtekintés"
-
 msgid "Delete?"
 msgstr "Törli?"
 
@@ -479,16 +498,6 @@ msgstr " %(filter_title)s szerint "
 
 msgid "Summary"
 msgstr "Összegzés"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s alkalmazásban elérhető modellek."
-
-msgid "Add"
-msgstr "Új"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr "Jelenleg nincs jogosultsága bármit megtekinteni vagy szerkeszteni."
 
 msgid "Recent actions"
 msgstr "Legutóbbi műveletek"
@@ -521,6 +530,9 @@ msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "Elfelejtette jelszavát vagy felhasználónevét?"
+
+msgid "Toggle navigation"
+msgstr "Navigáció megjelenítése/elrejtése"
 
 msgid "Date/time"
 msgstr "Dátum/idő"

@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2020-01-21 20:36+0000\n"
-"Last-Translator: Igor Jerosimić\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-14 21:42+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -26,6 +26,9 @@ msgstr "африкански"
 
 msgid "Arabic"
 msgstr "арапски"
+
+msgid "Algerian Arabic"
+msgstr "Алжирски арапски"
 
 msgid "Asturian"
 msgstr "астуријски"
@@ -150,6 +153,9 @@ msgstr "интерлингва"
 msgid "Indonesian"
 msgstr "индонежански"
 
+msgid "Igbo"
+msgstr ""
+
 msgid "Ido"
 msgstr "идо"
 
@@ -179,6 +185,9 @@ msgstr "канада"
 
 msgid "Korean"
 msgstr "корејски"
+
+msgid "Kyrgyz"
+msgstr "Киргиски"
 
 msgid "Luxembourgish"
 msgstr "луксембуршки"
@@ -264,8 +273,14 @@ msgstr "тамилски"
 msgid "Telugu"
 msgstr "телугу"
 
+msgid "Tajik"
+msgstr ""
+
 msgid "Thai"
 msgstr "тајландски"
+
+msgid "Turkmen"
+msgstr ""
 
 msgid "Turkish"
 msgstr "турски"
@@ -580,6 +595,9 @@ msgstr "Вредност \"%(value)s\" мора бити None, True или False
 msgid "Boolean (Either True, False or None)"
 msgstr "Булова вредност (True, False или None)"
 
+msgid "Positive big integer"
+msgstr "Велик позитиван цео број"
+
 msgid "Positive integer"
 msgstr "Позитиван цео број"
 
@@ -633,6 +651,12 @@ msgstr "Фајл"
 
 msgid "Image"
 msgstr "Слика"
+
+msgid "A JSON object"
+msgstr "JSON објекат"
+
+msgid "Value must be valid JSON."
+msgstr "Вредност мора бити исправан JSON."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -727,6 +751,9 @@ msgstr "Унесите комплетну вредност."
 msgid "Enter a valid UUID."
 msgstr "Унесите исправан UUID."
 
+msgid "Enter a valid JSON."
+msgstr "Унесите исправан JSON."
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -815,15 +842,7 @@ msgstr "Да"
 msgid "No"
 msgstr "Не"
 
-msgid "Year"
-msgstr "Година"
-
-msgid "Month"
-msgstr "Месец"
-
-msgid "Day"
-msgstr "Дан"
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "да,не,можда"
 
@@ -1138,9 +1157,6 @@ msgid_plural "%d minutes"
 msgstr[0] "%d минут"
 msgstr[1] "%d минута"
 msgstr[2] "%d минута"
-
-msgid "0 minutes"
-msgstr "0 минута"
 
 msgid "Forbidden"
 msgstr "Забрањено"

@@ -3,14 +3,14 @@ import sys
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.management.utils import get_command_line_option
-from django.test.utils import get_runner
+from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
 
 
 class Command(BaseCommand):
     help = 'Discover and run tests in the specified modules or the current directory.'
 
     # DiscoverRunner runs the checks after databases are set up.
-    requires_system_checks = False
+    requires_system_checks = []
     test_runner = None
 
     def run_from_argv(self, argv):
@@ -49,8 +49,10 @@ class Command(BaseCommand):
     def handle(self, *test_labels, **options):
         TestRunner = get_runner(settings, options['testrunner'])
 
+        time_keeper = TimeKeeper() if options.get('timing', False) else NullTimeKeeper()
         test_runner = TestRunner(**options)
-        failures = test_runner.run_tests(test_labels)
-
+        with time_keeper.timed('Total run'):
+            failures = test_runner.run_tests(test_labels)
+        time_keeper.print_results()
         if failures:
             sys.exit(1)

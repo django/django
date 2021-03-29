@@ -1,6 +1,7 @@
 import pickle
 
-from django.forms import BooleanField, ValidationError
+from django.core.exceptions import ValidationError
+from django.forms import BooleanField
 from django.test import SimpleTestCase
 
 

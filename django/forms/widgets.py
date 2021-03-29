@@ -8,7 +8,6 @@ import warnings
 from collections import defaultdict
 from itertools import chain
 
-from django.conf import settings
 from django.forms.utils import to_current_timezone
 from django.templatetags.static import static
 from django.utils import datetime_safe, formats
@@ -140,15 +139,21 @@ class Media:
         except CyclicDependencyError:
             warnings.warn(
                 'Detected duplicate Media files in an opposite order: {}'.format(
-                    ', '.join(repr(l) for l in lists)
+                    ', '.join(repr(list_) for list_ in lists)
                 ), MediaOrderConflictWarning,
             )
             return list(all_items)
 
     def __add__(self, other):
         combined = Media()
-        combined._css_lists = self._css_lists + other._css_lists
-        combined._js_lists = self._js_lists + other._js_lists
+        combined._css_lists = self._css_lists[:]
+        combined._js_lists = self._js_lists[:]
+        for item in other._css_lists:
+            if item and item not in self._css_lists:
+                combined._css_lists.append(item)
+        for item in other._js_lists:
+            if item and item not in self._js_lists:
+                combined._js_lists.append(item)
         return combined
 
 
@@ -225,16 +230,16 @@ class Widget(metaclass=MediaDefiningClass):
         return str(value)
 
     def get_context(self, name, value, attrs):
-        context = {}
-        context['widget'] = {
-            'name': name,
-            'is_hidden': self.is_hidden,
-            'required': self.is_required,
-            'value': self.format_value(value),
-            'attrs': self.build_attrs(self.attrs, attrs),
-            'template_name': self.template_name,
+        return {
+            'widget': {
+                'name': name,
+                'is_hidden': self.is_hidden,
+                'required': self.is_required,
+                'value': self.format_value(value),
+                'attrs': self.build_attrs(self.attrs, attrs),
+                'template_name': self.template_name,
+            },
         }
-        return context
 
     def render(self, name, value, attrs=None, renderer=None):
         """Render the widget as an HTML string."""
@@ -601,8 +606,8 @@ class ChoiceWidget(Widget):
 
             for subvalue, sublabel in choices:
                 selected = (
-                    str(subvalue) in value and
-                    (not has_selected or self.allow_multiple_selected)
+                    (not has_selected or self.allow_multiple_selected) and
+                    str(subvalue) in value
                 )
                 has_selected |= selected
                 subgroup.append(self.create_option(
@@ -615,8 +620,6 @@ class ChoiceWidget(Widget):
 
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         index = str(index) if subindex is None else "%s_%s" % (index, subindex)
-        if attrs is None:
-            attrs = {}
         option_attrs = self.build_attrs(self.attrs, attrs) if self.option_inherits_attrs else {}
         if selected:
             option_attrs.update(self.checked_attribute)
@@ -777,7 +780,7 @@ class CheckboxSelectMultiple(ChoiceWidget):
         return False
 
     def id_for_label(self, id_, index=None):
-        """"
+        """
         Don't include for="field_0" in <label> because clicking such a label
         would toggle the first checkbox.
         """
@@ -799,6 +802,13 @@ class MultiWidget(Widget):
     template_name = 'django/forms/widgets/multiwidget.html'
 
     def __init__(self, widgets, attrs=None):
+        if isinstance(widgets, dict):
+            self.widgets_names = [
+                ('_%s' % name) if name else '' for name in widgets
+            ]
+            widgets = widgets.values()
+        else:
+            self.widgets_names = ['_%s' % i for i in range(len(widgets))]
         self.widgets = [w() if isinstance(w, type) else w for w in widgets]
         super().__init__(attrs)
 
@@ -820,10 +830,10 @@ class MultiWidget(Widget):
         input_type = final_attrs.pop('type', None)
         id_ = final_attrs.get('id')
         subwidgets = []
-        for i, widget in enumerate(self.widgets):
+        for i, (widget_name, widget) in enumerate(zip(self.widgets_names, self.widgets)):
             if input_type is not None:
                 widget.input_type = input_type
-            widget_name = '%s_%s' % (name, i)
+            widget_name = name + widget_name
             try:
                 widget_value = value[i]
             except IndexError:
@@ -843,12 +853,15 @@ class MultiWidget(Widget):
         return id_
 
     def value_from_datadict(self, data, files, name):
-        return [widget.value_from_datadict(data, files, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
+        return [
+            widget.value_from_datadict(data, files, name + widget_name)
+            for widget_name, widget in zip(self.widgets_names, self.widgets)
+        ]
 
     def value_omitted_from_data(self, data, files, name):
         return all(
-            widget.value_omitted_from_data(data, files, name + '_%s' % i)
-            for i, widget in enumerate(self.widgets)
+            widget.value_omitted_from_data(data, files, name + widget_name)
+            for widget_name, widget in zip(self.widgets_names, self.widgets)
         )
 
     def decompress(self, value):
@@ -1018,7 +1031,7 @@ class SelectDateWidget(Widget):
                 # Convert any zeros in the date to empty strings to match the
                 # empty option value.
                 year, month, day = [int(val) or '' for val in match.groups()]
-            elif settings.USE_L10N:
+            else:
                 input_format = get_format('DATE_INPUT_FORMATS')[0]
                 try:
                     d = datetime.datetime.strptime(value, input_format)

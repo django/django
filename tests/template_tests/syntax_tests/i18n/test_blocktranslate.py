@@ -299,6 +299,15 @@ class I18nBlockTransTagTests(SimpleTestCase):
             self.engine.render_to_string('template', {'a': [1, 2, 3]})
 
     @setup({'template': (
+        '{% load i18n %}{% blocktranslate count counter=num %}{{ counter }}'
+        '{% plural %}{{ counter }}{% endblocktranslate %}'
+    )})
+    def test_count_not_number(self, tag_name):
+        msg = "'counter' argument to '{}' tag must be a number.".format(tag_name)
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('template', {'num': '1'})
+
+    @setup({'template': (
         '{% load i18n %}{% blocktranslate count count=var|length %}'
         'There is {{ count }} object. {% block a %} {% endblock %}'
         '{% endblocktranslate %}'

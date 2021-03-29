@@ -1,5 +1,3 @@
-import unittest
-
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection, models
@@ -14,6 +12,7 @@ from .models import (
 class IntegerFieldTests(TestCase):
     model = IntegerModel
     documented_range = (-2147483648, 2147483647)
+    rel_db_type_class = models.IntegerField
 
     @property
     def backend_range(self):
@@ -154,27 +153,43 @@ class IntegerFieldTests(TestCase):
                 with self.assertRaisesMessage(exception, msg):
                     self.model.objects.create(value=value)
 
+    def test_rel_db_type(self):
+        field = self.model._meta.get_field('value')
+        rel_db_type = field.rel_db_type(connection)
+        self.assertEqual(rel_db_type, self.rel_db_type_class().db_type(connection))
+
 
 class SmallIntegerFieldTests(IntegerFieldTests):
     model = SmallIntegerModel
     documented_range = (-32768, 32767)
+    rel_db_type_class = models.SmallIntegerField
 
 
 class BigIntegerFieldTests(IntegerFieldTests):
     model = BigIntegerModel
     documented_range = (-9223372036854775808, 9223372036854775807)
+    rel_db_type_class = models.BigIntegerField
 
 
 class PositiveSmallIntegerFieldTests(IntegerFieldTests):
     model = PositiveSmallIntegerModel
     documented_range = (0, 32767)
+    rel_db_type_class = (
+        models.PositiveSmallIntegerField
+        if connection.features.related_fields_match_type
+        else models.SmallIntegerField
+    )
 
 
 class PositiveIntegerFieldTests(IntegerFieldTests):
     model = PositiveIntegerModel
     documented_range = (0, 2147483647)
+    rel_db_type_class = (
+        models.PositiveIntegerField
+        if connection.features.related_fields_match_type
+        else models.IntegerField
+    )
 
-    @unittest.skipIf(connection.vendor == 'sqlite', "SQLite doesn't have a constraint.")
     def test_negative_values(self):
         p = PositiveIntegerModel.objects.create(value=0)
         p.value = models.F('value') - 1
@@ -185,6 +200,11 @@ class PositiveIntegerFieldTests(IntegerFieldTests):
 class PositiveBigIntegerFieldTests(IntegerFieldTests):
     model = PositiveBigIntegerModel
     documented_range = (0, 9223372036854775807)
+    rel_db_type_class = (
+        models.PositiveBigIntegerField
+        if connection.features.related_fields_match_type
+        else models.BigIntegerField
+    )
 
 
 class ValidationTests(SimpleTestCase):

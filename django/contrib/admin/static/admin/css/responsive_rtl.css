@@ -23,9 +23,9 @@
     [dir="rtl"] .change-list .filtered .paginator,
     [dir="rtl"] .filtered #toolbar,
     [dir="rtl"] .filtered div.xfull,
-    [dir="rtl"] .filtered .actions {
-        margin-right: 0;
-        margin-left: 230px;
+    [dir="rtl"] .filtered .actions,
+    [dir="rtl"] #changelist-filter {
+        margin-left: 0;
     }
 
     [dir="rtl"] .inline-group ul.tools a.add,
@@ -63,15 +63,6 @@
 /* MOBILE */
 
 @media (max-width: 767px) {
-    [dir="rtl"] .change-list .filtered .results,
-    [dir="rtl"] .change-list .filtered .paginator,
-    [dir="rtl"] .filtered #toolbar,
-    [dir="rtl"] .filtered div.xfull,
-    [dir="rtl"] .filtered .actions {
-        margin-left: 0;
-    }
-
-    [dir="rtl"] .aligned .add-another,
     [dir="rtl"] .aligned .related-lookup,
     [dir="rtl"] .aligned .datetimeshortcuts {
         margin-left: 0;
@@ -79,6 +70,11 @@
     }
 
     [dir="rtl"] .aligned ul {
+        margin-right: 0;
+    }
+
+    [dir="rtl"] #changelist-filter {
+        margin-left: 0;
         margin-right: 0;
     }
 }

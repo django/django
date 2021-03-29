@@ -14,6 +14,7 @@ you quickly accomplish common tasks.
    custom-management-commands
    custom-model-fields
    custom-lookups
+   custom-template-backend
    custom-template-tags
    custom-file-storage
    deployment/index

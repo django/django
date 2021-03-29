@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# F Wolff <friedel@translate.org.za>, 2019
+# F Wolff <friedel@translate.org.za>, 2019-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2019-01-04 18:27+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-07-20 17:08+0000\n"
 "Last-Translator: F Wolff <friedel@translate.org.za>\n"
 "Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
 "af/)\n"
@@ -52,8 +52,8 @@ msgstr "Geen wagwoord gestel nie."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Ongeldige wagwoordformaat of onbekende hutsalgoritme."
 
-msgid "The two password fields didn't match."
-msgstr "Die twee wagwoordvelde stem nie ooreen nie."
+msgid "The two password fields didn’t match."
+msgstr "Die twee wagwoordvelde stem nie ooreen nie"
 
 msgid "Password"
 msgstr "Wagwoord"
@@ -65,12 +65,12 @@ msgid "Enter the same password as before, for verification."
 msgstr "Tik die wagwoord net soos tevore om te bevestig."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Rou wagwoorde word nie gestoor nie. Daar is dus geen manier om ’n gebruiker "
-"se wagwoord te sien nie, maar u kan die wagwoord met <a href=\"{}\">dié "
-"vorm</a> verander."
+"Rou wagwoorde word nie gestoor nie, dus is daar geen manier om die gebruiker "
+"se wagwoord te sien nie, maar die wagwoord kan gewysig word met <a href="
+"\"{}\">hierdie vorm</a>."
 
 #, python-format
 msgid ""
@@ -245,21 +245,21 @@ msgstr[1] "’n Wagwoord moet ten minste %(min_length)d karakters bevat."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Die wagwoord is te soortgelyk aan die %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
-"Die wagwoord kan nie te soortgelyk aan die ander personeelinligting wees nie."
+"Die wagwoord mag nie soortgelyk wees aan u ander persoonlike inligting nie."
 
 msgid "This password is too common."
 msgstr "Dié wagwoord is te algemeen."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Die wagwoord kan nie ’n algemeen gebruikte wagwoord wees nie."
+msgid "Your password can’t be a commonly used password."
+msgstr "U wagwoord mag nie ’n algemeen gebruikte wagwoord wees nie."
 
 msgid "This password is entirely numeric."
 msgstr "Dié wagwoord is heeltemal numeries."
 
-msgid "Your password can't be entirely numeric."
-msgstr "Die wagwoord kan nie heeltemal numeries wees nie."
+msgid "Your password can’t be entirely numeric."
+msgstr "Die wagwoord mag nie geheel numeries wees nie."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

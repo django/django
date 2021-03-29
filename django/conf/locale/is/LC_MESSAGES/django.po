@@ -1,20 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# gudmundur <inactive+gudmundur@transifex.com>, 2011
+# db999e1e0e51ac90b00482cb5db0f98b_32999f5 <3ec5202d5df408dd2f95d8c361fed970_5926>, 2011
 # Hafsteinn Einarsson <haffi67@gmail.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Matt R, 2018
 # saevarom <saevar@saevar.is>, 2011
 # saevarom <saevar@saevar.is>, 2013,2015
-# Thordur Sigurdsson <thordur@ja.is>, 2016-2019
+# Thordur Sigurdsson <thordur@ja.is>, 2016-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-20 05:29+0000\n"
-"Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-14 21:42+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
 "MIME-Version: 1.0\n"
@@ -28,6 +28,9 @@ msgstr "Afríkanska"
 
 msgid "Arabic"
 msgstr "Arabíska"
+
+msgid "Algerian Arabic"
+msgstr ""
 
 msgid "Asturian"
 msgstr "Astúríska"
@@ -152,6 +155,9 @@ msgstr "Interlingua"
 msgid "Indonesian"
 msgstr "Indónesíska"
 
+msgid "Igbo"
+msgstr ""
+
 msgid "Ido"
 msgstr "Ido"
 
@@ -181,6 +187,9 @@ msgstr "Kannadanska"
 
 msgid "Korean"
 msgstr "Kóreska"
+
+msgid "Kyrgyz"
+msgstr ""
 
 msgid "Luxembourgish"
 msgstr "Lúxemborgíska"
@@ -266,8 +275,14 @@ msgstr "Tamílska"
 msgid "Telugu"
 msgstr "Telúgúska"
 
+msgid "Tajik"
+msgstr ""
+
 msgid "Thai"
 msgstr "Tælenska"
+
+msgid "Turkmen"
+msgstr ""
 
 msgid "Turkish"
 msgstr "Tyrkneska"
@@ -575,6 +590,9 @@ msgstr "„%(value)s“ verður að vera eitt eftirtalinna: None, True eða Fals
 msgid "Boolean (Either True, False or None)"
 msgstr "Boole-gildi (True, False eða None)"
 
+msgid "Positive big integer"
+msgstr "Jákvæð stór heiltala"
+
 msgid "Positive integer"
 msgstr "Jákvæð heiltala"
 
@@ -628,6 +646,12 @@ msgstr "Skrá"
 
 msgid "Image"
 msgstr "Mynd"
+
+msgid "A JSON object"
+msgstr "JSON hlutur"
+
+msgid "Value must be valid JSON."
+msgstr "Gildi verður að vera gilt JSON."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -720,6 +744,9 @@ msgstr "Sláðu inn heilt gildi."
 msgid "Enter a valid UUID."
 msgstr "Sláðu inn gilt UUID."
 
+msgid "Enter a valid JSON."
+msgstr "Sláðu inn gilt JSON."
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -807,15 +834,7 @@ msgstr "Já"
 msgid "No"
 msgstr "Nei"
 
-msgid "Year"
-msgstr "Ár"
-
-msgid "Month"
-msgstr "Mánuður"
-
-msgid "Day"
-msgstr "Dagur"
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "já,nei,kannski"
 
@@ -1123,9 +1142,6 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d mínúta"
 msgstr[1] "%d mínútur"
-
-msgid "0 minutes"
-msgstr "0 mínútur"
 
 msgid "Forbidden"
 msgstr ""

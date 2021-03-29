@@ -3,19 +3,14 @@ import calendar
 import datetime
 import re
 import unicodedata
-import warnings
 from binascii import Error as BinasciiError
 from email.utils import formatdate
 from urllib.parse import (
-    ParseResult, SplitResult, _coerce_args, _splitnetloc, _splitparams, quote,
-    quote_plus, scheme_chars, unquote, unquote_plus,
-    urlencode as original_urlencode, uses_params,
+    ParseResult, SplitResult, _coerce_args, _splitnetloc, _splitparams,
+    scheme_chars, urlencode as original_urlencode, uses_params,
 )
 
-from django.core.exceptions import TooManyFieldsSent
 from django.utils.datastructures import MultiValueDict
-from django.utils.deprecation import RemovedInDjango40Warning
-from django.utils.functional import keep_lazy_text
 from django.utils.regex_helper import _lazy_re_compile
 
 # based on RFC 7232, Appendix C
@@ -41,64 +36,6 @@ ASCTIME_DATE = _lazy_re_compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
 
 RFC3986_GENDELIMS = ":/?#[]@"
 RFC3986_SUBDELIMS = "!$&'()*+,;="
-
-FIELDS_MATCH = _lazy_re_compile('[&;]')
-
-
-@keep_lazy_text
-def urlquote(url, safe='/'):
-    """
-    A legacy compatibility wrapper to Python's urllib.parse.quote() function.
-    (was used for unicode handling on Python 2)
-    """
-    warnings.warn(
-        'django.utils.http.urlquote() is deprecated in favor of '
-        'urllib.parse.quote().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return quote(url, safe)
-
-
-@keep_lazy_text
-def urlquote_plus(url, safe=''):
-    """
-    A legacy compatibility wrapper to Python's urllib.parse.quote_plus()
-    function. (was used for unicode handling on Python 2)
-    """
-    warnings.warn(
-        'django.utils.http.urlquote_plus() is deprecated in favor of '
-        'urllib.parse.quote_plus(),',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return quote_plus(url, safe)
-
-
-@keep_lazy_text
-def urlunquote(quoted_url):
-    """
-    A legacy compatibility wrapper to Python's urllib.parse.unquote() function.
-    (was used for unicode handling on Python 2)
-    """
-    warnings.warn(
-        'django.utils.http.urlunquote() is deprecated in favor of '
-        'urllib.parse.unquote().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return unquote(quoted_url)
-
-
-@keep_lazy_text
-def urlunquote_plus(quoted_url):
-    """
-    A legacy compatibility wrapper to Python's urllib.parse.unquote_plus()
-    function. (was used for unicode handling on Python 2)
-    """
-    warnings.warn(
-        'django.utils.http.urlunquote_plus() is deprecated in favor of '
-        'urllib.parse.unquote_plus().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return unquote_plus(quoted_url)
 
 
 def urlencode(query, doseq=False):
@@ -175,7 +112,7 @@ def parse_http_date(date):
     else:
         raise ValueError("%r is not in a valid HTTP date format" % date)
     try:
-        year = int(m.group('year'))
+        year = int(m['year'])
         if year < 100:
             current_year = datetime.datetime.utcnow().year
             current_century = current_year - (current_year % 100)
@@ -185,11 +122,11 @@ def parse_http_date(date):
                 year += current_century - 100
             else:
                 year += current_century
-        month = MONTHS.index(m.group('mon').lower()) + 1
-        day = int(m.group('day'))
-        hour = int(m.group('hour'))
-        min = int(m.group('min'))
-        sec = int(m.group('sec'))
+        month = MONTHS.index(m['mon'].lower()) + 1
+        day = int(m['day'])
+        hour = int(m['hour'])
+        min = int(m['min'])
+        sec = int(m['sec'])
         result = datetime.datetime(year, month, day, hour, min, sec)
         return calendar.timegm(result.utctimetuple())
     except Exception as exc:
@@ -266,7 +203,7 @@ def parse_etags(etag_str):
     else:
         # Parse each ETag individually, and return any that are valid.
         etag_matches = (ETAG_MATCH.match(etag.strip()) for etag in etag_str.split(','))
-        return [match.group(1) for match in etag_matches if match]
+        return [match[1] for match in etag_matches if match]
 
 
 def quote_etag(etag_str):
@@ -326,15 +263,6 @@ def url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
         _url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=require_https) and
         _url_has_allowed_host_and_scheme(url.replace('\\', '/'), allowed_hosts, require_https=require_https)
     )
-
-
-def is_safe_url(url, allowed_hosts, require_https=False):
-    warnings.warn(
-        'django.utils.http.is_safe_url() is deprecated in favor of '
-        'url_has_allowed_host_and_scheme().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return url_has_allowed_host_and_scheme(url, allowed_hosts, require_https)
 
 
 # Copied from urllib.parse.urlparse() but uses fixed urlsplit() function.
@@ -413,59 +341,6 @@ def _url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
     valid_schemes = ['https'] if require_https else ['http', 'https']
     return ((not url_info.netloc or url_info.netloc in allowed_hosts) and
             (not scheme or scheme in valid_schemes))
-
-
-def limited_parse_qsl(qs, keep_blank_values=False, encoding='utf-8',
-                      errors='replace', fields_limit=None):
-    """
-    Return a list of key/value tuples parsed from query string.
-
-    Copied from urlparse with an additional "fields_limit" argument.
-    Copyright (C) 2013 Python Software Foundation (see LICENSE.python).
-
-    Arguments:
-
-    qs: percent-encoded query string to be parsed
-
-    keep_blank_values: flag indicating whether blank values in
-        percent-encoded queries should be treated as blank strings. A
-        true value indicates that blanks should be retained as blank
-        strings. The default false value indicates that blank values
-        are to be ignored and treated as if they were  not included.
-
-    encoding and errors: specify how to decode percent-encoded sequences
-        into Unicode characters, as accepted by the bytes.decode() method.
-
-    fields_limit: maximum number of fields parsed or an exception
-        is raised. None means no limit and is the default.
-    """
-    if fields_limit:
-        pairs = FIELDS_MATCH.split(qs, fields_limit)
-        if len(pairs) > fields_limit:
-            raise TooManyFieldsSent(
-                'The number of GET/POST parameters exceeded '
-                'settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.'
-            )
-    else:
-        pairs = FIELDS_MATCH.split(qs)
-    r = []
-    for name_value in pairs:
-        if not name_value:
-            continue
-        nv = name_value.split('=', 1)
-        if len(nv) != 2:
-            # Handle case of a control-name with no equal sign
-            if keep_blank_values:
-                nv.append('')
-            else:
-                continue
-        if nv[1] or keep_blank_values:
-            name = nv[0].replace('+', ' ')
-            name = unquote(name, encoding=encoding, errors=errors)
-            value = nv[1].replace('+', ' ')
-            value = unquote(value, encoding=encoding, errors=errors)
-            r.append((name, value))
-    return r
 
 
 def escape_leading_slashes(url):

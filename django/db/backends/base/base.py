@@ -1,3 +1,4 @@
+import _thread
 import copy
 import threading
 import time
@@ -5,7 +6,6 @@ import warnings
 from collections import deque
 from contextlib import contextmanager
 
-import _thread
 import pytz
 
 from django.conf import settings
@@ -632,6 +632,8 @@ class BaseDatabaseWrapper:
         return self.SchemaEditorClass(self, *args, **kwargs)
 
     def on_commit(self, func):
+        if not callable(func):
+            raise TypeError("on_commit()'s callback must be a callable.")
         if self.in_atomic_block:
             # Transaction in progress; save for execution on commit.
             self.run_on_commit.append((set(self.savepoint_ids), func))

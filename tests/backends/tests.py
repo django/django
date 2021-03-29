@@ -20,7 +20,7 @@ from django.test import (
 
 from .models import (
     Article, Object, ObjectReference, Person, Post, RawData, Reporter,
-    ReporterProxy, SchoolClass, Square,
+    ReporterProxy, SchoolClass, SQLKeywordsModel, Square,
     VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ,
 )
 
@@ -161,16 +161,8 @@ class LongNameTest(TransactionTestCase):
             VLM._meta.db_table,
             VLM_m2m._meta.db_table,
         ]
-        sequences = [
-            {
-                'column': VLM._meta.pk.column,
-                'table': VLM._meta.db_table
-            },
-        ]
-        sql_list = connection.ops.sql_flush(no_style(), tables, sequences)
-        with connection.cursor() as cursor:
-            for statement in sql_list:
-                cursor.execute(statement)
+        sql_list = connection.ops.sql_flush(no_style(), tables, reset_sequences=True)
+        connection.ops.execute_sql_flush(sql_list)
 
 
 class SequenceResetTest(TestCase):
@@ -325,7 +317,7 @@ class BackendTestCase(TransactionTestCase):
         self.assertEqual(Square.objects.count(), 9)
 
     def test_unicode_fetches(self):
-        # fetchone, fetchmany, fetchall return strings as unicode objects #6254
+        # fetchone, fetchmany, fetchall return strings as Unicode objects.
         qn = connection.ops.quote_name
         Person(first_name="John", last_name="Doe").save()
         Person(first_name="Jane", last_name="Doe").save()
@@ -357,7 +349,7 @@ class BackendTestCase(TransactionTestCase):
             # As password is probably wrong, a database exception is expected
             pass
         except Exception as e:
-            self.fail("Unexpected error raised with unicode password: %s" % e)
+            self.fail('Unexpected error raised with Unicode password: %s' % e)
         finally:
             connection.settings_dict['PASSWORD'] = old_password
 
@@ -630,7 +622,18 @@ class FkConstraintsTests(TransactionTestCase):
             with connection.constraint_checks_disabled():
                 a.save()
                 with self.assertRaises(IntegrityError):
-                    connection.check_constraints()
+                    connection.check_constraints(table_names=[Article._meta.db_table])
+            transaction.set_rollback(True)
+
+    def test_check_constraints_sql_keywords(self):
+        with transaction.atomic():
+            obj = SQLKeywordsModel.objects.create(reporter=self.r)
+            obj.refresh_from_db()
+            obj.reporter_id = 30
+            with connection.constraint_checks_disabled():
+                obj.save()
+                with self.assertRaises(IntegrityError):
+                    connection.check_constraints(table_names=['order'])
             transaction.set_rollback(True)
 
 
@@ -673,10 +676,9 @@ class ThreadTests(TransactionTestCase):
             # (the connection opened in the main thread will automatically be
             # closed on teardown).
             for conn in connections_dict.values():
-                if conn is not connection:
-                    if conn.allow_thread_sharing:
-                        conn.close()
-                        conn.dec_thread_sharing()
+                if conn is not connection and conn.allow_thread_sharing:
+                    conn.close()
+                    conn.dec_thread_sharing()
 
     def test_connections_thread_local(self):
         """
@@ -710,10 +712,9 @@ class ThreadTests(TransactionTestCase):
             # (the connection opened in the main thread will automatically be
             # closed on teardown).
             for conn in connections_dict.values():
-                if conn is not connection:
-                    if conn.allow_thread_sharing:
-                        conn.close()
-                        conn.dec_thread_sharing()
+                if conn is not connection and conn.allow_thread_sharing:
+                    conn.close()
+                    conn.dec_thread_sharing()
 
     def test_pass_connection_between_threads(self):
         """
@@ -814,7 +815,8 @@ class ThreadTests(TransactionTestCase):
 class MySQLPKZeroTests(TestCase):
     """
     Zero as id for AutoField should raise exception in MySQL, because MySQL
-    does not allow zero for autoincrement primary key.
+    does not allow zero for autoincrement primary key if the
+    NO_AUTO_VALUE_ON_ZERO SQL mode is not enabled.
     """
     @skipIfDBFeature('allows_auto_pk_0')
     def test_zero_as_autoval(self):

@@ -1,7 +1,7 @@
 import datetime
 
 from django import forms
-from django.core.validators import ValidationError
+from django.core.exceptions import ValidationError
 from django.forms.models import ModelChoiceIterator
 from django.forms.widgets import CheckboxSelectMultiple
 from django.template import Context, Template

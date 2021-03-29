@@ -104,7 +104,7 @@ class ContentTypeManager(models.Manager):
     def get_for_id(self, id):
         """
         Lookup a ContentType by ID. Use the same shared cache as get_for_model
-        (though ContentTypes are obviously not created on-the-fly by get_by_id).
+        (though ContentTypes are not created on-the-fly by get_by_id).
         """
         try:
             ct = self._cache[self.db][id]

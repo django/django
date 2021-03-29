@@ -55,7 +55,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             return orig_settings_dict
         else:
             root, ext = os.path.splitext(orig_settings_dict['NAME'])
-            return {**orig_settings_dict, 'NAME': '{}_{}.{}'.format(root, suffix, ext)}
+            return {**orig_settings_dict, 'NAME': '{}_{}{}'.format(root, suffix, ext)}
 
     def _clone_test_db(self, suffix, verbosity, keepdb=False):
         source_database_name = self.connection.settings_dict['NAME']

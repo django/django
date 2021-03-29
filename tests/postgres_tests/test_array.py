@@ -9,8 +9,8 @@ from django.core import checks, exceptions, serializers, validators
 from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
-from django.db.models.expressions import RawSQL
-from django.db.models.functions import Cast
+from django.db.models.expressions import Exists, OuterRef, RawSQL, Value
+from django.db.models.functions import Cast, Upper
 from django.test import TransactionTestCase, modify_settings, override_settings
 from django.test.utils import isolate_apps
 from django.utils import timezone
@@ -25,14 +25,17 @@ from .models import (
 )
 
 try:
+    from psycopg2.extras import NumericRange
+
     from django.contrib.postgres.aggregates import ArrayAgg
     from django.contrib.postgres.fields import ArrayField
-    from django.contrib.postgres.fields.array import IndexTransform, SliceTransform
+    from django.contrib.postgres.fields.array import (
+        IndexTransform, SliceTransform,
+    )
     from django.contrib.postgres.forms import (
         SimpleArrayField, SplitArrayField, SplitArrayWidget,
     )
     from django.db.backends.postgresql.base import PSYCOPG2_VERSION
-    from psycopg2.extras import NumericRange
 except ImportError:
     pass
 
@@ -202,11 +205,11 @@ class TestQuerying(PostgreSQLTestCase):
     @classmethod
     def setUpTestData(cls):
         cls.objs = NullableIntegerArrayModel.objects.bulk_create([
-            NullableIntegerArrayModel(field=[1]),
-            NullableIntegerArrayModel(field=[2]),
-            NullableIntegerArrayModel(field=[2, 3]),
-            NullableIntegerArrayModel(field=[20, 30, 40]),
-            NullableIntegerArrayModel(field=None),
+            NullableIntegerArrayModel(order=1, field=[1]),
+            NullableIntegerArrayModel(order=2, field=[2]),
+            NullableIntegerArrayModel(order=3, field=[2, 3]),
+            NullableIntegerArrayModel(order=4, field=[20, 30, 40]),
+            NullableIntegerArrayModel(order=5, field=None),
         ])
 
     def test_empty_list(self):
@@ -221,6 +224,12 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__exact=[1]),
             self.objs[:1]
+        )
+
+    def test_exact_with_expression(self):
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__exact=[Value(1)]),
+            self.objs[:1],
         )
 
     def test_exact_charfield(self):
@@ -293,21 +302,37 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[:2]
         )
 
-    @unittest.expectedFailure
     def test_contained_by_including_F_object(self):
-        # This test asserts that Array objects passed to filters can be
-        # constructed to contain F objects. This currently doesn't work as the
-        # psycopg2 mogrify method that generates the ARRAY() syntax is
-        # expecting literals, not column references (#27095).
         self.assertSequenceEqual(
-            NullableIntegerArrayModel.objects.filter(field__contained_by=[models.F('id'), 2]),
-            self.objs[:2]
+            NullableIntegerArrayModel.objects.filter(field__contained_by=[models.F('order'), 2]),
+            self.objs[:3],
         )
 
     def test_contains(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__contains=[2]),
             self.objs[1:3]
+        )
+
+    def test_contains_subquery(self):
+        IntegerArrayModel.objects.create(field=[2, 3])
+        inner_qs = IntegerArrayModel.objects.values_list('field', flat=True)
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__contains=inner_qs[:1]),
+            self.objs[2:3],
+        )
+        inner_qs = IntegerArrayModel.objects.filter(field__contains=OuterRef('field'))
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(Exists(inner_qs)),
+            self.objs[1:3],
+        )
+
+    def test_contains_including_expression(self):
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field__contains=[2, Value(6) / Value(2)],
+            ),
+            self.objs[2:3],
         )
 
     def test_icontains(self):
@@ -335,6 +360,18 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             CharArrayModel.objects.filter(field__overlap=['text']),
             []
+        )
+
+    def test_overlap_charfield_including_expression(self):
+        obj_1 = CharArrayModel.objects.create(field=['TEXT', 'lower text'])
+        obj_2 = CharArrayModel.objects.create(field=['lower text', 'TEXT'])
+        CharArrayModel.objects.create(field=['lower text', 'text'])
+        self.assertSequenceEqual(
+            CharArrayModel.objects.filter(field__overlap=[
+                Upper(Value('text')),
+                'other',
+            ]),
+            [obj_1, obj_2],
         )
 
     def test_lookups_autofield_array(self):
@@ -395,6 +432,13 @@ class TestQuerying(PostgreSQLTestCase):
                 ),
             ),
             self.objs[:1],
+        )
+
+    def test_index_annotation(self):
+        qs = NullableIntegerArrayModel.objects.annotate(second=models.F('field__1'))
+        self.assertCountEqual(
+            qs.values_list('second', flat=True),
+            [None, None, None, 3, 30],
         )
 
     def test_overlap(self):
@@ -458,6 +502,15 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[2:3],
         )
 
+    def test_slice_annotation(self):
+        qs = NullableIntegerArrayModel.objects.annotate(
+            first_two=models.F('field__0_2'),
+        )
+        self.assertCountEqual(
+            qs.values_list('first_two', flat=True),
+            [None, [1], [2], [2, 3], [20, 30]],
+        )
+
     def test_usage_in_subquery(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(
@@ -489,7 +542,9 @@ class TestQuerying(PostgreSQLTestCase):
         value = models.Value([1], output_field=ArrayField(models.IntegerField()))
         self.assertEqual(
             NullableIntegerArrayModel.objects.annotate(
-                array_length=models.Func(value, 1, function='ARRAY_LENGTH'),
+                array_length=models.Func(
+                    value, 1, function='ARRAY_LENGTH', output_field=models.IntegerField(),
+                ),
             ).values('array_length').annotate(
                 count=models.Count('pk'),
             ).get()['array_length'],

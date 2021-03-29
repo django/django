@@ -66,8 +66,8 @@ For example::
 Now we have a different problem - the longer name of "Helena Bonham Carter"
 doesn't show up as it is much longer. Trigram searches consider all
 combinations of three letters, and compares how many appear in both search and
-source strings. For the longer name, there are more combinations which appear
-in the source string so it is no longer considered a close match.
+source strings. For the longer name, there are more combinations that don't
+appear in the source string, so it is no longer considered a close match.
 
 The correct choice of comparison functions here depends on your particular data
 set, for example the language(s) used and the type of text being searched. All

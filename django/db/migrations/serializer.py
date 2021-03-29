@@ -5,6 +5,8 @@ import decimal
 import enum
 import functools
 import math
+import os
+import pathlib
 import re
 import types
 import uuid
@@ -217,6 +219,19 @@ class OperationSerializer(BaseSerializer):
         return string.rstrip(','), imports
 
 
+class PathLikeSerializer(BaseSerializer):
+    def serialize(self):
+        return repr(os.fspath(self.value)), {}
+
+
+class PathSerializer(BaseSerializer):
+    def serialize(self):
+        # Convert concrete paths to pure paths to avoid issues with migrations
+        # generated on one platform being used on a different platform.
+        prefix = 'Pure' if isinstance(self.value, pathlib.Path) else ''
+        return 'pathlib.%s%r' % (prefix, self.value), {'import pathlib'}
+
+
 class RegexSerializer(BaseSerializer):
     def serialize(self):
         regex_pattern, pattern_imports = serializer_factory(self.value.pattern).serialize()
@@ -298,6 +313,8 @@ class Serializer:
         collections.abc.Iterable: IterableSerializer,
         (COMPILED_REGEX_TYPE, RegexObject): RegexSerializer,
         uuid.UUID: UUIDSerializer,
+        pathlib.PurePath: PathSerializer,
+        os.PathLike: PathLikeSerializer,
     }
 
     @classmethod

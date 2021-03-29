@@ -16,7 +16,8 @@ from django.core.validators import (
     validate_ipv4_address, validate_ipv6_address, validate_ipv46_address,
     validate_slug, validate_unicode_slug,
 )
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango41Warning
 
 try:
     from PIL import Image  # noqa
@@ -50,7 +51,7 @@ TEST_DATA = [
     (validate_email, 'example@valid-with-hyphens.com', None),
     (validate_email, 'test@domain.with.idn.tld.उदाहरण.परीक्षा', None),
     (validate_email, 'email@localhost', None),
-    (EmailValidator(whitelist=['localdomain']), 'email@localdomain', None),
+    (EmailValidator(allowlist=['localdomain']), 'email@localdomain', None),
     (validate_email, '"test@test"@example.com', None),
     (validate_email, 'example@atm.%s' % ('a' * 63), None),
     (validate_email, 'example@%s.atm' % ('a' * 63), None),
@@ -222,6 +223,9 @@ TEST_DATA = [
     (URLValidator(EXTENDED_SCHEMES), 'git+ssh://git@github.com/example/hg-git.git', None),
 
     (URLValidator(EXTENDED_SCHEMES), 'git://-invalid.com', ValidationError),
+    (URLValidator(), None, ValidationError),
+    (URLValidator(), 56, ValidationError),
+    (URLValidator(), 'no_scheme', ValidationError),
     # Trailing newlines not accepted
     (URLValidator(), 'http://www.djangoproject.com/\n', ValidationError),
     (URLValidator(), 'http://[::ffff:192.9.5.5]\n', ValidationError),
@@ -280,7 +284,7 @@ TEST_DATA = [
         (DecimalValidator(decimal_places=2, max_digits=10), Decimal(value), ValidationError)
         for value in (
             'NaN', '-NaN', '+NaN', 'sNaN', '-sNaN', '+sNaN',
-            'Inf', '-Inf', '+Inf', 'Infinity', '-Infinity', '-Infinity',
+            'Inf', '-Inf', '+Inf', 'Infinity', '-Infinity', '+Infinity',
         )
     ],
 
@@ -507,3 +511,42 @@ class TestValidatorEquality(TestCase):
             ProhibitNullCharactersValidator(message='message', code='code1'),
             ProhibitNullCharactersValidator(message='message', code='code2')
         )
+
+
+class DeprecationTests(SimpleTestCase):
+    @ignore_warnings(category=RemovedInDjango41Warning)
+    def test_whitelist(self):
+        validator = EmailValidator(whitelist=['localdomain'])
+        self.assertEqual(validator.domain_allowlist, ['localdomain'])
+        self.assertIsNone(validator('email@localdomain'))
+        self.assertEqual(validator.domain_allowlist, validator.domain_whitelist)
+
+    def test_whitelist_warning(self):
+        msg = "The whitelist argument is deprecated in favor of allowlist."
+        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
+            EmailValidator(whitelist='localdomain')
+
+    @ignore_warnings(category=RemovedInDjango41Warning)
+    def test_domain_whitelist(self):
+        validator = EmailValidator()
+        validator.domain_whitelist = ['mydomain']
+        self.assertEqual(validator.domain_allowlist, ['mydomain'])
+        self.assertEqual(validator.domain_allowlist, validator.domain_whitelist)
+
+    def test_domain_whitelist_access_warning(self):
+        validator = EmailValidator()
+        msg = (
+            'The domain_whitelist attribute is deprecated in favor of '
+            'domain_allowlist.'
+        )
+        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
+            validator.domain_whitelist
+
+    def test_domain_whitelist_set_warning(self):
+        validator = EmailValidator()
+        msg = (
+            'The domain_whitelist attribute is deprecated in favor of '
+            'domain_allowlist.'
+        )
+        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
+            validator.domain_whitelist = ['mydomain']

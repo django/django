@@ -154,7 +154,6 @@ class TestInline(TestDataMixin, TestCase):
         # Identically named callable isn't present in the parent ModelAdmin,
         # rendering of the add view shouldn't explode
         response = self.client.get(reverse('admin:admin_inlines_novel_add'))
-        self.assertEqual(response.status_code, 200)
         # View should have the child inlines section
         self.assertContains(
             response,
@@ -164,7 +163,6 @@ class TestInline(TestDataMixin, TestCase):
     def test_callable_lookup(self):
         """Admin inline should invoke local callable when its name is listed in readonly_fields"""
         response = self.client.get(reverse('admin:admin_inlines_poll_add'))
-        self.assertEqual(response.status_code, 200)
         # Add parent object view should have the child inlines section
         self.assertContains(
             response,
@@ -482,6 +480,16 @@ class TestInline(TestDataMixin, TestCase):
             html=True
         )
 
+    def test_inlines_plural_heading_foreign_key(self):
+        response = self.client.get(reverse('admin:admin_inlines_holder4_add'))
+        self.assertContains(response, '<h2>Inner4 stackeds</h2>', html=True)
+        self.assertContains(response, '<h2>Inner4 tabulars</h2>', html=True)
+
+    def test_inlines_singular_heading_one_to_one(self):
+        response = self.client.get(reverse('admin:admin_inlines_person_add'))
+        self.assertContains(response, '<h2>Author</h2>', html=True)  # Tabular.
+        self.assertContains(response, '<h2>Fashionista</h2>', html=True)  # Stacked.
+
 
 @override_settings(ROOT_URLCONF='admin_inlines.urls')
 class TestInlineMedia(TestDataMixin, TestCase):
@@ -510,7 +518,7 @@ class TestInlineMedia(TestDataMixin, TestCase):
                 'my_awesome_inline_scripts.js',
                 'custom_number.js',
                 'admin/js/jquery.init.js',
-                'admin/js/inlines.min.js',
+                'admin/js/inlines.js',
             ]
         )
         self.assertContains(response, 'my_awesome_inline_scripts.js')
@@ -1205,20 +1213,6 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-2')), 1)
 
-    def test_alternating_rows(self):
-        self.admin_login(username='super', password='secret')
-        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_profilecollection_add'))
-
-        # Add a few inlines
-        self.selenium.find_element_by_link_text('Add another Profile').click()
-        self.selenium.find_element_by_link_text('Add another Profile').click()
-
-        row_selector = 'form#profilecollection_form tr.dynamic-profile_set'
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            "%s.row1" % row_selector)), 2, msg="Expect two row1 styled rows")
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            "%s.row2" % row_selector)), 1, msg="Expect one row2 styled row")
-
     def test_collapsed_inlines(self):
         # Collapsed inlines have SHOW/HIDE links.
         self.admin_login(username='super', password='secret')
@@ -1255,3 +1249,148 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.wait_until_visible(field_name)
             hide_links[hide_index].click()
             self.wait_until_invisible(field_name)
+
+    def assertBorder(self, element, border):
+        width, style, color = border.split(' ')
+        border_properties = [
+            'border-bottom-%s',
+            'border-left-%s',
+            'border-right-%s',
+            'border-top-%s',
+        ]
+        for prop in border_properties:
+            prop = prop % 'width'
+            self.assertEqual(element.value_of_css_property(prop), width)
+        for prop in border_properties:
+            prop = prop % 'style'
+            self.assertEqual(element.value_of_css_property(prop), style)
+        # Convert hex color to rgb.
+        self.assertRegex(color, '#[0-9a-f]{6}')
+        r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:], 16)
+        # The value may be expressed as either rgb() or rgba() depending on the
+        # browser.
+        colors = [
+            'rgb(%d, %d, %d)' % (r, g, b),
+            'rgba(%d, %d, %d, 1)' % (r, g, b),
+        ]
+        for prop in border_properties:
+            prop = prop % 'color'
+            self.assertIn(element.value_of_css_property(prop), colors)
+
+    def test_inline_formset_error_input_border(self):
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder5_add'))
+        self.wait_until_visible('#id_dummy')
+        self.selenium.find_element_by_id('id_dummy').send_keys(1)
+        fields = ['id_inner5stacked_set-0-dummy', 'id_inner5tabular_set-0-dummy']
+        show_links = self.selenium.find_elements_by_link_text('SHOW')
+        for show_index, field_name in enumerate(fields):
+            show_links[show_index].click()
+            self.wait_until_visible('#' + field_name)
+            self.selenium.find_element_by_id(field_name).send_keys(1)
+
+        # Before save all inputs have default border
+        for inline in ('stacked', 'tabular'):
+            for field_name in ('name', 'select', 'text'):
+                element_id = 'id_inner5%s_set-0-%s' % (inline, field_name)
+                self.assertBorder(
+                    self.selenium.find_element_by_id(element_id),
+                    '1px solid #cccccc',
+                )
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        # Test the red border around inputs by css selectors
+        stacked_selectors = ['.errors input', '.errors select', '.errors textarea']
+        for selector in stacked_selectors:
+            self.assertBorder(
+                self.selenium.find_element_by_css_selector(selector),
+                '1px solid #ba2121',
+            )
+        tabular_selectors = [
+            'td ul.errorlist + input', 'td ul.errorlist + select', 'td ul.errorlist + textarea'
+        ]
+        for selector in tabular_selectors:
+            self.assertBorder(
+                self.selenium.find_element_by_css_selector(selector),
+                '1px solid #ba2121',
+            )
+
+    def test_inline_formset_error(self):
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder5_add'))
+        stacked_inline_formset_selector = 'div#inner5stacked_set-group fieldset.module.collapse'
+        tabular_inline_formset_selector = 'div#inner5tabular_set-group fieldset.module.collapse'
+        # Inlines without errors, both inlines collapsed
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.assertEqual(
+            len(self.selenium.find_elements_by_css_selector(stacked_inline_formset_selector + '.collapsed')), 1
+        )
+        self.assertEqual(
+            len(self.selenium.find_elements_by_css_selector(tabular_inline_formset_selector + '.collapsed')), 1
+        )
+        show_links = self.selenium.find_elements_by_link_text('SHOW')
+        self.assertEqual(len(show_links), 2)
+
+        # Inlines with errors, both inlines expanded
+        test_fields = ['#id_inner5stacked_set-0-dummy', '#id_inner5tabular_set-0-dummy']
+        for show_index, field_name in enumerate(test_fields):
+            show_links[show_index].click()
+            self.wait_until_visible(field_name)
+            self.selenium.find_element_by_id(field_name[1:]).send_keys(1)
+        hide_links = self.selenium.find_elements_by_link_text('HIDE')
+        self.assertEqual(len(hide_links), 2)
+        for hide_index, field_name in enumerate(test_fields):
+            hide_link = hide_links[hide_index]
+            self.selenium.execute_script('window.scrollTo(0, %s);' % hide_link.location['y'])
+            hide_link.click()
+            self.wait_until_invisible(field_name)
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.assertEqual(
+            len(self.selenium.find_elements_by_css_selector(stacked_inline_formset_selector + '.collapsed')), 0
+        )
+        self.assertEqual(
+            len(self.selenium.find_elements_by_css_selector(tabular_inline_formset_selector + '.collapsed')), 0
+        )
+        self.assertEqual(
+            len(self.selenium.find_elements_by_css_selector(stacked_inline_formset_selector)), 1
+        )
+        self.assertEqual(
+            len(self.selenium.find_elements_by_css_selector(tabular_inline_formset_selector)), 1
+        )
+
+    def test_inlines_verbose_name(self):
+        """
+        The item added by the "Add another XXX" link must use the correct
+        verbose_name in the inline form.
+        """
+        self.admin_login(username='super', password='secret')
+        # Hide sidebar.
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_course_add'))
+        toggle_button = self.selenium.find_element_by_css_selector('#toggle-nav-sidebar')
+        toggle_button.click()
+        # Each combination of horizontal/vertical fiter with stacked/tabular
+        # inlines.
+        tests = [
+            'admin:admin_inlines_course_add',
+            'admin:admin_inlines_courseproxy_add',
+            'admin:admin_inlines_courseproxy1_add',
+            'admin:admin_inlines_courseproxy2_add',
+        ]
+        css_selector = '.dynamic-class_set#class_set-%s h2'
+
+        for url_name in tests:
+            with self.subTest(url=url_name):
+                self.selenium.get(self.live_server_url + reverse(url_name))
+                # First inline shows the verbose_name.
+                available, chosen = self.selenium.find_elements_by_css_selector(css_selector % 0)
+                self.assertEqual(available.text, 'AVAILABLE ATTENDANT')
+                self.assertEqual(chosen.text, 'CHOSEN ATTENDANT')
+                # Added inline should also have the correct verbose_name.
+                self.selenium.find_element_by_link_text('Add another Class').click()
+                available, chosen = self.selenium.find_elements_by_css_selector(css_selector % 1)
+                self.assertEqual(available.text, 'AVAILABLE ATTENDANT')
+                self.assertEqual(chosen.text, 'CHOSEN ATTENDANT')
+                # Third inline should also have the correct verbose_name.
+                self.selenium.find_element_by_link_text('Add another Class').click()
+                available, chosen = self.selenium.find_elements_by_css_selector(css_selector % 2)
+                self.assertEqual(available.text, 'AVAILABLE ATTENDANT')
+                self.assertEqual(chosen.text, 'CHOSEN ATTENDANT')

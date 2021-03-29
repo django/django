@@ -1,0 +1,3 @@
+pyenchant
+sphinx
+sphinxcontrib-spelling

@@ -36,7 +36,7 @@ Bugfixes
   migrations using ``QuerySet.defer()`` from leaking to test and application
   code.
 
-* Fixed a typo in the name of the `strictly_above` PostGIS lookup
+* Fixed a typo in the name of the ``strictly_above`` PostGIS lookup
   (:ticket:`25592`).
 
 * Fixed crash with ``contrib.postgres.forms.SplitArrayField`` and

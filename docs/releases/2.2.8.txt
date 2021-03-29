@@ -33,7 +33,7 @@ inlines in the admin form of an otherwise view-only parent model.
 Given the complexity of the Django admin, and in-particular the permissions
 related checks, it is the view of the Django security team that this change was
 necessary: that it is not currently feasible to maintain the existing behavior
-whilst escaping the potential privilege escalation in a way that would avoid a
+while escaping the potential privilege escalation in a way that would avoid a
 recurrence of similar issues in the future, and that would be compatible with
 Django's *safe by default* philosophy.
 
@@ -49,7 +49,7 @@ Bugfixes
 
 * Fixed a data loss possibility in the admin changelist view when a custom
   :ref:`formset's prefix <formset-prefix>` contains regular expression special
-  characters, e.g. `'$'` (:ticket:`31031`).
+  characters, e.g. ``'$'`` (:ticket:`31031`).
 
 * Fixed a regression in Django 2.2.1 that caused a crash when migrating
   permissions for proxy models with a multiple database setup if the

@@ -2,13 +2,13 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016
+# znotdead <zhirafchik@gmail.com>, 2016,2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-13 17:57+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
@@ -86,16 +86,16 @@ msgstr ""
 "незахаванае страціцца."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Абралі дзеяньне, але не захавалі зьмены ў пэўных палях. Каб захаваць, "
+"Абралі дзеяньне, але не захавалі зьмены ў пэўных палях. Каб захаваць, "
 "націсьніце «Добра». Дзеяньне потым трэба будзе запусьціць нанова."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 "Абралі дзеяньне, а ў палях нічога не зьмянялі. Мажліва, вы хацелі націснуць "

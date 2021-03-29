@@ -157,11 +157,12 @@ Django quotes column and table names behind the scenes.
     part of a :djadmin:`flush` management command. That is, Django
     *manages* the database tables' lifecycles.
 
-    If ``False``, no database table creation or deletion operations will be
-    performed for this model. This is useful if the model represents an existing
-    table or a database view that has been created by some other means. This is
-    the *only* difference when ``managed=False``. All other aspects of
-    model handling are exactly the same as normal. This includes
+    If ``False``, no database table creation, modification, or deletion
+    operations will be performed for this model. This is useful if the model
+    represents an existing table or a database view that has been created by
+    some other means. This is the *only* difference when ``managed=False``. All
+    other aspects of model handling are exactly the same as normal. This
+    includes
 
     #. Adding an automatic primary key field to the model if you don't
        declare it.  To avoid confusion for later code readers, it's

@@ -5,10 +5,16 @@ Advice for new contributors
 New contributor and not sure what to do? Want to help but just don't know how
 to get started? This is the section for you.
 
-.. admonition:: Basic tools and workflow
+.. admonition:: Get up and running!
 
     If you are new to contributing to Django, the :doc:`/intro/contributing`
     tutorial will give you an introduction to the tools and the workflow.
+
+This page contains more general advice on ways you can contribute to Django,
+and how to approach that.
+
+If you are looking for a reference on the details of making code contributions,
+see the :doc:`/internals/contributing/writing-code/index` documentation.
 
 First steps
 ===========
@@ -146,7 +152,7 @@ FAQ
    (except the Django fellow), and sometimes folks just don't have time. The
    best thing to do is to send a gentle reminder to the |django-developers|
    mailing list asking for review on the ticket, or to bring it up in the
-   `#django-dev` IRC channel.
+   ``#django-dev`` IRC channel.
 
 2. **I'm sure my ticket is absolutely 100% perfect, can I mark it as RFC
    myself?**

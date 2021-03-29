@@ -10,7 +10,7 @@
 <thead>
 <tr>
 {% for header in result_headers %}
-<th scope="col" {{ header.class_attrib }}>
+<th scope="col"{{ header.class_attrib }}>
    {% if header.sortable %}
      {% if header.sort_priority > 0 %}
        <div class="sortoptions">
@@ -30,7 +30,7 @@
 {% if result.form.non_field_errors %}
     <tr><td colspan="{{ result|length }}">{{ result.form.non_field_errors }}</td></tr>
 {% endif %}
-<tr class="{% cycle 'row1' 'row2' %}">{% for item in result %}{{ item }}{% endfor %}</tr>
+<tr>{% for item in result %}{{ item }}{% endfor %}</tr>
 {% endfor %}
 </tbody>
 </table>

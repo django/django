@@ -237,9 +237,9 @@ class FileSystemStorage(Storage):
         directory = os.path.dirname(full_path)
         try:
             if self.directory_permissions_mode is not None:
-                # os.makedirs applies the global umask, so we reset it,
-                # for consistency with file_permissions_mode behavior.
-                old_umask = os.umask(0)
+                # Set the umask because os.makedirs() doesn't apply the "mode"
+                # argument to intermediate-level directories.
+                old_umask = os.umask(0o777 & ~self.directory_permissions_mode)
                 try:
                     os.makedirs(directory, self.directory_permissions_mode, exist_ok=True)
                 finally:
@@ -294,7 +294,8 @@ class FileSystemStorage(Storage):
         return str(name).replace('\\', '/')
 
     def delete(self, name):
-        assert name, "The name argument is not allowed to be empty."
+        if not name:
+            raise ValueError('The name must be given to delete().')
         name = self.path(name)
         # If the file or directory exists, delete it from the filesystem.
         try:

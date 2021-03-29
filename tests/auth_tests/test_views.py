@@ -1,10 +1,9 @@
 import datetime
 import itertools
-import os
 import re
 from importlib import import_module
 from unittest import mock
-from urllib.parse import quote
+from urllib.parse import quote, urljoin
 
 from django.apps import apps
 from django.conf import settings
@@ -53,8 +52,8 @@ class AuthViewsTestCase(TestCase):
         cls.u1 = User.objects.create_user(username='testclient', password='password', email='testclient@example.com')
         cls.u3 = User.objects.create_user(username='staff', password='password', email='staffmember@example.com')
 
-    def login(self, username='testclient', password='password'):
-        response = self.client.post('/login/', {
+    def login(self, username='testclient', password='password', url='/login/'):
+        response = self.client.post(url, {
             'username': username,
             'password': password,
         })
@@ -201,7 +200,7 @@ class PasswordResetTest(AuthViewsTestCase):
     def _read_signup_email(self, email):
         urlmatch = re.search(r"https?://[^/]*(/.*reset/\S*)", email.body)
         self.assertIsNotNone(urlmatch, "No URL found in sent email")
-        return urlmatch.group(), urlmatch.groups()[0]
+        return urlmatch[0], urlmatch[1]
 
     def test_confirm_valid(self):
         url, path = self._test_confirm_start()
@@ -414,7 +413,7 @@ class CustomUserPasswordResetTest(AuthViewsTestCase):
     def _read_signup_email(self, email):
         urlmatch = re.search(r"https?://[^/]*(/.*reset/\S*)", email.body)
         self.assertIsNotNone(urlmatch, "No URL found in sent email")
-        return urlmatch.group(), urlmatch.groups()[0]
+        return urlmatch[0], urlmatch[1]
 
     def test_confirm_valid_custom_user(self):
         url, path = self._test_confirm_start()
@@ -727,6 +726,31 @@ class LoginTest(AuthViewsTestCase):
         self.login()
         self.assertNotEqual(original_session_key, self.client.session.session_key)
 
+    def test_login_get_default_redirect_url(self):
+        response = self.login(url='/login/get_default_redirect_url/')
+        self.assertRedirects(response, '/custom/', fetch_redirect_response=False)
+
+    def test_login_next_page(self):
+        response = self.login(url='/login/next_page/')
+        self.assertRedirects(response, '/somewhere/', fetch_redirect_response=False)
+
+    def test_login_named_next_page_named(self):
+        response = self.login(url='/login/next_page/named/')
+        self.assertRedirects(response, '/password_reset/', fetch_redirect_response=False)
+
+    @override_settings(LOGIN_REDIRECT_URL='/custom/')
+    def test_login_next_page_overrides_login_redirect_url_setting(self):
+        response = self.login(url='/login/next_page/')
+        self.assertRedirects(response, '/somewhere/', fetch_redirect_response=False)
+
+    def test_login_redirect_url_overrides_next_page(self):
+        response = self.login(url='/login/next_page/?next=/test/')
+        self.assertRedirects(response, '/test/', fetch_redirect_response=False)
+
+    def test_login_redirect_url_overrides_get_default_redirect_url(self):
+        response = self.login(url='/login/get_default_redirect_url/?next=/test/')
+        self.assertRedirects(response, '/test/', fetch_redirect_response=False)
+
 
 class LoginURLSettings(AuthViewsTestCase):
     """Tests for settings.LOGIN_URL."""
@@ -973,7 +997,7 @@ class LogoutTest(AuthViewsTestCase):
         in #25490.
         """
         response = self.client.get('/logout/')
-        self.assertIn('no-store', response['Cache-Control'])
+        self.assertIn('no-store', response.headers['Cache-Control'])
 
     def test_logout_with_overridden_redirect_url(self):
         # Bug 11223
@@ -1194,11 +1218,8 @@ class ChangelistTests(AuthViewsTestCase):
         rel_link = re.search(
             r'you can change the password using <a href="([^"]*)">this form</a>',
             response.content.decode()
-        ).groups()[0]
-        self.assertEqual(
-            os.path.normpath(user_change_url + rel_link),
-            os.path.normpath(password_change_url)
-        )
+        )[1]
+        self.assertEqual(urljoin(user_change_url, rel_link), password_change_url)
 
         response = self.client.post(
             password_change_url,
@@ -1252,7 +1273,7 @@ class ChangelistTests(AuthViewsTestCase):
         self.assertContains(
             response,
             '<strong>algorithm</strong>: %s\n\n'
-            '<strong>salt</strong>: %s**********\n\n'
+            '<strong>salt</strong>: %s********************\n\n'
             '<strong>hash</strong>: %s**************************\n\n' % (
                 algo, salt[:2], hash_string[:6],
             ),
@@ -1284,7 +1305,8 @@ class UUIDUserTests(TestCase):
 
         password_change_url = reverse('custom_user_admin:auth_user_password_change', args=(u.pk,))
         response = self.client.get(password_change_url)
-        self.assertEqual(response.status_code, 200)
+        # The action attribute is omitted.
+        self.assertContains(response, '<form method="post" id="uuiduser_form">')
 
         # A LogEntry is created with pk=1 which breaks a FK constraint on MySQL
         with connection.constraint_checks_disabled():

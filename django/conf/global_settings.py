@@ -93,6 +93,7 @@ LANGUAGES = [
     ('hy', gettext_noop('Armenian')),
     ('ia', gettext_noop('Interlingua')),
     ('id', gettext_noop('Indonesian')),
+    ('ig', gettext_noop('Igbo')),
     ('io', gettext_noop('Ido')),
     ('is', gettext_noop('Icelandic')),
     ('it', gettext_noop('Italian')),
@@ -103,6 +104,7 @@ LANGUAGES = [
     ('km', gettext_noop('Khmer')),
     ('kn', gettext_noop('Kannada')),
     ('ko', gettext_noop('Korean')),
+    ('ky', gettext_noop('Kyrgyz')),
     ('lb', gettext_noop('Luxembourgish')),
     ('lt', gettext_noop('Lithuanian')),
     ('lv', gettext_noop('Latvian')),
@@ -131,7 +133,9 @@ LANGUAGES = [
     ('sw', gettext_noop('Swahili')),
     ('ta', gettext_noop('Tamil')),
     ('te', gettext_noop('Telugu')),
+    ('tg', gettext_noop('Tajik')),
     ('th', gettext_noop('Thai')),
+    ('tk', gettext_noop('Turkmen')),
     ('tr', gettext_noop('Turkish')),
     ('tt', gettext_noop('Tatar')),
     ('udm', gettext_noop('Udmurt')),
@@ -410,6 +414,9 @@ THOUSAND_SEPARATOR = ','
 DEFAULT_TABLESPACE = ''
 DEFAULT_INDEX_TABLESPACE = ''
 
+# Default primary key field type.
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 # Default X-Frame-Options header value
 X_FRAME_OPTIONS = 'DENY'
 
@@ -460,7 +467,7 @@ SESSION_COOKIE_PATH = '/'
 # Whether to use the HttpOnly flag.
 SESSION_COOKIE_HTTPONLY = True
 # Whether to set the flag restricting cookie leaks on cross-site requests.
-# This can be 'Lax', 'Strict', or None to disable the flag.
+# This can be 'Lax', 'Strict', 'None', or False to disable the flag.
 SESSION_COOKIE_SAMESITE = 'Lax'
 # Whether to save the session data on every request.
 SESSION_SAVE_EVERY_REQUEST = False
@@ -502,11 +509,7 @@ LOGIN_REDIRECT_URL = '/accounts/profile/'
 
 LOGOUT_REDIRECT_URL = None
 
-# The number of days a password reset link is valid for
-PASSWORD_RESET_TIMEOUT_DAYS = 3
-
-# The minimum number of seconds a password reset link is valid for
-# (default: 3 days).
+# The number of seconds a password reset link is valid for (default: 3 days).
 PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 3
 
 # the first hasher in this list is the preferred algorithm.  any

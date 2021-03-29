@@ -62,6 +62,8 @@ class BulkInsertMapper:
     TIMESTAMP = 'TO_TIMESTAMP(%s)'
 
     types = {
+        'AutoField': NUMBER,
+        'BigAutoField': NUMBER,
         'BigIntegerField': NUMBER,
         'BinaryField': BLOB,
         'BooleanField': NUMBER,
@@ -71,11 +73,18 @@ class BulkInsertMapper:
         'DurationField': INTERVAL,
         'FloatField': NUMBER,
         'IntegerField': NUMBER,
-        'NullBooleanField': NUMBER,
         'PositiveBigIntegerField': NUMBER,
         'PositiveIntegerField': NUMBER,
         'PositiveSmallIntegerField': NUMBER,
+        'SmallAutoField': NUMBER,
         'SmallIntegerField': NUMBER,
         'TextField': CLOB,
         'TimeField': TIMESTAMP,
     }
+
+
+def dsn(settings_dict):
+    if settings_dict['PORT']:
+        host = settings_dict['HOST'].strip() or 'localhost'
+        return Database.makedsn(host, int(settings_dict['PORT']), settings_dict['NAME'])
+    return settings_dict['NAME']

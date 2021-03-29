@@ -11,7 +11,7 @@ class LocaleMiddleware(MiddlewareMixin):
     """
     Parse a request and decide what translation object to install in the
     current thread context. This allows pages to be dynamically translated to
-    the language the user desires (if the language is available, of course).
+    the language the user desires (if the language is available).
     """
     response_redirect_class = HttpResponseRedirect
 
@@ -57,5 +57,5 @@ class LocaleMiddleware(MiddlewareMixin):
 
         if not (i18n_patterns_used and language_from_path):
             patch_vary_headers(response, ('Accept-Language',))
-        response.setdefault('Content-Language', language)
+        response.headers.setdefault('Content-Language', language)
         return response

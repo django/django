@@ -2,7 +2,6 @@
 Helper functions for creating Form classes from Django models
 and database field objects.
 """
-
 from itertools import chain
 
 from django.core.exceptions import (
@@ -96,10 +95,18 @@ def model_to_dict(instance, fields=None, exclude=None):
 
 def apply_limit_choices_to_to_formfield(formfield):
     """Apply limit_choices_to to the formfield's queryset if needed."""
+    from django.db.models import Exists, OuterRef, Q
     if hasattr(formfield, 'queryset') and hasattr(formfield, 'get_limit_choices_to'):
         limit_choices_to = formfield.get_limit_choices_to()
-        if limit_choices_to is not None:
-            formfield.queryset = formfield.queryset.complex_filter(limit_choices_to)
+        if limit_choices_to:
+            complex_filter = limit_choices_to
+            if not isinstance(complex_filter, Q):
+                complex_filter = Q(**limit_choices_to)
+            complex_filter &= Q(pk=OuterRef('pk'))
+            # Use Exists() to avoid potential duplicates.
+            formfield.queryset = formfield.queryset.filter(
+                Exists(formfield.queryset.model._base_manager.filter(complex_filter)),
+            )
 
 
 def fields_for_model(model, fields=None, exclude=None, widgets=None,
@@ -814,7 +821,7 @@ class BaseModelFormSet(BaseFormSet):
 
     def add_fields(self, form, index):
         """Add a hidden field for the object's primary key."""
-        from django.db.models import AutoField, OneToOneField, ForeignKey
+        from django.db.models import AutoField, ForeignKey, OneToOneField
         self._pk_field = pk = self.model._meta.pk
         # If a pk isn't editable, then it won't be on the form, so we need to
         # add it here so we can tell which object is which when we get the
@@ -861,7 +868,8 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
                          can_order=False, max_num=None, fields=None, exclude=None,
                          widgets=None, validate_max=False, localized_fields=None,
                          labels=None, help_texts=None, error_messages=None,
-                         min_num=None, validate_min=False, field_classes=None):
+                         min_num=None, validate_min=False, field_classes=None,
+                         absolute_max=None, can_delete_extra=True):
     """Return a FormSet class for the given Django model class."""
     meta = getattr(form, 'Meta', None)
     if (getattr(meta, 'fields', fields) is None and
@@ -878,7 +886,8 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
                              error_messages=error_messages, field_classes=field_classes)
     FormSet = formset_factory(form, formset, extra=extra, min_num=min_num, max_num=max_num,
                               can_order=can_order, can_delete=can_delete,
-                              validate_min=validate_min, validate_max=validate_max)
+                              validate_min=validate_min, validate_max=validate_max,
+                              absolute_max=absolute_max, can_delete_extra=can_delete_extra)
     FormSet.model = model
     return FormSet
 
@@ -1047,7 +1056,8 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
                           can_delete=True, max_num=None, formfield_callback=None,
                           widgets=None, validate_max=False, localized_fields=None,
                           labels=None, help_texts=None, error_messages=None,
-                          min_num=None, validate_min=False, field_classes=None):
+                          min_num=None, validate_min=False, field_classes=None,
+                          absolute_max=None, can_delete_extra=True):
     """
     Return an ``InlineFormSet`` for the given kwargs.
 
@@ -1077,6 +1087,8 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
         'help_texts': help_texts,
         'error_messages': error_messages,
         'field_classes': field_classes,
+        'absolute_max': absolute_max,
+        'can_delete_extra': can_delete_extra,
     }
     FormSet = modelformset_factory(model, **kwargs)
     FormSet.fk = fk
@@ -1272,7 +1284,11 @@ class ModelChoiceField(ChoiceField):
                 value = getattr(value, key)
             value = self.queryset.get(**{key: value})
         except (ValueError, TypeError, self.queryset.model.DoesNotExist):
-            raise ValidationError(self.error_messages['invalid_choice'], code='invalid_choice')
+            raise ValidationError(
+                self.error_messages['invalid_choice'],
+                code='invalid_choice',
+                params={'value': value},
+            )
         return value
 
     def validate(self, value):
@@ -1291,7 +1307,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
     widget = SelectMultiple
     hidden_widget = MultipleHiddenInput
     default_error_messages = {
-        'list': _('Enter a list of values.'),
+        'invalid_list': _('Enter a list of values.'),
         'invalid_choice': _('Select a valid choice. %(value)s is not one of the'
                             ' available choices.'),
         'invalid_pk_value': _('“%(pk)s” is not a valid value.')
@@ -1312,7 +1328,10 @@ class ModelMultipleChoiceField(ModelChoiceField):
         elif not self.required and not value:
             return self.queryset.none()
         if not isinstance(value, (list, tuple)):
-            raise ValidationError(self.error_messages['list'], code='list')
+            raise ValidationError(
+                self.error_messages['invalid_list'],
+                code='invalid_list',
+            )
         qs = self._check_values(value)
         # Since this overrides the inherited ModelChoiceField.clean
         # we run custom validators here
@@ -1333,8 +1352,8 @@ class ModelMultipleChoiceField(ModelChoiceField):
         except TypeError:
             # list of lists isn't hashable, for example
             raise ValidationError(
-                self.error_messages['list'],
-                code='list',
+                self.error_messages['invalid_list'],
+                code='invalid_list',
             )
         for pk in value:
             try:

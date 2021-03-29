@@ -15,19 +15,22 @@ from .models import Article, ArticleProxy, Site
 
 @override_settings(ROOT_URLCONF='admin_utils.urls')
 class LogEntryTests(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
-        self.site = Site.objects.create(domain='example.org')
-        self.a1 = Article.objects.create(
-            site=self.site,
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
+        cls.site = Site.objects.create(domain='example.org')
+        cls.a1 = Article.objects.create(
+            site=cls.site,
             title="Title",
             created=datetime(2008, 3, 12, 11, 54),
         )
         content_type_pk = ContentType.objects.get_for_model(Article).pk
         LogEntry.objects.log_action(
-            self.user.pk, content_type_pk, self.a1.pk, repr(self.a1), CHANGE,
+            cls.user.pk, content_type_pk, cls.a1.pk, repr(cls.a1), CHANGE,
             change_message='Changed something'
         )
+
+    def setUp(self):
         self.client.force_login(self.user)
 
     def test_logentry_save(self):

@@ -244,10 +244,12 @@ class BooleanFieldListFilter(FieldListFilter):
         return [self.lookup_kwarg, self.lookup_kwarg2]
 
     def choices(self, changelist):
+        field_choices = dict(self.field.flatchoices)
         for lookup, title in (
-                (None, _('All')),
-                ('1', _('Yes')),
-                ('0', _('No'))):
+            (None, _('All')),
+            ('1', field_choices.get(True, _('Yes'))),
+            ('0', field_choices.get(False, _('No'))),
+        ):
             yield {
                 'selected': self.lookup_val == lookup and not self.lookup_val2,
                 'query_string': changelist.get_query_string({self.lookup_kwarg: lookup}, [self.lookup_kwarg2]),
@@ -257,7 +259,7 @@ class BooleanFieldListFilter(FieldListFilter):
             yield {
                 'selected': self.lookup_val2 == 'True',
                 'query_string': changelist.get_query_string({self.lookup_kwarg2: 'True'}, [self.lookup_kwarg]),
-                'display': _('Unknown'),
+                'display': field_choices.get(None, _('Unknown')),
             }
 
 

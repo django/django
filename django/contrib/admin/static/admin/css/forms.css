@@ -6,7 +6,7 @@
     overflow: hidden;
     padding: 10px;
     font-size: 13px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--hairline-color);
 }
 
 .form-row img, .form-row input {
@@ -22,21 +22,17 @@ form .form-row p {
     padding-left: 0;
 }
 
-.hidden {
-    display: none;
-}
-
 /* FORM LABELS */
 
 label {
     font-weight: normal;
-    color: #666;
+    color: var(--body-quiet-color);
     font-size: 13px;
 }
 
 .required label, label.required {
     font-weight: bold;
-    color: #333;
+    color: var(--body-fg);
 }
 
 /* RADIO BUTTONS */
@@ -219,24 +215,24 @@ fieldset.collapsed h2, fieldset.collapsed {
 }
 
 fieldset.collapsed {
-    border: 1px solid #eee;
+    border: 1px solid var(--hairline-color);
     border-radius: 4px;
     overflow: hidden;
 }
 
 fieldset.collapsed h2 {
-    background: #f8f8f8;
-    color: #666;
+    background: var(--darkened-bg);
+    color: var(--body-quiet-color);
 }
 
 fieldset .collapse-toggle {
-    color: #fff;
+    color: var(--header-link-color);
 }
 
 fieldset.collapsed .collapse-toggle {
     background: transparent;
     display: inline;
-    color: #447e9b;
+    color: var(--link-fg);
 }
 
 /* MONOSPACE TEXTAREAS */
@@ -250,8 +246,8 @@ fieldset.monospace textarea {
 .submit-row {
     padding: 12px 14px;
     margin: 0 0 20px;
-    background: #f8f8f8;
-    border: 1px solid #eee;
+    background: var(--darkened-bg);
+    border: 1px solid var(--hairline-color);
     border-radius: 4px;
     text-align: right;
     overflow: hidden;
@@ -283,35 +279,35 @@ body.popup .submit-row {
 
 .submit-row a.deletelink {
     display: block;
-    background: #ba2121;
+    background: var(--delete-button-bg);
     border-radius: 4px;
     padding: 10px 15px;
     height: 15px;
     line-height: 15px;
-    color: #fff;
+    color: var(--button-fg);
 }
 
 .submit-row a.closelink {
     display: inline-block;
-    background: #bbbbbb;
+    background: var(--close-button-bg);
     border-radius: 4px;
     padding: 10px 15px;
     height: 15px;
     line-height: 15px;
     margin: 0 0 0 5px;
-    color: #fff;
+    color: var(--button-fg);
 }
 
 .submit-row a.deletelink:focus,
 .submit-row a.deletelink:hover,
 .submit-row a.deletelink:active {
-    background: #a41515;
+    background: var(--delete-button-hover-bg);
 }
 
 .submit-row a.closelink:focus,
 .submit-row a.closelink:hover,
 .submit-row a.closelink:active {
-    background: #aaaaaa;
+    background: var(--close-button-hover-bg);
 }
 
 /* CUSTOM FORM FIELDS */
@@ -390,12 +386,12 @@ body.popup .submit-row {
 
 .inline-related h3 {
     margin: 0;
-    color: #666;
+    color: var(--body-quiet-color);
     padding: 5px;
     font-size: 13px;
-    background: #f8f8f8;
-    border-top: 1px solid #eee;
-    border-bottom: 1px solid #eee;
+    background: var(--darkened-bg);
+    border-top: 1px solid var(--hairline-color);
+    border-bottom: 1px solid var(--hairline-color);
 }
 
 .inline-related h3 span.delete {
@@ -409,7 +405,7 @@ body.popup .submit-row {
 
 .inline-related fieldset {
     margin: 0;
-    background: #fff;
+    background: var(--body-bg);
     border: none;
     width: 100%;
 }
@@ -421,7 +417,7 @@ body.popup .submit-row {
     text-align: left;
     font-weight: bold;
     background: #bcd;
-    color: #fff;
+    color: var(--body-bg);
 }
 
 .inline-group .tabular fieldset.module {
@@ -430,6 +426,7 @@ body.popup .submit-row {
 
 .inline-related.tabular fieldset.module table {
     width: 100%;
+    overflow-x: scroll;
 }
 
 .last-related fieldset {
@@ -459,7 +456,7 @@ body.popup .submit-row {
     overflow: hidden;
     font-size: 9px;
     font-weight: bold;
-    color: #666;
+    color: var(--body-quiet-color);
     _width: 700px;
 }
 
@@ -476,15 +473,15 @@ body.popup .submit-row {
 
 .inline-group div.add-row,
 .inline-group .tabular tr.add-row td {
-    color: #666;
-    background: #f8f8f8;
+    color: var(--body-quiet-color);
+    background: var(--darkened-bg);
     padding: 8px 10px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--hairline-color);
 }
 
 .inline-group .tabular tr.add-row td {
     padding: 8px 10px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--hairline-color);
 }
 
 .inline-group ul.tools a.add,
@@ -501,18 +498,12 @@ body.popup .submit-row {
 
 /* RELATED FIELD ADD ONE / LOOKUP */
 
-.add-another, .related-lookup {
+.related-lookup {
     margin-left: 5px;
     display: inline-block;
     vertical-align: middle;
     background-repeat: no-repeat;
     background-size: 14px;
-}
-
-.add-another {
-    width: 16px;
-    height: 16px;
-    background-image: url(../img/icon-addlink.svg);
 }
 
 .related-lookup {

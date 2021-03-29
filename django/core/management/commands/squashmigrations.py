@@ -188,16 +188,20 @@ class Command(BaseCommand):
             fh.write(writer.as_string())
 
         if self.verbosity > 0:
-            self.stdout.write(self.style.MIGRATE_HEADING("Created new squashed migration %s" % writer.path))
-            self.stdout.write("  You should commit this migration but leave the old ones in place;")
-            self.stdout.write("  the new migration will be used for new installs. Once you are sure")
-            self.stdout.write("  all instances of the codebase have applied the migrations you squashed,")
-            self.stdout.write("  you can delete them.")
+            self.stdout.write(
+                self.style.MIGRATE_HEADING('Created new squashed migration %s' % writer.path) + '\n'
+                '  You should commit this migration but leave the old ones in place;\n'
+                '  the new migration will be used for new installs. Once you are sure\n'
+                '  all instances of the codebase have applied the migrations you squashed,\n'
+                '  you can delete them.'
+            )
             if writer.needs_manual_porting:
-                self.stdout.write(self.style.MIGRATE_HEADING("Manual porting required"))
-                self.stdout.write("  Your migrations contained functions that must be manually copied over,")
-                self.stdout.write("  as we could not safely copy their implementation.")
-                self.stdout.write("  See the comment at the top of the squashed migration for details.")
+                self.stdout.write(
+                    self.style.MIGRATE_HEADING('Manual porting required') + '\n'
+                    '  Your migrations contained functions that must be manually copied over,\n'
+                    '  as we could not safely copy their implementation.\n'
+                    '  See the comment at the top of the squashed migration for details.'
+                )
 
     def find_migration(self, loader, app_label, name):
         try:

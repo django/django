@@ -69,6 +69,10 @@ Django provides three built-in storage classes in
     to prevent manipulation) to persist notifications across requests. Old
     messages are dropped if the cookie data size would exceed 2048 bytes.
 
+    .. versionchanged:: 3.2
+
+        Messages format was changed to the :rfc:`6265` compliant format.
+
 .. class:: storage.fallback.FallbackStorage
 
     This class first uses ``CookieStorage``, and falls back to using
@@ -365,7 +369,7 @@ Adding messages in class-based views
     from django.views.generic.edit import CreateView
     from myapp.models import Author
 
-    class AuthorCreate(SuccessMessageMixin, CreateView):
+    class AuthorCreateView(SuccessMessageMixin, CreateView):
         model = Author
         success_url = '/success/'
         success_message = "%(name)s was created successfully"
@@ -382,7 +386,7 @@ method.
     from django.views.generic.edit import CreateView
     from myapp.models import ComplicatedModel
 
-    class ComplicatedCreate(SuccessMessageMixin, CreateView):
+    class ComplicatedCreateView(SuccessMessageMixin, CreateView):
         model = ComplicatedModel
         success_url = '/success/'
         success_message = "%(calculated_field)s was created successfully"

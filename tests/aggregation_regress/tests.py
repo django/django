@@ -374,7 +374,7 @@ class AggregationTests(TestCase):
         # Conditional aggregation of a grouped queryset.
         self.assertEqual(
             Book.objects.annotate(c=Count('authors')).values('pk').aggregate(test=Sum(
-                Case(When(c__gt=1, then=1), output_field=IntegerField())
+                Case(When(c__gt=1, then=1))
             ))['test'],
             3
         )
@@ -382,13 +382,13 @@ class AggregationTests(TestCase):
     def test_sliced_conditional_aggregate(self):
         self.assertEqual(
             Author.objects.all()[:5].aggregate(test=Sum(Case(
-                When(age__lte=35, then=1), output_field=IntegerField()
+                When(age__lte=35, then=1)
             )))['test'],
             3
         )
 
     def test_annotated_conditional_aggregate(self):
-        annotated_qs = Book.objects.annotate(discount_price=F('price') * 0.75)
+        annotated_qs = Book.objects.annotate(discount_price=F('price') * Decimal('0.75'))
         self.assertAlmostEqual(
             annotated_qs.aggregate(test=Avg(Case(
                 When(pages__lt=400, then='discount_price'),
@@ -701,10 +701,10 @@ class AggregationTests(TestCase):
         qs = Book.objects.extra(select={'pub': 'publisher_id'}).values('pub').annotate(Count('id')).order_by('pub')
         self.assertSequenceEqual(
             qs, [
-                {'pub': self.b1.id, 'id__count': 2},
-                {'pub': self.b2.id, 'id__count': 1},
-                {'pub': self.b3.id, 'id__count': 2},
-                {'pub': self.b4.id, 'id__count': 1}
+                {'pub': self.p1.id, 'id__count': 2},
+                {'pub': self.p2.id, 'id__count': 1},
+                {'pub': self.p3.id, 'id__count': 2},
+                {'pub': self.p4.id, 'id__count': 1},
             ],
         )
 
@@ -876,7 +876,7 @@ class AggregationTests(TestCase):
         )
 
         # Note: intentionally no order_by(), that case needs tests, too.
-        publishers = Publisher.objects.filter(id__in=[1, 2])
+        publishers = Publisher.objects.filter(id__in=[self.p1.id, self.p2.id])
         self.assertEqual(
             sorted(p.name for p in publishers),
             [
@@ -974,7 +974,7 @@ class AggregationTests(TestCase):
     def test_empty_filter_aggregate(self):
         self.assertEqual(
             Author.objects.filter(id__in=[]).annotate(Count("friends")).aggregate(Count("pk")),
-            {"pk__count": None}
+            {"pk__count": 0}
         )
 
     def test_none_call_before_aggregate(self):
@@ -1450,8 +1450,10 @@ class AggregationTests(TestCase):
         query = Book.objects.annotate(Count('authors')).filter(
             q1 | q2).order_by('pk')
         self.assertQuerysetEqual(
-            query, [1, 4, 5, 6],
-            lambda b: b.pk)
+            query,
+            [self.b1.pk, self.b4.pk, self.b5.pk, self.b6.pk],
+            attrgetter('pk'),
+        )
 
     def test_ticket_11293_q_immutable(self):
         """

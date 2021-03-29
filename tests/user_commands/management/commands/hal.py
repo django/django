@@ -12,6 +12,7 @@ class Command(BaseCommand):
         app_labels = set(app_labels)
 
         if options['empty']:
+            self.stdout.write()
             self.stdout.write("Dave, I can't do that.")
             return
 

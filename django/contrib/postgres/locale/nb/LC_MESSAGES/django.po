@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-01-21 12:13+0000\n"
-"Last-Translator: Jon <jon@kolonial.no>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -35,21 +35,11 @@ msgstr "Oversikt over strenger til strenger/nulls"
 msgid "The value of “%(key)s” is not a string or null."
 msgstr "Verdien av \"%(key)s\" er ikke en streng eller null."
 
-msgid "A JSON object"
-msgstr "Et JSON-objekt"
-
-msgid "Value must be valid JSON."
-msgstr "Verdi må være gyldig JSON."
-
 msgid "Could not load JSON data."
 msgstr "Kunne ikke laste JSON-data."
 
 msgid "Input must be a JSON dictionary."
 msgstr "Input må være en JSON-dictionary."
-
-#, python-format
-msgid "“%(value)s” value must be valid JSON."
-msgstr "\"%(value)s\"-verdien må være gyldig JSON."
 
 msgid "Enter two valid values."
 msgstr "Oppgi to gyldige verdier."

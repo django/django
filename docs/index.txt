@@ -38,16 +38,11 @@ Having trouble? We'd like to help!
 * Looking for specific information? Try the :ref:`genindex`, :ref:`modindex` or
   the :doc:`detailed table of contents <contents>`.
 
-* Search for information in the archives of the |django-users| mailing list, or
-  `post a question`_.
-
-* Ask a question in the `#django IRC channel`_.
+* Not found anything? See :doc:`faq/help` for information on getting support
+  and asking questions to the community.
 
 * Report bugs with Django in our `ticket tracker`_.
 
-.. _archives: https://groups.google.com/group/django-users/
-.. _post a question: https://groups.google.com/d/forum/django-users
-.. _#django IRC channel: irc://irc.freenode.net/django
 .. _ticket tracker: https://code.djangoproject.com/
 
 How the documentation is organized
@@ -110,8 +105,7 @@ manipulating the data of your Web application. Learn more about it below:
   :doc:`Custom lookups <howto/custom-lookups>` |
   :doc:`Query Expressions <ref/models/expressions>` |
   :doc:`Conditional Expressions <ref/models/conditional-expressions>` |
-  :doc:`Database Functions <ref/models/database-functions>` |
-  :doc:`Asynchronous Support <topics/async>`
+  :doc:`Database Functions <ref/models/database-functions>`
 
 * **Other:**
   :doc:`Supported databases <ref/databases>` |
@@ -131,7 +125,8 @@ to know about views via the links below:
   :doc:`URLconfs <topics/http/urls>` |
   :doc:`View functions <topics/http/views>` |
   :doc:`Shortcuts <topics/http/shortcuts>` |
-  :doc:`Decorators <topics/http/decorators>`
+  :doc:`Decorators <topics/http/decorators>` |
+  :doc:`Asynchronous Support <topics/async>`
 
 * **Reference:**
   :doc:`Built-in Views <ref/views>` |
@@ -178,7 +173,8 @@ designers and how it can be extended by programmers:
 
 * **For programmers:**
   :doc:`Template API <ref/templates/api>` |
-  :doc:`Custom tags and filters <howto/custom-template-tags>`
+  :doc:`Custom tags and filters <howto/custom-template-tags>` |
+  :doc:`Custom template backend <howto/custom-template-backend>`
 
 Forms
 =====

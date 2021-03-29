@@ -20,7 +20,6 @@ class SHA224Tests(TestCase):
             Author(alias=None),
         ])
 
-    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support SHA224.")
     def test_basic(self):
         authors = Author.objects.annotate(
             sha224_alias=SHA224('alias'),
@@ -37,7 +36,6 @@ class SHA224Tests(TestCase):
             ],
         )
 
-    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support SHA224.")
     def test_transform(self):
         with register_lookup(CharField, SHA224):
             authors = Author.objects.filter(

@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Claude Paroz <claude@2xlibre.net>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # John Moylan <john@8t8.eu>, 2013
 # John Stafford <John.Stafford@rte.ie>, 2013
@@ -12,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-05 00:38+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-14 21:42+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Irish (http://www.transifex.com/django/django/language/ga/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -28,6 +29,9 @@ msgstr "Afracáinis"
 
 msgid "Arabic"
 msgstr "Araibis"
+
+msgid "Algerian Arabic"
+msgstr ""
 
 msgid "Asturian"
 msgstr "Astúiris"
@@ -152,6 +156,9 @@ msgstr "Interlingua"
 msgid "Indonesian"
 msgstr "Indinéisis"
 
+msgid "Igbo"
+msgstr ""
+
 msgid "Ido"
 msgstr "Ido"
 
@@ -181,6 +188,9 @@ msgstr "Cannadais"
 
 msgid "Korean"
 msgstr "Cóiréis"
+
+msgid "Kyrgyz"
+msgstr ""
 
 msgid "Luxembourgish"
 msgstr "Lucsamburgach"
@@ -266,8 +276,14 @@ msgstr "Tamailis"
 msgid "Telugu"
 msgstr "Teileagúis"
 
+msgid "Tajik"
+msgstr ""
+
 msgid "Thai"
 msgstr "Téalainnis"
+
+msgid "Turkmen"
+msgstr ""
 
 msgid "Turkish"
 msgstr "Tuircis"
@@ -565,6 +581,9 @@ msgstr ""
 msgid "Boolean (Either True, False or None)"
 msgstr "Boole (Fíor, Bréagach nó Dada)"
 
+msgid "Positive big integer"
+msgstr ""
+
 msgid "Positive integer"
 msgstr "Slánuimhir dearfach"
 
@@ -614,6 +633,12 @@ msgstr "Comhaid"
 
 msgid "Image"
 msgstr "Íomhá"
+
+msgid "A JSON object"
+msgstr ""
+
+msgid "Value must be valid JSON."
+msgstr ""
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -708,6 +733,9 @@ msgstr ""
 msgid "Enter a valid UUID."
 msgstr ""
 
+msgid "Enter a valid JSON."
+msgstr ""
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -798,17 +826,9 @@ msgstr "Tá"
 msgid "No"
 msgstr "Níl"
 
-msgid "Year"
-msgstr ""
-
-msgid "Month"
-msgstr ""
-
-msgid "Day"
-msgstr ""
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
-msgstr "tá, níl, b'fhéidir"
+msgstr "tá,níl,b'fhéidir"
 
 #, python-format
 msgid "%(size)d byte"
@@ -1135,9 +1155,6 @@ msgstr[1] "%d nóiméad"
 msgstr[2] "%d nóiméad"
 msgstr[3] "%d nóiméad"
 msgstr[4] "%d nóiméad"
-
-msgid "0 minutes"
-msgstr "0 nóiméad"
 
 msgid "Forbidden"
 msgstr "Toirmiscthe"

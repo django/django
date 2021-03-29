@@ -101,10 +101,10 @@ Arguments sent with this signal:
 
     .. note::
 
-        ``instance._state`` isn't set before sending the ``post_init`` signal,
-        so ``_state`` attributes always have their default values. For example,
-        ``_state.db`` is ``None`` and cannot be used to check an ``instance``
-        database.
+        :attr:`instance._state <django.db.models.Model._state>` isn't set
+        before sending the ``post_init`` signal, so ``_state`` attributes
+        always have their default values. For example, ``_state.db`` is
+        ``None``.
 
 .. warning::
 
@@ -424,6 +424,11 @@ Arguments sent with this signal:
     For example, the :mod:`django.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
 
+``stdout``
+    .. versionadded:: 4.0
+
+    A stream-like object where verbose output should be redirected.
+
 ``using``
     The alias of database on which a command will operate.
 
@@ -477,6 +482,11 @@ Arguments sent with this signal:
 
     For example, the :mod:`django.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
+
+``stdout``
+    .. versionadded:: 4.0
+
+    A stream-like object where verbose output should be redirected.
 
 ``using``
     The database alias used for synchronization. Defaults to the ``default``

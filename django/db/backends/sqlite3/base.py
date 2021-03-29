@@ -7,6 +7,7 @@ import functools
 import hashlib
 import math
 import operator
+import random
 import re
 import statistics
 import warnings
@@ -25,12 +26,12 @@ from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.duration import duration_microseconds
 from django.utils.regex_helper import _lazy_re_compile
 
-from .client import DatabaseClient                          # isort:skip
-from .creation import DatabaseCreation                      # isort:skip
-from .features import DatabaseFeatures                      # isort:skip
-from .introspection import DatabaseIntrospection            # isort:skip
-from .operations import DatabaseOperations                  # isort:skip
-from .schema import DatabaseSchemaEditor                    # isort:skip
+from .client import DatabaseClient
+from .creation import DatabaseCreation
+from .features import DatabaseFeatures
+from .introspection import DatabaseIntrospection
+from .operations import DatabaseOperations
+from .schema import DatabaseSchemaEditor
 
 
 def decoder(conv_func):
@@ -62,8 +63,10 @@ def list_aggregate(function):
 
 
 def check_sqlite_version():
-    if Database.sqlite_version_info < (3, 8, 3):
-        raise ImproperlyConfigured('SQLite 3.8.3 or later is required (found %s).' % Database.sqlite_version)
+    if Database.sqlite_version_info < (3, 9, 0):
+        raise ImproperlyConfigured(
+            'SQLite 3.9.0 or later is required (found %s).' % Database.sqlite_version
+        )
 
 
 check_sqlite_version()
@@ -72,7 +75,6 @@ Database.register_converter("bool", b'1'.__eq__)
 Database.register_converter("time", decoder(parse_time))
 Database.register_converter("datetime", decoder(parse_datetime))
 Database.register_converter("timestamp", decoder(parse_datetime))
-Database.register_converter("TIMESTAMP", decoder(parse_datetime))
 
 Database.register_adapter(decimal.Decimal, str)
 
@@ -100,7 +102,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'BigIntegerField': 'bigint',
         'IPAddressField': 'char(15)',
         'GenericIPAddressField': 'char(39)',
-        'NullBooleanField': 'bool',
+        'JSONField': 'text',
         'OneToOneField': 'integer',
         'PositiveBigIntegerField': 'bigint unsigned',
         'PositiveIntegerField': 'integer unsigned',
@@ -114,6 +116,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     }
     data_type_check_constraints = {
         'PositiveBigIntegerField': '"%(column)s" >= 0',
+        'JSONField': '(JSON_VALID("%(column)s") OR "%(column)s" IS NULL)',
         'PositiveIntegerField': '"%(column)s" >= 0',
         'PositiveSmallIntegerField': '"%(column)s" >= 0',
     }
@@ -176,9 +179,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 "settings.DATABASES is improperly configured. "
                 "Please supply the NAME value.")
         kwargs = {
-            # TODO: Remove str() when dropping support for PY36.
-            # https://bugs.python.org/issue33496
-            'database': str(settings_dict['NAME']),
+            'database': settings_dict['NAME'],
             'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,
             **settings_dict['OPTIONS'],
         }
@@ -202,48 +203,56 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @async_unsafe
     def get_new_connection(self, conn_params):
         conn = Database.connect(**conn_params)
-        conn.create_function("django_date_extract", 2, _sqlite_datetime_extract)
-        conn.create_function("django_date_trunc", 2, _sqlite_date_trunc)
-        conn.create_function('django_datetime_cast_date', 3, _sqlite_datetime_cast_date)
-        conn.create_function('django_datetime_cast_time', 3, _sqlite_datetime_cast_time)
-        conn.create_function('django_datetime_extract', 4, _sqlite_datetime_extract)
-        conn.create_function('django_datetime_trunc', 4, _sqlite_datetime_trunc)
-        conn.create_function("django_time_extract", 2, _sqlite_time_extract)
-        conn.create_function("django_time_trunc", 2, _sqlite_time_trunc)
-        conn.create_function("django_time_diff", 2, _sqlite_time_diff)
-        conn.create_function("django_timestamp_diff", 2, _sqlite_timestamp_diff)
-        conn.create_function("django_format_dtdelta", 3, _sqlite_format_dtdelta)
-        conn.create_function('regexp', 2, _sqlite_regexp)
-        conn.create_function('ACOS', 1, none_guard(math.acos))
-        conn.create_function('ASIN', 1, none_guard(math.asin))
-        conn.create_function('ATAN', 1, none_guard(math.atan))
-        conn.create_function('ATAN2', 2, none_guard(math.atan2))
-        conn.create_function('CEILING', 1, none_guard(math.ceil))
-        conn.create_function('COS', 1, none_guard(math.cos))
-        conn.create_function('COT', 1, none_guard(lambda x: 1 / math.tan(x)))
-        conn.create_function('DEGREES', 1, none_guard(math.degrees))
-        conn.create_function('EXP', 1, none_guard(math.exp))
-        conn.create_function('FLOOR', 1, none_guard(math.floor))
-        conn.create_function('LN', 1, none_guard(math.log))
-        conn.create_function('LOG', 2, none_guard(lambda x, y: math.log(y, x)))
-        conn.create_function('LPAD', 3, _sqlite_lpad)
-        conn.create_function('MD5', 1, none_guard(lambda x: hashlib.md5(x.encode()).hexdigest()))
-        conn.create_function('MOD', 2, none_guard(math.fmod))
-        conn.create_function('PI', 0, lambda: math.pi)
-        conn.create_function('POWER', 2, none_guard(operator.pow))
-        conn.create_function('RADIANS', 1, none_guard(math.radians))
-        conn.create_function('REPEAT', 2, none_guard(operator.mul))
-        conn.create_function('REVERSE', 1, none_guard(lambda x: x[::-1]))
-        conn.create_function('RPAD', 3, _sqlite_rpad)
-        conn.create_function('SHA1', 1, none_guard(lambda x: hashlib.sha1(x.encode()).hexdigest()))
-        conn.create_function('SHA224', 1, none_guard(lambda x: hashlib.sha224(x.encode()).hexdigest()))
-        conn.create_function('SHA256', 1, none_guard(lambda x: hashlib.sha256(x.encode()).hexdigest()))
-        conn.create_function('SHA384', 1, none_guard(lambda x: hashlib.sha384(x.encode()).hexdigest()))
-        conn.create_function('SHA512', 1, none_guard(lambda x: hashlib.sha512(x.encode()).hexdigest()))
-        conn.create_function('SIGN', 1, none_guard(lambda x: (x > 0) - (x < 0)))
-        conn.create_function('SIN', 1, none_guard(math.sin))
-        conn.create_function('SQRT', 1, none_guard(math.sqrt))
-        conn.create_function('TAN', 1, none_guard(math.tan))
+        create_deterministic_function = functools.partial(
+            conn.create_function,
+            deterministic=True,
+        )
+        create_deterministic_function('django_date_extract', 2, _sqlite_datetime_extract)
+        create_deterministic_function('django_date_trunc', 4, _sqlite_date_trunc)
+        create_deterministic_function('django_datetime_cast_date', 3, _sqlite_datetime_cast_date)
+        create_deterministic_function('django_datetime_cast_time', 3, _sqlite_datetime_cast_time)
+        create_deterministic_function('django_datetime_extract', 4, _sqlite_datetime_extract)
+        create_deterministic_function('django_datetime_trunc', 4, _sqlite_datetime_trunc)
+        create_deterministic_function('django_time_extract', 2, _sqlite_time_extract)
+        create_deterministic_function('django_time_trunc', 4, _sqlite_time_trunc)
+        create_deterministic_function('django_time_diff', 2, _sqlite_time_diff)
+        create_deterministic_function('django_timestamp_diff', 2, _sqlite_timestamp_diff)
+        create_deterministic_function('django_format_dtdelta', 3, _sqlite_format_dtdelta)
+        create_deterministic_function('regexp', 2, _sqlite_regexp)
+        create_deterministic_function('ACOS', 1, none_guard(math.acos))
+        create_deterministic_function('ASIN', 1, none_guard(math.asin))
+        create_deterministic_function('ATAN', 1, none_guard(math.atan))
+        create_deterministic_function('ATAN2', 2, none_guard(math.atan2))
+        create_deterministic_function('BITXOR', 2, none_guard(operator.xor))
+        create_deterministic_function('CEILING', 1, none_guard(math.ceil))
+        create_deterministic_function('COS', 1, none_guard(math.cos))
+        create_deterministic_function('COT', 1, none_guard(lambda x: 1 / math.tan(x)))
+        create_deterministic_function('DEGREES', 1, none_guard(math.degrees))
+        create_deterministic_function('EXP', 1, none_guard(math.exp))
+        create_deterministic_function('FLOOR', 1, none_guard(math.floor))
+        create_deterministic_function('LN', 1, none_guard(math.log))
+        create_deterministic_function('LOG', 2, none_guard(lambda x, y: math.log(y, x)))
+        create_deterministic_function('LPAD', 3, _sqlite_lpad)
+        create_deterministic_function('MD5', 1, none_guard(lambda x: hashlib.md5(x.encode()).hexdigest()))
+        create_deterministic_function('MOD', 2, none_guard(math.fmod))
+        create_deterministic_function('PI', 0, lambda: math.pi)
+        create_deterministic_function('POWER', 2, none_guard(operator.pow))
+        create_deterministic_function('RADIANS', 1, none_guard(math.radians))
+        create_deterministic_function('REPEAT', 2, none_guard(operator.mul))
+        create_deterministic_function('REVERSE', 1, none_guard(lambda x: x[::-1]))
+        create_deterministic_function('RPAD', 3, _sqlite_rpad)
+        create_deterministic_function('SHA1', 1, none_guard(lambda x: hashlib.sha1(x.encode()).hexdigest()))
+        create_deterministic_function('SHA224', 1, none_guard(lambda x: hashlib.sha224(x.encode()).hexdigest()))
+        create_deterministic_function('SHA256', 1, none_guard(lambda x: hashlib.sha256(x.encode()).hexdigest()))
+        create_deterministic_function('SHA384', 1, none_guard(lambda x: hashlib.sha384(x.encode()).hexdigest()))
+        create_deterministic_function('SHA512', 1, none_guard(lambda x: hashlib.sha512(x.encode()).hexdigest()))
+        create_deterministic_function('SIGN', 1, none_guard(lambda x: (x > 0) - (x < 0)))
+        create_deterministic_function('SIN', 1, none_guard(math.sin))
+        create_deterministic_function('SQRT', 1, none_guard(math.sqrt))
+        create_deterministic_function('TAN', 1, none_guard(math.tan))
+        # Don't use the built-in RANDOM() function because it returns a value
+        # in the range [-1 * 2^63, 2^63 - 1] instead of [0, 1).
+        conn.create_function('RAND', 0, random.random)
         conn.create_aggregate('STDDEV_POP', 1, list_aggregate(statistics.pstdev))
         conn.create_aggregate('STDDEV_SAMP', 1, list_aggregate(statistics.stdev))
         conn.create_aggregate('VAR_POP', 1, list_aggregate(statistics.pvariance))
@@ -313,19 +322,24 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     violations = cursor.execute('PRAGMA foreign_key_check').fetchall()
                 else:
                     violations = chain.from_iterable(
-                        cursor.execute('PRAGMA foreign_key_check(%s)' % table_name).fetchall()
+                        cursor.execute(
+                            'PRAGMA foreign_key_check(%s)'
+                            % self.ops.quote_name(table_name)
+                        ).fetchall()
                         for table_name in table_names
                     )
                 # See https://www.sqlite.org/pragma.html#pragma_foreign_key_check
                 for table_name, rowid, referenced_table_name, foreign_key_index in violations:
                     foreign_key = cursor.execute(
-                        'PRAGMA foreign_key_list(%s)' % table_name
+                        'PRAGMA foreign_key_list(%s)' % self.ops.quote_name(table_name)
                     ).fetchall()[foreign_key_index]
                     column_name, referenced_column_name = foreign_key[3:5]
                     primary_key_column_name = self.introspection.get_primary_key_column(cursor, table_name)
                     primary_key_value, bad_value = cursor.execute(
                         'SELECT %s, %s FROM %s WHERE rowid = %%s' % (
-                            primary_key_column_name, column_name, table_name
+                            self.ops.quote_name(primary_key_column_name),
+                            self.ops.quote_name(column_name),
+                            self.ops.quote_name(table_name),
                         ),
                         (rowid,),
                     ).fetchone()
@@ -431,8 +445,8 @@ def _sqlite_datetime_parse(dt, tzname=None, conn_tzname=None):
     return dt
 
 
-def _sqlite_date_trunc(lookup_type, dt):
-    dt = _sqlite_datetime_parse(dt)
+def _sqlite_date_trunc(lookup_type, dt, tzname, conn_tzname):
+    dt = _sqlite_datetime_parse(dt, tzname, conn_tzname)
     if dt is None:
         return None
     if lookup_type == 'year':
@@ -449,13 +463,17 @@ def _sqlite_date_trunc(lookup_type, dt):
         return "%i-%02i-%02i" % (dt.year, dt.month, dt.day)
 
 
-def _sqlite_time_trunc(lookup_type, dt):
+def _sqlite_time_trunc(lookup_type, dt, tzname, conn_tzname):
     if dt is None:
         return None
-    try:
-        dt = backend_utils.typecast_time(dt)
-    except (ValueError, TypeError):
-        return None
+    dt_parsed = _sqlite_datetime_parse(dt, tzname, conn_tzname)
+    if dt_parsed is None:
+        try:
+            dt = backend_utils.typecast_time(dt)
+        except (ValueError, TypeError):
+            return None
+    else:
+        dt = dt_parsed
     if lookup_type == 'hour':
         return "%02i:00:00" % dt.hour
     elif lookup_type == 'minute':

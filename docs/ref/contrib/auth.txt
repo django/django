@@ -12,10 +12,13 @@ topic guide </topics/auth/index>`.
 ``User`` model
 ==============
 
+.. class:: models.User
+
 Fields
 ------
 
 .. class:: models.User
+    :noindex:
 
     :class:`~django.contrib.auth.models.User` objects have the following
     fields:
@@ -32,17 +35,9 @@ Fields
         ``max_length=191`` because MySQL can only create unique indexes with
         191 characters in that case by default.
 
-        .. admonition:: Usernames and Unicode
-
-            Django originally accepted only ASCII letters and numbers in
-            usernames. Although it wasn't a deliberate choice, Unicode
-            characters have always been accepted when using Python 3. Django
-            1.10 officially added Unicode support in usernames, keeping the
-            ASCII-only behavior on Python 2.
-
     .. attribute:: first_name
 
-        Optional (:attr:`blank=True <django.db.models.Field.blank>`). 30
+        Optional (:attr:`blank=True <django.db.models.Field.blank>`). 150
         characters or fewer.
 
     .. attribute:: last_name
@@ -115,6 +110,7 @@ Attributes
 ----------
 
 .. class:: models.User
+    :noindex:
 
     .. attribute:: is_authenticated
 
@@ -140,6 +136,7 @@ Methods
 -------
 
 .. class:: models.User
+    :noindex:
 
     .. method:: get_username()
 
@@ -192,8 +189,6 @@ Methods
         been called for this user.
 
     .. method:: get_user_permissions(obj=None)
-
-        .. versionadded:: 3.0
 
         Returns a set of permission strings that the user has directly.
 
@@ -287,13 +282,7 @@ Manager methods
         Same as :meth:`create_user`, but sets :attr:`~models.User.is_staff` and
         :attr:`~models.User.is_superuser` to ``True``.
 
-        .. versionchanged:: 3.0
-
-            The ``email`` and ``password`` parameters were made optional.
-
     .. method:: with_perm(perm, is_active=True, include_superusers=True, backend=None, obj=None)
-
-        .. versionadded:: 3.0
 
         Returns users that have the given permission ``perm`` either in the
         ``"<app label>.<permission codename>"`` format or as a
@@ -359,6 +348,7 @@ Fields
 fields:
 
 .. class:: models.Permission
+    :noindex:
 
     .. attribute:: name
 
@@ -390,6 +380,7 @@ Fields
 :class:`~django.contrib.auth.models.Group` objects have the following fields:
 
 .. class:: models.Group
+    :noindex:
 
     .. attribute:: name
 
@@ -496,8 +487,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
 .. class:: BaseBackend
 
-    .. versionadded:: 3.0
-
     A base class that provides default implementations for all required
     methods. By default, it will reject any user and provide no permissions.
 
@@ -599,8 +588,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         field are allowed.
 
     .. method:: with_perm(perm, is_active=True, include_superusers=True, obj=None)
-
-        .. versionadded:: 3.0
 
         Returns all active users who have the permission ``perm`` either in
         the form of ``"<app label>.<permission codename>"`` or a

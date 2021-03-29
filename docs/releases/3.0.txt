@@ -19,8 +19,8 @@ project.
 Python compatibility
 ====================
 
-Django 3.0 supports Python 3.6, 3.7, and 3.8. We **highly recommend** and only
-officially support the latest release of each series.
+Django 3.0 supports Python 3.6, 3.7, 3.8, and 3.9 (as of 3.0.11). We **highly
+recommend** and only officially support the latest release of each series.
 
 The Django 2.2.x series is the last to support Python 3.5.
 
@@ -513,7 +513,7 @@ In older versions, the :setting:`FILE_UPLOAD_PERMISSIONS` setting defaults to
 uploaded files having different permissions depending on their size and which
 upload handler is used.
 
-``FILE_UPLOAD_PERMISSION`` now defaults to ``0o644`` to avoid this
+``FILE_UPLOAD_PERMISSIONS`` now defaults to ``0o644`` to avoid this
 inconsistency.
 
 New default values for security settings
@@ -570,8 +570,6 @@ Miscellaneous
 
 * ``alias=None`` is added to the signature of
   :meth:`.Expression.get_group_by_cols`.
-
-* Support for ``sqlparse`` < 0.2.2 is removed.
 
 * ``RegexPattern``, used by :func:`~django.urls.re_path`, no longer returns
   keyword arguments with ``None`` values to be passed to the view for the

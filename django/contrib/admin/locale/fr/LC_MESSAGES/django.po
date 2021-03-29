@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Claude Paroz <claude@2xlibre.net>, 2013-2019
+# Claude Paroz <claude@2xlibre.net>, 2013-2020
 # Claude Paroz <claude@2xlibre.net>, 2011,2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-18 16:24+0000\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-07-15 08:40+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -68,6 +68,12 @@ msgstr "Aucune date"
 
 msgid "Has date"
 msgstr "Possède une date"
+
+msgid "Empty"
+msgstr "Vide"
+
+msgid "Not empty"
+msgstr "Non vide"
 
 #, python-format
 msgid ""
@@ -340,6 +346,19 @@ msgstr "Sélectionner tous les %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Effacer la sélection"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modèles de l’application %(name)s"
+
+msgid "Add"
+msgstr "Ajouter"
+
+msgid "View"
+msgstr "Afficher"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Vous n’avez pas la permission de voir ou de modifier quoi que ce soit."
+
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
@@ -389,6 +408,9 @@ msgstr "Voir sur le site"
 
 msgid "Filter"
 msgstr "Filtre"
+
+msgid "Clear all filters"
+msgstr "Effacer tous les filtres"
 
 msgid "Remove from sorting"
 msgstr "Enlever du tri"
@@ -468,9 +490,6 @@ msgstr ""
 "Voulez-vous vraiment supprimer les objets %(objects_name)s sélectionnés ? "
 "Tous les objets suivants et les éléments liés seront supprimés :"
 
-msgid "View"
-msgstr "Afficher"
-
 msgid "Delete?"
 msgstr "Supprimer ?"
 
@@ -480,16 +499,6 @@ msgstr " Par %(filter_title)s "
 
 msgid "Summary"
 msgstr "Résumé"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modèles de l’application %(name)s"
-
-msgid "Add"
-msgstr "Ajouter"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr "Vous n’avez pas la permission de voir ou de modifier quoi que ce soit."
 
 msgid "Recent actions"
 msgstr "Actions récentes"
@@ -523,6 +532,9 @@ msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "Mot de passe ou nom d’utilisateur oublié ?"
+
+msgid "Toggle navigation"
+msgstr "Basculer la navigation"
 
 msgid "Date/time"
 msgstr "Date/heure"

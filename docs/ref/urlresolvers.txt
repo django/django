@@ -137,6 +137,13 @@ If the URL does not resolve, the function raises a
         For example, if ``path('users/<id>/', ...)`` is the matching pattern,
         ``route`` will contain ``'users/<id>/'``.
 
+    .. attribute:: ResolverMatch.tried
+
+        .. versionadded:: 3.2
+
+        The list of URL patterns tried before the URL either matched one or
+        exhausted available patterns.
+
     .. attribute:: ResolverMatch.app_name
 
         The application namespace for the URL pattern that matches the

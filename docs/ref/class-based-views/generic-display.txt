@@ -19,7 +19,7 @@ many projects they are typically the most commonly used views.
 
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
-    * ``django.views.generic.detail.BaseDetailView``
+    * :class:`django.views.generic.detail.BaseDetailView`
     * :class:`django.views.generic.detail.SingleObjectMixin`
     * :class:`django.views.generic.base.View`
 
@@ -34,7 +34,7 @@ many projects they are typically the most commonly used views.
     #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
     #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_object_name()`
     #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data()`
-    #. ``get()``
+    #. :meth:`~django.views.generic.detail.BaseDetailView.get`
     #. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
 
     **Example myapp/views.py**::
@@ -73,6 +73,26 @@ many projects they are typically the most commonly used views.
         <p>Published: {{ object.pub_date|date }}</p>
         <p>Date: {{ now|date }}</p>
 
+.. class:: django.views.generic.detail.BaseDetailView
+
+    A base view for displaying a single object. It is not intended to be used
+    directly, but rather as a parent class of the
+    :class:`django.views.generic.detail.DetailView` or other views representing
+    details of a single object.
+
+    **Ancestors (MRO)**
+
+    This view inherits methods and attributes from the following views:
+
+    * :class:`django.views.generic.detail.SingleObjectMixin`
+    * :class:`django.views.generic.base.View`
+
+    **Methods**
+
+    .. method:: get(request, *args, **kwargs)
+
+        Adds ``object`` to the context.
+
 ``ListView``
 ============
 
@@ -103,7 +123,7 @@ many projects they are typically the most commonly used views.
     #. :meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset()`
     #. :meth:`~django.views.generic.list.MultipleObjectMixin.get_context_object_name()`
     #. :meth:`~django.views.generic.list.MultipleObjectMixin.get_context_data()`
-    #. ``get()``
+    #. :meth:`~django.views.generic.list.BaseListView.get`
     #. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
 
     **Example views.py**::

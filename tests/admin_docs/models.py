@@ -3,6 +3,7 @@ Models for testing various aspects of the djang.contrib.admindocs app
 """
 
 from django.db import models
+from django.utils.functional import cached_property
 
 
 class Company(models.Model):
@@ -55,6 +56,10 @@ class Person(models.Model):
     @property
     def a_property(self):
         return 'a_property'
+
+    @cached_property
+    def a_cached_property(self):
+        return 'a_cached_property'
 
     def suffix_company_name(self, suffix='ltd'):
         return self.company.name + suffix

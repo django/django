@@ -25,9 +25,7 @@ Basic configuration
 ===================
 
 Once you've got mod_wsgi installed and activated, edit your Apache server's
-`httpd.conf`_ file and add the following. If you are using a version of Apache
-older than 2.4, replace ``Require all granted`` with ``Allow from all`` and
-also add the line ``Order deny,allow`` above it.
+`httpd.conf`_ file and add the following.
 
 .. _httpd.conf: https://wiki.apache.org/httpd/DistrosDefaultLayout
 
@@ -50,9 +48,9 @@ your project package (``mysite`` in this example). This tells Apache to serve
 any request below the given URL using the WSGI application defined in that
 file.
 
-If you install your project's Python dependencies inside a `virtualenv`_, add
-the path to the virtualenv using ``WSGIPythonHome``. See the `mod_wsgi
-virtualenv guide`_ for more details.
+If you install your project's Python dependencies inside a :mod:`virtual
+environment <venv>`, add the path using ``WSGIPythonHome``. See the `mod_wsgi
+virtual environment guide`_ for more details.
 
 The ``WSGIPythonPath`` line ensures that your project package is available for
 import on the Python path; in other words, that ``import mysite`` works.
@@ -66,8 +64,7 @@ for you; otherwise, you'll need to create it. See the :doc:`WSGI overview
 documentation</howto/deployment/wsgi/index>` for the default contents you
 should put in this file, and what else you can add to it.
 
-.. _virtualenv: https://virtualenv.pypa.io/
-.. _mod_wsgi virtualenv guide: https://modwsgi.readthedocs.io/en/develop/user-guides/virtual-environments.html
+.. _mod_wsgi virtual environment guide: https://modwsgi.readthedocs.io/en/develop/user-guides/virtual-environments.html
 
 .. warning::
 
@@ -174,10 +171,6 @@ a static file. All other URLs will be served using mod_wsgi:
     Require all granted
     </Files>
     </Directory>
-
-If you are using a version of Apache older than 2.4, replace
-``Require all granted`` with ``Allow from all`` and also add the line
-``Order deny,allow`` above it.
 
 .. _Nginx: https://nginx.org/en/
 .. _Apache: https://httpd.apache.org/

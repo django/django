@@ -38,7 +38,7 @@ Measurement                Relationships             Operations              Edi
 .. class:: Area(expression, **extra)
 
 *Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_area>`__,
+<https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_st-area>`_,
 Oracle, `PostGIS <https://postgis.net/docs/ST_Area.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns the area of the
@@ -82,10 +82,6 @@ Keyword Argument       Description
                        representation -- the default value is 8. Ignored on
                        Oracle.
 =====================  =====================================================
-
-.. versionchanged:: 3.1
-
-    Oracle support was added.
 
 ``AsGML``
 =========
@@ -173,8 +169,6 @@ __ https://www.w3.org/Graphics/SVG/
 
 .. class:: AsWKB(expression, **extra)
 
-.. versionadded:: 3.1
-
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-format-conversion-functions.html#function_st-asbinary>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_AsBinary.html>`__, SpatiaLite
@@ -193,8 +187,6 @@ __ https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry#Well
 =========
 
 .. class:: AsWKT(expression, **extra)
-
-.. versionadded:: 3.1
 
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-format-conversion-functions.html#function_st-astext>`__,
@@ -356,8 +348,6 @@ __ https://en.wikipedia.org/wiki/Geohash
 ====================
 
 .. class:: GeometryDistance(expr1, expr2, **extra)
-
-.. versionadded:: 3.0
 
 *Availability*: `PostGIS <https://postgis.net/docs/geometry_distance_knn.html>`__
 

@@ -27,7 +27,6 @@ class CacheTest(SimpleTestCase):
 @skipIf(sys.platform == 'win32' and (3, 8, 0) < sys.version_info < (3, 8, 1), 'https://bugs.python.org/issue38563')
 class DatabaseConnectionTest(SimpleTestCase):
     """A database connection cannot be used in an async context."""
-    @async_to_sync
     async def test_get_async_connection(self):
         with self.assertRaises(SynchronousOnlyOperation):
             list(SimpleModel.objects.all())
@@ -43,7 +42,6 @@ class AsyncUnsafeTest(SimpleTestCase):
     def dangerous_method(self):
         return True
 
-    @async_to_sync
     async def test_async_unsafe(self):
         # async_unsafe decorator catches bad access and returns the right
         # message.
@@ -55,7 +53,7 @@ class AsyncUnsafeTest(SimpleTestCase):
             self.dangerous_method()
 
     @mock.patch.dict(os.environ, {'DJANGO_ALLOW_ASYNC_UNSAFE': 'true'})
-    @async_to_sync
+    @async_to_sync  # mock.patch() is not async-aware.
     async def test_async_unsafe_suppressed(self):
         # Decorator doesn't trigger check when the environment variable to
         # suppress it is set.

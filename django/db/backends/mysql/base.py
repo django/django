@@ -19,21 +19,21 @@ except ImportError as err:
         'Did you install mysqlclient?'
     ) from err
 
-from MySQLdb.constants import CLIENT, FIELD_TYPE                # isort:skip
-from MySQLdb.converters import conversions                      # isort:skip
+from MySQLdb.constants import CLIENT, FIELD_TYPE
+from MySQLdb.converters import conversions
 
 # Some of these import MySQLdb, so import them after checking if it's installed.
-from .client import DatabaseClient                          # isort:skip
-from .creation import DatabaseCreation                      # isort:skip
-from .features import DatabaseFeatures                      # isort:skip
-from .introspection import DatabaseIntrospection            # isort:skip
-from .operations import DatabaseOperations                  # isort:skip
-from .schema import DatabaseSchemaEditor                    # isort:skip
-from .validation import DatabaseValidation                  # isort:skip
+from .client import DatabaseClient
+from .creation import DatabaseCreation
+from .features import DatabaseFeatures
+from .introspection import DatabaseIntrospection
+from .operations import DatabaseOperations
+from .schema import DatabaseSchemaEditor
+from .validation import DatabaseValidation
 
 version = Database.version_info
-if version < (1, 3, 13):
-    raise ImproperlyConfigured('mysqlclient 1.3.13 or newer is required; you have %s.' % Database.__version__)
+if version < (1, 4, 0):
+    raise ImproperlyConfigured('mysqlclient 1.4.0 or newer is required; you have %s.' % Database.__version__)
 
 
 # MySQLdb returns TIME columns as timedelta -- they are more like timedelta in
@@ -118,7 +118,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'BigIntegerField': 'bigint',
         'IPAddressField': 'char(15)',
         'GenericIPAddressField': 'char(39)',
-        'NullBooleanField': 'bool',
+        'JSONField': 'json',
         'OneToOneField': 'integer',
         'PositiveBigIntegerField': 'bigint UNSIGNED',
         'PositiveIntegerField': 'integer UNSIGNED',
@@ -341,18 +341,45 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @cached_property
     def data_type_check_constraints(self):
         if self.features.supports_column_check_constraints:
-            return {
+            check_constraints = {
                 'PositiveBigIntegerField': '`%(column)s` >= 0',
                 'PositiveIntegerField': '`%(column)s` >= 0',
                 'PositiveSmallIntegerField': '`%(column)s` >= 0',
             }
+            if self.mysql_is_mariadb and self.mysql_version < (10, 4, 3):
+                # MariaDB < 10.4.3 doesn't automatically use the JSON_VALID as
+                # a check constraint.
+                check_constraints['JSONField'] = 'JSON_VALID(`%(column)s`)'
+            return check_constraints
         return {}
 
     @cached_property
-    def mysql_server_info(self):
+    def mysql_server_data(self):
         with self.temporary_connection() as cursor:
-            cursor.execute('SELECT VERSION()')
-            return cursor.fetchone()[0]
+            # Select some server variables and test if the time zone
+            # definitions are installed. CONVERT_TZ returns NULL if 'UTC'
+            # timezone isn't loaded into the mysql.time_zone table.
+            cursor.execute("""
+                SELECT VERSION(),
+                       @@sql_mode,
+                       @@default_storage_engine,
+                       @@sql_auto_is_null,
+                       @@lower_case_table_names,
+                       CONVERT_TZ('2001-01-01 01:00:00', 'UTC', 'UTC') IS NOT NULL
+            """)
+            row = cursor.fetchone()
+        return {
+            'version': row[0],
+            'sql_mode': row[1],
+            'default_storage_engine': row[2],
+            'sql_auto_is_null': bool(row[3]),
+            'lower_case_table_names': bool(row[4]),
+            'has_zoneinfo_database': bool(row[5]),
+        }
+
+    @cached_property
+    def mysql_server_info(self):
+        return self.mysql_server_data['version']
 
     @cached_property
     def mysql_version(self):
@@ -364,3 +391,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @cached_property
     def mysql_is_mariadb(self):
         return 'mariadb' in self.mysql_server_info.lower()
+
+    @cached_property
+    def sql_mode(self):
+        sql_mode = self.mysql_server_data['sql_mode']
+        return set(sql_mode.split(',') if sql_mode else ())

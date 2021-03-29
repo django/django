@@ -165,3 +165,32 @@ class DateFormatTests(SimpleTestCase):
                 dateformat.format(dt, 'r'),
                 'Sun, 08 Jul 1979 22:00:00 +0100',
             )
+
+    def test_year_before_1000(self):
+        tests = [
+            (476, '76'),
+            (42, '42'),
+            (4, '04'),
+        ]
+        for year, expected_date in tests:
+            with self.subTest(year=year):
+                self.assertEqual(
+                    dateformat.format(datetime(year, 9, 8, 5, 0), 'y'),
+                    expected_date,
+                )
+
+    def test_twelve_hour_format(self):
+        tests = [
+            (0, '12'),
+            (1, '1'),
+            (11, '11'),
+            (12, '12'),
+            (13, '1'),
+            (23, '11'),
+        ]
+        for hour, expected in tests:
+            with self.subTest(hour=hour):
+                self.assertEqual(
+                    dateformat.format(datetime(2000, 1, 1, hour), 'g'),
+                    expected,
+                )

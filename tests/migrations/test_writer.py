@@ -4,7 +4,9 @@ import enum
 import functools
 import math
 import os
+import pathlib
 import re
+import sys
 import uuid
 from unittest import mock
 
@@ -428,6 +430,45 @@ class WriterTests(SimpleTestCase):
             "(uuid.UUID('c7853ec1-2ea3-4359-b02d-b54e8f1bcee2'), 'UUID B')], "
             "default=uuid.UUID('5c859437-d061-4847-b3f7-e6b78852f8c8'))"
         )
+
+    def test_serialize_pathlib(self):
+        # Pure path objects work in all platforms.
+        self.assertSerializedEqual(pathlib.PurePosixPath())
+        self.assertSerializedEqual(pathlib.PureWindowsPath())
+        path = pathlib.PurePosixPath('/path/file.txt')
+        expected = ("pathlib.PurePosixPath('/path/file.txt')", {'import pathlib'})
+        self.assertSerializedResultEqual(path, expected)
+        path = pathlib.PureWindowsPath('A:\\File.txt')
+        expected = ("pathlib.PureWindowsPath('A:/File.txt')", {'import pathlib'})
+        self.assertSerializedResultEqual(path, expected)
+        # Concrete path objects work on supported platforms.
+        if sys.platform == 'win32':
+            self.assertSerializedEqual(pathlib.WindowsPath.cwd())
+            path = pathlib.WindowsPath('A:\\File.txt')
+            expected = ("pathlib.PureWindowsPath('A:/File.txt')", {'import pathlib'})
+            self.assertSerializedResultEqual(path, expected)
+        else:
+            self.assertSerializedEqual(pathlib.PosixPath.cwd())
+            path = pathlib.PosixPath('/path/file.txt')
+            expected = ("pathlib.PurePosixPath('/path/file.txt')", {'import pathlib'})
+            self.assertSerializedResultEqual(path, expected)
+
+        field = models.FilePathField(path=pathlib.PurePosixPath('/home/user'))
+        string, imports = MigrationWriter.serialize(field)
+        self.assertEqual(
+            string,
+            "models.FilePathField(path=pathlib.PurePosixPath('/home/user'))",
+        )
+        self.assertIn('import pathlib', imports)
+
+    def test_serialize_path_like(self):
+        path_like = list(os.scandir(os.path.dirname(__file__)))[0]
+        expected = (repr(path_like.path), {})
+        self.assertSerializedResultEqual(path_like, expected)
+
+        field = models.FilePathField(path=path_like)
+        string = MigrationWriter.serialize(field)[0]
+        self.assertEqual(string, 'models.FilePathField(path=%r)' % path_like.path)
 
     def test_serialize_functions(self):
         with self.assertRaisesMessage(ValueError, 'Cannot serialize function: lambda'):

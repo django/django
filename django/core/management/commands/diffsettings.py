@@ -10,7 +10,7 @@ class Command(BaseCommand):
     help = """Displays differences between the current settings.py and Django's
     default settings."""
 
-    requires_system_checks = False
+    requires_system_checks = []
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -39,7 +39,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, **options):
-        from django.conf import settings, Settings, global_settings
+        from django.conf import Settings, global_settings, settings
 
         # Because settings are imported lazily, we need to explicitly load them.
         if not settings.configured:

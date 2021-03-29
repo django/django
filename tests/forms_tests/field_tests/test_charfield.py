@@ -1,6 +1,6 @@
+from django.core.exceptions import ValidationError
 from django.forms import (
     CharField, HiddenInput, PasswordInput, Textarea, TextInput,
-    ValidationError,
 )
 from django.test import SimpleTestCase
 

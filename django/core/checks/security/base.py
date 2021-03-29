@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 from .. import Error, Tags, Warning, register
 
@@ -8,6 +9,7 @@ REFERRER_POLICY_VALUES = {
     'strict-origin-when-cross-origin', 'unsafe-url',
 }
 
+SECRET_KEY_INSECURE_PREFIX = 'django-insecure-'
 SECRET_KEY_MIN_LENGTH = 50
 SECRET_KEY_MIN_UNIQUE_CHARACTERS = 5
 
@@ -67,12 +69,14 @@ W008 = Warning(
 )
 
 W009 = Warning(
-    "Your SECRET_KEY has less than %(min_length)s characters or less than "
-    "%(min_unique_chars)s unique characters. Please generate a long and random "
-    "SECRET_KEY, otherwise many of Django's security-critical features will be "
-    "vulnerable to attack." % {
+    "Your SECRET_KEY has less than %(min_length)s characters, less than "
+    "%(min_unique_chars)s unique characters, or it's prefixed with "
+    "'%(insecure_prefix)s' indicating that it was generated automatically by "
+    "Django. Please generate a long and random SECRET_KEY, otherwise many of "
+    "Django's security-critical features will be vulnerable to attack." % {
         'min_length': SECRET_KEY_MIN_LENGTH,
         'min_unique_chars': SECRET_KEY_MIN_UNIQUE_CHARACTERS,
+        'insecure_prefix': SECRET_KEY_INSECURE_PREFIX,
     },
     id='security.W009',
 )
@@ -182,11 +186,16 @@ def check_ssl_redirect(app_configs, **kwargs):
 
 @register(Tags.security, deploy=True)
 def check_secret_key(app_configs, **kwargs):
-    passed_check = (
-        getattr(settings, 'SECRET_KEY', None) and
-        len(set(settings.SECRET_KEY)) >= SECRET_KEY_MIN_UNIQUE_CHARACTERS and
-        len(settings.SECRET_KEY) >= SECRET_KEY_MIN_LENGTH
-    )
+    try:
+        secret_key = settings.SECRET_KEY
+    except (ImproperlyConfigured, AttributeError):
+        passed_check = False
+    else:
+        passed_check = (
+            len(set(secret_key)) >= SECRET_KEY_MIN_UNIQUE_CHARACTERS and
+            len(secret_key) >= SECRET_KEY_MIN_LENGTH and
+            not secret_key.startswith(SECRET_KEY_INSECURE_PREFIX)
+        )
     return [] if passed_check else [W009]
 
 

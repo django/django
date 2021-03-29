@@ -13,10 +13,14 @@ from urllib.request import urlopen
 from django.core.cache import cache
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files.base import ContentFile, File
-from django.core.files.storage import FileSystemStorage, get_storage_class
+from django.core.files.storage import (
+    FileSystemStorage, Storage as BaseStorage, default_storage,
+    get_storage_class,
+)
 from django.core.files.uploadedfile import (
     InMemoryUploadedFile, SimpleUploadedFile, TemporaryUploadedFile,
 )
+from django.db.models import FileField
 from django.db.models.fields.files import FileDescriptor
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
@@ -25,7 +29,9 @@ from django.test.utils import requires_tz_support
 from django.urls import NoReverseMatch, reverse_lazy
 from django.utils import timezone
 
-from .models import Storage, temp_storage, temp_storage_location
+from .models import (
+    Storage, callable_storage, temp_storage, temp_storage_location,
+)
 
 FILE_SUFFIX_REGEX = '[A-Za-z0-9]{7}'
 
@@ -495,7 +501,10 @@ class FileStorageTests(SimpleTestCase):
         Calling delete with an empty name should not try to remove the base
         storage directory, but fail loudly (#20660).
         """
-        with self.assertRaises(AssertionError):
+        msg = 'The name must be given to delete().'
+        with self.assertRaisesMessage(ValueError, msg):
+            self.storage.delete(None)
+        with self.assertRaisesMessage(ValueError, msg):
             self.storage.delete('')
 
     def test_delete_deletes_directories(self):
@@ -866,6 +875,58 @@ class FileFieldStorageTests(TestCase):
             self.assertEqual(f.read(), b'content')
 
 
+class FieldCallableFileStorageTests(SimpleTestCase):
+    def setUp(self):
+        self.temp_storage_location = tempfile.mkdtemp(suffix='filefield_callable_storage')
+
+    def tearDown(self):
+        shutil.rmtree(self.temp_storage_location)
+
+    def test_callable_base_class_error_raises(self):
+        class NotStorage:
+            pass
+        msg = 'FileField.storage must be a subclass/instance of django.core.files.storage.Storage'
+        for invalid_type in (NotStorage, str, list, set, tuple):
+            with self.subTest(invalid_type=invalid_type):
+                with self.assertRaisesMessage(TypeError, msg):
+                    FileField(storage=invalid_type)
+
+    def test_file_field_storage_none_uses_default_storage(self):
+        self.assertEqual(FileField().storage, default_storage)
+
+    def test_callable_function_storage_file_field(self):
+        storage = FileSystemStorage(location=self.temp_storage_location)
+
+        def get_storage():
+            return storage
+
+        obj = FileField(storage=get_storage)
+        self.assertEqual(obj.storage, storage)
+        self.assertEqual(obj.storage.location, storage.location)
+
+    def test_callable_class_storage_file_field(self):
+        class GetStorage(FileSystemStorage):
+            pass
+
+        obj = FileField(storage=GetStorage)
+        self.assertIsInstance(obj.storage, BaseStorage)
+
+    def test_callable_storage_file_field_in_model(self):
+        obj = Storage()
+        self.assertEqual(obj.storage_callable.storage, temp_storage)
+        self.assertEqual(obj.storage_callable.storage.location, temp_storage_location)
+        self.assertIsInstance(obj.storage_callable_class.storage, BaseStorage)
+
+    def test_deconstruction(self):
+        """
+        Deconstructing gives the original callable, not the evaluated value.
+        """
+        obj = Storage()
+        *_, kwargs = obj._meta.get_field('storage_callable').deconstruct()
+        storage = kwargs['storage']
+        self.assertIs(storage, callable_storage)
+
+
 # Tests for a race condition on file saving (#4948).
 # This is written in such a way that it'll always pass on platforms
 # without threading.
@@ -925,16 +986,19 @@ class FileStoragePermissions(unittest.TestCase):
     @override_settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o765)
     def test_file_upload_directory_permissions(self):
         self.storage = FileSystemStorage(self.storage_dir)
-        name = self.storage.save("the_directory/the_file", ContentFile("data"))
-        dir_mode = os.stat(os.path.dirname(self.storage.path(name)))[0] & 0o777
-        self.assertEqual(dir_mode, 0o765)
+        name = self.storage.save('the_directory/subdir/the_file', ContentFile('data'))
+        file_path = Path(self.storage.path(name))
+        self.assertEqual(file_path.parent.stat().st_mode & 0o777, 0o765)
+        self.assertEqual(file_path.parent.parent.stat().st_mode & 0o777, 0o765)
 
     @override_settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=None)
     def test_file_upload_directory_default_permissions(self):
         self.storage = FileSystemStorage(self.storage_dir)
-        name = self.storage.save("the_directory/the_file", ContentFile("data"))
-        dir_mode = os.stat(os.path.dirname(self.storage.path(name)))[0] & 0o777
-        self.assertEqual(dir_mode, 0o777 & ~self.umask)
+        name = self.storage.save('the_directory/subdir/the_file', ContentFile('data'))
+        file_path = Path(self.storage.path(name))
+        expected_mode = 0o777 & ~self.umask
+        self.assertEqual(file_path.parent.stat().st_mode & 0o777, expected_mode)
+        self.assertEqual(file_path.parent.parent.stat().st_mode & 0o777, expected_mode)
 
 
 class FileStoragePathParsing(SimpleTestCase):

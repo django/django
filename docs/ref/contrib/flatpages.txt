@@ -79,7 +79,7 @@ to place the pattern at the end of the other urlpatterns::
 
     # Your other patterns here
     urlpatterns += [
-        path('<path:url>', views.flatpage),
+        re_path(r'^(?P<url>.*/)$', views.flatpage),
     ]
 
 .. warning::

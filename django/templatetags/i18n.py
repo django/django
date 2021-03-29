@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.conf import settings
 from django.template import Library, Node, TemplateSyntaxError, Variable
 from django.template.base import TokenType, render_value_in_context
@@ -135,6 +137,11 @@ class BlockTranslateNode(Node):
         singular, vars = self.render_token_list(self.singular)
         if self.plural and self.countervar and self.counter:
             count = self.counter.resolve(context)
+            if not isinstance(count, (Decimal, float, int)):
+                raise TemplateSyntaxError(
+                    "%r argument to %r tag must be a number."
+                    % (self.countervar, self.tag_name)
+                )
             context[self.countervar] = count
             plural, plural_vars = self.render_token_list(self.plural)
             if message_context:

@@ -14,5 +14,5 @@ Bugfixes
 
 * Fixed a regression in Django 2.2.4 that caused a crash when filtering with a
   ``Subquery()`` annotation of a queryset containing
-  :class:`~django.contrib.postgres.fields.JSONField` or
+  ``django.contrib.postgres.fields.JSONField`` or
   :class:`~django.contrib.postgres.fields.HStoreField` (:ticket:`30769`).

@@ -8,9 +8,6 @@ from django.db import models
 class Author(models.Model):
     name = models.CharField(max_length=100)
 
-    def __str__(self):
-        return self.name
-
     def get_absolute_url(self):
         return '/authors/%s/' % self.id
 
@@ -26,9 +23,6 @@ class BaseArticle(models.Model):
 
     class Meta:
         abstract = True
-
-    def __str__(self):
-        return self.title
 
 
 class Article(BaseArticle):

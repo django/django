@@ -42,6 +42,10 @@ class PostGISAdapter:
     def __str__(self):
         return self.getquoted()
 
+    @classmethod
+    def _fix_polygon(cls, poly):
+        return poly
+
     def prepare(self, conn):
         """
         This method allows escaping the binary in the style required by the

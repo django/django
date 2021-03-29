@@ -1,3 +1,4 @@
+import string
 import uuid
 
 from django.core.exceptions import ImproperlyConfigured
@@ -140,10 +141,19 @@ class SimplifiedURLTests(SimpleTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             path('foo/<nonexistent:var>/', empty_view)
 
-    def test_space_in_route(self):
-        msg = "URL route 'space/<int: num>' cannot contain whitespace."
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            path('space/<int: num>', empty_view)
+    def test_whitespace_in_route(self):
+        msg = (
+            "URL route 'space/<int:num>/extra/<str:%stest>' cannot contain "
+            "whitespace in angle brackets <…>"
+        )
+        for whitespace in string.whitespace:
+            with self.subTest(repr(whitespace)):
+                with self.assertRaisesMessage(ImproperlyConfigured, msg % whitespace):
+                    path('space/<int:num>/extra/<str:%stest>' % whitespace, empty_view)
+        # Whitespaces are valid in paths.
+        p = path('space%s/<int:num>/' % string.whitespace, empty_view)
+        match = p.resolve('space%s/1/' % string.whitespace)
+        self.assertEqual(match.kwargs, {'num': 1})
 
 
 @override_settings(ROOT_URLCONF='urlpatterns.converter_urls')
@@ -249,13 +259,21 @@ class SameNameTests(SimpleTestCase):
 
 
 class ParameterRestrictionTests(SimpleTestCase):
-    def test_non_identifier_parameter_name_causes_exception(self):
+    def test_integer_parameter_name_causes_exception(self):
         msg = (
             "URL route 'hello/<int:1>/' uses parameter name '1' which isn't "
             "a valid Python identifier."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             path(r'hello/<int:1>/', lambda r: None)
+
+    def test_non_identifier_parameter_name_causes_exception(self):
+        msg = (
+            "URL route 'b/<int:book.id>/' uses parameter name 'book.id' which "
+            "isn't a valid Python identifier."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            path(r'b/<int:book.id>/', lambda r: None)
 
     def test_allows_non_ascii_but_valid_identifiers(self):
         # \u0394 is "GREEK CAPITAL LETTER DELTA", a valid identifier.

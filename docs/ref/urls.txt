@@ -136,14 +136,6 @@ Helper function to return a URL pattern for serving files in debug mode::
         # ... the rest of your URLconf goes here ...
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-``url()``
-=========
-
-.. function:: url(regex, view, kwargs=None, name=None)
-
-This function is an alias to :func:`django.urls.re_path()`. It's likely to be
-deprecated in a future release.
-
 ``handler400``
 ==============
 

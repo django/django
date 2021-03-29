@@ -72,11 +72,6 @@ this header instead, set the :setting:`X_FRAME_OPTIONS` setting::
 
     X_FRAME_OPTIONS = 'SAMEORIGIN'
 
-.. versionchanged:: 3.0
-
-    The default value of the :setting:`X_FRAME_OPTIONS` setting was changed
-    from ``SAMEORIGIN`` to ``DENY``.
-
 When using the middleware there may be some views where you do **not** want the
 ``X-Frame-Options`` header set. For those cases, you can use a view decorator
 that tells the middleware not to set the header::

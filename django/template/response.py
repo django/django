@@ -11,7 +11,7 @@ class SimpleTemplateResponse(HttpResponse):
     rendering_attrs = ['template_name', 'context_data', '_post_render_callbacks']
 
     def __init__(self, template, context=None, content_type=None, status=None,
-                 charset=None, using=None):
+                 charset=None, using=None, headers=None):
         # It would seem obvious to call these next two members 'template' and
         # 'context', but those names are reserved as part of the test Client
         # API. To avoid the name collision, we use different names.
@@ -33,7 +33,7 @@ class SimpleTemplateResponse(HttpResponse):
         # content argument doesn't make sense here because it will be replaced
         # with rendered template so we always pass empty string in order to
         # prevent errors and provide shorter signature.
-        super().__init__('', content_type, status, charset=charset)
+        super().__init__('', content_type, status, charset=charset, headers=headers)
 
         # _is_rendered tracks whether the template and context has been baked
         # into a final response.
@@ -139,6 +139,6 @@ class TemplateResponse(SimpleTemplateResponse):
     rendering_attrs = SimpleTemplateResponse.rendering_attrs + ['_request']
 
     def __init__(self, request, template, context=None, content_type=None,
-                 status=None, charset=None, using=None):
-        super().__init__(template, context, content_type, status, charset, using)
+                 status=None, charset=None, using=None, headers=None):
+        super().__init__(template, context, content_type, status, charset, using, headers=headers)
         self._request = request

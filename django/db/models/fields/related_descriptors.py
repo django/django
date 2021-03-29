@@ -581,6 +581,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             queryset._add_hints(instance=self.instance)
             if self._db:
                 queryset = queryset.using(self._db)
+            queryset._defer_next_filter = True
             queryset = queryset.filter(**self.core_filters)
             for field in self.field.foreign_related_fields:
                 val = getattr(self.instance, field.attname)
@@ -641,7 +642,6 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
         def add(self, *objs, bulk=True):
             self._remove_prefetched_objects()
-            objs = list(objs)
             db = router.db_for_write(self.model, instance=self.instance)
 
             def check_and_update_obj(obj):

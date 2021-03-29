@@ -17,7 +17,7 @@ class Loader:
 
         for origin in self.get_template_sources(template_name):
             if skip is not None and origin in skip:
-                tried.append((origin, 'Skipped'))
+                tried.append((origin, 'Skipped to avoid recursion'))
                 continue
 
             try:

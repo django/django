@@ -1,25 +1,3 @@
-body {
-    direction: rtl;
-}
-
-/* LOGIN */
-
-.login .form-row {
-    float: right;
-}
-
-.login .form-row label {
-    float: right;
-    padding-left: 0.5em;
-    padding-right: 0;
-    text-align: left;
-}
-
-.login .submit-row {
-    clear: both;
-    padding: 1em 9.4em 0 0;
-}
-
 /* GLOBAL */
 
 th {
@@ -109,29 +87,19 @@ thead th.sorted .text {
 }
 
 #changelist-filter {
-    right: auto;
-    left: 0;
     border-left: none;
     border-right: none;
-}
-
-.change-list .filtered .results, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull {
-    margin-right: 0;
-    margin-left: 280px;
+    margin-left: 0;
+    margin-right: 30px;
 }
 
 #changelist-filter li.selected {
     border-left: none;
     padding-left: 10px;
     margin-left: 0;
-    border-right: 5px solid #eaeaea;
+    border-right: 5px solid var(--hairline-color);
     padding-right: 10px;
     margin-right: -15px;
-}
-
-.filtered .actions {
-    margin-left: 280px;
-    margin-right: 0;
 }
 
 #changelist table tbody td:first-child, #changelist table tbody th:first-child {
@@ -256,14 +224,4 @@ form .form-row p.datetime {
 .inline-related h3 span.delete label {
     margin-left: inherit;
     margin-right: 2px;
-}
-
-/* IE7 specific bug fixes */
-
-div.colM {
-    position: relative;
-}
-
-.submit-row input {
-    float: left;
 }

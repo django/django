@@ -9,7 +9,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(ROOT, 'templates')
 
 
-def setup(templates, *args, **kwargs):
+def setup(templates, *args, test_once=False):
     """
     Runs test method multiple times in the following order:
 
@@ -21,10 +21,10 @@ def setup(templates, *args, **kwargs):
     False       True        INVALID
     True        False
     True        True
+
+    Use test_once=True to test deprecation warnings since the message won't be
+    displayed multiple times.
     """
-    # when testing deprecation warnings, it's useful to run just one test since
-    # the message won't be displayed multiple times
-    test_once = kwargs.get('test_once', False)
 
     for arg in args:
         templates.update(arg)

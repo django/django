@@ -1,10 +1,11 @@
+from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import (
     BooleanField, CharField, ChoiceField, DateField, DateTimeField,
     DecimalField, EmailField, FileField, FloatField, Form,
     GenericIPAddressField, IntegerField, ModelChoiceField,
     ModelMultipleChoiceField, MultipleChoiceField, RegexField,
-    SplitDateTimeField, TimeField, URLField, ValidationError, utils,
+    SplitDateTimeField, TimeField, URLField, utils,
 )
 from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase
@@ -301,9 +302,22 @@ class ModelChoiceFieldErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
         e = {
             'required': 'REQUIRED',
             'invalid_choice': '%(value)s IS INVALID CHOICE',
-            'list': 'NOT A LIST OF VALUES',
+            'invalid_list': 'NOT A LIST OF VALUES',
         }
         f = ModelMultipleChoiceField(queryset=ChoiceModel.objects.all(), error_messages=e)
         self.assertFormErrors(['REQUIRED'], f.clean, '')
         self.assertFormErrors(['NOT A LIST OF VALUES'], f.clean, '3')
         self.assertFormErrors(['4 IS INVALID CHOICE'], f.clean, ['4'])
+
+    def test_modelchoicefield_value_placeholder(self):
+        f = ModelChoiceField(
+            queryset=ChoiceModel.objects.all(),
+            error_messages={
+                'invalid_choice': '"%(value)s" is not one of the available choices.',
+            },
+        )
+        self.assertFormErrors(
+            ['"invalid" is not one of the available choices.'],
+            f.clean,
+            'invalid',
+        )

@@ -1,13 +1,15 @@
 import os
+import unittest.loader
 from argparse import ArgumentParser
 from contextlib import contextmanager
-from unittest import TestSuite, TextTestRunner, defaultTestLoader, skipUnless
+from unittest import TestSuite, TextTestRunner, defaultTestLoader, mock
 
 from django.db import connections
 from django.test import SimpleTestCase
 from django.test.runner import DiscoverRunner
-from django.test.utils import captured_stderr, captured_stdout
-from django.utils.version import PY37
+from django.test.utils import (
+    NullTimeKeeper, TimeKeeper, captured_stderr, captured_stdout,
+)
 
 
 @contextmanager
@@ -79,7 +81,6 @@ class DiscoverRunnerTests(SimpleTestCase):
 
         self.assertEqual(count, 1)
 
-    @skipUnless(PY37, 'unittest -k option requires Python 3.7 and later')
     def test_name_patterns(self):
         all_test_1 = [
             'DjangoCase1.test_1', 'DjangoCase2.test_1',
@@ -209,6 +210,15 @@ class DiscoverRunnerTests(SimpleTestCase):
         self.assertIn('test_2', suite[9].id(),
                       msg="Methods of unittest cases should be reversed.")
 
+    def test_build_suite_failed_tests_first(self):
+        # The "doesnotexist" label results in a _FailedTest instance.
+        suite = DiscoverRunner().build_suite(
+            test_labels=['test_runner_apps.sample', 'doesnotexist'],
+        )
+        tests = list(suite)
+        self.assertIsInstance(tests[0], unittest.loader._FailedTest)
+        self.assertNotIsInstance(tests[-1], unittest.loader._FailedTest)
+
     def test_overridable_get_test_runner_kwargs(self):
         self.assertIsInstance(DiscoverRunner().get_test_runner_kwargs(), dict)
 
@@ -269,14 +279,6 @@ class DiscoverRunnerTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             DiscoverRunner(pdb=True, parallel=2)
 
-    def test_buffer_with_parallel(self):
-        msg = (
-            'You cannot use -b/--buffer with parallel tests; pass '
-            '--parallel=1 to use it.'
-        )
-        with self.assertRaisesMessage(ValueError, msg):
-            DiscoverRunner(buffer=True, parallel=2)
-
     def test_buffer_mode_test_pass(self):
         runner = DiscoverRunner(buffer=True, verbose=0)
         with captured_stdout() as stdout, captured_stderr() as stderr:
@@ -297,6 +299,49 @@ class DiscoverRunnerTests(SimpleTestCase):
         self.assertIn('Write to stderr.', stderr.getvalue())
         self.assertIn('Write to stdout.', stdout.getvalue())
 
+    @mock.patch('faulthandler.enable')
+    def test_faulthandler_enabled(self, mocked_enable):
+        with mock.patch('faulthandler.is_enabled', return_value=False):
+            DiscoverRunner(enable_faulthandler=True)
+            mocked_enable.assert_called()
+
+    @mock.patch('faulthandler.enable')
+    def test_faulthandler_already_enabled(self, mocked_enable):
+        with mock.patch('faulthandler.is_enabled', return_value=True):
+            DiscoverRunner(enable_faulthandler=True)
+            mocked_enable.assert_not_called()
+
+    @mock.patch('faulthandler.enable')
+    def test_faulthandler_enabled_fileno(self, mocked_enable):
+        # sys.stderr that is not an actual file.
+        with mock.patch('faulthandler.is_enabled', return_value=False), captured_stderr():
+            DiscoverRunner(enable_faulthandler=True)
+            mocked_enable.assert_called()
+
+    @mock.patch('faulthandler.enable')
+    def test_faulthandler_disabled(self, mocked_enable):
+        with mock.patch('faulthandler.is_enabled', return_value=False):
+            DiscoverRunner(enable_faulthandler=False)
+            mocked_enable.assert_not_called()
+
+    def test_timings_not_captured(self):
+        runner = DiscoverRunner(timing=False)
+        with captured_stderr() as stderr:
+            with runner.time_keeper.timed('test'):
+                pass
+            runner.time_keeper.print_results()
+        self.assertTrue(isinstance(runner.time_keeper, NullTimeKeeper))
+        self.assertNotIn('test', stderr.getvalue())
+
+    def test_timings_captured(self):
+        runner = DiscoverRunner(timing=True)
+        with captured_stderr() as stderr:
+            with runner.time_keeper.timed('test'):
+                pass
+            runner.time_keeper.print_results()
+        self.assertTrue(isinstance(runner.time_keeper, TimeKeeper))
+        self.assertIn('test', stderr.getvalue())
+
 
 class DiscoverRunnerGetDatabasesTests(SimpleTestCase):
     runner = DiscoverRunner(verbosity=2)
@@ -311,7 +356,7 @@ class DiscoverRunnerGetDatabasesTests(SimpleTestCase):
     def assertSkippedDatabases(self, test_labels, expected_databases):
         databases, output = self.get_databases(test_labels)
         self.assertEqual(databases, expected_databases)
-        skipped_databases = set(connections) - expected_databases
+        skipped_databases = set(connections) - set(expected_databases)
         if skipped_databases:
             self.assertIn(self.skip_msg + ', '.join(sorted(skipped_databases)), output)
         else:
@@ -319,31 +364,37 @@ class DiscoverRunnerGetDatabasesTests(SimpleTestCase):
 
     def test_mixed(self):
         databases, output = self.get_databases(['test_runner_apps.databases.tests'])
-        self.assertEqual(databases, set(connections))
+        self.assertEqual(databases, {'default': True, 'other': False})
         self.assertNotIn(self.skip_msg, output)
 
     def test_all(self):
         databases, output = self.get_databases(['test_runner_apps.databases.tests.AllDatabasesTests'])
-        self.assertEqual(databases, set(connections))
+        self.assertEqual(databases, {alias: False for alias in connections})
         self.assertNotIn(self.skip_msg, output)
 
     def test_default_and_other(self):
         self.assertSkippedDatabases([
             'test_runner_apps.databases.tests.DefaultDatabaseTests',
             'test_runner_apps.databases.tests.OtherDatabaseTests',
-        ], {'default', 'other'})
+        ], {'default': False, 'other': False})
 
     def test_default_only(self):
         self.assertSkippedDatabases([
             'test_runner_apps.databases.tests.DefaultDatabaseTests',
-        ], {'default'})
+        ], {'default': False})
 
     def test_other_only(self):
         self.assertSkippedDatabases([
             'test_runner_apps.databases.tests.OtherDatabaseTests'
-        ], {'other'})
+        ], {'other': False})
 
     def test_no_databases_required(self):
         self.assertSkippedDatabases([
             'test_runner_apps.databases.tests.NoDatabaseTests'
-        ], set())
+        ], {})
+
+    def test_serialize(self):
+        databases, _ = self.get_databases([
+            'test_runner_apps.databases.tests.DefaultDatabaseSerializedTests'
+        ])
+        self.assertEqual(databases, {'default': True})

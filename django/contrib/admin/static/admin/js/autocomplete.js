@@ -1,12 +1,16 @@
-(function($) {
-    'use strict';
-    var init = function($element, options) {
-        var settings = $.extend({
+'use strict';
+{
+    const $ = django.jQuery;
+    const init = function($element, options) {
+        const settings = $.extend({
             ajax: {
                 data: function(params) {
                     return {
                         term: params.term,
-                        page: params.page
+                        page: params.page,
+                        app_label: $element.data('app-label'),
+                        model_name: $element.data('model-name'),
+                        field_name: $element.data('field-name')
                     };
                 }
             }
@@ -15,9 +19,9 @@
     };
 
     $.fn.djangoAdminSelect2 = function(options) {
-        var settings = $.extend({}, options);
+        const settings = $.extend({}, options);
         $.each(this, function(i, element) {
-            var $element = $(element);
+            const $element = $(element);
             init($element, settings);
         });
         return this;
@@ -34,4 +38,4 @@
             return $newFormset.find('.admin-autocomplete').djangoAdminSelect2();
         };
     })(this));
-}(django.jQuery));
+}

@@ -23,7 +23,6 @@ from collections import defaultdict
 from django.conf import settings
 from django.core.cache import caches
 from django.http import HttpResponse, HttpResponseNotModified
-from django.utils.encoding import iri_to_uri
 from django.utils.http import (
     http_date, parse_etags, parse_http_date_safe, quote_etag,
 )
@@ -62,7 +61,7 @@ def patch_cache_control(response, **kwargs):
 
     cc = defaultdict(set)
     if response.get('Cache-Control'):
-        for field in cc_delim_re.split(response['Cache-Control']):
+        for field in cc_delim_re.split(response.headers['Cache-Control']):
             directive, value = dictitem(field)
             if directive == 'no-cache':
                 # no-cache supports multiple field names.
@@ -100,7 +99,7 @@ def patch_cache_control(response, **kwargs):
         else:
             directives.append(dictvalue(directive, values))
     cc = ', '.join(directives)
-    response['Cache-Control'] = cc
+    response.headers['Cache-Control'] = cc
 
 
 def get_max_age(response):
@@ -110,7 +109,7 @@ def get_max_age(response):
     """
     if not response.has_header('Cache-Control'):
         return
-    cc = dict(_to_tuple(el) for el in cc_delim_re.split(response['Cache-Control']))
+    cc = dict(_to_tuple(el) for el in cc_delim_re.split(response.headers['Cache-Control']))
     try:
         return int(cc['max-age'])
     except (ValueError, TypeError, KeyError):
@@ -119,7 +118,7 @@ def get_max_age(response):
 
 def set_response_etag(response):
     if not response.streaming and response.content:
-        response['ETag'] = quote_etag(hashlib.md5(response.content).hexdigest())
+        response.headers['ETag'] = quote_etag(hashlib.md5(response.content).hexdigest())
     return response
 
 
@@ -140,7 +139,7 @@ def _not_modified(request, response=None):
         # Last-Modified.
         for header in ('Cache-Control', 'Content-Location', 'Date', 'ETag', 'Expires', 'Last-Modified', 'Vary'):
             if header in response:
-                new_response[header] = response[header]
+                new_response.headers[header] = response.headers[header]
 
         # Preserve cookies as per the cookie specification: "If a proxy server
         # receives a response which contains a Set-cookie header, it should
@@ -181,10 +180,13 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
             return _precondition_failed(request)
 
     # Step 4: Test the If-Modified-Since precondition.
-    if (not if_none_match_etags and if_modified_since and
-            not _if_modified_since_passes(last_modified, if_modified_since)):
-        if request.method in ('GET', 'HEAD'):
-            return _not_modified(request, response)
+    if (
+        not if_none_match_etags and
+        if_modified_since and
+        not _if_modified_since_passes(last_modified, if_modified_since) and
+        request.method in ('GET', 'HEAD')
+    ):
+        return _not_modified(request, response)
 
     # Step 5: Test the If-Range precondition (not supported).
     # Step 6: Return original response since there isn't a conditional response.
@@ -261,7 +263,7 @@ def patch_response_headers(response, cache_timeout=None):
     if cache_timeout < 0:
         cache_timeout = 0  # Can't have max-age negative
     if not response.has_header('Expires'):
-        response['Expires'] = http_date(time.time() + cache_timeout)
+        response.headers['Expires'] = http_date(time.time() + cache_timeout)
     patch_cache_control(response, max_age=cache_timeout)
 
 
@@ -284,7 +286,7 @@ def patch_vary_headers(response, newheaders):
     # implementations may rely on the order of the Vary contents in, say,
     # computing an MD5 hash.
     if response.has_header('Vary'):
-        vary_headers = cc_delim_re.split(response['Vary'])
+        vary_headers = cc_delim_re.split(response.headers['Vary'])
     else:
         vary_headers = []
     # Use .lower() here so we treat headers as case-insensitive.
@@ -293,9 +295,9 @@ def patch_vary_headers(response, newheaders):
                           if newheader.lower() not in existing_headers]
     vary_headers += additional_headers
     if '*' in vary_headers:
-        response['Vary'] = '*'
+        response.headers['Vary'] = '*'
     else:
-        response['Vary'] = ', '.join(vary_headers)
+        response.headers['Vary'] = ', '.join(vary_headers)
 
 
 def has_vary_header(response, header_query):
@@ -304,14 +306,14 @@ def has_vary_header(response, header_query):
     """
     if not response.has_header('Vary'):
         return False
-    vary_headers = cc_delim_re.split(response['Vary'])
+    vary_headers = cc_delim_re.split(response.headers['Vary'])
     existing_headers = {header.lower() for header in vary_headers}
     return header_query.lower() in existing_headers
 
 
 def _i18n_cache_key_suffix(request, cache_key):
     """If necessary, add the current locale or time zone to the cache key."""
-    if settings.USE_I18N or settings.USE_L10N:
+    if settings.USE_I18N:
         # first check if LocaleMiddleware or another middleware added
         # LANGUAGE_CODE to request, then fall back to the active language
         # which in turn can also fall back to settings.LANGUAGE_CODE
@@ -328,7 +330,7 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
         value = request.META.get(header)
         if value is not None:
             ctx.update(value.encode())
-    url = hashlib.md5(iri_to_uri(request.build_absolute_uri()).encode('ascii'))
+    url = hashlib.md5(request.build_absolute_uri().encode('ascii'))
     cache_key = 'views.decorators.cache.cache_page.%s.%s.%s.%s' % (
         key_prefix, method, url.hexdigest(), ctx.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
@@ -336,7 +338,7 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
 
 def _generate_cache_header_key(key_prefix, request):
     """Return a cache key for the header cache."""
-    url = hashlib.md5(iri_to_uri(request.build_absolute_uri()).encode('ascii'))
+    url = hashlib.md5(request.build_absolute_uri().encode('ascii'))
     cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
         key_prefix, url.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
@@ -385,13 +387,13 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
     if cache is None:
         cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
     if response.has_header('Vary'):
-        is_accept_language_redundant = settings.USE_I18N or settings.USE_L10N
-        # If i18n or l10n are used, the generated cache key will be suffixed
-        # with the current locale. Adding the raw value of Accept-Language is
-        # redundant in that case and would result in storing the same content
-        # under multiple keys in the cache. See #18191 for details.
+        is_accept_language_redundant = settings.USE_I18N
+        # If i18n is used, the generated cache key will be suffixed with the
+        # current locale. Adding the raw value of Accept-Language is redundant
+        # in that case and would result in storing the same content under
+        # multiple keys in the cache. See #18191 for details.
         headerlist = []
-        for header in cc_delim_re.split(response['Vary']):
+        for header in cc_delim_re.split(response.headers['Vary']):
             header = header.upper().replace('-', '_')
             if header != 'ACCEPT_LANGUAGE' or not is_accept_language_redundant:
                 headerlist.append('HTTP_' + header)

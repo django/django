@@ -13,6 +13,7 @@ except ImportError:
     pass
 else:
     from psycopg2 import errorcodes
+
     from django.db.backends.postgresql.creation import DatabaseCreation
 
 

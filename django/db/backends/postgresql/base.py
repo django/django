@@ -41,12 +41,12 @@ if PSYCOPG2_VERSION < (2, 5, 4):
 
 
 # Some of these import psycopg2, so import them after checking if it's installed.
-from .client import DatabaseClient                          # NOQA isort:skip
-from .creation import DatabaseCreation                      # NOQA isort:skip
-from .features import DatabaseFeatures                      # NOQA isort:skip
-from .introspection import DatabaseIntrospection            # NOQA isort:skip
-from .operations import DatabaseOperations                  # NOQA isort:skip
-from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
+from .client import DatabaseClient  # NOQA
+from .creation import DatabaseCreation  # NOQA
+from .features import DatabaseFeatures  # NOQA
+from .introspection import DatabaseIntrospection  # NOQA
+from .operations import DatabaseOperations  # NOQA
+from .schema import DatabaseSchemaEditor  # NOQA
 
 psycopg2.extensions.register_adapter(SafeString, psycopg2.extensions.QuotedString)
 psycopg2.extras.register_uuid()
@@ -86,7 +86,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'BigIntegerField': 'bigint',
         'IPAddressField': 'inet',
         'GenericIPAddressField': 'inet',
-        'NullBooleanField': 'boolean',
+        'JSONField': 'jsonb',
         'OneToOneField': 'integer',
         'PositiveBigIntegerField': 'bigint',
         'PositiveIntegerField': 'integer',
@@ -152,10 +152,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def get_connection_params(self):
         settings_dict = self.settings_dict
         # None may be used to connect to the default 'postgres' db
-        if settings_dict['NAME'] == '':
+        if (
+            settings_dict['NAME'] == '' and
+            not settings_dict.get('OPTIONS', {}).get('service')
+        ):
             raise ImproperlyConfigured(
                 "settings.DATABASES is improperly configured. "
-                "Please supply the NAME value.")
+                "Please supply the NAME or OPTIONS['service'] value."
+            )
         if len(settings_dict['NAME'] or '') > self.ops.max_name_length():
             raise ImproperlyConfigured(
                 "The database name '%s' (%d characters) is longer than "
@@ -166,10 +170,19 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     self.ops.max_name_length(),
                 )
             )
-        conn_params = {
-            'database': settings_dict['NAME'] or 'postgres',
-            **settings_dict['OPTIONS'],
-        }
+        conn_params = {}
+        if settings_dict['NAME']:
+            conn_params = {
+                'database': settings_dict['NAME'],
+                **settings_dict['OPTIONS'],
+            }
+        elif settings_dict['NAME'] is None:
+            # Connect to the default 'postgres' db.
+            settings_dict.get('OPTIONS', {}).pop('service', None)
+            conn_params = {'database': 'postgres', **settings_dict['OPTIONS']}
+        else:
+            conn_params = {**settings_dict['OPTIONS']}
+
         conn_params.pop('isolation_level', None)
         if settings_dict['USER']:
             conn_params['user'] = settings_dict['USER']
@@ -199,7 +212,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             # Set the isolation level to the value from OPTIONS.
             if self.isolation_level != connection.isolation_level:
                 connection.set_session(isolation_level=self.isolation_level)
-
+        # Register dummy loads() to avoid a round trip from psycopg2's decode
+        # to json.dumps() to json.loads(), when using a custom decoder in
+        # JSONField.
+        psycopg2.extras.register_default_jsonb(conn_or_curs=connection, loads=lambda x: x)
         return connection
 
     def ensure_timezone(self):
@@ -245,12 +261,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # For now, it's here so that every use of "threading" is
         # also async-compatible.
         try:
-            if hasattr(asyncio, 'current_task'):
-                # Python 3.7 and up
-                current_task = asyncio.current_task()
-            else:
-                # Python 3.6
-                current_task = asyncio.Task.current_task()
+            current_task = asyncio.current_task()
         except RuntimeError:
             current_task = None
         # Current task can be none even if the current_task call didn't error
@@ -316,6 +327,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                             yield cursor
                     finally:
                         conn.close()
+                    break
+            else:
+                raise
 
     @cached_property
     def pg_version(self):

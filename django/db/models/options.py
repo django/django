@@ -5,12 +5,13 @@ from collections import defaultdict
 
 from django.apps import apps
 from django.conf import settings
-from django.core.exceptions import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
 from django.db import connections
 from django.db.models import AutoField, Manager, OrderWrt, UniqueConstraint
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.functional import cached_property
+from django.utils.module_loading import import_string
 from django.utils.text import camel_case_to_spaces, format_lazy
 from django.utils.translation import override
 
@@ -217,6 +218,37 @@ class Options:
             new_objs.append(obj)
         return new_objs
 
+    def _get_default_pk_class(self):
+        pk_class_path = getattr(
+            self.app_config,
+            'default_auto_field',
+            settings.DEFAULT_AUTO_FIELD,
+        )
+        if self.app_config and self.app_config._is_default_auto_field_overridden:
+            app_config_class = type(self.app_config)
+            source = (
+                f'{app_config_class.__module__}.'
+                f'{app_config_class.__qualname__}.default_auto_field'
+            )
+        else:
+            source = 'DEFAULT_AUTO_FIELD'
+        if not pk_class_path:
+            raise ImproperlyConfigured(f'{source} must not be empty.')
+        try:
+            pk_class = import_string(pk_class_path)
+        except ImportError as e:
+            msg = (
+                f"{source} refers to the module '{pk_class_path}' that could "
+                f"not be imported."
+            )
+            raise ImproperlyConfigured(msg) from e
+        if not issubclass(pk_class, AutoField):
+            raise ValueError(
+                f"Primary key '{pk_class_path}' referred by {source} must "
+                f"subclass AutoField."
+            )
+        return pk_class
+
     def _prepare(self, model):
         if self.order_with_respect_to:
             # The app registry will not be ready at this point, so we cannot
@@ -250,7 +282,8 @@ class Options:
                 field.primary_key = True
                 self.setup_pk(field)
             else:
-                auto = AutoField(verbose_name='ID', primary_key=True, auto_created=True)
+                pk_class = self._get_default_pk_class()
+                auto = pk_class(verbose_name='ID', primary_key=True, auto_created=True)
                 model.add_to_class('id', auto)
 
     def add_manager(self, manager):
@@ -698,7 +731,8 @@ class Options:
             )
             for f in fields_with_relations:
                 if not isinstance(f.remote_field.model, str):
-                    related_objects_graph[f.remote_field.model._meta.concrete_model._meta].append(f)
+                    remote_label = f.remote_field.model._meta.concrete_model._meta.label
+                    related_objects_graph[remote_label].append(f)
 
         for model in all_models:
             # Set the relation_tree using the internal __dict__. In this way
@@ -706,7 +740,7 @@ class Options:
             # __dict__ takes precedence over a data descriptor (such as
             # @cached_property). This means that the _meta._relation_tree is
             # only called if related_objects is not in __dict__.
-            related_objects = related_objects_graph[model._meta.concrete_model._meta]
+            related_objects = related_objects_graph[model._meta.concrete_model._meta.label]
             model._meta.__dict__['_relation_tree'] = related_objects
         # It seems it is possible that self is not in all_models, so guard
         # against that with default for get().

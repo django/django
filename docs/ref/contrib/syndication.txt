@@ -7,7 +7,7 @@ The syndication feed framework
               quite easily.
 
 Django comes with a high-level syndication-feed-generating framework for
-creating RSS_ and Atom_ feeds.
+creating RSS_ and :rfc:`Atom <4287>` feeds.
 
 To create any syndication feed, all you have to do is write a short
 Python class. You can create as many feeds as you want.
@@ -17,7 +17,6 @@ you want to generate feeds outside of a Web context, or in some other
 lower-level way.
 
 .. _RSS: http://www.whatisrss.com/
-.. _Atom: https://tools.ietf.org/html/rfc4287
 
 The high-level framework
 ========================
@@ -310,11 +309,6 @@ Feeds created by the syndication framework automatically include the
 appropriate ``<language>`` tag (RSS 2.0) or ``xml:lang`` attribute (Atom). By
 default, this is :func:`django.utils.translation.get_language()`. You can change it
 by setting the ``language`` class attribute.
-
-.. versionchanged:: 3.0
-
-    The ``language`` class attribute was added. In older versions, the behavior
-    is the same as ``language = settings.LANGUAGE_CODE``.
 
 URLs
 ----
@@ -895,6 +889,27 @@ This example illustrates all possible attributes and methods for a
 
         item_copyright = 'Copyright (c) 2007, Sally Smith' # Hard-coded copyright notice.
 
+        # ITEM COMMENTS URL -- It's optional to use one of these three. This is
+        # a hook that specifies how to get the URL of a page for comments for a
+        # given item.
+
+        def item_comments(self, obj):
+            """
+            Takes an item, as returned by items(), and returns the item's
+            comments URL as a normal Python string.
+            """
+
+        def item_comments(self):
+            """
+            Returns the comments URL for every item in the feed.
+            """
+
+        item_comments = 'https://www.example.com/comments' # Hard-coded comments URL
+
+.. versionchanged:: 3.2
+
+    Support for a comments URL per feed item was added through the
+    ``item_comments`` hook.
 
 The low-level framework
 =======================
@@ -1034,7 +1049,7 @@ attributes. Thus, you can subclass the appropriate feed generator class
 (``Atom1Feed`` or ``Rss201rev2Feed``) and extend these callbacks. They are:
 
 .. _georss: http://georss.org/
-.. _itunes podcast format: https://www.apple.com/itunes/podcasts/specs.html
+.. _itunes podcast format: https://help.apple.com/itc/podcasts_connect/#/itcb54353390
 
 ``SyndicationFeed.root_attributes(self)``
     Return a ``dict`` of attributes to add to the root feed element

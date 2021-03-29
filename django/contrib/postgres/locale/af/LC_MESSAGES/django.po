@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# F Wolff <friedel@translate.org.za>, 2019
+# F Wolff <friedel@translate.org.za>, 2019-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2019-01-04 18:56+0000\n"
-"Last-Translator: F Wolff <friedel@translate.org.za>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
 "af/)\n"
 "MIME-Version: 1.0\n"
@@ -31,24 +31,14 @@ msgid "Map of strings to strings/nulls"
 msgstr "Woordeboek van stringe na stringe/nulls"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "Die waarde van “%(key)s” is nie 'n string of nul nie."
-
-msgid "A JSON object"
-msgstr "’n JSON-objek"
-
-msgid "Value must be valid JSON."
-msgstr "Die waarde moet geldige JSON wees."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "Die waarde “%(key)s” is nie 'n string of null nie."
 
 msgid "Could not load JSON data."
 msgstr "Kon nie JSON-data laai nie."
 
 msgid "Input must be a JSON dictionary."
 msgstr "Toevoer moet 'n JSON-woordeboek wees."
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "Die waarde “%(value)s” moet geldige JSON wees."
 
 msgid "Enter two valid values."
 msgstr "Gee twee geldige waardes."

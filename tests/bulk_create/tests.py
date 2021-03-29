@@ -9,9 +9,9 @@ from django.test import (
 )
 
 from .models import (
-    Country, NoFields, NullableFields, Pizzeria, ProxyCountry,
-    ProxyMultiCountry, ProxyMultiProxyCountry, ProxyProxyCountry, Restaurant,
-    State, TwoFields,
+    BigAutoFieldModel, Country, NoFields, NullableFields, Pizzeria,
+    ProxyCountry, ProxyMultiCountry, ProxyMultiProxyCountry, ProxyProxyCountry,
+    Restaurant, SmallAutoFieldModel, State, TwoFields,
 )
 
 
@@ -115,7 +115,8 @@ class BulkCreateTests(TestCase):
     def test_zero_as_autoval(self):
         """
         Zero as id for AutoField should raise exception in MySQL, because MySQL
-        does not allow zero for automatic primary key.
+        does not allow zero for automatic primary key if the
+        NO_AUTO_VALUE_ON_ZERO SQL mode is not enabled.
         """
         valid_country = Country(name='Germany', iso_two_letter='DE')
         invalid_country = Country(id=0, name='Poland', iso_two_letter='PL')
@@ -234,10 +235,16 @@ class BulkCreateTests(TestCase):
 
     @skipUnlessDBFeature('has_bulk_insert')
     def test_bulk_insert_nullable_fields(self):
+        fk_to_auto_fields = {
+            'auto_field': NoFields.objects.create(),
+            'small_auto_field': SmallAutoFieldModel.objects.create(),
+            'big_auto_field': BigAutoFieldModel.objects.create(),
+        }
         # NULL can be mixed with other values in nullable fields
         nullable_fields = [field for field in NullableFields._meta.get_fields() if field.name != 'id']
         NullableFields.objects.bulk_create([
-            NullableFields(**{field.name: None}) for field in nullable_fields
+            NullableFields(**{**fk_to_auto_fields, field.name: None})
+            for field in nullable_fields
         ])
         self.assertEqual(NullableFields.objects.count(), len(nullable_fields))
         for field in nullable_fields:
@@ -314,3 +321,29 @@ class BulkCreateTests(TestCase):
         # Without ignore_conflicts=True, there's a problem.
         with self.assertRaises(IntegrityError):
             TwoFields.objects.bulk_create(conflicting_objects)
+
+    def test_nullable_fk_after_parent(self):
+        parent = NoFields()
+        child = NullableFields(auto_field=parent, integer_field=88)
+        parent.save()
+        NullableFields.objects.bulk_create([child])
+        child = NullableFields.objects.get(integer_field=88)
+        self.assertEqual(child.auto_field, parent)
+
+    @skipUnlessDBFeature('can_return_rows_from_bulk_insert')
+    def test_nullable_fk_after_parent_bulk_create(self):
+        parent = NoFields()
+        child = NullableFields(auto_field=parent, integer_field=88)
+        NoFields.objects.bulk_create([parent])
+        NullableFields.objects.bulk_create([child])
+        child = NullableFields.objects.get(integer_field=88)
+        self.assertEqual(child.auto_field, parent)
+
+    def test_unsaved_parent(self):
+        parent = NoFields()
+        msg = (
+            "bulk_create() prohibited to prevent data loss due to unsaved "
+            "related object 'auto_field'."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            NullableFields.objects.bulk_create([NullableFields(auto_field=parent)])

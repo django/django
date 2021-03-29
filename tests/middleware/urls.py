@@ -8,4 +8,7 @@ urlpatterns = [
     path('needsquoting#/', views.empty_view),
     # Accepts paths with two leading slashes.
     re_path(r'^(.+)/security/$', views.empty_view),
+    # Should not append slash.
+    path('sensitive_fbv/', views.sensitive_fbv),
+    path('sensitive_cbv/', views.SensitiveCBV.as_view()),
 ]

@@ -5,7 +5,7 @@ from django.contrib.sessions.backends.cache import SessionStore
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import (
-    CSRF_SESSION_KEY, CSRF_TOKEN_LENGTH, REASON_BAD_TOKEN,
+    CSRF_SESSION_KEY, CSRF_TOKEN_LENGTH, REASON_BAD_ORIGIN, REASON_BAD_TOKEN,
     REASON_NO_CSRF_COOKIE, CsrfViewMiddleware,
     _compare_masked_tokens as equivalent_tokens, get_token,
 )
@@ -39,7 +39,9 @@ class CsrfViewMiddlewareTestMixin:
     _csrf_id = _csrf_id_cookie = '1bcdefghij2bcdefghij3bcdefghij4bcdefghij5bcdefghij6bcdefghijABCD'
 
     def _get_GET_no_csrf_cookie_request(self):
-        return TestingHttpRequest()
+        req = TestingHttpRequest()
+        req.method = 'GET'
+        return req
 
     def _get_GET_csrf_cookie_request(self):
         raise NotImplementedError('This method must be implemented by a subclass.')
@@ -64,7 +66,7 @@ class CsrfViewMiddlewareTestMixin:
         match = re.search('name="csrfmiddlewaretoken" value="(.*?)"', text)
         csrf_token = csrf_id or self._csrf_id
         self.assertTrue(
-            match and equivalent_tokens(csrf_token, match.group(1)),
+            match and equivalent_tokens(csrf_token, match[1]),
             "Could not find csrfmiddlewaretoken to match %s" % csrf_token
         )
 
@@ -308,11 +310,20 @@ class CsrfViewMiddlewareTestMixin:
         CsrfViewMiddleware generates a 403 response if it receives an HTTPS
         request with a bad host.
         """
-        req = self._get_GET_no_csrf_cookie_request()
+        req = self._get_POST_no_csrf_cookie_request()
         req._is_secure_override = True
         req.META['HTTP_HOST'] = '@malformed'
         req.META['HTTP_REFERER'] = 'https://www.evil.org/somepage'
         req.META['SERVER_PORT'] = '443'
+        mw = CsrfViewMiddleware(token_view)
+        response = mw.process_view(req, token_view, (), {})
+        self.assertEqual(response.status_code, 403)
+
+    def test_origin_malformed_host(self):
+        req = self._get_POST_no_csrf_cookie_request()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = '@malformed'
+        req.META['HTTP_ORIGIN'] = 'https://www.evil.org'
         mw = CsrfViewMiddleware(token_view)
         response = mw.process_view(req, token_view, (), {})
         self.assertEqual(response.status_code, 403)
@@ -351,6 +362,12 @@ class CsrfViewMiddlewareTestMixin:
         # >>> urlparse('https://')
         # ParseResult(scheme='https', netloc='', path='', params='', query='', fragment='')
         req.META['HTTP_REFERER'] = 'https://'
+        response = mw.process_view(req, post_form_view, (), {})
+        self.assertContains(response, malformed_referer_msg, status_code=403)
+        # Invalid URL
+        # >>> urlparse('https://[')
+        # ValueError: Invalid IPv6 URL
+        req.META['HTTP_REFERER'] = 'https://['
         response = mw.process_view(req, post_form_view, (), {})
         self.assertContains(response, malformed_referer_msg, status_code=403)
 
@@ -399,7 +416,7 @@ class CsrfViewMiddlewareTestMixin:
         resp = mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(resp)
 
-    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_TRUSTED_ORIGINS=['dashboard.example.com'])
+    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_TRUSTED_ORIGINS=['https://dashboard.example.com'])
     def test_https_csrf_trusted_origin_allowed(self):
         """
         A POST HTTPS request with a referer added to the CSRF_TRUSTED_ORIGINS
@@ -414,7 +431,7 @@ class CsrfViewMiddlewareTestMixin:
         resp = mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(resp)
 
-    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_TRUSTED_ORIGINS=['.example.com'])
+    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_TRUSTED_ORIGINS=['https://*.example.com'])
     def test_https_csrf_wildcard_trusted_origin_allowed(self):
         """
         A POST HTTPS request with a referer that matches a CSRF_TRUSTED_ORIGINS
@@ -454,10 +471,9 @@ class CsrfViewMiddlewareTestMixin:
         """
         ensure_csrf_cookie() doesn't log warnings (#19436).
         """
-        with self.assertRaisesMessage(AssertionError, 'no logs'):
-            with self.assertLogs('django.request', 'WARNING'):
-                req = self._get_GET_no_csrf_cookie_request()
-                ensure_csrf_cookie_view(req)
+        with self.assertNoLogs('django.request', 'WARNING'):
+            req = self._get_GET_no_csrf_cookie_request()
+            ensure_csrf_cookie_view(req)
 
     def test_post_data_read_failure(self):
         """
@@ -510,6 +526,154 @@ class CsrfViewMiddlewareTestMixin:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(resp.status_code, 403)
         self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % REASON_BAD_TOKEN)
+
+    @override_settings(ALLOWED_HOSTS=['www.example.com'])
+    def test_bad_origin_bad_domain(self):
+        """A request with a bad origin is rejected."""
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'https://www.evil.org'
+        mw = CsrfViewMiddleware(post_form_view)
+        self.assertIs(mw._origin_verified(req), False)
+        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
+            response = mw.process_view(req, post_form_view, (), {})
+        self.assertEqual(response.status_code, 403)
+        msg = REASON_BAD_ORIGIN % req.META['HTTP_ORIGIN']
+        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % msg)
+
+    @override_settings(ALLOWED_HOSTS=['www.example.com'])
+    def test_bad_origin_null_origin(self):
+        """A request with a null origin is rejected."""
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'null'
+        mw = CsrfViewMiddleware(post_form_view)
+        self.assertIs(mw._origin_verified(req), False)
+        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
+            response = mw.process_view(req, post_form_view, (), {})
+        self.assertEqual(response.status_code, 403)
+        msg = REASON_BAD_ORIGIN % req.META['HTTP_ORIGIN']
+        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % msg)
+
+    @override_settings(ALLOWED_HOSTS=['www.example.com'])
+    def test_bad_origin_bad_protocol(self):
+        """A request with an origin with wrong protocol is rejected."""
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'http://example.com'
+        mw = CsrfViewMiddleware(post_form_view)
+        self.assertIs(mw._origin_verified(req), False)
+        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
+            response = mw.process_view(req, post_form_view, (), {})
+        self.assertEqual(response.status_code, 403)
+        msg = REASON_BAD_ORIGIN % req.META['HTTP_ORIGIN']
+        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % msg)
+
+    @override_settings(
+        ALLOWED_HOSTS=['www.example.com'],
+        CSRF_TRUSTED_ORIGINS=[
+            'http://no-match.com',
+            'https://*.example.com',
+            'http://*.no-match.com',
+            'http://*.no-match-2.com',
+        ],
+    )
+    def test_bad_origin_csrf_trusted_origin_bad_protocol(self):
+        """
+        A request with an origin with the wrong protocol compared to
+        CSRF_TRUSTED_ORIGINS is rejected.
+        """
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'http://foo.example.com'
+        mw = CsrfViewMiddleware(post_form_view)
+        self.assertIs(mw._origin_verified(req), False)
+        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
+            response = mw.process_view(req, post_form_view, (), {})
+        self.assertEqual(response.status_code, 403)
+        msg = REASON_BAD_ORIGIN % req.META['HTTP_ORIGIN']
+        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % msg)
+        self.assertEqual(mw.allowed_origins_exact, {'http://no-match.com'})
+        self.assertEqual(mw.allowed_origin_subdomains, {
+            'https': ['.example.com'],
+            'http': ['.no-match.com', '.no-match-2.com'],
+        })
+
+    @override_settings(ALLOWED_HOSTS=['www.example.com'])
+    def test_bad_origin_cannot_be_parsed(self):
+        """
+        A POST request with an origin that can't be parsed by urlparse() is
+        rejected.
+        """
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'https://['
+        mw = CsrfViewMiddleware(post_form_view)
+        self.assertIs(mw._origin_verified(req), False)
+        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
+            response = mw.process_view(req, post_form_view, (), {})
+        self.assertEqual(response.status_code, 403)
+        msg = REASON_BAD_ORIGIN % req.META['HTTP_ORIGIN']
+        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % msg)
+
+    @override_settings(ALLOWED_HOSTS=['www.example.com'])
+    def test_good_origin_insecure(self):
+        """A POST HTTP request with a good origin is accepted."""
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'http://www.example.com'
+        mw = CsrfViewMiddleware(post_form_view)
+        self.assertIs(mw._origin_verified(req), True)
+        response = mw.process_view(req, post_form_view, (), {})
+        self.assertIsNone(response)
+
+    @override_settings(ALLOWED_HOSTS=['www.example.com'])
+    def test_good_origin_secure(self):
+        """A POST HTTPS request with a good origin is accepted."""
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'https://www.example.com'
+        mw = CsrfViewMiddleware(post_form_view)
+        self.assertIs(mw._origin_verified(req), True)
+        response = mw.process_view(req, post_form_view, (), {})
+        self.assertIsNone(response)
+
+    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_TRUSTED_ORIGINS=['https://dashboard.example.com'])
+    def test_good_origin_csrf_trusted_origin_allowed(self):
+        """
+        A POST request with an origin added to the CSRF_TRUSTED_ORIGINS
+        setting is accepted.
+        """
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'https://dashboard.example.com'
+        mw = CsrfViewMiddleware(post_form_view)
+        self.assertIs(mw._origin_verified(req), True)
+        resp = mw.process_view(req, post_form_view, (), {})
+        self.assertIsNone(resp)
+        self.assertEqual(mw.allowed_origins_exact, {'https://dashboard.example.com'})
+        self.assertEqual(mw.allowed_origin_subdomains, {})
+
+    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_TRUSTED_ORIGINS=['https://*.example.com'])
+    def test_good_origin_wildcard_csrf_trusted_origin_allowed(self):
+        """
+        A POST request with an origin that matches a CSRF_TRUSTED_ORIGINS
+        wildcard is accepted.
+        """
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'https://foo.example.com'
+        mw = CsrfViewMiddleware(post_form_view)
+        self.assertIs(mw._origin_verified(req), True)
+        response = mw.process_view(req, post_form_view, (), {})
+        self.assertIsNone(response)
+        self.assertEqual(mw.allowed_origins_exact, set())
+        self.assertEqual(mw.allowed_origin_subdomains, {'https': ['.example.com']})
 
 
 class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):

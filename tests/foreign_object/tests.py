@@ -408,15 +408,15 @@ class MultiColumnFKTests(TestCase):
         Person.objects.bulk_create(objs, 10)
 
     def test_isnull_lookup(self):
-        Membership.objects.create(membership_country=self.usa, person=self.bob, group_id=None)
-        Membership.objects.create(membership_country=self.usa, person=self.bob, group=self.cia)
-        self.assertQuerysetEqual(
+        m1 = Membership.objects.create(membership_country=self.usa, person=self.bob, group_id=None)
+        m2 = Membership.objects.create(membership_country=self.usa, person=self.bob, group=self.cia)
+        self.assertSequenceEqual(
             Membership.objects.filter(group__isnull=True),
-            ['<Membership: Bob is a member of NULL>']
+            [m1],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Membership.objects.filter(group__isnull=False),
-            ['<Membership: Bob is a member of CIA>']
+            [m2],
         )
 
 

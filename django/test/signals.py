@@ -14,7 +14,7 @@ from django.utils import timezone
 from django.utils.formats import FORMAT_SETTINGS, reset_format_cache
 from django.utils.functional import empty
 
-template_rendered = Signal(providing_args=["template", "context"])
+template_rendered = Signal()
 
 # Most setting_changed receivers are supposed to be added below,
 # except for cases where the receiver is related to a contrib app.
@@ -28,7 +28,8 @@ def clear_cache_handlers(**kwargs):
     if kwargs['setting'] == 'CACHES':
         from django.core.cache import caches, close_caches
         close_caches()
-        caches._caches = Local()
+        caches._settings = caches.settings = caches.configure_settings(None)
+        caches._connections = Local()
 
 
 @receiver(setting_changed)
@@ -175,7 +176,9 @@ def static_finders_changed(**kwargs):
 @receiver(setting_changed)
 def auth_password_validators_changed(**kwargs):
     if kwargs['setting'] == 'AUTH_PASSWORD_VALIDATORS':
-        from django.contrib.auth.password_validation import get_default_password_validators
+        from django.contrib.auth.password_validation import (
+            get_default_password_validators,
+        )
         get_default_password_validators.cache_clear()
 
 

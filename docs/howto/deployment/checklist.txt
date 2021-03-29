@@ -109,9 +109,6 @@ and in production. Django defaults to per-process :ref:`local-memory caching
 Cache servers often have weak authentication. Make sure they only accept
 connections from your application servers.
 
-If you're using Memcached, consider using :ref:`cached sessions
-<cached-sessions-backend>` to improve performance.
-
 :setting:`DATABASES`
 --------------------
 
@@ -186,6 +183,15 @@ Performance optimizations
 
 Setting :setting:`DEBUG = False <DEBUG>` disables several features that are
 only useful in development. In addition, you can tune the following settings.
+
+Sessions
+--------
+
+Consider using :ref:`cached sessions <cached-sessions-backend>` to improve
+performance.
+
+If using database-backed sessions, regularly :ref:`clear old sessions
+<clearing-the-session-store>` to avoid storing unnecessary data.
 
 :setting:`CONN_MAX_AGE`
 -----------------------

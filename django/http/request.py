@@ -1,25 +1,23 @@
 import cgi
 import codecs
 import copy
-import warnings
 from io import BytesIO
 from itertools import chain
-from urllib.parse import quote, urlencode, urljoin, urlsplit
+from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
 
 from django.conf import settings
 from django.core import signing
 from django.core.exceptions import (
-    DisallowedHost, ImproperlyConfigured, RequestDataTooBig,
+    DisallowedHost, ImproperlyConfigured, RequestDataTooBig, TooManyFieldsSent,
 )
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
 from django.utils.datastructures import (
     CaseInsensitiveMapping, ImmutableList, MultiValueDict,
 )
-from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.encoding import escape_uri_path, iri_to_uri
 from django.utils.functional import cached_property
-from django.utils.http import is_same_domain, limited_parse_qsl
+from django.utils.http import is_same_domain
 from django.utils.regex_helper import _lazy_re_compile
 
 from .multipartparser import parse_header
@@ -257,14 +255,6 @@ class HttpRequest:
     def is_secure(self):
         return self.scheme == 'https'
 
-    def is_ajax(self):
-        warnings.warn(
-            'request.is_ajax() is deprecated. See Django 3.1 release notes '
-            'for more details about this deprecation.',
-            RemovedInDjango40Warning,
-        )
-        return self.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
-
     @property
     def encoding(self):
         return self._encoding
@@ -361,7 +351,7 @@ class HttpRequest:
 
     def close(self):
         if hasattr(self, '_files'):
-            for f in chain.from_iterable(l[1] for l in self._files.lists()):
+            for f in chain.from_iterable(list_[1] for list_ in self._files.lists()):
                 f.close()
 
     # File-like and iterator interface.
@@ -445,8 +435,8 @@ class QueryDict(MultiValueDict):
         query_string = query_string or ''
         parse_qsl_kwargs = {
             'keep_blank_values': True,
-            'fields_limit': settings.DATA_UPLOAD_MAX_NUMBER_FIELDS,
             'encoding': self.encoding,
+            'max_num_fields': settings.DATA_UPLOAD_MAX_NUMBER_FIELDS,
         }
         if isinstance(query_string, bytes):
             # query_string normally contains URL-encoded data, a subset of ASCII.
@@ -455,8 +445,18 @@ class QueryDict(MultiValueDict):
             except UnicodeDecodeError:
                 # ... but some user agents are misbehaving :-(
                 query_string = query_string.decode('iso-8859-1')
-        for key, value in limited_parse_qsl(query_string, **parse_qsl_kwargs):
-            self.appendlist(key, value)
+        try:
+            for key, value in parse_qsl(query_string, **parse_qsl_kwargs):
+                self.appendlist(key, value)
+        except ValueError as e:
+            # ValueError can also be raised if the strict_parsing argument to
+            # parse_qsl() is True. As that is not used by Django, assume that
+            # the exception was raised by exceeding the value of max_num_fields
+            # instead of fragile checks of exception message strings.
+            raise TooManyFieldsSent(
+                'The number of GET/POST parameters exceeded '
+                'settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.'
+            ) from e
         self._mutable = mutable
 
     @classmethod

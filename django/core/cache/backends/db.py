@@ -267,9 +267,12 @@ class DatabaseCache(BaseDatabaseCache):
                 cursor.execute(
                     connection.ops.cache_key_culling_sql() % table,
                     [cull_num])
-                cursor.execute("DELETE FROM %s "
-                               "WHERE cache_key < %%s" % table,
-                               [cursor.fetchone()[0]])
+                last_cache_key = cursor.fetchone()
+                if last_cache_key:
+                    cursor.execute(
+                        'DELETE FROM %s WHERE cache_key < %%s' % table,
+                        [last_cache_key[0]],
+                    )
 
     def clear(self):
         db = router.db_for_write(self.cache_model_class)

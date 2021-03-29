@@ -24,26 +24,30 @@ TIMESINCE_CHUNKS = (
 )
 
 
-def timesince(d, now=None, reversed=False, time_strings=None):
+def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
     """
     Take two datetime objects and return the time between d and now as a nicely
     formatted string, e.g. "10 minutes". If d occurs after now, return
     "0 minutes".
 
     Units used are years, months, weeks, days, hours, and minutes.
-    Seconds and microseconds are ignored.  Up to two adjacent units will be
+    Seconds and microseconds are ignored. Up to `depth` adjacent units will be
     displayed.  For example, "2 weeks, 3 days" and "1 year, 3 months" are
     possible outputs, but "2 weeks, 3 hours" and "1 year, 5 days" are not.
 
     `time_strings` is an optional dict of strings to replace the default
     TIME_STRINGS dict.
 
+    `depth` is an optional integer to control the number of adjacent time
+    units returned.
+
     Adapted from
     https://web.archive.org/web/20060617175230/http://blog.natbat.co.uk/archive/2003/Jun/14/time_since
     """
     if time_strings is None:
         time_strings = TIME_STRINGS
-
+    if depth <= 0:
+        raise ValueError('depth must be greater than 0.')
     # Convert datetime.date to datetime.datetime for comparison.
     if not isinstance(d, datetime.datetime):
         d = datetime.datetime(d.year, d.month, d.day)
@@ -74,18 +78,24 @@ def timesince(d, now=None, reversed=False, time_strings=None):
         count = since // seconds
         if count != 0:
             break
-    result = avoid_wrapping(time_strings[name] % count)
-    if i + 1 < len(TIMESINCE_CHUNKS):
-        # Now get the second item
-        seconds2, name2 = TIMESINCE_CHUNKS[i + 1]
-        count2 = (since - (seconds * count)) // seconds2
-        if count2 != 0:
-            result += gettext(', ') + avoid_wrapping(time_strings[name2] % count2)
-    return result
+    else:
+        return avoid_wrapping(time_strings['minute'] % 0)
+    result = []
+    current_depth = 0
+    while i < len(TIMESINCE_CHUNKS) and current_depth < depth:
+        seconds, name = TIMESINCE_CHUNKS[i]
+        count = since // seconds
+        if count == 0:
+            break
+        result.append(avoid_wrapping(time_strings[name] % count))
+        since -= seconds * count
+        current_depth += 1
+        i += 1
+    return gettext(', ').join(result)
 
 
-def timeuntil(d, now=None, time_strings=None):
+def timeuntil(d, now=None, time_strings=None, depth=2):
     """
     Like timesince, but return a string measuring the time until the given time.
     """
-    return timesince(d, now, reversed=True, time_strings=time_strings)
+    return timesince(d, now, reversed=True, time_strings=time_strings, depth=depth)

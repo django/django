@@ -9,23 +9,13 @@ for a list of all possible variables.
 import importlib
 import os
 import time
-import traceback
-import warnings
 from pathlib import Path
 
-import django
 from django.conf import global_settings
-from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.core.validators import URLValidator
-from django.utils.deprecation import RemovedInDjango40Warning
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
-
-PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG = (
-    'The PASSWORD_RESET_TIMEOUT_DAYS setting is deprecated. Use '
-    'PASSWORD_RESET_TIMEOUT instead.'
-)
 
 
 class SettingsReference(str):
@@ -76,6 +66,14 @@ class LazySettings(LazyObject):
         if self._wrapped is empty:
             self._setup(name)
         val = getattr(self._wrapped, name)
+
+        # Special case some settings which require further modification.
+        # This is done here for performance reasons so the modified value is cached.
+        if name in {'MEDIA_URL', 'STATIC_URL'} and val is not None:
+            val = self._add_script_prefix(val)
+        elif name == 'SECRET_KEY' and not val:
+            raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
+
         self.__dict__[name] = val
         return val
 
@@ -118,14 +116,8 @@ class LazySettings(LazyObject):
         Useful when the app is being served at a subpath and manually prefixing
         subpath to STATIC_URL and MEDIA_URL in settings is inconvenient.
         """
-        # Don't apply prefix to valid URLs.
-        try:
-            URLValidator()(value)
-            return value
-        except (ValidationError, AttributeError):
-            pass
-        # Don't apply prefix to absolute paths.
-        if value.startswith('/'):
+        # Don't apply prefix to absolute paths and URLs.
+        if value.startswith(('http://', 'https://', '/')):
             return value
         from django.urls import get_script_prefix
         return '%s%s' % (get_script_prefix(), value)
@@ -134,28 +126,6 @@ class LazySettings(LazyObject):
     def configured(self):
         """Return True if the settings have already been configured."""
         return self._wrapped is not empty
-
-    @property
-    def PASSWORD_RESET_TIMEOUT_DAYS(self):
-        stack = traceback.extract_stack()
-        # Show a warning if the setting is used outside of Django.
-        # Stack index: -1 this line, -2 the caller.
-        filename, _, _, _ = stack[-2]
-        if not filename.startswith(os.path.dirname(django.__file__)):
-            warnings.warn(
-                PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG,
-                RemovedInDjango40Warning,
-                stacklevel=2,
-            )
-        return self.__getattr__('PASSWORD_RESET_TIMEOUT_DAYS')
-
-    @property
-    def STATIC_URL(self):
-        return self._add_script_prefix(self.__getattr__('STATIC_URL'))
-
-    @property
-    def MEDIA_URL(self):
-        return self._add_script_prefix(self.__getattr__('MEDIA_URL'))
 
 
 class Settings:
@@ -171,6 +141,7 @@ class Settings:
         mod = importlib.import_module(self.SETTINGS_MODULE)
 
         tuple_settings = (
+            'ALLOWED_HOSTS',
             "INSTALLED_APPS",
             "TEMPLATE_DIRS",
             "LOCALE_PATHS",
@@ -182,21 +153,9 @@ class Settings:
 
                 if (setting in tuple_settings and
                         not isinstance(setting_value, (list, tuple))):
-                    raise ImproperlyConfigured("The %s setting must be a list or a tuple. " % setting)
+                    raise ImproperlyConfigured("The %s setting must be a list or a tuple." % setting)
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
-
-        if not self.SECRET_KEY:
-            raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
-
-        if self.is_overridden('PASSWORD_RESET_TIMEOUT_DAYS'):
-            if self.is_overridden('PASSWORD_RESET_TIMEOUT'):
-                raise ImproperlyConfigured(
-                    'PASSWORD_RESET_TIMEOUT_DAYS/PASSWORD_RESET_TIMEOUT are '
-                    'mutually exclusive.'
-                )
-            setattr(self, 'PASSWORD_RESET_TIMEOUT', self.PASSWORD_RESET_TIMEOUT_DAYS * 60 * 60 * 24)
-            warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
 
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
@@ -241,9 +200,6 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        if name == 'PASSWORD_RESET_TIMEOUT_DAYS':
-            setattr(self, 'PASSWORD_RESET_TIMEOUT', value * 60 * 60 * 24)
-            warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
         super().__setattr__(name, value)
 
     def __delattr__(self, name):

@@ -12,12 +12,18 @@ from django.utils.functional import cached_property
 
 
 class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
-
-    mysql = True
     name = 'mysql'
     geom_func_prefix = 'ST_'
 
     Adapter = WKTAdapter
+
+    @cached_property
+    def mariadb(self):
+        return self.connection.mysql_is_mariadb
+
+    @cached_property
+    def mysql(self):
+        return not self.connection.mysql_is_mariadb
 
     @cached_property
     def select(self):

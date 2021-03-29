@@ -1,11 +1,9 @@
 import codecs
 import datetime
 import locale
-import warnings
 from decimal import Decimal
 from urllib.parse import quote
 
-from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import Promise
 
 
@@ -99,22 +97,6 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     return str(s).encode(encoding, errors)
 
 
-def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
-    warnings.warn(
-        'smart_text() is deprecated in favor of smart_str().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return smart_str(s, encoding, strings_only, errors)
-
-
-def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
-    warnings.warn(
-        'force_text() is deprecated in favor of force_str().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return force_str(s, encoding, strings_only, errors)
-
-
 def iri_to_uri(iri):
     """
     Convert an Internationalized Resource Identifier (IRI) portion to a URI
@@ -157,7 +139,7 @@ _hextobyte = {
     for fmt in ['%02x', '%02X']
 }
 # And then everything above 128, because bytes ≥ 128 are part of multibyte
-# unicode characters.
+# Unicode characters.
 _hexdig = '0123456789ABCDEFabcdef'
 _hextobyte.update({
     (a + b).encode(): bytes.fromhex(a + b)

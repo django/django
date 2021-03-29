@@ -134,8 +134,7 @@ For example::
             # Do something else.
             pass
 
-Of course, it's ugly to hard-code the site IDs like that. This sort of
-hard-coding is best for hackish fixes that you need done quickly. The
+It's fragile to hard-code the site IDs like that, in case they change. The
 cleaner way of accomplishing the same thing is to check the current site's
 domain::
 

@@ -355,7 +355,7 @@ from that ``{{ form }}`` by Django's template language.
     use the ``url``, ``email`` and ``number`` HTML5 input types. By default,
     browsers may apply their own validation on these fields, which may be
     stricter than Django's validation. If you would like to disable this
-    behavior, set the `novalidate` attribute on the ``form`` tag, or specify
+    behavior, set the ``novalidate`` attribute on the ``form`` tag, or specify
     a different widget on the field, like :class:`TextInput`.
 
 We now have a working web form, described by a Django :class:`Form`, processed
@@ -576,11 +576,11 @@ Complete ``<label>`` elements can also be generated using the
 Rendering form error messages
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Of course, the price of this flexibility is more work. Until now we haven't had
-to worry about how to display form errors, because that's taken care of for us.
-In this example we have had to make sure we take care of any errors for each
-field and any errors for the form as a whole. Note ``{{ form.non_field_errors
-}}`` at the top of the form and the template lookup for errors on each field.
+The price of this flexibility is a bit more work. Until now we haven't had to
+worry about how to display form errors, because that's taken care of for us. In
+this example we have had to make sure we take care of any errors for each field
+and any errors for the form as a whole. Note ``{{ form.non_field_errors }}`` at
+the top of the form and the template lookup for errors on each field.
 
 Using ``{{ form.name_of_field.errors }}`` displays a list of form errors,
 rendered as an unordered list. This might look like:

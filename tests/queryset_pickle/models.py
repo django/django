@@ -37,7 +37,7 @@ class Group(models.Model):
 
 class Event(models.Model):
     title = models.CharField(max_length=100)
-    group = models.ForeignKey(Group, models.CASCADE)
+    group = models.ForeignKey(Group, models.CASCADE, limit_choices_to=models.Q())
 
 
 class Happening(models.Model):
@@ -57,6 +57,7 @@ class Container:
 
 
 class M2MModel(models.Model):
+    added = models.DateField(default=datetime.date.today)
     groups = models.ManyToManyField(Group)
 
 

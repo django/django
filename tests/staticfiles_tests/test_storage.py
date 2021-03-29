@@ -4,6 +4,7 @@ import sys
 import tempfile
 import unittest
 from io import StringIO
+from pathlib import Path
 from unittest import mock
 
 from django.conf import settings
@@ -202,6 +203,8 @@ class TestHashedFiles:
         self.assertIn(os.path.join('cached', 'css', 'window.css'), stats['post_processed'])
         self.assertIn(os.path.join('cached', 'css', 'img', 'window.png'), stats['unmodified'])
         self.assertIn(os.path.join('test', 'nonascii.css'), stats['post_processed'])
+        # No file should be yielded twice.
+        self.assertCountEqual(stats['post_processed'], set(stats['post_processed']))
         self.assertPostCondition()
 
     def test_css_import_case_insensitive(self):
@@ -386,6 +389,15 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         )
 
 
+@override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.NoneHashStorage')
+class TestCollectionNoneHashStorage(CollectionTestCase):
+    hashed_file_path = hashed_file_path
+
+    def test_hashed_name(self):
+        relpath = self.hashed_file_path('cached/styles.css')
+        self.assertEqual(relpath, 'cached/styles.css')
+
+
 @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.SimpleStorage')
 class TestCollectionSimpleStorage(CollectionTestCase):
     hashed_file_path = hashed_file_path
@@ -448,12 +460,19 @@ class TestStaticFilePermissions(CollectionTestCase):
     )
     def test_collect_static_files_permissions(self):
         call_command('collectstatic', **self.command_params)
-        test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
-        test_dir = os.path.join(settings.STATIC_ROOT, "subdir")
-        file_mode = os.stat(test_file)[0] & 0o777
-        dir_mode = os.stat(test_dir)[0] & 0o777
+        static_root = Path(settings.STATIC_ROOT)
+        test_file = static_root / 'test.txt'
+        file_mode = test_file.stat().st_mode & 0o777
         self.assertEqual(file_mode, 0o655)
-        self.assertEqual(dir_mode, 0o765)
+        tests = [
+            static_root / 'subdir',
+            static_root / 'nested',
+            static_root / 'nested' / 'css',
+        ]
+        for directory in tests:
+            with self.subTest(directory=directory):
+                dir_mode = directory.stat().st_mode & 0o777
+                self.assertEqual(dir_mode, 0o765)
 
     @override_settings(
         FILE_UPLOAD_PERMISSIONS=None,
@@ -461,12 +480,19 @@ class TestStaticFilePermissions(CollectionTestCase):
     )
     def test_collect_static_files_default_permissions(self):
         call_command('collectstatic', **self.command_params)
-        test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
-        test_dir = os.path.join(settings.STATIC_ROOT, "subdir")
-        file_mode = os.stat(test_file)[0] & 0o777
-        dir_mode = os.stat(test_dir)[0] & 0o777
+        static_root = Path(settings.STATIC_ROOT)
+        test_file = static_root / 'test.txt'
+        file_mode = test_file.stat().st_mode & 0o777
         self.assertEqual(file_mode, 0o666 & ~self.umask)
-        self.assertEqual(dir_mode, 0o777 & ~self.umask)
+        tests = [
+            static_root / 'subdir',
+            static_root / 'nested',
+            static_root / 'nested' / 'css',
+        ]
+        for directory in tests:
+            with self.subTest(directory=directory):
+                dir_mode = directory.stat().st_mode & 0o777
+                self.assertEqual(dir_mode, 0o777 & ~self.umask)
 
     @override_settings(
         FILE_UPLOAD_PERMISSIONS=0o655,
@@ -475,12 +501,19 @@ class TestStaticFilePermissions(CollectionTestCase):
     )
     def test_collect_static_files_subclass_of_static_storage(self):
         call_command('collectstatic', **self.command_params)
-        test_file = os.path.join(settings.STATIC_ROOT, "test.txt")
-        test_dir = os.path.join(settings.STATIC_ROOT, "subdir")
-        file_mode = os.stat(test_file)[0] & 0o777
-        dir_mode = os.stat(test_dir)[0] & 0o777
+        static_root = Path(settings.STATIC_ROOT)
+        test_file = static_root / 'test.txt'
+        file_mode = test_file.stat().st_mode & 0o777
         self.assertEqual(file_mode, 0o640)
-        self.assertEqual(dir_mode, 0o740)
+        tests = [
+            static_root / 'subdir',
+            static_root / 'nested',
+            static_root / 'nested' / 'css',
+        ]
+        for directory in tests:
+            with self.subTest(directory=directory):
+                dir_mode = directory.stat().st_mode & 0o777
+                self.assertEqual(dir_mode, 0o740)
 
 
 @override_settings(

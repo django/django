@@ -5,7 +5,9 @@ from django.contrib.admin.models import LogEntry
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.templatetags.admin_list import pagination
 from django.contrib.admin.tests import AdminSeleniumTestCase
-from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR
+from django.contrib.admin.views.main import (
+    ALL_VAR, IS_POPUP_VAR, ORDER_VAR, PAGE_VAR, SEARCH_VAR, TO_FIELD_VAR,
+)
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages.storage.cookie import CookieStorage
@@ -40,7 +42,7 @@ from .models import (
 
 def build_tbody_html(pk, href, extra_fields):
     return (
-        '<tbody><tr class="row1">'
+        '<tbody><tr>'
         '<td class="action-checkbox">'
         '<input type="checkbox" name="_selected_action" value="{}" '
         'class="action-select"></td>'
@@ -257,7 +259,7 @@ class ChangeListTests(TestCase):
         Regression test for #14312: list_editable with pagination
         """
         new_parent = Parent.objects.create(name='parent')
-        for i in range(200):
+        for i in range(1, 201):
             Child.objects.create(name='name %s' % i, parent=new_parent)
         request = self.factory.get('/child/', data={'p': -1})  # Anything outside range
         request.user = self.superuser
@@ -272,7 +274,7 @@ class ChangeListTests(TestCase):
 
     def test_custom_paginator(self):
         new_parent = Parent.objects.create(name='parent')
-        for i in range(200):
+        for i in range(1, 201):
             Child.objects.create(name='name %s' % i, parent=new_parent)
 
         request = self.factory.get('/child/')
@@ -574,7 +576,7 @@ class ChangeListTests(TestCase):
         use queryset set by modeladmin.
         """
         parent = Parent.objects.create(name='anything')
-        for i in range(30):
+        for i in range(1, 31):
             Child.objects.create(name='name %s' % i, parent=parent)
             Child.objects.create(name='filtered %s' % i, parent=parent)
 
@@ -650,7 +652,7 @@ class ChangeListTests(TestCase):
 
     def test_show_all(self):
         parent = Parent.objects.create(name='anything')
-        for i in range(30):
+        for i in range(1, 31):
             Child.objects.create(name='name %s' % i, parent=parent)
             Child.objects.create(name='filtered %s' % i, parent=parent)
 
@@ -708,15 +710,65 @@ class ChangeListTests(TestCase):
 
     def test_clear_all_filters_link(self):
         self.client.force_login(self.superuser)
-        link = '<a href="?">&#10006; Clear all filters</a>'
-        response = self.client.get(reverse('admin:auth_user_changelist'))
-        self.assertNotContains(response, link)
+        url = reverse('admin:auth_user_changelist')
+        response = self.client.get(url)
+        self.assertNotContains(response, '&#10006; Clear all filters')
+        link = '<a href="%s">&#10006; Clear all filters</a>'
+        for data, href in (
+            ({'is_staff__exact': '0'}, '?'),
+            (
+                {'is_staff__exact': '0', 'username__startswith': 'test'},
+                '?username__startswith=test',
+            ),
+            (
+                {'is_staff__exact': '0', SEARCH_VAR: 'test'},
+                '?%s=test' % SEARCH_VAR,
+            ),
+            (
+                {'is_staff__exact': '0', IS_POPUP_VAR: 'id'},
+                '?%s=id' % IS_POPUP_VAR,
+            ),
+        ):
+            with self.subTest(data=data):
+                response = self.client.get(url, data=data)
+                self.assertContains(response, link % href)
+
+    def test_clear_all_filters_link_callable_filter(self):
+        self.client.force_login(self.superuser)
+        url = reverse('admin:admin_changelist_band_changelist')
+        response = self.client.get(url)
+        self.assertNotContains(response, '&#10006; Clear all filters')
+        link = '<a href="%s">&#10006; Clear all filters</a>'
+        for data, href in (
+            ({'nr_of_members_partition': '5'}, '?'),
+            (
+                {'nr_of_members_partition': 'more', 'name__startswith': 'test'},
+                '?name__startswith=test',
+            ),
+            (
+                {'nr_of_members_partition': '5', IS_POPUP_VAR: 'id'},
+                '?%s=id' % IS_POPUP_VAR,
+            ),
+        ):
+            with self.subTest(data=data):
+                response = self.client.get(url, data=data)
+                self.assertContains(response, link % href)
+
+    def test_no_clear_all_filters_link(self):
+        self.client.force_login(self.superuser)
+        url = reverse('admin:auth_user_changelist')
+        link = '>&#10006; Clear all filters</a>'
         for data in (
             {SEARCH_VAR: 'test'},
-            {'is_staff__exact': '0'},
+            {ORDER_VAR: '-1'},
+            {TO_FIELD_VAR: 'id'},
+            {PAGE_VAR: '1'},
+            {IS_POPUP_VAR: '1'},
+            {'username__startswith': 'test'},
         ):
-            response = self.client.get(reverse('admin:auth_user_changelist'), data=data)
-            self.assertContains(response, link)
+            with self.subTest(data=data):
+                response = self.client.get(url, data=data)
+                self.assertNotContains(response, link)
 
     def test_tuple_list_display(self):
         swallow = Swallow.objects.create(origin='Africa', load='12.34', speed='22.2')
@@ -917,7 +969,7 @@ class ChangeListTests(TestCase):
             custom_site.register(UnorderedObject, UnorderedObjectAdmin)
             model_admin = UnorderedObjectAdmin(UnorderedObject, custom_site)
             counter = 0 if ascending else 51
-            for page in range(0, 5):
+            for page in range(1, 6):
                 request = self._mocked_authenticated_request('/unorderedobject/?p=%s' % page, superuser)
                 response = model_admin.changelist_view(request)
                 for result in response.context_data['cl'].result_list:
@@ -961,7 +1013,7 @@ class ChangeListTests(TestCase):
             custom_site.register(OrderedObject, OrderedObjectAdmin)
             model_admin = OrderedObjectAdmin(OrderedObject, custom_site)
             counter = 0 if ascending else 51
-            for page in range(0, 5):
+            for page in range(1, 6):
                 request = self._mocked_authenticated_request('/orderedobject/?p=%s' % page, superuser)
                 response = model_admin.changelist_view(request)
                 for result in response.context_data['cl'].result_list:
@@ -1190,26 +1242,32 @@ class ChangeListTests(TestCase):
         request = self.factory.get('/group/')
         request.user = self.superuser
         cl = m.get_changelist_instance(request)
-        per_page = cl.list_per_page = 10
+        cl.list_per_page = 10
 
-        for page_num, objects_count, expected_page_range in [
-            (0, per_page, []),
-            (0, per_page * 2, list(range(2))),
-            (5, per_page * 11, list(range(11))),
-            (5, per_page * 12, [0, 1, 2, 3, 4, 5, 6, 7, 8, '.', 10, 11]),
-            (6, per_page * 12, [0, 1, '.', 3, 4, 5, 6, 7, 8, 9, 10, 11]),
-            (6, per_page * 13, [0, 1, '.', 3, 4, 5, 6, 7, 8, 9, '.', 11, 12]),
+        ELLIPSIS = cl.paginator.ELLIPSIS
+        for number, pages, expected in [
+            (1, 1, []),
+            (1, 2, [1, 2]),
+            (6, 11, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
+            (6, 12, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
+            (6, 13, [1, 2, 3, 4, 5, 6, 7, 8, 9, ELLIPSIS, 12, 13]),
+            (7, 12, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
+            (7, 13, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]),
+            (7, 14, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ELLIPSIS, 13, 14]),
+            (8, 13, [1, 2, ELLIPSIS, 5, 6, 7, 8, 9, 10, 11, 12, 13]),
+            (8, 14, [1, 2, ELLIPSIS, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]),
+            (8, 15, [1, 2, ELLIPSIS, 5, 6, 7, 8, 9, 10, 11, ELLIPSIS, 14, 15]),
         ]:
-            # assuming we have exactly `objects_count` objects
-            Group.objects.all().delete()
-            for i in range(objects_count):
-                Group.objects.create(name='test band')
+            with self.subTest(number=number, pages=pages):
+                # assuming exactly `pages * cl.list_per_page` objects
+                Group.objects.all().delete()
+                for i in range(pages * cl.list_per_page):
+                    Group.objects.create(name='test band')
 
-            # setting page number and calculating page range
-            cl.page_num = page_num
-            cl.get_results(request)
-            real_page_range = pagination(cl)['page_range']
-            self.assertEqual(expected_page_range, list(real_page_range))
+                # setting page number and calculating page range
+                cl.page_num = number
+                cl.get_results(request)
+                self.assertEqual(list(pagination(cl)['page_range']), expected)
 
     def test_object_tools_displayed_no_add_permission(self):
         """
@@ -1293,16 +1351,148 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Test amount of rows in the Changelist
         rows = self.selenium.find_elements_by_css_selector(
-            '%s #result_list tbody tr' % form_id)
+            '%s #result_list tbody tr' % form_id
+        )
         self.assertEqual(len(rows), 1)
+        row = rows[0]
+
+        selection_indicator = self.selenium.find_element_by_css_selector(
+            '%s .action-counter' % form_id
+        )
+        all_selector = self.selenium.find_element_by_id('action-toggle')
+        row_selector = self.selenium.find_element_by_css_selector(
+            '%s #result_list tbody tr:first-child .action-select' % form_id
+        )
 
         # Test current selection
-        selection_indicator = self.selenium.find_element_by_css_selector(
-            '%s .action-counter' % form_id)
         self.assertEqual(selection_indicator.text, "0 of 1 selected")
+        self.assertIs(all_selector.get_property('checked'), False)
+        self.assertEqual(row.get_attribute('class'), '')
 
         # Select a row and check again
-        row_selector = self.selenium.find_element_by_css_selector(
-            '%s #result_list tbody tr:first-child .action-select' % form_id)
         row_selector.click()
         self.assertEqual(selection_indicator.text, "1 of 1 selected")
+        self.assertIs(all_selector.get_property('checked'), True)
+        self.assertEqual(row.get_attribute('class'), 'selected')
+
+        # Deselect a row and check again
+        row_selector.click()
+        self.assertEqual(selection_indicator.text, "0 of 1 selected")
+        self.assertIs(all_selector.get_property('checked'), False)
+        self.assertEqual(row.get_attribute('class'), '')
+
+    def test_select_all_across_pages(self):
+        Parent.objects.bulk_create([Parent(name='parent%d' % i) for i in range(101)])
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_changelist_parent_changelist'))
+
+        selection_indicator = self.selenium.find_element_by_css_selector('.action-counter')
+        select_all_indicator = self.selenium.find_element_by_css_selector('.actions .all')
+        question = self.selenium.find_element_by_css_selector('.actions > .question')
+        clear = self.selenium.find_element_by_css_selector('.actions > .clear')
+        select_all = self.selenium.find_element_by_id('action-toggle')
+        select_across = self.selenium.find_element_by_name('select_across')
+
+        self.assertIs(question.is_displayed(), False)
+        self.assertIs(clear.is_displayed(), False)
+        self.assertIs(select_all.get_property('checked'), False)
+        self.assertEqual(select_across.get_property('value'), '0')
+        self.assertIs(selection_indicator.is_displayed(), True)
+        self.assertEqual(selection_indicator.text, '0 of 100 selected')
+        self.assertIs(select_all_indicator.is_displayed(), False)
+
+        select_all.click()
+        self.assertIs(question.is_displayed(), True)
+        self.assertIs(clear.is_displayed(), False)
+        self.assertIs(select_all.get_property('checked'), True)
+        self.assertEqual(select_across.get_property('value'), '0')
+        self.assertIs(selection_indicator.is_displayed(), True)
+        self.assertEqual(selection_indicator.text, '100 of 100 selected')
+        self.assertIs(select_all_indicator.is_displayed(), False)
+
+        question.click()
+        self.assertIs(question.is_displayed(), False)
+        self.assertIs(clear.is_displayed(), True)
+        self.assertIs(select_all.get_property('checked'), True)
+        self.assertEqual(select_across.get_property('value'), '1')
+        self.assertIs(selection_indicator.is_displayed(), False)
+        self.assertIs(select_all_indicator.is_displayed(), True)
+
+        clear.click()
+        self.assertIs(question.is_displayed(), False)
+        self.assertIs(clear.is_displayed(), False)
+        self.assertIs(select_all.get_property('checked'), False)
+        self.assertEqual(select_across.get_property('value'), '0')
+        self.assertIs(selection_indicator.is_displayed(), True)
+        self.assertEqual(selection_indicator.text, '0 of 100 selected')
+        self.assertIs(select_all_indicator.is_displayed(), False)
+
+    def test_actions_warn_on_pending_edits(self):
+        Parent.objects.create(name='foo')
+
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_changelist_parent_changelist'))
+
+        name_input = self.selenium.find_element_by_id('id_form-0-name')
+        name_input.clear()
+        name_input.send_keys('bar')
+        self.selenium.find_element_by_id('action-toggle').click()
+        self.selenium.find_element_by_name('index').click()  # Go
+        alert = self.selenium.switch_to.alert
+        try:
+            self.assertEqual(
+                alert.text,
+                'You have unsaved changes on individual editable fields. If you '
+                'run an action, your unsaved changes will be lost.'
+            )
+        finally:
+            alert.dismiss()
+
+    def test_save_with_changes_warns_on_pending_action(self):
+        from selenium.webdriver.support.ui import Select
+
+        Parent.objects.create(name='parent')
+
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_changelist_parent_changelist'))
+
+        name_input = self.selenium.find_element_by_id('id_form-0-name')
+        name_input.clear()
+        name_input.send_keys('other name')
+        Select(
+            self.selenium.find_element_by_name('action')
+        ).select_by_value('delete_selected')
+        self.selenium.find_element_by_name('_save').click()
+        alert = self.selenium.switch_to.alert
+        try:
+            self.assertEqual(
+                alert.text,
+                'You have selected an action, but you haven’t saved your '
+                'changes to individual fields yet. Please click OK to save. '
+                'You’ll need to re-run the action.',
+            )
+        finally:
+            alert.dismiss()
+
+    def test_save_without_changes_warns_on_pending_action(self):
+        from selenium.webdriver.support.ui import Select
+
+        Parent.objects.create(name='parent')
+
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_changelist_parent_changelist'))
+
+        Select(
+            self.selenium.find_element_by_name('action')
+        ).select_by_value('delete_selected')
+        self.selenium.find_element_by_name('_save').click()
+        alert = self.selenium.switch_to.alert
+        try:
+            self.assertEqual(
+                alert.text,
+                'You have selected an action, and you haven’t made any '
+                'changes on individual fields. You’re probably looking for '
+                'the Go button rather than the Save button.',
+            )
+        finally:
+            alert.dismiss()
