@@ -1,7 +1,7 @@
 import copy
 import itertools
 import operator
-from functools import total_ordering, wraps, update_wrapper
+from functools import total_ordering, update_wrapper, wraps
 
 
 class cached_property:
