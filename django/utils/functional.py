@@ -1,7 +1,7 @@
 import copy
 import itertools
 import operator
-from functools import total_ordering, wraps
+from functools import total_ordering, wraps, update_wrapper
 
 
 class cached_property:
@@ -25,7 +25,7 @@ class cached_property:
 
     def __init__(self, func, name=None):
         self.real_func = func
-        self.__doc__ = getattr(func, '__doc__')
+        update_wrapper(self, func)
 
     def __set_name__(self, owner, name):
         if self.name is None:
@@ -54,6 +54,7 @@ class classproperty:
     Decorator that converts a method with a single cls argument into a property
     that can be accessed directly from the class.
     """
+
     def __init__(self, method=None):
         self.fget = method
 
@@ -368,6 +369,7 @@ class SimpleLazyObject(LazyObject):
     Designed for compound objects of unknown type. For builtins or objects of
     known type, use django.utils.functional.lazy.
     """
+
     def __init__(self, func):
         """
         Pass in a callable that returns the object to be wrapped.
