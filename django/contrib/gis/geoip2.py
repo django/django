@@ -25,18 +25,11 @@ __all__ = ["HAS_GEOIP2"]
 
 try:
     import geoip2.database
-except ImportError:
+except ImportError:  # pragma: no cover
     HAS_GEOIP2 = False
 else:
     HAS_GEOIP2 = True
     __all__ += ["GeoIP2", "GeoIP2Exception"]
-
-# Creating the settings dictionary with any settings, if needed.
-GEOIP_SETTINGS = {
-    "GEOIP_PATH": getattr(settings, "GEOIP_PATH", None),
-    "GEOIP_CITY": getattr(settings, "GEOIP_CITY", "GeoLite2-City.mmdb"),
-    "GEOIP_COUNTRY": getattr(settings, "GEOIP_COUNTRY", "GeoLite2-Country.mmdb"),
-}
 
 
 class GeoIP2Exception(Exception):
@@ -95,7 +88,7 @@ class GeoIP2:
             raise GeoIP2Exception("Invalid GeoIP caching option: %s" % cache)
 
         # Getting the GeoIP data path.
-        path = path or GEOIP_SETTINGS["GEOIP_PATH"]
+        path = path or getattr(settings, "GEOIP_PATH", None)
         if not path:
             raise GeoIP2Exception(
                 "GeoIP path must be provided via parameter or the GEOIP_PATH setting."
@@ -106,12 +99,16 @@ class GeoIP2:
             # Constructing the GeoIP database filenames using the settings
             # dictionary. If the database files for the GeoLite country
             # and/or city datasets exist, then try to open them.
-            country_db = path / (country or GEOIP_SETTINGS["GEOIP_COUNTRY"])
+            country_db = path / (
+                country or getattr(settings, "GEOIP_COUNTRY", "GeoLite2-Country.mmdb")
+            )
             if country_db.is_file():
                 self._country = geoip2.database.Reader(str(country_db), mode=cache)
                 self._country_file = country_db
 
-            city_db = path / (city or GEOIP_SETTINGS["GEOIP_CITY"])
+            city_db = path / (
+                city or getattr(settings, "GEOIP_CITY", "GeoLite2-City.mmdb")
+            )
             if city_db.is_file():
                 self._city = geoip2.database.Reader(str(city_db), mode=cache)
                 self._city_file = city_db
