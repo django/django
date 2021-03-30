@@ -245,8 +245,14 @@ class SafeExceptionReporterFilter:
 
 class ExceptionReporter:
     """Organize and coordinate reporting on exceptions."""
-    html_template_path = CURRENT_DIR / 'templates' / 'technical_500.html'
-    text_template_path = CURRENT_DIR / 'templates' / 'technical_500.txt'
+
+    @property
+    def html_template_path(self):
+        return CURRENT_DIR / 'templates' / 'technical_500.html'
+
+    @property
+    def text_template_path(self):
+        return CURRENT_DIR / 'templates' / 'technical_500.txt'
 
     def __init__(self, request, exc_type, exc_value, tb, is_email=False):
         self.request = request
