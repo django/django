@@ -60,13 +60,10 @@
 }
 
 .main.shifted > #nav-sidebar {
-    left: 24px;
     margin-left: 0;
 }
 
 [dir="rtl"] .main.shifted > #nav-sidebar {
-    left: 0;
-    right: 24px;
     margin-right: 0;
 }
 
