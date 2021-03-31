@@ -19,7 +19,6 @@ class EmailBackend(BaseEmailBackend):
                  ssl_cafile=None, ssl_capath=None, ssl_cadata=None,
                  **kwargs):
         super().__init__(fail_silently=fail_silently)
-
         # server connection
         self.host = host or settings.EMAIL_HOST
         self.port = port or settings.EMAIL_PORT
@@ -30,30 +29,14 @@ class EmailBackend(BaseEmailBackend):
         self.use_tls = settings.EMAIL_USE_TLS if use_tls is None else use_tls
         self.use_ssl = settings.EMAIL_USE_SSL if use_ssl is None else use_ssl
         # client cert
-        self.ssl_keyfile = (
-            settings.EMAIL_SSL_KEYFILE if ssl_keyfile is None
-            else ssl_keyfile
-        )
-        self.ssl_certfile = (
-            settings.EMAIL_SSL_CERTFILE if ssl_certfile is None
-            else ssl_certfile
-        )
+        self.ssl_keyfile = settings.EMAIL_SSL_KEYFILE if ssl_keyfile is None else ssl_keyfile
+        self.ssl_certfile = settings.EMAIL_SSL_CERTFILE if ssl_certfile is None else ssl_certfile
         # server cert
-        self.ssl_cafile = (
-            settings.EMAIL_SSL_CAFILE if ssl_cafile is None
-            else ssl_cafile
-        )
-        self.ssl_capath = (
-            settings.EMAIL_SSL_CAPATH if ssl_capath is None
-            else ssl_capath
-        )
-        self.ssl_cadata = (
-            settings.EMAIL_SSL_CADATA if ssl_cadata is None
-            else ssl_cadata
-        )
+        self.ssl_cafile = settings.EMAIL_SSL_CAFILE if ssl_cafile is None else ssl_cafile
+        self.ssl_capath = settings.EMAIL_SSL_CAPATH if ssl_capath is None else ssl_capath
+        self.ssl_cadata = settings.EMAIL_SSL_CADATA if ssl_cadata is None else ssl_cadata
         # timeout
         self.timeout = settings.EMAIL_TIMEOUT if timeout is None else timeout
-
         if self.use_ssl and self.use_tls:
             raise ValueError(
                 "EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set "
@@ -79,15 +62,12 @@ class EmailBackend(BaseEmailBackend):
         context = ssl.create_default_context(
             cafile=self.ssl_cafile,
             capath=self.ssl_capath,
-            cadata=self.ssl_cadata
+            cadata=self.ssl_cadata,
         )
         if self.ssl_keyfile and not self.ssl_certfile:
             raise ValueError('certfile must be specified')
         if self.ssl_certfile:
-            context.load_cert_chain(
-                self.ssl_certfile,
-                self.ssl_keyfile
-            )
+            context.load_cert_chain(self.ssl_certfile, self.ssl_keyfile)
 
         # If local_hostname is not specified, socket.getfqdn() gets used.
         # For performance, we use the cached FQDN for local_hostname.
@@ -95,9 +75,7 @@ class EmailBackend(BaseEmailBackend):
         if self.timeout is not None:
             connection_params['timeout'] = self.timeout
         if self.use_ssl:
-            connection_params.update({
-                'context': context
-            })
+            connection_params['context'] = context
         try:
             self.connection = self.connection_class(self.host, self.port, **connection_params)
 

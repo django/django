@@ -1490,7 +1490,9 @@ file and private key file are handled.
 .. setting:: EMAIL_SSL_CAFILE
 
 ``EMAIL_SSL_CAFILE``
----------------------
+--------------------
+
+.. versionadded:: 4.0
 
 Default: ``None``
 
@@ -1502,7 +1504,9 @@ information about how to arrange the certificates in this file.
 .. setting:: EMAIL_SSL_CAPATH
 
 ``EMAIL_SSL_CAPATH``
----------------------
+--------------------
+
+.. versionadded:: 4.0
 
 Default: ``None``
 
@@ -1515,7 +1519,9 @@ in PEM format, following an `OpenSSL_specific_layout`_.
 .. setting:: EMAIL_SSL_CADATA
 
 ``EMAIL_SSL_CADATA``
----------------------
+--------------------
+
+.. versionadded:: 4.0
 
 Default: ``None``
 
@@ -3571,6 +3577,9 @@ Email
 * :setting:`EMAIL_HOST_PASSWORD`
 * :setting:`EMAIL_HOST_USER`
 * :setting:`EMAIL_PORT`
+* :setting:`EMAIL_SSL_CADATA`
+* :setting:`EMAIL_SSL_CAFILE`
+* :setting:`EMAIL_SSL_CAPATH`
 * :setting:`EMAIL_SSL_CERTFILE`
 * :setting:`EMAIL_SSL_KEYFILE`
 * :setting:`EMAIL_SUBJECT_PREFIX`

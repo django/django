@@ -497,6 +497,11 @@ SMTP backend
     If unspecified, the default ``timeout`` will be the one provided by
     :func:`socket.getdefaulttimeout()`, which defaults to ``None`` (no timeout).
 
+    .. versionchanged:: 4.0
+
+        The ``ssl_cafile``, ``ssl_capath``, and ``ssl_cadata`` keyword
+        arguments were added.
+
 .. _topic-email-console-backend:
 
 Console backend
