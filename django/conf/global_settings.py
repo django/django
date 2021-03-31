@@ -202,7 +202,7 @@ EMAIL_PORT = 25
 EMAIL_USE_LOCALTIME = False
 
 # Optional: Override the fully qualified domain name of the generated Message-ID.
-EMAIL_MESSAGEID_FQDN = None
+EMAIL_FQDN = None
 
 # Optional SMTP authentication information for EMAIL_HOST.
 EMAIL_HOST_USER = ''

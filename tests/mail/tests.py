@@ -381,23 +381,23 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertRegex(email.message()['Message-ID'], pattern)
 
     @override_settings(
-        EMAIL_MESSAGEID_FQDN='example.com',
+        EMAIL_FQDN='example.com',
     )
     def test_message_id_override(self):
         email = EmailMessage('subject', 'content', 'from@example.com', ['to@example.com'])
         pattern = r'^<\d+\.\d+\.\d+@example.com>$'
         self.assertRegex(email.message()['Message-ID'], pattern)
 
-    def test_check_setting_email_messageid_fqdn(self):
-        with override_settings(EMAIL_MESSAGEID_FQDN='@nowhere.com'):
+    def test_check_setting_email_fqdn(self):
+        with override_settings(EMAIL_FQDN='@nowhere.com'):
             self.assertIsInstance(checks.email.check_messageid_fqdn(None)[0], checks.Error)
-        with override_settings(EMAIL_MESSAGEID_FQDN='.nowhere.com'):
+        with override_settings(EMAIL_FQDN='.nowhere.com'):
             self.assertIsInstance(checks.email.check_messageid_fqdn(None)[0], checks.Error)
-        with override_settings(EMAIL_MESSAGEID_FQDN='no.where-.com'):
+        with override_settings(EMAIL_FQDN='no.where-.com'):
             self.assertIsInstance(checks.email.check_messageid_fqdn(None)[0], checks.Error)
-        with override_settings(EMAIL_MESSAGEID_FQDN='no where.com'):
+        with override_settings(EMAIL_FQDN='no where.com'):
             self.assertIsInstance(checks.email.check_messageid_fqdn(None)[0], checks.Error)
-        with override_settings(EMAIL_MESSAGEID_FQDN='valid-domain.com'):
+        with override_settings(EMAIL_FQDN='valid-domain.com'):
             self.assertEqual(checks.email.check_messageid_fqdn(None), [])
         self.assertEqual(checks.email.check_messageid_fqdn(None), [])
 
