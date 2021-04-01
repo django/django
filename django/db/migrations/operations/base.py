@@ -1,5 +1,5 @@
 from django.db import router
-
+from contextlib import contextmanager
 
 class Operation:
     """
@@ -138,3 +138,11 @@ class Operation:
             ", ".join(map(repr, self._constructor_args[0])),
             ",".join(" %s=%r" % x for x in self._constructor_args[1].items()),
         )
+
+@contextmanager
+def patch_project_state(schema_editor, project_state):
+    schema_editor.project_state = project_state
+    try:
+        yield
+    finally:
+        del schema_editor.project_state

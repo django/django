@@ -1,10 +1,12 @@
 import logging
+import warnings
 from datetime import datetime
-
+from django.db import models
 from django.db.backends.ddl_references import (
     Columns, Expressions, ForeignKeyName, IndexName, Statement, Table,
 )
-from django.db.backends.utils import names_digest, split_identifier
+from django.db.backends.utils import names_digest, split_identifier, truncate_name
+from django.db.migrations.state import ModelState, resolve_related_model
 from django.db.models import Deferrable, Index
 from django.db.models.sql import Query
 from django.db.transaction import TransactionManagementError, atomic
@@ -39,6 +41,17 @@ def _related_non_m2m_objects(old_field, new_field):
     return zip(
         (obj for obj in _all_related_fields(old_field.model) if _is_relevant_relation(obj, old_field)),
         (obj for obj in _all_related_fields(new_field.model) if _is_relevant_relation(obj, new_field)),
+    )
+
+
+def warn_on_model_class_passed(self, func):
+    warnings.warn(
+        "The handling of model classes in method {}.{}.{} is deprecated and will be removed in Django 4.0. "
+        "Use django.db.migrations.state.ModelState instead.".format(
+            self.__class__.__module__, self.__class__.__name__, func.__name__
+        ),
+        DeprecationWarning
+        # RemovedInDjango21Warning
     )
 
 
@@ -340,19 +353,38 @@ class BaseDatabaseSchemaEditor:
 
     def delete_model(self, model):
         """Delete a model from the database."""
-        # Handle auto-created intermediary models
-        for field in model._meta.local_many_to_many:
-            if field.remote_field.through._meta.auto_created:
-                self.delete_model(field.remote_field.through)
-
-        # Delete the table
-        self.execute(self.sql_delete_table % {
-            "table": self.quote_name(model._meta.db_table),
-        })
+        if isinstance(model,ModelState):
+            # We have a ModelState here
+            # Handle auto-created intermediary models
+            for name in model.fields:
+                if model.fields[name].many_to_many and model.fields[name].remote_field.auto_created is True:
+                    self._delete_m2m_model(model, name)
+        else:
+            # We have a regular model here
+            warn_on_model_class_passed(self,self.delete_model)
+            # Handle auto-created intermediary models
+            for field in model._meta.local_many_to_many:
+                if field.remote_field.through._meta.auto_created:
+                    self.delete_model(field.remote_field.through)
+            self.execute(self.sql_delete_table % {
+                "table": self.quote_name(model._meta.db_table),
+            })
         # Remove all deferred statements referencing the deleted table.
         for sql in list(self.deferred_sql):
             if isinstance(sql, Statement) and sql.references_table(model._meta.db_table):
                 self.deferred_sql.remove(sql)
+
+    def _delete_m2m_model(self, model, field_name):
+        through_db_table = '%s_%s_%s' % (
+            model.app_label, model.name_lower, field_name.lower(),
+        )
+        through_db_table = truncate_name(
+            through_db_table,
+            self.connection.ops.max_name_length()
+        )
+        self.execute(self.sql_delete_table % {
+            "table": self.quote_name(through_db_table),
+        })
 
     def add_index(self, model, index):
         """Add an index on a model."""
@@ -527,29 +559,65 @@ class BaseDatabaseSchemaEditor:
         but for M2Ms may involve deleting a table.
         """
         # Special-case implicit M2M tables
-        if field.many_to_many and field.remote_field.through._meta.auto_created:
-            return self.delete_model(field.remote_field.through)
-        # It might not actually have a column behind it
-        if field.db_parameters(connection=self.connection)['type'] is None:
-            return
-        # Drop any FK constraints, MySQL requires explicit deletion
-        if field.remote_field:
-            fk_names = self._constraint_names(model, [field.column], foreign_key=True)
-            for fk_name in fk_names:
-                self.execute(self._delete_fk_sql(model, fk_name))
-        # Delete the column
-        sql = self.sql_delete_column % {
-            "table": self.quote_name(model._meta.db_table),
-            "column": self.quote_name(field.column),
-        }
-        self.execute(sql)
-        # Reset connection if required
-        if self.connection.features.connection_persists_old_columns:
-            self.connection.close()
-        # Remove all deferred statements referencing the deleted column.
-        for sql in list(self.deferred_sql):
-            if isinstance(sql, Statement) and sql.references_column(model._meta.db_table, field.column):
-                self.deferred_sql.remove(sql)
+        if isinstance(model, ModelState):
+            if isinstance(field, str):
+                field_name = field
+                field = model.get_field_by_name(field_name)
+            else:
+                # This case is used for the OrderWrt field changes, as the "_order"
+                # field is not serialized into the ModelState
+                field_name = field.name
+            # Special-case implicit M2M tables
+            if field.many_to_many:
+                # Explicit m2m table
+                if field.remote_field.through:
+                    through_model = resolve_related_model(field.remote_field.through, model)
+                    through_model = self.project_state.get_model(*through_model)
+                    return self.delete_model(through_model)
+                else:
+                    return self._delete_m2m_model(model, field_name)
+            # It might not actually have a column behind it
+            if not field.concrete:
+                return
+            # Drop any FK constraints, MySQL requires explicit deletion
+            if field.remote_field:
+                fk_names = self._constraint_names(model, [field.column], foreign_key=True)
+                for fk_name in fk_names:
+                    self.execute(self._delete_constraint_sql(self.sql_delete_fk, model, fk_name))
+            # Delete the column
+            sql = self.sql_delete_column % {
+                "table": self.quote_name(model._meta.db_table),
+                "column": self.quote_name(field.column),
+            }
+            self.execute(sql)
+            # Reset connection if required
+            if self.connection.features.connection_persists_old_columns:
+                self.connection.close()
+        else:
+            warn_on_model_class_passed(self, self.remove_field)
+            if field.many_to_many and field.remote_field.through._meta.auto_created:
+                return self.delete_model(field.remote_field.through)
+            # It might not actually have a column behind it
+            if field.db_parameters(connection=self.connection)['type'] is None:
+                return
+            # Drop any FK constraints, MySQL requires explicit deletion
+            if field.remote_field:
+                fk_names = self._constraint_names(model, [field.column], foreign_key=True)
+                for fk_name in fk_names:
+                    self.execute(self._delete_fk_sql(model, fk_name))
+            # Delete the column
+            sql = self.sql_delete_column % {
+                "table": self.quote_name(model._meta.db_table),
+                "column": self.quote_name(field.column),
+            }
+            self.execute(sql)
+            # Reset connection if required
+            if self.connection.features.connection_persists_old_columns:
+                self.connection.close()
+            # Remove all deferred statements referencing the deleted column.
+            for sql in list(self.deferred_sql):
+                if isinstance(sql, Statement) and sql.references_column(model._meta.db_table, field.column):
+                    self.deferred_sql.remove(sql)
 
     def alter_field(self, model, old_field, new_field, strict=False):
         """

@@ -2,7 +2,7 @@ from django.core.exceptions import FieldDoesNotExist
 from django.db.models import NOT_PROVIDED
 from django.utils.functional import cached_property
 
-from .base import Operation
+from .base import Operation, patch_project_state
 from .utils import field_is_referenced, field_references, get_references
 
 
@@ -162,12 +162,12 @@ class RemoveField(FieldOperation):
         old_field = model_state.fields.pop(self.name)
         # Delay rendering of relationships if it's not a relational field
         delay = not old_field.is_relation
-        state.reload_model(app_label, self.model_name_lower, delay=delay)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        from_model = from_state.apps.get_model(app_label, self.model_name)
-        if self.allow_migrate_model(schema_editor.connection.alias, from_model):
-            schema_editor.remove_field(from_model, from_model._meta.get_field(self.name))
+        from_model_state = from_state.models[app_label, self.model_name_lower]
+        if self.allow_migrate_model(schema_editor.connection.alias, from_model_state):
+            with patch_project_state(schema_editor, from_state):
+                schema_editor.remove_field(from_model_state,self.name)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)

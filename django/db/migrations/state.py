@@ -4,16 +4,27 @@ from contextlib import contextmanager
 from django.apps import AppConfig
 from django.apps.registry import Apps, apps as global_apps
 from django.conf import settings
-from django.db import models
+from django.db import connection,connections,models
 from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
 from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.db.models.utils import make_model_tuple
+from django.db.backends.utils import truncate_name
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.version import get_docs_version
 
 from .exceptions import InvalidBasesError
 
+def resolve_related_model(related_model, base_model):
+    if isinstance(base_model, (models.Model, ModelState)):
+        base_model = base_model._meta.label
+    this_al, this_mn = _get_app_label_and_model_name(base_model)
+    if related_model == RECURSIVE_RELATIONSHIP_CONSTANT:
+        to_al, to_mn = this_al, this_mn
+    else:
+        to_al, to_mn = _get_app_label_and_model_name(related_model, this_al)
+    assert to_al, "No app_label found when resolving relationship between %s to %s" % (base_model, related_model)
+    return to_al, to_mn
 
 def _get_app_label_and_model_name(model, app_label=''):
     if isinstance(model, str):
@@ -93,6 +104,14 @@ class ProjectState:
         self.models[(app_label, model_name)] = model_state
         if 'apps' in self.__dict__:  # hasattr would cache the property
             self.reload_model(app_label, model_name)
+
+    def get_model(self, app_label, model_name):
+        try:
+            model = self.models[app_label, model_name.lower()]
+        except KeyError:
+            # model = self.apps.get_model(app_label, model_name)
+            model = ModelState.from_model(global_apps.get_model(app_label, model_name))
+        return model
 
     def remove_model(self, app_label, model_name):
         del self.models[app_label, model_name]
@@ -392,6 +411,16 @@ class ModelState:
     def name_lower(self):
         return self.name.lower()
 
+    @cached_property
+    def _meta(self):
+        return ModelStateOptions(self)
+
+    def get_field_by_name(self, name):
+        for fname in self.fields:
+            if fname == name:
+                return self.fields[fname]
+        raise ValueError("No field called %s on model %s" % (name, self.name))
+
     @classmethod
     def from_model(cls, model, exclude_rels=False):
         """Given a model, return a ModelState representing it."""
@@ -602,3 +631,122 @@ class ModelState:
             (self.bases == other.bases) and
             (self.managers == other.managers)
         )
+
+class ModelStateOptions(object):
+
+    def __init__(self, model):
+        self.model = model
+
+    def get_field(self,name):
+        return self.model.get_field_by_name(name)
+
+    @property
+    def app_label(self):
+        return self.model.app_label
+
+    @property
+    def model_name(self):
+        return self.model.name_lower
+
+    @cached_property
+    def db_table(self):
+        db_table = self.model.options.get('db_table')
+        if db_table is None:
+            db_table = "%s_%s" % (self.model.app_label, self.model.name_lower)
+        return truncate_name(db_table, connection.ops.max_name_length())
+
+    @cached_property
+    def db_tablespace(self):
+        return self.model.options.get('db_tablespace', None)
+
+    @cached_property
+    def index_together(self):
+        return self.model.options.get('index_together', [])
+
+    @cached_property
+    def indexes(self):
+        return self.model.options.get('indexes', [])
+
+    @cached_property
+    def label(self):
+        return '%s.%s' % (self.model.app_label, self.model.name)
+
+    @cached_property
+    def label_lower(self):
+        return '%s.%s' % (self.model.app_label, self.model.name_lower)
+
+    @cached_property
+    def managed(self):
+        return self.model.options.get('managed', True)
+
+    @cached_property
+    def order_with_respect_to(self):
+        return self.model.options.get('order_with_respect_to', None)
+
+    @cached_property
+    def pk(self):
+        for name in self.model.fields:
+            if self.model.fields[name].primary_key:
+                return self.model.fields[name]
+
+
+
+    @cached_property
+    def proxy(self):
+        return self.model.options.get('proxy', False)
+
+    @cached_property
+    def required_db_features(self):
+        return self.model.options.get('required_db_features', [])
+
+    @cached_property
+    def required_db_vendor(self):
+        return self.model.options.get('required_db_vendor', None)
+
+    @cached_property
+    def swappable(self):
+        return self.model.options.get('swappable', None)
+
+    @cached_property
+    def swapped(self):
+        """
+        Has this model been swapped out for another? If so, return the model
+        name of the replacement; otherwise, return None.
+        For historical reasons, model name lookups using get_model() are
+        case insensitive, so we make sure we are case insensitive here.
+        """
+        if self.swappable:
+            swapped_for = getattr(settings, self.swappable, None)
+            if swapped_for:
+                try:
+                    swapped_label, swapped_object = swapped_for.split('.')
+                except ValueError:
+                    # setting not in the format app_label.model_name
+                    # raising ImproperlyConfigured here causes problems with
+                    # test cleanup code - instead it is raised in get_user_model
+                    # or as part of validation.
+                    return swapped_for
+
+                if '%s.%s' % (swapped_label, swapped_object.lower()) not in (None, self.label_lower):
+                    return swapped_for
+        return None
+
+    @cached_property
+    def unique_together(self):
+        return self.model.options.get('unique_together', [])
+
+    def can_migrate(self, conn):
+        """
+        Return True if the model can/should be migrated on the `connection`.
+        `connection` can be either a real connection or a connection alias.
+        """
+        if self.proxy or self.swapped or not self.managed:
+            return False
+        if isinstance(conn, str):
+            conn = connections[conn]
+        if self.required_db_vendor:
+            return self.required_db_vendor == conn.vendor
+        if self.required_db_features:
+            return all(getattr(conn.features, feat, False)
+                       for feat in self.required_db_features)
+        return True
