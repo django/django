@@ -1248,9 +1248,9 @@ class OrderBy(Expression):
         return (template % placeholders).rstrip(), params
 
     def as_oracle(self, compiler, connection):
-        # Oracle doesn't allow ORDER BY EXISTS() unless it's wrapped in
-        # a CASE WHEN.
-        if isinstance(self.expression, Exists):
+        # Oracle doesn't allow ORDER BY EXISTS() or filters unless it's wrapped
+        # in a CASE WHEN.
+        if connection.ops.conditional_expression_supported_in_where_clause(self.expression):
             copy = self.copy()
             copy.expression = Case(
                 When(self.expression, then=True),

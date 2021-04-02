@@ -277,6 +277,9 @@ Models
 * The ``skip_locked`` argument of :meth:`.QuerySet.select_for_update()` is now
   allowed on MariaDB 10.6+.
 
+* :class:`~django.db.models.Lookup` expressions may now be used in ``QuerySet``
+  annotations, aggregations, and directly in filters.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

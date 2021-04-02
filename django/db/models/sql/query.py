@@ -1262,9 +1262,9 @@ class Query(BaseExpression):
         if hasattr(filter_expr, 'resolve_expression'):
             if not getattr(filter_expr, 'conditional', False):
                 raise TypeError('Cannot filter against a non-conditional expression.')
-            condition = self.build_lookup(
-                ['exact'], filter_expr.resolve_expression(self, allow_joins=allow_joins), True
-            )
+            condition = filter_expr.resolve_expression(self, allow_joins=allow_joins)
+            if not isinstance(condition, Lookup):
+                condition = self.build_lookup(['exact'], condition, True)
             clause = self.where_class()
             clause.add(condition, AND)
             return clause, []

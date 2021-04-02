@@ -208,6 +208,25 @@ class WhereNode(tree.Node):
         clone.resolved = True
         return clone
 
+    @cached_property
+    def output_field(self):
+        from django.db.models import BooleanField
+        return BooleanField()
+
+    def select_format(self, compiler, sql, params):
+        # Wrap filters with a CASE WHEN expression if a database backend
+        # (e.g. Oracle) doesn't support boolean expression in SELECT or GROUP
+        # BY list.
+        if not compiler.connection.features.supports_boolean_expr_in_select_clause:
+            sql = f'CASE WHEN {sql} THEN 1 ELSE 0 END'
+        return sql, params
+
+    def get_db_converters(self, connection):
+        return self.output_field.get_db_converters(connection)
+
+    def get_lookup(self, lookup):
+        return self.output_field.get_lookup(lookup)
+
 
 class NothingNode:
     """A node that matches nothing."""
