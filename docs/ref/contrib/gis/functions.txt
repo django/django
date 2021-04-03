@@ -44,7 +44,7 @@ Oracle, `PostGIS <https://postgis.net/docs/ST_Area.html>`__, SpatiaLite
 Accepts a single geographic field or expression and returns the area of the
 field as an :class:`~django.contrib.gis.measure.Area` measure.
 
-MySQL and SpatiaLite without LWGEOM don't support area calculations on
+MySQL and SpatiaLite without LWGEOM/RTTOPO don't support area calculations on
 geographic SRSes.
 
 ``AsGeoJSON``
@@ -208,7 +208,7 @@ __ https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry
 .. class:: Azimuth(point_a, point_b, **extra)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Azimuth.html>`__,
-SpatiaLite (LWGEOM)
+SpatiaLite (LWGEOM/RTTOPO)
 
 Returns the azimuth in radians of the segment defined by the given point
 geometries, or ``None`` if the two points are coincident. The azimuth is angle
@@ -334,7 +334,8 @@ are returned unchanged.
 
 *Availability*: `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-geohash-functions.html#function_st-geohash>`__ (≥ 5.7.5),
-`PostGIS <https://postgis.net/docs/ST_GeoHash.html>`__, SpatiaLite (LWGEOM)
+`PostGIS <https://postgis.net/docs/ST_GeoHash.html>`__, SpatiaLite
+(LWGEOM/RTTOPO)
 
 Accepts a single geographic field or expression and returns a `GeoHash`__
 representation of the geometry.
@@ -416,7 +417,7 @@ Returns a float between 0 and 1 representing the location of the closest point o
 .. class:: MakeValid(expr)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_MakeValid.html>`__,
-SpatiaLite (LWGEOM)
+SpatiaLite (LWGEOM/RTTOPO)
 
 Accepts a geographic field or expression and attempts to convert the value into
 a valid geometry without losing any of the input vertices. Geometries that are

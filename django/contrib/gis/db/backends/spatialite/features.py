@@ -11,7 +11,7 @@ class DatabaseFeatures(BaseSpatialFeatures, SQLiteDatabaseFeatures):
 
     @cached_property
     def supports_area_geodetic(self):
-        return bool(self.connection.ops.lwgeom_version())
+        return bool(self.connection.ops.geom_lib_version())
 
     @cached_property
     def django_test_skips(self):

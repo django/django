@@ -367,16 +367,12 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         dist2 = SouthTexasCityFt.objects.annotate(distance=Distance('point', lagrange)).order_by('id')
         dist_qs = [dist1, dist2]
 
-        # Original query done on PostGIS, have to adjust AlmostEqual tolerance
-        # for Oracle.
-        tol = 2 if connection.ops.oracle else 5
-
         # Ensuring expected distances are returned for each distance queryset.
         for qs in dist_qs:
             for i, c in enumerate(qs):
                 with self.subTest(c=c):
-                    self.assertAlmostEqual(m_distances[i], c.distance.m, tol)
-                    self.assertAlmostEqual(ft_distances[i], c.distance.survey_ft, tol)
+                    self.assertAlmostEqual(m_distances[i], c.distance.m, -1)
+                    self.assertAlmostEqual(ft_distances[i], c.distance.survey_ft, -1)
 
     @skipUnlessDBFeature("has_Distance_function", "supports_distance_geodetic")
     def test_distance_geodetic(self):

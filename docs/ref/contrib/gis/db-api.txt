@@ -344,9 +344,9 @@ functions are available on each spatial backend.
 
 .. currentmodule:: django.contrib.gis.db.models.functions
 
-====================================  =======  ============== ============ =========== ==========
+====================================  =======  ============== ============ =========== =================
 Function                              PostGIS  Oracle         MariaDB      MySQL       SpatiaLite
-====================================  =======  ============== ============ =========== ==========
+====================================  =======  ============== ============ =========== =================
 :class:`Area`                         X        X              X            X           X
 :class:`AsGeoJSON`                    X        X              X (≥ 10.2.4) X (≥ 5.7.5) X
 :class:`AsGML`                        X        X                                       X
@@ -354,19 +354,19 @@ Function                              PostGIS  Oracle         MariaDB      MySQL
 :class:`AsSVG`                        X                                                X
 :class:`AsWKB`                        X        X              X            X           X
 :class:`AsWKT`                        X        X              X            X           X
-:class:`Azimuth`                      X                                                X (LWGEOM)
+:class:`Azimuth`                      X                                                X (LWGEOM/RTTOPO)
 :class:`BoundingCircle`               X        X
 :class:`Centroid`                     X        X              X            X           X
 :class:`Difference`                   X        X              X            X           X
 :class:`Distance`                     X        X              X            X           X
 :class:`Envelope`                     X        X              X            X           X
 :class:`ForcePolygonCW`               X                                                X
-:class:`GeoHash`                      X                                    X (≥ 5.7.5) X (LWGEOM)
+:class:`GeoHash`                      X                                    X (≥ 5.7.5) X (LWGEOM/RTTOPO)
 :class:`Intersection`                 X        X              X            X           X
 :class:`IsValid`                      X        X                           X (≥ 5.7.5) X
 :class:`Length`                       X        X              X            X           X
 :class:`LineLocatePoint`              X                                                X
-:class:`MakeValid`                    X                                                X (LWGEOM)
+:class:`MakeValid`                    X                                                X (LWGEOM/RTTOPO)
 :class:`MemSize`                      X
 :class:`NumGeometries`                X        X              X            X           X
 :class:`NumPoints`                    X        X              X            X           X
@@ -379,7 +379,7 @@ Function                              PostGIS  Oracle         MariaDB      MySQL
 :class:`Transform`                    X        X                                       X
 :class:`Translate`                    X                                                X
 :class:`Union`                        X        X              X            X           X
-====================================  =======  ============== ============ =========== ==========
+====================================  =======  ============== ============ =========== =================
 
 Aggregate Functions
 -------------------
