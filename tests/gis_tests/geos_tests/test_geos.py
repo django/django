@@ -638,10 +638,10 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             i1 = fromstr(self.geometries.intersect_geoms[i].wkt)
             self.assertIs(a.intersects(b), True)
             i2 = a.intersection(b)
-            self.assertEqual(i1, i2)
-            self.assertEqual(i1, a & b)  # __and__ is intersection operator
+            self.assertTrue(i1.equals(i2))
+            self.assertTrue(i1.equals(a & b))  # __and__ is intersection operator
             a &= b  # testing __iand__
-            self.assertEqual(i1, a)
+            self.assertTrue(i1.equals(a))
 
     def test_union(self):
         "Testing union()."
@@ -650,10 +650,10 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
             u1 = fromstr(self.geometries.union_geoms[i].wkt)
             u2 = a.union(b)
-            self.assertEqual(u1, u2)
-            self.assertEqual(u1, a | b)  # __or__ is union operator
+            self.assertTrue(u1.equals(u2))
+            self.assertTrue(u1.equals(a | b))  # __or__ is union operator
             a |= b  # testing __ior__
-            self.assertEqual(u1, a)
+            self.assertTrue(u1.equals(a))
 
     def test_unary_union(self):
         "Testing unary_union."
@@ -671,10 +671,10 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
             d1 = fromstr(self.geometries.diff_geoms[i].wkt)
             d2 = a.difference(b)
-            self.assertEqual(d1, d2)
-            self.assertEqual(d1, a - b)  # __sub__ is difference operator
+            self.assertTrue(d1.equals(d2))
+            self.assertTrue(d1.equals(a - b))  # __sub__ is difference operator
             a -= b  # testing __isub__
-            self.assertEqual(d1, a)
+            self.assertTrue(d1.equals(a))
 
     def test_symdifference(self):
         "Testing sym_difference()."
@@ -683,10 +683,10 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
             d1 = fromstr(self.geometries.sdiff_geoms[i].wkt)
             d2 = a.sym_difference(b)
-            self.assertEqual(d1, d2)
-            self.assertEqual(d1, a ^ b)  # __xor__ is symmetric difference operator
+            self.assertTrue(d1.equals(d2))
+            self.assertTrue(d1.equals(a ^ b))  # __xor__ is symmetric difference operator
             a ^= b  # testing __ixor__
-            self.assertEqual(d1, a)
+            self.assertTrue(d1.equals(a))
 
     def test_buffer(self):
         bg = self.geometries.buffer_geoms[0]
