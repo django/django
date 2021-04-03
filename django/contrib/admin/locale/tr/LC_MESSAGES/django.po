@@ -634,7 +634,7 @@ msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
-"Lütfen yeni parolanızı iki kere girin böylece böylece doğru olarak "
+"Lütfen yeni parolanızı iki kere girin böylece doğru olarak "
 "yazdığınızı doğrulayabilelim."
 
 msgid "New password:"
