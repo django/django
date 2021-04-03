@@ -317,75 +317,74 @@ class CsrfViewMiddleware(MiddlewareMixin):
             return None
 
         # Assume that anything not defined as 'safe' by RFC7231 needs protection
-        if request.method not in ('GET', 'HEAD', 'OPTIONS', 'TRACE'):
-            if getattr(request, '_dont_enforce_csrf_checks', False):
-                # Mechanism to turn off CSRF checks for test suite.
-                # It comes after the creation of CSRF cookies, so that
-                # everything else continues to work exactly the same
-                # (e.g. cookies are sent, etc.), but before any
-                # branches that call reject().
-                return self._accept(request)
+        if request.method in ('GET', 'HEAD', 'OPTIONS', 'TRACE'):
+            return self._accept(request)
 
-            # Reject the request if the Origin header doesn't match an allowed
-            # value.
-            if 'HTTP_ORIGIN' in request.META:
-                if not self._origin_verified(request):
-                    return self._reject(request, REASON_BAD_ORIGIN % request.META['HTTP_ORIGIN'])
-            elif request.is_secure():
-                # If the Origin header wasn't provided, reject HTTPS requests
-                # if the Referer header doesn't match an allowed value.
-                #
-                # Suppose user visits http://example.com/
-                # An active network attacker (man-in-the-middle, MITM) sends a
-                # POST form that targets https://example.com/detonate-bomb/ and
-                # submits it via JavaScript.
-                #
-                # The attacker will need to provide a CSRF cookie and token, but
-                # that's no problem for a MITM and the session-independent
-                # secret we're using. So the MITM can circumvent the CSRF
-                # protection. This is true for any HTTP connection, but anyone
-                # using HTTPS expects better! For this reason, for
-                # https://example.com/ we need additional protection that treats
-                # http://example.com/ as completely untrusted. Under HTTPS,
-                # Barth et al. found that the Referer header is missing for
-                # same-domain requests in only about 0.2% of cases or less, so
-                # we can use strict Referer checking.
-                try:
-                    self._check_referer(request)
-                except RejectRequest as exc:
-                    return self._reject(request, exc.reason)
+        if getattr(request, '_dont_enforce_csrf_checks', False):
+            # Mechanism to turn off CSRF checks for test suite. It comes after
+            # the creation of CSRF cookies, so that everything else continues
+            # to work exactly the same (e.g. cookies are sent, etc.), but
+            # before any branches that call reject().
+            return self._accept(request)
 
-            # Access csrf_token via self._get_token() as rotate_token() may
-            # have been called by an authentication middleware during the
-            # process_request() phase.
-            csrf_token = self._get_token(request)
-            if csrf_token is None:
-                # No CSRF cookie. For POST requests, we insist on a CSRF cookie,
-                # and in this way we can avoid all CSRF attacks, including login
-                # CSRF.
-                return self._reject(request, REASON_NO_CSRF_COOKIE)
+        # Reject the request if the Origin header doesn't match an allowed
+        # value.
+        if 'HTTP_ORIGIN' in request.META:
+            if not self._origin_verified(request):
+                return self._reject(request, REASON_BAD_ORIGIN % request.META['HTTP_ORIGIN'])
+        elif request.is_secure():
+            # If the Origin header wasn't provided, reject HTTPS requests if
+            # the Referer header doesn't match an allowed value.
+            #
+            # Suppose user visits http://example.com/
+            # An active network attacker (man-in-the-middle, MITM) sends a
+            # POST form that targets https://example.com/detonate-bomb/ and
+            # submits it via JavaScript.
+            #
+            # The attacker will need to provide a CSRF cookie and token, but
+            # that's no problem for a MITM and the session-independent secret
+            # we're using. So the MITM can circumvent the CSRF protection. This
+            # is true for any HTTP connection, but anyone using HTTPS expects
+            # better! For this reason, for https://example.com/ we need
+            # additional protection that treats http://example.com/ as
+            # completely untrusted. Under HTTPS, Barth et al. found that the
+            # Referer header is missing for same-domain requests in only about
+            # 0.2% of cases or less, so we can use strict Referer checking.
+            try:
+                self._check_referer(request)
+            except RejectRequest as exc:
+                return self._reject(request, exc.reason)
 
-            # Check non-cookie token for match.
-            request_csrf_token = ""
-            if request.method == "POST":
-                try:
-                    request_csrf_token = request.POST.get('csrfmiddlewaretoken', '')
-                except OSError:
-                    # Handle a broken connection before we've completed reading
-                    # the POST data. process_view shouldn't raise any
-                    # exceptions, so we'll ignore and serve the user a 403
-                    # (assuming they're still listening, which they probably
-                    # aren't because of the error).
-                    pass
+        # Access csrf_token via self._get_token() as rotate_token() may have
+        # been called by an authentication middleware during the
+        # process_request() phase.
+        csrf_token = self._get_token(request)
+        if csrf_token is None:
+            # No CSRF cookie. For POST requests, we insist on a CSRF cookie,
+            # and in this way we can avoid all CSRF attacks, including login
+            # CSRF.
+            return self._reject(request, REASON_NO_CSRF_COOKIE)
 
-            if request_csrf_token == "":
-                # Fall back to X-CSRFToken, to make things easier for AJAX,
-                # and possible for PUT/DELETE.
-                request_csrf_token = request.META.get(settings.CSRF_HEADER_NAME, '')
+        # Check non-cookie token for match.
+        request_csrf_token = ''
+        if request.method == 'POST':
+            try:
+                request_csrf_token = request.POST.get('csrfmiddlewaretoken', '')
+            except OSError:
+                # Handle a broken connection before we've completed reading the
+                # POST data. process_view shouldn't raise any exceptions, so
+                # we'll ignore and serve the user a 403 (assuming they're still
+                # listening, which they probably aren't because of the error).
+                pass
 
-            request_csrf_token = _sanitize_token(request_csrf_token)
-            if not _compare_masked_tokens(request_csrf_token, csrf_token):
-                return self._reject(request, REASON_BAD_TOKEN)
+        if request_csrf_token == '':
+            # Fall back to X-CSRFToken, to make things easier for AJAX, and
+            # possible for PUT/DELETE.
+            request_csrf_token = request.META.get(settings.CSRF_HEADER_NAME, '')
+
+        request_csrf_token = _sanitize_token(request_csrf_token)
+        if not _compare_masked_tokens(request_csrf_token, csrf_token):
+            return self._reject(request, REASON_BAD_TOKEN)
 
         return self._accept(request)
 
