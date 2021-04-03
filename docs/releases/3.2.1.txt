@@ -9,4 +9,4 @@ Django 3.2.1 fixes several bugs in 3.2.0.
 Bugfixes
 ========
 
-* ...
+* Corrected detection of GDAL 3.2 on Windows (:ticket:`32544`).
