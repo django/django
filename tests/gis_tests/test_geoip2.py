@@ -5,25 +5,22 @@ from unittest import mock, skipUnless
 from django.conf import settings
 from django.contrib.gis.geoip2 import HAS_GEOIP2
 from django.contrib.gis.geos import GEOSGeometry
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 
 if HAS_GEOIP2:
     from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
 
+# Test files and IP addresses come from the MaxMind-DB test repository: https://github.com/maxmind/MaxMind-DB
+GEOIP2_TEST_PATH = pathlib.Path(__file__).parent / "data" / "geoip2"
 
-# Note: Requires both the GeoIP country and city datasets.
-# The GEOIP_DATA path should be the only setting set (the directory
-# should contain links or the actual database files 'GeoLite2-City.mmdb' and
-# 'GeoLite2-City.mmdb'.
-@skipUnless(
-    HAS_GEOIP2 and getattr(settings, "GEOIP_PATH", None),
-    "GeoIP is required along with the GEOIP_PATH setting."
-)
+
+@skipUnless(HAS_GEOIP2, "GeoIP is required")
+@override_settings(GEOIP_PATH=GEOIP2_TEST_PATH)
 class GeoIPTest(SimpleTestCase):
-    addr = '129.237.192.1'
+    addr = '2.125.160.216'
     fqdn = 'ku.edu'
 
-    def test01_init(self):
+    def test_init(self):
         "GeoIP initialization."
         g1 = GeoIP2()  # Everything inferred from GeoIP path
         path = settings.GEOIP_PATH
@@ -65,7 +62,7 @@ class GeoIPTest(SimpleTestCase):
         with self.assertRaisesMessage(GeoIP2Exception, msg):
             GeoIP2(invalid_path)
 
-    def test02_bad_query(self):
+    def test_bad_query(self):
         "GeoIP query parameter checking."
         cntry_g = GeoIP2(city='<foo>')
         # No city database available, these calls should fail.
@@ -81,58 +78,42 @@ class GeoIPTest(SimpleTestCase):
             cntry_g.country_name(GeoIP2)
 
     @mock.patch('socket.gethostbyname')
-    def test03_country(self, gethostbyname):
+    def test_country(self, gethostbyname):
         "GeoIP country querying methods."
-        gethostbyname.return_value = '128.249.1.1'
+        gethostbyname.return_value = '2.125.160.216'
         g = GeoIP2(city='<foo>')
 
         for query in (self.fqdn, self.addr):
+            self.assertEqual('GB', g.country_code(query))
+            self.assertEqual('United Kingdom', g.country_name(query))
             self.assertEqual(
-                'US',
-                g.country_code(query),
-                'Failed for func country_code and query %s' % query
-            )
-            self.assertEqual(
-                'United States',
-                g.country_name(query),
-                'Failed for func country_name and query %s' % query
-            )
-            self.assertEqual(
-                {'country_code': 'US', 'country_name': 'United States'},
+                {'country_code': 'GB', 'country_name': 'United Kingdom'},
                 g.country(query)
             )
 
     @mock.patch('socket.gethostbyname')
-    def test04_city(self, gethostbyname):
+    def test_city(self, gethostbyname):
         "GeoIP city querying methods."
-        gethostbyname.return_value = '129.237.192.1'
+        gethostbyname.return_value = '2.125.160.216'
         g = GeoIP2(country='<foo>')
 
         for query in (self.fqdn, self.addr):
             # Country queries should still work.
+            self.assertEqual('GB', g.country_code(query))
+            self.assertEqual('United Kingdom', g.country_name(query))
             self.assertEqual(
-                'US',
-                g.country_code(query),
-                'Failed for func country_code and query %s' % query
-            )
-            self.assertEqual(
-                'United States',
-                g.country_name(query),
-                'Failed for func country_name and query %s' % query
-            )
-            self.assertEqual(
-                {'country_code': 'US', 'country_name': 'United States'},
+                {'country_code': 'GB', 'country_name': 'United Kingdom'},
                 g.country(query)
             )
 
             # City information dictionary.
             d = g.city(query)
-            self.assertEqual('NA', d['continent_code'])
-            self.assertEqual('North America', d['continent_name'])
-            self.assertEqual('US', d['country_code'])
-            self.assertEqual('Lawrence', d['city'])
-            self.assertEqual('KS', d['region'])
-            self.assertEqual('America/Chicago', d['time_zone'])
+            self.assertEqual('EU', d['continent_code'])
+            self.assertEqual('Europe', d['continent_name'])
+            self.assertEqual('GB', d['country_code'])
+            self.assertEqual('Boxford', d['city'])
+            self.assertEqual('ENG', d['region'])
+            self.assertEqual('Europe/London', d['time_zone'])
             self.assertFalse(d['is_in_european_union'])
             geom = g.geos(query)
             self.assertIsInstance(geom, GEOSGeometry)
@@ -141,13 +122,11 @@ class GeoIPTest(SimpleTestCase):
                 self.assertIsInstance(e1, float)
                 self.assertIsInstance(e2, float)
 
-    def test06_ipv6_query(self):
+    def test_ipv6_city(self):
         "GeoIP can lookup IPv6 addresses."
         g = GeoIP2()
-        d = g.city('2002:81ed:c9a5::81ed:c9a5')  # IPv6 address for www.nhm.ku.edu
-        self.assertEqual('US', d['country_code'])
-        self.assertEqual('Lawrence', d['city'])
-        self.assertEqual('KS', d['region'])
+        d = g.city('::202:300')
+        self.assertEqual(d['city'], 'Boxford')
 
     def test_repr(self):
         path = settings.GEOIP_PATH
