@@ -3,6 +3,7 @@ import socket
 import geoip2.database
 
 from django.conf import settings
+from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv46_address
 from django.utils._os import to_path
@@ -210,7 +211,6 @@ class GeoIP2:
         "Return a GEOS Point object for the given query."
         ll = self.lon_lat(query)
         if ll:
-            from django.contrib.gis.geos import Point
             return Point(ll, srid=4326)
         else:
             return None
