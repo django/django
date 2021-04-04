@@ -68,9 +68,7 @@ class GeoIP2:
             'GeoLite2-City.mmdb'; overrides the GEOIP_CITY setting.
         """
         # Checking the given cache option.
-        if cache in self.cache_options:
-            self._cache = cache
-        else:
+        if cache not in self.cache_options:
             raise GeoIP2Exception('Invalid GeoIP caching option: %s' % cache)
 
         # Getting the GeoIP data path.
