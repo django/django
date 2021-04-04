@@ -9,6 +9,7 @@ from django.utils._os import to_path
 
 from .resources import City, Country
 
+
 class GeoIP2Exception(Exception):
     pass
 
