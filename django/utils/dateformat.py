@@ -1,6 +1,6 @@
 """
 PHP date() style date formatting
-See http://www.php.net/date for format strings
+See https://www.php.net/date for format strings
 
 Usage:
 >>> import datetime

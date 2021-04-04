@@ -685,7 +685,7 @@ def parse_header(line):
             name = p[:i].strip().lower().decode('ascii')
             if name.endswith('*'):
                 # Lang/encoding embedded in the value (like "filename*=UTF-8''file.ext")
-                # http://tools.ietf.org/html/rfc2231#section-4
+                # https://tools.ietf.org/html/rfc2231#section-4
                 name = name[:-1]
                 if p.count(b"'") == 2:
                     has_encoding = True

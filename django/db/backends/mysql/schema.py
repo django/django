@@ -126,7 +126,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         MySQL can remove an implicit FK index on a field when that field is
         covered by another index like a unique_together. "covered" here means
         that the more complex index starts like the simpler one.
-        http://bugs.mysql.com/bug.php?id=37910 / Django ticket #24757
+        https://bugs.mysql.com/bug.php?id=37910 / Django ticket #24757
         We check here before removing the [unique|index]_together if we have to
         recreate a FK index.
         """

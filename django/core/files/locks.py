@@ -5,7 +5,7 @@ Based partially on an example by Jonathan Feignberg in the Python
 Cookbook [1] (licensed under the Python Software License) and a ctypes port by
 Anatoly Techtonik for Roundup [2] (license [3]).
 
-[1] http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/65203
+[1] https://code.activestate.com/recipes/65203/
 [2] https://sourceforge.net/p/roundup/code/ci/default/tree/roundup/backends/portalocker.py
 [3] https://sourceforge.net/p/roundup/code/ci/default/tree/COPYING.txt
 
