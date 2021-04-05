@@ -310,6 +310,9 @@ Miscellaneous
 * The ``django.contrib.gis.geoip2.GeoIP2.coords()`` method is deprecated. Use
   ``django.contrib.gis.geoip2.GeoIP2.lon_lat()`` instead.
 
+* The ``django.contrib.gis.geoip2.GeoIP2.open()`` method is deprecated. Use the
+  :class:`~django.contrib.gis.geoip2.GeoIP2` constructor instead.
+
 Features removed in 5.1
 =======================
 

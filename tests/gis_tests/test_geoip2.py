@@ -29,14 +29,13 @@ class GeoIPTest(SimpleTestCase):
         g1 = GeoIP2()  # Everything inferred from GeoIP path
         path = settings.GEOIP_PATH
         g2 = GeoIP2(path, 0)  # Passing in data path explicitly.
-        g3 = GeoIP2.open(path, 0)  # MaxMind Python API syntax.
         # path accepts str and pathlib.Path.
         if isinstance(path, str):
-            g4 = GeoIP2(pathlib.Path(path))
+            g3 = GeoIP2(pathlib.Path(path))
         else:
-            g4 = GeoIP2(str(path))
+            g3 = GeoIP2(str(path))
 
-        for g in (g1, g2, g3, g4):
+        for g in (g1, g2, g3):
             self.assertTrue(g._country)
             self.assertTrue(g._city)
 
@@ -198,3 +197,10 @@ class GeoIPTest(SimpleTestCase):
             e1, e2 = g.coords(self.fqdn)
         self.assertIsInstance(e1, float)
         self.assertIsInstance(e2, float)
+
+    def test_open_deprecation_warning(self):
+        msg = "GeoIP2.open() is deprecated. Use GeoIP2() instead."
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            g = GeoIP2.open(settings.GEOIP_PATH, 0)
+        self.assertTrue(g._country)
+        self.assertTrue(g._city)

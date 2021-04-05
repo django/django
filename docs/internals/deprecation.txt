@@ -66,6 +66,8 @@ details on these changes.
 
 * The ``django.contrib.gis.geoip2.GeoIP2.coords()`` method will be removed.
 
+* The ``django.contrib.gis.geoip2.GeoIP2.open()`` method will be removed.
+
 .. _deprecation-removed-in-5.1:
 
 5.1

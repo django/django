@@ -230,4 +230,9 @@ class GeoIP2:
 
     @classmethod
     def open(cls, full_path, cache):
+        warnings.warn(
+            "GeoIP2.open() is deprecated. Use GeoIP2() instead.",
+            RemovedInDjango60Warning,
+            stacklevel=2,
+        )
         return GeoIP2(full_path, cache)

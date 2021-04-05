@@ -100,6 +100,10 @@ Instantiating
 This classmethod instantiates the GeoIP object from the given database path
 and given cache setting.
 
+.. deprecated:: 5.1
+
+   Use the :class:`GeoIP2()` constructor instead.
+
 Querying
 --------
 
