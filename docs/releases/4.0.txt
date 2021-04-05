@@ -437,6 +437,10 @@ Miscellaneous
 
 * The undocumented ``django.utils.baseconv`` module is deprecated.
 
+* The ``django.contrib.gis.geoip2.GeoIP2.open()`` class method is deprecated
+  and the :class:`~django.contrib.gis.geoip2.GeoIP2` constructor should be used
+  instead.
+
 Features removed in 4.0
 =======================
 

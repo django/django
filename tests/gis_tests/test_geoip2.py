@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.gis.geoip2 import HAS_GEOIP2
 from django.contrib.gis.geos import GEOSGeometry
 from django.test import SimpleTestCase, override_settings
+from django.utils.deprecation import RemovedInDjango50Warning
 
 if HAS_GEOIP2:
     from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
@@ -29,17 +30,16 @@ class GeoLite2Test(SimpleTestCase):
 
         g1 = GeoIP2()  # Everything inferred from GeoIP path
         g2 = GeoIP2(path, 0)  # Passing in data path explicitly.
-        g3 = GeoIP2.open(path, 0)  # MaxMind Python API syntax.
-        g4 = GeoIP2(str(path))  # path accepts str instead of pathlib.Path.
-        for g in (g1, g2, g3, g4):
+        g3 = GeoIP2(str(path))  # path accepts str instead of pathlib.Path.
+        for g in (g1, g2, g3):
             self.assertTrue(g._country)
             self.assertTrue(g._city)
 
         # Only passing in the location of one database.
-        g5 = GeoIP2(path / 'GeoLite2-City-Test.mmdb', country='')
-        g6 = GeoIP2(path / 'GeoLite2-Country-Test.mmdb', city='')
-        self.assertIsNone(g5._country)
-        self.assertIsNone(g6._city)
+        g4 = GeoIP2(path / 'GeoLite2-City-Test.mmdb', country='')
+        g5 = GeoIP2(path / 'GeoLite2-Country-Test.mmdb', city='')
+        self.assertIsNone(g4._country)
+        self.assertIsNone(g5._city)
 
         # Improper parameters.
         bad_params = (23, 'foo', 15.23)
@@ -149,6 +149,11 @@ class GeoLite2Test(SimpleTestCase):
         self.assertEqual(g._check_query('127.0.0.1'), '127.0.0.1')
         self.assertEqual(g._check_query('2002:81ed:c9a5::81ed:c9a5'), '2002:81ed:c9a5::81ed:c9a5')
         self.assertEqual(g._check_query('invalid-ip-address'), 'expected')
+
+    def test_open_deprecation_warning(self):
+        msg = 'The GeoIP2.open() class method has been deprecated in favor of using GeoIP2() directly.'
+        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+            GeoIP2.open(settings.GEOIP_PATH / settings.GEOIP_CITY, 0)
 
 
 @skipUnless(HAS_GEOIP2, 'GeoIP2 is required.')

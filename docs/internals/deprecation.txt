@@ -19,6 +19,8 @@ details on these changes.
 
 * The undocumented ``django.utils.baseconv`` module will be removed.
 
+* The ``django.contrib.gis.geoip2.GeoIP2.open()`` class method will be removed.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

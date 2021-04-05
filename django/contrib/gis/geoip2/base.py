@@ -1,4 +1,5 @@
 import socket
+import warnings
 
 import geoip2.database
 
@@ -7,6 +8,7 @@ from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv46_address
 from django.utils._os import to_path
+from django.utils.deprecation import RemovedInDjango50Warning
 
 from .resources import City, Country
 
@@ -208,4 +210,8 @@ class GeoIP2:
 
     @classmethod
     def open(cls, full_path, cache):
+        warnings.warn(
+            'The GeoIP2.open() class method has been deprecated in favor of '
+            'using GeoIP2() directly.', category=RemovedInDjango50Warning,
+        )
         return GeoIP2(full_path, cache)
