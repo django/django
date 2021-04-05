@@ -3,6 +3,8 @@ import itertools
 import pathlib
 from unittest import mock, skipUnless
 
+import geoip2
+
 from django.conf import settings
 from django.contrib.gis.geoip2 import HAS_GEOIP2
 from django.contrib.gis.geos import GEOSGeometry
@@ -145,6 +147,15 @@ class GeoLite2Test(SimpleTestCase):
                 })
                 self.assertEqual(g.country_code(query), 'GB')
                 self.assertEqual(g.country_name(query), 'United Kingdom')
+
+    def test_not_found(self):
+        g1 = GeoIP2(city='<invalid>')
+        g2 = GeoIP2(country='<invalid>')
+        for function, query in itertools.product((g1.country, g2.city), ('127.0.0.1', '::1')):
+            with self.subTest(function=function.__qualname__, query=query):
+                msg = f'The address {query} is not in the database.'
+                with self.assertRaisesMessage(geoip2.errors.AddressNotFoundError, msg):
+                    function(query)
 
     def test_del(self):
         g = GeoIP2()
