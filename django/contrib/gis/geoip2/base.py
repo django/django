@@ -138,7 +138,7 @@ class GeoIP2:
             'city': self._city_file,
         }
 
-    def _check_query(self, query, country=False, city=False, city_or_country=False):
+    def _check_query(self, query, city=False, city_or_country=False):
         "Check the query and database availability."
         # Making sure a string was passed in for the query.
         if not isinstance(query, str):
@@ -147,8 +147,6 @@ class GeoIP2:
         # Extra checks for the existence of country and city databases.
         if city_or_country and not (self._country or self._city):
             raise GeoIP2Exception('Invalid GeoIP country and city data files.')
-        elif country and not self._country:
-            raise GeoIP2Exception('Invalid GeoIP country data file: %s' % self._country_file)
         elif city and not self._city:
             raise GeoIP2Exception('Invalid GeoIP city data file: %s' % self._city_file)
 
