@@ -4,15 +4,16 @@
 # Anvar Ulugov <wasatiyatm@gmail.com>, 2020
 # Bedilbek Khamidov <bedilbek@gmail.com>, 2019
 # Claude Paroz <claude@2xlibre.net>, 2019
+# Shukrullo Turgunov <shukrullo@umail.uz>, 2021
 # Sukhrobbek Ismatov <isukhrobbek@gmail.com>, 2019
 # Yet Sum <sotuvchicom@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-01-21 09:24+0000\n"
-"Last-Translator: Anvar Ulugov <wasatiyatm@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-03-23 11:13+0000\n"
+"Last-Translator: Shukrullo Turgunov <shukrullo@umail.uz>\n"
 "Language-Team: Uzbek (http://www.transifex.com/django/django/language/uz/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,19 +22,19 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "%(verbose_name_plural)s tanlanganlarni o'chirish"
+
+#, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr "Muvaffaqiyatli %(count)d%(items)s o'chirildi."
+msgstr "%(count)d%(items)s muvaffaqiyatli o'chirildi."
 
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr "%(name)s o'chirib bo'lmaydi"
+msgstr "%(name)s o'chirib bo'lmadi"
 
 msgid "Are you sure?"
 msgstr "Ishonchingiz komilmi?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "%(verbose_name_plural)s tanlanganlarini o'chirish"
 
 msgid "Administration"
 msgstr "Administratsiya"
@@ -70,6 +71,12 @@ msgstr "Sanasi yo'q"
 
 msgid "Has date"
 msgstr "Sanasi bor"
+
+msgid "Empty"
+msgstr "Bo'sh"
+
+msgid "Not empty"
+msgstr "Bo'sh emas"
 
 #, python-format
 msgid ""
@@ -129,15 +136,15 @@ msgstr ""
 
 #, python-format
 msgid "Added “%(object)s”."
-msgstr ""
+msgstr "\"%(object)s\" qo'shildi."
 
 #, python-format
 msgid "Changed “%(object)s” — %(changes)s"
-msgstr ""
+msgstr "%(object)s dan %(changes)sga o'zgartirildi."
 
 #, python-format
 msgid "Deleted “%(object)s.”"
-msgstr ""
+msgstr "\"%(object)s\" o'chirildi."
 
 msgid "LogEntry Object"
 msgstr ""
@@ -320,6 +327,19 @@ msgstr ""
 msgid "Clear selection"
 msgstr ""
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr ""
+
+msgid "Add"
+msgstr "Qo'shish"
+
+msgid "View"
+msgstr "Ko'rish"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr ""
+
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
@@ -365,6 +385,9 @@ msgstr "Saytda ko'rish"
 
 msgid "Filter"
 msgstr "Saralash"
+
+msgid "Clear all filters"
+msgstr ""
 
 msgid "Remove from sorting"
 msgstr "Tartiblashdan chiqarish"
@@ -429,9 +452,6 @@ msgid ""
 "following objects and their related items will be deleted:"
 msgstr ""
 
-msgid "View"
-msgstr "Ko'rish"
-
 msgid "Delete?"
 msgstr "O'chirasizmi?"
 
@@ -441,16 +461,6 @@ msgstr ""
 
 msgid "Summary"
 msgstr "Xulosa"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr ""
-
-msgid "Add"
-msgstr "Qo'shish"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr ""
 
 msgid "Recent actions"
 msgstr "So'ngi harakatlar"
@@ -477,6 +487,9 @@ msgid ""
 msgstr ""
 
 msgid "Forgotten your password or username?"
+msgstr ""
+
+msgid "Toggle navigation"
 msgstr ""
 
 msgid "Date/time"

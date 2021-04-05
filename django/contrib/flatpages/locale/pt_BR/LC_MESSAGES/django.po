@@ -10,6 +10,7 @@
 # semente, 2012-2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
+# Rafael Fontenelle <rffontenelle@gmail.com>, 2021
 # Sergio Oliveira <seocam@seocam.com>, 2013
 # Thiago Avelino <t@avelino.xxx>, 2013
 msgid ""
@@ -17,8 +18,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-12-11 00:26+0000\n"
-"Last-Translator: Amanda Savluchinske <amandasavluchinske@gmail.com>\n"
+"PO-Revision-Date: 2021-01-17 06:37+0000\n"
+"Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -39,8 +40,7 @@ msgstr "URL"
 msgid ""
 "Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"Exemplo: “/about/contact/”. Assegure que se tenha barras no início e no "
-"final."
+"Exemplo: “/about/contact/”. Certifique-se de ter barras no início e no final."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
@@ -50,7 +50,7 @@ msgstr ""
 "barras ou til."
 
 msgid "Example: “/about/contact”. Make sure to have a leading slash."
-msgstr "Exemplo: “/about/contact”. Assegure que se tenha uma barra no início."
+msgstr "Exemplo: “/about/contact”. Certifique-se de ter uma barra no início."
 
 msgid "URL is missing a leading slash."
 msgstr "Está faltando uma barra no início da URL."

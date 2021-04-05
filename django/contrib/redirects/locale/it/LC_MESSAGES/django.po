@@ -4,14 +4,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Marco Bonetti, 2014
 # Mirco Grillo <mirco.grillomg@gmail.com>, 2020
-# palmux <palmux@gmail.com>, 2014-2015
+# palmux <palmux@gmail.com>, 2014-2015,2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-07-23 08:41+0000\n"
-"Last-Translator: Mirco Grillo <mirco.grillomg@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-15 16:04+0000\n"
+"Last-Translator: palmux <palmux@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -40,11 +40,11 @@ msgid "redirect to"
 msgstr "redirezione verso"
 
 msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"“http://”."
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
 msgstr ""
 "Può essere un percorso assoluto (come sopra) o un URL completo che inizia "
-"con 'http://'."
+"con \"https: //\"."
 
 msgid "redirect"
 msgstr "redirezione"

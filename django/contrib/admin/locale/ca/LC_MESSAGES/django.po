@@ -9,14 +9,15 @@
 # Gil Obradors Via <gil.obradors@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Manel Clos <manelclos@gmail.com>, 2020
+# Marc Compte <marc@compte.cat>, 2021
 # Roger Pons <rogerpons@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-14 22:38+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-04-04 21:09+0000\n"
+"Last-Translator: Marc Compte <marc@compte.cat>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -24,6 +25,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ca\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Eliminar els %(verbose_name_plural)s seleccionats"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -35,10 +40,6 @@ msgstr "No es pot esborrar %(name)s"
 
 msgid "Are you sure?"
 msgstr "N'esteu segur?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Eliminar els %(verbose_name_plural)s seleccionats"
 
 msgid "Administration"
 msgstr "Administració"
@@ -87,7 +88,7 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
-"Si us plau, introduïu un %(username)s i contrasenya correcta per un compte "
+"Si us plau, introduïu un %(username)s i contrasenya correctes per un compte "
 "de personal. Observeu que ambdós camps són sensibles a majúscules."
 
 msgid "Action:"
@@ -191,34 +192,32 @@ msgid "The {name} “{obj}” was added successfully."
 msgstr "El {name} \"{obj}\" fou afegit amb èxit."
 
 msgid "You may edit it again below."
-msgstr "Hauria d'editar de nou a sota."
+msgstr "Podeu editar-lo de nou a sota."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
-"El {name} \"{obj}\"  s'ha afegit amb èxit. Pots afegir un altre  {name} a "
+"El {name} \"{obj}\" s'ha afegit amb èxit. Podeu afegir un altre {name} a "
 "sota."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
-"El {name} \"{obj}\" fou canviat amb èxit. Pots editar-ho un altra vegada a "
-"sota."
+"El {name} \"{obj}\" fou canviat amb èxit. Podeu editar-lo de nou a sota."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
-"El  {name} \"{obj}\" s'ha afegit amb èxit. Pots editar-lo altra vegada a "
-"sota."
+"El  {name} \"{obj}\" s'ha afegit amb èxit. Podeu editar-lo de nou a sota."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
-"El {name} \"{obj}\" fou canviat amb èxit. Pots afegir un altre  {name} a "
+"El {name} \"{obj}\" fou canviat amb èxit. Podeu afegir un altre {name} a "
 "sota."
 
 #, python-brace-format
@@ -377,7 +376,7 @@ msgid "Change password"
 msgstr "Canviar contrasenya"
 
 msgid "Please correct the error below."
-msgstr "Si us plau, corregeix l'error de sota"
+msgstr "Si us plau, corregiu l'error de sota."
 
 msgid "Please correct the errors below."
 msgstr "Si us plau, corregiu els errors mostrats a sota."
@@ -534,7 +533,7 @@ msgid "Forgotten your password or username?"
 msgstr "Heu oblidat la vostra contrasenya o nom d'usuari?"
 
 msgid "Toggle navigation"
-msgstr ""
+msgstr "Canviar mode de navegació"
 
 msgid "Date/time"
 msgstr "Data/hora"
@@ -591,7 +590,7 @@ msgstr "Tanca"
 
 #, python-format
 msgid "Change selected %(model)s"
-msgstr "Canviea el %(model)s seleccionat"
+msgstr "Canvieu el %(model)s seleccionat"
 
 #, python-format
 msgid "Add another %(model)s"

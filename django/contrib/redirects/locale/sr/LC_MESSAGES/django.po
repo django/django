@@ -2,14 +2,14 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018
-# Igor Jerosimić, 2020
+# Igor Jerosimić, 2020-2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-01-21 20:01+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-15 17:04+0000\n"
 "Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
@@ -40,11 +40,11 @@ msgid "redirect to"
 msgstr "преусмери ка"
 
 msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"“http://”."
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
 msgstr ""
 "Ово може да буде апсолутна путања (као изнад) или потпун URL који почиње са "
-"“http://”."
+"шемом као нпр. “https://”."
 
 msgid "redirect"
 msgstr "преусмеравање"

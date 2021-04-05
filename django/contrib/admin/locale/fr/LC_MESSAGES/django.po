@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Bruno Brouard <annoa.b@gmail.com>, 2021
 # Claude Paroz <claude@2xlibre.net>, 2013-2020
 # Claude Paroz <claude@2xlibre.net>, 2011,2013
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -8,15 +9,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-15 08:40+0000\n"
-"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-03-04 20:53+0000\n"
+"Last-Translator: Bruno Brouard <annoa.b@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Supprimer les %(verbose_name_plural)s sélectionnés"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -28,10 +33,6 @@ msgstr "Impossible de supprimer %(name)s"
 
 msgid "Are you sure?"
 msgstr "Êtes-vous sûr ?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Supprimer les %(verbose_name_plural)s sélectionnés"
 
 msgid "Administration"
 msgstr "Administration"
@@ -98,13 +99,13 @@ msgid "Addition"
 msgstr "Ajout"
 
 msgid "Change"
-msgstr "Modifier"
+msgstr "Modification"
 
 msgid "Deletion"
 msgstr "Suppression"
 
 msgid "action time"
-msgstr "heure de l’action"
+msgstr "date de l’action"
 
 msgid "user"
 msgstr "utilisateur"
@@ -198,14 +199,14 @@ msgstr ""
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
-"L’objet {name} « {obj} » a été modifié avec succès. Vous pouvez continuer "
-"l’édition ci-dessous."
+"L’objet {name} « {obj} » a été modifié avec succès. Vous pouvez l’éditer à "
+"nouveau ci-dessous."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
-"L’objet {name} « {obj} » a été ajouté avec succès. Vous pouvez continuer "
-"l’édition ci-dessous."
+"L’objet {name} « {obj} » a été ajouté avec succès. Vous pouvez l’éditer à "
+"nouveau ci-dessous."
 
 #, python-brace-format
 msgid ""
@@ -295,7 +296,7 @@ msgid "Django administration"
 msgstr "Administration de Django"
 
 msgid "Site administration"
-msgstr "Administration du site"
+msgstr "Site d’administration"
 
 msgid "Log in"
 msgstr "Connexion"
@@ -305,7 +306,7 @@ msgid "%(app)s administration"
 msgstr "Administration de %(app)s"
 
 msgid "Page not found"
-msgstr "Cette page n’a pas été trouvée"
+msgstr "Page non trouvée"
 
 msgid "We’re sorry, but the requested page could not be found."
 msgstr "Nous sommes désolés, mais la page demandée est introuvable."

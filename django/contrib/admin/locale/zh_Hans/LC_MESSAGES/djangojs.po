@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bai HuanCheng <xiqingongzi@gmail.com>, 2018
+# HuanCheng Bai白宦成 <xiqingongzi@gmail.com>, 2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kewei Ma <marknv.42@gmail.com>, 2016
 # Lele Long <schemacs@gmail.com>, 2011,2015
@@ -9,6 +9,7 @@
 # matthew Yip <yymmatthew@gmail.com>, 2020
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # slene <vslene@gmail.com>, 2011
+# Veoco <one@nomox.cn>, 2021
 # spaceoi <zhangzhaoyu@gmail.com>, 2016
 # ced773123cfad7b4e8b79ca80f736af9, 2012
 # Kevin Sze <leiarix@gmail.com>, 2012
@@ -16,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-25 06:12+0000\n"
-"Last-Translator: matthew Yip <yymmatthew@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-02-07 04:25+0000\n"
+"Last-Translator: Veoco <one@nomox.cn>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -184,6 +185,54 @@ msgid "November"
 msgstr "十一月"
 
 msgid "December"
+msgstr "十二月"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "一月"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "二月"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "三月"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "四月"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "五月"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "六月"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "七月"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "八月"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "九月"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "十月"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "十一月"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
 msgstr "十二月"
 
 msgctxt "one letter Sunday"
