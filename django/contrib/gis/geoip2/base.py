@@ -198,32 +198,26 @@ class GeoIP2:
         enc_query = self._check_query(query, city_or_country=True)
         return Country(self._country_or_city(enc_query))
 
-    # #### Coordinate retrieval routines ####
     def coords(self, query, ordering=("longitude", "latitude")):
-        cdict = self.city(query)
-        if cdict is None:
-            return None
-        else:
-            return tuple(cdict[o] for o in ordering)
+        data = self.city(query)
+        return tuple(data[o] for o in ordering)
 
     def lon_lat(self, query):
         "Return a tuple of the (longitude, latitude) for the given query."
-        return self.coords(query)
+        data = self.city(query)
+        return data["longitude"], data["latitude"]
 
     def lat_lon(self, query):
         "Return a tuple of the (latitude, longitude) for the given query."
-        return self.coords(query, ("latitude", "longitude"))
+        data = self.city(query)
+        return data["latitude"], data["longitude"]
 
     def geos(self, query):
         "Return a GEOS Point object for the given query."
-        ll = self.lon_lat(query)
-        if ll:
-            # Allows importing and using GeoIP2() when GEOS is not installed.
-            from django.contrib.gis.geos import Point
+        # Allows importing and using GeoIP2() when GEOS is not installed.
+        from django.contrib.gis.geos import Point
 
-            return Point(ll, srid=4326)
-        else:
-            return None
+        return Point(self.lon_lat(query), srid=4326)
 
     @classmethod
     def open(cls, full_path, cache):
