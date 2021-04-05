@@ -171,13 +171,11 @@ class GeoIP2:
 
     def country_code(self, query):
         "Return the country code for the given IP Address or FQDN."
-        enc_query = self._check_query(query, city_or_country=True)
-        return self.country(enc_query)['country_code']
+        return self.country(query)['country_code']
 
     def country_name(self, query):
         "Return the country name for the given IP Address or FQDN."
-        enc_query = self._check_query(query, city_or_country=True)
-        return self.country(enc_query)['country_name']
+        return self.country(query)['country_name']
 
     def country(self, query):
         """
