@@ -108,8 +108,11 @@ class GeoLite2Test(SimpleTestCase):
                 self.assertEqual(
                     g.country(query),
                     {
+                        "continent_code": "EU",
+                        "continent_name": "Europe",
                         "country_code": "GB",
                         "country_name": "United Kingdom",
+                        "is_in_european_union": False,
                     },
                 )
                 self.assertEqual(g.country_code(query), "GB")
@@ -148,8 +151,11 @@ class GeoLite2Test(SimpleTestCase):
                 self.assertEqual(
                     g.country(query),
                     {
+                        "continent_code": "EU",
+                        "continent_name": "Europe",
                         "country_code": "GB",
                         "country_name": "United Kingdom",
+                        "is_in_european_union": False,
                     },
                 )
                 self.assertEqual(g.country_code(query), "GB")

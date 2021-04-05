@@ -62,6 +62,9 @@ Minor features
 * :class:`~django.contrib.gis.geoip2.GeoIP2` now allows querying using
   :class:`ipaddress.IPv4Address` or :class:`ipaddress.IPv6Address` objects.
 
+* :meth:`.GeoIP2.country` now exposes the ``continent_code``,
+  ``continent_name``, and ``is_in_european_union`` values.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
