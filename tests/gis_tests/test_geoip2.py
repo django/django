@@ -1,3 +1,4 @@
+import ipaddress
 import itertools
 import pathlib
 from unittest import mock, skipUnless
@@ -22,8 +23,10 @@ GEOIP_PATH = pathlib.Path(__file__).parent.joinpath('data/geoip2').resolve()
 )
 class GeoLite2Test(SimpleTestCase):
     fqdn = 'sky.uk'
-    ipv4 = '2.125.160.216'
-    ipv6 = '::ffff:027d:a0d8'  # 2.125.160.216 as an IPv4 mapped IPv6 address.
+    ipv4_str = '2.125.160.216'
+    ipv6_str = '::ffff:027d:a0d8'  # 2.125.160.216 as an IPv4 mapped IPv6 address.
+    ipv4_addr = ipaddress.ip_address(ipv4_str)
+    ipv6_addr = ipaddress.ip_address(ipv6_str)
 
     def test_init(self):
         path = settings.GEOIP_PATH
@@ -74,7 +77,7 @@ class GeoLite2Test(SimpleTestCase):
 
         functions += (g.country, g.country_code, g.country_name)
 
-        msg = 'GeoIP query must be a string, not type'
+        msg = 'GeoIP query must be a string or instance of IPv4Address or IPv6Address, not type'
         for function, value in itertools.product(functions, values):
             with self.subTest(function=function.__qualname__, type=type(value)):
                 with self.assertRaisesMessage(TypeError, msg):
@@ -85,7 +88,7 @@ class GeoLite2Test(SimpleTestCase):
         gethostbyname.return_value = '2.125.160.216'
         g = GeoIP2(city='<invalid>')
 
-        for query in (self.fqdn, self.ipv4, self.ipv6):
+        for query in (self.fqdn, self.ipv4_str, self.ipv6_str, self.ipv4_addr, self.ipv6_addr):
             with self.subTest(query=query):
                 self.assertEqual(g.country(query), {
                     'country_code': 'GB',
@@ -99,7 +102,7 @@ class GeoLite2Test(SimpleTestCase):
         gethostbyname.return_value = '2.125.160.216'
         g = GeoIP2(country='<invalid>')
 
-        for query in (self.fqdn, self.ipv4, self.ipv6):
+        for query in (self.fqdn, self.ipv4_str, self.ipv6_str, self.ipv4_addr, self.ipv6_addr):
             with self.subTest(query=query):
                 self.assertEqual(g.city(query), {
                     'city': 'Boxford',
