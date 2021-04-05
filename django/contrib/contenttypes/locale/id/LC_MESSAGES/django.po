@@ -39,7 +39,7 @@ msgstr "Tipe konten objek %(ct_id)s tidak memiliki model yang terkait"
 
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn’t exist"
-msgstr "Jenis isi %(ct_id)s object %(obj_id)s tidak ada"
+msgstr "Tipe konten %(ct_id)s dengan objek %(obj_id)s tidak ada"
 
 #, python-format
 msgid "%(ct_name)s objects don’t have a get_absolute_url() method"

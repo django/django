@@ -34,7 +34,7 @@ msgid "Cannot delete %(name)s"
 msgstr "Tidak dapat menghapus %(name)s"
 
 msgid "Are you sure?"
-msgstr "Yakin?"
+msgstr "Apakah anda yakin?"
 
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"

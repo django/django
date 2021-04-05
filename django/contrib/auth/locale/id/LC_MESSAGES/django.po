@@ -106,7 +106,7 @@ msgid "Password (again)"
 msgstr "Sandi (ulangi)"
 
 msgid "algorithm"
-msgstr "algoritme"
+msgstr "algoritma"
 
 msgid "iterations"
 msgstr "iterasi"

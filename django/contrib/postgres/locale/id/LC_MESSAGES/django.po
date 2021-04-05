@@ -27,10 +27,10 @@ msgstr "Ekstensi PostgreSQL"
 
 #, python-format
 msgid "Item %(nth)s in the array did not validate:"
-msgstr "Butir %(nth)s dalam larik tidak tervalidasi:"
+msgstr "Item %(nth)s dalam array tidak tervalidasi:"
 
 msgid "Nested arrays must have the same length."
-msgstr "Array bersaran harus mempunyai panjang yang sama."
+msgstr "Array bersarang harus mempunyai panjang yang sama."
 
 msgid "Map of strings to strings/nulls"
 msgstr "Pemetaan dari string ke string/null"
@@ -43,7 +43,7 @@ msgid "Could not load JSON data."
 msgstr "Tidak dapat memuat data JSON."
 
 msgid "Input must be a JSON dictionary."
-msgstr "Masukan harus kamus JSON."
+msgstr "Masukan harus berupa JSON dictionary."
 
 msgid "Enter two valid values."
 msgstr "Masukkan dua nilai yang valid."
@@ -58,7 +58,7 @@ msgid "Enter two numbers."
 msgstr "Masukkan dua buah bilangan."
 
 msgid "Enter two valid date/times."
-msgstr "Masukan dua buah tanggal/waktu."
+msgstr "Masukan dua tanggal/waktu yang benar."
 
 msgid "Enter two valid dates."
 msgstr "Masukan dua buah tanggal yang benar."
@@ -71,7 +71,7 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no more than "
 "%(limit_value)d."
 msgstr[0] ""
-"Daftar mengandung %(show_value)d butir, seharusnya mengandung tidak lebih "
+"List berisi %(show_value)d item, seharusnya berisi tidak lebih "
 "dari %(limit_value)d."
 
 #, python-format
@@ -82,7 +82,7 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no fewer than "
 "%(limit_value)d."
 msgstr[0] ""
-"Daftar mengandung%(show_value)d butir, seharusnya mengandung tidak kurang "
+"Daftar berisi%(show_value)d item, seharusnya berisi tidak kurang "
 "dari %(limit_value)d."
 
 #, python-format
@@ -97,7 +97,7 @@ msgstr "Beberapa kunci yang tidak dikenali diberikan: %(keys)s"
 msgid ""
 "Ensure that this range is completely less than or equal to %(limit_value)s."
 msgstr ""
-"Pastikan bahwa jangkauan ini sepenuhnya kurang dari atau sama dengan "
+"Pastikan bahwa jarak ini sepenuhnya kurang dari atau sama dengan "
 "%(limit_value)s."
 
 #, python-format
@@ -105,5 +105,5 @@ msgid ""
 "Ensure that this range is completely greater than or equal to "
 "%(limit_value)s."
 msgstr ""
-"Pastikan bahwa jangkauan ini sepenuhnya lebih dari atau sama dengan "
+"Pastikan bahwa jarak ini sepenuhnya lebih dari atau sama dengan "
 "%(limit_value)s."
