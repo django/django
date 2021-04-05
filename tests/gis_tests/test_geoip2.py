@@ -91,8 +91,11 @@ class GeoLite2Test(SimpleTestCase):
         for query in (self.fqdn, self.ipv4_str, self.ipv6_str, self.ipv4_addr, self.ipv6_addr):
             with self.subTest(query=query):
                 self.assertEqual(g.country(query), {
+                    'continent_code': 'EU',
+                    'continent_name': 'Europe',
                     'country_code': 'GB',
                     'country_name': 'United Kingdom',
+                    'is_in_european_union': False,
                 })
                 self.assertEqual(g.country_code(query), 'GB')
                 self.assertEqual(g.country_name(query), 'United Kingdom')
@@ -130,8 +133,11 @@ class GeoLite2Test(SimpleTestCase):
 
                 # Country queries should still work.
                 self.assertEqual(g.country(query), {
+                    'continent_code': 'EU',
+                    'continent_name': 'Europe',
                     'country_code': 'GB',
                     'country_name': 'United Kingdom',
+                    'is_in_european_union': False,
                 })
                 self.assertEqual(g.country_code(query), 'GB')
                 self.assertEqual(g.country_name(query), 'United Kingdom')

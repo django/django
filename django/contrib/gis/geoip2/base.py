@@ -198,8 +198,11 @@ class GeoIP2:
         enc_query = self._check_query(query, city_or_country=True)
         response = self._country_or_city(enc_query)
         return {
+            'continent_code': response.continent.code,
+            'continent_name': response.continent.name,
             'country_code': response.country.iso_code,
             'country_name': response.country.name,
+            'is_in_european_union': response.country.is_in_european_union,
         }
 
     # #### Coordinate retrieval routines ####

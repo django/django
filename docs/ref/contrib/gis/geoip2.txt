@@ -30,7 +30,11 @@ Here is an example of its usage::
     >>> from django.contrib.gis.geoip2 import GeoIP2
     >>> g = GeoIP2()
     >>> g.country('google.com')
-    {'country_code': 'US', 'country_name': 'United States'}
+    {'continent_code': 'NA',
+     'continent_name': 'North America',
+     'country_code': 'US',
+     'country_name': 'United States',
+     'is_in_european_union': False}
     >>> g.city('72.14.207.99')
     {'city': 'Mountain View',
     'continent_code': 'NA',
