@@ -110,6 +110,11 @@ Minor features
 * The :meth:`~django.contrib.gis.geoip2.GeoIP2.country` result now exposes the
   ``continent_code``, ``continent_name``, and ``is_in_european_union`` values.
 
+* The :meth:`~django.contrib.gis.geoip2.GeoIP2.city` result now exposes the
+  ``accuracy_radius`` and ``region_name`` values. In addition the ``dma_code``
+  and ``region`` values are now exposed as ``metro_code`` and ``region_code``,
+  but the previous keys are also retained for backward compatibility.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
