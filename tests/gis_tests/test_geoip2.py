@@ -1,3 +1,4 @@
+import ipaddress
 import itertools
 import pathlib
 from unittest import mock, skipUnless
@@ -25,15 +26,20 @@ def build_geoip_path(*parts):
 )
 class GeoLite2Test(SimpleTestCase):
     fqdn = "sky.uk"
-    ipv4 = "2.125.160.216"
-    ipv6 = "::ffff:027d:a0d8"
+    ipv4_str = "2.125.160.216"
+    ipv6_str = "::ffff:027d:a0d8"
+    ipv4_addr = ipaddress.ip_address(ipv4_str)
+    ipv6_addr = ipaddress.ip_address(ipv6_str)
+    query_values = (fqdn, ipv4_str, ipv6_str, ipv4_addr, ipv6_addr)
 
     @classmethod
     def setUpClass(cls):
         # Avoid referencing __file__ at module level.
         cls.enterClassContext(override_settings(GEOIP_PATH=build_geoip_path()))
         # Always mock host lookup to avoid test breakage if DNS changes.
-        cls.enterClassContext(mock.patch("socket.gethostbyname", return_value=cls.ipv4))
+        cls.enterClassContext(
+            mock.patch("socket.gethostbyname", return_value=cls.ipv4_str)
+        )
 
         super().setUpClass()
 
@@ -86,7 +92,10 @@ class GeoLite2Test(SimpleTestCase):
 
         functions += (g.country, g.country_code, g.country_name)
         values = (123, 123.45, b"", (), [], {}, set(), frozenset(), GeoIP2)
-        msg = "GeoIP query must be a string, not type"
+        msg = (
+            "GeoIP query must be a string or instance of IPv4Address or IPv6Address, "
+            "not type"
+        )
         for function, value in itertools.product(functions, values):
             with self.subTest(function=function.__qualname__, type=type(value)):
                 with self.assertRaisesMessage(TypeError, msg):
@@ -94,7 +103,7 @@ class GeoLite2Test(SimpleTestCase):
 
     def test_country(self):
         g = GeoIP2(city="<invalid>")
-        for query in (self.fqdn, self.ipv4, self.ipv6):
+        for query in self.query_values:
             with self.subTest(query=query):
                 self.assertEqual(
                     g.country(query),
@@ -108,7 +117,7 @@ class GeoLite2Test(SimpleTestCase):
 
     def test_city(self):
         g = GeoIP2(country="<invalid>")
-        for query in (self.fqdn, self.ipv4, self.ipv6):
+        for query in self.query_values:
             with self.subTest(query=query):
                 self.assertEqual(
                     g.city(query),
@@ -188,15 +197,17 @@ class GeoLite2Test(SimpleTestCase):
 
     def test_check_query(self):
         g = GeoIP2()
-        self.assertEqual(g._check_query(self.ipv4), self.ipv4)
-        self.assertEqual(g._check_query(self.ipv6), self.ipv6)
-        self.assertEqual(g._check_query(self.fqdn), self.ipv4)
+        self.assertEqual(g._check_query(self.fqdn), self.ipv4_str)
+        self.assertEqual(g._check_query(self.ipv4_str), self.ipv4_str)
+        self.assertEqual(g._check_query(self.ipv6_str), self.ipv6_str)
+        self.assertEqual(g._check_query(self.ipv4_addr), self.ipv4_addr)
+        self.assertEqual(g._check_query(self.ipv6_addr), self.ipv6_addr)
 
     def test_coords_deprecation_warning(self):
         g = GeoIP2()
         msg = "GeoIP2.coords() is deprecated. Use GeoIP2.lon_lat() instead."
         with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
-            e1, e2 = g.coords(self.ipv4)
+            e1, e2 = g.coords(self.ipv4_str)
         self.assertIsInstance(e1, float)
         self.assertIsInstance(e2, float)
 
