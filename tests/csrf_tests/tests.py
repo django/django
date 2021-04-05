@@ -305,6 +305,19 @@ class CsrfViewMiddlewareTestMixin:
             status_code=403,
         )
 
+    @override_settings(DEBUG=True)
+    def test_https_no_referer(self):
+        """A POST HTTPS request with a missing referer is rejected."""
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        mw = CsrfViewMiddleware(post_form_view)
+        response = mw.process_view(req, post_form_view, (), {})
+        self.assertContains(
+            response,
+            'Referer checking failed - no Referer.',
+            status_code=403,
+        )
+
     def test_https_malformed_host(self):
         """
         CsrfViewMiddleware generates a 403 response if it receives an HTTPS
@@ -411,6 +424,21 @@ class CsrfViewMiddlewareTestMixin:
             'HTTP_X_FORWARDED_HOST': 'www.example.com',
             'HTTP_X_FORWARDED_PORT': '443',
         })
+        mw = CsrfViewMiddleware(post_form_view)
+        mw.process_request(req)
+        resp = mw.process_view(req, post_form_view, (), {})
+        self.assertIsNone(resp)
+
+    @override_settings(CSRF_TRUSTED_ORIGINS=['https://dashboard.example.com'])
+    def test_https_good_referer_malformed_host(self):
+        """
+        A POST HTTPS request is accepted if it receives a good referer with
+        a bad host.
+        """
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = '@malformed'
+        req.META['HTTP_REFERER'] = 'https://dashboard.example.com/somepage'
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         resp = mw.process_view(req, post_form_view, (), {})
