@@ -136,6 +136,16 @@ class GeoLite2Test(SimpleTestCase):
                 self.assertEqual(g.country_code(query), 'GB')
                 self.assertEqual(g.country_name(query), 'United Kingdom')
 
+    def test_del(self):
+        g = GeoIP2()
+        city = g._city
+        country = g._country
+        self.assertIs(city._db_reader.closed, False)
+        self.assertIs(country._db_reader.closed, False)
+        del g
+        self.assertIs(city._db_reader.closed, True)
+        self.assertIs(country._db_reader.closed, True)
+
     def test_repr(self):
         g = GeoIP2()
         meta = g._reader.metadata()
