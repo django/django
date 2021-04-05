@@ -9,8 +9,6 @@ from django.core.validators import validate_ipv46_address
 from django.utils._os import to_path
 from django.utils.deprecation import RemovedInDjango60Warning
 
-from .resources import City, Country
-
 # Creating the settings dictionary with any settings, if needed.
 GEOIP_SETTINGS = {
     "GEOIP_PATH": getattr(settings, "GEOIP_PATH", None),
@@ -182,7 +180,22 @@ class GeoIP2:
         may be undefined (None).
         """
         enc_query = self._check_query(query, city=True)
-        return City(self._city.city(enc_query))
+        response = self._city.city(enc_query)
+        region = response.subdivisions[0] if response.subdivisions else None
+        return {
+            "city": response.city.name,
+            "continent_code": response.continent.code,
+            "continent_name": response.continent.name,
+            "country_code": response.country.iso_code,
+            "country_name": response.country.name,
+            "dma_code": response.location.metro_code,
+            "is_in_european_union": response.country.is_in_european_union,
+            "latitude": response.location.latitude,
+            "longitude": response.location.longitude,
+            "postal_code": response.postal.code,
+            "region": region.iso_code if region else None,
+            "time_zone": response.location.time_zone,
+        }
 
     def country_code(self, query):
         "Return the country code for the given IP Address or FQDN."
@@ -200,7 +213,11 @@ class GeoIP2:
         """
         # Returning the country code and name
         enc_query = self._check_query(query, city_or_country=True)
-        return Country(self._country_or_city(enc_query))
+        response = self._country_or_city(enc_query)
+        return {
+            "country_code": response.country.iso_code,
+            "country_name": response.country.name,
+        }
 
     def coords(self, query, ordering=("longitude", "latitude")):
         warnings.warn(
