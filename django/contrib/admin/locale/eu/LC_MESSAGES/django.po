@@ -7,19 +7,24 @@
 # julen, 2012-2013
 # julen, 2013
 # Urtzi Odriozola <urtzi.odriozola@gmail.com>, 2017
+# Yoaira García <ygarcia@codesyntax.eus>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-01-22 09:57+0000\n"
-"Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-03-22 12:29+0000\n"
+"Last-Translator: Yoaira García <ygarcia@codesyntax.eus>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: eu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Ezabatu aukeratutako %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -31,10 +36,6 @@ msgstr "Ezin da %(name)s ezabatu"
 
 msgid "Are you sure?"
 msgstr "Ziur al zaude?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Ezabatu aukeratutako %(verbose_name_plural)s"
 
 msgid "Administration"
 msgstr "Kudeaketa"
@@ -71,6 +72,12 @@ msgstr "Datarik ez"
 
 msgid "Has date"
 msgstr "Data dauka"
+
+msgid "Empty"
+msgstr "Hutsik"
+
+msgid "Not empty"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -129,23 +136,23 @@ msgid "log entries"
 msgstr "log sarrerak"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "\"%(object)s\" gehituta."
+msgid "Added “%(object)s”."
+msgstr ""
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "\"%(object)s\" aldatuta - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr ""
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "\"%(object)s\" ezabatuta."
+msgid "Deleted “%(object)s.”"
+msgstr ""
 
 msgid "LogEntry Object"
 msgstr "LogEntry objetua"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "{name} \"{object}\" gehitu."
+msgid "Added {name} “{object}”."
+msgstr ""
 
 msgid "Added."
 msgstr "Gehituta"
@@ -154,16 +161,16 @@ msgid "and"
 msgstr "eta"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "{fields}-(e)tik {name} \"{object}\" aldatatuta."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr ""
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "{fields} aldatuta."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr "{name} \"{object}\" ezabatuta."
+msgid "Deleted {name} “{object}”."
+msgstr ""
 
 msgid "No fields changed."
 msgstr "Ez da eremurik aldatu."
@@ -171,48 +178,39 @@ msgstr "Ez da eremurik aldatu."
 msgid "None"
 msgstr "Bat ere ez"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
-"Bat baino gehiago hautatzeko, sakatu \"Kontrol\" tekla edo \"Command\" Mac "
-"batean."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" ondo gehitu da."
+msgid "The {name} “{obj}” was added successfully."
+msgstr ""
 
 msgid "You may edit it again below."
 msgstr "Aldaketa gehiago egin ditzazkezu jarraian."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
-"{name} \"{obj}\" ondo gehitu da. Beste {name} bat gehitu dezakezu jarraian."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgid "The {name} “{obj}” was changed successfully."
 msgstr ""
-"{name} \"{obj}\" ondo aldatu da. Aldaketa gehiago egin ditzazkezu jarraian."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"{name} \"{obj}\" ondo gehitu da. Aldaketa gehiago egin ditzazkezu jarraian."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-"{name} \"{obj}\" ondo aldatu da. Beste {name} bat gehitu dezakezu jarraian."
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "{name} \"{obj}\" ondo aldatu da."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -225,13 +223,12 @@ msgid "No action selected."
 msgstr "Ez dago ekintzarik aukeratuta."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" ondo ezabatu da."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr ""
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
-"\"%(key)s\" ID dun %(name)s ez dira existitzen. Agian ezabatua izan da?"
 
 #, python-format
 msgid "Add %s"
@@ -302,8 +299,8 @@ msgstr "%(app)s kudeaketa"
 msgid "Page not found"
 msgstr "Ez da orririk aurkitu"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Barkatu, eskatutako orria ezin daiteke aurkitu"
+msgid "We’re sorry, but the requested page could not be found."
+msgstr "Sentitzen dugu, baina eskatutako orria ezin da aurkitu."
 
 msgid "Home"
 msgstr "Hasiera"
@@ -318,11 +315,9 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Zerbitzariaren errorea <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Errore bat gertatu da. Errorea guneko kudeatzaileari jakinarazi zaio email "
-"bidez eta laster egon beharko luke konponduta. Barkatu eragozpenak."
 
 msgid "Run the selected action"
 msgstr "Burutu aukeratutako ekintza"
@@ -340,12 +335,25 @@ msgstr "Hautatu %(total_count)s %(module_name)s guztiak"
 msgid "Clear selection"
 msgstr "Garbitu hautapena"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "%(name)s aplikazioaren modeloak"
+
+msgid "Add"
+msgstr "Gehitu"
+
+msgid "View"
+msgstr "Ikusi"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Ez duzu ezer ikusteko edo editatzeko baimenik."
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
-"Lehenik idatzi erabiltzaile-izena eta pasahitza. Gero erabiltzaile-aukera "
-"gehiago aldatu ahal izango dituzu."
+"Lehenik, sartu erabiltzailea eta pasahitza bat. Gero, editatzeko aukera "
+"gehiago izango dituzu. "
 
 msgid "Enter a username and password."
 msgstr "Sartu erabiltzaile izen eta pasahitz bat."
@@ -389,6 +397,9 @@ msgstr "Webgunean ikusi"
 msgid "Filter"
 msgstr "Iragazkia"
 
+msgid "Clear all filters"
+msgstr "Garbitu filtro guztiak."
+
 msgid "Remove from sorting"
 msgstr "Kendu ordenaziotik"
 
@@ -430,8 +441,8 @@ msgstr ""
 msgid "Objects"
 msgstr "Objetuak"
 
-msgid "Yes, I'm sure"
-msgstr "Bai, ziur nago"
+msgid "Yes, I’m sure"
+msgstr "bai, ziur nago "
 
 msgid "No, take me back"
 msgstr "Ez, itzuli atzera"
@@ -465,9 +476,6 @@ msgstr ""
 "Ziur zaude aukeratutako %(objects_name)s ezabatu nahi duzula? Objektu guzti "
 "hauek eta erlazionatutako elementu guztiak ezabatuko dira:"
 
-msgid "View"
-msgstr "Ikusi"
-
 msgid "Delete?"
 msgstr "Ezabatu?"
 
@@ -477,16 +485,6 @@ msgstr "Irizpidea: %(filter_title)s"
 
 msgid "Summary"
 msgstr "Laburpena"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s aplikazioaren modeloak"
-
-msgid "Add"
-msgstr "Gehitu"
-
-msgid "You don't have permission to view or edit anything."
-msgstr "Ez duzu ezer ikusi edo ezabatzeko baimenik."
 
 msgid "Recent actions"
 msgstr "Azken ekintzak"
@@ -501,12 +499,10 @@ msgid "Unknown content"
 msgstr "Eduki ezezaguna"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Zerbait gaizki dago zure datu-basearen instalazioan. Ziurtatu datu-baseko "
-"taulak sortu direla eta dagokion erabiltzaileak irakurtzeko baimena duela."
 
 #, python-format
 msgid ""
@@ -519,6 +515,9 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "Pasahitza edo erabiltzaile-izena ahaztu duzu?"
 
+msgid "Toggle navigation"
+msgstr ""
+
 msgid "Date/time"
 msgstr "Data/ordua"
 
@@ -529,11 +528,9 @@ msgid "Action"
 msgstr "Ekintza"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"Objektu honek ez dauka aldaketen historiarik. Ziurrenik kudeaketa gunetik "
-"kanpo gehituko zen."
 
 msgid "Show all"
 msgstr "Erakutsi dena"
@@ -597,11 +594,11 @@ msgid "Your password was changed."
 msgstr "Zure pasahitza aldatu egin da."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Idatzi pasahitz zaharra segurtasun arrazoiengatik eta gero pasahitz berria "
-"bi aldiz, akatsik egiten ez duzula ziurta dezagun."
+"Mesedez, sartu zure pasahitza zaharra segurtasunagatik, gero sartu berria bi "
+"aldiz, ondo idatzita dagoela ziurtatzeko. "
 
 msgid "Change my password"
 msgstr "Nire pasahitza aldatu"
@@ -634,19 +631,18 @@ msgstr ""
 "erabilita egotea. Eskatu berriro pasahitza berrezartzea."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Zure pasahitza ezartzeko jarraibideak bidali dizkizugu email bidez, sartu "
-"duzun helbide elektronikoa kontu bati lotuta badago. Laster jaso beharko "
-"zenituzke."
+"Zure pasahitza jartzeko aginduak bidali dizkizugu... sartu duzun posta "
+"elektronikoarekin konturen bat baldin badago. Laster jasoko dituzu."
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"Ez baduzu mezurik jasotzen, ziurtatu izena ematean erabilitako helbide "
-"berdina idatzi duzula eta egiaztatu spam karpeta."
+"Posta elektronikorik jasotzen ez baduzu, ziurtatu erregistratu duzun "
+"helbidean sartu zarela, eta zure spam horria begiratu. "
 
 #, python-format
 msgid ""
@@ -659,8 +655,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Zoaz hurrengo orrira eta aukeratu pasahitz berria:"
 
-msgid "Your username, in case you've forgotten:"
-msgstr "Zure erabiltzaile-izena (ahaztu baduzu):"
+msgid "Your username, in case you’ve forgotten:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "Mila esker gure webgunea erabiltzeagatik!"
@@ -670,11 +666,11 @@ msgid "The %(site_name)s team"
 msgstr "%(site_name)s webguneko taldea"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"Pasahitza ahaztu duzu? Idatzi zure helbide elektronikoa eta berri bat "
-"ezartzeko jarraibideak bidaliko dizkizugu."
+"Pasahitza ahaztu zaizu? Sartu zure helbidea behean, eta berria jartzeko "
+"argibideak bidaliko dizkizugu "
 
 msgid "Email address:"
 msgstr "Helbide elektronikoa:"

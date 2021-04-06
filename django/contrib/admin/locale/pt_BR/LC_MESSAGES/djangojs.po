@@ -7,15 +7,16 @@
 # semente, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
+# Rafael Fontenelle <rffontenelle@gmail.com>, 2021
 # Renata Barbosa Almeida <renata-rj000@hotmail.com>, 2016
 # Samuel Nogueira Bacelar <samuelnbacelar@hotmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-09-22 14:12+0000\n"
-"Last-Translator: Samuel Nogueira Bacelar <samuelnbacelar@hotmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-17 05:53+0000\n"
+"Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -187,6 +188,54 @@ msgstr "Novembro"
 
 msgid "December"
 msgstr "Dezembro"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Fev"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Abr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Mai"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Jun"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Jul"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Ago"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Set"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Out"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dez"
 
 msgctxt "one letter Sunday"
 msgid "S"

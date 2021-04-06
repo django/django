@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016,2019
+# Michael Wolf <milupo@sorbzilla.de>, 2016,2019,2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-21 20:22+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-02-01 22:11+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
 "language/hsb/)\n"
@@ -38,11 +38,11 @@ msgid "redirect to"
 msgstr "dalesposrědkowanje do"
 
 msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"“http://”."
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
 msgstr ""
 "To móže pak absolutna šćežka być (kaž horjeka) pak dospołny URL, kotryž so z "
-"\"http:/\" započina."
+"\"https:/\" započina."
 
 msgid "redirect"
 msgstr "dalesposrědkowanje"

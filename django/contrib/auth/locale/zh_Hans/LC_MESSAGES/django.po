@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Bo Li <bo.li@measureofquality.com>, 2020
 # David <huangtao0202@gmail.com>, 2019
 # ausaki <www.ljm969087551@qq.com>, 2017
 # jamin M <lxxmbyx@163.com>, 2019
@@ -19,8 +20,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-02-24 16:54+0000\n"
-"Last-Translator: Wentao Han <wentao.han@gmail.com>\n"
+"PO-Revision-Date: 2020-12-09 02:32+0000\n"
+"Last-Translator: Bo Li <bo.li@measureofquality.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -87,7 +88,7 @@ msgstr ""
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
-msgstr "请输入一个正确的 %(username)s 和密码. 注意他们都是大区分大小写的."
+msgstr "请输入一个正确的%(username)s和密码。注意，两者都区分大小写。"
 
 msgid "This account is inactive."
 msgstr "该帐号未激活。"
@@ -108,7 +109,7 @@ msgid "Old password"
 msgstr "旧密码"
 
 msgid "Password (again)"
-msgstr "密码(重复)"
+msgstr "密码（重复）"
 
 msgid "algorithm"
 msgstr "算法"
@@ -187,7 +188,8 @@ msgid "username"
 msgstr "用户名"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "必填。150个字符或者更少。包含字母，数字和仅有的@/./+/-/_符号。"
+msgstr ""
+"必填；长度为150个字符或以下；只能包含字母、数字、特殊字符“@”、“.”、“-”和“_”。"
 
 msgid "A user with that username already exists."
 msgstr "已存在一位使用该名字的用户。"
@@ -264,12 +266,14 @@ msgstr "重置 %(site_name)s 的密码"
 msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
-msgstr "请输入合法的用户名。只能包含英文字母，数字和@/./+/-/_字符。"
+msgstr ""
+"请输入合法的用户名。只能包含英文字母、数字、特殊字符“@”、“.”、“-”和“_”。"
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
-msgstr "请输入合法用户名。只能包含字母，数字和@/./+/-/_ 字符。"
+msgstr ""
+"请输入合法的用户名。只能包含英文字母、数字、特殊字符“@”、“.”、“-”和“_”。"
 
 msgid "Logged out"
 msgstr "登出"

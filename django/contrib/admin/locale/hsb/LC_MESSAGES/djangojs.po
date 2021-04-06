@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016,2020
+# Michael Wolf <milupo@sorbzilla.de>, 2016,2020-2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-28 19:59+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-02-01 21:45+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
 "language/hsb/)\n"
@@ -190,6 +190,54 @@ msgstr "Nowember"
 
 msgid "December"
 msgstr "December"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Jan."
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Feb."
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Měr."
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Apr."
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Meja"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Jun."
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Jul."
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Awg."
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sep."
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Okt."
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Now."
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dec."
 
 msgctxt "one letter Sunday"
 msgid "S"

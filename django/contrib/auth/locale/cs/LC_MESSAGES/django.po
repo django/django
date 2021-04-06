@@ -5,13 +5,13 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Tomáš Ehrlich <tomas.ehrlich@gmail.com>, 2015
 # Vláďa Macek <macek@sandbox.cz>, 2013-2014
-# Vláďa Macek <macek@sandbox.cz>, 2015-2017,2019
+# Vláďa Macek <macek@sandbox.cz>, 2015-2017,2019,2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-19 08:58+0000\n"
+"PO-Revision-Date: 2021-03-18 23:35+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -126,7 +126,7 @@ msgid "memory cost"
 msgstr "spotřeba paměti"
 
 msgid "time cost"
-msgstr "doba"
+msgstr "časový náklad"
 
 msgid "parallelism"
 msgstr "paralelismus"

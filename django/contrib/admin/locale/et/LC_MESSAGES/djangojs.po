@@ -4,15 +4,16 @@
 # eallik <eallik@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
-# Martin Pajuste <martinpajuste@gmail.com>, 2016,2020
+# Martin <martinpajuste@gmail.com>, 2021
+# Martin <martinpajuste@gmail.com>, 2016,2020
 # Ragnar Rebase <rrebase@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-25 09:13+0000\n"
-"Last-Translator: Martin Pajuste <martinpajuste@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-03-22 11:55+0000\n"
+"Last-Translator: Martin <martinpajuste@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -185,6 +186,54 @@ msgstr "november"
 
 msgid "December"
 msgstr "detsember"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "jaan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "veebr"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "märts"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "mai"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "juuni"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "juuli"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "aug"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "sept"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "dets"
 
 msgctxt "one letter Sunday"
 msgid "S"

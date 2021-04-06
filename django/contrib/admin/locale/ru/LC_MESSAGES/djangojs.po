@@ -8,15 +8,16 @@
 # Eugene <eugene.mechanism@gmail.com>, 2016
 # crazyzubr <hjcnbckfd@gmail.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Panasoft, 2021
 # Алексей Борискин <sun.void@gmail.com>, 2012,2014-2015
 # Андрей Щуров <shurov9009@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-07-30 12:35+0000\n"
-"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-03-16 22:55+0000\n"
+"Last-Translator: Panasoft\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -202,6 +203,54 @@ msgstr "Ноябрь"
 
 msgid "December"
 msgstr "Декабрь"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Янв"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Фев"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Мар"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Апр"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Май"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Июн"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Июл"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Авг"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Сен"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Окт"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Ноя"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Дек"
 
 msgctxt "one letter Sunday"
 msgid "S"

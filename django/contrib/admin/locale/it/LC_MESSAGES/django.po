@@ -10,16 +10,16 @@
 # Marco Bonetti, 2014
 # Mirco Grillo <mirco.grillomg@gmail.com>, 2018,2020
 # Nicola Larosa <transifex@teknico.net>, 2013
-# palmux <palmux@gmail.com>, 2014-2015
+# palmux <palmux@gmail.com>, 2014-2015,2021
 # Mattia Procopio <promat85@gmail.com>, 2015
 # Stefano Brentegani <sbrentegani@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-23 08:39+0000\n"
-"Last-Translator: Mirco Grillo <mirco.grillomg@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-15 15:53+0000\n"
+"Last-Translator: palmux <palmux@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -27,6 +27,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: it\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Cancella %(verbose_name_plural)s selezionati"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -38,10 +42,6 @@ msgstr "Impossibile cancellare %(name)s "
 
 msgid "Are you sure?"
 msgstr "Confermi?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Cancella %(verbose_name_plural)s selezionati"
 
 msgid "Administration"
 msgstr "Amministrazione"
@@ -143,7 +143,7 @@ msgstr "voci di log"
 
 #, python-format
 msgid "Added “%(object)s”."
-msgstr "%(object)s aggiunto."
+msgstr "\"%(object)s\" aggiunto."
 
 #, python-format
 msgid "Changed “%(object)s” — %(changes)s"
@@ -151,7 +151,7 @@ msgstr "%(object)s%(changes)s modificati"
 
 #, python-format
 msgid "Deleted “%(object)s.”"
-msgstr "Cancellato \"%(object)s .\""
+msgstr "\"%(object)s\" cancellato."
 
 msgid "LogEntry Object"
 msgstr "Oggetto LogEntry"
@@ -244,8 +244,7 @@ msgstr "%(name)s \"%(obj)s\" cancellato correttamente."
 #, python-format
 msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
-"%(name)s con ID \"%(key)s\" non esiste. Probabilmente è stato stato "
-"cancellato?"
+"%(name)s con ID \"%(key)s\" non esiste. Probabilmente è stato cancellato?"
 
 #, python-format
 msgid "Add %s"
@@ -365,7 +364,7 @@ msgid "View"
 msgstr "Vista"
 
 msgid "You don’t have permission to view or edit anything."
-msgstr "Non hai i permessi per visualizzare o modificare nulla"
+msgstr "Non hai i permessi per visualizzare o modificare nulla."
 
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
@@ -417,7 +416,7 @@ msgid "Filter"
 msgstr "Filtra"
 
 msgid "Clear all filters"
-msgstr "Disattiva tutti i filtri"
+msgstr "Cancella tutti i filtri"
 
 msgid "Remove from sorting"
 msgstr "Elimina dall'ordinamento"
@@ -523,9 +522,9 @@ msgid ""
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Ci sono problemi nell'installazione del database. Assicurati che le tabelle "
-"del database siano state create, e che il database sia leggibile dall'utente "
-"corretto."
+"Qualcosa non è andato a buon fine nell'installazione del database. "
+"Assicurati che le tabelle del database siano state create, e che il database "
+"sia leggibile dall'utente corretto."
 
 #, python-format
 msgid ""
@@ -661,9 +660,8 @@ msgid ""
 "We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Abbiamo inviato istruzioni per impostare la password all'indirizzo email che "
-"hai indicato. Dovresti riceverle a breve a patto che l'indirizzo che hai "
-"inserito sia valido."
+"Abbiamo inviato istruzioni per impostare la password, se esiste un account "
+"valido all'indirizzo email che hai indicato. Dovresti riceverle a breve."
 
 msgid ""
 "If you don’t receive an email, please make sure you’ve entered the address "
@@ -697,8 +695,8 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"Password dimenticata? Inserisci il tuo indirizzo email qui sotto, e ti "
-"invieremo istruzioni per impostarne una nuova."
+"Password dimenticata? Inserisci il tuo indirizzo email qui sotto e ti "
+"invieremo le istruzioni per impostarne una nuova."
 
 msgid "Email address:"
 msgstr "Indirizzo email:"

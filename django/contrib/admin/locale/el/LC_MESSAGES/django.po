@@ -1,27 +1,32 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Antonis Christofides <antonis@antonischristofides.com>, 2021
 # Dimitris Glezos <glezos@transifex.com>, 2011
 # Giannis Meletakis <meletakis@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Nick Mavrakis <mavrakis.n@gmail.com>, 2017-2018
+# Nick Mavrakis <mavrakis.n@gmail.com>, 2016-2018,2021
 # Nick Mavrakis <mavrakis.n@gmail.com>, 2016
 # Pãnoș <panos.laganakos@gmail.com>, 2014
-# Pãnoș <panos.laganakos@gmail.com>, 2016,2019
+# Pãnoș <panos.laganakos@gmail.com>, 2014,2016,2019-2020
 # Yorgos Pagles <y.pagles@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-01-25 19:38+0000\n"
-"Last-Translator: Pãnoș <panos.laganakos@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-03-30 03:21+0000\n"
+"Last-Translator: Antonis Christofides <antonis@antonischristofides.com>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: el\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "%(verbose_name_plural)s: Διαγραφή επιλεγμένων"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -32,11 +37,7 @@ msgid "Cannot delete %(name)s"
 msgstr "Αδύνατη η διαγραφή του %(name)s"
 
 msgid "Are you sure?"
-msgstr "Είστε σίγουροι;"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Διαγραφή επιλεγμένων %(verbose_name_plural)s"
+msgstr "Είστε σίγουρος;"
 
 msgid "Administration"
 msgstr "Διαχείριση"
@@ -63,10 +64,10 @@ msgid "Past 7 days"
 msgstr "Τελευταίες 7 ημέρες"
 
 msgid "This month"
-msgstr "Αυτόν το μήνα"
+msgstr "Αυτό το μήνα"
 
 msgid "This year"
-msgstr "Αυτόν το χρόνο"
+msgstr "Αυτό το χρόνο"
 
 msgid "No date"
 msgstr "Καθόλου ημερομηνία"
@@ -74,21 +75,27 @@ msgstr "Καθόλου ημερομηνία"
 msgid "Has date"
 msgstr "Έχει ημερομηνία"
 
+msgid "Empty"
+msgstr "Χωρίς τιμή"
+
+msgid "Not empty"
+msgstr "Με τιμή"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
-"Παρακαλώ εισάγετε το σωστό %(username)s και κωδικό για λογαριασμό "
-"προσωπικού. Σημειώστε οτι και στα δύο πεδία μπορεί να έχει σημασία αν είναι "
-"κεφαλαία ή μικρά. "
+"Παρακαλώ δώστε το σωστό %(username)s και συνθηματικό για λογαριασμό "
+"προσωπικού. Και στα δύο πεδία μπορεί να έχει σημασία η διάκριση κεφαλαίων/"
+"μικρών."
 
 msgid "Action:"
 msgstr "Ενέργεια:"
 
 #, python-format
 msgid "Add another %(verbose_name)s"
-msgstr "Προσθήκη και άλλου %(verbose_name)s"
+msgstr "Να προστεθεί %(verbose_name)s"
 
 msgid "Remove"
 msgstr "Αφαίρεση"
@@ -123,50 +130,50 @@ msgid "action flag"
 msgstr "σημαία ενέργειας"
 
 msgid "change message"
-msgstr "αλλαγή μηνύματος"
+msgstr "μήνυμα τροποποίησης"
 
 msgid "log entry"
-msgstr "εγγραφή καταγραφής"
+msgstr "καταχώριση αρχείου καταγραφής"
 
 msgid "log entries"
-msgstr "εγγραφές καταγραφής"
+msgstr "καταχωρίσεις αρχείου καταγραφής"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "Προστέθηκαν \"%(object)s\"."
+msgid "Added “%(object)s”."
+msgstr "Προστέθηκε «%(object)s»."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "Αλλάχθηκαν \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "Τροποποιήθηκε «%(object)s» — %(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "Διαγράφηκαν \"%(object)s.\""
+msgid "Deleted “%(object)s.”"
+msgstr "Διαγράφηκε «%(object)s»."
 
 msgid "LogEntry Object"
 msgstr "Αντικείμενο LogEntry"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "Προστέθηκε {name} \"{object}\"."
+msgid "Added {name} “{object}”."
+msgstr "Προστέθηκε {name} “{object}”."
 
 msgid "Added."
-msgstr "Προστέθηκε"
+msgstr "Προστέθηκε."
 
 msgid "and"
 msgstr "και"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "Αλλαγή του {fields} για {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "{name} «{object}»: Αλλαγή {fields}."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr "Αλλαγή του {fields}."
+msgstr "Αλλαγή {fields}."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr "Διαγραφή {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
+msgstr "Διεγράφη {name} «{object}»."
 
 msgid "No fields changed."
 msgstr "Δεν άλλαξε κανένα πεδίο."
@@ -174,86 +181,82 @@ msgstr "Δεν άλλαξε κανένα πεδίο."
 msgid "None"
 msgstr "Κανένα"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
-"Κρατήστε πατημένο το \"Control\", ή το \"Command\" αν έχετε Mac, για να "
-"επιλέξετε παραπάνω από ένα."
+"Κρατήστε πατημένο το «Control» («Command» σε Mac) για να επιλέξετε "
+"περισσότερα από ένα αντικείμενα."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "Το {name} \"{obj}\" αποθηκεύτηκε με επιτυχία."
+msgid "The {name} “{obj}” was added successfully."
+msgstr "Προστέθηκε {name} «{obj}»."
 
 msgid "You may edit it again below."
-msgstr "Μπορείτε να το επεξεργαστείτε ξανά παρακάτω."
+msgstr "Μπορεί να πραγματοποιηθεί περαιτέρω επεξεργασία παρακάτω."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
-"below."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
-"Το {name} \"{obj}\" προστέθηκε με επιτυχία. Μπορείτε να προσθέσετε και άλλο "
-"{name} παρακάτω."
+"Προστέθηκε {name} «{obj}». Μπορεί να πραγματοποιηθεί νέα πρόσθεση παρακάτω."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
-"Το {name} \"{obj}\" αλλάχθηκε επιτυχώς. Μπορείτε να το επεξεργαστείτε ξανά "
+"Το αντικείμενο ({name}) «{obj}» τροποποιήθηκε. Μπορεί να πραγματοποιηθεί "
+"περαιτέρω επεξεργασία παρακάτω."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr ""
+"Προστέθηκε {name} «{obj}». Μπορεί να πραγματοποιηθεί περαιτέρω επεξεργασία "
 "παρακάτω."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"Το {name} \"{obj}\" προστέθηκε με επιτυχία. Μπορείτε να το επεξεργαστείτε "
-"πάλι παρακάτω."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
-"Το {name} \"{obj}\" αλλάχθηκε με επιτυχία. Μπορείτε να προσθέσετε και άλλο "
+"Το αντικείμενο ({name}) «{obj}» τροποποιήθηκε. Μπορεί να προστεθεί επιπλέον "
 "{name} παρακάτω."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "Το {name} \"{obj}\" αλλάχθηκε με επιτυχία."
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "Το αντικείμενο ({name}) «{obj}» τροποποιήθηκε."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
-"Καμμία αλλαγή δεν έχει πραγματοποιηθεί ακόμα γιατί δεν έχετε επιλέξει κανένα "
-"αντικείμενο. Πρέπει να επιλέξετε ένα ή περισσότερα αντικείμενα για να "
-"πραγματοποιήσετε ενέργειες σε αυτά."
+"Καμία αλλαγή δεν πραγματοποιήθηκε γιατί δεν έχετε επιλέξει αντικείμενο. "
+"Επιλέξτε ένα ή περισσότερα αντικείμενα για να πραγματοποιήσετε ενέργειες σ' "
+"αυτά."
 
 msgid "No action selected."
 msgstr "Δεν έχει επιλεγεί ενέργεια."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "Το %(name)s \"%(obj)s\" διαγράφηκε με επιτυχία."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "Διεγράφη το αντικείμενο (%(name)s) «%(obj)s»"
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
-msgstr "%(name)s με το ID \"%(key)s\" δεν υπάρχει. Μήπως διαγράφηκε;"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr "Δεν υπάρχει %(name)s με ID «%(key)s». Ίσως να έχει διαγραφεί."
 
 #, python-format
 msgid "Add %s"
-msgstr "Προσθήκη %s"
+msgstr "Να προστεθεί %s"
 
 #, python-format
 msgid "Change %s"
-msgstr "Αλλαγή του %s"
+msgstr "%s: Τροποποίηση"
 
 #, python-format
 msgid "View %s"
-msgstr "Προβολή %s"
+msgstr "%s: Προβολή"
 
 msgid "Database error"
-msgstr "Σφάλμα βάσεως δεδομένων"
+msgstr "Σφάλμα στη βάση δεδομένων"
 
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
@@ -269,7 +272,7 @@ msgstr[1] "Επιλέχθηκαν και τα %(total_count)s"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr "Επιλέγησαν 0 από %(cnt)s"
+msgstr "Επιλέχθηκαν 0 από %(cnt)s"
 
 #, python-format
 msgid "Change history: %s"
@@ -286,8 +289,9 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
-"Η διαγραφή %(class_name)s %(instance)s θα απαιτούσε την διαγραφή των "
-"ακόλουθων προστατευόμενων συγγενεύων αντικειμένων: %(related_objects)s"
+"Η διαγραφή του αντικειμένου (%(class_name)s) %(instance)s θα απαιτούσε τη "
+"διαγραφή των παρακάτω προστατευόμενων συσχετισμένων αντικειμένων: "
+"%(related_objects)s"
 
 msgid "Django site admin"
 msgstr "Ιστότοπος διαχείρισης Django"
@@ -306,29 +310,29 @@ msgid "%(app)s administration"
 msgstr "Διαχείριση %(app)s"
 
 msgid "Page not found"
-msgstr "Η σελίδα δε βρέθηκε"
+msgstr "Η σελίδα δεν βρέθηκε"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Λυπόμαστε, αλλά η σελίδα που ζητήθηκε δε μπόρεσε να βρεθεί."
+msgid "We’re sorry, but the requested page could not be found."
+msgstr "Λυπούμαστε, αλλά η σελίδα που ζητήθηκε δεν βρέθηκε."
 
 msgid "Home"
 msgstr "Αρχική"
 
 msgid "Server error"
-msgstr "Σφάλμα εξυπηρετητή"
+msgstr "Σφάλμα στο server"
 
 msgid "Server error (500)"
-msgstr "Σφάλμα εξυπηρετητή (500)"
+msgstr "Σφάλμα στο server (500)"
 
 msgid "Server Error <em>(500)</em>"
-msgstr "Σφάλμα εξυπηρετητή <em>(500)</em>"
+msgstr "Σφάλμα στο server <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Υπήρξε ένα σφάλμα. Έχει αναφερθεί στους διαχειριστές της σελίδας μέσω email, "
-"και λογικά θα διορθωθεί αμεσα. Ευχαριστούμε για την υπομονή σας."
+"Παρουσιάστηκε σφάλμα. Εστάλη στους διαχειριστές με email και πιθανότατα θα "
+"διορθωθεί σύντομα. Ευχαριστούμε για την υπομονή σας."
 
 msgid "Run the selected action"
 msgstr "Εκτέλεση της επιλεγμένης ενέργειας"
@@ -341,21 +345,33 @@ msgstr "Κάντε κλικ εδώ για να επιλέξετε τα αντι�
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
-msgstr "Επιλέξτε και τα %(total_count)s %(module_name)s"
+msgstr "Επιλέξτε και τα %(total_count)s αντικείμενα (%(module_name)s)"
 
 msgid "Clear selection"
 msgstr "Καθαρισμός επιλογής"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Μοντέλα στην εφαρμογή %(name)s"
+
+msgid "Add"
+msgstr "Προσθήκη"
+
+msgid "View"
+msgstr "Προβολή"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Δεν έχετε δικαίωμα να δείτε ή να επεξεργαστείτε κάτι."
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
-"Αρχικά εισάγετε το όνομα χρήστη και τον κωδικό πρόσβασης. Μετά την "
-"ολοκλήρωση αυτού του βήματος θα έχετε την επιλογή να προσθέσετε όλα τα "
-"υπόλοιπα στοιχεία για τον χρήστη."
+"Καταρχήν προσδιορίστε όνομα χρήστη και συνθηματικό. Κατόπιν θα σας δοθεί η "
+"δυνατότητα να εισαγάγετε περισσότερες πληροφορίες για το χρήστη."
 
 msgid "Enter a username and password."
-msgstr "Εισάγετε όνομα χρήστη και συνθηματικό."
+msgstr "Προσδιορίστε όνομα χρήστη και συνθηματικό."
 
 msgid "Change password"
 msgstr "Αλλαγή συνθηματικού"
@@ -369,14 +385,13 @@ msgstr "Παρακαλοϋμε διορθώστε τα παρακάτω λάθη
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
-"Εισάγετε ένα νέο κωδικό πρόσβασης για τον χρήστη <strong>%(username)s</"
-"strong>."
+"Προσδιορίστε νέο συνθηματικό για το χρήστη <strong>%(username)s</strong>."
 
 msgid "Welcome,"
-msgstr "Καλωσήρθατε,"
+msgstr "Καλώς ήρθατε,"
 
 msgid "View site"
-msgstr "Δες την εφαρμογή"
+msgstr "Μετάβαση στην εφαρμογή"
 
 msgid "Documentation"
 msgstr "Τεκμηρίωση"
@@ -386,7 +401,7 @@ msgstr "Αποσύνδεση"
 
 #, python-format
 msgid "Add %(name)s"
-msgstr "Προσθήκη %(name)s"
+msgstr "%(name)s: προσθήκη"
 
 msgid "History"
 msgstr "Ιστορικό"
@@ -396,6 +411,9 @@ msgstr "Προβολή στον ιστότοπο"
 
 msgid "Filter"
 msgstr "Φίλτρο"
+
+msgid "Clear all filters"
+msgstr "Καθαρισμός όλων των φίλτρων"
 
 msgid "Remove from sorting"
 msgstr "Αφαίρεση από την ταξινόμηση"
@@ -416,36 +434,35 @@ msgid ""
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Επιλέξατε την διαγραφή του αντικειμένου '%(escaped_object)s' είδους "
-"%(object_name)s. Αυτό συνεπάγεται την διαγραφή συσχετισμένων αντικειμενων "
-"για τα οποία δεν έχετε δικάιωμα διαγραφής. Τα είδη των αντικειμένων αυτών "
-"είναι:"
+"Επιλέξατε τη διαγραφή του αντικειμένου '%(escaped_object)s' τύπου "
+"%(object_name)s. Αυτό συνεπάγεται τη διαγραφή συσχετισμένων αντικειμενων για "
+"τα οποία δεν έχετε δικάιωμα διαγραφής. Οι τύποι των αντικειμένων αυτών είναι:"
 
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Η διαγραφή του %(object_name)s '%(escaped_object)s'  απαιτεί την διαγραφή "
-"των παρακάτω προστατευμένων αντικειμένων:"
+"Η διαγραφή του αντικειμένου (%(object_name)s) «%(escaped_object)s» απαιτεί "
+"τη διαγραφή των παρακάτω προστατευόμενων αντικειμένων:"
 
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Επιβεβαιώστε ότι επιθημείτε την διαγραφή του %(object_name)s "
-"\"%(escaped_object)s\". Αν προχωρήσετε με την διαγραφή όλα τα παρακάτω "
-"συσχετισμένα αντικείμενα θα διαγραφούν επίσης:"
+"Επιβεβαιώστε ότι επιθυμείτε τη διαγραφή των επιλεγμένων αντικειμένων "
+"(%(object_name)s \"%(escaped_object)s\"). Αν προχωρήσετε με τη διαγραφή, όλα "
+"τα παρακάτω συσχετισμένα αντικείμενα θα διαγραφούν επίσης:"
 
 msgid "Objects"
 msgstr "Αντικείμενα"
 
-msgid "Yes, I'm sure"
-msgstr "Ναι, είμαι βέβαιος"
+msgid "Yes, I’m sure"
+msgstr "Ναι"
 
 msgid "No, take me back"
-msgstr "Όχι, επέστρεψε με πίσω."
+msgstr "Όχι"
 
 msgid "Delete multiple objects"
 msgstr "Διαγραφή πολλαπλών αντικειμένων"
@@ -456,29 +473,26 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Η διαγραφή των επιλεγμένων %(objects_name)s θα είχε σαν αποτέλεσμα την "
-"διαγραφή συσχετισμένων αντικειμένων για τα οποία δεν έχετε το διακαίωμα "
-"διαγραφής:"
+"Η διαγραφή των επιλεγμένων αντικειμένων τύπου «%(objects_name)s» θα είχε "
+"αποτέλεσμα τη διαγραφή των ακόλουθων συσχετισμένων αντικειμένων για τα οποία "
+"δεν έχετε το διακαίωμα διαγραφής:"
 
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
-"Η διαγραφή των επιλεγμένων %(objects_name)s απαιτεί την διαγραφή των "
-"παρακάτω προστατευμένων αντικειμένων:"
+"Η διαγραφή των επιλεγμένων αντικειμένων τύπου «%(objects_name)s» απαιτεί τη "
+"διαγραφή των παρακάτω προστατευμένων συσχετισμένων αντικειμένων:"
 
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"Επιβεβαιώστε ότι επιθημείτε την διαγραφή των επιλεγμένων %(objects_name)s . "
-"Αν προχωρήσετε με την διαγραφή όλα τα παρακάτω συσχετισμένα αντικείμενα θα "
-"διαγραφούν επίσης:"
-
-msgid "View"
-msgstr "Προβολή"
+"Επιβεβαιώστε ότι επιθυμείτε τη διαγραφή των επιλεγμένων αντικειμένων τύπου "
+"«%(objects_name)s». Αν προχωρήσετε με τη διαγραφή, όλα τα παρακάτω "
+"συσχετισμένα αντικείμενα θα διαγραφούν επίσης:"
 
 msgid "Delete?"
 msgstr "Διαγραφή;"
@@ -490,21 +504,11 @@ msgstr " Ανά %(filter_title)s "
 msgid "Summary"
 msgstr "Περίληψη"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Μοντέλα στην εφαρμογή %(name)s"
-
-msgid "Add"
-msgstr "Προσθήκη"
-
-msgid "You don't have permission to view or edit anything."
-msgstr "Δεν έχετε δικαίωμα να δείτε ή να επεξεργαστείτε τίποτα."
-
 msgid "Recent actions"
 msgstr "Πρόσφατες ενέργειες"
 
 msgid "My actions"
-msgstr "Οι ενέργειες μου"
+msgstr "Οι ενέργειές μου"
 
 msgid "None available"
 msgstr "Κανένα διαθέσιμο"
@@ -513,24 +517,27 @@ msgid "Unknown content"
 msgstr "Άγνωστο περιεχόμενο"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Φαίνεται να υπάρχει πρόβλημα με την εγκατάσταση της βάσης σας. Θα πρέπει να "
-"βεβαιωθείτε ότι οι απαραίτητοι πίνακες έχουν δημιουργηθεί και ότι η βάση "
-"είναι προσβάσιμη από τον αντίστοιχο χρήστη που έχετε δηλώσει."
+"Υπάρχει κάποιο πρόβλημα στη βάση δεδομένων. Βεβαιωθείτε πως οι κατάλληλοι "
+"πίνακες έχουν δημιουργηθεί και πως υπάρχουν τα κατάλληλα δικαιώματα "
+"πρόσβασης."
 
 #, python-format
 msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
-"Επικυρωθήκατε ως %(username)s, αλλά δεν έχετε εξουσιοδότηση για αυτή την "
-"σελίδα. Θέλετε να συνδεθείτε με άλλο λογαριασμό;"
+"Έχετε ταυτοποιηθεί ως %(username)s, αλλά δεν έχετε δικαίωμα πρόσβασης σ' "
+"αυτή τη σελίδα. Θέλετε να συνδεθείτε με άλλο λογαριασμό;"
 
 msgid "Forgotten your password or username?"
 msgstr "Ξεχάσατε το συνθηματικό ή το όνομα χρήστη σας;"
+
+msgid "Toggle navigation"
+msgstr "Εναλλαγή προβολής πλοήγησης"
 
 msgid "Date/time"
 msgstr "Ημερομηνία/ώρα"
@@ -542,11 +549,11 @@ msgid "Action"
 msgstr "Ενέργεια"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"Δεν υπάρχει ιστορικό αλλαγών γι' αυτό το αντικείμενο. Είναι πιθανό η "
-"προσθήκη του να μην πραγματοποιήθηκε χρησιμοποιώντας το διαχειριστικό."
+"Αυτό το αντικείμενο δεν έχει ιστορικό αλλαγών. Πιθανότατα δεν προστέθηκε "
+"μέσω του παρόντος διαχειριστικού ιστότοπου."
 
 msgid "Show all"
 msgstr "Εμφάνιση όλων"
@@ -571,10 +578,10 @@ msgid "%(full_result_count)s total"
 msgstr "%(full_result_count)s συνολικά"
 
 msgid "Save as new"
-msgstr "Αποθήκευση ως νέο"
+msgstr "Αποθήκευση ως νέου"
 
 msgid "Save and add another"
-msgstr "Αποθήκευση και προσθήκη καινούριου"
+msgstr "Αποθήκευση και προσθήκη καινούργιου"
 
 msgid "Save and continue editing"
 msgstr "Αποθήκευση και συνέχεια επεξεργασίας"
@@ -587,18 +594,18 @@ msgstr "Κλείσιμο"
 
 #, python-format
 msgid "Change selected %(model)s"
-msgstr "Άλλαξε το επιλεγμένο %(model)s"
+msgstr "Να τροποποιηθεί το επιλεγμένο αντικείμενο (%(model)s)"
 
 #, python-format
 msgid "Add another %(model)s"
-msgstr "Πρόσθεσε άλλο ένα %(model)s"
+msgstr "Να προστεθεί %(model)s"
 
 #, python-format
 msgid "Delete selected %(model)s"
-msgstr "Διέγραψε το επιλεγμένο %(model)s"
+msgstr "Να διαγραφεί το επιλεγμένο αντικείμενο (%(model)s)"
 
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Ευχαριστούμε που διαθέσατε κάποιο ποιοτικό χρόνο στον ιστότοπο σήμερα."
+msgstr "Ευχαριστούμε που διαθέσατε χρόνο στον ιστότοπο."
 
 msgid "Log in again"
 msgstr "Επανασύνδεση"
@@ -610,12 +617,11 @@ msgid "Your password was changed."
 msgstr "Το συνθηματικό σας αλλάχθηκε."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Παρακαλούμε εισάγετε το παλιό σας συνθηματικό, για λόγους ασφάλειας, και "
-"κατόπιν εισάγετε το νέο σας συνθηματικό δύο φορές ούτως ώστε να "
-"πιστοποιήσουμε ότι το πληκτρολογήσατε σωστά."
+"Δώστε το παλιό σας συνθηματικό και ακολούθως το νέο σας συνθηματικό δύο "
+"φορές ώστε να ελέγξουμε ότι το πληκτρολογήσατε σωστά."
 
 msgid "Change my password"
 msgstr "Αλλαγή του συνθηματικού μου"
@@ -624,19 +630,17 @@ msgid "Password reset"
 msgstr "Επαναφορά συνθηματικού"
 
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr ""
-"Ορίσατε επιτυχώς έναν κωδικό πρόσβασής. Πλέον έχετε την δυνατότητα να "
-"συνδεθήτε."
+msgstr "Το συνθηματικό σας ορίστηκε. Μπορείτε τώρα να συνδεθείτε."
 
 msgid "Password reset confirmation"
-msgstr "Επιβεβαίωση επαναφοράς κωδικού πρόσβασης"
+msgstr "Επιβεβαίωση επαναφοράς συνθηματικού"
 
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
-"Παρακαλούμε πληκτρολογήστε το νέο κωδικό πρόσβασης δύο φορές ώστε να "
-"βεβαιωθούμε ότι δεν πληκτρολογήσατε κάποιον χαρακτήρα λανθασμένα."
+"Δώστε το νέο συνθηματικό σας δύο φορές ώστε να ελέγξουμε ότι το "
+"πληκτρολογήσατε σωστά."
 
 msgid "New password:"
 msgstr "Νέο συνθηματικό:"
@@ -648,61 +652,56 @@ msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
-"Ο σύνδεσμος που χρησιμοποιήσατε για την επαναφορά του κωδικού πρόσβασης δεν "
-"είναι πλεόν διαθέσιμος. Πιθανώς έχει ήδη χρησιμοποιηθεί. Θα χρειαστεί να "
-"πραγματοποιήσετε και πάλι την διαδικασία αίτησης επαναφοράς του κωδικού "
-"πρόσβασης."
+"Ο σύνδεσμος που χρησιμοποιήσατε για την επαναφορά του συνθηματικού δεν είναι "
+"σωστός, ίσως γιατί έχει ήδη χρησιμοποιηθεί. Πραγματοποιήστε εξαρχής τη "
+"διαδικασία αίτησης επαναφοράς του συνθηματικού."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Σας έχουμε αποστείλει οδηγίες σχετικά με τον ορισμό του κωδικού σας, αν "
-"υπάρχει ήδη κάποιος λογαριασμός με την διεύθυνση ηλεκτρονικού ταχυδρομείου "
-"που δηλώσατε. Θα λάβετε τις οδηγίες σύντομα."
+"Σας στείλαμε email με οδηγίες ορισμού συνθηματικού. Θα πρέπει να το λάβετε "
+"σύντομα."
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"Εάν δεν λάβετε email, παρακαλούμε σιγουρευτείτε οτί έχετε εισάγει την "
-"διεύθυνση με την οποία έχετε εγγραφεί, και ελέγξτε τον φάκελο με τα "
-"ανεπιθύμητα."
+"Εάν δεν λάβετε email, παρακαλούμε σιγουρευτείτε ότι έχετε εισαγάγει τη "
+"διεύθυνση με την οποία έχετε εγγραφεί, και ελέγξτε το φάκελο ανεπιθύμητης "
+"αλληλογραφίας."
 
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
-"Λαμβάνετε αυτό το email επειδή ζητήσατε επαναφορά κωδικού για τον λογαριασμό "
-"σας στο %(site_name)s."
+"Λαμβάνετε αυτό το email επειδή ζητήσατε επαναφορά συνθηματικού για το "
+"λογαριασμό σας στον ιστότοπο %(site_name)s."
 
 msgid "Please go to the following page and choose a new password:"
 msgstr ""
-"Παρακαλούμε επισκεφθήτε την ακόλουθη σελίδα και επιλέξτε ένα νέο κωδικό "
-"πρόσβασης: "
+"Παρακαλούμε επισκεφθείτε την ακόλουθη σελίδα και επιλέξτε νέο συνθηματικό: "
 
-msgid "Your username, in case you've forgotten:"
-msgstr ""
-"Το όνομα χρήστη με το οποίο είστε καταχωρημένος για την περίπτωση στην οποία "
-"το έχετε ξεχάσει:"
+msgid "Your username, in case you’ve forgotten:"
+msgstr "Το όνομα χρήστη, σε περίπτωση που δεν το θυμάστε:"
 
 msgid "Thanks for using our site!"
-msgstr "Ευχαριστούμε που χρησιμοποιήσατε τον ιστότοπο μας!"
+msgstr "Ευχαριστούμε που χρησιμοποιήσατε τον ιστότοπό μας!"
 
 #, python-format
 msgid "The %(site_name)s team"
-msgstr "Η ομάδα του %(site_name)s"
+msgstr "Η ομάδα του ιστότοπου %(site_name)s"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"Ξεχάσατε τον κωδικό σας; Εισάγετε το email σας παρακάτω, και θα σας "
-"αποστείλουμε οδηγίες για να ρυθμίσετε εναν καινούργιο."
+"Ξεχάσατε το συνθηματικό σας; Εισαγάγετε το email σας και θα σας στείλουμε "
+"οδηγίες για να ορίσετε καινούργιο."
 
 msgid "Email address:"
-msgstr "Ηλεκτρονική διεύθυνση:"
+msgstr "Διεύθυνση email:"
 
 msgid "Reset my password"
 msgstr "Επαναφορά του συνθηματικού μου"
@@ -712,15 +711,15 @@ msgstr "Όλες οι ημερομηνίες"
 
 #, python-format
 msgid "Select %s"
-msgstr "Επιλέξτε %s"
+msgstr "Επιλέξτε αντικείμενο (%s)"
 
 #, python-format
 msgid "Select %s to change"
-msgstr "Επιλέξτε %s προς αλλαγή"
+msgstr "Επιλέξτε αντικείμενο (%s) προς αλλαγή"
 
 #, python-format
 msgid "Select %s to view"
-msgstr "Επιλέξτε %s για προβολή"
+msgstr "Επιλέξτε αντικείμενο (%s) για προβολή"
 
 msgid "Date:"
 msgstr "Ημ/νία:"

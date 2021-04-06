@@ -4,6 +4,7 @@
 # Andriy Sokolovskiy <me@asokolovskiy.com>, 2015
 # Denis Podlesniy <haos616@gmail.com>, 2016
 # Igor Melnyk, 2017
+# Illia Volochii <illia.volochii@gmail.com>, 2021
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2015-2016
 # tarasyyyk <taras.korzhak96@gmail.com>, 2018
 # Zoriana Zaiats, 2017
@@ -12,8 +13,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-12 20:01+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2021-01-19 23:59+0000\n"
+"Last-Translator: Illia Volochii <illia.volochii@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +27,7 @@ msgstr ""
 "(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
 msgid "PostgreSQL extensions"
-msgstr "Розширення  PostgreSQL"
+msgstr "Розширення PostgreSQL"
 
 #, python-format
 msgid "Item %(nth)s in the array did not validate:"
@@ -40,7 +41,7 @@ msgstr "Асоціативний масив із рядків у рядки/об
 
 #, python-format
 msgid "The value of “%(key)s” is not a string or null."
-msgstr ""
+msgstr "Значення “%(key)s” не є рядком чи null."
 
 msgid "Could not load JSON data."
 msgstr "Не вдалося завантажити JSON-дані."
