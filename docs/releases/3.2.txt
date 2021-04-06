@@ -1,8 +1,8 @@
-============================================
-Django 3.2 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 3.2 release notes
+========================
 
-*Expected April 2021*
+*April 6, 2021*
 
 Welcome to Django 3.2!
 
@@ -169,11 +169,11 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* :attr:`.ModelAdmin.search_fields` now allows searching against quoted phrases
-  with spaces.
+* :attr:`.ModelAdmin.search_fields` now allows searching against quoted
+  phrases with spaces.
 
-* Read-only related fields are now rendered as navigable links if target models
-  are registered in the admin.
+* Read-only related fields are now rendered as navigable links if target
+  models are registered in the admin.
 
 * The admin now supports theming, and includes a dark theme that is enabled
   according to browser settings. See :ref:`admin-theming` for more details.
@@ -341,8 +341,8 @@ Generic Views
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* :djadmin:`loaddata` now supports fixtures stored in XZ archives (``.xz``) and
-  LZMA archives (``.lzma``).
+* :djadmin:`loaddata` now supports fixtures stored in XZ archives (``.xz``)
+  and LZMA archives (``.lzma``).
 
 * :djadmin:`dumpdata` now can compress data in the ``bz2``, ``gz``, ``lzma``,
   or ``xz`` formats.
@@ -351,10 +351,10 @@ Management Commands
   connection. In that case, check for a consistent migration history is
   skipped.
 
-* :attr:`.BaseCommand.requires_system_checks` now supports specifying a list of
-  tags. System checks registered in the chosen tags will be checked for errors
-  prior to executing the command. In previous versions, either all or none
-  of the system checks were performed.
+* :attr:`.BaseCommand.requires_system_checks` now supports specifying a list
+  of tags. System checks registered in the chosen tags will be checked for
+  errors prior to executing the command. In previous versions, either all or
+  none of the system checks were performed.
 
 * Support for colored terminal output on Windows is updated. Various modern
   terminal environments are automatically detected, and the options for
@@ -382,14 +382,14 @@ Models
   using the ``condition`` argument with ``lookups``.
 
 * The new :attr:`.Index.include` and :attr:`.UniqueConstraint.include`
-  attributes allow creating covering indexes and covering unique constraints on
-  PostgreSQL 11+.
+  attributes allow creating covering indexes and covering unique constraints
+  on PostgreSQL 11+.
 
 * The new :attr:`.UniqueConstraint.opclasses` attribute allows setting
   PostgreSQL operator classes.
 
-* The :meth:`.QuerySet.update` method now respects the ``order_by()`` clause on
-  MySQL and MariaDB.
+* The :meth:`.QuerySet.update` method now respects the ``order_by()`` clause
+  on MySQL and MariaDB.
 
 * :class:`FilteredRelation() <django.db.models.FilteredRelation>` now supports
   nested relations.
@@ -448,16 +448,16 @@ Pagination
 ~~~~~~~~~~
 
 * The new :meth:`django.core.paginator.Paginator.get_elided_page_range` method
-  allows generating a page range with some of the values elided. If there are a
-  large number of pages, this can be helpful for generating a reasonable number
-  of page links in a template.
+  allows generating a page range with some of the values elided. If there are
+  a large number of pages, this can be helpful for generating a reasonable
+  number of page links in a template.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* Response headers are now stored in :attr:`.HttpResponse.headers`. This can be
-  used instead of the original dict-like interface of ``HttpResponse`` objects.
-  Both interfaces will continue to be supported. See
+* Response headers are now stored in :attr:`.HttpResponse.headers`. This can
+  be used instead of the original dict-like interface of ``HttpResponse``
+  objects. Both interfaces will continue to be supported. See
   :ref:`setting-header-fields` for details.
 
 * The new ``headers`` parameter of :class:`~django.http.HttpResponse`,
@@ -468,17 +468,17 @@ Requests and Responses
 Security
 ~~~~~~~~
 
-* The :setting:`SECRET_KEY` setting is now checked for a valid value upon first
-  access, rather than when settings are first loaded. This enables running
-  management commands that do not rely on the ``SECRET_KEY`` without needing to
-  provide a value. As a consequence of this, calling
+* The :setting:`SECRET_KEY` setting is now checked for a valid value upon
+  first access, rather than when settings are first loaded. This enables
+  running management commands that do not rely on the ``SECRET_KEY`` without
+  needing to provide a value. As a consequence of this, calling
   :func:`~django.conf.settings.configure` without providing a valid
   ``SECRET_KEY``, and then going on to access ``settings.SECRET_KEY`` will now
   raise an :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
-* The new ``Signer.sign_object()`` and ``Signer.unsign_object()`` methods allow
-  signing complex data structures. See :ref:`signing-complex-data` for more
-  details.
+* The new ``Signer.sign_object()`` and ``Signer.unsign_object()`` methods
+  allow signing complex data structures. See :ref:`signing-complex-data` for
+  more details.
 
   Also, :func:`signing.dumps() <django.core.signing.dumps>` and
   :func:`~django.core.signing.loads` become shortcuts for
@@ -535,22 +535,22 @@ Tests
 
 * :meth:`.TransactionTestCase.assertQuerysetEqual` now supports direct
   comparison against another queryset rather than being restricted to
-  comparison against a list of string representations of objects when using the
-  default value for the ``transform`` argument.
+  comparison against a list of string representations of objects when using
+  the default value for the ``transform`` argument.
 
 Utilities
 ~~~~~~~~~
 
 * The new ``depth`` parameter of ``django.utils.timesince.timesince()`` and
-  ``django.utils.timesince.timeuntil()`` functions allows specifying the number
-  of adjacent time units to return.
+  ``django.utils.timesince.timeuntil()`` functions allows specifying the
+  number of adjacent time units to return.
 
 Validators
 ~~~~~~~~~~
 
-* Built-in validators now include the provided value in the ``params`` argument
-  of a raised :exc:`~django.core.exceptions.ValidationError`. This allows
-  custom error messages to use the ``%(value)s`` placeholder.
+* Built-in validators now include the provided value in the ``params``
+  argument of a raised :exc:`~django.core.exceptions.ValidationError`. This
+  allows custom error messages to use the ``%(value)s`` placeholder.
 
 * The :class:`.ValidationError` equality operator now ignores ``messages`` and
   ``params`` ordering.
@@ -566,8 +566,8 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* The new ``DatabaseFeatures.introspected_field_types`` property replaces these
-  features:
+* The new ``DatabaseFeatures.introspected_field_types`` property replaces
+  these features:
 
   * ``can_introspect_autofield``
   * ``can_introspect_big_integer_field``
@@ -608,8 +608,8 @@ backends.
 
 * Third-party database backends must implement support for functional indexes
   (:attr:`.Index.expressions`) or set
-  ``DatabaseFeatures.supports_expression_indexes`` to ``False``. If ``COLLATE``
-  is not a part of the ``CREATE INDEX`` statement, set
+  ``DatabaseFeatures.supports_expression_indexes`` to ``False``. If
+  ``COLLATE`` is not a part of the ``CREATE INDEX`` statement, set
   ``DatabaseFeatures.collate_as_index_expression`` to ``True``.
 
 :mod:`django.contrib.admin`
@@ -626,8 +626,9 @@ backends.
 
 * Minified JavaScript files are no longer included with the admin. If you
   require these files to be minified, consider using a third party app or
-  external build tool. The minified vendored JavaScript files packaged with the
-  admin (e.g. :ref:`jquery.min.js <contrib-admin-jquery>`) are still included.
+  external build tool. The minified vendored JavaScript files packaged with
+  the admin (e.g. :ref:`jquery.min.js <contrib-admin-jquery>`) are still
+  included.
 
 * :attr:`.ModelAdmin.prepopulated_fields` no longer strips English stop words,
   such as ``'a'`` or ``'an'``.
@@ -683,9 +684,9 @@ Miscellaneous
 
 * When an application defines an :class:`~django.apps.AppConfig` subclass in
   an ``apps.py`` submodule, Django now uses this configuration automatically,
-  even if it isn't enabled with ``default_app_config``. Set ``default = False``
-  in the :class:`~django.apps.AppConfig` subclass if you need to prevent this
-  behavior. See :ref:`whats-new-3.2` for more details.
+  even if it isn't enabled with ``default_app_config``. Set
+  ``default = False`` in the :class:`~django.apps.AppConfig` subclass if you
+  need to prevent this behavior. See :ref:`whats-new-3.2` for more details.
 
 * Instantiating an abstract model now raises ``TypeError``.
 
@@ -716,12 +717,12 @@ Miscellaneous
 * The password reset mechanism now invalidates tokens when the user email is
   changed.
 
-* :djadmin:`makemessages` command no longer processes invalid locales specified
-  using :option:`makemessages --locale` option, when they contain hyphens
-  (``'-'``).
+* :djadmin:`makemessages` command no longer processes invalid locales
+  specified using :option:`makemessages --locale` option, when they contain
+  hyphens (``'-'``).
 
-* The ``django.contrib.auth.forms.ReadOnlyPasswordHashField`` form field is now
-  :attr:`~django.forms.Field.disabled` by default. Therefore
+* The ``django.contrib.auth.forms.ReadOnlyPasswordHashField`` form field is
+  now :attr:`~django.forms.Field.disabled` by default. Therefore
   ``UserChangeForm.clean_password()`` is no longer required to return the
   initial value.
 
@@ -755,8 +756,8 @@ Miscellaneous
   :meth:`.TestCase.setUpTestData` is deprecated.
 
 * Using a boolean value in :attr:`.BaseCommand.requires_system_checks` is
-  deprecated. Use ``'__all__'`` instead of ``True``, and ``[]`` (an empty list)
-  instead of ``False``.
+  deprecated. Use ``'__all__'`` instead of ``True``, and ``[]`` (an empty
+  list) instead of ``False``.
 
 * The ``whitelist`` argument and ``domain_whitelist`` attribute of
   :class:`~django.core.validators.EmailValidator` are deprecated. Use
