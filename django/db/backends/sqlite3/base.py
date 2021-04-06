@@ -563,6 +563,7 @@ def _sqlite_format_dtdelta(conn, lhs, rhs):
     LHS and RHS can be either:
     - An integer number of microseconds
     - A string representing a datetime
+    - A scalar value, e.g. float
     """
     conn = conn.strip()
     try:
@@ -574,8 +575,12 @@ def _sqlite_format_dtdelta(conn, lhs, rhs):
         # typecast_timestamp returns a date or a datetime without timezone.
         # It will be formatted as "%Y-%m-%d" or "%Y-%m-%d %H:%M:%S[.%f]"
         out = str(real_lhs + real_rhs)
-    else:
+    elif conn == '-':
         out = str(real_lhs - real_rhs)
+    elif conn == '*':
+        out = real_lhs * real_rhs
+    else:
+        out = real_lhs / real_rhs
     return out
 
 

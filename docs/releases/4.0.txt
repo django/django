@@ -233,6 +233,9 @@ Models
 * :meth:`.QuerySet.bulk_create` now sets the primary key on objects when using
   SQLite 3.35+.
 
+* :class:`~django.db.models.DurationField` now supports multiplying and
+  dividing by scalar values on SQLite.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

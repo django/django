@@ -60,6 +60,7 @@ class Experiment(models.Model):
     estimated_time = models.DurationField()
     start = models.DateTimeField()
     end = models.DateTimeField()
+    scalar = models.IntegerField(null=True)
 
     class Meta:
         db_table = 'expressions_ExPeRiMeNt'

@@ -68,6 +68,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "returns JSON": {
                 'schema.tests.SchemaTests.test_func_index_json_key_transform',
             },
+            "MySQL supports multiplying and dividing DurationFields by a "
+            "scalar value but it's not implemented (#25287).": {
+                'expressions.tests.FTimeDeltaTests.test_durationfield_multiply_divide',
+            },
         }
         if 'ONLY_FULL_GROUP_BY' in self.connection.sql_mode:
             skips.update({
