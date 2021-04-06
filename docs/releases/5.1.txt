@@ -305,6 +305,13 @@ backends.
 
 * Support for GDAL 2.4 is removed.
 
+* :class:`~django.contrib.gis.geoip2.GeoIP2` no longer opens both city and
+  country databases when a directory path is provided, preferring the city
+  database, if it is available. The country database is a subset of the city
+  database and both are not typically needed. If you require use of the country
+  database when in the same directory as the city database, explicitly pass the
+  country database path to the constructor.
+
 Dropped support for MariaDB 10.4
 --------------------------------
 
