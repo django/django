@@ -1,13 +1,13 @@
 repos:
   - repo: https://github.com/PyCQA/isort
-    rev: 5.6.4
+    rev: 5.8.0
     hooks:
       - id: isort
-  - repo: https://gitlab.com/pycqa/flake8
-    rev: 3.8.4
+  - repo: https://github.com/PyCQA/flake8
+    rev: 3.9.0
     hooks:
       - id: flake8
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v7.16.0
+    rev: v7.23.0
     hooks:
       - id: eslint
