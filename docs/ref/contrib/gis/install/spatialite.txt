@@ -7,7 +7,7 @@ spatial database.
 
 First, check if you can install SpatiaLite from system packages or binaries.
 
-For example, on Debian-based distributions that package SpatiaLite 4.2+, try to
+For example, on Debian-based distributions that package SpatiaLite 4.3+, try to
 install the ``libsqlite3-mod-spatialite`` package. For older releases install
 ``spatialite-bin``.
 
