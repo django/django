@@ -1,3 +1,5 @@
+import asyncio
+
 from django.http import Http404, HttpResponse
 from django.template import engines
 from django.template.response import TemplateResponse
@@ -11,6 +13,9 @@ log = []
 class BaseMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
+        if asyncio.iscoroutinefunction(self.get_response):
+            # Mark the class as async-capable.
+            self._is_coroutine = asyncio.coroutines._is_coroutine
 
     def __call__(self, request):
         return self.get_response(request)
