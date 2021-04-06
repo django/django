@@ -10,6 +10,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv46_address
 from django.utils._os import to_path
 from django.utils.deprecation import RemovedInDjango50Warning
+from django.utils.functional import cached_property
 
 
 class GeoIP2Exception(Exception):
@@ -30,13 +31,8 @@ class GeoIP2:
     MODE_MEMORY = 8
     cache_options = frozenset((MODE_AUTO, MODE_MMAP_EXT, MODE_MMAP, MODE_FILE, MODE_MEMORY))
 
-    # Paths to the city & country binary databases.
-    _city_file = ''
-    _country_file = ''
-
-    # Initially, pointers to GeoIP file references are NULL.
-    _city = None
-    _country = None
+    _path = ''
+    _reader = None
 
     def __init__(self, path=None, cache=0, country=None, city=None):
         """
@@ -61,101 +57,68 @@ class GeoIP2:
         * city: The name of the GeoIP city data file. Defaults to
             'GeoLite2-City.mmdb'; overrides the GEOIP_CITY setting.
         """
-        # Checking the given cache option.
         if cache not in self.cache_options:
             raise GeoIP2Exception('Invalid GeoIP caching option: %s' % cache)
 
-        # Getting the GeoIP data path.
         path = path or getattr(settings, 'GEOIP_PATH', None)
         if not path:
             raise GeoIP2Exception('GeoIP path must be provided via parameter or the GEOIP_PATH setting.')
 
         path = to_path(path)
-        if path.is_dir():
-            # Constructing the GeoIP database filenames using the settings
-            # dictionary. If the database files for the GeoLite country
-            # and/or city datasets exist, then try to open them.
-            country_db = path / (country or getattr(settings, 'GEOIP_COUNTRY', 'GeoLite2-Country.mmdb'))
-            if country_db.is_file():
-                self._country = geoip2.database.Reader(str(country_db), mode=cache)
-                self._country_file = country_db
+        candidates = [
+            path,  # Try the path first in case it is the full path to a database.
+            path / (city or getattr(settings, 'GEOIP_CITY', 'GeoLite2-City.mmdb')),
+            path / (country or getattr(settings, 'GEOIP_COUNTRY', 'GeoLite2-Country.mmdb')),
+        ]
 
-            city_db = path / (city or getattr(settings, 'GEOIP_CITY', 'GeoLite2-City.mmdb'))
-            if city_db.is_file():
-                self._city = geoip2.database.Reader(str(city_db), mode=cache)
-                self._city_file = city_db
-            if not self._reader:
-                raise GeoIP2Exception('Could not load a database from %s.' % path)
-        elif path.is_file():
-            # Otherwise, some detective work will be needed to figure out
-            # whether the given database path is for the GeoIP country or city
-            # databases.
+        for path in candidates:
+            if not path.is_file():
+                continue
             reader = geoip2.database.Reader(str(path), mode=cache)
-            db_type = reader.metadata().database_type
-
-            if db_type.endswith('City'):
-                # GeoLite City database detected.
-                self._city = reader
-                self._city_file = path
-            elif db_type.endswith('Country'):
-                # GeoIP Country database detected.
-                self._country = reader
-                self._country_file = path
-            else:
-                raise GeoIP2Exception('Unable to recognize database edition: %s' % db_type)
+            self._path = path
+            self._reader = reader
+            break
         else:
             raise GeoIP2Exception('GeoIP path must be a valid file or directory.')
 
-    @property
-    def _reader(self):
-        return self._country or self._city
-
-    @property
-    def _country_or_city(self):
-        if self._country:
-            return self._country.country
-        else:
-            return self._city.city
+        database_type = self._metadata.database_type
+        if not database_type.endswith(('City', 'Country')):
+            raise GeoIP2Exception(f'Unable to handle database edition: {database_type}')
 
     def __del__(self):
         # Cleanup any GeoIP file handles lying around.
-        if self._city:
-            self._city.close()
-        if self._country:
-            self._country.close()
+        if self._reader:
+            self._reader.close()
 
     def __repr__(self):
-        meta = self._reader.metadata()
-        version = '[v%s.%s]' % (meta.binary_format_major_version, meta.binary_format_minor_version)
-        return '<%(cls)s %(version)s _country_file="%(country)s", _city_file="%(city)s">' % {
-            'cls': self.__class__.__name__,
-            'version': version,
-            'country': self._country_file,
-            'city': self._city_file,
-        }
+        metadata = self._metadata
+        version = f'[v{metadata.binary_format_major_version}.{metadata.binary_format_minor_version}]'
+        return f"<{self.__class__.__name__} {version} _path='{self._path}'>"
 
-    def _check_query(self, query, city=False, city_or_country=False):
-        "Check the query and database availability."
-        # Making sure a string was passed in for the query.
+    @cached_property
+    def _metadata(self):
+        return self._reader.metadata()
+
+    def _query(self, query, *, require_city=False):
         if not isinstance(query, (str, ipaddress.IPv4Address, ipaddress.IPv6Address)):
             raise TypeError(
                 'GeoIP query must be a string or instance of IPv4Address or '
                 'IPv6Address, not type %s' % type(query).__name__,
             )
 
-        # Extra checks for the existence of country and city databases.
-        if city_or_country and not (self._country or self._city):
-            raise GeoIP2Exception('Invalid GeoIP country and city data files.')
-        elif city and not self._city:
-            raise GeoIP2Exception('Invalid GeoIP city data file: %s' % self._city_file)
+        is_city = self._metadata.database_type.endswith('City')
 
-        # Return the query string back to the caller. GeoIP2 only takes IP addresses.
+        if require_city and not is_city:
+            raise GeoIP2Exception('Invalid GeoIP city data file: %s' % self._path)  # XXX
+
         try:
             validate_ipv46_address(query)
         except ValidationError:
+            # GeoIP2 only takes IP addresses, so try to resolve a hostname.
             query = socket.gethostbyname(query)
 
-        return query
+        function = self._reader.city if is_city else self._reader.country
+        return function(query)
 
     def city(self, query):
         """
@@ -163,8 +126,7 @@ class GeoIP2:
         Fully Qualified Domain Name (FQDN). Some information in the dictionary
         may be undefined (None).
         """
-        enc_query = self._check_query(query, city=True)
-        response = self._city.city(enc_query)
+        response = self._query(query, require_city=True)
         region = response.subdivisions[0] if response.subdivisions else None
         return {
             'accuracy_radius': response.location.accuracy_radius,
@@ -186,23 +148,13 @@ class GeoIP2:
             'region': region.iso_code if region else None,
         }
 
-    def country_code(self, query):
-        "Return the country code for the given IP Address or FQDN."
-        return self.country(query)['country_code']
-
-    def country_name(self, query):
-        "Return the country name for the given IP Address or FQDN."
-        return self.country(query)['country_name']
-
     def country(self, query):
         """
         Return a dictionary with the country code and name when given an
         IP address or a Fully Qualified Domain Name (FQDN). For example, both
         '24.124.1.80' and 'djangoproject.com' are valid parameters.
         """
-        # Returning the country code and name
-        enc_query = self._check_query(query, city_or_country=True)
-        response = self._country_or_city(enc_query)
+        response = self._query(query, require_city=False)
         return {
             'continent_code': response.continent.code,
             'continent_name': response.continent.name,
@@ -210,6 +162,14 @@ class GeoIP2:
             'country_name': response.country.name,
             'is_in_european_union': response.country.is_in_european_union,
         }
+
+    def country_code(self, query):
+        "Return the country code for the given IP Address or FQDN."
+        return self.country(query)['country_code']
+
+    def country_name(self, query):
+        "Return the country name for the given IP Address or FQDN."
+        return self.country(query)['country_name']
 
     def lon_lat(self, query):
         data = self.city(query)
