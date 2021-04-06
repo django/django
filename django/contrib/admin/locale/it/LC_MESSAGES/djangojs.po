@@ -7,15 +7,15 @@
 # Marco Bonetti, 2014
 # Mirco Grillo <mirco.grillomg@gmail.com>, 2020
 # Nicola Larosa <transifex@teknico.net>, 2011-2012
-# palmux <palmux@gmail.com>, 2015
+# palmux <palmux@gmail.com>, 2015,2021
 # Stefano Brentegani <sbrentegani@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-07-23 08:40+0000\n"
-"Last-Translator: Mirco Grillo <mirco.grillomg@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-15 15:58+0000\n"
+"Last-Translator: palmux <palmux@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -95,14 +95,14 @@ msgid ""
 "action."
 msgstr ""
 "Hai selezionato un'azione, ma non hai ancora salvato le modifiche apportate "
-"a campi singoli. Fai clic su OK per salvare. Poi dovrai ri-eseguire l'azione."
+"a campi singoli. Fai clic su OK per salvare. Poi dovrai rieseguire l'azione."
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
 "fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Hai selezionato un'azione, e non hai ancora apportato alcuna modifica a "
+"Hai selezionato un'azione e non hai ancora apportato alcuna modifica ai "
 "campi singoli. Probabilmente stai cercando il pulsante Vai, invece di Salva."
 
 msgid "Now"
@@ -188,6 +188,54 @@ msgstr "Novembre"
 
 msgid "December"
 msgstr "Dicembre"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Gen"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Mag"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Giu"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Lug"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Ago"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Set"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Ott"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dic"
 
 msgctxt "one letter Sunday"
 msgid "S"

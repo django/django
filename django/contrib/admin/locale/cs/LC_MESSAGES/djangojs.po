@@ -4,13 +4,13 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jirka Vejrazka <Jirka.Vejrazka@gmail.com>, 2011
 # Vláďa Macek <macek@sandbox.cz>, 2012,2014
-# Vláďa Macek <macek@sandbox.cz>, 2015-2016,2020
+# Vláďa Macek <macek@sandbox.cz>, 2015-2016,2020-2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-06-05 06:06+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-03-18 23:23+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -123,7 +123,7 @@ msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
 msgstr[0] "Poznámka: Váš čas o %s hodinu předstihuje čas na serveru."
 msgstr[1] "Poznámka: Váš čas o %s hodiny předstihuje čas na serveru."
-msgstr[2] "Poznámka: Váš čas o %s hodin předstihuje čas na serveru."
+msgstr[2] "Poznámka: Váš čas o %s hodiny předstihuje čas na serveru."
 msgstr[3] "Poznámka: Váš čas o %s hodin předstihuje čas na serveru."
 
 #, javascript-format
@@ -131,7 +131,7 @@ msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Poznámka: Váš čas se o %s hodinu zpožďuje za časem na serveru."
 msgstr[1] "Poznámka: Váš čas se o %s hodiny zpožďuje za časem na serveru."
-msgstr[2] "Poznámka: Váš čas se o %s hodin zpožďuje za časem na serveru."
+msgstr[2] "Poznámka: Váš čas se o %s hodiny zpožďuje za časem na serveru."
 msgstr[3] "Poznámka: Váš čas se o %s hodin zpožďuje za časem na serveru."
 
 msgid "Choose a Time"
@@ -190,6 +190,54 @@ msgstr "listopad"
 
 msgid "December"
 msgstr "prosinec"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Led"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Úno"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Bře"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Dub"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Kvě"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Čvn"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Čvc"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Srp"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Zář"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Říj"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Lis"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Pro"
 
 msgctxt "one letter Sunday"
 msgid "S"

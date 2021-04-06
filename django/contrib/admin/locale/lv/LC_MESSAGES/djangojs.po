@@ -3,14 +3,14 @@
 # Translators:
 # NullIsNot0 <nullisnot0@inbox.lv>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
-# NullIsNot0 <nullisnot0@inbox.lv>, 2020
+# NullIsNot0 <nullisnot0@inbox.lv>, 2020-2021
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-20 05:18+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-25 22:47+0000\n"
 "Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
@@ -189,6 +189,54 @@ msgstr "novembris"
 
 msgid "December"
 msgstr "decembris"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Mai"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Jūn"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Jūl"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Aug"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sep"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dec"
 
 msgctxt "one letter Sunday"
 msgid "S"

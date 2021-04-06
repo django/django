@@ -509,19 +509,19 @@ class FormattingTests(SimpleTestCase):
             self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
             self.assertEqual('.', get_format('DECIMAL_SEPARATOR'))
             self.assertEqual('10:15 a.m.', time_format(self.t))
-            self.assertEqual('des. 31, 2009', date_format(self.d))
+            self.assertEqual('Des. 31, 2009', date_format(self.d))
             self.assertEqual('desembre 2009', date_format(self.d, 'YEAR_MONTH_FORMAT'))
             self.assertEqual('12/31/2009 8:50 p.m.', date_format(self.dt, 'SHORT_DATETIME_FORMAT'))
             self.assertEqual('No localizable', localize('No localizable'))
             self.assertEqual('66666.666', localize(self.n))
             self.assertEqual('99999.999', localize(self.f))
             self.assertEqual('10000', localize(self.long))
-            self.assertEqual('des. 31, 2009', localize(self.d))
-            self.assertEqual('des. 31, 2009, 8:50 p.m.', localize(self.dt))
+            self.assertEqual('Des. 31, 2009', localize(self.d))
+            self.assertEqual('Des. 31, 2009, 8:50 p.m.', localize(self.dt))
             self.assertEqual('66666.666', Template('{{ n }}').render(self.ctxt))
             self.assertEqual('99999.999', Template('{{ f }}').render(self.ctxt))
-            self.assertEqual('des. 31, 2009', Template('{{ d }}').render(self.ctxt))
-            self.assertEqual('des. 31, 2009, 8:50 p.m.', Template('{{ dt }}').render(self.ctxt))
+            self.assertEqual('Des. 31, 2009', Template('{{ d }}').render(self.ctxt))
+            self.assertEqual('Des. 31, 2009, 8:50 p.m.', Template('{{ dt }}').render(self.ctxt))
             self.assertEqual('66666.67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
             self.assertEqual('100000.0', Template('{{ f|floatformat }}').render(self.ctxt))
             self.assertEqual(
@@ -551,7 +551,7 @@ class FormattingTests(SimpleTestCase):
             self.assertEqual(['Introdu\xefu un n\xfamero.'], form.errors['decimal_field'])
             self.assertEqual(['Introdu\xefu una data v\xe0lida.'], form.errors['date_field'])
             self.assertEqual(['Introdu\xefu una data/hora v\xe0lides.'], form.errors['datetime_field'])
-            self.assertEqual(['Introdu\xefu un n\xfamero sencer.'], form.errors['integer_field'])
+            self.assertEqual(['Introdu\xefu un n\xfamero enter.'], form.errors['integer_field'])
 
             form2 = SelectDateForm({
                 'date_field_month': '12',

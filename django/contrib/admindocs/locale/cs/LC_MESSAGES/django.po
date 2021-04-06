@@ -3,13 +3,13 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Vláďa Macek <macek@sandbox.cz>, 2012-2014
-# Vláďa Macek <macek@sandbox.cz>, 2015-2016,2019
+# Vláďa Macek <macek@sandbox.cz>, 2015-2016,2019,2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-19 09:23+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-03-18 23:13+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -102,11 +102,11 @@ msgstr "Nainstalujte balík docutils"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
+"The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
-"Dokumentační systém administračního rozhraní potřebuje pythonskou knihovnu "
-"<a href=\"%(link)s\">docutils</a>."
+"Dokumentační systém administračního rozhraní vyžaduje pythonskou knihovnu <a "
+"href=\"%(link)s\">docutils</a>."
 
 #, python-format
 msgid ""
