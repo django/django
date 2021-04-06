@@ -271,7 +271,7 @@ If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
 *  argon2-cffi_ 19.1.0+
-*  asgiref_ 3.2.10+ (required)
+*  asgiref_ 3.3.2+ (required)
 *  bcrypt_
 *  colorama_
 *  docutils_

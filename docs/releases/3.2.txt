@@ -739,6 +739,9 @@ Miscellaneous
   messages in the :rfc:`6265` compliant format. Support for cookies that use
   the old format remains until Django 4.1.
 
+* The minimum supported version of ``asgiref`` is increased from 3.2.10 to
+  3.3.2.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2
