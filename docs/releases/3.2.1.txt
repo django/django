@@ -1,0 +1,12 @@
+==========================
+Django 3.2.1 release notes
+==========================
+
+*Expected May 4, 2021*
+
+Django 3.2.1 fixes several bugs in 3.2.0.
+
+Bugfixes
+========
+
+* ...
