@@ -334,6 +334,14 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
     return failures
 
 
+def get_app_test_labels(verbosity, parallel, start_at, start_after):
+    test_labels = []
+    state = setup(verbosity, test_labels, parallel, start_at, start_after)
+    test_labels = get_installed()
+    teardown(state)
+    return test_labels
+
+
 def get_subprocess_args(options):
     subprocess_args = [
         sys.executable, __file__, '--settings=%s' % options.settings
@@ -352,9 +360,8 @@ def get_subprocess_args(options):
 
 
 def bisect_tests(bisection_label, options, test_labels, parallel, start_at, start_after):
-    state = setup(options.verbosity, test_labels, parallel, start_at, start_after)
-
-    test_labels = test_labels or get_installed()
+    if not test_labels:
+        test_labels = get_app_test_labels(options.verbosity, parallel, start_at, start_after)
 
     print('***** Bisecting test suite: %s' % ' '.join(test_labels))
 
@@ -399,13 +406,11 @@ def bisect_tests(bisection_label, options, test_labels, parallel, start_at, star
 
     if len(test_labels) == 1:
         print("***** Source of error: %s" % test_labels[0])
-    teardown(state)
 
 
 def paired_tests(paired_test, options, test_labels, parallel, start_at, start_after):
-    state = setup(options.verbosity, test_labels, parallel, start_at, start_after)
-
-    test_labels = test_labels or get_installed()
+    if not test_labels:
+        test_labels = get_app_test_labels(options.verbosity, parallel, start_at, start_after)
 
     print('***** Trying paired execution')
 
@@ -428,7 +433,6 @@ def paired_tests(paired_test, options, test_labels, parallel, start_at, start_af
             return
 
     print('***** No problem pair found')
-    teardown(state)
 
 
 if __name__ == "__main__":
