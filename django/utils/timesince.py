@@ -6,12 +6,12 @@ from django.utils.timezone import is_aware, utc
 from django.utils.translation import gettext, ngettext_lazy
 
 TIME_STRINGS = {
-    'year': ngettext_lazy('%d year', '%d years'),
-    'month': ngettext_lazy('%d month', '%d months'),
-    'week': ngettext_lazy('%d week', '%d weeks'),
-    'day': ngettext_lazy('%d day', '%d days'),
-    'hour': ngettext_lazy('%d hour', '%d hours'),
-    'minute': ngettext_lazy('%d minute', '%d minutes'),
+    'year': ngettext_lazy('%(number)d year', '%(number)d years'),
+    'month': ngettext_lazy('%(number)d month', '%(number)d months'),
+    'week': ngettext_lazy('%(number)d week', '%(number)d weeks'),
+    'day': ngettext_lazy('%(number)d day', '%(number)d days'),
+    'hour': ngettext_lazy('%(number)d hour', '%(number)d hours'),
+    'minute': ngettext_lazy('%(number)d minute', '%(number)d minutes'),
 }
 
 TIMESINCE_CHUNKS = (

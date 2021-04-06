@@ -202,21 +202,21 @@ class NaturalTimeFormatter:
     }
     past_substrings = {
         # Translators: 'naturaltime-past' strings will be included in '%(delta)s ago'
-        'year': npgettext_lazy('naturaltime-past', '%d year', '%d years'),
-        'month': npgettext_lazy('naturaltime-past', '%d month', '%d months'),
-        'week': npgettext_lazy('naturaltime-past', '%d week', '%d weeks'),
-        'day': npgettext_lazy('naturaltime-past', '%d day', '%d days'),
-        'hour': npgettext_lazy('naturaltime-past', '%d hour', '%d hours'),
-        'minute': npgettext_lazy('naturaltime-past', '%d minute', '%d minutes'),
+        'year': npgettext_lazy('naturaltime-past', '%(number)d year', '%(number)d years'),
+        'month': npgettext_lazy('naturaltime-past', '%(number)d month', '%(number)d months'),
+        'week': npgettext_lazy('naturaltime-past', '%(number)d week', '%(number)d weeks'),
+        'day': npgettext_lazy('naturaltime-past', '%(number)d day', '%(number)d days'),
+        'hour': npgettext_lazy('naturaltime-past', '%(number)d hour', '%(number)d hours'),
+        'minute': npgettext_lazy('naturaltime-past', '%(number)d minute', '%(number)d minutes'),
     }
     future_substrings = {
         # Translators: 'naturaltime-future' strings will be included in '%(delta)s from now'
-        'year': npgettext_lazy('naturaltime-future', '%d year', '%d years'),
-        'month': npgettext_lazy('naturaltime-future', '%d month', '%d months'),
-        'week': npgettext_lazy('naturaltime-future', '%d week', '%d weeks'),
-        'day': npgettext_lazy('naturaltime-future', '%d day', '%d days'),
-        'hour': npgettext_lazy('naturaltime-future', '%d hour', '%d hours'),
-        'minute': npgettext_lazy('naturaltime-future', '%d minute', '%d minutes'),
+        'year': npgettext_lazy('naturaltime-future', '%(number)d year', '%(number)d years'),
+        'month': npgettext_lazy('naturaltime-future', '%(number)d month', '%(number)d months'),
+        'week': npgettext_lazy('naturaltime-future', '%(number)d week', '%(number)d weeks'),
+        'day': npgettext_lazy('naturaltime-future', '%(number)d day', '%(number)d days'),
+        'hour': npgettext_lazy('naturaltime-future', '%(number)d hour', '%(number)d hours'),
+        'minute': npgettext_lazy('naturaltime-future', '%(number)d minute', '%(number)d minutes'),
     }
 
     @classmethod
