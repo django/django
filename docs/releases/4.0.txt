@@ -230,6 +230,9 @@ Models
   :class:`Round() <django.db.models.functions.Round>` database function allows
   specifying the number of decimal places after rounding.
 
+* :meth:`.QuerySet.bulk_create` now sets the primary key on objects when using
+  SQLite 3.35+.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
