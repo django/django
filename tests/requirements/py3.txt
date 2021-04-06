@@ -1,4 +1,4 @@
-asgiref >= 3.2.10
+asgiref >= 3.3.2
 argon2-cffi >= 16.1.0
 backports.zoneinfo; python_version < '3.9'
 bcrypt
