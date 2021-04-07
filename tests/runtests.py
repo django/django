@@ -133,11 +133,11 @@ def get_installed():
 
 
 def setup(verbosity, test_labels, start_at, start_after):
-    # Reduce the given test labels to just the app module path.
+    # Reduce each test label to just the top-level module part.
     test_labels_set = set()
     for label in test_labels:
-        bits = label.split('.')[:1]
-        test_labels_set.add('.'.join(bits))
+        test_module = label.split('.')[0]
+        test_labels_set.add(test_module)
 
     # Force declaring available_apps in TransactionTestCase for faster tests.
     def no_available_apps(self):
