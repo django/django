@@ -500,6 +500,4 @@ class GDALRaster(GDALRasterBase):
         Return information about this raster in a string format equivalent
         to the output of the gdalinfo command line utility.
         """
-        if not capi.get_ds_info:
-            raise ValueError('GDAL ≥ 2.1 is required for using the info property.')
         return capi.get_ds_info(self.ptr, None).decode()

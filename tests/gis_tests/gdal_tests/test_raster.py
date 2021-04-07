@@ -4,7 +4,7 @@ import struct
 import tempfile
 from unittest import mock
 
-from django.contrib.gis.gdal import GDAL_VERSION, GDALRaster, SpatialReference
+from django.contrib.gis.gdal import GDALRaster, SpatialReference
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.raster.band import GDALBand
 from django.contrib.gis.shortcuts import numpy
@@ -270,8 +270,6 @@ class GDALRasterTests(SimpleTestCase):
         self.assertEqual(result, [23] * 4)
 
     def test_set_nodata_none_on_raster_creation(self):
-        if GDAL_VERSION < (2, 1):
-            self.skipTest("GDAL >= 2.1 is required for this test.")
         # Create raster without data and without nodata value.
         rast = GDALRaster({
             'datatype': 1,
@@ -322,11 +320,6 @@ class GDALRasterTests(SimpleTestCase):
         self.assertNotIn('OWNER', source.metadata['DEFAULT'])
 
     def test_raster_info_accessor(self):
-        if GDAL_VERSION < (2, 1):
-            msg = 'GDAL ≥ 2.1 is required for using the info property.'
-            with self.assertRaisesMessage(ValueError, msg):
-                self.rs.info
-            return
         infos = self.rs.info
         # Data
         info_lines = [line.strip() for line in infos.split('\n') if line.strip() != '']
@@ -389,8 +382,7 @@ class GDALRasterTests(SimpleTestCase):
         compressed = GDALRaster(compressed.name)
         self.assertEqual(compressed.metadata['IMAGE_STRUCTURE']['COMPRESSION'], 'PACKBITS',)
         self.assertEqual(compressed.bands[0].metadata['IMAGE_STRUCTURE']['PIXELTYPE'], 'SIGNEDBYTE')
-        if GDAL_VERSION >= (2, 1):
-            self.assertIn('Block=40x23', compressed.info)
+        self.assertIn('Block=40x23', compressed.info)
 
     def test_raster_warp(self):
         # Create in memory raster
@@ -796,13 +788,8 @@ class GDALBandTests(SimpleTestCase):
             'height': 1,
             'bands': [{'data': [0], 'nodata_value': 1}],
         })
-        if GDAL_VERSION < (2, 1):
-            msg = 'GDAL >= 2.1 required to delete nodata values.'
-            with self.assertRaisesMessage(ValueError, msg):
-                rsmem.bands[0].nodata_value = None
-        else:
-            rsmem.bands[0].nodata_value = None
-            self.assertIsNone(rsmem.bands[0].nodata_value)
+        rsmem.bands[0].nodata_value = None
+        self.assertIsNone(rsmem.bands[0].nodata_value)
 
     def test_band_data_replication(self):
         band = GDALRaster({

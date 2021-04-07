@@ -314,6 +314,8 @@ backends.
 
 * Support for PostGIS 2.3 is removed.
 
+* Support for GDAL 2.0 and GEOS 3.5 is removed.
+
 Dropped support for PostgreSQL 9.6
 ----------------------------------
 
