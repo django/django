@@ -161,7 +161,7 @@ class ExclusionConstraint(BaseConstraint):
             repr(self.expressions),
             repr(self.name),
             '' if self.condition is None else ' condition=%s' % self.condition,
-            '' if self.deferrable is None else ' deferrable=%s' % self.deferrable,
+            '' if self.deferrable is None else ' deferrable=%r' % self.deferrable,
             '' if not self.include else ' include=%s' % repr(self.include),
             '' if not self.opclasses else ' opclasses=%s' % repr(self.opclasses),
         )
