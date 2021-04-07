@@ -132,19 +132,12 @@ def get_installed():
     return [app_config.name for app_config in apps.get_app_configs()]
 
 
-def setup(verbosity, test_labels, parallel, start_at, start_after):
+def setup(verbosity, test_labels, start_at, start_after):
     # Reduce the given test labels to just the app module path.
     test_labels_set = set()
     for label in test_labels:
         bits = label.split('.')[:1]
         test_labels_set.add('.'.join(bits))
-
-    if verbosity >= 1:
-        msg = "Testing against Django installed in '%s'" % os.path.dirname(django.__file__)
-        max_parallel = default_test_processes() if parallel == 0 else parallel
-        if max_parallel > 1:
-            msg += " with up to %d processes" % max_parallel
-        print(msg)
 
     # Force declaring available_apps in TransactionTestCase for faster tests.
     def no_available_apps(self):
@@ -309,7 +302,14 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
                  test_labels, debug_sql, parallel, tags, exclude_tags,
                  test_name_patterns, start_at, start_after, pdb, buffer,
                  timing):
-    state = setup(verbosity, test_labels, parallel, start_at, start_after)
+    if verbosity >= 1:
+        msg = "Testing against Django installed in '%s'" % os.path.dirname(django.__file__)
+        max_parallel = default_test_processes() if parallel == 0 else parallel
+        if max_parallel > 1:
+            msg += " with up to %d processes" % max_parallel
+        print(msg)
+
+    state = setup(verbosity, test_labels, start_at, start_after)
     # Run the test suite, including the extra validation tests.
     if not hasattr(settings, 'TEST_RUNNER'):
         settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
@@ -334,9 +334,9 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
     return failures
 
 
-def get_app_test_labels(verbosity, parallel, start_at, start_after):
+def get_app_test_labels(verbosity, start_at, start_after):
     test_labels = []
-    state = setup(verbosity, test_labels, parallel, start_at, start_after)
+    state = setup(verbosity, test_labels, start_at, start_after)
     test_labels = get_installed()
     teardown(state)
     return test_labels
@@ -359,9 +359,9 @@ def get_subprocess_args(options):
     return subprocess_args
 
 
-def bisect_tests(bisection_label, options, test_labels, parallel, start_at, start_after):
+def bisect_tests(bisection_label, options, test_labels, start_at, start_after):
     if not test_labels:
-        test_labels = get_app_test_labels(options.verbosity, parallel, start_at, start_after)
+        test_labels = get_app_test_labels(options.verbosity, start_at, start_after)
 
     print('***** Bisecting test suite: %s' % ' '.join(test_labels))
 
@@ -408,9 +408,9 @@ def bisect_tests(bisection_label, options, test_labels, parallel, start_at, star
         print("***** Source of error: %s" % test_labels[0])
 
 
-def paired_tests(paired_test, options, test_labels, parallel, start_at, start_after):
+def paired_tests(paired_test, options, test_labels, start_at, start_after):
     if not test_labels:
-        test_labels = get_app_test_labels(options.verbosity, parallel, start_at, start_after)
+        test_labels = get_app_test_labels(options.verbosity, start_at, start_after)
 
     print('***** Trying paired execution')
 
@@ -582,13 +582,13 @@ if __name__ == "__main__":
 
     if options.bisect:
         bisect_tests(
-            options.bisect, options, options.modules, options.parallel,
-            options.start_at, options.start_after,
+            options.bisect, options, options.modules, options.start_at,
+            options.start_after,
         )
     elif options.pair:
         paired_tests(
-            options.pair, options, options.modules, options.parallel,
-            options.start_at, options.start_after,
+            options.pair, options, options.modules, options.start_at,
+            options.start_after,
         )
     else:
         time_keeper = TimeKeeper() if options.timing else NullTimeKeeper()
