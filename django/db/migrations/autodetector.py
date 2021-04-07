@@ -1,5 +1,6 @@
 import functools
 import re
+from collections import defaultdict
 from itertools import chain
 
 from django.conf import settings
@@ -11,6 +12,19 @@ from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.utils.topological_sort import stable_topological_sort
+
+pre_add_operation_hooks = defaultdict(list)
+post_add_operation_hooks = defaultdict(list)
+
+
+def register_pre_add_operation_hook(operation_class, hook_function):
+    global pre_add_operation_hooks
+    pre_add_operation_hooks[operation_class].append(hook_function)
+
+
+def register_post_add_operation_hook(operation_class, hook_function):
+    global post_add_operation_hooks
+    post_add_operation_hooks[operation_class].append(hook_function)
 
 
 class MigrationAutodetector:
@@ -434,11 +448,40 @@ class MigrationAutodetector:
 
     def add_operation(self, app_label, operation, dependencies=None, beginning=False):
         # Dependencies are (app_label, model_name, field_name, create/delete as True/False)
+
+        operations = []
+        for hook_function in pre_add_operation_hooks[operation.__class__]:
+            for pre_operation in hook_function(
+                operation, app_label=app_label, from_state=self.from_state, to_state=self.to_state,
+                dependencies=dependencies,
+            ):
+                # Make sure they don't return the source operation as part of the list
+                if operation == pre_operation:
+                    continue
+                if not hasattr(pre_operation, "_auto_deps"):
+                    pre_operation._auto_deps = dependencies or []
+                operations.append(pre_operation)
+
         operation._auto_deps = dependencies or []
-        if beginning:
-            self.generated_operations.setdefault(app_label, []).insert(0, operation)
-        else:
-            self.generated_operations.setdefault(app_label, []).append(operation)
+        operations.append(operation)
+
+        for hook_function in post_add_operation_hooks[operation.__class__]:
+            for post_operation in hook_function(
+                operation, app_label=app_label, from_state=self.from_state, to_state=self.to_state,
+                dependencies=dependencies,
+            ):
+                # Make sure they don't return the source operation as part of the list
+                if operation == post_operation:
+                    continue
+                if not hasattr(post_operation, "_auto_deps"):
+                    post_operation._auto_deps = dependencies or []
+                operations.append(post_operation)
+
+        for i, operation in enumerate(operations):
+            if beginning:
+                self.generated_operations.setdefault(app_label, []).insert(i, operation)
+            else:
+                self.generated_operations.setdefault(app_label, []).append(operation)
 
     def swappable_first_key(self, item):
         """
