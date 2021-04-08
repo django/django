@@ -374,7 +374,7 @@ intersection between them.
 
 *Availability*: `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-convenience-functions.html#function_st-isvalid>`__ (≥ 5.7.5),
-`PostGIS <https://postgis.net/docs/ST_IsValid.html>`__, Oracle, SpatiaLite (LWGEOM)
+`PostGIS <https://postgis.net/docs/ST_IsValid.html>`__, Oracle, SpatiaLite
 
 Accepts a geographic field or expression and tests if the value is well formed.
 Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
