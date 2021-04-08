@@ -10,3 +10,7 @@ Bugfixes
 ========
 
 * Corrected detection of GDAL 3.2 on Windows (:ticket:`32544`).
+
+* Fixed a bug in Django 3.2 where subclasses of ``BigAutoField`` and
+  ``SmallAutoField`` were not allowed for the :setting:`DEFAULT_AUTO_FIELD`
+  setting (:ticket:`32620`).
