@@ -4,6 +4,10 @@ from django.test import SimpleTestCase, override_settings
 from django.test.utils import isolate_apps
 
 
+class MyBigAutoField(models.BigAutoField):
+    pass
+
+
 @isolate_apps('model_options')
 class TestDefaultPK(SimpleTestCase):
     @override_settings(DEFAULT_AUTO_FIELD='django.db.models.NonexistentAutoField')
@@ -73,6 +77,15 @@ class TestDefaultPK(SimpleTestCase):
             pass
 
         self.assertIsInstance(Model._meta.pk, models.SmallAutoField)
+
+    @override_settings(
+        DEFAULT_AUTO_FIELD='model_options.test_default_pk.MyBigAutoField'
+    )
+    def test_default_auto_field_setting_bigautofield_subclass(self):
+        class Model(models.Model):
+            pass
+
+        self.assertIsInstance(Model._meta.pk, MyBigAutoField)
 
     @isolate_apps('model_options.apps.ModelPKConfig')
     @override_settings(DEFAULT_AUTO_FIELD='django.db.models.AutoField')
