@@ -326,7 +326,7 @@ Lookup Type                        PostGIS    Oracle   MariaDB   MySQL [#]_   Sp
 :lookup:`equals`                   X          X        X         X            X          C
 :lookup:`exact <same_as>`          X          X        X         X            X          B
 :lookup:`intersects`               X          X        X         X            X          B
-:lookup:`isvalid`                  X          X                  X (≥ 5.7.5)  X (LWGEOM)
+:lookup:`isvalid`                  X          X                  X (≥ 5.7.5)  X
 :lookup:`overlaps`                 X          X        X         X            X          B
 :lookup:`relate`                   X          X        X                      X          C
 :lookup:`same_as`                  X          X        X         X            X          B
@@ -371,7 +371,7 @@ Function                              PostGIS  Oracle         MariaDB      MySQL
 :class:`ForcePolygonCW`               X                                                X
 :class:`GeoHash`                      X                                    X (≥ 5.7.5) X (LWGEOM)
 :class:`Intersection`                 X        X              X            X           X
-:class:`IsValid`                      X        X                           X (≥ 5.7.5) X (LWGEOM)
+:class:`IsValid`                      X        X                           X (≥ 5.7.5) X
 :class:`Length`                       X        X              X            X           X
 :class:`LineLocatePoint`              X                                                X
 :class:`MakeValid`                    X                                                X (LWGEOM)
