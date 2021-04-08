@@ -28,14 +28,6 @@ not conform to the OGC standard. Django supports spatial functions operating on
 real geometries available in modern MySQL versions. However, the spatial
 functions are not as rich as other backends like PostGIS.
 
-.. warning::
-
-    True spatial indexes (R-trees) are only supported with
-    MyISAM tables on MySQL. [#fnmysqlidx]_ In other words, when using
-    MySQL spatial extensions you have to choose between fast spatial
-    lookups and the integrity of your data -- MyISAM tables do
-    not support transactions or foreign key constraints.
-
 Raster Support
 --------------
 
@@ -412,12 +404,4 @@ Aggregate                PostGIS  Oracle  SpatiaLite
 .. [#fnwkt] *See* Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, Document 99-049 (May 5, 1999), at  Ch. 3.2.5, p. 3-11 (SQL Textual Representation of Geometry).
 .. [#fnewkb] *See* `PostGIS EWKB, EWKT and Canonical Forms <https://postgis.net/docs/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
 .. [#fndistsphere15] *See* `PostGIS documentation <https://postgis.net/docs/ST_DistanceSphere.html>`_ on ``ST_DistanceSphere``.
-.. [#fnmysqlidx] *See* `Creating Spatial Indexes <https://dev.mysql.com/doc/refman/en/creating-spatial-indexes.html>`_
-   in the MySQL Reference Manual:
-
-        For MyISAM tables, ``SPATIAL INDEX`` creates an R-tree index. For storage
-        engines that support nonspatial indexing of spatial columns, the engine
-        creates a B-tree index. A B-tree index on spatial values will be useful
-        for exact-value lookups, but not for range scans.
-
 .. [#] Refer :ref:`mysql-spatial-limitations` section for more details.

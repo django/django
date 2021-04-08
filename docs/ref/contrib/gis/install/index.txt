@@ -43,8 +43,8 @@ how to install.
 
 Spatial database
 ----------------
-PostgreSQL (with PostGIS), MySQL (mostly with MyISAM engine), Oracle, and SQLite
-(with SpatiaLite) are the spatial databases currently supported.
+PostgreSQL (with PostGIS), MySQL, Oracle, and SQLite (with SpatiaLite) are the
+spatial databases currently supported.
 
 .. note::
 
