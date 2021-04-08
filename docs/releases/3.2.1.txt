@@ -14,3 +14,8 @@ Bugfixes
 * Fixed a bug in Django 3.2 where subclasses of ``BigAutoField`` and
   ``SmallAutoField`` were not allowed for the :setting:`DEFAULT_AUTO_FIELD`
   setting (:ticket:`32620`).
+
+* Fixed a regression in Django 3.2 that caused a crash of
+  ``QuerySet.values()/values_list()`` after ``QuerySet.union()``,
+  ``intersection()``, and ``difference()`` when it was ordered by an
+  unannotated field (:ticket:`32627`).

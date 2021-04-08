@@ -347,10 +347,16 @@ class SQLCompiler:
                 continue
 
             if not self.query.extra or col not in self.query.extra:
-                # 'col' is of the form 'field' or 'field1__field2' or
-                # '-field1__field2__field', etc.
-                order_by.extend(self.find_ordering_name(
-                    field, self.query.get_meta(), default_order=asc))
+                if self.query.combinator and self.select:
+                    # Don't use the first model's field because other
+                    # combinated queries might define it differently.
+                    order_by.append((OrderBy(F(col), descending=descending), False))
+                else:
+                    # 'col' is of the form 'field' or 'field1__field2' or
+                    # '-field1__field2__field', etc.
+                    order_by.extend(self.find_ordering_name(
+                        field, self.query.get_meta(), default_order=asc,
+                    ))
             else:
                 if col not in self.query.extra_select:
                     order_by.append((
