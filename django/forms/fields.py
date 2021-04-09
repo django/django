@@ -715,7 +715,7 @@ class BooleanField(Field):
         return super().to_python(value)
 
     def validate(self, value):
-        if not value and self.required:
+        if value is None and self.required:
             raise ValidationError(self.error_messages['required'], code='required')
 
     def has_changed(self, initial, data):
