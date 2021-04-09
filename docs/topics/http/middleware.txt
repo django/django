@@ -286,6 +286,9 @@ if the very next middleware in the chain raises an
 that exception; instead it will get an :class:`~django.http.HttpResponse`
 object with a :attr:`~django.http.HttpResponse.status_code` of 404.
 
+You can set :setting:`DEBUG_PROPAGATE_EXCEPTIONS` to ``True`` to skip this
+conversion and propagate exceptions upwards.
+
 .. _async-middleware:
 
 Asynchronous support
