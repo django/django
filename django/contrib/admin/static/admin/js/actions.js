@@ -125,7 +125,7 @@
             });
         });
 
-        document.querySelector('#changelist-form button[name=index]').addEventListener('click', function() {
+        document.querySelector('#changelist-form button[name=index]').addEventListener('click', function(event) {
             if (list_editable_changed) {
                 const confirmed = confirm(gettext("You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost."));
                 if (!confirmed) {
