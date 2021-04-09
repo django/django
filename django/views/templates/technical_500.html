@@ -16,6 +16,7 @@
     h3 { margin:1em 0 .5em 0; }
     h4 { margin:0 0 .5em 0; font-weight: normal; }
     code, pre { font-size: 100%; white-space: pre-wrap; }
+    summary { cursor: pointer; }
     table { border:1px solid #ccc; border-collapse: collapse; width:100%; background:white; }
     tbody td, tbody th { vertical-align:top; padding:2px 3px; }
     thead th {
@@ -40,8 +41,8 @@
     div.context ol.context-line li span { position:absolute; right:32px; }
     .user div.context ol.context-line li { background-color:#bbb; color:#000; }
     .user div.context ol li { color:#666; }
-    div.commands { margin-left: 40px; }
-    div.commands a { color:#555; text-decoration:none; }
+    div.commands, summary.commands { margin-left: 40px; }
+    div.commands a, summary.commands { color:#555; text-decoration:none; }
     .user div.commands a { color: black; }
     #summary { background: #ffc; }
     #summary h2 { font-weight: normal; color: #666; }
@@ -71,7 +72,6 @@
       }
     }
     window.onload = function() {
-      hideAll(document.querySelectorAll('table.vars'));
       hideAll(document.querySelectorAll('ol.pre-context'));
       hideAll(document.querySelectorAll('ol.post-context'));
       hideAll(document.querySelectorAll('div.pastebin'));
@@ -83,14 +83,6 @@
           e.style.display = e.style.display == 'none' ? 'block': 'none';
         }
       }
-      return false;
-    }
-    function varToggle(link, id) {
-      toggle('v' + id);
-      var s = link.getElementsByTagName('span')[0];
-      var uarr = String.fromCharCode(0x25b6);
-      var darr = String.fromCharCode(0x25bc);
-      s.textContent = s.textContent == uarr ? darr : uarr;
       return false;
     }
     function switchPastebinFriendly(link) {
@@ -254,13 +246,14 @@
           {% endif %}
 
           {% if frame.vars %}
-            <div class="commands">
-                {% if is_email %}
-                    <h2>Local Vars</h2>
-                {% else %}
-                    <a href="#" onclick="return varToggle(this, '{{ frame.id }}')"><span>&#x25b6;</span> Local vars</a>
-                {% endif %}
-            </div>
+            {% if is_email %}
+              <div class="commands">
+                <h2>Local Vars</h2>
+              </div>
+            {% else %}
+              <details>
+                <summary class="commands">Local vars</summary>
+            {% endif %}
             <table class="vars" id="v{{ frame.id }}">
               <thead>
                 <tr>
@@ -277,6 +270,7 @@
                 {% endfor %}
               </tbody>
             </table>
+            {% if not is_email %}</details>{% endif %}
           {% endif %}
         </li>
       {% endfor %}
