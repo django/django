@@ -231,16 +231,17 @@ def setup(verbosity, start_at, start_after, test_labels=None):
         # if the module (or an ancestor) was named on the command line, or
         # no modules were named (i.e., run all), import
         # this module and add it to INSTALLED_APPS.
-        module_found_in_labels = not test_labels or any(
-            _module_match_label(module_label, label) for label in test_labels_set
-        )
+        if test_labels and not any(
+            _module_match_label(test_module, label) for label in test_labels_set
+        ):
+            continue
 
-        if module_name in CONTRIB_TESTS_TO_APPS and module_found_in_labels:
+        if module_name in CONTRIB_TESTS_TO_APPS:
             for contrib_app in CONTRIB_TESTS_TO_APPS[module_name]:
                 if contrib_app not in settings.INSTALLED_APPS:
                     settings.INSTALLED_APPS.append(contrib_app)
 
-        if module_found_in_labels and module_label not in installed_app_names:
+        if module_label not in installed_app_names:
             if verbosity >= 2:
                 print("Importing application %s" % module_name)
             settings.INSTALLED_APPS.append(module_label)
