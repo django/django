@@ -354,7 +354,7 @@ authors with a count of highly rated books::
     >>> Author.objects.annotate(num_books=Count('book'), highly_rated_books=highly_rated)
 
 Each ``Author`` in the result set will have the ``num_books`` and
-``highly_rated_books`` attributes.
+``highly_rated_books`` attributes. See also :ref:`conditional-aggregation`.
 
 .. admonition:: Choosing between ``filter`` and ``QuerySet.filter()``
 
