@@ -419,9 +419,9 @@ class Field(RegisterLookupMixin):
 
          * The name of the field on the model, if contribute_to_class() has
            been run.
-         * The import path of the field, including the class:e.g.
-           django.db.models.IntegerField This should be the most portable
-           version, so less specific may be better.
+         * The import path of the field, including the class, e.g.
+           django.db.models.IntegerField. This should be the most portable
+           version, so less specific might be better.
          * A list of positional arguments.
          * A dict of keyword arguments.
 
