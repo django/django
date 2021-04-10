@@ -140,6 +140,11 @@ any time leading up to the actual release:
     $ git checkout -b stable/3.1.x origin/main
     $ git push origin -u stable/3.1.x:stable/3.1.x
 
+   At the same time, update the ``django_next_version`` variable in
+   ``docs/conf.py`` on the stable release branch to point to the new
+   development version. For example, when creating ``stable/4.2.x``, set
+   ``django_next_version`` to ``'5.0'`` on the new branch.
+
 #. If this is the "dot zero" release of a new series, create a new branch from
    the current stable branch in the `django-docs-translations
    <https://github.com/django/django-docs-translations>`_ repository. For
