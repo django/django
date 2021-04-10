@@ -8,8 +8,8 @@ from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
 
 from .exceptions import (
-    AmbiguityError, BadMigrationError, InconsistentMigrationHistory,
-    NodeNotFoundError,
+    AmbiguityError, BadMigrationError, InconsistentMigrationFileHistory,
+    InconsistentMigrationHistory, NodeNotFoundError,
 )
 
 MIGRATIONS_MODULE_NAME = 'migrations'
@@ -284,6 +284,24 @@ class MigrationLoader:
                     ) from exc
             raise
         self.graph.ensure_not_cyclic()
+
+    def check_consistent_migration_files(self, connection, app_labels):
+        """
+        Raise InconsistentMigrationFileHistory if a migration file is missing from migrations module.
+        """
+        recorder = MigrationRecorder(connection)
+        applied = recorder.applied_migrations()
+        deleted_migration_al = set()
+        for migration in applied:
+            if migration not in self.graph.nodes:
+                deleted_migration_al.add(migration[0])
+        if deleted_migration_al:
+            if not app_labels:
+                raise InconsistentMigrationFileHistory(
+                    ', '.join(repr(app) for app in sorted(deleted_migration_al)))
+            elif any(apps in app_labels for apps in deleted_migration_al):
+                raise InconsistentMigrationFileHistory(
+                    ', '.join(repr(app) for app in sorted(deleted_migration_al) if app in app_labels))
 
     def check_consistent_history(self, connection):
         """

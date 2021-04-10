@@ -1065,20 +1065,20 @@ class MakeMigrationsTests(MigrationTestBase):
                 call_command("makemigrations", "migrations", verbosity=0)
                 initial_file = os.path.join(migration_dir, "0001_initial.py")
                 self.assertTrue(os.path.exists(initial_file))
-                self.assertEqual(has_table.call_count, 1)  # 'default' is checked
+                self.assertEqual(has_table.call_count, 2)  # 'default' is checked
 
                 # Router says not to migrate 'other' so consistency shouldn't
                 # be checked.
                 with self.settings(DATABASE_ROUTERS=['migrations.routers.TestRouter']):
                     call_command('makemigrations', 'migrations', verbosity=0)
-                self.assertEqual(has_table.call_count, 2)  # 'default' again
+                self.assertEqual(has_table.call_count, 4)  # 'default' again
 
                 # With a router that doesn't prohibit migrating 'other',
                 # consistency is checked.
                 with self.settings(DATABASE_ROUTERS=['migrations.routers.DefaultOtherRouter']):
                     with self.assertRaisesMessage(Exception, 'Other connection'):
                         call_command('makemigrations', 'migrations', verbosity=0)
-                self.assertEqual(has_table.call_count, 4)  # 'default' and 'other'
+                self.assertEqual(has_table.call_count, 7)  # 'default' and 'other'
 
                 # With a router that doesn't allow migrating on any database,
                 # no consistency checks are made.
@@ -1096,7 +1096,7 @@ class MakeMigrationsTests(MigrationTestBase):
                     # Raises an error if invalid app_name/model_name occurs.
                     apps.get_app_config(app_name).get_model(call_kwargs['model_name'])
                 self.assertEqual(called_aliases, set(connections))
-                self.assertEqual(has_table.call_count, 4)
+                self.assertEqual(has_table.call_count, 7)
 
     def test_failing_migration(self):
         # If a migration fails to serialize, it shouldn't generate an empty file. #21280
@@ -1115,7 +1115,7 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         with self.temporary_migration_module(module="migrations.test_migrations_conflict"):
             with self.assertRaises(CommandError) as context:
-                call_command("makemigrations")
+                call_command("makemigrations", verbosity=0)
         self.assertEqual(
             str(context.exception),
             "Conflicting migrations detected; multiple leaf nodes in the "
@@ -1139,7 +1139,7 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         msg = 'You must supply at least one app label when using --empty.'
         with self.assertRaisesMessage(CommandError, msg):
-            call_command("makemigrations", empty=True)
+            call_command("makemigrations", empty=True, verbosity=0)
 
     def test_makemigrations_empty_migration(self):
         """
@@ -1647,6 +1647,18 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module(module="migrations.test_migrations"):
             with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
                 call_command("makemigrations")
+
+    def test_makemigrations_inconsistent_file_history(self):
+        """
+        makemigrations should warn if an applied migration file is missing
+        """
+        out = io.StringIO()
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied('migrations', '0003_third')
+        msg = 'Warning: Some migration files are missing in app(s): \'migrations\''
+        with self.temporary_migration_module(module='migrations.test_migrations'):
+            call_command('makemigrations', 'migrations', stdout=out)
+            self.assertIn(msg, out.getvalue())
 
     def test_makemigrations_inconsistent_history_db_failure(self):
         msg = (

@@ -21,6 +21,11 @@ class InconsistentMigrationHistory(Exception):
     pass
 
 
+class InconsistentMigrationFileHistory(Exception):
+    """An applied migration is missing from the migrations module"""
+    pass
+
+
 class InvalidBasesError(ValueError):
     """A model's base classes can't be resolved."""
     pass

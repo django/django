@@ -11,6 +11,7 @@ from django.core.management.base import (
 from django.db import DEFAULT_DB_ALIAS, OperationalError, connections, router
 from django.db.migrations import Migration
 from django.db.migrations.autodetector import MigrationAutodetector
+from django.db.migrations.exceptions import InconsistentMigrationFileHistory
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.questioner import (
     InteractiveMigrationQuestioner, MigrationQuestioner,
@@ -108,6 +109,14 @@ class Command(BaseCommand):
                         % (alias, error),
                         RuntimeWarning,
                     )
+                try:
+                    loader.check_consistent_migration_files(connection, app_labels)
+                except InconsistentMigrationFileHistory as e:
+                    if self.verbosity > 0:
+                        self.stdout.write(self.style.NOTICE(
+                            'Warning: Some migration files are missing in app(s): %s ' % str(e)
+                        ))
+
         # Before anything else, see if there's conflicting apps and drop out
         # hard if there are any and they don't want to merge
         conflicts = loader.detect_conflicts()
