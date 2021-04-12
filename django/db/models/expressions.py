@@ -348,6 +348,8 @@ class BaseExpression:
 
     def get_group_by_cols(self, alias=None):
         if not self.contains_aggregate:
+            if alias:
+                return [Ref(alias, self)]
             return [self]
         cols = []
         for source in self.get_source_expressions():
