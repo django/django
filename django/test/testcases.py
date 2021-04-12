@@ -1553,21 +1553,28 @@ class LiveServerTestCase(TransactionTestCase):
         return cls.host
 
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def _make_connections_override(cls):
         connections_override = {}
         for conn in connections.all():
             # If using in-memory sqlite databases, pass the connections to
             # the server thread.
             if conn.vendor == 'sqlite' and conn.is_in_memory_db():
-                # Explicitly enable thread-shareability for this connection
-                conn.inc_thread_sharing()
                 connections_override[conn.alias] = conn
+        return connections_override
 
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
         cls._live_server_modified_settings = modify_settings(
             ALLOWED_HOSTS={'append': cls.allowed_host},
         )
         cls._live_server_modified_settings.enable()
+
+        connections_override = cls._make_connections_override()
+        for conn in connections_override.values():
+            # Explicitly enable thread-shareability for this connection.
+            conn.inc_thread_sharing()
+
         cls.server_thread = cls._create_server_thread(connections_override)
         cls.server_thread.daemon = True
         cls.server_thread.start()
