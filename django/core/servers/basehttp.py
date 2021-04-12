@@ -219,12 +219,19 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         handler.run(self.server.get_app())
 
 
-def run(addr, port, wsgi_handler, ipv6=False, threading=False, server_cls=WSGIServer):
+def run(addr, port, wsgi_handler, ipv6=False, threading=False,
+        server_cls=WSGIServer, on_bind=None):
     server_address = (addr, port)
+    cls_dict = {}
+    if on_bind is not None:
+        def server_bind(self):
+            super(httpd_cls, self).server_bind()
+            on_bind(self.server_name, self.server_port)
+        cls_dict['server_bind'] = server_bind
     if threading:
-        httpd_cls = type('WSGIServer', (socketserver.ThreadingMixIn, server_cls), {})
+        httpd_cls = type('WSGIServer', (socketserver.ThreadingMixIn, server_cls), cls_dict)
     else:
-        httpd_cls = server_cls
+        httpd_cls = type('WSGIServer', (server_cls,), cls_dict)
     httpd = httpd_cls(server_address, WSGIRequestHandler, ipv6=ipv6)
     if threading:
         # ThreadingMixIn.daemon_threads indicates how threads will behave on an
