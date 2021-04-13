@@ -1778,6 +1778,7 @@ class ConstraintsTests(TestCase):
             field2 = models.PositiveSmallIntegerField()
             field3 = models.PositiveSmallIntegerField()
             parent = models.ForeignKey('self', models.CASCADE)
+            previous = models.OneToOneField('self', models.CASCADE, related_name='next')
 
             class Meta:
                 constraints = [
@@ -1792,9 +1793,18 @@ class ConstraintsTests(TestCase):
                     models.CheckConstraint(
                         name='name3', check=models.Q(parent__field3=models.F('field1'))
                     ),
+                    models.CheckConstraint(
+                        name='name4', check=models.Q(name=Lower('previous__name')),
+                    ),
                 ]
 
-        joined_fields = ['parent__field1', 'parent__field2', 'parent__field3', 'parent__name']
+        joined_fields = [
+            'parent__field1',
+            'parent__field2',
+            'parent__field3',
+            'parent__name',
+            'previous__name',
+        ]
         errors = Model.check(databases=self.databases)
         expected_errors = [
             Error(
