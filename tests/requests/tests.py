@@ -570,6 +570,24 @@ class RequestsTests(SimpleTestCase):
         request = factory.get('/path/with:colons')
         self.assertEqual(request.get_raw_uri(), 'http://evil.com/path/with:colons')
 
+    def test_request_json(self):
+        payload = FakePayload('{"a": 1.5}')
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
+        self.assertEqual(request.json(), {'a': 1.5})
+        self.assertEqual(request.json(parse_float=str), {'a': '1.5'})
+        payload = FakePayload('a=b')
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
+        with self.assertRaises(ValueError):
+            request.json()
+
 
 class HostValidationTests(SimpleTestCase):
     poisoned_hosts = [

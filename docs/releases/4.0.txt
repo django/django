@@ -242,6 +242,9 @@ Requests and Responses
   same browsing context. You can prevent this header from being added by
   setting the :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY` setting to ``None``.
 
+* New :meth:`HttpRequest.json()` method is a shortcut for decoding json in
+  the request body.
+
 Security
 ~~~~~~~~
 

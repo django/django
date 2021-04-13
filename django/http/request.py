@@ -1,6 +1,7 @@
 import cgi
 import codecs
 import copy
+import json
 from io import BytesIO
 from itertools import chain
 from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
@@ -353,6 +354,9 @@ class HttpRequest:
         if hasattr(self, '_files'):
             for f in chain.from_iterable(list_[1] for list_ in self._files.lists()):
                 f.close()
+
+    def json(self, **kwargs):
+        return json.loads(self.body, **kwargs)
 
     # File-like and iterator interface.
     #

@@ -429,6 +429,12 @@ Methods
     <django.views.decorators.vary.vary_on_headers>` so that the responses are
     properly cached.
 
+.. method:: HttpRequest.json(**kwargs)
+
+    Returns JSON decoded request body. Raises ``ValueError`` if decoding fails.
+
+    All ``kwargs`` get passed to Python's json decoder.
+
 .. method:: HttpRequest.read(size=None)
 .. method:: HttpRequest.readline()
 .. method:: HttpRequest.readlines()
