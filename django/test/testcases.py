@@ -43,7 +43,7 @@ from django.test.utils import (
     override_settings,
 )
 from django.utils.deprecation import RemovedInDjango41Warning
-from django.utils.functional import classproperty
+from django.utils.functional import cached_property, classproperty
 from django.utils.version import PY310
 from django.views.static import serve
 
@@ -296,13 +296,19 @@ class SimpleTestCase(unittest.TestCase):
         * Create a test client.
         * Clear the mail test outbox.
         """
-        self.client = self.client_class()
-        self.async_client = self.async_client_class()
         mail.outbox = []
 
     def _post_teardown(self):
         """Perform post-test things."""
         pass
+
+    @cached_property
+    def client(self):
+        return self.client_class()
+
+    @cached_property
+    def async_client(self):
+        return self.async_client_class()
 
     def settings(self, **kwargs):
         """
