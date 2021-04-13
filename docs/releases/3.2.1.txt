@@ -19,3 +19,6 @@ Bugfixes
   ``QuerySet.values()/values_list()`` after ``QuerySet.union()``,
   ``intersection()``, and ``difference()`` when it was ordered by an
   unannotated field (:ticket:`32627`).
+
+* Restored, following a regression in Django 3.2, displaying an exception
+  message on the technical 404 debug page (:ticket:`32637`).

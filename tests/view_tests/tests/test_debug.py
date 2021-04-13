@@ -160,6 +160,12 @@ class DebugViewTests(SimpleTestCase):
 
     def test_technical_404(self):
         response = self.client.get('/technical404/')
+        self.assertContains(
+            response,
+            '<pre class="exception_value">Testing technical 404.</pre>',
+            status_code=404,
+            html=True,
+        )
         self.assertContains(response, "Raised by:", status_code=404)
         self.assertContains(response, "view_tests.views.technical404", status_code=404)
         self.assertContains(
