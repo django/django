@@ -2076,6 +2076,8 @@ class Model(metaclass=ModelBase):
                 # JOIN must happen at the first lookup.
                 first_lookup = lookups[0]
                 if (
+                    hasattr(field, 'get_transform') and
+                    hasattr(field, 'get_lookup') and
                     field.get_transform(first_lookup) is None and
                     field.get_lookup(first_lookup) is None
                 ):
