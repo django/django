@@ -22,3 +22,7 @@ Bugfixes
 
 * Restored, following a regression in Django 3.2, displaying an exception
   message on the technical 404 debug page (:ticket:`32637`).
+
+* Fixed a bug in Django 3.2 where a system check would crash on a reverse
+  one-to-one relationships in ``CheckConstraint.check`` or
+  ``UniqueConstraint.condition`` (:ticket:`32635`).
