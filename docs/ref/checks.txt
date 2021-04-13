@@ -83,6 +83,7 @@ Django's system checks are organized using the following tags:
   you specify configured database aliases using the ``--database`` option when
   calling the :djadmin:`check` command.
 * ``files``: Checks files related configuration.
+* ``logging``: Checks logging related configuration.
 * ``models``: Checks of model, field, and manager definitions.
 * ``security``: Checks security related configuration.
 * ``signals``: Checks on signal declarations and handler registrations.
@@ -167,6 +168,17 @@ The following checks verify your setup for :doc:`/topics/files`:
 
 * **files.E001**: The :setting:`FILE_UPLOAD_TEMP_DIR` setting refers to the
   nonexistent directory ``<path>``.
+
+Logging
+-------
+
+.. versionadded:: 4.0
+
+The following checks verify that settings related to logging and error
+reporting are configured correctly:
+
+* **logging.E001**: :setting:`ADMINS` and/or :setting:`MANAGERS` contains
+  invalid email addresses.
 
 Model fields
 ------------

@@ -14,6 +14,7 @@ class Tags:
     compatibility = 'compatibility'
     database = 'database'
     files = 'files'
+    logging = 'logging'
     models = 'models'
     security = 'security'
     signals = 'signals'

@@ -10,6 +10,7 @@ import django.core.checks.caches  # NOQA isort:skip
 import django.core.checks.compatibility.django_4_0  # NOQA isort:skip
 import django.core.checks.database  # NOQA isort:skip
 import django.core.checks.files  # NOQA isort:skip
+import django.core.checks.logging  # NOQA isort:skip
 import django.core.checks.model_checks  # NOQA isort:skip
 import django.core.checks.security.base  # NOQA isort:skip
 import django.core.checks.security.csrf  # NOQA isort:skip
