@@ -897,15 +897,30 @@ class ShadowingFieldsTests(SimpleTestCase):
         class Target(models.Model):
             pass
 
-        class Model(models.Model):
+        msg = (
+            "Class Model has an attribute 'fk_id' which would be "
+            "overridden. Check definitions."
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
+            class Model(models.Model):
+                fk = models.ForeignKey(Target, models.CASCADE)
+                fk_id = models.IntegerField()
+
+    def test_parental_id_clash(self):
+        class Target(models.Model):
+            pass
+
+        class Parent(models.Model):
             fk = models.ForeignKey(Target, models.CASCADE)
+
+        class Child(Parent):
             fk_id = models.IntegerField()
 
-        self.assertEqual(Model.check(), [
+        self.assertEqual(Child.check(), [
             Error(
                 "The field 'fk_id' clashes with the field 'fk' from model "
-                "'invalid_models_tests.model'.",
-                obj=Model._meta.get_field('fk_id'),
+                "'invalid_models_tests.parent'.",
+                obj=Child._meta.get_field('fk_id'),
                 id='models.E006',
             )
         ])
@@ -917,17 +932,13 @@ class OtherModelTests(SimpleTestCase):
     def test_unique_primary_key(self):
         invalid_id = models.IntegerField(primary_key=False)
 
-        class Model(models.Model):
-            id = invalid_id
-
-        self.assertEqual(Model.check(), [
-            Error(
-                "'id' can only be used as a field name if the field also sets "
-                "'primary_key=True'.",
-                obj=Model,
-                id='models.E004',
-            ),
-        ])
+        msg = (
+            "Class Model has an attribute 'id' which would be "
+            "overridden. Check definitions."
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
+            class Model(models.Model):
+                id = invalid_id
 
     def test_ordering_non_iterable(self):
         class Model(models.Model):

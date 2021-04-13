@@ -322,6 +322,11 @@ class ModelBase(type):
         return new_class
 
     def add_to_class(cls, name, value):
+        if name in cls.__dict__:  # not hasattr() to avoid parent attrs
+            raise AttributeError(
+                f"Class {cls.__name__} has an attribute '{name}' which would be "
+                f"overridden. Check definitions."
+            )
         if _has_contribute_to_class(value):
             value.contribute_to_class(cls, name)
         else:

@@ -156,6 +156,18 @@ class ManagersRegressionTests(TestCase):
         relation = related.test_fk.create()
         self.assertEqual(related.test_fk.get(), relation)
 
+    @isolate_apps('managers_regress')
+    def test_generated_manager_does_not_override(self):
+        # Make sure a generated manager does not override an attribute
+        # defined explicitly on the class
+        msg = (
+            "Class Bogus has an attribute 'objects' which would be "
+            "overridden. Check definitions."
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
+            class Bogus(models.Model):
+                objects = "not a manager"
+
 
 @isolate_apps('managers_regress')
 class TestManagerInheritance(SimpleTestCase):
