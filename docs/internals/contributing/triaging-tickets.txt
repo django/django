@@ -143,9 +143,11 @@ Ready For Checkin
 The ticket was reviewed by any member of the community other than the person
 who supplied the patch and found to meet all the requirements for a
 commit-ready patch. A committer now needs to give the patch a final
-review prior to being committed. See the
-:ref:`New contributors' FAQ<new-contributors-faq>` for "My ticket has been in
-RFC forever! What should I do?"
+review prior to being committed.
+
+There are a lot of pull requests. It can take a while for your patch to get
+reviewed. See the :ref:`contributing code FAQ<new-contributors-faq>` for some
+ideas here.
 
 Someday/Maybe
 -------------
