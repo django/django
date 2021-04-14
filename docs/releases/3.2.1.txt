@@ -2,9 +2,19 @@
 Django 3.2.1 release notes
 ==========================
 
-*Expected May 4, 2021*
+*May 4, 2021*
 
-Django 3.2.1 fixes several bugs in 3.2.
+Django 3.2.1 fixes a security issue and several bugs in 3.2.
+
+CVE-2021-31542: Potential directory-traversal via uploaded files
+================================================================
+
+``MultiPartParser``, ``UploadedFile``, and ``FieldFile`` allowed
+directory-traversal via uploaded files with suitably crafted file names.
+
+In order to mitigate this risk, stricter basename and path sanitation is now
+applied. Specifically, empty file names and paths with dot segments will be
+rejected.
 
 Bugfixes
 ========
