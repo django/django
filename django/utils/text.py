@@ -18,6 +18,9 @@ if six.PY2:
     # Import force_unicode even though this module doesn't use it, because some
     # people rely on it being here.
     from django.utils.encoding import force_unicode  # NOQA
+from django.core.exceptions import SuspiciousFileOperation
+from django.utils.functional import SimpleLazyObject, keep_lazy_text, lazy
+from django.utils.translation import gettext as _, gettext_lazy, pgettext
 
 
 @keep_lazy_text
@@ -234,7 +237,7 @@ class Truncator(SimpleLazyObject):
 
 
 @keep_lazy_text
-def get_valid_filename(s):
+def get_valid_filename(name):
     """
     Returns the given string converted to a string that can be used for a clean
     filename. Specifically, leading and trailing spaces are removed; other
@@ -243,8 +246,15 @@ def get_valid_filename(s):
     >>> get_valid_filename("john's portrait in 2004.jpg")
     'johns_portrait_in_2004.jpg'
     """
-    s = force_text(s).strip().replace(' ', '_')
-    return re.sub(r'(?u)[^-\w.]', '', s)
+    # Whatever this is (and it may easily not be a str), make sure it ends up as a unicode type
+    if not isinstance(name,unicode):
+        name = name.decode("utf-8","replace")
+
+    s = name.strip().replace(' ', '_')
+    s = re.sub(r'(?u)[^-\w.]', '', s)
+    if s in {'', '.', '..'}:
+        raise SuspiciousFileOperation("Could not derive file name from '%s'" % name)
+    return s
 
 
 @keep_lazy_text
@@ -265,10 +275,17 @@ def get_text_list(list_, last_word=ugettext_lazy('or')):
         return ''
     if len(list_) == 1:
         return force_text(list_[0])
-    return '%s %s %s' % (
-        # Translators: This string is used as a separator between list elements
-        _(', ').join(force_text(i) for i in list_[:-1]),
-        force_text(last_word), force_text(list_[-1]))
+    if six.PY2:
+        # Decode added to poper over some differences between str/unicode in Py2
+        return '%s %s %s' % (
+            # Translators: This string is used as a separator between list elements
+            _(', ').decode("utf-8","replace").join(force_text(i) for i in list_[:-1]),
+            force_text(last_word), force_text(list_[-1]))
+    else:
+        return '%s %s %s' % (
+            # Translators: This string is used as a separator between list elements
+            _(', ').join(force_text(i) for i in list_[:-1]),
+            force_text(last_word), force_text(list_[-1]))
 
 
 @keep_lazy_text
