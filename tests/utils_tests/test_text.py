@@ -1,6 +1,7 @@
 import json
 import sys
 
+from django.core.exceptions import SuspiciousFileOperation
 from django.test import SimpleTestCase
 from django.utils import text
 from django.utils.functional import lazystr
@@ -229,6 +230,13 @@ class TestUtilsText(SimpleTestCase):
         filename = "^&'@{}[],$=!-#()%+~_123.txt"
         self.assertEqual(text.get_valid_filename(filename), "-_123.txt")
         self.assertEqual(text.get_valid_filename(lazystr(filename)), "-_123.txt")
+        msg = "Could not derive file name from '???'"
+        with self.assertRaisesMessage(SuspiciousFileOperation, msg):
+            text.get_valid_filename('???')
+        # After sanitizing this would yield '..'.
+        msg = "Could not derive file name from '$.$.$'"
+        with self.assertRaisesMessage(SuspiciousFileOperation, msg):
+            text.get_valid_filename('$.$.$')
 
     def test_compress_sequence(self):
         data = [{'key': i} for i in range(10)]
