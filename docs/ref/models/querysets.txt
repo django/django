@@ -2646,7 +2646,8 @@ unique field in the order that is specified without conflicts. For example::
 
 .. note::
 
-    If the ``order_by()`` clause contains annotations, it will be ignored.
+    ``order_by()`` clause will be ignored if it contains annotations, inherited
+    fields, or lookups spanning relations.
 
 ``delete()``
 ~~~~~~~~~~~~
