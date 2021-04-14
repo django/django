@@ -18,6 +18,9 @@ if six.PY2:
     # Import force_unicode even though this module doesn't use it, because some
     # people rely on it being here.
     from django.utils.encoding import force_unicode  # NOQA
+from django.core.exceptions import SuspiciousFileOperation
+from django.utils.functional import SimpleLazyObject, keep_lazy_text, lazy
+from django.utils.translation import gettext as _, gettext_lazy, pgettext
 
 
 @keep_lazy_text
@@ -234,7 +237,7 @@ class Truncator(SimpleLazyObject):
 
 
 @keep_lazy_text
-def get_valid_filename(s):
+def get_valid_filename(name):
     """
     Returns the given string converted to a string that can be used for a clean
     filename. Specifically, leading and trailing spaces are removed; other
@@ -243,8 +246,11 @@ def get_valid_filename(s):
     >>> get_valid_filename("john's portrait in 2004.jpg")
     'johns_portrait_in_2004.jpg'
     """
-    s = force_text(s).strip().replace(' ', '_')
-    return re.sub(r'(?u)[^-\w.]', '', s)
+    s = str(name).strip().replace(' ', '_')
+    s = re.sub(r'(?u)[^-\w.]', '', s)
+    if s in {'', '.', '..'}:
+        raise SuspiciousFileOperation("Could not derive file name from '%s'" % name)
+    return s
 
 
 @keep_lazy_text

@@ -12,9 +12,14 @@ import tempfile as sys_tempfile
 import unittest
 from io import BytesIO
 
+from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http.multipartparser import MultiPartParser, parse_header
+from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
+from django.http.multipartparser import (
+    MultiPartParser, MultiPartParserError, parse_header,
+)
 from django.test import SimpleTestCase, TestCase, client, override_settings
 from django.utils.encoding import force_bytes
 from django.utils.http import urlquote
@@ -26,6 +31,31 @@ from .models import FileModel
 UNICODE_FILENAME = 'test-0123456789_中文_Orléans.jpg'
 MEDIA_ROOT = sys_tempfile.mkdtemp()
 UPLOAD_TO = os.path.join(MEDIA_ROOT, 'test_upload')
+
+CANDIDATE_TRAVERSAL_FILE_NAMES = [
+    '/tmp/hax0rd.txt',          # Absolute path, *nix-style.
+    'C:\\Windows\\hax0rd.txt',  # Absolute path, win-style.
+    'C:/Windows/hax0rd.txt',    # Absolute path, broken-style.
+    '\\tmp\\hax0rd.txt',        # Absolute path, broken in a different way.
+    '/tmp\\hax0rd.txt',         # Absolute path, broken by mixing.
+    'subdir/hax0rd.txt',        # Descendant path, *nix-style.
+    'subdir\\hax0rd.txt',       # Descendant path, win-style.
+    'sub/dir\\hax0rd.txt',      # Descendant path, mixed.
+    '../../hax0rd.txt',         # Relative path, *nix-style.
+    '..\\..\\hax0rd.txt',       # Relative path, win-style.
+    '../..\\hax0rd.txt',        # Relative path, mixed.
+    '..&#x2F;hax0rd.txt',       # HTML entities.
+]
+
+CANDIDATE_INVALID_FILE_NAMES = [
+    '/tmp/',        # Directory, *nix-style.
+    'c:\\tmp\\',    # Directory, win-style.
+    '/tmp/.',       # Directory dot, *nix-style.
+    'c:\\tmp\\.',   # Directory dot, *nix-style.
+    '/tmp/..',      # Parent directory, *nix-style.
+    'c:\\tmp\\..',  # Parent directory, win-style.
+    '',             # Empty filename.
+]
 
 
 @override_settings(MEDIA_ROOT=MEDIA_ROOT, ROOT_URLCONF='file_uploads.urls', MIDDLEWARE=[])
@@ -41,6 +71,22 @@ class FileUploadTests(TestCase):
     def tearDownClass(cls):
         shutil.rmtree(MEDIA_ROOT)
         super(FileUploadTests, cls).tearDownClass()
+
+    def test_upload_name_is_validated(self):
+        candidates = [
+            '/tmp/',
+            '/tmp/..',
+            '/tmp/.',
+        ]
+        if sys.platform == 'win32':
+            candidates.extend([
+                'c:\\tmp\\',
+                'c:\\tmp\\..',
+                'c:\\tmp\\.',
+            ])
+        for file_name in candidates:
+            with self.subTest(file_name=file_name):
+                self.assertRaises(SuspiciousFileOperation, UploadedFile, name=file_name)
 
     def test_simple_upload(self):
         with open(__file__, 'rb') as fp:
@@ -596,6 +642,45 @@ class MultiParserTests(unittest.TestCase):
             'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
             'CONTENT_LENGTH': '1'
         }, StringIO('x'), [], 'utf-8')
+
+    def test_invalid_content_type(self):
+        with self.assertRaisesMessage(MultiPartParserError, 'Invalid Content-Type: text/plain'):
+            MultiPartParser({
+                'CONTENT_TYPE': 'text/plain',
+                'CONTENT_LENGTH': '1',
+            }, StringIO('x'), [], 'utf-8')
+
+    def test_negative_content_length(self):
+        with self.assertRaisesMessage(MultiPartParserError, 'Invalid content length: -1'):
+            MultiPartParser({
+                'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
+                'CONTENT_LENGTH': -1,
+            }, StringIO('x'), [], 'utf-8')
+
+    def test_bad_type_content_length(self):
+        multipart_parser = MultiPartParser({
+            'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
+            'CONTENT_LENGTH': 'a',
+        }, StringIO('x'), [], 'utf-8')
+        self.assertEqual(multipart_parser._content_length, 0)
+
+    def test_sanitize_file_name(self):
+        parser = MultiPartParser({
+            'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
+            'CONTENT_LENGTH': '1'
+        }, StringIO('x'), [], 'utf-8')
+        for file_name in CANDIDATE_TRAVERSAL_FILE_NAMES:
+            with self.subTest(file_name=file_name):
+                self.assertEqual(parser.sanitize_file_name(file_name), 'hax0rd.txt')
+
+    def test_sanitize_invalid_file_name(self):
+        parser = MultiPartParser({
+            'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
+            'CONTENT_LENGTH': '1',
+        }, StringIO('x'), [], 'utf-8')
+        for file_name in CANDIDATE_INVALID_FILE_NAMES:
+            with self.subTest(file_name=file_name):
+                self.assertIsNone(parser.sanitize_file_name(file_name))
 
     def test_rfc2231_parsing(self):
         test_data = (
