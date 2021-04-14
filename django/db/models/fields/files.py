@@ -6,6 +6,7 @@ from django.core import checks
 from django.core.files.base import File
 from django.core.files.images import ImageFile
 from django.core.files.storage import Storage, default_storage
+from django.core.files.utils import validate_file_name
 from django.db.models import signals
 from django.db.models.fields import Field
 from django.db.models.query_utils import DeferredAttribute
@@ -312,6 +313,7 @@ class FileField(Field):
         Until the storage layer, all file paths are expected to be Unix style
         (with forward slashes).
         """
+        filename = validate_file_name(filename)
         if callable(self.upload_to):
             filename = self.upload_to(instance, filename)
         else:
