@@ -3541,6 +3541,7 @@ class AdminSearchTest(TestCase):
         cls.per2 = Person.objects.create(name='Grace Hopper', gender=1, alive=False)
         cls.per3 = Person.objects.create(name='Guido van Rossum', gender=1, alive=True)
         Person.objects.create(name='John Doe', gender=1)
+        Person.objects.create(name='John O"Hara', gender=1)
         Person.objects.create(name="John O'Hara", gender=1)
 
         cls.t1 = Recommender.objects.create()
@@ -3616,7 +3617,7 @@ class AdminSearchTest(TestCase):
             response = self.client.get(reverse('admin:admin_views_person_changelist') + '?q=Gui')
         self.assertContains(
             response,
-            """<span class="small quiet">1 result (<a href="?">5 total</a>)</span>""",
+            """<span class="small quiet">1 result (<a href="?">6 total</a>)</span>""",
             html=True
         )
 
@@ -3647,7 +3648,10 @@ class AdminSearchTest(TestCase):
             ("John Doe John", 0),
             ('"John Do"', 1),
             ("'John Do'", 1),
+            ("'John O\'Hara'", 0),
             ("'John O\\'Hara'", 1),
+            ('"John O\"Hara"', 0),
+            ('"John O\\"Hara"', 1),
         ]
         for search, hits in tests:
             with self.subTest(search=search):
