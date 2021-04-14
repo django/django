@@ -1,3 +1,4 @@
+import binascii
 import json
 
 from django.conf import settings
@@ -182,7 +183,7 @@ class CookieStorage(BaseStorage):
             # with:
             #   decoded = None.
             decoded = self._legacy_decode(data)
-        except json.JSONDecodeError:
+        except (binascii.Error, json.JSONDecodeError):
             decoded = self.signer.unsign(data)
 
         if decoded:
