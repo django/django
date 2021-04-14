@@ -1,0 +1,41 @@
+============================
+Django 1.11.29.1 release notes
+============================
+
+*November 2, 2021*
+
+Django 1.11.29.1 security fixes
+
+CVE-2021-31542: Potential directory-traversal via uploaded files
+================================================================
+
+``MultiPartParser``, ``UploadedFile``, and ``FieldFile`` allowed
+directory-traversal via uploaded files with suitably crafted file names.
+
+In order to mitigate this risk, stricter basename and path sanitation is now
+applied. Specifically, empty file names and paths with dot segments will be
+rejected.
+
+
+CVE-2021-33203: Potential directory traversal via ``admindocs``
+===============================================================
+
+Staff members could use the :mod:`~django.contrib.admindocs`
+``TemplateDetailView`` view to check the existence of arbitrary files.
+Additionally, if (and only if) the default admindocs templates have been
+customized by the developers to also expose the file contents, then not only
+the existence but also the file contents would have been exposed.
+
+As a mitigation, path sanitation is now applied and only files within the
+template root directories can be loaded.
+
+
+*March 4, 2020*
+
+Django 1.11.29 fixes a security issue in 1.11.28.
+
+CVE-2020-9402: Potential SQL injection via ``tolerance`` parameter in GIS functions and aggregates on Oracle
+============================================================================================================
+
+GIS functions and aggregates on Oracle were subject to SQL injection,
+using a suitably crafted ``tolerance``.

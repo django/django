@@ -3,10 +3,12 @@ import os
 import warnings
 from datetime import datetime
 
+import django.utils.six
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import File, locks
 from django.core.files.move import file_move_safe
+from django.core.files.utils import validate_file_name
 from django.core.signals import setting_changed
 from django.utils import timezone
 from django.utils._os import abspathu, safe_join
@@ -18,6 +20,9 @@ from django.utils.functional import LazyObject, cached_property
 from django.utils.module_loading import import_string
 from django.utils.six.moves.urllib.parse import urljoin
 from django.utils.text import get_valid_filename
+
+if django.utils.six.PY2:
+    import pathlib2 as pathlib
 
 __all__ = ('Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage')
 
@@ -68,6 +73,9 @@ class Storage(object):
         available for new content to be written to.
         """
         dir_name, file_name = os.path.split(name)
+        if '..' in pathlib.PurePath(dir_name).parts:
+            raise SuspiciousFileOperation("Detected path traversal attempt in '%s'" % dir_name)
+        validate_file_name(file_name)
         file_root, file_ext = os.path.splitext(file_name)
         # If the filename already exists, add an underscore and a random 7
         # character alphanumeric string (before the file extension, if one
@@ -100,6 +108,8 @@ class Storage(object):
         """
         # `filename` may include a path as returned by FileField.upload_to.
         dirname, filename = os.path.split(filename)
+        if '..' in pathlib.PurePath(dirname).parts:
+            raise SuspiciousFileOperation("Detected path traversal attempt in '%s'" % dirname)
         return os.path.normpath(os.path.join(dirname, self.get_valid_name(filename)))
 
     def path(self, name):

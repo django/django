@@ -42,6 +42,7 @@ from django.utils.six.moves.urllib.parse import (
     unquote, urljoin, urlparse, urlsplit, urlunsplit,
 )
 from django.utils.six.moves.urllib.request import url2pathname
+from django.utils.test_backport import BackPortedTestCaseMixin
 from django.views.static import serve
 
 __all__ = ('TestCase', 'TransactionTestCase',
@@ -150,7 +151,7 @@ class _CursorFailure(object):
         )
 
 
-class SimpleTestCase(unittest.TestCase):
+class SimpleTestCase(unittest.TestCase,BackPortedTestCaseMixin):
 
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
