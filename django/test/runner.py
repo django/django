@@ -650,7 +650,9 @@ class DiscoverRunner:
         # _FailedTest objects include things like test modules that couldn't be
         # found or that couldn't be loaded due to syntax errors.
         test_types = (unittest.loader._FailedTest, *self.reorder_by)
-        all_tests = reorder_tests(all_tests, test_types, self.reverse)
+        all_tests = list(reorder_tests(all_tests, test_types, self.reverse))
+        if self.verbosity >= 1:
+            print('Found %d tests.' % len(all_tests))
         suite = self.test_suite(all_tests)
 
         if self.parallel > 1:

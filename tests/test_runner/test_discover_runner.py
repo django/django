@@ -58,28 +58,28 @@ class DiscoverRunnerTests(SimpleTestCase):
                 DiscoverRunner().load_tests_for_label('test_discover_runner.py', {})
 
     def test_dotted_test_module(self):
-        count = DiscoverRunner().build_suite(
+        count = DiscoverRunner(verbosity=0).build_suite(
             ['test_runner_apps.sample.tests_sample'],
         ).countTestCases()
 
         self.assertEqual(count, 4)
 
     def test_dotted_test_class_vanilla_unittest(self):
-        count = DiscoverRunner().build_suite(
+        count = DiscoverRunner(verbosity=0).build_suite(
             ['test_runner_apps.sample.tests_sample.TestVanillaUnittest'],
         ).countTestCases()
 
         self.assertEqual(count, 1)
 
     def test_dotted_test_class_django_testcase(self):
-        count = DiscoverRunner().build_suite(
+        count = DiscoverRunner(verbosity=0).build_suite(
             ['test_runner_apps.sample.tests_sample.TestDjangoTestCase'],
         ).countTestCases()
 
         self.assertEqual(count, 1)
 
     def test_dotted_test_method_django_testcase(self):
-        count = DiscoverRunner().build_suite(
+        count = DiscoverRunner(verbosity=0).build_suite(
             ['test_runner_apps.sample.tests_sample.TestDjangoTestCase.test_sample'],
         ).countTestCases()
 
@@ -88,6 +88,7 @@ class DiscoverRunnerTests(SimpleTestCase):
     def test_pattern(self):
         count = DiscoverRunner(
             pattern="*_tests.py",
+            verbosity=0,
         ).build_suite(['test_runner_apps.sample']).countTestCases()
 
         self.assertEqual(count, 1)
@@ -115,13 +116,14 @@ class DiscoverRunnerTests(SimpleTestCase):
         ]:
             with self.subTest(pattern):
                 suite = DiscoverRunner(
-                    test_name_patterns=pattern
+                    test_name_patterns=pattern,
+                    verbosity=0,
                 ).build_suite(['test_runner_apps.simple'])
                 self.assertEqual(expected, self.get_test_methods_names(suite))
 
     def test_file_path(self):
         with change_cwd(".."):
-            count = DiscoverRunner().build_suite(
+            count = DiscoverRunner(verbosity=0).build_suite(
                 ['test_runner_apps/sample/'],
             ).countTestCases()
 
@@ -133,21 +135,21 @@ class DiscoverRunnerTests(SimpleTestCase):
         working directory.
         """
         with change_cwd("."):
-            suite = DiscoverRunner().build_suite([])
+            suite = DiscoverRunner(verbosity=0).build_suite([])
             self.assertEqual(
                 suite._tests[0].id().split(".")[0],
                 os.path.basename(os.getcwd()),
             )
 
     def test_empty_test_case(self):
-        count = DiscoverRunner().build_suite(
+        count = DiscoverRunner(verbosity=0).build_suite(
             ['test_runner_apps.sample.tests_sample.EmptyTestCase'],
         ).countTestCases()
 
         self.assertEqual(count, 0)
 
     def test_discovery_on_package(self):
-        count = DiscoverRunner().build_suite(
+        count = DiscoverRunner(verbosity=0).build_suite(
             ['test_runner_apps.sample.tests'],
         ).countTestCases()
 
@@ -161,7 +163,7 @@ class DiscoverRunnerTests(SimpleTestCase):
         This results in tests from adjacent modules being run when they
         should not. The discover runner avoids this behavior.
         """
-        count = DiscoverRunner().build_suite(
+        count = DiscoverRunner(verbosity=0).build_suite(
             ['test_runner_apps.sample.empty'],
         ).countTestCases()
 
@@ -169,7 +171,7 @@ class DiscoverRunnerTests(SimpleTestCase):
 
     def test_testcase_ordering(self):
         with change_cwd(".."):
-            suite = DiscoverRunner().build_suite(['test_runner_apps/sample/'])
+            suite = DiscoverRunner(verbosity=0).build_suite(['test_runner_apps/sample/'])
             self.assertEqual(
                 suite._tests[0].__class__.__name__,
                 'TestDjangoTestCase',
@@ -187,9 +189,10 @@ class DiscoverRunnerTests(SimpleTestCase):
         """
         base_app = 'forms_tests'
         sub_app = 'forms_tests.field_tests'
+        runner = DiscoverRunner(verbosity=0)
         with self.modify_settings(INSTALLED_APPS={'append': sub_app}):
-            single = DiscoverRunner().build_suite([base_app]).countTestCases()
-            dups = DiscoverRunner().build_suite([base_app, sub_app]).countTestCases()
+            single = runner.build_suite([base_app]).countTestCases()
+            dups = runner.build_suite([base_app, sub_app]).countTestCases()
         self.assertEqual(single, dups)
 
     def test_reverse(self):
@@ -197,7 +200,7 @@ class DiscoverRunnerTests(SimpleTestCase):
         Reverse should reorder tests while maintaining the grouping specified
         by ``DiscoverRunner.reorder_by``.
         """
-        runner = DiscoverRunner(reverse=True)
+        runner = DiscoverRunner(reverse=True, verbosity=0)
         suite = runner.build_suite(
             test_labels=('test_runner_apps.sample', 'test_runner_apps.simple'))
         self.assertIn('test_runner_apps.simple', next(iter(suite)).id(),
@@ -223,7 +226,7 @@ class DiscoverRunnerTests(SimpleTestCase):
 
     def test_build_suite_failed_tests_first(self):
         # The "doesnotexist" label results in a _FailedTest instance.
-        suite = DiscoverRunner().build_suite(
+        suite = DiscoverRunner(verbosity=0).build_suite(
             test_labels=['test_runner_apps.sample', 'doesnotexist'],
         )
         tests = list(suite)
@@ -243,23 +246,24 @@ class DiscoverRunnerTests(SimpleTestCase):
         self.assertEqual(DiscoverRunner().test_loader, defaultTestLoader)
 
     def test_tags(self):
-        runner = DiscoverRunner(tags=['core'])
+        runner = DiscoverRunner(tags=['core'], verbosity=0)
         self.assertEqual(runner.build_suite(['test_runner_apps.tagged.tests']).countTestCases(), 1)
-        runner = DiscoverRunner(tags=['fast'])
+        runner = DiscoverRunner(tags=['fast'], verbosity=0)
         self.assertEqual(runner.build_suite(['test_runner_apps.tagged.tests']).countTestCases(), 2)
-        runner = DiscoverRunner(tags=['slow'])
+        runner = DiscoverRunner(tags=['slow'], verbosity=0)
         self.assertEqual(runner.build_suite(['test_runner_apps.tagged.tests']).countTestCases(), 2)
 
     def test_exclude_tags(self):
-        runner = DiscoverRunner(tags=['fast'], exclude_tags=['core'])
+        runner = DiscoverRunner(tags=['fast'], exclude_tags=['core'], verbosity=0)
         self.assertEqual(runner.build_suite(['test_runner_apps.tagged.tests']).countTestCases(), 1)
-        runner = DiscoverRunner(tags=['fast'], exclude_tags=['slow'])
+        runner = DiscoverRunner(tags=['fast'], exclude_tags=['slow'], verbosity=0)
         self.assertEqual(runner.build_suite(['test_runner_apps.tagged.tests']).countTestCases(), 0)
-        runner = DiscoverRunner(exclude_tags=['slow'])
+        runner = DiscoverRunner(exclude_tags=['slow'], verbosity=0)
         self.assertEqual(runner.build_suite(['test_runner_apps.tagged.tests']).countTestCases(), 0)
 
     def test_tag_inheritance(self):
         def count_tests(**kwargs):
+            kwargs.setdefault('verbosity', 0)
             suite = DiscoverRunner(**kwargs).build_suite(['test_runner_apps.tagged.tests_inheritance'])
             return suite.countTestCases()
 
@@ -273,7 +277,7 @@ class DiscoverRunnerTests(SimpleTestCase):
     def test_tag_fail_to_load(self):
         with self.assertRaises(SyntaxError):
             import_module('test_runner_apps.tagged.tests_syntax_error')
-        runner = DiscoverRunner(tags=['syntax_error'])
+        runner = DiscoverRunner(tags=['syntax_error'], verbosity=0)
         # A label that doesn't exist or cannot be loaded due to syntax errors
         # is always considered matching.
         suite = runner.build_suite(['doesnotexist', 'test_runner_apps.tagged'])
@@ -293,6 +297,15 @@ class DiscoverRunnerTests(SimpleTestCase):
         with captured_stdout() as stdout:
             runner.build_suite(['test_runner_apps.tagged.tests'])
             self.assertIn('Excluding test tag(s): bar, foo.\n', stdout.getvalue())
+
+    def test_number_of_tests_found_displayed(self):
+        runner = DiscoverRunner()
+        with captured_stdout() as stdout:
+            runner.build_suite([
+                'test_runner_apps.sample.tests_sample.TestDjangoTestCase',
+                'test_runner_apps.simple',
+            ])
+            self.assertIn('Found 14 tests.\n', stdout.getvalue())
 
     def test_pdb_with_parallel(self):
         msg = (
@@ -371,8 +384,8 @@ class DiscoverRunnerGetDatabasesTests(SimpleTestCase):
     skip_msg = 'Skipping setup of unused database(s): '
 
     def get_databases(self, test_labels):
-        suite = self.runner.build_suite(test_labels)
         with captured_stdout() as stdout:
+            suite = self.runner.build_suite(test_labels)
             databases = self.runner.get_databases(suite)
         return databases, stdout.getvalue()
 
