@@ -168,13 +168,13 @@ class Sitemap:
                 'lastmod': lastmod,
                 'changefreq': self._get('changefreq', item),
                 'priority': str(priority if priority is not None else ''),
+                'alternates': [],
             }
 
             if self.i18n and self.alternates:
-                alternates = []
                 for lang_code in self._languages():
                     loc = f'{protocol}://{domain}{self._location(item, lang_code)}'
-                    alternates.append({
+                    url_info['alternates'].append({
                         'location': loc,
                         'lang_code': lang_code,
                     })
@@ -182,11 +182,10 @@ class Sitemap:
                     lang_code = settings.LANGUAGE_CODE
                     loc = f'{protocol}://{domain}{self._location(item, lang_code)}'
                     loc = loc.replace(f'/{lang_code}/', '/', 1)
-                    alternates.append({
+                    url_info['alternates'].append({
                         'location': loc,
                         'lang_code': 'x-default',
                     })
-                url_info['alternates'] = alternates
 
             urls.append(url_info)
 

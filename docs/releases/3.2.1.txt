@@ -30,3 +30,6 @@ Bugfixes
 * Fixed a regression in Django 3.2 that caused a crash of
   :attr:`.ModelAdmin.search_fields` when searching against phrases with
   unbalanced quotes (:ticket:`32649`).
+
+* Fixed a bug in Django 3.2 where variable lookup errors were logged rendering
+  the sitemap template if alternates were not defined (:ticket:`32648`).
