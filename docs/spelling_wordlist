@@ -217,6 +217,7 @@ fieldsets
 filename
 filenames
 filesystem
+filesystems
 fk
 flatpage
 flatpages

@@ -102,6 +102,9 @@ Minor features
 
 * Added support for SpatiaLite 5.
 
+* :class:`~django.contrib.gis.gdal.GDALRaster` now allows creating rasters in
+  any GDAL virtual filesystem.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
