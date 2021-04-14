@@ -28,7 +28,7 @@ This will install the latest version of Django which works on your
 version of Python. If you can't upgrade your pip (or Python), request
 an older version of Django:
 
-    $ python -m pip install "django<2"
+    $ python -m pip install "django<4"
 """.format(*(REQUIRED_PYTHON + CURRENT_PYTHON)))
     sys.exit(1)
 
