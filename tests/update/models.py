@@ -45,3 +45,7 @@ class Bar(models.Model):
 
 class UniqueNumber(models.Model):
     number = models.IntegerField(unique=True)
+
+
+class UniqueNumberChild(UniqueNumber):
+    pass
