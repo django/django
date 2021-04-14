@@ -5,7 +5,7 @@ from contextlib import ContextDecorator
 from decimal import ROUND_UP, Decimal
 
 from django.utils.autoreload import autoreload_started, file_changed
-from django.utils.functional import lazy
+from django.utils.functional import lazy, Promise
 from django.utils.regex_helper import _lazy_re_compile
 
 __all__ = [
@@ -13,7 +13,7 @@ __all__ = [
     'get_language', 'get_language_from_request',
     'get_language_info', 'get_language_bidi',
     'check_for_language', 'to_language', 'to_locale', 'templatize',
-    'gettext', 'gettext_lazy', 'gettext_noop',
+    'gettext', 'gettext_lazy', 'gettext_noop', 'is_lazy_gettext',
     'ngettext', 'ngettext_lazy',
     'pgettext', 'pgettext_lazy',
     'npgettext', 'npgettext_lazy',
@@ -88,6 +88,10 @@ def npgettext(context, singular, plural, number):
 
 gettext_lazy = lazy(gettext, str)
 pgettext_lazy = lazy(pgettext, str)
+
+
+def is_lazy_gettext(obj):
+    return isinstance(obj, Promise) and obj.__reduce__()[1][0] == gettext
 
 
 def lazy_number(func, resultclass, number=None, **kwargs):
