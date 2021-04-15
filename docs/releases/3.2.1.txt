@@ -44,3 +44,6 @@ Bugfixes
 * Fixed a regression in Django 3.2 that caused a crash when decoding a cookie
   value, used by ``django.contrib.messages.storage.cookie.CookieStorage``, in
   the pre-Django 3.2 format (:ticket:`32643`).
+
+* Fixed a regression in Django 3.2 that stopped the shift-key modifier
+  selecting multiple rows in the admin changelist (:ticket:`32647`).

@@ -88,6 +88,16 @@
     window.Actions = function(actionCheckboxes, options) {
         options = Object.assign({}, defaults, options);
         let list_editable_changed = false;
+        let lastChecked = null;
+        let shiftPressed = false;
+
+        document.addEventListener('keydown', (event) => {
+            shiftPressed = event.shiftKey;
+        });
+
+        document.addEventListener('keyup', (event) => {
+            shiftPressed = event.shiftKey;
+        });
 
         document.getElementById(options.allToggleId).addEventListener('click', function(event) {
             checker(actionCheckboxes, options, this.checked);
@@ -113,12 +123,28 @@
             });
         });
 
+        function affectedCheckboxes(target, withModifier) {
+            const multiSelect = (lastChecked && withModifier && lastChecked !== target);
+            if (!multiSelect) {
+                return [target];
+            }
+            const checkboxes = Array.from(actionCheckboxes);
+            const targetIndex = checkboxes.findIndex(el => el === target);
+            const lastCheckedIndex = checkboxes.findIndex(el => el === lastChecked);
+            const startIndex = Math.min(targetIndex, lastCheckedIndex);
+            const endIndex = Math.max(targetIndex, lastCheckedIndex);
+            const filtered = checkboxes.filter((el, index) => (startIndex <= index) && (index <= endIndex));
+            return filtered;
+        };
+
         Array.from(document.getElementById('result_list').tBodies).forEach(function(el) {
             el.addEventListener('change', function(event) {
                 const target = event.target;
                 if (target.classList.contains('action-select')) {
-                    target.closest('tr').classList.toggle(options.selectedClass, target.checked);
+                    const checkboxes = affectedCheckboxes(target, shiftPressed);
+                    checker(checkboxes, options, target.checked);
                     updateCounter(actionCheckboxes, options);
+                    lastChecked = target;
                 } else {
                     list_editable_changed = true;
                 }
