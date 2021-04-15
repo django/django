@@ -68,7 +68,7 @@ def Deserializer(stream_or_string, **options):
     try:
         objects = json.loads(stream_or_string)
         yield from PythonDeserializer(objects, **options)
-    except (GeneratorExit, DeserializationError):
+    except (GeneratorExit, MemoryError, DeserializationError):
         raise
     except Exception as exc:
         raise DeserializationError() from exc

@@ -2,6 +2,7 @@ import datetime
 import decimal
 import json
 import re
+from unittest import mock
 
 from django.core import serializers
 from django.core.serializers.base import DeserializationError
@@ -91,6 +92,10 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
         with self.assertRaises(DeserializationError):
             for obj in serializers.deserialize("json", """[{"pk":1}"""):
                 pass
+
+        with self.assertRaises(MemoryError):
+            with mock.patch('django.core.serializers.deserialize', side_effect=MemoryError):
+                serializers.deserialize('json', self.pkless_str)
 
     def test_helpful_error_message_invalid_pk(self):
         """
