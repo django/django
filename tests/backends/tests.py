@@ -501,7 +501,7 @@ class BackendTestCase(TransactionTestCase):
         params, kwargs = mocked_logger.debug.call_args
         self.assertIn('; alias=%s', params[0])
         self.assertEqual(params[2], sql)
-        self.assertEqual(params[3], None)
+        self.assertIsNone(params[3])
         self.assertEqual(params[4], connection.alias)
         self.assertEqual(
             list(kwargs['extra']),
