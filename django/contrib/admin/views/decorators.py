@@ -8,7 +8,7 @@ def staff_member_required(view_func, redirect_field_name=REDIRECT_FIELD_NAME, lo
     member, displaying the login page if necessary.
     """
     return user_passes_test(
-        lambda u: u.is_active and u.is_staff,
+        lambda req: req.user.is_active and req.user.is_staff,
         login_url=login_url,
         redirect_field_name=redirect_field_name
     )(view_func)

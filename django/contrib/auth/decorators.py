@@ -18,7 +18,7 @@ def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIE
     def decorator(view_func):
         @wraps(view_func, assigned=available_attrs(view_func))
         def _wrapped_view(request, *args, **kwargs):
-            if test_func(request.user):
+            if test_func(request):
                 return view_func(request, *args, **kwargs)
             path = request.build_absolute_uri()
             # urlparse chokes on lazy objects in Python 3, force to str
@@ -38,13 +38,22 @@ def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIE
     return decorator
 
 
+def check_user_status(req):
+    roar_site = req.get_roar_site()
+    condition_list = [lambda req: req.user.is_authenticated()]
+    if roar_site.engine.settings.get('enable_community_signup'):
+        condition_list.append(
+            lambda req: req.user.can('ignore_paywall', on=roar_site, on_community_site=True)
+        )
+    return all(fn(req) for fn in condition_list):
+
 def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
     """
     Decorator for views that checks that the user is logged in, redirecting
     to the log-in page if necessary.
     """
     actual_decorator = user_passes_test(
-        lambda u: u.is_authenticated(),
+        check_user_status,
         login_url=login_url,
         redirect_field_name=redirect_field_name
     )
@@ -60,7 +69,8 @@ def permission_required(perm, login_url=None, raise_exception=False):
     If the raise_exception parameter is given the PermissionDenied exception
     is raised.
     """
-    def check_perms(user):
+    def check_perms(request):
+        user = request.user
         if not isinstance(perm, (list, tuple)):
             perms = (perm, )
         else:
