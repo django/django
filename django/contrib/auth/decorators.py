@@ -41,7 +41,7 @@ def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIE
 def check_user_status(req):
     roar_site = req.get_roar_site()
     condition_list = [lambda req: req.user.is_authenticated()]
-    if roar_site.engine.settings.get('enable_community_signup'):
+    if not roar_site.engine.settings.get('enable_community_signup'):
         condition_list.append(
             lambda req: req.user.can('ignore_paywall', on=roar_site, on_community_site=True)
         )
