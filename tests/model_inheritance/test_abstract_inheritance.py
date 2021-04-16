@@ -57,7 +57,7 @@ class AbstractInheritanceTests(SimpleTestCase):
 
         self.assertEqual(Child.check(), [])
         inherited_field = Child._meta.get_field('name')
-        self.assertTrue(isinstance(inherited_field, models.CharField))
+        self.assertIsInstance(inherited_field, models.CharField)
         self.assertEqual(inherited_field.max_length, 255)
 
     def test_diamond_shaped_multiple_inheritance_is_depth_first(self):
@@ -93,7 +93,7 @@ class AbstractInheritanceTests(SimpleTestCase):
 
         self.assertEqual(Child.check(), [])
         inherited_field = Child._meta.get_field('name')
-        self.assertTrue(isinstance(inherited_field, models.CharField))
+        self.assertIsInstance(inherited_field, models.CharField)
         self.assertEqual(inherited_field.max_length, 255)
 
     def test_target_field_may_be_pushed_down(self):
@@ -124,7 +124,7 @@ class AbstractInheritanceTests(SimpleTestCase):
 
         self.assertEqual(Child.check(), [])
         inherited_field = Child._meta.get_field('name')
-        self.assertTrue(isinstance(inherited_field, models.IntegerField))
+        self.assertIsInstance(inherited_field, models.IntegerField)
 
     def test_multiple_inheritance_cannot_shadow_concrete_inherited_field(self):
         class ConcreteParent(models.Model):

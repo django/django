@@ -405,7 +405,7 @@ class DiscoverRunnerTests(SimpleTestCase):
             with runner.time_keeper.timed('test'):
                 pass
             runner.time_keeper.print_results()
-        self.assertTrue(isinstance(runner.time_keeper, NullTimeKeeper))
+        self.assertIsInstance(runner.time_keeper, NullTimeKeeper)
         self.assertNotIn('test', stderr.getvalue())
 
     def test_timings_captured(self):
@@ -414,7 +414,7 @@ class DiscoverRunnerTests(SimpleTestCase):
             with runner.time_keeper.timed('test'):
                 pass
             runner.time_keeper.print_results()
-        self.assertTrue(isinstance(runner.time_keeper, TimeKeeper))
+        self.assertIsInstance(runner.time_keeper, TimeKeeper)
         self.assertIn('test', stderr.getvalue())
 
     def test_log(self):
