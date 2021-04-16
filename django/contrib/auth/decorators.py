@@ -45,7 +45,7 @@ def check_user_status(req):
         condition_list.append(
             lambda req: req.user.can('ignore_paywall', on=roar_site, on_community_site=True)
         )
-    return all(fn(req) for fn in condition_list):
+    return all(fn(req) for fn in condition_list)
 
 def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
     """
