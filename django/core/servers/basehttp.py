@@ -194,6 +194,9 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         self.handle_one_request()
         while not self.close_connection:
             self.handle_one_request()
+        
+        self.rfile.peek()
+        
         try:
             self.connection.shutdown(socket.SHUT_WR)
         except (AttributeError, OSError):
@@ -207,10 +210,19 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
             self.request_version = ''
             self.command = ''
             self.send_error(414)
+            self.send_error(HTTPStatus.REQUEST_URI_TOO_LONG)
             return
 
-        if not self.parse_request():  # An error code has been sent, just exit
+        if not self.raw_requestline:
+            self.close_connection = True
             return
+
+
+        if not self.parse_request():  # An error code has been sent, just exit
+            handler.request_handler = self #backpointer for logging & connection closing
+            handler.run(self.server.get_app())
+
+            self.wfile.flush() #send the response if not already done
 
         handler = ServerHandler(
             self.rfile, self.wfile, self.get_stderr(), self.get_environ()
