@@ -559,6 +559,8 @@ class ModelAdmin(BaseModelAdmin):
     list_max_show_all = 200
     list_editable = ()
     search_fields = ()
+    #search_help_text = []
+
     date_hierarchy = None
     save_as = False
     save_as_continue = True
