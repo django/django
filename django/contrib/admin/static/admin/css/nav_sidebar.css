@@ -1,8 +1,7 @@
 .sticky {
     position: sticky;
     top: 0;
-    /* Subtracts the height of headers */
-    max-height: calc(100vh - 48px - 36px - 1px);
+    max-height: 100vh;
 }
 
 .toggle-nav-sidebar {

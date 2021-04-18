@@ -37,6 +37,34 @@
         });
     }
 
+    function resizeSidebar() {
+        const sidebar = document.querySelector("#nav-sidebar.sticky");
+        if (!sidebar) {
+            return;
+        }
+
+        let headerHeight = 0;
+        const header = document.getElementById('header');
+        const breadcrumbs = document.getElementsByClassName('breadcrumbs');
+
+        if (header) {
+            headerHeight += header.offsetHeight;
+        }
+
+        if (breadcrumbs) {
+            Array.from(breadcrumbs).forEach(function(element) {
+                headerHeight += element.offsetHeight;
+            });
+        }
+
+        const visibleHeader = Math.max(headerHeight - window.pageYOffset, 0);
+        const sidebarHeight = window.innerHeight - visibleHeader - 1;
+        sidebar.style.maxHeight = `${sidebarHeight}px`;
+    }
+    resizeSidebar();
+    document.addEventListener('scroll', resizeSidebar, false);
+    window.addEventListener('resize', resizeSidebar, false);
+
     function initSidebarQuickFilter() {
         const options = [];
         const navSidebar = document.getElementById('nav-sidebar');
