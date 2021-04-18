@@ -1,11 +1,12 @@
 import operator
+from unittest import skipIf
 
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import Exists, F, IntegerField, OuterRef, Value
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
-from .models import Celebrity, Number, ReservedName
+from .models import Celebrity, Number, ReservedName, SpecialCategory
 
 
 @skipUnlessDBFeature('supports_select_union')
@@ -251,6 +252,38 @@ class QuerySetSetOperationTests(TestCase):
             qs1.union(qs2).order_by('extra_name').values_list('pk', flat=True),
             [reserved_name.pk],
         )
+
+    def test_union_multiple_models_with_values_list_and_order_by_extra_different_fields(self):
+        special_category = SpecialCategory.objects.create(name='sc1', special_name='SN1')
+        celebrity = Celebrity.objects.create(name='John Doe')
+        qs1 = SpecialCategory.objects.extra(select={'extra_name': 'special_name'})
+        qs2 = Celebrity.objects.extra(select={'extra_name': 'name'})
+        self.assertSequenceEqual(
+            qs1.union(qs2).order_by('extra_name').values_list('pk', flat=True),
+            [celebrity.pk, special_category.pk],
+        )
+
+    @skipIf(connection.vendor == 'postgresql', 'PostgreSQL does not allow UNION on different types')
+    def test_union_multiple_models_with_values_list_and_order_by_extra_different_field_types(self):
+        reserved_name = ReservedName.objects.create(name='rn1', order=0)
+        celebrity = Celebrity.objects.create(name='John Doe')
+        qs1 = Celebrity.objects.extra(select={'extra_name': 'greatest_fan_id'})
+        qs2 = ReservedName.objects.extra(select={'extra_name': 'name'})
+        self.assertSequenceEqual(
+            qs1.union(qs2).order_by('extra_name').values_list('pk', flat=True),
+            [celebrity.pk, reserved_name.pk],
+        )
+
+    def test_union_multiple_models_with_values_and_order_by_extra_select_different_fields(self):
+        special_category = SpecialCategory.objects.create(name='sc1', special_name='SN1')
+        celebrity = Celebrity.objects.create(name='John Doe')
+        qs1 = SpecialCategory.objects.extra(select={'extra_name': 'special_name'})
+        qs2 = Celebrity.objects.extra(select={'extra_name': 'name'})
+        result_qs = list(qs1.union(qs2).order_by('extra_name').values('pk', 'extra_name'))
+        self.assertEqual(result_qs[0]['pk'], celebrity.pk)
+        self.assertEqual(result_qs[0]['extra_name'], 'John Doe')
+        self.assertEqual(result_qs[1]['pk'], special_category.pk)
+        self.assertEqual(result_qs[1]['extra_name'], 'SN1')
 
     def test_count_union(self):
         qs1 = Number.objects.filter(num__lte=1).values('num')

@@ -358,7 +358,7 @@ class SQLCompiler:
                         field, self.query.get_meta(), default_order=asc,
                     ))
             else:
-                if col not in self.query.extra_select:
+                if col not in self.query.extra_select and not self.query.combinator:
                     order_by.append((
                         OrderBy(RawSQL(*self.query.extra[col]), descending=descending),
                         False))
@@ -395,7 +395,13 @@ class SQLCompiler:
                     order_by_idx = len(self.query.select) + 1
                     col_name = f'__orderbycol{order_by_idx}'
                     for q in self.query.combined_queries:
-                        q.add_annotation(expr_src, col_name)
+                        # We use a Ref with a combined query to resolve the
+                        # field on each subquery extra
+                        if is_ref:
+                            q_src = RawSQL(*q.extra[src.refs])
+                        else:
+                            q_src = expr_src
+                        q.add_annotation(q_src, col_name)
                     self.query.add_select_col(resolved, col_name)
                     resolved.set_source_expressions([RawSQL(f'{order_by_idx}', ())])
             sql, params = self.compile(resolved)
