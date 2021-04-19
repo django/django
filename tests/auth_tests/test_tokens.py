@@ -3,7 +3,9 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from .models import CustomEmailField
 
@@ -131,3 +133,10 @@ class TokenGeneratorTest(TestCase):
         tk_default = default_password_generator.make_token(user)
         self.assertIs(custom_password_generator.check_token(user, tk_default), False)
         self.assertIs(default_password_generator.check_token(user, tk_custom), False)
+
+    @override_settings(SECRET_KEY='')
+    def test_secret_lazy_validation(self):
+        default_token_generator = PasswordResetTokenGenerator()
+        msg = 'The SECRET_KEY setting must not be empty.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            default_token_generator.secret
