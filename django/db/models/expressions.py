@@ -1232,7 +1232,6 @@ class OrderBy(BaseExpression):
             'ordering': 'DESC' if self.descending else 'ASC',
             **extra_context,
         }
-        template = template or self.template
         params *= template.count('%(expression)s')
         return (template % placeholders).rstrip(), params
 
