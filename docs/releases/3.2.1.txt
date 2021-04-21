@@ -51,3 +51,8 @@ Bugfixes
 * Fixed a bug in Django 3.2 where a system check would crash on the
   :setting:`STATICFILES_DIRS` setting with a list of 2-tuples of
   ``(prefix, path)`` (:ticket:`32665`).
+
+* Fixed a long standing bug involving queryset bitwise combination when used
+  with subqueries that began manifesting in Django 3.2, due to a separate fix
+  using ``Exists`` to ``exclude()`` multi-valued relationships
+  (:ticket:`32650`).
