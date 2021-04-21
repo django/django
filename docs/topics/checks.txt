@@ -77,6 +77,8 @@ implied by the class name.
 * :class:`Error`
 * :class:`Critical`
 
+.. _registering-labeling-checks:
+
 Registering and labeling checks
 -------------------------------
 
