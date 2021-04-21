@@ -269,15 +269,7 @@ class SQLCompiler:
             ret.append((col, (sql, params), alias))
         return ret, klass_info, annotations
 
-    def get_order_by(self):
-        """
-        Return a list of 2-tuples of form (expr, (sql, params, is_ref)) for the
-        ORDER BY clause.
-
-        The order_by clause can alter the select clause (for example it
-        can add aliases to clauses that do not yet have one, or it can
-        add totally new select clauses).
-        """
+    def _order_by_pairs(self):
         if self.query.extra_order_by:
             ordering = self.query.extra_order_by
         elif not self.query.default_ordering:
@@ -290,11 +282,10 @@ class SQLCompiler:
         else:
             ordering = []
         if self.query.standard_ordering:
-            asc, desc = ORDER_DIR['ASC']
+            default_order, _ = ORDER_DIR['ASC']
         else:
-            asc, desc = ORDER_DIR['DESC']
+            default_order, _ = ORDER_DIR['DESC']
 
-        order_by = []
         for field in ordering:
             if hasattr(field, 'resolve_expression'):
                 if isinstance(field, Value):
@@ -305,20 +296,24 @@ class SQLCompiler:
                 if not self.query.standard_ordering:
                     field = field.copy()
                     field.reverse_ordering()
-                order_by.append((field, False))
+                yield field, False
                 continue
             if field == '?':  # random
-                order_by.append((OrderBy(Random()), False))
+                yield OrderBy(Random()), False
                 continue
 
-            col, order = get_order_dir(field, asc)
+            col, order = get_order_dir(field, default_order)
             descending = order == 'DESC'
 
             if col in self.query.annotation_select:
                 # Reference to expression in SELECT clause
-                order_by.append((
-                    OrderBy(Ref(col, self.query.annotation_select[col]), descending=descending),
-                    True))
+                yield (
+                    OrderBy(
+                        Ref(col, self.query.annotation_select[col]),
+                        descending=descending,
+                    ),
+                    True,
+                )
                 continue
             if col in self.query.annotations:
                 # References to an expression which is masked out of the SELECT
@@ -332,44 +327,58 @@ class SQLCompiler:
                     if isinstance(expr, Value):
                         # output_field must be resolved for constants.
                         expr = Cast(expr, expr.output_field)
-                order_by.append((OrderBy(expr, descending=descending), False))
+                yield OrderBy(expr, descending=descending), False
                 continue
 
             if '.' in field:
                 # This came in through an extra(order_by=...) addition. Pass it
                 # on verbatim.
                 table, col = col.split('.', 1)
-                order_by.append((
+                yield (
                     OrderBy(
                         RawSQL('%s.%s' % (self.quote_name_unless_alias(table), col), []),
-                        descending=descending
-                    ), False))
+                        descending=descending,
+                    ),
+                    False,
+                )
                 continue
 
-            if not self.query.extra or col not in self.query.extra:
+            if self.query.extra and col in self.query.extra:
+                if col in self.query.extra_select:
+                    yield (
+                        OrderBy(Ref(col, RawSQL(*self.query.extra[col])), descending=descending),
+                        True,
+                    )
+                else:
+                    yield (
+                        OrderBy(RawSQL(*self.query.extra[col]), descending=descending),
+                        False,
+                    )
+            else:
                 if self.query.combinator and self.select:
                     # Don't use the first model's field because other
                     # combinated queries might define it differently.
-                    order_by.append((OrderBy(F(col), descending=descending), False))
+                    yield OrderBy(F(col), descending=descending), False
                 else:
                     # 'col' is of the form 'field' or 'field1__field2' or
                     # '-field1__field2__field', etc.
-                    order_by.extend(self.find_ordering_name(
-                        field, self.query.get_meta(), default_order=asc,
-                    ))
-            else:
-                if col not in self.query.extra_select:
-                    order_by.append((
-                        OrderBy(RawSQL(*self.query.extra[col]), descending=descending),
-                        False))
-                else:
-                    order_by.append((
-                        OrderBy(Ref(col, RawSQL(*self.query.extra[col])), descending=descending),
-                        True))
+                    yield from self.find_ordering_name(
+                        field, self.query.get_meta(), default_order=default_order,
+                    )
+
+    def get_order_by(self):
+        """
+        Return a list of 2-tuples of the form (expr, (sql, params, is_ref)) for
+        the ORDER BY clause.
+
+        The order_by clause can alter the select clause (for example it can add
+        aliases to clauses that do not yet have one, or it can add totally new
+        select clauses).
+        """
         result = []
         seen = set()
 
-        for expr, is_ref in order_by:
+        for expr, is_ref in self._order_by_pairs():
             resolved = expr.resolve_expression(self.query, allow_joins=True, reuse=None)
             if self.query.combinator and self.select:
                 src = resolved.get_source_expressions()[0]
