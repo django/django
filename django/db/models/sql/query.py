@@ -631,6 +631,10 @@ class Query(BaseExpression):
         joinpromoter.add_votes(rhs_votes)
         joinpromoter.update_join_types(self)
 
+        # Combine subqueries aliases to ensure aliases relabelling properly
+        # handle subqueries when combining where and select clauses.
+        self.subq_aliases |= rhs.subq_aliases
+
         # Now relabel a copy of the rhs where-clause and add it to the current
         # one.
         w = rhs.where.clone()
