@@ -218,9 +218,10 @@ All attributes can be set in your derived class and can be used in
 .. attribute:: BaseCommand.requires_system_checks
 
     A list or tuple of tags, e.g. ``[Tags.staticfiles, Tags.models]``. System
-    checks registered in the chosen tags will be checked for errors prior to
-    executing the command. The value ``'__all__'`` can be used to specify
-    that all system checks should be performed. Default value is ``'__all__'``.
+    checks :ref:`registered in the chosen tags <registering-labeling-checks>`
+    will be checked for errors prior to executing the command. The value
+    ``'__all__'`` can be used to specify that all system checks should be
+    performed. Default value is ``'__all__'``.
 
     .. versionchanged:: 3.2
 
