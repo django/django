@@ -132,7 +132,9 @@ def get_installed():
     return [app_config.name for app_config in apps.get_app_configs()]
 
 
-def setup(verbosity, test_labels, start_at, start_after):
+def setup(verbosity, start_at, start_after, test_labels=None):
+    if test_labels is None:
+        test_labels = []
     # Reduce each test label to just the top-level module part.
     test_labels_set = set()
     for label in test_labels:
@@ -309,7 +311,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
             msg += " with up to %d processes" % max_parallel
         print(msg)
 
-    state = setup(verbosity, test_labels, start_at, start_after)
+    state = setup(verbosity, start_at, start_after, test_labels)
     # Run the test suite, including the extra validation tests.
     if not hasattr(settings, 'TEST_RUNNER'):
         settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
@@ -335,8 +337,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
 
 
 def get_app_test_labels(verbosity, start_at, start_after):
-    test_labels = []
-    state = setup(verbosity, test_labels, start_at, start_after)
+    state = setup(verbosity, start_at, start_after)
     test_labels = get_installed()
     teardown(state)
     return test_labels
