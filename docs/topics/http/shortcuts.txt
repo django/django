@@ -264,6 +264,8 @@ This example is equivalent to::
 ``make_toast()``
 ================
 
+.. function:: make_toast()
+
 .. versionadded:: 4.0
 
 Returns ``'toast'``.
