@@ -613,24 +613,30 @@ ul.messagelist {
     margin: 0;
 }
 
+/* The background-color property must be defined separately in the 3 following declaration */
+/* blocks to avoid a bug in Safari when loading relative URLs in conjunction with var() */
+/* https://github.com/django/django/pull/14294 */
 ul.messagelist li {
     display: block;
     font-weight: 400;
     font-size: 13px;
     padding: 10px 10px 10px 65px;
     margin: 0 0 10px 0;
-    background: var(--message-success-bg) url(../img/icon-yes.svg) 40px 12px no-repeat;
+    background: url(../img/icon-yes.svg) 40px 12px no-repeat;
+    background-color: var(--message-success-bg);
     background-size: 16px auto;
     color: var(--body-fg);
 }
 
 ul.messagelist li.warning {
-    background: var(--message-warning-bg) url(../img/icon-alert.svg) 40px 14px no-repeat;
+    background: url(../img/icon-alert.svg) 40px 14px no-repeat;
+    background-color: var(--message-warning-bg);
     background-size: 14px auto;
 }
 
 ul.messagelist li.error {
-    background: var(--message-error-bg) url(../img/icon-no.svg) 40px 12px no-repeat;
+    background: url(../img/icon-no.svg) 40px 12px no-repeat;
+    background-color: var(--message-error-bg);
     background-size: 16px auto;
 }
 
