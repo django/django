@@ -222,7 +222,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # https://www.sqlite.org/lang_createtable.html
         # method_1: PRIMARY KEY(COLUMN_NAME)
         # method_2: COLUMN_NAME TYPE NULL PRIMARY KEY
-        method_1_match = re.match(r'PRIMARY KEY\((.+?)[\,)]')
+        method_1_match = re.match(r'PRIMARY KEY\((.+?)[\,)]', fields_sql)
         if method_1_match:
             # return the first found
             if method_1_match[0]:
