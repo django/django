@@ -36,10 +36,12 @@ class FlexibleFieldLookupDict:
         'int': 'IntegerField',
         'integer': 'IntegerField',
         'bigint': 'BigIntegerField',
+        'unsigned integer': 'PositiveIntegerField',
         'integer unsigned': 'PositiveIntegerField',
         'bigint unsigned': 'PositiveBigIntegerField',
         'decimal': 'DecimalField',
         'real': 'FloatField',
+        'double': 'FloatField',
         'text': 'TextField',
         'char': 'CharField',
         'varchar': 'CharField',
@@ -59,8 +61,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_field_type(self, data_type, description):
         field_type = super().get_field_type(data_type, description)
-        if description.pk and field_type in {'BigIntegerField', 'IntegerField', 'SmallIntegerField'}:
-            # No support for BigAutoField or SmallAutoField as SQLite treats
+        if description.pk and field_type in {'BigIntegerField', 'IntegerField', 'SmallIntegerField', 'PositiveIntegerField'}:
+            # No support for BigAutoField, SmallAutoField or PositiveIntegerField as SQLite treats
             # all integer primary keys as signed 64-bit integers.
             return 'AutoField'
         if description.has_json_constraint:
@@ -215,12 +217,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # Views don't have a primary key.
             return None
         fields_sql = create_sql[create_sql.index('(') + 1:create_sql.rindex(')')]
-        for field_desc in fields_sql.split(','):
-            field_desc = field_desc.strip()
-            m = re.match(r'(?:(?:["`\[])(.*)(?:["`\]])|(\w+)).*PRIMARY KEY.*', field_desc)
-            if m:
-                return m[1] if m[1] else m[2]
-        return None
+
+        field_desc = fields_sql.strip()
+        m = re.match(r'(?:(?:["`\[])(.*)(?:["`\]])|(\w+)).*PRIMARY KEY.*', field_desc)
+        if m:
+            return m[1] if m[1] else m[2]
+        else:
+            return None
 
     def _get_foreign_key_constraints(self, cursor, table_name):
         constraints = {}
