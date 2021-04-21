@@ -218,12 +218,27 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             return None
         fields_sql = create_sql[create_sql.index('(') + 1:create_sql.rindex(')')]
 
-        field_desc = fields_sql.strip()
-        m = re.match(r'(?:(?:["`\[])(.*)(?:["`\]])|(\w+)).*PRIMARY KEY.*', field_desc)
-        if m:
-            return m[1] if m[1] else m[2]
-        else:
-            return None
+        # there are two ways to define a primary key
+        # https://www.sqlite.org/lang_createtable.html
+        # method_1: PRIMARY KEY(COLUMN_NAME)
+        # method_2: COLUMN_NAME TYPE NULL PRIMARY KEY
+        method_1_match = re.match(r'PRIMARY KEY\((.+?)[\,)]')
+        if method_1_match:
+            # return the first found
+            if method_1_match[0]:
+                return method_1_match[0]
+            else:
+                return None
+
+        for field_desc in fields_sql.split(','):
+            field_desc = field_desc.strip()
+            method_2_match = re.match(r'(?:(?:["`\[])(.*)(?:["`\]])|(\w+)).*PRIMARY KEY.*', field_desc)
+            if method_2_match:
+                if method_2_match[1]:
+                    return method_2_match[1]
+                else:
+                    return method_2_match[2]
+        return None
 
     def _get_foreign_key_constraints(self, cursor, table_name):
         constraints = {}
