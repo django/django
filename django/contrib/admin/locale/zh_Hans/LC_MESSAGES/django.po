@@ -601,7 +601,7 @@ msgid "Your password was changed."
 msgstr "你的密码已修改。"
 
 msgid ""
-"Please enter your old password, for security’s sake, and then enter your new "
+"Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr "安全起见请输入你的旧密码。然后输入两次你的新密码以确保输入正确。"
 
