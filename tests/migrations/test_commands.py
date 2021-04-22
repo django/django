@@ -519,7 +519,15 @@ class MigrateTests(MigrationTestBase):
     def test_showmigrations_unmigrated_app(self):
         out = io.StringIO()
         call_command('showmigrations', 'unmigrated_app', stdout=out, no_color=True)
-        self.assertEqual('unmigrated_app\n (no migrations)\n', out.getvalue().lower())
+        try:
+            self.assertEqual('unmigrated_app\n (no migrations)\n', out.getvalue().lower())
+        finally:
+            # unmigrated_app.SillyModel has a foreign key to
+            # 'migrations.Tribble', but that model is only defined in a
+            # migration, so the global app registry never sees it and the
+            # reference is left dangling. Remove it to avoid problems in
+            # subsequent tests.
+            apps._pending_operations.pop(('migrations', 'tribble'), None)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_empty"})
     def test_showmigrations_plan_no_migrations(self):
@@ -836,7 +844,7 @@ class MigrateTests(MigrationTestBase):
         # but that model is only defined in a migration, so the global app
         # registry never sees it and the reference is left dangling. Remove it
         # to avoid problems in subsequent tests.
-        del apps._pending_operations[('migrations', 'tribble')]
+        apps._pending_operations.pop(('migrations', 'tribble'), None)
 
     @override_settings(INSTALLED_APPS=['migrations.migrations_test_apps.unmigrated_app_syncdb'])
     def test_migrate_syncdb_deferred_sql_executed_with_schemaeditor(self):
