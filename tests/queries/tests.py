@@ -2810,7 +2810,7 @@ class ExcludeTests(TestCase):
         ) | JobResponsibilities.objects.exclude(
             job__responsibilities__description='foo',
         )
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             Job.objects.annotate(
                 responsibility=subquery.filter(
                     job=OuterRef('name'),
