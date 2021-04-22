@@ -46,7 +46,7 @@
           {% endif %}
         {% endfor %}
       {% endif %}
-      {{ action_list.paginator.count }} {% if action_list.paginator.count == 1 %}{% translate "entry" %}{% else %}{% translate "entries" %}{% endif %}
+      {{ action_list.paginator.count }} {% blocktranslate count counter=action_list.paginator.count %}entry{% plural %}entries{% endblocktranslate %}
     </p>
 {% else %}
     <p>{% translate 'This object doesn’t have a change history. It probably wasn’t added via this admin site.' %}</p>
