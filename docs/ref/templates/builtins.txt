@@ -1906,6 +1906,8 @@ The filter returns ``0`` for an undefined variable.
 ``length_is``
 -------------
 
+.. deprecated:: 4.2
+
 Returns ``True`` if the value's length is the argument, or ``False`` otherwise.
 
 For example::
