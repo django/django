@@ -22,6 +22,8 @@ details on these changes.
 * The ``AlterIndexTogether`` migration operation will be removed. A stub
   operation will remain for compatibility with historical migrations.
 
+* The ``length_is`` template filter will be removed.
+
 .. _deprecation-removed-in-5.0:
 
 5.0

@@ -317,3 +317,18 @@ Miscellaneous
   for using Python's :py:mod:`secrets` module to generate passwords.
 
 * The ``AlterIndexTogether`` migration operation is deprecated.
+
+* The ``length_is`` template filter is deprecated in favor of :tfilter:`length`
+  and the ``==`` operator within an :ttag:`{% if %}<if>` tag. For example
+
+  .. code-block:: html+django
+
+    {% if value|length == 4 %}…{% endif %}
+    {% if value|length == 4 %}True{% else %}False{% endif %}
+
+  instead of:
+
+  .. code-block:: html+django
+
+    {% if value|length_is:4 %}…{% endif %}
+    {{ value|length_is:4 }}

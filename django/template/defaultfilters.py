@@ -2,6 +2,7 @@
 import random as random_module
 import re
 import types
+import warnings
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
 from inspect import unwrap
@@ -11,6 +12,7 @@ from urllib.parse import quote
 
 from django.utils import formats
 from django.utils.dateformat import format, time_format
+from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.encoding import iri_to_uri
 from django.utils.html import avoid_wrapping, conditional_escape, escape, escapejs
 from django.utils.html import json_script as _json_script
@@ -611,6 +613,11 @@ def length(value):
 @register.filter(is_safe=False)
 def length_is(value, arg):
     """Return a boolean of whether the value's length is the argument."""
+    warnings.warn(
+        "The length_is template filter is deprecated in favor of the length template "
+        "filter and the == operator within an {% if %} tag.",
+        RemovedInDjango51Warning,
+    )
     try:
         return len(value) == int(arg)
     except (ValueError, TypeError):

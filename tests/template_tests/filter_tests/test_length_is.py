@@ -1,9 +1,11 @@
 from django.template.defaultfilters import length_is
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango51Warning
 
 from ..utils import setup
 
 
+@ignore_warnings(category=RemovedInDjango51Warning)
 class LengthIsTests(SimpleTestCase):
     @setup({"length_is01": '{% if some_list|length_is:"4" %}Four{% endif %}'})
     def test_length_is01(self):
@@ -103,6 +105,7 @@ class LengthIsTests(SimpleTestCase):
         self.assertEqual(output, "")
 
 
+@ignore_warnings(category=RemovedInDjango51Warning)
 class FunctionTests(SimpleTestCase):
     def test_empty_list(self):
         self.assertIs(length_is([], 0), True)
@@ -111,3 +114,17 @@ class FunctionTests(SimpleTestCase):
     def test_string(self):
         self.assertIs(length_is("a", 1), True)
         self.assertIs(length_is("a", 10), False)
+
+
+class DeprecationTests(SimpleTestCase):
+    @setup(
+        {"length_is_warning": "{{ string|length_is:3 }}"},
+        test_once=True,
+    )
+    def test_length_is_warning(self):
+        msg = (
+            "The length_is template filter is deprecated in favor of the length "
+            "template filter and the == operator within an {% if %} tag."
+        )
+        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
+            self.engine.render_to_string("length_is_warning", {"string": "good"})
