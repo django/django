@@ -87,6 +87,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         'Raises ORA-00600: internal error code.': {
             'model_fields.test_jsonfield.TestQuerying.test_usage_in_subquery',
         },
+        "Oracle doesn't allow filters to be compared to another expression in "
+        "the WHERE clause.": {
+            'lookup.tests.LookupTests.test_lookup_rhs',
+        },
     }
     django_test_expected_failures = {
         # A bug in Django/cx_Oracle with respect to string handling (#23843).

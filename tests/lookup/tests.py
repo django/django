@@ -5,13 +5,16 @@ from operator import attrgetter
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
-from django.db.models import Exists, Max, OuterRef
+from django.db.models import (
+    BooleanField, Exists, ExpressionWrapper, F, Max, OuterRef, Q,
+)
 from django.db.models.functions import Substr
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 
 from .models import (
-    Article, Author, Freebie, Game, IsNullWithNoneAsRHS, Player, Season, Tag,
+    Article, Author, Freebie, Game, IsNullWithNoneAsRHS, Player, Product,
+    Season, Stock, Tag,
 )
 
 
@@ -1000,3 +1003,20 @@ class LookupTests(TestCase):
             with self.subTest(qs=qs):
                 with self.assertRaisesMessage(ValueError, msg):
                     qs.exists()
+
+    def test_lookup_rhs(self):
+        product = Product.objects.create(name='GME', qty_target=5000)
+        stock_1 = Stock.objects.create(product=product, short=True, qty_available=180)
+        stock_2 = Stock.objects.create(product=product, short=False, qty_available=5100)
+        Stock.objects.create(product=product, short=False, qty_available=4000)
+        self.assertCountEqual(
+            Stock.objects.filter(short=Q(qty_available__lt=F('product__qty_target'))),
+            [stock_1, stock_2],
+        )
+        self.assertCountEqual(
+            Stock.objects.filter(short=ExpressionWrapper(
+                Q(qty_available__lt=F('product__qty_target')),
+                output_field=BooleanField(),
+            )),
+            [stock_1, stock_2],
+        )

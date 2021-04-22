@@ -94,6 +94,7 @@ class Product(models.Model):
 
 class Stock(models.Model):
     product = models.ForeignKey(Product, models.CASCADE)
+    short = models.BooleanField(default=False)
     qty_available = models.DecimalField(max_digits=6, decimal_places=2)
 
 
