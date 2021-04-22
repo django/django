@@ -2518,7 +2518,7 @@ class AutoFieldMeta(type):
 
     @property
     def _subclasses(self):
-        return (BigAutoField, SmallAutoField)
+        return (BigAutoField, SmallAutoField, UUIDAutoField)
 
     def __instancecheck__(self, instance):
         return isinstance(instance, self._subclasses) or super().__instancecheck__(instance)
@@ -2552,3 +2552,10 @@ class SmallAutoField(AutoFieldMixin, SmallIntegerField):
 
     def rel_db_type(self, connection):
         return SmallIntegerField().db_type(connection=connection)
+
+class UUIDAutoField(AutoFieldMixin, UUIDField):
+    def get_internal_type(self):
+        return 'UUIDAutoField'
+
+    def rel_db_type(self, connection):
+        return UUIDField().db_type(connection=connection)
