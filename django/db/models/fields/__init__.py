@@ -2553,6 +2553,7 @@ class SmallAutoField(AutoFieldMixin, SmallIntegerField):
     def rel_db_type(self, connection):
         return SmallIntegerField().db_type(connection=connection)
 
+
 class UUIDAutoField(AutoFieldMixin, UUIDField):
     def get_internal_type(self):
         return 'UUIDAutoField'
