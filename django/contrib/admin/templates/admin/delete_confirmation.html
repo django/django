@@ -22,18 +22,10 @@
 {% block content %}
 {% if perms_lacking %}
     <p>{% blocktranslate with escaped_object=object %}Deleting the {{ object_name }} '{{ escaped_object }}' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktranslate %}</p>
-    <ul>
-    {% for obj in perms_lacking %}
-        <li>{{ obj }}</li>
-    {% endfor %}
-    </ul>
+    <ul>{{ perms_lacking|unordered_list }}</ul>
 {% elif protected %}
     <p>{% blocktranslate with escaped_object=object %}Deleting the {{ object_name }} '{{ escaped_object }}' would require deleting the following protected related objects:{% endblocktranslate %}</p>
-    <ul>
-    {% for obj in protected %}
-        <li>{{ obj }}</li>
-    {% endfor %}
-    </ul>
+    <ul>{{ protected|unordered_list }}</ul>
 {% else %}
     <p>{% blocktranslate with escaped_object=object %}Are you sure you want to delete the {{ object_name }} "{{ escaped_object }}"? All of the following related items will be deleted:{% endblocktranslate %}</p>
     {% include "admin/includes/object_delete_summary.html" %}

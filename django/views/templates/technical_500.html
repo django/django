@@ -224,10 +224,12 @@
         </h3></li>
         {% endif %}{% endifchanged %}
         <li class="frame {{ frame.type }}">
-          {% if not frame.tb %}
-            {% if forloop.first %}None{% else %}Traceback: None{% endif %}
-          {% else %}
+          {% if frame.tb %}
             <code class="fname">{{ frame.filename }}</code>, line {{ frame.lineno }}, in {{ frame.function }}
+          {% elif forloop.first %}
+            None
+          {% else %}
+            Traceback: None
           {% endif %}
 
           {% if frame.context_line %}
@@ -325,7 +327,7 @@ The above exception ({{ frame.exc_cause|force_escape }}) was the direct cause of
 {% else %}
 During handling of the above exception ({{ frame.exc_cause|force_escape }}), another exception occurred:
 {% endif %}{% endif %}{% endifchanged %}  {% if frame.tb %}File "{{ frame.filename }}"{% if frame.context_line %}, line {{ frame.lineno }}{% endif %}, in {{ frame.function }}
-{% if frame.context_line %}    {% spaceless %}{{ frame.context_line }}{% endspaceless %}{% endif %}{% else %}{% if forloop.first %}None{% else %}Traceback: None{% endif %}{% endif %}{% endfor %}
+{% if frame.context_line %}    {% spaceless %}{{ frame.context_line }}{% endspaceless %}{% endif %}{% elif forloop.first %}None{% else %}Traceback: None{% endif %}{% endfor %}
 
 Exception Type: {{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}
 Exception Value: {{ exception_value|force_escape }}

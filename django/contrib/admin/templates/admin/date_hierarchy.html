@@ -7,7 +7,7 @@
 {% endblock %}
 {% block date-hierarchy-choices %}
 {% for choice in choices %}
-<li> {% if choice.link %}<a href="{{ choice.link }}">{% endif %}{{ choice.title }}{% if choice.link %}</a>{% endif %}</li>
+<li> {% if choice.link %}<a href="{{ choice.link }}">{{ choice.title }}</a>{% else %}{{ choice.title }}{% endif %}</li>
 {% endfor %}
 {% endblock %}
 {% endblock %}
