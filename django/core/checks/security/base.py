@@ -19,9 +19,9 @@ SECRET_KEY_MIN_UNIQUE_CHARACTERS = 5
 W001 = Warning(
     "You do not have 'django.middleware.security.SecurityMiddleware' "
     "in your MIDDLEWARE so the SECURE_HSTS_SECONDS, "
-    "SECURE_CONTENT_TYPE_NOSNIFF, SECURE_BROWSER_XSS_FILTER, "
-    "SECURE_REFERRER_POLICY, SECURE_CROSS_ORIGIN_OPENER_POLICY, "
-    "and SECURE_SSL_REDIRECT settings will have no effect.",
+    "SECURE_CONTENT_TYPE_NOSNIFF, SECURE_REFERRER_POLICY, "
+    "SECURE_CROSS_ORIGIN_OPENER_POLICY, and SECURE_SSL_REDIRECT settings will "
+    "have no effect.",
     id='security.W001',
 )
 

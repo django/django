@@ -416,8 +416,7 @@ The following checks are run if you use the :option:`check --deploy` option:
 * **security.W001**: You do not have
   :class:`django.middleware.security.SecurityMiddleware` in your
   :setting:`MIDDLEWARE` so the :setting:`SECURE_HSTS_SECONDS`,
-  :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, :setting:`SECURE_BROWSER_XSS_FILTER`,
-  :setting:`SECURE_REFERRER_POLICY`,
+  :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, :setting:`SECURE_REFERRER_POLICY`,
   :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY`, and
   :setting:`SECURE_SSL_REDIRECT` settings will have no effect.
 * **security.W002**: You do not have
@@ -446,7 +445,7 @@ The following checks are run if you use the :option:`check --deploy` option:
   set to ``True``, so your pages will not be served with an
   ``'X-Content-Type-Options: nosniff'`` header. You should consider enabling
   this header to prevent the browser from identifying content types incorrectly.
-* **security.W007**: Your :setting:`SECURE_BROWSER_XSS_FILTER` setting is not
+* **security.W007**: Your ``SECURE_BROWSER_XSS_FILTER`` setting is not
   set to ``True``, so your pages will not be served with an
   ``'X-XSS-Protection: 1; mode=block'`` header. You should consider enabling
   this header to activate the browser's XSS filtering and help prevent XSS

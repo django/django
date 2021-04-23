@@ -196,7 +196,6 @@ The ``django.middleware.security.SecurityMiddleware`` provides several security
 enhancements to the request/response cycle. Each one can be independently
 enabled or disabled with a setting.
 
-* :setting:`SECURE_BROWSER_XSS_FILTER`
 * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
 * :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY`
 * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
@@ -421,33 +420,6 @@ download files and you cannot set the header using your Web server, this
 setting will be useful.
 
 __ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
-
-.. _x-xss-protection:
-
-``X-XSS-Protection: 1; mode=block``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Some browsers have the ability to block content that appears to be an `XSS
-attack`_. They work by looking for JavaScript content in the GET or POST
-parameters of a page. If the JavaScript is replayed in the server's response,
-the page is blocked from rendering and an error page is shown instead.
-
-The `X-XSS-Protection header`__ is used to control the operation of the
-XSS filter.
-
-To enable the XSS filter in the browser, and force it to always block
-suspected XSS attacks, you can pass the ``X-XSS-Protection: 1; mode=block``
-header. ``SecurityMiddleware`` will do this for all responses if the
-:setting:`SECURE_BROWSER_XSS_FILTER` setting is ``True``.
-
-.. warning::
-    The browser XSS filter is a useful defense measure, but must not be
-    relied upon exclusively. It cannot detect all XSS attacks and not all
-    browsers support the header. Ensure you are still :ref:`validating and
-    sanitizing <cross-site-scripting>` all input to prevent XSS attacks.
-
-.. _XSS attack: https://en.wikipedia.org/wiki/Cross-site_scripting
-__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
 
 .. _ssl-redirect:
 

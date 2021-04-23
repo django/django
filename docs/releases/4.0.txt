@@ -357,6 +357,24 @@ subdomains by setting :setting:`CSRF_COOKIE_DOMAIN` (or
 :setting:`SESSION_COOKIE_DOMAIN` if :setting:`CSRF_USE_SESSIONS` is enabled) to
 a value starting with a dot.
 
+``SecurityMiddleware`` no longer sets the ``X-XSS-Protection`` header
+---------------------------------------------------------------------
+
+The :class:`~django.middleware.security.SecurityMiddleware` no longer sets the
+``X-XSS-Protection`` header if the ``SECURE_BROWSER_XSS_FILTER`` setting is
+``True``. The setting is removed.
+
+Most modern browsers don't honor the ``X-XSS-Protection`` HTTP header. You can
+use Content-Security-Policy_ without allowing ``'unsafe-inline'`` scripts
+instead.
+
+If you want to support legacy browsers and set the header, use this line in a
+custom middleware::
+
+    response.headers.setdefault('X-XSS-Protection', '1; mode=block')
+
+.. _Content-Security-Policy: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
+
 Miscellaneous
 -------------
 

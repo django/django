@@ -175,34 +175,6 @@ class SecurityMiddlewareTest(SimpleTestCase):
         """
         self.assertNotIn('X-Content-Type-Options', self.process_response().headers)
 
-    @override_settings(SECURE_BROWSER_XSS_FILTER=True)
-    def test_xss_filter_on(self):
-        """
-        With SECURE_BROWSER_XSS_FILTER set to True, the middleware adds
-        "s-xss-protection: 1; mode=block" header to the response.
-        """
-        self.assertEqual(
-            self.process_response().headers['X-XSS-Protection'],
-            '1; mode=block',
-        )
-
-    @override_settings(SECURE_BROWSER_XSS_FILTER=True)
-    def test_xss_filter_already_present(self):
-        """
-        The middleware will not override an "X-XSS-Protection" header
-        already present in the response.
-        """
-        response = self.process_response(secure=True, headers={"X-XSS-Protection": "foo"})
-        self.assertEqual(response.headers["X-XSS-Protection"], "foo")
-
-    @override_settings(SECURE_BROWSER_XSS_FILTER=False)
-    def test_xss_filter_off(self):
-        """
-        With SECURE_BROWSER_XSS_FILTER set to False, the middleware does not
-        add an "X-XSS-Protection" header to the response.
-        """
-        self.assertNotIn('X-XSS-Protection', self.process_response().headers)
-
     @override_settings(SECURE_SSL_REDIRECT=True)
     def test_ssl_redirect_on(self):
         """

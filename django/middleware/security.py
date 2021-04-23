@@ -12,7 +12,6 @@ class SecurityMiddleware(MiddlewareMixin):
         self.sts_include_subdomains = settings.SECURE_HSTS_INCLUDE_SUBDOMAINS
         self.sts_preload = settings.SECURE_HSTS_PRELOAD
         self.content_type_nosniff = settings.SECURE_CONTENT_TYPE_NOSNIFF
-        self.xss_filter = settings.SECURE_BROWSER_XSS_FILTER
         self.redirect = settings.SECURE_SSL_REDIRECT
         self.redirect_host = settings.SECURE_SSL_HOST
         self.redirect_exempt = [re.compile(r) for r in settings.SECURE_REDIRECT_EXEMPT]
@@ -41,9 +40,6 @@ class SecurityMiddleware(MiddlewareMixin):
 
         if self.content_type_nosniff:
             response.headers.setdefault('X-Content-Type-Options', 'nosniff')
-
-        if self.xss_filter:
-            response.headers.setdefault('X-XSS-Protection', '1; mode=block')
 
         if self.referrer_policy:
             # Support a comma-separated string or iterable of values to allow
