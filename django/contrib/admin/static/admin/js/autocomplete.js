@@ -2,16 +2,23 @@
 {
     const $ = django.jQuery;
     const init = function($element, options) {
-        const settings = $.extend({
+        let userData = function(params) {};
+        if (options.ajax && options.ajax.data) {
+            userData = options.ajax.data;
+            delete options.ajax.data;
+        }
+
+        const settings = $.extend(true, {
             ajax: {
                 data: function(params) {
-                    return {
+                    const defaultData = {
                         term: params.term,
                         page: params.page,
                         app_label: $element.data('app-label'),
                         model_name: $element.data('model-name'),
                         field_name: $element.data('field-name')
                     };
+                    return $.extend(defaultData, userData(params));
                 }
             }
         }, options);
