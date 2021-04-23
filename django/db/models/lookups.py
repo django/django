@@ -3,7 +3,7 @@ import math
 from copy import copy
 
 from django.core.exceptions import EmptyResultSet
-from django.db.models.expressions import Case, Exists, Func, Value, When
+from django.db.models.expressions import Case, Func, Value, When
 from django.db.models.fields import (
     CharField, DateTimeField, Field, IntegerField, UUIDField,
 )
@@ -124,12 +124,12 @@ class Lookup:
         raise NotImplementedError
 
     def as_oracle(self, compiler, connection):
-        # Oracle doesn't allow EXISTS() to be compared to another expression
-        # unless it's wrapped in a CASE WHEN.
+        # Oracle doesn't allow EXISTS() and filters to be compared to another
+        # expression unless they're wrapped in a CASE WHEN.
         wrapped = False
         exprs = []
         for expr in (self.lhs, self.rhs):
-            if isinstance(expr, Exists):
+            if connection.ops.conditional_expression_supported_in_where_clause(expr):
                 expr = Case(When(expr, then=True), default=False)
                 wrapped = True
             exprs.append(expr)
