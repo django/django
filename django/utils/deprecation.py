@@ -137,12 +137,12 @@ class MiddlewareMixin:
         if hasattr(self, 'process_request'):
             response = await sync_to_async(
                 self.process_request,
-                thread_sensitive=False,
+                thread_sensitive=True,
             )(request)
         response = response or await self.get_response(request)
         if hasattr(self, 'process_response'):
             response = await sync_to_async(
                 self.process_response,
-                thread_sensitive=False,
+                thread_sensitive=True,
             )(request, response)
         return response
