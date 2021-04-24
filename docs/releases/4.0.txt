@@ -325,6 +325,9 @@ Tests
 * The new :meth:`.DiscoverRunner.log` method allows customizing the way
   messages are logged.
 
+* Django test runner now supports a :option:`--shuffle <test --shuffle>` option
+  to execute tests in a random order.
+
 URLs
 ~~~~
 

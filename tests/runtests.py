@@ -353,7 +353,7 @@ class ActionSelenium(argparse.Action):
 def django_tests(verbosity, interactive, failfast, keepdb, reverse,
                  test_labels, debug_sql, parallel, tags, exclude_tags,
                  test_name_patterns, start_at, start_after, pdb, buffer,
-                 timing):
+                 timing, shuffle):
     if verbosity >= 1:
         msg = "Testing against Django installed in '%s'" % os.path.dirname(django.__file__)
         max_parallel = default_test_processes() if parallel == 0 else parallel
@@ -380,6 +380,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
         pdb=pdb,
         buffer=buffer,
         timing=timing,
+        shuffle=shuffle,
     )
     failures = test_runner.run_tests(test_labels)
     teardown_run_tests(state)
@@ -406,6 +407,11 @@ def get_subprocess_args(options):
         subprocess_args.append('--tag=%s' % options.tags)
     if options.exclude_tags:
         subprocess_args.append('--exclude_tag=%s' % options.exclude_tags)
+    if options.shuffle is not False:
+        if options.shuffle is None:
+            subprocess_args.append('--shuffle')
+        else:
+            subprocess_args.append('--shuffle=%s' % options.shuffle)
     return subprocess_args
 
 
@@ -522,6 +528,13 @@ if __name__ == "__main__":
     parser.add_argument(
         '--pair',
         help='Run the test suite in pairs with the named test to find problem pairs.',
+    )
+    parser.add_argument(
+        '--shuffle', nargs='?', default=False, type=int, metavar='SEED',
+        help=(
+            'Shuffle the order of test cases to help check that tests are '
+            'properly isolated.'
+        ),
     )
     parser.add_argument(
         '--reverse', action='store_true',
@@ -650,7 +663,7 @@ if __name__ == "__main__":
                 options.exclude_tags,
                 getattr(options, 'test_name_patterns', None),
                 options.start_at, options.start_after, options.pdb, options.buffer,
-                options.timing,
+                options.timing, options.shuffle,
             )
         time_keeper.print_results()
         if failures:

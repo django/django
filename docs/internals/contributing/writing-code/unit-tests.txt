@@ -470,12 +470,13 @@ the first one:
 
     $ ./runtests.py --pair basic.tests.ModelTest.test_eq queries transactions
 
-You can also try running any set of tests in reverse using the ``--reverse``
-option in order to verify that executing tests in a different order does not
-cause any trouble:
+You can also try running any set of tests in a random or reverse order using
+the ``--shuffle`` and ``--reverse`` options. This can help verify that
+executing tests in a different order does not cause any trouble:
 
 .. console::
 
+    $ ./runtests.py basic --shuffle
     $ ./runtests.py basic --reverse
 
 Seeing the SQL queries run during a test

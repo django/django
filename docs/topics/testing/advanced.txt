@@ -510,7 +510,7 @@ behavior. This class defines the ``run_tests()`` entry point, plus a
 selection of other methods that are used by ``run_tests()`` to set up, execute
 and tear down the test suite.
 
-.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, parallel=0, tags=None, exclude_tags=None, test_name_patterns=None, pdb=False, buffer=False, enable_faulthandler=True, timing=True, **kwargs)
+.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, parallel=0, tags=None, exclude_tags=None, test_name_patterns=None, pdb=False, buffer=False, enable_faulthandler=True, timing=True, shuffle=False, **kwargs)
 
     ``DiscoverRunner`` will search for tests in any file matching ``pattern``.
 
@@ -539,7 +539,8 @@ and tear down the test suite.
     If ``reverse`` is ``True``, test cases will be executed in the opposite
     order. This could be useful to debug tests that aren't properly isolated
     and have side effects. :ref:`Grouping by test class <order-of-tests>` is
-    preserved when using this option.
+    preserved when using this option. This option can be used in conjunction
+    with ``--shuffle`` to reverse the order for a particular random seed.
 
     ``debug_mode`` specifies what the :setting:`DEBUG` setting should be
     set to prior to running tests.
@@ -576,6 +577,14 @@ and tear down the test suite.
     If ``timing`` is ``True``, test timings, including database setup and total
     run time, will be shown.
 
+    If ``shuffle`` is an integer, test cases will be shuffled in a random order
+    prior to execution, using the integer as a random seed. If ``shuffle`` is
+    ``None``, the seed will be generated randomly. In both cases, the seed will
+    be logged to the console and set to ``self.shuffle_seed`` prior to running
+    tests. This option can be used to help detect tests that aren't properly
+    isolated. :ref:`Grouping by test class <order-of-tests>` is preserved when
+    using this option.
+
     Django may, from time to time, extend the capabilities of the test runner
     by adding new arguments. The ``**kwargs`` declaration allows for this
     expansion. If you subclass ``DiscoverRunner`` or write your own test
@@ -589,6 +598,10 @@ and tear down the test suite.
     .. versionadded:: 3.2
 
         The ``enable_faulthandler`` and ``timing`` arguments were added.
+
+    .. versionadded:: 4.0
+
+        The ``shuffle`` argument was added.
 
 Attributes
 ~~~~~~~~~~
