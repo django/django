@@ -1890,6 +1890,7 @@ class ModelAdmin(BaseModelAdmin):
         context = {
             **self.admin_site.each_context(request),
             'title': title,
+            'subtitle': None,
             'object_name': object_name,
             'object': obj,
             'deleted_objects': deleted_objects,
@@ -1930,6 +1931,7 @@ class ModelAdmin(BaseModelAdmin):
         context = {
             **self.admin_site.each_context(request),
             'title': _('Change history: %s') % obj,
+            'subtitle': None,
             'action_list': action_list,
             'module_name': str(capfirst(opts.verbose_name_plural)),
             'object': obj,

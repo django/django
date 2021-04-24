@@ -525,6 +525,7 @@ class AdminSite:
         context = {
             **self.each_context(request),
             'title': self.index_title,
+            'subtitle': None,
             'app_list': app_list,
             **(extra_context or {}),
         }
@@ -542,6 +543,7 @@ class AdminSite:
         context = {
             **self.each_context(request),
             'title': _('%(app)s administration') % {'app': app_dict['name']},
+            'subtitle': None,
             'app_list': [app_dict],
             'app_label': app_label,
             **(extra_context or {}),

@@ -56,3 +56,6 @@ Bugfixes
   with subqueries that began manifesting in Django 3.2, due to a separate fix
   using ``Exists`` to ``exclude()`` multi-valued relationships
   (:ticket:`32650`).
+
+* Fixed a bug in Django 3.2 where variable lookup errors were logged when
+  rendering some admin templates (:ticket:`32681`).
