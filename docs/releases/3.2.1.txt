@@ -68,3 +68,7 @@ Bugfixes
 
 * Fixed a regression in Django 3.2 where the calling process environment would
   not be passed to the ``dbshell`` command on PostgreSQL (:ticket:`32687`).
+
+* Fixed a performance regression in Django 3.2 when building complex filters
+  with subqueries (:ticket:`32632`). As a side-effect the private API to check
+  ``django.db.sql.query.Query`` equality is removed.

@@ -36,7 +36,6 @@ from django.db.models.sql.where import (
     AND, OR, ExtraWhere, NothingNode, WhereNode,
 )
 from django.utils.functional import cached_property
-from django.utils.hashable import make_hashable
 from django.utils.tree import Node
 
 __all__ = ['Query', 'RawQuery']
@@ -249,14 +248,6 @@ class Query(BaseExpression):
     def base_table(self):
         for alias in self.alias_map:
             return alias
-
-    @property
-    def identity(self):
-        identity = (
-            (arg, make_hashable(value))
-            for arg, value in self.__dict__.items()
-        )
-        return (self.__class__, *identity)
 
     def __str__(self):
         """
