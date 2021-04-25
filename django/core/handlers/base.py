@@ -228,14 +228,13 @@ class BaseHandler:
             wrapped_callback = self.make_view_atomic(callback)
             # If it is a synchronous view, run it in a subthread
             if not asyncio.iscoroutinefunction(wrapped_callback):
-                # Many legacy middleware applications require thread_sensitive=True
                 wrapped_callback = sync_to_async(wrapped_callback, thread_sensitive=True)
             try:
                 response = await wrapped_callback(request, *callback_args, **callback_kwargs)
             except Exception as e:
                 response = await sync_to_async(
                     self.process_exception_by_middleware,
-                    thread_sensitive=False,
+                    thread_sensitive=True,
                 )(e, request)
                 if response is None:
                     raise
@@ -261,11 +260,11 @@ class BaseHandler:
                 if asyncio.iscoroutinefunction(response.render):
                     response = await response.render()
                 else:
-                    response = await sync_to_async(response.render, thread_sensitive=False)()
+                    response = await sync_to_async(response.render, thread_sensitive=True)()
             except Exception as e:
                 response = await sync_to_async(
                     self.process_exception_by_middleware,
-                    thread_sensitive=False,
+                    thread_sensitive=True,
                 )(e, request)
                 if response is None:
                     raise
