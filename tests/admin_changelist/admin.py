@@ -33,6 +33,7 @@ site.register(Event, EventAdmin)
 class ParentAdmin(admin.ModelAdmin):
     list_filter = ['child__name']
     search_fields = ['child__name']
+    list_select_related = ['child']
 
 
 class ChildAdmin(admin.ModelAdmin):
