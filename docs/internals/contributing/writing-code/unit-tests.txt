@@ -153,7 +153,10 @@ The included settings module (``tests/test_sqlite.py``) allows you to run the
 test suite using SQLite. If you want to run the tests using a different
 database, you'll need to define your own settings file. Some tests, such as
 those for ``contrib.postgres``, are specific to a particular database backend
-and will be skipped if run with a different backend.
+and will be skipped if run with a different backend. Some tests are skipped or
+expected failures on a particular database backend (see
+``DatabaseFeatures.django_test_skips`` and
+``DatabaseFeatures.django_test_expected_failures`` on each backend).
 
 To run the tests with different settings, ensure that the module is on your
 :envvar:`PYTHONPATH` and pass the module with ``--settings``.
