@@ -122,7 +122,7 @@ class ChangeList:
 
     def get_filters(self, request):
         lookup_params = self.get_filters_params()
-        use_distinct = False
+        may_have_duplicates = False
         has_active_filters = False
 
         for key, value in lookup_params.items():
@@ -157,7 +157,7 @@ class ChangeList:
                 # processes. If that happened, check if distinct() is needed to
                 # remove duplicate results.
                 if lookup_params_count > len(lookup_params):
-                    use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, field_path)
+                    may_have_duplicates |= lookup_needs_distinct(self.lookup_opts, field_path)
             if spec and spec.has_output():
                 filter_specs.append(spec)
                 if lookup_params_count > len(lookup_params):
@@ -203,9 +203,9 @@ class ChangeList:
         try:
             for key, value in lookup_params.items():
                 lookup_params[key] = prepare_lookup_value(key, value)
-                use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, key)
+                may_have_duplicates |= lookup_needs_distinct(self.lookup_opts, key)
             return (
-                filter_specs, bool(filter_specs), lookup_params, use_distinct,
+                filter_specs, bool(filter_specs), lookup_params, may_have_duplicates,
                 has_active_filters,
             )
         except FieldDoesNotExist as e:
@@ -445,7 +445,7 @@ class ChangeList:
             self.filter_specs,
             self.has_filters,
             remaining_lookup_params,
-            filters_use_distinct,
+            filters_may_have_duplicates,
             self.has_active_filters,
         ) = self.get_filters(request)
         # Then, we let every list filter modify the queryset to its liking.
@@ -480,7 +480,9 @@ class ChangeList:
         qs = qs.order_by(*ordering)
 
         # Apply search results
-        qs, search_use_distinct = self.model_admin.get_search_results(request, qs, self.query)
+        qs, search_may_have_duplicates = self.model_admin.get_search_results(
+            request, qs, self.query,
+        )
 
         # Set query string for clearing all filters.
         self.clear_all_filters_qs = self.get_query_string(
@@ -488,7 +490,7 @@ class ChangeList:
             remove=self.get_filters_params(),
         )
         # Remove duplicates from results, if necessary
-        if filters_use_distinct | search_use_distinct:
+        if filters_may_have_duplicates | search_may_have_duplicates:
             return qs.distinct()
         else:
             return qs
