@@ -135,7 +135,7 @@ class BaseDatabaseSchemaEditor:
         # Log the command we're running, then run it
         logger.debug("%s; (params %r)", sql, params, extra={'params': params, 'sql': sql})
         if self.collect_sql:
-            ending = "" if sql.endswith(";") else ";"
+            ending = "" if sql.rstrip().endswith(";") else ";"
             if params is not None:
                 self.collected_sql.append((sql % tuple(map(self.quote_value, params))) + ending)
             else:

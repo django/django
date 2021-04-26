@@ -3007,6 +3007,7 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model('test_runsql')
         new_state = project_state.clone()
         tests = [
+            'INSERT INTO test_runsql_pony (pink, weight) VALUES (1, 1);\n',
             'INSERT INTO test_runsql_pony (pink, weight) VALUES (1, 1)\n',
         ]
         for sql in tests:
