@@ -65,3 +65,6 @@ Bugfixes
   admin changelist now uses ``Exists()`` instead ``QuerySet.distinct()``
   because calling ``delete()`` after ``distinct()`` is not allowed in Django
   3.2 to address a data loss possibility.
+
+* Fixed a regression in Django 3.2 where the calling process environment would
+  not be passed to the ``dbshell`` command on PostgreSQL (:ticket:`32687`).

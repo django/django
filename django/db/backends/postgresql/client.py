@@ -51,7 +51,7 @@ class DatabaseClient(BaseDatabaseClient):
             env['PGSSLKEY'] = str(sslkey)
         if passfile:
             env['PGPASSFILE'] = str(passfile)
-        return args, env
+        return args, (env or None)
 
     def runshell(self, parameters):
         sigint_handler = signal.getsignal(signal.SIGINT)
