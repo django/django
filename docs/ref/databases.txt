@@ -273,7 +273,7 @@ Another option is to wrap each ``QuerySet`` using server-side cursors in an
 for the duration of the transaction. This way, the server-side cursor will only
 live for the duration of the transaction.
 
-.. _PgBouncer: https://pgbouncer.github.io/
+.. _PgBouncer: https://www.pgbouncer.org/
 
 .. _manually-specified-autoincrement-pk:
 
@@ -387,7 +387,7 @@ MySQL has a couple drivers that implement the Python Database API described in
   library.
 
 .. _mysqlclient: https://pypi.org/project/mysqlclient/
-.. _MySQL Connector/Python: https://dev.mysql.com/downloads/connector/python
+.. _MySQL Connector/Python: https://dev.mysql.com/downloads/connector/python/
 
 These drivers are thread-safe and provide connection pooling.
 
@@ -828,7 +828,7 @@ a row is added, changed, or deleted within the loop, then that row may or may
 not appear, or may appear twice, in subsequent results fetched from the
 iterator. Your code must handle this.
 
-.. _`Isolation in SQLite`: https://sqlite.org/isolation.html
+.. _`Isolation in SQLite`: https://www.sqlite.org/isolation.html
 
 .. _sqlite-json1:
 

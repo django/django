@@ -21,7 +21,7 @@ to raster (image) data.
     Although the module is named ``gdal``, GeoDjango only supports some of the
     capabilities of OGR and GDAL's raster features at this time.
 
-__ https://www.gdal.org/
+__ https://gdal.org/
 __ https://gdal.org/user/vector_data_model.html
 
 Overview
@@ -1644,7 +1644,7 @@ Examples of using the different keys when creating rasters can be found in the
 documentation of the corresponding attributes and methods of the
 :class:`GDALRaster` and :class:`GDALBand` classes.
 
-__ https://geojson.org
+__ https://geojson.org/
 
 The ``ds_input`` dictionary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

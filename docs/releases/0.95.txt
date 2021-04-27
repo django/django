@@ -114,7 +114,7 @@ by Django users and developers from around the world. Friendly people are
 usually available at any hour of the day -- to help, or just to chat.
 
 .. _Django website: https://www.djangoproject.com/
-.. _django-users: https://groups.google.com/group/django-users
+.. _django-users: https://groups.google.com/g/django-users
 
 Thanks for using Django!
 

@@ -1324,8 +1324,9 @@ If ``value`` is ``"String with spaces"``, the output will be
 
 Formats a date according to the given format.
 
-Uses a similar format as PHP's ``date()`` function (https://php.net/date)
-with some differences.
+Uses a similar format to PHP's `date()
+<https://www.php.net/manual/en/function.date.php>`_ function with some
+differences.
 
 .. note::
     These format characters are not used in Django outside of templates. They
@@ -2106,8 +2107,8 @@ individual elements of the sequence.
 Returns a slice of the list.
 
 Uses the same syntax as Python's list slicing. See
-https://www.diveinto.org/python3/native-datatypes.html#slicinglists
-for an introduction.
+https://diveinto.org/python3/native-datatypes.html#slicinglists for an
+introduction.
 
 Example::
 

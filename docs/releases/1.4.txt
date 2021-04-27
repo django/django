@@ -115,7 +115,7 @@ comprehensively. See the
 :class:`documentation<django.test.LiveServerTestCase>` for more details and
 concrete examples.
 
-.. _Selenium: https://selenium.dev/
+.. _Selenium: https://www.selenium.dev/
 
 Updated default project layout and ``manage.py``
 ------------------------------------------------

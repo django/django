@@ -587,7 +587,7 @@ the timezone based on the system timezone, you can use `tzlocal
 
 This works similar to ``settings.TIME_ZONE = None`` except that it also sets
 ``os.environ['TZ']``. `Let us know
-<https://groups.google.com/d/topic/django-developers/OAV3FChfuPM/discussion>`__
+<https://groups.google.com/g/django-developers/c/OAV3FChfuPM/discussion>`__
 if there's a use case where you find you can't adapt your code to set a
 ``TIME_ZONE``.
 

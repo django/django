@@ -337,7 +337,7 @@ Now you're ready to actually put the release out there. To do this:
    that they install correctly, but it'll catch silly mistakes.
 
 #. Ask a few people on IRC to verify the checksums by visiting the checksums
-   file (e.g. https://www.djangoproject.com/m/pgp/Django-1.5b1.checksum.txt)
+   file (e.g. https://media.djangoproject.com/pgp/Django-1.5b1.checksum.txt)
    and following the instructions in it. For bonus points, they can also unpack
    the downloaded release tarball and verify that its contents appear to be
    correct (proper version numbers, no stray ``.pyc`` or other undesirable
@@ -451,8 +451,8 @@ need to be done by the releaser.
    <https://readthedocs.org/projects/django/>`_. Since the automatically
    generated version names ("stable-A.B.x") differ from the version names
    used in Read the Docs ("A.B.x"), `create a ticket
-   <https://github.com/rtfd/readthedocs.org/issues/5537>`_ requesting the new
-   version.
+   <https://github.com/readthedocs/readthedocs.org/issues/5537>`_ requesting
+   the new version.
 
 #. `Request the new classifier on PyPI
    <https://github.com/pypa/trove-classifiers/issues/29>`_. For example

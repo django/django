@@ -91,7 +91,7 @@ This accomplishes several things quite nicely:
               raise Http404("Article does not exist on this site")
           # ...
 
-.. _ljworld.com: http://www.ljworld.com/
+.. _ljworld.com: https://www2.ljworld.com/
 .. _lawrence.com: http://www.lawrence.com/
 
 Associating content with a single site

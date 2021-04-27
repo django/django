@@ -689,7 +689,7 @@ Coverage will help to identify dead code. See
 :doc:`Testing in Django </topics/testing/index>` has comprehensive
 information about testing.
 
-.. _Selenium: http://seleniumhq.org/
+.. _Selenium: https://www.selenium.dev/
 .. _continuous integration: https://en.wikipedia.org/wiki/Continuous_integration
 
 What's next?
