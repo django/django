@@ -935,7 +935,7 @@ Example::
     >>> u = Zipcode.objects.filter(poly__within=bbox).aggregate(Union(poly))  # A more sensible approach.
 
 .. rubric:: Footnotes
-.. [#fnde9im] *See* `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, at Ch. 2.1.13.2, p. 2-13 (The Dimensionally Extended Nine-Intersection Model).
+.. [#fnde9im] *See* `OpenGIS Simple Feature Specification For SQL <https://portal.ogc.org/files/?artifact_id=829>`_, at Ch. 2.1.13.2, p. 2-13 (The Dimensionally Extended Nine-Intersection Model).
 .. [#fnsdorelate] *See* `SDO_RELATE documentation <https://docs.oracle.com/en/
    database/oracle/oracle-database/18/spatl/spatial-operators-reference.html#
    GUID-97C17C18-F05E-49B4-BE11-E89B972E2A02>`_, from the Oracle Spatial and

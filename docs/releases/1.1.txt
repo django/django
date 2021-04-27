@@ -347,8 +347,8 @@ For full details, see :ref:`the documentation on defining URL namespaces
 GeoDjango
 ---------
 
-In Django 1.1, GeoDjango_ (i.e. ``django.contrib.gis``) has several new
-features:
+In Django 1.1, :doc:`GeoDjango </ref/contrib/gis/index>` (i.e.
+``django.contrib.gis``) has several new features:
 
 * Support for SpatiaLite_ -- a spatial database for SQLite -- as a spatial
   backend.
@@ -363,7 +363,6 @@ features:
 
 For more details, see the GeoDjango documentation.
 
-.. _geodjango: http://geodjango.org/
 .. _spatialite: https://www.gaia-gis.it/gaia-sins/
 
 Other improvements
