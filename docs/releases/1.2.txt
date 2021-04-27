@@ -370,8 +370,7 @@ The GDAL interface now allows the user to set a
 when iterating over a :class:`~django.contrib.gis.gdal.Layer`.
 
 Finally, :doc:`GeoDjango's documentation </ref/contrib/gis/index>` is now
-included with Django's and is no longer
-hosted separately at `geodjango.org <http://geodjango.org/>`_.
+included with Django's and is no longer hosted separately at ``geodjango.org``.
 
 .. _1.2-js-assisted-inlines:
 

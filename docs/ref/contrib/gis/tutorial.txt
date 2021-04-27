@@ -38,7 +38,7 @@ basic apps`_ project. [#]_
 
 .. _OGC: https://www.opengeospatial.org/
 .. _world borders: https://thematicmapping.org/downloads/world_borders.php
-.. _GeoDjango basic apps: https://code.google.com/p/geodjango-basic-apps/
+.. _GeoDjango basic apps: https://code.google.com/archive/p/geodjango-basic-apps
 
 Setting Up
 ==========
@@ -737,7 +737,7 @@ position.
 
 .. _OpenLayers: https://openlayers.org/
 .. _Open Street Map: https://www.openstreetmap.org/
-.. _Vector Map Level 0: https://earth-info.nga.mil/publications/vmap0.html
+.. _Vector Map Level 0: http://web.archive.org/web/20201024202709/https://earth-info.nga.mil/publications/vmap0.html
 .. _OSGeo: https://www.osgeo.org/
 
 .. _osmgeoadmin-intro:

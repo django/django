@@ -72,7 +72,7 @@ extended.
 See :doc:`the documentation on class-based generic views</topics/class-based-views/index>`
 for more details. There is also a document to help you `convert
 your function-based generic views to class-based
-views <https://docs.djangoproject.com/en/1.4/topics/generic-views-migration/>`_.
+views <https://raw.githubusercontent.com/django/django/ea9dc9f4b03ae034c1dc080730422dda7a9c2e47/docs/topics/generic-views-migration.txt>`_.
 
 Logging
 -------
