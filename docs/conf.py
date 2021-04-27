@@ -50,6 +50,28 @@ extensions = [
 autosectionlabel_prefix_document = True
 autosectionlabel_maxdepth = 2
 
+# Linkcheck settings.
+linkcheck_ignore = [
+    # Special-use addresses and domain names. (RFC 6761/6890)
+    r'^https?://(?:127\.0\.0\.1|\[::1\])(?::\d+)?/',
+    r'^https?://(?:[^/\.]+\.)*example\.(?:com|net|org)(?::\d+)?/',
+    r'^https?://(?:[^/\.]+\.)*(?:example|invalid|localhost|test)(?::\d+)?/',
+    # Pages that are inaccessible because they require authentication.
+    r'^https://github\.com/[^/]+/[^/]+/fork',
+    r'^https://code\.djangoproject\.com/github/login',
+    r'^https://code\.djangoproject\.com/newticket',
+    r'^https://(?:code|www)\.djangoproject\.com/admin/',
+    r'^https://www\.djangoproject\.com/community/add/blogs/',
+    r'^https://www\.google\.com/webmasters/tools/ping',
+    r'^https://search\.google\.com/search-console/welcome',
+    # Fragments used to dynamically switch content or populate fields.
+    r'^https://webchat\.freenode\.net/#',
+    r'^https://github\.com/[^#]+#L\d+-L\d+$',
+    r'^https://help\.apple\.com/itc/podcasts_connect/#/itc',
+    # Anchors on certain pages with missing a[name] attributes.
+    r'^https://tools\.ietf\.org/html/rfc1123\.html#section-',
+]
+
 # Spelling check needs an additional module that is not installed by default.
 # Add it only if spelling check is requested so docs can be generated without it.
 if 'spelling' in sys.argv:

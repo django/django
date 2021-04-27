@@ -103,9 +103,9 @@ any time leading up to the actual release:
 #. Check with the other committers to make sure they don't have any
    uncommitted changes for the release.
 
-#. Proofread the release notes, including looking at the online
-   version to catch any broken links or reST errors, and make sure the
-   release notes contain the correct date.
+#. Proofread the release notes, including looking at the online version to
+   :ref:`catch any broken links <documentation-link-check>` or reST errors, and
+   make sure the release notes contain the correct date.
 
 #. Double-check that the release notes mention deprecation timelines
    for any APIs noted as deprecated, and that they mention any changes

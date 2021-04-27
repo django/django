@@ -510,6 +510,28 @@ one of the following:
 * If, and only if, you are sure the word you are using is correct - add it
   to ``docs/spelling_wordlist`` (please keep the list in alphabetical order).
 
+.. _documentation-link-check:
+
+Link check
+==========
+
+Links in documentation can become broken or changed such that they are no
+longer the canonical link. Sphinx provides a builder that can check whether the
+links in the documentation are working. From the ``docs`` directory, run ``make
+linkcheck``. Output is printed to the terminal, but can also be found in
+``_build/linkcheck/output.txt`` and ``_build/linkcheck/output.json``.
+
+Entries that have a status of "working" are fine, those that are "unchecked" or
+"ignored" have been skipped because they either cannot be checked or have
+matched ignore rules in the configuration.
+
+Entries that have a status of "broken" need to be fixed. Those that have a
+status of "redirected" may need to be updated to point to the canonical
+location, e.g. the scheme has changed ``http://`` → ``https://``. In certain
+cases, we do not want to update a "redirected" link, e.g. a rewrite to always
+point to the latest or stable version of documentation, e.g. ``/en/stable/`` →
+``/en/3.2/``.
+
 Translating documentation
 =========================
 
