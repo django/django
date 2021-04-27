@@ -1790,7 +1790,7 @@ Example usage::
 
     django-admin migrate --pythonpath='/home/djangoprojects/myproject'
 
-.. _import search path: https://www.diveinto.org/python3/your-first-python-program.html#importsearchpath
+.. _import search path: https://diveinto.org/python3/your-first-python-program.html#importsearchpath
 
 .. django-admin-option:: --settings SETTINGS
 

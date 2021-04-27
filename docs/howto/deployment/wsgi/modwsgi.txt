@@ -27,7 +27,7 @@ Basic configuration
 Once you've got mod_wsgi installed and activated, edit your Apache server's
 `httpd.conf`_ file and add the following.
 
-.. _httpd.conf: https://wiki.apache.org/httpd/DistrosDefaultLayout
+.. _httpd.conf: https://cwiki.apache.org/confluence/display/httpd/DistrosDefaultLayout
 
 .. code-block:: apache
 

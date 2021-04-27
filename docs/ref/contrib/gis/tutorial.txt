@@ -36,7 +36,7 @@ basic apps`_ project. [#]_
     Proceed through the tutorial sections sequentially for step-by-step
     instructions.
 
-.. _OGC: https://www.opengeospatial.org/
+.. _OGC: https://www.ogc.org/
 .. _world borders: https://thematicmapping.org/downloads/world_borders.php
 .. _GeoDjango basic apps: https://code.google.com/archive/p/geodjango-basic-apps
 
@@ -769,4 +769,4 @@ in your ``admin.py`` file::
 .. [#] This point is the `University of Houston Law Center
        <https://www.law.uh.edu/>`_.
 .. [#] Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification
-       For SQL <https://www.opengeospatial.org/standards/sfs>`_.
+       For SQL <https://www.ogc.org/standards/sfs>`_.

@@ -19,7 +19,7 @@ maintained by `Refractions Research`__ of Victoria, Canada.
 
 __ https://trac.osgeo.org/geos/
 __ https://sourceforge.net/projects/jts-topo-suite/
-__ https://www.opengeospatial.org/standards/sfs
+__ https://www.ogc.org/standards/sfs
 __ http://www.refractions.net/
 
 Features

@@ -1056,7 +1056,7 @@ this into account.
 For more information, see the full :doc:`syndication framework
 documentation </ref/contrib/syndication>`.
 
-.. _RSS best practices: http://www.rssboard.org/rss-profile
+.. _RSS best practices: https://www.rssboard.org/rss-profile
 
 Technical message IDs
 ---------------------

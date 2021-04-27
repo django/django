@@ -934,7 +934,7 @@ relevant documentation pages have been updated or removed.
 
 The new package is available `on GitHub`_ and on PyPI.
 
-.. _on GitHub: https://github.com/django/django-formtools/
+.. _on GitHub: https://github.com/jazzband/django-formtools/
 
 Database connection reloading between tests
 -------------------------------------------

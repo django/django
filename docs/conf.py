@@ -18,7 +18,7 @@ from os.path import abspath, dirname, join
 #
 # Python's default allowed recursion depth is 1000 but this isn't enough for
 # building docs/ref/settings.txt sometimes.
-# https://groups.google.com/d/topic/sphinx-dev/MtRf64eGtv4/discussion
+# https://groups.google.com/g/sphinx-dev/c/MtRf64eGtv4/discussion
 sys.setrecursionlimit(2000)
 
 # Make sure we get the version of this copy of Django

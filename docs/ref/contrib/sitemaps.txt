@@ -273,7 +273,7 @@ Note:
         links pointing to other language versions using the `hreflang
         attribute`_. The default is ``False``.
 
-        .. _hreflang attribute: https://support.google.com/webmasters/answer/189077
+        .. _hreflang attribute: https://developers.google.com/search/docs/advanced/crawling/localized-versions
 
     .. attribute:: Sitemap.x_default
 
@@ -516,7 +516,7 @@ generate a Google News compatible sitemap:
     {% endspaceless %}
     </urlset>
 
-.. _`Google news sitemaps`: https://support.google.com/news/publisher/answer/74288?hl=en
+.. _`Google news sitemaps`: https://support.google.com/news/publisher-center/answer/9606710
 
 Pinging Google
 ==============
@@ -547,9 +547,9 @@ that: :func:`django.contrib.sitemaps.ping_google()`.
 .. admonition:: Register with Google first!
 
     The :func:`ping_google` command only works if you have registered your
-    site with `Google Webmaster Tools`_.
+    site with `Google Search Console`_.
 
-.. _`Google Webmaster Tools`: https://www.google.com/webmasters/tools/
+.. _`Google Search Console`: https://search.google.com/search-console/welcome
 
 One useful way to call :func:`ping_google` is from a model's ``save()``
 method::

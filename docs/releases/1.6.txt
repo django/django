@@ -1043,7 +1043,7 @@ occasions, such as:
 This makes the cache effectively work on a per-session basis regardless of the
 ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting.
 
-__ https://www.google.com/analytics/
+__ https://marketingplatform.google.com/about/analytics/
 
 ``SEND_BROKEN_LINK_EMAILS`` setting
 -----------------------------------

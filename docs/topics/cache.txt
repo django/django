@@ -35,9 +35,9 @@ specific views, you can cache only the pieces that are difficult to produce,
 or you can cache your entire site.
 
 Django also works well with "downstream" caches, such as `Squid
-<http://www.squid-cache.org>`_ and browser-based caches. These are the types of
-caches that you don't directly control but to which you can provide hints (via
-HTTP headers) about which parts of your site should be cached, and how.
+<http://www.squid-cache.org/>`_ and browser-based caches. These are the types
+of caches that you don't directly control but to which you can provide hints
+(via HTTP headers) about which parts of your site should be cached, and how.
 
 .. seealso::
     The :ref:`Cache Framework design philosophy <cache-design-philosophy>`
