@@ -122,6 +122,11 @@ class DebugViewTests(SimpleTestCase):
 
     def test_404(self):
         response = self.client.get('/raises404/')
+        self.assertNotContains(
+            response,
+            '<pre class="exception_value">',
+            status_code=404,
+        )
         self.assertContains(
             response,
             '<p>The current path, <code>not-in-urls</code>, didn’t match any '
@@ -133,6 +138,11 @@ class DebugViewTests(SimpleTestCase):
     def test_404_not_in_urls(self):
         response = self.client.get('/not-in-urls')
         self.assertNotContains(response, "Raised by:", status_code=404)
+        self.assertNotContains(
+            response,
+            '<pre class="exception_value">',
+            status_code=404,
+        )
         self.assertContains(response, "Django tried these URL patterns", status_code=404)
         self.assertContains(
             response,
