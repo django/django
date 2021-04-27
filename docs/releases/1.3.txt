@@ -439,14 +439,13 @@ prohibited words an empty list.
 
 If you want to restore the old behavior, simply put a
 ``PROFANITIES_LIST`` setting in your settings file that includes the
-words that you want to prohibit (see the `commit that implemented this
-change`_ if you want to see the list of words that was historically
-prohibited). However, if avoiding profanities is important to you, you
-would be well advised to seek out a better, less naive approach to the
-problem.
+words that you want to prohibit (see the :commit:`commit that implemented this
+change <edd767d2612d891a906268cf590571f541dd164f>` if you want to see the list
+of words that was historically prohibited). However, if avoiding profanities is
+important to you, you would be well advised to seek out a better, less naive
+approach to the problem.
 
 .. _Scunthorpe problem: https://en.wikipedia.org/wiki/Scunthorpe_problem
-.. _commit that implemented this change: https://code.djangoproject.com/changeset/13996
 
 Localflavor changes
 -------------------
@@ -763,7 +762,8 @@ Changes to the login methods of the admin
 In previous version the admin app defined login methods in multiple locations
 and ignored the almost identical implementation in the already used auth app.
 A side effect of this duplication was the missing adoption of the changes made
-in r12634_ to support a broader set of characters for usernames.
+in :commit:`r12634 <c8015052d935a99a5c8f96434b2d0cd16d8a4e14>` to support a
+broader set of characters for usernames.
 
 This release refactors the admin's login mechanism to use a subclass of the
 :class:`~django.contrib.auth.forms.AuthenticationForm` instead of a manual
@@ -771,8 +771,6 @@ form validation. The previously undocumented method
 ``'django.contrib.admin.sites.AdminSite.display_login_form'`` has been removed
 in favor of a new :attr:`~django.contrib.admin.AdminSite.login_form`
 attribute.
-
-.. _r12634: https://code.djangoproject.com/changeset/12634
 
 ``reset`` and ``sqlreset`` management commands
 ----------------------------------------------
