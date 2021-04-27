@@ -26,7 +26,7 @@
 <body>
   <div id="summary">
     <h1>Page not found <span>(404)</span></h1>
-    {% if reason %}<pre class="exception_value">{{ reason }}</pre>{% endif %}
+    {% if reason and resolved %}<pre class="exception_value">{{ reason }}</pre>{% endif %}
     <table class="meta">
       <tr>
         <th>Request Method:</th>
