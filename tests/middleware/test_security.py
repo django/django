@@ -321,3 +321,42 @@ class SecurityMiddlewareTest(SimpleTestCase):
         """
         response = self.process_response(headers={'Cross-Origin-Opener-Policy': 'same-origin'})
         self.assertEqual(response.headers['Cross-Origin-Opener-Policy'], 'same-origin')
+
+    @override_settings(SECURE_CROSS_ORIGIN_EMBEDDER_POLICY=None)
+    def test_coep_off(self):
+        """
+        With SECURE_CROSS_ORIGIN_EMBEDDER_POLICY set to None, the middleware does
+        not add a "Cross-Origin-Embedder-Policy" header to the response.
+        """
+        self.assertNotIn('Cross-Origin-Embedder-Policy', self.process_response())
+
+    def test_coep_default(self):
+        """SECURE_CROSS_ORIGIN_EMBEDDER_POLICY defaults to require-corp."""
+        self.assertEqual(
+            self.process_response().headers['Cross-Origin-Embedder-Policy'],
+            'require-corp',
+        )
+
+    def test_coep_on(self):
+        """
+        With SECURE_CROSS_ORIGIN_EMBEDDER_POLICY set to a valid value, the
+        middleware adds a "Cross-Origin-Embedder-Policy" header to the response.
+        """
+        tests = ['require-corp', 'unsafe-none']
+        for value in tests:
+            with self.subTest(value=value), override_settings(
+                SECURE_CROSS_ORIGIN_EMBEDDER_POLICY=value,
+            ):
+                self.assertEqual(
+                    self.process_response().headers['Cross-Origin-Embedder-Policy'],
+                    value,
+                )
+
+    @override_settings(SECURE_CROSS_ORIGIN_EMBEDDER_POLICY='unsafe-none')
+    def test_coep_already_present(self):
+        """
+        The middleware doesn't override a "Cross-Origin-Embedder-Policy" header
+        already present in the response.
+        """
+        response = self.process_response(headers={'Cross-Origin-Embedder-Policy': 'require-corp'})
+        self.assertEqual(response.headers['Cross-Origin-Embedder-Policy'], 'require-corp')

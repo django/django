@@ -226,6 +226,21 @@ document protected by COOP opens a cross-origin popup window, the popup’s
 attacks. See :ref:`the cross-origin opener policy section of the security
 middleware reference <cross-origin-opener-policy>` for details.
 
+Cross-origin embedder policy
+==========================
+
+COEP, when used with the cross-origin opener policy (COOP) header, is used to create a
+``cross-origin isolated state`` for your site. This state prevents
+the modification of document.domain and makes cross-origin requests less dangerous.
+It also allows developers to use otherwise dangerous features like SharedBufferArray,
+performance.measureMemory, and the JS Self-Profiling API.
+When set, COEP instructs the browser not to load cross-origin resources
+into the document unless they give explicit permission using CORS or CORP.
+Because of this, COEP can only be effectively used if developers also have the
+ability to set the CORP or CORS header. COEP can only be set to one value, ``require-corp``.
+See :ref:`the cross-origin embedder policy section of the security
+middleware reference <cross-origin-embedder-policy>` for details.
+
 Session security
 ================
 

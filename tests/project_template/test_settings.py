@@ -39,6 +39,7 @@ class TestStartProjectSettings(SimpleTestCase):
                 b'Content-Length: 0',
                 b'Content-Type: text/html; charset=utf-8',
                 b'Cross-Origin-Opener-Policy: same-origin',
+                b'Cross-Origin-Embedder-Policy: require-corp',
                 b'Referrer-Policy: same-origin',
                 b'X-Content-Type-Options: nosniff',
                 b'X-Frame-Options: DENY',

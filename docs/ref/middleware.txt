@@ -199,6 +199,7 @@ enabled or disabled with a setting.
 * :setting:`SECURE_BROWSER_XSS_FILTER`
 * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
 * :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY`
+* :setting:`SECURE_CROSS_ORIGIN_EMBEDDER_POLICY`
 * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
 * :setting:`SECURE_HSTS_PRELOAD`
 * :setting:`SECURE_HSTS_SECONDS`
@@ -391,6 +392,37 @@ valid values for this setting are:
     Allows the document to be added to its opener's browsing context group
     unless the opener itself has a COOP of ``same-origin`` or
     ``same-origin-allow-popups``.
+
+.. _cross-origin-embedder-policy:
+
+Cross-Origin Embedder Policy
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`Cross-Origin Embedder Policy`__ (COEP), when used with
+the`cross-origin opener`__ (COOP) policy header,
+is used to create a “cross-origin isolated state” for your site.
+This state prevents the modification of document.domain and makes cross-origin
+requests less dangerous. It also allows developers to use otherwise dangerous
+features like SharedBufferArray, performance.measureMemory,
+and the JS Self-Profiling API.
+
+__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Embedder-Policy
+
+``SecurityMiddleware`` can set the ``Cross-Origin-Embedder-Policy`` header for
+you, based on the :setting:`SECURE_CROSS_ORIGIN_EMBEDDER_POLICY` setting. The
+valid values for this setting are:
+
+``require-corp``
+    A document can only load resources from the same origin,
+    or resources explicitly marked as loadable from another origin.
+    If a cross origin resource supports CORS, the crossorigin attribute or
+    the Cross-Origin-Resource-Policy header must be used to load it
+    without being blocked by COEP.
+
+``unsafe-none``
+    This is the default value. Allows the document to fetch cross-origin
+    resources without giving explicit permission through
+    the CORS protocol or the Cross-Origin-Resource-Policy header.
 
 .. _x-content-type-options:
 
