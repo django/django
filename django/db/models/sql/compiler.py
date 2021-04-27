@@ -1452,6 +1452,24 @@ class SQLDeleteCompiler(SQLCompiler):
         self.query.get_initial_alias()
         return sum(self.query.alias_refcount[t] > 0 for t in self.query.alias_map) == 1
 
+    @classmethod
+    def _expr_refs_base_model(cls, expr, base_model):
+        if isinstance(expr, Query):
+            return expr.model == base_model
+        if not hasattr(expr, 'get_source_expressions'):
+            return False
+        return any(
+            cls._expr_refs_base_model(source_expr, base_model)
+            for source_expr in expr.get_source_expressions()
+        )
+
+    @cached_property
+    def contains_self_reference_subquery(self):
+        return any(
+            self._expr_refs_base_model(expr, self.query.model)
+            for expr in chain(self.query.annotations.values(), self.query.where.children)
+        )
+
     def _as_sql(self, query):
         result = [
             'DELETE FROM %s' % self.quote_name_unless_alias(query.base_table)
@@ -1466,7 +1484,7 @@ class SQLDeleteCompiler(SQLCompiler):
         Create the SQL for this query. Return the SQL string and list of
         parameters.
         """
-        if self.single_alias:
+        if self.single_alias and not self.contains_self_reference_subquery:
             return self._as_sql(self.query)
         innerq = self.query.clone()
         innerq.__class__ = Query

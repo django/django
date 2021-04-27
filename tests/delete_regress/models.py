@@ -24,6 +24,7 @@ class Person(models.Model):
 
 class Book(models.Model):
     pagecount = models.IntegerField()
+    owner = models.ForeignKey('Child', models.CASCADE, null=True)
 
 
 class Toy(models.Model):
