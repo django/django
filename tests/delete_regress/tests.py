@@ -1,6 +1,7 @@
 import datetime
 
 from django.db import connection, models, transaction
+from django.db.models import Exists, OuterRef
 from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, skipUnlessDBFeature,
 )
@@ -354,6 +355,19 @@ class DeleteTests(TestCase):
         self.assertEqual(researcher1.secondary_contact, contact2)
         self.assertEqual(researcher2.primary_contact, contact2)
         self.assertIsNone(researcher2.secondary_contact)
+
+    def test_self_reference_with_through_m2m_at_second_level(self):
+        toy = Toy.objects.create(name='Paints')
+        child = Child.objects.create(name='Juan')
+        Book.objects.create(pagecount=500, owner=child)
+        PlayedWith.objects.create(child=child, toy=toy, date=datetime.date.today())
+        Book.objects.filter(Exists(
+            Book.objects.filter(
+                pk=OuterRef('pk'),
+                owner__toys=toy.pk,
+            ),
+        )).delete()
+        self.assertIs(Book.objects.exists(), False)
 
 
 class DeleteDistinct(SimpleTestCase):
