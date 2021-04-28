@@ -387,6 +387,18 @@ custom middleware::
 
 .. _Content-Security-Policy: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
 
+Migrations autodetector changes
+-------------------------------
+
+The migrations autodetector now uses model states instead of model classes.
+Also, migration operations for ``ForeignKey`` and ``ManyToManyField`` fields no
+longer specify attributes which were not passed to the fields during
+initialization.
+
+As a side-effect, running ``makemigrations`` might generate no-op
+``AlterField`` operations for ``ManyToManyField`` and ``ForeignKey`` fields in
+some cases.
+
 Miscellaneous
 -------------
 
@@ -421,10 +433,6 @@ Miscellaneous
 
 * Tests that fail to load, for example due to syntax errors, now always match
   when using :option:`test --tag`.
-
-* The migrations autodetector now uses model states instead of model classes.
-  As a side-effect ``makemigrations`` might generate no-op ``AlterField``
-  operations for ``ForeignKey`` fields in some cases.
 
 * The undocumented ``django.contrib.admin.utils.lookup_needs_distinct()``
   function is renamed to ``lookup_spawns_duplicates()``.
