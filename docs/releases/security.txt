@@ -999,8 +999,8 @@ September 9, 2011 - :cve:`2011-4139`
 Versions affected
 ~~~~~~~~~~~~~~~~~
 
-* Django 1.2 :commit:`(patch) <c613af4d64>`
-* Django 1.3 :commit:`(patch) <2f7fadc38e>`
+* Django 1.2 :commit:`(patch) <c613af4d6485586c79d692b70a9acac429f3ca9d>`
+* Django 1.3 :commit:`(patch) <2f7fadc38efa58ac0a8f93f936b82332a199f396>`
 
 September 9, 2011 - :cve:`2011-4138`
 ------------------------------------
@@ -1012,8 +1012,8 @@ Information leakage/arbitrary request issuance via ``URLField.verify_exists``.
 Versions affected
 ~~~~~~~~~~~~~~~~~
 
-* Django 1.2: :commit:`(patch) <7268f8af86>`
-* Django 1.3: :commit:`(patch) <1a76dbefdf>`
+* Django 1.2: :commit:`(patch) <7268f8af86186518821d775c530d5558fd726930>`
+* Django 1.3: :commit:`(patch) <1a76dbefdfc60e2d5954c0ba614c3d054ba9c3f0>`
 
 September 9, 2011 - :cve:`2011-4137`
 ------------------------------------
@@ -1024,8 +1024,8 @@ Denial-of-service via ``URLField.verify_exists``. `Full description
 Versions affected
 ~~~~~~~~~~~~~~~~~
 
-* Django 1.2 :commit:`(patch) <7268f8af86>`
-* Django 1.3 :commit:`(patch) <1a76dbefdf>`
+* Django 1.2 :commit:`(patch) <7268f8af86186518821d775c530d5558fd726930>`
+* Django 1.3 :commit:`(patch) <1a76dbefdfc60e2d5954c0ba614c3d054ba9c3f0>`
 
 September 9, 2011 - :cve:`2011-4136`
 ------------------------------------
@@ -1036,8 +1036,8 @@ Session manipulation when using memory-cache-backed session. `Full description
 Versions affected
 ~~~~~~~~~~~~~~~~~
 
-* Django 1.2 :commit:`(patch) <ac7c3a110f>`
-* Django 1.3 :commit:`(patch) <fbe2eead2f>`
+* Django 1.2 :commit:`(patch) <ac7c3a110f906e4dfed3a17451bf7fd9fcb81296>`
+* Django 1.3 :commit:`(patch) <fbe2eead2fa9d808658ca582241bcacb02618840>`
 
 February 8, 2011 - :cve:`2011-0698`
 -----------------------------------
@@ -1048,8 +1048,8 @@ description <https://www.djangoproject.com/weblog/2011/feb/08/security/>`__
 Versions affected
 ~~~~~~~~~~~~~~~~~
 
-* Django 1.1 :commit:`(patch) <570a32a047>`
-* Django 1.2 :commit:`(patch) <194566480b>`
+* Django 1.1 :commit:`(patch) <570a32a047ea56265646217264b0d3dab1a14dbd>`
+* Django 1.2 :commit:`(patch) <194566480b15cf4e294d3f03ff587019b74044b2>`
 
 February 8, 2011 - :cve:`2011-0697`
 -----------------------------------
@@ -1060,8 +1060,8 @@ XSS via unsanitized names of uploaded files. `Full description
 Versions affected
 ~~~~~~~~~~~~~~~~~
 
-* Django 1.1 :commit:`(patch) <1966786d2d>`
-* Django 1.2 :commit:`(patch) <1f814a9547>`
+* Django 1.1 :commit:`(patch) <1966786d2dde73e17f39cf340eb33fcb5d73904e>`
+* Django 1.2 :commit:`(patch) <1f814a9547842dcfabdae09573055984af9d3fab>`
 
 February 8, 2011 - :cve:`2011-0696`
 -----------------------------------
@@ -1072,8 +1072,8 @@ CSRF via forged HTTP headers. `Full description
 Versions affected
 ~~~~~~~~~~~~~~~~~
 
-* Django 1.1 :commit:`(patch) <408c5c873c>`
-* Django 1.2 :commit:`(patch) <818e70344e>`
+* Django 1.1 :commit:`(patch) <408c5c873ce1437c7eee9544ff279ecbad7e150a>`
+* Django 1.2 :commit:`(patch) <818e70344e7193f6ebc73c82ed574e6ce3c91afc>`
 
 December 22, 2010 - :cve:`2010-4535`
 ------------------------------------
@@ -1084,8 +1084,8 @@ Denial-of-service in password-reset mechanism. `Full description
 Versions affected
 ~~~~~~~~~~~~~~~~~
 
-* Django 1.1 :commit:`(patch) <7f8dd9cbac>`
-* Django 1.2 :commit:`(patch) <d5d8942a16>`
+* Django 1.1 :commit:`(patch) <7f8dd9cbac074389af8d8fd235bf2cb657227b9a>`
+* Django 1.2 :commit:`(patch) <d5d8942a160685c403d381a279e72e09de5489a9>`
 
 December 22, 2010 - :cve:`2010-4534`
 ------------------------------------
@@ -1096,8 +1096,8 @@ Information leakage in administrative interface. `Full description
 Versions affected
 ~~~~~~~~~~~~~~~~~
 
-* Django 1.1 :commit:`(patch) <17084839fd>`
-* Django 1.2 :commit:`(patch) <85207a245b>`
+* Django 1.1 :commit:`(patch) <17084839fd7e267da5729f2a27753322b9d415a0>`
+* Django 1.2 :commit:`(patch) <85207a245bf09fdebe486b4c7bbcb65300f2a693>`
 
 September 8, 2010 - :cve:`2010-3082`
 ------------------------------------
@@ -1108,7 +1108,7 @@ XSS via trusting unsafe cookie value. `Full description
 Versions affected
 ~~~~~~~~~~~~~~~~~
 
-* Django 1.2 :commit:`(patch) <7f84657b6b>`
+* Django 1.2 :commit:`(patch) <7f84657b6b2243cc787bdb9f296710c8d13ad0bd>`
 
 October 9, 2009 - :cve:`2009-3965`
 ----------------------------------
@@ -1119,8 +1119,8 @@ description <https://www.djangoproject.com/weblog/2009/oct/09/security/>`__
 Versions affected
 ~~~~~~~~~~~~~~~~~
 
-* Django 1.0 :commit:`(patch) <594a28a904>`
-* Django 1.1 :commit:`(patch) <e3e992e18b>`
+* Django 1.0 :commit:`(patch) <594a28a9044120bed58671dde8a805c9e0f6c79a>`
+* Django 1.1 :commit:`(patch) <e3e992e18b368fcd56aabafc1b5bf80a6e11b495>`
 
 July 28, 2009 - :cve:`2009-2659`
 --------------------------------
@@ -1131,8 +1131,8 @@ Directory-traversal in development server media handler. `Full description
 Versions affected
 ~~~~~~~~~~~~~~~~~
 
-* Django 0.96 :commit:`(patch) <da85d76fd6>`
-* Django 1.0 :commit:`(patch) <df7f917b7f>`
+* Django 0.96 :commit:`(patch) <da85d76fd6ca846f3b0ff414e042ddb5e62e2e69>`
+* Django 1.0 :commit:`(patch) <df7f917b7f51ba969faa49d000ffc79572c5dcb4>`
 
 September 2, 2008 - :cve:`2008-3909`
 ------------------------------------
@@ -1157,8 +1157,8 @@ Versions affected
 ~~~~~~~~~~~~~~~~~
 
 * Django 0.91 :commit:`(patch) <6e657e2c404a96e744748209e896d8a69c15fdf2>`
-* Django 0.95 :commit:`(patch) <50ce7fb57d>`
-* Django 0.96 :commit:`(patch) <7791e5c050>`
+* Django 0.95 :commit:`(patch) <50ce7fb57d79e8940ccf6e2781f2f01df029b5c5>`
+* Django 0.96 :commit:`(patch) <7791e5c050cebf86d868c5dab7092185b125fdc9>`
 
 October 26, 2007 - :cve:`2007-5712`
 -----------------------------------
@@ -1189,7 +1189,7 @@ Apparent "caching" of authenticated user. `Full description
 Versions affected
 ~~~~~~~~~~~~~~~~~
 
-* Django 0.95 :commit:`(patch) <e89f0a6558>`
+* Django 0.95 :commit:`(patch) <e89f0a65581f82a5740bfe989136cea75d09cd67>`
 
 August 16, 2006 - :cve:`2007-0404`
 ----------------------------------
@@ -1202,4 +1202,5 @@ Versions affected
 
 * Django 0.90 :commit:`(patch) <6eefa521be3c658dc0b38f8d62d52e9801e198ab>`
 * Django 0.91 :commit:`(patch) <d31e39173c29537e6a1613278c93634c18a3206e>`
-* Django 0.95 :commit:`(patch) <a132d411c6>` (released January 21 2007)
+* Django 0.95 :commit:`(patch) <a132d411c6986418ee6c0edc331080aa792fee6e>`
+  (released January 21 2007)
