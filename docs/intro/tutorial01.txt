@@ -224,25 +224,28 @@ and type this command:
 
     $ python manage.py startapp polls
 
-That'll create a directory :file:`polls`, which is laid out like this::
+That'll create a directory :file:`polls`, which is laid out like this within your ``mysite`` project::
 
-    polls/
-        __init__.py
-        admin.py
-        apps.py
-        migrations/
+    mysite/
+        manage.py
+        mysite/
+            ...
+        polls
             __init__.py
-        models.py
-        tests.py
-        views.py
+            admin.py
+            apps.py
+            migrations/
+                __init__.py
+            models.py
+            tests.py
+            views.py
 
-This directory structure will house the poll application.
+The ``polls`` directory structure will house the poll application.
 
 Write your first view
 =====================
 
-Let's write the first view. Open the file ``polls/views.py``
-and put the following Python code in it:
+Let's write the first view. Open the file ``polls/views.py``. You’ll notice that Django has included some default code for you. You can delete this and replace it with the following Python code:
 
 .. code-block:: python
     :caption: polls/views.py
@@ -283,8 +286,19 @@ In the ``polls/urls.py`` file include the following code:
         path('', views.index, name='index'),
     ]
 
-The next step is to point the root URLconf at the ``polls.urls`` module. In
-``mysite/urls.py``, add an import for ``django.urls.include`` and insert an
+The next step is to point the root URLconf at the ``polls.urls`` module.
+
+.. admonition:: What is the root URLconf?
+
+	The root URLconf is where Django starts looking for a url match. When you ran ``django-admin startproject mysite`` earlier, Django added this to :file:`mysite/settings.py`:
+
+	.. console::
+
+		ROOT_URLCONF = 'mysite.urls'
+
+	This is how Django knows where the root URLconf is. It is the file ``urls.py`` within ``mysite``.
+
+In ``mysite/urls.py``, add an import for ``django.urls.include`` and insert an
 :func:`~django.urls.include` in the ``urlpatterns`` list, so you have:
 
 .. code-block:: python
