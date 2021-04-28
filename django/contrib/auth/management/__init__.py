@@ -80,9 +80,9 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
         for ct, (codename, name) in searched_perms
         if (ct.pk, codename) not in all_perms
     ]
-    Permission.objects.using(using).bulk_create(perms)
-    if verbosity >= 2:
-        for perm in perms:
+    for perm in perms:
+        perm.save(using=using)
+        if verbosity >= 2:
             print("Adding permission '%s'" % perm)
 
 
