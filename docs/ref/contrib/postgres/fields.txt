@@ -711,8 +711,7 @@ The returned ranges share a bound with the passed range.
 Querying using the bounds
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are three transforms available for use in queries. You can extract the
-lower or upper bound, or query based on emptiness.
+Range fields support several extra lookups.
 
 .. fieldlookup:: rangefield.startswith
 
