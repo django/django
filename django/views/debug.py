@@ -274,6 +274,17 @@ class ExceptionReporter:
         self.template_does_not_exist = False
         self.postmortem = None
 
+    def _get_raw_insecure_uri(self):
+        """
+        Return an absolute URI from variables available in this request. Skip
+        allowed hosts protection, so may return insecure URI.
+        """
+        return '{scheme}://{host}{path}'.format(
+            scheme=self.request.scheme,
+            host=self.request._get_raw_host(),
+            path=self.request.get_full_path(),
+        )
+
     def get_traceback_data(self):
         """Return a dictionary containing traceback information."""
         if self.exc_type and issubclass(self.exc_type, TemplateDoesNotExist):
@@ -337,6 +348,8 @@ class ExceptionReporter:
             c['request_GET_items'] = self.request.GET.items()
             c['request_FILES_items'] = self.request.FILES.items()
             c['request_COOKIES_items'] = self.request.COOKIES.items()
+            c['request_insecure_uri'] = self._get_raw_insecure_uri()
+
         # Check whether exception info is available
         if self.exc_type:
             c['exception_type'] = self.exc_type.__name__

@@ -108,7 +108,7 @@
     </tr>
     <tr>
       <th>Request URL:</th>
-      <td>{{ request.get_raw_uri }}</td>
+      <td>{{ request_insecure_uri }}</td>
     </tr>
 {% endif %}
     <tr>
@@ -289,7 +289,7 @@ Environment:
 
 {% if request %}
 Request Method: {{ request.META.REQUEST_METHOD }}
-Request URL: {{ request.get_raw_uri }}
+Request URL: {{ request_insecure_uri }}
 {% endif %}
 Django Version: {{ django_version_info }}
 Python Version: {{ sys_version_info }}

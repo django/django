@@ -399,6 +399,9 @@ Miscellaneous
 * The undocumented ``django.contrib.admin.utils.lookup_needs_distinct()``
   function is renamed to ``lookup_spawns_duplicates()``.
 
+* The undocumented ``HttpRequest.get_raw_uri()`` method is removed. The
+  :meth:`.HttpRequest.build_absolute_uri` method may be a suitable alternative.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0

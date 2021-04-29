@@ -180,17 +180,6 @@ class HttpRequest:
                 raise
         return value
 
-    def get_raw_uri(self):
-        """
-        Return an absolute URI from variables available in this request. Skip
-        allowed hosts protection, so may return insecure URI.
-        """
-        return '{scheme}://{host}{path}'.format(
-            scheme=self.scheme,
-            host=self._get_raw_host(),
-            path=self.get_full_path(),
-        )
-
     def build_absolute_uri(self, location=None):
         """
         Build an absolute URI from the location and the variables available in

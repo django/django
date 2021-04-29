@@ -942,6 +942,20 @@ class ExceptionReporterTests(SimpleTestCase):
             reporter.get_traceback_text()
             m.assert_called_once_with(encoding='utf-8')
 
+    @override_settings(ALLOWED_HOSTS=['example.com'])
+    def test_get_raw_insecure_uri(self):
+        factory = RequestFactory(HTTP_HOST='evil.com')
+        tests = [
+            ('////absolute-uri', 'http://evil.com//absolute-uri'),
+            ('/?foo=bar', 'http://evil.com/?foo=bar'),
+            ('/path/with:colons', 'http://evil.com/path/with:colons'),
+        ]
+        for url, expected in tests:
+            with self.subTest(url=url):
+                request = factory.get(url)
+                reporter = ExceptionReporter(request, None, None, None)
+                self.assertEqual(reporter._get_raw_insecure_uri(), expected)
+
 
 class PlainTextReportTests(SimpleTestCase):
     rf = RequestFactory()
