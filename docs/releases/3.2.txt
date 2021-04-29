@@ -95,6 +95,11 @@ or on a per-model basis::
 In anticipation of the changing default, a system check will provide a warning
 if you do not have an explicit setting for :setting:`DEFAULT_AUTO_FIELD`.
 
+When changing the value of :setting:`DEFAULT_AUTO_FIELD`, migrations for the
+primary key of existing auto-created through tables cannot be generated
+currently. See the :setting:`DEFAULT_AUTO_FIELD` docs for details on migrating
+such tables.
+
 .. _new_functional_indexes:
 
 Functional indexes

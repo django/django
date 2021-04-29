@@ -1260,6 +1260,31 @@ Default: ``'``:class:`django.db.models.AutoField`\ ``'``
 Default primary key field type to use for models that don't have a field with
 :attr:`primary_key=True <django.db.models.Field.primary_key>`.
 
+.. admonition:: Migrating auto-created through tables
+
+    The value of ``DEFAULT_AUTO_FIELD`` will be respected when creating new
+    auto-created through tables for many-to-many relationships.
+
+    Unfortunately, the primary keys of existing auto-created through tables
+    cannot currently be updated by the migrations framework.
+
+    This means that if you switch the value of ``DEFAULT_AUTO_FIELD`` and then
+    generate migrations, the primary keys of the related models will be
+    updated, as will the foreign keys from the through table, but the primary
+    key of the auto-created through table will not be migrated.
+
+    In order to address this, you should add a
+    :class:`~django.db.migrations.operations.RunSQL` operation to your
+    migrations to perform the required ``ALTER TABLE`` step. You can check the
+    existing table name through ``sqlmigrate``, ``dbshell``, or with the
+    field’s ``remote_field.through._meta.db_table`` property.
+
+    Explicitly defined through models are already handled by the migrations
+    system.
+
+    Allowing automatic migrations for the primary key of existing auto-created
+    through tables :ticket:`may be implemented at a later date <32674>`.
+
 .. setting:: DEFAULT_CHARSET
 
 ``DEFAULT_CHARSET``
