@@ -995,7 +995,7 @@ class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
         with self.wait_page_loaded():
             self.selenium.find_element_by_name('_save').click()
 
-        # Make sure that "now" in javascript is within 10 seconds
+        # Make sure that "now" in JavaScript is within 10 seconds
         # from "now" on the server side.
         member = Member.objects.get(name='test')
         self.assertGreater(member.birthdate, now - error_margin)

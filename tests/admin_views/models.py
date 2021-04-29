@@ -759,7 +759,7 @@ class PrePopulatedPostLargeSlug(models.Model):
     """
     Regression test for #15938: a large max_length for the slugfield must not
     be localized in prepopulated_fields_js.html or it might end up breaking
-    the javascript (ie, using THOUSAND_SEPARATOR ends up with maxLength=1,000)
+    the JavaScript (ie, using THOUSAND_SEPARATOR ends up with maxLength=1,000)
     """
     title = models.CharField(max_length=100)
     published = models.BooleanField(default=False)

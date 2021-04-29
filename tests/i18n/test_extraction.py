@@ -444,7 +444,7 @@ class BasicExtractorTests(ExtractorTests):
             self.assertIn('mañana; charset=CHARSET', pot_contents)
 
 
-class JavascriptExtractorTests(ExtractorTests):
+class JavaScriptExtractorTests(ExtractorTests):
 
     PO_FILE = 'locale/%s/LC_MESSAGES/djangojs.po' % LOCALE
 

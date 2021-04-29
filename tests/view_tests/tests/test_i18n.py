@@ -324,7 +324,7 @@ class I18NViewTests(SimpleTestCase):
 
     def test_i18n_language_non_english_default(self):
         """
-        Check if the Javascript i18n view returns an empty language catalog
+        Check if the JavaScript i18n view returns an empty language catalog
         if the default language is non-English, the selected language
         is English and there is not 'en' translation available. See #13388,
         #3594 and #13726 for more details.
@@ -337,7 +337,7 @@ class I18NViewTests(SimpleTestCase):
     def test_non_english_default_english_userpref(self):
         """
         Same as above with the difference that there IS an 'en' translation
-        available. The Javascript i18n view must return a NON empty language catalog
+        available. The JavaScript i18n view must return a NON empty language catalog
         with the proper English translations. See #13726 for more details.
         """
         with self.settings(LANGUAGE_CODE='fr'), override('en-us'):

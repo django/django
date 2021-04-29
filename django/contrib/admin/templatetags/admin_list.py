@@ -234,7 +234,7 @@ def items_for_result(cl, result, form):
                 link_or_text = result_repr
             else:
                 url = add_preserved_filters({'preserved_filters': cl.preserved_filters, 'opts': cl.opts}, url)
-                # Convert the pk to something that can be used in Javascript.
+                # Convert the pk to something that can be used in JavaScript.
                 # Problem cases are non-ASCII strings.
                 if cl.to_field:
                     attr = str(cl.to_field)
