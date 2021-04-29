@@ -396,6 +396,9 @@ Miscellaneous
   As a side-effect ``makemigrations`` might generate no-op ``AlterField``
   operations for ``ForeignKey`` fields in some cases.
 
+* The undocumented ``django.contrib.admin.utils.lookup_needs_distinct()``
+  function is renamed to ``lookup_spawns_duplicates()``.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0
