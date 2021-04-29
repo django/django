@@ -1099,7 +1099,7 @@ Without passing ``safe=False``, a :exc:`TypeError` will be raised.
     it was possible to poison the JavaScript ``Array`` constructor. For this
     reason, Django does not allow passing non-dict objects to the
     :class:`~django.http.JsonResponse` constructor by default.  However, most
-    modern browsers implement EcmaScript 5 which removes this attack vector.
+    modern browsers implement ECMAScript 5 which removes this attack vector.
     Therefore it is possible to disable this security precaution.
 
 Changing the default JSON encoder

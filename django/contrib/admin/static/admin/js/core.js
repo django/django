@@ -1,4 +1,4 @@
-// Core javascript helper functions
+// Core JavaScript helper functions
 'use strict';
 
 // quickElement(tagType, parentReference [, textInChildNode, attribute, attributeValue ...]);

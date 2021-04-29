@@ -10,7 +10,7 @@ register = template.Library()
 
 def prepopulated_fields_js(context):
     """
-    Create a list of prepopulated_fields that should render Javascript for
+    Create a list of prepopulated_fields that should render JavaScript for
     the prepopulated fields for both the admin form and inlines.
     """
     prepopulated_fields = []
