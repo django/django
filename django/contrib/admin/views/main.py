@@ -11,7 +11,8 @@ from django.contrib.admin.options import (
     IS_POPUP_VAR, TO_FIELD_VAR, IncorrectLookupParameters,
 )
 from django.contrib.admin.utils import (
-    get_fields_from_path, lookup_needs_distinct, prepare_lookup_value, quote,
+    get_fields_from_path, lookup_spawns_duplicates, prepare_lookup_value,
+    quote,
 )
 from django.core.exceptions import (
     FieldDoesNotExist, ImproperlyConfigured, SuspiciousOperation,
@@ -154,10 +155,12 @@ class ChangeList:
                     self.model, self.model_admin, field_path=field_path,
                 )
                 # field_list_filter_class removes any lookup_params it
-                # processes. If that happened, check if distinct() is needed to
-                # remove duplicate results.
+                # processes. If that happened, check if duplicates should be
+                # removed.
                 if lookup_params_count > len(lookup_params):
-                    may_have_duplicates |= lookup_needs_distinct(self.lookup_opts, field_path)
+                    may_have_duplicates |= lookup_spawns_duplicates(
+                        self.lookup_opts, field_path,
+                    )
             if spec and spec.has_output():
                 filter_specs.append(spec)
                 if lookup_params_count > len(lookup_params):
@@ -198,12 +201,12 @@ class ChangeList:
         # have been removed from lookup_params, which now only contains other
         # parameters passed via the query string. We now loop through the
         # remaining parameters both to ensure that all the parameters are valid
-        # fields and to determine if at least one of them needs distinct(). If
+        # fields and to determine if at least one of them spawns duplicates. If
         # the lookup parameters aren't real fields, then bail out.
         try:
             for key, value in lookup_params.items():
                 lookup_params[key] = prepare_lookup_value(key, value)
-                may_have_duplicates |= lookup_needs_distinct(self.lookup_opts, key)
+                may_have_duplicates |= lookup_spawns_duplicates(self.lookup_opts, key)
             return (
                 filter_specs, bool(filter_specs), lookup_params, may_have_duplicates,
                 has_active_filters,

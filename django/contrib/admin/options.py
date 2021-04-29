@@ -17,7 +17,7 @@ from django.contrib.admin.exceptions import DisallowedModelAdminToField
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     NestedObjects, construct_change_message, flatten_fieldsets,
-    get_deleted_objects, lookup_needs_distinct, model_format_dict,
+    get_deleted_objects, lookup_spawns_duplicates, model_format_dict,
     model_ngettext, quote, unquote,
 )
 from django.contrib.admin.widgets import (
@@ -1031,7 +1031,7 @@ class ModelAdmin(BaseModelAdmin):
                               for orm_lookup in orm_lookups]
                 queryset = queryset.filter(reduce(operator.or_, or_queries))
             may_have_duplicates |= any(
-                lookup_needs_distinct(self.opts, search_spec)
+                lookup_spawns_duplicates(self.opts, search_spec)
                 for search_spec in orm_lookups
             )
         return queryset, may_have_duplicates
