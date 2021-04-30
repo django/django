@@ -87,6 +87,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         'Raises ORA-00600: internal error code.': {
             'model_fields.test_jsonfield.TestQuerying.test_usage_in_subquery',
         },
+        "Comparing to TruncTime() doesn't work on Oracle (#32722).": {
+            'db_functions.datetime.test_extract_trunc.DateFunctionWithTimeZoneTests.test_trunc_time_no_microseconds',
+            'db_functions.datetime.test_extract_trunc.DateFunctionTests.test_trunc_time_no_microseconds',
+        },
     }
     django_test_expected_failures = {
         # A bug in Django/cx_Oracle with respect to string handling (#23843).
