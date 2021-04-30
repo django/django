@@ -4,7 +4,9 @@ from django.db import DatabaseError, connection
 from django.db.models import BooleanField
 from django.test import TransactionTestCase
 
-from ..models import Square
+from ..models import (
+    Square, VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ,
+)
 
 
 @unittest.skipUnless(connection.vendor == 'oracle', 'Oracle tests')
@@ -15,6 +17,13 @@ class Tests(unittest.TestCase):
         name = '"SOME%NAME"'
         quoted_name = connection.ops.quote_name(name)
         self.assertEqual(quoted_name % (), name)
+
+    def test_quote_name_db_table(self):
+        model = VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
+        db_table = model._meta.db_table.upper()
+        self.assertEqual(f'"{db_table}"', connection.ops.quote_name(
+            'backends_verylongmodelnamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+        ))
 
     def test_dbms_session(self):
         """A stored procedure can be called through a cursor wrapper."""
