@@ -6,6 +6,9 @@ from .. import Error, Tags, Warning, register
 CROSS_ORIGIN_OPENER_POLICY_VALUES = {
     'same-origin', 'same-origin-allow-popups', 'unsafe-none',
 }
+CROSS_ORIGIN_EMBEDDER_POLICY_VALUES = {
+    'require-corp', 'unsafe-none',
+}
 REFERRER_POLICY_VALUES = {
     'no-referrer', 'no-referrer-when-downgrade', 'origin',
     'origin-when-cross-origin', 'same-origin', 'strict-origin',
@@ -21,7 +24,7 @@ W001 = Warning(
     "in your MIDDLEWARE so the SECURE_HSTS_SECONDS, "
     "SECURE_CONTENT_TYPE_NOSNIFF, SECURE_BROWSER_XSS_FILTER, "
     "SECURE_REFERRER_POLICY, SECURE_CROSS_ORIGIN_OPENER_POLICY, "
-    "and SECURE_SSL_REDIRECT settings will have no effect.",
+    "SECURE_CROSS_ORIGIN_EMBEDDER_POLICY, and SECURE_SSL_REDIRECT settings will have no effect.",
     id='security.W001',
 )
 
@@ -131,6 +134,14 @@ E024 = Error(
     id='security.E024',
 )
 
+E025 = Error(
+    'You have set the SECURE_CROSS_ORIGIN_EMBEDDER_POLICY setting to an invalid '
+    'value.',
+    hint='Valid values are: {}.'.format(
+        ', '.join(sorted(CROSS_ORIGIN_EMBEDDER_POLICY_VALUES)),
+    ),
+    id='security.E025',
+)
 
 def _security_middleware():
     return 'django.middleware.security.SecurityMiddleware' in settings.MIDDLEWARE
@@ -254,4 +265,15 @@ def check_cross_origin_opener_policy(app_configs, **kwargs):
         settings.SECURE_CROSS_ORIGIN_OPENER_POLICY not in CROSS_ORIGIN_OPENER_POLICY_VALUES
     ):
         return [E024]
+    return []
+
+
+@register(Tags.security, deploy=True)
+def check_cross_origin_embedder_policy(app_configs, **kwargs):
+    if (
+        _security_middleware() and
+        settings.SECURE_CROSS_ORIGIN_EMBEDDER_POLICY is not None and
+        settings.SECURE_CROSS_ORIGIN_EMBEDDER_POLICY not in CROSS_ORIGIN_EMBEDDER_POLICY_VALUES
+    ):
+        return [E025]
     return []
