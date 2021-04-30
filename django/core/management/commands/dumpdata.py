@@ -234,7 +234,7 @@ class Command(BaseCommand):
                     use_natural_foreign_keys=use_natural_foreign_keys,
                     use_natural_primary_keys=use_natural_primary_keys,
                     stream=stream or self.stdout, progress_output=progress_output,
-                    object_count=object_count,
+                    object_count=object_count, ensure_ascii=True,
                 )
             finally:
                 if stream:
