@@ -1330,3 +1330,36 @@ class LookaheadTests(SimpleTestCase):
             with self.subTest(name=name, kwargs=kwargs):
                 with self.assertRaises(NoReverseMatch):
                     reverse(name, kwargs=kwargs)
+
+
+@override_settings(ROOT_URLCONF='urlpatterns_reverse.overlapping_urls')
+class BacktrackingURLResolverTests(SimpleTestCase):
+    def test_overlapping_urls_reverse(self):
+        url = reverse('overlapping_view1', kwargs={'title':'some-title'})
+        self.assertEqual(url, '/overlapping/some-title/')
+
+        url = reverse('overlapping_view2', kwargs={'author':'some-author'})
+        self.assertEqual(url, '/overlapping/some-author/')
+
+    def test_overlapping_urls_resolve(self):
+        response = self.client.get('/overlapping/some-title/')
+        self.assertContains(response, 'Author is: some-title')
+
+    def test_overlapping_urls_not_resolve(self):
+        response = self.client.get('/not_overlapping/some-keyword/')
+        self.assertEqual(response.status_code, 404)
+
+    def test_nested_overlapping_urls_reverse(self):
+        url = reverse('nested_overlapping_view1', kwargs={'title':'some-title'})
+        self.assertEqual(url, '/nested/overlapping/some-title/')
+
+        url = reverse('nested_overlapping_view2', kwargs={'author':'some-author'})
+        self.assertEqual(url, '/nested/overlapping/some-author/')
+
+    def test_nested_overlapping_urls_resolve(self):
+        response = self.client.get('/nested/overlapping/some-title/')
+        self.assertContains(response, 'Author is: some-title')
+
+    def test_nested_overlapping_urls_not_resolve(self):
+        response = self.client.get('/nested/not_overlapping/some-keyword/')
+        self.assertEqual(response.status_code, 404)

@@ -2,7 +2,7 @@ from functools import partial, update_wrapper
 
 from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, DoesNotResolve
 from django.views.generic import RedirectView
 
 
@@ -24,6 +24,22 @@ def nested_view(request):
 
 def erroneous_view(request):
     import non_existent  # NOQA
+
+
+def overlapping_view1(request, title):
+    raise DoesNotResolve
+
+
+def overlapping_view2(request, author):
+    return HttpResponse(f'Author is: {author}')
+
+
+def overlapping_view3(request, keyword):
+    return HttpResponse(f'Keyword is: {keyword}')
+
+
+def not_overlapping_view(request, keyword):
+    raise DoesNotResolve
 
 
 def pass_resolver_match_view(request, *args, **kwargs):
