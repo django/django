@@ -361,7 +361,12 @@ class URLPattern:
         else:
             return []
 
-    def resolve(self, path):
+    def resolve(self, path, resolved=None, caller=None):
+        if resolved is not None:
+            if caller not in resolved:
+                resolved[caller] = set()
+            resolved[caller].add(self)
+
         match = self.pattern.match(path)
         if match:
             new_path, args, kwargs = match
@@ -556,15 +561,24 @@ class URLResolver:
             self._populate()
         return name in self._callback_strs
 
-    def resolve(self, path):
+    def resolve(self, path, tried=None, resolved=None, caller=None):
         path = str(path)  # path may be a reverse_lazy object
-        tried = []
+        if tried is None:
+            tried = []
+        if resolved is None:
+            resolved = {}
+        if caller not in resolved:
+            resolved[caller] = set()
         match = self.pattern.match(path)
         if match:
+            if self not in resolved:
+                resolved[self] = set()
             new_path, args, kwargs = match
             for pattern in self.url_patterns:
+                if pattern in resolved[self]:
+                    continue
                 try:
-                    sub_match = pattern.resolve(new_path)
+                    sub_match = pattern.resolve(new_path, resolved=resolved, caller=self)
                 except Resolver404 as e:
                     self._extend_tried(tried, pattern, e.args[0].get('tried'))
                 else:
@@ -591,7 +605,11 @@ class URLResolver:
                             tried,
                         )
                     tried.append([pattern])
+                resolved[self].add(pattern)
+            resolved[caller].add(self)
+            del resolved[self]
             raise Resolver404({'tried': tried, 'path': new_path})
+        resolved[caller].add(self)
         raise Resolver404({'path': path})
 
     @cached_property
