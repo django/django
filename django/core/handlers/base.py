@@ -183,6 +183,8 @@ class BaseHandler:
                     wrapped_callback = async_to_sync(wrapped_callback)
                 try:
                     response = wrapped_callback(request, *callback_args, **callback_kwargs)
+                    # Complain if the view returned None (a common error).
+                    self.check_response(response, callback)
                 except DoesNotResolve:
                     # Continue resolve URLs if the view raises DoesNotResolve
                     # to indicate the URL pattern doesn't match
@@ -194,8 +196,6 @@ class BaseHandler:
                     else:
                         break
 
-        # Complain if the view returned None (a common error).
-        self.check_response(response, callback)
 
         # If the response supports deferred rendering, apply template
         # response middleware and then render the response
@@ -244,6 +244,8 @@ class BaseHandler:
                     wrapped_callback = sync_to_async(wrapped_callback, thread_sensitive=True)
                 try:
                     response = await wrapped_callback(request, *callback_args, **callback_kwargs)
+                    # Complain if the view returned None or an uncalled coroutine.
+                    self.check_response(response, callback)
                 except DoesNotResolve:
                     # Continue resolve URLs if the view raises DoesNotResolve
                     # to indicate the URL pattern doesn't match
@@ -258,8 +260,6 @@ class BaseHandler:
                     else:
                         break
 
-        # Complain if the view returned None or an uncalled coroutine.
-        self.check_response(response, callback)
 
         # If the response supports deferred rendering, apply template
         # response middleware and then render the response
