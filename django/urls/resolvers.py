@@ -25,7 +25,7 @@ from django.utils.regex_helper import _lazy_re_compile, normalize
 from django.utils.translation import get_language
 
 from .converters import get_converter
-from .exceptions import NoReverseMatch, Resolver404
+from .exceptions import NoReverseMatch, Resolver404, ResolutionAborted
 from .utils import get_callable
 
 
@@ -386,7 +386,7 @@ class URLPattern:
 
 
 class URLResolver:
-    def __init__(self, pattern, urlconf_name, default_kwargs=None, app_name=None, namespace=None):
+    def __init__(self, pattern, urlconf_name, default_kwargs=None, app_name=None, namespace=None, is_terminal=False, terminal_callback=None):
         self.pattern = pattern
         # urlconf_name is the dotted Python path to the module defining
         # urlpatterns. It may also be an object with an urlpatterns attribute
@@ -396,6 +396,8 @@ class URLResolver:
         self.default_kwargs = default_kwargs or {}
         self.namespace = namespace
         self.app_name = app_name
+        self.is_terminal = is_terminal
+        self.terminal_callback = terminal_callback
         self._reverse_dict = {}
         self._namespace_dict = {}
         self._app_dict = {}
@@ -565,6 +567,17 @@ class URLResolver:
             for pattern in self.url_patterns:
                 try:
                     sub_match = pattern.resolve(new_path)
+                except ResolutionAborted as e:
+                    self._extend_tried(tried, pattern, e.args[0].get('tried'))
+                    to_call = self.terminal_callback
+                    if e.args[0].get('callback') is not None:
+                        to_call = e.args[0].get('callback')
+
+                    raise ResolutionAborted({
+                        'tried': tried,
+                        'path': new_path,
+                        'callback': to_call
+                    })
                 except Resolver404 as e:
                     self._extend_tried(tried, pattern, e.args[0].get('tried'))
                 else:
@@ -591,6 +604,14 @@ class URLResolver:
                             tried,
                         )
                     tried.append([pattern])
+
+                    if self.is_terminal and pattern == self.url_patterns[-1]:
+                        raise ResolutionAborted({
+                            'tried': tried,
+                            'path': new_path,
+                            'callback': self.terminal_callback
+                        })
+
             raise Resolver404({'tried': tried, 'path': new_path})
         raise Resolver404({'path': path})
 
