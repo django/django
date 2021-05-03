@@ -18,7 +18,7 @@ from django.test import (
 )
 from django.test.utils import override_script_prefix
 from django.urls import (
-    NoReverseMatch, Resolver404, ResolverMatch, URLPattern, URLResolver,
+    NoReverseMatch, Resolver404, ResolverMatch, ResolutionAborted, URLPattern, URLResolver,
     get_callable, get_resolver, get_urlconf, include, path, re_path, resolve,
     reverse, reverse_lazy,
 )
@@ -1233,7 +1233,7 @@ class IncludeTests(SimpleTestCase):
     app_urls = URLObject('inc-app')
 
     def test_include_urls(self):
-        self.assertEqual(include(self.url_patterns), (self.url_patterns, None, None))
+        self.assertEqual(include(self.url_patterns), (self.url_patterns, None, None, False, None))
 
     def test_include_namespace(self):
         msg = (
@@ -1261,25 +1261,25 @@ class IncludeTests(SimpleTestCase):
     def test_include_2_tuple(self):
         self.assertEqual(
             include((self.url_patterns, 'app_name')),
-            (self.url_patterns, 'app_name', 'app_name')
+            (self.url_patterns, 'app_name', 'app_name', False, None)
         )
 
     def test_include_2_tuple_namespace(self):
         self.assertEqual(
             include((self.url_patterns, 'app_name'), namespace='namespace'),
-            (self.url_patterns, 'app_name', 'namespace')
+            (self.url_patterns, 'app_name', 'namespace', False, None)
         )
 
     def test_include_app_name(self):
         self.assertEqual(
             include(self.app_urls),
-            (self.app_urls, 'inc-app', 'inc-app')
+            (self.app_urls, 'inc-app', 'inc-app', False, None)
         )
 
     def test_include_app_name_namespace(self):
         self.assertEqual(
             include(self.app_urls, 'namespace'),
-            (self.app_urls, 'inc-app', 'namespace')
+            (self.app_urls, 'inc-app', 'namespace', False, None)
         )
 
 
@@ -1330,3 +1330,52 @@ class LookaheadTests(SimpleTestCase):
             with self.subTest(name=name, kwargs=kwargs):
                 with self.assertRaises(NoReverseMatch):
                     reverse(name, kwargs=kwargs)
+
+
+@override_settings(ROOT_URLCONF="urlpatterns_reverse.terminal_urls")
+class IncludeTerminalTests(SimpleTestCase):
+    def test_url_resolution_breaks_if_terminal_and_no_match(self):
+        url_types_names = [
+            [{'type': URLPattern, 'name': None}],
+            [{'type': URLResolver}, {'type': URLPattern, 'name': 'terminal'}],
+            [{'type': URLResolver}, {'type': URLPattern, 'name': 'terminal-1'}],
+            [{'type': URLResolver}, {'type': URLResolver}, {'type': URLPattern, 'name': 'terminal-21'}],
+            [{'type': URLResolver}, {'type': URLResolver}, {'type': URLPattern, 'name': 'terminal-22'}],
+        ]
+
+        with self.assertRaisesMessage(ResolutionAborted, 'tried') as cm:
+            resolve('/terminal/terminal2/terminal23')
+        e = cm.exception
+        # make sure the correct callback is returned
+        self.assertEqual(e.args[0]['callback'], 'terminal')
+        # make sure only URLS below prefix are tested
+        self.assertEqual(
+            len(e.args[0]['tried']),
+            len(url_types_names),
+            'Wrong number of tried URLs returned.  Expected %s, got %s.' % (
+                len(url_types_names), len(e.args[0]['tried'])
+            )
+        )
+        for tried, expected in zip(e.args[0]['tried'], url_types_names):
+            for t, e in zip(tried, expected):
+                with self.subTest(t):
+                    self.assertIsInstance(t, e['type']), '%s is not an instance of %s' % (t, e['type'])
+                    if 'name' in e:
+                        if not e['name']:
+                            self.assertIsNone(t.name, 'Expected no URL name but found %s.' % t.name)
+                        else:
+                            self.assertEqual(
+                                t.name,
+                                e['name'],
+                                'Wrong URL name.  Expected "%s", got "%s".' % (e['name'], t.name)
+                            )
+
+
+    def test_get_incorrect_url_with_terminal_falls_to_callback_if_provided(self):
+        response = self.client.get('/terminal/non-existent-url')
+        self.assertEqual(response.status_code, 404)
+        
+        response = self.client.get('/terminal/terminal2/terminal23')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Fallback")

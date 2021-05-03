@@ -14,6 +14,10 @@ def absolute_kwargs_view(request, arg1=1, arg2=2):
     return HttpResponse()
 
 
+def terminal_view(request, *args, **kwargs):
+    return HttpResponse("Fallback")
+
+
 def defaults_view(request, arg1, arg2):
     pass
 
