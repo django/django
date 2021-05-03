@@ -9,7 +9,7 @@ from .resolvers import (
 )
 
 
-def include(arg, namespace=None):
+def include(arg, namespace=None, terminal_prefix=False, terminal_callback=None):
     app_name = None
     if isinstance(arg, tuple):
         # Callable returning a namespace hint.
@@ -51,20 +51,27 @@ def include(arg, namespace=None):
                 raise ImproperlyConfigured(
                     'Using i18n_patterns in an included URLconf is not allowed.'
                 )
-    return (urlconf_module, app_name, namespace)
+    return (urlconf_module, app_name, namespace, terminal_prefix, terminal_callback)
 
 
 def _path(route, view, kwargs=None, name=None, Pattern=None):
     if isinstance(view, (list, tuple)):
         # For include(...) processing.
         pattern = Pattern(route, is_endpoint=False)
-        urlconf_module, app_name, namespace = view
+        urlconf_module, app_name, namespace, *terminal_args = view
+        is_terminal, terminal_callback = (False, None)
+        if len(terminal_args) == 2:
+            is_terminal, terminal_callback = terminal_args
+        if len(terminal_args) == 1:
+            is_terminal = terminal_args[0]
         return URLResolver(
             pattern,
             urlconf_module,
             kwargs,
             app_name=app_name,
             namespace=namespace,
+            is_terminal=is_terminal,
+            terminal_callback=terminal_callback
         )
     elif callable(view):
         pattern = Pattern(route, name=name, is_endpoint=True)
