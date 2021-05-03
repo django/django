@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
 from django.core.signals import request_finished
 from django.db import connections, transaction
-from django.urls import get_resolver, set_urlconf
+from django.urls import get_resolver, set_urlconf, reverse, ResolutionAborted
 from django.utils.log import log_response
 from django.utils.module_loading import import_string
 
@@ -287,7 +287,14 @@ class BaseHandler:
         else:
             resolver = get_resolver()
         # Resolve the view, and assign the match object back to the request.
-        resolver_match = resolver.resolve(request.path_info)
+        try:
+            resolver_match = resolver.resolve(request.path_info)
+        except ResolutionAborted as e:
+            callback_name = e.args[0]['callback']
+            if callback_name is not None:
+                callback = reverse(callback_name)
+                resolver_match = resolver.resolve(callback)
+
         request.resolver_match = resolver_match
         return resolver_match
 
