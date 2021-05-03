@@ -58,7 +58,7 @@ class BaseConverter:
         return "<%s: base%s (%s)>" % (self.__class__.__name__, len(self.digits), self.digits)
 
     def encode(self, i):
-        neg, value = self.convert(i, self.decimal_digits, self.digits, '-')
+        neg, value = self.convert(i, self.decimal_digits, self.digits, self.sign)
         if neg:
             return self.sign + value
         return value
