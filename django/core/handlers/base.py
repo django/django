@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
 from django.core.signals import request_finished
 from django.db import connections, transaction
-from django.urls import get_resolver, set_urlconf
+from django.urls import get_resolver, set_urlconf, DoesNotResolve
 from django.utils.log import log_response
 from django.utils.module_loading import import_string
 
@@ -163,26 +163,36 @@ class BaseHandler:
         template_response middleware. This method is everything that happens
         inside the request/response middleware.
         """
+        tried = []
+        resolved = {}
         response = None
-        callback, callback_args, callback_kwargs = self.resolve_request(request)
 
-        # Apply view middleware
-        for middleware_method in self._view_middleware:
-            response = middleware_method(request, callback, callback_args, callback_kwargs)
-            if response:
-                break
+        while response is None:
+            callback, callback_args, callback_kwargs = self.resolve_request(request, tried=tried, resolved=resolved)
 
-        if response is None:
-            wrapped_callback = self.make_view_atomic(callback)
-            # If it is an asynchronous view, run it in a subthread.
-            if asyncio.iscoroutinefunction(wrapped_callback):
-                wrapped_callback = async_to_sync(wrapped_callback)
-            try:
-                response = wrapped_callback(request, *callback_args, **callback_kwargs)
-            except Exception as e:
-                response = self.process_exception_by_middleware(e, request)
-                if response is None:
-                    raise
+            # Apply view middleware
+            for middleware_method in self._view_middleware:
+                response = middleware_method(request, callback, callback_args, callback_kwargs)
+                if response:
+                    break
+
+            if response is None:
+                wrapped_callback = self.make_view_atomic(callback)
+                # If it is an asynchronous view, run it in a subthread.
+                if asyncio.iscoroutinefunction(wrapped_callback):
+                    wrapped_callback = async_to_sync(wrapped_callback)
+                try:
+                    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+                except DoesNotResolve:
+                    # Continue resolve URLs if the view raises DoesNotResolve
+                    # to indicate the URL pattern doesn't match
+                    continue
+                except Exception as e:
+                    response = self.process_exception_by_middleware(e, request)
+                    if response is None:
+                        raise
+                    else:
+                        break
 
         # Complain if the view returned None (a common error).
         self.check_response(response, callback)
@@ -215,29 +225,38 @@ class BaseHandler:
         template_response middleware. This method is everything that happens
         inside the request/response middleware.
         """
+        tried = []
+        resolved = {}
         response = None
-        callback, callback_args, callback_kwargs = self.resolve_request(request)
 
-        # Apply view middleware.
-        for middleware_method in self._view_middleware:
-            response = await middleware_method(request, callback, callback_args, callback_kwargs)
-            if response:
-                break
+        while response is None:
+            callback, callback_args, callback_kwargs = self.resolve_request(request, tried=tried, resolved=resolved)
+            # Apply view middleware.
+            for middleware_method in self._view_middleware:
+                response = await middleware_method(request, callback, callback_args, callback_kwargs)
+                if response:
+                    break
 
-        if response is None:
-            wrapped_callback = self.make_view_atomic(callback)
-            # If it is a synchronous view, run it in a subthread
-            if not asyncio.iscoroutinefunction(wrapped_callback):
-                wrapped_callback = sync_to_async(wrapped_callback, thread_sensitive=True)
-            try:
-                response = await wrapped_callback(request, *callback_args, **callback_kwargs)
-            except Exception as e:
-                response = await sync_to_async(
-                    self.process_exception_by_middleware,
-                    thread_sensitive=True,
-                )(e, request)
-                if response is None:
-                    raise
+            if response is None:
+                wrapped_callback = self.make_view_atomic(callback)
+                # If it is a synchronous view, run it in a subthread
+                if not asyncio.iscoroutinefunction(wrapped_callback):
+                    wrapped_callback = sync_to_async(wrapped_callback, thread_sensitive=True)
+                try:
+                    response = await wrapped_callback(request, *callback_args, **callback_kwargs)
+                except DoesNotResolve:
+                    # Continue resolve URLs if the view raises DoesNotResolve
+                    # to indicate the URL pattern doesn't match
+                    continue
+                except Exception as e:
+                    response = await sync_to_async(
+                        self.process_exception_by_middleware,
+                        thread_sensitive=True,
+                    )(e, request)
+                    if response is None:
+                        raise
+                    else:
+                        break
 
         # Complain if the view returned None or an uncalled coroutine.
         self.check_response(response, callback)
@@ -274,7 +293,7 @@ class BaseHandler:
             raise RuntimeError('Response is still a coroutine.')
         return response
 
-    def resolve_request(self, request):
+    def resolve_request(self, request, tried, resolved):
         """
         Retrieve/set the urlconf for the request. Return the view resolved,
         with its args and kwargs.
@@ -287,7 +306,7 @@ class BaseHandler:
         else:
             resolver = get_resolver()
         # Resolve the view, and assign the match object back to the request.
-        resolver_match = resolver.resolve(request.path_info)
+        resolver_match = resolver.resolve(request.path_info, tried=tried, resolved=resolved)
         request.resolver_match = resolver_match
         return resolver_match
 
