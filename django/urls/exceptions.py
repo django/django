@@ -7,3 +7,7 @@ class Resolver404(Http404):
 
 class NoReverseMatch(Exception):
     pass
+
+
+class DoesNotResolve(Resolver404):
+    pass
