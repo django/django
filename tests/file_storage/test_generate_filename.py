@@ -103,7 +103,7 @@ class GenerateFilenameStorageTests(SimpleTestCase):
         folder = 'not/a/folder/'
 
         f = FileField(upload_to=folder, storage=storage)
-        key = 'my-file-key\\with odd characters'
+        key = 'my-file-key$$with odd characters'
         data = ContentFile('test')
         expected_key = AWSS3Storage.prefix + folder + key
 
