@@ -1,4 +1,6 @@
 import os
+import sys
+from unittest import skipIf
 
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files.base import ContentFile
@@ -93,6 +95,7 @@ class GenerateFilenameStorageTests(SimpleTestCase):
             os.path.normpath('some/folder/test_with_space.txt')
         )
 
+    @skipIf(sys.platform == 'win32', 'Path components in filename are not supported after 0b79eb3.')
     def test_filefield_awss3_storage(self):
         """
         Simulate a FileField with an S3 storage which uses keys rather than
