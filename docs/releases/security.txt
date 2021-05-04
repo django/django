@@ -36,6 +36,12 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+May 4, 2021 - :cve:`2021-31542`
+-------------------------------
+
+Potential directory-traversal via uploaded files. `Full description
+<https://www.djangoproject.com/weblog/2021/may/04/security-releases/>`__
+
 April 6, 2021 - :cve:`2021-28658`
 ---------------------------------
 
