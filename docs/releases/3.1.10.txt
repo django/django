@@ -1,10 +1,10 @@
-==========================
-Django 3.2.2 release notes
-==========================
+===========================
+Django 3.1.10 release notes
+===========================
 
 *May 6, 2021*
 
-Django 3.2.2 fixes a security issue and a bug in 3.2.1.
+Django 3.1.10 fixes a security issue in 3.1.9.
 
 CVE-2021-32052: Header injection possibility since ``URLValidator`` accepted newlines in input on Python 3.9.5+
 ===============================================================================================================
@@ -20,10 +20,3 @@ entering your data only existed if you are using this validator outside of the
 form fields.
 
 This issue was introduced by the :bpo:`43882` fix.
-
-Bugfixes
-========
-
-* Prevented, following a regression in Django 3.2.1, :djadmin:`makemigrations`
-  from generating infinite migrations for a model with ``Meta.ordering``
-  contained ``OrderBy`` expressions (:ticket:`32714`).
