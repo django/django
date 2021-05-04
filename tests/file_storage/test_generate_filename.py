@@ -1,4 +1,6 @@
 import os
+import sys
+from unittest import skipIf
 
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files.base import ContentFile
@@ -93,11 +95,15 @@ class GenerateFilenameStorageTests(SimpleTestCase):
             os.path.normpath('some/folder/test_with_space.txt')
         )
 
+    @skipIf(sys.platform == 'win32', "Example filename uses illegal Windows path characters.")
     def test_filefield_awss3_storage(self):
         """
         Simulate a FileField with an S3 storage which uses keys rather than
         folders and names. FileField and Storage shouldn't have any os.path()
         calls that break the key.
+
+        Skipped on Windows because (correctly) \\ will not pass
+        validate_file_name() sanitization there.
         """
         storage = AWSS3Storage()
         folder = 'not/a/folder/'
