@@ -42,6 +42,13 @@ May 4, 2021 - :cve:`2021-31542`
 Potential directory-traversal via uploaded files. `Full description
 <https://www.djangoproject.com/weblog/2021/may/04/security-releases/>`__
 
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.2 :commit:`(patch) <c98f446c188596d4ba6de71d1b77b4a6c5c2a007>`
+* Django 3.1 :commit:`(patch) <25d84d64122c15050a0ee739e859f22ddab5ac48>`
+* Django 2.2 :commit:`(patch) <04ac1624bdc2fa737188401757cf95ced122d26d>`
+
 April 6, 2021 - :cve:`2021-28658`
 ---------------------------------
 
