@@ -1174,8 +1174,7 @@ class Exists(Subquery):
         return sql, params
 
 
-@deconstructible
-class OrderBy(BaseExpression):
+class OrderBy(Expression):
     template = '%(expression)s %(ordering)s'
     conditional = False
 
