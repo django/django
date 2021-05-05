@@ -625,9 +625,8 @@ http://127.0.0.1:8000/admin/. You should see the admin's login screen:
    :alt: Django admin login screen
 
 Since :doc:`translation </topics/i18n/translation>` is turned on by default, if
-you set :setting:`LANGUAGE_CODE` (in :file:`mysite/settings.py`), the login 
-screen will be displayed in the given language (if Django has appropriate 
-translations).
+you set :setting:`LANGUAGE_CODE`, the login screen will be displayed in the
+given language (if Django has appropriate translations).
 
 Enter the admin site
 --------------------
@@ -715,7 +714,7 @@ The bottom part of the page gives you a couple of options:
 	the time displayed would differ by the number of hours your timezone 
 	differs	from UTC.
 
-Next change "Date published" by clicking the "Today" and "Now" shortcuts. Then
+Change "Date published" by clicking the "Today" and "Now" shortcuts. Then
 click "Save and continue editing." Then click "History" in the upper right.
 You'll see a page listing all changes made to this object via the Django admin,
 with the timestamp and username of the person who made the change:

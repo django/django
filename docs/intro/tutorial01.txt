@@ -224,30 +224,25 @@ and type this command:
 
     $ python manage.py startapp polls
 
-That'll create a directory :file:`polls`, which is laid out like this within your ``mysite`` project:: 
+That'll create a directory :file:`polls`, which is laid out like this::
 
-    mysite/
-        manage.py
-        mysite/
-            ...
-        polls
+    polls/
+        __init__.py
+        admin.py
+        apps.py
+        migrations/
             __init__.py
-            admin.py
-            apps.py
-            migrations/
-                __init__.py
-            models.py
-            tests.py
-            views.py
+        models.py
+        tests.py
+        views.py
 
 The ``polls`` directory structure will house the poll application.
 
 Write your first view
 =====================
 
-Let's write the first view. Open the file ``polls/views.py``. You’ll notice 
-that Django has included some default code for you. You can delete this and 
-replace it with the following Python code:
+Let's write the first view. Open the file ``polls/views.py``
+and put the following Python code in it:
 
 .. code-block:: python
     :caption: polls/views.py
