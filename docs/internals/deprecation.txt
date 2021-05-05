@@ -17,6 +17,8 @@ details on these changes.
 
 * The ``SERIALIZE`` test setting will be removed.
 
+* The undocumented ``django.utils.baseconv`` module will be removed.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

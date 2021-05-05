@@ -432,6 +432,8 @@ Miscellaneous
   :attr:`~django.test.TestCase.databases` with the
   :ref:`serialized_rollback <test-case-serialized-rollback>` option enabled.
 
+* The undocumented ``django.utils.baseconv`` module is deprecated.
+
 Features removed in 4.0
 =======================
 
