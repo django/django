@@ -233,7 +233,7 @@ class PyMemcacheCache(BaseMemcachedCache):
     def __init__(self, server, params):
         import pymemcache.serde
         super().__init__(server, params, library=pymemcache, value_not_found_exception=KeyError)
-        self._class = self._lib.HashClient
+        self._class = self._lib.PooledClient
         self._options = {
             'allow_unicode_keys': True,
             'default_noreply': False,
