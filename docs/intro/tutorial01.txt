@@ -236,7 +236,7 @@ That'll create a directory :file:`polls`, which is laid out like this::
         tests.py
         views.py
 
-The ``polls`` directory structure will house the poll application.
+This directory structure will house the poll application.
 
 Write your first view
 =====================
