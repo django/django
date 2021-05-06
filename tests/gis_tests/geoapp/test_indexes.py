@@ -1,13 +1,16 @@
+import unittest
+
 from django.db import connection
 from django.db.models import Index
+from django.contrib.gis.db import models
 from django.test import TransactionTestCase
 
-from .models import City, SchemaCity
+from .models import City
 
 
 class SchemaIndexesTests(TransactionTestCase):
     available_apps = []
-    models = [City, SchemaCity]
+    models = [City]
 
     def get_indexes(self, table):
         with connection.cursor() as cursor:
@@ -28,9 +31,8 @@ class SchemaIndexesTests(TransactionTestCase):
             return False
         return True
 
+    @unittest.skipUnless(connection.ops.postgis, 'PostGIS-specific test.')
     def test_using_sql(self):
-        if not connection.ops.postgis:
-            self.skipTest('This is a PostGIS-specific test.')
         index = Index(fields=['point'])
         editor = connection.schema_editor()
         self.assertIn(
@@ -38,9 +40,15 @@ class SchemaIndexesTests(TransactionTestCase):
             str(index.create_sql(City, editor)),
         )
 
+    @unittest.skipUnless(connection.ops.postgis, 'PostGIS-specific test.')
     def test_using_sql__schema(self):
-        if not connection.ops.postgis:
-            self.skipTest('This is a PostGIS-specific test.')
+        class SchemaCity(models.Model):
+            point = models.PointField()
+
+            class Meta:
+                app_label = 'geoapp'
+                db_table = 'public"."geoapp_schema_city'
+
         index = Index(fields=['point'])
         editor = connection.schema_editor()
         create_index_sql = str(index.create_sql(SchemaCity, editor))
