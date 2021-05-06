@@ -22,6 +22,7 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         if fields is None or len(fields) != 1 or not hasattr(fields[0], 'geodetic'):
             return super()._create_index_sql(model, fields=fields, **kwargs)
 
+        table = model._meta.db_table
         field = fields[0]
         field_column = self.quote_name(field.column)
 
@@ -32,15 +33,17 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         elif field.dim > 2 and not field.geography:
             # Use "nd" ops which are fast on multidimensional cases
             field_column = "%s %s" % (field_column, self.geom_index_ops_nd)
-        if kwargs.get('name') is None:
-            index_name = '%s_%s_id' % (model._meta.db_table, field.column)
-        else:
-            index_name = kwargs['name']
+
+        name = kwargs.get("name")
+        if not name:
+            name = self._create_index_name(
+                table, [field.column], kwargs.get("suffix", "")
+            )
 
         return Statement(
             self.sql_create_index,
-            name=self.quote_name(index_name),
-            table=self.quote_name(model._meta.db_table),
+            name=self.quote_name(name),
+            table=self.quote_name(table),
             using=' USING %s' % self.geom_index_type,
             columns=field_column,
             extra='',

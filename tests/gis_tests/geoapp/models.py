@@ -28,6 +28,14 @@ class City(NamedModel):
         app_label = 'geoapp'
 
 
+class SchemaCity(NamedModel):
+    point = models.PointField()
+
+    class Meta:
+        app_label = 'geoapp'
+        db_table = 'public"."geoapp_schema_city'
+
+
 # This is an inherited model from City
 class PennsylvaniaCity(City):
     county = models.CharField(max_length=30)
