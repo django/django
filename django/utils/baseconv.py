@@ -30,10 +30,10 @@ Sample usage::
   >>> base20.decode('-31e')
   -1234
   >>> base11 = BaseConverter('0123456789-', sign='$')
-  >>> base11.encode('$1234')
+  >>> base11.encode(-1234)
   '$-22'
   >>> base11.decode('$-22')
-  '$1234'
+  -1234
 
 """
 

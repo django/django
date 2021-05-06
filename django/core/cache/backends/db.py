@@ -225,7 +225,7 @@ class DatabaseCache(BaseDatabaseCache):
                 ),
                 keys,
             )
-        return bool(cursor.rowcount)
+            return bool(cursor.rowcount)
 
     def has_key(self, key, version=None):
         key = self.make_key(key, version=version)

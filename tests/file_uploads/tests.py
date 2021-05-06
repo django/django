@@ -9,8 +9,9 @@ from io import BytesIO, StringIO
 from unittest import mock
 from urllib.parse import quote
 
+from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import temp as tempfile
-from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
 from django.http.multipartparser import (
     FILE, MultiPartParser, MultiPartParserError, Parser, parse_header,
 )
@@ -39,6 +40,16 @@ CANDIDATE_TRAVERSAL_FILE_NAMES = [
     '..&sol;hax0rd.txt',        # HTML entities.
 ]
 
+CANDIDATE_INVALID_FILE_NAMES = [
+    '/tmp/',        # Directory, *nix-style.
+    'c:\\tmp\\',    # Directory, win-style.
+    '/tmp/.',       # Directory dot, *nix-style.
+    'c:\\tmp\\.',   # Directory dot, *nix-style.
+    '/tmp/..',      # Parent directory, *nix-style.
+    'c:\\tmp\\..',  # Parent directory, win-style.
+    '',             # Empty filename.
+]
+
 
 @override_settings(MEDIA_ROOT=MEDIA_ROOT, ROOT_URLCONF='file_uploads.urls', MIDDLEWARE=[])
 class FileUploadTests(TestCase):
@@ -52,6 +63,22 @@ class FileUploadTests(TestCase):
     def tearDownClass(cls):
         shutil.rmtree(MEDIA_ROOT)
         super().tearDownClass()
+
+    def test_upload_name_is_validated(self):
+        candidates = [
+            '/tmp/',
+            '/tmp/..',
+            '/tmp/.',
+        ]
+        if sys.platform == 'win32':
+            candidates.extend([
+                'c:\\tmp\\',
+                'c:\\tmp\\..',
+                'c:\\tmp\\.',
+            ])
+        for file_name in candidates:
+            with self.subTest(file_name=file_name):
+                self.assertRaises(SuspiciousFileOperation, UploadedFile, name=file_name)
 
     def test_simple_upload(self):
         with open(__file__, 'rb') as fp:
@@ -717,6 +744,15 @@ class MultiParserTests(SimpleTestCase):
         for file_name in CANDIDATE_TRAVERSAL_FILE_NAMES:
             with self.subTest(file_name=file_name):
                 self.assertEqual(parser.sanitize_file_name(file_name), 'hax0rd.txt')
+
+    def test_sanitize_invalid_file_name(self):
+        parser = MultiPartParser({
+            'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
+            'CONTENT_LENGTH': '1',
+        }, StringIO('x'), [], 'utf-8')
+        for file_name in CANDIDATE_INVALID_FILE_NAMES:
+            with self.subTest(file_name=file_name):
+                self.assertIsNone(parser.sanitize_file_name(file_name))
 
     def test_rfc2231_parsing(self):
         test_data = (

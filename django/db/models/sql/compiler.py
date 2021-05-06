@@ -554,7 +554,10 @@ class SQLCompiler:
                     if alias:
                         s_sql = '%s AS %s' % (s_sql, self.connection.ops.quote_name(alias))
                     elif with_col_aliases:
-                        s_sql = '%s AS %s' % (s_sql, 'Col%d' % col_idx)
+                        s_sql = '%s AS %s' % (
+                            s_sql,
+                            self.connection.ops.quote_name('col%d' % col_idx),
+                        )
                         col_idx += 1
                     params.extend(s_params)
                     out_cols.append(s_sql)
