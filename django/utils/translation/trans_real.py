@@ -474,14 +474,17 @@ def get_supported_language_variant(lang_code, strict=False):
     <https://www.djangoproject.com/weblog/2007/oct/26/security-fix/>.
     """
     if lang_code:
-        # If 'fr-ca' is not supported, try special fallback or language-only 'fr'.
+        # If 'zh-hant-tw' is not supported, try special fallback or subsequent
+        # language codes i.e. 'zh-hant' and 'zh'.
         possible_lang_codes = [lang_code]
         try:
             possible_lang_codes.extend(LANG_INFO[lang_code]['fallback'])
         except KeyError:
             pass
-        generic_lang_code = lang_code.split('-')[0]
-        possible_lang_codes.append(generic_lang_code)
+        i = None
+        while (i := lang_code.rfind('-', 0, i)) > -1:
+            possible_lang_codes.append(lang_code[:i])
+        generic_lang_code = possible_lang_codes[-1]
         supported_lang_codes = get_languages()
 
         for code in possible_lang_codes:

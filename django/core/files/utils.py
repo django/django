@@ -1,3 +1,19 @@
+import os
+
+from django.core.exceptions import SuspiciousFileOperation
+
+
+def validate_file_name(name):
+    if name != os.path.basename(name):
+        raise SuspiciousFileOperation("File name '%s' includes path elements" % name)
+
+    # Remove potentially dangerous names
+    if name in {'', '.', '..'}:
+        raise SuspiciousFileOperation("Could not derive file name from '%s'" % name)
+
+    return name
+
+
 class FileProxyMixin:
     """
     A mixin class used to forward file methods to an underlaying file

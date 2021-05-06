@@ -2000,3 +2000,25 @@ class ExpressionWrapperTests(SimpleTestCase):
         group_by_cols = expr.get_group_by_cols(alias=None)
         self.assertEqual(group_by_cols, [expr.expression])
         self.assertEqual(group_by_cols[0].output_field, expr.output_field)
+
+
+class OrderByTests(SimpleTestCase):
+    def test_equal(self):
+        self.assertEqual(
+            OrderBy(F('field'), nulls_last=True),
+            OrderBy(F('field'), nulls_last=True),
+        )
+        self.assertNotEqual(
+            OrderBy(F('field'), nulls_last=True),
+            OrderBy(F('field'), nulls_last=False),
+        )
+
+    def test_hash(self):
+        self.assertEqual(
+            hash(OrderBy(F('field'), nulls_last=True)),
+            hash(OrderBy(F('field'), nulls_last=True)),
+        )
+        self.assertNotEqual(
+            hash(OrderBy(F('field'), nulls_last=True)),
+            hash(OrderBy(F('field'), nulls_last=False)),
+        )
