@@ -36,6 +36,20 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+May 6, 2021 - :cve:`2021-32052`
+-------------------------------
+
+Header injection possibility since ``URLValidator`` accepted newlines in input
+on Python 3.9.5+. `Full description
+<https://www.djangoproject.com/weblog/2021/may/06/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.2 :commit:`(patch) <2d2c1d0c97832860fbd6597977e2aae17dd7e5b2>`
+* Django 3.1 :commit:`(patch) <afb23f5929944a407e4990edef1c7806a94c9879>`
+* Django 2.2 :commit:`(patch) <d9594c4ea57b6309d93879805302cec9ae9f23ff>`
+
 May 4, 2021 - :cve:`2021-31542`
 -------------------------------
 
