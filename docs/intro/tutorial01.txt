@@ -287,13 +287,17 @@ The next step is to point the root URLconf at the ``polls.urls`` module.
 
 .. admonition:: What is the root URLconf?
 
-	The root URLconf is where Django starts looking for a url match. When you ran ``django-admin startproject mysite`` earlier, Django added this to :file:`mysite/settings.py`:
+	The root URLconf is where Django starts looking for a url match. When you 
+	ran ``django-admin startproject mysite`` earlier, Django added this to 
+	:file:`mysite/settings.py`:
 
 	.. console::
 
 		ROOT_URLCONF = 'mysite.urls'
 
-	This is how Django knows where the root URLconf is. It is the file ``urls.py`` within ``mysite``.
+	Django settings are very important since they contain all the 
+	configuration for your Django project. Becoming familiar with 
+	your settings will help you throughout this tutorial.
 
 In ``mysite/urls.py``, add an import for ``django.urls.include`` and insert an
 :func:`~django.urls.include` in the ``urlpatterns`` list, so you have:
