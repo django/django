@@ -535,10 +535,9 @@ Troubleshooting
 
    Let's reproduce this error by comparing a naive and an aware datetime::
 
-       >>> import datetime
        >>> from django.utils import timezone
-       >>> naive = datetime.datetime.utcnow()
        >>> aware = timezone.now()
+       >>> naive = timezone.make_naive(aware)
        >>> naive == aware
        Traceback (most recent call last):
        ...
