@@ -923,19 +923,28 @@ class DateFunctionTests(TestCase):
         self.create_model(None, None)
         self.assertIsNone(DTModel.objects.annotate(truncated=TruncTime('start_datetime')).first().truncated)
 
-    def test_trunc_time_no_microseconds(self):
-        start_datetime = datetime(2015, 6, 15, 14, 30, 26)
+    def test_trunc_time_comparison(self):
+        start_datetime = datetime(2015, 6, 15, 14, 30, 26)  # 0 microseconds.
+        end_datetime = datetime(2015, 6, 15, 14, 30, 26, 321)
         if settings.USE_TZ:
             start_datetime = timezone.make_aware(start_datetime, is_dst=False)
-        self.create_model(start_datetime, None)
+            end_datetime = timezone.make_aware(end_datetime, is_dst=False)
+        self.create_model(start_datetime, end_datetime)
         self.assertIs(
-            DTModel.objects.filter(start_datetime__time=start_datetime.time()).exists(),
+            DTModel.objects.filter(
+                start_datetime__time=start_datetime.time(),
+                end_datetime__time=end_datetime.time(),
+            ).exists(),
             True,
         )
         self.assertIs(
             DTModel.objects.annotate(
-                extracted=TruncTime('start_datetime'),
-            ).filter(extracted=start_datetime.time()).exists(),
+                extracted_start=TruncTime('start_datetime'),
+                extracted_end=TruncTime('end_datetime'),
+            ).filter(
+                extracted_start=start_datetime.time(),
+                extracted_end=end_datetime.time(),
+            ).exists(),
             True,
         )
 

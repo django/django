@@ -135,9 +135,15 @@ END;
         return 'TRUNC(%s)' % field_name
 
     def datetime_cast_time_sql(self, field_name, tzname):
-        # Since `TimeField` values are stored as TIMESTAMP where only the date
-        # part is ignored, convert the field to the specified timezone.
-        return self._convert_field_to_tz(field_name, tzname)
+        # Since `TimeField` values are stored as TIMESTAMP change to the
+        # default date and convert the field to the specified timezone.
+        convert_datetime_sql = (
+            "TO_TIMESTAMP(CONCAT('1900-01-01 ', TO_CHAR(%s, 'HH24:MI:SS.FF')), "
+            "'YYYY-MM-DD HH24:MI:SS.FF')"
+        ) % self._convert_field_to_tz(field_name, tzname)
+        return "CASE WHEN %s IS NOT NULL THEN %s ELSE NULL END" % (
+            field_name, convert_datetime_sql,
+        )
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
