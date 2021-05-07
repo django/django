@@ -926,8 +926,17 @@ class Node:
         try:
             return self.render(context)
         except Exception as e:
-            if context.template.engine.debug and not hasattr(e, 'template_debug'):
-                e.template_debug = context.render_context.template.get_exception_info(e, self.token)
+            if context.template.engine.debug:
+                # Store the actual node that caused the exception.
+                if not hasattr(e, '_culprit_node'):
+                    e._culprit_node = self
+                if (
+                    not hasattr(e, 'template_debug') and
+                    context.render_context.template.origin == e._culprit_node.origin
+                ):
+                    e.template_debug = context.render_context.template.get_exception_info(
+                        e, e._culprit_node.token,
+                    )
             raise
 
     def __iter__(self):
