@@ -54,8 +54,8 @@ class DateFormatTests(SimpleTestCase):
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), ltz), dt)
         # astimezone() is safe here because the target timezone doesn't have DST
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U'))), dt.astimezone(ltz).replace(tzinfo=None))
-        self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), tz).utctimetuple(), dt.utctimetuple())
-        self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), ltz).utctimetuple(), dt.utctimetuple())
+        self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), tz).timetuple(), dt.astimezone(tz).timetuple())
+        self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), ltz).timetuple(), dt.astimezone(ltz).timetuple())
 
     def test_epoch(self):
         udt = datetime(1970, 1, 1, tzinfo=utc)

@@ -479,8 +479,8 @@ class WriterTests(SimpleTestCase):
         self.serialize_round_trip(models.SET(42))
 
     def test_serialize_datetime(self):
-        self.assertSerializedEqual(datetime.datetime.utcnow())
-        self.assertSerializedEqual(datetime.datetime.utcnow)
+        self.assertSerializedEqual(datetime.datetime.now())
+        self.assertSerializedEqual(datetime.datetime.now)
         self.assertSerializedEqual(datetime.datetime.today())
         self.assertSerializedEqual(datetime.datetime.today)
         self.assertSerializedEqual(datetime.date.today())
@@ -662,8 +662,8 @@ class WriterTests(SimpleTestCase):
         Tests serializing a simple migration.
         """
         fields = {
-            'charfield': models.DateTimeField(default=datetime.datetime.utcnow),
-            'datetimefield': models.DateTimeField(default=datetime.datetime.utcnow),
+            'charfield': models.DateTimeField(default=datetime.datetime.now),
+            'datetimefield': models.DateTimeField(default=datetime.datetime.now),
         }
 
         options = {

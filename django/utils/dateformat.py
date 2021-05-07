@@ -12,7 +12,6 @@ Usage:
 """
 import calendar
 import datetime
-import time
 from email.utils import format_datetime as format_datetime_rfc5322
 
 from django.utils.dates import (
@@ -20,7 +19,7 @@ from django.utils.dates import (
 )
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.timezone import (
-    _datetime_ambiguous_or_imaginary, get_default_timezone, is_aware, is_naive,
+    _datetime_ambiguous_or_imaginary, get_default_timezone, is_naive,
     make_aware,
 )
 from django.utils.translation import gettext as _
@@ -295,10 +294,10 @@ class DateFormat(TimeFormat):
 
     def U(self):
         "Seconds since the Unix epoch (January 1 1970 00:00:00 GMT)"
-        if isinstance(self.data, datetime.datetime) and is_aware(self.data):
-            return int(calendar.timegm(self.data.utctimetuple()))
-        else:
-            return int(time.mktime(self.data.timetuple()))
+        value = self.data
+        if not isinstance(value, datetime.datetime):
+            value = datetime.datetime.combine(value, datetime.time.min)
+        return int(value.timestamp())
 
     def w(self):
         "Day of the week, numeric, i.e. '0' (Sunday) to '6' (Saturday)"
