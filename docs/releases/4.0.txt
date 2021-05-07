@@ -437,6 +437,8 @@ Miscellaneous
 
 * The undocumented ``django.utils.baseconv`` module is deprecated.
 
+* The undocumented ``django.utils.datetime_safe`` module is deprecated.
+
 Features removed in 4.0
 =======================
 

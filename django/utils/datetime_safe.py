@@ -8,9 +8,17 @@
 # '0010/08/02 was a Monday'
 
 import time
+import warnings
 from datetime import date as real_date, datetime as real_datetime
 
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.regex_helper import _lazy_re_compile
+
+warnings.warn(
+    'The django.utils.datetime_safe module is deprecated.',
+    category=RemovedInDjango50Warning,
+    stacklevel=2,
+)
 
 
 class date(real_date):

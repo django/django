@@ -1,7 +1,10 @@
 from datetime import date as original_date, datetime as original_datetime
 
-from django.test import SimpleTestCase
-from django.utils.datetime_safe import date, datetime
+from django.test import SimpleTestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango50Warning
+
+with ignore_warnings(category=RemovedInDjango50Warning):
+    from django.utils.datetime_safe import date, datetime
 
 
 class DatetimeTests(SimpleTestCase):
