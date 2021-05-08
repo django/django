@@ -40,6 +40,9 @@ class DateParseTests(unittest.TestCase):
             ('2012-04-23T10:20:30.400+02', datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(120))),
             ('2012-04-23T10:20:30.400-02', datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(-120))),
             ('2012-04-23T10:20:30,400-02', datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(-120))),
+            ('2012-04-23T10:20:30.400 +0230', datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(150))),
+            ('2012-04-23T10:20:30,400 +00', datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(0))),
+            ('2012-04-23T10:20:30   -02', datetime(2012, 4, 23, 10, 20, 30, 0, get_fixed_timezone(-120))),
         )
         for source, expected in valid_inputs:
             with self.subTest(source=source):
