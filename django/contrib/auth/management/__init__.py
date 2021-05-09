@@ -9,6 +9,7 @@ from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.management import create_contenttypes
 from django.core import exceptions
 from django.db import DEFAULT_DB_ALIAS, router
+from django.utils.translation import gettext_lazy as _
 
 
 def _get_all_permissions(opts):
@@ -27,7 +28,7 @@ def _get_builtin_permissions(opts):
     for action in opts.default_permissions:
         perms.append((
             get_permission_codename(action, opts),
-            'Can %s %s' % (action, opts.verbose_name_raw)
+            _('Can %(action)s %(verbose_name)s' % {'action': action, 'verbose_name': opts.verbose_name_raw})
         ))
     return perms
 

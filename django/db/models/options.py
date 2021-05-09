@@ -13,6 +13,7 @@ from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.text import camel_case_to_spaces, format_lazy
+from django.utils.translation import gettext_lazy as _
 from django.utils.translation import override
 
 PROXY_PARENTS = object()
@@ -90,7 +91,7 @@ class Options:
         self.unique_together = []
         self.index_together = []
         self.select_on_save = False
-        self.default_permissions = ('add', 'change', 'delete', 'view')
+        self.default_permissions = (_('add'), _('change'), _('delete'), _('view'))
         self.permissions = []
         self.object_name = None
         self.app_label = app_label

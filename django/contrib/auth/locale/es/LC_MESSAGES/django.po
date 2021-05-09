@@ -11,13 +11,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011
+# Mario Villaizán, 2021
 # Uriel Medina <urimeba511@gmail.com>, 2020
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"POT-Creation-Date: 2021-05-07 23:55+0200\n"
 "PO-Revision-Date: 2020-09-25 17:48+0000\n"
 "Last-Translator: Uriel Medina <urimeba511@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
@@ -145,6 +146,10 @@ msgstr "factor trabajo"
 
 msgid "checksum"
 msgstr "suma de verificación"
+
+#, python-format
+msgid "Can %(action)s %(verbose_name)s"
+msgstr "Puede %(action)s %(verbose_name)s"
 
 msgid "name"
 msgstr "nombre"
