@@ -3697,6 +3697,50 @@ database-related operations. It's similar to how an
 or annotation. They make it possible to define and reuse conditions, and
 combine them using operators such as ``|`` (``OR``) and ``&`` (``AND``). See
 :ref:`complex-lookups-with-q`.
+You can use the ``jsonify`` method to deconstruct a Q object into a JSON object -- for example, for the purpose of passing a complex saved query back to a front end web form for editing.
+Here is an example use case of the ``jsonify`` method. 
+
+    ======== EXAMPLE Q OBJECT =========
+    Q =  (OR: ('city__icontains', 'San fran'), (AND: ('city__icontains', 'Chicago'), ('city__isnull', False), ('ask__lte', '50'), ('ask__isnull', False))) 
+    ======== jsonify OUTPUT =========
+    JSON = 
+    {
+        'OR': {
+            '0': {
+                'AND': {
+                    'field_of_interest': 'city',
+                    'comparison_phrase': 'icontains',
+                    'comparison_value': 'San fran',
+                    'not': false,
+                    'include_null': true
+                }
+            },
+            '1': {
+                'AND': {
+                    '0': {
+                        'AND': {
+                            'field_of_interest': 'city',
+                            'comparison_phrase': 'icontains',
+                            'comparison_value': 'Chicago',
+                            'not': false,
+                            'include_null': false
+                        }
+                    },
+                    '2': {
+                        'AND': {
+                            'field_of_interest': 'ask',
+                            'comparison_phrase': 'lte',
+                            'comparison_value': '50',
+                            'not': false,
+                            'include_null': false
+                        }
+                    }
+                }
+            }
+        }
+    } 
+
+
 
 ``Prefetch()`` objects
 ----------------------

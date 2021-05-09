@@ -90,6 +90,103 @@ class Q(tree.Node):
             kwargs['_negated'] = True
         return path, args, kwargs
 
+    def _query_is_complex(self, depth):
+        """ utility function for jsonify() ; determines whether a given
+        Q object's children represent a complex query (True) or simple (False)"""
+        return any(isinstance(o, Q) for o in self.children) or (
+            len(self.children) > 2 or (depth == 0) or (
+                len(self.children) == 2 and (
+                    not any('isnull' in _tuple[0] for _tuple in self.children)
+                )
+            )
+        )
+
+    def jsonify(self, depth=0):
+        """ Recursive utility function to fully deconstruct a Q
+        object into a usable dictionary that can be translated back into a front
+        end Edit Query form mimicking the original Search Form """
+        jsonified = {}
+        connector = self.connector
+        use_connector = False
+        children = self.children
+        if self._query_is_complex(depth):
+            # use AND or OR as a new key
+            use_connector = True
+            jsonified[connector] = {}
+        deconstructed_q = self.deconstruct()
+        criterion_is_negated = deconstructed_q[-1].get('_negated', False)
+        # Because the (<field>__isnull, <Boolean>) tuples are skipped,
+        # need to use this flag to prevent return values like
+        # {0:<>,2:<>,4:<>}; this flag allows maintaining {0:<>,1:<>,2:<>}
+        use_previous_index = False
+        for criterion_index, criterion in enumerate(children):
+            cindex = criterion_index - 1 if use_previous_index else criterion_index
+            if isinstance(criterion, Q):
+                next_level = criterion.jsonify(depth=depth + 1)
+                use_connector_dict = {
+                    cindex: next_level
+                }
+                if use_connector and criterion._query_is_complex(depth=depth + 1):
+                    jsonified[connector].update(use_connector_dict)
+                # If next_level contains a key already in jsonfied[connector], that key's
+                # value gets overwritten. Can't just use .update() for this one.
+                # Avoid overwrite.
+                elif use_connector:
+                    for k, v in next_level.items():
+                        if k in jsonified[connector]:
+                            while k in jsonified[connector]:
+                                k += 1
+                        # Now k not in connector dictionary, will not overwrite.
+                        jsonified[connector][k] = v
+                else:
+                    jsonified.update(next_level)
+            elif isinstance(criterion, tuple):
+                # Recursion base case.
+                # 2-tuple (<field>__<compphrase>,  <compvalue>)
+                try:
+                    field_of_interest = criterion[0].split('__')[0]
+                    comparison_phrase = criterion[0].split('__')[1]
+                except IndexError:
+                    # if __  not in criterion[0], operation is = and
+                    # criterion[0] is just <field_of_interest>
+                    field_of_interest = criterion[0]
+                    comparison_phrase = 'eq'
+                comparison_value = criterion[1]
+                if comparison_phrase == 'isnull':
+                    # Don't create an entire criterion for this; use this value
+                    # to set the include_null property for the previous criterion.
+                    if use_connector:
+                        jsonified[connector][
+                            cindex - 1]['include_null'] = comparison_value
+                    else:
+                        if 'include_null' in jsonified:
+                            jsonified['include_null'] = comparison_value
+                        else:
+                            # Handle case where previous criterion was its own recursive call
+                            jsonified[connector][
+                                cindex - 1]['include_null'] = comparison_value
+                    # this tells the next iteration to use
+                    # criterion_index - 1 (because the index for isnull is skipped); this
+                    # avoids a dict that looks like {0:<>, 2:<>, 4:<>}
+                    # Never need to reset this back to false. Once it is true, leave true.
+                    use_previous_index = True
+                else:
+                    d = {
+                        "field_of_interest": field_of_interest,
+                        "comparison_phrase": comparison_phrase,
+                        # second member of 2-tuple,
+                        "comparison_value": comparison_value,
+                        # NOT negated, guaranteed for this else branch.
+                        "not": criterion_is_negated,
+                        # Use True as default. Next iteration will govern real value.
+                        "include_null": True
+                    }
+                    if use_connector:
+                        jsonified[connector][cindex] = d
+                    else:
+                        jsonified[cindex] = d
+        return jsonified
+
 
 class DeferredAttribute:
     """
