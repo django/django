@@ -1,5 +1,5 @@
-from django.db.backends.ddl_references import Statement
 from django.db.backends.postgresql.schema import DatabaseSchemaEditor
+from django.db.models.expressions import Col, Func
 
 
 class PostGISSchemaEditor(DatabaseSchemaEditor):
@@ -22,33 +22,31 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         if fields is None or len(fields) != 1 or not hasattr(fields[0], 'geodetic'):
             return super()._create_index_sql(model, fields=fields, **kwargs)
 
-        table = model._meta.db_table
         field = fields[0]
-        field_column = self.quote_name(field.column)
-
+        template = None
         if field.geom_type == 'RASTER':
             # For raster fields, wrap index creation SQL statement with ST_ConvexHull.
             # Indexes on raster columns are based on the convex hull of the raster.
-            field_column = self.rast_index_wrapper % field_column
+            template = self.rast_index_wrapper % "%(expressions)s"
         elif field.dim > 2 and not field.geography:
             # Use "nd" ops which are fast on multidimensional cases
-            field_column = "%s %s" % (field_column, self.geom_index_ops_nd)
+            template = "%%(expressions)s %s" % self.geom_index_ops_nd
+
+        expressions = None
+        if template is not None:
+            fields = None
+            expressions = Func(Col(None, field), template=template)
 
         name = kwargs.get("name")
         if not name:
-            name = self._create_index_name(
-                table, [field.column], kwargs.get("suffix", "")
-            )
+            name = self._create_index_name(model._meta.db_table, [field.column], "_id")
 
-        return Statement(
-            self.sql_create_index,
-            name=self.quote_name(name),
-            table=self.quote_name(table),
+        return super()._create_index_sql(
+            model,
+            name=name,
+            fields=fields,
+            expressions=expressions,
             using=' USING %s' % self.geom_index_type,
-            columns=field_column,
-            extra='',
-            condition='',
-            include='',
         )
 
     def _alter_column_type_sql(self, table, old_field, new_field, new_type):
