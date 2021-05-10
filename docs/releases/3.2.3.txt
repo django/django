@@ -9,4 +9,4 @@ Django 3.2.3 fixes several bugs in 3.2.2.
 Bugfixes
 ========
 
-* ...
+* Prepared for ``mysqlclient`` > 2.0.3 support (:ticket:`32732`).
