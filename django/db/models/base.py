@@ -1298,6 +1298,7 @@ class Model(metaclass=ModelBase):
     @classmethod
     def _check_default_pk(cls):
         if (
+            not cls._meta.abstract and
             cls._meta.pk.auto_created and
             # Inherited PKs are checked in parents models.
             not (
