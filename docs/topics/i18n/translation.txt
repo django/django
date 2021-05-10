@@ -1890,12 +1890,12 @@ which checks if the given language is supported by Django.
 
 To help write more concise code, there is also a context manager
 :func:`django.utils.translation.override()` that stores the current language on
-enter and restores it on exit. With it, the above example becomes::
+enter and optionally restores it on exit. With it, the above example becomes::
 
     from django.utils import translation
 
     def welcome_translated(language):
-        with translation.override(language):
+        with translation.override(language, deactivate=True):
             return translation.gettext('welcome')
 
 Language cookie
