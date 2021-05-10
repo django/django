@@ -22,6 +22,7 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         if fields is None or len(fields) != 1 or not hasattr(fields[0], 'geodetic'):
             return super()._create_index_sql(model, fields=fields, **kwargs)
 
+        table = model._meta.db_table
         field = fields[0]
         field_column = self.quote_name(field.column)
 
@@ -35,14 +36,19 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
 
         name = kwargs.get("name")
         if not name:
-            name = self._create_index_name(model._meta.db_table, [field.column], "_id")
+            name = self._create_index_name(
+                table, [field.column], kwargs.get("suffix", "")
+            )
 
-        return super()._create_index_sql(
-            model,
-            fields=fields,
-            name=name,
+        return Statement(
+            self.sql_create_index,
+            name=self.quote_name(name),
+            table=self.quote_name(table),
             using=' USING %s' % self.geom_index_type,
             columns=field_column,
+            extra='',
+            condition='',
+            include='',
         )
 
     def _alter_column_type_sql(self, table, old_field, new_field, new_type):
