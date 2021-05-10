@@ -1367,7 +1367,7 @@ Format character  Description                               Example output
 ``t``             Number of days in the given month.        ``28`` to ``31``
 **Year**
 ``y``             Year, 2 digits with leading zeros.        ``'00'`` to ``'99'``
-``Y``             Year, 4 digits.                           ``'1999'``
+``Y``             Year, 4 digits with leading zeros.        ``'0001'``, ..., ``'1999'``, ..., ``'9999'``
 ``L``             Boolean for whether it's a leap year.     ``True`` or ``False``
 ``o``             ISO-8601 week-numbering year,             ``'1999'``
                   corresponding to the ISO-8601 week
