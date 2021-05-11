@@ -32,7 +32,7 @@ class LookupTests(SimpleTestCase):
         lookup = Lookup(Value(1), Value(2))
         self.assertEqual(
             repr(lookup),
-            'Lookup(lhs=%(value1)s, rhs=%(value2)s)' % {
+            'Lookup(%(value1)s, %(value2)s)' % {
                 "value1": repr(Value(1)),
                 "value2": repr(Value(2))
             }
