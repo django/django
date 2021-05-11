@@ -2206,6 +2206,17 @@ class StartApp(AdminScriptTestCase):
             "another directory."
         )
 
+    def test_target_name_with_trailing_slash(self):
+        """Directory name with trailing slash is not considred empty (#32734)"""
+        with tempfile.TemporaryDirectory() as prefix:
+            target = os.path.join(prefix, 'directory', '')
+            _, err = self.run_django_admin(['startapp', 'app', target])
+            self.assertNotInOutput(
+                err,
+                "CommandError: '' is not a valid app directory. Please make "
+                "sure the directory is a valid identifier."
+            )
+
     def test_overlaying_app(self):
         # Use a subdirectory so it is outside the PYTHONPATH.
         os.makedirs(os.path.join(self.test_dir, 'apps/app1'))
