@@ -1,10 +1,7 @@
-from datetime import (
-    date as original_date, datetime as original_datetime,
-    time as original_time,
-)
+from datetime import date as original_date, datetime as original_datetime
 
 from django.test import SimpleTestCase
-from django.utils.datetime_safe import date, datetime, time
+from django.utils.datetime_safe import date, datetime
 
 
 class DatetimeTests(SimpleTestCase):
@@ -13,7 +10,6 @@ class DatetimeTests(SimpleTestCase):
         self.percent_y_safe = (1900, 1, 1)  # >= 1900 required on Windows.
         self.just_safe = (1000, 1, 1)
         self.just_unsafe = (999, 12, 31, 23, 59, 59)
-        self.just_time = (11, 30, 59)
         self.really_old = (20, 1, 1)
         self.more_recent = (2006, 1, 1)
 
@@ -30,10 +26,6 @@ class DatetimeTests(SimpleTestCase):
             original_datetime(*self.just_safe).strftime('%Y-%m-%d'), datetime(*self.just_safe).strftime('%Y-%m-%d')
         )
 
-        self.assertEqual(
-            original_time(*self.just_time).strftime('%H:%M:%S'), time(*self.just_time).strftime('%H:%M:%S')
-        )
-
     def test_safe_strftime(self):
         self.assertEqual(date(*self.just_unsafe[:3]).strftime('%Y-%m-%d (weekday %w)'), '0999-12-31 (weekday 2)')
         self.assertEqual(date(*self.just_safe).strftime('%Y-%m-%d (weekday %w)'), '1000-01-01 (weekday 3)')
@@ -44,8 +36,6 @@ class DatetimeTests(SimpleTestCase):
         self.assertEqual(
             datetime(*self.just_safe).strftime('%Y-%m-%d %H:%M:%S (weekday %w)'), '1000-01-01 00:00:00 (weekday 3)'
         )
-
-        self.assertEqual(time(*self.just_time).strftime('%H:%M:%S AM'), '11:30:59 AM')
 
         # %y will error before this date
         self.assertEqual(date(*self.percent_y_safe).strftime('%y'), '00')
