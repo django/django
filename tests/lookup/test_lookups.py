@@ -28,6 +28,16 @@ class LookupTests(SimpleTestCase):
         self.assertNotEqual(hash(lookup), hash(Lookup(Value(3), lookup.rhs)))
         self.assertNotEqual(hash(lookup), hash(CustomLookup(lookup.lhs, lookup.rhs)))
 
+    def test_repr(self):
+        lookup = Lookup(Value(1), Value(2))
+        self.assertEqual(
+            repr(lookup),
+            'Lookup(lhs=%(value1)s, rhs=%(value2)s)' % {
+                "value1": repr(Value(1)),
+                "value2": repr(Value(2))
+            }
+        )
+
 
 class YearLookupTests(SimpleTestCase):
     def test_get_bound_params(self):
