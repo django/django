@@ -414,7 +414,7 @@ AdvanceCOMP's ``advpng``:
    $ advpng -z4 `find . -type f -not -path "./_build/*" -name "*.png"`
 
 This is based on OptiPNG version 0.7.5. Older versions may complain about the
-``--strip all`` option being lossy.
+``-strip all`` option being lossy.
 
 An example
 ==========

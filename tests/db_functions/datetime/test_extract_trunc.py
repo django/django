@@ -923,6 +923,22 @@ class DateFunctionTests(TestCase):
         self.create_model(None, None)
         self.assertIsNone(DTModel.objects.annotate(truncated=TruncTime('start_datetime')).first().truncated)
 
+    def test_trunc_time_no_microseconds(self):
+        start_datetime = datetime(2015, 6, 15, 14, 30, 26)
+        if settings.USE_TZ:
+            start_datetime = timezone.make_aware(start_datetime, is_dst=False)
+        self.create_model(start_datetime, None)
+        self.assertIs(
+            DTModel.objects.filter(start_datetime__time=start_datetime.time()).exists(),
+            True,
+        )
+        self.assertIs(
+            DTModel.objects.annotate(
+                extracted=TruncTime('start_datetime'),
+            ).filter(extracted=start_datetime.time()).exists(),
+            True,
+        )
+
     def test_trunc_day_func(self):
         start_datetime = datetime(2015, 6, 15, 14, 30, 50, 321)
         end_datetime = truncate_to(datetime(2016, 6, 15, 14, 10, 50, 123), 'day')

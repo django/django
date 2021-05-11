@@ -40,13 +40,13 @@ import time
 import zlib
 
 from django.conf import settings
-from django.utils import baseconv
 from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.encoding import force_bytes
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
 
 _SEP_UNSAFE = _lazy_re_compile(r'^[A-z0-9-_=]*$')
+BASE62_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 
 
 class BadSignature(Exception):
@@ -57,6 +57,31 @@ class BadSignature(Exception):
 class SignatureExpired(BadSignature):
     """Signature timestamp is older than required max_age."""
     pass
+
+
+def b62_encode(s):
+    if s == 0:
+        return '0'
+    sign = '-' if s < 0 else ''
+    s = abs(s)
+    encoded = ''
+    while s > 0:
+        s, remainder = divmod(s, 62)
+        encoded = BASE62_ALPHABET[remainder] + encoded
+    return sign + encoded
+
+
+def b62_decode(s):
+    if s == '0':
+        return 0
+    sign = 1
+    if s[0] == '-':
+        s = s[1:]
+        sign = -1
+    decoded = 0
+    for digit in s:
+        decoded = decoded * 62 + BASE62_ALPHABET.index(digit)
+    return sign * decoded
 
 
 def b64_encode(s):
@@ -187,7 +212,7 @@ class Signer:
 class TimestampSigner(Signer):
 
     def timestamp(self):
-        return baseconv.base62.encode(int(time.time()))
+        return b62_encode(int(time.time()))
 
     def sign(self, value):
         value = '%s%s%s' % (value, self.sep, self.timestamp())
@@ -200,7 +225,7 @@ class TimestampSigner(Signer):
         """
         result = super().unsign(value)
         value, timestamp = result.rsplit(self.sep, 1)
-        timestamp = baseconv.base62.decode(timestamp)
+        timestamp = b62_decode(timestamp)
         if max_age is not None:
             if isinstance(max_age, datetime.timedelta):
                 max_age = max_age.total_seconds()

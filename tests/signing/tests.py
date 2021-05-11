@@ -195,3 +195,10 @@ class TestTimestampSigner(SimpleTestCase):
             self.assertEqual(signer.unsign(ts, max_age=datetime.timedelta(seconds=11)), value)
             with self.assertRaises(signing.SignatureExpired):
                 signer.unsign(ts, max_age=10)
+
+
+class TestBase62(SimpleTestCase):
+    def test_base62(self):
+        tests = [-10 ** 10, 10 ** 10, 1620378259, *range(-100, 100)]
+        for i in tests:
+            self.assertEqual(i, signing.b62_decode(signing.b62_encode(i)))
