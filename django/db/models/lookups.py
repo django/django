@@ -40,6 +40,9 @@ class Lookup:
             value = transform(value)
         return value
 
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.lhs!r}, {self.rhs!r})'
+
     def batch_process_rhs(self, compiler, connection, rhs=None):
         if rhs is None:
             rhs = self.rhs
