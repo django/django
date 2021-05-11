@@ -1322,6 +1322,10 @@ class Queries4Tests(TestCase):
         self.assertEqual(len(combined), 1)
         self.assertEqual(combined[0].name, 'a1')
 
+    def test_combine_or_filter_reuse(self):
+        combined = Author.objects.filter(name='a1') | Author.objects.filter(name='a3')
+        self.assertEqual(combined.get(name='a1'), self.a1)
+
     def test_join_reuse_order(self):
         # Join aliases are reused in order. This shouldn't raise AssertionError
         # because change_map contains a circular reference (#26522).
