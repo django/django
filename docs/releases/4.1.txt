@@ -251,10 +251,12 @@ Management Commands
 * The new :djadmin:`optimizemigration` command allows optimizing operations for
   a migration.
 
+
 Migrations
 ~~~~~~~~~~
 
-* ...
+* Squashed migrations can now themselves be squashed before being transitioned to
+  normal migrations.
 
 Models
 ~~~~~~

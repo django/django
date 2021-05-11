@@ -703,7 +703,7 @@ migrations it replaces and distribute this change to all running instances
 of your application, making sure that they run ``migrate`` to store the change
 in their database.
 
-You must then transition the squashed migration to a normal migration by:
+You can then transition the squashed migration to a normal migration by:
 
 - Deleting all the migration files it replaces.
 - Updating all migrations that depend on the deleted migrations to depend on
@@ -712,8 +712,11 @@ You must then transition the squashed migration to a normal migration by:
   squashed migration (this is how Django tells that it is a squashed migration).
 
 .. note::
-    Once you've squashed a migration, you should not then re-squash that squashed
-    migration until you have fully transitioned it to a normal migration.
+   You can squash squashed migrations themselves without transitioning to normal
+   migrations, which might be useful for situations where every environment has
+   not yet run the original squashed migration set. But in general it is better
+   to transition squashed migrations to normal migrations to be able to clean up
+   older migration files.
 
 .. admonition:: Pruning references to deleted migrations
 
