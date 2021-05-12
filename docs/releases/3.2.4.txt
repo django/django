@@ -18,3 +18,7 @@ Bugfixes
 
 * Prevented unnecessary initialization of unused caches following a regression
   in Django 3.2 (:ticket:`32747`).
+
+* Fixed a crash in Django 3.2 that could occur when running ``mod_wsgi`` with
+  the recommended settings while the Windows ``colorama`` library was installed
+  (:ticket:`32740`).
