@@ -125,3 +125,11 @@ Common pitfalls
 
     ...\> set http_proxy=http://username:password@proxyserver:proxyport
     ...\> set https_proxy=https://username:password@proxyserver:proxyport
+
+* In general, Django assumes that ``UTF-8`` encoding is used for I/O. This may
+  cause problems if your system is set to use a different encoding. Recent
+  versions of Python allow setting the :envvar:`PYTHONUTF8` environment
+  variable in order to force a ``UTF-8`` encoding. Windows 10 also provides a
+  system-wide setting by checking ``Use Unicode UTF-8 for worldwide language
+  support`` in :menuselection:`Language --> Administrative Language Settings
+  --> Change system locale` in system settings.
