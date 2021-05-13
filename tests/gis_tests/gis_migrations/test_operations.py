@@ -210,7 +210,7 @@ class OperationTests(OperationTestCase):
         self.assertSpatialIndexExists('gis_neighborhood', 'point3d')
 
         with connection.cursor() as cursor:
-            index_name = 'gis_neighborhood_point3d_id'
+            index_name = 'gis_neighborhood_point3d_113bc868_id'
             cursor.execute(self.get_opclass_query, [index_name])
             self.assertEqual(
                 cursor.fetchall(),

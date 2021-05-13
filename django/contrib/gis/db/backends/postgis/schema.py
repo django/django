@@ -33,10 +33,9 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         elif field.dim > 2 and not field.geography:
             # Use "nd" ops which are fast on multidimensional cases
             opclasses = [self.geom_index_ops_nd]
-        if not kwargs.get('name'):
-            name = '%s_%s_id' % (model._meta.db_table, field.column)
-        else:
-            name = kwargs['name']
+        name = kwargs.get('name')
+        if not name:
+            name = self._create_index_name(model._meta.db_table, [field.column], '_id')
 
         return super()._create_index_sql(
             model,
