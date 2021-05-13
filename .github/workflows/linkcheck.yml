@@ -1,0 +1,39 @@
+name: Linkcheck
+
+on:
+  schedule:
+    - cron: "0 14 * * 1" # Every Monday at 2PM UTC
+
+jobs:
+  linkcheck:
+    runs-on: ubuntu-latest
+    name: linkcheck
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('docs/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - run: python -m pip install -r docs/requirements.txt
+      - name: Build docs
+        run: |
+          cd docs
+          sphinx-build -b spelling -n -q -W --keep-going -d _build/doctrees -D language=en_US -j auto . _build/spelling
+      - name: Linkcheck docs
+        run: |
+          cd docs
+          sphinx-build -b linkcheck ../docs/ _build/linkcheck
+      - name: Upload linkcheck output
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: linkcheck
+          path: docs/_build/linkcheck/
