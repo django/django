@@ -1,8 +1,10 @@
 import os
 import sys
+import tempfile
 import unittest
 
-from django.core.files import temp
+from django.core.exceptions import SuspiciousFileOperation
+from django.core.files import File, temp
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.db.utils import IntegrityError
@@ -58,6 +60,15 @@ class FileFieldTests(TestCase):
         d = Document.objects.create(myfile='something.txt')
         d.refresh_from_db()
         self.assertIs(d.myfile.instance, d)
+
+    @unittest.skipIf(sys.platform == 'win32', "Crashes with OSError on Windows.")
+    def test_save_without_name(self):
+        with tempfile.NamedTemporaryFile(suffix='.txt') as tmp:
+            document = Document.objects.create(myfile='something.txt')
+            document.myfile = File(tmp)
+            msg = f"Detected path traversal attempt in '{tmp.name}'"
+            with self.assertRaisesMessage(SuspiciousFileOperation, msg):
+                document.save()
 
     def test_defer(self):
         Document.objects.create(myfile='something.txt')
