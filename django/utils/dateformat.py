@@ -265,16 +265,14 @@ class DateFormat(TimeFormat):
 
     def r(self):
         "RFC 5322 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"
-        if type(self.data) is date:
-            raise TypeError(
-                "The format for date objects may not contain time-related "
-                "format specifiers (found 'r')."
-            )
-        if is_naive(self.data):
-            dt = make_aware(self.data, timezone=self.timezone)
-        else:
-            dt = self.data
-        return format_datetime_rfc5322(dt)
+        value = self.data
+        if not isinstance(value, datetime):
+            # Assume midnight in default timezone if datetime.date provided.
+            default_timezone = get_default_timezone()
+            value = datetime.combine(value, time.min).replace(tzinfo=default_timezone)
+        elif is_naive(value):
+            value = make_aware(value, timezone=self.timezone)
+        return format_datetime_rfc5322(value)
 
     def S(self):
         """
