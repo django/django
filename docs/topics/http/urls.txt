@@ -287,6 +287,12 @@ The URLconf doesn't look at the request method. In other words, all request
 methods -- ``POST``, ``GET``, ``HEAD``, etc. -- will be routed to the same
 function for the same URL.
 
+Also note that if the URL contains characters that require quoting,
+the URLconf talks about the quoted (encoded) form, e.g. 
+``Orleàns/`` will arrive as ``Orle%C3%A0ns/``.
+Use the latter for immediate matching.
+Use :func:`urllib.parse.unquote` to obtain the original value.
+
 Specifying defaults for view arguments
 ======================================
 
