@@ -431,6 +431,20 @@ Miscellaneous
 Features deprecated in 4.0
 ==========================
 
+Time zone support
+-----------------
+
+In order to follow good practice, the default value of the :setting:`USE_TZ`
+setting will change from ``False`` to ``True``, and time zone support will be
+enabled by default, in Django 5.0.
+
+Note that the default :file:`settings.py` file created by
+:djadmin:`django-admin startproject <startproject>` includes
+:setting:`USE_TZ = True <USE_TZ>` since Django 1.4.
+
+You can set ``USE_TZ`` to ``False`` in your project settings before then to
+opt-out.
+
 Miscellaneous
 -------------
 

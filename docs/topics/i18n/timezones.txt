@@ -26,11 +26,16 @@ to this problem is to use UTC in the code and use local time only when
 interacting with end users.
 
 Time zone support is disabled by default. To enable it, set :setting:`USE_TZ =
-True <USE_TZ>` in your settings file. By default, time zone support uses pytz_,
-which is installed when you install Django; Django also supports the use of
-other time zone implementations like :mod:`zoneinfo` by passing
-:class:`~datetime.tzinfo` objects directly to functions in
-:mod:`django.utils.timezone`.
+True <USE_TZ>` in your settings file.
+
+.. note::
+
+    In Django 5.0, time zone support will be enabled by default.
+
+By default, time zone support uses pytz_, which is installed when you install
+Django; Django also supports the use of other time zone implementations like
+:mod:`zoneinfo` by passing :class:`~datetime.tzinfo` objects directly to
+functions in :mod:`django.utils.timezone`.
 
 .. versionchanged:: 3.2
 
