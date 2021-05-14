@@ -246,7 +246,7 @@ msgstr "No se seleccionó ninguna acción."
 
 #, python-format
 msgid "The %(name)s “%(obj)s” was deleted successfully."
-msgstr "El%(name)s “%(obj)s” fue eliminado con éxito."
+msgstr "El %(name)s “%(obj)s” fue eliminado con éxito."
 
 #, python-format
 msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
