@@ -1723,6 +1723,19 @@ class CacheClosingTests(SimpleTestCase):
         signals.request_finished.send(self.__class__)
         self.assertTrue(cache.closed)
 
+    def test_close_only_initialized(self):
+        with self.settings(CACHES={
+            'cache_1': {
+                'BACKEND': 'cache.closeable_cache.CacheClass',
+            },
+            'cache_2': {
+                'BACKEND': 'cache.closeable_cache.CacheClass',
+            },
+        }):
+            self.assertEqual(caches.all(initialized_only=True), [])
+            signals.request_finished.send(self.__class__)
+            self.assertEqual(caches.all(initialized_only=True), [])
+
 
 DEFAULT_MEMORY_CACHES_SETTINGS = {
     'default': {
@@ -2625,3 +2638,20 @@ class CacheHandlerTest(SimpleTestCase):
         )
         with self.assertRaisesMessage(InvalidCacheBackendError, msg):
             test_caches['invalid_backend']
+
+    def test_all(self):
+        test_caches = CacheHandler({
+            'cache_1': {
+                'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+            },
+            'cache_2': {
+                'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+            },
+        })
+        self.assertEqual(test_caches.all(initialized_only=True), [])
+        cache_1 = test_caches['cache_1']
+        self.assertEqual(test_caches.all(initialized_only=True), [cache_1])
+        self.assertEqual(len(test_caches.all()), 2)
+        # .all() initializes all caches.
+        self.assertEqual(len(test_caches.all(initialized_only=True)), 2)
+        self.assertEqual(test_caches.all(), test_caches.all(initialized_only=True))

@@ -15,3 +15,6 @@ Bugfixes
 
 * Fixed a bug in Django 3.2 where a system check would crash on an abstract
   model (:ticket:`32733`).
+
+* Prevented unnecessary initialization of unused caches following a regression
+  in Django 3.2 (:ticket:`32747`).
