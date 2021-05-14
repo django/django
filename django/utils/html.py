@@ -218,8 +218,6 @@ def smart_urlquote(url):
     except UnicodeError:  # invalid domain part
         return unquote_quote(url)
 
-    path = unquote_quote(path)
-
     if query:
         # Separately unquoting key/value, so as to not mix querystring separators
         # included in query values. See #22267.
@@ -228,6 +226,7 @@ def smart_urlquote(url):
         # urlencode will take care of quoting
         query = urlencode(query_parts)
 
+    path = unquote_quote(path)
     # Leave fragment unaltered.
 
     return urlunsplit((scheme, netloc, path, query, fragment))
