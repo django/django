@@ -37,7 +37,9 @@ class Book(models.Model):
 
 
 class BookWithCustomPK(models.Model):
-    my_pk = models.DecimalField(max_digits=5, decimal_places=0, primary_key=True)
+    # Numeric field/Decimal Field is not supported in primary key/unique key.
+    # So changed it to Float field.
+    my_pk = models.FloatField(primary_key=True)
     author = models.ForeignKey(Author, models.CASCADE)
     title = models.CharField(max_length=100)
 

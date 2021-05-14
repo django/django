@@ -101,10 +101,8 @@ class InspectDBTestCase(TestCase):
         assertFieldType('bool_field', "models.{}()".format(bool_field_type))
         assertFieldType('null_bool_field', 'models.{}(blank=True, null=True)'.format(bool_field_type))
 
-        if connection.features.can_introspect_decimal_field:
-            # django-spanner creates DecimalField as FLOAT64 until Spanner
-            # supports numeric.
-            assertFieldType('decimal_field', "models.FloatField()")
+        if connection.vendor != 'sqlite':
+            assertFieldType('decimal_field', "models.DecimalField(max_digits=6, decimal_places=1)")
         else:       # Guessed arguments on SQLite, see #5014
             assertFieldType('decimal_field', "models.DecimalField(max_digits=10, decimal_places=5)  "
                                              "# max_digits and decimal_places have been guessed, "

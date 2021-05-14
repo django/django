@@ -212,7 +212,9 @@ class Product(models.Model):
 
 
 class Price(models.Model):
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    # Numeric field/Decimal Field is not supported in primary key/unique key.
+    # So changed it to Float field.
+    price = models.FloatField()
     quantity = models.PositiveIntegerField()
 
     class Meta:
