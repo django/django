@@ -71,7 +71,7 @@ class GenerateFilenameStorageTests(SimpleTestCase):
         ]
         f = FileField(upload_to='some/folder/')
         for file_name, msg_file_name in candidates:
-            msg = f"Could not derive file name from '{msg_file_name}'"
+            msg = "Could not derive file name from '%s'" % msg_file_name
             with self.subTest(file_name=file_name):
                 with self.assertRaisesMessage(SuspiciousFileOperation, msg):
                     f.generate_filename(None, file_name)
@@ -89,7 +89,7 @@ class GenerateFilenameStorageTests(SimpleTestCase):
             '/tmp/../path',
         ]
         for file_name in candidates:
-            msg = f"Detected path traversal attempt in '{file_name}'"
+            msg = "Detected path traversal attempt in '%s'" % file_name
             with self.subTest(file_name=file_name):
                 with self.assertRaisesMessage(SuspiciousFileOperation, msg):
                     f.generate_filename(None, file_name)
@@ -145,7 +145,7 @@ class GenerateFilenameStorageTests(SimpleTestCase):
             '$.$.$',
         ]
         for file_name in candidates:
-            msg = f"Detected path traversal attempt in '/tmp/{file_name}'"
+            msg = "Detected path traversal attempt in '/tmp/%s'" % file_name
             with self.subTest(file_name=file_name):
                 with self.assertRaisesMessage(SuspiciousFileOperation, msg):
                     f.generate_filename(None, file_name)
@@ -157,7 +157,7 @@ class GenerateFilenameStorageTests(SimpleTestCase):
         f = FileField(upload_to=upload_to)
         candidates = ['..', '.', '']
         for file_name in candidates:
-            msg = f"Could not derive file name from '/tmp/{file_name}'"
+            msg = "Could not derive file name from '/tmp/%s'" % file_name
             with self.subTest(file_name=file_name):
                 with self.assertRaisesMessage(SuspiciousFileOperation, msg):
                     f.generate_filename(None, file_name)
