@@ -43,6 +43,17 @@ model system.
     as ``'polls.Question'``. This sort of reference can be quite handy when
     dealing with circular import dependencies and swappable models.
 
+.. note::
+
+    Model signals such as ``post_save`` are usually running inside a transaction
+    and may not have been written to the database. There are many situations when
+    this is important such as using a signal to send an event to a remote system
+    which may race to read the unwritten data; or sending an email and having the
+    transaction roll back.
+
+    In such situations consider calling :meth:`~django.db.transaction.on_commit`
+    from the signal handler to handle the logic.
+    
 ``pre_init``
 ------------
 
