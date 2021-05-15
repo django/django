@@ -235,6 +235,11 @@ Note:
         sitemap was requested is used. If the sitemap is built outside the
         context of a request, the default is ``'http'``.
 
+        .. deprecated:: 4.0
+
+            The default protocol for sitemaps built outside the context of a
+            request will change from ``'http'`` to ``'https'`` in Django 5.0.
+
     .. attribute:: Sitemap.limit
 
         **Optional.**

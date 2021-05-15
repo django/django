@@ -4,8 +4,9 @@ from datetime import date
 from django.contrib.sitemaps import Sitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
-from django.test import modify_settings, override_settings
+from django.test import ignore_warnings, modify_settings, override_settings
 from django.utils import translation
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.formats import localize
 
 from .base import SitemapTestsBase
@@ -197,6 +198,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 """ % date.today()
         self.assertXMLEqual(response.content.decode(), expected_content)
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_sitemap_get_urls_no_site_1(self):
         """
         Check we get ImproperlyConfigured if we don't pass a site object to
@@ -207,6 +209,7 @@ class HTTPSitemapTests(SitemapTestsBase):
             Sitemap().get_urls()
 
     @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_sitemap_get_urls_no_site_2(self):
         """
         Check we get ImproperlyConfigured when we don't pass a site object to
@@ -216,6 +219,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         with self.assertRaisesMessage(ImproperlyConfigured, self.use_sitemap_err_msg):
             Sitemap().get_urls()
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_sitemap_item(self):
         """
         Check to make sure that the raw item is included with each

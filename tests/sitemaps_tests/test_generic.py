@@ -1,7 +1,8 @@
 from datetime import datetime
 
 from django.contrib.sitemaps import GenericSitemap
-from django.test import override_settings
+from django.test import ignore_warnings, override_settings
+from django.utils.deprecation import RemovedInDjango50Warning
 
 from .base import SitemapTestsBase
 from .models import TestModel
@@ -70,6 +71,17 @@ class GenericViewsSitemapTests(SitemapTestsBase):
             with self.subTest(protocol=protocol):
                 self.assertEqual(sitemap.get_protocol(protocol), protocol)
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_get_protocol_default(self):
         sitemap = GenericSitemap({'queryset': None})
         self.assertEqual(sitemap.get_protocol(), 'http')
+
+    def test_get_protocol_default_warning(self):
+        sitemap = GenericSitemap({'queryset': None})
+        msg = (
+            "The default sitemap protocol will be changed from 'http' to "
+            "'https' in Django 5.0. Set Sitemap.protocol to silence this "
+            "warning."
+        )
+        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+            sitemap.get_protocol()
