@@ -266,6 +266,15 @@ class DateFunctionTests(TestCase):
             with self.subTest(t):
                 self.assertIsNone(DTModel.objects.annotate(extracted=t).first().extracted)
 
+    def test_extract_outerref_validation(self):
+        inner_qs = DTModel.objects.filter(name=ExtractMonth(OuterRef('name')))
+        msg = (
+            'Extract input expression must be DateField, DateTimeField, '
+            'TimeField, or DurationField.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            DTModel.objects.annotate(related_name=Subquery(inner_qs.values('name')[:1]))
+
     @skipUnlessDBFeature('has_native_duration_field')
     def test_extract_duration(self):
         start_datetime = datetime(2015, 6, 15, 14, 30, 50, 321)
@@ -1097,6 +1106,31 @@ class DateFunctionTests(TestCase):
                 {'name': 'J. R. R. Tolkien', 'newest_fan_year': datetime(2016, 1, 1, 0, 0, tzinfo=tz)},
             ]
         )
+
+    def test_extract_outerref(self):
+        datetime_1 = datetime(2000, 1, 1)
+        datetime_2 = datetime(2001, 3, 5)
+        datetime_3 = datetime(2002, 1, 3)
+        if settings.USE_TZ:
+            datetime_1 = timezone.make_aware(datetime_1, is_dst=False)
+            datetime_2 = timezone.make_aware(datetime_2, is_dst=False)
+            datetime_3 = timezone.make_aware(datetime_3, is_dst=False)
+        obj_1 = self.create_model(datetime_1, datetime_3)
+        obj_2 = self.create_model(datetime_2, datetime_1)
+        obj_3 = self.create_model(datetime_3, datetime_2)
+
+        inner_qs = DTModel.objects.filter(
+            start_datetime__year=2000,
+            start_datetime__month=ExtractMonth(OuterRef('end_datetime')),
+        )
+        qs = DTModel.objects.annotate(
+            related_pk=Subquery(inner_qs.values('pk')[:1]),
+        )
+        self.assertSequenceEqual(qs.order_by('name').values('pk', 'related_pk'), [
+            {'pk': obj_1.pk, 'related_pk': obj_1.pk},
+            {'pk': obj_2.pk, 'related_pk': obj_1.pk},
+            {'pk': obj_3.pk, 'related_pk': None},
+        ])
 
 
 @override_settings(USE_TZ=True, TIME_ZONE='UTC')
