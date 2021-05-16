@@ -108,6 +108,7 @@ class TimezoneTests(SimpleTestCase):
     def test_is_aware(self):
         self.assertTrue(timezone.is_aware(datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)))
         self.assertFalse(timezone.is_aware(datetime.datetime(2011, 9, 1, 13, 20, 30)))
+        self.assertTrue(timezone.is_aware(datetime.time(21, 22, 23, 240000, tzinfo=timezone.get_current_timezone())))
 
     def test_is_naive(self):
         self.assertFalse(timezone.is_naive(datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)))
