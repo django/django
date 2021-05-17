@@ -16,6 +16,7 @@ from django.db import models
 from django.http import Http404
 from django.template.engine import Engine
 from django.urls import get_mod_func, get_resolver, get_urlconf
+from django.utils._os import safe_join
 from django.utils.decorators import method_decorator
 from django.utils.inspect import (
     func_accepts_kwargs, func_accepts_var_args, get_func_full_args,
@@ -329,7 +330,7 @@ class TemplateDetailView(BaseAdminDocsView):
         else:
             # This doesn't account for template loaders (#24128).
             for index, directory in enumerate(default_engine.dirs):
-                template_file = Path(directory) / template
+                template_file = Path(safe_join(directory, template))
                 if template_file.exists():
                     template_contents = template_file.read_text()
                 else:
