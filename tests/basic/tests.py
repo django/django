@@ -1,5 +1,6 @@
 import threading
 from datetime import datetime, timedelta
+from functools import partial
 from unittest import mock
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
@@ -9,12 +10,15 @@ from django.db.models.query import MAX_GET_RESULTS, EmptyQuerySet
 from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, skipUnlessDBFeature,
 )
+from django.utils import timezone
 from django.utils.translation import gettext_lazy
 
 from .models import (
     Article, ArticleSelectOnSave, ChildPrimaryKeyWithDefault, FeaturedArticle,
     PrimaryKeyWithDefault, SelfRef,
 )
+
+datetime_utc = partial(datetime, tzinfo=timezone.utc)
 
 
 class ModelInstanceCreationTests(TestCase):
@@ -23,7 +27,7 @@ class ModelInstanceCreationTests(TestCase):
         a = Article(
             id=None,
             headline='Parrot programs in Python',
-            pub_date=datetime(2005, 7, 28),
+            pub_date=datetime_utc(2005, 7, 28),
         )
         self.assertIsNone(a.id)
         self.assertEqual(Article.objects.all().count(), 0)
@@ -38,33 +42,33 @@ class ModelInstanceCreationTests(TestCase):
         You can initialize a model instance using positional arguments,
         which should match the field order as defined in the model.
         """
-        a = Article(None, 'Second article', datetime(2005, 7, 29))
+        a = Article(None, 'Second article', datetime_utc(2005, 7, 29))
         a.save()
 
         self.assertEqual(a.headline, 'Second article')
-        self.assertEqual(a.pub_date, datetime(2005, 7, 29, 0, 0))
+        self.assertEqual(a.pub_date, datetime_utc(2005, 7, 29, 0, 0))
 
     def test_can_create_instance_using_kwargs(self):
         a = Article(
             id=None,
             headline='Third article',
-            pub_date=datetime(2005, 7, 30),
+            pub_date=datetime_utc(2005, 7, 30),
         )
         a.save()
         self.assertEqual(a.headline, 'Third article')
-        self.assertEqual(a.pub_date, datetime(2005, 7, 30, 0, 0))
+        self.assertEqual(a.pub_date, datetime_utc(2005, 7, 30, 0, 0))
 
     def test_autofields_generate_different_values_for_each_instance(self):
-        a1 = Article.objects.create(headline='First', pub_date=datetime(2005, 7, 30, 0, 0))
-        a2 = Article.objects.create(headline='First', pub_date=datetime(2005, 7, 30, 0, 0))
-        a3 = Article.objects.create(headline='First', pub_date=datetime(2005, 7, 30, 0, 0))
+        a1 = Article.objects.create(headline='First', pub_date=datetime_utc(2005, 7, 30, 0, 0))
+        a2 = Article.objects.create(headline='First', pub_date=datetime_utc(2005, 7, 30, 0, 0))
+        a3 = Article.objects.create(headline='First', pub_date=datetime_utc(2005, 7, 30, 0, 0))
         self.assertNotEqual(a3.id, a1.id)
         self.assertNotEqual(a3.id, a2.id)
 
     def test_can_mix_and_match_position_and_kwargs(self):
         # You can also mix and match position and keyword arguments, but
         # be sure not to duplicate field information.
-        a = Article(None, 'Fourth article', pub_date=datetime(2005, 7, 31))
+        a = Article(None, 'Fourth article', pub_date=datetime_utc(2005, 7, 31))
         a.save()
         self.assertEqual(a.headline, 'Fourth article')
 
@@ -91,13 +95,13 @@ class ModelInstanceCreationTests(TestCase):
         You can leave off the value for an AutoField when creating an
         object, because it'll get filled in automatically when you save().
         """
-        a = Article(headline='Article 5', pub_date=datetime(2005, 7, 31))
+        a = Article(headline='Article 5', pub_date=datetime_utc(2005, 7, 31))
         a.save()
         self.assertEqual(a.headline, 'Article 5')
         self.assertIsNotNone(a.id)
 
     def test_leaving_off_a_field_with_default_set_the_default_will_be_saved(self):
-        a = Article(pub_date=datetime(2005, 7, 31))
+        a = Article(pub_date=datetime_utc(2005, 7, 31))
         a.save()
         self.assertEqual(a.headline, 'Default headline')
 
@@ -105,20 +109,20 @@ class ModelInstanceCreationTests(TestCase):
         """as much precision in *seconds*"""
         a1 = Article(
             headline='Article 7',
-            pub_date=datetime(2005, 7, 31, 12, 30),
+            pub_date=datetime_utc(2005, 7, 31, 12, 30),
         )
         a1.save()
-        self.assertEqual(Article.objects.get(id__exact=a1.id).pub_date, datetime(2005, 7, 31, 12, 30))
+        self.assertEqual(Article.objects.get(id__exact=a1.id).pub_date, datetime_utc(2005, 7, 31, 12, 30))
 
         a2 = Article(
             headline='Article 8',
-            pub_date=datetime(2005, 7, 31, 12, 30, 45),
+            pub_date=datetime_utc(2005, 7, 31, 12, 30, 45),
         )
         a2.save()
-        self.assertEqual(Article.objects.get(id__exact=a2.id).pub_date, datetime(2005, 7, 31, 12, 30, 45))
+        self.assertEqual(Article.objects.get(id__exact=a2.id).pub_date, datetime_utc(2005, 7, 31, 12, 30, 45))
 
     def test_saving_an_object_again_does_not_create_a_new_object(self):
-        a = Article(headline='original', pub_date=datetime(2014, 5, 16))
+        a = Article(headline='original', pub_date=datetime_utc(2014, 5, 16))
         a.save()
         current_id = a.id
 
@@ -132,7 +136,7 @@ class ModelInstanceCreationTests(TestCase):
     def test_querysets_checking_for_membership(self):
         headlines = [
             'Parrot programs in Python', 'Second article', 'Third article']
-        some_pub_date = datetime(2014, 5, 16, 12, 1)
+        some_pub_date = datetime_utc(2014, 5, 16, 12, 1)
         for headline in headlines:
             Article(headline=headline, pub_date=some_pub_date).save()
         a = Article(headline='Some headline', pub_date=some_pub_date)
@@ -165,7 +169,7 @@ class ModelTest(TestCase):
     def test_queryset_delete_removes_all_items_in_that_queryset(self):
         headlines = [
             'An article', 'Article One', 'Amazing article', 'Boring article']
-        some_pub_date = datetime(2014, 5, 16, 12, 1)
+        some_pub_date = datetime_utc(2014, 5, 16, 12, 1)
         for headline in headlines:
             Article(headline=headline, pub_date=some_pub_date).save()
         self.assertQuerysetEqual(
@@ -177,7 +181,7 @@ class ModelTest(TestCase):
         self.assertEqual(Article.objects.get().headline, 'Boring article')
 
     def test_not_equal_and_equal_operators_behave_as_expected_on_instances(self):
-        some_pub_date = datetime(2014, 5, 16, 12, 1)
+        some_pub_date = datetime_utc(2014, 5, 16, 12, 1)
         a1 = Article.objects.create(headline='First', pub_date=some_pub_date)
         a2 = Article.objects.create(headline='Second', pub_date=some_pub_date)
         self.assertNotEqual(a1, a2)
@@ -188,17 +192,17 @@ class ModelTest(TestCase):
     def test_microsecond_precision(self):
         a9 = Article(
             headline='Article 9',
-            pub_date=datetime(2005, 7, 31, 12, 30, 45, 180),
+            pub_date=datetime_utc(2005, 7, 31, 12, 30, 45, 180),
         )
         a9.save()
-        self.assertEqual(Article.objects.get(pk=a9.pk).pub_date, datetime(2005, 7, 31, 12, 30, 45, 180))
+        self.assertEqual(Article.objects.get(pk=a9.pk).pub_date, datetime_utc(2005, 7, 31, 12, 30, 45, 180))
 
     def test_manually_specify_primary_key(self):
         # You can manually specify the primary key when creating a new object.
         a101 = Article(
             id=101,
             headline='Article 101',
-            pub_date=datetime(2005, 7, 31, 12, 30, 45),
+            pub_date=datetime_utc(2005, 7, 31, 12, 30, 45),
         )
         a101.save()
         a101 = Article.objects.get(pk=101)
@@ -208,7 +212,7 @@ class ModelTest(TestCase):
         # You can create saved objects in a single step
         a10 = Article.objects.create(
             headline="Article 10",
-            pub_date=datetime(2005, 7, 31, 12, 30, 45),
+            pub_date=datetime_utc(2005, 7, 31, 12, 30, 45),
         )
         self.assertEqual(Article.objects.get(headline="Article 10"), a10)
 
@@ -217,22 +221,23 @@ class ModelTest(TestCase):
         # the given year, including Jan. 1 and Dec. 31.
         a11 = Article.objects.create(
             headline='Article 11',
-            pub_date=datetime(2008, 1, 1),
+            pub_date=datetime_utc(2008, 1, 1),
         )
         a12 = Article.objects.create(
             headline='Article 12',
-            pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999),
+            pub_date=datetime_utc(2008, 12, 31, 23, 59, 59, 999999),
         )
-        self.assertSequenceEqual(
-            Article.objects.filter(pub_date__year=2008),
-            [a11, a12],
-        )
+        with self.settings(TIME_ZONE='UTC'):
+            self.assertSequenceEqual(
+                Article.objects.filter(pub_date__year=2008),
+                [a11, a12],
+            )
 
     def test_unicode_data(self):
         # Unicode data works, too.
         a = Article(
             headline='\u6797\u539f \u3081\u3050\u307f',
-            pub_date=datetime(2005, 7, 28),
+            pub_date=datetime_utc(2005, 7, 28),
         )
         a.save()
         self.assertEqual(Article.objects.get(pk=a.id).headline, '\u6797\u539f \u3081\u3050\u307f')
@@ -243,15 +248,15 @@ class ModelTest(TestCase):
         # keys are equal.
         a10 = Article.objects.create(
             headline="Article 10",
-            pub_date=datetime(2005, 7, 31, 12, 30, 45),
+            pub_date=datetime_utc(2005, 7, 31, 12, 30, 45),
         )
         a11 = Article.objects.create(
             headline='Article 11',
-            pub_date=datetime(2008, 1, 1),
+            pub_date=datetime_utc(2008, 1, 1),
         )
         a12 = Article.objects.create(
             headline='Article 12',
-            pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999),
+            pub_date=datetime_utc(2008, 12, 31, 23, 59, 59, 999999),
         )
 
         s = {a10, a11, a12}
@@ -261,26 +266,27 @@ class ModelTest(TestCase):
         # The 'select' argument to extra() supports names with dashes in
         # them, as long as you use values().
         Article.objects.bulk_create([
-            Article(headline='Article 10', pub_date=datetime(2005, 7, 31, 12, 30, 45)),
-            Article(headline='Article 11', pub_date=datetime(2008, 1, 1)),
-            Article(headline='Article 12', pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999)),
+            Article(headline='Article 10', pub_date=datetime_utc(2005, 7, 31, 12, 30, 45)),
+            Article(headline='Article 11', pub_date=datetime_utc(2008, 1, 1)),
+            Article(headline='Article 12', pub_date=datetime_utc(2008, 12, 31, 23, 59, 59, 999999)),
         ])
-        dicts = Article.objects.filter(
-            pub_date__year=2008).extra(
-            select={'dashed-value': '1'}).values('headline', 'dashed-value')
-        self.assertEqual(
-            [sorted(d.items()) for d in dicts],
-            [[('dashed-value', 1), ('headline', 'Article 11')], [('dashed-value', 1), ('headline', 'Article 12')]]
-        )
+        with self.settings(TIME_ZONE='UTC'):
+            dicts = Article.objects.filter(
+                pub_date__year=2008).extra(
+                select={'dashed-value': '1'}).values('headline', 'dashed-value')
+            self.assertEqual(
+                [sorted(d.items()) for d in dicts],
+                [[('dashed-value', 1), ('headline', 'Article 11')], [('dashed-value', 1), ('headline', 'Article 12')]]
+            )
 
     def test_extra_method_select_argument_with_dashes(self):
         # If you use 'select' with extra() and names containing dashes on a
         # query that's *not* a values() query, those extra 'select' values
         # will silently be ignored.
         Article.objects.bulk_create([
-            Article(headline='Article 10', pub_date=datetime(2005, 7, 31, 12, 30, 45)),
-            Article(headline='Article 11', pub_date=datetime(2008, 1, 1)),
-            Article(headline='Article 12', pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999)),
+            Article(headline='Article 10', pub_date=datetime_utc(2005, 7, 31, 12, 30, 45)),
+            Article(headline='Article 11', pub_date=datetime_utc(2008, 1, 1)),
+            Article(headline='Article 12', pub_date=datetime_utc(2008, 12, 31, 23, 59, 59, 999999)),
         ])
         articles = Article.objects.filter(
             pub_date__year=2008).extra(select={'dashed-value': '1', 'undashedvalue': '2'})
@@ -293,7 +299,7 @@ class ModelTest(TestCase):
         """
         notlazy = 'test'
         lazy = gettext_lazy(notlazy)
-        Article.objects.create(headline=lazy, pub_date=datetime.now())
+        Article.objects.create(headline=lazy, pub_date=timezone.now())
         article = Article.objects.get()
         self.assertEqual(article.headline, notlazy)
         # test that assign + save works with Promise objects
@@ -306,7 +312,7 @@ class ModelTest(TestCase):
         self.assertEqual(article.headline, notlazy)
         # still test bulk_create()
         Article.objects.all().delete()
-        Article.objects.bulk_create([Article(headline=lazy, pub_date=datetime.now())])
+        Article.objects.bulk_create([Article(headline=lazy, pub_date=timezone.now())])
         article = Article.objects.get()
         self.assertEqual(article.headline, notlazy)
 
@@ -319,7 +325,7 @@ class ModelTest(TestCase):
 
     def test_emptyqs_values(self):
         # test for #15959
-        Article.objects.create(headline='foo', pub_date=datetime.now())
+        Article.objects.create(headline='foo', pub_date=timezone.now())
         with self.assertNumQueries(0):
             qs = Article.objects.none().values_list('pk')
             self.assertIsInstance(qs, EmptyQuerySet)
@@ -327,7 +333,7 @@ class ModelTest(TestCase):
 
     def test_emptyqs_customqs(self):
         # A hacky test for custom QuerySet subclass - refs #17271
-        Article.objects.create(headline='foo', pub_date=datetime.now())
+        Article.objects.create(headline='foo', pub_date=timezone.now())
 
         class CustomQuerySet(models.QuerySet):
             def do_something(self):
@@ -343,7 +349,7 @@ class ModelTest(TestCase):
 
     def test_emptyqs_values_order(self):
         # Tests for ticket #17712
-        Article.objects.create(headline='foo', pub_date=datetime.now())
+        Article.objects.create(headline='foo', pub_date=timezone.now())
         with self.assertNumQueries(0):
             self.assertEqual(len(Article.objects.none().values_list('id').order_by('id')), 0)
         with self.assertNumQueries(0):
@@ -353,7 +359,7 @@ class ModelTest(TestCase):
     @skipUnlessDBFeature('can_distinct_on_fields')
     def test_emptyqs_distinct(self):
         # Tests for #19426
-        Article.objects.create(headline='foo', pub_date=datetime.now())
+        Article.objects.create(headline='foo', pub_date=timezone.now())
         with self.assertNumQueries(0):
             self.assertEqual(len(Article.objects.none().distinct('headline', 'pub_date')), 0)
 
@@ -399,7 +405,7 @@ class ModelTest(TestCase):
 
     def test_delete_and_access_field(self):
         # Accessing a field after it's deleted from a model reloads its value.
-        pub_date = datetime.now()
+        pub_date = timezone.now()
         article = Article.objects.create(headline='foo', pub_date=pub_date)
         new_pub_date = article.pub_date + timedelta(days=10)
         article.headline = 'bar'
@@ -413,7 +419,7 @@ class ModelTest(TestCase):
     def test_multiple_objects_max_num_fetched(self):
         max_results = MAX_GET_RESULTS - 1
         Article.objects.bulk_create(
-            Article(headline='Area %s' % i, pub_date=datetime(2005, 7, 28))
+            Article(headline='Area %s' % i, pub_date=datetime_utc(2005, 7, 28))
             for i in range(max_results)
         )
         self.assertRaisesMessage(
@@ -422,7 +428,7 @@ class ModelTest(TestCase):
             Article.objects.get,
             headline__startswith='Area',
         )
-        Article.objects.create(headline='Area %s' % max_results, pub_date=datetime(2005, 7, 28))
+        Article.objects.create(headline='Area %s' % max_results, pub_date=datetime_utc(2005, 7, 28))
         self.assertRaisesMessage(
             MultipleObjectsReturned,
             'get() returned more than one Article -- it returned more than %d!' % max_results,
@@ -438,7 +444,7 @@ class ModelLookupTest(TestCase):
         cls.a = Article(
             id=None,
             headline='Swallow programs in Python',
-            pub_date=datetime(2005, 7, 28),
+            pub_date=datetime_utc(2005, 7, 28),
         )
         # Save it into the database. You have to call save() explicitly.
         cls.a.save()
@@ -457,8 +463,9 @@ class ModelLookupTest(TestCase):
         self.assertEqual(Article.objects.get(headline__startswith='Swallow'), self.a)
         self.assertEqual(Article.objects.get(pub_date__year=2005), self.a)
         self.assertEqual(Article.objects.get(pub_date__year=2005, pub_date__month=7), self.a)
-        self.assertEqual(Article.objects.get(pub_date__year=2005, pub_date__month=7, pub_date__day=28), self.a)
-        self.assertEqual(Article.objects.get(pub_date__week_day=5), self.a)
+        with self.settings(TIME_ZONE='UTC'):
+            self.assertEqual(Article.objects.get(pub_date__year=2005, pub_date__month=7, pub_date__day=28), self.a)
+            self.assertEqual(Article.objects.get(pub_date__week_day=5), self.a)
 
     def test_equal_lookup(self):
         # The "__exact" lookup type can be omitted, as a shortcut.
@@ -478,14 +485,15 @@ class ModelLookupTest(TestCase):
             [self.a],
         )
 
-        self.assertSequenceEqual(
-            Article.objects.filter(pub_date__week_day=5),
-            [self.a],
-        )
-        self.assertSequenceEqual(
-            Article.objects.filter(pub_date__week_day=6),
-            [],
-        )
+        with self.settings(TIME_ZONE='UTC'):
+            self.assertSequenceEqual(
+                Article.objects.filter(pub_date__week_day=5),
+                [self.a],
+            )
+            self.assertSequenceEqual(
+                Article.objects.filter(pub_date__week_day=6),
+                [],
+            )
 
     def test_does_not_exist(self):
         # Django raises an Article.DoesNotExist exception for get() if the
@@ -518,7 +526,7 @@ class ModelLookupTest(TestCase):
         a = Article(
             id=None,
             headline='Swallow bites Python',
-            pub_date=datetime(2005, 7, 28),
+            pub_date=datetime_utc(2005, 7, 28),
         )
         a.save()
 
@@ -545,7 +553,7 @@ class ConcurrentSaveTests(TransactionTestCase):
         Test fetching, deleting and finally saving an object - we should get
         an insert in this case.
         """
-        a = Article.objects.create(headline='foo', pub_date=datetime.now())
+        a = Article.objects.create(headline='foo', pub_date=timezone.now())
         exceptions = []
 
         def deleter():
@@ -629,10 +637,10 @@ class ManagerTest(SimpleTestCase):
 
 class SelectOnSaveTests(TestCase):
     def test_select_on_save(self):
-        a1 = Article.objects.create(pub_date=datetime.now())
+        a1 = Article.objects.create(pub_date=timezone.now())
         with self.assertNumQueries(1):
             a1.save()
-        asos = ArticleSelectOnSave.objects.create(pub_date=datetime.now())
+        asos = ArticleSelectOnSave.objects.create(pub_date=timezone.now())
         with self.assertNumQueries(2):
             asos.save()
         with self.assertNumQueries(1):
@@ -666,7 +674,7 @@ class SelectOnSaveTests(TestCase):
 
         try:
             Article._base_manager._queryset_class = FakeQuerySet
-            asos = ArticleSelectOnSave.objects.create(pub_date=datetime.now())
+            asos = ArticleSelectOnSave.objects.create(pub_date=timezone.now())
             with self.assertNumQueries(3):
                 asos.save()
                 self.assertTrue(FakeQuerySet.called)
@@ -688,8 +696,8 @@ class SelectOnSaveTests(TestCase):
 class ModelRefreshTests(TestCase):
 
     def test_refresh(self):
-        a = Article.objects.create(pub_date=datetime.now())
-        Article.objects.create(pub_date=datetime.now())
+        a = Article.objects.create(pub_date=timezone.now())
+        Article.objects.create(pub_date=timezone.now())
         Article.objects.filter(pk=a.pk).update(headline='new headline')
         with self.assertNumQueries(1):
             a.refresh_from_db()
@@ -743,7 +751,7 @@ class ModelRefreshTests(TestCase):
         self.assertEqual(s2.selfref, s1)
 
     def test_refresh_unsaved(self):
-        pub_date = datetime.now()
+        pub_date = timezone.now()
         a = Article.objects.create(pub_date=pub_date)
         a2 = Article(id=a.pk)
         with self.assertNumQueries(1):
@@ -754,7 +762,7 @@ class ModelRefreshTests(TestCase):
     def test_refresh_fk_on_delete_set_null(self):
         a = Article.objects.create(
             headline='Parrot programs in Python',
-            pub_date=datetime(2005, 7, 28),
+            pub_date=datetime_utc(2005, 7, 28),
         )
         s1 = SelfRef.objects.create(article=a)
         a.delete()
@@ -763,7 +771,7 @@ class ModelRefreshTests(TestCase):
         self.assertIsNone(s1.article)
 
     def test_refresh_no_fields(self):
-        a = Article.objects.create(pub_date=datetime.now())
+        a = Article.objects.create(pub_date=timezone.now())
         with self.assertNumQueries(0):
             a.refresh_from_db(fields=[])
 
@@ -771,7 +779,7 @@ class ModelRefreshTests(TestCase):
         """refresh_from_db() clear cached reverse relations."""
         article = Article.objects.create(
             headline='Parrot programs in Python',
-            pub_date=datetime(2005, 7, 28),
+            pub_date=datetime_utc(2005, 7, 28),
         )
         self.assertFalse(hasattr(article, 'featured'))
         FeaturedArticle.objects.create(article_id=article.pk)
@@ -781,7 +789,7 @@ class ModelRefreshTests(TestCase):
     def test_refresh_clears_one_to_one_field(self):
         article = Article.objects.create(
             headline='Parrot programs in Python',
-            pub_date=datetime(2005, 7, 28),
+            pub_date=datetime_utc(2005, 7, 28),
         )
         featured = FeaturedArticle.objects.create(article_id=article.pk)
         self.assertEqual(featured.article.headline, 'Parrot programs in Python')
@@ -791,7 +799,7 @@ class ModelRefreshTests(TestCase):
         self.assertEqual(featured.article.headline, 'Parrot programs in Python 2.0')
 
     def test_prefetched_cache_cleared(self):
-        a = Article.objects.create(pub_date=datetime(2005, 7, 28))
+        a = Article.objects.create(pub_date=datetime_utc(2005, 7, 28))
         s = SelfRef.objects.create(article=a)
         # refresh_from_db() without fields=[...]
         a1_prefetched = Article.objects.prefetch_related('selfref_set').first()
