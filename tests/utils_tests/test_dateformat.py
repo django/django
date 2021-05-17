@@ -1,3 +1,4 @@
+import itertools
 from datetime import date, datetime
 
 from django.test import SimpleTestCase, override_settings
@@ -147,15 +148,21 @@ class DateFormatTests(SimpleTestCase):
         self.assertEqual(dateformat.format(aware_dt, 'O'), '-0330')
 
     def test_invalid_time_format_specifiers(self):
-        my_birthday = date(1984, 8, 7)
+        class customdate(date):
+            pass
 
-        for specifier in ['a', 'A', 'f', 'g', 'G', 'h', 'H', 'i', 'P', 'r', 's', 'u']:
+        dates = [date(1984, 8, 7), customdate(1984, 8, 7)]
+        specifiers = ['a', 'A', 'f', 'g', 'G', 'h', 'H', 'i', 'P', 'r', 's', 'u']
+
+        for date_, specifier in itertools.product(dates, specifiers):
+            name = date_.__class__.__name__
             msg = (
-                "The format for date objects may not contain time-related "
-                "format specifiers (found '%s')." % specifier
+                'The format for date objects may not contain time-related '
+                f'format specifiers (found {specifier!r}).'
             )
-            with self.assertRaisesMessage(TypeError, msg):
-                dateformat.format(my_birthday, specifier)
+            with self.subTest(type=name, specifier=specifier):
+                with self.assertRaisesMessage(TypeError, msg):
+                    dateformat.format(date_, specifier)
 
     def test_r_format_with_non_en_locale(self):
         # Changing the locale doesn't change the "r" format.

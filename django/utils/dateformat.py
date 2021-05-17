@@ -33,7 +33,11 @@ class Formatter:
         pieces = []
         for i, piece in enumerate(re_formatchars.split(str(formatstr))):
             if i % 2:
-                if type(self.data) is datetime.date and hasattr(TimeFormat, piece):
+                if (
+                    not isinstance(self.data, datetime.datetime) and
+                    isinstance(self.data, datetime.date) and
+                    hasattr(TimeFormat, piece)
+                ):
                     raise TypeError(
                         "The format for date objects may not contain "
                         "time-related format specifiers (found '%s')." % piece
@@ -264,7 +268,10 @@ class DateFormat(TimeFormat):
 
     def r(self):
         "RFC 5322 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"
-        if type(self.data) is datetime.date:
+        if (
+            not isinstance(self.data, datetime.datetime) and
+            isinstance(self.data, datetime.date)
+        ):
             raise TypeError(
                 "The format for date objects may not contain time-related "
                 "format specifiers (found 'r')."
