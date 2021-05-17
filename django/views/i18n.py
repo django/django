@@ -101,7 +101,7 @@ js_catalog_template = r"""
   django.catalog = django.catalog || {};
   {% if catalog_str %}
   const newcatalog = {{ catalog_str }};
-  for (const key in newcatalog) {
+  for (var key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   {% endif %}
