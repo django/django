@@ -2294,7 +2294,10 @@ database query like ``count()`` would.
 
 Takes a list of field values (``id_list``) and the ``field_name`` for those
 values, and returns a dictionary mapping each value to an instance of the
-object with the given field value. If ``id_list`` isn't provided, all objects
+object with the given field value. No
+:exc:`django.core.exceptions.ObjectDoesNotExist` exceptions will ever be raised
+by ``in_bulk``; that is, any ``id_list`` value not matching any instance will
+simply be ignored. If ``id_list`` isn't provided, all objects
 in the queryset are returned. ``field_name`` must be a unique field or a
 distinct field (if there's only one field specified in :meth:`distinct`).
 ``field_name`` defaults to the primary key.
