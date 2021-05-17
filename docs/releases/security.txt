@@ -1156,7 +1156,7 @@ XSS via admin login redirect. `Full description
 Versions affected
 ~~~~~~~~~~~~~~~~~
 
-* Django 0.91 :commit:`(patch) <50ce7fb57d>`
+* Django 0.91 :commit:`(patch) <6e657e2c404a96e744748209e896d8a69c15fdf2>`
 * Django 0.95 :commit:`(patch) <50ce7fb57d>`
 * Django 0.96 :commit:`(patch) <7791e5c050>`
 
@@ -1200,6 +1200,6 @@ Filename validation issue in translation framework. `Full description
 Versions affected
 ~~~~~~~~~~~~~~~~~
 
-* Django 0.90 :commit:`(patch) <518d406e53>`
-* Django 0.91 :commit:`(patch) <518d406e53>`
+* Django 0.90 :commit:`(patch) <6eefa521be3c658dc0b38f8d62d52e9801e198ab>`
+* Django 0.91 :commit:`(patch) <d31e39173c29537e6a1613278c93634c18a3206e>`
 * Django 0.95 :commit:`(patch) <a132d411c6>` (released January 21 2007)
