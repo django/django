@@ -458,7 +458,7 @@ that contains a reference to them. On the plus side, methods and managers from
 these base classes inherit normally, so if you absolutely need access to these
 you can opt to move them into a superclass.
 
-To remove old references, you can :ref:`squash migrations <migration-squashing>`
+To remove old references, you can :ref:`trim migrations <migration-trimming>`
 or, if there aren't many references, copy them into the migration files.
 
 .. _migrations-removing-model-fields:
@@ -505,8 +505,8 @@ to::
 You should keep the field's methods that are required for it to operate in
 database migrations such as ``__init__()``, ``deconstruct()``, and
 ``get_internal_type()``. Keep this stub field for as long as any migrations
-which reference the field exist. For example, after squashing migrations and
-removing the old ones, you should be able to remove the field completely.
+which reference the field exist. For example, after removing migrations by
+trimming or squashing them, you should be able to remove the field completely.
 
 .. _data-migrations:
 
@@ -622,26 +622,116 @@ to be able to write your own, see the :doc:`migration operations reference
 </ref/migration-operations>` and the "how-to" on :doc:`writing migrations
 </howto/writing-migrations>`.
 
-.. _migration-squashing:
+.. _migration-trimming:
 
-Squashing migrations
-====================
+Trimming migrations
+===================
 
 You are encouraged to make migrations freely and not worry about how many you
 have; the migration code is optimized to deal with hundreds at a time without
 much slowdown. However, eventually you will want to move back from having
-several hundred migrations to just a few, and that's where squashing comes in.
+several hundred migrations to just a few. That's where trimming migrations
+comes in.
 
-Squashing is the act of reducing an existing set of many migrations down to
+Trimming is the act of reducing an existing set of many migrations down to
 one (or sometimes a few) migrations which still represent the same changes.
 
-Django does this by taking all of your existing migrations, extracting their
-``Operation``\s and putting them all in sequence, and then running an optimizer
-over them to try and reduce the length of the list - for example, it knows
-that :class:`~django.db.migrations.operations.CreateModel` and
-:class:`~django.db.migrations.operations.DeleteModel` cancel each other out,
-and it knows that :class:`~django.db.migrations.operations.AddField` can be
-rolled into :class:`~django.db.migrations.operations.CreateModel`.
+There are two common approaches to trimming migrations. The first is to use the
+``squashmigrations`` command to create a merged migration file, however this
+approach can be impractical on complex projects. The second approach is to
+coordinate with your team to ensure that all installations of your app are up
+to date, then to have a scheduled time when migrations are removed and
+recreated from scratch.
+
+Which approach is best for your project will depend on the complexity of it
+and the flexibility of your team.
+
+
+.. _manual-migration-trimming:
+
+Trimming migrations manually
+----------------------------
+
+The easiest and most reliable way to trim migrations is to do so manually,
+instead of using the ``squashmigrations`` command. When doing this process, any
+apps that have foreign key interdependencies will need to be trimmed at the same
+time so that old migrations do not depend on deleted migrations. For example,
+if your ``pizza`` app has an ``Ingredients`` model in your ``food`` app, you
+will need to manually trim both the ``food`` and the ``pizza`` apps
+simultaneously. It is often easiest to trim all apps in your project at the
+same time.
+
+Once you have identified the apps you plan to trim, ensure that all of your
+installations of your project are up to date with the same migrations and
+ensure that no new migrations will be created until this process is complete.
+To check that all migrations are in place, run the following on all
+installations of your project::
+
+    $ ./manage.py makemigrations
+
+And::
+
+    $ ./manage.py showmigrations
+
+``makemigrations`` should show "No changes detected" and ``showmigrations``
+should show "[X]" for all migrations, indicating that they have been applied.
+
+After all of your databases are up to date, you need to clear the migration
+history table. Run the following for each of your apps you plan to migrate::
+
+    $ ./manage.py migrate --fake my_app1 my_app2 zero
+
+If you run ``showmigrations`` again, it will now show that none of your
+migrations have been applied.
+
+Next, save any data or SQL migrations that you have. Find these migrations by
+searching for ``RunPython`` and ``RunSQL`` in your migration files, and copy
+anything you find to a temporary file.
+
+Delete all of the migrations in the affected apps with something like::
+
+    $ cd my_app1
+    $ find . -path "migrations/*.py" -not -name "__init__.py" -delete
+
+Create a fresh migration for each app with::
+
+    $ ./manage.py makemigrations
+
+For any app that had data or SQL migrations, recreate empty migration files with
+with::
+
+    $ ./manage.py makemigrations --empty my_app1 my_app2
+
+Using the temporary file you made above, recreate the data and SQL migrations
+that you need by copying over any old ``RunPython`` or ``RunSQL`` commands.
+
+You should now have new migration files representing the state of your
+database and any data migrations that you had prior to starting this process.
+
+Because your database already has these changes applied by your old migrations,
+you do not need to actually migrate it, but these migrations do need to be
+marked as applied. Thus, fake running them with::
+
+    $ ./manage.py migrate --fake
+
+Finally, to verify that everything worked, check that the migration has been
+applied successfully with::
+
+    $ ./manage.py showmigrations
+
+
+.. _migration-squashing:
+
+Squashing migrations
+--------------------
+
+Django squashes migrations by taking all of your existing migrations,
+extracting their ``Operation``\s, putting them all in sequence, and then
+running an optimizer over them to try and reduce the length of the list - for
+example, it knows that :class:`~django.db.migrations.operations.CreateModel`
+and :class:`~django.db.migrations.operations.DeleteModel` cancel each other
+out, and it knows that :class:`~django.db.migrations.operations.AddField` can
+be rolled into :class:`~django.db.migrations.operations.CreateModel`.
 
 Once the operation sequence has been reduced as much as possible - the amount
 possible depends on how closely intertwined your models are and if you have
