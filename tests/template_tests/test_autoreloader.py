@@ -64,6 +64,26 @@ class TemplateReloadTests(SimpleTestCase):
         autoreload.reset_loaders()
         self.assertEqual(mock_reset.call_count, 2)
 
+    @override_settings(
+        TEMPLATES=[{
+            'DIRS': [
+                str(ROOT) + '/absolute_str',
+                'template_tests/relative_str',
+                Path('template_tests/relative_path'),
+            ],
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        }]
+    )
+    def test_template_dirs_normalized_to_paths(self):
+        self.assertSetEqual(
+            autoreload.get_template_directories(),
+            {
+                ROOT / 'absolute_str',
+                Path.cwd() / 'template_tests/relative_str',
+                Path.cwd() / 'template_tests/relative_path',
+            }
+        )
+
 
 @require_jinja2
 @override_settings(INSTALLED_APPS=['template_tests'])

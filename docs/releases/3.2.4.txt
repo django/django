@@ -22,3 +22,6 @@ Bugfixes
 * Fixed a crash in Django 3.2 that could occur when running ``mod_wsgi`` with
   the recommended settings while the Windows ``colorama`` library was installed
   (:ticket:`32740`).
+  
+* Fixed a bug in Django 3.2 that would trigger the auto-reloader for template
+  changes when directory paths were specified with strings (:ticket:`32744`).
