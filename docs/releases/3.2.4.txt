@@ -6,6 +6,18 @@ Django 3.2.4 release notes
 
 Django 3.2.4 fixes two security issues and several bugs in 3.2.3.
 
+CVE-2021-33203: Potential directory traversal via ``admindocs``
+===============================================================
+
+Staff members could use the :mod:`~django.contrib.admindocs`
+``TemplateDetailView`` view to check the existence of arbitrary files.
+Additionally, if (and only if) the default admindocs templates have been
+customized by the developers to also expose the file contents, then not only
+the existence but also the file contents would have been exposed.
+
+As a mitigation, path sanitation is now applied and only files within the
+template root directories can be loaded.
+
 Bugfixes
 ========
 
