@@ -434,6 +434,18 @@ class ModelDefaultAutoFieldTests(SimpleTestCase):
             Warning(self.msg, hint=self.hint, obj=Parent, id='models.W042'),
         ])
 
+    def test_auto_created_pk_inherited_abstract_parent(self):
+        class Parent(models.Model):
+            class Meta:
+                abstract = True
+
+        class Child(Parent):
+            pass
+
+        self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [
+            Warning(self.msg, hint=self.hint, obj=Child, id='models.W042'),
+        ])
+
     @override_settings(DEFAULT_AUTO_FIELD='django.db.models.BigAutoField')
     def test_default_auto_field_setting(self):
         class Model(models.Model):
