@@ -716,7 +716,7 @@ For example::
     def get_absolute_url(self):
         # here we assume that you have detail-view as URL pattern name
         from django.urls import reverse
-        return reverse('detail-view', kwargs={"pk" : self.pk})
+        return reverse('people-detail', kwargs={'pk' : self.pk})
 
 One place Django uses ``get_absolute_url()`` is in the admin app. If an object
 defines this method, the object-editing page will have a "View on site" link
