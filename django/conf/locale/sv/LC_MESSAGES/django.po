@@ -1115,7 +1115,7 @@ msgid "0 minutes"
 msgstr "0 minuter"
 
 msgid "Forbidden"
-msgstr "Ottillåtet"
+msgstr "Otillåtet"
 
 msgid "CSRF verification failed. Request aborted."
 msgstr "CSRF-verifikation misslyckades. Förfrågan avbröts."
