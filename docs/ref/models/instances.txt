@@ -714,7 +714,6 @@ usually the best approach.
 For example::
 
     def get_absolute_url(self):
-        # here we assume that you have detail-view as URL pattern name
         from django.urls import reverse
         return reverse('people-detail', kwargs={'pk' : self.pk})
 
