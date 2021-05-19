@@ -656,10 +656,10 @@ The easiest and most reliable way to trim migrations is to do so manually,
 instead of using the ``squashmigrations`` command. When doing this process, any
 apps that have foreign key interdependencies will need to be trimmed at the same
 time so that old migrations do not depend on deleted migrations. For example,
-if your ``pizza`` app has an ``Ingredients`` model in your ``food`` app, you
-will need to manually trim both the ``food`` and the ``pizza`` apps
-simultaneously. It is often easiest to trim all apps in your project at the
-same time.
+if your ``pizza`` app has a ``ForeignKey`` to an ``Ingredients`` model in your
+``food`` app, you will need to manually trim both the ``food`` and the
+``pizza`` apps simultaneously. It is often easiest to trim all apps in your
+project at the same time.
 
 Once you have identified the apps you plan to trim, ensure that all of your
 installations of your project are up to date with the same migrations and
@@ -679,7 +679,9 @@ should show "[X]" for all migrations, indicating that they have been applied.
 After all of your databases are up to date, you need to clear the migration
 history table. Run the following for each of your apps you plan to migrate::
 
-    $ ./manage.py migrate --fake my_app1 my_app2 zero
+    $ ./manage.py migrate --fake my_app1 zero
+    $ ./manage.py migrate --fake my_app2 zero
+    ...
 
 If you run ``showmigrations`` again, it will now show that none of your
 migrations have been applied.
@@ -688,17 +690,19 @@ Next, save any data or SQL migrations that you have. Find these migrations by
 searching for ``RunPython`` and ``RunSQL`` in your migration files, and copy
 anything you find to a temporary file.
 
-Delete all of the migrations in the affected apps with something like::
+Delete all of the migrations in the affected apps. In a Unix system the
+following will generally work::
 
     $ cd my_app1
     $ find . -path "migrations/*.py" -not -name "__init__.py" -delete
 
-Create a fresh migration for each app with::
+Create migrations for each app. For apps with interdependencies, this may
+create more than one migration::
 
     $ ./manage.py makemigrations
 
-For any app that had data or SQL migrations, recreate empty migration files with
-with::
+For any app that had data or SQL migrations, analyze whether those migrations
+are still needed. For those that are needed, recreate empty migration files::
 
     $ ./manage.py makemigrations --empty my_app1 my_app2
 
@@ -710,12 +714,28 @@ database and any data migrations that you had prior to starting this process.
 
 Because your database already has these changes applied by your old migrations,
 you do not need to actually migrate it, but these migrations do need to be
-marked as applied. Thus, fake running them with::
+marked as applied. Thus, fake running them::
 
     $ ./manage.py migrate --fake
 
-Finally, to verify that everything worked, check that the migration has been
-applied successfully with::
+To verify that everything worked, check that the migration has been
+applied successfully::
+
+    $ ./manage.py showmigrations
+
+This computer is now complete. To deploy this to other computers running the
+code base, begin by clearing the migration history on those computers::
+
+    $ ./manage.py migrate --fake my_app1 zero
+    $ ./manage.py migrate --fake my_app2 zero
+    ...
+
+Then, copy or deploy the new migrations to those computers. Finally, fake the
+new migrations::
+
+    $ ./manage.py migrate --fake
+
+And verify with::
 
     $ ./manage.py showmigrations
 
