@@ -68,6 +68,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return self._is_limited_data_type(field)
         return False
 
+    def skip_default_on_alter(self, field):
+        if self._is_limited_data_type(field) and not self.connection.mysql_is_mariadb:
+            # MySQL doesn't support defaults for BLOB and TEXT in the
+            # ALTER COLUMN statement.
+            return True
+        return False
+
     @property
     def _supports_limited_data_type_defaults(self):
         # MariaDB >= 10.2.1 and MySQL >= 8.0.13 supports defaults for BLOB

@@ -266,6 +266,13 @@ class BaseDatabaseSchemaEditor:
         """
         return False
 
+    def skip_default_on_alter(self, field):
+        """
+        Some backends don't accept default values for certain columns types
+        (i.e. MySQL longtext and longblob) in the ALTER COLUMN statement.
+        """
+        return False
+
     def prepare_default(self, value):
         """
         Only used for backends which have requires_literal_defaults feature
@@ -721,7 +728,7 @@ class BaseDatabaseSchemaEditor:
             old_default = self.effective_default(old_field)
             new_default = self.effective_default(new_field)
             if (
-                not self.skip_default(new_field) and
+                not self.skip_default_on_alter(new_field) and
                 old_default != new_default and
                 new_default is not None
             ):
