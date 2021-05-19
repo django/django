@@ -410,3 +410,17 @@ class UtilsTests(SimpleTestCase):
 
     def test_quote(self):
         self.assertEqual(quote('something\nor\nother'), 'something_0Aor_0Aother')
+
+    def test_modeladmin_repr(self):
+        class ArticleAdmin(admin.ModelAdmin):
+            pass
+
+        admin.site.register(Article, ArticleAdmin)
+
+        try:
+            self.assertEqual(
+                repr(admin.site._registry[Article]),
+                "<ArticleAdmin model=Article site=AdminSite>",
+            )
+        finally:
+            admin.site.unregister(Article)

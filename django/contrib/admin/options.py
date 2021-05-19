@@ -593,6 +593,13 @@ class ModelAdmin(BaseModelAdmin):
     def __str__(self):
         return "%s.%s" % (self.model._meta.app_label, self.__class__.__name__)
 
+    def __repr__(self):
+        return "<%(cls)s model=%(model)s site=%(site)s>" % {
+            'cls': self.__class__.__name__,
+            'model': self.model.__name__,
+            'site': self.admin_site.__class__.__name__,
+        }
+
     def get_inline_instances(self, request, obj=None):
         inline_instances = []
         for inline_class in self.get_inlines(request, obj):
