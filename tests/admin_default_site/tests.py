@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin import sites
 from django.test import SimpleTestCase, override_settings
+from .sites import OtherAdminSite
 
 
 @override_settings(INSTALLED_APPS=[
@@ -29,3 +30,9 @@ class CustomAdminSiteTests(SimpleTestCase):
 class DefaultAdminSiteTests(SimpleTestCase):
     def test_use_default_admin_site(self):
         self.assertEqual(admin.site.__class__.__name__, 'AdminSite')
+
+
+class OtherAdminSiteTests(SimpleTestCase):
+    def test_not_default_admin_site_repr(self):
+        other_admin_site = OtherAdminSite(name='other')
+        self.assertEqual(repr(other_admin_site), '<OtherAdminSite name=other>')

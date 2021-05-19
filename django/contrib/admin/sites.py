@@ -555,11 +555,17 @@ class AdminSite:
             'admin/app_index.html'
         ], context)
 
+    def __repr__(self):
+        return f'<{self.__class__.__name__} name={self.name}>'
+
 
 class DefaultAdminSite(LazyObject):
     def _setup(self):
         AdminSiteClass = import_string(apps.get_app_config('admin').default_site)
         self._wrapped = AdminSiteClass()
+
+    def __repr__(self):
+        return repr(self._wrapped)
 
 
 # This global object represents the default admin site, for the common case.
