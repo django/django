@@ -559,6 +559,7 @@ class ModelAdmin(BaseModelAdmin):
     list_max_show_all = 200
     list_editable = ()
     search_fields = ()
+    search_help_text = None
     date_hierarchy = None
     save_as = False
     save_as_continue = True
@@ -747,6 +748,7 @@ class ModelAdmin(BaseModelAdmin):
             self.list_editable,
             self,
             sortable_by,
+            self.search_help_text,
         )
 
     def get_object(self, request, object_id, from_field=None):

@@ -1381,6 +1381,13 @@ subclass::
 
         Support for searching against quoted phrases with spaces was added.
 
+.. attribute:: ModelAdmin.search_help_text
+
+    .. versionadded:: 4.0
+
+    Set ``search_help_text`` to specify a descriptive text for the search box
+    which will be displayed below it.
+
 .. attribute:: ModelAdmin.show_full_result_count
 
     Set ``show_full_result_count`` to control whether the full count of objects
