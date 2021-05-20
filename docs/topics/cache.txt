@@ -1135,11 +1135,13 @@ the request reaches your website.
 
 Here are a few examples of downstream caches:
 
-* Your ISP may cache certain pages, so if you requested a page from
-  https://example.com/, your ISP would send you the page without having to
-  access example.com directly. The maintainers of example.com have no
-  knowledge of this caching; the ISP sits between example.com and your Web
-  browser, handling all of the caching transparently.
+* When using HTTP, your :abbr:`ISP (Internet Service Provider)` may cache
+  certain pages, so if you requested a page from ``http://example.com/``, your
+  ISP would send you the page without having to access example.com directly.
+  The maintainers of example.com have no knowledge of this caching; the ISP
+  sits between example.com and your Web browser, handling all of the caching
+  transparently. Such caching is not possible under HTTPS as it would
+  constitute a man-in-the-middle attack.
 
 * Your Django website may sit behind a *proxy cache*, such as Squid Web
   Proxy Cache (http://www.squid-cache.org/), that caches pages for
