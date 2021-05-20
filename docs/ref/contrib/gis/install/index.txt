@@ -109,9 +109,9 @@ Troubleshooting
 If you can't find the solution to your problem here then participate in the
 community!  You can:
 
-* Join the ``#geodjango`` IRC channel on Freenode. Please be patient and polite
-  -- while you may not get an immediate response, someone will attempt to answer
-  your question as soon as they see it.
+* Join the ``#django-geo`` IRC channel on Libera.Chat. Please be patient and
+  polite -- while you may not get an immediate response, someone will attempt
+  to answer your question as soon as they see it.
 * Ask your question on the `GeoDjango`__ mailing list.
 * File a ticket on the `Django trac`__ if you think there's a bug.  Make
   sure to provide a complete description of the problem, versions used,
