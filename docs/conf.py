@@ -65,7 +65,6 @@ linkcheck_ignore = [
     r'^https://www\.google\.com/webmasters/tools/ping',
     r'^https://search\.google\.com/search-console/welcome',
     # Fragments used to dynamically switch content or populate fields.
-    r'^https://webchat\.freenode\.net/#',
     r'^https://github\.com/[^#]+#L\d+-L\d+$',
     r'^https://help\.apple\.com/itc/podcasts_connect/#/itc',
     # Anchors on certain pages with missing a[name] attributes.
