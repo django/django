@@ -39,5 +39,5 @@ best chances to be included in Django core:
 
 .. _ticket tracker: https://code.djangoproject.com/
 .. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
-.. _#django-dev IRC channel: https://webchat.freenode.net/#django-dev
+.. _#django-dev IRC channel: irc://irc.libera.chat/django-dev
 .. _Django forum: https://forum.djangoproject.com/

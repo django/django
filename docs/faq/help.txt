@@ -22,13 +22,13 @@ Then, please post it in one of the following channels:
 * The Django Forum section `"Using Django"`_. This is for web-based
   discussions.
 * The |django-users| mailing list. This is for email-based discussions.
-* The `#django IRC channel`_ on the Freenode IRC network. This is for
-  chat-based discussions. If you're new to IRC, see the `Freenode
+* The `#django IRC channel`_ on the Libera.Chat IRC network. This is for
+  chat-based discussions. If you're new to IRC, see the `Libera.Chat
   documentation`_ for different ways to connect.
 
 .. _`"Using Django"`: https://forum.djangoproject.com/c/users
-.. _#django IRC channel: https://webchat.freenode.net/#django
-.. _Freenode documentation: https://freenode.net/kb/answer/chat
+.. _#django IRC channel: irc://irc.libera.chat/django
+.. _Libera.Chat documentation: https://libera.chat/guides/connect
 
 In all these channels please abide by the `Django Code of Conduct`_. In
 summary, being friendly and patient, considerate, respectful, and careful in
