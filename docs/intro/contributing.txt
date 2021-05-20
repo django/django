@@ -40,11 +40,11 @@ so that it can be of use to the widest audience.
 .. admonition:: Where to get help:
 
     If you're having trouble going through this tutorial, please post a message
-    to |django-developers| or drop by `#django-dev on irc.freenode.net`__ to
+    to |django-developers| or drop by `#django-dev on irc.libera.chat`__ to
     chat with other Django users who might be able to help.
 
 __ https://diveinto.org/python3/table-of-contents.html
-__ irc://irc.freenode.net/django-dev
+__ irc://irc.libera.chat/django-dev
 
 What does this tutorial cover?
 ------------------------------

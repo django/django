@@ -23,8 +23,8 @@ __ `executing custom SQL directly`_
       :doc:`custom query expressions </ref/models/expressions/>`.
 
     Before using raw SQL, explore :doc:`the ORM </topics/db/index>`. Ask on
-    |django-users| or the `#django IRC channel
-    <irc://irc.freenode.net/django>`_ to see if the ORM supports your use case.
+    one of :doc:`the support channels </faq/help>` to see if the ORM supports
+    your use case.
 
 .. warning::
 

@@ -441,7 +441,7 @@ What's next?
 We'll take a short break, and then work on Django 1.2 will begin -- no rest for
 the weary! If you'd like to help, discussion of Django development, including
 progress toward the 1.2 release, takes place daily on the |django-developers|
-mailing list and in the ``#django-dev`` IRC channel on ``irc.freenode.net``.
+mailing list and in the ``#django-dev`` IRC channel on ``irc.libera.chat``.
 Feel free to join the discussions!
 
 Django's online documentation also includes pointers on how to contribute to

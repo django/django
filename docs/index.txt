@@ -23,7 +23,7 @@ Having trouble? We'd like to help!
 
 .. _archives: https://groups.google.com/group/django-users/
 .. _post a question: https://groups.google.com/d/forum/django-users
-.. _#django IRC channel: irc://irc.freenode.net/django
+.. _#django IRC channel: irc://irc.libera.chat/django
 .. _ticket tracker: https://code.djangoproject.com/
 
 How the documentation is organized

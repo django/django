@@ -25,7 +25,7 @@ ticket here: https://code.djangoproject.com/newticket
 
 To get more help:
 
-* Join the ``#django`` channel on irc.freenode.net. Lots of helpful people hang
+* Join the ``#django`` channel on ``irc.libera.chat``. Lots of helpful people
   out there. See https://en.wikipedia.org/wiki/Wikipedia:IRC/Tutorial if you're
   new to IRC.
 

@@ -127,7 +127,7 @@ particular Django setup, try the |django-users| mailing list or the `#django
 IRC channel`_ instead.
 
 .. _ticket system: https://code.djangoproject.com/
-.. _#django IRC channel: irc://irc.freenode.net/django
+.. _#django IRC channel: irc://irc.libera.chat/django
 
 In plain text
 -------------

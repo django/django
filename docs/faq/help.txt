@@ -9,10 +9,9 @@ If this FAQ doesn't contain an answer to your question, you might want to
 try the |django-users| mailing list. Feel free to ask any question related
 to installing, using, or debugging Django.
 
-If you prefer IRC, the `#django IRC channel`_ on the Freenode IRC network is an
-active community of helpful individuals who may be able to solve your problem.
-
-.. _`#django IRC channel`: irc://irc.freenode.net/django
+If you prefer IRC, the `#django IRC channel`_ on the Libera.Chat IRC network is
+an active community of helpful individuals who may be able to solve your
+problem.
 
 .. _message-does-not-appear-on-django-users:
 
@@ -40,7 +39,7 @@ As with most open-source mailing lists, the folks on |django-users| are
 volunteers. If nobody has answered your question, it may be because nobody
 knows the answer, it may be because nobody can understand the question, or it
 may be that everybody that can help is busy. One thing you might try is to ask
-the question on IRC -- visit the `#django IRC channel`_ on the Freenode IRC
+the question on IRC -- visit the `#django IRC channel`_ on the Libera.Chat IRC
 network.
 
 You might notice we have a second mailing list, called |django-developers| --
@@ -69,3 +68,4 @@ while a defect is outstanding, we would like to minimize any damage that
 could be inflicted through public knowledge of that defect.
 
 .. _`policy for handling security issues`: ../contributing/#reporting-security-issues
+.. _`#django IRC channel`: irc://irc.libera.chat/django

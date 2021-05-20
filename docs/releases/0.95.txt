@@ -109,9 +109,9 @@ many common questions appear with some regularity, and any particular problem
 may already have been answered.
 
 Finally, for those who prefer the more immediate feedback offered by IRC,
-there's a `#django` channel on irc.freenode.net that is regularly populated
-by Django users and developers from around the world. Friendly people are
-usually available at any hour of the day -- to help, or just to chat.
+there's a ``#django`` channel on ``irc.libera.chat`` that is regularly
+populated by Django users and developers from around the world. Friendly people
+are usually available at any hour of the day -- to help, or just to chat.
 
 .. _Django website: https://www.djangoproject.com/
 .. _django-users: https://groups.google.com/group/django-users
