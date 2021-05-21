@@ -324,7 +324,11 @@ scenes.
 
 .. attribute:: Field.db_index
 
-If ``True``, a database index will be created for this field.
+If ``True``, one or more database indexes will be created for this field. When
+used with PostgreSQL, two indexes will be created. One for ``like`` queries,
+and one for exact matches. It is usually preferable to use
+:attr:`Meta.indexes <django.db.models.Options.indexes>`.
+
 
 ``db_tablespace``
 -----------------
