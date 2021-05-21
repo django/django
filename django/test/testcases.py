@@ -1624,12 +1624,15 @@ class SerializeMixin:
     """
     lockfile = None
 
-    @classmethod
-    def setUpClass(cls):
+    def __init_subclass__(cls, /, **kwargs):
+        super().__init_subclass__(**kwargs)
         if cls.lockfile is None:
             raise ValueError(
                 "{}.lockfile isn't set. Set it to a unique value "
                 "in the base class.".format(cls.__name__))
+
+    @classmethod
+    def setUpClass(cls):
         cls._lockfile = open(cls.lockfile)
         locks.lock(cls._lockfile, locks.LOCK_EX)
         super().setUpClass()
