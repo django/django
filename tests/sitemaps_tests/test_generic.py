@@ -57,3 +57,19 @@ class GenericViewsSitemapTests(SitemapTestsBase):
 """ % (self.base_url, test_model.pk)
         self.assertXMLEqual(response.content.decode(), expected_content)
         self.assertEqual(response.headers['Last-Modified'], 'Wed, 13 Mar 2013 10:00:00 GMT')
+
+    def test_get_protocol_defined_in_constructor(self):
+        for protocol in ['http', 'https']:
+            with self.subTest(protocol=protocol):
+                sitemap = GenericSitemap({'queryset': None}, protocol=protocol)
+                self.assertEqual(sitemap.get_protocol(), protocol)
+
+    def test_get_protocol_passed_as_argument(self):
+        sitemap = GenericSitemap({'queryset': None})
+        for protocol in ['http', 'https']:
+            with self.subTest(protocol=protocol):
+                self.assertEqual(sitemap.get_protocol(protocol), protocol)
+
+    def test_get_protocol_default(self):
+        sitemap = GenericSitemap({'queryset': None})
+        self.assertEqual(sitemap.get_protocol(), 'http')
