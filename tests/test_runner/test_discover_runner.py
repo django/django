@@ -348,6 +348,12 @@ class DiscoverRunnerTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             DiscoverRunner(pdb=True, parallel=2)
 
+    def test_number_of_parallel_workers(self):
+        """Number of processes doesn't exceed the number of TestCases."""
+        runner = DiscoverRunner(parallel=5, verbosity=0)
+        suite = runner.build_suite(['test_runner_apps.tagged'])
+        self.assertEqual(suite.processes, len(suite.subsuites))
+
     def test_buffer_mode_test_pass(self):
         runner = DiscoverRunner(buffer=True, verbose=0)
         with captured_stdout() as stdout, captured_stderr() as stderr:

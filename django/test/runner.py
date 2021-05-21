@@ -404,8 +404,8 @@ class ParallelTestSuite(unittest.TestSuite):
     run_subsuite = _run_subsuite
     runner_class = RemoteTestRunner
 
-    def __init__(self, suite, processes, failfast=False, buffer=False):
-        self.subsuites = partition_suite_by_case(suite)
+    def __init__(self, subsuites, processes, failfast=False, buffer=False):
+        self.subsuites = subsuites
         self.processes = processes
         self.failfast = failfast
         self.buffer = buffer
@@ -685,22 +685,17 @@ class DiscoverRunner:
         suite = self.test_suite(all_tests)
 
         if self.parallel > 1:
-            parallel_suite = self.parallel_test_suite(
-                suite,
-                self.parallel,
-                self.failfast,
-                self.buffer,
-            )
-
+            subsuites = partition_suite_by_case(suite)
             # Since tests are distributed across processes on a per-TestCase
             # basis, there's no need for more processes than TestCases.
-            parallel_units = len(parallel_suite.subsuites)
-            self.parallel = min(self.parallel, parallel_units)
-
-            # If there's only one TestCase, parallelization isn't needed.
-            if self.parallel > 1:
-                suite = parallel_suite
-
+            processes = min(self.parallel, len(subsuites))
+            if processes > 1:
+                suite = self.parallel_test_suite(
+                    subsuites,
+                    processes,
+                    self.failfast,
+                    self.buffer,
+                )
         return suite
 
     def setup_databases(self, **kwargs):
