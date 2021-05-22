@@ -35,7 +35,7 @@ def get_connection(backend=None, fail_silently=False, **kwds):
     return klass(fail_silently=fail_silently, **kwds)
 
 
-def send_mail(subject, message, from_email, recipient_list,
+def send_mail(subject, message, recipient_list, from_email=None,
               fail_silently=False, auth_user=None, auth_password=None,
               connection=None, html_message=None):
     """
