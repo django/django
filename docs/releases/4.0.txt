@@ -265,6 +265,9 @@ Models
 
 * :meth:`.QuerySet.bulk_update` now returns the number of objects updated.
 
+* The new :attr:`.Aggregate.empty_aggregate_value` attribute allows specifying
+  a value to return when the aggregation is used over an empty result set.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

@@ -490,12 +490,19 @@ class Query(BaseExpression):
             self.default_cols = False
             self.extra = {}
 
+        empty_aggregate_result = [
+            expression.empty_aggregate_value
+            for expression in outer_query.annotation_select.values()
+        ]
+        elide_empty = not any(result is NotImplemented for result in empty_aggregate_result)
         outer_query.clear_ordering(force=True)
         outer_query.clear_limits()
         outer_query.select_for_update = False
         outer_query.select_related = False
-        compiler = outer_query.get_compiler(using, elide_empty=False)
+        compiler = outer_query.get_compiler(using, elide_empty=elide_empty)
         result = compiler.execute_sql(SINGLE)
+        if result is None:
+            result = empty_aggregate_result
 
         converters = compiler.get_converters(outer_query.annotation_select.values())
         result = next(compiler.apply_converters((result,), converters))

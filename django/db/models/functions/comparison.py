@@ -65,6 +65,14 @@ class Coalesce(Func):
             raise ValueError('Coalesce must take at least two expressions')
         super().__init__(*expressions, **extra)
 
+    @property
+    def empty_aggregate_value(self):
+        for expression in self.get_source_expressions():
+            result = expression.empty_aggregate_value
+            if result is NotImplemented or result is not None:
+                return result
+        return None
+
     def as_oracle(self, compiler, connection, **extra_context):
         # Oracle prohibits mixing TextField (NCLOB) and CharField (NVARCHAR2),
         # so convert all fields to NCLOB when that type is expected.

@@ -153,6 +153,7 @@ class BaseExpression:
     # aggregate specific fields
     is_summary = False
     _output_field_resolved_to_none = False
+    empty_aggregate_value = NotImplemented
     # Can the expression be used in a WHERE clause?
     filterable = True
     # Can the expression can be used as a source expression in Window?
@@ -794,6 +795,10 @@ class Value(SQLiteNumericMixin, Expression):
             return fields.BinaryField()
         if isinstance(self.value, UUID):
             return fields.UUIDField()
+
+    @property
+    def empty_aggregate_value(self):
+        return self.value
 
 
 class RawSQL(Expression):
