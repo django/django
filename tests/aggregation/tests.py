@@ -8,6 +8,7 @@ from django.db.models import (
     Avg, Case, Count, DecimalField, DurationField, Exists, F, FloatField,
     IntegerField, Max, Min, OuterRef, Subquery, Sum, Value, When,
 )
+from django.db.models.expressions import RawSQL
 from django.db.models.functions import Coalesce, Greatest
 from django.test import TestCase
 from django.test.testcases import skipUnlessDBFeature
@@ -1340,3 +1341,34 @@ class AggregateTestCase(TestCase):
             ('Stuart Russell', 1),
             ('Peter Norvig', 2),
         ], lambda a: (a.name, a.contact_count), ordered=False)
+
+    def test_coalesced_empty_result_set(self):
+        self.assertEqual(
+            Publisher.objects.none().aggregate(
+                sum_awards=Coalesce(Sum('num_awards'), 0),
+            )['sum_awards'],
+            0,
+        )
+        # Multiple expressions.
+        self.assertEqual(
+            Publisher.objects.none().aggregate(
+                sum_awards=Coalesce(Sum('num_awards'), None, 0),
+            )['sum_awards'],
+            0,
+        )
+        # Nested coalesce.
+        self.assertEqual(
+            Publisher.objects.none().aggregate(
+                sum_awards=Coalesce(Coalesce(Sum('num_awards'), None), 0),
+            )['sum_awards'],
+            0,
+        )
+        # Expression coalesce.
+        self.assertIsInstance(
+            Store.objects.none().aggregate(
+                latest_opening=Coalesce(
+                    Max('original_opening'), RawSQL('CURRENT_TIMESTAMP', []),
+                ),
+            )['latest_opening'],
+            datetime.datetime,
+        )

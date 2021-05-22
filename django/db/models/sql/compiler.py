@@ -26,10 +26,13 @@ class SQLCompiler:
         re.MULTILINE | re.DOTALL,
     )
 
-    def __init__(self, query, connection, using):
+    def __init__(self, query, connection, using, elide_empty=True):
         self.query = query
         self.connection = connection
         self.using = using
+        # Some queries, e.g. coalesced aggregation, need to be executed even if
+        # they would return an empty result set.
+        self.elide_empty = elide_empty
         self.quote_cache = {'*': '*'}
         # The select, klass_info, and annotations are needed by QuerySet.iterator()
         # these are set as a side-effect of executing the query. Note that we calculate
@@ -458,7 +461,7 @@ class SQLCompiler:
     def get_combinator_sql(self, combinator, all):
         features = self.connection.features
         compilers = [
-            query.get_compiler(self.using, self.connection)
+            query.get_compiler(self.using, self.connection, self.elide_empty)
             for query in self.query.combined_queries if not query.is_empty()
         ]
         if not features.supports_slicing_ordering_in_compound:
@@ -535,7 +538,13 @@ class SQLCompiler:
                 # This must come after 'select', 'ordering', and 'distinct'
                 # (see docstring of get_from_clause() for details).
                 from_, f_params = self.get_from_clause()
-                where, w_params = self.compile(self.where) if self.where is not None else ("", [])
+                try:
+                    where, w_params = self.compile(self.where) if self.where is not None else ('', [])
+                except EmptyResultSet:
+                    if self.elide_empty:
+                        raise
+                    # Use a predicate that's always False.
+                    where, w_params = '0 = 1', []
                 having, h_params = self.compile(self.having) if self.having is not None else ("", [])
                 result = ['SELECT']
                 params = []
@@ -1652,7 +1661,7 @@ class SQLAggregateCompiler(SQLCompiler):
         params = tuple(params)
 
         inner_query_sql, inner_query_params = self.query.inner_query.get_compiler(
-            self.using
+            self.using, elide_empty=self.elide_empty,
         ).as_sql(with_col_aliases=True)
         sql = 'SELECT %s FROM (%s) subquery' % (sql, inner_query_sql)
         params = params + inner_query_params

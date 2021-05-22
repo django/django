@@ -273,12 +273,12 @@ class Query(BaseExpression):
         memo[id(self)] = result
         return result
 
-    def get_compiler(self, using=None, connection=None):
+    def get_compiler(self, using=None, connection=None, elide_empty=True):
         if using is None and connection is None:
             raise ValueError("Need either using or connection")
         if using:
             connection = connections[using]
-        return connection.ops.compiler(self.compiler)(self, connection, using)
+        return connection.ops.compiler(self.compiler)(self, connection, using, elide_empty)
 
     def get_meta(self):
         """
@@ -494,10 +494,8 @@ class Query(BaseExpression):
         outer_query.clear_limits()
         outer_query.select_for_update = False
         outer_query.select_related = False
-        compiler = outer_query.get_compiler(using)
+        compiler = outer_query.get_compiler(using, elide_empty=False)
         result = compiler.execute_sql(SINGLE)
-        if result is None:
-            result = [None] * len(outer_query.annotation_select)
 
         converters = compiler.get_converters(outer_query.annotation_select.values())
         result = next(compiler.apply_converters((result,), converters))
