@@ -69,7 +69,7 @@ constraint.
 ``UniqueConstraint``
 ====================
 
-.. class:: UniqueConstraint(*expressions, fields=(), name=None, condition=None, deferrable=None, include=None, opclasses=())
+.. class:: UniqueConstraint(*expressions, fields=(), name=None, condition=None, deferrable=None, include=None, opclasses=(), db_tablespace=None)
 
     Creates a unique constraint in the database.
 
@@ -203,3 +203,20 @@ For example::
 creates a unique index on ``username`` using ``varchar_pattern_ops``.
 
 ``opclasses`` are ignored for databases besides PostgreSQL.
+
+``db_tablespace``
+-----------------
+
+.. attribute:: UniqueConstraint.db_tablespace
+
+.. versionadded:: 4.0
+
+The name of the :doc:`database tablespace </topics/db/tablespaces>` to use for
+this constraint. For single field constraints, if ``db_tablespace`` isn't
+provided, the constraint is created in the ``db_tablespace`` of the field.
+
+If :attr:`.Field.db_tablespace` isn't specified (or if the constraint uses
+multiple fields), the constraint is created in tablespace specified in the
+:attr:`~django.db.models.Options.db_tablespace` option inside the model's
+``class Meta``. If neither of those tablespaces are set, the constraint is
+created in the same tablespace as the table.

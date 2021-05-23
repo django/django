@@ -102,6 +102,7 @@ class UniqueConstraint(BaseConstraint):
         deferrable=None,
         include=None,
         opclasses=(),
+        db_tablespace=None,
     ):
         if not name:
             raise ValueError('A unique constraint must be named.')
@@ -132,6 +133,10 @@ class UniqueConstraint(BaseConstraint):
             raise ValueError(
                 'UniqueConstraint with expressions cannot be deferred.'
             )
+        if db_tablespace and deferrable:
+            raise ValueError(
+                'UniqueConstraint with db_tablespace cannot be deferred.'
+            )
         if expressions and opclasses:
             raise ValueError(
                 'UniqueConstraint.opclasses cannot be used with expressions. '
@@ -159,6 +164,7 @@ class UniqueConstraint(BaseConstraint):
             F(expression) if isinstance(expression, str) else expression
             for expression in expressions
         )
+        self.db_tablespace = db_tablespace
         super().__init__(name)
 
     @property
@@ -195,6 +201,7 @@ class UniqueConstraint(BaseConstraint):
             model, fields, self.name, condition=condition,
             deferrable=self.deferrable, include=include,
             opclasses=self.opclasses, expressions=expressions,
+            db_tablespace=self.db_tablespace,
         )
 
     def create_sql(self, model, schema_editor):
@@ -206,6 +213,7 @@ class UniqueConstraint(BaseConstraint):
             model, fields, self.name, condition=condition,
             deferrable=self.deferrable, include=include,
             opclasses=self.opclasses, expressions=expressions,
+            db_tablespace=self.db_tablespace,
         )
 
     def remove_sql(self, model, schema_editor):
@@ -215,14 +223,18 @@ class UniqueConstraint(BaseConstraint):
         return schema_editor._delete_unique_sql(
             model, self.name, condition=condition, deferrable=self.deferrable,
             include=include, opclasses=self.opclasses, expressions=expressions,
+            db_tablespace=self.db_tablespace,
         )
 
     def __repr__(self):
-        return '<%s:%s%s%s%s%s%s%s>' % (
+        return '<%s:%s%s%s%s%s%s%s%s>' % (
             self.__class__.__qualname__,
             '' if not self.fields else ' fields=%s' % repr(self.fields),
             '' if not self.expressions else ' expressions=%s' % repr(self.expressions),
             ' name=%s' % repr(self.name),
+            ''
+            if self.db_tablespace is None
+            else ' db_tablespace=%s' % repr(self.db_tablespace),
             '' if self.condition is None else ' condition=%s' % self.condition,
             '' if self.deferrable is None else ' deferrable=%r' % self.deferrable,
             '' if not self.include else ' include=%s' % repr(self.include),
@@ -238,7 +250,8 @@ class UniqueConstraint(BaseConstraint):
                 self.deferrable == other.deferrable and
                 self.include == other.include and
                 self.opclasses == other.opclasses and
-                self.expressions == other.expressions
+                self.expressions == other.expressions and
+                self.db_tablespace == other.db_tablespace
             )
         return super().__eq__(other)
 
@@ -254,4 +267,6 @@ class UniqueConstraint(BaseConstraint):
             kwargs['include'] = self.include
         if self.opclasses:
             kwargs['opclasses'] = self.opclasses
+        if self.db_tablespace is not None:
+            kwargs['db_tablespace'] = self.db_tablespace
         return path, self.expressions, kwargs

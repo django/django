@@ -195,6 +195,25 @@ class SchemaTests(PostgreSQLTestCase):
         self.assertNotIn(constraint.name, self.get_constraints(Scene._meta.db_table))
         Scene.objects.create(scene='ScEnE 10', setting="Sir Bedemir's Castle")
 
+    @skipUnlessDBFeature('supports_tablespaces')
+    def test_opclass_tablespace(self):
+        constraint = UniqueConstraint(
+            name='test_opclass_tablespace',
+            fields=['scene'],
+            opclasses=['varchar_pattern_ops'],
+            db_tablespace='pg_default',
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Scene, constraint)
+            sql = constraint.create_sql(Scene, editor)
+        self.assertIn('TABLESPACE %s' % editor.quote_name(constraint.db_tablespace), str(sql))
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query, [constraint.name])
+            self.assertCountEqual(
+                cursor.fetchall(),
+                [('varchar_pattern_ops', constraint.name)],
+            )
+
 
 class ExclusionConstraintTests(PostgreSQLTestCase):
     def get_constraints(self, table):

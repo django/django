@@ -26,22 +26,24 @@ for :attr:`~django.db.models.Options.db_tablespace`. This is useful for setting
 a tablespace for the built-in Django apps and other applications whose code you
 cannot control.
 
-Declaring tablespaces for indexes
-=================================
+Declaring tablespaces for indexes and unique constraints
+========================================================
 
 You can pass the :attr:`~django.db.models.Index.db_tablespace` option to an
 ``Index`` constructor to specify the name of a tablespace to use for the index.
-For single field indexes, you can pass the
+The same is valid for ``UniqueConstraint`` where
+:attr:`~django.db.models.UniqueConstraint.db_tablespace` can be used.
+For single field indexes and constraints, you can pass the
 :attr:`~django.db.models.Field.db_tablespace` option to a ``Field`` constructor
-to specify an alternate tablespace for the field's column index. If the column
-doesn't have an index, the option is ignored.
+to specify an alternate tablespace for the field's column index or constraint.
+If the column doesn't have an index, the option is ignored.
 
 You can use the :setting:`DEFAULT_INDEX_TABLESPACE` setting to specify
 a default value for :attr:`~django.db.models.Field.db_tablespace`.
 
 If :attr:`~django.db.models.Field.db_tablespace` isn't specified and you didn't
-set :setting:`DEFAULT_INDEX_TABLESPACE`, the index is created in the same
-tablespace as the tables.
+set :setting:`DEFAULT_INDEX_TABLESPACE`, the index or constraint is created in
+the same tablespace as the tables.
 
 An example
 ==========

@@ -243,6 +243,20 @@ class UniqueConstraintTests(TestCase):
         self.assertEqual(constraint, mock.ANY)
         self.assertNotEqual(constraint, another_constraint)
 
+    def test_eq_with_db_tablespace(self):
+        constraint_1 = models.UniqueConstraint(
+            fields=['foo', 'bar'],
+            name='tablespace',
+            db_tablespace='baz_tablespace',
+        )
+        constraint_2 = models.UniqueConstraint(
+            fields=['foo', 'bar'],
+            name='tablespace',
+            db_tablespace='other_tablespace',
+        )
+        self.assertEqual(constraint_1, constraint_1)
+        self.assertNotEqual(constraint_1, constraint_2)
+
     def test_repr(self):
         fields = ['foo', 'bar']
         name = 'unique_fields'
@@ -310,6 +324,18 @@ class UniqueConstraintTests(TestCase):
             repr(constraint),
             "<UniqueConstraint: expressions=(Lower(F(title)), F(author)) "
             "name='book_func_uq'>",
+        )
+
+    def test_repr_with_db_tablespace(self):
+        constraint = models.UniqueConstraint(
+            fields=['foo', 'bar'],
+            name='tablespace',
+            db_tablespace='baz_tablespace',
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<UniqueConstraint: fields=('foo', 'bar') name='tablespace' "
+            "db_tablespace='baz_tablespace'>",
         )
 
     def test_deconstruction(self):
@@ -383,6 +409,20 @@ class UniqueConstraintTests(TestCase):
         self.assertEqual(path, 'django.db.models.UniqueConstraint')
         self.assertEqual(args, (Lower('title'),))
         self.assertEqual(kwargs, {'name': name})
+
+    def test_deconstruction_with_db_tablespace(self):
+        fields = ['foo', 'bar']
+        name = 'unique_fields'
+        db_tablespace = 'some_tablespace'
+        constraint = models.UniqueConstraint(fields=fields, name=name, db_tablespace=db_tablespace)
+        path, args, kwargs = constraint.deconstruct()
+        self.assertEqual(path, 'django.db.models.UniqueConstraint')
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {
+            'fields': tuple(fields),
+            'name': name,
+            'db_tablespace': db_tablespace,
+        })
 
     def test_database_constraint(self):
         with self.assertRaises(IntegrityError):
@@ -485,6 +525,16 @@ class UniqueConstraintTests(TestCase):
             models.UniqueConstraint(
                 Lower('name'),
                 name='deferred_expression_unique',
+                deferrable=models.Deferrable.DEFERRED,
+            )
+
+    def test_deferrable_with_db_tablespace(self):
+        message = 'UniqueConstraint with db_tablespace cannot be deferred.'
+        with self.assertRaisesMessage(ValueError, message):
+            models.UniqueConstraint(
+                fields=['name'],
+                name='name_tablespace_unique',
+                db_tablespace='some_tablespace',
                 deferrable=models.Deferrable.DEFERRED,
             )
 

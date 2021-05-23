@@ -4,6 +4,7 @@ import unittest
 from copy import copy
 from unittest import mock
 
+from django.conf import settings
 from django.core.exceptions import FieldError
 from django.core.management.color import no_style
 from django.db import (
@@ -2453,6 +2454,90 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             with self.assertRaises(DatabaseError):
                 editor.add_constraint(Author, constraint)
+
+    @skipUnlessDBFeature('supports_tablespaces')
+    def test_unique_constraint_db_tablespace(self):
+        class BookWithTablespace(Model):
+            title = CharField(max_length=50)
+            author = CharField(max_length=50)
+            shortcut = CharField(max_length=50, db_tablespace='idx_tbls')
+            isbn = CharField(max_length=50, db_tablespace='idx_tbls')
+
+            class Meta:
+                app_label = 'schema'
+
+        editor = connection.schema_editor()
+        # UniqueConstraint with db_tablespace attribute.
+        for fields in [
+            # Field with db_tablespace specified on model.
+            ['shortcut'],
+            # Field without db_tablespace specified on model.
+            ['author'],
+            # Multi-column with db_tablespaces specified on model.
+            ['shortcut', 'isbn'],
+            # Multi-column without db_tablespace specified on model.
+            ['title', 'author'],
+        ]:
+            with self.subTest(fields=fields):
+                constraint = UniqueConstraint(fields=fields, db_tablespace='idx_tbls2', name='tablespace_unq')
+                self.assertIn('"idx_tbls2"', str(constraint.create_sql(BookWithTablespace, editor)).lower())
+        # UniqueConstraint without db_tablespace attribute.
+        for fields in [['author'], ['shortcut', 'isbn'], ['title', 'author']]:
+            with self.subTest(fields=fields):
+                constraint = UniqueConstraint(fields=fields, name='tablespace_unq')
+                # The DEFAULT_INDEX_TABLESPACE setting can't be tested because
+                # it's evaluated when the model class is defined. As a
+                # consequence, @override_settings doesn't work.
+                if settings.DEFAULT_INDEX_TABLESPACE:
+                    self.assertIn(
+                        '"%s"' % settings.DEFAULT_INDEX_TABLESPACE,
+                        str(constraint.create_sql(BookWithTablespace, editor)).lower()
+                    )
+                else:
+                    self.assertNotIn('TABLESPACE', str(constraint.create_sql(BookWithTablespace, editor)))
+        # Field with db_tablespace specified on the model and an constraint without
+        # db_tablespace.
+        constraint = UniqueConstraint(fields=['shortcut'], name='tablespace_unq')
+        editor = connection.schema_editor()
+        self.assertIn('"idx_tbls"', str(constraint.create_sql(BookWithTablespace, editor)).lower())
+
+    @skipUnlessDBFeature(
+        'supports_expression_indexes',
+        'supports_tablespaces',
+        'supports_partial_indexes',
+        'supports_covering_indexes',
+        'supports_order_by_nulls_modifier',
+    )
+    def test_unique_constraint_db_tablespace_with_conditional_covering(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        constraint = UniqueConstraint(
+            F("name").desc(nulls_last=True),
+            name='author_name_desc_tbls_cond_inc_unq',
+            condition=Q(weight__isnull=False),
+            include=['weight'],
+            db_tablespace='pg_default',
+        )
+        # SQL contains column, a condition and a tablespace
+        with connection.schema_editor() as editor:
+            sql = constraint.create_sql(Author, editor)
+        table = Author._meta.db_table
+        self.assertIs(sql.references_column(table, 'name'), True)
+        self.assertIn(
+            'WHERE %s IS NOT NULL' % editor.quote_name('weight'),
+            str(sql),
+        )
+        self.assertIn('TABLESPACE %s' % editor.quote_name(constraint.db_tablespace), str(sql))
+
+    @skipIfDBFeature('supports_tablespaces')
+    def test_unique_constraint_db_tablespace_unsupported(self):
+        constraint = UniqueConstraint(
+            fields=['name'],
+            name='tbsp_name_uq',
+            db_tablespace='some_tablespace',
+        )
+        with connection.schema_editor() as editor:
+            self.assertNotIn('TABLESPACE', str(constraint.create_sql(Author, editor)))
 
     def test_index_together(self):
         """

@@ -88,7 +88,9 @@ class BaseDatabaseSchemaEditor:
     sql_delete_fk = sql_delete_constraint
 
     sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(include)s%(extra)s%(condition)s"
-    sql_create_unique_index = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)%(include)s%(condition)s"
+    sql_create_unique_index = (
+        "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)%(include)s%(extra)s%(condition)s"
+    )
     sql_delete_index = "DROP INDEX %(name)s"
 
     sql_create_pk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s PRIMARY KEY (%(columns)s)"
@@ -997,6 +999,8 @@ class BaseDatabaseSchemaEditor:
         return index_name
 
     def _get_index_tablespace_sql(self, model, fields, db_tablespace=None):
+        if not self.connection.features.supports_tablespaces:
+            return ''
         if db_tablespace is None:
             if len(fields) == 1 and fields[0].db_tablespace:
                 db_tablespace = fields[0].db_tablespace
@@ -1191,16 +1195,16 @@ class BaseDatabaseSchemaEditor:
 
     def _unique_sql(
         self, model, fields, name, condition=None, deferrable=None,
-        include=None, opclasses=None, expressions=None,
+        include=None, opclasses=None, expressions=None, db_tablespace=None,
     ):
         if (
             deferrable and
             not self.connection.features.supports_deferrable_unique_constraints
         ):
             return None
-        if condition or include or opclasses or expressions:
-            # Databases support conditional, covering, and functional unique
-            # constraints via a unique index.
+        if condition or include or opclasses or expressions or db_tablespace:
+            # Databases support conditional, covering, functional unique
+            # constraints and custom tablespace via a unique index.
             sql = self._create_unique_sql(
                 model,
                 fields,
@@ -1209,6 +1213,7 @@ class BaseDatabaseSchemaEditor:
                 include=include,
                 opclasses=opclasses,
                 expressions=expressions,
+                db_tablespace=db_tablespace,
             )
             if sql:
                 self.deferred_sql.append(sql)
@@ -1224,7 +1229,7 @@ class BaseDatabaseSchemaEditor:
 
     def _create_unique_sql(
         self, model, fields, name=None, condition=None, deferrable=None,
-        include=None, opclasses=None, expressions=None,
+        include=None, opclasses=None, expressions=None, db_tablespace=None,
     ):
         if (
             (
@@ -1247,7 +1252,8 @@ class BaseDatabaseSchemaEditor:
             name = IndexName(table, columns, '_uniq', create_unique_name)
         else:
             name = self.quote_name(name)
-        if condition or include or opclasses or expressions:
+        tablespace_sql = self._get_index_tablespace_sql(model, fields=fields, db_tablespace=db_tablespace)
+        if condition or include or opclasses or expressions or tablespace_sql:
             sql = self.sql_create_unique_index
         else:
             sql = self.sql_create_unique
@@ -1263,11 +1269,12 @@ class BaseDatabaseSchemaEditor:
             condition=self._index_condition_sql(condition),
             deferrable=self._deferrable_constraint_sql(deferrable),
             include=self._index_include_sql(model, include),
+            extra=tablespace_sql,
         )
 
     def _delete_unique_sql(
         self, model, name, condition=None, deferrable=None, include=None,
-        opclasses=None, expressions=None,
+        opclasses=None, expressions=None, db_tablespace=None,
     ):
         if (
             (
@@ -1280,7 +1287,7 @@ class BaseDatabaseSchemaEditor:
 
         ):
             return None
-        if condition or include or opclasses or expressions:
+        if condition or include or opclasses or expressions or db_tablespace:
             sql = self.sql_delete_index
         else:
             sql = self.sql_delete_unique

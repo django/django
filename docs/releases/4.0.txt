@@ -245,6 +245,9 @@ Models
 * :class:`~django.db.models.DurationField` now supports multiplying and
   dividing by scalar values on SQLite.
 
+* Added the :attr:`~django.db.models.UniqueConstraint.db_tablespace` parameter
+  to class-based unique constraints.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
