@@ -1,7 +1,4 @@
-from django.core.exceptions import FieldDoesNotExist
-from django.db.migrations.utils import (
-    field_is_referenced, field_references, get_references,
-)
+from django.db.migrations.utils import field_references
 from django.db.models import NOT_PROVIDED
 from django.utils.functional import cached_property
 
@@ -85,16 +82,13 @@ class AddField(FieldOperation):
         )
 
     def state_forwards(self, app_label, state):
-        # If preserve default is off, don't use the default for future state
-        if not self.preserve_default:
-            field = self.field.clone()
-            field.default = NOT_PROVIDED
-        else:
-            field = self.field
-        state.models[app_label, self.model_name_lower].fields[self.name] = field
-        # Delay rendering of relationships if it's not a relational field
-        delay = not field.is_relation
-        state.reload_model(app_label, self.model_name_lower, delay=delay)
+        state.add_field(
+            app_label,
+            self.model_name_lower,
+            self.name,
+            self.field,
+            self.preserve_default,
+        )
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
@@ -160,11 +154,7 @@ class RemoveField(FieldOperation):
         )
 
     def state_forwards(self, app_label, state):
-        model_state = state.models[app_label, self.model_name_lower]
-        old_field = model_state.fields.pop(self.name)
-        # Delay rendering of relationships if it's not a relational field
-        delay = not old_field.is_relation
-        state.reload_model(app_label, self.model_name_lower, delay=delay)
+        state.remove_field(app_label, self.model_name_lower, self.name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.apps.get_model(app_label, self.model_name)
@@ -216,24 +206,13 @@ class AlterField(FieldOperation):
         )
 
     def state_forwards(self, app_label, state):
-        if not self.preserve_default:
-            field = self.field.clone()
-            field.default = NOT_PROVIDED
-        else:
-            field = self.field
-        model_state = state.models[app_label, self.model_name_lower]
-        model_state.fields[self.name] = field
-        # TODO: investigate if old relational fields must be reloaded or if it's
-        # sufficient if the new field is (#27737).
-        # Delay rendering of relationships if it's not a relational field and
-        # not referenced by a foreign key.
-        delay = (
-            not field.is_relation and
-            not field_is_referenced(
-                state, (app_label, self.model_name_lower), (self.name, field),
-            )
+        state.alter_field(
+            app_label,
+            self.model_name_lower,
+            self.name,
+            self.field,
+            self.preserve_default,
         )
-        state.reload_model(app_label, self.model_name_lower, delay=delay)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
@@ -301,49 +280,7 @@ class RenameField(FieldOperation):
         )
 
     def state_forwards(self, app_label, state):
-        model_state = state.models[app_label, self.model_name_lower]
-        # Rename the field
-        fields = model_state.fields
-        try:
-            found = fields.pop(self.old_name)
-        except KeyError:
-            raise FieldDoesNotExist(
-                "%s.%s has no field named '%s'" % (app_label, self.model_name, self.old_name)
-            )
-        fields[self.new_name] = found
-        for field in fields.values():
-            # Fix from_fields to refer to the new field.
-            from_fields = getattr(field, 'from_fields', None)
-            if from_fields:
-                field.from_fields = tuple([
-                    self.new_name if from_field_name == self.old_name else from_field_name
-                    for from_field_name in from_fields
-                ])
-        # Fix index/unique_together to refer to the new field
-        options = model_state.options
-        for option in ('index_together', 'unique_together'):
-            if option in options:
-                options[option] = [
-                    [self.new_name if n == self.old_name else n for n in together]
-                    for together in options[option]
-                ]
-        # Fix to_fields to refer to the new field.
-        delay = True
-        references = get_references(
-            state, (app_label, self.model_name_lower), (self.old_name, found),
-        )
-        for *_, field, reference in references:
-            delay = False
-            if reference.to:
-                remote_field, to_fields = reference.to
-                if getattr(remote_field, 'field_name', None) == self.old_name:
-                    remote_field.field_name = self.new_name
-                if to_fields:
-                    field.to_fields = tuple([
-                        self.new_name if to_field_name == self.old_name else to_field_name
-                        for to_field_name in to_fields
-                    ])
-        state.reload_model(app_label, self.model_name_lower, delay=delay)
+        state.rename_field(app_label, self.model_name_lower, self.old_name, self.new_name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
