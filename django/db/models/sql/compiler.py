@@ -40,6 +40,15 @@ class SQLCompiler:
         self.klass_info = None
         self._meta_ordering = None
 
+    def __repr__(self):
+        return '<%s query=%s, connection=%s, using=%s >' % (
+            self.__class__.__qualname__,
+            repr(self.query),
+            repr(self.connection),
+            repr(self.using)
+
+        )
+
     def setup_query(self):
         if all(self.query.alias_refcount[a] == 0 for a in self.query.alias_map):
             self.query.get_initial_alias()
