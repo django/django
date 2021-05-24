@@ -3,7 +3,6 @@ import unittest
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS, ProgrammingError, connection
-from django.db.models.sql.compiler import SQLCompiler
 from django.db.utils import ConnectionHandler, load_backend
 from django.test import SimpleTestCase, TestCase
 from django.utils.connection import ConnectionDoesNotExist
@@ -91,13 +90,3 @@ class LoadBackendTests(SimpleTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg) as cm:
             load_backend('foo')
         self.assertEqual(str(cm.exception.__cause__), "No module named 'foo'")
-
-
-class SQLCompilerTests(SimpleTestCase):
-
-    def test_repr(self):
-        sql_compiler = SQLCompiler('SomeQuery', 'SomeConnection', 'Using')
-        return self.assertEqual(
-            repr(sql_compiler),
-            "<SQLCompiler query='SomeQuery', connection='SomeConnection', using='Using' >"
-        )
