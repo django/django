@@ -39,6 +39,27 @@ the :meth:`request.get_host() <django.http.HttpRequest.get_host>` method.
 How you use this is up to you, but Django uses it in a couple of ways
 automatically via a couple of conventions.
 
+Installation
+============
+
+To install the sites app, follow these steps:
+
+#. Add ``'django.contrib.sites'`` to your :setting:`INSTALLED_APPS` setting.
+
+#. Run the command :djadmin:`manage.py migrate <migrate>`.  This will add the Site model to your database.
+
+#. Add the :setting:`SITE_ID` setting to your settings.py.
+
+#. Define the site that your code base refers to in your top level ``urls.py``, by using code similar to the following...
+
+```python
+from django.contrib.sites.models import Site
+current_site = Site.objects.all().first()
+current_site.domain_name = "www.mygroovysite.com"
+current_site.name = "www.mygroovysite.com"
+current_site.save()
+```
+
 Example usage
 =============
 
