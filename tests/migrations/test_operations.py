@@ -8,6 +8,7 @@ from django.db.migrations.state import ModelState, ProjectState
 from django.db.models.functions import Abs
 from django.db.transaction import atomic
 from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
+from django.test.utils import CaptureQueriesContext
 
 from .models import FoodManager, FoodQuerySet, UnicodeModel
 from .test_base import OperationTestBase
@@ -2395,7 +2396,7 @@ class OperationTests(OperationTestBase):
         self.assertEqual(len(new_state.models[app_label, 'pony'].options['constraints']), 1)
         Pony = new_state.apps.get_model(app_label, 'Pony')
         self.assertEqual(len(Pony._meta.constraints), 1)
-        with connection.schema_editor() as editor:
+        with connection.schema_editor() as editor, CaptureQueriesContext(connection) as ctx:
             operation.database_forwards(app_label, editor, project_state, new_state)
         Pony.objects.create(pink=1, weight=4.0)
         if connection.features.supports_deferrable_unique_constraints:
@@ -2413,6 +2414,7 @@ class OperationTests(OperationTestBase):
                     obj.pink = 3
                     obj.save()
         else:
+            self.assertEqual(len(ctx), 0)
             Pony.objects.create(pink=1, weight=4.0)
         # Reversal.
         with connection.schema_editor() as editor:
@@ -2447,11 +2449,13 @@ class OperationTests(OperationTestBase):
         self.assertEqual(len(new_state.models[app_label, 'pony'].options['constraints']), 0)
         Pony = new_state.apps.get_model(app_label, 'Pony')
         self.assertEqual(len(Pony._meta.constraints), 0)
-        with connection.schema_editor() as editor:
+        with connection.schema_editor() as editor, CaptureQueriesContext(connection) as ctx:
             operation.database_forwards(app_label, editor, project_state, new_state)
         # Constraint doesn't work.
         Pony.objects.create(pink=1, weight=4.0)
         Pony.objects.create(pink=1, weight=4.0).delete()
+        if not connection.features.supports_deferrable_unique_constraints:
+            self.assertEqual(len(ctx), 0)
         # Reversal.
         with connection.schema_editor() as editor:
             operation.database_backwards(app_label, editor, new_state, project_state)
@@ -2499,13 +2503,14 @@ class OperationTests(OperationTestBase):
         self.assertEqual(len(new_state.models[app_label, 'pony'].options['constraints']), 1)
         Pony = new_state.apps.get_model(app_label, 'Pony')
         self.assertEqual(len(Pony._meta.constraints), 1)
-        with connection.schema_editor() as editor:
+        with connection.schema_editor() as editor, CaptureQueriesContext(connection) as ctx:
             operation.database_forwards(app_label, editor, project_state, new_state)
         Pony.objects.create(pink=1, weight=4.0)
         if connection.features.supports_covering_indexes:
             with self.assertRaises(IntegrityError):
                 Pony.objects.create(pink=1, weight=4.0)
         else:
+            self.assertEqual(len(ctx), 0)
             Pony.objects.create(pink=1, weight=4.0)
         # Reversal.
         with connection.schema_editor() as editor:
@@ -2540,11 +2545,13 @@ class OperationTests(OperationTestBase):
         self.assertEqual(len(new_state.models[app_label, 'pony'].options['constraints']), 0)
         Pony = new_state.apps.get_model(app_label, 'Pony')
         self.assertEqual(len(Pony._meta.constraints), 0)
-        with connection.schema_editor() as editor:
+        with connection.schema_editor() as editor, CaptureQueriesContext(connection) as ctx:
             operation.database_forwards(app_label, editor, project_state, new_state)
         # Constraint doesn't work.
         Pony.objects.create(pink=1, weight=4.0)
         Pony.objects.create(pink=1, weight=4.0).delete()
+        if not connection.features.supports_covering_indexes:
+            self.assertEqual(len(ctx), 0)
         # Reversal.
         with connection.schema_editor() as editor:
             operation.database_backwards(app_label, editor, new_state, project_state)
