@@ -65,6 +65,16 @@ The new :ref:`scrypt password hasher <scrypt-usage>` is more secure and
 recommended over PBKDF2. However, it's not the default as it requires OpenSSL
 1.1+ and more memory.
 
+Redis cache backend
+-------------------
+
+The new ``django.core.cache.backends.redis.RedisCache`` cache backend provides
+built-in support for caching with Redis. `redis-py`_ 3.0.0 or higher is
+required. For more details, see the :ref:`documentation on caching with Redis
+in Django <redis>`.
+
+.. _`redis-py`: https://pypi.org/project/redis/
+
 Minor features
 --------------
 

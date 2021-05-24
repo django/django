@@ -153,6 +153,7 @@ The cache backend to use. The built-in cache backends are:
 * ``'django.core.cache.backends.locmem.LocMemCache'``
 * ``'django.core.cache.backends.memcached.PyMemcacheCache'``
 * ``'django.core.cache.backends.memcached.PyLibMCCache'``
+* ``'django.core.cache.backends.redis.RedisCache'``
 
 You can use a cache backend that doesn't ship with Django by setting
 :setting:`BACKEND <CACHES-BACKEND>` to a fully-qualified path of a cache
@@ -161,6 +162,10 @@ backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 .. versionchanged:: 3.2
 
     The ``PyMemcacheCache`` backend was added.
+
+.. versionchanged:: 4.0
+
+    The ``RedisCache`` backend was added.
 
 .. setting:: CACHES-KEY_FUNCTION
 

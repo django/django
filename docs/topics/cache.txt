@@ -62,7 +62,6 @@ settings file. Here's an explanation of all available values for
 Memcached
 ---------
 
-The fastest, most efficient type of cache supported natively by Django,
 Memcached__ is an entirely memory-based cache server, originally developed
 to handle high loads at LiveJournal.com and subsequently open-sourced by
 Danga Interactive. It is used by sites such as Facebook and Wikipedia to
@@ -168,6 +167,71 @@ particularly temporary.
     The ``MemcachedCache`` backend is deprecated as ``python-memcached`` has
     some problems and seems to be unmaintained. Use ``PyMemcacheCache`` or
     ``PyLibMCCache`` instead.
+
+.. _redis:
+
+Redis
+-----
+
+.. versionadded:: 4.0
+
+Redis__ is an in-memory database that can be used for caching. To begin you'll
+need a Redis server running either locally or on a remote machine.
+
+__ https://redis.io/
+
+After setting up the Redis server, you'll need to install Python bindings for
+Redis. `redis-py`_ is the binding supported natively by Django. Installing the
+additional `hiredis-py`_ package is also recommended.
+
+.. _`redis-py`: https://pypi.org/project/redis/
+.. _`hiredis-py`: https://pypi.org/project/hiredis/
+
+To use Redis as your cache backend with Django:
+
+* Set :setting:`BACKEND <CACHES-BACKEND>` to
+  ``django.core.cache.backends.redis.RedisCache``.
+
+* Set :setting:`LOCATION <CACHES-LOCATION>` to the URL pointing to your Redis
+  instance, using the appropriate scheme. See the ``redis-py`` docs for
+  `details on the available schemes
+  <https://redis-py.readthedocs.io/en/stable/#redis.ConnectionPool.from_url>`_.
+
+For example, if Redis is running on localhost (127.0.0.1) port 6379::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': 'redis://127.0.0.1:6379',
+        }
+    }
+
+Often Redis servers are protected with authentication. In order to supply a
+username and password, add them in the ``LOCATION`` along with the URL::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': 'redis://username:password@127.0.0.1:6379',
+        }
+    }
+
+If you have multiple Redis servers set up in the replication mode, you can
+specify the servers either as a semicolon or comma delimited string, or as a
+list. While using multiple servers, write operations are performed on the first
+server (leader). Read operations are performed on the other servers (replicas)
+chosen at random::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': [
+                'redis://127.0.0.1:6379', # leader
+                'redis://127.0.0.1:6378', # read-replica 1
+                'redis://127.0.0.1:6377', # read-replica 2
+            ],
+        }
+    }
 
 .. _database-caching:
 
@@ -422,9 +486,9 @@ behavior. These arguments are provided as additional keys in the
     On some backends (``database`` in particular) this makes culling *much*
     faster at the expense of more cache misses.
 
-  Memcached backends pass the contents of :setting:`OPTIONS <CACHES-OPTIONS>`
-  as keyword arguments to the client constructors, allowing for more advanced
-  control of client behavior. For example usage, see below.
+  The Memcached and Redis backends pass the contents of :setting:`OPTIONS
+  <CACHES-OPTIONS>` as keyword arguments to the client constructors, allowing
+  for more advanced control of client behavior. For example usage, see below.
 
 * :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`: A string that will be
   automatically included (prepended by default) to all cache keys
@@ -495,6 +559,27 @@ flag on the connection's socket::
             }
         }
     }
+
+Here's an example configuration for a ``redis`` based backend that selects
+database ``10`` (by default Redis ships with 16 logical databases), specifies a
+`parser class`_ (``redis.connection.HiredisParser`` will be used by default if
+the ``hiredis-py`` package is installed), and sets a custom `connection pool
+class`_ (``redis.ConnectionPool`` is used by default)::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': 'redis://127.0.0.1:6379',
+            'OPTIONS': {
+                'db': '10',
+                'parser_class': 'redis.connection.PythonParser',
+                'pool_class': 'redis.BlockingConnectionPool',
+            }
+        }
+    }
+
+.. _`parser class`: https://github.com/andymccurdy/redis-py#parsers
+.. _`connection pool class`: https://github.com/andymccurdy/redis-py#connection-pools
 
 .. _the-per-site-cache:
 

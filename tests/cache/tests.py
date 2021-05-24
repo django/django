@@ -22,6 +22,7 @@ from django.core.cache import (
     caches,
 )
 from django.core.cache.backends.base import InvalidCacheBackendError
+from django.core.cache.backends.redis import RedisCacheClient
 from django.core.cache.utils import make_template_fragment_key
 from django.db import close_old_connections, connection, connections
 from django.db.backends.utils import CursorWrapper
@@ -1373,10 +1374,9 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(cache.get(9), 9)
 
 
-# memcached backend isn't guaranteed to be available.
-# To check the memcached backend, the test settings file will
-# need to contain at least one cache backend setting that points at
-# your memcache server.
+# memcached and redis backends aren't guaranteed to be available.
+# To check the backends, the test settings file will need to contain at least
+# one cache backend setting that points at your cache server.
 configured_caches = {}
 for _cache_params in settings.CACHES.values():
     configured_caches[_cache_params['BACKEND']] = _cache_params
@@ -1386,6 +1386,11 @@ PyMemcacheCache_params = configured_caches.get('django.core.cache.backends.memca
 
 # The memcached backends don't support cull-related options like `MAX_ENTRIES`.
 memcached_excluded_caches = {'cull', 'zero_cull'}
+
+RedisCache_params = configured_caches.get('django.core.cache.backends.redis.RedisCache')
+
+# The redis backend does not support cull-related options like `MAX_ENTRIES`.
+redis_excluded_caches = {'cull', 'zero_cull'}
 
 
 class BaseMemcachedTests(BaseCacheTests):
@@ -1725,6 +1730,60 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
             fh.write(b'')
         with open(cache_file, 'rb') as fh:
             self.assertIs(cache._is_expired(fh), True)
+
+
+@unittest.skipUnless(RedisCache_params, "Redis backend not configured")
+@override_settings(CACHES=caches_setting_for_tests(
+    base=RedisCache_params,
+    exclude=redis_excluded_caches,
+))
+class RedisCacheTests(BaseCacheTests, TestCase):
+
+    def setUp(self):
+        import redis
+        super().setUp()
+        self.lib = redis
+
+    @property
+    def incr_decr_type_error(self):
+        return self.lib.ResponseError
+
+    def test_cache_client_class(self):
+        self.assertIs(cache._class, RedisCacheClient)
+        self.assertIsInstance(cache._cache, RedisCacheClient)
+
+    def test_get_backend_timeout_method(self):
+        positive_timeout = 10
+        positive_backend_timeout = cache.get_backend_timeout(positive_timeout)
+        self.assertEqual(positive_backend_timeout, positive_timeout)
+
+        negative_timeout = -5
+        negative_backend_timeout = cache.get_backend_timeout(negative_timeout)
+        self.assertEqual(negative_backend_timeout, 0)
+
+        none_timeout = None
+        none_backend_timeout = cache.get_backend_timeout(none_timeout)
+        self.assertIsNone(none_backend_timeout)
+
+    def test_get_connection_pool_index(self):
+        pool_index = cache._cache._get_connection_pool_index(write=True)
+        self.assertEqual(pool_index, 0)
+        pool_index = cache._cache._get_connection_pool_index(write=False)
+        if len(cache._cache._servers) == 1:
+            self.assertEqual(pool_index, 0)
+        else:
+            self.assertGreater(pool_index, 0)
+            self.assertLess(pool_index, len(cache._cache._servers))
+
+    def test_get_connection_pool(self):
+        pool = cache._cache._get_connection_pool(write=True)
+        self.assertIsInstance(pool, self.lib.ConnectionPool)
+
+        pool = cache._cache._get_connection_pool(write=False)
+        self.assertIsInstance(pool, self.lib.ConnectionPool)
+
+    def test_get_client(self):
+        self.assertIsInstance(cache._cache.get_client(), self.lib.Redis)
 
 
 class FileBasedCachePathLibTests(FileBasedCacheTests):
