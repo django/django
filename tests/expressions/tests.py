@@ -1806,10 +1806,10 @@ class ValueTests(TestCase):
             (b'', BinaryField),
             (uuid.uuid4(), UUIDField),
         ]
-        for value, ouput_field_type in value_types:
+        for value, output_field_type in value_types:
             with self.subTest(type=type(value)):
                 expr = Value(value)
-                self.assertIsInstance(expr.output_field, ouput_field_type)
+                self.assertIsInstance(expr.output_field, output_field_type)
 
     def test_resolve_output_field_failure(self):
         msg = 'Cannot resolve expression type, unknown output_field'
