@@ -1755,6 +1755,22 @@ class ValueTests(TestCase):
         self.assertEqual(len(kwargs), 1)
         self.assertEqual(kwargs['output_field'].deconstruct(), CharField().deconstruct())
 
+    def test_repr(self):
+        tests = [
+            (None, 'Value(None)'),
+            ('str', "Value('str')"),
+            (True, 'Value(True)'),
+            (42, 'Value(42)'),
+            (
+                datetime.datetime(2019, 5, 15),
+                'Value(datetime.datetime(2019, 5, 15, 0, 0))',
+            ),
+            (Decimal('3.14'), "Value(Decimal('3.14'))"),
+        ]
+        for value, expected in tests:
+            with self.subTest(value=value):
+                self.assertEqual(repr(Value(value)), expected)
+
     def test_equal(self):
         value = Value('name')
         self.assertEqual(value, Value('name'))
@@ -1880,7 +1896,7 @@ class ReprTests(SimpleTestCase):
         )
         self.assertEqual(
             repr(When(Q(age__gte=18), then=Value('legal'))),
-            "<When: WHEN <Q: (AND: ('age__gte', 18))> THEN Value(legal)>"
+            "<When: WHEN <Q: (AND: ('age__gte', 18))> THEN Value('legal')>"
         )
         self.assertEqual(repr(Col('alias', 'field')), "Col(alias, field)")
         self.assertEqual(repr(F('published')), "F(published)")

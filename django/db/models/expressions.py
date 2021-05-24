@@ -743,7 +743,7 @@ class Value(SQLiteNumericMixin, Expression):
         self.value = value
 
     def __repr__(self):
-        return "{}({})".format(self.__class__.__name__, self.value)
+        return f'{self.__class__.__name__}({self.value!r})'
 
     def as_sql(self, compiler, connection):
         connection.ops.check_expression_support(self)
