@@ -1,0 +1,9 @@
+===========================
+Django 2.2.24 release notes
+===========================
+
+*Expected June 2, 2021*
+
+Django 2.2.24 fixes two security issues in 2.2.23.
+
+...
