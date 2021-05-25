@@ -50,7 +50,7 @@ website can be found at `github.com/django/djangoproject.com
 <https://github.com/django/djangoproject.com>`_.
 
 .. _Git: https://git-scm.com/
-.. _documentation: https://git-scm.com/documentation
+.. _documentation: https://git-scm.com/doc
 .. _branches: https://github.com/django/django/branches
 .. _tags: https://github.com/django/django/tags
 

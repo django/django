@@ -988,7 +988,7 @@ case you do not have Firefox installed or wish to use another browser. The
 example above is just a tiny fraction of what the Selenium client can do; check
 out the `full reference`_ for more details.
 
-.. _Selenium: http://seleniumhq.org/
+.. _Selenium: https://www.selenium.dev/
 .. _selenium package: https://pypi.org/project/selenium/
 .. _full reference: https://selenium-python.readthedocs.io/api.html
 .. _Firefox: https://www.mozilla.com/firefox/

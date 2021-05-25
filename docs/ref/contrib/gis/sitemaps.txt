@@ -19,4 +19,4 @@ Reference
 --------------
 
 .. rubric:: Footnotes
-.. [#] https://www.opengeospatial.org/standards/kml
+.. [#] https://www.ogc.org/standards/kml

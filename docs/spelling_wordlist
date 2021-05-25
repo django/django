@@ -217,6 +217,7 @@ fieldsets
 filename
 filenames
 filesystem
+filesystems
 fk
 flatpage
 flatpages
@@ -228,7 +229,6 @@ formfield
 formset
 formsets
 formtools
-freenode
 Frysian
 functionalities
 gdal
@@ -331,6 +331,7 @@ Kyrgyz
 latin
 lawrence
 lexer
+Libera
 lifecycle
 lifecycles
 linearize

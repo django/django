@@ -2572,7 +2572,7 @@ on whichever model contains the actual reference to the
 :class:`~django.db.models.ManyToManyField`. Depending on your ``ModelAdmin``
 definition, each many-to-many field in your model will be represented by a
 standard HTML ``<select multiple>``, a horizontal or vertical filter, or a
-``raw_id_admin`` widget. However, it is also possible to replace these
+``raw_id_fields`` widget. However, it is also possible to replace these
 widgets with inlines.
 
 Suppose we have the following models::
@@ -3025,12 +3025,17 @@ Templates can override or extend base admin templates as described in
 
       Each model is a dict with the following keys:
 
+      * ``model``: the model class
       * ``object_name``: class name of the model
       * ``name``: plural name of the model
       * ``perms``: a ``dict`` tracking ``add``, ``change``, ``delete``, and
         ``view`` permissions
       * ``admin_url``: admin changelist URL for the model
       * ``add_url``: admin URL to add a new model instance
+
+    .. versionchanged:: 4.0
+
+        The ``model`` variable for each model was added.
 
 .. method:: AdminSite.has_permission(request)
 

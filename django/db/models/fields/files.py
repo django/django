@@ -6,6 +6,7 @@ from django.core import checks
 from django.core.files.base import File
 from django.core.files.images import ImageFile
 from django.core.files.storage import Storage, default_storage
+from django.core.files.utils import validate_file_name
 from django.db.models import signals
 from django.db.models.fields import Field
 from django.db.models.query_utils import DeferredAttribute
@@ -317,6 +318,7 @@ class FileField(Field):
         else:
             dirname = datetime.datetime.now().strftime(str(self.upload_to))
             filename = posixpath.join(dirname, filename)
+        filename = validate_file_name(filename, allow_relative_path=True)
         return self.storage.generate_filename(filename)
 
     def save_form_data(self, instance, data):

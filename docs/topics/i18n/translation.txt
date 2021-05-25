@@ -1555,9 +1555,9 @@ multiple times::
     in general, and doesn't depend on ``gettext``. For more information, read
     its documentation about `working with message catalogs`_.
 
-    .. _Message extracting: http://babel.pocoo.org/en/latest/messages.html#message-extraction
-    .. _Babel: http://babel.pocoo.org/
-    .. _working with message catalogs: http://babel.pocoo.org/en/latest/messages.html
+    .. _Message extracting: https://babel.pocoo.org/en/latest/messages.html#message-extraction
+    .. _Babel: https://babel.pocoo.org/en/latest/
+    .. _working with message catalogs: https://babel.pocoo.org/en/latest/messages.html
 
 .. admonition:: No gettext?
 

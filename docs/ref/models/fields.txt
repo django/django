@@ -1662,7 +1662,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     example::
 
         def limit_pub_date_choices():
-            return {'pub_date__lte': datetime.date.utcnow()}
+            return {'pub_date__lte': datetime.date.today()}
 
         limit_choices_to = limit_pub_date_choices
 

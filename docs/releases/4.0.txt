@@ -72,6 +72,9 @@ Minor features
 
 * The navigation sidebar now has a quick filter toolbar.
 
+* The new context variable ``model`` which contains the model class for each
+  model is added to the :meth:`.AdminSite.each_context` method.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -101,6 +104,9 @@ Minor features
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Added support for SpatiaLite 5.
+
+* :class:`~django.contrib.gis.gdal.GDALRaster` now allows creating rasters in
+  any GDAL virtual filesystem.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -420,10 +426,27 @@ Miscellaneous
 * The undocumented ``HttpRequest.get_raw_uri()`` method is removed. The
   :meth:`.HttpRequest.build_absolute_uri` method may be a suitable alternative.
 
+* The ``object`` argument of undocumented ``ModelAdmin.log_addition()``,
+  ``log_change()``, and ``log_deletion()`` methods is renamed to ``obj``.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0
 ==========================
+
+Time zone support
+-----------------
+
+In order to follow good practice, the default value of the :setting:`USE_TZ`
+setting will change from ``False`` to ``True``, and time zone support will be
+enabled by default, in Django 5.0.
+
+Note that the default :file:`settings.py` file created by
+:djadmin:`django-admin startproject <startproject>` includes
+:setting:`USE_TZ = True <USE_TZ>` since Django 1.4.
+
+You can set ``USE_TZ`` to ``False`` in your project settings before then to
+opt-out.
 
 Miscellaneous
 -------------
@@ -431,6 +454,13 @@ Miscellaneous
 * ``SERIALIZE`` test setting is deprecated as it can be inferred from the
   :attr:`~django.test.TestCase.databases` with the
   :ref:`serialized_rollback <test-case-serialized-rollback>` option enabled.
+
+* The undocumented ``django.utils.baseconv`` module is deprecated.
+
+* The undocumented ``django.utils.datetime_safe`` module is deprecated.
+
+* The default sitemap protocol for sitemaps built outside the context of a
+  request will change from ``'http'`` to ``'https'`` in Django 5.0.
 
 Features removed in 4.0
 =======================

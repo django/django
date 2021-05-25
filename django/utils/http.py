@@ -1,5 +1,4 @@
 import base64
-import calendar
 import datetime
 import re
 import unicodedata
@@ -112,9 +111,10 @@ def parse_http_date(date):
     else:
         raise ValueError("%r is not in a valid HTTP date format" % date)
     try:
+        tz = datetime.timezone.utc
         year = int(m['year'])
         if year < 100:
-            current_year = datetime.datetime.utcnow().year
+            current_year = datetime.datetime.now(tz=tz).year
             current_century = current_year - (current_year % 100)
             if year - (current_year % 100) > 50:
                 # year that appears to be more than 50 years in the future are
@@ -127,8 +127,8 @@ def parse_http_date(date):
         hour = int(m['hour'])
         min = int(m['min'])
         sec = int(m['sec'])
-        result = datetime.datetime(year, month, day, hour, min, sec)
-        return calendar.timegm(result.utctimetuple())
+        result = datetime.datetime(year, month, day, hour, min, sec, tzinfo=tz)
+        return int(result.timestamp())
     except Exception as exc:
         raise ValueError("%r is not a valid date" % date) from exc
 

@@ -89,8 +89,9 @@ def get_git_changeset():
         shell=True, cwd=repo_dir, universal_newlines=True,
     )
     timestamp = git_log.stdout
+    tz = datetime.timezone.utc
     try:
-        timestamp = datetime.datetime.utcfromtimestamp(int(timestamp))
+        timestamp = datetime.datetime.fromtimestamp(int(timestamp), tz=tz)
     except ValueError:
         return None
     return timestamp.strftime('%Y%m%d%H%M%S')

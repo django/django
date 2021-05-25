@@ -2,11 +2,11 @@
 Decorators for views based on HTTP headers.
 """
 
-from calendar import timegm
 from functools import wraps
 
 from django.http import HttpResponseNotAllowed
 from django.middleware.http import ConditionalGetMiddleware
+from django.utils import timezone
 from django.utils.cache import get_conditional_response
 from django.utils.decorators import decorator_from_middleware
 from django.utils.http import http_date, quote_etag
@@ -82,7 +82,9 @@ def condition(etag_func=None, last_modified_func=None):
                 if last_modified_func:
                     dt = last_modified_func(request, *args, **kwargs)
                     if dt:
-                        return timegm(dt.utctimetuple())
+                        if not timezone.is_aware(dt):
+                            dt = timezone.make_aware(dt, timezone.utc)
+                        return int(dt.timestamp())
 
             # The value from etag_func() could be quoted or unquoted.
             res_etag = etag_func(request, *args, **kwargs) if etag_func else None

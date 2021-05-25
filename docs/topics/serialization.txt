@@ -167,7 +167,7 @@ Identifier  Information
 ==========  ==============================================================
 
 .. _json: https://json.org/
-.. _jsonl: http://jsonlines.org/
+.. _jsonl: https://jsonlines.org/
 .. _PyYAML: https://pyyaml.org/
 
 XML
@@ -303,7 +303,7 @@ The JSON serializer uses ``DjangoJSONEncoder`` for encoding. A subclass of
 :class:`~decimal.Decimal`, ``Promise`` (``django.utils.functional.lazy()`` objects), :class:`~uuid.UUID`
    A string representation of the object.
 
-.. _ecma-262: https://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15
+.. _ecma-262: https://262.ecma-international.org/5.1/#sec-15.9.1.15
 
 .. _serialization-formats-jsonl:
 

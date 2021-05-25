@@ -13,6 +13,7 @@ from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
+from django.forms import forms
 from django.forms.fields import CharField, Field, IntegerField
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils import translation
@@ -1024,6 +1025,18 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
         field = ReadOnlyPasswordHashField()
         self.assertIs(field.disabled, True)
         self.assertFalse(field.has_changed('aaa', 'bbb'))
+
+    def test_label(self):
+        """
+        ReadOnlyPasswordHashWidget doesn't contain a for attribute in the
+        <label> because it doesn't have any labelable elements.
+        """
+        class TestForm(forms.Form):
+            hash_field = ReadOnlyPasswordHashField()
+
+        bound_field = TestForm()['hash_field']
+        self.assertEqual(bound_field.field.widget.id_for_label('id'), None)
+        self.assertEqual(bound_field.label_tag(), '<label>Hash field:</label>')
 
 
 class AdminPasswordChangeFormTest(TestDataMixin, TestCase):

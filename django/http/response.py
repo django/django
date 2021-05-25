@@ -203,9 +203,9 @@ class HttpResponseBase:
         self.cookies[key] = value
         if expires is not None:
             if isinstance(expires, datetime.datetime):
-                if timezone.is_aware(expires):
-                    expires = timezone.make_naive(expires, timezone.utc)
-                delta = expires - expires.utcnow()
+                if timezone.is_naive(expires):
+                    expires = timezone.make_aware(expires, timezone.utc)
+                delta = expires - datetime.datetime.now(tz=timezone.utc)
                 # Add one second so the date matches exactly (a fraction of
                 # time gets lost between converting to a timedelta and
                 # then the date string).

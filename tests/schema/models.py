@@ -158,6 +158,7 @@ class IntegerPK(models.Model):
 
 class Note(models.Model):
     info = models.TextField()
+    address = models.TextField(null=True)
 
     class Meta:
         apps = new_apps

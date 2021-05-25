@@ -1,5 +1,3 @@
-from calendar import timegm
-
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http import Http404, HttpResponse
@@ -42,8 +40,7 @@ class Feed:
         if hasattr(self, 'item_pubdate') or hasattr(self, 'item_updateddate'):
             # if item_pubdate or item_updateddate is defined for the feed, set
             # header so as ConditionalGetMiddleware is able to send 304 NOT MODIFIED
-            response.headers['Last-Modified'] = http_date(
-                timegm(feedgen.latest_post_date().utctimetuple()))
+            response.headers['Last-Modified'] = http_date(feedgen.latest_post_date().timestamp())
         feedgen.write(response, 'utf-8')
         return response
 

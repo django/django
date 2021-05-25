@@ -16,7 +16,7 @@ Django also comes with a lower-level feed-generating API. Use this if
 you want to generate feeds outside of a Web context, or in some other
 lower-level way.
 
-.. _RSS: http://www.whatisrss.com/
+.. _RSS: https://developer.mozilla.org/en-US/docs/Glossary/RSS
 
 The high-level framework
 ========================
