@@ -128,7 +128,7 @@ class DatabaseCache(BaseDatabaseCache):
                 exp = datetime.fromtimestamp(timeout, tz=tz)
             exp = exp.replace(microsecond=0)
             if num > self._max_entries:
-                self._cull(db, cursor, now)
+                self._cull(db, cursor, now, num)
             pickled = pickle.dumps(value, self.pickle_protocol)
             # The DB column is expecting a string, so make sure the value is a
             # string, not bytes. Refs #19274.
@@ -247,7 +247,7 @@ class DatabaseCache(BaseDatabaseCache):
             )
             return cursor.fetchone() is not None
 
-    def _cull(self, db, cursor, now):
+    def _cull(self, db, cursor, now, num):
         if self._cull_frequency == 0:
             self.clear()
         else:
@@ -255,10 +255,10 @@ class DatabaseCache(BaseDatabaseCache):
             table = connection.ops.quote_name(self._table)
             cursor.execute("DELETE FROM %s WHERE expires < %%s" % table,
                            [connection.ops.adapt_datetimefield_value(now)])
-            cursor.execute("SELECT COUNT(*) FROM %s" % table)
-            num = cursor.fetchone()[0]
-            if num > self._max_entries:
-                cull_num = num // self._cull_frequency
+            deleted_count = cursor.rowcount
+            remaining_num = num - deleted_count
+            if remaining_num > self._max_entries:
+                cull_num = remaining_num // self._cull_frequency
                 cursor.execute(
                     connection.ops.cache_key_culling_sql() % table,
                     [cull_num])
