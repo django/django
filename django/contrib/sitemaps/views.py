@@ -1,5 +1,4 @@
 import datetime
-from calendar import timegm
 from functools import wraps
 
 from django.contrib.sites.shortcuts import get_current_site
@@ -7,6 +6,7 @@ from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404
 from django.template.response import TemplateResponse
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.http import http_date
 
 
@@ -72,10 +72,10 @@ def sitemap(request, sitemaps, section=None,
             if all_sites_lastmod:
                 site_lastmod = getattr(site, 'latest_lastmod', None)
                 if site_lastmod is not None:
-                    site_lastmod = (
-                        site_lastmod.utctimetuple() if isinstance(site_lastmod, datetime.datetime)
-                        else site_lastmod.timetuple()
-                    )
+                    if not isinstance(site_lastmod, datetime.datetime):
+                        site_lastmod = datetime.datetime.combine(site_lastmod, datetime.time.min)
+                    if timezone.is_naive(site_lastmod):
+                        site_lastmod = timezone.make_aware(site_lastmod, timezone.utc)
                     lastmod = site_lastmod if lastmod is None else max(lastmod, site_lastmod)
                 else:
                     all_sites_lastmod = False
@@ -88,5 +88,5 @@ def sitemap(request, sitemaps, section=None,
     if all_sites_lastmod and lastmod is not None:
         # if lastmod is defined for all sites, set header so as
         # ConditionalGetMiddleware is able to send 304 NOT MODIFIED
-        response.headers['Last-Modified'] = http_date(timegm(lastmod))
+        response.headers['Last-Modified'] = http_date(lastmod.timestamp())
     return response

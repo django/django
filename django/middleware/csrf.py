@@ -5,7 +5,6 @@ This module provides a middleware that implements protection
 against request forgeries from other sites.
 """
 import logging
-import re
 import string
 from collections import defaultdict
 from urllib.parse import urlparse
@@ -19,8 +18,10 @@ from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import cached_property
 from django.utils.http import is_same_domain
 from django.utils.log import log_response
+from django.utils.regex_helper import _lazy_re_compile
 
 logger = logging.getLogger('django.security.csrf')
+token_re = _lazy_re_compile('[^a-zA-Z0-9]')
 
 REASON_BAD_ORIGIN = "Origin checking failed - %s does not match any trusted origins."
 REASON_NO_REFERER = "Referer checking failed - no Referer."
@@ -107,7 +108,7 @@ def rotate_token(request):
 
 def _sanitize_token(token):
     # Allow only ASCII alphanumerics
-    if re.search('[^a-zA-Z0-9]', token):
+    if token_re.search(token):
         return _get_new_csrf_token()
     elif len(token) == CSRF_TOKEN_LENGTH:
         return token

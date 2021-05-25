@@ -19,7 +19,7 @@ class SetCookieTests(SimpleTestCase):
         # evaluated expiration time and the time evaluated in set_cookie(). If
         # this difference doesn't exist, the cookie time will be 1 second
         # larger. The sleep guarantees that there will be a time difference.
-        expires = datetime.utcnow() + timedelta(seconds=10)
+        expires = datetime.now(tz=utc).replace(tzinfo=None) + timedelta(seconds=10)
         time.sleep(0.001)
         response.set_cookie('datetime', expires=expires)
         datetime_cookie = response.cookies['datetime']
@@ -28,7 +28,7 @@ class SetCookieTests(SimpleTestCase):
     def test_aware_expiration(self):
         """set_cookie() accepts an aware datetime as expiration time."""
         response = HttpResponse()
-        expires = (datetime.utcnow() + timedelta(seconds=10)).replace(tzinfo=utc)
+        expires = datetime.now(tz=utc) + timedelta(seconds=10)
         time.sleep(0.001)
         response.set_cookie('datetime', expires=expires)
         datetime_cookie = response.cookies['datetime']

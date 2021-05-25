@@ -51,7 +51,7 @@ All attributes should be considered read-only, unless stated otherwise.
 .. attribute:: HttpRequest.path
 
     A string representing the full path to the requested page, not including
-    the scheme or domain.
+    the scheme, domain, or query string.
 
     Example: ``"/music/bands/the_beatles/"``
 
@@ -1095,9 +1095,9 @@ Without passing ``safe=False``, a :exc:`TypeError` will be raised.
 .. warning::
 
     Before the `5th edition of ECMAScript
-    <https://www.ecma-international.org/ecma-262/5.1/index.html#sec-11.1.4>`_
-    it was possible to poison the JavaScript ``Array`` constructor. For this
-    reason, Django does not allow passing non-dict objects to the
+    <https://262.ecma-international.org/5.1/#sec-11.1.4>`_ it was possible to
+    poison the JavaScript ``Array`` constructor. For this reason, Django does
+    not allow passing non-dict objects to the
     :class:`~django.http.JsonResponse` constructor by default.  However, most
     modern browsers implement ECMAScript 5 which removes this attack vector.
     Therefore it is possible to disable this security precaution.

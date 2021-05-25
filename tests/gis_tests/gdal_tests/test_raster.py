@@ -2,6 +2,7 @@ import os
 import shutil
 import struct
 import tempfile
+import zipfile
 from unittest import mock
 
 from django.contrib.gis.gdal import GDALRaster, SpatialReference
@@ -228,6 +229,17 @@ class GDALRasterTests(SimpleTestCase):
         self.assertEqual(result, list(range(16)))
         # The vsi buffer is None for rasters that are not vsi based.
         self.assertIsNone(self.rs.vsi_buffer)
+
+    def test_vsi_vsizip_filesystem(self):
+        rst_zipfile = tempfile.NamedTemporaryFile(suffix='.zip')
+        with zipfile.ZipFile(rst_zipfile, mode='w') as zf:
+            zf.write(self.rs_path, 'raster.tif')
+        rst_path = '/vsizip/' + os.path.join(rst_zipfile.name, 'raster.tif')
+        rst = GDALRaster(rst_path)
+        self.assertEqual(rst.driver.name, self.rs.driver.name)
+        self.assertEqual(rst.name, rst_path)
+        self.assertIs(rst.is_vsi_based, True)
+        self.assertIsNone(rst.vsi_buffer)
 
     def test_offset_size_and_shape_on_raster_creation(self):
         rast = GDALRaster({

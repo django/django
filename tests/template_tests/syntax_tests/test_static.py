@@ -2,6 +2,7 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 from django.template import TemplateSyntaxError
+from django.templatetags.static import StaticNode
 from django.test import SimpleTestCase, override_settings
 
 from ..utils import setup
@@ -69,3 +70,17 @@ class StaticTagTests(SimpleTestCase):
         msg = "'static' takes at least one argument (path to file)"
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('t')
+
+
+class StaticNodeTests(SimpleTestCase):
+    def test_repr(self):
+        static_node = StaticNode(varname='named-var', path='named-path')
+        self.assertEqual(
+            repr(static_node),
+            "StaticNode(varname='named-var', path='named-path')",
+        )
+        static_node = StaticNode(path='named-path')
+        self.assertEqual(
+            repr(static_node),
+            "StaticNode(varname=None, path='named-path')",
+        )

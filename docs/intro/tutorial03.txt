@@ -212,7 +212,7 @@ Put the following code in that template:
     To make the tutorial shorter, all template examples use incomplete HTML. In
     your own projects you should use `complete HTML documents`__.
 
-__ https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/Getting_started#Anatomy_of_an_HTML_document
+__ https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/Getting_started#anatomy_of_an_html_document
 
 Now let's update our ``index`` view in ``polls/views.py`` to use the template:
 

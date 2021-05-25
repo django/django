@@ -6,7 +6,7 @@ from django.contrib.admin.utils import (
     label_for_field, lookup_field,
 )
 from django.contrib.admin.views.main import (
-    ALL_VAR, ORDER_VAR, PAGE_VAR, SEARCH_VAR,
+    ALL_VAR, IS_POPUP_VAR, ORDER_VAR, PAGE_VAR, SEARCH_VAR,
 )
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
@@ -423,7 +423,8 @@ def search_form(cl):
     return {
         'cl': cl,
         'show_result_count': cl.result_count != cl.full_result_count,
-        'search_var': SEARCH_VAR
+        'search_var': SEARCH_VAR,
+        'is_popup_var': IS_POPUP_VAR,
     }
 
 

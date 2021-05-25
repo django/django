@@ -132,7 +132,7 @@ will be merged into the main Django documentation shortly. Huge thanks go to
 Justin Bronn, Jeremy Dunck, Brett Hoerner and Travis Pinney for their efforts in
 creating and completing this feature.
 
-See http://geodjango.org/ for details.
+See :doc:`GeoDjango </ref/contrib/gis/index>` for details.
 
 .. _Geographic Information Systems: https://en.wikipedia.org/wiki/Geographic_information_system
 

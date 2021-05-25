@@ -24,6 +24,7 @@ from django.core.cache import (
 from django.core.cache.backends.base import InvalidCacheBackendError
 from django.core.cache.utils import make_template_fragment_key
 from django.db import close_old_connections, connection, connections
+from django.db.backends.utils import CursorWrapper
 from django.http import (
     HttpRequest, HttpResponse, HttpResponseNotModified, StreamingHttpResponse,
 )
@@ -1116,6 +1117,27 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         with self.assertNumQueries(1):
             cache.delete_many(['a', 'b', 'c'])
 
+    def test_delete_cursor_rowcount(self):
+        """
+        The rowcount attribute should not be checked on a closed cursor.
+        """
+        class MockedCursorWrapper(CursorWrapper):
+            is_closed = False
+
+            def close(self):
+                self.cursor.close()
+                self.is_closed = True
+
+            @property
+            def rowcount(self):
+                if self.is_closed:
+                    raise Exception('Cursor is closed.')
+                return self.cursor.rowcount
+
+        cache.set_many({'a': 1, 'b': 2})
+        with mock.patch('django.db.backends.utils.CursorWrapper', MockedCursorWrapper):
+            self.assertIs(cache.delete('a'), True)
+
     def test_zero_cull(self):
         self._perform_cull_test('zero_cull', 50, 18)
 
@@ -1700,6 +1722,19 @@ class CacheClosingTests(SimpleTestCase):
         self.assertFalse(cache.closed)
         signals.request_finished.send(self.__class__)
         self.assertTrue(cache.closed)
+
+    def test_close_only_initialized(self):
+        with self.settings(CACHES={
+            'cache_1': {
+                'BACKEND': 'cache.closeable_cache.CacheClass',
+            },
+            'cache_2': {
+                'BACKEND': 'cache.closeable_cache.CacheClass',
+            },
+        }):
+            self.assertEqual(caches.all(initialized_only=True), [])
+            signals.request_finished.send(self.__class__)
+            self.assertEqual(caches.all(initialized_only=True), [])
 
 
 DEFAULT_MEMORY_CACHES_SETTINGS = {
@@ -2603,3 +2638,20 @@ class CacheHandlerTest(SimpleTestCase):
         )
         with self.assertRaisesMessage(InvalidCacheBackendError, msg):
             test_caches['invalid_backend']
+
+    def test_all(self):
+        test_caches = CacheHandler({
+            'cache_1': {
+                'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+            },
+            'cache_2': {
+                'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+            },
+        })
+        self.assertEqual(test_caches.all(initialized_only=True), [])
+        cache_1 = test_caches['cache_1']
+        self.assertEqual(test_caches.all(initialized_only=True), [cache_1])
+        self.assertEqual(len(test_caches.all()), 2)
+        # .all() initializes all caches.
+        self.assertEqual(len(test_caches.all(initialized_only=True)), 2)
+        self.assertEqual(test_caches.all(), test_caches.all(initialized_only=True))

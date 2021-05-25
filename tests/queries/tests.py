@@ -7,7 +7,7 @@ from threading import Lock
 
 from django.core.exceptions import EmptyResultSet, FieldError
 from django.db import DEFAULT_DB_ALIAS, connection
-from django.db.models import Count, Exists, F, OuterRef, Q
+from django.db.models import Count, Exists, F, Max, OuterRef, Q
 from django.db.models.expressions import RawSQL
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import NothingNode, WhereNode
@@ -1322,6 +1322,10 @@ class Queries4Tests(TestCase):
         self.assertEqual(len(combined), 1)
         self.assertEqual(combined[0].name, 'a1')
 
+    def test_combine_or_filter_reuse(self):
+        combined = Author.objects.filter(name='a1') | Author.objects.filter(name='a3')
+        self.assertEqual(combined.get(name='a1'), self.a1)
+
     def test_join_reuse_order(self):
         # Join aliases are reused in order. This shouldn't raise AssertionError
         # because change_map contains a circular reference (#26522).
@@ -1854,6 +1858,17 @@ class Queries6Tests(TestCase):
             Tag.objects.order_by('-name').select_related('parent')[:2],
             [self.t5, self.t4],
         )
+
+    def test_col_alias_quoted(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            self.assertEqual(
+                Tag.objects.values('parent').annotate(
+                    tag_per_parent=Count('pk'),
+                ).aggregate(Max('tag_per_parent')),
+                {'tag_per_parent__max': 2},
+            )
+        sql = captured_queries[0]['sql']
+        self.assertIn('AS %s' % connection.ops.quote_name('col1'), sql)
 
 
 class RawQueriesTests(TestCase):

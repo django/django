@@ -64,7 +64,9 @@ class Extract(TimezoneMixin, Transform):
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         copy = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
-        field = copy.lhs.output_field
+        field = getattr(copy.lhs, 'output_field', None)
+        if field is None:
+            return copy
         if not isinstance(field, (DateField, DateTimeField, TimeField, DurationField)):
             raise ValueError(
                 'Extract input expression must be DateField, DateTimeField, '

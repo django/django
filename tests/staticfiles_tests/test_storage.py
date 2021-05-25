@@ -27,14 +27,9 @@ def hashed_file_path(test, path):
 class TestHashedFiles:
     hashed_file_path = hashed_file_path
 
-    def setUp(self):
-        self._max_post_process_passes = storage.staticfiles_storage.max_post_process_passes
-        super().setUp()
-
     def tearDown(self):
         # Clear hashed files to avoid side effects among tests.
         storage.staticfiles_storage.hashed_files.clear()
-        storage.staticfiles_storage.max_post_process_passes = self._max_post_process_passes
 
     def assertPostCondition(self):
         """

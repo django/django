@@ -1755,6 +1755,22 @@ class ValueTests(TestCase):
         self.assertEqual(len(kwargs), 1)
         self.assertEqual(kwargs['output_field'].deconstruct(), CharField().deconstruct())
 
+    def test_repr(self):
+        tests = [
+            (None, 'Value(None)'),
+            ('str', "Value('str')"),
+            (True, 'Value(True)'),
+            (42, 'Value(42)'),
+            (
+                datetime.datetime(2019, 5, 15),
+                'Value(datetime.datetime(2019, 5, 15, 0, 0))',
+            ),
+            (Decimal('3.14'), "Value(Decimal('3.14'))"),
+        ]
+        for value, expected in tests:
+            with self.subTest(value=value):
+                self.assertEqual(repr(Value(value)), expected)
+
     def test_equal(self):
         value = Value('name')
         self.assertEqual(value, Value('name'))
@@ -1806,10 +1822,10 @@ class ValueTests(TestCase):
             (b'', BinaryField),
             (uuid.uuid4(), UUIDField),
         ]
-        for value, ouput_field_type in value_types:
+        for value, output_field_type in value_types:
             with self.subTest(type=type(value)):
                 expr = Value(value)
-                self.assertIsInstance(expr.output_field, ouput_field_type)
+                self.assertIsInstance(expr.output_field, output_field_type)
 
     def test_resolve_output_field_failure(self):
         msg = 'Cannot resolve expression type, unknown output_field'
@@ -1880,7 +1896,7 @@ class ReprTests(SimpleTestCase):
         )
         self.assertEqual(
             repr(When(Q(age__gte=18), then=Value('legal'))),
-            "<When: WHEN <Q: (AND: ('age__gte', 18))> THEN Value(legal)>"
+            "<When: WHEN <Q: (AND: ('age__gte', 18))> THEN Value('legal')>"
         )
         self.assertEqual(repr(Col('alias', 'field')), "Col(alias, field)")
         self.assertEqual(repr(F('published')), "F(published)")
@@ -2000,3 +2016,25 @@ class ExpressionWrapperTests(SimpleTestCase):
         group_by_cols = expr.get_group_by_cols(alias=None)
         self.assertEqual(group_by_cols, [expr.expression])
         self.assertEqual(group_by_cols[0].output_field, expr.output_field)
+
+
+class OrderByTests(SimpleTestCase):
+    def test_equal(self):
+        self.assertEqual(
+            OrderBy(F('field'), nulls_last=True),
+            OrderBy(F('field'), nulls_last=True),
+        )
+        self.assertNotEqual(
+            OrderBy(F('field'), nulls_last=True),
+            OrderBy(F('field'), nulls_last=False),
+        )
+
+    def test_hash(self):
+        self.assertEqual(
+            hash(OrderBy(F('field'), nulls_last=True)),
+            hash(OrderBy(F('field'), nulls_last=True)),
+        )
+        self.assertNotEqual(
+            hash(OrderBy(F('field'), nulls_last=True)),
+            hash(OrderBy(F('field'), nulls_last=False)),
+        )

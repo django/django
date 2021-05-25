@@ -477,7 +477,8 @@ class SelectDateWidgetTest(WidgetTest):
             w.value_from_datadict({'date_year': '1899', 'date_month': '8', 'date_day': '13'}, {}, 'date'),
             '13-08-1899',
         )
-        # And years before 1000 (demonstrating the need for datetime_safe).
+        # And years before 1000 (demonstrating the need for
+        # sanitize_strftime_format).
         w = SelectDateWidget(years=('0001',))
         self.assertEqual(
             w.value_from_datadict({'date_year': '0001', 'date_month': '8', 'date_day': '13'}, {}, 'date'),

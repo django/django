@@ -90,7 +90,7 @@ class Node:
         If `squash` is False the data is prepared and added as a child to
         this tree without further logic.
         """
-        if data in self.children:
+        if self.connector == conn_type and data in self.children:
             return data
         if not squash:
             self.children.append(data)

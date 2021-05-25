@@ -9,10 +9,12 @@ for a list of all possible variables.
 import importlib
 import os
 import time
+import warnings
 from pathlib import Path
 
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
@@ -156,6 +158,14 @@ class Settings:
                     raise ImproperlyConfigured("The %s setting must be a list or a tuple." % setting)
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
+
+        if self.USE_TZ is False and not self.is_overridden('USE_TZ'):
+            warnings.warn(
+                'The default value of USE_TZ will change from False to True '
+                'in Django 5.0. Set USE_TZ to False in your project settings '
+                'if you want to keep the current default behavior.',
+                category=RemovedInDjango50Warning,
+            )
 
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find

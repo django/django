@@ -172,7 +172,7 @@ site is one module of Django the framework. Furthermore, although Django has
 special conveniences for building "CMS-y" apps, that doesn't mean it's not just
 as appropriate for building "non-CMS-y" apps (whatever that means!).
 
-.. _Drupal: https://drupal.org/
+.. _Drupal: https://www.drupal.org/
 
 How can I download the Django documentation to read it offline?
 ===============================================================
@@ -197,7 +197,7 @@ software are still a matter of some debate.
 
 For example, `APA style`_,  would dictate something like::
 
-    Django (Version 1.5) [Computer Software]. (2013). Retrieved from https://djangoproject.com.
+    Django (Version 1.5) [Computer Software]. (2013). Retrieved from https://www.djangoproject.com/.
 
 However, the only true guide is what your publisher will accept, so get a copy
 of those guidelines and fill in the gaps as best you can.
@@ -207,11 +207,11 @@ Foundation".
 
 If you need a publishing location, use "Lawrence, Kansas".
 
-If you need a web address, use https://djangoproject.com.
+If you need a web address, use https://www.djangoproject.com/.
 
 If you need a name, just use "Django", without any tagline.
 
 If you need a publication date, use the year of release of the version you're
 referencing (e.g., 2013 for v1.5)
 
-.. _APA style: https://www.apastyle.org
+.. _APA style: https://apastyle.apa.org/

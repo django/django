@@ -422,7 +422,7 @@ form is rendered, the problem may not even be visible on the web page.
 The alternative approach would be to include all fields automatically, or
 remove only some. This fundamental approach is known to be much less secure
 and has led to serious exploits on major websites (e.g. `GitHub
-<https://github.com/blog/1068-public-key-security-vulnerability-and-mitigation>`_).
+<https://github.blog/2012-03-04-public-key-security-vulnerability-and-mitigation/>`_).
 
 There are, however, two shortcuts available for cases where you can guarantee
 these security concerns do not apply to you:

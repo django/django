@@ -403,6 +403,14 @@ class ModelDefaultAutoFieldTests(SimpleTestCase):
 
         self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [])
 
+    def test_skipped_on_abstract_model(self):
+        class Abstract(models.Model):
+            class Meta:
+                abstract = True
+
+        # Call .check() because abstract models are not registered.
+        self.assertEqual(Abstract.check(), [])
+
     def test_explicit_inherited_parent_link(self):
         class Parent(models.Model):
             id = models.AutoField(primary_key=True)
@@ -432,6 +440,18 @@ class ModelDefaultAutoFieldTests(SimpleTestCase):
 
         self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [
             Warning(self.msg, hint=self.hint, obj=Parent, id='models.W042'),
+        ])
+
+    def test_auto_created_pk_inherited_abstract_parent(self):
+        class Parent(models.Model):
+            class Meta:
+                abstract = True
+
+        class Child(Parent):
+            pass
+
+        self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [
+            Warning(self.msg, hint=self.hint, obj=Child, id='models.W042'),
         ])
 
     @override_settings(DEFAULT_AUTO_FIELD='django.db.models.BigAutoField')
