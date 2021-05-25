@@ -64,6 +64,7 @@ class AdminScriptTestCase(SimpleTestCase):
                 'DEFAULT_AUTO_FIELD',
                 'ROOT_URLCONF',
                 'SECRET_KEY',
+                'USE_TZ',
             ]
             for s in exports:
                 if hasattr(settings, s):
