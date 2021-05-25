@@ -60,6 +60,17 @@ For more details, see the reference documentation for :setting:`DATABASES`.
     If you're using SQLite, you don't need to create anything beforehand - the
     database file will be created automatically when it is needed.
 
+<<<<<<< Updated upstream
+=======
+.. admonition:: Time Zone Setting
+
+	While you're editing :file:`mysite/settings.py`, you can think about how you 
+	want to handle time zones. Django :ref:`best practice for time 
+	zone <time-zones-overview>` recommends using the default value of 'UTC'
+	for setting :setting:`TIME_ZONE`. You also have the option of setting it
+	to your own time zone.
+
+>>>>>>> Stashed changes
 Also, note the :setting:`INSTALLED_APPS` setting at the top of the file. That
 holds the names of all Django applications that are activated in this Django
 instance. Apps can be used in multiple projects, and you can package and
@@ -698,6 +709,17 @@ The bottom part of the page gives you a couple of options:
 
 * Delete -- Displays a delete confirmation page.
 
+<<<<<<< Updated upstream
+=======
+.. admonition:: Time not right?
+
+	If the value of "Date published" doesn't match the time you remember 
+	creating the question in :doc:`Tutorial 1</intro/tutorial01>`, it is likely 
+	you left the :setting:`TIME_ZONE` setting as the default UTC. In that case, 
+	the time displayed would differ by the number of hours your timezone 
+	differs	from UTC.
+
+>>>>>>> Stashed changes
 Change the "Date published" by clicking the "Today" and "Now" shortcuts. Then
 click "Save and continue editing." Then click "History" in the upper right.
 You'll see a page listing all changes made to this object via the Django admin,
