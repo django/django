@@ -2,9 +2,9 @@
 Django 3.2.4 release notes
 ==========================
 
-*Expected June 1, 2021*
+*Expected June 2, 2021*
 
-Django 3.2.4 fixes several bugs in 3.2.3.
+Django 3.2.4 fixes two security issues and several bugs in 3.2.3.
 
 Bugfixes
 ========
