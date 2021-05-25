@@ -64,6 +64,9 @@ class BaseDatabaseFeatures:
     has_real_datatype = False
     supports_subqueries_in_group_by = True
 
+    # Does the backend ignore unnecessary ORDER BY clauses in subqueries?
+    ignores_unnecessary_order_by_in_subqueries = True
+
     # Is there a true datatype for uuid?
     has_native_uuid_field = False
 

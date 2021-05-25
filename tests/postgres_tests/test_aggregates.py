@@ -1,4 +1,6 @@
-from django.db.models import CharField, F, OuterRef, Q, Subquery, Value
+from django.db.models import (
+    CharField, F, Func, IntegerField, OuterRef, Q, Subquery, Value,
+)
 from django.db.models.fields.json import KeyTextTransform, KeyTransform
 from django.db.models.functions import Cast, Concat, Substr
 from django.test.utils import Approximate
@@ -12,6 +14,7 @@ try:
         RegrAvgX, RegrAvgY, RegrCount, RegrIntercept, RegrR2, RegrSlope,
         RegrSXX, RegrSXY, RegrSYY, StatAggregate, StringAgg,
     )
+    from django.contrib.postgres.fields import ArrayField
 except ImportError:
     pass  # psycopg2 is not installed
 
@@ -388,6 +391,20 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         self.assertSequenceEqual(
             AggregateTestModel.objects.filter(id__in=Subquery(subquery)),
             [self.aggs[0]],
+        )
+
+    def test_ordering_isnt_cleared_for_array_subquery(self):
+        inner_qs = AggregateTestModel.objects.order_by('-integer_field')
+        qs = AggregateTestModel.objects.annotate(
+            integers=Func(
+                Subquery(inner_qs.values('integer_field')),
+                function='ARRAY',
+                output_field=ArrayField(base_field=IntegerField()),
+            ),
+        )
+        self.assertSequenceEqual(
+            qs.first().integers,
+            inner_qs.values_list('integer_field', flat=True),
         )
 
 

@@ -239,6 +239,7 @@ class SubqueryConstraint:
         self.alias = alias
         self.columns = columns
         self.targets = targets
+        query_object.clear_ordering(clear_default=True)
         self.query_object = query_object
 
     def as_sql(self, compiler, connection):

@@ -404,9 +404,16 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             placeholder = '(' + ', '.join(sqls) + ')'
             return (placeholder, sqls_params)
         else:
-            if not getattr(self.rhs, 'has_select_fields', True):
-                self.rhs.clear_select_clause()
-                self.rhs.add_fields(['pk'])
+            from django.db.models.sql.query import (  # avoid circular import
+                Query,
+            )
+            if isinstance(self.rhs, Query):
+                query = self.rhs
+                query.clear_ordering(clear_default=True)
+                if not query.has_select_fields:
+                    query.clear_select_clause()
+                    query.add_fields(['pk'])
+
             return super().process_rhs(compiler, connection)
 
     def get_group_by_cols(self, alias=None):
