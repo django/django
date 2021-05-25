@@ -44,20 +44,36 @@ Installation
 
 To install the sites app, follow these steps:
 
-#. Add ``'django.contrib.sites'`` to your :setting:`INSTALLED_APPS` setting.
+#. Add :mod:`django.contrib.sites` to your :setting:`INSTALLED_APPS` setting.
 
 #. Run the command :djadmin:`manage.py migrate <migrate>`.  This will add the Site model to your database.
 
 #. Add the :setting:`SITE_ID` setting to your settings.py.
 
-#. Define the site that your code base refers to in your top level ``urls.py``, by using code similar to the following...
+#. Make sure that your site is created after the site model has become available.  In the following example the site is created using two custom settings, `SITE_NAME` and `SITE_DOMAIN` in a post-migrate signal in the app's apps.py.
 
 ```python
-from django.contrib.sites.models import Site
-current_site = Site.objects.all().first()
-current_site.domain_name = "www.mygroovysite.com"
-current_site.name = "www.mygroovysite.com"
-current_site.save()
+from django.apps import AppConfig
+from django.db.models.signals import post_migrate
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+
+
+def callback(sender, **kwargs):
+    from django.contrib.sites.models import Site
+    try:
+        current_site = Site.objects.get(id=settings.SITE_ID)
+        if current_site.domain != settings.SITE_DOMAIN:
+            raise ImproperlyConfigured("SITE_ID does not match SITE_DOMAIN") 
+    except Site.DoesNotExist:
+        Site.objects.create(domain=settings.SITE_DOMAIN, name=settings.SITE_NAME, id=settings.SITE_ID)
+    
+
+class MyDjangoAppConfig(AppConfig):
+    name = 'mydjango_app'
+
+    def ready(self):
+        post_migrate.connect(callback, sender=self)
 ```
 
 Example usage
