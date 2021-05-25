@@ -25,7 +25,7 @@ objects, and a ``Publication`` has multiple ``Article`` objects:
 
     class Article(models.Model):
         headline = models.CharField(max_length=100)
-        publications = models.ManyToManyField(Publication)
+        publications = models.ManyToManyField(Publication, on_delete=models.CASCADE)
 
         class Meta:
             ordering = ['headline']
