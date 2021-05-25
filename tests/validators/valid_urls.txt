@@ -63,6 +63,12 @@ http://0.0.0.0/
 http://255.255.255.255
 http://224.0.0.0
 http://224.1.1.1
+http://111.112.113.114/
+http://88.88.88.88/
+http://11.12.13.14/
+http://10.20.30.40/
+http://1.2.3.4/
+http://127.0.01.09.home.lan
 http://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.example.com
 http://example.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.com
 http://example.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
