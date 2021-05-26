@@ -626,9 +626,10 @@ class URLResolver:
             iter(patterns)
         except TypeError as e:
             msg = (
-                "The included URLconf '{name}' does not appear to have any "
-                "patterns in it. If you see valid patterns in the file then "
-                "the issue is probably caused by a circular import."
+                "The included URLconf '{name}' does not appear to have "
+                "any patterns in it. If you see the 'urlpatterns' variable "
+                "with valid patterns in the file then the issue is probably "
+                "caused by a circular import."
             )
             raise ImproperlyConfigured(msg.format(name=self.urlconf_name)) from e
         return patterns
