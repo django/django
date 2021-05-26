@@ -219,6 +219,17 @@ class TestChildArguments(SimpleTestCase):
         with self.assertRaisesMessage(RuntimeError, msg):
             autoreload.get_child_arguments()
 
+    @mock.patch('sys.argv', [__file__, 'runserver'])
+    @mock.patch('sys.warnoptions', [])
+    def test_module_no_spec(self):
+        module = types.ModuleType('test_module')
+        del module.__spec__
+        with mock.patch.dict(sys.modules, {'__main__': module}):
+            self.assertEqual(
+                autoreload.get_child_arguments(),
+                [sys.executable, __file__, 'runserver']
+            )
+
 
 class TestUtilities(SimpleTestCase):
     def test_is_django_module(self):
