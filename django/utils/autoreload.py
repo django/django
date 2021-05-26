@@ -222,7 +222,8 @@ def get_child_arguments():
     args = [sys.executable] + ['-W%s' % o for o in sys.warnoptions]
     # __spec__ is set when the server was started with the `-m` option,
     # see https://docs.python.org/3/reference/import.html#main-spec
-    if __main__.__spec__ is not None and __main__.__spec__.parent:
+    # __spec__ may not exist, e.g. when running in a Conda env.
+    if getattr(__main__, '__spec__', None) is not None and __main__.__spec__.parent:
         args += ['-m', __main__.__spec__.parent]
         args += sys.argv[1:]
     elif not py_script.exists():
