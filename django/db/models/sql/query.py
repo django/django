@@ -447,11 +447,10 @@ class Query(BaseExpression):
             inner_query.select_for_update = False
             inner_query.select_related = False
             inner_query.set_annotation_mask(self.annotation_select)
-            if not self.is_sliced and not self.distinct_fields:
-                # Queries with distinct_fields need ordering and when a limit
-                # is applied we must take the slice from the ordered query.
-                # Otherwise no need for ordering.
-                inner_query.clear_ordering(True)
+            # Queries with distinct_fields need ordering and when a limit is
+            # applied we must take the slice from the ordered query. Otherwise
+            # no need for ordering.
+            inner_query.clear_ordering(force=False)
             if not inner_query.distinct:
                 # If the inner query uses default select and it has some
                 # aggregate annotations, then we must make sure the inner
@@ -491,7 +490,7 @@ class Query(BaseExpression):
             self.default_cols = False
             self.extra = {}
 
-        outer_query.clear_ordering(True)
+        outer_query.clear_ordering(force=True)
         outer_query.clear_limits()
         outer_query.select_for_update = False
         outer_query.select_related = False
@@ -534,7 +533,7 @@ class Query(BaseExpression):
                 combined_query.exists(using, limit=limit_combined)
                 for combined_query in q.combined_queries
             )
-        q.clear_ordering(True)
+        q.clear_ordering(force=True)
         if limit:
             q.set_limits(high=1)
         q.add_extra({'a': 1}, None, None, None, None, None)
@@ -1040,7 +1039,7 @@ class Query(BaseExpression):
         if (self.low_mark == 0 and self.high_mark is None and
                 not self.distinct_fields and
                 not self.select_for_update):
-            clone.clear_ordering(True)
+            clone.clear_ordering(force=True)
         clone.where.resolve_expression(query, *args, **kwargs)
         for key, value in clone.annotations.items():
             resolved = value.resolve_expression(query, *args, **kwargs)
@@ -1769,7 +1768,7 @@ class Query(BaseExpression):
         query = Query(self.model)
         query._filtered_relations = self._filtered_relations
         query.add_filter(filter_expr)
-        query.clear_ordering(True)
+        query.clear_ordering(force=True)
         # Try to have as simple as possible subquery -> trim leading joins from
         # the subquery.
         trimmed_prefix, contains_louter = query.trim_start(names_with_path)
@@ -1970,14 +1969,18 @@ class Query(BaseExpression):
         else:
             self.default_ordering = False
 
-    def clear_ordering(self, force_empty):
+    def clear_ordering(self, force=False, clear_default=True):
         """
-        Remove any ordering settings. If 'force_empty' is True, there will be
-        no ordering in the resulting query (not even the model's default).
+        Remove any ordering settings if the current query allows it without
+        side effects, set 'force' to True to clear the ordering regardless.
+        If 'clear_default' is True, there will be no ordering in the resulting
+        query (not even the model's default).
         """
+        if not force and (self.is_sliced or self.distinct_fields or self.select_for_update):
+            return
         self.order_by = ()
         self.extra_order_by = ()
-        if force_empty:
+        if clear_default:
             self.default_ordering = False
 
     def set_group_by(self, allow_aliases=True):

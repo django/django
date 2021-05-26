@@ -1609,7 +1609,7 @@ class SQLUpdateCompiler(SQLCompiler):
             return
         query = self.query.chain(klass=Query)
         query.select_related = False
-        query.clear_ordering(True)
+        query.clear_ordering(force=True)
         query.extra = {}
         query.select = []
         query.add_fields([query.get_meta().pk.name])

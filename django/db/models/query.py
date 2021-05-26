@@ -658,7 +658,7 @@ class QuerySet:
             )
         obj = self._chain()
         obj.query.set_limits(high=1)
-        obj.query.clear_ordering(force_empty=True)
+        obj.query.clear_ordering(force=True)
         obj.query.add_ordering(*order_by)
         return obj.get()
 
@@ -741,7 +741,7 @@ class QuerySet:
         # Disable non-supported fields.
         del_query.query.select_for_update = False
         del_query.query.select_related = False
-        del_query.query.clear_ordering(force_empty=True)
+        del_query.query.clear_ordering(force=True)
 
         collector = Collector(using=del_query.db)
         collector.collect(del_query)
@@ -1009,7 +1009,7 @@ class QuerySet:
         # Clone the query to inherit the select list and everything
         clone = self._chain()
         # Clear limits and ordering so they can be reapplied
-        clone.query.clear_ordering(True)
+        clone.query.clear_ordering(force=True)
         clone.query.clear_limits()
         clone.query.combined_queries = (self.query,) + tuple(qs.query for qs in other_qs)
         clone.query.combinator = combinator
@@ -1166,7 +1166,7 @@ class QuerySet:
         if self.query.is_sliced:
             raise TypeError('Cannot reorder a query once a slice has been taken.')
         obj = self._chain()
-        obj.query.clear_ordering(force_empty=False)
+        obj.query.clear_ordering(force=True, clear_default=False)
         obj.query.add_ordering(*field_names)
         return obj
 
