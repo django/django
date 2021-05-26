@@ -7,7 +7,9 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, override_settings
 from django.test.utils import requires_tz_support
 from django.utils import timezone
-from django.utils.feedgenerator import rfc2822_date, rfc3339_date
+from django.utils.feedgenerator import (
+    Atom1Feed, Rss201rev2Feed, rfc2822_date, rfc3339_date,
+)
 
 from .models import Article, Entry
 
@@ -419,6 +421,22 @@ class SyndicationFeedTest(FeedTestCase):
         doc = minidom.parseString(response.content)
         published = doc.getElementsByTagName('published')[0].firstChild.wholeText
         self.assertEqual(published[-6:], '+00:42')
+
+    def test_feed_no_content_self_closing_tag(self):
+        tests = [
+            (Atom1Feed, 'link'),
+            (Rss201rev2Feed, 'atom:link'),
+        ]
+        for feedgenerator, tag in tests:
+            with self.subTest(feedgenerator=feedgenerator.__name__):
+                feed = feedgenerator(
+                    title='title',
+                    link='https://example.com',
+                    description='self closing tags test',
+                    feed_url='https://feed.url.com',
+                )
+                doc = feed.writeString('utf-8')
+                self.assertIn(f'<{tag} href="https://feed.url.com" rel="self"/>', doc)
 
     @requires_tz_support
     def test_feed_last_modified_time_naive_date(self):

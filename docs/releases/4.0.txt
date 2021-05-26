@@ -432,6 +432,10 @@ Miscellaneous
 * The ``object`` argument of undocumented ``ModelAdmin.log_addition()``,
   ``log_change()``, and ``log_deletion()`` methods is renamed to ``obj``.
 
+* :class:`~django.utils.feedgenerator.RssFeed`,
+  :class:`~django.utils.feedgenerator.Atom1Feed`, and their subclasses now
+  emit elements with no content as self-closing tags.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0
