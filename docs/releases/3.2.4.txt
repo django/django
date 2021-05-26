@@ -25,3 +25,6 @@ Bugfixes
   
 * Fixed a bug in Django 3.2 that would trigger the auto-reloader for template
   changes when directory paths were specified with strings (:ticket:`32744`).
+
+* Fixed a regression in Django 3.2 that caused a crash of auto-reloader with
+  ``AttributeError``, e.g. inside a ``Conda`` environment (:ticket:`32783`).
