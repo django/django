@@ -762,6 +762,13 @@ class ClientTest(TestCase):
         response = self.client.get('/django_project_redirect/')
         self.assertRedirects(response, 'https://www.djangoproject.com/', fetch_redirect_response=False)
 
+    def test_external_redirect_without_trailing_slash(self):
+        """
+        Client._handle_redirects() with an empty path.
+        """
+        response = self.client.get('/no_trailing_slash_external_redirect/', follow=True)
+        self.assertRedirects(response, 'https://testserver')
+
     def test_external_redirect_with_fetch_error_msg(self):
         """
         assertRedirects without fetch_redirect_response=False raises
