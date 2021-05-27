@@ -18,8 +18,9 @@ from django.forms.renderers import DjangoTemplates, get_default_renderer
 from django.forms.utils import ErrorList
 from django.http import QueryDict
 from django.template import Context, Template
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.utils.datastructures import MultiValueDict
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.safestring import mark_safe
 
 
@@ -3169,6 +3170,7 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
 
         self.assertHTMLEqual(boundfield.label_tag(label_suffix='$'), '<label for="id_field">Field$</label>')
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_field_name(self):
         """#5749 - `field_name` may be used as a key in _html_output()."""
         class SomeForm(Form):
@@ -3186,6 +3188,7 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
         form = SomeForm()
         self.assertHTMLEqual(form.as_p(), '<p id="p_some_field"></p>')
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_field_without_css_classes(self):
         """
         `css_classes` may be used as a key in _html_output() (empty classes).
@@ -3205,6 +3208,7 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
         form = SomeForm()
         self.assertHTMLEqual(form.as_p(), '<p class=""></p>')
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_field_with_css_class(self):
         """
         `css_classes` may be used as a key in _html_output() (class comes
@@ -3226,6 +3230,7 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
         form = SomeForm()
         self.assertHTMLEqual(form.as_p(), '<p class="foo"></p>')
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_field_name_with_hidden_input(self):
         """
         BaseForm._html_output() should merge all the hidden input fields and
@@ -3253,6 +3258,7 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
             '<input id="id_hidden2" name="hidden2" type="hidden"></p>'
         )
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_field_name_with_hidden_input_and_non_matching_row_ender(self):
         """
         BaseForm._html_output() should merge all the hidden input fields and
