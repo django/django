@@ -27,6 +27,8 @@ details on these changes.
 * The default sitemap protocol for sitemaps built outside the context of a
   request will change from ``'http'`` to ``'https'``.
 
+* ``BaseForm._html_output()`` will be removed.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

@@ -465,6 +465,9 @@ Miscellaneous
 * The default sitemap protocol for sitemaps built outside the context of a
   request will change from ``'http'`` to ``'https'`` in Django 5.0.
 
+* Since form rendering now uses the template engine, the undocumented
+  ``BaseForm._html_output()` helper method is deprecated.
+
 Features removed in 4.0
 =======================
 
