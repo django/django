@@ -102,8 +102,8 @@ Context available in form templates
 
 .. versionadded:: 4.0
 
-Form templates receive a context from :meth:`.Form.get_context`. Be default,
-forms receive dictionary with the following values:
+Form templates receive a context from :meth:`.Form.get_context`. By default,
+forms receive a dictionary with the following values:
 
 * ``form``: The bound form.
 * ``fields``: All bound fields, except the hidden fields.

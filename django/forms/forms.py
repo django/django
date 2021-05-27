@@ -10,7 +10,7 @@ from django.forms.fields import Field, FileField
 from django.forms.utils import ErrorDict, ErrorList
 from django.forms.widgets import Media, MediaDefiningClass
 from django.utils.datastructures import MultiValueDict
-from django.utils.deprecation import RemovedInNextVersionWarning
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, html_safe
 from django.utils.safestring import mark_safe
@@ -67,7 +67,6 @@ class BaseForm:
     template_name_p = 'django/forms/p.html'
     template_name_table = 'django/forms/table.html'
     template_name_ul = 'django/forms/ul.html'
-
     template_name_label = 'django/forms/label.html'
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
@@ -200,7 +199,7 @@ class BaseForm:
         "Output HTML. Used by as_table(), as_ul(), as_p()."
         warnings.warn(
             '`django.forms.BaseForm._html_output` is deprecated.'
-            ' Please use the `render` and `get_context` methods.', RemovedInNextVersionWarning)
+            ' Please use the `render` and `get_context` methods.', RemovedInDjango50Warning)
         # Errors that should be displayed above all fields.
         top_errors = self.non_field_errors().copy()
         output, hidden_fields = [], []
@@ -279,7 +278,7 @@ class BaseForm:
 
     def get_context(self):
         """
-        Return context text for form rendering.
+        Return context for form rendering.
 
         The available context is:
 
@@ -287,7 +286,6 @@ class BaseForm:
             `fields`: All bound fields, except the hidden fields.
             `hidden_fields`: All hidden bound fields.
             `errors`: All non field related or hidden field related form errors.
-
         """
         bound_fields = []
         hidden_fields = []

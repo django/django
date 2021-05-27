@@ -504,11 +504,11 @@ a form object, and each rendering method returns a string.
 
 .. versionadded:: 4.0
 
-Template that is going to going to be rendered if the form is case into a
-string, e.g. via ``print(form)`` or in a template via ``{{ form }}``.
-The template can be changed per form by overwriting the ``template_name``
-attribute or by overriding the default template, see also
-:ref:`Overriding built-in form templates <overriding-built-in-form-templates>`.
+Template that is going to be rendered if the form is case into a string, e.g.
+via ``print(form)`` or in a template via ``{{ form }}``. The template can be
+changed per form by overwriting the ``template_name`` attribute or by
+overriding the default template, see also :ref:`Overriding built-in form
+templates <overriding-built-in-form-templates>`.
 
 ``as_p()``
 ----------
@@ -588,9 +588,9 @@ The available context is:
 
 .. versionadded:: 4.0
 
-The render method is is called by the ``__str__`` as well as the
-:meth:`.Form.as_table`, :meth:`.Form.as_p` and :meth:`.Form.as_ul` methods.
-All arguments are optional and will default to:
+The render method is called by the ``__str__`` as well as the
+:meth:`.Form.as_table`, :meth:`.Form.as_p` and :meth:`.Form.as_ul` methods. All
+arguments are optional and will default to:
 
 * ``template_name``: :attr:`.Form.template_name`
 * ``context``: :meth:`.Form.get_context`
