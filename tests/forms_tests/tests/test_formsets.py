@@ -1313,7 +1313,7 @@ class TestIsBoundBehavior(SimpleTestCase):
         )
         self.assertEqual(formset.errors, [])
         # Can still render the formset.
-        self.assertEqual(
+        self.assertHTMLEqual(
             str(formset),
             '<tr><td colspan="2">'
             '<ul class="errorlist nonfield">'
@@ -1344,7 +1344,7 @@ class TestIsBoundBehavior(SimpleTestCase):
         )
         self.assertEqual(formset.errors, [])
         # Can still render the formset.
-        self.assertEqual(
+        self.assertHTMLEqual(
             str(formset),
             '<tr><td colspan="2">'
             '<ul class="errorlist nonfield">'

@@ -1,4 +1,4 @@
-{% for  error in  errors %}
+{% if errors %}
   <tr>
     <td colspan="2">
       {{ errors }}
@@ -7,7 +7,7 @@
       {% endif %}
     </td>
   </tr>
-{% endfor %}
+{% endif %}
 {% for field, errors in fields %}
   <tr{% if field.css_classes %} class="{{ field.css_classes }}"{% endif %}>
     <th>{% if field.label %}{{ field.label_tag }}{% endif %}</th>
