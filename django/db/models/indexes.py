@@ -245,7 +245,7 @@ class IndexExpression(Func):
             for_save,
         )
         if not isinstance(resolve_root_expression, Col):
-            root_expression = Func(root_expression, template='(%(expressions)s)')
+            root_expression = Func(root_expression, template='%(expressions)s')
 
         if wrappers:
             # Order wrappers and set their expressions.
