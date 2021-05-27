@@ -273,6 +273,16 @@ class ClientTest(TestCase):
         # location returned 301 when retrieved
         self.assertRedirects(response, '/permanent_redirect_view/', target_status_code=301)
 
+    def test_redirect_without_trailing_slash(self):
+        "Get a URL that redirects to a non relative URL without the trailing slash"
+        response = self.client.get('/external_redirect_view/', follow=True)
+        self.assertRedirects(response, 'https://testserver')
+
+    def test_redirect_without_trailing_slash_with_query(self):
+        "Get a URL that redirects to a non relative URL without the trailing slash with query params"
+        response = self.client.get('/external_redirect_view/?foo=bar', follow=True)
+        self.assertRedirects(response, 'https://testserver?foo=bar')
+
     def test_follow_redirect(self):
         "A URL that redirects can be followed to termination."
         response = self.client.get('/double_redirect_view/', follow=True)

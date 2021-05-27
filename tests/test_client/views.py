@@ -131,6 +131,14 @@ def redirect_view(request):
     return HttpResponseRedirect('/get_view/' + query)
 
 
+def external_redirect_view(request):
+    if request.GET:
+        query = '?' + urlencode(request.GET, True)
+    else:
+        query = ''
+    return HttpResponseRedirect('https://testserver' + query)
+
+
 def method_saving_307_redirect_query_string_view(request):
     return HttpResponseRedirect('/post_view/?hello=world', status=307)
 
@@ -393,3 +401,7 @@ class TwoArgException(Exception):
 
 def two_arg_exception(request):
     raise TwoArgException('one', 'two')
+
+
+def index_view(request):
+    return HttpResponse('Hello world')
