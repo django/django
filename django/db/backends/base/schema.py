@@ -151,9 +151,9 @@ class BaseDatabaseSchemaEditor:
         """Take a model and return its table definition."""
         # Add any unique_togethers (always deferred, as some fields might be
         # created afterwards, like geometry fields with some backends).
-        for fields in model._meta.unique_together:
-            columns = [model._meta.get_field(field).column for field in fields]
-            self.deferred_sql.append(self._create_unique_sql(model, columns))
+        for field_names in model._meta.unique_together:
+            fields = [model._meta.get_field(field) for field in field_names]
+            self.deferred_sql.append(self._create_unique_sql(model, fields))
         # Create column SQL, add FK deferreds if needed.
         column_sqls = []
         params = []
@@ -407,9 +407,9 @@ class BaseDatabaseSchemaEditor:
         for fields in olds.difference(news):
             self._delete_composed_index(model, fields, {'unique': True}, self.sql_delete_unique)
         # Created uniques
-        for fields in news.difference(olds):
-            columns = [model._meta.get_field(field).column for field in fields]
-            self.execute(self._create_unique_sql(model, columns))
+        for field_names in news.difference(olds):
+            fields = [model._meta.get_field(field) for field in field_names]
+            self.execute(self._create_unique_sql(model, fields))
 
     def alter_index_together(self, model, old_index_together, new_index_together):
         """
@@ -790,7 +790,7 @@ class BaseDatabaseSchemaEditor:
             self._delete_primary_key(model, strict)
         # Added a unique?
         if self._unique_should_be_added(old_field, new_field):
-            self.execute(self._create_unique_sql(model, [new_field.column]))
+            self.execute(self._create_unique_sql(model, [new_field]))
         # Added an index? Add an index if db_index switched to True or a unique
         # constraint will no longer be used in lieu of an index. The following
         # lines from the truth table show all True cases; the rest are False:
@@ -1214,7 +1214,7 @@ class BaseDatabaseSchemaEditor:
                 self.deferred_sql.append(sql)
             return None
         constraint = self.sql_unique_constraint % {
-            'columns': ', '.join(map(self.quote_name, fields)),
+            'columns': ', '.join([self.quote_name(field.column) for field in fields]),
             'deferrable': self._deferrable_constraint_sql(deferrable),
         }
         return self.sql_constraint % {
@@ -1223,7 +1223,7 @@ class BaseDatabaseSchemaEditor:
         }
 
     def _create_unique_sql(
-        self, model, columns, name=None, condition=None, deferrable=None,
+        self, model, fields, name=None, condition=None, deferrable=None,
         include=None, opclasses=None, expressions=None,
     ):
         if (
@@ -1242,6 +1242,7 @@ class BaseDatabaseSchemaEditor:
 
         compiler = Query(model, alias_cols=False).get_compiler(connection=self.connection)
         table = model._meta.db_table
+        columns = [field.column for field in fields]
         if name is None:
             name = IndexName(table, columns, '_uniq', create_unique_name)
         else:

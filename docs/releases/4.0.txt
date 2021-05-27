@@ -321,6 +321,9 @@ backends.
   ``iso_year`` argument in order to support bounds for ISO-8601 week-numbering
   years.
 
+* The second argument of ``DatabaseSchemaEditor._unique_sql()`` and
+  ``_create_unique_sql()`` methods is now fields instead of columns.
+
 :mod:`django.contrib.gis`
 -------------------------
 

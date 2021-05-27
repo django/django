@@ -3287,7 +3287,7 @@ class SchemaTests(TransactionTestCase):
 
             constraint_name = 'CamelCaseUniqConstraint'
             expected_constraint_name = identifier_converter(constraint_name)
-            editor.execute(editor._create_unique_sql(model, [field.column], constraint_name))
+            editor.execute(editor._create_unique_sql(model, [field], constraint_name))
             self.assertIn(expected_constraint_name, self.get_constraints(model._meta.db_table))
             editor.alter_field(model, get_field(unique=True), field, strict=True)
             self.assertNotIn(expected_constraint_name, self.get_constraints(model._meta.db_table))
