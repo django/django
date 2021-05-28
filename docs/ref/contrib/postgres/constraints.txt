@@ -115,7 +115,13 @@ used for queries that select only included fields
 (:attr:`~ExclusionConstraint.include`) and filter only by indexed fields
 (:attr:`~ExclusionConstraint.expressions`).
 
-``include`` is supported only for GiST indexes on PostgreSQL 12+.
+``include`` is supported for GiST indexes on PostgreSQL 12+ and SP-GiST
+indexes on PostgreSQL 14+.
+
+.. versionchanged:: 4.1
+
+    Support for covering exclusion constraints using SP-GiST indexes on
+    PostgreSQL 14+ was added.
 
 ``opclasses``
 -------------

@@ -71,6 +71,10 @@ Minor features
 * :class:`~django.contrib.postgres.indexes.SpGistIndex` now supports covering
   indexes on PostgreSQL 14+.
 
+* :class:`~django.contrib.postgres.constraints.ExclusionConstraint` now
+  supports covering exclusion constraints using SP-GiST indexes on PostgreSQL
+  14+.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
