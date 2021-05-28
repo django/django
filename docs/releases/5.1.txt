@@ -63,7 +63,8 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :class:`~django.contrib.postgres.indexes.BTreeIndex` now supports the
+  ``deduplicate_items`` parameter.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
