@@ -142,7 +142,7 @@ class Migration(migrations.Migration):
             name='Scene',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('scene', models.CharField(max_length=255)),
+                ('scene', models.TextField()),
                 ('setting', models.CharField(max_length=255)),
             ],
             options=None,

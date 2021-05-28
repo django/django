@@ -210,8 +210,14 @@ See the PostgreSQL documentation for more details about `covering indexes`_.
 
 .. admonition:: Restrictions on PostgreSQL
 
-    PostgreSQL 11+ only supports covering B-Tree indexes, and PostgreSQL 12+
-    also supports covering :class:`GiST indexes
-    <django.contrib.postgres.indexes.GistIndex>`.
+    PostgreSQL 11+ only supports covering B-Tree indexes, PostgreSQL 12+ also
+    supports covering :class:`GiST indexes
+    <django.contrib.postgres.indexes.GistIndex>`, and PostgreSQL 14+ also
+    supports covering :class:`SP-GiST indexes
+    <django.contrib.postgres.indexes.SpGistIndex>`.
+
+.. versionchanged:: 4.1
+
+    Support for covering SP-GiST indexes with PostgreSQL 14+ was added.
 
 .. _covering indexes: https://www.postgresql.org/docs/current/indexes-index-only-scans.html

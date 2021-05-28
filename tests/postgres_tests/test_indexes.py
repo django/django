@@ -518,6 +518,33 @@ class SchemaTests(PostgreSQLTestCase):
             editor.remove_index(TextFieldModel, index)
         self.assertNotIn(index_name, self.get_constraints(TextFieldModel._meta.db_table))
 
+    @skipUnlessDBFeature('supports_covering_spgist_indexes')
+    def test_spgist_include(self):
+        index_name = 'scene_spgist_include_setting'
+        index = SpGistIndex(name=index_name, fields=['scene'], include=['setting'])
+        with connection.schema_editor() as editor:
+            editor.add_index(Scene, index)
+        constraints = self.get_constraints(Scene._meta.db_table)
+        self.assertIn(index_name, constraints)
+        self.assertEqual(constraints[index_name]['type'], SpGistIndex.suffix)
+        self.assertEqual(constraints[index_name]['columns'], ['scene', 'setting'])
+        with connection.schema_editor() as editor:
+            editor.remove_index(Scene, index)
+        self.assertNotIn(index_name, self.get_constraints(Scene._meta.db_table))
+
+    def test_spgist_include_not_supported(self):
+        index_name = 'spgist_include_exception'
+        index = SpGistIndex(fields=['scene'], name=index_name, include=['setting'])
+        msg = 'Covering SP-GiST indexes require PostgreSQL 14+.'
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            with mock.patch(
+                'django.db.backends.postgresql.features.DatabaseFeatures.supports_covering_spgist_indexes',
+                False,
+            ):
+                with connection.schema_editor() as editor:
+                    editor.add_index(Scene, index)
+        self.assertNotIn(index_name, self.get_constraints(Scene._meta.db_table))
+
     def test_op_class(self):
         index_name = 'test_op_class'
         index = Index(

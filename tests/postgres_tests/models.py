@@ -101,7 +101,7 @@ class BigAutoFieldModel(models.Model):
 # Scene/Character/Line models are used to test full text search. They're
 # populated with content from Monty Python and the Holy Grail.
 class Scene(models.Model):
-    scene = models.CharField(max_length=255)
+    scene = models.TextField()
     setting = models.CharField(max_length=255)
 
 

@@ -68,6 +68,9 @@ Minor features
   aggregate function returns an ``int`` of the bitwise ``XOR`` of all non-null
   input values.
 
+* :class:`~django.contrib.postgres.indexes.SpGistIndex` now supports covering
+  indexes on PostgreSQL 14+.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
