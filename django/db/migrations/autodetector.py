@@ -915,7 +915,7 @@ class MigrationAutodetector:
     def generate_altered_fields(self):
         """
         Make AlterField operations, or possibly RemovedField/AddField if alter
-        isn's possible.
+        isn't possible.
         """
         for app_label, model_name, field_name in sorted(self.old_field_keys & self.new_field_keys):
             # Did the field change?
