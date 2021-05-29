@@ -484,7 +484,7 @@ Install Django and set up database
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :ref:`install Django <installing-official-release>` on your system. It is
-recommended that you create a :doc:`virtural environment
+recommended that you create a :doc:`virtual environment
 <python:tutorial/venv>` for each project you create.
 
 psycopg2
