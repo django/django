@@ -28,9 +28,15 @@ REASON_BAD_ORIGIN = "Origin checking failed - %s does not match any trusted orig
 REASON_NO_REFERER = "Referer checking failed - no Referer."
 REASON_BAD_REFERER = "Referer checking failed - %s does not match any trusted origins."
 REASON_NO_CSRF_COOKIE = "CSRF cookie not set."
-REASON_BAD_TOKEN = "CSRF token missing or incorrect."
+REASON_CSRF_TOKEN_INCORRECT = 'CSRF token incorrect.'
+REASON_CSRF_TOKEN_MISSING = 'CSRF token missing.'
 REASON_MALFORMED_REFERER = "Referer checking failed - Referer is malformed."
 REASON_INSECURE_REFERER = "Referer checking failed - Referer is insecure while host is secure."
+# The reason strings below are for passing to InvalidTokenFormat. They are
+# phrases without a subject because they can be in reference to either the CSRF
+# cookie or non-cookie token.
+REASON_INCORRECT_LENGTH = 'has incorrect length'
+REASON_INVALID_CHARACTERS = 'has invalid characters'
 
 CSRF_SECRET_LENGTH = 32
 CSRF_TOKEN_LENGTH = 2 * CSRF_SECRET_LENGTH
@@ -107,13 +113,18 @@ def rotate_token(request):
     request.csrf_cookie_needs_reset = True
 
 
+class InvalidTokenFormat(Exception):
+    def __init__(self, reason):
+        self.reason = reason
+
+
 def _sanitize_token(token):
+    if len(token) not in (CSRF_TOKEN_LENGTH, CSRF_SECRET_LENGTH):
+        raise InvalidTokenFormat(REASON_INCORRECT_LENGTH)
     # Make sure all characters are in CSRF_ALLOWED_CHARS.
     if invalid_token_chars_re.search(token):
-        return _get_new_csrf_token()
-    elif len(token) == CSRF_TOKEN_LENGTH:
-        return token
-    elif len(token) == CSRF_SECRET_LENGTH:
+        raise InvalidTokenFormat(REASON_INVALID_CHARACTERS)
+    if len(token) == CSRF_SECRET_LENGTH:
         # Older Django versions set cookies to values of CSRF_SECRET_LENGTH
         # alphanumeric characters. For backwards compatibility, accept
         # such values as unmasked secrets.
@@ -121,7 +132,7 @@ def _sanitize_token(token):
         # different code paths in the checks, although that might be a tad more
         # efficient.
         return _mask_cipher_secret(token)
-    return _get_new_csrf_token()
+    return token
 
 
 def _compare_masked_tokens(request_csrf_token, csrf_token):
@@ -206,7 +217,11 @@ class CsrfViewMiddleware(MiddlewareMixin):
             except KeyError:
                 return None
 
-            csrf_token = _sanitize_token(cookie_token)
+            try:
+                csrf_token = _sanitize_token(cookie_token)
+            except InvalidTokenFormat:
+                csrf_token = _get_new_csrf_token()
+
             if csrf_token != cookie_token:
                 # Cookie token needed to be replaced;
                 # the cookie needs to be reset.
@@ -381,11 +396,18 @@ class CsrfViewMiddleware(MiddlewareMixin):
         if request_csrf_token == '':
             # Fall back to X-CSRFToken, to make things easier for AJAX, and
             # possible for PUT/DELETE.
-            request_csrf_token = request.META.get(settings.CSRF_HEADER_NAME, '')
+            try:
+                request_csrf_token = request.META[settings.CSRF_HEADER_NAME]
+            except KeyError:
+                return self._reject(request, REASON_CSRF_TOKEN_MISSING)
 
-        request_csrf_token = _sanitize_token(request_csrf_token)
+        try:
+            request_csrf_token = _sanitize_token(request_csrf_token)
+        except InvalidTokenFormat as exc:
+            return self._reject(request, f'CSRF token {exc.reason}.')
+
         if not _compare_masked_tokens(request_csrf_token, csrf_token):
-            return self._reject(request, REASON_BAD_TOKEN)
+            return self._reject(request, REASON_CSRF_TOKEN_INCORRECT)
 
         return self._accept(request)
 

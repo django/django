@@ -5,9 +5,9 @@ from django.contrib.sessions.backends.cache import SessionStore
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import (
-    CSRF_SESSION_KEY, CSRF_TOKEN_LENGTH, REASON_BAD_ORIGIN, REASON_BAD_TOKEN,
-    REASON_NO_CSRF_COOKIE, CsrfViewMiddleware, RejectRequest,
-    _compare_masked_tokens as equivalent_tokens, get_token,
+    CSRF_SESSION_KEY, CSRF_TOKEN_LENGTH, REASON_BAD_ORIGIN,
+    REASON_CSRF_TOKEN_MISSING, REASON_NO_CSRF_COOKIE, CsrfViewMiddleware,
+    RejectRequest, _compare_masked_tokens as equivalent_tokens, get_token,
 )
 from django.test import SimpleTestCase, override_settings
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
@@ -125,28 +125,28 @@ class CsrfViewMiddlewareTestMixin:
         If a CSRF cookie is present but with no token, the middleware rejects
         the incoming request.
         """
-        self._check_bad_or_missing_token(None, REASON_BAD_TOKEN)
+        self._check_bad_or_missing_token(None, REASON_CSRF_TOKEN_MISSING)
 
     def test_csrf_cookie_bad_token_characters(self):
         """
         If a CSRF cookie is present but the token has invalid characters, the
         middleware rejects the incoming request.
         """
-        self._check_bad_or_missing_token(64 * '*', REASON_BAD_TOKEN)
+        self._check_bad_or_missing_token(64 * '*', 'CSRF token has invalid characters.')
 
     def test_csrf_cookie_bad_token_length(self):
         """
         If a CSRF cookie is present but the token has an incorrect length, the
         middleware rejects the incoming request.
         """
-        self._check_bad_or_missing_token(16 * 'a', REASON_BAD_TOKEN)
+        self._check_bad_or_missing_token(16 * 'a', 'CSRF token has incorrect length.')
 
     def test_csrf_cookie_incorrect_token(self):
         """
         If a CSRF cookie is present but the correctly formatted token is
         incorrect, the middleware rejects the incoming request.
         """
-        self._check_bad_or_missing_token(64 * 'a', REASON_BAD_TOKEN)
+        self._check_bad_or_missing_token(64 * 'a', 'CSRF token incorrect.')
 
     def test_process_request_csrf_cookie_and_token(self):
         """
@@ -601,7 +601,10 @@ class CsrfViewMiddlewareTestMixin:
         with self.assertLogs('django.security.csrf', 'WARNING') as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(resp.status_code, 403)
-        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % REASON_BAD_TOKEN)
+        self.assertEqual(
+            cm.records[0].getMessage(),
+            'Forbidden (%s): ' % REASON_CSRF_TOKEN_MISSING,
+        )
 
     @override_settings(ALLOWED_HOSTS=['www.example.com'])
     def test_bad_origin_bad_domain(self):
