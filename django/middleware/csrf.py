@@ -21,7 +21,8 @@ from django.utils.log import log_response
 from django.utils.regex_helper import _lazy_re_compile
 
 logger = logging.getLogger('django.security.csrf')
-token_re = _lazy_re_compile('[^a-zA-Z0-9]')
+# This matches if any character is not in CSRF_ALLOWED_CHARS.
+invalid_token_chars_re = _lazy_re_compile('[^a-zA-Z0-9]')
 
 REASON_BAD_ORIGIN = "Origin checking failed - %s does not match any trusted origins."
 REASON_NO_REFERER = "Referer checking failed - no Referer."
@@ -107,8 +108,8 @@ def rotate_token(request):
 
 
 def _sanitize_token(token):
-    # Allow only ASCII alphanumerics
-    if token_re.search(token):
+    # Make sure all characters are in CSRF_ALLOWED_CHARS.
+    if invalid_token_chars_re.search(token):
         return _get_new_csrf_token()
     elif len(token) == CSRF_TOKEN_LENGTH:
         return token
