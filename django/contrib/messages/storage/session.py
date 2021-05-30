@@ -22,6 +22,9 @@ class SessionStorage(BaseStorage):
             )
         super().__init__(request, *args, **kwargs)
 
+    def __repr__(self):
+        return f'{self.__class__.__qualname__}(request = {self.request!r})'
+
     def _get(self, *args, **kwargs):
         """
         Retrieve a list of messages from the request's session. This storage

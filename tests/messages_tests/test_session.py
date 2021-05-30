@@ -36,6 +36,13 @@ class SessionTests(BaseTests, TestCase):
     def stored_messages_count(self, storage, response):
         return stored_session_messages_count(storage)
 
+    def test_repr(self):
+        storage = self.get_storage()
+        request = self.get_request()
+        self.assertEqual(
+            repr(storage),
+            f'SessionStorage(request = {request!r})')
+
     def test_no_session(self):
         msg = (
             'The session-based temporary message storage requires session '
