@@ -16,6 +16,9 @@ class FallbackStorage(BaseStorage):
                          for storage_class in self.storage_classes]
         self._used_storages = set()
 
+    def __repr__(self):
+        return f'{self.__class__.__qualname__}(storages = {self.storages!r})'
+
     def _get(self, *args, **kwargs):
         """
         Get a single list of messages from all storage backends.

@@ -42,6 +42,12 @@ class FallbackTests(BaseTests, SimpleTestCase):
             self.stored_session_messages_count(storage, response)
         )
 
+    def test_repr(self):
+        storage = self.get_storage()
+        self.assertEqual(
+            repr(storage),
+            f'FallbackStorage(storages = {storage.storages!r})')
+
     def test_get(self):
         request = self.get_request()
         storage = self.storage_class(request)
