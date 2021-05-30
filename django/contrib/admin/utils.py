@@ -13,7 +13,7 @@ from django.utils import formats, timezone
 from django.utils.html import format_html
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.text import capfirst
-from django.utils.translation import ngettext, override as translation_override
+from django.utils.translation import ngettext, override as translation_override, is_lazy_gettext, gettext_lazy
 
 QUOTE_MAP = {i: '_%02X' % i for i in b'":/_#?;@&=+$,"[]<>%\n\\'}
 UNQUOTE_MAP = {v: chr(k) for k, v in QUOTE_MAP.items()}
@@ -257,7 +257,18 @@ def model_ngettext(obj, n=None):
         obj = obj.model
     d = model_format_dict(obj)
     singular, plural = d["verbose_name"], d["verbose_name_plural"]
-    return ngettext(singular, plural, n or 0)
+    # if strings are translations, resolve their source strings
+    if is_lazy_gettext(singular):
+        singular = singular._proxy____args[0]
+    if is_lazy_gettext(plural):
+        plural = plural._proxy____args[0]
+    result = ngettext(singular, plural, n or 0)
+    # if there's no plural translation, use simple pluralization
+    if n == 1 and result == singular or n != 1 and result == plural:
+        if n == 1:
+            return gettext_lazy(singular)
+        return gettext_lazy(plural)
+    return result
 
 
 def lookup_field(name, obj, model_admin=None):

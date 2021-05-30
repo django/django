@@ -85,3 +85,9 @@ class VehicleMixin(Vehicle):
 
 class Car(VehicleMixin):
     pass
+
+
+class Foo(models.Model):
+    class Meta:
+        verbose_name = _('foo')
+        verbose_name_plural = _('foos')

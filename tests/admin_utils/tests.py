@@ -1,5 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
+from unittest.mock import patch
 
 from django import forms
 from django.conf import settings
@@ -8,7 +9,7 @@ from django.contrib.admin import helpers
 from django.contrib.admin.utils import (
     NestedObjects, display_for_field, display_for_value, flatten,
     flatten_fieldsets, help_text_for_field, label_for_field, lookup_field,
-    quote,
+    quote, model_ngettext,
 )
 from django.db import DEFAULT_DB_ALIAS, models
 from django.test import SimpleTestCase, TestCase, override_settings
@@ -16,7 +17,7 @@ from django.utils.formats import localize
 from django.utils.safestring import mark_safe
 
 from .models import (
-    Article, Car, Count, Event, EventGuide, Location, Site, Vehicle,
+    Article, Car, Count, Event, EventGuide, Location, Site, Vehicle, Foo,
 )
 
 
@@ -410,3 +411,9 @@ class UtilsTests(SimpleTestCase):
 
     def test_quote(self):
         self.assertEqual(quote('something\nor\nother'), 'something_0Aor_0Aother')
+
+    @patch('django.contrib.admin.utils.ngettext')
+    def test_model_ngettext(self, ngettext):
+        model_ngettext(Foo(), None)
+        self.assertIsInstance(ngettext.call_args.args[0], str, type(ngettext.call_args.args[0]))
+        self.assertIsInstance(ngettext.call_args.args[1], str, type(ngettext.call_args.args[1]))
