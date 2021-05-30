@@ -155,9 +155,11 @@ msgstr ""
 msgid "change message"
 msgstr ""
 
-#: contrib/admin/models.py:66
+#: contrib/admin/models.py:66 contrib/admin/models.py:68
 msgid "log entry"
-msgstr ""
+msgid_plural "log entries"
+msgstr[0] ""
+msgstr[1] ""
 
 #: contrib/admin/models.py:67
 msgid "log entries"

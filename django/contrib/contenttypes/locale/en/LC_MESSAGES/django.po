@@ -21,9 +21,11 @@ msgstr ""
 msgid "python model class name"
 msgstr ""
 
-#: contrib/contenttypes/models.py:139
+#: contrib/contenttypes/models.py:139 contrib/contenttypes/models.py:141
 msgid "content type"
-msgstr ""
+msgid_plural "content types"
+msgstr[0] ""
+msgstr[1] ""
 
 #: contrib/contenttypes/models.py:140
 msgid "content types"

@@ -41,9 +41,11 @@ msgid ""
 "scheme such as “https://”."
 msgstr ""
 
-#: contrib/redirects/models.py:25
+#: contrib/redirects/models.py:25 contrib/redirects/models.py:27
 msgid "redirect"
-msgstr ""
+msgid_plural "redirects"
+msgstr[0] ""
+msgstr[1] ""
 
 #: contrib/redirects/models.py:26
 msgid "redirects"

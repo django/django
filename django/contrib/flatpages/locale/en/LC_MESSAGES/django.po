@@ -87,9 +87,11 @@ msgstr ""
 msgid "sites"
 msgstr ""
 
-#: contrib/flatpages/models.py:31
+#: contrib/flatpages/models.py:31 contrib/flatpages/models.py:33
 msgid "flat page"
-msgstr ""
+msgid_plural "flat pages"
+msgstr[0] ""
+msgstr[1] ""
 
 #: contrib/flatpages/models.py:32
 msgid "flat pages"

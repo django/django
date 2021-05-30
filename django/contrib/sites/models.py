@@ -4,7 +4,7 @@ from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.db.models.signals import pre_delete, pre_save
 from django.http.request import split_domain_port
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, ngettext_noop
 
 SITE_CACHE = {}
 
@@ -91,6 +91,7 @@ class Site(models.Model):
         db_table = 'django_site'
         verbose_name = _('site')
         verbose_name_plural = _('sites')
+        ngettext_noop('site', 'sites')
         ordering = ['domain']
 
     def __str__(self):

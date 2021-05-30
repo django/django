@@ -3,7 +3,7 @@ This module allows importing AbstractBaseSession even
 when django.contrib.sessions is not in INSTALLED_APPS.
 """
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, ngettext_noop
 
 
 class BaseSessionManager(models.Manager):
@@ -34,6 +34,7 @@ class AbstractBaseSession(models.Model):
         abstract = True
         verbose_name = _('session')
         verbose_name_plural = _('sessions')
+        ngettext_noop('session', 'sessions')
 
     def __str__(self):
         return self.session_key

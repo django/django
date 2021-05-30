@@ -29,9 +29,11 @@ msgstr ""
 msgid "expire date"
 msgstr ""
 
-#: contrib/sessions/models.py:52
+#: contrib/sessions/base_session.py:35 contrib/sessions/base_session.py:37
 msgid "session"
-msgstr ""
+msgid_plural "sessions"
+msgstr[0] ""
+msgstr[1] ""
 
 #: contrib/sessions/models.py:53
 msgid "sessions"

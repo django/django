@@ -29,9 +29,11 @@ msgstr ""
 msgid "display name"
 msgstr ""
 
-#: contrib/sites/models.py:88
+#: contrib/sites/models.py:92 contrib/sites/models.py:94
 msgid "site"
-msgstr ""
+msgid_plural "sites"
+msgstr[0] ""
+msgstr[1] ""
 
 #: contrib/sites/models.py:89
 msgid "sites"
