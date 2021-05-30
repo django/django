@@ -388,6 +388,13 @@ def gettext_noop(message):
     return message
 
 
+def ngettext_noop(singular, plural):
+    """
+    Mark strings for plural translation but don't translate them now.
+    """
+    return plural
+
+
 def do_ntranslate(singular, plural, number, translation_function):
     global _default
 

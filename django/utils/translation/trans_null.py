@@ -21,6 +21,10 @@ def ngettext(singular, plural, number):
 ngettext_lazy = ngettext
 
 
+def ngettext_noop(singular, plural):
+    return plural
+
+
 def pgettext(context, message):
     return gettext(message)
 

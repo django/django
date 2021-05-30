@@ -179,6 +179,9 @@ language because they are exchanged over systems or users -- such as strings
 in a database -- but should be translated at the last possible point in time,
 such as when the string is presented to the user.
 
+Use the :func:`django.utils.translation.ngettext_noop()` function to specify
+pluralized messages without translating them.
+
 Pluralization
 -------------
 

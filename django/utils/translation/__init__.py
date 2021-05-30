@@ -14,7 +14,7 @@ __all__ = [
     'get_language_info', 'get_language_bidi',
     'check_for_language', 'to_language', 'to_locale', 'templatize',
     'gettext', 'gettext_lazy', 'gettext_noop', 'is_lazy_gettext',
-    'ngettext', 'ngettext_lazy',
+    'ngettext', 'ngettext_lazy', 'ngettext_noop',
     'pgettext', 'pgettext_lazy',
     'npgettext', 'npgettext_lazy',
 ]
@@ -72,6 +72,10 @@ def gettext_noop(message):
 
 def gettext(message):
     return _trans.gettext(message)
+
+
+def ngettext_noop(singular, plural):
+    return _trans.ngettext_noop(singular, plural)
 
 
 def ngettext(singular, plural, number):
