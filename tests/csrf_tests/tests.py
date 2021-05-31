@@ -56,9 +56,12 @@ class CsrfViewMiddlewareTestMixin:
         req.method = "POST"
         return req
 
-    def _get_POST_request_with_token(self):
+    def _get_POST_request_with_token(self, token=None):
+        """The token argument defaults to the valid test token."""
+        if token is None:
+            token = self._csrf_id
         req = self._get_POST_csrf_cookie_request()
-        req.POST['csrfmiddlewaretoken'] = self._csrf_id
+        req.POST['csrfmiddlewaretoken'] = token
         return req
 
     def _check_token_present(self, response, csrf_id=None):
@@ -91,8 +94,7 @@ class CsrfViewMiddlewareTestMixin:
         csrf_cookie = resp.cookies.get(settings.CSRF_COOKIE_NAME, False)
         self.assertIs(csrf_cookie, False)
 
-    # Check the request processing
-    def test_process_request_no_csrf_cookie(self):
+    def test_no_csrf_cookie(self):
         """
         If no CSRF cookies is present, the middleware rejects the incoming
         request. This will stop login CSRF.
@@ -105,18 +107,46 @@ class CsrfViewMiddlewareTestMixin:
         self.assertEqual(403, resp.status_code)
         self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE)
 
-    def test_process_request_csrf_cookie_no_token(self):
-        """
-        If a CSRF cookie is present but no token, the middleware rejects
-        the incoming request.
-        """
-        req = self._get_POST_csrf_cookie_request()
+    def _check_bad_or_missing_token(self, token, expected):
+        """Passing None for token includes no token."""
+        if token is None:
+            req = self._get_POST_csrf_cookie_request()
+        else:
+            req = self._get_POST_request_with_token(token=token)
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         with self.assertLogs('django.security.csrf', 'WARNING') as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(403, resp.status_code)
-        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % REASON_BAD_TOKEN)
+        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % expected)
+
+    def test_csrf_cookie_no_token(self):
+        """
+        If a CSRF cookie is present but with no token, the middleware rejects
+        the incoming request.
+        """
+        self._check_bad_or_missing_token(None, REASON_BAD_TOKEN)
+
+    def test_csrf_cookie_bad_token_characters(self):
+        """
+        If a CSRF cookie is present but the token has invalid characters, the
+        middleware rejects the incoming request.
+        """
+        self._check_bad_or_missing_token(64 * '*', REASON_BAD_TOKEN)
+
+    def test_csrf_cookie_bad_token_length(self):
+        """
+        If a CSRF cookie is present but the token has an incorrect length, the
+        middleware rejects the incoming request.
+        """
+        self._check_bad_or_missing_token(16 * 'a', REASON_BAD_TOKEN)
+
+    def test_csrf_cookie_incorrect_token(self):
+        """
+        If a CSRF cookie is present but the correctly formatted token is
+        incorrect, the middleware rejects the incoming request.
+        """
+        self._check_bad_or_missing_token(64 * 'a', REASON_BAD_TOKEN)
 
     def test_process_request_csrf_cookie_and_token(self):
         """
