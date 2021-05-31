@@ -43,11 +43,12 @@ class CsrfViewMiddlewareTestMixin:
         req.method = 'GET'
         return req
 
-    def _get_GET_csrf_cookie_request(self):
+    def _get_GET_csrf_cookie_request(self, cookie=None):
         raise NotImplementedError('This method must be implemented by a subclass.')
 
-    def _get_POST_csrf_cookie_request(self):
-        req = self._get_GET_csrf_cookie_request()
+    def _get_POST_csrf_cookie_request(self, cookie=None):
+        """The cookie argument defaults to the valid test cookie."""
+        req = self._get_GET_csrf_cookie_request(cookie=cookie)
         req.method = "POST"
         return req
 
@@ -94,18 +95,25 @@ class CsrfViewMiddlewareTestMixin:
         csrf_cookie = resp.cookies.get(settings.CSRF_COOKIE_NAME, False)
         self.assertIs(csrf_cookie, False)
 
-    def test_no_csrf_cookie(self):
-        """
-        If no CSRF cookies is present, the middleware rejects the incoming
-        request. This will stop login CSRF.
-        """
-        req = self._get_POST_no_csrf_cookie_request()
+    def _check_bad_or_missing_cookie(self, cookie, expected):
+        """Passing None for cookie includes no cookie."""
+        if cookie is None:
+            req = self._get_POST_no_csrf_cookie_request()
+        else:
+            req = self._get_POST_csrf_cookie_request(cookie=cookie)
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         with self.assertLogs('django.security.csrf', 'WARNING') as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(403, resp.status_code)
-        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE)
+        self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % expected)
+
+    def test_no_csrf_cookie(self):
+        """
+        If no CSRF cookies is present, the middleware rejects the incoming
+        request. This will stop login CSRF.
+        """
+        self._check_bad_or_missing_cookie(None, REASON_NO_CSRF_COOKIE)
 
     def _check_bad_or_missing_token(self, token, expected):
         """Passing None for token includes no token."""
@@ -762,9 +770,12 @@ class CsrfViewMiddlewareTestMixin:
 
 class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
 
-    def _get_GET_csrf_cookie_request(self):
+    def _get_GET_csrf_cookie_request(self, cookie=None):
+        """The cookie argument defaults to the valid test cookie."""
+        if cookie is None:
+            cookie = self._csrf_id_cookie
         req = TestingHttpRequest()
-        req.COOKIES[settings.CSRF_COOKIE_NAME] = self._csrf_id_cookie
+        req.COOKIES[settings.CSRF_COOKIE_NAME] = cookie
         return req
 
     def _get_POST_bare_secret_csrf_cookie_request(self):
@@ -846,6 +857,20 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
             mw.process_view(req, token_view, (), {})
             resp = mw(req)
             self.assertEqual(resp.cookies['csrfcookie']['samesite'], 'Strict')
+
+    def test_bad_csrf_cookie_characters(self):
+        """
+        If the CSRF cookie has invalid characters in a POST request, the
+        middleware rejects the incoming request.
+        """
+        self._check_bad_or_missing_cookie(64 * '*', REASON_CSRF_TOKEN_MISSING)
+
+    def test_bad_csrf_cookie_length(self):
+        """
+        If the CSRF cookie has an incorrect length in a POST request, the
+        middleware rejects the incoming request.
+        """
+        self._check_bad_or_missing_cookie(16 * 'a', REASON_CSRF_TOKEN_MISSING)
 
     def test_process_view_token_too_long(self):
         """
@@ -943,9 +968,12 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
         req.session[CSRF_SESSION_KEY] = self._csrf_id_cookie[:32]
         return req
 
-    def _get_GET_csrf_cookie_request(self):
+    def _get_GET_csrf_cookie_request(self, cookie=None):
+        """The cookie argument defaults to the valid test cookie."""
+        if cookie is None:
+            cookie = self._csrf_id_cookie
         req = TestingHttpRequest()
-        req.session[CSRF_SESSION_KEY] = self._csrf_id_cookie
+        req.session[CSRF_SESSION_KEY] = cookie
         return req
 
     def test_no_session_on_request(self):
