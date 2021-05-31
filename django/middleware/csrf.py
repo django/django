@@ -217,14 +217,12 @@ class CsrfViewMiddleware(MiddlewareMixin):
             except KeyError:
                 return None
 
-            try:
-                csrf_token = _sanitize_token(cookie_token)
-            except InvalidTokenFormat:
-                csrf_token = _get_new_csrf_token()
+            # This can raise InvalidTokenFormat.
+            csrf_token = _sanitize_token(cookie_token)
 
             if csrf_token != cookie_token:
-                # Cookie token needed to be replaced;
-                # the cookie needs to be reset.
+                # Then the cookie token had length CSRF_SECRET_LENGTH, so flag
+                # to replace it with the masked version.
                 request.csrf_cookie_needs_reset = True
             return csrf_token
 
@@ -318,7 +316,12 @@ class CsrfViewMiddleware(MiddlewareMixin):
             raise RejectRequest(REASON_BAD_REFERER % referer.geturl())
 
     def process_request(self, request):
-        csrf_token = self._get_token(request)
+        try:
+            csrf_token = self._get_token(request)
+        except InvalidTokenFormat:
+            csrf_token = _get_new_csrf_token()
+            request.csrf_cookie_needs_reset = True
+
         if csrf_token is not None:
             # Use same token next time.
             request.META['CSRF_COOKIE'] = csrf_token
@@ -374,7 +377,11 @@ class CsrfViewMiddleware(MiddlewareMixin):
         # Access csrf_token via self._get_token() as rotate_token() may have
         # been called by an authentication middleware during the
         # process_request() phase.
-        csrf_token = self._get_token(request)
+        try:
+            csrf_token = self._get_token(request)
+        except InvalidTokenFormat as exc:
+            return self._reject(request, f'CSRF cookie {exc.reason}.')
+
         if csrf_token is None:
             # No CSRF cookie. For POST requests, we insist on a CSRF cookie,
             # and in this way we can avoid all CSRF attacks, including login
