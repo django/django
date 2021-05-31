@@ -88,6 +88,14 @@ class BaseTests:
         storage._loaded_data = data or []
         return storage
 
+    def test_repr(self):
+        request = self.get_request()
+        storage = self.storage_class(request)
+        self.assertEqual(
+            repr(storage),
+            f'<{self.storage_class.__qualname__}: request=<HttpRequest>>',
+        )
+
     def test_add(self):
         storage = self.get_storage()
         self.assertFalse(storage.added_new)

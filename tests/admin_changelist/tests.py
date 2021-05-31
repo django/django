@@ -67,6 +67,13 @@ class ChangeListTests(TestCase):
         request.user = user
         return request
 
+    def test_repr(self):
+        m = ChildAdmin(Child, custom_site)
+        request = self.factory.get('/child/')
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        self.assertEqual(repr(cl), '<ChangeList: model=Child model_admin=ChildAdmin>')
+
     def test_specified_ordering_by_f_expression(self):
         class OrderedByFBandAdmin(admin.ModelAdmin):
             list_display = ['name', 'genres', 'nr_of_members']

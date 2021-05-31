@@ -108,6 +108,13 @@ class ChangeList:
         self.title = title % self.opts.verbose_name
         self.pk_attname = self.lookup_opts.pk.attname
 
+    def __repr__(self):
+        return '<%s: model=%s model_admin=%s>' % (
+            self.__class__.__qualname__,
+            self.model.__qualname__,
+            self.model_admin.__class__.__qualname__,
+        )
+
     def get_filters_params(self, params=None):
         """
         Return all params except IGNORED_PARAMS.
