@@ -1194,6 +1194,13 @@ class ExpressionsNumericTests(TestCase):
         self.assertEqual(Number.objects.get(pk=n.pk).integer, 10)
         self.assertEqual(Number.objects.get(pk=n.pk).float, Approximate(256.900, places=3))
 
+    def test_decimal_expression(self):
+        n = Number.objects.create(integer=1, decimal_value=Decimal('0.5'))
+        n.decimal_value = F('decimal_value') - Decimal('0.4')
+        n.save()
+        n.refresh_from_db()
+        self.assertEqual(n.decimal_value, Decimal('0.1'))
+
 
 class ExpressionOperatorTests(TestCase):
     @classmethod
