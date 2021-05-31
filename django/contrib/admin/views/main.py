@@ -108,6 +108,15 @@ class ChangeList:
         self.title = title % self.opts.verbose_name
         self.pk_attname = self.lookup_opts.pk.attname
 
+    def __repr__(self):
+        return '<%s model = %s, opts = %s, lookup_opts = %s, root_queryset = %s>' % (
+            self.__class__.__qualname__,
+            repr(self.model),
+            repr(self.opts),
+            repr(self.lookup_opts),
+            repr(self.root_queryset)
+        )
+
     def get_filters_params(self, params=None):
         """
         Return all params except IGNORED_PARAMS.
