@@ -7,7 +7,7 @@ from threading import Lock
 
 from django.core.exceptions import EmptyResultSet, FieldError
 from django.db import DEFAULT_DB_ALIAS, connection
-from django.db.models import Count, Exists, F, Max, OuterRef, Q
+from django.db.models import Count, Exists, F, Max, OuterRef, Q, Subquery
 from django.db.models.expressions import RawSQL
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import NothingNode, WhereNode
@@ -2832,6 +2832,31 @@ class ExcludeTests(TestCase):
                 ).values('id')[:1]
             ),
             [self.j1, self.j2],
+        )
+
+    def test_exclude_nullable_fields_annotation(self):
+        from django.db.models.functions import Abs
+        number = Number.objects.create(num=1, other_num=1)
+        Number.objects.create(num=2, other_num=2, another_num=2)
+        self.assertSequenceEqual(
+            Number.objects.annotate(x=Abs('another_num')).exclude(x=2),
+            [number]
+        )
+        self.assertSequenceEqual(
+            Number.objects.annotate(x=Abs('another_num')).exclude(other_num=F('x')),
+            [number],
+        )
+        self.assertSequenceEqual(
+            Number.objects.annotate(x=Abs('another_num')).exclude(num=F('x')),
+            [number],
+        )
+
+    def test_exclude_nullable_subquery_annotation(self):
+        number = Number.objects.create(num=1, other_num=1)
+        subquery_with_null = Subquery(Number.objects.filter(num=1).values('another_num')[:1])
+        self.assertSequenceEqual(
+            Number.objects.annotate(current_num=subquery_with_null).exclude(current_num=1),
+            [number]
         )
 
 

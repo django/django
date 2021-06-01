@@ -20,7 +20,7 @@ from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import (
-    BaseExpression, Col, Exists, F, OuterRef, Ref, ResolvedOuterRef,
+    BaseExpression, Col, Exists, F, OuterRef, Ref, ResolvedOuterRef, Subquery,
 )
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
@@ -1282,13 +1282,34 @@ class Query(BaseExpression):
             self.check_filterable(value)
 
         clause = self.where_class()
+        alias = self.get_initial_alias()
         if reffed_expression:
             condition = self.build_lookup(lookups, reffed_expression, value)
             clause.add(condition, AND)
-            return clause, []
+            # When col is nullable, add IS NOT NULL.
+            is_subquery = isinstance(reffed_expression, Subquery)
+            col = self._gen_cols(reffed_expression)
+            is_need_to_check = is_subquery or col
+            if is_need_to_check:
+                lookup_type = condition.lookup_name
+                common_add_nullable_condition = (
+                    current_negated and
+                    (lookup_type != 'isnull' or condition.rhs is False) and
+                    condition.rhs is not None
+                )
+                if is_subquery:
+                    if common_add_nullable_condition:
+                        lookup_class = reffed_expression.get_lookup('isnull')
+                        clause.add(lookup_class(reffed_expression, False), AND)
+                else:
+                    target = col.target
+                    if common_add_nullable_condition and self.is_nullable(target):
+                        lookup_class = target.get_lookup('isnull')
+                        col = self._get_col(target, target, alias)
+                        clause.add(lookup_class(col, False), AND)
+            return clause, ()
 
         opts = self.get_meta()
-        alias = self.get_initial_alias()
         allow_many = not branch_negated or not split_subq
 
         try:
