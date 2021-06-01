@@ -160,6 +160,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         return [(None, ("NULL", [], False))]
 
+    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
+        return value
+
     def last_executed_query(self, cursor, sql, params):
         # With MySQLdb, cursor objects have an (undocumented) "_executed"
         # attribute where the exact query sent to the database is saved.
