@@ -28,3 +28,6 @@ Bugfixes
 
 * Fixed a regression in Django 3.2 that caused a crash of auto-reloader with
   ``AttributeError``, e.g. inside a ``Conda`` environment (:ticket:`32783`).
+
+* Fixed a regression in Django 3.2 that caused a loss of precision for
+  operations with ``DecimalField`` on MySQL (:ticket:`32793`).
