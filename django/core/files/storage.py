@@ -316,7 +316,7 @@ class FileSystemStorage(Storage):
             pass
 
     def exists(self, name):
-        return os.path.exists(self.path(name))
+        return os.path.lexists(self.path(name))
 
     def listdir(self, path):
         path = self.path(path)

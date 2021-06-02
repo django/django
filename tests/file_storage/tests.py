@@ -28,6 +28,7 @@ from django.test import (
 from django.test.utils import requires_tz_support
 from django.urls import NoReverseMatch, reverse_lazy
 from django.utils import timezone
+from django.utils._os import symlinks_supported
 
 from .models import (
     Storage, callable_storage, temp_storage, temp_storage_location,
@@ -296,6 +297,16 @@ class FileStorageTests(SimpleTestCase):
             os.path.join(self.temp_dir, 'path', 'to', 'test.file')))
 
         self.storage.delete('path/to/test.file')
+
+    @unittest.skipUnless(symlinks_supported(), 'Must be able to symlink to run this test.')
+    def test_file_save_broken_symlink(self):
+        """A new path is created on save when a broken symlink is supplied."""
+        nonexistent_file_path = os.path.join(self.temp_dir, 'nonexistent.txt')
+        broken_symlink_path = os.path.join(self.temp_dir, 'symlink.txt')
+        os.symlink(nonexistent_file_path, broken_symlink_path)
+        f = ContentFile('some content')
+        f_name = self.storage.save(broken_symlink_path, f)
+        self.assertIs(os.path.exists(os.path.join(self.temp_dir, f_name)), True)
 
     def test_save_doesnt_close(self):
         with TemporaryUploadedFile('test', 'text/plain', 1, 'utf8') as file:
