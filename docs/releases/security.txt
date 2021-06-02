@@ -36,6 +36,33 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+June 2, 2021 - :cve:`2021-33203`
+-------------------------------
+
+Potential directory traversal via ``admindocs``. `Full description
+<https://www.djangoproject.com/weblog/2021/jun/02/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.2 :commit:`(patch) <dfaba12cda060b8b292ae1d271b44bf810b1c5b9>`
+* Django 3.1 :commit:`(patch) <20c67a0693c4ede2b09af02574823485e82e4c8f>`
+* Django 2.2 :commit:`(patch) <053cc9534d174dc89daba36724ed2dcb36755b90>`
+
+June 2, 2021 - :cve:`2021-33571`
+-------------------------------
+
+Possible indeterminate SSRF, RFI, and LFI attacks since validators accepted
+leading zeros in IPv4 addresses. `Full description
+<https://www.djangoproject.com/weblog/2021/jun/02/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.2 :commit:`(patch) <9f75e2e562fa0c0482f3dde6fc7399a9070b4a3d>`
+* Django 3.1 :commit:`(patch) <203d4ab9ebcd72fc4d6eb7398e66ed9e474e118e>`
+* Django 2.2 :commit:`(patch) <f27c38ab5d90f68c9dd60cabef248a570c0be8fc>`
+
 May 6, 2021 - :cve:`2021-32052`
 -------------------------------
 
