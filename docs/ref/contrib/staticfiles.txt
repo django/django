@@ -313,12 +313,28 @@ For example, the ``'css/styles.css'`` file with this content:
 
     @import url("../admin/css/base.27e20196a850.css");
 
+You can change the location of the manifest file by using a custom
+``ManifestStaticFilesStorage`` subclass that sets the ``manifest_storage``
+argument. For example::
+
+    from django.conf import settings
+    from django.contrib.staticfiles.storage import (
+        ManifestStaticFilesStorage, StaticFilesStorage,
+    )
+
+    class MyManifestStaticFilesStorage(ManifestStaticFilesStorage):
+        def __init__(self, *args, **kwargs):
+            manifest_storage = StaticFilesStorage(location=settings.BASE_DIR)
+            super().__init__(*args, manifest_storage=manifest_storage, **kwargs)
+
 .. versionchanged:: 4.0
 
     Support for finding paths in the source map comments was added.
 
     Support for finding paths to JavaScript modules in ``import`` and
     ``export`` statements was added.
+
+    The ``manifest_storage`` argument was added.
 
 .. attribute:: storage.ManifestStaticFilesStorage.max_post_process_passes
 
@@ -383,6 +399,10 @@ hashing algorithm.
 
 Use this mixin with a custom storage to append the MD5 hash of the file's
 content to the filename as :class:`~storage.ManifestStaticFilesStorage` does.
+
+.. versionchanged:: 4.0
+
+    The ``manifest_storage`` argument was added.
 
 Finders Module
 ==============

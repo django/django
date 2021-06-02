@@ -401,13 +401,16 @@ class ManifestFilesMixin(HashedFilesMixin):
     manifest_strict = True
     keep_intermediate_files = False
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, manifest_storage=None, **kwargs):
         super().__init__(*args, **kwargs)
+        if manifest_storage is None:
+            manifest_storage = self
+        self.manifest_storage = manifest_storage
         self.hashed_files = self.load_manifest()
 
     def read_manifest(self):
         try:
-            with self.open(self.manifest_name) as manifest:
+            with self.manifest_storage.open(self.manifest_name) as manifest:
                 return manifest.read().decode()
         except FileNotFoundError:
             return None
@@ -435,10 +438,10 @@ class ManifestFilesMixin(HashedFilesMixin):
 
     def save_manifest(self):
         payload = {'paths': self.hashed_files, 'version': self.manifest_version}
-        if self.exists(self.manifest_name):
-            self.delete(self.manifest_name)
+        if self.manifest_storage.exists(self.manifest_name):
+            self.manifest_storage.delete(self.manifest_name)
         contents = json.dumps(payload).encode()
-        self._save(self.manifest_name, ContentFile(contents))
+        self.manifest_storage._save(self.manifest_name, ContentFile(contents))
 
     def stored_name(self, name):
         parsed_name = urlsplit(unquote(name))
