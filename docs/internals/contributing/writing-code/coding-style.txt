@@ -25,7 +25,7 @@ To use the tool, first install ``pre-commit`` and then the git hooks:
 On the first commit ``pre-commit`` will install the hooks, these are
 installed in their own environments and will take a short while to
 install on the first run. Subsequent checks will be significantly faster.
-If the an error is found an appropriate error message will be displayed.
+If an error is found an appropriate error message will be displayed.
 If the error was with ``isort`` then the tool will go ahead and fix them for
 you. Review the changes and re-stage for commit if you are happy with
 them.
