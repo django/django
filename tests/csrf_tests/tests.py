@@ -975,6 +975,33 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         self.assertEqual(len(csrf_cookie.value), CSRF_TOKEN_LENGTH)
         self.assertNotEqual(csrf_cookie.value, token)
 
+    def test_masked_unmasked_combinations(self):
+        """
+        All combinations are allowed of (1) masked and unmasked cookies,
+        (2) masked and unmasked tokens, and (3) tokens provided via POST and
+        the X-CSRFToken header.
+        """
+        cases = [
+            (TEST_SECRET, TEST_SECRET, None),
+            (TEST_SECRET, MASKED_TEST_SECRET2, None),
+            (TEST_SECRET, None, TEST_SECRET),
+            (TEST_SECRET, None, MASKED_TEST_SECRET2),
+            (MASKED_TEST_SECRET1, TEST_SECRET, None),
+            (MASKED_TEST_SECRET1, MASKED_TEST_SECRET2, None),
+            (MASKED_TEST_SECRET1, None, TEST_SECRET),
+            (MASKED_TEST_SECRET1, None, MASKED_TEST_SECRET2),
+        ]
+        for args in cases:
+            with self.subTest(args=args):
+                cookie, post_token, meta_token = args
+                req = self._get_POST_csrf_cookie_request(
+                    cookie=cookie, post_token=post_token, meta_token=meta_token,
+                )
+                mw = CsrfViewMiddleware(token_view)
+                mw.process_request(req)
+                resp = mw.process_view(req, token_view, (), {})
+                self.assertIsNone(resp)
+
     def test_bare_secret_accepted_and_replaced(self):
         """
         The csrf token is reset from a bare secret.
@@ -1054,6 +1081,29 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             mw = CsrfViewMiddleware(lambda req: HttpResponse())
             mw.process_request(HttpRequest())
+
+    def test_masked_unmasked_combinations(self):
+        """
+        Masked and unmasked tokens are allowed both as POST and as the
+        X-CSRFToken header.
+        """
+        cases = [
+            # Bare secrets are not allowed when CSRF_USE_SESSIONS=True.
+            (MASKED_TEST_SECRET1, TEST_SECRET, None),
+            (MASKED_TEST_SECRET1, MASKED_TEST_SECRET2, None),
+            (MASKED_TEST_SECRET1, None, TEST_SECRET),
+            (MASKED_TEST_SECRET1, None, MASKED_TEST_SECRET2),
+        ]
+        for args in cases:
+            with self.subTest(args=args):
+                cookie, post_token, meta_token = args
+                req = self._get_POST_csrf_cookie_request(
+                    cookie=cookie, post_token=post_token, meta_token=meta_token,
+                )
+                mw = CsrfViewMiddleware(token_view)
+                mw.process_request(req)
+                resp = mw.process_view(req, token_view, (), {})
+                self.assertIsNone(resp)
 
     def test_process_response_get_token_used(self):
         """The ensure_csrf_cookie() decorator works without middleware."""
