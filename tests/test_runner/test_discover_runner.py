@@ -306,7 +306,7 @@ class DiscoverRunnerTests(SimpleTestCase):
                 'test_runner_apps.sample.tests_sample.TestDjangoTestCase',
                 'test_runner_apps.simple',
             ])
-            self.assertIn('Found 14 tests.\n', stdout.getvalue())
+            self.assertIn('Found 14 test(s).\n', stdout.getvalue())
 
     def test_pdb_with_parallel(self):
         msg = (
