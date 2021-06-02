@@ -88,7 +88,7 @@ class CsrfViewMiddlewareTestMixin:
     """
 
     _csrf_id_cookie = MASKED_TEST_SECRET1
-    _csrf_id = MASKED_TEST_SECRET1
+    _csrf_id_token = MASKED_TEST_SECRET2
 
     def _get_GET_no_csrf_cookie_request(self):
         req = TestingHttpRequest()
@@ -125,12 +125,12 @@ class CsrfViewMiddlewareTestMixin:
 
     def _get_POST_request_with_token(self, cookie=None):
         """The cookie argument defaults to this class's default test cookie."""
-        return self._get_POST_csrf_cookie_request(cookie=cookie, post_token=self._csrf_id)
+        return self._get_POST_csrf_cookie_request(cookie=cookie, post_token=self._csrf_id_token)
 
     def _check_token_present(self, response, csrf_id=None):
         text = str(response.content, response.charset)
         match = re.search('name="csrfmiddlewaretoken" value="(.*?)"', text)
-        csrf_token = csrf_id or self._csrf_id
+        csrf_token = csrf_id or self._csrf_id_token
         self.assertTrue(
             match and equivalent_tokens(csrf_token, match[1]),
             "Could not find csrfmiddlewaretoken to match %s" % csrf_token
@@ -267,7 +267,7 @@ class CsrfViewMiddlewareTestMixin:
         """
         The token may be passed in a header instead of in the form.
         """
-        req = self._get_POST_csrf_cookie_request(meta_token=self._csrf_id)
+        req = self._get_POST_csrf_cookie_request(meta_token=self._csrf_id_token)
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         resp = mw.process_view(req, post_form_view, (), {})
@@ -279,7 +279,7 @@ class CsrfViewMiddlewareTestMixin:
         settings.CSRF_HEADER_NAME can be used to customize the CSRF header name
         """
         req = self._get_POST_csrf_cookie_request(
-            meta_token=self._csrf_id,
+            meta_token=self._csrf_id_token,
             token_header='HTTP_X_CSRFTOKEN_CUSTOMIZED',
         )
         mw = CsrfViewMiddleware(post_form_view)
@@ -310,14 +310,14 @@ class CsrfViewMiddlewareTestMixin:
         """
         HTTP PUT and DELETE can get through with X-CSRFToken and a cookie.
         """
-        req = self._get_POST_csrf_cookie_request(meta_token=self._csrf_id)
+        req = self._get_POST_csrf_cookie_request(meta_token=self._csrf_id_token)
         req.method = 'PUT'
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         resp = mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(resp)
 
-        req = self._get_POST_csrf_cookie_request(meta_token=self._csrf_id)
+        req = self._get_POST_csrf_cookie_request(meta_token=self._csrf_id_token)
         req.method = 'DELETE'
         mw.process_request(req)
         resp = mw.process_view(req, post_form_view, (), {})
@@ -681,7 +681,7 @@ class CsrfViewMiddlewareTestMixin:
 
             POST = property(_get_post, _set_post)
 
-        token = ('ABC' + self._csrf_id)[:CSRF_TOKEN_LENGTH]
+        token = ('ABC' + self._csrf_id_token)[:CSRF_TOKEN_LENGTH]
 
         req = CsrfPostRequest(token, raise_error=False)
         mw = CsrfViewMiddleware(post_form_view)
@@ -965,7 +965,7 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         If the token contains non-alphanumeric characters, it is ignored and a
         new token is created.
         """
-        token = ('!@#' + self._csrf_id)[:CSRF_TOKEN_LENGTH]
+        token = ('!@#' + self._csrf_id_token)[:CSRF_TOKEN_LENGTH]
         req = self._get_GET_no_csrf_cookie_request()
         req.COOKIES[settings.CSRF_COOKIE_NAME] = token
         mw = CsrfViewMiddleware(token_view)
