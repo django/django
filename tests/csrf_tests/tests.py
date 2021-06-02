@@ -123,9 +123,9 @@ class CsrfViewMiddlewareTestMixin:
         req.method = "POST"
         return req
 
-    def _get_POST_request_with_token(self):
-        req = self._get_POST_csrf_cookie_request(post_token=self._csrf_id)
-        return req
+    def _get_POST_request_with_token(self, cookie=None):
+        """The cookie argument defaults to this class's default test cookie."""
+        return self._get_POST_csrf_cookie_request(cookie=cookie, post_token=self._csrf_id)
 
     def _check_token_present(self, response, csrf_id=None):
         text = str(response.content, response.charset)
@@ -863,16 +863,6 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         req.COOKIES[settings.CSRF_COOKIE_NAME] = cookie
         return req
 
-    def _get_POST_bare_secret_csrf_cookie_request(self):
-        req = self._get_POST_no_csrf_cookie_request()
-        req.COOKIES[settings.CSRF_COOKIE_NAME] = TEST_SECRET
-        return req
-
-    def _get_POST_bare_secret_csrf_cookie_request_with_token(self):
-        req = self._get_POST_bare_secret_csrf_cookie_request()
-        req.POST['csrfmiddlewaretoken'] = self._csrf_id
-        return req
-
     def test_ensures_csrf_cookie_no_middleware(self):
         """
         The ensure_csrf_cookie() decorator works without middleware.
@@ -989,7 +979,7 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         """
         The csrf token is reset from a bare secret.
         """
-        req = self._get_POST_bare_secret_csrf_cookie_request_with_token()
+        req = self._get_POST_request_with_token(cookie=TEST_SECRET)
         mw = CsrfViewMiddleware(token_view)
         mw.process_request(req)
         resp = mw.process_view(req, token_view, (), {})
@@ -1047,11 +1037,6 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
     """
     CSRF tests with CSRF_USE_SESSIONS=True.
     """
-
-    def _get_POST_bare_secret_csrf_cookie_request(self):
-        req = self._get_POST_no_csrf_cookie_request()
-        req.session[CSRF_SESSION_KEY] = TEST_SECRET
-        return req
 
     def _get_GET_csrf_cookie_request(self, cookie=None):
         """The cookie argument defaults to the valid test cookie."""
