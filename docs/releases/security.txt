@@ -37,7 +37,7 @@ All security issues have been handled under versions of Django's security
 process. These are listed below.
 
 June 2, 2021 - :cve:`2021-33203`
--------------------------------
+--------------------------------
 
 Potential directory traversal via ``admindocs``. `Full description
 <https://www.djangoproject.com/weblog/2021/jun/02/security-releases/>`__
@@ -50,7 +50,7 @@ Versions affected
 * Django 2.2 :commit:`(patch) <053cc9534d174dc89daba36724ed2dcb36755b90>`
 
 June 2, 2021 - :cve:`2021-33571`
--------------------------------
+--------------------------------
 
 Possible indeterminate SSRF, RFI, and LFI attacks since validators accepted
 leading zeros in IPv4 addresses. `Full description
