@@ -2272,7 +2272,7 @@ Adding custom validation to the admin
 
 You can also add custom validation of data in the admin. The automatic admin
 interface reuses :mod:`django.forms`, and the ``ModelAdmin`` class gives you
-the ability define your own form::
+the ability to define your own form::
 
     class ArticleAdmin(admin.ModelAdmin):
         form = MyArticleAdminForm
