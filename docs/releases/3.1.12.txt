@@ -2,7 +2,7 @@
 Django 3.1.12 release notes
 ===========================
 
-*Expected June 2, 2021*
+*June 2, 2021*
 
 Django 3.1.12 fixes two security issues in 3.1.11.
 
