@@ -5,9 +5,10 @@ from django.contrib.sessions.backends.cache import SessionStore
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import (
-    CSRF_SESSION_KEY, CSRF_TOKEN_LENGTH, REASON_BAD_ORIGIN,
+    CSRF_ALLOWED_CHARS, CSRF_SESSION_KEY, CSRF_TOKEN_LENGTH, REASON_BAD_ORIGIN,
     REASON_CSRF_TOKEN_MISSING, REASON_NO_CSRF_COOKIE, CsrfViewMiddleware,
-    RejectRequest, _compare_masked_tokens as equivalent_tokens, get_token,
+    RejectRequest, _compare_masked_tokens as equivalent_tokens,
+    _mask_cipher_secret, _unmask_cipher_token, get_token,
 )
 from django.test import SimpleTestCase, override_settings
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
@@ -16,6 +17,56 @@ from .views import (
     ensure_csrf_cookie_view, non_token_view_using_request_processor,
     post_form_view, token_view,
 )
+
+# This is a test (unmasked) CSRF cookie / secret.
+TEST_SECRET = 'lcccccccX2kcccccccY2jcccccccssIC'
+# Two masked versions of TEST_SECRET for testing purposes.
+MASKED_TEST_SECRET1 = '1bcdefghij2bcdefghij3bcdefghij4bcdefghij5bcdefghij6bcdefghijABCD'
+MASKED_TEST_SECRET2 = '2JgchWvM1tpxT2lfz9aydoXW9yT1DN3NdLiejYxOOlzzV4nhBbYqmqZYbAV3V5Bf'
+
+
+class CsrfFunctionTests(SimpleTestCase):
+
+    def test_unmask_cipher_token(self):
+        cases = [
+            (TEST_SECRET, MASKED_TEST_SECRET1),
+            (TEST_SECRET, MASKED_TEST_SECRET2),
+            (
+                32 * 'a',
+                'vFioG3XOLyGyGsPRFyB9iYUs341ufzIEvFioG3XOLyGyGsPRFyB9iYUs341ufzIE',
+            ),
+            (32 * 'a', 64 * 'a'),
+            (32 * 'a', 64 * 'b'),
+            (32 * 'b', 32 * 'a' + 32 * 'b'),
+            (32 * 'b', 32 * 'b' + 32 * 'c'),
+            (32 * 'c', 32 * 'a' + 32 * 'c'),
+        ]
+        for secret, masked_secret in cases:
+            with self.subTest(masked_secret=masked_secret):
+                actual = _unmask_cipher_token(masked_secret)
+                self.assertEqual(actual, secret)
+
+    # This method depends on _unmask_cipher_token() being correct.
+    def assertMaskedSecretCorrect(self, masked_secret, secret):
+        """Test that a string is a valid masked version of a secret."""
+        self.assertEqual(len(masked_secret), CSRF_TOKEN_LENGTH)
+        self.assertTrue(
+            set(masked_secret).issubset(set(CSRF_ALLOWED_CHARS)),
+            msg=f'invalid characters in {masked_secret!r}',
+        )
+        actual = _unmask_cipher_token(masked_secret)
+        self.assertEqual(actual, secret)
+
+    def test_mask_cipher_secret(self):
+        cases = [
+            32 * 'a',
+            TEST_SECRET,
+            'da4SrUiHJYoJ0HYQ0vcgisoIuFOxx4ER',
+        ]
+        for secret in cases:
+            with self.subTest(secret=secret):
+                masked = _mask_cipher_secret(secret)
+                self.assertMaskedSecretCorrect(masked, secret)
 
 
 class TestingHttpRequest(HttpRequest):
@@ -36,7 +87,8 @@ class CsrfViewMiddlewareTestMixin:
     Shared methods and tests for session-based and cookie-based tokens.
     """
 
-    _csrf_id = _csrf_id_cookie = '1bcdefghij2bcdefghij3bcdefghij4bcdefghij5bcdefghij6bcdefghijABCD'
+    _csrf_id_cookie = MASKED_TEST_SECRET1
+    _csrf_id = MASKED_TEST_SECRET1
 
     def _get_GET_no_csrf_cookie_request(self):
         req = TestingHttpRequest()
@@ -813,12 +865,12 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
 
     def _get_POST_bare_secret_csrf_cookie_request(self):
         req = self._get_POST_no_csrf_cookie_request()
-        req.COOKIES[settings.CSRF_COOKIE_NAME] = self._csrf_id_cookie[:32]
+        req.COOKIES[settings.CSRF_COOKIE_NAME] = TEST_SECRET
         return req
 
     def _get_POST_bare_secret_csrf_cookie_request_with_token(self):
         req = self._get_POST_bare_secret_csrf_cookie_request()
-        req.POST['csrfmiddlewaretoken'] = self._csrf_id_cookie[:32]
+        req.POST['csrfmiddlewaretoken'] = self._csrf_id
         return req
 
     def test_ensures_csrf_cookie_no_middleware(self):
@@ -998,7 +1050,7 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
 
     def _get_POST_bare_secret_csrf_cookie_request(self):
         req = self._get_POST_no_csrf_cookie_request()
-        req.session[CSRF_SESSION_KEY] = self._csrf_id_cookie[:32]
+        req.session[CSRF_SESSION_KEY] = TEST_SECRET
         return req
 
     def _get_GET_csrf_cookie_request(self, cookie=None):
