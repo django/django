@@ -81,7 +81,7 @@ Django community and others to maintain a great ecosystem to work in:
 We're looking forward to working with you. Welcome aboard! ⛵️
 
 .. _posting guidelines: https://code.djangoproject.com/wiki/UsingTheMailingList
-.. _#django IRC channel: irc://irc.libera.chat/django
+.. _#django IRC channel: https://web.libera.chat/#django
 .. _community page: https://www.djangoproject.com/community/
 .. _Django forum: https://forum.djangoproject.com/
 .. _register it here: https://www.djangoproject.com/community/add/blogs/

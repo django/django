@@ -164,4 +164,4 @@ Votes on technical matters should be announced and held in public on the
 
 .. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query
-.. _#django: irc://irc.libera.chat/django
+.. _#django: https://web.libera.chat/#django
