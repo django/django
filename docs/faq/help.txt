@@ -27,7 +27,7 @@ Then, please post it in one of the following channels:
   documentation`_ for different ways to connect.
 
 .. _`"Using Django"`: https://forum.djangoproject.com/c/users
-.. _#django IRC channel: irc://irc.libera.chat/django
+.. _#django IRC channel: https://web.libera.chat/#django
 .. _Libera.Chat documentation: https://libera.chat/guides/connect
 
 In all these channels please abide by the `Django Code of Conduct`_. In
