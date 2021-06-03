@@ -9,6 +9,7 @@ import pickle
 import sys
 import textwrap
 import unittest
+from contextlib import contextmanager
 from importlib import import_module
 from io import StringIO
 
@@ -598,13 +599,24 @@ class DiscoverRunner:
         setup_test_environment(debug=self.debug_mode)
         unittest.installHandler()
 
+    @contextmanager
+    def load_with_patterns(self):
+        original_test_name_patterns = self.test_loader.testNamePatterns
+        self.test_loader.testNamePatterns = self.test_name_patterns
+        try:
+            yield
+        finally:
+            # Restore the original patterns.
+            self.test_loader.testNamePatterns = original_test_name_patterns
+
     def load_tests_for_label(self, label, discover_kwargs):
         label_as_path = os.path.abspath(label)
         tests = None
 
         # If a module, or "module.ClassName[.method_name]", just run those.
         if not os.path.exists(label_as_path):
-            tests = self.test_loader.loadTestsFromName(label)
+            with self.load_with_patterns():
+                tests = self.test_loader.loadTestsFromName(label)
             if tests.countTestCases():
                 return tests
         # Try discovery if "label" is a package or directory.
@@ -626,7 +638,8 @@ class DiscoverRunner:
         if os.path.isdir(label_as_path) and not self.top_level:
             kwargs['top_level_dir'] = find_top_level(label_as_path)
 
-        tests = self.test_loader.discover(start_dir=label, **kwargs)
+        with self.load_with_patterns():
+            tests = self.test_loader.discover(start_dir=label, **kwargs)
 
         # Make unittest forget the top-level dir it calculated from this run,
         # to support running tests from two different top-levels.
@@ -636,7 +649,6 @@ class DiscoverRunner:
     def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
         test_labels = test_labels or ['.']
         extra_tests = extra_tests or []
-        self.test_loader.testNamePatterns = self.test_name_patterns
 
         discover_kwargs = {}
         if self.pattern is not None:
