@@ -319,8 +319,8 @@ vulnerability allows and much worse).
     include the ``Referrer-Policy: no-referrer`` header. Due to the CSRF
     protection's strict referer checking on HTTPS requests, those techniques
     cause a CSRF failure on requests with 'unsafe' methods. Instead, use
-    alternatives like ``<a rel="noreferrer" ...>"`` for links to third-party
-    sites.
+    alternatives like ``Referrer-Policy: same-origin`` or ``<a rel="noreferrer" ...>"`` 
+    for links to third-party sites.
 
 .. _BREACH: http://breachattack.com/
 .. _Origin header: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin
