@@ -309,6 +309,13 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
                     list(Book.objects.prefetch_related(relation))
                     self.assertEqual(add_q_mock.call_count, 1)
 
+    def test_named_values_list(self):
+        qs = Author.objects.prefetch_related('books')
+        self.assertCountEqual(
+            [value.name for value in qs.values_list('name', named=True)],
+            ['Anne', 'Charlotte', 'Emily', 'Jane'],
+        )
+
 
 class RawQuerySetTests(TestDataMixin, TestCase):
     def test_basic(self):
