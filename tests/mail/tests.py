@@ -1442,13 +1442,9 @@ class SMTPBackendTestsBase(SimpleTestCase):
             EMAIL_HOST="127.0.0.1",
             EMAIL_PORT=cls.server.socket.getsockname()[1])
         cls._settings_override.enable()
+        cls.addClassCleanup(cls._settings_override.disable)
         cls.server.start()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls._settings_override.disable()
-        cls.server.stop()
-        super().tearDownClass()
+        cls.addClassCleanup(cls.server.stop)
 
 
 class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
