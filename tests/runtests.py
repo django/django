@@ -110,7 +110,7 @@ CONTRIB_TESTS_TO_APPS = {
 }
 
 
-def get_test_modules():
+def get_test_modules(gis_enabled):
     """
     Scan the tests directory and yield the names of all test modules.
 
@@ -118,7 +118,7 @@ def get_test_modules():
     the case of GIS tests, two dotted parts like "gis_tests.gdal_tests".
     """
     discovery_dirs = ['']
-    if connection.features.gis_enabled:
+    if gis_enabled:
         # GIS tests are in nested apps
         discovery_dirs.append('gis_tests')
     else:
@@ -216,7 +216,8 @@ def setup(verbosity, start_at, start_after, test_labels=None):
     # django.setup() so that connection.features.gis_enabled can be accessed
     # without raising AppRegistryNotReady when running gis_tests in isolation
     # on some backends (e.g. PostGIS).
-    if 'gis_tests' in test_labels_set and not connection.features.gis_enabled:
+    gis_enabled = connection.features.gis_enabled
+    if 'gis_tests' in test_labels_set and not gis_enabled:
         print('Aborting: A GIS database backend is required to run gis_tests.')
         sys.exit(1)
 
@@ -226,7 +227,7 @@ def setup(verbosity, start_at, start_after, test_labels=None):
 
     start_label = start_at or start_after
     installed_app_names = set(get_installed())
-    for test_module in get_test_modules():
+    for test_module in get_test_modules(gis_enabled):
         if start_label:
             if not _module_match_label(test_module, start_label):
                 continue
