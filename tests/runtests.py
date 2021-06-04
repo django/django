@@ -286,7 +286,8 @@ def setup(verbosity, start_at, start_after, test_labels=None):
     # Django's own test suite is running.
     os.environ['RUNNING_DJANGOS_TEST_SUITE'] = 'true'
 
-    return state
+    test_labels = test_labels or test_modules
+    return test_labels, state
 
 
 def teardown(state):
@@ -338,7 +339,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
             msg += " with up to %d processes" % max_parallel
         print(msg)
 
-    state = setup(verbosity, start_at, start_after, test_labels)
+    test_labels, state = setup(verbosity, start_at, start_after, test_labels)
     # Run the test suite, including the extra validation tests.
     if not hasattr(settings, 'TEST_RUNNER'):
         settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
@@ -358,7 +359,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
         buffer=buffer,
         timing=timing,
     )
-    failures = test_runner.run_tests(test_labels or get_installed())
+    failures = test_runner.run_tests(test_labels)
     teardown(state)
     return failures
 
