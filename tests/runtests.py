@@ -142,11 +142,7 @@ def get_test_modules(gis_enabled):
                 yield test_module
 
 
-def get_installed():
-    return [app_config.name for app_config in apps.get_app_configs()]
-
-
-def setup(verbosity, start_at, start_after, test_labels=None):
+def get_filtered_test_modules(start_at, start_after, gis_enabled, test_labels=None):
     if test_labels is None:
         test_labels = []
     # Reduce each test label to just the top-level module part.
@@ -155,13 +151,35 @@ def setup(verbosity, start_at, start_after, test_labels=None):
         test_module = label.split('.')[0]
         test_labels_set.add(test_module)
 
-    # Force declaring available_apps in TransactionTestCase for faster tests.
-    def no_available_apps(self):
-        raise Exception("Please define available_apps in TransactionTestCase "
-                        "and its subclasses.")
-    TransactionTestCase.available_apps = property(no_available_apps)
-    TestCase.available_apps = None
+    # It would be nice to put this validation earlier but it must come after
+    # django.setup() so that connection.features.gis_enabled can be accessed.
+    if 'gis_tests' in test_labels_set and not gis_enabled:
+        print('Aborting: A GIS database backend is required to run gis_tests.')
+        sys.exit(1)
 
+    def _module_match_label(module_name, label):
+        # Exact or ancestor match.
+        return module_name == label or module_name.startswith(label + '.')
+
+    start_label = start_at or start_after
+    for test_module in get_test_modules(gis_enabled):
+        if start_label:
+            if not _module_match_label(test_module, start_label):
+                continue
+            start_label = ''
+            if not start_at:
+                assert start_after
+                # Skip the current one before starting.
+                continue
+        # If the module (or an ancestor) was named on the command line, or
+        # no modules were named (i.e., run all), include the test module.
+        if not test_labels or any(
+            _module_match_label(test_module, label) for label in test_labels_set
+        ):
+            yield test_module
+
+
+def setup_collect_tests(start_at, start_after, test_labels=None):
     state = {
         'INSTALLED_APPS': settings.INSTALLED_APPS,
         'ROOT_URLCONF': getattr(settings, "ROOT_URLCONF", ""),
@@ -212,57 +230,57 @@ def setup(verbosity, start_at, start_after, test_labels=None):
     # Load all the ALWAYS_INSTALLED_APPS.
     django.setup()
 
-    # It would be nice to put this validation earlier but it must come after
-    # django.setup() so that connection.features.gis_enabled can be accessed
-    # without raising AppRegistryNotReady when running gis_tests in isolation
-    # on some backends (e.g. PostGIS).
+    # This flag must be evaluated after django.setup() because otherwise it can
+    # raise AppRegistryNotReady when running gis_tests in isolation on some
+    # backends (e.g. PostGIS).
     gis_enabled = connection.features.gis_enabled
-    if 'gis_tests' in test_labels_set and not gis_enabled:
-        print('Aborting: A GIS database backend is required to run gis_tests.')
-        sys.exit(1)
 
-    def _module_match_label(module_name, label):
-        # Exact or ancestor match.
-        return module_name == label or module_name.startswith(label + '.')
+    test_modules = list(get_filtered_test_modules(
+        start_at, start_after, gis_enabled, test_labels=test_labels,
+    ))
+    return test_modules, state
 
-    start_label = start_at or start_after
-    installed_app_names = set(get_installed())
-    for test_module in get_test_modules(gis_enabled):
-        if start_label:
-            if not _module_match_label(test_module, start_label):
-                continue
-            start_label = ''
-            if not start_at:
-                assert start_after
-                # Skip the current one before starting.
-                continue
-        # if the module (or an ancestor) was named on the command line, or
-        # no modules were named (i.e., run all), import
-        # this module and add it to INSTALLED_APPS.
-        if test_labels and not any(
-            _module_match_label(test_module, label) for label in test_labels_set
-        ):
-            continue
 
+def get_installed():
+    return [app_config.name for app_config in apps.get_app_configs()]
+
+
+# This function should be called only after calling django.setup(),
+# since it calls connection.features.gis_enabled.
+def get_apps_to_install(test_modules):
+    for test_module in test_modules:
         if test_module in CONTRIB_TESTS_TO_APPS:
-            for contrib_app in CONTRIB_TESTS_TO_APPS[test_module]:
-                if contrib_app not in settings.INSTALLED_APPS:
-                    settings.INSTALLED_APPS.append(contrib_app)
-
-        if test_module not in installed_app_names:
-            if verbosity >= 2:
-                print("Importing application %s" % test_module)
-            settings.INSTALLED_APPS.append(test_module)
+            yield from CONTRIB_TESTS_TO_APPS[test_module]
+        yield test_module
 
     # Add contrib.gis to INSTALLED_APPS if needed (rather than requiring
     # @override_settings(INSTALLED_APPS=...) on all test cases.
-    gis = 'django.contrib.gis'
-    if connection.features.gis_enabled and gis not in settings.INSTALLED_APPS:
+    if connection.features.gis_enabled:
+        yield 'django.contrib.gis'
+
+
+def setup(verbosity, start_at, start_after, test_labels=None):
+    test_modules, state = setup_collect_tests(start_at, start_after, test_labels=test_labels)
+
+    installed_apps = set(get_installed())
+    for app in get_apps_to_install(test_modules):
+        if app in installed_apps:
+            continue
         if verbosity >= 2:
-            print("Importing application %s" % gis)
-        settings.INSTALLED_APPS.append(gis)
+            print(f'Importing application {app}')
+        settings.INSTALLED_APPS.append(app)
+        installed_apps.add(app)
 
     apps.set_installed_apps(settings.INSTALLED_APPS)
+
+    # Force declaring available_apps in TransactionTestCase for faster tests.
+    def no_available_apps(self):
+        raise Exception(
+            'Please define available_apps in TransactionTestCase and its '
+            'subclasses.'
+        )
+    TransactionTestCase.available_apps = property(no_available_apps)
+    TestCase.available_apps = None
 
     # Set an environment variable that other code may consult to see if
     # Django's own test suite is running.
