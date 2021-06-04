@@ -265,7 +265,7 @@ def get_apps_to_install(test_modules):
         yield 'django.contrib.gis'
 
 
-def setup(verbosity, start_at, start_after, test_labels=None):
+def setup_run_tests(verbosity, start_at, start_after, test_labels=None):
     test_modules, state = setup_collect_tests(start_at, start_after, test_labels=test_labels)
 
     installed_apps = set(get_installed())
@@ -296,7 +296,7 @@ def setup(verbosity, start_at, start_after, test_labels=None):
     return test_labels, state
 
 
-def teardown(state):
+def teardown_run_tests(state):
     teardown_collect_tests(state)
     # Discard the multiprocessing.util finalizer that tries to remove a
     # temporary directory that's already removed by this script's
@@ -343,7 +343,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
             msg += " with up to %d processes" % max_parallel
         print(msg)
 
-    test_labels, state = setup(verbosity, start_at, start_after, test_labels)
+    test_labels, state = setup_run_tests(verbosity, start_at, start_after, test_labels)
     # Run the test suite, including the extra validation tests.
     if not hasattr(settings, 'TEST_RUNNER'):
         settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
@@ -364,7 +364,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
         timing=timing,
     )
     failures = test_runner.run_tests(test_labels)
-    teardown(state)
+    teardown_run_tests(state)
     return failures
 
 
