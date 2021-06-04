@@ -241,6 +241,12 @@ def setup_collect_tests(start_at, start_after, test_labels=None):
     return test_modules, state
 
 
+def teardown_collect_tests(state):
+    # Restore the old settings.
+    for key, value in state.items():
+        setattr(settings, key, value)
+
+
 def get_installed():
     return [app_config.name for app_config in apps.get_app_configs()]
 
@@ -291,9 +297,7 @@ def setup(verbosity, start_at, start_after, test_labels=None):
 
 
 def teardown(state):
-    # Restore the old settings.
-    for key, value in state.items():
-        setattr(settings, key, value)
+    teardown_collect_tests(state)
     # Discard the multiprocessing.util finalizer that tries to remove a
     # temporary directory that's already removed by this script's
     # atexit.register(shutil.rmtree, TMPDIR) handler. Prevents
@@ -364,11 +368,10 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
     return failures
 
 
-def get_app_test_labels(verbosity, start_at, start_after):
-    state = setup(verbosity, start_at, start_after)
-    test_labels = get_installed()
-    teardown(state)
-    return test_labels
+def collect_test_modules(start_at, start_after):
+    test_modules, state = setup_collect_tests(start_at, start_after)
+    teardown_collect_tests(state)
+    return test_modules
 
 
 def get_subprocess_args(options):
@@ -390,7 +393,7 @@ def get_subprocess_args(options):
 
 def bisect_tests(bisection_label, options, test_labels, start_at, start_after):
     if not test_labels:
-        test_labels = get_app_test_labels(options.verbosity, start_at, start_after)
+        test_labels = collect_test_modules(start_at, start_after)
 
     print('***** Bisecting test suite: %s' % ' '.join(test_labels))
 
@@ -439,7 +442,7 @@ def bisect_tests(bisection_label, options, test_labels, start_at, start_after):
 
 def paired_tests(paired_test, options, test_labels, start_at, start_after):
     if not test_labels:
-        test_labels = get_app_test_labels(options.verbosity, start_at, start_after)
+        test_labels = collect_test_modules(start_at, start_after)
 
     print('***** Trying paired execution')
 
