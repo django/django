@@ -981,6 +981,15 @@ class TextNode(Node):
     def render(self, context):
         return self.s
 
+    def render_annotated(self, context):
+        """
+        Return the given value.
+
+        The default implementation of this method handles exceptions raised
+        during rendering, which is not necessary for text nodes.
+        """
+        return self.s
+
 
 def render_value_in_context(value, context):
     """
