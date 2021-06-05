@@ -463,6 +463,18 @@ class TestCollectionNoneHashStorage(CollectionTestCase):
         self.assertEqual(relpath, 'cached/styles.css')
 
 
+@override_settings(
+    STATICFILES_STORAGE='staticfiles_tests.storage.NoPostProcessReplacedPathStorage'
+)
+class TestCollectionNoPostProcessReplacedPaths(CollectionTestCase):
+    run_collectstatic_in_setUp = False
+
+    def test_collectstatistic_no_post_process_replaced_paths(self):
+        stdout = StringIO()
+        self.run_collectstatic(verbosity=1, stdout=stdout)
+        self.assertIn('post-processed', stdout.getvalue())
+
+
 @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.SimpleStorage')
 class TestCollectionSimpleStorage(CollectionTestCase):
     hashed_file_path = hashed_file_path

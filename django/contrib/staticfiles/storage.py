@@ -260,6 +260,7 @@ class HashedFilesMixin:
                 processed_adjustable_paths[name] = (name, hashed_name, processed)
 
         paths = {path: paths[path] for path in adjustable_paths}
+        substitutions = False
 
         for i in range(self.max_post_process_passes):
             substitutions = False
