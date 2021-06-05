@@ -504,7 +504,7 @@ a form object, and each rendering method returns a string.
 
 .. versionadded:: 4.0
 
-Template that is going to be rendered if the form is case into a string, e.g.
+Template that is going to be rendered if the form is cast into a string, e.g.
 via ``print(form)`` or in a template via ``{{ form }}``. The template can be
 changed per form by overwriting the ``template_name`` attribute or by
 overriding the default template, see also :ref:`Overriding built-in form
