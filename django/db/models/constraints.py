@@ -187,7 +187,7 @@ class UniqueConstraint(BaseConstraint):
         )
 
     def constraint_sql(self, model, schema_editor):
-        fields = [model._meta.get_field(field_name).column for field_name in self.fields]
+        fields = [model._meta.get_field(field_name) for field_name in self.fields]
         include = [model._meta.get_field(field_name).column for field_name in self.include]
         condition = self._get_condition_sql(model, schema_editor)
         expressions = self._get_index_expressions(model, schema_editor)
@@ -198,7 +198,7 @@ class UniqueConstraint(BaseConstraint):
         )
 
     def create_sql(self, model, schema_editor):
-        fields = [model._meta.get_field(field_name).column for field_name in self.fields]
+        fields = [model._meta.get_field(field_name) for field_name in self.fields]
         include = [model._meta.get_field(field_name).column for field_name in self.include]
         condition = self._get_condition_sql(model, schema_editor)
         expressions = self._get_index_expressions(model, schema_editor)

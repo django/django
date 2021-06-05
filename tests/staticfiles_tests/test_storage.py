@@ -27,14 +27,9 @@ def hashed_file_path(test, path):
 class TestHashedFiles:
     hashed_file_path = hashed_file_path
 
-    def setUp(self):
-        self._max_post_process_passes = storage.staticfiles_storage.max_post_process_passes
-        super().setUp()
-
     def tearDown(self):
         # Clear hashed files to avoid side effects among tests.
         storage.staticfiles_storage.hashed_files.clear()
-        storage.staticfiles_storage.max_post_process_passes = self._max_post_process_passes
 
     def assertPostCondition(self):
         """
@@ -162,6 +157,52 @@ class TestHashedFiles:
         self.assertEqual(relpath, "cached/url.902310b73412.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             self.assertIn(b"https://", relfile.read())
+        self.assertPostCondition()
+
+    def test_module_import(self):
+        relpath = self.hashed_file_path('cached/module.js')
+        self.assertEqual(relpath, 'cached/module.91b9cf9935da.js')
+        tests = [
+            # Relative imports.
+            b'import testConst from "./module_test.d489af3cf882.js";',
+            b'import relativeModule from "../nested/js/nested.866475c46bb4.js";',
+            b'import { firstConst, secondConst } from "./module_test.d489af3cf882.js";',
+            # Absolute import.
+            b'import rootConst from "/static/absolute_root.5586327fe78c.js";',
+            # Dynamic import.
+            b'const dynamicModule = import("./module_test.d489af3cf882.js");',
+            # Creating a module object.
+            b'import * as NewModule from "./module_test.d489af3cf882.js";',
+            # Aliases.
+            b'import { testConst as alias } from "./module_test.d489af3cf882.js";',
+            b'import {\n'
+            b'    firstVar as firstVarAlias,\n'
+            b'    secondVar as secondVarAlias\n'
+            b'} from "./module_test.d489af3cf882.js";',
+        ]
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            for module_import in tests:
+                with self.subTest(module_import=module_import):
+                    self.assertIn(module_import, content)
+        self.assertPostCondition()
+
+    def test_aggregating_modules(self):
+        relpath = self.hashed_file_path('cached/module.js')
+        self.assertEqual(relpath, 'cached/module.91b9cf9935da.js')
+        tests = [
+            b'export * from "./module_test.d489af3cf882.js";',
+            b'export { testConst } from "./module_test.d489af3cf882.js";',
+            b'export {\n'
+            b'    firstVar as firstVarAlias,\n'
+            b'    secondVar as secondVarAlias\n'
+            b'} from "./module_test.d489af3cf882.js";',
+        ]
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            for module_import in tests:
+                with self.subTest(module_import=module_import):
+                    self.assertIn(module_import, content)
         self.assertPostCondition()
 
     @override_settings(

@@ -84,7 +84,10 @@ class ExtraPatternsStorage(ManifestStaticFilesStorage):
     patterns = tuple(ManifestStaticFilesStorage.patterns) + (
         (
             "*.js", (
-                (r"""(url\(['"]{0,1}\s*(.*?)["']{0,1}\))""", 'JS_URL("%s")'),
+                (
+                    r"""(?P<matched>url\(['"]{0,1}\s*(?P<url>.*?)["']{0,1}\))""",
+                    'JS_URL("%(url)s")',
+                ),
             ),
         ),
     )

@@ -1381,6 +1381,13 @@ subclass::
 
         Support for searching against quoted phrases with spaces was added.
 
+.. attribute:: ModelAdmin.search_help_text
+
+    .. versionadded:: 4.0
+
+    Set ``search_help_text`` to specify a descriptive text for the search box
+    which will be displayed below it.
+
 .. attribute:: ModelAdmin.show_full_result_count
 
     Set ``show_full_result_count`` to control whether the full count of objects
@@ -2265,7 +2272,7 @@ Adding custom validation to the admin
 
 You can also add custom validation of data in the admin. The automatic admin
 interface reuses :mod:`django.forms`, and the ``ModelAdmin`` class gives you
-the ability define your own form::
+the ability to define your own form::
 
     class ArticleAdmin(admin.ModelAdmin):
         form = MyArticleAdminForm
@@ -2572,7 +2579,7 @@ on whichever model contains the actual reference to the
 :class:`~django.db.models.ManyToManyField`. Depending on your ``ModelAdmin``
 definition, each many-to-many field in your model will be represented by a
 standard HTML ``<select multiple>``, a horizontal or vertical filter, or a
-``raw_id_admin`` widget. However, it is also possible to replace these
+``raw_id_fields`` widget. However, it is also possible to replace these
 widgets with inlines.
 
 Suppose we have the following models::
@@ -3025,12 +3032,17 @@ Templates can override or extend base admin templates as described in
 
       Each model is a dict with the following keys:
 
+      * ``model``: the model class
       * ``object_name``: class name of the model
       * ``name``: plural name of the model
       * ``perms``: a ``dict`` tracking ``add``, ``change``, ``delete``, and
         ``view`` permissions
       * ``admin_url``: admin changelist URL for the model
       * ``add_url``: admin URL to add a new model instance
+
+    .. versionchanged:: 4.0
+
+        The ``model`` variable for each model was added.
 
 .. method:: AdminSite.has_permission(request)
 

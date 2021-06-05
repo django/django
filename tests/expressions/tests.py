@@ -1194,6 +1194,13 @@ class ExpressionsNumericTests(TestCase):
         self.assertEqual(Number.objects.get(pk=n.pk).integer, 10)
         self.assertEqual(Number.objects.get(pk=n.pk).float, Approximate(256.900, places=3))
 
+    def test_decimal_expression(self):
+        n = Number.objects.create(integer=1, decimal_value=Decimal('0.5'))
+        n.decimal_value = F('decimal_value') - Decimal('0.4')
+        n.save()
+        n.refresh_from_db()
+        self.assertEqual(n.decimal_value, Decimal('0.1'))
+
 
 class ExpressionOperatorTests(TestCase):
     @classmethod
@@ -1755,6 +1762,22 @@ class ValueTests(TestCase):
         self.assertEqual(len(kwargs), 1)
         self.assertEqual(kwargs['output_field'].deconstruct(), CharField().deconstruct())
 
+    def test_repr(self):
+        tests = [
+            (None, 'Value(None)'),
+            ('str', "Value('str')"),
+            (True, 'Value(True)'),
+            (42, 'Value(42)'),
+            (
+                datetime.datetime(2019, 5, 15),
+                'Value(datetime.datetime(2019, 5, 15, 0, 0))',
+            ),
+            (Decimal('3.14'), "Value(Decimal('3.14'))"),
+        ]
+        for value, expected in tests:
+            with self.subTest(value=value):
+                self.assertEqual(repr(Value(value)), expected)
+
     def test_equal(self):
         value = Value('name')
         self.assertEqual(value, Value('name'))
@@ -1806,10 +1829,10 @@ class ValueTests(TestCase):
             (b'', BinaryField),
             (uuid.uuid4(), UUIDField),
         ]
-        for value, ouput_field_type in value_types:
+        for value, output_field_type in value_types:
             with self.subTest(type=type(value)):
                 expr = Value(value)
-                self.assertIsInstance(expr.output_field, ouput_field_type)
+                self.assertIsInstance(expr.output_field, output_field_type)
 
     def test_resolve_output_field_failure(self):
         msg = 'Cannot resolve expression type, unknown output_field'
@@ -1880,7 +1903,7 @@ class ReprTests(SimpleTestCase):
         )
         self.assertEqual(
             repr(When(Q(age__gte=18), then=Value('legal'))),
-            "<When: WHEN <Q: (AND: ('age__gte', 18))> THEN Value(legal)>"
+            "<When: WHEN <Q: (AND: ('age__gte', 18))> THEN Value('legal')>"
         )
         self.assertEqual(repr(Col('alias', 'field')), "Col(alias, field)")
         self.assertEqual(repr(F('published')), "F(published)")

@@ -17,6 +17,16 @@ details on these changes.
 
 * The ``SERIALIZE`` test setting will be removed.
 
+* The undocumented ``django.utils.baseconv`` module will be removed.
+
+* The undocumented ``django.utils.datetime_safe`` module will be removed.
+
+* The default value of the ``USE_TZ`` setting will change from ``False`` to
+  ``True``.
+
+* The default sitemap protocol for sitemaps built outside the context of a
+  request will change from ``'http'`` to ``'https'``.
+
 .. _deprecation-removed-in-4.1:
 
 4.1
@@ -104,7 +114,7 @@ details on these changes.
 * Support for the pre-Django 3.1 user sessions (that use the SHA-1 algorithm)
   will be removed.
 
-* The ``get_request`` argument for
+* The ``get_response`` argument for
   ``django.utils.deprecation.MiddlewareMixin.__init__()`` will be required and
   won't accept ``None``.
 

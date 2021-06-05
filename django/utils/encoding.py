@@ -160,7 +160,7 @@ def uri_to_iri(uri):
     if uri is None:
         return uri
     uri = force_bytes(uri)
-    # Fast selective unqote: First, split on '%' and then starting with the
+    # Fast selective unquote: First, split on '%' and then starting with the
     # second block, decode the first 2 bytes if they represent a hex code to
     # decode. The rest of the block is the part after '%AB', not containing
     # any '%'. Add that to the output without further processing.

@@ -501,7 +501,8 @@ Django 3.0, we're removing these APIs at this time.
   ``six.python_2_unicode_compatible()``.
 
 * ``django.utils.functional.curry()`` - Use :func:`functools.partial` or
-  :class:`functools.partialmethod`. See :commit:`5b1c389603a353625ae1603`.
+  :class:`functools.partialmethod`. See
+  :commit:`5b1c389603a353625ae1603ba345147356336afb`.
 
 * ``django.utils.safestring.SafeBytes`` - Unused since Django 2.0.
 

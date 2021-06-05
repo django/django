@@ -25,6 +25,9 @@ class PermWrapper:
     def __init__(self, user):
         self.user = user
 
+    def __repr__(self):
+        return f'{self.__class__.__qualname__}({self.user!r})'
+
     def __getitem__(self, app_label):
         return PermLookupDict(self.user, app_label)
 

@@ -54,8 +54,8 @@ class DateFormatTests(SimpleTestCase):
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), ltz), dt)
         # astimezone() is safe here because the target timezone doesn't have DST
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U'))), dt.astimezone(ltz).replace(tzinfo=None))
-        self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), tz).utctimetuple(), dt.utctimetuple())
-        self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), ltz).utctimetuple(), dt.utctimetuple())
+        self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), tz).timetuple(), dt.astimezone(tz).timetuple())
+        self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), ltz).timetuple(), dt.astimezone(ltz).timetuple())
 
     def test_epoch(self):
         udt = datetime(1970, 1, 1, tzinfo=utc)
@@ -166,7 +166,7 @@ class DateFormatTests(SimpleTestCase):
                 'Sun, 08 Jul 1979 22:00:00 +0100',
             )
 
-    def test_year_before_1000(self):
+    def test_y_format_year_before_1000(self):
         tests = [
             (476, '76'),
             (42, '42'),
@@ -178,6 +178,10 @@ class DateFormatTests(SimpleTestCase):
                     dateformat.format(datetime(year, 9, 8, 5, 0), 'y'),
                     expected_date,
                 )
+
+    def test_Y_format_year_before_1000(self):
+        self.assertEqual(dateformat.format(datetime(1, 1, 1), 'Y'), '0001')
+        self.assertEqual(dateformat.format(datetime(999, 1, 1), 'Y'), '0999')
 
     def test_twelve_hour_format(self):
         tests = [

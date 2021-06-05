@@ -73,9 +73,9 @@ class TemplateCommand(BaseCommand):
             except OSError as e:
                 raise CommandError(e)
         else:
-            if app_or_project == 'app':
-                self.validate_name(os.path.basename(target), 'directory')
             top_dir = os.path.abspath(os.path.expanduser(target))
+            if app_or_project == 'app':
+                self.validate_name(os.path.basename(top_dir), 'directory')
             if not os.path.exists(top_dir):
                 raise CommandError("Destination directory '%s' does not "
                                    "exist, please create it first." % top_dir)

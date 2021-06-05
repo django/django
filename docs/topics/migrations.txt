@@ -676,7 +676,7 @@ app label and migration name you want to squash up to, and it'll get to work::
   Do you wish to proceed? [yN] y
   Optimizing...
     Optimized from 12 operations to 7 operations.
-  Created new squashed migration /home/andrew/Programs/DjangoTest/test/migrations/0001_squashed_0004_undo_somthing.py
+  Created new squashed migration /home/andrew/Programs/DjangoTest/test/migrations/0001_squashed_0004_undo_something.py
     You should commit this migration but leave the old ones in place;
     the new migration will be used for new installs. Once you are sure
     all instances of the codebase have applied the migrations you squashed,

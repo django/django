@@ -2809,6 +2809,10 @@ See also :setting:`DECIMAL_SEPARATOR`, :setting:`NUMBER_GROUPING` and
 
 Default: ``False``
 
+.. note::
+
+    In Django 5.0, the default value will change from ``False`` to ``True``.
+
 A boolean that specifies if datetimes will be timezone-aware by default or not.
 If this is set to ``True``, Django will use timezone-aware datetimes internally.
 

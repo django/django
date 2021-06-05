@@ -50,6 +50,9 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
         context['summary'] = summary
         return context
 
+    def id_for_label(self, id_):
+        return None
+
 
 class ReadOnlyPasswordHashField(forms.Field):
     widget = ReadOnlyPasswordHashWidget

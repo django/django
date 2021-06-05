@@ -1,3 +1,4 @@
+import logging
 import os
 import unittest.loader
 from argparse import ArgumentParser
@@ -23,6 +24,16 @@ def change_cwd(directory):
         yield
     finally:
         os.chdir(old_cwd)
+
+
+@contextmanager
+def change_loader_patterns(patterns):
+    original_patterns = DiscoverRunner.test_loader.testNamePatterns
+    DiscoverRunner.test_loader.testNamePatterns = patterns
+    try:
+        yield
+    finally:
+        DiscoverRunner.test_loader.testNamePatterns = original_patterns
 
 
 class DiscoverRunnerTests(SimpleTestCase):
@@ -120,6 +131,28 @@ class DiscoverRunnerTests(SimpleTestCase):
                     verbosity=0,
                 ).build_suite(['test_runner_apps.simple'])
                 self.assertEqual(expected, self.get_test_methods_names(suite))
+
+    def test_loader_patterns_not_mutated(self):
+        runner = DiscoverRunner(test_name_patterns=['test_sample'], verbosity=0)
+        tests = [
+            ('test_runner_apps.sample.tests', 1),
+            ('test_runner_apps.sample.tests.Test.test_sample', 1),
+            ('test_runner_apps.sample.empty', 0),
+            ('test_runner_apps.sample.tests_sample.EmptyTestCase', 0),
+        ]
+        for test_labels, tests_count in tests:
+            with self.subTest(test_labels=test_labels):
+                with change_loader_patterns(['UnittestCase1']):
+                    count = runner.build_suite([test_labels]).countTestCases()
+                    self.assertEqual(count, tests_count)
+                    self.assertEqual(runner.test_loader.testNamePatterns, ['UnittestCase1'])
+
+    def test_loader_patterns_not_mutated_when_test_label_is_file_path(self):
+        runner = DiscoverRunner(test_name_patterns=['test_sample'], verbosity=0)
+        with change_cwd('.'), change_loader_patterns(['UnittestCase1']):
+            with self.assertRaises(RuntimeError):
+                runner.build_suite(['test_discover_runner.py'])
+            self.assertEqual(runner.test_loader.testNamePatterns, ['UnittestCase1'])
 
     def test_file_path(self):
         with change_cwd(".."):
@@ -305,7 +338,7 @@ class DiscoverRunnerTests(SimpleTestCase):
                 'test_runner_apps.sample.tests_sample.TestDjangoTestCase',
                 'test_runner_apps.simple',
             ])
-            self.assertIn('Found 14 tests.\n', stdout.getvalue())
+            self.assertIn('Found 14 test(s).\n', stdout.getvalue())
 
     def test_pdb_with_parallel(self):
         msg = (
@@ -377,6 +410,43 @@ class DiscoverRunnerTests(SimpleTestCase):
             runner.time_keeper.print_results()
         self.assertTrue(isinstance(runner.time_keeper, TimeKeeper))
         self.assertIn('test', stderr.getvalue())
+
+    def test_log(self):
+        custom_low_level = 5
+        custom_high_level = 45
+        msg = 'logging message'
+        cases = [
+            (0, None, False),
+            (0, custom_low_level, False),
+            (0, logging.DEBUG, False),
+            (0, logging.INFO, False),
+            (0, logging.WARNING, False),
+            (0, custom_high_level, False),
+            (1, None, True),
+            (1, custom_low_level, False),
+            (1, logging.DEBUG, False),
+            (1, logging.INFO, True),
+            (1, logging.WARNING, True),
+            (1, custom_high_level, True),
+            (2, None, True),
+            (2, custom_low_level, True),
+            (2, logging.DEBUG, True),
+            (2, logging.INFO, True),
+            (2, logging.WARNING, True),
+            (2, custom_high_level, True),
+            (3, None, True),
+            (3, custom_low_level, True),
+            (3, logging.DEBUG, True),
+            (3, logging.INFO, True),
+            (3, logging.WARNING, True),
+            (3, custom_high_level, True),
+        ]
+        for verbosity, level, output in cases:
+            with self.subTest(verbosity=verbosity, level=level):
+                with captured_stdout() as stdout:
+                    runner = DiscoverRunner(verbosity=verbosity)
+                    runner.log(msg, level)
+                    self.assertEqual(stdout.getvalue(), f'{msg}\n' if output else '')
 
 
 class DiscoverRunnerGetDatabasesTests(SimpleTestCase):

@@ -559,6 +559,7 @@ class ModelAdmin(BaseModelAdmin):
     list_max_show_all = 200
     list_editable = ()
     search_fields = ()
+    search_help_text = None
     date_hierarchy = None
     save_as = False
     save_as_continue = True
@@ -747,6 +748,7 @@ class ModelAdmin(BaseModelAdmin):
             self.list_editable,
             self,
             sortable_by,
+            self.search_help_text,
         )
 
     def get_object(self, request, object_id, from_field=None):
@@ -801,7 +803,7 @@ class ModelAdmin(BaseModelAdmin):
     def get_paginator(self, request, queryset, per_page, orphans=0, allow_empty_first_page=True):
         return self.paginator(queryset, per_page, orphans, allow_empty_first_page)
 
-    def log_addition(self, request, object, message):
+    def log_addition(self, request, obj, message):
         """
         Log that an object has been successfully added.
 
@@ -810,14 +812,14 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.models import ADDITION, LogEntry
         return LogEntry.objects.log_action(
             user_id=request.user.pk,
-            content_type_id=get_content_type_for_model(object).pk,
-            object_id=object.pk,
-            object_repr=str(object),
+            content_type_id=get_content_type_for_model(obj).pk,
+            object_id=obj.pk,
+            object_repr=str(obj),
             action_flag=ADDITION,
             change_message=message,
         )
 
-    def log_change(self, request, object, message):
+    def log_change(self, request, obj, message):
         """
         Log that an object has been successfully changed.
 
@@ -826,14 +828,14 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.models import CHANGE, LogEntry
         return LogEntry.objects.log_action(
             user_id=request.user.pk,
-            content_type_id=get_content_type_for_model(object).pk,
-            object_id=object.pk,
-            object_repr=str(object),
+            content_type_id=get_content_type_for_model(obj).pk,
+            object_id=obj.pk,
+            object_repr=str(obj),
             action_flag=CHANGE,
             change_message=message,
         )
 
-    def log_deletion(self, request, object, object_repr):
+    def log_deletion(self, request, obj, object_repr):
         """
         Log that an object will be deleted. Note that this method must be
         called before the deletion.
@@ -843,8 +845,8 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.models import DELETION, LogEntry
         return LogEntry.objects.log_action(
             user_id=request.user.pk,
-            content_type_id=get_content_type_for_model(object).pk,
-            object_id=object.pk,
+            content_type_id=get_content_type_for_model(obj).pk,
+            object_id=obj.pk,
             object_repr=object_repr,
             action_flag=DELETION,
         )

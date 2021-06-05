@@ -132,5 +132,5 @@ See also
 
 A `complete list`_ of browsers supporting ``X-Frame-Options``.
 
-.. _complete list: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options#Browser_compatibility
+.. _complete list: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options#browser_compatibility
 .. _other clickjacking prevention techniques: https://en.wikipedia.org/wiki/Clickjacking#Prevention

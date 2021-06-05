@@ -160,6 +160,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         return [(None, ("NULL", [], False))]
 
+    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
+        return value
+
     def last_executed_query(self, cursor, sql, params):
         # With MySQLdb, cursor objects have an (undocumented) "_executed"
         # attribute where the exact query sent to the database is saved.
@@ -262,7 +265,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if timezone.is_aware(value):
             raise ValueError("MySQL backend does not support timezone-aware times.")
 
-        return str(value)
+        return value.isoformat(timespec='microseconds')
 
     def max_name_length(self):
         return 64

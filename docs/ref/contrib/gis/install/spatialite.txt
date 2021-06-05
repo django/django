@@ -18,7 +18,7 @@ For Windows, you may find binaries on the `Gaia-SINS`__ home page.
 In any case, you should always be able to :ref:`install from source
 <spatialite_source>`.
 
-__ https://www.gaia-gis.it/fossil/libspatialite
+__ https://www.gaia-gis.it/fossil/libspatialite/index
 __ https://www.gaia-gis.it/gaia-sins/
 
 .. _spatialite_source:

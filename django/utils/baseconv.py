@@ -1,3 +1,4 @@
+# RemovedInDjango50Warning
 # Copyright (c) 2010 Guilherme Gondim. All rights reserved.
 # Copyright (c) 2009 Simon Willison. All rights reserved.
 # Copyright (c) 2002 Drew Perttula. All rights reserved.
@@ -36,6 +37,15 @@ Sample usage::
   -1234
 
 """
+import warnings
+
+from django.utils.deprecation import RemovedInDjango50Warning
+
+warnings.warn(
+    'The django.utils.baseconv module is deprecated.',
+    category=RemovedInDjango50Warning,
+    stacklevel=2,
+)
 
 BASE2_ALPHABET = '01'
 BASE16_ALPHABET = '0123456789ABCDEF'

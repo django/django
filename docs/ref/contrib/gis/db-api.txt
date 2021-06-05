@@ -401,7 +401,7 @@ Aggregate                PostGIS  Oracle  SpatiaLite
 =======================  =======  ======  ==========
 
 .. rubric:: Footnotes
-.. [#fnwkt] *See* Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, Document 99-049 (May 5, 1999), at  Ch. 3.2.5, p. 3-11 (SQL Textual Representation of Geometry).
+.. [#fnwkt] *See* Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification For SQL <https://portal.ogc.org/files/?artifact_id=829>`_, Document 99-049 (May 5, 1999), at  Ch. 3.2.5, p. 3-11 (SQL Textual Representation of Geometry).
 .. [#fnewkb] *See* `PostGIS EWKB, EWKT and Canonical Forms <https://postgis.net/docs/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
 .. [#fndistsphere15] *See* `PostGIS documentation <https://postgis.net/docs/ST_DistanceSphere.html>`_ on ``ST_DistanceSphere``.
 .. [#] Refer :ref:`mysql-spatial-limitations` section for more details.

@@ -58,11 +58,7 @@ class FileUploadTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         os.makedirs(MEDIA_ROOT, exist_ok=True)
-
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(MEDIA_ROOT)
-        super().tearDownClass()
+        cls.addClassCleanup(shutil.rmtree, MEDIA_ROOT)
 
     def test_upload_name_is_validated(self):
         candidates = [
@@ -678,11 +674,7 @@ class DirectoryCreationTests(SimpleTestCase):
     def setUpClass(cls):
         super().setUpClass()
         os.makedirs(MEDIA_ROOT, exist_ok=True)
-
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(MEDIA_ROOT)
-        super().tearDownClass()
+        cls.addClassCleanup(shutil.rmtree, MEDIA_ROOT)
 
     def setUp(self):
         self.obj = FileModel()

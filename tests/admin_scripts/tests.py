@@ -64,6 +64,7 @@ class AdminScriptTestCase(SimpleTestCase):
                 'DEFAULT_AUTO_FIELD',
                 'ROOT_URLCONF',
                 'SECRET_KEY',
+                'USE_TZ',
             ]
             for s in exports:
                 if hasattr(settings, s):
@@ -2205,6 +2206,13 @@ class StartApp(AdminScriptTestCase):
             "module and cannot be used as an app directory. Please try "
             "another directory."
         )
+
+    def test_trailing_slash_in_target_app_directory_name(self):
+        app_dir = os.path.join(self.test_dir, 'apps', 'app1')
+        os.makedirs(app_dir)
+        _, err = self.run_django_admin(['startapp', 'app', os.path.join('apps', 'app1', '')])
+        self.assertNoOutput(err)
+        self.assertIs(os.path.exists(os.path.join(app_dir, 'apps.py')), True)
 
     def test_overlaying_app(self):
         # Use a subdirectory so it is outside the PYTHONPATH.

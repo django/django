@@ -778,6 +778,15 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(Note, old_field, new_field, strict=True)
 
+    def test_alter_text_field_to_not_null_with_default_value(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Note)
+        old_field = Note._meta.get_field('address')
+        new_field = TextField(blank=True, default='', null=False)
+        new_field.set_attributes_from_name('address')
+        with connection.schema_editor() as editor:
+            editor.alter_field(Note, old_field, new_field, strict=True)
+
     @skipUnlessDBFeature('can_defer_constraint_checks', 'can_rollback_ddl')
     def test_alter_fk_checks_deferred_constraints(self):
         """
@@ -2189,6 +2198,22 @@ class SchemaTests(TransactionTestCase):
             AuthorWithUniqueNameAndBirthday._meta.constraints = []
             editor.remove_constraint(AuthorWithUniqueNameAndBirthday, constraint)
 
+    def test_unique_constraint(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        constraint = UniqueConstraint(fields=['name'], name='name_uq')
+        # Add constraint.
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Author, constraint)
+            sql = constraint.create_sql(Author, editor)
+        table = Author._meta.db_table
+        self.assertIs(sql.references_table(table), True)
+        self.assertIs(sql.references_column(table, 'name'), True)
+        # Remove constraint.
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(Author, constraint)
+        self.assertNotIn(constraint.name, self.get_constraints(table))
+
     @skipUnlessDBFeature('supports_expression_indexes')
     def test_func_unique_constraint(self):
         with connection.schema_editor() as editor:
@@ -3262,7 +3287,7 @@ class SchemaTests(TransactionTestCase):
 
             constraint_name = 'CamelCaseUniqConstraint'
             expected_constraint_name = identifier_converter(constraint_name)
-            editor.execute(editor._create_unique_sql(model, [field.column], constraint_name))
+            editor.execute(editor._create_unique_sql(model, [field], constraint_name))
             self.assertIn(expected_constraint_name, self.get_constraints(model._meta.db_table))
             editor.alter_field(model, get_field(unique=True), field, strict=True)
             self.assertNotIn(expected_constraint_name, self.get_constraints(model._meta.db_table))

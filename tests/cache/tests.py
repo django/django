@@ -40,6 +40,7 @@ from django.test import (
     ignore_warnings, override_settings,
 )
 from django.test.signals import setting_changed
+from django.test.utils import CaptureQueriesContext
 from django.utils import timezone, translation
 from django.utils.cache import (
     get_cache_key, learn_cache_key, patch_cache_control, patch_vary_headers,
@@ -1117,6 +1118,18 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         with self.assertNumQueries(1):
             cache.delete_many(['a', 'b', 'c'])
 
+    def test_cull_count_queries(self):
+        old_max_entries = cache._max_entries
+        # Force _cull to delete on first cached record.
+        cache._max_entries = -1
+        with CaptureQueriesContext(connection) as captured_queries:
+            try:
+                cache.set('force_cull', 'value', 1000)
+            finally:
+                cache._max_entries = old_max_entries
+        num_count_queries = sum('COUNT' in query['sql'] for query in captured_queries)
+        self.assertEqual(num_count_queries, 1)
+
     def test_delete_cursor_rowcount(self):
         """
         The rowcount attribute should not be checked on a closed cursor.
@@ -1722,6 +1735,19 @@ class CacheClosingTests(SimpleTestCase):
         self.assertFalse(cache.closed)
         signals.request_finished.send(self.__class__)
         self.assertTrue(cache.closed)
+
+    def test_close_only_initialized(self):
+        with self.settings(CACHES={
+            'cache_1': {
+                'BACKEND': 'cache.closeable_cache.CacheClass',
+            },
+            'cache_2': {
+                'BACKEND': 'cache.closeable_cache.CacheClass',
+            },
+        }):
+            self.assertEqual(caches.all(initialized_only=True), [])
+            signals.request_finished.send(self.__class__)
+            self.assertEqual(caches.all(initialized_only=True), [])
 
 
 DEFAULT_MEMORY_CACHES_SETTINGS = {
@@ -2625,3 +2651,20 @@ class CacheHandlerTest(SimpleTestCase):
         )
         with self.assertRaisesMessage(InvalidCacheBackendError, msg):
             test_caches['invalid_backend']
+
+    def test_all(self):
+        test_caches = CacheHandler({
+            'cache_1': {
+                'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+            },
+            'cache_2': {
+                'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+            },
+        })
+        self.assertEqual(test_caches.all(initialized_only=True), [])
+        cache_1 = test_caches['cache_1']
+        self.assertEqual(test_caches.all(initialized_only=True), [cache_1])
+        self.assertEqual(len(test_caches.all()), 2)
+        # .all() initializes all caches.
+        self.assertEqual(len(test_caches.all(initialized_only=True)), 2)
+        self.assertEqual(test_caches.all(), test_caches.all(initialized_only=True))

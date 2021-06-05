@@ -75,11 +75,12 @@ tempfile.tempdir = os.environ['TMPDIR'] = TMPDIR
 atexit.register(shutil.rmtree, TMPDIR)
 
 
-SUBDIRS_TO_SKIP = [
-    'data',
-    'import_error_package',
-    'test_runner_apps',
-]
+# This is a dict mapping RUNTESTS_DIR subdirectory to subdirectories of that
+# directory to skip when searching for test modules.
+SUBDIRS_TO_SKIP = {
+    '': {'import_error_package', 'test_runner_apps'},
+    'gis_tests': {'data'},
+}
 
 ALWAYS_INSTALLED_APPS = [
     'django.contrib.contenttypes',
@@ -110,29 +111,43 @@ CONTRIB_TESTS_TO_APPS = {
 
 
 def get_test_modules():
-    modules = []
-    discovery_paths = [(None, RUNTESTS_DIR)]
+    """
+    Scan the tests directory and yield the names of all test modules.
+
+    The yielded names have either one dotted part like "test_runner" or, in
+    the case of GIS tests, two dotted parts like "gis_tests.gdal_tests".
+    """
+    discovery_dirs = ['']
     if connection.features.gis_enabled:
         # GIS tests are in nested apps
-        discovery_paths.append(('gis_tests', os.path.join(RUNTESTS_DIR, 'gis_tests')))
+        discovery_dirs.append('gis_tests')
     else:
-        SUBDIRS_TO_SKIP.append('gis_tests')
+        SUBDIRS_TO_SKIP[''].add('gis_tests')
 
-    for modpath, dirpath in discovery_paths:
+    for dirname in discovery_dirs:
+        dirpath = os.path.join(RUNTESTS_DIR, dirname)
+        subdirs_to_skip = SUBDIRS_TO_SKIP[dirname]
         for f in os.scandir(dirpath):
-            if ('.' not in f.name and
-                    os.path.basename(f.name) not in SUBDIRS_TO_SKIP and
-                    not f.is_file() and
-                    os.path.exists(os.path.join(f.path, '__init__.py'))):
-                modules.append((modpath, f.name))
-    return modules
+            if (
+                '.' in f.name or
+                os.path.basename(f.name) in subdirs_to_skip or
+                f.is_file() or
+                not os.path.exists(os.path.join(f.path, '__init__.py'))
+            ):
+                continue
+            test_module = f.name
+            if dirname:
+                test_module = dirname + '.' + test_module
+            yield test_module
 
 
 def get_installed():
     return [app_config.name for app_config in apps.get_app_configs()]
 
 
-def setup(verbosity, test_labels, start_at, start_after):
+def setup(verbosity, start_at, start_after, test_labels=None):
+    if test_labels is None:
+        test_labels = []
     # Reduce each test label to just the top-level module part.
     test_labels_set = set()
     for label in test_labels:
@@ -204,24 +219,17 @@ def setup(verbosity, test_labels, start_at, start_after):
         print('Aborting: A GIS database backend is required to run gis_tests.')
         sys.exit(1)
 
-    def _module_match_label(module_label, label):
+    def _module_match_label(module_name, label):
         # Exact or ancestor match.
-        return module_label == label or module_label.startswith(label + '.')
-
-    # Load all the test model apps.
-    test_modules = get_test_modules()
+        return module_name == label or module_name.startswith(label + '.')
 
     found_start = not (start_at or start_after)
     installed_app_names = set(get_installed())
-    for modpath, module_name in test_modules:
-        if modpath:
-            module_label = modpath + '.' + module_name
-        else:
-            module_label = module_name
+    for test_module in get_test_modules():
         if not found_start:
-            if start_at and _module_match_label(module_label, start_at):
+            if start_at and _module_match_label(test_module, start_at):
                 found_start = True
-            elif start_after and _module_match_label(module_label, start_after):
+            elif start_after and _module_match_label(test_module, start_after):
                 found_start = True
                 continue
             else:
@@ -229,19 +237,20 @@ def setup(verbosity, test_labels, start_at, start_after):
         # if the module (or an ancestor) was named on the command line, or
         # no modules were named (i.e., run all), import
         # this module and add it to INSTALLED_APPS.
-        module_found_in_labels = not test_labels or any(
-            _module_match_label(module_label, label) for label in test_labels_set
-        )
+        if test_labels and not any(
+            _module_match_label(test_module, label) for label in test_labels_set
+        ):
+            continue
 
-        if module_name in CONTRIB_TESTS_TO_APPS and module_found_in_labels:
-            for contrib_app in CONTRIB_TESTS_TO_APPS[module_name]:
+        if test_module in CONTRIB_TESTS_TO_APPS:
+            for contrib_app in CONTRIB_TESTS_TO_APPS[test_module]:
                 if contrib_app not in settings.INSTALLED_APPS:
                     settings.INSTALLED_APPS.append(contrib_app)
 
-        if module_found_in_labels and module_label not in installed_app_names:
+        if test_module not in installed_app_names:
             if verbosity >= 2:
-                print("Importing application %s" % module_name)
-            settings.INSTALLED_APPS.append(module_label)
+                print("Importing application %s" % test_module)
+            settings.INSTALLED_APPS.append(test_module)
 
     # Add contrib.gis to INSTALLED_APPS if needed (rather than requiring
     # @override_settings(INSTALLED_APPS=...) on all test cases.
@@ -309,7 +318,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
             msg += " with up to %d processes" % max_parallel
         print(msg)
 
-    state = setup(verbosity, test_labels, start_at, start_after)
+    state = setup(verbosity, start_at, start_after, test_labels)
     # Run the test suite, including the extra validation tests.
     if not hasattr(settings, 'TEST_RUNNER'):
         settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
@@ -335,8 +344,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
 
 
 def get_app_test_labels(verbosity, start_at, start_after):
-    test_labels = []
-    state = setup(verbosity, test_labels, start_at, start_after)
+    state = setup(verbosity, start_at, start_after)
     test_labels = get_installed()
     teardown(state)
     return test_labels

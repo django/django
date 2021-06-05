@@ -24,7 +24,8 @@ from django.test import (
 from django.utils import translation
 from django.utils.formats import (
     date_format, get_format, get_format_modules, iter_format_modules, localize,
-    localize_input, reset_format_cache, sanitize_separators, time_format,
+    localize_input, reset_format_cache, sanitize_separators,
+    sanitize_strftime_format, time_format,
 )
 from django.utils.numberformat import format as nformat
 from django.utils.safestring import SafeString, mark_safe
@@ -1073,6 +1074,51 @@ class FormattingTests(SimpleTestCase):
             for value, expected in tests:
                 with self.subTest(value=value):
                     self.assertEqual(localize_input(value), expected)
+
+    def test_sanitize_strftime_format(self):
+        for year in (1, 99, 999, 1000):
+            dt = datetime.date(year, 1, 1)
+            for fmt, expected in [
+                ('%C', '%02d' % (year // 100)),
+                ('%F', '%04d-01-01' % year),
+                ('%G', '%04d' % year),
+                ('%Y', '%04d' % year),
+            ]:
+                with self.subTest(year=year, fmt=fmt):
+                    fmt = sanitize_strftime_format(fmt)
+                    self.assertEqual(dt.strftime(fmt), expected)
+
+    def test_sanitize_strftime_format_with_escaped_percent(self):
+        dt = datetime.date(1, 1, 1)
+        for fmt, expected in [
+            ('%%C', '%C'),
+            ('%%F', '%F'),
+            ('%%G', '%G'),
+            ('%%Y', '%Y'),
+            ('%%%%C', '%%C'),
+            ('%%%%F', '%%F'),
+            ('%%%%G', '%%G'),
+            ('%%%%Y', '%%Y'),
+        ]:
+            with self.subTest(fmt=fmt):
+                fmt = sanitize_strftime_format(fmt)
+                self.assertEqual(dt.strftime(fmt), expected)
+
+        for year in (1, 99, 999, 1000):
+            dt = datetime.date(year, 1, 1)
+            for fmt, expected in [
+                ('%%%C', '%%%02d' % (year // 100)),
+                ('%%%F', '%%%04d-01-01' % year),
+                ('%%%G', '%%%04d' % year),
+                ('%%%Y', '%%%04d' % year),
+                ('%%%%%C', '%%%%%02d' % (year // 100)),
+                ('%%%%%F', '%%%%%04d-01-01' % year),
+                ('%%%%%G', '%%%%%04d' % year),
+                ('%%%%%Y', '%%%%%04d' % year),
+            ]:
+                with self.subTest(year=year, fmt=fmt):
+                    fmt = sanitize_strftime_format(fmt)
+                    self.assertEqual(dt.strftime(fmt), expected)
 
     def test_sanitize_separators(self):
         """

@@ -42,15 +42,30 @@ class StaticFilesStorage(FileSystemStorage):
 
 
 class HashedFilesMixin:
-    default_template = """url("%s")"""
+    default_template = """url("%(url)s")"""
     max_post_process_passes = 5
     patterns = (
         ("*.css", (
-            r"""(url\(['"]{0,1}\s*(.*?)["']{0,1}\))""",
-            (r"""(@import\s*["']\s*(.*?)["'])""", """@import url("%s")"""),
+            r"""(?P<matched>url\(['"]{0,1}\s*(?P<url>.*?)["']{0,1}\))""",
+            (
+                r"""(?P<matched>@import\s*["']\s*(?P<url>.*?)["'])""",
+                """@import url("%(url)s")""",
+            ),
         )),
         ('*.js', (
-            (r'(?m)^(//# (?-i:sourceMappingURL)=(.*))$', '//# sourceMappingURL=%s'),
+            (
+                r'(?P<matched>)^(//# (?-i:sourceMappingURL)=(?P<url>.*))$',
+                '//# sourceMappingURL=%(url)s',
+            ),
+            (
+                r"""(?P<matched>import\s+(?s:(?P<imports>.*?))\s*from\s*["'](?P<url>.*?)["'])""",
+                'import %(imports)s from "%(url)s"',
+            ),
+            (
+                r"""(?P<matched>export\s+(?s:(?P<exports>.*?))\s*from\s*["'](?P<url>.*?)["'])""",
+                'export %(exports)s from "%(url)s"',
+            ),
+            (r"""(?P<matched>import\(["'](?P<url>.*?)["']\))""", 'import("%(url)s")'),
         )),
     )
     keep_intermediate_files = True
@@ -163,7 +178,9 @@ class HashedFilesMixin:
             This requires figuring out which files the matched URL resolves
             to and calling the url() method of the storage.
             """
-            matched, url = matchobj.groups()
+            matches = matchobj.groupdict()
+            matched = matches['matched']
+            url = matches['url']
 
             # Ignore absolute/protocol-relative and data-uri URLs.
             if re.match(r'^[a-z]+:', url):
@@ -199,7 +216,8 @@ class HashedFilesMixin:
                 transformed_url += ('?#' if '?#' in url else '#') + fragment
 
             # Return the hashed version to the file
-            return template % unquote(transformed_url)
+            matches['url'] = unquote(transformed_url)
+            return template % matches
 
         return converter
 

@@ -89,6 +89,18 @@ class RelatedField(FieldCacheMixin, Field):
     many_to_many = False
     many_to_one = False
 
+    def __init__(
+        self,
+        related_name=None,
+        related_query_name=None,
+        limit_choices_to=None,
+        **kwargs,
+    ):
+        self._related_name = related_name
+        self._related_query_name = related_query_name
+        self._limit_choices_to = limit_choices_to
+        super().__init__(**kwargs)
+
     @cached_property
     def related_model(self):
         # Can't cache this property until all the models are loaded.
@@ -319,12 +331,12 @@ class RelatedField(FieldCacheMixin, Field):
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        if self.remote_field.limit_choices_to:
-            kwargs['limit_choices_to'] = self.remote_field.limit_choices_to
-        if self.remote_field.related_name is not None:
-            kwargs['related_name'] = self.remote_field.related_name
-        if self.remote_field.related_query_name is not None:
-            kwargs['related_query_name'] = self.remote_field.related_query_name
+        if self._limit_choices_to:
+            kwargs['limit_choices_to'] = self._limit_choices_to
+        if self._related_name is not None:
+            kwargs['related_name'] = self._related_name
+        if self._related_query_name is not None:
+            kwargs['related_query_name'] = self._related_query_name
         return name, path, args, kwargs
 
     def get_forward_related_filter(self, obj):
@@ -471,7 +483,13 @@ class ForeignObject(RelatedField):
                 on_delete=on_delete,
             )
 
-        super().__init__(rel=rel, **kwargs)
+        super().__init__(
+            rel=rel,
+            related_name=related_name,
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
+            **kwargs,
+        )
 
         self.from_fields = from_fields
         self.to_fields = to_fields
@@ -825,6 +843,9 @@ class ForeignKey(ForeignObject):
         super().__init__(
             to,
             on_delete,
+            related_name=related_name,
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
             from_fields=[RECURSIVE_RELATIONSHIP_CONSTANT],
             to_fields=[to_field],
             **kwargs,
@@ -1174,7 +1195,12 @@ class ManyToManyField(RelatedField):
         )
         self.has_null_arg = 'null' in kwargs
 
-        super().__init__(**kwargs)
+        super().__init__(
+            related_name=related_name,
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
+            **kwargs,
+        )
 
         self.db_table = db_table
         self.swappable = swappable

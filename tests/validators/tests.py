@@ -136,6 +136,16 @@ TEST_DATA = [
     (validate_ipv4_address, '1.1.1.1\n', ValidationError),
     (validate_ipv4_address, '٧.2٥.3٣.243', ValidationError),
 
+    # Leading zeros are forbidden to avoid ambiguity with the octal notation.
+    (validate_ipv4_address, '000.000.000.000', ValidationError),
+    (validate_ipv4_address, '016.016.016.016', ValidationError),
+    (validate_ipv4_address, '192.168.000.001', ValidationError),
+    (validate_ipv4_address, '01.2.3.4', ValidationError),
+    (validate_ipv4_address, '01.2.3.4', ValidationError),
+    (validate_ipv4_address, '1.02.3.4', ValidationError),
+    (validate_ipv4_address, '1.2.03.4', ValidationError),
+    (validate_ipv4_address, '1.2.3.04', ValidationError),
+
     # validate_ipv6_address uses django.utils.ipv6, which
     # is tested in much greater detail in its own testcase
     (validate_ipv6_address, 'fe80::1', None),
@@ -160,6 +170,16 @@ TEST_DATA = [
     (validate_ipv46_address, '1:2', ValidationError),
     (validate_ipv46_address, '::zzz', ValidationError),
     (validate_ipv46_address, '12345::', ValidationError),
+
+    # Leading zeros are forbidden to avoid ambiguity with the octal notation.
+    (validate_ipv46_address, '000.000.000.000', ValidationError),
+    (validate_ipv46_address, '016.016.016.016', ValidationError),
+    (validate_ipv46_address, '192.168.000.001', ValidationError),
+    (validate_ipv46_address, '01.2.3.4', ValidationError),
+    (validate_ipv46_address, '01.2.3.4', ValidationError),
+    (validate_ipv46_address, '1.02.3.4', ValidationError),
+    (validate_ipv46_address, '1.2.03.4', ValidationError),
+    (validate_ipv46_address, '1.2.3.04', ValidationError),
 
     (validate_comma_separated_integer_list, '1', None),
     (validate_comma_separated_integer_list, '12', None),
@@ -226,9 +246,15 @@ TEST_DATA = [
     (URLValidator(), None, ValidationError),
     (URLValidator(), 56, ValidationError),
     (URLValidator(), 'no_scheme', ValidationError),
-    # Trailing newlines not accepted
+    # Newlines and tabs are not accepted.
     (URLValidator(), 'http://www.djangoproject.com/\n', ValidationError),
     (URLValidator(), 'http://[::ffff:192.9.5.5]\n', ValidationError),
+    (URLValidator(), 'http://www.djangoproject.com/\r', ValidationError),
+    (URLValidator(), 'http://[::ffff:192.9.5.5]\r', ValidationError),
+    (URLValidator(), 'http://www.django\rproject.com/', ValidationError),
+    (URLValidator(), 'http://[::\rffff:192.9.5.5]', ValidationError),
+    (URLValidator(), 'http://\twww.djangoproject.com/', ValidationError),
+    (URLValidator(), 'http://\t[::ffff:192.9.5.5]', ValidationError),
     # Trailing junk does not take forever to reject
     (URLValidator(), 'http://www.asdasdasdasdsadfm.com.br ', ValidationError),
     (URLValidator(), 'http://www.asdasdasdasdsadfm.com.br z', ValidationError),

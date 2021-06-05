@@ -1,6 +1,8 @@
+from django.contrib.gis.db import models
 from django.db import connection
 from django.db.models import Index
 from django.test import TransactionTestCase
+from django.test.utils import isolate_apps
 
 from .models import City
 
@@ -36,6 +38,30 @@ class SchemaIndexesTests(TransactionTestCase):
         self.assertIn(
             '%s USING ' % editor.quote_name(City._meta.db_table),
             str(index.create_sql(City, editor)),
+        )
+
+    @isolate_apps('gis_tests.geoapp')
+    def test_namespaced_db_table(self):
+        if not connection.ops.postgis:
+            self.skipTest('PostGIS-specific test.')
+
+        class SchemaCity(models.Model):
+            point = models.PointField()
+
+            class Meta:
+                app_label = 'geoapp'
+                db_table = 'django_schema"."geoapp_schema_city'
+
+        index = Index(fields=['point'])
+        editor = connection.schema_editor()
+        create_index_sql = str(index.create_sql(SchemaCity, editor))
+        self.assertIn(
+            '%s USING ' % editor.quote_name(SchemaCity._meta.db_table),
+            create_index_sql,
+        )
+        self.assertIn(
+            'CREATE INDEX "geoapp_schema_city_point_9ed70651_id" ',
+            create_index_sql,
         )
 
     def test_index_name(self):

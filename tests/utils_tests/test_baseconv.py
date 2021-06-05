@@ -1,10 +1,15 @@
 from unittest import TestCase
 
-from django.utils.baseconv import (
-    BaseConverter, base2, base16, base36, base56, base62, base64,
-)
+from django.test import ignore_warnings
+from django.utils.deprecation import RemovedInDjango50Warning
+
+with ignore_warnings(category=RemovedInDjango50Warning):
+    from django.utils.baseconv import (
+        BaseConverter, base2, base16, base36, base56, base62, base64,
+    )
 
 
+# RemovedInDjango50Warning
 class TestBaseConv(TestCase):
 
     def test_baseconv(self):
