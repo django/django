@@ -291,9 +291,9 @@ class BaseForm:
         hidden_fields = []
         top_errors = self.non_field_errors()
         for name, field in self.fields.items():
-            bf = self[name]
-            bf_errors = self.error_class(bf.errors)
-            if bf.is_hidden:
+            bound_field = self[name]
+            bf_errors = self.error_class(bound_field.errors)
+            if bound_field.is_hidden:
                 if bf_errors:
                     top_errors.extend(
                         [
@@ -301,9 +301,9 @@ class BaseForm:
                             for e in bf_errors
                         ]
                     )
-                hidden_fields.append(bf)
+                hidden_fields.append(bound_field)
             else:
-                bound_fields.append((bf, mark_safe(str(bf_errors))))
+                bound_fields.append((bound_field, mark_safe(str(bf_errors))))
         return {
             'form': self,
             'fields': bound_fields,
