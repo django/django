@@ -1036,7 +1036,7 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
 
         bound_field = TestForm()['hash_field']
         self.assertEqual(bound_field.field.widget.id_for_label('id'), None)
-        self.assertEqual(bound_field.label_tag(), '<label>Hash field:</label>')
+        self.assertHTMLEqual(bound_field.label_tag(), '<label>Hash field:</label>')
 
 
 class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
