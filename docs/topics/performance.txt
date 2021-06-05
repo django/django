@@ -411,7 +411,7 @@ performance gains for your application to outweigh the potential risks.
 With these caveats in mind, you should be aware of:
 
 `PyPy <https://www.pypy.org/>`_
-~~~~~~~~~~~~~~~~~~~~~~~~~~~----
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `PyPy <https://www.pypy.org/>`_ is an implementation of Python in Python itself
 (the 'standard' Python implementation is in C). PyPy can offer substantial
