@@ -2,6 +2,7 @@ import unittest
 
 from django.core.checks import Error, Warning
 from django.core.checks.model_checks import _check_lazy_references
+from django.core.exceptions import FieldError
 from django.db import connection, connections, models
 from django.db.models.functions import Abs, Lower, Round
 from django.db.models.signals import post_init
@@ -929,16 +930,42 @@ class ShadowingFieldsTests(SimpleTestCase):
 @isolate_apps('invalid_models_tests')
 class OtherModelTests(SimpleTestCase):
 
+    def test_primary_key_generation_failure(self):
+        invalid_id = models.IntegerField(primary_key=False)
+
+        msg = "Adding a generated Primary Key field to model Model failed."
+
+        with self.assertRaisesMessage(FieldError, msg):
+            class Model(models.Model):
+                id = invalid_id
+
     def test_unique_primary_key(self):
         invalid_id = models.IntegerField(primary_key=False)
 
-        msg = (
-            "Class Model has an attribute 'id' which would be "
-            "overridden. Check definitions."
-        )
-        with self.assertRaisesMessage(AttributeError, msg):
-            class Model(models.Model):
-                id = invalid_id
+        class CarelessAttrGenerationModel(models.Model):
+
+            @classmethod
+            def add_to_class(cls, name, value):
+                """
+                This is essentially an old definition of add_to_class()
+                Newer definition makes sure not to override attributes
+                defined in the same class
+                """
+                if hasattr(value, 'contribute_to_class'):
+                    value.contribute_to_class(cls, name)
+                else:
+                    setattr(cls, name, value)
+
+            id = invalid_id
+
+        self.assertEqual(CarelessAttrGenerationModel.check(), [
+            Error(
+                "'id' can only be used as a field name if the field also sets "
+                "'primary_key=True'.",
+                obj=CarelessAttrGenerationModel,
+                id='models.E004',
+            ),
+        ])
 
     def test_ordering_non_iterable(self):
         class Model(models.Model):

@@ -283,8 +283,7 @@ class Options:
                 self.setup_pk(field)
             else:
                 pk_class = self._get_default_pk_class()
-                auto = pk_class(verbose_name='ID', primary_key=True, auto_created=True)
-                model.add_to_class('id', auto)
+                model.create_auto_pk(pk_class)
 
     def add_manager(self, manager):
         self.local_managers.append(manager)

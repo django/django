@@ -332,6 +332,13 @@ class ModelBase(type):
         else:
             setattr(cls, name, value)
 
+    def create_auto_pk(cls, pk_class):
+        pk_field = pk_class(verbose_name='ID', primary_key=True, auto_created=True)
+        try:
+            cls.add_to_class('id', pk_field)
+        except Exception:
+            raise FieldError(f"Adding a generated Primary Key field to model {cls.__name__} failed.")
+
     def _prepare(cls):
         """Create some methods once self._meta has been populated."""
         opts = cls._meta
