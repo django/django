@@ -223,16 +223,16 @@ def setup(verbosity, start_at, start_after, test_labels=None):
         # Exact or ancestor match.
         return module_name == label or module_name.startswith(label + '.')
 
-    found_start = not (start_at or start_after)
+    start_label = start_at or start_after
     installed_app_names = set(get_installed())
     for test_module in get_test_modules():
-        if not found_start:
-            if start_at and _module_match_label(test_module, start_at):
-                found_start = True
-            elif start_after and _module_match_label(test_module, start_after):
-                found_start = True
+        if start_label:
+            if not _module_match_label(test_module, start_label):
                 continue
-            else:
+            start_label = ''
+            if not start_at:
+                assert start_after
+                # Skip the current one before starting.
                 continue
         # if the module (or an ancestor) was named on the command line, or
         # no modules were named (i.e., run all), import
