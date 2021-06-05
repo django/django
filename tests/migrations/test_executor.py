@@ -104,6 +104,29 @@ class ExecutorTests(MigrationTestBase):
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_book")
 
+    @override_settings(
+        MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed'},
+    )
+    def test_migrate_backward_to_squashed_migration(self):
+        executor = MigrationExecutor(connection)
+        try:
+            self.assertTableNotExists('migrations_author')
+            self.assertTableNotExists('migrations_book')
+            executor.migrate([('migrations', '0001_squashed_0002')])
+            self.assertTableExists('migrations_author')
+            self.assertTableExists('migrations_book')
+            executor.loader.build_graph()
+            # Migrate backward to a squashed migration.
+            executor.migrate([('migrations', '0001_initial')])
+            self.assertTableExists('migrations_author')
+            self.assertTableNotExists('migrations_book')
+        finally:
+            # Unmigrate everything.
+            executor = MigrationExecutor(connection)
+            executor.migrate([('migrations', None)])
+            self.assertTableNotExists('migrations_author')
+            self.assertTableNotExists('migrations_book')
+
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_non_atomic"})
     def test_non_atomic_migration(self):
         """
@@ -733,6 +756,7 @@ class FakeLoader:
     def __init__(self, graph, applied):
         self.graph = graph
         self.applied_migrations = applied
+        self.replace_migrations = True
 
 
 class FakeMigration:
