@@ -171,10 +171,8 @@ def number_format(value, decimal_pos=None, use_l10n=None, force_grouping=False):
     If use_l10n is provided and is not None, it forces the value to
     be localized (or not), overriding the value of settings.USE_L10N.
     """
-    if use_l10n or (use_l10n is None and settings.USE_L10N):
-        lang = get_language()
-    else:
-        lang = None
+    use_l10n = use_l10n or (use_l10n is None and settings.USE_L10N)
+    lang = get_language() if use_l10n else None
     return numberformat.format(
         value,
         get_format('DECIMAL_SEPARATOR', lang, use_l10n=use_l10n),
