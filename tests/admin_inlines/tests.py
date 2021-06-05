@@ -143,10 +143,10 @@ class TestInline(TestDataMixin, TestCase):
         }
         response = self.client.post(reverse('admin:admin_inlines_titlecollection_add'), data)
         # Here colspan is "4": two fields (title1 and title2), one hidden field and the delete checkbox.
-        self.assertContains(
-            response,
+        self.assertInHTML(
             '<tr class="row-form-errors"><td colspan="4"><ul class="errorlist nonfield">'
-            '<li>The two titles must be the same</li></ul></td></tr>'
+            '<li>The two titles must be the same</li></ul></td></tr>',
+            response.content.decode(),
         )
 
     def test_no_parent_callable_lookup(self):
