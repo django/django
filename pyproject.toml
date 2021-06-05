@@ -6,9 +6,12 @@ build-backend = 'setuptools.build_meta:__legacy__'
 skip-string-normalization = true
 extend-exclude = '''
 /(
-  django/forms/models.py
-  | docs
-  | scripts
+  (
+    docs
+    | scripts
+  )/
+  | django/forms/models.py
+  | tests/gis_tests/test_spatialrefsys.py
   | tests/test_runner_apps/tagged/tests_syntax_error.py
-)/
+)
 '''
