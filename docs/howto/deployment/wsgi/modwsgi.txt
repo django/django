@@ -133,14 +133,14 @@ follows the same version numbering as the mod_wsgi package on PyPi. If
 you are on Windows and your Apache distribution is not installed into 
 the directory C:/Apache24, first set the environment variable 
 MOD_WSGI_APACHE_ROOTDIR to the directory containing the Apache distribution.
- Ensure you use forward slashes in the directory path. The directory path 
+Ensure you use forward slashes in the directory path. The directory path 
 should not include path components with spaces in the name. Note that nothing
- will be copied into your Apache installation at this point. As a result, 
+will be copied into your Apache installation at this point. As a result, 
 you do not need to run this as the root user unless installing it into a site
- wide Python installation rather than a Python virtual environment. It is 
+wide Python installation rather than a Python virtual environment. It is 
 recommended you always use Python virtual environments and never install any
- Python package directly into the system Python installation. On a UNIX type
- system, to verify that the installation was successful, run the 
+Python package directly into the system Python installation. On a UNIX type
+system, to verify that the installation was successful, run the 
 mod_wsgi-express script with the start-server command:
 
 .. code-block:: apache
@@ -148,25 +148,25 @@ mod_wsgi-express script with the start-server command:
     mod_wsgi-express start-server
 
 This will start up Apache/mod_wsgi on port 8000. You can then verify that the
- installation worked by pointing your browser at:
+installation worked by pointing your browser at:
 
 .. code-block:: apache
 
     http://localhost:8000/
 
 When started in this way, the Apache web server will stay in the foreground.
- To stop the Apache server, use CTRL-C. For a simple WSGI application 
+To stop the Apache server, use CTRL-C. For a simple WSGI application 
 contained in a WSGI script file called wsgi.py, in the current directory,
- you can now run:
+you can now run:
 
 .. code-block:: apache
     
     mod_wsgi-express start-server wsgi.py
 
 This instance of the Apache web server will be completely independent of,
- and will not interfere with any existing instance of Apache you may have
- running on port 80. If you already have another web server running on port
- 8000, you can override the port to be used using the --port option:
+and will not interfere with any existing instance of Apache you may have
+running on port 80. If you already have another web server running on port
+8000, you can override the port to be used using the --port option:
 
 .. code-block:: apache
 
@@ -179,7 +179,7 @@ For a complete list of options you can run:
     mod_wsgi-express start-server --help
 
 For further information related to using mod_wsgi-express see the main
- mod_wsgi documentation.
+mod_wsgi documentation.
 
 .. _serving-files:
 
