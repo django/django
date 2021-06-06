@@ -289,7 +289,7 @@ class BaseForm:
         """
         bound_fields = []
         hidden_fields = []
-        top_errors = self.non_field_errors()
+        top_errors = self.non_field_errors().copy()
         for name, field in self.fields.items():
             bound_field = self[name]
             bf_errors = self.error_class(bound_field.errors)
