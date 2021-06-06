@@ -127,18 +127,19 @@ def get_test_modules():
     for dirname in discovery_dirs:
         dirpath = os.path.join(RUNTESTS_DIR, dirname)
         subdirs_to_skip = SUBDIRS_TO_SKIP[dirname]
-        for f in os.scandir(dirpath):
-            if (
-                '.' in f.name or
-                os.path.basename(f.name) in subdirs_to_skip or
-                f.is_file() or
-                not os.path.exists(os.path.join(f.path, '__init__.py'))
-            ):
-                continue
-            test_module = f.name
-            if dirname:
-                test_module = dirname + '.' + test_module
-            yield test_module
+        with os.scandir(dirpath) as entries:
+            for f in entries:
+                if (
+                    '.' in f.name or
+                    os.path.basename(f.name) in subdirs_to_skip or
+                    f.is_file() or
+                    not os.path.exists(os.path.join(f.path, '__init__.py'))
+                ):
+                    continue
+                test_module = f.name
+                if dirname:
+                    test_module = dirname + '.' + test_module
+                yield test_module
 
 
 def get_installed():
