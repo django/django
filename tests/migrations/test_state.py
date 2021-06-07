@@ -1088,7 +1088,7 @@ class ModelStateTests(SimpleTestCase):
             'Tag',
             [
                 ('id', models.AutoField(primary_key=True)),
-                # Purposedly re-ordered.
+                # Purposely re-ordered.
                 ('hidden', models.BooleanField()),
                 ('name', models.CharField(max_length=100)),
             ],
