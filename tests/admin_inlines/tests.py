@@ -1367,7 +1367,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_course_add'))
         toggle_button = self.selenium.find_element_by_css_selector('#toggle-nav-sidebar')
         toggle_button.click()
-        # Each combination of horizontal/vertical fiter with stacked/tabular
+        # Each combination of horizontal/vertical filter with stacked/tabular
         # inlines.
         tests = [
             'admin:admin_inlines_course_add',
