@@ -463,6 +463,10 @@ Miscellaneous
   :class:`~django.utils.feedgenerator.Atom1Feed`, and their subclasses now
   emit elements with no content as self-closing tags.
 
+* ``NodeList.render()`` no longer casts the output of ``render()`` method for
+  individual nodes to a string. ``Node.render()`` should always return a string
+  as documented.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0

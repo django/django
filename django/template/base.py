@@ -59,7 +59,7 @@ from django.template.context import BaseContext
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
 from django.utils.regex_helper import _lazy_re_compile
-from django.utils.safestring import SafeData, mark_safe
+from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import (
     get_text_list, smart_split, unescape_string_literal,
 )
@@ -954,14 +954,9 @@ class NodeList(list):
     contains_nontext = False
 
     def render(self, context):
-        bits = []
-        for node in self:
-            if isinstance(node, Node):
-                bit = node.render_annotated(context)
-            else:
-                bit = node
-            bits.append(str(bit))
-        return mark_safe(''.join(bits))
+        return SafeString(''.join([
+            node.render_annotated(context) for node in self
+        ]))
 
     def get_nodes_by_type(self, nodetype):
         "Return a list of all nodes of the given type"
