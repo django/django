@@ -125,8 +125,14 @@ class CsrfViewMiddlewareTestMixin:
         """
         self._check_bad_or_missing_cookie(None, REASON_NO_CSRF_COOKIE)
 
-    def _check_bad_or_missing_token(self, expected, token=None):
-        req = self._get_POST_csrf_cookie_request(post_token=token)
+    def _check_bad_or_missing_token(
+        self, expected, post_token=None, meta_token=None, token_header=None,
+    ):
+        req = self._get_POST_csrf_cookie_request(
+            post_token=post_token,
+            meta_token=meta_token,
+            token_header=token_header,
+        )
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         with self.assertLogs('django.security.csrf', 'WARNING') as cm:
@@ -140,14 +146,34 @@ class CsrfViewMiddlewareTestMixin:
         middleware rejects the incoming request.
         """
         cases = [
-            (None, REASON_CSRF_TOKEN_MISSING),
-            (64 * '*', 'CSRF token has invalid characters.'),
-            (16 * 'a', 'CSRF token has incorrect length.'),
-            (64 * 'a', 'CSRF token incorrect.'),
+            (None, None, REASON_CSRF_TOKEN_MISSING),
+            (16 * 'a', None, 'CSRF token has incorrect length.'),
+            (64 * '*', None, 'CSRF token has invalid characters.'),
+            (64 * 'a', None, 'CSRF token incorrect.'),
+            (None, 16 * 'a', 'CSRF token has incorrect length.'),
+            (None, 64 * '*', 'CSRF token has invalid characters.'),
+            (None, 64 * 'a', 'CSRF token incorrect.'),
         ]
-        for token, expected in cases:
-            with self.subTest(token=token):
-                self._check_bad_or_missing_token(expected, token)
+        for post_token, meta_token, expected in cases:
+            with self.subTest(post_token=post_token, meta_token=meta_token):
+                self._check_bad_or_missing_token(
+                    expected,
+                    post_token=post_token,
+                    meta_token=meta_token,
+                )
+
+    @override_settings(CSRF_HEADER_NAME='HTTP_X_CSRFTOKEN_CUSTOMIZED')
+    def test_csrf_cookie_bad_token_custom_header(self):
+        """
+        If a CSRF cookie is present and an invalid token is passed via a
+        custom CSRF_HEADER_NAME, the middleware rejects the incoming request.
+        """
+        expected = 'CSRF token has incorrect length.'
+        self._check_bad_or_missing_token(
+            expected,
+            meta_token=16 * 'a',
+            token_header='HTTP_X_CSRFTOKEN_CUSTOMIZED',
+        )
 
     def test_process_request_csrf_cookie_and_token(self):
         """
