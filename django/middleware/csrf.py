@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core.exceptions import DisallowedHost, ImproperlyConfigured
+from django.http.request import HttpHeaders
 from django.urls import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.crypto import constant_time_compare, get_random_string
@@ -28,7 +29,6 @@ REASON_BAD_ORIGIN = "Origin checking failed - %s does not match any trusted orig
 REASON_NO_REFERER = "Referer checking failed - no Referer."
 REASON_BAD_REFERER = "Referer checking failed - %s does not match any trusted origins."
 REASON_NO_CSRF_COOKIE = "CSRF cookie not set."
-REASON_CSRF_TOKEN_INCORRECT = 'CSRF token incorrect.'
 REASON_CSRF_TOKEN_MISSING = 'CSRF token missing.'
 REASON_MALFORMED_REFERER = "Referer checking failed - Referer is malformed."
 REASON_INSECURE_REFERER = "Referer checking failed - Referer is insecure while host is secure."
@@ -315,6 +315,13 @@ class CsrfViewMiddleware(MiddlewareMixin):
         if not is_same_domain(referer.netloc, good_referer):
             raise RejectRequest(REASON_BAD_REFERER % referer.geturl())
 
+    def _bad_token_message(self, reason, token_source):
+        if token_source != 'POST':
+            # Assume it is a settings.CSRF_HEADER_NAME value.
+            header_name = HttpHeaders.parse_header_name(token_source)
+            token_source = f'the {header_name!r} HTTP header'
+        return f'CSRF token from {token_source} {reason}.'
+
     def _check_token(self, request):
         # Access csrf_token via self._get_token() as rotate_token() may have
         # been called by an authentication middleware during the
@@ -349,14 +356,19 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 request_csrf_token = request.META[settings.CSRF_HEADER_NAME]
             except KeyError:
                 raise RejectRequest(REASON_CSRF_TOKEN_MISSING)
+            token_source = settings.CSRF_HEADER_NAME
+        else:
+            token_source = 'POST'
 
         try:
             request_csrf_token = _sanitize_token(request_csrf_token)
         except InvalidTokenFormat as exc:
-            raise RejectRequest(f'CSRF token {exc.reason}.')
+            reason = self._bad_token_message(exc.reason, token_source)
+            raise RejectRequest(reason)
 
         if not _compare_masked_tokens(request_csrf_token, csrf_token):
-            raise RejectRequest(REASON_CSRF_TOKEN_INCORRECT)
+            reason = self._bad_token_message('incorrect', token_source)
+            raise RejectRequest(reason)
 
     def process_request(self, request):
         try:
