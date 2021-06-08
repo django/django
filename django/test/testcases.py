@@ -179,10 +179,13 @@ class SimpleTestCase(unittest.TestCase):
         if cls._overridden_settings:
             cls._cls_overridden_context = override_settings(**cls._overridden_settings)
             cls._cls_overridden_context.enable()
+            cls.addClassCleanup(cls._cls_overridden_context.disable)
         if cls._modified_settings:
             cls._cls_modified_context = modify_settings(cls._modified_settings)
             cls._cls_modified_context.enable()
+            cls.addClassCleanup(cls._cls_modified_context.disable)
         cls._add_databases_failures()
+        cls.addClassCleanup(cls._remove_databases_failures)
 
     @classmethod
     def _validate_databases(cls):
@@ -226,17 +229,6 @@ class SimpleTestCase(unittest.TestCase):
             for name, _ in cls._disallowed_connection_methods:
                 method = getattr(connection, name)
                 setattr(connection, name, method.wrapped)
-
-    @classmethod
-    def tearDownClass(cls):
-        cls._remove_databases_failures()
-        if hasattr(cls, '_cls_modified_context'):
-            cls._cls_modified_context.disable()
-            delattr(cls, '_cls_modified_context')
-        if hasattr(cls, '_cls_overridden_context'):
-            cls._cls_overridden_context.disable()
-            delattr(cls, '_cls_overridden_context')
-        super().tearDownClass()
 
     def __call__(self, result=None):
         """
@@ -1221,14 +1213,12 @@ class TestCase(TransactionTestCase):
                         call_command('loaddata', *cls.fixtures, **{'verbosity': 0, 'database': db_name})
                     except Exception:
                         cls._rollback_atomics(cls.cls_atomics)
-                        cls._remove_databases_failures()
                         raise
             pre_attrs = cls.__dict__.copy()
             try:
                 cls.setUpTestData()
             except Exception:
                 cls._rollback_atomics(cls.cls_atomics)
-                cls._remove_databases_failures()
                 raise
             for name, value in cls.__dict__.items():
                 if value is not pre_attrs.get(name):
@@ -1634,10 +1624,6 @@ class SerializeMixin:
     @classmethod
     def setUpClass(cls):
         cls._lockfile = open(cls.lockfile)
+        cls.addClassCleanup(cls._lockfile.close)
         locks.lock(cls._lockfile, locks.LOCK_EX)
         super().setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        cls._lockfile.close()
