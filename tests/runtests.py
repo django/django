@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 import warnings
+from pathlib import Path
 
 try:
     import django
@@ -142,18 +143,34 @@ def get_test_modules(gis_enabled):
                 yield test_module
 
 
+def get_label_module(label):
+    """Return the top-level module part for a test label."""
+    path = Path(label)
+    if len(path.parts) == 1:
+        # Interpret the label as a dotted module name.
+        return label.split('.')[0]
+
+    # Otherwise, interpret the label as a path. Check existence first to
+    # provide a better error message than relative_to() if it doesn't exist.
+    if not path.exists():
+        raise RuntimeError(f'Test label path {label} does not exist')
+    path = path.resolve()
+    rel_path = path.relative_to(RUNTESTS_DIR)
+    return rel_path.parts[0]
+
+
 def get_filtered_test_modules(start_at, start_after, gis_enabled, test_labels=None):
     if test_labels is None:
         test_labels = []
     # Reduce each test label to just the top-level module part.
-    test_labels_set = set()
+    label_modules = set()
     for label in test_labels:
-        test_module = label.split('.')[0]
-        test_labels_set.add(test_module)
+        test_module = get_label_module(label)
+        label_modules.add(test_module)
 
     # It would be nice to put this validation earlier but it must come after
     # django.setup() so that connection.features.gis_enabled can be accessed.
-    if 'gis_tests' in test_labels_set and not gis_enabled:
+    if 'gis_tests' in label_modules and not gis_enabled:
         print('Aborting: A GIS database backend is required to run gis_tests.')
         sys.exit(1)
 
@@ -174,7 +191,8 @@ def get_filtered_test_modules(start_at, start_after, gis_enabled, test_labels=No
         # If the module (or an ancestor) was named on the command line, or
         # no modules were named (i.e., run all), include the test module.
         if not test_labels or any(
-            _module_match_label(test_module, label) for label in test_labels_set
+            _module_match_label(test_module, label_module) for
+            label_module in label_modules
         ):
             yield test_module
 

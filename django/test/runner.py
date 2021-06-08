@@ -629,8 +629,8 @@ class DiscoverRunner:
                 assert tests is None
                 raise RuntimeError(
                     f'One of the test labels is a path to a file: {label!r}, '
-                    f'which is not supported. Use a dotted module name '
-                    f'instead.'
+                    f'which is not supported. Use a dotted module name or '
+                    f'path to a directory instead.'
                 )
             return tests
 
