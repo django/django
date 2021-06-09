@@ -141,6 +141,11 @@ class SimplifiedURLTests(SimpleTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             path('foo/<nonexistent:var>/', empty_view)
 
+    def test_invalid_view(self):
+        msg = 'view must be a callable or a list/tuple in the case of include().'
+        with self.assertRaisesMessage(TypeError, msg):
+            path('articles/', 'invalid_view')
+
     def test_whitespace_in_route(self):
         msg = (
             "URL route 'space/<int:num>/extra/<str:%stest>' cannot contain "
