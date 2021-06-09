@@ -2,6 +2,7 @@ from operator import attrgetter
 
 from django.core.exceptions import FieldError, ValidationError
 from django.db import connection, models
+from django.db.models.query_utils import DeferredAttribute
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import CaptureQueriesContext, isolate_apps
 
@@ -221,6 +222,36 @@ class ModelInheritanceTests(TestCase):
         self.assertIs(models.QuerySet[Post], models.QuerySet)
         self.assertIs(models.QuerySet[Post, Post], models.QuerySet)
         self.assertIs(models.QuerySet[Post, int, str], models.QuerySet)
+
+    def test_shadow_parent_attribute_with_field(self):
+        class ScalarParent(models.Model):
+            foo = 1
+
+        class ScalarOverride(ScalarParent):
+            foo = models.IntegerField()
+
+        self.assertEqual(type(ScalarOverride.foo), DeferredAttribute)
+
+    def test_shadow_parent_property_with_field(self):
+        class PropertyParent(models.Model):
+            @property
+            def foo(self):
+                pass
+
+        class PropertyOverride(PropertyParent):
+            foo = models.IntegerField()
+
+        self.assertEqual(type(PropertyOverride.foo), DeferredAttribute)
+
+    def test_shadow_parent_method_with_field(self):
+        class MethodParent(models.Model):
+            def foo(self):
+                pass
+
+        class MethodOverride(MethodParent):
+            foo = models.IntegerField()
+
+        self.assertEqual(type(MethodOverride.foo), DeferredAttribute)
 
 
 class ModelInheritanceDataTests(TestCase):

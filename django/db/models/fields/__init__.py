@@ -782,11 +782,7 @@ class Field(RegisterLookupMixin):
         self.model = cls
         cls._meta.add_field(self, private=private_only)
         if self.column:
-            # Don't override classmethods with the descriptor. This means that
-            # if you have a classmethod and a field with the same name, then
-            # such fields can't be deferred (we don't have a check for this).
-            if not getattr(cls, self.attname, None):
-                setattr(cls, self.attname, self.descriptor_class(self))
+            setattr(cls, self.attname, self.descriptor_class(self))
         if self.choices is not None:
             # Don't override a get_FOO_display() method defined explicitly on
             # this class, but don't check methods derived from inheritance, to

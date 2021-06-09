@@ -34,7 +34,12 @@ class AbstractInheritanceTests(SimpleTestCase):
         self.assertEqual(DerivedChild._meta.get_field('name').max_length, 50)
         self.assertEqual(DerivedGrandChild._meta.get_field('name').max_length, 50)
 
-    def test_multiple_inheritance_cannot_shadow_inherited_field(self):
+    def test_multiple_inheritance_allows_inherited_field(self):
+        """
+        Single layer multiple inheritance is as expected, deriving the
+        inherited field from the first base.
+        """
+
         class ParentA(models.Model):
             name = models.CharField(max_length=255)
 
@@ -50,14 +55,46 @@ class AbstractInheritanceTests(SimpleTestCase):
         class Child(ParentA, ParentB):
             pass
 
-        self.assertEqual(Child.check(), [
-            Error(
-                "The field 'name' clashes with the field 'name' from model "
-                "'model_inheritance.child'.",
-                obj=Child._meta.get_field('name'),
-                id='models.E006',
-            ),
-        ])
+        self.assertEqual(Child.check(), [])
+        inherited_field = Child._meta.get_field('name')
+        self.assertTrue(isinstance(inherited_field, models.CharField))
+        self.assertEqual(inherited_field.max_length, 255)
+
+    def test_diamond_shaped_multiple_inheritance_is_depth_first(self):
+        """
+        In contrast to standard Python MRO, resolution of inherited fields is
+        strictly depth-first, rather than breadth-first in diamond-shaped cases.
+
+        This is because a copy of the parent field descriptor is placed onto
+        the model class in ModelBase.__new__(), rather than the attribute
+        lookup going via bases. (It only **looks** like inheritance.)
+
+        Here, Child inherits name from Root, rather than ParentB.
+        """
+
+        class Root(models.Model):
+            name = models.CharField(max_length=255)
+
+            class Meta:
+                abstract = True
+
+        class ParentA(Root):
+            class Meta:
+                abstract = True
+
+        class ParentB(Root):
+            name = models.IntegerField()
+
+            class Meta:
+                abstract = True
+
+        class Child(ParentA, ParentB):
+            pass
+
+        self.assertEqual(Child.check(), [])
+        inherited_field = Child._meta.get_field('name')
+        self.assertTrue(isinstance(inherited_field, models.CharField))
+        self.assertEqual(inherited_field.max_length, 255)
 
     def test_target_field_may_be_pushed_down(self):
         """
