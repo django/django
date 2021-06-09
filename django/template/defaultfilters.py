@@ -553,7 +553,7 @@ def join(value, arg, autoescape=True):
 def last(value):
     """Return the last item in a list."""
     try:
-        return value[-1]
+        return value[len(value)-1]
     except IndexError:
         return ''
 
