@@ -79,7 +79,9 @@ class BaseContext:
         "Get a variable's value, starting at the current context and going upward"
         for d in reversed(self.dicts):
             if key in d:
-                return d[key]
+                value = d[key]
+                self.dicts[-1][key] = value
+                return value
         raise KeyError(key)
 
     def __delitem__(self, key):
