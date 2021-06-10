@@ -16,3 +16,7 @@ Bugfixes
 * Fixed a bug in Django 3.2 that caused a migration crash on MySQL 8.0.13+ when
   altering ``BinaryField``, ``JSONField``, or ``TextField`` to non-nullable
   (:ticket:`32503`).
+
+* Fixed a regression in Django 3.2 that caused a migration crash on MySQL
+  8.0.13+ when adding nullable ``BinaryField``, ``JSONField``, or ``TextField``
+  with a default value (:ticket:`32832`).
