@@ -196,7 +196,7 @@ class BaseForm:
         for name, field in self.fields.items():
             html_class_attr = ''
             bf = self[name]
-            bf_errors = self.error_class(bf.errors)
+            bf_errors = self.error_class(bf.errors, field=bf)
             if bf.is_hidden:
                 if bf_errors:
                     top_errors.extend(
@@ -210,9 +210,12 @@ class BaseForm:
                 if css_classes:
                     html_class_attr = ' class="%s"' % css_classes
 
+                extra_attrs = {'aria-describedby': f'{bf.id_for_label}_helptext'}
                 if errors_on_separate_row and bf_errors:
                     output.append(error_row % str(bf_errors))
+                    extra_attrs['aria-describedby'] += f' {bf.id_for_label}_errorlist'
 
+                bf.field.widget.attrs.update(extra_attrs)
                 if bf.label:
                     label = conditional_escape(bf.label)
                     label = bf.label_tag(label) or ''
@@ -220,7 +223,7 @@ class BaseForm:
                     label = ''
 
                 if field.help_text:
-                    help_text = help_text_html % field.help_text
+                    help_text = help_text_html % (bf.id_for_label, field.help_text)
                 else:
                     help_text = ''
 
@@ -271,7 +274,7 @@ class BaseForm:
             normal_row='<tr%(html_class_attr)s><th>%(label)s</th><td>%(errors)s%(field)s%(help_text)s</td></tr>',
             error_row='<tr><td colspan="2">%s</td></tr>',
             row_ender='</td></tr>',
-            help_text_html='<br><span class="helptext">%s</span>',
+            help_text_html='<br><span class="helptext", id="%s_helptext">%s</span>',
             errors_on_separate_row=False,
         )
 
@@ -281,7 +284,7 @@ class BaseForm:
             normal_row='<li%(html_class_attr)s>%(errors)s%(label)s %(field)s%(help_text)s</li>',
             error_row='<li>%s</li>',
             row_ender='</li>',
-            help_text_html=' <span class="helptext">%s</span>',
+            help_text_html=' <span class="helptext" id="%s_helptext">%s</span>',
             errors_on_separate_row=False,
         )
 
@@ -291,7 +294,7 @@ class BaseForm:
             normal_row='<p%(html_class_attr)s>%(label)s %(field)s%(help_text)s</p>',
             error_row='%s',
             row_ender='</p>',
-            help_text_html=' <span class="helptext">%s</span>',
+            help_text_html=' <span class="helptext" id="%s_helptext">%s</span>',
             errors_on_separate_row=True,
         )
 

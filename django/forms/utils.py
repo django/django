@@ -81,13 +81,15 @@ class ErrorList(UserList, list):
     """
     A collection of errors that knows how to display itself in various formats.
     """
-    def __init__(self, initlist=None, error_class=None):
+    def __init__(self, initlist=None, error_class=None, field=None):
         super().__init__(initlist)
 
         if error_class is None:
             self.error_class = 'errorlist'
         else:
             self.error_class = 'errorlist {}'.format(error_class)
+
+        self.field = field
 
     def as_data(self):
         return ValidationError(self.data).error_list
@@ -114,10 +116,19 @@ class ErrorList(UserList, list):
         if not self.data:
             return ''
 
+        li = format_html_join('', '<li>{}</li>', ((e,) for e in self))
+        if self.field:
+            return format_html(
+                '<div id="{}_{}"><ul class="{}">{}</ul></div>',
+                self.field.id_for_label,
+                self.error_class,
+                self.error_class,
+                li,
+            )
         return format_html(
             '<ul class="{}">{}</ul>',
             self.error_class,
-            format_html_join('', '<li>{}</li>', ((e,) for e in self))
+            li,
         )
 
     def as_text(self):
