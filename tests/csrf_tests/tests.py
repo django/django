@@ -46,10 +46,24 @@ class CsrfViewMiddlewareTestMixin:
     def _get_GET_csrf_cookie_request(self, cookie=None):
         raise NotImplementedError('This method must be implemented by a subclass.')
 
-    def _get_POST_csrf_cookie_request(self, cookie=None):
-        """The cookie argument defaults to the valid test cookie."""
+    def _get_POST_csrf_cookie_request(
+        self, cookie=None, post_token=None, meta_token=None, token_header=None,
+    ):
+        """
+        The cookie argument defaults to this class's default test cookie. The
+        post_token and meta_token arguments are included in the request's
+        req.POST and req.META headers, respectively, when that argument is
+        provided and non-None. The token_header argument is the header key to
+        use for req.META, defaults to "HTTP_X_CSRFTOKEN".
+        """
+        if token_header is None:
+            token_header = 'HTTP_X_CSRFTOKEN'
         req = self._get_GET_csrf_cookie_request(cookie=cookie)
         req.method = "POST"
+        if post_token is not None:
+            req.POST['csrfmiddlewaretoken'] = post_token
+        if meta_token is not None:
+            req.META[token_header] = meta_token
         return req
 
     def _get_POST_no_csrf_cookie_request(self):
@@ -57,12 +71,8 @@ class CsrfViewMiddlewareTestMixin:
         req.method = "POST"
         return req
 
-    def _get_POST_request_with_token(self, token=None):
-        """The token argument defaults to the valid test token."""
-        if token is None:
-            token = self._csrf_id
-        req = self._get_POST_csrf_cookie_request()
-        req.POST['csrfmiddlewaretoken'] = token
+    def _get_POST_request_with_token(self):
+        req = self._get_POST_csrf_cookie_request(post_token=self._csrf_id)
         return req
 
     def _check_token_present(self, response, csrf_id=None):
@@ -115,12 +125,8 @@ class CsrfViewMiddlewareTestMixin:
         """
         self._check_bad_or_missing_cookie(None, REASON_NO_CSRF_COOKIE)
 
-    def _check_bad_or_missing_token(self, token, expected):
-        """Passing None for token includes no token."""
-        if token is None:
-            req = self._get_POST_csrf_cookie_request()
-        else:
-            req = self._get_POST_request_with_token(token=token)
+    def _check_bad_or_missing_token(self, expected, token=None):
+        req = self._get_POST_csrf_cookie_request(post_token=token)
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         with self.assertLogs('django.security.csrf', 'WARNING') as cm:
@@ -168,8 +174,7 @@ class CsrfViewMiddlewareTestMixin:
         """
         The token may be passed in a header instead of in the form.
         """
-        req = self._get_POST_csrf_cookie_request()
-        req.META['HTTP_X_CSRFTOKEN'] = self._csrf_id
+        req = self._get_POST_csrf_cookie_request(meta_token=self._csrf_id)
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         resp = mw.process_view(req, post_form_view, (), {})
@@ -180,8 +185,10 @@ class CsrfViewMiddlewareTestMixin:
         """
         settings.CSRF_HEADER_NAME can be used to customize the CSRF header name
         """
-        req = self._get_POST_csrf_cookie_request()
-        req.META['HTTP_X_CSRFTOKEN_CUSTOMIZED'] = self._csrf_id
+        req = self._get_POST_csrf_cookie_request(
+            meta_token=self._csrf_id,
+            token_header='HTTP_X_CSRFTOKEN_CUSTOMIZED',
+        )
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         resp = mw.process_view(req, post_form_view, (), {})
@@ -210,17 +217,15 @@ class CsrfViewMiddlewareTestMixin:
         """
         HTTP PUT and DELETE can get through with X-CSRFToken and a cookie.
         """
-        req = self._get_GET_csrf_cookie_request()
+        req = self._get_POST_csrf_cookie_request(meta_token=self._csrf_id)
         req.method = 'PUT'
-        req.META['HTTP_X_CSRFTOKEN'] = self._csrf_id
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         resp = mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(resp)
 
-        req = self._get_GET_csrf_cookie_request()
+        req = self._get_POST_csrf_cookie_request(meta_token=self._csrf_id)
         req.method = 'DELETE'
-        req.META['HTTP_X_CSRFTOKEN'] = self._csrf_id
         mw.process_request(req)
         resp = mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(resp)
