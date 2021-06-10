@@ -128,33 +128,20 @@ class CsrfViewMiddlewareTestMixin:
         self.assertEqual(403, resp.status_code)
         self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % expected)
 
-    def test_csrf_cookie_no_token(self):
+    def test_csrf_cookie_bad_or_missing_token(self):
         """
-        If a CSRF cookie is present but with no token, the middleware rejects
-        the incoming request.
-        """
-        self._check_bad_or_missing_token(None, REASON_CSRF_TOKEN_MISSING)
-
-    def test_csrf_cookie_bad_token_characters(self):
-        """
-        If a CSRF cookie is present but the token has invalid characters, the
+        If a CSRF cookie is present but the token is missing or invalid, the
         middleware rejects the incoming request.
         """
-        self._check_bad_or_missing_token(64 * '*', 'CSRF token has invalid characters.')
-
-    def test_csrf_cookie_bad_token_length(self):
-        """
-        If a CSRF cookie is present but the token has an incorrect length, the
-        middleware rejects the incoming request.
-        """
-        self._check_bad_or_missing_token(16 * 'a', 'CSRF token has incorrect length.')
-
-    def test_csrf_cookie_incorrect_token(self):
-        """
-        If a CSRF cookie is present but the correctly formatted token is
-        incorrect, the middleware rejects the incoming request.
-        """
-        self._check_bad_or_missing_token(64 * 'a', 'CSRF token incorrect.')
+        cases = [
+            (None, REASON_CSRF_TOKEN_MISSING),
+            (64 * '*', 'CSRF token has invalid characters.'),
+            (16 * 'a', 'CSRF token has incorrect length.'),
+            (64 * 'a', 'CSRF token incorrect.'),
+        ]
+        for token, expected in cases:
+            with self.subTest(token=token):
+                self._check_bad_or_missing_token(expected, token)
 
     def test_process_request_csrf_cookie_and_token(self):
         """
