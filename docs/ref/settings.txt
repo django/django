@@ -1244,6 +1244,8 @@ Default decimal separator used when formatting decimal numbers.
 
 Note that if :setting:`USE_L10N` is set to ``True``, then the locale-dictated
 format has higher precedence and will be applied instead.
+If :setting:`USE_L10N` is set to ``False``, ``DECIMAL_SEPARATOR`` will be
+observed in form validation, but not in the template filter :tfilter:`floatformat`.
 
 See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
@@ -2665,6 +2667,9 @@ used only when :setting:`USE_THOUSAND_SEPARATOR` is ``True`` and
 
 Note that if :setting:`USE_L10N` is set to ``True``, then the locale-dictated
 format has higher precedence and will be applied instead.
+If :setting:`USE_L10N` is set to ``False``, ``THOUSAND_SEPARATOR`` will be
+observed in form validation where :setting:`USE_THOUSAND_SEPARATOR` and
+:setting:`NUMBER_GROUPING` permit, but not in the template filter :tfilter:`floatformat`.
 
 See also :setting:`NUMBER_GROUPING`, :setting:`DECIMAL_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
@@ -2797,7 +2802,11 @@ A boolean that specifies whether to display numbers using a thousand separator.
 When set to ``True`` and :setting:`USE_L10N` is also ``True``, Django will
 format numbers using the :setting:`NUMBER_GROUPING` and
 :setting:`THOUSAND_SEPARATOR` settings. These settings may also be dictated by
-the locale, which takes precedence.
+the locale, which takes precedence. When :setting:`USE_L10N` is set to
+``False``, ``USE_THOUSAND_SEPARATOR`` will be observed in form validation, but
+not in the template filter :tfilter:`floatformat`. (See the :tfilter:`floatformat`
+documentation for a method to force thousand grouping when :setting:`USE_L10N`
+is ``True`` without regard for ``USE_THOUSAND_SEPARATOR``.)
 
 See also :setting:`DECIMAL_SEPARATOR`, :setting:`NUMBER_GROUPING` and
 :setting:`THOUSAND_SEPARATOR`.
