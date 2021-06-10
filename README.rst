@@ -51,4 +51,22 @@ Supporting the Development of Django
 
 Django's development depends on your contributions. 
 
-If you depend on Django, remember to support the Django Software Foundation: https://www.djangoproject.com/fundraising/
+If you depend on Django, remember to support the Django Software Foundation:
+
+* **Make a donation:** We accept donations via card on our `fundraising page`_.
+
+.. _`fundraising page`: https://www.djangoproject.com/fundraising/
+
+* **Buy official Django merchandise:** Visit our `official merchandise store`_ to buy Django branded t-shirts, accessories, and more.
+
+.. _`official merchandise store`: https://django.threadless.com/
+
+* **Sponsor us via GitHub Sponsors:** Django is part of GitHub Sponsors. Visit the `Django GitHub Sponsors page`_ to sponsor us via there.
+
+.. _`Django GitHub Sponsors page`: https://github.com/sponsors/django
+
+**Are you a company who's willing to donate ?**
+
+We have a corporate sponsorship program, Please `get in touch`_ if you'd like to know more.
+
+.. _`get in touch`: https://www.djangoproject.com/contact/foundation/
