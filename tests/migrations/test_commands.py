@@ -929,6 +929,15 @@ class MigrateTests(MigrationTestBase):
         recorder.record_applied("migrations", "0001_initial")
         recorder.record_applied("migrations", "0002_second")
         out = io.StringIO()
+        call_command('showmigrations', 'migrations', stdout=out, no_color=True)
+        self.assertEqual(
+            "migrations\n"
+            " [-] 0001_squashed_0002 (2 squashed migrations) "
+            "run 'manage.py migrate' to finish recording.\n",
+            out.getvalue().lower(),
+        )
+
+        out = io.StringIO()
         call_command("migrate", "migrations", verbosity=0)
         call_command("showmigrations", "migrations", stdout=out, no_color=True)
         self.assertEqual(
