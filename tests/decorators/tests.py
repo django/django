@@ -123,13 +123,31 @@ class DecoratorsTest(TestCase):
         self.assertEqual(response, ['test2', 'test1'])
 
     def test_cache_page(self):
+        n = 0
+
         def my_view(request):
-            return "response"
+            nonlocal n
+            n += 1
+            return HttpResponse(str(n))
+
+        request = HttpRequest()
+        request.method = 'GET'
+        request.META['SERVER_NAME'] = 'testserver'
+        request.META['SERVER_PORT'] = 80
 
         my_view_cached = cache_page(123)(my_view)
-        self.assertEqual(my_view_cached(), "response")
+        response = my_view_cached(request)
+        self.assertEqual(response.content.decode(), "1")
+        response = my_view_cached(request)
+        self.assertEqual(response.content.decode(), "1")
+        self.assertEqual(n, 1)
+
         my_view_cached2 = cache_page(123, key_prefix="test")(my_view)
-        self.assertEqual(my_view_cached2(HttpRequest()), "response")
+        response = my_view_cached2(request)
+        self.assertEqual(response.content.decode(), "2")
+        response = my_view_cached2(request)
+        self.assertEqual(response.content.decode(), "2")
+        self.assertEqual(n, 2)
 
     @override_settings(CACHE_MIDDLEWARE_KEY_PREFIX="customprefix")
     def test_cache_page_settings_key_prefix(self):
