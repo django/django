@@ -551,6 +551,13 @@ Miscellaneous
   ``django.db.migrations.state.ProjectState.__init__()`` method must now be a
   set if provided.
 
+* :class:`~django.forms.RadioSelect` and
+  :class:`~django.forms.CheckboxSelectMultiple` widgets are now rendered in
+  ``<div>`` tags so they are announced more concisely by screen readers. If you
+  need the previous behavior, :ref:`override the widget template
+  <overriding-built-in-widget-templates>` with the appropriate template from
+  Django 3.2.
+
 .. _deprecated-features-4.0:
 
 Features deprecated in 4.0
