@@ -51,7 +51,7 @@ class MultipleObjectMixin(ContextMixin):
         """Return the field or fields to use for ordering the queryset."""
         return self.ordering
 
-    def paginate_queryset(self,page=None,  queryset, page_size):
+    def paginate_queryset(self,  queryset, page_size, page=None):
         """Paginate the queryset, if needed."""
         paginator = self.get_paginator(
             queryset, page_size, orphans=self.get_paginate_orphans(),
