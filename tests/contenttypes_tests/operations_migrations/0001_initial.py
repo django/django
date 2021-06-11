@@ -10,4 +10,16 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(primary_key=True)),
             ],
         ),
+        migrations.CreateModel(
+            'Bar',
+            [
+                ('id', models.AutoField(primary_key=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            'Baz',
+            [
+                ('id', models.AutoField(primary_key=True)),
+            ],
+        ),
     ]

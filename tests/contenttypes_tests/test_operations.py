@@ -45,7 +45,7 @@ class ContentTypeOperationsTests(TransactionTestCase):
 
     def test_existing_content_type_rename(self):
         ContentType.objects.create(app_label='contenttypes_tests', model='foo')
-        call_command('migrate', 'contenttypes_tests', database='default', interactive=False, verbosity=0,)
+        call_command('migrate', 'contenttypes_tests', '0002', database='default', interactive=False, verbosity=0,)
         self.assertFalse(ContentType.objects.filter(app_label='contenttypes_tests', model='foo').exists())
         self.assertTrue(ContentType.objects.filter(app_label='contenttypes_tests', model='renamedfoo').exists())
         call_command('migrate', 'contenttypes_tests', 'zero', database='default', interactive=False, verbosity=0)
@@ -56,7 +56,7 @@ class ContentTypeOperationsTests(TransactionTestCase):
     def test_existing_content_type_rename_other_database(self):
         ContentType.objects.using('other').create(app_label='contenttypes_tests', model='foo')
         other_content_types = ContentType.objects.using('other').filter(app_label='contenttypes_tests')
-        call_command('migrate', 'contenttypes_tests', database='other', interactive=False, verbosity=0)
+        call_command('migrate', 'contenttypes_tests', '0002', database='other', interactive=False, verbosity=0)
         self.assertFalse(other_content_types.filter(model='foo').exists())
         self.assertTrue(other_content_types.filter(model='renamedfoo').exists())
         call_command('migrate', 'contenttypes_tests', 'zero', database='other', interactive=False, verbosity=0)
@@ -64,7 +64,7 @@ class ContentTypeOperationsTests(TransactionTestCase):
         self.assertFalse(other_content_types.filter(model='renamedfoo').exists())
 
     def test_missing_content_type_rename_ignore(self):
-        call_command('migrate', 'contenttypes_tests', database='default', interactive=False, verbosity=0,)
+        call_command('migrate', 'contenttypes_tests', '0002', database='default', interactive=False, verbosity=0,)
         self.assertFalse(ContentType.objects.filter(app_label='contenttypes_tests', model='foo').exists())
         self.assertTrue(ContentType.objects.filter(app_label='contenttypes_tests', model='renamedfoo').exists())
         call_command('migrate', 'contenttypes_tests', 'zero', database='default', interactive=False, verbosity=0)
@@ -74,9 +74,33 @@ class ContentTypeOperationsTests(TransactionTestCase):
     def test_content_type_rename_conflict(self):
         ContentType.objects.create(app_label='contenttypes_tests', model='foo')
         ContentType.objects.create(app_label='contenttypes_tests', model='renamedfoo')
-        call_command('migrate', 'contenttypes_tests', database='default', interactive=False, verbosity=0)
+        call_command('migrate', 'contenttypes_tests', '0002', database='default', interactive=False, verbosity=0)
         self.assertTrue(ContentType.objects.filter(app_label='contenttypes_tests', model='foo').exists())
         self.assertTrue(ContentType.objects.filter(app_label='contenttypes_tests', model='renamedfoo').exists())
         call_command('migrate', 'contenttypes_tests', 'zero', database='default', interactive=False, verbosity=0)
         self.assertTrue(ContentType.objects.filter(app_label='contenttypes_tests', model='foo').exists())
         self.assertTrue(ContentType.objects.filter(app_label='contenttypes_tests', model='renamedfoo').exists())
+
+
+@override_settings(
+    MIGRATION_MODULES=dict(
+        settings.MIGRATION_MODULES,
+        contenttypes_tests='contenttypes_tests.operations_migrations',
+    ),
+)
+class ContentTypeManagerOperationsTests(TransactionTestCase):
+    databases = {'default', 'other'}
+    available_apps = [
+        'contenttypes_tests',
+        'django.contrib.contenttypes',
+    ]
+
+    def test_get_for_models_creation_on_migration(self):
+        ContentType.objects.clear_cache()
+        call_command('migrate', 'contenttypes_tests', '0003', database='default', interactive=False, verbosity=0)
+
+    def test_get_for_models_load_on_migration(self):
+        ContentType.objects.create(app_label='contenttypes_tests', model='foo')
+        ContentType.objects.create(app_label='contenttypes_tests', model='baz')
+        ContentType.objects.clear_cache()
+        call_command('migrate', 'contenttypes_tests', '0003', database='default', interactive=False, verbosity=0)
