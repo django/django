@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import (
 )
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.middleware.clickjacking import XFrameOptionsMiddleware
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 from django.utils.decorators import method_decorator
 from django.utils.functional import keep_lazy, keep_lazy_text, lazy
 from django.utils.safestring import mark_safe
@@ -125,10 +125,37 @@ class DecoratorsTest(TestCase):
     def test_cache_page(self):
         def my_view(request):
             return "response"
+
         my_view_cached = cache_page(123)(my_view)
-        self.assertEqual(my_view_cached(HttpRequest()), "response")
+        self.assertEqual(my_view_cached(), "response")
         my_view_cached2 = cache_page(123, key_prefix="test")(my_view)
         self.assertEqual(my_view_cached2(HttpRequest()), "response")
+
+    @override_settings(CACHE_MIDDLEWARE_KEY_PREFIX="customprefix")
+    def test_cache_page_settings_key_prefix(self):
+        n = 0
+
+        def my_view(request):
+            nonlocal n
+            n = n + 1
+            return HttpResponse(str(n))
+
+        request = HttpRequest()
+        request.method = 'GET'
+        request.META['SERVER_NAME'] = 'testserver'
+        request.META['SERVER_PORT'] = 80
+
+        my_view_cached = cache_page(123)(my_view)
+        response = my_view_cached(request)
+        self.assertEqual(response.content.decode(), "1")
+
+        my_view_cached2 = cache_page(123, key_prefix="customprefix")(my_view)
+        response = my_view_cached2(request)
+        self.assertEqual(response.content.decode(), "1")
+
+        my_view_cached3 = cache_page(123, key_prefix="newprefix")(my_view)
+        response = my_view_cached3(request)
+        self.assertEqual(response.content.decode(), "2")
 
     def test_require_safe_accepts_only_safe_methods(self):
         """

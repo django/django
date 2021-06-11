@@ -5,8 +5,10 @@ from django.middleware.cache import CacheMiddleware
 from django.utils.cache import add_never_cache_headers, patch_cache_control
 from django.utils.decorators import decorator_from_middleware_with_args
 
+_sentinel = object()
 
-def cache_page(timeout, *, cache=None, key_prefix=None):
+
+def cache_page(timeout, *, cache=None, key_prefix=_sentinel):
     """
     Decorator for views that tries getting the page from the cache and
     populates the cache if the page isn't in the cache yet.
@@ -20,8 +22,13 @@ def cache_page(timeout, *, cache=None, key_prefix=None):
     Additionally, all headers from the response's Vary header will be taken
     into account on caching -- just like the middleware does.
     """
+    kwargs = {}
+
+    if key_prefix is not _sentinel:
+        kwargs['key_prefix'] = key_prefix
+
     return decorator_from_middleware_with_args(CacheMiddleware)(
-        page_timeout=timeout, cache_alias=cache, key_prefix=key_prefix,
+        page_timeout=timeout, cache_alias=cache, **kwargs,
     )
 
 
