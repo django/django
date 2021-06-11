@@ -51,13 +51,13 @@ class MultipleObjectMixin(ContextMixin):
         """Return the field or fields to use for ordering the queryset."""
         return self.ordering
 
-    def paginate_queryset(self, queryset, page_size):
+    def paginate_queryset(self,page=None,  queryset, page_size):
         """Paginate the queryset, if needed."""
         paginator = self.get_paginator(
             queryset, page_size, orphans=self.get_paginate_orphans(),
             allow_empty_first_page=self.get_allow_empty())
         page_kwarg = self.page_kwarg
-        page = self.kwargs.get(page_kwarg) or self.request.GET.get(page_kwarg) or 1
+        page = page or self.kwargs.get(page_kwarg) or self.request.GET.get(page_kwarg) or 1
         try:
             page_number = int(page)
         except ValueError:
