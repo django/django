@@ -47,12 +47,6 @@ functions in :mod:`django.utils.timezone`.
     startproject <startproject>` includes :setting:`USE_TZ = True <USE_TZ>`
     for convenience.
 
-.. note::
-
-    There is also an independent but related :setting:`USE_L10N` setting that
-    controls whether Django should activate format localization. See
-    :doc:`/topics/i18n/formatting` for more details.
-
 If you're wrestling with a particular problem, start with the :ref:`time zone
 FAQ <time-zones-faq>`.
 

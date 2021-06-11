@@ -81,19 +81,18 @@ class FloatFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         n = 4.35
         self.assertFalse(f.has_changed(n, '4.3500'))
 
-        with translation.override('fr'), self.settings(USE_L10N=True):
+        with translation.override('fr'):
             f = FloatField(localize=True)
             localized_n = formats.localize_input(n)  # -> '4,35' in French
             self.assertFalse(f.has_changed(n, localized_n))
 
-    @override_settings(USE_L10N=False, DECIMAL_SEPARATOR=',')
+    @override_settings(DECIMAL_SEPARATOR=',')
     def test_decimalfield_support_decimal_separator(self):
         f = FloatField(localize=True)
         self.assertEqual(f.clean('1001,10'), 1001.10)
         self.assertEqual(f.clean('1001.10'), 1001.10)
 
-    @override_settings(USE_L10N=False, DECIMAL_SEPARATOR=',', USE_THOUSAND_SEPARATOR=True,
-                       THOUSAND_SEPARATOR='.')
+    @override_settings(DECIMAL_SEPARATOR=',', USE_THOUSAND_SEPARATOR=True, THOUSAND_SEPARATOR='.')
     def test_decimalfield_support_thousands_separator(self):
         f = FloatField(localize=True)
         self.assertEqual(f.clean('1.001,10'), 1001.10)

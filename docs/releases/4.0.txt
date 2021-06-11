@@ -419,6 +419,20 @@ backends.
 * The second argument of ``DatabaseSchemaEditor._unique_sql()`` and
   ``_create_unique_sql()`` methods is now fields instead of columns.
 
+Localization enabled by default
+-------------------------------
+
+The former ``USE_L10N`` setting disappeared. By default, any date or number
+displayed by Django is now localized. Of course, the :ttag:`localize` tag and
+the :tfilter:`localize`/:tfilter:`unlocalize` filters are still honored by
+Django.
+
+If any format-related setting is defined in your settings file (like
+:setting:`DATE_FORMAT`, :setting:`DECIMAL_SEPARATOR`, etc.), it now takes
+precedence over locale-dictated formats. So if needed, you can simulate the
+old ``USE_L10N = False`` behavior by defining those format settings in your
+settings file.
+
 :mod:`django.contrib.gis`
 -------------------------
 

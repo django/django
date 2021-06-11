@@ -52,13 +52,6 @@ More details can be found in the `W3C Web Internationalization FAQ`_, the `Wikip
 .. _GNU gettext documentation: https://www.gnu.org/software/gettext/manual/gettext.html#Concepts
 .. _Wikipedia article: https://en.wikipedia.org/wiki/Internationalization_and_localization
 
-.. warning::
-
-    Translation and formatting are controlled by :setting:`USE_I18N` and
-    :setting:`USE_L10N` settings respectively. However, both features involve
-    internationalization and localization. The names of the settings are an
-    unfortunate result of Django's history.
-
 Here are some other terms that will help us to handle a common language:
 
 .. glossary::

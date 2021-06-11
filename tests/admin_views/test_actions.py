@@ -72,7 +72,7 @@ class AdminActionsTest(TestCase):
         self.assertContains(response, 'Are you sure you want to delete the selected subscribers?')
         self.assertContains(response, '<ul></ul>', html=True)
 
-    @override_settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True, NUMBER_GROUPING=3)
+    @override_settings(USE_THOUSAND_SEPARATOR=True, NUMBER_GROUPING=3)
     def test_non_localized_pk(self):
         """
         If USE_THOUSAND_SEPARATOR is set, the ids for the objects selected for

@@ -936,7 +936,7 @@ Date format helper functions
 ``django.utils.translation.get_date_formats()`` and
 ``django.utils.translation.get_partial_date_formats()`` have been deprecated
 in favor of the appropriate calls to ``django.utils.formats.get_format()``,
-which is locale-aware when :setting:`USE_L10N` is set to ``True``, and falls
+which is locale-aware when ``USE_L10N`` is set to ``True``, and falls
 back to default settings if set to ``False``.
 
 To get the different date formats, instead of writing this::

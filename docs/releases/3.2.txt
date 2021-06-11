@@ -672,7 +672,7 @@ Miscellaneous
   and underscores.
 
 * The :tfilter:`intcomma` and :tfilter:`intword` template filters no longer
-  depend on the :setting:`USE_L10N` setting.
+  depend on the ``USE_L10N`` setting.
 
 * Support for ``argon2-cffi`` < 19.1.0 is removed.
 

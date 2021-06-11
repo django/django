@@ -8,17 +8,14 @@ register = Library()
 def localize(value):
     """
     Force a value to be rendered as a localized value,
-    regardless of the value of ``settings.USE_L10N``.
+    regardless of the value of any format setting.
     """
     return str(formats.localize(value, use_l10n=True))
 
 
 @register.filter(is_safe=False)
 def unlocalize(value):
-    """
-    Force a value to be rendered as a non-localized value,
-    regardless of the value of ``settings.USE_L10N``.
-    """
+    """Force a value to be rendered as a non-localized value."""
     return str(formats.localize(value, use_l10n=False))
 
 
@@ -42,7 +39,7 @@ class LocalizeNode(Node):
 def localize_tag(parser, token):
     """
     Force or prevents localization of values, regardless of the value of
-    `settings.USE_L10N`.
+    any format setting.
 
     Sample usage::
 

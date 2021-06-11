@@ -31,12 +31,6 @@ make some optimizations so as not to load the internationalization machinery.
 
 .. note::
 
-    There is also an independent but related :setting:`USE_L10N` setting that
-    controls if Django should implement format localization. See
-    :doc:`/topics/i18n/formatting` for more details.
-
-.. note::
-
     Make sure you've activated translation for your project (the fastest way is
     to check if :setting:`MIDDLEWARE` includes
     :mod:`django.middleware.locale.LocaleMiddleware`). If you haven't yet,

@@ -201,7 +201,7 @@ class UtilsTests(SimpleTestCase):
         display_value = display_for_field(12345, models.IntegerField(), self.empty_value)
         self.assertEqual(display_value, '12345')
 
-    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
+    @override_settings(USE_THOUSAND_SEPARATOR=True)
     def test_number_formats_with_thousand_separator_display_for_field(self):
         display_value = display_for_field(12345.6789, models.FloatField(), self.empty_value)
         self.assertEqual(display_value, '12,345.6789')
@@ -219,7 +219,7 @@ class UtilsTests(SimpleTestCase):
         display_value = display_for_value([1, 2, 'buckle', 'my', 'shoe'], self.empty_value)
         self.assertEqual(display_value, '1, 2, buckle, my, shoe')
 
-    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
+    @override_settings(USE_THOUSAND_SEPARATOR=True)
     def test_list_display_for_value_boolean(self):
         self.assertEqual(
             display_for_value(True, '', boolean=True),

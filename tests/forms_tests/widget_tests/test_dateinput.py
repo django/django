@@ -1,7 +1,6 @@
 from datetime import date
 
 from django.forms import DateInput
-from django.test import override_settings
 from django.utils import translation
 
 from .base import WidgetTest
@@ -38,7 +37,6 @@ class DateInputTest(WidgetTest):
         widget = DateInput(format='%d/%m/%Y', attrs={'type': 'date'})
         self.check_html(widget, 'date', d, html='<input type="date" name="date" value="17/09/2007">')
 
-    @override_settings(USE_L10N=True)
     @translation.override('de-at')
     def test_l10n(self):
         self.check_html(

@@ -6,7 +6,6 @@ from django.test import SimpleTestCase, override_settings
 from django.utils.translation import activate, deactivate
 
 
-@override_settings(TIME_INPUT_FORMATS=["%I:%M:%S %p", "%I:%M %p"], USE_L10N=True)
 class LocalizedTimeTests(SimpleTestCase):
     def setUp(self):
         # nl/formats.py has customized TIME_INPUT_FORMATS:
@@ -310,7 +309,6 @@ class SimpleTimeFormatTests(SimpleTestCase):
         self.assertEqual(text, "13:30:00")
 
 
-@override_settings(DATE_INPUT_FORMATS=["%d/%m/%Y", "%d-%m-%Y"], USE_L10N=True)
 class LocalizedDateTests(SimpleTestCase):
     def setUp(self):
         activate('de')
@@ -615,7 +613,6 @@ class SimpleDateFormatTests(SimpleTestCase):
         self.assertEqual(text, "2010-12-21")
 
 
-@override_settings(DATETIME_INPUT_FORMATS=["%I:%M:%S %p %d/%m/%Y", "%I:%M %p %d-%m-%Y"], USE_L10N=True)
 class LocalizedDateTimeTests(SimpleTestCase):
     def setUp(self):
         activate('de')

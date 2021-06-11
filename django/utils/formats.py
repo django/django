@@ -29,23 +29,43 @@ ISO_INPUT_FORMATS = {
     ],
 }
 
-
-FORMAT_SETTINGS = frozenset([
-    'DECIMAL_SEPARATOR',
-    'THOUSAND_SEPARATOR',
-    'NUMBER_GROUPING',
-    'FIRST_DAY_OF_WEEK',
-    'MONTH_DAY_FORMAT',
-    'TIME_FORMAT',
-    'DATE_FORMAT',
-    'DATETIME_FORMAT',
-    'SHORT_DATE_FORMAT',
-    'SHORT_DATETIME_FORMAT',
-    'YEAR_MONTH_FORMAT',
-    'DATE_INPUT_FORMATS',
-    'TIME_INPUT_FORMATS',
-    'DATETIME_INPUT_FORMATS',
-])
+# The values are used as defaults when a format file is missing the setting.
+FORMAT_SETTINGS = {
+    'DECIMAL_SEPARATOR': '.',
+    'THOUSAND_SEPARATOR': ',',
+    'NUMBER_GROUPING': 0,
+    'FIRST_DAY_OF_WEEK': 0,
+    'MONTH_DAY_FORMAT': 'F j',
+    'TIME_FORMAT': 'P',
+    'DATE_FORMAT': 'N j, Y',
+    'DATETIME_FORMAT': 'N j, Y, P',
+    'SHORT_DATE_FORMAT': 'm/d/Y',
+    'SHORT_DATETIME_FORMAT': 'm/d/Y P',
+    'YEAR_MONTH_FORMAT': 'F Y',
+    'DATE_INPUT_FORMATS': [
+        '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y',  # '2006-10-25', '10/25/2006', '10/25/06'
+        '%b %d %Y', '%b %d, %Y',             # 'Oct 25 2006', 'Oct 25, 2006'
+        '%d %b %Y', '%d %b, %Y',             # '25 Oct 2006', '25 Oct, 2006'
+        '%B %d %Y', '%B %d, %Y',             # 'October 25 2006', 'October 25, 2006'
+        '%d %B %Y', '%d %B, %Y',             # '25 October 2006', '25 October, 2006'
+    ],
+    'TIME_INPUT_FORMATS': [
+        '%H:%M:%S',     # '14:30:59'
+        '%H:%M:%S.%f',  # '14:30:59.000200'
+        '%H:%M',        # '14:30'
+    ],
+    'DATETIME_INPUT_FORMATS': [
+        '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
+        '%Y-%m-%d %H:%M:%S.%f',  # '2006-10-25 14:30:59.000200'
+        '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
+        '%m/%d/%Y %H:%M:%S',     # '10/25/2006 14:30:59'
+        '%m/%d/%Y %H:%M:%S.%f',  # '10/25/2006 14:30:59.000200'
+        '%m/%d/%Y %H:%M',        # '10/25/2006 14:30'
+        '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
+        '%m/%d/%y %H:%M:%S.%f',  # '10/25/06 14:30:59.000200'
+        '%m/%d/%y %H:%M',        # '10/25/06 14:30'
+    ],
+}
 
 
 def reset_format_cache():
@@ -102,11 +122,13 @@ def get_format(format_type, lang=None, use_l10n=None):
     format_type is the name of the format, e.g. 'DATE_FORMAT'.
 
     If use_l10n is provided and is not None, it forces the value to
-    be localized (or not), overriding the value of settings.USE_L10N.
+    be localized (or not), overriding the value of any format setting.
     """
-    use_l10n = use_l10n or (use_l10n is None and settings.USE_L10N)
+    use_l10n = (use_l10n is None and getattr(settings, format_type, None) is None) or use_l10n
     if use_l10n and lang is None:
         lang = get_language()
+    elif not use_l10n:
+        lang = None
     cache_key = (format_type, lang)
     try:
         return _format_cache[cache_key]
@@ -126,6 +148,8 @@ def get_format(format_type, lang=None, use_l10n=None):
         if format_type not in FORMAT_SETTINGS:
             return format_type
         val = getattr(settings, format_type)
+        if val is None:
+            return FORMAT_SETTINGS[format_type]
     elif format_type in ISO_INPUT_FORMATS:
         # If a list of input formats from one of the format_modules was
         # retrieved, make sure the ISO_INPUT_FORMATS are in this list.
@@ -146,7 +170,7 @@ def date_format(value, format=None, use_l10n=None):
     localizable format.
 
     If use_l10n is provided and is not None, that will force the value to
-    be localized (or not), overriding the value of settings.USE_L10N.
+    be localized (or not), overriding the value of any DATE_* setting.
     """
     return dateformat.format(value, get_format(format or 'DATE_FORMAT', use_l10n=use_l10n))
 
@@ -156,7 +180,7 @@ def time_format(value, format=None, use_l10n=None):
     Format a datetime.time object using a localizable format.
 
     If use_l10n is provided and is not None, it forces the value to
-    be localized (or not), overriding the value of settings.USE_L10N.
+    be localized (or not), overriding the value of any TIME_* setting.
     """
     return dateformat.time_format(value, get_format(format or 'TIME_FORMAT', use_l10n=use_l10n))
 
@@ -166,10 +190,9 @@ def number_format(value, decimal_pos=None, use_l10n=None, force_grouping=False):
     Format a numeric value using localization settings.
 
     If use_l10n is provided and is not None, it forces the value to
-    be localized (or not), overriding the value of settings.USE_L10N.
+    be localized (or not), overriding the value of any number format setting.
     """
-    use_l10n = use_l10n or (use_l10n is None and settings.USE_L10N)
-    lang = get_language() if use_l10n else None
+    lang = get_language() if use_l10n is not False else None
     return numberformat.format(
         value,
         get_format('DECIMAL_SEPARATOR', lang, use_l10n=use_l10n),
@@ -187,7 +210,7 @@ def localize(value, use_l10n=None):
     formatted as a string using current locale format.
 
     If use_l10n is provided and is not None, it forces the value to
-    be localized (or not), overriding the value of settings.USE_L10N.
+    be localized (or not), overriding the value of any format setting.
     """
     if isinstance(value, str):  # Handle strings first for performance reasons.
         return value

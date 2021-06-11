@@ -2,7 +2,7 @@ from datetime import date, datetime
 
 from django.core.exceptions import ValidationError
 from django.forms import DateField, Form, HiddenInput, SelectDateWidget
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase
 from django.utils import translation
 
 
@@ -37,7 +37,6 @@ class DateFieldTest(SimpleTestCase):
         d = GetDate({'mydate_month': '1', 'mydate_day': '1', 'mydate_year': '2010'})
         self.assertIn('<label for="id_mydate_month">', d.as_p())
 
-    @override_settings(USE_L10N=True)
     @translation.override('nl')
     def test_l10n_date_changed(self):
         """
@@ -95,7 +94,6 @@ class DateFieldTest(SimpleTestCase):
         }, initial={'mydate': date(2008, 4, 1)})
         self.assertFalse(b.has_changed())
 
-    @override_settings(USE_L10N=True)
     @translation.override('nl')
     def test_l10n_invalid_date_in(self):
         # Invalid dates shouldn't be allowed
@@ -104,7 +102,6 @@ class DateFieldTest(SimpleTestCase):
         # 'Geef een geldige datum op.' = 'Enter a valid date.'
         self.assertEqual(a.errors, {'mydate': ['Voer een geldige datum in.']})
 
-    @override_settings(USE_L10N=True)
     @translation.override('nl')
     def test_form_label_association(self):
         # label tag is correctly associated with first rendered dropdown

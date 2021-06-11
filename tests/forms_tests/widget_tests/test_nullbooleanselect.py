@@ -1,5 +1,4 @@
 from django.forms import NullBooleanSelect
-from django.test import override_settings
 from django.utils import translation
 
 from .base import WidgetTest
@@ -89,7 +88,6 @@ class NullBooleanSelectTest(WidgetTest):
             </select>"""
         ))
 
-    @override_settings(USE_L10N=True)
     def test_l10n(self):
         """
         The NullBooleanSelect widget's options are lazily localized (#17190).

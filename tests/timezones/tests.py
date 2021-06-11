@@ -812,7 +812,7 @@ class SerializationTests(SimpleTestCase):
                 self.assertEqual(obj.dt, dt)
 
 
-@override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=True)
+@override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_TZ=True)
 class TemplateTests(SimpleTestCase):
 
     @requires_tz_support
@@ -1072,7 +1072,7 @@ class TemplateTests(SimpleTestCase):
             self.assertEqual(tpl.render(Context({})), "+0700")
 
 
-@override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=False)
+@override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_TZ=False)
 class LegacyFormsTests(TestCase):
 
     def test_form(self):
@@ -1109,7 +1109,7 @@ class LegacyFormsTests(TestCase):
         self.assertEqual(e.dt, datetime.datetime(2011, 9, 1, 13, 20, 30))
 
 
-@override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=True)
+@override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_TZ=True)
 class NewFormsTests(TestCase):
 
     @requires_tz_support
@@ -1178,7 +1178,6 @@ class NewFormsTests(TestCase):
 @override_settings(
     DATETIME_FORMAT='c',
     TIME_ZONE='Africa/Nairobi',
-    USE_L10N=False,
     USE_TZ=True,
     ROOT_URLCONF='timezones.urls',
 )

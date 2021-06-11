@@ -471,9 +471,8 @@ For each field, we describe the default widget used if you don't specify
         ``datetime.date`` object.
 
     If no ``input_formats`` argument is provided, the default input formats are
-    taken from :setting:`DATE_INPUT_FORMATS` if :setting:`USE_L10N` is
-    ``False``, or from the active locale format ``DATE_INPUT_FORMATS`` key if
-    localization is enabled. See also :doc:`format localization
+    taken from :setting:`DATE_INPUT_FORMATS` if defined, or from the active
+    locale format ``DATE_INPUT_FORMATS`` key. See also :doc:`format localization
     </topics/i18n/formatting>`.
 
 ``DateTimeField``
@@ -509,9 +508,8 @@ For each field, we describe the default widget used if you don't specify
 
     If no ``input_formats`` argument is provided, the default input formats are
     taken from :setting:`DATETIME_INPUT_FORMATS` and
-    :setting:`DATE_INPUT_FORMATS` if :setting:`USE_L10N` is ``False``, or from
-    the active locale format ``DATETIME_INPUT_FORMATS`` and
-    ``DATE_INPUT_FORMATS`` keys if localization is enabled. See also
+    :setting:`DATE_INPUT_FORMATS` if defined, or from the active locale format
+    ``DATETIME_INPUT_FORMATS`` and ``DATE_INPUT_FORMATS`` keys. See also
     :doc:`format localization </topics/i18n/formatting>`.
 
 ``DecimalField``
@@ -992,9 +990,8 @@ For each field, we describe the default widget used if you don't specify
         ``datetime.time`` object.
 
     If no ``input_formats`` argument is provided, the default input formats are
-    taken from :setting:`TIME_INPUT_FORMATS` if :setting:`USE_L10N` is
-    ``False``, or from the active locale format ``TIME_INPUT_FORMATS`` key if
-    localization is enabled. See also :doc:`format localization
+    taken from :setting:`TIME_INPUT_FORMATS` if defined, or from the active
+    locale format ``TIME_INPUT_FORMATS`` key. See also :doc:`format localization
     </topics/i18n/formatting>`.
 
 ``URLField``

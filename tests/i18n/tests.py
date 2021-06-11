@@ -23,9 +23,9 @@ from django.test import (
 )
 from django.utils import translation
 from django.utils.formats import (
-    date_format, get_format, iter_format_modules, localize, localize_input,
-    reset_format_cache, sanitize_separators, sanitize_strftime_format,
-    time_format,
+    FORMAT_SETTINGS, date_format, get_format, iter_format_modules, localize,
+    localize_input, reset_format_cache, sanitize_separators,
+    sanitize_strftime_format, time_format,
 )
 from django.utils.numberformat import format as nformat
 from django.utils.safestring import SafeString, mark_safe
@@ -422,7 +422,6 @@ class TranslationThreadSafetyTests(SimpleTestCase):
         self.assertLess(translation_count, len(trans_real._translations))
 
 
-@override_settings(USE_L10N=True)
 class FormattingTests(SimpleTestCase):
 
     def setUp(self):
@@ -498,14 +497,17 @@ class FormattingTests(SimpleTestCase):
             self.assertEqual('31.12.2009 в 20:50', Template('{{ dt|date:"d.m.Y в H:i" }}').render(self.ctxt))
             self.assertEqual('⌚ 10:15', Template('{{ t|time:"⌚ H:i" }}').render(self.ctxt))
 
-    @override_settings(USE_L10N=False)
-    def test_l10n_disabled(self):
+    @override_settings(**FORMAT_SETTINGS)
+    def test_locale_settings_forced(self):
         """
+        Whatever the locale, format settings, if present, override the
+        locale-dictated format.
         Catalan locale with format i18n disabled translations will be used,
         but not formats
         """
+        self.maxDiff = 3000
         with translation.override('ca', deactivate=True):
-            self.maxDiff = 3000
+            # Formats
             self.assertEqual('N j, Y', get_format('DATE_FORMAT'))
             self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
             self.assertEqual('.', get_format('DECIMAL_SEPARATOR'))
@@ -513,12 +515,14 @@ class FormattingTests(SimpleTestCase):
             self.assertEqual('Des. 31, 2009', date_format(self.d))
             self.assertEqual('desembre 2009', date_format(self.d, 'YEAR_MONTH_FORMAT'))
             self.assertEqual('12/31/2009 8:50 p.m.', date_format(self.dt, 'SHORT_DATETIME_FORMAT'))
+            # Test localize()
             self.assertEqual('No localizable', localize('No localizable'))
             self.assertEqual('66666.666', localize(self.n))
             self.assertEqual('99999.999', localize(self.f))
             self.assertEqual('10000', localize(self.long))
             self.assertEqual('Des. 31, 2009', localize(self.d))
             self.assertEqual('Des. 31, 2009, 8:50 p.m.', localize(self.dt))
+            # Template rendering
             self.assertEqual('66666.666', Template('{{ n }}').render(self.ctxt))
             self.assertEqual('99999.999', Template('{{ f }}').render(self.ctxt))
             self.assertEqual('Des. 31, 2009', Template('{{ d }}').render(self.ctxt))
@@ -539,6 +543,7 @@ class FormattingTests(SimpleTestCase):
                 '12/31/2009 8:50 p.m.', Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt)
             )
 
+            # Forms behavior
             form = I18nForm({
                 'decimal_field': '66666,666',
                 'float_field': '99999,999',
@@ -626,31 +631,6 @@ class FormattingTests(SimpleTestCase):
                 '</select>',
                 forms.SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
             )
-
-            # We shouldn't change the behavior of the floatformat filter re:
-            # thousand separator and grouping when localization is disabled
-            # even if the USE_THOUSAND_SEPARATOR, NUMBER_GROUPING and
-            # THOUSAND_SEPARATOR settings are specified.
-            with self.settings(USE_THOUSAND_SEPARATOR=True, NUMBER_GROUPING=1, THOUSAND_SEPARATOR='!'):
-                self.assertEqual('66666.67', Template('{{ n|floatformat:"2u" }}').render(self.ctxt))
-                self.assertEqual('100000.0', Template('{{ f|floatformat:"u" }}').render(self.ctxt))
-
-    def test_false_like_locale_formats(self):
-        """
-        The active locale's formats take precedence over the default settings
-        even if they would be interpreted as False in a conditional test
-        (e.g. 0 or empty string) (#16938).
-        """
-        with translation.override('fr'):
-            with self.settings(USE_THOUSAND_SEPARATOR=True, THOUSAND_SEPARATOR='!'):
-                self.assertEqual('\xa0', get_format('THOUSAND_SEPARATOR'))
-                # Even a second time (after the format has been cached)...
-                self.assertEqual('\xa0', get_format('THOUSAND_SEPARATOR'))
-
-            with self.settings(FIRST_DAY_OF_WEEK=0):
-                self.assertEqual(1, get_format('FIRST_DAY_OF_WEEK'))
-                # Even a second time (after the format has been cached)...
-                self.assertEqual(1, get_format('FIRST_DAY_OF_WEEK'))
 
     def test_l10n_enabled(self):
         self.maxDiff = 3000
@@ -1135,7 +1115,7 @@ class FormattingTests(SimpleTestCase):
                 self.assertEqual(sanitize_separators('77\xa0777,777'), '77777.777')
                 self.assertEqual(sanitize_separators('12 345'), '12345')
                 self.assertEqual(sanitize_separators('77 777,777'), '77777.777')
-            with self.settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=False):
+            with self.settings(USE_THOUSAND_SEPARATOR=True, THOUSAND_SEPARATOR='.'):
                 self.assertEqual(sanitize_separators('12\xa0345'), '12\xa0345')
 
         with self.settings(USE_THOUSAND_SEPARATOR=True):
@@ -1144,13 +1124,12 @@ class FormattingTests(SimpleTestCase):
                 # Suspicion that user entered dot as decimal separator (#22171)
                 self.assertEqual(sanitize_separators('10.10'), '10.10')
 
-        with self.settings(USE_L10N=False, DECIMAL_SEPARATOR=','):
+        with self.settings(DECIMAL_SEPARATOR=','):
             self.assertEqual(sanitize_separators('1001,10'), '1001.10')
             self.assertEqual(sanitize_separators('1001.10'), '1001.10')
 
         with self.settings(
-            USE_L10N=False, DECIMAL_SEPARATOR=',', USE_THOUSAND_SEPARATOR=True,
-            THOUSAND_SEPARATOR='.'
+            DECIMAL_SEPARATOR=',', USE_THOUSAND_SEPARATOR=True, THOUSAND_SEPARATOR='.'
         ):
             self.assertEqual(sanitize_separators('1.001,10'), '1001.10')
             self.assertEqual(sanitize_separators('1001,10'), '1001.10')
@@ -1225,10 +1204,15 @@ class FormattingTests(SimpleTestCase):
         output3 = '; '.join([expected_localized, expected_unlocalized])
         output4 = '; '.join([expected_unlocalized, expected_localized])
         with translation.override('de', deactivate=True):
-            with self.settings(USE_L10N=False, USE_THOUSAND_SEPARATOR=True):
+            with self.settings(
+                USE_THOUSAND_SEPARATOR=True,
+                DECIMAL_SEPARATOR='.',
+                NUMBER_GROUPING=0,
+                DATE_FORMAT='N j, Y',
+            ):
                 self.assertEqual(template1.render(context), output1)
                 self.assertEqual(template4.render(context), output4)
-            with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True):
+            with self.settings(USE_THOUSAND_SEPARATOR=True):
                 self.assertEqual(template1.render(context), output1)
                 self.assertEqual(template2.render(context), output2)
                 self.assertEqual(template3.render(context), output3)
@@ -1242,15 +1226,13 @@ class FormattingTests(SimpleTestCase):
         context = Context(
             {'int': 1455, 'float': 3.14, 'decimal': decimal.Decimal('24.1567')}
         )
-        for use_l10n in [True, False]:
-            with self.subTest(use_l10n=use_l10n), self.settings(
-                USE_L10N=use_l10n,
-                DECIMAL_SEPARATOR=',',
-                USE_THOUSAND_SEPARATOR=True,
-                THOUSAND_SEPARATOR='°',
-                NUMBER_GROUPING=2,
-            ):
-                self.assertEqual(template.render(context), '1455/3.14/24.1567')
+        with self.settings(
+            DECIMAL_SEPARATOR=',',
+            USE_THOUSAND_SEPARATOR=True,
+            THOUSAND_SEPARATOR='°',
+            NUMBER_GROUPING=2,
+        ):
+            self.assertEqual(template.render(context), '1455/3.14/24.1567')
 
     def test_localized_as_text_as_hidden_input(self):
         """

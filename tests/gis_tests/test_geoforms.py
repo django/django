@@ -238,7 +238,7 @@ class SpecializedFieldTest(SimpleTestCase):
         self.assertIn(escape(ogr.json), rendered)
 
     # map_srid in openlayers.html template must not be localized.
-    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
+    @override_settings(USE_THOUSAND_SEPARATOR=True)
     def test_pointfield(self):
         class PointForm(forms.Form):
             p = forms.PointField()

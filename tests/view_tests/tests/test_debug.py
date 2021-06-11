@@ -195,7 +195,7 @@ class DebugViewTests(SimpleTestCase):
         """
         Numeric IDs and fancy traceback context blocks line numbers shouldn't be localized.
         """
-        with self.settings(DEBUG=True, USE_L10N=True):
+        with self.settings(DEBUG=True):
             with self.assertLogs('django.request', 'ERROR'):
                 response = self.client.get('/raises500/')
             # We look for a HTML fragment of the form
