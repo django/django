@@ -315,6 +315,49 @@ class CsrfViewMiddleware(MiddlewareMixin):
         if not is_same_domain(referer.netloc, good_referer):
             raise RejectRequest(REASON_BAD_REFERER % referer.geturl())
 
+    def _check_token(self, request):
+        # Access csrf_token via self._get_token() as rotate_token() may have
+        # been called by an authentication middleware during the
+        # process_request() phase.
+        try:
+            csrf_token = self._get_token(request)
+        except InvalidTokenFormat as exc:
+            raise RejectRequest(f'CSRF cookie {exc.reason}.')
+
+        if csrf_token is None:
+            # No CSRF cookie. For POST requests, we insist on a CSRF cookie,
+            # and in this way we can avoid all CSRF attacks, including login
+            # CSRF.
+            raise RejectRequest(REASON_NO_CSRF_COOKIE)
+
+        # Check non-cookie token for match.
+        request_csrf_token = ''
+        if request.method == 'POST':
+            try:
+                request_csrf_token = request.POST.get('csrfmiddlewaretoken', '')
+            except OSError:
+                # Handle a broken connection before we've completed reading the
+                # POST data. process_view shouldn't raise any exceptions, so
+                # we'll ignore and serve the user a 403 (assuming they're still
+                # listening, which they probably aren't because of the error).
+                pass
+
+        if request_csrf_token == '':
+            # Fall back to X-CSRFToken, to make things easier for AJAX, and
+            # possible for PUT/DELETE.
+            try:
+                request_csrf_token = request.META[settings.CSRF_HEADER_NAME]
+            except KeyError:
+                raise RejectRequest(REASON_CSRF_TOKEN_MISSING)
+
+        try:
+            request_csrf_token = _sanitize_token(request_csrf_token)
+        except InvalidTokenFormat as exc:
+            raise RejectRequest(f'CSRF token {exc.reason}.')
+
+        if not _compare_masked_tokens(request_csrf_token, csrf_token):
+            raise RejectRequest(REASON_CSRF_TOKEN_INCORRECT)
+
     def process_request(self, request):
         try:
             csrf_token = self._get_token(request)
@@ -374,47 +417,10 @@ class CsrfViewMiddleware(MiddlewareMixin):
             except RejectRequest as exc:
                 return self._reject(request, exc.reason)
 
-        # Access csrf_token via self._get_token() as rotate_token() may have
-        # been called by an authentication middleware during the
-        # process_request() phase.
         try:
-            csrf_token = self._get_token(request)
-        except InvalidTokenFormat as exc:
-            return self._reject(request, f'CSRF cookie {exc.reason}.')
-
-        if csrf_token is None:
-            # No CSRF cookie. For POST requests, we insist on a CSRF cookie,
-            # and in this way we can avoid all CSRF attacks, including login
-            # CSRF.
-            return self._reject(request, REASON_NO_CSRF_COOKIE)
-
-        # Check non-cookie token for match.
-        request_csrf_token = ''
-        if request.method == 'POST':
-            try:
-                request_csrf_token = request.POST.get('csrfmiddlewaretoken', '')
-            except OSError:
-                # Handle a broken connection before we've completed reading the
-                # POST data. process_view shouldn't raise any exceptions, so
-                # we'll ignore and serve the user a 403 (assuming they're still
-                # listening, which they probably aren't because of the error).
-                pass
-
-        if request_csrf_token == '':
-            # Fall back to X-CSRFToken, to make things easier for AJAX, and
-            # possible for PUT/DELETE.
-            try:
-                request_csrf_token = request.META[settings.CSRF_HEADER_NAME]
-            except KeyError:
-                return self._reject(request, REASON_CSRF_TOKEN_MISSING)
-
-        try:
-            request_csrf_token = _sanitize_token(request_csrf_token)
-        except InvalidTokenFormat as exc:
-            return self._reject(request, f'CSRF token {exc.reason}.')
-
-        if not _compare_masked_tokens(request_csrf_token, csrf_token):
-            return self._reject(request, REASON_CSRF_TOKEN_INCORRECT)
+            self._check_token(request)
+        except RejectRequest as exc:
+            return self._reject(request, exc.reason)
 
         return self._accept(request)
 
