@@ -86,7 +86,7 @@ class ContentTypeManager(models.Manager):
                 model__in=needed_models
             )
             for ct in cts:
-                opts_models = needed_opts.pop(ct.model_class()._meta, [])
+                opts_models = needed_opts.pop(ct._meta.apps.get_model(ct.app_label, ct.model)._meta, [])
                 for model in opts_models:
                     results[model] = ct
                 self._add_to_cache(self.db, ct)
