@@ -343,7 +343,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
             # Mechanism to turn off CSRF checks for test suite. It comes after
             # the creation of CSRF cookies, so that everything else continues
             # to work exactly the same (e.g. cookies are sent, etc.), but
-            # before any branches that call reject().
+            # before any branches that call the _reject method.
             return self._accept(request)
 
         # Reject the request if the Origin header doesn't match an allowed
