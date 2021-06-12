@@ -95,6 +95,9 @@ class ContentTypeManagerOperationsTests(TransactionTestCase):
         'django.contrib.contenttypes',
     ]
 
+    def setUp(self) -> None:
+        call_command('migrate', 'contenttypes_tests', 'zero', database='default', interactive=False, verbosity=0)
+
     def test_get_for_models_creation_on_migration(self):
         ContentType.objects.clear_cache()
         call_command('migrate', 'contenttypes_tests', '0003', database='default', interactive=False, verbosity=0)
