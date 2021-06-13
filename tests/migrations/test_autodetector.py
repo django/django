@@ -6,13 +6,13 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser
 from django.core.validators import RegexValidator, validate_slug
-from django.db import connection, models
+from django.db import connection, migrations, models
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ModelState, ProjectState
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import isolate_lru_cache
 
 from .models import FoodManager, FoodQuerySet
@@ -464,9 +464,9 @@ class AutodetectorTests(TestCase):
 
     def repr_changes(self, changes, include_dependencies=False):
         output = ""
-        for app_label, migrations in sorted(changes.items()):
+        for app_label, migrations_ in sorted(changes.items()):
             output += "  %s:\n" % app_label
-            for migration in migrations:
+            for migration in migrations_:
                 output += "    %s\n" % migration.name
                 for operation in migration.operations:
                     output += "      %s\n" % operation
@@ -584,9 +584,13 @@ class AutodetectorTests(TestCase):
         return project_state
 
     def get_changes(self, before_states, after_states, questioner=None):
+        if not isinstance(before_states, ProjectState):
+            before_states = self.make_project_state(before_states)
+        if not isinstance(after_states, ProjectState):
+            after_states = self.make_project_state(after_states)
         return MigrationAutodetector(
-            self.make_project_state(before_states),
-            self.make_project_state(after_states),
+            before_states,
+            after_states,
             questioner,
         )._detect_changes()
 
@@ -600,8 +604,10 @@ class AutodetectorTests(TestCase):
         graph.add_dependency("testapp.0002_foobar", ("testapp", "0002_foobar"), ("testapp", "0001_initial"))
         graph.add_dependency("testapp.0002_foobar", ("testapp", "0002_foobar"), ("otherapp", "0001_initial"))
         # Use project state to make a new migration change set
-        before = self.make_project_state([])
-        after = self.make_project_state([self.author_empty, self.other_pony, self.other_stable])
+        before = self.make_project_state([self.publisher, self.other_pony])
+        after = self.make_project_state([
+            self.author_empty, self.publisher, self.other_pony, self.other_stable,
+        ])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Run through arrange_for_graph
@@ -609,8 +615,28 @@ class AutodetectorTests(TestCase):
         # Make sure there's a new name, deps match, etc.
         self.assertEqual(changes["testapp"][0].name, "0003_author")
         self.assertEqual(changes["testapp"][0].dependencies, [("testapp", "0002_foobar")])
-        self.assertEqual(changes["otherapp"][0].name, "0002_pony_stable")
+        self.assertEqual(changes["otherapp"][0].name, '0002_stable')
         self.assertEqual(changes["otherapp"][0].dependencies, [("otherapp", "0001_initial")])
+
+    def test_arrange_for_graph_with_multiple_initial(self):
+        # Make a fake graph.
+        graph = MigrationGraph()
+        # Use project state to make a new migration change set.
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_with_book, self.book, self.attribution])
+        autodetector = MigrationAutodetector(before, after, MigrationQuestioner({'ask_initial': True}))
+        changes = autodetector._detect_changes()
+        changes = autodetector.arrange_for_graph(changes, graph)
+
+        self.assertEqual(changes['otherapp'][0].name, '0001_initial')
+        self.assertEqual(changes['otherapp'][0].dependencies, [])
+        self.assertEqual(changes['otherapp'][1].name, '0002_initial')
+        self.assertCountEqual(
+            changes['otherapp'][1].dependencies,
+            [('testapp', '0001_initial'), ('otherapp', '0001_initial')],
+        )
+        self.assertEqual(changes['testapp'][0].name, '0001_initial')
+        self.assertEqual(changes['testapp'][0].dependencies, [('otherapp', '0001_initial')])
 
     def test_trim_apps(self):
         """
@@ -1624,30 +1650,38 @@ class AutodetectorTests(TestCase):
         """
         # First, we test the default pk field name
         changes = self.get_changes([], [self.author_empty, self.author_proxy_third, self.book_proxy_fk])
-        # The field name the FK on the book model points to
-        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].remote_field.field_name, 'id')
+        # The model the FK is pointing from and to.
+        self.assertEqual(
+            changes['otherapp'][0].operations[0].fields[2][1].remote_field.model,
+            'thirdapp.AuthorProxy',
+        )
         # Now, we test the custom pk field name
         changes = self.get_changes([], [self.author_custom_pk, self.author_proxy_third, self.book_proxy_fk])
-        # The field name the FK on the book model points to
-        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].remote_field.field_name, 'pk_field')
+        # The model the FK is pointing from and to.
+        self.assertEqual(
+            changes['otherapp'][0].operations[0].fields[2][1].remote_field.model,
+            'thirdapp.AuthorProxy',
+        )
 
     def test_proxy_to_mti_with_fk_to_proxy(self):
         # First, test the pk table and field name.
-        changes = self.get_changes(
-            [],
+        to_state = self.make_project_state(
             [self.author_empty, self.author_proxy_third, self.book_proxy_fk],
         )
+        changes = self.get_changes([], to_state)
+        fk_field = changes['otherapp'][0].operations[0].fields[2][1]
         self.assertEqual(
-            changes['otherapp'][0].operations[0].fields[2][1].remote_field.model._meta.db_table,
-            'testapp_author',
+            to_state.get_concrete_model_key(fk_field.remote_field.model),
+            ('testapp', 'author'),
         )
-        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].remote_field.field_name, 'id')
+        self.assertEqual(fk_field.remote_field.model, 'thirdapp.AuthorProxy')
 
         # Change AuthorProxy to use MTI.
-        changes = self.get_changes(
-            [self.author_empty, self.author_proxy_third, self.book_proxy_fk],
+        from_state = to_state.clone()
+        to_state = self.make_project_state(
             [self.author_empty, self.author_proxy_third_notproxy, self.book_proxy_fk],
         )
+        changes = self.get_changes(from_state, to_state)
         # Right number/type of migrations for the AuthorProxy model?
         self.assertNumberMigrations(changes, 'thirdapp', 1)
         self.assertOperationTypes(changes, 'thirdapp', 0, ['DeleteModel', 'CreateModel'])
@@ -1658,30 +1692,39 @@ class AutodetectorTests(TestCase):
         # otherapp should depend on thirdapp.
         self.assertMigrationDependencies(changes, 'otherapp', 0, [('thirdapp', 'auto_1')])
         # Now, test the pk table and field name.
+        fk_field = changes['otherapp'][0].operations[0].field
         self.assertEqual(
-            changes['otherapp'][0].operations[0].field.remote_field.model._meta.db_table,
-            'thirdapp_authorproxy',
+            to_state.get_concrete_model_key(fk_field.remote_field.model),
+            ('thirdapp', 'authorproxy'),
         )
-        self.assertEqual(changes['otherapp'][0].operations[0].field.remote_field.field_name, 'author_ptr')
+        self.assertEqual(fk_field.remote_field.model, 'thirdapp.AuthorProxy')
 
     def test_proxy_to_mti_with_fk_to_proxy_proxy(self):
         # First, test the pk table and field name.
-        changes = self.get_changes(
-            [],
-            [self.author_empty, self.author_proxy, self.author_proxy_proxy, self.book_proxy_proxy_fk],
-        )
+        to_state = self.make_project_state([
+            self.author_empty,
+            self.author_proxy,
+            self.author_proxy_proxy,
+            self.book_proxy_proxy_fk,
+        ])
+        changes = self.get_changes([], to_state)
+        fk_field = changes['otherapp'][0].operations[0].fields[1][1]
         self.assertEqual(
-            changes['otherapp'][0].operations[0].fields[1][1].remote_field.model._meta.db_table,
-            'testapp_author',
+            to_state.get_concrete_model_key(fk_field.remote_field.model),
+            ('testapp', 'author'),
         )
-        self.assertEqual(changes['otherapp'][0].operations[0].fields[1][1].remote_field.field_name, 'id')
+        self.assertEqual(fk_field.remote_field.model, 'testapp.AAuthorProxyProxy')
 
         # Change AuthorProxy to use MTI. FK still points to AAuthorProxyProxy,
         # a proxy of AuthorProxy.
-        changes = self.get_changes(
-            [self.author_empty, self.author_proxy, self.author_proxy_proxy, self.book_proxy_proxy_fk],
-            [self.author_empty, self.author_proxy_notproxy, self.author_proxy_proxy, self.book_proxy_proxy_fk],
-        )
+        from_state = to_state.clone()
+        to_state = self.make_project_state([
+            self.author_empty,
+            self.author_proxy_notproxy,
+            self.author_proxy_proxy,
+            self.book_proxy_proxy_fk,
+        ])
+        changes = self.get_changes(from_state, to_state)
         # Right number/type of migrations for the AuthorProxy model?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ['DeleteModel', 'CreateModel'])
@@ -1692,11 +1735,12 @@ class AutodetectorTests(TestCase):
         # otherapp should depend on testapp.
         self.assertMigrationDependencies(changes, 'otherapp', 0, [('testapp', 'auto_1')])
         # Now, test the pk table and field name.
+        fk_field = changes['otherapp'][0].operations[0].field
         self.assertEqual(
-            changes['otherapp'][0].operations[0].field.remote_field.model._meta.db_table,
-            'testapp_authorproxy',
+            to_state.get_concrete_model_key(fk_field.remote_field.model),
+            ('testapp', 'authorproxy'),
         )
-        self.assertEqual(changes['otherapp'][0].operations[0].field.remote_field.field_name, 'author_ptr')
+        self.assertEqual(fk_field.remote_field.model, 'testapp.AAuthorProxyProxy')
 
     def test_unmanaged_create(self):
         """The autodetector correctly deals with managed models."""
@@ -1739,12 +1783,14 @@ class AutodetectorTests(TestCase):
         """
         # First, we test the default pk field name
         changes = self.get_changes([], [self.author_unmanaged_default_pk, self.book])
-        # The field name the FK on the book model points to
-        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].remote_field.field_name, 'id')
+        # The model the FK on the book model points to.
+        fk_field = changes['otherapp'][0].operations[0].fields[2][1]
+        self.assertEqual(fk_field.remote_field.model, 'testapp.Author')
         # Now, we test the custom pk field name
         changes = self.get_changes([], [self.author_unmanaged_custom_pk, self.book])
-        # The field name the FK on the book model points to
-        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].remote_field.field_name, 'pk_field')
+        # The model the FK on the book model points to.
+        fk_field = changes['otherapp'][0].operations[0].fields[2][1]
+        self.assertEqual(fk_field.remote_field.model, 'testapp.Author')
 
     @override_settings(AUTH_USER_MODEL="thirdapp.CustomUser")
     def test_swappable(self):
@@ -1768,11 +1814,7 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["AlterField"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0, model_name="author", name='user')
         fk_field = changes['testapp'][0].operations[0].field
-        to_model = '%s.%s' % (
-            fk_field.remote_field.model._meta.app_label,
-            fk_field.remote_field.model._meta.object_name,
-        )
-        self.assertEqual(to_model, 'thirdapp.CustomUser')
+        self.assertEqual(fk_field.remote_field.model, 'thirdapp.CustomUser')
 
     def test_add_field_with_default(self):
         """#22030 - Adding a field with a default should work."""
@@ -2131,6 +2173,115 @@ class AutodetectorTests(TestCase):
         )
         self.assertNotIn("_order", [name for name, field in changes['testapp'][0].operations[0].fields])
 
+    def test_add_model_order_with_respect_to_index_foo_together(self):
+        changes = self.get_changes([], [
+            self.book,
+            ModelState('testapp', 'Author', [
+                ('id', models.AutoField(primary_key=True)),
+                ('name', models.CharField(max_length=200)),
+                ('book', models.ForeignKey('otherapp.Book', models.CASCADE)),
+            ], options={
+                'order_with_respect_to': 'book',
+                'index_together': {('name', '_order')},
+                'unique_together': {('id', '_order')},
+            }),
+        ])
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['CreateModel'])
+        self.assertOperationAttributes(
+            changes,
+            'testapp',
+            0,
+            0,
+            name='Author',
+            options={
+                'order_with_respect_to': 'book',
+                'index_together': {('name', '_order')},
+                'unique_together': {('id', '_order')},
+            },
+        )
+
+    def test_add_model_order_with_respect_to_index_constraint(self):
+        tests = [
+            (
+                'AddIndex',
+                {'indexes': [
+                    models.Index(fields=['_order'], name='book_order_idx'),
+                ]},
+            ),
+            (
+                'AddConstraint',
+                {'constraints': [
+                    models.CheckConstraint(
+                        check=models.Q(_order__gt=1),
+                        name='book_order_gt_1',
+                    ),
+                ]},
+            ),
+        ]
+        for operation, extra_option in tests:
+            with self.subTest(operation=operation):
+                after = ModelState('testapp', 'Author', [
+                    ('id', models.AutoField(primary_key=True)),
+                    ('name', models.CharField(max_length=200)),
+                    ('book', models.ForeignKey('otherapp.Book', models.CASCADE)),
+                ], options={
+                    'order_with_respect_to': 'book',
+                    **extra_option,
+                })
+                changes = self.get_changes([], [self.book, after])
+                self.assertNumberMigrations(changes, 'testapp', 1)
+                self.assertOperationTypes(changes, 'testapp', 0, [
+                    'CreateModel', operation,
+                ])
+                self.assertOperationAttributes(
+                    changes,
+                    'testapp',
+                    0,
+                    0,
+                    name='Author',
+                    options={'order_with_respect_to': 'book'},
+                )
+
+    def test_set_alter_order_with_respect_to_index_constraint_foo_together(self):
+        tests = [
+            (
+                'AddIndex',
+                {'indexes': [
+                    models.Index(fields=['_order'], name='book_order_idx'),
+                ]},
+            ),
+            (
+                'AddConstraint',
+                {'constraints': [
+                    models.CheckConstraint(
+                        check=models.Q(_order__gt=1),
+                        name='book_order_gt_1',
+                    ),
+                ]},
+            ),
+            ('AlterIndexTogether', {'index_together': {('name', '_order')}}),
+            ('AlterUniqueTogether', {'unique_together': {('id', '_order')}}),
+        ]
+        for operation, extra_option in tests:
+            with self.subTest(operation=operation):
+                after = ModelState('testapp', 'Author', [
+                    ('id', models.AutoField(primary_key=True)),
+                    ('name', models.CharField(max_length=200)),
+                    ('book', models.ForeignKey('otherapp.Book', models.CASCADE)),
+                ], options={
+                    'order_with_respect_to': 'book',
+                    **extra_option,
+                })
+                changes = self.get_changes(
+                    [self.book, self.author_with_book],
+                    [self.book, after],
+                )
+                self.assertNumberMigrations(changes, 'testapp', 1)
+                self.assertOperationTypes(changes, 'testapp', 0, [
+                    'AlterOrderWithRespectTo', operation,
+                ])
+
     def test_alter_model_managers(self):
         """
         Changing the model managers adds a new operation.
@@ -2192,6 +2343,26 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "CreateModel"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0, name="Author")
         self.assertOperationAttributes(changes, 'testapp', 0, 1, name="Aardvark")
+
+    def test_bases_first_mixed_case_app_label(self):
+        app_label = 'MiXedCaseApp'
+        changes = self.get_changes([], [
+            ModelState(app_label, 'owner', [
+                ('id', models.AutoField(primary_key=True)),
+            ]),
+            ModelState(app_label, 'place', [
+                ('id', models.AutoField(primary_key=True)),
+                ('owner', models.ForeignKey('MiXedCaseApp.owner', models.CASCADE)),
+            ]),
+            ModelState(app_label, 'restaurant', [], bases=('MiXedCaseApp.place',)),
+        ])
+        self.assertNumberMigrations(changes, app_label, 1)
+        self.assertOperationTypes(changes, app_label, 0, [
+            'CreateModel', 'CreateModel', 'CreateModel',
+        ])
+        self.assertOperationAttributes(changes, app_label, 0, 0, name='owner')
+        self.assertOperationAttributes(changes, app_label, 0, 1, name='place')
+        self.assertOperationAttributes(changes, app_label, 0, 2, name='restaurant')
 
     def test_multiple_bases(self):
         """#23956 - Inheriting models doesn't move *_ptr fields into AddField operations."""
@@ -2454,3 +2625,143 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'app', 1)
         self.assertOperationTypes(changes, 'app', 0, ['DeleteModel'])
         self.assertOperationAttributes(changes, 'app', 0, 0, name='Dog')
+
+    def test_add_model_with_field_removed_from_base_model(self):
+        """
+        Removing a base field takes place before adding a new inherited model
+        that has a field with the same name.
+        """
+        before = [
+            ModelState('app', 'readable', [
+                ('id', models.AutoField(primary_key=True)),
+                ('title', models.CharField(max_length=200)),
+            ]),
+        ]
+        after = [
+            ModelState('app', 'readable', [
+                ('id', models.AutoField(primary_key=True)),
+            ]),
+            ModelState('app', 'book', [
+                ('title', models.CharField(max_length=200)),
+            ], bases=('app.readable',)),
+        ]
+        changes = self.get_changes(before, after)
+        self.assertNumberMigrations(changes, 'app', 1)
+        self.assertOperationTypes(changes, 'app', 0, ['RemoveField', 'CreateModel'])
+        self.assertOperationAttributes(changes, 'app', 0, 0, name='title', model_name='readable')
+        self.assertOperationAttributes(changes, 'app', 0, 1, name='book')
+
+
+class MigrationSuggestNameTests(SimpleTestCase):
+    def test_no_operations(self):
+        class Migration(migrations.Migration):
+            operations = []
+
+        migration = Migration('some_migration', 'test_app')
+        self.assertIs(migration.suggest_name().startswith('auto_'), True)
+
+    def test_no_operations_initial(self):
+        class Migration(migrations.Migration):
+            initial = True
+            operations = []
+
+        migration = Migration('some_migration', 'test_app')
+        self.assertEqual(migration.suggest_name(), 'initial')
+
+    def test_single_operation(self):
+        class Migration(migrations.Migration):
+            operations = [migrations.CreateModel('Person', fields=[])]
+
+        migration = Migration('0001_initial', 'test_app')
+        self.assertEqual(migration.suggest_name(), 'person')
+
+        class Migration(migrations.Migration):
+            operations = [migrations.DeleteModel('Person')]
+
+        migration = Migration('0002_initial', 'test_app')
+        self.assertEqual(migration.suggest_name(), 'delete_person')
+
+    def test_single_operation_long_name(self):
+        class Migration(migrations.Migration):
+            operations = [migrations.CreateModel('A' * 53, fields=[])]
+
+        migration = Migration('some_migration', 'test_app')
+        self.assertEqual(migration.suggest_name(), 'a' * 53)
+
+    def test_two_operations(self):
+        class Migration(migrations.Migration):
+            operations = [
+                migrations.CreateModel('Person', fields=[]),
+                migrations.DeleteModel('Animal'),
+            ]
+
+        migration = Migration('some_migration', 'test_app')
+        self.assertEqual(migration.suggest_name(), 'person_delete_animal')
+
+    def test_two_create_models(self):
+        class Migration(migrations.Migration):
+            operations = [
+                migrations.CreateModel('Person', fields=[]),
+                migrations.CreateModel('Animal', fields=[]),
+            ]
+
+        migration = Migration('0001_initial', 'test_app')
+        self.assertEqual(migration.suggest_name(), 'person_animal')
+
+    def test_two_create_models_with_initial_true(self):
+        class Migration(migrations.Migration):
+            initial = True
+            operations = [
+                migrations.CreateModel('Person', fields=[]),
+                migrations.CreateModel('Animal', fields=[]),
+            ]
+
+        migration = Migration('0001_initial', 'test_app')
+        self.assertEqual(migration.suggest_name(), 'initial')
+
+    def test_many_operations_suffix(self):
+        class Migration(migrations.Migration):
+            operations = [
+                migrations.CreateModel('Person1', fields=[]),
+                migrations.CreateModel('Person2', fields=[]),
+                migrations.CreateModel('Person3', fields=[]),
+                migrations.DeleteModel('Person4'),
+                migrations.DeleteModel('Person5'),
+            ]
+
+        migration = Migration('some_migration', 'test_app')
+        self.assertEqual(
+            migration.suggest_name(),
+            'person1_person2_person3_delete_person4_and_more',
+        )
+
+    def test_operation_with_no_suggested_name(self):
+        class Migration(migrations.Migration):
+            operations = [
+                migrations.CreateModel('Person', fields=[]),
+                migrations.RunSQL('SELECT 1 FROM person;'),
+            ]
+
+        migration = Migration('some_migration', 'test_app')
+        self.assertIs(migration.suggest_name().startswith('auto_'), True)
+
+    def test_none_name(self):
+        class Migration(migrations.Migration):
+            operations = [migrations.RunSQL('SELECT 1 FROM person;')]
+
+        migration = Migration('0001_initial', 'test_app')
+        suggest_name = migration.suggest_name()
+        self.assertIs(suggest_name.startswith('auto_'), True)
+
+    def test_none_name_with_initial_true(self):
+        class Migration(migrations.Migration):
+            initial = True
+            operations = [migrations.RunSQL('SELECT 1 FROM person;')]
+
+        migration = Migration('0001_initial', 'test_app')
+        self.assertEqual(migration.suggest_name(), 'initial')
+
+    def test_auto(self):
+        migration = migrations.Migration('0001_initial', 'test_app')
+        suggest_name = migration.suggest_name()
+        self.assertIs(suggest_name.startswith('auto_'), True)

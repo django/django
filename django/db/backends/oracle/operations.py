@@ -89,7 +89,8 @@ END;
             # https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/EXTRACT-datetime.html
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
-    def date_trunc_sql(self, lookup_type, field_name):
+    def date_trunc_sql(self, lookup_type, field_name, tzname=None):
+        field_name = self._convert_field_to_tz(field_name, tzname)
         # https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/ROUND-and-TRUNC-Date-Functions.html
         if lookup_type in ('year', 'month'):
             return "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
@@ -114,7 +115,7 @@ END;
         return tzname
 
     def _convert_field_to_tz(self, field_name, tzname):
-        if not settings.USE_TZ:
+        if not (settings.USE_TZ and tzname):
             return field_name
         if not self._tzname_re.match(tzname):
             raise ValueError("Invalid time zone name: %s" % tzname)
@@ -134,9 +135,15 @@ END;
         return 'TRUNC(%s)' % field_name
 
     def datetime_cast_time_sql(self, field_name, tzname):
-        # Since `TimeField` values are stored as TIMESTAMP where only the date
-        # part is ignored, convert the field to the specified timezone.
-        return self._convert_field_to_tz(field_name, tzname)
+        # Since `TimeField` values are stored as TIMESTAMP change to the
+        # default date and convert the field to the specified timezone.
+        convert_datetime_sql = (
+            "TO_TIMESTAMP(CONCAT('1900-01-01 ', TO_CHAR(%s, 'HH24:MI:SS.FF')), "
+            "'YYYY-MM-DD HH24:MI:SS.FF')"
+        ) % self._convert_field_to_tz(field_name, tzname)
+        return "CASE WHEN %s IS NOT NULL THEN %s ELSE NULL END" % (
+            field_name, convert_datetime_sql,
+        )
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
@@ -161,10 +168,11 @@ END;
             sql = "CAST(%s AS DATE)" % field_name  # Cast to DATE removes sub-second precision.
         return sql
 
-    def time_trunc_sql(self, lookup_type, field_name):
+    def time_trunc_sql(self, lookup_type, field_name, tzname=None):
         # The implementation is similar to `datetime_trunc_sql` as both
         # `DateTimeField` and `TimeField` are stored as TIMESTAMP where
         # the date part of the later is ignored.
+        field_name = self._convert_field_to_tz(field_name, tzname)
         if lookup_type == 'hour':
             sql = "TRUNC(%s, 'HH24')" % field_name
         elif lookup_type == 'minute':
@@ -176,11 +184,11 @@ END;
     def get_db_converters(self, expression):
         converters = super().get_db_converters(expression)
         internal_type = expression.output_field.get_internal_type()
-        if internal_type == 'TextField':
+        if internal_type in ['JSONField', 'TextField']:
             converters.append(self.convert_textfield_value)
         elif internal_type == 'BinaryField':
             converters.append(self.convert_binaryfield_value)
-        elif internal_type in ['BooleanField', 'NullBooleanField']:
+        elif internal_type == 'BooleanField':
             converters.append(self.convert_booleanfield_value)
         elif internal_type == 'DateTimeField':
             if settings.USE_TZ:
@@ -256,20 +264,18 @@ END;
         columns = []
         for param in returning_params:
             value = param.get_value()
-            if value is None or value == []:
-                # cx_Oracle < 6.3 returns None, >= 6.3 returns empty list.
+            if value == []:
                 raise DatabaseError(
                     'The database did not return a new row id. Probably '
                     '"ORA-1403: no data found" was raised internally but was '
                     'hidden by the Oracle OCI library (see '
                     'https://code.djangoproject.com/ticket/28859).'
                 )
-            # cx_Oracle < 7 returns value, >= 7 returns list with single value.
-            columns.append(value[0] if isinstance(value, list) else value)
+            columns.append(value[0])
         return tuple(columns)
 
     def field_cast_sql(self, db_type, internal_type):
-        if db_type and db_type.endswith('LOB'):
+        if db_type and db_type.endswith('LOB') and internal_type != 'JSONField':
             return "DBMS_LOB.SUBSTR(%s)"
         else:
             return "%s"
@@ -307,6 +313,8 @@ END;
     def lookup_cast(self, lookup_type, internal_type=None):
         if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith'):
             return "UPPER(%s)"
+        if internal_type == 'JSONField' and lookup_type == 'exact':
+            return 'DBMS_LOB.SUBSTR(%s)'
         return "%s"
 
     def max_in_list_size(self):
@@ -332,15 +340,12 @@ END;
         # always defaults to uppercase.
         # We simplify things by making Oracle identifiers always uppercase.
         if not name.startswith('"') and not name.endswith('"'):
-            name = '"%s"' % truncate_name(name.upper(), self.max_name_length())
+            name = '"%s"' % truncate_name(name, self.max_name_length())
         # Oracle puts the query text into a (query % args) construct, so % signs
         # in names need to be escaped. The '%%' will be collapsed back to '%' at
         # that stage so we aren't really making the name longer here.
         name = name.replace('%', '%%')
         return name.upper()
-
-    def random_function_sql(self):
-        return "DBMS_RANDOM.RANDOM"
 
     def regex_lookup(self, lookup_type):
         if lookup_type == 'regex':
@@ -404,53 +409,58 @@ END;
         # Django's test suite.
         return lru_cache(maxsize=512)(self.__foreign_key_constraints)
 
-    def sql_flush(self, style, tables, sequences, allow_cascade=False):
-        if tables:
-            truncated_tables = {table.upper() for table in tables}
-            constraints = set()
-            # Oracle's TRUNCATE CASCADE only works with ON DELETE CASCADE
-            # foreign keys which Django doesn't define. Emulate the
-            # PostgreSQL behavior which truncates all dependent tables by
-            # manually retrieving all foreign key constraints and resolving
-            # dependencies.
-            for table in tables:
-                for foreign_table, constraint in self._foreign_key_constraints(table, recursive=allow_cascade):
-                    if allow_cascade:
-                        truncated_tables.add(foreign_table)
-                    constraints.add((foreign_table, constraint))
-            sql = [
-                "%s %s %s %s %s %s %s %s;" % (
-                    style.SQL_KEYWORD('ALTER'),
-                    style.SQL_KEYWORD('TABLE'),
-                    style.SQL_FIELD(self.quote_name(table)),
-                    style.SQL_KEYWORD('DISABLE'),
-                    style.SQL_KEYWORD('CONSTRAINT'),
-                    style.SQL_FIELD(self.quote_name(constraint)),
-                    style.SQL_KEYWORD('KEEP'),
-                    style.SQL_KEYWORD('INDEX'),
-                ) for table, constraint in constraints
-            ] + [
-                "%s %s %s;" % (
-                    style.SQL_KEYWORD('TRUNCATE'),
-                    style.SQL_KEYWORD('TABLE'),
-                    style.SQL_FIELD(self.quote_name(table)),
-                ) for table in truncated_tables
-            ] + [
-                "%s %s %s %s %s %s;" % (
-                    style.SQL_KEYWORD('ALTER'),
-                    style.SQL_KEYWORD('TABLE'),
-                    style.SQL_FIELD(self.quote_name(table)),
-                    style.SQL_KEYWORD('ENABLE'),
-                    style.SQL_KEYWORD('CONSTRAINT'),
-                    style.SQL_FIELD(self.quote_name(constraint)),
-                ) for table, constraint in constraints
-            ]
-            # Since we've just deleted all the rows, running our sequence
-            # ALTER code will reset the sequence to 0.
-            sql.extend(self.sequence_reset_by_name_sql(style, sequences))
-            return sql
-        else:
+    def sql_flush(self, style, tables, *, reset_sequences=False, allow_cascade=False):
+        if not tables:
             return []
+
+        truncated_tables = {table.upper() for table in tables}
+        constraints = set()
+        # Oracle's TRUNCATE CASCADE only works with ON DELETE CASCADE foreign
+        # keys which Django doesn't define. Emulate the PostgreSQL behavior
+        # which truncates all dependent tables by manually retrieving all
+        # foreign key constraints and resolving dependencies.
+        for table in tables:
+            for foreign_table, constraint in self._foreign_key_constraints(table, recursive=allow_cascade):
+                if allow_cascade:
+                    truncated_tables.add(foreign_table)
+                constraints.add((foreign_table, constraint))
+        sql = [
+            '%s %s %s %s %s %s %s %s;' % (
+                style.SQL_KEYWORD('ALTER'),
+                style.SQL_KEYWORD('TABLE'),
+                style.SQL_FIELD(self.quote_name(table)),
+                style.SQL_KEYWORD('DISABLE'),
+                style.SQL_KEYWORD('CONSTRAINT'),
+                style.SQL_FIELD(self.quote_name(constraint)),
+                style.SQL_KEYWORD('KEEP'),
+                style.SQL_KEYWORD('INDEX'),
+            ) for table, constraint in constraints
+        ] + [
+            '%s %s %s;' % (
+                style.SQL_KEYWORD('TRUNCATE'),
+                style.SQL_KEYWORD('TABLE'),
+                style.SQL_FIELD(self.quote_name(table)),
+            ) for table in truncated_tables
+        ] + [
+            '%s %s %s %s %s %s;' % (
+                style.SQL_KEYWORD('ALTER'),
+                style.SQL_KEYWORD('TABLE'),
+                style.SQL_FIELD(self.quote_name(table)),
+                style.SQL_KEYWORD('ENABLE'),
+                style.SQL_KEYWORD('CONSTRAINT'),
+                style.SQL_FIELD(self.quote_name(constraint)),
+            ) for table, constraint in constraints
+        ]
+        if reset_sequences:
+            sequences = [
+                sequence
+                for sequence in self.connection.introspection.sequence_list()
+                if sequence['table'].upper() in truncated_tables
+            ]
+            # Since we've just deleted all the rows, running our sequence ALTER
+            # code will reset the sequence to 0.
+            sql.extend(self.sequence_reset_by_name_sql(style, sequences))
+        return sql
 
     def sequence_reset_by_name_sql(self, style, sequences):
         sql = []
@@ -487,18 +497,6 @@ END;
                     # Only one AutoField is allowed per model, so don't
                     # continue to loop
                     break
-            for f in model._meta.many_to_many:
-                if not f.remote_field.through:
-                    no_autofield_sequence_name = self._get_no_autofield_sequence_name(f.m2m_db_table())
-                    table = self.quote_name(f.m2m_db_table())
-                    column = self.quote_name('id')
-                    output.append(query % {
-                        'no_autofield_sequence_name': no_autofield_sequence_name,
-                        'table': table,
-                        'column': column,
-                        'table_name': strip_quotes(table),
-                        'column_name': 'ID',
-                    })
         return output
 
     def start_transaction_sql(self):
@@ -562,6 +560,9 @@ END;
 
         return Oracle_datetime(1900, 1, 1, value.hour, value.minute,
                                value.second, value.microsecond)
+
+    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
+        return value
 
     def combine_expression(self, connector, sub_expressions):
         lhs, rhs = sub_expressions

@@ -126,7 +126,7 @@ You can query the models using :ref:`lookups across relationships <lookups-that-
     >>> Restaurant.objects.exclude(place__address__contains="Ashland")
     <QuerySet [<Restaurant: Demon Dogs the restaurant>]>
 
-This of course works in reverse::
+This also works in reverse::
 
     >>> Place.objects.get(pk=1)
     <Place: Demon Dogs the place>

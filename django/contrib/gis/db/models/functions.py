@@ -101,10 +101,13 @@ class SQLiteDecimalToFloatMixin:
     is not acceptable by the GIS functions expecting numeric values.
     """
     def as_sqlite(self, compiler, connection, **extra_context):
-        for expr in self.get_source_expressions():
-            if hasattr(expr, 'value') and isinstance(expr.value, Decimal):
-                expr.value = float(expr.value)
-        return super().as_sql(compiler, connection, **extra_context)
+        copy = self.copy()
+        copy.set_source_expressions([
+            Value(float(expr.value)) if hasattr(expr, 'value') and isinstance(expr.value, Decimal)
+            else expr
+            for expr in copy.get_source_expressions()
+        ])
+        return copy.as_sql(compiler, connection, **extra_context)
 
 
 class OracleToleranceMixin:
@@ -190,12 +193,14 @@ class AsGML(GeoFunc):
         return super(AsGML, clone).as_sql(compiler, connection, **extra_context)
 
 
-class AsKML(AsGML):
-    def as_sqlite(self, compiler, connection, **extra_context):
-        # No version parameter
-        clone = self.copy()
-        clone.set_source_expressions(self.get_source_expressions()[1:])
-        return clone.as_sql(compiler, connection, **extra_context)
+class AsKML(GeoFunc):
+    output_field = TextField()
+
+    def __init__(self, expression, precision=8, **extra):
+        expressions = [expression]
+        if precision is not None:
+            expressions.append(self._handle_param(precision, 'precision', int))
+        super().__init__(*expressions, **extra)
 
 
 class AsSVG(GeoFunc):
@@ -221,7 +226,7 @@ class AsWKT(GeoFunc):
     arity = 1
 
 
-class BoundingCircle(OracleToleranceMixin, GeoFunc):
+class BoundingCircle(OracleToleranceMixin, GeomOutputGeoFunc):
     def __init__(self, expression, num_seg=48, **extra):
         super().__init__(expression, num_seg, **extra)
 

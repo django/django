@@ -1,5 +1,6 @@
 from itertools import chain
 
+from django.utils.inspect import func_accepts_kwargs
 from django.utils.itercompat import is_iterable
 
 
@@ -12,9 +13,12 @@ class Tags:
     caches = 'caches'
     compatibility = 'compatibility'
     database = 'database'
+    files = 'files'
     models = 'models'
     security = 'security'
     signals = 'signals'
+    sites = 'sites'
+    staticfiles = 'staticfiles'
     templates = 'templates'
     translation = 'translation'
     urls = 'urls'
@@ -36,13 +40,17 @@ class CheckRegistry:
 
             registry = CheckRegistry()
             @registry.register('mytag', 'anothertag')
-            def my_check(apps, **kwargs):
+            def my_check(app_configs, **kwargs):
                 # ... perform checks and collect `errors` ...
                 return errors
             # or
             registry.register(my_check, 'mytag', 'anothertag')
         """
         def inner(check):
+            if not func_accepts_kwargs(check):
+                raise TypeError(
+                    'Check functions must accept keyword arguments (**kwargs).'
+                )
             check.tags = tags
             checks = self.deployment_checks if kwargs.get('deploy') else self.registered_checks
             checks.add(check)
@@ -67,9 +75,12 @@ class CheckRegistry:
 
         for check in checks:
             new_errors = check(app_configs=app_configs, databases=databases)
-            assert is_iterable(new_errors), (
-                "The function %r did not return a list. All functions registered "
-                "with the checks registry must return a list." % check)
+            if not is_iterable(new_errors):
+                raise TypeError(
+                    'The function %r did not return a list. All functions '
+                    'registered with the checks registry must return a list.'
+                    % check,
+                )
             errors.extend(new_errors)
         return errors
 

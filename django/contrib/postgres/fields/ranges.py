@@ -173,8 +173,7 @@ class DateTimeRangeContains(PostgresOperatorLookup):
     def process_rhs(self, compiler, connection):
         # Transform rhs value for db lookup.
         if isinstance(self.rhs, datetime.date):
-            output_field = models.DateTimeField() if isinstance(self.rhs, datetime.datetime) else models.DateField()
-            value = models.Value(self.rhs, output_field=output_field)
+            value = models.Value(self.rhs)
             self.rhs = value.resolve_expression(compiler.query)
         return super().process_rhs(compiler, connection)
 

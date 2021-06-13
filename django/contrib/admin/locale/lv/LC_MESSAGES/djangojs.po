@@ -3,13 +3,14 @@
 # Translators:
 # NullIsNot0 <nullisnot0@inbox.lv>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
+# NullIsNot0 <nullisnot0@inbox.lv>, 2020-2021
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-11-18 08:13+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-25 22:47+0000\n"
 "Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
@@ -88,20 +89,20 @@ msgstr ""
 "izpildīsiet izvēlēto darbību, šīs izmaiņas netiks saglabātas."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Jūs esat izvēlējies veikt darbību un neesat saglabājis veiktās izmaiņas. "
-"Lūdzu nospiežat OK, lai saglabātu. Jums nāksies šo darbību izpildīt vēlreiz."
+"Jūs esiet izvēlējies veikt darbību, bet neesiet saglabājis veiktās izmaiņas. "
+"Lūdzu nospiediet OK, lai saglabātu. Šo darbību jums nāksies izpildīt vēlreiz."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Jūs esat izvēlējies veikt darbību un neesat izmainījis nevienu lauku. Jūs "
-"droši vien meklējat pogu 'Aiziet' nevis 'Saglabāt'."
+"Jūs esiet izvēlējies veikt darbību un neesiet mainījis nevienu lauku. Jūs "
+"droši vien meklējiet pogu 'Aiziet' nevis 'Saglabāt'."
 
 msgid "Now"
 msgstr "Tagad"
@@ -188,6 +189,54 @@ msgstr "novembris"
 
 msgid "December"
 msgstr "decembris"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Mai"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Jūn"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Jūl"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Aug"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sep"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dec"
 
 msgctxt "one letter Sunday"
 msgid "S"

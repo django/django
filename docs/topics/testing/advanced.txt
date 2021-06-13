@@ -507,10 +507,10 @@ Defining a test runner
 A test runner is a class defining a ``run_tests()`` method. Django ships
 with a ``DiscoverRunner`` class that defines the default Django testing
 behavior. This class defines the ``run_tests()`` entry point, plus a
-selection of other methods that are used to by ``run_tests()`` to set up,
-execute and tear down the test suite.
+selection of other methods that are used by ``run_tests()`` to set up, execute
+and tear down the test suite.
 
-.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, test_name_patterns=None, **kwargs)
+.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, parallel=0, tags=None, exclude_tags=None, test_name_patterns=None, pdb=False, buffer=False, enable_faulthandler=True, timing=True, **kwargs)
 
     ``DiscoverRunner`` will search for tests in any file matching ``pattern``.
 
@@ -544,6 +544,19 @@ execute and tear down the test suite.
     ``debug_mode`` specifies what the :setting:`DEBUG` setting should be
     set to prior to running tests.
 
+    ``parallel`` specifies the number of processes.  If ``parallel`` is greater
+    than ``1``, the test suite will run in ``parallel`` processes. If there are
+    fewer test cases than configured processes, Django will reduce the number
+    of processes accordingly. Each process gets its own database. This option
+    requires the third-party ``tblib`` package to display tracebacks correctly.
+
+    ``tags`` can be used to specify a set of :ref:`tags for filtering tests
+    <topics-tagging-tests>`. May be combined with ``exclude_tags``.
+
+    ``exclude_tags`` can be used to specify a set of
+    :ref:`tags for excluding tests <topics-tagging-tests>`. May be combined
+    with ``tags``.
+
     If ``debug_sql`` is ``True``, failing test cases will output SQL queries
     logged to the :ref:`django.db.backends logger <django-db-logger>` as well
     as the traceback. If ``verbosity`` is ``2``, then queries in all tests are
@@ -551,6 +564,17 @@ execute and tear down the test suite.
 
     ``test_name_patterns`` can be used to specify a set of patterns for
     filtering test methods and classes by their names.
+
+    If ``pdb`` is ``True``, a debugger (``pdb`` or ``ipdb``) will be spawned at
+    each test error or failure.
+
+    If ``buffer`` is ``True``, outputs from passing tests will be discarded.
+
+    If ``enable_faulthandler`` is ``True``, :py:mod:`faulthandler` will be
+    enabled.
+
+    If ``timing`` is ``True``, test timings, including database setup and total
+    run time, will be shown.
 
     Django may, from time to time, extend the capabilities of the test runner
     by adding new arguments. The ``**kwargs`` declaration allows for this
@@ -561,6 +585,10 @@ execute and tear down the test suite.
     Create or override an ``add_arguments(cls, parser)`` class method and add
     custom arguments by calling ``parser.add_argument()`` inside the method, so
     that the :djadmin:`test` command will be able to use those arguments.
+
+    .. versionadded:: 3.2
+
+        The ``enable_faulthandler`` and ``timing`` arguments were added.
 
 Attributes
 ~~~~~~~~~~
@@ -617,7 +645,7 @@ Methods
     :func:`~django.test.utils.setup_test_environment` and setting
     :setting:`DEBUG` to ``self.debug_mode`` (defaults to ``False``).
 
-.. method:: DiscoverRunner.build_suite(test_labels, extra_tests=None, **kwargs)
+.. method:: DiscoverRunner.build_suite(test_labels=None, extra_tests=None, **kwargs)
 
     Constructs a test suite that matches the test labels provided.
 
@@ -652,10 +680,6 @@ Methods
 
     Runs the :doc:`system checks </topics/checks>` on the test ``databases``.
 
-    .. versionadded:: 3.1
-
-        The ``databases`` parameter was added.
-
 .. method:: DiscoverRunner.run_suite(suite, **kwargs)
 
     Runs the test suite.
@@ -681,6 +705,17 @@ Methods
     Computes and returns a return code based on a test suite, and the result
     from that test suite.
 
+.. method:: DiscoverRunner.log(msg, level=None)
+
+    .. versionadded:: 4.0
+
+    Prints to the console a message with the given integer `logging level`_
+    (e.g. ``logging.DEBUG``, ``logging.INFO``, or ``logging.WARNING``),
+    respecting the current ``verbosity``. For example, an ``INFO`` message will
+    be logged if the ``verbosity`` is at least 1, and ``DEBUG`` will be logged
+    if it is at least 2.
+
+.. _`logging level`: https://docs.python.org/3/library/logging.html#levels
 
 Testing utilities
 -----------------
@@ -707,7 +742,7 @@ utility methods in the ``django.test.utils`` module.
     Performs global post-test teardown, such as removing instrumentation from
     the template system and restoring normal email services.
 
-.. function:: setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, aliases=None, **kwargs)
+.. function:: setup_databases(verbosity, interactive, *, time_keeper=None, keepdb=False, debug_sql=False, parallel=0, aliases=None, serialized_aliases=None, **kwargs)
 
     Creates the test databases.
 
@@ -718,6 +753,20 @@ utility methods in the ``django.test.utils`` module.
     The ``aliases`` argument determines which :setting:`DATABASES` aliases test
     databases should be setup for. If it's not provided, it defaults to all of
     :setting:`DATABASES` aliases.
+
+    The ``serialized_aliases`` argument determines what subset of ``aliases``
+    test databases should have their state serialized to allow usage of the
+    :ref:`serialized_rollback <test-case-serialized-rollback>` feature. If
+    it's not provided, it defaults to ``aliases``.
+
+    .. versionchanged:: 3.2
+
+        The ``time_keeper`` kwarg was added, and all kwargs were made
+        keyword-only.
+
+    .. versionchanged:: 4.0
+
+        The ``serialized_aliases`` kwarg was added.
 
 .. function:: teardown_databases(old_config, parallel=0, keepdb=False)
 

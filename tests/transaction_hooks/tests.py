@@ -233,3 +233,8 @@ class TestConnectionOnCommit(TransactionTestCase):
                 transaction.on_commit(should_never_be_called)
         finally:
             connection.set_autocommit(True)
+
+    def test_raises_exception_non_callable(self):
+        msg = "on_commit()'s callback must be a callable."
+        with self.assertRaisesMessage(TypeError, msg):
+            transaction.on_commit(None)

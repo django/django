@@ -161,6 +161,11 @@ def from_current_timezone(value):
     if settings.USE_TZ and value is not None and timezone.is_naive(value):
         current_timezone = timezone.get_current_timezone()
         try:
+            if (
+                not timezone._is_pytz_zone(current_timezone) and
+                timezone._datetime_ambiguous_or_imaginary(value, current_timezone)
+            ):
+                raise ValueError('Ambiguous or non-existent time.')
             return timezone.make_aware(value, current_timezone)
         except Exception as exc:
             raise ValidationError(

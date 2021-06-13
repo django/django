@@ -50,7 +50,7 @@ Django will choose a view by examining the URL that's requested (to be precise,
 the part of the URL after the domain name).
 
 Now in your time on the web you may have come across such beauties as
-"ME2/Sites/dirmod.asp?sid=&type=gen&mod=Core+Pages&gid=A6CD4967199A42D9B65B1B".
+``ME2/Sites/dirmod.htm?sid=&type=gen&mod=Core+Pages&gid=A6CD4967199A42D9B65B1B``.
 You will be pleased to know that Django allows us much more elegant
 *URL patterns* than that.
 
@@ -212,7 +212,7 @@ Put the following code in that template:
     To make the tutorial shorter, all template examples use incomplete HTML. In
     your own projects you should use `complete HTML documents`__.
 
-__ https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/Getting_started#Anatomy_of_an_HTML_document
+__ https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/Getting_started#anatomy_of_an_html_document
 
 Now let's update our ``index`` view in ``polls/views.py`` to use the template:
 

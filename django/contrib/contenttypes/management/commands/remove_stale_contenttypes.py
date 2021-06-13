@@ -71,7 +71,7 @@ This list doesn't include any cascade deletions to data outside of Django's
 models (uncommon).
 
 Are you sure you want to delete these content types?
-If you're unsure, answer 'no'.\n""" % content_type_display)
+If you're unsure, answer 'no'.""" % content_type_display)
                     ok_to_delete = input("Type 'yes' to continue, or 'no' to cancel: ")
                 else:
                     ok_to_delete = 'yes'

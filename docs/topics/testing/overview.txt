@@ -229,9 +229,20 @@ the Django test runner reorders tests in the following way:
     database by a given :class:`~django.test.TransactionTestCase` test, they
     must be updated to be able to run independently.
 
+.. note::
+
+    Failures detected when loading tests are ordered before all of the above
+    for quicker feedback. This includes things like test modules that couldn't
+    be found or that couldn't be loaded due to syntax errors.
+
 You may reverse the execution order inside groups using the :option:`test
 --reverse` option. This can help with ensuring your tests are independent from
 each other.
+
+.. versionchanged:: 4.0
+
+    In older versions, failures detected when loading tests were not ordered
+    first.
 
 .. _test-case-serialized-rollback:
 

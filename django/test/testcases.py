@@ -1,13 +1,15 @@
 import asyncio
 import difflib
 import json
+import logging
 import posixpath
 import sys
 import threading
 import unittest
+import warnings
 from collections import Counter
 from contextlib import contextmanager
-from copy import copy
+from copy import copy, deepcopy
 from difflib import get_close_matches
 from functools import wraps
 from unittest.suite import _DebugResult
@@ -40,7 +42,9 @@ from django.test.utils import (
     CaptureQueriesContext, ContextList, compare_xml, modify_settings,
     override_settings,
 )
+from django.utils.deprecation import RemovedInDjango41Warning
 from django.utils.functional import classproperty
+from django.utils.version import PY310
 from django.views.static import serve
 
 __all__ = ('TestCase', 'TransactionTestCase',
@@ -175,10 +179,13 @@ class SimpleTestCase(unittest.TestCase):
         if cls._overridden_settings:
             cls._cls_overridden_context = override_settings(**cls._overridden_settings)
             cls._cls_overridden_context.enable()
+            cls.addClassCleanup(cls._cls_overridden_context.disable)
         if cls._modified_settings:
             cls._cls_modified_context = modify_settings(cls._modified_settings)
             cls._cls_modified_context.enable()
+            cls.addClassCleanup(cls._cls_modified_context.disable)
         cls._add_databases_failures()
+        cls.addClassCleanup(cls._remove_databases_failures)
 
     @classmethod
     def _validate_databases(cls):
@@ -222,17 +229,6 @@ class SimpleTestCase(unittest.TestCase):
             for name, _ in cls._disallowed_connection_methods:
                 method = getattr(connection, name)
                 setattr(connection, name, method.wrapped)
-
-    @classmethod
-    def tearDownClass(cls):
-        cls._remove_databases_failures()
-        if hasattr(cls, '_cls_modified_context'):
-            cls._cls_modified_context.disable()
-            delattr(cls, '_cls_modified_context')
-        if hasattr(cls, '_cls_overridden_context'):
-            cls._cls_overridden_context.disable()
-            delattr(cls, '_cls_overridden_context')
-        super().tearDownClass()
 
     def __call__(self, result=None):
         """
@@ -343,7 +339,6 @@ class SimpleTestCase(unittest.TestCase):
             )
 
             url, status_code = response.redirect_chain[-1]
-            scheme, netloc, path, query, fragment = urlsplit(url)
 
             self.assertEqual(
                 response.status_code, target_status_code,
@@ -473,7 +468,7 @@ class SimpleTestCase(unittest.TestCase):
         """
         Assert that a response indicates that some content was retrieved
         successfully, (i.e., the HTTP status code was as expected) and that
-        ``text`` doesn't occurs in the content of the response.
+        ``text`` doesn't occur in the content of the response.
         """
         text_repr, real_count, msg_prefix = self._assert_contains(
             response, text, status_code, msg_prefix, html)
@@ -728,6 +723,29 @@ class SimpleTestCase(unittest.TestCase):
             self.assertWarns, 'warning', expected_warning, expected_message,
             *args, **kwargs
         )
+
+    # A similar method is available in Python 3.10+.
+    if not PY310:
+        @contextmanager
+        def assertNoLogs(self, logger, level=None):
+            """
+            Assert no messages are logged on the logger, with at least the
+            given level.
+            """
+            if isinstance(level, int):
+                level = logging.getLevelName(level)
+            elif level is None:
+                level = 'INFO'
+            try:
+                with self.assertLogs(logger, level) as cm:
+                    yield
+            except AssertionError as e:
+                msg = e.args[0]
+                expected_msg = f'no logs of level {level} or higher triggered on {logger}'
+                if msg != expected_msg:
+                    raise e
+            else:
+                self.fail(f'Unexpected logs found: {cm.output!r}')
 
     def assertFieldOutput(self, fieldclass, valid, invalid, field_args=None,
                           field_kwargs=None, empty_value=''):
@@ -1039,16 +1057,37 @@ class TransactionTestCase(SimpleTestCase):
                          allow_cascade=self.available_apps is not None,
                          inhibit_post_migrate=inhibit_post_migrate)
 
-    def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True, msg=None):
-        items = map(transform, qs)
-        if not ordered:
-            return self.assertEqual(Counter(items), Counter(values), msg=msg)
+    def assertQuerysetEqual(self, qs, values, transform=None, ordered=True, msg=None):
         values = list(values)
+        # RemovedInDjango41Warning.
+        if transform is None:
+            if (
+                values and isinstance(values[0], str) and
+                qs and not isinstance(qs[0], str)
+            ):
+                # Transform qs using repr() if the first element of values is a
+                # string and the first element of qs is not (which would be the
+                # case if qs is a flattened values_list).
+                warnings.warn(
+                    "In Django 4.1, repr() will not be called automatically "
+                    "on a queryset when compared to string values. Set an "
+                    "explicit 'transform' to silence this warning.",
+                    category=RemovedInDjango41Warning,
+                    stacklevel=2,
+                )
+                transform = repr
+        items = qs
+        if transform is not None:
+            items = map(transform, items)
+        if not ordered:
+            return self.assertDictEqual(Counter(items), Counter(values), msg=msg)
         # For example qs.iterator() could be passed as qs, but it does not
         # have 'ordered' attribute.
         if len(values) > 1 and hasattr(qs, 'ordered') and not qs.ordered:
-            raise ValueError("Trying to compare non-ordered queryset "
-                             "against more than one ordered values")
+            raise ValueError(
+                'Trying to compare non-ordered queryset against more than one '
+                'ordered value.'
+            )
         return self.assertEqual(list(items), values, msg=msg)
 
     def assertNumQueries(self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs):
@@ -1069,6 +1108,59 @@ def connections_support_transactions(aliases=None):
     """
     conns = connections.all() if aliases is None else (connections[alias] for alias in aliases)
     return all(conn.features.supports_transactions for conn in conns)
+
+
+class TestData:
+    """
+    Descriptor to provide TestCase instance isolation for attributes assigned
+    during the setUpTestData() phase.
+
+    Allow safe alteration of objects assigned in setUpTestData() by test
+    methods by exposing deep copies instead of the original objects.
+
+    Objects are deep copied using a memo kept on the test case instance in
+    order to maintain their original relationships.
+    """
+    memo_attr = '_testdata_memo'
+
+    def __init__(self, name, data):
+        self.name = name
+        self.data = data
+
+    def get_memo(self, testcase):
+        try:
+            memo = getattr(testcase, self.memo_attr)
+        except AttributeError:
+            memo = {}
+            setattr(testcase, self.memo_attr, memo)
+        return memo
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self.data
+        memo = self.get_memo(instance)
+        try:
+            data = deepcopy(self.data, memo)
+        except TypeError:
+            # RemovedInDjango41Warning.
+            msg = (
+                "Assigning objects which don't support copy.deepcopy() during "
+                "setUpTestData() is deprecated. Either assign the %s "
+                "attribute during setUpClass() or setUp(), or add support for "
+                "deepcopy() to %s.%s.%s."
+            ) % (
+                self.name,
+                owner.__module__,
+                owner.__qualname__,
+                self.name,
+            )
+            warnings.warn(msg, category=RemovedInDjango41Warning, stacklevel=2)
+            data = self.data
+        setattr(instance, self.name, data)
+        return data
+
+    def __repr__(self):
+        return '<TestData: name=%r, data=%r>' % (self.name, self.data)
 
 
 class TestCase(TransactionTestCase):
@@ -1109,25 +1201,35 @@ class TestCase(TransactionTestCase):
         super().setUpClass()
         if not cls._databases_support_transactions():
             return
-        cls.cls_atomics = cls._enter_atomics()
-
-        if cls.fixtures:
-            for db_name in cls._databases_names(include_mirrors=False):
-                try:
-                    call_command('loaddata', *cls.fixtures, **{'verbosity': 0, 'database': db_name})
-                except Exception:
-                    cls._rollback_atomics(cls.cls_atomics)
-                    cls._remove_databases_failures()
-                    raise
+        # Disable the durability check to allow testing durable atomic blocks
+        # in a transaction for performance reasons.
+        transaction.Atomic._ensure_durability = False
         try:
-            cls.setUpTestData()
+            cls.cls_atomics = cls._enter_atomics()
+
+            if cls.fixtures:
+                for db_name in cls._databases_names(include_mirrors=False):
+                    try:
+                        call_command('loaddata', *cls.fixtures, **{'verbosity': 0, 'database': db_name})
+                    except Exception:
+                        cls._rollback_atomics(cls.cls_atomics)
+                        raise
+            pre_attrs = cls.__dict__.copy()
+            try:
+                cls.setUpTestData()
+            except Exception:
+                cls._rollback_atomics(cls.cls_atomics)
+                raise
+            for name, value in cls.__dict__.items():
+                if value is not pre_attrs.get(name):
+                    setattr(cls, name, TestData(name, value))
         except Exception:
-            cls._rollback_atomics(cls.cls_atomics)
-            cls._remove_databases_failures()
+            transaction.Atomic._ensure_durability = True
             raise
 
     @classmethod
     def tearDownClass(cls):
+        transaction.Atomic._ensure_durability = True
         if cls._databases_support_transactions():
             cls._rollback_atomics(cls.cls_atomics)
             for conn in connections.all():
@@ -1169,6 +1271,21 @@ class TestCase(TransactionTestCase):
             connection.features.can_defer_constraint_checks and
             not connection.needs_rollback and connection.is_usable()
         )
+
+    @classmethod
+    @contextmanager
+    def captureOnCommitCallbacks(cls, *, using=DEFAULT_DB_ALIAS, execute=False):
+        """Context manager to capture transaction.on_commit() callbacks."""
+        callbacks = []
+        start_count = len(connections[using].run_on_commit)
+        try:
+            yield callbacks
+        finally:
+            run_on_commit = connections[using].run_on_commit[start_count:]
+            callbacks[:] = [func for sids, func in run_on_commit]
+            if execute:
+                for callback in callbacks:
+                    callback()
 
 
 class CheckCondition:
@@ -1349,6 +1466,8 @@ class _MediaFilesHandler(FSFilesHandler):
 class LiveServerThread(threading.Thread):
     """Thread for running a live http server while the tests are running."""
 
+    server_class = ThreadedWSGIServer
+
     def __init__(self, host, static_handler, connections_override=None, port=0):
         self.host = host
         self.port = port
@@ -1384,8 +1503,13 @@ class LiveServerThread(threading.Thread):
         finally:
             connections.close_all()
 
-    def _create_server(self):
-        return ThreadedWSGIServer((self.host, self.port), QuietWSGIRequestHandler, allow_reuse_address=False)
+    def _create_server(self, connections_override=None):
+        return self.server_class(
+            (self.host, self.port),
+            QuietWSGIRequestHandler,
+            allow_reuse_address=False,
+            connections_override=connections_override,
+        )
 
     def terminate(self):
         if hasattr(self, 'httpd'):
@@ -1420,21 +1544,28 @@ class LiveServerTestCase(TransactionTestCase):
         return cls.host
 
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def _make_connections_override(cls):
         connections_override = {}
         for conn in connections.all():
             # If using in-memory sqlite databases, pass the connections to
             # the server thread.
             if conn.vendor == 'sqlite' and conn.is_in_memory_db():
-                # Explicitly enable thread-shareability for this connection
-                conn.inc_thread_sharing()
                 connections_override[conn.alias] = conn
+        return connections_override
 
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
         cls._live_server_modified_settings = modify_settings(
             ALLOWED_HOSTS={'append': cls.allowed_host},
         )
         cls._live_server_modified_settings.enable()
+
+        connections_override = cls._make_connections_override()
+        for conn in connections_override.values():
+            # Explicitly enable thread-shareability for this connection.
+            conn.inc_thread_sharing()
+
         cls.server_thread = cls._create_server_thread(connections_override)
         cls.server_thread.daemon = True
         cls.server_thread.start()
@@ -1458,21 +1589,18 @@ class LiveServerTestCase(TransactionTestCase):
 
     @classmethod
     def _tearDownClassInternal(cls):
-        # There may not be a 'server_thread' attribute if setUpClass() for some
-        # reasons has raised an exception.
-        if hasattr(cls, 'server_thread'):
-            # Terminate the live server's thread
-            cls.server_thread.terminate()
+        # Terminate the live server's thread.
+        cls.server_thread.terminate()
+        # Restore shared connections' non-shareability.
+        for conn in cls.server_thread.connections_override.values():
+            conn.dec_thread_sharing()
 
-            # Restore sqlite in-memory database connections' non-shareability.
-            for conn in cls.server_thread.connections_override.values():
-                conn.dec_thread_sharing()
+        cls._live_server_modified_settings.disable()
+        super().tearDownClass()
 
     @classmethod
     def tearDownClass(cls):
         cls._tearDownClassInternal()
-        cls._live_server_modified_settings.disable()
-        super().tearDownClass()
 
 
 class SerializeMixin:
@@ -1486,17 +1614,16 @@ class SerializeMixin:
     """
     lockfile = None
 
-    @classmethod
-    def setUpClass(cls):
+    def __init_subclass__(cls, /, **kwargs):
+        super().__init_subclass__(**kwargs)
         if cls.lockfile is None:
             raise ValueError(
                 "{}.lockfile isn't set. Set it to a unique value "
                 "in the base class.".format(cls.__name__))
-        cls._lockfile = open(cls.lockfile)
-        locks.lock(cls._lockfile, locks.LOCK_EX)
-        super().setUpClass()
 
     @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        cls._lockfile.close()
+    def setUpClass(cls):
+        cls._lockfile = open(cls.lockfile)
+        cls.addClassCleanup(cls._lockfile.close)
+        locks.lock(cls._lockfile, locks.LOCK_EX)
+        super().setUpClass()

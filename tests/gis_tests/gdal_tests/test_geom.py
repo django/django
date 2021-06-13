@@ -350,7 +350,9 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(k1, orig)
         self.assertNotEqual(k1, k2)
 
-        prec = 3
+        # Different PROJ versions use different transformations, all are
+        # correct as having a 1 meter accuracy.
+        prec = -1
         for p in (t1, t2, t3, k2):
             self.assertAlmostEqual(trans.x, p.x, prec)
             self.assertAlmostEqual(trans.y, p.y, prec)
@@ -360,7 +362,9 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         ls_orig = OGRGeometry('LINESTRING(-104.609 38.255)', 4326)
         ls_trans = OGRGeometry('LINESTRING(992385.4472045 481455.4944650)', 2774)
 
-        prec = 3
+        # Different PROJ versions use different transformations, all are
+        # correct as having a 1 meter accuracy.
+        prec = -1
         ls_orig.transform(ls_trans.srs)
         # Making sure the coordinate dimension is still 2D.
         self.assertEqual(2, ls_orig.coord_dim)
@@ -374,10 +378,10 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
             d1 = OGRGeometry(self.geometries.diff_geoms[i].wkt)
             d2 = a.difference(b)
-            self.assertEqual(d1, d2)
-            self.assertEqual(d1, a - b)  # __sub__ is difference operator
+            self.assertTrue(d1.geos.equals(d2.geos))
+            self.assertTrue(d1.geos.equals((a - b).geos))  # __sub__ is difference operator
             a -= b  # testing __isub__
-            self.assertEqual(d1, a)
+            self.assertTrue(d1.geos.equals(a.geos))
 
     def test_intersection(self):
         "Testing intersects() and intersection()."
@@ -387,10 +391,10 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             i1 = OGRGeometry(self.geometries.intersect_geoms[i].wkt)
             self.assertTrue(a.intersects(b))
             i2 = a.intersection(b)
-            self.assertEqual(i1, i2)
-            self.assertEqual(i1, a & b)  # __and__ is intersection operator
+            self.assertTrue(i1.geos.equals(i2.geos))
+            self.assertTrue(i1.geos.equals((a & b).geos))  # __and__ is intersection operator
             a &= b  # testing __iand__
-            self.assertEqual(i1, a)
+            self.assertTrue(i1.geos.equals(a.geos))
 
     def test_symdifference(self):
         "Testing sym_difference()."
@@ -399,10 +403,10 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
             d1 = OGRGeometry(self.geometries.sdiff_geoms[i].wkt)
             d2 = a.sym_difference(b)
-            self.assertEqual(d1, d2)
-            self.assertEqual(d1, a ^ b)  # __xor__ is symmetric difference operator
+            self.assertTrue(d1.geos.equals(d2.geos))
+            self.assertTrue(d1.geos.equals((a ^ b).geos))  # __xor__ is symmetric difference operator
             a ^= b  # testing __ixor__
-            self.assertEqual(d1, a)
+            self.assertTrue(d1.geos.equals(a.geos))
 
     def test_union(self):
         "Testing union()."
@@ -411,10 +415,10 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
             u1 = OGRGeometry(self.geometries.union_geoms[i].wkt)
             u2 = a.union(b)
-            self.assertEqual(u1, u2)
-            self.assertEqual(u1, a | b)  # __or__ is union operator
+            self.assertTrue(u1.geos.equals(u2.geos))
+            self.assertTrue(u1.geos.equals((a | b).geos))  # __or__ is union operator
             a |= b  # testing __ior__
-            self.assertEqual(u1, a)
+            self.assertTrue(u1.geos.equals(a.geos))
 
     def test_add(self):
         "Testing GeometryCollection.add()."

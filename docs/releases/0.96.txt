@@ -250,6 +250,4 @@ all their hard work:
 * Everyone who submitted a bug report, patch or ticket comment. We can't
   possibly thank everyone by name -- over 200 developers submitted patches
   that went into 0.96 -- but everyone who's contributed to Django is listed
-  in AUTHORS_.
-
-.. _AUTHORS: https://code.djangoproject.com/browser/django/trunk/AUTHORS
+  in :source:`AUTHORS`.

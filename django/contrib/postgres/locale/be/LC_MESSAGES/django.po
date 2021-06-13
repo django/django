@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-10-16 18:19+0000\n"
-"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -37,21 +37,11 @@ msgstr "Адпаведнасць радкоў у радкі/нулі"
 msgid "The value of “%(key)s” is not a string or null."
 msgstr "Значэнне “%(key)s” не з'яўляецца радком ці null."
 
-msgid "A JSON object"
-msgstr "JSON аб’ект"
-
-msgid "Value must be valid JSON."
-msgstr "Значэнне павінна быць сапраўдным JSON."
-
 msgid "Could not load JSON data."
 msgstr "Не атрымалася загрузіць дадзеныя JSON."
 
 msgid "Input must be a JSON dictionary."
 msgstr "Значэнне павінна быць JSON слоўнікам. "
-
-#, python-format
-msgid "“%(value)s” value must be valid JSON."
-msgstr "“%(value)s” значэнне павінна быць сапраўдным JSON."
 
 msgid "Enter two valid values."
 msgstr "Увядзіце два сапраўдных значэнні."

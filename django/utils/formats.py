@@ -1,10 +1,12 @@
 import datetime
 import decimal
+import functools
+import re
 import unicodedata
 from importlib import import_module
 
 from django.conf import settings
-from django.utils import dateformat, datetime_safe, numberformat
+from django.utils import dateformat, numberformat
 from django.utils.functional import lazy
 from django.utils.translation import (
     check_for_language, get_language, to_locale,
@@ -169,10 +171,8 @@ def number_format(value, decimal_pos=None, use_l10n=None, force_grouping=False):
     If use_l10n is provided and is not None, it forces the value to
     be localized (or not), overriding the value of settings.USE_L10N.
     """
-    if use_l10n or (use_l10n is None and settings.USE_L10N):
-        lang = get_language()
-    else:
-        lang = None
+    use_l10n = use_l10n or (use_l10n is None and settings.USE_L10N)
+    lang = get_language() if use_l10n else None
     return numberformat.format(
         value,
         get_format('DECIMAL_SEPARATOR', lang, use_l10n=use_l10n),
@@ -197,6 +197,8 @@ def localize(value, use_l10n=None):
     elif isinstance(value, bool):  # Make sure booleans don't get treated as numbers
         return str(value)
     elif isinstance(value, (decimal.Decimal, float, int)):
+        if use_l10n is False:
+            return str(value)
         return number_format(value, use_l10n=use_l10n)
     elif isinstance(value, datetime.datetime):
         return date_format(value, 'DATETIME_FORMAT', use_l10n=use_l10n)
@@ -219,17 +221,50 @@ def localize_input(value, default=None):
     elif isinstance(value, (decimal.Decimal, float, int)):
         return number_format(value)
     elif isinstance(value, datetime.datetime):
-        value = datetime_safe.new_datetime(value)
         format = default or get_format('DATETIME_INPUT_FORMATS')[0]
+        format = sanitize_strftime_format(format)
         return value.strftime(format)
     elif isinstance(value, datetime.date):
-        value = datetime_safe.new_date(value)
         format = default or get_format('DATE_INPUT_FORMATS')[0]
+        format = sanitize_strftime_format(format)
         return value.strftime(format)
     elif isinstance(value, datetime.time):
         format = default or get_format('TIME_INPUT_FORMATS')[0]
         return value.strftime(format)
     return value
+
+
+@functools.lru_cache()
+def sanitize_strftime_format(fmt):
+    """
+    Ensure that certain specifiers are correctly padded with leading zeros.
+
+    For years < 1000 specifiers %C, %F, %G, and %Y don't work as expected for
+    strftime provided by glibc on Linux as they don't pad the year or century
+    with leading zeros. Support for specifying the padding explicitly is
+    available, however, which can be used to fix this issue.
+
+    FreeBSD, macOS, and Windows do not support explicitly specifying the
+    padding, but return four digit years (with leading zeros) as expected.
+
+    This function checks whether the %Y produces a correctly padded string and,
+    if not, makes the following substitutions:
+
+    - %C → %02C
+    - %F → %010F
+    - %G → %04G
+    - %Y → %04Y
+
+    See https://bugs.python.org/issue13305 for more details.
+    """
+    if datetime.date(1, 1, 1).strftime('%Y') == '0001':
+        return fmt
+    mapping = {'C': 2, 'F': 10, 'G': 4, 'Y': 4}
+    return re.sub(
+        r'((?:^|[^%])(?:%%)*)%([CFGY])',
+        lambda m: r'%s%%0%s%s' % (m[1], mapping[m[2]], m[2]),
+        fmt,
+    )
 
 
 def sanitize_separators(value):

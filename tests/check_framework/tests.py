@@ -4,6 +4,7 @@ from io import StringIO
 from django.apps import apps
 from django.core import checks
 from django.core.checks import Error, Warning
+from django.core.checks.messages import CheckMessage
 from django.core.checks.registry import CheckRegistry
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -66,6 +67,28 @@ class SystemCheckFrameworkTests(SimpleTestCase):
         self.assertEqual(errors, errors2)
         self.assertEqual(sorted(errors), [4, 5])
 
+    def test_register_no_kwargs_error(self):
+        registry = CheckRegistry()
+        msg = 'Check functions must accept keyword arguments (**kwargs).'
+        with self.assertRaisesMessage(TypeError, msg):
+            @registry.register
+            def no_kwargs(app_configs, databases):
+                pass
+
+    def test_register_run_checks_non_iterable(self):
+        registry = CheckRegistry()
+
+        @registry.register
+        def return_non_iterable(**kwargs):
+            return Error('Message')
+
+        msg = (
+            'The function %r did not return a list. All functions registered '
+            'with the checks registry must return a list.' % return_non_iterable
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            registry.run_checks()
+
 
 class MessageTests(SimpleTestCase):
 
@@ -123,6 +146,11 @@ class MessageTests(SimpleTestCase):
     def test_not_equal_to_non_check(self):
         e = Error("Error", obj=DummyObj())
         self.assertNotEqual(e, 'a string')
+
+    def test_invalid_level(self):
+        msg = 'The first argument should be level.'
+        with self.assertRaisesMessage(TypeError, msg):
+            CheckMessage('ERROR', 'Message')
 
 
 def simple_system_check(**kwargs):

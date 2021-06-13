@@ -152,6 +152,20 @@ class BasicExtractorTests(ExtractorTests):
             with self.assertRaisesRegex(CommandError, msg):
                 management.call_command('makemessages')
 
+    def test_valid_locale(self):
+        out = StringIO()
+        management.call_command('makemessages', locale=['de'], stdout=out, verbosity=1)
+        self.assertNotIn('invalid locale de', out.getvalue())
+        self.assertIn('processing locale de', out.getvalue())
+        self.assertIs(Path(self.PO_FILE).exists(), True)
+
+    def test_invalid_locale(self):
+        out = StringIO()
+        management.call_command('makemessages', locale=['pl-PL'], stdout=out, verbosity=1)
+        self.assertIn('invalid locale pl-PL, did you mean pl_PL?', out.getvalue())
+        self.assertNotIn('processing locale pl-PL', out.getvalue())
+        self.assertIs(Path('locale/pl-PL/LC_MESSAGES/django.po').exists(), False)
+
     def test_comments_extractor(self):
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
@@ -430,7 +444,7 @@ class BasicExtractorTests(ExtractorTests):
             self.assertIn('mañana; charset=CHARSET', pot_contents)
 
 
-class JavascriptExtractorTests(ExtractorTests):
+class JavaScriptExtractorTests(ExtractorTests):
 
     PO_FILE = 'locale/%s/LC_MESSAGES/djangojs.po' % LOCALE
 
@@ -715,26 +729,25 @@ class ExcludedLocaleExtractionTests(ExtractorTests):
             execute_from_command_line(['django-admin', 'help', 'makemessages'])
 
     def test_one_locale_excluded(self):
-        management.call_command('makemessages', exclude=['it'], stdout=StringIO())
+        management.call_command('makemessages', exclude=['it'], verbosity=0)
         self.assertRecentlyModified(self.PO_FILE % 'en')
         self.assertRecentlyModified(self.PO_FILE % 'fr')
         self.assertNotRecentlyModified(self.PO_FILE % 'it')
 
     def test_multiple_locales_excluded(self):
-        management.call_command('makemessages', exclude=['it', 'fr'], stdout=StringIO())
+        management.call_command('makemessages', exclude=['it', 'fr'], verbosity=0)
         self.assertRecentlyModified(self.PO_FILE % 'en')
         self.assertNotRecentlyModified(self.PO_FILE % 'fr')
         self.assertNotRecentlyModified(self.PO_FILE % 'it')
 
     def test_one_locale_excluded_with_locale(self):
-        management.call_command('makemessages', locale=['en', 'fr'], exclude=['fr'], stdout=StringIO())
+        management.call_command('makemessages', locale=['en', 'fr'], exclude=['fr'], verbosity=0)
         self.assertRecentlyModified(self.PO_FILE % 'en')
         self.assertNotRecentlyModified(self.PO_FILE % 'fr')
         self.assertNotRecentlyModified(self.PO_FILE % 'it')
 
     def test_multiple_locales_excluded_with_locale(self):
-        management.call_command('makemessages', locale=['en', 'fr', 'it'], exclude=['fr', 'it'],
-                                stdout=StringIO())
+        management.call_command('makemessages', locale=['en', 'fr', 'it'], exclude=['fr', 'it'], verbosity=0)
         self.assertRecentlyModified(self.PO_FILE % 'en')
         self.assertNotRecentlyModified(self.PO_FILE % 'fr')
         self.assertNotRecentlyModified(self.PO_FILE % 'it')
@@ -745,9 +758,13 @@ class CustomLayoutExtractionTests(ExtractorTests):
     work_subdir = 'project_dir'
 
     def test_no_locale_raises(self):
-        msg = "Unable to find a locale path to store translations for file"
+        msg = (
+            "Unable to find a locale path to store translations for file "
+            "__init__.py. Make sure the 'locale' directory exist in an app or "
+            "LOCALE_PATHS setting is set."
+        )
         with self.assertRaisesMessage(management.CommandError, msg):
-            management.call_command('makemessages', locale=LOCALE, verbosity=0)
+            management.call_command('makemessages', locale=[LOCALE], verbosity=0)
 
     def test_project_locale_paths(self):
         self._test_project_locale_paths(os.path.join(self.test_dir, 'project_locale'))

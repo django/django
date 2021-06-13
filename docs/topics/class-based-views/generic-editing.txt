@@ -39,7 +39,7 @@ The view can be constructed using a ``FormView``:
     from myapp.forms import ContactForm
     from django.views.generic.edit import FormView
 
-    class ContactView(FormView):
+    class ContactFormView(FormView):
         template_name = 'contact.html'
         form_class = ContactForm
         success_url = '/thanks/'
@@ -119,15 +119,15 @@ here; we don't have to write any logic ourselves:
     from django.views.generic.edit import CreateView, DeleteView, UpdateView
     from myapp.models import Author
 
-    class AuthorCreate(CreateView):
+    class AuthorCreateView(CreateView):
         model = Author
         fields = ['name']
 
-    class AuthorUpdate(UpdateView):
+    class AuthorUpdateView(UpdateView):
         model = Author
         fields = ['name']
 
-    class AuthorDelete(DeleteView):
+    class AuthorDeleteView(DeleteView):
         model = Author
         success_url = reverse_lazy('author-list')
 
@@ -150,13 +150,13 @@ Finally, we hook these new views into the URLconf:
     :caption: urls.py
 
     from django.urls import path
-    from myapp.views import AuthorCreate, AuthorDelete, AuthorUpdate
+    from myapp.views import AuthorCreateView, AuthorDeleteView, AuthorUpdateView
 
     urlpatterns = [
         # ...
-        path('author/add/', AuthorCreate.as_view(), name='author-add'),
-        path('author/<int:pk>/', AuthorUpdate.as_view(), name='author-update'),
-        path('author/<int:pk>/delete/', AuthorDelete.as_view(), name='author-delete'),
+        path('author/add/', AuthorCreateView.as_view(), name='author-add'),
+        path('author/<int:pk>/', AuthorUpdateView.as_view(), name='author-update'),
+        path('author/<int:pk>/delete/', AuthorDeleteView.as_view(), name='author-delete'),
     ]
 
 .. note::
@@ -210,7 +210,7 @@ to edit, and override
     from django.views.generic.edit import CreateView
     from myapp.models import Author
 
-    class AuthorCreate(LoginRequiredMixin, CreateView):
+    class AuthorCreateView(LoginRequiredMixin, CreateView):
         model = Author
         fields = ['name']
 
@@ -259,6 +259,6 @@ works with an API-based workflow as well as 'normal' form POSTs::
                 }
                 return JsonResponse(data)
 
-    class AuthorCreate(JsonableResponseMixin, CreateView):
+    class AuthorCreateView(JsonableResponseMixin, CreateView):
         model = Author
         fields = ['name']

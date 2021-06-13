@@ -1,4 +1,5 @@
 import os
+import pathlib
 from datetime import datetime
 from urllib.parse import urljoin
 
@@ -6,6 +7,7 @@ from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import File, locks
 from django.core.files.move import file_move_safe
+from django.core.files.utils import validate_file_name
 from django.core.signals import setting_changed
 from django.utils import timezone
 from django.utils._os import safe_join
@@ -74,6 +76,9 @@ class Storage:
         available for new content to be written to.
         """
         dir_name, file_name = os.path.split(name)
+        if '..' in pathlib.PurePath(dir_name).parts:
+            raise SuspiciousFileOperation("Detected path traversal attempt in '%s'" % dir_name)
+        validate_file_name(file_name)
         file_root, file_ext = os.path.splitext(file_name)
         # If the filename already exists, generate an alternative filename
         # until it doesn't exist.
@@ -105,6 +110,8 @@ class Storage:
         """
         # `filename` may include a path as returned by FileField.upload_to.
         dirname, filename = os.path.split(filename)
+        if '..' in pathlib.PurePath(dirname).parts:
+            raise SuspiciousFileOperation("Detected path traversal attempt in '%s'" % dirname)
         return os.path.normpath(os.path.join(dirname, self.get_valid_name(filename)))
 
     def path(self, name):
@@ -237,9 +244,9 @@ class FileSystemStorage(Storage):
         directory = os.path.dirname(full_path)
         try:
             if self.directory_permissions_mode is not None:
-                # os.makedirs applies the global umask, so we reset it,
-                # for consistency with file_permissions_mode behavior.
-                old_umask = os.umask(0)
+                # Set the umask because os.makedirs() doesn't apply the "mode"
+                # argument to intermediate-level directories.
+                old_umask = os.umask(0o777 & ~self.directory_permissions_mode)
                 try:
                     os.makedirs(directory, self.directory_permissions_mode, exist_ok=True)
                 finally:
@@ -294,7 +301,8 @@ class FileSystemStorage(Storage):
         return str(name).replace('\\', '/')
 
     def delete(self, name):
-        assert name, "The name argument is not allowed to be empty."
+        if not name:
+            raise ValueError('The name must be given to delete().')
         name = self.path(name)
         # If the file or directory exists, delete it from the filesystem.
         try:
@@ -308,16 +316,17 @@ class FileSystemStorage(Storage):
             pass
 
     def exists(self, name):
-        return os.path.exists(self.path(name))
+        return os.path.lexists(self.path(name))
 
     def listdir(self, path):
         path = self.path(path)
         directories, files = [], []
-        for entry in os.scandir(path):
-            if entry.is_dir():
-                directories.append(entry.name)
-            else:
-                files.append(entry.name)
+        with os.scandir(path) as entries:
+            for entry in entries:
+                if entry.is_dir():
+                    directories.append(entry.name)
+                else:
+                    files.append(entry.name)
         return directories, files
 
     def path(self, name):
@@ -339,11 +348,8 @@ class FileSystemStorage(Storage):
         If timezone support is enabled, make an aware datetime object in UTC;
         otherwise make a naive one in the local timezone.
         """
-        if settings.USE_TZ:
-            # Safe to use .replace() because UTC doesn't have DST
-            return datetime.utcfromtimestamp(ts).replace(tzinfo=timezone.utc)
-        else:
-            return datetime.fromtimestamp(ts)
+        tz = timezone.utc if settings.USE_TZ else None
+        return datetime.fromtimestamp(ts, tz=tz)
 
     def get_accessed_time(self, name):
         return self._datetime_from_timestamp(os.path.getatime(self.path(name)))

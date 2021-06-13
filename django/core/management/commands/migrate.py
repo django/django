@@ -20,7 +20,7 @@ from django.utils.text import Truncator
 
 class Command(BaseCommand):
     help = "Updates database schema. Manages both apps with migrations and those without."
-    requires_system_checks = False
+    requires_system_checks = []
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -188,8 +188,9 @@ class Command(BaseCommand):
                 )
             else:
                 if targets[0][1] is None:
-                    self.stdout.write(self.style.MIGRATE_LABEL(
-                        "  Unapply all migrations: ") + "%s" % (targets[0][0],)
+                    self.stdout.write(
+                        self.style.MIGRATE_LABEL('  Unapply all migrations: ') +
+                        str(targets[0][0])
                     )
                 else:
                     self.stdout.write(self.style.MIGRATE_LABEL(
@@ -200,7 +201,7 @@ class Command(BaseCommand):
         pre_migrate_state = executor._create_project_state(with_applied_migrations=True)
         pre_migrate_apps = pre_migrate_state.apps
         emit_pre_migrate_signal(
-            self.verbosity, self.interactive, connection.alias, apps=pre_migrate_apps, plan=plan,
+            self.verbosity, self.interactive, connection.alias, stdout=self.stdout, apps=pre_migrate_apps, plan=plan,
         )
 
         # Run the syncdb phase.
@@ -226,8 +227,9 @@ class Command(BaseCommand):
                 changes = autodetector.changes(graph=executor.loader.graph)
                 if changes:
                     self.stdout.write(self.style.NOTICE(
-                        "  Your models have changes that are not yet reflected "
-                        "in a migration, and so won't be applied."
+                        "  Your models in app(s): %s have changes that are not "
+                        "yet reflected in a migration, and so won't be "
+                        "applied." % ", ".join(repr(app) for app in sorted(changes))
                     ))
                     self.stdout.write(self.style.NOTICE(
                         "  Run 'manage.py makemigrations' to make new "
@@ -264,7 +266,7 @@ class Command(BaseCommand):
         # Send the post_migrate signal, so individual apps can do whatever they need
         # to do at this point.
         emit_post_migrate_signal(
-            self.verbosity, self.interactive, connection.alias, apps=post_migrate_apps, plan=plan,
+            self.verbosity, self.interactive, connection.alias, stdout=self.stdout, apps=post_migrate_apps, plan=plan,
         )
 
     def migration_progress_callback(self, action, migration=None, fake=False):
@@ -331,7 +333,7 @@ class Command(BaseCommand):
 
         # Create the tables for each model
         if self.verbosity >= 1:
-            self.stdout.write("  Creating tables...\n")
+            self.stdout.write('  Creating tables...')
         with connection.schema_editor() as editor:
             for app_name, model_list in manifest.items():
                 for model in model_list:
@@ -340,15 +342,15 @@ class Command(BaseCommand):
                         continue
                     if self.verbosity >= 3:
                         self.stdout.write(
-                            "    Processing %s.%s model\n" % (app_name, model._meta.object_name)
+                            '    Processing %s.%s model' % (app_name, model._meta.object_name)
                         )
                     if self.verbosity >= 1:
-                        self.stdout.write("    Creating table %s\n" % model._meta.db_table)
+                        self.stdout.write('    Creating table %s' % model._meta.db_table)
                     editor.create_model(model)
 
             # Deferred SQL is executed when exiting the editor's context.
             if self.verbosity >= 1:
-                self.stdout.write("    Running deferred SQL...\n")
+                self.stdout.write('    Running deferred SQL...')
 
     @staticmethod
     def describe_operation(operation, backwards):

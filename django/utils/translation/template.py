@@ -165,16 +165,16 @@ def templatize(src, origin=None):
                 bmatch = block_re.match(t.contents)
                 cmatches = constant_re.findall(t.contents)
                 if imatch:
-                    g = imatch.group(1)
+                    g = imatch[1]
                     if g[0] == '"':
                         g = g.strip('"')
                     elif g[0] == "'":
                         g = g.strip("'")
                     g = g.replace('%', '%%')
-                    if imatch.group(2):
+                    if imatch[2]:
                         # A context is provided
-                        context_match = context_re.match(imatch.group(2))
-                        message_context = context_match.group(1)
+                        context_match = context_re.match(imatch[2])
+                        message_context = context_match[1]
                         if message_context[0] == '"':
                             message_context = message_context.strip('"')
                         elif message_context[0] == "'":
@@ -188,10 +188,10 @@ def templatize(src, origin=None):
                 elif bmatch:
                     for fmatch in constant_re.findall(t.contents):
                         out.write(' _(%s) ' % fmatch)
-                    if bmatch.group(1):
+                    if bmatch[1]:
                         # A context is provided
-                        context_match = context_re.match(bmatch.group(1))
-                        message_context = context_match.group(1)
+                        context_match = context_re.match(bmatch[1])
+                        message_context = context_match[1]
                         if message_context[0] == '"':
                             message_context = message_context.strip('"')
                         elif message_context[0] == "'":
@@ -212,7 +212,7 @@ def templatize(src, origin=None):
                 parts = t.contents.split('|')
                 cmatch = constant_re.match(parts[0])
                 if cmatch:
-                    out.write(' _(%s) ' % cmatch.group(1))
+                    out.write(' _(%s) ' % cmatch[1])
                 for p in parts[1:]:
                     if p.find(':_(') >= 0:
                         out.write(' %s ' % p.split(':', 1)[1])

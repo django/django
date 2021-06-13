@@ -10,9 +10,6 @@ class Person(models.Model):
     class Meta:
         ordering = ('name',)
 
-    def __str__(self):
-        return self.name
-
 
 class Group(models.Model):
     name = models.CharField(max_length=128)
@@ -26,9 +23,6 @@ class Group(models.Model):
 
     class Meta:
         ordering = ('name',)
-
-    def __str__(self):
-        return self.name
 
 
 class Membership(models.Model):
@@ -74,9 +68,6 @@ class PersonSelfRefM2M(models.Model):
     friends = models.ManyToManyField('self', through="Friendship", symmetrical=False)
     sym_friends = models.ManyToManyField('self', through='SymmetricalFriendship', symmetrical=True)
 
-    def __str__(self):
-        return self.name
-
 
 class Friendship(models.Model):
     first = models.ForeignKey(PersonSelfRefM2M, models.CASCADE, related_name="rel_from_set")
@@ -99,9 +90,6 @@ class Event(models.Model):
         related_name='events_invited',
     )
 
-    def __str__(self):
-        return self.title
-
 
 class Invitation(models.Model):
     event = models.ForeignKey(Event, models.CASCADE, related_name='invitations')
@@ -121,9 +109,6 @@ class Employee(models.Model):
 
     class Meta:
         ordering = ('pk',)
-
-    def __str__(self):
-        return self.name
 
 
 class Relationship(models.Model):

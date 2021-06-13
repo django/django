@@ -20,6 +20,9 @@ else:
 
 
 def get_view_name(view_func):
+    if hasattr(view_func, 'view_class'):
+        klass = view_func.view_class
+        return f'{klass.__module__}.{klass.__qualname__}'
     mod_name = view_func.__module__
     view_name = getattr(view_func, '__qualname__', view_func.__class__.__name__)
     return mod_name + '.' + view_name
@@ -148,7 +151,7 @@ def replace_named_groups(pattern):
     4. ^(?P<a>\w+)/b/(?P<c>\w+) ==> ^<a>/b/<c>
     """
     named_group_indices = [
-        (m.start(0), m.end(0), m.group(1))
+        (m.start(0), m.end(0), m[1])
         for m in named_group_matcher.finditer(pattern)
     ]
     # Tuples of (named capture group pattern, group name).

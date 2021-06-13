@@ -203,6 +203,7 @@ the directories which were searched:
 -------------
 
 .. django-admin:: runserver [addrport]
+    :noindex:
 
 Overrides the core :djadmin:`runserver` command if the ``staticfiles`` app
 is :setting:`installed<INSTALLED_APPS>` and adds automatic serving of static
@@ -290,23 +291,34 @@ The storage backend automatically replaces the paths found in the saved
 files matching other saved files with the path of the cached copy (using
 the :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
 method). The regular expressions used to find those paths
-(``django.contrib.staticfiles.storage.HashedFilesMixin.patterns``)
-by default covers the `@import`_ rule and `url()`_ statement of `Cascading
-Style Sheets`_. For example, the ``'css/styles.css'`` file with the
-content
+(``django.contrib.staticfiles.storage.HashedFilesMixin.patterns``) cover:
+
+* The `@import`_ rule and `url()`_ statement of `Cascading Style Sheets`_.
+* The `source map`_ comment in JavaScript.
+* The `modules import`_ in JavaScript.
+* The `modules aggregation`_ in JavaScript.
+
+For example, the ``'css/styles.css'`` file with this content:
 
 .. code-block:: css
 
     @import url("../admin/css/base.css");
 
-would be replaced by calling the :meth:`~django.core.files.storage.Storage.url`
-method of the ``ManifestStaticFilesStorage`` storage backend, ultimately
-saving a ``'css/styles.55e7cbb9ba48.css'`` file with the following
-content:
+...would be replaced by calling the
+:meth:`~django.core.files.storage.Storage.url` method of the
+``ManifestStaticFilesStorage`` storage backend, ultimately saving a
+``'css/styles.55e7cbb9ba48.css'`` file with the following content:
 
 .. code-block:: css
 
     @import url("../admin/css/base.27e20196a850.css");
+
+.. versionchanged:: 4.0
+
+    Support for finding paths in the source map comments was added.
+
+    Support for finding paths to JavaScript modules in ``import`` and
+    ``export`` statements was added.
 
 .. attribute:: storage.ManifestStaticFilesStorage.max_post_process_passes
 
@@ -360,6 +372,9 @@ hashing algorithm.
 .. _`@import`: https://www.w3.org/TR/CSS2/cascade.html#at-import
 .. _`url()`: https://www.w3.org/TR/CSS2/syndata.html#uri
 .. _`Cascading Style Sheets`: https://www.w3.org/Style/CSS/
+.. _`source map`: https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map
+.. _`modules import`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#importing_features_into_your_script
+.. _`modules aggregation`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#aggregating_modules
 
 ``ManifestFilesMixin``
 ----------------------
@@ -435,9 +450,10 @@ This view function serves static files in development.
     :py:mod:`mimetypes` module from the Python standard library, which itself
     relies on the underlying platform's map files. If you find that this view
     doesn't return proper content types for certain files, it is most likely
-    that the platform's map files need to be updated. This can be achieved, for
-    example, by installing or updating the ``mailcap`` package on a Red Hat
-    distribution, or ``mime-support`` on a Debian distribution.
+    that the platform's map files are incorrect or need to be updated. This can
+    be achieved, for example, by installing or updating the ``mailcap`` package
+    on a Red Hat distribution, ``mime-support`` on a Debian distribution, or by
+    editing the keys under ``HKEY_CLASSES_ROOT`` in the Windows registry.
 
 This view is automatically enabled by :djadmin:`runserver` (with a
 :setting:`DEBUG` setting set to ``True``). To use the view with a different

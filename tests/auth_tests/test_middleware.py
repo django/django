@@ -1,12 +1,16 @@
 from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest, HttpResponse
 from django.test import TestCase
 
 
 class TestAuthenticationMiddleware(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user('test_user', 'test@example.com', 'test_password')
+
     def setUp(self):
-        self.user = User.objects.create_user('test_user', 'test@example.com', 'test_password')
         self.middleware = AuthenticationMiddleware(lambda req: HttpResponse())
         self.client.force_login(self.user)
         self.request = HttpRequest()
@@ -35,5 +39,5 @@ class TestAuthenticationMiddleware(TestCase):
             "'django.contrib.sessions.middleware.SessionMiddleware' before "
             "'django.contrib.auth.middleware.AuthenticationMiddleware'."
         )
-        with self.assertRaisesMessage(AssertionError, msg):
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.middleware(HttpRequest())

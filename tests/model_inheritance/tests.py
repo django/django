@@ -217,6 +217,11 @@ class ModelInheritanceTests(TestCase):
         self.assertSequenceEqual(qs, [p2, p1])
         self.assertIn(expected_order_by_sql, str(qs.query))
 
+    def test_queryset_class_getitem(self):
+        self.assertIs(models.QuerySet[Post], models.QuerySet)
+        self.assertIs(models.QuerySet[Post, Post], models.QuerySet)
+        self.assertIs(models.QuerySet[Post, int, str], models.QuerySet)
+
 
 class ModelInheritanceDataTests(TestCase):
     @classmethod

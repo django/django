@@ -1,5 +1,6 @@
 import datetime
 import decimal
+import json
 from collections import defaultdict
 
 from django.core.exceptions import FieldDoesNotExist
@@ -24,9 +25,9 @@ class FieldIsAForeignKeyColumnName(Exception):
     pass
 
 
-def lookup_needs_distinct(opts, lookup_path):
+def lookup_spawns_duplicates(opts, lookup_path):
     """
-    Return True if 'distinct()' should be used to query the given lookup path.
+    Return True if the given lookup path spawns duplicates.
     """
     lookup_fields = lookup_path.split(LOOKUP_SEP)
     # Go through the fields (following all relations) and look for an m2m.
@@ -44,7 +45,8 @@ def lookup_needs_distinct(opts, lookup_path):
                 path_info = field.get_path_info()
                 opts = path_info[-1].to_opts
                 if any(path.m2m for path in path_info):
-                    # This field is a m2m relation so distinct must be called.
+                    # This field is a m2m relation so duplicates must be
+                    # handled.
                     return True
     return False
 
@@ -74,7 +76,7 @@ def quote(s):
 
 def unquote(s):
     """Undo the effects of quote()."""
-    return UNQUOTE_RE.sub(lambda m: UNQUOTE_MAP[m.group(0)], s)
+    return UNQUOTE_RE.sub(lambda m: UNQUOTE_MAP[m[0]], s)
 
 
 def flatten(fields):
@@ -337,7 +339,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
             else:
                 message = "Unable to lookup '%s' on %s" % (name, model._meta.object_name)
                 if model_admin:
-                    message += " or %s" % (model_admin.__class__.__name__,)
+                    message += " or %s" % model_admin.__class__.__name__
                 if form:
                     message += " or %s" % form.__class__.__name__
                 raise AttributeError(message)
@@ -398,6 +400,11 @@ def display_for_field(value, field, empty_value_display):
         return formats.number_format(value)
     elif isinstance(field, models.FileField) and value:
         return format_html('<a href="{}">{}</a>', value.url, value)
+    elif isinstance(field, models.JSONField) and value:
+        try:
+            return json.dumps(value, ensure_ascii=False, cls=field.encoder)
+        except TypeError:
+            return display_for_value(value, empty_value_display)
     else:
         return display_for_value(value, empty_value_display)
 

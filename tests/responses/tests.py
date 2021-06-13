@@ -39,12 +39,12 @@ class HttpResponseBaseTests(SimpleTestCase):
         """
         r = HttpResponseBase()
 
-        r['Header'] = 'Value'
+        r.headers['Header'] = 'Value'
         r.setdefault('header', 'changed')
-        self.assertEqual(r['header'], 'Value')
+        self.assertEqual(r.headers['header'], 'Value')
 
         r.setdefault('x-header', 'DefaultValue')
-        self.assertEqual(r['X-Header'], 'DefaultValue')
+        self.assertEqual(r.headers['X-Header'], 'DefaultValue')
 
 
 class HttpResponseTests(SimpleTestCase):
@@ -92,7 +92,7 @@ class HttpResponseTests(SimpleTestCase):
 
         response = HttpResponse(charset=ISO88591)
         self.assertEqual(response.charset, ISO88591)
-        self.assertEqual(response['Content-Type'], 'text/html; charset=%s' % ISO88591)
+        self.assertEqual(response.headers['Content-Type'], 'text/html; charset=%s' % ISO88591)
 
         response = HttpResponse(content_type='text/plain; charset=%s' % UTF8, charset=ISO88591)
         self.assertEqual(response.charset, ISO88591)
@@ -134,7 +134,7 @@ class HttpResponseTests(SimpleTestCase):
 
     def test_repr_no_content_type(self):
         response = HttpResponse(status=204)
-        del response['Content-Type']
+        del response.headers['Content-Type']
         self.assertEqual(repr(response), '<HttpResponse status_code=204>')
 
     def test_wrap_textiowrapper(self):
@@ -145,7 +145,7 @@ class HttpResponseTests(SimpleTestCase):
         self.assertEqual(r.content, content.encode(UTF8))
 
     def test_generator_cache(self):
-        generator = ("{}".format(i) for i in range(10))
+        generator = (str(i) for i in range(10))
         response = HttpResponse(content=generator)
         self.assertEqual(response.content, b'0123456789')
         with self.assertRaises(StopIteration):

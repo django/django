@@ -1,15 +1,15 @@
+import platform
 import unittest
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest import mock
 
-from django.test import SimpleTestCase, ignore_warnings
+from django.test import SimpleTestCase
 from django.utils.datastructures import MultiValueDict
-from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.http import (
     base36_to_int, escape_leading_slashes, http_date, int_to_base36,
-    is_safe_url, is_same_domain, parse_etags, parse_http_date, quote_etag,
-    url_has_allowed_host_and_scheme, urlencode, urlquote, urlquote_plus,
-    urlsafe_base64_decode, urlsafe_base64_encode, urlunquote, urlunquote_plus,
+    is_same_domain, parse_etags, parse_http_date, quote_etag,
+    url_has_allowed_host_and_scheme, urlencode, urlsafe_base64_decode,
+    urlsafe_base64_encode,
 )
 
 
@@ -129,7 +129,7 @@ class Base36IntTests(SimpleTestCase):
             self.assertEqual(base36_to_int(b36), n)
 
 
-class IsSafeURLTests(SimpleTestCase):
+class URLHasAllowedHostAndSchemeTests(unittest.TestCase):
     def test_bad_urls(self):
         bad_urls = (
             'http://example.com',
@@ -233,14 +233,6 @@ class IsSafeURLTests(SimpleTestCase):
                     False,
                 )
 
-    def test_is_safe_url_deprecated(self):
-        msg = (
-            'django.utils.http.is_safe_url() is deprecated in favor of '
-            'url_has_allowed_host_and_scheme().'
-        )
-        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
-            is_safe_url('https://example.com', allowed_hosts={'example.com'})
-
 
 class URLSafeBase64Tests(unittest.TestCase):
     def test_roundtrip(self):
@@ -248,25 +240,6 @@ class URLSafeBase64Tests(unittest.TestCase):
         encoded = urlsafe_base64_encode(bytestring)
         decoded = urlsafe_base64_decode(encoded)
         self.assertEqual(bytestring, decoded)
-
-
-@ignore_warnings(category=RemovedInDjango40Warning)
-class URLQuoteTests(unittest.TestCase):
-    def test_quote(self):
-        self.assertEqual(urlquote('Paris & Orl\xe9ans'), 'Paris%20%26%20Orl%C3%A9ans')
-        self.assertEqual(urlquote('Paris & Orl\xe9ans', safe="&"), 'Paris%20&%20Orl%C3%A9ans')
-
-    def test_unquote(self):
-        self.assertEqual(urlunquote('Paris%20%26%20Orl%C3%A9ans'), 'Paris & Orl\xe9ans')
-        self.assertEqual(urlunquote('Paris%20&%20Orl%C3%A9ans'), 'Paris & Orl\xe9ans')
-
-    def test_quote_plus(self):
-        self.assertEqual(urlquote_plus('Paris & Orl\xe9ans'), 'Paris+%26+Orl%C3%A9ans')
-        self.assertEqual(urlquote_plus('Paris & Orl\xe9ans', safe="&"), 'Paris+&+Orl%C3%A9ans')
-
-    def test_unquote_plus(self):
-        self.assertEqual(urlunquote_plus('Paris+%26+Orl%C3%A9ans'), 'Paris & Orl\xe9ans')
-        self.assertEqual(urlunquote_plus('Paris+&+Orl%C3%A9ans'), 'Paris & Orl\xe9ans')
 
 
 class IsSameDomainTests(unittest.TestCase):
@@ -315,37 +288,52 @@ class HttpDateProcessingTests(unittest.TestCase):
 
     def test_parsing_rfc1123(self):
         parsed = parse_http_date('Sun, 06 Nov 1994 08:49:37 GMT')
-        self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(1994, 11, 6, 8, 49, 37))
+        self.assertEqual(
+            datetime.fromtimestamp(parsed, timezone.utc),
+            datetime(1994, 11, 6, 8, 49, 37, tzinfo=timezone.utc),
+        )
 
+    @unittest.skipIf(platform.architecture()[0] == '32bit', 'The Year 2038 problem.')
     @mock.patch('django.utils.http.datetime.datetime')
     def test_parsing_rfc850(self, mocked_datetime):
         mocked_datetime.side_effect = datetime
-        mocked_datetime.utcnow = mock.Mock()
-        utcnow_1 = datetime(2019, 11, 6, 8, 49, 37)
-        utcnow_2 = datetime(2020, 11, 6, 8, 49, 37)
-        utcnow_3 = datetime(2048, 11, 6, 8, 49, 37)
+        mocked_datetime.now = mock.Mock()
+        now_1 = datetime(2019, 11, 6, 8, 49, 37, tzinfo=timezone.utc)
+        now_2 = datetime(2020, 11, 6, 8, 49, 37, tzinfo=timezone.utc)
+        now_3 = datetime(2048, 11, 6, 8, 49, 37, tzinfo=timezone.utc)
         tests = (
-            (utcnow_1, 'Tuesday, 31-Dec-69 08:49:37 GMT', datetime(2069, 12, 31, 8, 49, 37)),
-            (utcnow_1, 'Tuesday, 10-Nov-70 08:49:37 GMT', datetime(1970, 11, 10, 8, 49, 37)),
-            (utcnow_1, 'Sunday, 06-Nov-94 08:49:37 GMT', datetime(1994, 11, 6, 8, 49, 37)),
-            (utcnow_2, 'Wednesday, 31-Dec-70 08:49:37 GMT', datetime(2070, 12, 31, 8, 49, 37)),
-            (utcnow_2, 'Friday, 31-Dec-71 08:49:37 GMT', datetime(1971, 12, 31, 8, 49, 37)),
-            (utcnow_3, 'Sunday, 31-Dec-00 08:49:37 GMT', datetime(2000, 12, 31, 8, 49, 37)),
-            (utcnow_3, 'Friday, 31-Dec-99 08:49:37 GMT', datetime(1999, 12, 31, 8, 49, 37)),
+            (now_1, 'Tuesday, 31-Dec-69 08:49:37 GMT', datetime(2069, 12, 31, 8, 49, 37, tzinfo=timezone.utc)),
+            (now_1, 'Tuesday, 10-Nov-70 08:49:37 GMT', datetime(1970, 11, 10, 8, 49, 37, tzinfo=timezone.utc)),
+            (now_1, 'Sunday, 06-Nov-94 08:49:37 GMT', datetime(1994, 11, 6, 8, 49, 37, tzinfo=timezone.utc)),
+            (now_2, 'Wednesday, 31-Dec-70 08:49:37 GMT', datetime(2070, 12, 31, 8, 49, 37, tzinfo=timezone.utc)),
+            (now_2, 'Friday, 31-Dec-71 08:49:37 GMT', datetime(1971, 12, 31, 8, 49, 37, tzinfo=timezone.utc)),
+            (now_3, 'Sunday, 31-Dec-00 08:49:37 GMT', datetime(2000, 12, 31, 8, 49, 37, tzinfo=timezone.utc)),
+            (now_3, 'Friday, 31-Dec-99 08:49:37 GMT', datetime(1999, 12, 31, 8, 49, 37, tzinfo=timezone.utc)),
         )
-        for utcnow, rfc850str, expected_date in tests:
+        for now, rfc850str, expected_date in tests:
             with self.subTest(rfc850str=rfc850str):
-                mocked_datetime.utcnow.return_value = utcnow
+                mocked_datetime.now.return_value = now
                 parsed = parse_http_date(rfc850str)
-                self.assertEqual(datetime.utcfromtimestamp(parsed), expected_date)
+                mocked_datetime.now.assert_called_once_with(tz=timezone.utc)
+                self.assertEqual(
+                    datetime.fromtimestamp(parsed, timezone.utc),
+                    expected_date,
+                )
+            mocked_datetime.reset_mock()
 
     def test_parsing_asctime(self):
         parsed = parse_http_date('Sun Nov  6 08:49:37 1994')
-        self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(1994, 11, 6, 8, 49, 37))
+        self.assertEqual(
+            datetime.fromtimestamp(parsed, timezone.utc),
+            datetime(1994, 11, 6, 8, 49, 37, tzinfo=timezone.utc),
+        )
 
     def test_parsing_year_less_than_70(self):
         parsed = parse_http_date('Sun Nov  6 08:49:37 0037')
-        self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(2037, 11, 6, 8, 49, 37))
+        self.assertEqual(
+            datetime.fromtimestamp(parsed, timezone.utc),
+            datetime(2037, 11, 6, 8, 49, 37, tzinfo=timezone.utc),
+        )
 
 
 class EscapeLeadingSlashesTests(unittest.TestCase):

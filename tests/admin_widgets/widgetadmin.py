@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from .models import (
     Advisor, Album, Band, Bee, Car, CarTire, Event, Inventory, Member, Profile,
-    School, User,
+    ReleaseEvent, School, User, VideoStream,
 )
 
 
@@ -47,6 +47,8 @@ site.register(Member)
 site.register(Band)
 site.register(Event, EventAdmin)
 site.register(Album, AlbumAdmin)
+site.register(ReleaseEvent, search_fields=['name'])
+site.register(VideoStream, autocomplete_fields=['release_event'])
 
 site.register(Inventory)
 

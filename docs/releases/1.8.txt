@@ -17,9 +17,9 @@ See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
 
 Django 1.8 has been designated as Django's second :term:`long-term support
-release`. It will receive security updates for at least three years after its
-release. Support for the previous LTS, Django 1.4, will end 6 months from the
-release date of Django 1.8.
+release <Long-term support release>`. It will receive security updates for at
+least three years after its release. Support for the previous LTS, Django 1.4,
+will end 6 months from the release date of Django 1.8.
 
 Python compatibility
 ====================
@@ -658,7 +658,7 @@ Validators
 ~~~~~~~~~~
 
 * :class:`~django.core.validators.URLValidator` now supports IPv6 addresses,
-  unicode domains, and URLs containing authentication data.
+  Unicode domains, and URLs containing authentication data.
 
 .. _backwards-incompatible-1.8:
 
@@ -934,7 +934,7 @@ relevant documentation pages have been updated or removed.
 
 The new package is available `on GitHub`_ and on PyPI.
 
-.. _on GitHub: https://github.com/django/django-formtools/
+.. _on GitHub: https://github.com/jazzband/django-formtools/
 
 Database connection reloading between tests
 -------------------------------------------
@@ -1123,11 +1123,9 @@ Miscellaneous
   check framework (unless you pass it ``skip_checks=False``).
 
 * When iterating over lines, :class:`~django.core.files.File` now uses
-  `universal newlines`_. The following are recognized as ending a line: the
-  Unix end-of-line convention ``'\n'``, the Windows convention ``'\r\n'``, and
-  the old Macintosh convention ``'\r'``.
-
-  .. _universal newlines: https://www.python.org/dev/peps/pep-0278
+  :pep:`universal newlines <278>`. The following are recognized as ending a
+  line: the Unix end-of-line convention ``'\n'``, the Windows convention
+  ``'\r\n'``, and the old Macintosh convention ``'\r'``.
 
 * The Memcached cache backends ``MemcachedCache`` and ``PyLibMCCache`` will
   delete a key if ``set()`` fails. This is necessary to ensure the ``cache_db``
@@ -1270,7 +1268,7 @@ Thus ``patterns()`` serves little purpose and is a burden when teaching new user
 (answering the newbie's question "why do I need this empty string as the first
 argument to ``patterns()``?"). For these reasons, we are deprecating it.
 Updating your code is as simple as ensuring that ``urlpatterns`` is a list of
-:func:`django.conf.urls.url` instances. For example::
+``django.conf.urls.url()`` instances. For example::
 
     from django.conf.urls import url
     from myapp import views
@@ -1280,8 +1278,8 @@ Updating your code is as simple as ensuring that ``urlpatterns`` is a list of
         url('^other/$', views.otherview),
     ]
 
-Passing a string as ``view`` to :func:`~django.conf.urls.url`
--------------------------------------------------------------
+Passing a string as ``view`` to ``django.conf.urls.url()``
+----------------------------------------------------------
 
 Related to the previous item, referencing views as strings in the ``url()``
 function is deprecated. Pass the callable view as described in the previous
@@ -1319,7 +1317,7 @@ instead.
 
 Related to the previous item, the ``prefix`` argument to
 :func:`django.conf.urls.i18n.i18n_patterns` has been deprecated. Simply pass a
-list of :func:`django.conf.urls.url` instances instead.
+list of ``django.conf.urls.url()`` instances instead.
 
 Using an incorrect count of unpacked values in the :ttag:`for` template tag
 ---------------------------------------------------------------------------

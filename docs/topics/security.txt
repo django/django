@@ -10,7 +10,7 @@ on securing a Django-powered site.
 Cross site scripting (XSS) protection
 =====================================
 
-.. highlightlang:: html+django
+.. highlight:: html+django
 
 XSS attacks allow a user to inject client side scripts into the browsers of
 other users. This is usually achieved by storing the malicious scripts in the
@@ -213,6 +213,19 @@ protect the privacy of your users, restricting under which circumstances the
 ``Referer`` header is set. See :ref:`the referrer policy section of the
 security middleware reference <referrer-policy>` for details.
 
+Cross-origin opener policy
+==========================
+
+.. versionadded:: 4.0
+
+The cross-origin opener policy (COOP) header allows browsers to isolate a
+top-level window from other documents by putting them in a different context
+group so that they cannot directly interact with the top-level window. If a
+document protected by COOP opens a cross-origin popup window, the popup’s
+``window.opener`` property will be ``null``. COOP protects against cross-origin
+attacks. See :ref:`the cross-origin opener policy section of the security
+middleware reference <cross-origin-opener-policy>` for details.
+
 Session security
 ================
 
@@ -261,7 +274,7 @@ User-uploaded content
      from something like ``usercontent-example.com``. It's *not* sufficient to
      serve content from a subdomain like ``usercontent.example.com``.
 
-  #. Beyond this, applications may choose to define a whitelist of allowable
+  #. Beyond this, applications may choose to define a list of allowable
      file extensions for user uploaded files and configure the web server
      to only serve such files.
 
@@ -290,6 +303,9 @@ security protection of the Web server, operating system and other components.
   list`_ which identifies some common vulnerabilities in web applications. While
   Django has tools to address some of the issues, other issues must be
   accounted for in the design of your project.
+* Mozilla discusses various topics regarding `web security`_. Their
+  pages also include security principles that apply to any system.
 
 .. _LimitRequestBody: https://httpd.apache.org/docs/2.4/mod/core.html#limitrequestbody
-.. _Top 10 list: https://www.owasp.org/index.php/Top_10-2017_Top_10
+.. _Top 10 list: https://owasp.org/www-project-top-ten/OWASP_Top_Ten_2017/
+.. _web security: https://infosec.mozilla.org/guidelines/web_security.html

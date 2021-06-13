@@ -8,6 +8,17 @@ class TemplateTests(SimpleTestCase):
         template_string = gettext_lazy('lazy string')
         self.assertEqual(Template(template_string).render(Context()), template_string)
 
+    def test_repr(self):
+        template = Template(
+            '<html><body>\n'
+            '{% if test %}<h1>{{ varvalue }}</h1>{% endif %}'
+            '</body></html>'
+        )
+        self.assertEqual(
+            repr(template),
+            '<Template template_string="<html><body>{% if t...">',
+        )
+
 
 class VariableDoesNotExistTests(SimpleTestCase):
     def test_str(self):

@@ -151,7 +151,7 @@ class ASGIHandler(base.BaseHandler):
             return
         # Request is complete and can be served.
         set_script_prefix(self.get_script_prefix(scope))
-        await sync_to_async(signals.request_started.send)(sender=self.__class__, scope=scope)
+        await sync_to_async(signals.request_started.send, thread_sensitive=True)(sender=self.__class__, scope=scope)
         # Get the request and check for basic issues.
         request, error_response = self.create_request(scope, body_file)
         if request is None:
@@ -259,7 +259,7 @@ class ASGIHandler(base.BaseHandler):
                     'body': chunk,
                     'more_body': not last,
                 })
-        await sync_to_async(response.close)()
+        await sync_to_async(response.close, thread_sensitive=True)()
 
     @classmethod
     def chunk_bytes(cls, data):

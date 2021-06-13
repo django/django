@@ -51,11 +51,11 @@ class BaseHandler:
                 middleware_is_async = middleware_can_async
             try:
                 # Adapt handler, if needed.
-                handler = self.adapt_method_mode(
+                adapted_handler = self.adapt_method_mode(
                     middleware_is_async, handler, handler_is_async,
                     debug=settings.DEBUG, name='middleware %s' % middleware_path,
                 )
-                mw_instance = middleware(handler)
+                mw_instance = middleware(adapted_handler)
             except MiddlewareNotUsed as exc:
                 if settings.DEBUG:
                     if str(exc):
@@ -63,6 +63,8 @@ class BaseHandler:
                     else:
                         logger.debug('MiddlewareNotUsed: %r', middleware_path)
                 continue
+            else:
+                handler = adapted_handler
 
             if mw_instance is None:
                 raise ImproperlyConfigured(
@@ -117,7 +119,7 @@ class BaseHandler:
                 return sync_to_async(method, thread_sensitive=True)
         elif method_is_async:
             if debug:
-                logger.debug('Asynchronous %s adapted.' % name)
+                logger.debug('Asynchronous %s adapted.', name)
             return async_to_sync(method)
         return method
 
@@ -148,7 +150,7 @@ class BaseHandler:
         response = await self._middleware_chain(request)
         response._resource_closers.append(request.close)
         if response.status_code >= 400:
-            await sync_to_async(log_response)(
+            await sync_to_async(log_response, thread_sensitive=False)(
                 '%s: %s', response.reason_phrase, request.path,
                 response=response,
                 request=request,
@@ -179,6 +181,8 @@ class BaseHandler:
                 response = wrapped_callback(request, *callback_args, **callback_kwargs)
             except Exception as e:
                 response = self.process_exception_by_middleware(e, request)
+                if response is None:
+                    raise
 
         # Complain if the view returned None (a common error).
         self.check_response(response, callback)
@@ -200,6 +204,8 @@ class BaseHandler:
                 response = response.render()
             except Exception as e:
                 response = self.process_exception_by_middleware(e, request)
+                if response is None:
+                    raise
 
         return response
 
@@ -230,6 +236,8 @@ class BaseHandler:
                     self.process_exception_by_middleware,
                     thread_sensitive=True,
                 )(e, request)
+                if response is None:
+                    raise
 
         # Complain if the view returned None or an uncalled coroutine.
         self.check_response(response, callback)
@@ -258,6 +266,8 @@ class BaseHandler:
                     self.process_exception_by_middleware,
                     thread_sensitive=True,
                 )(e, request)
+                if response is None:
+                    raise
 
         # Make sure the response is not a coroutine
         if asyncio.iscoroutine(response):
@@ -323,13 +333,13 @@ class BaseHandler:
     def process_exception_by_middleware(self, exception, request):
         """
         Pass the exception to the exception middleware. If no middleware
-        return a response for this exception, raise it.
+        return a response for this exception, return None.
         """
         for middleware_method in self._exception_middleware:
             response = middleware_method(request, exception)
             if response:
                 return response
-        raise
+        return None
 
 
 def reset_urlconf(sender, **kwargs):

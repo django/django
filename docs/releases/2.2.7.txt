@@ -11,7 +11,7 @@ Bugfixes
 
 * Fixed a crash when using a ``contains``, ``contained_by``, ``has_key``,
   ``has_keys``, or ``has_any_keys`` lookup on
-  :class:`~django.contrib.postgres.fields.JSONField`, if the right or left hand
+  ``django.contrib.postgres.fields.JSONField``, if the right or left hand
   side of an expression is a key transform (:ticket:`30826`).
 
 * Prevented :option:`migrate --plan` from showing that ``RunPython`` operations

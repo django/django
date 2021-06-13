@@ -183,12 +183,20 @@ this. For a small app like polls, this process isn't too difficult.
    license. Just be aware that your licensing choice will affect who is able
    to use your code.
 
-#. Next we'll create ``setup.cfg`` and ``setup.py`` files which detail how to
-   build and install the app. A full explanation of these files is beyond the
-   scope of this tutorial, but the `setuptools documentation
-   <https://setuptools.readthedocs.io/en/latest/>`_ has a good explanation.
-   Create the files ``django-polls/setup.cfg`` and ``django-polls/setup.py``
-   with the following contents:
+#. Next we'll create ``pyproject.toml``, ``setup.cfg``, and ``setup.py`` files
+   which detail how to build and install the app. A full explanation of these
+   files is beyond the scope of this tutorial, but the `setuptools
+   documentation <https://setuptools.readthedocs.io/en/latest/>`_ has a good
+   explanation. Create the ``django-polls/pyproject.toml``,
+   ``django-polls/setup.cfg``, and ``django-polls/setup.py`` files with the
+   following contents:
+
+   .. code-block:: toml
+        :caption: django-polls/pyproject.toml
+
+        [build-system]
+        requires = ['setuptools>=40.8.0', 'wheel']
+        build-backend = 'setuptools.build_meta:__legacy__'
 
    .. code-block:: ini
         :caption: django-polls/setup.cfg
@@ -212,15 +220,17 @@ this. For a small app like polls, this process isn't too difficult.
             Programming Language :: Python
             Programming Language :: Python :: 3
             Programming Language :: Python :: 3 :: Only
-            Programming Language :: Python :: 3.6
-            Programming Language :: Python :: 3.7
             Programming Language :: Python :: 3.8
+            Programming Language :: Python :: 3.9
             Topic :: Internet :: WWW/HTTP
             Topic :: Internet :: WWW/HTTP :: Dynamic Content
 
         [options]
         include_package_data = true
         packages = find:
+        python_requires = >=3.8
+        install_requires =
+            Django >= X.Y  # Replace "X.Y" as appropriate
 
    .. code-block:: python
         :caption: django-polls/setup.py
@@ -277,8 +287,8 @@ working. We'll now fix this by installing our new ``django-polls`` package.
    users of the machine.
 
    Note that per-user installations can still affect the behavior of system
-   tools that run as that user, so ``virtualenv`` is a more robust solution
-   (see below).
+   tools that run as that user, so using a virtual environment is a more robust
+   solution (see below).
 
 #. To install the package, use pip (you already :ref:`installed it
    <installing-reusable-apps-prerequisites>`, right?)::
@@ -307,8 +317,8 @@ the world! If this wasn't just an example, you could now:
   tutorial <https://packaging.python.org/tutorials/packaging-projects/#uploading-the-distribution-archives>`_
   for doing this.
 
-Installing Python packages with virtualenv
-==========================================
+Installing Python packages with a virtual environment
+=====================================================
 
 Earlier, we installed the polls app as a user library. This has some
 disadvantages:
@@ -319,7 +329,7 @@ disadvantages:
   the same name).
 
 Typically, these situations only arise once you're maintaining several Django
-projects. When they do, the best solution is to use `virtualenv
-<https://virtualenv.pypa.io/>`_. This tool allows you to maintain multiple
-isolated Python environments, each with its own copy of the libraries and
-package namespace.
+projects. When they do, the best solution is to use :doc:`venv
+<python:tutorial/venv>`. This tool allows you to maintain multiple isolated
+Python environments, each with its own copy of the libraries and package
+namespace.

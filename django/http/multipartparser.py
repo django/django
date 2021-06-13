@@ -149,6 +149,8 @@ class MultiPartParser:
         num_post_keys = 0
         # To limit the amount of data read from the request.
         read_size = None
+        # Whether a file upload is finished.
+        uploaded_file = True
 
         try:
             for item_type, meta_data, field_stream in Parser(stream, self._boundary):
@@ -158,6 +160,7 @@ class MultiPartParser:
                     # we hit the next boundary/part of the multipart content.
                     self.handle_file_complete(old_field_name, counters)
                     old_field_name = None
+                    uploaded_file = True
 
                 try:
                     disposition = meta_data['content-disposition'][1]
@@ -209,7 +212,7 @@ class MultiPartParser:
                     file_name = disposition.get('filename')
                     if file_name:
                         file_name = force_str(file_name, encoding, errors='replace')
-                        file_name = self.IE_sanitize(html.unescape(file_name))
+                        file_name = self.sanitize_file_name(file_name)
                     if not file_name:
                         continue
 
@@ -223,6 +226,7 @@ class MultiPartParser:
                         content_length = None
 
                     counters = [0] * len(handlers)
+                    uploaded_file = False
                     try:
                         for handler in handlers:
                             try:
@@ -277,6 +281,9 @@ class MultiPartParser:
             if not e.connection_reset:
                 exhaust(self._input_data)
         else:
+            if not uploaded_file:
+                for handler in handlers:
+                    handler.upload_interrupted()
             # Make sure that the request data is all fed
             exhaust(self._input_data)
 
@@ -297,9 +304,28 @@ class MultiPartParser:
                 self._files.appendlist(force_str(old_field_name, self._encoding, errors='replace'), file_obj)
                 break
 
-    def IE_sanitize(self, filename):
-        """Cleanup filename from Internet Explorer full paths."""
-        return filename and filename[filename.rfind("\\") + 1:].strip()
+    def sanitize_file_name(self, file_name):
+        """
+        Sanitize the filename of an upload.
+
+        Remove all possible path separators, even though that might remove more
+        than actually required by the target system. Filenames that could
+        potentially cause problems (current/parent dir) are also discarded.
+
+        It should be noted that this function could still return a "filepath"
+        like "C:some_file.txt" which is handled later on by the storage layer.
+        So while this function does sanitize filenames to some extent, the
+        resulting filename should still be considered as untrusted user input.
+        """
+        file_name = html.unescape(file_name)
+        file_name = file_name.rsplit('/')[-1]
+        file_name = file_name.rsplit('\\')[-1]
+
+        if file_name in {'', '.', '..'}:
+            return None
+        return file_name
+
+    IE_sanitize = sanitize_file_name
 
     def _close_files(self):
         # Free up all file handles.

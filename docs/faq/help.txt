@@ -5,9 +5,9 @@ FAQ: Getting Help
 How do I do X? Why doesn't Y work? Where can I go to get help?
 ==============================================================
 
-First, please check if your question is answered on the :doc:`FAQ <faq/index>`.
-Also, search for answers using your favorite search engine, and in `the
-forum`_.
+First, please check if your question is answered on the :doc:`FAQ
+</faq/index>`. Also, search for answers using your favorite search engine, and
+in `the forum`_.
 
 .. _`the forum`: https://forum.djangoproject.com/
 
@@ -22,11 +22,13 @@ Then, please post it in one of the following channels:
 * The Django Forum section `"Using Django"`_. This is for web-based
   discussions.
 * The |django-users| mailing list. This is for email-based discussions.
-* The `#django IRC channel`_ on the Freenode IRC network. This is for
-  chat-based discussions.
+* The `#django IRC channel`_ on the Libera.Chat IRC network. This is for
+  chat-based discussions. If you're new to IRC, see the `Libera.Chat
+  documentation`_ for different ways to connect.
 
 .. _`"Using Django"`: https://forum.djangoproject.com/c/users
-.. _`#django IRC channel`: irc://irc.freenode.net/django
+.. _#django IRC channel: https://web.libera.chat/#django
+.. _Libera.Chat documentation: https://libera.chat/guides/connect
 
 In all these channels please abide by the `Django Code of Conduct`_. In
 summary, being friendly and patient, considerate, respectful, and careful in

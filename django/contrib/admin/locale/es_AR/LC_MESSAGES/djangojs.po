@@ -2,13 +2,13 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Ramiro Morales, 2014-2016
+# Ramiro Morales, 2014-2016,2020-2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-03-21 12:54+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -84,22 +84,22 @@ msgstr ""
 "ejecuta una acción las mismas se perderán."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Ha seleccionado una acción, pero todavía no ha grabado las modificaciones "
-"que ha realizado en campos individuales. Por favor haga click en Aceptar "
-"para grabarlas. Necesitará ejecutar la acción nuevamente."
+"Ha seleccionado una acción pero todavía no ha grabado sus cambios en campos "
+"individuales. Por favor haga click en Ok para grabarlos. Luego necesitará re-"
+"ejecutar la acción."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Ha seleccionado una acción pero no ha realizado ninguna modificación en "
-"campos individuales. Es probable que lo que necesite usar en realidad sea el "
-"botón Ejecutar y no el botón Guardar."
+"Ha seleccionado una acción y no ha realizado ninguna modificación de campos "
+"individuales. Es probable que deba usar el botón 'Ir'  y no el botón "
+"'Grabar'."
 
 msgid "Now"
 msgstr "Ahora"
@@ -192,6 +192,54 @@ msgstr "Noviembre"
 
 msgid "December"
 msgstr "Diciembre"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Ene"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Abr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "May"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Jun"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Jul"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Ago"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Set"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Oct"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dic"
 
 msgctxt "one letter Sunday"
 msgid "S"

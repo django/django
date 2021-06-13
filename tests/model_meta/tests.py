@@ -257,7 +257,7 @@ class RelationTreeTests(SimpleTestCase):
         self.assertEqual(
             sorted(field.related_query_name() for field in BasePerson._meta._relation_tree),
             sorted([
-                '+', '_relating_basepeople_hidden_+', 'BasePerson_following_abstract+',
+                '+', '_model_meta_relating_basepeople_hidden_+', 'BasePerson_following_abstract+',
                 'BasePerson_following_abstract+', 'BasePerson_following_base+', 'BasePerson_following_base+',
                 'BasePerson_friends_abstract+', 'BasePerson_friends_abstract+', 'BasePerson_friends_base+',
                 'BasePerson_friends_base+', 'BasePerson_m2m_abstract+', 'BasePerson_m2m_base+', 'Relating_basepeople+',
@@ -279,10 +279,19 @@ class ParentListTests(SimpleTestCase):
 class PropertyNamesTests(SimpleTestCase):
     def test_person(self):
         # Instance only descriptors don't appear in _property_names.
-        self.assertEqual(AbstractPerson().test_instance_only_descriptor, 1)
+        self.assertEqual(BasePerson().test_instance_only_descriptor, 1)
+        with self.assertRaisesMessage(AttributeError, 'Instance only'):
+            AbstractPerson.test_instance_only_descriptor
         self.assertEqual(AbstractPerson._meta._property_names, frozenset(['pk', 'test_property']))
 
 
 class ReturningFieldsTests(SimpleTestCase):
     def test_pk(self):
         self.assertEqual(Relation._meta.db_returning_fields, [Relation._meta.pk])
+
+
+class AbstractModelTests(SimpleTestCase):
+    def test_abstract_model_not_instantiated(self):
+        msg = 'Abstract models cannot be instantiated.'
+        with self.assertRaisesMessage(TypeError, msg):
+            AbstractPerson()

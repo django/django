@@ -6,12 +6,13 @@ admin
 admindocs
 admins
 affine
+affordances
 aggregator
 Ai
 Alchin
+allowlist
 alphanumerics
 amet
-amongst
 analytics
 apnumber
 app
@@ -203,6 +204,7 @@ Ess
 ETag
 ETags
 exe
+exfiltration
 extensibility
 Facebook
 fallback
@@ -215,6 +217,7 @@ fieldsets
 filename
 filenames
 filesystem
+filesystems
 fk
 flatpage
 flatpages
@@ -226,7 +229,6 @@ formfield
 formset
 formsets
 formtools
-freenode
 Frysian
 functionalities
 gdal
@@ -277,10 +279,12 @@ hstore
 html
 http
 https
+Hypercorn
 hyperlinks
 ie
 ies
 iframe
+Igbo
 inbox
 incrementing
 indexable
@@ -323,9 +327,11 @@ Koziarski
 kwarg
 kwargs
 Kyngesburye
+Kyrgyz
 latin
 lawrence
 lexer
+Libera
 lifecycle
 lifecycles
 linearize
@@ -367,6 +373,7 @@ metre
 MiB
 micrometre
 middleware
+middlewares
 migrationname
 millimetre
 Minification
@@ -471,6 +478,7 @@ postfix
 postgis
 postgres
 postgresql
+PowerShell
 pq
 pre
 precisions
@@ -602,6 +610,7 @@ sortable
 spam
 spammers
 spatialite
+Spectre
 Springmeyer
 SQL
 ssi
@@ -660,6 +669,7 @@ systemwide
 tablespace
 tablespaces
 tagline
+Tajik
 tarball
 tarballs
 teardown
@@ -669,6 +679,7 @@ textarea
 th
 that'll
 Thejaswi
+theming
 This'll
 threadlocals
 threadpool
@@ -699,6 +710,7 @@ trigram
 trigrams
 tuple
 tuples
+Turkmen
 tv
 txt
 tz
@@ -724,7 +736,6 @@ ungrouped
 unhandled
 unharmful
 unhashable
-unicode
 uninstall
 uninstalling
 unioning
@@ -741,6 +752,7 @@ unpickled
 unpickling
 unpopulated
 unpythonic
+Unregisters
 unrendered
 unreproducible
 Unreviewed
@@ -777,12 +789,8 @@ versioned
 versioning
 vertices
 viewable
-virtualenv
-virtualenvs
 virtualized
 Weblog
-whitelist
-whitelisted
 whitespace
 whitespaces
 whizbang

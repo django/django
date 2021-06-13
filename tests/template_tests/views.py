@@ -24,4 +24,4 @@ def template_response_view(request):
 
 
 def snark(request):
-    return HttpResponse('Found him!')
+    return HttpResponse('Found them!')

@@ -1,6 +1,7 @@
 import json
 
 from django.db.models import CharField, F, OuterRef, Q, Subquery, Value
+from django.db.models.fields.json import KeyTextTransform, KeyTransform
 from django.db.models.functions import Cast, Concat, Substr
 from django.test.utils import Approximate
 
@@ -20,10 +21,27 @@ except ImportError:
 class TestGeneralAggregate(PostgreSQLTestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.agg1 = AggregateTestModel.objects.create(boolean_field=True, char_field='Foo1', integer_field=0)
-        AggregateTestModel.objects.create(boolean_field=False, char_field='Foo2', integer_field=1)
-        AggregateTestModel.objects.create(boolean_field=False, char_field='Foo4', integer_field=2)
-        AggregateTestModel.objects.create(boolean_field=True, char_field='Foo3', integer_field=0)
+        cls.aggs = AggregateTestModel.objects.bulk_create([
+            AggregateTestModel(boolean_field=True, char_field='Foo1', integer_field=0),
+            AggregateTestModel(
+                boolean_field=False,
+                char_field='Foo2',
+                integer_field=1,
+                json_field={'lang': 'pl'},
+            ),
+            AggregateTestModel(
+                boolean_field=False,
+                char_field='Foo4',
+                integer_field=2,
+                json_field={'lang': 'en'},
+            ),
+            AggregateTestModel(
+                boolean_field=True,
+                char_field='Foo3',
+                integer_field=0,
+                json_field={'breed': 'collie'},
+            ),
+        ])
 
     def test_array_agg_charfield(self):
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('char_field'))
@@ -78,6 +96,25 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                     arrayagg=ArrayAgg('boolean_field', ordering=ordering)
                 )
                 self.assertEqual(values, {'arrayagg': expected_output})
+
+    def test_array_agg_jsonfield(self):
+        values = AggregateTestModel.objects.aggregate(
+            arrayagg=ArrayAgg(
+                KeyTransform('lang', 'json_field'),
+                filter=Q(json_field__lang__isnull=False),
+            ),
+        )
+        self.assertEqual(values, {'arrayagg': ['pl', 'en']})
+
+    def test_array_agg_jsonfield_ordering(self):
+        values = AggregateTestModel.objects.aggregate(
+            arrayagg=ArrayAgg(
+                KeyTransform('lang', 'json_field'),
+                filter=Q(json_field__lang__isnull=False),
+                ordering=KeyTransform('lang', 'json_field'),
+            ),
+        )
+        self.assertEqual(values, {'arrayagg': ['en', 'pl']})
 
     def test_array_agg_filter(self):
         values = AggregateTestModel.objects.aggregate(
@@ -155,6 +192,12 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         values = AggregateTestModel.objects.aggregate(booland=BoolAnd('boolean_field'))
         self.assertEqual(values, {'booland': None})
 
+    def test_bool_and_q_object(self):
+        values = AggregateTestModel.objects.aggregate(
+            booland=BoolAnd(Q(integer_field__gt=2)),
+        )
+        self.assertEqual(values, {'booland': False})
+
     def test_bool_or_general(self):
         values = AggregateTestModel.objects.aggregate(boolor=BoolOr('boolean_field'))
         self.assertEqual(values, {'boolor': True})
@@ -163,6 +206,12 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         AggregateTestModel.objects.all().delete()
         values = AggregateTestModel.objects.aggregate(boolor=BoolOr('boolean_field'))
         self.assertEqual(values, {'boolor': None})
+
+    def test_bool_or_q_object(self):
+        values = AggregateTestModel.objects.aggregate(
+            boolor=BoolOr(Q(integer_field__gt=2)),
+        )
+        self.assertEqual(values, {'boolor': False})
 
     def test_string_agg_requires_delimiter(self):
         with self.assertRaises(TypeError):
@@ -193,6 +242,17 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                 )
                 self.assertEqual(values, {'stringagg': expected_output})
 
+    def test_string_agg_jsonfield_ordering(self):
+        values = AggregateTestModel.objects.aggregate(
+            stringagg=StringAgg(
+                KeyTextTransform('lang', 'json_field'),
+                delimiter=';',
+                ordering=KeyTextTransform('lang', 'json_field'),
+                output_field=CharField(),
+            ),
+        )
+        self.assertEqual(values, {'stringagg': 'en;pl'})
+
     def test_string_agg_filter(self):
         values = AggregateTestModel.objects.aggregate(
             stringagg=StringAgg(
@@ -221,6 +281,52 @@ class TestGeneralAggregate(PostgreSQLTestCase):
     def test_json_agg_empty(self):
         values = AggregateTestModel.objects.none().aggregate(jsonagg=JSONBAgg('integer_field'))
         self.assertEqual(values, json.loads('{"jsonagg": []}'))
+
+    def test_json_agg_charfield_ordering(self):
+        ordering_test_cases = (
+            (F('char_field').desc(), ['Foo4', 'Foo3', 'Foo2', 'Foo1']),
+            (F('char_field').asc(), ['Foo1', 'Foo2', 'Foo3', 'Foo4']),
+            (F('char_field'), ['Foo1', 'Foo2', 'Foo3', 'Foo4']),
+            ('char_field', ['Foo1', 'Foo2', 'Foo3', 'Foo4']),
+            ('-char_field', ['Foo4', 'Foo3', 'Foo2', 'Foo1']),
+            (Concat('char_field', Value('@')), ['Foo1', 'Foo2', 'Foo3', 'Foo4']),
+            (Concat('char_field', Value('@')).desc(), ['Foo4', 'Foo3', 'Foo2', 'Foo1']),
+        )
+        for ordering, expected_output in ordering_test_cases:
+            with self.subTest(ordering=ordering, expected_output=expected_output):
+                values = AggregateTestModel.objects.aggregate(
+                    jsonagg=JSONBAgg('char_field', ordering=ordering),
+                )
+                self.assertEqual(values, {'jsonagg': expected_output})
+
+    def test_json_agg_integerfield_ordering(self):
+        values = AggregateTestModel.objects.aggregate(
+            jsonagg=JSONBAgg('integer_field', ordering=F('integer_field').desc()),
+        )
+        self.assertEqual(values, {'jsonagg': [2, 1, 0, 0]})
+
+    def test_json_agg_booleanfield_ordering(self):
+        ordering_test_cases = (
+            (F('boolean_field').asc(), [False, False, True, True]),
+            (F('boolean_field').desc(), [True, True, False, False]),
+            (F('boolean_field'), [False, False, True, True]),
+        )
+        for ordering, expected_output in ordering_test_cases:
+            with self.subTest(ordering=ordering, expected_output=expected_output):
+                values = AggregateTestModel.objects.aggregate(
+                    jsonagg=JSONBAgg('boolean_field', ordering=ordering),
+                )
+                self.assertEqual(values, {'jsonagg': expected_output})
+
+    def test_json_agg_jsonfield_ordering(self):
+        values = AggregateTestModel.objects.aggregate(
+            jsonagg=JSONBAgg(
+                KeyTransform('lang', 'json_field'),
+                filter=Q(json_field__lang__isnull=False),
+                ordering=KeyTransform('lang', 'json_field'),
+            ),
+        )
+        self.assertEqual(values, {'jsonagg': ['en', 'pl']})
 
     def test_string_agg_array_agg_ordering_in_subquery(self):
         stats = []
@@ -254,9 +360,9 @@ class TestGeneralAggregate(PostgreSQLTestCase):
 
     def test_string_agg_array_agg_filter_in_subquery(self):
         StatTestModel.objects.bulk_create([
-            StatTestModel(related_field=self.agg1, int1=0, int2=5),
-            StatTestModel(related_field=self.agg1, int1=1, int2=4),
-            StatTestModel(related_field=self.agg1, int1=2, int2=3),
+            StatTestModel(related_field=self.aggs[0], int1=0, int2=5),
+            StatTestModel(related_field=self.aggs[0], int1=1, int2=4),
+            StatTestModel(related_field=self.aggs[0], int1=2, int2=3),
         ])
         for aggregate, expected_result in (
             (
@@ -293,7 +399,7 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         ).exclude(stringagg='').values('id')
         self.assertSequenceEqual(
             AggregateTestModel.objects.filter(id__in=Subquery(subquery)),
-            [self.agg1],
+            [self.aggs[0]],
         )
 
 
@@ -321,6 +427,18 @@ class TestAggregateDistinct(PostgreSQLTestCase):
     def test_array_agg_distinct_true(self):
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('char_field', distinct=True))
         self.assertEqual(sorted(values['arrayagg']), ['Bar', 'Foo'])
+
+    def test_json_agg_distinct_false(self):
+        values = AggregateTestModel.objects.aggregate(
+            jsonagg=JSONBAgg('char_field', distinct=False),
+        )
+        self.assertEqual(sorted(values['jsonagg']), ['Bar', 'Foo', 'Foo'])
+
+    def test_json_agg_distinct_true(self):
+        values = AggregateTestModel.objects.aggregate(
+            jsonagg=JSONBAgg('char_field', distinct=True),
+        )
+        self.assertEqual(sorted(values['jsonagg']), ['Bar', 'Foo'])
 
 
 class TestStatisticsAggregate(PostgreSQLTestCase):

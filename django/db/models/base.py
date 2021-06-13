@@ -4,6 +4,7 @@ import warnings
 from functools import partialmethod
 from itertools import chain
 
+import django
 from django.apps import apps
 from django.conf import settings
 from django.core import checks
@@ -19,7 +20,7 @@ from django.db.models import (
     NOT_PROVIDED, ExpressionWrapper, IntegerField, Max, Value,
 )
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.constraints import CheckConstraint
+from django.db.models.constraints import CheckConstraint, UniqueConstraint
 from django.db.models.deletion import CASCADE, Collector
 from django.db.models.fields.related import (
     ForeignObjectRel, OneToOneField, lazy_related_operation, resolve_relation,
@@ -27,7 +28,7 @@ from django.db.models.fields.related import (
 from django.db.models.functions import Coalesce
 from django.db.models.manager import Manager
 from django.db.models.options import Options
-from django.db.models.query import Q
+from django.db.models.query import F, Q
 from django.db.models.signals import (
     class_prepared, post_init, post_save, pre_init, pre_save,
 )
@@ -36,7 +37,6 @@ from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext_lazy as _
-from django.utils.version import get_version
 
 
 class Deferred:
@@ -91,7 +91,7 @@ class ModelBase(type):
         # method to type.__new__() so that they're properly initialized
         # (i.e. __set_name__()).
         contributable_attrs = {}
-        for obj_name, obj in list(attrs.items()):
+        for obj_name, obj in attrs.items():
             if _has_contribute_to_class(obj):
                 contributable_attrs[obj_name] = obj
             else:
@@ -409,6 +409,8 @@ class Model(metaclass=ModelBase):
         opts = self._meta
         _setattr = setattr
         _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError('Abstract models cannot be instantiated.')
 
         pre_init.send(sender=cls, args=args, kwargs=kwargs)
 
@@ -440,7 +442,11 @@ class Model(metaclass=ModelBase):
                 if val is _DEFERRED:
                     continue
                 _setattr(self, field.attname, val)
-                kwargs.pop(field.name, None)
+                if kwargs.pop(field.name, NOT_PROVIDED) is not NOT_PROVIDED:
+                    raise TypeError(
+                        f"{cls.__qualname__}() got both positional and "
+                        f"keyword arguments for field '{field.name}'."
+                    )
 
         # Now we're left with the unprocessed fields that *must* come from
         # keywords, or default.
@@ -538,30 +544,34 @@ class Model(metaclass=ModelBase):
 
     def __reduce__(self):
         data = self.__getstate__()
-        data[DJANGO_VERSION_PICKLE_KEY] = get_version()
+        data[DJANGO_VERSION_PICKLE_KEY] = django.__version__
         class_id = self._meta.app_label, self._meta.object_name
         return model_unpickle, (class_id,), data
 
     def __getstate__(self):
         """Hook to allow choosing the attributes to pickle."""
-        return self.__dict__
+        state = self.__dict__.copy()
+        state['_state'] = copy.copy(state['_state'])
+        state['_state'].fields_cache = state['_state'].fields_cache.copy()
+        return state
 
     def __setstate__(self, state):
-        msg = None
         pickled_version = state.get(DJANGO_VERSION_PICKLE_KEY)
         if pickled_version:
-            current_version = get_version()
-            if current_version != pickled_version:
-                msg = (
-                    "Pickled model instance's Django version %s does not match "
-                    "the current version %s." % (pickled_version, current_version)
+            if pickled_version != django.__version__:
+                warnings.warn(
+                    "Pickled model instance's Django version %s does not "
+                    "match the current version %s."
+                    % (pickled_version, django.__version__),
+                    RuntimeWarning,
+                    stacklevel=2,
                 )
         else:
-            msg = "Pickled model instance's Django version is not specified."
-
-        if msg:
-            warnings.warn(msg, RuntimeWarning, stacklevel=2)
-
+            warnings.warn(
+                "Pickled model instance's Django version is not specified.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
         self.__dict__.update(state)
 
     def _get_pk_val(self, meta=None):
@@ -673,38 +683,7 @@ class Model(metaclass=ModelBase):
         that the "save" must be an SQL insert or update (or equivalent for
         non-SQL backends), respectively. Normally, they should not be set.
         """
-        # Ensure that a model instance without a PK hasn't been assigned to
-        # a ForeignKey or OneToOneField on this model. If the field is
-        # nullable, allowing the save() would result in silent data loss.
-        for field in self._meta.concrete_fields:
-            # If the related field isn't cached, then an instance hasn't
-            # been assigned and there's no need to worry about this check.
-            if field.is_relation and field.is_cached(self):
-                obj = getattr(self, field.name, None)
-                if not obj:
-                    continue
-                # A pk may have been assigned manually to a model instance not
-                # saved to the database (or auto-generated in a case like
-                # UUIDField), but we allow the save to proceed and rely on the
-                # database to raise an IntegrityError if applicable. If
-                # constraints aren't supported by the database, there's the
-                # unavoidable risk of data corruption.
-                if obj.pk is None:
-                    # Remove the object from a related instance cache.
-                    if not field.remote_field.multiple:
-                        field.remote_field.delete_cached_value(obj)
-                    raise ValueError(
-                        "save() prohibited to prevent data loss due to "
-                        "unsaved related object '%s'." % field.name
-                    )
-                elif getattr(self, field.attname) is None:
-                    # Use pk from related object if it has been saved after
-                    # an assignment.
-                    setattr(self, field.attname, obj.pk)
-                # If the relationship's pk/to_field was changed, clear the
-                # cached relationship.
-                if getattr(obj, field.target_field.attname) != getattr(self, field.attname):
-                    field.delete_cached_value(self)
+        self._prepare_related_fields_for_save(operation_name='save')
 
         using = using or router.db_for_write(self.__class__, instance=self)
         if force_insert and (force_update or update_fields):
@@ -721,7 +700,7 @@ class Model(metaclass=ModelBase):
             update_fields = frozenset(update_fields)
             field_names = set()
 
-            for field in self._meta.fields:
+            for field in self._meta.concrete_fields:
                 if not field.primary_key:
                     field_names.add(field.name)
 
@@ -731,9 +710,11 @@ class Model(metaclass=ModelBase):
             non_model_fields = update_fields.difference(field_names)
 
             if non_model_fields:
-                raise ValueError("The following fields do not exist in this "
-                                 "model or are m2m fields: %s"
-                                 % ', '.join(non_model_fields))
+                raise ValueError(
+                    'The following fields do not exist in this model, are m2m '
+                    'fields, or are non-concrete fields: %s'
+                    % ', '.join(non_model_fields)
+                )
 
         # If saving to the same database, and this model is deferred, then
         # automatically do an "update_fields" save on the loaded fields.
@@ -930,6 +911,40 @@ class Model(metaclass=ModelBase):
             [self], fields=fields, returning_fields=returning_fields,
             using=using, raw=raw,
         )
+
+    def _prepare_related_fields_for_save(self, operation_name):
+        # Ensure that a model instance without a PK hasn't been assigned to
+        # a ForeignKey or OneToOneField on this model. If the field is
+        # nullable, allowing the save would result in silent data loss.
+        for field in self._meta.concrete_fields:
+            # If the related field isn't cached, then an instance hasn't been
+            # assigned and there's no need to worry about this check.
+            if field.is_relation and field.is_cached(self):
+                obj = getattr(self, field.name, None)
+                if not obj:
+                    continue
+                # A pk may have been assigned manually to a model instance not
+                # saved to the database (or auto-generated in a case like
+                # UUIDField), but we allow the save to proceed and rely on the
+                # database to raise an IntegrityError if applicable. If
+                # constraints aren't supported by the database, there's the
+                # unavoidable risk of data corruption.
+                if obj.pk is None:
+                    # Remove the object from a related instance cache.
+                    if not field.remote_field.multiple:
+                        field.remote_field.delete_cached_value(obj)
+                    raise ValueError(
+                        "%s() prohibited to prevent data loss due to unsaved "
+                        "related object '%s'." % (operation_name, field.name)
+                    )
+                elif getattr(self, field.attname) in field.empty_values:
+                    # Use pk from related object if it has been saved after
+                    # an assignment.
+                    setattr(self, field.attname, obj.pk)
+                # If the relationship's pk/to_field was changed, clear the
+                # cached relationship.
+                if getattr(obj, field.target_field.attname) != getattr(self, field.attname):
+                    field.delete_cached_value(self)
 
     def delete(self, using=None, keep_parents=False):
         using = using or router.db_for_write(self.__class__, instance=self)
@@ -1276,12 +1291,43 @@ class Model(metaclass=ModelBase):
             errors += [
                 *cls._check_index_together(),
                 *cls._check_unique_together(),
-                *cls._check_indexes(),
+                *cls._check_indexes(databases),
                 *cls._check_ordering(),
                 *cls._check_constraints(databases),
+                *cls._check_default_pk(),
             ]
 
         return errors
+
+    @classmethod
+    def _check_default_pk(cls):
+        if (
+            not cls._meta.abstract and
+            cls._meta.pk.auto_created and
+            # Inherited PKs are checked in parents models.
+            not (
+                isinstance(cls._meta.pk, OneToOneField) and
+                cls._meta.pk.remote_field.parent_link
+            ) and
+            not settings.is_overridden('DEFAULT_AUTO_FIELD') and
+            not cls._meta.app_config._is_default_auto_field_overridden
+        ):
+            return [
+                checks.Warning(
+                    f"Auto-created primary key used when not defining a "
+                    f"primary key type, by default "
+                    f"'{settings.DEFAULT_AUTO_FIELD}'.",
+                    hint=(
+                        f"Configure the DEFAULT_AUTO_FIELD setting or the "
+                        f"{cls._meta.app_config.__class__.__qualname__}."
+                        f"default_auto_field attribute to point to a subclass "
+                        f"of AutoField, e.g. 'django.db.models.BigAutoField'."
+                    ),
+                    obj=cls,
+                    id='models.W042',
+                ),
+            ]
+        return []
 
     @classmethod
     def _check_swappable(cls):
@@ -1585,9 +1631,10 @@ class Model(metaclass=ModelBase):
             return errors
 
     @classmethod
-    def _check_indexes(cls):
-        """Check the fields and names of indexes."""
+    def _check_indexes(cls, databases):
+        """Check fields, names, and conditions of indexes."""
         errors = []
+        references = set()
         for index in cls._meta.indexes:
             # Index name can't start with an underscore or a number, restricted
             # for cross-database compatibility with Oracle.
@@ -1609,7 +1656,66 @@ class Model(metaclass=ModelBase):
                         id='models.E034',
                     ),
                 )
+            if index.contains_expressions:
+                for expression in index.expressions:
+                    references.update(
+                        ref[0] for ref in cls._get_expr_references(expression)
+                    )
+        for db in databases:
+            if not router.allow_migrate_model(db, cls):
+                continue
+            connection = connections[db]
+            if not (
+                connection.features.supports_partial_indexes or
+                'supports_partial_indexes' in cls._meta.required_db_features
+            ) and any(index.condition is not None for index in cls._meta.indexes):
+                errors.append(
+                    checks.Warning(
+                        '%s does not support indexes with conditions.'
+                        % connection.display_name,
+                        hint=(
+                            "Conditions will be ignored. Silence this warning "
+                            "if you don't care about it."
+                        ),
+                        obj=cls,
+                        id='models.W037',
+                    )
+                )
+            if not (
+                connection.features.supports_covering_indexes or
+                'supports_covering_indexes' in cls._meta.required_db_features
+            ) and any(index.include for index in cls._meta.indexes):
+                errors.append(
+                    checks.Warning(
+                        '%s does not support indexes with non-key columns.'
+                        % connection.display_name,
+                        hint=(
+                            "Non-key columns will be ignored. Silence this "
+                            "warning if you don't care about it."
+                        ),
+                        obj=cls,
+                        id='models.W040',
+                    )
+                )
+            if not (
+                connection.features.supports_expression_indexes or
+                'supports_expression_indexes' in cls._meta.required_db_features
+            ) and any(index.contains_expressions for index in cls._meta.indexes):
+                errors.append(
+                    checks.Warning(
+                        '%s does not support indexes on expressions.'
+                        % connection.display_name,
+                        hint=(
+                            "An index won't be created. Silence this warning "
+                            "if you don't care about it."
+                        ),
+                        obj=cls,
+                        id='models.W043',
+                    )
+                )
         fields = [field for index in cls._meta.indexes for field, _ in index.fields_orders]
+        fields += [include for index in cls._meta.indexes for include in index.include]
+        fields += references
         errors.extend(cls._check_local_fields(fields, 'indexes'))
         return errors
 
@@ -1725,7 +1831,9 @@ class Model(metaclass=ModelBase):
                     else:
                         _cls = None
                 except (FieldDoesNotExist, AttributeError):
-                    if fld is None or fld.get_transform(part) is None:
+                    if fld is None or (
+                        fld.get_transform(part) is None and fld.get_lookup(part) is None
+                    ):
                         errors.append(
                             checks.Error(
                                 "'ordering' refers to the nonexistent field, "
@@ -1839,18 +1947,35 @@ class Model(metaclass=ModelBase):
         return errors
 
     @classmethod
+    def _get_expr_references(cls, expr):
+        if isinstance(expr, Q):
+            for child in expr.children:
+                if isinstance(child, tuple):
+                    lookup, value = child
+                    yield tuple(lookup.split(LOOKUP_SEP))
+                    yield from cls._get_expr_references(value)
+                else:
+                    yield from cls._get_expr_references(child)
+        elif isinstance(expr, F):
+            yield tuple(expr.name.split(LOOKUP_SEP))
+        elif hasattr(expr, 'get_source_expressions'):
+            for src_expr in expr.get_source_expressions():
+                yield from cls._get_expr_references(src_expr)
+
+    @classmethod
     def _check_constraints(cls, databases):
         errors = []
         for db in databases:
             if not router.allow_migrate_model(db, cls):
                 continue
             connection = connections[db]
-            if (
+            if not (
                 connection.features.supports_table_check_constraints or
                 'supports_table_check_constraints' in cls._meta.required_db_features
+            ) and any(
+                isinstance(constraint, CheckConstraint)
+                for constraint in cls._meta.constraints
             ):
-                continue
-            if any(isinstance(constraint, CheckConstraint) for constraint in cls._meta.constraints):
                 errors.append(
                     checks.Warning(
                         '%s does not support check constraints.' % connection.display_name,
@@ -1862,6 +1987,139 @@ class Model(metaclass=ModelBase):
                         id='models.W027',
                     )
                 )
+            if not (
+                connection.features.supports_partial_indexes or
+                'supports_partial_indexes' in cls._meta.required_db_features
+            ) and any(
+                isinstance(constraint, UniqueConstraint) and constraint.condition is not None
+                for constraint in cls._meta.constraints
+            ):
+                errors.append(
+                    checks.Warning(
+                        '%s does not support unique constraints with '
+                        'conditions.' % connection.display_name,
+                        hint=(
+                            "A constraint won't be created. Silence this "
+                            "warning if you don't care about it."
+                        ),
+                        obj=cls,
+                        id='models.W036',
+                    )
+                )
+            if not (
+                connection.features.supports_deferrable_unique_constraints or
+                'supports_deferrable_unique_constraints' in cls._meta.required_db_features
+            ) and any(
+                isinstance(constraint, UniqueConstraint) and constraint.deferrable is not None
+                for constraint in cls._meta.constraints
+            ):
+                errors.append(
+                    checks.Warning(
+                        '%s does not support deferrable unique constraints.'
+                        % connection.display_name,
+                        hint=(
+                            "A constraint won't be created. Silence this "
+                            "warning if you don't care about it."
+                        ),
+                        obj=cls,
+                        id='models.W038',
+                    )
+                )
+            if not (
+                connection.features.supports_covering_indexes or
+                'supports_covering_indexes' in cls._meta.required_db_features
+            ) and any(
+                isinstance(constraint, UniqueConstraint) and constraint.include
+                for constraint in cls._meta.constraints
+            ):
+                errors.append(
+                    checks.Warning(
+                        '%s does not support unique constraints with non-key '
+                        'columns.' % connection.display_name,
+                        hint=(
+                            "A constraint won't be created. Silence this "
+                            "warning if you don't care about it."
+                        ),
+                        obj=cls,
+                        id='models.W039',
+                    )
+                )
+            if not (
+                connection.features.supports_expression_indexes or
+                'supports_expression_indexes' in cls._meta.required_db_features
+            ) and any(
+                isinstance(constraint, UniqueConstraint) and constraint.contains_expressions
+                for constraint in cls._meta.constraints
+            ):
+                errors.append(
+                    checks.Warning(
+                        '%s does not support unique constraints on '
+                        'expressions.' % connection.display_name,
+                        hint=(
+                            "A constraint won't be created. Silence this "
+                            "warning if you don't care about it."
+                        ),
+                        obj=cls,
+                        id='models.W044',
+                    )
+                )
+            fields = set(chain.from_iterable(
+                (*constraint.fields, *constraint.include)
+                for constraint in cls._meta.constraints if isinstance(constraint, UniqueConstraint)
+            ))
+            references = set()
+            for constraint in cls._meta.constraints:
+                if isinstance(constraint, UniqueConstraint):
+                    if (
+                        connection.features.supports_partial_indexes or
+                        'supports_partial_indexes' not in cls._meta.required_db_features
+                    ) and isinstance(constraint.condition, Q):
+                        references.update(cls._get_expr_references(constraint.condition))
+                    if (
+                        connection.features.supports_expression_indexes or
+                        'supports_expression_indexes' not in cls._meta.required_db_features
+                    ) and constraint.contains_expressions:
+                        for expression in constraint.expressions:
+                            references.update(cls._get_expr_references(expression))
+                elif isinstance(constraint, CheckConstraint):
+                    if (
+                        connection.features.supports_table_check_constraints or
+                        'supports_table_check_constraints' not in cls._meta.required_db_features
+                    ) and isinstance(constraint.check, Q):
+                        references.update(cls._get_expr_references(constraint.check))
+            for field_name, *lookups in references:
+                # pk is an alias that won't be found by opts.get_field.
+                if field_name != 'pk':
+                    fields.add(field_name)
+                if not lookups:
+                    # If it has no lookups it cannot result in a JOIN.
+                    continue
+                try:
+                    if field_name == 'pk':
+                        field = cls._meta.pk
+                    else:
+                        field = cls._meta.get_field(field_name)
+                    if not field.is_relation or field.many_to_many or field.one_to_many:
+                        continue
+                except FieldDoesNotExist:
+                    continue
+                # JOIN must happen at the first lookup.
+                first_lookup = lookups[0]
+                if (
+                    hasattr(field, 'get_transform') and
+                    hasattr(field, 'get_lookup') and
+                    field.get_transform(first_lookup) is None and
+                    field.get_lookup(first_lookup) is None
+                ):
+                    errors.append(
+                        checks.Error(
+                            "'constraints' refers to the joined field '%s'."
+                            % LOOKUP_SEP.join([field_name] + lookups),
+                            obj=cls,
+                            id='models.E041',
+                        )
+                    )
+            errors.extend(cls._check_local_fields(fields, 'constraints'))
         return errors
 
 

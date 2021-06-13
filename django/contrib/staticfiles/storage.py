@@ -42,12 +42,30 @@ class StaticFilesStorage(FileSystemStorage):
 
 
 class HashedFilesMixin:
-    default_template = """url("%s")"""
+    default_template = """url("%(url)s")"""
     max_post_process_passes = 5
     patterns = (
         ("*.css", (
-            r"""(url\(['"]{0,1}\s*(.*?)["']{0,1}\))""",
-            (r"""(@import\s*["']\s*(.*?)["'])""", """@import url("%s")"""),
+            r"""(?P<matched>url\(['"]{0,1}\s*(?P<url>.*?)["']{0,1}\))""",
+            (
+                r"""(?P<matched>@import\s*["']\s*(?P<url>.*?)["'])""",
+                """@import url("%(url)s")""",
+            ),
+        )),
+        ('*.js', (
+            (
+                r'(?P<matched>)^(//# (?-i:sourceMappingURL)=(?P<url>.*))$',
+                '//# sourceMappingURL=%(url)s',
+            ),
+            (
+                r"""(?P<matched>import\s+(?s:(?P<imports>.*?))\s*from\s*["'](?P<url>.*?)["'])""",
+                'import %(imports)s from "%(url)s"',
+            ),
+            (
+                r"""(?P<matched>export\s+(?s:(?P<exports>.*?))\s*from\s*["'](?P<url>.*?)["'])""",
+                'export %(exports)s from "%(url)s"',
+            ),
+            (r"""(?P<matched>import\(["'](?P<url>.*?)["']\))""", 'import("%(url)s")'),
         )),
     )
     keep_intermediate_files = True
@@ -98,8 +116,7 @@ class HashedFilesMixin:
                 content.close()
         path, filename = os.path.split(clean_name)
         root, ext = os.path.splitext(filename)
-        if file_hash is not None:
-            file_hash = ".%s" % file_hash
+        file_hash = ('.%s' % file_hash) if file_hash else ''
         hashed_name = os.path.join(path, "%s%s%s" %
                                    (root, file_hash, ext))
         unparsed_name = list(parsed_name)
@@ -161,7 +178,9 @@ class HashedFilesMixin:
             This requires figuring out which files the matched URL resolves
             to and calling the url() method of the storage.
             """
-            matched, url = matchobj.groups()
+            matches = matchobj.groupdict()
+            matched = matches['matched']
+            url = matches['url']
 
             # Ignore absolute/protocol-relative and data-uri URLs.
             if re.match(r'^[a-z]+:', url):
@@ -197,7 +216,8 @@ class HashedFilesMixin:
                 transformed_url += ('?#' if '?#' in url else '#') + fragment
 
             # Return the hashed version to the file
-            return template % unquote(transformed_url)
+            matches['url'] = unquote(transformed_url)
+            return template % matches
 
         return converter
 
@@ -227,17 +247,26 @@ class HashedFilesMixin:
             path for path in paths
             if matches_patterns(path, self._patterns)
         ]
-        # Do a single pass first. Post-process all files once, then repeat for
-        # adjustable files.
+
+        # Adjustable files to yield at end, keyed by the original path.
+        processed_adjustable_paths = {}
+
+        # Do a single pass first. Post-process all files once, yielding not
+        # adjustable files and exceptions, and collecting adjustable files.
         for name, hashed_name, processed, _ in self._post_process(paths, adjustable_paths, hashed_files):
-            yield name, hashed_name, processed
+            if name not in adjustable_paths or isinstance(processed, Exception):
+                yield name, hashed_name, processed
+            else:
+                processed_adjustable_paths[name] = (name, hashed_name, processed)
 
         paths = {path: paths[path] for path in adjustable_paths}
+        substitutions = False
 
         for i in range(self.max_post_process_passes):
             substitutions = False
             for name, hashed_name, processed, subst in self._post_process(paths, adjustable_paths, hashed_files):
-                yield name, hashed_name, processed
+                # Overwrite since hashed_name may be newer.
+                processed_adjustable_paths[name] = (name, hashed_name, processed)
                 substitutions = substitutions or subst
 
             if not substitutions:
@@ -248,6 +277,9 @@ class HashedFilesMixin:
 
         # Store the processed paths
         self.hashed_files.update(hashed_files)
+
+        # Yield adjustable files with final, hashed name.
+        yield from processed_adjustable_paths.values()
 
     def _post_process(self, paths, adjustable_paths, hashed_files):
         # Sort the files by directory level

@@ -1,5 +1,6 @@
 from django.template.base import TemplateSyntaxError
 from django.template.context import Context
+from django.template.loader_tags import BlockContext, BlockNode
 from django.test import SimpleTestCase
 
 from ..utils import SilentAttrClass, SilentGetItemClass, SomeClass, setup
@@ -333,3 +334,14 @@ class BasicSyntaxTests(SimpleTestCase):
         self.assertEqual(output, '%%')
         output = self.engine.render_to_string('tpl-weird-percent')
         self.assertEqual(output, '% %s')
+
+
+class BlockContextTests(SimpleTestCase):
+    def test_repr(self):
+        block_context = BlockContext()
+        block_context.add_blocks({'content': BlockNode('content', [])})
+        self.assertEqual(
+            repr(block_context),
+            "<BlockContext: blocks=defaultdict(<class 'list'>, "
+            "{'content': [<Block Node: content. Contents: []>]})>",
+        )

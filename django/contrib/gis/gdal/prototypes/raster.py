@@ -5,7 +5,7 @@ related data structures.
 from ctypes import POINTER, c_bool, c_char_p, c_double, c_int, c_void_p
 from functools import partial
 
-from django.contrib.gis.gdal.libgdal import GDAL_VERSION, std_call
+from django.contrib.gis.gdal.libgdal import std_call
 from django.contrib.gis.gdal.prototypes.generation import (
     chararray_output, const_string_output, double_output, int_output,
     void_output, voidptr_output,
@@ -40,6 +40,7 @@ copy_ds = voidptr_output(
 add_band_ds = void_output(std_call('GDALAddBand'), [c_void_p, c_int])
 get_ds_description = const_string_output(std_call('GDALGetDescription'), [c_void_p])
 get_ds_driver = voidptr_output(std_call('GDALGetDatasetDriver'), [c_void_p])
+get_ds_info = const_string_output(std_call('GDALInfo'), [c_void_p, c_void_p])
 get_ds_xsize = int_output(std_call('GDALGetRasterXSize'), [c_void_p])
 get_ds_ysize = int_output(std_call('GDALGetRasterYSize'), [c_void_p])
 get_ds_raster_count = int_output(std_call('GDALGetRasterCount'), [c_void_p])
@@ -56,11 +57,6 @@ get_ds_metadata_item = const_string_output(std_call('GDALGetMetadataItem'), [c_v
 set_ds_metadata_item = const_string_output(std_call('GDALSetMetadataItem'), [c_void_p, c_char_p, c_char_p, c_char_p])
 free_dsl = void_output(std_call('CSLDestroy'), [POINTER(c_char_p)], errcheck=False)
 
-if GDAL_VERSION >= (2, 1):
-    get_ds_info = const_string_output(std_call('GDALInfo'), [c_void_p, c_void_p])
-else:
-    get_ds_info = None
-
 # Raster Band Routines
 band_io = void_output(
     std_call('GDALRasterIO'),
@@ -75,10 +71,7 @@ get_band_datatype = int_output(std_call('GDALGetRasterDataType'), [c_void_p])
 get_band_color_interp = int_output(std_call('GDALGetRasterColorInterpretation'), [c_void_p])
 get_band_nodata_value = double_output(std_call('GDALGetRasterNoDataValue'), [c_void_p, POINTER(c_int)])
 set_band_nodata_value = void_output(std_call('GDALSetRasterNoDataValue'), [c_void_p, c_double])
-if GDAL_VERSION >= (2, 1):
-    delete_band_nodata_value = void_output(std_call('GDALDeleteRasterNoDataValue'), [c_void_p])
-else:
-    delete_band_nodata_value = None
+delete_band_nodata_value = void_output(std_call('GDALDeleteRasterNoDataValue'), [c_void_p])
 get_band_statistics = void_output(
     std_call('GDALGetRasterStatistics'),
     [

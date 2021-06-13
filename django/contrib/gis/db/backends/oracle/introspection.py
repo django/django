@@ -1,14 +1,19 @@
 import cx_Oracle
 
 from django.db.backends.oracle.introspection import DatabaseIntrospection
+from django.utils.functional import cached_property
 
 
 class OracleIntrospection(DatabaseIntrospection):
-    # Associating any OBJECTVAR instances with GeometryField.  Of course,
-    # this won't work right on Oracle objects that aren't MDSYS.SDO_GEOMETRY,
-    # but it is the only object type supported within Django anyways.
-    data_types_reverse = DatabaseIntrospection.data_types_reverse.copy()
-    data_types_reverse[cx_Oracle.OBJECT] = 'GeometryField'
+    # Associating any OBJECTVAR instances with GeometryField. This won't work
+    # right on Oracle objects that aren't MDSYS.SDO_GEOMETRY, but it is the
+    # only object type supported within Django anyways.
+    @cached_property
+    def data_types_reverse(self):
+        return {
+            **super().data_types_reverse,
+            cx_Oracle.OBJECT: 'GeometryField',
+        }
 
     def get_geometry_type(self, table_name, description):
         with self.connection.cursor() as cursor:

@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Besnik <besnik@programeshqip.org>, 2011-2012,2015
-# Besnik <besnik@programeshqip.org>, 2015,2017
+# Besnik Bleta <besnik@programeshqip.org>, 2011-2012,2015
+# Besnik Bleta <besnik@programeshqip.org>, 2020-2021
+# Besnik Bleta <besnik@programeshqip.org>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-11-29 22:17+0000\n"
-"Last-Translator: Besnik <besnik@programeshqip.org>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-15 13:33+0000\n"
+"Last-Translator: Besnik Bleta <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -84,17 +85,17 @@ msgstr ""
 "kryeni një veprim, ndryshimet e paruajtura do të humbin."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Keni përzgjedhur një veprim, por nuk keni ruajtur ende ndryshimet që bëtë te "
+"Keni përzgjedhur një veprim, por s’keni ruajtur ende ndryshimet që bëtë te "
 "fusha individuale. Ju lutemi, klikoni OK që të bëhet ruajtja. Do t’ju duhet "
 "ta ribëni veprimin."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 "Keni përzgjedhur një veprim, dhe nuk keni bërë ndonjë ndryshim te fusha "
@@ -184,6 +185,54 @@ msgstr "Nëntor"
 
 msgid "December"
 msgstr "Dhjetor"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Shk"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Pri"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Maj"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Qer"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Kor"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Gus"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sht"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Tet"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Nën"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dhje"
 
 msgctxt "one letter Sunday"
 msgid "S"

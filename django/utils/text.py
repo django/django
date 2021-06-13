@@ -1,11 +1,10 @@
 import html.entities
 import re
 import unicodedata
-import warnings
 from gzip import GzipFile
 from io import BytesIO
 
-from django.utils.deprecation import RemovedInDjango40Warning
+from django.core.exceptions import SuspiciousFileOperation
 from django.utils.functional import SimpleLazyObject, keep_lazy_text, lazy
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.translation import gettext as _, gettext_lazy, pgettext
@@ -14,7 +13,11 @@ from django.utils.translation import gettext as _, gettext_lazy, pgettext
 @keep_lazy_text
 def capfirst(x):
     """Capitalize the first letter of a string."""
-    return x and str(x)[0].upper() + str(x)[1:]
+    if not x:
+        return x
+    if not isinstance(x, str):
+        x = str(x)
+    return x[0].upper() + x[1:]
 
 
 # Set up regular expressions
@@ -175,14 +178,14 @@ class Truncator(SimpleLazyObject):
                 # Checked through whole string
                 break
             pos = m.end(0)
-            if m.group(1):
+            if m[1]:
                 # It's an actual non-HTML word or char
                 current_len += 1
                 if current_len == truncate_len:
                     end_text_pos = pos
                 continue
             # Check for tag
-            tag = re_tag.match(m.group(0))
+            tag = re_tag.match(m[0])
             if not tag or current_len >= truncate_len:
                 # Don't worry about non tags or tags after our truncate point
                 continue
@@ -219,7 +222,7 @@ class Truncator(SimpleLazyObject):
 
 
 @keep_lazy_text
-def get_valid_filename(s):
+def get_valid_filename(name):
     """
     Return the given string converted to a string that can be used for a clean
     filename. Remove leading and trailing spaces; convert other spaces to
@@ -228,8 +231,11 @@ def get_valid_filename(s):
     >>> get_valid_filename("john's portrait in 2004.jpg")
     'johns_portrait_in_2004.jpg'
     """
-    s = str(s).strip().replace(' ', '_')
-    return re.sub(r'(?u)[^-\w.]', '', s)
+    s = str(name).strip().replace(' ', '_')
+    s = re.sub(r'(?u)[^-\w.]', '', s)
+    if s in {'', '.', '..'}:
+        raise SuspiciousFileOperation("Could not derive file name from '%s'" % name)
+    return s
 
 
 @keep_lazy_text
@@ -334,11 +340,11 @@ def smart_split(text):
     ['A', '"\\"funky\\" style"', 'test.']
     """
     for bit in smart_split_re.finditer(str(text)):
-        yield bit.group(0)
+        yield bit[0]
 
 
 def _replace_entity(match):
-    text = match.group(1)
+    text = match[1]
     if text[0] == '#':
         text = text[1:]
         try:
@@ -348,25 +354,15 @@ def _replace_entity(match):
                 c = int(text)
             return chr(c)
         except ValueError:
-            return match.group(0)
+            return match[0]
     else:
         try:
             return chr(html.entities.name2codepoint[text])
         except KeyError:
-            return match.group(0)
+            return match[0]
 
 
 _entity_re = _lazy_re_compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
-
-
-@keep_lazy_text
-def unescape_entities(text):
-    warnings.warn(
-        'django.utils.text.unescape_entities() is deprecated in favor of '
-        'html.unescape().',
-        RemovedInDjango40Warning, stacklevel=2,
-    )
-    return _entity_re.sub(_replace_entity, str(text))
 
 
 @keep_lazy_text
@@ -393,17 +389,18 @@ def unescape_string_literal(s):
 @keep_lazy_text
 def slugify(value, allow_unicode=False):
     """
-    Convert to ASCII if 'allow_unicode' is False. Convert spaces to hyphens.
-    Remove characters that aren't alphanumerics, underscores, or hyphens.
-    Convert to lowercase. Also strip leading and trailing whitespace.
+    Convert to ASCII if 'allow_unicode' is False. Convert spaces or repeated
+    dashes to single dashes. Remove characters that aren't alphanumerics,
+    underscores, or hyphens. Convert to lowercase. Also strip leading and
+    trailing whitespace, dashes, and underscores.
     """
     value = str(value)
     if allow_unicode:
         value = unicodedata.normalize('NFKC', value)
     else:
         value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
-    value = re.sub(r'[^\w\s-]', '', value.lower()).strip()
-    return re.sub(r'[-\s]+', '-', value)
+    value = re.sub(r'[^\w\s-]', '', value.lower())
+    return re.sub(r'[-\s]+', '-', value).strip('-_')
 
 
 def camel_case_to_spaces(value):

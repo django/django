@@ -3,7 +3,7 @@ Testing some internals of the template processing. These are *not* examples to b
 """
 from django.template import Library, TemplateSyntaxError
 from django.template.base import (
-    FilterExpression, Parser, Token, TokenType, Variable,
+    FilterExpression, Lexer, Parser, Token, TokenType, Variable,
 )
 from django.template.defaultfilters import register as filter_library
 from django.test import SimpleTestCase
@@ -18,6 +18,22 @@ class ParserTests(SimpleTestCase):
         token = Token(TokenType.BLOCK, 'sometag _("Page not found") value|yesno:_("yes,no")')
         split = token.split_contents()
         self.assertEqual(split, ["sometag", '_("Page not found")', 'value|yesno:_("yes,no")'])
+
+    def test_repr(self):
+        token = Token(TokenType.BLOCK, 'some text')
+        self.assertEqual(repr(token), '<Block token: "some text...">')
+        parser = Parser([token], builtins=[filter_library])
+        self.assertEqual(
+            repr(parser),
+            '<Parser tokens=[<Block token: "some text...">]>',
+        )
+        filter_expression = FilterExpression('news|upper', parser)
+        self.assertEqual(repr(filter_expression), "<FilterExpression 'news|upper'>")
+        lexer = Lexer('{% for i in 1 %}{{ a }}\n{% endfor %}')
+        self.assertEqual(
+            repr(lexer),
+            '<Lexer template_string="{% for i in 1 %}{{ a...", verbatim=False>',
+        )
 
     def test_filter_parsing(self):
         c = {"article": {"section": "News"}}

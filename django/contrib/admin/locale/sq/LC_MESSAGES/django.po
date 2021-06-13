@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Besnik <besnik@programeshqip.org>, 2011,2015
-# Besnik <besnik@programeshqip.org>, 2015,2018-2019
+# Besnik Bleta <besnik@programeshqip.org>, 2011,2015
+# Besnik Bleta <besnik@programeshqip.org>, 2020
+# Besnik Bleta <besnik@programeshqip.org>, 2015,2018-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-18 09:47+0000\n"
-"Last-Translator: Besnik <besnik@programeshqip.org>\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-07-14 22:38+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -68,6 +69,12 @@ msgstr "Pa datë"
 
 msgid "Has date"
 msgstr "Ka datë"
+
+msgid "Empty"
+msgstr "E zbrazët"
+
+msgid "Not empty"
+msgstr "Jo e zbrazët"
 
 #, python-format
 msgid ""
@@ -330,7 +337,20 @@ msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Përzgjidhni krejt %(total_count)s %(module_name)s"
 
 msgid "Clear selection"
-msgstr "Pastroje përzgjedhjen"
+msgstr "Spastroje përzgjedhjen"
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modele te aplikacioni %(name)s"
+
+msgid "Add"
+msgstr "Shtoni"
+
+msgid "View"
+msgstr "Shiheni"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "S’keni leje të shihni apo të përpunoni gjë."
 
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
@@ -380,6 +400,9 @@ msgstr "Shiheni në sajt"
 
 msgid "Filter"
 msgstr "Filtër"
+
+msgid "Clear all filters"
+msgstr "Spastroji krejt filtrat"
 
 msgid "Remove from sorting"
 msgstr "Hiqe prej renditjeje"
@@ -458,9 +481,6 @@ msgstr ""
 "Jeni i sigurt se doni të fshihen %(objects_name)s e përzgjedhur? Krejt "
 "objektet vijues dhe gjëra të lidhura me ta do të fshihen:"
 
-msgid "View"
-msgstr "Shiheni"
-
 msgid "Delete?"
 msgstr "Të fshihet?"
 
@@ -470,16 +490,6 @@ msgstr " Nga %(filter_title)s "
 
 msgid "Summary"
 msgstr "Përmbledhje"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modele te aplikacioni %(name)s"
-
-msgid "Add"
-msgstr "Shtoni"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr "S’keni leje të shihni apo të përpunoni gjë."
 
 msgid "Recent actions"
 msgstr "Veprime së fundi"
@@ -512,6 +522,9 @@ msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "Harruat fjalëkalimin ose emrin tuaj të përdoruesit?"
+
+msgid "Toggle navigation"
+msgstr ""
 
 msgid "Date/time"
 msgstr "Datë/kohë"

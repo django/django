@@ -1,7 +1,8 @@
 import pickle
 
+from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import FileField, ValidationError
+from django.forms import FileField
 from django.test import SimpleTestCase
 
 
@@ -20,10 +21,12 @@ class FileFieldTest(SimpleTestCase):
             f.clean(None, '')
         self.assertEqual('files/test2.pdf', f.clean(None, 'files/test2.pdf'))
         no_file_msg = "'No file was submitted. Check the encoding type on the form.'"
+        file = SimpleUploadedFile(None, b'')
+        file._name = ''
         with self.assertRaisesMessage(ValidationError, no_file_msg):
-            f.clean(SimpleUploadedFile('', b''))
+            f.clean(file)
         with self.assertRaisesMessage(ValidationError, no_file_msg):
-            f.clean(SimpleUploadedFile('', b''), '')
+            f.clean(file, '')
         self.assertEqual('files/test3.pdf', f.clean(None, 'files/test3.pdf'))
         with self.assertRaisesMessage(ValidationError, no_file_msg):
             f.clean('some content that is not a file')

@@ -1,5 +1,7 @@
 import copy
+from collections import defaultdict
 from contextlib import contextmanager
+from functools import partial
 
 from django.apps import AppConfig
 from django.apps.registry import Apps, apps as global_apps
@@ -13,6 +15,7 @@ from django.utils.module_loading import import_string
 from django.utils.version import get_docs_version
 
 from .exceptions import InvalidBasesError
+from .utils import resolve_relation
 
 
 def _get_app_label_and_model_name(model, app_label=''):
@@ -87,6 +90,8 @@ class ProjectState:
         # Apps to include from main registry, usually unmigrated ones
         self.real_apps = real_apps or []
         self.is_delayed = False
+        # {remote_model_key: {model_key: [(field_name, field)]}}
+        self.relations = None
 
     def add_model(self, model_state):
         app_label, model_name = model_state.app_label, model_state.name_lower
@@ -125,7 +130,7 @@ class ProjectState:
         # Directly related models are the models pointed to by ForeignKeys,
         # OneToOneFields, and ManyToManyFields.
         direct_related_models = set()
-        for name, field in model_state.fields:
+        for field in model_state.fields.values():
             if field.is_relation:
                 if field.remote_field.model == RECURSIVE_RELATIONSHIP_CONSTANT:
                     continue
@@ -188,6 +193,67 @@ class ProjectState:
         # Render all models
         self.apps.render_multiple(states_to_be_rendered)
 
+    def resolve_fields_and_relations(self):
+        # Resolve fields.
+        for model_state in self.models.values():
+            for field_name, field in model_state.fields.items():
+                field.name = field_name
+        # Resolve relations.
+        # {remote_model_key: {model_key: [(field_name, field)]}}
+        self.relations = defaultdict(partial(defaultdict, list))
+        concretes, proxies = self._get_concrete_models_mapping_and_proxy_models()
+
+        real_apps = set(self.real_apps)
+        for model_key in concretes:
+            model_state = self.models[model_key]
+            for field_name, field in model_state.fields.items():
+                remote_field = field.remote_field
+                if not remote_field:
+                    continue
+                remote_model_key = resolve_relation(remote_field.model, *model_key)
+                if remote_model_key[0] not in real_apps and remote_model_key in concretes:
+                    remote_model_key = concretes[remote_model_key]
+                self.relations[remote_model_key][model_key].append((field_name, field))
+
+                through = getattr(remote_field, 'through', None)
+                if not through:
+                    continue
+                through_model_key = resolve_relation(through, *model_key)
+                if through_model_key[0] not in real_apps and through_model_key in concretes:
+                    through_model_key = concretes[through_model_key]
+                self.relations[through_model_key][model_key].append((field_name, field))
+        for model_key in proxies:
+            self.relations[model_key] = self.relations[concretes[model_key]]
+
+    def get_concrete_model_key(self, model):
+        concrete_models_mapping, _ = self._get_concrete_models_mapping_and_proxy_models()
+        model_key = make_model_tuple(model)
+        return concrete_models_mapping[model_key]
+
+    def _get_concrete_models_mapping_and_proxy_models(self):
+        concrete_models_mapping = {}
+        proxy_models = {}
+        # Split models to proxy and concrete models.
+        for model_key, model_state in self.models.items():
+            if model_state.options.get('proxy'):
+                proxy_models[model_key] = model_state
+                # Find a concrete model for the proxy.
+                concrete_models_mapping[model_key] = self._find_concrete_model_from_proxy(
+                    proxy_models, model_state,
+                )
+            else:
+                concrete_models_mapping[model_key] = model_key
+        return concrete_models_mapping, proxy_models
+
+    def _find_concrete_model_from_proxy(self, proxy_models, model_state):
+        for base in model_state.bases:
+            base_key = make_model_tuple(base)
+            base_state = proxy_models.get(base_key)
+            if not base_state:
+                # Concrete model found, stop looking at bases.
+                return base_key
+            return self._find_concrete_model_from_proxy(proxy_models, base_state)
+
     def clone(self):
         """Return an exact copy of this ProjectState."""
         new_state = ProjectState(
@@ -207,11 +273,6 @@ class ProjectState:
     def apps(self):
         return StateApps(self.real_apps, self.models)
 
-    @property
-    def concrete_apps(self):
-        self.apps = StateApps(self.real_apps, self.models, ignore_swappable=True)
-        return self.apps
-
     @classmethod
     def from_apps(cls, apps):
         """Take an Apps and return a ProjectState matching it."""
@@ -227,15 +288,14 @@ class ProjectState:
 
 class AppConfigStub(AppConfig):
     """Stub of an AppConfig. Only provides a label and a dict of models."""
-    # Not used, but required by AppConfig.__init__
-    path = ''
-
     def __init__(self, label):
-        self.label = label
+        self.apps = None
+        self.models = {}
         # App-label and app-name are not the same thing, so technically passing
         # in the label here is wrong. In practice, migrations don't care about
         # the app name, but we need something unique, and the label works fine.
-        super().__init__(label, None)
+        self.label = label
+        self.name = label
 
     def import_models(self):
         self.models = self.apps.all_models[self.label]
@@ -332,7 +392,6 @@ class StateApps(Apps):
         if app_label not in self.app_configs:
             self.app_configs[app_label] = AppConfigStub(app_label)
             self.app_configs[app_label].apps = self
-            self.app_configs[app_label].models = {}
         self.app_configs[app_label].models[model._meta.model_name] = model
         self.do_pending_operations(model)
         self.clear_cache()
@@ -359,16 +418,13 @@ class ModelState:
     def __init__(self, app_label, name, fields, options=None, bases=None, managers=None):
         self.app_label = app_label
         self.name = name
-        self.fields = fields
+        self.fields = dict(fields)
         self.options = options or {}
         self.options.setdefault('indexes', [])
         self.options.setdefault('constraints', [])
         self.bases = bases or (models.Model,)
         self.managers = managers or []
-        # Sanity-check that fields is NOT a dict. It must be ordered.
-        if isinstance(self.fields, dict):
-            raise ValueError("ModelState.fields cannot be a dict - it must be a list of 2-tuples.")
-        for name, field in fields:
+        for name, field in self.fields.items():
             # Sanity-check that fields are NOT already bound to a model.
             if hasattr(field, 'model'):
                 raise ValueError(
@@ -396,6 +452,14 @@ class ModelState:
     @cached_property
     def name_lower(self):
         return self.name.lower()
+
+    def get_field(self, field_name):
+        field_name = (
+            self.options['order_with_respect_to']
+            if field_name == '_order'
+            else field_name
+        )
+        return self.fields[field_name]
 
     @classmethod
     def from_model(cls, model, exclude_rels=False):
@@ -544,7 +608,7 @@ class ModelState:
         return self.__class__(
             app_label=self.app_label,
             name=self.name,
-            fields=list(self.fields),
+            fields=dict(self.fields),
             # Since options are shallow-copied here, operations such as
             # AddIndex must replace their option (e.g 'indexes') rather
             # than mutating it.
@@ -566,8 +630,8 @@ class ModelState:
             )
         except LookupError:
             raise InvalidBasesError("Cannot resolve one or more bases from %r" % (self.bases,))
-        # Turn fields into a dict for the body, add other bits
-        body = {name: field.clone() for name, field in self.fields}
+        # Clone fields for the body, add other bits.
+        body = {name: field.clone() for name, field in self.fields.items()}
         body['Meta'] = meta
         body['__module__'] = "__fake__"
 
@@ -575,12 +639,6 @@ class ModelState:
         body.update(self.construct_managers())
         # Then, make a Model object (apps.register_model is called in __new__)
         return type(self.name, bases, body)
-
-    def get_field_by_name(self, name):
-        for fname, field in self.fields:
-            if fname == name:
-                return field
-        raise ValueError("No field called %s on model %s" % (name, self.name))
 
     def get_index_by_name(self, name):
         for index in self.options['indexes']:
@@ -602,8 +660,13 @@ class ModelState:
             (self.app_label == other.app_label) and
             (self.name == other.name) and
             (len(self.fields) == len(other.fields)) and
-            all((k1 == k2 and (f1.deconstruct()[1:] == f2.deconstruct()[1:]))
-                for (k1, f1), (k2, f2) in zip(self.fields, other.fields)) and
+            all(
+                k1 == k2 and f1.deconstruct()[1:] == f2.deconstruct()[1:]
+                for (k1, f1), (k2, f2) in zip(
+                    sorted(self.fields.items()),
+                    sorted(other.fields.items()),
+                )
+            ) and
             (self.options == other.options) and
             (self.bases == other.bases) and
             (self.managers == other.managers)

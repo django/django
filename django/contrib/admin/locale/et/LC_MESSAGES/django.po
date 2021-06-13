@@ -2,19 +2,20 @@
 #
 # Translators:
 # eallik <eallik@gmail.com>, 2011
+# Erlend Eelmets <debcf78e@opayq.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
 # Martin Pajuste <martinpajuste@gmail.com>, 2015
-# Martin Pajuste <martinpajuste@gmail.com>, 2016,2019
+# Martin Pajuste <martinpajuste@gmail.com>, 2016,2019-2020
 # Marti Raudsepp <marti@juffo.org>, 2016
 # Ragnar Rebase <rrebase@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-12-28 01:34+0000\n"
-"Last-Translator: Ragnar Rebase <rrebase@gmail.com>\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-09-03 15:38+0000\n"
+"Last-Translator: Erlend Eelmets <debcf78e@opayq.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -73,6 +74,12 @@ msgstr "Kuupäev puudub"
 
 msgid "Has date"
 msgstr "Kuupäev olemas"
+
+msgid "Empty"
+msgstr "Tühi"
+
+msgid "Not empty"
+msgstr "Mitte tühi"
 
 #, python-format
 msgid ""
@@ -332,6 +339,19 @@ msgstr "Märgista kõik %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Tühjenda valik"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Rakenduse %(name)s moodulid"
+
+msgid "Add"
+msgstr "Lisa"
+
+msgid "View"
+msgstr "Vaata"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Teil pole õigust midagi vaadata ega muuta."
+
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
@@ -379,6 +399,9 @@ msgstr "Näita lehel"
 
 msgid "Filter"
 msgstr "Filtreeri"
+
+msgid "Clear all filters"
+msgstr "Tühjenda kõik filtrid"
 
 msgid "Remove from sorting"
 msgstr "Eemalda sorteerimisest"
@@ -457,9 +480,6 @@ msgstr ""
 "Kas oled kindel, et soovid kustutada valitud %(objects_name)s? Kõik "
 "järgnevad objektid ja seotud objektid kustutatakse:"
 
-msgid "View"
-msgstr "Vaata"
-
 msgid "Delete?"
 msgstr "Kustutan?"
 
@@ -469,16 +489,6 @@ msgstr " %(filter_title)s "
 
 msgid "Summary"
 msgstr "Kokkuvõte"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Rakenduse %(name)s moodulid"
-
-msgid "Add"
-msgstr "Lisa"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr "Teil pole õigust midagi vaadata ega muuta."
 
 msgid "Recent actions"
 msgstr "Hiljutised toimingud"
@@ -510,6 +520,9 @@ msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "Unustasite oma parooli või kasutajanime?"
+
+msgid "Toggle navigation"
+msgstr "Lülita navigeerimine sisse"
 
 msgid "Date/time"
 msgstr "Kuupäev/kellaaeg"

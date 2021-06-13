@@ -98,6 +98,11 @@ class StaticNode(template.Node):
         self.path = path
         self.varname = varname
 
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}(varname={self.varname!r}, path={self.path!r})'
+        )
+
     def url(self, context):
         path = self.path.resolve(context)
         return self.handle_simple(path)

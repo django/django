@@ -66,9 +66,10 @@ Here are some other terms that will help us to handle a common language:
     locale name
       A locale name, either a language specification of the form ``ll`` or a
       combined language and country specification of the form ``ll_CC``.
-      Examples: ``it``, ``de_AT``, ``es``, ``pt_BR``. The language part is
-      always in lowercase and the country part in upper case. The separator is
-      an underscore.
+      Examples: ``it``, ``de_AT``, ``es``, ``pt_BR``, ``sr_Latn``. The language
+      part is always in lowercase. The country part is in titlecase if it has
+      more than 2 characters, otherwise it's in uppercase. The separator is an
+      underscore.
 
     language code
       Represents the name of a language. Browsers send the names of the

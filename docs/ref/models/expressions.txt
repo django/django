@@ -90,10 +90,10 @@ Built-in Expressions
 
 .. class:: F
 
-An ``F()`` object represents the value of a model field or annotated column. It
-makes it possible to refer to model field values and perform  database
-operations using them without actually having to pull them out of the  database
-into Python memory.
+An ``F()`` object represents the value of a model field, transformed value of a
+model field, or annotated column. It makes it possible to refer to model field
+values and perform database operations using them without actually having to
+pull them out of the database into Python memory.
 
 Instead, Django uses the ``F()`` object to generate an SQL expression that
 describes the required operation at the database level.
@@ -154,6 +154,10 @@ the field value of each one, and saving each one back to the database::
 
 * getting the database, rather than Python, to do work
 * reducing the number of queries some operations require
+
+.. versionchanged:: 3.2
+
+    Support for transforms of the field was added.
 
 .. _avoiding-race-conditions-using-f:
 
@@ -338,7 +342,7 @@ The ``Func`` API is as follows:
                         **extra_context
                     )
 
-        To avoid a SQL injection vulnerability, ``extra_context`` :ref:`must
+        To avoid an SQL injection vulnerability, ``extra_context`` :ref:`must
         not contain untrusted user input <avoiding-sql-injection-in-query-expressions>`
         as these values are interpolated into the SQL string rather than passed
         as query parameters, where the database driver would escape them.
@@ -353,7 +357,7 @@ assumed to be column references and will be wrapped in ``F()`` expressions
 while other values will be wrapped in ``Value()`` expressions.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
-into the ``template`` attribute. To avoid a SQL injection vulnerability,
+into the ``template`` attribute. To avoid an SQL injection vulnerability,
 ``extra`` :ref:`must not contain untrusted user input
 <avoiding-sql-injection-in-query-expressions>` as these values are interpolated
 into the SQL string rather than passed as query parameters, where the database
@@ -406,9 +410,9 @@ The ``Aggregate`` API is as follows:
         allows passing a ``distinct`` keyword argument. If set to ``False``
         (default), ``TypeError`` is raised if ``distinct=True`` is passed.
 
-The ``expressions`` positional arguments can include expressions or the names
-of model fields. They will be converted to a string and used as the
-``expressions`` placeholder within the ``template``.
+The ``expressions`` positional arguments can include expressions, transforms of
+the model field, or the names of model fields. They will be converted to a
+string and used as the ``expressions`` placeholder within the ``template``.
 
 The ``output_field`` argument requires a model field instance, like
 ``IntegerField()`` or ``BooleanField()``, into which Django will load the value
@@ -434,6 +438,10 @@ and :ref:`filtering-on-annotations` for example usage.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
 into the ``template`` attribute.
+
+.. versionchanged:: 3.2
+
+    Support for transforms of the field was added.
 
 Creating your own Aggregate Functions
 -------------------------------------
@@ -484,7 +492,15 @@ The ``output_field`` argument should be a model field instance, like
 after it's retrieved from the database. Usually no arguments are needed when
 instantiating the model field as any arguments relating to data validation
 (``max_length``, ``max_digits``, etc.) will not be enforced on the expression's
-output value.
+output value. If no ``output_field`` is specified it will be tentatively
+inferred from the :py:class:`type` of the provided ``value``, if possible. For
+example, passing an instance of :py:class:`datetime.datetime` as ``value``
+would default ``output_field`` to :class:`~django.db.models.DateTimeField`.
+
+.. versionchanged:: 3.2
+
+  Support for inferring a default ``output_field`` from the type of ``value``
+  was added.
 
 ``ExpressionWrapper()`` expressions
 -----------------------------------
@@ -543,9 +559,9 @@ Referencing columns from the outer queryset
 .. class:: OuterRef(field)
 
 Use ``OuterRef`` when a queryset in a ``Subquery`` needs to refer to a field
-from the outer query. It acts like an :class:`F` expression except that the
-check to see if it refers to a valid field isn't made until the outer queryset
-is resolved.
+from the outer query or its transform. It acts like an :class:`F` expression
+except that the check to see if it refers to a valid field isn't made until the
+outer queryset is resolved.
 
 Instances of ``OuterRef`` may be used in conjunction with nested instances
 of ``Subquery`` to refer to a containing queryset that isn't the immediate
@@ -553,6 +569,10 @@ parent. For example, this queryset would need to be within a nested pair of
 ``Subquery`` instances to resolve correctly::
 
     >>> Book.objects.filter(author=OuterRef(OuterRef('pk')))
+
+.. versionchanged:: 3.2
+
+    Support for transforms of the field was added.
 
 Limiting a subquery to a single column
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -613,12 +633,13 @@ On PostgreSQL, the SQL looks like:
 .. code-block:: sql
 
     SELECT "post"."id", "post"."published_at", EXISTS(
-        SELECT U0."id", U0."post_id", U0."email", U0."created_at"
+        SELECT (1) as "a"
         FROM "comment" U0
         WHERE (
             U0."created_at" >= YYYY-MM-DD HH:MM:SS AND
-            U0."post_id" = ("post"."id")
+            U0."post_id" = "post"."id"
         )
+        LIMIT 1
     ) AS "recent_comment" FROM "post"
 
 It's unnecessary to force ``Exists`` to refer to a single column, since the
@@ -640,13 +661,6 @@ directly filter a queryset::
 
 This will ensure that the subquery will not be added to the ``SELECT`` columns,
 which may result in a better performance.
-
-.. versionchanged:: 3.0
-
-    In previous versions of Django, it was necessary to first annotate and then
-    filter against the annotation. This resulted in the annotated value always
-    being present in the query result, and often resulted in a query that took
-    more time to execute.
 
 Using aggregates within a ``Subquery`` expression
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -685,11 +699,15 @@ Sometimes database expressions can't easily express a complex ``WHERE`` clause.
 In these edge cases, use the ``RawSQL`` expression. For example::
 
     >>> from django.db.models.expressions import RawSQL
-    >>> queryset.annotate(val=RawSQL("select col from sometable where othercol = %s", (someparam,)))
+    >>> queryset.annotate(val=RawSQL("select col from sometable where othercol = %s", (param,)))
 
 These extra lookups may not be portable to different database engines (because
 you're explicitly writing SQL code) and violate the DRY principle, so you
 should avoid them if possible.
+
+``RawSQL`` expressions can also be used as the target of ``__in`` filters::
+
+    >>> queryset.filter(id__in=RawSQL("select id from sometable where col = %s", (param,)))
 
 .. warning::
 
@@ -876,7 +894,7 @@ values of an expression in the partition. If the ``released`` field of the
 example annotates each movie with the average rating of a movie's peers
 released between twelve months before and twelve months after the each movie.
 
-    >>> from django.db.models import Avg, ExpressionList, F, ValueRange, Window
+    >>> from django.db.models import Avg, F, ValueRange, Window
     >>> Movie.objects.annotate(
     >>>     avg_rating=Window(
     >>>         expression=Avg('rating'),
@@ -994,10 +1012,6 @@ calling the appropriate methods on the wrapped expression.
         nested expressions. ``F()`` objects, in particular, hold a reference
         to a column. The ``alias`` parameter will be ``None`` unless the
         expression has been annotated and is used for grouping.
-
-        .. versionchanged:: 3.0
-
-            The ``alias`` parameter was added.
 
     .. method:: asc(nulls_first=False, nulls_last=False)
 
@@ -1151,12 +1165,12 @@ SQL injection::
         template = "%(function)s('%(substring)s' in %(expressions)s)"
 
         def __init__(self, expression, substring):
-            # substring=substring is a SQL injection vulnerability!
+            # substring=substring is an SQL injection vulnerability!
             super().__init__(expression, substring=substring)
 
-This function generates a SQL string without any parameters. Since ``substring``
-is passed to ``super().__init__()`` as a keyword argument, it's interpolated
-into the SQL string before the query is sent to the database.
+This function generates an SQL string without any parameters. Since
+``substring`` is passed to ``super().__init__()`` as a keyword argument, it's
+interpolated into the SQL string before the query is sent to the database.
 
 Here's a corrected rewrite::
 

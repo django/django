@@ -20,9 +20,12 @@ class RemoveStaleContentTypesTests(TestCase):
         'django.contrib.contenttypes',
     ]
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.before_count = ContentType.objects.count()
+        cls.content_type = ContentType.objects.create(app_label='contenttypes_tests', model='Fake')
+
     def setUp(self):
-        self.before_count = ContentType.objects.count()
-        self.content_type = ContentType.objects.create(app_label='contenttypes_tests', model='Fake')
         self.app_config = apps.get_app_config('contenttypes_tests')
 
     def test_interactive_true_with_dependent_objects(self):

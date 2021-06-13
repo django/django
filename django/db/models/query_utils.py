@@ -8,44 +8,16 @@ circular import difficulties.
 import copy
 import functools
 import inspect
-import warnings
 from collections import namedtuple
 
-from django.core.exceptions import FieldDoesNotExist, FieldError
+from django.core.exceptions import FieldError
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
-from django.utils.deprecation import RemovedInDjango40Warning
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
 # sides of the relation. The join_field is the field backing the relation.
 PathInfo = namedtuple('PathInfo', 'from_opts to_opts target_fields join_field m2m direct filtered_relation')
-
-
-class InvalidQueryType(type):
-    @property
-    def _subclasses(self):
-        return (FieldDoesNotExist, FieldError)
-
-    def __warn(self):
-        warnings.warn(
-            'The InvalidQuery exception class is deprecated. Use '
-            'FieldDoesNotExist or FieldError instead.',
-            category=RemovedInDjango40Warning,
-            stacklevel=4,
-        )
-
-    def __instancecheck__(self, instance):
-        self.__warn()
-        return isinstance(instance, self._subclasses) or super().__instancecheck__(instance)
-
-    def __subclasscheck__(self, subclass):
-        self.__warn()
-        return issubclass(subclass, self._subclasses) or super().__subclasscheck__(subclass)
-
-
-class InvalidQuery(Exception, metaclass=InvalidQueryType):
-    pass
 
 
 def subclasses(cls):
@@ -69,15 +41,14 @@ class Q(tree.Node):
         super().__init__(children=[*args, *sorted(kwargs.items())], connector=_connector, negated=_negated)
 
     def _combine(self, other, conn):
-        if not isinstance(other, Q):
+        if not(isinstance(other, Q) or getattr(other, 'conditional', False) is True):
             raise TypeError(other)
 
-        # If the other Q() is empty, ignore it and just use `self`.
-        if not other:
-            return copy.deepcopy(self)
-        # Or if this Q is empty, ignore it and just use `other`.
-        elif not self:
-            return copy.deepcopy(other)
+        if not self:
+            return other.copy() if hasattr(other, 'copy') else copy.copy(other)
+        elif isinstance(other, Q) and not other:
+            _, args, kwargs = self.deconstruct()
+            return type(self)(*args, **kwargs)
 
         obj = type(self)()
         obj.connector = conn
@@ -111,14 +82,10 @@ class Q(tree.Node):
         path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
         if path.startswith('django.db.models.query_utils'):
             path = path.replace('django.db.models.query_utils', 'django.db.models')
-        args, kwargs = (), {}
-        if len(self.children) == 1 and not isinstance(self.children[0], Q):
-            child = self.children[0]
-            kwargs = {child[0]: child[1]}
-        else:
-            args = tuple(self.children)
-            if self.connector != self.default:
-                kwargs = {'_connector': self.connector}
+        args = tuple(self.children)
+        kwargs = {}
+        if self.connector != self.default:
+            kwargs['_connector'] = self.connector
         if self.negated:
             kwargs['_negated'] = True
         return path, args, kwargs
@@ -147,8 +114,8 @@ class DeferredAttribute:
             val = self._check_parent_chain(instance)
             if val is None:
                 instance.refresh_from_db(fields=[field_name])
-                val = getattr(instance, field_name)
-            data[field_name] = val
+            else:
+                data[field_name] = val
         return data[field_name]
 
     def _check_parent_chain(self, instance):

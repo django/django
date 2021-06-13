@@ -11,18 +11,23 @@
     <div id="qunit-fixture">
     </div>
     <script type="text/html" id="result-table">
-        <table id="result_list">
-            <tr>
-                <th>
-                   <input type="checkbox" id="action-toggle">
-                </th>
-            </tr>
-            <tr>
-                <td class="action-checkbox">
-                    <input class="action-select" type="checkbox" value="618">
-                </td>
-            </tr>
-        </table>
+        <form id="changelist-form">
+            <button type="submit" class="button" name="index" value="0">Go</button>
+            <span class="action-counter" data-actions-icnt="100"></span>
+            <table id="result_list">
+                <tr>
+                    <th>
+                       <input type="checkbox" id="action-toggle">
+                    </th>
+                </tr>
+                <tr>
+                    <td class="action-checkbox">
+                        <input class="action-select" type="checkbox" value="618">
+                    </td>
+                </tr>
+            </table>
+            <input type="submit" name="_save" value="Save">
+        </form>
     </script>
     <script type="text/html" id="tabular-formset">
         <input id="id_first-TOTAL_FORMS" value="1">
@@ -78,6 +83,33 @@
             </div>
         </div>
     </script>
+    <script type="text/html" id="nav-sidebar-filter">
+      <nav class="sticky" id="nav-sidebar">
+        <input type="search" id="nav-filter"
+               placeholder="Start typing to filter..."
+               aria-label="Filter navigation items">
+        <div class="app-auth module current-app">
+          <table>
+            <caption>
+              <a href="/admin/auth/" class="section"
+                 title="Models in the Authentication and Authorization application">
+                    Authentication and Authorization
+              </a>
+            </caption>
+            <tbody>
+            <tr class="model-group">
+              <th scope="row"><a href="/admin/auth/group/">Groups</a></th>
+              <td><a href="/admin/auth/group/add/" class="addlink">Add</a></td>
+            </tr>
+            <tr class="model-user current-model">
+              <th scope="row"><a href="/admin/auth/user/" aria-current="page">Users</a></th>
+              <td><a href="/admin/auth/user/add/" class="addlink">Add</a></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </nav>
+    </script>
 
     <script src="../node_modules/qunit/qunit/qunit.js"></script>
 
@@ -88,6 +120,9 @@
 
     <script src='../django/contrib/admin/static/admin/js/core.js' data-cover></script>
     <script src='./admin/core.test.js'></script>
+
+    <script src='../django/contrib/admin/static/admin/js/nav_sidebar.js' data-cover></script>
+    <script src='./admin/navigation.test.js'></script>
 
     <script src='../django/contrib/admin/static/admin/js/admin/RelatedObjectLookups.js' data-cover></script>
 

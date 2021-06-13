@@ -1,9 +1,16 @@
-from django.core.exceptions import FieldError
-from django.db.models import Count, F, Max
-from django.db.models.functions import Concat, Lower
-from django.test import TestCase
+import unittest
 
-from .models import A, B, Bar, D, DataPoint, Foo, RelatedPoint
+from django.core.exceptions import FieldError
+from django.db import IntegrityError, connection, transaction
+from django.db.models import CharField, Count, F, IntegerField, Max
+from django.db.models.functions import Abs, Concat, Lower
+from django.test import TestCase
+from django.test.utils import register_lookup
+
+from .models import (
+    A, B, Bar, D, DataPoint, Foo, RelatedPoint, UniqueNumber,
+    UniqueNumberChild,
+)
 
 
 class SimpleTest(TestCase):
@@ -126,7 +133,7 @@ class AdvancedTests(TestCase):
         """
         method = DataPoint.objects.all()[:2].update
         msg = 'Cannot update a query once a slice has been taken.'
-        with self.assertRaisesMessage(AssertionError, msg):
+        with self.assertRaisesMessage(TypeError, msg):
             method(another_value='another thing')
 
     def test_update_respects_to_field(self):
@@ -150,6 +157,13 @@ class AdvancedTests(TestCase):
         )
         with self.assertRaisesMessage(FieldError, msg):
             Bar.objects.update(m2m_foo='whatever')
+
+    def test_update_transformed_field(self):
+        A.objects.create(x=5)
+        A.objects.create(x=-6)
+        with register_lookup(IntegerField, Abs):
+            A.objects.update(x=F('x__abs'))
+            self.assertCountEqual(A.objects.values_list('x', flat=True), [5, 6])
 
     def test_update_annotated_queryset(self):
         """
@@ -191,11 +205,73 @@ class AdvancedTests(TestCase):
 
     def test_update_with_joined_field_annotation(self):
         msg = 'Joined field references are not permitted in this query'
-        for annotation in (
-            F('data__name'),
-            Lower('data__name'),
-            Concat('data__name', 'data__value'),
-        ):
-            with self.subTest(annotation=annotation):
-                with self.assertRaisesMessage(FieldError, msg):
-                    RelatedPoint.objects.annotate(new_name=annotation).update(name=F('new_name'))
+        with register_lookup(CharField, Lower):
+            for annotation in (
+                F('data__name'),
+                F('data__name__lower'),
+                Lower('data__name'),
+                Concat('data__name', 'data__value'),
+            ):
+                with self.subTest(annotation=annotation):
+                    with self.assertRaisesMessage(FieldError, msg):
+                        RelatedPoint.objects.annotate(
+                            new_name=annotation,
+                        ).update(name=F('new_name'))
+
+
+@unittest.skipUnless(
+    connection.vendor == 'mysql',
+    'UPDATE...ORDER BY syntax is supported on MySQL/MariaDB',
+)
+class MySQLUpdateOrderByTest(TestCase):
+    """Update field with a unique constraint using an ordered queryset."""
+    @classmethod
+    def setUpTestData(cls):
+        UniqueNumber.objects.create(number=1)
+        UniqueNumber.objects.create(number=2)
+
+    def test_order_by_update_on_unique_constraint(self):
+        tests = [
+            ('-number', 'id'),
+            (F('number').desc(), 'id'),
+            (F('number') * -1, 'id'),
+        ]
+        for ordering in tests:
+            with self.subTest(ordering=ordering), transaction.atomic():
+                updated = UniqueNumber.objects.order_by(*ordering).update(
+                    number=F('number') + 1,
+                )
+                self.assertEqual(updated, 2)
+
+    def test_order_by_update_on_unique_constraint_annotation(self):
+        # Ordering by annotations is omitted because they cannot be resolved in
+        # .update().
+        with self.assertRaises(IntegrityError):
+            UniqueNumber.objects.annotate(
+                number_inverse=F('number').desc(),
+            ).order_by('number_inverse').update(
+                number=F('number') + 1,
+            )
+
+    def test_order_by_update_on_parent_unique_constraint(self):
+        # Ordering by inherited fields is omitted because joined fields cannot
+        # be used in the ORDER BY clause.
+        UniqueNumberChild.objects.create(number=3)
+        UniqueNumberChild.objects.create(number=4)
+        with self.assertRaises(IntegrityError):
+            UniqueNumberChild.objects.order_by('number').update(
+                number=F('number') + 1,
+            )
+
+    def test_order_by_update_on_related_field(self):
+        # Ordering by related fields is omitted because joined fields cannot be
+        # used in the ORDER BY clause.
+        data = DataPoint.objects.create(name='d0', value='apple')
+        related = RelatedPoint.objects.create(name='r0', data=data)
+        with self.assertNumQueries(1) as ctx:
+            updated = RelatedPoint.objects.order_by('data__name').update(name='new')
+        sql = ctx.captured_queries[0]['sql']
+        self.assertNotIn('ORDER BY', sql)
+        self.assertEqual(updated, 1)
+        related.refresh_from_db()
+        self.assertEqual(related.name, 'new')

@@ -3,7 +3,9 @@ import uuid
 
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import connection, models
-from django.test import SimpleTestCase, TestCase, skipIfDBFeature
+from django.test import (
+    SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature,
+)
 from django.test.utils import isolate_apps, override_settings
 from django.utils.functional import lazy
 from django.utils.timezone import now
@@ -84,7 +86,7 @@ class BinaryFieldTests(SimpleTestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class CharFieldTests(SimpleTestCase):
+class CharFieldTests(TestCase):
 
     def test_valid_field(self):
         class Model(models.Model):
@@ -384,6 +386,30 @@ class CharFieldTests(SimpleTestCase):
                 id='mysql.W003',
             )
         ])
+
+    def test_db_collation(self):
+        class Model(models.Model):
+            field = models.CharField(max_length=100, db_collation='anything')
+
+        field = Model._meta.get_field('field')
+        error = Error(
+            '%s does not support a database collation on CharFields.'
+            % connection.display_name,
+            id='fields.E190',
+            obj=field,
+        )
+        expected = [] if connection.features.supports_collation_on_charfield else [error]
+        self.assertEqual(field.check(databases=self.databases), expected)
+
+    def test_db_collation_required_db_features(self):
+        class Model(models.Model):
+            field = models.CharField(max_length=100, db_collation='anything')
+
+            class Meta:
+                required_db_features = {'supports_collation_on_charfield'}
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(databases=self.databases), [])
 
 
 @isolate_apps('invalid_models_tests')
@@ -777,6 +803,30 @@ class TextFieldTests(TestCase):
             )
         ])
 
+    def test_db_collation(self):
+        class Model(models.Model):
+            field = models.TextField(db_collation='anything')
+
+        field = Model._meta.get_field('field')
+        error = Error(
+            '%s does not support a database collation on TextFields.'
+            % connection.display_name,
+            id='fields.E190',
+            obj=field,
+        )
+        expected = [] if connection.features.supports_collation_on_textfield else [error]
+        self.assertEqual(field.check(databases=self.databases), expected)
+
+    def test_db_collation_required_db_features(self):
+        class Model(models.Model):
+            field = models.TextField(db_collation='anything')
+
+            class Meta:
+                required_db_features = {'supports_collation_on_textfield'}
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(databases=self.databases), [])
+
 
 @isolate_apps('invalid_models_tests')
 class UUIDFieldTests(TestCase):
@@ -791,5 +841,49 @@ class UUIDFieldTests(TestCase):
                     [uuid.UUID('25d405be-4895-4d50-9b2e-d6695359ce47'), 'Other'],
                 ],
             )
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
+
+@isolate_apps('invalid_models_tests')
+@skipUnlessDBFeature('supports_json_field')
+class JSONFieldTests(TestCase):
+    def test_invalid_default(self):
+        class Model(models.Model):
+            field = models.JSONField(default={})
+
+        self.assertEqual(Model._meta.get_field('field').check(), [
+            DjangoWarning(
+                msg=(
+                    "JSONField default should be a callable instead of an "
+                    "instance so that it's not shared between all field "
+                    "instances."
+                ),
+                hint=(
+                    'Use a callable instead, e.g., use `dict` instead of `{}`.'
+                ),
+                obj=Model._meta.get_field('field'),
+                id='fields.E010',
+            )
+        ])
+
+    def test_valid_default(self):
+        class Model(models.Model):
+            field = models.JSONField(default=dict)
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
+    def test_valid_default_none(self):
+        class Model(models.Model):
+            field = models.JSONField(default=None)
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
+    def test_valid_callable_default(self):
+        def callable_default():
+            return {'it': 'works'}
+
+        class Model(models.Model):
+            field = models.JSONField(default=callable_default)
 
         self.assertEqual(Model._meta.get_field('field').check(), [])

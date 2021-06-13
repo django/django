@@ -4,6 +4,7 @@ from . import feeds
 
 urlpatterns = [
     path('syndication/rss2/', feeds.TestRss2Feed()),
+    path('syndication/rss2/articles/<int:entry_id>/', feeds.TestGetObjectFeed()),
     path(
         'syndication/rss2/guid_ispermalink_true/',
         feeds.TestRss2FeedWithGuidIsPermaLinkTrue()),

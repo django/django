@@ -1,11 +1,16 @@
+import binascii
 import json
+import random
 
+from django.conf import settings
 from django.contrib.messages import constants
 from django.contrib.messages.storage.base import Message
 from django.contrib.messages.storage.cookie import (
     CookieStorage, MessageDecoder, MessageEncoder,
 )
+from django.core.signing import b64_decode, get_cookie_signer
 from django.test import SimpleTestCase, override_settings
+from django.utils.crypto import get_random_string
 from django.utils.safestring import SafeData, mark_safe
 
 from .base import BaseTests
@@ -68,7 +73,9 @@ class CookieTests(BaseTests, SimpleTestCase):
         response = self.get_response()
         storage.add(constants.INFO, 'test')
         storage.update(response)
-        self.assertIn('test', response.cookies['messages'].value)
+        messages = storage._decode(response.cookies['messages'].value)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].message, 'test')
         self.assertEqual(response.cookies['messages']['domain'], '.example.com')
         self.assertEqual(response.cookies['messages']['expires'], '')
         self.assertIs(response.cookies['messages']['secure'], True)
@@ -85,6 +92,10 @@ class CookieTests(BaseTests, SimpleTestCase):
         self.assertEqual(response.cookies['messages'].value, '')
         self.assertEqual(response.cookies['messages']['domain'], '.example.com')
         self.assertEqual(response.cookies['messages']['expires'], 'Thu, 01 Jan 1970 00:00:00 GMT')
+        self.assertEqual(
+            response.cookies['messages']['samesite'],
+            settings.SESSION_COOKIE_SAMESITE,
+        )
 
     def test_get_bad_cookie(self):
         request = self.get_request()
@@ -109,15 +120,30 @@ class CookieTests(BaseTests, SimpleTestCase):
         # size which will fit 4 messages into the cookie, but not 5.
         # See also FallbackTest.test_session_fallback
         msg_size = int((CookieStorage.max_cookie_size - 54) / 4.5 - 37)
+        first_msg = None
+        # Generate the same (tested) content every time that does not get run
+        # through zlib compression.
+        random.seed(42)
         for i in range(5):
-            storage.add(constants.INFO, str(i) * msg_size)
+            msg = get_random_string(msg_size)
+            storage.add(constants.INFO, msg)
+            if i == 0:
+                first_msg = msg
         unstored_messages = storage.update(response)
 
         cookie_storing = self.stored_messages_count(storage, response)
         self.assertEqual(cookie_storing, 4)
 
         self.assertEqual(len(unstored_messages), 1)
-        self.assertEqual(unstored_messages[0].message, '0' * msg_size)
+        self.assertEqual(unstored_messages[0].message, first_msg)
+
+    def test_message_rfc6265(self):
+        non_compliant_chars = ['\\', ',', ';', '"']
+        messages = ['\\te,st', ';m"e', '\u2019', '123"NOTRECEIVED"']
+        storage = self.get_storage()
+        encoded = storage._encode(messages)
+        for illegal in non_compliant_chars:
+            self.assertEqual(encoded.find(illegal), -1)
 
     def test_json_encoder_decoder(self):
         """
@@ -134,7 +160,7 @@ class CookieTests(BaseTests, SimpleTestCase):
             },
             Message(constants.INFO, 'message %s'),
         ]
-        encoder = MessageEncoder(separators=(',', ':'))
+        encoder = MessageEncoder()
         value = encoder.encode(messages)
         decoded_messages = json.loads(value, cls=MessageDecoder)
         self.assertEqual(messages, decoded_messages)
@@ -154,13 +180,17 @@ class CookieTests(BaseTests, SimpleTestCase):
         self.assertIsInstance(encode_decode(mark_safe("<b>Hello Django!</b>")), SafeData)
         self.assertNotIsInstance(encode_decode("<b>Hello Django!</b>"), SafeData)
 
-    def test_legacy_hash_decode(self):
-        # RemovedInDjango40Warning: pre-Django 3.1 hashes will be invalid.
+    def test_legacy_encode_decode(self):
+        # RemovedInDjango41Warning: pre-Django 3.2 encoded messages will be
+        # invalid.
         storage = self.storage_class(self.get_request())
-        messages = ['this', 'that']
-        # Encode/decode a message using the pre-Django 3.1 hash.
-        encoder = MessageEncoder(separators=(',', ':'))
+        messages = ['this', Message(0, 'Successfully signed in as admin@example.org')]
+        # Encode/decode a message using the pre-Django 3.2 format.
+        encoder = MessageEncoder()
         value = encoder.encode(messages)
-        encoded_messages = '%s$%s' % (storage._legacy_hash(value), value)
+        with self.assertRaises(binascii.Error):
+            b64_decode(value.encode())
+        signer = get_cookie_signer(salt=storage.key_salt)
+        encoded_messages = signer.sign(value)
         decoded_messages = storage._decode(encoded_messages)
         self.assertEqual(messages, decoded_messages)

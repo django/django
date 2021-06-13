@@ -3,9 +3,9 @@ from unittest import mock, skipUnless
 from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth.hashers import (
     UNUSABLE_PASSWORD_PREFIX, UNUSABLE_PASSWORD_SUFFIX_LENGTH,
-    BasePasswordHasher, PBKDF2PasswordHasher, PBKDF2SHA1PasswordHasher,
-    check_password, get_hasher, identify_hasher, is_password_usable,
-    make_password,
+    BasePasswordHasher, BCryptPasswordHasher, BCryptSHA256PasswordHasher,
+    PBKDF2PasswordHasher, PBKDF2SHA1PasswordHasher, check_password, get_hasher,
+    identify_hasher, is_password_usable, make_password,
 )
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
@@ -63,7 +63,7 @@ class TestUtilsHashPass(SimpleTestCase):
 
     def test_pbkdf2(self):
         encoded = make_password('lètmein', 'seasalt', 'pbkdf2_sha256')
-        self.assertEqual(encoded, 'pbkdf2_sha256$216000$seasalt$youGZxOw6ZOcfrXv2i8/AhrnpZflJJ9EshS9XmUJTUg=')
+        self.assertEqual(encoded, 'pbkdf2_sha256$320000$seasalt$Toj2II2rBvFiGQcPmUml1Nlni2UtvyRWwz/jz4q6q/4=')
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
@@ -74,6 +74,12 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
+        # Salt entropy check.
+        hasher = get_hasher('pbkdf2_sha256')
+        encoded_weak_salt = make_password('lètmein', 'iodizedsalt', 'pbkdf2_sha256')
+        encoded_strong_salt = make_password('lètmein', hasher.salt(), 'pbkdf2_sha256')
+        self.assertIs(hasher.must_update(encoded_weak_salt), True)
+        self.assertIs(hasher.must_update(encoded_strong_salt), False)
 
     @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
     def test_sha1(self):
@@ -89,6 +95,12 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
+        # Salt entropy check.
+        hasher = get_hasher('sha1')
+        encoded_weak_salt = make_password('lètmein', 'iodizedsalt', 'sha1')
+        encoded_strong_salt = make_password('lètmein', hasher.salt(), 'sha1')
+        self.assertIs(hasher.must_update(encoded_weak_salt), True)
+        self.assertIs(hasher.must_update(encoded_strong_salt), False)
 
     @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.MD5PasswordHasher'])
     def test_md5(self):
@@ -104,6 +116,12 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
+        # Salt entropy check.
+        hasher = get_hasher('md5')
+        encoded_weak_salt = make_password('lètmein', 'iodizedsalt', 'md5')
+        encoded_strong_salt = make_password('lètmein', hasher.salt(), 'md5')
+        self.assertIs(hasher.must_update(encoded_weak_salt), True)
+        self.assertIs(hasher.must_update(encoded_strong_salt), False)
 
     @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.UnsaltedMD5PasswordHasher'])
     def test_unsalted_md5(self):
@@ -211,7 +229,7 @@ class TestUtilsHashPass(SimpleTestCase):
             hasher.rounds = 4
             encoded = make_password('letmein', hasher='bcrypt')
             rounds = hasher.safe_summary(encoded)['work factor']
-            self.assertEqual(rounds, '04')
+            self.assertEqual(rounds, 4)
 
             state = {'upgraded': False}
 
@@ -296,14 +314,26 @@ class TestUtilsHashPass(SimpleTestCase):
     def test_low_level_pbkdf2(self):
         hasher = PBKDF2PasswordHasher()
         encoded = hasher.encode('lètmein', 'seasalt2')
-        self.assertEqual(encoded, 'pbkdf2_sha256$216000$seasalt2$gHyszNJ9lwTG5y3MQUjZe+OJmYVTBPl/y7bYq9dtk8M=')
+        self.assertEqual(encoded, 'pbkdf2_sha256$320000$seasalt2$BRr4pYNIQDsLFP+u4dzjs7pFuWJEin4lFMMoO9wBYvo=')
         self.assertTrue(hasher.verify('lètmein', encoded))
 
     def test_low_level_pbkdf2_sha1(self):
         hasher = PBKDF2SHA1PasswordHasher()
         encoded = hasher.encode('lètmein', 'seasalt2')
-        self.assertEqual(encoded, 'pbkdf2_sha1$216000$seasalt2$E1KH89wMKuPXrrQzifVcG4cBtiA=')
+        self.assertEqual(encoded, 'pbkdf2_sha1$320000$seasalt2$sDOkTvzV93jPWTRVxFGh50Jefo0=')
         self.assertTrue(hasher.verify('lètmein', encoded))
+
+    @skipUnless(bcrypt, 'bcrypt not installed')
+    def test_bcrypt_salt_check(self):
+        hasher = BCryptPasswordHasher()
+        encoded = hasher.encode('lètmein', hasher.salt())
+        self.assertIs(hasher.must_update(encoded), False)
+
+    @skipUnless(bcrypt, 'bcrypt not installed')
+    def test_bcryptsha256_salt_check(self):
+        hasher = BCryptSHA256PasswordHasher()
+        encoded = hasher.encode('lètmein', hasher.salt())
+        self.assertIs(hasher.must_update(encoded), False)
 
     @override_settings(
         PASSWORD_HASHERS=[
@@ -471,6 +501,11 @@ class BasePasswordHasherTests(SimpleTestCase):
         with self.assertRaisesMessage(NotImplementedError, msg):
             self.hasher.encode('password', 'salt')
 
+    def test_decode(self):
+        msg = self.not_implemented_msg % 'a decode'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.hasher.decode('encoded')
+
     def test_harden_runtime(self):
         msg = 'subclasses of BasePasswordHasher should provide a harden_runtime() method'
         with self.assertWarnsMessage(Warning, msg):
@@ -497,13 +532,13 @@ class TestUtilsHashPassArgon2(SimpleTestCase):
     def test_argon2(self):
         encoded = make_password('lètmein', hasher='argon2')
         self.assertTrue(is_password_usable(encoded))
-        self.assertTrue(encoded.startswith('argon2$'))
+        self.assertTrue(encoded.startswith('argon2$argon2id$'))
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
         self.assertEqual(identify_hasher(encoded).algorithm, 'argon2')
         # Blank passwords
         blank_encoded = make_password('', hasher='argon2')
-        self.assertTrue(blank_encoded.startswith('argon2$'))
+        self.assertTrue(blank_encoded.startswith('argon2$argon2id$'))
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
@@ -514,18 +549,40 @@ class TestUtilsHashPassArgon2(SimpleTestCase):
         )
         self.assertTrue(check_password('secret', encoded))
         self.assertFalse(check_password('wrong', encoded))
+        # Old hashes with version attribute.
+        encoded = (
+            'argon2$argon2i$v=19$m=8,t=1,p=1$c2FsdHNhbHQ$YC9+jJCrQhs5R6db7LlN8Q'
+        )
+        self.assertIs(check_password('secret', encoded), True)
+        self.assertIs(check_password('wrong', encoded), False)
+        # Salt entropy check.
+        hasher = get_hasher('argon2')
+        encoded_weak_salt = make_password('lètmein', 'iodizedsalt', 'argon2')
+        encoded_strong_salt = make_password('lètmein', hasher.salt(), 'argon2')
+        self.assertIs(hasher.must_update(encoded_weak_salt), True)
+        self.assertIs(hasher.must_update(encoded_strong_salt), False)
+
+    def test_argon2_decode(self):
+        salt = 'abcdefghijk'
+        encoded = make_password('lètmein', salt=salt, hasher='argon2')
+        hasher = get_hasher('argon2')
+        decoded = hasher.decode(encoded)
+        self.assertEqual(decoded['memory_cost'], hasher.memory_cost)
+        self.assertEqual(decoded['parallelism'], hasher.parallelism)
+        self.assertEqual(decoded['salt'], salt)
+        self.assertEqual(decoded['time_cost'], hasher.time_cost)
 
     def test_argon2_upgrade(self):
         self._test_argon2_upgrade('time_cost', 'time cost', 1)
-        self._test_argon2_upgrade('memory_cost', 'memory cost', 16)
+        self._test_argon2_upgrade('memory_cost', 'memory cost', 64)
         self._test_argon2_upgrade('parallelism', 'parallelism', 1)
 
     def test_argon2_version_upgrade(self):
         hasher = get_hasher('argon2')
         state = {'upgraded': False}
         encoded = (
-            'argon2$argon2i$m=8,t=1,p=1$c29tZXNhbHQ$gwQOXSNhxiOxPOA0+PY10P9QFO'
-            '4NAYysnqRt1GSQLE55m+2GYDt9FEjPMHhP2Cuf0nOEXXMocVrsJAtNSsKyfg'
+            'argon2$argon2id$v=19$m=102400,t=2,p=8$Y041dExhNkljRUUy$TMa6A8fPJh'
+            'CAUXRhJXCXdw'
         )
 
         def setter(password):

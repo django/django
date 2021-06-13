@@ -62,12 +62,30 @@ class MigrationTestBase(TransactionTestCase):
                 any(
                     c["index"]
                     for c in connections[using].introspection.get_constraints(cursor, table).values()
-                    if c['columns'] == list(columns) and (index_type is None or c['type'] == index_type)
+                    if (
+                        c['columns'] == list(columns) and
+                        (index_type is None or c['type'] == index_type) and
+                        not c['unique']
+                    )
                 ),
             )
 
     def assertIndexNotExists(self, table, columns):
         return self.assertIndexExists(table, columns, False)
+
+    def assertIndexNameExists(self, table, index, using='default'):
+        with connections[using].cursor() as cursor:
+            self.assertIn(
+                index,
+                connection.introspection.get_constraints(cursor, table),
+            )
+
+    def assertIndexNameNotExists(self, table, index, using='default'):
+        with connections[using].cursor() as cursor:
+            self.assertNotIn(
+                index,
+                connection.introspection.get_constraints(cursor, table),
+            )
 
     def assertConstraintExists(self, table, name, value=True, using='default'):
         with connections[using].cursor() as cursor:
@@ -79,6 +97,14 @@ class MigrationTestBase(TransactionTestCase):
 
     def assertConstraintNotExists(self, table, name):
         return self.assertConstraintExists(table, name, False)
+
+    def assertUniqueConstraintExists(self, table, columns, value=True, using='default'):
+        with connections[using].cursor() as cursor:
+            constraints = connections[using].introspection.get_constraints(cursor, table).values()
+            self.assertEqual(
+                value,
+                any(c['unique'] for c in constraints if c['columns'] == list(columns)),
+            )
 
     def assertFKExists(self, table, columns, to, value=True, using='default'):
         with connections[using].cursor() as cursor:
@@ -182,6 +208,7 @@ class OperationTestBase(MigrationTestBase):
         multicol_index=False, related_model=False, mti_model=False,
         proxy_model=False, manager_model=False, unique_together=False,
         options=False, db_table=None, index_together=False, constraints=None,
+        indexes=None,
     ):
         """Creates a test model state and database table."""
         # Make the "current" state.
@@ -213,6 +240,9 @@ class OperationTestBase(MigrationTestBase):
                 'Pony',
                 models.Index(fields=['pink', 'weight'], name='pony_test_idx'),
             ))
+        if indexes:
+            for index in indexes:
+                operations.append(migrations.AddIndex('Pony', index))
         if constraints:
             for constraint in constraints:
                 operations.append(migrations.AddConstraint('Pony', constraint))
@@ -236,7 +266,7 @@ class OperationTestBase(MigrationTestBase):
                 [
                     ('id', models.AutoField(primary_key=True)),
                     ('pony', models.ForeignKey('Pony', models.CASCADE)),
-                    ('friend', models.ForeignKey('self', models.CASCADE))
+                    ('friend', models.ForeignKey('self', models.CASCADE, null=True))
                 ],
             ))
         if mti_model:

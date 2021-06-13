@@ -7,7 +7,7 @@ spatial database.
 
 First, check if you can install SpatiaLite from system packages or binaries.
 
-For example, on Debian-based distributions that package SpatiaLite 4.2+, try to
+For example, on Debian-based distributions that package SpatiaLite 4.3+, try to
 install the ``libsqlite3-mod-spatialite`` package. For older releases install
 ``spatialite-bin``.
 
@@ -18,7 +18,7 @@ For Windows, you may find binaries on the `Gaia-SINS`__ home page.
 In any case, you should always be able to :ref:`install from source
 <spatialite_source>`.
 
-__ https://www.gaia-gis.it/fossil/libspatialite
+__ https://www.gaia-gis.it/fossil/libspatialite/index
 __ https://www.gaia-gis.it/gaia-sins/
 
 .. _spatialite_source:
@@ -26,7 +26,7 @@ __ https://www.gaia-gis.it/gaia-sins/
 Installing from source
 ======================
 
-:doc:`GEOS and PROJ.4</ref/contrib/gis/install/geolibs>` should be installed
+:doc:`GEOS and PROJ</ref/contrib/gis/install/geolibs>` should be installed
 prior to building SpatiaLite.
 
 SQLite

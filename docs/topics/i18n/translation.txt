@@ -53,12 +53,6 @@ Specify a translation string by using the function
 as a shorter alias, ``_``, to save typing.
 
 .. note::
-    The ``u`` prefixing of ``gettext`` functions was originally to distinguish
-    usage between unicode strings and bytestrings on Python 2. For code that
-    supports only Python 3, they can be used interchangeably. A deprecation for
-    the prefixed functions may happen in a future Django release.
-
-.. note::
     Python's standard library ``gettext`` module installs ``_()`` into the
     global namespace, as an alias for ``gettext()``. In Django, we have chosen
     not to follow this practice, for a couple of reasons:
@@ -130,7 +124,7 @@ specified with Python's standard named-string interpolation syntax. Example::
 
 This technique lets language-specific translations reorder the placeholder
 text. For example, an English translation may be ``"Today is November 26."``,
-while a Spanish translation may be ``"Hoy es 26 de Noviembre."`` -- with the
+while a Spanish translation may be ``"Hoy es 26 de noviembre."`` -- with the
 month and the day placeholders swapped.
 
 For this reason, you should use named-string interpolation (e.g., ``%(day)s``)
@@ -210,7 +204,8 @@ For example::
         page = ngettext(
             'there is %(count)d object',
             'there are %(count)d objects',
-        count) % {
+            count,
+        ) % {
             'count': count,
         }
         return HttpResponse(page)
@@ -234,7 +229,7 @@ sophisticated, but will produce incorrect results for some languages::
     text = ngettext(
         'There is %(count)d %(name)s available.',
         'There are %(count)d %(name)s available.',
-        count
+        count,
     ) % {
         'count': count,
         'name': name
@@ -246,7 +241,7 @@ In a case like this, consider something like the following::
     text = ngettext(
         'There is %(count)d %(name)s object available.',
         'There are %(count)d %(name)s objects available.',
-        count
+        count,
     ) % {
         'count': count,
         'name': Report._meta.verbose_name,
@@ -265,21 +260,17 @@ In a case like this, consider something like the following::
         text = ngettext(
             'There is %(count)d %(name)s available.',
             'There are %(count)d %(plural_name)s available.',
-            count
+            count,
         ) % {
             'count': Report.objects.count(),
             'name': Report._meta.verbose_name,
-            'plural_name': Report._meta.verbose_name_plural
+            'plural_name': Report._meta.verbose_name_plural,
         }
 
     You would get an error when running :djadmin:`django-admin
     compilemessages <compilemessages>`::
 
         a format specification for argument 'name', as in 'msgstr[0]', doesn't exist in 'msgid'
-
-.. versionchanged: 2.2.12
-
-    Added support for different plural equations in ``.po`` files.
 
 .. _contextual-markers:
 
@@ -394,12 +385,14 @@ verbose names Django performs by looking at the model's class name::
             verbose_name = _('my thing')
             verbose_name_plural = _('my things')
 
-Model methods ``short_description`` attribute values
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Model methods ``description`` argument to the ``@display`` decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For model methods, you can provide translations to Django and the admin site
-with the ``short_description`` attribute::
+with the ``description`` argument to the :func:`~django.contrib.admin.display`
+decorator::
 
+    from django.contrib import admin
     from django.db import models
     from django.utils.translation import gettext_lazy as _
 
@@ -411,9 +404,9 @@ with the ``short_description`` attribute::
             verbose_name=_('kind'),
         )
 
+        @admin.display(description=_('Is it a mouse?'))
         def is_mouse(self):
             return self.kind.type == MOUSE_TYPE
-        is_mouse.short_description = _('Is it a mouse?')
 
 Working with lazy translation objects
 -------------------------------------
@@ -424,7 +417,7 @@ arbitrary Python code. For example, the following won't work because the
 `requests <https://pypi.org/project/requests/>`_ library doesn't handle
 ``gettext_lazy`` objects::
 
-    body = gettext_lazy("I \u2764 Django")  # (unicode :heart:)
+    body = gettext_lazy("I \u2764 Django")  # (Unicode :heart:)
     requests.post('https://example.com/send', data={'body': body})
 
 You can avoid such problems by casting ``gettext_lazy()`` objects to text
@@ -453,13 +446,14 @@ helper function described next.
 Lazy translations and plural
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When using lazy translation for a plural string (``[u]n[p]gettext_lazy``), you
+When using lazy translation for a plural string (``n[p]gettext_lazy``), you
 generally don't know the ``number`` argument at the time of the string
 definition. Therefore, you are authorized to pass a key name instead of an
 integer as the ``number`` argument. Then ``number`` will be looked up in the
 dictionary under that key during string interpolation. Here's example::
 
     from django import forms
+    from django.core.exceptions import ValidationError
     from django.utils.translation import ngettext_lazy
 
     class MyForm(forms.Form):
@@ -469,7 +463,7 @@ dictionary under that key during string interpolation. Here's example::
         def clean(self):
             # ...
             if error:
-                raise forms.ValidationError(self.error_message % {'num': number})
+                raise ValidationError(self.error_message % {'num': number})
 
 If the string contains exactly one unnamed placeholder, you can interpolate
 directly with the ``number`` argument::
@@ -483,7 +477,7 @@ directly with the ``number`` argument::
         def clean(self):
             # ...
             if error:
-                raise forms.ValidationError(self.error_message % number)
+                raise ValidationError(self.error_message % number)
 
 
 Formatting strings: ``format_lazy()``
@@ -551,7 +545,7 @@ Similar access to this information is available for template code. See below.
 Internationalization: in template code
 ======================================
 
-.. highlightlang:: html+django
+.. highlight:: html+django
 
 Translations in :doc:`Django templates </ref/templates/language>` uses two template
 tags and a slightly different syntax than in Python code. To give your template
@@ -627,11 +621,6 @@ using the ``context`` keyword:
 .. code-block:: html+django
 
     {% translate "May" context "month name" %}
-
-.. versionchanged:: 3.1
-
-   The ``trans`` tag was renamed to ``translate``.  The ``trans``
-   tag is still supported as an alias for backwards compatibility.
 
 .. templatetag:: blocktrans
 .. templatetag:: blocktranslate
@@ -748,13 +737,8 @@ For instance, the following ``{% blocktranslate %}`` tag::
     {% endblocktranslate %}
 
 will result in the entry ``"First sentence. Second paragraph."`` in the PO file,
-compared to ``"\n  First sentence.\n  Second sentence.\n"``, if the ``trimmed``
-option had not been specified.
-
-.. versionchanged:: 3.1
-
-   The ``blocktrans`` tag was renamed to ``blocktranslate``. The ``blocktrans``
-   tag is still supported as an alias for backwards compatibility.
+compared to ``"\n  First sentence.\n  Second paragraph.\n"``, if the
+``trimmed`` option had not been specified.
 
 String literals passed to tags and filters
 ------------------------------------------
@@ -964,7 +948,7 @@ There are also some filters available for convenience:
 Internationalization: in JavaScript code
 ========================================
 
-.. highlightlang:: python
+.. highlight:: python
 
 Adding translations to JavaScript poses some problems:
 
@@ -1051,7 +1035,7 @@ precedence.
 Using the JavaScript translation catalog
 ----------------------------------------
 
-.. highlightlang:: javascript
+.. highlight:: javascript
 
 To use the catalog, pull in the dynamically generated script like this:
 
@@ -1085,9 +1069,12 @@ interface within your Python code::
 The ``ngettext`` function provides an interface to pluralize words and
 phrases::
 
-    var object_count = 1 // or 0, or 2, or 3, ...
-    s = ngettext('literal for the singular case',
-            'literal for the plural case', object_count);
+    const objectCount = 1 // or 0, or 2, or 3, ...
+    const string = ngettext(
+        'literal for the singular case',
+        'literal for the plural case',
+        objectCount
+    );
 
 ``interpolate``
 ~~~~~~~~~~~~~~~
@@ -1101,23 +1088,29 @@ function supports both positional and named interpolation:
   corresponding ``fmt`` placeholders in the same order they appear.
   For example::
 
-    fmts = ngettext('There is %s object. Remaining: %s',
-            'There are %s objects. Remaining: %s', 11);
-    s = interpolate(fmts, [11, 20]);
-    // s is 'There are 11 objects. Remaining: 20'
+    const formats = ngettext(
+      'There is %s object. Remaining: %s',
+      'There are %s objects. Remaining: %s',
+      11
+    );
+    const string = interpolate(formats, [11, 20]);
+    // string is 'There are 11 objects. Remaining: 20'
 
 * Named interpolation: This mode is selected by passing the optional
   boolean ``named`` parameter as ``true``. ``obj`` contains a JavaScript
   object or associative array. For example::
 
-    d = {
-        count: 10,
-        total: 50
+    const data = {
+      count: 10,
+      total: 50
     };
 
-    fmts = ngettext('Total: %(total)s, there is %(count)s object',
-    'there are %(count)s of a total of %(total)s objects', d.count);
-    s = interpolate(fmts, d, true);
+    const formats = ngettext(
+        'Total: %(total)s, there is %(count)s object',
+        'there are %(count)s of a total of %(total)s objects',
+        data.count
+    );
+    const string = interpolate(formats, data, true);
 
 You shouldn't go over the top with string interpolation, though: this is still
 JavaScript, so the code has to make repeated regular-expression substitutions.
@@ -1562,9 +1555,9 @@ multiple times::
     in general, and doesn't depend on ``gettext``. For more information, read
     its documentation about `working with message catalogs`_.
 
-    .. _Message extracting: http://babel.pocoo.org/en/latest/messages.html#message-extraction
-    .. _Babel: http://babel.pocoo.org/
-    .. _working with message catalogs: http://babel.pocoo.org/en/latest/messages.html
+    .. _Message extracting: https://babel.pocoo.org/en/latest/messages.html#message-extraction
+    .. _Babel: https://babel.pocoo.org/en/latest/
+    .. _working with message catalogs: https://babel.pocoo.org/en/latest/messages.html
 
 .. admonition:: No gettext?
 
@@ -1623,6 +1616,13 @@ otherwise, they'll be tacked together without whitespace!
     **must** use UTF-8 as the encoding for your PO files (the default when PO
     files are created).  This means that everybody will be using the same
     encoding, which is important when Django processes the PO files.
+
+.. admonition:: Fuzzy entries
+
+    :djadmin:`makemessages` sometimes generates translation entries marked as
+    fuzzy, e.g. when translations are inferred from previously translated
+    strings. By default, fuzzy entries are **not** processed by
+    :djadmin:`compilemessages`.
 
 To reexamine all source code and templates for new translation strings and
 update all message files for **all** languages, run this::
@@ -1803,12 +1803,6 @@ set, to ``/``, depending on the nature of the request:
   the ``next`` parameter was set. Otherwise a 204 status code (No Content) will
   be returned.
 
-.. versionchanged:: 3.1
-
-    In older versions, the distinction for the fallback is based on whether the
-    ``X-Requested-With`` header is set to the value ``XMLHttpRequest``. This is
-    set by the jQuery ``ajax()`` method.
-
 Here's example HTML template code:
 
 .. code-block:: html+django
@@ -1838,7 +1832,7 @@ redirected in the ``redirect_to`` context variable.
 Explicitly setting the active language
 --------------------------------------
 
-.. highlightlang:: python
+.. highlight:: python
 
 You may want to set the active language for the current session explicitly. Perhaps
 a user's language preference is retrieved from another system, for example.
@@ -1858,10 +1852,6 @@ response::
 You would typically want to use both: :func:`django.utils.translation.activate()`
 changes the language for this thread, and setting the cookie makes this
 preference persist in future requests.
-
-.. versionchanged:: 3.0
-
-    In older versions, you could set the language in the current session.
 
 Using translations outside views and templates
 ----------------------------------------------
@@ -2030,8 +2020,8 @@ Notes:
   set :setting:`LANGUAGES` to a list of languages. For example::
 
       LANGUAGES = [
-        ('de', _('German')),
-        ('en', _('English')),
+          ('de', _('German')),
+          ('en', _('English')),
       ]
 
   This example restricts languages that are available for automatic

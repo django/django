@@ -24,9 +24,11 @@ ERROR_PAGE_TEMPLATE = """
 """
 
 
-# This can be called when CsrfViewMiddleware.process_view has not run,
+# These views can be called when CsrfViewMiddleware.process_view() not run,
 # therefore need @requires_csrf_token in case the template needs
 # {% csrf_token %}.
+
+
 @requires_csrf_token
 def page_not_found(request, exception, template_name=ERROR_404_TEMPLATE_NAME):
     """
@@ -119,16 +121,16 @@ def bad_request(request, exception, template_name=ERROR_400_TEMPLATE_NAME):
     return HttpResponseBadRequest(template.render())
 
 
-# This can be called when CsrfViewMiddleware.process_view has not run,
-# therefore need @requires_csrf_token in case the template needs
-# {% csrf_token %}.
 @requires_csrf_token
 def permission_denied(request, exception, template_name=ERROR_403_TEMPLATE_NAME):
     """
     Permission denied (403) handler.
 
     Templates: :template:`403.html`
-    Context: None
+    Context:
+        exception
+            The message from the exception which triggered the 403 (if one was
+            supplied).
 
     If the template does not exist, an Http403 response containing the text
     "403 Forbidden" (as per RFC 7231) will be returned.

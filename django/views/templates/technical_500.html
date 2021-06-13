@@ -16,6 +16,7 @@
     h3 { margin:1em 0 .5em 0; }
     h4 { margin:0 0 .5em 0; font-weight: normal; }
     code, pre { font-size: 100%; white-space: pre-wrap; }
+    summary { cursor: pointer; }
     table { border:1px solid #ccc; border-collapse: collapse; width:100%; background:white; }
     tbody td, tbody th { vertical-align:top; padding:2px 3px; }
     thead th {
@@ -40,8 +41,8 @@
     div.context ol.context-line li span { position:absolute; right:32px; }
     .user div.context ol.context-line li { background-color:#bbb; color:#000; }
     .user div.context ol li { color:#666; }
-    div.commands { margin-left: 40px; }
-    div.commands a { color:#555; text-decoration:none; }
+    div.commands, summary.commands { margin-left: 40px; }
+    div.commands a, summary.commands { color:#555; text-decoration:none; }
     .user div.commands a { color: black; }
     #summary { background: #ffc; }
     #summary h2 { font-weight: normal; color: #666; }
@@ -61,6 +62,7 @@
     span.commands a:link {color:#5E5694;}
     pre.exception_value { font-family: sans-serif; color: #575757; font-size: 1.5em; margin: 10px 0 10px 0; }
     .append-bottom { margin-bottom: 10px; }
+    .fname { user-select: all; }
   </style>
   {% if not is_email %}
   <script>
@@ -70,7 +72,6 @@
       }
     }
     window.onload = function() {
-      hideAll(document.querySelectorAll('table.vars'));
       hideAll(document.querySelectorAll('ol.pre-context'));
       hideAll(document.querySelectorAll('ol.post-context'));
       hideAll(document.querySelectorAll('div.pastebin'));
@@ -82,14 +83,6 @@
           e.style.display = e.style.display == 'none' ? 'block': 'none';
         }
       }
-      return false;
-    }
-    function varToggle(link, id) {
-      toggle('v' + id);
-      var s = link.getElementsByTagName('span')[0];
-      var uarr = String.fromCharCode(0x25b6);
-      var darr = String.fromCharCode(0x25bc);
-      s.textContent = s.textContent == uarr ? darr : uarr;
       return false;
     }
     function switchPastebinFriendly(link) {
@@ -115,7 +108,7 @@
     </tr>
     <tr>
       <th>Request URL:</th>
-      <td>{{ request.get_raw_uri }}</td>
+      <td>{{ request_insecure_uri }}</td>
     </tr>
 {% endif %}
     <tr>
@@ -137,7 +130,7 @@
 {% if lastframe %}
     <tr>
       <th>Exception Location:</th>
-      <td>{{ lastframe.filename }} in {{ lastframe.function }}, line {{ lastframe.lineno }}</td>
+      <td><span class="fname">{{ lastframe.filename }}</span>, line {{ lastframe.lineno }}, in {{ lastframe.function }}</td>
     </tr>
 {% endif %}
     <tr>
@@ -224,7 +217,11 @@
         </h3></li>
         {% endif %}{% endifchanged %}
         <li class="frame {{ frame.type }}">
-          <code>{{ frame.filename }}</code> in <code>{{ frame.function }}</code>
+          {% if not frame.tb %}
+            {% if forloop.first %}None{% else %}Traceback: None{% endif %}
+          {% else %}
+            <code class="fname">{{ frame.filename }}</code>, line {{ frame.lineno }}, in {{ frame.function }}
+          {% endif %}
 
           {% if frame.context_line %}
             <div class="context" id="c{{ frame.id }}">
@@ -249,13 +246,14 @@
           {% endif %}
 
           {% if frame.vars %}
-            <div class="commands">
-                {% if is_email %}
-                    <h2>Local Vars</h2>
-                {% else %}
-                    <a href="#" onclick="return varToggle(this, '{{ frame.id }}')"><span>&#x25b6;</span> Local vars</a>
-                {% endif %}
-            </div>
+            {% if is_email %}
+              <div class="commands">
+                <h2>Local Vars</h2>
+              </div>
+            {% else %}
+              <details>
+                <summary class="commands">Local vars</summary>
+            {% endif %}
             <table class="vars" id="v{{ frame.id }}">
               <thead>
                 <tr>
@@ -272,12 +270,13 @@
                 {% endfor %}
               </tbody>
             </table>
+            {% if not is_email %}</details>{% endif %}
           {% endif %}
         </li>
       {% endfor %}
     </ul>
   </div>
-  <form action="http://dpaste.com/" name="pasteform" id="pasteform" method="post">
+  <form action="https://dpaste.com/" name="pasteform" id="pasteform" method="post">
 {% if not is_email %}
   <div id="pastebinTraceback" class="pastebin">
     <input type="hidden" name="language" value="PythonConsole">
@@ -290,7 +289,7 @@ Environment:
 
 {% if request %}
 Request Method: {{ request.META.REQUEST_METHOD }}
-Request URL: {{ request.get_raw_uri }}
+Request URL: {{ request_insecure_uri }}
 {% endif %}
 Django Version: {{ django_version_info }}
 Python Version: {{ sys_version_info }}
@@ -318,8 +317,8 @@ Traceback (most recent call last):{% for frame in frames %}
 The above exception ({{ frame.exc_cause|force_escape }}) was the direct cause of the following exception:
 {% else %}
 During handling of the above exception ({{ frame.exc_cause|force_escape }}), another exception occurred:
-{% endif %}{% endif %}{% endifchanged %}  File "{{ frame.filename }}"{% if frame.context_line %}, line {{ frame.lineno }}{% endif %}, in {{ frame.function }}
-{% if frame.context_line %}    {% spaceless %}{{ frame.context_line }}{% endspaceless %}{% endif %}{% endfor %}
+{% endif %}{% endif %}{% endifchanged %}  {% if frame.tb %}File "{{ frame.filename }}"{% if frame.context_line %}, line {{ frame.lineno }}{% endif %}, in {{ frame.function }}
+{% if frame.context_line %}    {% spaceless %}{{ frame.context_line }}{% endspaceless %}{% endif %}{% else %}{% if forloop.first %}None{% else %}Traceback: None{% endif %}{% endif %}{% endfor %}
 
 Exception Type: {{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}
 Exception Value: {{ exception_value|force_escape }}
@@ -473,7 +472,7 @@ Exception Value: {{ exception_value|force_escape }}
 {% if not is_email %}
   <div id="explanation">
     <p>
-      You're seeing this error because you have <code>DEBUG = True</code> in your
+      You’re seeing this error because you have <code>DEBUG = True</code> in your
       Django settings file. Change that to <code>False</code>, and Django will
       display a standard page generated by the handler for this status code.
     </p>

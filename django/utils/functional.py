@@ -119,8 +119,10 @@ def lazy(func, *resultclasses):
                         setattr(cls, method_name, meth)
             cls._delegate_bytes = bytes in resultclasses
             cls._delegate_text = str in resultclasses
-            assert not (cls._delegate_bytes and cls._delegate_text), (
-                "Cannot call lazy() with both bytes and text return types.")
+            if cls._delegate_bytes and cls._delegate_text:
+                raise ValueError(
+                    'Cannot call lazy() with both bytes and text return types.'
+                )
             if cls._delegate_text:
                 cls.__str__ = cls.__text_cast
             elif cls._delegate_bytes:
@@ -175,6 +177,12 @@ def lazy(func, *resultclasses):
             if self._delegate_text:
                 return str(self) % rhs
             return self.__cast() % rhs
+
+        def __add__(self, other):
+            return self.__cast() + other
+
+        def __radd__(self, other):
+            return other + self.__cast()
 
         def __deepcopy__(self, memo):
             # Instances of this class are effectively immutable. It's just a

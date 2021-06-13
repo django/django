@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib import admin
 from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
 from django.contrib.admin.options import VERTICAL, ModelAdmin, TabularInline
 from django.contrib.admin.sites import AdminSite
@@ -62,7 +63,7 @@ class RawIdCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'raw_id_fields[0]' refers to 'non_existent_field', "
-            "which is not an attribute of 'modeladmin.ValidationTestModel'.",
+            "which is not a field of 'modeladmin.ValidationTestModel'.",
             'admin.E002'
         )
 
@@ -82,6 +83,18 @@ class RawIdCheckTests(CheckTestCase):
             raw_id_fields = ('users',)
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+    def test_field_attname(self):
+        class TestModelAdmin(ModelAdmin):
+            raw_id_fields = ['band_id']
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            ValidationTestModel,
+            "The value of 'raw_id_fields[0]' refers to 'band_id', which is "
+            "not a field of 'modeladmin.ValidationTestModel'.",
+            'admin.E002',
+        )
 
 
 class FieldsetsCheckTests(CheckTestCase):
@@ -277,7 +290,7 @@ class FilterVerticalCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'filter_vertical[0]' refers to 'non_existent_field', "
-            "which is not an attribute of 'modeladmin.ValidationTestModel'.",
+            "which is not a field of 'modeladmin.ValidationTestModel'.",
             'admin.E019'
         )
 
@@ -317,7 +330,7 @@ class FilterHorizontalCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'filter_horizontal[0]' refers to 'non_existent_field', "
-            "which is not an attribute of 'modeladmin.ValidationTestModel'.",
+            "which is not a field of 'modeladmin.ValidationTestModel'.",
             'admin.E019'
         )
 
@@ -358,7 +371,7 @@ class RadioFieldsCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'radio_fields' refers to 'non_existent_field', "
-            "which is not an attribute of 'modeladmin.ValidationTestModel'.",
+            "which is not a field of 'modeladmin.ValidationTestModel'.",
             'admin.E022'
         )
 
@@ -420,7 +433,7 @@ class PrepopulatedFieldsCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'prepopulated_fields' refers to 'non_existent_field', "
-            "which is not an attribute of 'modeladmin.ValidationTestModel'.",
+            "which is not a field of 'modeladmin.ValidationTestModel'.",
             'admin.E027'
         )
 
@@ -431,7 +444,7 @@ class PrepopulatedFieldsCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'prepopulated_fields[\"slug\"][0]' refers to 'non_existent_field', "
-            "which is not an attribute of 'modeladmin.ValidationTestModel'.",
+            "which is not a field of 'modeladmin.ValidationTestModel'.",
             'admin.E030'
         )
 
@@ -499,10 +512,12 @@ class ListDisplayTests(CheckTestCase):
         )
 
     def test_valid_case(self):
+        @admin.display
         def a_callable(obj):
             pass
 
         class TestModelAdmin(ModelAdmin):
+            @admin.display
             def a_method(self, obj):
                 pass
             list_display = ('name', 'decade_published_in', 'a_method', a_callable)
@@ -563,10 +578,12 @@ class ListDisplayLinksCheckTests(CheckTestCase):
         )
 
     def test_valid_case(self):
+        @admin.display
         def a_callable(obj):
             pass
 
         class TestModelAdmin(ModelAdmin):
+            @admin.display
             def a_method(self, obj):
                 pass
             list_display = ('name', 'decade_published_in', 'a_method', a_callable)
@@ -868,7 +885,7 @@ class OrderingCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'ordering[0]' refers to 'non_existent_field', "
-            "which is not an attribute of 'modeladmin.ValidationTestModel'.",
+            "which is not a field of 'modeladmin.ValidationTestModel'.",
             'admin.E033'
         )
 
@@ -909,7 +926,7 @@ class OrderingCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'ordering[0]' refers to 'nonexistent', which is not "
-            "an attribute of 'modeladmin.ValidationTestModel'.",
+            "a field of 'modeladmin.ValidationTestModel'.",
             'admin.E033'
         )
 
@@ -1337,7 +1354,7 @@ class AutocompleteFieldsTests(CheckTestCase):
             Admin, ValidationTestModel,
             msg=(
                 "The value of 'autocomplete_fields[0]' refers to 'nonexistent', "
-                "which is not an attribute of 'modeladmin.ValidationTestModel'."
+                "which is not a field of 'modeladmin.ValidationTestModel'."
             ),
             id='admin.E037',
             invalid_obj=Admin,
@@ -1417,10 +1434,9 @@ class AutocompleteFieldsTests(CheckTestCase):
 class ActionsCheckTests(CheckTestCase):
 
     def test_custom_permissions_require_matching_has_method(self):
+        @admin.action(permissions=['custom'])
         def custom_permission_action(modeladmin, request, queryset):
             pass
-
-        custom_permission_action.allowed_permissions = ('custom',)
 
         class BandAdmin(ModelAdmin):
             actions = (custom_permission_action,)
@@ -1433,6 +1449,7 @@ class ActionsCheckTests(CheckTestCase):
         )
 
     def test_actions_not_unique(self):
+        @admin.action
         def action(modeladmin, request, queryset):
             pass
 
@@ -1447,9 +1464,11 @@ class ActionsCheckTests(CheckTestCase):
         )
 
     def test_actions_unique(self):
+        @admin.action
         def action1(modeladmin, request, queryset):
             pass
 
+        @admin.action
         def action2(modeladmin, request, queryset):
             pass
 

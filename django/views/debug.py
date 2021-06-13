@@ -2,6 +2,7 @@ import functools
 import re
 import sys
 import types
+import warnings
 from pathlib import Path
 
 from django.conf import settings
@@ -25,7 +26,19 @@ DEBUG_ENGINE = Engine(
     libraries={'i18n': 'django.templatetags.i18n'},
 )
 
-CURRENT_DIR = Path(__file__).parent
+
+def builtin_template_path(name):
+    """
+    Return a path to a builtin template.
+
+    Avoid calling this function at the module level or in a class-definition
+    because __file__ may not exist, e.g. in frozen environments.
+    """
+    return Path(__file__).parent / 'templates' / name
+
+
+class ExceptionCycleWarning(UserWarning):
+    pass
 
 
 class CallableSettingWrapper:
@@ -86,14 +99,19 @@ class SafeExceptionReporterFilter:
         value is a dictionary, recursively cleanse the keys in that dictionary.
         """
         try:
-            if self.hidden_settings.search(key):
-                cleansed = self.cleansed_substitute
-            elif isinstance(value, dict):
-                cleansed = {k: self.cleanse_setting(k, v) for k, v in value.items()}
-            else:
-                cleansed = value
+            is_sensitive = self.hidden_settings.search(key)
         except TypeError:
-            # If the key isn't regex-able, just return as-is.
+            is_sensitive = False
+
+        if is_sensitive:
+            cleansed = self.cleansed_substitute
+        elif isinstance(value, dict):
+            cleansed = {k: self.cleanse_setting(k, v) for k, v in value.items()}
+        elif isinstance(value, list):
+            cleansed = [self.cleanse_setting('', v) for v in value]
+        elif isinstance(value, tuple):
+            cleansed = tuple([self.cleanse_setting('', v) for v in value])
+        else:
             cleansed = value
 
         if callable(cleansed):
@@ -235,6 +253,15 @@ class SafeExceptionReporterFilter:
 
 class ExceptionReporter:
     """Organize and coordinate reporting on exceptions."""
+
+    @property
+    def html_template_path(self):
+        return builtin_template_path('technical_500.html')
+
+    @property
+    def text_template_path(self):
+        return builtin_template_path('technical_500.txt')
+
     def __init__(self, request, exc_type, exc_value, tb, is_email=False):
         self.request = request
         self.filter = get_exception_reporter_filter(self.request)
@@ -246,6 +273,17 @@ class ExceptionReporter:
         self.template_info = getattr(self.exc_value, 'template_debug', None)
         self.template_does_not_exist = False
         self.postmortem = None
+
+    def _get_raw_insecure_uri(self):
+        """
+        Return an absolute URI from variables available in this request. Skip
+        allowed hosts protection, so may return insecure URI.
+        """
+        return '{scheme}://{host}{path}'.format(
+            scheme=self.request.scheme,
+            host=self.request._get_raw_host(),
+            path=self.request.get_full_path(),
+        )
 
     def get_traceback_data(self):
         """Return a dictionary containing traceback information."""
@@ -310,6 +348,8 @@ class ExceptionReporter:
             c['request_GET_items'] = self.request.GET.items()
             c['request_FILES_items'] = self.request.FILES.items()
             c['request_COOKIES_items'] = self.request.COOKIES.items()
+            c['request_insecure_uri'] = self._get_raw_insecure_uri()
+
         # Check whether exception info is available
         if self.exc_type:
             c['exception_type'] = self.exc_type.__name__
@@ -321,14 +361,14 @@ class ExceptionReporter:
 
     def get_traceback_html(self):
         """Return HTML version of debug 500 HTTP error page."""
-        with Path(CURRENT_DIR, 'templates', 'technical_500.html').open(encoding='utf-8') as fh:
+        with self.html_template_path.open(encoding='utf-8') as fh:
             t = DEBUG_ENGINE.from_string(fh.read())
         c = Context(self.get_traceback_data(), use_l10n=False)
         return t.render(c)
 
     def get_traceback_text(self):
         """Return plain text version of debug 500 HTTP error page."""
-        with Path(CURRENT_DIR, 'templates', 'technical_500.txt').open(encoding='utf-8') as fh:
+        with self.text_template_path.open(encoding='utf-8') as fh:
             t = DEBUG_ENGINE.from_string(fh.read())
         c = Context(self.get_traceback_data(), autoescape=False, use_l10n=False)
         return t.render(c)
@@ -369,7 +409,7 @@ class ExceptionReporter:
                 # (https://www.python.org/dev/peps/pep-0263/)
                 match = re.search(br'coding[:=]\s*([-\w.]+)', line)
                 if match:
-                    encoding = match.group(1).decode('ascii')
+                    encoding = match[1].decode('ascii')
                     break
             source = [str(sline, encoding, 'replace') for sline in source]
 
@@ -384,19 +424,25 @@ class ExceptionReporter:
             return None, [], None, []
         return lower_bound, pre_context, context_line, post_context
 
-    def get_traceback_frames(self):
-        def explicit_or_implicit_cause(exc_value):
-            explicit = getattr(exc_value, '__cause__', None)
-            implicit = getattr(exc_value, '__context__', None)
-            return explicit or implicit
+    def _get_explicit_or_implicit_cause(self, exc_value):
+        explicit = getattr(exc_value, '__cause__', None)
+        suppress_context = getattr(exc_value, '__suppress_context__', None)
+        implicit = getattr(exc_value, '__context__', None)
+        return explicit or (None if suppress_context else implicit)
 
+    def get_traceback_frames(self):
         # Get the exception and all its causes
         exceptions = []
         exc_value = self.exc_value
         while exc_value:
             exceptions.append(exc_value)
-            exc_value = explicit_or_implicit_cause(exc_value)
+            exc_value = self._get_explicit_or_implicit_cause(exc_value)
             if exc_value in exceptions:
+                warnings.warn(
+                    "Cycle in the exception chain detected: exception '%s' "
+                    "encountered again." % exc_value,
+                    ExceptionCycleWarning,
+                )
                 # Avoid infinite loop if there's a cyclic reference (#29393).
                 break
 
@@ -408,7 +454,25 @@ class ExceptionReporter:
         # In case there's just one exception, take the traceback from self.tb
         exc_value = exceptions.pop()
         tb = self.tb if not exceptions else exc_value.__traceback__
+        while True:
+            frames.extend(self.get_exception_traceback_frames(exc_value, tb))
+            try:
+                exc_value = exceptions.pop()
+            except IndexError:
+                break
+            tb = exc_value.__traceback__
+        return frames
 
+    def get_exception_traceback_frames(self, exc_value, tb):
+        exc_cause = self._get_explicit_or_implicit_cause(exc_value)
+        exc_cause_explicit = getattr(exc_value, '__cause__', True)
+        if tb is None:
+            yield {
+                'exc_cause': exc_cause,
+                'exc_cause_explicit': exc_cause_explicit,
+                'tb': None,
+                'type': 'user',
+            }
         while tb is not None:
             # Support for __traceback_hide__ which is used by a few libraries
             # to hide internal frames.
@@ -428,9 +492,9 @@ class ExceptionReporter:
                 pre_context = []
                 context_line = '<source code not available>'
                 post_context = []
-            frames.append({
-                'exc_cause': explicit_or_implicit_cause(exc_value),
-                'exc_cause_explicit': getattr(exc_value, '__cause__', True),
+            yield {
+                'exc_cause': exc_cause,
+                'exc_cause_explicit': exc_cause_explicit,
                 'tb': tb,
                 'type': 'django' if module_name.startswith('django.') else 'user',
                 'filename': filename,
@@ -442,17 +506,8 @@ class ExceptionReporter:
                 'context_line': context_line,
                 'post_context': post_context,
                 'pre_context_lineno': pre_context_lineno + 1,
-            })
-
-            # If the traceback for current exception is consumed, try the
-            # other exception.
-            if not tb.tb_next and exceptions:
-                exc_value = exceptions.pop()
-                tb = exc_value.__traceback__
-            else:
-                tb = tb.tb_next
-
-        return frames
+            }
+            tb = tb.tb_next
 
 
 def technical_404_response(request, exception):
@@ -465,8 +520,10 @@ def technical_404_response(request, exception):
     try:
         tried = exception.args[0]['tried']
     except (IndexError, TypeError, KeyError):
-        tried = []
+        resolved = True
+        tried = request.resolver_match.tried if request.resolver_match else None
     else:
+        resolved = False
         if (not tried or (                  # empty URLconf
             request.path == '/' and
             len(tried) == 1 and             # default URLconf
@@ -487,7 +544,9 @@ def technical_404_response(request, exception):
     else:
         obj = resolver_match.func
 
-        if hasattr(obj, '__name__'):
+        if hasattr(obj, 'view_class'):
+            caller = obj.view_class
+        elif hasattr(obj, '__name__'):
             caller = obj.__name__
         elif hasattr(obj, '__class__') and hasattr(obj.__class__, '__name__'):
             caller = obj.__class__.__name__
@@ -496,7 +555,7 @@ def technical_404_response(request, exception):
             module = obj.__module__
             caller = '%s.%s' % (module, caller)
 
-    with Path(CURRENT_DIR, 'templates', 'technical_404.html').open(encoding='utf-8') as fh:
+    with builtin_template_path('technical_404.html').open(encoding='utf-8') as fh:
         t = DEBUG_ENGINE.from_string(fh.read())
     reporter_filter = get_default_exception_reporter_filter()
     c = Context({
@@ -504,6 +563,7 @@ def technical_404_response(request, exception):
         'root_urlconf': settings.ROOT_URLCONF,
         'request_path': error_url,
         'urlpatterns': tried,
+        'resolved': resolved,
         'reason': str(exception),
         'request': request,
         'settings': reporter_filter.get_safe_settings(),
@@ -514,7 +574,7 @@ def technical_404_response(request, exception):
 
 def default_urlconf(request):
     """Create an empty URLconf 404 error response."""
-    with Path(CURRENT_DIR, 'templates', 'default_urlconf.html').open(encoding='utf-8') as fh:
+    with builtin_template_path('default_urlconf.html').open(encoding='utf-8') as fh:
         t = DEBUG_ENGINE.from_string(fh.read())
     c = Context({
         'version': get_docs_version(),

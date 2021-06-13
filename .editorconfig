@@ -42,3 +42,6 @@ indent_style = tab
 
 [docs/**.txt]
 max_line_length = 79
+
+[*.yml]
+indent_size = 2

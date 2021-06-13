@@ -3,12 +3,17 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
+from django.test.utils import override_settings
+
+from .models import CustomEmailField
 
 
 class MockedPasswordResetTokenGenerator(PasswordResetTokenGenerator):
     def __init__(self, now):
         self._now_val = now
+        super().__init__()
 
     def _now(self):
         return self._now_val
@@ -33,6 +38,27 @@ class TokenGeneratorTest(TestCase):
         tk1 = p0.make_token(user)
         tk2 = p0.make_token(user_reload)
         self.assertEqual(tk1, tk2)
+
+    def test_token_with_different_email(self):
+        """Updating the user email address invalidates the token."""
+        tests = [
+            (CustomEmailField, None),
+            (CustomEmailField, 'test4@example.com'),
+            (User, 'test4@example.com'),
+        ]
+        for model, email in tests:
+            with self.subTest(model=model.__qualname__, email=email):
+                user = model.objects.create_user(
+                    'changeemailuser',
+                    email=email,
+                    password='testpw',
+                )
+                p0 = PasswordResetTokenGenerator()
+                tk1 = p0.make_token(user)
+                self.assertIs(p0.check_token(user, tk1), True)
+                setattr(user, user.get_email_field_name(), 'test4new@example.com')
+                user.save()
+                self.assertIs(p0.check_token(user, tk1), False)
 
     def test_timeout(self):
         """The token is valid after n seconds, but no greater."""
@@ -88,13 +114,29 @@ class TokenGeneratorTest(TestCase):
         self.assertIs(p0.check_token(user, tk1), False)
         self.assertIs(p1.check_token(user, tk0), False)
 
-    def test_legacy_token_validation(self):
-        # RemovedInDjango40Warning: pre-Django 3.1 tokens will be invalid.
-        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
-        p_old_generator = PasswordResetTokenGenerator()
-        p_old_generator.algorithm = 'sha1'
-        p_new_generator = PasswordResetTokenGenerator()
+    def test_token_with_different_secret_subclass(self):
+        class CustomPasswordResetTokenGenerator(PasswordResetTokenGenerator):
+            secret = 'test-secret'
 
-        legacy_token = p_old_generator.make_token(user)
-        self.assertIs(p_old_generator.check_token(user, legacy_token), True)
-        self.assertIs(p_new_generator.check_token(user, legacy_token), True)
+        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
+        custom_password_generator = CustomPasswordResetTokenGenerator()
+        tk_custom = custom_password_generator.make_token(user)
+        self.assertIs(custom_password_generator.check_token(user, tk_custom), True)
+
+        default_password_generator = PasswordResetTokenGenerator()
+        self.assertNotEqual(
+            custom_password_generator.secret,
+            default_password_generator.secret,
+        )
+        self.assertEqual(default_password_generator.secret, settings.SECRET_KEY)
+        # Tokens created with a different secret don't validate.
+        tk_default = default_password_generator.make_token(user)
+        self.assertIs(custom_password_generator.check_token(user, tk_default), False)
+        self.assertIs(default_password_generator.check_token(user, tk_custom), False)
+
+    @override_settings(SECRET_KEY='')
+    def test_secret_lazy_validation(self):
+        default_token_generator = PasswordResetTokenGenerator()
+        msg = 'The SECRET_KEY setting must not be empty.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            default_token_generator.secret

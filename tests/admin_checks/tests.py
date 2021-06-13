@@ -134,6 +134,12 @@ class SystemChecksTestCase(SimpleTestCase):
                 "be enabled in DjangoTemplates (TEMPLATES) in order to use "
                 "the admin application.",
                 id='admin.E404',
+            ),
+            checks.Warning(
+                "'django.template.context_processors.request' must be enabled "
+                "in DjangoTemplates (TEMPLATES) in order to use the admin "
+                "navigation sidebar.",
+                id='admin.W411',
             )
         ]
         self.assertEqual(admin.checks.check_dependencies(), expected)
@@ -150,7 +156,10 @@ class SystemChecksTestCase(SimpleTestCase):
             'DIRS': [],
             'APP_DIRS': True,
             'OPTIONS': {
-                'context_processors': ['django.contrib.messages.context_processors.messages'],
+                'context_processors': [
+                    'django.template.context_processors.request',
+                    'django.contrib.messages.context_processors.messages',
+                ],
             },
         }],
     )
@@ -177,6 +186,7 @@ class SystemChecksTestCase(SimpleTestCase):
                 'APP_DIRS': True,
                 'OPTIONS': {
                     'context_processors': [
+                        'django.template.context_processors.request',
                         'django.contrib.auth.context_processors.auth',
                         'django.contrib.messages.context_processors.messages',
                     ],
@@ -204,6 +214,12 @@ class SystemChecksTestCase(SimpleTestCase):
             checks.Error(
                 "'django.contrib.sessions.middleware.SessionMiddleware' "
                 "must be in MIDDLEWARE in order to use the admin application.",
+                hint=(
+                    "Insert "
+                    "'django.contrib.sessions.middleware.SessionMiddleware' "
+                    "before "
+                    "'django.contrib.auth.middleware.AuthenticationMiddleware'."
+                ),
                 id='admin.E410',
             ),
         ]
@@ -293,7 +309,7 @@ class SystemChecksTestCase(SimpleTestCase):
         self.assertEqual(SongAdmin(Song, AdminSite()).check(), [
             checks.Error(
                 "The value of 'list_editable[0]' refers to 'test', which is "
-                "not an attribute of 'admin_checks.Song'.",
+                "not a field of 'admin_checks.Song'.",
                 obj=SongAdmin,
                 id='admin.E121',
             )
@@ -602,7 +618,7 @@ class SystemChecksTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "The value of 'raw_id_fields[0]' refers to 'nonexistent', "
-                "which is not an attribute of 'admin_checks.Album'.",
+                "which is not a field of 'admin_checks.Album'.",
                 obj=RawIdNonexistentAdmin,
                 id='admin.E002',
             )
@@ -676,6 +692,7 @@ class SystemChecksTestCase(SimpleTestCase):
         self.assertEqual(errors, [])
 
     def test_readonly_on_method(self):
+        @admin.display
         def my_function(obj):
             pass
 
@@ -689,6 +706,7 @@ class SystemChecksTestCase(SimpleTestCase):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = ("readonly_method_on_modeladmin",)
 
+            @admin.display
             def readonly_method_on_modeladmin(self, obj):
                 pass
 
@@ -701,6 +719,7 @@ class SystemChecksTestCase(SimpleTestCase):
 
             def __getattr__(self, item):
                 if item == "dynamic_method":
+                    @admin.display
                     def method(obj):
                         pass
                     return method
@@ -761,6 +780,7 @@ class SystemChecksTestCase(SimpleTestCase):
 
     def test_extra(self):
         class SongAdmin(admin.ModelAdmin):
+            @admin.display
             def awesome_song(self, instance):
                 if instance.title == "Born to Run":
                     return "Best Ever!"

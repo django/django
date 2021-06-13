@@ -4,7 +4,9 @@ import enum
 import functools
 import math
 import os
+import pathlib
 import re
+import sys
 import uuid
 from unittest import mock
 
@@ -429,6 +431,46 @@ class WriterTests(SimpleTestCase):
             "default=uuid.UUID('5c859437-d061-4847-b3f7-e6b78852f8c8'))"
         )
 
+    def test_serialize_pathlib(self):
+        # Pure path objects work in all platforms.
+        self.assertSerializedEqual(pathlib.PurePosixPath())
+        self.assertSerializedEqual(pathlib.PureWindowsPath())
+        path = pathlib.PurePosixPath('/path/file.txt')
+        expected = ("pathlib.PurePosixPath('/path/file.txt')", {'import pathlib'})
+        self.assertSerializedResultEqual(path, expected)
+        path = pathlib.PureWindowsPath('A:\\File.txt')
+        expected = ("pathlib.PureWindowsPath('A:/File.txt')", {'import pathlib'})
+        self.assertSerializedResultEqual(path, expected)
+        # Concrete path objects work on supported platforms.
+        if sys.platform == 'win32':
+            self.assertSerializedEqual(pathlib.WindowsPath.cwd())
+            path = pathlib.WindowsPath('A:\\File.txt')
+            expected = ("pathlib.PureWindowsPath('A:/File.txt')", {'import pathlib'})
+            self.assertSerializedResultEqual(path, expected)
+        else:
+            self.assertSerializedEqual(pathlib.PosixPath.cwd())
+            path = pathlib.PosixPath('/path/file.txt')
+            expected = ("pathlib.PurePosixPath('/path/file.txt')", {'import pathlib'})
+            self.assertSerializedResultEqual(path, expected)
+
+        field = models.FilePathField(path=pathlib.PurePosixPath('/home/user'))
+        string, imports = MigrationWriter.serialize(field)
+        self.assertEqual(
+            string,
+            "models.FilePathField(path=pathlib.PurePosixPath('/home/user'))",
+        )
+        self.assertIn('import pathlib', imports)
+
+    def test_serialize_path_like(self):
+        with os.scandir(os.path.dirname(__file__)) as entries:
+            path_like = list(entries)[0]
+        expected = (repr(path_like.path), {})
+        self.assertSerializedResultEqual(path_like, expected)
+
+        field = models.FilePathField(path=path_like)
+        string = MigrationWriter.serialize(field)[0]
+        self.assertEqual(string, 'models.FilePathField(path=%r)' % path_like.path)
+
     def test_serialize_functions(self):
         with self.assertRaisesMessage(ValueError, 'Cannot serialize function: lambda'):
             self.assertSerializedEqual(lambda x: 42)
@@ -438,8 +480,8 @@ class WriterTests(SimpleTestCase):
         self.serialize_round_trip(models.SET(42))
 
     def test_serialize_datetime(self):
-        self.assertSerializedEqual(datetime.datetime.utcnow())
-        self.assertSerializedEqual(datetime.datetime.utcnow)
+        self.assertSerializedEqual(datetime.datetime.now())
+        self.assertSerializedEqual(datetime.datetime.now)
         self.assertSerializedEqual(datetime.datetime.today())
         self.assertSerializedEqual(datetime.datetime.today)
         self.assertSerializedEqual(datetime.date.today())
@@ -451,13 +493,15 @@ class WriterTests(SimpleTestCase):
             datetime.datetime(2014, 1, 1, 1, 1),
             ("datetime.datetime(2014, 1, 1, 1, 1)", {'import datetime'})
         )
-        self.assertSerializedResultEqual(
-            datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc),
-            (
-                "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc)",
-                {'import datetime', 'from django.utils.timezone import utc'},
-            )
-        )
+        for tzinfo in (utc, datetime.timezone.utc):
+            with self.subTest(tzinfo=tzinfo):
+                self.assertSerializedResultEqual(
+                    datetime.datetime(2012, 1, 1, 1, 1, tzinfo=tzinfo),
+                    (
+                        "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc)",
+                        {'import datetime', 'from django.utils.timezone import utc'},
+                    )
+                )
 
     def test_serialize_fields(self):
         self.assertSerializedFieldEqual(models.CharField(max_length=255))
@@ -619,8 +663,8 @@ class WriterTests(SimpleTestCase):
         Tests serializing a simple migration.
         """
         fields = {
-            'charfield': models.DateTimeField(default=datetime.datetime.utcnow),
-            'datetimefield': models.DateTimeField(default=datetime.datetime.utcnow),
+            'charfield': models.DateTimeField(default=datetime.datetime.now),
+            'datetimefield': models.DateTimeField(default=datetime.datetime.now),
         }
 
         options = {

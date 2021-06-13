@@ -78,15 +78,15 @@ class CustomColumnsTests(TestCase):
         )
 
     def test_author_querying(self):
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Author.objects.all().order_by('last_name'),
-            ['<Author: Peter Jones>', '<Author: John Smith>']
+            [self.a2, self.a1],
         )
 
     def test_author_filtering(self):
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Author.objects.filter(first_name__exact='John'),
-            ['<Author: John Smith>']
+            [self.a1],
         )
 
     def test_author_get(self):
@@ -111,15 +111,12 @@ class CustomColumnsTests(TestCase):
             getattr(a, 'last')
 
     def test_m2m_table(self):
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.article.authors.all().order_by('last_name'),
-            ['<Author: Peter Jones>', '<Author: John Smith>']
+            [self.a2, self.a1],
         )
-        self.assertQuerysetEqual(
-            self.a1.article_set.all(),
-            ['<Article: Django lets you build Web apps easily>']
-        )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(self.a1.article_set.all(), [self.article])
+        self.assertSequenceEqual(
             self.article.authors.filter(last_name='Jones'),
-            ['<Author: Peter Jones>']
+            [self.a2],
         )

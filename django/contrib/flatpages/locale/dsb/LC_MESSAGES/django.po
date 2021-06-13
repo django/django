@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016,2019
+# Michael Wolf <milupo@sorbzilla.de>, 2016,2019-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-02-19 10:23+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-02-25 16:06+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -28,10 +28,10 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"Pśikład: '/about/contact/'. Pśeznańśo se, až sćo wócynjajucu a zacynjajucu "
-"nakósnu smužku pódał."
+"Pśikład: „/about/contact/“. Pśeznańśo se, až sćo pódał wócynjajucu a "
+"zacynjajucu nakósnu smužku."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
@@ -40,9 +40,9 @@ msgstr ""
 "Toś ta gódnota smějo jano pismiki, licby, dypki, pódsmužki, , wězawki, "
 "nakósne smužki abo tildy wopśimowaś."
 
-msgid "Example: '/about/contact'. Make sure to have a leading slash."
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
 msgstr ""
-"Pśikład: '/about/contact'. Pśeznańśo se, až maśo wjeducu nakósnu smužku."
+"Pśikład: „/about/contact“. Pśeznańśo se, až maśo wjeducu nakósnu smužku."
 
 msgid "URL is missing a leading slash."
 msgstr "URL njama wócynjajucu nakósnu smužku."
@@ -67,11 +67,11 @@ msgid "template name"
 msgstr "mě pśedłogi"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"Pśikład: 'flatpages/contact_page.html'. Jolic to njejo pódane, buźo system "
-"'flatpages/default.html' wužywaś."
+"Pśikład: „flatpages/contact_page.html“. Jolic to njejo pódane, buźo system "
+"„flatpages/default.html“ wužywaś."
 
 msgid "registration required"
 msgstr "registrěrowanje trěbne"

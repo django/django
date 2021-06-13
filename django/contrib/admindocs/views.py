@@ -4,7 +4,6 @@ from inspect import cleandoc
 from pathlib import Path
 
 from django.apps import apps
-from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admindocs import utils
@@ -16,7 +15,9 @@ from django.db import models
 from django.http import Http404
 from django.template.engine import Engine
 from django.urls import get_mod_func, get_resolver, get_urlconf
+from django.utils._os import safe_join
 from django.utils.decorators import method_decorator
+from django.utils.functional import cached_property
 from django.utils.inspect import (
     func_accepts_kwargs, func_accepts_var_args, get_func_full_args,
     method_has_no_args,
@@ -120,8 +121,11 @@ class ViewIndexView(BaseAdminDocsView):
 
     def get_context_data(self, **kwargs):
         views = []
-        urlconf = import_module(settings.ROOT_URLCONF)
-        view_functions = extract_views_from_urlpatterns(urlconf.urlpatterns)
+        url_resolver = get_resolver(get_urlconf())
+        try:
+            view_functions = extract_views_from_urlpatterns(url_resolver.url_patterns)
+        except ImproperlyConfigured:
+            view_functions = []
         for (func, regex, namespace, name) in view_functions:
             views.append({
                 'full_name': get_view_name(func),
@@ -248,7 +252,7 @@ class ModelDetailView(BaseAdminDocsView):
         methods = []
         # Gather model methods.
         for func_name, func in model.__dict__.items():
-            if inspect.isfunction(func) or isinstance(func, property):
+            if inspect.isfunction(func) or isinstance(func, (cached_property, property)):
                 try:
                     for exclude in MODEL_METHODS_EXCLUDE:
                         if func_name.startswith(exclude):
@@ -259,9 +263,10 @@ class ModelDetailView(BaseAdminDocsView):
                 verbose = verbose and (
                     utils.parse_rst(cleandoc(verbose), 'model', _('model:') + opts.model_name)
                 )
-                # Show properties and methods without arguments as fields.
-                # Otherwise, show as a 'method with arguments'.
-                if isinstance(func, property):
+                # Show properties, cached_properties, and methods without
+                # arguments as fields. Otherwise, show as a 'method with
+                # arguments'.
+                if isinstance(func, (cached_property, property)):
                     fields.append({
                         'name': func_name,
                         'data_type': get_return_data_type(func_name),
@@ -329,7 +334,7 @@ class TemplateDetailView(BaseAdminDocsView):
         else:
             # This doesn't account for template loaders (#24128).
             for index, directory in enumerate(default_engine.dirs):
-                template_file = Path(directory) / template
+                template_file = Path(safe_join(directory, template))
                 if template_file.exists():
                     template_contents = template_file.read_text()
                 else:

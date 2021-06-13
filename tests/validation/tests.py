@@ -48,6 +48,13 @@ class BaseModelValidationTests(ValidationAssertions, TestCase):
         mtv = ModelToValidate(number=10, name='Some Name', parent_id=parent.pk)
         self.assertFailsValidation(mtv.full_clean, ['parent'])
 
+    def test_FK_validates_using_base_manager(self):
+        # Archived articles are not available through the default manager, only
+        # the base manager.
+        author = Author.objects.create(name="Randy", archived=True)
+        article = Article(title='My Article', author=author)
+        self.assertIsNone(article.full_clean())
+
     def test_wrong_email_value_raises_error(self):
         mtv = ModelToValidate(number=10, name='Some Name', email='not-an-email')
         self.assertFailsValidation(mtv.full_clean, ['email'])

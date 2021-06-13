@@ -21,25 +21,6 @@ from django.views.debug import ExceptionReporter
 from . import views
 from .logconfig import MyEmailBackend
 
-# logging config prior to using filter with mail_admins
-OLD_LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
-    },
-    'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-    }
-}
-
 
 class LoggingFiltersTest(SimpleTestCase):
     def test_require_debug_false_filter(self):
@@ -72,13 +53,8 @@ class SetupDefaultLoggingMixin:
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls._logging = settings.LOGGING
         logging.config.dictConfig(DEFAULT_LOGGING)
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        logging.config.dictConfig(cls._logging)
+        cls.addClassCleanup(logging.config.dictConfig, settings.LOGGING)
 
 
 class DefaultLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleTestCase):
@@ -483,13 +459,16 @@ class SetupConfigureLogging(SimpleTestCase):
     """
     Calling django.setup() initializes the logging configuration.
     """
-    @override_settings(
-        LOGGING_CONFIG='logging_tests.tests.dictConfig',
-        LOGGING=OLD_LOGGING,
-    )
     def test_configure_initializes_logging(self):
         from django import setup
-        setup()
+        try:
+            with override_settings(
+                LOGGING_CONFIG='logging_tests.tests.dictConfig',
+            ):
+                setup()
+        finally:
+            # Restore logging from settings.
+            setup()
         self.assertTrue(dictConfig.called)
 
 
@@ -605,4 +584,4 @@ class LogFormattersTests(SimpleTestCase):
 
         with patch_django_server_logger() as logger_output:
             logger.info(log_msg)
-            self.assertRegex(logger_output.getvalue(), r'^\[[-:,.\s\d]+\] %s' % log_msg)
+            self.assertRegex(logger_output.getvalue(), r'^\[[/:,\w\s\d]+\] %s\n' % log_msg)

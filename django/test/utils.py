@@ -1,5 +1,7 @@
 import asyncio
+import collections
 import logging
+import os
 import re
 import sys
 import time
@@ -23,6 +25,7 @@ from django.db.models.options import Options
 from django.template import Template
 from django.test.signals import setting_changed, template_rendered
 from django.urls import get_script_prefix, set_script_prefix
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.translation import deactivate
 
 try:
@@ -33,9 +36,11 @@ except ImportError:
 
 __all__ = (
     'Approximate', 'ContextList', 'isolate_lru_cache', 'get_runner',
-    'modify_settings', 'override_settings',
+    'CaptureQueriesContext',
+    'ignore_warnings', 'isolate_apps', 'modify_settings', 'override_settings',
+    'override_system_checks', 'tag',
     'requires_tz_support',
-    'setup_test_environment', 'teardown_test_environment',
+    'setup_databases', 'setup_test_environment', 'teardown_test_environment',
 )
 
 TZ_SUPPORT = hasattr(time, 'tzset')
@@ -152,8 +157,22 @@ def teardown_test_environment():
     del mail.outbox
 
 
-def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, aliases=None, **kwargs):
+def setup_databases(
+    verbosity,
+    interactive,
+    *,
+    time_keeper=None,
+    keepdb=False,
+    debug_sql=False,
+    parallel=0,
+    aliases=None,
+    serialized_aliases=None,
+    **kwargs,
+):
     """Create the test databases."""
+    if time_keeper is None:
+        time_keeper = NullTimeKeeper()
+
     test_databases, mirrored_aliases = get_unique_databases_and_mirrors(aliases)
 
     old_names = []
@@ -167,19 +186,39 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
             # Actually create the database for the first connection
             if first_alias is None:
                 first_alias = alias
-                connection.creation.create_test_db(
-                    verbosity=verbosity,
-                    autoclobber=not interactive,
-                    keepdb=keepdb,
-                    serialize=connection.settings_dict['TEST'].get('SERIALIZE', True),
-                )
+                with time_keeper.timed("  Creating '%s'" % alias):
+                    # RemovedInDjango50Warning: when the deprecation ends,
+                    # replace with:
+                    # serialize_alias = serialized_aliases is None or alias in serialized_aliases
+                    try:
+                        serialize_alias = connection.settings_dict['TEST']['SERIALIZE']
+                    except KeyError:
+                        serialize_alias = (
+                            serialized_aliases is None or
+                            alias in serialized_aliases
+                        )
+                    else:
+                        warnings.warn(
+                            'The SERIALIZE test database setting is '
+                            'deprecated as it can be inferred from the '
+                            'TestCase/TransactionTestCase.databases that '
+                            'enable the serialized_rollback feature.',
+                            category=RemovedInDjango50Warning,
+                        )
+                    connection.creation.create_test_db(
+                        verbosity=verbosity,
+                        autoclobber=not interactive,
+                        keepdb=keepdb,
+                        serialize=serialize_alias,
+                    )
                 if parallel > 1:
                     for index in range(parallel):
-                        connection.creation.clone_test_db(
-                            suffix=str(index + 1),
-                            verbosity=verbosity,
-                            keepdb=keepdb,
-                        )
+                        with time_keeper.timed("  Cloning '%s'" % alias):
+                            connection.creation.clone_test_db(
+                                suffix=str(index + 1),
+                                verbosity=verbosity,
+                                keepdb=keepdb,
+                            )
             # Configure all other connections as mirrors of the first one
             else:
                 connections[alias].creation.set_as_test_mirror(connections[first_alias].settings_dict)
@@ -194,6 +233,20 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
             connections[alias].force_debug_cursor = True
 
     return old_names
+
+
+def iter_test_cases(tests):
+    """
+    Return an iterator over a test suite's unittest.TestCase objects.
+
+    The tests argument can also be an iterable of TestCase objects.
+    """
+    for test in tests:
+        if isinstance(test, TestCase):
+            yield test
+        else:
+            # Otherwise, assume it is a test suite.
+            yield from iter_test_cases(test)
 
 
 def dependency_ordered(test_databases, dependencies):
@@ -270,9 +323,14 @@ def get_unique_databases_and_mirrors(aliases=None):
             # we only need to create the test database once.
             item = test_databases.setdefault(
                 connection.creation.test_db_signature(),
-                (connection.settings_dict['NAME'], set())
+                (connection.settings_dict['NAME'], []),
             )
-            item[1].add(alias)
+            # The default database must be the first because data migrations
+            # use the default alias by default.
+            if alias == DEFAULT_DB_ALIAS:
+                item[1].insert(0, alias)
+            else:
+                item[1].append(alias)
 
             if 'DEPENDENCIES' in test_settings:
                 dependencies[alias] = test_settings['DEPENDENCIES']
@@ -341,24 +399,15 @@ class TestContextDecorator:
     def decorate_class(self, cls):
         if issubclass(cls, TestCase):
             decorated_setUp = cls.setUp
-            decorated_tearDown = cls.tearDown
 
             def setUp(inner_self):
                 context = self.enable()
+                inner_self.addCleanup(self.disable)
                 if self.attr_name:
                     setattr(inner_self, self.attr_name, context)
-                try:
-                    decorated_setUp(inner_self)
-                except Exception:
-                    self.disable()
-                    raise
-
-            def tearDown(inner_self):
-                decorated_tearDown(inner_self)
-                self.disable()
+                decorated_setUp(inner_self)
 
             cls.setUp = setUp
-            cls.tearDown = tearDown
             return cls
         raise TypeError('Can only decorate subclasses of unittest.TestCase')
 
@@ -839,6 +888,36 @@ class isolate_apps(TestContextDecorator):
 
     def disable(self):
         setattr(Options, 'default_apps', self.old_apps)
+
+
+class TimeKeeper:
+    def __init__(self):
+        self.records = collections.defaultdict(list)
+
+    @contextmanager
+    def timed(self, name):
+        self.records[name]
+        start_time = time.perf_counter()
+        try:
+            yield
+        finally:
+            end_time = time.perf_counter() - start_time
+            self.records[name].append(end_time)
+
+    def print_results(self):
+        for name, end_times in self.records.items():
+            for record_time in end_times:
+                record = '%s took %.3fs' % (name, record_time)
+                sys.stderr.write(record + os.linesep)
+
+
+class NullTimeKeeper:
+    @contextmanager
+    def timed(self, name):
+        yield
+
+    def print_results(self):
+        pass
 
 
 def tag(*tags):

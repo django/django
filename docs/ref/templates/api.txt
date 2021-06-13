@@ -755,8 +755,17 @@ Writing your own context processors
 
 A context processor has a simple interface: It's a Python function that takes
 one argument, an :class:`~django.http.HttpRequest` object, and returns a
-dictionary that gets added to the template context. Each context processor
-*must* return a dictionary.
+dictionary that gets added to the template context.
+
+For example, to add the :setting:`DEFAULT_FROM_EMAIL` setting to every
+context::
+
+    from django.conf import settings
+
+    def from_email(request):
+        return {
+            "DEFAULT_FROM_EMAIL": settings.DEFAULT_FROM_EMAIL,
+        }
 
 Custom context processors can live anywhere in your code base. All Django
 cares about is that your custom context processors are pointed to by the

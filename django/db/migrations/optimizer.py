@@ -9,7 +9,7 @@ class MigrationOptimizer:
     nothing.
     """
 
-    def optimize(self, operations, app_label=None):
+    def optimize(self, operations, app_label):
         """
         Main optimization entry point. Pass in a list of Operation instances,
         get out a new list of Operation instances.
@@ -25,11 +25,10 @@ class MigrationOptimizer:
         The inner loop is run until the starting list is the same as the result
         list, and then the result is returned. This means that operation
         optimization must be stable and always return an equal or shorter list.
-
-        The app_label argument is optional, but if you pass it you'll get more
-        efficient optimization.
         """
         # Internal tracking variable for test assertions about # of loops
+        if app_label is None:
+            raise TypeError('app_label must be a str.')
         self._iterations = 0
         while True:
             result = self.optimize_inner(operations, app_label)
@@ -38,7 +37,7 @@ class MigrationOptimizer:
                 return result
             operations = result
 
-    def optimize_inner(self, operations, app_label=None):
+    def optimize_inner(self, operations, app_label):
         """Inner optimization loop."""
         new_operations = []
         for i, operation in enumerate(operations):

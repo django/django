@@ -259,11 +259,12 @@ details can be found in the :ref:`common model field option reference
 Automatic primary key fields
 ----------------------------
 
-By default, Django gives each model the following field::
+By default, Django gives each model an auto-incrementing primary key with the
+type specified per app in :attr:`AppConfig.default_auto_field
+<django.apps.AppConfig.default_auto_field>` or globally in the
+:setting:`DEFAULT_AUTO_FIELD` setting. For example::
 
-    id = models.AutoField(primary_key=True)
-
-This is an auto-incrementing primary key.
+    id = models.BigAutoField(primary_key=True)
 
 If you'd like to specify a custom primary key, specify
 :attr:`primary_key=True <Field.primary_key>` on one of your fields. If Django
@@ -272,6 +273,11 @@ sees you've explicitly set :attr:`Field.primary_key`, it won't add the automatic
 
 Each model requires exactly one field to have :attr:`primary_key=True
 <Field.primary_key>` (either explicitly declared or automatically added).
+
+.. versionchanged:: 3.2
+
+    In older versions, auto-created primary key fields were always
+    :class:`AutoField`\s.
 
 .. _verbose-field-names:
 
@@ -352,8 +358,8 @@ reference <ref-foreignkey>` for details.
 
 It's suggested, but not required, that the name of a
 :class:`~django.db.models.ForeignKey` field (``manufacturer`` in the example
-above) be the name of the model, lowercase. You can, of course, call the field
-whatever you want. For example::
+above) be the name of the model, lowercase. You can call the field whatever you
+want. For example::
 
     class Car(models.Model):
         company_that_makes_it = models.ForeignKey(
@@ -521,8 +527,11 @@ the intermediate model::
     >>> beatles.members.all()
     <QuerySet [<Person: Ringo Starr>, <Person: Paul McCartney>]>
 
-You can also use ``add()``, ``create()``, or ``set()`` to create relationships,
-as long as you specify ``through_defaults`` for any required fields::
+You can also use :meth:`~django.db.models.fields.related.RelatedManager.add`,
+:meth:`~django.db.models.fields.related.RelatedManager.create`, or
+:meth:`~django.db.models.fields.related.RelatedManager.set` to create
+relationships, as long as you specify ``through_defaults`` for any required
+fields::
 
     >>> beatles.members.add(john, through_defaults={'date_joined': date(1960, 8, 1)})
     >>> beatles.members.create(name="George Harrison", through_defaults={'date_joined': date(1960, 8, 1)})
@@ -952,17 +961,44 @@ extend the parent's :ref:`Meta <meta-options>` class, it can subclass it. For ex
         class Meta(CommonInfo.Meta):
             db_table = 'student_info'
 
-Django does make one adjustment to the :ref:`Meta <meta-options>` class of an abstract base
-class: before installing the :ref:`Meta <meta-options>` attribute, it sets ``abstract=False``.
-This means that children of abstract base classes don't automatically become
-abstract classes themselves. Of course, you can make an abstract base class
-that inherits from another abstract base class. You just need to remember to
-explicitly set ``abstract=True`` each time.
+Django does make one adjustment to the :ref:`Meta <meta-options>` class of an
+abstract base class: before installing the :ref:`Meta <meta-options>`
+attribute, it sets ``abstract=False``. This means that children of abstract
+base classes don't automatically become abstract classes themselves. To make
+an abstract base class that inherits from another abstract base class, you need
+to explicitly set ``abstract=True`` on the child.
 
 Some attributes won't make sense to include in the :ref:`Meta <meta-options>` class of an
 abstract base class. For example, including ``db_table`` would mean that all
 the child classes (the ones that don't specify their own :ref:`Meta <meta-options>`) would use
 the same database table, which is almost certainly not what you want.
+
+Due to the way Python inheritance works, if a child class inherits from
+multiple abstract base classes, only the :ref:`Meta <meta-options>` options
+from the first listed class will be inherited by default. To inherit :ref:`Meta
+<meta-options>` options from multiple abstract base classes, you must
+explicitly declare the :ref:`Meta <meta-options>` inheritance. For example::
+
+    from django.db import models
+
+    class CommonInfo(models.Model):
+        name = models.CharField(max_length=100)
+        age = models.PositiveIntegerField()
+
+        class Meta:
+            abstract = True
+            ordering = ['name']
+
+    class Unmanaged(models.Model):
+        class Meta:
+            abstract = True
+            managed = False
+
+    class Student(CommonInfo, Unmanaged):
+        home_group = models.CharField(max_length=5)
+
+        class Meta(CommonInfo.Meta, Unmanaged.Meta):
+            pass
 
 .. _abstract-related-name:
 

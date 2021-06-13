@@ -1,4 +1,5 @@
-from django.forms import CharField, ComboField, EmailField, ValidationError
+from django.core.exceptions import ValidationError
+from django.forms import CharField, ComboField, EmailField
 from django.test import SimpleTestCase
 
 

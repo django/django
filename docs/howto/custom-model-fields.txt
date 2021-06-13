@@ -301,10 +301,10 @@ than disappearing if they take on the old default value.
 
 In addition, try to avoid returning values as positional arguments; where
 possible, return values as keyword arguments for maximum future compatibility.
-Of course, if you change the names of things more often than their position
-in the constructor's argument list, you might prefer positional, but bear in
-mind that people will be reconstructing your field from the serialized version
-for quite a while (possibly years), depending how long your migrations live for.
+If you change the names of things more often than their position in the
+constructor's argument list, you might prefer positional, but bear in mind that
+people will be reconstructing your field from the serialized version for quite
+a while (possibly years), depending how long your migrations live for.
 
 You can see the results of deconstruction by looking in migrations that include
 the field, and you can test deconstruction in unit tests by deconstructing and
@@ -451,8 +451,8 @@ time -- i.e., when the class is instantiated. To do that, implement
 Finally, if your column requires truly complex SQL setup, return ``None`` from
 :meth:`.db_type`. This will cause Django's SQL creation code to skip
 over this field. You are then responsible for creating the column in the right
-table in some other way, of course, but this gives you a way to tell Django to
-get out of the way.
+table in some other way, but this gives you a way to tell Django to get out of
+the way.
 
 The :meth:`~Field.rel_db_type` method is called by fields such as ``ForeignKey``
 and ``OneToOneField`` that point to another field to determine their database
@@ -541,8 +541,8 @@ Converting Python objects to query values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Since using a database requires conversion in both ways, if you override
-:meth:`~Field.to_python` you also have to override :meth:`~Field.get_prep_value`
-to convert Python objects back to query values.
+:meth:`~Field.from_db_value` you also have to override
+:meth:`~Field.get_prep_value` to convert Python objects back to query values.
 
 For example::
 

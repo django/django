@@ -122,13 +122,13 @@ class SimpleTemplateResponseTest(SimpleTestCase):
 
     def test_kwargs(self):
         response = self._response(content_type='application/json', status=504, charset='ascii')
-        self.assertEqual(response['content-type'], 'application/json')
+        self.assertEqual(response.headers['content-type'], 'application/json')
         self.assertEqual(response.status_code, 504)
         self.assertEqual(response.charset, 'ascii')
 
     def test_args(self):
         response = SimpleTemplateResponse('', {}, 'application/json', 504)
-        self.assertEqual(response['content-type'], 'application/json')
+        self.assertEqual(response.headers['content-type'], 'application/json')
         self.assertEqual(response.status_code, 504)
 
     @require_jinja2
@@ -175,7 +175,7 @@ class SimpleTemplateResponseTest(SimpleTestCase):
         unpickled_response = pickle.loads(pickled_response)
 
         self.assertEqual(unpickled_response.content, response.content)
-        self.assertEqual(unpickled_response['content-type'], response['content-type'])
+        self.assertEqual(unpickled_response.headers['content-type'], response.headers['content-type'])
         self.assertEqual(unpickled_response.status_code, response.status_code)
 
         # ...and the unpickled response doesn't have the
@@ -216,6 +216,14 @@ class SimpleTemplateResponseTest(SimpleTestCase):
 
         self.assertEqual(unpickled_response.cookies['key'].value, 'value')
 
+    def test_headers(self):
+        response = SimpleTemplateResponse(
+            'first/test.html',
+            {'value': 123, 'fn': datetime.now},
+            headers={'X-Foo': 'foo'},
+        )
+        self.assertEqual(response.headers['X-Foo'], 'foo')
+
 
 @override_settings(TEMPLATES=[{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -249,13 +257,13 @@ class TemplateResponseTest(SimpleTestCase):
 
     def test_kwargs(self):
         response = self._response(content_type='application/json', status=504)
-        self.assertEqual(response['content-type'], 'application/json')
+        self.assertEqual(response.headers['content-type'], 'application/json')
         self.assertEqual(response.status_code, 504)
 
     def test_args(self):
         response = TemplateResponse(self.factory.get('/'), '', {},
                                     'application/json', 504)
-        self.assertEqual(response['content-type'], 'application/json')
+        self.assertEqual(response.headers['content-type'], 'application/json')
         self.assertEqual(response.status_code, 504)
 
     @require_jinja2
@@ -287,7 +295,7 @@ class TemplateResponseTest(SimpleTestCase):
         unpickled_response = pickle.loads(pickled_response)
 
         self.assertEqual(unpickled_response.content, response.content)
-        self.assertEqual(unpickled_response['content-type'], response['content-type'])
+        self.assertEqual(unpickled_response.headers['content-type'], response.headers['content-type'])
         self.assertEqual(unpickled_response.status_code, response.status_code)
 
         # ...and the unpickled response doesn't have the
@@ -318,6 +326,15 @@ class TemplateResponseTest(SimpleTestCase):
         pickled_response = pickle.dumps(response)
         unpickled_response = pickle.loads(pickled_response)
         pickle.dumps(unpickled_response)
+
+    def test_headers(self):
+        response = TemplateResponse(
+            self.factory.get('/'),
+            'first/test.html',
+            {'value': 123, 'fn': datetime.now},
+            headers={'X-Foo': 'foo'},
+        )
+        self.assertEqual(response.headers['X-Foo'], 'foo')
 
 
 @modify_settings(MIDDLEWARE={'append': ['template_tests.test_response.custom_urlconf_middleware']})

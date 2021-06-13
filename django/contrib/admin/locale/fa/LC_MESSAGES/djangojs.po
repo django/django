@@ -6,15 +6,16 @@
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Pouya Abbassi, 2016
+# rahim agh <rahim.aghareb@gmail.com>, 2020-2021
 # Reza Mohammadi <reza@teeleh.ir>, 2014
 # Sina Cheraghi <sinacher@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-04-03 13:56+0000\n"
+"Last-Translator: rahim agh <rahim.aghareb@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -87,21 +88,21 @@ msgstr ""
 "دهید،  تغییرات از دست خواهند رفت"
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"شما کاری را انتخاب کرده اید، ولی هنوز تغییرات بعضی فیلد ها را ذخیره نکرده "
-"اید. لطفا OK را فشار دهید تا ذخیره شود.\n"
-"شما باید عملیات را دوباره انجام دهید."
+"شما یک اقدام را انتخاب کرده‌اید، ولی تغییراتی که در فیلدهای شخصی وارد کرده‌اید "
+"هنوز ذخیره نشده‌اند. لطفاً کلید OK را برای ذخیره کردن تغییرات بزنید. لازم است "
+"که اقدام را دوباره اجرا کنید."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"شما عملی را انجام داده اید، ولی تغییری انجام نداده اید. احتمالا دنبال کلید "
-"Go به جای Save میگردید."
+"شما یک اقدام را انتخاب کرده‌اید، ولی تغییراتی در فیلدهای شخصی وارد نکرده‌اید. "
+"احتمالاً به جای کلید Save به دنبال کلید Go می‌گردید."
 
 msgid "Now"
 msgstr "اکنون"
@@ -185,6 +186,54 @@ msgid "November"
 msgstr "نوامبر"
 
 msgid "December"
+msgstr "دسامبر"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "ژانویه"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "فوریه"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "مارس"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "آوریل"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "می"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "ژوئن"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "ژوئیه"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "اوت"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "سپتامبر"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "اکتبر"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "نوامبر"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
 msgstr "دسامبر"
 
 msgctxt "one letter Sunday"

@@ -1,6 +1,9 @@
 from django.contrib.admin.forms import AdminAuthenticationForm
+from django.contrib.admin.helpers import AdminForm
 from django.contrib.auth.models import User
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
+
+from .admin import ArticleForm
 
 
 # To verify that the login form rejects inactive users, use an authentication
@@ -18,3 +21,21 @@ class AdminAuthenticationFormTests(TestCase):
         }
         form = AdminAuthenticationForm(None, data)
         self.assertEqual(form.non_field_errors(), ['This account is inactive.'])
+
+
+class AdminFormTests(SimpleTestCase):
+    def test_repr(self):
+        fieldsets = (
+            ('My fields', {
+                'classes': ['collapse'],
+                'fields': ('url', 'title', 'content', 'sites'),
+            }),
+        )
+        form = ArticleForm()
+        admin_form = AdminForm(form, fieldsets, {})
+        self.assertEqual(
+            repr(admin_form),
+            "<AdminForm: form=ArticleForm fieldsets=(('My fields', "
+            "{'classes': ['collapse'], "
+            "'fields': ('url', 'title', 'content', 'sites')}),)>",
+        )

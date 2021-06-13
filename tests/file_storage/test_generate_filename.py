@@ -1,7 +1,8 @@
 import os
 
+from django.core.exceptions import SuspiciousFileOperation
 from django.core.files.base import ContentFile
-from django.core.files.storage import Storage
+from django.core.files.storage import FileSystemStorage, Storage
 from django.db.models import FileField
 from django.test import SimpleTestCase
 
@@ -36,6 +37,62 @@ class AWSS3Storage(Storage):
 
 
 class GenerateFilenameStorageTests(SimpleTestCase):
+    def test_storage_dangerous_paths(self):
+        candidates = [
+            ('/tmp/..', '..'),
+            ('/tmp/.', '.'),
+            ('', ''),
+        ]
+        s = FileSystemStorage()
+        msg = "Could not derive file name from '%s'"
+        for file_name, base_name in candidates:
+            with self.subTest(file_name=file_name):
+                with self.assertRaisesMessage(SuspiciousFileOperation, msg % base_name):
+                    s.get_available_name(file_name)
+                with self.assertRaisesMessage(SuspiciousFileOperation, msg % base_name):
+                    s.generate_filename(file_name)
+
+    def test_storage_dangerous_paths_dir_name(self):
+        file_name = '/tmp/../path'
+        s = FileSystemStorage()
+        msg = "Detected path traversal attempt in '/tmp/..'"
+        with self.assertRaisesMessage(SuspiciousFileOperation, msg):
+            s.get_available_name(file_name)
+        with self.assertRaisesMessage(SuspiciousFileOperation, msg):
+            s.generate_filename(file_name)
+
+    def test_filefield_dangerous_filename(self):
+        candidates = [
+            ('..', 'some/folder/..'),
+            ('.', 'some/folder/.'),
+            ('', 'some/folder/'),
+            ('???', '???'),
+            ('$.$.$', '$.$.$'),
+        ]
+        f = FileField(upload_to='some/folder/')
+        for file_name, msg_file_name in candidates:
+            msg = f"Could not derive file name from '{msg_file_name}'"
+            with self.subTest(file_name=file_name):
+                with self.assertRaisesMessage(SuspiciousFileOperation, msg):
+                    f.generate_filename(None, file_name)
+
+    def test_filefield_dangerous_filename_dot_segments(self):
+        f = FileField(upload_to='some/folder/')
+        msg = "Detected path traversal attempt in 'some/folder/../path'"
+        with self.assertRaisesMessage(SuspiciousFileOperation, msg):
+            f.generate_filename(None, '../path')
+
+    def test_filefield_generate_filename_absolute_path(self):
+        f = FileField(upload_to='some/folder/')
+        candidates = [
+            '/tmp/path',
+            '/tmp/../path',
+        ]
+        for file_name in candidates:
+            msg = f"Detected path traversal attempt in '{file_name}'"
+            with self.subTest(file_name=file_name):
+                with self.assertRaisesMessage(SuspiciousFileOperation, msg):
+                    f.generate_filename(None, file_name)
 
     def test_filefield_generate_filename(self):
         f = FileField(upload_to='some/folder/')
@@ -53,6 +110,57 @@ class GenerateFilenameStorageTests(SimpleTestCase):
             f.generate_filename(None, 'test with space.txt'),
             os.path.normpath('some/folder/test_with_space.txt')
         )
+
+    def test_filefield_generate_filename_upload_to_overrides_dangerous_filename(self):
+        def upload_to(instance, filename):
+            return 'test.txt'
+
+        f = FileField(upload_to=upload_to)
+        candidates = [
+            '/tmp/.',
+            '/tmp/..',
+            '/tmp/../path',
+            '/tmp/path',
+            'some/folder/',
+            'some/folder/.',
+            'some/folder/..',
+            'some/folder/???',
+            'some/folder/$.$.$',
+            'some/../test.txt',
+            '',
+        ]
+        for file_name in candidates:
+            with self.subTest(file_name=file_name):
+                self.assertEqual(f.generate_filename(None, file_name), 'test.txt')
+
+    def test_filefield_generate_filename_upload_to_absolute_path(self):
+        def upload_to(instance, filename):
+            return '/tmp/' + filename
+
+        f = FileField(upload_to=upload_to)
+        candidates = [
+            'path',
+            '../path',
+            '???',
+            '$.$.$',
+        ]
+        for file_name in candidates:
+            msg = f"Detected path traversal attempt in '/tmp/{file_name}'"
+            with self.subTest(file_name=file_name):
+                with self.assertRaisesMessage(SuspiciousFileOperation, msg):
+                    f.generate_filename(None, file_name)
+
+    def test_filefield_generate_filename_upload_to_dangerous_filename(self):
+        def upload_to(instance, filename):
+            return '/tmp/' + filename
+
+        f = FileField(upload_to=upload_to)
+        candidates = ['..', '.', '']
+        for file_name in candidates:
+            msg = f"Could not derive file name from '/tmp/{file_name}'"
+            with self.subTest(file_name=file_name):
+                with self.assertRaisesMessage(SuspiciousFileOperation, msg):
+                    f.generate_filename(None, file_name)
 
     def test_filefield_awss3_storage(self):
         """

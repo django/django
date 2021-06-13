@@ -12,7 +12,7 @@ class RedirectFallbackMiddleware(MiddlewareMixin):
     response_gone_class = HttpResponseGone
     response_redirect_class = HttpResponsePermanentRedirect
 
-    def __init__(self, get_response=None):
+    def __init__(self, get_response):
         if not apps.is_installed('django.contrib.sites'):
             raise ImproperlyConfigured(
                 "You cannot use RedirectFallbackMiddleware when "

@@ -558,18 +558,6 @@ class RequestsTests(SimpleTestCase):
         with self.assertRaises(UnreadablePostError):
             request.FILES
 
-    @override_settings(ALLOWED_HOSTS=['example.com'])
-    def test_get_raw_uri(self):
-        factory = RequestFactory(HTTP_HOST='evil.com')
-        request = factory.get('////absolute-uri')
-        self.assertEqual(request.get_raw_uri(), 'http://evil.com//absolute-uri')
-
-        request = factory.get('/?foo=bar')
-        self.assertEqual(request.get_raw_uri(), 'http://evil.com/?foo=bar')
-
-        request = factory.get('/path/with:colons')
-        self.assertEqual(request.get_raw_uri(), 'http://evil.com/path/with:colons')
-
 
 class HostValidationTests(SimpleTestCase):
     poisoned_hosts = [

@@ -1,22 +1,27 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Claude Paroz <claude@2xlibre.net>, 2013-2019
+# Bruno Brouard <annoa.b@gmail.com>, 2021
+# Claude Paroz <claude@2xlibre.net>, 2013-2020
 # Claude Paroz <claude@2xlibre.net>, 2011,2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-18 16:24+0000\n"
-"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-03-04 20:53+0000\n"
+"Last-Translator: Bruno Brouard <annoa.b@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Supprimer les %(verbose_name_plural)s sélectionnés"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -28,10 +33,6 @@ msgstr "Impossible de supprimer %(name)s"
 
 msgid "Are you sure?"
 msgstr "Êtes-vous sûr ?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Supprimer les %(verbose_name_plural)s sélectionnés"
 
 msgid "Administration"
 msgstr "Administration"
@@ -69,6 +70,12 @@ msgstr "Aucune date"
 msgid "Has date"
 msgstr "Possède une date"
 
+msgid "Empty"
+msgstr "Vide"
+
+msgid "Not empty"
+msgstr "Non vide"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -92,13 +99,13 @@ msgid "Addition"
 msgstr "Ajout"
 
 msgid "Change"
-msgstr "Modifier"
+msgstr "Modification"
 
 msgid "Deletion"
 msgstr "Suppression"
 
 msgid "action time"
-msgstr "heure de l’action"
+msgstr "date de l’action"
 
 msgid "user"
 msgstr "utilisateur"
@@ -192,14 +199,14 @@ msgstr ""
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
-"L’objet {name} « {obj} » a été modifié avec succès. Vous pouvez continuer "
-"l’édition ci-dessous."
+"L’objet {name} « {obj} » a été modifié avec succès. Vous pouvez l’éditer à "
+"nouveau ci-dessous."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
-"L’objet {name} « {obj} » a été ajouté avec succès. Vous pouvez continuer "
-"l’édition ci-dessous."
+"L’objet {name} « {obj} » a été ajouté avec succès. Vous pouvez l’éditer à "
+"nouveau ci-dessous."
 
 #, python-brace-format
 msgid ""
@@ -289,7 +296,7 @@ msgid "Django administration"
 msgstr "Administration de Django"
 
 msgid "Site administration"
-msgstr "Administration du site"
+msgstr "Site d’administration"
 
 msgid "Log in"
 msgstr "Connexion"
@@ -299,7 +306,7 @@ msgid "%(app)s administration"
 msgstr "Administration de %(app)s"
 
 msgid "Page not found"
-msgstr "Cette page n’a pas été trouvée"
+msgstr "Page non trouvée"
 
 msgid "We’re sorry, but the requested page could not be found."
 msgstr "Nous sommes désolés, mais la page demandée est introuvable."
@@ -339,6 +346,19 @@ msgstr "Sélectionner tous les %(total_count)s %(module_name)s"
 
 msgid "Clear selection"
 msgstr "Effacer la sélection"
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modèles de l’application %(name)s"
+
+msgid "Add"
+msgstr "Ajouter"
+
+msgid "View"
+msgstr "Afficher"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Vous n’avez pas la permission de voir ou de modifier quoi que ce soit."
 
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
@@ -389,6 +409,9 @@ msgstr "Voir sur le site"
 
 msgid "Filter"
 msgstr "Filtre"
+
+msgid "Clear all filters"
+msgstr "Effacer tous les filtres"
 
 msgid "Remove from sorting"
 msgstr "Enlever du tri"
@@ -468,9 +491,6 @@ msgstr ""
 "Voulez-vous vraiment supprimer les objets %(objects_name)s sélectionnés ? "
 "Tous les objets suivants et les éléments liés seront supprimés :"
 
-msgid "View"
-msgstr "Afficher"
-
 msgid "Delete?"
 msgstr "Supprimer ?"
 
@@ -480,16 +500,6 @@ msgstr " Par %(filter_title)s "
 
 msgid "Summary"
 msgstr "Résumé"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modèles de l’application %(name)s"
-
-msgid "Add"
-msgstr "Ajouter"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr "Vous n’avez pas la permission de voir ou de modifier quoi que ce soit."
 
 msgid "Recent actions"
 msgstr "Actions récentes"
@@ -523,6 +533,9 @@ msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "Mot de passe ou nom d’utilisateur oublié ?"
+
+msgid "Toggle navigation"
+msgstr "Basculer la navigation"
 
 msgid "Date/time"
 msgstr "Date/heure"

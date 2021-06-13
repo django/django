@@ -112,12 +112,12 @@ Use the ``django.test.Client`` class to make requests.
 .. class:: Client(enforce_csrf_checks=False, json_encoder=DjangoJSONEncoder, **defaults)
 
     It requires no arguments at time of construction. However, you can use
-    keywords arguments to specify some default headers. For example, this will
+    keyword arguments to specify some default headers. For example, this will
     send a ``User-Agent`` HTTP header in each request::
 
         >>> c = Client(HTTP_USER_AGENT='Mozilla/5.0')
 
-    The values from the ``extra`` keywords arguments passed to
+    The values from the ``extra`` keyword arguments passed to
     :meth:`~django.test.Client.get()`,
     :meth:`~django.test.Client.post()`, etc. have precedence over
     the defaults passed to the class constructor.
@@ -131,10 +131,6 @@ Use the ``django.test.Client`` class to make requests.
     The ``raise_request_exception`` argument allows controlling whether or not
     exceptions raised during the request should also be raised in the test.
     Defaults to ``True``.
-
-    .. versionadded:: 3.0
-
-        The ``raise_request_exception`` argument was added.
 
     Once you have a ``Client`` instance, you can call any of the following
     methods:
@@ -248,7 +244,7 @@ Use the ``django.test.Client`` class to make requests.
         wish to upload as a value. For example::
 
             >>> c = Client()
-            >>> with open('wishlist.doc') as fp:
+            >>> with open('wishlist.doc', 'rb') as fp:
             ...     c.post('/customers/wishes/', {'name': 'fred', 'attachment': fp})
 
         (The name ``attachment`` here is not relevant; use whatever name your
@@ -481,8 +477,6 @@ Specifically, a ``Response`` object has the following attributes:
 
     .. attribute:: exc_info
 
-        .. versionadded:: 3.0
-
         A tuple of three values that provides information about the unhandled
         exception, if any, that occurred during the view.
 
@@ -557,9 +551,9 @@ Specifically, a ``Response`` object has the following attributes:
         If the given URL is not found, accessing this attribute will raise a
         :exc:`~django.urls.Resolver404` exception.
 
-You can also use dictionary syntax on the response object to query the value
-of any settings in the HTTP headers. For example, you could determine the
-content type of a response using ``response['Content-Type']``.
+As with a normal response, you can also access the headers through
+:attr:`.HttpResponse.headers`. For example, you could determine the content
+type of a response using ``response.headers['Content-Type']``.
 
 Exceptions
 ----------
@@ -775,11 +769,6 @@ If your tests make any database queries, use subclasses
     :exc:`unittest.SkipTest` in ``setUpClass()``, be sure to do it before
     calling ``super()`` to avoid this.
 
-.. versionchanged:: 3.1
-
-    The ``debug()`` method was implemented to allow running a test without
-    collecting the result and catching exceptions.
-
 ``TransactionTestCase``
 -----------------------
 
@@ -879,11 +868,49 @@ It also provides an additional method:
     (for instance, MySQL with the MyISAM engine), ``setUpTestData()`` will be
     called before each test, negating the speed benefits.
 
-    Be careful not to modify any objects created in ``setUpTestData()`` in
-    your test methods. Modifications to in-memory objects from setup work done
-    at the class level will persist between test methods. If you do need to
-    modify them, you could reload them in the ``setUp()`` method with
-    :meth:`~django.db.models.Model.refresh_from_db`, for example.
+    .. versionchanged:: 3.2
+
+        Objects assigned to class attributes in ``setUpTestData()`` must
+        support creating deep copies with :py:func:`copy.deepcopy` in order to
+        isolate them from alterations performed by each test methods. In
+        previous versions of Django these objects were reused and changes made
+        to them were persisted between test methods.
+
+.. classmethod:: TestCase.captureOnCommitCallbacks(using=DEFAULT_DB_ALIAS, execute=False)
+
+    .. versionadded:: 3.2
+
+    Returns a context manager that captures :func:`transaction.on_commit()
+    <django.db.transaction.on_commit>` callbacks for the given database
+    connection. It returns a list that contains, on exit of the context, the
+    captured callback functions. From this list you can make assertions on the
+    callbacks or call them to invoke their side effects, emulating a commit.
+
+    ``using`` is the alias of the database connection to capture callbacks for.
+
+    If ``execute`` is ``True``, all the callbacks will be called as the context
+    manager exits, if no exception occurred. This emulates a commit after the
+    wrapped block of code.
+
+    For example::
+
+        from django.core import mail
+        from django.test import TestCase
+
+
+        class ContactTests(TestCase):
+            def test_post(self):
+                with self.captureOnCommitCallbacks(execute=True) as callbacks:
+                    response = self.client.post(
+                        '/contact/',
+                        {'message': 'I like your site'},
+                    )
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(callbacks), 1)
+                self.assertEqual(len(mail.outbox), 1)
+                self.assertEqual(mail.outbox[0].subject, 'Contact Form')
+                self.assertEqual(mail.outbox[0].body, 'I like your site')
 
 .. _live-test-server:
 
@@ -961,7 +988,7 @@ case you do not have Firefox installed or wish to use another browser. The
 example above is just a tiny fraction of what the Selenium client can do; check
 out the `full reference`_ for more details.
 
-.. _Selenium: http://seleniumhq.org/
+.. _Selenium: https://www.selenium.dev/
 .. _selenium package: https://pypi.org/project/selenium/
 .. _full reference: https://selenium-python.readthedocs.io/api.html
 .. _Firefox: https://www.mozilla.com/firefox/
@@ -998,7 +1025,7 @@ out the `full reference`_ for more details.
     for more information.
 
     .. _Selenium FAQ: https://web.archive.org/web/20160129132110/http://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions#Q:_WebDriver_fails_to_find_elements_/_Does_not_block_on_page_loa
-    .. _Selenium documentation: https://www.seleniumhq.org/docs/04_webdriver_advanced.html#explicit-waits
+    .. _Selenium documentation: https://www.selenium.dev/documentation/en/webdriver/waits/#explicit-wait
 
 Test cases features
 ===================
@@ -1569,8 +1596,8 @@ your test suite.
       closed or the HTML document ends.
     * Empty tags are equivalent to their self-closing version.
     * The ordering of attributes of an HTML element is not significant.
-    * Attributes without an argument are equal to attributes that equal in
-      name and value (see the examples).
+    * Boolean attributes (like ``checked``) without an argument are equal to
+      attributes that equal in name and value (see the examples).
     * Text, character references, and entity references that refer to the same
       character are equivalent.
 
@@ -1588,10 +1615,16 @@ your test suite.
             '<input id="id_accept_terms" type="checkbox" checked>'
         )
 
-    ``html1`` and ``html2`` must be valid HTML. An ``AssertionError`` will be
+    ``html1`` and ``html2`` must contain HTML. An ``AssertionError`` will be
     raised if one of them cannot be parsed.
 
     Output in case of error can be customized with the ``msg`` argument.
+
+    .. versionchanged:: 4.0
+
+        In older versions, any attribute (not only boolean attributes) without
+        a value was considered equal to an attribute with the same name and
+        value.
 
 .. method:: SimpleTestCase.assertHTMLNotEqual(html1, html2, msg=None)
 
@@ -1599,7 +1632,7 @@ your test suite.
     comparison is based on HTML semantics. See
     :meth:`~SimpleTestCase.assertHTMLEqual` for details.
 
-    ``html1`` and ``html2`` must be valid HTML. An ``AssertionError`` will be
+    ``html1`` and ``html2`` must contain HTML. An ``AssertionError`` will be
     raised if one of them cannot be parsed.
 
     Output in case of error can be customized with the ``msg`` argument.
@@ -1611,7 +1644,7 @@ your test suite.
     :meth:`~SimpleTestCase.assertHTMLEqual`, the comparison is
     made on parsed content, hence only semantic differences are considered, not
     syntax differences. When invalid XML is passed in any parameter, an
-    ``AssertionError`` is always raised, even if both string are identical.
+    ``AssertionError`` is always raised, even if both strings are identical.
 
     XML declaration, document type, processing instructions, and comments are
     ignored. Only the root element and its children are compared.
@@ -1634,7 +1667,7 @@ your test suite.
     of ``needle`` occurrences will be strictly verified.
 
     Whitespace in most cases is ignored, and attribute ordering is not
-    significant. The passed-in arguments must be valid HTML.
+    significant. See :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
 
 .. method:: SimpleTestCase.assertJSONEqual(raw, expected_data, msg=None)
 
@@ -1651,23 +1684,37 @@ your test suite.
 
     Output in case of error can be customized with the ``msg`` argument.
 
-.. method:: TransactionTestCase.assertQuerysetEqual(qs, values, transform=repr, ordered=True, msg=None)
+.. method:: TransactionTestCase.assertQuerysetEqual(qs, values, transform=None, ordered=True, msg=None)
 
-    Asserts that a queryset ``qs`` returns a particular list of values ``values``.
+    Asserts that a queryset ``qs`` matches a particular iterable of values
+    ``values``.
 
-    The comparison of the contents of ``qs`` and ``values`` is performed using
-    the function ``transform``; by default, this means that the ``repr()`` of
-    each value is compared. Any other callable can be used if ``repr()`` doesn't
-    provide a unique or helpful comparison.
+    If ``transform`` is provided, ``values`` is compared to a list produced by
+    applying ``transform`` to each member of ``qs``.
 
     By default, the comparison is also ordering dependent. If ``qs`` doesn't
     provide an implicit ordering, you can set the ``ordered`` parameter to
     ``False``, which turns the comparison into a ``collections.Counter`` comparison.
     If the order is undefined (if the given ``qs`` isn't ordered and the
-    comparison is against more than one ordered values), a ``ValueError`` is
+    comparison is against more than one ordered value), a ``ValueError`` is
     raised.
 
     Output in case of error can be customized with the ``msg`` argument.
+
+    .. versionchanged:: 3.2
+
+        The default value of ``transform`` argument was changed to ``None``.
+
+    .. versionadded:: 3.2
+
+        Support for direct comparison between querysets was added.
+
+    .. deprecated:: 3.2
+
+        If ``transform`` is not provided and ``values`` is a list of strings,
+        it's compared to a list produced by applying ``repr()`` to each member
+        of ``qs``. This behavior is deprecated and will be removed in Django
+        4.1. If you need it, explicitly set ``transform`` to ``repr``.
 
 .. method:: TransactionTestCase.assertNumQueries(num, func, *args, **kwargs)
 
@@ -1760,8 +1807,6 @@ won't be run.
 Testing asynchronous code
 =========================
 
-.. versionadded:: 3.1
-
 If you merely want to test the output of your asynchronous views, the standard
 test client will run them inside their own asynchronous loop without any extra
 work needed on your part.
@@ -1777,9 +1822,22 @@ If you are testing from an asynchronous function, you must also use the
 asynchronous test client. This is available as ``django.test.AsyncClient``,
 or as ``self.async_client`` on any test.
 
-With the exception of the ``follow`` parameter, which is not supported,
 ``AsyncClient`` has the same methods and signatures as the synchronous (normal)
-test client, but any method that makes a request must be awaited::
+test client, with two exceptions:
+
+* The ``follow`` parameter is not supported.
+* Headers passed as ``extra`` keyword arguments should not have the ``HTTP_``
+  prefix required by the synchronous client (see :meth:`Client.get`). For
+  example, here is how to set an HTTP ``Accept`` header::
+
+    >>> c = AsyncClient()
+    >>> c.get(
+    ...     '/customers/details/',
+    ...     {'name': 'fred', 'age': 7},
+    ...     ACCEPT='application/json'
+    ... )
+
+Using ``AsyncClient`` any method that makes a request must be awaited::
 
     async def test_my_thing(self):
         response = await self.async_client.get('/some-url/')

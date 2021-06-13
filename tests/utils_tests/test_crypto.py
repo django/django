@@ -1,12 +1,10 @@
 import hashlib
 import unittest
 
-from django.test import SimpleTestCase, ignore_warnings
+from django.test import SimpleTestCase
 from django.utils.crypto import (
-    InvalidAlgorithm, constant_time_compare, get_random_string, pbkdf2,
-    salted_hmac,
+    InvalidAlgorithm, constant_time_compare, pbkdf2, salted_hmac,
 )
-from django.utils.deprecation import RemovedInDjango40Warning
 
 
 class TestUtilsCryptoMisc(SimpleTestCase):
@@ -185,14 +183,3 @@ class TestUtilsCryptoPBKDF2(unittest.TestCase):
     def test_default_hmac_alg(self):
         kwargs = {'password': b'password', 'salt': b'salt', 'iterations': 1, 'dklen': 20}
         self.assertEqual(pbkdf2(**kwargs), hashlib.pbkdf2_hmac(hash_name=hashlib.sha256().name, **kwargs))
-
-
-class DeprecationTests(SimpleTestCase):
-    @ignore_warnings(category=RemovedInDjango40Warning)
-    def test_get_random_string(self):
-        self.assertEqual(len(get_random_string()), 12)
-
-    def test_get_random_string_warning(self):
-        msg = 'Not providing a length argument is deprecated.'
-        with self.assertRaisesMessage(RemovedInDjango40Warning, msg):
-            get_random_string()

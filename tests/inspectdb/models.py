@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import connection, models
 
 
 class People(models.Model):
@@ -66,6 +66,34 @@ class ColumnTypes(models.Model):
     time_field = models.TimeField()
     url_field = models.URLField()
     uuid_field = models.UUIDField()
+
+
+class JSONFieldColumnType(models.Model):
+    json_field = models.JSONField()
+    null_json_field = models.JSONField(blank=True, null=True)
+
+    class Meta:
+        required_db_features = {
+            'can_introspect_json_field',
+            'supports_json_field',
+        }
+
+
+test_collation = connection.features.test_collations.get('non_default')
+
+
+class CharFieldDbCollation(models.Model):
+    char_field = models.CharField(max_length=10, db_collation=test_collation)
+
+    class Meta:
+        required_db_features = {'supports_collation_on_charfield'}
+
+
+class TextFieldDbCollation(models.Model):
+    text_field = models.TextField(db_collation=test_collation)
+
+    class Meta:
+        required_db_features = {'supports_collation_on_textfield'}
 
 
 class UniqueTogether(models.Model):

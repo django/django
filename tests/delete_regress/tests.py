@@ -1,7 +1,10 @@
 import datetime
 
 from django.db import connection, models, transaction
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.db.models import Exists, OuterRef
+from django.test import (
+    SimpleTestCase, TestCase, TransactionTestCase, skipUnlessDBFeature,
+)
 
 from .models import (
     Award, AwardNote, Book, Child, Contact, Eaten, Email, File, Food, FooFile,
@@ -292,20 +295,6 @@ class Ticket19102Tests(TestCase):
         self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
 
     @skipUnlessDBFeature("update_can_self_select")
-    @skipUnlessDBFeature('can_distinct_on_fields')
-    def test_ticket_19102_distinct_on(self):
-        # Both Login objs should have same description so that only the one
-        # having smaller PK will be deleted.
-        Login.objects.update(description='description')
-        with self.assertNumQueries(1):
-            Login.objects.distinct('description').order_by('pk').filter(
-                orgunit__name__isnull=False
-            ).delete()
-        # Assumed that l1 which is created first has smaller PK.
-        self.assertFalse(Login.objects.filter(pk=self.l1.pk).exists())
-        self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
-
-    @skipUnlessDBFeature("update_can_self_select")
     def test_ticket_19102_select_related(self):
         with self.assertNumQueries(1):
             Login.objects.filter(
@@ -366,3 +355,25 @@ class DeleteTests(TestCase):
         self.assertEqual(researcher1.secondary_contact, contact2)
         self.assertEqual(researcher2.primary_contact, contact2)
         self.assertIsNone(researcher2.secondary_contact)
+
+    def test_self_reference_with_through_m2m_at_second_level(self):
+        toy = Toy.objects.create(name='Paints')
+        child = Child.objects.create(name='Juan')
+        Book.objects.create(pagecount=500, owner=child)
+        PlayedWith.objects.create(child=child, toy=toy, date=datetime.date.today())
+        Book.objects.filter(Exists(
+            Book.objects.filter(
+                pk=OuterRef('pk'),
+                owner__toys=toy.pk,
+            ),
+        )).delete()
+        self.assertIs(Book.objects.exists(), False)
+
+
+class DeleteDistinct(SimpleTestCase):
+    def test_disallowed_delete_distinct(self):
+        msg = 'Cannot call delete() after .distinct().'
+        with self.assertRaisesMessage(TypeError, msg):
+            Book.objects.distinct().delete()
+        with self.assertRaisesMessage(TypeError, msg):
+            Book.objects.distinct('id').delete()

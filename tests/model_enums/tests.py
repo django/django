@@ -48,7 +48,7 @@ class ChoicesTests(SimpleTestCase):
         self.assertEqual(Suit.values, [1, 2, 3, 4])
         self.assertEqual(Suit.names, ['DIAMOND', 'SPADE', 'HEART', 'CLUB'])
 
-        self.assertEqual(repr(Suit.DIAMOND), '<Suit.DIAMOND: 1>')
+        self.assertEqual(repr(Suit.DIAMOND), 'Suit.DIAMOND')
         self.assertEqual(Suit.DIAMOND.label, 'Diamond')
         self.assertEqual(Suit.DIAMOND.value, 1)
         self.assertEqual(Suit['DIAMOND'], Suit.DIAMOND)
@@ -89,7 +89,7 @@ class ChoicesTests(SimpleTestCase):
         self.assertEqual(YearInSchool.values, ['FR', 'SO', 'JR', 'SR', 'GR'])
         self.assertEqual(YearInSchool.names, ['FRESHMAN', 'SOPHOMORE', 'JUNIOR', 'SENIOR', 'GRADUATE'])
 
-        self.assertEqual(repr(YearInSchool.FRESHMAN), "<YearInSchool.FRESHMAN: 'FR'>")
+        self.assertEqual(repr(YearInSchool.FRESHMAN), 'YearInSchool.FRESHMAN')
         self.assertEqual(YearInSchool.FRESHMAN.label, 'Freshman')
         self.assertEqual(YearInSchool.FRESHMAN.value, 'FR')
         self.assertEqual(YearInSchool['FRESHMAN'], YearInSchool.FRESHMAN)
@@ -154,6 +154,30 @@ class ChoicesTests(SimpleTestCase):
         template = Template('{{ Suit.DIAMOND.label }}|{{ Suit.DIAMOND.value }}')
         output = template.render(Context({'Suit': Suit}))
         self.assertEqual(output, 'Diamond|1')
+
+    def test_property_names_conflict_with_member_names(self):
+        with self.assertRaises(AttributeError):
+            models.TextChoices('Properties', 'choices labels names values')
+
+    def test_label_member(self):
+        # label can be used as a member.
+        Stationery = models.TextChoices('Stationery', 'label stamp sticker')
+        self.assertEqual(Stationery.label.label, 'Label')
+        self.assertEqual(Stationery.label.value, 'label')
+        self.assertEqual(Stationery.label.name, 'label')
+
+    def test_do_not_call_in_templates_member(self):
+        # do_not_call_in_templates is not implicitly treated as a member.
+        Special = models.IntegerChoices('Special', 'do_not_call_in_templates')
+        self.assertEqual(
+            Special.do_not_call_in_templates.label,
+            'Do Not Call In Templates',
+        )
+        self.assertEqual(Special.do_not_call_in_templates.value, 1)
+        self.assertEqual(
+            Special.do_not_call_in_templates.name,
+            'do_not_call_in_templates',
+        )
 
 
 class Separator(bytes, models.Choices):

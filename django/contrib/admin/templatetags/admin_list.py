@@ -6,7 +6,7 @@ from django.contrib.admin.utils import (
     label_for_field, lookup_field,
 )
 from django.contrib.admin.views.main import (
-    ALL_VAR, ORDER_VAR, PAGE_VAR, SEARCH_VAR,
+    ALL_VAR, IS_POPUP_VAR, ORDER_VAR, PAGE_VAR, SEARCH_VAR,
 )
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
@@ -24,24 +24,22 @@ from .base import InclusionAdminNode
 
 register = Library()
 
-DOT = '.'
-
 
 @register.simple_tag
 def paginator_number(cl, i):
     """
     Generate an individual page index link in a paginated list.
     """
-    if i == DOT:
-        return '… '
+    if i == cl.paginator.ELLIPSIS:
+        return format_html('{} ', cl.paginator.ELLIPSIS)
     elif i == cl.page_num:
-        return format_html('<span class="this-page">{}</span> ', i + 1)
+        return format_html('<span class="this-page">{}</span> ', i)
     else:
         return format_html(
             '<a href="{}"{}>{}</a> ',
             cl.get_query_string({PAGE_VAR: i}),
-            mark_safe(' class="end"' if i == cl.paginator.num_pages - 1 else ''),
-            i + 1,
+            mark_safe(' class="end"' if i == cl.paginator.num_pages else ''),
+            i,
         )
 
 
@@ -49,39 +47,8 @@ def pagination(cl):
     """
     Generate the series of links to the pages in a paginated list.
     """
-    paginator, page_num = cl.paginator, cl.page_num
-
     pagination_required = (not cl.show_all or not cl.can_show_all) and cl.multi_page
-    if not pagination_required:
-        page_range = []
-    else:
-        ON_EACH_SIDE = 3
-        ON_ENDS = 2
-
-        # If there are 10 or fewer pages, display links to every page.
-        # Otherwise, do some fancy
-        if paginator.num_pages <= 10:
-            page_range = range(paginator.num_pages)
-        else:
-            # Insert "smart" pagination links, so that there are always ON_ENDS
-            # links at either end of the list of pages, and there are always
-            # ON_EACH_SIDE links at either end of the "current page" link.
-            page_range = []
-            if page_num > (ON_EACH_SIDE + ON_ENDS):
-                page_range += [
-                    *range(0, ON_ENDS), DOT,
-                    *range(page_num - ON_EACH_SIDE, page_num + 1),
-                ]
-            else:
-                page_range.extend(range(0, page_num + 1))
-            if page_num < (paginator.num_pages - ON_EACH_SIDE - ON_ENDS - 1):
-                page_range += [
-                    *range(page_num + 1, page_num + ON_EACH_SIDE + 1), DOT,
-                    *range(paginator.num_pages - ON_ENDS, paginator.num_pages)
-                ]
-            else:
-                page_range.extend(range(page_num + 1, paginator.num_pages))
-
+    page_range = cl.paginator.get_elided_page_range(cl.page_num) if pagination_required else []
     need_show_all_link = cl.can_show_all and not cl.show_all and cl.multi_page
     return {
         'cl': cl,
@@ -253,8 +220,6 @@ def items_for_result(cl, result, form):
                     result_repr = display_for_field(value, f, empty_value_display)
                 if isinstance(f, (models.DateField, models.TimeField, models.ForeignKey)):
                     row_classes.append('nowrap')
-        if str(result_repr) == '':
-            result_repr = mark_safe('&nbsp;')
         row_class = mark_safe(' class="%s"' % ' '.join(row_classes))
         # If list_display_links not defined, add the link tag to the first field
         if link_in_col(first, field_name, cl):
@@ -269,7 +234,7 @@ def items_for_result(cl, result, form):
                 link_or_text = result_repr
             else:
                 url = add_preserved_filters({'preserved_filters': cl.preserved_filters, 'opts': cl.opts}, url)
-                # Convert the pk to something that can be used in Javascript.
+                # Convert the pk to something that can be used in JavaScript.
                 # Problem cases are non-ASCII strings.
                 if cl.to_field:
                     attr = str(cl.to_field)
@@ -382,12 +347,12 @@ def date_hierarchy(cl):
             # select appropriate start level
             date_range = cl.queryset.aggregate(first=models.Min(field_name),
                                                last=models.Max(field_name))
-            if dates_or_datetimes == 'datetimes':
-                date_range = {
-                    k: timezone.localtime(v) if timezone.is_aware(v) else v
-                    for k, v in date_range.items()
-                }
             if date_range['first'] and date_range['last']:
+                if dates_or_datetimes == 'datetimes':
+                    date_range = {
+                        k: timezone.localtime(v) if timezone.is_aware(v) else v
+                        for k, v in date_range.items()
+                    }
                 if date_range['first'].year == date_range['last'].year:
                     year_lookup = date_range['first'].year
                     if date_range['first'].month == date_range['last'].month:
@@ -458,7 +423,8 @@ def search_form(cl):
     return {
         'cl': cl,
         'show_result_count': cl.result_count != cl.full_result_count,
-        'search_var': SEARCH_VAR
+        'search_var': SEARCH_VAR,
+        'is_popup_var': IS_POPUP_VAR,
     }
 
 

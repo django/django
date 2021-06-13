@@ -280,6 +280,31 @@ class SignalTests(BaseSignalSetup, TestCase):
         signals.pre_init.disconnect(callback)
         ref.assert_not_called()
 
+    @isolate_apps('signals', kwarg_name='apps')
+    def test_disconnect_model(self, apps):
+        received = []
+
+        def receiver(**kwargs):
+            received.append(kwargs)
+
+        class Created(models.Model):
+            pass
+
+        signals.post_init.connect(receiver, sender=Created, apps=apps)
+        try:
+            self.assertIs(
+                signals.post_init.disconnect(receiver, sender=Created, apps=apps),
+                True,
+            )
+            self.assertIs(
+                signals.post_init.disconnect(receiver, sender=Created, apps=apps),
+                False,
+            )
+            Created()
+            self.assertEqual(received, [])
+        finally:
+            signals.post_init.disconnect(receiver, sender=Created)
+
 
 class LazyModelRefTests(BaseSignalSetup, SimpleTestCase):
     def setUp(self):
@@ -326,20 +351,51 @@ class LazyModelRefTests(BaseSignalSetup, SimpleTestCase):
             signals.post_init.disconnect(self.receiver, sender=Created)
 
     @isolate_apps('signals', kwarg_name='apps')
-    def test_disconnect(self, apps):
+    def test_disconnect_registered_model(self, apps):
+        received = []
+
+        def receiver(**kwargs):
+            received.append(kwargs)
+
+        class Created(models.Model):
+            pass
+
+        signals.post_init.connect(receiver, sender='signals.Created', apps=apps)
+        try:
+            self.assertIsNone(
+                signals.post_init.disconnect(receiver, sender='signals.Created', apps=apps)
+            )
+            self.assertIsNone(
+                signals.post_init.disconnect(receiver, sender='signals.Created', apps=apps)
+            )
+            Created()
+            self.assertEqual(received, [])
+        finally:
+            signals.post_init.disconnect(receiver, sender='signals.Created')
+
+    @isolate_apps('signals', kwarg_name='apps')
+    def test_disconnect_unregistered_model(self, apps):
         received = []
 
         def receiver(**kwargs):
             received.append(kwargs)
 
         signals.post_init.connect(receiver, sender='signals.Created', apps=apps)
-        signals.post_init.disconnect(receiver, sender='signals.Created', apps=apps)
+        try:
+            self.assertIsNone(
+                signals.post_init.disconnect(receiver, sender='signals.Created', apps=apps)
+            )
+            self.assertIsNone(
+                signals.post_init.disconnect(receiver, sender='signals.Created', apps=apps)
+            )
 
-        class Created(models.Model):
-            pass
+            class Created(models.Model):
+                pass
 
-        Created()
-        self.assertEqual(received, [])
+            Created()
+            self.assertEqual(received, [])
+        finally:
+            signals.post_init.disconnect(receiver, sender='signals.Created')
 
     def test_register_model_class_senders_immediately(self):
         """

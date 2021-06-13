@@ -28,8 +28,17 @@ class Category(models.Model):
         return self.__str__()
 
 
+class WriterManager(models.Manager):
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(archived=False)
+
+
 class Writer(models.Model):
     name = models.CharField(max_length=50, help_text='Use both first and last names.')
+    archived = models.BooleanField(default=False, editable=False)
+
+    objects = WriterManager()
 
     class Meta:
         ordering = ('name',)
@@ -402,9 +411,14 @@ class StumpJoke(models.Model):
         Character,
         models.CASCADE,
         limit_choices_to=today_callable_dict,
-        related_name="+",
+        related_name='jokes',
     )
-    has_fooled_today = models.ManyToManyField(Character, limit_choices_to=today_callable_q, related_name="+")
+    has_fooled_today = models.ManyToManyField(
+        Character,
+        limit_choices_to=today_callable_q,
+        related_name='jokes_today',
+    )
+    funny = models.BooleanField(default=False)
 
 
 # Model for #13776
@@ -463,3 +477,6 @@ class Award(models.Model):
 
 class NullableUniqueCharFieldModel(models.Model):
     codename = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    email = models.EmailField(blank=True, null=True)
+    slug = models.SlugField(blank=True, null=True)
+    url = models.URLField(blank=True, null=True)

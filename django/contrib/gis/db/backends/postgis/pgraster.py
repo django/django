@@ -1,6 +1,6 @@
 import struct
 
-from django.forms import ValidationError
+from django.core.exceptions import ValidationError
 
 from .const import (
     BANDTYPE_FLAG_HASNODATA, BANDTYPE_PIXTYPE_MASK, GDAL_TO_POSTGIS,

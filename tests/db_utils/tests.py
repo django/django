@@ -5,6 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS, ProgrammingError, connection
 from django.db.utils import ConnectionHandler, load_backend
 from django.test import SimpleTestCase, TestCase
+from django.utils.connection import ConnectionDoesNotExist
 
 
 class ConnectionHandlerTests(SimpleTestCase):
@@ -38,6 +39,30 @@ class ConnectionHandlerTests(SimpleTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             conns['other'].ensure_connection()
 
+    def test_nonexistent_alias(self):
+        msg = "The connection 'nonexistent' doesn't exist."
+        conns = ConnectionHandler({
+            DEFAULT_DB_ALIAS: {'ENGINE': 'django.db.backends.dummy'},
+        })
+        with self.assertRaisesMessage(ConnectionDoesNotExist, msg):
+            conns['nonexistent']
+
+    def test_ensure_defaults_nonexistent_alias(self):
+        msg = "The connection 'nonexistent' doesn't exist."
+        conns = ConnectionHandler({
+            DEFAULT_DB_ALIAS: {'ENGINE': 'django.db.backends.dummy'},
+        })
+        with self.assertRaisesMessage(ConnectionDoesNotExist, msg):
+            conns.ensure_defaults('nonexistent')
+
+    def test_prepare_test_settings_nonexistent_alias(self):
+        msg = "The connection 'nonexistent' doesn't exist."
+        conns = ConnectionHandler({
+            DEFAULT_DB_ALIAS: {'ENGINE': 'django.db.backends.dummy'},
+        })
+        with self.assertRaisesMessage(ConnectionDoesNotExist, msg):
+            conns.prepare_test_settings('nonexistent')
+
 
 class DatabaseErrorWrapperTests(TestCase):
 
@@ -57,8 +82,9 @@ class LoadBackendTests(SimpleTestCase):
 
     def test_load_backend_invalid_name(self):
         msg = (
-            "'foo' isn't an available database backend.\n"
-            "Try using 'django.db.backends.XXX', where XXX is one of:\n"
+            "'foo' isn't an available database backend or couldn't be "
+            "imported. Check the above exception. To use one of the built-in "
+            "backends, use 'django.db.backends.XXX', where XXX is one of:\n"
             "    'mysql', 'oracle', 'postgresql', 'sqlite3'"
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg) as cm:

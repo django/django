@@ -1,3 +1,4 @@
+from django.contrib import admin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -15,7 +16,11 @@ class Article(models.Model):
     """
     site = models.ForeignKey(Site, models.CASCADE, related_name="admin_articles")
     title = models.CharField(max_length=100)
-    hist = models.CharField(max_length=100, verbose_name=_("History"))
+    hist = models.CharField(
+        max_length=100,
+        verbose_name=_('History'),
+        help_text=_('History help text'),
+    )
     created = models.DateTimeField(null=True)
 
     def __str__(self):
@@ -24,9 +29,9 @@ class Article(models.Model):
     def test_from_model(self):
         return "nothing"
 
+    @admin.display(description='not What you Expect')
     def test_from_model_with_override(self):
         return "nothing"
-    test_from_model_with_override.short_description = "not What you Expect"
 
 
 class ArticleProxy(Article):

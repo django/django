@@ -4,6 +4,7 @@
 # André Hagenbruch, 2012
 # Florian Apolloner <florian@apolloner.eu>, 2011
 # Dimitris Glezos <glezos@transifex.com>, 2012
+# Florian Apolloner <florian@apolloner.eu>, 2020
 # Jannis Vajen, 2013
 # Jannis Leidel <jannis@leidel.info>, 2013-2018,2020
 # Jannis Vajen, 2016
@@ -13,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-01-17 22:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2020-07-14 19:53+0200\n"
+"PO-Revision-Date: 2020-07-17 07:47+0000\n"
+"Last-Translator: Florian Apolloner <florian@apolloner.eu>\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -73,6 +74,12 @@ msgstr "Kein Datum"
 
 msgid "Has date"
 msgstr "Besitzt Datum"
+
+msgid "Empty"
+msgstr "Leer"
+
+msgid "Not empty"
+msgstr "Nicht leer"
 
 #, python-format
 msgid ""
@@ -252,8 +259,8 @@ msgstr "Datenbankfehler"
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] "%(count)s \"%(name)s\" wurde erfolgreich geändert."
-msgstr[1] "%(count)s \"%(name)s\" wurden erfolgreich geändert."
+msgstr[0] "%(count)s %(name)s wurde erfolgreich geändert."
+msgstr[1] "%(count)s %(name)s wurden erfolgreich geändert."
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -341,6 +348,21 @@ msgstr "Alle %(total_count)s %(module_name)s auswählen"
 msgid "Clear selection"
 msgstr "Auswahl widerrufen"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modelle der %(name)s-Anwendung"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "View"
+msgstr "Ansehen"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr ""
+"Das Benutzerkonto besitzt nicht die nötigen Rechte, um etwas anzusehen oder "
+"zu ändern."
+
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
@@ -391,6 +413,9 @@ msgstr "Auf der Website anzeigen"
 msgid "Filter"
 msgstr "Filter"
 
+msgid "Clear all filters"
+msgstr "Alle Filter zurücksetzen"
+
 msgid "Remove from sorting"
 msgstr "Aus der Sortierung entfernen"
 
@@ -410,9 +435,9 @@ msgid ""
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Das Löschen des %(object_name)s \"%(escaped_object)s\" hätte das Löschen "
-"davon abhängiger Daten zur Folge, aber Sie haben nicht die nötigen Rechte, "
-"um die folgenden davon abhängigen Daten zu löschen:"
+"Das Löschen des %(object_name)s „%(escaped_object)s“ hätte das Löschen davon "
+"abhängiger Daten zur Folge, aber Sie haben nicht die nötigen Rechte, um die "
+"folgenden davon abhängigen Daten zu löschen:"
 
 #, python-format
 msgid ""
@@ -427,7 +452,7 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Sind Sie sicher, dass Sie %(object_name)s \"%(escaped_object)s\" löschen "
+"Sind Sie sicher, dass Sie %(object_name)s „%(escaped_object)s“ löschen "
 "wollen? Es werden zusätzlich die folgenden davon abhängigen Daten gelöscht:"
 
 msgid "Objects"
@@ -468,9 +493,6 @@ msgstr ""
 "Sind Sie sicher, dass Sie die ausgewählten %(objects_name)s löschen wollen? "
 "Alle folgenden Objekte und ihre verwandten Objekte werden gelöscht:"
 
-msgid "View"
-msgstr "Ansehen"
-
 msgid "Delete?"
 msgstr "Löschen?"
 
@@ -480,18 +502,6 @@ msgstr " Nach %(filter_title)s "
 
 msgid "Summary"
 msgstr "Zusammenfassung"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modelle der %(name)s-Anwendung"
-
-msgid "Add"
-msgstr "Hinzufügen"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr ""
-"Das Benutzerkonto besitzt nicht die nötigen Rechte, um etwas anzusehen oder "
-"zu ändern."
 
 msgid "Recent actions"
 msgstr "Neueste Aktionen"
@@ -524,6 +534,9 @@ msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "Benutzername oder Passwort vergessen?"
+
+msgid "Toggle navigation"
+msgstr "Navigation ein-/ausblenden"
 
 msgid "Date/time"
 msgstr "Datum/Zeit"

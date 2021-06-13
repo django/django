@@ -24,6 +24,11 @@ __all__ = [
 # UTC time zone as a tzinfo instance.
 utc = pytz.utc
 
+_PYTZ_BASE_CLASSES = (pytz.tzinfo.BaseTzInfo, pytz._FixedOffset)
+# In releases prior to 2018.4, pytz.UTC was not a subclass of BaseTzInfo
+if not isinstance(pytz.UTC, pytz._FixedOffset):
+    _PYTZ_BASE_CLASSES = _PYTZ_BASE_CLASSES + (type(pytz.UTC),)
+
 
 def get_fixed_timezone(offset):
     """Return a tzinfo instance with a fixed offset from UTC."""
@@ -68,7 +73,7 @@ def get_current_timezone_name():
 
 def _get_timezone_name(timezone):
     """Return the name of ``timezone``."""
-    return timezone.tzname(None)
+    return str(timezone)
 
 # Timezone selection functions.
 
@@ -189,11 +194,7 @@ def now():
     """
     Return an aware or naive datetime.datetime, depending on settings.USE_TZ.
     """
-    if settings.USE_TZ:
-        # timeit shows that datetime.now(tz=utc) is 24% slower
-        return datetime.utcnow().replace(tzinfo=utc)
-    else:
-        return datetime.now()
+    return datetime.now(tz=utc if settings.USE_TZ else None)
 
 
 # By design, these four functions don't perform any checks on their arguments.
@@ -229,7 +230,7 @@ def make_aware(value, timezone=None, is_dst=None):
     """Make a naive datetime.datetime in a given time zone aware."""
     if timezone is None:
         timezone = get_current_timezone()
-    if hasattr(timezone, 'localize'):
+    if _is_pytz_zone(timezone):
         # This method is available for pytz time zones.
         return timezone.localize(value, is_dst=is_dst)
     else:
@@ -249,3 +250,20 @@ def make_naive(value, timezone=None):
     if is_naive(value):
         raise ValueError("make_naive() cannot be applied to a naive datetime")
     return value.astimezone(timezone).replace(tzinfo=None)
+
+
+def _is_pytz_zone(tz):
+    """Checks if a zone is a pytz zone."""
+    return isinstance(tz, _PYTZ_BASE_CLASSES)
+
+
+def _datetime_ambiguous_or_imaginary(dt, tz):
+    if _is_pytz_zone(tz):
+        try:
+            tz.utcoffset(dt)
+        except (pytz.AmbiguousTimeError, pytz.NonExistentTimeError):
+            return True
+        else:
+            return False
+
+    return tz.utcoffset(dt.replace(fold=not dt.fold)) != tz.utcoffset(dt)

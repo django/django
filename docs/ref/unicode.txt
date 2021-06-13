@@ -18,8 +18,8 @@ able to store certain characters in the database, and information will be lost.
 * MySQL users, refer to the `MySQL manual`_ for details on how to set or alter
   the database character set encoding.
 
-* PostgreSQL users, refer to the `PostgreSQL manual`_ (section 22.3.2 in
-  PostgreSQL 9) for details on creating databases with the correct encoding.
+* PostgreSQL users, refer to the `PostgreSQL manual`_ for details on creating
+  databases with the correct encoding.
 
 * Oracle users, refer to the `Oracle manual`_ for details on how to set
   (`section 2`_) or alter (`section 11`_) the database character set encoding.
@@ -28,7 +28,7 @@ able to store certain characters in the database, and information will be lost.
   for internal encoding.
 
 .. _MySQL manual: https://dev.mysql.com/doc/refman/en/charset-database.html
-.. _PostgreSQL manual: https://www.postgresql.org/docs/current/multibyte.html
+.. _PostgreSQL manual: https://www.postgresql.org/docs/current/multibyte.html#id-1.6.10.5.6
 .. _Oracle manual: https://docs.oracle.com/en/database/oracle/oracle-database/18/nlspg/index.html
 .. _section 2: https://docs.oracle.com/en/database/oracle/oracle-database/18/nlspg/choosing-character-set.html
 .. _section 11: https://docs.oracle.com/en/database/oracle/oracle-database/18/nlspg/character-set-migration.html
@@ -143,11 +143,12 @@ from then on, you can treat the result as always being a string.
 URI and IRI handling
 ~~~~~~~~~~~~~~~~~~~~
 
-Web frameworks have to deal with URLs (which are a type of IRI_). One
+Web frameworks have to deal with URLs (which are a type of IRI). One
 requirement of URLs is that they are encoded using only ASCII characters.
 However, in an international environment, you might need to construct a
-URL from an IRI_ -- very loosely speaking, a URI_ that can contain Unicode
-characters. Use these functions for quoting and converting an IRI to a URI:
+URL from an :rfc:`IRI <3987>` -- very loosely speaking, a :rfc:`URI <2396>`
+that can contain Unicode characters. Use these functions for quoting and
+converting an IRI to a URI:
 
 * The :func:`django.utils.encoding.iri_to_uri()` function, which implements the
   conversion from IRI to URI as required by :rfc:`3987#section-3.1`.
@@ -212,9 +213,6 @@ following is always true::
 
 So you can safely call it multiple times on the same URI/IRI without risking
 double-quoting problems.
-
-.. _URI: https://www.ietf.org/rfc/rfc2396.txt
-.. _IRI: https://www.ietf.org/rfc/rfc3987.txt
 
 Models
 ======

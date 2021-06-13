@@ -1,4 +1,4 @@
-from django.db.models import CharField, Value
+from django.db.models import IntegerField, Value
 from django.db.models.functions import Lower, Right
 from django.test import TestCase
 
@@ -23,5 +23,5 @@ class RightTests(TestCase):
             Author.objects.annotate(raises=Right('name', 0))
 
     def test_expressions(self):
-        authors = Author.objects.annotate(name_part=Right('name', Value(3), output_field=CharField()))
+        authors = Author.objects.annotate(name_part=Right('name', Value(3, output_field=IntegerField())))
         self.assertQuerysetEqual(authors.order_by('name'), ['ith', 'nda'], lambda a: a.name_part)

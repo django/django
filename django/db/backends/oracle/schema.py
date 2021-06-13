@@ -14,6 +14,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_not_null = "MODIFY %(column)s NOT NULL"
     sql_alter_column_default = "MODIFY %(column)s DEFAULT %(default)s"
     sql_alter_column_no_default = "MODIFY %(column)s DEFAULT NULL"
+    sql_alter_column_no_default_null = sql_alter_column_no_default
+    sql_alter_column_collate = "MODIFY %(column)s %(type)s%(collation)s"
+
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
     sql_create_column_inline_fk = 'CONSTRAINT %(name)s REFERENCES %(to_table)s(%(to_column)s)%(deferrable)s'
     sql_delete_table = "DROP TABLE %(table)s CASCADE CONSTRAINTS"
@@ -122,6 +125,17 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Rename and possibly make the new field NOT NULL
         super().alter_field(model, new_temp_field, new_field)
 
+    def _alter_column_type_sql(self, model, old_field, new_field, new_type):
+        auto_field_types = {'AutoField', 'BigAutoField', 'SmallAutoField'}
+        # Drop the identity if migrating away from AutoField.
+        if (
+            old_field.get_internal_type() in auto_field_types and
+            new_field.get_internal_type() not in auto_field_types and
+            self._is_identity_column(model._meta.db_table, new_field.column)
+        ):
+            self._drop_identity(model._meta.db_table, new_field.column)
+        return super()._alter_column_type_sql(model, old_field, new_field, new_type)
+
     def normalize_name(self, name):
         """
         Get the properly shortened and uppercased identifier as returned by
@@ -170,3 +184,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             'table': self.quote_name(table_name),
             'column': self.quote_name(column_name),
         })
+
+    def _get_default_collation(self, table_name):
+        with self.connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT default_collation FROM user_tables WHERE table_name = %s
+            """, [self.normalize_name(table_name)])
+            return cursor.fetchone()[0]
+
+    def _alter_column_collation_sql(self, model, new_field, new_type, new_collation):
+        if new_collation is None:
+            new_collation = self._get_default_collation(model._meta.db_table)
+        return super()._alter_column_collation_sql(model, new_field, new_type, new_collation)

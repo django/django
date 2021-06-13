@@ -34,7 +34,12 @@ class CustomManyToManyField(RelatedField):
         self.db_table = db_table
         if kwargs['rel'].through is not None:
             assert self.db_table is None, "Cannot specify a db_table if an intermediary model is used."
-        super().__init__(**kwargs)
+        super().__init__(
+            related_name=related_name,
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
+            **kwargs,
+        )
 
     def contribute_to_class(self, cls, name, **kwargs):
         if self.remote_field.symmetrical and (

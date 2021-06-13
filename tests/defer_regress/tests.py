@@ -121,13 +121,13 @@ class DeferRegressionTest(TestCase):
             list)
 
     def test_ticket_23270(self):
-        Derived.objects.create(text="foo", other_text="bar")
+        d = Derived.objects.create(text="foo", other_text="bar")
         with self.assertNumQueries(1):
             obj = Base.objects.select_related("derived").defer("text")[0]
             self.assertIsInstance(obj.derived, Derived)
             self.assertEqual("bar", obj.derived.other_text)
             self.assertNotIn("text", obj.__dict__)
-            self.assertEqual(1, obj.derived.base_ptr_id)
+            self.assertEqual(d.pk, obj.derived.base_ptr_id)
 
     def test_only_and_defer_usage_on_proxy_models(self):
         # Regression for #15790 - only() broken for proxy models

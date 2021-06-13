@@ -1,11 +1,12 @@
+import pickle
+import sys
 import unittest
 
 from django.test import SimpleTestCase
 from django.test.runner import RemoteTestResult
-from django.utils.version import PY37
 
 try:
-    import tblib
+    import tblib.pickling_support
 except ImportError:
     tblib = None
 
@@ -52,6 +53,48 @@ class SampleFailingSubtest(SimpleTestCase):
 
 class RemoteTestResultTest(SimpleTestCase):
 
+    def _test_error_exc_info(self):
+        try:
+            raise ValueError('woops')
+        except ValueError:
+            return sys.exc_info()
+
+    def test_was_successful_no_events(self):
+        result = RemoteTestResult()
+        self.assertIs(result.wasSuccessful(), True)
+
+    def test_was_successful_one_success(self):
+        result = RemoteTestResult()
+        result.addSuccess(None)
+        self.assertIs(result.wasSuccessful(), True)
+
+    def test_was_successful_one_expected_failure(self):
+        result = RemoteTestResult()
+        result.addExpectedFailure(None, self._test_error_exc_info())
+        self.assertIs(result.wasSuccessful(), True)
+
+    def test_was_successful_one_skip(self):
+        result = RemoteTestResult()
+        result.addSkip(None, 'Skipped')
+        self.assertIs(result.wasSuccessful(), True)
+
+    @unittest.skipUnless(tblib is not None, 'requires tblib to be installed')
+    def test_was_successful_one_error(self):
+        result = RemoteTestResult()
+        result.addError(None, self._test_error_exc_info())
+        self.assertIs(result.wasSuccessful(), False)
+
+    @unittest.skipUnless(tblib is not None, 'requires tblib to be installed')
+    def test_was_successful_one_failure(self):
+        result = RemoteTestResult()
+        result.addFailure(None, self._test_error_exc_info())
+        self.assertIs(result.wasSuccessful(), False)
+
+    def test_picklable(self):
+        result = RemoteTestResult()
+        loaded_result = pickle.loads(pickle.dumps(result))
+        self.assertEqual(result.events, loaded_result.events)
+
     def test_pickle_errors_detection(self):
         picklable_error = RuntimeError('This is fine')
         not_unpicklable_error = ExceptionThatFailsUnpickling('arg')
@@ -76,12 +119,12 @@ class RemoteTestResultTest(SimpleTestCase):
 
         events = result.events
         self.assertEqual(len(events), 4)
+        self.assertIs(result.wasSuccessful(), False)
 
         event = events[1]
         self.assertEqual(event[0], 'addSubTest')
         self.assertEqual(str(event[2]), 'dummy_test (test_runner.test_parallel.SampleFailingSubtest) (index=0)')
-        trailing_comma = '' if PY37 else ','
-        self.assertEqual(repr(event[3][1]), "AssertionError('0 != 1'%s)" % trailing_comma)
+        self.assertEqual(repr(event[3][1]), "AssertionError('0 != 1')")
 
         event = events[2]
-        self.assertEqual(repr(event[3][1]), "AssertionError('2 != 1'%s)" % trailing_comma)
+        self.assertEqual(repr(event[3][1]), "AssertionError('2 != 1')")

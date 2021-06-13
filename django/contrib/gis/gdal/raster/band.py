@@ -152,8 +152,6 @@ class GDALBand(GDALRasterBase):
         Set the nodata value for this band.
         """
         if value is None:
-            if not capi.delete_band_nodata_value:
-                raise ValueError('GDAL >= 2.1 required to delete nodata values.')
             capi.delete_band_nodata_value(self._ptr)
         elif not isinstance(value, (int, float)):
             raise ValueError('Nodata value must be numeric or None.')

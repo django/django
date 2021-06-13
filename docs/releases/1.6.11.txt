@@ -13,9 +13,9 @@ Last year :func:`~django.utils.html.strip_tags`  was changed to work
 iteratively. The problem is that the size of the input it's processing can
 increase on each iteration which results in an infinite loop in
 ``strip_tags()``. This issue only affects versions of Python that haven't
-received  `a bugfix in HTMLParser <https://bugs.python.org/issue20288>`_; namely
-Python < 2.7.7 and 3.3.5. Some operating system vendors have also backported
-the fix for the Python bug into their packages of earlier versions.
+received :bpo:`a bugfix in HTMLParser <20288>`; namely Python < 2.7.7 and
+3.3.5. Some operating system vendors have also backported the fix for the
+Python bug into their packages of earlier versions.
 
 To remedy this issue, ``strip_tags()`` will now return the original input if
 it detects the length of the string it's processing increases. Remember that

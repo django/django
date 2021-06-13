@@ -1,10 +1,12 @@
 import unittest
 
 from django.db import DatabaseError, connection
-from django.db.models import BooleanField, NullBooleanField
+from django.db.models import BooleanField
 from django.test import TransactionTestCase
 
-from ..models import Square
+from ..models import (
+    Square, VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ,
+)
 
 
 @unittest.skipUnless(connection.vendor == 'oracle', 'Oracle tests')
@@ -15,6 +17,13 @@ class Tests(unittest.TestCase):
         name = '"SOME%NAME"'
         quoted_name = connection.ops.quote_name(name)
         self.assertEqual(quoted_name % (), name)
+
+    def test_quote_name_db_table(self):
+        model = VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
+        db_table = model._meta.db_table.upper()
+        self.assertEqual(f'"{db_table}"', connection.ops.quote_name(
+            'backends_verylongmodelnamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+        ))
 
     def test_dbms_session(self):
         """A stored procedure can be called through a cursor wrapper."""
@@ -48,7 +57,7 @@ class Tests(unittest.TestCase):
 
     def test_boolean_constraints(self):
         """Boolean fields have check constraints on their values."""
-        for field in (BooleanField(), NullBooleanField(), BooleanField(null=True)):
+        for field in (BooleanField(), BooleanField(null=True)):
             with self.subTest(field=field):
                 field.set_attributes_from_name('is_nice')
                 self.assertIn('"IS_NICE" IN (0,1)', field.db_check(connection))
@@ -86,7 +95,10 @@ class TransactionalTests(TransactionTestCase):
         old_password = connection.settings_dict['PASSWORD']
         connection.settings_dict['PASSWORD'] = 'p@ssword'
         try:
-            self.assertIn('/"p@ssword"@', connection._connect_string())
+            self.assertIn(
+                '/"p@ssword"@',
+                connection.client.connect_string(connection.settings_dict),
+            )
             with self.assertRaises(DatabaseError) as context:
                 connection.cursor()
             # Database exception: "ORA-01017: invalid username/password" is

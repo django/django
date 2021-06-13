@@ -1,6 +1,4 @@
 import logging
-import warnings
-from functools import update_wrapper
 
 from django.core.exceptions import ImproperlyConfigured
 from django.http import (
@@ -10,8 +8,6 @@ from django.http import (
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import classonlymethod
-from django.utils.deprecation import RemovedInDjango40Warning
-from django.utils.functional import SimpleLazyObject
 
 logger = logging.getLogger('django.request')
 
@@ -74,12 +70,16 @@ class View:
         view.view_class = cls
         view.view_initkwargs = initkwargs
 
-        # take name and docstring from class
-        update_wrapper(view, cls, updated=())
+        # __name__ and __qualname__ are intentionally left unchanged as
+        # view_class should be used to robustly determine the name of the view
+        # instead.
+        view.__doc__ = cls.__doc__
+        view.__module__ = cls.__module__
+        view.__annotations__ = cls.dispatch.__annotations__
+        # Copy possible attributes set by decorators, e.g. @csrf_exempt, from
+        # the dispatch method.
+        view.__dict__.update(cls.dispatch.__dict__)
 
-        # and possible attributes set by decorators
-        # like csrf_exempt from dispatch
-        update_wrapper(view, cls.dispatch, assigned=())
         return view
 
     def setup(self, request, *args, **kwargs):
@@ -110,8 +110,8 @@ class View:
     def options(self, request, *args, **kwargs):
         """Handle responding to requests for the OPTIONS HTTP verb."""
         response = HttpResponse()
-        response['Allow'] = ', '.join(self._allowed_methods())
-        response['Content-Length'] = '0'
+        response.headers['Allow'] = ', '.join(self._allowed_methods())
+        response.headers['Content-Length'] = '0'
         return response
 
     def _allowed_methods(self):
@@ -155,31 +155,12 @@ class TemplateResponseMixin:
 
 
 class TemplateView(TemplateResponseMixin, ContextMixin, View):
-    """Render a template."""
+    """
+    Render a template. Pass keyword arguments from the URLconf to the context.
+    """
     def get(self, request, *args, **kwargs):
-        # RemovedInDjango40Warning: when the deprecation ends, replace with:
-        #   context = self.get_context_data()
-        context_kwargs = _wrap_url_kwargs_with_deprecation_warning(kwargs)
-        context = self.get_context_data(**context_kwargs)
+        context = self.get_context_data(**kwargs)
         return self.render_to_response(context)
-
-
-# RemovedInDjango40Warning
-def _wrap_url_kwargs_with_deprecation_warning(url_kwargs):
-    context_kwargs = {}
-    for key, value in url_kwargs.items():
-        # Bind into function closure.
-        @SimpleLazyObject
-        def access_value(key=key, value=value):
-            warnings.warn(
-                'TemplateView passing URL kwargs to the context is '
-                'deprecated. Reference %s in your template through '
-                'view.kwargs instead.' % key,
-                RemovedInDjango40Warning, stacklevel=2,
-            )
-            return value
-        context_kwargs[key] = access_value
-    return context_kwargs
 
 
 class RedirectView(View):

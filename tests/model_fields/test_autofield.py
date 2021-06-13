@@ -9,14 +9,17 @@ from .test_integerfield import (
 
 class AutoFieldTests(IntegerFieldTests):
     model = AutoModel
+    rel_db_type_class = models.IntegerField
 
 
 class BigAutoFieldTests(BigIntegerFieldTests):
     model = BigAutoModel
+    rel_db_type_class = models.BigIntegerField
 
 
 class SmallAutoFieldTests(SmallIntegerFieldTests):
     model = SmallAutoModel
+    rel_db_type_class = models.SmallIntegerField
 
 
 class AutoFieldInheritanceTests(SimpleTestCase):
@@ -27,6 +30,18 @@ class AutoFieldInheritanceTests(SimpleTestCase):
                 self.assertIsInstance(field(), models.AutoField)
 
     def test_issubclass_of_autofield(self):
-        for field in (models.BigAutoField, models.SmallAutoField):
+        class MyBigAutoField(models.BigAutoField):
+            pass
+
+        class MySmallAutoField(models.SmallAutoField):
+            pass
+
+        tests = [
+            MyBigAutoField,
+            MySmallAutoField,
+            models.BigAutoField,
+            models.SmallAutoField,
+        ]
+        for field in tests:
             with self.subTest(field.__name__):
                 self.assertTrue(issubclass(field, models.AutoField))

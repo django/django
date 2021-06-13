@@ -81,8 +81,8 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     @cached_property
     def unsupported_functions(self):
         unsupported = {'BoundingCircle', 'GeometryDistance', 'MemSize'}
-        if not self.lwgeom_version():
-            unsupported |= {'Azimuth', 'GeoHash', 'IsValid', 'MakeValid'}
+        if not self.geom_lib_version():
+            unsupported |= {'Azimuth', 'GeoHash', 'MakeValid'}
         return unsupported
 
     @cached_property
@@ -159,13 +159,27 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         "Return the version of GEOS used by SpatiaLite as a string."
         return self._get_spatialite_func('geos_version()')
 
-    def proj4_version(self):
-        "Return the version of the PROJ.4 library used by SpatiaLite."
+    def proj_version(self):
+        """Return the version of the PROJ library used by SpatiaLite."""
         return self._get_spatialite_func('proj4_version()')
 
     def lwgeom_version(self):
         """Return the version of LWGEOM library used by SpatiaLite."""
         return self._get_spatialite_func('lwgeom_version()')
+
+    def rttopo_version(self):
+        """Return the version of RTTOPO library used by SpatiaLite."""
+        return self._get_spatialite_func('rttopo_version()')
+
+    def geom_lib_version(self):
+        """
+        Return the version of the version-dependant geom library used by
+        SpatiaLite.
+        """
+        if self.spatial_version >= (5,):
+            return self.rttopo_version()
+        else:
+            return self.lwgeom_version()
 
     def spatialite_version(self):
         "Return the SpatiaLite library version as a string."
@@ -189,11 +203,15 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     # Routines for getting the OGC-compliant models.
     def geometry_columns(self):
-        from django.contrib.gis.db.backends.spatialite.models import SpatialiteGeometryColumns
+        from django.contrib.gis.db.backends.spatialite.models import (
+            SpatialiteGeometryColumns,
+        )
         return SpatialiteGeometryColumns
 
     def spatial_ref_sys(self):
-        from django.contrib.gis.db.backends.spatialite.models import SpatialiteSpatialRefSys
+        from django.contrib.gis.db.backends.spatialite.models import (
+            SpatialiteSpatialRefSys,
+        )
         return SpatialiteSpatialRefSys
 
     def get_geometry_converter(self, expression):

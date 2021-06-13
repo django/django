@@ -7,8 +7,8 @@ from django.utils.safestring import SafeData, mark_safe
 
 class customescape(str):
     def __html__(self):
-        # implement specific and obviously wrong escaping
-        # in order to be able to tell for sure when it runs
+        # Implement specific and wrong escaping in order to be able to detect
+        # when it runs.
         return self.replace('<', '<<').replace('>', '>>')
 
 

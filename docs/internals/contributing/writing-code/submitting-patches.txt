@@ -82,15 +82,14 @@ As always, more communication is better than less communication!
 Which tickets should be claimed?
 --------------------------------
 
-Of course, going through the steps of claiming tickets is overkill in some
-cases.
+Going through the steps of claiming tickets is overkill in some cases.
 
 In the case of small changes, such as typos in the documentation or small bugs
 that will only take a few minutes to fix, you don't need to jump through the
 hoops of claiming tickets. Submit your patch directly and you're done!
 
-Of course, it is *always* acceptable, regardless whether someone has claimed it
-or not, to submit patches to a ticket if you happen to have a patch ready.
+It is *always* acceptable, regardless whether someone has claimed it or not, to
+submit patches to a ticket if you happen to have a patch ready.
 
 .. _patch-style:
 
@@ -223,8 +222,8 @@ Finally, there are a couple of updates to Django's documentation to make:
    under the appropriate version describing what code will be removed.
 
 Once you have completed these steps, you are finished with the deprecation.
-In each :term:`feature release`, all ``RemovedInDjangoXXWarning``\s matching
-the new version are removed.
+In each :term:`feature release <Feature release>`, all
+``RemovedInDjangoXXWarning``\s matching the new version are removed.
 
 JavaScript patches
 ==================
@@ -269,8 +268,8 @@ Bugs
   is applied)?
 * If it's a bug that :ref:`qualifies for a backport <supported-versions-policy>`
   to the stable version of Django, is there a release note in
-  ``docs/releases/A.B.C.txt``? Bug fixes that will be applied only to the
-  master branch don't need a release note.
+  ``docs/releases/A.B.C.txt``? Bug fixes that will be applied only to the main
+  branch don't need a release note.
 
 New Features
 ------------
@@ -291,7 +290,9 @@ All code changes
 
 * Does the :doc:`coding style
   </internals/contributing/writing-code/coding-style>` conform to our
-  guidelines? Are there any ``flake8`` errors?
+  guidelines? Are there any ``flake8`` errors? You can install the
+  :ref:`pre-commit <coding-style-pre-commit>` hooks to automatically catch
+  these errors.
 * If the change is backwards incompatible in any way, is there a note
   in the release notes (``docs/releases/A.B.txt``)?
 * Is Django's test suite passing?

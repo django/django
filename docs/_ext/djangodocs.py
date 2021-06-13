@@ -10,12 +10,11 @@ from docutils.parsers.rst import Directive
 from docutils.statemachine import ViewList
 from sphinx import addnodes
 from sphinx.builders.html import StandaloneHTMLBuilder
-from sphinx.directives import CodeBlock
-from sphinx.errors import SphinxError
+from sphinx.directives.code import CodeBlock
 from sphinx.domains.std import Cmdoption
 from sphinx.errors import ExtensionError
 from sphinx.util import logging
-from sphinx.util.console import bold, red
+from sphinx.util.console import bold
 from sphinx.writers.html import HTMLTranslator
 
 logger = logging.getLogger(__name__)
@@ -352,7 +351,7 @@ class ConsoleDirective(CodeBlock):
         if env.app.builder.name not in ('djangohtml', 'json'):
             return [lit_blk_obj]
 
-        lit_blk_obj['uid'] = '%s' % env.new_serialno('console')
+        lit_blk_obj['uid'] = str(env.new_serialno('console'))
         # Only add the tabbed UI if there is actually a Windows-specific
         # version of the CLI example.
         win_content = code_block_to_win(self.content)
@@ -379,8 +378,9 @@ def default_role_error(
     name, rawtext, text, lineno, inliner, options=None, content=None
 ):
     msg = (
-        "Default role used (`single backticks`) at line %s: %s. Did you mean "
-        "to use two backticks for ``code``, or miss an underscore for a "
-        "`link`_ ?" % (lineno, rawtext)
+        "Default role used (`single backticks`): %s. Did you mean to use two "
+        "backticks for ``code``, or miss an underscore for a `link`_ ?"
+        % rawtext
     )
-    raise SphinxError(red(msg))
+    logger.warning(msg, location=(inliner.document.current_source, lineno))
+    return [nodes.Text(text)], []

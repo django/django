@@ -308,17 +308,17 @@ class BilateralTransformTests(TestCase):
 
     def test_bilateral_upper(self):
         with register_lookup(models.CharField, UpperBilateralTransform):
-            Author.objects.bulk_create([
-                Author(name='Doe'),
-                Author(name='doe'),
-                Author(name='Foo'),
-            ])
-            self.assertQuerysetEqual(
+            author1 = Author.objects.create(name='Doe')
+            author2 = Author.objects.create(name='doe')
+            author3 = Author.objects.create(name='Foo')
+            self.assertCountEqual(
                 Author.objects.filter(name__upper='doe'),
-                ["<Author: Doe>", "<Author: doe>"], ordered=False)
-            self.assertQuerysetEqual(
+                [author1, author2],
+            )
+            self.assertSequenceEqual(
                 Author.objects.filter(name__upper__contains='f'),
-                ["<Author: Foo>"], ordered=False)
+                [author3],
+            )
 
     def test_bilateral_inner_qs(self):
         with register_lookup(models.CharField, UpperBilateralTransform):

@@ -5,11 +5,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import File, temp
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import TemporaryUploadedFile
-from django.db import IntegrityError
+from django.db import IntegrityError, models
 from django.test import TestCase, override_settings
+from django.test.utils import isolate_apps
 
 from .models import Document
 
@@ -61,6 +63,15 @@ class FileFieldTests(TestCase):
         d = Document.objects.create(myfile='something.txt')
         d.refresh_from_db()
         self.assertIs(d.myfile.instance, d)
+
+    @unittest.skipIf(sys.platform == 'win32', "Crashes with OSError on Windows.")
+    def test_save_without_name(self):
+        with tempfile.NamedTemporaryFile(suffix='.txt') as tmp:
+            document = Document.objects.create(myfile='something.txt')
+            document.myfile = File(tmp)
+            msg = f"Detected path traversal attempt in '{tmp.name}'"
+            with self.assertRaisesMessage(SuspiciousFileOperation, msg):
+                document.save()
 
     def test_defer(self):
         Document.objects.create(myfile='something.txt')
@@ -147,3 +158,21 @@ class FileFieldTests(TestCase):
                         self.assertEqual(document.myfile.field, loaded_myfile.field)
                     finally:
                         document.myfile.delete()
+
+    @isolate_apps('model_fields')
+    def test_abstract_filefield_model(self):
+        """
+        FileField.model returns the concrete model for fields defined in an
+        abstract model.
+        """
+        class AbstractMyDocument(models.Model):
+            myfile = models.FileField(upload_to='unused')
+
+            class Meta:
+                abstract = True
+
+        class MyDocument(AbstractMyDocument):
+            pass
+
+        document = MyDocument(myfile='test_file.py')
+        self.assertEqual(document.myfile.field.model, MyDocument)

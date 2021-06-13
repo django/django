@@ -19,7 +19,6 @@ class Migration(migrations.Migration):
                 ('content_type', models.ForeignKey(
                     to='contenttypes.ContentType',
                     on_delete=models.CASCADE,
-                    to_field='id',
                     verbose_name='content type',
                 )),
                 ('codename', models.CharField(max_length=100, verbose_name='codename')),

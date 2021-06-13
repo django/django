@@ -1,9 +1,9 @@
 import json
 import sys
 
-from django.test import SimpleTestCase, ignore_warnings
+from django.core.exceptions import SuspiciousFileOperation
+from django.test import SimpleTestCase
 from django.utils import text
-from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import lazystr
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy, override
@@ -52,7 +52,8 @@ class TestUtilsText(SimpleTestCase):
                 ['a', 'b', 'c', 'd']),
         ]
         for test, expected in testdata:
-            self.assertEqual(list(text.smart_split(test)), expected)
+            with self.subTest(value=test):
+                self.assertEqual(list(text.smart_split(test)), expected)
 
     def test_truncate_chars(self):
         truncator = text.Truncator('The quick brown fox jumped over the lazy dog.')
@@ -189,9 +190,16 @@ class TestUtilsText(SimpleTestCase):
 
     def test_slugify(self):
         items = (
-            # given - expected - unicode?
+            # given - expected - Unicode?
             ('Hello, World!', 'hello-world', False),
             ('spam & eggs', 'spam-eggs', False),
+            (' multiple---dash and  space ', 'multiple-dash-and-space', False),
+            ('\t whitespace-in-value \n', 'whitespace-in-value', False),
+            ('underscore_in-value', 'underscore_in-value', False),
+            ('__strip__underscore-value___', 'strip__underscore-value', False),
+            ('--strip-dash-value---', 'strip-dash-value', False),
+            ('__strip-mixed-value---', 'strip-mixed-value', False),
+            ('_ -strip-mixed-value _-', 'strip-mixed-value', False),
             ('spam & ıçüş', 'spam-ıçüş', True),
             ('foo ıç bar', 'foo-ıç-bar', True),
             ('    foo ıç bar', 'foo-ıç-bar', True),
@@ -199,34 +207,11 @@ class TestUtilsText(SimpleTestCase):
             ('İstanbul', 'istanbul', True),
         )
         for value, output, is_unicode in items:
-            self.assertEqual(text.slugify(value, allow_unicode=is_unicode), output)
-        # interning the result may be useful, e.g. when fed to Path.
-        self.assertEqual(sys.intern(text.slugify('a')), 'a')
-
-    @ignore_warnings(category=RemovedInDjango40Warning)
-    def test_unescape_entities(self):
-        items = [
-            ('', ''),
-            ('foo', 'foo'),
-            ('&amp;', '&'),
-            ('&am;', '&am;'),
-            ('&#x26;', '&'),
-            ('&#xk;', '&#xk;'),
-            ('&#38;', '&'),
-            ('foo &amp; bar', 'foo & bar'),
-            ('foo & bar', 'foo & bar'),
-        ]
-        for value, output in items:
-            self.assertEqual(text.unescape_entities(value), output)
-            self.assertEqual(text.unescape_entities(lazystr(value)), output)
-
-    def test_unescape_entities_deprecated(self):
-        msg = (
-            'django.utils.text.unescape_entities() is deprecated in favor of '
-            'html.unescape().'
-        )
-        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
-            text.unescape_entities('foo')
+            with self.subTest(value=value):
+                self.assertEqual(text.slugify(value, allow_unicode=is_unicode), output)
+        # Interning the result may be useful, e.g. when fed to Path.
+        with self.subTest('intern'):
+            self.assertEqual(sys.intern(text.slugify('a')), 'a')
 
     def test_unescape_string_literal(self):
         items = [
@@ -236,13 +221,21 @@ class TestUtilsText(SimpleTestCase):
             ("'\'ab\' c'", "'ab' c"),
         ]
         for value, output in items:
-            self.assertEqual(text.unescape_string_literal(value), output)
-            self.assertEqual(text.unescape_string_literal(lazystr(value)), output)
+            with self.subTest(value=value):
+                self.assertEqual(text.unescape_string_literal(value), output)
+                self.assertEqual(text.unescape_string_literal(lazystr(value)), output)
 
     def test_get_valid_filename(self):
         filename = "^&'@{}[],$=!-#()%+~_123.txt"
         self.assertEqual(text.get_valid_filename(filename), "-_123.txt")
         self.assertEqual(text.get_valid_filename(lazystr(filename)), "-_123.txt")
+        msg = "Could not derive file name from '???'"
+        with self.assertRaisesMessage(SuspiciousFileOperation, msg):
+            text.get_valid_filename('???')
+        # After sanitizing this would yield '..'.
+        msg = "Could not derive file name from '$.$.$'"
+        with self.assertRaisesMessage(SuspiciousFileOperation, msg):
+            text.get_valid_filename('$.$.$')
 
     def test_compress_sequence(self):
         data = [{'key': i} for i in range(10)]

@@ -1,6 +1,6 @@
 import math
 
-from django.db.models.expressions import Func
+from django.db.models.expressions import Func, Value
 from django.db.models.fields import FloatField, IntegerField
 from django.db.models.functions import Cast
 from django.db.models.functions.mixins import (
@@ -141,9 +141,40 @@ class Radians(NumericOutputFieldMixin, Transform):
         )
 
 
-class Round(Transform):
+class Random(NumericOutputFieldMixin, Func):
+    function = 'RANDOM'
+    arity = 0
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, function='RAND', **extra_context)
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, function='DBMS_RANDOM.VALUE', **extra_context)
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, function='RAND', **extra_context)
+
+    def get_group_by_cols(self, alias=None):
+        return []
+
+
+class Round(FixDecimalInputMixin, Transform):
     function = 'ROUND'
     lookup_name = 'round'
+    arity = None  # Override Transform's arity=1 to enable passing precision.
+
+    def __init__(self, expression, precision=0, **extra):
+        super().__init__(expression, precision, **extra)
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        precision = self.get_source_expressions()[1]
+        if isinstance(precision, Value) and precision.value < 0:
+            raise ValueError('SQLite does not support negative precision.')
+        return super().as_sqlite(compiler, connection, **extra_context)
+
+    def _resolve_output_field(self):
+        source = self.get_source_expressions()[0]
+        return source.output_field
 
 
 class Sign(Transform):

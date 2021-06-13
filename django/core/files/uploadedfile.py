@@ -8,6 +8,7 @@ from io import BytesIO
 from django.conf import settings
 from django.core.files import temp as tempfile
 from django.core.files.base import File
+from django.core.files.utils import validate_file_name
 
 __all__ = ('UploadedFile', 'TemporaryUploadedFile', 'InMemoryUploadedFile',
            'SimpleUploadedFile')
@@ -46,6 +47,8 @@ class UploadedFile(File):
                 name, ext = os.path.splitext(name)
                 ext = ext[:255]
                 name = name[:255 - len(ext)] + ext
+
+            name = validate_file_name(name)
 
         self._name = name
 

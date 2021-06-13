@@ -97,7 +97,7 @@ class Command(BaseCommand):
                 fake_user_data = {}
                 if hasattr(self.stdin, 'isatty') and not self.stdin.isatty():
                     raise NotRunningInTTYException
-                default_username = get_default_username()
+                default_username = get_default_username(database=database)
                 if username:
                     error_msg = self._validate_username(username, verbose_field_name, database)
                     if error_msg:

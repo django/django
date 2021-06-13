@@ -1,22 +1,27 @@
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 from .. import Error, Tags, Warning, register
 
+CROSS_ORIGIN_OPENER_POLICY_VALUES = {
+    'same-origin', 'same-origin-allow-popups', 'unsafe-none',
+}
 REFERRER_POLICY_VALUES = {
     'no-referrer', 'no-referrer-when-downgrade', 'origin',
     'origin-when-cross-origin', 'same-origin', 'strict-origin',
     'strict-origin-when-cross-origin', 'unsafe-url',
 }
 
+SECRET_KEY_INSECURE_PREFIX = 'django-insecure-'
 SECRET_KEY_MIN_LENGTH = 50
 SECRET_KEY_MIN_UNIQUE_CHARACTERS = 5
 
 W001 = Warning(
     "You do not have 'django.middleware.security.SecurityMiddleware' "
     "in your MIDDLEWARE so the SECURE_HSTS_SECONDS, "
-    "SECURE_CONTENT_TYPE_NOSNIFF, SECURE_BROWSER_XSS_FILTER, "
-    "SECURE_REFERRER_POLICY, and SECURE_SSL_REDIRECT settings will have no "
-    "effect.",
+    "SECURE_CONTENT_TYPE_NOSNIFF, SECURE_REFERRER_POLICY, "
+    "SECURE_CROSS_ORIGIN_OPENER_POLICY, and SECURE_SSL_REDIRECT settings will "
+    "have no effect.",
     id='security.W001',
 )
 
@@ -67,12 +72,14 @@ W008 = Warning(
 )
 
 W009 = Warning(
-    "Your SECRET_KEY has less than %(min_length)s characters or less than "
-    "%(min_unique_chars)s unique characters. Please generate a long and random "
-    "SECRET_KEY, otherwise many of Django's security-critical features will be "
-    "vulnerable to attack." % {
+    "Your SECRET_KEY has less than %(min_length)s characters, less than "
+    "%(min_unique_chars)s unique characters, or it's prefixed with "
+    "'%(insecure_prefix)s' indicating that it was generated automatically by "
+    "Django. Please generate a long and random SECRET_KEY, otherwise many of "
+    "Django's security-critical features will be vulnerable to attack." % {
         'min_length': SECRET_KEY_MIN_LENGTH,
         'min_unique_chars': SECRET_KEY_MIN_UNIQUE_CHARACTERS,
+        'insecure_prefix': SECRET_KEY_INSECURE_PREFIX,
     },
     id='security.W009',
 )
@@ -113,6 +120,15 @@ E023 = Error(
     'You have set the SECURE_REFERRER_POLICY setting to an invalid value.',
     hint='Valid values are: {}.'.format(', '.join(sorted(REFERRER_POLICY_VALUES))),
     id='security.E023',
+)
+
+E024 = Error(
+    'You have set the SECURE_CROSS_ORIGIN_OPENER_POLICY setting to an invalid '
+    'value.',
+    hint='Valid values are: {}.'.format(
+        ', '.join(sorted(CROSS_ORIGIN_OPENER_POLICY_VALUES)),
+    ),
+    id='security.E024',
 )
 
 
@@ -182,11 +198,16 @@ def check_ssl_redirect(app_configs, **kwargs):
 
 @register(Tags.security, deploy=True)
 def check_secret_key(app_configs, **kwargs):
-    passed_check = (
-        getattr(settings, 'SECRET_KEY', None) and
-        len(set(settings.SECRET_KEY)) >= SECRET_KEY_MIN_UNIQUE_CHARACTERS and
-        len(settings.SECRET_KEY) >= SECRET_KEY_MIN_LENGTH
-    )
+    try:
+        secret_key = settings.SECRET_KEY
+    except (ImproperlyConfigured, AttributeError):
+        passed_check = False
+    else:
+        passed_check = (
+            len(set(secret_key)) >= SECRET_KEY_MIN_UNIQUE_CHARACTERS and
+            len(secret_key) >= SECRET_KEY_MIN_LENGTH and
+            not secret_key.startswith(SECRET_KEY_INSECURE_PREFIX)
+        )
     return [] if passed_check else [W009]
 
 
@@ -222,4 +243,15 @@ def check_referrer_policy(app_configs, **kwargs):
             values = set(settings.SECURE_REFERRER_POLICY)
         if not values <= REFERRER_POLICY_VALUES:
             return [E023]
+    return []
+
+
+@register(Tags.security, deploy=True)
+def check_cross_origin_opener_policy(app_configs, **kwargs):
+    if (
+        _security_middleware() and
+        settings.SECURE_CROSS_ORIGIN_OPENER_POLICY is not None and
+        settings.SECURE_CROSS_ORIGIN_OPENER_POLICY not in CROSS_ORIGIN_OPENER_POLICY_VALUES
+    ):
+        return [E024]
     return []

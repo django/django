@@ -76,19 +76,21 @@ class OnDeleteTests(TestCase):
             "Cannot delete some instances of model 'R' because they are "
             "referenced through protected foreign keys: 'A.protect'."
         )
-        with self.assertRaisesMessage(ProtectedError, msg):
+        with self.assertRaisesMessage(ProtectedError, msg) as cm:
             a.protect.delete()
+        self.assertEqual(cm.exception.protected_objects, {a})
 
     def test_protect_multiple(self):
         a = create_a('protect')
-        B.objects.create(protect=a.protect)
+        b = B.objects.create(protect=a.protect)
         msg = (
             "Cannot delete some instances of model 'R' because they are "
             "referenced through protected foreign keys: 'A.protect', "
             "'B.protect'."
         )
-        with self.assertRaisesMessage(ProtectedError, msg):
+        with self.assertRaisesMessage(ProtectedError, msg) as cm:
             a.protect.delete()
+        self.assertEqual(cm.exception.protected_objects, {a, b})
 
     def test_protect_path(self):
         a = create_a('protect')
@@ -98,8 +100,9 @@ class OnDeleteTests(TestCase):
             "Cannot delete some instances of model 'P' because they are "
             "referenced through protected foreign keys: 'R.p'."
         )
-        with self.assertRaisesMessage(ProtectedError, msg):
+        with self.assertRaisesMessage(ProtectedError, msg) as cm:
             a.protect.p.delete()
+        self.assertEqual(cm.exception.protected_objects, {a})
 
     def test_do_nothing(self):
         # Testing DO_NOTHING is a bit harder: It would raise IntegrityError for a normal model,
@@ -177,19 +180,21 @@ class OnDeleteTests(TestCase):
             "Cannot delete some instances of model 'R' because they are "
             "referenced through restricted foreign keys: 'A.restrict'."
         )
-        with self.assertRaisesMessage(RestrictedError, msg):
+        with self.assertRaisesMessage(RestrictedError, msg) as cm:
             a.restrict.delete()
+        self.assertEqual(cm.exception.restricted_objects, {a})
 
     def test_restrict_multiple(self):
         a = create_a('restrict')
-        B3.objects.create(restrict=a.restrict)
+        b3 = B3.objects.create(restrict=a.restrict)
         msg = (
             "Cannot delete some instances of model 'R' because they are "
             "referenced through restricted foreign keys: 'A.restrict', "
             "'B3.restrict'."
         )
-        with self.assertRaisesMessage(RestrictedError, msg):
+        with self.assertRaisesMessage(RestrictedError, msg) as cm:
             a.restrict.delete()
+        self.assertEqual(cm.exception.restricted_objects, {a, b3})
 
     def test_restrict_path_cascade_indirect(self):
         a = create_a('restrict')
@@ -199,8 +204,9 @@ class OnDeleteTests(TestCase):
             "Cannot delete some instances of model 'P' because they are "
             "referenced through restricted foreign keys: 'A.restrict'."
         )
-        with self.assertRaisesMessage(RestrictedError, msg):
+        with self.assertRaisesMessage(RestrictedError, msg) as cm:
             a.restrict.p.delete()
+        self.assertEqual(cm.exception.restricted_objects, {a})
         # Object referenced also with CASCADE relationship can be deleted.
         a.cascade.p = a.restrict.p
         a.cascade.save()
@@ -222,13 +228,14 @@ class OnDeleteTests(TestCase):
         delete_top = DeleteTop.objects.create()
         b1 = B1.objects.create(delete_top=delete_top)
         b2 = B2.objects.create(delete_top=delete_top)
-        DeleteBottom.objects.create(b1=b1, b2=b2)
+        delete_bottom = DeleteBottom.objects.create(b1=b1, b2=b2)
         msg = (
             "Cannot delete some instances of model 'B1' because they are "
             "referenced through restricted foreign keys: 'DeleteBottom.b1'."
         )
-        with self.assertRaisesMessage(RestrictedError, msg):
+        with self.assertRaisesMessage(RestrictedError, msg) as cm:
             b1.delete()
+        self.assertEqual(cm.exception.restricted_objects, {delete_bottom})
         self.assertTrue(DeleteTop.objects.exists())
         self.assertTrue(B1.objects.exists())
         self.assertTrue(B2.objects.exists())
@@ -244,14 +251,18 @@ class OnDeleteTests(TestCase):
         delete_top = DeleteTop.objects.create()
         generic_b1 = GenericB1.objects.create(generic_delete_top=delete_top)
         generic_b2 = GenericB2.objects.create(generic_delete_top=delete_top)
-        GenericDeleteBottom.objects.create(generic_b1=generic_b1, generic_b2=generic_b2)
+        generic_delete_bottom = GenericDeleteBottom.objects.create(
+            generic_b1=generic_b1,
+            generic_b2=generic_b2,
+        )
         msg = (
             "Cannot delete some instances of model 'GenericB1' because they "
             "are referenced through restricted foreign keys: "
             "'GenericDeleteBottom.generic_b1'."
         )
-        with self.assertRaisesMessage(RestrictedError, msg):
+        with self.assertRaisesMessage(RestrictedError, msg) as cm:
             generic_b1.delete()
+        self.assertEqual(cm.exception.restricted_objects, {generic_delete_bottom})
         self.assertTrue(DeleteTop.objects.exists())
         self.assertTrue(GenericB1.objects.exists())
         self.assertTrue(GenericB2.objects.exists())
@@ -351,6 +362,10 @@ class OnDeleteDbTests(TestCase):
 
 
 class DeletionTests(TestCase):
+    def test_sliced_queryset(self):
+        msg = "Cannot use 'limit' or 'offset' with delete()."
+        with self.assertRaisesMessage(TypeError, msg):
+            M.objects.all()[0:5].delete()
 
     def test_m2m(self):
         m = M.objects.create()
@@ -609,11 +624,10 @@ class DeletionTests(TestCase):
         existed_objs = {
             R._meta.label: R.objects.count(),
             HiddenUser._meta.label: HiddenUser.objects.count(),
-            A._meta.label: A.objects.count(),
-            MR._meta.label: MR.objects.count(),
             HiddenUserProfile._meta.label: HiddenUserProfile.objects.count(),
         }
         deleted, deleted_objs = R.objects.all().delete()
+        self.assertCountEqual(deleted_objs.keys(), existed_objs.keys())
         for k, v in existed_objs.items():
             self.assertEqual(deleted_objs[k], v)
 
@@ -637,13 +651,13 @@ class DeletionTests(TestCase):
         existed_objs = {
             R._meta.label: R.objects.count(),
             HiddenUser._meta.label: HiddenUser.objects.count(),
-            A._meta.label: A.objects.count(),
             MR._meta.label: MR.objects.count(),
             HiddenUserProfile._meta.label: HiddenUserProfile.objects.count(),
             M.m2m.through._meta.label: M.m2m.through.objects.count(),
         }
         deleted, deleted_objs = r.delete()
         self.assertEqual(deleted, sum(existed_objs.values()))
+        self.assertCountEqual(deleted_objs.keys(), existed_objs.keys())
         for k, v in existed_objs.items():
             self.assertEqual(deleted_objs[k], v)
 
@@ -693,6 +707,12 @@ class DeletionTests(TestCase):
 
 
 class FastDeleteTests(TestCase):
+    def test_fast_delete_all(self):
+        with self.assertNumQueries(1) as ctx:
+            User.objects.all().delete()
+        sql = ctx.captured_queries[0]['sql']
+        # No subqueries is used when performing a full delete.
+        self.assertNotIn('SELECT', sql)
 
     def test_fast_delete_fk(self):
         u = User.objects.create(
@@ -781,7 +801,7 @@ class FastDeleteTests(TestCase):
         with self.assertNumQueries(1):
             self.assertEqual(
                 User.objects.filter(avatar__desc='missing').delete(),
-                (0, {'delete.User': 0})
+                (0, {}),
             )
 
     def test_fast_delete_combined_relationships(self):
@@ -791,3 +811,16 @@ class FastDeleteTests(TestCase):
         referer = Referrer.objects.create(origin=origin, unique_field=42)
         with self.assertNumQueries(2):
             referer.delete()
+
+    def test_fast_delete_aggregation(self):
+        # Fast-deleting when filtering against an aggregation result in
+        # a single query containing a subquery.
+        Base.objects.create()
+        with self.assertNumQueries(1):
+            self.assertEqual(
+                Base.objects.annotate(
+                    rels_count=models.Count('rels'),
+                ).filter(rels_count=0).delete(),
+                (1, {'delete.Base': 1}),
+            )
+        self.assertIs(Base.objects.exists(), False)
