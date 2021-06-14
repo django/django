@@ -157,7 +157,7 @@ class Command(BaseCommand):
                         validate_password(password2, self.UserModel(**fake_user_data))
                     except exceptions.ValidationError as err:
                         self.stderr.write('\n'.join(err.messages))
-                        response = input('Bypass password validation and create user anyway? [y/N]: ')
+                        response = input('Bypass password validation and create user anyway? [y/n]: ')
                         if response.lower() != 'y':
                             continue
                     user_data[PASSWORD_FIELD] = password
