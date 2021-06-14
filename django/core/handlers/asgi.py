@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import sys
 import tempfile
@@ -17,6 +18,34 @@ from django.urls import set_script_prefix
 from django.utils.functional import cached_property
 
 logger = logging.getLogger('django.request')
+
+
+async def _sync_to_async_iterator(iterator):
+    """
+    Iterate over a sync generator in an async context.
+    """
+    q = asyncio.Queue()
+
+    def sync_iterator():
+        for item in iterator:
+            q.put_nowait(item)
+
+    task = asyncio.create_task(sync_to_async(sync_iterator)())
+    try:
+        while True:
+            next_item = asyncio.create_task(q.get())
+            done, pending = await asyncio.wait(
+                [next_item, task],
+                return_when=asyncio.FIRST_COMPLETED
+            )
+            if next_item in done:
+                yield next_item.result()
+            elif task in done:
+                next_item.cancel()
+                break
+    finally:
+        task.cancel()
+        task.result()
 
 
 class ASGIRequest(HttpRequest):
@@ -239,7 +268,7 @@ class ASGIHandler(base.BaseHandler):
         if response.streaming:
             # Access `__iter__` and not `streaming_content` directly in case
             # it has been overridden in a subclass.
-            for part in response:
+            async for part in _sync_to_async_iterator(response):
                 for chunk, _ in self.chunk_bytes(part):
                     await send({
                         'type': 'http.response.body',

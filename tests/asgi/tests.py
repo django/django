@@ -243,3 +243,17 @@ class ASGITest(SimpleTestCase):
         self.assertEqual(request_finished_thread, target_thread)
         request_started.disconnect(signal_handler)
         request_finished.disconnect(signal_handler)
+
+    async def test_streaming_response(self):
+        application = get_asgi_application()
+        scope = self.async_request_factory._base_scope(path='/streaming/')
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({'type': 'http.request'})
+        response_start = await communicator.receive_output()
+        self.assertEqual(response_start['type'], 'http.response.start')
+        self.assertEqual(response_start['status'], 200)
+        response_body = await communicator.receive_output()
+        self.assertEqual(response_body['type'], 'http.response.body')
+        self.assertEqual(response_body['body'], b'Hello World!')
+        # Give response.close() time to finish.
+        await communicator.wait()
