@@ -4,7 +4,7 @@ import sys
 import tempfile
 import traceback
 
-from asgiref.sync import sync_to_async
+from asgiref.sync import async_to_sync, sync_to_async
 
 from django.conf import settings
 from django.core import signals
@@ -24,28 +24,37 @@ async def _sync_to_async_iterator(iterator):
     """
     Iterate over a sync generator in an async context.
     """
-    q = asyncio.Queue()
+    q = asyncio.Queue(maxsize=5)
+    bytes_in_queue = 0
+    sentinel = object()
 
     def sync_iterator():
-        for item in iterator:
-            q.put_nowait(item)
+        nonlocal bytes_in_queue
+        try:
+            for item in iterator:
+
+                # Wait until bytes in queue are smaller
+                while bytes_in_queue > 1024:
+                    async_to_sync(asyncio.sleep)(0.01)
+
+                if q.full():
+                    async_to_sync(q.put)(item)
+                else:
+                    q.put_nowait(item)
+                bytes_in_queue += len(item)
+        finally:
+            async_to_sync(q.put)(sentinel)
 
     task = asyncio.create_task(sync_to_async(sync_iterator)())
-    try:
-        while True:
-            next_item = asyncio.create_task(q.get())
-            done, pending = await asyncio.wait(
-                [next_item, task],
-                return_when=asyncio.FIRST_COMPLETED
-            )
-            if next_item in done:
-                yield next_item.result()
-            elif task in done:
-                next_item.cancel()
-                break
-    finally:
-        task.cancel()
-        task.result()
+    while True:
+        item = await q.get()
+        if item is sentinel:
+            break
+        yield item
+        bytes_in_queue -= len(item)
+
+    # Raise exceptions thrown in task
+    await task
 
 
 class ASGIRequest(HttpRequest):
