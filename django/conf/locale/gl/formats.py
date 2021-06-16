@@ -7,8 +7,8 @@ TIME_FORMAT = 'H:i'
 DATETIME_FORMAT = r'j \d\e F \d\e Y \á\s H:i'
 YEAR_MONTH_FORMAT = r'F \d\e Y'
 MONTH_DAY_FORMAT = r'j \d\e F'
-SHORT_DATE_FORMAT = 'd-m-Y'
-SHORT_DATETIME_FORMAT = 'd-m-Y, H:i'
+SHORT_DATE_FORMAT = 'd/m/Y'
+SHORT_DATETIME_FORMAT = 'd/m/Y, H:i'
 FIRST_DAY_OF_WEEK = 1  # Monday
 
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,
