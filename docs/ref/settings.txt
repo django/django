@@ -2775,9 +2775,12 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_L10N` and :setting:`USE_TZ`.
 
 Default: ``False``
 
-A boolean that specifies if localized formatting of data will be enabled by
-default or not. If this is set to ``True``, e.g. Django will display numbers and
-dates using the format of the current locale.
+A boolean that specifies whether localized formatting of data will be enabled
+by default. When set to ``True``, Django will display numbers and dates using
+the format of the current locale, or if the locale lacks format information,
+the format dictated by Django's other settings (such as
+:setting:`USE_THOUSAND_SEPARATOR`). Setting ``USE_L10N`` to ``False`` leaves
+it up to each feature whether to observe Django's other format settings.
 
 See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
 
