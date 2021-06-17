@@ -22,7 +22,7 @@ Bugfixes
   with a default value (:ticket:`32832`).
 
 * Fixed a bug in Django 3.2 and earlier in
-  :meth:`~django.forms.boundfield.BoundWidget.id_for_label`. It returend
+  :meth:`~django.forms.boundfield.BoundWidget.id_for_label`. It returned
   a wrong ``id``, when used by a ``ChoiceField`` with
   ``widget=CheckboxSelectMultiple`` and rendered by a form initialized
   with ``auto_id='...%s...'``.
