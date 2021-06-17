@@ -76,6 +76,12 @@ Minor features
   supports covering exclusion constraints using SP-GiST indexes on PostgreSQL
   14+.
 
+* The new ``default_bounds`` attribute of :attr:`DateTimeRangeField
+  <django.contrib.postgres.fields.DateTimeRangeField.default_bounds>` and
+  :attr:`DecimalRangeField
+  <django.contrib.postgres.fields.DecimalRangeField.default_bounds>` allows
+  specifying bounds for list and tuple inputs.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

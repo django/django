@@ -249,6 +249,7 @@ class Migration(migrations.Migration):
                 ('decimals', DecimalRangeField(null=True, blank=True)),
                 ('timestamps', DateTimeRangeField(null=True, blank=True)),
                 ('timestamps_inner', DateTimeRangeField(null=True, blank=True)),
+                ('timestamps_closed_bounds', DateTimeRangeField(null=True, blank=True, default_bounds='[]')),
                 ('dates', DateRangeField(null=True, blank=True)),
                 ('dates_inner', DateRangeField(null=True, blank=True)),
             ],

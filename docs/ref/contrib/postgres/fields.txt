@@ -503,9 +503,9 @@ All of the range fields translate to :ref:`psycopg2 Range objects
 <psycopg2:adapt-range>` in Python, but also accept tuples as input if no bounds
 information is necessary. The default is lower bound included, upper bound
 excluded, that is ``[)`` (see the PostgreSQL documentation for details about
-`different bounds`_).
-
-.. _different bounds: https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-IO
+`different bounds`_). The default bounds can be changed for non-discrete range
+fields (:class:`.DateTimeRangeField` and :class:`.DecimalRangeField`) by using
+the ``default_bounds`` argument.
 
 ``IntegerRangeField``
 ---------------------
@@ -538,22 +538,42 @@ excluded, that is ``[)`` (see the PostgreSQL documentation for details about
 ``DecimalRangeField``
 ---------------------
 
-.. class:: DecimalRangeField(**options)
+.. class:: DecimalRangeField(default_bounds='[)', **options)
 
     Stores a range of floating point values. Based on a
     :class:`~django.db.models.DecimalField`. Represented by a ``numrange`` in
     the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
     Python.
 
+    .. attribute:: DecimalRangeField.default_bounds
+
+        .. versionadded:: 4.1
+
+        Optional. The value of ``bounds`` for list and tuple inputs. The
+        default is lower bound included, upper bound excluded, that is ``[)``
+        (see the PostgreSQL documentation for details about
+        `different bounds`_). ``default_bounds`` is not used for
+        :class:`~psycopg2:psycopg2.extras.NumericRange` inputs.
+
 ``DateTimeRangeField``
 ----------------------
 
-.. class:: DateTimeRangeField(**options)
+.. class:: DateTimeRangeField(default_bounds='[)', **options)
 
     Stores a range of timestamps. Based on a
     :class:`~django.db.models.DateTimeField`. Represented by a ``tstzrange`` in
     the database and a :class:`~psycopg2:psycopg2.extras.DateTimeTZRange` in
     Python.
+
+    .. attribute:: DateTimeRangeField.default_bounds
+
+        .. versionadded:: 4.1
+
+        Optional. The value of ``bounds`` for list and tuple inputs. The
+        default is lower bound included, upper bound excluded, that is ``[)``
+        (see the PostgreSQL documentation for details about
+        `different bounds`_). ``default_bounds`` is not used for
+        :class:`~psycopg2:psycopg2.extras.DateTimeTZRange` inputs.
 
 ``DateRangeField``
 ------------------
@@ -884,3 +904,5 @@ used with a custom range functions that expected boundaries, for example to
 define :class:`~django.contrib.postgres.constraints.ExclusionConstraint`. See
 `the PostgreSQL documentation for the full details <https://www.postgresql.org/
 docs/current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_.
+
+.. _different bounds: https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-IO

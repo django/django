@@ -50,6 +50,41 @@ class BasicTests(PostgreSQLSimpleTestCase):
                 instance = Model(field=value)
                 self.assertEqual(instance.get_field_display(), display)
 
+    def test_discrete_range_fields_unsupported_default_bounds(self):
+        discrete_range_types = [
+            pg_fields.BigIntegerRangeField,
+            pg_fields.IntegerRangeField,
+            pg_fields.DateRangeField,
+        ]
+        for field_type in discrete_range_types:
+            msg = f"Cannot use 'default_bounds' with {field_type.__name__}."
+            with self.assertRaisesMessage(TypeError, msg):
+                field_type(choices=[((51, 100), '51-100')], default_bounds='[]')
+
+    def test_continuous_range_fields_default_bounds(self):
+        continuous_range_types = [
+            pg_fields.DecimalRangeField,
+            pg_fields.DateTimeRangeField,
+        ]
+        for field_type in continuous_range_types:
+            field = field_type(choices=[((51, 100), '51-100')], default_bounds='[]')
+            self.assertEqual(field.default_bounds, '[]')
+
+    def test_invalid_default_bounds(self):
+        tests = [')]', ')[', '](', '])', '([', '[(', 'x', '', None]
+        msg = "default_bounds must be one of '[)', '(]', '()', or '[]'."
+        for invalid_bounds in tests:
+            with self.assertRaisesMessage(ValueError, msg):
+                pg_fields.DecimalRangeField(default_bounds=invalid_bounds)
+
+    def test_deconstruct(self):
+        field = pg_fields.DecimalRangeField()
+        *_, kwargs = field.deconstruct()
+        self.assertEqual(kwargs, {})
+        field = pg_fields.DecimalRangeField(default_bounds='[]')
+        *_, kwargs = field.deconstruct()
+        self.assertEqual(kwargs, {'default_bounds': '[]'})
+
 
 class TestSaveLoad(PostgreSQLTestCase):
 
@@ -83,6 +118,19 @@ class TestSaveLoad(PostgreSQLTestCase):
         loaded = RangesModel.objects.get()
         self.assertEqual(NumericRange(0, 10), loaded.ints)
 
+    def test_tuple_range_with_default_bounds(self):
+        range_ = (timezone.now(), timezone.now() + datetime.timedelta(hours=1))
+        RangesModel.objects.create(timestamps_closed_bounds=range_, timestamps=range_)
+        loaded = RangesModel.objects.get()
+        self.assertEqual(
+            loaded.timestamps_closed_bounds,
+            DateTimeTZRange(range_[0], range_[1], '[]'),
+        )
+        self.assertEqual(
+            loaded.timestamps,
+            DateTimeTZRange(range_[0], range_[1], '[)'),
+        )
+
     def test_range_object_boundaries(self):
         r = NumericRange(0, 10, '[]')
         instance = RangesModel(decimals=r)
@@ -90,6 +138,16 @@ class TestSaveLoad(PostgreSQLTestCase):
         loaded = RangesModel.objects.get()
         self.assertEqual(r, loaded.decimals)
         self.assertIn(10, loaded.decimals)
+
+    def test_range_object_boundaries_range_with_default_bounds(self):
+        range_ = DateTimeTZRange(
+            timezone.now(),
+            timezone.now() + datetime.timedelta(hours=1),
+            bounds='()',
+        )
+        RangesModel.objects.create(timestamps_closed_bounds=range_)
+        loaded = RangesModel.objects.get()
+        self.assertEqual(loaded.timestamps_closed_bounds, range_)
 
     def test_unbounded(self):
         r = NumericRange(None, None, '()')
@@ -478,6 +536,8 @@ class TestSerialization(PostgreSQLSimpleTestCase):
         '"bigints": null, "timestamps": "{\\"upper\\": \\"2014-02-02T12:12:12+00:00\\", '
         '\\"lower\\": \\"2014-01-01T00:00:00+00:00\\", \\"bounds\\": \\"[)\\"}", '
         '"timestamps_inner": null, '
+        '"timestamps_closed_bounds": "{\\"upper\\": \\"2014-02-02T12:12:12+00:00\\", '
+        '\\"lower\\": \\"2014-01-01T00:00:00+00:00\\", \\"bounds\\": \\"()\\"}", '
         '"dates": "{\\"upper\\": \\"2014-02-02\\", \\"lower\\": \\"2014-01-01\\", \\"bounds\\": \\"[)\\"}", '
         '"dates_inner": null }, '
         '"model": "postgres_tests.rangesmodel", "pk": null}]'
@@ -492,15 +552,19 @@ class TestSerialization(PostgreSQLSimpleTestCase):
         instance = RangesModel(
             ints=NumericRange(0, 10), decimals=NumericRange(empty=True),
             timestamps=DateTimeTZRange(self.lower_dt, self.upper_dt),
+            timestamps_closed_bounds=DateTimeTZRange(
+                self.lower_dt, self.upper_dt, bounds='()',
+            ),
             dates=DateRange(self.lower_date, self.upper_date),
         )
         data = serializers.serialize('json', [instance])
         dumped = json.loads(data)
-        for field in ('ints', 'dates', 'timestamps'):
+        for field in ('ints', 'dates', 'timestamps', 'timestamps_closed_bounds'):
             dumped[0]['fields'][field] = json.loads(dumped[0]['fields'][field])
         check = json.loads(self.test_data)
-        for field in ('ints', 'dates', 'timestamps'):
+        for field in ('ints', 'dates', 'timestamps', 'timestamps_closed_bounds'):
             check[0]['fields'][field] = json.loads(check[0]['fields'][field])
+
         self.assertEqual(dumped, check)
 
     def test_loading(self):
@@ -510,6 +574,10 @@ class TestSerialization(PostgreSQLSimpleTestCase):
         self.assertIsNone(instance.bigints)
         self.assertEqual(instance.dates, DateRange(self.lower_date, self.upper_date))
         self.assertEqual(instance.timestamps, DateTimeTZRange(self.lower_dt, self.upper_dt))
+        self.assertEqual(
+            instance.timestamps_closed_bounds,
+            DateTimeTZRange(self.lower_dt, self.upper_dt, bounds='()'),
+        )
 
     def test_serialize_range_with_null(self):
         instance = RangesModel(ints=NumericRange(None, 10))
@@ -886,26 +954,47 @@ class TestFormField(PostgreSQLSimpleTestCase):
         model_field = pg_fields.IntegerRangeField()
         form_field = model_field.formfield()
         self.assertIsInstance(form_field, pg_forms.IntegerRangeField)
+        self.assertEqual(form_field.range_kwargs, {})
 
     def test_model_field_formfield_biginteger(self):
         model_field = pg_fields.BigIntegerRangeField()
         form_field = model_field.formfield()
         self.assertIsInstance(form_field, pg_forms.IntegerRangeField)
+        self.assertEqual(form_field.range_kwargs, {})
 
     def test_model_field_formfield_float(self):
-        model_field = pg_fields.DecimalRangeField()
+        model_field = pg_fields.DecimalRangeField(default_bounds='()')
         form_field = model_field.formfield()
         self.assertIsInstance(form_field, pg_forms.DecimalRangeField)
+        self.assertEqual(form_field.range_kwargs, {'bounds': '()'})
 
     def test_model_field_formfield_date(self):
         model_field = pg_fields.DateRangeField()
         form_field = model_field.formfield()
         self.assertIsInstance(form_field, pg_forms.DateRangeField)
+        self.assertEqual(form_field.range_kwargs, {})
 
     def test_model_field_formfield_datetime(self):
         model_field = pg_fields.DateTimeRangeField()
         form_field = model_field.formfield()
         self.assertIsInstance(form_field, pg_forms.DateTimeRangeField)
+        self.assertEqual(
+            form_field.range_kwargs,
+            {'bounds': pg_fields.ranges.CANONICAL_RANGE_BOUNDS},
+        )
+
+    def test_model_field_formfield_datetime_default_bounds(self):
+        model_field = pg_fields.DateTimeRangeField(default_bounds='[]')
+        form_field = model_field.formfield()
+        self.assertIsInstance(form_field, pg_forms.DateTimeRangeField)
+        self.assertEqual(form_field.range_kwargs, {'bounds': '[]'})
+
+    def test_model_field_with_default_bounds(self):
+        field = pg_forms.DateTimeRangeField(default_bounds='[]')
+        value = field.clean(['2014-01-01 00:00:00', '2014-02-03 12:13:14'])
+        lower = datetime.datetime(2014, 1, 1, 0, 0, 0)
+        upper = datetime.datetime(2014, 2, 3, 12, 13, 14)
+        self.assertEqual(value, DateTimeTZRange(lower, upper, '[]'))
 
     def test_has_changed(self):
         for field, value in (

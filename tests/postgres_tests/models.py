@@ -135,6 +135,9 @@ class RangesModel(PostgreSQLModel):
     decimals = DecimalRangeField(blank=True, null=True)
     timestamps = DateTimeRangeField(blank=True, null=True)
     timestamps_inner = DateTimeRangeField(blank=True, null=True)
+    timestamps_closed_bounds = DateTimeRangeField(
+        blank=True, null=True, default_bounds='[]',
+    )
     dates = DateRangeField(blank=True, null=True)
     dates_inner = DateRangeField(blank=True, null=True)
 
