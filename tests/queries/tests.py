@@ -3134,6 +3134,14 @@ class QuerySetExceptionTests(SimpleTestCase):
         with self.assertRaisesMessage(FieldError, msg):
             Article.objects.order_by('*')
 
+    def test_order_by_escape_prevention(self):
+        msg = (
+            "Cannot resolve keyword 'queries.name);' into field. Choices are: "
+            "created, id, name"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Article.objects.order_by('queries.name);')
+
     def test_invalid_queryset_model(self):
         msg = 'Cannot use QuerySet for "Article": Use a QuerySet for "ExtraInfo".'
         with self.assertRaisesMessage(ValueError, msg):
