@@ -30,7 +30,9 @@ from django.db.models.lookups import Lookup
 from django.db.models.query_utils import (
     Q, check_rel_lookup_compatibility, refs_expression,
 )
-from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
+from django.db.models.sql.constants import (
+    INNER, LOUTER, ORDER_DIR, ORDER_PATTERN, SINGLE,
+)
 from django.db.models.sql.datastructures import (
     BaseTable, Empty, Join, MultiJoin,
 )
@@ -1969,7 +1971,7 @@ class Query(BaseExpression):
         errors = []
         for item in ordering:
             if isinstance(item, str):
-                if '.' in item:
+                if '.' in item and ORDER_PATTERN.match(item):
                     warnings.warn(
                         'Passing column raw column aliases to order_by() is '
                         'deprecated. Wrap %r in a RawSQL expression before '
