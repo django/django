@@ -260,8 +260,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         meta = type("Meta", (), meta_contents)
         body_copy['Meta'] = meta
         body_copy['__module__'] = model.__module__
-        type(model._meta.object_name, model.__bases__, body_copy)
-
+        
         # Construct a model with a renamed table name.
         body_copy = copy.deepcopy(body)
         meta_contents = {
