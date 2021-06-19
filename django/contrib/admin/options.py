@@ -1548,7 +1548,8 @@ class ModelAdmin(BaseModelAdmin):
 
         model = self.model
         opts = model._meta
-
+        last_log_entry_pk = None  # used to protect against editing of old version
+        post_last_log_entry_pk = None
         if request.method == 'POST' and '_saveasnew' in request.POST:
             object_id = None
 
@@ -1561,7 +1562,6 @@ class ModelAdmin(BaseModelAdmin):
 
         else:
             obj = self.get_object(request, unquote(object_id), to_field)
-
             if request.method == 'POST':
                 if not self.has_change_permission(request, obj):
                     raise PermissionDenied
@@ -1571,6 +1571,13 @@ class ModelAdmin(BaseModelAdmin):
 
             if obj is None:
                 return self._get_obj_does_not_exist_redirect(request, opts, object_id)
+            from django.contrib.admin.models import ADDITION, LogEntry
+            from django.contrib.contenttypes.models import ContentType
+            last_log_entry = LogEntry.objects.filter(
+                content_type=ContentType.objects.get_for_model(obj),
+                object_id=obj.pk
+            ).order_by('-action_time').first()
+            last_log_entry_pk = last_log_entry.pk if last_log_entry else 0
 
         fieldsets = self.get_fieldsets(request, obj)
         ModelForm = self.get_form(
@@ -1578,6 +1585,10 @@ class ModelAdmin(BaseModelAdmin):
         )
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES, instance=obj)
+            if obj:
+                post_last_log_entry_pk = request.POST.get('djangolastlogentrypk')
+                if post_last_log_entry_pk is not None and str(post_last_log_entry_pk) != str(last_log_entry_pk):
+                    form.add_error(None, _('Object was modified by other admin session'))
             form_validated = form.is_valid()
             if form_validated:
                 new_object = self.save_form(request, form, change=not add)
@@ -1632,6 +1643,9 @@ class ModelAdmin(BaseModelAdmin):
             **self.admin_site.each_context(request),
             'title': title % opts.verbose_name,
             'subtitle': str(obj) if obj else None,
+            # use the log entry pk from the post,
+            # so save after error will not override
+            'last_log_entry_pk': post_last_log_entry_pk if post_last_log_entry_pk is not None else last_log_entry_pk,
             'adminform': adminForm,
             'object_id': object_id,
             'original': obj,
