@@ -12,7 +12,7 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import resolve_url
 from django.urls import reverse_lazy
@@ -261,7 +261,10 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
     @method_decorator(sensitive_post_parameters())
     @method_decorator(never_cache)
     def dispatch(self, *args, **kwargs):
-        assert 'uidb64' in kwargs and 'token' in kwargs
+        if 'uidb64' not in kwargs or 'token' not in kwargs:
+            raise ImproperlyConfigured(
+                "The URL path must contain 'uidb64' and 'token' parameters."
+            )
 
         self.validlink = False
         self.user = self.get_user(kwargs['uidb64'])
