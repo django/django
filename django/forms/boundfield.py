@@ -33,6 +33,10 @@ class BoundField:
             return self.as_widget() + self.as_hidden(only_initial=True)
         return self.as_widget()
 
+    def __repr__(self):
+        class_name = self.__class__.__name__
+        return f'<{class_name} name={self.name} label={self.label}>'
+        
     @cached_property
     def subwidgets(self):
         """
