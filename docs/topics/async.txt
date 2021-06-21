@@ -147,7 +147,7 @@ If you're using an IPython shell, you can disable this event loop by running::
 
 as a command at the IPython prompt. This will allow you to run synchronous code
 without generating :exc:`~django.core.exceptions.SynchronousOnlyOperation`
-errors; however, you also won't be able to `await` asynchronous APIs. To turn
+errors; however, you also won't be able to ``await`` asynchronous APIs. To turn
 the event loop back on, run::
 
     %autoawait on
