@@ -429,7 +429,8 @@ class RequestFactory:
             secure=False, **extra):
         """Construct a PUT request."""
         data = self._encode_json(data, content_type)
-        return self.generic('PUT', path, data, content_type,
+        put_data = self._encode_data(data, content_type)
+        return self.generic('PUT', path, put_data, content_type,
                             secure=secure, **extra)
 
     def patch(self, path, data='', content_type='application/octet-stream',
