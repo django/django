@@ -1,9 +1,11 @@
 from django.core.exceptions import FieldDoesNotExist
+from django.db.migrations.utils import (
+    field_is_referenced, field_references, get_references,
+)
 from django.db.models import NOT_PROVIDED
 from django.utils.functional import cached_property
 
 from .base import Operation
-from .utils import field_is_referenced, field_references, get_references
 
 
 class FieldOperation(Operation):
