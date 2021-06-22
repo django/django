@@ -278,8 +278,9 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         values = AggregateTestModel.objects.aggregate(jsonbagg=JSONBAgg('char_field'))
         self.assertEqual(values, {'jsonbagg': ['Foo1', 'Foo2', 'Foo4', 'Foo3']})
 
-    def test_jsonb_agg_empty(self):
-        values = AggregateTestModel.objects.none().aggregate(jsonbagg=JSONBAgg('integer_field'))
+    def test_jsonb_agg_empty_result(self):
+        AggregateTestModel.objects.all().delete()
+        values = AggregateTestModel.objects.aggregate(jsonbagg=JSONBAgg('integer_field'))
         self.assertEqual(values, json.loads('{"jsonbagg": []}'))
 
     def test_jsonb_agg_charfield_ordering(self):
