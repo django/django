@@ -1,5 +1,3 @@
-import json
-
 from django.db.models import CharField, F, OuterRef, Q, Subquery, Value
 from django.db.models.fields.json import KeyTextTransform, KeyTransform
 from django.db.models.functions import Cast, Concat, Substr
@@ -281,7 +279,7 @@ class TestGeneralAggregate(PostgreSQLTestCase):
     def test_jsonb_agg_empty_result(self):
         AggregateTestModel.objects.all().delete()
         values = AggregateTestModel.objects.aggregate(jsonbagg=JSONBAgg('integer_field'))
-        self.assertEqual(values, json.loads('{"jsonbagg": []}'))
+        self.assertEqual(values, {'jsonbagg': []})
 
     def test_jsonb_agg_charfield_ordering(self):
         ordering_test_cases = (
