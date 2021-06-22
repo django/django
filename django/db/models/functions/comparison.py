@@ -42,6 +42,12 @@ class Cast(Func):
             template = "JSON_EXTRACT(%(expressions)s, '$')"
         return self.as_sql(compiler, connection, template=template, **extra_context)
 
+    def as_postgresql(self, compiler, connection, **extra_context):
+        # CAST would be valid too, but the :: shortcut syntax is more readable.
+        # 'expressions' is wrapped in parentheses in case it's a complex
+        # expression.
+        return self.as_sql(compiler, connection, template='(%(expressions)s)::%(db_type)s', **extra_context)
+
     def as_oracle(self, compiler, connection, **extra_context):
         if self.output_field.get_internal_type() == 'JSONField':
             # Oracle doesn't support explicit cast to JSON.
