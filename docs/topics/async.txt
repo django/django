@@ -136,11 +136,26 @@ functions in its own, sync function, and call that using
 :func:`asgiref.sync.sync_to_async` (or any other way of running sync code in
 its own thread).
 
-You may still be forced to run sync code from an async context. For example,
-if the requirement is forced on you by an external environment, such as in a
-Jupyter_ notebook. If you are sure there is no chance of the code being run
-concurrently, and you *absolutely* need to run this sync code from an async
-context, then you can disable the warning by setting the
+The async context can be imposed upon you by the environment in which you are
+running your Django code. For example, Jupyter_ notebooks and IPython_
+interactive shells both transparently provide an active event loop so that it is
+easier to interact with asynchronous APIs.
+
+If you're using an IPython shell, you can disable this event loop by running::
+
+    %autoawait off
+
+as a command at the IPython prompt. This will allow you to run synchronous code
+without generating :exc:`~django.core.exceptions.SynchronousOnlyOperation`
+errors; however, you also won't be able to ``await`` asynchronous APIs. To turn
+the event loop back on, run::
+
+    %autoawait on
+
+If you're in an environment other than IPython (or you can't turn off
+``autoawait`` in IPython for some reason), you are *certain* there is no chance
+of your code being run concurrently, and you *absolutely* need to run your sync
+code from an async context, then you can disable the warning by setting the
 :envvar:`DJANGO_ALLOW_ASYNC_UNSAFE` environment variable to any value.
 
 .. warning::
@@ -156,6 +171,7 @@ If you need to do this from within Python, do that with ``os.environ``::
     os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 .. _Jupyter: https://jupyter.org/
+.. _IPython: https://ipython.org
 
 Async adapter functions
 =======================
