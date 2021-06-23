@@ -93,13 +93,14 @@ class CsrfViewMiddlewareTestMixin:
     def _set_csrf_cookie(self, req, cookie):
         raise NotImplementedError('This method must be implemented by a subclass.')
 
-    def _get_request(self):
+    def _get_request(self, method=None, cookie=None):
+        if method is None:
+            method = 'GET'
         req = TestingHttpRequest()
-        req.method = 'GET'
+        req.method = method
+        if cookie is not None:
+            self._set_csrf_cookie(req, cookie)
         return req
-
-    def _get_GET_no_csrf_cookie_request(self):
-        return self._get_request()
 
     def _get_GET_csrf_cookie_request(self, cookie=None):
         """The cookie argument defaults to the valid test cookie."""
@@ -129,11 +130,6 @@ class CsrfViewMiddlewareTestMixin:
             req.META[token_header] = meta_token
         return req
 
-    def _get_POST_no_csrf_cookie_request(self):
-        req = self._get_GET_no_csrf_cookie_request()
-        req.method = "POST"
-        return req
-
     def _get_POST_request_with_token(self, cookie=None):
         """The cookie argument defaults to this class's default test cookie."""
         return self._get_POST_csrf_cookie_request(cookie=cookie, post_token=self._csrf_id_token)
@@ -155,7 +151,7 @@ class CsrfViewMiddlewareTestMixin:
         # This is important to make pages cacheable.  Pages which do call
         # get_token(), assuming they use the token, are not cacheable because
         # the token is specific to the user
-        req = self._get_GET_no_csrf_cookie_request()
+        req = self._get_request()
         # non_token_view_using_request_processor does not call get_token(), but
         # does use the csrf request processor.  By using this, we are testing
         # that the view processor is properly lazy and doesn't call get_token()
@@ -170,10 +166,7 @@ class CsrfViewMiddlewareTestMixin:
 
     def _check_bad_or_missing_cookie(self, cookie, expected):
         """Passing None for cookie includes no cookie."""
-        if cookie is None:
-            req = self._get_POST_no_csrf_cookie_request()
-        else:
-            req = self._get_POST_csrf_cookie_request(cookie=cookie)
+        req = self._get_request(method='POST', cookie=cookie)
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         with self.assertLogs('django.security.csrf', 'WARNING') as cm:
@@ -302,16 +295,14 @@ class CsrfViewMiddlewareTestMixin:
         """
         HTTP PUT and DELETE methods have protection
         """
-        req = TestingHttpRequest()
-        req.method = 'PUT'
+        req = self._get_request(method='PUT')
         mw = CsrfViewMiddleware(post_form_view)
         with self.assertLogs('django.security.csrf', 'WARNING') as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(403, resp.status_code)
         self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE)
 
-        req = TestingHttpRequest()
-        req.method = 'DELETE'
+        req = self._get_request(method='DELETE')
         with self.assertLogs('django.security.csrf', 'WARNING') as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(403, resp.status_code)
@@ -339,7 +330,7 @@ class CsrfViewMiddlewareTestMixin:
         """
         CsrfTokenNode works when no CSRF cookie is set.
         """
-        req = self._get_GET_no_csrf_cookie_request()
+        req = self._get_request()
         resp = token_view(req)
 
         token = get_token(req)
@@ -350,7 +341,7 @@ class CsrfViewMiddlewareTestMixin:
         """
         A new token is sent if the csrf_cookie is the empty string.
         """
-        req = self._get_GET_no_csrf_cookie_request()
+        req = self._get_request()
         req.COOKIES[settings.CSRF_COOKIE_NAME] = ""
         mw = CsrfViewMiddleware(token_view)
         mw.process_view(req, token_view, (), {})
@@ -395,7 +386,7 @@ class CsrfViewMiddlewareTestMixin:
         CsrfTokenNode works when a CSRF cookie is created by
         the middleware (when one was not already present)
         """
-        req = self._get_GET_no_csrf_cookie_request()
+        req = self._get_request()
         mw = CsrfViewMiddleware(token_view)
         mw.process_view(req, token_view, (), {})
         resp = mw(req)
@@ -462,7 +453,7 @@ class CsrfViewMiddlewareTestMixin:
         CsrfViewMiddleware generates a 403 response if it receives an HTTPS
         request with a bad host.
         """
-        req = self._get_POST_no_csrf_cookie_request()
+        req = self._get_request(method='POST')
         req._is_secure_override = True
         req.META['HTTP_HOST'] = '@malformed'
         req.META['HTTP_REFERER'] = 'https://www.evil.org/somepage'
@@ -478,7 +469,7 @@ class CsrfViewMiddlewareTestMixin:
         self.assertEqual(response.status_code, 403)
 
     def test_origin_malformed_host(self):
-        req = self._get_POST_no_csrf_cookie_request()
+        req = self._get_request(method='POST')
         req._is_secure_override = True
         req.META['HTTP_HOST'] = '@malformed'
         req.META['HTTP_ORIGIN'] = 'https://www.evil.org'
@@ -652,7 +643,7 @@ class CsrfViewMiddlewareTestMixin:
         ensure_csrf_cookie() doesn't log warnings (#19436).
         """
         with self.assertNoLogs('django.request', 'WARNING'):
-            req = self._get_GET_no_csrf_cookie_request()
+            req = self._get_request()
             ensure_csrf_cookie_view(req)
 
     def test_post_data_read_failure(self):
@@ -873,7 +864,7 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         """
         The ensure_csrf_cookie() decorator works without middleware.
         """
-        req = self._get_GET_no_csrf_cookie_request()
+        req = self._get_request()
         resp = ensure_csrf_cookie_view(req)
         self.assertTrue(resp.cookies.get(settings.CSRF_COOKIE_NAME, False))
         self.assertIn('Cookie', resp.get('Vary', ''))
@@ -883,7 +874,7 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         The ensure_csrf_cookie() decorator works with the CsrfViewMiddleware
         enabled.
         """
-        req = self._get_GET_no_csrf_cookie_request()
+        req = self._get_request()
         mw = CsrfViewMiddleware(ensure_csrf_cookie_view)
         mw.process_view(req, ensure_csrf_cookie_view, (), {})
         resp = mw(req)
@@ -894,7 +885,7 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         """
         CSRF cookie age can be set using settings.CSRF_COOKIE_AGE.
         """
-        req = self._get_GET_no_csrf_cookie_request()
+        req = self._get_request()
 
         MAX_AGE = 123
         with self.settings(CSRF_COOKIE_NAME='csrfcookie',
@@ -915,7 +906,7 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         CSRF cookie age does not have max age set and therefore uses
         session-based cookies.
         """
-        req = self._get_GET_no_csrf_cookie_request()
+        req = self._get_request()
 
         MAX_AGE = None
         with self.settings(CSRF_COOKIE_NAME='csrfcookie',
@@ -932,7 +923,7 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
             self.assertEqual(max_age, '')
 
     def test_csrf_cookie_samesite(self):
-        req = self._get_GET_no_csrf_cookie_request()
+        req = self._get_request()
         with self.settings(CSRF_COOKIE_NAME='csrfcookie', CSRF_COOKIE_SAMESITE='Strict'):
             mw = CsrfViewMiddleware(token_view)
             mw.process_view(req, token_view, (), {})
@@ -958,7 +949,7 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         If the token is longer than expected, it is ignored and a new token is
         created.
         """
-        req = self._get_GET_no_csrf_cookie_request()
+        req = self._get_request()
         req.COOKIES[settings.CSRF_COOKIE_NAME] = 'x' * 100000
         mw = CsrfViewMiddleware(token_view)
         mw.process_view(req, token_view, (), {})
@@ -972,7 +963,7 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         new token is created.
         """
         token = ('!@#' + self._csrf_id_token)[:CSRF_TOKEN_LENGTH]
-        req = self._get_GET_no_csrf_cookie_request()
+        req = self._get_request()
         req.COOKIES[settings.CSRF_COOKIE_NAME] = token
         mw = CsrfViewMiddleware(token_view)
         mw.process_view(req, token_view, (), {})
@@ -1108,13 +1099,13 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
 
     def test_process_response_get_token_used(self):
         """The ensure_csrf_cookie() decorator works without middleware."""
-        req = self._get_GET_no_csrf_cookie_request()
+        req = self._get_request()
         ensure_csrf_cookie_view(req)
         self.assertTrue(req.session.get(CSRF_SESSION_KEY, False))
 
     def test_session_modify(self):
         """The session isn't saved if the CSRF cookie is unchanged."""
-        req = self._get_GET_no_csrf_cookie_request()
+        req = self._get_request()
         mw = CsrfViewMiddleware(ensure_csrf_cookie_view)
         mw.process_view(req, ensure_csrf_cookie_view, (), {})
         mw(req)
@@ -1129,7 +1120,7 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
         The ensure_csrf_cookie() decorator works with the CsrfViewMiddleware
         enabled.
         """
-        req = self._get_GET_no_csrf_cookie_request()
+        req = self._get_request()
         mw = CsrfViewMiddleware(ensure_csrf_cookie_view)
         mw.process_view(req, ensure_csrf_cookie_view, (), {})
         mw(req)
@@ -1140,7 +1131,7 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
         CsrfTokenNode works when a CSRF cookie is created by the middleware
         (when one was not already present).
         """
-        req = self._get_GET_no_csrf_cookie_request()
+        req = self._get_request()
         mw = CsrfViewMiddleware(token_view)
         mw.process_view(req, token_view, (), {})
         resp = mw(req)
