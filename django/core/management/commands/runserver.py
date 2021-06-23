@@ -109,7 +109,7 @@ class Command(BaseCommand):
             self.inner_run(None, **options)
 
     def _on_bind(self, server_name, server_port):
-        """Display server name and port after server bind"""
+        """Display server name and port after server bind."""
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
         now = datetime.now().strftime('%B %d, %Y - %X')
         self.stdout.write(now)
