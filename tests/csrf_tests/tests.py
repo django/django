@@ -90,10 +90,13 @@ class CsrfViewMiddlewareTestMixin:
     _csrf_id_cookie = MASKED_TEST_SECRET1
     _csrf_id_token = MASKED_TEST_SECRET2
 
-    def _get_GET_no_csrf_cookie_request(self):
+    def _get_request(self):
         req = TestingHttpRequest()
         req.method = 'GET'
         return req
+
+    def _get_GET_no_csrf_cookie_request(self):
+        return self._get_request()
 
     def _get_GET_csrf_cookie_request(self, cookie=None):
         raise NotImplementedError('This method must be implemented by a subclass.')
@@ -859,7 +862,7 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         """The cookie argument defaults to the valid test cookie."""
         if cookie is None:
             cookie = self._csrf_id_cookie
-        req = TestingHttpRequest()
+        req = self._get_request()
         req.COOKIES[settings.CSRF_COOKIE_NAME] = cookie
         return req
 
@@ -1069,7 +1072,7 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
         """The cookie argument defaults to the valid test cookie."""
         if cookie is None:
             cookie = self._csrf_id_cookie
-        req = TestingHttpRequest()
+        req = self._get_request()
         req.session[CSRF_SESSION_KEY] = cookie
         return req
 
