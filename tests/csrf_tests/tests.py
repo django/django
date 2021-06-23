@@ -90,6 +90,9 @@ class CsrfViewMiddlewareTestMixin:
     _csrf_id_cookie = MASKED_TEST_SECRET1
     _csrf_id_token = MASKED_TEST_SECRET2
 
+    def _set_csrf_cookie(self, req, cookie):
+        raise NotImplementedError('This method must be implemented by a subclass.')
+
     def _get_request(self):
         req = TestingHttpRequest()
         req.method = 'GET'
@@ -99,7 +102,12 @@ class CsrfViewMiddlewareTestMixin:
         return self._get_request()
 
     def _get_GET_csrf_cookie_request(self, cookie=None):
-        raise NotImplementedError('This method must be implemented by a subclass.')
+        """The cookie argument defaults to the valid test cookie."""
+        if cookie is None:
+            cookie = self._csrf_id_cookie
+        req = self._get_request()
+        self._set_csrf_cookie(req, cookie)
+        return req
 
     def _get_POST_csrf_cookie_request(
         self, cookie=None, post_token=None, meta_token=None, token_header=None,
@@ -858,13 +866,8 @@ class CsrfViewMiddlewareTestMixin:
 
 class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
 
-    def _get_GET_csrf_cookie_request(self, cookie=None):
-        """The cookie argument defaults to the valid test cookie."""
-        if cookie is None:
-            cookie = self._csrf_id_cookie
-        req = self._get_request()
+    def _set_csrf_cookie(self, req, cookie):
         req.COOKIES[settings.CSRF_COOKIE_NAME] = cookie
-        return req
 
     def test_ensures_csrf_cookie_no_middleware(self):
         """
@@ -1068,13 +1071,8 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
     CSRF tests with CSRF_USE_SESSIONS=True.
     """
 
-    def _get_GET_csrf_cookie_request(self, cookie=None):
-        """The cookie argument defaults to the valid test cookie."""
-        if cookie is None:
-            cookie = self._csrf_id_cookie
-        req = self._get_request()
+    def _set_csrf_cookie(self, req, cookie):
         req.session[CSRF_SESSION_KEY] = cookie
-        return req
 
     def test_no_session_on_request(self):
         msg = (
