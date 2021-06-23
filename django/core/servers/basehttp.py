@@ -225,7 +225,7 @@ def run(addr, port, wsgi_handler, ipv6=False, threading=False,
     cls_dict = {}
     if on_bind is not None:
         def server_bind(self):
-            super(httpd_cls, self).server_bind()
+            server_cls.server_bind(self)
             on_bind(self.server_name, self.server_port)
         cls_dict['server_bind'] = server_bind
     if threading:
