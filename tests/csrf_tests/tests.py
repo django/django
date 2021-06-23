@@ -102,33 +102,36 @@ class CsrfViewMiddlewareTestMixin:
             self._set_csrf_cookie(req, cookie)
         return req
 
-    def _get_GET_csrf_cookie_request(self, cookie=None):
-        """The cookie argument defaults to the valid test cookie."""
-        if cookie is None:
-            cookie = self._csrf_id_cookie
-        req = self._get_request()
-        self._set_csrf_cookie(req, cookie)
-        return req
-
-    def _get_POST_csrf_cookie_request(
-        self, cookie=None, post_token=None, meta_token=None, token_header=None,
+    def _get_csrf_cookie_request(
+        self, method=None, cookie=None, post_token=None, meta_token=None,
+        token_header=None,
     ):
         """
-        The cookie argument defaults to this class's default test cookie. The
-        post_token and meta_token arguments are included in the request's
-        req.POST and req.META headers, respectively, when that argument is
-        provided and non-None. The token_header argument is the header key to
-        use for req.META, defaults to "HTTP_X_CSRFTOKEN".
+        The method argument defaults to "GET". The cookie argument defaults to
+        this class's default test cookie. The post_token and meta_token
+        arguments are included in the request's req.POST and req.META headers,
+        respectively, when that argument is provided and non-None. The
+        token_header argument is the header key to use for req.META, defaults
+        to "HTTP_X_CSRFTOKEN".
         """
+        if cookie is None:
+            cookie = self._csrf_id_cookie
         if token_header is None:
             token_header = 'HTTP_X_CSRFTOKEN'
-        req = self._get_GET_csrf_cookie_request(cookie=cookie)
-        req.method = "POST"
+        req = self._get_request(method=method, cookie=cookie)
         if post_token is not None:
             req.POST['csrfmiddlewaretoken'] = post_token
         if meta_token is not None:
             req.META[token_header] = meta_token
         return req
+
+    def _get_POST_csrf_cookie_request(
+        self, cookie=None, post_token=None, meta_token=None, token_header=None,
+    ):
+        return self._get_csrf_cookie_request(
+            method='POST', cookie=cookie, post_token=post_token,
+            meta_token=meta_token, token_header=token_header,
+        )
 
     def _get_POST_request_with_token(self, cookie=None):
         """The cookie argument defaults to this class's default test cookie."""
@@ -312,15 +315,13 @@ class CsrfViewMiddlewareTestMixin:
         """
         HTTP PUT and DELETE can get through with X-CSRFToken and a cookie.
         """
-        req = self._get_POST_csrf_cookie_request(meta_token=self._csrf_id_token)
-        req.method = 'PUT'
+        req = self._get_csrf_cookie_request(method='PUT', meta_token=self._csrf_id_token)
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         resp = mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(resp)
 
-        req = self._get_POST_csrf_cookie_request(meta_token=self._csrf_id_token)
-        req.method = 'DELETE'
+        req = self._get_csrf_cookie_request(method='DELETE', meta_token=self._csrf_id_token)
         mw.process_request(req)
         resp = mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(resp)
@@ -355,7 +356,7 @@ class CsrfViewMiddlewareTestMixin:
         """
         CsrfTokenNode works when a CSRF cookie is set.
         """
-        req = self._get_GET_csrf_cookie_request()
+        req = self._get_csrf_cookie_request()
         mw = CsrfViewMiddleware(token_view)
         mw.process_request(req)
         mw.process_view(req, token_view, (), {})
@@ -366,7 +367,7 @@ class CsrfViewMiddlewareTestMixin:
         """
         get_token still works for a view decorated with 'csrf_exempt'.
         """
-        req = self._get_GET_csrf_cookie_request()
+        req = self._get_csrf_cookie_request()
         mw = CsrfViewMiddleware(token_view)
         mw.process_request(req)
         mw.process_view(req, csrf_exempt(token_view), (), {})
@@ -377,7 +378,7 @@ class CsrfViewMiddlewareTestMixin:
         """
         get_token() works for a view decorated solely with requires_csrf_token.
         """
-        req = self._get_GET_csrf_cookie_request()
+        req = self._get_csrf_cookie_request()
         resp = requires_csrf_token(token_view)(req)
         self._check_token_present(resp)
 
