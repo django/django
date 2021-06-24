@@ -5,8 +5,8 @@ Logging
 .. module:: django.utils.log
    :synopsis: Logging tools for Django applications
 
-A quick logging primer
-======================
+Overview
+========
 
 Django uses Python's builtin :mod:`logging` module to perform system logging.
 The usage of this module is discussed in detail in Python's own documentation.
@@ -68,7 +68,7 @@ it is passed to a *Handler*.
 Handlers
 ~~~~~~~~
 
-The handler is the engine that determines what happens to each message
+The *handler* is the engine that determines what happens to each message
 in a logger. It describes a particular logging behavior, such as
 writing a message to the screen, to a file, or to a network socket.
 
@@ -89,7 +89,7 @@ file for later analysis.
 Filters
 ~~~~~~~
 
-A filter is used to provide additional control over which log records
+A *filter* is used to provide additional control over which log records
 are passed from logger to handler.
 
 By default, any log message that meets log level requirements will be
@@ -111,14 +111,14 @@ can be used in a chain to perform multiple filtering actions.
 Formatters
 ~~~~~~~~~~
 
-Ultimately, a log record needs to be rendered as text. Formatters
+Ultimately, a log record needs to be rendered as text. *Formatters*
 describe the exact format of that text. A formatter usually consists
 of a Python formatting string containing
 :ref:`LogRecord attributes <python:logrecord-attributes>`; however,
 you can also write custom formatters to implement specific formatting behavior.
 
-Using logging
-=============
+How to use logging
+==================
 
 Once you have configured your loggers, handlers, filters and
 formatters, you need to place logging calls into your code. Using the
@@ -492,11 +492,11 @@ configuring the logging in your settings file will load your logging config
 immediately. As such, your logging config must appear *after* any settings on
 which it depends.
 
-Django's logging extensions
-===========================
+Django logging extension reference
+==================================
 
 Django provides a number of utilities to handle the unique
-requirements of logging in Web server environment.
+requirements of logging in a web server environment.
 
 Loggers
 -------
