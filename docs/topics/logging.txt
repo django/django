@@ -68,9 +68,9 @@ it is passed to a *Handler*.
 Handlers
 ~~~~~~~~
 
-The *handler* is the engine that determines what happens to each
-message in a logger. It describes a particular logging behavior, such
-as writing a message to the screen, to a file, or to a network socket.
+The *handler* is the engine that determines what happens to each message
+in a logger. It describes a particular logging behavior, such as
+writing a message to the screen, to a file, or to a network socket.
 
 Like loggers, handlers also have a log level. If the log level of a
 log record doesn't meet or exceed the level of the handler, the
