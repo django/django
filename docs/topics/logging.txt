@@ -28,8 +28,8 @@ A Python logging configuration consists of four parts:
 Loggers
 ~~~~~~~
 
-A logger is the entry point into the logging system. Each logger is
-a named bucket to which messages can be written for processing.
+A *logger* is the entry point into the logging system. Each logger is a named
+bucket to which messages can be written for processing.
 
 A logger is configured to have a *log level*. This log level describes
 the severity of the messages that the logger will handle. Python
@@ -117,27 +117,67 @@ of a Python formatting string containing
 :ref:`LogRecord attributes <python:logrecord-attributes>`; however,
 you can also write custom formatters to implement specific formatting behavior.
 
+.. _logging-how-to:
+
 How to use logging
 ==================
 
-Once you have configured your loggers, handlers, filters and
-formatters, you need to place logging calls into your code. Using the
-logging framework works like this::
+Django provides a :ref:`default logging configuration
+<default-logging-configuration>`, that for example generates the messages that
+appear in the console when using the :djadmin:`runserver`.
 
-    # import the logging library
+Make a basic logging call
+-------------------------
+
+Python programmers will often use ``print()`` in their code as a quick and
+convenient debugging tool. Using the logging framework is only a little more
+effort than that, but it's much more elegant and flexible. As well as being
+useful for debugging, logging can also provide you with more - and better
+structured - information about the state and health of your application.
+
+To send a log message from within your code, you place a logging call into it.
+
+.. admonition:: Don't be tempted to use logging calls in ``settings.py``
+
+    The way that Django logging is configured as part of the ``setup()``
+    function means that logging calls placed in ``settings.py`` may not work as
+    expected, because *logging will not be set up at that point*. To explore
+    logging, use a view function as suggested in the example below.
+
+First, import the Python logging library, and then obtain a logger instance
+with :py:func:`logging.getLogger`. The ``getLogger()`` method must be provided
+with a name. A good option is to use ``__name__``, which will provide the name
+of the current Python module (see :ref:`naming-loggers` for use of explicit
+naming)::
+
     import logging
 
-    # Get an instance of a logger
     logger = logging.getLogger(__name__)
 
-    def my_view(request, arg1, arg):
-        ...
-        if bad_mojo:
-            # Log an error message
-            logger.error('Something went wrong!')
+And then in a function, for example in a view, send a message to the logger::
 
-And that's it! Every time the ``bad_mojo`` condition is activated, an
-error log record will be written.
+    def some_view(request):
+        ...
+        if some_risky_state:
+            logger.warning('Platform is running at risk')
+
+When this code is executed, that message will be sent to the logger (and if
+you're using Django's default logging configuration, it will appear in the
+console).
+
+The ``WARNING`` level used in the example above is one of several
+:ref:`logging severity levels <topic-logging-parts-loggers>`: ``DEBUG``,
+``INFO``, ``WARNING``, ``ERROR``, ``CRITICAL``. So, another example might be::
+
+    logger.critical('Payment system is not responding')
+
+The default logging configuration, which Django inherits from the Python
+logging module, prints all messages of level ``WARNING`` and higher to the
+console. Django's own defaults will *not* pass ``INFO`` or lower severity
+messages from applications other than Django itself to the console - that will
+need to be configured explicitly.
+
+.. _naming-loggers:
 
 Naming loggers
 --------------
