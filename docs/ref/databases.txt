@@ -693,9 +693,9 @@ Option          MariaDB   MySQL
 =============== ========= ==========
 
 When using ``select_for_update()`` on MySQL, make sure you filter a queryset
-against at least set of fields contained in unique constraints or only against
-fields covered by indexes. Otherwise, an exclusive write lock will be acquired
-over the full table for the duration of the transaction.
+against at least a set of fields contained in unique constraints or only
+against fields covered by indexes. Otherwise, an exclusive write lock will be
+acquired over the full table for the duration of the transaction.
 
 Automatic typecasting can cause unexpected results
 --------------------------------------------------
