@@ -2221,7 +2221,8 @@ normally supports it).
 .. method:: bulk_update(objs, fields, batch_size=None)
 
 This method efficiently updates the given fields on the provided model
-instances, generally with one query::
+instances, generally with one query, and returns the number of objects
+updated::
 
     >>> objs = [
     ...    Entry.objects.create(headline='Entry 1'),
@@ -2230,6 +2231,11 @@ instances, generally with one query::
     >>> objs[0].headline = 'This is entry 1'
     >>> objs[1].headline = 'This is entry 2'
     >>> Entry.objects.bulk_update(objs, ['headline'])
+    2
+
+.. versionchanged:: 4.0
+
+    The return value of the number of objects updated was added.
 
 :meth:`.QuerySet.update` is used to save the changes, so this is more efficient
 than iterating through the list of models and calling ``save()`` on each of
@@ -2246,6 +2252,10 @@ them, but it has a few caveats:
   extra query per ancestor.
 * When an individual batch contains duplicates, only the first instance in that
   batch will result in an update.
+* The number of objects updated returned by the function may be fewer than the
+  number of objects passed in. This can be due to duplicate objects passed in
+  which are updated in the same batch or race conditions such that objects are
+  no longer present in the database.
 
 The ``batch_size`` parameter controls how many objects are saved in a single
 query. The default is to update all objects in one batch, except for SQLite

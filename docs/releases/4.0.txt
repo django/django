@@ -263,6 +263,8 @@ Models
 * :class:`~django.db.models.DurationField` now supports multiplying and
   dividing by scalar values on SQLite.
 
+* :meth:`.QuerySet.bulk_update` now returns the number of objects updated.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
