@@ -3,6 +3,7 @@
 import html
 import json
 import re
+import string
 from html.parser import HTMLParser
 from urllib.parse import (
     parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit,
@@ -206,6 +207,16 @@ def smart_urlquote(url):
         # See also https://bugs.python.org/issue16285
         return quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + '~')
 
+    def maybe_quote_fragment(fragment):
+        # Only quote if the fragment does not conform to spec.
+        # From https://datatracker.ietf.org/doc/html/rfc3986#appendix-A.
+        RFC3986_UNRESERVED = string.ascii_letters + string.digits + '-._~'
+        RFC3986_PCHAR = RFC3986_UNRESERVED + RFC3986_SUBDELIMS + ':@'
+        RFC3986_FRAGMENT = RFC3986_PCHAR + '/?'
+
+        is_fragment_ok = re.fullmatch(r'(%[0-9a-fA-F]{2}|[' + re.escape(RFC3986_FRAGMENT) + r'])*', fragment)
+        return fragment if is_fragment_ok else quote(fragment, safe=RFC3986_FRAGMENT)
+
     # Handle IDN before quoting.
     try:
         scheme, netloc, path, query, fragment = urlsplit(url)
@@ -227,7 +238,8 @@ def smart_urlquote(url):
         query = urlencode(query_parts)
 
     path = unquote_quote(path)
-    # Leave fragment unaltered.
+
+    fragment = maybe_quote_fragment(fragment)
 
     return urlunsplit((scheme, netloc, path, query, fragment))
 
