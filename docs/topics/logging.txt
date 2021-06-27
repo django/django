@@ -702,15 +702,8 @@ Python logging module.
             }
         },
 
-    Note that this HTML version of the email contains a full traceback,
-    with names and values of local variables at each level of the stack, plus
-    the values of your Django settings. This information is potentially very
-    sensitive, and you may not want to send it over email. Consider using
-    something such as `Sentry`_ to get the best of both worlds -- the
-    rich information of full tracebacks plus the security of *not* sending the
-    information over email. You may also explicitly designate certain
-    sensitive information to be filtered out of error reports -- learn more on
-    :ref:`Filtering error reports<filtering-error-reports>`.
+    Be aware of the :ref:`security implications of logging
+    <logging-security-implications>` when using the ``AdminEmailHandler``.
 
     By setting the ``email_backend`` argument of ``AdminEmailHandler``, the
     :ref:`email backend <topic-email-backends>` that is being used by the
@@ -746,8 +739,6 @@ Python logging module.
         Sends emails to admin users. To customize this behavior, you can
         subclass the :class:`~django.utils.log.AdminEmailHandler` class and
         override this method.
-
-.. _Sentry: https://pypi.org/project/sentry/
 
 Filters
 -------
@@ -848,3 +839,38 @@ above.
 See also :ref:`Configuring logging <configuring-logging>` to learn how you can
 complement or replace this default logging configuration defined in
 :source:`django/utils/log.py`.
+
+.. _logging-security-implications:
+
+Security implications
+=====================
+
+The logging system handles potentially sensitive information. For example, the
+log record may contain information about a web request or a stack trace, while
+some of the data you collect in your own loggers may also have security
+implications. You need to be sure you know:
+
+* what information is collected
+* where it will subsequently be stored
+* how it will be transferred
+* who might have access to it.
+
+To help control the collection of sensitive information, you can explicitly
+designate certain sensitive information to be filtered out of error reports --
+read more about how to :ref:`filter error reports <filtering-error-reports>`.
+
+``AdminEmailHandler``
+---------------------
+
+The built-in :class:`AdminEmailHandler` deserves a mention in the context of
+security. If its ``include_html`` option is enabled, the email message it sends
+will contain a full traceback, with names and values of local variables at each
+level of the stack, plus the values of your Django settings (in other words,
+the same level of detail that is exposed in a web page when :setting:`DEBUG` is
+``True``).
+
+It's generally not considered a good idea to send such potentially sensitive
+information over email. Consider instead using one of the many third-party
+services to which detailed logs can be sent to get the best of multiple worlds
+-- the rich information of full tracebacks, clear management of who is notified
+and has access to the information, and so on.
