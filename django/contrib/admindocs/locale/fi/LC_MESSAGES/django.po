@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015,2017,2020
+# Aarni Koskela, 2015,2017,2020-2021
 # Elias Luttinen <elias.luttinen@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 11:18+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2021-04-14 12:19+0000\n"
+"Last-Translator: Aarni Koskela\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -101,6 +101,8 @@ msgid ""
 "The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
+"Hallinnan dokumentaatio vaatii Pythonin <a href=\"%(link)s\">docutils</a>-"
+"kirjaston."
 
 #, python-format
 msgid ""
