@@ -427,9 +427,9 @@ Creating your database
 
 You can `create your database`_ using the command-line tools and this SQL::
 
-  CREATE DATABASE <dbname> CHARACTER SET utf8;
+  CREATE DATABASE <dbname> CHARACTER SET utf8mb4;
 
-This ensures all tables and columns will use UTF-8 by default.
+This ensures all tables and columns will use UTF-8 (4 bytes) by default. MySQL's default encoding switched to ``utf8mb4`` after v8.0.1 in 2017. This allows ``char`` and ``varchar `` columns to store strings with emoji correctly.
 
 .. _create your database: https://dev.mysql.com/doc/refman/en/create-database.html
 
