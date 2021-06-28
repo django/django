@@ -2,7 +2,7 @@
 Logging
 =======
 
-.. seealso:: 
+.. seealso::
 
     :ref:`Django logging reference <logging_ref>`.
 
