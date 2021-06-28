@@ -186,6 +186,15 @@ Note:
         Django respond appropriately to requests with an ``If-Modified-Since``
         header which will prevent sending the sitemap if it hasn't changed.
 
+    .. attribute:: Sitemap.paginator
+
+        **Optional.**
+
+        This property returns a :class:`~django.core.paginator.Paginator` for
+        :attr:`~Sitemap.items()`. If you generate sitemaps in a batch you may
+        want to override this as a cached property in order to avoid multiple
+        ``items()`` calls.
+
     .. attribute:: Sitemap.changefreq
 
         **Optional.** Either a method or attribute.
