@@ -36,7 +36,7 @@ class MySuite:
         yield from self.tests
 
 
-class TestSuiteTests(unittest.TestCase):
+class TestSuiteTests(SimpleTestCase):
     def build_test_suite(self, test_classes, suite=None, suite_class=None):
         if suite_class is None:
             suite_class = unittest.TestSuite
@@ -88,6 +88,14 @@ class TestSuiteTests(unittest.TestCase):
         self.assertTestNames(tests, expected=[
             'Tests1.test1', 'Tests1.test2', 'Tests2.test1', 'Tests2.test2',
         ])
+
+    def test_iter_test_cases_string_input(self):
+        msg = (
+            "Test 'a' must be a test case or test suite not string (was found "
+            "in 'abc')."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            list(iter_test_cases('abc'))
 
     def test_iter_test_cases_iterable_of_tests(self):
         class Tests(unittest.TestCase):
