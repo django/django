@@ -12,6 +12,7 @@ from django.http import (
 )
 from django.template import Context, Engine, TemplateDoesNotExist, loader
 from django.utils._os import safe_join
+from django.utils.cache import add_never_cache_headers
 from django.utils.http import http_date, parse_http_date
 from django.utils.translation import gettext as _, gettext_lazy
 
@@ -51,6 +52,7 @@ def serve(request, path, document_root=None, show_indexes=False):
     response.headers["Last-Modified"] = http_date(statobj.st_mtime)
     if encoding:
         response.headers["Content-Encoding"] = encoding
+    add_never_cache_headers(response)
     return response
 
 
