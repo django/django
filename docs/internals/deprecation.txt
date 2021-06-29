@@ -30,6 +30,10 @@ details on these changes.
 * The ``extra_tests`` argument for ``DiscoverRunner.build_suite()`` and
   ``DiscoverRunner.run_tests()`` will be removed.
 
+* The ``django.contrib.postgres.aggregates.ArrayAgg``, ``JSONBAgg``, and
+  ``StringAgg`` aggregates will return ``None`` when there are no rows instead
+  of ``[]``, ``[]``, and ``''`` respectively.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

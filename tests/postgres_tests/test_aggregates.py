@@ -3,7 +3,8 @@ from django.db.models import (
 )
 from django.db.models.fields.json import KeyTextTransform, KeyTransform
 from django.db.models.functions import Cast, Concat, Substr
-from django.test.utils import Approximate
+from django.test.utils import Approximate, ignore_warnings
+from django.utils.deprecation import RemovedInDjango50Warning
 
 from . import PostgreSQLTestCase
 from .models import AggregateTestModel, StatTestModel
@@ -44,6 +45,7 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             ),
         ])
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_empty_result_set(self):
         AggregateTestModel.objects.all().delete()
         tests = [
@@ -99,6 +101,49 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                         aggregation=aggregation,
                     )
                     self.assertEqual(values, {'aggregation': expected_result})
+
+    def test_convert_value_deprecation(self):
+        AggregateTestModel.objects.all().delete()
+        queryset = AggregateTestModel.objects.all()
+
+        with self.assertWarnsMessage(RemovedInDjango50Warning, ArrayAgg.deprecation_msg):
+            queryset.aggregate(aggregation=ArrayAgg('boolean_field'))
+
+        with self.assertWarnsMessage(RemovedInDjango50Warning, JSONBAgg.deprecation_msg):
+            queryset.aggregate(aggregation=JSONBAgg('integer_field'))
+
+        with self.assertWarnsMessage(RemovedInDjango50Warning, StringAgg.deprecation_msg):
+            queryset.aggregate(aggregation=StringAgg('char_field', delimiter=';'))
+
+        # No warnings raised if default argument provided.
+        self.assertEqual(
+            queryset.aggregate(aggregation=ArrayAgg('boolean_field', default=None)),
+            {'aggregation': None},
+        )
+        self.assertEqual(
+            queryset.aggregate(aggregation=JSONBAgg('integer_field', default=None)),
+            {'aggregation': None},
+        )
+        self.assertEqual(
+            queryset.aggregate(
+                aggregation=StringAgg('char_field', delimiter=';', default=None),
+            ),
+            {'aggregation': None},
+        )
+        self.assertEqual(
+            queryset.aggregate(aggregation=ArrayAgg('boolean_field', default=Value([]))),
+            {'aggregation': []},
+        )
+        self.assertEqual(
+            queryset.aggregate(aggregation=JSONBAgg('integer_field', default=Value('[]'))),
+            {'aggregation': []},
+        )
+        self.assertEqual(
+            queryset.aggregate(
+                aggregation=StringAgg('char_field', delimiter=';', default=Value('')),
+            ),
+            {'aggregation': ''},
+        )
 
     def test_array_agg_charfield(self):
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('char_field'))

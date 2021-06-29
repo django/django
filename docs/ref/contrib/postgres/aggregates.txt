@@ -52,6 +52,13 @@ General-purpose aggregation functions
             from django.db.models import F
             F('some_field').desc()
 
+    .. deprecated:: 4.0
+
+        If there are no rows and ``default`` is not provided, ``ArrayAgg``
+        returns an empty list instead of ``None``. This behavior is deprecated
+        and will be removed in Django 5.0. If you need it, explicitly set
+        ``default`` to ``Value([])``.
+
 ``BitAnd``
 ----------
 
@@ -138,6 +145,13 @@ General-purpose aggregation functions
 
         Examples are the same as for :attr:`ArrayAgg.ordering`.
 
+    .. deprecated:: 4.0
+
+        If there are no rows and ``default`` is not provided, ``JSONBAgg``
+        returns an empty list instead of ``None``. This behavior is deprecated
+        and will be removed in Django 5.0. If you need it, explicitly set
+        ``default`` to ``Value('[]')``.
+
 ``StringAgg``
 -------------
 
@@ -163,6 +177,13 @@ General-purpose aggregation functions
         elements in the result string.
 
         Examples are the same as for :attr:`ArrayAgg.ordering`.
+
+    .. deprecated:: 4.0
+
+        If there are no rows and ``default`` is not provided, ``StringAgg``
+        returns an empty string instead of ``None``. This behavior is
+        deprecated and will be removed in Django 5.0. If you need it,
+        explicitly set ``default`` to ``Value('')``.
 
 Aggregate functions for statistics
 ==================================
