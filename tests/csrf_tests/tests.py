@@ -349,7 +349,7 @@ class CsrfViewMiddlewareTestMixin:
         A new token is sent if the csrf_cookie is the empty string.
         """
         req = self._get_request()
-        req.COOKIES[settings.CSRF_COOKIE_NAME] = ""
+        self._set_csrf_cookie(req, '')
         mw = CsrfViewMiddleware(token_view)
         mw.process_view(req, token_view, (), {})
         resp = token_view(req)
@@ -881,7 +881,8 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         """
         req = self._get_request()
         resp = ensure_csrf_cookie_view(req)
-        self.assertTrue(resp.cookies.get(settings.CSRF_COOKIE_NAME, False))
+        csrf_cookie = self._read_csrf_cookie(req, resp)
+        self.assertTrue(csrf_cookie)
         self.assertIn('Cookie', resp.get('Vary', ''))
 
     def test_ensures_csrf_cookie_with_middleware(self):
@@ -893,7 +894,8 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         mw = CsrfViewMiddleware(ensure_csrf_cookie_view)
         mw.process_view(req, ensure_csrf_cookie_view, (), {})
         resp = mw(req)
-        self.assertTrue(resp.cookies.get(settings.CSRF_COOKIE_NAME, False))
+        csrf_cookie = self._read_csrf_cookie(req, resp)
+        self.assertTrue(csrf_cookie)
         self.assertIn('Cookie', resp.get('Vary', ''))
 
     def test_csrf_cookie_age(self):
@@ -965,12 +967,12 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         created.
         """
         req = self._get_request()
-        req.COOKIES[settings.CSRF_COOKIE_NAME] = 'x' * 100000
+        self._set_csrf_cookie(req, 'x' * 100000)
         mw = CsrfViewMiddleware(token_view)
         mw.process_view(req, token_view, (), {})
         resp = mw(req)
-        csrf_cookie = resp.cookies.get(settings.CSRF_COOKIE_NAME, False)
-        self.assertEqual(len(csrf_cookie.value), CSRF_TOKEN_LENGTH)
+        csrf_cookie = self._read_csrf_cookie(req, resp)
+        self.assertEqual(len(csrf_cookie), CSRF_TOKEN_LENGTH)
 
     def test_process_view_token_invalid_chars(self):
         """
@@ -979,13 +981,13 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         """
         token = ('!@#' + self._csrf_id_token)[:CSRF_TOKEN_LENGTH]
         req = self._get_request()
-        req.COOKIES[settings.CSRF_COOKIE_NAME] = token
+        self._set_csrf_cookie(req, token)
         mw = CsrfViewMiddleware(token_view)
         mw.process_view(req, token_view, (), {})
         resp = mw(req)
-        csrf_cookie = resp.cookies.get(settings.CSRF_COOKIE_NAME, False)
-        self.assertEqual(len(csrf_cookie.value), CSRF_TOKEN_LENGTH)
-        self.assertNotEqual(csrf_cookie.value, token)
+        csrf_cookie = self._read_csrf_cookie(req, resp)
+        self.assertEqual(len(csrf_cookie), CSRF_TOKEN_LENGTH)
+        self.assertNotEqual(csrf_cookie, token)
 
     def test_masked_unmasked_combinations(self):
         """
@@ -1024,10 +1026,9 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         resp = mw.process_view(req, token_view, (), {})
         self.assertIsNone(resp)
         resp = mw(req)
-        self.assertIn(settings.CSRF_COOKIE_NAME, resp.cookies, "Cookie was not reset from bare secret")
-        csrf_cookie = resp.cookies[settings.CSRF_COOKIE_NAME]
-        self.assertEqual(len(csrf_cookie.value), CSRF_TOKEN_LENGTH)
-        self._check_token_present(resp, csrf_id=csrf_cookie.value)
+        csrf_cookie = self._read_csrf_cookie(req, resp)
+        self.assertEqual(len(csrf_cookie), CSRF_TOKEN_LENGTH)
+        self._check_token_present(resp, csrf_id=csrf_cookie)
 
     @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_COOKIE_DOMAIN='.example.com', USE_X_FORWARDED_PORT=True)
     def test_https_good_referer_behind_proxy(self):
@@ -1080,7 +1081,7 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
     def _set_csrf_cookie(self, req, cookie):
         req.session[CSRF_SESSION_KEY] = cookie
 
-    def _read_csrf_cookie(self, req, resp):
+    def _read_csrf_cookie(self, req, resp=None):
         """
         Return the CSRF cookie as a string, or False if no cookie is present.
         """
@@ -1124,7 +1125,8 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
         """The ensure_csrf_cookie() decorator works without middleware."""
         req = self._get_request()
         ensure_csrf_cookie_view(req)
-        self.assertTrue(req.session.get(CSRF_SESSION_KEY, False))
+        csrf_cookie = self._read_csrf_cookie(req)
+        self.assertTrue(csrf_cookie)
 
     def test_session_modify(self):
         """The session isn't saved if the CSRF cookie is unchanged."""
@@ -1132,7 +1134,8 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
         mw = CsrfViewMiddleware(ensure_csrf_cookie_view)
         mw.process_view(req, ensure_csrf_cookie_view, (), {})
         mw(req)
-        self.assertIsNotNone(req.session.get(CSRF_SESSION_KEY))
+        csrf_cookie = self._read_csrf_cookie(req)
+        self.assertTrue(csrf_cookie)
         req.session.modified = False
         mw.process_view(req, ensure_csrf_cookie_view, (), {})
         mw(req)
@@ -1147,7 +1150,8 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
         mw = CsrfViewMiddleware(ensure_csrf_cookie_view)
         mw.process_view(req, ensure_csrf_cookie_view, (), {})
         mw(req)
-        self.assertTrue(req.session.get(CSRF_SESSION_KEY, False))
+        csrf_cookie = self._read_csrf_cookie(req)
+        self.assertTrue(csrf_cookie)
 
     @override_settings(
         ALLOWED_HOSTS=['www.example.com'],
