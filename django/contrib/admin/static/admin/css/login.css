@@ -13,6 +13,7 @@
 
 .login #header h1 {
     font-size: 18px;
+    margin: 0;
 }
 
 .login #header h1 a {
