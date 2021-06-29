@@ -93,6 +93,12 @@ class CsrfViewMiddlewareTestMixin:
     def _set_csrf_cookie(self, req, cookie):
         raise NotImplementedError('This method must be implemented by a subclass.')
 
+    def _read_csrf_cookie(self, req, resp):
+        """
+        Return the CSRF cookie as a string, or False if no cookie is present.
+        """
+        raise NotImplementedError('This method must be implemented by a subclass.')
+
     def _get_request(self, method=None, cookie=None):
         if method is None:
             method = 'GET'
@@ -164,7 +170,7 @@ class CsrfViewMiddlewareTestMixin:
         mw.process_view(req, non_token_view_using_request_processor, (), {})
         resp = mw(req)
 
-        csrf_cookie = resp.cookies.get(settings.CSRF_COOKIE_NAME, False)
+        csrf_cookie = self._read_csrf_cookie(req, resp)
         self.assertIs(csrf_cookie, False)
 
     def _check_bad_or_missing_cookie(self, cookie, expected):
@@ -391,8 +397,8 @@ class CsrfViewMiddlewareTestMixin:
         mw = CsrfViewMiddleware(token_view)
         mw.process_view(req, token_view, (), {})
         resp = mw(req)
-        csrf_cookie = resp.cookies[settings.CSRF_COOKIE_NAME]
-        self._check_token_present(resp, csrf_id=csrf_cookie.value)
+        csrf_cookie = self._read_csrf_cookie(req, resp)
+        self._check_token_present(resp, csrf_id=csrf_cookie)
 
     def test_cookie_not_reset_on_accepted_request(self):
         """
@@ -405,12 +411,11 @@ class CsrfViewMiddlewareTestMixin:
         mw.process_request(req)
         mw.process_view(req, token_view, (), {})
         resp = mw(req)
-        csrf_cookie = resp.cookies.get(settings.CSRF_COOKIE_NAME, None)
-        if csrf_cookie:
-            self.assertEqual(
-                csrf_cookie.value, self._csrf_id_cookie,
-                "CSRF cookie was changed on an accepted request"
-            )
+        csrf_cookie = self._read_csrf_cookie(req, resp)
+        self.assertEqual(
+            csrf_cookie, self._csrf_id_cookie,
+            'CSRF cookie was changed on an accepted request',
+        )
 
     @override_settings(DEBUG=True, ALLOWED_HOSTS=['www.example.com'])
     def test_https_bad_referer(self):
@@ -861,6 +866,15 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
     def _set_csrf_cookie(self, req, cookie):
         req.COOKIES[settings.CSRF_COOKIE_NAME] = cookie
 
+    def _read_csrf_cookie(self, req, resp):
+        """
+        Return the CSRF cookie as a string, or False if no cookie is present.
+        """
+        if settings.CSRF_COOKIE_NAME not in resp.cookies:
+            return False
+        csrf_cookie = resp.cookies[settings.CSRF_COOKIE_NAME]
+        return csrf_cookie.value
+
     def test_ensures_csrf_cookie_no_middleware(self):
         """
         The ensure_csrf_cookie() decorator works without middleware.
@@ -1066,6 +1080,14 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
     def _set_csrf_cookie(self, req, cookie):
         req.session[CSRF_SESSION_KEY] = cookie
 
+    def _read_csrf_cookie(self, req, resp):
+        """
+        Return the CSRF cookie as a string, or False if no cookie is present.
+        """
+        if CSRF_SESSION_KEY not in req.session:
+            return False
+        return req.session[CSRF_SESSION_KEY]
+
     def test_no_session_on_request(self):
         msg = (
             'CSRF_USE_SESSIONS is enabled, but request.session is not set. '
@@ -1126,18 +1148,6 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
         mw.process_view(req, ensure_csrf_cookie_view, (), {})
         mw(req)
         self.assertTrue(req.session.get(CSRF_SESSION_KEY, False))
-
-    def test_token_node_with_new_csrf_cookie(self):
-        """
-        CsrfTokenNode works when a CSRF cookie is created by the middleware
-        (when one was not already present).
-        """
-        req = self._get_request()
-        mw = CsrfViewMiddleware(token_view)
-        mw.process_view(req, token_view, (), {})
-        resp = mw(req)
-        csrf_cookie = req.session[CSRF_SESSION_KEY]
-        self._check_token_present(resp, csrf_id=csrf_cookie)
 
     @override_settings(
         ALLOWED_HOSTS=['www.example.com'],
