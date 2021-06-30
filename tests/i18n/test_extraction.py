@@ -765,6 +765,8 @@ class CustomLayoutExtractionTests(ExtractorTests):
         )
         with self.assertRaisesMessage(management.CommandError, msg):
             management.call_command('makemessages', locale=[LOCALE], verbosity=0)
+        # Working files are cleaned up on an error.
+        self.assertFalse(os.path.exists('./app_no_locale/test.html.py'))
 
     def test_project_locale_paths(self):
         self._test_project_locale_paths(os.path.join(self.test_dir, 'project_locale'))

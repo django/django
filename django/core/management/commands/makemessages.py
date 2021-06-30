@@ -581,6 +581,8 @@ class Command(BaseCommand):
 
         if msgs:
             if locale_dir is NO_LOCALE_DIR:
+                for build_file in build_files:
+                    build_file.cleanup()
                 file_path = os.path.normpath(build_files[0].path)
                 raise CommandError(
                     "Unable to find a locale path to store translations for "
