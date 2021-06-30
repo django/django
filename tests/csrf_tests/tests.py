@@ -7,8 +7,8 @@ from django.http import HttpRequest, HttpResponse, UnreadablePostError
 from django.middleware.csrf import (
     CSRF_ALLOWED_CHARS, CSRF_SESSION_KEY, CSRF_TOKEN_LENGTH, REASON_BAD_ORIGIN,
     REASON_CSRF_TOKEN_MISSING, REASON_NO_CSRF_COOKIE, CsrfViewMiddleware,
-    RejectRequest, _compare_masked_tokens as equivalent_tokens,
-    _mask_cipher_secret, _unmask_cipher_token, get_token,
+    RejectRequest, _does_token_match, _mask_cipher_secret, _unmask_cipher_token,
+    get_token,
 )
 from django.test import SimpleTestCase, override_settings
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
@@ -209,7 +209,7 @@ class CsrfViewMiddlewareTestMixin:
         match = re.search('name="csrfmiddlewaretoken" value="(.*?)"', text)
         csrf_token = csrf_id or self._csrf_id_token
         self.assertTrue(
-            match and equivalent_tokens(csrf_token, match[1]),
+            match and _does_token_match(csrf_token, match[1]),
             "Could not find csrfmiddlewaretoken to match %s" % csrf_token
         )
 
@@ -1296,4 +1296,4 @@ class CsrfInErrorHandlingViewsTests(SimpleTestCase):
         response = self.client.get('/does not exist/')
         self.assertEqual(response.status_code, 599)
         token2 = response.content
-        self.assertTrue(equivalent_tokens(token1.decode('ascii'), token2.decode('ascii')))
+        self.assertTrue(_does_token_match(token1.decode('ascii'), token2.decode('ascii')))
