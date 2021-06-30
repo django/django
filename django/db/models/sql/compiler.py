@@ -1,4 +1,5 @@
 import collections
+import json
 import re
 from functools import partial
 from itertools import chain
@@ -1250,9 +1251,10 @@ class SQLCompiler:
         result = list(self.execute_sql())
         # Some backends return 1 item tuples with strings, and others return
         # tuples with integers and strings. Flatten them out into strings.
+        output_formatter = json.dumps if self.query.explain_format == 'json' else str
         for row in result[0]:
             if not isinstance(row, str):
-                yield ' '.join(str(c) for c in row)
+                yield ' '.join(output_formatter(c) for c in row)
             else:
                 yield row
 

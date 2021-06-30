@@ -1,3 +1,4 @@
+import json
 import unittest
 import xml.etree.ElementTree
 
@@ -38,6 +39,13 @@ class ExplainTests(TestCase):
                             except xml.etree.ElementTree.ParseError as e:
                                 self.fail(
                                     f'QuerySet.explain() result is not valid XML: {e}'
+                                )
+                        elif format == 'json':
+                            try:
+                                json.loads(result)
+                            except json.JSONDecodeError as e:
+                                self.fail(
+                                    f'QuerySet.explain() result is not valid JSON: {e}'
                                 )
 
     @skipUnlessDBFeature('validates_explain_options')
