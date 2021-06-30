@@ -226,8 +226,9 @@ class BasicExtractorTests(ExtractorTests):
         )
         with self.assertRaisesMessage(SyntaxError, msg):
             management.call_command('makemessages', locale=[LOCALE], extensions=['tpl'], verbosity=0)
-        # The temporary file was cleaned up
+        # The temporary files were cleaned up.
         self.assertFalse(os.path.exists('./templates/template_with_error.tpl.py'))
+        self.assertFalse(os.path.exists('./templates/template_0_with_no_error.tpl.py'))
 
     def test_unicode_decode_error(self):
         shutil.copyfile('./not_utf8.sample', './not_utf8.txt')
