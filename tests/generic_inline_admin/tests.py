@@ -1,14 +1,14 @@
-from django.contrib import admin
-from django.contrib.admin.sites import AdminSite
-from django.contrib.auth.models import User
-from django.contrib.contenttypes.admin import GenericTabularInline
-from django.contrib.contenttypes.models import ContentType
-from django.forms.formsets import DEFAULT_MAX_NUM
-from django.forms.models import ModelForm
-from django.test import (
+from mango.contrib import admin
+from mango.contrib.admin.sites import AdminSite
+from mango.contrib.auth.models import User
+from mango.contrib.contenttypes.admin import GenericTabularInline
+from mango.contrib.contenttypes.models import ContentType
+from mango.forms.formsets import DEFAULT_MAX_NUM
+from mango.forms.models import ModelForm
+from mango.test import (
     RequestFactory, SimpleTestCase, TestCase, override_settings,
 )
-from django.urls import reverse
+from mango.urls import reverse
 
 from .admin import MediaInline, MediaPermanentInline, site as admin_site
 from .models import Category, Episode, EpisodePermanent, Media, PhoneNumber
@@ -27,7 +27,7 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-        e = Episode.objects.create(name='This Week in Django')
+        e = Episode.objects.create(name='This Week in Mango')
         self.episode_pk = e.pk
         m = Media(content_object=e, url='http://example.com/podcast.mp3')
         m.save()
@@ -58,7 +58,7 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
         A smoke test to ensure POST on add_view works.
         """
         post_data = {
-            "name": "This Week in Django",
+            "name": "This Week in Mango",
             # inline data
             "generic_inline_admin-media-content_type-object_id-TOTAL_FORMS": "1",
             "generic_inline_admin-media-content_type-object_id-INITIAL_FORMS": "0",
@@ -72,7 +72,7 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
         A smoke test to ensure POST on edit_view works.
         """
         post_data = {
-            "name": "This Week in Django",
+            "name": "This Week in Mango",
             # inline data
             "generic_inline_admin-media-content_type-object_id-TOTAL_FORMS": "3",
             "generic_inline_admin-media-content_type-object_id-INITIAL_FORMS": "2",
@@ -103,7 +103,7 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         content type IDs, which will vary depending on what other tests
         have been run), thus we do it here.
         """
-        e = model.objects.create(name='This Week in Django')
+        e = model.objects.create(name='This Week in Mango')
         Media.objects.create(content_object=e, url='http://example.com/podcast.mp3')
         return e
 

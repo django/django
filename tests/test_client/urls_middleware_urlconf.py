@@ -1,5 +1,5 @@
-from django.http import HttpResponse
-from django.urls import path
+from mango.http import HttpResponse
+from mango.urls import path
 
 
 def empty_response(request):

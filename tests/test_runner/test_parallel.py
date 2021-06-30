@@ -2,8 +2,8 @@ import pickle
 import sys
 import unittest
 
-from django.test import SimpleTestCase
-from django.test.runner import RemoteTestResult
+from mango.test import SimpleTestCase
+from mango.test.runner import RemoteTestResult
 
 try:
     import tblib.pickling_support

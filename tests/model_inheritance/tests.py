@@ -1,10 +1,10 @@
 from operator import attrgetter
 
-from django.core.exceptions import FieldError, ValidationError
-from django.db import connection, models
-from django.db.models.query_utils import DeferredAttribute
-from django.test import SimpleTestCase, TestCase
-from django.test.utils import CaptureQueriesContext, isolate_apps
+from mango.core.exceptions import FieldError, ValidationError
+from mango.db import connection, models
+from mango.db.models.query_utils import DeferredAttribute
+from mango.test import SimpleTestCase, TestCase
+from mango.test.utils import CaptureQueriesContext, isolate_apps
 
 from .models import (
     Base, Chef, CommonInfo, GrandChild, GrandParent, ItalianRestaurant,
@@ -66,7 +66,7 @@ class ModelInheritanceTests(TestCase):
         post.attached_comment_set.create(content="Save $ on V1agr@", is_spam=True)
         post.attached_link_set.create(
             content="The Web framework for perfections with deadlines.",
-            url="http://www.djangoproject.com/"
+            url="http://www.mangoproject.com/"
         )
 
         # The Post model doesn't have an attribute called

@@ -1,10 +1,10 @@
-from django.contrib.auth import get_user, get_user_model
-from django.contrib.auth.models import AnonymousUser, User
-from django.core.exceptions import ImproperlyConfigured
-from django.db import IntegrityError
-from django.http import HttpRequest
-from django.test import TestCase, override_settings
-from django.utils import translation
+from mango.contrib.auth import get_user, get_user_model
+from mango.contrib.auth.models import AnonymousUser, User
+from mango.core.exceptions import ImproperlyConfigured
+from mango.db import IntegrityError
+from mango.http import HttpRequest
+from mango.test import TestCase, override_settings
+from mango.utils import translation
 
 from .models import CustomUser
 

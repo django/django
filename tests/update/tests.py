@@ -1,11 +1,11 @@
 import unittest
 
-from django.core.exceptions import FieldError
-from django.db import IntegrityError, connection, transaction
-from django.db.models import CharField, Count, F, IntegerField, Max
-from django.db.models.functions import Abs, Concat, Lower
-from django.test import TestCase
-from django.test.utils import register_lookup
+from mango.core.exceptions import FieldError
+from mango.db import IntegrityError, connection, transaction
+from mango.db.models import CharField, Count, F, IntegerField, Max
+from mango.db.models.functions import Abs, Concat, Lower
+from mango.test import TestCase
+from mango.test.utils import register_lookup
 
 from .models import (
     A, B, Bar, D, DataPoint, Foo, RelatedPoint, UniqueNumber,
@@ -152,7 +152,7 @@ class AdvancedTests(TestCase):
     def test_update_m2m_field(self):
         msg = (
             'Cannot update model field '
-            '<django.db.models.fields.related.ManyToManyField: m2m_foo> '
+            '<mango.db.models.fields.related.ManyToManyField: m2m_foo> '
             '(only non-relations and foreign keys permitted).'
         )
         with self.assertRaisesMessage(FieldError, msg):

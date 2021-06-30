@@ -1,5 +1,5 @@
 """
-Sphinx plugins for Django documentation.
+Sphinx plugins for Mango documentation.
 """
 import json
 import os
@@ -45,18 +45,18 @@ def setup(app):
         indextemplate="pair: %s; field lookup type",
     )
     app.add_object_type(
-        directivename="django-admin",
+        directivename="mango-admin",
         rolename="djadmin",
-        indextemplate="pair: %s; django-admin command",
-        parse_node=parse_django_admin_node,
+        indextemplate="pair: %s; mango-admin command",
+        parse_node=parse_mango_admin_node,
     )
-    app.add_directive('django-admin-option', Cmdoption)
-    app.add_config_value('django_next_version', '0.0', True)
+    app.add_directive('mango-admin-option', Cmdoption)
+    app.add_config_value('mango_next_version', '0.0', True)
     app.add_directive('versionadded', VersionDirective)
     app.add_directive('versionchanged', VersionDirective)
-    app.add_builder(DjangoStandaloneHTMLBuilder)
-    app.set_translator('djangohtml', DjangoHTMLTranslator)
-    app.set_translator('json', DjangoHTMLTranslator)
+    app.add_builder(MangoStandaloneHTMLBuilder)
+    app.set_translator('mangohtml', MangoHTMLTranslator)
+    app.set_translator('json', MangoHTMLTranslator)
     app.add_node(
         ConsoleNode,
         html=(visit_console_html, None),
@@ -90,7 +90,7 @@ class VersionDirective(Directive):
         node = addnodes.versionmodified()
         ret.append(node)
 
-        if self.arguments[0] == env.config.django_next_version:
+        if self.arguments[0] == env.config.mango_next_version:
             node['version'] = "Development version"
         else:
             node['version'] = self.arguments[0]
@@ -106,9 +106,9 @@ class VersionDirective(Directive):
         return ret
 
 
-class DjangoHTMLTranslator(HTMLTranslator):
+class MangoHTMLTranslator(HTMLTranslator):
     """
-    Django-specific reST to HTML tweaks.
+    Mango-specific reST to HTML tweaks.
     """
 
     # Don't use border=1, which docutils does by default.
@@ -142,8 +142,8 @@ class DjangoHTMLTranslator(HTMLTranslator):
     # that work.
     #
     version_text = {
-        'versionchanged': 'Changed in Django %s',
-        'versionadded': 'New in Django %s',
+        'versionchanged': 'Changed in Mango %s',
+        'versionadded': 'New in Mango %s',
     }
 
     def visit_versionmodified(self, node):
@@ -170,20 +170,20 @@ class DjangoHTMLTranslator(HTMLTranslator):
         node['ids'] = old_ids
 
 
-def parse_django_admin_node(env, sig, signode):
+def parse_mango_admin_node(env, sig, signode):
     command = sig.split(' ')[0]
     env.ref_context['std:program'] = command
-    title = "django-admin %s" % sig
+    title = "mango-admin %s" % sig
     signode += addnodes.desc_name(title, title)
     return command
 
 
-class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
+class MangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
     """
     Subclass to add some extra things we need.
     """
 
-    name = 'djangohtml'
+    name = 'mangohtml'
 
     def finish(self):
         super().finish()
@@ -201,7 +201,7 @@ class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
         }
         outfilename = os.path.join(self.outdir, "templatebuiltins.js")
         with open(outfilename, 'w') as fp:
-            fp.write('var django_template_builtins = ')
+            fp.write('var mango_template_builtins = ')
             json.dump(templatebuiltins, fp)
             fp.write(';\n')
 
@@ -234,7 +234,7 @@ def depart_console_dummy(self, node):
 
 def visit_console_html(self, node):
     """Generate HTML for the console directive."""
-    if self.builder.name in ('djangohtml', 'json') and node['win_console_text']:
+    if self.builder.name in ('mangohtml', 'json') and node['win_console_text']:
         # Put a mark on the document object signaling the fact the directive
         # has been used on it.
         self.document._console_directive_used_flag = True
@@ -346,9 +346,9 @@ class ConsoleDirective(CodeBlock):
         self.arguments = ['console']
         lit_blk_obj = super().run()[0]
 
-        # Only do work when the djangohtml HTML Sphinx builder is being used,
+        # Only do work when the mangohtml HTML Sphinx builder is being used,
         # invoke the default behavior for the rest.
-        if env.app.builder.name not in ('djangohtml', 'json'):
+        if env.app.builder.name not in ('mangohtml', 'json'):
             return [lit_blk_obj]
 
         lit_blk_obj['uid'] = str(env.new_serialno('console'))

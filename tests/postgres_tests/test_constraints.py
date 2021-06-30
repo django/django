@@ -1,17 +1,17 @@
 import datetime
 from unittest import mock
 
-from django.contrib.postgres.indexes import OpClass
-from django.db import (
+from mango.contrib.postgres.indexes import OpClass
+from mango.db import (
     IntegrityError, NotSupportedError, connection, transaction,
 )
-from django.db.models import (
+from mango.db.models import (
     CheckConstraint, Deferrable, F, Func, IntegerField, Q, UniqueConstraint,
 )
-from django.db.models.fields.json import KeyTextTransform
-from django.db.models.functions import Cast, Left, Lower
-from django.test import modify_settings, skipUnlessDBFeature
-from django.utils import timezone
+from mango.db.models.fields.json import KeyTextTransform
+from mango.db.models.functions import Cast, Left, Lower
+from mango.test import modify_settings, skipUnlessDBFeature
+from mango.utils import timezone
 
 from . import PostgreSQLTestCase
 from .models import HotelReservation, RangesModel, Room, Scene
@@ -19,15 +19,15 @@ from .models import HotelReservation, RangesModel, Room, Scene
 try:
     from psycopg2.extras import DateRange, NumericRange
 
-    from django.contrib.postgres.constraints import ExclusionConstraint
-    from django.contrib.postgres.fields import (
+    from mango.contrib.postgres.constraints import ExclusionConstraint
+    from mango.contrib.postgres.fields import (
         DateTimeRangeField, RangeBoundary, RangeOperators,
     )
 except ImportError:
     pass
 
 
-@modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
+@modify_settings(INSTALLED_APPS={'append': 'mango.contrib.postgres'})
 class SchemaTests(PostgreSQLTestCase):
     get_opclass_query = '''
         SELECT opcname, c.relname FROM pg_opclass AS oc
@@ -451,7 +451,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             expressions=[('datespan', RangeOperators.OVERLAPS), ('room', RangeOperators.EQUAL)],
         )
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, 'django.contrib.postgres.constraints.ExclusionConstraint')
+        self.assertEqual(path, 'mango.contrib.postgres.constraints.ExclusionConstraint')
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {
             'name': 'exclude_overlapping',
@@ -465,7 +465,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             expressions=[('datespan', RangeOperators.OVERLAPS), ('room', RangeOperators.EQUAL)],
         )
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, 'django.contrib.postgres.constraints.ExclusionConstraint')
+        self.assertEqual(path, 'mango.contrib.postgres.constraints.ExclusionConstraint')
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {
             'name': 'exclude_overlapping',
@@ -480,7 +480,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             condition=Q(cancelled=False),
         )
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, 'django.contrib.postgres.constraints.ExclusionConstraint')
+        self.assertEqual(path, 'mango.contrib.postgres.constraints.ExclusionConstraint')
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {
             'name': 'exclude_overlapping',
@@ -495,7 +495,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             deferrable=Deferrable.DEFERRED,
         )
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, 'django.contrib.postgres.constraints.ExclusionConstraint')
+        self.assertEqual(path, 'mango.contrib.postgres.constraints.ExclusionConstraint')
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {
             'name': 'exclude_overlapping',
@@ -510,7 +510,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             include=['cancelled', 'room'],
         )
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, 'django.contrib.postgres.constraints.ExclusionConstraint')
+        self.assertEqual(path, 'mango.contrib.postgres.constraints.ExclusionConstraint')
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {
             'name': 'exclude_overlapping',
@@ -525,7 +525,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             opclasses=['range_ops'],
         )
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, 'django.contrib.postgres.constraints.ExclusionConstraint')
+        self.assertEqual(path, 'mango.contrib.postgres.constraints.ExclusionConstraint')
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {
             'name': 'exclude_overlapping',
@@ -750,7 +750,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         msg = 'Covering exclusion constraints requires PostgreSQL 12+.'
         with connection.schema_editor() as editor:
             with mock.patch(
-                'django.db.backends.postgresql.features.DatabaseFeatures.supports_covering_gist_indexes',
+                'mango.db.backends.postgresql.features.DatabaseFeatures.supports_covering_gist_indexes',
                 False,
             ):
                 with self.assertRaisesMessage(NotSupportedError, msg):

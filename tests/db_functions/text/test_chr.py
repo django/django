@@ -1,7 +1,7 @@
-from django.db.models import IntegerField
-from django.db.models.functions import Chr, Left, Ord
-from django.test import TestCase
-from django.test.utils import register_lookup
+from mango.db.models import IntegerField
+from mango.db.models.functions import Chr, Left, Ord
+from mango.test import TestCase
+from mango.test.utils import register_lookup
 
 from ..models import Author
 

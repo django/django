@@ -1,8 +1,8 @@
-from django.http import HttpResponse
-from django.middleware.csrf import get_token
-from django.template import Context, RequestContext, Template
-from django.template.context_processors import csrf
-from django.views.decorators.csrf import ensure_csrf_cookie
+from mango.http import HttpResponse
+from mango.middleware.csrf import get_token
+from mango.template import Context, RequestContext, Template
+from mango.template.context_processors import csrf
+from mango.views.decorators.csrf import ensure_csrf_cookie
 
 
 def post_form_view(request):

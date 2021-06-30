@@ -1,7 +1,7 @@
 import warnings
 
-from django.test import SimpleTestCase
-from django.utils.deprecation import (
+from mango.test import SimpleTestCase
+from mango.utils.deprecation import (
     DeprecationInstanceCheck, RemovedInNextVersionWarning, RenameMethodsBase,
 )
 

@@ -2,18 +2,18 @@
 ``LayerMapping`` data import utility
 ====================================
 
-.. module:: django.contrib.gis.utils.layermapping
-    :synopsis: Spatial data import utility for GeoDjango models.
+.. module:: mango.contrib.gis.utils.layermapping
+    :synopsis: Spatial data import utility for GeoMango models.
 
-.. currentmodule:: django.contrib.gis.utils
+.. currentmodule:: mango.contrib.gis.utils
 
 The :class:`LayerMapping` class provides a way to map the contents of
-vector spatial data files (e.g. shapefiles) into GeoDjango models.
+vector spatial data files (e.g. shapefiles) into GeoMango models.
 
 This utility grew out of the author's personal needs to eliminate
 the code repetition that went into pulling geometries and fields out of
 a vector layer, converting to another coordinate system (e.g. WGS84), and
-then inserting into a GeoDjango model.
+then inserting into a GeoMango model.
 
 .. note::
 
@@ -24,7 +24,7 @@ then inserting into a GeoDjango model.
     GIS data sources, like shapefiles, may be very large.  If you find
     that :class:`LayerMapping` is using too much memory, set
     :setting:`DEBUG` to ``False`` in your settings.  When :setting:`DEBUG`
-    is set to ``True``, Django :ref:`automatically logs <faq-see-raw-sql-queries>`
+    is set to ``True``, Mango :ref:`automatically logs <faq-see-raw-sql-queries>`
     *every* SQL query -- and when SQL statements contain geometries, this may
     consume more memory than is typical.
 
@@ -34,7 +34,7 @@ Example
 #. You need a GDAL-supported data source, like a shapefile (here we're using
    a simple polygon shapefile, ``test_poly.shp``, with three features)::
 
-    >>> from django.contrib.gis.gdal import DataSource
+    >>> from mango.contrib.gis.gdal import DataSource
     >>> ds = DataSource('test_poly.shp')
     >>> layer = ds[0]
     >>> print(layer.fields) # Exploring the fields in the layer, we only want the 'str' field.
@@ -50,9 +50,9 @@ Example
         PRIMEM["Greenwich",0],
         UNIT["Degree",0.017453292519943295]]
 
-#. Now we define our corresponding Django model (make sure to use :djadmin:`migrate`)::
+#. Now we define our corresponding Mango model (make sure to use :djadmin:`migrate`)::
 
-    from django.contrib.gis.db import models
+    from mango.contrib.gis.db import models
 
     class TestGeo(models.Model):
         name = models.CharField(max_length=25) # corresponds to the 'str' field
@@ -64,7 +64,7 @@ Example
 #. Use :class:`LayerMapping` to extract all the features and place them in the
    database::
 
-    >>> from django.contrib.gis.utils import LayerMapping
+    >>> from mango.contrib.gis.utils import LayerMapping
     >>> from geoapp.models import TestGeo
     >>> mapping = {'name' : 'str', # The 'name' model field maps to the 'str' layer field.
                    'poly' : 'POLYGON', # For geometry fields use OGC name.
@@ -77,9 +77,9 @@ Example
 
 Here, :class:`LayerMapping` transformed the three geometries from the shapefile
 in their original spatial reference system (WGS84) to the spatial reference
-system of the GeoDjango model (NAD83).  If no spatial reference system is
+system of the GeoMango model (NAD83).  If no spatial reference system is
 defined for the layer, use the ``source_srs`` keyword with a
-:class:`~django.contrib.gis.gdal.SpatialReference` object to specify one.
+:class:`~mango.contrib.gis.gdal.SpatialReference` object to specify one.
 
 ``LayerMapping`` API
 ====================
@@ -96,7 +96,7 @@ Argument           Description
 
 ``data_source``    The path to the OGR-supported data source file
                    (e.g., a shapefile).  Also accepts
-                   :class:`django.contrib.gis.gdal.DataSource` instances.
+                   :class:`mango.contrib.gis.gdal.DataSource` instances.
 
 ``mapping``        A dictionary: keys are strings corresponding to
                    the model field, and values correspond to
@@ -115,7 +115,7 @@ Keyword Arguments
 ``source_srs``         Use this to specify the source SRS manually (for
                        example, some shapefiles don't come with a ``'.prj'``
                        file).  An integer SRID, WKT or PROJ strings, and
-                       :class:`django.contrib.gis.gdal.SpatialReference`
+                       :class:`mango.contrib.gis.gdal.SpatialReference`
                        objects are accepted.
 
 ``encoding``           Specifies the character set encoding of the strings
@@ -203,7 +203,7 @@ Troubleshooting
 Running out of memory
 ---------------------
 
-As noted in the warning at the top of this section, Django stores all SQL
+As noted in the warning at the top of this section, Mango stores all SQL
 queries when ``DEBUG=True``.  Set ``DEBUG=False`` in your settings, and this
 should stop excessive memory use when running ``LayerMapping`` scripts.
 

@@ -7,17 +7,17 @@ from pathlib import Path
 from subprocess import run
 from unittest import mock
 
-from django.core.management import (
+from mango.core.management import (
     CommandError, call_command, execute_from_command_line,
 )
-from django.core.management.commands.makemessages import (
+from mango.core.management.commands.makemessages import (
     Command as MakeMessagesCommand,
 )
-from django.core.management.utils import find_command
-from django.test import SimpleTestCase, override_settings
-from django.test.utils import captured_stderr, captured_stdout
-from django.utils import translation
-from django.utils.translation import gettext
+from mango.core.management.utils import find_command
+from mango.test import SimpleTestCase, override_settings
+from mango.test.utils import captured_stderr, captured_stdout
+from mango.utils import translation
+from mango.utils.translation import gettext
 
 from .utils import RunInTmpDirMixin, copytree
 
@@ -33,8 +33,8 @@ class MessageCompilationTests(RunInTmpDirMixin, SimpleTestCase):
 class PoFileTests(MessageCompilationTests):
 
     LOCALE = 'es_AR'
-    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
-    MO_FILE_EN = 'locale/en/LC_MESSAGES/django.mo'
+    MO_FILE = 'locale/%s/LC_MESSAGES/mango.mo' % LOCALE
+    MO_FILE_EN = 'locale/en/LC_MESSAGES/mango.mo'
 
     def test_bom_rejection(self):
         stderr = StringIO()
@@ -71,7 +71,7 @@ class PoFileContentsTests(MessageCompilationTests):
     # Ticket #11240
 
     LOCALE = 'fr'
-    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
+    MO_FILE = 'locale/%s/LC_MESSAGES/mango.mo' % LOCALE
 
     def test_percent_symbol_in_po_file(self):
         call_command('compilemessages', locale=[self.LOCALE], verbosity=0)
@@ -86,8 +86,8 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
     def setUp(self):
         super().setUp()
         localedir = os.path.join(self.test_dir, 'locale')
-        self.MO_FILE_HR = os.path.join(localedir, 'hr/LC_MESSAGES/django.mo')
-        self.MO_FILE_FR = os.path.join(localedir, 'fr/LC_MESSAGES/django.mo')
+        self.MO_FILE_HR = os.path.join(localedir, 'hr/LC_MESSAGES/mango.mo')
+        self.MO_FILE_FR = os.path.join(localedir, 'fr/LC_MESSAGES/mango.mo')
 
     def test_one_locale(self):
         with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
@@ -107,7 +107,7 @@ class ExcludedLocaleCompilationTests(MessageCompilationTests):
 
     work_subdir = 'exclude'
 
-    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo'
+    MO_FILE = 'locale/%s/LC_MESSAGES/mango.mo'
 
     def setUp(self):
         super().setUp()
@@ -118,7 +118,7 @@ class ExcludedLocaleCompilationTests(MessageCompilationTests):
             # `call_command` bypasses the parser; by calling
             # `execute_from_command_line` with the help subcommand we
             # ensure that there are no issues with the parser itself.
-            execute_from_command_line(['django-admin', 'help', 'compilemessages'])
+            execute_from_command_line(['mango-admin', 'help', 'compilemessages'])
 
     def test_one_locale_excluded(self):
         call_command('compilemessages', exclude=['it'], verbosity=0)
@@ -148,7 +148,7 @@ class ExcludedLocaleCompilationTests(MessageCompilationTests):
 class IgnoreDirectoryCompilationTests(MessageCompilationTests):
     # Reuse the exclude directory since it contains some locale fixtures.
     work_subdir = 'exclude'
-    MO_FILE = '%s/%s/LC_MESSAGES/django.mo'
+    MO_FILE = '%s/%s/LC_MESSAGES/mango.mo'
     CACHE_DIR = Path('cache') / 'locale'
     NESTED_DIR = Path('outdated') / 'v1' / 'locale'
 
@@ -194,7 +194,7 @@ class CompilationErrorHandling(MessageCompilationTests):
         # Make sure the output of msgfmt is unaffected by the current locale.
         env = os.environ.copy()
         env.update({'LC_ALL': 'C'})
-        with mock.patch('django.core.management.utils.run', lambda *args, **kwargs: run(*args, env=env, **kwargs)):
+        with mock.patch('mango.core.management.utils.run', lambda *args, **kwargs: run(*args, env=env, **kwargs)):
             cmd = MakeMessagesCommand()
             if cmd.gettext_version < (0, 18, 3):
                 self.skipTest("python-brace-format is a recent gettext addition.")
@@ -206,8 +206,8 @@ class CompilationErrorHandling(MessageCompilationTests):
 
 class ProjectAndAppTests(MessageCompilationTests):
     LOCALE = 'ru'
-    PROJECT_MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
-    APP_MO_FILE = 'app_with_locale/locale/%s/LC_MESSAGES/django.mo' % LOCALE
+    PROJECT_MO_FILE = 'locale/%s/LC_MESSAGES/mango.mo' % LOCALE
+    APP_MO_FILE = 'app_with_locale/locale/%s/LC_MESSAGES/mango.mo' % LOCALE
 
 
 class FuzzyTranslationTest(ProjectAndAppTests):
@@ -245,4 +245,4 @@ class PathLibLocaleCompilationTests(MessageCompilationTests):
     def test_locale_paths_pathlib(self):
         with override_settings(LOCALE_PATHS=[Path(self.test_dir) / 'canned_locale']):
             call_command('compilemessages', locale=['fr'], verbosity=0)
-            self.assertTrue(os.path.exists('canned_locale/fr/LC_MESSAGES/django.mo'))
+            self.assertTrue(os.path.exists('canned_locale/fr/LC_MESSAGES/mango.mo'))

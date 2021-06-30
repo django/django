@@ -1,13 +1,13 @@
 import os
 from datetime import datetime
 
-from django.test import SimpleTestCase
-from django.utils.functional import lazystr
-from django.utils.html import (
+from mango.test import SimpleTestCase
+from mango.utils.functional import lazystr
+from mango.utils.html import (
     conditional_escape, escape, escapejs, format_html, html_safe, json_script,
     linebreaks, smart_urlquote, strip_spaces_between_tags, strip_tags, urlize,
 )
-from django.utils.safestring import mark_safe
+from mango.utils.safestring import mark_safe
 
 
 class TestUtilsHtml(SimpleTestCase):
@@ -183,10 +183,10 @@ class TestUtilsHtml(SimpleTestCase):
             ('http://example.com/%C3%B6/ä/', 'http://example.com/%C3%B6/%C3%A4/'),
             ('http://example.com/?x=1&y=2+3&z=', 'http://example.com/?x=1&y=2+3&z='),
             ('http://example.com/?x=<>"\'', 'http://example.com/?x=%3C%3E%22%27'),
-            ('http://example.com/?q=http://example.com/?x=1%26q=django',
-             'http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3Ddjango'),
-            ('http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3Ddjango',
-             'http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3Ddjango'),
+            ('http://example.com/?q=http://example.com/?x=1%26q=mango',
+             'http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3Dmango'),
+            ('http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3Dmango',
+             'http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3Dmango'),
             ('http://.www.f oo.bar/', 'http://.www.f%20oo.bar/'),
         )
         # IDNs are properly quoted

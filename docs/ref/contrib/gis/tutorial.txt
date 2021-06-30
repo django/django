@@ -1,34 +1,34 @@
 ==================
-GeoDjango Tutorial
+GeoMango Tutorial
 ==================
 
 Introduction
 ============
 
-GeoDjango is an included contrib module for Django that turns it into a
-world-class geographic Web framework.  GeoDjango strives to make it as simple
+GeoMango is an included contrib module for Mango that turns it into a
+world-class geographic Web framework.  GeoMango strives to make it as simple
 as possible to create geographic Web applications, like location-based services.
 Its features include:
 
-* Django model fields for `OGC`_ geometries and raster data.
-* Extensions to Django's ORM for querying and manipulating spatial data.
+* Mango model fields for `OGC`_ geometries and raster data.
+* Extensions to Mango's ORM for querying and manipulating spatial data.
 * Loosely-coupled, high-level Python interfaces for GIS geometry and raster
   operations and data manipulation in different formats.
 * Editing geometry fields from the admin.
 
-This tutorial assumes familiarity with Django; thus, if you're brand new to
-Django, please read through the :doc:`regular tutorial </intro/tutorial01>` to
-familiarize yourself with Django first.
+This tutorial assumes familiarity with Mango; thus, if you're brand new to
+Mango, please read through the :doc:`regular tutorial </intro/tutorial01>` to
+familiarize yourself with Mango first.
 
 .. note::
 
-    GeoDjango has additional requirements beyond what Django requires --
+    GeoMango has additional requirements beyond what Mango requires --
     please consult the :doc:`installation documentation <install/index>`
     for more details.
 
 This tutorial will guide you through the creation of a geographic web
 application for viewing the `world borders`_. [#]_ Some of the code
-used in this tutorial is taken from and/or inspired by the `GeoDjango
+used in this tutorial is taken from and/or inspired by the `GeoMango
 basic apps`_ project. [#]_
 
 .. note::
@@ -38,7 +38,7 @@ basic apps`_ project. [#]_
 
 .. _OGC: https://www.ogc.org/
 .. _world borders: https://thematicmapping.org/downloads/world_borders.php
-.. _GeoDjango basic apps: https://code.google.com/archive/p/geodjango-basic-apps
+.. _GeoMango basic apps: https://code.google.com/archive/p/geomango-basic-apps
 
 Setting Up
 ==========
@@ -55,47 +55,47 @@ would for any other project. We provide some tips for selected databases:
 Create a New Project
 --------------------
 
-Use the standard ``django-admin`` script to create a project called
-``geodjango``:
+Use the standard ``mango-admin`` script to create a project called
+``geomango``:
 
 .. console::
 
-    $ django-admin startproject geodjango
+    $ mango-admin startproject geomango
 
-This will initialize a new project. Now, create a ``world`` Django application
-within the ``geodjango`` project:
+This will initialize a new project. Now, create a ``world`` Mango application
+within the ``geomango`` project:
 
 .. console::
 
-    $ cd geodjango
+    $ cd geomango
     $ python manage.py startapp world
 
 Configure ``settings.py``
 -------------------------
 
-The ``geodjango`` project settings are stored in the ``geodjango/settings.py``
+The ``geomango`` project settings are stored in the ``geomango/settings.py``
 file. Edit the database connection settings to match your setup::
 
     DATABASES = {
         'default': {
-             'ENGINE': 'django.contrib.gis.db.backends.postgis',
-             'NAME': 'geodjango',
+             'ENGINE': 'mango.contrib.gis.db.backends.postgis',
+             'NAME': 'geomango',
              'USER': 'geo',
         },
     }
 
 In addition, modify the :setting:`INSTALLED_APPS` setting to include
-:mod:`django.contrib.admin`, :mod:`django.contrib.gis`,
+:mod:`mango.contrib.admin`, :mod:`mango.contrib.gis`,
 and ``world`` (your newly created application)::
 
     INSTALLED_APPS = [
-        'django.contrib.admin',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
-        'django.contrib.gis',
+        'mango.contrib.admin',
+        'mango.contrib.auth',
+        'mango.contrib.contenttypes',
+        'mango.contrib.sessions',
+        'mango.contrib.messages',
+        'mango.contrib.staticfiles',
+        'mango.contrib.gis',
         'world',
     ]
 
@@ -192,13 +192,13 @@ Geographic Models
 Defining a Geographic Model
 ---------------------------
 
-Now that you've examined your dataset using ``ogrinfo``, create a GeoDjango
+Now that you've examined your dataset using ``ogrinfo``, create a GeoMango
 model to represent this data::
 
-    from django.contrib.gis.db import models
+    from mango.contrib.gis.db import models
 
     class WorldBorder(models.Model):
-        # Regular Django fields corresponding to the attributes in the
+        # Regular Mango fields corresponding to the attributes in the
         # world borders shapefile.
         name = models.CharField(max_length=50)
         area = models.IntegerField()
@@ -212,14 +212,14 @@ model to represent this data::
         lon = models.FloatField()
         lat = models.FloatField()
 
-        # GeoDjango-specific: a geometry field (MultiPolygonField)
+        # GeoMango-specific: a geometry field (MultiPolygonField)
         mpoly = models.MultiPolygonField()
 
         # Returns the string representation of the model.
         def __str__(self):
             return self.name
 
-Note that the ``models`` module is imported from ``django.contrib.gis.db``.
+Note that the ``models`` module is imported from ``mango.contrib.gis.db``.
 
 The default spatial reference system for geometry fields is WGS84 (meaning
 the `SRID`__ is 4326) -- in other words, the field coordinates are in
@@ -292,10 +292,10 @@ Importing Spatial Data
 ======================
 
 This section will show you how to import the world borders shapefile into the
-database via GeoDjango models using the :doc:`layermapping`.
+database via GeoMango models using the :doc:`layermapping`.
 
 There are many different ways to import data into a spatial database --
-besides the tools included within GeoDjango, you may also use the following:
+besides the tools included within GeoMango, you may also use the following:
 
 * `ogr2ogr`_: A command-line utility included with GDAL that
   can import many vector data formats into PostGIS, MySQL, and Oracle databases.
@@ -311,10 +311,10 @@ GDAL Interface
 --------------
 
 Earlier, you used ``ogrinfo`` to examine the contents of the world borders
-shapefile.  GeoDjango also includes a Pythonic interface to GDAL's powerful OGR
+shapefile.  GeoMango also includes a Pythonic interface to GDAL's powerful OGR
 library that can work with all the vector data sources that OGR supports.
 
-First, invoke the Django shell:
+First, invoke the Mango shell:
 
 .. console::
 
@@ -327,13 +327,13 @@ you can determine its path using Python's :class:`pathlib.Path`::
     >>> import world
     >>> world_shp = Path(world.__file__).resolve().parent / 'data' / 'TM_WORLD_BORDERS-0.3.shp'
 
-Now, open the world borders shapefile using GeoDjango's
-:class:`~django.contrib.gis.gdal.DataSource` interface::
+Now, open the world borders shapefile using GeoMango's
+:class:`~mango.contrib.gis.gdal.DataSource` interface::
 
-    >>> from django.contrib.gis.gdal import DataSource
+    >>> from mango.contrib.gis.gdal import DataSource
     >>> ds = DataSource(world_shp)
     >>> print(ds)
-    / ... /geodjango/world/data/TM_WORLD_BORDERS-0.3.shp (ESRI Shapefile)
+    / ... /geomango/world/data/TM_WORLD_BORDERS-0.3.shp (ESRI Shapefile)
 
 Data source objects can have different layers of geospatial features; however,
 shapefiles are only allowed to have one layer::
@@ -357,13 +357,13 @@ You can see the layer's geometry type and how many features it contains::
     specificity with regards to geometry types.  This shapefile, like
     many others, actually includes ``MultiPolygon`` geometries, not Polygons.
     It's important to use a more general field type in models: a
-    GeoDjango ``MultiPolygonField`` will accept a ``Polygon`` geometry, but a
+    GeoMango ``MultiPolygonField`` will accept a ``Polygon`` geometry, but a
     ``PolygonField`` will not accept a ``MultiPolygon`` type geometry.  This
     is why the ``WorldBorder`` model defined above uses a ``MultiPolygonField``.
 
-The :class:`~django.contrib.gis.gdal.Layer` may also have a spatial reference
+The :class:`~mango.contrib.gis.gdal.Layer` may also have a spatial reference
 system associated with it.  If it does, the ``srs`` attribute will return a
-:class:`~django.contrib.gis.gdal.SpatialReference` object::
+:class:`~mango.contrib.gis.gdal.SpatialReference` object::
 
     >>> srs = lyr.srs
     >>> print(srs)
@@ -404,10 +404,10 @@ method)::
     South Georgia South Sandwich Islands 338
     Taiwan 363
 
-:class:`~django.contrib.gis.gdal.Layer` objects may be sliced::
+:class:`~mango.contrib.gis.gdal.Layer` objects may be sliced::
 
     >>> lyr[0:2]
-    [<django.contrib.gis.gdal.feature.Feature object at 0x2f47690>, <django.contrib.gis.gdal.feature.Feature object at 0x2f47650>]
+    [<mango.contrib.gis.gdal.feature.Feature object at 0x2f47690>, <mango.contrib.gis.gdal.feature.Feature object at 0x2f47650>]
 
 And individual features may be retrieved by their feature ID::
 
@@ -432,7 +432,7 @@ Create a file called ``load.py`` inside the ``world`` application,
 with the following code::
 
     from pathlib import Path
-    from django.contrib.gis.utils import LayerMapping
+    from mango.contrib.gis.utils import LayerMapping
     from .models import WorldBorder
 
     world_mapping = {
@@ -462,7 +462,7 @@ A few notes about what's going on:
   ``WorldBorder`` model.  The value is the name of the shapefile field
   that data will be loaded from.
 * The key ``mpoly`` for the geometry field is ``MULTIPOLYGON``, the
-  geometry type GeoDjango will import the field as.  Even simple polygons in
+  geometry type GeoMango will import the field as.  Even simple polygons in
   the shapefile will automatically be converted into collections prior to
   insertion into the database.
 * The path to the shapefile is not absolute -- in other words, if you move the
@@ -471,7 +471,7 @@ A few notes about what's going on:
 * The ``transform`` keyword is set to ``False`` because the data in the
   shapefile does not need to be converted -- it's already in WGS84 (SRID=4326).
 
-Afterwards, invoke the Django shell from the ``geodjango`` project directory:
+Afterwards, invoke the Mango shell from the ``geomango`` project directory:
 
 .. console::
 
@@ -516,16 +516,16 @@ A few notes about the command-line options given above:
 * The ``--srid=4326`` option sets the SRID for the geographic field.
 * The ``--mapping`` option tells ``ogrinspect`` to also generate a
   mapping dictionary for use with
-  :class:`~django.contrib.gis.utils.LayerMapping`.
+  :class:`~mango.contrib.gis.utils.LayerMapping`.
 * The ``--multi`` option is specified so that the geographic field is a
-  :class:`~django.contrib.gis.db.models.MultiPolygonField` instead of just a
-  :class:`~django.contrib.gis.db.models.PolygonField`.
+  :class:`~mango.contrib.gis.db.models.MultiPolygonField` instead of just a
+  :class:`~mango.contrib.gis.db.models.PolygonField`.
 
 The command produces the following output, which may be copied
-directly into the ``models.py`` of a GeoDjango application::
+directly into the ``models.py`` of a GeoMango application::
 
-    # This is an auto-generated Django model module created by ogrinspect.
-    from django.contrib.gis.db import models
+    # This is an auto-generated Mango model module created by ogrinspect.
+    from mango.contrib.gis.db import models
 
     class WorldBorder(models.Model):
         fips = models.CharField(max_length=2)
@@ -562,7 +562,7 @@ Spatial Queries
 
 Spatial Lookups
 ---------------
-GeoDjango adds spatial lookups to the Django ORM.  For example, you
+GeoMango adds spatial lookups to the Mango ORM.  For example, you
 can find the country in the ``WorldBorder`` table that contains
 a particular point.  First, fire up the management shell:
 
@@ -592,7 +592,7 @@ Here, you can combine the ``intersects`` spatial lookup with the ``get``
 method to retrieve only the ``WorldBorder`` instance for San Marino instead
 of a queryset::
 
-    >>> from django.contrib.gis.geos import Point
+    >>> from mango.contrib.gis.geos import Point
     >>> pnt = Point(12.4604, 43.9420)
     >>> WorldBorder.objects.get(mpoly__intersects=pnt)
     <WorldBorder: San Marino>
@@ -604,13 +604,13 @@ available queries -- the :doc:`db-api` documentation has more.
 
 Automatic Spatial Transformations
 ---------------------------------
-When doing spatial queries, GeoDjango automatically transforms
+When doing spatial queries, GeoMango automatically transforms
 geometries if they're in a different coordinate system.  In the following
 example, coordinates will be expressed in `EPSG SRID 32140`__,
 a coordinate system specific to south Texas **only** and in units of
 **meters**, not degrees::
 
-    >>> from django.contrib.gis.geos import GEOSGeometry, Point
+    >>> from mango.contrib.gis.geos import GEOSGeometry, Point
     >>> pnt = Point(954158.1, 4215137.1, srid=32140)
 
 Note that ``pnt`` may also be constructed with EWKT, an "extended" form of
@@ -618,7 +618,7 @@ WKT that includes the SRID::
 
     >>> pnt = GEOSGeometry('SRID=32140;POINT(954158.1 4215137.1)')
 
-GeoDjango's ORM will automatically wrap geometry values
+GeoMango's ORM will automatically wrap geometry values
 in transformation SQL, allowing the developer to work at a higher level
 of abstraction::
 
@@ -642,9 +642,9 @@ __ https://spatialreference.org/ref/epsg/32140/
     When using :doc:`raw queries </topics/db/sql>`, you must wrap your geometry
     fields so that the field value can be recognized by GEOS::
 
-        from django.db import connection
+        from mango.db import connection
         # or if you're querying a non-default database:
-        from django.db import connections
+        from mango.db import connections
         connection = connections['your_gis_db_alias']
 
         City.objects.raw('SELECT id, name, %s as point from myapp_city' % (connection.ops.select % 'point'))
@@ -653,9 +653,9 @@ __ https://spatialreference.org/ref/epsg/32140/
 
 Lazy Geometries
 ---------------
-GeoDjango loads geometries in a standardized textual representation.  When the
-geometry field is first accessed, GeoDjango creates a
-:class:`~django.contrib.gis.geos.GEOSGeometry` object, exposing powerful
+GeoMango loads geometries in a standardized textual representation.  When the
+geometry field is first accessed, GeoMango creates a
+:class:`~mango.contrib.gis.geos.GEOSGeometry` object, exposing powerful
 functionality, such as serialization properties for popular geospatial
 formats::
 
@@ -681,7 +681,7 @@ the GEOS library::
 Geographic annotations
 ----------------------
 
-GeoDjango also offers a set of geographic annotations to compute distances and
+GeoMango also offers a set of geographic annotations to compute distances and
 several other operations (intersection, difference, etc.). See the
 :doc:`functions` documentation.
 
@@ -692,27 +692,27 @@ Putting your data on the map
 Geographic Admin
 ----------------
 
-GeoDjango extends :doc:`Django's admin application </ref/contrib/admin/index>`
+GeoMango extends :doc:`Mango's admin application </ref/contrib/admin/index>`
 with support for editing geometry fields.
 
 Basics
 ~~~~~~
 
-GeoDjango also supplements the Django admin by allowing users to create
+GeoMango also supplements the Mango admin by allowing users to create
 and modify geometries on a JavaScript slippy map (powered by `OpenLayers`_).
 
 Let's dive right in.  Create a file called ``admin.py`` inside the
 ``world`` application with the following code::
 
-    from django.contrib.gis import admin
+    from mango.contrib.gis import admin
     from .models import WorldBorder
 
     admin.site.register(WorldBorder, admin.GeoModelAdmin)
 
-Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
+Next, edit your ``urls.py`` in the ``geomango`` application folder as follows::
 
-    from django.contrib.gis import admin
-    from django.urls import include, path
+    from mango.contrib.gis import admin
+    from mango.urls import include, path
 
     urlpatterns = [
         path('admin/', admin.site.urls),
@@ -724,7 +724,7 @@ Create an admin user:
 
     $ python manage.py createsuperuser
 
-Next, start up the Django development server:
+Next, start up the Mango development server:
 
 .. console::
 
@@ -745,10 +745,10 @@ position.
 ``OSMGeoAdmin``
 ~~~~~~~~~~~~~~~
 
-With the :class:`~django.contrib.gis.admin.OSMGeoAdmin`, GeoDjango uses
+With the :class:`~mango.contrib.gis.admin.OSMGeoAdmin`, GeoMango uses
 a `Open Street Map`_ layer in the admin.
 This provides more context (including street and thoroughfare details) than
-available with the :class:`~django.contrib.gis.admin.GeoModelAdmin`
+available with the :class:`~mango.contrib.gis.admin.GeoModelAdmin`
 (which uses the `Vector Map Level 0`_ WMS dataset hosted at `OSGeo`_).
 
 The PROJ datum shifting files must be installed (see the :ref:`PROJ
@@ -764,7 +764,7 @@ in your ``admin.py`` file::
 .. [#] Special thanks to Bjørn Sandvik of `thematicmapping.org
        <https://thematicmapping.org/>`_ for providing and maintaining this
        dataset.
-.. [#] GeoDjango basic apps was written by Dane Springmeyer, Josh Livni, and
+.. [#] GeoMango basic apps was written by Dane Springmeyer, Josh Livni, and
        Christopher Schmidt.
 .. [#] This point is the `University of Houston Law Center
        <https://www.law.uh.edu/>`_.

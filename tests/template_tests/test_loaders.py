@@ -4,10 +4,10 @@ import tempfile
 import unittest
 from contextlib import contextmanager
 
-from django.template import TemplateDoesNotExist
-from django.template.engine import Engine
-from django.test import SimpleTestCase, override_settings
-from django.utils.functional import lazystr
+from mango.template import TemplateDoesNotExist
+from mango.template.engine import Engine
+from mango.test import SimpleTestCase, override_settings
+from mango.utils.functional import lazystr
 
 from .utils import TEMPLATE_DIR
 
@@ -18,8 +18,8 @@ class CachedLoaderTests(SimpleTestCase):
         self.engine = Engine(
             dirs=[TEMPLATE_DIR],
             loaders=[
-                ('django.template.loaders.cached.Loader', [
-                    'django.template.loaders.filesystem.Loader',
+                ('mango.template.loaders.cached.Loader', [
+                    'mango.template.loaders.filesystem.Loader',
                 ]),
             ],
         )
@@ -102,7 +102,7 @@ class FileSystemLoaderTests(SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.engine = Engine(dirs=[TEMPLATE_DIR], loaders=['django.template.loaders.filesystem.Loader'])
+        cls.engine = Engine(dirs=[TEMPLATE_DIR], loaders=['mango.template.loaders.filesystem.Loader'])
         super().setUpClass()
 
     @contextmanager
@@ -133,16 +133,16 @@ class FileSystemLoaderTests(SimpleTestCase):
         self.assertEqual(template.origin.name, os.path.join(TEMPLATE_DIR, 'index.html'))
         self.assertEqual(template.origin.template_name, 'index.html')
         self.assertEqual(template.origin.loader, self.engine.template_loaders[0])
-        self.assertEqual(template.origin.loader_name, 'django.template.loaders.filesystem.Loader')
+        self.assertEqual(template.origin.loader_name, 'mango.template.loaders.filesystem.Loader')
 
     def test_loaders_dirs(self):
-        engine = Engine(loaders=[('django.template.loaders.filesystem.Loader', [TEMPLATE_DIR])])
+        engine = Engine(loaders=[('mango.template.loaders.filesystem.Loader', [TEMPLATE_DIR])])
         template = engine.get_template('index.html')
         self.assertEqual(template.origin.name, os.path.join(TEMPLATE_DIR, 'index.html'))
 
     def test_loaders_dirs_empty(self):
         """An empty dirs list in loaders overrides top level dirs."""
-        engine = Engine(dirs=[TEMPLATE_DIR], loaders=[('django.template.loaders.filesystem.Loader', [])])
+        engine = Engine(dirs=[TEMPLATE_DIR], loaders=[('mango.template.loaders.filesystem.Loader', [])])
         with self.assertRaises(TemplateDoesNotExist):
             engine.get_template('index.html')
 
@@ -209,7 +209,7 @@ class AppDirectoriesLoaderTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         cls.engine = Engine(
-            loaders=['django.template.loaders.app_directories.Loader'],
+            loaders=['mango.template.loaders.app_directories.Loader'],
         )
         super().setUpClass()
 
@@ -231,7 +231,7 @@ class LocmemLoaderTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         cls.engine = Engine(
-            loaders=[('django.template.loaders.locmem.Loader', {
+            loaders=[('mango.template.loaders.locmem.Loader', {
                 'index.html': 'index',
             })],
         )

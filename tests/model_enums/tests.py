@@ -3,11 +3,11 @@ import decimal
 import ipaddress
 import uuid
 
-from django.db import models
-from django.template import Context, Template
-from django.test import SimpleTestCase
-from django.utils.functional import Promise
-from django.utils.translation import gettext_lazy as _
+from mango.db import models
+from mango.template import Context, Template
+from mango.test import SimpleTestCase
+from mango.utils.functional import Promise
+from mango.utils.translation import gettext_lazy as _
 
 
 class Suit(models.IntegerChoices):

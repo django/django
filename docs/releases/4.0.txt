@@ -1,14 +1,14 @@
 ============================================
-Django 4.0 release notes - UNDER DEVELOPMENT
+Mango 4.0 release notes - UNDER DEVELOPMENT
 ============================================
 
 *Expected December 2021*
 
-Welcome to Django 4.0!
+Welcome to Mango 4.0!
 
 These release notes cover the :ref:`new features <whats-new-4.0>`, as well as
 some :ref:`backwards incompatible changes <backwards-incompatible-4.0>` you'll
-want to be aware of when upgrading from Django 3.2 or earlier. We've
+want to be aware of when upgrading from Mango 3.2 or earlier. We've
 :ref:`begun the deprecation process for some features
 <deprecated-features-4.0>`.
 
@@ -18,28 +18,28 @@ project.
 Python compatibility
 ====================
 
-Django 4.0 supports Python 3.8, 3.9, and 3.10. We **highly recommend** and only
+Mango 4.0 supports Python 3.8, 3.9, and 3.10. We **highly recommend** and only
 officially support the latest release of each series.
 
-The Django 3.2.x series is the last to support Python 3.6 and 3.7.
+The Mango 3.2.x series is the last to support Python 3.6 and 3.7.
 
 .. _whats-new-4.0:
 
-What's new in Django 4.0
+What's new in Mango 4.0
 ========================
 
 Functional unique constraints
 -----------------------------
 
-The new :attr:`*expressions <django.db.models.UniqueConstraint.expressions>`
+The new :attr:`*expressions <mango.db.models.UniqueConstraint.expressions>`
 positional argument of
-:class:`UniqueConstraint() <django.db.models.UniqueConstraint>` enables
+:class:`UniqueConstraint() <mango.db.models.UniqueConstraint>` enables
 creating functional unique constraints on expressions and database functions.
 For example::
 
-    from django.db import models
-    from django.db.models import UniqueConstraint
-    from django.db.models.functions import Lower
+    from mango.db import models
+    from mango.db.models import UniqueConstraint
+    from mango.db.models.functions import Lower
 
 
     class MyModel(models.Model):
@@ -56,12 +56,12 @@ For example::
             ]
 
 Functional unique constraints are added to models using the
-:attr:`Meta.constraints <django.db.models.Options.constraints>` option.
+:attr:`Meta.constraints <mango.db.models.Options.constraints>` option.
 
 Minor features
 --------------
 
-:mod:`django.contrib.admin`
+:mod:`mango.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The ``admin/base.html`` template now has a new block ``header`` which
@@ -78,7 +78,7 @@ Minor features
 * The new :attr:`.ModelAdmin.search_help_text` attribute allows specifying a
   descriptive text for the search box.
 
-:mod:`django.contrib.admindocs`
+:mod:`mango.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The admindocs now allows esoteric setups where :setting:`ROOT_URLCONF` is not
@@ -86,83 +86,83 @@ Minor features
 
 * The model section of the ``admindocs`` now shows cached properties.
 
-:mod:`django.contrib.auth`
+:mod:`mango.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The default iteration count for the PBKDF2 password hasher is increased from
   260,000 to 320,000.
 
 * The new
-  :attr:`LoginView.next_page <django.contrib.auth.views.LoginView.next_page>`
+  :attr:`LoginView.next_page <mango.contrib.auth.views.LoginView.next_page>`
   attribute and
-  :meth:`~django.contrib.auth.views.LoginView.get_default_redirect_url` method
+  :meth:`~mango.contrib.auth.views.LoginView.get_default_redirect_url` method
   allow customizing the redirect after login.
 
-:mod:`django.contrib.contenttypes`
+:mod:`mango.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * ...
 
-:mod:`django.contrib.gis`
+:mod:`mango.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Added support for SpatiaLite 5.
 
-* :class:`~django.contrib.gis.gdal.GDALRaster` now allows creating rasters in
+* :class:`~mango.contrib.gis.gdal.GDALRaster` now allows creating rasters in
   any GDAL virtual filesystem.
 
-:mod:`django.contrib.messages`
+:mod:`mango.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * ...
 
-:mod:`django.contrib.postgres`
+:mod:`mango.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The PostgreSQL backend now supports connecting by a service name. See
   :ref:`postgresql-connection-settings` for more details.
 
-* The new :class:`~django.contrib.postgres.operations.AddConstraintNotValid`
+* The new :class:`~mango.contrib.postgres.operations.AddConstraintNotValid`
   operation allows creating check constraints on PostgreSQL without verifying
   that all existing rows satisfy the new constraint.
 
-* The new :class:`~django.contrib.postgres.operations.ValidateConstraint`
+* The new :class:`~mango.contrib.postgres.operations.ValidateConstraint`
   operation allows validating check constraints which were created using
-  :class:`~django.contrib.postgres.operations.AddConstraintNotValid` on
+  :class:`~mango.contrib.postgres.operations.AddConstraintNotValid` on
   PostgreSQL.
 
-:mod:`django.contrib.redirects`
+:mod:`mango.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * ...
 
-:mod:`django.contrib.sessions`
+:mod:`mango.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * ...
 
-:mod:`django.contrib.sitemaps`
+:mod:`mango.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * ...
 
-:mod:`django.contrib.sites`
+:mod:`mango.contrib.sites`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * ...
 
-:mod:`django.contrib.staticfiles`
+:mod:`mango.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
+* :class:`~mango.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
   replaces paths to JavaScript source map references with their hashed
   counterparts.
 
-* :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
+* :class:`~mango.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
   replaces paths to JavaScript modules in ``import`` and ``export`` statements
   with their hashed counterparts.
 
-:mod:`django.contrib.syndication`
+:mod:`mango.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * ...
@@ -207,9 +207,9 @@ File Uploads
 Forms
 ~~~~~
 
-* :class:`~django.forms.ModelChoiceField` now includes the provided value in
+* :class:`~mango.forms.ModelChoiceField` now includes the provided value in
   the ``params`` argument of a raised
-  :exc:`~django.core.exceptions.ValidationError` for the ``invalid_choice``
+  :exc:`~mango.core.exceptions.ValidationError` for the ``invalid_choice``
   error message. This allows custom error messages to use the ``%(value)s``
   placeholder.
 
@@ -249,19 +249,19 @@ Models
   query in the simplest and fastest way possible.
 
 * The new ``precision`` argument of the
-  :class:`Round() <django.db.models.functions.Round>` database function allows
+  :class:`Round() <mango.db.models.functions.Round>` database function allows
   specifying the number of decimal places after rounding.
 
 * :meth:`.QuerySet.bulk_create` now sets the primary key on objects when using
   SQLite 3.35+.
 
-* :class:`~django.db.models.DurationField` now supports multiplying and
+* :class:`~mango.db.models.DurationField` now supports multiplying and
   dividing by scalar values on SQLite.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* The :class:`~django.middleware.security.SecurityMiddleware` now adds the
+* The :class:`~mango.middleware.security.SecurityMiddleware` now adds the
   :ref:`Cross-Origin Opener Policy <cross-origin-opener-policy>` header with a
   value of ``'same-origin'`` to prevent cross-origin popups from sharing the
   same browsing context. You can prevent this header from being added by
@@ -280,8 +280,8 @@ Serialization
 Signals
 ~~~~~~~
 
-* The new ``stdout`` argument for :func:`~django.db.models.signals.pre_migrate`
-  and :func:`~django.db.models.signals.post_migrate` signals allows redirecting
+* The new ``stdout`` argument for :func:`~mango.db.models.signals.pre_migrate`
+  and :func:`~mango.db.models.signals.post_migrate` signals allows redirecting
   output to a stream-like object. It should be preferred over
   :py:data:`sys.stdout` and :py:func:`print` when emitting verbose output in
   order to allow proper capture when testing.
@@ -295,12 +295,12 @@ Tests
 ~~~~~
 
 * The new ``serialized_aliases`` argument of
-  :func:`django.test.utils.setup_databases` determines which
+  :func:`mango.test.utils.setup_databases` determines which
   :setting:`DATABASES` aliases test databases should have their state
   serialized to allow usage of the
   :ref:`serialized_rollback <test-case-serialized-rollback>` feature.
 
-* Django test runner now supports a :option:`--buffer <test --buffer>` option
+* Mango test runner now supports a :option:`--buffer <test --buffer>` option
   with parallel tests.
 
 * The new :meth:`.DiscoverRunner.log` method allows customizing the way
@@ -340,7 +340,7 @@ backends.
 * The second argument of ``DatabaseSchemaEditor._unique_sql()`` and
   ``_create_unique_sql()`` methods is now fields instead of columns.
 
-:mod:`django.contrib.gis`
+:mod:`mango.contrib.gis`
 -------------------------
 
 * Support for PostGIS 2.3 is removed.
@@ -350,14 +350,14 @@ backends.
 Dropped support for PostgreSQL 9.6
 ----------------------------------
 
-Upstream support for PostgreSQL 9.6 ends in November 2021. Django 4.0 supports
+Upstream support for PostgreSQL 9.6 ends in November 2021. Mango 4.0 supports
 PostgreSQL 10 and higher.
 
 Dropped support for Oracle 12.2 and 18c
 ---------------------------------------
 
 Upstream support for Oracle 12.2 ends in March 2022 and for Oracle 18c it ends
-in June 2021. Django 3.2 will be supported until April 2024. Django 4.0
+in June 2021. Mango 3.2 will be supported until April 2024. Mango 4.0
 officially supports Oracle 19c.
 
 .. _csrf-trusted-origins-changes-4.0:
@@ -388,7 +388,7 @@ a value starting with a dot.
 ``SecurityMiddleware`` no longer sets the ``X-XSS-Protection`` header
 ---------------------------------------------------------------------
 
-The :class:`~django.middleware.security.SecurityMiddleware` no longer sets the
+The :class:`~mango.middleware.security.SecurityMiddleware` no longer sets the
 ``X-XSS-Protection`` header if the ``SECURE_BROWSER_XSS_FILTER`` setting is
 ``True``. The setting is removed.
 
@@ -420,11 +420,11 @@ Miscellaneous
 
 * Support for ``cx_Oracle`` < 7.0 is removed.
 
-* To allow serving a Django site on a subpath without changing the value of
+* To allow serving a Mango site on a subpath without changing the value of
   :setting:`STATIC_URL`, the leading slash is removed from that setting (now
   ``'static/'``) in the default :djadmin:`startproject` template.
 
-* The :class:`~django.contrib.admin.AdminSite` method for the admin ``index``
+* The :class:`~mango.contrib.admin.AdminSite` method for the admin ``index``
   view is no longer decorated with ``never_cache`` when accessed directly,
   rather than via the recommended ``AdminSite.urls`` property, or
   ``AdminSite.get_urls()`` method.
@@ -432,7 +432,7 @@ Miscellaneous
 * Unsupported operations on a sliced queryset now raise ``TypeError`` instead
   of ``AssertionError``.
 
-* The undocumented ``django.test.runner.reorder_suite()`` function is renamed
+* The undocumented ``mango.test.runner.reorder_suite()`` function is renamed
   to ``reorder_tests()``. It now accepts an iterable of tests rather than a
   test suite, and returns an iterator of tests.
 
@@ -443,14 +443,14 @@ Miscellaneous
   ``EmailMessage.attach()`` with an invalid ``content`` or ``mimetype``
   arguments now raise ``ValueError`` instead of ``AssertionError``.
 
-* :meth:`~django.test.SimpleTestCase.assertHTMLEqual` no longer considers a
+* :meth:`~mango.test.SimpleTestCase.assertHTMLEqual` no longer considers a
   non-boolean attribute without a value equal to an attribute with the same
   name and value.
 
 * Tests that fail to load, for example due to syntax errors, now always match
   when using :option:`test --tag`.
 
-* The undocumented ``django.contrib.admin.utils.lookup_needs_distinct()``
+* The undocumented ``mango.contrib.admin.utils.lookup_needs_distinct()``
   function is renamed to ``lookup_spawns_duplicates()``.
 
 * The undocumented ``HttpRequest.get_raw_uri()`` method is removed. The
@@ -459,8 +459,8 @@ Miscellaneous
 * The ``object`` argument of undocumented ``ModelAdmin.log_addition()``,
   ``log_change()``, and ``log_deletion()`` methods is renamed to ``obj``.
 
-* :class:`~django.utils.feedgenerator.RssFeed`,
-  :class:`~django.utils.feedgenerator.Atom1Feed`, and their subclasses now
+* :class:`~mango.utils.feedgenerator.RssFeed`,
+  :class:`~mango.utils.feedgenerator.Atom1Feed`, and their subclasses now
   emit elements with no content as self-closing tags.
 
 * ``NodeList.render()`` no longer casts the output of ``render()`` method for
@@ -477,11 +477,11 @@ Time zone support
 
 In order to follow good practice, the default value of the :setting:`USE_TZ`
 setting will change from ``False`` to ``True``, and time zone support will be
-enabled by default, in Django 5.0.
+enabled by default, in Mango 5.0.
 
 Note that the default :file:`settings.py` file created by
-:djadmin:`django-admin startproject <startproject>` includes
-:setting:`USE_TZ = True <USE_TZ>` since Django 1.4.
+:djadmin:`mango-admin startproject <startproject>` includes
+:setting:`USE_TZ = True <USE_TZ>` since Mango 1.4.
 
 You can set ``USE_TZ`` to ``False`` in your project settings before then to
 opt-out.
@@ -490,42 +490,42 @@ Miscellaneous
 -------------
 
 * ``SERIALIZE`` test setting is deprecated as it can be inferred from the
-  :attr:`~django.test.TestCase.databases` with the
+  :attr:`~mango.test.TestCase.databases` with the
   :ref:`serialized_rollback <test-case-serialized-rollback>` option enabled.
 
-* The undocumented ``django.utils.baseconv`` module is deprecated.
+* The undocumented ``mango.utils.baseconv`` module is deprecated.
 
-* The undocumented ``django.utils.datetime_safe`` module is deprecated.
+* The undocumented ``mango.utils.datetime_safe`` module is deprecated.
 
 * The default sitemap protocol for sitemaps built outside the context of a
-  request will change from ``'http'`` to ``'https'`` in Django 5.0.
+  request will change from ``'http'`` to ``'https'`` in Mango 5.0.
 
 Features removed in 4.0
 =======================
 
 These features have reached the end of their deprecation cycle and are removed
-in Django 4.0.
+in Mango 4.0.
 
 See :ref:`deprecated-features-3.0` for details on these changes, including how
 to remove usage of these features.
 
-* ``django.utils.http.urlquote()``, ``urlquote_plus()``, ``urlunquote()``, and
+* ``mango.utils.http.urlquote()``, ``urlquote_plus()``, ``urlunquote()``, and
   ``urlunquote_plus()`` are removed.
 
-* ``django.utils.encoding.force_text()`` and ``smart_text()`` are removed.
+* ``mango.utils.encoding.force_text()`` and ``smart_text()`` are removed.
 
-* ``django.utils.translation.ugettext()``, ``ugettext_lazy()``,
+* ``mango.utils.translation.ugettext()``, ``ugettext_lazy()``,
   ``ugettext_noop()``, ``ungettext()``, and ``ungettext_lazy()`` are removed.
 
-* ``django.views.i18n.set_language()`` doesn't set the user language in
+* ``mango.views.i18n.set_language()`` doesn't set the user language in
   ``request.session`` (key ``_language``).
 
 * ``alias=None`` is required in the signature of
-  ``django.db.models.Expression.get_group_by_cols()`` subclasses.
+  ``mango.db.models.Expression.get_group_by_cols()`` subclasses.
 
-* ``django.utils.text.unescape_entities()`` is removed.
+* ``mango.utils.text.unescape_entities()`` is removed.
 
-* ``django.utils.http.is_safe_url()`` is removed.
+* ``mango.utils.http.is_safe_url()`` is removed.
 
 See :ref:`deprecated-features-3.1` for details on these changes, including how
 to remove usage of these features.
@@ -535,37 +535,37 @@ to remove usage of these features.
 * The :lookup:`isnull` lookup no longer allows using non-boolean values as the
   right-hand side.
 
-* The ``django.db.models.query_utils.InvalidQuery`` exception class is removed.
+* The ``mango.db.models.query_utils.InvalidQuery`` exception class is removed.
 
-* The ``django-admin.py`` entry point is removed.
+* The ``mango-admin.py`` entry point is removed.
 
 * The ``HttpRequest.is_ajax()`` method is removed.
 
-* Support for the pre-Django 3.1 encoding format of cookies values used by
-  ``django.contrib.messages.storage.cookie.CookieStorage`` is removed.
+* Support for the pre-Mango 3.1 encoding format of cookies values used by
+  ``mango.contrib.messages.storage.cookie.CookieStorage`` is removed.
 
-* Support for the pre-Django 3.1 password reset tokens in the admin site (that
+* Support for the pre-Mango 3.1 password reset tokens in the admin site (that
   use the SHA-1 hashing algorithm) is removed.
 
-* Support for the pre-Django 3.1 encoding format of sessions is removed.
+* Support for the pre-Mango 3.1 encoding format of sessions is removed.
 
-* Support for the pre-Django 3.1 ``django.core.signing.Signer`` signatures
+* Support for the pre-Mango 3.1 ``mango.core.signing.Signer`` signatures
   (encoded with the SHA-1 algorithm) is removed.
 
-* Support for the pre-Django 3.1 ``django.core.signing.dumps()`` signatures
-  (encoded with the SHA-1 algorithm) in ``django.core.signing.loads()`` is
+* Support for the pre-Mango 3.1 ``mango.core.signing.dumps()`` signatures
+  (encoded with the SHA-1 algorithm) in ``mango.core.signing.loads()`` is
   removed.
 
-* Support for the pre-Django 3.1 user sessions (that use the SHA-1 algorithm)
+* Support for the pre-Mango 3.1 user sessions (that use the SHA-1 algorithm)
   is removed.
 
 * The ``get_response`` argument for
-  ``django.utils.deprecation.MiddlewareMixin.__init__()`` is required and
+  ``mango.utils.deprecation.MiddlewareMixin.__init__()`` is required and
   doesn't accept ``None``.
 
-* The ``providing_args`` argument for ``django.dispatch.Signal`` is removed.
+* The ``providing_args`` argument for ``mango.dispatch.Signal`` is removed.
 
-* The ``length`` argument for ``django.utils.crypto.get_random_string()`` is
+* The ``length`` argument for ``mango.utils.crypto.get_random_string()`` is
   required.
 
 * The ``list`` message for ``ModelMultipleChoiceField`` is removed.
@@ -575,15 +575,15 @@ to remove usage of these features.
 * The ``NullBooleanField`` model field is removed, except for support in
   historical migrations.
 
-* ``django.conf.urls.url()`` is removed.
+* ``mango.conf.urls.url()`` is removed.
 
-* The ``django.contrib.postgres.fields.JSONField`` model field is removed,
+* The ``mango.contrib.postgres.fields.JSONField`` model field is removed,
   except for support in historical migrations.
 
-* ``django.contrib.postgres.fields.jsonb.KeyTransform`` and
-  ``django.contrib.postgres.fields.jsonb.KeyTextTransform`` are removed.
+* ``mango.contrib.postgres.fields.jsonb.KeyTransform`` and
+  ``mango.contrib.postgres.fields.jsonb.KeyTextTransform`` are removed.
 
-* ``django.contrib.postgres.forms.JSONField`` is removed.
+* ``mango.contrib.postgres.forms.JSONField`` is removed.
 
 * The ``{% ifequal %}`` and ``{% ifnotequal %}`` template tags are removed.
 

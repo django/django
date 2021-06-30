@@ -3,9 +3,9 @@ This custom Session model adds an extra column to store an account ID. In
 real-world applications, it gives you the option of querying the database for
 all active sessions for a particular account.
 """
-from django.contrib.sessions.backends.db import SessionStore as DBStore
-from django.contrib.sessions.base_session import AbstractBaseSession
-from django.db import models
+from mango.contrib.sessions.backends.db import SessionStore as DBStore
+from mango.contrib.sessions.base_session import AbstractBaseSession
+from mango.db import models
 
 
 class CustomSession(AbstractBaseSession):

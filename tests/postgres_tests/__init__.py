@@ -2,8 +2,8 @@ import unittest
 
 from forms_tests.widget_tests.base import WidgetTest
 
-from django.db import connection
-from django.test import SimpleTestCase, TestCase, modify_settings
+from mango.db import connection
+from mango.test import SimpleTestCase, TestCase, modify_settings
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific tests")
@@ -18,6 +18,6 @@ class PostgreSQLTestCase(TestCase):
 
 @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific tests")
 # To locate the widget's template.
-@modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
+@modify_settings(INSTALLED_APPS={'append': 'mango.contrib.postgres'})
 class PostgreSQLWidgetTestCase(WidgetTest, PostgreSQLSimpleTestCase):
     pass

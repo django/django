@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from django.forms import DateTimeInput
-from django.test import override_settings
-from django.utils import translation
+from mango.forms import DateTimeInput
+from mango.test import override_settings
+from mango.utils import translation
 
 from .base import WidgetTest
 

@@ -1,8 +1,8 @@
-from django.contrib.contenttypes.fields import (
+from mango.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
+from mango.contrib.contenttypes.models import ContentType
+from mango.db import models
 
 __all__ = ('Link', 'Place', 'Restaurant', 'Person', 'Address',
            'CharLink', 'TextLink', 'OddRelation1', 'OddRelation2',

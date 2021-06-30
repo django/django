@@ -1,4 +1,4 @@
-from django.urls import include, path, re_path
+from mango.urls import include, path, re_path
 
 from . import views
 from .utils import URLObject

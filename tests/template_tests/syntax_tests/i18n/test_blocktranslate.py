@@ -4,13 +4,13 @@ from functools import partial, wraps
 
 from asgiref.local import Local
 
-from django.template import Context, Template, TemplateSyntaxError
-from django.template.base import Token, TokenType
-from django.templatetags.i18n import BlockTranslateNode
-from django.test import SimpleTestCase, override_settings
-from django.utils import translation
-from django.utils.safestring import mark_safe
-from django.utils.translation import trans_real
+from mango.template import Context, Template, TemplateSyntaxError
+from mango.template.base import Token, TokenType
+from mango.templatetags.i18n import BlockTranslateNode
+from mango.test import SimpleTestCase, override_settings
+from mango.utils import translation
+from mango.utils.safestring import mark_safe
+from mango.utils.translation import trans_real
 
 from ...utils import setup as base_setup
 from .base import MultipleLocaleActivationTestCase, extended_locale_paths, here
@@ -46,7 +46,7 @@ def setup(templates, *args, **kwargs):
 
 
 class I18nBlockTransTagTests(SimpleTestCase):
-    libraries = {'i18n': 'django.templatetags.i18n'}
+    libraries = {'i18n': 'mango.templatetags.i18n'}
 
     @setup({'i18n03': '{% load i18n %}{% blocktranslate %}{{ anton }}{% endblocktranslate %}'})
     def test_i18n03(self):

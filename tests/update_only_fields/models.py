@@ -1,5 +1,5 @@
 
-from django.db import models
+from mango.db import models
 
 
 class Account(models.Model):

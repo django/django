@@ -1,0 +1,3 @@
+from mango.shortcuts import render
+
+# Create your views here.

@@ -6,23 +6,23 @@ import threading
 
 from admin_scripts.tests import AdminScriptTestCase
 
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.http import (
+from mango.conf import settings
+from mango.contrib.auth.models import User
+from mango.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from mango.http import (
     HttpRequest, HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
-from django.shortcuts import redirect
-from django.test import (
+from mango.shortcuts import redirect
+from mango.test import (
     RequestFactory, SimpleTestCase, TestCase, override_settings,
 )
-from django.test.utils import override_script_prefix
-from django.urls import (
+from mango.test.utils import override_script_prefix
+from mango.urls import (
     NoReverseMatch, Resolver404, ResolverMatch, URLPattern, URLResolver,
     get_callable, get_resolver, get_urlconf, include, path, re_path, resolve,
     reverse, reverse_lazy,
 )
-from django.urls.resolvers import RegexPattern
+from mango.urls.resolvers import RegexPattern
 
 from . import middleware, urlconf_outer, views
 from .utils import URLObject
@@ -549,7 +549,7 @@ class ReverseLazySettingsTest(AdminScriptTestCase):
         super().setUp()
         self.write_settings(
             'settings.py',
-            extra="from django.urls import reverse_lazy\nLOGIN_URL = reverse_lazy('login')",
+            extra="from mango.urls import reverse_lazy\nLOGIN_URL = reverse_lazy('login')",
         )
 
     def test_lazy_in_settings(self):
@@ -1192,7 +1192,7 @@ class ViewLoadingTests(SimpleTestCase):
             get_callable('urlpatterns_reverse.views.i_should_not_exist')
 
     def test_attributeerror_not_hidden(self):
-        msg = 'I am here to confuse django.urls.get_callable'
+        msg = 'I am here to confuse mango.urls.get_callable'
         with self.assertRaisesMessage(AttributeError, msg):
             get_callable('urlpatterns_reverse.views_broken.i_am_broken')
 

@@ -1,11 +1,11 @@
 """
 A second, custom AdminSite -- see tests.CustomAdminSiteTests.
 """
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
-from django.http import HttpResponse
-from django.urls import path
+from mango.contrib import admin
+from mango.contrib.auth.admin import UserAdmin
+from mango.contrib.auth.models import User
+from mango.http import HttpResponse
+from mango.urls import path
 
 from . import admin as base_admin, forms, models
 
@@ -29,7 +29,7 @@ class Admin2(admin.AdminSite):
         ] + super().get_urls()
 
     def my_view(self, request):
-        return HttpResponse("Django is a magical pony!")
+        return HttpResponse("Mango is a magical pony!")
 
     def password_change(self, request, extra_context=None):
         return super().password_change(request, {'spam': 'eggs'})

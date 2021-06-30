@@ -1,5 +1,5 @@
 ============================
-How to use Django with uWSGI
+How to use Mango with uWSGI
 ============================
 
 .. highlight:: bash
@@ -11,11 +11,11 @@ container server coded in pure C.
 
 .. seealso::
 
-    The uWSGI docs offer a `tutorial`_ covering Django, nginx, and uWSGI (one
+    The uWSGI docs offer a `tutorial`_ covering Mango, nginx, and uWSGI (one
     possible deployment setup of many). The docs below are focused on how to
-    integrate Django with uWSGI.
+    integrate Mango with uWSGI.
 
-    .. _tutorial: https://uwsgi.readthedocs.io/en/latest/tutorials/Django_and_nginx.html
+    .. _tutorial: https://uwsgi.readthedocs.io/en/latest/tutorials/Mango_and_nginx.html
 
 Prerequisite: uWSGI
 ===================
@@ -38,9 +38,9 @@ uWSGI model
 -----------
 
 uWSGI operates on a client-server model. Your Web server (e.g., nginx, Apache)
-communicates with a ``django-uwsgi`` "worker" process to serve dynamic content.
+communicates with a ``mango-uwsgi`` "worker" process to serve dynamic content.
 
-Configuring and starting the uWSGI server for Django
+Configuring and starting the uWSGI server for Mango
 ----------------------------------------------------
 
 uWSGI supports multiple ways to configure the process. See uWSGI's
@@ -65,13 +65,13 @@ Here's an example command to start a uWSGI server::
 
 This assumes you have a top-level project package named ``mysite``, and
 within it a module :file:`mysite/wsgi.py` that contains a WSGI ``application``
-object. This is the layout you'll have if you ran ``django-admin
+object. This is the layout you'll have if you ran ``mango-admin
 startproject mysite`` (using your own project name in place of ``mysite``) with
-a recent version of Django. If this file doesn't exist, you'll need to create
+a recent version of Mango. If this file doesn't exist, you'll need to create
 it. See the :doc:`/howto/deployment/wsgi/index` documentation for the default
 contents you should put in this file and what else you can add to it.
 
-The Django-specific options here are:
+The Mango-specific options here are:
 
 * ``chdir``: The path to the directory that needs to be on Python's import
   path -- i.e., the directory containing the ``mysite`` package.

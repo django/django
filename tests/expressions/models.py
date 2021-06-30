@@ -3,7 +3,7 @@ Tests for F() query expression syntax.
 """
 import uuid
 
-from django.db import models
+from mango.db import models
 
 
 class Manager(models.Model):

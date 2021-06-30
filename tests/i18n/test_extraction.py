@@ -10,17 +10,17 @@ from unittest import mock, skipIf, skipUnless
 
 from admin_scripts.tests import AdminScriptTestCase
 
-from django.core import management
-from django.core.management import execute_from_command_line
-from django.core.management.base import CommandError
-from django.core.management.commands.makemessages import (
+from mango.core import management
+from mango.core.management import execute_from_command_line
+from mango.core.management.base import CommandError
+from mango.core.management.commands.makemessages import (
     Command as MakeMessagesCommand, write_pot_file,
 )
-from django.core.management.utils import find_command
-from django.test import SimpleTestCase, override_settings
-from django.test.utils import captured_stderr, captured_stdout
-from django.utils._os import symlinks_supported
-from django.utils.translation import TranslatorCommentWarning
+from mango.core.management.utils import find_command
+from mango.test import SimpleTestCase, override_settings
+from mango.test.utils import captured_stderr, captured_stdout
+from mango.utils._os import symlinks_supported
+from mango.utils.translation import TranslatorCommentWarning
 
 from .utils import POFileAssertionMixin, RunInTmpDirMixin, copytree
 
@@ -35,7 +35,7 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
 
     work_subdir = 'commands'
 
-    PO_FILE = 'locale/%s/LC_MESSAGES/django.po' % LOCALE
+    PO_FILE = 'locale/%s/LC_MESSAGES/mango.po' % LOCALE
 
     def _run_makemessages(self, **options):
         out = StringIO()
@@ -92,9 +92,9 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
 
     def assertLocationCommentPresent(self, po_filename, line_number, *comment_parts):
         r"""
-        self.assertLocationCommentPresent('django.po', 42, 'dirA', 'dirB', 'foo.py')
+        self.assertLocationCommentPresent('mango.po', 42, 'dirA', 'dirB', 'foo.py')
 
-        verifies that the django.po file has a gettext-style location comment of the form
+        verifies that the mango.po file has a gettext-style location comment of the form
 
         `#: dirA/dirB/foo.py:42`
 
@@ -146,7 +146,7 @@ class BasicExtractorTests(ExtractorTests):
         # One of either the --locale, --exclude, or --all options is required.
         msg = "Type 'manage.py help makemessages' for usage information."
         with mock.patch(
-            'django.core.management.commands.makemessages.sys.argv',
+            'mango.core.management.commands.makemessages.sys.argv',
             ['manage.py', 'makemessages'],
         ):
             with self.assertRaisesRegex(CommandError, msg):
@@ -164,7 +164,7 @@ class BasicExtractorTests(ExtractorTests):
         management.call_command('makemessages', locale=['pl-PL'], stdout=out, verbosity=1)
         self.assertIn('invalid locale pl-PL, did you mean pl_PL?', out.getvalue())
         self.assertNotIn('processing locale pl-PL', out.getvalue())
-        self.assertIs(Path('locale/pl-PL/LC_MESSAGES/django.po').exists(), False)
+        self.assertIs(Path('locale/pl-PL/LC_MESSAGES/mango.po').exists(), False)
 
     def test_comments_extractor(self):
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
@@ -176,7 +176,7 @@ class BasicExtractorTests(ExtractorTests):
             # Comments in templates
             self.assertIn('#. Translators: This comment should be extracted', po_contents)
             self.assertIn(
-                "#. Translators: Django comment block for translators\n#. "
+                "#. Translators: Mango comment block for translators\n#. "
                 "string's meaning unveiled",
                 po_contents
             )
@@ -369,7 +369,7 @@ class BasicExtractorTests(ExtractorTests):
         cmd = MakeMessagesCommand()
         cmd.ignore_patterns = ['CVS', '.*', '*~', '*.pyc']
         cmd.symlinks = False
-        cmd.domain = 'django'
+        cmd.domain = 'mango'
         cmd.extensions = ['html', 'txt', 'py']
         cmd.verbosity = 0
         cmd.locale_paths = []
@@ -379,12 +379,12 @@ class BasicExtractorTests(ExtractorTests):
         self.assertEqual(found_exts.difference({'.py', '.html', '.txt'}), set())
 
         cmd.extensions = ['js']
-        cmd.domain = 'djangojs'
+        cmd.domain = 'mangojs'
         found_files = cmd.find_files(self.test_dir)
         found_exts = {os.path.splitext(tfile.file)[1] for tfile in found_files}
         self.assertEqual(found_exts.difference({'.js'}), set())
 
-    @mock.patch('django.core.management.commands.makemessages.popen_wrapper')
+    @mock.patch('mango.core.management.commands.makemessages.popen_wrapper')
     def test_makemessages_gettext_version(self, mocked_popen_wrapper):
         # "Normal" output:
         mocked_popen_wrapper.return_value = (
@@ -415,7 +415,7 @@ class BasicExtractorTests(ExtractorTests):
         Update of PO file doesn't corrupt it with non-UTF-8 encoding on Windows
         (#23271).
         """
-        BR_PO_BASE = 'locale/pt_BR/LC_MESSAGES/django'
+        BR_PO_BASE = 'locale/pt_BR/LC_MESSAGES/mango'
         shutil.copyfile(BR_PO_BASE + '.pristine', BR_PO_BASE + '.po')
         management.call_command('makemessages', locale=['pt_BR'], verbosity=0)
         self.assertTrue(os.path.exists(BR_PO_BASE + '.po'))
@@ -446,10 +446,10 @@ class BasicExtractorTests(ExtractorTests):
 
 class JavaScriptExtractorTests(ExtractorTests):
 
-    PO_FILE = 'locale/%s/LC_MESSAGES/djangojs.po' % LOCALE
+    PO_FILE = 'locale/%s/LC_MESSAGES/mangojs.po' % LOCALE
 
     def test_javascript_literals(self):
-        _, po_contents = self._run_makemessages(domain='djangojs')
+        _, po_contents = self._run_makemessages(domain='mangojs')
         self.assertMsgId('This literal should be included.', po_contents)
         self.assertMsgId('gettext_noop should, too.', po_contents)
         self.assertMsgId('This one as well.', po_contents)
@@ -471,7 +471,7 @@ class JavaScriptExtractorTests(ExtractorTests):
         """
         with override_settings(STATIC_ROOT=os.path.join(self.test_dir, 'static/'),
                                MEDIA_ROOT=os.path.join(self.test_dir, 'media_root/')):
-            _, po_contents = self._run_makemessages(domain='djangojs')
+            _, po_contents = self._run_makemessages(domain='mangojs')
             self.assertMsgId("Static content inside app should be included.", po_contents)
             self.assertNotMsgId("Content from STATIC_ROOT should not be included", po_contents)
 
@@ -480,7 +480,7 @@ class JavaScriptExtractorTests(ExtractorTests):
         """
         Regression test for #23717.
         """
-        _, po_contents = self._run_makemessages(domain='djangojs')
+        _, po_contents = self._run_makemessages(domain='mangojs')
         self.assertMsgId("Static content inside app should be included.", po_contents)
 
 
@@ -538,7 +538,7 @@ class SymlinkExtractorTests(ExtractorTests):
 
 class CopyPluralFormsExtractorTests(ExtractorTests):
 
-    PO_FILE_ES = 'locale/es/LC_MESSAGES/django.po'
+    PO_FILE_ES = 'locale/es/LC_MESSAGES/mango.po'
 
     def test_copy_plural_forms(self):
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
@@ -566,7 +566,7 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE) as fp:
             po_contents = fp.read()
-            self.assertNotIn("#-#-#-#-#  django.pot (PACKAGE VERSION)  #-#-#-#-#\\n", po_contents)
+            self.assertNotIn("#-#-#-#-#  mango.pot (PACKAGE VERSION)  #-#-#-#-#\\n", po_contents)
             self.assertMsgId('First `translate`, then `blocktranslate` with a plural', po_contents)
             self.assertMsgIdPlural('Plural for a `translate` and `blocktranslate` collision case', po_contents)
 
@@ -650,7 +650,7 @@ class LocationCommentsTests(ExtractorTests):
         self.assertTrue(os.path.exists(self.PO_FILE))
         self.assertLocationCommentNotPresent(self.PO_FILE, None, 'test.html')
 
-    @mock.patch('django.core.management.commands.makemessages.Command.gettext_version', new=(0, 18, 99))
+    @mock.patch('mango.core.management.commands.makemessages.Command.gettext_version', new=(0, 18, 99))
     def test_add_location_gettext_version_check(self):
         """
         CommandError is raised when using makemessages --add-location with
@@ -663,7 +663,7 @@ class LocationCommentsTests(ExtractorTests):
 
 class KeepPotFileExtractorTests(ExtractorTests):
 
-    POT_FILE = 'locale/django.pot'
+    POT_FILE = 'locale/mango.pot'
 
     def test_keep_pot_disabled_by_default(self):
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
@@ -679,9 +679,9 @@ class KeepPotFileExtractorTests(ExtractorTests):
 
 
 class MultipleLocaleExtractionTests(ExtractorTests):
-    PO_FILE_PT = 'locale/pt/LC_MESSAGES/django.po'
-    PO_FILE_DE = 'locale/de/LC_MESSAGES/django.po'
-    PO_FILE_KO = 'locale/ko/LC_MESSAGES/django.po'
+    PO_FILE_PT = 'locale/pt/LC_MESSAGES/mango.po'
+    PO_FILE_DE = 'locale/de/LC_MESSAGES/mango.po'
+    PO_FILE_KO = 'locale/ko/LC_MESSAGES/mango.po'
     LOCALES = ['pt', 'de', 'ch']
 
     def test_multiple_locales(self):
@@ -699,7 +699,7 @@ class MultipleLocaleExtractionTests(ExtractorTests):
         # Excluding locales that do not compile
         management.call_command('makemessages', exclude=['ja', 'es_AR'], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE_KO))
-        self.assertFalse(os.path.exists('locale/_do_not_pick/LC_MESSAGES/django.po'))
+        self.assertFalse(os.path.exists('locale/_do_not_pick/LC_MESSAGES/mango.po'))
 
 
 class ExcludedLocaleExtractionTests(ExtractorTests):
@@ -707,7 +707,7 @@ class ExcludedLocaleExtractionTests(ExtractorTests):
     work_subdir = 'exclude'
 
     LOCALES = ['en', 'fr', 'it']
-    PO_FILE = 'locale/%s/LC_MESSAGES/django.po'
+    PO_FILE = 'locale/%s/LC_MESSAGES/mango.po'
 
     def _set_times_for_all_po_files(self):
         """
@@ -726,7 +726,7 @@ class ExcludedLocaleExtractionTests(ExtractorTests):
             # `call_command` bypasses the parser; by calling
             # `execute_from_command_line` with the help subcommand we
             # ensure that there are no issues with the parser itself.
-            execute_from_command_line(['django-admin', 'help', 'makemessages'])
+            execute_from_command_line(['mango-admin', 'help', 'makemessages'])
 
     def test_one_locale_excluded(self):
         management.call_command('makemessages', exclude=['it'], verbosity=0)
@@ -780,9 +780,9 @@ class CustomLayoutExtractionTests(ExtractorTests):
         with override_settings(LOCALE_PATHS=[locale_path]):
             management.call_command('makemessages', locale=[LOCALE], verbosity=0)
             project_de_locale = os.path.join(
-                self.test_dir, 'project_locale', 'de', 'LC_MESSAGES', 'django.po')
+                self.test_dir, 'project_locale', 'de', 'LC_MESSAGES', 'mango.po')
             app_de_locale = os.path.join(
-                self.test_dir, 'app_with_locale', 'locale', 'de', 'LC_MESSAGES', 'django.po')
+                self.test_dir, 'app_with_locale', 'locale', 'de', 'LC_MESSAGES', 'mango.po')
             self.assertTrue(os.path.exists(project_de_locale))
             self.assertTrue(os.path.exists(app_de_locale))
 
@@ -798,6 +798,6 @@ class CustomLayoutExtractionTests(ExtractorTests):
 @skipUnless(has_xgettext, 'xgettext is mandatory for extraction tests')
 class NoSettingsExtractionTests(AdminScriptTestCase):
     def test_makemessages_no_settings(self):
-        out, err = self.run_django_admin(['makemessages', '-l', 'en', '-v', '0'])
+        out, err = self.run_mango_admin(['makemessages', '-l', 'en', '-v', '0'])
         self.assertNoOutput(err)
         self.assertNoOutput(out)

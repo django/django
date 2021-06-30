@@ -1,6 +1,6 @@
-from django.core.handlers.wsgi import WSGIHandler
-from django.test import SimpleTestCase, override_settings
-from django.test.client import FakePayload
+from mango.core.handlers.wsgi import WSGIHandler
+from mango.test import SimpleTestCase, override_settings
+from mango.test.client import FakePayload
 
 
 class ExceptionHandlerTests(SimpleTestCase):

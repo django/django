@@ -2,13 +2,13 @@
 Logging
 =======
 
-.. module:: django.utils.log
-   :synopsis: Logging tools for Django applications
+.. module:: mango.utils.log
+   :synopsis: Logging tools for Mango applications
 
 A quick logging primer
 ======================
 
-Django uses Python's builtin :mod:`logging` module to perform system logging.
+Mango uses Python's builtin :mod:`logging` module to perform system logging.
 The usage of this module is discussed in detail in Python's own documentation.
 However, if you've never used Python's logging framework (or even if you have),
 here's a quick primer.
@@ -203,7 +203,7 @@ the logging output.
 
 Python's logging library provides several techniques to configure
 logging, ranging from a programmatic interface to configuration files.
-By default, Django uses the :ref:`dictConfig format
+By default, Mango uses the :ref:`dictConfig format
 <logging-config-dictschema>`.
 
 In order to configure logging, you use :setting:`LOGGING` to define a
@@ -212,7 +212,7 @@ handlers, filters and formatters that you want in your logging setup,
 and the log levels and other properties that you want those components
 to have.
 
-By default, the :setting:`LOGGING` setting is merged with :ref:`Django's
+By default, the :setting:`LOGGING` setting is merged with :ref:`Mango's
 default logging configuration <default-logging-configuration>` using the
 following scheme.
 
@@ -227,7 +227,7 @@ you can set ``disable_existing_loggers`` to ``False`` and redefine some or all
 of the default loggers; or you can set :setting:`LOGGING_CONFIG` to ``None``
 and :ref:`handle logging config yourself <disabling-logging-configuration>`.
 
-Logging is configured as part of the general Django ``setup()`` function.
+Logging is configured as part of the general Mango ``setup()`` function.
 Therefore, you can be certain that loggers are always ready for use in your
 project code.
 
@@ -266,7 +266,7 @@ This configures the parent ``root`` logger to send messages with the
 development.
 
 Next we can add more fine-grained logging. Here's an example of how to make the
-logging system print more messages from just the :ref:`django-logger` named
+logging system print more messages from just the :ref:`mango-logger` named
 logger:
 
 .. code-block:: python
@@ -287,7 +287,7 @@ logger:
             'level': 'WARNING',
         },
         'loggers': {
-            'django': {
+            'mango': {
                 'handlers': ['console'],
                 'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
                 'propagate': False,
@@ -295,16 +295,16 @@ logger:
         },
     }
 
-By default, this config sends messages from the ``django`` logger of level
-``INFO`` or higher to the console. This is the same level as Django's default
+By default, this config sends messages from the ``mango`` logger of level
+``INFO`` or higher to the console. This is the same level as Mango's default
 logging config, except that the default config only displays log records when
-``DEBUG=True``. Django does not log many such ``INFO`` level messages. With
+``DEBUG=True``. Mango does not log many such ``INFO`` level messages. With
 this config, however, you can also set the environment variable
-``DJANGO_LOG_LEVEL=DEBUG`` to see all of Django's debug logging which is very
+``DJANGO_LOG_LEVEL=DEBUG`` to see all of Mango's debug logging which is very
 verbose as it includes all database queries.
 
 You don't have to log to the console. Here's a configuration which writes all
-logging from the :ref:`django-logger` named logger to a local file:
+logging from the :ref:`mango-logger` named logger to a local file:
 
 .. code-block:: python
     :caption: settings.py
@@ -316,11 +316,11 @@ logging from the :ref:`django-logger` named logger to a local file:
             'file': {
                 'level': 'DEBUG',
                 'class': 'logging.FileHandler',
-                'filename': '/path/to/django/debug.log',
+                'filename': '/path/to/mango/debug.log',
             },
         },
         'loggers': {
-            'django': {
+            'mango': {
                 'handlers': ['file'],
                 'level': 'DEBUG',
                 'propagate': True,
@@ -329,7 +329,7 @@ logging from the :ref:`django-logger` named logger to a local file:
     }
 
 If you use this example, be sure to change the ``'filename'`` path to a
-location that's writable by the user that's running the Django application.
+location that's writable by the user that's running the Mango application.
 
 Finally, here's an example of a fairly complex logging setup:
 
@@ -355,7 +355,7 @@ Finally, here's an example of a fairly complex logging setup:
                 'foo': 'bar',
             },
             'require_debug_true': {
-                '()': 'django.utils.log.RequireDebugTrue',
+                '()': 'mango.utils.log.RequireDebugTrue',
             },
         },
         'handlers': {
@@ -367,16 +367,16 @@ Finally, here's an example of a fairly complex logging setup:
             },
             'mail_admins': {
                 'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
+                'class': 'mango.utils.log.AdminEmailHandler',
                 'filters': ['special']
             }
         },
         'loggers': {
-            'django': {
+            'mango': {
                 'handlers': ['console'],
                 'propagate': True,
             },
-            'django.request': {
+            'mango.request': {
                 'handlers': ['mail_admins'],
                 'level': 'ERROR',
                 'propagate': False,
@@ -416,7 +416,7 @@ This logging configuration does the following things:
     ``foo`` will be given a value of ``bar`` when instantiating
     ``SpecialFilter``.
 
-  * ``django.utils.log.RequireDebugTrue``, which passes on records when
+  * ``mango.utils.log.RequireDebugTrue``, which passes on records when
     :setting:`DEBUG` is ``True``.
 
 * Defines two handlers:
@@ -431,13 +431,13 @@ This logging configuration does the following things:
 
 * Configures three loggers:
 
-  * ``django``, which passes all messages to the ``console`` handler.
+  * ``mango``, which passes all messages to the ``console`` handler.
 
-  * ``django.request``, which passes all ``ERROR`` messages to
+  * ``mango.request``, which passes all ``ERROR`` messages to
     the ``mail_admins`` handler. In addition, this logger is
     marked to *not* propagate messages. This means that log
-    messages written to ``django.request`` will not be handled
-    by the ``django`` logger.
+    messages written to ``mango.request`` will not be handled
+    by the ``mango`` logger.
 
   * ``myproject.custom``, which passes all messages at ``INFO``
     or higher that also pass the ``special`` filter to two
@@ -453,7 +453,7 @@ If you don't want to use Python's dictConfig format to configure your
 logger, you can specify your own configuration scheme.
 
 The :setting:`LOGGING_CONFIG` setting defines the callable that will
-be used to configure Django's loggers. By default, it points at
+be used to configure Mango's loggers. By default, it points at
 Python's :func:`logging.config.dictConfig()` function. However, if you want to
 use a different configuration process, you can use any other callable
 that takes a single argument. The contents of :setting:`LOGGING` will
@@ -467,15 +467,15 @@ Disabling logging configuration
 If you don't want to configure logging at all (or you want to manually
 configure logging using your own approach), you can set
 :setting:`LOGGING_CONFIG` to ``None``. This will disable the
-configuration process for :ref:`Django's default logging
+configuration process for :ref:`Mango's default logging
 <default-logging-configuration>`.
 
 Setting :setting:`LOGGING_CONFIG` to ``None`` only means that the automatic
 configuration process is disabled, not logging itself. If you disable the
-configuration process, Django will still make logging calls, falling back to
+configuration process, Mango will still make logging calls, falling back to
 whatever default logging behavior is defined.
 
-Here's an example that disables Django's logging configuration and then
+Here's an example that disables Mango's logging configuration and then
 manually configures logging:
 
 .. code-block:: python
@@ -492,34 +492,34 @@ configuring the logging in your settings file will load your logging config
 immediately. As such, your logging config must appear *after* any settings on
 which it depends.
 
-Django's logging extensions
+Mango's logging extensions
 ===========================
 
-Django provides a number of utilities to handle the unique
+Mango provides a number of utilities to handle the unique
 requirements of logging in Web server environment.
 
 Loggers
 -------
 
-Django provides several built-in loggers.
+Mango provides several built-in loggers.
 
-.. _django-logger:
+.. _mango-logger:
 
-``django``
+``mango``
 ~~~~~~~~~~
 
-The catch-all logger for messages in the  ``django`` hierarchy. No messages are
+The catch-all logger for messages in the  ``mango`` hierarchy. No messages are
 posted using this name but instead using one of the loggers below.
 
-.. _django-request-logger:
+.. _mango-request-logger:
 
-``django.request``
+``mango.request``
 ~~~~~~~~~~~~~~~~~~
 
 Log messages related to the handling of requests. 5XX responses are
 raised as ``ERROR`` messages; 4XX responses are raised as ``WARNING``
-messages. Requests that are logged to the ``django.security`` logger aren't
-logged to ``django.request``.
+messages. Requests that are logged to the ``mango.security`` logger aren't
+logged to ``mango.request``.
 
 Messages to this logger have the following extra context:
 
@@ -529,9 +529,9 @@ Messages to this logger have the following extra context:
 * ``request``: The request object that generated the logging
   message.
 
-.. _django-server-logger:
+.. _mango-server-logger:
 
-``django.server``
+``mango.server``
 ~~~~~~~~~~~~~~~~~
 
 Log messages related to the handling of requests received by the server invoked
@@ -545,18 +545,18 @@ Messages to this logger have the following extra context:
 
 * ``request``: The request object that generated the logging message.
 
-.. _django-template-logger:
+.. _mango-template-logger:
 
-``django.template``
+``mango.template``
 ~~~~~~~~~~~~~~~~~~~
 
 Log messages related to the rendering of templates.
 
 * Missing context variables are logged as ``DEBUG`` messages.
 
-.. _django-db-logger:
+.. _mango-db-logger:
 
-``django.db.backends``
+``mango.db.backends``
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Messages relating to the interaction of code with the database. For example,
@@ -578,26 +578,26 @@ This logging does not include framework-level initialization (e.g.
 ``COMMIT``, and ``ROLLBACK``). Turn on query logging in your database if you
 wish to view all database queries.
 
-.. _django-security-logger:
+.. _mango-security-logger:
 
-``django.security.*``
+``mango.security.*``
 ~~~~~~~~~~~~~~~~~~~~~~
 
 The security loggers will receive messages on any occurrence of
-:exc:`~django.core.exceptions.SuspiciousOperation` and other security-related
+:exc:`~mango.core.exceptions.SuspiciousOperation` and other security-related
 errors. There is a sub-logger for each subtype of security error, including all
 ``SuspiciousOperation``\s. The level of the log event depends on where the
 exception is handled.  Most occurrences are logged as a warning, while
 any ``SuspiciousOperation`` that reaches the WSGI handler will be logged as an
 error. For example, when an HTTP ``Host`` header is included in a request from
-a client that does not match :setting:`ALLOWED_HOSTS`, Django will return a 400
+a client that does not match :setting:`ALLOWED_HOSTS`, Mango will return a 400
 response, and an error message will be logged to the
-``django.security.DisallowedHost`` logger.
+``mango.security.DisallowedHost`` logger.
 
-These log events will reach the ``django`` logger by default, which mails error
+These log events will reach the ``mango`` logger by default, which mails error
 events to admins when ``DEBUG=False``. Requests resulting in a 400 response due
-to a ``SuspiciousOperation`` will not be logged to the ``django.request``
-logger, but only to the ``django.security`` logger.
+to a ``SuspiciousOperation`` will not be logged to the ``mango.request``
+logger, but only to the ``mango.security`` logger.
 
 To silence a particular type of ``SuspiciousOperation``, you can override that
 specific logger following this example::
@@ -608,30 +608,30 @@ specific logger following this example::
         },
     },
     'loggers': {
-        'django.security.DisallowedHost': {
+        'mango.security.DisallowedHost': {
             'handlers': ['null'],
             'propagate': False,
         },
     },
 
-Other ``django.security`` loggers not based on ``SuspiciousOperation`` are:
+Other ``mango.security`` loggers not based on ``SuspiciousOperation`` are:
 
-* ``django.security.csrf``: For :ref:`CSRF failures <csrf-rejected-requests>`.
+* ``mango.security.csrf``: For :ref:`CSRF failures <csrf-rejected-requests>`.
 
-``django.db.backends.schema``
+``mango.db.backends.schema``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Logs the SQL queries that are executed during schema changes to the database by
 the :doc:`migrations framework </topics/migrations>`. Note that it won't log the
-queries executed by :class:`~django.db.migrations.operations.RunPython`.
+queries executed by :class:`~mango.db.migrations.operations.RunPython`.
 Messages to this logger have ``params`` and ``sql`` in their extra context (but
-unlike ``django.db.backends``, not duration). The values have the same meaning
-as explained in :ref:`django-db-logger`.
+unlike ``mango.db.backends``, not duration). The values have the same meaning
+as explained in :ref:`mango-db-logger`.
 
 Handlers
 --------
 
-Django provides one log handler in addition to those provided by the
+Mango provides one log handler in addition to those provided by the
 Python logging module.
 
 .. class:: AdminEmailHandler(include_html=False, email_backend=None, reporter_class=None)
@@ -652,19 +652,19 @@ Python logging module.
     containing the full content of the debug Web page that would have been
     produced if :setting:`DEBUG` were ``True``. To set this value in your
     configuration, include it in the handler definition for
-    ``django.utils.log.AdminEmailHandler``, like this::
+    ``mango.utils.log.AdminEmailHandler``, like this::
 
         'handlers': {
             'mail_admins': {
                 'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
+                'class': 'mango.utils.log.AdminEmailHandler',
                 'include_html': True,
             }
         },
 
     Note that this HTML version of the email contains a full traceback,
     with names and values of local variables at each level of the stack, plus
-    the values of your Django settings. This information is potentially very
+    the values of your Mango settings. This information is potentially very
     sensitive, and you may not want to send it over email. Consider using
     something such as `Sentry`_ to get the best of both worlds -- the
     rich information of full tracebacks plus the security of *not* sending the
@@ -679,8 +679,8 @@ Python logging module.
         'handlers': {
             'mail_admins': {
                 'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
-                'email_backend': 'django.core.mail.backends.filebased.EmailBackend',
+                'class': 'mango.utils.log.AdminEmailHandler',
+                'email_backend': 'mango.core.mail.backends.filebased.EmailBackend',
             }
         },
 
@@ -688,14 +688,14 @@ Python logging module.
     :setting:`EMAIL_BACKEND` will be used.
 
     The ``reporter_class`` argument of ``AdminEmailHandler`` allows providing
-    an ``django.views.debug.ExceptionReporter`` subclass to customize the
+    an ``mango.views.debug.ExceptionReporter`` subclass to customize the
     traceback text sent in the email body. You provide a string import path to
     the class you wish to use, like this::
 
         'handlers': {
             'mail_admins': {
                 'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
+                'class': 'mango.utils.log.AdminEmailHandler',
                 'include_html': True,
                 'reporter_class': 'somepackage.error_reporter.CustomErrorReporter'
             }
@@ -704,7 +704,7 @@ Python logging module.
     .. method:: send_mail(subject, message, *args, **kwargs)
 
         Sends emails to admin users. To customize this behavior, you can
-        subclass the :class:`~django.utils.log.AdminEmailHandler` class and
+        subclass the :class:`~mango.utils.log.AdminEmailHandler` class and
         override this method.
 
 .. _Sentry: https://pypi.org/project/sentry/
@@ -712,7 +712,7 @@ Python logging module.
 Filters
 -------
 
-Django provides some log filters in addition to those provided by the Python
+Mango provides some log filters in addition to those provided by the Python
 logging module.
 
 .. class:: CallbackFilter(callback)
@@ -722,11 +722,11 @@ logging module.
     passes through the filter. Handling of that record will not proceed if the
     callback returns False.
 
-    For instance, to filter out :exc:`~django.http.UnreadablePostError`
+    For instance, to filter out :exc:`~mango.http.UnreadablePostError`
     (raised when a user cancels an upload) from the admin emails, you would
     create a filter function::
 
-        from django.http import UnreadablePostError
+        from mango.http import UnreadablePostError
 
         def skip_unreadable_post(record):
             if record.exc_info:
@@ -739,7 +739,7 @@ logging module.
 
         'filters': {
             'skip_unreadable_posts': {
-                '()': 'django.utils.log.CallbackFilter',
+                '()': 'mango.utils.log.CallbackFilter',
                 'callback': skip_unreadable_post,
             }
         },
@@ -747,7 +747,7 @@ logging module.
             'mail_admins': {
                 'level': 'ERROR',
                 'filters': ['skip_unreadable_posts'],
-                'class': 'django.utils.log.AdminEmailHandler'
+                'class': 'mango.utils.log.AdminEmailHandler'
             }
         },
 
@@ -761,14 +761,14 @@ logging module.
 
         'filters': {
             'require_debug_false': {
-                '()': 'django.utils.log.RequireDebugFalse',
+                '()': 'mango.utils.log.RequireDebugFalse',
             }
         },
         'handlers': {
             'mail_admins': {
                 'level': 'ERROR',
                 'filters': ['require_debug_false'],
-                'class': 'django.utils.log.AdminEmailHandler'
+                'class': 'mango.utils.log.AdminEmailHandler'
             }
         },
 
@@ -779,32 +779,32 @@ logging module.
 
 .. _default-logging-configuration:
 
-Django's default logging configuration
+Mango's default logging configuration
 ======================================
 
-By default, Django configures the following logging:
+By default, Mango configures the following logging:
 
 When :setting:`DEBUG` is ``True``:
 
-* The ``django`` logger sends messages in the ``django`` hierarchy (except
-  ``django.server``) at the ``INFO`` level or higher to the console.
+* The ``mango`` logger sends messages in the ``mango`` hierarchy (except
+  ``mango.server``) at the ``INFO`` level or higher to the console.
 
 When :setting:`DEBUG` is ``False``:
 
-* The ``django`` logger sends messages in the ``django`` hierarchy (except
-  ``django.server``)  with ``ERROR`` or ``CRITICAL`` level to
+* The ``mango`` logger sends messages in the ``mango`` hierarchy (except
+  ``mango.server``)  with ``ERROR`` or ``CRITICAL`` level to
   :class:`AdminEmailHandler`.
 
 Independent of the value of :setting:`DEBUG`:
 
-* The :ref:`django-server-logger` logger sends messages at the ``INFO`` level
+* The :ref:`mango-server-logger` logger sends messages at the ``INFO`` level
   or higher to the console.
 
-All loggers except :ref:`django-server-logger` propagate logging to their
-parents, up to the root ``django`` logger. The ``console`` and ``mail_admins``
+All loggers except :ref:`mango-server-logger` propagate logging to their
+parents, up to the root ``mango`` logger. The ``console`` and ``mail_admins``
 handlers are attached to the root logger to provide the behavior described
 above.
 
 See also :ref:`Configuring logging <configuring-logging>` to learn how you can
 complement or replace this default logging configuration defined in
-:source:`django/utils/log.py`.
+:source:`mango/utils/log.py`.

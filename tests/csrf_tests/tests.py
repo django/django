@@ -1,16 +1,16 @@
 import re
 
-from django.conf import settings
-from django.contrib.sessions.backends.cache import SessionStore
-from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpRequest, HttpResponse
-from django.middleware.csrf import (
+from mango.conf import settings
+from mango.contrib.sessions.backends.cache import SessionStore
+from mango.core.exceptions import ImproperlyConfigured
+from mango.http import HttpRequest, HttpResponse
+from mango.middleware.csrf import (
     CSRF_SESSION_KEY, CSRF_TOKEN_LENGTH, REASON_BAD_ORIGIN,
     REASON_CSRF_TOKEN_MISSING, REASON_NO_CSRF_COOKIE, CsrfViewMiddleware,
     RejectRequest, _compare_masked_tokens as equivalent_tokens, get_token,
 )
-from django.test import SimpleTestCase, override_settings
-from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
+from mango.test import SimpleTestCase, override_settings
+from mango.views.decorators.csrf import csrf_exempt, requires_csrf_token
 
 from .views import (
     ensure_csrf_cookie_view, non_token_view_using_request_processor,
@@ -103,7 +103,7 @@ class CsrfViewMiddlewareTestMixin:
             req = self._get_POST_csrf_cookie_request(cookie=cookie)
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
-        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
+        with self.assertLogs('mango.security.csrf', 'WARNING') as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(403, resp.status_code)
         self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % expected)
@@ -123,7 +123,7 @@ class CsrfViewMiddlewareTestMixin:
             req = self._get_POST_request_with_token(token=token)
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
-        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
+        with self.assertLogs('mango.security.csrf', 'WARNING') as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(403, resp.status_code)
         self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % expected)
@@ -207,14 +207,14 @@ class CsrfViewMiddlewareTestMixin:
         req = TestingHttpRequest()
         req.method = 'PUT'
         mw = CsrfViewMiddleware(post_form_view)
-        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
+        with self.assertLogs('mango.security.csrf', 'WARNING') as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(403, resp.status_code)
         self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE)
 
         req = TestingHttpRequest()
         req.method = 'DELETE'
-        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
+        with self.assertLogs('mango.security.csrf', 'WARNING') as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(403, resp.status_code)
         self.assertEqual(cm.records[0].getMessage(), 'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE)
@@ -555,7 +555,7 @@ class CsrfViewMiddlewareTestMixin:
         """
         ensure_csrf_cookie() doesn't log warnings (#19436).
         """
-        with self.assertNoLogs('django.request', 'WARNING'):
+        with self.assertNoLogs('mango.request', 'WARNING'):
             req = self._get_GET_no_csrf_cookie_request()
             ensure_csrf_cookie_view(req)
 
@@ -606,7 +606,7 @@ class CsrfViewMiddlewareTestMixin:
 
         req = CsrfPostRequest(token, raise_error=True)
         mw.process_request(req)
-        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
+        with self.assertLogs('mango.security.csrf', 'WARNING') as cm:
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(resp.status_code, 403)
         self.assertEqual(
@@ -623,7 +623,7 @@ class CsrfViewMiddlewareTestMixin:
         mw = CsrfViewMiddleware(post_form_view)
         self._check_referer_rejects(mw, req)
         self.assertIs(mw._origin_verified(req), False)
-        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
+        with self.assertLogs('mango.security.csrf', 'WARNING') as cm:
             response = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(response.status_code, 403)
         msg = REASON_BAD_ORIGIN % req.META['HTTP_ORIGIN']
@@ -638,7 +638,7 @@ class CsrfViewMiddlewareTestMixin:
         mw = CsrfViewMiddleware(post_form_view)
         self._check_referer_rejects(mw, req)
         self.assertIs(mw._origin_verified(req), False)
-        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
+        with self.assertLogs('mango.security.csrf', 'WARNING') as cm:
             response = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(response.status_code, 403)
         msg = REASON_BAD_ORIGIN % req.META['HTTP_ORIGIN']
@@ -654,7 +654,7 @@ class CsrfViewMiddlewareTestMixin:
         mw = CsrfViewMiddleware(post_form_view)
         self._check_referer_rejects(mw, req)
         self.assertIs(mw._origin_verified(req), False)
-        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
+        with self.assertLogs('mango.security.csrf', 'WARNING') as cm:
             response = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(response.status_code, 403)
         msg = REASON_BAD_ORIGIN % req.META['HTTP_ORIGIN']
@@ -681,7 +681,7 @@ class CsrfViewMiddlewareTestMixin:
         mw = CsrfViewMiddleware(post_form_view)
         self._check_referer_rejects(mw, req)
         self.assertIs(mw._origin_verified(req), False)
-        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
+        with self.assertLogs('mango.security.csrf', 'WARNING') as cm:
             response = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(response.status_code, 403)
         msg = REASON_BAD_ORIGIN % req.META['HTTP_ORIGIN']
@@ -704,7 +704,7 @@ class CsrfViewMiddlewareTestMixin:
         mw = CsrfViewMiddleware(post_form_view)
         self._check_referer_rejects(mw, req)
         self.assertIs(mw._origin_verified(req), False)
-        with self.assertLogs('django.security.csrf', 'WARNING') as cm:
+        with self.assertLogs('mango.security.csrf', 'WARNING') as cm:
             response = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(response.status_code, 403)
         msg = REASON_BAD_ORIGIN % req.META['HTTP_ORIGIN']

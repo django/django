@@ -1,6 +1,6 @@
-from django.contrib.gis.db import models
-from django.db import migrations
-from django.db.models import deletion
+from mango.contrib.gis.db import models
+from mango.db import migrations
+from mango.db.models import deletion
 
 
 class Migration(migrations.Migration):

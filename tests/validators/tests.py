@@ -5,9 +5,9 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from unittest import TestCase, mock
 
-from django.core.exceptions import ValidationError
-from django.core.files.base import ContentFile
-from django.core.validators import (
+from mango.core.exceptions import ValidationError
+from mango.core.files.base import ContentFile
+from mango.core.validators import (
     BaseValidator, DecimalValidator, EmailValidator, FileExtensionValidator,
     MaxLengthValidator, MaxValueValidator, MinLengthValidator,
     MinValueValidator, ProhibitNullCharactersValidator, RegexValidator,
@@ -16,8 +16,8 @@ from django.core.validators import (
     validate_ipv4_address, validate_ipv6_address, validate_ipv46_address,
     validate_slug, validate_unicode_slug,
 )
-from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango41Warning
+from mango.test import SimpleTestCase, ignore_warnings
+from mango.utils.deprecation import RemovedInMango41Warning
 
 try:
     from PIL import Image  # noqa
@@ -146,7 +146,7 @@ TEST_DATA = [
     (validate_ipv4_address, '1.2.03.4', ValidationError),
     (validate_ipv4_address, '1.2.3.04', ValidationError),
 
-    # validate_ipv6_address uses django.utils.ipv6, which
+    # validate_ipv6_address uses mango.utils.ipv6, which
     # is tested in much greater detail in its own testcase
     (validate_ipv6_address, 'fe80::1', None),
     (validate_ipv6_address, '::1', None),
@@ -247,13 +247,13 @@ TEST_DATA = [
     (URLValidator(), 56, ValidationError),
     (URLValidator(), 'no_scheme', ValidationError),
     # Newlines and tabs are not accepted.
-    (URLValidator(), 'http://www.djangoproject.com/\n', ValidationError),
+    (URLValidator(), 'http://www.mangoproject.com/\n', ValidationError),
     (URLValidator(), 'http://[::ffff:192.9.5.5]\n', ValidationError),
-    (URLValidator(), 'http://www.djangoproject.com/\r', ValidationError),
+    (URLValidator(), 'http://www.mangoproject.com/\r', ValidationError),
     (URLValidator(), 'http://[::ffff:192.9.5.5]\r', ValidationError),
-    (URLValidator(), 'http://www.django\rproject.com/', ValidationError),
+    (URLValidator(), 'http://www.mango\rproject.com/', ValidationError),
     (URLValidator(), 'http://[::\rffff:192.9.5.5]', ValidationError),
-    (URLValidator(), 'http://\twww.djangoproject.com/', ValidationError),
+    (URLValidator(), 'http://\twww.mangoproject.com/', ValidationError),
     (URLValidator(), 'http://\t[::ffff:192.9.5.5]', ValidationError),
     # Trailing junk does not take forever to reject
     (URLValidator(), 'http://www.asdasdasdasdsadfm.com.br ', ValidationError),
@@ -377,8 +377,8 @@ class TestValidators(SimpleTestCase):
 
     def test_max_length_validator_message(self):
         v = MaxLengthValidator(16, message='"%(value)s" has more than %(limit_value)d characters.')
-        with self.assertRaisesMessage(ValidationError, '"djangoproject.com" has more than 16 characters.'):
-            v('djangoproject.com')
+        with self.assertRaisesMessage(ValidationError, '"mangoproject.com" has more than 16 characters.'):
+            v('mangoproject.com')
 
 
 class TestValidatorEquality(TestCase):
@@ -540,7 +540,7 @@ class TestValidatorEquality(TestCase):
 
 
 class DeprecationTests(SimpleTestCase):
-    @ignore_warnings(category=RemovedInDjango41Warning)
+    @ignore_warnings(category=RemovedInMango41Warning)
     def test_whitelist(self):
         validator = EmailValidator(whitelist=['localdomain'])
         self.assertEqual(validator.domain_allowlist, ['localdomain'])
@@ -549,10 +549,10 @@ class DeprecationTests(SimpleTestCase):
 
     def test_whitelist_warning(self):
         msg = "The whitelist argument is deprecated in favor of allowlist."
-        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
+        with self.assertRaisesMessage(RemovedInMango41Warning, msg):
             EmailValidator(whitelist='localdomain')
 
-    @ignore_warnings(category=RemovedInDjango41Warning)
+    @ignore_warnings(category=RemovedInMango41Warning)
     def test_domain_whitelist(self):
         validator = EmailValidator()
         validator.domain_whitelist = ['mydomain']
@@ -565,7 +565,7 @@ class DeprecationTests(SimpleTestCase):
             'The domain_whitelist attribute is deprecated in favor of '
             'domain_allowlist.'
         )
-        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
+        with self.assertRaisesMessage(RemovedInMango41Warning, msg):
             validator.domain_whitelist
 
     def test_domain_whitelist_set_warning(self):
@@ -574,5 +574,5 @@ class DeprecationTests(SimpleTestCase):
             'The domain_whitelist attribute is deprecated in favor of '
             'domain_allowlist.'
         )
-        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
+        with self.assertRaisesMessage(RemovedInMango41Warning, msg):
             validator.domain_whitelist = ['mydomain']

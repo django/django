@@ -1,7 +1,7 @@
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
-from django.core.paginator import Paginator
+from mango.contrib import admin
+from mango.contrib.auth.admin import UserAdmin
+from mango.contrib.auth.models import User
+from mango.core.paginator import Paginator
 
 from .models import Band, Child, Event, Parent, Swallow
 

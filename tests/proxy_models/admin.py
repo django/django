@@ -1,4 +1,4 @@
-from django.contrib import admin
+from mango.contrib import admin
 
 from .models import ProxyTrackerUser, TrackerUser
 

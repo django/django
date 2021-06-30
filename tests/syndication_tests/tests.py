@@ -1,13 +1,13 @@
 import datetime
 from xml.dom import minidom
 
-from django.contrib.sites.models import Site
-from django.contrib.syndication import views
-from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, override_settings
-from django.test.utils import requires_tz_support
-from django.utils import timezone
-from django.utils.feedgenerator import (
+from mango.contrib.sites.models import Site
+from mango.contrib.syndication import views
+from mango.core.exceptions import ImproperlyConfigured
+from mango.test import TestCase, override_settings
+from mango.test.utils import requires_tz_support
+from mango.utils import timezone
+from mango.utils.feedgenerator import (
     Atom1Feed, Rss201rev2Feed, rfc2822_date, rfc3339_date,
 )
 
@@ -116,7 +116,7 @@ class SyndicationFeedTest(FeedTestCase):
             'ttl': '600',
             'copyright': 'Copyright (c) 2007, Sally Smith',
         })
-        self.assertCategories(chan, ['python', 'django'])
+        self.assertCategories(chan, ['python', 'mango'])
 
         # Ensure the content of the channel is correct
         self.assertChildNodeContent(chan, {
@@ -241,7 +241,7 @@ class SyndicationFeedTest(FeedTestCase):
             'title': 'My blog',
             'link': 'http://example.com/blog/',
         })
-        self.assertCategories(chan, ['python', 'django'])
+        self.assertCategories(chan, ['python', 'mango'])
 
         # Check feed_url is passed
         self.assertEqual(
@@ -356,7 +356,7 @@ class SyndicationFeedTest(FeedTestCase):
         feed = minidom.parseString(response.content).firstChild
 
         self.assertEqual(feed.nodeName, 'feed')
-        self.assertEqual(feed.getAttribute('django'), 'rocks')
+        self.assertEqual(feed.getAttribute('mango'), 'rocks')
         self.assertChildNodes(
             feed,
             ['title', 'subtitle', 'link', 'id', 'updated', 'entry', 'spam', 'rights', 'category', 'author']
@@ -537,9 +537,9 @@ class SyndicationFeedTest(FeedTestCase):
         prefix_domain_mapping = (
             (('example.com', '/foo/?arg=value'), 'http://example.com/foo/?arg=value'),
             (('example.com', '/foo/?arg=value', True), 'https://example.com/foo/?arg=value'),
-            (('example.com', 'http://djangoproject.com/doc/'), 'http://djangoproject.com/doc/'),
-            (('example.com', 'https://djangoproject.com/doc/'), 'https://djangoproject.com/doc/'),
-            (('example.com', 'mailto:uhoh@djangoproject.com'), 'mailto:uhoh@djangoproject.com'),
+            (('example.com', 'http://mangoproject.com/doc/'), 'http://mangoproject.com/doc/'),
+            (('example.com', 'https://mangoproject.com/doc/'), 'https://mangoproject.com/doc/'),
+            (('example.com', 'mailto:uhoh@mangoproject.com'), 'mailto:uhoh@mangoproject.com'),
             (('example.com', '//example.com/foo/?arg=value'), 'http://example.com/foo/?arg=value'),
         )
         for prefix in prefix_domain_mapping:

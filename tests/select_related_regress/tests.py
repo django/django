@@ -1,4 +1,4 @@
-from django.test import TestCase
+from mango.test import TestCase
 
 from .models import (
     A, B, Building, C, Chick, Child, Class, Client, ClientStatus, Connection,

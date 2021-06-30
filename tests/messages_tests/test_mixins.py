@@ -1,6 +1,6 @@
-from django.core.signing import b64_decode
-from django.test import SimpleTestCase, override_settings
-from django.urls import reverse
+from mango.core.signing import b64_decode
+from mango.test import SimpleTestCase, override_settings
+from mango.urls import reverse
 
 from .urls import ContactFormViewWithMsg
 

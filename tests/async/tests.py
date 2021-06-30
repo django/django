@@ -4,10 +4,10 @@ from unittest import mock, skipIf
 
 from asgiref.sync import async_to_sync
 
-from django.core.cache import DEFAULT_CACHE_ALIAS, caches
-from django.core.exceptions import SynchronousOnlyOperation
-from django.test import SimpleTestCase
-from django.utils.asyncio import async_unsafe
+from mango.core.cache import DEFAULT_CACHE_ALIAS, caches
+from mango.core.exceptions import SynchronousOnlyOperation
+from mango.test import SimpleTestCase
+from mango.utils.asyncio import async_unsafe
 
 from .models import SimpleModel
 

@@ -2,22 +2,22 @@ import gettext
 import json
 from os import path
 
-from django.conf import settings
-from django.test import (
+from mango.conf import settings
+from mango.test import (
     RequestFactory, SimpleTestCase, TestCase, modify_settings,
     override_settings,
 )
-from django.test.selenium import SeleniumTestCase
-from django.urls import reverse
-from django.utils.translation import get_language, override
-from django.views.i18n import JavaScriptCatalog, get_formats
+from mango.test.selenium import SeleniumTestCase
+from mango.urls import reverse
+from mango.utils.translation import get_language, override
+from mango.views.i18n import JavaScriptCatalog, get_formats
 
 from ..urls import locale_dir
 
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
 class SetLanguageTests(TestCase):
-    """Test the django.views.i18n.set_language view."""
+    """Test the mango.views.i18n.set_language view."""
 
     def _get_inactive_language_code(self):
         """Return language code for a language which is not activated."""
@@ -146,7 +146,7 @@ class SetLanguageTests(TestCase):
         # we force saving language to a cookie rather than a session
         # by excluding session middleware and those which do require it
         test_settings = {
-            'MIDDLEWARE': ['django.middleware.common.CommonMiddleware'],
+            'MIDDLEWARE': ['mango.middleware.common.CommonMiddleware'],
             'LANGUAGE_COOKIE_NAME': 'mylanguage',
             'LANGUAGE_COOKIE_AGE': 3600 * 7 * 2,
             'LANGUAGE_COOKIE_DOMAIN': '.example.com',
@@ -182,7 +182,7 @@ class SetLanguageTests(TestCase):
         self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
 
     @modify_settings(MIDDLEWARE={
-        'append': 'django.middleware.locale.LocaleMiddleware',
+        'append': 'mango.middleware.locale.LocaleMiddleware',
     })
     def test_lang_from_translated_i18n_pattern(self):
         response = self.client.post(
@@ -201,7 +201,7 @@ class SetLanguageTests(TestCase):
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
 class I18NViewTests(SimpleTestCase):
-    """Test django.views.i18n views other than set_language."""
+    """Test mango.views.i18n views other than set_language."""
     @override_settings(LANGUAGE_CODE='de')
     def test_get_formats(self):
         formats = get_formats()
@@ -214,7 +214,7 @@ class I18NViewTests(SimpleTestCase):
         """The javascript_catalog can be deployed with language settings"""
         for lang_code in ['es', 'fr', 'ru']:
             with override(lang_code):
-                catalog = gettext.translation('djangojs', locale_dir, [lang_code])
+                catalog = gettext.translation('mangojs', locale_dir, [lang_code])
                 trans_txt = catalog.gettext('this is to be translated')
                 response = self.client.get('/jsi18n/')
                 self.assertEqual(response.headers['Content-Type'], 'text/javascript; charset="utf-8"')
@@ -230,7 +230,7 @@ class I18NViewTests(SimpleTestCase):
     def test_jsi18n_USE_I18N_False(self):
         response = self.client.get('/jsi18n/')
         # default plural function
-        self.assertContains(response, 'django.pluralidx = function(count) { return (count == 1) ? 0 : 1; };')
+        self.assertContains(response, 'mango.pluralidx = function(count) { return (count == 1) ? 0 : 1; };')
         self.assertNotContains(response, 'var newcatalog =')
 
     def test_jsoni18n(self):
@@ -373,7 +373,7 @@ class I18NViewTests(SimpleTestCase):
         """
         Check if the JavaScript i18n view returns a complete language catalog
         if the default language is en-us, the selected language has a
-        translation available and a catalog composed by djangojs domain
+        translation available and a catalog composed by mangojs domain
         translations of multiple Python packages is requested. See #13388,
         #3594 and #13514 for more details.
         """
@@ -432,8 +432,8 @@ class I18nSeleniumTests(SeleniumTestCase):
 
     # The test cases use fixtures & translations from these apps.
     available_apps = [
-        'django.contrib.admin', 'django.contrib.auth',
-        'django.contrib.contenttypes', 'view_tests',
+        'mango.contrib.admin', 'mango.contrib.auth',
+        'mango.contrib.contenttypes', 'view_tests',
     ]
 
     @override_settings(LANGUAGE_CODE='de')

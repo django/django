@@ -1,8 +1,8 @@
 import copy
 import unittest
 
-from django.db import DEFAULT_DB_ALIAS, connection, connections
-from django.test import SimpleTestCase
+from mango.db import DEFAULT_DB_ALIAS, connection, connections
+from mango.test import SimpleTestCase
 
 
 @unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests')

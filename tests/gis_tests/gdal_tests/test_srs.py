@@ -1,11 +1,11 @@
 from unittest import skipIf
 
-from django.contrib.gis.gdal import (
+from mango.contrib.gis.gdal import (
     GDAL_VERSION, AxisOrder, CoordTransform, GDALException, SpatialReference,
     SRSException,
 )
-from django.contrib.gis.geos import GEOSGeometry
-from django.test import SimpleTestCase
+from mango.contrib.gis.geos import GEOSGeometry
+from mango.test import SimpleTestCase
 
 
 class TestSRS:

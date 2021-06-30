@@ -16,12 +16,12 @@ from unittest import mock, skip, skipIf
 
 import pytz
 
-import django.__main__
-from django.apps.registry import Apps
-from django.test import SimpleTestCase
-from django.test.utils import extend_sys_path
-from django.utils import autoreload
-from django.utils.autoreload import WatchmanUnavailable
+import mango.__main__
+from mango.apps.registry import Apps
+from mango.test import SimpleTestCase
+from mango.test.utils import extend_sys_path
+from mango.utils import autoreload
+from mango.utils.autoreload import WatchmanUnavailable
 
 from .test_module import __main__ as test_main, main_module as test_main_module
 from .utils import on_macos_with_hfs
@@ -164,19 +164,19 @@ class TestIterModulesAndFiles(SimpleTestCase):
 
 
 class TestChildArguments(SimpleTestCase):
-    @mock.patch.dict(sys.modules, {'__main__': django.__main__})
-    @mock.patch('sys.argv', [django.__main__.__file__, 'runserver'])
+    @mock.patch.dict(sys.modules, {'__main__': mango.__main__})
+    @mock.patch('sys.argv', [mango.__main__.__file__, 'runserver'])
     @mock.patch('sys.warnoptions', [])
     def test_run_as_module(self):
         self.assertEqual(
             autoreload.get_child_arguments(),
-            [sys.executable, '-m', 'django', 'runserver']
+            [sys.executable, '-m', 'mango', 'runserver']
         )
 
     @mock.patch.dict(sys.modules, {'__main__': test_main})
     @mock.patch('sys.argv', [test_main.__file__, 'runserver'])
     @mock.patch('sys.warnoptions', [])
-    def test_run_as_non_django_module(self):
+    def test_run_as_non_mango_module(self):
         self.assertEqual(
             autoreload.get_child_arguments(),
             [sys.executable, '-m', 'utils_tests.test_module', 'runserver'],
@@ -185,7 +185,7 @@ class TestChildArguments(SimpleTestCase):
     @mock.patch.dict(sys.modules, {'__main__': test_main_module})
     @mock.patch('sys.argv', [test_main.__file__, 'runserver'])
     @mock.patch('sys.warnoptions', [])
-    def test_run_as_non_django_module_non_package(self):
+    def test_run_as_non_mango_module_non_package(self):
         self.assertEqual(
             autoreload.get_child_arguments(),
             [sys.executable, '-m', 'utils_tests.test_module.main_module', 'runserver'],
@@ -202,7 +202,7 @@ class TestChildArguments(SimpleTestCase):
     @mock.patch('sys.warnoptions', [])
     def test_exe_fallback(self):
         with tempfile.TemporaryDirectory() as tmpdir:
-            exe_path = Path(tmpdir) / 'django-admin.exe'
+            exe_path = Path(tmpdir) / 'mango-admin.exe'
             exe_path.touch()
             with mock.patch('sys.argv', [exe_path.with_suffix(''), 'runserver']):
                 self.assertEqual(
@@ -213,9 +213,9 @@ class TestChildArguments(SimpleTestCase):
     @mock.patch('sys.warnoptions', [])
     def test_entrypoint_fallback(self):
         with tempfile.TemporaryDirectory() as tmpdir:
-            script_path = Path(tmpdir) / 'django-admin-script.py'
+            script_path = Path(tmpdir) / 'mango-admin-script.py'
             script_path.touch()
-            with mock.patch('sys.argv', [script_path.with_name('django-admin'), 'runserver']):
+            with mock.patch('sys.argv', [script_path.with_name('mango-admin'), 'runserver']):
                 self.assertEqual(
                     autoreload.get_child_arguments(),
                     [sys.executable, script_path, 'runserver']
@@ -241,23 +241,23 @@ class TestChildArguments(SimpleTestCase):
 
 
 class TestUtilities(SimpleTestCase):
-    def test_is_django_module(self):
+    def test_is_mango_module(self):
         for module, expected in (
             (pytz, False),
             (sys, False),
             (autoreload, True)
         ):
             with self.subTest(module=module):
-                self.assertIs(autoreload.is_django_module(module), expected)
+                self.assertIs(autoreload.is_mango_module(module), expected)
 
-    def test_is_django_path(self):
+    def test_is_mango_path(self):
         for module, expected in (
             (pytz.__file__, False),
             (contextlib.__file__, False),
             (autoreload.__file__, True)
         ):
             with self.subTest(module=module):
-                self.assertIs(autoreload.is_django_path(module), expected)
+                self.assertIs(autoreload.is_mango_path(module), expected)
 
 
 class TestCommonRoots(SimpleTestCase):
@@ -305,7 +305,7 @@ class TestSysPathDirectories(SimpleTestCase):
 
 
 class GetReloaderTests(SimpleTestCase):
-    @mock.patch('django.utils.autoreload.WatchmanReloader')
+    @mock.patch('mango.utils.autoreload.WatchmanReloader')
     def test_watchman_unavailable(self, mocked_watchman):
         mocked_watchman.check_availability.side_effect = WatchmanUnavailable
         self.assertIsInstance(autoreload.get_reloader(), autoreload.StatReloader)
@@ -320,13 +320,13 @@ class GetReloaderTests(SimpleTestCase):
 
 class RunWithReloaderTests(SimpleTestCase):
     @mock.patch.dict(os.environ, {autoreload.DJANGO_AUTORELOAD_ENV: 'true'})
-    @mock.patch('django.utils.autoreload.get_reloader')
+    @mock.patch('mango.utils.autoreload.get_reloader')
     def test_swallows_keyboard_interrupt(self, mocked_get_reloader):
         mocked_get_reloader.side_effect = KeyboardInterrupt()
         autoreload.run_with_reloader(lambda: None)  # No exception
 
     @mock.patch.dict(os.environ, {autoreload.DJANGO_AUTORELOAD_ENV: 'false'})
-    @mock.patch('django.utils.autoreload.restart_with_reloader')
+    @mock.patch('mango.utils.autoreload.restart_with_reloader')
     def test_calls_sys_exit(self, mocked_restart_reloader):
         mocked_restart_reloader.return_value = 1
         with self.assertRaises(SystemExit) as exc:
@@ -334,55 +334,55 @@ class RunWithReloaderTests(SimpleTestCase):
         self.assertEqual(exc.exception.code, 1)
 
     @mock.patch.dict(os.environ, {autoreload.DJANGO_AUTORELOAD_ENV: 'true'})
-    @mock.patch('django.utils.autoreload.start_django')
-    @mock.patch('django.utils.autoreload.get_reloader')
-    def test_calls_start_django(self, mocked_reloader, mocked_start_django):
+    @mock.patch('mango.utils.autoreload.start_mango')
+    @mock.patch('mango.utils.autoreload.get_reloader')
+    def test_calls_start_mango(self, mocked_reloader, mocked_start_mango):
         mocked_reloader.return_value = mock.sentinel.RELOADER
         autoreload.run_with_reloader(mock.sentinel.METHOD)
-        self.assertEqual(mocked_start_django.call_count, 1)
+        self.assertEqual(mocked_start_mango.call_count, 1)
         self.assertSequenceEqual(
-            mocked_start_django.call_args[0],
+            mocked_start_mango.call_args[0],
             [mock.sentinel.RELOADER, mock.sentinel.METHOD]
         )
 
 
-class StartDjangoTests(SimpleTestCase):
-    @mock.patch('django.utils.autoreload.StatReloader')
+class StartMangoTests(SimpleTestCase):
+    @mock.patch('mango.utils.autoreload.StatReloader')
     def test_watchman_becomes_unavailable(self, mocked_stat):
         mocked_stat.should_stop.return_value = True
         fake_reloader = mock.MagicMock()
         fake_reloader.should_stop = False
         fake_reloader.run.side_effect = autoreload.WatchmanUnavailable()
 
-        autoreload.start_django(fake_reloader, lambda: None)
+        autoreload.start_mango(fake_reloader, lambda: None)
         self.assertEqual(mocked_stat.call_count, 1)
 
-    @mock.patch('django.utils.autoreload.ensure_echo_on')
+    @mock.patch('mango.utils.autoreload.ensure_echo_on')
     def test_echo_on_called(self, mocked_echo):
         fake_reloader = mock.MagicMock()
-        autoreload.start_django(fake_reloader, lambda: None)
+        autoreload.start_mango(fake_reloader, lambda: None)
         self.assertEqual(mocked_echo.call_count, 1)
 
-    @mock.patch('django.utils.autoreload.check_errors')
+    @mock.patch('mango.utils.autoreload.check_errors')
     def test_check_errors_called(self, mocked_check_errors):
         fake_method = mock.MagicMock(return_value=None)
         fake_reloader = mock.MagicMock()
-        autoreload.start_django(fake_reloader, fake_method)
+        autoreload.start_mango(fake_reloader, fake_method)
         self.assertCountEqual(mocked_check_errors.call_args[0], [fake_method])
 
     @mock.patch('threading.Thread')
-    @mock.patch('django.utils.autoreload.check_errors')
+    @mock.patch('mango.utils.autoreload.check_errors')
     def test_starts_thread_with_args(self, mocked_check_errors, mocked_thread):
         fake_reloader = mock.MagicMock()
         fake_main_func = mock.MagicMock()
         fake_thread = mock.MagicMock()
         mocked_check_errors.return_value = fake_main_func
         mocked_thread.return_value = fake_thread
-        autoreload.start_django(fake_reloader, fake_main_func, 123, abc=123)
+        autoreload.start_mango(fake_reloader, fake_main_func, 123, abc=123)
         self.assertEqual(mocked_thread.call_count, 1)
         self.assertEqual(
             mocked_thread.call_args[1],
-            {'target': fake_main_func, 'args': (123,), 'kwargs': {'abc': 123}, 'name': 'django-main-thread'}
+            {'target': fake_main_func, 'args': (123,), 'kwargs': {'abc': 123}, 'name': 'mango-main-thread'}
         )
         self.assertIs(fake_thread.daemon, True)
         self.assertTrue(fake_thread.start.called)
@@ -402,7 +402,7 @@ class TestCheckErrors(SimpleTestCase):
 
 
 class TestRaiseLastException(SimpleTestCase):
-    @mock.patch('django.utils.autoreload._exception', None)
+    @mock.patch('mango.utils.autoreload._exception', None)
     def test_no_exception(self):
         # Should raise no exception if _exception is None
         autoreload.raise_last_exception()
@@ -417,7 +417,7 @@ class TestRaiseLastException(SimpleTestCase):
         except MyException:
             exc_info = sys.exc_info()
 
-        with mock.patch('django.utils.autoreload._exception', exc_info):
+        with mock.patch('mango.utils.autoreload._exception', exc_info):
             with self.assertRaisesMessage(MyException, 'Test Message'):
                 autoreload.raise_last_exception()
 
@@ -432,7 +432,7 @@ class TestRaiseLastException(SimpleTestCase):
         except MyException:
             exc_info = sys.exc_info()
 
-        with mock.patch('django.utils.autoreload._exception', exc_info):
+        with mock.patch('mango.utils.autoreload._exception', exc_info):
             with self.assertRaisesMessage(MyException, 'Test Message'):
                 autoreload.raise_last_exception()
 
@@ -445,7 +445,7 @@ class TestRaiseLastException(SimpleTestCase):
             except Exception:
                 exc_info = sys.exc_info()
 
-        with mock.patch('django.utils.autoreload._exception', exc_info):
+        with mock.patch('mango.utils.autoreload._exception', exc_info):
             with self.assertRaises(Exception) as cm:
                 autoreload.raise_last_exception()
             self.assertEqual(cm.exception.args[0], 1)
@@ -456,11 +456,11 @@ class RestartWithReloaderTests(SimpleTestCase):
     executable = '/usr/bin/python'
 
     def patch_autoreload(self, argv):
-        patch_call = mock.patch('django.utils.autoreload.subprocess.run', return_value=CompletedProcess(argv, 0))
+        patch_call = mock.patch('mango.utils.autoreload.subprocess.run', return_value=CompletedProcess(argv, 0))
         patches = [
-            mock.patch('django.utils.autoreload.sys.argv', argv),
-            mock.patch('django.utils.autoreload.sys.executable', self.executable),
-            mock.patch('django.utils.autoreload.sys.warnoptions', ['all']),
+            mock.patch('mango.utils.autoreload.sys.argv', argv),
+            mock.patch('mango.utils.autoreload.sys.executable', self.executable),
+            mock.patch('mango.utils.autoreload.sys.warnoptions', ['all']),
         ]
         for p in patches:
             p.start()
@@ -482,15 +482,15 @@ class RestartWithReloaderTests(SimpleTestCase):
                 [self.executable, '-Wall'] + argv,
             )
 
-    def test_python_m_django(self):
-        main = '/usr/lib/pythonX.Y/site-packages/django/__main__.py'
+    def test_python_m_mango(self):
+        main = '/usr/lib/pythonX.Y/site-packages/mango/__main__.py'
         argv = [main, 'runserver']
         mock_call = self.patch_autoreload(argv)
-        with mock.patch('django.__main__.__file__', main):
-            with mock.patch.dict(sys.modules, {'__main__': django.__main__}):
+        with mock.patch('mango.__main__.__file__', main):
+            with mock.patch.dict(sys.modules, {'__main__': mango.__main__}):
                 autoreload.restart_with_reloader()
             self.assertEqual(mock_call.call_count, 1)
-            self.assertEqual(mock_call.call_args[0][0], [self.executable, '-Wall', '-m', 'django'] + argv[1:])
+            self.assertEqual(mock_call.call_args[0][0], [self.executable, '-Wall', '-m', 'mango'] + argv[1:])
 
 
 class ReloaderTests(SimpleTestCase):
@@ -534,8 +534,8 @@ class ReloaderTests(SimpleTestCase):
 
 
 class IntegrationTests:
-    @mock.patch('django.utils.autoreload.BaseReloader.notify_file_changed')
-    @mock.patch('django.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
+    @mock.patch('mango.utils.autoreload.BaseReloader.notify_file_changed')
+    @mock.patch('mango.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
     def test_glob(self, mocked_modules, notify_mock):
         non_py_file = self.ensure_file(self.tempdir / 'non_py_file')
         self.reloader.watch_dir(self.tempdir, '*.py')
@@ -545,8 +545,8 @@ class IntegrationTests:
         self.assertEqual(notify_mock.call_count, 1)
         self.assertCountEqual(notify_mock.call_args[0], [self.existing_file])
 
-    @mock.patch('django.utils.autoreload.BaseReloader.notify_file_changed')
-    @mock.patch('django.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
+    @mock.patch('mango.utils.autoreload.BaseReloader.notify_file_changed')
+    @mock.patch('mango.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
     def test_multiple_globs(self, mocked_modules, notify_mock):
         self.ensure_file(self.tempdir / 'x.test')
         self.reloader.watch_dir(self.tempdir, '*.py')
@@ -556,8 +556,8 @@ class IntegrationTests:
         self.assertEqual(notify_mock.call_count, 1)
         self.assertCountEqual(notify_mock.call_args[0], [self.existing_file])
 
-    @mock.patch('django.utils.autoreload.BaseReloader.notify_file_changed')
-    @mock.patch('django.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
+    @mock.patch('mango.utils.autoreload.BaseReloader.notify_file_changed')
+    @mock.patch('mango.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
     def test_overlapping_globs(self, mocked_modules, notify_mock):
         self.reloader.watch_dir(self.tempdir, '*.py')
         self.reloader.watch_dir(self.tempdir, '*.p*')
@@ -566,8 +566,8 @@ class IntegrationTests:
         self.assertEqual(notify_mock.call_count, 1)
         self.assertCountEqual(notify_mock.call_args[0], [self.existing_file])
 
-    @mock.patch('django.utils.autoreload.BaseReloader.notify_file_changed')
-    @mock.patch('django.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
+    @mock.patch('mango.utils.autoreload.BaseReloader.notify_file_changed')
+    @mock.patch('mango.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
     def test_glob_recursive(self, mocked_modules, notify_mock):
         non_py_file = self.ensure_file(self.tempdir / 'dir' / 'non_py_file')
         py_file = self.ensure_file(self.tempdir / 'dir' / 'file.py')
@@ -578,8 +578,8 @@ class IntegrationTests:
         self.assertEqual(notify_mock.call_count, 1)
         self.assertCountEqual(notify_mock.call_args[0], [py_file])
 
-    @mock.patch('django.utils.autoreload.BaseReloader.notify_file_changed')
-    @mock.patch('django.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
+    @mock.patch('mango.utils.autoreload.BaseReloader.notify_file_changed')
+    @mock.patch('mango.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
     def test_multiple_recursive_globs(self, mocked_modules, notify_mock):
         non_py_file = self.ensure_file(self.tempdir / 'dir' / 'test.txt')
         py_file = self.ensure_file(self.tempdir / 'dir' / 'file.py')
@@ -591,8 +591,8 @@ class IntegrationTests:
         self.assertEqual(notify_mock.call_count, 2)
         self.assertCountEqual(notify_mock.call_args_list, [mock.call(py_file), mock.call(non_py_file)])
 
-    @mock.patch('django.utils.autoreload.BaseReloader.notify_file_changed')
-    @mock.patch('django.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
+    @mock.patch('mango.utils.autoreload.BaseReloader.notify_file_changed')
+    @mock.patch('mango.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
     def test_nested_glob_recursive(self, mocked_modules, notify_mock):
         inner_py_file = self.ensure_file(self.tempdir / 'dir' / 'file.py')
         self.reloader.watch_dir(self.tempdir, '**/*.py')
@@ -602,8 +602,8 @@ class IntegrationTests:
         self.assertEqual(notify_mock.call_count, 1)
         self.assertCountEqual(notify_mock.call_args[0], [inner_py_file])
 
-    @mock.patch('django.utils.autoreload.BaseReloader.notify_file_changed')
-    @mock.patch('django.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
+    @mock.patch('mango.utils.autoreload.BaseReloader.notify_file_changed')
+    @mock.patch('mango.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
     def test_overlapping_glob_recursive(self, mocked_modules, notify_mock):
         py_file = self.ensure_file(self.tempdir / 'dir' / 'file.py')
         self.reloader.watch_dir(self.tempdir, '**/*.p*')
@@ -780,7 +780,7 @@ class StatReloaderTests(ReloaderTests, IntegrationTests):
         # Shorten the sleep time to speed up tests.
         self.reloader.SLEEP_TIME = 0.01
 
-    @mock.patch('django.utils.autoreload.StatReloader.notify_file_changed')
+    @mock.patch('mango.utils.autoreload.StatReloader.notify_file_changed')
     def test_tick_does_not_trigger_twice(self, mock_notify_file_changed):
         with mock.patch.object(self.reloader, 'watched_files', return_value=[self.existing_file]):
             ticker = self.reloader.tick()

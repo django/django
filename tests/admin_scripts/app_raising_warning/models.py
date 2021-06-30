@@ -1,5 +1,5 @@
-from django.core import checks
-from django.db import models
+from mango.core import checks
+from mango.db import models
 
 
 class ModelRaisingMessages(models.Model):

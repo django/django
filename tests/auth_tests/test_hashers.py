@@ -1,14 +1,14 @@
 from unittest import mock, skipUnless
 
-from django.conf.global_settings import PASSWORD_HASHERS
-from django.contrib.auth.hashers import (
+from mango.conf.global_settings import PASSWORD_HASHERS
+from mango.contrib.auth.hashers import (
     UNUSABLE_PASSWORD_PREFIX, UNUSABLE_PASSWORD_SUFFIX_LENGTH,
     BasePasswordHasher, BCryptPasswordHasher, BCryptSHA256PasswordHasher,
     PBKDF2PasswordHasher, PBKDF2SHA1PasswordHasher, check_password, get_hasher,
     identify_hasher, is_password_usable, make_password,
 )
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from mango.test import SimpleTestCase
+from mango.test.utils import override_settings
 
 try:
     import crypt
@@ -81,7 +81,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertIs(hasher.must_update(encoded_weak_salt), True)
         self.assertIs(hasher.must_update(encoded_strong_salt), False)
 
-    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
+    @override_settings(PASSWORD_HASHERS=['mango.contrib.auth.hashers.SHA1PasswordHasher'])
     def test_sha1(self):
         encoded = make_password('lètmein', 'seasalt', 'sha1')
         self.assertEqual(encoded, 'sha1$seasalt$cff36ea83f5706ce9aa7454e63e431fc726b2dc8')
@@ -102,7 +102,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertIs(hasher.must_update(encoded_weak_salt), True)
         self.assertIs(hasher.must_update(encoded_strong_salt), False)
 
-    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.MD5PasswordHasher'])
+    @override_settings(PASSWORD_HASHERS=['mango.contrib.auth.hashers.MD5PasswordHasher'])
     def test_md5(self):
         encoded = make_password('lètmein', 'seasalt', 'md5')
         self.assertEqual(encoded, 'md5$seasalt$3f86d0d3d465b7b458c231bf3555c0e3')
@@ -123,7 +123,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertIs(hasher.must_update(encoded_weak_salt), True)
         self.assertIs(hasher.must_update(encoded_strong_salt), False)
 
-    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.UnsaltedMD5PasswordHasher'])
+    @override_settings(PASSWORD_HASHERS=['mango.contrib.auth.hashers.UnsaltedMD5PasswordHasher'])
     def test_unsalted_md5(self):
         encoded = make_password('lètmein', '', 'unsalted_md5')
         self.assertEqual(encoded, '88a434c88cca4e900f7874cd98123f43')
@@ -142,7 +142,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
 
-    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher'])
+    @override_settings(PASSWORD_HASHERS=['mango.contrib.auth.hashers.UnsaltedSHA1PasswordHasher'])
     def test_unsalted_sha1(self):
         encoded = make_password('lètmein', '', 'unsalted_sha1')
         self.assertEqual(encoded, 'sha1$$6d138ca3ae545631b3abd71a4f076ce759c5700b')
@@ -161,7 +161,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertFalse(check_password(' ', blank_encoded))
 
     @skipUnless(crypt, "no crypt module to generate password.")
-    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.CryptPasswordHasher'])
+    @override_settings(PASSWORD_HASHERS=['mango.contrib.auth.hashers.CryptPasswordHasher'])
     def test_crypt(self):
         encoded = make_password('lètmei', 'ab', 'crypt')
         self.assertEqual(encoded, 'crypt$$ab1Hv2Lg7ltQo')
@@ -201,7 +201,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertFalse(check_password(' ', blank_encoded))
 
     @skipUnless(bcrypt, "bcrypt not installed")
-    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.BCryptPasswordHasher'])
+    @override_settings(PASSWORD_HASHERS=['mango.contrib.auth.hashers.BCryptPasswordHasher'])
     def test_bcrypt(self):
         encoded = make_password('lètmein', hasher='bcrypt')
         self.assertTrue(is_password_usable(encoded))
@@ -217,7 +217,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertFalse(check_password(' ', blank_encoded))
 
     @skipUnless(bcrypt, "bcrypt not installed")
-    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.BCryptPasswordHasher'])
+    @override_settings(PASSWORD_HASHERS=['mango.contrib.auth.hashers.BCryptPasswordHasher'])
     def test_bcrypt_upgrade(self):
         hasher = get_hasher('bcrypt')
         self.assertEqual('bcrypt', hasher.algorithm)
@@ -250,7 +250,7 @@ class TestUtilsHashPass(SimpleTestCase):
             hasher.rounds = old_rounds
 
     @skipUnless(bcrypt, "bcrypt not installed")
-    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.BCryptPasswordHasher'])
+    @override_settings(PASSWORD_HASHERS=['mango.contrib.auth.hashers.BCryptPasswordHasher'])
     def test_bcrypt_harden_runtime(self):
         hasher = get_hasher('bcrypt')
         self.assertEqual('bcrypt', hasher.algorithm)
@@ -337,9 +337,9 @@ class TestUtilsHashPass(SimpleTestCase):
 
     @override_settings(
         PASSWORD_HASHERS=[
-            'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-            'django.contrib.auth.hashers.SHA1PasswordHasher',
-            'django.contrib.auth.hashers.MD5PasswordHasher',
+            'mango.contrib.auth.hashers.PBKDF2PasswordHasher',
+            'mango.contrib.auth.hashers.SHA1PasswordHasher',
+            'mango.contrib.auth.hashers.MD5PasswordHasher',
         ],
     )
     def test_upgrade(self):
@@ -365,9 +365,9 @@ class TestUtilsHashPass(SimpleTestCase):
 
     @override_settings(
         PASSWORD_HASHERS=[
-            'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-            'django.contrib.auth.hashers.SHA1PasswordHasher',
-            'django.contrib.auth.hashers.MD5PasswordHasher',
+            'mango.contrib.auth.hashers.PBKDF2PasswordHasher',
+            'mango.contrib.auth.hashers.SHA1PasswordHasher',
+            'mango.contrib.auth.hashers.MD5PasswordHasher',
         ],
     )
     def test_no_upgrade_on_incorrect_pass(self):
@@ -455,7 +455,7 @@ class TestUtilsHashPass(SimpleTestCase):
         # Revert to the old iteration count and check if the password would get
         # updated to the new iteration count.
         with self.settings(PASSWORD_HASHERS=[
-                'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+                'mango.contrib.auth.hashers.PBKDF2PasswordHasher',
                 'auth_tests.test_hashers.PBKDF2SingleIterationHasher']):
             self.assertTrue(check_password('letmein', encoded, setter))
             self.assertTrue(state['upgraded'])

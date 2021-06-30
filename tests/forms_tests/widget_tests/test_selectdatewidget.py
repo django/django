@@ -1,9 +1,9 @@
 from datetime import date
 
-from django.forms import DateField, Form, SelectDateWidget
-from django.test import override_settings
-from django.utils import translation
-from django.utils.dates import MONTHS_AP
+from mango.forms import DateField, Form, SelectDateWidget
+from mango.test import override_settings
+from mango.utils import translation
+from mango.utils.dates import MONTHS_AP
 
 from .base import WidgetTest
 

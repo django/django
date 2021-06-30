@@ -2,11 +2,11 @@ import decimal
 import json
 import re
 
-from django.core import serializers
-from django.core.serializers.base import DeserializationError
-from django.db import models
-from django.test import TestCase, TransactionTestCase
-from django.test.utils import isolate_apps
+from mango.core import serializers
+from mango.core.serializers.base import DeserializationError
+from mango.db import models
+from mango.test import TestCase, TransactionTestCase
+from mango.test.utils import isolate_apps
 
 from .models import Score
 from .tests import SerializersTestBase, SerializersTransactionTestBase

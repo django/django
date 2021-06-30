@@ -7,19 +7,19 @@ from pathlib import Path
 from sqlite3 import dbapi2
 from unittest import mock
 
-from django.core.exceptions import ImproperlyConfigured
-from django.db import NotSupportedError, connection, transaction
-from django.db.models import Aggregate, Avg, CharField, StdDev, Sum, Variance
-from django.db.utils import ConnectionHandler
-from django.test import (
+from mango.core.exceptions import ImproperlyConfigured
+from mango.db import NotSupportedError, connection, transaction
+from mango.db.models import Aggregate, Avg, CharField, StdDev, Sum, Variance
+from mango.db.utils import ConnectionHandler
+from mango.test import (
     TestCase, TransactionTestCase, override_settings, skipIfDBFeature,
 )
-from django.test.utils import isolate_apps
+from mango.test.utils import isolate_apps
 
 from ..models import Author, Item, Object, Square
 
 try:
-    from django.db.backends.sqlite3.base import check_sqlite_version
+    from mango.db.backends.sqlite3.base import check_sqlite_version
 except ImproperlyConfigured:
     # Ignore "SQLite is too old" when running tests on another database.
     pass
@@ -72,7 +72,7 @@ class Tests(TestCase):
 
     def test_memory_db_test_name(self):
         """A named in-memory db should be allowed where supported."""
-        from django.db.backends.sqlite3.base import DatabaseWrapper
+        from mango.db.backends.sqlite3.base import DatabaseWrapper
         settings_dict = {
             'TEST': {
                 'NAME': 'file:memorydb_test?mode=memory&cache=shared',
@@ -101,7 +101,7 @@ class Tests(TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             settings_dict = {
                 'default': {
-                    'ENGINE': 'django.db.backends.sqlite3',
+                    'ENGINE': 'mango.db.backends.sqlite3',
                     'NAME': Path(tmp) / 'test.db',
                 },
             }

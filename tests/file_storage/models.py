@@ -9,8 +9,8 @@ import random
 import tempfile
 from pathlib import Path
 
-from django.core.files.storage import FileSystemStorage
-from django.db import models
+from mango.core.files.storage import FileSystemStorage
+from mango.db import models
 
 
 class CustomValidNameStorage(FileSystemStorage):

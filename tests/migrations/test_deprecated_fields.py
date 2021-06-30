@@ -1,5 +1,5 @@
-from django.core.management import call_command
-from django.test import override_settings
+from mango.core.management import call_command
+from mango.test import override_settings
 
 from .test_base import MigrationTestBase
 

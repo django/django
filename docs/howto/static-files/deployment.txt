@@ -4,7 +4,7 @@ Deploying static files
 
 .. seealso::
 
-    For an introduction to the use of :mod:`django.contrib.staticfiles`, see
+    For an introduction to the use of :mod:`mango.contrib.staticfiles`, see
     :doc:`/howto/static-files/index`.
 
 .. _staticfiles-production:
@@ -18,7 +18,7 @@ arrange for the collected static files directory (:setting:`STATIC_ROOT`) to be
 moved to the static file server and served. Depending on
 :setting:`STATICFILES_STORAGE`, files may need to be moved to a new location
 manually or the :func:`post_process
-<django.contrib.staticfiles.storage.StaticFilesStorage.post_process>` method of
+<mango.contrib.staticfiles.storage.StaticFilesStorage.post_process>` method of
 the ``Storage`` class might take care of that.
 
 As with all deployment tasks, the devil's in the details. Every production
@@ -44,8 +44,8 @@ multiple web servers.
 Serving static files from a dedicated server
 --------------------------------------------
 
-Most larger Django sites use a separate Web server -- i.e., one that's not also
-running Django -- for serving static files. This server often runs a different
+Most larger Mango sites use a separate Web server -- i.e., one that's not also
+running Mango -- for serving static files. This server often runs a different
 type of web server -- faster but less full-featured. Some common choices are:
 
 * Nginx_
@@ -57,7 +57,7 @@ type of web server -- faster but less full-featured. Some common choices are:
 Configuring these servers is out of scope of this document; check each
 server's respective documentation for instructions.
 
-Since your static file server won't be running Django, you'll need to modify
+Since your static file server won't be running Mango, you'll need to modify
 the deployment strategy to look something like:
 
 * When your static files change, run :djadmin:`collectstatic` locally.
@@ -83,7 +83,7 @@ server you'd need to transfer the static files to the storage provider or CDN.
 
 There's any number of ways you might do this, but if the provider has an API,
 you can use a :doc:`custom file storage backend </howto/custom-file-storage>`
-to integrate the CDN with your Django project. If you've written or are using a
+to integrate the CDN with your Mango project. If you've written or are using a
 3rd party custom storage backend, you can tell :djadmin:`collectstatic` to use
 it by setting :setting:`STATICFILES_STORAGE` to the storage engine.
 
@@ -100,12 +100,12 @@ change your :setting:`STATICFILES_STORAGE` setting.
 For details on how you'd write one of these backends, see
 :doc:`/howto/custom-file-storage`. There are 3rd party apps available that
 provide storage backends for many common file storage APIs. A good starting
-point is the `overview at djangopackages.org
-<https://djangopackages.org/grids/g/storage-backends/>`_.
+point is the `overview at mangopackages.org
+<https://mangopackages.org/grids/g/storage-backends/>`_.
 
 Learn more
 ==========
 
 For complete details on all the settings, commands, template tags, and other
-pieces included in :mod:`django.contrib.staticfiles`, see :doc:`the
+pieces included in :mod:`mango.contrib.staticfiles`, see :doc:`the
 staticfiles reference </ref/contrib/staticfiles>`.

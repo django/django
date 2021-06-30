@@ -1,9 +1,9 @@
 from datetime import date, datetime
 
-from django.core.exceptions import ValidationError
-from django.forms import DateField, Form, HiddenInput, SelectDateWidget
-from django.test import SimpleTestCase, override_settings
-from django.utils import translation
+from mango.core.exceptions import ValidationError
+from mango.forms import DateField, Form, HiddenInput, SelectDateWidget
+from mango.test import SimpleTestCase, override_settings
+from mango.utils import translation
 
 
 class GetDate(Form):

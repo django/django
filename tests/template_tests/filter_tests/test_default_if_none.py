@@ -1,5 +1,5 @@
-from django.template.defaultfilters import default_if_none
-from django.test import SimpleTestCase
+from mango.template.defaultfilters import default_if_none
+from mango.test import SimpleTestCase
 
 
 class FunctionTests(SimpleTestCase):

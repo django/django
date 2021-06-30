@@ -15,22 +15,22 @@ except ImportError:
     except ImportError:
         zoneinfo = None
 
-from django.contrib.auth.models import User
-from django.core import serializers
-from django.db import connection
-from django.db.models import F, Max, Min
-from django.http import HttpRequest
-from django.template import (
+from mango.contrib.auth.models import User
+from mango.core import serializers
+from mango.db import connection
+from mango.db.models import F, Max, Min
+from mango.http import HttpRequest
+from mango.template import (
     Context, RequestContext, Template, TemplateSyntaxError, context_processors,
 )
-from django.test import (
+from mango.test import (
     SimpleTestCase, TestCase, TransactionTestCase, override_settings,
     skipIfDBFeature, skipUnlessDBFeature,
 )
-from django.test.utils import requires_tz_support
-from django.urls import reverse
-from django.utils import timezone
-from django.utils.timezone import timedelta
+from mango.test.utils import requires_tz_support
+from mango.urls import reverse
+from mango.utils import timezone
+from mango.utils.timezone import timedelta
 
 from .forms import (
     EventForm, EventLocalizedForm, EventLocalizedModelForm, EventModelForm,
@@ -1029,7 +1029,7 @@ class TemplateTests(SimpleTestCase):
     @skipIf(sys.platform == 'win32', "Windows uses non-standard time zone names")
     def test_tz_template_context_processor(self):
         """
-        Test the django.template.context_processors.tz template context processor.
+        Test the mango.template.context_processors.tz template context processor.
         """
         tpl = Template("{{ TIME_ZONE }}")
         context = Context()

@@ -1,6 +1,6 @@
-from django.contrib.staticfiles.utils import check_settings
-from django.core.exceptions import ImproperlyConfigured
-from django.test import SimpleTestCase, override_settings
+from mango.contrib.staticfiles.utils import check_settings
+from mango.core.exceptions import ImproperlyConfigured
+from mango.test import SimpleTestCase, override_settings
 
 
 class CheckSettingsTests(SimpleTestCase):

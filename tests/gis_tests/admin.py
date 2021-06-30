@@ -1,6 +1,6 @@
 try:
-    from django.contrib.gis import admin
+    from mango.contrib.gis import admin
 except ImportError:
-    from django.contrib import admin
+    from mango.contrib import admin
 
     admin.OSMGeoAdmin = admin.ModelAdmin

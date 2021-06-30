@@ -1,8 +1,8 @@
 import functools
 
-from django.template import Library
-from django.template.base import Node
-from django.test import SimpleTestCase
+from mango.template import Library
+from mango.template.base import Node
+from mango.test import SimpleTestCase
 
 
 class FilterRegistrationTests(SimpleTestCase):

@@ -1,7 +1,7 @@
-from django.core.exceptions import PermissionDenied
-from django.template.response import TemplateResponse
-from django.test import SimpleTestCase, modify_settings, override_settings
-from django.urls import path
+from mango.core.exceptions import PermissionDenied
+from mango.template.response import TemplateResponse
+from mango.test import SimpleTestCase, modify_settings, override_settings
+from mango.urls import path
 
 
 class MiddlewareAccessingContent:

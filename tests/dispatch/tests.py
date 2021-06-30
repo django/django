@@ -3,9 +3,9 @@ import sys
 import weakref
 from types import TracebackType
 
-from django.dispatch import Signal, receiver
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from mango.dispatch import Signal, receiver
+from mango.test import SimpleTestCase
+from mango.test.utils import override_settings
 
 if hasattr(sys, 'pypy_version_info'):
     def garbage_collect():
@@ -166,7 +166,7 @@ class DispatcherTests(SimpleTestCase):
             raise ValueError('this')
         a_signal.connect(fails)
         try:
-            with self.assertLogs('django.dispatch', 'ERROR') as cm:
+            with self.assertLogs('mango.dispatch', 'ERROR') as cm:
                 result = a_signal.send_robust(sender=self, val='test')
             err = result[0][1]
             self.assertIsInstance(err, ValueError)

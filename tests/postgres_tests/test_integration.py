@@ -12,7 +12,7 @@ class PostgresIntegrationTests(PostgreSQLSimpleTestCase):
             del test_environ['DJANGO_SETTINGS_MODULE']
         test_environ['PYTHONPATH'] = os.path.join(os.path.dirname(__file__), '../../')
         result = subprocess.run(
-            [sys.executable, '-m', 'django', 'check', '--settings', 'integration_settings'],
+            [sys.executable, '-m', 'mango', 'check', '--settings', 'integration_settings'],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
             cwd=os.path.dirname(__file__),

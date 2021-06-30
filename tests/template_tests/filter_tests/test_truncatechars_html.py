@@ -1,5 +1,5 @@
-from django.template.defaultfilters import truncatechars_html
-from django.test import SimpleTestCase
+from mango.template.defaultfilters import truncatechars_html
+from mango.test import SimpleTestCase
 
 
 class FunctionTests(SimpleTestCase):

@@ -5,14 +5,14 @@ from pathlib import Path
 from unittest import mock
 from urllib.parse import quote_plus
 
-from django.test import SimpleTestCase
-from django.utils.encoding import (
-    DjangoUnicodeDecodeError, escape_uri_path, filepath_to_uri, force_bytes,
+from mango.test import SimpleTestCase
+from mango.utils.encoding import (
+    MangoUnicodeDecodeError, escape_uri_path, filepath_to_uri, force_bytes,
     force_str, get_system_encoding, iri_to_uri, repercent_broken_unicode,
     smart_bytes, smart_str, uri_to_iri,
 )
-from django.utils.functional import SimpleLazyObject
-from django.utils.translation import gettext_lazy
+from mango.utils.functional import SimpleLazyObject
+from mango.utils.translation import gettext_lazy
 
 
 class TestEncodingUtils(SimpleTestCase):
@@ -32,12 +32,12 @@ class TestEncodingUtils(SimpleTestCase):
         s = SimpleLazyObject(lambda: 'x')
         self.assertIs(type(force_str(s)), str)
 
-    def test_force_str_DjangoUnicodeDecodeError(self):
+    def test_force_str_MangoUnicodeDecodeError(self):
         msg = (
             "'utf-8' codec can't decode byte 0xff in position 0: invalid "
             "start byte. You passed in b'\\xff' (<class 'bytes'>)"
         )
-        with self.assertRaisesMessage(DjangoUnicodeDecodeError, msg):
+        with self.assertRaisesMessage(MangoUnicodeDecodeError, msg):
             force_str(b'\xff')
 
     def test_force_bytes_exception(self):

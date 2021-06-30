@@ -1,9 +1,9 @@
 import binascii
 
-from django.contrib.gis.geos import (
+from mango.contrib.gis.geos import (
     GEOSGeometry, Point, Polygon, WKBReader, WKBWriter, WKTReader, WKTWriter,
 )
-from django.test import SimpleTestCase
+from mango.test import SimpleTestCase
 
 
 class GEOSIOTest(SimpleTestCase):

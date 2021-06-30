@@ -1,6 +1,6 @@
-from django.core import mail
-from django.core.management import call_command
-from django.test import SimpleTestCase, override_settings
+from mango.core import mail
+from mango.core.management import call_command
+from mango.test import SimpleTestCase, override_settings
 
 
 @override_settings(

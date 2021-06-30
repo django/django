@@ -1,20 +1,20 @@
 from datetime import datetime
 
-from django.conf import settings
-from django.contrib.auth import authenticate
-from django.contrib.auth.backends import RemoteUserBackend
-from django.contrib.auth.middleware import RemoteUserMiddleware
-from django.contrib.auth.models import User
-from django.middleware.csrf import _get_new_csrf_string, _mask_cipher_secret
-from django.test import Client, TestCase, modify_settings, override_settings
-from django.utils import timezone
+from mango.conf import settings
+from mango.contrib.auth import authenticate
+from mango.contrib.auth.backends import RemoteUserBackend
+from mango.contrib.auth.middleware import RemoteUserMiddleware
+from mango.contrib.auth.models import User
+from mango.middleware.csrf import _get_new_csrf_string, _mask_cipher_secret
+from mango.test import Client, TestCase, modify_settings, override_settings
+from mango.utils import timezone
 
 
 @override_settings(ROOT_URLCONF='auth_tests.urls')
 class RemoteUserTest(TestCase):
 
-    middleware = 'django.contrib.auth.middleware.RemoteUserMiddleware'
-    backend = 'django.contrib.auth.backends.RemoteUserBackend'
+    middleware = 'mango.contrib.auth.middleware.RemoteUserMiddleware'
+    backend = 'mango.contrib.auth.backends.RemoteUserBackend'
     header = 'REMOTE_USER'
     email_header = 'REMOTE_EMAIL'
 
@@ -70,8 +70,8 @@ class RemoteUserTest(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertIn(b'CSRF verification failed.', response.content)
 
-        # This request will call django.contrib.auth.login() which will call
-        # django.middleware.csrf.rotate_token() thus changing the value of
+        # This request will call mango.contrib.auth.login() which will call
+        # mango.middleware.csrf.rotate_token() thus changing the value of
         # request.META['CSRF_COOKIE'] from the user submitted value set by
         # CsrfViewMiddleware.process_request() to the new csrftoken value set
         # by rotate_token(). Csrf validation should still pass when the view is
@@ -204,7 +204,7 @@ class RemoteUserNoCreateTest(RemoteUserTest):
 
 class AllowAllUsersRemoteUserBackendTest(RemoteUserTest):
     """Backend that allows inactive users."""
-    backend = 'django.contrib.auth.backends.AllowAllUsersRemoteUserBackend'
+    backend = 'mango.contrib.auth.backends.AllowAllUsersRemoteUserBackend'
 
     def test_inactive_user(self):
         user = User.objects.create(username='knownuser', is_active=False)
@@ -293,7 +293,7 @@ class PersistentRemoteUserTest(RemoteUserTest):
     PersistentRemoteUserMiddleware keeps the user logged in even if the
     subsequent calls do not contain the header value.
     """
-    middleware = 'django.contrib.auth.middleware.PersistentRemoteUserMiddleware'
+    middleware = 'mango.contrib.auth.middleware.PersistentRemoteUserMiddleware'
     require_header = False
 
     def test_header_disappears(self):

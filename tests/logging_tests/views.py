@@ -1,10 +1,10 @@
-from django.core.exceptions import (
+from mango.core.exceptions import (
     DisallowedHost, PermissionDenied, SuspiciousOperation,
 )
-from django.http import (
+from mango.http import (
     Http404, HttpResponse, HttpResponseRedirect, HttpResponseServerError,
 )
-from django.http.multipartparser import MultiPartParserError
+from mango.http.multipartparser import MultiPartParserError
 
 
 def innocent(request):

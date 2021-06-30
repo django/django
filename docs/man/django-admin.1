@@ -1,8 +1,8 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "DJANGO-ADMIN" "1" "January 14, 2021" "3.2" "Django"
+.TH "DJANGO-ADMIN" "1" "January 14, 2021" "3.2" "Mango"
 .SH NAME
-django-admin \- Utility script for the Django Web framework
+mango-admin \- Utility script for the Mango Web framework
 .
 .nr rst2man-indent-level 0
 .
@@ -31,26 +31,26 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
 .sp
-\fBdjango\-admin\fP is Django\(aqs command\-line utility for administrative tasks.
+\fBmango\-admin\fP is Mango\(aqs command\-line utility for administrative tasks.
 This document outlines all it can do.
 .sp
-In addition, \fBmanage.py\fP is automatically created in each Django project. It
-does the same thing as \fBdjango\-admin\fP but also sets the
+In addition, \fBmanage.py\fP is automatically created in each Mango project. It
+does the same thing as \fBmango\-admin\fP but also sets the
 \fBDJANGO_SETTINGS_MODULE\fP environment variable so that it points to your
 project\(aqs \fBsettings.py\fP file.
 .sp
-The \fBdjango\-admin\fP script should be on your system path if you installed
-Django via \fBpip\fP\&. If it\(aqs not in your path, ensure you have your virtual
+The \fBmango\-admin\fP script should be on your system path if you installed
+Mango via \fBpip\fP\&. If it\(aqs not in your path, ensure you have your virtual
 environment activated.
 .sp
-Generally, when working on a single Django project, it\(aqs easier to use
-\fBmanage.py\fP than \fBdjango\-admin\fP\&. If you need to switch between multiple
-Django settings files, use \fBdjango\-admin\fP with
+Generally, when working on a single Mango project, it\(aqs easier to use
+\fBmanage.py\fP than \fBmango\-admin\fP\&. If you need to switch between multiple
+Mango settings files, use \fBmango\-admin\fP with
 \fBDJANGO_SETTINGS_MODULE\fP or the \fI\%\-\-settings\fP command line
 option.
 .sp
-The command\-line examples throughout this document use \fBdjango\-admin\fP to
-be consistent, but any example can use \fBmanage.py\fP or \fBpython \-m django\fP
+The command\-line examples throughout this document use \fBmango\-admin\fP to
+be consistent, but any example can use \fBmanage.py\fP or \fBpython \-m mango\fP
 just as well.
 .SH USAGE
 .INDENT 0.0
@@ -58,9 +58,9 @@ just as well.
 .sp
 .nf
 .ft C
-$ django\-admin <command> [options]
+$ mango\-admin <command> [options]
 $ manage.py <command> [options]
-$ python \-m django <command> [options]
+$ python \-m mango <command> [options]
 .ft P
 .fi
 .UNINDENT
@@ -72,16 +72,16 @@ for the given command.
 .SS Getting runtime help
 .INDENT 0.0
 .TP
-.B django\-admin help
+.B mango\-admin help
 .UNINDENT
 .sp
-Run \fBdjango\-admin help\fP to display usage information and a list of the
+Run \fBmango\-admin help\fP to display usage information and a list of the
 commands provided by each application.
 .sp
-Run \fBdjango\-admin help \-\-commands\fP to display a list of all available
+Run \fBmango\-admin help \-\-commands\fP to display a list of all available
 commands.
 .sp
-Run \fBdjango\-admin help <command>\fP to display a description of the given
+Run \fBmango\-admin help <command>\fP to display a description of the given
 command and a list of its available options.
 .SS App names
 .sp
@@ -91,10 +91,10 @@ contains the string \fB\(aqmysite.blog\(aq\fP, the app name is \fBblog\fP\&.
 .SS Determining the version
 .INDENT 0.0
 .TP
-.B django\-admin version
+.B mango\-admin version
 .UNINDENT
 .sp
-Run \fBdjango\-admin version\fP to display the current Django version.
+Run \fBmango\-admin version\fP to display the current Mango version.
 .sp
 The output follows the schema described in \fI\%PEP 440\fP:
 .INDENT 0.0
@@ -112,16 +112,16 @@ The output follows the schema described in \fI\%PEP 440\fP:
 .SS Displaying debug output
 .sp
 Use \fI\%\-\-verbosity\fP to specify the amount of notification and debug
-information that \fBdjango\-admin\fP prints to the console.
+information that \fBmango\-admin\fP prints to the console.
 .SH AVAILABLE COMMANDS
 .SS \fBcheck\fP
 .INDENT 0.0
 .TP
-.B django\-admin check [app_label [app_label ...]]
+.B mango\-admin check [app_label [app_label ...]]
 .UNINDENT
 .sp
 Uses the system check framework to inspect the entire
-Django project for common problems.
+Mango project for common problems.
 .sp
 By default, all apps will be checked. You can check a subset of apps by
 providing a list of app labels as arguments:
@@ -130,7 +130,7 @@ providing a list of app labels as arguments:
 .sp
 .nf
 .ft C
-django\-admin check auth admin myapp
+mango\-admin check auth admin myapp
 .ft P
 .fi
 .UNINDENT
@@ -149,7 +149,7 @@ For example, to perform only models and compatibility checks, run:
 .sp
 .nf
 .ft C
-django\-admin check \-\-tag models \-\-tag compatibility
+mango\-admin check \-\-tag models \-\-tag compatibility
 .ft P
 .fi
 .UNINDENT
@@ -167,7 +167,7 @@ Specifies the database to run checks requiring database access:
 .sp
 .nf
 .ft C
-django\-admin check \-\-database default \-\-database other
+mango\-admin check \-\-database default \-\-database other
 .ft P
 .fi
 .UNINDENT
@@ -197,7 +197,7 @@ variable, or by passing the \fB\-\-settings\fP option:
 .sp
 .nf
 .ft C
-django\-admin check \-\-deploy \-\-settings=production_settings
+mango\-admin check \-\-deploy \-\-settings=production_settings
 .ft P
 .fi
 .UNINDENT
@@ -216,7 +216,7 @@ status. Default is \fBERROR\fP\&.
 .SS \fBcompilemessages\fP
 .INDENT 0.0
 .TP
-.B django\-admin compilemessages
+.B mango\-admin compilemessages
 .UNINDENT
 .sp
 Compiles \fB\&.po\fP files created by \fI\%makemessages\fP to \fB\&.mo\fP files for
@@ -247,14 +247,14 @@ Example usage:
 .sp
 .nf
 .ft C
-django\-admin compilemessages \-\-locale=pt_BR
-django\-admin compilemessages \-\-locale=pt_BR \-\-locale=fr \-f
-django\-admin compilemessages \-l pt_BR
-django\-admin compilemessages \-l pt_BR \-l fr \-\-use\-fuzzy
-django\-admin compilemessages \-\-exclude=pt_BR
-django\-admin compilemessages \-\-exclude=pt_BR \-\-exclude=fr
-django\-admin compilemessages \-x pt_BR
-django\-admin compilemessages \-x pt_BR \-x fr
+mango\-admin compilemessages \-\-locale=pt_BR
+mango\-admin compilemessages \-\-locale=pt_BR \-\-locale=fr \-f
+mango\-admin compilemessages \-l pt_BR
+mango\-admin compilemessages \-l pt_BR \-l fr \-\-use\-fuzzy
+mango\-admin compilemessages \-\-exclude=pt_BR
+mango\-admin compilemessages \-\-exclude=pt_BR \-\-exclude=fr
+mango\-admin compilemessages \-x pt_BR
+mango\-admin compilemessages \-x pt_BR \-x fr
 .ft P
 .fi
 .UNINDENT
@@ -273,7 +273,7 @@ Example usage:
 .sp
 .nf
 .ft C
-django\-admin compilemessages \-\-ignore=cache \-\-ignore=outdated/*/locale
+mango\-admin compilemessages \-\-ignore=cache \-\-ignore=outdated/*/locale
 .ft P
 .fi
 .UNINDENT
@@ -281,7 +281,7 @@ django\-admin compilemessages \-\-ignore=cache \-\-ignore=outdated/*/locale
 .SS \fBcreatecachetable\fP
 .INDENT 0.0
 .TP
-.B django\-admin createcachetable
+.B mango\-admin createcachetable
 .UNINDENT
 .sp
 Creates the cache tables for use with the database cache backend using the
@@ -304,7 +304,7 @@ customize it or use the migrations framework.
 .SS \fBdbshell\fP
 .INDENT 0.0
 .TP
-.B django\-admin dbshell
+.B mango\-admin dbshell
 .UNINDENT
 .sp
 Runs the command\-line client for the database engine specified in your
@@ -346,7 +346,7 @@ command\(aqs \fB\-c\fP flag to execute a raw SQL query directly:
 .sp
 .nf
 .ft C
-$ django\-admin dbshell \-\- \-c \(aqselect current_user\(aq
+$ mango\-admin dbshell \-\- \-c \(aqselect current_user\(aq
  current_user
 \-\-\-\-\-\-\-\-\-\-\-\-\-\-
  postgres
@@ -362,11 +362,11 @@ On MySQL/MariaDB, you can do this with the \fBmysql\fP command\(aqs \fB\-e\fP fl
 .sp
 .nf
 .ft C
-$ django\-admin dbshell \-\- \-e "select user()"
+$ mango\-admin dbshell \-\- \-e "select user()"
 +\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-+
 | user()               |
 +\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-+
-| djangonaut@localhost |
+| mangonaut@localhost |
 +\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-+
 .ft P
 .fi
@@ -384,10 +384,10 @@ command\-line client, e.g. \fB\(aqisolation_level\(aq\fP\&.
 .SS \fBdiffsettings\fP
 .INDENT 0.0
 .TP
-.B django\-admin diffsettings
+.B mango\-admin diffsettings
 .UNINDENT
 .sp
-Displays differences between the current settings file and Django\(aqs default
+Displays differences between the current settings file and Mango\(aqs default
 settings (or another settings file specified by \fI\%\-\-default\fP).
 .sp
 Settings that don\(aqt appear in the defaults are followed by \fB"###"\fP\&. For
@@ -399,7 +399,7 @@ example, the default settings don\(aqt define \fBROOT_URLCONF\fP, so
 .B \-\-all
 .UNINDENT
 .sp
-Displays all settings, even if they have Django\(aqs default value. Such settings
+Displays all settings, even if they have Mango\(aqs default value. Such settings
 are prefixed by \fB"###"\fP\&.
 .INDENT 0.0
 .TP
@@ -407,7 +407,7 @@ are prefixed by \fB"###"\fP\&.
 .UNINDENT
 .sp
 The settings module to compare the current settings against. Leave empty to
-compare against Django\(aqs default settings.
+compare against Mango\(aqs default settings.
 .INDENT 0.0
 .TP
 .B \-\-output {hash,unified}
@@ -421,7 +421,7 @@ plus sign.
 .SS \fBdumpdata\fP
 .INDENT 0.0
 .TP
-.B django\-admin dumpdata [app_label[.ModelName] [app_label[.ModelName] ...]]
+.B mango\-admin dumpdata [app_label[.ModelName] [app_label[.ModelName] ...]]
 .UNINDENT
 .sp
 Outputs to standard output all data in the database associated with the named
@@ -440,7 +440,7 @@ objects will be dumped.
 .B \-\-all, \-a
 .UNINDENT
 .sp
-Uses Django\(aqs base manager, dumping records which might otherwise be filtered
+Uses Mango\(aqs base manager, dumping records which might otherwise be filtered
 or modified by a custom manager.
 .INDENT 0.0
 .TP
@@ -473,7 +473,7 @@ once:
 .sp
 .nf
 .ft C
-django\-admin dumpdata \-\-exclude=auth \-\-exclude=contenttypes
+mango\-admin dumpdata \-\-exclude=auth \-\-exclude=contenttypes
 .ft P
 .fi
 .UNINDENT
@@ -532,7 +532,7 @@ For example, to output the data as a compressed JSON file:
 .sp
 .nf
 .ft C
-django\-admin dumpdata \-o mydata.json.gz
+mango\-admin dumpdata \-o mydata.json.gz
 .ft P
 .fi
 .UNINDENT
@@ -540,7 +540,7 @@ django\-admin dumpdata \-o mydata.json.gz
 .SS \fBflush\fP
 .INDENT 0.0
 .TP
-.B django\-admin flush
+.B mango\-admin flush
 .UNINDENT
 .sp
 Removes all data from the database and re\-executes any post\-synchronization
@@ -563,11 +563,11 @@ Specifies the database to flush. Defaults to \fBdefault\fP\&.
 .SS \fBinspectdb\fP
 .INDENT 0.0
 .TP
-.B django\-admin inspectdb [table [table ...]]
+.B mango\-admin inspectdb [table [table ...]]
 .UNINDENT
 .sp
 Introspects the database tables in the database pointed\-to by the
-\fBNAME\fP setting and outputs a Django model module (a \fBmodels.py\fP
+\fBNAME\fP setting and outputs a Mango model module (a \fBmodels.py\fP
 file) to standard output.
 .sp
 You may choose what tables or views to inspect by passing their names as
@@ -575,7 +575,7 @@ arguments. If no arguments are provided, models are created for views only if
 the \fI\%\-\-include\-views\fP option is used. Models for partition tables are
 created on PostgreSQL if the \fI\%\-\-include\-partitions\fP option is used.
 .sp
-Use this if you have a legacy database with which you\(aqd like to use Django.
+Use this if you have a legacy database with which you\(aqd like to use Mango.
 The script will inspect the database and create a model for each table within
 it.
 .sp
@@ -588,7 +588,7 @@ If \fBinspectdb\fP cannot map a column\(aqs type to a model field type, it\(aqll
 use \fBTextField\fP and will insert the Python comment
 \fB\(aqThis field type is a guess.\(aq\fP next to the field in the generated
 model. The recognized fields may depend on apps listed in
-\fBINSTALLED_APPS\fP\&. For example, \fBdjango.contrib.postgres\fP adds
+\fBINSTALLED_APPS\fP\&. For example, \fBmango.contrib.postgres\fP adds
 recognition for several PostgreSQL\-specific field types.
 .IP \(bu 2
 If the database column name is a Python reserved word (such as
@@ -606,14 +606,14 @@ you run it, you\(aqll want to look over the generated models yourself to make
 customizations. In particular, you\(aqll need to rearrange models\(aq order, so that
 models that refer to other models are ordered properly.
 .sp
-Django doesn\(aqt create database defaults when a
+Mango doesn\(aqt create database defaults when a
 \fBdefault\fP is specified on a model field.
 Similarly, database defaults aren\(aqt translated to model field defaults or
 detected in any fashion by \fBinspectdb\fP\&.
 .sp
 By default, \fBinspectdb\fP creates unmanaged models. That is, \fBmanaged = False\fP
-in the model\(aqs \fBMeta\fP class tells Django not to manage each table\(aqs creation,
-modification, and deletion. If you do want to allow Django to manage the
+in the model\(aqs \fBMeta\fP class tells Mango not to manage each table\(aqs creation,
+modification, and deletion. If you do want to allow Mango to manage the
 table\(aqs lifecycle, you\(aqll need to change the
 \fBmanaged\fP option to \fBTrue\fP (or remove
 it because \fBTrue\fP is its default value).
@@ -658,7 +658,7 @@ If this option is provided, models are also created for database views.
 .SS \fBloaddata\fP
 .INDENT 0.0
 .TP
-.B django\-admin loaddata fixture [fixture ...]
+.B mango\-admin loaddata fixture [fixture ...]
 .UNINDENT
 .sp
 Searches for and loads the contents of the named fixture into the database.
@@ -703,7 +703,7 @@ A \fIfixture\fP is a collection of files that contain the serialized contents of
 the database. Each fixture has a unique name, and the files that comprise the
 fixture can be distributed over multiple directories, in multiple applications.
 .sp
-Django will search in three locations for fixtures:
+Mango will search in three locations for fixtures:
 .INDENT 0.0
 .IP 1. 3
 In the \fBfixtures\fP directory of every installed application
@@ -713,7 +713,7 @@ In any directory named in the \fBFIXTURE_DIRS\fP setting
 In the literal path named by the fixture
 .UNINDENT
 .sp
-Django will load any and all fixtures it finds in these locations that match
+Mango will load any and all fixtures it finds in these locations that match
 the provided fixture names.
 .sp
 If the named fixture has a file extension, only fixtures of that type
@@ -723,7 +723,7 @@ will be loaded. For example:
 .sp
 .nf
 .ft C
-django\-admin loaddata mydata.json
+mango\-admin loaddata mydata.json
 .ft P
 .fi
 .UNINDENT
@@ -733,14 +733,14 @@ would only load JSON fixtures called \fBmydata\fP\&. The fixture extension
 must correspond to the registered name of a
 serializer (e.g., \fBjson\fP or \fBxml\fP).
 .sp
-If you omit the extensions, Django will search all available fixture types
+If you omit the extensions, Mango will search all available fixture types
 for a matching fixture. For example:
 .INDENT 0.0
 .INDENT 3.5
 .sp
 .nf
 .ft C
-django\-admin loaddata mydata
+mango\-admin loaddata mydata
 .ft P
 .fi
 .UNINDENT
@@ -757,7 +757,7 @@ directories will be included in the search path. For example:
 .sp
 .nf
 .ft C
-django\-admin loaddata foo/bar/mydata.json
+mango\-admin loaddata foo/bar/mydata.json
 .ft P
 .fi
 .UNINDENT
@@ -780,7 +780,7 @@ raise an exception:
 .sp
 .nf
 .ft C
-from django.db.models.signals import post_save
+from mango.db.models.signals import post_save
 from .models import MyModel
 
 def my_handler(**kwargs):
@@ -841,7 +841,7 @@ format. For example:
 .sp
 .nf
 .ft C
-django\-admin loaddata mydata.json
+mango\-admin loaddata mydata.json
 .ft P
 .fi
 .UNINDENT
@@ -887,7 +887,7 @@ example:
 .sp
 .nf
 .ft C
-django\-admin loaddata \-\-format=json \-
+mango\-admin loaddata \-\-format=json \-
 .ft P
 .fi
 .UNINDENT
@@ -904,7 +904,7 @@ For example:
 .sp
 .nf
 .ft C
-django\-admin dumpdata \-\-format=json \-\-database=test app_label.ModelName | django\-admin loaddata \-\-format=json \-\-database=prod \-
+mango\-admin dumpdata \-\-format=json \-\-database=test app_label.ModelName | mango\-admin loaddata \-\-format=json \-\-database=prod \-
 .ft P
 .fi
 .UNINDENT
@@ -912,12 +912,12 @@ django\-admin dumpdata \-\-format=json \-\-database=test app_label.ModelName | d
 .SS \fBmakemessages\fP
 .INDENT 0.0
 .TP
-.B django\-admin makemessages
+.B mango\-admin makemessages
 .UNINDENT
 .sp
 Runs over the entire source tree of the current directory and pulls out all
 strings marked for translation. It creates (or updates) a message file in the
-conf/locale (in the Django tree) or locale (for project and application)
+conf/locale (in the Mango tree) or locale (for project and application)
 directory. After making changes to the messages files you need to compile them
 with \fI\%compilemessages\fP for use with the builtin gettext support. See
 the i18n documentation for details.
@@ -945,7 +945,7 @@ Example usage:
 .sp
 .nf
 .ft C
-django\-admin makemessages \-\-locale=de \-\-extension xhtml
+mango\-admin makemessages \-\-locale=de \-\-extension xhtml
 .ft P
 .fi
 .UNINDENT
@@ -958,7 +958,7 @@ multiple times:
 .sp
 .nf
 .ft C
-django\-admin makemessages \-\-locale=de \-\-extension=html,txt \-\-extension xml
+mango\-admin makemessages \-\-locale=de \-\-extension=html,txt \-\-extension xml
 .ft P
 .fi
 .UNINDENT
@@ -983,14 +983,14 @@ Example usage:
 .sp
 .nf
 .ft C
-django\-admin makemessages \-\-locale=pt_BR
-django\-admin makemessages \-\-locale=pt_BR \-\-locale=fr
-django\-admin makemessages \-l pt_BR
-django\-admin makemessages \-l pt_BR \-l fr
-django\-admin makemessages \-\-exclude=pt_BR
-django\-admin makemessages \-\-exclude=pt_BR \-\-exclude=fr
-django\-admin makemessages \-x pt_BR
-django\-admin makemessages \-x pt_BR \-x fr
+mango\-admin makemessages \-\-locale=pt_BR
+mango\-admin makemessages \-\-locale=pt_BR \-\-locale=fr
+mango\-admin makemessages \-l pt_BR
+mango\-admin makemessages \-l pt_BR \-l fr
+mango\-admin makemessages \-\-exclude=pt_BR
+mango\-admin makemessages \-\-exclude=pt_BR \-\-exclude=fr
+mango\-admin makemessages \-x pt_BR
+mango\-admin makemessages \-x pt_BR \-x fr
 .ft P
 .fi
 .UNINDENT
@@ -1003,9 +1003,9 @@ django\-admin makemessages \-x pt_BR \-x fr
 Specifies the domain of the messages files. Supported options are:
 .INDENT 0.0
 .IP \(bu 2
-\fBdjango\fP for all \fB*.py\fP, \fB*.html\fP and \fB*.txt\fP files (default)
+\fBmango\fP for all \fB*.py\fP, \fB*.html\fP and \fB*.txt\fP files (default)
 .IP \(bu 2
-\fBdjangojs\fP for \fB*.js\fP files
+\fBmangojs\fP for \fB*.js\fP files
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1020,7 +1020,7 @@ Example usage:
 .sp
 .nf
 .ft C
-django\-admin makemessages \-\-locale=de \-\-symlinks
+mango\-admin makemessages \-\-locale=de \-\-symlinks
 .ft P
 .fi
 .UNINDENT
@@ -1041,7 +1041,7 @@ Example usage:
 .sp
 .nf
 .ft C
-django\-admin makemessages \-\-locale=en_US \-\-ignore=apps/* \-\-ignore=secret/*.html
+mango\-admin makemessages \-\-locale=en_US \-\-ignore=apps/* \-\-ignore=secret/*.html
 .ft P
 .fi
 .UNINDENT
@@ -1103,7 +1103,7 @@ the keywords that \fI\%makemessages\fP passes to \fBxgettext\fP\&.
 .SS \fBmakemigrations\fP
 .INDENT 0.0
 .TP
-.B django\-admin makemigrations [app_label [app_label ...]]
+.B mango\-admin makemigrations [app_label [app_label ...]]
 .UNINDENT
 .sp
 Creates new migrations based on the changes detected to your models.
@@ -1158,7 +1158,7 @@ name must be a valid Python \fI\%identifier\fP\&.
 .B \-\-no\-header
 .UNINDENT
 .sp
-Generate migration files without Django version and timestamp header.
+Generate migration files without Mango version and timestamp header.
 .INDENT 0.0
 .TP
 .B \-\-check
@@ -1174,7 +1174,7 @@ history is skipped.
 .SS \fBmigrate\fP
 .INDENT 0.0
 .TP
-.B django\-admin migrate [app_label] [migration_name]
+.B mango\-admin migrate [app_label] [migration_name]
 .UNINDENT
 .sp
 Synchronizes the database state with the current set of models and migrations.
@@ -1231,7 +1231,7 @@ run correctly.
 .B \-\-fake\-initial
 .UNINDENT
 .sp
-Allows Django to skip an app\(aqs initial migration if all database tables with
+Allows Mango to skip an app\(aqs initial migration if all database tables with
 the names of all models created by all
 \fBCreateModel\fP operations in that
 migration already exist. This option is intended for use when first running
@@ -1273,7 +1273,7 @@ detected.
 .SS \fBrunserver\fP
 .INDENT 0.0
 .TP
-.B django\-admin runserver [addrport]
+.B mango\-admin runserver [addrport]
 .UNINDENT
 .sp
 Starts a lightweight development Web server on the local machine. By default,
@@ -1291,7 +1291,7 @@ DO NOT USE THIS SERVER IN A PRODUCTION SETTING. It has not gone through
 security audits or performance tests. (And that\(aqs how it\(aqs gonna stay. We\(aqre in
 the business of making Web frameworks, not Web servers, so improving this
 server to be able to handle a production environment is outside the scope of
-Django.)
+Mango.)
 .sp
 The development server automatically reloads Python code for each request, as
 needed. You don\(aqt need to restart the server for code changes to take effect.
@@ -1302,7 +1302,7 @@ If you\(aqre using Linux or MacOS and install both \fI\%pywatchman\fP and the
 \fI\%Watchman\fP service, kernel signals will be used to autoreload the server
 (rather than polling file modification timestamps each second). This offers
 better performance on large projects, reduced response time after code changes,
-more robust change detection, and a reduction in power usage. Django supports
+more robust change detection, and a reduction in power usage. Mango supports
 \fBpywatchman\fP 1.2.0 and higher.
 .INDENT 0.0
 .INDENT 3.5
@@ -1328,12 +1328,12 @@ by setting the \fI\%DJANGO_WATCHMAN_TIMEOUT\fP environment variable.
 .UNINDENT
 .sp
 When you start the server, and each time you change Python code while the
-server is running, the system check framework will check your entire Django
+server is running, the system check framework will check your entire Mango
 project for some common errors (see the \fI\%check\fP command). If any
 errors are found, they will be printed to standard output.
 .sp
 You can run as many concurrent servers as you want, as long as they\(aqre on
-separate ports by executing \fBdjango\-admin runserver\fP more than once.
+separate ports by executing \fBmango\-admin runserver\fP more than once.
 .sp
 Note that the default IP address, \fB127.0.0.1\fP, is not accessible from other
 machines on your network. To make your development server viewable to other
@@ -1350,7 +1350,7 @@ If the staticfiles contrib app is enabled
 with its own runserver command.
 .sp
 Logging of each request and response of the server is sent to the
-django\-server\-logger logger.
+mango\-server\-logger logger.
 .INDENT 0.0
 .TP
 .B \-\-noreload
@@ -1381,7 +1381,7 @@ Port 8000 on IP address \fB127.0.0.1\fP:
 .sp
 .nf
 .ft C
-django\-admin runserver
+mango\-admin runserver
 .ft P
 .fi
 .UNINDENT
@@ -1393,7 +1393,7 @@ Port 8000 on IP address \fB1.2.3.4\fP:
 .sp
 .nf
 .ft C
-django\-admin runserver 1.2.3.4:8000
+mango\-admin runserver 1.2.3.4:8000
 .ft P
 .fi
 .UNINDENT
@@ -1405,7 +1405,7 @@ Port 7000 on IP address \fB127.0.0.1\fP:
 .sp
 .nf
 .ft C
-django\-admin runserver 7000
+mango\-admin runserver 7000
 .ft P
 .fi
 .UNINDENT
@@ -1417,7 +1417,7 @@ Port 7000 on IP address \fB1.2.3.4\fP:
 .sp
 .nf
 .ft C
-django\-admin runserver 1.2.3.4:7000
+mango\-admin runserver 1.2.3.4:7000
 .ft P
 .fi
 .UNINDENT
@@ -1429,7 +1429,7 @@ Port 8000 on IPv6 address \fB::1\fP:
 .sp
 .nf
 .ft C
-django\-admin runserver \-6
+mango\-admin runserver \-6
 .ft P
 .fi
 .UNINDENT
@@ -1441,7 +1441,7 @@ Port 7000 on IPv6 address \fB::1\fP:
 .sp
 .nf
 .ft C
-django\-admin runserver \-6 7000
+mango\-admin runserver \-6 7000
 .ft P
 .fi
 .UNINDENT
@@ -1453,7 +1453,7 @@ Port 7000 on IPv6 address \fB2001:0db8:1234:5678::9\fP:
 .sp
 .nf
 .ft C
-django\-admin runserver [2001:0db8:1234:5678::9]:7000
+mango\-admin runserver [2001:0db8:1234:5678::9]:7000
 .ft P
 .fi
 .UNINDENT
@@ -1465,7 +1465,7 @@ Port 8000 on IPv4 address of host \fBlocalhost\fP:
 .sp
 .nf
 .ft C
-django\-admin runserver localhost:8000
+mango\-admin runserver localhost:8000
 .ft P
 .fi
 .UNINDENT
@@ -1477,7 +1477,7 @@ Port 8000 on IPv6 address of host \fBlocalhost\fP:
 .sp
 .nf
 .ft C
-django\-admin runserver \-6 localhost:8000
+mango\-admin runserver \-6 localhost:8000
 .ft P
 .fi
 .UNINDENT
@@ -1486,22 +1486,22 @@ django\-admin runserver \-6 localhost:8000
 .sp
 By default, the development server doesn\(aqt serve any static files for your site
 (such as CSS files, images, things under \fBMEDIA_URL\fP and so forth). If
-you want to configure Django to serve static media, read
+you want to configure Mango to serve static media, read
 /howto/static\-files/index\&.
 .SS \fBsendtestemail\fP
 .INDENT 0.0
 .TP
-.B django\-admin sendtestemail [email [email ...]]
+.B mango\-admin sendtestemail [email [email ...]]
 .UNINDENT
 .sp
-Sends a test email (to confirm email sending through Django is working) to the
+Sends a test email (to confirm email sending through Mango is working) to the
 recipient(s) specified. For example:
 .INDENT 0.0
 .INDENT 3.5
 .sp
 .nf
 .ft C
-django\-admin sendtestemail foo@example.com bar@example.com
+mango\-admin sendtestemail foo@example.com bar@example.com
 .ft P
 .fi
 .UNINDENT
@@ -1526,7 +1526,7 @@ Mails the email addresses specified in \fBADMINS\fP using
 .SS \fBshell\fP
 .INDENT 0.0
 .TP
-.B django\-admin shell
+.B mango\-admin shell
 .UNINDENT
 .sp
 Starts the Python interactive interpreter.
@@ -1535,7 +1535,7 @@ Starts the Python interactive interpreter.
 .B \-\-interface {ipython,bpython,python}, \-i {ipython,bpython,python}
 .UNINDENT
 .sp
-Specifies the shell to use. By default, Django will use \fI\%IPython\fP or \fI\%bpython\fP if
+Specifies the shell to use. By default, Mango will use \fI\%IPython\fP or \fI\%bpython\fP if
 either is installed. If both are installed, specify which one you want like so:
 .sp
 IPython:
@@ -1544,7 +1544,7 @@ IPython:
 .sp
 .nf
 .ft C
-django\-admin shell \-i ipython
+mango\-admin shell \-i ipython
 .ft P
 .fi
 .UNINDENT
@@ -1556,7 +1556,7 @@ bpython:
 .sp
 .nf
 .ft C
-django\-admin shell \-i bpython
+mango\-admin shell \-i bpython
 .ft P
 .fi
 .UNINDENT
@@ -1569,7 +1569,7 @@ Python interpreter, use \fBpython\fP as the interface name, like so:
 .sp
 .nf
 .ft C
-django\-admin shell \-i python
+mango\-admin shell \-i python
 .ft P
 .fi
 .UNINDENT
@@ -1587,13 +1587,13 @@ variable or the \fB~/.pythonrc.py\fP script is read.
 .B \-\-command COMMAND, \-c COMMAND
 .UNINDENT
 .sp
-Lets you pass a command as a string to execute it as Django, like so:
+Lets you pass a command as a string to execute it as Mango, like so:
 .INDENT 0.0
 .INDENT 3.5
 .sp
 .nf
 .ft C
-django\-admin shell \-\-command="import django; print(django.__version__)"
+mango\-admin shell \-\-command="import mango; print(mango.__version__)"
 .ft P
 .fi
 .UNINDENT
@@ -1605,9 +1605,9 @@ You can also pass code in on standard input to execute it. For example:
 .sp
 .nf
 .ft C
-$ django\-admin shell <<EOF
-> import django
-> print(django.__version__)
+$ mango\-admin shell <<EOF
+> import mango
+> print(mango.__version__)
 > EOF
 .ft P
 .fi
@@ -1619,7 +1619,7 @@ On Windows, the REPL is output due to implementation limits of
 .SS \fBshowmigrations\fP
 .INDENT 0.0
 .TP
-.B django\-admin showmigrations [app_label [app_label ...]]
+.B mango\-admin showmigrations [app_label [app_label ...]]
 .UNINDENT
 .sp
 Shows all migrations in a project. You can choose from one of two formats:
@@ -1628,7 +1628,7 @@ Shows all migrations in a project. You can choose from one of two formats:
 .B \-\-list, \-l
 .UNINDENT
 .sp
-Lists all of the apps Django knows about, the migrations available for each
+Lists all of the apps Mango knows about, the migrations available for each
 app, and whether or not each migration is applied (marked by an \fB[X]\fP next to
 the migration name). For a \fB\-\-verbosity\fP of 2 and above, the applied
 datetimes are also shown.
@@ -1642,7 +1642,7 @@ This is the default output format.
 .B \-\-plan, \-p
 .UNINDENT
 .sp
-Shows the migration plan Django will follow to apply migrations. Like
+Shows the migration plan Mango will follow to apply migrations. Like
 \fB\-\-list\fP, applied migrations are marked by an \fB[X]\fP\&. For a \fB\-\-verbosity\fP
 of 2 and above, all dependencies of a migration will also be shown.
 .sp
@@ -1657,7 +1657,7 @@ Specifies the database to examine. Defaults to \fBdefault\fP\&.
 .SS \fBsqlflush\fP
 .INDENT 0.0
 .TP
-.B django\-admin sqlflush
+.B mango\-admin sqlflush
 .UNINDENT
 .sp
 Prints the SQL statements that would be executed for the \fI\%flush\fP
@@ -1671,7 +1671,7 @@ Specifies the database for which to print the SQL. Defaults to \fBdefault\fP\&.
 .SS \fBsqlmigrate\fP
 .INDENT 0.0
 .TP
-.B django\-admin sqlmigrate app_label migration_name
+.B mango\-admin sqlmigrate app_label migration_name
 .UNINDENT
 .sp
 Prints the SQL for the named migration. This requires an active database
@@ -1695,7 +1695,7 @@ Specifies the database for which to generate the SQL. Defaults to \fBdefault\fP\
 .SS \fBsqlsequencereset\fP
 .INDENT 0.0
 .TP
-.B django\-admin sqlsequencereset app_label [app_label ...]
+.B mango\-admin sqlsequencereset app_label [app_label ...]
 .UNINDENT
 .sp
 Prints the SQL statements for resetting sequences for the given app name(s).
@@ -1714,7 +1714,7 @@ Specifies the database for which to print the SQL. Defaults to \fBdefault\fP\&.
 .SS \fBsquashmigrations\fP
 .INDENT 0.0
 .TP
-.B django\-admin squashmigrations app_label [start_migration_name] migration_name
+.B mango\-admin squashmigrations app_label [start_migration_name] migration_name
 .UNINDENT
 .sp
 Squashes the migrations for \fBapp_label\fP up to and including \fBmigration_name\fP
@@ -1722,19 +1722,19 @@ down into fewer migrations, if possible. The resulting squashed migrations
 can live alongside the unsquashed ones safely. For more information,
 please read migration\-squashing\&.
 .sp
-When \fBstart_migration_name\fP is given, Django will only include migrations
+When \fBstart_migration_name\fP is given, Mango will only include migrations
 starting from and including this migration. This helps to mitigate the
 squashing limitation of \fBRunPython\fP and
-\fBdjango.db.migrations.operations.RunSQL\fP migration operations.
+\fBmango.db.migrations.operations.RunSQL\fP migration operations.
 .INDENT 0.0
 .TP
 .B \-\-no\-optimize
 .UNINDENT
 .sp
-Disables the optimizer when generating a squashed migration. By default, Django
+Disables the optimizer when generating a squashed migration. By default, Mango
 will try to optimize the operations in your migrations to reduce the size of
 the resulting file. Use this option if this process is failing or creating
-incorrect migrations, though please also file a Django bug report about the
+incorrect migrations, though please also file a Mango bug report about the
 behavior, as optimization is meant to be safe.
 .INDENT 0.0
 .TP
@@ -1754,21 +1754,21 @@ first and last migration, with \fB_squashed_\fP in between.
 .B \-\-no\-header
 .UNINDENT
 .sp
-Generate squashed migration file without Django version and timestamp header.
+Generate squashed migration file without Mango version and timestamp header.
 .SS \fBstartapp\fP
 .INDENT 0.0
 .TP
-.B django\-admin startapp name [directory]
+.B mango\-admin startapp name [directory]
 .UNINDENT
 .sp
-Creates a Django app directory structure for the given app name in the current
+Creates a Mango app directory structure for the given app name in the current
 directory or the given destination.
 .sp
 By default, \fI\%the new directory\fP contains a
 \fBmodels.py\fP file and other app template files. If only the app name is given,
 the app directory will be created in the current working directory.
 .sp
-If the optional destination is provided, Django will use that existing
+If the optional destination is provided, Mango will use that existing
 directory rather than creating a new one. You can use \(aq.\(aq to denote the current
 working directory.
 .sp
@@ -1778,7 +1778,7 @@ For example:
 .sp
 .nf
 .ft C
-django\-admin startapp myapp /Users/jezdez/Code/myapp
+mango\-admin startapp myapp /Users/jezdez/Code/myapp
 .ft P
 .fi
 .UNINDENT
@@ -1800,13 +1800,13 @@ creating the \fBmyapp\fP app:
 .sp
 .nf
 .ft C
-django\-admin startapp \-\-template=/Users/jezdez/Code/my_app_template myapp
+mango\-admin startapp \-\-template=/Users/jezdez/Code/my_app_template myapp
 .ft P
 .fi
 .UNINDENT
 .UNINDENT
 .sp
-Django will also accept URLs (\fBhttp\fP, \fBhttps\fP, \fBftp\fP) to compressed
+Mango will also accept URLs (\fBhttp\fP, \fBhttps\fP, \fBftp\fP) to compressed
 archives with the app template files, downloading and extracting them on the
 fly.
 .sp
@@ -1817,7 +1817,7 @@ zip files, you can use a URL like:
 .sp
 .nf
 .ft C
-django\-admin startapp \-\-template=https://github.com/githubuser/django\-app\-template/archive/master.zip myapp
+mango\-admin startapp \-\-template=https://github.com/githubuser/mango\-app\-template/archive/master.zip myapp
 .ft P
 .fi
 .UNINDENT
@@ -1853,14 +1853,14 @@ options)
 .IP \(bu 2
 \fBdocs_version\fP \-\- the version of the documentation: \fB\(aqdev\(aq\fP or \fB\(aq1.x\(aq\fP
 .IP \(bu 2
-\fBdjango_version\fP \-\- the version of Django, e.g. \fB\(aq2.0.3\(aq\fP
+\fBmango_version\fP \-\- the version of Mango, e.g. \fB\(aq2.0.3\(aq\fP
 .UNINDENT
 .sp
 \fBWARNING:\fP
 .INDENT 0.0
 .INDENT 3.5
-When the app template files are rendered with the Django template
-engine (by default all \fB*.py\fP files), Django will also replace all
+When the app template files are rendered with the Mango template
+engine (by default all \fB*.py\fP files), Mango will also replace all
 stray template variables contained. For example, if one of the Python files
 contains a docstring explaining a particular feature related
 to template rendering, it might result in an incorrect example.
@@ -1868,7 +1868,7 @@ to template rendering, it might result in an incorrect example.
 To work around this problem, you can use the \fBtemplatetag\fP
 template tag to "escape" the various parts of the template syntax.
 .sp
-In addition, to allow Python template files that contain Django template
+In addition, to allow Python template files that contain Mango template
 language syntax while also preventing packaging systems from trying to
 byte\-compile invalid \fB*.py\fP files, template files ending with \fB\&.py\-tpl\fP
 will be renamed to \fB\&.py\fP\&.
@@ -1877,10 +1877,10 @@ will be renamed to \fB\&.py\fP\&.
 .SS \fBstartproject\fP
 .INDENT 0.0
 .TP
-.B django\-admin startproject name [directory]
+.B mango\-admin startproject name [directory]
 .UNINDENT
 .sp
-Creates a Django project directory structure for the given project name in
+Creates a Mango project directory structure for the given project name in
 the current directory or the given destination.
 .sp
 By default, \fI\%the new directory\fP contains
@@ -1891,7 +1891,7 @@ If only the project name is given, both the project directory and project
 package will be named \fB<projectname>\fP and the project directory
 will be created in the current working directory.
 .sp
-If the optional destination is provided, Django will use that existing
+If the optional destination is provided, Mango will use that existing
 directory as the project directory, and create \fBmanage.py\fP and the project
 package within it. Use \(aq.\(aq to denote the current working directory.
 .sp
@@ -1901,7 +1901,7 @@ For example:
 .sp
 .nf
 .ft C
-django\-admin startproject myproject /Users/jezdez/Code/myproject_repo
+mango\-admin startproject myproject /Users/jezdez/Code/myproject_repo
 .ft P
 .fi
 .UNINDENT
@@ -1943,7 +1943,7 @@ supported options)
 .IP \(bu 2
 \fBdocs_version\fP \-\- the version of the documentation: \fB\(aqdev\(aq\fP or \fB\(aq1.x\(aq\fP
 .IP \(bu 2
-\fBdjango_version\fP \-\- the version of Django, e.g. \fB\(aq2.0.3\(aq\fP
+\fBmango_version\fP \-\- the version of Mango, e.g. \fB\(aq2.0.3\(aq\fP
 .UNINDENT
 .sp
 Please also see the \fI\%rendering warning\fP as mentioned
@@ -1951,7 +1951,7 @@ for \fI\%startapp\fP\&.
 .SS \fBtest\fP
 .INDENT 0.0
 .TP
-.B django\-admin test [test_label [test_label ...]]
+.B mango\-admin test [test_label [test_label ...]]
 .UNINDENT
 .sp
 Runs tests for all installed apps. See /topics/testing/index for more
@@ -2032,8 +2032,8 @@ By default \fB\-\-parallel\fP runs one process per core according to
 either by providing it as the option\(aqs value, e.g. \fB\-\-parallel=4\fP, or by
 setting the \fI\%DJANGO_TEST_PROCESSES\fP environment variable.
 .sp
-Django distributes test cases — \fI\%unittest.TestCase\fP subclasses — to
-subprocesses. If there are fewer test cases than configured processes, Django
+Mango distributes test cases — \fI\%unittest.TestCase\fP subclasses — to
+subprocesses. If there are fewer test cases than configured processes, Mango
 will reduce the number of processes accordingly.
 .sp
 Each process gets its own database. You must ensure that different test cases
@@ -2072,7 +2072,7 @@ don\(aqt.
 \fBWARNING:\fP
 .INDENT 0.0
 .INDENT 3.5
-When test parallelization is enabled and a test fails, Django may be
+When test parallelization is enabled and a test fails, Mango may be
 unable to display the exception traceback. This can make debugging
 difficult. If you encounter this problem, run the affected test without
 parallelization to see the traceback of the failure.
@@ -2133,7 +2133,7 @@ as \fI\%unittest\(aqs \-\-buffer option\fP\&.
 .sp
 
 .sp
-Django automatically calls \fI\%faulthandler.enable()\fP when starting the
+Mango automatically calls \fI\%faulthandler.enable()\fP when starting the
 tests, which allows it to print a traceback if the interpreter crashes. Pass
 \fB\-\-no\-faulthandler\fP to disable this behavior.
 .INDENT 0.0
@@ -2147,10 +2147,10 @@ Outputs timings, including database setup and total run time.
 .SS \fBtestserver\fP
 .INDENT 0.0
 .TP
-.B django\-admin testserver [fixture [fixture ...]]
+.B mango\-admin testserver [fixture [fixture ...]]
 .UNINDENT
 .sp
-Runs a Django development server (as in \fI\%runserver\fP) using data from
+Runs a Mango development server (as in \fI\%runserver\fP) using data from
 the given fixture(s).
 .sp
 For example, this command:
@@ -2159,7 +2159,7 @@ For example, this command:
 .sp
 .nf
 .ft C
-django\-admin testserver mydata.json
+mango\-admin testserver mydata.json
 .ft P
 .fi
 .UNINDENT
@@ -2173,7 +2173,7 @@ Create a test database, as described in the\-test\-database\&.
 Populate the test database with fixture data from the given fixtures.
 (For more on fixtures, see the documentation for \fI\%loaddata\fP above.)
 .IP 3. 3
-Runs the Django development server (as in \fI\%runserver\fP), pointed at
+Runs the Mango development server (as in \fI\%runserver\fP), pointed at
 this newly created test database instead of your production database.
 .UNINDENT
 .sp
@@ -2184,7 +2184,7 @@ When you\(aqre writing unit tests of how your views
 act with certain fixture data, you can use \fBtestserver\fP to interact with
 the views in a Web browser, manually.
 .IP \(bu 2
-Let\(aqs say you\(aqre developing your Django application and have a "pristine"
+Let\(aqs say you\(aqre developing your Mango application and have a "pristine"
 copy of a database that you\(aqd like to interact with. You can dump your
 database to a fixture (using the \fI\%dumpdata\fP command, explained
 above), then use \fBtestserver\fP to run your Web application with that data.
@@ -2213,8 +2213,8 @@ To run the test server on port 7000 with \fBfixture1\fP and \fBfixture2\fP:
 .sp
 .nf
 .ft C
-django\-admin testserver \-\-addrport 7000 fixture1 fixture2
-django\-admin testserver fixture1 fixture2 \-\-addrport 7000
+mango\-admin testserver \-\-addrport 7000 fixture1 fixture2
+mango\-admin testserver fixture1 fixture2 \-\-addrport 7000
 .ft P
 .fi
 .UNINDENT
@@ -2230,7 +2230,7 @@ To run on 1.2.3.4:7000 with a \fBtest\fP fixture:
 .sp
 .nf
 .ft C
-django\-admin testserver \-\-addrport 1.2.3.4:7000 test
+mango\-admin testserver \-\-addrport 1.2.3.4:7000 test
 .ft P
 .fi
 .UNINDENT
@@ -2244,18 +2244,18 @@ Suppresses all user prompts. A typical prompt is a warning about deleting an
 existing test database.
 .SH COMMANDS PROVIDED BY APPLICATIONS
 .sp
-Some commands are only available when the \fBdjango.contrib\fP application that
+Some commands are only available when the \fBmango.contrib\fP application that
 implements them has been
 \fBenabled\fP\&. This section describes them grouped by
 their application.
-.SS \fBdjango.contrib.auth\fP
+.SS \fBmango.contrib.auth\fP
 .SS \fBchangepassword\fP
 .INDENT 0.0
 .TP
-.B django\-admin changepassword [<username>]
+.B mango\-admin changepassword [<username>]
 .UNINDENT
 .sp
-This command is only available if Django\(aqs authentication system (\fBdjango.contrib.auth\fP) is installed.
+This command is only available if Mango\(aqs authentication system (\fBmango.contrib.auth\fP) is installed.
 .sp
 Allows changing a user\(aqs password. It prompts you to enter a new password twice
 for the given user. If the entries are identical, this immediately becomes the
@@ -2274,7 +2274,7 @@ Example usage:
 .sp
 .nf
 .ft C
-django\-admin changepassword ringo
+mango\-admin changepassword ringo
 .ft P
 .fi
 .UNINDENT
@@ -2282,14 +2282,14 @@ django\-admin changepassword ringo
 .SS \fBcreatesuperuser\fP
 .INDENT 0.0
 .TP
-.B django\-admin createsuperuser
+.B mango\-admin createsuperuser
 .UNINDENT
 .INDENT 0.0
 .TP
 .B DJANGO_SUPERUSER_PASSWORD
 .UNINDENT
 .sp
-This command is only available if Django\(aqs authentication system (\fBdjango.contrib.auth\fP) is installed.
+This command is only available if Mango\(aqs authentication system (\fBmango.contrib.auth\fP) is installed.
 .sp
 Creates a superuser account (a user who has all permissions). This is
 useful if you need to create an initial superuser account or if you need to
@@ -2342,14 +2342,14 @@ it could be useful if you have a \fBForeignKey\fP in
 \fBREQUIRED_FIELDS\fP and want to
 allow creating an instance instead of entering the primary key of an existing
 instance.
-.SS \fBdjango.contrib.contenttypes\fP
+.SS \fBmango.contrib.contenttypes\fP
 .SS \fBremove_stale_contenttypes\fP
 .INDENT 0.0
 .TP
-.B django\-admin remove_stale_contenttypes
+.B mango\-admin remove_stale_contenttypes
 .UNINDENT
 .sp
-This command is only available if Django\(aqs contenttypes app (\fBdjango.contrib.contenttypes\fP) is installed.
+This command is only available if Mango\(aqs contenttypes app (\fBmango.contrib.contenttypes\fP) is installed.
 .sp
 Deletes stale content types (from deleted models) in your database. Any objects
 that depend on the deleted content types will also be deleted. A list of
@@ -2370,39 +2370,39 @@ Specifies the database to use. Defaults to \fBdefault\fP\&.
 .sp
 Deletes stale content types including ones from previously installed apps that
 have been removed from \fBINSTALLED_APPS\fP\&. Defaults to \fBFalse\fP\&.
-.SS \fBdjango.contrib.gis\fP
+.SS \fBmango.contrib.gis\fP
 .SS \fBogrinspect\fP
 .sp
-This command is only available if GeoDjango
-(\fBdjango.contrib.gis\fP) is installed.
+This command is only available if GeoMango
+(\fBmango.contrib.gis\fP) is installed.
 .sp
-Please refer to its \fBdescription\fP in the GeoDjango
+Please refer to its \fBdescription\fP in the GeoMango
 documentation.
-.SS \fBdjango.contrib.sessions\fP
+.SS \fBmango.contrib.sessions\fP
 .SS \fBclearsessions\fP
 .INDENT 0.0
 .TP
-.B django\-admin clearsessions
+.B mango\-admin clearsessions
 .UNINDENT
 .sp
 Can be run as a cron job or directly to clean out expired sessions.
-.SS \fBdjango.contrib.sitemaps\fP
+.SS \fBmango.contrib.sitemaps\fP
 .SS \fBping_google\fP
 .sp
-This command is only available if the Sitemaps framework (\fBdjango.contrib.sitemaps\fP) is installed.
+This command is only available if the Sitemaps framework (\fBmango.contrib.sitemaps\fP) is installed.
 .sp
 Please refer to its \fBdescription\fP in the Sitemaps
 documentation.
-.SS \fBdjango.contrib.staticfiles\fP
+.SS \fBmango.contrib.staticfiles\fP
 .SS \fBcollectstatic\fP
 .sp
-This command is only available if the static files application (\fBdjango.contrib.staticfiles\fP) is installed.
+This command is only available if the static files application (\fBmango.contrib.staticfiles\fP) is installed.
 .sp
 Please refer to its \fBdescription\fP in the
 staticfiles documentation.
 .SS \fBfindstatic\fP
 .sp
-This command is only available if the static files application (\fBdjango.contrib.staticfiles\fP) is installed.
+This command is only available if the static files application (\fBmango.contrib.staticfiles\fP) is installed.
 .sp
 Please refer to its \fBdescription\fP in the staticfiles documentation.
 .SH DEFAULT OPTIONS
@@ -2415,7 +2415,7 @@ allows for the following options:
 .UNINDENT
 .sp
 Adds the given filesystem path to the Python \fI\%import search path\fP\&. If this
-isn\(aqt provided, \fBdjango\-admin\fP will use the \fI\%PYTHONPATH\fP environment
+isn\(aqt provided, \fBmango\-admin\fP will use the \fI\%PYTHONPATH\fP environment
 variable.
 .sp
 This option is unnecessary in \fBmanage.py\fP, because it takes care of setting
@@ -2427,7 +2427,7 @@ Example usage:
 .sp
 .nf
 .ft C
-django\-admin migrate \-\-pythonpath=\(aq/home/djangoprojects/myproject\(aq
+mango\-admin migrate \-\-pythonpath=\(aq/home/mangoprojects/myproject\(aq
 .ft P
 .fi
 .UNINDENT
@@ -2439,7 +2439,7 @@ django\-admin migrate \-\-pythonpath=\(aq/home/djangoprojects/myproject\(aq
 .sp
 Specifies the settings module to use. The settings module should be in Python
 package syntax, e.g. \fBmysite.settings\fP\&. If this isn\(aqt provided,
-\fBdjango\-admin\fP will use the \fBDJANGO_SETTINGS_MODULE\fP environment
+\fBmango\-admin\fP will use the \fBDJANGO_SETTINGS_MODULE\fP environment
 variable.
 .sp
 This option is unnecessary in \fBmanage.py\fP, because it uses
@@ -2451,7 +2451,7 @@ Example usage:
 .sp
 .nf
 .ft C
-django\-admin migrate \-\-settings=mysite.settings
+mango\-admin migrate \-\-settings=mysite.settings
 .ft P
 .fi
 .UNINDENT
@@ -2462,7 +2462,7 @@ django\-admin migrate \-\-settings=mysite.settings
 .UNINDENT
 .sp
 Displays a full stack trace when a \fBCommandError\fP
-is raised. By default, \fBdjango\-admin\fP will show an error message when a
+is raised. By default, \fBmango\-admin\fP will show an error message when a
 \fBCommandError\fP occurs and a full stack trace for any other exception.
 .sp
 Example usage:
@@ -2471,7 +2471,7 @@ Example usage:
 .sp
 .nf
 .ft C
-django\-admin migrate \-\-traceback
+mango\-admin migrate \-\-traceback
 .ft P
 .fi
 .UNINDENT
@@ -2500,7 +2500,7 @@ Example usage:
 .sp
 .nf
 .ft C
-django\-admin migrate \-\-verbosity 2
+mango\-admin migrate \-\-verbosity 2
 .ft P
 .fi
 .UNINDENT
@@ -2520,7 +2520,7 @@ Example usage:
 .sp
 .nf
 .ft C
-django\-admin runserver \-\-no\-color
+mango\-admin runserver \-\-no\-color
 .ft P
 .fi
 .UNINDENT
@@ -2549,7 +2549,7 @@ Example usage:
 .sp
 .nf
 .ft C
-django\-admin migrate \-\-skip\-checks
+mango\-admin migrate \-\-skip\-checks
 .ft P
 .fi
 .UNINDENT
@@ -2561,7 +2561,7 @@ django\-admin migrate \-\-skip\-checks
 .B DJANGO_COLORS
 .UNINDENT
 .sp
-The \fBdjango\-admin\fP / \fBmanage.py\fP commands will use pretty
+The \fBmango\-admin\fP / \fBmanage.py\fP commands will use pretty
 color\-coded output if your terminal supports ANSI\-colored output. It
 won\(aqt use the color codes if you\(aqre piping the command\(aqs output to
 another program unless the \fI\%\-\-force\-color\fP option is used.
@@ -2577,7 +2577,7 @@ two third\-party libraries are needed:
 .INDENT 0.0
 .IP \(bu 2
 Install \fI\%colorama\fP, a Python package that translates ANSI color codes into
-Windows API calls. Django commands will detect its presence and will make use
+Windows API calls. Mango commands will detect its presence and will make use
 of its services to color output just like on Unix\-based platforms.
 \fBcolorama\fP can be installed via pip:
 .INDENT 2.0
@@ -2592,12 +2592,12 @@ of its services to color output just like on Unix\-based platforms.
 .UNINDENT
 .IP \(bu 2
 Install \fI\%ANSICON\fP, a third\-party tool that allows \fBcmd.exe\fP to process
-ANSI color codes. Django commands will detect its presence and will make use
+ANSI color codes. Mango commands will detect its presence and will make use
 of its services to color output just like on Unix\-based platforms.
 .UNINDENT
 .sp
 Other modern terminal environments on Windows, that support terminal colors,
-but which are not automatically detected as supported by Django, may "fake" the
+but which are not automatically detected as supported by Mango, may "fake" the
 installation of \fBANSICON\fP by setting the appropriate environmental variable,
 \fBANSICON="on"\fP\&.
 .sp
@@ -2605,7 +2605,7 @@ Updated support for syntax coloring on Windows.
 
 .SS Custom colors
 .sp
-The colors used for syntax highlighting can be customized. Django
+The colors used for syntax highlighting can be customized. Mango
 ships with three color palettes:
 .INDENT 0.0
 .IP \(bu 2
@@ -2633,7 +2633,7 @@ export DJANGO_COLORS="light"
 .UNINDENT
 .UNINDENT
 .sp
-You can also customize the colors that are used. Django specifies a
+You can also customize the colors that are used. Mango specifies a
 number of roles in which color is used:
 .INDENT 0.0
 .IP \(bu 2
@@ -2758,13 +2758,13 @@ would specify the use of all the colors in the light color palette,
 overridden as specified.
 .SS Bash completion
 .sp
-If you use the Bash shell, consider installing the Django bash completion
-script, which lives in \fBextras/django_bash_completion\fP in the Django source
-distribution. It enables tab\-completion of \fBdjango\-admin\fP and
+If you use the Bash shell, consider installing the Mango bash completion
+script, which lives in \fBextras/mango_bash_completion\fP in the Mango source
+distribution. It enables tab\-completion of \fBmango\-admin\fP and
 \fBmanage.py\fP commands, so you can, for instance...
 .INDENT 0.0
 .IP \(bu 2
-Type \fBdjango\-admin\fP\&.
+Type \fBmango\-admin\fP\&.
 .IP \(bu 2
 Press [TAB] to see all available options.
 .IP \(bu 2
@@ -2775,7 +2775,7 @@ with \fBsql\fP\&.
 See /howto/custom\-management\-commands for how to add customized actions.
 .INDENT 0.0
 .TP
-.B django.core.management.call_command(name, *args, **options)
+.B mango.core.management.call_command(name, *args, **options)
 .UNINDENT
 .sp
 To call a management command from code use \fBcall_command\fP\&.
@@ -2803,8 +2803,8 @@ Examples:
 .sp
 .nf
 .ft C
-from django.core import management
-from django.core.management.commands import loaddata
+from mango.core import management
+from mango.core.management.commands import loaddata
 
 management.call_command(\(aqflush\(aq, verbosity=0, interactive=False)
 management.call_command(\(aqloaddata\(aq, \(aqtest_data\(aq, verbosity=0)
@@ -2838,7 +2838,7 @@ management.call_command(\(aqdumpdata\(aq, use_natural_foreign_keys=True)
 .UNINDENT
 .sp
 Some command options have different names when using \fBcall_command()\fP instead
-of \fBdjango\-admin\fP or \fBmanage.py\fP\&. For example, \fBdjango\-admin
+of \fBmango\-admin\fP or \fBmanage.py\fP\&. For example, \fBmango\-admin
 createsuperuser \-\-no\-input\fP translates to \fBcall_command(\(aqcreatesuperuser\(aq,
 interactive=False)\fP\&. To find what keyword argument name to use for
 \fBcall_command()\fP, check the command\(aqs source code for the \fBdest\fP argument
@@ -2874,8 +2874,8 @@ with open(\(aq/path/to/command_output\(aq, \(aqw\(aq) as f:
 .UNINDENT
 .UNINDENT
 .SH AUTHOR
-Django Software Foundation
+Mango Software Foundation
 .SH COPYRIGHT
-Django Software Foundation and contributors
+Mango Software Foundation and contributors
 .\" Generated by docutils manpage writer.
 .

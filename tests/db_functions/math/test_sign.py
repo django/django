@@ -1,9 +1,9 @@
 from decimal import Decimal
 
-from django.db.models import DecimalField
-from django.db.models.functions import Sign
-from django.test import TestCase
-from django.test.utils import register_lookup
+from mango.db.models import DecimalField
+from mango.db.models.functions import Sign
+from mango.test import TestCase
+from mango.test.utils import register_lookup
 
 from ..models import DecimalModel, FloatModel, IntegerModel
 

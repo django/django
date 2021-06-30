@@ -3,32 +3,32 @@ import threading
 
 from asgiref.sync import async_to_sync
 
-from django.contrib.admindocs.middleware import XViewMiddleware
-from django.contrib.auth.middleware import (
+from mango.contrib.admindocs.middleware import XViewMiddleware
+from mango.contrib.auth.middleware import (
     AuthenticationMiddleware, RemoteUserMiddleware,
 )
-from django.contrib.flatpages.middleware import FlatpageFallbackMiddleware
-from django.contrib.messages.middleware import MessageMiddleware
-from django.contrib.redirects.middleware import RedirectFallbackMiddleware
-from django.contrib.sessions.middleware import SessionMiddleware
-from django.contrib.sites.middleware import CurrentSiteMiddleware
-from django.db import connection
-from django.http.request import HttpRequest
-from django.http.response import HttpResponse
-from django.middleware.cache import (
+from mango.contrib.flatpages.middleware import FlatpageFallbackMiddleware
+from mango.contrib.messages.middleware import MessageMiddleware
+from mango.contrib.redirects.middleware import RedirectFallbackMiddleware
+from mango.contrib.sessions.middleware import SessionMiddleware
+from mango.contrib.sites.middleware import CurrentSiteMiddleware
+from mango.db import connection
+from mango.http.request import HttpRequest
+from mango.http.response import HttpResponse
+from mango.middleware.cache import (
     CacheMiddleware, FetchFromCacheMiddleware, UpdateCacheMiddleware,
 )
-from django.middleware.clickjacking import XFrameOptionsMiddleware
-from django.middleware.common import (
+from mango.middleware.clickjacking import XFrameOptionsMiddleware
+from mango.middleware.common import (
     BrokenLinkEmailsMiddleware, CommonMiddleware,
 )
-from django.middleware.csrf import CsrfViewMiddleware
-from django.middleware.gzip import GZipMiddleware
-from django.middleware.http import ConditionalGetMiddleware
-from django.middleware.locale import LocaleMiddleware
-from django.middleware.security import SecurityMiddleware
-from django.test import SimpleTestCase
-from django.utils.deprecation import MiddlewareMixin
+from mango.middleware.csrf import CsrfViewMiddleware
+from mango.middleware.gzip import GZipMiddleware
+from mango.middleware.http import ConditionalGetMiddleware
+from mango.middleware.locale import LocaleMiddleware
+from mango.middleware.security import SecurityMiddleware
+from mango.test import SimpleTestCase
+from mango.utils.deprecation import MiddlewareMixin
 
 
 class MiddlewareMixinTests(SimpleTestCase):

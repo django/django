@@ -2,15 +2,15 @@
 ******** Models for test_data.py ***********
 The following classes are for testing basic data marshalling, including
 NULL values, where allowed.
-The basic idea is to have a model for each Django data type.
+The basic idea is to have a model for each Mango data type.
 """
 import uuid
 
-from django.contrib.contenttypes.fields import (
+from mango.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
+from mango.contrib.contenttypes.models import ContentType
+from mango.db import models
 
 from .base import BaseModel
 

@@ -1,7 +1,7 @@
 from decimal import Decimal
 
-from django.db.models.functions import Power
-from django.test import TestCase
+from mango.db.models.functions import Power
+from mango.test import TestCase
 
 from ..models import DecimalModel, FloatModel, IntegerModel
 

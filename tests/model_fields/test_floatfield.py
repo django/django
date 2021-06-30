@@ -1,5 +1,5 @@
-from django.db import transaction
-from django.test import TestCase
+from mango.db import transaction
+from mango.test import TestCase
 
 from .models import FloatModel
 

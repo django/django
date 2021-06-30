@@ -1,7 +1,7 @@
-from django.core import checks
-from django.db import models
-from django.test import SimpleTestCase
-from django.test.utils import isolate_apps
+from mango.core import checks
+from mango.db import models
+from mango.test import SimpleTestCase
+from mango.test.utils import isolate_apps
 
 
 @isolate_apps('check_framework')

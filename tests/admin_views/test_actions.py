@@ -1,13 +1,13 @@
 import json
 
-from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
-from django.contrib.admin.views.main import IS_POPUP_VAR
-from django.contrib.auth.models import Permission, User
-from django.core import mail
-from django.template.loader import render_to_string
-from django.template.response import TemplateResponse
-from django.test import TestCase, override_settings
-from django.urls import reverse
+from mango.contrib.admin.helpers import ACTION_CHECKBOX_NAME
+from mango.contrib.admin.views.main import IS_POPUP_VAR
+from mango.contrib.auth.models import Permission, User
+from mango.core import mail
+from mango.template.loader import render_to_string
+from mango.template.response import TemplateResponse
+from mango.test import TestCase, override_settings
+from mango.urls import reverse
 
 from .admin import SubscriberAdmin
 from .forms import MediaActionForm

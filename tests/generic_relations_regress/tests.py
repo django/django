@@ -1,7 +1,7 @@
-from django.db import IntegrityError
-from django.db.models import ProtectedError, Q, Sum
-from django.forms.models import modelform_factory
-from django.test import TestCase, skipIfDBFeature
+from mango.db import IntegrityError
+from mango.db.models import ProtectedError, Q, Sum
+from mango.forms.models import modelform_factory
+from mango.test import TestCase, skipIfDBFeature
 
 from .models import (
     A, Address, B, Board, C, Cafe, CharLink, Company, Contact, Content, D,

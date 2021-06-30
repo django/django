@@ -6,10 +6,10 @@ from contextlib import contextmanager
 from importlib import import_module
 from unittest import TestSuite, TextTestRunner, defaultTestLoader, mock
 
-from django.db import connections
-from django.test import SimpleTestCase
-from django.test.runner import DiscoverRunner
-from django.test.utils import (
+from mango.db import connections
+from mango.test import SimpleTestCase
+from mango.test.runner import DiscoverRunner
+from mango.test.utils import (
     NullTimeKeeper, TimeKeeper, captured_stderr, captured_stdout,
 )
 
@@ -82,16 +82,16 @@ class DiscoverRunnerTests(SimpleTestCase):
 
         self.assertEqual(count, 1)
 
-    def test_dotted_test_class_django_testcase(self):
+    def test_dotted_test_class_mango_testcase(self):
         count = DiscoverRunner(verbosity=0).build_suite(
-            ['test_runner_apps.sample.tests_sample.TestDjangoTestCase'],
+            ['test_runner_apps.sample.tests_sample.TestMangoTestCase'],
         ).countTestCases()
 
         self.assertEqual(count, 1)
 
-    def test_dotted_test_method_django_testcase(self):
+    def test_dotted_test_method_mango_testcase(self):
         count = DiscoverRunner(verbosity=0).build_suite(
-            ['test_runner_apps.sample.tests_sample.TestDjangoTestCase.test_sample'],
+            ['test_runner_apps.sample.tests_sample.TestMangoTestCase.test_sample'],
         ).countTestCases()
 
         self.assertEqual(count, 1)
@@ -106,12 +106,12 @@ class DiscoverRunnerTests(SimpleTestCase):
 
     def test_name_patterns(self):
         all_test_1 = [
-            'DjangoCase1.test_1', 'DjangoCase2.test_1',
+            'MangoCase1.test_1', 'MangoCase2.test_1',
             'SimpleCase1.test_1', 'SimpleCase2.test_1',
             'UnittestCase1.test_1', 'UnittestCase2.test_1',
         ]
         all_test_2 = [
-            'DjangoCase1.test_2', 'DjangoCase2.test_2',
+            'MangoCase1.test_2', 'MangoCase2.test_2',
             'SimpleCase1.test_2', 'SimpleCase2.test_2',
             'UnittestCase1.test_2', 'UnittestCase2.test_2',
         ]
@@ -207,8 +207,8 @@ class DiscoverRunnerTests(SimpleTestCase):
             suite = DiscoverRunner(verbosity=0).build_suite(['test_runner_apps/sample/'])
             self.assertEqual(
                 suite._tests[0].__class__.__name__,
-                'TestDjangoTestCase',
-                msg="TestDjangoTestCase should be the first test case")
+                'TestMangoTestCase',
+                msg="TestMangoTestCase should be the first test case")
             self.assertEqual(
                 suite._tests[1].__class__.__name__,
                 'TestZimpleTestCase',
@@ -240,18 +240,18 @@ class DiscoverRunnerTests(SimpleTestCase):
                       msg="Test labels should be reversed.")
         suite = runner.build_suite(test_labels=('test_runner_apps.simple',))
         suite = tuple(suite)
-        self.assertIn('DjangoCase', suite[0].id(),
+        self.assertIn('MangoCase', suite[0].id(),
                       msg="Test groups should not be reversed.")
         self.assertIn('SimpleCase', suite[4].id(),
                       msg="Test groups order should be preserved.")
-        self.assertIn('DjangoCase2', suite[0].id(),
-                      msg="Django test cases should be reversed.")
+        self.assertIn('MangoCase2', suite[0].id(),
+                      msg="Mango test cases should be reversed.")
         self.assertIn('SimpleCase2', suite[4].id(),
                       msg="Simple test cases should be reversed.")
         self.assertIn('UnittestCase2', suite[8].id(),
                       msg="Unittest test cases should be reversed.")
         self.assertIn('test_2', suite[0].id(),
-                      msg="Methods of Django cases should be reversed.")
+                      msg="Methods of Mango cases should be reversed.")
         self.assertIn('test_2', suite[4].id(),
                       msg="Methods of simple cases should be reversed.")
         self.assertIn('test_2', suite[9].id(),
@@ -335,7 +335,7 @@ class DiscoverRunnerTests(SimpleTestCase):
         runner = DiscoverRunner()
         with captured_stdout() as stdout:
             runner.build_suite([
-                'test_runner_apps.sample.tests_sample.TestDjangoTestCase',
+                'test_runner_apps.sample.tests_sample.TestMangoTestCase',
                 'test_runner_apps.simple',
             ])
             self.assertIn('Found 14 test(s).\n', stdout.getvalue())

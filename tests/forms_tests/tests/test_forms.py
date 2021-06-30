@@ -3,10 +3,10 @@ import datetime
 import json
 import uuid
 
-from django.core.exceptions import NON_FIELD_ERRORS
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.validators import MaxValueValidator, RegexValidator
-from django.forms import (
+from mango.core.exceptions import NON_FIELD_ERRORS
+from mango.core.files.uploadedfile import SimpleUploadedFile
+from mango.core.validators import MaxValueValidator, RegexValidator
+from mango.forms import (
     BooleanField, CharField, CheckboxSelectMultiple, ChoiceField, DateField,
     DateTimeField, EmailField, FileField, FileInput, FloatField, Form,
     HiddenInput, ImageField, IntegerField, MultipleChoiceField,
@@ -14,13 +14,13 @@ from django.forms import (
     RadioSelect, Select, SplitDateTimeField, SplitHiddenDateTimeWidget,
     Textarea, TextInput, TimeField, ValidationError, forms,
 )
-from django.forms.renderers import DjangoTemplates, get_default_renderer
-from django.forms.utils import ErrorList
-from django.http import QueryDict
-from django.template import Context, Template
-from django.test import SimpleTestCase
-from django.utils.datastructures import MultiValueDict
-from django.utils.safestring import mark_safe
+from mango.forms.renderers import MangoTemplates, get_default_renderer
+from mango.forms.utils import ErrorList
+from mango.http import QueryDict
+from mango.template import Context, Template
+from mango.test import SimpleTestCase
+from mango.utils.datastructures import MultiValueDict
+from mango.utils.safestring import mark_safe
 
 
 class Person(Form):
@@ -333,7 +333,7 @@ class FormsTestCase(SimpleTestCase):
 
     def test_auto_id(self):
         # "auto_id" tells the Form to add an "id" attribute to each form element.
-        # If it's a string that contains '%s', Django will use that as a format string
+        # If it's a string that contains '%s', Mango will use that as a format string
         # into which the field's name will be inserted. It will also put a <label> around
         # the human-readable labels for a field.
         p = Person(auto_id='%s_id')
@@ -507,7 +507,7 @@ class FormsTestCase(SimpleTestCase):
 <option value="P">Python</option>
 <option value="J">Java</option>
 </select>""")
-        f = FrameworkForm({'name': 'Django', 'language': 'P'}, auto_id=False)
+        f = FrameworkForm({'name': 'Mango', 'language': 'P'}, auto_id=False)
         self.assertHTMLEqual(str(f['language']), """<select name="language">
 <option value="P" selected>Python</option>
 <option value="J">Java</option>
@@ -536,7 +536,7 @@ class FormsTestCase(SimpleTestCase):
 <option value="P">Python</option>
 <option value="J">Java</option>
 </select>""")
-        f = FrameworkForm({'name': 'Django', 'language': 'P'}, auto_id=False)
+        f = FrameworkForm({'name': 'Mango', 'language': 'P'}, auto_id=False)
         self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language">
 <option value="P" selected>Python</option>
 <option value="J">Java</option>
@@ -557,7 +557,7 @@ class FormsTestCase(SimpleTestCase):
 <option value="P">Python</option>
 <option value="J">Java</option>
 </select>""")
-        f = FrameworkForm({'name': 'Django', 'language': 'P'}, auto_id=False)
+        f = FrameworkForm({'name': 'Mango', 'language': 'P'}, auto_id=False)
         self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language">
 <option value="P" selected>Python</option>
 <option value="J">Java</option>
@@ -1633,7 +1633,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#x27;xss&#x27;)&lt
 
     def test_specifying_labels(self):
         # You can specify the label for a field by using the 'label' argument to a Field
-        # class. If you don't specify 'label', Django will use the field name with
+        # class. If you don't specify 'label', Mango will use the field name with
         # underscores converted to spaces, and the initial letter capitalized.
         class UserRegistration(Form):
             username = CharField(max_length=10, label='Your username')
@@ -1690,7 +1690,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#x27;xss&#x27;)&lt
 <input type="password" name="password" id="id_password" required></li>"""
         )
 
-        # If label is None, Django will auto-create the label from the field name. This
+        # If label is None, Mango will auto-create the label from the field name. This
         # is default behavior.
         class UserRegistration(Form):
             username = CharField(max_length=10, label=None)
@@ -1752,14 +1752,14 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#x27;xss&#x27;)&lt
         # empty dictionary). Also, the initial value is *not* used if data for a
         # particular required field isn't provided.
         class UserRegistration(Form):
-            username = CharField(max_length=10, initial='django')
+            username = CharField(max_length=10, initial='mango')
             password = CharField(widget=PasswordInput)
 
         # Here, we're not submitting any data, so the initial value will be displayed.)
         p = UserRegistration(auto_id=False)
         self.assertHTMLEqual(
             p.as_ul(),
-            """<li>Username: <input type="text" name="username" value="django" maxlength="10" required></li>
+            """<li>Username: <input type="text" name="username" value="mango" maxlength="10" required></li>
 <li>Password: <input type="password" name="password" required></li>"""
         )
 
@@ -1806,10 +1806,10 @@ Password: <input type="password" name="password" required></li>"""
             password = CharField(widget=PasswordInput)
 
         # Here, we're not submitting any data, so the initial value will be displayed.)
-        p = UserRegistration(initial={'username': 'django'}, auto_id=False)
+        p = UserRegistration(initial={'username': 'mango'}, auto_id=False)
         self.assertHTMLEqual(
             p.as_ul(),
-            """<li>Username: <input type="text" name="username" value="django" maxlength="10" required></li>
+            """<li>Username: <input type="text" name="username" value="mango" maxlength="10" required></li>
 <li>Password: <input type="password" name="password" required></li>"""
         )
         p = UserRegistration(initial={'username': 'stephane'}, auto_id=False)
@@ -1820,7 +1820,7 @@ Password: <input type="password" name="password" required></li>"""
         )
 
         # The 'initial' parameter is meaningless if you pass data.
-        p = UserRegistration({}, initial={'username': 'django'}, auto_id=False)
+        p = UserRegistration({}, initial={'username': 'mango'}, auto_id=False)
         self.assertHTMLEqual(
             p.as_ul(),
             """<li><ul class="errorlist"><li>This field is required.</li></ul>
@@ -1828,7 +1828,7 @@ Username: <input type="text" name="username" maxlength="10" required></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>
 Password: <input type="password" name="password" required></li>"""
         )
-        p = UserRegistration({'username': ''}, initial={'username': 'django'}, auto_id=False)
+        p = UserRegistration({'username': ''}, initial={'username': 'mango'}, auto_id=False)
         self.assertHTMLEqual(
             p.as_ul(),
             """<li><ul class="errorlist"><li>This field is required.</li></ul>
@@ -1836,7 +1836,7 @@ Username: <input type="text" name="username" maxlength="10" required></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>
 Password: <input type="password" name="password" required></li>"""
         )
-        p = UserRegistration({'username': 'foo'}, initial={'username': 'django'}, auto_id=False)
+        p = UserRegistration({'username': 'foo'}, initial={'username': 'mango'}, auto_id=False)
         self.assertHTMLEqual(
             p.as_ul(), """<li>Username: <input type="text" name="username" value="foo" maxlength="10" required></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>
@@ -1846,14 +1846,14 @@ Password: <input type="password" name="password" required></li>"""
         # A dynamic 'initial' value is *not* used as a fallback if data is not provided.
         # In this example, we don't provide a value for 'username', and the form raises a
         # validation error rather than using the initial value for 'username'.
-        p = UserRegistration({'password': 'secret'}, initial={'username': 'django'})
+        p = UserRegistration({'password': 'secret'}, initial={'username': 'mango'})
         self.assertEqual(p.errors['username'], ['This field is required.'])
         self.assertFalse(p.is_valid())
 
         # If a Form defines 'initial' *and* 'initial' is passed as a parameter to Form(),
         # then the latter will get precedence.
         class UserRegistration(Form):
-            username = CharField(max_length=10, initial='django')
+            username = CharField(max_length=10, initial='mango')
             password = CharField(widget=PasswordInput)
 
         p = UserRegistration(initial={'username': 'babik'}, auto_id=False)
@@ -1872,8 +1872,8 @@ Password: <input type="password" name="password" required></li>"""
             options = MultipleChoiceField(choices=[('f', 'foo'), ('b', 'bar'), ('w', 'whiz')])
 
         # We need to define functions that get called later.)
-        def initial_django():
-            return 'django'
+        def initial_mango():
+            return 'mango'
 
         def initial_stephane():
             return 'stephane'
@@ -1885,10 +1885,10 @@ Password: <input type="password" name="password" required></li>"""
             return ['b', 'w']
 
         # Here, we're not submitting any data, so the initial value will be displayed.)
-        p = UserRegistration(initial={'username': initial_django, 'options': initial_options}, auto_id=False)
+        p = UserRegistration(initial={'username': initial_mango, 'options': initial_options}, auto_id=False)
         self.assertHTMLEqual(
             p.as_ul(),
-            """<li>Username: <input type="text" name="username" value="django" maxlength="10" required></li>
+            """<li>Username: <input type="text" name="username" value="mango" maxlength="10" required></li>
 <li>Password: <input type="password" name="password" required></li>
 <li>Options: <select multiple name="options" required>
 <option value="f" selected>foo</option>
@@ -1898,7 +1898,7 @@ Password: <input type="password" name="password" required></li>"""
         )
 
         # The 'initial' parameter is meaningless if you pass data.
-        p = UserRegistration({}, initial={'username': initial_django, 'options': initial_options}, auto_id=False)
+        p = UserRegistration({}, initial={'username': initial_mango, 'options': initial_options}, auto_id=False)
         self.assertHTMLEqual(
             p.as_ul(),
             """<li><ul class="errorlist"><li>This field is required.</li></ul>
@@ -1912,7 +1912,7 @@ Options: <select multiple name="options" required>
 <option value="w">whiz</option>
 </select></li>"""
         )
-        p = UserRegistration({'username': ''}, initial={'username': initial_django}, auto_id=False)
+        p = UserRegistration({'username': ''}, initial={'username': initial_mango}, auto_id=False)
         self.assertHTMLEqual(
             p.as_ul(),
             """<li><ul class="errorlist"><li>This field is required.</li></ul>
@@ -1927,7 +1927,7 @@ Options: <select multiple name="options" required>
 </select></li>"""
         )
         p = UserRegistration(
-            {'username': 'foo', 'options': ['f', 'b']}, initial={'username': initial_django}, auto_id=False
+            {'username': 'foo', 'options': ['f', 'b']}, initial={'username': initial_mango}, auto_id=False
         )
         self.assertHTMLEqual(
             p.as_ul(),
@@ -1944,14 +1944,14 @@ Password: <input type="password" name="password" required></li>
         # A callable 'initial' value is *not* used as a fallback if data is not provided.
         # In this example, we don't provide a value for 'username', and the form raises a
         # validation error rather than using the initial value for 'username'.
-        p = UserRegistration({'password': 'secret'}, initial={'username': initial_django, 'options': initial_options})
+        p = UserRegistration({'password': 'secret'}, initial={'username': initial_mango, 'options': initial_options})
         self.assertEqual(p.errors['username'], ['This field is required.'])
         self.assertFalse(p.is_valid())
 
         # If a Form defines 'initial' *and* 'initial' is passed as a parameter to Form(),
         # then the latter will get precedence.
         class UserRegistration(Form):
-            username = CharField(max_length=10, initial=initial_django)
+            username = CharField(max_length=10, initial=initial_mango)
             password = CharField(widget=PasswordInput)
             options = MultipleChoiceField(
                 choices=[('f', 'foo'), ('b', 'bar'), ('w', 'whiz')],
@@ -1961,7 +1961,7 @@ Password: <input type="password" name="password" required></li>
         p = UserRegistration(auto_id=False)
         self.assertHTMLEqual(
             p.as_ul(),
-            """<li>Username: <input type="text" name="username" value="django" maxlength="10" required></li>
+            """<li>Username: <input type="text" name="username" value="mango" maxlength="10" required></li>
 <li>Password: <input type="password" name="password" required></li>
 <li>Options: <select multiple name="options" required>
 <option value="f">foo</option>
@@ -2028,13 +2028,13 @@ Password: <input type="password" name="password" required></li>
         # the widget for a field by using the BoundField's value method.
 
         class UserRegistration(Form):
-            username = CharField(max_length=10, initial='djangonaut')
+            username = CharField(max_length=10, initial='mangonaut')
             password = CharField(widget=PasswordInput)
 
         unbound = UserRegistration()
         bound = UserRegistration({'password': 'foo'})
         self.assertIsNone(bound['username'].value())
-        self.assertEqual(unbound['username'].value(), 'djangonaut')
+        self.assertEqual(unbound['username'].value(), 'mangonaut')
         self.assertEqual(bound['password'].value(), 'foo')
         self.assertIsNone(unbound['password'].value())
 
@@ -2610,9 +2610,9 @@ Password: <input type="password" name="password" required>
 <input type="submit" required>
 </form>""")
         self.assertHTMLEqual(
-            t.render(Context({'form': UserRegistration({'username': 'django'}, auto_id=False)})),
+            t.render(Context({'form': UserRegistration({'username': 'mango'}, auto_id=False)})),
             """<form>
-<p><label>Your username: <input type="text" name="username" value="django" maxlength="10" required></label></p>
+<p><label>Your username: <input type="text" name="username" value="mango" maxlength="10" required></label></p>
 <ul class="errorlist"><li>This field is required.</li></ul><p>
 <label>Password: <input type="password" name="password1" required></label></p>
 <ul class="errorlist"><li>This field is required.</li></ul>
@@ -2623,7 +2623,7 @@ Password: <input type="password" name="password" required>
 
         # Use form.[field].label to output a field's label. You can specify the label for
         # a field by using the 'label' argument to a Field class. If you don't specify
-        # 'label', Django will use the field name with underscores converted to spaces,
+        # 'label', Mango will use the field name with underscores converted to spaces,
         # and the initial letter capitalized.
         t = Template('''<form>
 <p><label>{{ form.username.label }}: {{ form.username }}</label></p>
@@ -2699,10 +2699,10 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
 </form>''')
         self.assertHTMLEqual(
             t.render(Context({
-                'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)
+                'form': UserRegistration({'username': 'mango', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)
             })),
             """<form>
-<p><label>Your username: <input type="text" name="username" value="django" maxlength="10" required></label></p>
+<p><label>Your username: <input type="text" name="username" value="mango" maxlength="10" required></label></p>
 <p><label>Password: <input type="password" name="password1" required></label></p>
 <p><label>Password (again): <input type="password" name="password2" required></label></p>
 <input type="submit" required>
@@ -2717,11 +2717,11 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
 </form>''')
         self.assertHTMLEqual(
             t.render(Context({
-                'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)
+                'form': UserRegistration({'username': 'mango', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)
             })),
             """<form>
 <ul class="errorlist nonfield"><li>Please make sure your passwords match.</li></ul>
-<p><label>Your username: <input type="text" name="username" value="django" maxlength="10" required></label></p>
+<p><label>Your username: <input type="text" name="username" value="mango" maxlength="10" required></label></p>
 <p><label>Password: <input type="password" name="password1" required></label></p>
 <p><label>Password (again): <input type="password" name="password2" required></label></p>
 <input type="submit" required>
@@ -3749,7 +3749,7 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
         self.assertIsNot(field_copy.error_messages, field.error_messages)
 
 
-class CustomRenderer(DjangoTemplates):
+class CustomRenderer(MangoTemplates):
     pass
 
 
@@ -3771,7 +3771,7 @@ class RendererTests(SimpleTestCase):
 
     def test_attribute_instance(self):
         class CustomForm(Form):
-            default_renderer = DjangoTemplates()
+            default_renderer = MangoTemplates()
 
         form = CustomForm()
         self.assertEqual(form.renderer, CustomForm.default_renderer)
@@ -3785,7 +3785,7 @@ class RendererTests(SimpleTestCase):
 
     def test_attribute_override(self):
         class CustomForm(Form):
-            default_renderer = DjangoTemplates()
+            default_renderer = MangoTemplates()
 
         custom = CustomRenderer()
         form = CustomForm(renderer=custom)

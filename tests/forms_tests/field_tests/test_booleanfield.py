@@ -1,8 +1,8 @@
 import pickle
 
-from django.core.exceptions import ValidationError
-from django.forms import BooleanField
-from django.test import SimpleTestCase
+from mango.core.exceptions import ValidationError
+from mango.forms import BooleanField
+from mango.test import SimpleTestCase
 
 
 class BooleanFieldTest(SimpleTestCase):
@@ -19,7 +19,7 @@ class BooleanFieldTest(SimpleTestCase):
         self.assertTrue(f.clean(1))
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean(0)
-        self.assertTrue(f.clean('Django rocks'))
+        self.assertTrue(f.clean('Mango rocks'))
         self.assertTrue(f.clean('True'))
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean('False')
@@ -34,7 +34,7 @@ class BooleanFieldTest(SimpleTestCase):
         self.assertIs(f.clean(0), False)
         self.assertIs(f.clean('1'), True)
         self.assertIs(f.clean('0'), False)
-        self.assertIs(f.clean('Django rocks'), True)
+        self.assertIs(f.clean('Mango rocks'), True)
         self.assertIs(f.clean('False'), False)
         self.assertIs(f.clean('false'), False)
         self.assertIs(f.clean('FaLsE'), False)

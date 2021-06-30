@@ -1,13 +1,13 @@
-from django.apps import apps
-from django.contrib.contenttypes.fields import (
+from mango.apps import apps
+from mango.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
-from django.core.exceptions import FieldDoesNotExist
-from django.db.models import (
+from mango.core.exceptions import FieldDoesNotExist
+from mango.db.models import (
     CharField, Field, ForeignObjectRel, ManyToManyField,
 )
-from django.db.models.options import EMPTY_RELATION_TREE, IMMUTABLE_WARNING
-from django.test import SimpleTestCase
+from mango.db.models.options import EMPTY_RELATION_TREE, IMMUTABLE_WARNING
+from mango.test import SimpleTestCase
 
 from .models import (
     AbstractPerson, BasePerson, Child, CommonAncestor, FirstParent, Person,

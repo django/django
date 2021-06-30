@@ -1,9 +1,9 @@
-from django.contrib.admin.utils import quote
-from django.contrib.admin.views.main import IS_POPUP_VAR
-from django.contrib.auth.models import User
-from django.template.response import TemplateResponse
-from django.test import TestCase, override_settings
-from django.urls import reverse
+from mango.contrib.admin.utils import quote
+from mango.contrib.admin.views.main import IS_POPUP_VAR
+from mango.contrib.auth.models import User
+from mango.template.response import TemplateResponse
+from mango.test import TestCase, override_settings
+from mango.urls import reverse
 
 from .models import Action, Car, Person
 

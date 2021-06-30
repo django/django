@@ -1,6 +1,6 @@
-from django.db import models
+from mango.db import models
 
-# Since the test database doesn't have tablespaces, it's impossible for Django
+# Since the test database doesn't have tablespaces, it's impossible for Mango
 # to create the tables for models where db_tablespace is set. To avoid this
 # problem, we mark the models as unmanaged, and temporarily revert them to
 # managed during each test. We also set them to use the same tables as the

@@ -1,7 +1,7 @@
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
-from django.template import engines
-from django.template.response import TemplateResponse
+from mango.core.exceptions import PermissionDenied
+from mango.http import HttpResponse
+from mango.template import engines
+from mango.template.response import TemplateResponse
 
 
 def normal_view(request):
@@ -9,7 +9,7 @@ def normal_view(request):
 
 
 def template_response(request):
-    template = engines['django'].from_string('template_response OK{% for m in mw %}\n{{ m }}{% endfor %}')
+    template = engines['mango'].from_string('template_response OK{% for m in mw %}\n{{ m }}{% endfor %}')
     return TemplateResponse(request, template, context={'mw': []})
 
 

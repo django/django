@@ -1,8 +1,8 @@
 import decimal
 
-from django.core.exceptions import ValidationError
-from django.forms import TypedMultipleChoiceField
-from django.test import SimpleTestCase
+from mango.core.exceptions import ValidationError
+from mango.forms import TypedMultipleChoiceField
+from mango.test import SimpleTestCase
 
 
 class TypedMultipleChoiceFieldTest(SimpleTestCase):

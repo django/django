@@ -1,9 +1,9 @@
 import datetime
 
-from django.core import signing
-from django.test import SimpleTestCase
-from django.test.utils import freeze_time
-from django.utils.crypto import InvalidAlgorithm
+from mango.core import signing
+from mango.test import SimpleTestCase
+from mango.test.utils import freeze_time
+from mango.utils.crypto import InvalidAlgorithm
 
 
 class TestSigner(SimpleTestCase):

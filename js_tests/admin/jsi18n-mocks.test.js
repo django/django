@@ -1,23 +1,23 @@
 'use strict';
 {
     const globals = this;
-    const django = globals.django;
+    const mango = globals.mango;
 
-    django.pluralidx = function(count) { return (count === 1) ? 0 : 1; };
+    mango.pluralidx = function(count) { return (count === 1) ? 0 : 1; };
 
     /* gettext identity library */
 
-    django.gettext = function(msgid) { return msgid; };
-    django.ngettext = function(singular, plural, count) {
+    mango.gettext = function(msgid) { return msgid; };
+    mango.ngettext = function(singular, plural, count) {
         return (count === 1) ? singular : plural;
     };
-    django.gettext_noop = function(msgid) { return msgid; };
-    django.pgettext = function(context, msgid) { return msgid; };
-    django.npgettext = function(context, singular, plural, count) {
+    mango.gettext_noop = function(msgid) { return msgid; };
+    mango.pgettext = function(context, msgid) { return msgid; };
+    mango.npgettext = function(context, singular, plural, count) {
         return (count === 1) ? singular : plural;
     };
 
-    django.interpolate = function(fmt, obj, named) {
+    mango.interpolate = function(fmt, obj, named) {
         if (named) {
             return fmt.replace(/%\(\w+\)s/g, function(match) {
                 return String(obj[match.slice(2, -2)]);
@@ -31,7 +31,7 @@
 
     /* formatting library */
 
-    django.formats = {
+    mango.formats = {
         "DATETIME_FORMAT": "N j, Y, P",
         "DATETIME_INPUT_FORMATS": [
             "%Y-%m-%d %H:%M:%S",
@@ -69,8 +69,8 @@
         "YEAR_MONTH_FORMAT": "F Y"
     };
 
-    django.get_format = function(format_type) {
-        const value = django.formats[format_type];
+    mango.get_format = function(format_type) {
+        const value = mango.formats[format_type];
         if (typeof value === 'undefined') {
             return format_type;
         } else {
@@ -79,12 +79,12 @@
     };
 
     /* add to global namespace */
-    globals.pluralidx = django.pluralidx;
-    globals.gettext = django.gettext;
-    globals.ngettext = django.ngettext;
-    globals.gettext_noop = django.gettext_noop;
-    globals.pgettext = django.pgettext;
-    globals.npgettext = django.npgettext;
-    globals.interpolate = django.interpolate;
-    globals.get_format = django.get_format;
+    globals.pluralidx = mango.pluralidx;
+    globals.gettext = mango.gettext;
+    globals.ngettext = mango.ngettext;
+    globals.gettext_noop = mango.gettext_noop;
+    globals.pgettext = mango.pgettext;
+    globals.npgettext = mango.npgettext;
+    globals.interpolate = mango.interpolate;
+    globals.get_format = mango.get_format;
 };

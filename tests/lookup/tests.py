@@ -3,14 +3,14 @@ from datetime import datetime
 from math import ceil
 from operator import attrgetter
 
-from django.core.exceptions import FieldError
-from django.db import connection, models
-from django.db.models import (
+from mango.core.exceptions import FieldError
+from mango.db import connection, models
+from mango.db.models import (
     BooleanField, Exists, ExpressionWrapper, F, Max, OuterRef, Q,
 )
-from django.db.models.functions import Substr
-from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import isolate_apps
+from mango.db.models.functions import Substr
+from mango.test import TestCase, skipUnlessDBFeature
+from mango.test.utils import isolate_apps
 
 from .models import (
     Article, Author, Freebie, Game, IsNullWithNoneAsRHS, Player, Product,
@@ -492,7 +492,7 @@ class LookupTests(TestCase):
 
     def test_escaping(self):
         # Underscores, percent signs and backslashes have special meaning in the
-        # underlying SQL code, but Django handles the quoting of them automatically.
+        # underlying SQL code, but Mango handles the quoting of them automatically.
         a8 = Article.objects.create(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20))
 
         self.assertSequenceEqual(

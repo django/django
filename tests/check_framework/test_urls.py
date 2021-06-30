@@ -1,11 +1,11 @@
-from django.conf import settings
-from django.core.checks.messages import Error, Warning
-from django.core.checks.urls import (
+from mango.conf import settings
+from mango.core.checks.messages import Error, Warning
+from mango.core.checks.urls import (
     E006, check_url_config, check_url_namespaces_unique, check_url_settings,
     get_warning_for_invalid_pattern,
 )
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from mango.test import SimpleTestCase
+from mango.test.utils import override_settings
 
 
 class CheckUrlConfigTests(SimpleTestCase):
@@ -216,14 +216,14 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
     def test_bad_handlers_invalid_path(self):
         result = check_url_config(None)
         paths = [
-            'django.views.bad_handler',
-            'django.invalid_module.bad_handler',
+            'mango.views.bad_handler',
+            'mango.invalid_module.bad_handler',
             'invalid_module.bad_handler',
-            'django',
+            'mango',
         ]
         hints = [
-            "Could not import '{}'. View does not exist in module django.views.",
-            "Could not import '{}'. Parent module django.invalid_module does not exist.",
+            "Could not import '{}'. View does not exist in module mango.views.",
+            "Could not import '{}'. Parent module mango.invalid_module does not exist.",
             "No module named 'invalid_module'",
             "Could not import '{}'. The path must be fully qualified.",
         ]

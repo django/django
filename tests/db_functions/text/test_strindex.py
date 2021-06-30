@@ -1,7 +1,7 @@
-from django.db.models import Value
-from django.db.models.functions import StrIndex
-from django.test import TestCase
-from django.utils import timezone
+from mango.db.models import Value
+from mango.db.models.functions import StrIndex
+from mango.test import TestCase
+from mango.utils import timezone
 
 from ..models import Article, Author
 
@@ -16,8 +16,8 @@ class StrIndexTests(TestCase):
 
     def test_annotate_textfield(self):
         Article.objects.create(
-            title='How to Django',
-            text='This is about How to Django.',
+            title='How to Mango',
+            text='This is about How to Mango.',
             written=timezone.now(),
         )
         Article.objects.create(

@@ -1,7 +1,7 @@
 from urllib.request import urlopen
 
-from django.http import HttpResponse, StreamingHttpResponse
-from django.views.decorators.csrf import csrf_exempt
+from mango.http import HttpResponse, StreamingHttpResponse
+from mango.views.decorators.csrf import csrf_exempt
 
 from .models import Person
 

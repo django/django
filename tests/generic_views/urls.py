@@ -1,8 +1,8 @@
-from django.contrib.auth import views as auth_views
-from django.contrib.auth.decorators import login_required
-from django.urls import path, re_path
-from django.views.decorators.cache import cache_page
-from django.views.generic import TemplateView, dates
+from mango.contrib.auth import views as auth_views
+from mango.contrib.auth.decorators import login_required
+from mango.urls import path, re_path
+from mango.views.decorators.cache import cache_page
+from mango.views.generic import TemplateView, dates
 
 from . import views
 from .models import Book

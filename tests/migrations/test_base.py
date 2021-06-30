@@ -4,14 +4,14 @@ import tempfile
 from contextlib import contextmanager
 from importlib import import_module
 
-from django.apps import apps
-from django.db import connection, connections, migrations, models
-from django.db.migrations.migration import Migration
-from django.db.migrations.recorder import MigrationRecorder
-from django.db.migrations.state import ProjectState
-from django.test import TransactionTestCase
-from django.test.utils import extend_sys_path
-from django.utils.module_loading import module_dir
+from mango.apps import apps
+from mango.db import connection, connections, migrations, models
+from mango.db.migrations.migration import Migration
+from mango.db.migrations.recorder import MigrationRecorder
+from mango.db.migrations.state import ProjectState
+from mango.test import TransactionTestCase
+from mango.test.utils import extend_sys_path
+from mango.utils.module_loading import module_dir
 
 
 class MigrationTestBase(TransactionTestCase):

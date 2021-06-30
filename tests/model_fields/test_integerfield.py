@@ -1,7 +1,7 @@
-from django.core import validators
-from django.core.exceptions import ValidationError
-from django.db import IntegrityError, connection, models
-from django.test import SimpleTestCase, TestCase
+from mango.core import validators
+from mango.core.exceptions import ValidationError
+from mango.db import IntegrityError, connection, models
+from mango.test import SimpleTestCase, TestCase
 
 from .models import (
     BigIntegerModel, IntegerModel, PositiveBigIntegerModel,

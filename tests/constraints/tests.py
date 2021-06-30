@@ -1,12 +1,12 @@
 from unittest import mock
 
-from django.core.exceptions import ValidationError
-from django.db import IntegrityError, connection, models
-from django.db.models import F
-from django.db.models.constraints import BaseConstraint
-from django.db.models.functions import Lower
-from django.db.transaction import atomic
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from mango.core.exceptions import ValidationError
+from mango.db import IntegrityError, connection, models
+from mango.db.models import F
+from mango.db.models.constraints import BaseConstraint
+from mango.db.models.functions import Lower
+from mango.db.transaction import atomic
+from mango.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
 from .models import (
     ChildModel, Product, UniqueConstraintConditionProduct,
@@ -86,7 +86,7 @@ class CheckConstraintTests(TestCase):
         name = 'price_gt_discounted_price'
         constraint = models.CheckConstraint(check=check, name=name)
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, 'django.db.models.CheckConstraint')
+        self.assertEqual(path, 'mango.db.models.CheckConstraint')
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {'check': check, 'name': name})
 
@@ -317,7 +317,7 @@ class UniqueConstraintTests(TestCase):
         name = 'unique_fields'
         constraint = models.UniqueConstraint(fields=fields, name=name)
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, 'django.db.models.UniqueConstraint')
+        self.assertEqual(path, 'mango.db.models.UniqueConstraint')
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {'fields': tuple(fields), 'name': name})
 
@@ -327,7 +327,7 @@ class UniqueConstraintTests(TestCase):
         condition = models.Q(foo=models.F('bar'))
         constraint = models.UniqueConstraint(fields=fields, name=name, condition=condition)
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, 'django.db.models.UniqueConstraint')
+        self.assertEqual(path, 'mango.db.models.UniqueConstraint')
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {'fields': tuple(fields), 'name': name, 'condition': condition})
 
@@ -340,7 +340,7 @@ class UniqueConstraintTests(TestCase):
             deferrable=models.Deferrable.DEFERRED,
         )
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, 'django.db.models.UniqueConstraint')
+        self.assertEqual(path, 'mango.db.models.UniqueConstraint')
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {
             'fields': tuple(fields),
@@ -354,7 +354,7 @@ class UniqueConstraintTests(TestCase):
         include = ['baz_1', 'baz_2']
         constraint = models.UniqueConstraint(fields=fields, name=name, include=include)
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, 'django.db.models.UniqueConstraint')
+        self.assertEqual(path, 'mango.db.models.UniqueConstraint')
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {
             'fields': tuple(fields),
@@ -368,7 +368,7 @@ class UniqueConstraintTests(TestCase):
         opclasses = ['varchar_pattern_ops', 'text_pattern_ops']
         constraint = models.UniqueConstraint(fields=fields, name=name, opclasses=opclasses)
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, 'django.db.models.UniqueConstraint')
+        self.assertEqual(path, 'mango.db.models.UniqueConstraint')
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {
             'fields': tuple(fields),
@@ -380,7 +380,7 @@ class UniqueConstraintTests(TestCase):
         name = 'unique_fields'
         constraint = models.UniqueConstraint(Lower('title'), name=name)
         path, args, kwargs = constraint.deconstruct()
-        self.assertEqual(path, 'django.db.models.UniqueConstraint')
+        self.assertEqual(path, 'mango.db.models.UniqueConstraint')
         self.assertEqual(args, (Lower('title'),))
         self.assertEqual(kwargs, {'name': name})
 
@@ -552,7 +552,7 @@ class UniqueConstraintTests(TestCase):
     def test_expressions_with_opclasses(self):
         msg = (
             'UniqueConstraint.opclasses cannot be used with expressions. Use '
-            'django.contrib.postgres.indexes.OpClass() instead.'
+            'mango.contrib.postgres.indexes.OpClass() instead.'
         )
         with self.assertRaisesMessage(ValueError, msg):
             models.UniqueConstraint(

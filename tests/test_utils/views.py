@@ -1,6 +1,6 @@
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
-from django.template import Context, Template
+from mango.http import HttpResponse
+from mango.shortcuts import get_object_or_404
+from mango.template import Context, Template
 
 from .models import Person
 

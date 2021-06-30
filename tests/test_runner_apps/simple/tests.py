@@ -1,9 +1,9 @@
 from unittest import TestCase
 
-from django.test import SimpleTestCase, TestCase as DjangoTestCase
+from mango.test import SimpleTestCase, TestCase as MangoTestCase
 
 
-class DjangoCase1(DjangoTestCase):
+class MangoCase1(MangoTestCase):
 
     def test_1(self):
         pass
@@ -12,7 +12,7 @@ class DjangoCase1(DjangoTestCase):
         pass
 
 
-class DjangoCase2(DjangoTestCase):
+class MangoCase2(MangoTestCase):
 
     def test_1(self):
         pass

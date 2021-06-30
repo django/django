@@ -3,8 +3,8 @@ import unittest
 from collections import namedtuple
 from contextlib import contextmanager
 
-from django.db import connection, models
-from django.test import TestCase
+from mango.db import connection, models
+from mango.test import TestCase
 
 from ..models import Person
 
@@ -42,7 +42,7 @@ class ServerSideCursorsPostgres(TestCase):
         cursors = self.inspect_cursors()
         self.assertEqual(len(cursors), num_expected)
         for cursor in cursors:
-            self.assertIn('_django_curs_', cursor.name)
+            self.assertIn('_mango_curs_', cursor.name)
             self.assertFalse(cursor.is_scrollable)
             self.assertFalse(cursor.is_holdable)
             self.assertFalse(cursor.is_binary)

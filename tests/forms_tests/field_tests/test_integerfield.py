@@ -1,6 +1,6 @@
-from django.core.exceptions import ValidationError
-from django.forms import IntegerField, Textarea
-from django.test import SimpleTestCase
+from mango.core.exceptions import ValidationError
+from mango.forms import IntegerField, Textarea
+from mango.test import SimpleTestCase
 
 from . import FormFieldAssertionsMixin
 

@@ -1,5 +1,5 @@
-from django.contrib import messages
-from django.test import RequestFactory, SimpleTestCase
+from mango.contrib import messages
+from mango.test import RequestFactory, SimpleTestCase
 
 
 class DummyStorage:
@@ -35,7 +35,7 @@ class ApiTests(SimpleTestCase):
         self.assertEqual(self.storage.store, [])
 
     def test_middleware_missing(self):
-        msg = 'You cannot add messages without installing django.contrib.messages.middleware.MessageMiddleware'
+        msg = 'You cannot add messages without installing mango.contrib.messages.middleware.MessageMiddleware'
         with self.assertRaisesMessage(messages.MessageFailure, msg):
             messages.add_message(self.request, messages.DEBUG, 'some message')
         self.assertEqual(self.storage.store, [])
@@ -59,7 +59,7 @@ class CustomRequest:
 class CustomRequestApiTests(ApiTests):
     """
     add_message() should use ducktyping to allow request wrappers such as the
-    one in Django REST framework.
+    one in Mango REST framework.
     """
     def setUp(self):
         super().setUp()

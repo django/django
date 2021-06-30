@@ -2,7 +2,7 @@
 Clickjacking Protection
 ========================
 
-.. module:: django.middleware.clickjacking
+.. module:: mango.middleware.clickjacking
    :synopsis: Protects against Clickjacking
 
 The clickjacking middleware and decorators provide easy-to-use protection
@@ -37,7 +37,7 @@ loading in a frame no matter which site made the request.
 
 .. _X-Frame-Options: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
 
-Django provides a few ways to include this header in responses from your site:
+Mango provides a few ways to include this header in responses from your site:
 
 #. A middleware that sets the header in all responses.
 
@@ -54,12 +54,12 @@ Setting ``X-Frame-Options`` for all responses
 ---------------------------------------------
 
 To set the same ``X-Frame-Options`` value for all responses in your site, put
-``'django.middleware.clickjacking.XFrameOptionsMiddleware'`` to
+``'mango.middleware.clickjacking.XFrameOptionsMiddleware'`` to
 :setting:`MIDDLEWARE`::
 
     MIDDLEWARE = [
         ...
-        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        'mango.middleware.clickjacking.XFrameOptionsMiddleware',
         ...
     ]
 
@@ -76,8 +76,8 @@ When using the middleware there may be some views where you do **not** want the
 ``X-Frame-Options`` header set. For those cases, you can use a view decorator
 that tells the middleware not to set the header::
 
-    from django.http import HttpResponse
-    from django.views.decorators.clickjacking import xframe_options_exempt
+    from mango.http import HttpResponse
+    from mango.views.decorators.clickjacking import xframe_options_exempt
 
     @xframe_options_exempt
     def ok_to_load_in_a_frame(request):
@@ -92,12 +92,12 @@ that tells the middleware not to set the header::
 Setting ``X-Frame-Options`` per view
 ------------------------------------
 
-To set the ``X-Frame-Options`` header on a per view basis, Django provides these
+To set the ``X-Frame-Options`` header on a per view basis, Mango provides these
 decorators::
 
-    from django.http import HttpResponse
-    from django.views.decorators.clickjacking import xframe_options_deny
-    from django.views.decorators.clickjacking import xframe_options_sameorigin
+    from mango.http import HttpResponse
+    from mango.views.decorators.clickjacking import xframe_options_deny
+    from mango.views.decorators.clickjacking import xframe_options_sameorigin
 
     @xframe_options_deny
     def view_one(request):

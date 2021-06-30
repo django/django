@@ -2,23 +2,23 @@ import datetime
 import re
 from unittest import mock
 
-from django.contrib.auth.forms import (
+from mango.contrib.auth.forms import (
     AdminPasswordChangeForm, AuthenticationForm, PasswordChangeForm,
     PasswordResetForm, ReadOnlyPasswordHashField, ReadOnlyPasswordHashWidget,
     SetPasswordForm, UserChangeForm, UserCreationForm,
 )
-from django.contrib.auth.models import User
-from django.contrib.auth.signals import user_login_failed
-from django.contrib.sites.models import Site
-from django.core import mail
-from django.core.exceptions import ValidationError
-from django.core.mail import EmailMultiAlternatives
-from django.forms import forms
-from django.forms.fields import CharField, Field, IntegerField
-from django.test import SimpleTestCase, TestCase, override_settings
-from django.utils import translation
-from django.utils.text import capfirst
-from django.utils.translation import gettext as _
+from mango.contrib.auth.models import User
+from mango.contrib.auth.signals import user_login_failed
+from mango.contrib.sites.models import Site
+from mango.core import mail
+from mango.core.exceptions import ValidationError
+from mango.core.mail import EmailMultiAlternatives
+from mango.forms import forms
+from mango.forms.fields import CharField, Field, IntegerField
+from mango.test import SimpleTestCase, TestCase, override_settings
+from mango.utils import translation
+from mango.utils.text import capfirst
+from mango.utils.translation import gettext as _
 
 from .models.custom_user import (
     CustomUser, CustomUserWithoutIsActiveField, ExtensionUser,
@@ -91,7 +91,7 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         self.assertEqual(form['password1'].errors, required_error)
         self.assertEqual(form['password2'].errors, [])
 
-    @mock.patch('django.contrib.auth.password_validation.password_changed')
+    @mock.patch('mango.contrib.auth.password_validation.password_changed')
     def test_success(self, password_changed):
         # The success case.
         data = {
@@ -137,7 +137,7 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         """
         To prevent almost identical usernames, visually identical but differing
         by their unicode code points only, Unicode NFKC normalization should
-        make appear them equal to Django.
+        make appear them equal to Mango.
         """
         omega_username = 'iamtheΩ'  # U+03A9 GREEK CAPITAL LETTER OMEGA
         ohm_username = 'iamtheΩ'  # U+2126 OHM SIGN
@@ -155,8 +155,8 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         )
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-        {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {
+        {'NAME': 'mango.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+        {'NAME': 'mango.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {
             'min_length': 12,
         }},
     ])
@@ -231,7 +231,7 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         self.assertEqual(form.cleaned_data['password2'], data['password2'])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+        {'NAME': 'mango.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     ])
     def test_password_help_text(self):
         form = UserCreationForm()
@@ -241,7 +241,7 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         )
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+        {'NAME': 'mango.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     ])
     def test_user_create_form_validates_password_with_all_data(self):
         """UserCreationForm password validation uses all of the form's data."""
@@ -280,7 +280,7 @@ class UserCreationFormTest(TestDataMixin, TestCase):
 
 # To verify that the login form rejects inactive users, use an authentication
 # backend that allows them.
-@override_settings(AUTHENTICATION_BACKENDS=['django.contrib.auth.backends.AllowAllUsersModelBackend'])
+@override_settings(AUTHENTICATION_BACKENDS=['mango.contrib.auth.backends.AllowAllUsersModelBackend'])
 class AuthenticationFormTest(TestDataMixin, TestCase):
 
     def test_invalid_username(self):
@@ -311,7 +311,7 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         self.assertEqual(form.non_field_errors(), [str(form.error_messages['inactive'])])
 
     # Use an authentication backend that rejects inactive users.
-    @override_settings(AUTHENTICATION_BACKENDS=['django.contrib.auth.backends.ModelBackend'])
+    @override_settings(AUTHENTICATION_BACKENDS=['mango.contrib.auth.backends.ModelBackend'])
     def test_inactive_user_incorrect_password(self):
         """An invalid login doesn't leak the inactive status of a user."""
         data = {
@@ -358,7 +358,7 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
             self.assertEqual(form.non_field_errors(), [str(form.error_messages['inactive'])])
 
     # Use an authentication backend that allows inactive users.
-    @override_settings(AUTHENTICATION_BACKENDS=['django.contrib.auth.backends.AllowAllUsersModelBackend'])
+    @override_settings(AUTHENTICATION_BACKENDS=['mango.contrib.auth.backends.AllowAllUsersModelBackend'])
     def test_custom_login_allowed_policy(self):
         # The user is inactive, but our custom form policy allows them to log in.
         data = {
@@ -533,7 +533,7 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
             [str(form.error_messages['password_mismatch'])]
         )
 
-    @mock.patch('django.contrib.auth.password_validation.password_changed')
+    @mock.patch('mango.contrib.auth.password_validation.password_changed')
     def test_success(self, password_changed):
         user = User.objects.get(username='testclient')
         data = {
@@ -548,8 +548,8 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
         self.assertEqual(password_changed.call_count, 1)
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-        {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {
+        {'NAME': 'mango.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+        {'NAME': 'mango.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {
             'min_length': 12,
         }},
     ])
@@ -580,8 +580,8 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
         self.assertEqual(form.cleaned_data['new_password2'], data['new_password2'])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-        {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {
+        {'NAME': 'mango.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+        {'NAME': 'mango.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {
             'min_length': 12,
         }},
     ])
@@ -632,7 +632,7 @@ class PasswordChangeFormTest(TestDataMixin, TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form["new_password2"].errors, [str(form.error_messages['password_mismatch'])])
 
-    @mock.patch('django.contrib.auth.password_validation.password_changed')
+    @mock.patch('mango.contrib.auth.password_validation.password_changed')
     def test_success(self, password_changed):
         # The success case.
         user = User.objects.get(username='testclient')
@@ -1005,7 +1005,7 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
         html = widget.render(name='password', value=None, attrs={})
         self.assertIn(_("No password set."), html)
 
-    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.PBKDF2PasswordHasher'])
+    @override_settings(PASSWORD_HASHERS=['mango.contrib.auth.hashers.PBKDF2PasswordHasher'])
     def test_render(self):
         widget = ReadOnlyPasswordHashWidget()
         value = 'pbkdf2_sha256$100000$a6Pucb1qSFcD$WmCkn9Hqidj48NVe5x0FEM6A9YiOqQcl/83m2Z5udm0='
@@ -1041,7 +1041,7 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
 
 class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
 
-    @mock.patch('django.contrib.auth.password_validation.password_changed')
+    @mock.patch('mango.contrib.auth.password_validation.password_changed')
     def test_success(self, password_changed):
         user = User.objects.get(username='testclient')
         data = {

@@ -1,7 +1,7 @@
-from django.template.defaultfilters import unordered_list
-from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy
+from mango.template.defaultfilters import unordered_list
+from mango.test import SimpleTestCase
+from mango.utils.safestring import mark_safe
+from mango.utils.translation import gettext_lazy
 
 from ..utils import setup
 

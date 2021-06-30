@@ -1,5 +1,5 @@
-from django.db.models.functions import Random
-from django.test import TestCase
+from mango.db.models.functions import Random
+from mango.test import TestCase
 
 from ..models import FloatModel
 

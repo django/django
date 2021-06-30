@@ -10,22 +10,22 @@ except ImportError:
     except ImportError:
         zoneinfo = None
 
-from django.conf import settings
-from django.db.models import (
+from mango.conf import settings
+from mango.db.models import (
     DateField, DateTimeField, F, IntegerField, Max, OuterRef, Subquery,
     TimeField,
 )
-from django.db.models.functions import (
+from mango.db.models.functions import (
     Extract, ExtractDay, ExtractHour, ExtractIsoWeekDay, ExtractIsoYear,
     ExtractMinute, ExtractMonth, ExtractQuarter, ExtractSecond, ExtractWeek,
     ExtractWeekDay, ExtractYear, Trunc, TruncDate, TruncDay, TruncHour,
     TruncMinute, TruncMonth, TruncQuarter, TruncSecond, TruncTime, TruncWeek,
     TruncYear,
 )
-from django.test import (
+from mango.test import (
     TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature,
 )
-from django.utils import timezone
+from mango.utils import timezone
 
 from ..models import Author, DTModel, Fan
 

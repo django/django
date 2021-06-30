@@ -1,8 +1,8 @@
 import unittest
 
-from django.db import DatabaseError, connection
-from django.db.models import BooleanField
-from django.test import TransactionTestCase
+from mango.db import DatabaseError, connection
+from mango.db.models import BooleanField
+from mango.test import TransactionTestCase
 
 from ..models import (
     Square, VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ,
@@ -28,7 +28,7 @@ class Tests(unittest.TestCase):
     def test_dbms_session(self):
         """A stored procedure can be called through a cursor wrapper."""
         with connection.cursor() as cursor:
-            cursor.callproc('DBMS_SESSION.SET_IDENTIFIER', ['_django_testing!'])
+            cursor.callproc('DBMS_SESSION.SET_IDENTIFIER', ['_mango_testing!'])
 
     def test_cursor_var(self):
         """Cursor variables can be passed as query parameters."""
@@ -84,7 +84,7 @@ class TransactionalTests(TransactionTestCase):
             with self.assertRaisesMessage(DatabaseError, (
                 'The database did not return a new row id. Probably "ORA-1403: '
                 'no data found" was raised internally but was hidden by the '
-                'Oracle OCI library (see https://code.djangoproject.com/ticket/28859).'
+                'Oracle OCI library (see https://code.mangoproject.com/ticket/28859).'
             )):
                 Square.objects.create(root=2, square=4)
         finally:

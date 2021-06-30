@@ -7,14 +7,14 @@ from unittest import skipIf
 from asgiref.sync import SyncToAsync
 from asgiref.testing import ApplicationCommunicator
 
-from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
-from django.core.asgi import get_asgi_application
-from django.core.signals import request_finished, request_started
-from django.db import close_old_connections
-from django.test import (
+from mango.contrib.staticfiles.handlers import ASGIStaticFilesHandler
+from mango.core.asgi import get_asgi_application
+from mango.core.signals import request_finished, request_started
+from mango.db import close_old_connections
+from mango.test import (
     AsyncRequestFactory, SimpleTestCase, modify_settings, override_settings,
 )
-from django.utils.http import http_date
+from mango.utils.http import http_date
 
 from .urls import test_filename
 
@@ -95,13 +95,13 @@ class ASGITest(SimpleTestCase):
         # Allow response.close() to finish.
         await communicator.wait()
 
-    @modify_settings(INSTALLED_APPS={'append': 'django.contrib.staticfiles'})
+    @modify_settings(INSTALLED_APPS={'append': 'mango.contrib.staticfiles'})
     @override_settings(
         STATIC_URL='static/',
         STATIC_ROOT=TEST_STATIC_ROOT,
         STATICFILES_DIRS=[TEST_STATIC_ROOT],
         STATICFILES_FINDERS=[
-            'django.contrib.staticfiles.finders.FileSystemFinder',
+            'mango.contrib.staticfiles.finders.FileSystemFinder',
         ],
     )
     async def test_static_file_response(self):
@@ -193,7 +193,7 @@ class ASGITest(SimpleTestCase):
         scope = self.async_request_factory._base_scope(path='/', type='other')
         communicator = ApplicationCommunicator(application, scope)
         await communicator.send_input({'type': 'http.request'})
-        msg = 'Django can only handle ASGI/HTTP connections, not other.'
+        msg = 'Mango can only handle ASGI/HTTP connections, not other.'
         with self.assertRaisesMessage(ValueError, msg):
             await communicator.receive_output()
 

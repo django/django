@@ -9,26 +9,26 @@ from io import StringIO
 from pathlib import Path
 from unittest import mock
 
-from django.core import mail
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db import DatabaseError, connection
-from django.http import Http404
-from django.shortcuts import render
-from django.template import TemplateDoesNotExist
-from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.utils import LoggingCaptureMixin
-from django.urls import path, reverse
-from django.urls.converters import IntConverter
-from django.utils.functional import SimpleLazyObject
-from django.utils.regex_helper import _lazy_re_compile
-from django.utils.safestring import mark_safe
-from django.views.debug import (
+from mango.core import mail
+from mango.core.files.uploadedfile import SimpleUploadedFile
+from mango.db import DatabaseError, connection
+from mango.http import Http404
+from mango.shortcuts import render
+from mango.template import TemplateDoesNotExist
+from mango.test import RequestFactory, SimpleTestCase, override_settings
+from mango.test.utils import LoggingCaptureMixin
+from mango.urls import path, reverse
+from mango.urls.converters import IntConverter
+from mango.utils.functional import SimpleLazyObject
+from mango.utils.regex_helper import _lazy_re_compile
+from mango.utils.safestring import mark_safe
+from mango.views.debug import (
     CallableSettingWrapper, ExceptionCycleWarning, ExceptionReporter,
     Path as DebugPath, SafeExceptionReporterFilter, default_urlconf,
     get_default_exception_reporter_filter, technical_404_response,
     technical_500_response,
 )
-from django.views.decorators.debug import (
+from mango.views.decorators.debug import (
     sensitive_post_parameters, sensitive_variables,
 )
 
@@ -68,27 +68,27 @@ class CallableSettingWrapperTests(SimpleTestCase):
 class DebugViewTests(SimpleTestCase):
 
     def test_files(self):
-        with self.assertLogs('django.request', 'ERROR'):
+        with self.assertLogs('mango.request', 'ERROR'):
             response = self.client.get('/raises/')
         self.assertEqual(response.status_code, 500)
 
         data = {
             'file_data.txt': SimpleUploadedFile('file_data.txt', b'haha'),
         }
-        with self.assertLogs('django.request', 'ERROR'):
+        with self.assertLogs('mango.request', 'ERROR'):
             response = self.client.post('/raises/', data)
         self.assertContains(response, 'file_data.txt', status_code=500)
         self.assertNotContains(response, 'haha', status_code=500)
 
     def test_400(self):
         # When DEBUG=True, technical_500_template() is called.
-        with self.assertLogs('django.security', 'WARNING'):
+        with self.assertLogs('mango.security', 'WARNING'):
             response = self.client.get('/raises400/')
         self.assertContains(response, '<div class="context" id="', status_code=400)
 
     def test_400_bad_request(self):
         # When DEBUG=True, technical_500_template() is called.
-        with self.assertLogs('django.request', 'WARNING') as cm:
+        with self.assertLogs('mango.request', 'WARNING') as cm:
             response = self.client.get('/raises400_bad_request/')
         self.assertContains(response, '<div class="context" id="', status_code=400)
         self.assertEqual(
@@ -98,7 +98,7 @@ class DebugViewTests(SimpleTestCase):
 
     # Ensure no 403.html template exists to test the default case.
     @override_settings(TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
     }])
     def test_403(self):
         response = self.client.get('/raises403/')
@@ -106,10 +106,10 @@ class DebugViewTests(SimpleTestCase):
 
     # Set up a test 403.html template.
     @override_settings(TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
         'OPTIONS': {
             'loaders': [
-                ('django.template.loaders.locmem.Loader', {
+                ('mango.template.loaders.locmem.Loader', {
                     '403.html': 'This is a test template for a 403 error ({{ exception }}).',
                 }),
             ],
@@ -143,7 +143,7 @@ class DebugViewTests(SimpleTestCase):
             '<pre class="exception_value">',
             status_code=404,
         )
-        self.assertContains(response, "Django tried these URL patterns", status_code=404)
+        self.assertContains(response, "Mango tried these URL patterns", status_code=404)
         self.assertContains(
             response,
             '<p>The current path, <code>not-in-urls</code>, didn’t match any '
@@ -196,7 +196,7 @@ class DebugViewTests(SimpleTestCase):
         Numeric IDs and fancy traceback context blocks line numbers shouldn't be localized.
         """
         with self.settings(DEBUG=True, USE_L10N=True):
-            with self.assertLogs('django.request', 'ERROR'):
+            with self.assertLogs('mango.request', 'ERROR'):
                 response = self.client.get('/raises500/')
             # We look for a HTML fragment of the form
             # '<div class="context" id="c38123208">', not '<div class="context" id="c38,123,208"'
@@ -210,7 +210,7 @@ class DebugViewTests(SimpleTestCase):
             )
 
     def test_template_exceptions(self):
-        with self.assertLogs('django.request', 'ERROR'):
+        with self.assertLogs('mango.request', 'ERROR'):
             try:
                 self.client.get(reverse('template_exception'))
             except Exception:
@@ -228,15 +228,15 @@ class DebugViewTests(SimpleTestCase):
             tempdir = os.path.dirname(tmpfile.name)
             template_path = os.path.join(tempdir, template_name)
             with override_settings(TEMPLATES=[{
-                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'BACKEND': 'mango.template.backends.mango.MangoTemplates',
                 'DIRS': [tempdir],
-            }]), self.assertLogs('django.request', 'ERROR'):
+            }]), self.assertLogs('mango.request', 'ERROR'):
                 response = self.client.get(reverse('raises_template_does_not_exist', kwargs={"path": template_name}))
             self.assertContains(response, "%s (Source does not exist)" % template_path, status_code=500, count=2)
             # Assert as HTML.
             self.assertContains(
                 response,
-                '<li><code>django.template.loaders.filesystem.Loader</code>: '
+                '<li><code>mango.template.loaders.filesystem.Loader</code>: '
                 '%s (Source does not exist)</li>' % os.path.join(tempdir, 'notfound.html'),
                 status_code=500,
                 html=True,
@@ -246,7 +246,7 @@ class DebugViewTests(SimpleTestCase):
         """
         Make sure if you don't specify a template, the debug view doesn't blow up.
         """
-        with self.assertLogs('django.request', 'ERROR'):
+        with self.assertLogs('mango.request', 'ERROR'):
             with self.assertRaises(TemplateDoesNotExist):
                 self.client.get('/render_no_template/')
 
@@ -298,19 +298,19 @@ class DebugViewTests(SimpleTestCase):
             self.assertContains(response, 'Page not found', status_code=404)
 
     def test_exception_reporter_from_request(self):
-        with self.assertLogs('django.request', 'ERROR'):
+        with self.assertLogs('mango.request', 'ERROR'):
             response = self.client.get('/custom_reporter_class_view/')
         self.assertContains(response, 'custom traceback text', status_code=500)
 
     @override_settings(DEFAULT_EXCEPTION_REPORTER='view_tests.views.CustomExceptionReporter')
     def test_exception_reporter_from_settings(self):
-        with self.assertLogs('django.request', 'ERROR'):
+        with self.assertLogs('mango.request', 'ERROR'):
             response = self.client.get('/raises500/')
         self.assertContains(response, 'custom traceback text', status_code=500)
 
     @override_settings(DEFAULT_EXCEPTION_REPORTER='view_tests.views.TemplateOverrideExceptionReporter')
     def test_template_override_exception_reporter(self):
-        with self.assertLogs('django.request', 'ERROR'):
+        with self.assertLogs('mango.request', 'ERROR'):
             response = self.client.get('/raises500/')
         self.assertContains(
             response,
@@ -319,7 +319,7 @@ class DebugViewTests(SimpleTestCase):
             html=True,
         )
 
-        with self.assertLogs('django.request', 'ERROR'):
+        with self.assertLogs('mango.request', 'ERROR'):
             response = self.client.get('/raises500/', HTTP_ACCEPT='text/plain')
         self.assertContains(response, 'Oh dear, an error occurred!', status_code=500)
 
@@ -349,20 +349,20 @@ class DebugViewQueriesAllowedTests(SimpleTestCase):
     ROOT_URLCONF='view_tests.urls',
     # No template directories are configured, so no templates will be found.
     TEMPLATES=[{
-        'BACKEND': 'django.template.backends.dummy.TemplateStrings',
+        'BACKEND': 'mango.template.backends.dummy.TemplateStrings',
     }],
 )
-class NonDjangoTemplatesDebugViewTests(SimpleTestCase):
+class NonMangoTemplatesDebugViewTests(SimpleTestCase):
 
     def test_400(self):
         # When DEBUG=True, technical_500_template() is called.
-        with self.assertLogs('django.security', 'WARNING'):
+        with self.assertLogs('mango.security', 'WARNING'):
             response = self.client.get('/raises400/')
         self.assertContains(response, '<div class="context" id="', status_code=400)
 
     def test_400_bad_request(self):
         # When DEBUG=True, technical_500_template() is called.
-        with self.assertLogs('django.request', 'WARNING') as cm:
+        with self.assertLogs('mango.request', 'WARNING') as cm:
             response = self.client.get('/raises400_bad_request/')
         self.assertContains(response, '<div class="context" id="', status_code=400)
         self.assertEqual(
@@ -381,7 +381,7 @@ class NonDjangoTemplatesDebugViewTests(SimpleTestCase):
     def test_template_not_found_error(self):
         # Raises a TemplateDoesNotExist exception and shows the debug view.
         url = reverse('raises_template_does_not_exist', kwargs={"path": "notfound.html"})
-        with self.assertLogs('django.request', 'ERROR'):
+        with self.assertLogs('mango.request', 'ERROR'):
             response = self.client.get(url)
         self.assertContains(response, '<div class="context" id="', status_code=500)
 
@@ -647,7 +647,7 @@ class ExceptionReporterTests(SimpleTestCase):
         except Exception:
             exc_type, exc_value, tb = sys.exc_info()
         with mock.patch(
-            'django.views.debug.ExceptionReporter._get_source',
+            'mango.views.debug.ExceptionReporter._get_source',
             return_value=['wrong source'],
         ):
             request = self.rf.get('/test_view/')

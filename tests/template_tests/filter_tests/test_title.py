@@ -1,5 +1,5 @@
-from django.template.defaultfilters import title
-from django.test import SimpleTestCase
+from mango.template.defaultfilters import title
+from mango.test import SimpleTestCase
 
 from ..utils import setup
 

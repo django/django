@@ -1,5 +1,5 @@
-from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.db import models
+from mango.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from mango.db import models
 
 
 class UserManager(BaseUserManager):

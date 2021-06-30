@@ -1,3 +1,3 @@
-from django.template import Library
+from mango.template import Library
 
 register = Library()

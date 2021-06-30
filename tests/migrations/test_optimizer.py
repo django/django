@@ -1,8 +1,8 @@
-from django.db import migrations, models
-from django.db.migrations import operations
-from django.db.migrations.optimizer import MigrationOptimizer
-from django.db.migrations.serializer import serializer_factory
-from django.test import SimpleTestCase
+from mango.db import migrations, models
+from mango.db.migrations import operations
+from mango.db.migrations.optimizer import MigrationOptimizer
+from mango.db.migrations.serializer import serializer_factory
+from mango.test import SimpleTestCase
 
 from .models import EmptyManager, UnicodeModel
 

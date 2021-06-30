@@ -1,5 +1,5 @@
-from django.template.defaultfilters import get_digit
-from django.test import SimpleTestCase
+from mango.template.defaultfilters import get_digit
+from mango.test import SimpleTestCase
 
 
 class FunctionTests(SimpleTestCase):

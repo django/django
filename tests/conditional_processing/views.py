@@ -1,5 +1,5 @@
-from django.http import HttpResponse
-from django.views.decorators.http import condition, etag, last_modified
+from mango.http import HttpResponse
+from mango.views.decorators.http import condition, etag, last_modified
 
 from .tests import ETAG, FULL_RESPONSE, LAST_MODIFIED, WEAK_ETAG
 

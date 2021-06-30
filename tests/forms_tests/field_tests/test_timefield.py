@@ -1,8 +1,8 @@
 import datetime
 
-from django.core.exceptions import ValidationError
-from django.forms import TimeField
-from django.test import SimpleTestCase
+from mango.core.exceptions import ValidationError
+from mango.forms import TimeField
+from mango.test import SimpleTestCase
 
 from . import FormFieldAssertionsMixin
 

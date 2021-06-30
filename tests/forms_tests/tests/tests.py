@@ -1,10 +1,10 @@
 import datetime
 
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db import models
-from django.forms import CharField, FileField, Form, ModelForm
-from django.forms.models import ModelFormMetaclass
-from django.test import SimpleTestCase, TestCase
+from mango.core.files.uploadedfile import SimpleUploadedFile
+from mango.db import models
+from mango.forms import CharField, FileField, Form, ModelForm
+from mango.forms.models import ModelFormMetaclass
+from mango.test import SimpleTestCase, TestCase
 
 from ..models import (
     BoundaryModel, ChoiceFieldModel, ChoiceModel, ChoiceOptionModel, Defaults,
@@ -197,7 +197,7 @@ class FormsModelTestCase(TestCase):
         self.assertEqual(instance_form.initial['def_date'], datetime.date(1969, 4, 4))
         self.assertEqual(instance_form.initial['value'], 12)
 
-        from django.forms import CharField
+        from mango.forms import CharField
 
         class ExcludingForm(ModelForm):
             name = CharField(max_length=255)

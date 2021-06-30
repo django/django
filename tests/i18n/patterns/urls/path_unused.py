@@ -1,5 +1,5 @@
-from django.urls import re_path
-from django.views.generic import TemplateView
+from mango.urls import re_path
+from mango.views.generic import TemplateView
 
 view = TemplateView.as_view(template_name='dummy.html')
 

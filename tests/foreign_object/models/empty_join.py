@@ -1,7 +1,7 @@
-from django.db import models
-from django.db.models.fields.related import ReverseManyToOneDescriptor
-from django.db.models.lookups import StartsWith
-from django.db.models.query_utils import PathInfo
+from mango.db import models
+from mango.db.models.fields.related import ReverseManyToOneDescriptor
+from mango.db.models.lookups import StartsWith
+from mango.db.models.query_utils import PathInfo
 
 
 class CustomForeignObjectRel(models.ForeignObjectRel):

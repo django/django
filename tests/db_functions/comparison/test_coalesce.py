@@ -1,7 +1,7 @@
-from django.db.models import TextField
-from django.db.models.functions import Coalesce, Lower
-from django.test import TestCase
-from django.utils import timezone
+from mango.db.models import TextField
+from mango.db.models.functions import Coalesce, Lower
+from mango.test import TestCase
+from mango.utils import timezone
 
 from ..models import Article, Author
 
@@ -29,7 +29,7 @@ class CoalesceTests(TestCase):
         a1 = Author.objects.create(name='John Smith', alias='smithj')
         a2 = Author.objects.create(name='Rhonda')
         ar1 = Article.objects.create(
-            title='How to Django',
+            title='How to Mango',
             text=lorem_ipsum,
             written=timezone.now(),
         )

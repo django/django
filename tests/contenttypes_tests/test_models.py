@@ -1,7 +1,7 @@
-from django.contrib.contenttypes.models import ContentType, ContentTypeManager
-from django.db import models
-from django.test import TestCase, override_settings
-from django.test.utils import isolate_apps
+from mango.contrib.contenttypes.models import ContentType, ContentTypeManager
+from mango.db import models
+from mango.test import TestCase, override_settings
+from mango.test.utils import isolate_apps
 
 from .models import Author, ConcreteModel, FooWithUrl, ProxyModel
 

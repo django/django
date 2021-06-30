@@ -1,10 +1,10 @@
-from django.contrib.messages import constants
-from django.contrib.messages.storage.base import Message
-from django.contrib.messages.storage.session import SessionStorage
-from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpRequest
-from django.test import TestCase
-from django.utils.safestring import SafeData, mark_safe
+from mango.contrib.messages import constants
+from mango.contrib.messages.storage.base import Message
+from mango.contrib.messages.storage.session import SessionStorage
+from mango.core.exceptions import ImproperlyConfigured
+from mango.http import HttpRequest
+from mango.test import TestCase
+from mango.utils.safestring import SafeData, mark_safe
 
 from .base import BaseTests
 
@@ -57,6 +57,6 @@ class SessionTests(BaseTests, TestCase):
         the message storage.
         """
         storage = self.get_storage()
-        message = Message(constants.DEBUG, mark_safe("<b>Hello Django!</b>"))
+        message = Message(constants.DEBUG, mark_safe("<b>Hello Mango!</b>"))
         set_session_data(storage, [message])
         self.assertIsInstance(list(storage)[0].message, SafeData)

@@ -1,10 +1,10 @@
 import unittest
 
-from django.core.exceptions import ImproperlyConfigured
-from django.db import ProgrammingError
+from mango.core.exceptions import ImproperlyConfigured
+from mango.db import ProgrammingError
 
 try:
-    from django.contrib.gis.db.backends.postgis.operations import (
+    from mango.contrib.gis.db.backends.postgis.operations import (
         PostGISOperations,
     )
     HAS_POSTGRES = True

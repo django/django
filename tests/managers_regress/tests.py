@@ -1,7 +1,7 @@
-from django.db import models
-from django.template import Context, Template
-from django.test import SimpleTestCase, TestCase, override_settings
-from django.test.utils import isolate_apps
+from mango.db import models
+from mango.template import Context, Template
+from mango.test import SimpleTestCase, TestCase, override_settings
+from mango.test.utils import isolate_apps
 
 from .models import (
     AbstractBase1, AbstractBase2, AbstractBase3, Child1, Child2, Child3,

@@ -1,10 +1,10 @@
 from operator import attrgetter
 
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.sessions.backends.db import SessionStore
-from django.db import models
-from django.db.models import Count
-from django.test import TestCase, override_settings
+from mango.contrib.contenttypes.models import ContentType
+from mango.contrib.sessions.backends.db import SessionStore
+from mango.db import models
+from mango.db.models import Count
+from mango.test import TestCase, override_settings
 
 from .models import (
     Base, Child, Derived, Feature, Item, ItemAndSimpleItem, Leaf, Location,
@@ -91,7 +91,7 @@ class DeferRegressionTest(TestCase):
             list(SimpleItem.objects.annotate(Count('feature')).only('name')),
             list)
 
-    @override_settings(SESSION_SERIALIZER='django.contrib.sessions.serializers.PickleSerializer')
+    @override_settings(SESSION_SERIALIZER='mango.contrib.sessions.serializers.PickleSerializer')
     def test_ticket_12163(self):
         # Test for #12163 - Pickling error saving session with unsaved model
         # instances.

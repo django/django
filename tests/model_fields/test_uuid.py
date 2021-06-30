@@ -1,11 +1,11 @@
 import json
 import uuid
 
-from django.core import exceptions, serializers
-from django.db import IntegrityError, connection, models
-from django.db.models import CharField, F, Value
-from django.db.models.functions import Concat, Repeat
-from django.test import (
+from mango.core import exceptions, serializers
+from mango.db import IntegrityError, connection, models
+from mango.db.models import CharField, F, Value
+from mango.db.models.functions import Concat, Repeat
+from mango.test import (
     SimpleTestCase, TestCase, TransactionTestCase, skipUnlessDBFeature,
 )
 

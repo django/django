@@ -4,9 +4,9 @@ import sys
 import tempfile
 from unittest import skipIf
 
-from django.core.files.base import ContentFile
-from django.http import FileResponse
-from django.test import SimpleTestCase
+from mango.core.files.base import ContentFile
+from mango.http import FileResponse
+from mango.test import SimpleTestCase
 
 
 class FileResponseTests(SimpleTestCase):

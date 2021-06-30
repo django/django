@@ -3,11 +3,11 @@ import threading
 import time
 from unittest import skipIf, skipUnless
 
-from django.db import (
+from mango.db import (
     DatabaseError, Error, IntegrityError, OperationalError, connection,
     transaction,
 )
-from django.test import (
+from mango.test import (
     TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
 

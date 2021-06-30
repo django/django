@@ -15,38 +15,38 @@ import warnings
 from pathlib import Path
 from unittest import mock, skipIf
 
-from django.conf import settings
-from django.core import management, signals
-from django.core.cache import (
+from mango.conf import settings
+from mango.core import management, signals
+from mango.core.cache import (
     DEFAULT_CACHE_ALIAS, CacheHandler, CacheKeyWarning, InvalidCacheKey, cache,
     caches,
 )
-from django.core.cache.backends.base import InvalidCacheBackendError
-from django.core.cache.utils import make_template_fragment_key
-from django.db import close_old_connections, connection, connections
-from django.db.backends.utils import CursorWrapper
-from django.http import (
+from mango.core.cache.backends.base import InvalidCacheBackendError
+from mango.core.cache.utils import make_template_fragment_key
+from mango.db import close_old_connections, connection, connections
+from mango.db.backends.utils import CursorWrapper
+from mango.http import (
     HttpRequest, HttpResponse, HttpResponseNotModified, StreamingHttpResponse,
 )
-from django.middleware.cache import (
+from mango.middleware.cache import (
     CacheMiddleware, FetchFromCacheMiddleware, UpdateCacheMiddleware,
 )
-from django.middleware.csrf import CsrfViewMiddleware
-from django.template import engines
-from django.template.context_processors import csrf
-from django.template.response import TemplateResponse
-from django.test import (
+from mango.middleware.csrf import CsrfViewMiddleware
+from mango.template import engines
+from mango.template.context_processors import csrf
+from mango.template.response import TemplateResponse
+from mango.test import (
     RequestFactory, SimpleTestCase, TestCase, TransactionTestCase,
     ignore_warnings, override_settings,
 )
-from django.test.signals import setting_changed
-from django.test.utils import CaptureQueriesContext
-from django.utils import timezone, translation
-from django.utils.cache import (
+from mango.test.signals import setting_changed
+from mango.test.utils import CaptureQueriesContext
+from mango.utils import timezone, translation
+from mango.utils.cache import (
     get_cache_key, learn_cache_key, patch_cache_control, patch_vary_headers,
 )
-from django.utils.deprecation import RemovedInDjango41Warning
-from django.views.decorators.cache import cache_control, cache_page
+from mango.utils.deprecation import RemovedInMango41Warning
+from mango.views.decorators.cache import cache_control, cache_page
 
 from .models import Poll, expensive_calculation
 
@@ -78,7 +78,7 @@ KEY_ERRORS_WITH_MEMCACHED_MSG = (
 
 @override_settings(CACHES={
     'default': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        'BACKEND': 'mango.core.cache.backends.dummy.DummyCache',
     }
 })
 class DummyCacheTests(SimpleTestCase):
@@ -280,7 +280,7 @@ class BaseCacheTests:
     # A common set of tests to apply to all cache backends
     factory = RequestFactory()
 
-    # RemovedInDjango41Warning: python-memcached doesn't support .get() with
+    # RemovedInMango41Warning: python-memcached doesn't support .get() with
     # default.
     supports_get_with_default = True
 
@@ -1078,7 +1078,7 @@ class BaseCacheTests:
 
 
 @override_settings(CACHES=caches_setting_for_tests(
-    BACKEND='django.core.cache.backends.db.DatabaseCache',
+    BACKEND='mango.core.cache.backends.db.DatabaseCache',
     # Spaces are used in the table name to ensure quoting/escaping is working
     LOCATION='test cache table'
 ))
@@ -1148,7 +1148,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
                 return self.cursor.rowcount
 
         cache.set_many({'a': 1, 'b': 2})
-        with mock.patch('django.db.backends.utils.CursorWrapper', MockedCursorWrapper):
+        with mock.patch('mango.db.backends.utils.CursorWrapper', MockedCursorWrapper):
             self.assertIs(cache.delete('a'), True)
 
     def test_zero_cull(self):
@@ -1160,7 +1160,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self.assertEqual(out.getvalue(), "Cache table 'test cache table' already exists.\n" * len(settings.CACHES))
 
     @override_settings(CACHES=caches_setting_for_tests(
-        BACKEND='django.core.cache.backends.db.DatabaseCache',
+        BACKEND='mango.core.cache.backends.db.DatabaseCache',
         # Use another table name to avoid the 'table already exists' message.
         LOCATION='createcachetable_dry_run_mode'
     ))
@@ -1195,17 +1195,17 @@ class DBCacheRouter:
     """A router that puts the cache table on the 'other' database."""
 
     def db_for_read(self, model, **hints):
-        if model._meta.app_label == 'django_cache':
+        if model._meta.app_label == 'mango_cache':
             return 'other'
         return None
 
     def db_for_write(self, model, **hints):
-        if model._meta.app_label == 'django_cache':
+        if model._meta.app_label == 'mango_cache':
             return 'other'
         return None
 
     def allow_migrate(self, db, app_label, **hints):
-        if app_label == 'django_cache':
+        if app_label == 'mango_cache':
             return db == 'other'
         return None
 
@@ -1213,7 +1213,7 @@ class DBCacheRouter:
 @override_settings(
     CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'BACKEND': 'mango.core.cache.backends.db.DatabaseCache',
             'LOCATION': 'my_cache_table',
         },
     },
@@ -1250,13 +1250,13 @@ class PicklingSideEffect:
 
 
 limit_locmem_entries = override_settings(CACHES=caches_setting_for_tests(
-    BACKEND='django.core.cache.backends.locmem.LocMemCache',
+    BACKEND='mango.core.cache.backends.locmem.LocMemCache',
     OPTIONS={'MAX_ENTRIES': 9},
 ))
 
 
 @override_settings(CACHES=caches_setting_for_tests(
-    BACKEND='django.core.cache.backends.locmem.LocMemCache',
+    BACKEND='mango.core.cache.backends.locmem.LocMemCache',
 ))
 class LocMemCacheTests(BaseCacheTests, TestCase):
 
@@ -1278,9 +1278,9 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         caches['custom_key2']._expire_info = cache._expire_info
 
     @override_settings(CACHES={
-        'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'},
+        'default': {'BACKEND': 'mango.core.cache.backends.locmem.LocMemCache'},
         'other': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'mango.core.cache.backends.locmem.LocMemCache',
             'LOCATION': 'other'
         },
     })
@@ -1360,8 +1360,8 @@ configured_caches = {}
 for _cache_params in settings.CACHES.values():
     configured_caches[_cache_params['BACKEND']] = _cache_params
 
-PyLibMCCache_params = configured_caches.get('django.core.cache.backends.memcached.PyLibMCCache')
-PyMemcacheCache_params = configured_caches.get('django.core.cache.backends.memcached.PyMemcacheCache')
+PyLibMCCache_params = configured_caches.get('mango.core.cache.backends.memcached.PyLibMCCache')
+PyMemcacheCache_params = configured_caches.get('mango.core.cache.backends.memcached.PyMemcacheCache')
 
 # The memcached backends don't support cull-related options like `MAX_ENTRIES`.
 memcached_excluded_caches = {'cull', 'zero_cull'}
@@ -1469,11 +1469,11 @@ class BaseMemcachedTests(BaseCacheTests):
             self.assertEqual(failing_keys, ['key'])
 
 
-# RemovedInDjango41Warning.
-MemcachedCache_params = configured_caches.get('django.core.cache.backends.memcached.MemcachedCache')
+# RemovedInMango41Warning.
+MemcachedCache_params = configured_caches.get('mango.core.cache.backends.memcached.MemcachedCache')
 
 
-@ignore_warnings(category=RemovedInDjango41Warning)
+@ignore_warnings(category=RemovedInMango41Warning)
 @unittest.skipUnless(MemcachedCache_params, "MemcachedCache backend not configured")
 @override_settings(CACHES=caches_setting_for_tests(
     base=MemcachedCache_params,
@@ -1509,27 +1509,27 @@ class MemcachedCacheTests(BaseMemcachedTests, TestCase):
 
 class MemcachedCacheDeprecationTests(SimpleTestCase):
     def test_warning(self):
-        from django.core.cache.backends.memcached import MemcachedCache
+        from mango.core.cache.backends.memcached import MemcachedCache
 
         # Remove warnings filter on MemcachedCache deprecation warning, added
         # in runtests.py.
         warnings.filterwarnings(
             'error',
             'MemcachedCache is deprecated',
-            category=RemovedInDjango41Warning,
+            category=RemovedInMango41Warning,
         )
         try:
             msg = (
                 'MemcachedCache is deprecated in favor of PyMemcacheCache and '
                 'PyLibMCCache.'
             )
-            with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
+            with self.assertRaisesMessage(RemovedInMango41Warning, msg):
                 MemcachedCache('127.0.0.1:11211', {})
         finally:
             warnings.filterwarnings(
                 'ignore',
                 'MemcachedCache is deprecated',
-                category=RemovedInDjango41Warning,
+                category=RemovedInMango41Warning,
             )
 
 
@@ -1612,7 +1612,7 @@ class PyMemcacheCacheTests(BaseMemcachedTests, TestCase):
 
 
 @override_settings(CACHES=caches_setting_for_tests(
-    BACKEND='django.core.cache.backends.filebased.FileBasedCache',
+    BACKEND='mango.core.cache.backends.filebased.FileBasedCache',
 ))
 class FileBasedCacheTests(BaseCacheTests, TestCase):
     """
@@ -1752,7 +1752,7 @@ class CacheClosingTests(SimpleTestCase):
 
 DEFAULT_MEMORY_CACHES_SETTINGS = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'BACKEND': 'mango.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'unique-snowflake',
     }
 }
@@ -1778,7 +1778,7 @@ class DefaultNonExpiringCacheKeyTests(SimpleTestCase):
         """The default expiration time of a cache key is 5 minutes.
 
         This value is defined in
-        django.core.cache.backends.base.BaseCache.__init__().
+        mango.core.cache.backends.base.BaseCache.__init__().
         """
         self.assertEqual(300, self.DEFAULT_TIMEOUT)
 
@@ -1830,14 +1830,14 @@ class DefaultNonExpiringCacheKeyTests(SimpleTestCase):
     CACHE_MIDDLEWARE_SECONDS=1,
     CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'mango.core.cache.backends.locmem.LocMemCache',
         },
     },
     USE_I18N=False,
     ALLOWED_HOSTS=['.example.com'],
 )
 class CacheUtils(SimpleTestCase):
-    """TestCase for django.utils.cache functions."""
+    """TestCase for mango.utils.cache functions."""
     host = 'www.example.com'
     path = '/cache/test/'
     factory = RequestFactory(HTTP_HOST=host)
@@ -1974,7 +1974,7 @@ class CacheUtils(SimpleTestCase):
 @override_settings(
     CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'mango.core.cache.backends.locmem.LocMemCache',
             'KEY_PREFIX': 'cacheprefix',
         },
     },
@@ -1988,7 +1988,7 @@ class PrefixedCacheUtils(CacheUtils):
     CACHE_MIDDLEWARE_KEY_PREFIX='test',
     CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'mango.core.cache.backends.locmem.LocMemCache',
         },
     },
 )
@@ -2032,7 +2032,7 @@ class CacheHEADTest(SimpleTestCase):
     CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
     CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'mango.core.cache.backends.locmem.LocMemCache',
         },
     },
     LANGUAGES=[
@@ -2228,7 +2228,7 @@ class CacheI18nTest(SimpleTestCase):
 @override_settings(
     CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'mango.core.cache.backends.locmem.LocMemCache',
             'KEY_PREFIX': 'cacheprefix'
         },
     },
@@ -2251,10 +2251,10 @@ def csrf_view(request):
     CACHE_MIDDLEWARE_SECONDS=30,
     CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'mango.core.cache.backends.locmem.LocMemCache',
         },
         'other': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'mango.core.cache.backends.locmem.LocMemCache',
             'LOCATION': 'other',
             'TIMEOUT': '1',
         },
@@ -2294,7 +2294,7 @@ class CacheMiddlewareTest(SimpleTestCase):
 
         self.assertEqual(as_view_decorator.cache_timeout, 30)  # Timeout value for 'default' cache, i.e. 30
         self.assertEqual(as_view_decorator.key_prefix, '')
-        # Value of DEFAULT_CACHE_ALIAS from django.core.cache
+        # Value of DEFAULT_CACHE_ALIAS from mango.core.cache
         self.assertEqual(as_view_decorator.cache_alias, 'default')
         self.assertEqual(as_view_decorator.cache, self.default_cache)
 
@@ -2463,7 +2463,7 @@ class CacheMiddlewareTest(SimpleTestCase):
 
     def test_sensitive_cookie_not_cached(self):
         """
-        Django must prevent caching of responses that set a user-specific (and
+        Mango must prevent caching of responses that set a user-specific (and
         maybe security sensitive) cookie in response to a cookie-less request.
         """
         request = self.factory.get('/view/')
@@ -2496,7 +2496,7 @@ class CacheMiddlewareTest(SimpleTestCase):
     CACHE_MIDDLEWARE_SECONDS=1,
     CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'mango.core.cache.backends.locmem.LocMemCache',
         },
     },
     USE_I18N=False,
@@ -2531,7 +2531,7 @@ class TestWithTemplateResponse(SimpleTestCase):
         )
         for initial_vary, newheaders, resulting_vary in headers:
             with self.subTest(initial_vary=initial_vary, newheaders=newheaders):
-                template = engines['django'].from_string("This is a test")
+                template = engines['mango'].from_string("This is a test")
                 response = TemplateResponse(HttpRequest(), template)
                 if initial_vary is not None:
                     response.headers['Vary'] = initial_vary
@@ -2540,7 +2540,7 @@ class TestWithTemplateResponse(SimpleTestCase):
 
     def test_get_cache_key(self):
         request = self.factory.get(self.path)
-        template = engines['django'].from_string("This is a test")
+        template = engines['mango'].from_string("This is a test")
         response = TemplateResponse(HttpRequest(), template)
         key_prefix = 'localprefix'
         # Expect None if no headers have been set yet.
@@ -2563,7 +2563,7 @@ class TestWithTemplateResponse(SimpleTestCase):
 
     def test_get_cache_key_with_query(self):
         request = self.factory.get(self.path, {'test': 1})
-        template = engines['django'].from_string("This is a test")
+        template = engines['mango'].from_string("This is a test")
         response = TemplateResponse(HttpRequest(), template)
         # Expect None if no headers have been set yet.
         self.assertIsNone(get_cache_key(request))
@@ -2642,12 +2642,12 @@ class CacheHandlerTest(SimpleTestCase):
     def test_nonexistent_backend(self):
         test_caches = CacheHandler({
             'invalid_backend': {
-                'BACKEND': 'django.nonexistent.NonexistentBackend',
+                'BACKEND': 'mango.nonexistent.NonexistentBackend',
             },
         })
         msg = (
-            "Could not find backend 'django.nonexistent.NonexistentBackend': "
-            "No module named 'django.nonexistent'"
+            "Could not find backend 'mango.nonexistent.NonexistentBackend': "
+            "No module named 'mango.nonexistent'"
         )
         with self.assertRaisesMessage(InvalidCacheBackendError, msg):
             test_caches['invalid_backend']
@@ -2655,10 +2655,10 @@ class CacheHandlerTest(SimpleTestCase):
     def test_all(self):
         test_caches = CacheHandler({
             'cache_1': {
-                'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+                'BACKEND': 'mango.core.cache.backends.dummy.DummyCache',
             },
             'cache_2': {
-                'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+                'BACKEND': 'mango.core.cache.backends.dummy.DummyCache',
             },
         })
         self.assertEqual(test_caches.all(initialized_only=True), [])

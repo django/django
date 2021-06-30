@@ -1,12 +1,12 @@
 from unittest import skipUnless
 
-from django.contrib.gis.db.models import fields
-from django.contrib.gis.geos import MultiPolygon, Polygon
-from django.core.exceptions import ImproperlyConfigured
-from django.db import connection, migrations, models
-from django.db.migrations.migration import Migration
-from django.db.migrations.state import ProjectState
-from django.test import (
+from mango.contrib.gis.db.models import fields
+from mango.contrib.gis.geos import MultiPolygon, Polygon
+from mango.core.exceptions import ImproperlyConfigured
+from mango.db import connection, migrations, models
+from mango.db.migrations.migration import Migration
+from mango.db.migrations.state import ProjectState
+from mango.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
 

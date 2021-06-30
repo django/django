@@ -3,13 +3,13 @@ from functools import partialmethod
 from io import StringIO
 from unittest import mock, skipIf
 
-from django.core import serializers
-from django.core.serializers import SerializerDoesNotExist
-from django.core.serializers.base import ProgressBar
-from django.db import connection, transaction
-from django.http import HttpResponse
-from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
-from django.test.utils import Approximate
+from mango.core import serializers
+from mango.core.serializers import SerializerDoesNotExist
+from mango.core.serializers.base import ProgressBar
+from mango.db import connection, transaction
+from mango.http import HttpResponse
+from mango.test import SimpleTestCase, override_settings, skipUnlessDBFeature
+from mango.test.utils import Approximate
 
 from .models import (
     Actor, Article, Author, AuthorProfile, BaseModel, Category, Child,
@@ -20,7 +20,7 @@ from .models import (
 
 @override_settings(
     SERIALIZATION_MODULES={
-        "json2": "django.core.serializers.json",
+        "json2": "mango.core.serializers.json",
     }
 )
 class SerializerRegistrationTests(SimpleTestCase):
@@ -33,7 +33,7 @@ class SerializerRegistrationTests(SimpleTestCase):
 
     def test_register(self):
         "Registering a new serializer populates the full registry. Refs #14823"
-        serializers.register_serializer('json3', 'django.core.serializers.json')
+        serializers.register_serializer('json3', 'mango.core.serializers.json')
 
         public_formats = serializers.get_public_serializer_formats()
         self.assertIn('json3', public_formats)
@@ -43,7 +43,7 @@ class SerializerRegistrationTests(SimpleTestCase):
     def test_unregister(self):
         "Unregistering a serializer doesn't cause the registry to be repopulated. Refs #14823"
         serializers.unregister_serializer('xml')
-        serializers.register_serializer('json3', 'django.core.serializers.json')
+        serializers.register_serializer('json3', 'mango.core.serializers.json')
 
         public_formats = serializers.get_public_serializer_formats()
 
@@ -345,7 +345,7 @@ class SerializersTestBase:
         """Deserialized content can be saved with force_insert as a parameter."""
         serial_str = serializers.serialize(self.serializer_name, [self.a1])
         deserial_obj = list(serializers.deserialize(self.serializer_name, serial_str))[0]
-        with mock.patch('django.db.models.Model') as mock_model:
+        with mock.patch('mango.db.models.Model') as mock_model:
             deserial_obj.save(force_insert=False)
             mock_model.save_base.assert_called_with(deserial_obj.object, raw=True, using=None, force_insert=False)
 

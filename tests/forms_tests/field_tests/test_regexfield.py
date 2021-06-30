@@ -1,8 +1,8 @@
 import re
 
-from django.core.exceptions import ValidationError
-from django.forms import RegexField
-from django.test import SimpleTestCase
+from mango.core.exceptions import ValidationError
+from mango.forms import RegexField
+from mango.test import SimpleTestCase
 
 
 class RegexFieldTest(SimpleTestCase):

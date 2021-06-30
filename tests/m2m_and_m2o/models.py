@@ -3,7 +3,7 @@ Many-to-many and many-to-one relationships to the same table
 
 Make sure to set ``related_name`` if you use relationships to the same table.
 """
-from django.db import models
+from mango.db import models
 
 
 class User(models.Model):

@@ -1,11 +1,11 @@
 ===================
-GeoDjango Utilities
+GeoMango Utilities
 ===================
 
-.. module:: django.contrib.gis.utils
-    :synopsis: GeoDjango's collection of utilities.
+.. module:: mango.contrib.gis.utils
+    :synopsis: GeoMango's collection of utilities.
 
-The :mod:`django.contrib.gis.utils` module contains various utilities that are
+The :mod:`mango.contrib.gis.utils` module contains various utilities that are
 useful in creating geospatial Web applications.
 
 .. toctree::

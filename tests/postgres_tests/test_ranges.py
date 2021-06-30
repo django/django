@@ -2,13 +2,13 @@ import datetime
 import json
 from decimal import Decimal
 
-from django import forms
-from django.core import exceptions, serializers
-from django.db.models import DateField, DateTimeField, F, Func, Value
-from django.http import QueryDict
-from django.test import override_settings
-from django.test.utils import isolate_apps
-from django.utils import timezone
+from mango import forms
+from mango.core import exceptions, serializers
+from mango.db.models import DateField, DateTimeField, F, Func, Value
+from mango.http import QueryDict
+from mango.test import override_settings
+from mango.test.utils import isolate_apps
+from mango.utils import timezone
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import (
@@ -19,8 +19,8 @@ from .models import (
 try:
     from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange
 
-    from django.contrib.postgres import fields as pg_fields, forms as pg_forms
-    from django.contrib.postgres.validators import (
+    from mango.contrib.postgres import fields as pg_fields, forms as pg_forms
+    from mango.contrib.postgres.validators import (
         RangeMaxValueValidator, RangeMinValueValidator,
     )
 except ImportError:

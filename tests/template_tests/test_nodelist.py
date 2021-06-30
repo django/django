@@ -1,6 +1,6 @@
-from django.template import Context, Engine
-from django.template.base import TextNode, VariableNode
-from django.test import SimpleTestCase
+from mango.template import Context, Engine
+from mango.template.base import TextNode, VariableNode
+from mango.test import SimpleTestCase
 
 
 class NodelistTest(SimpleTestCase):

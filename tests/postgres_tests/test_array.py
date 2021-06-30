@@ -4,16 +4,16 @@ import json
 import unittest
 import uuid
 
-from django import forms
-from django.core import checks, exceptions, serializers, validators
-from django.core.exceptions import FieldError
-from django.core.management import call_command
-from django.db import IntegrityError, connection, models
-from django.db.models.expressions import Exists, OuterRef, RawSQL, Value
-from django.db.models.functions import Cast, Upper
-from django.test import TransactionTestCase, modify_settings, override_settings
-from django.test.utils import isolate_apps
-from django.utils import timezone
+from mango import forms
+from mango.core import checks, exceptions, serializers, validators
+from mango.core.exceptions import FieldError
+from mango.core.management import call_command
+from mango.db import IntegrityError, connection, models
+from mango.db.models.expressions import Exists, OuterRef, RawSQL, Value
+from mango.db.models.functions import Cast, Upper
+from mango.test import TransactionTestCase, modify_settings, override_settings
+from mango.test.utils import isolate_apps
+from mango.utils import timezone
 
 from . import (
     PostgreSQLSimpleTestCase, PostgreSQLTestCase, PostgreSQLWidgetTestCase,
@@ -27,15 +27,15 @@ from .models import (
 try:
     from psycopg2.extras import NumericRange
 
-    from django.contrib.postgres.aggregates import ArrayAgg
-    from django.contrib.postgres.fields import ArrayField
-    from django.contrib.postgres.fields.array import (
+    from mango.contrib.postgres.aggregates import ArrayAgg
+    from mango.contrib.postgres.fields import ArrayField
+    from mango.contrib.postgres.fields.array import (
         IndexTransform, SliceTransform,
     )
-    from django.contrib.postgres.forms import (
+    from mango.contrib.postgres.forms import (
         SimpleArrayField, SplitArrayField, SplitArrayWidget,
     )
-    from django.db.backends.postgresql.base import PSYCOPG2_VERSION
+    from mango.db.backends.postgresql.base import PSYCOPG2_VERSION
 except ImportError:
     pass
 
@@ -736,7 +736,7 @@ class TestMigrations(TransactionTestCase):
     def test_subclass_deconstruct(self):
         field = ArrayField(models.IntegerField())
         name, path, args, kwargs = field.deconstruct()
-        self.assertEqual(path, 'django.contrib.postgres.fields.ArrayField')
+        self.assertEqual(path, 'mango.contrib.postgres.fields.ArrayField')
 
         field = ArrayFieldSubclass()
         name, path, args, kwargs = field.deconstruct()
@@ -1040,7 +1040,7 @@ class TestSplitFormField(PostgreSQLSimpleTestCase):
             SplitArrayField(forms.IntegerField(max_value=100), size=2).clean([0, 101])
 
     # To locate the widget's template.
-    @modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
+    @modify_settings(INSTALLED_APPS={'append': 'mango.contrib.postgres'})
     def test_rendering(self):
         class SplitForm(forms.Form):
             array = SplitArrayField(forms.CharField(), size=3)
@@ -1141,7 +1141,7 @@ class TestSplitFormWidget(PostgreSQLWidgetTestCase):
                             'required': False,
                             'value': 'val1',
                             'attrs': {},
-                            'template_name': 'django/forms/widgets/text.html',
+                            'template_name': 'mango/forms/widgets/text.html',
                             'type': 'text',
                         },
                         {
@@ -1150,7 +1150,7 @@ class TestSplitFormWidget(PostgreSQLWidgetTestCase):
                             'required': False,
                             'value': 'val2',
                             'attrs': {},
-                            'template_name': 'django/forms/widgets/text.html',
+                            'template_name': 'mango/forms/widgets/text.html',
                             'type': 'text',
                         },
                     ]

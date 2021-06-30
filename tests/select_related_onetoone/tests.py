@@ -1,6 +1,6 @@
-from django.core.exceptions import FieldError
-from django.db.models import FilteredRelation
-from django.test import SimpleTestCase, TestCase
+from mango.core.exceptions import FieldError
+from mango.db.models import FilteredRelation
+from mango.test import SimpleTestCase, TestCase
 
 from .models import (
     AdvancedUserStat, Child1, Child2, Child3, Child4, Image, LinkedList,
@@ -86,12 +86,12 @@ class ReverseSelectRelatedTestCase(TestCase):
 
     def test_nullable_relation(self):
         im = Image.objects.create(name="imag1")
-        p1 = Product.objects.create(name="Django Plushie", image=im)
-        p2 = Product.objects.create(name="Talking Django Plushie")
+        p1 = Product.objects.create(name="Mango Plushie", image=im)
+        p2 = Product.objects.create(name="Talking Mango Plushie")
 
         with self.assertNumQueries(1):
             result = sorted(Product.objects.select_related("image"), key=lambda x: x.name)
-            self.assertEqual([p.name for p in result], ["Django Plushie", "Talking Django Plushie"])
+            self.assertEqual([p.name for p in result], ["Mango Plushie", "Talking Mango Plushie"])
 
             self.assertEqual(p1.image, im)
             # Check for ticket #13839

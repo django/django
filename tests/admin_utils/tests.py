@@ -1,19 +1,19 @@
 from datetime import datetime
 from decimal import Decimal
 
-from django import forms
-from django.conf import settings
-from django.contrib import admin
-from django.contrib.admin import helpers
-from django.contrib.admin.utils import (
+from mango import forms
+from mango.conf import settings
+from mango.contrib import admin
+from mango.contrib.admin import helpers
+from mango.contrib.admin.utils import (
     NestedObjects, display_for_field, display_for_value, flatten,
     flatten_fieldsets, help_text_for_field, label_for_field, lookup_field,
     quote,
 )
-from django.db import DEFAULT_DB_ALIAS, models
-from django.test import SimpleTestCase, TestCase, override_settings
-from django.utils.formats import localize
-from django.utils.safestring import mark_safe
+from mango.db import DEFAULT_DB_ALIAS, models
+from mango.test import SimpleTestCase, TestCase, override_settings
+from mango.utils.formats import localize
+from mango.utils.safestring import mark_safe
 
 from .models import (
     Article, Car, Count, Event, EventGuide, Location, Site, Vehicle,

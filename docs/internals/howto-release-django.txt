@@ -1,10 +1,10 @@
 =====================
-How is Django Formed?
+How is Mango Formed?
 =====================
 
 .. highlight:: console
 
-This document explains how to release Django.
+This document explains how to release Mango.
 
 **Please, keep these instructions up-to-date if you make changes!** The point
 here is to be descriptive, not prescriptive, so feel free to streamline or
@@ -34,11 +34,11 @@ The short version of the steps involved is:
 
 #. Update version numbers and create the release package(s).
 
-#. Upload the package(s) to the ``djangoproject.com`` server.
+#. Upload the package(s) to the ``mangoproject.com`` server.
 
 #. Upload the new version(s) to PyPI.
 
-#. Declare the new version in the admin on ``djangoproject.com``.
+#. Declare the new version in the admin on ``mangoproject.com``.
 
 #. Post the blog entry and send out the email announcements.
 
@@ -60,7 +60,7 @@ You'll need a few things before getting started:
 
       $ python -m pip install wheel twine
 
-* Access to Django's record on PyPI. Create a file with your credentials:
+* Access to Mango's record on PyPI. Create a file with your credentials:
 
   .. code-block:: ini
     :caption: ~/.pypirc
@@ -69,11 +69,11 @@ You'll need a few things before getting started:
     username:YourUsername
     password:YourPassword
 
-* Access to the ``djangoproject.com`` server to upload files.
+* Access to the ``mangoproject.com`` server to upload files.
 
-* Access to the admin on ``djangoproject.com`` as a "Site maintainer".
+* Access to the admin on ``mangoproject.com`` as a "Site maintainer".
 
-* Access to post to ``django-announce``.
+* Access to post to ``mango-announce``.
 
 * If this is a security release, access to the pre-notification distribution
   list.
@@ -90,11 +90,11 @@ any time leading up to the actual release:
 
 #. If this is a security release, send out pre-notification **one week** before
    the release. The template for that email and a list of the recipients are in
-   the private ``django-security`` GitHub wiki. BCC the pre-notification
+   the private ``mango-security`` GitHub wiki. BCC the pre-notification
    recipients. Sign the email with the key you'll use for the release and
    include `CVE IDs <https://cveform.mitre.org/>`_ (requested with Vendor:
-   djangoproject, Product: django) and patches for each issue being fixed.
-   Also, :ref:`notify django-announce <security-disclosure>` of the upcoming
+   mangoproject, Product: mango) and patches for each issue being fixed.
+   Also, :ref:`notify mango-announce <security-disclosure>` of the upcoming
    security release.
 
 #. As the release approaches, watch Trac to make sure no release blockers
@@ -125,30 +125,30 @@ any time leading up to the actual release:
    are validation errors which need to be debugged, so avoid doing this task
    immediately before a release is needed.
 
-#. :ref:`Update the django-admin manual page <django-admin-manpage>`::
+#. :ref:`Update the mango-admin manual page <mango-admin-manpage>`::
 
         $ cd docs
         $ make man
-        $ man _build/man/django-admin.1  # do a quick sanity check
-        $ cp _build/man/django-admin.1 man/django-admin.1
+        $ man _build/man/mango-admin.1  # do a quick sanity check
+        $ cp _build/man/mango-admin.1 man/mango-admin.1
 
    and then commit the changed man page.
 
 #. If this is the alpha release of a new series, create a new stable branch
-   from main. For example, when releasing Django 3.1::
+   from main. For example, when releasing Mango 3.1::
 
     $ git checkout -b stable/3.1.x origin/main
     $ git push origin -u stable/3.1.x:stable/3.1.x
 
-   At the same time, update the ``django_next_version`` variable in
+   At the same time, update the ``mango_next_version`` variable in
    ``docs/conf.py`` on the stable release branch to point to the new
    development version. For example, when creating ``stable/4.2.x``, set
-   ``django_next_version`` to ``'5.0'`` on the new branch.
+   ``mango_next_version`` to ``'5.0'`` on the new branch.
 
 #. If this is the "dot zero" release of a new series, create a new branch from
-   the current stable branch in the `django-docs-translations
-   <https://github.com/django/django-docs-translations>`_ repository. For
-   example, when releasing Django 2.2::
+   the current stable branch in the `mango-docs-translations
+   <https://github.com/nikhiljohn10/mango-docs-translations>`_ repository. For
+   example, when releasing Mango 2.2::
 
     $ git checkout -b stable/2.2.x origin/stable/2.1.x
     $ git push origin stable/2.2.x:stable/2.2.x
@@ -161,9 +161,9 @@ admin at any time and mark it as inactive. Here are a few examples: `example
 security release announcement`__, `example regular release announcement`__,
 `example pre-release announcement`__.
 
-__ https://www.djangoproject.com/weblog/2013/feb/19/security/
-__ https://www.djangoproject.com/weblog/2012/mar/23/14/
-__ https://www.djangoproject.com/weblog/2012/nov/27/15-beta-1/
+__ https://www.mangoproject.com/weblog/2013/feb/19/security/
+__ https://www.mangoproject.com/weblog/2012/mar/23/14/
+__ https://www.mangoproject.com/weblog/2012/nov/27/15-beta-1/
 
 Actually rolling the release
 ============================
@@ -173,7 +173,7 @@ OK, this is the fun part, where we actually push out a release!
 #. Check `Jenkins`__ is green for the version(s) you're putting out. You
    probably shouldn't issue a release until it's green.
 
-   __ https://djangoci.com
+   __ https://mangoci.com
 
 #. A release always begins from a release branch, so you should make sure
    you're on a stable branch and up-to-date. For example::
@@ -182,14 +182,14 @@ OK, this is the fun part, where we actually push out a release!
         $ git pull
 
 #. If this is a security release, merge the appropriate patches from
-   ``django-security``. Rebase these patches as necessary to make each one a
+   ``mango-security``. Rebase these patches as necessary to make each one a
    plain commit on the release branch rather than a merge commit. To ensure
    this, merge them with the ``--ff-only`` flag; for example::
 
         $ git checkout stable/1.5.x
         $ git merge --ff-only security/1.5.x
 
-   (This assumes ``security/1.5.x`` is a branch in the ``django-security`` repo
+   (This assumes ``security/1.5.x`` is a branch in the ``mango-security`` repo
    containing the necessary security patches for the next release in the 1.5
    series.)
 
@@ -206,7 +206,7 @@ OK, this is the fun part, where we actually push out a release!
    this change on all branches where the release notes for a particular version
    are located.
 
-#. Update the version number in ``django/__init__.py`` for the release.
+#. Update the version number in ``mango/__init__.py`` for the release.
    Please see `notes on setting the VERSION tuple`_ below for details
    on ``VERSION``.
 
@@ -234,7 +234,7 @@ OK, this is the fun part, where we actually push out a release!
         $ sha1sum *
         $ sha256sum *
 
-#. Create a "checksums" file, ``Django-<<VERSION>>.checksum.txt`` containing
+#. Create a "checksums" file, ``Mango-<<VERSION>>.checksum.txt`` containing
    the hashes and release information. Start with this template and insert the
    correct version, date, GPG key ID (from
    ``gpg --list-keys --keyid-format LONG``), release manager's GitHub username,
@@ -243,11 +243,11 @@ OK, this is the fun part, where we actually push out a release!
    .. code-block:: text
 
     This file contains MD5, SHA1, and SHA256 checksums for the source-code
-    tarball and wheel files of Django <<VERSION>>, released <<DATE>>.
+    tarball and wheel files of Mango <<VERSION>>, released <<DATE>>.
 
     To use this file, you will need a working install of PGP or other
     compatible public-key encryption software. You will also need to have
-    the Django release manager's public key in your keyring. This key has
+    the Mango release manager's public key in your keyring. This key has
     the ID ``XXXXXXXXXXXXXXXX`` and can be imported from the MIT
     keyserver, for example, if using the open-source GNU Privacy Guard
     implementation of PGP:
@@ -263,14 +263,14 @@ OK, this is the fun part, where we actually push out a release!
         gpg --verify <<THIS FILENAME>>
 
     Once you have verified this file, you can use normal MD5, SHA1, or SHA256
-    checksumming applications to generate the checksums of the Django
+    checksumming applications to generate the checksums of the Mango
     package and compare them to the checksums listed below.
 
     Release packages:
     =================
 
-    https://www.djangoproject.com/m/releases/<<RELEASE TAR.GZ FILENAME>>
-    https://www.djangoproject.com/m/releases/<<RELEASE WHL FILENAME>>
+    https://www.mangoproject.com/m/releases/<<RELEASE TAR.GZ FILENAME>>
+    https://www.mangoproject.com/m/releases/<<RELEASE WHL FILENAME>>
 
     MD5 checksums:
     ==============
@@ -291,9 +291,9 @@ OK, this is the fun part, where we actually push out a release!
     <<SHA256SUM>>  <<RELEASE WHL FILENAME>>
 
 #. Sign the checksum file (``gpg --clearsign --digest-algo SHA256
-   Django-<version>.checksum.txt``). This generates a signed document,
-   ``Django-<version>.checksum.txt.asc`` which you can then verify using ``gpg
-   --verify Django-<version>.checksum.txt.asc``.
+   Mango-<version>.checksum.txt``). This generates a signed document,
+   ``Mango-<version>.checksum.txt.asc`` which you can then verify using ``gpg
+   --verify Mango-<version>.checksum.txt.asc``.
 
 If you're issuing multiple releases, repeat these steps for each release.
 
@@ -302,17 +302,17 @@ Making the release(s) available to the public
 
 Now you're ready to actually put the release out there. To do this:
 
-#. Upload the release package(s) to the djangoproject server, replacing
+#. Upload the release package(s) to the mangoproject server, replacing
    A.B. with the appropriate version number, e.g. 1.5 for a 1.5.x release::
 
-        $ scp Django-* djangoproject.com:/home/www/www/media/releases/A.B
+        $ scp Mango-* mangoproject.com:/home/www/www/media/releases/A.B
 
    If this is the alpha release of a new series, you will need to create the
    directory A.B.
 
 #. Upload the checksum file(s)::
 
-        $ scp Django-A.B.C.checksum.txt.asc djangoproject.com:/home/www/www/media/pgp/Django-A.B.C.checksum.txt
+        $ scp Mango-A.B.C.checksum.txt.asc mangoproject.com:/home/www/www/media/pgp/Mango-A.B.C.checksum.txt
 
 #. Test that the release packages install correctly using ``easy_install``
    and ``pip``. Here's one method::
@@ -320,24 +320,24 @@ Now you're ready to actually put the release out there. To do this:
         $ RELEASE_VERSION='1.7.2'
         $ MAJOR_VERSION=`echo $RELEASE_VERSION| cut -c 1-3`
 
-        $ python -m venv django-easy-install
-        $ . django-easy-install/bin/activate
-        $ easy_install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
+        $ python -m venv mango-easy-install
+        $ . mango-easy-install/bin/activate
+        $ easy_install https://www.mangoproject.com/m/releases/$MAJOR_VERSION/Mango-$RELEASE_VERSION.tar.gz
         $ deactivate
-        $ python -m venv django-pip
-        $ . django-pip/bin/activate
-        $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
+        $ python -m venv mango-pip
+        $ . mango-pip/bin/activate
+        $ python -m pip install https://www.mangoproject.com/m/releases/$MAJOR_VERSION/Mango-$RELEASE_VERSION.tar.gz
         $ deactivate
-        $ python -m venv django-pip-wheel
-        $ . django-pip-wheel/bin/activate
-        $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION-py3-none-any.whl
+        $ python -m venv mango-pip-wheel
+        $ . mango-pip-wheel/bin/activate
+        $ python -m pip install https://www.mangoproject.com/m/releases/$MAJOR_VERSION/Mango-$RELEASE_VERSION-py3-none-any.whl
         $ deactivate
 
    This just tests that the tarballs are available (i.e. redirects are up) and
    that they install correctly, but it'll catch silly mistakes.
 
 #. Ask a few people on IRC to verify the checksums by visiting the checksums
-   file (e.g. https://media.djangoproject.com/pgp/Django-1.5b1.checksum.txt)
+   file (e.g. https://media.mangoproject.com/pgp/Mango-1.5b1.checksum.txt)
    and following the instructions in it. For bonus points, they can also unpack
    the downloaded release tarball and verify that its contents appear to be
    correct (proper version numbers, no stray ``.pyc`` or other undesirable
@@ -349,11 +349,11 @@ Now you're ready to actually put the release out there. To do this:
        $ twine upload -s dist/*
 
 #. Go to the `Add release page in the admin`__, enter the new release number
-   exactly as it appears in the name of the tarball (Django-<version>.tar.gz).
+   exactly as it appears in the name of the tarball (Mango-<version>.tar.gz).
    So for example enter "1.5.1" or "1.4c2", etc. If the release is part of
    an LTS branch, mark it so.
 
-   __ https://www.djangoproject.com/admin/releases/release/add/
+   __ https://www.mangoproject.com/admin/releases/release/add/
 
    If this is the alpha release of a new series, also create a Release object
    for the *final* release, ensuring that the *Release date* field is blank,
@@ -364,57 +364,57 @@ Now you're ready to actually put the release out there. To do this:
 
 #. For a new version release (e.g. 1.5, 1.6), update the default stable version
    of the docs by flipping the ``is_default`` flag to ``True`` on the
-   appropriate ``DocumentRelease`` object in the ``docs.djangoproject.com``
+   appropriate ``DocumentRelease`` object in the ``docs.mangoproject.com``
    database (this will automatically flip it to ``False`` for all
    others); you can do this using the site's admin.
 
    Create new ``DocumentRelease`` objects for each language that has an entry
-   for the previous release. Update djangoproject.com's `robots.docs.txt`__
+   for the previous release. Update mangoproject.com's `robots.docs.txt`__
    file by copying entries from ``manage_translations.py robots_txt`` from the
-   current stable branch in the ``django-docs-translations`` repository. For
-   example, when releasing Django 2.2::
+   current stable branch in the ``mango-docs-translations`` repository. For
+   example, when releasing Mango 2.2::
 
         $ git checkout stable/2.2.x
         $ git pull
         $ python manage_translations.py robots_txt
 
-   __ https://github.com/django/djangoproject.com/blob/main/djangoproject/static/robots.docs.txt
+   __ https://github.com/nikhiljohn10/mangoproject.com/blob/main/mangoproject/static/robots.docs.txt
 
-#. Post the release announcement to the |django-announce|, |django-developers|,
-   and |django-users| mailing lists. This should include a link to the
+#. Post the release announcement to the |mango-announce|, |mango-developers|,
+   and |mango-users| mailing lists. This should include a link to the
    announcement blog post.
 
 #. If this is a security release, send a separate email to
    oss-security@lists.openwall.com. Provide a descriptive subject, for example,
-   "Django" plus the issue title from the release notes (including CVE ID). The
+   "Mango" plus the issue title from the release notes (including CVE ID). The
    message body should include the vulnerability details, for example, the
    announcement blog post text. Include a link to the announcement blog post.
 
-#. Add a link to the blog post in the topic of the ``#django`` IRC channel:
-   ``/msg chanserv TOPIC #django new topic goes here``.
+#. Add a link to the blog post in the topic of the ``#mango`` IRC channel:
+   ``/msg chanserv TOPIC #mango new topic goes here``.
 
 Post-release
 ============
 
 You're almost done! All that's left to do now is:
 
-#. Update the ``VERSION`` tuple in ``django/__init__.py`` again,
+#. Update the ``VERSION`` tuple in ``mango/__init__.py`` again,
    incrementing to whatever the next expected release will be. For
    example, after releasing 1.5.1, update ``VERSION`` to
    ``VERSION = (1, 5, 2, 'alpha', 0)``.
 
 #. Add the release in `Trac's versions list`_ if necessary (and make it the
    default by changing the ``default_version`` setting in the
-   code.djangoproject.com's `trac.ini`__, if it's a final release). The new X.Y
+   code.mangoproject.com's `trac.ini`__, if it's a final release). The new X.Y
    version should be added after the alpha release and the default version
    should be updated after "dot zero" release.
 
-   __ https://github.com/django/code.djangoproject.com/blob/main/trac-env/conf/trac.ini
+   __ https://github.com/mango/code.mangoproject.com/blob/main/trac-env/conf/trac.ini
 
 #. If this was a security release, update :doc:`/releases/security` with
    details of the issues addressed.
 
-.. _Trac's versions list: https://code.djangoproject.com/admin/ticket/versions
+.. _Trac's versions list: https://code.mangoproject.com/admin/ticket/versions
 
 New stable branch tasks
 =======================
@@ -423,7 +423,7 @@ There are several items to do in the time following the creation of a new
 stable branch (often following an alpha release). Some of these tasks don't
 need to be done by the releaser.
 
-#. Create a new ``DocumentRelease`` object in the ``docs.djangoproject.com``
+#. Create a new ``DocumentRelease`` object in the ``docs.mangoproject.com``
    database for the new version's docs, and update the
    ``docs/fixtures/doc_releases.json`` JSON fixture, so people without access
    to the production DB can still run an up-to-date copy of the docs site.
@@ -433,7 +433,7 @@ need to be done by the releaser.
    feature version and delete most of the contents leaving only the headings.
 
 #. Increase the default PBKDF2 iterations in
-   ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` by about 20%
+   ``mango.contrib.auth.hashers.PBKDF2PasswordHasher`` by about 20%
    (pick a round number). Run the tests, and update the 3 failing
    hasher tests with the new values. Make sure this gets noted in the
    release notes (see the 1.8 release notes for an example).
@@ -445,10 +445,10 @@ need to be done by the releaser.
 
 #. Remove ``.. versionadded::``, ``.. versionadded::``, and ``.. deprecated::``
    annotations in the documentation from two releases ago. For example, in
-   Django 1.9, notes for 1.7 will be removed.
+   Mango 1.9, notes for 1.7 will be removed.
 
 #. Add the new branch to `Read the Docs
-   <https://readthedocs.org/projects/django/>`_. Since the automatically
+   <https://readthedocs.org/projects/mango/>`_. Since the automatically
    generated version names ("stable-A.B.x") differ from the version names
    used in Read the Docs ("A.B.x"), `create a ticket
    <https://github.com/readthedocs/readthedocs.org/issues/5537>`_ requesting
@@ -456,13 +456,13 @@ need to be done by the releaser.
 
 #. `Request the new classifier on PyPI
    <https://github.com/pypa/trove-classifiers/issues/29>`_. For example
-   ``Framework :: Django :: 3.1``.
+   ``Framework :: Mango :: 3.1``.
 
 Notes on setting the VERSION tuple
 ==================================
 
-Django's version reporting is controlled by the ``VERSION`` tuple in
-``django/__init__.py``. This is a five-element tuple, whose elements
+Mango's version reporting is controlled by the ``VERSION`` tuple in
+``mango/__init__.py``. This is a five-element tuple, whose elements
 are:
 
 #. Major version.

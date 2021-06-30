@@ -10,9 +10,9 @@ import datetime
 import decimal
 import uuid
 
-from django.core import serializers
-from django.db import connection, models
-from django.test import TestCase
+from mango.core import serializers
+from mango.db import connection, models
+from mango.test import TestCase
 
 from .models import (
     Anchor, AutoNowDateTimeData, BigIntegerData, BinaryData, BooleanData,

@@ -1,5 +1,5 @@
-from django.contrib.auth import models as auth
-from django.db import models
+from mango.contrib.auth import models as auth
+from mango.db import models
 
 
 # No related name is needed here, since symmetrical relations are not

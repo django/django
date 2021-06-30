@@ -1,7 +1,7 @@
 import unittest
 
-from django.contrib.messages.middleware import MessageMiddleware
-from django.http import HttpRequest, HttpResponse
+from mango.contrib.messages.middleware import MessageMiddleware
+from mango.http import HttpRequest, HttpResponse
 
 
 class MiddlewareTests(unittest.TestCase):

@@ -1,15 +1,15 @@
-from django.conf import settings
-from django.contrib.redirects.middleware import RedirectFallbackMiddleware
-from django.contrib.redirects.models import Redirect
-from django.contrib.sites.models import Site
-from django.core.exceptions import ImproperlyConfigured
-from django.http import (
+from mango.conf import settings
+from mango.contrib.redirects.middleware import RedirectFallbackMiddleware
+from mango.contrib.redirects.models import Redirect
+from mango.contrib.sites.models import Site
+from mango.core.exceptions import ImproperlyConfigured
+from mango.http import (
     HttpResponse, HttpResponseForbidden, HttpResponseRedirect,
 )
-from django.test import TestCase, modify_settings, override_settings
+from mango.test import TestCase, modify_settings, override_settings
 
 
-@modify_settings(MIDDLEWARE={'append': 'django.contrib.redirects.middleware.RedirectFallbackMiddleware'})
+@modify_settings(MIDDLEWARE={'append': 'mango.contrib.redirects.middleware.RedirectFallbackMiddleware'})
 @override_settings(APPEND_SLASH=False, ROOT_URLCONF='redirects_tests.urls', SITE_ID=1)
 class RedirectTests(TestCase):
 
@@ -58,14 +58,14 @@ class RedirectTests(TestCase):
         response = self.client.get('/initial')
         self.assertEqual(response.status_code, 410)
 
-    @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
+    @modify_settings(INSTALLED_APPS={'remove': 'mango.contrib.sites'})
     def test_sites_not_installed(self):
         def get_response(request):
             return HttpResponse()
 
         msg = (
             'You cannot use RedirectFallbackMiddleware when '
-            'django.contrib.sites is not installed.'
+            'mango.contrib.sites is not installed.'
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             RedirectFallbackMiddleware(get_response)

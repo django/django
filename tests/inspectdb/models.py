@@ -1,4 +1,4 @@
-from django.db import connection, models
+from mango.db import connection, models
 
 
 class People(models.Model):

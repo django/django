@@ -1,5 +1,5 @@
 =====================================
-Writing your first Django app, part 3
+Writing your first Mango app, part 3
 =====================================
 
 This tutorial begins where :doc:`Tutorial 2 </intro/tutorial02>` left off. We're
@@ -14,7 +14,7 @@ interface -- "views."
 Overview
 ========
 
-A view is a "type" of Web page in your Django application that generally serves
+A view is a "type" of Web page in your Mango application that generally serves
 a specific function and has a specific template. For example, in a blog
 application, you might have the following views:
 
@@ -44,20 +44,20 @@ In our poll application, we'll have the following four views:
 * Vote action -- handles voting for a particular choice in a particular
   question.
 
-In Django, web pages and other content are delivered by views. Each view is
+In Mango, web pages and other content are delivered by views. Each view is
 represented by a Python function (or method, in the case of class-based views).
-Django will choose a view by examining the URL that's requested (to be precise,
+Mango will choose a view by examining the URL that's requested (to be precise,
 the part of the URL after the domain name).
 
 Now in your time on the web you may have come across such beauties as
 ``ME2/Sites/dirmod.htm?sid=&type=gen&mod=Core+Pages&gid=A6CD4967199A42D9B65B1B``.
-You will be pleased to know that Django allows us much more elegant
+You will be pleased to know that Mango allows us much more elegant
 *URL patterns* than that.
 
 A URL pattern is the general form of a URL - for example:
 ``/newsarchive/<year>/<month>/``.
 
-To get from a URL to a view, Django uses what are known as 'URLconfs'. A
+To get from a URL to a view, Mango uses what are known as 'URLconfs'. A
 URLconf maps URL patterns to views.
 
 This tutorial provides basic instruction in the use of URLconfs, and you can
@@ -83,12 +83,12 @@ slightly different, because they take an argument:
         return HttpResponse("You're voting on question %s." % question_id)
 
 Wire these new views into the ``polls.urls`` module by adding the following
-:func:`~django.urls.path` calls:
+:func:`~mango.urls.path` calls:
 
 .. code-block:: python
     :caption: polls/urls.py
 
-    from django.urls import path
+    from mango.urls import path
 
     from . import views
 
@@ -108,7 +108,7 @@ method and display whatever ID you provide in the URL. Try
 "/polls/34/results/" and "/polls/34/vote/" too -- these will display the
 placeholder results and voting pages.
 
-When somebody requests a page from your website -- say, "/polls/34/", Django
+When somebody requests a page from your website -- say, "/polls/34/", Mango
 will load the ``mysite.urls`` Python module because it's pointed to by the
 :setting:`ROOT_URLCONF` setting. It finds the variable named ``urlpatterns``
 and traverses the patterns in order. After finding the match at ``'polls/'``,
@@ -129,18 +129,18 @@ Write views that actually do something
 ======================================
 
 Each view is responsible for doing one of two things: returning an
-:class:`~django.http.HttpResponse` object containing the content for the
-requested page, or raising an exception such as :exc:`~django.http.Http404`. The
+:class:`~mango.http.HttpResponse` object containing the content for the
+requested page, or raising an exception such as :exc:`~mango.http.Http404`. The
 rest is up to you.
 
 Your view can read records from a database, or not. It can use a template
-system such as Django's -- or a third-party Python template system -- or not.
+system such as Mango's -- or a third-party Python template system -- or not.
 It can generate a PDF file, output XML, create a ZIP file on the fly, anything
 you want, using whatever Python libraries you want.
 
-All Django wants is that :class:`~django.http.HttpResponse`. Or an exception.
+All Mango wants is that :class:`~mango.http.HttpResponse`. Or an exception.
 
-Because it's convenient, let's use Django's own database API, which we covered
+Because it's convenient, let's use Mango's own database API, which we covered
 in :doc:`Tutorial 2 </intro/tutorial02>`. Here's one stab at a new ``index()``
 view, which displays the latest 5 poll questions in the system, separated by
 commas, according to publication date:
@@ -148,7 +148,7 @@ commas, according to publication date:
 .. code-block:: python
     :caption: polls/views.py
 
-    from django.http import HttpResponse
+    from mango.http import HttpResponse
 
     from .models import Question
 
@@ -162,16 +162,16 @@ commas, according to publication date:
 
 There's a problem here, though: the page's design is hard-coded in the view. If
 you want to change the way the page looks, you'll have to edit this Python code.
-So let's use Django's template system to separate the design from Python by
+So let's use Mango's template system to separate the design from Python by
 creating a template that the view can use.
 
 First, create a directory called ``templates`` in your ``polls`` directory.
-Django will look for templates in there.
+Mango will look for templates in there.
 
-Your project's :setting:`TEMPLATES` setting describes how Django will load and
-render templates. The default settings file configures a ``DjangoTemplates``
+Your project's :setting:`TEMPLATES` setting describes how Mango will load and
+render templates. The default settings file configures a ``MangoTemplates``
 backend whose :setting:`APP_DIRS <TEMPLATES-APP_DIRS>` option is set to
-``True``. By convention ``DjangoTemplates`` looks for a "templates"
+``True``. By convention ``MangoTemplates`` looks for a "templates"
 subdirectory in each of the :setting:`INSTALLED_APPS`.
 
 Within the ``templates`` directory you have just created, create another
@@ -179,22 +179,22 @@ directory called ``polls``, and within that create a file called
 ``index.html``. In other words, your template should be at
 ``polls/templates/polls/index.html``. Because of how the ``app_directories``
 template loader works as described above, you can refer to this template within
-Django as ``polls/index.html``.
+Mango as ``polls/index.html``.
 
 .. admonition:: Template namespacing
 
     Now we *might* be able to get away with putting our templates directly in
     ``polls/templates`` (rather than creating another ``polls`` subdirectory),
-    but it would actually be a bad idea. Django will choose the first template
+    but it would actually be a bad idea. Mango will choose the first template
     it finds whose name matches, and if you had a template with the same name
-    in a *different* application, Django would be unable to distinguish between
-    them. We need to be able to point Django at the right one, and the best
+    in a *different* application, Mango would be unable to distinguish between
+    them. We need to be able to point Mango at the right one, and the best
     way to ensure this is by *namespacing* them. That is, by putting those
     templates inside *another* directory named for the application itself.
 
 Put the following code in that template:
 
-.. code-block:: html+django
+.. code-block:: html+mango
     :caption: polls/templates/polls/index.html
 
     {% if latest_question_list %}
@@ -219,8 +219,8 @@ Now let's update our ``index`` view in ``polls/views.py`` to use the template:
 .. code-block:: python
     :caption: polls/views.py
 
-    from django.http import HttpResponse
-    from django.template import loader
+    from mango.http import HttpResponse
+    from mango.template import loader
 
     from .models import Question
 
@@ -241,18 +241,18 @@ Load the page by pointing your browser at "/polls/", and you should see a
 bulleted-list containing the "What's up" question from :doc:`Tutorial 2
 </intro/tutorial02>`. The link points to the question's detail page.
 
-A shortcut: :func:`~django.shortcuts.render`
+A shortcut: :func:`~mango.shortcuts.render`
 --------------------------------------------
 
 It's a very common idiom to load a template, fill a context and return an
-:class:`~django.http.HttpResponse` object with the result of the rendered
-template. Django provides a shortcut. Here's the full ``index()`` view,
+:class:`~mango.http.HttpResponse` object with the result of the rendered
+template. Mango provides a shortcut. Here's the full ``index()`` view,
 rewritten:
 
 .. code-block:: python
     :caption: polls/views.py
 
-    from django.shortcuts import render
+    from mango.shortcuts import render
 
     from .models import Question
 
@@ -263,13 +263,13 @@ rewritten:
         return render(request, 'polls/index.html', context)
 
 Note that once we've done this in all these views, we no longer need to import
-:mod:`~django.template.loader` and :class:`~django.http.HttpResponse` (you'll
+:mod:`~mango.template.loader` and :class:`~mango.http.HttpResponse` (you'll
 want to keep ``HttpResponse`` if you still have the stub methods for ``detail``,
 ``results``, and ``vote``).
 
-The :func:`~django.shortcuts.render` function takes the request object as its
+The :func:`~mango.shortcuts.render` function takes the request object as its
 first argument, a template name as its second argument and a dictionary as its
-optional third argument. It returns an :class:`~django.http.HttpResponse`
+optional third argument. It returns an :class:`~mango.http.HttpResponse`
 object of the given template rendered with the given context.
 
 Raising a 404 error
@@ -281,8 +281,8 @@ for a given poll. Here's the view:
 .. code-block:: python
     :caption: polls/views.py
 
-    from django.http import Http404
-    from django.shortcuts import render
+    from mango.http import Http404
+    from mango.shortcuts import render
 
     from .models import Question
     # ...
@@ -293,31 +293,31 @@ for a given poll. Here's the view:
             raise Http404("Question does not exist")
         return render(request, 'polls/detail.html', {'question': question})
 
-The new concept here: The view raises the :exc:`~django.http.Http404` exception
+The new concept here: The view raises the :exc:`~mango.http.Http404` exception
 if a question with the requested ID doesn't exist.
 
 We'll discuss what you could put in that ``polls/detail.html`` template a bit
 later, but if you'd like to quickly get the above example working, a file
 containing just:
 
-.. code-block:: html+django
+.. code-block:: html+mango
     :caption: polls/templates/polls/detail.html
 
     {{ question }}
 
 will get you started for now.
 
-A shortcut: :func:`~django.shortcuts.get_object_or_404`
+A shortcut: :func:`~mango.shortcuts.get_object_or_404`
 -------------------------------------------------------
 
-It's a very common idiom to use :meth:`~django.db.models.query.QuerySet.get`
-and raise :exc:`~django.http.Http404` if the object doesn't exist. Django
+It's a very common idiom to use :meth:`~mango.db.models.query.QuerySet.get`
+and raise :exc:`~mango.http.Http404` if the object doesn't exist. Mango
 provides a shortcut. Here's the ``detail()`` view, rewritten:
 
 .. code-block:: python
     :caption: polls/views.py
 
-    from django.shortcuts import get_object_or_404, render
+    from mango.shortcuts import get_object_or_404, render
 
     from .models import Question
     # ...
@@ -325,29 +325,29 @@ provides a shortcut. Here's the ``detail()`` view, rewritten:
         question = get_object_or_404(Question, pk=question_id)
         return render(request, 'polls/detail.html', {'question': question})
 
-The :func:`~django.shortcuts.get_object_or_404` function takes a Django model
+The :func:`~mango.shortcuts.get_object_or_404` function takes a Mango model
 as its first argument and an arbitrary number of keyword arguments, which it
-passes to the :meth:`~django.db.models.query.QuerySet.get` function of the
-model's manager. It raises :exc:`~django.http.Http404` if the object doesn't
+passes to the :meth:`~mango.db.models.query.QuerySet.get` function of the
+model's manager. It raises :exc:`~mango.http.Http404` if the object doesn't
 exist.
 
 .. admonition:: Philosophy
 
-    Why do we use a helper function :func:`~django.shortcuts.get_object_or_404`
+    Why do we use a helper function :func:`~mango.shortcuts.get_object_or_404`
     instead of automatically catching the
-    :exc:`~django.core.exceptions.ObjectDoesNotExist` exceptions at a higher
-    level, or having the model API raise :exc:`~django.http.Http404` instead of
-    :exc:`~django.core.exceptions.ObjectDoesNotExist`?
+    :exc:`~mango.core.exceptions.ObjectDoesNotExist` exceptions at a higher
+    level, or having the model API raise :exc:`~mango.http.Http404` instead of
+    :exc:`~mango.core.exceptions.ObjectDoesNotExist`?
 
     Because that would couple the model layer to the view layer. One of the
-    foremost design goals of Django is to maintain loose coupling. Some
-    controlled coupling is introduced in the :mod:`django.shortcuts` module.
+    foremost design goals of Mango is to maintain loose coupling. Some
+    controlled coupling is introduced in the :mod:`mango.shortcuts` module.
 
-There's also a :func:`~django.shortcuts.get_list_or_404` function, which works
-just as :func:`~django.shortcuts.get_object_or_404` -- except using
-:meth:`~django.db.models.query.QuerySet.filter` instead of
-:meth:`~django.db.models.query.QuerySet.get`. It raises
-:exc:`~django.http.Http404` if the list is empty.
+There's also a :func:`~mango.shortcuts.get_list_or_404` function, which works
+just as :func:`~mango.shortcuts.get_object_or_404` -- except using
+:meth:`~mango.db.models.query.QuerySet.filter` instead of
+:meth:`~mango.db.models.query.QuerySet.get`. It raises
+:exc:`~mango.http.Http404` if the list is empty.
 
 Use the template system
 =======================
@@ -356,7 +356,7 @@ Back to the ``detail()`` view for our poll application. Given the context
 variable ``question``, here's what the ``polls/detail.html`` template might look
 like:
 
-.. code-block:: html+django
+.. code-block:: html+mango
     :caption: polls/templates/polls/detail.html
 
     <h1>{{ question.question_text }}</h1>
@@ -367,7 +367,7 @@ like:
     </ul>
 
 The template system uses dot-lookup syntax to access variable attributes. In
-the example of ``{{ question.question_text }}``, first Django does a dictionary lookup
+the example of ``{{ question.question_text }}``, first Mango does a dictionary lookup
 on the object ``question``. Failing that, it tries an attribute lookup -- which
 works, in this case. If attribute lookup had failed, it would've tried a
 list-index lookup.
@@ -385,17 +385,17 @@ Removing hardcoded URLs in templates
 Remember, when we wrote the link to a question in the ``polls/index.html``
 template, the link was partially hardcoded like this:
 
-.. code-block:: html+django
+.. code-block:: html+mango
 
     <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li>
 
 The problem with this hardcoded, tightly-coupled approach is that it becomes
 challenging to change URLs on projects with a lot of templates. However, since
-you defined the name argument in the :func:`~django.urls.path` functions in
+you defined the name argument in the :func:`~mango.urls.path` functions in
 the ``polls.urls`` module, you can remove a reliance on specific URL paths
 defined in your url configurations by using the ``{% url %}`` template tag:
 
-.. code-block:: html+django
+.. code-block:: html+mango
 
     <li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
 
@@ -420,11 +420,11 @@ template (or templates) you would change it in ``polls/urls.py``::
 Namespacing URL names
 =====================
 
-The tutorial project has just one app, ``polls``. In real Django projects,
-there might be five, ten, twenty apps or more. How does Django differentiate
+The tutorial project has just one app, ``polls``. In real Mango projects,
+there might be five, ten, twenty apps or more. How does Mango differentiate
 the URL names between them? For example, the ``polls`` app has a ``detail``
 view, and so might an app on the same project that is for a blog. How does one
-make it so that Django knows which app view to create for a url when using the
+make it so that Mango knows which app view to create for a url when using the
 ``{% url %}`` template tag?
 
 The answer is to add namespaces to your  URLconf. In the ``polls/urls.py``
@@ -433,7 +433,7 @@ file, go ahead and add an ``app_name`` to set the application namespace:
 .. code-block:: python
     :caption: polls/urls.py
 
-    from django.urls import path
+    from mango.urls import path
 
     from . import views
 
@@ -447,14 +447,14 @@ file, go ahead and add an ``app_name`` to set the application namespace:
 
 Now change your ``polls/index.html`` template from:
 
-.. code-block:: html+django
+.. code-block:: html+mango
     :caption: polls/templates/polls/index.html
 
     <li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
 
 to point at the namespaced detail view:
 
-.. code-block:: html+django
+.. code-block:: html+mango
     :caption: polls/templates/polls/index.html
 
     <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>

@@ -2,7 +2,7 @@
 ``QuerySet`` API reference
 ==========================
 
-.. currentmodule:: django.db.models.query
+.. currentmodule:: mango.db.models.query
 
 This document describes the details of the ``QuerySet`` API. It builds on the
 material presented in the :doc:`model </topics/db/models>` and :doc:`database
@@ -36,7 +36,7 @@ You can evaluate a ``QuerySet`` in the following ways:
 
 * **Slicing.** As explained in :ref:`limiting-querysets`, a ``QuerySet`` can
   be sliced, using Python's array-slicing syntax. Slicing an unevaluated
-  ``QuerySet`` usually returns another unevaluated ``QuerySet``, but Django
+  ``QuerySet`` usually returns another unevaluated ``QuerySet``, but Mango
   will execute the database query if you use the "step" parameter of slice
   syntax, and will return a list. Slicing a ``QuerySet`` that has been
   evaluated also returns a list.
@@ -59,7 +59,7 @@ You can evaluate a ``QuerySet`` in the following ways:
 
   Note: If you only need to determine the number of records in the set (and
   don't need the actual objects), it's much more efficient to handle a count
-  at the database level using SQL's ``SELECT COUNT(*)``. Django provides a
+  at the database level using SQL's ``SELECT COUNT(*)``. Mango provides a
   :meth:`~QuerySet.count` method for precisely this reason.
 
 * **list().** Force evaluation of a ``QuerySet`` by calling ``list()`` on
@@ -122,15 +122,15 @@ described here.
 
 .. admonition:: You can't share pickles between versions
 
-    Pickles of ``QuerySets`` are only valid for the version of Django that
-    was used to generate them. If you generate a pickle using Django
+    Pickles of ``QuerySets`` are only valid for the version of Mango that
+    was used to generate them. If you generate a pickle using Mango
     version N, there is no guarantee that pickle will be readable with
-    Django version N+1. Pickles should not be used as part of a long-term
+    Mango version N+1. Pickles should not be used as part of a long-term
     archival strategy.
 
     Since pickle compatibility errors can be difficult to diagnose, such as
     silently corrupted objects, a ``RuntimeWarning`` is raised when you try to
-    unpickle a queryset in a Django version that is different than the one in
+    unpickle a queryset in a Mango version that is different than the one in
     which it was pickled.
 
 .. _queryset-api:
@@ -167,12 +167,12 @@ Here's the formal declaration of a ``QuerySet``:
         parameter is an opaque representation of that query state and is not
         part of a public API.
 
-.. currentmodule:: django.db.models.query.QuerySet
+.. currentmodule:: mango.db.models.query.QuerySet
 
 Methods that return new ``QuerySet``\s
 --------------------------------------
 
-Django provides a range of ``QuerySet`` refinement methods that modify either
+Mango provides a range of ``QuerySet`` refinement methods that modify either
 the types of results returned by the ``QuerySet`` or the way its SQL query is
 executed.
 
@@ -189,7 +189,7 @@ The lookup parameters (``**kwargs``) should be in the format described in
 underlying SQL statement.
 
 If you need to execute more complex queries (for example, queries with ``OR`` statements),
-you can use :class:`Q objects <django.db.models.Q>`.
+you can use :class:`Q objects <mango.db.models.Q>`.
 
 ``exclude()``
 ~~~~~~~~~~~~~
@@ -231,7 +231,7 @@ In SQL terms, that evaluates to:
 Note the second example is more restrictive.
 
 If you need to execute more complex queries (for example, queries with ``OR`` statements),
-you can use :class:`Q objects <django.db.models.Q>`.
+you can use :class:`Q objects <mango.db.models.Q>`.
 
 ``annotate()``
 ~~~~~~~~~~~~~~
@@ -247,7 +247,7 @@ are related to the objects in the ``QuerySet``.
 Each argument to ``annotate()`` is an annotation that will be added
 to each object in the ``QuerySet`` that is returned.
 
-The aggregation functions that are provided by Django are described
+The aggregation functions that are provided by Mango are described
 in `Aggregation Functions`_ below.
 
 Annotations specified using keyword arguments will use the keyword as
@@ -260,7 +260,7 @@ else must be a keyword argument.
 For example, if you were manipulating a list of blogs, you may want
 to determine how many entries have been made in each blog::
 
-    >>> from django.db.models import Count
+    >>> from mango.db.models import Count
     >>> q = Blog.objects.annotate(Count('entry'))
     # The name of the first blog
     >>> q[0].name
@@ -298,7 +298,7 @@ should result in better performance.
 For example, if you want to find blogs with more than 5 entries, but are not
 interested in the exact number of entries, you could do this::
 
-    >>> from django.db.models import Count
+    >>> from mango.db.models import Count
     >>> blogs = Blog.objects.alias(entries=Count('entry')).filter(entries__gt=5)
 
 ``alias()`` can be used in conjunction with :meth:`annotate`, :meth:`exclude`,
@@ -347,10 +347,10 @@ and so on for as many models as you want to join. For example::
 
     Entry.objects.order_by('blog__name', 'headline')
 
-If you try to order by a field that is a relation to another model, Django will
+If you try to order by a field that is a relation to another model, Mango will
 use the default ordering on the related model, or order by the related model's
 primary key if there is no :attr:`Meta.ordering
-<django.db.models.Options.ordering>` specified. For example, since the ``Blog``
+<mango.db.models.Options.ordering>` specified. For example, since the ``Blog``
 model has no default ordering specified::
 
     Entry.objects.order_by('blog')
@@ -379,8 +379,8 @@ related model ordering can change the expected results.
 
 .. note::
     It is permissible to specify a multi-valued field to order the results by
-    (for example, a :class:`~django.db.models.ManyToManyField` field, or the
-    reverse relation of a :class:`~django.db.models.ForeignKey` field).
+    (for example, a :class:`~mango.db.models.ManyToManyField` field, or the
+    reverse relation of a :class:`~mango.db.models.ForeignKey` field).
 
     Consider this case::
 
@@ -407,11 +407,11 @@ related model ordering can change the expected results.
     not, make sure the results are what you expect.
 
 There's no way to specify whether ordering should be case sensitive. With
-respect to case-sensitivity, Django will order results however your database
+respect to case-sensitivity, Mango will order results however your database
 backend normally orders them.
 
 You can order by a field converted to lowercase with
-:class:`~django.db.models.functions.Lower` which will achieve case-consistent
+:class:`~mango.db.models.functions.Lower` which will achieve case-consistent
 ordering::
 
     Entry.objects.order_by(Lower('headline').desc())
@@ -456,7 +456,7 @@ To retrieve the "last" five items in a queryset, you could do this::
 Note that this is not quite the same as slicing from the end of a sequence in
 Python. The above example will return the last item first, then the
 penultimate item and so on. If we had a Python sequence and looked at
-``seq[-5:]``, we would see the fifth-last item first. Django doesn't support
+``seq[-5:]``, we would see the fifth-last item first. Mango doesn't support
 that mode of access (slicing from the end), because it's not possible to do it
 efficiently in SQL.
 
@@ -540,7 +540,7 @@ Examples (those after the first will only work on PostgreSQL)::
     that has been defined. You might have to explicitly order by the relation
     ``_id`` or referenced field to make sure the ``DISTINCT ON`` expressions
     match those at the beginning of the ``ORDER BY`` clause. For example, if
-    the ``Blog`` model defined an :attr:`~django.db.models.Options.ordering` by
+    the ``Blog`` model defined an :attr:`~mango.db.models.Options.ordering` by
     ``name``::
 
         Entry.objects.order_by('blog').distinct('blog')
@@ -588,15 +588,15 @@ Example::
 The ``values()`` method also takes optional keyword arguments,
 ``**expressions``, which are passed through to :meth:`annotate`::
 
-    >>> from django.db.models.functions import Lower
+    >>> from mango.db.models.functions import Lower
     >>> Blog.objects.values(lower_name=Lower('name'))
     <QuerySet [{'lower_name': 'beatles blog'}]>
 
 You can use built-in and :doc:`custom lookups </howto/custom-lookups>` in
 ordering. For example::
 
-    >>> from django.db.models import CharField
-    >>> from django.db.models.functions import Lower
+    >>> from mango.db.models import CharField
+    >>> from mango.db.models.functions import Lower
     >>> CharField.register_lookup(Lower)
     >>> Blog.objects.values('name__lower')
     <QuerySet [{'name__lower': 'beatles blog'}]>
@@ -605,7 +605,7 @@ An aggregate within a ``values()`` clause is applied before other arguments
 within the same ``values()`` clause. If you need to group by another value,
 add it to an earlier ``values()`` clause instead. For example::
 
-    >>> from django.db.models import Count
+    >>> from mango.db.models import Count
     >>> Blog.objects.values('entry__authors', entries=Count('entry'))
     <QuerySet [{'entry__authors': 1, 'entries': 20}, {'entry__authors': 1, 'entries': 13}]>
     >>> Blog.objects.values('entry__authors').annotate(entries=Count('entry'))
@@ -614,7 +614,7 @@ add it to an earlier ``values()`` clause instead. For example::
 A few subtleties that are worth mentioning:
 
 * If you have a field called ``foo`` that is a
-  :class:`~django.db.models.ForeignKey`, the default ``values()`` call
+  :class:`~mango.db.models.ForeignKey`, the default ``values()`` call
   will return a dictionary key called ``foo_id``, since this is the name
   of the hidden model attribute that stores the actual value (the ``foo``
   attribute refers to the related model). When you are calling
@@ -651,8 +651,8 @@ A few subtleties that are worth mentioning:
   if the transform has been registered on the relevant field type the first
   :meth:`annotate` can be omitted, thus the following examples are equivalent::
 
-    >>> from django.db.models import CharField, Count
-    >>> from django.db.models.functions import Lower
+    >>> from mango.db.models import CharField, Count
+    >>> from mango.db.models.functions import Lower
     >>> CharField.register_lookup(Lower)
     >>> Blog.objects.values('entry__authors__name__lower').annotate(entries=Count('entry'))
     <QuerySet [{'entry__authors__name__lower': 'test author', 'entries': 33}]>
@@ -675,7 +675,7 @@ Finally, note that you can call ``filter()``, ``order_by()``, etc. after the
     Blog.objects.values().order_by('id')
     Blog.objects.order_by('id').values()
 
-The people who made Django prefer to put all the SQL-affecting methods first,
+The people who made Mango prefer to put all the SQL-affecting methods first,
 followed (optionally) by any output-affecting methods (such as ``values()``),
 but it doesn't really matter. This is your chance to really flaunt your
 individualism.
@@ -689,7 +689,7 @@ You can also refer to fields on related models with reverse relations through
 
 .. warning::
 
-   Because :class:`~django.db.models.ManyToManyField` attributes and reverse
+   Because :class:`~mango.db.models.ManyToManyField` attributes and reverse
    relations can have multiple related rows, including these can have a
    multiplier effect on the size of your result set. This will be especially
    pronounced if you include multiple such fields in your ``values()`` query,
@@ -707,7 +707,7 @@ first item is the first field, etc. For example::
 
     >>> Entry.objects.values_list('id', 'headline')
     <QuerySet [(1, 'First entry'), ...]>
-    >>> from django.db.models.functions import Lower
+    >>> from mango.db.models.functions import Lower
     >>> Entry.objects.values_list('id', Lower('headline'))
     <QuerySet [(1, 'first entry'), ...]>
 
@@ -748,7 +748,7 @@ other multivalued relations (such as the one-to-many relation of a reverse
 foreign key) because the "one row, one object" assumption doesn't hold.
 
 For example, notice the behavior when querying across a
-:class:`~django.db.models.ManyToManyField`::
+:class:`~mango.db.models.ManyToManyField`::
 
     >>> Author.objects.values_list('name', 'entry__headline')
     <QuerySet [('Noam Chomsky', 'Impressions of Gaza'),
@@ -826,7 +826,7 @@ object in the result list is "truncated" to the given ``type``.
 ``tzinfo`` defines the time zone to which datetimes are converted prior to
 truncation. Indeed, a given datetime has different representations depending
 on the time zone in use. This parameter must be a :class:`datetime.tzinfo`
-object. If it's ``None``, Django uses the :ref:`current time zone
+object. If it's ``None``, Mango uses the :ref:`current time zone
 <default-current-time-zone>`. It has no effect when :setting:`USE_TZ` is
 ``False``.
 
@@ -843,7 +843,7 @@ ambiguous datetimes in daylight saving time. By default (when ``is_dst=None``),
     ``tzinfo.tzname(None)``. This translates into the following requirements:
 
     - SQLite: no requirements. Conversions are performed in Python with pytz_
-      (installed when you install Django).
+      (installed when you install Mango).
     - PostgreSQL: no requirements (see `Time Zones`_).
     - Oracle: no requirements (see `Choosing a Time Zone File`_).
     - MySQL: load the time zone tables with `mysql_tzinfo_to_sql`_.
@@ -868,7 +868,7 @@ Examples::
 
     >>> Entry.objects.none()
     <QuerySet []>
-    >>> from django.db.models.query import EmptyQuerySet
+    >>> from mango.db.models.query import EmptyQuerySet
     >>> isinstance(Entry.objects.none(), EmptyQuerySet)
     True
 
@@ -973,7 +973,7 @@ And here's ``select_related`` lookup::
 
 You can use ``select_related()`` with any queryset of objects::
 
-    from django.utils import timezone
+    from mango.utils import timezone
 
     # Find all the blogs with entries scheduled to be published in the future.
     blogs = set()
@@ -992,7 +992,7 @@ These querysets are equivalent::
 You can follow foreign keys in a similar way to querying them. If you have the
 following models::
 
-    from django.db import models
+    from mango.db import models
 
     class City(models.Model):
         # ...
@@ -1024,16 +1024,16 @@ will cache the related ``Person`` *and* the related ``City``::
     p = b.author         # Hits the database.
     c = p.hometown       # Hits the database.
 
-You can refer to any :class:`~django.db.models.ForeignKey` or
-:class:`~django.db.models.OneToOneField` relation in the list of fields
+You can refer to any :class:`~mango.db.models.ForeignKey` or
+:class:`~mango.db.models.OneToOneField` relation in the list of fields
 passed to ``select_related()``.
 
 You can also refer to the reverse direction of a
-:class:`~django.db.models.OneToOneField` in the list of fields passed to
+:class:`~mango.db.models.OneToOneField` in the list of fields passed to
 ``select_related`` — that is, you can traverse a
-:class:`~django.db.models.OneToOneField` back to the object on which the field
+:class:`~mango.db.models.OneToOneField` back to the object on which the field
 is defined. Instead of specifying the field name, use the :attr:`related_name
-<django.db.models.ForeignKey.related_name>` for the field on the related object.
+<mango.db.models.ForeignKey.related_name>` for the field on the related object.
 
 There may be some situations where you wish to call ``select_related()`` with a
 lot of related objects, or where you don't know all of the relations. In these
@@ -1075,15 +1075,15 @@ relationship, and does the 'joining' in Python. This allows it to prefetch
 many-to-many and many-to-one objects, which cannot be done using
 ``select_related``, in addition to the foreign key and one-to-one relationships
 that are supported by ``select_related``. It also supports prefetching of
-:class:`~django.contrib.contenttypes.fields.GenericRelation` and
-:class:`~django.contrib.contenttypes.fields.GenericForeignKey`, however, it
+:class:`~mango.contrib.contenttypes.fields.GenericRelation` and
+:class:`~mango.contrib.contenttypes.fields.GenericForeignKey`, however, it
 must be restricted to a homogeneous set of results. For example, prefetching
 objects referenced by a ``GenericForeignKey`` is only supported if the query
 is restricted to one ``ContentType``.
 
 For example, suppose you have these models::
 
-    from django.db import models
+    from mango.db import models
 
     class Topping(models.Model):
         name = models.CharField(max_length=30)
@@ -1125,7 +1125,7 @@ The additional queries in ``prefetch_related()`` are executed after the
 ``QuerySet`` has begun to be evaluated and the primary query has been executed.
 
 If you have an iterable of model instances, you can prefetch related attributes
-on those instances using the :func:`~django.db.models.prefetch_related_objects`
+on those instances using the :func:`~mango.db.models.prefetch_related_objects`
 function.
 
 Note that the result cache of the primary ``QuerySet`` and all specified related
@@ -1152,11 +1152,11 @@ database.
     use this feature with caution!
 
     Also, if you call the database-altering methods
-    :meth:`~django.db.models.fields.related.RelatedManager.add`,
-    :meth:`~django.db.models.fields.related.RelatedManager.remove`,
-    :meth:`~django.db.models.fields.related.RelatedManager.clear` or
-    :meth:`~django.db.models.fields.related.RelatedManager.set`, on
-    :class:`related managers<django.db.models.fields.related.RelatedManager>`,
+    :meth:`~mango.db.models.fields.related.RelatedManager.add`,
+    :meth:`~mango.db.models.fields.related.RelatedManager.remove`,
+    :meth:`~mango.db.models.fields.related.RelatedManager.clear` or
+    :meth:`~mango.db.models.fields.related.RelatedManager.set`, on
+    :class:`related managers<mango.db.models.fields.related.RelatedManager>`,
     any prefetched cache for the relation will be cleared.
 
 You can also use the normal join syntax to do related fields of related
@@ -1218,13 +1218,13 @@ profile for your use case!
 Note that if you use ``iterator()`` to run the query, ``prefetch_related()``
 calls will be ignored since these two optimizations do not make sense together.
 
-You can use the :class:`~django.db.models.Prefetch` object to further control
+You can use the :class:`~mango.db.models.Prefetch` object to further control
 the prefetch operation.
 
 In its simplest form ``Prefetch`` is equivalent to the traditional string based
 lookups:
 
-    >>> from django.db.models import Prefetch
+    >>> from mango.db.models import Prefetch
     >>> Restaurant.objects.prefetch_related(Prefetch('pizzas__toppings'))
 
 You can provide a custom queryset with the optional ``queryset`` argument.
@@ -1233,7 +1233,7 @@ This can be used to change the default ordering of the queryset:
     >>> Restaurant.objects.prefetch_related(
     ...     Prefetch('pizzas__toppings', queryset=Toppings.objects.order_by('name')))
 
-Or to call :meth:`~django.db.models.query.QuerySet.select_related()` when
+Or to call :meth:`~mango.db.models.query.QuerySet.select_related()` when
 applicable to reduce the number of queries even further:
 
     >>> Pizza.objects.prefetch_related(
@@ -1345,8 +1345,8 @@ database selected by the outer query. All of the following are valid::
 
 .. method:: extra(select=None, where=None, params=None, tables=None, order_by=None, select_params=None)
 
-Sometimes, the Django query syntax by itself can't easily express a complex
-``WHERE`` clause. For these edge cases, Django provides the ``extra()``
+Sometimes, the Mango query syntax by itself can't easily express a complex
+``WHERE`` clause. For these edge cases, Mango provides the ``extra()``
 ``QuerySet`` modifier — a hook for injecting specific clauses into the SQL
 generated by a ``QuerySet``.
 
@@ -1355,8 +1355,8 @@ generated by a ``QuerySet``.
     This is an old API that we aim to deprecate at some point in the future.
     Use it only if you cannot express your query using other queryset methods.
     If you do need to use it, please `file a ticket
-    <https://code.djangoproject.com/newticket>`_ using the `QuerySet.extra
-    keyword <https://code.djangoproject.com/query?status=assigned&status=new&keywords=~QuerySet.extra>`_
+    <https://code.mangoproject.com/newticket>`_ using the `QuerySet.extra
+    keyword <https://code.mangoproject.com/query?status=assigned&status=new&keywords=~QuerySet.extra>`_
     with your use case (please check the list of existing tickets first) so
     that we can enhance the QuerySet API to allow removing ``extra()``. We are
     no longer improving or fixing bugs for this method.
@@ -1372,10 +1372,10 @@ generated by a ``QuerySet``.
 
         >>> qs.annotate(val=RawSQL("select col from sometable where othercol = %s", (someparam,)))
 
-    The main benefit of using :class:`~django.db.models.expressions.RawSQL` is
+    The main benefit of using :class:`~mango.db.models.expressions.RawSQL` is
     that you can set ``output_field`` if needed. The main downside is that if
     you refer to some table alias of the queryset in the raw SQL, then it is
-    possible that Django might change that alias (for example, when the
+    possible that Mango might change that alias (for example, when the
     queryset is used as a subquery in yet another query).
 
 .. warning::
@@ -1391,7 +1391,7 @@ generated by a ``QuerySet``.
 
         SELECT col FROM sometable WHERE othercol = '%s'  # unsafe!
 
-    You can read more about how Django's :ref:`SQL injection protection
+    You can read more about how Mango's :ref:`SQL injection protection
     <sql-injection-protection>` works.
 
 By definition, these extra lookups may not be portable to different database
@@ -1415,7 +1415,7 @@ of the arguments is required, but you should use at least one of them.
   ``is_recent``, a boolean representing whether the entry's ``pub_date``
   is greater than Jan. 1, 2006.
 
-  Django inserts the given SQL snippet directly into the ``SELECT``
+  Mango inserts the given SQL snippet directly into the ``SELECT``
   statement, so the resulting SQL of the above example would be something like:
 
   .. code-block:: sql
@@ -1445,7 +1445,7 @@ of the arguments is required, but you should use at least one of them.
       FROM blog_blog;
 
   Note that the parentheses required by most database engines around
-  subqueries are not required in Django's ``select`` clauses. Also note
+  subqueries are not required in Mango's ``select`` clauses. Also note
   that some database backends, such as some MySQL versions, don't support
   subqueries.
 
@@ -1484,7 +1484,7 @@ of the arguments is required, but you should use at least one of them.
 
   Be careful when using the ``tables`` parameter if you're specifying
   tables that are already used in the query. When you add extra tables
-  via the ``tables`` parameter, Django assumes you want that table
+  via the ``tables`` parameter, Mango assumes you want that table
   included an extra time, if it is already included. That creates a
   problem, since the table name will then be given an alias. If a table
   appears multiple times in an SQL statement, the second and subsequent
@@ -1569,7 +1569,7 @@ fields, some of which could contain a lot of data (for example, text fields),
 or require expensive processing to convert them to Python objects. If you are
 using the results of a queryset in some situation where you don't know
 if you need those particular fields when you initially fetch the data, you can
-tell Django not to retrieve them from the database.
+tell Mango not to retrieve them from the database.
 
 This is done by passing the names of the fields to not load to ``defer()``::
 
@@ -1622,7 +1622,7 @@ one, doing so will result in an error.
     normalize your models and put the non-loaded data into a separate model
     (and database table). If the columns *must* stay in the one table for some
     reason, create a model with ``Meta.managed = False`` (see the
-    :attr:`managed attribute <django.db.models.Options.managed>` documentation)
+    :attr:`managed attribute <mango.db.models.Options.managed>` documentation)
     containing just the fields you normally need to load and use that where you
     might otherwise call ``defer()``. This makes your code more explicit to the
     reader, is slightly faster and consumes a little less memory in the Python
@@ -1654,9 +1654,9 @@ one, doing so will result in an error.
 
 .. note::
 
-    When calling :meth:`~django.db.models.Model.save()` for instances with
+    When calling :meth:`~mango.db.models.Model.save()` for instances with
     deferred fields, only the loaded fields will be saved. See
-    :meth:`~django.db.models.Model.save()` for more details.
+    :meth:`~mango.db.models.Model.save()` for more details.
 
 ``only()``
 ~~~~~~~~~~
@@ -1703,9 +1703,9 @@ is an error as well.
 
 .. note::
 
-    When calling :meth:`~django.db.models.Model.save()` for instances with
+    When calling :meth:`~mango.db.models.Model.save()` for instances with
     deferred fields, only the loaded fields will be saved. See
-    :meth:`~django.db.models.Model.save()` for more details.
+    :meth:`~mango.db.models.Model.save()` for more details.
 
 ``using()``
 ~~~~~~~~~~~
@@ -1735,7 +1735,7 @@ generating a ``SELECT ... FOR UPDATE`` SQL statement on supported databases.
 
 For example::
 
-    from django.db import transaction
+    from mango.db import transaction
 
     entries = Entry.objects.select_for_update().filter(author=request.user)
     with transaction.atomic():
@@ -1751,7 +1751,7 @@ Usually, if another transaction has already acquired a lock on one of the
 selected rows, the query will block until the lock is released. If this is
 not the behavior you want, call ``select_for_update(nowait=True)``. This will
 make the call non-blocking. If a conflicting lock is already acquired by
-another transaction, :exc:`~django.db.DatabaseError` will be raised when the
+another transaction, :exc:`~mango.db.DatabaseError` will be raised when the
 queryset is evaluated. You can also ignore locked rows by using
 ``select_for_update(skip_locked=True)`` instead. The ``nowait`` and
 ``skip_locked`` are mutually exclusive and attempts to call
@@ -1784,7 +1784,7 @@ You can't use ``select_for_update()`` on nullable relations::
     >>> Person.objects.select_related('hometown').select_for_update()
     Traceback (most recent call last):
     ...
-    django.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
+    mango.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
 
 To avoid that restriction, you can exclude null objects if you don't care about
 them::
@@ -1800,12 +1800,12 @@ only on PostgreSQL.
 
 Passing ``nowait=True``, ``skip_locked=True``, ``no_key=True``, or ``of`` to
 ``select_for_update()`` using database backends that do not support these
-options, such as MySQL, raises a :exc:`~django.db.NotSupportedError`. This
+options, such as MySQL, raises a :exc:`~mango.db.NotSupportedError`. This
 prevents code from unexpectedly blocking.
 
 Evaluating a queryset with ``select_for_update()`` in autocommit mode on
 backends which support ``SELECT ... FOR UPDATE`` is a
-:exc:`~django.db.transaction.TransactionManagementError` error because the
+:exc:`~mango.db.transaction.TransactionManagementError` error because the
 rows are not locked in that case. If allowed, this would facilitate data
 corruption and could easily be caused by calling code that expects to be run in
 a transaction outside of one.
@@ -1818,17 +1818,17 @@ raised if ``select_for_update()`` is used in autocommit mode.
 .. warning::
 
     Although ``select_for_update()`` normally fails in autocommit mode, since
-    :class:`~django.test.TestCase` automatically wraps each test in a
+    :class:`~mango.test.TestCase` automatically wraps each test in a
     transaction, calling ``select_for_update()`` in a ``TestCase`` even outside
-    an :func:`~django.db.transaction.atomic()` block will (perhaps unexpectedly)
+    an :func:`~mango.db.transaction.atomic()` block will (perhaps unexpectedly)
     pass without raising a ``TransactionManagementError``. To properly test
     ``select_for_update()`` you should use
-    :class:`~django.test.TransactionTestCase`.
+    :class:`~mango.test.TransactionTestCase`.
 
 .. admonition:: Certain expressions may not be supported
 
     PostgreSQL doesn't support ``select_for_update()`` with
-    :class:`~django.db.models.expressions.Window` expressions.
+    :class:`~mango.db.models.expressions.Window` expressions.
 
 .. versionchanged:: 3.2
 
@@ -1842,7 +1842,7 @@ raised if ``select_for_update()`` is used in autocommit mode.
 .. method:: raw(raw_query, params=(), translations=None)
 
 Takes a raw SQL query, executes it, and returns a
-``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
+``mango.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
 can be iterated over just like a normal ``QuerySet`` to provide object
 instances.
 
@@ -1873,7 +1873,7 @@ The following are equivalent::
 
     Model.objects.filter(x=1) & Model.objects.filter(y=2)
     Model.objects.filter(x=1, y=2)
-    from django.db.models import Q
+    from mango.db.models import Q
     Model.objects.filter(Q(x=1) & Q(y=2))
 
 SQL equivalent:
@@ -1890,7 +1890,7 @@ Combines two ``QuerySet``\s using the SQL ``OR`` operator.
 The following are equivalent::
 
     Model.objects.filter(x=1) | Model.objects.filter(y=2)
-    from django.db.models import Q
+    from mango.db.models import Q
     Model.objects.filter(Q(x=1) | Q(y=2))
 
 SQL equivalent:
@@ -1927,23 +1927,23 @@ without any arguments to return the object for that row::
     Entry.objects.filter(pk=1).get()
 
 If ``get()`` doesn't find any object, it raises a :exc:`Model.DoesNotExist
-<django.db.models.Model.DoesNotExist>` exception::
+<mango.db.models.Model.DoesNotExist>` exception::
 
     Entry.objects.get(id=-999) # raises Entry.DoesNotExist
 
 If ``get()`` finds more than one object, it raises a
 :exc:`Model.MultipleObjectsReturned
-<django.db.models.Model.MultipleObjectsReturned>` exception::
+<mango.db.models.Model.MultipleObjectsReturned>` exception::
 
     Entry.objects.get(name='A Duplicated Name') # raises Entry.MultipleObjectsReturned
 
 Both these exception classes are attributes of the model class, and specific to
 that model. If you want to handle such exceptions from several ``get()`` calls
 for different models, you can use their generic base classes. For example, you
-can use :exc:`django.core.exceptions.ObjectDoesNotExist`  to handle
-:exc:`~django.db.models.Model.DoesNotExist` exceptions from multiple models::
+can use :exc:`mango.core.exceptions.ObjectDoesNotExist`  to handle
+:exc:`~mango.db.models.Model.DoesNotExist` exceptions from multiple models::
 
-    from django.core.exceptions import ObjectDoesNotExist
+    from mango.core.exceptions import ObjectDoesNotExist
 
     try:
         blog = Blog.objects.get(id=1)
@@ -1972,7 +1972,7 @@ elsewhere, but all it means is that a new object will always be created.
 Normally you won't need to worry about this. However, if your model contains a
 manual primary key value that you set and if that value already exists in the
 database, a call to ``create()`` will fail with an
-:exc:`~django.db.IntegrityError` since primary keys must be unique. Be
+:exc:`~mango.db.IntegrityError` since primary keys must be unique. Be
 prepared to handle the exception if you are using manual primary keys.
 
 ``get_or_create()``
@@ -2013,25 +2013,25 @@ found, ``get_or_create()`` returns a tuple of that object and ``False``.
 .. warning::
 
     This method is atomic assuming that the database enforces uniqueness of the
-    keyword arguments (see :attr:`~django.db.models.Field.unique` or
-    :attr:`~django.db.models.Options.unique_together`). If the fields used in the
+    keyword arguments (see :attr:`~mango.db.models.Field.unique` or
+    :attr:`~mango.db.models.Options.unique_together`). If the fields used in the
     keyword arguments do not have a uniqueness constraint, concurrent calls to
     this method may result in multiple rows with the same parameters being
     inserted.
 
 You can specify more complex conditions for the retrieved object by chaining
 ``get_or_create()`` with ``filter()`` and using :class:`Q objects
-<django.db.models.Q>`. For example, to retrieve Robert or Bob Marley if either
+<mango.db.models.Q>`. For example, to retrieve Robert or Bob Marley if either
 exists, and create the latter otherwise::
 
-    from django.db.models import Q
+    from mango.db.models import Q
 
     obj, created = Person.objects.filter(
         Q(first_name='Bob') | Q(first_name='Robert'),
     ).get_or_create(last_name='Marley', defaults={'first_name': 'Bob'})
 
 If multiple objects are found, ``get_or_create()`` raises
-:exc:`~django.core.exceptions.MultipleObjectsReturned`. If an object is *not*
+:exc:`~mango.core.exceptions.MultipleObjectsReturned`. If an object is *not*
 found, ``get_or_create()`` will instantiate and save a new object, returning a
 tuple of the new object and ``True``. The new object will be created roughly
 according to this algorithm::
@@ -2058,9 +2058,9 @@ If you have a field named ``defaults`` and want to use it as an exact lookup in
 The ``get_or_create()`` method has similar error behavior to :meth:`create()`
 when you're using manually specified primary keys. If an object needs to be
 created and the key already exists in the database, an
-:exc:`~django.db.IntegrityError` will be raised.
+:exc:`~mango.db.IntegrityError` will be raised.
 
-Finally, a word on using ``get_or_create()`` in Django views. Please make sure
+Finally, a word on using ``get_or_create()`` in Mango views. Please make sure
 to use it only in ``POST`` requests unless you have a good reason not to.
 ``GET`` requests shouldn't have any effect on data. Instead, use ``POST``
 whenever a request to a page has a side effect on your data. For more, see
@@ -2068,7 +2068,7 @@ whenever a request to a page has a side effect on your data. For more, see
 
 .. warning::
 
-  You can use ``get_or_create()`` through :class:`~django.db.models.ManyToManyField`
+  You can use ``get_or_create()`` through :class:`~mango.db.models.ManyToManyField`
   attributes and reverse relations. In that case you will restrict the queries
   inside the context of that relation. That could lead you to some integrity
   problems if you don't use it consistently.
@@ -2148,7 +2148,7 @@ if uniqueness is not enforced at the database level.
 
 Like :meth:`get_or_create` and :meth:`create`, if you're using manually
 specified primary keys and an object needs to be created but the key already
-exists in the database, an :exc:`~django.db.IntegrityError` is raised.
+exists in the database, an :exc:`~mango.db.IntegrityError` is raised.
 
 ``bulk_create()``
 ~~~~~~~~~~~~~~~~~
@@ -2169,7 +2169,7 @@ This has a number of caveats though:
 * The model's ``save()`` method will not be called, and the ``pre_save`` and
   ``post_save`` signals will not be sent.
 * It does not work with child models in a multi-table inheritance scenario.
-* If the model's primary key is an :class:`~django.db.models.AutoField`, the
+* If the model's primary key is an :class:`~mango.db.models.AutoField`, the
   primary key attribute can only be retrieved on certain databases (currently
   PostgreSQL, MariaDB 10.5+, and SQLite 3.35+). On other databases, it will not
   be set.
@@ -2237,8 +2237,8 @@ them, but it has a few caveats:
 
 * You cannot update the model's primary key.
 * Each model's ``save()`` method isn't called, and the
-  :attr:`~django.db.models.signals.pre_save` and
-  :attr:`~django.db.models.signals.post_save` signals aren't sent.
+  :attr:`~mango.db.models.signals.pre_save` and
+  :attr:`~mango.db.models.signals.post_save` signals aren't sent.
 * If updating a large number of columns in a large number of rows, the SQL
   generated can be very large. Avoid this by specifying a suitable
   ``batch_size``.
@@ -2298,11 +2298,11 @@ Example::
     >>> Blog.objects.in_bulk([])
     {}
     >>> Blog.objects.in_bulk()
-    {1: <Blog: Beatles Blog>, 2: <Blog: Cheddar Talk>, 3: <Blog: Django Weblog>}
+    {1: <Blog: Beatles Blog>, 2: <Blog: Cheddar Talk>, 3: <Blog: Mango Weblog>}
     >>> Blog.objects.in_bulk(['beatles_blog'], field_name='slug')
     {'beatles_blog': <Blog: Beatles Blog>}
     >>> Blog.objects.distinct('name').in_bulk(field_name='name')
-    {'Beatles Blog': <Blog: Beatles Blog>, 'Cheddar Talk': <Blog: Cheddar Talk>, 'Django Weblog': <Blog: Django Weblog>}
+    {'Beatles Blog': <Blog: Beatles Blog>, 'Cheddar Talk': <Blog: Cheddar Talk>, 'Mango Weblog': <Blog: Mango Weblog>}
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 
@@ -2367,7 +2367,7 @@ doesn't provide isolation between queries within a connection, be careful when
 writing to the table being iterated over. See :ref:`sqlite-isolation` for
 more information.
 
-The ``chunk_size`` parameter controls the size of batches Django retrieves from
+The ``chunk_size`` parameter controls the size of batches Mango retrieves from
 the database driver. Larger batches decrease the overhead of communicating with
 the database driver at the expense of a slight increase in memory consumption.
 
@@ -2402,12 +2402,12 @@ The negative sign in ``'-expire_date'`` means to sort ``expire_date`` in
 the earliest ``expire_date`` is selected.
 
 If your model's :ref:`Meta <meta-options>` specifies
-:attr:`~django.db.models.Options.get_latest_by`, you can omit any arguments to
+:attr:`~mango.db.models.Options.get_latest_by`, you can omit any arguments to
 ``earliest()`` or ``latest()``. The fields specified in
-:attr:`~django.db.models.Options.get_latest_by` will be used by default.
+:attr:`~mango.db.models.Options.get_latest_by` will be used by default.
 
 Like :meth:`get()`, ``earliest()`` and ``latest()`` raise
-:exc:`~django.db.models.Model.DoesNotExist` if there is no object with the
+:exc:`~mango.db.models.Model.DoesNotExist` if there is no object with the
 given parameters.
 
 Note that ``earliest()`` and ``latest()`` exist purely for convenience and
@@ -2429,7 +2429,7 @@ readability.
 
 .. method:: earliest(*fields)
 
-Works otherwise like :meth:`~django.db.models.query.QuerySet.latest` except
+Works otherwise like :meth:`~mango.db.models.query.QuerySet.latest` except
 the direction is changed.
 
 ``first()``
@@ -2470,7 +2470,7 @@ Returns a dictionary of aggregate values (averages, sums, etc.) calculated over
 the ``QuerySet``. Each argument to ``aggregate()`` specifies a value that will
 be included in the dictionary that is returned.
 
-The aggregation functions that are provided by Django are described in
+The aggregation functions that are provided by Mango are described in
 `Aggregation Functions`_ below. Since aggregates are also :doc:`query
 expressions </ref/models/expressions>`, you may combine aggregates with other
 aggregates or values to create complex aggregates.
@@ -2484,7 +2484,7 @@ a keyword argument as an alias.
 For example, when you are working with blog entries, you may want to know the
 number of authors that have contributed blog entries::
 
-    >>> from django.db.models import Count
+    >>> from mango.db.models import Count
     >>> q = Blog.objects.aggregate(Count('entry'))
     {'entry__count': 16}
 
@@ -2622,12 +2622,12 @@ and calling ``save()``.
 
 Finally, realize that ``update()`` does an update at the SQL level and, thus,
 does not call any ``save()`` methods on your models, nor does it emit the
-:attr:`~django.db.models.signals.pre_save` or
-:attr:`~django.db.models.signals.post_save` signals (which are a consequence of
-calling :meth:`Model.save() <django.db.models.Model.save>`). If you want to
+:attr:`~mango.db.models.signals.pre_save` or
+:attr:`~mango.db.models.signals.post_save` signals (which are a consequence of
+calling :meth:`Model.save() <mango.db.models.Model.save>`). If you want to
 update a bunch of records for a model that has a custom
-:meth:`~django.db.models.Model.save()` method, loop over them and call
-:meth:`~django.db.models.Model.save()`, like this::
+:meth:`~mango.db.models.Model.save()` method, loop over them and call
+:meth:`~mango.db.models.Model.save()`, like this::
 
     for e in Entry.objects.filter(pub_date__year=2010):
         e.comments_on = False
@@ -2670,7 +2670,7 @@ For example, to delete all the entries in a particular blog::
     >>> Entry.objects.filter(blog=b).delete()
     (4, {'weblog.Entry': 2, 'weblog.Entry_authors': 2})
 
-By default, Django's :class:`~django.db.models.ForeignKey` emulates the SQL
+By default, Mango's :class:`~mango.db.models.ForeignKey` emulates the SQL
 constraint ``ON DELETE CASCADE`` — in other words, any objects with foreign
 keys pointing at the objects to be deleted will be deleted along with them.
 For example::
@@ -2682,22 +2682,22 @@ For example::
     (5, {'weblog.Blog': 1, 'weblog.Entry': 2, 'weblog.Entry_authors': 2})
 
 This cascade behavior is customizable via the
-:attr:`~django.db.models.ForeignKey.on_delete` argument to the
-:class:`~django.db.models.ForeignKey`.
+:attr:`~mango.db.models.ForeignKey.on_delete` argument to the
+:class:`~mango.db.models.ForeignKey`.
 
 The ``delete()`` method does a bulk delete and does not call any ``delete()``
 methods on your models. It does, however, emit the
-:data:`~django.db.models.signals.pre_delete` and
-:data:`~django.db.models.signals.post_delete` signals for all deleted objects
+:data:`~mango.db.models.signals.pre_delete` and
+:data:`~mango.db.models.signals.post_delete` signals for all deleted objects
 (including cascaded deletions).
 
-Django needs to fetch objects into memory to send signals and handle cascades.
-However, if there are no cascades and no signals, then Django may take a
+Mango needs to fetch objects into memory to send signals and handle cascades.
+However, if there are no cascades and no signals, then Mango may take a
 fast-path and delete objects without fetching into memory. For large
 deletes this can result in significantly reduced memory usage. The amount of
 executed queries can be reduced, too.
 
-ForeignKeys which are set to :attr:`~django.db.models.ForeignKey.on_delete`
+ForeignKeys which are set to :attr:`~mango.db.models.ForeignKey.on_delete`
 ``DO_NOTHING`` do not prevent taking the fast-path in deletion.
 
 Note that the queries generated in object deletion is an implementation
@@ -2708,7 +2708,7 @@ detail subject to change.
 
 .. classmethod:: as_manager()
 
-Class method that returns an instance of :class:`~django.db.models.Manager`
+Class method that returns an instance of :class:`~mango.db.models.Manager`
 with a copy of the ``QuerySet``’s methods. See
 :ref:`create-manager-with-queryset-methods` for more details.
 
@@ -2767,7 +2767,7 @@ specified as keyword arguments to the ``QuerySet`` methods :meth:`filter()`,
 For an introduction, see :ref:`models and database queries documentation
 <field-lookups-intro>`.
 
-Django's built-in lookups are listed below. It is also possible to write
+Mango's built-in lookups are listed below. It is also possible to write
 :doc:`custom lookups </howto/custom-lookups>` for model fields.
 
 As a convenience when no lookup type is provided (like in
@@ -2797,7 +2797,7 @@ SQL equivalents:
 
     In MySQL, a database table's "collation" setting determines whether
     ``exact`` comparisons are case-sensitive. This is a database setting, *not*
-    a Django setting. It's possible to configure your MySQL tables to use
+    a Mango setting. It's possible to configure your MySQL tables to use
     case-sensitive comparisons, but some trade-offs are involved. For more
     information about this, see the :ref:`collation section <mysql-collation>`
     in the :doc:`databases </ref/databases>` documentation.
@@ -3504,18 +3504,18 @@ SQL equivalents:
 Aggregation functions
 ---------------------
 
-.. currentmodule:: django.db.models
+.. currentmodule:: mango.db.models
 
-Django provides the following aggregation functions in the
-``django.db.models`` module. For details on how to use these
+Mango provides the following aggregation functions in the
+``mango.db.models`` module. For details on how to use these
 aggregate functions, see :doc:`the topic guide on aggregation
-</topics/db/aggregation>`. See the :class:`~django.db.models.Aggregate`
+</topics/db/aggregation>`. See the :class:`~mango.db.models.Aggregate`
 documentation to learn how to create your aggregates.
 
 .. warning::
 
     SQLite can't handle aggregation on date/time fields out of the box.
-    This is because there are no native date/time fields in SQLite and Django
+    This is because there are no native date/time fields in SQLite and Mango
     currently emulates these features using a text field. Attempts to use
     aggregation on date/time fields in SQLite will raise ``NotSupportedError``.
 
@@ -3546,7 +3546,7 @@ of the return value
 
 .. note::
 
-    When combining multiple field types, Django can only determine the
+    When combining multiple field types, Mango can only determine the
     ``output_field`` if all fields are of the same type. Otherwise, you
     must provide the ``output_field`` yourself.
 
@@ -3555,7 +3555,7 @@ of the return value
 ``filter``
 ~~~~~~~~~~
 
-An optional :class:`Q object <django.db.models.Q>` that's used to filter the
+An optional :class:`Q object <mango.db.models.Q>` that's used to filter the
 rows that are aggregated.
 
 See :ref:`conditional-aggregation` and :ref:`filtering-on-annotations` for
@@ -3693,7 +3693,7 @@ elsewhere.
 
 A ``Q()`` object represents an SQL condition that can be used in
 database-related operations. It's similar to how an
-:class:`F() <django.db.models.F>` object represents the value of a model field
+:class:`F() <mango.db.models.F>` object represents the value of a model field
 or annotation. They make it possible to define and reuse conditions, and
 combine them using operators such as ``|`` (``OR``) and ``&`` (``AND``). See
 :ref:`complex-lookups-with-q`.
@@ -3704,13 +3704,13 @@ combine them using operators such as ``|`` (``OR``) and ``&`` (``AND``). See
 .. class:: Prefetch(lookup, queryset=None, to_attr=None)
 
 The ``Prefetch()`` object can be used to control the operation of
-:meth:`~django.db.models.query.QuerySet.prefetch_related()`.
+:meth:`~mango.db.models.query.QuerySet.prefetch_related()`.
 
 The ``lookup`` argument describes the relations to follow and works the same
 as the string based lookups passed to
-:meth:`~django.db.models.query.QuerySet.prefetch_related()`. For example:
+:meth:`~mango.db.models.query.QuerySet.prefetch_related()`. For example:
 
-    >>> from django.db.models import Prefetch
+    >>> from mango.db.models import Prefetch
     >>> Question.objects.prefetch_related(Prefetch('choice_set')).get().choice_set.all()
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
     # This will only execute two queries regardless of the number of Question
@@ -3720,7 +3720,7 @@ as the string based lookups passed to
 
 The ``queryset`` argument supplies a base ``QuerySet`` for the given lookup.
 This is useful to further filter down the prefetch operation, or to call
-:meth:`~django.db.models.query.QuerySet.select_related()` from the prefetched
+:meth:`~mango.db.models.query.QuerySet.select_related()` from the prefetched
 relation, hence reducing the number of queries even further:
 
     >>> voted_choices = Choice.objects.filter(votes__gt=0)
@@ -3758,7 +3758,7 @@ for example, when fetching models from a cache or instantiating them manually.
 Pass an iterable of model instances (must all be of the same class) and the
 lookups or :class:`Prefetch` objects you want to prefetch for. For example::
 
-    >>> from django.db.models import prefetch_related_objects
+    >>> from mango.db.models import prefetch_related_objects
     >>> restaurants = fetch_top_restaurants_from_cache()  # A list of Restaurants
     >>> prefetch_related_objects(restaurants, 'pizzas__toppings')
 
@@ -3777,7 +3777,7 @@ overridden by using a custom queryset in a related lookup.
 
     .. attribute:: FilteredRelation.condition
 
-        A :class:`~django.db.models.Q` object to control the filtering.
+        A :class:`~mango.db.models.Q` object to control the filtering.
 
 ``FilteredRelation`` is used with :meth:`~.QuerySet.annotate()` to create an
 ``ON`` clause when a ``JOIN`` is performed. It doesn't act on the default
@@ -3787,7 +3787,7 @@ below).
 For example, to find restaurants that have vegetarian pizzas with
 ``'mozzarella'`` in the name::
 
-    >>> from django.db.models import FilteredRelation, Q
+    >>> from mango.db.models import FilteredRelation, Q
     >>> Restaurant.objects.annotate(
     ...    pizzas_vegetarian=FilteredRelation(
     ...        'pizzas', condition=Q(pizzas__vegetarian=True),
@@ -3807,7 +3807,7 @@ operate on vegetarian pizzas.
 ``FilteredRelation`` doesn't support:
 
 * :meth:`.QuerySet.only` and :meth:`~.QuerySet.prefetch_related`.
-* A :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
+* A :class:`~mango.contrib.contenttypes.fields.GenericForeignKey`
   inherited from a parent model.
 
 .. versionchanged:: 3.2

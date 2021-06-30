@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from django.core.exceptions import ValidationError
-from django.db import models
+from mango.core.exceptions import ValidationError
+from mango.db import models
 
 
 class ValidationMessagesTest(TestCase):

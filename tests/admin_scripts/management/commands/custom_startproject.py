@@ -1,4 +1,4 @@
-from django.core.management.commands.startproject import Command as BaseCommand
+from mango.core.management.commands.startproject import Command as BaseCommand
 
 
 class Command(BaseCommand):

@@ -2,26 +2,26 @@ from pathlib import Path
 
 from template_tests.test_response import test_processor_name
 
-from django.template import Context, EngineHandler, RequestContext
-from django.template.backends.django import DjangoTemplates
-from django.template.library import InvalidTemplateLibrary
-from django.test import RequestFactory, override_settings
+from mango.template import Context, EngineHandler, RequestContext
+from mango.template.backends.mango import MangoTemplates
+from mango.template.library import InvalidTemplateLibrary
+from mango.test import RequestFactory, override_settings
 
 from .test_dummy import TemplateStringsTests
 
 
-class DjangoTemplatesTests(TemplateStringsTests):
+class MangoTemplatesTests(TemplateStringsTests):
 
-    engine_class = DjangoTemplates
-    backend_name = 'django'
+    engine_class = MangoTemplates
+    backend_name = 'mango'
     request_factory = RequestFactory()
 
     def test_context_has_priority_over_template_context_processors(self):
         # See ticket #23789.
-        engine = DjangoTemplates({
+        engine = MangoTemplates({
             'DIRS': [],
             'APP_DIRS': False,
-            'NAME': 'django',
+            'NAME': 'mango',
             'OPTIONS': {
                 'context_processors': [test_processor_name],
             },
@@ -39,11 +39,11 @@ class DjangoTemplatesTests(TemplateStringsTests):
         self.assertEqual(content, 'no')
 
     def test_render_requires_dict(self):
-        """django.Template.render() requires a dict."""
-        engine = DjangoTemplates({
+        """mango.Template.render() requires a dict."""
+        engine = MangoTemplates({
             'DIRS': [],
             'APP_DIRS': False,
-            'NAME': 'django',
+            'NAME': 'mango',
             'OPTIONS': {},
         })
         template = engine.from_string('')
@@ -58,10 +58,10 @@ class DjangoTemplatesTests(TemplateStringsTests):
 
     @override_settings(INSTALLED_APPS=['template_backends.apps.good'])
     def test_templatetag_discovery(self):
-        engine = DjangoTemplates({
+        engine = MangoTemplates({
             'DIRS': [],
             'APP_DIRS': False,
-            'NAME': 'django',
+            'NAME': 'mango',
             'OPTIONS': {
                 'libraries': {
                     'alternate': 'template_backends.apps.good.templatetags.good_tags',
@@ -79,10 +79,10 @@ class DjangoTemplatesTests(TemplateStringsTests):
             engine.engine.libraries['subpackage.tags'],
             'template_backends.apps.good.templatetags.subpackage.tags',
         )
-        # libraries are discovered from django.templatetags
+        # libraries are discovered from mango.templatetags
         self.assertEqual(
             engine.engine.libraries['static'],
-            'django.templatetags.static',
+            'mango.templatetags.static',
         )
         # libraries passed in OPTIONS are registered
         self.assertEqual(
@@ -105,19 +105,19 @@ class DjangoTemplatesTests(TemplateStringsTests):
             "ImportError raised when trying to load "
             "'template_backends.apps.importerror.templatetags.broken_tags'"
         ) as cm:
-            DjangoTemplates({
+            MangoTemplates({
                 'DIRS': [],
                 'APP_DIRS': False,
-                'NAME': 'django',
+                'NAME': 'mango',
                 'OPTIONS': {},
             })
         self.assertIsInstance(cm.exception.__cause__, ImportError)
 
     def test_builtins_discovery(self):
-        engine = DjangoTemplates({
+        engine = MangoTemplates({
             'DIRS': [],
             'APP_DIRS': False,
-            'NAME': 'django',
+            'NAME': 'mango',
             'OPTIONS': {
                 'builtins': ['template_backends.apps.good.templatetags.good_tags'],
             },
@@ -125,54 +125,54 @@ class DjangoTemplatesTests(TemplateStringsTests):
 
         self.assertEqual(
             engine.engine.builtins, [
-                'django.template.defaulttags',
-                'django.template.defaultfilters',
-                'django.template.loader_tags',
+                'mango.template.defaulttags',
+                'mango.template.defaultfilters',
+                'mango.template.loader_tags',
                 'template_backends.apps.good.templatetags.good_tags',
             ]
         )
 
     def test_autoescape_off(self):
         templates = [{
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'BACKEND': 'mango.template.backends.mango.MangoTemplates',
             'OPTIONS': {'autoescape': False},
         }]
         engines = EngineHandler(templates=templates)
         self.assertEqual(
-            engines['django'].from_string('Hello, {{ name }}').render({'name': 'Bob & Jim'}),
+            engines['mango'].from_string('Hello, {{ name }}').render({'name': 'Bob & Jim'}),
             'Hello, Bob & Jim'
         )
 
     def test_autoescape_default(self):
         templates = [{
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'BACKEND': 'mango.template.backends.mango.MangoTemplates',
         }]
         engines = EngineHandler(templates=templates)
         self.assertEqual(
-            engines['django'].from_string('Hello, {{ name }}').render({'name': 'Bob & Jim'}),
+            engines['mango'].from_string('Hello, {{ name }}').render({'name': 'Bob & Jim'}),
             'Hello, Bob &amp; Jim'
         )
 
     default_loaders = [
-        'django.template.loaders.filesystem.Loader',
-        'django.template.loaders.app_directories.Loader',
+        'mango.template.loaders.filesystem.Loader',
+        'mango.template.loaders.app_directories.Loader',
     ]
 
     @override_settings(DEBUG=False)
     def test_non_debug_default_template_loaders(self):
-        engine = DjangoTemplates({'DIRS': [], 'APP_DIRS': True, 'NAME': 'django', 'OPTIONS': {}})
-        self.assertEqual(engine.engine.loaders, [('django.template.loaders.cached.Loader', self.default_loaders)])
+        engine = MangoTemplates({'DIRS': [], 'APP_DIRS': True, 'NAME': 'mango', 'OPTIONS': {}})
+        self.assertEqual(engine.engine.loaders, [('mango.template.loaders.cached.Loader', self.default_loaders)])
 
     @override_settings(DEBUG=True)
     def test_debug_default_template_loaders(self):
-        engine = DjangoTemplates({'DIRS': [], 'APP_DIRS': True, 'NAME': 'django', 'OPTIONS': {}})
+        engine = MangoTemplates({'DIRS': [], 'APP_DIRS': True, 'NAME': 'mango', 'OPTIONS': {}})
         self.assertEqual(engine.engine.loaders, self.default_loaders)
 
     def test_dirs_pathlib(self):
-        engine = DjangoTemplates({
+        engine = MangoTemplates({
             'DIRS': [Path(__file__).parent / 'templates' / 'template_backends'],
             'APP_DIRS': False,
-            'NAME': 'django',
+            'NAME': 'mango',
             'OPTIONS': {},
         })
         template = engine.get_template('hello.html')

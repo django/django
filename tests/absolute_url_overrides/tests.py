@@ -1,6 +1,6 @@
-from django.db import models
-from django.test import SimpleTestCase
-from django.test.utils import isolate_apps
+from mango.db import models
+from mango.test import SimpleTestCase
+from mango.test.utils import isolate_apps
 
 
 @isolate_apps('absolute_url_overrides')

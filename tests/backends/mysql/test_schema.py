@@ -1,7 +1,7 @@
 import unittest
 
-from django.db import connection
-from django.test import TestCase
+from mango.db import connection
+from mango.test import TestCase
 
 
 @unittest.skipUnless(connection.vendor == 'mysql', 'MySQL tests')

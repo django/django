@@ -1,10 +1,10 @@
 from unittest import skipUnless
 
-from django.db import connection
-from django.db.models import CharField, TextField, Value as V
-from django.db.models.functions import Concat, ConcatPair, Upper
-from django.test import TestCase
-from django.utils import timezone
+from mango.db import connection
+from mango.db.models import CharField, TextField, Value as V
+from mango.db.models.functions import Concat, ConcatPair, Upper
+from mango.test import TestCase
+from mango.utils import timezone
 
 from ..models import Article, Author
 

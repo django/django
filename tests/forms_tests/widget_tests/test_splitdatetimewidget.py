@@ -1,6 +1,6 @@
 from datetime import date, datetime, time
 
-from django.forms import SplitDateTimeWidget
+from mango.forms import SplitDateTimeWidget
 
 from .base import WidgetTest
 

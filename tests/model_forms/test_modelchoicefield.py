@@ -1,11 +1,11 @@
 import datetime
 
-from django import forms
-from django.core.exceptions import ValidationError
-from django.forms.models import ModelChoiceIterator
-from django.forms.widgets import CheckboxSelectMultiple
-from django.template import Context, Template
-from django.test import TestCase
+from mango import forms
+from mango.core.exceptions import ValidationError
+from mango.forms.models import ModelChoiceIterator
+from mango.forms.widgets import CheckboxSelectMultiple
+from mango.template import Context, Template
+from mango.test import TestCase
 
 from .models import Article, Author, Book, Category, Writer
 

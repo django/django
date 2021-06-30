@@ -1,10 +1,10 @@
 from decimal import Decimal, localcontext
 
-from django.template.defaultfilters import floatformat
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
-from django.utils import translation
-from django.utils.safestring import mark_safe
+from mango.template.defaultfilters import floatformat
+from mango.test import SimpleTestCase
+from mango.test.utils import override_settings
+from mango.utils import translation
+from mango.utils.safestring import mark_safe
 
 from ..utils import setup
 

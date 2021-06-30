@@ -7,28 +7,28 @@ from copy import deepcopy
 from decimal import Decimal
 from unittest import mock
 
-from django.core.exceptions import FieldError
-from django.db import DatabaseError, NotSupportedError, connection
-from django.db.models import (
+from mango.core.exceptions import FieldError
+from mango.db import DatabaseError, NotSupportedError, connection
+from mango.db.models import (
     AutoField, Avg, BinaryField, BooleanField, Case, CharField, Count,
     DateField, DateTimeField, DecimalField, DurationField, Exists, Expression,
     ExpressionList, ExpressionWrapper, F, FloatField, Func, IntegerField, Max,
     Min, Model, OrderBy, OuterRef, Q, StdDev, Subquery, Sum, TimeField,
     UUIDField, Value, Variance, When,
 )
-from django.db.models.expressions import (
+from mango.db.models.expressions import (
     Col, Combinable, CombinedExpression, RawSQL, Ref,
 )
-from django.db.models.functions import (
+from mango.db.models.functions import (
     Coalesce, Concat, Left, Length, Lower, Substr, Upper,
 )
-from django.db.models.sql import constants
-from django.db.models.sql.datastructures import Join
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import (
+from mango.db.models.sql import constants
+from mango.db.models.sql.datastructures import Join
+from mango.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from mango.test.utils import (
     Approximate, CaptureQueriesContext, isolate_apps, register_lookup,
 )
-from django.utils.functional import SimpleLazyObject
+from mango.utils.functional import SimpleLazyObject
 
 from .models import (
     UUID, UUIDPK, Company, Employee, Experiment, Manager, Number,
@@ -991,7 +991,7 @@ class FTests(SimpleTestCase):
     def test_deconstruct(self):
         f = F('name')
         path, args, kwargs = f.deconstruct()
-        self.assertEqual(path, 'django.db.models.expressions.F')
+        self.assertEqual(path, 'mango.db.models.expressions.F')
         self.assertEqual(args, (f.name,))
         self.assertEqual(kwargs, {})
 
@@ -1750,14 +1750,14 @@ class ValueTests(TestCase):
     def test_deconstruct(self):
         value = Value('name')
         path, args, kwargs = value.deconstruct()
-        self.assertEqual(path, 'django.db.models.expressions.Value')
+        self.assertEqual(path, 'mango.db.models.expressions.Value')
         self.assertEqual(args, (value.value,))
         self.assertEqual(kwargs, {})
 
     def test_deconstruct_output_field(self):
         value = Value('name', output_field=CharField())
         path, args, kwargs = value.deconstruct()
-        self.assertEqual(path, 'django.db.models.expressions.Value')
+        self.assertEqual(path, 'mango.db.models.expressions.Value')
         self.assertEqual(args, (value.value,))
         self.assertEqual(len(kwargs), 1)
         self.assertEqual(kwargs['output_field'].deconstruct(), CharField().deconstruct())

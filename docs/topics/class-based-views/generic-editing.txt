@@ -10,7 +10,7 @@ Form processing generally has 3 paths:
 
 Implementing this yourself often results in a lot of repeated boilerplate code
 (see :ref:`Using a form in a view<using-a-form-in-a-view>`). To help avoid
-this, Django provides a collection of generic class-based views for form
+this, Mango provides a collection of generic class-based views for form
 processing.
 
 Basic forms
@@ -21,7 +21,7 @@ Given a contact form:
 .. code-block:: python
     :caption: forms.py
 
-    from django import forms
+    from mango import forms
 
     class ContactForm(forms.Form):
         name = forms.CharField()
@@ -37,7 +37,7 @@ The view can be constructed using a ``FormView``:
     :caption: views.py
 
     from myapp.forms import ContactForm
-    from django.views.generic.edit import FormView
+    from mango.views.generic.edit import FormView
 
     class ContactFormView(FormView):
         template_name = 'contact.html'
@@ -53,54 +53,54 @@ The view can be constructed using a ``FormView``:
 Notes:
 
 * FormView inherits
-  :class:`~django.views.generic.base.TemplateResponseMixin` so
-  :attr:`~django.views.generic.base.TemplateResponseMixin.template_name`
+  :class:`~mango.views.generic.base.TemplateResponseMixin` so
+  :attr:`~mango.views.generic.base.TemplateResponseMixin.template_name`
   can be used here.
 * The default implementation for
-  :meth:`~django.views.generic.edit.FormMixin.form_valid` simply
-  redirects to the :attr:`~django.views.generic.edit.FormMixin.success_url`.
+  :meth:`~mango.views.generic.edit.FormMixin.form_valid` simply
+  redirects to the :attr:`~mango.views.generic.edit.FormMixin.success_url`.
 
 Model forms
 ===========
 
 Generic views really shine when working with models.  These generic
-views will automatically create a :class:`~django.forms.ModelForm`, so long as
+views will automatically create a :class:`~mango.forms.ModelForm`, so long as
 they can work out which model class to use:
 
-* If the :attr:`~django.views.generic.edit.ModelFormMixin.model` attribute is
+* If the :attr:`~mango.views.generic.edit.ModelFormMixin.model` attribute is
   given, that model class will be used.
-* If :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
+* If :meth:`~mango.views.generic.detail.SingleObjectMixin.get_object()`
   returns an object, the class of that object will be used.
-* If a :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` is
+* If a :attr:`~mango.views.generic.detail.SingleObjectMixin.queryset` is
   given, the model for that queryset will be used.
 
 Model form views provide a
-:meth:`~django.views.generic.edit.ModelFormMixin.form_valid()` implementation
+:meth:`~mango.views.generic.edit.ModelFormMixin.form_valid()` implementation
 that saves the model automatically.  You can override this if you have any
 special requirements; see below for examples.
 
 You don't even need to provide a ``success_url`` for
-:class:`~django.views.generic.edit.CreateView` or
-:class:`~django.views.generic.edit.UpdateView` - they will use
-:meth:`~django.db.models.Model.get_absolute_url()` on the model object if available.
+:class:`~mango.views.generic.edit.CreateView` or
+:class:`~mango.views.generic.edit.UpdateView` - they will use
+:meth:`~mango.db.models.Model.get_absolute_url()` on the model object if available.
 
-If you want to use a custom :class:`~django.forms.ModelForm` (for instance to
+If you want to use a custom :class:`~mango.forms.ModelForm` (for instance to
 add extra validation), set
-:attr:`~django.views.generic.edit.FormMixin.form_class` on your view.
+:attr:`~mango.views.generic.edit.FormMixin.form_class` on your view.
 
 .. note::
     When specifying a custom form class, you must still specify the model,
-    even though the :attr:`~django.views.generic.edit.FormMixin.form_class` may
-    be a :class:`~django.forms.ModelForm`.
+    even though the :attr:`~mango.views.generic.edit.FormMixin.form_class` may
+    be a :class:`~mango.forms.ModelForm`.
 
-First we need to add :meth:`~django.db.models.Model.get_absolute_url()` to our
+First we need to add :meth:`~mango.db.models.Model.get_absolute_url()` to our
 ``Author`` class:
 
 .. code-block:: python
     :caption: models.py
 
-    from django.db import models
-    from django.urls import reverse
+    from mango.db import models
+    from mango.urls import reverse
 
     class Author(models.Model):
         name = models.CharField(max_length=200)
@@ -115,8 +115,8 @@ here; we don't have to write any logic ourselves:
 .. code-block:: python
     :caption: views.py
 
-    from django.urls import reverse_lazy
-    from django.views.generic.edit import CreateView, DeleteView, UpdateView
+    from mango.urls import reverse_lazy
+    from mango.views.generic.edit import CreateView, DeleteView, UpdateView
     from myapp.models import Author
 
     class AuthorCreateView(CreateView):
@@ -132,24 +132,24 @@ here; we don't have to write any logic ourselves:
         success_url = reverse_lazy('author-list')
 
 .. note::
-    We have to use :func:`~django.urls.reverse_lazy` instead of
+    We have to use :func:`~mango.urls.reverse_lazy` instead of
     ``reverse()``, as the urls are not loaded when the file is imported.
 
 The ``fields`` attribute works the same way as the ``fields`` attribute on the
-inner ``Meta`` class on :class:`~django.forms.ModelForm`. Unless you define the
+inner ``Meta`` class on :class:`~mango.forms.ModelForm`. Unless you define the
 form class in another way, the attribute is required and the view will raise
-an :exc:`~django.core.exceptions.ImproperlyConfigured` exception if it's not.
+an :exc:`~mango.core.exceptions.ImproperlyConfigured` exception if it's not.
 
-If you specify both the :attr:`~django.views.generic.edit.ModelFormMixin.fields`
-and :attr:`~django.views.generic.edit.FormMixin.form_class` attributes, an
-:exc:`~django.core.exceptions.ImproperlyConfigured` exception will be raised.
+If you specify both the :attr:`~mango.views.generic.edit.ModelFormMixin.fields`
+and :attr:`~mango.views.generic.edit.FormMixin.form_class` attributes, an
+:exc:`~mango.core.exceptions.ImproperlyConfigured` exception will be raised.
 
 Finally, we hook these new views into the URLconf:
 
 .. code-block:: python
     :caption: urls.py
 
-    from django.urls import path
+    from mango.urls import path
     from myapp.views import AuthorCreateView, AuthorDeleteView, AuthorUpdateView
 
     urlpatterns = [
@@ -162,11 +162,11 @@ Finally, we hook these new views into the URLconf:
 .. note::
 
     These views inherit
-    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
+    :class:`~mango.views.generic.detail.SingleObjectTemplateResponseMixin`
     which uses
-    :attr:`~django.views.generic.detail.SingleObjectTemplateResponseMixin.template_name_suffix`
+    :attr:`~mango.views.generic.detail.SingleObjectTemplateResponseMixin.template_name_suffix`
     to construct the
-    :attr:`~django.views.generic.base.TemplateResponseMixin.template_name`
+    :attr:`~mango.views.generic.base.TemplateResponseMixin.template_name`
     based on the model.
 
     In this example:
@@ -176,22 +176,22 @@ Finally, we hook these new views into the URLconf:
 
     If you wish to have separate templates for :class:`CreateView` and
     :class:`UpdateView`, you can set either
-    :attr:`~django.views.generic.base.TemplateResponseMixin.template_name` or
-    :attr:`~django.views.generic.detail.SingleObjectTemplateResponseMixin.template_name_suffix`
+    :attr:`~mango.views.generic.base.TemplateResponseMixin.template_name` or
+    :attr:`~mango.views.generic.detail.SingleObjectTemplateResponseMixin.template_name_suffix`
     on your view class.
 
 Models and ``request.user``
 ===========================
 
 To track the user that created an object using a :class:`CreateView`,
-you can use a custom :class:`~django.forms.ModelForm` to do this. First, add
+you can use a custom :class:`~mango.forms.ModelForm` to do this. First, add
 the foreign key relation to the model:
 
 .. code-block:: python
     :caption: models.py
 
-    from django.contrib.auth.models import User
-    from django.db import models
+    from mango.contrib.auth.models import User
+    from mango.db import models
 
     class Author(models.Model):
         name = models.CharField(max_length=200)
@@ -201,13 +201,13 @@ the foreign key relation to the model:
 
 In the view, ensure that you don't include ``created_by`` in the list of fields
 to edit, and override
-:meth:`~django.views.generic.edit.ModelFormMixin.form_valid()` to add the user:
+:meth:`~mango.views.generic.edit.ModelFormMixin.form_valid()` to add the user:
 
 .. code-block:: python
     :caption: views.py
 
-    from django.contrib.auth.mixins import LoginRequiredMixin
-    from django.views.generic.edit import CreateView
+    from mango.contrib.auth.mixins import LoginRequiredMixin
+    from mango.views.generic.edit import CreateView
     from myapp.models import Author
 
     class AuthorCreateView(LoginRequiredMixin, CreateView):
@@ -218,7 +218,7 @@ to edit, and override
             form.instance.created_by = self.request.user
             return super().form_valid(form)
 
-:class:`~django.contrib.auth.mixins.LoginRequiredMixin` prevents users who
+:class:`~mango.contrib.auth.mixins.LoginRequiredMixin` prevents users who
 aren't logged in from accessing the form. If you omit that, you'll need to
 handle unauthorized users in :meth:`~.ModelFormMixin.form_valid()`.
 
@@ -230,8 +230,8 @@ Content negotiation example
 Here is an example showing how you might go about implementing a form that
 works with an API-based workflow as well as 'normal' form POSTs::
 
-    from django.http import JsonResponse
-    from django.views.generic.edit import CreateView
+    from mango.http import JsonResponse
+    from mango.views.generic.edit import CreateView
     from myapp.models import Author
 
     class JsonableResponseMixin:

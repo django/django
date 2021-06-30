@@ -1,8 +1,8 @@
 from datetime import date, timedelta
 
-from django.template.defaultfilters import add
-from django.test import SimpleTestCase
-from django.utils.translation import gettext_lazy
+from mango.template.defaultfilters import add
+from mango.test import SimpleTestCase
+from mango.utils.translation import gettext_lazy
 
 from ..utils import setup
 

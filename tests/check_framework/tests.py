@@ -1,16 +1,16 @@
 import sys
 from io import StringIO
 
-from django.apps import apps
-from django.core import checks
-from django.core.checks import Error, Warning
-from django.core.checks.messages import CheckMessage
-from django.core.checks.registry import CheckRegistry
-from django.core.management import call_command
-from django.core.management.base import CommandError
-from django.db import models
-from django.test import SimpleTestCase
-from django.test.utils import (
+from mango.apps import apps
+from mango.core import checks
+from mango.core.checks import Error, Warning
+from mango.core.checks.messages import CheckMessage
+from mango.core.checks.registry import CheckRegistry
+from mango.core.management import call_command
+from mango.core.management.base import CommandError
+from mango.db import models
+from mango.test import SimpleTestCase
+from mango.test.utils import (
     isolate_apps, override_settings, override_system_checks,
 )
 

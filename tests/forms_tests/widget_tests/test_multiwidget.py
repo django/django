@@ -1,7 +1,7 @@
 import copy
 from datetime import datetime
 
-from django.forms import (
+from mango.forms import (
     CharField, FileInput, MultipleChoiceField, MultiValueField, MultiWidget,
     RadioSelect, SelectMultiple, SplitDateTimeField, SplitDateTimeWidget,
     TextInput,

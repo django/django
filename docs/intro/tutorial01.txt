@@ -1,5 +1,5 @@
 =====================================
-Writing your first Django app, part 1
+Writing your first Mango app, part 1
 =====================================
 
 Let's learn by example.
@@ -12,26 +12,26 @@ It'll consist of two parts:
 * A public site that lets people view polls and vote in them.
 * An admin site that lets you add, change, and delete polls.
 
-We'll assume you have :doc:`Django installed </intro/install>` already. You can
-tell Django is installed and which version by running the following command
+We'll assume you have :doc:`Mango installed </intro/install>` already. You can
+tell Mango is installed and which version by running the following command
 in a shell prompt (indicated by the $ prefix):
 
 .. console::
 
-    $ python -m django --version
+    $ python -m mango --version
 
-If Django is installed, you should see the version of your installation. If it
-isn't, you'll get an error telling "No module named django".
+If Mango is installed, you should see the version of your installation. If it
+isn't, you'll get an error telling "No module named mango".
 
-This tutorial is written for Django |version|, which supports Python 3.8 and
-later. If the Django version doesn't match, you can refer to the tutorial for
-your version of Django by using the version switcher at the bottom right corner
-of this page, or update Django to the newest version. If you're using an older
+This tutorial is written for Mango |version|, which supports Python 3.8 and
+later. If the Mango version doesn't match, you can refer to the tutorial for
+your version of Mango by using the version switcher at the bottom right corner
+of this page, or update Mango to the newest version. If you're using an older
 version of Python, check :ref:`faq-python-version-support` to find a compatible
-version of Django.
+version of Mango.
 
-See :doc:`How to install Django </topics/install>` for advice on how to remove
-older versions of Django and install a newer one.
+See :doc:`How to install Mango </topics/install>` for advice on how to remove
+older versions of Mango and install a newer one.
 
 .. admonition:: Where to get help:
 
@@ -41,10 +41,10 @@ older versions of Django and install a newer one.
 Creating a project
 ==================
 
-If this is your first time using Django, you'll have to take care of some
+If this is your first time using Mango, you'll have to take care of some
 initial setup. Namely, you'll need to auto-generate some code that establishes a
-Django :term:`project` -- a collection of settings for an instance of Django,
-including database configuration, Django-specific options and
+Mango :term:`project` -- a collection of settings for an instance of Mango,
+including database configuration, Mango-specific options and
 application-specific settings.
 
 From the command line, ``cd`` into a directory where you'd like to store your
@@ -52,23 +52,23 @@ code, then run the following command:
 
 .. console::
 
-   $ django-admin startproject mysite
+   $ mango-admin startproject mysite
 
 This will create a ``mysite`` directory in your current directory. If it didn't
-work, see :ref:`troubleshooting-django-admin`.
+work, see :ref:`troubleshooting-mango-admin`.
 
 .. note::
 
-    You'll need to avoid naming projects after built-in Python or Django
+    You'll need to avoid naming projects after built-in Python or Mango
     components. In particular, this means you should avoid using names like
-    ``django`` (which will conflict with Django itself) or ``test`` (which
+    ``mango`` (which will conflict with Mango itself) or ``test`` (which
     conflicts with a built-in Python package).
 
 .. admonition:: Where should this code live?
 
     If your background is in plain old PHP (with no use of modern frameworks),
     you're probably used to putting code under the Web server's document root
-    (in a place such as ``/var/www``). With Django, you don't do that. It's
+    (in a place such as ``/var/www``). With Mango, you don't do that. It's
     not a good idea to put any of this Python code within your Web server's
     document root, because it risks the possibility that people may be able
     to view your code over the Web. That's not good for security.
@@ -90,11 +90,11 @@ Let's look at what :djadmin:`startproject` created::
 These files are:
 
 * The outer :file:`mysite/` root directory is a container for your project. Its
-  name doesn't matter to Django; you can rename it to anything you like.
+  name doesn't matter to Mango; you can rename it to anything you like.
 
 * :file:`manage.py`: A command-line utility that lets you interact with this
-  Django project in various ways. You can read all the details about
-  :file:`manage.py` in :doc:`/ref/django-admin`.
+  Mango project in various ways. You can read all the details about
+  :file:`manage.py` in :doc:`/ref/mango-admin`.
 
 * The inner :file:`mysite/` directory is the actual Python package for your
   project. Its name is the Python package name you'll need to use to import
@@ -104,12 +104,12 @@ These files are:
   directory should be considered a Python package. If you're a Python beginner,
   read :ref:`more about packages <tut-packages>` in the official Python docs.
 
-* :file:`mysite/settings.py`: Settings/configuration for this Django
+* :file:`mysite/settings.py`: Settings/configuration for this Mango
   project.  :doc:`/topics/settings` will tell you all about how settings
   work.
 
-* :file:`mysite/urls.py`: The URL declarations for this Django project; a
-  "table of contents" of your Django-powered site. You can read more about
+* :file:`mysite/urls.py`: The URL declarations for this Mango project; a
+  "table of contents" of your Mango-powered site. You can read more about
   URLs in :doc:`/topics/http/urls`.
 
 * :file:`mysite/asgi.py`: An entry-point for ASGI-compatible web servers to
@@ -121,7 +121,7 @@ These files are:
 The development server
 ======================
 
-Let's verify your Django project works. Change into the outer :file:`mysite` directory, if
+Let's verify your Mango project works. Change into the outer :file:`mysite` directory, if
 you haven't already, and run the following commands:
 
 .. console::
@@ -140,7 +140,7 @@ You'll see the following output on the command line:
     Run 'python manage.py migrate' to apply them.
 
     |today| - 15:50:53
-    Django version |version|, using settings 'mysite.settings'
+    Mango version |version|, using settings 'mysite.settings'
     Starting development server at http://127.0.0.1:8000/
     Quit the server with CONTROL-C.
 
@@ -148,8 +148,8 @@ You'll see the following output on the command line:
     Ignore the warning about unapplied database migrations for now; we'll deal
     with the database shortly.
 
-You've started the Django development server, a lightweight Web server written
-purely in Python. We've included this with Django so you can develop things
+You've started the Mango development server, a lightweight Web server written
+purely in Python. We've included this with Mango so you can develop things
 rapidly, without having to deal with configuring a production server -- such as
 Apache -- until you're ready for production.
 
@@ -199,8 +199,8 @@ Creating the Polls app
 Now that your environment -- a "project" -- is set up, you're set to start
 doing work.
 
-Each application you write in Django consists of a Python package that follows
-a certain convention. Django comes with a utility that automatically generates
+Each application you write in Mango consists of a Python package that follows
+a certain convention. Mango comes with a utility that automatically generates
 the basic directory structure of an app, so you can focus on writing code
 rather than creating directories.
 
@@ -247,13 +247,13 @@ and put the following Python code in it:
 .. code-block:: python
     :caption: polls/views.py
 
-    from django.http import HttpResponse
+    from mango.http import HttpResponse
 
 
     def index(request):
         return HttpResponse("Hello, world. You're at the polls index.")
 
-This is the simplest view possible in Django. To call the view, we need to map
+This is the simplest view possible in Mango. To call the view, we need to map
 it to a URL - and for this we need a URLconf.
 
 To create a URLconf in the polls directory, create a file called ``urls.py``.
@@ -275,7 +275,7 @@ In the ``polls/urls.py`` file include the following code:
 .. code-block:: python
     :caption: polls/urls.py
 
-    from django.urls import path
+    from mango.urls import path
 
     from . import views
 
@@ -284,32 +284,32 @@ In the ``polls/urls.py`` file include the following code:
     ]
 
 The next step is to point the root URLconf at the ``polls.urls`` module. In
-``mysite/urls.py``, add an import for ``django.urls.include`` and insert an
-:func:`~django.urls.include` in the ``urlpatterns`` list, so you have:
+``mysite/urls.py``, add an import for ``mango.urls.include`` and insert an
+:func:`~mango.urls.include` in the ``urlpatterns`` list, so you have:
 
 .. code-block:: python
     :caption: mysite/urls.py
 
-    from django.contrib import admin
-    from django.urls import include, path
+    from mango.contrib import admin
+    from mango.urls import include, path
 
     urlpatterns = [
         path('polls/', include('polls.urls')),
         path('admin/', admin.site.urls),
     ]
 
-The :func:`~django.urls.include` function allows referencing other URLconfs.
-Whenever Django encounters :func:`~django.urls.include`, it chops off whatever
+The :func:`~mango.urls.include` function allows referencing other URLconfs.
+Whenever Mango encounters :func:`~mango.urls.include`, it chops off whatever
 part of the URL matched up to that point and sends the remaining string to the
 included URLconf for further processing.
 
-The idea behind :func:`~django.urls.include` is to make it easy to
+The idea behind :func:`~mango.urls.include` is to make it easy to
 plug-and-play URLs. Since polls are in their own URLconf
 (``polls/urls.py``), they can be placed under "/polls/", or under
 "/fun_polls/", or under "/content/polls/", or any other path root, and the
 app will still work.
 
-.. admonition:: When to use :func:`~django.urls.include()`
+.. admonition:: When to use :func:`~mango.urls.include()`
 
     You should always use ``include()`` when you include other URL patterns.
     ``admin.site.urls`` is the only exception to this.
@@ -330,15 +330,15 @@ text "*Hello, world. You're at the polls index.*", which you defined in the
     If you get an error page here, check that you're going to
     http://localhost:8000/polls/ and not http://localhost:8000/.
 
-The :func:`~django.urls.path` function is passed four arguments, two required:
+The :func:`~mango.urls.path` function is passed four arguments, two required:
 ``route`` and ``view``, and two optional: ``kwargs``, and ``name``.
 At this point, it's worth reviewing what these arguments are for.
 
-:func:`~django.urls.path` argument: ``route``
+:func:`~mango.urls.path` argument: ``route``
 ---------------------------------------------
 
 ``route`` is a string that contains a URL pattern. When processing a request,
-Django starts at the first pattern in ``urlpatterns`` and makes its way down
+Mango starts at the first pattern in ``urlpatterns`` and makes its way down
 the list, comparing the requested URL against each pattern until it finds one
 that matches.
 
@@ -347,24 +347,24 @@ in a request to ``https://www.example.com/myapp/``, the URLconf will look for
 ``myapp/``. In a request to ``https://www.example.com/myapp/?page=3``, the
 URLconf will also look for ``myapp/``.
 
-:func:`~django.urls.path` argument: ``view``
+:func:`~mango.urls.path` argument: ``view``
 --------------------------------------------
 
-When Django finds a matching pattern, it calls the specified view function with
-an :class:`~django.http.HttpRequest` object as the first argument and any
+When Mango finds a matching pattern, it calls the specified view function with
+an :class:`~mango.http.HttpRequest` object as the first argument and any
 "captured" values from the route as keyword arguments. We'll give an example
 of this in a bit.
 
-:func:`~django.urls.path` argument: ``kwargs``
+:func:`~mango.urls.path` argument: ``kwargs``
 ----------------------------------------------
 
 Arbitrary keyword arguments can be passed in a dictionary to the target view. We
-aren't going to use this feature of Django in the tutorial.
+aren't going to use this feature of Mango in the tutorial.
 
-:func:`~django.urls.path` argument: ``name``
+:func:`~mango.urls.path` argument: ``name``
 --------------------------------------------
 
-Naming your URL lets you refer to it unambiguously from elsewhere in Django,
+Naming your URL lets you refer to it unambiguously from elsewhere in Mango,
 especially from within templates. This powerful feature allows you to make
 global changes to the URL patterns of your project while only touching a single
 file.

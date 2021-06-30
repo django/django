@@ -1,9 +1,9 @@
 import unittest
 
-from django.db import NotSupportedError, connection, transaction
-from django.db.models import Count
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext
+from mango.db import NotSupportedError, connection, transaction
+from mango.db.models import Count
+from mango.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from mango.test.utils import CaptureQueriesContext
 
 from .models import Tag
 

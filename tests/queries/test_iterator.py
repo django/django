@@ -1,9 +1,9 @@
 import datetime
 from unittest import mock
 
-from django.db import connections
-from django.db.models.sql.compiler import cursor_iter
-from django.test import TestCase
+from mango.db import connections
+from mango.db.models.sql.compiler import cursor_iter
+from mango.test import TestCase
 
 from .models import Article
 
@@ -24,7 +24,7 @@ class QuerySetIteratorTests(TestCase):
 
     def test_default_iterator_chunk_size(self):
         qs = Article.objects.iterator()
-        with mock.patch('django.db.models.sql.compiler.cursor_iter', side_effect=cursor_iter) as cursor_iter_mock:
+        with mock.patch('mango.db.models.sql.compiler.cursor_iter', side_effect=cursor_iter) as cursor_iter_mock:
             next(qs)
         self.assertEqual(cursor_iter_mock.call_count, 1)
         mock_args, _mock_kwargs = cursor_iter_mock.call_args
@@ -33,7 +33,7 @@ class QuerySetIteratorTests(TestCase):
     def test_iterator_chunk_size(self):
         batch_size = 3
         qs = Article.objects.iterator(chunk_size=batch_size)
-        with mock.patch('django.db.models.sql.compiler.cursor_iter', side_effect=cursor_iter) as cursor_iter_mock:
+        with mock.patch('mango.db.models.sql.compiler.cursor_iter', side_effect=cursor_iter) as cursor_iter_mock:
             next(qs)
         self.assertEqual(cursor_iter_mock.call_count, 1)
         mock_args, _mock_kwargs = cursor_iter_mock.call_args

@@ -1,5 +1,5 @@
-from django.test import SimpleTestCase
-from django.test.client import FakePayload
+from mango.test import SimpleTestCase
+from mango.test.client import FakePayload
 
 
 class FakePayloadTests(SimpleTestCase):

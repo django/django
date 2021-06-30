@@ -1,10 +1,10 @@
 import datetime
 import json
 
-from django import forms
-from django.core import exceptions, serializers
-from django.db import models
-from django.test import SimpleTestCase, TestCase
+from mango import forms
+from mango.core import exceptions, serializers
+from mango.db import models
+from mango.test import SimpleTestCase, TestCase
 
 from .models import DurationModel, NullDurationModel
 

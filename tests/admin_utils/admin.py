@@ -1,5 +1,5 @@
-from django import forms
-from django.contrib import admin
+from mango import forms
+from mango.contrib import admin
 
 from .models import Article, ArticleProxy, Site
 

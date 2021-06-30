@@ -1,4 +1,4 @@
-from django.core.management.base import LabelCommand
+from mango.core.management.base import LabelCommand
 
 
 class Command(LabelCommand):

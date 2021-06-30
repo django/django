@@ -1,5 +1,5 @@
-from django.contrib.gis.db import models
-from django.db import connection, migrations
+from mango.contrib.gis.db import models
+from mango.db import connection, migrations
 
 ops = [
     migrations.CreateModel(

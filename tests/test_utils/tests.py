@@ -5,29 +5,29 @@ import warnings
 from io import StringIO
 from unittest import mock
 
-from django.conf import settings
-from django.contrib.staticfiles.finders import get_finder, get_finders
-from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.exceptions import ImproperlyConfigured
-from django.core.files.storage import default_storage
-from django.db import (
+from mango.conf import settings
+from mango.contrib.staticfiles.finders import get_finder, get_finders
+from mango.contrib.staticfiles.storage import staticfiles_storage
+from mango.core.exceptions import ImproperlyConfigured
+from mango.core.files.storage import default_storage
+from mango.db import (
     IntegrityError, connection, connections, models, router, transaction,
 )
-from django.forms import EmailField, IntegerField
-from django.http import HttpResponse
-from django.template.loader import render_to_string
-from django.test import (
+from mango.forms import EmailField, IntegerField
+from mango.http import HttpResponse
+from mango.template.loader import render_to_string
+from mango.test import (
     SimpleTestCase, TestCase, TransactionTestCase, ignore_warnings,
     skipIfDBFeature, skipUnlessDBFeature,
 )
-from django.test.html import HTMLParseError, parse_html
-from django.test.utils import (
+from mango.test.html import HTMLParseError, parse_html
+from mango.test.utils import (
     CaptureQueriesContext, TestContextDecorator, isolate_apps,
     override_settings, setup_test_environment,
 )
-from django.urls import NoReverseMatch, path, reverse, reverse_lazy
-from django.utils.deprecation import RemovedInDjango41Warning
-from django.utils.log import DEFAULT_LOGGING
+from mango.urls import NoReverseMatch, path, reverse, reverse_lazy
+from mango.utils.deprecation import RemovedInMango41Warning
+from mango.utils.log import DEFAULT_LOGGING
 
 from .models import Car, Person, PossessedCar
 from .views import empty_response
@@ -47,7 +47,7 @@ class SkippingTestCase(SimpleTestCase):
 
     def test_skip_unless_db_feature(self):
         """
-        Testing the django.test.skipUnlessDBFeature decorator.
+        Testing the mango.test.skipUnlessDBFeature decorator.
         """
         # Total hack, but it works, just want an attribute that's always true.
         @skipUnlessDBFeature("__class__")
@@ -87,7 +87,7 @@ class SkippingTestCase(SimpleTestCase):
 
     def test_skip_if_db_feature(self):
         """
-        Testing the django.test.skipIfDBFeature decorator.
+        Testing the mango.test.skipIfDBFeature decorator.
         """
         @skipIfDBFeature("__class__")
         def test_func():
@@ -234,7 +234,7 @@ class AssertNumQueriesUponConnectionTests(TransactionTestCase):
                 with connection.cursor() as cursor:
                     cursor.execute('SELECT 1' + connection.features.bare_select_suffix)
 
-        ensure_connection = 'django.db.backends.base.base.BaseDatabaseWrapper.ensure_connection'
+        ensure_connection = 'mango.db.backends.base.base.BaseDatabaseWrapper.ensure_connection'
         with mock.patch(ensure_connection, side_effect=make_configuration_query):
             with self.assertNumQueries(1):
                 list(Car.objects.all())
@@ -368,7 +368,7 @@ class AssertQuerysetEqualDeprecationTests(TestCase):
         cls.p1 = Person.objects.create(name='p1')
         cls.p2 = Person.objects.create(name='p2')
 
-    @ignore_warnings(category=RemovedInDjango41Warning)
+    @ignore_warnings(category=RemovedInMango41Warning)
     def test_str_values(self):
         self.assertQuerysetEqual(
             Person.objects.all().order_by('name'),
@@ -377,11 +377,11 @@ class AssertQuerysetEqualDeprecationTests(TestCase):
 
     def test_str_values_warning(self):
         msg = (
-            "In Django 4.1, repr() will not be called automatically on a "
+            "In Mango 4.1, repr() will not be called automatically on a "
             "queryset when compared to string values. Set an explicit "
             "'transform' to silence this warning."
         )
-        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
+        with self.assertRaisesMessage(RemovedInMango41Warning, msg):
             self.assertQuerysetEqual(
                 Person.objects.all().order_by('name'),
                 [repr(self.p1), repr(self.p2)],
@@ -583,7 +583,7 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
         response = HttpResponse()
         error_msg = (
             'assertTemplateUsed() and assertTemplateNotUsed() are only '
-            'usable on responses fetched using the Django test Client.'
+            'usable on responses fetched using the Mango test Client.'
         )
         with self.assertRaisesMessage(ValueError, error_msg):
             self.assertTemplateUsed(response, 'template.html')
@@ -1137,35 +1137,35 @@ class AssertNoLogsTest(SimpleTestCase):
         cls.addClassCleanup(logging.config.dictConfig, settings.LOGGING)
 
     def setUp(self):
-        self.logger = logging.getLogger('django')
+        self.logger = logging.getLogger('mango')
 
     @override_settings(DEBUG=True)
     def test_fails_when_log_emitted(self):
-        msg = "Unexpected logs found: ['INFO:django:FAIL!']"
+        msg = "Unexpected logs found: ['INFO:mango:FAIL!']"
         with self.assertRaisesMessage(AssertionError, msg):
-            with self.assertNoLogs('django', 'INFO'):
+            with self.assertNoLogs('mango', 'INFO'):
                 self.logger.info('FAIL!')
 
     @override_settings(DEBUG=True)
     def test_text_level(self):
-        with self.assertNoLogs('django', 'INFO'):
+        with self.assertNoLogs('mango', 'INFO'):
             self.logger.debug('DEBUG logs are ignored.')
 
     @override_settings(DEBUG=True)
     def test_int_level(self):
-        with self.assertNoLogs('django', logging.INFO):
+        with self.assertNoLogs('mango', logging.INFO):
             self.logger.debug('DEBUG logs are ignored.')
 
     @override_settings(DEBUG=True)
     def test_default_level(self):
-        with self.assertNoLogs('django'):
+        with self.assertNoLogs('mango'):
             self.logger.debug('DEBUG logs are ignored.')
 
     @override_settings(DEBUG=True)
     def test_does_not_hide_other_failures(self):
         msg = '1 != 2'
         with self.assertRaisesMessage(AssertionError, msg):
-            with self.assertNoLogs('django'):
+            with self.assertNoLogs('mango'):
                 self.assertEqual(1, 2)
 
 
@@ -1259,7 +1259,7 @@ class SetupTestEnvironmentTests(SimpleTestCase):
         for type_ in (list, tuple):
             with self.subTest(type_=type_):
                 allowed_hosts = type_('*')
-                with mock.patch('django.test.utils._TestState') as x:
+                with mock.patch('mango.test.utils._TestState') as x:
                     del x.saved_data
                     with self.settings(ALLOWED_HOSTS=allowed_hosts):
                         setup_test_environment()
@@ -1308,7 +1308,7 @@ class OverrideSettingsTests(SimpleTestCase):
     def test_override_media_root(self):
         """
         Overriding the MEDIA_ROOT setting should be reflected in the
-        base_location attribute of django.core.files.storage.default_storage.
+        base_location attribute of mango.core.files.storage.default_storage.
         """
         self.assertEqual(default_storage.base_location, '')
         with self.settings(MEDIA_ROOT='test_value'):
@@ -1317,7 +1317,7 @@ class OverrideSettingsTests(SimpleTestCase):
     def test_override_media_url(self):
         """
         Overriding the MEDIA_URL setting should be reflected in the
-        base_url attribute of django.core.files.storage.default_storage.
+        base_url attribute of mango.core.files.storage.default_storage.
         """
         self.assertEqual(default_storage.base_location, '')
         with self.settings(MEDIA_URL='/test_value/'):
@@ -1327,7 +1327,7 @@ class OverrideSettingsTests(SimpleTestCase):
         """
         Overriding the FILE_UPLOAD_PERMISSIONS setting should be reflected in
         the file_permissions_mode attribute of
-        django.core.files.storage.default_storage.
+        mango.core.files.storage.default_storage.
         """
         self.assertEqual(default_storage.file_permissions_mode, 0o644)
         with self.settings(FILE_UPLOAD_PERMISSIONS=0o777):
@@ -1337,7 +1337,7 @@ class OverrideSettingsTests(SimpleTestCase):
         """
         Overriding the FILE_UPLOAD_DIRECTORY_PERMISSIONS setting should be
         reflected in the directory_permissions_mode attribute of
-        django.core.files.storage.default_storage.
+        mango.core.files.storage.default_storage.
         """
         self.assertIsNone(default_storage.directory_permissions_mode)
         with self.settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o777):
@@ -1355,7 +1355,7 @@ class OverrideSettingsTests(SimpleTestCase):
         """
         Overriding the STATIC_URL setting should be reflected in the
         base_url attribute of
-        django.contrib.staticfiles.storage.staticfiles_storage.
+        mango.contrib.staticfiles.storage.staticfiles_storage.
         """
         with self.settings(STATIC_URL='/test/'):
             self.assertEqual(staticfiles_storage.base_url, '/test/')
@@ -1364,7 +1364,7 @@ class OverrideSettingsTests(SimpleTestCase):
         """
         Overriding the STATIC_ROOT setting should be reflected in the
         location attribute of
-        django.contrib.staticfiles.storage.staticfiles_storage.
+        mango.contrib.staticfiles.storage.staticfiles_storage.
         """
         with self.settings(STATIC_ROOT='/tmp/test'):
             self.assertEqual(staticfiles_storage.location, os.path.abspath('/tmp/test'))
@@ -1372,21 +1372,21 @@ class OverrideSettingsTests(SimpleTestCase):
     def test_override_staticfiles_storage(self):
         """
         Overriding the STATICFILES_STORAGE setting should be reflected in
-        the value of django.contrib.staticfiles.storage.staticfiles_storage.
+        the value of mango.contrib.staticfiles.storage.staticfiles_storage.
         """
         new_class = 'ManifestStaticFilesStorage'
-        new_storage = 'django.contrib.staticfiles.storage.' + new_class
+        new_storage = 'mango.contrib.staticfiles.storage.' + new_class
         with self.settings(STATICFILES_STORAGE=new_storage):
             self.assertEqual(staticfiles_storage.__class__.__name__, new_class)
 
     def test_override_staticfiles_finders(self):
         """
         Overriding the STATICFILES_FINDERS setting should be reflected in
-        the return value of django.contrib.staticfiles.finders.get_finders.
+        the return value of mango.contrib.staticfiles.finders.get_finders.
         """
         current = get_finders()
         self.assertGreater(len(list(current)), 1)
-        finders = ['django.contrib.staticfiles.finders.FileSystemFinder']
+        finders = ['mango.contrib.staticfiles.finders.FileSystemFinder']
         with self.settings(STATICFILES_FINDERS=finders):
             self.assertEqual(len(list(get_finders())), len(finders))
 
@@ -1394,14 +1394,14 @@ class OverrideSettingsTests(SimpleTestCase):
         """
         Overriding the STATICFILES_DIRS setting should be reflected in
         the locations attribute of the
-        django.contrib.staticfiles.finders.FileSystemFinder instance.
+        mango.contrib.staticfiles.finders.FileSystemFinder instance.
         """
-        finder = get_finder('django.contrib.staticfiles.finders.FileSystemFinder')
+        finder = get_finder('mango.contrib.staticfiles.finders.FileSystemFinder')
         test_path = '/tmp/test'
         expected_location = ('', test_path)
         self.assertNotIn(expected_location, finder.locations)
         with self.settings(STATICFILES_DIRS=[test_path]):
-            finder = get_finder('django.contrib.staticfiles.finders.FileSystemFinder')
+            finder = get_finder('mango.contrib.staticfiles.finders.FileSystemFinder')
             self.assertIn(expected_location, finder.locations)
 
 

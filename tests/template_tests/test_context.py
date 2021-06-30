@@ -1,11 +1,11 @@
 from unittest import mock
 
-from django.http import HttpRequest
-from django.template import (
+from mango.http import HttpRequest
+from mango.template import (
     Context, Engine, RequestContext, Template, Variable, VariableDoesNotExist,
 )
-from django.template.context import RenderContext
-from django.test import RequestFactory, SimpleTestCase
+from mango.template.context import RenderContext
+from mango.test import RequestFactory, SimpleTestCase
 
 
 class ContextTests(SimpleTestCase):
@@ -224,7 +224,7 @@ class RequestContextTests(SimpleTestCase):
         together.
         """
         engine = Engine(loaders=[
-            ('django.template.loaders.locmem.Loader', {
+            ('mango.template.loaders.locmem.Loader', {
                 'child': '{{ var|default:"none" }}',
             }),
         ])

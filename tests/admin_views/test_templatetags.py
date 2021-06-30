@@ -1,12 +1,12 @@
 import datetime
 
-from django.contrib.admin import ModelAdmin
-from django.contrib.admin.templatetags.admin_list import date_hierarchy
-from django.contrib.admin.templatetags.admin_modify import submit_row
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
-from django.test import RequestFactory, TestCase
-from django.urls import reverse
+from mango.contrib.admin import ModelAdmin
+from mango.contrib.admin.templatetags.admin_list import date_hierarchy
+from mango.contrib.admin.templatetags.admin_modify import submit_row
+from mango.contrib.auth.admin import UserAdmin
+from mango.contrib.auth.models import User
+from mango.test import RequestFactory, TestCase
+from mango.urls import reverse
 
 from .admin import ArticleAdmin, site
 from .models import Article, Question

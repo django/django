@@ -13,15 +13,15 @@ dedicated PostgreSQL extension. A trigram lookup is given an expression and
 returns results that have a similarity measurement greater than the current
 similarity threshold.
 
-To use it, add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`
+To use it, add ``'mango.contrib.postgres'`` in your :setting:`INSTALLED_APPS`
 and activate the `pg_trgm extension
 <https://www.postgresql.org/docs/current/pgtrgm.html>`_ on PostgreSQL. You can
 install the extension using the
-:class:`~django.contrib.postgres.operations.TrigramExtension` migration
+:class:`~mango.contrib.postgres.operations.TrigramExtension` migration
 operation.
 
 The ``trigram_similar`` lookup can be used on
-:class:`~django.db.models.CharField` and :class:`~django.db.models.TextField`::
+:class:`~mango.db.models.CharField` and :class:`~mango.db.models.TextField`::
 
     >>> City.objects.filter(name__trigram_similar="Middlesborough")
     ['<City: Middlesbrough>']
@@ -34,17 +34,17 @@ The ``trigram_similar`` lookup can be used on
 The ``unaccent`` lookup allows you to perform accent-insensitive lookups using
 a dedicated PostgreSQL extension.
 
-This lookup is implemented using :class:`~django.db.models.Transform`, so it
+This lookup is implemented using :class:`~mango.db.models.Transform`, so it
 can be chained with other lookup functions. To use it, you need to add
-``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS` and activate
+``'mango.contrib.postgres'`` in your :setting:`INSTALLED_APPS` and activate
 the `unaccent extension on PostgreSQL`_. The
-:class:`~django.contrib.postgres.operations.UnaccentExtension` migration
+:class:`~mango.contrib.postgres.operations.UnaccentExtension` migration
 operation is available if you want to perform this activation using migrations).
 
 .. _unaccent extension on PostgreSQL: https://www.postgresql.org/docs/current/unaccent.html
 
 The ``unaccent`` lookup can be used on
-:class:`~django.db.models.CharField` and :class:`~django.db.models.TextField`::
+:class:`~mango.db.models.CharField` and :class:`~mango.db.models.TextField`::
 
     >>> City.objects.filter(name__unaccent="México")
     ['<City: Mexico>']

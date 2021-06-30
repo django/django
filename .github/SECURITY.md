@@ -1,3 +1,3 @@
-# Django Security Policies
+# Mango Security Policies
 
-Please see https://www.djangoproject.com/security/.
+Please see https://www.mangoproject.com/security/.

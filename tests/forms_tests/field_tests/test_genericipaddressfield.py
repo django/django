@@ -1,6 +1,6 @@
-from django.core.exceptions import ValidationError
-from django.forms import GenericIPAddressField
-from django.test import SimpleTestCase
+from mango.core.exceptions import ValidationError
+from mango.forms import GenericIPAddressField
+from mango.test import SimpleTestCase
 
 
 class GenericIPAddressFieldTest(SimpleTestCase):
@@ -13,7 +13,7 @@ class GenericIPAddressFieldTest(SimpleTestCase):
 
     def test_generic_ipaddress_as_generic(self):
         # The edge cases of the IPv6 validation code are not deeply tested
-        # here, they are covered in the tests for django.utils.ipv6
+        # here, they are covered in the tests for mango.utils.ipv6
         f = GenericIPAddressField()
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean('')

@@ -1,16 +1,16 @@
 =================
-Django Exceptions
+Mango Exceptions
 =================
 
-Django raises some of its own exceptions as well as standard Python exceptions.
+Mango raises some of its own exceptions as well as standard Python exceptions.
 
-Django Core Exceptions
+Mango Core Exceptions
 ======================
 
-.. module:: django.core.exceptions
-    :synopsis: Django core exceptions
+.. module:: mango.core.exceptions
+    :synopsis: Mango core exceptions
 
-Django core exception classes are defined in ``django.core.exceptions``.
+Mango core exception classes are defined in ``mango.core.exceptions``.
 
 ``AppRegistryNotReady``
 -----------------------
@@ -27,11 +27,11 @@ Django core exception classes are defined in ``django.core.exceptions``.
 .. exception:: ObjectDoesNotExist
 
     The base class for :exc:`Model.DoesNotExist
-    <django.db.models.Model.DoesNotExist>` exceptions. A ``try/except`` for
+    <mango.db.models.Model.DoesNotExist>` exceptions. A ``try/except`` for
     ``ObjectDoesNotExist`` will catch
-    :exc:`~django.db.models.Model.DoesNotExist` exceptions for all models.
+    :exc:`~mango.db.models.Model.DoesNotExist` exceptions for all models.
 
-    See :meth:`~django.db.models.query.QuerySet.get()`.
+    See :meth:`~mango.db.models.query.QuerySet.get()`.
 
 ``EmptyResultSet``
 ------------------
@@ -39,7 +39,7 @@ Django core exception classes are defined in ``django.core.exceptions``.
 .. exception:: EmptyResultSet
 
     ``EmptyResultSet`` may be raised during query generation if a query won't
-    return any results. Most Django projects won't encounter this exception,
+    return any results. Most Mango projects won't encounter this exception,
     but it might be useful for implementing custom lookups and expressions.
 
 ``FieldDoesNotExist``
@@ -57,12 +57,12 @@ Django core exception classes are defined in ``django.core.exceptions``.
 .. exception:: MultipleObjectsReturned
 
     The base class for :exc:`Model.MultipleObjectsReturned
-    <django.db.models.Model.MultipleObjectsReturned>` exceptions. A
+    <mango.db.models.Model.MultipleObjectsReturned>` exceptions. A
     ``try/except`` for ``MultipleObjectsReturned`` will catch
-    :exc:`~django.db.models.Model.MultipleObjectsReturned` exceptions for all
+    :exc:`~mango.db.models.Model.MultipleObjectsReturned` exceptions for all
     models.
 
-    See :meth:`~django.db.models.query.QuerySet.get()`.
+    See :meth:`~mango.db.models.query.QuerySet.get()`.
 
 ``SuspiciousOperation``
 -----------------------
@@ -87,7 +87,7 @@ Django core exception classes are defined in ``django.core.exceptions``.
 
     If a ``SuspiciousOperation`` exception reaches the ASGI/WSGI handler level
     it is logged at the ``Error`` level and results in
-    a :class:`~django.http.HttpResponseBadRequest`. See the :doc:`logging
+    a :class:`~mango.http.HttpResponseBadRequest`. See the :doc:`logging
     documentation </topics/logging/>` for more information.
 
 ``PermissionDenied``
@@ -104,7 +104,7 @@ Django core exception classes are defined in ``django.core.exceptions``.
 .. exception:: ViewDoesNotExist
 
     The :exc:`ViewDoesNotExist` exception is raised by
-    :mod:`django.urls` when a requested view does not exist.
+    :mod:`mango.urls` when a requested view does not exist.
 
 ``MiddlewareNotUsed``
 ---------------------
@@ -119,7 +119,7 @@ Django core exception classes are defined in ``django.core.exceptions``.
 
 .. exception:: ImproperlyConfigured
 
-    The :exc:`ImproperlyConfigured` exception is raised when Django is
+    The :exc:`ImproperlyConfigured` exception is raised when Mango is
     somehow improperly configured -- for example, if a value in ``settings.py``
     is incorrect or unparseable.
 
@@ -172,7 +172,7 @@ list of errors.
     The :exc:`BadRequest` exception is raised when the request cannot be
     processed due to a client error. If a ``BadRequest`` exception reaches the
     ASGI/WSGI handler level it results in a
-    :class:`~django.http.HttpResponseBadRequest`.
+    :class:`~mango.http.HttpResponseBadRequest`.
 
 ``RequestAborted``
 ------------------
@@ -197,19 +197,19 @@ list of errors.
     The :exc:`SynchronousOnlyOperation` exception is raised when code that
     is only allowed in synchronous Python code is called from an asynchronous
     context (a thread with a running asynchronous event loop). These parts of
-    Django are generally heavily reliant on thread-safety to function and don't
+    Mango are generally heavily reliant on thread-safety to function and don't
     work correctly under coroutines sharing the same thread.
 
     If you are trying to call code that is synchronous-only from an
     asynchronous thread, then create a synchronous thread and call it in that.
     You can accomplish this is with :func:`asgiref.sync.sync_to_async`.
 
-.. currentmodule:: django.urls
+.. currentmodule:: mango.urls
 
 URL Resolver exceptions
 =======================
 
-URL Resolver exceptions are defined in ``django.urls``.
+URL Resolver exceptions are defined in ``mango.urls``.
 
 ``Resolver404``
 ---------------
@@ -217,26 +217,26 @@ URL Resolver exceptions are defined in ``django.urls``.
 .. exception:: Resolver404
 
     The :exc:`Resolver404` exception is raised by
-    :func:`~django.urls.resolve()` if the path passed to ``resolve()`` doesn't
-    map to a view. It's a subclass of :class:`django.http.Http404`.
+    :func:`~mango.urls.resolve()` if the path passed to ``resolve()`` doesn't
+    map to a view. It's a subclass of :class:`mango.http.Http404`.
 
 ``NoReverseMatch``
 ------------------
 
 .. exception:: NoReverseMatch
 
-    The :exc:`NoReverseMatch` exception is raised by :mod:`django.urls` when a
+    The :exc:`NoReverseMatch` exception is raised by :mod:`mango.urls` when a
     matching URL in your URLconf cannot be identified based on the parameters
     supplied.
 
-.. currentmodule:: django.db
+.. currentmodule:: mango.db
 
 Database Exceptions
 ===================
 
-Database exceptions may be imported from ``django.db``.
+Database exceptions may be imported from ``mango.db``.
 
-Django wraps the standard database exceptions so that your Django code has a
+Mango wraps the standard database exceptions so that your Mango code has a
 guaranteed common implementation of these classes.
 
 .. exception:: Error
@@ -249,7 +249,7 @@ guaranteed common implementation of these classes.
 .. exception:: ProgrammingError
 .. exception:: NotSupportedError
 
-The Django wrappers for database exceptions behave exactly the same as
+The Mango wrappers for database exceptions behave exactly the same as
 the underlying database exceptions. See :pep:`249`, the Python Database API
 Specification v2.0, for further information.
 
@@ -260,21 +260,21 @@ information provided.
 .. exception:: models.ProtectedError
 
 Raised to prevent deletion of referenced objects when using
-:attr:`django.db.models.PROTECT`. :exc:`models.ProtectedError` is a subclass
+:attr:`mango.db.models.PROTECT`. :exc:`models.ProtectedError` is a subclass
 of :exc:`IntegrityError`.
 
 .. exception:: models.RestrictedError
 
 Raised to prevent deletion of referenced objects when using
-:attr:`django.db.models.RESTRICT`. :exc:`models.RestrictedError` is a subclass
+:attr:`mango.db.models.RESTRICT`. :exc:`models.RestrictedError` is a subclass
 of :exc:`IntegrityError`.
 
-.. currentmodule:: django.http
+.. currentmodule:: mango.http
 
 Http Exceptions
 ===============
 
-Http exceptions may be imported from ``django.http``.
+Http exceptions may be imported from ``mango.http``.
 
 ``UnreadablePostError``
 -----------------------
@@ -283,12 +283,12 @@ Http exceptions may be imported from ``django.http``.
 
     :exc:`UnreadablePostError` is raised when a user cancels an upload.
 
-.. currentmodule:: django.contrib.sessions.exceptions
+.. currentmodule:: mango.contrib.sessions.exceptions
 
 Sessions Exceptions
 ===================
 
-Sessions exceptions are defined in ``django.contrib.sessions.exceptions``.
+Sessions exceptions are defined in ``mango.contrib.sessions.exceptions``.
 
 ``SessionInterrupted``
 ----------------------
@@ -299,14 +299,14 @@ Sessions exceptions are defined in ``django.contrib.sessions.exceptions``.
 
     :exc:`SessionInterrupted` is raised when a session is destroyed in a
     concurrent request. It's a subclass of
-    :exc:`~django.core.exceptions.BadRequest`.
+    :exc:`~mango.core.exceptions.BadRequest`.
 
 Transaction Exceptions
 ======================
 
-.. currentmodule:: django.db.transaction
+.. currentmodule:: mango.db.transaction
 
-Transaction exceptions are defined in ``django.db.transaction``.
+Transaction exceptions are defined in ``mango.db.transaction``.
 
 ``TransactionManagementError``
 ------------------------------
@@ -316,12 +316,12 @@ Transaction exceptions are defined in ``django.db.transaction``.
     :exc:`TransactionManagementError` is raised for any and all problems
     related to database transactions.
 
-.. currentmodule:: django.test
+.. currentmodule:: mango.test
 
 Testing Framework Exceptions
 ============================
 
-Exceptions provided by the ``django.test`` package.
+Exceptions provided by the ``mango.test`` package.
 
 ``RedirectCycleError``
 ----------------------
@@ -334,5 +334,5 @@ Exceptions provided by the ``django.test`` package.
 Python Exceptions
 =================
 
-Django raises built-in Python exceptions when appropriate as well. See the
+Mango raises built-in Python exceptions when appropriate as well. See the
 Python documentation for further information on the :ref:`bltin-exceptions`.

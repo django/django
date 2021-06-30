@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 
-from django.db.models.functions import Now
-from django.test import TestCase
-from django.utils import timezone
+from mango.db.models.functions import Now
+from mango.test import TestCase
+from mango.utils import timezone
 
 from ..models import Article
 
@@ -15,7 +15,7 @@ class NowTests(TestCase):
 
     def test_basic(self):
         a1 = Article.objects.create(
-            title='How to Django',
+            title='How to Mango',
             text=lorem_ipsum,
             written=timezone.now(),
         )
@@ -36,7 +36,7 @@ class NowTests(TestCase):
         self.assertIsInstance(a2.published, datetime)
         self.assertQuerysetEqual(
             Article.objects.filter(published__lte=Now()),
-            ['How to Django'],
+            ['How to Mango'],
             lambda a: a.title
         )
         self.assertQuerysetEqual(

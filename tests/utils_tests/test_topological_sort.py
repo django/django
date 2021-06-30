@@ -1,5 +1,5 @@
-from django.test import SimpleTestCase
-from django.utils.topological_sort import (
+from mango.test import SimpleTestCase
+from mango.utils.topological_sort import (
     CyclicDependencyError, stable_topological_sort, topological_sort_as_sets,
 )
 

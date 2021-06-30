@@ -1,7 +1,7 @@
 import datetime
 
-from django.forms import MultiWidget, RadioSelect
-from django.test import override_settings
+from mango.forms import MultiWidget, RadioSelect
+from mango.test import override_settings
 
 from .base import WidgetTest
 

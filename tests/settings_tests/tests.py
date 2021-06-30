@@ -4,16 +4,16 @@ import unittest
 from types import ModuleType, SimpleNamespace
 from unittest import mock
 
-from django.conf import ENVIRONMENT_VARIABLE, LazySettings, Settings, settings
-from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpRequest
-from django.test import (
+from mango.conf import ENVIRONMENT_VARIABLE, LazySettings, Settings, settings
+from mango.core.exceptions import ImproperlyConfigured
+from mango.http import HttpRequest
+from mango.test import (
     SimpleTestCase, TestCase, TransactionTestCase, modify_settings,
     override_settings, signals,
 )
-from django.test.utils import requires_tz_support
-from django.urls import clear_script_prefix, set_script_prefix
-from django.utils.deprecation import RemovedInDjango50Warning
+from mango.test.utils import requires_tz_support
+from mango.urls import clear_script_prefix, set_script_prefix
+from mango.utils.deprecation import RemovedInMango50Warning
 
 
 @modify_settings(ITEMS={
@@ -213,7 +213,7 @@ class SettingsTests(SimpleTestCase):
         self.assertIsInstance(decorated, type)
         self.assertTrue(issubclass(decorated, SimpleTestCase))
 
-        with self.assertRaisesMessage(Exception, "Only subclasses of Django SimpleTestCase"):
+        with self.assertRaisesMessage(Exception, "Only subclasses of Mango SimpleTestCase"):
             decorated = override_settings(TEST='override')(UnittestTestCaseSubclass)
 
     def test_signal_callback_context_manager(self):
@@ -328,7 +328,7 @@ class SettingsTests(SimpleTestCase):
             getattr(s, 'foo')
 
     @requires_tz_support
-    @mock.patch('django.conf.global_settings.TIME_ZONE', 'test')
+    @mock.patch('mango.conf.global_settings.TIME_ZONE', 'test')
     def test_incorrect_timezone(self):
         with self.assertRaisesMessage(ValueError, 'Incorrect timezone setting: test'):
             settings._setup()
@@ -339,11 +339,11 @@ class SettingsTests(SimpleTestCase):
         sys.modules['fake_settings_module'] = settings_module
         msg = (
             'The default value of USE_TZ will change from False to True in '
-            'Django 5.0. Set USE_TZ to False in your project settings if you '
+            'Mango 5.0. Set USE_TZ to False in your project settings if you '
             'want to keep the current default behavior.'
         )
         try:
-            with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
+            with self.assertRaisesMessage(RemovedInMango50Warning, msg):
                 Settings('fake_settings_module')
         finally:
             del sys.modules['fake_settings_module']

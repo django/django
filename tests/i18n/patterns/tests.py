@@ -1,15 +1,15 @@
 import os
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponse, HttpResponsePermanentRedirect
-from django.middleware.locale import LocaleMiddleware
-from django.template import Context, Template
-from django.test import SimpleTestCase, override_settings
-from django.test.client import RequestFactory
-from django.test.utils import override_script_prefix
-from django.urls import clear_url_caches, reverse, translate_url
-from django.utils import translation
+from mango.conf import settings
+from mango.core.exceptions import ImproperlyConfigured
+from mango.http import HttpResponse, HttpResponsePermanentRedirect
+from mango.middleware.locale import LocaleMiddleware
+from mango.template import Context, Template
+from mango.test import SimpleTestCase, override_settings
+from mango.test.client import RequestFactory
+from mango.test.utils import override_script_prefix
+from mango.urls import clear_url_caches, reverse, translate_url
+from mango.utils import translation
 
 
 class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
@@ -28,16 +28,16 @@ class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
         ('pt-br', 'Brazilian Portuguese'),
     ],
     MIDDLEWARE=[
-        'django.middleware.locale.LocaleMiddleware',
-        'django.middleware.common.CommonMiddleware',
+        'mango.middleware.locale.LocaleMiddleware',
+        'mango.middleware.common.CommonMiddleware',
     ],
     ROOT_URLCONF='i18n.patterns.urls.default',
     TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
         'DIRS': [os.path.join(os.path.dirname(__file__), 'templates')],
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.i18n',
+                'mango.template.context_processors.i18n',
             ],
         },
     }],
@@ -236,7 +236,7 @@ class URLRedirectTests(URLTestCaseBase):
     @override_settings(
         MIDDLEWARE=[
             'i18n.patterns.tests.PermanentRedirectLocaleMiddleWare',
-            'django.middleware.common.CommonMiddleware',
+            'mango.middleware.common.CommonMiddleware',
         ],
     )
     def test_custom_redirect_class(self):

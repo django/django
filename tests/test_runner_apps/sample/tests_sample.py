@@ -1,7 +1,7 @@
 import doctest
 from unittest import TestCase
 
-from django.test import SimpleTestCase, TestCase as DjangoTestCase
+from mango.test import SimpleTestCase, TestCase as MangoTestCase
 
 from . import doctests
 
@@ -12,7 +12,7 @@ class TestVanillaUnittest(TestCase):
         self.assertEqual(1, 1)
 
 
-class TestDjangoTestCase(DjangoTestCase):
+class TestMangoTestCase(MangoTestCase):
 
     def test_sample(self):
         self.assertEqual(1, 1)

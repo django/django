@@ -1,5 +1,5 @@
-from django.template.defaultfilters import dictsortreversed
-from django.test import SimpleTestCase
+from mango.template.defaultfilters import dictsortreversed
+from mango.test import SimpleTestCase
 
 
 class FunctionTests(SimpleTestCase):

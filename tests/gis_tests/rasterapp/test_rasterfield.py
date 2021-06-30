@@ -1,16 +1,16 @@
 import json
 
-from django.contrib.gis.db.models.fields import BaseSpatialField
-from django.contrib.gis.db.models.functions import Distance
-from django.contrib.gis.db.models.lookups import DistanceLookupBase, GISLookup
-from django.contrib.gis.gdal import GDALRaster
-from django.contrib.gis.geos import GEOSGeometry
-from django.contrib.gis.measure import D
-from django.contrib.gis.shortcuts import numpy
-from django.db import connection
-from django.db.models import F, Func, Q
-from django.test import TransactionTestCase, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext
+from mango.contrib.gis.db.models.fields import BaseSpatialField
+from mango.contrib.gis.db.models.functions import Distance
+from mango.contrib.gis.db.models.lookups import DistanceLookupBase, GISLookup
+from mango.contrib.gis.gdal import GDALRaster
+from mango.contrib.gis.geos import GEOSGeometry
+from mango.contrib.gis.measure import D
+from mango.contrib.gis.shortcuts import numpy
+from mango.db import connection
+from mango.db.models import F, Func, Q
+from mango.test import TransactionTestCase, skipUnlessDBFeature
+from mango.test.utils import CaptureQueriesContext
 
 from ..data.rasters.textrasters import JSON_RASTER
 from .models import RasterModel, RasterRelatedModel
@@ -143,7 +143,7 @@ class RasterFieldTest(TransactionTestCase):
         unprojected coordinate systems. This test just checks that the lookup
         can be called, but doesn't check if the result makes logical sense.
         """
-        from django.contrib.gis.db.backends.postgis.operations import (
+        from mango.contrib.gis.db.backends.postgis.operations import (
             PostGISOperations,
         )
 

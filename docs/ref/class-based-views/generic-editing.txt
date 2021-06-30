@@ -5,15 +5,15 @@ Generic editing views
 The following views are described on this page and provide a foundation for
 editing content:
 
-* :class:`django.views.generic.edit.FormView`
-* :class:`django.views.generic.edit.CreateView`
-* :class:`django.views.generic.edit.UpdateView`
-* :class:`django.views.generic.edit.DeleteView`
+* :class:`mango.views.generic.edit.FormView`
+* :class:`mango.views.generic.edit.CreateView`
+* :class:`mango.views.generic.edit.UpdateView`
+* :class:`mango.views.generic.edit.DeleteView`
 
 .. seealso::
 
     The :doc:`messages framework </ref/contrib/messages>` contains
-    :class:`~django.contrib.messages.views.SuccessMessageMixin`, which
+    :class:`~mango.contrib.messages.views.SuccessMessageMixin`, which
     facilitates presenting messages about successful form submissions.
 
 .. note::
@@ -21,8 +21,8 @@ editing content:
     Some of the examples on this page assume that an ``Author`` model has been
     defined as follows in ``myapp/models.py``::
 
-        from django.db import models
-        from django.urls import reverse
+        from mango.db import models
+        from mango.urls import reverse
 
         class Author(models.Model):
             name = models.CharField(max_length=200)
@@ -33,7 +33,7 @@ editing content:
 ``FormView``
 ============
 
-.. class:: django.views.generic.edit.FormView
+.. class:: mango.views.generic.edit.FormView
 
     A view that displays a form. On error, redisplays the form with validation
     errors; on success, redirects to a new URL.
@@ -42,15 +42,15 @@ editing content:
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.edit.BaseFormView`
-    * :class:`django.views.generic.edit.FormMixin`
-    * :class:`django.views.generic.edit.ProcessFormView`
-    * :class:`django.views.generic.base.View`
+    * :class:`mango.views.generic.base.TemplateResponseMixin`
+    * :class:`mango.views.generic.edit.BaseFormView`
+    * :class:`mango.views.generic.edit.FormMixin`
+    * :class:`mango.views.generic.edit.ProcessFormView`
+    * :class:`mango.views.generic.base.View`
 
     **Example myapp/forms.py**::
 
-        from django import forms
+        from mango import forms
 
         class ContactForm(forms.Form):
             name = forms.CharField()
@@ -63,7 +63,7 @@ editing content:
     **Example myapp/views.py**::
 
         from myapp.forms import ContactForm
-        from django.views.generic.edit import FormView
+        from mango.views.generic.edit import FormView
 
         class ContactFormView(FormView):
             template_name = 'contact.html'
@@ -78,31 +78,31 @@ editing content:
 
     **Example myapp/contact.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+mango
 
         <form method="post">{% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="Send message">
         </form>
 
-.. class:: django.views.generic.edit.BaseFormView
+.. class:: mango.views.generic.edit.BaseFormView
 
     A base view for displaying a form. It is not intended to be used directly,
     but rather as a parent class of the
-    :class:`django.views.generic.edit.FormView` or other views displaying a
+    :class:`mango.views.generic.edit.FormView` or other views displaying a
     form.
 
     **Ancestors (MRO)**
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.edit.FormMixin`
-    * :class:`django.views.generic.edit.ProcessFormView`
+    * :class:`mango.views.generic.edit.FormMixin`
+    * :class:`mango.views.generic.edit.ProcessFormView`
 
 ``CreateView``
 ==============
 
-.. class:: django.views.generic.edit.CreateView
+.. class:: mango.views.generic.edit.CreateView
 
     A view that displays a form for creating an object, redisplaying the form
     with validation errors (if there are any) and saving the object.
@@ -111,14 +111,14 @@ editing content:
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.edit.BaseCreateView`
-    * :class:`django.views.generic.edit.ModelFormMixin`
-    * :class:`django.views.generic.edit.FormMixin`
-    * :class:`django.views.generic.detail.SingleObjectMixin`
-    * :class:`django.views.generic.edit.ProcessFormView`
-    * :class:`django.views.generic.base.View`
+    * :class:`mango.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`mango.views.generic.base.TemplateResponseMixin`
+    * :class:`mango.views.generic.edit.BaseCreateView`
+    * :class:`mango.views.generic.edit.ModelFormMixin`
+    * :class:`mango.views.generic.edit.FormMixin`
+    * :class:`mango.views.generic.detail.SingleObjectMixin`
+    * :class:`mango.views.generic.edit.ProcessFormView`
+    * :class:`mango.views.generic.base.View`
 
     **Attributes**
 
@@ -138,7 +138,7 @@ editing content:
 
     **Example myapp/views.py**::
 
-        from django.views.generic.edit import CreateView
+        from mango.views.generic.edit import CreateView
         from myapp.models import Author
 
         class AuthorCreateView(CreateView):
@@ -147,25 +147,25 @@ editing content:
 
     **Example myapp/author_form.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+mango
 
         <form method="post">{% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="Save">
         </form>
 
-.. class:: django.views.generic.edit.BaseCreateView
+.. class:: mango.views.generic.edit.BaseCreateView
 
     A base view for creating a new object instance. It is not intended to be
     used directly, but rather as a parent class of the
-    :class:`django.views.generic.edit.CreateView`.
+    :class:`mango.views.generic.edit.CreateView`.
 
     **Ancestors (MRO)**
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.edit.ModelFormMixin`
-    * :class:`django.views.generic.edit.ProcessFormView`
+    * :class:`mango.views.generic.edit.ModelFormMixin`
+    * :class:`mango.views.generic.edit.ProcessFormView`
 
     **Methods**
 
@@ -180,7 +180,7 @@ editing content:
 ``UpdateView``
 ==============
 
-.. class:: django.views.generic.edit.UpdateView
+.. class:: mango.views.generic.edit.UpdateView
 
     A view that displays a form for editing an existing object, redisplaying
     the form with validation errors (if there are any) and saving changes to
@@ -191,14 +191,14 @@ editing content:
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.edit.BaseUpdateView`
-    * :class:`django.views.generic.edit.ModelFormMixin`
-    * :class:`django.views.generic.edit.FormMixin`
-    * :class:`django.views.generic.detail.SingleObjectMixin`
-    * :class:`django.views.generic.edit.ProcessFormView`
-    * :class:`django.views.generic.base.View`
+    * :class:`mango.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`mango.views.generic.base.TemplateResponseMixin`
+    * :class:`mango.views.generic.edit.BaseUpdateView`
+    * :class:`mango.views.generic.edit.ModelFormMixin`
+    * :class:`mango.views.generic.edit.FormMixin`
+    * :class:`mango.views.generic.detail.SingleObjectMixin`
+    * :class:`mango.views.generic.edit.ProcessFormView`
+    * :class:`mango.views.generic.base.View`
 
     **Attributes**
 
@@ -217,7 +217,7 @@ editing content:
 
     **Example myapp/views.py**::
 
-        from django.views.generic.edit import UpdateView
+        from mango.views.generic.edit import UpdateView
         from myapp.models import Author
 
         class AuthorUpdateView(UpdateView):
@@ -227,25 +227,25 @@ editing content:
 
     **Example myapp/author_update_form.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+mango
 
         <form method="post">{% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="Update">
         </form>
 
-.. class:: django.views.generic.edit.BaseUpdateView
+.. class:: mango.views.generic.edit.BaseUpdateView
 
     A base view for updating an existing object instance. It is not intended to
     be used directly, but rather as a parent class of the
-    :class:`django.views.generic.edit.UpdateView`.
+    :class:`mango.views.generic.edit.UpdateView`.
 
     **Ancestors (MRO)**
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.edit.ModelFormMixin`
-    * :class:`django.views.generic.edit.ProcessFormView`
+    * :class:`mango.views.generic.edit.ModelFormMixin`
+    * :class:`mango.views.generic.edit.ProcessFormView`
 
     **Methods**
 
@@ -260,7 +260,7 @@ editing content:
 ``DeleteView``
 ==============
 
-.. class:: django.views.generic.edit.DeleteView
+.. class:: mango.views.generic.edit.DeleteView
 
     A view that displays a confirmation page and deletes an existing object.
     The given object will only be deleted if the request method is ``POST``. If
@@ -271,13 +271,13 @@ editing content:
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.edit.BaseDeleteView`
-    * :class:`django.views.generic.edit.DeletionMixin`
-    * :class:`django.views.generic.detail.BaseDetailView`
-    * :class:`django.views.generic.detail.SingleObjectMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`mango.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`mango.views.generic.base.TemplateResponseMixin`
+    * :class:`mango.views.generic.edit.BaseDeleteView`
+    * :class:`mango.views.generic.edit.DeletionMixin`
+    * :class:`mango.views.generic.detail.BaseDetailView`
+    * :class:`mango.views.generic.detail.SingleObjectMixin`
+    * :class:`mango.views.generic.base.View`
 
     **Attributes**
 
@@ -291,8 +291,8 @@ editing content:
 
     **Example myapp/views.py**::
 
-        from django.urls import reverse_lazy
-        from django.views.generic.edit import DeleteView
+        from mango.urls import reverse_lazy
+        from mango.views.generic.edit import DeleteView
         from myapp.models import Author
 
         class AuthorDeleteView(DeleteView):
@@ -301,22 +301,22 @@ editing content:
 
     **Example myapp/author_confirm_delete.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+mango
 
         <form method="post">{% csrf_token %}
             <p>Are you sure you want to delete "{{ object }}"?</p>
             <input type="submit" value="Confirm">
         </form>
 
-.. class:: django.views.generic.edit.BaseDeleteView
+.. class:: mango.views.generic.edit.BaseDeleteView
 
     A base view for deleting an object instance. It is not intended to be used
     directly, but rather as a parent class of the
-    :class:`django.views.generic.edit.DeleteView`.
+    :class:`mango.views.generic.edit.DeleteView`.
 
     **Ancestors (MRO)**
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.edit.DeletionMixin`
-    * :class:`django.views.generic.detail.BaseDetailView`
+    * :class:`mango.views.generic.edit.DeletionMixin`
+    * :class:`mango.views.generic.detail.BaseDetailView`

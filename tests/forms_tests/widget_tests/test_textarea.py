@@ -1,5 +1,5 @@
-from django.forms import Textarea
-from django.utils.safestring import mark_safe
+from mango.forms import Textarea
+from mango.utils.safestring import mark_safe
 
 from .base import WidgetTest
 

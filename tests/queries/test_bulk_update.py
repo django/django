@@ -1,9 +1,9 @@
 import datetime
 
-from django.core.exceptions import FieldDoesNotExist
-from django.db.models import F
-from django.db.models.functions import Lower
-from django.test import TestCase, skipUnlessDBFeature
+from mango.core.exceptions import FieldDoesNotExist
+from mango.db.models import F
+from mango.db.models.functions import Lower
+from mango.test import TestCase, skipUnlessDBFeature
 
 from .models import (
     Article, CustomDbColumn, CustomPk, Detail, Individual, JSONFieldNullable,

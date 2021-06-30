@@ -1,4 +1,4 @@
-from django.test import override_settings
+from mango.test import override_settings
 
 from .cases import StaticFilesTestCase
 

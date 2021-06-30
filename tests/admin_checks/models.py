@@ -2,9 +2,9 @@
 Tests of ModelAdmin system checks logic.
 """
 
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
+from mango.contrib.contenttypes.fields import GenericForeignKey
+from mango.contrib.contenttypes.models import ContentType
+from mango.db import models
 
 
 class Album(models.Model):

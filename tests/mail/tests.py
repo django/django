@@ -17,16 +17,16 @@ from smtplib import SMTP, SMTPAuthenticationError, SMTPException
 from ssl import SSLError
 from unittest import mock
 
-from django.core import mail
-from django.core.mail import (
+from mango.core import mail
+from mango.core.mail import (
     DNS_NAME, EmailMessage, EmailMultiAlternatives, mail_admins, mail_managers,
     send_mail, send_mass_mail,
 )
-from django.core.mail.backends import console, dummy, filebased, locmem, smtp
-from django.core.mail.message import BadHeaderError, sanitize_address
-from django.test import SimpleTestCase, override_settings
-from django.test.utils import requires_tz_support
-from django.utils.translation import gettext_lazy
+from mango.core.mail.backends import console, dummy, filebased, locmem, smtp
+from mango.core.mail.message import BadHeaderError, sanitize_address
+from mango.test import SimpleTestCase, override_settings
+from mango.test.utils import requires_tz_support
+from mango.utils.translation import gettext_lazy
 
 
 class HeadersCheckMixin:
@@ -50,13 +50,13 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
     """
     Non-backend specific tests.
     """
-    def get_decoded_attachments(self, django_message):
+    def get_decoded_attachments(self, mango_message):
         """
-        Encode the specified django.core.mail.message.EmailMessage, then decode
+        Encode the specified mango.core.mail.message.EmailMessage, then decode
         it using Python's email.parser module and, for each attachment of the
         message, return a list of tuples with (filename, content, mimetype).
         """
-        msg_bytes = django_message.message().as_bytes()
+        msg_bytes = mango_message.message().as_bytes()
         email_message = message_from_bytes(msg_bytes)
 
         def iter_attachments():
@@ -579,19 +579,19 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
     def test_backend_arg(self):
         """Test backend argument of mail.get_connection()"""
-        self.assertIsInstance(mail.get_connection('django.core.mail.backends.smtp.EmailBackend'), smtp.EmailBackend)
+        self.assertIsInstance(mail.get_connection('mango.core.mail.backends.smtp.EmailBackend'), smtp.EmailBackend)
         self.assertIsInstance(
-            mail.get_connection('django.core.mail.backends.locmem.EmailBackend'),
+            mail.get_connection('mango.core.mail.backends.locmem.EmailBackend'),
             locmem.EmailBackend
         )
-        self.assertIsInstance(mail.get_connection('django.core.mail.backends.dummy.EmailBackend'), dummy.EmailBackend)
+        self.assertIsInstance(mail.get_connection('mango.core.mail.backends.dummy.EmailBackend'), dummy.EmailBackend)
         self.assertIsInstance(
-            mail.get_connection('django.core.mail.backends.console.EmailBackend'),
+            mail.get_connection('mango.core.mail.backends.console.EmailBackend'),
             console.EmailBackend
         )
         with tempfile.TemporaryDirectory() as tmp_dir:
             self.assertIsInstance(
-                mail.get_connection('django.core.mail.backends.filebased.EmailBackend', file_path=tmp_dir),
+                mail.get_connection('mango.core.mail.backends.filebased.EmailBackend', file_path=tmp_dir),
                 filebased.EmailBackend
             )
 
@@ -600,11 +600,11 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         else:
             msg = 'expected str, bytes or os.PathLike object, not object'
         with self.assertRaisesMessage(TypeError, msg):
-            mail.get_connection('django.core.mail.backends.filebased.EmailBackend', file_path=object())
+            mail.get_connection('mango.core.mail.backends.filebased.EmailBackend', file_path=object())
         self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
 
     @override_settings(
-        EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
+        EMAIL_BACKEND='mango.core.mail.backends.locmem.EmailBackend',
         ADMINS=[('nobody', 'nobody@example.com')],
         MANAGERS=[('nobody', 'nobody@example.com')])
     def test_connection_arg(self):
@@ -632,13 +632,13 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         mail_admins('Admin message', 'Content', connection=connection)
         self.assertEqual(mail.outbox, [])
         self.assertEqual(len(connection.test_outbox), 1)
-        self.assertEqual(connection.test_outbox[0].subject, '[Django] Admin message')
+        self.assertEqual(connection.test_outbox[0].subject, '[Mango] Admin message')
 
         connection = mail.get_connection('mail.custombackend.EmailBackend')
         mail_managers('Manager message', 'Content', connection=connection)
         self.assertEqual(mail.outbox, [])
         self.assertEqual(len(connection.test_outbox), 1)
-        self.assertEqual(connection.test_outbox[0].subject, '[Django] Manager message')
+        self.assertEqual(connection.test_outbox[0].subject, '[Mango] Manager message')
 
     def test_dont_mangle_from_in_body(self):
         # Regression for #13433 - Make sure that EmailMessage doesn't mangle
@@ -720,7 +720,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         # The child message header is not base64 encoded
         self.assertIn('Child Subject', parent_s)
 
-        # Feature test: try attaching Django's EmailMessage object directly to the mail.
+        # Feature test: try attaching Mango's EmailMessage object directly to the mail.
         parent_msg = EmailMessage(
             'Parent Subject', 'Some parent body', 'bounce@example.com', ['to@example.com'],
             headers={'From': 'from@example.com'},
@@ -884,9 +884,9 @@ class MailTimeZoneTests(SimpleTestCase):
 
 class PythonGlobalState(SimpleTestCase):
     """
-    Tests for #12422 -- Django smarts (#2472/#11212) with charset of utf-8 text
+    Tests for #12422 -- Mango smarts (#2472/#11212) with charset of utf-8 text
     parts shouldn't pollute global email Python package charset registry when
-    django.mail.message is imported.
+    mango.mail.message is imported.
     """
 
     def test_utf8(self):
@@ -1027,7 +1027,7 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         mail_managers('Subject', 'Content', html_message='HTML Content')
         message = self.get_the_message()
 
-        self.assertEqual(message.get('subject'), '[Django] Subject')
+        self.assertEqual(message.get('subject'), '[Mango] Subject')
         self.assertEqual(message.get_all('to'), ['nobody@example.com'])
         self.assertTrue(message.is_multipart())
         self.assertEqual(len(message.get_payload()), 2)
@@ -1042,7 +1042,7 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         mail_admins('Subject', 'Content', html_message='HTML Content')
         message = self.get_the_message()
 
-        self.assertEqual(message.get('subject'), '[Django] Subject')
+        self.assertEqual(message.get('subject'), '[Mango] Subject')
         self.assertEqual(message.get_all('to'), ['nobody@example.com'])
         self.assertTrue(message.is_multipart())
         self.assertEqual(len(message.get_payload()), 2)
@@ -1061,12 +1061,12 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         """
         mail_managers(gettext_lazy('Subject'), 'Content')
         message = self.get_the_message()
-        self.assertEqual(message.get('subject'), '[Django] Subject')
+        self.assertEqual(message.get('subject'), '[Mango] Subject')
 
         self.flush_mailbox()
         mail_admins(gettext_lazy('Subject'), 'Content')
         message = self.get_the_message()
-        self.assertEqual(message.get('subject'), '[Django] Subject')
+        self.assertEqual(message.get('subject'), '[Mango] Subject')
 
     @override_settings(ADMINS=[], MANAGERS=[])
     def test_empty_admins(self):
@@ -1136,21 +1136,21 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         """
         Regression test for #15042
         """
-        self.assertTrue(send_mail("Subject", "Content", "tester", ["django"]))
+        self.assertTrue(send_mail("Subject", "Content", "tester", ["mango"]))
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), 'Subject')
         self.assertEqual(message.get('from'), "tester")
-        self.assertEqual(message.get('to'), "django")
+        self.assertEqual(message.get('to'), "mango")
 
     def test_lazy_addresses(self):
         """
         Email sending should support lazy email addresses (#24416).
         """
         _ = gettext_lazy
-        self.assertTrue(send_mail('Subject', 'Content', _('tester'), [_('django')]))
+        self.assertTrue(send_mail('Subject', 'Content', _('tester'), [_('mango')]))
         message = self.get_the_message()
         self.assertEqual(message.get('from'), 'tester')
-        self.assertEqual(message.get('to'), 'django')
+        self.assertEqual(message.get('to'), 'mango')
 
         self.flush_mailbox()
         m = EmailMessage(
@@ -1197,7 +1197,7 @@ class BaseEmailBackendTests(HeadersCheckMixin):
 
 
 class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
-    email_backend = 'django.core.mail.backends.locmem.EmailBackend'
+    email_backend = 'mango.core.mail.backends.locmem.EmailBackend'
 
     def get_mailbox_content(self):
         return [m.message() for m in mail.outbox]
@@ -1230,7 +1230,7 @@ class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
 
 class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
-    email_backend = 'django.core.mail.backends.filebased.EmailBackend'
+    email_backend = 'mango.core.mail.backends.filebased.EmailBackend'
 
     def setUp(self):
         super().setUp()
@@ -1299,7 +1299,7 @@ class FileBackendPathLibTests(FileBackendTests):
 
 
 class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
-    email_backend = 'django.core.mail.backends.console.EmailBackend'
+    email_backend = 'mango.core.mail.backends.console.EmailBackend'
 
     def setUp(self):
         super().setUp()
@@ -1324,7 +1324,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
         The console backend can be pointed at an arbitrary stream.
         """
         s = StringIO()
-        connection = mail.get_connection('django.core.mail.backends.console.EmailBackend', stream=s)
+        connection = mail.get_connection('mango.core.mail.backends.console.EmailBackend', stream=s)
         send_mail('Subject', 'Content', 'from@example.com', ['to@example.com'], connection=connection)
         message = s.getvalue().split('\n' + ('-' * 79) + '\n')[0].encode()
         self.assertMessageHasHeaders(message, {
@@ -1448,7 +1448,7 @@ class SMTPBackendTestsBase(SimpleTestCase):
 
 
 class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
-    email_backend = 'django.core.mail.backends.smtp.EmailBackend'
+    email_backend = 'mango.core.mail.backends.smtp.EmailBackend'
 
     def setUp(self):
         super().setUp()
@@ -1613,7 +1613,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
     def test_connection_timeout_default(self):
         """The connection's timeout value is None by default."""
-        connection = mail.get_connection('django.core.mail.backends.smtp.EmailBackend')
+        connection = mail.get_connection('mango.core.mail.backends.smtp.EmailBackend')
         self.assertIsNone(connection.timeout)
 
     def test_connection_timeout_custom(self):

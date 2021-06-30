@@ -4,15 +4,15 @@ run with a backend other than PostgreSQL.
 """
 import enum
 
-from django.db import models
+from mango.db import models
 
 try:
-    from django.contrib.postgres.fields import (
+    from mango.contrib.postgres.fields import (
         ArrayField, BigIntegerRangeField, CICharField, CIEmailField,
         CITextField, DateRangeField, DateTimeRangeField, DecimalRangeField,
         HStoreField, IntegerRangeField,
     )
-    from django.contrib.postgres.search import SearchVector, SearchVectorField
+    from mango.contrib.postgres.search import SearchVector, SearchVectorField
 except ImportError:
     class DummyArrayField(models.Field):
         def __init__(self, base_field, size=None, **kwargs):

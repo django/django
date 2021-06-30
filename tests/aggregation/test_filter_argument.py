@@ -1,12 +1,12 @@
 import datetime
 from decimal import Decimal
 
-from django.db.models import (
+from mango.db.models import (
     Avg, Case, Count, Exists, F, Max, OuterRef, Q, StdDev, Subquery, Sum,
     Variance, When,
 )
-from django.test import TestCase
-from django.test.utils import Approximate
+from mango.test import TestCase
+from mango.test.utils import Approximate
 
 from .models import Author, Book, Publisher
 
@@ -19,17 +19,17 @@ class FilteredAggregateTests(TestCase):
         cls.a3 = Author.objects.create(name='test3', age=100)
         cls.p1 = Publisher.objects.create(name='Apress', num_awards=3, duration=datetime.timedelta(days=1))
         cls.b1 = Book.objects.create(
-            isbn='159059725', name='The Definitive Guide to Django: Web Development Done Right',
+            isbn='159059725', name='The Definitive Guide to Mango: Web Development Done Right',
             pages=447, rating=4.5, price=Decimal('30.00'), contact=cls.a1, publisher=cls.p1,
             pubdate=datetime.date(2007, 12, 6),
         )
         cls.b2 = Book.objects.create(
-            isbn='067232959', name='Sams Teach Yourself Django in 24 Hours',
+            isbn='067232959', name='Sams Teach Yourself Mango in 24 Hours',
             pages=528, rating=3.0, price=Decimal('23.09'), contact=cls.a2, publisher=cls.p1,
             pubdate=datetime.date(2008, 3, 3),
         )
         cls.b3 = Book.objects.create(
-            isbn='159059996', name='Practical Django Projects',
+            isbn='159059996', name='Practical Mango Projects',
             pages=600, rating=4.5, price=Decimal('29.69'), contact=cls.a3, publisher=cls.p1,
             pubdate=datetime.date(2008, 6, 23),
         )

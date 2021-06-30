@@ -4,9 +4,9 @@ import sys
 import tempfile
 import unittest
 
-from django.core.exceptions import SuspiciousOperation
-from django.test import SimpleTestCase
-from django.utils import archive
+from mango.core.exceptions import SuspiciousOperation
+from mango.test import SimpleTestCase
+from mango.utils import archive
 
 try:
     import bz2  # NOQA

@@ -1,6 +1,6 @@
-from django.contrib.auth.models import User
-from django.core.exceptions import ImproperlyConfigured
-from django.test import override_settings
+from mango.contrib.auth.models import User
+from mango.core.exceptions import ImproperlyConfigured
+from mango.test import override_settings
 
 from .tests import AdminDocsTestCase, TestDataMixin
 
@@ -53,7 +53,7 @@ class XViewMiddlewareTest(TestDataMixin, AdminDocsTestCase):
         msg = (
             "The XView middleware requires authentication middleware to be "
             "installed. Edit your MIDDLEWARE setting to insert "
-            "'django.contrib.auth.middleware.AuthenticationMiddleware'."
+            "'mango.contrib.auth.middleware.AuthenticationMiddleware'."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.client.head('/xview/func/')

@@ -1,7 +1,7 @@
-from django.template import NodeList, TemplateSyntaxError
-from django.template.base import Node
-from django.template.loader_tags import ExtendsNode
-from django.test import SimpleTestCase
+from mango.template import NodeList, TemplateSyntaxError
+from mango.template.base import Node
+from mango.template.loader_tags import ExtendsNode
+from mango.test import SimpleTestCase
 
 from ..utils import setup
 

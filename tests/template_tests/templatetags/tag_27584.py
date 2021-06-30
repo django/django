@@ -1,4 +1,4 @@
-from django import template
+from mango import template
 
 register = template.Library()
 

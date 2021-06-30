@@ -1,10 +1,10 @@
 import datetime
 from unittest import mock
 
-from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, override_settings, skipUnlessDBFeature
-from django.test.utils import requires_tz_support
-from django.utils import timezone
+from mango.core.exceptions import ImproperlyConfigured
+from mango.test import TestCase, override_settings, skipUnlessDBFeature
+from mango.test.utils import requires_tz_support
+from mango.utils import timezone
 
 from .models import Artist, Author, Book, BookSigning, Page
 
@@ -280,7 +280,7 @@ class YearArchiveViewTests(TestDataMixin, TestCase):
         res = self.client.get('/dates/books/2011/')
         self.assertEqual(list(res.context['date_list']), list(sorted(res.context['date_list'])))
 
-    @mock.patch('django.views.generic.list.MultipleObjectMixin.get_context_data')
+    @mock.patch('mango.views.generic.list.MultipleObjectMixin.get_context_data')
     def test_get_context_data_receives_extra_context(self, mock):
         """
         MultipleObjectMixin.get_context_data() receives the context set by

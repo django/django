@@ -1,5 +1,5 @@
-from django.apps.registry import Apps
-from django.db import models
+from mango.apps.registry import Apps
+from mango.db import models
 
 # Because we want to test creation and deletion of these as separate things,
 # these models are all inserted into a separate Apps so the main test

@@ -1,25 +1,25 @@
 ============================
-The Django template language
+The Mango template language
 ============================
 
-This document explains the language syntax of the Django template system. If
+This document explains the language syntax of the Mango template system. If
 you're looking for a more technical perspective on how it works and how to
 extend it, see :doc:`/ref/templates/api`.
 
-Django's template language is designed to strike a balance between power and
+Mango's template language is designed to strike a balance between power and
 ease. It's designed to feel comfortable to those used to working with HTML. If
 you have any exposure to other text-based template languages, such as Smarty_
-or Jinja2_, you should feel right at home with Django's templates.
+or Jinja2_, you should feel right at home with Mango's templates.
 
 .. admonition:: Philosophy
 
     If you have a background in programming, or if you're used to languages
     which mix programming code directly into HTML, you'll want to bear in
-    mind that the Django template system is not simply Python embedded into
+    mind that the Mango template system is not simply Python embedded into
     HTML. This is by design: the template system is meant to express
     presentation, not program logic.
 
-    The Django template system provides tags which function similarly to some
+    The Mango template system provides tags which function similarly to some
     programming constructs -- an :ttag:`if` tag for boolean tests, a :ttag:`for`
     tag for looping, etc. -- but these are not simply executed as the
     corresponding Python code, and the template system will not execute
@@ -27,14 +27,14 @@ or Jinja2_, you should feel right at home with Django's templates.
     are supported by default (although you can add :doc:`your own extensions
     </howto/custom-template-tags>` to the template language as needed).
 
-.. _`The Django template language: For Python programmers`: ../templates_python/
+.. _`The Mango template language: For Python programmers`: ../templates_python/
 .. _Smarty: https://www.smarty.net/
 .. _Jinja2: https://palletsprojects.com/p/jinja/
 
 Templates
 =========
 
-.. highlight:: html+django
+.. highlight:: html+mango
 
 A template is a text file. It can generate any text-based format (HTML, XML,
 CSV, etc.).
@@ -45,7 +45,7 @@ template is evaluated, and **tags**, which control the logic of the template.
 Below is a minimal template that illustrates a few basics. Each element will be
 explained later in this document.
 
-.. code-block:: html+django
+.. code-block:: html+mango
 
     {% extends "base_generic.html" %}
 
@@ -67,7 +67,7 @@ explained later in this document.
 .. admonition:: Philosophy
 
     Why use a text-based template instead of an XML-based one (like Zope's
-    TAL)? We wanted Django's template language to be usable for more than
+    TAL)? We wanted Mango's template language to be usable for more than
     just XML/HTML templates. You can use the template language for any
     text-based format such as emails, JavaScript and CSV.
 
@@ -144,7 +144,7 @@ variable.
 Filter arguments that contain spaces must be quoted; for example, to join a
 list with commas and spaces you'd use ``{{ list|join:", " }}``.
 
-Django provides about sixty built-in template filters. You can read all about
+Mango provides about sixty built-in template filters. You can read all about
 them in the :ref:`built-in filter reference <ref-templates-builtins-filters>`.
 To give you a taste of what's available, here are some of the more commonly
 used template filters:
@@ -182,7 +182,7 @@ You can also create your own custom template filters; see
 
 .. seealso::
 
-    Django's admin interface can include a complete reference of all template
+    Mango's admin interface can include a complete reference of all template
     tags and filters available for a given site. See
     :doc:`/ref/contrib/admin/admindocs`.
 
@@ -196,7 +196,7 @@ some load external information into the template to be used by later variables.
 Some tags require beginning and ending tags (i.e. ``{% tag %} ... tag contents
 ... {% endtag %}``).
 
-Django ships with about two dozen built-in template tags. You can read all about
+Mango ships with about two dozen built-in template tags. You can read all about
 them in the :ref:`built-in tag reference <ref-templates-builtins-tags>`. To give
 you a taste of what's available, here are some of the more commonly used
 tags:
@@ -253,7 +253,7 @@ You can also create your own custom template tags; see
 
 .. seealso::
 
-    Django's admin interface can include a complete reference of all template
+    Mango's admin interface can include a complete reference of all template
     tags and filters available for a given site. See
     :doc:`/ref/contrib/admin/admindocs`.
 
@@ -281,7 +281,7 @@ multiline portion of the template, see the :ttag:`comment` tag.
 Template inheritance
 ====================
 
-The most powerful -- and thus the most complex -- part of Django's template
+The most powerful -- and thus the most complex -- part of Mango's template
 engine is template inheritance. Template inheritance allows you to build a base
 "skeleton" template that contains all the common elements of your site and
 defines **blocks** that child templates can override.
@@ -483,14 +483,14 @@ To avoid this problem, you have two options:
 * One, you can make sure to run each untrusted variable through the
   :tfilter:`escape` filter (documented below), which converts potentially
   harmful HTML characters to unharmful ones. This was the default solution
-  in Django for its first few years, but the problem is that it puts the
+  in Mango for its first few years, but the problem is that it puts the
   onus on *you*, the developer / template author, to ensure you're escaping
   everything. It's easy to forget to escape data.
 
-* Two, you can take advantage of Django's automatic HTML escaping. The
+* Two, you can take advantage of Mango's automatic HTML escaping. The
   remainder of this section describes how auto-escaping works.
 
-By default in Django, every template automatically escapes the output
+By default in Mango, every template automatically escapes the output
 of every variable tag. Specifically, these five characters are
 escaped:
 
@@ -500,7 +500,7 @@ escaped:
 * ``"`` (double quote) is converted to ``&quot;``
 * ``&`` is converted to ``&amp;``
 
-Again, we stress that this behavior is on by default. If you're using Django's
+Again, we stress that this behavior is on by default. If you're using Mango's
 template system, you're protected.
 
 .. _Cross Site Scripting: https://en.wikipedia.org/wiki/Cross-site_scripting
@@ -515,7 +515,7 @@ Why would you want to turn it off? Because sometimes, template variables
 contain data that you *intend* to be rendered as raw HTML, in which case you
 don't want their contents to be escaped. For example, you might store a blob of
 HTML in your database and want to embed that directly into your template. Or,
-you might be using Django's template system to produce text that is *not* HTML
+you might be using Mango's template system to produce text that is *not* HTML
 -- like an email message, for instance.
 
 For individual variables
@@ -563,7 +563,7 @@ The auto-escaping tag passes its effect onto templates that extend the
 current one as well as templates included via the :ttag:`include` tag,
 just like all block tags. For example:
 
-.. code-block:: html+django
+.. code-block:: html+mango
     :caption: base.html
 
     {% autoescape off %}
@@ -572,7 +572,7 @@ just like all block tags. For example:
     {% endblock %}
     {% endautoescape %}
 
-.. code-block:: html+django
+.. code-block:: html+mango
     :caption: child.html
 
     {% extends "base.html" %}
@@ -634,7 +634,7 @@ Accessing method calls
 
 Most method calls attached to objects are also available from within templates.
 This means that templates have access to much more than just class attributes
-(like field names) and variables passed in from views. For example, the Django
+(like field names) and variables passed in from views. For example, the Mango
 ORM provides the :ref:`"entry_set"<topics-db-queries-related>` syntax for
 finding a collection of objects related on a foreign key. Therefore, given
 a model called "comment" with a foreign key relationship to a model called
@@ -659,12 +659,12 @@ You can also access methods you've explicitly defined on your own models:
         def foo(self):
             return "bar"
 
-.. code-block:: html+django
+.. code-block:: html+mango
     :caption: template.html
 
     {{ task.foo }}
 
-Because Django intentionally limits the amount of logic processing available
+Because Mango intentionally limits the amount of logic processing available
 in the template language, it is not possible to pass arguments to method calls
 accessed from within templates. Data should be calculated in views, then passed
 to templates for display.
@@ -676,7 +676,7 @@ Custom tag and filter libraries
 
 Certain applications provide custom tag and filter libraries. To access them in
 a template, ensure the application is in :setting:`INSTALLED_APPS` (we'd add
-``'django.contrib.humanize'`` for this example), and then use the :ttag:`load`
+``'mango.contrib.humanize'`` for this example), and then use the :ttag:`load`
 tag in a template::
 
     {% load humanize %}
@@ -685,7 +685,7 @@ tag in a template::
 
 In the above, the :ttag:`load` tag loads the ``humanize`` tag library, which then
 makes the ``intcomma`` filter available for use. If you've enabled
-:mod:`django.contrib.admindocs`, you can consult the documentation area in your
+:mod:`mango.contrib.admindocs`, you can consult the documentation area in your
 admin to find the list of custom libraries in your installation.
 
 The :ttag:`load` tag can take multiple library names, separated by spaces.

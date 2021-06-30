@@ -5,12 +5,12 @@ import re
 from io import StringIO
 from pathlib import Path
 
-from django.core import management, serializers
-from django.core.exceptions import ImproperlyConfigured
-from django.core.serializers.base import DeserializationError
-from django.db import IntegrityError, transaction
-from django.db.models import signals
-from django.test import (
+from mango.core import management, serializers
+from mango.core.exceptions import ImproperlyConfigured
+from mango.core.serializers.base import DeserializationError
+from mango.db import IntegrityError, transaction
+from mango.db.models import signals
+from mango.test import (
     TestCase, TransactionTestCase, override_settings, skipIfDBFeature,
     skipUnlessDBFeature,
 )

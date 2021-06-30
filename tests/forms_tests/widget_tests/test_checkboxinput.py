@@ -1,4 +1,4 @@
-from django.forms import CheckboxInput
+from mango.forms import CheckboxInput
 
 from .base import WidgetTest
 

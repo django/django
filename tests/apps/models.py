@@ -1,5 +1,5 @@
-from django.apps.registry import Apps
-from django.db import models
+from mango.apps.registry import Apps
+from mango.db import models
 
 # We're testing app registry presence on load, so this is handy.
 

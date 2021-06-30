@@ -1,6 +1,6 @@
-from django.http import Http404
-from django.shortcuts import get_list_or_404, get_object_or_404
-from django.test import TestCase
+from mango.http import Http404
+from mango.shortcuts import get_list_or_404, get_object_or_404
+from mango.test import TestCase
 
 from .models import Article, Author
 

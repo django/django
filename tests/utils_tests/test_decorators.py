@@ -1,8 +1,8 @@
-from django.http import HttpResponse
-from django.template import engines
-from django.template.response import TemplateResponse
-from django.test import RequestFactory, SimpleTestCase
-from django.utils.decorators import decorator_from_middleware
+from mango.http import HttpResponse
+from mango.template import engines
+from mango.template.response import TemplateResponse
+from mango.test import RequestFactory, SimpleTestCase
+from mango.utils.decorators import decorator_from_middleware
 
 
 class ProcessViewMiddleware:
@@ -56,7 +56,7 @@ full_dec = decorator_from_middleware(FullMiddleware)
 class DecoratorFromMiddlewareTests(SimpleTestCase):
     """
     Tests for view decorators created using
-    ``django.utils.decorators.decorator_from_middleware``.
+    ``mango.utils.decorators.decorator_from_middleware``.
     """
     rf = RequestFactory()
 
@@ -78,7 +78,7 @@ class DecoratorFromMiddlewareTests(SimpleTestCase):
         """
         @full_dec
         def normal_view(request):
-            template = engines['django'].from_string("Hello world")
+            template = engines['mango'].from_string("Hello world")
             return HttpResponse(template.render())
 
         request = self.rf.get('/')
@@ -96,7 +96,7 @@ class DecoratorFromMiddlewareTests(SimpleTestCase):
         """
         @full_dec
         def template_response_view(request):
-            template = engines['django'].from_string("Hello world")
+            template = engines['mango'].from_string("Hello world")
             return TemplateResponse(request, template)
 
         request = self.rf.get('/')

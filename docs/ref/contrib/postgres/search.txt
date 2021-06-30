@@ -2,7 +2,7 @@
 Full text search
 ================
 
-The database functions in the ``django.contrib.postgres.search`` module ease
+The database functions in the ``mango.contrib.postgres.search`` module ease
 the use of PostgreSQL's `full text search engine
 <https://www.postgresql.org/docs/current/textsearch.html>`_.
 
@@ -14,7 +14,7 @@ For the examples in this document, we'll use the models defined in
     For a high-level overview of searching, see the :doc:`topic documentation
     </topics/db/search>`.
 
-.. currentmodule:: django.contrib.postgres.search
+.. currentmodule:: mango.contrib.postgres.search
 
 The ``search`` lookup
 =====================
@@ -32,7 +32,7 @@ and a ``plainto_tsquery`` from the search term ``'Cheese'``, both using the
 default database search configuration. The results are obtained by matching the
 query and the vector.
 
-To use the ``search`` lookup, ``'django.contrib.postgres'`` must be in your
+To use the ``search`` lookup, ``'mango.contrib.postgres'`` must be in your
 :setting:`INSTALLED_APPS`.
 
 ``SearchVector``
@@ -44,14 +44,14 @@ Searching against a single field is great but rather limiting. The ``Entry``
 instances we're searching belong to a ``Blog``, which has a ``tagline`` field.
 To query against both fields, use a ``SearchVector``::
 
-    >>> from django.contrib.postgres.search import SearchVector
+    >>> from mango.contrib.postgres.search import SearchVector
     >>> Entry.objects.annotate(
     ...     search=SearchVector('body_text', 'blog__tagline'),
     ... ).filter(search='Cheese')
     [<Entry: Cheese on Toast recipes>, <Entry: Pizza Recipes>]
 
 The arguments to ``SearchVector`` can be any
-:class:`~django.db.models.Expression` or the name of a field. Multiple
+:class:`~mango.db.models.Expression` or the name of a field. Multiple
 arguments will be concatenated together using a space so that the search
 document includes them all.
 
@@ -88,7 +88,7 @@ Examples:
 
 .. _Full Text Search docs: https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
 
-    >>> from django.contrib.postgres.search import SearchQuery
+    >>> from mango.contrib.postgres.search import SearchQuery
     >>> SearchQuery('red tomato')  # two keywords
     >>> SearchQuery('tomato red')  # same results as above
     >>> SearchQuery('red tomato', search_type='phrase')  # a phrase
@@ -98,7 +98,7 @@ Examples:
 
 ``SearchQuery`` terms can be combined logically to provide more flexibility::
 
-    >>> from django.contrib.postgres.search import SearchQuery
+    >>> from mango.contrib.postgres.search import SearchQuery
     >>> SearchQuery('meat') & SearchQuery('cheese')  # AND
     >>> SearchQuery('meat') | SearchQuery('cheese')  # OR
     >>> ~SearchQuery('meat')  # NOT
@@ -119,7 +119,7 @@ the terms are in the document, and how important the part of the document is
 where they occur. The better the match, the higher the value of the rank. To
 order by relevancy::
 
-    >>> from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+    >>> from mango.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
     >>> vector = SearchVector('body_text')
     >>> query = SearchQuery('cheese')
     >>> Entry.objects.annotate(rank=SearchRank(vector, query)).order_by('-rank')
@@ -136,7 +136,7 @@ Provide an integer to the ``normalization`` parameter to control rank
 normalization. This integer is a bit mask, so you can combine multiple
 behaviors::
 
-    >>> from django.db.models import Value
+    >>> from mango.db.models import Value
     >>> Entry.objects.annotate(
     ...     rank=SearchRank(
     ...         vector,
@@ -184,7 +184,7 @@ results`_.
 
 Usage example::
 
-    >>> from django.contrib.postgres.search import SearchHeadline, SearchQuery
+    >>> from mango.contrib.postgres.search import SearchHeadline, SearchQuery
     >>> query = SearchQuery('red tomato')
     >>> entry = Entry.objects.annotate(
     ...     headline=SearchHeadline(
@@ -211,7 +211,7 @@ You can specify the ``config`` attribute to a :class:`SearchVector` and
 :class:`SearchQuery` to use a different search configuration. This allows using
 different language parsers and dictionaries as defined by the database::
 
-    >>> from django.contrib.postgres.search import SearchQuery, SearchVector
+    >>> from mango.contrib.postgres.search import SearchQuery, SearchVector
     >>> Entry.objects.annotate(
     ...     search=SearchVector('body_text', config='french'),
     ... ).filter(search=SearchQuery('œuf', config='french'))
@@ -219,7 +219,7 @@ different language parsers and dictionaries as defined by the database::
 
 The value of ``config`` could also be stored in another column::
 
-    >>> from django.db.models import F
+    >>> from mango.db.models import F
     >>> Entry.objects.annotate(
     ...     search=SearchVector('body_text', config=F('blog__language')),
     ... ).filter(search=SearchQuery('œuf', config=F('blog__language')))
@@ -233,7 +233,7 @@ Weighting queries
 Every field may not have the same relevance in a query, so you can set weights
 of various vectors before you combine them::
 
-    >>> from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+    >>> from mango.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
     >>> vector = SearchVector('body_text', weight='A') + SearchVector('blog__tagline', weight='B')
     >>> query = SearchQuery('cheese')
     >>> Entry.objects.annotate(rank=SearchRank(vector, query)).filter(rank__gte=0.3).order_by('rank')
@@ -286,7 +286,7 @@ lookup, you can use a couple of other expressions.
 To use them, you need to activate the `pg_trgm extension
 <https://www.postgresql.org/docs/current/pgtrgm.html>`_ on PostgreSQL. You can
 install it using the
-:class:`~django.contrib.postgres.operations.TrigramExtension` migration
+:class:`~mango.contrib.postgres.operations.TrigramExtension` migration
 operation.
 
 ``TrigramSimilarity``
@@ -299,7 +299,7 @@ trigram similarity between the two arguments.
 
 Usage example::
 
-    >>> from django.contrib.postgres.search import TrigramSimilarity
+    >>> from mango.contrib.postgres.search import TrigramSimilarity
     >>> Author.objects.create(name='Katy Stevens')
     >>> Author.objects.create(name='Stephen Keats')
     >>> test = 'Katie Stephens'
@@ -318,7 +318,7 @@ trigram distance between the two arguments.
 
 Usage example::
 
-    >>> from django.contrib.postgres.search import TrigramDistance
+    >>> from mango.contrib.postgres.search import TrigramDistance
     >>> Author.objects.create(name='Katy Stevens')
     >>> Author.objects.create(name='Stephen Keats')
     >>> test = 'Katie Stephens'

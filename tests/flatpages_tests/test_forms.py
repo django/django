@@ -1,12 +1,12 @@
-from django.conf import settings
-from django.contrib.flatpages.forms import FlatpageForm
-from django.contrib.flatpages.models import FlatPage
-from django.contrib.sites.models import Site
-from django.test import TestCase, modify_settings, override_settings
-from django.utils import translation
+from mango.conf import settings
+from mango.contrib.flatpages.forms import FlatpageForm
+from mango.contrib.flatpages.models import FlatPage
+from mango.contrib.sites.models import Site
+from mango.test import TestCase, modify_settings, override_settings
+from mango.utils import translation
 
 
-@modify_settings(INSTALLED_APPS={'append': ['django.contrib.flatpages']})
+@modify_settings(INSTALLED_APPS={'append': ['mango.contrib.flatpages']})
 @override_settings(SITE_ID=1)
 class FlatpageAdminFormTests(TestCase):
 
@@ -45,7 +45,7 @@ class FlatpageAdminFormTests(TestCase):
             self.assertFalse(form.is_valid())
             self.assertEqual(form.errors['url'], ["URL is missing a leading slash."])
 
-    @override_settings(APPEND_SLASH=True, MIDDLEWARE=['django.middleware.common.CommonMiddleware'])
+    @override_settings(APPEND_SLASH=True, MIDDLEWARE=['mango.middleware.common.CommonMiddleware'])
     def test_flatpage_requires_trailing_slash_with_append_slash(self):
         form = FlatpageForm(data=dict(url='/no_trailing_slash', **self.form_data))
         with translation.override('en'):
@@ -57,7 +57,7 @@ class FlatpageAdminFormTests(TestCase):
             self.assertFalse(form.is_valid())
             self.assertEqual(form.errors['url'], ["URL is missing a trailing slash."])
 
-    @override_settings(APPEND_SLASH=False, MIDDLEWARE=['django.middleware.common.CommonMiddleware'])
+    @override_settings(APPEND_SLASH=False, MIDDLEWARE=['mango.middleware.common.CommonMiddleware'])
     def test_flatpage_doesnt_requires_trailing_slash_without_append_slash(self):
         form = FlatpageForm(data=dict(url='/no_trailing_slash', **self.form_data))
         self.assertTrue(form.is_valid())

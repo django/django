@@ -1,13 +1,13 @@
-from django import forms
-from django.contrib import admin
-from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
-from django.contrib.admin.options import VERTICAL, ModelAdmin, TabularInline
-from django.contrib.admin.sites import AdminSite
-from django.core.checks import Error
-from django.db.models import F, Field, Model
-from django.db.models.functions import Upper
-from django.forms.models import BaseModelFormSet
-from django.test import SimpleTestCase
+from mango import forms
+from mango.contrib import admin
+from mango.contrib.admin import BooleanFieldListFilter, SimpleListFilter
+from mango.contrib.admin.options import VERTICAL, ModelAdmin, TabularInline
+from mango.contrib.admin.sites import AdminSite
+from mango.core.checks import Error
+from mango.db.models import F, Field, Model
+from mango.db.models.functions import Upper
+from mango.forms.models import BaseModelFormSet
+from mango.test import SimpleTestCase
 
 from .models import (
     Band, Song, User, ValidationTestInlineModel, ValidationTestModel,

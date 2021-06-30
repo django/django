@@ -1,4 +1,4 @@
-from django.forms import SelectMultiple
+from mango.forms import SelectMultiple
 
 from .base import WidgetTest
 

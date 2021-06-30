@@ -1,6 +1,6 @@
-from django.db.models import F, Value
-from django.db.models.functions import Concat, Replace
-from django.test import TestCase
+from mango.db.models import F, Value
+from mango.db.models.functions import Concat, Replace
+from mango.test import TestCase
 
 from ..models import Author
 

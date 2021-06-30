@@ -1,4 +1,4 @@
-from django.forms import FileInput
+from mango.forms import FileInput
 
 from .base import WidgetTest
 

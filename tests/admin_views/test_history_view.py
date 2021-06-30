@@ -1,7 +1,7 @@
-from django.contrib.admin.models import LogEntry
-from django.contrib.auth.models import User
-from django.test import TestCase, override_settings
-from django.urls import reverse
+from mango.contrib.admin.models import LogEntry
+from mango.contrib.auth.models import User
+from mango.test import TestCase, override_settings
+from mango.urls import reverse
 
 from .models import City, State
 

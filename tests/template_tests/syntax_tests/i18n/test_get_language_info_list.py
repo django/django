@@ -1,6 +1,6 @@
-from django.template import TemplateSyntaxError
-from django.test import SimpleTestCase
-from django.utils import translation
+from mango.template import TemplateSyntaxError
+from mango.test import SimpleTestCase
+from mango.utils import translation
 
 from ...utils import setup
 
@@ -8,7 +8,7 @@ from ...utils import setup
 class GetLanguageInfoListTests(SimpleTestCase):
     libraries = {
         'custom': 'template_tests.templatetags.custom',
-        'i18n': 'django.templatetags.i18n',
+        'i18n': 'mango.templatetags.i18n',
     }
 
     @setup({'i18n30': '{% load i18n %}'

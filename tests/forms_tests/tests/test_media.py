@@ -1,6 +1,6 @@
-from django.forms import CharField, Form, Media, MultiWidget, TextInput
-from django.template import Context, Template
-from django.test import SimpleTestCase, override_settings
+from mango.forms import CharField, Form, Media, MultiWidget, TextInput
+from mango.template import Context, Template
+from mango.test import SimpleTestCase, override_settings
 
 
 @override_settings(

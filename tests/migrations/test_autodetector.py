@@ -2,18 +2,18 @@ import functools
 import re
 from unittest import mock
 
-from django.apps import apps
-from django.conf import settings
-from django.contrib.auth.models import AbstractBaseUser
-from django.core.validators import RegexValidator, validate_slug
-from django.db import connection, migrations, models
-from django.db.migrations.autodetector import MigrationAutodetector
-from django.db.migrations.graph import MigrationGraph
-from django.db.migrations.loader import MigrationLoader
-from django.db.migrations.questioner import MigrationQuestioner
-from django.db.migrations.state import ModelState, ProjectState
-from django.test import SimpleTestCase, TestCase, override_settings
-from django.test.utils import isolate_lru_cache
+from mango.apps import apps
+from mango.conf import settings
+from mango.contrib.auth.models import AbstractBaseUser
+from mango.core.validators import RegexValidator, validate_slug
+from mango.db import connection, migrations, models
+from mango.db.migrations.autodetector import MigrationAutodetector
+from mango.db.migrations.graph import MigrationGraph
+from mango.db.migrations.loader import MigrationLoader
+from mango.db.migrations.questioner import MigrationQuestioner
+from mango.db.migrations.state import ModelState, ProjectState
+from mango.test import SimpleTestCase, TestCase, override_settings
+from mango.test.utils import isolate_lru_cache
 
 from .models import FoodManager, FoodQuerySet
 
@@ -708,7 +708,7 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["AddField"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name")
 
-    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition',
+    @mock.patch('mango.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition',
                 side_effect=AssertionError("Should not have prompted for not null addition"))
     def test_add_date_fields_with_auto_now_not_asking_for_default(self, mocked_ask_method):
         changes = self.get_changes([self.author_empty], [self.author_dates_of_birth_auto_now])
@@ -719,7 +719,7 @@ class AutodetectorTests(TestCase):
         self.assertOperationFieldAttributes(changes, "testapp", 0, 1, auto_now=True)
         self.assertOperationFieldAttributes(changes, "testapp", 0, 2, auto_now=True)
 
-    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition',
+    @mock.patch('mango.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition',
                 side_effect=AssertionError("Should not have prompted for not null addition"))
     def test_add_date_fields_with_auto_now_add_not_asking_for_null_addition(self, mocked_ask_method):
         changes = self.get_changes([self.author_empty], [self.author_dates_of_birth_auto_now_add])
@@ -730,7 +730,7 @@ class AutodetectorTests(TestCase):
         self.assertOperationFieldAttributes(changes, "testapp", 0, 1, auto_now_add=True)
         self.assertOperationFieldAttributes(changes, "testapp", 0, 2, auto_now_add=True)
 
-    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_auto_now_add_addition')
+    @mock.patch('mango.db.migrations.questioner.MigrationQuestioner.ask_auto_now_add_addition')
     def test_add_date_fields_with_auto_now_add_asking_for_default(self, mocked_ask_method):
         changes = self.get_changes([self.author_empty], [self.author_dates_of_birth_auto_now_add])
         # Right number/type of migrations?
@@ -807,7 +807,7 @@ class AutodetectorTests(TestCase):
             (value.func, value.args, value.keywords)
         )
 
-    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
+    @mock.patch('mango.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
                 side_effect=AssertionError("Should not have prompted for not null addition"))
     def test_alter_field_to_not_null_with_default(self, mocked_ask_method):
         """
@@ -821,7 +821,7 @@ class AutodetectorTests(TestCase):
         self.assertOperationFieldAttributes(changes, "testapp", 0, 0, default='Ada Lovelace')
 
     @mock.patch(
-        'django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
+        'mango.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
         return_value=models.NOT_PROVIDED,
     )
     def test_alter_field_to_not_null_without_default(self, mocked_ask_method):
@@ -837,7 +837,7 @@ class AutodetectorTests(TestCase):
         self.assertOperationFieldAttributes(changes, "testapp", 0, 0, default=models.NOT_PROVIDED)
 
     @mock.patch(
-        'django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
+        'mango.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
         return_value='Some Name',
     )
     def test_alter_field_to_not_null_oneoff_default(self, mocked_ask_method):
@@ -1007,7 +1007,7 @@ class AutodetectorTests(TestCase):
         )
         self.assertOperationAttributes(changes, 'app', 0, 1, model_name='foo', name='renamed_field')
         self.assertEqual(changes['app'][0].operations[-1].field.deconstruct(), (
-            'renamed_field', 'django.db.models.IntegerField', [], {'db_column': 'field'},
+            'renamed_field', 'mango.db.models.IntegerField', [], {'db_column': 'field'},
         ))
 
     def test_rename_related_field_preserved_db_column(self):
@@ -1038,7 +1038,7 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, 'app', 0, 1, model_name='bar', name='renamed_foo')
         self.assertEqual(changes['app'][0].operations[-1].field.deconstruct(), (
             'renamed_foo',
-            'django.db.models.ForeignKey',
+            'mango.db.models.ForeignKey',
             [],
             {'to': 'app.foo', 'on_delete': models.CASCADE, 'db_column': 'foo_id'},
         ))
@@ -1970,7 +1970,7 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, 'testapp', 0, 0, name="publisher")
         self.assertOperationAttributes(changes, 'testapp', 0, 1, name="Publisher")
 
-    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition',
+    @mock.patch('mango.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition',
                 side_effect=AssertionError("Should not have prompted for not null addition"))
     def test_add_many_to_many(self, mocked_ask_method):
         """#22435 - Adding a ManyToManyField should not prompt for a default."""
@@ -2590,7 +2590,7 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'a', 1)
         self.assertOperationTypes(changes, 'a', 0, ['CreateModel', 'CreateModel', 'CreateModel', 'AddField'])
 
-    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition',
+    @mock.patch('mango.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition',
                 side_effect=AssertionError("Should not have prompted for not null addition"))
     def test_add_blank_textfield_and_charfield(self, mocked_ask_method):
         """
@@ -2603,7 +2603,7 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["AddField", "AddField"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0)
 
-    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition')
+    @mock.patch('mango.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition')
     def test_add_non_blank_textfield_and_charfield(self, mocked_ask_method):
         """
         #23405 - Adding a NOT NULL and non-blank `CharField` or `TextField`

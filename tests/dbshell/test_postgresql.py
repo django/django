@@ -5,9 +5,9 @@ import sys
 from pathlib import Path
 from unittest import mock, skipUnless
 
-from django.db import connection
-from django.db.backends.postgresql.client import DatabaseClient
-from django.test import SimpleTestCase
+from mango.db import connection
+from mango.db.backends.postgresql.client import DatabaseClient
+from mango.test import SimpleTestCase
 
 
 class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
@@ -69,8 +69,8 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
 
     def test_service(self):
         self.assertEqual(
-            self.settings_to_cmd_args_env({'OPTIONS': {'service': 'django_test'}}),
-            (['psql'], {'PGSERVICE': 'django_test'}),
+            self.settings_to_cmd_args_env({'OPTIONS': {'service': 'mango_test'}}),
+            (['psql'], {'PGSERVICE': 'mango_test'}),
         )
 
     def test_passfile(self):
@@ -92,12 +92,12 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
         self.assertEqual(
             self.settings_to_cmd_args_env({
                 'OPTIONS': {
-                    'service': 'django_test',
+                    'service': 'mango_test',
                     'passfile': '~/.custompgpass',
                 },
             }),
             (
-                ['psql'], {'PGSERVICE': 'django_test', 'PGPASSFILE': '~/.custompgpass'},
+                ['psql'], {'PGSERVICE': 'mango_test', 'PGPASSFILE': '~/.custompgpass'},
             ),
         )
 

@@ -1,10 +1,10 @@
 ===========================
-Django 1.10.6 release notes
+Mango 1.10.6 release notes
 ===========================
 
 *March 1, 2017*
 
-Django 1.10.6 fixes several bugs in 1.10.5.
+Mango 1.10.6 fixes several bugs in 1.10.5.
 
 Bugfixes
 ========

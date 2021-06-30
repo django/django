@@ -1,5 +1,5 @@
-from django.forms import Widget
-from django.forms.widgets import Input
+from mango.forms import Widget
+from mango.forms.widgets import Input
 
 from .base import WidgetTest
 

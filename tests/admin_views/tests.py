@@ -15,33 +15,33 @@ except ImportError:
     except ImportError:
         zoneinfo = None
 
-from django.contrib import admin
-from django.contrib.admin import AdminSite, ModelAdmin
-from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
-from django.contrib.admin.models import ADDITION, DELETION, LogEntry
-from django.contrib.admin.options import TO_FIELD_VAR
-from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
-from django.contrib.admin.tests import AdminSeleniumTestCase
-from django.contrib.admin.utils import quote
-from django.contrib.admin.views.main import IS_POPUP_VAR
-from django.contrib.auth import REDIRECT_FIELD_NAME, get_permission_codename
-from django.contrib.auth.models import Group, Permission, User
-from django.contrib.contenttypes.models import ContentType
-from django.core import mail
-from django.core.checks import Error
-from django.core.files import temp as tempfile
-from django.forms.utils import ErrorList
-from django.template.response import TemplateResponse
-from django.test import (
+from mango.contrib import admin
+from mango.contrib.admin import AdminSite, ModelAdmin
+from mango.contrib.admin.helpers import ACTION_CHECKBOX_NAME
+from mango.contrib.admin.models import ADDITION, DELETION, LogEntry
+from mango.contrib.admin.options import TO_FIELD_VAR
+from mango.contrib.admin.templatetags.admin_urls import add_preserved_filters
+from mango.contrib.admin.tests import AdminSeleniumTestCase
+from mango.contrib.admin.utils import quote
+from mango.contrib.admin.views.main import IS_POPUP_VAR
+from mango.contrib.auth import REDIRECT_FIELD_NAME, get_permission_codename
+from mango.contrib.auth.models import Group, Permission, User
+from mango.contrib.contenttypes.models import ContentType
+from mango.core import mail
+from mango.core.checks import Error
+from mango.core.files import temp as tempfile
+from mango.forms.utils import ErrorList
+from mango.template.response import TemplateResponse
+from mango.test import (
     TestCase, modify_settings, override_settings, skipUnlessDBFeature,
 )
-from django.test.utils import override_script_prefix
-from django.urls import NoReverseMatch, resolve, reverse
-from django.utils import formats, translation
-from django.utils.cache import get_max_age
-from django.utils.encoding import iri_to_uri
-from django.utils.html import escape
-from django.utils.http import urlencode
+from mango.test.utils import override_script_prefix
+from mango.urls import NoReverseMatch, resolve, reverse
+from mango.utils import formats, translation
+from mango.utils.cache import get_max_age
+from mango.utils.encoding import iri_to_uri
+from mango.utils.html import escape
+from mango.utils.http import urlencode
 
 from . import customadmin
 from .admin import CityAdmin, site, site2
@@ -255,7 +255,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_basic_edit_GET_old_url_redirect(self):
         """
-        The change URL changed in Django 1.9, but the old one still redirects.
+        The change URL changed in Mango 1.9, but the old one still redirects.
         """
         response = self.client.get(
             reverse('admin:admin_views_section_change', args=(self.s1.pk,)).replace('change/', '')
@@ -813,7 +813,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             self.assertContains(response, '%Y-%m-%d %H:%M:%S')
 
     def test_disallowed_filtering(self):
-        with self.assertLogs('django.security.DisallowedModelAdminLookup', 'ERROR'):
+        with self.assertLogs('mango.security.DisallowedModelAdminLookup', 'ERROR'):
             response = self.client.get(
                 "%s?owner__email__startswith=fuzzy" % reverse('admin:admin_views_album_changelist')
             )
@@ -843,13 +843,13 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_disallowed_to_field(self):
         url = reverse('admin:admin_views_section_changelist')
-        with self.assertLogs('django.security.DisallowedModelAdminToField', 'ERROR'):
+        with self.assertLogs('mango.security.DisallowedModelAdminToField', 'ERROR'):
             response = self.client.get(url, {TO_FIELD_VAR: 'missing_field'})
         self.assertEqual(response.status_code, 400)
 
         # Specifying a field that is not referred by any other model registered
         # to this admin site should raise an exception.
-        with self.assertLogs('django.security.DisallowedModelAdminToField', 'ERROR'):
+        with self.assertLogs('mango.security.DisallowedModelAdminToField', 'ERROR'):
             response = self.client.get(reverse('admin:admin_views_section_changelist'), {TO_FIELD_VAR: 'name'})
         self.assertEqual(response.status_code, 400)
 
@@ -878,24 +878,24 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         # #25622 - Specifying a field of a model only referred by a generic
         # relation should raise DisallowedModelAdminToField.
         url = reverse('admin:admin_views_referencedbygenrel_changelist')
-        with self.assertLogs('django.security.DisallowedModelAdminToField', 'ERROR'):
+        with self.assertLogs('mango.security.DisallowedModelAdminToField', 'ERROR'):
             response = self.client.get(url, {TO_FIELD_VAR: 'object_id'})
         self.assertEqual(response.status_code, 400)
 
         # We also want to prevent the add, change, and delete views from
         # leaking a disallowed field value.
-        with self.assertLogs('django.security.DisallowedModelAdminToField', 'ERROR'):
+        with self.assertLogs('mango.security.DisallowedModelAdminToField', 'ERROR'):
             response = self.client.post(reverse('admin:admin_views_section_add'), {TO_FIELD_VAR: 'name'})
         self.assertEqual(response.status_code, 400)
 
         section = Section.objects.create()
         url = reverse('admin:admin_views_section_change', args=(section.pk,))
-        with self.assertLogs('django.security.DisallowedModelAdminToField', 'ERROR'):
+        with self.assertLogs('mango.security.DisallowedModelAdminToField', 'ERROR'):
             response = self.client.post(url, {TO_FIELD_VAR: 'name'})
         self.assertEqual(response.status_code, 400)
 
         url = reverse('admin:admin_views_section_delete', args=(section.pk,))
-        with self.assertLogs('django.security.DisallowedModelAdminToField', 'ERROR'):
+        with self.assertLogs('mango.security.DisallowedModelAdminToField', 'ERROR'):
             response = self.client.post(url, {TO_FIELD_VAR: 'name'})
         self.assertEqual(response.status_code, 400)
 
@@ -1065,7 +1065,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse('admin:app_list', args=('admin_views',)))
         self.assertContains(
             response,
-            '<title>Admin_Views administration | Django site admin</title>',
+            '<title>Admin_Views administration | Mango site admin</title>',
         )
         self.assertEqual(response.context['title'], 'Admin_Views administration')
         self.assertEqual(response.context['app_label'], 'admin_views')
@@ -1076,7 +1076,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         )
         self.assertContains(
             response,
-            '<title>Article 1 | Change article | Django site admin</title>',
+            '<title>Article 1 | Change article | Mango site admin</title>',
         )
         self.assertContains(response, '<h1>Change article</h1>')
         self.assertContains(response, '<h2>Article 1</h2>')
@@ -1085,7 +1085,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         )
         self.assertContains(
             response,
-            '<title>Article 2 | Change article | Django site admin</title>',
+            '<title>Article 2 | Change article | Mango site admin</title>',
         )
         self.assertContains(response, '<h1>Change article</h1>')
         self.assertContains(response, '<h2>Article 2</h2>')
@@ -1103,7 +1103,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         )
         self.assertContains(
             response,
-            '<title>Article 1 | View article | Django site admin</title>',
+            '<title>Article 1 | View article | Mango site admin</title>',
         )
         self.assertContains(response, '<h1>View article</h1>')
         self.assertContains(response, '<h2>Article 1</h2>')
@@ -1112,7 +1112,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         )
         self.assertContains(
             response,
-            '<title>Article 2 | View article | Django site admin</title>',
+            '<title>Article 2 | View article | Mango site admin</title>',
         )
         self.assertContains(response, '<h1>View article</h1>')
         self.assertContains(response, '<h2>Article 2</h2>')
@@ -1130,12 +1130,12 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         ]
         for url in tests:
             with self.subTest(url=url):
-                with self.assertNoLogs('django.template', 'DEBUG'):
+                with self.assertNoLogs('mango.template', 'DEBUG'):
                     self.client.get(url)
 
 
 @override_settings(TEMPLATES=[{
-    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'BACKEND': 'mango.template.backends.mango.MangoTemplates',
     # Put this app's and the shared tests templates dirs in DIRS to take precedence
     # over the admin's templates dir.
     'DIRS': [
@@ -1145,10 +1145,10 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
     'APP_DIRS': True,
     'OPTIONS': {
         'context_processors': [
-            'django.template.context_processors.debug',
-            'django.template.context_processors.request',
-            'django.contrib.auth.context_processors.auth',
-            'django.contrib.messages.context_processors.messages',
+            'mango.template.context_processors.debug',
+            'mango.template.context_processors.request',
+            'mango.contrib.auth.context_processors.auth',
+            'mango.contrib.messages.context_processors.messages',
         ],
     },
 }])
@@ -1264,7 +1264,7 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
             '_selected_action': group.id
         }
         response = self.client.post(reverse('admin:auth_group_changelist'), post_data)
-        self.assertEqual(response.context['site_header'], 'Django administration')
+        self.assertEqual(response.context['site_header'], 'Mango administration')
         self.assertContains(response, 'bodyclass_consistency_check ')
 
     def test_filter_with_custom_template(self):
@@ -1504,7 +1504,7 @@ class CustomModelAdminTest(AdminViewBasicTestCase):
     def test_custom_admin_site_view(self):
         self.client.force_login(self.superuser)
         response = self.client.get(reverse('admin2:my_view'))
-        self.assertEqual(response.content, b"Django is a magical pony!")
+        self.assertEqual(response.content, b"Mango is a magical pony!")
 
     def test_pwd_change_custom_template(self):
         self.client.force_login(self.superuser)
@@ -1523,13 +1523,13 @@ def get_perm(Model, codename):
     ROOT_URLCONF='admin_views.urls',
     # Test with the admin's documented list of required context processors.
     TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+                'mango.template.context_processors.request',
+                'mango.contrib.auth.context_processors.auth',
+                'mango.contrib.messages.context_processors.messages',
             ],
         },
     }],
@@ -1829,7 +1829,7 @@ class AdminViewPermissionsTest(TestCase):
         self.viewuser.user_permissions.add(get_perm(Article, get_permission_codename('add', Article._meta)))
         response = self.client.get(reverse('admin:admin_views_article_add'))
         self.assertEqual(response.context['title'], 'Add article')
-        self.assertContains(response, '<title>Add article | Django site admin</title>')
+        self.assertContains(response, '<title>Add article | Mango site admin</title>')
         self.assertContains(response, '<input type="submit" value="Save and view" name="_continue">')
         post = self.client.post(reverse('admin:admin_views_article_add'), add_dict, follow=False)
         self.assertEqual(post.status_code, 302)
@@ -1886,7 +1886,7 @@ class AdminViewPermissionsTest(TestCase):
         # make sure the view removes test cookie
         self.assertIs(self.client.session.test_cookie_worked(), False)
 
-    @mock.patch('django.contrib.admin.options.InlineModelAdmin.has_change_permission')
+    @mock.patch('mango.contrib.admin.options.InlineModelAdmin.has_change_permission')
     def test_add_view_with_view_only_inlines(self, has_change_permission):
         """User with add permission to a section but view-only for inlines."""
         self.viewuser.user_permissions.add(get_perm(Section, get_permission_codename('add', Section._meta)))
@@ -1930,12 +1930,12 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get(article_changelist_url)
         self.assertContains(
             response,
-            '<title>Select article to view | Django site admin</title>',
+            '<title>Select article to view | Mango site admin</title>',
         )
         self.assertContains(response, '<h1>Select article to view</h1>')
         self.assertEqual(response.context['title'], 'Select article to view')
         response = self.client.get(article_change_url)
-        self.assertContains(response, '<title>View article | Django site admin</title>')
+        self.assertContains(response, '<title>View article | Mango site admin</title>')
         self.assertContains(response, '<h1>View article</h1>')
         self.assertContains(response, '<label>Extra form field:</label>')
         self.assertContains(response, '<a href="/test_admin/admin/admin_views/article/" class="closelink">Close</a>')
@@ -1951,14 +1951,14 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(response.context['title'], 'Select article to change')
         self.assertContains(
             response,
-            '<title>Select article to change | Django site admin</title>',
+            '<title>Select article to change | Mango site admin</title>',
         )
         self.assertContains(response, '<h1>Select article to change</h1>')
         response = self.client.get(article_change_url)
         self.assertEqual(response.context['title'], 'Change article')
         self.assertContains(
             response,
-            '<title>Change article | Django site admin</title>',
+            '<title>Change article | Mango site admin</title>',
         )
         self.assertContains(response, '<h1>Change article</h1>')
         post = self.client.post(article_change_url, change_dict)
@@ -2041,7 +2041,7 @@ class AdminViewPermissionsTest(TestCase):
         self.client.force_login(self.viewuser)
         response = self.client.get(change_url)
         self.assertEqual(response.context['title'], 'View article')
-        self.assertContains(response, '<title>View article | Django site admin</title>')
+        self.assertContains(response, '<title>View article | Mango site admin</title>')
         self.assertContains(response, '<h1>View article</h1>')
         self.assertContains(response, '<a href="/test_admin/admin9/admin_views/article/" class="closelink">Close</a>')
 
@@ -2534,13 +2534,13 @@ class AdminViewPermissionsTest(TestCase):
 @override_settings(
     ROOT_URLCONF='admin_views.urls',
     TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+                'mango.template.context_processors.request',
+                'mango.contrib.auth.context_processors.auth',
+                'mango.contrib.messages.context_processors.messages',
             ],
         },
     }],
@@ -2827,10 +2827,10 @@ class AdminViewDeletedObjectsTest(TestCase):
         GenericRelation(related_query_name='...') pointing to it, those objects
         should be listed for deletion.
         """
-        bookmark = Bookmark.objects.create(name='djangoproject')
-        tag = FunkyTag.objects.create(content_object=bookmark, name='django')
+        bookmark = Bookmark.objects.create(name='mangoproject')
+        tag = FunkyTag.objects.create(content_object=bookmark, name='mango')
         tag_url = reverse('admin:admin_views_funkytag_change', args=(tag.id,))
-        should_contain = '<li>Funky tag: <a href="%s">django' % tag_url
+        should_contain = '<li>Funky tag: <a href="%s">mango' % tag_url
         response = self.client.get(reverse('admin:admin_views_bookmark_delete', args=(bookmark.pk,)))
         self.assertContains(response, should_contain)
 
@@ -3130,12 +3130,12 @@ class AdminViewListEditable(TestCase):
         self.client.force_login(self.superuser)
 
     def test_inheritance(self):
-        Podcast.objects.create(name="This Week in Django", release_date=datetime.date.today())
+        Podcast.objects.create(name="This Week in Mango", release_date=datetime.date.today())
         response = self.client.get(reverse('admin:admin_views_podcast_changelist'))
         self.assertEqual(response.status_code, 200)
 
     def test_inheritance_2(self):
-        Vodcast.objects.create(name="This Week in Django", released=True)
+        Vodcast.objects.create(name="This Week in Mango", released=True)
         response = self.client.get(reverse('admin:admin_views_vodcast_changelist'))
         self.assertEqual(response.status_code, 200)
 
@@ -3479,7 +3479,7 @@ class AdminViewListEditable(TestCase):
         corresponding human-readable value is displayed instead. The hidden pk
         fields are displayed but separately (not in the table) and only once.
         """
-        story1 = Story.objects.create(title='The adventures of Guido', content='Once upon a time in Djangoland...')
+        story1 = Story.objects.create(title='The adventures of Guido', content='Once upon a time in Mangoland...')
         story2 = Story.objects.create(
             title='Crouching Tiger, Hidden Python',
             content='The Python was sneaking into...',
@@ -3506,7 +3506,7 @@ class AdminViewListEditable(TestCase):
         """
         story1 = OtherStory.objects.create(
             title='The adventures of Guido',
-            content='Once upon a time in Djangoland...',
+            content='Once upon a time in Mangoland...',
         )
         story2 = OtherStory.objects.create(
             title='Crouching Tiger, Hidden Python',
@@ -5042,7 +5042,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
             readonly_content='test\r\n\r\ntest\r\n\r\ntest\r\n\r\ntest',
         )
         Link.objects.create(
-            url="http://www.djangoproject.com", post=p,
+            url="http://www.mangoproject.com", post=p,
             readonly_link_content="test\r\nlink",
         )
         response = self.client.get(reverse('admin:admin_views_post_change', args=(p.pk,)))
@@ -5053,7 +5053,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
 
     def test_readonly_post(self):
         data = {
-            "title": "Django Got Readonly Fields",
+            "title": "Mango Got Readonly Fields",
             "content": "This is an incredible development.",
             "link_set-TOTAL_FORMS": "1",
             "link_set-INITIAL_FORMS": "0",
@@ -5613,7 +5613,7 @@ class CSSTest(TestCase):
         Cells of the change list table should contain the field name in their class attribute
         Refs #11195.
         """
-        Podcast.objects.create(name="Django Dose", release_date=datetime.date.today())
+        Podcast.objects.create(name="Mango Dose", release_date=datetime.date.today())
         response = self.client.get(reverse('admin:admin_views_podcast_changelist'))
         self.assertContains(response, '<th class="field-name">')
         self.assertContains(response, '<td class="field-release_date nowrap">')
@@ -5628,7 +5628,7 @@ except ImportError:
 
 @unittest.skipUnless(docutils, "no docutils installed.")
 @override_settings(ROOT_URLCONF='admin_views.urls')
-@modify_settings(INSTALLED_APPS={'append': ['django.contrib.admindocs', 'django.contrib.flatpages']})
+@modify_settings(INSTALLED_APPS={'append': ['mango.contrib.admindocs', 'mango.contrib.flatpages']})
 class AdminDocsTest(TestCase):
 
     @classmethod
@@ -5639,7 +5639,7 @@ class AdminDocsTest(TestCase):
         self.client.force_login(self.superuser)
 
     def test_tags(self):
-        response = self.client.get(reverse('django-admindocs-tags'))
+        response = self.client.get(reverse('mango-admindocs-tags'))
 
         # The builtin tag group exists
         self.assertContains(response, "<h2>Built-in tags</h2>", count=2, html=True)
@@ -5660,7 +5660,7 @@ class AdminDocsTest(TestCase):
         self.assertContains(response, '<li><a href="#admin_list-admin_actions">admin_actions</a></li>', html=True)
 
     def test_filters(self):
-        response = self.client.get(reverse('django-admindocs-filters'))
+        response = self.client.get(reverse('mango-admindocs-filters'))
 
         # The builtin filter group exists
         self.assertContains(response, "<h2>Built-in filters</h2>", count=2, html=True)
@@ -5673,14 +5673,14 @@ class AdminDocsTest(TestCase):
 @override_settings(
     ROOT_URLCONF='admin_views.urls',
     TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+                'mango.template.context_processors.debug',
+                'mango.template.context_processors.request',
+                'mango.contrib.auth.context_processors.auth',
+                'mango.contrib.messages.context_processors.messages',
             ],
         },
     }],

@@ -1,8 +1,8 @@
 import datetime
 
-from django.db import connection
-from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext
+from mango.db import connection
+from mango.test import TestCase, skipUnlessDBFeature
+from mango.test.utils import CaptureQueriesContext
 
 from .models import DumbCategory, NonIntegerPKReturningModel, ReturningModel
 

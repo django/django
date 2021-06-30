@@ -2,8 +2,8 @@ import unittest
 
 import sqlparse
 
-from django.db import connection
-from django.test import TestCase
+from mango.db import connection
+from mango.test import TestCase
 
 
 @unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests')

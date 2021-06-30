@@ -1,8 +1,8 @@
-from django.core.exceptions import ImproperlyConfigured
-from django.core.handlers.wsgi import WSGIHandler, WSGIRequest, get_script_name
-from django.core.signals import request_finished, request_started
-from django.db import close_old_connections, connection
-from django.test import (
+from mango.core.exceptions import ImproperlyConfigured
+from mango.core.handlers.wsgi import WSGIHandler, WSGIRequest, get_script_name
+from mango.core.signals import request_finished, request_started
+from mango.db import close_old_connections, connection
+from mango.test import (
     RequestFactory, SimpleTestCase, TransactionTestCase, override_settings,
 )
 

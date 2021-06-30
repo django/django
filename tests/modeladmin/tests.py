@@ -1,21 +1,21 @@
 from datetime import date
 
-from django import forms
-from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
-from django.contrib.admin.options import (
+from mango import forms
+from mango.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
+from mango.contrib.admin.options import (
     HORIZONTAL, VERTICAL, ModelAdmin, TabularInline,
     get_content_type_for_model,
 )
-from django.contrib.admin.sites import AdminSite
-from django.contrib.admin.widgets import (
+from mango.contrib.admin.sites import AdminSite
+from mango.contrib.admin.widgets import (
     AdminDateWidget, AdminRadioSelect, AutocompleteSelect,
     AutocompleteSelectMultiple,
 )
-from django.contrib.auth.models import User
-from django.db import models
-from django.forms.widgets import Select
-from django.test import SimpleTestCase, TestCase
-from django.test.utils import isolate_apps
+from mango.contrib.auth.models import User
+from mango.db import models
+from mango.forms.widgets import Select
+from mango.test import SimpleTestCase, TestCase
+from mango.test.utils import isolate_apps
 
 from .models import Band, Concert, Song
 

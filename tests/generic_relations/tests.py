@@ -1,8 +1,8 @@
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import FieldError
-from django.db import IntegrityError
-from django.db.models import Q
-from django.test import SimpleTestCase, TestCase
+from mango.contrib.contenttypes.models import ContentType
+from mango.core.exceptions import FieldError
+from mango.db import IntegrityError
+from mango.db.models import Q
+from mango.test import SimpleTestCase, TestCase
 
 from .models import (
     AllowsNullGFK, Animal, Carrot, Comparison, ConcreteRelatedModel,

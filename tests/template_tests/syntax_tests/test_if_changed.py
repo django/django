@@ -1,5 +1,5 @@
-from django.template import Context, Engine
-from django.test import SimpleTestCase
+from mango.template import Context, Engine
+from mango.test import SimpleTestCase
 
 from ..utils import setup
 
@@ -205,7 +205,7 @@ class IfChangedTests(SimpleTestCase):
         isn't used. Hence we don't use the @setup decorator.
         """
         engine = Engine(loaders=[
-            ('django.template.loaders.locmem.Loader', {
+            ('mango.template.loaders.locmem.Loader', {
                 'template': '{% for x in vars %}{% include "include" %}{% endfor %}',
                 'include': '{% ifchanged %}{{ x }}{% endifchanged %}',
             }),
@@ -216,7 +216,7 @@ class IfChangedTests(SimpleTestCase):
     def test_include_state(self):
         """Tests the node state for different IncludeNodes (#27974)."""
         engine = Engine(loaders=[
-            ('django.template.loaders.locmem.Loader', {
+            ('mango.template.loaders.locmem.Loader', {
                 'template': '{% for x in vars %}{% include "include" %}{% include "include" %}{% endfor %}',
                 'include': '{% ifchanged %}{{ x }}{% endifchanged %}',
             }),

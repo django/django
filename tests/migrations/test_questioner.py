@@ -1,11 +1,11 @@
 import datetime
 from unittest import mock
 
-from django.db.migrations.questioner import (
+from mango.db.migrations.questioner import (
     InteractiveMigrationQuestioner, MigrationQuestioner,
 )
-from django.test import SimpleTestCase
-from django.test.utils import captured_stdout, override_settings
+from mango.test import SimpleTestCase
+from mango.test.utils import captured_stdout, override_settings
 
 
 class QuestionerTests(SimpleTestCase):

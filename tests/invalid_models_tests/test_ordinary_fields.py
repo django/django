@@ -1,16 +1,16 @@
 import unittest
 import uuid
 
-from django.core.checks import Error, Warning as DjangoWarning
-from django.db import connection, models
-from django.test import (
+from mango.core.checks import Error, Warning as MangoWarning
+from mango.db import connection, models
+from mango.test import (
     SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
-from django.test.utils import isolate_apps, override_settings
-from django.utils.functional import lazy
-from django.utils.timezone import now
-from django.utils.translation import gettext_lazy as _
-from django.utils.version import get_docs_version
+from mango.test.utils import isolate_apps, override_settings
+from mango.utils.functional import lazy
+from mango.utils.timezone import now
+from mango.utils.translation import gettext_lazy as _
+from mango.utils.version import get_docs_version
 
 
 @isolate_apps('invalid_models_tests')
@@ -28,7 +28,7 @@ class AutoFieldTests(SimpleTestCase):
         class Model(models.Model):
             field = models.AutoField(primary_key=False)
 
-            # Prevent Django from autocreating `id` AutoField, which would
+            # Prevent Mango from autocreating `id` AutoField, which would
             # result in an error, because a model must have exactly one
             # AutoField.
             another = models.IntegerField(primary_key=True)
@@ -48,7 +48,7 @@ class AutoFieldTests(SimpleTestCase):
 
         field = Model._meta.get_field('auto')
         self.assertEqual(field.check(), [
-            DjangoWarning(
+            MangoWarning(
                 "'max_length' is ignored when used with %s."
                 % field.__class__.__name__,
                 hint="Remove 'max_length' from field",
@@ -367,7 +367,7 @@ class CharFieldTests(TestCase):
     @unittest.skipUnless(connection.vendor == 'mysql',
                          "Test valid only for MySQL")
     def test_too_long_char_field_under_mysql(self):
-        from django.db.backends.mysql.validation import DatabaseValidation
+        from mango.db.backends.mysql.validation import DatabaseValidation
 
         class Model(models.Model):
             field = models.CharField(unique=True, max_length=256)
@@ -375,11 +375,11 @@ class CharFieldTests(TestCase):
         field = Model._meta.get_field('field')
         validator = DatabaseValidation(connection=connection)
         self.assertEqual(validator.check_field(field), [
-            DjangoWarning(
+            MangoWarning(
                 '%s may not allow unique CharFields to have a max_length > '
                 '255.' % connection.display_name,
                 hint=(
-                    'See: https://docs.djangoproject.com/en/%s/ref/databases/'
+                    'See: https://docs.mangoproject.com/en/%s/ref/databases/'
                     '#mysql-character-fields' % get_docs_version()
                 ),
                 obj=field,
@@ -450,21 +450,21 @@ class DateFieldTests(SimpleTestCase):
         errors.extend(field_d.check())
         errors.extend(field_now.check())  # doesn't raise a warning
         self.assertEqual(errors, [
-            DjangoWarning(
+            MangoWarning(
                 'Fixed default value provided.',
                 hint='It seems you set a fixed date / time / datetime '
                      'value as default for this field. This may not be '
                      'what you want. If you want to have the current date '
-                     'as default, use `django.utils.timezone.now`',
+                     'as default, use `mango.utils.timezone.now`',
                 obj=field_dt,
                 id='fields.W161',
             ),
-            DjangoWarning(
+            MangoWarning(
                 'Fixed default value provided.',
                 hint='It seems you set a fixed date / time / datetime '
                      'value as default for this field. This may not be '
                      'what you want. If you want to have the current date '
-                     'as default, use `django.utils.timezone.now`',
+                     'as default, use `mango.utils.timezone.now`',
                 obj=field_d,
                 id='fields.W161',
             )
@@ -492,21 +492,21 @@ class DateTimeFieldTests(SimpleTestCase):
         errors.extend(field_d.check())
         errors.extend(field_now.check())  # doesn't raise a warning
         self.assertEqual(errors, [
-            DjangoWarning(
+            MangoWarning(
                 'Fixed default value provided.',
                 hint='It seems you set a fixed date / time / datetime '
                      'value as default for this field. This may not be '
                      'what you want. If you want to have the current date '
-                     'as default, use `django.utils.timezone.now`',
+                     'as default, use `mango.utils.timezone.now`',
                 obj=field_dt,
                 id='fields.W161',
             ),
-            DjangoWarning(
+            MangoWarning(
                 'Fixed default value provided.',
                 hint='It seems you set a fixed date / time / datetime '
                      'value as default for this field. This may not be '
                      'what you want. If you want to have the current date '
-                     'as default, use `django.utils.timezone.now`',
+                     'as default, use `mango.utils.timezone.now`',
                 obj=field_d,
                 id='fields.W161',
             )
@@ -730,7 +730,7 @@ class IntegerFieldTests(SimpleTestCase):
                 continue
             with self.subTest(name=field.name):
                 self.assertEqual(field.check(), [
-                    DjangoWarning(
+                    MangoWarning(
                         "'max_length' is ignored when used with %s." % field.__class__.__name__,
                         hint="Remove 'max_length' from field",
                         obj=field,
@@ -756,21 +756,21 @@ class TimeFieldTests(SimpleTestCase):
         errors.extend(field_t.check())
         errors.extend(field_now.check())  # doesn't raise a warning
         self.assertEqual(errors, [
-            DjangoWarning(
+            MangoWarning(
                 'Fixed default value provided.',
                 hint='It seems you set a fixed date / time / datetime '
                      'value as default for this field. This may not be '
                      'what you want. If you want to have the current date '
-                     'as default, use `django.utils.timezone.now`',
+                     'as default, use `mango.utils.timezone.now`',
                 obj=field_dt,
                 id='fields.W161',
             ),
-            DjangoWarning(
+            MangoWarning(
                 'Fixed default value provided.',
                 hint='It seems you set a fixed date / time / datetime '
                      'value as default for this field. This may not be '
                      'what you want. If you want to have the current date '
-                     'as default, use `django.utils.timezone.now`',
+                     'as default, use `mango.utils.timezone.now`',
                 obj=field_t,
                 id='fields.W161',
             )
@@ -791,7 +791,7 @@ class TextFieldTests(TestCase):
         field = Model._meta.get_field('value')
         field_type = field.db_type(connection)
         self.assertEqual(field.check(databases=self.databases), [
-            DjangoWarning(
+            MangoWarning(
                 '%s does not support a database index on %s columns.'
                 % (connection.display_name, field_type),
                 hint=(
@@ -853,7 +853,7 @@ class JSONFieldTests(TestCase):
             field = models.JSONField(default={})
 
         self.assertEqual(Model._meta.get_field('field').check(), [
-            DjangoWarning(
+            MangoWarning(
                 msg=(
                     "JSONField default should be a callable instead of an "
                     "instance so that it's not shared between all field "

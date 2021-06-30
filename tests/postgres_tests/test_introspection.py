@@ -1,12 +1,12 @@
 from io import StringIO
 
-from django.core.management import call_command
-from django.test.utils import modify_settings
+from mango.core.management import call_command
+from mango.test.utils import modify_settings
 
 from . import PostgreSQLTestCase
 
 
-@modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
+@modify_settings(INSTALLED_APPS={'append': 'mango.contrib.postgres'})
 class InspectDBTests(PostgreSQLTestCase):
     def assertFieldsInModel(self, model, field_outputs):
         out = StringIO()
@@ -23,10 +23,10 @@ class InspectDBTests(PostgreSQLTestCase):
         self.assertFieldsInModel(
             'postgres_tests_rangesmodel',
             [
-                'ints = django.contrib.postgres.fields.IntegerRangeField(blank=True, null=True)',
-                'bigints = django.contrib.postgres.fields.BigIntegerRangeField(blank=True, null=True)',
-                'decimals = django.contrib.postgres.fields.DecimalRangeField(blank=True, null=True)',
-                'timestamps = django.contrib.postgres.fields.DateTimeRangeField(blank=True, null=True)',
-                'dates = django.contrib.postgres.fields.DateRangeField(blank=True, null=True)',
+                'ints = mango.contrib.postgres.fields.IntegerRangeField(blank=True, null=True)',
+                'bigints = mango.contrib.postgres.fields.BigIntegerRangeField(blank=True, null=True)',
+                'decimals = mango.contrib.postgres.fields.DecimalRangeField(blank=True, null=True)',
+                'timestamps = mango.contrib.postgres.fields.DateTimeRangeField(blank=True, null=True)',
+                'dates = mango.contrib.postgres.fields.DateRangeField(blank=True, null=True)',
             ],
         )

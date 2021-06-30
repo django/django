@@ -2,11 +2,11 @@
 Database Functions
 ==================
 
-.. module:: django.db.models.functions
+.. module:: mango.db.models.functions
     :synopsis: Database Functions
 
 The classes documented below provide a way for users to use functions provided
-by the underlying database as annotations, aggregations, or filters in Django.
+by the underlying database as annotations, aggregations, or filters in Mango.
 Functions are also :doc:`expressions <expressions>`, so they can be used and
 combined with other expressions like :ref:`aggregate functions
 <aggregation-functions>`.
@@ -37,8 +37,8 @@ Forces the result type of ``expression`` to be the one from ``output_field``.
 
 Usage example::
 
-    >>> from django.db.models import FloatField
-    >>> from django.db.models.functions import Cast
+    >>> from mango.db.models import FloatField
+    >>> from mango.db.models.functions import Cast
     >>> Author.objects.create(age=25, name='Margaret Smith')
     >>> author = Author.objects.annotate(
     ...    age_as_float=Cast('age', output_field=FloatField()),
@@ -59,8 +59,8 @@ will result in a database error.
 Usage examples::
 
     >>> # Get a screen name from least to most public
-    >>> from django.db.models import Sum, Value as V
-    >>> from django.db.models.functions import Coalesce
+    >>> from mango.db.models import Sum, Value as V
+    >>> from mango.db.models.functions import Coalesce
     >>> Author.objects.create(name='Margaret Smith', goes_by='Maggie')
     >>> author = Author.objects.annotate(
     ...    screen_name=Coalesce('alias', 'goes_by', 'name')).get()
@@ -81,9 +81,9 @@ Usage examples::
     A Python value passed to ``Coalesce`` on MySQL may be converted to an
     incorrect type unless explicitly cast to the correct database type:
 
-    >>> from django.db.models import DateTimeField
-    >>> from django.db.models.functions import Cast, Coalesce
-    >>> from django.utils import timezone
+    >>> from mango.db.models import DateTimeField
+    >>> from mango.db.models.functions import Cast, Coalesce
+    >>> from mango.utils import timezone
     >>> now = timezone.now()
     >>> Coalesce('updated', Cast(now, DateTimeField()))
 
@@ -126,7 +126,7 @@ Usage example::
         modified = models.DateTimeField(auto_now=True)
         blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
 
-    >>> from django.db.models.functions import Greatest
+    >>> from mango.db.models.functions import Greatest
     >>> blog = Blog.objects.create(body='Greatest is the best.')
     >>> comment = Comment.objects.create(body='No, Least is better.', blog=blog)
     >>> comments = Comment.objects.annotate(last_updated=Greatest('modified', 'blog__modified'))
@@ -160,8 +160,8 @@ pairs.
 
 Usage example::
 
-    >>> from django.db.models import F
-    >>> from django.db.models.functions import JSONObject, Lower
+    >>> from mango.db.models import F
+    >>> from mango.db.models.functions import JSONObject, Lower
     >>> Author.objects.create(name='Margaret Smith', alias='msmith', age=25)
     >>> author = Author.objects.annotate(json_object=JSONObject(
     ...     name=Lower('name'),
@@ -205,7 +205,7 @@ returns ``expression1``.
 
     Due to an :ref:`Oracle convention<oracle-null-empty-strings>`, this
     function returns the empty string instead of ``None`` when the expressions
-    are of type :class:`~django.db.models.CharField`.
+    are of type :class:`~mango.db.models.CharField`.
 
     Passing ``Value(None)`` to ``expression1`` is prohibited on Oracle since
     Oracle doesn't accept ``NULL`` as the first argument.
@@ -235,7 +235,7 @@ Extracts a component of a date as a number.
 Takes an ``expression`` representing a ``DateField``, ``DateTimeField``,
 ``TimeField``, or ``DurationField`` and a ``lookup_name``, and returns the part
 of the date referenced by ``lookup_name`` as an ``IntegerField``.
-Django usually uses the databases' extract function, so you may use any
+Mango usually uses the databases' extract function, so you may use any
 ``lookup_name`` that your database supports. A ``tzinfo`` subclass, usually
 provided by ``pytz``, can be passed to extract a value in a specific timezone.
 
@@ -254,7 +254,7 @@ Given the datetime ``2015-06-15 23:30:01.000321+00:00``, the built-in
 * "minute": 30
 * "second": 1
 
-If a different timezone like ``Australia/Melbourne`` is active in Django, then
+If a different timezone like ``Australia/Melbourne`` is active in Mango, then
 the datetime is converted to the timezone before the value is extracted. The
 timezone offset for Melbourne in the example date above is +10:00. The values
 returned when this timezone is active will be the same as above except for:
@@ -293,7 +293,7 @@ e.g. use ``ExtractYear(...)`` rather than ``Extract(..., lookup_name='year')``.
 Usage example::
 
     >>> from datetime import datetime
-    >>> from django.db.models.functions import Extract
+    >>> from mango.db.models.functions import Extract
     >>> start = datetime(2015, 6, 15)
     >>> end = datetime(2015, 7, 2)
     >>> Experiment.objects.create(
@@ -357,8 +357,8 @@ Since ``DateField``\s don't have a time component, only ``Extract`` subclasses
 that deal with date-parts can be used with ``DateField``::
 
     >>> from datetime import datetime
-    >>> from django.utils import timezone
-    >>> from django.db.models.functions import (
+    >>> from mango.utils import timezone
+    >>> from mango.db.models.functions import (
     ...     ExtractDay, ExtractMonth, ExtractQuarter, ExtractWeek,
     ...     ExtractIsoWeekDay, ExtractWeekDay, ExtractIsoYear, ExtractYear,
     ... )
@@ -408,8 +408,8 @@ Each class is also a ``Transform`` registered on ``DateTimeField`` as
 ``DateTimeField`` examples::
 
     >>> from datetime import datetime
-    >>> from django.utils import timezone
-    >>> from django.db.models.functions import (
+    >>> from mango.utils import timezone
+    >>> from mango.db.models.functions import (
     ...     ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
     ...     ExtractQuarter, ExtractSecond, ExtractWeek, ExtractIsoWeekDay,
     ...     ExtractWeekDay, ExtractIsoYear, ExtractYear,
@@ -440,7 +440,7 @@ Each class is also a ``Transform`` registered on ``DateTimeField`` as
      'second': 1}
 
 When :setting:`USE_TZ` is ``True`` then datetimes are stored in the database
-in UTC. If a different timezone is active in Django, the datetime is converted
+in UTC. If a different timezone is active in Mango, the datetime is converted
 to that timezone before the value is extracted. The example below converts to
 the Melbourne timezone (UTC +10:00), which changes the day, weekday, and hour
 values that are returned::
@@ -483,16 +483,16 @@ typically using the SQL ``CURRENT_TIMESTAMP``.
 
 Usage example::
 
-    >>> from django.db.models.functions import Now
+    >>> from mango.db.models.functions import Now
     >>> Article.objects.filter(published__lte=Now())
-    <QuerySet [<Article: How to Django>]>
+    <QuerySet [<Article: How to Mango>]>
 
 .. admonition:: PostgreSQL considerations
 
     On PostgreSQL, the SQL ``CURRENT_TIMESTAMP`` returns the time that the
     current transaction started. Therefore for cross-database compatibility,
     ``Now()`` uses ``STATEMENT_TIMESTAMP`` instead. If you need the transaction
-    timestamp, use :class:`django.contrib.postgres.functions.TransactionNow`.
+    timestamp, use :class:`mango.contrib.postgres.functions.TransactionNow`.
 
 ``Trunc``
 ---------
@@ -531,7 +531,7 @@ return:
 * "minute": 2015-06-15 14:30:00+00:00
 * "second": 2015-06-15 14:30:50+00:00
 
-If a different timezone like ``Australia/Melbourne`` is active in Django, then
+If a different timezone like ``Australia/Melbourne`` is active in Mango, then
 the datetime is converted to the new timezone before the value is truncated.
 The timezone offset for Melbourne in the example date above is +10:00. The
 values returned when this timezone is active will be:
@@ -559,8 +559,8 @@ subclasses.
 Usage example::
 
     >>> from datetime import datetime
-    >>> from django.db.models import Count, DateTimeField
-    >>> from django.db.models.functions import Trunc
+    >>> from mango.db.models import Count, DateTimeField
+    >>> from mango.db.models.functions import Trunc
     >>> Experiment.objects.create(start_datetime=datetime(2015, 6, 15, 14, 30, 50, 321))
     >>> Experiment.objects.create(start_datetime=datetime(2015, 6, 15, 14, 40, 2, 123))
     >>> Experiment.objects.create(start_datetime=datetime(2015, 12, 25, 10, 5, 27, 999))
@@ -611,9 +611,9 @@ Since ``DateField``\s don't have a time component, only ``Trunc`` subclasses
 that deal with date-parts can be used with ``DateField``::
 
     >>> from datetime import datetime
-    >>> from django.db.models import Count
-    >>> from django.db.models.functions import TruncMonth, TruncYear
-    >>> from django.utils import timezone
+    >>> from mango.db.models import Count
+    >>> from mango.db.models.functions import TruncMonth, TruncYear
+    >>> from mango.utils import timezone
     >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=timezone.utc)
     >>> start2 = datetime(2015, 6, 15, 14, 40, 2, 123, tzinfo=timezone.utc)
     >>> start3 = datetime(2015, 12, 31, 17, 5, 27, 999, tzinfo=timezone.utc)
@@ -694,11 +694,11 @@ datetimes with less precision. ``expression`` must have an ``output_field`` of
 Usage example::
 
     >>> from datetime import date, datetime
-    >>> from django.db.models import Count
-    >>> from django.db.models.functions import (
+    >>> from mango.db.models import Count
+    >>> from mango.db.models.functions import (
     ...     TruncDate, TruncDay, TruncHour, TruncMinute, TruncSecond,
     ... )
-    >>> from django.utils import timezone
+    >>> from mango.utils import timezone
     >>> import pytz
     >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=timezone.utc)
     >>> Experiment.objects.create(start_datetime=start1, start_date=start1.date())
@@ -744,9 +744,9 @@ Since ``TimeField``\s don't have a date component, only ``Trunc`` subclasses
 that deal with time-parts can be used with ``TimeField``::
 
     >>> from datetime import datetime
-    >>> from django.db.models import Count, TimeField
-    >>> from django.db.models.functions import TruncHour
-    >>> from django.utils import timezone
+    >>> from mango.db.models import Count, TimeField
+    >>> from mango.db.models.functions import TruncHour
+    >>> from mango.utils import timezone
     >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=timezone.utc)
     >>> start2 = datetime(2014, 6, 15, 14, 40, 2, 123, tzinfo=timezone.utc)
     >>> start3 = datetime(2015, 12, 31, 17, 5, 27, 999, tzinfo=timezone.utc)
@@ -793,7 +793,7 @@ Returns the absolute value of a numeric field or expression.
 
 Usage example::
 
-    >>> from django.db.models.functions import Abs
+    >>> from mango.db.models.functions import Abs
     >>> Vector.objects.create(x=-0.5, y=1.1)
     >>> vector = Vector.objects.annotate(x_abs=Abs('x'), y_abs=Abs('y')).get()
     >>> vector.x_abs, vector.y_abs
@@ -801,8 +801,8 @@ Usage example::
 
 It can also be registered as a transform. For example::
 
-    >>> from django.db.models import FloatField
-    >>> from django.db.models.functions import Abs
+    >>> from mango.db.models import FloatField
+    >>> from mango.db.models.functions import Abs
     >>> FloatField.register_lookup(Abs)
     >>> # Get vectors inside the unit cube
     >>> vectors = Vector.objects.filter(x__abs__lt=1, y__abs__lt=1)
@@ -817,7 +817,7 @@ must be within the range -1 to 1.
 
 Usage example::
 
-    >>> from django.db.models.functions import ACos
+    >>> from mango.db.models.functions import ACos
     >>> Vector.objects.create(x=0.5, y=-0.9)
     >>> vector = Vector.objects.annotate(x_acos=ACos('x'), y_acos=ACos('y')).get()
     >>> vector.x_acos, vector.y_acos
@@ -825,8 +825,8 @@ Usage example::
 
 It can also be registered as a transform. For example::
 
-    >>> from django.db.models import FloatField
-    >>> from django.db.models.functions import ACos
+    >>> from mango.db.models import FloatField
+    >>> from mango.db.models.functions import ACos
     >>> FloatField.register_lookup(ACos)
     >>> # Get vectors whose arccosine is less than 1
     >>> vectors = Vector.objects.filter(x__acos__lt=1, y__acos__lt=1)
@@ -841,7 +841,7 @@ be in the range -1 to 1.
 
 Usage example::
 
-    >>> from django.db.models.functions import ASin
+    >>> from mango.db.models.functions import ASin
     >>> Vector.objects.create(x=0, y=1)
     >>> vector = Vector.objects.annotate(x_asin=ASin('x'), y_asin=ASin('y')).get()
     >>> vector.x_asin, vector.y_asin
@@ -849,8 +849,8 @@ Usage example::
 
 It can also be registered as a transform. For example::
 
-    >>> from django.db.models import FloatField
-    >>> from django.db.models.functions import ASin
+    >>> from mango.db.models import FloatField
+    >>> from mango.db.models.functions import ASin
     >>> FloatField.register_lookup(ASin)
     >>> # Get vectors whose arcsine is less than 1
     >>> vectors = Vector.objects.filter(x__asin__lt=1, y__asin__lt=1)
@@ -864,7 +864,7 @@ Returns the arctangent of a numeric field or expression.
 
 Usage example::
 
-    >>> from django.db.models.functions import ATan
+    >>> from mango.db.models.functions import ATan
     >>> Vector.objects.create(x=3.12, y=6.987)
     >>> vector = Vector.objects.annotate(x_atan=ATan('x'), y_atan=ATan('y')).get()
     >>> vector.x_atan, vector.y_atan
@@ -872,8 +872,8 @@ Usage example::
 
 It can also be registered as a transform. For example::
 
-    >>> from django.db.models import FloatField
-    >>> from django.db.models.functions import ATan
+    >>> from mango.db.models import FloatField
+    >>> from mango.db.models.functions import ATan
     >>> FloatField.register_lookup(ATan)
     >>> # Get vectors whose arctangent is less than 2
     >>> vectors = Vector.objects.filter(x__atan__lt=2, y__atan__lt=2)
@@ -887,7 +887,7 @@ Returns the arctangent of ``expression1 / expression2``.
 
 Usage example::
 
-    >>> from django.db.models.functions import ATan2
+    >>> from mango.db.models.functions import ATan2
     >>> Vector.objects.create(x=2.5, y=1.9)
     >>> vector = Vector.objects.annotate(atan2=ATan2('x', 'y')).get()
     >>> vector.atan2
@@ -903,7 +903,7 @@ expression.
 
 Usage example::
 
-    >>> from django.db.models.functions import Ceil
+    >>> from mango.db.models.functions import Ceil
     >>> Vector.objects.create(x=3.12, y=7.0)
     >>> vector = Vector.objects.annotate(x_ceil=Ceil('x'), y_ceil=Ceil('y')).get()
     >>> vector.x_ceil, vector.y_ceil
@@ -911,8 +911,8 @@ Usage example::
 
 It can also be registered as a transform. For example::
 
-    >>> from django.db.models import FloatField
-    >>> from django.db.models.functions import Ceil
+    >>> from mango.db.models import FloatField
+    >>> from mango.db.models.functions import Ceil
     >>> FloatField.register_lookup(Ceil)
     >>> # Get vectors whose ceil is less than 10
     >>> vectors = Vector.objects.filter(x__ceil__lt=10, y__ceil__lt=10)
@@ -926,7 +926,7 @@ Returns the cosine  of a numeric field or expression.
 
 Usage example::
 
-    >>> from django.db.models.functions import Cos
+    >>> from mango.db.models.functions import Cos
     >>> Vector.objects.create(x=-8.0, y=3.1415926)
     >>> vector = Vector.objects.annotate(x_cos=Cos('x'), y_cos=Cos('y')).get()
     >>> vector.x_cos, vector.y_cos
@@ -934,8 +934,8 @@ Usage example::
 
 It can also be registered as a transform. For example::
 
-    >>> from django.db.models import FloatField
-    >>> from django.db.models.functions import Cos
+    >>> from mango.db.models import FloatField
+    >>> from mango.db.models.functions import Cos
     >>> FloatField.register_lookup(Cos)
     >>> # Get vectors whose cosine is less than 0.5
     >>> vectors = Vector.objects.filter(x__cos__lt=0.5, y__cos__lt=0.5)
@@ -949,7 +949,7 @@ Returns the cotangent of a numeric field or expression.
 
 Usage example::
 
-    >>> from django.db.models.functions import Cot
+    >>> from mango.db.models.functions import Cot
     >>> Vector.objects.create(x=12.0, y=1.0)
     >>> vector = Vector.objects.annotate(x_cot=Cot('x'), y_cot=Cot('y')).get()
     >>> vector.x_cot, vector.y_cot
@@ -957,8 +957,8 @@ Usage example::
 
 It can also be registered as a transform. For example::
 
-    >>> from django.db.models import FloatField
-    >>> from django.db.models.functions import Cot
+    >>> from mango.db.models import FloatField
+    >>> from mango.db.models.functions import Cot
     >>> FloatField.register_lookup(Cot)
     >>> # Get vectors whose cotangent is less than 1
     >>> vectors = Vector.objects.filter(x__cot__lt=1, y__cot__lt=1)
@@ -972,7 +972,7 @@ Converts a numeric field or expression from radians to degrees.
 
 Usage example::
 
-    >>> from django.db.models.functions import Degrees
+    >>> from mango.db.models.functions import Degrees
     >>> Vector.objects.create(x=-1.57, y=3.14)
     >>> vector = Vector.objects.annotate(x_d=Degrees('x'), y_d=Degrees('y')).get()
     >>> vector.x_d, vector.y_d
@@ -980,8 +980,8 @@ Usage example::
 
 It can also be registered as a transform. For example::
 
-    >>> from django.db.models import FloatField
-    >>> from django.db.models.functions import Degrees
+    >>> from mango.db.models import FloatField
+    >>> from mango.db.models.functions import Degrees
     >>> FloatField.register_lookup(Degrees)
     >>> # Get vectors whose degrees are less than 360
     >>> vectors = Vector.objects.filter(x__degrees__lt=360, y__degrees__lt=360)
@@ -996,7 +996,7 @@ a numeric field or expression.
 
 Usage example::
 
-    >>> from django.db.models.functions import Exp
+    >>> from mango.db.models.functions import Exp
     >>> Vector.objects.create(x=5.4, y=-2.0)
     >>> vector = Vector.objects.annotate(x_exp=Exp('x'), y_exp=Exp('y')).get()
     >>> vector.x_exp, vector.y_exp
@@ -1004,8 +1004,8 @@ Usage example::
 
 It can also be registered as a transform. For example::
 
-    >>> from django.db.models import FloatField
-    >>> from django.db.models.functions import Exp
+    >>> from mango.db.models import FloatField
+    >>> from mango.db.models.functions import Exp
     >>> FloatField.register_lookup(Exp)
     >>> # Get vectors whose exp() is greater than 10
     >>> vectors = Vector.objects.filter(x__exp__gt=10, y__exp__gt=10)
@@ -1020,7 +1020,7 @@ expression.
 
 Usage example::
 
-    >>> from django.db.models.functions import Floor
+    >>> from mango.db.models.functions import Floor
     >>> Vector.objects.create(x=5.4, y=-2.3)
     >>> vector = Vector.objects.annotate(x_floor=Floor('x'), y_floor=Floor('y')).get()
     >>> vector.x_floor, vector.y_floor
@@ -1028,8 +1028,8 @@ Usage example::
 
 It can also be registered as a transform. For example::
 
-    >>> from django.db.models import FloatField
-    >>> from django.db.models.functions import Floor
+    >>> from mango.db.models import FloatField
+    >>> from mango.db.models.functions import Floor
     >>> FloatField.register_lookup(Floor)
     >>> # Get vectors whose floor() is greater than 10
     >>> vectors = Vector.objects.filter(x__floor__gt=10, y__floor__gt=10)
@@ -1043,7 +1043,7 @@ Returns the natural logarithm a numeric field or expression.
 
 Usage example::
 
-    >>> from django.db.models.functions import Ln
+    >>> from mango.db.models.functions import Ln
     >>> Vector.objects.create(x=5.4, y=233.0)
     >>> vector = Vector.objects.annotate(x_ln=Ln('x'), y_ln=Ln('y')).get()
     >>> vector.x_ln, vector.y_ln
@@ -1051,8 +1051,8 @@ Usage example::
 
 It can also be registered as a transform. For example::
 
-    >>> from django.db.models import FloatField
-    >>> from django.db.models.functions import Ln
+    >>> from mango.db.models import FloatField
+    >>> from mango.db.models.functions import Ln
     >>> FloatField.register_lookup(Ln)
     >>> # Get vectors whose value greater than e
     >>> vectors = Vector.objects.filter(x__ln__gt=1, y__ln__gt=1)
@@ -1067,7 +1067,7 @@ the first to base of the second.
 
 Usage example::
 
-    >>> from django.db.models.functions import Log
+    >>> from mango.db.models.functions import Log
     >>> Vector.objects.create(x=2.0, y=4.0)
     >>> vector = Vector.objects.annotate(log=Log('x', 'y')).get()
     >>> vector.log
@@ -1083,7 +1083,7 @@ the first divided by the second (modulo operation).
 
 Usage example::
 
-    >>> from django.db.models.functions import Mod
+    >>> from mango.db.models.functions import Mod
     >>> Vector.objects.create(x=5.4, y=2.3)
     >>> vector = Vector.objects.annotate(mod=Mod('x', 'y')).get()
     >>> vector.mod
@@ -1106,7 +1106,7 @@ raised to the power of the second.
 
 Usage example::
 
-    >>> from django.db.models.functions import Power
+    >>> from mango.db.models.functions import Power
     >>> Vector.objects.create(x=2, y=-2)
     >>> vector = Vector.objects.annotate(power=Power('x', 'y')).get()
     >>> vector.power
@@ -1121,7 +1121,7 @@ Converts a numeric field or expression from degrees to radians.
 
 Usage example::
 
-    >>> from django.db.models.functions import Radians
+    >>> from mango.db.models.functions import Radians
     >>> Vector.objects.create(x=-90, y=180)
     >>> vector = Vector.objects.annotate(x_r=Radians('x'), y_r=Radians('y')).get()
     >>> vector.x_r, vector.y_r
@@ -1129,8 +1129,8 @@ Usage example::
 
 It can also be registered as a transform. For example::
 
-    >>> from django.db.models import FloatField
-    >>> from django.db.models.functions import Radians
+    >>> from mango.db.models import FloatField
+    >>> from mango.db.models.functions import Radians
     >>> FloatField.register_lookup(Radians)
     >>> # Get vectors whose radians are less than 1
     >>> vectors = Vector.objects.filter(x__radians__lt=1, y__radians__lt=1)
@@ -1155,7 +1155,7 @@ values are rounded up or down depends on the database.
 
 Usage example::
 
-    >>> from django.db.models.functions import Round
+    >>> from mango.db.models.functions import Round
     >>> Vector.objects.create(x=5.4, y=-2.37)
     >>> vector = Vector.objects.annotate(x_r=Round('x'), y_r=Round('y', precision=1)).get()
     >>> vector.x_r, vector.y_r
@@ -1163,8 +1163,8 @@ Usage example::
 
 It can also be registered as a transform. For example::
 
-    >>> from django.db.models import FloatField
-    >>> from django.db.models.functions import Round
+    >>> from mango.db.models import FloatField
+    >>> from mango.db.models.functions import Round
     >>> FloatField.register_lookup(Round)
     >>> # Get vectors whose round() is less than 20
     >>> vectors = Vector.objects.filter(x__round__lt=20, y__round__lt=20)
@@ -1182,7 +1182,7 @@ Returns the sign (-1, 0, 1) of a numeric field or expression.
 
 Usage example::
 
-    >>> from django.db.models.functions import Sign
+    >>> from mango.db.models.functions import Sign
     >>> Vector.objects.create(x=5.4, y=-2.3)
     >>> vector = Vector.objects.annotate(x_sign=Sign('x'), y_sign=Sign('y')).get()
     >>> vector.x_sign, vector.y_sign
@@ -1190,8 +1190,8 @@ Usage example::
 
 It can also be registered as a transform. For example::
 
-    >>> from django.db.models import FloatField
-    >>> from django.db.models.functions import Sign
+    >>> from mango.db.models import FloatField
+    >>> from mango.db.models.functions import Sign
     >>> FloatField.register_lookup(Sign)
     >>> # Get vectors whose signs of components are less than 0.
     >>> vectors = Vector.objects.filter(x__sign__lt=0, y__sign__lt=0)
@@ -1205,7 +1205,7 @@ Returns the sine of a numeric field or expression.
 
 Usage example::
 
-    >>> from django.db.models.functions import Sin
+    >>> from mango.db.models.functions import Sin
     >>> Vector.objects.create(x=5.4, y=-2.3)
     >>> vector = Vector.objects.annotate(x_sin=Sin('x'), y_sin=Sin('y')).get()
     >>> vector.x_sin, vector.y_sin
@@ -1213,8 +1213,8 @@ Usage example::
 
 It can also be registered as a transform. For example::
 
-    >>> from django.db.models import FloatField
-    >>> from django.db.models.functions import Sin
+    >>> from mango.db.models import FloatField
+    >>> from mango.db.models.functions import Sin
     >>> FloatField.register_lookup(Sin)
     >>> # Get vectors whose sin() is less than 0
     >>> vectors = Vector.objects.filter(x__sin__lt=0, y__sin__lt=0)
@@ -1228,7 +1228,7 @@ Returns the square root of a nonnegative numeric field or expression.
 
 Usage example::
 
-    >>> from django.db.models.functions import Sqrt
+    >>> from mango.db.models.functions import Sqrt
     >>> Vector.objects.create(x=4.0, y=12.0)
     >>> vector = Vector.objects.annotate(x_sqrt=Sqrt('x'), y_sqrt=Sqrt('y')).get()
     >>> vector.x_sqrt, vector.y_sqrt
@@ -1236,8 +1236,8 @@ Usage example::
 
 It can also be registered as a transform. For example::
 
-    >>> from django.db.models import FloatField
-    >>> from django.db.models.functions import Sqrt
+    >>> from mango.db.models import FloatField
+    >>> from mango.db.models.functions import Sqrt
     >>> FloatField.register_lookup(Sqrt)
     >>> # Get vectors whose sqrt() is less than 5
     >>> vectors = Vector.objects.filter(x__sqrt__lt=5, y__sqrt__lt=5)
@@ -1251,7 +1251,7 @@ Returns the tangent of a numeric field or expression.
 
 Usage example::
 
-    >>> from django.db.models.functions import Tan
+    >>> from mango.db.models.functions import Tan
     >>> Vector.objects.create(x=0, y=12)
     >>> vector = Vector.objects.annotate(x_tan=Tan('x'), y_tan=Tan('y')).get()
     >>> vector.x_tan, vector.y_tan
@@ -1259,8 +1259,8 @@ Usage example::
 
 It can also be registered as a transform. For example::
 
-    >>> from django.db.models import FloatField
-    >>> from django.db.models.functions import Tan
+    >>> from mango.db.models import FloatField
+    >>> from mango.db.models.functions import Tan
     >>> FloatField.register_lookup(Tan)
     >>> # Get vectors whose tangent is less than 0
     >>> vectors = Vector.objects.filter(x__tan__lt=0, y__tan__lt=0)
@@ -1284,7 +1284,7 @@ The default lookup name is ``chr``.
 
 Usage example::
 
-    >>> from django.db.models.functions import Chr
+    >>> from mango.db.models.functions import Chr
     >>> Author.objects.create(name='Margaret Smith')
     >>> author = Author.objects.filter(name__startswith=Chr(ord('M'))).get()
     >>> print(author.name)
@@ -1298,19 +1298,19 @@ Usage example::
 Accepts a list of at least two text fields or expressions and returns the
 concatenated text. Each argument must be of a text or char type. If you want
 to concatenate a ``TextField()`` with a ``CharField()``, then be sure to tell
-Django that the ``output_field`` should be a ``TextField()``. Specifying an
+Mango that the ``output_field`` should be a ``TextField()``. Specifying an
 ``output_field`` is also required when concatenating a ``Value`` as in the
 example below.
 
 This function will never have a null result. On backends where a null argument
-results in the entire expression being null, Django will ensure that each null
+results in the entire expression being null, Mango will ensure that each null
 part is converted to an empty string first.
 
 Usage example::
 
     >>> # Get the display name as "name (goes_by)"
-    >>> from django.db.models import CharField, Value as V
-    >>> from django.db.models.functions import Concat
+    >>> from mango.db.models import CharField, Value as V
+    >>> from mango.db.models.functions import Concat
     >>> Author.objects.create(name='Margaret Smith', goes_by='Maggie')
     >>> author = Author.objects.annotate(
     ...     screen_name=Concat(
@@ -1330,7 +1330,7 @@ Returns the first ``length`` characters of the given text field or expression.
 
 Usage example::
 
-    >>> from django.db.models.functions import Left
+    >>> from mango.db.models.functions import Left
     >>> Author.objects.create(name='Margaret Smith')
     >>> author = Author.objects.annotate(first_initial=Left('name', 1)).get()
     >>> print(author.first_initial)
@@ -1347,7 +1347,7 @@ the value has. If the expression is null, then the length will also be null.
 Usage example::
 
     >>> # Get the length of the name and goes_by fields
-    >>> from django.db.models.functions import Length
+    >>> from mango.db.models.functions import Length
     >>> Author.objects.create(name='Margaret Smith')
     >>> author = Author.objects.annotate(
     ...    name_length=Length('name'),
@@ -1357,8 +1357,8 @@ Usage example::
 
 It can also be registered as a transform. For example::
 
-    >>> from django.db.models import CharField
-    >>> from django.db.models.functions import Length
+    >>> from mango.db.models import CharField
+    >>> from mango.db.models.functions import Length
     >>> CharField.register_lookup(Length)
     >>> # Get authors whose name is longer than 7 characters
     >>> authors = Author.objects.filter(name__length__gt=7)
@@ -1375,7 +1375,7 @@ It can also be registered as a transform as described in :class:`Length`.
 
 Usage example::
 
-    >>> from django.db.models.functions import Lower
+    >>> from mango.db.models.functions import Lower
     >>> Author.objects.create(name='Margaret Smith')
     >>> author = Author.objects.annotate(name_lower=Lower('name')).get()
     >>> print(author.name_lower)
@@ -1392,8 +1392,8 @@ The default ``fill_text`` is a space.
 
 Usage example::
 
-    >>> from django.db.models import Value
-    >>> from django.db.models.functions import LPad
+    >>> from mango.db.models import Value
+    >>> from mango.db.models.functions import LPad
     >>> Author.objects.create(name='John', alias='j')
     >>> Author.objects.update(name=LPad('name', 8, Value('abc')))
     1
@@ -1405,7 +1405,7 @@ Usage example::
 
 .. class:: LTrim(expression, **extra)
 
-Similar to :class:`~django.db.models.functions.Trim`, but removes only leading
+Similar to :class:`~mango.db.models.functions.Trim`, but removes only leading
 spaces.
 
 ``MD5``
@@ -1420,7 +1420,7 @@ It can also be registered as a transform as described in :class:`Length`.
 
 Usage example::
 
-    >>> from django.db.models.functions import MD5
+    >>> from mango.db.models.functions import MD5
     >>> Author.objects.create(name='Margaret Smith')
     >>> author = Author.objects.annotate(name_md5=MD5('name')).get()
     >>> print(author.name_md5)
@@ -1441,7 +1441,7 @@ The default lookup name is ``ord``.
 
 Usage example::
 
-    >>> from django.db.models.functions import Ord
+    >>> from mango.db.models.functions import Ord
     >>> Author.objects.create(name='Margaret Smith')
     >>> author = Author.objects.annotate(name_code_point=Ord('name')).get()
     >>> print(author.name_code_point)
@@ -1457,7 +1457,7 @@ times.
 
 Usage example::
 
-    >>> from django.db.models.functions import Repeat
+    >>> from mango.db.models.functions import Repeat
     >>> Author.objects.create(name='John', alias='j')
     >>> Author.objects.update(name=Repeat('name', 3))
     1
@@ -1475,8 +1475,8 @@ are case-sensitive.
 
 Usage example::
 
-    >>> from django.db.models import Value
-    >>> from django.db.models.functions import Replace
+    >>> from mango.db.models import Value
+    >>> from mango.db.models.functions import Replace
     >>> Author.objects.create(name='Margaret Johnson')
     >>> Author.objects.create(name='Margaret Smith')
     >>> Author.objects.update(name=Replace('name', Value('Margaret'), Value('Margareth')))
@@ -1497,7 +1497,7 @@ default lookup name is ``reverse``.
 
 Usage example::
 
-    >>> from django.db.models.functions import Reverse
+    >>> from mango.db.models.functions import Reverse
     >>> Author.objects.create(name='Margaret Smith')
     >>> author = Author.objects.annotate(backward=Reverse('name')).get()
     >>> print(author.backward)
@@ -1512,7 +1512,7 @@ Returns the last ``length`` characters of the given text field or expression.
 
 Usage example::
 
-    >>> from django.db.models.functions import Right
+    >>> from mango.db.models.functions import Right
     >>> Author.objects.create(name='Margaret Smith')
     >>> author = Author.objects.annotate(last_letter=Right('name', 1)).get()
     >>> print(author.last_letter)
@@ -1523,7 +1523,7 @@ Usage example::
 
 .. class:: RPad(expression, length, fill_text=Value(' '), **extra)
 
-Similar to :class:`~django.db.models.functions.LPad`, but pads on the right
+Similar to :class:`~mango.db.models.functions.LPad`, but pads on the right
 side.
 
 ``RTrim``
@@ -1531,7 +1531,7 @@ side.
 
 .. class:: RTrim(expression, **extra)
 
-Similar to :class:`~django.db.models.functions.Trim`, but removes only trailing
+Similar to :class:`~mango.db.models.functions.Trim`, but removes only trailing
 spaces.
 
 ``SHA1``, ``SHA224``, ``SHA256``, ``SHA384``, and ``SHA512``
@@ -1550,7 +1550,7 @@ They can also be registered as transforms as described in :class:`Length`.
 
 Usage example::
 
-    >>> from django.db.models.functions import SHA1
+    >>> from mango.db.models.functions import SHA1
     >>> Author.objects.create(name='Margaret Smith')
     >>> author = Author.objects.annotate(name_sha1=SHA1('name')).get()
     >>> print(author.name_sha1)
@@ -1560,7 +1560,7 @@ Usage example::
 
     The `pgcrypto extension <https://www.postgresql.org/docs/current/
     pgcrypto.html>`_ must be installed. You can use the
-    :class:`~django.contrib.postgres.operations.CryptoExtension` migration
+    :class:`~mango.contrib.postgres.operations.CryptoExtension` migration
     operation to install it.
 
 .. admonition:: Oracle
@@ -1578,8 +1578,8 @@ found.
 
 Usage example::
 
-    >>> from django.db.models import Value as V
-    >>> from django.db.models.functions import StrIndex
+    >>> from mango.db.models import Value as V
+    >>> from mango.db.models.functions import StrIndex
     >>> Author.objects.create(name='Margaret Smith')
     >>> Author.objects.create(name='Smith, Margaret')
     >>> Author.objects.create(name='Margaret Jackson')
@@ -1611,7 +1611,7 @@ than 0. If ``length`` is ``None``, then the rest of the string will be returned.
 Usage example::
 
     >>> # Set the alias to the first 5 characters of the name as lowercase
-    >>> from django.db.models.functions import Lower, Substr
+    >>> from mango.db.models.functions import Lower, Substr
     >>> Author.objects.create(name='Margaret Smith')
     >>> Author.objects.update(alias=Lower(Substr('name', 1, 5)))
     1
@@ -1628,7 +1628,7 @@ trailing spaces removed.
 
 Usage example::
 
-    >>> from django.db.models.functions import Trim
+    >>> from mango.db.models.functions import Trim
     >>> Author.objects.create(name='  John  ', alias='j')
     >>> Author.objects.update(name=Trim('name'))
     1
@@ -1647,7 +1647,7 @@ It can also be registered as a transform as described in :class:`Length`.
 
 Usage example::
 
-    >>> from django.db.models.functions import Upper
+    >>> from mango.db.models.functions import Upper
     >>> Author.objects.create(name='Margaret Smith')
     >>> author = Author.objects.annotate(name_upper=Upper('name')).get()
     >>> print(author.name_upper)
@@ -1659,7 +1659,7 @@ Window functions
 ================
 
 There are a number of functions to use in a
-:class:`~django.db.models.expressions.Window` expression for computing the rank
+:class:`~mango.db.models.expressions.Window` expression for computing the rank
 of elements or the :class:`Ntile` of some rows.
 
 ``CumeDist``
@@ -1736,7 +1736,7 @@ within the window. Returns ``None`` if no row exists.
 
 Some databases may handle a nonexistent nth-value differently. For example,
 Oracle returns an empty string rather than ``None`` for character-based
-expressions. Django doesn't do any conversions in these cases.
+expressions. Mango doesn't do any conversions in these cases.
 
 ``Ntile``
 ---------

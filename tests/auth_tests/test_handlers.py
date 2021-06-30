@@ -1,8 +1,8 @@
-from django.contrib.auth.handlers.modwsgi import (
+from mango.contrib.auth.handlers.modwsgi import (
     check_password, groups_for_user,
 )
-from django.contrib.auth.models import Group, User
-from django.test import TransactionTestCase, override_settings
+from mango.contrib.auth.models import Group, User
+from mango.test import TransactionTestCase, override_settings
 
 from .models import CustomUser
 
@@ -15,8 +15,8 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
     """
 
     available_apps = [
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
+        'mango.contrib.auth',
+        'mango.contrib.contenttypes',
         'auth_tests',
     ]
 

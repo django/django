@@ -1,5 +1,5 @@
-from django.test import SimpleTestCase
-from django.utils.connection import BaseConnectionHandler
+from mango.test import SimpleTestCase
+from mango.utils.connection import BaseConnectionHandler
 
 
 class BaseConnectionHandlerTests(SimpleTestCase):

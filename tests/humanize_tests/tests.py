@@ -1,13 +1,13 @@
 import datetime
 from decimal import Decimal
 
-from django.contrib.humanize.templatetags import humanize
-from django.template import Context, Template, defaultfilters
-from django.test import SimpleTestCase, modify_settings, override_settings
-from django.utils import translation
-from django.utils.html import escape
-from django.utils.timezone import get_fixed_timezone, utc
-from django.utils.translation import gettext as _
+from mango.contrib.humanize.templatetags import humanize
+from mango.template import Context, Template, defaultfilters
+from mango.test import SimpleTestCase, modify_settings, override_settings
+from mango.utils import translation
+from mango.utils.html import escape
+from mango.utils.timezone import get_fixed_timezone, utc
+from mango.utils.translation import gettext as _
 
 # Mock out datetime in some tests so they don't fail occasionally when they
 # run too slow. Use a fixed datetime for datetime.now(). DST change in
@@ -26,7 +26,7 @@ class MockDateTime(datetime.datetime):
             return now.replace(tzinfo=tz) + tz.utcoffset(now)
 
 
-@modify_settings(INSTALLED_APPS={'append': 'django.contrib.humanize'})
+@modify_settings(INSTALLED_APPS={'append': 'mango.contrib.humanize'})
 class HumanizeTests(SimpleTestCase):
 
     def humanize_tester(self, test_list, result_list, method, normalize_result_func=escape):

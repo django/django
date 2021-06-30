@@ -1,5 +1,5 @@
-from django.core.checks import register
-from django.db import models
+from mango.core.checks import register
+from mango.db import models
 
 
 class SimpleModel(models.Model):

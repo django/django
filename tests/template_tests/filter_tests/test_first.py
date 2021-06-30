@@ -1,6 +1,6 @@
-from django.template.defaultfilters import first
-from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from mango.template.defaultfilters import first
+from mango.test import SimpleTestCase
+from mango.utils.safestring import mark_safe
 
 from ..utils import setup
 

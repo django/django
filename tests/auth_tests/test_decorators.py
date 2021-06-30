@@ -1,10 +1,10 @@
-from django.conf import settings
-from django.contrib.auth import models
-from django.contrib.auth.decorators import login_required, permission_required
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
-from django.test import TestCase, override_settings
-from django.test.client import RequestFactory
+from mango.conf import settings
+from mango.contrib.auth import models
+from mango.contrib.auth.decorators import login_required, permission_required
+from mango.core.exceptions import PermissionDenied
+from mango.http import HttpResponse
+from mango.test import TestCase, override_settings
+from mango.test.client import RequestFactory
 
 from .test_views import AuthViewsTestCase
 

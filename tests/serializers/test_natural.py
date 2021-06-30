@@ -1,6 +1,6 @@
-from django.core import serializers
-from django.db import connection
-from django.test import TestCase
+from mango.core import serializers
+from mango.db import connection
+from mango.test import TestCase
 
 from .models import (
     Child, FKAsPKNoNaturalKey, FKDataNaturalKey, NaturalKeyAnchor,
@@ -42,9 +42,9 @@ def natural_key_serializer_test(self, format):
 def natural_key_test(self, format):
     book1 = {
         'data': '978-1590597255',
-        'title': 'The Definitive Guide to Django: Web Development Done Right',
+        'title': 'The Definitive Guide to Mango: Web Development Done Right',
     }
-    book2 = {'data': '978-1590599969', 'title': 'Practical Django Projects'}
+    book2 = {'data': '978-1590599969', 'title': 'Practical Mango Projects'}
 
     # Create the books.
     adrian = NaturalKeyAnchor.objects.create(**book1)

@@ -1,5 +1,5 @@
-from django.db.models import Q
-from django.test import TestCase
+from mango.db.models import Q
+from mango.test import TestCase
 
 from .models import (
     Comment, Forum, Item, Post, PropertyValue, SystemDetails, SystemInfo,

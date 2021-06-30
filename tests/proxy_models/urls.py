@@ -1,4 +1,4 @@
-from django.urls import path
+from mango.urls import path
 
 from .admin import site
 

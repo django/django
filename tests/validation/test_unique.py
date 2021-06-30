@@ -1,10 +1,10 @@
 import datetime
 import unittest
 
-from django.apps.registry import Apps
-from django.core.exceptions import ValidationError
-from django.db import models
-from django.test import TestCase
+from mango.apps.registry import Apps
+from mango.core.exceptions import ValidationError
+from mango.db import models
+from mango.test import TestCase
 
 from .models import (
     CustomPKModel, FlexibleDatePost, ModelToValidate, Post, UniqueErrorsModel,
@@ -110,23 +110,23 @@ class PerformUniqueChecksTest(TestCase):
 
     def test_unique_for_date(self):
         Post.objects.create(
-            title="Django 1.0 is released", slug="Django 1.0",
+            title="Mango 1.0 is released", slug="Mango 1.0",
             subtitle="Finally", posted=datetime.date(2008, 9, 3),
         )
-        p = Post(title="Django 1.0 is released", posted=datetime.date(2008, 9, 3))
+        p = Post(title="Mango 1.0 is released", posted=datetime.date(2008, 9, 3))
         with self.assertRaises(ValidationError) as cm:
             p.full_clean()
         self.assertEqual(cm.exception.message_dict, {'title': ['Title must be unique for Posted date.']})
 
         # Should work without errors
-        p = Post(title="Work on Django 1.1 begins", posted=datetime.date(2008, 9, 3))
+        p = Post(title="Work on Mango 1.1 begins", posted=datetime.date(2008, 9, 3))
         p.full_clean()
 
         # Should work without errors
-        p = Post(title="Django 1.0 is released", posted=datetime.datetime(2008, 9, 4))
+        p = Post(title="Mango 1.0 is released", posted=datetime.datetime(2008, 9, 4))
         p.full_clean()
 
-        p = Post(slug="Django 1.0", posted=datetime.datetime(2008, 1, 1))
+        p = Post(slug="Mango 1.0", posted=datetime.datetime(2008, 1, 1))
         with self.assertRaises(ValidationError) as cm:
             p.full_clean()
         self.assertEqual(cm.exception.message_dict, {'slug': ['Slug must be unique for Posted year.']})
@@ -136,7 +136,7 @@ class PerformUniqueChecksTest(TestCase):
             p.full_clean()
         self.assertEqual(cm.exception.message_dict, {'subtitle': ['Subtitle must be unique for Posted month.']})
 
-        p = Post(title="Django 1.0 is released")
+        p = Post(title="Mango 1.0 is released")
         with self.assertRaises(ValidationError) as cm:
             p.full_clean()
         self.assertEqual(cm.exception.message_dict, {'posted': ['This field cannot be null.']})
@@ -147,13 +147,13 @@ class PerformUniqueChecksTest(TestCase):
         associated DateField is None.
         """
         FlexibleDatePost.objects.create(
-            title="Django 1.0 is released", slug="Django 1.0",
+            title="Mango 1.0 is released", slug="Mango 1.0",
             subtitle="Finally", posted=datetime.date(2008, 9, 3),
         )
-        p = FlexibleDatePost(title="Django 1.0 is released")
+        p = FlexibleDatePost(title="Mango 1.0 is released")
         p.full_clean()
 
-        p = FlexibleDatePost(slug="Django 1.0")
+        p = FlexibleDatePost(slug="Mango 1.0")
         p.full_clean()
 
         p = FlexibleDatePost(subtitle="Finally")

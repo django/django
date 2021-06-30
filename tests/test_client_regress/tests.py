@@ -4,20 +4,20 @@ Regression tests for the Test Client, especially the customized assertions.
 import itertools
 import os
 
-from django.contrib.auth.models import User
-from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.http import HttpResponse
-from django.template import (
+from mango.contrib.auth.models import User
+from mango.contrib.auth.signals import user_logged_in, user_logged_out
+from mango.http import HttpResponse
+from mango.template import (
     Context, RequestContext, TemplateSyntaxError, engines,
 )
-from django.template.response import SimpleTemplateResponse
-from django.test import (
+from mango.template.response import SimpleTemplateResponse
+from mango.test import (
     Client, SimpleTestCase, TestCase, modify_settings, override_settings,
 )
-from django.test.client import RedirectCycleError, RequestFactory, encode_file
-from django.test.utils import ContextList
-from django.urls import NoReverseMatch, reverse
-from django.utils.translation import gettext_lazy
+from mango.test.client import RedirectCycleError, RequestFactory, encode_file
+from mango.test.utils import ContextList
+from mango.urls import NoReverseMatch, reverse
+from mango.utils.translation import gettext_lazy
 
 from .models import CustomUser
 from .views import CustomTestException
@@ -164,7 +164,7 @@ class AssertContainsTests(SimpleTestCase):
         """
         An unrendered SimpleTemplateResponse may be used in assertContains().
         """
-        template = engines['django'].from_string('Hello')
+        template = engines['mango'].from_string('Hello')
         response = SimpleTemplateResponse(template)
         self.assertContains(response, 'Hello')
 
@@ -180,7 +180,7 @@ class AssertContainsTests(SimpleTestCase):
         """
         An unrendered SimpleTemplateResponse may be used in assertNotContains().
         """
-        template = engines['django'].from_string('Hello')
+        template = engines['mango'].from_string('Hello')
         response = SimpleTemplateResponse(template)
         self.assertNotContains(response, 'Bye')
 
@@ -480,7 +480,7 @@ class AssertRedirectsTests(SimpleTestCase):
                 self.assertRedirects(response, 'http://testserver/secure_view/', status_code=302)
 
     def test_redirect_fetch_redirect_response(self):
-        """Preserve extra headers of requests made with django.test.Client."""
+        """Preserve extra headers of requests made with mango.test.Client."""
         methods = (
             'get', 'post', 'head', 'options', 'put', 'patch', 'delete', 'trace',
         )
@@ -861,7 +861,7 @@ class ExceptionTests(TestDataMixin, TestCase):
 class TemplateExceptionTests(SimpleTestCase):
 
     @override_settings(TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
         'DIRS': [os.path.join(os.path.dirname(__file__), 'bad_templates')],
     }])
     def test_bad_404_template(self):
@@ -948,7 +948,7 @@ class ContextTests(TestDataMixin, TestCase):
         # the request instance. This triggers a bug caused by some ways of
         # copying RequestContext.
         with self.settings(TEMPLATES=[{
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'BACKEND': 'mango.template.backends.mango.MangoTemplates',
             'APP_DIRS': True,
             'OPTIONS': {
                 'context_processors': [
@@ -1044,7 +1044,7 @@ class SessionTests(TestDataMixin, TestCase):
         self.assertTrue(listener.executed)
 
     @override_settings(AUTHENTICATION_BACKENDS=(
-        'django.contrib.auth.backends.ModelBackend',
+        'mango.contrib.auth.backends.ModelBackend',
         'test_client_regress.auth_backends.CustomUserBackend'))
     def test_logout_with_custom_auth_backend(self):
         "Request a logout after logging in with custom authentication backend"

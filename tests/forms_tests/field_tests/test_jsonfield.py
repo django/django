@@ -1,11 +1,11 @@
 import json
 import uuid
 
-from django.core.serializers.json import DjangoJSONEncoder
-from django.forms import (
+from mango.core.serializers.json import MangoJSONEncoder
+from mango.forms import (
     CharField, Form, JSONField, Textarea, TextInput, ValidationError,
 )
-from django.test import SimpleTestCase
+from mango.test import SimpleTestCase
 
 
 class JSONFieldTest(SimpleTestCase):
@@ -86,7 +86,7 @@ class JSONFieldTest(SimpleTestCase):
 
         value = {'uuid': uuid.UUID('{c141e152-6550-4172-a784-05448d98204b}')}
         encoded_value = '{"uuid": "c141e152-6550-4172-a784-05448d98204b"}'
-        field = JSONField(encoder=DjangoJSONEncoder, decoder=CustomDecoder)
+        field = JSONField(encoder=MangoJSONEncoder, decoder=CustomDecoder)
         self.assertEqual(field.prepare_value(value), encoded_value)
         self.assertEqual(field.clean(encoded_value), value)
 

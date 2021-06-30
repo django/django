@@ -3,12 +3,12 @@ import datetime
 import os
 from unittest import mock
 
-from django.db import DEFAULT_DB_ALIAS, connection, connections
-from django.db.backends.base.creation import (
+from mango.db import DEFAULT_DB_ALIAS, connection, connections
+from mango.db.backends.base.creation import (
     TEST_DATABASE_PREFIX, BaseDatabaseCreation,
 )
-from django.test import SimpleTestCase, TransactionTestCase
-from django.test.utils import override_settings
+from mango.test import SimpleTestCase, TransactionTestCase
+from mango.test.utils import override_settings
 
 from ..models import (
     CircularA, CircularB, Object, ObjectReference, ObjectSelfReference,
@@ -17,7 +17,7 @@ from ..models import (
 
 
 def get_connection_copy():
-    # Get a copy of the default connection. (Can't use django.db.connection
+    # Get a copy of the default connection. (Can't use mango.db.connection
     # because it'll modify the default connection itself.)
     test_connection = copy.copy(connections[DEFAULT_DB_ALIAS])
     test_connection.settings_dict = copy.deepcopy(
@@ -56,9 +56,9 @@ class TestDbSignatureTests(SimpleTestCase):
 @override_settings(INSTALLED_APPS=['backends.base.app_unmigrated'])
 @mock.patch.object(connection, 'ensure_connection')
 @mock.patch.object(connection, 'prepare_database')
-@mock.patch('django.db.migrations.recorder.MigrationRecorder.has_table', return_value=False)
-@mock.patch('django.db.migrations.executor.MigrationExecutor.migrate')
-@mock.patch('django.core.management.commands.migrate.Command.sync_apps')
+@mock.patch('mango.db.migrations.recorder.MigrationRecorder.has_table', return_value=False)
+@mock.patch('mango.db.migrations.executor.MigrationExecutor.migrate')
+@mock.patch('mango.core.management.commands.migrate.Command.sync_apps')
 class TestDbCreationTests(SimpleTestCase):
     available_apps = ['backends.base.app_unmigrated']
 
@@ -163,7 +163,7 @@ class TestDeserializeDbFromString(TransactionTestCase):
         obj_1.obj = obj_2
         obj_1.save()
         # Serialize objects.
-        with mock.patch('django.db.migrations.loader.MigrationLoader') as loader:
+        with mock.patch('mango.db.migrations.loader.MigrationLoader') as loader:
             # serialize_db_to_string() serializes only migrated apps, so mark
             # the backends app as migrated.
             loader_instance = loader.return_value
@@ -185,7 +185,7 @@ class TestDeserializeDbFromString(TransactionTestCase):
         obj_a.obj = obj_b
         obj_a.save()
         # Serialize objects.
-        with mock.patch('django.db.migrations.loader.MigrationLoader') as loader:
+        with mock.patch('mango.db.migrations.loader.MigrationLoader') as loader:
             # serialize_db_to_string() serializes only migrated apps, so mark
             # the backends app as migrated.
             loader_instance = loader.return_value
@@ -202,7 +202,7 @@ class TestDeserializeDbFromString(TransactionTestCase):
 
     def test_serialize_db_to_string_base_manager(self):
         SchoolClass.objects.create(year=1000, last_updated=datetime.datetime.now())
-        with mock.patch('django.db.migrations.loader.MigrationLoader') as loader:
+        with mock.patch('mango.db.migrations.loader.MigrationLoader') as loader:
             # serialize_db_to_string() serializes only migrated apps, so mark
             # the backends app as migrated.
             loader_instance = loader.return_value
@@ -229,10 +229,10 @@ class TestMarkTests(SimpleTestCase):
     def test_mark_expected_failures_and_skips(self):
         test_connection = get_connection_copy()
         creation = BaseDatabaseCreation(test_connection)
-        creation.connection.features.django_test_expected_failures = {
+        creation.connection.features.mango_test_expected_failures = {
             'backends.base.test_creation.expected_failure_test_function',
         }
-        creation.connection.features.django_test_skips = {
+        creation.connection.features.mango_test_skips = {
             'skip test class': {
                 'backends.base.test_creation.SkipTestClass',
             },

@@ -2,11 +2,11 @@ import time
 from datetime import datetime, timedelta
 from http import cookies
 
-from django.http import HttpResponse
-from django.test import SimpleTestCase
-from django.test.utils import freeze_time
-from django.utils.http import http_date
-from django.utils.timezone import utc
+from mango.http import HttpResponse
+from mango.test import SimpleTestCase
+from mango.test.utils import freeze_time
+from mango.utils.http import http_date
+from mango.utils.timezone import utc
 
 
 class SetCookieTests(SimpleTestCase):

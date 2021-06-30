@@ -2,17 +2,17 @@ import datetime
 import re
 from decimal import Decimal
 
-from django.core.exceptions import FieldError
-from django.db import connection
-from django.db.models import (
+from mango.core.exceptions import FieldError
+from mango.db import connection
+from mango.db.models import (
     Avg, Case, Count, DecimalField, DurationField, Exists, F, FloatField,
     IntegerField, Max, Min, OuterRef, Subquery, Sum, Value, When,
 )
-from django.db.models.functions import Coalesce, Greatest
-from django.test import TestCase
-from django.test.testcases import skipUnlessDBFeature
-from django.test.utils import Approximate, CaptureQueriesContext
-from django.utils import timezone
+from mango.db.models.functions import Coalesce, Greatest
+from mango.test import TestCase
+from mango.test.testcases import skipUnlessDBFeature
+from mango.test.utils import Approximate, CaptureQueriesContext
+from mango.utils import timezone
 
 from .models import Author, Book, Publisher, Store
 
@@ -46,22 +46,22 @@ class AggregateTestCase(TestCase):
         cls.p5 = Publisher.objects.create(name="Jonno's House of Books", num_awards=0)
 
         cls.b1 = Book.objects.create(
-            isbn='159059725', name='The Definitive Guide to Django: Web Development Done Right',
+            isbn='159059725', name='The Definitive Guide to Mango: Web Development Done Right',
             pages=447, rating=4.5, price=Decimal('30.00'), contact=cls.a1, publisher=cls.p1,
             pubdate=datetime.date(2007, 12, 6)
         )
         cls.b2 = Book.objects.create(
-            isbn='067232959', name='Sams Teach Yourself Django in 24 Hours',
+            isbn='067232959', name='Sams Teach Yourself Mango in 24 Hours',
             pages=528, rating=3.0, price=Decimal('23.09'), contact=cls.a3, publisher=cls.p2,
             pubdate=datetime.date(2008, 3, 3)
         )
         cls.b3 = Book.objects.create(
-            isbn='159059996', name='Practical Django Projects',
+            isbn='159059996', name='Practical Mango Projects',
             pages=300, rating=4.0, price=Decimal('29.69'), contact=cls.a4, publisher=cls.p1,
             pubdate=datetime.date(2008, 6, 23)
         )
         cls.b4 = Book.objects.create(
-            isbn='013235613', name='Python Web Development with Django',
+            isbn='013235613', name='Python Web Development with Mango',
             pages=350, rating=4.0, price=Decimal('29.69'), contact=cls.a5, publisher=cls.p3,
             pubdate=datetime.date(2008, 11, 3)
         )
@@ -162,10 +162,10 @@ class AggregateTestCase(TestCase):
     def test_annotate_basic(self):
         self.assertQuerysetEqual(
             Book.objects.annotate().order_by('pk'), [
-                "The Definitive Guide to Django: Web Development Done Right",
-                "Sams Teach Yourself Django in 24 Hours",
-                "Practical Django Projects",
-                "Python Web Development with Django",
+                "The Definitive Guide to Mango: Web Development Done Right",
+                "Sams Teach Yourself Mango in 24 Hours",
+                "Practical Mango Projects",
+                "Python Web Development with Mango",
                 "Artificial Intelligence: A Modern Approach",
                 "Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp"
             ],
@@ -176,7 +176,7 @@ class AggregateTestCase(TestCase):
         b = books.get(pk=self.b1.pk)
         self.assertEqual(
             b.name,
-            'The Definitive Guide to Django: Web Development Done Right'
+            'The Definitive Guide to Mango: Web Development Done Right'
         )
         self.assertEqual(b.mean_age, 34.5)
 
@@ -185,7 +185,7 @@ class AggregateTestCase(TestCase):
             page_sum=Sum("pages")).defer('name').filter(pk=self.b1.pk)
 
         rows = [
-            (self.b1.id, "159059725", 447, "The Definitive Guide to Django: Web Development Done Right")
+            (self.b1.id, "159059725", 447, "The Definitive Guide to Mango: Web Development Done Right")
         ]
         self.assertQuerysetEqual(
             qs.order_by('pk'), rows,
@@ -198,7 +198,7 @@ class AggregateTestCase(TestCase):
 
         rows = [
             (self.b1.id, "159059725", 447, "Adrian Holovaty",
-             "The Definitive Guide to Django: Web Development Done Right")
+             "The Definitive Guide to Mango: Web Development Done Right")
         ]
         self.assertQuerysetEqual(
             qs.order_by('pk'), rows,
@@ -210,9 +210,9 @@ class AggregateTestCase(TestCase):
         self.assertQuerysetEqual(
             books, [
                 ('Artificial Intelligence: A Modern Approach', 51.5),
-                ('Practical Django Projects', 29.0),
-                ('Python Web Development with Django', Approximate(30.3, places=1)),
-                ('Sams Teach Yourself Django in 24 Hours', 45.0)
+                ('Practical Mango Projects', 29.0),
+                ('Python Web Development with Mango', Approximate(30.3, places=1)),
+                ('Sams Teach Yourself Mango in 24 Hours', 45.0)
             ],
             lambda b: (b.name, b.authors__age__avg),
         )
@@ -222,10 +222,10 @@ class AggregateTestCase(TestCase):
             books, [
                 ('Artificial Intelligence: A Modern Approach', 2),
                 ('Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp', 1),
-                ('Practical Django Projects', 1),
-                ('Python Web Development with Django', 3),
-                ('Sams Teach Yourself Django in 24 Hours', 1),
-                ('The Definitive Guide to Django: Web Development Done Right', 2)
+                ('Practical Mango Projects', 1),
+                ('Python Web Development with Mango', 3),
+                ('Sams Teach Yourself Mango in 24 Hours', 1),
+                ('The Definitive Guide to Mango: Web Development Done Right', 2)
             ],
             lambda b: (b.name, b.num_authors)
         )
@@ -266,10 +266,10 @@ class AggregateTestCase(TestCase):
             books, [
                 ('Artificial Intelligence: A Modern Approach', 7),
                 ('Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp', 9),
-                ('Practical Django Projects', 3),
-                ('Python Web Development with Django', 7),
-                ('Sams Teach Yourself Django in 24 Hours', 1),
-                ('The Definitive Guide to Django: Web Development Done Right', 3)
+                ('Practical Mango Projects', 3),
+                ('Python Web Development with Mango', 7),
+                ('Sams Teach Yourself Mango in 24 Hours', 1),
+                ('The Definitive Guide to Mango: Web Development Done Right', 3)
             ],
             lambda b: (b.name, b.publisher__num_awards__sum)
         )
@@ -295,7 +295,7 @@ class AggregateTestCase(TestCase):
                     "id": self.b1.id,
                     "isbn": "159059725",
                     "mean_age": 34.5,
-                    "name": "The Definitive Guide to Django: Web Development Done Right",
+                    "name": "The Definitive Guide to Mango: Web Development Done Right",
                     "pages": 447,
                     "price": Approximate(Decimal("30")),
                     "pubdate": datetime.date(2007, 12, 6),
@@ -324,7 +324,7 @@ class AggregateTestCase(TestCase):
         books = Book.objects.filter(pk=self.b1.pk).annotate(mean_age=Avg("authors__age")).values("name")
         self.assertEqual(
             list(books),
-            [{'name': 'The Definitive Guide to Django: Web Development Done Right'}],
+            [{'name': 'The Definitive Guide to Mango: Web Development Done Right'}],
         )
 
         books = Book.objects.filter(pk=self.b1.pk).values().annotate(mean_age=Avg('authors__age'))
@@ -335,7 +335,7 @@ class AggregateTestCase(TestCase):
                     "id": self.b1.id,
                     "isbn": "159059725",
                     "mean_age": 34.5,
-                    "name": "The Definitive Guide to Django: Web Development Done Right",
+                    "name": "The Definitive Guide to Mango: Web Development Done Right",
                     "pages": 447,
                     "price": Approximate(Decimal("30")),
                     "pubdate": datetime.date(2007, 12, 6),
@@ -616,7 +616,7 @@ class AggregateTestCase(TestCase):
         books = Book.objects.annotate(num_authors=Count("authors__name")).filter(num_authors__exact=2).order_by("pk")
         self.assertQuerysetEqual(
             books, [
-                "The Definitive Guide to Django: Web Development Done Right",
+                "The Definitive Guide to Mango: Web Development Done Right",
                 "Artificial Intelligence: A Modern Approach",
             ],
             lambda b: b.name
@@ -1189,9 +1189,9 @@ class AggregateTestCase(TestCase):
             min_age=Min('contact__friends__age'),
         ).values('name', 'min_age').order_by('name')
         self.assertEqual(list(books_qs), [
-            {'name': 'Practical Django Projects', 'min_age': 34},
+            {'name': 'Practical Mango Projects', 'min_age': 34},
             {
-                'name': 'The Definitive Guide to Django: Web Development Done Right',
+                'name': 'The Definitive Guide to Mango: Web Development Done Right',
                 'min_age': 29,
             },
         ])

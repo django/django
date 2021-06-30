@@ -1,8 +1,8 @@
 import re
 
-from django.db import connection
-from django.test import TestCase, skipUnlessDBFeature
-from django.utils.functional import cached_property
+from mango.db import connection
+from mango.test import TestCase, skipUnlessDBFeature
+from mango.utils.functional import cached_property
 
 test_srs = ({
     'srid': 4326,
@@ -123,7 +123,7 @@ class SpatialRefSysTest(TestCase):
         Test adding a new entry in the SpatialRefSys model using the
         add_srs_entry utility.
         """
-        from django.contrib.gis.utils import add_srs_entry
+        from mango.contrib.gis.utils import add_srs_entry
 
         add_srs_entry(3857)
         self.assertTrue(

@@ -1,6 +1,6 @@
-from django.core.exceptions import ValidationError
-from django.db import models
-from django.test import TestCase
+from mango.core.exceptions import ValidationError
+from mango.db import models
+from mango.test import TestCase
 
 from .models import DataModel
 

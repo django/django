@@ -4,12 +4,12 @@ import unittest
 from copy import copy
 from unittest import mock
 
-from django.core.exceptions import FieldError
-from django.core.management.color import no_style
-from django.db import (
+from mango.core.exceptions import FieldError
+from mango.core.management.color import no_style
+from mango.db import (
     DatabaseError, DataError, IntegrityError, OperationalError, connection,
 )
-from django.db.models import (
+from mango.db.models import (
     CASCADE, PROTECT, AutoField, BigAutoField, BigIntegerField, BinaryField,
     BooleanField, CharField, CheckConstraint, DateField, DateTimeField,
     DecimalField, F, FloatField, ForeignKey, ForeignObject, Index,
@@ -17,17 +17,17 @@ from django.db.models import (
     PositiveIntegerField, Q, SlugField, SmallAutoField, SmallIntegerField,
     TextField, TimeField, UniqueConstraint, UUIDField, Value,
 )
-from django.db.models.fields.json import KeyTextTransform
-from django.db.models.functions import Abs, Cast, Collate, Lower, Random, Upper
-from django.db.models.indexes import IndexExpression
-from django.db.transaction import TransactionManagementError, atomic
-from django.test import (
+from mango.db.models.fields.json import KeyTextTransform
+from mango.db.models.functions import Abs, Cast, Collate, Lower, Random, Upper
+from mango.db.models.indexes import IndexExpression
+from mango.db.transaction import TransactionManagementError, atomic
+from mango.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
-from django.test.utils import (
+from mango.test.utils import (
     CaptureQueriesContext, isolate_apps, register_lookup,
 )
-from django.utils import timezone
+from mango.utils import timezone
 
 from .fields import (
     CustomManyToManyField, InheritedManyToManyField, MediumBlobField,
@@ -946,7 +946,7 @@ class SchemaTests(TransactionTestCase):
 
     @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific')
     def test_alter_field_with_custom_db_type(self):
-        from django.contrib.postgres.fields import ArrayField
+        from mango.contrib.postgres.fields import ArrayField
 
         class Foo(Model):
             field = ArrayField(CharField(max_length=255))
@@ -967,7 +967,7 @@ class SchemaTests(TransactionTestCase):
     @isolate_apps('schema')
     @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific')
     def test_alter_array_field_decrease_base_field_length(self):
-        from django.contrib.postgres.fields import ArrayField
+        from mango.contrib.postgres.fields import ArrayField
 
         class ArrayModel(Model):
             field = ArrayField(CharField(max_length=16))
@@ -991,7 +991,7 @@ class SchemaTests(TransactionTestCase):
     @isolate_apps('schema')
     @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific')
     def test_alter_array_field_decrease_nested_base_field_length(self):
-        from django.contrib.postgres.fields import ArrayField
+        from mango.contrib.postgres.fields import ArrayField
 
         class ArrayModel(Model):
             field = ArrayField(ArrayField(CharField(max_length=16)))
@@ -1119,9 +1119,9 @@ class SchemaTests(TransactionTestCase):
         self.assertEqual(columns['author_id'][0], connection.features.introspected_field_types['IntegerField'])
         # Ensure the field is unique
         author = Author.objects.create(name="Joe")
-        BookWithO2O.objects.create(author=author, title="Django 1", pub_date=datetime.datetime.now())
+        BookWithO2O.objects.create(author=author, title="Mango 1", pub_date=datetime.datetime.now())
         with self.assertRaises(IntegrityError):
-            BookWithO2O.objects.create(author=author, title="Django 2", pub_date=datetime.datetime.now())
+            BookWithO2O.objects.create(author=author, title="Mango 2", pub_date=datetime.datetime.now())
         BookWithO2O.objects.all().delete()
         self.assertForeignKeyExists(BookWithO2O, 'author_id', 'schema_author')
         # Alter the OneToOneField to ForeignKey
@@ -1134,8 +1134,8 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Book)
         self.assertEqual(columns['author_id'][0], connection.features.introspected_field_types['IntegerField'])
         # Ensure the field is not unique anymore
-        Book.objects.create(author=author, title="Django 1", pub_date=datetime.datetime.now())
-        Book.objects.create(author=author, title="Django 2", pub_date=datetime.datetime.now())
+        Book.objects.create(author=author, title="Mango 1", pub_date=datetime.datetime.now())
+        Book.objects.create(author=author, title="Mango 2", pub_date=datetime.datetime.now())
         self.assertForeignKeyExists(Book, 'author_id', 'schema_author')
 
     @skipUnlessDBFeature('supports_foreign_keys')
@@ -1152,8 +1152,8 @@ class SchemaTests(TransactionTestCase):
         self.assertEqual(columns['author_id'][0], connection.features.introspected_field_types['IntegerField'])
         # Ensure the field is not unique
         author = Author.objects.create(name="Joe")
-        Book.objects.create(author=author, title="Django 1", pub_date=datetime.datetime.now())
-        Book.objects.create(author=author, title="Django 2", pub_date=datetime.datetime.now())
+        Book.objects.create(author=author, title="Mango 1", pub_date=datetime.datetime.now())
+        Book.objects.create(author=author, title="Mango 2", pub_date=datetime.datetime.now())
         Book.objects.all().delete()
         self.assertForeignKeyExists(Book, 'author_id', 'schema_author')
         # Alter the ForeignKey to OneToOneField
@@ -1166,9 +1166,9 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(BookWithO2O)
         self.assertEqual(columns['author_id'][0], connection.features.introspected_field_types['IntegerField'])
         # Ensure the field is unique now
-        BookWithO2O.objects.create(author=author, title="Django 1", pub_date=datetime.datetime.now())
+        BookWithO2O.objects.create(author=author, title="Mango 1", pub_date=datetime.datetime.now())
         with self.assertRaises(IntegrityError):
-            BookWithO2O.objects.create(author=author, title="Django 2", pub_date=datetime.datetime.now())
+            BookWithO2O.objects.create(author=author, title="Mango 2", pub_date=datetime.datetime.now())
         self.assertForeignKeyExists(BookWithO2O, 'author_id', 'schema_author')
 
     def test_alter_field_fk_to_o2o(self):
@@ -1993,7 +1993,7 @@ class SchemaTests(TransactionTestCase):
         new_field = CharField(max_length=255, unique=True)
         new_field.model = Author
         new_field.set_attributes_from_name('name')
-        with self.assertLogs('django.db.backends.schema', 'DEBUG') as cm:
+        with self.assertLogs('mango.db.backends.schema', 'DEBUG') as cm:
             with connection.schema_editor() as editor:
                 editor.alter_field(Author, Author._meta.get_field('name'), new_field)
         # One SQL statement is executed to alter the field.
@@ -2025,7 +2025,7 @@ class SchemaTests(TransactionTestCase):
         new_field = SlugField(max_length=75, unique=True)
         new_field.model = Tag
         new_field.set_attributes_from_name('slug')
-        with self.assertLogs('django.db.backends.schema', 'DEBUG') as cm:
+        with self.assertLogs('mango.db.backends.schema', 'DEBUG') as cm:
             with connection.schema_editor() as editor:
                 editor.alter_field(Tag, Tag._meta.get_field('slug'), new_field)
         # One SQL statement is executed to alter the field.
@@ -3727,8 +3727,8 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Node, old_field, new_field, strict=True)
         self.assertForeignKeyExists(Node, 'parent_id', Node._meta.db_table)
 
-    @mock.patch('django.db.backends.base.schema.datetime')
-    @mock.patch('django.db.backends.base.schema.timezone')
+    @mock.patch('mango.db.backends.base.schema.datetime')
+    @mock.patch('mango.db.backends.base.schema.timezone')
     def test_add_datefield_and_datetimefield_use_effective_default(self, mocked_datetime, mocked_tz):
         """
         effective_default() should be used for DateField, DateTimeField, and
@@ -3837,11 +3837,11 @@ class SchemaTests(TransactionTestCase):
     @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific db_table syntax.')
     def test_namespaced_db_table_foreign_key_reference(self):
         with connection.cursor() as cursor:
-            cursor.execute('CREATE SCHEMA django_schema_tests')
+            cursor.execute('CREATE SCHEMA mango_schema_tests')
 
         def delete_schema():
             with connection.cursor() as cursor:
-                cursor.execute('DROP SCHEMA django_schema_tests CASCADE')
+                cursor.execute('DROP SCHEMA mango_schema_tests CASCADE')
 
         self.addCleanup(delete_schema)
 
@@ -3852,7 +3852,7 @@ class SchemaTests(TransactionTestCase):
         class Book(Model):
             class Meta:
                 app_label = 'schema'
-                db_table = '"django_schema_tests"."schema_book"'
+                db_table = '"mango_schema_tests"."schema_book"'
 
         author = ForeignKey(Author, CASCADE)
         author.set_attributes_from_name('author')

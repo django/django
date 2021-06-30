@@ -1,4 +1,4 @@
-from django.forms import PasswordInput
+from mango.forms import PasswordInput
 
 from .base import WidgetTest
 

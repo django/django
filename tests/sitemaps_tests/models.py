@@ -1,5 +1,5 @@
-from django.db import models
-from django.urls import reverse
+from mango.db import models
+from mango.urls import reverse
 
 
 class TestModel(models.Model):

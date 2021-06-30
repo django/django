@@ -2,12 +2,12 @@ import copy
 import datetime
 from operator import attrgetter
 
-from django.core.exceptions import ValidationError
-from django.db import models, router
-from django.db.models.sql import InsertQuery
-from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import isolate_apps
-from django.utils.timezone import get_fixed_timezone
+from mango.core.exceptions import ValidationError
+from mango.db import models, router
+from mango.db.models.sql import InsertQuery
+from mango.test import TestCase, skipUnlessDBFeature
+from mango.test.utils import isolate_apps
+from mango.utils.timezone import get_fixed_timezone
 
 from .models import (
     Article, Department, Event, Model1, Model2, Model3, NonAutoPK, Party,

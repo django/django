@@ -1,6 +1,6 @@
-from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
-from django.core.handlers.asgi import ASGIHandler
-from django.test import AsyncRequestFactory
+from mango.contrib.staticfiles.handlers import ASGIStaticFilesHandler
+from mango.core.handlers.asgi import ASGIHandler
+from mango.test import AsyncRequestFactory
 
 from .cases import StaticFilesTestCase
 

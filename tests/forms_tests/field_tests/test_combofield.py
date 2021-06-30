@@ -1,6 +1,6 @@
-from django.core.exceptions import ValidationError
-from django.forms import CharField, ComboField, EmailField
-from django.test import SimpleTestCase
+from mango.core.exceptions import ValidationError
+from mango.forms import CharField, ComboField, EmailField
+from mango.test import SimpleTestCase
 
 
 class ComboFieldTest(SimpleTestCase):

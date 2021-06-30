@@ -1,17 +1,17 @@
 import tempfile
 from io import StringIO
 
-from django.contrib.gis import gdal
-from django.contrib.gis.db.models import Extent, MakeLine, Union, functions
-from django.contrib.gis.geos import (
+from mango.contrib.gis import gdal
+from mango.contrib.gis.db.models import Extent, MakeLine, Union, functions
+from mango.contrib.gis.geos import (
     GeometryCollection, GEOSGeometry, LinearRing, LineString, MultiLineString,
     MultiPoint, MultiPolygon, Point, Polygon, fromstr,
 )
-from django.core.management import call_command
-from django.db import DatabaseError, NotSupportedError, connection
-from django.db.models import F, OuterRef, Subquery
-from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext
+from mango.core.management import call_command
+from mango.db import DatabaseError, NotSupportedError, connection
+from mango.db.models import F, OuterRef, Subquery
+from mango.test import TestCase, skipUnlessDBFeature
+from mango.test.utils import CaptureQueriesContext
 
 from ..utils import skipUnlessGISLookup
 from .models import (
@@ -427,7 +427,7 @@ class GeoLookupTest(TestCase):
 
     def test_wkt_string_in_lookup(self):
         # Valid WKT strings don't emit error logs.
-        with self.assertNoLogs('django.contrib.gis', 'ERROR'):
+        with self.assertNoLogs('mango.contrib.gis', 'ERROR'):
             State.objects.filter(poly__intersects='LINESTRING(0 0, 1 1, 5 5)')
 
     @skipUnlessDBFeature("supports_relate_lookup")

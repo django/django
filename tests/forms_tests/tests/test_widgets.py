@@ -1,6 +1,6 @@
-from django.contrib.admin.tests import AdminSeleniumTestCase
-from django.test import override_settings
-from django.urls import reverse
+from mango.contrib.admin.tests import AdminSeleniumTestCase
+from mango.test import override_settings
+from mango.urls import reverse
 
 from ..models import Article
 

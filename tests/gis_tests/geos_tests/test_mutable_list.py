@@ -6,7 +6,7 @@
 
 import unittest
 
-from django.contrib.gis.geos.mutable_list import ListMixin
+from mango.contrib.gis.geos.mutable_list import ListMixin
 
 
 class UserListA(ListMixin):

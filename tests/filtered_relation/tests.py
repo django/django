@@ -2,12 +2,12 @@ from datetime import date
 from decimal import Decimal
 from unittest import mock
 
-from django.db import connection, transaction
-from django.db.models import (
+from mango.db import connection, transaction
+from mango.db.models import (
     Case, Count, DecimalField, F, FilteredRelation, Q, Sum, When,
 )
-from django.test import TestCase
-from django.test.testcases import skipUnlessDBFeature
+from mango.test import TestCase
+from mango.test.testcases import skipUnlessDBFeature
 
 from .models import (
     Author, Book, BookDailySales, Borrower, Currency, Editor, ExchangeRate,

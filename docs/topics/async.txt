@@ -4,15 +4,15 @@ Asynchronous support
 
 .. currentmodule:: asgiref.sync
 
-Django has support for writing asynchronous ("async") views, along with an
+Mango has support for writing asynchronous ("async") views, along with an
 entirely async-enabled request stack if you are running under
 :doc:`ASGI </howto/deployment/asgi/index>`. Async views will still work under
 WSGI, but with performance penalties, and without the ability to have efficient
 long-running requests.
 
-We're still working on async support for the ORM and other parts of Django.
+We're still working on async support for the ORM and other parts of Mango.
 You can expect to see this in future releases. For now, you can use the
-:func:`sync_to_async` adapter to interact with the sync parts of Django.
+:func:`sync_to_async` adapter to interact with the sync parts of Mango.
 There is also a whole range of async-native Python libraries that you can
 integrate with.
 
@@ -27,7 +27,7 @@ class-based view, this means making its ``__call__()`` method an ``async def``
 
 .. note::
 
-    Django uses ``asyncio.iscoroutinefunction`` to test if your view is
+    Mango uses ``asyncio.iscoroutinefunction`` to test if your view is
     asynchronous or not. If you implement your own method of returning a
     coroutine, ensure you set the ``_is_coroutine`` attribute of the view
     to ``asyncio.coroutines._is_coroutine`` so this function returns ``True``.
@@ -40,27 +40,27 @@ The main benefits are the ability to service hundreds of connections without
 using Python threads. This allows you to use slow streaming, long-polling, and
 other exciting response types.
 
-If you want to use these, you will need to deploy Django using
+If you want to use these, you will need to deploy Mango using
 :doc:`ASGI </howto/deployment/asgi/index>` instead.
 
 .. warning::
 
     You will only get the benefits of a fully-asynchronous request stack if you
     have *no synchronous middleware* loaded into your site. If there is a piece
-    of synchronous middleware, then Django must use a thread per request to
+    of synchronous middleware, then Mango must use a thread per request to
     safely emulate a synchronous environment for it.
 
     Middleware can be built to support :ref:`both sync and async
-    <async-middleware>` contexts. Some of Django's middleware is built like
-    this, but not all. To see what middleware Django has to adapt, you can turn
-    on debug logging for the ``django.request`` logger and look for log
+    <async-middleware>` contexts. Some of Mango's middleware is built like
+    this, but not all. To see what middleware Mango has to adapt, you can turn
+    on debug logging for the ``mango.request`` logger and look for log
     messages about *"Synchronous middleware ... adapted"*.
 
 In both ASGI and WSGI mode, you can still safely use asynchronous support to
 run code concurrently rather than serially. This is especially handy when
 dealing with external APIs or data stores.
 
-If you want to call a part of Django that is still synchronous, like the ORM,
+If you want to call a part of Mango that is still synchronous, like the ORM,
 you will need to wrap it in a :func:`sync_to_async` call. For example::
 
     from asgiref.sync import sync_to_async
@@ -77,8 +77,8 @@ entire function using :func:`sync_to_async`. For example::
 
     get_blog = sync_to_async(_get_blog, thread_sensitive=True)
 
-If you accidentally try to call a part of Django that is still synchronous-only
-from an async view, you will trigger Django's
+If you accidentally try to call a part of Mango that is still synchronous-only
+from an async view, you will trigger Mango's
 :ref:`asynchronous safety protection <async-safety>` to protect your data from
 corruption.
 
@@ -86,18 +86,18 @@ Performance
 -----------
 
 When running in a mode that does not match the view (e.g. an async view under
-WSGI, or a traditional sync view under ASGI), Django must emulate the other
+WSGI, or a traditional sync view under ASGI), Mango must emulate the other
 call style to allow your code to run. This context-switch causes a small
 performance penalty of around a millisecond.
 
-This is also true of middleware. Django will attempt to minimize the number of
+This is also true of middleware. Mango will attempt to minimize the number of
 context-switches between sync and async. If you have an ASGI server, but all
 your middleware and views are synchronous, it will switch just once, before it
 enters the middleware stack.
 
 However, if you put synchronous middleware between an ASGI server and an
 asynchronous view, it will have to switch into sync mode for the middleware and
-then back to async mode for the view. Django will also hold the sync thread
+then back to async mode for the view. Mango will also hold the sync thread
 open for middleware exception propagation. This may not be noticeable at first,
 but adding this penalty of one thread per request can remove any async
 performance advantage.
@@ -115,15 +115,15 @@ Async safety
 
 .. envvar:: DJANGO_ALLOW_ASYNC_UNSAFE
 
-Certain key parts of Django are not able to operate safely in an async
+Certain key parts of Mango are not able to operate safely in an async
 environment, as they have global state that is not coroutine-aware. These parts
-of Django are classified as "async-unsafe", and are protected from execution in
+of Mango are classified as "async-unsafe", and are protected from execution in
 an async environment. The ORM is the main example, but there are other parts
 that are also protected in this way.
 
 If you try to run any of these parts from a thread where there is a *running
 event loop*, you will get a
-:exc:`~django.core.exceptions.SynchronousOnlyOperation` error. Note that you
+:exc:`~mango.core.exceptions.SynchronousOnlyOperation` error. Note that you
 don't have to be inside an async function directly to have this error occur. If
 you have called a sync function directly from an async function,
 without using :func:`sync_to_async` or similar, then it can also occur. This is
@@ -146,7 +146,7 @@ context, then you can disable the warning by setting the
 .. warning::
 
     If you enable this option and there is concurrent access to the
-    async-unsafe parts of Django, you may suffer data loss or corruption. Be
+    async-unsafe parts of Mango, you may suffer data loss or corruption. Be
     very careful and do not use this in production environments.
 
 If you need to do this from within Python, do that with ``os.environ``::
@@ -166,9 +166,9 @@ context, or vice-versa. For this there are two adapter functions, from the
 are used to transition between the calling styles while preserving
 compatibility.
 
-These adapter functions are widely used in Django. The `asgiref`_ package
-itself is part of the Django project, and it is automatically installed as a
-dependency when you install Django with ``pip``.
+These adapter functions are widely used in Mango. The `asgiref`_ package
+itself is part of the Mango project, and it is automatically installed as a
+dependency when you install Mango with ``pip``.
 
 .. _asgiref: https://pypi.org/project/asgiref/
 
@@ -240,7 +240,7 @@ thread, so :func:`sync_to_async` has two threading modes:
 
     ``asgiref`` version 3.3.0 changed the default value of the
     ``thread_sensitive`` parameter to ``True``. This is a safer default, and in
-    many cases interacting with Django the correct value, but be sure to
+    many cases interacting with Mango the correct value, but be sure to
     evaluate uses of ``sync_to_async()`` if updating ``asgiref`` from a prior
     version.
 
@@ -251,13 +251,13 @@ main thread. If you use ``asyncio.run()`` or similar, it will fall back to
 running thread-sensitive functions in a single, shared thread, but this will
 not be the main thread.
 
-The reason this is needed in Django is that many libraries, specifically
+The reason this is needed in Mango is that many libraries, specifically
 database adapters, require that they are accessed in the same thread that they
-were created in. Also a lot of existing Django code assumes it all runs in the
+were created in. Also a lot of existing Mango code assumes it all runs in the
 same thread, e.g. middleware adding things to a request for later use in views.
 
 Rather than introduce potential compatibility issues with this code, we instead
-opted to add this mode so that all existing Django sync code runs in the same
+opted to add this mode so that all existing Mango sync code runs in the same
 thread and thus is fully compatible with async mode. Note that sync code will
 always be in a *different* thread to any async code that is calling it, so you
 should avoid passing raw database handles or other thread-sensitive references

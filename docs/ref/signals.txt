@@ -2,8 +2,8 @@
 Signals
 =======
 
-A list of all the signals that Django sends. All built-in signals are sent
-using the :meth:`~django.dispatch.Signal.send` method.
+A list of all the signals that Mango sends. All built-in signals are sent
+using the :meth:`~mango.dispatch.Signal.send` method.
 
 .. seealso::
 
@@ -16,24 +16,24 @@ using the :meth:`~django.dispatch.Signal.send` method.
 Model signals
 =============
 
-.. module:: django.db.models.signals
+.. module:: mango.db.models.signals
    :synopsis: Signals sent by the model system.
 
-The :mod:`django.db.models.signals` module defines a set of signals sent by the
+The :mod:`mango.db.models.signals` module defines a set of signals sent by the
 model system.
 
 .. warning::
 
     Many of these signals are sent by various model methods like
-    ``__init__()`` or :meth:`~django.db.models.Model.save` that you can
+    ``__init__()`` or :meth:`~mango.db.models.Model.save` that you can
     override in your own code.
 
     If you override these methods on your model, you must call the parent class'
     methods for these signals to be sent.
 
-    Note also that Django stores signal handlers as weak references by default,
+    Note also that Mango stores signal handlers as weak references by default,
     so if your handler is a local function, it may be garbage collected.  To
-    prevent this, pass ``weak=False`` when you call the signal's :meth:`~django.dispatch.Signal.connect`.
+    prevent this, pass ``weak=False`` when you call the signal's :meth:`~mango.dispatch.Signal.connect`.
 
 .. note::
 
@@ -46,12 +46,12 @@ model system.
 ``pre_init``
 ------------
 
-.. attribute:: django.db.models.signals.pre_init
+.. attribute:: mango.db.models.signals.pre_init
    :module:
 
 .. ^^^^^^^ this :module: hack keeps Sphinx from prepending the module.
 
-Whenever you instantiate a Django model, this signal is sent at the beginning
+Whenever you instantiate a Mango model, this signal is sent at the beginning
 of the model's ``__init__()`` method.
 
 Arguments sent with this signal:
@@ -86,7 +86,7 @@ Argument    Value
 ``post_init``
 -------------
 
-.. data:: django.db.models.signals.post_init
+.. data:: mango.db.models.signals.post_init
    :module:
 
 Like pre_init, but this one is sent when the ``__init__()`` method finishes.
@@ -101,7 +101,7 @@ Arguments sent with this signal:
 
     .. note::
 
-        :attr:`instance._state <django.db.models.Model._state>` isn't set
+        :attr:`instance._state <mango.db.models.Model._state>` isn't set
         before sending the ``post_init`` signal, so ``_state`` attributes
         always have their default values. For example, ``_state.db`` is
         ``None``.
@@ -115,10 +115,10 @@ Arguments sent with this signal:
 ``pre_save``
 ------------
 
-.. data:: django.db.models.signals.pre_save
+.. data:: mango.db.models.signals.pre_save
    :module:
 
-This is sent at the beginning of a model's :meth:`~django.db.models.Model.save`
+This is sent at the beginning of a model's :meth:`~mango.db.models.Model.save`
 method.
 
 Arguments sent with this signal:
@@ -145,11 +145,11 @@ Arguments sent with this signal:
 ``post_save``
 -------------
 
-.. data:: django.db.models.signals.post_save
+.. data:: mango.db.models.signals.post_save
    :module:
 
 Like :data:`pre_save`, but sent at the end of the
-:meth:`~django.db.models.Model.save` method.
+:meth:`~mango.db.models.Model.save` method.
 
 Arguments sent with this signal:
 
@@ -178,11 +178,11 @@ Arguments sent with this signal:
 ``pre_delete``
 --------------
 
-.. data:: django.db.models.signals.pre_delete
+.. data:: mango.db.models.signals.pre_delete
    :module:
 
-Sent at the beginning of a model's :meth:`~django.db.models.Model.delete`
-method and a queryset's :meth:`~django.db.models.query.QuerySet.delete` method.
+Sent at the beginning of a model's :meth:`~mango.db.models.Model.delete`
+method and a queryset's :meth:`~mango.db.models.query.QuerySet.delete` method.
 
 Arguments sent with this signal:
 
@@ -198,12 +198,12 @@ Arguments sent with this signal:
 ``post_delete``
 ---------------
 
-.. data:: django.db.models.signals.post_delete
+.. data:: mango.db.models.signals.post_delete
    :module:
 
 Like :data:`pre_delete`, but sent at the end of a model's
-:meth:`~django.db.models.Model.delete` method and a queryset's
-:meth:`~django.db.models.query.QuerySet.delete` method.
+:meth:`~mango.db.models.Model.delete` method and a queryset's
+:meth:`~mango.db.models.query.QuerySet.delete` method.
 
 Arguments sent with this signal:
 
@@ -222,12 +222,12 @@ Arguments sent with this signal:
 ``m2m_changed``
 ---------------
 
-.. data:: django.db.models.signals.m2m_changed
+.. data:: mango.db.models.signals.m2m_changed
    :module:
 
-Sent when a :class:`~django.db.models.ManyToManyField` is changed on a model
+Sent when a :class:`~mango.db.models.ManyToManyField` is changed on a model
 instance. Strictly speaking, this is not a model signal since it is sent by the
-:class:`~django.db.models.ManyToManyField`, but since it complements the
+:class:`~mango.db.models.ManyToManyField`, but since it complements the
 :data:`pre_save`/:data:`post_save` and :data:`pre_delete`/:data:`post_delete`
 when it comes to tracking changes to models, it is included here.
 
@@ -235,14 +235,14 @@ Arguments sent with this signal:
 
 ``sender``
     The intermediate model class describing the
-    :class:`~django.db.models.ManyToManyField`. This class is automatically
+    :class:`~mango.db.models.ManyToManyField`. This class is automatically
     created when a many-to-many field is defined; you can access it using the
     ``through`` attribute on the many-to-many field.
 
 ``instance``
     The instance whose many-to-many relation is updated. This can be an
     instance of the ``sender``, or of the class the
-    :class:`~django.db.models.ManyToManyField` is related to.
+    :class:`~mango.db.models.ManyToManyField` is related to.
 
 ``action``
     A string indicating the type of update that is done on the relation.
@@ -299,7 +299,7 @@ like this::
 
 If we connected a handler like this::
 
-    from django.db.models.signals import m2m_changed
+    from mango.db.models.signals import m2m_changed
 
     def toppings_changed(sender, **kwargs):
         # Do something
@@ -326,7 +326,7 @@ Argument        Value
 ``action``      ``"pre_add"`` (followed by a separate signal with ``"post_add"``)
 
 ``reverse``     ``False`` (``Pizza`` contains the
-                :class:`~django.db.models.ManyToManyField`, so this call
+                :class:`~mango.db.models.ManyToManyField`, so this call
                 modifies the forward relation)
 
 ``model``       ``Topping`` (the class of the objects added to the
@@ -353,7 +353,7 @@ Argument        Value
 ``action``      ``"pre_remove"`` (followed by a separate signal with ``"post_remove"``)
 
 ``reverse``     ``True`` (``Pizza`` contains the
-                :class:`~django.db.models.ManyToManyField`, so this call
+                :class:`~mango.db.models.ManyToManyField`, so this call
                 modifies the reverse relation)
 
 ``model``       ``Pizza`` (the class of the objects removed from the
@@ -368,15 +368,15 @@ Argument        Value
 ``class_prepared``
 ------------------
 
-.. data:: django.db.models.signals.class_prepared
+.. data:: mango.db.models.signals.class_prepared
    :module:
 
 Sent whenever a model class has been "prepared" -- that is, once model has
-been defined and registered with Django's model system. Django uses this
+been defined and registered with Mango's model system. Mango uses this
 signal internally; it's not generally used in third-party applications.
 
 Since this signal is sent during the app registry population process, and
-:meth:`AppConfig.ready() <django.apps.AppConfig.ready>` runs after the app
+:meth:`AppConfig.ready() <mango.apps.AppConfig.ready>` runs after the app
 registry is fully populated, receivers cannot be connected in that method.
 One possibility is to connect them ``AppConfig.__init__()`` instead, taking
 care not to import models or trigger calls to the app registry.
@@ -389,12 +389,12 @@ Arguments that are sent with this signal:
 Management signals
 ==================
 
-Signals sent by :doc:`django-admin </ref/django-admin>`.
+Signals sent by :doc:`mango-admin </ref/mango-admin>`.
 
 ``pre_migrate``
 ---------------
 
-.. data:: django.db.models.signals.pre_migrate
+.. data:: mango.db.models.signals.pre_migrate
    :module:
 
 Sent by the :djadmin:`migrate` command before it starts to install an
@@ -403,7 +403,7 @@ application. It's not emitted for applications that lack a ``models`` module.
 Arguments sent with this signal:
 
 ``sender``
-    An :class:`~django.apps.AppConfig` instance for the application about to
+    An :class:`~mango.apps.AppConfig` instance for the application about to
     be migrated/synced.
 
 ``app_config``
@@ -421,7 +421,7 @@ Arguments sent with this signal:
     things on the command line. If ``interactive`` is ``False``, functions
     which listen for this signal should not try to prompt for anything.
 
-    For example, the :mod:`django.contrib.auth` app only prompts to create a
+    For example, the :mod:`mango.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
 
 ``stdout``
@@ -440,15 +440,15 @@ Arguments sent with this signal:
     if the migration was rolled back (``True``) or applied (``False``).
 
 ``apps``
-    An instance of :data:`Apps <django.apps>` containing the state of the
+    An instance of :data:`Apps <mango.apps>` containing the state of the
     project before the migration run. It should be used instead of the global
-    :attr:`apps <django.apps.apps>` registry to retrieve the models you
+    :attr:`apps <mango.apps.apps>` registry to retrieve the models you
     want to perform operations on.
 
 ``post_migrate``
 ----------------
 
-.. data:: django.db.models.signals.post_migrate
+.. data:: mango.db.models.signals.post_migrate
    :module:
 
 Sent at the end of the :djadmin:`migrate` (even if no migrations are run) and
@@ -462,7 +462,7 @@ so may cause the :djadmin:`flush` command to fail if it runs during the
 Arguments sent with this signal:
 
 ``sender``
-    An :class:`~django.apps.AppConfig` instance for the application that was
+    An :class:`~mango.apps.AppConfig` instance for the application that was
     just installed.
 
 ``app_config``
@@ -480,7 +480,7 @@ Arguments sent with this signal:
     things on the command line. If ``interactive`` is ``False``, functions
     which listen for this signal should not try to prompt for anything.
 
-    For example, the :mod:`django.contrib.auth` app only prompts to create a
+    For example, the :mod:`mango.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
 
 ``stdout``
@@ -500,16 +500,16 @@ Arguments sent with this signal:
     migration was rolled back (``True``) or applied (``False``).
 
 ``apps``
-    An instance of :data:`Apps <django.apps.apps>` containing the state of the
+    An instance of :data:`Apps <mango.apps.apps>` containing the state of the
     project after the migration run. It should be used instead of the global
-    :attr:`apps <django.apps.apps>` registry to retrieve the models you
+    :attr:`apps <mango.apps.apps>` registry to retrieve the models you
     want to perform operations on.
 
 For example, you could register a callback in an
-:class:`~django.apps.AppConfig` like this::
+:class:`~mango.apps.AppConfig` like this::
 
-    from django.apps import AppConfig
-    from django.db.models.signals import post_migrate
+    from mango.apps import AppConfig
+    from mango.db.models.signals import post_migrate
 
     def my_callback(sender, **kwargs):
         # Your specific logic here
@@ -523,9 +523,9 @@ For example, you could register a callback in an
 
 .. note::
 
-    If you provide an :class:`~django.apps.AppConfig` instance as the sender
+    If you provide an :class:`~mango.apps.AppConfig` instance as the sender
     argument, please ensure that the signal is registered in
-    :meth:`~django.apps.AppConfig.ready`. ``AppConfig``\s are recreated for
+    :meth:`~mango.apps.AppConfig.ready`. ``AppConfig``\s are recreated for
     tests that run with a modified set of :setting:`INSTALLED_APPS` (such as
     when settings are overridden) and such signals should be connected for each
     new ``AppConfig`` instance.
@@ -533,7 +533,7 @@ For example, you could register a callback in an
 Request/response signals
 ========================
 
-.. module:: django.core.signals
+.. module:: mango.core.signals
    :synopsis: Core signals sent by the request/response system.
 
 Signals sent by the core framework when processing a request.
@@ -541,15 +541,15 @@ Signals sent by the core framework when processing a request.
 ``request_started``
 -------------------
 
-.. data:: django.core.signals.request_started
+.. data:: mango.core.signals.request_started
    :module:
 
-Sent when Django begins processing an HTTP request.
+Sent when Mango begins processing an HTTP request.
 
 Arguments sent with this signal:
 
 ``sender``
-    The handler class -- e.g. ``django.core.handlers.wsgi.WsgiHandler`` -- that
+    The handler class -- e.g. ``mango.core.handlers.wsgi.WsgiHandler`` -- that
     handled the request.
 ``environ``
     The ``environ`` dictionary provided to the request.
@@ -557,10 +557,10 @@ Arguments sent with this signal:
 ``request_finished``
 --------------------
 
-.. data:: django.core.signals.request_finished
+.. data:: mango.core.signals.request_finished
    :module:
 
-Sent when Django finishes delivering an HTTP response to the client.
+Sent when Mango finishes delivering an HTTP response to the client.
 
 Arguments sent with this signal:
 
@@ -570,10 +570,10 @@ Arguments sent with this signal:
 ``got_request_exception``
 -------------------------
 
-.. data:: django.core.signals.got_request_exception
+.. data:: mango.core.signals.got_request_exception
    :module:
 
-This signal is sent whenever Django encounters an exception while processing an incoming HTTP request.
+This signal is sent whenever Mango encounters an exception while processing an incoming HTTP request.
 
 Arguments sent with this signal:
 
@@ -581,12 +581,12 @@ Arguments sent with this signal:
     Unused (always ``None``).
 
 ``request``
-    The :class:`~django.http.HttpRequest` object.
+    The :class:`~mango.http.HttpRequest` object.
 
 Test signals
 ============
 
-.. module:: django.test.signals
+.. module:: mango.test.signals
    :synopsis: Signals sent during testing.
 
 Signals only sent when :ref:`running tests <running-tests>`.
@@ -594,19 +594,19 @@ Signals only sent when :ref:`running tests <running-tests>`.
 ``setting_changed``
 -------------------
 
-.. data:: django.test.signals.setting_changed
+.. data:: mango.test.signals.setting_changed
    :module:
 
 This signal is sent when the value of a setting is changed through the
-``django.test.TestCase.settings()`` context manager or the
-:func:`django.test.override_settings` decorator/context manager.
+``mango.test.TestCase.settings()`` context manager or the
+:func:`mango.test.override_settings` decorator/context manager.
 
 It's actually sent twice: when the new value is applied ("setup") and when the
 original value is restored ("teardown"). Use the ``enter`` argument to
 distinguish between the two.
 
-You can also import this signal from ``django.core.signals`` to avoid importing
-from ``django.test`` in non-test situations.
+You can also import this signal from ``mango.core.signals`` to avoid importing
+from ``mango.test`` in non-test situations.
 
 Arguments sent with this signal:
 
@@ -626,28 +626,28 @@ Arguments sent with this signal:
 ``template_rendered``
 ---------------------
 
-.. data:: django.test.signals.template_rendered
+.. data:: mango.test.signals.template_rendered
    :module:
 
 Sent when the test system renders a template. This signal is not emitted during
-normal operation of a Django server -- it is only available during testing.
+normal operation of a Mango server -- it is only available during testing.
 
 Arguments sent with this signal:
 
 ``sender``
-    The :class:`~django.template.Template` object which was rendered.
+    The :class:`~mango.template.Template` object which was rendered.
 
 ``template``
     Same as sender
 
 ``context``
-    The :class:`~django.template.Context` with which the template was
+    The :class:`~mango.template.Context` with which the template was
     rendered.
 
 Database Wrappers
 =================
 
-.. module:: django.db.backends
+.. module:: mango.db.backends
    :synopsis: Core signals sent by the database wrapper.
 
 Signals sent by the database wrapper when a database connection is
@@ -656,7 +656,7 @@ initiated.
 ``connection_created``
 ----------------------
 
-.. data:: django.db.backends.signals.connection_created
+.. data:: mango.db.backends.signals.connection_created
    :module:
 
 Sent when the database wrapper makes the initial connection to the
@@ -667,8 +667,8 @@ Arguments sent with this signal:
 
 ``sender``
     The database wrapper class -- i.e.
-    ``django.db.backends.postgresql.DatabaseWrapper`` or
-    ``django.db.backends.mysql.DatabaseWrapper``, etc.
+    ``mango.db.backends.postgresql.DatabaseWrapper`` or
+    ``mango.db.backends.mysql.DatabaseWrapper``, etc.
 
 ``connection``
     The database connection that was opened. This can be used in a

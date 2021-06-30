@@ -1,10 +1,10 @@
 import os
 
-from django.core.exceptions import SuspiciousFileOperation
-from django.core.files.base import ContentFile
-from django.core.files.storage import FileSystemStorage, Storage
-from django.db.models import FileField
-from django.test import SimpleTestCase
+from mango.core.exceptions import SuspiciousFileOperation
+from mango.core.files.base import ContentFile
+from mango.core.files.storage import FileSystemStorage, Storage
+from mango.db.models import FileField
+from mango.test import SimpleTestCase
 
 
 class AWSS3Storage(Storage):

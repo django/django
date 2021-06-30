@@ -1,8 +1,8 @@
 from unittest import mock
 
-from django.db import connection
-from django.db.backends.base.client import BaseDatabaseClient
-from django.test import SimpleTestCase
+from mango.db import connection
+from mango.db.backends.base.client import BaseDatabaseClient
+from mango.test import SimpleTestCase
 
 
 class SimpleDatabaseClientTests(SimpleTestCase):

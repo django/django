@@ -1,12 +1,12 @@
 from urllib.parse import urlencode
 
-from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
-from django.template.loader import render_to_string
-from django.test import Client
-from django.test.client import CONTENT_TYPE_RE
+from mango.conf import settings
+from mango.contrib.auth.decorators import login_required
+from mango.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from mango.shortcuts import render
+from mango.template.loader import render_to_string
+from mango.test import Client
+from mango.test.client import CONTENT_TYPE_RE
 
 
 class CustomTestException(Exception):

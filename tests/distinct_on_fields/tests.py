@@ -1,8 +1,8 @@
-from django.db import connection
-from django.db.models import CharField, Max
-from django.db.models.functions import Lower
-from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import register_lookup
+from mango.db import connection
+from mango.db.models import CharField, Max
+from mango.db.models.functions import Lower
+from mango.test import TestCase, skipUnlessDBFeature
+from mango.test.utils import register_lookup
 
 from .models import Celebrity, Fan, Staff, StaffTag, Tag
 

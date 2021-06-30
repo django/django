@@ -1,9 +1,9 @@
 import decimal
 
-from django.core.exceptions import ValidationError
-from django.forms import DecimalField, NumberInput, Widget
-from django.test import SimpleTestCase, override_settings
-from django.utils import formats, translation
+from mango.core.exceptions import ValidationError
+from mango.forms import DecimalField, NumberInput, Widget
+from mango.test import SimpleTestCase, override_settings
+from mango.utils import formats, translation
 
 from . import FormFieldAssertionsMixin
 

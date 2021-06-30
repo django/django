@@ -1,5 +1,5 @@
-from django.urls import include, path
-from django.views.generic import RedirectView
+from mango.urls import include, path
+from mango.views.generic import RedirectView
 
 from . import views
 

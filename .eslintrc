@@ -32,6 +32,6 @@
         "es6": true
     },
     "globals": {
-        "django": false
+        "mango": false
     }
 }

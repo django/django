@@ -1,8 +1,8 @@
 import datetime
 
-from django.db import connection, models, transaction
-from django.db.models import Exists, OuterRef
-from django.test import (
+from mango.db import connection, models, transaction
+from mango.db.models import Exists, OuterRef
+from mango.test import (
     SimpleTestCase, TestCase, TransactionTestCase, skipUnlessDBFeature,
 )
 
@@ -59,7 +59,7 @@ class DeleteLockingTest(TransactionTestCase):
 class DeleteCascadeTests(TestCase):
     def test_generic_relation_cascade(self):
         """
-        Django cascades deletes through generic-related objects to their
+        Mango cascades deletes through generic-related objects to their
         reverse relations.
         """
         person = Person.objects.create(name='Nelson Mandela')

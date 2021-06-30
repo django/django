@@ -1,6 +1,6 @@
-from django.template import Context, Template, Variable, VariableDoesNotExist
-from django.test import SimpleTestCase
-from django.utils.translation import gettext_lazy
+from mango.template import Context, Template, Variable, VariableDoesNotExist
+from mango.test import SimpleTestCase
+from mango.utils.translation import gettext_lazy
 
 
 class TemplateTests(SimpleTestCase):

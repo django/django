@@ -6,7 +6,7 @@ include LICENSE.python
 include MANIFEST.in
 include package.json
 include *.rst
-graft django
+graft mango
 graft docs
 graft extras
 graft js_tests

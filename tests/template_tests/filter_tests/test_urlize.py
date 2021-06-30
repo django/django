@@ -1,7 +1,7 @@
-from django.template.defaultfilters import urlize
-from django.test import SimpleTestCase
-from django.utils.functional import lazy
-from django.utils.safestring import mark_safe
+from mango.template.defaultfilters import urlize
+from mango.test import SimpleTestCase
+from mango.utils.functional import lazy
+from mango.utils.safestring import mark_safe
 
 from ..utils import setup
 
@@ -96,12 +96,12 @@ class FunctionTests(SimpleTestCase):
             '<a href="http://www.google.com" rel="nofollow">www.google.com</a>',
         )
         self.assertEqual(
-            urlize('djangoproject.org'),
-            '<a href="http://djangoproject.org" rel="nofollow">djangoproject.org</a>',
+            urlize('mangoproject.org'),
+            '<a href="http://mangoproject.org" rel="nofollow">mangoproject.org</a>',
         )
         self.assertEqual(
-            urlize('djangoproject.org/'),
-            '<a href="http://djangoproject.org/" rel="nofollow">djangoproject.org/</a>',
+            urlize('mangoproject.org/'),
+            '<a href="http://mangoproject.org/" rel="nofollow">mangoproject.org/</a>',
         )
 
     def test_url_split_chars(self):
@@ -126,8 +126,8 @@ class FunctionTests(SimpleTestCase):
 
     def test_email(self):
         self.assertEqual(
-            urlize('info@djangoproject.org'),
-            '<a href="mailto:info@djangoproject.org">info@djangoproject.org</a>',
+            urlize('info@mangoproject.org'),
+            '<a href="mailto:info@mangoproject.org">info@mangoproject.org</a>',
         )
 
     def test_word_with_dot(self):
@@ -174,14 +174,14 @@ class FunctionTests(SimpleTestCase):
         #11911 - Check urlize keeps balanced parentheses
         """
         self.assertEqual(
-            urlize('https://en.wikipedia.org/wiki/Django_(web_framework)'),
-            '<a href="https://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
-            'https://en.wikipedia.org/wiki/Django_(web_framework)</a>',
+            urlize('https://en.wikipedia.org/wiki/Mango_(web_framework)'),
+            '<a href="https://en.wikipedia.org/wiki/Mango_(web_framework)" rel="nofollow">'
+            'https://en.wikipedia.org/wiki/Mango_(web_framework)</a>',
         )
         self.assertEqual(
-            urlize('(see https://en.wikipedia.org/wiki/Django_(web_framework))'),
-            '(see <a href="https://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
-            'https://en.wikipedia.org/wiki/Django_(web_framework)</a>)',
+            urlize('(see https://en.wikipedia.org/wiki/Mango_(web_framework))'),
+            '(see <a href="https://en.wikipedia.org/wiki/Mango_(web_framework)" rel="nofollow">'
+            'https://en.wikipedia.org/wiki/Mango_(web_framework)</a>)',
         )
 
     def test_nofollow(self):
@@ -352,8 +352,8 @@ class FunctionTests(SimpleTestCase):
         or query string
         """
         self.assertEqual(
-            urlize('Go to djangoproject.com! and enjoy.'),
-            'Go to <a href="http://djangoproject.com" rel="nofollow">djangoproject.com</a>! and enjoy.',
+            urlize('Go to mangoproject.com! and enjoy.'),
+            'Go to <a href="http://mangoproject.com" rel="nofollow">mangoproject.com</a>! and enjoy.',
         )
         self.assertEqual(
             urlize('Search for google.com/?q=! and see.'),

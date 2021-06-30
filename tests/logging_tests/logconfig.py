@@ -1,8 +1,8 @@
 import logging
 
-from django.conf import settings
-from django.core.mail.backends.base import BaseEmailBackend
-from django.views.debug import ExceptionReporter
+from mango.conf import settings
+from mango.core.mail.backends.base import BaseEmailBackend
+from mango.views.debug import ExceptionReporter
 
 
 class MyHandler(logging.Handler):

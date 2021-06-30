@@ -1,8 +1,8 @@
-from django.contrib.auth.models import AnonymousUser, User
-from django.contrib.flatpages.models import FlatPage
-from django.contrib.sites.models import Site
-from django.template import Context, Template, TemplateSyntaxError
-from django.test import TestCase
+from mango.contrib.auth.models import AnonymousUser, User
+from mango.contrib.flatpages.models import FlatPage
+from mango.contrib.sites.models import Site
+from mango.template import Context, Template, TemplateSyntaxError
+from mango.test import TestCase
 
 
 class FlatpageTemplateTagTests(TestCase):

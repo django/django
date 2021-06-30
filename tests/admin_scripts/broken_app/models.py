@@ -1,1 +1,1 @@
-from django.db import modelz  # NOQA
+from mango.db import modelz  # NOQA

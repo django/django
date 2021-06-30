@@ -1,8 +1,8 @@
-from django.contrib import admin
-from django.contrib.admin.decorators import register
-from django.contrib.admin.sites import site
-from django.core.exceptions import ImproperlyConfigured
-from django.test import SimpleTestCase
+from mango.contrib import admin
+from mango.contrib.admin.decorators import register
+from mango.contrib.admin.sites import site
+from mango.core.exceptions import ImproperlyConfigured
+from mango.test import SimpleTestCase
 
 from .models import Location, Person, Place, Traveler
 

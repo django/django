@@ -8,36 +8,36 @@ from datetime import timedelta
 from http import cookies
 from pathlib import Path
 
-from django.conf import settings
-from django.contrib.sessions.backends.base import UpdateError
-from django.contrib.sessions.backends.cache import SessionStore as CacheSession
-from django.contrib.sessions.backends.cached_db import (
+from mango.conf import settings
+from mango.contrib.sessions.backends.base import UpdateError
+from mango.contrib.sessions.backends.cache import SessionStore as CacheSession
+from mango.contrib.sessions.backends.cached_db import (
     SessionStore as CacheDBSession,
 )
-from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
-from django.contrib.sessions.backends.file import SessionStore as FileSession
-from django.contrib.sessions.backends.signed_cookies import (
+from mango.contrib.sessions.backends.db import SessionStore as DatabaseSession
+from mango.contrib.sessions.backends.file import SessionStore as FileSession
+from mango.contrib.sessions.backends.signed_cookies import (
     SessionStore as CookieSession,
 )
-from django.contrib.sessions.exceptions import (
+from mango.contrib.sessions.exceptions import (
     InvalidSessionKey, SessionInterrupted,
 )
-from django.contrib.sessions.middleware import SessionMiddleware
-from django.contrib.sessions.models import Session
-from django.contrib.sessions.serializers import (
+from mango.contrib.sessions.middleware import SessionMiddleware
+from mango.contrib.sessions.models import Session
+from mango.contrib.sessions.serializers import (
     JSONSerializer, PickleSerializer,
 )
-from django.core import management
-from django.core.cache import caches
-from django.core.cache.backends.base import InvalidCacheBackendError
-from django.core.exceptions import ImproperlyConfigured
-from django.core.signing import TimestampSigner
-from django.http import HttpResponse
-from django.test import (
+from mango.core import management
+from mango.core.cache import caches
+from mango.core.cache.backends.base import InvalidCacheBackendError
+from mango.core.exceptions import ImproperlyConfigured
+from mango.core.signing import TimestampSigner
+from mango.http import HttpResponse
+from mango.test import (
     RequestFactory, SimpleTestCase, TestCase, ignore_warnings,
     override_settings,
 )
-from django.utils import timezone
+from mango.utils import timezone
 
 from .models import SessionStore as CustomDatabaseSession
 
@@ -322,7 +322,7 @@ class SessionTestsMixin:
         ]
         for encoded in tests:
             with self.subTest(encoded=encoded):
-                with self.assertLogs('django.security.SuspiciousSession', 'WARNING') as cm:
+                with self.assertLogs('mango.security.SuspiciousSession', 'WARNING') as cm:
                     self.assertEqual(self.session.decode(encoded), {})
                 # The failed decode is logged.
                 self.assertIn('Session data corrupted', cm.output[0])
@@ -334,7 +334,7 @@ class SessionTestsMixin:
 
     def test_actual_expiry(self):
         # this doesn't work with JSONSerializer (serializing timedelta)
-        with override_settings(SESSION_SERIALIZER='django.contrib.sessions.serializers.PickleSerializer'):
+        with override_settings(SESSION_SERIALIZER='mango.contrib.sessions.serializers.PickleSerializer'):
             self.session = self.backend()  # reinitialize after overriding settings
 
             # Regression test for #19200
@@ -393,7 +393,7 @@ class SessionTestsMixin:
 class DatabaseSessionTests(SessionTestsMixin, TestCase):
 
     backend = DatabaseSession
-    session_engine = 'django.contrib.sessions.backends.db'
+    session_engine = 'mango.contrib.sessions.backends.db'
 
     @property
     def model(self):
@@ -511,7 +511,7 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
             self.assertIs(self.session.exists(self.session.session_key), True)
 
     # Some backends might issue a warning
-    @ignore_warnings(module="django.core.cache.backends.base")
+    @ignore_warnings(module="mango.core.cache.backends.base")
     def test_load_overlong_key(self):
         self.session._session_key = (string.ascii_letters + string.digits) * 20
         self.assertEqual(self.session.load(), {})
@@ -572,7 +572,7 @@ class FileSessionTests(SessionTestsMixin, SimpleTestCase):
             self.backend()._key_to_file("a/b/c")
 
     @override_settings(
-        SESSION_ENGINE="django.contrib.sessions.backends.file",
+        SESSION_ENGINE="mango.contrib.sessions.backends.file",
         SESSION_COOKIE_AGE=0,
     )
     def test_clearsessions_command(self):
@@ -626,7 +626,7 @@ class CacheSessionTests(SessionTestsMixin, SimpleTestCase):
     backend = CacheSession
 
     # Some backends might issue a warning
-    @ignore_warnings(module="django.core.cache.backends.base")
+    @ignore_warnings(module="mango.core.cache.backends.base")
     def test_load_overlong_key(self):
         self.session._session_key = (string.ascii_letters + string.digits) * 20
         self.assertEqual(self.session.load(), {})
@@ -637,10 +637,10 @@ class CacheSessionTests(SessionTestsMixin, SimpleTestCase):
 
     @override_settings(CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+            'BACKEND': 'mango.core.cache.backends.dummy.DummyCache',
         },
         'sessions': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'mango.core.cache.backends.locmem.LocMemCache',
             'LOCATION': 'session',
         },
     }, SESSION_CACHE_ALIAS='sessions')

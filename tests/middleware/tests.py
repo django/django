@@ -5,20 +5,20 @@ import struct
 from io import BytesIO
 from urllib.parse import quote
 
-from django.conf import settings
-from django.core import mail
-from django.core.exceptions import PermissionDenied
-from django.http import (
+from mango.conf import settings
+from mango.core import mail
+from mango.core.exceptions import PermissionDenied
+from mango.http import (
     FileResponse, HttpRequest, HttpResponse, HttpResponseNotFound,
     HttpResponsePermanentRedirect, HttpResponseRedirect, StreamingHttpResponse,
 )
-from django.middleware.clickjacking import XFrameOptionsMiddleware
-from django.middleware.common import (
+from mango.middleware.clickjacking import XFrameOptionsMiddleware
+from mango.middleware.common import (
     BrokenLinkEmailsMiddleware, CommonMiddleware,
 )
-from django.middleware.gzip import GZipMiddleware
-from django.middleware.http import ConditionalGetMiddleware
-from django.test import RequestFactory, SimpleTestCase, override_settings
+from mango.middleware.gzip import GZipMiddleware
+from mango.middleware.http import ConditionalGetMiddleware
+from mango.test import RequestFactory, SimpleTestCase, override_settings
 
 int2byte = struct.Struct(">B").pack
 

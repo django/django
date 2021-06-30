@@ -1,14 +1,14 @@
 from unittest import mock
 
-from django.contrib.contenttypes.checks import check_model_name_lengths
-from django.contrib.contenttypes.fields import (
+from mango.contrib.contenttypes.checks import check_model_name_lengths
+from mango.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
-from django.contrib.contenttypes.models import ContentType
-from django.core import checks
-from django.db import models
-from django.test import SimpleTestCase, override_settings
-from django.test.utils import isolate_apps
+from mango.contrib.contenttypes.models import ContentType
+from mango.core import checks
+from mango.db import models
+from mango.test import SimpleTestCase, override_settings
+from mango.test.utils import isolate_apps
 
 
 @isolate_apps('contenttypes_tests', attr_name='apps')
@@ -95,7 +95,7 @@ class GenericForeignKeyTests(SimpleTestCase):
             )
         ])
 
-    @override_settings(INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'contenttypes_tests'])
+    @override_settings(INSTALLED_APPS=['mango.contrib.auth', 'mango.contrib.contenttypes', 'contenttypes_tests'])
     def test_generic_foreign_key_checks_are_performed(self):
         class Model(models.Model):
             content_object = GenericForeignKey()

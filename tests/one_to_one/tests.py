@@ -1,5 +1,5 @@
-from django.db import IntegrityError, connection, transaction
-from django.test import TestCase
+from mango.db import IntegrityError, connection, transaction
+from mango.test import TestCase
 
 from .models import (
     Bar, Director, Favorites, HiddenPointer, ManualPrimaryKey, MultiModel,

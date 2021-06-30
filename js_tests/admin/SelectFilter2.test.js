@@ -4,7 +4,7 @@
 QUnit.module('admin.SelectFilter2');
 
 QUnit.test('init', function(assert) {
-    const $ = django.jQuery;
+    const $ = mango.jQuery;
     $('<form><select id="id"></select></form>').appendTo('#qunit-fixture');
     $('<option value="0">A</option>').appendTo('#id');
     SelectFilter.init('id', 'things', 0);

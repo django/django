@@ -1,5 +1,5 @@
-from django.forms import Form, HiddenInput, NullBooleanField, RadioSelect
-from django.test import SimpleTestCase
+from mango.forms import Form, HiddenInput, NullBooleanField, RadioSelect
+from mango.test import SimpleTestCase
 
 from . import FormFieldAssertionsMixin
 

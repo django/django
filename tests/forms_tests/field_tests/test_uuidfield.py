@@ -1,8 +1,8 @@
 import uuid
 
-from django.core.exceptions import ValidationError
-from django.forms import UUIDField
-from django.test import SimpleTestCase
+from mango.core.exceptions import ValidationError
+from mango.forms import UUIDField
+from mango.test import SimpleTestCase
 
 
 class UUIDFieldTest(SimpleTestCase):

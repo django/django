@@ -1,8 +1,8 @@
 """
-Regression tests for Django built-in views.
+Regression tests for Mango built-in views.
 """
 
-from django.db import models
+from mango.db import models
 
 
 class Author(models.Model):

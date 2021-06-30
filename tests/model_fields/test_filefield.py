@@ -5,13 +5,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from django.core.exceptions import SuspiciousFileOperation
-from django.core.files import File, temp
-from django.core.files.base import ContentFile
-from django.core.files.uploadedfile import TemporaryUploadedFile
-from django.db import IntegrityError, models
-from django.test import TestCase, override_settings
-from django.test.utils import isolate_apps
+from mango.core.exceptions import SuspiciousFileOperation
+from mango.core.files import File, temp
+from mango.core.files.base import ContentFile
+from mango.core.files.uploadedfile import TemporaryUploadedFile
+from mango.db import IntegrityError, models
+from mango.test import TestCase, override_settings
+from mango.test.utils import isolate_apps
 
 from .models import Document
 

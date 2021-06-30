@@ -1,10 +1,10 @@
-from django.conf import settings
-from django.contrib.sites.managers import CurrentSiteManager
-from django.contrib.sites.models import Site
-from django.core import checks
-from django.db import models
-from django.test import SimpleTestCase, TestCase
-from django.test.utils import isolate_apps
+from mango.conf import settings
+from mango.contrib.sites.managers import CurrentSiteManager
+from mango.contrib.sites.models import Site
+from mango.core import checks
+from mango.db import models
+from mango.test import SimpleTestCase, TestCase
+from mango.test.utils import isolate_apps
 
 from .models import CustomArticle, ExclusiveArticle, SyndicatedArticle
 

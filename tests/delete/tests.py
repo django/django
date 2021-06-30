@@ -1,10 +1,10 @@
 from math import ceil
 
-from django.db import connection, models
-from django.db.models import ProtectedError, RestrictedError
-from django.db.models.deletion import Collector
-from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from mango.db import connection, models
+from mango.db.models import ProtectedError, RestrictedError
+from mango.db.models.deletion import Collector
+from mango.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
+from mango.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import (
     B1, B2, B3, MR, A, Avatar, B, Base, Child, DeleteBottom, DeleteTop,

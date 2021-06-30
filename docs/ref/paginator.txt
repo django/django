@@ -2,13 +2,13 @@
 Paginator
 =========
 
-Django provides a few classes that help you manage paginated data -- that is,
+Mango provides a few classes that help you manage paginated data -- that is,
 data that's split across several pages, with "Previous/Next" links. These
-classes live in :source:`django/core/paginator.py`.
+classes live in :source:`mango/core/paginator.py`.
 
 For examples, see the :doc:`Pagination topic guide </topics/pagination>`.
 
-.. module:: django.core.paginator
+.. module:: mango.core.paginator
    :synopsis: Classes to help you easily manage paginated data.
 
 ``Paginator`` class
@@ -24,8 +24,8 @@ For examples, see the :doc:`Pagination topic guide </topics/pagination>`.
     Required. A list, tuple, ``QuerySet``, or other sliceable object with a
     ``count()`` or ``__len__()`` method. For consistent pagination,
     ``QuerySet``\s should be ordered, e.g. with an
-    :meth:`~django.db.models.query.QuerySet.order_by` clause or with a default
-    :attr:`~django.db.models.Options.ordering` on the model.
+    :meth:`~mango.db.models.query.QuerySet.order_by` clause or with a default
+    :attr:`~mango.db.models.Options.ordering` on the model.
 
     .. admonition:: Performance issues paginating large ``QuerySet``\s
 

@@ -1,7 +1,7 @@
-from django.template.defaultfilters import slugify
-from django.test import SimpleTestCase
-from django.utils.functional import lazy
-from django.utils.safestring import mark_safe
+from mango.template.defaultfilters import slugify
+from mango.test import SimpleTestCase
+from mango.utils.functional import lazy
+from mango.utils.safestring import mark_safe
 
 from ..utils import setup
 

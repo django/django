@@ -1,4 +1,4 @@
-from django.db import migrations
+from mango.db import migrations
 
 
 def grow_tail(x, y):

@@ -1,10 +1,10 @@
 ===========================
-Django 1.11.4 release notes
+Mango 1.11.4 release notes
 ===========================
 
 *August 1, 2017*
 
-Django 1.11.4 fixes several bugs in 1.11.3.
+Mango 1.11.4 fixes several bugs in 1.11.3.
 
 Bugfixes
 ========

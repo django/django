@@ -1,5 +1,5 @@
-from django.db import DatabaseError, IntegrityError, transaction
-from django.test import TestCase
+from mango.db import DatabaseError, IntegrityError, transaction
+from mango.test import TestCase
 
 from .models import (
     Counter, InheritedCounter, ProxyCounter, SubCounter, WithCustomPK,

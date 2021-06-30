@@ -1,6 +1,6 @@
-from django.core import management
-from django.core.management import CommandError
-from django.test import TestCase
+from mango.core import management
+from mango.core.management import CommandError
+from mango.test import TestCase
 
 from .models import Article
 
@@ -12,7 +12,7 @@ class SampleTestCase(TestCase):
         "Test cases can load fixture objects into models defined in packages"
         self.assertQuerysetEqual(
             Article.objects.all(), [
-                "Django conquers world!",
+                "Mango conquers world!",
                 "Copyright is fine the way it is",
                 "Poker has no place on ESPN",
             ],
@@ -39,7 +39,7 @@ class FixtureTestCase(TestCase):
         management.call_command('loaddata', 'model_package_fixture2.json', verbosity=0)
         self.assertQuerysetEqual(
             Article.objects.all(), [
-                "Django conquers world!",
+                "Mango conquers world!",
                 "Copyright is fine the way it is",
                 "Poker has no place on ESPN",
             ],
@@ -52,7 +52,7 @@ class FixtureTestCase(TestCase):
 
         self.assertQuerysetEqual(
             Article.objects.all(), [
-                "Django conquers world!",
+                "Mango conquers world!",
                 "Copyright is fine the way it is",
                 "Poker has no place on ESPN",
             ],

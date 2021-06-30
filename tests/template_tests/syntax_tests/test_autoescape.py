@@ -1,6 +1,6 @@
-from django.template import TemplateSyntaxError
-from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
+from mango.template import TemplateSyntaxError
+from mango.test import SimpleTestCase
+from mango.utils.safestring import mark_safe
 
 from ..utils import SafeClass, UnsafeClass, setup
 

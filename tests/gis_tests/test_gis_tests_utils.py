@@ -1,5 +1,5 @@
-from django.db import connection, models
-from django.test import SimpleTestCase
+from mango.db import connection, models
+from mango.test import SimpleTestCase
 
 from .utils import FuncTestMixin
 

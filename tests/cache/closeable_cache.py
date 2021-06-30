@@ -1,4 +1,4 @@
-from django.core.cache.backends.locmem import LocMemCache
+from mango.core.cache.backends.locmem import LocMemCache
 
 
 class CloseHookMixin:

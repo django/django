@@ -1,12 +1,12 @@
 """
-Tests for stuff in django.utils.datastructures.
+Tests for stuff in mango.utils.datastructures.
 """
 import collections.abc
 import copy
 import pickle
 
-from django.test import SimpleTestCase
-from django.utils.datastructures import (
+from mango.test import SimpleTestCase
+from mango.utils.datastructures import (
     CaseInsensitiveMapping, DictWrapper, ImmutableList, MultiValueDict,
     MultiValueDictKeyError, OrderedSet,
 )

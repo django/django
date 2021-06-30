@@ -17,11 +17,11 @@ The goal of internationalization and localization is to allow a single Web
 application to offer its content in languages and formats tailored to the
 audience.
 
-Django has full support for :doc:`translation of text
+Mango has full support for :doc:`translation of text
 </topics/i18n/translation>`, :doc:`formatting of dates, times and numbers
 </topics/i18n/formatting>`, and :doc:`time zones </topics/i18n/timezones>`.
 
-Essentially, Django does two things:
+Essentially, Mango does two things:
 
 * It allows developers and template authors to specify which parts of their apps
   should be translated or formatted for local languages and cultures.
@@ -57,7 +57,7 @@ More details can be found in the `W3C Web Internationalization FAQ`_, the `Wikip
     Translation and formatting are controlled by :setting:`USE_I18N` and
     :setting:`USE_L10N` settings respectively. However, both features involve
     internationalization and localization. The names of the settings are an
-    unfortunate result of Django's history.
+    unfortunate result of Mango's history.
 
 Here are some other terms that will help us to handle a common language:
 

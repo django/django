@@ -1,4 +1,4 @@
-from django.forms.widgets import Input
+from mango.forms.widgets import Input
 
 from .base import WidgetTest
 

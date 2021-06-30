@@ -1,5 +1,5 @@
-from django.contrib.auth.models import User
-from django.test import (
+from mango.contrib.auth.models import User
+from mango.test import (
     SimpleTestCase, TestCase, modify_settings, override_settings,
 )
 
@@ -12,12 +12,12 @@ class TestDataMixin:
 
 
 @override_settings(ROOT_URLCONF='admin_docs.urls')
-@modify_settings(INSTALLED_APPS={'append': 'django.contrib.admindocs'})
+@modify_settings(INSTALLED_APPS={'append': 'mango.contrib.admindocs'})
 class AdminDocsSimpleTestCase(SimpleTestCase):
     pass
 
 
 @override_settings(ROOT_URLCONF='admin_docs.urls')
-@modify_settings(INSTALLED_APPS={'append': 'django.contrib.admindocs'})
+@modify_settings(INSTALLED_APPS={'append': 'mango.contrib.admindocs'})
 class AdminDocsTestCase(TestCase):
     pass

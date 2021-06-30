@@ -1,10 +1,10 @@
 from io import StringIO
 
-from django.apps import apps
-from django.core import management
-from django.db import migrations
-from django.db.models import signals
-from django.test import TransactionTestCase, override_settings
+from mango.apps import apps
+from mango.core import management
+from mango.db import migrations
+from mango.db.models import signals
+from mango.test import TransactionTestCase, override_settings
 
 APP_CONFIG = apps.get_app_config('migrate_signals')
 SIGNAL_ARGS = ['app_config', 'verbosity', 'interactive', 'using', 'stdout', 'plan', 'apps']

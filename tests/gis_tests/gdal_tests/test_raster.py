@@ -5,11 +5,11 @@ import tempfile
 import zipfile
 from unittest import mock
 
-from django.contrib.gis.gdal import GDALRaster, SpatialReference
-from django.contrib.gis.gdal.error import GDALException
-from django.contrib.gis.gdal.raster.band import GDALBand
-from django.contrib.gis.shortcuts import numpy
-from django.test import SimpleTestCase
+from mango.contrib.gis.gdal import GDALRaster, SpatialReference
+from mango.contrib.gis.gdal.error import GDALException
+from mango.contrib.gis.gdal.raster.band import GDALBand
+from mango.contrib.gis.shortcuts import numpy
+from mango.test import SimpleTestCase
 
 from ..data.rasters.textrasters import JSON_RASTER
 
@@ -312,7 +312,7 @@ class GDALRasterTests(SimpleTestCase):
         })
         # Set metadata on raster and on a band.
         metadata = {
-            'DEFAULT': {'OWNER': 'Django', 'VERSION': '1.0', 'AREA_OR_POINT': 'Point'},
+            'DEFAULT': {'OWNER': 'Mango', 'VERSION': '1.0', 'AREA_OR_POINT': 'Point'},
         }
         source.metadata = metadata
         source.bands[0].metadata = metadata

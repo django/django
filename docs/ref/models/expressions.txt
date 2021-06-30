@@ -2,7 +2,7 @@
 Query Expressions
 =================
 
-.. currentmodule:: django.db.models
+.. currentmodule:: mango.db.models
 
 Query expressions describe a value or a computation that can be used as part of
 an update, create, filter, order by, annotation, or aggregate. When an
@@ -14,7 +14,7 @@ to form more complex computations.
 Supported arithmetic
 ====================
 
-Django supports negation, addition, subtraction, multiplication, division,
+Mango supports negation, addition, subtraction, multiplication, division,
 modulo arithmetic, and the power operator on query expressions, using Python
 constants, variables, and even other expressions.
 
@@ -23,8 +23,8 @@ Some examples
 
 .. code-block:: python
 
-    from django.db.models import Count, F, Value
-    from django.db.models.functions import Length, Upper
+    from mango.db.models import Count, F, Value
+    from mango.db.models.functions import Length, Upper
 
     # Find companies that have more employees than chairs.
     Company.objects.filter(num_employees__gt=F('num_chairs'))
@@ -65,13 +65,13 @@ Some examples
     Company.objects.order_by(Length('name').asc())
     Company.objects.order_by(Length('name').desc())
     # or using the double underscore lookup syntax.
-    from django.db.models import CharField
-    from django.db.models.functions import Length
+    from mango.db.models import CharField
+    from mango.db.models.functions import Length
     CharField.register_lookup(Length)
     Company.objects.order_by('name__length')
 
     # Boolean expression can be used directly in filters.
-    from django.db.models import Exists
+    from mango.db.models import Exists
     Company.objects.filter(
         Exists(Employee.objects.filter(company=OuterRef('pk'), salary__gt=10))
     )
@@ -81,9 +81,9 @@ Built-in Expressions
 
 .. note::
 
-    These expressions are defined in ``django.db.models.expressions`` and
-    ``django.db.models.aggregates``, but for convenience they're available and
-    usually imported from :mod:`django.db.models`.
+    These expressions are defined in ``mango.db.models.expressions`` and
+    ``mango.db.models.aggregates``, but for convenience they're available and
+    usually imported from :mod:`mango.db.models`.
 
 ``F()`` expressions
 -------------------
@@ -95,7 +95,7 @@ model field, or annotated column. It makes it possible to refer to model field
 values and perform database operations using them without actually having to
 pull them out of the database into Python memory.
 
-Instead, Django uses the ``F()`` object to generate an SQL expression that
+Instead, Mango uses the ``F()`` object to generate an SQL expression that
 describes the required operation at the database level.
 
 Let's try this with an example. Normally, one might do something like this::
@@ -109,7 +109,7 @@ Here, we have pulled the value of ``reporter.stories_filed`` from the database
 into memory and manipulated it using familiar Python operators, and then saved
 the object back to the database. But instead we could also have done::
 
-    from django.db.models import F
+    from mango.db.models import F
 
     reporter = Reporters.objects.get(name='Tintin')
     reporter.stories_filed = F('stories_filed') + 1
@@ -119,14 +119,14 @@ Although ``reporter.stories_filed = F('stories_filed') + 1`` looks like a
 normal Python assignment of value to an instance attribute, in fact it's an SQL
 construct describing an operation on the database.
 
-When Django encounters an instance of ``F()``, it overrides the standard Python
+When Mango encounters an instance of ``F()``, it overrides the standard Python
 operators to create an encapsulated SQL expression; in this case, one which
 instructs the database to increment the database field represented by
 ``reporter.stories_filed``.
 
 Whatever value is or was on ``reporter.stories_filed``, Python never gets to
 know about it - it is dealt with entirely by the database. All Python does,
-through Django's ``F()`` class, is create the SQL syntax to refer to the field
+through Mango's ``F()`` class, is create the SQL syntax to refer to the field
 and describe the operation.
 
 To access the new value saved this way, the object must be reloaded::
@@ -143,7 +143,7 @@ the two queries we were using above - the ``get()`` and the
     reporter = Reporters.objects.filter(name='Tintin')
     reporter.update(stories_filed=F('stories_filed') + 1)
 
-We can also use :meth:`~django.db.models.query.QuerySet.update()` to increment
+We can also use :meth:`~mango.db.models.query.QuerySet.update()` to increment
 the field value on multiple objects - which could be very much faster than
 pulling them all into Python from the database, looping over them, incrementing
 the field value of each one, and saving each one back to the database::
@@ -217,11 +217,11 @@ different fields with arithmetic::
         chairs_needed=F('num_employees') - F('num_chairs'))
 
 If the fields that you're combining are of different types you'll need
-to tell Django what kind of field will be returned. Since ``F()`` does not
+to tell Mango what kind of field will be returned. Since ``F()`` does not
 directly support ``output_field`` you will need to wrap the expression with
 :class:`ExpressionWrapper`::
 
-    from django.db.models import DateTimeField, ExpressionWrapper, F
+    from mango.db.models import DateTimeField, ExpressionWrapper, F
 
     Ticket.objects.annotate(
         expires=ExpressionWrapper(
@@ -248,7 +248,7 @@ a field's null values. By default, the ordering depends on your database.
 For example, to sort companies that haven't been contacted (``last_contacted``
 is null) after companies that have been contacted::
 
-    from django.db.models import F
+    from mango.db.models import F
     Company.objects.order_by(F('last_contacted').desc(nulls_last=True))
 
 .. _func-expressions:
@@ -260,7 +260,7 @@ is null) after companies that have been contacted::
 database functions like ``COALESCE`` and ``LOWER``, or aggregates like ``SUM``.
 They can be used directly::
 
-    from django.db.models import F, Func
+    from mango.db.models import F, Func
 
     queryset.annotate(field_lower=Func(F('field'), function='LOWER'))
 
@@ -327,7 +327,7 @@ The ``Func`` API is as follows:
         customize the SQL as needed. For example:
 
         .. code-block:: python
-            :caption: django/db/models/functions.py
+            :caption: mango/db/models/functions.py
 
             class ConcatPair(Func):
                 ...
@@ -378,7 +378,7 @@ like ``Sum()`` and ``Count()``, inherit from ``Aggregate()``.
 Since ``Aggregate``\s are expressions and wrap expressions, you can represent
 some complex computations::
 
-    from django.db.models import Count
+    from mango.db.models import Count
 
     Company.objects.annotate(
         managers_required=(Count('num_employees') / 4) + Count('num_managers'))
@@ -402,7 +402,7 @@ The ``Aggregate`` API is as follows:
     .. attribute:: window_compatible
 
         Defaults to ``True`` since most aggregate functions can be used as the
-        source expression in :class:`~django.db.models.expressions.Window`.
+        source expression in :class:`~mango.db.models.expressions.Window`.
 
     .. attribute:: allow_distinct
 
@@ -415,13 +415,13 @@ the model field, or the names of model fields. They will be converted to a
 string and used as the ``expressions`` placeholder within the ``template``.
 
 The ``output_field`` argument requires a model field instance, like
-``IntegerField()`` or ``BooleanField()``, into which Django will load the value
+``IntegerField()`` or ``BooleanField()``, into which Mango will load the value
 after it's retrieved from the database. Usually no arguments are needed when
 instantiating the model field as any arguments relating to data validation
 (``max_length``, ``max_digits``, etc.) will not be enforced on the expression's
 output value.
 
-Note that ``output_field`` is only required when Django is unable to determine
+Note that ``output_field`` is only required when Mango is unable to determine
 what field type the result should be. Complex expressions that mix field types
 should define the desired ``output_field``. For example, adding an
 ``IntegerField()`` and a ``FloatField()`` together should probably have
@@ -432,7 +432,7 @@ should be invoked for each distinct value of ``expressions`` (or set of
 values, for multiple ``expressions``). The argument is only supported on
 aggregates that have :attr:`~Aggregate.allow_distinct` set to ``True``.
 
-The ``filter`` argument takes a :class:`Q object <django.db.models.Q>` that's
+The ``filter`` argument takes a :class:`Q object <mango.db.models.Q>` that's
 used to filter the rows that are aggregated. See :ref:`conditional-aggregation`
 and :ref:`filtering-on-annotations` for example usage.
 
@@ -450,7 +450,7 @@ You can create your own aggregate functions, too. At a minimum, you need to
 define ``function``, but you can also completely customize the SQL that is
 generated. Here's a brief example::
 
-    from django.db.models import Aggregate
+    from mango.db.models import Aggregate
 
     class Sum(Aggregate):
         # Supports SUM(ALL field).
@@ -477,25 +477,25 @@ boolean, or string within an expression, you can wrap that value within a
 ``Value()``.
 
 You will rarely need to use ``Value()`` directly. When you write the expression
-``F('field') + 1``, Django implicitly wraps the ``1`` in a ``Value()``,
+``F('field') + 1``, Mango implicitly wraps the ``1`` in a ``Value()``,
 allowing simple values to be used in more complex expressions. You will need to
 use ``Value()`` when you want to pass a string to an expression. Most
 expressions interpret a string argument as the name of a field, like
 ``Lower('name')``.
 
 The ``value`` argument describes the value to be included in the expression,
-such as ``1``, ``True``, or ``None``. Django knows how to convert these Python
+such as ``1``, ``True``, or ``None``. Mango knows how to convert these Python
 values into their corresponding database type.
 
 The ``output_field`` argument should be a model field instance, like
-``IntegerField()`` or ``BooleanField()``, into which Django will load the value
+``IntegerField()`` or ``BooleanField()``, into which Mango will load the value
 after it's retrieved from the database. Usually no arguments are needed when
 instantiating the model field as any arguments relating to data validation
 (``max_length``, ``max_digits``, etc.) will not be enforced on the expression's
 output value. If no ``output_field`` is specified it will be tentatively
 inferred from the :py:class:`type` of the provided ``value``, if possible. For
 example, passing an instance of :py:class:`datetime.datetime` as ``value``
-would default ``output_field`` to :class:`~django.db.models.DateTimeField`.
+would default ``output_field`` to :class:`~mango.db.models.DateTimeField`.
 
 .. versionchanged:: 3.2
 
@@ -517,7 +517,7 @@ Conditional expressions
 -----------------------
 
 Conditional expressions allow you to use :keyword:`if` ... :keyword:`elif` ...
-:keyword:`else` logic in queries. Django natively supports SQL ``CASE``
+:keyword:`else` logic in queries. Mango natively supports SQL ``CASE``
 expressions. For more details see :doc:`conditional-expressions`.
 
 ``Subquery()`` expressions
@@ -531,7 +531,7 @@ expression.
 For example, to annotate each post with the email address of the author of the
 newest comment on that post::
 
-    >>> from django.db.models import OuterRef, Subquery
+    >>> from mango.db.models import OuterRef, Subquery
     >>> newest = Comment.objects.filter(post=OuterRef('pk')).order_by('-created_at')
     >>> Post.objects.annotate(newest_commenter_email=Subquery(newest.values('email')[:1]))
 
@@ -549,7 +549,7 @@ On PostgreSQL, the SQL looks like:
 .. note::
 
     The examples in this section are designed to show how to force
-    Django to execute a subquery. In some cases it may be possible to
+    Mango to execute a subquery. In some cases it may be possible to
     write an equivalent queryset that performs the same task more
     clearly or efficiently.
 
@@ -582,7 +582,7 @@ instance, to use a ``Subquery`` as the target of an ``__in`` lookup. To return
 all comments for posts published within the last day::
 
     >>> from datetime import timedelta
-    >>> from django.utils import timezone
+    >>> from mango.utils import timezone
     >>> one_day_ago = timezone.now() - timedelta(days=1)
     >>> posts = Post.objects.filter(published_at__gte=one_day_ago)
     >>> Comment.objects.filter(post__in=Subquery(posts.values('pk')))
@@ -618,9 +618,9 @@ stop evaluation of the subquery when a first matching row is found.
 For example, to annotate each post with whether or not it has a comment from
 within the last day::
 
-    >>> from django.db.models import Exists, OuterRef
+    >>> from mango.db.models import Exists, OuterRef
     >>> from datetime import timedelta
-    >>> from django.utils import timezone
+    >>> from mango.utils import timezone
     >>> one_day_ago = timezone.now() - timedelta(days=1)
     >>> recent_comments = Comment.objects.filter(
     ...     post=OuterRef('pk'),
@@ -653,7 +653,7 @@ Filtering on a ``Subquery()`` or ``Exists()`` expressions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``Subquery()`` that returns a boolean value and ``Exists()`` may be used as a
-``condition`` in :class:`~django.db.models.expressions.When` expressions, or to
+``condition`` in :class:`~mango.db.models.expressions.When` expressions, or to
 directly filter a queryset::
 
     >>> recent_comments = Comment.objects.filter(...)  # From above
@@ -672,13 +672,13 @@ combination of :meth:`~.QuerySet.filter`, :meth:`~.QuerySet.values`, and
 Assuming both models have a ``length`` field, to find posts where the post
 length is greater than the total length of all combined comments::
 
-    >>> from django.db.models import OuterRef, Subquery, Sum
+    >>> from mango.db.models import OuterRef, Subquery, Sum
     >>> comments = Comment.objects.filter(post=OuterRef('pk')).order_by().values('post')
     >>> total_comments = comments.annotate(total=Sum('length')).values('total')
     >>> Post.objects.filter(length__gt=Subquery(total_comments))
 
 The initial ``filter(...)`` limits the subquery to the relevant parameters.
-``order_by()`` removes the default :attr:`~django.db.models.Options.ordering`
+``order_by()`` removes the default :attr:`~mango.db.models.Options.ordering`
 (if any) on the ``Comment`` model. ``values('post')`` aggregates comments by
 ``Post``. Finally, ``annotate(...)`` performs the aggregation. The order in
 which these queryset methods are applied is important. In this case, since the
@@ -691,14 +691,14 @@ there is an ``OuterRef``, this will not be possible to resolve).
 Raw SQL expressions
 -------------------
 
-.. currentmodule:: django.db.models.expressions
+.. currentmodule:: mango.db.models.expressions
 
 .. class:: RawSQL(sql, params, output_field=None)
 
 Sometimes database expressions can't easily express a complex ``WHERE`` clause.
 In these edge cases, use the ``RawSQL`` expression. For example::
 
-    >>> from django.db.models.expressions import RawSQL
+    >>> from mango.db.models.expressions import RawSQL
     >>> queryset.annotate(val=RawSQL("select col from sometable where othercol = %s", (param,)))
 
 These extra lookups may not be portable to different database engines (because
@@ -722,7 +722,7 @@ should avoid them if possible.
 
         RawSQL("select col from sometable where othercol = '%s'")  # unsafe!
 
-    You can read more about how Django's :ref:`SQL injection protection
+    You can read more about how Mango's :ref:`SQL injection protection
     <sql-injection-protection>` works.
 
 Window functions
@@ -733,7 +733,7 @@ normal aggregation function which computes a final result for each set defined
 by the group by, window functions operate on :ref:`frames <window-frames>` and
 partitions, and compute the result for each row.
 
-You can specify multiple windows in the same query which in Django ORM would be
+You can specify multiple windows in the same query which in Mango ORM would be
 equivalent to including multiple expressions in a :doc:`QuerySet.annotate()
 </topics/db/aggregation>` call. The ORM doesn't make use of named windows,
 instead they are part of the selected columns.
@@ -743,7 +743,7 @@ instead they are part of the selected columns.
     .. attribute:: filterable
 
         Defaults to ``False``. The SQL standard disallows referencing window
-        functions in the ``WHERE`` clause and Django raises an exception when
+        functions in the ``WHERE`` clause and Mango raises an exception when
         constructing a ``QuerySet`` that would do that.
 
     .. attribute:: template
@@ -764,8 +764,8 @@ Partitioning narrows which rows are used to compute the result set.
 The ``output_field`` is specified either as an argument or by the expression.
 
 The ``order_by`` argument accepts a sequence of expressions on which you can
-call :meth:`~django.db.models.Expression.asc` and
-:meth:`~django.db.models.Expression.desc`. The ordering controls the order in
+call :meth:`~mango.db.models.Expression.asc` and
+:meth:`~mango.db.models.Expression.desc`. The ordering controls the order in
 which the expression is applied. For example, if you sum over the rows in a
 partition, the first result is the value of the first row, the second is the
 sum of first and second row.
@@ -776,8 +776,8 @@ computation. See :ref:`window-frames` for details.
 For example, to annotate each movie with the average rating for the movies by
 the same studio in the same genre and release year::
 
-    >>> from django.db.models import Avg, F, Window
-    >>> from django.db.models.functions import ExtractYear
+    >>> from mango.db.models import Avg, F, Window
+    >>> from mango.db.models.functions import ExtractYear
     >>> Movie.objects.annotate(
     >>>     avg_rating=Window(
     >>>         expression=Avg('rating'),
@@ -795,8 +795,8 @@ genre, and release year) by using three window functions in the same query. The
 partition and ordering from the previous example is extracted into a dictionary
 to reduce repetition::
 
-    >>> from django.db.models import Avg, F, Max, Min, Window
-    >>> from django.db.models.functions import ExtractYear
+    >>> from mango.db.models import Avg, F, Max, Min, Window
+    >>> from mango.db.models.functions import ExtractYear
     >>> window = {
     >>>    'partition_by': [F('studio'), F('genre')],
     >>>    'order_by': ExtractYear('released').asc(),
@@ -813,11 +813,11 @@ to reduce repetition::
     >>>     ),
     >>> )
 
-Among Django's built-in database backends, MySQL 8.0.2+, PostgreSQL, and Oracle
+Among Mango's built-in database backends, MySQL 8.0.2+, PostgreSQL, and Oracle
 support window expressions. Support for different window expression features
 varies among the different databases. For example, the options in
-:meth:`~django.db.models.Expression.asc` and
-:meth:`~django.db.models.Expression.desc` may not be supported. Consult the
+:meth:`~mango.db.models.Expression.asc` and
+:meth:`~mango.db.models.Expression.desc` may not be supported. Consult the
 documentation for your database as needed.
 
 .. _window-frames:
@@ -877,8 +877,8 @@ If a movie's "peers" are described as movies released by the same studio in the
 same genre in the same year, this ``RowRange`` example annotates each movie
 with the average rating of a movie's two prior and two following peers::
 
-    >>> from django.db.models import Avg, F, RowRange, Window
-    >>> from django.db.models.functions import ExtractYear
+    >>> from mango.db.models import Avg, F, RowRange, Window
+    >>> from mango.db.models.functions import ExtractYear
     >>> Movie.objects.annotate(
     >>>     avg_rating=Window(
     >>>         expression=Avg('rating'),
@@ -894,7 +894,7 @@ values of an expression in the partition. If the ``released`` field of the
 example annotates each movie with the average rating of a movie's peers
 released between twelve months before and twelve months after the each movie.
 
-    >>> from django.db.models import Avg, F, ValueRange, Window
+    >>> from mango.db.models import Avg, F, ValueRange, Window
     >>> Movie.objects.annotate(
     >>>     avg_rating=Window(
     >>>         expression=Avg('rating'),
@@ -904,7 +904,7 @@ released between twelve months before and twelve months after the each movie.
     >>>     ),
     >>> )
 
-.. currentmodule:: django.db.models
+.. currentmodule:: mango.db.models
 
 Technical Information
 =====================
@@ -912,7 +912,7 @@ Technical Information
 Below you'll find technical implementation details that may be useful to
 library authors. The technical API and examples below will help with
 creating generic query expressions that can extend the built-in functionality
-that Django provides.
+that Mango provides.
 
 Expression API
 --------------
@@ -929,25 +929,25 @@ calling the appropriate methods on the wrapped expression.
 
     .. attribute:: contains_aggregate
 
-        Tells Django that this expression contains an aggregate and that a
+        Tells Mango that this expression contains an aggregate and that a
         ``GROUP BY`` clause needs to be added to the query.
 
     .. attribute:: contains_over_clause
 
-        Tells Django that this expression contains a
-        :class:`~django.db.models.expressions.Window` expression. It's used,
+        Tells Mango that this expression contains a
+        :class:`~mango.db.models.expressions.Window` expression. It's used,
         for example, to disallow window function expressions in queries that
         modify data.
 
     .. attribute:: filterable
 
-        Tells Django that this expression can be referenced in
+        Tells Mango that this expression can be referenced in
         :meth:`.QuerySet.filter`. Defaults to ``True``.
 
     .. attribute:: window_compatible
 
-        Tells Django that this expression can be used as the source expression
-        in :class:`~django.db.models.expressions.Window`. Defaults to
+        Tells Mango that this expression can be used as the source expression
+        in :class:`~mango.db.models.expressions.Window`. Defaults to
         ``False``.
 
     .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False, for_save=False)
@@ -1034,7 +1034,7 @@ calling the appropriate methods on the wrapped expression.
         implementing ``NULLS LAST`` would change its value to be
         ``NULLS FIRST``. Modifications are only required for expressions that
         implement sort order like ``OrderBy``. This method is called when
-        :meth:`~django.db.models.query.QuerySet.reverse()` is called on a
+        :meth:`~mango.db.models.query.QuerySet.reverse()` is called on a
         queryset.
 
 Writing your own Query Expressions
@@ -1052,7 +1052,7 @@ We'll start by defining the template to be used for SQL generation and
 an ``__init__()`` method to set some attributes::
 
   import copy
-  from django.db.models import Expression
+  from mango.db.models import Expression
 
   class Coalesce(Expression):
       template = 'COALESCE( %(expressions)s )'
@@ -1068,7 +1068,7 @@ an ``__init__()`` method to set some attributes::
 
 We do some basic validation on the parameters, including requiring at least
 2 columns or values, and ensuring they are expressions. We are requiring
-``output_field`` here so that Django knows what kind of model field to assign
+``output_field`` here so that Mango knows what kind of model field to assign
 the eventual result to.
 
 Now we implement the pre-processing and validation. Since we do not have
@@ -1129,7 +1129,7 @@ to play nice with other query expressions::
 
 Let's see how it works::
 
-    >>> from django.db.models import F, Value, CharField
+    >>> from mango.db.models import F, Value, CharField
     >>> qs = Company.objects.annotate(
     ...    tagline=Coalesce([
     ...        F('motto'),
@@ -1143,7 +1143,7 @@ Let's see how it works::
     Google: Do No Evil
     Apple: AAPL
     Yahoo: Internet Company
-    Django Software Foundation: No Tagline
+    Mango Software Foundation: No Tagline
 
 .. _avoiding-sql-injection-in-query-expressions:
 
@@ -1158,7 +1158,7 @@ they must not contain untrusted user input.
 For example, if ``substring`` is user-provided, this function is vulnerable to
 SQL injection::
 
-    from django.db.models import Func
+    from mango.db.models import Func
 
     class Position(Func):
         function = 'POSITION'
@@ -1196,7 +1196,7 @@ Let's say we're writing a backend for Microsoft's SQL Server which uses the SQL
 We'll monkey patch a new method called ``as_sqlserver()`` onto the ``Length``
 class::
 
-    from django.db.models.functions import Length
+    from mango.db.models.functions import Length
 
     def sqlserver_length(self, compiler, connection):
         return self.as_sql(compiler, connection, function='LEN')
@@ -1205,7 +1205,7 @@ class::
 
 You can also customize the SQL using the ``template`` parameter of ``as_sql()``.
 
-We use ``as_sqlserver()`` because ``django.db.connection.vendor`` returns
+We use ``as_sqlserver()`` because ``mango.db.connection.vendor`` returns
 ``sqlserver`` for the backend.
 
 Third-party backends can register their functions in the top level
@@ -1213,4 +1213,4 @@ Third-party backends can register their functions in the top level
 file (or package) that is imported from the top level ``__init__.py``.
 
 For user projects wishing to patch the backend that they're using, this code
-should live in an :meth:`AppConfig.ready()<django.apps.AppConfig.ready>` method.
+should live in an :meth:`AppConfig.ready()<mango.apps.AppConfig.ready>` method.

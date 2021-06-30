@@ -1,10 +1,10 @@
 from datetime import date, datetime
 
-from django.test import SimpleTestCase, override_settings
-from django.test.utils import TZ_SUPPORT, requires_tz_support
-from django.utils import dateformat, translation
-from django.utils.dateformat import format
-from django.utils.timezone import (
+from mango.test import SimpleTestCase, override_settings
+from mango.test.utils import TZ_SUPPORT, requires_tz_support
+from mango.utils import dateformat, translation
+from mango.utils.dateformat import format
+from mango.utils.timezone import (
     get_default_timezone, get_fixed_timezone, make_aware, utc,
 )
 

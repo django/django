@@ -1,4 +1,4 @@
-from django.urls import path
+from mango.urls import path
 
 from .views import LazyRedirectView, empty_view, login_required_view
 

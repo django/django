@@ -8,15 +8,15 @@ from io import BytesIO, StringIO, TextIOWrapper
 from pathlib import Path
 from unittest import mock
 
-from django.core.files import File, locks
-from django.core.files.base import ContentFile
-from django.core.files.move import file_move_safe
-from django.core.files.temp import NamedTemporaryFile
-from django.core.files.uploadedfile import (
+from mango.core.files import File, locks
+from mango.core.files.base import ContentFile
+from mango.core.files.move import file_move_safe
+from mango.core.files.temp import NamedTemporaryFile
+from mango.core.files.uploadedfile import (
     InMemoryUploadedFile, SimpleUploadedFile, TemporaryUploadedFile,
     UploadedFile,
 )
-from django.test import override_settings
+from mango.test import override_settings
 
 try:
     from PIL import Image, features
@@ -25,7 +25,7 @@ except ImportError:
     Image = None
     HAS_WEBP = False
 else:
-    from django.core.files import images
+    from mango.core.files import images
 
 
 class FileTests(unittest.TestCase):
@@ -65,7 +65,7 @@ class FileTests(unittest.TestCase):
 
     def test_namedtemporaryfile_closes(self):
         """
-        The symbol django.core.files.NamedTemporaryFile is assigned as
+        The symbol mango.core.files.NamedTemporaryFile is assigned as
         a different class on different operating systems. In
         any case, the result should minimally mock some of the API of
         tempfile.NamedTemporaryFile from the Python standard library.
@@ -405,13 +405,13 @@ class FileMoveSafeTests(unittest.TestCase):
         try:
             # This exception is required to reach the copystat() call in
             # file_safe_move().
-            with mock.patch('django.core.files.move.os.rename', side_effect=OSError()):
+            with mock.patch('mango.core.files.move.os.rename', side_effect=OSError()):
                 # An error besides EPERM isn't ignored.
-                with mock.patch('django.core.files.move.copystat', side_effect=copystat_EACCES_error):
+                with mock.patch('mango.core.files.move.copystat', side_effect=copystat_EACCES_error):
                     with self.assertRaises(PermissionError):
                         file_move_safe(self.file_a, self.file_b, allow_overwrite=True)
                 # EPERM is ignored.
-                with mock.patch('django.core.files.move.copystat', side_effect=copystat_EPERM_error):
+                with mock.patch('mango.core.files.move.copystat', side_effect=copystat_EPERM_error):
                     self.assertIsNone(file_move_safe(self.file_a, self.file_b, allow_overwrite=True))
         finally:
             os.close(handle_a)
@@ -422,11 +422,11 @@ class SpooledTempTests(unittest.TestCase):
     def test_in_memory_spooled_temp(self):
         with tempfile.SpooledTemporaryFile() as temp:
             temp.write(b"foo bar baz quux\n")
-            django_file = File(temp, name="something.txt")
-            self.assertEqual(django_file.size, 17)
+            mango_file = File(temp, name="something.txt")
+            self.assertEqual(mango_file.size, 17)
 
     def test_written_spooled_temp(self):
         with tempfile.SpooledTemporaryFile(max_size=4) as temp:
             temp.write(b"foo bar baz quux\n")
-            django_file = File(temp, name="something.txt")
-            self.assertEqual(django_file.size, 17)
+            mango_file = File(temp, name="something.txt")
+            self.assertEqual(mango_file.size, 17)

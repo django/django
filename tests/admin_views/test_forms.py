@@ -1,14 +1,14 @@
-from django.contrib.admin.forms import AdminAuthenticationForm
-from django.contrib.admin.helpers import AdminForm
-from django.contrib.auth.models import User
-from django.test import SimpleTestCase, TestCase, override_settings
+from mango.contrib.admin.forms import AdminAuthenticationForm
+from mango.contrib.admin.helpers import AdminForm
+from mango.contrib.auth.models import User
+from mango.test import SimpleTestCase, TestCase, override_settings
 
 from .admin import ArticleForm
 
 
 # To verify that the login form rejects inactive users, use an authentication
 # backend that allows them.
-@override_settings(AUTHENTICATION_BACKENDS=['django.contrib.auth.backends.AllowAllUsersModelBackend'])
+@override_settings(AUTHENTICATION_BACKENDS=['mango.contrib.auth.backends.AllowAllUsersModelBackend'])
 class AdminAuthenticationFormTests(TestCase):
     @classmethod
     def setUpTestData(cls):

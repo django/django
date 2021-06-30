@@ -5,7 +5,7 @@ Regression tests for proper working of ForeignKey(null=True). Tests these bugs:
 unexpected results
 
 """
-from django.db import models
+from mango.db import models
 
 
 # The first two models represent a very simple null FK ordering case.

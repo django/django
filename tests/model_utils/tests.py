@@ -1,5 +1,5 @@
-from django.db.models.utils import create_namedtuple_class
-from django.test import SimpleTestCase
+from mango.db.models.utils import create_namedtuple_class
+from mango.test import SimpleTestCase
 
 
 class NamedTupleClassTests(SimpleTestCase):

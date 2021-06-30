@@ -2,18 +2,18 @@ import datetime
 from decimal import Decimal
 from unittest import mock
 
-from django.core.exceptions import FieldError
-from django.db import NotSupportedError, connection
-from django.db.models import (
+from mango.core.exceptions import FieldError
+from mango.db import NotSupportedError, connection
+from mango.db.models import (
     Avg, BooleanField, Case, F, Func, IntegerField, Max, Min, OuterRef, Q,
     RowRange, Subquery, Sum, Value, ValueRange, When, Window, WindowFrame,
 )
-from django.db.models.fields.json import KeyTextTransform, KeyTransform
-from django.db.models.functions import (
+from mango.db.models.fields.json import KeyTextTransform, KeyTransform
+from mango.db.models.functions import (
     Cast, CumeDist, DenseRank, ExtractYear, FirstValue, Lag, LastValue, Lead,
     NthValue, Ntile, PercentRank, Rank, RowNumber, Upper,
 )
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from mango.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
 from .models import Detail, Employee
 

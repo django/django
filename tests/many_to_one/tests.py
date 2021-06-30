@@ -1,10 +1,10 @@
 import datetime
 from copy import deepcopy
 
-from django.core.exceptions import FieldError, MultipleObjectsReturned
-from django.db import IntegrityError, models, transaction
-from django.test import TestCase
-from django.utils.translation import gettext_lazy
+from mango.core.exceptions import FieldError, MultipleObjectsReturned
+from mango.db import IntegrityError, models, transaction
+from mango.test import TestCase
+from mango.utils.translation import gettext_lazy
 
 from .models import (
     Article, Category, Child, ChildNullableParent, ChildStringPrimaryKeyParent,

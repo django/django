@@ -1,14 +1,14 @@
 import datetime
 from unittest import skipUnless
 
-from django.db import connection
-from django.db.models import CASCADE, ForeignKey, Index, Q
-from django.db.models.functions import Lower
-from django.test import (
+from mango.db import connection
+from mango.db.models import CASCADE, ForeignKey, Index, Q
+from mango.db.models.functions import Lower
+from mango.test import (
     TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
-from django.test.utils import override_settings
-from django.utils import timezone
+from mango.test.utils import override_settings
+from mango.utils import timezone
 
 from .models import (
     Article, ArticleTranslation, IndexedArticle2, IndexTogetherSingleList,

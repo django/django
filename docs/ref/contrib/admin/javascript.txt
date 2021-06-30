@@ -15,13 +15,13 @@ events allow this. The event handler is passed three arguments:
 * ``$row`` is the newly added (or removed) row.
 * ``formsetName`` is the formset the row belongs to.
 
-The event is fired using the :ref:`django.jQuery namespace
+The event is fired using the :ref:`mango.jQuery namespace
 <contrib-admin-jquery>`.
 
 In your custom ``change_form.html`` template, extend the
 ``admin_change_form_document_ready`` block and add the event listener code:
 
-.. code-block:: html+django
+.. code-block:: html+mango
 
     {% extends 'admin/change_form.html' %}
     {% load static %}
@@ -44,22 +44,22 @@ In your custom ``change_form.html`` template, extend the
         $(document).on('formset:removed', function(event, $row, formsetName) {
             // Row removed
         });
-    })(django.jQuery);
+    })(mango.jQuery);
 
 Two points to keep in mind:
 
 * The JavaScript code must go in a template block if you are inheriting
   ``admin/change_form.html`` or it won't be rendered in the final HTML.
-* ``{{ block.super }}`` is added because Django's
+* ``{{ block.super }}`` is added because Mango's
   ``admin_change_form_document_ready`` block contains JavaScript code to handle
   various operations in the change form and we need that to be rendered too.
 
 Sometimes you'll need to work with ``jQuery`` plugins that are not registered
-in the ``django.jQuery`` namespace. To do that, change how the code listens for
-events. Instead of wrapping the listener in the ``django.jQuery`` namespace,
+in the ``mango.jQuery`` namespace. To do that, change how the code listens for
+events. Instead of wrapping the listener in the ``mango.jQuery`` namespace,
 listen to the event triggered from there. For example:
 
-.. code-block:: html+django
+.. code-block:: html+mango
 
     {% extends 'admin/change_form.html' %}
     {% load static %}
@@ -72,10 +72,10 @@ listen to the event triggered from there. For example:
 .. code-block:: javascript
     :caption: app/static/app/unregistered_handlers.js
 
-    django.jQuery(document).on('formset:added', function(event, $row, formsetName) {
+    mango.jQuery(document).on('formset:added', function(event, $row, formsetName) {
         // Row added
     });
 
-    django.jQuery(document).on('formset:removed', function(event, $row, formsetName) {
+    mango.jQuery(document).on('formset:removed', function(event, $row, formsetName) {
         // Row removed
     });

@@ -1,6 +1,6 @@
-from django.db import DEFAULT_DB_ALIAS, connections
-from django.test import LiveServerTestCase, TransactionTestCase
-from django.test.testcases import LiveServerThread
+from mango.db import DEFAULT_DB_ALIAS, connections
+from mango.test import LiveServerTestCase, TransactionTestCase
+from mango.test.testcases import LiveServerThread
 
 
 # Use TransactionTestCase instead of TestCase to run outside of a transaction,

@@ -1,5 +1,5 @@
-from django.core.exceptions import FieldError
-from django.test import TestCase
+from mango.core.exceptions import FieldError
+from mango.test import TestCase
 
 from .models import (
     Entry, Line, Post, RegressionModelSplit, SelfRefer, SelfReferChild,

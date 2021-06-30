@@ -1,4 +1,4 @@
-from django.urls import include, path, re_path
+from mango.urls import include, path, re_path
 
 from .views import (
     absolute_kwargs_view, defaults_view, empty_view, empty_view_nested_partial,

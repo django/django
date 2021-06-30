@@ -1,15 +1,15 @@
-from django.core.exceptions import ValidationError
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import (
+from mango.core.exceptions import ValidationError
+from mango.core.files.uploadedfile import SimpleUploadedFile
+from mango.forms import (
     BooleanField, CharField, ChoiceField, DateField, DateTimeField,
     DecimalField, EmailField, FileField, FloatField, Form,
     GenericIPAddressField, IntegerField, ModelChoiceField,
     ModelMultipleChoiceField, MultipleChoiceField, RegexField,
     SplitDateTimeField, TimeField, URLField, utils,
 )
-from django.template import Context, Template
-from django.test import SimpleTestCase, TestCase
-from django.utils.safestring import mark_safe
+from mango.template import Context, Template
+from mango.test import SimpleTestCase, TestCase
+from mango.utils.safestring import mark_safe
 
 from ..models import ChoiceModel
 
@@ -156,9 +156,9 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
         self.assertFormErrors(['REQUIRED'], f.clean, '')
         self.assertFormErrors(['INVALID'], f.clean, 'abc.c')
         self.assertFormErrors(
-            ['"http://djangoproject.com" has more than 17 characters.'],
+            ['"http://mangoproject.com" has more than 17 characters.'],
             f.clean,
-            'djangoproject.com'
+            'mangoproject.com'
         )
 
     def test_booleanfield(self):

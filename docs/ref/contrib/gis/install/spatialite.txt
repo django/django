@@ -105,7 +105,7 @@ in a location available in your ``PATH``.  For example::
     $ cd Spatialite\ Tools/tools
     $ sudo cp spatialite /Library/Frameworks/SQLite3.framework/Programs
 
-Finally, for GeoDjango to be able to find the KyngChaos SpatiaLite library,
+Finally, for GeoMango to be able to find the KyngChaos SpatiaLite library,
 add the following to your ``settings.py``::
 
     SPATIALITE_LIBRARY_PATH='/Library/Frameworks/SQLite3.framework/SQLite3'
@@ -122,7 +122,7 @@ including SQLite, SpatiaLite, PROJ, and GEOS. Install them like this::
     $ brew install spatialite-tools
     $ brew install gdal
 
-Finally, for GeoDjango to be able to find the SpatiaLite library, add the
+Finally, for GeoMango to be able to find the SpatiaLite library, add the
 following to your ``settings.py``::
 
     SPATIALITE_LIBRARY_PATH='/usr/local/lib/mod_spatialite.dylib'

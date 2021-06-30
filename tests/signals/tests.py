@@ -1,11 +1,11 @@
 from unittest import mock
 
-from django.apps.registry import Apps
-from django.db import models
-from django.db.models import signals
-from django.dispatch import receiver
-from django.test import SimpleTestCase, TestCase
-from django.test.utils import isolate_apps
+from mango.apps.registry import Apps
+from mango.db import models
+from mango.db.models import signals
+from mango.dispatch import receiver
+from mango.test import SimpleTestCase, TestCase
+from mango.test.utils import isolate_apps
 
 from .models import Author, Book, Car, Person
 

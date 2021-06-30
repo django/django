@@ -1,15 +1,15 @@
-from django.contrib import admin
-from django.contrib.admin import sites
-from django.test import SimpleTestCase, override_settings
+from mango.contrib import admin
+from mango.contrib.admin import sites
+from mango.test import SimpleTestCase, override_settings
 
 
 @override_settings(INSTALLED_APPS=[
     'admin_default_site.apps.MyCustomAdminConfig',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'mango.contrib.auth',
+    'mango.contrib.contenttypes',
+    'mango.contrib.sessions',
+    'mango.contrib.messages',
+    'mango.contrib.staticfiles',
 ])
 class CustomAdminSiteTests(SimpleTestCase):
 

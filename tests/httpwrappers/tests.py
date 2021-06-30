@@ -5,18 +5,18 @@ import pickle
 import unittest
 import uuid
 
-from django.core.exceptions import DisallowedRedirect
-from django.core.serializers.json import DjangoJSONEncoder
-from django.core.signals import request_finished
-from django.db import close_old_connections
-from django.http import (
+from mango.core.exceptions import DisallowedRedirect
+from mango.core.serializers.json import MangoJSONEncoder
+from mango.core.signals import request_finished
+from mango.db import close_old_connections
+from mango.http import (
     BadHeaderError, HttpResponse, HttpResponseNotAllowed,
     HttpResponseNotModified, HttpResponsePermanentRedirect,
     HttpResponseRedirect, JsonResponse, QueryDict, SimpleCookie,
     StreamingHttpResponse, parse_cookie,
 )
-from django.test import SimpleTestCase
-from django.utils.functional import lazystr
+from mango.test import SimpleTestCase
+from mango.utils.functional import lazystr
 
 
 class QueryDictTests(SimpleTestCase):
@@ -588,11 +588,11 @@ class JsonResponseTests(SimpleTestCase):
         self.assertEqual(json.loads(response.content.decode()), str(u))
 
     def test_json_response_custom_encoder(self):
-        class CustomDjangoJSONEncoder(DjangoJSONEncoder):
+        class CustomMangoJSONEncoder(MangoJSONEncoder):
             def encode(self, o):
                 return json.dumps({'foo': 'bar'})
 
-        response = JsonResponse({}, encoder=CustomDjangoJSONEncoder)
+        response = JsonResponse({}, encoder=CustomMangoJSONEncoder)
         self.assertEqual(json.loads(response.content.decode()), {'foo': 'bar'})
 
     def test_json_response_passing_arguments_to_json_dumps(self):
@@ -777,7 +777,7 @@ class CookieTests(unittest.TestCase):
         """
         # Chunks without an equals sign appear as unnamed values per
         # https://bugzilla.mozilla.org/show_bug.cgi?id=169091
-        self.assertIn('django_language', parse_cookie('abc=def; unnamed; django_language=en'))
+        self.assertIn('mango_language', parse_cookie('abc=def; unnamed; mango_language=en'))
         # Even a double quote may be an unnamed value.
         self.assertEqual(parse_cookie('a=b; "; c=d'), {'a': 'b', '': '"', 'c': 'd'})
         # Spaces in names and values, and an equals sign in values.

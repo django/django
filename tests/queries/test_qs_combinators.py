@@ -1,9 +1,9 @@
 import operator
 
-from django.db import DatabaseError, NotSupportedError, connection
-from django.db.models import Exists, F, IntegerField, OuterRef, Value
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext
+from mango.db import DatabaseError, NotSupportedError, connection
+from mango.db.models import Exists, F, IntegerField, OuterRef, Value
+from mango.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from mango.test.utils import CaptureQueriesContext
 
 from .models import Celebrity, Number, ReservedName
 

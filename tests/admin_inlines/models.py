@@ -3,9 +3,9 @@ Testing of admin inline formsets.
 """
 import random
 
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
+from mango.contrib.contenttypes.fields import GenericForeignKey
+from mango.contrib.contenttypes.models import ContentType
+from mango.db import models
 
 
 class Parent(models.Model):

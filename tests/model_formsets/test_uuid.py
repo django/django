@@ -1,5 +1,5 @@
-from django.forms.models import inlineformset_factory
-from django.test import TestCase
+from mango.forms.models import inlineformset_factory
+from mango.test import TestCase
 
 from .models import (
     AutoPKChildOfUUIDPKParent, AutoPKParent, ChildRelatedViaAK,

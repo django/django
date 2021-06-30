@@ -2,10 +2,10 @@
 PostgreSQL specific aggregation functions
 =========================================
 
-.. module:: django.contrib.postgres.aggregates
+.. module:: mango.contrib.postgres.aggregates
    :synopsis: PostgreSQL specific aggregation functions
 
-These functions are available from the ``django.contrib.postgres.aggregates``
+These functions are available from the ``mango.contrib.postgres.aggregates``
 module. They are described in more detail in the `PostgreSQL docs
 <https://www.postgresql.org/docs/current/functions-aggregate.html>`_.
 
@@ -48,7 +48,7 @@ General-purpose aggregation functions
 
             'some_field'
             '-some_field'
-            from django.db.models import F
+            from mango.db.models import F
             F('some_field').desc()
 
 ``BitAnd``
@@ -82,8 +82,8 @@ General-purpose aggregation functions
             published = models.BooleanField()
             rank = models.IntegerField()
 
-        >>> from django.db.models import Q
-        >>> from django.contrib.postgres.aggregates import BoolAnd
+        >>> from mango.db.models import Q
+        >>> from mango.contrib.postgres.aggregates import BoolAnd
         >>> Comment.objects.aggregate(booland=BoolAnd('published'))
         {'booland': False}
         >>> Comment.objects.aggregate(booland=BoolAnd(Q(rank__lt=100)))
@@ -104,8 +104,8 @@ General-purpose aggregation functions
             published = models.BooleanField()
             rank = models.IntegerField()
 
-        >>> from django.db.models import Q
-        >>> from django.contrib.postgres.aggregates import BoolOr
+        >>> from mango.db.models import Q
+        >>> from mango.contrib.postgres.aggregates import BoolOr
         >>> Comment.objects.aggregate(boolor=BoolOr('published'))
         {'boolor': True}
         >>> Comment.objects.aggregate(boolor=BoolOr(Q(rank__gt=2)))

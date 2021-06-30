@@ -12,30 +12,30 @@ from unittest import mock
 
 from asgiref.local import Local
 
-from django import forms
-from django.apps import AppConfig
-from django.conf import settings
-from django.conf.locale import LANG_INFO
-from django.conf.urls.i18n import i18n_patterns
-from django.template import Context, Template
-from django.test import (
+from mango import forms
+from mango.apps import AppConfig
+from mango.conf import settings
+from mango.conf.locale import LANG_INFO
+from mango.conf.urls.i18n import i18n_patterns
+from mango.template import Context, Template
+from mango.test import (
     RequestFactory, SimpleTestCase, TestCase, override_settings,
 )
-from django.utils import translation
-from django.utils.formats import (
+from mango.utils import translation
+from mango.utils.formats import (
     date_format, get_format, get_format_modules, iter_format_modules, localize,
     localize_input, reset_format_cache, sanitize_separators,
     sanitize_strftime_format, time_format,
 )
-from django.utils.numberformat import format as nformat
-from django.utils.safestring import SafeString, mark_safe
-from django.utils.translation import (
+from mango.utils.numberformat import format as nformat
+from mango.utils.safestring import SafeString, mark_safe
+from mango.utils.translation import (
     activate, check_for_language, deactivate, get_language, get_language_bidi,
     get_language_from_request, get_language_info, gettext, gettext_lazy,
     ngettext, ngettext_lazy, npgettext, npgettext_lazy, pgettext,
     round_away_from_one, to_language, to_locale, trans_null, trans_real,
 )
-from django.utils.translation.reloader import (
+from mango.utils.translation.reloader import (
     translation_file_changed, watch_for_translation_changes,
 )
 
@@ -55,7 +55,7 @@ class AppModuleStub:
 
 @contextmanager
 def patch_formats(lang, **settings):
-    from django.utils.formats import _format_cache
+    from mango.utils.formats import _format_cache
 
     # Populate _format_cache with temporary values
     for key, value in settings.items():
@@ -87,7 +87,7 @@ class TranslationTests(SimpleTestCase):
     @translation.override('fr')
     def test_multiple_plurals_per_language(self):
         """
-        Normally, French has 2 plurals. As other/locale/fr/LC_MESSAGES/django.po
+        Normally, French has 2 plurals. As other/locale/fr/LC_MESSAGES/mango.po
         has a different plural equation with 3 plurals, this tests if those
         plural are honored.
         """
@@ -1122,7 +1122,7 @@ class FormattingTests(SimpleTestCase):
 
     def test_sanitize_separators(self):
         """
-        Tests django.utils.formats.sanitize_separators.
+        Tests mango.utils.formats.sanitize_separators.
         """
         # Non-strings are untouched
         self.assertEqual(sanitize_separators(123), 123)
@@ -1163,7 +1163,7 @@ class FormattingTests(SimpleTestCase):
         """
         # Importing some format modules so that we can compare the returned
         # modules with these expected modules
-        default_mod = import_module('django.conf.locale.de.formats')
+        default_mod = import_module('mango.conf.locale.de.formats')
         test_mod = import_module('i18n.other.locale.de.formats')
         test_mod2 = import_module('i18n.other2.locale.de.formats')
 
@@ -1188,8 +1188,8 @@ class FormattingTests(SimpleTestCase):
         Tests the iter_format_modules function always yields format modules in
         a stable and correct order in presence of both base ll and ll_CC formats.
         """
-        en_format_mod = import_module('django.conf.locale.en.formats')
-        en_gb_format_mod = import_module('django.conf.locale.en_GB.formats')
+        en_format_mod = import_module('mango.conf.locale.en.formats')
+        en_gb_format_mod = import_module('mango.conf.locale.en_GB.formats')
         self.assertEqual(list(iter_format_modules('en-gb')), [en_gb_format_mod, en_format_mod])
 
     def test_get_format_modules_lang(self):
@@ -1402,7 +1402,7 @@ class MiscTests(SimpleTestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'es-ar,de'}
         self.assertEqual('es-ar', g(r))
 
-        # This test assumes there won't be a Django translation to a US
+        # This test assumes there won't be a Mango translation to a US
         # variation of the Spanish language, a safe assumption. When the
         # user sets it as the preferred language, the main 'es'
         # translation should be selected instead.
@@ -1410,9 +1410,9 @@ class MiscTests(SimpleTestCase):
         self.assertEqual(g(r), 'es')
 
         # This tests the following scenario: there isn't a main language (zh)
-        # translation of Django but there is a translation to variation (zh-hans)
+        # translation of Mango but there is a translation to variation (zh-hans)
         # the user sets zh-hans as the preferred language, it should be selected
-        # by Django without falling back nor ignoring it.
+        # by Mango without falling back nor ignoring it.
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-hans,de'}
         self.assertEqual(g(r), 'zh-hans')
 
@@ -1444,7 +1444,7 @@ class MiscTests(SimpleTestCase):
     def test_support_for_deprecated_chinese_language_codes(self):
         """
         Some browsers (Firefox, IE, etc.) use deprecated language codes. As these
-        language codes will be removed in Django 1.9, these will be incorrectly
+        language codes will be removed in Mango 1.9, these will be incorrectly
         matched. For example zh-tw (traditional) will be interpreted as zh-hans
         (simplified), which is wrong. So we should also accept these deprecated
         language codes.
@@ -1508,7 +1508,7 @@ class MiscTests(SimpleTestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
         self.assertEqual('es', g(r))
 
-        # This test assumes there won't be a Django translation to a US
+        # This test assumes there won't be a Mango translation to a US
         # variation of the Spanish language, a safe assumption. When the
         # user sets it as the preferred language, the main 'es'
         # translation should be selected instead.
@@ -1517,9 +1517,9 @@ class MiscTests(SimpleTestCase):
         self.assertEqual(g(r), 'es')
 
         # This tests the following scenario: there isn't a main language (zh)
-        # translation of Django but there is a translation to variation (zh-hans)
+        # translation of Mango but there is a translation to variation (zh-hans)
         # the user sets zh-hans as the preferred language, it should be selected
-        # by Django without falling back nor ignoring it.
+        # by Mango without falling back nor ignoring it.
         r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'zh-hans'}
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
         self.assertEqual(g(r), 'zh-hans')
@@ -1648,7 +1648,7 @@ class AppResolutionOrderI18NTests(ResolutionOrderI18NTests):
             # Doesn't work because it's added later in the list.
             self.assertGettext('Date/time', 'Datum/Zeit')
 
-            with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.admin.apps.SimpleAdminConfig'}):
+            with self.modify_settings(INSTALLED_APPS={'remove': 'mango.contrib.admin.apps.SimpleAdminConfig'}):
                 # Force refreshing translations.
                 activate('de')
 
@@ -1667,9 +1667,9 @@ class LocalePathsResolutionOrderI18NTests(ResolutionOrderI18NTests):
             self.assertGettext('Time', 'LOCALE_PATHS')
 
 
-class DjangoFallbackResolutionOrderI18NTests(ResolutionOrderI18NTests):
+class MangoFallbackResolutionOrderI18NTests(ResolutionOrderI18NTests):
 
-    def test_django_fallback(self):
+    def test_mango_fallback(self):
         self.assertEqual(gettext('Date/time'), 'Datum/Zeit')
 
 
@@ -1743,8 +1743,8 @@ class TestLanguageInfo(SimpleTestCase):
         ('fr', 'French'),
     ],
     MIDDLEWARE=[
-        'django.middleware.locale.LocaleMiddleware',
-        'django.middleware.common.CommonMiddleware',
+        'mango.middleware.locale.LocaleMiddleware',
+        'mango.middleware.common.CommonMiddleware',
     ],
     ROOT_URLCONF='i18n.urls',
 )
@@ -1766,8 +1766,8 @@ class LocaleMiddlewareTests(TestCase):
         ('fr', 'French'),
     ],
     MIDDLEWARE=[
-        'django.middleware.locale.LocaleMiddleware',
-        'django.middleware.common.CommonMiddleware',
+        'mango.middleware.locale.LocaleMiddleware',
+        'mango.middleware.common.CommonMiddleware',
     ],
     ROOT_URLCONF='i18n.urls_default_unprefixed',
     LANGUAGE_CODE='en',
@@ -1817,8 +1817,8 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
         ('pt-br', 'Portuguese (Brazil)'),
     ],
     MIDDLEWARE=[
-        'django.middleware.locale.LocaleMiddleware',
-        'django.middleware.common.CommonMiddleware',
+        'mango.middleware.locale.LocaleMiddleware',
+        'mango.middleware.common.CommonMiddleware',
     ],
     ROOT_URLCONF='i18n.urls'
 )
@@ -1838,7 +1838,7 @@ class CountrySpecificLanguageTests(SimpleTestCase):
         self.assertFalse(check_for_language('en\x00'))
         self.assertFalse(check_for_language(None))
         self.assertFalse(check_for_language('be@ '))
-        # Specifying encoding is not supported (Django enforces UTF-8)
+        # Specifying encoding is not supported (Mango enforces UTF-8)
         self.assertFalse(check_for_language('tr-TR.UTF-8'))
         self.assertFalse(check_for_language('tr-TR.UTF8'))
         self.assertFalse(check_for_language('de-DE.utf-8'))
@@ -1901,10 +1901,10 @@ class TranslationFilesMissing(SimpleTestCase):
             activate('en')
 
 
-class NonDjangoLanguageTests(SimpleTestCase):
+class NonMangoLanguageTests(SimpleTestCase):
     """
-    A language non present in default Django languages can still be
-    installed/used by a Django project.
+    A language non present in default Mango languages can still be
+    installed/used by a Mango project.
     """
     @override_settings(
         USE_I18N=True,
@@ -1915,7 +1915,7 @@ class NonDjangoLanguageTests(SimpleTestCase):
         LANGUAGE_CODE='xxx',
         LOCALE_PATHS=[os.path.join(here, 'commands', 'locale')],
     )
-    def test_non_django_language(self):
+    def test_non_mango_language(self):
         self.assertEqual(get_language(), 'xxx')
         self.assertEqual(gettext("year"), "reay")
 
@@ -1923,9 +1923,9 @@ class NonDjangoLanguageTests(SimpleTestCase):
     def test_check_for_language(self):
         with tempfile.TemporaryDirectory() as app_dir:
             os.makedirs(os.path.join(app_dir, 'locale', 'dummy_Lang', 'LC_MESSAGES'))
-            open(os.path.join(app_dir, 'locale', 'dummy_Lang', 'LC_MESSAGES', 'django.mo'), 'w').close()
+            open(os.path.join(app_dir, 'locale', 'dummy_Lang', 'LC_MESSAGES', 'mango.mo'), 'w').close()
             app_config = AppConfig('dummy_app', AppModuleStub(__path__=[app_dir]))
-            with mock.patch('django.apps.apps.get_app_configs', return_value=[app_config]):
+            with mock.patch('mango.apps.apps.get_app_configs', return_value=[app_config]):
                 self.assertIs(check_for_language('dummy-lang'), True)
 
     @override_settings(
@@ -1937,7 +1937,7 @@ class NonDjangoLanguageTests(SimpleTestCase):
         ],
     )
     @translation.override('xyz')
-    def test_plural_non_django_language(self):
+    def test_plural_non_mango_language(self):
         self.assertEqual(get_language(), 'xyz')
         self.assertEqual(ngettext('year', 'years', 2), 'years')
 
@@ -1969,9 +1969,9 @@ class WatchForTranslationChangesTests(SimpleTestCase):
         project_dir = Path(__file__).parent / 'sampleproject' / 'locale'
         mocked_sender.watch_dir.assert_any_call(project_dir, '**/*.mo')
 
-    def test_i18n_app_dirs_ignore_django_apps(self):
+    def test_i18n_app_dirs_ignore_mango_apps(self):
         mocked_sender = mock.MagicMock()
-        with self.settings(INSTALLED_APPS=['django.contrib.admin']):
+        with self.settings(INSTALLED_APPS=['mango.contrib.admin']):
             watch_for_translation_changes(mocked_sender)
         mocked_sender.watch_dir.assert_called_once_with(Path('locale'), '**/*.mo')
 

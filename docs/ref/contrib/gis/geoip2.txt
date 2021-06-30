@@ -2,7 +2,7 @@
 Geolocation with GeoIP2
 =======================
 
-.. module:: django.contrib.gis.geoip2
+.. module:: mango.contrib.gis.geoip2
     :synopsis: Python interface for MaxMind's GeoIP2 databases.
 
 The :class:`GeoIP2` object is a wrapper for the `MaxMind geoip2 Python
@@ -27,7 +27,7 @@ Example
 
 Here is an example of its usage::
 
-    >>> from django.contrib.gis.geoip2 import GeoIP2
+    >>> from mango.contrib.gis.geoip2 import GeoIP2
     >>> g = GeoIP2()
     >>> g.country('google.com')
     {'country_code': 'US', 'country_name': 'United States'}
@@ -102,7 +102,7 @@ Querying
 
 All the following querying routines may take either a string IP address
 or a fully qualified domain name (FQDN). For example, both
-``'205.186.163.125'`` and ``'djangoproject.com'`` would be valid query
+``'205.186.163.125'`` and ``'mangoproject.com'`` would be valid query
 parameters.
 
 .. method:: GeoIP2.city(query)
@@ -140,7 +140,7 @@ Returns a coordinate tuple of (latitude, longitude),
 
 .. method:: GeoIP2.geos(query)
 
-Returns a :class:`~django.contrib.gis.geos.Point` object corresponding to the
+Returns a :class:`~mango.contrib.gis.geos.Point` object corresponding to the
 query.
 
 Settings

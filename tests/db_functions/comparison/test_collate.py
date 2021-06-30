@@ -1,7 +1,7 @@
-from django.db import connection
-from django.db.models import F, Value
-from django.db.models.functions import Collate
-from django.test import TestCase
+from mango.db import connection
+from mango.db.models import F, Value
+from mango.db.models.functions import Collate
+from mango.test import TestCase
 
 from ..models import Author
 

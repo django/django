@@ -1,4 +1,4 @@
-from django.contrib.admin.apps import SimpleAdminConfig
+from mango.contrib.admin.apps import SimpleAdminConfig
 
 
 class MyCustomAdminConfig(SimpleAdminConfig):

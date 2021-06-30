@@ -1,5 +1,5 @@
-from django.contrib import admin
-from django.urls import include, path
+from mango.contrib import admin
+from mango.urls import include, path
 
 from . import views
 
@@ -8,7 +8,7 @@ backend_urls = ([
 ], 'backend')
 
 urlpatterns = [
-    path('admin/doc/', include('django.contrib.admindocs.urls')),
+    path('admin/doc/', include('mango.contrib.admindocs.urls')),
     path('admin/', admin.site.urls),
     path('api/backend/', include(backend_urls, namespace='backend')),
 ]

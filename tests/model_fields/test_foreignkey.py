@@ -1,11 +1,11 @@
 from decimal import Decimal
 
-from django.apps import apps
-from django.core import checks
-from django.core.exceptions import FieldError
-from django.db import models
-from django.test import TestCase, skipIfDBFeature
-from django.test.utils import isolate_apps
+from mango.apps import apps
+from mango.core import checks
+from mango.core.exceptions import FieldError
+from mango.db import models
+from mango.test import TestCase, skipIfDBFeature
+from mango.test.utils import isolate_apps
 
 from .models import Bar, FkToChar, Foo, PrimaryKeyCharModel
 

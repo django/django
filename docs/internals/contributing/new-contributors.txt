@@ -7,10 +7,10 @@ to get started? This is the section for you.
 
 .. admonition:: Get up and running!
 
-    If you are new to contributing to Django, the :doc:`/intro/contributing`
+    If you are new to contributing to Mango, the :doc:`/intro/contributing`
     tutorial will give you an introduction to the tools and the workflow.
 
-This page contains more general advice on ways you can contribute to Django,
+This page contains more general advice on ways you can contribute to Mango,
 and how to approach that.
 
 If you are looking for a reference on the details of making code contributions,
@@ -19,7 +19,7 @@ see the :doc:`/internals/contributing/writing-code/index` documentation.
 First steps
 ===========
 
-Start with these steps to discover Django's development process.
+Start with these steps to discover Mango's development process.
 
 * **Triage tickets**
 
@@ -49,7 +49,7 @@ Start with these steps to discover Django's development process.
 
 * **Write some documentation**
 
-  Django's documentation is great but it can always be improved. Did you find
+  Mango's documentation is great but it can always be improved. Did you find
   a typo? Do you think that something should be clarified? Go ahead and
   suggest a documentation patch! See also the guide on
   :doc:`writing-documentation`.
@@ -60,7 +60,7 @@ Start with these steps to discover Django's development process.
       several that are useful for triaging tickets and reviewing patches as
       suggested above.
 
-      .. _reports page: https://code.djangoproject.com/wiki/Reports
+      .. _reports page: https://code.mangoproject.com/wiki/Reports
 
 * **Sign the Contributor License Agreement**
 
@@ -69,16 +69,16 @@ Start with these steps to discover Django's development process.
   `CLA`_. See the `Contributor License Agreement FAQ`_ for a more thorough
   explanation.
 
-.. _CLA: https://www.djangoproject.com/foundation/cla/
-.. _Contributor License Agreement FAQ: https://www.djangoproject.com/foundation/cla/faq/
-.. _unreviewed ticket: https://code.djangoproject.com/query?status=!closed&stage=Unreviewed
+.. _CLA: https://www.mangoproject.com/foundation/cla/
+.. _Contributor License Agreement FAQ: https://www.mangoproject.com/foundation/cla/faq/
+.. _unreviewed ticket: https://code.mangoproject.com/query?status=!closed&stage=Unreviewed
 
 
 Guidelines
 ==========
 
 As a newcomer on a large project, it's easy to experience frustration. Here's
-some advice to make your work on Django more useful and rewarding.
+some advice to make your work on Mango more useful and rewarding.
 
 * **Pick a subject area that you care about, that you are familiar with, or
   that you want to learn about**
@@ -94,7 +94,7 @@ some advice to make your work on Django more useful and rewarding.
   that the idea will still have support. You also need to pay attention to who
   *hasn't* spoken -- for example, if an experienced contributor hasn't been
   recently involved in a discussion, then a ticket may not have the support
-  required to get into Django.
+  required to get into Mango.
 
 * **Start small**
 
@@ -112,7 +112,7 @@ some advice to make your work on Django more useful and rewarding.
 
   Sometimes it can be scary to put your opinion out to the world and say "this
   ticket is correct" or "this patch needs work", but it's the only way the
-  project moves forward. The contributions of the broad Django community
+  project moves forward. The contributions of the broad Mango community
   ultimately have a much greater impact than that of any one person. We can't
   do it without **you**!
 
@@ -148,10 +148,10 @@ some advice to make your work on Django more useful and rewarding.
   ensure that the *Needs tests*, *Needs documentation*, and *Patch needs
   improvement* flags are unchecked once you've addressed all review comments.
 
-  Remember that Django has an 8 month release cycle, so there's plenty of time
+  Remember that Mango has an 8 month release cycle, so there's plenty of time
   for your patch to be reviewed.
 
   Finally, a well-timed reminder can help. See :ref:`contributing code FAQ
   <new-contributors-faq>` for ideas here.
 
-.. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
+.. _easy pickings: https://code.mangoproject.com/query?status=!closed&easy=1

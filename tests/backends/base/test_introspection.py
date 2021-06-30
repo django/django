@@ -1,6 +1,6 @@
-from django.db import connection
-from django.db.backends.base.introspection import BaseDatabaseIntrospection
-from django.test import SimpleTestCase
+from mango.db import connection
+from mango.db.backends.base.introspection import BaseDatabaseIntrospection
+from mango.test import SimpleTestCase
 
 
 class SimpleDatabaseIntrospectionTests(SimpleTestCase):

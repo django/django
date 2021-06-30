@@ -2,7 +2,7 @@
 Submitting patches
 ==================
 
-We're always grateful for patches to Django's code. Indeed, bug reports
+We're always grateful for patches to Mango's code. Indeed, bug reports
 with associated patches will get fixed *far* more quickly than those
 without patches.
 
@@ -26,7 +26,7 @@ Hence, our policy is for contributors to "claim" tickets in order to let other
 developers know that a particular bug or feature is being worked on.
 
 If you have identified a contribution you want to make and you're capable of
-fixing it (as measured by your coding ability, knowledge of Django internals
+fixing it (as measured by your coding ability, knowledge of Mango internals
 and time availability), claim it by following these steps:
 
 * `Login using your GitHub account`_ or `create an account`_ in our ticket
@@ -45,21 +45,21 @@ and time availability), claim it by following these steps:
   any activity, it's probably safe to reassign it to yourself.
 
 * Log into your account, if you haven't already, by clicking "GitHub Login"
-  or "DjangoProject Login" in the upper left of the ticket page.
+  or "MangoProject Login" in the upper left of the ticket page.
 
 * Claim the ticket by clicking the "assign to myself" radio button under
   "Action" near the bottom of the page, then click "Submit changes."
 
 .. note::
-    The Django software foundation requests that anyone contributing more than
-    a trivial patch to Django sign and submit a `Contributor License
-    Agreement`_, this ensures that the Django Software Foundation has clear
+    The Mango software foundation requests that anyone contributing more than
+    a trivial patch to Mango sign and submit a `Contributor License
+    Agreement`_, this ensures that the Mango Software Foundation has clear
     license to all contributions allowing for a clear license for all users.
 
-.. _Login using your GitHub account: https://code.djangoproject.com/github/login
-.. _Create an account: https://www.djangoproject.com/accounts/register/
-.. _password reset page: https://www.djangoproject.com/accounts/password/reset/
-.. _Contributor License Agreement: https://www.djangoproject.com/foundation/cla/
+.. _Login using your GitHub account: https://code.mangoproject.com/github/login
+.. _Create an account: https://www.mangoproject.com/accounts/register/
+.. _password reset page: https://www.mangoproject.com/accounts/password/reset/
+.. _Contributor License Agreement: https://www.mangoproject.com/foundation/cla/
 
 Ticket claimers' responsibility
 -------------------------------
@@ -137,17 +137,17 @@ Regardless of the way you submit your work, follow these steps.
   checked. This makes the ticket appear in the "Patches needing review" queue
   on the `Development dashboard`_.
 
-.. _ticket tracker: https://code.djangoproject.com/
-.. _Development dashboard: https://dashboard.djangoproject.com/
+.. _ticket tracker: https://code.mangoproject.com/
+.. _Development dashboard: https://dashboard.mangoproject.com/
 
 Non-trivial patches
 ===================
 
 A "non-trivial" patch is one that is more than a small bug fix. It's a patch
-that introduces Django functionality and makes some sort of design decision.
+that introduces Mango functionality and makes some sort of design decision.
 
 If you provide a non-trivial patch, include evidence that alternatives have
-been discussed on |django-developers|.
+been discussed on |mango-developers|.
 
 If you're not sure whether your patch should be considered non-trivial, ask on
 the ticket for opinions.
@@ -157,58 +157,58 @@ the ticket for opinions.
 Deprecating a feature
 =====================
 
-There are a couple of reasons that code in Django might be deprecated:
+There are a couple of reasons that code in Mango might be deprecated:
 
 * If a feature has been improved or modified in a backwards-incompatible way,
   the old feature or behavior will be deprecated.
 
-* Sometimes Django will include a backport of a Python library that's not
-  included in a version of Python that Django currently supports. When Django
+* Sometimes Mango will include a backport of a Python library that's not
+  included in a version of Python that Mango currently supports. When Mango
   no longer needs to support the older version of Python that doesn't include
-  the library, the library will be deprecated in Django.
+  the library, the library will be deprecated in Mango.
 
 As the :ref:`deprecation policy<internal-release-deprecation-policy>` describes,
-the first release of Django that deprecates a feature (``A.B``) should raise a
-``RemovedInDjangoXXWarning`` (where XX is the Django version where the feature
+the first release of Mango that deprecates a feature (``A.B``) should raise a
+``RemovedInMangoXXWarning`` (where XX is the Mango version where the feature
 will be removed) when the deprecated feature is invoked. Assuming we have good
 test coverage, these warnings are converted to errors when :ref:`running the
 test suite <running-unit-tests>` with warnings enabled:
-``python -Wa runtests.py``. Thus, when adding a ``RemovedInDjangoXXWarning``
+``python -Wa runtests.py``. Thus, when adding a ``RemovedInMangoXXWarning``
 you need to eliminate or silence any warnings generated when running the tests.
 
-The first step is to remove any use of the deprecated behavior by Django itself.
+The first step is to remove any use of the deprecated behavior by Mango itself.
 Next you can silence warnings in tests that actually test the deprecated
 behavior by using the ``ignore_warnings`` decorator, either at the test or class
 level:
 
 #) In a particular test::
 
-    from django.test import ignore_warnings
-    from django.utils.deprecation import RemovedInDjangoXXWarning
+    from mango.test import ignore_warnings
+    from mango.utils.deprecation import RemovedInMangoXXWarning
 
-    @ignore_warnings(category=RemovedInDjangoXXWarning)
+    @ignore_warnings(category=RemovedInMangoXXWarning)
     def test_foo(self):
         ...
 
 #) For an entire test case::
 
-    from django.test import ignore_warnings
-    from django.utils.deprecation import RemovedInDjangoXXWarning
+    from mango.test import ignore_warnings
+    from mango.utils.deprecation import RemovedInMangoXXWarning
 
-    @ignore_warnings(category=RemovedInDjangoXXWarning)
+    @ignore_warnings(category=RemovedInMangoXXWarning)
     class MyDeprecatedTests(unittest.TestCase):
         ...
 
 You can also add a test for the deprecation warning::
 
-    from django.utils.deprecation import RemovedInDjangoXXWarning
+    from mango.utils.deprecation import RemovedInMangoXXWarning
 
     def test_foo_deprecation_warning(self):
         msg = 'Expected deprecation message'
-        with self.assertWarnsMessage(RemovedInDjangoXXWarning, msg):
+        with self.assertWarnsMessage(RemovedInMangoXXWarning, msg):
             # invoke deprecated behavior
 
-Finally, there are a couple of updates to Django's documentation to make:
+Finally, there are a couple of updates to Mango's documentation to make:
 
 #) If the existing feature is documented, mark it deprecated in documentation
    using the ``.. deprecated:: A.B`` annotation. Include a short description
@@ -223,7 +223,7 @@ Finally, there are a couple of updates to Django's documentation to make:
 
 Once you have completed these steps, you are finished with the deprecation.
 In each :term:`feature release <Feature release>`, all
-``RemovedInDjangoXXWarning``\s matching the new version are removed.
+``RemovedInMangoXXWarning``\s matching the new version are removed.
 
 JavaScript patches
 ==================
@@ -248,7 +248,7 @@ further works need to be done. If you're looking to become a committer,
 doing thorough reviews of patches is a great way to earn trust.
 
 Looking for a patch to review? Check out the "Patches needing review" section
-of the `Django Development Dashboard <https://dashboard.djangoproject.com/>`_.
+of the `Mango Development Dashboard <https://dashboard.mangoproject.com/>`_.
 Looking to get your patch reviewed? Ensure the Trac flags on the ticket are
 set so that the ticket appears in that queue.
 
@@ -267,7 +267,7 @@ Bugs
 * Is there a proper regression test (the test should fail before the fix
   is applied)?
 * If it's a bug that :ref:`qualifies for a backport <supported-versions-policy>`
-  to the stable version of Django, is there a release note in
+  to the stable version of Mango, is there a release note in
   ``docs/releases/A.B.C.txt``? Bug fixes that will be applied only to the main
   branch don't need a release note.
 
@@ -295,7 +295,7 @@ All code changes
   these errors.
 * If the change is backwards incompatible in any way, is there a note
   in the release notes (``docs/releases/A.B.txt``)?
-* Is Django's test suite passing?
+* Is Mango's test suite passing?
 
 All tickets
 -----------
@@ -305,4 +305,4 @@ All tickets
 * Are you the patch author and a new contributor? Please add yourself to the
   ``AUTHORS`` file and submit a `Contributor License Agreement`_.
 
-.. _Contributor License Agreement: https://www.djangoproject.com/foundation/cla/
+.. _Contributor License Agreement: https://www.mangoproject.com/foundation/cla/

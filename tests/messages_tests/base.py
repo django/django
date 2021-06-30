@@ -1,12 +1,12 @@
-from django.contrib.messages import constants, get_level, set_level, utils
-from django.contrib.messages.api import MessageFailure
-from django.contrib.messages.constants import DEFAULT_LEVELS
-from django.contrib.messages.storage import base, default_storage
-from django.contrib.messages.storage.base import Message
-from django.http import HttpRequest, HttpResponse
-from django.test import modify_settings, override_settings
-from django.urls import reverse
-from django.utils.translation import gettext_lazy
+from mango.contrib.messages import constants, get_level, set_level, utils
+from mango.contrib.messages.api import MessageFailure
+from mango.contrib.messages.constants import DEFAULT_LEVELS
+from mango.contrib.messages.storage import base, default_storage
+from mango.contrib.messages.storage.base import Message
+from mango.http import HttpRequest, HttpResponse
+from mango.test import modify_settings, override_settings
+from mango.urls import reverse
+from mango.utils.translation import gettext_lazy
 
 
 def add_level_messages(storage):
@@ -26,7 +26,7 @@ class override_settings_tags(override_settings):
     def enable(self):
         super().enable()
         # LEVEL_TAGS is a constant defined in the
-        # django.contrib.messages.storage.base module, so after changing
+        # mango.contrib.messages.storage.base module, so after changing
         # settings.MESSAGE_TAGS, update that constant also.
         self.old_level_tags = base.LEVEL_TAGS
         base.LEVEL_TAGS = utils.get_level_tags()
@@ -49,20 +49,20 @@ class BaseTests:
     def setUp(self):
         self.settings_override = override_settings_tags(
             TEMPLATES=[{
-                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'BACKEND': 'mango.template.backends.mango.MangoTemplates',
                 'DIRS': [],
                 'APP_DIRS': True,
                 'OPTIONS': {
                     'context_processors': (
-                        'django.contrib.auth.context_processors.auth',
-                        'django.contrib.messages.context_processors.messages',
+                        'mango.contrib.auth.context_processors.auth',
+                        'mango.contrib.messages.context_processors.messages',
                     ),
                 },
             }],
             ROOT_URLCONF='messages_tests.urls',
             MESSAGE_TAGS={},
             MESSAGE_STORAGE='%s.%s' % (self.storage_class.__module__, self.storage_class.__name__),
-            SESSION_SERIALIZER='django.contrib.sessions.serializers.JSONSerializer',
+            SESSION_SERIALIZER='mango.contrib.sessions.serializers.JSONSerializer',
         )
         self.settings_override.enable()
 
@@ -221,13 +221,13 @@ class BaseTests:
             self.assertContains(response, msg)
 
     @modify_settings(
-        INSTALLED_APPS={'remove': 'django.contrib.messages'},
-        MIDDLEWARE={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
+        INSTALLED_APPS={'remove': 'mango.contrib.messages'},
+        MIDDLEWARE={'remove': 'mango.contrib.messages.middleware.MessageMiddleware'},
     )
     @override_settings(
         MESSAGE_LEVEL=constants.DEBUG,
         TEMPLATES=[{
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'BACKEND': 'mango.template.backends.mango.MangoTemplates',
             'DIRS': [],
             'APP_DIRS': True,
         }],
@@ -247,12 +247,12 @@ class BaseTests:
                 self.client.post(add_url, data, follow=True)
 
     @modify_settings(
-        INSTALLED_APPS={'remove': 'django.contrib.messages'},
-        MIDDLEWARE={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
+        INSTALLED_APPS={'remove': 'mango.contrib.messages'},
+        MIDDLEWARE={'remove': 'mango.contrib.messages.middleware.MessageMiddleware'},
     )
     @override_settings(
         TEMPLATES=[{
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'BACKEND': 'mango.template.backends.mango.MangoTemplates',
             'DIRS': [],
             'APP_DIRS': True,
         }],

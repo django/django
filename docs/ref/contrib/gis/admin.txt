@@ -1,9 +1,9 @@
 ======================
-GeoDjango's admin site
+GeoMango's admin site
 ======================
 
-.. module:: django.contrib.gis.admin
-    :synopsis: GeoDjango's extensions to the admin site.
+.. module:: mango.contrib.gis.admin
+    :synopsis: GeoMango's extensions to the admin site.
 
 ``GeoModelAdmin``
 =================
@@ -52,7 +52,7 @@ GeoDjango's admin site
     .. note::
 
         This is different from adding the geometry field to
-        :attr:`~django.contrib.admin.ModelAdmin.readonly_fields`,
+        :attr:`~mango.contrib.admin.ModelAdmin.readonly_fields`,
         which will only display the WKT of the geometry. Setting
         ``modifiable=False``, actually displays the geometry in a map,
         but disables the ability to edit its vertices.

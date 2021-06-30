@@ -1,5 +1,5 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from django.db import models
+from mango.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from mango.db import models
 
 
 class Organization(models.Model):

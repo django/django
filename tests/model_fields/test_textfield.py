@@ -1,6 +1,6 @@
-from django import forms
-from django.db import models
-from django.test import SimpleTestCase, TestCase
+from mango import forms
+from mango.db import models
+from mango.test import SimpleTestCase, TestCase
 
 from .models import Post
 

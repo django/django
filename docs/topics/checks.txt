@@ -2,9 +2,9 @@
 System check framework
 ======================
 
-.. module:: django.core.checks
+.. module:: mango.core.checks
 
-The system check framework is a set of static checks for validating Django
+The system check framework is a set of static checks for validating Mango
 projects. It detects common problems and provides hints for how to fix them.
 The framework is extensible so you can easily add your own checks.
 
@@ -14,12 +14,12 @@ triggered implicitly before most commands, including :djadmin:`runserver` and
 WSGI stack that is used in deployment. If you need to run system checks on your
 deployment server, trigger them explicitly using :djadmin:`check`.
 
-Serious errors will prevent Django commands (such as :djadmin:`runserver`) from
+Serious errors will prevent Mango commands (such as :djadmin:`runserver`) from
 running at all. Minor problems are reported to the console. If you have inspected
 the cause of a warning and are happy to ignore it, you can hide specific warnings
 using the :setting:`SILENCED_SYSTEM_CHECKS` setting in your project settings file.
 
-A full list of all checks that can be raised by Django can be found in the
+A full list of all checks that can be raised by Mango can be found in the
 :doc:`System check reference </ref/checks>`.
 
 Writing your own checks
@@ -29,7 +29,7 @@ The framework is flexible and allows you to write functions that perform
 any other kind of check you may require. The following is an example stub
 check function::
 
-    from django.core.checks import Error, register
+    from mango.core.checks import Error, register
 
     @register()
     def example_check(app_configs, **kwargs):
@@ -58,8 +58,8 @@ The function must return a list of messages. If no problems are found as a resul
 of the check, the check function must return an empty list.
 
 The warnings and errors raised by the check method must be instances of
-:class:`~django.core.checks.CheckMessage`. An instance of
-:class:`~django.core.checks.CheckMessage` encapsulates a single reportable
+:class:`~mango.core.checks.CheckMessage`. An instance of
+:class:`~mango.core.checks.CheckMessage` encapsulates a single reportable
 error or warning. It also provides context and hints applicable to the
 message, and a unique identifier that is used for filtering purposes.
 
@@ -85,7 +85,7 @@ Registering and labeling checks
 Lastly, your check function must be registered explicitly with system check
 registry. Checks should be registered in a file that's loaded when your
 application is loaded; for example, in the :meth:`AppConfig.ready()
-<django.apps.AppConfig.ready>` method.
+<mango.apps.AppConfig.ready>` method.
 
 .. function:: register(*tags)(function)
 
@@ -94,7 +94,7 @@ check. Tagging checks is useful since it allows you to run only a certain
 group of checks. For example, to register a compatibility check, you would
 make the following call::
 
-    from django.core.checks import register, Tags
+    from mango.core.checks import register, Tags
 
     @register(Tags.compatibility)
     def my_check(app_configs, **kwargs):
@@ -141,8 +141,8 @@ constructor of ``IntegerField``. You may want to add a check to ensure that user
 provide a min value that is less than or equal to the max value. The following
 code snippet shows how you can implement this check::
 
-    from django.core import checks
-    from django.db import models
+    from mango.core import checks
+    from mango.db import models
 
     class RangedIntegerField(models.IntegerField):
         def __init__(self, min=None, max=None, **kwargs):
@@ -176,7 +176,7 @@ code snippet shows how you can implement this check::
             return []
 
 If you wanted to add checks to a model manager, you would take the same
-approach on your subclass of :class:`~django.db.models.Manager`.
+approach on your subclass of :class:`~mango.db.models.Manager`.
 
 If you want to add a check to a model class, the approach is *almost* the same:
 the only difference is that the check is a classmethod, not an instance method::
@@ -193,7 +193,7 @@ Writing tests
 
 Messages are comparable. That allows you to easily write tests::
 
-    from django.core.checks import Error
+    from mango.core.checks import Error
     errors = checked_object.check()
     expected_errors = [
         Error(

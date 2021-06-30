@@ -1,24 +1,24 @@
 """
-Tests for Django's bundled context processors.
+Tests for Mango's bundled context processors.
 """
-from django.test import SimpleTestCase, TestCase, override_settings
+from mango.test import SimpleTestCase, TestCase, override_settings
 
 
 @override_settings(
     ROOT_URLCONF='context_processors.urls',
     TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.request',
+                'mango.template.context_processors.request',
             ],
         },
     }],
 )
 class RequestContextProcessorTests(SimpleTestCase):
     """
-    Tests for the ``django.template.context_processors.request`` processor.
+    Tests for the ``mango.template.context_processors.request`` processor.
     """
 
     def test_request_attributes(self):
@@ -51,18 +51,18 @@ class RequestContextProcessorTests(SimpleTestCase):
     INTERNAL_IPS=['127.0.0.1'],
     ROOT_URLCONF='context_processors.urls',
     TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug',
+                'mango.template.context_processors.debug',
             ],
         },
     }],
 )
 class DebugContextProcessorTests(TestCase):
     """
-    Tests for the ``django.template.context_processors.debug`` processor.
+    Tests for the ``mango.template.context_processors.debug`` processor.
     """
     databases = {'default', 'other'}
 

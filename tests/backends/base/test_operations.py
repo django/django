@@ -1,14 +1,14 @@
 import decimal
 
-from django.core.management.color import no_style
-from django.db import NotSupportedError, connection, transaction
-from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.models import DurationField
-from django.test import (
+from mango.core.management.color import no_style
+from mango.db import NotSupportedError, connection, transaction
+from mango.db.backends.base.operations import BaseDatabaseOperations
+from mango.db.models import DurationField
+from mango.test import (
     SimpleTestCase, TestCase, TransactionTestCase, override_settings,
     skipIfDBFeature,
 )
-from django.utils import timezone
+from mango.utils import timezone
 
 from ..models import Author, Book
 
@@ -76,7 +76,7 @@ class SimpleDatabaseOperationTests(SimpleTestCase):
         self.assertIsNone(self.ops.adapt_datetimefield_value(None))
 
     def test_adapt_timefield_value(self):
-        msg = 'Django does not support timezone-aware times.'
+        msg = 'Mango does not support timezone-aware times.'
         with self.assertRaisesMessage(ValueError, msg):
             self.ops.adapt_timefield_value(timezone.make_aware(timezone.now()))
 

@@ -2,12 +2,12 @@
 PostgreSQL specific database constraints
 ========================================
 
-.. module:: django.contrib.postgres.constraints
+.. module:: mango.contrib.postgres.constraints
    :synopsis: PostgreSQL specific database constraint
 
 PostgreSQL supports additional data integrity constraints available from the
-``django.contrib.postgres.constraints`` module. They are added in the model
-:attr:`Meta.constraints <django.db.models.Options.constraints>` option.
+``mango.contrib.postgres.constraints`` module. They are added in the model
+:attr:`Meta.constraints <mango.db.models.Options.constraints>` option.
 
 ``ExclusionConstraint``
 =======================
@@ -20,11 +20,11 @@ PostgreSQL supports additional data integrity constraints available from the
     you need to activate the `btree_gist extension
     <https://www.postgresql.org/docs/current/btree-gist.html>`_ on PostgreSQL.
     You can install it using the
-    :class:`~django.contrib.postgres.operations.BtreeGistExtension` migration
+    :class:`~mango.contrib.postgres.operations.BtreeGistExtension` migration
     operation.
 
     If you attempt to insert a new row that conflicts with an existing row, an
-    :exc:`~django.db.IntegrityError` is raised. Similarly, when update
+    :exc:`~mango.db.IntegrityError` is raised. Similarly, when update
     conflicts with an existing row.
 
 ``name``
@@ -41,7 +41,7 @@ The name of the constraint.
 
 An iterable of 2-tuples. The first element is an expression or string. The
 second element is an SQL operator represented as a string. To avoid typos, you
-may use :class:`~django.contrib.postgres.fields.RangeOperators` which maps the
+may use :class:`~mango.contrib.postgres.fields.RangeOperators` which maps the
 operators with strings. For example::
 
     expressions=[
@@ -67,12 +67,12 @@ Matching is case insensitive. If not provided, the default index type is
 
 .. attribute:: ExclusionConstraint.condition
 
-A :class:`~django.db.models.Q` object that specifies the condition to restrict
+A :class:`~mango.db.models.Q` object that specifies the condition to restrict
 a constraint to a subset of rows. For example,
 ``condition=Q(cancelled=False)``.
 
 These conditions have the same database restrictions as
-:attr:`django.db.models.Index.condition`.
+:attr:`mango.db.models.Index.condition`.
 
 ``deferrable``
 --------------
@@ -82,9 +82,9 @@ These conditions have the same database restrictions as
 Set this parameter to create a deferrable exclusion constraint. Accepted values
 are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::
 
-    from django.contrib.postgres.constraints import ExclusionConstraint
-    from django.contrib.postgres.fields import RangeOperators
-    from django.db.models import Deferrable
+    from mango.contrib.postgres.constraints import ExclusionConstraint
+    from mango.contrib.postgres.fields import RangeOperators
+    from mango.db.models import Deferrable
 
 
     ExclusionConstraint(
@@ -147,10 +147,10 @@ Examples
 The following example restricts overlapping reservations in the same room, not
 taking canceled reservations into account::
 
-    from django.contrib.postgres.constraints import ExclusionConstraint
-    from django.contrib.postgres.fields import DateTimeRangeField, RangeOperators
-    from django.db import models
-    from django.db.models import Q
+    from mango.contrib.postgres.constraints import ExclusionConstraint
+    from mango.contrib.postgres.fields import DateTimeRangeField, RangeOperators
+    from mango.db import models
+    from mango.db.models import Q
 
     class Room(models.Model):
         number = models.IntegerField()
@@ -178,18 +178,18 @@ PostgreSQL range types, you should write an expression that uses the equivalent
 function (e.g. ``TsTzRange()``), and use the delimiters for the field. Most
 often, the delimiters will be ``'[)'``, meaning that the lower bound is
 inclusive and the upper bound is exclusive. You may use the
-:class:`~django.contrib.postgres.fields.RangeBoundary` that provides an
+:class:`~mango.contrib.postgres.fields.RangeBoundary` that provides an
 expression mapping for the `range boundaries <https://www.postgresql.org/docs/
 current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_. For example::
 
-    from django.contrib.postgres.constraints import ExclusionConstraint
-    from django.contrib.postgres.fields import (
+    from mango.contrib.postgres.constraints import ExclusionConstraint
+    from mango.contrib.postgres.fields import (
         DateTimeRangeField,
         RangeBoundary,
         RangeOperators,
     )
-    from django.db import models
-    from django.db.models import Func, Q
+    from mango.db import models
+    from mango.db.models import Func, Q
 
 
     class TsTzRange(Func):

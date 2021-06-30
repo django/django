@@ -3,15 +3,15 @@ import os
 import tempfile
 import uuid
 
-from django.contrib.contenttypes.fields import (
+from mango.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
-from django.contrib.contenttypes.models import ContentType
-from django.core.files.storage import FileSystemStorage
-from django.core.serializers.json import DjangoJSONEncoder
-from django.db import models
-from django.db.models.fields.files import ImageFieldFile
-from django.utils.translation import gettext_lazy as _
+from mango.contrib.contenttypes.models import ContentType
+from mango.core.files.storage import FileSystemStorage
+from mango.core.serializers.json import MangoJSONEncoder
+from mango.db import models
+from mango.db.models.fields.files import ImageFieldFile
+from mango.utils.translation import gettext_lazy as _
 
 try:
     from PIL import Image
@@ -352,7 +352,7 @@ class JSONModel(models.Model):
 class NullableJSONModel(models.Model):
     value = models.JSONField(blank=True, null=True)
     value_custom = models.JSONField(
-        encoder=DjangoJSONEncoder,
+        encoder=MangoJSONEncoder,
         decoder=CustomJSONDecoder,
         null=True,
     )

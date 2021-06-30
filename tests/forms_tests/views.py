@@ -1,5 +1,5 @@
-from django import forms
-from django.views.generic.edit import UpdateView
+from mango import forms
+from mango.views.generic.edit import UpdateView
 
 from .models import Article
 

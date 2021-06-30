@@ -1,7 +1,7 @@
-from django.db.models import CharField
-from django.db.models.functions import Length
-from django.test import TestCase
-from django.test.utils import register_lookup
+from mango.db.models import CharField
+from mango.db.models.functions import Length
+from mango.test import TestCase
+from mango.test.utils import register_lookup
 
 from ..models import Author
 

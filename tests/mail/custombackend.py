@@ -1,6 +1,6 @@
 """A custom backend for testing."""
 
-from django.core.mail.backends.base import BaseEmailBackend
+from mango.core.mail.backends.base import BaseEmailBackend
 
 
 class EmailBackend(BaseEmailBackend):

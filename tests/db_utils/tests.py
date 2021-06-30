@@ -1,11 +1,11 @@
-"""Tests for django.db.utils."""
+"""Tests for mango.db.utils."""
 import unittest
 
-from django.core.exceptions import ImproperlyConfigured
-from django.db import DEFAULT_DB_ALIAS, ProgrammingError, connection
-from django.db.utils import ConnectionHandler, load_backend
-from django.test import SimpleTestCase, TestCase
-from django.utils.connection import ConnectionDoesNotExist
+from mango.core.exceptions import ImproperlyConfigured
+from mango.db import DEFAULT_DB_ALIAS, ProgrammingError, connection
+from mango.db.utils import ConnectionHandler, load_backend
+from mango.test import SimpleTestCase, TestCase
+from mango.utils.connection import ConnectionDoesNotExist
 
 
 class ConnectionHandlerTests(SimpleTestCase):
@@ -24,7 +24,7 @@ class ConnectionHandlerTests(SimpleTestCase):
 
     def assertImproperlyConfigured(self, DATABASES):
         conns = ConnectionHandler(DATABASES)
-        self.assertEqual(conns[DEFAULT_DB_ALIAS].settings_dict['ENGINE'], 'django.db.backends.dummy')
+        self.assertEqual(conns[DEFAULT_DB_ALIAS].settings_dict['ENGINE'], 'mango.db.backends.dummy')
         msg = (
             'settings.DATABASES is improperly configured. Please supply the '
             'ENGINE value. Check settings documentation for more details.'
@@ -42,7 +42,7 @@ class ConnectionHandlerTests(SimpleTestCase):
     def test_nonexistent_alias(self):
         msg = "The connection 'nonexistent' doesn't exist."
         conns = ConnectionHandler({
-            DEFAULT_DB_ALIAS: {'ENGINE': 'django.db.backends.dummy'},
+            DEFAULT_DB_ALIAS: {'ENGINE': 'mango.db.backends.dummy'},
         })
         with self.assertRaisesMessage(ConnectionDoesNotExist, msg):
             conns['nonexistent']
@@ -50,7 +50,7 @@ class ConnectionHandlerTests(SimpleTestCase):
     def test_ensure_defaults_nonexistent_alias(self):
         msg = "The connection 'nonexistent' doesn't exist."
         conns = ConnectionHandler({
-            DEFAULT_DB_ALIAS: {'ENGINE': 'django.db.backends.dummy'},
+            DEFAULT_DB_ALIAS: {'ENGINE': 'mango.db.backends.dummy'},
         })
         with self.assertRaisesMessage(ConnectionDoesNotExist, msg):
             conns.ensure_defaults('nonexistent')
@@ -58,7 +58,7 @@ class ConnectionHandlerTests(SimpleTestCase):
     def test_prepare_test_settings_nonexistent_alias(self):
         msg = "The connection 'nonexistent' doesn't exist."
         conns = ConnectionHandler({
-            DEFAULT_DB_ALIAS: {'ENGINE': 'django.db.backends.dummy'},
+            DEFAULT_DB_ALIAS: {'ENGINE': 'mango.db.backends.dummy'},
         })
         with self.assertRaisesMessage(ConnectionDoesNotExist, msg):
             conns.prepare_test_settings('nonexistent')
@@ -84,7 +84,7 @@ class LoadBackendTests(SimpleTestCase):
         msg = (
             "'foo' isn't an available database backend or couldn't be "
             "imported. Check the above exception. To use one of the built-in "
-            "backends, use 'django.db.backends.XXX', where XXX is one of:\n"
+            "backends, use 'mango.db.backends.XXX', where XXX is one of:\n"
             "    'mysql', 'oracle', 'postgresql', 'sqlite3'"
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg) as cm:

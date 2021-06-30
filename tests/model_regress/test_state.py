@@ -1,5 +1,5 @@
-from django.db.models.base import ModelState, ModelStateFieldsCacheDescriptor
-from django.test import SimpleTestCase
+from mango.db.models.base import ModelState, ModelStateFieldsCacheDescriptor
+from mango.test import SimpleTestCase
 
 
 class ModelStateTests(SimpleTestCase):

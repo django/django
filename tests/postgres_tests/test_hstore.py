@@ -1,20 +1,20 @@
 import json
 
-from django.core import checks, exceptions, serializers
-from django.db import connection
-from django.db.models import F, OuterRef, Subquery
-from django.db.models.expressions import RawSQL
-from django.forms import Form
-from django.test.utils import CaptureQueriesContext, isolate_apps
+from mango.core import checks, exceptions, serializers
+from mango.db import connection
+from mango.db.models import F, OuterRef, Subquery
+from mango.db.models.expressions import RawSQL
+from mango.forms import Form
+from mango.test.utils import CaptureQueriesContext, isolate_apps
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import HStoreModel, PostgreSQLModel
 
 try:
-    from django.contrib.postgres import forms
-    from django.contrib.postgres.fields import HStoreField
-    from django.contrib.postgres.fields.hstore import KeyTransform
-    from django.contrib.postgres.validators import KeysValidator
+    from mango.contrib.postgres import forms
+    from mango.contrib.postgres.fields import HStoreField
+    from mango.contrib.postgres.fields.hstore import KeyTransform
+    from mango.contrib.postgres.validators import KeysValidator
 except ImportError:
     pass
 
@@ -401,6 +401,6 @@ class TestValidator(PostgreSQLSimpleTestCase):
         }
         validator = KeysValidator(keys=['a', 'b'], strict=True, messages=messages)
         path, args, kwargs = validator.deconstruct()
-        self.assertEqual(path, 'django.contrib.postgres.validators.KeysValidator')
+        self.assertEqual(path, 'mango.contrib.postgres.validators.KeysValidator')
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {'keys': ['a', 'b'], 'strict': True, 'messages': messages})

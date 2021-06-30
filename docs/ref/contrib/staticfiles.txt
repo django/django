@@ -2,10 +2,10 @@
 The ``staticfiles`` app
 =======================
 
-.. module:: django.contrib.staticfiles
+.. module:: mango.contrib.staticfiles
    :synopsis: An app for handling static files.
 
-``django.contrib.staticfiles`` collects static files from each of your
+``mango.contrib.staticfiles`` collects static files from each of your
 applications (and any other places you specify) into a single location that
 can easily be served in production.
 
@@ -32,12 +32,12 @@ following settings:
 Management Commands
 ===================
 
-``django.contrib.staticfiles`` exposes three management commands.
+``mango.contrib.staticfiles`` exposes three management commands.
 
 ``collectstatic``
 -----------------
 
-.. django-admin:: collectstatic
+.. mango-admin:: collectstatic
 
 Collects the static files into :setting:`STATIC_ROOT`.
 
@@ -58,11 +58,11 @@ Files are searched by using the :setting:`enabled finders
 specified by the :setting:`INSTALLED_APPS` setting.
 
 The :djadmin:`collectstatic` management command calls the
-:meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
+:meth:`~mango.contrib.staticfiles.storage.StaticFilesStorage.post_process`
 method of the :setting:`STATICFILES_STORAGE` after each run and passes
 a list of paths that have been found by the management command. It also
 receives all command line options of :djadmin:`collectstatic`. This is used
-by the :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
+by the :class:`~mango.contrib.staticfiles.storage.ManifestStaticFilesStorage`
 by default.
 
 By default, collected files receive permissions from
@@ -73,7 +73,7 @@ permissions for these files and/or directories, you can subclass either of the
 ``file_permissions_mode`` and/or ``directory_permissions_mode`` parameters,
 respectively. For example::
 
-    from django.contrib.staticfiles import storage
+    from mango.contrib.staticfiles import storage
 
     class MyStaticFilesStorage(storage.StaticFilesStorage):
         def __init__(self, *args, **kwargs):
@@ -86,35 +86,35 @@ Then set the :setting:`STATICFILES_STORAGE` setting to
 
 Some commonly used options are:
 
-.. django-admin-option:: --noinput, --no-input
+.. mango-admin-option:: --noinput, --no-input
 
     Do NOT prompt the user for input of any kind.
 
-.. django-admin-option:: --ignore PATTERN, -i PATTERN
+.. mango-admin-option:: --ignore PATTERN, -i PATTERN
 
     Ignore files, directories, or paths matching this glob-style pattern. Use
     multiple times to ignore more. When specifying a path, always use forward
     slashes, even on Windows.
 
-.. django-admin-option:: --dry-run, -n
+.. mango-admin-option:: --dry-run, -n
 
     Do everything except modify the filesystem.
 
-.. django-admin-option:: --clear, -c
+.. mango-admin-option:: --clear, -c
 
     Clear the existing files before trying to copy or link the original file.
 
-.. django-admin-option:: --link, -l
+.. mango-admin-option:: --link, -l
 
     Create a symbolic link to each file instead of copying.
 
-.. django-admin-option:: --no-post-process
+.. mango-admin-option:: --no-post-process
 
     Don't call the
-    :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
+    :meth:`~mango.contrib.staticfiles.storage.StaticFilesStorage.post_process`
     method of the configured :setting:`STATICFILES_STORAGE` storage backend.
 
-.. django-admin-option:: --no-default-ignore
+.. mango-admin-option:: --no-default-ignore
 
     Don't ignore the common private glob-style patterns ``'CVS'``, ``'.*'``
     and ``'*~'``.
@@ -132,12 +132,12 @@ Customizing the ignored pattern list
 
 The default ignored pattern list, ``['CVS', '.*', '*~']``, can be customized in
 a more persistent way than providing the ``--ignore`` command option at each
-``collectstatic`` invocation. Provide a custom :class:`~django.apps.AppConfig`
+``collectstatic`` invocation. Provide a custom :class:`~mango.apps.AppConfig`
 class, override the ``ignore_patterns`` attribute of this class and replace
-``'django.contrib.staticfiles'`` with that class path in your
+``'mango.contrib.staticfiles'`` with that class path in your
 :setting:`INSTALLED_APPS` setting::
 
-    from django.contrib.staticfiles.apps import StaticFilesConfig
+    from mango.contrib.staticfiles.apps import StaticFilesConfig
 
     class MyStaticFilesConfig(StaticFilesConfig):
         ignore_patterns = [...]  # your custom ignore list
@@ -145,7 +145,7 @@ class, override the ``ignore_patterns`` attribute of this class and replace
 ``findstatic``
 --------------
 
-.. django-admin:: findstatic staticfile [staticfile ...]
+.. mango-admin:: findstatic staticfile [staticfile ...]
 
 Searches for one or more relative paths with the enabled finders.
 
@@ -158,9 +158,9 @@ For example:
      /home/special.polls.com/core/static/css/base.css
      /home/polls.com/core/static/css/base.css
    Found 'admin/js/core.js' here:
-     /home/polls.com/src/django/contrib/admin/media/js/core.js
+     /home/polls.com/src/mango/contrib/admin/media/js/core.js
 
-.. django-admin-option:: findstatic --first
+.. mango-admin-option:: findstatic --first
 
 By default, all matching locations are found. To only return the first match
 for each relative path, use the ``--first`` option:
@@ -202,7 +202,7 @@ the directories which were searched:
 ``runserver``
 -------------
 
-.. django-admin:: runserver [addrport]
+.. mango-admin:: runserver [addrport]
     :noindex:
 
 Overrides the core :djadmin:`runserver` command if the ``staticfiles`` app
@@ -211,7 +211,7 @@ files. File serving doesn't run through :setting:`MIDDLEWARE`.
 
 The command adds these options:
 
-.. django-admin-option:: --nostatic
+.. mango-admin-option:: --nostatic
 
 Use the ``--nostatic`` option to disable serving of static files with the
 :doc:`staticfiles </ref/contrib/staticfiles>` app entirely. This option is
@@ -222,9 +222,9 @@ Example usage:
 
 .. console::
 
-    $ django-admin runserver --nostatic
+    $ mango-admin runserver --nostatic
 
-.. django-admin-option:: --insecure
+.. mango-admin-option:: --insecure
 
 Use the ``--insecure`` option to force serving of static files with the
 :doc:`staticfiles </ref/contrib/staticfiles>` app even if the :setting:`DEBUG`
@@ -240,7 +240,7 @@ Example usage:
 
 .. console::
 
-    $ django-admin runserver --insecure
+    $ mango-admin runserver --insecure
 
 .. _staticfiles-storages:
 
@@ -252,7 +252,7 @@ Storages
 
 .. class:: storage.StaticFilesStorage
 
-A subclass of the :class:`~django.core.files.storage.FileSystemStorage`
+A subclass of the :class:`~mango.core.files.storage.FileSystemStorage`
 storage backend that uses the :setting:`STATIC_ROOT` setting as the base
 file system location and the :setting:`STATIC_URL` setting respectively
 as the base URL.
@@ -267,7 +267,7 @@ line options. It yields tuples of three values:
 ``processed`` is a boolean indicating whether or not the value was
 post-processed, or an exception if post-processing failed.
 
-The :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
+The :class:`~mango.contrib.staticfiles.storage.ManifestStaticFilesStorage`
 uses this behind the scenes to replace the paths with their hashed
 counterparts and update the cache appropriately.
 
@@ -276,7 +276,7 @@ counterparts and update the cache appropriately.
 
 .. class:: storage.ManifestStaticFilesStorage
 
-A subclass of the :class:`~django.contrib.staticfiles.storage.StaticFilesStorage`
+A subclass of the :class:`~mango.contrib.staticfiles.storage.StaticFilesStorage`
 storage backend which stores the file names it handles by appending the MD5
 hash of the file's content to the filename. For example, the file
 ``css/styles.css`` would also be saved as ``css/styles.55e7cbb9ba48.css``.
@@ -289,9 +289,9 @@ load time for subsequent page visits.
 
 The storage backend automatically replaces the paths found in the saved
 files matching other saved files with the path of the cached copy (using
-the :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
+the :meth:`~mango.contrib.staticfiles.storage.StaticFilesStorage.post_process`
 method). The regular expressions used to find those paths
-(``django.contrib.staticfiles.storage.HashedFilesMixin.patterns``) cover:
+(``mango.contrib.staticfiles.storage.HashedFilesMixin.patterns``) cover:
 
 * The `@import`_ rule and `url()`_ statement of `Cascading Style Sheets`_.
 * The `source map`_ comment in JavaScript.
@@ -305,7 +305,7 @@ For example, the ``'css/styles.css'`` file with this content:
     @import url("../admin/css/base.css");
 
 ...would be replaced by calling the
-:meth:`~django.core.files.storage.Storage.url` method of the
+:meth:`~mango.core.files.storage.Storage.url` method of the
 ``ManifestStaticFilesStorage`` storage backend, ultimately saving a
 ``'css/styles.55e7cbb9ba48.css'`` file with the following content:
 
@@ -336,7 +336,7 @@ To enable the ``ManifestStaticFilesStorage`` you have to make sure the
 following requirements are met:
 
 * the :setting:`STATICFILES_STORAGE` setting is set to
-  ``'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'``
+  ``'mango.contrib.staticfiles.storage.ManifestStaticFilesStorage'``
 * the :setting:`DEBUG` setting is set to ``False``
 * you've collected all your static files by using the
   :djadmin:`collectstatic` management command
@@ -358,7 +358,7 @@ Due to the requirement of running :djadmin:`collectstatic`, this storage
 typically shouldn't be used when running tests as ``collectstatic`` isn't run
 as part of the normal test setup. During testing, ensure that the
 :setting:`STATICFILES_STORAGE` setting is set to something else like
-``'django.contrib.staticfiles.storage.StaticFilesStorage'`` (the default).
+``'mango.contrib.staticfiles.storage.StaticFilesStorage'`` (the default).
 
 .. method:: storage.ManifestStaticFilesStorage.file_hash(name, content=None)
 
@@ -390,7 +390,7 @@ Finders Module
 ``staticfiles`` finders has a ``searched_locations`` attribute which is a list
 of directory paths in which the finders searched. Example usage::
 
-    from django.contrib.staticfiles import finders
+    from mango.contrib.staticfiles import finders
 
     result = finders.find('css/base.css')
     searched_locations = finders.searched_locations
@@ -399,16 +399,16 @@ Other Helpers
 =============
 
 There are a few other helpers outside of the
-:mod:`staticfiles <django.contrib.staticfiles>` app to work with static
+:mod:`staticfiles <mango.contrib.staticfiles>` app to work with static
 files:
 
-- The :func:`django.template.context_processors.static` context processor
+- The :func:`mango.template.context_processors.static` context processor
   which adds :setting:`STATIC_URL` to every template context rendered
-  with :class:`~django.template.RequestContext` contexts.
+  with :class:`~mango.template.RequestContext` contexts.
 
 - The builtin template tag :ttag:`static` which takes a path and urljoins it
   with the static prefix :setting:`STATIC_URL`. If
-  ``django.contrib.staticfiles`` is installed, the tag uses the ``url()``
+  ``mango.contrib.staticfiles`` is installed, the tag uses the ``url()``
   method of the :setting:`STATICFILES_STORAGE` instead.
 
 - The builtin template tag :ttag:`get_static_prefix` which populates a
@@ -423,7 +423,7 @@ files:
 Static file development view
 ----------------------------
 
-.. currentmodule:: django.contrib.staticfiles
+.. currentmodule:: mango.contrib.staticfiles
 
 The static files tools are mostly designed to help with getting static files
 successfully deployed into production. This usually means a separate,
@@ -460,9 +460,9 @@ This view is automatically enabled by :djadmin:`runserver` (with a
 local development server, add the following snippet to the end of your
 primary URL configuration::
 
-   from django.conf import settings
-   from django.contrib.staticfiles import views
-   from django.urls import re_path
+   from mango.conf import settings
+   from mango.contrib.staticfiles import views
+   from mango.urls import re_path
 
    if settings.DEBUG:
        urlpatterns += [
@@ -480,7 +480,7 @@ you:
 This will return the proper URL pattern for serving static files to your
 already defined pattern list. Use it like this::
 
-   from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+   from mango.contrib.staticfiles.urls import staticfiles_urlpatterns
 
    # ... the rest of your URLconf here ...
 
@@ -489,7 +489,7 @@ already defined pattern list. Use it like this::
 This will inspect your :setting:`STATIC_URL` setting and wire up the view
 to serve static files accordingly. Don't forget to set the
 :setting:`STATICFILES_DIRS` setting appropriately to let
-``django.contrib.staticfiles`` know where to look for files in addition to
+``mango.contrib.staticfiles`` know where to look for files in addition to
 files in app directories.
 
 .. warning::
@@ -507,7 +507,7 @@ Specialized test case to support 'live testing'
 
 .. class:: testing.StaticLiveServerTestCase
 
-This unittest TestCase subclass extends :class:`django.test.LiveServerTestCase`.
+This unittest TestCase subclass extends :class:`mango.test.LiveServerTestCase`.
 
 Just like its parent, you can use it to write tests that involve running the
 code under test and consuming it with testing tools through HTTP (e.g. Selenium,
@@ -515,7 +515,7 @@ PhantomJS, etc.), because of which it's needed that the static assets are also
 published.
 
 But given the fact that it makes use of the
-:func:`django.contrib.staticfiles.views.serve` view described above, it can
+:func:`mango.contrib.staticfiles.views.serve` view described above, it can
 transparently overlay at test execution-time the assets provided by the
 ``staticfiles`` finders. This means you don't need to run
 :djadmin:`collectstatic` before or as a part of your tests setup.

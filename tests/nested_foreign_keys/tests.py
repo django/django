@@ -1,4 +1,4 @@
-from django.test import TestCase
+from mango.test import TestCase
 
 from .models import (
     Event, Movie, Package, PackageNullFK, Person, Screening, ScreeningNullFK,
@@ -7,7 +7,7 @@ from .models import (
 
 # These are tests for #16715. The basic scheme is always the same: 3 models with
 # 2 relations. The first relation may be null, while the second is non-nullable.
-# In some cases, Django would pick the wrong join type for the second relation,
+# In some cases, Mango would pick the wrong join type for the second relation,
 # resulting in missing objects in the queryset.
 #
 #   Model A

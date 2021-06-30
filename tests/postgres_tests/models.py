@@ -1,4 +1,4 @@
-from django.db import models
+from mango.db import models
 
 from .fields import (
     ArrayField, BigIntegerRangeField, CICharField, CIEmailField, CITextField,

@@ -2,20 +2,20 @@ import json
 from urllib.parse import urlencode
 from xml.dom.minidom import parseString
 
-from django.contrib.auth.decorators import login_required, permission_required
-from django.core import mail
-from django.core.exceptions import ValidationError
-from django.forms import fields
-from django.forms.forms import Form
-from django.forms.formsets import BaseFormSet, formset_factory
-from django.http import (
+from mango.contrib.auth.decorators import login_required, permission_required
+from mango.core import mail
+from mango.core.exceptions import ValidationError
+from mango.forms import fields
+from mango.forms.forms import Form
+from mango.forms.formsets import BaseFormSet, formset_factory
+from mango.http import (
     HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed,
     HttpResponseNotFound, HttpResponseRedirect,
 )
-from django.shortcuts import render
-from django.template import Context, Template
-from django.test import Client
-from django.utils.decorators import method_decorator
+from mango.shortcuts import render
+from mango.template import Context, Template
+from mango.test import Client
+from mango.utils.decorators import method_decorator
 
 
 def get_view(request):
@@ -377,8 +377,8 @@ def nesting_exception_view(request):
     raise Exception('exception message')
 
 
-def django_project_redirect(request):
-    return HttpResponseRedirect('https://www.djangoproject.com/')
+def mango_project_redirect(request):
+    return HttpResponseRedirect('https://www.mangoproject.com/')
 
 
 def upload_view(request):

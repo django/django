@@ -1,5 +1,5 @@
-from django.forms.renderers import DjangoTemplates, Jinja2
-from django.test import SimpleTestCase
+from mango.forms.renderers import MangoTemplates, Jinja2
+from mango.test import SimpleTestCase
 
 try:
     import jinja2
@@ -12,20 +12,20 @@ class WidgetTest(SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.django_renderer = DjangoTemplates()
+        cls.mango_renderer = MangoTemplates()
         cls.jinja2_renderer = Jinja2() if jinja2 else None
-        cls.renderers = [cls.django_renderer] + ([cls.jinja2_renderer] if cls.jinja2_renderer else [])
+        cls.renderers = [cls.mango_renderer] + ([cls.jinja2_renderer] if cls.jinja2_renderer else [])
         super().setUpClass()
 
     def check_html(self, widget, name, value, html='', attrs=None, strict=False, **kwargs):
         assertEqual = self.assertEqual if strict else self.assertHTMLEqual
         if self.jinja2_renderer:
             output = widget.render(name, value, attrs=attrs, renderer=self.jinja2_renderer, **kwargs)
-            # Django escapes quotes with '&quot;' while Jinja2 uses '&#34;'.
+            # Mango escapes quotes with '&quot;' while Jinja2 uses '&#34;'.
             output = output.replace('&#34;', '&quot;')
-            # Django escapes single quotes with '&#x27;' while Jinja2 uses '&#39;'.
+            # Mango escapes single quotes with '&#x27;' while Jinja2 uses '&#39;'.
             output = output.replace('&#39;', '&#x27;')
             assertEqual(output, html)
 
-        output = widget.render(name, value, attrs=attrs, renderer=self.django_renderer, **kwargs)
+        output = widget.render(name, value, attrs=attrs, renderer=self.mango_renderer, **kwargs)
         assertEqual(output, html)

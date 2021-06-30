@@ -1,8 +1,8 @@
-from django.core.exceptions import ValidationError
-from django.forms import (
+from mango.core.exceptions import ValidationError
+from mango.forms import (
     CharField, HiddenInput, PasswordInput, Textarea, TextInput,
 )
-from django.test import SimpleTestCase
+from mango.test import SimpleTestCase
 
 from . import FormFieldAssertionsMixin
 

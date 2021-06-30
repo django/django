@@ -1,8 +1,8 @@
 """
-Tests for forcing insert and update queries (instead of Django's normal
+Tests for forcing insert and update queries (instead of Mango's normal
 automatic behavior).
 """
-from django.db import models
+from mango.db import models
 
 
 class Counter(models.Model):

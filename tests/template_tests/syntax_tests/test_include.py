@@ -1,8 +1,8 @@
-from django.template import (
+from mango.template import (
     Context, Engine, TemplateDoesNotExist, TemplateSyntaxError, loader,
 )
-from django.template.loader_tags import IncludeNode
-from django.test import SimpleTestCase
+from mango.template.loader_tags import IncludeNode
+from mango.test import SimpleTestCase
 
 from ..utils import setup
 from .test_basic import basic_templates
@@ -218,8 +218,8 @@ class IncludeTests(SimpleTestCase):
 
     def test_extends_include_missing_cachedloader(self):
         engine = Engine(debug=True, loaders=[
-            ('django.template.loaders.cached.Loader', [
-                'django.template.loaders.app_directories.Loader',
+            ('mango.template.loaders.cached.Loader', [
+                'mango.template.loaders.app_directories.Loader',
             ]),
         ])
 
@@ -307,7 +307,7 @@ class IncludeTests(SimpleTestCase):
         isn't used, so the @setup decorator isn't used.
         """
         engine = Engine(loaders=[
-            ('django.template.loaders.locmem.Loader', {
+            ('mango.template.loaders.locmem.Loader', {
                 'template': '{% for x in vars %}{% include "include" %}{% endfor %}',
                 'include': '{% include "next" %}',
                 'next': '{% load custom %}{% counter %}'

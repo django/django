@@ -2,18 +2,18 @@
 PostgreSQL specific model fields
 ================================
 
-All of these fields are available from the ``django.contrib.postgres.fields``
+All of these fields are available from the ``mango.contrib.postgres.fields``
 module.
 
-.. currentmodule:: django.contrib.postgres.fields
+.. currentmodule:: mango.contrib.postgres.fields
 
 Indexing these fields
 =====================
 
-:class:`~django.db.models.Index` and :attr:`.Field.db_index` both create a
+:class:`~mango.db.models.Index` and :attr:`.Field.db_index` both create a
 B-tree index, which isn't particularly helpful when querying complex data types.
-Indexes such as :class:`~django.contrib.postgres.indexes.GinIndex` and
-:class:`~django.contrib.postgres.indexes.GistIndex` are better suited, though
+Indexes such as :class:`~mango.contrib.postgres.indexes.GinIndex` and
+:class:`~mango.contrib.postgres.indexes.GistIndex` are better suited, though
 the index choice is dependent on the queries that you're using. Generally, GiST
 may be a good choice for the :ref:`range fields <range-fields>` and
 :class:`HStoreField`, and GIN may be helpful for :class:`ArrayField`.
@@ -29,7 +29,7 @@ may be a good choice for the :ref:`range fields <range-fields>` and
     <ArrayField.size>`. ``ArrayField`` can be nested to store multi-dimensional
     arrays.
 
-    If you give the field a :attr:`~django.db.models.Field.default`, ensure
+    If you give the field a :attr:`~mango.db.models.Field.default`, ensure
     it's a callable such as ``list`` (for an empty default) or a callable that
     returns a list (such as a function). Incorrectly using ``default=[]``
     creates a mutable default that is shared between all instances of
@@ -41,19 +41,19 @@ may be a good choice for the :ref:`range fields <range-fields>` and
 
         Specifies the underlying data type and behavior for the array. It
         should be an instance of a subclass of
-        :class:`~django.db.models.Field`. For example, it could be an
-        :class:`~django.db.models.IntegerField` or a
-        :class:`~django.db.models.CharField`. Most field types are permitted,
+        :class:`~mango.db.models.Field`. For example, it could be an
+        :class:`~mango.db.models.IntegerField` or a
+        :class:`~mango.db.models.CharField`. Most field types are permitted,
         with the exception of those handling relational data
-        (:class:`~django.db.models.ForeignKey`,
-        :class:`~django.db.models.OneToOneField` and
-        :class:`~django.db.models.ManyToManyField`).
+        (:class:`~mango.db.models.ForeignKey`,
+        :class:`~mango.db.models.OneToOneField` and
+        :class:`~mango.db.models.ManyToManyField`).
 
         It is possible to nest array fields - you can specify an instance of
         ``ArrayField`` as the ``base_field``. For example::
 
-            from django.contrib.postgres.fields import ArrayField
-            from django.db import models
+            from mango.contrib.postgres.fields import ArrayField
+            from mango.db import models
 
             class ChessBoard(models.Model):
                 board = ArrayField(
@@ -81,8 +81,8 @@ may be a good choice for the :ref:`range fields <range-fields>` and
     When nesting ``ArrayField``, whether you use the ``size`` parameter or not,
     PostgreSQL requires that the arrays are rectangular::
 
-        from django.contrib.postgres.fields import ArrayField
-        from django.db import models
+        from mango.contrib.postgres.fields import ArrayField
+        from mango.db import models
 
         class Board(models.Model):
             pieces = ArrayField(ArrayField(models.IntegerField()))
@@ -108,8 +108,8 @@ Querying ``ArrayField``
 There are a number of custom lookups and transforms for :class:`ArrayField`.
 We will use the following example model::
 
-    from django.contrib.postgres.fields import ArrayField
-    from django.db import models
+    from mango.contrib.postgres.fields import ArrayField
+    from mango.db import models
 
     class Post(models.Model):
         name = models.CharField(max_length=200)
@@ -127,17 +127,17 @@ The :lookup:`contains` lookup is overridden on :class:`ArrayField`. The
 returned objects will be those where the values passed are a subset of the
 data. It uses the SQL operator ``@>``. For example::
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
+    >>> Post.objects.create(name='First post', tags=['thoughts', 'mango'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
-    >>> Post.objects.create(name='Third post', tags=['tutorial', 'django'])
+    >>> Post.objects.create(name='Third post', tags=['tutorial', 'mango'])
 
     >>> Post.objects.filter(tags__contains=['thoughts'])
     <QuerySet [<Post: First post>, <Post: Second post>]>
 
-    >>> Post.objects.filter(tags__contains=['django'])
+    >>> Post.objects.filter(tags__contains=['mango'])
     <QuerySet [<Post: First post>, <Post: Third post>]>
 
-    >>> Post.objects.filter(tags__contains=['django', 'thoughts'])
+    >>> Post.objects.filter(tags__contains=['mango', 'thoughts'])
     <QuerySet [<Post: First post>]>
 
 .. fieldlookup:: arrayfield.contained_by
@@ -149,14 +149,14 @@ This is the inverse of the :lookup:`contains <arrayfield.contains>` lookup -
 the objects returned will be those where the data is a subset of the values
 passed. It uses the SQL operator ``<@``. For example::
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
+    >>> Post.objects.create(name='First post', tags=['thoughts', 'mango'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
-    >>> Post.objects.create(name='Third post', tags=['tutorial', 'django'])
+    >>> Post.objects.create(name='Third post', tags=['tutorial', 'mango'])
 
-    >>> Post.objects.filter(tags__contained_by=['thoughts', 'django'])
+    >>> Post.objects.filter(tags__contained_by=['thoughts', 'mango'])
     <QuerySet [<Post: First post>, <Post: Second post>]>
 
-    >>> Post.objects.filter(tags__contained_by=['thoughts', 'django', 'tutorial'])
+    >>> Post.objects.filter(tags__contained_by=['thoughts', 'mango', 'tutorial'])
     <QuerySet [<Post: First post>, <Post: Second post>, <Post: Third post>]>
 
 .. fieldlookup:: arrayfield.overlap
@@ -167,9 +167,9 @@ passed. It uses the SQL operator ``<@``. For example::
 Returns objects where the data shares any results with the values passed. Uses
 the SQL operator ``&&``. For example::
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
+    >>> Post.objects.create(name='First post', tags=['thoughts', 'mango'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
-    >>> Post.objects.create(name='Third post', tags=['tutorial', 'django'])
+    >>> Post.objects.create(name='Third post', tags=['tutorial', 'mango'])
 
     >>> Post.objects.filter(tags__overlap=['thoughts'])
     <QuerySet [<Post: First post>, <Post: Second post>]>
@@ -183,9 +183,9 @@ the SQL operator ``&&``. For example::
 ~~~~~~~
 
 Returns the length of the array. The lookups available afterwards are those
-available for :class:`~django.db.models.IntegerField`. For example::
+available for :class:`~mango.db.models.IntegerField`. For example::
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
+    >>> Post.objects.create(name='First post', tags=['thoughts', 'mango'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
 
     >>> Post.objects.filter(tags__len=1)
@@ -201,13 +201,13 @@ There are no errors if it exceeds the :attr:`size <ArrayField.size>` of the
 array. The lookups available after the transform are those from the
 :attr:`base_field <ArrayField.base_field>`. For example::
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
+    >>> Post.objects.create(name='First post', tags=['thoughts', 'mango'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
 
     >>> Post.objects.filter(tags__0='thoughts')
     <QuerySet [<Post: First post>, <Post: Second post>]>
 
-    >>> Post.objects.filter(tags__1__iexact='Django')
+    >>> Post.objects.filter(tags__1__iexact='Mango')
     <QuerySet [<Post: First post>]>
 
     >>> Post.objects.filter(tags__276='javascript')
@@ -228,9 +228,9 @@ Slice transforms take a slice of the array. Any two non-negative integers can
 be used, separated by a single underscore. The lookups available after the
 transform do not change. For example::
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
+    >>> Post.objects.create(name='First post', tags=['thoughts', 'mango'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
-    >>> Post.objects.create(name='Third post', tags=['django', 'python', 'thoughts'])
+    >>> Post.objects.create(name='Third post', tags=['mango', 'python', 'thoughts'])
 
     >>> Post.objects.filter(tags__0_1=['thoughts'])
     <QuerySet [<Post: First post>, <Post: Second post>]>
@@ -250,7 +250,7 @@ transform do not change. For example::
     on multidimensional arrays. It will always work to use indexes to reach
     down to the final underlying data, but most other slices behave strangely
     at the database level and cannot be supported in a logical, consistent
-    fashion by Django.
+    fashion by Mango.
 
 ``CIText`` fields
 =================
@@ -264,10 +264,10 @@ transform do not change. For example::
     :ref:`setup the citext extension <create-postgresql-extensions>` in
     PostgreSQL before the first ``CreateModel`` migration operation.
 
-    If you're using an :class:`~django.contrib.postgres.fields.ArrayField`
-    of ``CIText`` fields, you must add ``'django.contrib.postgres'`` in your
+    If you're using an :class:`~mango.contrib.postgres.fields.ArrayField`
+    of ``CIText`` fields, you must add ``'mango.contrib.postgres'`` in your
     :setting:`INSTALLED_APPS`, otherwise field values will appear as strings
-    like ``'{thoughts,django}'``.
+    like ``'{thoughts,mango}'``.
 
     Several fields that use the mixin are provided:
 
@@ -275,9 +275,9 @@ transform do not change. For example::
 .. class:: CIEmailField(**options)
 .. class:: CITextField(**options)
 
-    These fields subclass :class:`~django.db.models.CharField`,
-    :class:`~django.db.models.EmailField`, and
-    :class:`~django.db.models.TextField`, respectively.
+    These fields subclass :class:`~mango.db.models.CharField`,
+    :class:`~mango.db.models.EmailField`, and
+    :class:`~mango.db.models.TextField`, respectively.
 
     ``max_length`` won't be enforced in the database since ``citext`` behaves
     similar to PostgreSQL's ``text`` type.
@@ -289,7 +289,7 @@ transform do not change. For example::
 
     On PostgreSQL 12+, it's preferable to use non-deterministic collations
     instead of the ``citext`` extension. You can create them using the
-    :class:`~django.contrib.postgres.operations.CreateCollation` migration
+    :class:`~mango.contrib.postgres.operations.CreateCollation` migration
     operation. For more details, see :ref:`manage-postgresql-collations` and
     the PostgreSQL documentation about `non-deterministic collations`_.
 
@@ -306,7 +306,7 @@ transform do not change. For example::
 
     To use this field, you'll need to:
 
-    #. Add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`.
+    #. Add ``'mango.contrib.postgres'`` in your :setting:`INSTALLED_APPS`.
     #. :ref:`Setup the hstore extension <create-postgresql-extensions>` in
        PostgreSQL.
 
@@ -317,7 +317,7 @@ transform do not change. For example::
 
     On occasions it may be useful to require or restrict the keys which are
     valid for a given field. This can be done using the
-    :class:`~django.contrib.postgres.validators.KeysValidator`.
+    :class:`~mango.contrib.postgres.validators.KeysValidator`.
 
 Querying ``HStoreField``
 ------------------------
@@ -327,8 +327,8 @@ lookups available for ``HStoreField``.
 
 We will use the following example model::
 
-    from django.contrib.postgres.fields import HStoreField
-    from django.db import models
+    from mango.contrib.postgres.fields import HStoreField
+    from mango.db import models
 
     class Dog(models.Model):
         name = models.CharField(max_length=200)
@@ -371,7 +371,7 @@ need to use the :lookup:`hstorefield.contains` lookup instead.
 ~~~~~~~~~~~~
 
 The :lookup:`contains` lookup is overridden on
-:class:`~django.contrib.postgres.fields.HStoreField`. The returned objects are
+:class:`~mango.contrib.postgres.fields.HStoreField`. The returned objects are
 those where the given ``dict`` of key-value pairs are all contained in the
 field. It uses the SQL operator ``@>``. For example::
 
@@ -456,7 +456,7 @@ Returns objects where all of the given keys are in the data. Uses the SQL operat
 Returns objects where the array of keys is the given value. Note that the order
 is not guaranteed to be reliable, so this transform is mainly useful for using
 in conjunction with lookups on
-:class:`~django.contrib.postgres.fields.ArrayField`. Uses the SQL function
+:class:`~mango.contrib.postgres.fields.ArrayField`. Uses the SQL function
 ``akeys()``. For example::
 
     >>> Dog.objects.create(name='Rufus', data={'toy': 'bone'})
@@ -473,7 +473,7 @@ in conjunction with lookups on
 Returns objects where the array of values is the given value. Note that the
 order is not guaranteed to be reliable, so this transform is mainly useful for
 using in conjunction with lookups on
-:class:`~django.contrib.postgres.fields.ArrayField`. Uses the SQL function
+:class:`~mango.contrib.postgres.fields.ArrayField`. Uses the SQL function
 ``avals()``. For example::
 
     >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
@@ -506,7 +506,7 @@ excluded, that is ``[)`` (see the PostgreSQL documentation for details about
 .. class:: IntegerRangeField(**options)
 
     Stores a range of integers. Based on an
-    :class:`~django.db.models.IntegerField`. Represented by an ``int4range`` in
+    :class:`~mango.db.models.IntegerField`. Represented by an ``int4range`` in
     the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
     Python.
 
@@ -520,7 +520,7 @@ excluded, that is ``[)`` (see the PostgreSQL documentation for details about
 .. class:: BigIntegerRangeField(**options)
 
     Stores a range of large integers. Based on a
-    :class:`~django.db.models.BigIntegerField`. Represented by an ``int8range``
+    :class:`~mango.db.models.BigIntegerField`. Represented by an ``int8range``
     in the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
     Python.
 
@@ -534,7 +534,7 @@ excluded, that is ``[)`` (see the PostgreSQL documentation for details about
 .. class:: DecimalRangeField(**options)
 
     Stores a range of floating point values. Based on a
-    :class:`~django.db.models.DecimalField`. Represented by a ``numrange`` in
+    :class:`~mango.db.models.DecimalField`. Represented by a ``numrange`` in
     the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
     Python.
 
@@ -544,7 +544,7 @@ excluded, that is ``[)`` (see the PostgreSQL documentation for details about
 .. class:: DateTimeRangeField(**options)
 
     Stores a range of timestamps. Based on a
-    :class:`~django.db.models.DateTimeField`. Represented by a ``tstzrange`` in
+    :class:`~mango.db.models.DateTimeField`. Represented by a ``tstzrange`` in
     the database and a :class:`~psycopg2:psycopg2.extras.DateTimeTZRange` in
     Python.
 
@@ -554,7 +554,7 @@ excluded, that is ``[)`` (see the PostgreSQL documentation for details about
 .. class:: DateRangeField(**options)
 
     Stores a range of dates. Based on a
-    :class:`~django.db.models.DateField`. Represented by a ``daterange`` in the
+    :class:`~mango.db.models.DateField`. Represented by a ``daterange`` in the
     database and a :class:`~psycopg2:psycopg2.extras.DateRange` in Python.
 
     Regardless of the bounds specified when saving the data, PostgreSQL always
@@ -568,8 +568,8 @@ There are a number of custom lookups and transforms for range fields. They are
 available on all the above fields, but we will use the following example
 model::
 
-    from django.contrib.postgres.fields import IntegerRangeField
-    from django.db import models
+    from mango.contrib.postgres.fields import IntegerRangeField
+    from mango.db import models
 
     class Event(models.Model):
         name = models.CharField(max_length=200)
@@ -582,7 +582,7 @@ model::
 We will also use the following example objects::
 
     >>> import datetime
-    >>> from django.utils import timezone
+    >>> from mango.utils import timezone
     >>> now = timezone.now()
     >>> Event.objects.create(name='Soft play', ages=(0, 10), start=now)
     >>> Event.objects.create(name='Pub trip', ages=(21, None), start=now - datetime.timedelta(days=1))
@@ -615,14 +615,14 @@ operators ``@>``, ``<@``, and ``&&`` respectively.
     <QuerySet [<Event: Soft play>]>
 
 The ``contained_by`` lookup is also available on the non-range field types:
-:class:`~django.db.models.SmallAutoField`,
-:class:`~django.db.models.AutoField`, :class:`~django.db.models.BigAutoField`,
-:class:`~django.db.models.SmallIntegerField`,
-:class:`~django.db.models.IntegerField`,
-:class:`~django.db.models.BigIntegerField`,
-:class:`~django.db.models.DecimalField`, :class:`~django.db.models.FloatField`,
-:class:`~django.db.models.DateField`, and
-:class:`~django.db.models.DateTimeField`. For example::
+:class:`~mango.db.models.SmallAutoField`,
+:class:`~mango.db.models.AutoField`, :class:`~mango.db.models.BigAutoField`,
+:class:`~mango.db.models.SmallIntegerField`,
+:class:`~mango.db.models.IntegerField`,
+:class:`~mango.db.models.BigIntegerField`,
+:class:`~mango.db.models.DecimalField`, :class:`~mango.db.models.FloatField`,
+:class:`~mango.db.models.DateField`, and
+:class:`~mango.db.models.DateTimeField`. For example::
 
     >>> from psycopg2.extras import DateTimeTZRange
     >>> Event.objects.filter(
@@ -741,7 +741,7 @@ for the base field.
 ^^^^^^^^^^^
 
 Returned objects are empty ranges. Can be chained to valid lookups for a
-:class:`~django.db.models.BooleanField`.
+:class:`~mango.db.models.BooleanField`.
 
     >>> Event.objects.filter(ages__isempty=True)
     <QuerySet []>
@@ -753,7 +753,7 @@ Returned objects are empty ranges. Can be chained to valid lookups for a
 
 Returns objects that have inclusive or exclusive lower bounds, depending on the
 boolean value passed. Can be chained to valid lookups for a
-:class:`~django.db.models.BooleanField`.
+:class:`~mango.db.models.BooleanField`.
 
     >>> Event.objects.filter(ages__lower_inc=True)
     <QuerySet [<Event: Soft play>, <Event: Pub trip>]>
@@ -765,7 +765,7 @@ boolean value passed. Can be chained to valid lookups for a
 
 Returns objects that have unbounded (infinite) or bounded lower bound,
 depending on the boolean value passed. Can be chained to valid lookups for a
-:class:`~django.db.models.BooleanField`.
+:class:`~mango.db.models.BooleanField`.
 
     >>> Event.objects.filter(ages__lower_inf=True)
     <QuerySet []>
@@ -777,7 +777,7 @@ depending on the boolean value passed. Can be chained to valid lookups for a
 
 Returns objects that have inclusive or exclusive upper bounds, depending on the
 boolean value passed. Can be chained to valid lookups for a
-:class:`~django.db.models.BooleanField`.
+:class:`~mango.db.models.BooleanField`.
 
     >>> Event.objects.filter(ages__upper_inc=True)
     <QuerySet []>
@@ -789,7 +789,7 @@ boolean value passed. Can be chained to valid lookups for a
 
 Returns objects that have unbounded (infinite) or bounded upper bound,
 depending on the boolean value passed. Can be chained to valid lookups for a
-:class:`~django.db.models.BooleanField`.
+:class:`~mango.db.models.BooleanField`.
 
     >>> Event.objects.filter(ages__upper_inf=True)
     <QuerySet [<Event: Pub trip>]>
@@ -797,7 +797,7 @@ depending on the boolean value passed. Can be chained to valid lookups for a
 Defining your own range types
 -----------------------------
 
-PostgreSQL allows the definition of custom range types. Django's model and form
+PostgreSQL allows the definition of custom range types. Mango's model and form
 field implementations use base classes below, and psycopg2 provides a
 :func:`~psycopg2:psycopg2.extras.register_range` to allow use of custom range
 types.
@@ -817,9 +817,9 @@ types.
     .. attribute:: form_field
 
         The form field class to use. Should be a subclass of
-        :class:`django.contrib.postgres.forms.BaseRangeField`.
+        :class:`mango.contrib.postgres.forms.BaseRangeField`.
 
-.. class:: django.contrib.postgres.forms.BaseRangeField
+.. class:: mango.contrib.postgres.forms.BaseRangeField
 
     Base class for form range fields.
 
@@ -874,6 +874,6 @@ RangeBoundary() expressions
 
 A ``RangeBoundary()`` expression represents the range boundaries. It can be
 used with a custom range functions that expected boundaries, for example to
-define :class:`~django.contrib.postgres.constraints.ExclusionConstraint`. See
+define :class:`~mango.contrib.postgres.constraints.ExclusionConstraint`. See
 `the PostgreSQL documentation for the full details <https://www.postgresql.org/
 docs/current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_.

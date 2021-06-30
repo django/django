@@ -1,8 +1,8 @@
 import datetime
 
-from django.test import SimpleTestCase
-from django.utils import feedgenerator
-from django.utils.timezone import get_fixed_timezone, utc
+from mango.test import SimpleTestCase
+from mango.utils import feedgenerator
+from mango.utils.timezone import get_fixed_timezone, utc
 
 
 class FeedgeneratorTests(SimpleTestCase):
@@ -24,10 +24,10 @@ class FeedgeneratorTests(SimpleTestCase):
         """
         self.assertEqual(
             feedgenerator.get_tag_uri(
-                'http://www.example.org:8000/2008/11/14/django#headline',
+                'http://www.example.org:8000/2008/11/14/mango#headline',
                 datetime.datetime(2008, 11, 14, 13, 37, 0),
             ),
-            'tag:www.example.org,2008-11-14:/2008/11/14/django/headline')
+            'tag:www.example.org,2008-11-14:/2008/11/14/mango/headline')
 
     def test_rfc2822_date(self):
         """

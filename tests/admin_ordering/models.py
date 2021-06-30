@@ -1,5 +1,5 @@
-from django.contrib import admin
-from django.db import models
+from mango.contrib import admin
+from mango.db import models
 
 
 class Band(models.Model):

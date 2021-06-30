@@ -1,9 +1,9 @@
 from io import BytesIO
 
-from django.core.exceptions import RequestDataTooBig, TooManyFieldsSent
-from django.core.handlers.wsgi import WSGIRequest
-from django.test import SimpleTestCase
-from django.test.client import FakePayload
+from mango.core.exceptions import RequestDataTooBig, TooManyFieldsSent
+from mango.core.handlers.wsgi import WSGIRequest
+from mango.test import SimpleTestCase
+from mango.test.client import FakePayload
 
 TOO_MANY_FIELDS_MSG = 'The number of GET/POST parameters exceeded settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.'
 TOO_MUCH_DATA_MSG = 'Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.'

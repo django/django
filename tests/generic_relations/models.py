@@ -9,11 +9,11 @@ The canonical example is tags (although this example implementation is *far*
 from complete).
 """
 
-from django.contrib.contenttypes.fields import (
+from mango.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
+from mango.contrib.contenttypes.models import ContentType
+from mango.db import models
 
 
 class TaggedItem(models.Model):

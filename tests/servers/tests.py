@@ -1,5 +1,5 @@
 """
-Tests for django.core.servers.
+Tests for mango.core.servers.
 """
 import errno
 import os
@@ -10,11 +10,11 @@ from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
-from django.conf import settings
-from django.core.servers.basehttp import ThreadedWSGIServer, WSGIServer
-from django.db import DEFAULT_DB_ALIAS, connections
-from django.test import LiveServerTestCase, override_settings
-from django.test.testcases import LiveServerThread, QuietWSGIRequestHandler
+from mango.conf import settings
+from mango.core.servers.basehttp import ThreadedWSGIServer, WSGIServer
+from mango.db import DEFAULT_DB_ALIAS, connections
+from mango.test import LiveServerTestCase, override_settings
+from mango.test.testcases import LiveServerThread, QuietWSGIRequestHandler
 
 from .models import Person
 
@@ -32,9 +32,9 @@ class LiveServerBase(LiveServerTestCase):
 
     available_apps = [
         'servers',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
+        'mango.contrib.auth',
+        'mango.contrib.contenttypes',
+        'mango.contrib.sessions',
     ]
     fixtures = ['testdata.json']
 
@@ -73,7 +73,7 @@ class LiveServerTestCloseConnectionTest(LiveServerBase):
         cls.old_conn_max_age = conn.settings_dict['CONN_MAX_AGE']
         # Set the connection's CONN_MAX_AGE to None to simulate the
         # CONN_MAX_AGE setting being set to None on the server. This prevents
-        # Django from closing the connection and allows testing that
+        # Mango from closing the connection and allows testing that
         # ThreadedWSGIServer closes connections.
         conn.settings_dict['CONN_MAX_AGE'] = None
         # Pass a database connection through to the server to check it is being

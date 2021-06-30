@@ -1,8 +1,8 @@
-from django import test
-from django.contrib.contenttypes.fields import (
+from mango import test
+from mango.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
-from django.db import models
+from mango.db import models
 
 from .models import AllFieldsModel
 

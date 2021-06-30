@@ -1,7 +1,7 @@
-from django.contrib import admin
-from django.contrib.auth import get_user_model
-from django.contrib.auth.admin import UserAdmin
-from django.urls import path
+from mango.contrib import admin
+from mango.contrib.auth import get_user_model
+from mango.contrib.auth.admin import UserAdmin
+from mango.urls import path
 
 site = admin.AdminSite(name='custom_user_admin')
 

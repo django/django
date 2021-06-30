@@ -1,11 +1,11 @@
 import datetime
 from operator import attrgetter
 
-from django.core.exceptions import FieldError
-from django.db import models
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import isolate_apps
-from django.utils import translation
+from mango.core.exceptions import FieldError
+from mango.db import models
+from mango.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from mango.test.utils import isolate_apps
+from mango.utils import translation
 
 from .models import (
     Article, ArticleIdea, ArticleTag, ArticleTranslation, Country, Friendship,

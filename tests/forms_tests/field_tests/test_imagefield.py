@@ -1,12 +1,12 @@
 import os
 import unittest
 
-from django.core.exceptions import ValidationError
-from django.core.files.uploadedfile import (
+from mango.core.exceptions import ValidationError
+from mango.core.files.uploadedfile import (
     SimpleUploadedFile, TemporaryUploadedFile,
 )
-from django.forms import ClearableFileInput, FileInput, ImageField, Widget
-from django.test import SimpleTestCase
+from mango.forms import ClearableFileInput, FileInput, ImageField, Widget
+from mango.test import SimpleTestCase
 
 from . import FormFieldAssertionsMixin
 

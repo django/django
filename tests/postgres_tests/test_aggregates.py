@@ -1,15 +1,15 @@
 import json
 
-from django.db.models import CharField, F, OuterRef, Q, Subquery, Value
-from django.db.models.fields.json import KeyTextTransform, KeyTransform
-from django.db.models.functions import Cast, Concat, Substr
-from django.test.utils import Approximate
+from mango.db.models import CharField, F, OuterRef, Q, Subquery, Value
+from mango.db.models.fields.json import KeyTextTransform, KeyTransform
+from mango.db.models.functions import Cast, Concat, Substr
+from mango.test.utils import Approximate
 
 from . import PostgreSQLTestCase
 from .models import AggregateTestModel, StatTestModel
 
 try:
-    from django.contrib.postgres.aggregates import (
+    from mango.contrib.postgres.aggregates import (
         ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, Corr, CovarPop, JSONBAgg,
         RegrAvgX, RegrAvgY, RegrCount, RegrIntercept, RegrR2, RegrSlope,
         RegrSXX, RegrSXY, RegrSYY, StatAggregate, StringAgg,

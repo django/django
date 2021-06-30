@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
 
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
-from django.test.utils import override_settings
+from mango.conf import settings
+from mango.contrib.auth.models import User
+from mango.contrib.auth.tokens import PasswordResetTokenGenerator
+from mango.core.exceptions import ImproperlyConfigured
+from mango.test import TestCase
+from mango.test.utils import override_settings
 
 from .models import CustomEmailField
 

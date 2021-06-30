@@ -1,6 +1,6 @@
 import unittest
 
-from django.contrib.gis.gdal import (
+from mango.contrib.gis.gdal import (
     GDAL_VERSION, gdal_full_version, gdal_version,
 )
 

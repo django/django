@@ -1,12 +1,12 @@
 """
 Testing some internals of the template processing. These are *not* examples to be copied in user code.
 """
-from django.template import Library, TemplateSyntaxError
-from django.template.base import (
+from mango.template import Library, TemplateSyntaxError
+from mango.template.base import (
     FilterExpression, Lexer, Parser, Token, TokenType, Variable,
 )
-from django.template.defaultfilters import register as filter_library
-from django.test import SimpleTestCase
+from mango.template.defaultfilters import register as filter_library
+from mango.test import SimpleTestCase
 
 
 class ParserTests(SimpleTestCase):

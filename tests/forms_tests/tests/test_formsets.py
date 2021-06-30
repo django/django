@@ -2,15 +2,15 @@ import datetime
 from collections import Counter
 from unittest import mock
 
-from django.core.exceptions import ValidationError
-from django.forms import (
+from mango.core.exceptions import ValidationError
+from mango.forms import (
     BaseForm, CharField, DateField, FileField, Form, IntegerField,
     SplitDateTimeField, formsets,
 )
-from django.forms.formsets import BaseFormSet, all_valid, formset_factory
-from django.forms.utils import ErrorList
-from django.forms.widgets import HiddenInput
-from django.test import SimpleTestCase
+from mango.forms.formsets import BaseFormSet, all_valid, formset_factory
+from mango.forms.utils import ErrorList
+from mango.forms.widgets import HiddenInput
+from mango.test import SimpleTestCase
 
 
 class Choice(Form):
@@ -166,8 +166,8 @@ class FormsFormsetTestCase(SimpleTestCase):
         mocked_full_clean, full_clean_counter = make_method_counter(BaseForm.full_clean)
         formset = self.make_choiceformset([('Calexico', '100'), ('Any1', '42'), ('Any2', '101')])
 
-        with mock.patch('django.forms.formsets.ManagementForm.is_valid', mocked_is_valid), \
-                mock.patch('django.forms.forms.BaseForm.full_clean', mocked_full_clean):
+        with mock.patch('mango.forms.formsets.ManagementForm.is_valid', mocked_is_valid), \
+                mock.patch('mango.forms.forms.BaseForm.full_clean', mocked_full_clean):
             self.assertTrue(formset.is_valid())
         self.assertEqual(is_valid_counter.call_count, 1)
         self.assertEqual(full_clean_counter.call_count, 4)

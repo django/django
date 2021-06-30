@@ -14,24 +14,24 @@ import unittest
 from io import StringIO
 from unittest import mock
 
-from django import conf, get_version
-from django.conf import settings
-from django.core.management import (
+from mango import conf, get_version
+from mango.conf import settings
+from mango.core.management import (
     BaseCommand, CommandError, call_command, color, execute_from_command_line,
 )
-from django.core.management.commands.loaddata import Command as LoaddataCommand
-from django.core.management.commands.runserver import (
+from mango.core.management.commands.loaddata import Command as LoaddataCommand
+from mango.core.management.commands.runserver import (
     Command as RunserverCommand,
 )
-from django.core.management.commands.testserver import (
+from mango.core.management.commands.testserver import (
     Command as TestserverCommand,
 )
-from django.db import ConnectionHandler, connection
-from django.db.migrations.recorder import MigrationRecorder
-from django.test import (
+from mango.db import ConnectionHandler, connection
+from mango.db.migrations.recorder import MigrationRecorder
+from mango.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
 )
-from django.test.utils import captured_stderr, captured_stdout
+from mango.test.utils import captured_stderr, captured_stdout
 
 custom_templates_dir = os.path.join(os.path.dirname(__file__), 'custom_templates')
 
@@ -74,7 +74,7 @@ class AdminScriptTestCase(SimpleTestCase):
                     settings_file.write("%s = %s\n" % (s, o))
 
             if apps is None:
-                apps = ['django.contrib.auth', 'django.contrib.contenttypes', 'admin_scripts']
+                apps = ['mango.contrib.auth', 'mango.contrib.contenttypes', 'admin_scripts']
 
             settings_file.write("INSTALLED_APPS = %s\n" % apps)
 
@@ -89,7 +89,7 @@ class AdminScriptTestCase(SimpleTestCase):
         paths = []
         for backend in settings.DATABASES.values():
             package = backend['ENGINE'].split('.')[0]
-            if package != 'django':
+            if package != 'mango':
                 backend_pkg = __import__(package)
                 backend_dir = os.path.dirname(backend_pkg.__file__)
                 paths.append(os.path.dirname(backend_dir))
@@ -97,12 +97,12 @@ class AdminScriptTestCase(SimpleTestCase):
 
     def run_test(self, args, settings_file=None, apps=None):
         base_dir = os.path.dirname(self.test_dir)
-        # The base dir for Django's tests is one level up.
+        # The base dir for Mango's tests is one level up.
         tests_dir = os.path.dirname(os.path.dirname(__file__))
-        # The base dir for Django is one level above the test dir. We don't use
-        # `import django` to figure that out, so we don't pick up a Django
+        # The base dir for Mango is one level above the test dir. We don't use
+        # `import mango` to figure that out, so we don't pick up a Mango
         # from site-packages or similar.
-        django_dir = os.path.dirname(tests_dir)
+        mango_dir = os.path.dirname(tests_dir)
         ext_backend_base_dirs = self._ext_backend_paths()
 
         # Define a temporary environment for the subprocess
@@ -113,7 +113,7 @@ class AdminScriptTestCase(SimpleTestCase):
             test_environ['DJANGO_SETTINGS_MODULE'] = settings_file
         elif 'DJANGO_SETTINGS_MODULE' in test_environ:
             del test_environ['DJANGO_SETTINGS_MODULE']
-        python_path = [base_dir, django_dir, tests_dir]
+        python_path = [base_dir, mango_dir, tests_dir]
         python_path.extend(ext_backend_base_dirs)
         test_environ['PYTHONPATH'] = os.pathsep.join(python_path)
         test_environ['PYTHONWARNINGS'] = ''
@@ -126,8 +126,8 @@ class AdminScriptTestCase(SimpleTestCase):
         )
         return p.stdout, p.stderr
 
-    def run_django_admin(self, args, settings_file=None):
-        return self.run_test(['-m', 'django', *args], settings_file)
+    def run_mango_admin(self, args, settings_file=None):
+        return self.run_test(['-m', 'mango', *args], settings_file)
 
     def run_manage(self, args, settings_file=None, manage_py=None):
         template_manage_py = (
@@ -168,31 +168,31 @@ class AdminScriptTestCase(SimpleTestCase):
 ##########################################################################
 # DJANGO ADMIN TESTS
 # This first series of test classes checks the environment processing
-# of the django-admin.
+# of the mango-admin.
 ##########################################################################
 
 
-class DjangoAdminNoSettings(AdminScriptTestCase):
-    "A series of tests for django-admin when there is no settings.py file."
+class MangoAdminNoSettings(AdminScriptTestCase):
+    "A series of tests for mango-admin when there is no settings.py file."
 
     def test_builtin_command(self):
-        "no settings: django-admin builtin commands fail with an error when no settings provided"
+        "no settings: mango-admin builtin commands fail with an error when no settings provided"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_bad_settings(self):
-        "no settings: django-admin builtin commands fail if settings file (from argument) doesn't exist"
+        "no settings: mango-admin builtin commands fail if settings file (from argument) doesn't exist"
         args = ['check', '--settings=bad_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
-        "no settings: django-admin builtin commands fail if settings file (from environment) doesn't exist"
+        "no settings: mango-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'bad_settings')
+        out, err = self.run_mango_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
@@ -202,14 +202,14 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
         doesn't exist.
         """
         args = ['startproject']
-        out, err = self.run_django_admin(args, settings_file='bad_settings')
+        out, err = self.run_mango_admin(args, settings_file='bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "You must provide a project name", regex=True)
 
 
-class DjangoAdminDefaultSettings(AdminScriptTestCase):
+class MangoAdminDefaultSettings(AdminScriptTestCase):
     """
-    A series of tests for django-admin when using a settings.py file that
+    A series of tests for mango-admin when using a settings.py file that
     contains the test application.
     """
     def setUp(self):
@@ -217,201 +217,201 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         self.write_settings('settings.py')
 
     def test_builtin_command(self):
-        "default: django-admin builtin commands fail with an error when no settings provided"
+        "default: mango-admin builtin commands fail with an error when no settings provided"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
-        "default: django-admin builtin commands succeed if settings are provided as argument"
+        "default: mango-admin builtin commands succeed if settings are provided as argument"
         args = ['check', '--settings=test_project.settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_environment(self):
-        "default: django-admin builtin commands succeed if settings are provided in the environment"
+        "default: mango-admin builtin commands succeed if settings are provided in the environment"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_mango_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_bad_settings(self):
-        "default: django-admin builtin commands fail if settings file (from argument) doesn't exist"
+        "default: mango-admin builtin commands fail if settings file (from argument) doesn't exist"
         args = ['check', '--settings=bad_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
-        "default: django-admin builtin commands fail if settings file (from environment) doesn't exist"
+        "default: mango-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'bad_settings')
+        out, err = self.run_mango_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_custom_command(self):
-        "default: django-admin can't execute user commands if it isn't provided settings"
+        "default: mango-admin can't execute user commands if it isn't provided settings"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No Django settings specified")
+        self.assertOutput(err, "No Mango settings specified")
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
-        "default: django-admin can execute user commands if settings are provided as argument"
+        "default: mango-admin can execute user commands if settings are provided as argument"
         args = ['noargs_command', '--settings=test_project.settings']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
 
     def test_custom_command_with_environment(self):
-        "default: django-admin can execute user commands if settings are provided in environment"
+        "default: mango-admin can execute user commands if settings are provided in environment"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_mango_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
 
 
-class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
+class MangoAdminFullPathDefaultSettings(AdminScriptTestCase):
     """
-    A series of tests for django-admin when using a settings.py file that
+    A series of tests for mango-admin when using a settings.py file that
     contains the test application specified using a full path.
     """
     def setUp(self):
         super().setUp()
-        self.write_settings('settings.py', ['django.contrib.auth', 'django.contrib.contenttypes',
+        self.write_settings('settings.py', ['mango.contrib.auth', 'mango.contrib.contenttypes',
                                             'admin_scripts', 'admin_scripts.complex_app'])
 
     def test_builtin_command(self):
-        "fulldefault: django-admin builtin commands fail with an error when no settings provided"
+        "fulldefault: mango-admin builtin commands fail with an error when no settings provided"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
-        "fulldefault: django-admin builtin commands succeed if a settings file is provided"
+        "fulldefault: mango-admin builtin commands succeed if a settings file is provided"
         args = ['check', '--settings=test_project.settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_environment(self):
-        "fulldefault: django-admin builtin commands succeed if the environment contains settings"
+        "fulldefault: mango-admin builtin commands succeed if the environment contains settings"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_mango_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_bad_settings(self):
-        "fulldefault: django-admin builtin commands fail if settings file (from argument) doesn't exist"
+        "fulldefault: mango-admin builtin commands fail if settings file (from argument) doesn't exist"
         args = ['check', '--settings=bad_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
-        "fulldefault: django-admin builtin commands fail if settings file (from environment) doesn't exist"
+        "fulldefault: mango-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'bad_settings')
+        out, err = self.run_mango_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_custom_command(self):
-        "fulldefault: django-admin can't execute user commands unless settings are provided"
+        "fulldefault: mango-admin can't execute user commands unless settings are provided"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No Django settings specified")
+        self.assertOutput(err, "No Mango settings specified")
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
-        "fulldefault: django-admin can execute user commands if settings are provided as argument"
+        "fulldefault: mango-admin can execute user commands if settings are provided as argument"
         args = ['noargs_command', '--settings=test_project.settings']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
 
     def test_custom_command_with_environment(self):
-        "fulldefault: django-admin can execute user commands if settings are provided in environment"
+        "fulldefault: mango-admin can execute user commands if settings are provided in environment"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_mango_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
 
 
-class DjangoAdminMinimalSettings(AdminScriptTestCase):
+class MangoAdminMinimalSettings(AdminScriptTestCase):
     """
-    A series of tests for django-admin when using a settings.py file that
+    A series of tests for mango-admin when using a settings.py file that
     doesn't contain the test application.
     """
     def setUp(self):
         super().setUp()
-        self.write_settings('settings.py', apps=['django.contrib.auth', 'django.contrib.contenttypes'])
+        self.write_settings('settings.py', apps=['mango.contrib.auth', 'mango.contrib.contenttypes'])
 
     def test_builtin_command(self):
-        "minimal: django-admin builtin commands fail with an error when no settings provided"
+        "minimal: mango-admin builtin commands fail with an error when no settings provided"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
-        "minimal: django-admin builtin commands fail if settings are provided as argument"
+        "minimal: mango-admin builtin commands fail if settings are provided as argument"
         args = ['check', '--settings=test_project.settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_environment(self):
-        "minimal: django-admin builtin commands fail if settings are provided in the environment"
+        "minimal: mango-admin builtin commands fail if settings are provided in the environment"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_mango_admin(args, 'test_project.settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_bad_settings(self):
-        "minimal: django-admin builtin commands fail if settings file (from argument) doesn't exist"
+        "minimal: mango-admin builtin commands fail if settings file (from argument) doesn't exist"
         args = ['check', '--settings=bad_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
-        "minimal: django-admin builtin commands fail if settings file (from environment) doesn't exist"
+        "minimal: mango-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'bad_settings')
+        out, err = self.run_mango_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_custom_command(self):
-        "minimal: django-admin can't execute user commands unless settings are provided"
+        "minimal: mango-admin can't execute user commands unless settings are provided"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No Django settings specified")
+        self.assertOutput(err, "No Mango settings specified")
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
-        "minimal: django-admin can't execute user commands, even if settings are provided as argument"
+        "minimal: mango-admin can't execute user commands, even if settings are provided as argument"
         args = ['noargs_command', '--settings=test_project.settings']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_environment(self):
-        "minimal: django-admin can't execute user commands, even if settings are provided in environment"
+        "minimal: mango-admin can't execute user commands, even if settings are provided in environment"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_mango_admin(args, 'test_project.settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
 
-class DjangoAdminAlternateSettings(AdminScriptTestCase):
+class MangoAdminAlternateSettings(AdminScriptTestCase):
     """
-    A series of tests for django-admin when using a settings file with a name
+    A series of tests for mango-admin when using a settings file with a name
     other than 'settings.py'.
     """
     def setUp(self):
@@ -419,135 +419,135 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
         self.write_settings('alternate_settings.py')
 
     def test_builtin_command(self):
-        "alternate: django-admin builtin commands fail with an error when no settings provided"
+        "alternate: mango-admin builtin commands fail with an error when no settings provided"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
-        "alternate: django-admin builtin commands succeed if settings are provided as argument"
+        "alternate: mango-admin builtin commands succeed if settings are provided as argument"
         args = ['check', '--settings=test_project.alternate_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_environment(self):
-        "alternate: django-admin builtin commands succeed if settings are provided in the environment"
+        "alternate: mango-admin builtin commands succeed if settings are provided in the environment"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'test_project.alternate_settings')
+        out, err = self.run_mango_admin(args, 'test_project.alternate_settings')
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_bad_settings(self):
-        "alternate: django-admin builtin commands fail if settings file (from argument) doesn't exist"
+        "alternate: mango-admin builtin commands fail if settings file (from argument) doesn't exist"
         args = ['check', '--settings=bad_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
-        "alternate: django-admin builtin commands fail if settings file (from environment) doesn't exist"
+        "alternate: mango-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'bad_settings')
+        out, err = self.run_mango_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_custom_command(self):
-        "alternate: django-admin can't execute user commands unless settings are provided"
+        "alternate: mango-admin can't execute user commands unless settings are provided"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No Django settings specified")
+        self.assertOutput(err, "No Mango settings specified")
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
-        "alternate: django-admin can execute user commands if settings are provided as argument"
+        "alternate: mango-admin can execute user commands if settings are provided as argument"
         args = ['noargs_command', '--settings=test_project.alternate_settings']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
 
     def test_custom_command_with_environment(self):
-        "alternate: django-admin can execute user commands if settings are provided in environment"
+        "alternate: mango-admin can execute user commands if settings are provided in environment"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args, 'test_project.alternate_settings')
+        out, err = self.run_mango_admin(args, 'test_project.alternate_settings')
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
 
 
-class DjangoAdminMultipleSettings(AdminScriptTestCase):
+class MangoAdminMultipleSettings(AdminScriptTestCase):
     """
-    A series of tests for django-admin when multiple settings files
+    A series of tests for mango-admin when multiple settings files
     (including the default 'settings.py') are available. The default settings
     file is insufficient for performing the operations described, so the
     alternate settings must be used by the running script.
     """
     def setUp(self):
         super().setUp()
-        self.write_settings('settings.py', apps=['django.contrib.auth', 'django.contrib.contenttypes'])
+        self.write_settings('settings.py', apps=['mango.contrib.auth', 'mango.contrib.contenttypes'])
         self.write_settings('alternate_settings.py')
 
     def test_builtin_command(self):
-        "alternate: django-admin builtin commands fail with an error when no settings provided"
+        "alternate: mango-admin builtin commands fail with an error when no settings provided"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
-        "alternate: django-admin builtin commands succeed if settings are provided as argument"
+        "alternate: mango-admin builtin commands succeed if settings are provided as argument"
         args = ['check', '--settings=test_project.alternate_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_environment(self):
-        "alternate: django-admin builtin commands succeed if settings are provided in the environment"
+        "alternate: mango-admin builtin commands succeed if settings are provided in the environment"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'test_project.alternate_settings')
+        out, err = self.run_mango_admin(args, 'test_project.alternate_settings')
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_bad_settings(self):
-        "alternate: django-admin builtin commands fail if settings file (from argument) doesn't exist"
+        "alternate: mango-admin builtin commands fail if settings file (from argument) doesn't exist"
         args = ['check', '--settings=bad_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
-        "alternate: django-admin builtin commands fail if settings file (from environment) doesn't exist"
+        "alternate: mango-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'bad_settings')
+        out, err = self.run_mango_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_custom_command(self):
-        "alternate: django-admin can't execute user commands unless settings are provided"
+        "alternate: mango-admin can't execute user commands unless settings are provided"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No Django settings specified")
+        self.assertOutput(err, "No Mango settings specified")
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
-        "alternate: django-admin can execute user commands if settings are provided as argument"
+        "alternate: mango-admin can execute user commands if settings are provided as argument"
         args = ['noargs_command', '--settings=test_project.alternate_settings']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
 
     def test_custom_command_with_environment(self):
-        "alternate: django-admin can execute user commands if settings are provided in environment"
+        "alternate: mango-admin can execute user commands if settings are provided in environment"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args, 'test_project.alternate_settings')
+        out, err = self.run_mango_admin(args, 'test_project.alternate_settings')
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
 
 
-class DjangoAdminSettingsDirectory(AdminScriptTestCase):
+class MangoAdminSettingsDirectory(AdminScriptTestCase):
     """
-    A series of tests for django-admin when the settings file is in a
+    A series of tests for mango-admin when the settings file is in a
     directory. (see #9751).
     """
 
@@ -559,7 +559,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         "directory: startapp creates the correct directory"
         args = ['startapp', 'settings_test']
         app_path = os.path.join(self.test_dir, 'settings_test')
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_mango_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
         with open(os.path.join(app_path, 'apps.py')) as f:
@@ -572,7 +572,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         template_path = os.path.join(custom_templates_dir, 'app_template')
         args = ['startapp', '--template', template_path, 'custom_settings_test']
         app_path = os.path.join(self.test_dir, 'custom_settings_test')
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_mango_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
         self.assertTrue(os.path.exists(os.path.join(app_path, 'api.py')))
@@ -581,7 +581,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         """startapp creates the correct directory with Unicode characters."""
         args = ['startapp', 'こんにちは']
         app_path = os.path.join(self.test_dir, 'こんにちは')
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_mango_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
         with open(os.path.join(app_path, 'apps.py'), encoding='utf8') as f:
@@ -590,44 +590,44 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
             self.assertIn("name = 'こんにちは'", content)
 
     def test_builtin_command(self):
-        "directory: django-admin builtin commands fail with an error when no settings provided"
+        "directory: mango-admin builtin commands fail with an error when no settings provided"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_bad_settings(self):
-        "directory: django-admin builtin commands fail if settings file (from argument) doesn't exist"
+        "directory: mango-admin builtin commands fail if settings file (from argument) doesn't exist"
         args = ['check', '--settings=bad_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
-        "directory: django-admin builtin commands fail if settings file (from environment) doesn't exist"
+        "directory: mango-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'bad_settings')
+        out, err = self.run_mango_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_custom_command(self):
-        "directory: django-admin can't execute user commands unless settings are provided"
+        "directory: mango-admin can't execute user commands unless settings are provided"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No Django settings specified")
+        self.assertOutput(err, "No Mango settings specified")
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_builtin_with_settings(self):
-        "directory: django-admin builtin commands succeed if settings are provided as argument"
+        "directory: mango-admin builtin commands succeed if settings are provided as argument"
         args = ['check', '--settings=test_project.settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_environment(self):
-        "directory: django-admin builtin commands succeed if settings are provided in the environment"
+        "directory: mango-admin builtin commands succeed if settings are provided in the environment"
         args = ['check', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_mango_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
 
@@ -644,7 +644,7 @@ class ManageManuallyConfiguredSettings(AdminScriptTestCase):
         out, err = self.run_manage(['invalid_command'], manage_py='configured_settings_manage.py')
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'invalid_command'")
-        self.assertNotInOutput(err, 'No Django settings specified')
+        self.assertNotInOutput(err, 'No Mango settings specified')
 
 
 class ManageNoSettings(AdminScriptTestCase):
@@ -743,7 +743,7 @@ class ManageFullPathDefaultSettings(AdminScriptTestCase):
     """
     def setUp(self):
         super().setUp()
-        self.write_settings('settings.py', ['django.contrib.auth', 'django.contrib.contenttypes', 'admin_scripts'])
+        self.write_settings('settings.py', ['mango.contrib.auth', 'mango.contrib.contenttypes', 'admin_scripts'])
 
     def test_builtin_command(self):
         "fulldefault: manage.py builtin commands succeed when default settings are appropriate"
@@ -808,7 +808,7 @@ class ManageMinimalSettings(AdminScriptTestCase):
     """
     def setUp(self):
         super().setUp()
-        self.write_settings('settings.py', apps=['django.contrib.auth', 'django.contrib.contenttypes'])
+        self.write_settings('settings.py', apps=['mango.contrib.auth', 'mango.contrib.contenttypes'])
 
     def test_builtin_command(self):
         "minimal: manage.py builtin commands fail with an error when no settings provided"
@@ -962,7 +962,7 @@ class ManageMultipleSettings(AdminScriptTestCase):
     """
     def setUp(self):
         super().setUp()
-        self.write_settings('settings.py', apps=['django.contrib.auth', 'django.contrib.contenttypes'])
+        self.write_settings('settings.py', apps=['mango.contrib.auth', 'mango.contrib.contenttypes'])
         self.write_settings('alternate_settings.py')
 
     def test_builtin_command(self):
@@ -1070,12 +1070,12 @@ class ManageSettingsWithSettingsErrors(AdminScriptTestCase):
         """
         self.write_settings(
             'settings.py',
-            extra='from django.core.exceptions import ImproperlyConfigured\n'
+            extra='from mango.core.exceptions import ImproperlyConfigured\n'
                   'raise ImproperlyConfigured()',
         )
         args = ['help']
         out, err = self.run_manage(args)
-        self.assertOutput(out, 'only Django core commands are listed')
+        self.assertOutput(out, 'only Mango core commands are listed')
         self.assertNoOutput(err)
 
 
@@ -1113,28 +1113,28 @@ class ManageCheck(AdminScriptTestCase):
             apps=[
                 'admin_scripts.complex_app',
                 'admin_scripts.simple_app',
-                'django.contrib.admin.apps.SimpleAdminConfig',
-                'django.contrib.auth',
-                'django.contrib.contenttypes',
-                'django.contrib.messages',
+                'mango.contrib.admin.apps.SimpleAdminConfig',
+                'mango.contrib.auth',
+                'mango.contrib.contenttypes',
+                'mango.contrib.messages',
             ],
             sdict={
                 'DEBUG': True,
                 'MIDDLEWARE': [
-                    'django.contrib.messages.middleware.MessageMiddleware',
-                    'django.contrib.auth.middleware.AuthenticationMiddleware',
-                    'django.contrib.sessions.middleware.SessionMiddleware',
+                    'mango.contrib.messages.middleware.MessageMiddleware',
+                    'mango.contrib.auth.middleware.AuthenticationMiddleware',
+                    'mango.contrib.sessions.middleware.SessionMiddleware',
                 ],
                 'TEMPLATES': [
                     {
-                        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
                         'DIRS': [],
                         'APP_DIRS': True,
                         'OPTIONS': {
                             'context_processors': [
-                                'django.template.context_processors.request',
-                                'django.contrib.auth.context_processors.auth',
-                                'django.contrib.messages.context_processors.messages',
+                                'mango.template.context_processors.request',
+                                'mango.contrib.auth.context_processors.auth',
+                                'mango.contrib.messages.context_processors.messages',
                             ],
                         },
                     },
@@ -1154,9 +1154,9 @@ class ManageCheck(AdminScriptTestCase):
             'settings.py',
             apps=[
                 'admin_scripts.app_with_import',
-                'django.contrib.auth',
-                'django.contrib.contenttypes',
-                'django.contrib.sites',
+                'mango.contrib.auth',
+                'mango.contrib.contenttypes',
+                'mango.contrib.sites',
             ],
             sdict={'DEBUG': True},
         )
@@ -1172,8 +1172,8 @@ class ManageCheck(AdminScriptTestCase):
             'settings.py',
             apps=[
                 'admin_scripts.app_raising_messages',
-                'django.contrib.auth',
-                'django.contrib.contenttypes',
+                'mango.contrib.auth',
+                'mango.contrib.contenttypes',
             ],
             sdict={'DEBUG': True},
         )
@@ -1198,7 +1198,7 @@ class ManageCheck(AdminScriptTestCase):
 
     def test_warning_does_not_halt(self):
         """
-        When there are only warnings or less serious messages, then Django
+        When there are only warnings or less serious messages, then Mango
         should not prevent user from launching their project, so `check`
         command should not raise `CommandError` exception.
 
@@ -1209,8 +1209,8 @@ class ManageCheck(AdminScriptTestCase):
             'settings.py',
             apps=[
                 'admin_scripts.app_raising_warning',
-                'django.contrib.auth',
-                'django.contrib.contenttypes',
+                'mango.contrib.auth',
+                'mango.contrib.contenttypes',
             ],
             sdict={'DEBUG': True},
         )
@@ -1302,7 +1302,7 @@ class ManageRunserver(SimpleTestCase):
         Ensure runserver.check_migrations doesn't choke on empty DATABASES.
         """
         tested_connections = ConnectionHandler({})
-        with mock.patch('django.core.management.base.connections', new=tested_connections):
+        with mock.patch('mango.core.management.base.connections', new=tested_connections):
             self.cmd.check_migrations()
 
     def test_readonly_database(self):
@@ -1314,9 +1314,9 @@ class ManageRunserver(SimpleTestCase):
         # You have # ...
         self.assertIn('unapplied migration(s)', self.output.getvalue())
 
-    @mock.patch('django.core.management.commands.runserver.run')
-    @mock.patch('django.core.management.base.BaseCommand.check_migrations')
-    @mock.patch('django.core.management.base.BaseCommand.check')
+    @mock.patch('mango.core.management.commands.runserver.run')
+    @mock.patch('mango.core.management.base.BaseCommand.check_migrations')
+    @mock.patch('mango.core.management.base.BaseCommand.check')
     def test_skip_checks(self, mocked_check, *mocked_objects):
         call_command(
             'runserver',
@@ -1394,7 +1394,7 @@ class ManageTestserver(SimpleTestCase):
             skip_checks=True, interactive=True, force_color=False,
         )
 
-    @mock.patch('django.db.connection.creation.create_test_db', return_value='test_db')
+    @mock.patch('mango.db.connection.creation.create_test_db', return_value='test_db')
     @mock.patch.object(LoaddataCommand, 'handle', return_value='')
     @mock.patch.object(RunserverCommand, 'handle', return_value='')
     def test_params_to_runserver(self, mock_runserver_handle, mock_loaddata_handle, mock_create_test_db):
@@ -1457,7 +1457,7 @@ class CommandTypes(AdminScriptTestCase):
         args = ['help']
         out, err = self.run_manage(args)
         self.assertOutput(out, "Type 'manage.py help <subcommand>' for help on a specific subcommand.")
-        self.assertOutput(out, '[django]')
+        self.assertOutput(out, '[mango]')
         self.assertOutput(out, 'startapp')
         self.assertOutput(out, 'startproject')
 
@@ -1467,7 +1467,7 @@ class CommandTypes(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNotInOutput(out, 'usage:')
         self.assertNotInOutput(out, 'Options:')
-        self.assertNotInOutput(out, '[django]')
+        self.assertNotInOutput(out, '[mango]')
         self.assertOutput(out, 'startapp')
         self.assertOutput(out, 'startproject')
         self.assertNotInOutput(out, '\n\n')
@@ -1494,7 +1494,7 @@ class CommandTypes(AdminScriptTestCase):
         self.assertNotEqual(tag_location, -1)
         self.assertNotEqual(version_location, -1)
         self.assertLess(tag_location, version_location)
-        self.assertOutput(out, "Checks the entire Django project for potential problems.")
+        self.assertOutput(out, "Checks the entire Mango project for potential problems.")
 
     def test_color_style(self):
         style = color.no_style()
@@ -1712,7 +1712,7 @@ class CommandTypes(AdminScriptTestCase):
         command = BaseCommand()
         command.check = lambda: []
         command.handle = lambda *args, **kwargs: args
-        with mock.patch('django.core.management.base.connections') as mock_connections:
+        with mock.patch('mango.core.management.base.connections') as mock_connections:
             command.run_from_argv(['', ''])
         # Test connections have been closed
         self.assertTrue(mock_connections.close_all.called)
@@ -1740,7 +1740,7 @@ class CommandTypes(AdminScriptTestCase):
         args = ['app_command', 'auth']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.auth, options=")
+        self.assertOutput(out, "EXECUTE:AppCommand name=mango.contrib.auth, options=")
         self.assertOutput(
             out,
             ", options=[('force_color', False), ('no_color', False), "
@@ -1759,14 +1759,14 @@ class CommandTypes(AdminScriptTestCase):
         args = ['app_command', 'auth', 'contenttypes']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.auth, options=")
+        self.assertOutput(out, "EXECUTE:AppCommand name=mango.contrib.auth, options=")
         self.assertOutput(
             out,
             ", options=[('force_color', False), ('no_color', False), "
             "('pythonpath', None), ('settings', None), ('traceback', False), "
             "('verbosity', 1)]"
         )
-        self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.contenttypes, options=")
+        self.assertOutput(out, "EXECUTE:AppCommand name=mango.contrib.contenttypes, options=")
         self.assertOutput(
             out,
             ", options=[('force_color', False), ('no_color', False), "
@@ -1831,15 +1831,15 @@ class Discovery(SimpleTestCase):
         """
         with self.settings(INSTALLED_APPS=['admin_scripts.complex_app',
                                            'admin_scripts.simple_app',
-                                           'django.contrib.auth',
-                                           'django.contrib.contenttypes']):
+                                           'mango.contrib.auth',
+                                           'mango.contrib.contenttypes']):
             out = StringIO()
             call_command('duplicate', stdout=out)
             self.assertEqual(out.getvalue().strip(), 'complex_app')
         with self.settings(INSTALLED_APPS=['admin_scripts.simple_app',
                                            'admin_scripts.complex_app',
-                                           'django.contrib.auth',
-                                           'django.contrib.contenttypes']):
+                                           'mango.contrib.auth',
+                                           'mango.contrib.contenttypes']):
             out = StringIO()
             call_command('duplicate', stdout=out)
             self.assertEqual(out.getvalue().strip(), 'simple_app')
@@ -1848,7 +1848,7 @@ class Discovery(SimpleTestCase):
 class ArgumentOrder(AdminScriptTestCase):
     """Tests for 2-stage argument parsing scheme.
 
-    django-admin command arguments are parsed in 2 parts; the core arguments
+    mango-admin command arguments are parsed in 2 parts; the core arguments
     (--settings, --traceback and --pythonpath) are parsed using a basic parser,
     ignoring any unknown options. Then the full settings are
     passed to the command parser, which extracts commands of interest to the
@@ -1856,7 +1856,7 @@ class ArgumentOrder(AdminScriptTestCase):
     """
     def setUp(self):
         super().setUp()
-        self.write_settings('settings.py', apps=['django.contrib.auth', 'django.contrib.contenttypes'])
+        self.write_settings('settings.py', apps=['mango.contrib.auth', 'mango.contrib.contenttypes'])
         self.write_settings('alternate_settings.py')
 
     def test_setting_then_option(self):
@@ -1907,8 +1907,8 @@ class ExecuteFromCommandLine(SimpleTestCase):
         args = ['help', 'shell']
         with captured_stdout() as out, captured_stderr() as err:
             with mock.patch('sys.argv', [None] + args):
-                execute_from_command_line(['django-admin'] + args)
-        self.assertIn('usage: django-admin shell', out.getvalue())
+                execute_from_command_line(['mango-admin'] + args)
+        self.assertIn('usage: mango-admin shell', out.getvalue())
         self.assertEqual(err.getvalue(), '')
 
 
@@ -1917,14 +1917,14 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
     available_apps = [
         'admin_scripts',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
+        'mango.contrib.auth',
+        'mango.contrib.contenttypes',
+        'mango.contrib.sessions',
     ]
 
     def test_wrong_args(self):
         "Make sure passing the wrong kinds of arguments outputs an error and prints usage"
-        out, err = self.run_django_admin(['startproject'])
+        out, err = self.run_mango_admin(['startproject'])
         self.assertNoOutput(out)
         self.assertOutput(err, "usage:")
         self.assertOutput(err, "You must provide a project name.")
@@ -1934,12 +1934,12 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', 'testproject']
         testproject_dir = os.path.join(self.test_dir, 'testproject')
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
 
         # running again..
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(
             err,
@@ -1955,7 +1955,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
                 args = ['startproject', bad_name]
                 testproject_dir = os.path.join(self.test_dir, bad_name)
 
-                out, err = self.run_django_admin(args)
+                out, err = self.run_mango_admin(args)
                 self.assertOutput(
                     err,
                     "Error: '%s' is not a valid project name. Please make "
@@ -1972,7 +1972,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', bad_name]
         testproject_dir = os.path.join(self.test_dir, bad_name)
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertOutput(
             err,
             "CommandError: 'os' conflicts with the name of an existing "
@@ -1987,12 +1987,12 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(self.test_dir, 'othertestproject')
         os.mkdir(testproject_dir)
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'manage.py')))
 
         # running again..
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(
             err,
@@ -2006,7 +2006,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', '--template', template_path, 'customtestproject']
         testproject_dir = os.path.join(self.test_dir, 'customtestproject')
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'additional_dir')))
@@ -2017,7 +2017,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', '--template', template_path, 'customtestproject']
         testproject_dir = os.path.join(self.test_dir, 'customtestproject')
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'additional_dir')))
@@ -2028,7 +2028,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', '--template', template_path, 'tarballtestproject']
         testproject_dir = os.path.join(self.test_dir, 'tarballtestproject')
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
@@ -2040,7 +2040,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(self.test_dir, 'altlocation')
         os.mkdir(testproject_dir)
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
@@ -2055,7 +2055,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', '--template', template_url, 'urltestproject']
         testproject_dir = os.path.join(self.test_dir, 'urltestproject')
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
@@ -2067,7 +2067,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', '--template', template_url, 'urltestproject']
         testproject_dir = os.path.join(self.test_dir, 'urltestproject')
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
@@ -2078,7 +2078,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', '--template', template_path, 'customtestproject', '-e', 'txt', '-n', 'Procfile']
         testproject_dir = os.path.join(self.test_dir, 'customtestproject')
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'additional_dir')))
@@ -2094,7 +2094,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', '--template', template_path, 'another_project', 'project_dir']
         testproject_dir = os.path.join(self.test_dir, 'project_dir')
         os.mkdir(testproject_dir)
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         test_manage_py = os.path.join(testproject_dir, 'manage.py')
         with open(test_manage_py) as fp:
@@ -2129,7 +2129,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         template_path = os.path.join(custom_templates_dir, 'project_template')
         args = ['startproject', '--template', template_path, 'yet_another_project', 'project_dir2']
         testproject_dir = os.path.join(self.test_dir, 'project_dir2')
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Destination directory '%s' does not exist, please create it first." % testproject_dir)
         self.assertFalse(os.path.exists(testproject_dir))
@@ -2143,7 +2143,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', '--template', template_path, '--extension=txt', 'customtestproject']
         testproject_dir = os.path.join(self.test_dir, 'customtestproject')
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         path = os.path.join(testproject_dir, 'ticket-18091-non-ascii-template.txt')
@@ -2162,7 +2162,7 @@ class StartApp(AdminScriptTestCase):
                 args = ['startapp', bad_name]
                 testproject_dir = os.path.join(self.test_dir, bad_name)
 
-                out, err = self.run_django_admin(args)
+                out, err = self.run_mango_admin(args)
                 self.assertOutput(
                     err,
                     "CommandError: '{}' is not a valid app name. Please make "
@@ -2179,7 +2179,7 @@ class StartApp(AdminScriptTestCase):
         args = ['startapp', bad_name]
         testproject_dir = os.path.join(self.test_dir, bad_name)
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertOutput(
             err,
             "CommandError: 'os' conflicts with the name of an existing "
@@ -2191,7 +2191,7 @@ class StartApp(AdminScriptTestCase):
     def test_invalid_target_name(self):
         for bad_target in ('invalid.dir_name', '7invalid_dir_name', '.invalid_dir_name'):
             with self.subTest(bad_target):
-                _, err = self.run_django_admin(['startapp', 'app', bad_target])
+                _, err = self.run_mango_admin(['startapp', 'app', bad_target])
                 self.assertOutput(
                     err,
                     "CommandError: '%s' is not a valid app directory. Please "
@@ -2199,7 +2199,7 @@ class StartApp(AdminScriptTestCase):
                 )
 
     def test_importable_target_name(self):
-        _, err = self.run_django_admin(['startapp', 'app', 'os'])
+        _, err = self.run_mango_admin(['startapp', 'app', 'os'])
         self.assertOutput(
             err,
             "CommandError: 'os' conflicts with the name of an existing Python "
@@ -2210,15 +2210,15 @@ class StartApp(AdminScriptTestCase):
     def test_trailing_slash_in_target_app_directory_name(self):
         app_dir = os.path.join(self.test_dir, 'apps', 'app1')
         os.makedirs(app_dir)
-        _, err = self.run_django_admin(['startapp', 'app', os.path.join('apps', 'app1', '')])
+        _, err = self.run_mango_admin(['startapp', 'app', os.path.join('apps', 'app1', '')])
         self.assertNoOutput(err)
         self.assertIs(os.path.exists(os.path.join(app_dir, 'apps.py')), True)
 
     def test_overlaying_app(self):
         # Use a subdirectory so it is outside the PYTHONPATH.
         os.makedirs(os.path.join(self.test_dir, 'apps/app1'))
-        self.run_django_admin(['startapp', 'app1', 'apps/app1'])
-        out, err = self.run_django_admin(['startapp', 'app2', 'apps/app1'])
+        self.run_mango_admin(['startapp', 'app1', 'apps/app1'])
+        out, err = self.run_mango_admin(['startapp', 'app2', 'apps/app1'])
         self.assertOutput(
             err,
             "already exists. Overlaying an app into an existing directory "
@@ -2226,7 +2226,7 @@ class StartApp(AdminScriptTestCase):
         )
 
     def test_template(self):
-        out, err = self.run_django_admin(['startapp', 'new_app'])
+        out, err = self.run_mango_admin(['startapp', 'new_app'])
         self.assertNoOutput(err)
         app_path = os.path.join(self.test_dir, 'new_app')
         self.assertIs(os.path.exists(app_path), True)
@@ -2234,7 +2234,7 @@ class StartApp(AdminScriptTestCase):
             content = f.read()
             self.assertIn('class NewAppConfig(AppConfig)', content)
             self.assertIn(
-                "default_auto_field = 'django.db.models.BigAutoField'",
+                "default_auto_field = 'mango.db.models.BigAutoField'",
                 content,
             )
             self.assertIn("name = 'new_app'", content)
@@ -2250,14 +2250,14 @@ class DiffSettings(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "FOO = 'bar'  ###")
-        # Attributes from django.conf.Settings don't appear.
+        # Attributes from mango.conf.Settings don't appear.
         self.assertNotInOutput(out, 'is_overridden = ')
 
     def test_settings_configured(self):
         out, err = self.run_manage(['diffsettings'], manage_py='configured_settings_manage.py')
         self.assertNoOutput(err)
         self.assertOutput(out, 'CUSTOM = 1  ###\nDEBUG = True')
-        # Attributes from django.conf.UserSettingsHolder don't appear.
+        # Attributes from mango.conf.UserSettingsHolder don't appear.
         self.assertNotInOutput(out, 'default_settings = ')
 
     def test_dynamic_settings_configured(self):
@@ -2294,7 +2294,7 @@ class DiffSettings(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, "+ FOO = 'bar'")
         self.assertOutput(out, "- SECRET_KEY = ''")
-        self.assertOutput(out, "+ SECRET_KEY = 'django_tests_secret_key'")
+        self.assertOutput(out, "+ SECRET_KEY = 'mango_tests_secret_key'")
         self.assertNotInOutput(out, "  APPEND_SLASH = True")
 
     def test_unified_all(self):
@@ -2330,26 +2330,26 @@ class Dumpdata(AdminScriptTestCase):
 
 
 class MainModule(AdminScriptTestCase):
-    """python -m django works like django-admin."""
+    """python -m mango works like mango-admin."""
 
     def test_program_name_in_help(self):
-        out, err = self.run_test(['-m', 'django', 'help'])
-        self.assertOutput(out, "Type 'python -m django help <subcommand>' for help on a specific subcommand.")
+        out, err = self.run_test(['-m', 'mango', 'help'])
+        self.assertOutput(out, "Type 'python -m mango help <subcommand>' for help on a specific subcommand.")
 
 
-class DjangoAdminSuggestions(AdminScriptTestCase):
+class MangoAdminSuggestions(AdminScriptTestCase):
     def setUp(self):
         super().setUp()
         self.write_settings('settings.py')
 
     def test_suggestions(self):
         args = ['rnserver', '--settings=test_project.settings']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'rnserver'. Did you mean runserver?")
 
     def test_no_suggestions(self):
         args = ['abcdef', '--settings=test_project.settings']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_mango_admin(args)
         self.assertNoOutput(out)
         self.assertNotInOutput(err, 'Did you mean')

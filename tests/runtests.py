@@ -13,23 +13,23 @@ import warnings
 from pathlib import Path
 
 try:
-    import django
+    import mango
 except ImportError as e:
     raise RuntimeError(
-        'Django module not found, reference tests/README.rst for instructions.'
+        'Mango module not found, reference tests/README.rst for instructions.'
     ) from e
 else:
-    from django.apps import apps
-    from django.conf import settings
-    from django.db import connection, connections
-    from django.test import TestCase, TransactionTestCase
-    from django.test.runner import default_test_processes
-    from django.test.selenium import SeleniumTestCaseBase
-    from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
-    from django.utils.deprecation import (
-        RemovedInDjango41Warning, RemovedInDjango50Warning,
+    from mango.apps import apps
+    from mango.conf import settings
+    from mango.db import connection, connections
+    from mango.test import TestCase, TransactionTestCase
+    from mango.test.runner import default_test_processes
+    from mango.test.selenium import SeleniumTestCaseBase
+    from mango.test.utils import NullTimeKeeper, TimeKeeper, get_runner
+    from mango.utils.deprecation import (
+        RemovedInMango41Warning, RemovedInMango50Warning,
     )
-    from django.utils.log import DEFAULT_LOGGING
+    from mango.utils.log import DEFAULT_LOGGING
 
 try:
     import MySQLdb
@@ -40,19 +40,19 @@ else:
     warnings.filterwarnings('ignore', r'\(1003, *', category=MySQLdb.Warning)
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
-warnings.simplefilter('error', RemovedInDjango50Warning)
-warnings.simplefilter('error', RemovedInDjango41Warning)
+warnings.simplefilter('error', RemovedInMango50Warning)
+warnings.simplefilter('error', RemovedInMango41Warning)
 # Make resource and runtime warning errors to ensure no usage of error prone
 # patterns.
 warnings.simplefilter("error", ResourceWarning)
 warnings.simplefilter("error", RuntimeWarning)
 # Ignore known warnings in test dependencies.
 warnings.filterwarnings("ignore", "'U' mode is deprecated", DeprecationWarning, module='docutils.io')
-# RemovedInDjango41Warning: Ignore MemcachedCache deprecation warning.
+# RemovedInMango41Warning: Ignore MemcachedCache deprecation warning.
 warnings.filterwarnings(
     'ignore',
     'MemcachedCache is deprecated',
-    category=RemovedInDjango41Warning,
+    category=RemovedInMango41Warning,
 )
 
 # Reduce garbage collection frequency to improve performance. Since CPython
@@ -67,7 +67,7 @@ RUNTESTS_DIR = os.path.abspath(os.path.dirname(__file__))
 TEMPLATE_DIR = os.path.join(RUNTESTS_DIR, 'templates')
 
 # Create a specific subdirectory for the duration of the test suite.
-TMPDIR = tempfile.mkdtemp(prefix='django_')
+TMPDIR = tempfile.mkdtemp(prefix='mango_')
 # Set the TMPDIR environment variable in addition to tempfile.tempdir
 # so that children processes inherit it.
 tempfile.tempdir = os.environ['TMPDIR'] = TMPDIR
@@ -84,30 +84,30 @@ SUBDIRS_TO_SKIP = {
 }
 
 ALWAYS_INSTALLED_APPS = [
-    'django.contrib.contenttypes',
-    'django.contrib.auth',
-    'django.contrib.sites',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.admin.apps.SimpleAdminConfig',
-    'django.contrib.staticfiles',
+    'mango.contrib.contenttypes',
+    'mango.contrib.auth',
+    'mango.contrib.sites',
+    'mango.contrib.sessions',
+    'mango.contrib.messages',
+    'mango.contrib.admin.apps.SimpleAdminConfig',
+    'mango.contrib.staticfiles',
 ]
 
 ALWAYS_MIDDLEWARE = [
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+    'mango.contrib.sessions.middleware.SessionMiddleware',
+    'mango.middleware.common.CommonMiddleware',
+    'mango.middleware.csrf.CsrfViewMiddleware',
+    'mango.contrib.auth.middleware.AuthenticationMiddleware',
+    'mango.contrib.messages.middleware.MessageMiddleware',
 ]
 
 # Need to add the associated contrib app to INSTALLED_APPS in some cases to
 # avoid "RuntimeError: Model class X doesn't declare an explicit app_label
 # and isn't in an application in INSTALLED_APPS."
 CONTRIB_TESTS_TO_APPS = {
-    'deprecation': ['django.contrib.flatpages', 'django.contrib.redirects'],
-    'flatpages_tests': ['django.contrib.flatpages'],
-    'redirects_tests': ['django.contrib.redirects'],
+    'deprecation': ['mango.contrib.flatpages', 'mango.contrib.redirects'],
+    'flatpages_tests': ['mango.contrib.flatpages'],
+    'redirects_tests': ['mango.contrib.redirects'],
 }
 
 
@@ -169,7 +169,7 @@ def get_filtered_test_modules(start_at, start_after, gis_enabled, test_labels=No
         label_modules.add(test_module)
 
     # It would be nice to put this validation earlier but it must come after
-    # django.setup() so that connection.features.gis_enabled can be accessed.
+    # mango.setup() so that connection.features.gis_enabled can be accessed.
     if 'gis_tests' in label_modules and not gis_enabled:
         print('Aborting: A GIS database backend is required to run gis_tests.')
         sys.exit(1)
@@ -214,15 +214,15 @@ def setup_collect_tests(start_at, start_after, test_labels=None):
     settings.STATIC_URL = 'static/'
     settings.STATIC_ROOT = os.path.join(TMPDIR, 'static')
     settings.TEMPLATES = [{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
         'DIRS': [TEMPLATE_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+                'mango.template.context_processors.debug',
+                'mango.template.context_processors.request',
+                'mango.contrib.auth.context_processors.auth',
+                'mango.contrib.messages.context_processors.messages',
             ],
         },
     }]
@@ -239,16 +239,16 @@ def setup_collect_tests(start_at, start_after, test_labels=None):
     log_config = copy.deepcopy(DEFAULT_LOGGING)
     # Filter out non-error logging so we don't have to capture it in lots of
     # tests.
-    log_config['loggers']['django']['level'] = 'ERROR'
+    log_config['loggers']['mango']['level'] = 'ERROR'
     settings.LOGGING = log_config
     settings.SILENCED_SYSTEM_CHECKS = [
         'fields.W342',  # ForeignKey(unique=True) -> OneToOneField
     ]
 
     # Load all the ALWAYS_INSTALLED_APPS.
-    django.setup()
+    mango.setup()
 
-    # This flag must be evaluated after django.setup() because otherwise it can
+    # This flag must be evaluated after mango.setup() because otherwise it can
     # raise AppRegistryNotReady when running gis_tests in isolation on some
     # backends (e.g. PostGIS).
     gis_enabled = connection.features.gis_enabled
@@ -269,7 +269,7 @@ def get_installed():
     return [app_config.name for app_config in apps.get_app_configs()]
 
 
-# This function should be called only after calling django.setup(),
+# This function should be called only after calling mango.setup(),
 # since it calls connection.features.gis_enabled.
 def get_apps_to_install(test_modules):
     for test_module in test_modules:
@@ -280,7 +280,7 @@ def get_apps_to_install(test_modules):
     # Add contrib.gis to INSTALLED_APPS if needed (rather than requiring
     # @override_settings(INSTALLED_APPS=...) on all test cases.
     if connection.features.gis_enabled:
-        yield 'django.contrib.gis'
+        yield 'mango.contrib.gis'
 
 
 def setup_run_tests(verbosity, start_at, start_after, test_labels=None):
@@ -307,7 +307,7 @@ def setup_run_tests(verbosity, start_at, start_after, test_labels=None):
     TestCase.available_apps = None
 
     # Set an environment variable that other code may consult to see if
-    # Django's own test suite is running.
+    # Mango's own test suite is running.
     os.environ['RUNNING_DJANGOS_TEST_SUITE'] = 'true'
 
     test_labels = test_labels or test_modules
@@ -327,7 +327,7 @@ def teardown_run_tests(state):
 
 def actual_test_processes(parallel):
     if parallel == 0:
-        # This doesn't work before django.setup() on some databases.
+        # This doesn't work before mango.setup() on some databases.
         if all(conn.features.can_clone_databases for conn in connections.all()):
             return default_test_processes()
         else:
@@ -350,12 +350,12 @@ class ActionSelenium(argparse.Action):
         setattr(namespace, self.dest, browsers)
 
 
-def django_tests(verbosity, interactive, failfast, keepdb, reverse,
+def mango_tests(verbosity, interactive, failfast, keepdb, reverse,
                  test_labels, debug_sql, parallel, tags, exclude_tags,
                  test_name_patterns, start_at, start_after, pdb, buffer,
                  timing):
     if verbosity >= 1:
-        msg = "Testing against Django installed in '%s'" % os.path.dirname(django.__file__)
+        msg = "Testing against Mango installed in '%s'" % os.path.dirname(mango.__file__)
         max_parallel = default_test_processes() if parallel == 0 else parallel
         if max_parallel > 1:
             msg += " with up to %d processes" % max_parallel
@@ -364,7 +364,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
     test_labels, state = setup_run_tests(verbosity, start_at, start_after, test_labels)
     # Run the test suite, including the extra validation tests.
     if not hasattr(settings, 'TEST_RUNNER'):
-        settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+        settings.TEST_RUNNER = 'mango.test.runner.DiscoverRunner'
     TestRunner = get_runner(settings)
     test_runner = TestRunner(
         verbosity=verbosity,
@@ -486,7 +486,7 @@ def paired_tests(paired_test, options, test_labels, start_at, start_after):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run the Django test suite.")
+    parser = argparse.ArgumentParser(description="Run the Mango test suite.")
     parser.add_argument(
         'modules', nargs='*', metavar='module',
         help='Optional path(s) to test modules; e.g. "i18n" or '
@@ -498,15 +498,15 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         '--noinput', action='store_false', dest='interactive',
-        help='Tells Django to NOT prompt the user for input of any kind.',
+        help='Tells Mango to NOT prompt the user for input of any kind.',
     )
     parser.add_argument(
         '--failfast', action='store_true',
-        help='Tells Django to stop running the test suite after first failed test.',
+        help='Tells Mango to stop running the test suite after first failed test.',
     )
     parser.add_argument(
         '--keepdb', action='store_true',
-        help='Tells Django to preserve the test database between runs.',
+        help='Tells Mango to preserve the test database between runs.',
     )
     parser.add_argument(
         '--settings',
@@ -643,7 +643,7 @@ if __name__ == "__main__":
     else:
         time_keeper = TimeKeeper() if options.timing else NullTimeKeeper()
         with time_keeper.timed('Total run'):
-            failures = django_tests(
+            failures = mango_tests(
                 options.verbosity, options.interactive, options.failfast,
                 options.keepdb, options.reverse, options.modules,
                 options.debug_sql, options.parallel, options.tags,

@@ -1,4 +1,4 @@
-from django.utils.translation import gettext as _, ngettext
+from mango.utils.translation import gettext as _, ngettext
 
 # Translators: This comment should be extracted
 dummy1 = _("This is a translatable string.")

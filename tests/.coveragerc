@@ -1,13 +1,13 @@
 [run]
 branch = True
 omit =
-    */django/utils/autoreload.py
-source = django
+    */mango/utils/autoreload.py
+source = mango
 
 [report]
 ignore_errors = True
 omit =
-    */django/conf/locale/*
+    */mango/conf/locale/*
     */tests/*
 
 [html]

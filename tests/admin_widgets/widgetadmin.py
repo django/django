@@ -1,4 +1,4 @@
-from django.contrib import admin
+from mango.contrib import admin
 
 from .models import (
     Advisor, Album, Band, Bee, Car, CarTire, Event, Inventory, Member, Profile,

@@ -1,7 +1,7 @@
 import os
 
-from django.template import Context, Engine, TemplateSyntaxError
-from django.test import SimpleTestCase
+from mango.template import Context, Engine, TemplateSyntaxError
+from mango.test import SimpleTestCase
 
 from .utils import ROOT
 

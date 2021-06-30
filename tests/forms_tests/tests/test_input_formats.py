@@ -1,9 +1,9 @@
 from datetime import date, datetime, time
 
-from django import forms
-from django.core.exceptions import ValidationError
-from django.test import SimpleTestCase, override_settings
-from django.utils.translation import activate, deactivate
+from mango import forms
+from mango.core.exceptions import ValidationError
+from mango.test import SimpleTestCase, override_settings
+from mango.utils.translation import activate, deactivate
 
 
 @override_settings(TIME_INPUT_FORMATS=["%I:%M:%S %p", "%I:%M %p"], USE_L10N=True)

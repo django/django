@@ -1,15 +1,15 @@
 ====================
-Django documentation
+Mango documentation
 ====================
 
-.. rubric:: Everything you need to know about Django.
+.. rubric:: Everything you need to know about Mango.
 
 .. _index-first-steps:
 
 First steps
 ===========
 
-Are you new to Django or to programming? This is the place to start!
+Are you new to Mango or to programming? This is the place to start!
 
 * **From scratch:**
   :doc:`Overview <intro/overview>` |
@@ -26,7 +26,7 @@ Are you new to Django or to programming? This is the place to start!
 
 * **Advanced Tutorials:**
   :doc:`How to write reusable apps <intro/reusable-apps>` |
-  :doc:`Writing your first patch for Django <intro/contributing>`
+  :doc:`Writing your first patch for Mango <intro/contributing>`
 
 Getting help
 ============
@@ -41,35 +41,35 @@ Having trouble? We'd like to help!
 * Not found anything? See :doc:`faq/help` for information on getting support
   and asking questions to the community.
 
-* Report bugs with Django in our `ticket tracker`_.
+* Report bugs with Mango in our `ticket tracker`_.
 
-.. _ticket tracker: https://code.djangoproject.com/
+.. _ticket tracker: https://code.mangoproject.com/
 
 How the documentation is organized
 ==================================
 
-Django has a lot of documentation. A high-level overview of how it's organized
+Mango has a lot of documentation. A high-level overview of how it's organized
 will help you know where to look for certain things:
 
 * :doc:`Tutorials </intro/index>` take you by the hand through a series of
-  steps to create a Web application. Start here if you're new to Django or Web
+  steps to create a Web application. Start here if you're new to Mango or Web
   application development. Also look at the ":ref:`index-first-steps`".
 
 * :doc:`Topic guides </topics/index>` discuss key topics and concepts at a
   fairly high level and provide useful background information and explanation.
 
 * :doc:`Reference guides </ref/index>` contain technical reference for APIs and
-  other aspects of Django's machinery. They describe how it works and how to
+  other aspects of Mango's machinery. They describe how it works and how to
   use it but assume that you have a basic understanding of key concepts.
 
 * :doc:`How-to guides </howto/index>` are recipes. They guide you through the
   steps involved in addressing key problems and use-cases. They are more
-  advanced than tutorials and assume some knowledge of how Django works.
+  advanced than tutorials and assume some knowledge of how Mango works.
 
 The model layer
 ===============
 
-Django provides an abstraction layer (the "models") for structuring and
+Mango provides an abstraction layer (the "models") for structuring and
 manipulating the data of your Web application. Learn more about it below:
 
 * **Models:**
@@ -117,7 +117,7 @@ manipulating the data of your Web application. Learn more about it below:
 The view layer
 ==============
 
-Django has the concept of "views" to encapsulate the logic responsible for
+Mango has the concept of "views" to encapsulate the logic responsible for
 processing a user's request and for returning the response. Find all you need
 to know about views via the links below:
 
@@ -179,7 +179,7 @@ designers and how it can be extended by programmers:
 Forms
 =====
 
-Django provides a rich framework to facilitate the creation of forms and the
+Mango provides a rich framework to facilitate the creation of forms and the
 manipulation of form data.
 
 * **The basics:**
@@ -198,7 +198,7 @@ The development process
 =======================
 
 Learn about the various components and tools to help you in the development and
-testing of Django applications:
+testing of Mango applications:
 
 * **Settings:**
   :doc:`Overview <topics/settings>` |
@@ -210,8 +210,8 @@ testing of Django applications:
 * **Exceptions:**
   :doc:`Overview <ref/exceptions>`
 
-* **django-admin and manage.py:**
-  :doc:`Overview <ref/django-admin>` |
+* **mango-admin and manage.py:**
+  :doc:`Overview <ref/mango-admin>` |
   :doc:`Adding custom commands <howto/custom-management-commands>`
 
 * **Testing:**
@@ -231,7 +231,7 @@ testing of Django applications:
 The admin
 =========
 
-Find all you need to know about the automated admin interface, one of Django's
+Find all you need to know about the automated admin interface, one of Mango's
 most popular features:
 
 * :doc:`Admin site <ref/contrib/admin/index>`
@@ -242,10 +242,10 @@ Security
 ========
 
 Security is a topic of paramount importance in the development of Web
-applications and Django provides multiple protection tools and mechanisms:
+applications and Mango provides multiple protection tools and mechanisms:
 
 * :doc:`Security overview <topics/security>`
-* :doc:`Disclosed security issues in Django <releases/security>`
+* :doc:`Disclosed security issues in Mango <releases/security>`
 * :doc:`Clickjacking protection <ref/clickjacking>`
 * :doc:`Cross Site Request Forgery protection <ref/csrf>`
 * :doc:`Cryptographic signing <topics/signing>`
@@ -254,7 +254,7 @@ applications and Django provides multiple protection tools and mechanisms:
 Internationalization and localization
 =====================================
 
-Django offers a robust internationalization and localization framework to
+Mango offers a robust internationalization and localization framework to
 assist you in the development of applications for multiple languages and world
 regions:
 
@@ -275,14 +275,14 @@ more efficiently - faster, and using fewer system resources.
 Geographic framework
 ====================
 
-:doc:`GeoDjango <ref/contrib/gis/index>` intends to be a world-class geographic
+:doc:`GeoMango <ref/contrib/gis/index>` intends to be a world-class geographic
 Web framework. Its goal is to make it as easy as possible to build GIS Web
 applications and harness the power of spatially enabled data.
 
 Common Web application tools
 ============================
 
-Django offers multiple tools commonly needed in the development of Web
+Mango offers multiple tools commonly needed in the development of Web
 applications:
 
 * **Authentication:**
@@ -306,7 +306,7 @@ applications:
 Other core functionalities
 ==========================
 
-Learn about some other core functionalities of the Django framework:
+Learn about some other core functionalities of the Mango framework:
 
 * :doc:`Conditional content processing <topics/conditional-view-processing>`
 * :doc:`Content types and generic relations <ref/contrib/contenttypes>`
@@ -315,19 +315,19 @@ Learn about some other core functionalities of the Django framework:
 * :doc:`Signals <topics/signals>`
 * :doc:`System check framework <topics/checks>`
 * :doc:`The sites framework <ref/contrib/sites>`
-* :doc:`Unicode in Django <ref/unicode>`
+* :doc:`Unicode in Mango <ref/unicode>`
 
-The Django open-source project
+The Mango open-source project
 ==============================
 
-Learn about the development process for the Django project itself and about how
+Learn about the development process for the Mango project itself and about how
 you can contribute:
 
 * **Community:**
   :doc:`How to get involved <internals/contributing/index>` |
   :doc:`The release process <internals/release-process>` |
   :doc:`Team organization <internals/organization>` |
-  :doc:`The Django source code repository <internals/git>` |
+  :doc:`The Mango source code repository <internals/git>` |
   :doc:`Security policies <internals/security>` |
   :doc:`Mailing lists <internals/mailing-lists>`
 
@@ -340,7 +340,7 @@ you can contribute:
 * **Third-party distributions:**
   :doc:`Overview <misc/distributions>`
 
-* **Django over time:**
+* **Mango over time:**
   :doc:`API stability <misc/api-stability>` |
   :doc:`Release notes and upgrading instructions <releases/index>` |
   :doc:`Deprecation Timeline <internals/deprecation>`

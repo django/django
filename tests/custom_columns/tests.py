@@ -1,5 +1,5 @@
-from django.core.exceptions import FieldError
-from django.test import TestCase
+from mango.core.exceptions import FieldError
+from mango.test import TestCase
 
 from .models import Article, Author
 
@@ -12,7 +12,7 @@ class CustomColumnsTests(TestCase):
         cls.a2 = Author.objects.create(first_name="Peter", last_name="Jones")
         cls.authors = [cls.a1, cls.a2]
 
-        cls.article = Article.objects.create(headline="Django lets you build Web apps easily", primary_author=cls.a1)
+        cls.article = Article.objects.create(headline="Mango lets you build Web apps easily", primary_author=cls.a1)
         cls.article.authors.set(cls.authors)
 
     def test_query_all_available_authors(self):
@@ -64,7 +64,7 @@ class CustomColumnsTests(TestCase):
     def test_get_all_articles_for_an_author(self):
         self.assertQuerysetEqual(
             self.a1.article_set.all(), [
-                "Django lets you build Web apps easily",
+                "Mango lets you build Web apps easily",
             ],
             lambda a: a.headline
         )

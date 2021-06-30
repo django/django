@@ -1,12 +1,12 @@
 import unittest
 
-from django.core.checks import Error, Warning
-from django.core.checks.model_checks import _check_lazy_references
-from django.db import connection, connections, models
-from django.db.models.functions import Abs, Lower, Round
-from django.db.models.signals import post_init
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import isolate_apps, override_settings, register_lookup
+from mango.core.checks import Error, Warning
+from mango.core.checks.model_checks import _check_lazy_references
+from mango.db import connection, connections, models
+from mango.db.models.functions import Abs, Lower, Round
+from mango.db.models.signals import post_init
+from mango.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from mango.test.utils import isolate_apps, override_settings, register_lookup
 
 
 class EmptyRouter:
@@ -1518,7 +1518,7 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertEqual(C.check(), [])
 
-    @isolate_apps('django.contrib.auth', kwarg_name='apps')
+    @isolate_apps('mango.contrib.auth', kwarg_name='apps')
     def test_lazy_reference_checks(self, apps):
         class DummyModel(models.Model):
             author = models.ForeignKey('Author', models.CASCADE)

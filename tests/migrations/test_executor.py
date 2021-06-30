@@ -1,13 +1,13 @@
 from unittest import mock
 
-from django.apps.registry import apps as global_apps
-from django.db import DatabaseError, connection, migrations, models
-from django.db.migrations.exceptions import InvalidMigrationPlan
-from django.db.migrations.executor import MigrationExecutor
-from django.db.migrations.graph import MigrationGraph
-from django.db.migrations.recorder import MigrationRecorder
-from django.db.migrations.state import ProjectState
-from django.test import (
+from mango.apps.registry import apps as global_apps
+from mango.db import DatabaseError, connection, migrations, models
+from mango.db.migrations.exceptions import InvalidMigrationPlan
+from mango.db.migrations.executor import MigrationExecutor
+from mango.db.migrations.graph import MigrationGraph
+from mango.db.migrations.recorder import MigrationRecorder
+from mango.db.migrations.state import ProjectState
+from mango.test import (
     SimpleTestCase, modify_settings, override_settings, skipUnlessDBFeature,
 )
 
@@ -23,7 +23,7 @@ class ExecutorTests(MigrationTestBase):
     test failures first, as they may be propagating into here.
     """
 
-    available_apps = ["migrations", "migrations2", "django.contrib.auth", "django.contrib.contenttypes"]
+    available_apps = ["migrations", "migrations2", "mango.contrib.auth", "mango.contrib.contenttypes"]
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_run(self):
@@ -312,7 +312,7 @@ class ExecutorTests(MigrationTestBase):
     @override_settings(
         MIGRATION_MODULES={
             "migrations": "migrations.test_migrations_custom_user",
-            "django.contrib.auth": "django.contrib.auth.migrations",
+            "mango.contrib.auth": "mango.contrib.auth.migrations",
         },
         AUTH_USER_MODEL="migrations.Author",
     )
@@ -683,7 +683,7 @@ class ExecutorTests(MigrationTestBase):
             ]
 
         executor = MigrationExecutor(connection)
-        with mock.patch('django.db.migrations.executor.MigrationExecutor.record_migration') as record_migration:
+        with mock.patch('mango.db.migrations.executor.MigrationExecutor.record_migration') as record_migration:
             record_migration.side_effect = RuntimeError('Recording migration failed.')
             with self.assertRaisesMessage(RuntimeError, 'Recording migration failed.'):
                 executor.apply_migration(

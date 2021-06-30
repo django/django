@@ -1,7 +1,7 @@
 from datetime import date, datetime
 
-from django.test import SimpleTestCase
-from django.utils import timezone
+from mango.test import SimpleTestCase
+from mango.utils import timezone
 
 
 class TimezoneTestCase(SimpleTestCase):

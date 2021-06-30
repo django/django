@@ -1,5 +1,5 @@
-from django.test import SimpleTestCase
-from django.test.testcases import SerializeMixin
+from mango.test import SimpleTestCase
+from mango.test.testcases import SerializeMixin
 
 
 class TestSerializeMixin(SimpleTestCase):

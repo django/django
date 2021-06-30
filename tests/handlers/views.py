@@ -1,10 +1,10 @@
 import asyncio
 from http import HTTPStatus
 
-from django.core.exceptions import BadRequest, SuspiciousOperation
-from django.db import connection, transaction
-from django.http import HttpResponse, StreamingHttpResponse
-from django.views.decorators.csrf import csrf_exempt
+from mango.core.exceptions import BadRequest, SuspiciousOperation
+from mango.db import connection, transaction
+from mango.http import HttpResponse, StreamingHttpResponse
+from mango.views.decorators.csrf import csrf_exempt
 
 
 def regular(request):

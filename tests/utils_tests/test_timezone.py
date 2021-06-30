@@ -12,8 +12,8 @@ except ImportError:
     except ImportError:
         zoneinfo = None
 
-from django.test import SimpleTestCase, override_settings
-from django.utils import timezone
+from mango.test import SimpleTestCase, override_settings
+from mango.utils import timezone
 
 CET = pytz.timezone("Europe/Paris")
 EAT = timezone.get_fixed_timezone(180)      # Africa/Nairobi
@@ -55,7 +55,7 @@ class TimezoneTests(SimpleTestCase):
         with timezone.override(EAT):
             self.assertEqual(timezone.localdate(aware), datetime.date(2014, 12, 31))
 
-        with mock.patch('django.utils.timezone.now', return_value=aware):
+        with mock.patch('mango.utils.timezone.now', return_value=aware):
             self.assertEqual(timezone.localdate(timezone=EAT), datetime.date(2014, 12, 31))
             with timezone.override(EAT):
                 self.assertEqual(timezone.localdate(), datetime.date(2014, 12, 31))

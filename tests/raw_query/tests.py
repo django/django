@@ -1,9 +1,9 @@
 from datetime import date
 from decimal import Decimal
 
-from django.core.exceptions import FieldDoesNotExist
-from django.db.models.query import RawQuerySet
-from django.test import TestCase, skipUnlessDBFeature
+from mango.core.exceptions import FieldDoesNotExist
+from mango.db.models.query import RawQuerySet
+from mango.test import TestCase, skipUnlessDBFeature
 
 from .models import (
     Author, Book, BookFkAsPk, Coffee, FriendlyAuthor, MixedCaseIDColumn,

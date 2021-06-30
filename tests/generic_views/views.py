@@ -1,8 +1,8 @@
-from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
-from django.urls import reverse, reverse_lazy
-from django.utils.decorators import method_decorator
-from django.views import generic
+from mango.contrib.auth.decorators import login_required
+from mango.core.paginator import Paginator
+from mango.urls import reverse, reverse_lazy
+from mango.utils.decorators import method_decorator
+from mango.views import generic
 
 from .forms import AuthorForm, ContactForm
 from .models import Artist, Author, Book, BookSigning, Page

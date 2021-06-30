@@ -1,6 +1,6 @@
-from django.db import connection
-from django.db.models import Max
-from django.test import TestCase
+from mango.db import connection
+from mango.db.models import Max
+from mango.test import TestCase
 
 from .models import Cash, CashModel
 

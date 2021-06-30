@@ -1,28 +1,28 @@
 import datetime
 
-from django.contrib import admin
-from django.contrib.admin.models import LogEntry
-from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.templatetags.admin_list import pagination
-from django.contrib.admin.tests import AdminSeleniumTestCase
-from django.contrib.admin.views.main import (
+from mango.contrib import admin
+from mango.contrib.admin.models import LogEntry
+from mango.contrib.admin.options import IncorrectLookupParameters
+from mango.contrib.admin.templatetags.admin_list import pagination
+from mango.contrib.admin.tests import AdminSeleniumTestCase
+from mango.contrib.admin.views.main import (
     ALL_VAR, IS_POPUP_VAR, ORDER_VAR, PAGE_VAR, SEARCH_VAR, TO_FIELD_VAR,
 )
-from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.messages.storage.cookie import CookieStorage
-from django.db import connection, models
-from django.db.models import F, Field, IntegerField
-from django.db.models.functions import Upper
-from django.db.models.lookups import Contains, Exact
-from django.template import Context, Template, TemplateSyntaxError
-from django.test import TestCase, override_settings
-from django.test.client import RequestFactory
-from django.test.utils import (
+from mango.contrib.auth.models import User
+from mango.contrib.contenttypes.models import ContentType
+from mango.contrib.messages.storage.cookie import CookieStorage
+from mango.db import connection, models
+from mango.db.models import F, Field, IntegerField
+from mango.db.models.functions import Upper
+from mango.db.models.lookups import Contains, Exact
+from mango.template import Context, Template, TemplateSyntaxError
+from mango.test import TestCase, override_settings
+from mango.test.client import RequestFactory
+from mango.test.utils import (
     CaptureQueriesContext, isolate_apps, register_lookup,
 )
-from django.urls import reverse
-from django.utils import formats
+from mango.urls import reverse
+from mango.utils import formats
 
 from .admin import (
     BandAdmin, ChildAdmin, ChordsBandAdmin, ConcertAdmin,

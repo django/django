@@ -1,9 +1,9 @@
 from functools import partial, update_wrapper
 
-from django.contrib.auth.decorators import user_passes_test
-from django.http import HttpResponse
-from django.urls import reverse_lazy
-from django.views.generic import RedirectView
+from mango.contrib.auth.decorators import user_passes_test
+from mango.http import HttpResponse
+from mango.urls import reverse_lazy
+from mango.views.generic import RedirectView
 
 
 def empty_view(request, *args, **kwargs):

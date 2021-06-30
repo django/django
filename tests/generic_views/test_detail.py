@@ -1,11 +1,11 @@
 import datetime
 
-from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.test import TestCase, override_settings
-from django.test.client import RequestFactory
-from django.views.generic.base import View
-from django.views.generic.detail import SingleObjectTemplateResponseMixin
-from django.views.generic.edit import ModelFormMixin
+from mango.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from mango.test import TestCase, override_settings
+from mango.test.client import RequestFactory
+from mango.views.generic.base import View
+from mango.views.generic.detail import SingleObjectTemplateResponseMixin
+from mango.views.generic.edit import ModelFormMixin
 
 from .models import Artist, Author, Book, Page
 

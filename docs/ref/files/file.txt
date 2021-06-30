@@ -2,10 +2,10 @@
 The ``File`` object
 ===================
 
-The :mod:`django.core.files` module and its submodules contain built-in classes
-for basic file handling in Django.
+The :mod:`mango.core.files` module and its submodules contain built-in classes
+for basic file handling in Mango.
 
-.. currentmodule:: django.core.files
+.. currentmodule:: mango.core.files
 
 The ``File`` class
 ==================
@@ -13,8 +13,8 @@ The ``File`` class
 .. class:: File(file_object, name=None)
 
     The :class:`File` class is a thin wrapper around a Python
-    :py:term:`file object` with some Django-specific additions.
-    Internally, Django uses this class when it needs to represent a file.
+    :py:term:`file object` with some Mango-specific additions.
+    Internally, Mango uses this class when it needs to represent a file.
 
     :class:`File` objects have the following attributes and methods:
 
@@ -34,8 +34,8 @@ The ``File`` class
         .. admonition:: Be careful with this attribute in subclasses.
 
             Some subclasses of :class:`File`, including
-            :class:`~django.core.files.base.ContentFile` and
-            :class:`~django.db.models.fields.files.FieldFile`, may replace this
+            :class:`~mango.core.files.base.ContentFile` and
+            :class:`~mango.db.models.fields.files.FieldFile`, may replace this
             attribute with an object other than a Python :py:term:`file object`.
             In these cases, this attribute may itself be a :class:`File`
             subclass (and not necessarily the same subclass). Whenever
@@ -79,39 +79,39 @@ The ``File`` class
 
         Close the file.
 
-    In addition to the listed methods, :class:`~django.core.files.File` exposes
+    In addition to the listed methods, :class:`~mango.core.files.File` exposes
     the following attributes and methods of its ``file`` object:
     ``encoding``, ``fileno``, ``flush``, ``isatty``, ``newlines``, ``read``,
     ``readinto``, ``readline``, ``readlines``, ``seek``, ``tell``,
     ``truncate``, ``write``, ``writelines``, ``readable()``, ``writable()``,
     and ``seekable()``.
 
-.. currentmodule:: django.core.files.base
+.. currentmodule:: mango.core.files.base
 
 The ``ContentFile`` class
 =========================
 
 .. class:: ContentFile(content, name=None)
 
-    The ``ContentFile`` class inherits from :class:`~django.core.files.File`,
-    but unlike :class:`~django.core.files.File` it operates on string content
+    The ``ContentFile`` class inherits from :class:`~mango.core.files.File`,
+    but unlike :class:`~mango.core.files.File` it operates on string content
     (bytes also supported), rather than an actual file. For example::
 
-        from django.core.files.base import ContentFile
+        from mango.core.files.base import ContentFile
 
         f1 = ContentFile("esta frase está en español")
         f2 = ContentFile(b"these are bytes")
 
-.. currentmodule:: django.core.files.images
+.. currentmodule:: mango.core.files.images
 
 The ``ImageFile`` class
 =======================
 
 .. class:: ImageFile(file_object, name=None)
 
-    Django provides a built-in class specifically for images.
-    :class:`django.core.files.images.ImageFile` inherits all the attributes
-    and methods of :class:`~django.core.files.File`, and additionally
+    Mango provides a built-in class specifically for images.
+    :class:`mango.core.files.images.ImageFile` inherits all the attributes
+    and methods of :class:`~mango.core.files.File`, and additionally
     provides the following:
 
     .. attribute:: width
@@ -122,7 +122,7 @@ The ``ImageFile`` class
 
         Height of the image in pixels.
 
-.. currentmodule:: django.core.files
+.. currentmodule:: mango.core.files
 
 Additional methods on files attached to objects
 ===============================================
@@ -146,7 +146,7 @@ below) will also have a couple of extra methods:
 
     Note that the ``content`` argument must be an instance of either
     :class:`File` or of a subclass of :class:`File`, such as
-    :class:`~django.core.files.base.ContentFile`.
+    :class:`~mango.core.files.base.ContentFile`.
 
 .. method:: File.delete(save=True)
 

@@ -1,11 +1,11 @@
 import time
 
-from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponse
-from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.utils import require_jinja2
-from django.urls import resolve
-from django.views.generic import RedirectView, TemplateView, View
+from mango.core.exceptions import ImproperlyConfigured
+from mango.http import HttpResponse
+from mango.test import RequestFactory, SimpleTestCase, override_settings
+from mango.test.utils import require_jinja2
+from mango.urls import resolve
+from mango.views.generic import RedirectView, TemplateView, View
 
 from . import views
 
@@ -346,7 +346,7 @@ class TemplateViewTest(SimpleTestCase):
         request = self.rf.get('/using/')
         view = TemplateView.as_view(template_name='generic_views/using.html')
         self.assertEqual(view(request).render().content, b'DTL\n')
-        view = TemplateView.as_view(template_name='generic_views/using.html', template_engine='django')
+        view = TemplateView.as_view(template_name='generic_views/using.html', template_engine='mango')
         self.assertEqual(view(request).render().content, b'DTL\n')
         view = TemplateView.as_view(template_name='generic_views/using.html', template_engine='jinja2')
         self.assertEqual(view(request).render().content, b'Jinja2\n')

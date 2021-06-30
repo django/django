@@ -1,24 +1,24 @@
-from django.contrib.auth.models import User
-from django.contrib.flatpages.models import FlatPage
-from django.contrib.sites.models import Site
-from django.test import Client, TestCase, modify_settings, override_settings
+from mango.contrib.auth.models import User
+from mango.contrib.flatpages.models import FlatPage
+from mango.contrib.sites.models import Site
+from mango.test import Client, TestCase, modify_settings, override_settings
 
 from .settings import FLATPAGES_TEMPLATES
 
 
-@modify_settings(INSTALLED_APPS={'append': 'django.contrib.flatpages'})
+@modify_settings(INSTALLED_APPS={'append': 'mango.contrib.flatpages'})
 @override_settings(
     LOGIN_URL='/accounts/login/',
     MIDDLEWARE=[
-        'django.middleware.common.CommonMiddleware',
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+        'mango.middleware.common.CommonMiddleware',
+        'mango.contrib.sessions.middleware.SessionMiddleware',
+        'mango.middleware.csrf.CsrfViewMiddleware',
+        'mango.contrib.auth.middleware.AuthenticationMiddleware',
+        'mango.contrib.messages.middleware.MessageMiddleware',
+        'mango.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     ],
     ROOT_URLCONF='flatpages_tests.urls',
-    CSRF_FAILURE_VIEW='django.views.csrf.csrf_failure',
+    CSRF_FAILURE_VIEW='mango.views.csrf.csrf_failure',
     TEMPLATES=FLATPAGES_TEMPLATES,
     SITE_ID=1,
 )

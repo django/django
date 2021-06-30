@@ -1,7 +1,7 @@
 import unittest
 from unittest import mock
 
-from django.contrib.gis.gdal import Driver, GDALException
+from mango.contrib.gis.gdal import Driver, GDALException
 
 valid_drivers = (
     # vector
@@ -45,10 +45,10 @@ class DriverTest(unittest.TestCase):
             dr = Driver(alias)
             self.assertEqual(full_name, str(dr))
 
-    @mock.patch('django.contrib.gis.gdal.driver.vcapi.get_driver_count')
-    @mock.patch('django.contrib.gis.gdal.driver.rcapi.get_driver_count')
-    @mock.patch('django.contrib.gis.gdal.driver.vcapi.register_all')
-    @mock.patch('django.contrib.gis.gdal.driver.rcapi.register_all')
+    @mock.patch('mango.contrib.gis.gdal.driver.vcapi.get_driver_count')
+    @mock.patch('mango.contrib.gis.gdal.driver.rcapi.get_driver_count')
+    @mock.patch('mango.contrib.gis.gdal.driver.vcapi.register_all')
+    @mock.patch('mango.contrib.gis.gdal.driver.rcapi.register_all')
     def test_registered(self, rreg, vreg, rcount, vcount):
         """
         Prototypes are registered only if their respective driver counts are

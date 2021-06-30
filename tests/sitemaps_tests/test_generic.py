@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from django.contrib.sitemaps import GenericSitemap
-from django.test import ignore_warnings, override_settings
-from django.utils.deprecation import RemovedInDjango50Warning
+from mango.contrib.sitemaps import GenericSitemap
+from mango.test import ignore_warnings, override_settings
+from mango.utils.deprecation import RemovedInMango50Warning
 
 from .base import SitemapTestsBase
 from .models import TestModel
@@ -71,7 +71,7 @@ class GenericViewsSitemapTests(SitemapTestsBase):
             with self.subTest(protocol=protocol):
                 self.assertEqual(sitemap.get_protocol(protocol), protocol)
 
-    @ignore_warnings(category=RemovedInDjango50Warning)
+    @ignore_warnings(category=RemovedInMango50Warning)
     def test_get_protocol_default(self):
         sitemap = GenericSitemap({'queryset': None})
         self.assertEqual(sitemap.get_protocol(), 'http')
@@ -80,8 +80,8 @@ class GenericViewsSitemapTests(SitemapTestsBase):
         sitemap = GenericSitemap({'queryset': None})
         msg = (
             "The default sitemap protocol will be changed from 'http' to "
-            "'https' in Django 5.0. Set Sitemap.protocol to silence this "
+            "'https' in Mango 5.0. Set Sitemap.protocol to silence this "
             "warning."
         )
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+        with self.assertWarnsMessage(RemovedInMango50Warning, msg):
             sitemap.get_protocol()

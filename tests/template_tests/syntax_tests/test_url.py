@@ -1,7 +1,7 @@
-from django.template import RequestContext, TemplateSyntaxError
-from django.template.defaulttags import URLNode
-from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.urls import NoReverseMatch, resolve
+from mango.template import RequestContext, TemplateSyntaxError
+from mango.template.defaulttags import URLNode
+from mango.test import RequestFactory, SimpleTestCase, override_settings
+from mango.urls import NoReverseMatch, resolve
 
 from ..utils import setup
 

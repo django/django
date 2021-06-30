@@ -1,6 +1,6 @@
 import operator
 
-from django.template import Engine, Library
+from mango.template import Engine, Library
 
 engine = Engine(app_dirs=True)
 register = Library()

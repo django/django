@@ -1,17 +1,17 @@
-from django.test import modify_settings
+from mango.test import modify_settings
 
 from . import PostgreSQLTestCase
 from .models import CharFieldModel, TextFieldModel
 
 try:
-    from django.contrib.postgres.search import (
+    from mango.contrib.postgres.search import (
         TrigramDistance, TrigramSimilarity,
     )
 except ImportError:
     pass
 
 
-@modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
+@modify_settings(INSTALLED_APPS={'append': 'mango.contrib.postgres'})
 class TrigramTest(PostgreSQLTestCase):
     Model = CharFieldModel
 

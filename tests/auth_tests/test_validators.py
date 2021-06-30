@@ -1,24 +1,24 @@
 import os
 
-from django.contrib.auth import validators
-from django.contrib.auth.models import User
-from django.contrib.auth.password_validation import (
+from mango.contrib.auth import validators
+from mango.contrib.auth.models import User
+from mango.contrib.auth.password_validation import (
     CommonPasswordValidator, MinimumLengthValidator, NumericPasswordValidator,
     UserAttributeSimilarityValidator, get_default_password_validators,
     get_password_validators, password_changed,
     password_validators_help_text_html, password_validators_help_texts,
     validate_password,
 )
-from django.core.exceptions import ValidationError
-from django.db import models
-from django.test import SimpleTestCase, TestCase, override_settings
-from django.test.utils import isolate_apps
-from django.utils.html import conditional_escape
+from mango.core.exceptions import ValidationError
+from mango.db import models
+from mango.test import SimpleTestCase, TestCase, override_settings
+from mango.test.utils import isolate_apps
+from mango.utils.html import conditional_escape
 
 
 @override_settings(AUTH_PASSWORD_VALIDATORS=[
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {
+    {'NAME': 'mango.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'mango.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {
         'min_length': 12,
     }},
 ])
@@ -31,7 +31,7 @@ class PasswordValidationTest(SimpleTestCase):
         self.assertEqual(validators[1].min_length, 12)
 
     def test_get_password_validators_custom(self):
-        validator_config = [{'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'}]
+        validator_config = [{'NAME': 'mango.contrib.auth.password_validation.CommonPasswordValidator'}]
         validators = get_password_validators(validator_config)
         self.assertEqual(len(validators), 1)
         self.assertEqual(validators[0].__class__.__name__, 'CommonPasswordValidator')
@@ -43,7 +43,7 @@ class PasswordValidationTest(SimpleTestCase):
         msg_too_short = 'This password is too short. It must contain at least 12 characters.'
 
         with self.assertRaises(ValidationError) as cm:
-            validate_password('django4242')
+            validate_password('mango4242')
         self.assertEqual(cm.exception.messages, [msg_too_short])
         self.assertEqual(cm.exception.error_list[0].code, 'password_too_short')
 
@@ -202,7 +202,7 @@ class CommonPasswordValidatorTest(SimpleTestCase):
         self.assertEqual(cm.exception.messages, [expected_error])
         self.assertEqual(cm.exception.error_list[0].code, 'password_too_common')
 
-    def test_validate_django_supplied_file(self):
+    def test_validate_mango_supplied_file(self):
         validator = CommonPasswordValidator()
         for password in validator.passwords:
             self.assertEqual(password, password.lower())

@@ -7,13 +7,13 @@ from io import StringIO
 from pathlib import Path
 from unittest import mock
 
-from django.conf import settings
-from django.contrib.staticfiles import finders, storage
-from django.contrib.staticfiles.management.commands.collectstatic import (
+from mango.conf import settings
+from mango.contrib.staticfiles import finders, storage
+from mango.contrib.staticfiles.management.commands.collectstatic import (
     Command as CollectstaticCommand,
 )
-from django.core.management import call_command
-from django.test import override_settings
+from mango.core.management import call_command
+from mango.test import override_settings
 
 from .cases import CollectionTestCase
 from .settings import TEST_ROOT
@@ -207,7 +207,7 @@ class TestHashedFiles:
 
     @override_settings(
         STATICFILES_DIRS=[os.path.join(TEST_ROOT, 'project', 'loop')],
-        STATICFILES_FINDERS=['django.contrib.staticfiles.finders.FileSystemFinder'],
+        STATICFILES_FINDERS=['mango.contrib.staticfiles.finders.FileSystemFinder'],
     )
     def test_import_loop(self):
         finders.get_finder.cache_clear()
@@ -283,7 +283,7 @@ class TestHashedFiles:
 
     @override_settings(
         STATICFILES_DIRS=[os.path.join(TEST_ROOT, 'project', 'faulty')],
-        STATICFILES_FINDERS=['django.contrib.staticfiles.finders.FileSystemFinder'],
+        STATICFILES_FINDERS=['mango.contrib.staticfiles.finders.FileSystemFinder'],
     )
     def test_post_processing_failure(self):
         """
@@ -328,7 +328,7 @@ class TestExtraPatternsStorage(CollectionTestCase):
 
 
 @override_settings(
-    STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage',
+    STATICFILES_STORAGE='mango.contrib.staticfiles.storage.ManifestStaticFilesStorage',
 )
 class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
     """
@@ -594,7 +594,7 @@ class TestStaticFilePermissions(CollectionTestCase):
 
 
 @override_settings(
-    STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage',
+    STATICFILES_STORAGE='mango.contrib.staticfiles.storage.ManifestStaticFilesStorage',
 )
 class TestCollectionHashedFilesCache(CollectionTestCase):
     """

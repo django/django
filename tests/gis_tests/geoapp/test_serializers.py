@@ -1,8 +1,8 @@
 import json
 
-from django.contrib.gis.geos import LinearRing, Point, Polygon
-from django.core import serializers
-from django.test import TestCase
+from mango.contrib.gis.geos import LinearRing, Point, Polygon
+from mango.core import serializers
+from mango.test import TestCase
 
 from .models import City, MultiFields, PennsylvaniaCity
 

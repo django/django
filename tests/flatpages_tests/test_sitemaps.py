@@ -1,7 +1,7 @@
-from django.apps import apps
-from django.contrib.sites.models import Site
-from django.test import TestCase
-from django.test.utils import modify_settings, override_settings
+from mango.apps import apps
+from mango.contrib.sites.models import Site
+from mango.test import TestCase
+from mango.test.utils import modify_settings, override_settings
 
 
 @override_settings(
@@ -10,7 +10,7 @@ from django.test.utils import modify_settings, override_settings
 )
 @modify_settings(
     INSTALLED_APPS={
-        'append': ['django.contrib.sitemaps', 'django.contrib.flatpages'],
+        'append': ['mango.contrib.sitemaps', 'mango.contrib.flatpages'],
     },
 )
 class FlatpagesSitemapTests(TestCase):

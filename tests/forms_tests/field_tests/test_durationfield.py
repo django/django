@@ -1,10 +1,10 @@
 import datetime
 
-from django.core.exceptions import ValidationError
-from django.forms import DurationField
-from django.test import SimpleTestCase
-from django.utils import translation
-from django.utils.duration import duration_string
+from mango.core.exceptions import ValidationError
+from mango.forms import DurationField
+from mango.test import SimpleTestCase
+from mango.utils import translation
+from mango.utils.duration import duration_string
 
 from . import FormFieldAssertionsMixin
 

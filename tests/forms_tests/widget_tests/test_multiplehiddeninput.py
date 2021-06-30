@@ -1,4 +1,4 @@
-from django.forms import MultipleHiddenInput
+from mango.forms import MultipleHiddenInput
 
 from .base import WidgetTest
 

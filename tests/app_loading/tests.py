@@ -1,8 +1,8 @@
 import os
 
-from django.apps import apps
-from django.test import SimpleTestCase
-from django.test.utils import extend_sys_path
+from mango.apps import apps
+from mango.test import SimpleTestCase
+from mango.test.utils import extend_sys_path
 
 
 class EggLoadingTest(SimpleTestCase):

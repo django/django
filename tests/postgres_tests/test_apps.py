@@ -1,6 +1,6 @@
-from django.db.backends.signals import connection_created
-from django.db.migrations.writer import MigrationWriter
-from django.test.utils import modify_settings
+from mango.db.backends.signals import connection_created
+from mango.db.migrations.writer import MigrationWriter
+from mango.test.utils import modify_settings
 
 from . import PostgreSQLTestCase
 
@@ -9,7 +9,7 @@ try:
         DateRange, DateTimeRange, DateTimeTZRange, NumericRange,
     )
 
-    from django.contrib.postgres.fields import (
+    from mango.contrib.postgres.fields import (
         DateRangeField, DateTimeRangeField, IntegerRangeField,
     )
 except ImportError:
@@ -18,9 +18,9 @@ except ImportError:
 
 class PostgresConfigTests(PostgreSQLTestCase):
     def test_register_type_handlers_connection(self):
-        from django.contrib.postgres.signals import register_type_handlers
+        from mango.contrib.postgres.signals import register_type_handlers
         self.assertNotIn(register_type_handlers, connection_created._live_receivers(None))
-        with modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'}):
+        with modify_settings(INSTALLED_APPS={'append': 'mango.contrib.postgres'}):
             self.assertIn(register_type_handlers, connection_created._live_receivers(None))
         self.assertNotIn(register_type_handlers, connection_created._live_receivers(None))
 
@@ -40,13 +40,13 @@ class PostgresConfigTests(PostgreSQLTestCase):
                         MigrationWriter.serialize(field)
 
         assertNotSerializable()
-        with self.modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'}):
+        with self.modify_settings(INSTALLED_APPS={'append': 'mango.contrib.postgres'}):
             for default, test_field in tests:
                 with self.subTest(default=default):
                     field = test_field(default=default)
                     serialized_field, imports = MigrationWriter.serialize(field)
                     self.assertEqual(imports, {
-                        'import django.contrib.postgres.fields.ranges',
+                        'import mango.contrib.postgres.fields.ranges',
                         'import psycopg2.extras',
                     })
                     self.assertIn(

@@ -1,6 +1,6 @@
-from django.db.models import Value as V
-from django.db.models.functions import Lower, StrIndex, Substr, Upper
-from django.test import TestCase
+from mango.db.models import Value as V
+from mango.db.models.functions import Lower, StrIndex, Substr, Upper
+from mango.test import TestCase
 
 from ..models import Author
 

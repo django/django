@@ -1,8 +1,8 @@
 """Tests for jslex."""
 # originally from https://bitbucket.org/ned/jslex
 
-from django.test import SimpleTestCase
-from django.utils.jslex import JsLexer, prepare_js_for_gettext
+from mango.test import SimpleTestCase
+from mango.utils.jslex import JsLexer, prepare_js_for_gettext
 
 
 class JsTokensTest(SimpleTestCase):

@@ -1,7 +1,7 @@
-from django.contrib import admin
-from django.contrib.auth.models import Permission, User
-from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
+from mango.contrib import admin
+from mango.contrib.auth.models import Permission, User
+from mango.contrib.contenttypes.models import ContentType
+from mango.test import TestCase
 
 from .models import Band
 

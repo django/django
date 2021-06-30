@@ -1,11 +1,11 @@
 from unittest import mock
 
-from django.core.management import call_command
+from mango.core.management import call_command
 
 from .base import SitemapTestsBase
 
 
-@mock.patch('django.contrib.sitemaps.management.commands.ping_google.ping_google')
+@mock.patch('mango.contrib.sitemaps.management.commands.ping_google.ping_google')
 class PingGoogleTests(SitemapTestsBase):
 
     def test_default(self, ping_google_func):

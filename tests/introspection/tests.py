@@ -1,8 +1,8 @@
 from unittest import mock, skipUnless
 
-from django.db import DatabaseError, connection
-from django.db.models import Index
-from django.test import TransactionTestCase, skipUnlessDBFeature
+from mango.db import DatabaseError, connection
+from mango.db.models import Index
+from mango.test import TransactionTestCase, skipUnlessDBFeature
 
 from .models import (
     Article, ArticleReporter, CheckConstraintModel, City, Comment, Country,
@@ -20,19 +20,19 @@ class IntrospectionTests(TransactionTestCase):
         self.assertIn(Reporter._meta.db_table, tl, "'%s' isn't in table_list()." % Reporter._meta.db_table)
         self.assertIn(Article._meta.db_table, tl, "'%s' isn't in table_list()." % Article._meta.db_table)
 
-    def test_django_table_names(self):
+    def test_mango_table_names(self):
         with connection.cursor() as cursor:
-            cursor.execute('CREATE TABLE django_ixn_test_table (id INTEGER);')
-            tl = connection.introspection.django_table_names()
-            cursor.execute("DROP TABLE django_ixn_test_table;")
-            self.assertNotIn('django_ixn_test_table', tl,
-                             "django_table_names() returned a non-Django table")
+            cursor.execute('CREATE TABLE mango_ixn_test_table (id INTEGER);')
+            tl = connection.introspection.mango_table_names()
+            cursor.execute("DROP TABLE mango_ixn_test_table;")
+            self.assertNotIn('mango_ixn_test_table', tl,
+                             "mango_table_names() returned a non-Mango table")
 
-    def test_django_table_names_retval_type(self):
+    def test_mango_table_names_retval_type(self):
         # Table name is a list #15216
-        tl = connection.introspection.django_table_names(only_existing=True)
+        tl = connection.introspection.mango_table_names(only_existing=True)
         self.assertIs(type(tl), list)
-        tl = connection.introspection.django_table_names(only_existing=False)
+        tl = connection.introspection.mango_table_names(only_existing=False)
         self.assertIs(type(tl), list)
 
     def test_table_names_with_views(self):
@@ -54,7 +54,7 @@ class IntrospectionTests(TransactionTestCase):
                 cursor.execute('DROP VIEW introspection_article_view')
 
     def test_unmanaged_through_model(self):
-        tables = connection.introspection.django_table_names()
+        tables = connection.introspection.mango_table_names()
         self.assertNotIn(ArticleReporter._meta.db_table, tables)
 
     def test_installed_models(self):
@@ -125,9 +125,9 @@ class IntrospectionTests(TransactionTestCase):
     @skipUnlessDBFeature('has_real_datatype')
     def test_postgresql_real_type(self):
         with connection.cursor() as cursor:
-            cursor.execute("CREATE TABLE django_ixn_real_test_table (number REAL);")
-            desc = connection.introspection.get_table_description(cursor, 'django_ixn_real_test_table')
-            cursor.execute('DROP TABLE django_ixn_real_test_table;')
+            cursor.execute("CREATE TABLE mango_ixn_real_test_table (number REAL);")
+            desc = connection.introspection.get_table_description(cursor, 'mango_ixn_real_test_table')
+            cursor.execute('DROP TABLE mango_ixn_real_test_table;')
         self.assertEqual(connection.introspection.get_field_type(desc[0][1], desc[0]), 'FloatField')
 
     @skipUnlessDBFeature('can_introspect_foreign_keys')

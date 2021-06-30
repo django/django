@@ -1,15 +1,15 @@
 import json
 from contextlib import contextmanager
 
-from django.contrib import admin
-from django.contrib.admin.tests import AdminSeleniumTestCase
-from django.contrib.admin.views.autocomplete import AutocompleteJsonView
-from django.contrib.auth.models import Permission, User
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import PermissionDenied
-from django.http import Http404
-from django.test import RequestFactory, override_settings
-from django.urls import reverse, reverse_lazy
+from mango.contrib import admin
+from mango.contrib.admin.tests import AdminSeleniumTestCase
+from mango.contrib.admin.views.autocomplete import AutocompleteJsonView
+from mango.contrib.auth.models import Permission, User
+from mango.contrib.contenttypes.models import ContentType
+from mango.core.exceptions import PermissionDenied
+from mango.http import Http404
+from mango.test import RequestFactory, override_settings
+from mango.urls import reverse, reverse_lazy
 
 from .admin import AnswerAdmin, QuestionAdmin
 from .models import (

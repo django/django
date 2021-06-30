@@ -1,9 +1,9 @@
 from unittest import mock
 
-from django.db import connection, migrations
+from mango.db import connection, migrations
 
 try:
-    from django.contrib.postgres.operations import (
+    from mango.contrib.postgres.operations import (
         BloomExtension, BtreeGinExtension, BtreeGistExtension, CITextExtension,
         CreateExtension, CryptoExtension, HStoreExtension, TrigramExtension,
         UnaccentExtension,

@@ -1,6 +1,6 @@
-from django.contrib.sites.managers import CurrentSiteManager
-from django.contrib.sites.models import Site
-from django.db import models
+from mango.contrib.sites.managers import CurrentSiteManager
+from mango.contrib.sites.models import Site
+from mango.db import models
 
 
 class AbstractArticle(models.Model):

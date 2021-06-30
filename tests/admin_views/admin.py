@@ -2,21 +2,21 @@ import datetime
 from io import StringIO
 from wsgiref.util import FileWrapper
 
-from django import forms
-from django.contrib import admin
-from django.contrib.admin import BooleanFieldListFilter
-from django.contrib.admin.views.main import ChangeList
-from django.contrib.auth.admin import GroupAdmin, UserAdmin
-from django.contrib.auth.models import Group, User
-from django.core.exceptions import ValidationError
-from django.core.mail import EmailMessage
-from django.db import models
-from django.forms.models import BaseModelFormSet
-from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
-from django.urls import path
-from django.utils.html import format_html
-from django.utils.safestring import mark_safe
-from django.views.decorators.common import no_append_slash
+from mango import forms
+from mango.contrib import admin
+from mango.contrib.admin import BooleanFieldListFilter
+from mango.contrib.admin.views.main import ChangeList
+from mango.contrib.auth.admin import GroupAdmin, UserAdmin
+from mango.contrib.auth.models import Group, User
+from mango.core.exceptions import ValidationError
+from mango.core.mail import EmailMessage
+from mango.db import models
+from mango.forms.models import BaseModelFormSet
+from mango.http import HttpResponse, JsonResponse, StreamingHttpResponse
+from mango.urls import path
+from mango.utils.html import format_html
+from mango.utils.safestring import mark_safe
+from mango.views.decorators.common import no_append_slash
 
 from .forms import MediaActionForm
 from .models import (
@@ -297,7 +297,7 @@ def external_mail(modeladmin, request, selected):
 
 @admin.action(description='Redirect to (Awesome action)')
 def redirect_to(modeladmin, request, selected):
-    from django.http import HttpResponseRedirect
+    from mango.http import HttpResponseRedirect
     return HttpResponseRedirect('/some-where-else/')
 
 

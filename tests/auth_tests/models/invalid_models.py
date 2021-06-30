@@ -1,5 +1,5 @@
-from django.contrib.auth.models import AbstractBaseUser, UserManager
-from django.db import models
+from mango.contrib.auth.models import AbstractBaseUser, UserManager
+from mango.db import models
 
 
 class CustomUserNonUniqueUsername(AbstractBaseUser):

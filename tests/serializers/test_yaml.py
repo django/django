@@ -2,9 +2,9 @@ import importlib
 import unittest
 from io import StringIO
 
-from django.core import management, serializers
-from django.core.serializers.base import DeserializationError
-from django.test import SimpleTestCase, TestCase, TransactionTestCase
+from mango.core import management, serializers
+from mango.core.serializers.base import DeserializationError
+from mango.test import SimpleTestCase, TestCase, TransactionTestCase
 
 from .models import Author
 from .tests import SerializersTestBase, SerializersTransactionTestBase
@@ -22,7 +22,7 @@ class YamlImportModuleMock:
     """Provides a wrapped import_module function to simulate yaml ImportError
 
     In order to run tests that verify the behavior of the YAML serializer
-    when run on a system that has yaml installed (like the django CI server),
+    when run on a system that has yaml installed (like the mango CI server),
     mock import_module, so that it raises an ImportError when the yaml
     serializer is being imported.  The importlib.import_module() call is
     being made in the serializers.register_serializer().

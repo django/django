@@ -4,14 +4,14 @@ from decimal import Decimal
 from operator import attrgetter, itemgetter
 from uuid import UUID
 
-from django.core.exceptions import FieldError
-from django.db import connection
-from django.db.models import (
+from mango.core.exceptions import FieldError
+from mango.db import connection
+from mango.db.models import (
     BinaryField, BooleanField, Case, Count, DecimalField, F,
     GenericIPAddressField, IntegerField, Max, Min, Q, Sum, TextField, Value,
     When,
 )
-from django.test import SimpleTestCase, TestCase
+from mango.test import SimpleTestCase, TestCase
 
 from .models import CaseTestModel, Client, FKCaseTestModel, O2OCaseTestModel
 

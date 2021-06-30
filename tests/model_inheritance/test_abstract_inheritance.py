@@ -1,12 +1,12 @@
-from django.contrib.contenttypes.fields import (
+from mango.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
-from django.contrib.contenttypes.models import ContentType
-from django.core.checks import Error
-from django.core.exceptions import FieldDoesNotExist, FieldError
-from django.db import models
-from django.test import SimpleTestCase
-from django.test.utils import isolate_apps
+from mango.contrib.contenttypes.models import ContentType
+from mango.core.checks import Error
+from mango.core.exceptions import FieldDoesNotExist, FieldError
+from mango.db import models
+from mango.test import SimpleTestCase
+from mango.test.utils import isolate_apps
 
 
 @isolate_apps('model_inheritance')

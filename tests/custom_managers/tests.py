@@ -1,5 +1,5 @@
-from django.db import models
-from django.test import TestCase
+from mango.db import models
+from mango.test import TestCase
 
 from .models import (
     Book, Car, CustomManager, CustomQuerySet, DeconstructibleCustomManager,
@@ -487,7 +487,7 @@ class CustomManagerTests(TestCase):
         mgr = models.Manager()
         as_manager, mgr_path, qs_path, args, kwargs = mgr.deconstruct()
         self.assertFalse(as_manager)
-        self.assertEqual(mgr_path, 'django.db.models.manager.Manager')
+        self.assertEqual(mgr_path, 'mango.db.models.manager.Manager')
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {})
 
@@ -515,7 +515,7 @@ class CustomManagerTests(TestCase):
     def test_deconstruct_from_queryset_failing(self):
         mgr = CustomManager('arg')
         msg = ("Could not find manager BaseCustomManagerFromCustomQuerySet in "
-               "django.db.models.manager.\n"
+               "mango.db.models.manager.\n"
                "Please note that you need to inherit from managers you "
                "dynamically generated with 'from_queryset()'.")
         with self.assertRaisesMessage(ValueError, msg):

@@ -1,12 +1,12 @@
 """
 Serialization
 
-``django.core.serializers`` provides interfaces to converting Django
+``mango.core.serializers`` provides interfaces to converting Mango
 ``QuerySet`` objects to and from "flat" data (i.e. strings).
 """
 from decimal import Decimal
 
-from django.db import models
+from mango.db import models
 
 
 class CategoryMetaDataManager(models.Manager):

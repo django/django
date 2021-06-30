@@ -1,5 +1,5 @@
-from django.db import connection, transaction
-from django.test import TransactionTestCase, skipUnlessDBFeature
+from mango.db import connection, transaction
+from mango.test import TransactionTestCase, skipUnlessDBFeature
 
 from .models import Thing
 

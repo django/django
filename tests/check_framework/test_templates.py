@@ -1,20 +1,20 @@
 from copy import copy, deepcopy
 
-from django.core.checks.templates import (
+from mango.core.checks.templates import (
     E001, E002, check_setting_app_dirs_loaders,
     check_string_if_invalid_is_string,
 )
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from mango.test import SimpleTestCase
+from mango.test.utils import override_settings
 
 
 class CheckTemplateSettingsAppDirsTest(SimpleTestCase):
     TEMPLATES_APP_DIRS_AND_LOADERS = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'BACKEND': 'mango.template.backends.mango.MangoTemplates',
             'APP_DIRS': True,
             'OPTIONS': {
-                'loaders': ['django.template.loaders.filesystem.Loader'],
+                'loaders': ['mango.template.loaders.filesystem.Loader'],
             },
         },
     ]
@@ -42,13 +42,13 @@ class CheckTemplateSettingsAppDirsTest(SimpleTestCase):
 class CheckTemplateStringIfInvalidTest(SimpleTestCase):
     TEMPLATES_STRING_IF_INVALID = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'BACKEND': 'mango.template.backends.mango.MangoTemplates',
             'OPTIONS': {
                 'string_if_invalid': False,
             },
         },
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'BACKEND': 'mango.template.backends.mango.MangoTemplates',
             'OPTIONS': {
                 'string_if_invalid': 42,
             },

@@ -1,9 +1,9 @@
 from unittest import skipUnless
 
-from django.db import connection
-from django.db.models import Value
-from django.db.models.functions import NullIf
-from django.test import TestCase
+from mango.db import connection
+from mango.db.models import Value
+from mango.db.models.functions import NullIf
+from mango.test import TestCase
 
 from ..models import Author
 

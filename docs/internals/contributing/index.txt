@@ -1,41 +1,41 @@
 ======================
-Contributing to Django
+Contributing to Mango
 ======================
 
-Django is a community that lives on its volunteers. As it keeps growing, we
+Mango is a community that lives on its volunteers. As it keeps growing, we
 always need more people to help others. You can contribute in many ways, either
 on the framework itself or in the wider ecosystem.
 
-Work on the Django framework
+Work on the Mango framework
 ============================
 
-The work on Django itself falls into three major areas:
+The work on Mango itself falls into three major areas:
 
 **Writing code** 💻
     Fix a bug, or add a new feature. You can make a pull request and see **your
-    code** in the next version of Django!
+    code** in the next version of Mango!
 
     Start from the :doc:`writing-code/index` docs.
 
 **Writing documentation** ✍️
-    Django's documentation is one of its key strengths. It's informative
+    Mango's documentation is one of its key strengths. It's informative
     and thorough. You can help to improve the documentation and keep it
     relevant as the framework evolves.
 
     See :doc:`writing-documentation` for more.
 
-**Localizing Django** 🗺️
-    Django is translated into over 100 languages - There's even some
+**Localizing Mango** 🗺️
+    Mango is translated into over 100 languages - There's even some
     translation for Klingon?! The i18n team are always looking for translators
     to help maintain and increase language reach.
 
-    See :doc:`localizing` to help translate Django.
+    See :doc:`localizing` to help translate Mango.
 
-If you think working *with* Django is fun, wait until you start working *on*
-it. Really, **ANYONE** can do something to help make Django better and greater!
+If you think working *with* Mango is fun, wait until you start working *on*
+it. Really, **ANYONE** can do something to help make Mango better and greater!
 
 This contributing guide contains everything you need to know to help build the
-Django Web framework. Browse the following sections to find out how:
+Mango Web framework. Browse the following sections to find out how:
 
 .. toctree::
    :maxdepth: 2
@@ -48,40 +48,40 @@ Django Web framework. Browse the following sections to find out how:
    localizing
    committing-code
 
-Join the Django community ❤️
+Join the Mango community ❤️
 ============================
 
-We're passionate about helping Django users make the jump to contributing
+We're passionate about helping Mango users make the jump to contributing
 members of the community. There are several other ways you can help the
-Django community and others to maintain a great ecosystem to work in:
+Mango community and others to maintain a great ecosystem to work in:
 
-* Join the `Django forum`_. This forum is a place for discussing the Django
+* Join the `Mango forum`_. This forum is a place for discussing the Mango
   framework and applications and projects that use it. This is also a good
   place to ask and answer any questions related to installing, using, or
-  contributing to Django.
+  contributing to Mango.
 
-* Join the |django-users| mailing list and answer questions. This
+* Join the |mango-users| mailing list and answer questions. This
   mailing list has a huge audience, and we really want to maintain a
-  friendly and helpful atmosphere. If you're new to the Django community,
+  friendly and helpful atmosphere. If you're new to the Mango community,
   you should read the `posting guidelines`_.
 
-* Join the `#django IRC channel`_ on Libera.Chat and answer questions. By
-  explaining Django to other users, you're going to learn a lot about the
+* Join the `#mango IRC channel`_ on Libera.Chat and answer questions. By
+  explaining Mango to other users, you're going to learn a lot about the
   framework yourself.
 
-* Blog about Django. We syndicate all the Django blogs we know about on
+* Blog about Mango. We syndicate all the Mango blogs we know about on
   the `community page`_; if you'd like to see your blog on that page you
   can `register it here`_.
 
-* Contribute to open-source Django projects, write some documentation, or
+* Contribute to open-source Mango projects, write some documentation, or
   release your own code as an open-source pluggable application. The
-  ecosystem of pluggable applications is a big strength of Django, help us
+  ecosystem of pluggable applications is a big strength of Mango, help us
   build it!
 
 We're looking forward to working with you. Welcome aboard! ⛵️
 
-.. _posting guidelines: https://code.djangoproject.com/wiki/UsingTheMailingList
-.. _#django IRC channel: https://web.libera.chat/#django
-.. _community page: https://www.djangoproject.com/community/
-.. _Django forum: https://forum.djangoproject.com/
-.. _register it here: https://www.djangoproject.com/community/add/blogs/
+.. _posting guidelines: https://code.mangoproject.com/wiki/UsingTheMailingList
+.. _#mango IRC channel: https://web.libera.chat/#mango
+.. _community page: https://www.mangoproject.com/community/
+.. _Mango forum: https://forum.mangoproject.com/
+.. _register it here: https://www.mangoproject.com/community/add/blogs/

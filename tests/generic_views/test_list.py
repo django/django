@@ -1,8 +1,8 @@
 import datetime
 
-from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, override_settings
-from django.views.generic.base import View
+from mango.core.exceptions import ImproperlyConfigured
+from mango.test import TestCase, override_settings
+from mango.views.generic.base import View
 
 from .models import Artist, Author, Book, Page
 

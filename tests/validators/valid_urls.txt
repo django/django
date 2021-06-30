@@ -1,4 +1,4 @@
-http://www.djangoproject.com/
+http://www.mangoproject.com/
 HTTP://WWW.DJANGOPROJECT.COM/
 http://localhost/
 http://example.com/
@@ -49,7 +49,7 @@ http://foo.com/blah_(wikipedia)_blah#cite-1
 http://foo.com/unicode_(✪)_in_parens
 http://foo.com/(something)?after=parens
 http://☺.damowmow.com/
-http://djangoproject.com/events/#&product=browser
+http://mangoproject.com/events/#&product=browser
 http://j.mp
 ftp://foo.bar/baz
 http://foo.bar/?q=Test%20URL-encoded%20stuff

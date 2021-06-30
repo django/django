@@ -1,5 +1,5 @@
-from django.core.checks import Tags
-from django.core.management.base import BaseCommand
+from mango.core.checks import Tags
+from mango.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):

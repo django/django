@@ -1,5 +1,5 @@
-from django.db import connection
-from django.test import SimpleTestCase
+from mango.db import connection
+from mango.test import SimpleTestCase
 
 
 class TestDatabaseFeatures(SimpleTestCase):

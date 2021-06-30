@@ -3,12 +3,12 @@ import unittest
 from os import path
 from urllib.parse import quote
 
-from django.conf.urls.static import static
-from django.core.exceptions import ImproperlyConfigured
-from django.http import FileResponse, HttpResponseNotModified
-from django.test import SimpleTestCase, override_settings
-from django.utils.http import http_date
-from django.views.static import was_modified_since
+from mango.conf.urls.static import static
+from mango.core.exceptions import ImproperlyConfigured
+from mango.http import FileResponse, HttpResponseNotModified
+from mango.test import SimpleTestCase, override_settings
+from mango.utils.http import http_date
+from mango.views.static import was_modified_since
 
 from .. import urls
 from ..urls import media_dir
@@ -16,7 +16,7 @@ from ..urls import media_dir
 
 @override_settings(DEBUG=True, ROOT_URLCONF='view_tests.urls')
 class StaticTests(SimpleTestCase):
-    """Tests django views in django/views/static.py"""
+    """Tests mango views in mango/views/static.py"""
 
     prefix = 'site_media'
 
@@ -69,7 +69,7 @@ class StaticTests(SimpleTestCase):
         response = self.client.get(
             '/%s/%s' % (self.prefix, file_name),
             HTTP_IF_MODIFIED_SINCE='Mon, 18 Jan 2038 05:14:07 GMT'
-            # This is 24h before max Unix time. Remember to fix Django and
+            # This is 24h before max Unix time. Remember to fix Mango and
             # update this test well before 2038 :)
         )
         self.assertIsInstance(response, HttpResponseNotModified)
@@ -121,10 +121,10 @@ class StaticTests(SimpleTestCase):
         self.assertEqual(response.context['file_list'], ['visible'])
 
     @override_settings(TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
         'OPTIONS': {
             'loaders': [
-                ('django.template.loaders.locmem.Loader', {
+                ('mango.template.loaders.locmem.Loader', {
                     'static/directory_index.html': 'Test index',
                 }),
             ],

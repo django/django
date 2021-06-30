@@ -7,13 +7,13 @@ Custom backends
 
 Here's how to implement a custom template backend in order to use another
 template system. A template backend is a class that inherits
-``django.template.backends.base.BaseEngine``. It must implement
+``mango.template.backends.base.BaseEngine``. It must implement
 ``get_template()`` and optionally ``from_string()``. Here's an example for a
 fictional ``foobar`` template library::
 
-    from django.template import TemplateDoesNotExist, TemplateSyntaxError
-    from django.template.backends.base import BaseEngine
-    from django.template.backends.utils import csrf_input_lazy, csrf_token_lazy
+    from mango.template import TemplateDoesNotExist, TemplateSyntaxError
+    from mango.template.backends.base import BaseEngine
+    from mango.template.backends.utils import csrf_input_lazy, csrf_token_lazy
 
     import foobar
 
@@ -67,7 +67,7 @@ See `DEP 182`_ for more information.
 Debug integration for custom engines
 ------------------------------------
 
-The Django debug page has hooks to provide detailed information when a template
+The Mango debug page has hooks to provide detailed information when a template
 error arises. Custom template engines can use these hooks to enhance the
 traceback information that appears to users. The following hooks are available:
 
@@ -76,22 +76,22 @@ traceback information that appears to users. The following hooks are available:
 Template postmortem
 ~~~~~~~~~~~~~~~~~~~
 
-The postmortem appears when :exc:`~django.template.TemplateDoesNotExist` is
+The postmortem appears when :exc:`~mango.template.TemplateDoesNotExist` is
 raised. It lists the template engines and loaders that were used when trying to
-find a given template. For example, if two Django engines are configured, the
+find a given template. For example, if two Mango engines are configured, the
 postmortem will appear like:
 
 .. image:: _images/postmortem.png
 
 Custom engines can populate the postmortem by passing the ``backend`` and
-``tried`` arguments when raising :exc:`~django.template.TemplateDoesNotExist`.
+``tried`` arguments when raising :exc:`~mango.template.TemplateDoesNotExist`.
 Backends that use the postmortem :ref:`should specify an origin
 <template-origin-api>` on the template object.
 
 Contextual line information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If an error happens during template parsing or rendering, Django can display
+If an error happens during template parsing or rendering, Mango can display
 the line the error happened on. For example:
 
 .. image:: _images/template-lines.png
@@ -153,10 +153,10 @@ Given the above template error, ``template_debug`` would look like::
 Origin API and 3rd-party integration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django templates have an :class:`~django.template.base.Origin` object available
+Mango templates have an :class:`~mango.template.base.Origin` object available
 through the ``template.origin`` attribute. This enables debug information to be
 displayed in the :ref:`template postmortem <template-postmortem>`, as well as
-in 3rd-party libraries, like the `Django Debug Toolbar`_.
+in 3rd-party libraries, like the `Mango Debug Toolbar`_.
 
 Custom engines can provide their own ``template.origin`` information by
 creating an object that specifies the following attributes:
@@ -167,7 +167,7 @@ creating an object that specifies the following attributes:
   template loading methods.
 
 * ``'loader_name'``: An optional string identifying the function or class used
-  to load the template, e.g. ``django.template.loaders.filesystem.Loader``.
+  to load the template, e.g. ``mango.template.loaders.filesystem.Loader``.
 
-.. _DEP 182: https://github.com/django/deps/blob/main/final/0182-multiple-template-engines.rst
-.. _Django Debug Toolbar: https://github.com/jazzband/django-debug-toolbar/
+.. _DEP 182: https://github.com/mango/deps/blob/main/final/0182-multiple-template-engines.rst
+.. _Mango Debug Toolbar: https://github.com/jazzband/mango-debug-toolbar/

@@ -1,7 +1,7 @@
-from django.core.exceptions import ValidationError
-from django.db import models
-from django.forms import ChoiceField, Form
-from django.test import SimpleTestCase
+from mango.core.exceptions import ValidationError
+from mango.db import models
+from mango.forms import ChoiceField, Form
+from mango.test import SimpleTestCase
 
 from . import FormFieldAssertionsMixin
 

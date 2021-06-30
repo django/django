@@ -1,9 +1,9 @@
 from datetime import date, datetime
 
-from django.core.exceptions import ValidationError
-from django.forms import DateTimeField
-from django.test import SimpleTestCase
-from django.utils.timezone import get_fixed_timezone, utc
+from mango.core.exceptions import ValidationError
+from mango.forms import DateTimeField
+from mango.test import SimpleTestCase
+from mango.utils.timezone import get_fixed_timezone, utc
 
 
 class DateTimeFieldTest(SimpleTestCase):

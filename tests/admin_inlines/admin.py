@@ -1,7 +1,7 @@
-from django import forms
-from django.contrib import admin
-from django.core.exceptions import ValidationError
-from django.db import models
+from mango import forms
+from mango.contrib import admin
+from mango.core.exceptions import ValidationError
+from mango.db import models
 
 from .models import (
     Author, BinaryTree, CapoFamiglia, Chapter, Child, ChildModel1, ChildModel2,

@@ -1,7 +1,7 @@
 import copy
 import unittest
 
-from django.utils.tree import Node
+from mango.utils.tree import Node
 
 
 class NodeTests(unittest.TestCase):

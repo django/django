@@ -2,10 +2,10 @@
 PostgreSQL specific model indexes
 =================================
 
-.. module:: django.contrib.postgres.indexes
+.. module:: mango.contrib.postgres.indexes
 
 The following are PostgreSQL specific :doc:`indexes </ref/models/indexes>`
-available from the ``django.contrib.postgres.indexes`` module.
+available from the ``mango.contrib.postgres.indexes`` module.
 
 ``BloomIndex``
 ==============
@@ -16,7 +16,7 @@ available from the ``django.contrib.postgres.indexes`` module.
 
     To use this index access you need to activate the bloom_ extension on
     PostgreSQL. You can install it using the
-    :class:`~django.contrib.postgres.operations.BloomExtension` migration
+    :class:`~mango.contrib.postgres.operations.BloomExtension` migration
     operation.
 
     Provide an integer number of bits from 1 to 4096 to the ``length``
@@ -82,7 +82,7 @@ available from the ``django.contrib.postgres.indexes`` module.
     you need to activate the `btree_gin extension
     <https://www.postgresql.org/docs/current/btree-gin.html>`_ on
     PostgreSQL. You can install it using the
-    :class:`~django.contrib.postgres.operations.BtreeGinExtension` migration
+    :class:`~mango.contrib.postgres.operations.BtreeGinExtension` migration
     operation.
 
     Set the ``fastupdate`` parameter to ``False`` to disable the `GIN Fast
@@ -108,9 +108,9 @@ available from the ``django.contrib.postgres.indexes`` module.
     Creates a `GiST index
     <https://www.postgresql.org/docs/current/gist.html>`_. These indexes are
     automatically created on spatial fields with :attr:`spatial_index=True
-    <django.contrib.gis.db.models.BaseSpatialField.spatial_index>`. They're
+    <mango.contrib.gis.db.models.BaseSpatialField.spatial_index>`. They're
     also useful on other types, such as
-    :class:`~django.contrib.postgres.fields.HStoreField` or the :ref:`range
+    :class:`~mango.contrib.postgres.fields.HStoreField` or the :ref:`range
     fields <range-fields>`.
 
     To use this index on data types not in the built-in `gist operator classes
@@ -118,7 +118,7 @@ available from the ``django.contrib.postgres.indexes`` module.
     you need to activate the `btree_gist extension
     <https://www.postgresql.org/docs/current/btree-gist.html>`_ on PostgreSQL.
     You can install it using the
-    :class:`~django.contrib.postgres.operations.BtreeGistExtension` migration
+    :class:`~mango.contrib.postgres.operations.BtreeGistExtension` migration
     operation.
 
     Set the ``buffering`` parameter to ``True`` or ``False`` to manually enable
@@ -184,7 +184,7 @@ available from the ``django.contrib.postgres.indexes`` module.
 
     An ``OpClass()`` expression represents the ``expression`` with a custom
     `operator class`_ that can be used to define functional indexes or unique
-    constraints. To use it, you need to add ``'django.contrib.postgres'`` in
+    constraints. To use it, you need to add ``'mango.contrib.postgres'`` in
     your :setting:`INSTALLED_APPS`. Set the ``name`` parameter to the name of
     the `operator class`_.
 

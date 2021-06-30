@@ -2,15 +2,15 @@ import datetime
 import tempfile
 import uuid
 
-from django.contrib import admin
-from django.contrib.auth.models import User
-from django.contrib.contenttypes.fields import (
+from mango.contrib import admin
+from mango.contrib.auth.models import User
+from mango.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
-from django.core.files.storage import FileSystemStorage
-from django.db import models
+from mango.contrib.contenttypes.models import ContentType
+from mango.core.exceptions import ValidationError
+from mango.core.files.storage import FileSystemStorage
+from mango.db import models
 
 
 class Section(models.Model):

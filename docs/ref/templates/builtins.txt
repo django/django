@@ -2,7 +2,7 @@
 Built-in template tags and filters
 ==================================
 
-This document describes Django's built-in template tags and filters. It is
+This document describes Mango's built-in template tags and filters. It is
 recommended that you use the :doc:`automatic documentation
 </ref/contrib/admin/admindocs>`, if available, as this will also include
 documentation for any custom tags or filters installed.
@@ -12,7 +12,7 @@ documentation for any custom tags or filters installed.
 Built-in tag reference
 ======================
 
-.. highlight:: html+django
+.. highlight:: html+mango
 
 .. templatetag:: autoescape
 
@@ -209,9 +209,9 @@ This tag can be used in two ways:
   ``"base.html"`` as the name of the parent template to extend.
 
 * ``{% extends variable %}`` uses the value of ``variable``. If the variable
-  evaluates to a string, Django will use that string as the name of the
+  evaluates to a string, Mango will use that string as the name of the
   parent template. If the variable evaluates to a ``Template`` object,
-  Django will use that object as the parent template.
+  Mango will use that object as the parent template.
 
 See :ref:`template-inheritance` for more information.
 
@@ -682,7 +682,7 @@ context. This allows you to reference a compiled ``Template`` in your context.
 
 Additionally, the variable may be an iterable of template names, in which case
 the first that can be loaded will be used, as per
-:func:`~django.template.loader.select_template`.
+:func:`~mango.template.loader.select_template`.
 
 An included template is rendered within the context of the template that
 includes it. This example produces the output ``"Hello, John!"``:
@@ -960,7 +960,7 @@ an attribute "description," you could use::
     {% regroup cities by country.description as country_list %}
 
 Or, if ``country`` is a field with ``choices``, it will have a
-:meth:`~django.db.models.Model.get_FOO_display` method available as an
+:meth:`~mango.db.models.Model.get_FOO_display` method available as an
 attribute, allowing  you to group on the display string rather than the
 ``choices`` key::
 
@@ -1083,7 +1083,7 @@ Sample usage::
 
 Returns an absolute path reference (a URL without the domain name) matching a
 given view and optional parameters. Any special characters in the resulting
-path will be encoded using :func:`~django.utils.encoding.iri_to_uri`.
+path will be encoded using :func:`~mango.utils.encoding.iri_to_uri`.
 
 This is a way to output links without violating the DRY principle by having to
 hard-code URLs in your templates::
@@ -1123,7 +1123,7 @@ such as this:
 The template tag will output the string ``/clients/client/123/``.
 
 Note that if the URL you're reversing doesn't exist, you'll get an
-:exc:`~django.urls.NoReverseMatch` exception raised, which will cause your
+:exc:`~mango.urls.NoReverseMatch` exception raised, which will cause your
 site to display an error page.
 
 If you'd like to retrieve a URL without displaying it, you can use a slightly
@@ -1165,7 +1165,7 @@ by the context as to the current application.
 Stops the template engine from rendering the contents of this block tag.
 
 A common use is to allow a JavaScript template layer that collides with
-Django's syntax. For example::
+Mango's syntax. For example::
 
     {% verbatim %}
         {{if dying}}Still alive.{{/if}}
@@ -1273,8 +1273,8 @@ For example::
 
     {{ value|addslashes }}
 
-If ``value`` is ``"I'm using Django"``, the output will be
-``"I\'m using Django"``.
+If ``value`` is ``"I'm using Mango"``, the output will be
+``"I\'m using Mango"``.
 
 .. templatefilter:: capfirst
 
@@ -1288,7 +1288,7 @@ For example::
 
     {{ value|capfirst }}
 
-If ``value`` is ``"django"``, the output will be ``"Django"``.
+If ``value`` is ``"mango"``, the output will be ``"Mango"``.
 
 .. templatefilter:: center
 
@@ -1301,7 +1301,7 @@ For example::
 
     "{{ value|center:"15" }}"
 
-If ``value`` is ``"Django"``, the output will be ``"     Django    "``.
+If ``value`` is ``"Mango"``, the output will be ``"     Mango    "``.
 
 .. templatefilter:: cut
 
@@ -1329,7 +1329,7 @@ Uses a similar format to PHP's `date()
 differences.
 
 .. note::
-    These format characters are not used in Django outside of templates. They
+    These format characters are not used in Mango outside of templates. They
     were designed to be compatible with PHP to ease transitioning for designers.
 
 .. _date-and-time-formatting-specifiers:
@@ -1441,7 +1441,7 @@ for example, ``"es"``, then for::
     {{ value|date:"SHORT_DATE_FORMAT" }}
 
 the output would be the string ``"09/01/2008"`` (the ``"SHORT_DATE_FORMAT"``
-format specifier for the ``es`` locale as shipped with Django is ``"d/m/Y"``).
+format specifier for the ``es`` locale as shipped with Mango is ``"d/m/Y"``).
 
 When used without a format string, the ``DATE_FORMAT`` format specifier is
 used. Assuming the same settings as the previous example::
@@ -1653,7 +1653,7 @@ If ``value`` is 123456789, the output would be ``117.7 MB``.
 
     Strictly speaking, ``filesizeformat`` does not conform to the International
     System of Units which recommends using KiB, MiB, GiB, etc. when byte sizes
-    are calculated in powers of 1024 (which is the case here). Instead, Django
+    are calculated in powers of 1024 (which is the case here). Instead, Mango
     uses traditional unit names (KB, MB, GB, etc.) corresponding to names that
     are more commonly used.
 
@@ -1953,7 +1953,7 @@ For example::
 
     "{{ value|ljust:"10" }}"
 
-If ``value`` is ``Django``, the output will be ``"Django    "``.
+If ``value`` is ``Mango``, the output will be ``"Mango    "``.
 
 .. templatefilter:: lower
 
@@ -2066,7 +2066,7 @@ For example::
 
     "{{ value|rjust:"10" }}"
 
-If ``value`` is ``Django``, the output will be ``"    Django"``.
+If ``value`` is ``Mango``, the output will be ``"    Mango"``.
 
 .. templatefilter:: safe
 
@@ -2205,7 +2205,7 @@ for example, ``"de"``, then for::
     {{ value|time:"TIME_FORMAT" }}
 
 the output will be the string ``"01:23"`` (The ``"TIME_FORMAT"`` format
-specifier for the ``de`` locale as shipped with Django is ``"H:i"``).
+specifier for the ``de`` locale as shipped with Mango is ``"H:i"``).
 
 The ``time`` filter will only accept parameters in the format string that
 relate to the time of day, not the date. If you need to format a ``date``
@@ -2430,7 +2430,7 @@ This template tag works on links prefixed with ``http://``, ``https://``, or
 
 It also supports domain-only links ending in one of the original top level
 domains (``.com``, ``.edu``, ``.gov``, ``.int``, ``.mil``, ``.net``, and
-``.org``). For example, ``djangoproject.com`` gets converted.
+``.org``). For example, ``mangoproject.com`` gets converted.
 
 Links can have trailing punctuation (periods, commas, close-parens) and leading
 punctuation (opening parens), and ``urlize`` will still do the right thing.
@@ -2442,9 +2442,9 @@ For example::
 
     {{ value|urlize }}
 
-If ``value`` is ``"Check out www.djangoproject.com"``, the output will be
-``"Check out <a href="http://www.djangoproject.com"
-rel="nofollow">www.djangoproject.com</a>"``.
+If ``value`` is ``"Check out www.mangoproject.com"``, the output will be
+``"Check out <a href="http://www.mangoproject.com"
+rel="nofollow">www.mangoproject.com</a>"``.
 
 In addition to web links, ``urlize`` also converts email addresses into
 ``mailto:`` links. If ``value`` is
@@ -2453,7 +2453,7 @@ In addition to web links, ``urlize`` also converts email addresses into
 
 The ``urlize`` filter also takes an optional parameter ``autoescape``. If
 ``autoescape`` is ``True``, the link text and URLs will be escaped using
-Django's built-in :tfilter:`escape` filter. The default value for
+Mango's built-in :tfilter:`escape` filter. The default value for
 ``autoescape`` is ``True``.
 
 .. note::
@@ -2477,9 +2477,9 @@ For example::
 
     {{ value|urlizetrunc:15 }}
 
-If ``value`` is ``"Check out www.djangoproject.com"``, the output would be
-``'Check out <a href="http://www.djangoproject.com"
-rel="nofollow">www.djangoproj…</a>'``.
+If ``value`` is ``"Check out www.mangoproject.com"``, the output would be
+``'Check out <a href="http://www.mangoproject.com"
+rel="nofollow">www.mangoproj…</a>'``.
 
 As with urlize_, this filter should only be applied to plain text.
 
@@ -2542,7 +2542,7 @@ Value       Argument                Outputs
 Internationalization tags and filters
 =====================================
 
-Django provides template tags and filters to control each aspect of
+Mango provides template tags and filters to control each aspect of
 :doc:`internationalization </topics/i18n/index>` in templates. They allow for
 granular control of translations, formatting, and time zone conversions.
 
@@ -2577,14 +2577,14 @@ See :ref:`time-zones-in-templates`.
 Other tags and filters libraries
 ================================
 
-Django comes with a couple of other template-tag libraries that you have to
+Mango comes with a couple of other template-tag libraries that you have to
 enable explicitly in your :setting:`INSTALLED_APPS` setting and enable in your
 template with the :ttag:`{% load %}<load>` tag.
 
-``django.contrib.humanize``
+``mango.contrib.humanize``
 ---------------------------
 
-A set of Django template filters useful for adding a "human touch" to data. See
+A set of Mango template filters useful for adding a "human touch" to data. See
 :doc:`/ref/contrib/humanize`.
 
 ``static``
@@ -2595,8 +2595,8 @@ A set of Django template filters useful for adding a "human touch" to data. See
 ``static``
 ~~~~~~~~~~
 
-To link to static files that are saved in :setting:`STATIC_ROOT` Django ships
-with a :ttag:`static` template tag. If the :mod:`django.contrib.staticfiles`
+To link to static files that are saved in :setting:`STATIC_ROOT` Mango ships
+with a :ttag:`static` template tag. If the :mod:`mango.contrib.staticfiles`
 app is installed, the tag will serve files using ``url()`` method of the
 storage specified by :setting:`STATICFILES_STORAGE`. For example::
 
@@ -2618,7 +2618,7 @@ slightly different call::
 
 .. admonition:: Using Jinja2 templates?
 
-    See :class:`~django.template.backends.jinja2.Jinja2` for information on
+    See :class:`~mango.template.backends.jinja2.Jinja2` for information on
     using the ``static`` tag with Jinja2.
 
 .. templatetag:: get_static_prefix

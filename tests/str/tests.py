@@ -1,8 +1,8 @@
 import datetime
 
-from django.db import models
-from django.test import TestCase
-from django.test.utils import isolate_apps
+from mango.db import models
+from mango.test import TestCase
+from mango.test.utils import isolate_apps
 
 from .models import InternationalArticle
 

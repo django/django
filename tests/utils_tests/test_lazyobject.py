@@ -4,7 +4,7 @@ import sys
 import warnings
 from unittest import TestCase
 
-from django.utils.functional import LazyObject, SimpleLazyObject, empty
+from mango.utils.functional import LazyObject, SimpleLazyObject, empty
 
 from .models import Category, CategoryInfo
 
@@ -371,7 +371,7 @@ class SimpleLazyObjectTestCase(LazyObjectTestCase):
 class BaseBaz:
     """
     A base class with a funky __reduce__ method, meant to simulate the
-    __reduce__ method of Model, which sets self._django_version.
+    __reduce__ method of Model, which sets self._mango_version.
     """
     def __init__(self):
         self.baz = 'wrong'

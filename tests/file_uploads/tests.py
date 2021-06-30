@@ -9,13 +9,13 @@ from io import BytesIO, StringIO
 from unittest import mock
 from urllib.parse import quote
 
-from django.core.exceptions import SuspiciousFileOperation
-from django.core.files import temp as tempfile
-from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
-from django.http.multipartparser import (
+from mango.core.exceptions import SuspiciousFileOperation
+from mango.core.files import temp as tempfile
+from mango.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
+from mango.http.multipartparser import (
     FILE, MultiPartParser, MultiPartParserError, Parser, parse_header,
 )
-from django.test import SimpleTestCase, TestCase, client, override_settings
+from mango.test import SimpleTestCase, TestCase, client, override_settings
 
 from . import uploadhandler
 from .models import FileModel
@@ -483,7 +483,7 @@ class FileUploadTests(TestCase):
             temp_file.write(b'a')
             temp_file.seek(0)
             with mock.patch(
-                'django.http.multipartparser.Parser',
+                'mango.http.multipartparser.Parser',
                 MockedParser,
             ):
                 response = self.client.post(
@@ -564,7 +564,7 @@ class FileUploadTests(TestCase):
                 return ret
 
         # Maybe this is a little more complicated that it needs to be; but if
-        # the django.test.client.FakePayload.read() implementation changes then
+        # the mango.test.client.FakePayload.read() implementation changes then
         # this test would fail.  So we need to know exactly what kind of error
         # it raises when there is an attempt to read more than the available bytes:
         try:
@@ -598,7 +598,7 @@ class FileUploadTests(TestCase):
         uploaded.
         """
         # Synthesize the contents of a file upload with a mixed case filename
-        # so we don't have to carry such a file in the Django tests source code
+        # so we don't have to carry such a file in the Mango tests source code
         # tree.
         vars = {'boundary': 'oUrBoUnDaRyStRiNg'}
         post_data = [

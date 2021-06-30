@@ -3,20 +3,20 @@ from unittest import mock
 
 from migrations.test_base import OperationTestBase
 
-from django.db import (
+from mango.db import (
     IntegrityError, NotSupportedError, connection, transaction,
 )
-from django.db.migrations.state import ProjectState
-from django.db.models import CheckConstraint, Index, Q, UniqueConstraint
-from django.db.utils import ProgrammingError
-from django.test import modify_settings, override_settings, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext
+from mango.db.migrations.state import ProjectState
+from mango.db.models import CheckConstraint, Index, Q, UniqueConstraint
+from mango.db.utils import ProgrammingError
+from mango.test import modify_settings, override_settings, skipUnlessDBFeature
+from mango.test.utils import CaptureQueriesContext
 
 from . import PostgreSQLTestCase
 
 try:
-    from django.contrib.postgres.indexes import BrinIndex, BTreeIndex
-    from django.contrib.postgres.operations import (
+    from mango.contrib.postgres.indexes import BrinIndex, BTreeIndex
+    from mango.contrib.postgres.operations import (
         AddConstraintNotValid, AddIndexConcurrently, BloomExtension,
         CreateCollation, CreateExtension, RemoveCollation,
         RemoveIndexConcurrently, ValidateConstraint,
@@ -334,7 +334,7 @@ class CreateCollationTests(PostgreSQLTestCase):
         msg = 'Non-deterministic collations require PostgreSQL 12+.'
         with connection.schema_editor(atomic=False) as editor:
             with mock.patch(
-                'django.db.backends.postgresql.features.DatabaseFeatures.'
+                'mango.db.backends.postgresql.features.DatabaseFeatures.'
                 'supports_non_deterministic_collations',
                 False,
             ):

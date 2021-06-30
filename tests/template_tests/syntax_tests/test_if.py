@@ -1,6 +1,6 @@
-from django.template import TemplateSyntaxError
-from django.template.defaulttags import IfNode
-from django.test import SimpleTestCase
+from mango.template import TemplateSyntaxError
+from mango.template.defaulttags import IfNode
+from mango.test import SimpleTestCase
 
 from ..utils import TestObj, setup
 

@@ -2,16 +2,16 @@ import binascii
 import json
 import random
 
-from django.conf import settings
-from django.contrib.messages import constants
-from django.contrib.messages.storage.base import Message
-from django.contrib.messages.storage.cookie import (
+from mango.conf import settings
+from mango.contrib.messages import constants
+from mango.contrib.messages.storage.base import Message
+from mango.contrib.messages.storage.cookie import (
     CookieStorage, MessageDecoder, MessageEncoder,
 )
-from django.core.signing import b64_decode, get_cookie_signer
-from django.test import SimpleTestCase, override_settings
-from django.utils.crypto import get_random_string
-from django.utils.safestring import SafeData, mark_safe
+from mango.core.signing import b64_decode, get_cookie_signer
+from mango.test import SimpleTestCase, override_settings
+from mango.utils.crypto import get_random_string
+from mango.utils.safestring import SafeData, mark_safe
 
 from .base import BaseTests
 
@@ -177,15 +177,15 @@ class CookieTests(BaseTests, SimpleTestCase):
             return decoded.message
 
         storage = self.get_storage()
-        self.assertIsInstance(encode_decode(mark_safe("<b>Hello Django!</b>")), SafeData)
-        self.assertNotIsInstance(encode_decode("<b>Hello Django!</b>"), SafeData)
+        self.assertIsInstance(encode_decode(mark_safe("<b>Hello Mango!</b>")), SafeData)
+        self.assertNotIsInstance(encode_decode("<b>Hello Mango!</b>"), SafeData)
 
     def test_legacy_encode_decode(self):
-        # RemovedInDjango41Warning: pre-Django 3.2 encoded messages will be
+        # RemovedInMango41Warning: pre-Mango 3.2 encoded messages will be
         # invalid.
         storage = self.storage_class(self.get_request())
         messages = ['this', Message(0, 'Successfully signed in as admin@example.org')]
-        # Encode/decode a message using the pre-Django 3.2 format.
+        # Encode/decode a message using the pre-Mango 3.2 format.
         encoder = MessageEncoder()
         value = encoder.encode(messages)
         with self.assertRaises(binascii.Error):

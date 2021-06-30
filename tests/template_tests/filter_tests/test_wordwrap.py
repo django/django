@@ -1,7 +1,7 @@
-from django.template.defaultfilters import wordwrap
-from django.test import SimpleTestCase
-from django.utils.functional import lazystr
-from django.utils.safestring import mark_safe
+from mango.template.defaultfilters import wordwrap
+from mango.test import SimpleTestCase
+from mango.utils.functional import lazystr
+from mango.utils.safestring import mark_safe
 
 from ..utils import setup
 

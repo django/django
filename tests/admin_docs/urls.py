@@ -1,5 +1,5 @@
-from django.contrib import admin
-from django.urls import include, path
+from mango.contrib import admin
+from mango.urls import include, path
 
 from . import views
 
@@ -9,7 +9,7 @@ ns_patterns = ([
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('admindocs/', include('django.contrib.admindocs.urls')),
+    path('admindocs/', include('mango.contrib.admindocs.urls')),
     path('', include(ns_patterns, namespace='test')),
     path('xview/func/', views.xview_dec(views.xview)),
     path('xview/class/', views.xview_dec(views.XViewClass.as_view())),

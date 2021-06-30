@@ -2,11 +2,11 @@ import time
 import unittest
 from datetime import date, datetime
 
-from django.core.exceptions import FieldError
-from django.db import connection, models
-from django.test import SimpleTestCase, TestCase, override_settings
-from django.test.utils import register_lookup
-from django.utils import timezone
+from mango.core.exceptions import FieldError
+from mango.db import connection, models
+from mango.test import SimpleTestCase, TestCase, override_settings
+from mango.test.utils import register_lookup
+from mango.utils import timezone
 
 from .models import Article, Author, MySQLUnixTimestamp
 

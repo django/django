@@ -1,13 +1,13 @@
 import re
 
-from django.forms import CharField, Form, Media
-from django.http import HttpRequest, HttpResponse
-from django.middleware.csrf import (
+from mango.forms import CharField, Form, Media
+from mango.http import HttpRequest, HttpResponse
+from mango.middleware.csrf import (
     CsrfViewMiddleware, _compare_masked_tokens as equivalent_tokens, get_token,
 )
-from django.template import TemplateDoesNotExist, TemplateSyntaxError
-from django.template.backends.dummy import TemplateStrings
-from django.test import SimpleTestCase
+from mango.template import TemplateDoesNotExist, TemplateSyntaxError
+from mango.template.backends.dummy import TemplateStrings
+from mango.test import SimpleTestCase
 
 
 class TemplateStringsTests(SimpleTestCase):
@@ -58,7 +58,7 @@ class TemplateStringsTests(SimpleTestCase):
         self.assertIn('&lt;script&gt;', content)
         self.assertNotIn('<script>', content)
 
-    def test_django_html_escaping(self):
+    def test_mango_html_escaping(self):
         if self.backend_name == 'dummy':
             self.skipTest("test doesn't apply to dummy backend")
 
@@ -67,7 +67,7 @@ class TemplateStringsTests(SimpleTestCase):
 
         media = Media(js=['my-script.js'])
         form = TestForm()
-        template = self.engine.get_template('template_backends/django_escaping.html')
+        template = self.engine.get_template('template_backends/mango_escaping.html')
         content = template.render({'media': media, 'test_form': form})
 
         expected = '{}\n\n{}\n\n{}'.format(media, form, form['test_field'])

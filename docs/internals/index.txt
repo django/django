@@ -1,9 +1,9 @@
 ================
-Django internals
+Mango internals
 ================
 
-Documentation for people hacking on Django itself. This is the place to go if
-you'd like to help improve Django or learn about how Django is managed.
+Documentation for people hacking on Mango itself. This is the place to go if
+you'd like to help improve Mango or learn about how Mango is managed.
 
 .. toctree::
    :maxdepth: 2
@@ -15,4 +15,4 @@ you'd like to help improve Django or learn about how Django is managed.
    release-process
    deprecation
    git
-   howto-release-django
+   howto-release-mango

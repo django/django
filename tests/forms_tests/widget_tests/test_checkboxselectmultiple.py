@@ -1,8 +1,8 @@
 import datetime
 
-from django import forms
-from django.forms import CheckboxSelectMultiple
-from django.test import override_settings
+from mango import forms
+from mango.forms import CheckboxSelectMultiple
+from mango.test import override_settings
 
 from .base import WidgetTest
 

@@ -1,7 +1,7 @@
-from django import forms
-from django.core.exceptions import NON_FIELD_ERRORS
-from django.test import TestCase
-from django.utils.functional import lazy
+from mango import forms
+from mango.core.exceptions import NON_FIELD_ERRORS
+from mango.test import TestCase
+from mango.utils.functional import lazy
 
 from . import ValidationAssertions
 from .models import (

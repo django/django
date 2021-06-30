@@ -1,5 +1,5 @@
-from django.db import connection
-from django.test import TestCase
+from mango.db import connection
+from mango.test import TestCase
 
 from .models import A01, A02, B01, B02, C01, C02, Managed1, Unmanaged2
 

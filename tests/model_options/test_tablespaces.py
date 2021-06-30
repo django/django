@@ -1,7 +1,7 @@
-from django.apps import apps
-from django.conf import settings
-from django.db import connection
-from django.test import (
+from mango.apps import apps
+from mango.conf import settings
+from mango.db import connection
+from mango.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
 

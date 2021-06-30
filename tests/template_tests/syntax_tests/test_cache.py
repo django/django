@@ -1,13 +1,13 @@
-from django.core.cache import cache
-from django.template import Context, Engine, TemplateSyntaxError
-from django.test import SimpleTestCase, override_settings
+from mango.core.cache import cache
+from mango.template import Context, Engine, TemplateSyntaxError
+from mango.test import SimpleTestCase, override_settings
 
 from ..utils import setup
 
 
 class CacheTagTests(SimpleTestCase):
     libraries = {
-        'cache': 'django.templatetags.cache',
+        'cache': 'mango.templatetags.cache',
         'custom': 'template_tests.templatetags.custom',
     }
 
@@ -138,7 +138,7 @@ class CacheTests(SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.engine = Engine(libraries={'cache': 'django.templatetags.cache'})
+        cls.engine = Engine(libraries={'cache': 'mango.templatetags.cache'})
         super().setUpClass()
 
     def test_cache_regression_20130(self):
@@ -148,11 +148,11 @@ class CacheTests(SimpleTestCase):
 
     @override_settings(CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'mango.core.cache.backends.locmem.LocMemCache',
             'LOCATION': 'default',
         },
         'template_fragments': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'mango.core.cache.backends.locmem.LocMemCache',
             'LOCATION': 'fragments',
         },
     })

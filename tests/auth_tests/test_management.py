@@ -6,21 +6,21 @@ from datetime import date
 from io import StringIO
 from unittest import mock
 
-from django.apps import apps
-from django.contrib.auth import get_permission_codename, management
-from django.contrib.auth.management import (
+from mango.apps import apps
+from mango.contrib.auth import get_permission_codename, management
+from mango.contrib.auth.management import (
     create_permissions, get_default_username,
 )
-from django.contrib.auth.management.commands import (
+from mango.contrib.auth.management.commands import (
     changepassword, createsuperuser,
 )
-from django.contrib.auth.models import Group, Permission, User
-from django.contrib.contenttypes.models import ContentType
-from django.core.management import call_command
-from django.core.management.base import CommandError
-from django.db import migrations
-from django.test import TestCase, override_settings
-from django.utils.translation import gettext_lazy as _
+from mango.contrib.auth.models import Group, Permission, User
+from mango.contrib.contenttypes.models import ContentType
+from mango.core.management import call_command
+from mango.core.management.base import CommandError
+from mango.db import migrations
+from mango.test import TestCase, override_settings
+from mango.utils.translation import gettext_lazy as _
 
 from .models import (
     CustomUser, CustomUserNonUniqueUsername, CustomUserWithFK,
@@ -140,7 +140,7 @@ class GetDefaultUsernameTestCase(TestCase):
 
 
 @override_settings(AUTH_PASSWORD_VALIDATORS=[
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    {'NAME': 'mango.contrib.auth.password_validation.NumericPasswordValidator'},
 ])
 class ChangepasswordManagementCommandTestCase(TestCase):
 
@@ -248,7 +248,7 @@ class MultiDBChangepasswordManagementCommandTestCase(TestCase):
 
 @override_settings(
     SILENCED_SYSTEM_CHECKS=['fields.W342'],  # ForeignKey(unique=True)
-    AUTH_PASSWORD_VALIDATORS=[{'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'}],
+    AUTH_PASSWORD_VALIDATORS=[{'NAME': 'mango.contrib.auth.password_validation.NumericPasswordValidator'}],
 )
 class CreatesuperuserManagementCommandTestCase(TestCase):
 
@@ -643,7 +643,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         test(self)
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+        {'NAME': 'mango.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     ])
     def test_validate_password_against_username(self):
         new_io = StringIO()
@@ -678,7 +678,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
     @override_settings(
         AUTH_USER_MODEL='auth_tests.CustomUser',
         AUTH_PASSWORD_VALIDATORS=[
-            {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+            {'NAME': 'mango.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
         ]
     )
     def test_validate_password_against_required_fields(self):

@@ -2,22 +2,22 @@ import sys
 from datetime import date
 from unittest import mock
 
-from django.contrib.auth import (
+from mango.contrib.auth import (
     BACKEND_SESSION_KEY, SESSION_KEY, _clean_credentials, authenticate,
     get_user, signals,
 )
-from django.contrib.auth.backends import BaseBackend, ModelBackend
-from django.contrib.auth.hashers import MD5PasswordHasher
-from django.contrib.auth.models import AnonymousUser, Group, Permission, User
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.http import HttpRequest
-from django.test import (
+from mango.contrib.auth.backends import BaseBackend, ModelBackend
+from mango.contrib.auth.hashers import MD5PasswordHasher
+from mango.contrib.auth.models import AnonymousUser, Group, Permission, User
+from mango.contrib.contenttypes.models import ContentType
+from mango.core.exceptions import ImproperlyConfigured, PermissionDenied
+from mango.http import HttpRequest
+from mango.test import (
     RequestFactory, SimpleTestCase, TestCase, modify_settings,
     override_settings,
 )
-from django.views.debug import technical_500_response
-from django.views.decorators.debug import sensitive_variables
+from mango.views.debug import technical_500_response
+from mango.views.decorators.debug import sensitive_variables
 
 from .models import (
     CustomPermissionsUser, CustomUser, CustomUserWithoutIsActiveField,
@@ -71,7 +71,7 @@ class BaseModelBackendTest:
     level UserModel attribute, and a create_users() method to
     construct two users for test purposes.
     """
-    backend = 'django.contrib.auth.backends.ModelBackend'
+    backend = 'mango.contrib.auth.backends.ModelBackend'
 
     def setUp(self):
         self.patched_settings = modify_settings(
@@ -622,7 +622,7 @@ class ChangedBackendSettingsTest(TestCase):
         request.session = self.client.session
         # Remove NewModelBackend
         with self.settings(AUTHENTICATION_BACKENDS=[
-                'django.contrib.auth.backends.ModelBackend']):
+                'mango.contrib.auth.backends.ModelBackend']):
             # Get the user from the request
             user = get_user(request)
 
@@ -705,7 +705,7 @@ class AuthenticateTests(TestCase):
 
     @override_settings(AUTHENTICATION_BACKENDS=(
         'auth_tests.test_auth_backends.SkippedBackend',
-        'django.contrib.auth.backends.ModelBackend',
+        'mango.contrib.auth.backends.ModelBackend',
     ))
     def test_skips_backends_without_arguments(self):
         """
@@ -716,7 +716,7 @@ class AuthenticateTests(TestCase):
 
     @override_settings(AUTHENTICATION_BACKENDS=(
         'auth_tests.test_auth_backends.SkippedBackendWithDecoratedMethod',
-        'django.contrib.auth.backends.ModelBackend',
+        'mango.contrib.auth.backends.ModelBackend',
     ))
     def test_skips_backends_with_decorated_method(self):
         self.assertEqual(authenticate(username='test', password='test'), self.user1)
@@ -811,7 +811,7 @@ class SelectingBackendTests(TestCase):
         user = User.objects.create_user(self.username, 'email', self.password)
         expected_message = (
             'backend must be a dotted import path string (got '
-            '<class \'django.contrib.auth.backends.ModelBackend\'>).'
+            '<class \'mango.contrib.auth.backends.ModelBackend\'>).'
         )
         with self.assertRaisesMessage(TypeError, expected_message):
             self.client._login(user, backend=ModelBackend)
@@ -823,7 +823,7 @@ class SelectingBackendTests(TestCase):
         self.assertBackendInSession(self.other_backend)
 
 
-@override_settings(AUTHENTICATION_BACKENDS=['django.contrib.auth.backends.AllowAllUsersModelBackend'])
+@override_settings(AUTHENTICATION_BACKENDS=['mango.contrib.auth.backends.AllowAllUsersModelBackend'])
 class AllowAllUsersModelBackendTest(TestCase):
     """
     Inactive users may authenticate with the AllowAllUsersModelBackend.

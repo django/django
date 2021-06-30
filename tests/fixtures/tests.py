@@ -7,15 +7,15 @@ import warnings
 from io import StringIO
 from unittest import mock
 
-from django.apps import apps
-from django.contrib.sites.models import Site
-from django.core import management
-from django.core.files.temp import NamedTemporaryFile
-from django.core.management import CommandError
-from django.core.management.commands.dumpdata import ProxyModelWarning
-from django.core.serializers.base import ProgressBar
-from django.db import IntegrityError, connection
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from mango.apps import apps
+from mango.contrib.sites.models import Site
+from mango.core import management
+from mango.core.files.temp import NamedTemporaryFile
+from mango.core.management import CommandError
+from mango.core.management.commands.dumpdata import ProxyModelWarning
+from mango.core.serializers.base import ProgressBar
+from mango.db import IntegrityError, connection
+from mango.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import (
     Article, Category, CircularA, CircularB, NaturalKeyThing,
@@ -42,7 +42,7 @@ class TestCaseFixtureLoadingTests(TestCase):
         "Test case has installed 3 fixture objects"
         self.assertSequenceEqual(
             Article.objects.values_list('headline', flat=True), [
-                'Django conquers world!',
+                'Mango conquers world!',
                 'Copyright is fine the way it is',
                 'Poker has no place on ESPN',
             ],
@@ -207,7 +207,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         self.assertSequenceEqual(
             Article.objects.values_list('headline', flat=True),
             [
-                'Django conquers world!',
+                'Mango conquers world!',
                 'Copyright is fine the way it is',
                 'Poker has no place on ESPN',
             ],
@@ -219,7 +219,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             Article.objects.values_list('headline', flat=True),
             [
                 'XML identified as leading cause of cancer',
-                'Django conquers world!',
+                'Mango conquers world!',
                 'Copyright is fine the way it is',
                 'Poker on TV is great!',
             ],
@@ -237,14 +237,14 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         self.assertQuerysetEqual(Tag.objects.all(), [
             '<Tag: <Article: Copyright is fine the way it is> tagged "copyright">',
             '<Tag: <Article: Copyright is fine the way it is> tagged "legal">',
-            '<Tag: <Article: Django conquers world!> tagged "django">',
-            '<Tag: <Article: Django conquers world!> tagged "world domination">',
+            '<Tag: <Article: Mango conquers world!> tagged "mango">',
+            '<Tag: <Article: Mango conquers world!> tagged "world domination">',
         ], transform=repr, ordered=False)
 
         # Load fixture 8, JSON file with dynamic Permission fields. Testing ManyToMany.
         management.call_command('loaddata', 'fixture8.json', verbosity=0)
         self.assertQuerysetEqual(Visa.objects.all(), [
-            '<Visa: Django Reinhardt Can add user, Can change user, Can delete user>',
+            '<Visa: Mango Reinhardt Can add user, Can change user, Can delete user>',
             '<Visa: Stephane Grappelli Can add user>',
             '<Visa: Prince >'
         ], transform=repr, ordered=False)
@@ -252,7 +252,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         # Load fixture 9, XML file with dynamic Permission fields. Testing ManyToMany.
         management.call_command('loaddata', 'fixture9.xml', verbosity=0)
         self.assertQuerysetEqual(Visa.objects.all(), [
-            '<Visa: Django Reinhardt Can add user, Can change user, Can delete user>',
+            '<Visa: Mango Reinhardt Can add user, Can change user, Can delete user>',
             '<Visa: Stephane Grappelli Can add user, Can delete user>',
             '<Visa: Artist formerly known as "Prince" Can change user>'
         ], transform=repr, ordered=False)
@@ -262,7 +262,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             Article.objects.values_list('headline', flat=True),
             [
                 'XML identified as leading cause of cancer',
-                'Django conquers world!',
+                'Mango conquers world!',
                 'Copyright is fine the way it is',
                 'Poker on TV is great!',
             ],
@@ -278,14 +278,14 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         self._dumpdata_assert(
             ['fixtures.book'],
             '[{"pk": 1, "model": "fixtures.book", "fields": {"name": "Music for all ages", "authors": [["Artist '
-            'formerly known as \\"Prince\\""], ["Django Reinhardt"]]}}]',
+            'formerly known as \\"Prince\\""], ["Mango Reinhardt"]]}}]',
             natural_foreign_keys=True
         )
 
         # You can also omit the primary keys for models that we can get later with natural keys.
         self._dumpdata_assert(
             ['fixtures.person'],
-            '[{"fields": {"name": "Django Reinhardt"}, "model": "fixtures.person"}, {"fields": {"name": "Stephane '
+            '[{"fields": {"name": "Mango Reinhardt"}, "model": "fixtures.person"}, {"fields": {"name": "Stephane '
             'Grappelli"}, "model": "fixtures.person"}, {"fields": {"name": "Artist formerly known as '
             '\\"Prince\\""}, "model": "fixtures.person"}]',
             natural_primary_keys=True
@@ -298,38 +298,38 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '"News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker on TV is '
             'great!", "pub_date": "2006-06-16T11:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
             '{"headline": "Copyright is fine the way it is", "pub_date": "2006-06-16T14:00:00"}}, {"pk": 4, '
-            '"model": "fixtures.article", "fields": {"headline": "Django conquers world!", "pub_date": '
+            '"model": "fixtures.article", "fields": {"headline": "Mango conquers world!", "pub_date": '
             '"2006-06-16T15:00:00"}}, {"pk": 5, "model": "fixtures.article", "fields": {"headline": "XML '
             'identified as leading cause of cancer", "pub_date": "2006-06-16T16:00:00"}}, {"pk": 1, "model": '
             '"fixtures.tag", "fields": {"tagged_type": ["fixtures", "article"], "name": "copyright", "tagged_id": '
             '3}}, {"pk": 2, "model": "fixtures.tag", "fields": {"tagged_type": ["fixtures", "article"], "name": '
             '"legal", "tagged_id": 3}}, {"pk": 3, "model": "fixtures.tag", "fields": {"tagged_type": ["fixtures", '
-            '"article"], "name": "django", "tagged_id": 4}}, {"pk": 4, "model": "fixtures.tag", "fields": '
+            '"article"], "name": "mango", "tagged_id": 4}}, {"pk": 4, "model": "fixtures.tag", "fields": '
             '{"tagged_type": ["fixtures", "article"], "name": "world domination", "tagged_id": 4}}, {"pk": 1, '
-            '"model": "fixtures.person", "fields": {"name": "Django Reinhardt"}}, {"pk": 2, "model": '
+            '"model": "fixtures.person", "fields": {"name": "Mango Reinhardt"}}, {"pk": 2, "model": '
             '"fixtures.person", "fields": {"name": "Stephane Grappelli"}}, {"pk": 3, "model": "fixtures.person", '
             '"fields": {"name": "Artist formerly known as \\"Prince\\""}}, {"pk": 1, "model": "fixtures.visa", '
-            '"fields": {"person": ["Django Reinhardt"], "permissions": [["add_user", "auth", "user"], '
+            '"fields": {"person": ["Mango Reinhardt"], "permissions": [["add_user", "auth", "user"], '
             '["change_user", "auth", "user"], ["delete_user", "auth", "user"]]}}, {"pk": 2, "model": '
             '"fixtures.visa", "fields": {"person": ["Stephane Grappelli"], "permissions": [["add_user", "auth", '
             '"user"], ["delete_user", "auth", "user"]]}}, {"pk": 3, "model": "fixtures.visa", "fields": {"person":'
             ' ["Artist formerly known as \\"Prince\\""], "permissions": [["change_user", "auth", "user"]]}}, '
             '{"pk": 1, "model": "fixtures.book", "fields": {"name": "Music for all ages", "authors": [["Artist '
-            'formerly known as \\"Prince\\""], ["Django Reinhardt"]]}}]',
+            'formerly known as \\"Prince\\""], ["Mango Reinhardt"]]}}]',
             natural_foreign_keys=True
         )
 
         # Dump the current contents of the database as an XML fixture
         self._dumpdata_assert(
             ['fixtures'],
-            '<?xml version="1.0" encoding="utf-8"?><django-objects version="1.0"><object pk="1" '
+            '<?xml version="1.0" encoding="utf-8"?><mango-objects version="1.0"><object pk="1" '
             'model="fixtures.category"><field type="CharField" name="title">News Stories</field><field '
             'type="TextField" name="description">Latest news stories</field></object><object pk="2" '
             'model="fixtures.article"><field type="CharField" name="headline">Poker on TV is great!</field><field '
             'type="DateTimeField" name="pub_date">2006-06-16T11:00:00</field></object><object pk="3" '
             'model="fixtures.article"><field type="CharField" name="headline">Copyright is fine the way it '
             'is</field><field type="DateTimeField" name="pub_date">2006-06-16T14:00:00</field></object><object '
-            'pk="4" model="fixtures.article"><field type="CharField" name="headline">Django conquers world!'
+            'pk="4" model="fixtures.article"><field type="CharField" name="headline">Mango conquers world!'
             '</field><field type="DateTimeField" name="pub_date">2006-06-16T15:00:00</field></object><object '
             'pk="5" model="fixtures.article"><field type="CharField" name="headline">XML identified as leading '
             'cause of cancer</field><field type="DateTimeField" name="pub_date">2006-06-16T16:00:00</field>'
@@ -340,17 +340,17 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>'
             'fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" '
             'name="tagged_id">3</field></object><object pk="3" model="fixtures.tag"><field type="CharField" '
-            'name="name">django</field><field to="contenttypes.contenttype" name="tagged_type" '
+            'name="name">mango</field><field to="contenttypes.contenttype" name="tagged_type" '
             'rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field '
             'type="PositiveIntegerField" name="tagged_id">4</field></object><object pk="4" model="fixtures.tag">'
             '<field type="CharField" name="name">world domination</field><field to="contenttypes.contenttype" '
             'name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field>'
             '<field type="PositiveIntegerField" name="tagged_id">4</field></object><object pk="1" '
-            'model="fixtures.person"><field type="CharField" name="name">Django Reinhardt</field></object>'
+            'model="fixtures.person"><field type="CharField" name="name">Mango Reinhardt</field></object>'
             '<object pk="2" model="fixtures.person"><field type="CharField" name="name">Stephane Grappelli'
             '</field></object><object pk="3" model="fixtures.person"><field type="CharField" name="name">'
             'Artist formerly known as "Prince"</field></object><object pk="1" model="fixtures.visa"><field '
-            'to="fixtures.person" name="person" rel="ManyToOneRel"><natural>Django Reinhardt</natural></field>'
+            'to="fixtures.person" name="person" rel="ManyToOneRel"><natural>Mango Reinhardt</natural></field>'
             '<field to="auth.permission" name="permissions" rel="ManyToManyRel"><object><natural>add_user'
             '</natural><natural>auth</natural><natural>user</natural></object><object><natural>change_user'
             '</natural><natural>auth</natural><natural>user</natural></object><object><natural>delete_user'
@@ -365,8 +365,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '<natural>auth</natural><natural>user</natural></object></field></object><object pk="1" '
             'model="fixtures.book"><field type="CharField" name="name">Music for all ages</field><field '
             'to="fixtures.person" name="authors" rel="ManyToManyRel"><object><natural>Artist formerly known as '
-            '"Prince"</natural></object><object><natural>Django Reinhardt</natural></object></field></object>'
-            '</django-objects>',
+            '"Prince"</natural></object><object><natural>Mango Reinhardt</natural></object></field></object>'
+            '</mango-objects>',
             format='xml', natural_foreign_keys=True
         )
 
@@ -433,7 +433,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             ['fixtures.Spy'],
             '[{"pk": %d, "model": "fixtures.spy", "fields": {"cover_blown": false}}]' % spy1.pk
         )
-        # Dump using Django's base manager. Should return all objects,
+        # Dump using Mango's base manager. Should return all objects,
         # even those normally filtered by the manager
         self._dumpdata_assert(
             ['fixtures.Spy'],
@@ -624,7 +624,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
     def test_compress_format_loading(self):
         # Load fixture 4 (compressed), using format specification
         management.call_command('loaddata', 'fixture4.json', verbosity=0)
-        self.assertEqual(Article.objects.get().headline, 'Django pets kitten')
+        self.assertEqual(Article.objects.get().headline, 'Mango pets kitten')
 
     def test_compressed_specified_loading(self):
         # Load fixture 5 (compressed), using format *and* compression specification
@@ -775,7 +775,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '{"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}, {"pk": 1, "model": '
             '"fixtures.tag", "fields": {"tagged_type": ["fixtures", "article"], "name": "copyright", "tagged_id": '
             '3}}, {"pk": 2, "model": "fixtures.tag", "fields": {"tagged_type": ["fixtures", "article"], "name": '
-            '"law", "tagged_id": 3}}, {"pk": 1, "model": "fixtures.person", "fields": {"name": "Django '
+            '"law", "tagged_id": 3}}, {"pk": 1, "model": "fixtures.person", "fields": {"name": "Mango '
             'Reinhardt"}}, {"pk": 2, "model": "fixtures.person", "fields": {"name": "Stephane Grappelli"}}, '
             '{"pk": 3, "model": "fixtures.person", "fields": {"name": "Prince"}}]',
             natural_foreign_keys=True
@@ -784,7 +784,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         # Dump the current contents of the database as an XML fixture
         self._dumpdata_assert(
             ['fixtures'],
-            '<?xml version="1.0" encoding="utf-8"?><django-objects version="1.0"><object pk="1" '
+            '<?xml version="1.0" encoding="utf-8"?><mango-objects version="1.0"><object pk="1" '
             'model="fixtures.category"><field type="CharField" name="title">News Stories</field><field '
             'type="TextField" name="description">Latest news stories</field></object><object pk="2" '
             'model="fixtures.article"><field type="CharField" name="headline">Poker has no place on ESPN</field>'
@@ -797,10 +797,10 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '</object><object pk="2" model="fixtures.tag"><field type="CharField" name="name">law</field><field '
             'to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural>'
             '<natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">3</field>'
-            '</object><object pk="1" model="fixtures.person"><field type="CharField" name="name">Django Reinhardt'
+            '</object><object pk="1" model="fixtures.person"><field type="CharField" name="name">Mango Reinhardt'
             '</field></object><object pk="2" model="fixtures.person"><field type="CharField" name="name">Stephane '
             'Grappelli</field></object><object pk="3" model="fixtures.person"><field type="CharField" name="name">'
-            'Prince</field></object></django-objects>',
+            'Prince</field></object></mango-objects>',
             format='xml', natural_foreign_keys=True
         )
 
@@ -840,14 +840,14 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         fixture_json = os.path.join(tests_dir, 'fixtures', 'fixture1.json')
         fixture_xml = os.path.join(tests_dir, 'fixtures', 'fixture3.xml')
 
-        with mock.patch('django.core.management.commands.loaddata.sys.stdin', open(fixture_json)):
+        with mock.patch('mango.core.management.commands.loaddata.sys.stdin', open(fixture_json)):
             management.call_command('loaddata', '--format=json', '-', verbosity=0)
             self.assertSequenceEqual(
                 Article.objects.values_list('headline', flat=True),
                 ['Time to reform copyright', 'Poker has no place on ESPN'],
             )
 
-        with mock.patch('django.core.management.commands.loaddata.sys.stdin', open(fixture_xml)):
+        with mock.patch('mango.core.management.commands.loaddata.sys.stdin', open(fixture_xml)):
             management.call_command('loaddata', '--format=xml', '-', verbosity=0)
             self.assertSequenceEqual(
                 Article.objects.values_list('headline', flat=True),
@@ -869,8 +869,8 @@ class NonexistentFixtureTests(TestCase):
         with self.assertRaisesMessage(CommandError, "No fixture named 'this_fixture_doesnt_exist' found."):
             management.call_command('loaddata', 'this_fixture_doesnt_exist', stdout=stdout_output)
 
-    @mock.patch('django.db.connection.enable_constraint_checking')
-    @mock.patch('django.db.connection.disable_constraint_checking')
+    @mock.patch('mango.db.connection.enable_constraint_checking')
+    @mock.patch('mango.db.connection.disable_constraint_checking')
     def test_nonexistent_fixture_no_constraint_checking(
             self, disable_constraint_checking, enable_constraint_checking):
         """
@@ -887,7 +887,7 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
 
     available_apps = [
         'fixtures',
-        'django.contrib.sites',
+        'mango.contrib.sites',
     ]
 
     @skipUnlessDBFeature('supports_forward_references')
@@ -925,7 +925,7 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
         self.assertSequenceEqual(
             Article.objects.values_list('headline', flat=True),
             [
-                'Django pets kitten',
+                'Mango pets kitten',
                 'Time to reform copyright',
                 'Poker has no place on ESPN',
             ],

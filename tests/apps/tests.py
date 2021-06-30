@@ -1,13 +1,13 @@
 import os
 
-from django.apps import AppConfig, apps
-from django.apps.registry import Apps
-from django.contrib.admin.models import LogEntry
-from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
-from django.db import models
-from django.test import SimpleTestCase, ignore_warnings, override_settings
-from django.test.utils import extend_sys_path, isolate_apps
-from django.utils.deprecation import RemovedInDjango41Warning
+from mango.apps import AppConfig, apps
+from mango.apps.registry import Apps
+from mango.contrib.admin.models import LogEntry
+from mango.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
+from mango.db import models
+from mango.test import SimpleTestCase, ignore_warnings, override_settings
+from mango.test.utils import extend_sys_path, isolate_apps
+from mango.utils.deprecation import RemovedInMango41Warning
 
 from .explicit_default_config_app.apps import ExplicitDefaultConfig
 from .explicit_default_config_empty_apps import ExplicitDefaultConfigEmptyApps
@@ -27,15 +27,15 @@ from .two_configs_one_default_app.apps import TwoConfig
 SOME_INSTALLED_APPS = [
     'apps.apps.MyAdmin',
     'apps.apps.MyAuth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'mango.contrib.contenttypes',
+    'mango.contrib.sessions',
+    'mango.contrib.messages',
+    'mango.contrib.staticfiles',
 ]
 
 SOME_INSTALLED_APPS_NAMES = [
-    'django.contrib.admin',
-    'django.contrib.auth',
+    'mango.contrib.admin',
+    'mango.contrib.auth',
 ] + SOME_INSTALLED_APPS[2:]
 
 HERE = os.path.dirname(__file__)
@@ -159,27 +159,27 @@ class AppsTests(SimpleTestCase):
         Tests apps.get_app_config().
         """
         app_config = apps.get_app_config('admin')
-        self.assertEqual(app_config.name, 'django.contrib.admin')
+        self.assertEqual(app_config.name, 'mango.contrib.admin')
 
         app_config = apps.get_app_config('staticfiles')
-        self.assertEqual(app_config.name, 'django.contrib.staticfiles')
+        self.assertEqual(app_config.name, 'mango.contrib.staticfiles')
 
         with self.assertRaises(LookupError):
             apps.get_app_config('admindocs')
 
-        msg = "No installed app with label 'django.contrib.auth'. Did you mean 'myauth'"
+        msg = "No installed app with label 'mango.contrib.auth'. Did you mean 'myauth'"
         with self.assertRaisesMessage(LookupError, msg):
-            apps.get_app_config('django.contrib.auth')
+            apps.get_app_config('mango.contrib.auth')
 
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_is_installed(self):
         """
         Tests apps.is_installed().
         """
-        self.assertIs(apps.is_installed('django.contrib.admin'), True)
-        self.assertIs(apps.is_installed('django.contrib.auth'), True)
-        self.assertIs(apps.is_installed('django.contrib.staticfiles'), True)
-        self.assertIs(apps.is_installed('django.contrib.admindocs'), False)
+        self.assertIs(apps.is_installed('mango.contrib.admin'), True)
+        self.assertIs(apps.is_installed('mango.contrib.auth'), True)
+        self.assertIs(apps.is_installed('mango.contrib.staticfiles'), True)
+        self.assertIs(apps.is_installed('mango.contrib.admindocs'), False)
 
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_get_model(self):
@@ -446,25 +446,25 @@ class AppConfigTests(SimpleTestCase):
 
     @override_settings(
         INSTALLED_APPS=['apps.apps.ModelPKAppsConfig'],
-        DEFAULT_AUTO_FIELD='django.db.models.SmallAutoField',
+        DEFAULT_AUTO_FIELD='mango.db.models.SmallAutoField',
     )
     def test_app_default_auto_field(self):
         apps_config = apps.get_app_config('apps')
         self.assertEqual(
             apps_config.default_auto_field,
-            'django.db.models.BigAutoField',
+            'mango.db.models.BigAutoField',
         )
         self.assertIs(apps_config._is_default_auto_field_overridden, True)
 
     @override_settings(
         INSTALLED_APPS=['apps.apps.PlainAppsConfig'],
-        DEFAULT_AUTO_FIELD='django.db.models.SmallAutoField',
+        DEFAULT_AUTO_FIELD='mango.db.models.SmallAutoField',
     )
     def test_default_auto_field_setting(self):
         apps_config = apps.get_app_config('apps')
         self.assertEqual(
             apps_config.default_auto_field,
-            'django.db.models.SmallAutoField',
+            'mango.db.models.SmallAutoField',
         )
         self.assertIs(apps_config._is_default_auto_field_overridden, False)
 
@@ -514,7 +514,7 @@ class NamespacePackageAppTests(SimpleTestCase):
 
 
 class DeprecationTests(SimpleTestCase):
-    @ignore_warnings(category=RemovedInDjango41Warning)
+    @ignore_warnings(category=RemovedInMango41Warning)
     def test_explicit_default_app_config(self):
         with self.settings(INSTALLED_APPS=['apps.explicit_default_config_app']):
             config = apps.get_app_config('explicit_default_config_app')
@@ -528,13 +528,13 @@ class DeprecationTests(SimpleTestCase):
         msg = (
             "'apps.explicit_default_config_app' defines default_app_config = "
             "'apps.explicit_default_config_app.apps.ExplicitDefaultConfig'. "
-            "Django now detects this configuration automatically. You can "
+            "Mango now detects this configuration automatically. You can "
             "remove default_app_config."
         )
-        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
+        with self.assertRaisesMessage(RemovedInMango41Warning, msg):
             with self.settings(INSTALLED_APPS=['apps.explicit_default_config_app']):
                 pass
-        with ignore_warnings(category=RemovedInDjango41Warning):
+        with ignore_warnings(category=RemovedInMango41Warning):
             with self.settings(INSTALLED_APPS=['apps.explicit_default_config_app']):
                 self.assertIsInstance(
                     apps.get_app_config('explicit_default_config_app'),
@@ -549,7 +549,7 @@ class DeprecationTests(SimpleTestCase):
         msg = (
             "'apps.explicit_default_config_mismatch_app' defines "
             "default_app_config = 'apps.explicit_default_config_mismatch_app."
-            "not_apps.ExplicitDefaultConfigMismatch'. However, Django's "
+            "not_apps.ExplicitDefaultConfigMismatch'. However, Mango's "
             "automatic detection picked another configuration, 'apps."
             "explicit_default_config_mismatch_app.apps."
             "ImplicitDefaultConfigMismatch'. You should move the default "
@@ -557,10 +557,10 @@ class DeprecationTests(SimpleTestCase):
             "this module defines several config classes, mark the default one "
             "with default = True."
         )
-        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
+        with self.assertRaisesMessage(RemovedInMango41Warning, msg):
             with self.settings(INSTALLED_APPS=['apps.explicit_default_config_mismatch_app']):
                 pass
-        with ignore_warnings(category=RemovedInDjango41Warning):
+        with ignore_warnings(category=RemovedInMango41Warning):
             with self.settings(INSTALLED_APPS=['apps.explicit_default_config_mismatch_app']):
                 self.assertIsInstance(
                     apps.get_app_config('explicit_default_config_mismatch_app'),
@@ -575,16 +575,16 @@ class DeprecationTests(SimpleTestCase):
         msg = (
             "'apps.explicit_default_config_empty_apps' defines "
             "default_app_config = 'apps.explicit_default_config_empty_apps."
-            "ExplicitDefaultConfigEmptyApps'. However, Django's automatic "
+            "ExplicitDefaultConfigEmptyApps'. However, Mango's automatic "
             "detection did not find this configuration. You should move the "
             "default config class to the apps submodule of your application "
             "and, if this module defines several config classes, mark the "
             "default one with default = True."
         )
-        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
+        with self.assertRaisesMessage(RemovedInMango41Warning, msg):
             with self.settings(INSTALLED_APPS=['apps.explicit_default_config_empty_apps']):
                 pass
-        with ignore_warnings(category=RemovedInDjango41Warning):
+        with ignore_warnings(category=RemovedInMango41Warning):
             with self.settings(INSTALLED_APPS=['apps.explicit_default_config_empty_apps']):
                 self.assertIsInstance(
                     apps.get_app_config('explicit_default_config_empty_apps'),
@@ -599,16 +599,16 @@ class DeprecationTests(SimpleTestCase):
         msg = (
             "'apps.explicit_default_config_without_apps' defines "
             "default_app_config = 'apps.explicit_default_config_without_apps."
-            "ExplicitDefaultConfigWithoutApps'. However, Django's automatic "
+            "ExplicitDefaultConfigWithoutApps'. However, Mango's automatic "
             "detection did not find this configuration. You should move the "
             "default config class to the apps submodule of your application "
             "and, if this module defines several config classes, mark the "
             "default one with default = True."
         )
-        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
+        with self.assertRaisesMessage(RemovedInMango41Warning, msg):
             with self.settings(INSTALLED_APPS=['apps.explicit_default_config_without_apps']):
                 pass
-        with ignore_warnings(category=RemovedInDjango41Warning):
+        with ignore_warnings(category=RemovedInMango41Warning):
             with self.settings(INSTALLED_APPS=['apps.explicit_default_config_without_apps']):
                 self.assertIsInstance(
                     apps.get_app_config('explicit_default_config_without_apps'),

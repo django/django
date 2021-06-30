@@ -1,9 +1,9 @@
 import json
 
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.db import models
-from django.test import SimpleTestCase, TestCase
-from django.test.utils import isolate_apps
+from mango.contrib.contenttypes.fields import GenericForeignKey
+from mango.db import models
+from mango.test import SimpleTestCase, TestCase
+from mango.test.utils import isolate_apps
 
 from .models import Answer, Question
 

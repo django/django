@@ -1,7 +1,7 @@
 import os
 
-from django.template import Context, Engine, TemplateDoesNotExist
-from django.test import SimpleTestCase
+from mango.template import Context, Engine, TemplateDoesNotExist
+from mango.test import SimpleTestCase
 
 from .utils import ROOT
 
@@ -40,7 +40,7 @@ class ExtendsBehaviorTests(SimpleTestCase):
         engine = Engine(
             dirs=[os.path.join(RECURSIVE, 'fs')],
             loaders=[(
-                'django.template.loaders.locmem.Loader', {
+                'mango.template.loaders.locmem.Loader', {
                     'one.html': (
                         '{% extends "one.html" %}{% block content %}{{ block.super }} locmem-one{% endblock %}'
                     ),
@@ -51,7 +51,7 @@ class ExtendsBehaviorTests(SimpleTestCase):
                         '{% extends "three.html" %}{% block content %}{{ block.super }} locmem-three{% endblock %}'
                     ),
                 }
-            ), 'django.template.loaders.filesystem.Loader'],
+            ), 'mango.template.loaders.filesystem.Loader'],
         )
         template = engine.get_template('one.html')
         output = template.render(Context({}))
@@ -80,8 +80,8 @@ class ExtendsBehaviorTests(SimpleTestCase):
                 os.path.join(RECURSIVE, 'fs3'),
             ],
             loaders=[
-                ('django.template.loaders.cached.Loader', [
-                    'django.template.loaders.filesystem.Loader',
+                ('mango.template.loaders.cached.Loader', [
+                    'mango.template.loaders.filesystem.Loader',
                 ]),
             ],
         )
@@ -111,10 +111,10 @@ class ExtendsBehaviorTests(SimpleTestCase):
         """
         engine = Engine(
             loaders=[
-                ['django.template.loaders.locmem.Loader', {
+                ['mango.template.loaders.locmem.Loader', {
                     'base.html': '{% extends "base.html" %}{% block content %}{{ block.super }} loader1{% endblock %}',
                 }],
-                ['django.template.loaders.locmem.Loader', {
+                ['mango.template.loaders.locmem.Loader', {
                     'base.html': '{% block content %}loader2{% endblock %}',
                 }],
             ]
@@ -130,12 +130,12 @@ class ExtendsBehaviorTests(SimpleTestCase):
         """
         engine = Engine(
             loaders=[
-                ['django.template.loaders.locmem.Loader', {
+                ['mango.template.loaders.locmem.Loader', {
                     'base.html': "{% extends 'base.html' %}{% block base %}{{ block.super }}2{% endblock %}",
                     'included.html':
                         "{% extends 'included.html' %}{% block included %}{{ block.super }}B{% endblock %}",
                 }],
-                ['django.template.loaders.locmem.Loader', {
+                ['mango.template.loaders.locmem.Loader', {
                     'base.html': "{% block base %}1{% endblock %}{% include 'included.html' %}",
                     'included.html': "{% block included %}A{% endblock %}",
                 }],

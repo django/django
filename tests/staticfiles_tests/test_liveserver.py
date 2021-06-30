@@ -1,15 +1,15 @@
 """
 A subset of the tests in tests/servers/tests exercising
-django.contrib.staticfiles.testing.StaticLiveServerTestCase instead of
-django.test.LiveServerTestCase.
+mango.contrib.staticfiles.testing.StaticLiveServerTestCase instead of
+mango.test.LiveServerTestCase.
 """
 
 import os
 from urllib.request import urlopen
 
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.core.exceptions import ImproperlyConfigured
-from django.test import modify_settings, override_settings
+from mango.contrib.staticfiles.testing import StaticLiveServerTestCase
+from mango.core.exceptions import ImproperlyConfigured
+from mango.test import modify_settings, override_settings
 
 TEST_ROOT = os.path.dirname(__file__)
 TEST_SETTINGS = {

@@ -1,5 +1,5 @@
 ==============================
-How to use Django with Uvicorn
+How to use Mango with Uvicorn
 ==============================
 
 .. highlight:: bash
@@ -14,7 +14,7 @@ You can install Uvicorn with ``pip``::
 
     python -m pip install uvicorn gunicorn
 
-Running Django in Uvicorn
+Running Mango in Uvicorn
 =========================
 
 When Uvicorn is installed, a ``uvicorn`` command is available which runs ASGI
@@ -22,7 +22,7 @@ applications. Uvicorn needs to be called with the location of a module
 containing an ASGI application object, followed by what the application is
 called (separated by a colon).
 
-For a typical Django project, invoking Uvicorn would look like::
+For a typical Mango project, invoking Uvicorn would look like::
 
     gunicorn myproject.asgi:application -k uvicorn.workers.UvicornWorker
 

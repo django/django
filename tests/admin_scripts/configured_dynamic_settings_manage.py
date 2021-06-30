@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import sys
 
-from django.conf import global_settings, settings
-from django.core.management import execute_from_command_line
+from mango.conf import global_settings, settings
+from mango.core.management import execute_from_command_line
 
 
 class Settings:

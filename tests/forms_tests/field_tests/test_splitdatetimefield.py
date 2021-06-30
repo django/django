@@ -1,9 +1,9 @@
 import datetime
 
-from django.core.exceptions import ValidationError
-from django.forms import SplitDateTimeField
-from django.forms.widgets import SplitDateTimeWidget
-from django.test import SimpleTestCase
+from mango.core.exceptions import ValidationError
+from mango.forms import SplitDateTimeField
+from mango.forms.widgets import SplitDateTimeWidget
+from mango.test import SimpleTestCase
 
 
 class SplitDateTimeFieldTest(SimpleTestCase):

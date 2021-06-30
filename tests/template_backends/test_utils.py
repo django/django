@@ -1,6 +1,6 @@
-from django.core.exceptions import ImproperlyConfigured
-from django.template import engines
-from django.test import SimpleTestCase, override_settings
+from mango.core.exceptions import ImproperlyConfigured
+from mango.template import engines
+from mango.test import SimpleTestCase, override_settings
 
 
 class TemplateUtilsTests(SimpleTestCase):
@@ -17,7 +17,7 @@ class TemplateUtilsTests(SimpleTestCase):
             engines.all()
 
     @override_settings(TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
         # Incorrect: APP_DIRS and loaders are mutually incompatible.
         'APP_DIRS': True,
         'OPTIONS': {'loaders': []},
@@ -34,13 +34,13 @@ class TemplateUtilsTests(SimpleTestCase):
             engines.all()
 
     @override_settings(TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
     }, {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
     }])
     def test_backend_names_must_be_unique(self):
         msg = (
-            "Template engine aliases aren't unique, duplicates: django. Set "
+            "Template engine aliases aren't unique, duplicates: mango. Set "
             "a unique NAME for each engine in settings.TEMPLATES."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):

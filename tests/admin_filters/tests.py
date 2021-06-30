@@ -2,15 +2,15 @@ import datetime
 import sys
 import unittest
 
-from django.contrib.admin import (
+from mango.contrib.admin import (
     AllValuesFieldListFilter, BooleanFieldListFilter, EmptyFieldListFilter,
     ModelAdmin, RelatedOnlyFieldListFilter, SimpleListFilter, site,
 )
-from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
-from django.core.exceptions import ImproperlyConfigured
-from django.test import RequestFactory, TestCase, override_settings
+from mango.contrib.admin.options import IncorrectLookupParameters
+from mango.contrib.auth.admin import UserAdmin
+from mango.contrib.auth.models import User
+from mango.core.exceptions import ImproperlyConfigured
+from mango.test import RequestFactory, TestCase, override_settings
 
 from .models import (
     Book, Bookmark, Department, Employee, ImprovedBook, TaggedItem,
@@ -282,18 +282,18 @@ class ListFiltersTests(TestCase):
         cls.lisa = User.objects.create_user('lisa', 'lisa@example.com')
 
         # Books
-        cls.djangonaut_book = Book.objects.create(
-            title='Djangonaut: an art of living', year=2009,
+        cls.mangonaut_book = Book.objects.create(
+            title='Mangonaut: an art of living', year=2009,
             author=cls.alfred, is_best_seller=True, date_registered=cls.today,
             availability=True,
         )
         cls.bio_book = Book.objects.create(
-            title='Django: a biography', year=1999, author=cls.alfred,
+            title='Mango: a biography', year=1999, author=cls.alfred,
             is_best_seller=False, no=207,
             availability=False,
         )
-        cls.django_book = Book.objects.create(
-            title='The Django Book', year=None, author=cls.bob,
+        cls.mango_book = Book.objects.create(
+            title='The Mango Book', year=None, author=cls.bob,
             is_best_seller=None, date_registered=cls.today, no=103,
             availability=True,
         )
@@ -345,7 +345,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.django_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.mango_book, self.mangonaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
@@ -371,9 +371,9 @@ class ListFiltersTests(TestCase):
         queryset = changelist.get_queryset(request)
         if (self.today.year, self.today.month) == (self.one_week_ago.year, self.one_week_ago.month):
             # In case one week ago is in the same month.
-            self.assertEqual(list(queryset), [self.guitar_book, self.django_book, self.djangonaut_book])
+            self.assertEqual(list(queryset), [self.guitar_book, self.mango_book, self.mangonaut_book])
         else:
-            self.assertEqual(list(queryset), [self.django_book, self.djangonaut_book])
+            self.assertEqual(list(queryset), [self.mango_book, self.mangonaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
@@ -399,9 +399,9 @@ class ListFiltersTests(TestCase):
         queryset = changelist.get_queryset(request)
         if self.today.year == self.one_week_ago.year:
             # In case one week ago is in the same year.
-            self.assertEqual(list(queryset), [self.guitar_book, self.django_book, self.djangonaut_book])
+            self.assertEqual(list(queryset), [self.guitar_book, self.mango_book, self.mangonaut_book])
         else:
-            self.assertEqual(list(queryset), [self.django_book, self.djangonaut_book])
+            self.assertEqual(list(queryset), [self.mango_book, self.mangonaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
@@ -425,7 +425,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.guitar_book, self.django_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.guitar_book, self.mango_book, self.mangonaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
@@ -464,7 +464,7 @@ class ListFiltersTests(TestCase):
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
         self.assertEqual(queryset.count(), 3)
-        self.assertEqual(list(queryset), [self.guitar_book, self.django_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.guitar_book, self.mango_book, self.mangonaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
@@ -492,7 +492,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.django_book])
+        self.assertEqual(list(queryset), [self.mango_book])
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][0]
@@ -639,7 +639,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.django_book, self.bio_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.mango_book, self.bio_book, self.mangonaut_book])
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][2]
@@ -705,20 +705,20 @@ class ListFiltersTests(TestCase):
         self.assertIs(choices[-1]['selected'], True)
         self.assertEqual(choices[-1]['query_string'], '?books_contributed__isnull=True')
 
-        request = self.request_factory.get('/', {'books_contributed__id__exact': self.django_book.pk})
+        request = self.request_factory.get('/', {'books_contributed__id__exact': self.mango_book.pk})
         request.user = self.alfred
         changelist = modeladmin.get_changelist_instance(request)
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][1]
         self.assertEqual(filterspec.title, 'book')
-        choice = select_by(filterspec.choices(changelist), "display", self.django_book.title)
+        choice = select_by(filterspec.choices(changelist), "display", self.mango_book.title)
         self.assertIs(choice['selected'], True)
-        self.assertEqual(choice['query_string'], '?books_contributed__id__exact=%d' % self.django_book.pk)
+        self.assertEqual(choice['query_string'], '?books_contributed__id__exact=%d' % self.mango_book.pk)
 
         # With one book, the list filter should appear because there is also a
         # (None) option.
-        Book.objects.exclude(pk=self.djangonaut_book.pk).delete()
+        Book.objects.exclude(pk=self.mangonaut_book.pk).delete()
         filterspec = changelist.get_filters(request)[0]
         self.assertEqual(len(filterspec), 2)
         # With no books remaining, no list filters should appear.
@@ -736,10 +736,10 @@ class ListFiltersTests(TestCase):
         changelist = modeladmin.get_changelist_instance(request)
         filterspec = changelist.get_filters(request)[0][0]
         expected = [
-            (self.bio_book.pk, 'Django: a biography'),
-            (self.djangonaut_book.pk, 'Djangonaut: an art of living'),
+            (self.bio_book.pk, 'Mango: a biography'),
+            (self.mangonaut_book.pk, 'Mangonaut: an art of living'),
             (self.guitar_book.pk, 'Guitar for dummies'),
-            (self.django_book.pk, 'The Django Book')
+            (self.mango_book.pk, 'The Mango Book')
         ]
         self.assertEqual(filterspec.lookup_choices, expected)
 
@@ -761,10 +761,10 @@ class ListFiltersTests(TestCase):
                 ('book', RelatedOnlyFieldListFilter),
             )
 
-        self.djangonaut_book.employee = self.john
-        self.djangonaut_book.save()
-        self.django_book.employee = self.jack
-        self.django_book.save()
+        self.mangonaut_book.employee = self.john
+        self.mangonaut_book.save()
+        self.mango_book.employee = self.jack
+        self.mango_book.save()
 
         modeladmin = EmployeeAdminReverseRelationship(Employee, site)
         request = self.request_factory.get('/')
@@ -772,8 +772,8 @@ class ListFiltersTests(TestCase):
         changelist = modeladmin.get_changelist_instance(request)
         filterspec = changelist.get_filters(request)[0][0]
         self.assertEqual(filterspec.lookup_choices, [
-            (self.djangonaut_book.pk, 'Djangonaut: an art of living'),
-            (self.django_book.pk, 'The Django Book'),
+            (self.mangonaut_book.pk, 'Mangonaut: an art of living'),
+            (self.mango_book.pk, 'The Mango Book'),
         ])
 
     def test_relatedonlyfieldlistfilter_manytomany_reverse_relationships(self):
@@ -803,8 +803,8 @@ class ListFiltersTests(TestCase):
             )
 
         albert = Employee.objects.create(name='Albert Green', department=self.dev)
-        self.djangonaut_book.employee = albert
-        self.djangonaut_book.save()
+        self.mangonaut_book.employee = albert
+        self.mangonaut_book.save()
         self.bio_book.employee = self.jack
         self.bio_book.save()
 
@@ -827,8 +827,8 @@ class ListFiltersTests(TestCase):
             )
 
         albert = Employee.objects.create(name='Albert Green', department=self.dev)
-        self.djangonaut_book.employee = albert
-        self.djangonaut_book.save()
+        self.mangonaut_book.employee = albert
+        self.mangonaut_book.save()
         self.bio_book.employee = self.jack
         self.bio_book.save()
 
@@ -845,8 +845,8 @@ class ListFiltersTests(TestCase):
 
     def test_relatedonlyfieldlistfilter_underscorelookup_foreignkey(self):
         Department.objects.create(code='TEST', description='Testing')
-        self.djangonaut_book.employee = self.john
-        self.djangonaut_book.save()
+        self.mangonaut_book.employee = self.john
+        self.mangonaut_book.save()
         self.bio_book.employee = self.jack
         self.bio_book.save()
 
@@ -877,11 +877,11 @@ class ListFiltersTests(TestCase):
         self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
 
     def test_listfilter_genericrelation(self):
-        django_bookmark = Bookmark.objects.create(url='https://www.djangoproject.com/')
+        mango_bookmark = Bookmark.objects.create(url='https://www.mangoproject.com/')
         python_bookmark = Bookmark.objects.create(url='https://www.python.org/')
         kernel_bookmark = Bookmark.objects.create(url='https://www.kernel.org/')
 
-        TaggedItem.objects.create(content_object=django_bookmark, tag='python')
+        TaggedItem.objects.create(content_object=mango_bookmark, tag='python')
         TaggedItem.objects.create(content_object=python_bookmark, tag='python')
         TaggedItem.objects.create(content_object=kernel_bookmark, tag='linux')
 
@@ -892,7 +892,7 @@ class ListFiltersTests(TestCase):
         changelist = modeladmin.get_changelist_instance(request)
         queryset = changelist.get_queryset(request)
 
-        expected = [python_bookmark, django_bookmark]
+        expected = [python_bookmark, mango_bookmark]
         self.assertEqual(list(queryset), expected)
 
     def test_booleanfieldlistfilter(self):
@@ -929,7 +929,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.guitar_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.guitar_book, self.mangonaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][3]
@@ -944,7 +944,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.django_book])
+        self.assertEqual(list(queryset), [self.mango_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][3]
@@ -978,7 +978,7 @@ class ListFiltersTests(TestCase):
         request.user = self.alfred
         changelist = modeladmin.get_changelist_instance(request)
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.django_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.mango_book, self.mangonaut_book])
         filterspec = changelist.get_filters(request)[0][6]
         self.assertEqual(filterspec.title, 'availability')
         choice = select_by(filterspec.choices(changelist), 'display', 'Free')
@@ -1002,7 +1002,7 @@ class ListFiltersTests(TestCase):
         queryset = changelist.get_queryset(request)
         self.assertEqual(
             list(queryset),
-            [self.guitar_book, self.django_book, self.bio_book, self.djangonaut_book],
+            [self.guitar_book, self.mango_book, self.bio_book, self.mangonaut_book],
         )
         filterspec = changelist.get_filters(request)[0][6]
         self.assertEqual(filterspec.title, 'availability')
@@ -1026,7 +1026,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.bio_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.bio_book, self.mangonaut_book])
 
     def test_fieldlistfilter_invalid_lookup_parameters(self):
         """Filtering by an invalid value."""
@@ -1097,7 +1097,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.guitar_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.guitar_book, self.mangonaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][1]
@@ -1114,7 +1114,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.mangonaut_book])
 
         # Make sure the correct choices are selected
         filterspec = changelist.get_filters(request)[0][1]
@@ -1419,14 +1419,14 @@ class ListFiltersTests(TestCase):
             (
                 book_admin,
                 {'author__isempty': '0'},
-                [self.django_book, self.bio_book, self.djangonaut_book, empty_title],
+                [self.mango_book, self.bio_book, self.mangonaut_book, empty_title],
             ),
             # Allows empty strings.
             (book_admin, {'title__isempty': '1'}, [empty_title]),
             (
                 book_admin,
                 {'title__isempty': '0'},
-                [self.django_book, self.bio_book, self.djangonaut_book, self.guitar_book],
+                [self.mango_book, self.bio_book, self.mangonaut_book, self.guitar_book],
             ),
         ]
         for modeladmin, query_string, expected_result in tests:
@@ -1458,7 +1458,7 @@ class ListFiltersTests(TestCase):
             (
                 book_admin,
                 {'improvedbook__isempty': '1'},
-                [self.django_book, self.bio_book, self.djangonaut_book],
+                [self.mango_book, self.bio_book, self.mangonaut_book],
             ),
             (book_admin, {'improvedbook__isempty': '0'}, [self.guitar_book]),
             # Reverse foreign key relationship.
@@ -1487,15 +1487,15 @@ class ListFiltersTests(TestCase):
 
         modeladmin = BookmarkGenericRelation(Bookmark, site)
 
-        django_bookmark = Bookmark.objects.create(url='https://www.djangoproject.com/')
+        mango_bookmark = Bookmark.objects.create(url='https://www.mangoproject.com/')
         python_bookmark = Bookmark.objects.create(url='https://www.python.org/')
         none_tags = Bookmark.objects.create(url='https://www.kernel.org/')
-        TaggedItem.objects.create(content_object=django_bookmark, tag='python')
+        TaggedItem.objects.create(content_object=mango_bookmark, tag='python')
         TaggedItem.objects.create(content_object=python_bookmark, tag='python')
 
         tests = [
             ({'tags__isempty': '1'}, [none_tags]),
-            ({'tags__isempty': '0'}, [django_bookmark, python_bookmark]),
+            ({'tags__isempty': '0'}, [mango_bookmark, python_bookmark]),
         ]
         for query_string, expected_result in tests:
             with self.subTest(query_string=query_string):

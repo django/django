@@ -2,13 +2,13 @@ from io import BytesIO
 from itertools import chain
 from urllib.parse import urlencode
 
-from django.core.exceptions import DisallowedHost
-from django.core.handlers.wsgi import LimitedStream, WSGIRequest
-from django.http import HttpRequest, RawPostDataException, UnreadablePostError
-from django.http.multipartparser import MultiPartParserError
-from django.http.request import HttpHeaders, split_domain_port
-from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.client import FakePayload
+from mango.core.exceptions import DisallowedHost
+from mango.core.handlers.wsgi import LimitedStream, WSGIRequest
+from mango.http import HttpRequest, RawPostDataException, UnreadablePostError
+from mango.http.multipartparser import MultiPartParserError
+from mango.http.request import HttpHeaders, split_domain_port
+from mango.test import RequestFactory, SimpleTestCase, override_settings
+from mango.test.client import FakePayload
 
 
 class RequestsTests(SimpleTestCase):

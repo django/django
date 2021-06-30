@@ -1,6 +1,6 @@
-from django.db.models import BooleanField, Exists, F, OuterRef, Q
-from django.db.models.expressions import RawSQL
-from django.test import SimpleTestCase
+from mango.db.models import BooleanField, Exists, F, OuterRef, Q
+from mango.db.models.expressions import RawSQL
+from mango.test import SimpleTestCase
 
 from .models import Tag
 
@@ -64,7 +64,7 @@ class QTests(SimpleTestCase):
     def test_deconstruct(self):
         q = Q(price__gt=F('discounted_price'))
         path, args, kwargs = q.deconstruct()
-        self.assertEqual(path, 'django.db.models.Q')
+        self.assertEqual(path, 'mango.db.models.Q')
         self.assertEqual(args, (('price__gt', F('discounted_price')),))
         self.assertEqual(kwargs, {})
 

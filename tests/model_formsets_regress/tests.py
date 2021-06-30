@@ -1,11 +1,11 @@
-from django import forms
-from django.forms.formsets import DELETION_FIELD_NAME, BaseFormSet
-from django.forms.models import (
+from mango import forms
+from mango.forms.formsets import DELETION_FIELD_NAME, BaseFormSet
+from mango.forms.models import (
     BaseModelFormSet, inlineformset_factory, modelform_factory,
     modelformset_factory,
 )
-from django.forms.utils import ErrorDict, ErrorList
-from django.test import TestCase
+from mango.forms.utils import ErrorDict, ErrorList
+from mango.test import TestCase
 
 from .models import (
     Host, Manager, Network, ProfileNetwork, Restaurant, User, UserPreferences,

@@ -1,13 +1,13 @@
-from django.apps import AppConfig
+from mango.apps import AppConfig
 
 
 class MyAdmin(AppConfig):
-    name = 'django.contrib.admin'
+    name = 'mango.contrib.admin'
     verbose_name = "Admin sweet admin."
 
 
 class MyAuth(AppConfig):
-    name = 'django.contrib.auth'
+    name = 'mango.contrib.auth'
     label = 'myauth'
     verbose_name = "All your password are belong to us."
 
@@ -35,4 +35,4 @@ class RelabeledAppsConfig(AppConfig):
 
 class ModelPKAppsConfig(AppConfig):
     name = 'apps'
-    default_auto_field = 'django.db.models.BigAutoField'
+    default_auto_field = 'mango.db.models.BigAutoField'

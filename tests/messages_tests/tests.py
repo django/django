@@ -1,8 +1,8 @@
 from unittest import mock
 
-from django.contrib.messages import constants
-from django.contrib.messages.storage.base import Message
-from django.test import SimpleTestCase
+from mango.contrib.messages import constants
+from mango.contrib.messages.storage.base import Message
+from mango.test import SimpleTestCase
 
 
 class MessageTests(SimpleTestCase):

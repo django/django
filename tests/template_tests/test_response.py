@@ -2,14 +2,14 @@ import pickle
 import time
 from datetime import datetime
 
-from django.template import engines
-from django.template.response import (
+from mango.template import engines
+from mango.template.response import (
     ContentNotRenderedError, SimpleTemplateResponse, TemplateResponse,
 )
-from django.test import (
+from mango.test import (
     RequestFactory, SimpleTestCase, modify_settings, override_settings,
 )
-from django.test.utils import require_jinja2
+from mango.test.utils import require_jinja2
 
 from .utils import TEMPLATE_DIR
 
@@ -32,7 +32,7 @@ def custom_urlconf_middleware(get_response):
 class SimpleTemplateResponseTest(SimpleTestCase):
 
     def _response(self, template='foo', *args, **kwargs):
-        template = engines['django'].from_string(template)
+        template = engines['mango'].from_string(template)
         return SimpleTemplateResponse(template, *args, **kwargs)
 
     def test_template_resolving(self):
@@ -62,7 +62,7 @@ class SimpleTemplateResponseTest(SimpleTestCase):
         self.assertEqual(response.content, b'foo')
 
         # rebaking doesn't change the rendered content
-        template = engines['django'].from_string('bar{{ baz }}')
+        template = engines['mango'].from_string('bar{{ baz }}')
         response.template_name = template
         response.render()
         self.assertEqual(response.content, b'foo')
@@ -135,7 +135,7 @@ class SimpleTemplateResponseTest(SimpleTestCase):
     def test_using(self):
         response = SimpleTemplateResponse('template_tests/using.html').render()
         self.assertEqual(response.content, b'DTL\n')
-        response = SimpleTemplateResponse('template_tests/using.html', using='django').render()
+        response = SimpleTemplateResponse('template_tests/using.html', using='mango').render()
         self.assertEqual(response.content, b'DTL\n')
         response = SimpleTemplateResponse('template_tests/using.html', using='jinja2').render()
         self.assertEqual(response.content, b'Jinja2\n')
@@ -226,7 +226,7 @@ class SimpleTemplateResponseTest(SimpleTestCase):
 
 
 @override_settings(TEMPLATES=[{
-    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'BACKEND': 'mango.template.backends.mango.MangoTemplates',
     'DIRS': [TEMPLATE_DIR],
     'OPTIONS': {
         'context_processors': [test_processor_name],
@@ -237,7 +237,7 @@ class TemplateResponseTest(SimpleTestCase):
 
     def _response(self, template='foo', *args, **kwargs):
         self._request = self.factory.get('/')
-        template = engines['django'].from_string(template)
+        template = engines['mango'].from_string(template)
         return TemplateResponse(self._request, template, *args, **kwargs)
 
     def test_render(self):
@@ -271,7 +271,7 @@ class TemplateResponseTest(SimpleTestCase):
         request = self.factory.get('/')
         response = TemplateResponse(request, 'template_tests/using.html').render()
         self.assertEqual(response.content, b'DTL\n')
-        response = TemplateResponse(request, 'template_tests/using.html', using='django').render()
+        response = TemplateResponse(request, 'template_tests/using.html', using='mango').render()
         self.assertEqual(response.content, b'DTL\n')
         response = TemplateResponse(request, 'template_tests/using.html', using='jinja2').render()
         self.assertEqual(response.content, b'Jinja2\n')
@@ -349,8 +349,8 @@ class CustomURLConfTest(SimpleTestCase):
 @modify_settings(
     MIDDLEWARE={
         'append': [
-            'django.middleware.cache.FetchFromCacheMiddleware',
-            'django.middleware.cache.UpdateCacheMiddleware',
+            'mango.middleware.cache.FetchFromCacheMiddleware',
+            'mango.middleware.cache.UpdateCacheMiddleware',
         ],
     },
 )

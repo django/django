@@ -10,25 +10,25 @@ from io import StringIO
 from pathlib import Path
 from urllib.request import urlopen
 
-from django.core.cache import cache
-from django.core.exceptions import SuspiciousFileOperation
-from django.core.files.base import ContentFile, File
-from django.core.files.storage import (
+from mango.core.cache import cache
+from mango.core.exceptions import SuspiciousFileOperation
+from mango.core.files.base import ContentFile, File
+from mango.core.files.storage import (
     FileSystemStorage, Storage as BaseStorage, default_storage,
     get_storage_class,
 )
-from django.core.files.uploadedfile import (
+from mango.core.files.uploadedfile import (
     InMemoryUploadedFile, SimpleUploadedFile, TemporaryUploadedFile,
 )
-from django.db.models import FileField
-from django.db.models.fields.files import FileDescriptor
-from django.test import (
+from mango.db.models import FileField
+from mango.db.models.fields.files import FileDescriptor
+from mango.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
 )
-from django.test.utils import requires_tz_support
-from django.urls import NoReverseMatch, reverse_lazy
-from django.utils import timezone
-from django.utils._os import symlinks_supported
+from mango.test.utils import requires_tz_support
+from mango.urls import NoReverseMatch, reverse_lazy
+from mango.utils import timezone
+from mango.utils._os import symlinks_supported
 
 from .models import (
     Storage, callable_storage, temp_storage, temp_storage_location,
@@ -44,7 +44,7 @@ class GetStorageClassTests(SimpleTestCase):
         get_storage_class returns the class for a storage backend name/path.
         """
         self.assertEqual(
-            get_storage_class('django.core.files.storage.FileSystemStorage'),
+            get_storage_class('mango.core.files.storage.FileSystemStorage'),
             FileSystemStorage)
 
     def test_get_invalid_storage_module(self):
@@ -59,21 +59,21 @@ class GetStorageClassTests(SimpleTestCase):
         get_storage_class raises an error if the requested class don't exist.
         """
         with self.assertRaises(ImportError):
-            get_storage_class('django.core.files.storage.NonexistentStorage')
+            get_storage_class('mango.core.files.storage.NonexistentStorage')
 
     def test_get_nonexistent_storage_module(self):
         """
         get_storage_class raises an error if the requested module don't exist.
         """
-        with self.assertRaisesMessage(ImportError, "No module named 'django.core.files.nonexistent_storage'"):
-            get_storage_class('django.core.files.nonexistent_storage.NonexistentStorage')
+        with self.assertRaisesMessage(ImportError, "No module named 'mango.core.files.nonexistent_storage'"):
+            get_storage_class('mango.core.files.nonexistent_storage.NonexistentStorage')
 
 
 class FileSystemStorageTests(unittest.TestCase):
 
     def test_deconstruction(self):
         path, args, kwargs = temp_storage.deconstruct()
-        self.assertEqual(path, "django.core.files.storage.FileSystemStorage")
+        self.assertEqual(path, "mango.core.files.storage.FileSystemStorage")
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {'location': temp_storage_location})
 
@@ -136,20 +136,20 @@ class FileStorageTests(SimpleTestCase):
     def _test_file_time_getter(self, getter):
         # Check for correct behavior under both USE_TZ=True and USE_TZ=False.
         # The tests are similar since they both set up a situation where the
-        # system time zone, Django's TIME_ZONE, and UTC are distinct.
+        # system time zone, Mango's TIME_ZONE, and UTC are distinct.
         self._test_file_time_getter_tz_handling_on(getter)
         self._test_file_time_getter_tz_handling_off(getter)
 
     @override_settings(USE_TZ=True, TIME_ZONE='Africa/Algiers')
     def _test_file_time_getter_tz_handling_on(self, getter):
-        # Django's TZ (and hence the system TZ) is set to Africa/Algiers which
-        # is UTC+1 and has no DST change. We can set the Django TZ to something
-        # else so that UTC, Django's TIME_ZONE, and the system timezone are all
+        # Mango's TZ (and hence the system TZ) is set to Africa/Algiers which
+        # is UTC+1 and has no DST change. We can set the Mango TZ to something
+        # else so that UTC, Mango's TIME_ZONE, and the system timezone are all
         # different.
         now_in_algiers = timezone.make_aware(datetime.now())
 
         with timezone.override(timezone.get_fixed_timezone(-300)):
-            # At this point the system TZ is +1 and the Django TZ
+            # At this point the system TZ is +1 and the Mango TZ
             # is -5. The following will be aware in UTC.
             now = timezone.now()
             self.assertFalse(self.storage.exists('test.file.tz.on'))
@@ -165,24 +165,24 @@ class FileStorageTests(SimpleTestCase):
             # The three timezones are indeed distinct.
             naive_now = datetime.now()
             algiers_offset = now_in_algiers.tzinfo.utcoffset(naive_now)
-            django_offset = timezone.get_current_timezone().utcoffset(naive_now)
+            mango_offset = timezone.get_current_timezone().utcoffset(naive_now)
             utc_offset = timezone.utc.utcoffset(naive_now)
             self.assertGreater(algiers_offset, utc_offset)
-            self.assertLess(django_offset, utc_offset)
+            self.assertLess(mango_offset, utc_offset)
 
             # dt and now should be the same effective time.
             self.assertLess(abs(dt - now), timedelta(seconds=2))
 
     @override_settings(USE_TZ=False, TIME_ZONE='Africa/Algiers')
     def _test_file_time_getter_tz_handling_off(self, getter):
-        # Django's TZ (and hence the system TZ) is set to Africa/Algiers which
-        # is UTC+1 and has no DST change. We can set the Django TZ to something
-        # else so that UTC, Django's TIME_ZONE, and the system timezone are all
+        # Mango's TZ (and hence the system TZ) is set to Africa/Algiers which
+        # is UTC+1 and has no DST change. We can set the Mango TZ to something
+        # else so that UTC, Mango's TIME_ZONE, and the system timezone are all
         # different.
         now_in_algiers = timezone.make_aware(datetime.now())
 
         with timezone.override(timezone.get_fixed_timezone(-300)):
-            # At this point the system TZ is +1 and the Django TZ
+            # At this point the system TZ is +1 and the Mango TZ
             # is -5.
             self.assertFalse(self.storage.exists('test.file.tz.off'))
 
@@ -196,10 +196,10 @@ class FileStorageTests(SimpleTestCase):
             # The three timezones are indeed distinct.
             naive_now = datetime.now()
             algiers_offset = now_in_algiers.tzinfo.utcoffset(naive_now)
-            django_offset = timezone.get_current_timezone().utcoffset(naive_now)
+            mango_offset = timezone.get_current_timezone().utcoffset(naive_now)
             utc_offset = timezone.utc.utcoffset(naive_now)
             self.assertGreater(algiers_offset, utc_offset)
-            self.assertLess(django_offset, utc_offset)
+            self.assertLess(mango_offset, utc_offset)
 
             # dt and naive_now should be the same effective time.
             self.assertLess(abs(dt - naive_now), timedelta(seconds=2))
@@ -691,8 +691,8 @@ class FileFieldStorageTests(TestCase):
             obj1.normal.size
 
         # Saving a file enables full functionality.
-        obj1.normal.save("django_test.txt", ContentFile("content"))
-        self.assertEqual(obj1.normal.name, "tests/django_test.txt")
+        obj1.normal.save("mango_test.txt", ContentFile("content"))
+        self.assertEqual(obj1.normal.name, "tests/mango_test.txt")
         self.assertEqual(obj1.normal.size, 7)
         self.assertEqual(obj1.normal.read(), b"content")
         obj1.normal.close()
@@ -706,21 +706,21 @@ class FileFieldStorageTests(TestCase):
 
         obj1.save()
         dirs, files = temp_storage.listdir("tests")
-        self.assertEqual(sorted(files), ["assignment.txt", "django_test.txt"])
+        self.assertEqual(sorted(files), ["assignment.txt", "mango_test.txt"])
 
         # Save another file with the same name.
         obj2 = Storage()
-        obj2.normal.save("django_test.txt", ContentFile("more content"))
+        obj2.normal.save("mango_test.txt", ContentFile("more content"))
         obj2_name = obj2.normal.name
-        self.assertRegex(obj2_name, "tests/django_test_%s.txt" % FILE_SUFFIX_REGEX)
+        self.assertRegex(obj2_name, "tests/mango_test_%s.txt" % FILE_SUFFIX_REGEX)
         self.assertEqual(obj2.normal.size, 12)
         obj2.normal.close()
 
         # Deleting an object does not delete the file it uses.
         obj2.delete()
-        obj2.normal.save("django_test.txt", ContentFile("more content"))
+        obj2.normal.save("mango_test.txt", ContentFile("more content"))
         self.assertNotEqual(obj2_name, obj2.normal.name)
-        self.assertRegex(obj2.normal.name, "tests/django_test_%s.txt" % FILE_SUFFIX_REGEX)
+        self.assertRegex(obj2.normal.name, "tests/mango_test_%s.txt" % FILE_SUFFIX_REGEX)
         obj2.normal.close()
 
     def test_filefield_read(self):
@@ -822,8 +822,8 @@ class FileFieldStorageTests(TestCase):
     def test_empty_upload_to(self):
         # upload_to can be empty, meaning it does not use subdirectory.
         obj = Storage()
-        obj.empty.save('django_test.txt', ContentFile('more content'))
-        self.assertEqual(obj.empty.name, "django_test.txt")
+        obj.empty.save('mango_test.txt', ContentFile('more content'))
+        self.assertEqual(obj.empty.name, "mango_test.txt")
         self.assertEqual(obj.empty.read(), b"more content")
         obj.empty.close()
 
@@ -856,10 +856,10 @@ class FileFieldStorageTests(TestCase):
     def test_filefield_pickling(self):
         # Push an object into the cache to make sure it pickles properly
         obj = Storage()
-        obj.normal.save("django_test.txt", ContentFile("more content"))
+        obj.normal.save("mango_test.txt", ContentFile("more content"))
         obj.normal.close()
         cache.set("obj", obj)
-        self.assertEqual(cache.get("obj").normal.name, "tests/django_test.txt")
+        self.assertEqual(cache.get("obj").normal.name, "tests/mango_test.txt")
 
     def test_file_object(self):
         # Create sample file
@@ -896,7 +896,7 @@ class FieldCallableFileStorageTests(SimpleTestCase):
     def test_callable_base_class_error_raises(self):
         class NotStorage:
             pass
-        msg = 'FileField.storage must be a subclass/instance of django.core.files.storage.Storage'
+        msg = 'FileField.storage must be a subclass/instance of mango.core.files.storage.Storage'
         for invalid_type in (NotStorage, str, list, set, tuple):
             with self.subTest(invalid_type=invalid_type):
                 with self.assertRaisesMessage(TypeError, msg):

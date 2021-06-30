@@ -1,7 +1,7 @@
 """Models for test_natural.py"""
 import uuid
 
-from django.db import models
+from mango.db import models
 
 
 class NaturalKeyAnchorManager(models.Manager):

@@ -9,19 +9,19 @@ from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
 
-from django.conf import settings
-from django.contrib.staticfiles import storage
-from django.contrib.staticfiles.management.commands import (
+from mango.conf import settings
+from mango.contrib.staticfiles import storage
+from mango.contrib.staticfiles.management.commands import (
     collectstatic, runserver,
 )
-from django.core.exceptions import ImproperlyConfigured
-from django.core.management import CommandError, call_command
-from django.core.management.base import SystemCheckError
-from django.test import RequestFactory, override_settings
-from django.test.utils import extend_sys_path
-from django.utils import timezone
-from django.utils._os import symlinks_supported
-from django.utils.functional import empty
+from mango.core.exceptions import ImproperlyConfigured
+from mango.core.management import CommandError, call_command
+from mango.core.management.base import SystemCheckError
+from mango.test import RequestFactory, override_settings
+from mango.test.utils import extend_sys_path
+from mango.utils import timezone
+from mango.utils._os import symlinks_supported
+from mango.utils.functional import empty
 
 from .cases import CollectionTestCase, StaticFilesTestCase, TestDefaults
 from .settings import TEST_ROOT, TEST_SETTINGS
@@ -38,10 +38,10 @@ class TestNoFilesCreated:
 
 
 class TestRunserver(StaticFilesTestCase):
-    @override_settings(MIDDLEWARE=['django.middleware.common.CommonMiddleware'])
+    @override_settings(MIDDLEWARE=['mango.middleware.common.CommonMiddleware'])
     def test_middleware_loaded_only_once(self):
         command = runserver.Command()
-        with mock.patch('django.middleware.common.CommonMiddleware') as mocked:
+        with mock.patch('mango.middleware.common.CommonMiddleware') as mocked:
             command.get_handler(use_static_handler=True, insecure_serving=True)
             self.assertEqual(mocked.call_count, 1)
 
@@ -125,7 +125,7 @@ class TestConfiguration(StaticFilesTestCase):
         staticfiles_storage = storage.staticfiles_storage
         try:
             storage.staticfiles_storage._wrapped = empty
-            with self.settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.StaticFilesStorage'):
+            with self.settings(STATICFILES_STORAGE='mango.contrib.staticfiles.storage.StaticFilesStorage'):
                 command = collectstatic.Command()
                 self.assertTrue(command.is_local_storage())
 
@@ -160,7 +160,7 @@ class TestCollectionHelpSubcommand(AdminScriptTestCase):
         Even if the STATIC_ROOT setting is not set, one can still call the
         `manage.py help collectstatic` command.
         """
-        self.write_settings('settings.py', apps=['django.contrib.staticfiles'])
+        self.write_settings('settings.py', apps=['mango.contrib.staticfiles'])
         out, err = self.run_manage(['help', 'collectstatic'])
         self.assertNoOutput(err)
 
@@ -218,13 +218,13 @@ class TestCollectionVerbosity(CollectionTestCase):
         self.assertIn(self.staticfiles_copied_msg, output)
         self.assertIn(self.copying_msg, output)
 
-    @override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage')
+    @override_settings(STATICFILES_STORAGE='mango.contrib.staticfiles.storage.ManifestStaticFilesStorage')
     def test_verbosity_1_with_post_process(self):
         stdout = StringIO()
         self.run_collectstatic(verbosity=1, stdout=stdout, post_process=True)
         self.assertNotIn(self.post_process_msg, stdout.getvalue())
 
-    @override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage')
+    @override_settings(STATICFILES_STORAGE='mango.contrib.staticfiles.storage.ManifestStaticFilesStorage')
     def test_verbosity_2_with_post_process(self):
         stdout = StringIO()
         self.run_collectstatic(verbosity=2, stdout=stdout, post_process=True)
@@ -352,7 +352,7 @@ class TestCollectionDryRun(TestNoFilesCreated, CollectionTestCase):
         super().run_collectstatic(dry_run=True)
 
 
-@override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage')
+@override_settings(STATICFILES_STORAGE='mango.contrib.staticfiles.storage.ManifestStaticFilesStorage')
 class TestCollectionDryRunManifestStaticFilesStorage(TestCollectionDryRun):
     pass
 

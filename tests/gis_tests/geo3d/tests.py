@@ -1,12 +1,12 @@
 import os
 import re
 
-from django.contrib.gis.db.models import Extent3D, Union
-from django.contrib.gis.db.models.functions import (
+from mango.contrib.gis.db.models import Extent3D, Union
+from mango.contrib.gis.db.models.functions import (
     AsGeoJSON, AsKML, Length, Perimeter, Scale, Translate,
 )
-from django.contrib.gis.geos import GEOSGeometry, LineString, Point, Polygon
-from django.test import TestCase, skipUnlessDBFeature
+from mango.contrib.gis.geos import GEOSGeometry, LineString, Point, Polygon
+from mango.test import TestCase, skipUnlessDBFeature
 
 from ..utils import FuncTestMixin
 from .models import (
@@ -99,7 +99,7 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
     """
     Only a subset of the PostGIS routines are 3D-enabled, and this TestCase
     tries to test the features that can handle 3D and that are also
-    available within GeoDjango.  For more information, see the PostGIS docs
+    available within GeoMango.  For more information, see the PostGIS docs
     on the routines that support 3D:
 
     https://postgis.net/docs/PostGIS_Special_Functions_Index.html#PostGIS_3D_Functions
@@ -142,7 +142,7 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
         Testing LayerMapping on 3D models.
         """
         # Import here as GDAL is required for those imports
-        from django.contrib.gis.utils import LayerMapError, LayerMapping
+        from mango.contrib.gis.utils import LayerMapError, LayerMapping
 
         point_mapping = {'point': 'POINT'}
         mpoint_mapping = {'mpoint': 'MULTIPOINT'}

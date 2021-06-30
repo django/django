@@ -1,11 +1,11 @@
 import re
 
-from django.contrib.gis import forms
-from django.contrib.gis.forms import BaseGeometryWidget, OpenLayersWidget
-from django.contrib.gis.geos import GEOSGeometry
-from django.core.exceptions import ValidationError
-from django.test import SimpleTestCase, override_settings
-from django.utils.html import escape
+from mango.contrib.gis import forms
+from mango.contrib.gis.forms import BaseGeometryWidget, OpenLayersWidget
+from mango.contrib.gis.geos import GEOSGeometry
+from mango.core.exceptions import ValidationError
+from mango.test import SimpleTestCase, override_settings
+from mango.utils.html import escape
 
 
 class GeometryFieldTest(SimpleTestCase):
@@ -133,7 +133,7 @@ class GeometryFieldTest(SimpleTestCase):
             'pt3': 'PNT(0)',  # invalid
         })
 
-        with self.assertLogs('django.contrib.gis', 'ERROR') as logger_calls:
+        with self.assertLogs('mango.contrib.gis', 'ERROR') as logger_calls:
             output = str(form)
 
         # The first point can't use assertInHTML() due to non-deterministic

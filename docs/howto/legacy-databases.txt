@@ -1,21 +1,21 @@
 =========================================
-Integrating Django with a legacy database
+Integrating Mango with a legacy database
 =========================================
 
-While Django is best suited for developing new applications, it's quite
-possible to integrate it into legacy databases. Django includes a couple of
+While Mango is best suited for developing new applications, it's quite
+possible to integrate it into legacy databases. Mango includes a couple of
 utilities to automate as much of this process as possible.
 
-This document assumes you know the Django basics, as covered in the
+This document assumes you know the Mango basics, as covered in the
 :doc:`tutorial </intro/tutorial01>`.
 
-Once you've got Django set up, you'll follow this general process to integrate
+Once you've got Mango set up, you'll follow this general process to integrate
 with an existing database.
 
-Give Django your database parameters
+Give Mango your database parameters
 ====================================
 
-You'll need to tell Django what your database connection parameters are, and
+You'll need to tell Mango what your database connection parameters are, and
 what the name of the database is. Do that by editing the :setting:`DATABASES`
 setting and assigning values to the following keys for the ``'default'``
 connection:
@@ -32,7 +32,7 @@ Auto-generate the models
 
 .. highlight:: bash
 
-Django comes with a utility called :djadmin:`inspectdb` that can create models
+Mango comes with a utility called :djadmin:`inspectdb` that can create models
 by introspecting an existing database. You can view the output by running this
 command::
 
@@ -50,7 +50,7 @@ the Python package that holds your app. Then add the app to your
 :setting:`INSTALLED_APPS` setting.
 
 By default, :djadmin:`inspectdb` creates unmanaged models. That is,
-``managed = False`` in the model's ``Meta`` class tells Django not to manage
+``managed = False`` in the model's ``Meta`` class tells Mango not to manage
 each table's creation, modification, and deletion::
 
     class Person(models.Model):
@@ -60,11 +60,11 @@ each table's creation, modification, and deletion::
            managed = False
            db_table = 'CENSUS_PERSONS'
 
-If you do want to allow Django to manage the table's lifecycle, you'll need to
-change the :attr:`~django.db.models.Options.managed` option above to ``True``
+If you do want to allow Mango to manage the table's lifecycle, you'll need to
+change the :attr:`~mango.db.models.Options.managed` option above to ``True``
 (or remove it because ``True`` is its default value).
 
-Install the core Django tables
+Install the core Mango tables
 ==============================
 
 Next, run the :djadmin:`migrate` command to install any extra needed database
@@ -75,7 +75,7 @@ records such as admin permissions and content types::
 Test and tweak
 ==============
 
-Those are the basic steps -- from here you'll want to tweak the models Django
+Those are the basic steps -- from here you'll want to tweak the models Mango
 generated until they work the way you'd like. Try accessing your data via the
-Django database API, and try editing objects via Django's admin site, and edit
+Mango database API, and try editing objects via Mango's admin site, and edit
 the models file accordingly.

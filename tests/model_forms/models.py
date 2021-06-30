@@ -3,10 +3,10 @@ import os
 import tempfile
 import uuid
 
-from django.core import validators
-from django.core.exceptions import ValidationError
-from django.core.files.storage import FileSystemStorage
-from django.db import models
+from mango.core import validators
+from mango.core.exceptions import ValidationError
+from mango.core.files.storage import FileSystemStorage
+from mango.db import models
 
 temp_storage_dir = tempfile.mkdtemp()
 temp_storage = FileSystemStorage(temp_storage_dir)

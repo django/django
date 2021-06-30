@@ -1,6 +1,6 @@
-from django.db.models import IntegerField, Value
-from django.db.models.functions import Lower, Right
-from django.test import TestCase
+from mango.db.models import IntegerField, Value
+from mango.db.models.functions import Lower, Right
+from mango.test import TestCase
 
 from ..models import Author
 

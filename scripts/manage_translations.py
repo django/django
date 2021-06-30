@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
-# This Python file contains utility scripts to manage Django translations.
-# It has to be run inside the django git root directory.
+# This Python file contains utility scripts to manage Mango translations.
+# It has to be run inside the mango git root directory.
 #
 # The following commands are available:
 #
@@ -22,9 +22,9 @@ import os
 from argparse import ArgumentParser
 from subprocess import PIPE, run
 
-import django
-from django.conf import settings
-from django.core.management import call_command
+import mango
+from mango.conf import settings
+from mango.core.management import call_command
 
 HAVE_JS = ['admin']
 
@@ -32,10 +32,10 @@ HAVE_JS = ['admin']
 def _get_locale_dirs(resources, include_core=True):
     """
     Return a tuple (contrib name, absolute path) for all locale directories,
-    optionally including the django core catalog.
+    optionally including the mango core catalog.
     If resources list is not None, filter directories matching resources content.
     """
-    contrib_dir = os.path.join(os.getcwd(), 'django', 'contrib')
+    contrib_dir = os.path.join(os.getcwd(), 'mango', 'contrib')
     dirs = []
 
     # Collect all locale directories
@@ -46,7 +46,7 @@ def _get_locale_dirs(resources, include_core=True):
             if contrib_name in HAVE_JS:
                 dirs.append(("%s-js" % contrib_name, path))
     if include_core:
-        dirs.insert(0, ('core', os.path.join(os.getcwd(), 'django', 'conf', 'locale')))
+        dirs.insert(0, ('core', os.path.join(os.getcwd(), 'mango', 'conf', 'locale')))
 
     # Filter by resources, if any
     if resources is not None:
@@ -62,16 +62,16 @@ def _get_locale_dirs(resources, include_core=True):
 def _tx_resource_for_name(name):
     """ Return the Transifex resource name """
     if name == 'core':
-        return "django.core"
+        return "mango.core"
     else:
-        return "django.contrib-%s" % name
+        return "mango.contrib-%s" % name
 
 
 def _check_diff(cat_name, base_path):
     """
     Output the approximate number of changed/added strings in the en catalog.
     """
-    po_path = '%(path)s/en/LC_MESSAGES/django%(ext)s.po' % {
+    po_path = '%(path)s/en/LC_MESSAGES/mango%(ext)s.po' % {
         'path': base_path, 'ext': 'js' if cat_name.endswith('-js') else ''}
     p = run("git diff -U0 %s | egrep '^[-+]msgid' | wc -l" % po_path,
             stdout=PIPE, stderr=PIPE, shell=True)
@@ -81,20 +81,20 @@ def _check_diff(cat_name, base_path):
 
 def update_catalogs(resources=None, languages=None):
     """
-    Update the en/LC_MESSAGES/django.po (main and contrib) files with
+    Update the en/LC_MESSAGES/mango.po (main and contrib) files with
     new/updated translatable strings.
     """
     settings.configure()
-    django.setup()
+    mango.setup()
     if resources is not None:
         print("`update_catalogs` will always process all resources.")
     contrib_dirs = _get_locale_dirs(None, include_core=False)
 
-    os.chdir(os.path.join(os.getcwd(), 'django'))
-    print("Updating en catalogs for Django and contrib apps...")
+    os.chdir(os.path.join(os.getcwd(), 'mango'))
+    print("Updating en catalogs for Mango and contrib apps...")
     call_command('makemessages', locale=['en'])
-    print("Updating en JS catalogs for Django and contrib apps...")
-    call_command('makemessages', locale=['en'], domain='djangojs')
+    print("Updating en JS catalogs for Mango and contrib apps...")
+    call_command('makemessages', locale=['en'], domain='mangojs')
 
     # Output changed stats
     _check_diff('core', os.path.join(os.getcwd(), 'conf', 'locale'))
@@ -105,7 +105,7 @@ def update_catalogs(resources=None, languages=None):
 def lang_stats(resources=None, languages=None):
     """
     Output language statistics of committed translation files for each
-    Django catalog.
+    Mango catalog.
     If resources is provided, it should be a list of translation resource to
     limit the output (e.g. ['core', 'gis']).
     """
@@ -118,7 +118,7 @@ def lang_stats(resources=None, languages=None):
             if languages and lang not in languages:
                 continue
             # TODO: merge first with the latest en catalog
-            po_path = '{path}/{lang}/LC_MESSAGES/django{ext}.po'.format(
+            po_path = '{path}/{lang}/LC_MESSAGES/mango{ext}.po'.format(
                 path=dir_, lang=lang, ext='js' if name.endswith('-js') else ''
             )
             p = run(
@@ -156,7 +156,7 @@ def fetch(resources=None, languages=None):
 
         # msgcat to wrap lines and msgfmt for compilation of .mo file
         for lang in target_langs:
-            po_path = '%(path)s/%(lang)s/LC_MESSAGES/django%(ext)s.po' % {
+            po_path = '%(path)s/%(lang)s/LC_MESSAGES/mango%(ext)s.po' % {
                 'path': dir_, 'lang': lang, 'ext': 'js' if name.endswith('-js') else ''}
             if not os.path.exists(po_path):
                 print("No %(lang)s translation for resource %(name)s" % {

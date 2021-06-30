@@ -1,15 +1,15 @@
 import datetime
 from decimal import Decimal
 
-from django.db.models import (
+from mango.db.models import (
     AutoField, BinaryField, BooleanField, CharField, DateField, DateTimeField,
     DecimalField, EmailField, FileField, FilePathField, FloatField,
     GenericIPAddressField, ImageField, IntegerField, IPAddressField,
     PositiveBigIntegerField, PositiveIntegerField, PositiveSmallIntegerField,
     SlugField, SmallIntegerField, TextField, TimeField, URLField,
 )
-from django.test import SimpleTestCase
-from django.utils.functional import lazy
+from mango.test import SimpleTestCase
+from mango.utils.functional import lazy
 
 
 class PromiseTest(SimpleTestCase):

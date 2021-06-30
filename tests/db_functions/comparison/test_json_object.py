@@ -1,9 +1,9 @@
-from django.db import NotSupportedError
-from django.db.models import F, Value
-from django.db.models.functions import JSONObject, Lower
-from django.test import TestCase
-from django.test.testcases import skipIfDBFeature, skipUnlessDBFeature
-from django.utils import timezone
+from mango.db import NotSupportedError
+from mango.db.models import F, Value
+from mango.db.models.functions import JSONObject, Lower
+from mango.test import TestCase
+from mango.test.testcases import skipIfDBFeature, skipUnlessDBFeature
+from mango.utils import timezone
 
 from ..models import Article, Author
 

@@ -1,18 +1,18 @@
 from unittest import mock
 from urllib.parse import urlencode
 
-from django.contrib.sitemaps import (
+from mango.contrib.sitemaps import (
     SitemapNotFound, _get_sitemap_full_url, ping_google,
 )
-from django.core.exceptions import ImproperlyConfigured
-from django.test import modify_settings, override_settings
+from mango.core.exceptions import ImproperlyConfigured
+from mango.test import modify_settings, override_settings
 
 from .base import SitemapTestsBase
 
 
 class PingGoogleTests(SitemapTestsBase):
 
-    @mock.patch('django.contrib.sitemaps.urlopen')
+    @mock.patch('mango.contrib.sitemaps.urlopen')
     def test_something(self, urlopen):
         ping_google()
         params = urlencode({'sitemap': 'https://example.com/sitemap-without-entries/sitemap.xml'})
@@ -41,8 +41,8 @@ class PingGoogleTests(SitemapTestsBase):
             'http://example.com/foo.xml'
         )
 
-    @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
+    @modify_settings(INSTALLED_APPS={'remove': 'mango.contrib.sites'})
     def test_get_sitemap_full_url_no_sites(self):
-        msg = "ping_google requires django.contrib.sites, which isn't installed."
+        msg = "ping_google requires mango.contrib.sites, which isn't installed."
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             _get_sitemap_full_url(None)

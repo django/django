@@ -1,5 +1,5 @@
-from django.core.management.base import BaseCommand
-from django.urls import reverse
+from mango.core.management.base import BaseCommand
+from mango.urls import reverse
 
 
 class Command(BaseCommand):

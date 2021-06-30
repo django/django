@@ -4,16 +4,16 @@ from unittest import mock
 
 from multiple_database.routers import TestRouter
 
-from django.core.exceptions import FieldError
-from django.db import (
+from mango.core.exceptions import FieldError
+from mango.db import (
     DatabaseError, NotSupportedError, connection, connections, router,
     transaction,
 )
-from django.test import (
+from mango.test import (
     TransactionTestCase, override_settings, skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.test.utils import CaptureQueriesContext
+from mango.test.utils import CaptureQueriesContext
 
 from .models import (
     City, CityCountryProxy, Country, EUCity, EUCountry, Person, PersonProfile,

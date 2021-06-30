@@ -1,11 +1,11 @@
 import random
 
-from django.contrib.messages import constants
-from django.contrib.messages.storage.fallback import (
+from mango.contrib.messages import constants
+from mango.contrib.messages.storage.fallback import (
     CookieStorage, FallbackStorage,
 )
-from django.test import SimpleTestCase
-from django.utils.crypto import get_random_string
+from mango.test import SimpleTestCase
+from mango.utils.crypto import get_random_string
 
 from .base import BaseTests
 from .test_cookie import set_cookie_data, stored_cookie_messages_count

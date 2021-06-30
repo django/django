@@ -1,23 +1,23 @@
-from django.template import TemplateDoesNotExist
-from django.template.loader import (
+from mango.template import TemplateDoesNotExist
+from mango.template.loader import (
     get_template, render_to_string, select_template,
 )
-from django.test import SimpleTestCase, override_settings
-from django.test.client import RequestFactory
+from mango.test import SimpleTestCase, override_settings
+from mango.test.client import RequestFactory
 
 
 @override_settings(TEMPLATES=[{
-    'BACKEND': 'django.template.backends.dummy.TemplateStrings',
+    'BACKEND': 'mango.template.backends.dummy.TemplateStrings',
     'APP_DIRS': True,
 }, {
-    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'BACKEND': 'mango.template.backends.mango.MangoTemplates',
     'OPTIONS': {
         'context_processors': [
-            'django.template.context_processors.request',
+            'mango.template.context_processors.request',
         ],
         'loaders': [
-            'django.template.loaders.filesystem.Loader',
-            'django.template.loaders.app_directories.Loader',
+            'mango.template.loaders.filesystem.Loader',
+            'mango.template.loaders.app_directories.Loader',
         ]
     },
 }])
@@ -29,11 +29,11 @@ class TemplateLoaderTests(SimpleTestCase):
 
     def test_get_template_second_engine(self):
         template = get_template("template_loader/goodbye.html")
-        self.assertEqual(template.render(), "Goodbye! (Django templates)\n")
+        self.assertEqual(template.render(), "Goodbye! (Mango templates)\n")
 
     def test_get_template_using_engine(self):
-        template = get_template("template_loader/hello.html", using="django")
-        self.assertEqual(template.render(), "Hello! (Django templates)\n")
+        template = get_template("template_loader/hello.html", using="mango")
+        self.assertEqual(template.render(), "Hello! (Mango templates)\n")
 
     def test_get_template_not_found(self):
         with self.assertRaises(TemplateDoesNotExist) as e:
@@ -42,7 +42,7 @@ class TemplateLoaderTests(SimpleTestCase):
             e.exception.chain[-1].tried[0][0].template_name,
             'template_loader/unknown.html',
         )
-        self.assertEqual(e.exception.chain[-1].backend.name, 'django')
+        self.assertEqual(e.exception.chain[-1].backend.name, 'mango')
 
     def test_select_template_first_engine(self):
         template = select_template(["template_loader/unknown.html",
@@ -52,12 +52,12 @@ class TemplateLoaderTests(SimpleTestCase):
     def test_select_template_second_engine(self):
         template = select_template(["template_loader/unknown.html",
                                     "template_loader/goodbye.html"])
-        self.assertEqual(template.render(), "Goodbye! (Django templates)\n")
+        self.assertEqual(template.render(), "Goodbye! (Mango templates)\n")
 
     def test_select_template_using_engine(self):
         template = select_template(["template_loader/unknown.html",
-                                    "template_loader/hello.html"], using="django")
-        self.assertEqual(template.render(), "Hello! (Django templates)\n")
+                                    "template_loader/hello.html"], using="mango")
+        self.assertEqual(template.render(), "Hello! (Mango templates)\n")
 
     def test_select_template_empty(self):
         with self.assertRaises(TemplateDoesNotExist):
@@ -85,12 +85,12 @@ class TemplateLoaderTests(SimpleTestCase):
             e.exception.chain[-1].tried[0][0].template_name,
             'template_loader/missing.html',
         )
-        self.assertEqual(e.exception.chain[-1].backend.name, 'django')
+        self.assertEqual(e.exception.chain[-1].backend.name, 'mango')
 
     def test_select_template_tries_all_engines_before_names(self):
         template = select_template(["template_loader/goodbye.html",
                                     "template_loader/hello.html"])
-        self.assertEqual(template.render(), "Goodbye! (Django templates)\n")
+        self.assertEqual(template.render(), "Goodbye! (Mango templates)\n")
 
     def test_render_to_string_first_engine(self):
         content = render_to_string("template_loader/hello.html")
@@ -98,7 +98,7 @@ class TemplateLoaderTests(SimpleTestCase):
 
     def test_render_to_string_second_engine(self):
         content = render_to_string("template_loader/goodbye.html")
-        self.assertEqual(content, "Goodbye! (Django templates)\n")
+        self.assertEqual(content, "Goodbye! (Mango templates)\n")
 
     def test_render_to_string_with_request(self):
         request = RequestFactory().get('/foobar/')
@@ -106,8 +106,8 @@ class TemplateLoaderTests(SimpleTestCase):
         self.assertEqual(content, "/foobar/\n")
 
     def test_render_to_string_using_engine(self):
-        content = render_to_string("template_loader/hello.html", using="django")
-        self.assertEqual(content, "Hello! (Django templates)\n")
+        content = render_to_string("template_loader/hello.html", using="mango")
+        self.assertEqual(content, "Hello! (Mango templates)\n")
 
     def test_render_to_string_not_found(self):
         with self.assertRaises(TemplateDoesNotExist) as e:
@@ -116,7 +116,7 @@ class TemplateLoaderTests(SimpleTestCase):
             e.exception.chain[-1].tried[0][0].template_name,
             'template_loader/unknown.html',
         )
-        self.assertEqual(e.exception.chain[-1].backend.name, 'django')
+        self.assertEqual(e.exception.chain[-1].backend.name, 'mango')
 
     def test_render_to_string_with_list_first_engine(self):
         content = render_to_string(["template_loader/unknown.html",
@@ -126,12 +126,12 @@ class TemplateLoaderTests(SimpleTestCase):
     def test_render_to_string_with_list_second_engine(self):
         content = render_to_string(["template_loader/unknown.html",
                                     "template_loader/goodbye.html"])
-        self.assertEqual(content, "Goodbye! (Django templates)\n")
+        self.assertEqual(content, "Goodbye! (Mango templates)\n")
 
     def test_render_to_string_with_list_using_engine(self):
         content = render_to_string(["template_loader/unknown.html",
-                                    "template_loader/hello.html"], using="django")
-        self.assertEqual(content, "Hello! (Django templates)\n")
+                                    "template_loader/hello.html"], using="mango")
+        self.assertEqual(content, "Hello! (Mango templates)\n")
 
     def test_render_to_string_with_list_empty(self):
         with self.assertRaises(TemplateDoesNotExist):
@@ -150,7 +150,7 @@ class TemplateLoaderTests(SimpleTestCase):
             e.exception.chain[1].tried[0][0].template_name,
             'template_loader/unknown.html',
         )
-        self.assertEqual(e.exception.chain[1].backend.name, 'django')
+        self.assertEqual(e.exception.chain[1].backend.name, 'mango')
         self.assertEqual(
             e.exception.chain[2].tried[0][0].template_name,
             'template_loader/missing.html',
@@ -160,9 +160,9 @@ class TemplateLoaderTests(SimpleTestCase):
             e.exception.chain[3].tried[0][0].template_name,
             'template_loader/missing.html',
         )
-        self.assertEqual(e.exception.chain[3].backend.name, 'django')
+        self.assertEqual(e.exception.chain[3].backend.name, 'mango')
 
     def test_render_to_string_with_list_tries_all_engines_before_names(self):
         content = render_to_string(["template_loader/goodbye.html",
                                     "template_loader/hello.html"])
-        self.assertEqual(content, "Goodbye! (Django templates)\n")
+        self.assertEqual(content, "Goodbye! (Mango templates)\n")

@@ -1,8 +1,8 @@
-from django.contrib.auth.models import (
+from mango.contrib.auth.models import (
     AbstractBaseUser, AbstractUser, BaseUserManager, Group, Permission,
     PermissionsMixin, UserManager,
 )
-from django.db import models
+from mango.db import models
 
 
 # The custom user uses email as the unique identifier, and requires

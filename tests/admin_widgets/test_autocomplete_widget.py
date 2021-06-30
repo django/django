@@ -1,9 +1,9 @@
-from django import forms
-from django.contrib import admin
-from django.contrib.admin.widgets import AutocompleteSelect
-from django.forms import ModelChoiceField
-from django.test import TestCase, override_settings
-from django.utils import translation
+from mango import forms
+from mango.contrib import admin
+from mango.contrib.admin.widgets import AutocompleteSelect
+from mango.forms import ModelChoiceField
+from mango.test import TestCase, override_settings
+from mango.utils import translation
 
 from .models import Album, Band, ReleaseEvent, VideoStream
 

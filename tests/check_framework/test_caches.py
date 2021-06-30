@@ -1,23 +1,23 @@
 import pathlib
 
-from django.core.checks import Warning
-from django.core.checks.caches import (
+from mango.core.checks import Warning
+from mango.core.checks.caches import (
     E001, check_cache_location_not_exposed, check_default_cache_is_configured,
     check_file_based_cache_is_absolute,
 )
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from mango.test import SimpleTestCase
+from mango.test.utils import override_settings
 
 
 class CheckCacheSettingsAppDirsTest(SimpleTestCase):
     VALID_CACHES_CONFIGURATION = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'mango.core.cache.backends.locmem.LocMemCache',
         },
     }
     INVALID_CACHES_CONFIGURATION = {
         'other': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'mango.core.cache.backends.locmem.LocMemCache',
         },
     }
 
@@ -47,7 +47,7 @@ class CheckCacheLocationTest(SimpleTestCase):
         return {
             'CACHES': {
                 'default': {
-                    'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+                    'BACKEND': 'mango.core.cache.backends.filebased.FileBasedCache',
                     'LOCATION': cache_path,
                 },
             },
@@ -125,7 +125,7 @@ class CheckCacheAbsolutePath(SimpleTestCase):
     def test_absolute_path(self):
         with self.settings(CACHES={
             'default': {
-                'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+                'BACKEND': 'mango.core.cache.backends.filebased.FileBasedCache',
                 'LOCATION': pathlib.Path.cwd() / 'cache',
             },
         }):
@@ -134,7 +134,7 @@ class CheckCacheAbsolutePath(SimpleTestCase):
     def test_relative_path(self):
         with self.settings(CACHES={
             'default': {
-                'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+                'BACKEND': 'mango.core.cache.backends.filebased.FileBasedCache',
                 'LOCATION': 'cache',
             },
         }):

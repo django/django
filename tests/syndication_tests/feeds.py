@@ -1,6 +1,6 @@
-from django.contrib.syndication import views
-from django.utils import feedgenerator
-from django.utils.timezone import get_fixed_timezone
+from mango.contrib.syndication import views
+from mango.utils import feedgenerator
+from mango.utils.timezone import get_fixed_timezone
 
 from .models import Article, Entry
 
@@ -13,7 +13,7 @@ class TestRss2Feed(views.Feed):
     author_name = 'Sally Smith'
     author_email = 'test@example.com'
     author_link = 'http://www.example.com/'
-    categories = ('python', 'django')
+    categories = ('python', 'mango')
     feed_copyright = 'Copyright (c) 2007, Sally Smith'
     ttl = 600
 
@@ -192,7 +192,7 @@ class MyCustomAtom1Feed(feedgenerator.Atom1Feed):
     """
     def root_attributes(self):
         attrs = super().root_attributes()
-        attrs['django'] = 'rocks'
+        attrs['mango'] = 'rocks'
         return attrs
 
     def add_root_elements(self, handler):

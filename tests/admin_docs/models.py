@@ -2,8 +2,8 @@
 Models for testing various aspects of the djang.contrib.admindocs app
 """
 
-from django.db import models
-from django.utils.functional import cached_property
+from mango.db import models
+from mango.utils.functional import cached_property
 
 
 class Company(models.Model):

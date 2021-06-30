@@ -1,6 +1,6 @@
-from django.core.exceptions import ValidationError
-from django.forms import MultipleChoiceField
-from django.test import SimpleTestCase
+from mango.core.exceptions import ValidationError
+from mango.forms import MultipleChoiceField
+from mango.test import SimpleTestCase
 
 
 class MultipleChoiceFieldTest(SimpleTestCase):

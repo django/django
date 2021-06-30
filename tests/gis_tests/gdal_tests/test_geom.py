@@ -1,12 +1,12 @@
 import json
 import pickle
 
-from django.contrib.gis.gdal import (
+from mango.contrib.gis.gdal import (
     CoordTransform, GDALException, OGRGeometry, OGRGeomType, SpatialReference,
 )
-from django.template import Context
-from django.template.engine import Engine
-from django.test import SimpleTestCase
+from mango.template import Context
+from mango.template.engine import Engine
+from mango.test import SimpleTestCase
 
 from ..test_data import TestDataMixin
 
@@ -43,11 +43,11 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(OGRGeomType(1), OGRGeomType('point'))
         self.assertNotEqual(OGRGeomType('POINT'), OGRGeomType(6))
 
-        # Testing the Django field name equivalent property.
-        self.assertEqual('PointField', OGRGeomType('Point').django)
-        self.assertEqual('GeometryField', OGRGeomType('Geometry').django)
-        self.assertEqual('GeometryField', OGRGeomType('Unknown').django)
-        self.assertIsNone(OGRGeomType('none').django)
+        # Testing the Mango field name equivalent property.
+        self.assertEqual('PointField', OGRGeomType('Point').mango)
+        self.assertEqual('GeometryField', OGRGeomType('Geometry').mango)
+        self.assertEqual('GeometryField', OGRGeomType('Unknown').mango)
+        self.assertIsNone(OGRGeomType('none').mango)
 
         # 'Geometry' initialization implies an unknown geometry type.
         gt = OGRGeomType('Geometry')
@@ -59,7 +59,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         wkb25bit = OGRGeomType.wkb25bit
         self.assertEqual(OGRGeomType(wkb25bit + 1), 'Point25D')
         self.assertEqual(OGRGeomType('MultiLineString25D'), (5 + wkb25bit))
-        self.assertEqual('GeometryCollectionField', OGRGeomType('GeometryCollection25D').django)
+        self.assertEqual('GeometryCollectionField', OGRGeomType('GeometryCollection25D').mango)
 
     def test_wkt(self):
         "Testing WKT output."

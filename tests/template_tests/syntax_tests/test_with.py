@@ -1,6 +1,6 @@
-from django.template import TemplateSyntaxError
-from django.template.defaulttags import WithNode
-from django.test import SimpleTestCase
+from mango.template import TemplateSyntaxError
+from mango.template.defaulttags import WithNode
+from mango.test import SimpleTestCase
 
 from ..utils import setup
 

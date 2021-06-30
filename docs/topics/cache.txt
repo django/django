@@ -1,5 +1,5 @@
 ========================
-Django's cache framework
+Mango's cache framework
 ========================
 
 A fundamental trade-off in dynamic websites is, well, they're dynamic. Each
@@ -28,13 +28,13 @@ explaining how this would work for a dynamically generated Web page::
         save the generated page in the cache (for next time)
         return the generated page
 
-Django comes with a robust cache system that lets you save dynamic pages so
-they don't have to be calculated for each request. For convenience, Django
+Mango comes with a robust cache system that lets you save dynamic pages so
+they don't have to be calculated for each request. For convenience, Mango
 offers different levels of cache granularity: You can cache the output of
 specific views, you can cache only the pieces that are difficult to produce,
 or you can cache your entire site.
 
-Django also works well with "downstream" caches, such as `Squid
+Mango also works well with "downstream" caches, such as `Squid
 <http://www.squid-cache.org/>`_ and browser-based caches. These are the types
 of caches that you don't directly control but to which you can provide hints
 (via HTTP headers) about which parts of your site should be cached, and how.
@@ -62,7 +62,7 @@ settings file. Here's an explanation of all available values for
 Memcached
 ---------
 
-The fastest, most efficient type of cache supported natively by Django,
+The fastest, most efficient type of cache supported natively by Mango,
 Memcached__ is an entirely memory-based cache server, originally developed
 to handle high loads at LiveJournal.com and subsequently open-sourced by
 Danga Interactive. It is used by sites such as Facebook and Wikipedia to
@@ -77,16 +77,16 @@ database or filesystem usage.
 
 After installing Memcached itself, you'll need to install a Memcached
 binding. There are several Python Memcached bindings available; the
-two supported by Django are `pylibmc`_ and `pymemcache`_.
+two supported by Mango are `pylibmc`_ and `pymemcache`_.
 
 .. _`pylibmc`: https://pypi.org/project/pylibmc/
 .. _`pymemcache`: https://pypi.org/project/pymemcache/
 
-To use Memcached with Django:
+To use Memcached with Mango:
 
 * Set :setting:`BACKEND <CACHES-BACKEND>` to
-  ``django.core.cache.backends.memcached.PyMemcacheCache`` or
-  ``django.core.cache.backends.memcached.PyLibMCCache`` (depending on your
+  ``mango.core.cache.backends.memcached.PyMemcacheCache`` or
+  ``mango.core.cache.backends.memcached.PyLibMCCache`` (depending on your
   chosen memcached binding)
 
 * Set :setting:`LOCATION <CACHES-LOCATION>` to ``ip:port`` values,
@@ -99,7 +99,7 @@ the ``pymemcache`` binding::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+            'BACKEND': 'mango.core.cache.backends.memcached.PyMemcacheCache',
             'LOCATION': '127.0.0.1:11211',
         }
     }
@@ -109,7 +109,7 @@ In this example, Memcached is available through a local Unix socket file
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+            'BACKEND': 'mango.core.cache.backends.memcached.PyMemcacheCache',
             'LOCATION': 'unix:/tmp/memcached.sock',
         }
     }
@@ -127,7 +127,7 @@ address 172.19.26.240 and 172.19.26.242, both on port 11211::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+            'BACKEND': 'mango.core.cache.backends.memcached.PyMemcacheCache',
             'LOCATION': [
                 '172.19.26.240:11211',
                 '172.19.26.242:11211',
@@ -141,7 +141,7 @@ on the IP addresses 172.19.26.240 (port 11211), 172.19.26.242 (port 11212), and
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+            'BACKEND': 'mango.core.cache.backends.memcached.PyMemcacheCache',
             'LOCATION': [
                 '172.19.26.240:11211',
                 '172.19.26.242:11212',
@@ -154,7 +154,7 @@ A final point about Memcached is that memory-based caching has a
 disadvantage: because the cached data is stored in memory, the data will be
 lost if your server crashes. Clearly, memory isn't intended for permanent data
 storage, so don't rely on memory-based caching as your only data storage.
-Without a doubt, *none* of the Django caching backends should be used for
+Without a doubt, *none* of the Mango caching backends should be used for
 permanent storage -- they're all intended to be solutions for caching, not
 storage -- but we point this out here because memory-based caching is
 particularly temporary.
@@ -174,13 +174,13 @@ particularly temporary.
 Database caching
 ----------------
 
-Django can store its cached data in your database. This works best if you've
+Mango can store its cached data in your database. This works best if you've
 got a fast, well-indexed database server.
 
 To use a database table as your cache backend:
 
 * Set :setting:`BACKEND <CACHES-BACKEND>` to
-  ``django.core.cache.backends.db.DatabaseCache``
+  ``mango.core.cache.backends.db.DatabaseCache``
 
 * Set :setting:`LOCATION <CACHES-LOCATION>` to ``tablename``, the name of the
   database table. This name can be whatever you want, as long as it's a valid
@@ -190,7 +190,7 @@ In this example, the cache table's name is ``my_cache_table``::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'BACKEND': 'mango.core.cache.backends.db.DatabaseCache',
             'LOCATION': 'my_cache_table',
         }
     }
@@ -208,7 +208,7 @@ command::
     python manage.py createcachetable
 
 This creates a table in your database that is in the proper format that
-Django's database-cache system expects. The name of the table is taken from
+Mango's database-cache system expects. The name of the table is taken from
 :setting:`LOCATION <CACHES-LOCATION>`.
 
 If you are using multiple database caches, :djadmin:`createcachetable` creates
@@ -229,7 +229,7 @@ Multiple databases
 If you use database caching with multiple databases, you'll also need
 to set up routing instructions for your database cache table. For the
 purposes of routing, the database cache table appears as a model named
-``CacheEntry``, in an application named ``django_cache``. This model
+``CacheEntry``, in an application named ``mango_cache``. This model
 won't appear in the models cache, but the model details can be used
 for routing purposes.
 
@@ -243,19 +243,19 @@ operations to ``cache_replica``, and all write operations to
 
         def db_for_read(self, model, **hints):
             "All cache read operations go to the replica"
-            if model._meta.app_label == 'django_cache':
+            if model._meta.app_label == 'mango_cache':
                 return 'cache_replica'
             return None
 
         def db_for_write(self, model, **hints):
             "All cache write operations go to primary"
-            if model._meta.app_label == 'django_cache':
+            if model._meta.app_label == 'mango_cache':
                 return 'cache_primary'
             return None
 
         def allow_migrate(self, db, app_label, model_name=None, **hints):
             "Only install the cache model on primary"
-            if app_label == 'django_cache':
+            if app_label == 'mango_cache':
                 return db == 'cache_primary'
             return None
 
@@ -270,14 +270,14 @@ Filesystem caching
 
 The file-based backend serializes and stores each cache value as a separate
 file. To use this backend set :setting:`BACKEND <CACHES-BACKEND>` to
-``"django.core.cache.backends.filebased.FileBasedCache"`` and
+``"mango.core.cache.backends.filebased.FileBasedCache"`` and
 :setting:`LOCATION <CACHES-LOCATION>` to a suitable directory. For example,
-to store cached data in ``/var/tmp/django_cache``, use this setting::
+to store cached data in ``/var/tmp/mango_cache``, use this setting::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-            'LOCATION': '/var/tmp/django_cache',
+            'BACKEND': 'mango.core.cache.backends.filebased.FileBasedCache',
+            'LOCATION': '/var/tmp/mango_cache',
         }
     }
 
@@ -286,7 +286,7 @@ like this::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+            'BACKEND': 'mango.core.cache.backends.filebased.FileBasedCache',
             'LOCATION': 'c:/foo/bar',
         }
     }
@@ -298,7 +298,7 @@ setting.
 Make sure the directory pointed-to by this setting either exists and is
 readable and writable, or that it can be created by the system user under which
 your Web server runs. Continuing the above example, if your server runs as the
-user ``apache``, make sure the directory ``/var/tmp/django_cache`` exists and
+user ``apache``, make sure the directory ``/var/tmp/mango_cache`` exists and
 is readable and writable by the user ``apache``, or that it can be created by
 the user ``apache``.
 
@@ -321,12 +321,12 @@ This is the default cache if another is not specified in your settings file. If
 you want the speed advantages of in-memory caching but don't have the capability
 of running Memcached, consider the local-memory cache backend. This cache is
 per-process (see below) and thread-safe. To use it, set :setting:`BACKEND
-<CACHES-BACKEND>` to ``"django.core.cache.backends.locmem.LocMemCache"``. For
+<CACHES-BACKEND>` to ``"mango.core.cache.backends.locmem.LocMemCache"``. For
 example::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'mango.core.cache.backends.locmem.LocMemCache',
             'LOCATION': 'unique-snowflake',
         }
     }
@@ -347,7 +347,7 @@ production environments. It's nice for development.
 Dummy caching (for development)
 -------------------------------
 
-Finally, Django comes with a "dummy" cache that doesn't actually cache -- it
+Finally, Mango comes with a "dummy" cache that doesn't actually cache -- it
 just implements the cache interface without doing anything.
 
 This is useful if you have a production site that uses heavy-duty caching in
@@ -357,16 +357,16 @@ activate dummy caching, set :setting:`BACKEND <CACHES-BACKEND>` like so::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+            'BACKEND': 'mango.core.cache.backends.dummy.DummyCache',
         }
     }
 
 Using a custom cache backend
 ----------------------------
 
-While Django includes support for a number of cache backends out-of-the-box,
+While Mango includes support for a number of cache backends out-of-the-box,
 sometimes you might want to use a customized cache backend. To use an external
-cache backend with Django, use the Python import path as the
+cache backend with Mango, use the Python import path as the
 :setting:`BACKEND <CACHES-BACKEND>` of the :setting:`CACHES` setting, like so::
 
     CACHES = {
@@ -377,10 +377,10 @@ cache backend with Django, use the Python import path as the
 
 If you're building your own backend, you can use the standard cache backends
 as reference implementations. You'll find the code in the
-``django/core/cache/backends/`` directory of the Django source.
+``mango/core/cache/backends/`` directory of the Mango source.
 
 Note: Without a really compelling reason, such as a host that doesn't support
-them, you should stick to the cache backends included with Django. They've
+them, you should stick to the cache backends included with Mango. They've
 been well-tested and are well-documented.
 
 .. _cache_arguments:
@@ -428,13 +428,13 @@ behavior. These arguments are provided as additional keys in the
 
 * :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`: A string that will be
   automatically included (prepended by default) to all cache keys
-  used by the Django server.
+  used by the Mango server.
 
   See the :ref:`cache documentation <cache_key_prefixing>` for
   more information.
 
 * :setting:`VERSION <CACHES-VERSION>`: The default version number
-  for cache keys generated by the Django server.
+  for cache keys generated by the Mango server.
 
   See the :ref:`cache documentation <cache_versioning>` for more
   information.
@@ -451,8 +451,8 @@ of 60 seconds, and a maximum capacity of 1000 items::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-            'LOCATION': '/var/tmp/django_cache',
+            'BACKEND': 'mango.core.cache.backends.filebased.FileBasedCache',
+            'LOCATION': '/var/tmp/mango_cache',
             'TIMEOUT': 60,
             'OPTIONS': {
                 'MAX_ENTRIES': 1000
@@ -465,7 +465,7 @@ the binary protocol, SASL authentication, and the ``ketama`` behavior mode::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+            'BACKEND': 'mango.core.cache.backends.memcached.PyLibMCCache',
             'LOCATION': '127.0.0.1:11211',
             'OPTIONS': {
                 'binary': True,
@@ -485,7 +485,7 @@ flag on the connection's socket::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+            'BACKEND': 'mango.core.cache.backends.memcached.PyMemcacheCache',
             'LOCATION': '127.0.0.1:11211',
             'OPTIONS': {
                 'no_delay': True,
@@ -503,14 +503,14 @@ The per-site cache
 
 Once the cache is set up, the simplest way to use caching is to cache your
 entire site. You'll need to add
-``'django.middleware.cache.UpdateCacheMiddleware'`` and
-``'django.middleware.cache.FetchFromCacheMiddleware'`` to your
+``'mango.middleware.cache.UpdateCacheMiddleware'`` and
+``'mango.middleware.cache.FetchFromCacheMiddleware'`` to your
 :setting:`MIDDLEWARE` setting, as in this example::
 
     MIDDLEWARE = [
-        'django.middleware.cache.UpdateCacheMiddleware',
-        'django.middleware.common.CommonMiddleware',
-        'django.middleware.cache.FetchFromCacheMiddleware',
+        'mango.middleware.cache.UpdateCacheMiddleware',
+        'mango.middleware.common.CommonMiddleware',
+        'mango.middleware.cache.FetchFromCacheMiddleware',
     ]
 
 .. note::
@@ -519,14 +519,14 @@ entire site. You'll need to add
     and the "fetch" middleware must be last. The details are a bit obscure, but
     see `Order of MIDDLEWARE`_ below if you'd like the full story.
 
-Then, add the following required settings to your Django settings file:
+Then, add the following required settings to your Mango settings file:
 
 * :setting:`CACHE_MIDDLEWARE_ALIAS` -- The cache alias to use for storage.
 * :setting:`CACHE_MIDDLEWARE_SECONDS` -- The number of seconds each page should
   be cached.
 * :setting:`CACHE_MIDDLEWARE_KEY_PREFIX` -- If the cache is shared across
-  multiple sites using the same Django installation, set this to the name of
-  the site, or some other string that is unique to this Django instance, to
+  multiple sites using the same Mango installation, set this to the name of
+  the site, or some other string that is unique to this Mango instance, to
   prevent key collisions. Use an empty string if you don't care.
 
 ``FetchFromCacheMiddleware`` caches GET and HEAD responses with status 200,
@@ -537,7 +537,7 @@ the same response headers as the corresponding GET request; in which case it can
 return a cached GET response for HEAD request.
 
 Additionally, ``UpdateCacheMiddleware`` automatically sets a few headers in
-each :class:`~django.http.HttpResponse` which affect :ref:`downstream caches
+each :class:`~mango.http.HttpResponse` which affect :ref:`downstream caches
 <downstream-caches>`:
 
 * Sets the ``Expires`` header to the current date/time plus the defined
@@ -551,17 +551,17 @@ See :doc:`/topics/http/middleware` for more on middleware.
 If a view sets its own cache expiry time (i.e. it has a ``max-age`` section in
 its ``Cache-Control`` header) then the page will be cached until the expiry
 time, rather than :setting:`CACHE_MIDDLEWARE_SECONDS`. Using the decorators in
-``django.views.decorators.cache`` you can easily set a view's expiry time
-(using the :func:`~django.views.decorators.cache.cache_control` decorator) or
+``mango.views.decorators.cache`` you can easily set a view's expiry time
+(using the :func:`~mango.views.decorators.cache.cache_control` decorator) or
 disable caching for a view (using the
-:func:`~django.views.decorators.cache.never_cache` decorator). See the
+:func:`~mango.views.decorators.cache.never_cache` decorator). See the
 `using other headers`__ section for more on these decorators.
 
 .. _i18n-cache-key:
 
 If :setting:`USE_I18N` is set to ``True`` then the generated cache key will
 include the name of the active :term:`language<language code>` -- see also
-:ref:`how-django-discovers-language-preference`). This allows you to easily
+:ref:`how-mango-discovers-language-preference`). This allows you to easily
 cache multilingual sites without having to create the cache key yourself.
 
 Cache keys also include the :ref:`current time zone
@@ -572,13 +572,13 @@ __ `Controlling cache: Using other headers`_
 The per-view cache
 ==================
 
-.. function:: django.views.decorators.cache.cache_page
+.. function:: mango.views.decorators.cache.cache_page
 
 A more granular way to use the caching framework is by caching the output of
-individual views. ``django.views.decorators.cache`` defines a ``cache_page``
+individual views. ``mango.views.decorators.cache`` defines a ``cache_page``
 decorator that will automatically cache the view's response for you::
 
-    from django.views.decorators.cache import cache_page
+    from mango.views.decorators.cache import cache_page
 
     @cache_page(60 * 15)
     def my_view(request):
@@ -653,7 +653,7 @@ to it in the URLconf. Here's the old URLconf from earlier::
 
 Here's the same thing, with ``my_view`` wrapped in ``cache_page``::
 
-    from django.views.decorators.cache import cache_page
+    from mango.views.decorators.cache import cache_page
 
     urlpatterns = [
         path('foo/<int:code>/', cache_page(60 * 15)(my_view)),
@@ -674,7 +674,7 @@ and the name to give the cache fragment. The fragment is cached forever if
 timeout is ``None``. The name will be taken as is, do not use a variable. For
 example:
 
-.. code-block:: html+django
+.. code-block:: html+mango
 
     {% load cache %}
     {% cache 500 sidebar %}
@@ -688,7 +688,7 @@ of your site. Do this by passing one or more additional arguments, which may be
 variables with or without filters, to the ``{% cache %}`` template tag to
 uniquely identify the cache fragment:
 
-.. code-block:: html+django
+.. code-block:: html+mango
 
     {% load cache %}
     {% cache 500 sidebar request.user.username %}
@@ -701,7 +701,7 @@ tag you could use one of the
 :ref:`translation-specific variables<template-translation-vars>` available in
 templates to achieve the same result:
 
-.. code-block:: html+django
+.. code-block:: html+mango
 
     {% load i18n %}
     {% load cache %}
@@ -717,7 +717,7 @@ resolves to an integer value. For example, if the template variable
 ``my_timeout`` is set to the value ``600``, then the following two examples are
 equivalent:
 
-.. code-block:: html+django
+.. code-block:: html+mango
 
     {% cache 600 sidebar %} ... {% endcache %}
     {% cache my_timeout sidebar %} ... {% endcache %}
@@ -730,13 +730,13 @@ If no such cache exists, it will fall back to using the default cache. You may
 select an alternate cache backend to use with the ``using`` keyword argument,
 which must be the last argument to the tag.
 
-.. code-block:: html+django
+.. code-block:: html+mango
 
     {% cache 300 local-thing ...  using="localcache" %}
 
 It is considered an error to specify a cache name that is not configured.
 
-.. function:: django.core.cache.utils.make_template_fragment_key(fragment_name, vary_on=None)
+.. function:: mango.core.cache.utils.make_template_fragment_key(fragment_name, vary_on=None)
 
 If you want to obtain the cache key used for a cached fragment, you can use
 ``make_template_fragment_key``. ``fragment_name`` is the same as second argument
@@ -746,8 +746,8 @@ a cached item, for example:
 
 .. code-block:: pycon
 
-    >>> from django.core.cache import cache
-    >>> from django.core.cache.utils import make_template_fragment_key
+    >>> from mango.core.cache import cache
+    >>> from mango.core.cache.utils import make_template_fragment_key
     # cache key for {% cache 500 sidebar username %}
     >>> key = make_template_fragment_key('sidebar', [username])
     >>> cache.delete(key) # invalidates cached template fragment
@@ -770,7 +770,7 @@ per-site or per-view cache strategies offer, because you wouldn't want to
 cache the entire result (since some of the data changes often), but you'd still
 want to cache the results that rarely change.
 
-For cases like this, Django exposes a low-level cache API. You can use this API
+For cases like this, Mango exposes a low-level cache API. You can use this API
 to store objects in the cache with any level of granularity you like.  You can
 cache any Python object that can be pickled safely: strings, dictionaries,
 lists of model objects, and so forth. (Most common Python objects can be
@@ -780,14 +780,14 @@ pickling.)
 Accessing the cache
 -------------------
 
-.. data:: django.core.cache.caches
+.. data:: mango.core.cache.caches
 
     You can access the caches configured in the :setting:`CACHES` setting
-    through a dict-like object: ``django.core.cache.caches``. Repeated
+    through a dict-like object: ``mango.core.cache.caches``. Repeated
     requests for the same alias in the same thread will return the same
     object.
 
-        >>> from django.core.cache import caches
+        >>> from mango.core.cache import caches
         >>> cache1 = caches['myalias']
         >>> cache2 = caches['myalias']
         >>> cache1 is cache2
@@ -799,19 +799,19 @@ Accessing the cache
     To provide thread-safety, a different instance of the cache backend will
     be returned for each thread.
 
-.. data:: django.core.cache.cache
+.. data:: mango.core.cache.cache
 
     As a shortcut, the default cache is available as
-    ``django.core.cache.cache``::
+    ``mango.core.cache.cache``::
 
-        >>> from django.core.cache import cache
+        >>> from mango.core.cache import cache
 
     This object is equivalent to ``caches['default']``.
 
 Basic usage
 -----------
 
-.. currentmodule:: django.core.caches
+.. currentmodule:: mango.core.caches
 
 The basic interface is:
 
@@ -1008,12 +1008,12 @@ by one server to be used by another server. If the format of cached
 data is different between servers, this can lead to some very hard to
 diagnose problems.
 
-To prevent this, Django provides the ability to prefix all cache keys
+To prevent this, Mango provides the ability to prefix all cache keys
 used by a server. When a particular cache key is saved or retrieved,
-Django will automatically prefix the cache key with the value of the
+Mango will automatically prefix the cache key with the value of the
 :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>` cache setting.
 
-By ensuring each Django instance has a different
+By ensuring each Mango instance has a different
 :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`, you can ensure that there will be no
 collisions in cache values.
 
@@ -1027,8 +1027,8 @@ purge any existing cached values. The easiest way to do this is to
 flush the entire cache, but this can lead to the loss of cache values
 that are still valid and useful.
 
-Django provides a better way to target individual cache values.
-Django's cache framework has a system-wide version identifier,
+Mango provides a better way to target individual cache values.
+Mango's cache framework has a system-wide version identifier,
 specified using the :setting:`VERSION <CACHES-VERSION>` cache setting.
 The value of this setting is automatically combined with the cache
 prefix and the user-provided cache key to obtain the final cache key.
@@ -1093,7 +1093,7 @@ Memcached, the most commonly-used production cache backend, does not allow
 cache keys longer than 250 characters or containing whitespace or control
 characters, and using such keys will cause an exception. To encourage
 cache-portable code and minimize unpleasant surprises, the other built-in cache
-backends issue a warning (``django.core.cache.backends.base.CacheKeyWarning``)
+backends issue a warning (``mango.core.cache.backends.base.CacheKeyWarning``)
 if a key is used that would cause an error on memcached.
 
 If you are using a production backend that can accept a wider range of keys (a
@@ -1104,7 +1104,7 @@ this code in the ``management`` module of one of your
 
      import warnings
 
-     from django.core.cache import CacheKeyWarning
+     from mango.core.cache import CacheKeyWarning
 
      warnings.simplefilter("ignore", CacheKeyWarning)
 
@@ -1113,7 +1113,7 @@ built-in backends, you can subclass it, override just the ``validate_key``
 method, and follow the instructions for `using a custom cache backend`_. For
 instance, to do this for the ``locmem`` backend, put this code in a module::
 
-    from django.core.cache.backends.locmem import LocMemCache
+    from mango.core.cache.backends.locmem import LocMemCache
 
     class CustomLocMemCache(LocMemCache):
         def validate_key(self, key):
@@ -1143,7 +1143,7 @@ Here are a few examples of downstream caches:
   transparently. Such caching is not possible under HTTPS as it would
   constitute a man-in-the-middle attack.
 
-* Your Django website may sit behind a *proxy cache*, such as Squid Web
+* Your Mango website may sit behind a *proxy cache*, such as Squid Web
   Proxy Cache (http://www.squid-cache.org/), that caches pages for
   performance. In this case, each request first would be handled by the
   proxy, and it would be passed to your application only if needed.
@@ -1179,7 +1179,7 @@ mechanism should take into account when building its cache key. For example, if
 the contents of a Web page depend on a user's language preference, the page is
 said to "vary on language."
 
-By default, Django's cache system creates its cache keys using the requested
+By default, Mango's cache system creates its cache keys using the requested
 fully-qualified URL -- e.g.,
 ``"https://www.example.com/stories/2005/?order_by=author"``. This means every
 request to that URL will use the same cached version, regardless of user-agent
@@ -1188,16 +1188,16 @@ produces different content based on some difference in request headers -- such
 as a cookie, or a language, or a user-agent -- you'll need to use the ``Vary``
 header to tell caching mechanisms that the page output depends on those things.
 
-To do this in Django, use the convenient
-:func:`django.views.decorators.vary.vary_on_headers` view decorator, like so::
+To do this in Mango, use the convenient
+:func:`mango.views.decorators.vary.vary_on_headers` view decorator, like so::
 
-    from django.views.decorators.vary import vary_on_headers
+    from mango.views.decorators.vary import vary_on_headers
 
     @vary_on_headers('User-Agent')
     def my_view(request):
         ...
 
-In this case, a caching mechanism (such as Django's own cache middleware) will
+In this case, a caching mechanism (such as Mango's own cache middleware) will
 cache a separate version of the page for each unique user-agent.
 
 The advantage to using the ``vary_on_headers`` decorator rather than manually
@@ -1219,7 +1219,7 @@ different from a request with the user-agent ``Mozilla`` and the cookie value
 ``foo=ham``.
 
 Because varying on cookie is so common, there's a
-:func:`django.views.decorators.vary.vary_on_cookie` decorator. These two views
+:func:`mango.views.decorators.vary.vary_on_cookie` decorator. These two views
 are equivalent::
 
     @vary_on_cookie
@@ -1233,11 +1233,11 @@ are equivalent::
 The headers you pass to ``vary_on_headers`` are not case sensitive;
 ``"User-Agent"`` is the same thing as ``"user-agent"``.
 
-You can also use a helper function, :func:`django.utils.cache.patch_vary_headers`,
+You can also use a helper function, :func:`mango.utils.cache.patch_vary_headers`,
 directly. This function sets, or adds to, the ``Vary header``. For example::
 
-    from django.shortcuts import render
-    from django.utils.cache import patch_vary_headers
+    from mango.shortcuts import render
+    from mango.utils.cache import patch_vary_headers
 
     def my_view(request):
         ...
@@ -1245,7 +1245,7 @@ directly. This function sets, or adds to, the ``Vary header``. For example::
         patch_vary_headers(response, ['Cookie'])
         return response
 
-``patch_vary_headers`` takes an :class:`~django.http.HttpResponse` instance as
+``patch_vary_headers`` takes an :class:`~mango.http.HttpResponse` instance as
 its first argument and a list/tuple of case-insensitive header names as its
 second argument.
 
@@ -1266,10 +1266,10 @@ public cache. So Web applications need a way to tell caches which data is
 private and which is public.
 
 The solution is to indicate a page's cache should be "private." To do this in
-Django, use the :func:`~django.views.decorators.cache.cache_control` view
+Mango, use the :func:`~mango.views.decorators.cache.cache_control` view
 decorator. Example::
 
-    from django.views.decorators.cache import cache_control
+    from mango.views.decorators.cache import cache_control
 
     @cache_control(private=True)
     def my_view(request):
@@ -1283,12 +1283,12 @@ exclusive. The decorator ensures that the "public" directive is removed if
 "private" should be set (and vice versa). An example use of the two directives
 would be a blog site that offers both private and public entries. Public
 entries may be cached on any shared cache. The following code uses
-:func:`~django.utils.cache.patch_cache_control`, the manual way to modify the
+:func:`~mango.utils.cache.patch_cache_control`, the manual way to modify the
 cache control header (it is internally called by the
-:func:`~django.views.decorators.cache.cache_control` decorator)::
+:func:`~mango.views.decorators.cache.cache_control` decorator)::
 
-    from django.views.decorators.cache import patch_cache_control
-    from django.views.decorators.vary import vary_on_cookie
+    from mango.views.decorators.cache import patch_cache_control
+    from mango.views.decorators.vary import vary_on_cookie
 
     @vary_on_cookie
     def list_blog_entries_view(request):
@@ -1302,12 +1302,12 @@ cache control header (it is internally called by the
         return response
 
 You can control downstream caches in other ways as well (see :rfc:`7234` for
-details on HTTP caching). For example, even if you don't use Django's
+details on HTTP caching). For example, even if you don't use Mango's
 server-side cache framework, you can still tell clients to cache a view for a
 certain amount of time with the :rfc:`max-age <7234#section-5.2.2.8>`
 directive::
 
-    from django.views.decorators.cache import cache_control
+    from mango.views.decorators.cache import cache_control
 
     @cache_control(max_age=3600)
     def my_view(request):
@@ -1316,7 +1316,7 @@ directive::
 (If you *do* use the caching middleware, it already sets the ``max-age`` with
 the value of the :setting:`CACHE_MIDDLEWARE_SECONDS` setting. In that case,
 the custom ``max_age`` from the
-:func:`~django.views.decorators.cache.cache_control` decorator will take
+:func:`~mango.views.decorators.cache.cache_control` decorator will take
 precedence, and the header values will be merged correctly.)
 
 Any valid ``Cache-Control`` response directive is valid in ``cache_control()``.
@@ -1333,11 +1333,11 @@ The full list of known directives can be found in the `IANA registry`_
 .. _IANA registry: https://www.iana.org/assignments/http-cache-directives/http-cache-directives.xhtml
 
 If you want to use headers to disable caching altogether,
-:func:`~django.views.decorators.cache.never_cache` is a view decorator that
+:func:`~mango.views.decorators.cache.never_cache` is a view decorator that
 adds headers to ensure the response won't be cached by browsers or other
 caches. Example::
 
-    from django.views.decorators.cache import never_cache
+    from mango.views.decorators.cache import never_cache
 
     @never_cache
     def myview(request):

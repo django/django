@@ -1,8 +1,8 @@
 from datetime import datetime, time
 
-from django.template.defaultfilters import date
-from django.test import SimpleTestCase, override_settings
-from django.utils import timezone, translation
+from mango.template.defaultfilters import date
+from mango.test import SimpleTestCase, override_settings
+from mango.utils import timezone, translation
 
 from ..utils import setup
 from .timezone_utils import TimezoneTestCase

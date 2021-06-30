@@ -3,10 +3,10 @@ import re
 from io import StringIO
 from unittest import mock, skipUnless
 
-from django.core.management import call_command
-from django.db import connection
-from django.db.backends.base.introspection import TableInfo
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from mango.core.management import call_command
+from mango.db import connection
+from mango.db.backends.base.introspection import TableInfo
+from mango.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import PeopleMoreData, test_collation
 
@@ -38,9 +38,9 @@ class InspectDBTestCase(TestCase):
         call_command('inspectdb', table_name_filter=inspectdb_tables_only, stdout=out)
         error_message = "inspectdb has examined a table that should have been filtered out."
         # contrib.contenttypes is one of the apps always installed when running
-        # the Django test suite, check that one of its tables hasn't been
+        # the Mango test suite, check that one of its tables hasn't been
         # inspected
-        self.assertNotIn("class DjangoContentType(models.Model):", out.getvalue(), msg=error_message)
+        self.assertNotIn("class MangoContentType(models.Model):", out.getvalue(), msg=error_message)
 
     def test_table_option(self):
         """
@@ -66,7 +66,7 @@ class InspectDBTestCase(TestCase):
         return assertFieldType
 
     def test_field_types(self):
-        """Test introspection of various Django field types"""
+        """Test introspection of various Mango field types"""
         assertFieldType = self.make_field_type_asserter()
         introspected_field_types = connection.features.introspected_field_types
         char_field_type = introspected_field_types['CharField']
@@ -149,7 +149,7 @@ class InspectDBTestCase(TestCase):
             )
 
     def test_number_field_types(self):
-        """Test introspection of various Django field types"""
+        """Test introspection of various Mango field types"""
         assertFieldType = self.make_field_type_asserter()
         introspected_field_types = connection.features.introspected_field_types
 
@@ -321,7 +321,7 @@ class InspectDBTestCase(TestCase):
         be visible in the output.
         """
         out = StringIO()
-        with mock.patch('django.db.connection.introspection.get_table_list',
+        with mock.patch('mango.db.connection.introspection.get_table_list',
                         return_value=[TableInfo(name='nonexistent', type='t')]):
             call_command('inspectdb', stdout=out)
         output = out.getvalue()

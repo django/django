@@ -1,4 +1,4 @@
-from django.contrib.gis.db import models
+from mango.contrib.gis.db import models
 
 
 class RasterModel(models.Model):

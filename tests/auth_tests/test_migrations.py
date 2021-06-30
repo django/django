@@ -1,28 +1,28 @@
 from importlib import import_module
 
-from django.apps import apps
-from django.contrib.auth.models import Permission, User
-from django.contrib.contenttypes.models import ContentType
-from django.db import connection, connections
-from django.test import TransactionTestCase
-from django.test.utils import captured_stdout
+from mango.apps import apps
+from mango.contrib.auth.models import Permission, User
+from mango.contrib.contenttypes.models import ContentType
+from mango.db import connection, connections
+from mango.test import TransactionTestCase
+from mango.test.utils import captured_stdout
 
 from .models import Proxy, UserProxy
 
-update_proxy_permissions = import_module('django.contrib.auth.migrations.0011_update_proxy_permissions')
+update_proxy_permissions = import_module('mango.contrib.auth.migrations.0011_update_proxy_permissions')
 
 
 class ProxyModelWithDifferentAppLabelTests(TransactionTestCase):
     available_apps = [
         'auth_tests',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
+        'mango.contrib.auth',
+        'mango.contrib.contenttypes',
     ]
 
     def setUp(self):
         """
         Create proxy permissions with content_type to the concrete model
-        rather than the proxy model (as they were before Django 2.2 and
+        rather than the proxy model (as they were before Mango 2.2 and
         migration 11).
         """
         Permission.objects.all().delete()
@@ -93,14 +93,14 @@ class ProxyModelWithDifferentAppLabelTests(TransactionTestCase):
 class ProxyModelWithSameAppLabelTests(TransactionTestCase):
     available_apps = [
         'auth_tests',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
+        'mango.contrib.auth',
+        'mango.contrib.contenttypes',
     ]
 
     def setUp(self):
         """
         Create proxy permissions with content_type to the concrete model
-        rather than the proxy model (as they were before Django 2.2 and
+        rather than the proxy model (as they were before Mango 2.2 and
         migration 11).
         """
         Permission.objects.all().delete()
@@ -193,8 +193,8 @@ class MultiDBProxyModelAppLabelTests(TransactionTestCase):
     databases = {'default', 'other'}
     available_apps = [
         'auth_tests',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
+        'mango.contrib.auth',
+        'mango.contrib.contenttypes',
     ]
 
     def setUp(self):

@@ -12,7 +12,7 @@ API Reference
    contrib/index
    csrf
    databases
-   django-admin
+   mango-admin
    exceptions
    files/index
    forms/index

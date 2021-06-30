@@ -1,6 +1,6 @@
-from django.contrib.auth import views as auth_views
-from django.urls import path
-from django.views.generic import RedirectView
+from mango.contrib.auth import views as auth_views
+from mango.urls import path
+from mango.views.generic import RedirectView
 
 from . import views
 from .models import Article, DateArticle

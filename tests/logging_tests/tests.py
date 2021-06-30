@@ -4,19 +4,19 @@ from io import StringIO
 
 from admin_scripts.tests import AdminScriptTestCase
 
-from django.conf import settings
-from django.core import mail
-from django.core.exceptions import PermissionDenied
-from django.core.files.temp import NamedTemporaryFile
-from django.core.management import color
-from django.http.multipartparser import MultiPartParserError
-from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.utils import LoggingCaptureMixin
-from django.utils.log import (
+from mango.conf import settings
+from mango.core import mail
+from mango.core.exceptions import PermissionDenied
+from mango.core.files.temp import NamedTemporaryFile
+from mango.core.management import color
+from mango.http.multipartparser import MultiPartParserError
+from mango.test import RequestFactory, SimpleTestCase, override_settings
+from mango.test.utils import LoggingCaptureMixin
+from mango.utils.log import (
     DEFAULT_LOGGING, AdminEmailHandler, CallbackFilter, RequireDebugFalse,
     RequireDebugTrue, ServerFormatter,
 )
-from django.views.debug import ExceptionReporter
+from mango.views.debug import ExceptionReporter
 
 from . import views
 from .logconfig import MyEmailBackend
@@ -59,9 +59,9 @@ class SetupDefaultLoggingMixin:
 
 class DefaultLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleTestCase):
 
-    def test_django_logger(self):
+    def test_mango_logger(self):
         """
-        The 'django' base logger only output anything when DEBUG=True.
+        The 'mango' base logger only output anything when DEBUG=True.
         """
         self.logger.error("Hey, this is an error.")
         self.assertEqual(self.logger_output.getvalue(), '')
@@ -71,24 +71,24 @@ class DefaultLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleT
             self.assertEqual(self.logger_output.getvalue(), 'Hey, this is an error.\n')
 
     @override_settings(DEBUG=True)
-    def test_django_logger_warning(self):
+    def test_mango_logger_warning(self):
         self.logger.warning('warning')
         self.assertEqual(self.logger_output.getvalue(), 'warning\n')
 
     @override_settings(DEBUG=True)
-    def test_django_logger_info(self):
+    def test_mango_logger_info(self):
         self.logger.info('info')
         self.assertEqual(self.logger_output.getvalue(), 'info\n')
 
     @override_settings(DEBUG=True)
-    def test_django_logger_debug(self):
+    def test_mango_logger_debug(self):
         self.logger.debug('debug')
         self.assertEqual(self.logger_output.getvalue(), '')
 
 
 class LoggingAssertionMixin:
 
-    def assertLogsRequest(self, url, level, msg, status_code, logger='django.request', exc_class=None):
+    def assertLogsRequest(self, url, level, msg, status_code, logger='mango.request', exc_class=None):
         with self.assertLogs(logger, level) as cm:
             try:
                 self.client.get(url)
@@ -182,8 +182,8 @@ class HandlerLoggingTests(SetupDefaultLoggingMixin, LoggingAssertionMixin, Loggi
     USE_I18N=True,
     LANGUAGES=[('en', 'English')],
     MIDDLEWARE=[
-        'django.middleware.locale.LocaleMiddleware',
-        'django.middleware.common.CommonMiddleware',
+        'mango.middleware.locale.LocaleMiddleware',
+        'mango.middleware.common.CommonMiddleware',
     ],
     ROOT_URLCONF='logging_tests.urls_i18n',
 )
@@ -222,7 +222,7 @@ class CallbackFilterTest(SimpleTestCase):
 
 
 class AdminEmailHandlerTest(SimpleTestCase):
-    logger = logging.getLogger('django')
+    logger = logging.getLogger('mango')
     request_factory = RequestFactory()
 
     def get_admin_email_handler(self, logger):
@@ -370,7 +370,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
         self.assertEqual(len(mail.outbox), 1)
         msg = mail.outbox[0]
         self.assertEqual(msg.to, ['admin@example.com'])
-        self.assertEqual(msg.subject, "[Django] ERROR (EXTERNAL IP): message")
+        self.assertEqual(msg.subject, "[Mango] ERROR (EXTERNAL IP): message")
         self.assertIn("Report at %s" % url_path, msg.body)
 
     @override_settings(
@@ -457,10 +457,10 @@ dictConfig.called = False
 
 class SetupConfigureLogging(SimpleTestCase):
     """
-    Calling django.setup() initializes the logging configuration.
+    Calling mango.setup() initializes the logging configuration.
     """
     def test_configure_initializes_logging(self):
-        from django import setup
+        from mango import setup
         try:
             with override_settings(
                 LOGGING_CONFIG='logging_tests.tests.dictConfig',
@@ -481,7 +481,7 @@ class SecurityLoggerTest(LoggingAssertionMixin, SimpleTestCase):
             level='ERROR',
             msg='dubious',
             status_code=400,
-            logger='django.security.SuspiciousOperation',
+            logger='mango.security.SuspiciousOperation',
         )
 
     def test_suspicious_operation_uses_sublogger(self):
@@ -490,7 +490,7 @@ class SecurityLoggerTest(LoggingAssertionMixin, SimpleTestCase):
             level='ERROR',
             msg='dubious',
             status_code=400,
-            logger='django.security.DisallowedHost',
+            logger='mango.security.DisallowedHost',
         )
 
     @override_settings(
@@ -568,20 +568,20 @@ class LogFormattersTests(SimpleTestCase):
     def test_server_formatter_default_format(self):
         server_time = '2016-09-25 10:20:30'
         log_msg = 'log message'
-        logger = logging.getLogger('django.server')
+        logger = logging.getLogger('mango.server')
 
         @contextmanager
-        def patch_django_server_logger():
+        def patch_mango_server_logger():
             old_stream = logger.handlers[0].stream
             new_stream = StringIO()
             logger.handlers[0].stream = new_stream
             yield new_stream
             logger.handlers[0].stream = old_stream
 
-        with patch_django_server_logger() as logger_output:
+        with patch_mango_server_logger() as logger_output:
             logger.info(log_msg, extra={'server_time': server_time})
             self.assertEqual('[%s] %s\n' % (server_time, log_msg), logger_output.getvalue())
 
-        with patch_django_server_logger() as logger_output:
+        with patch_mango_server_logger() as logger_output:
             logger.info(log_msg)
             self.assertRegex(logger_output.getvalue(), r'^\[[/:,\w\s\d]+\] %s\n' % log_msg)

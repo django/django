@@ -1,13 +1,13 @@
-from django import forms
-from django.contrib import admin
-from django.contrib.admin import AdminSite
-from django.contrib.auth.backends import ModelBackend
-from django.contrib.auth.middleware import AuthenticationMiddleware
-from django.contrib.contenttypes.admin import GenericStackedInline
-from django.contrib.messages.middleware import MessageMiddleware
-from django.contrib.sessions.middleware import SessionMiddleware
-from django.core import checks
-from django.test import SimpleTestCase, override_settings
+from mango import forms
+from mango.contrib import admin
+from mango.contrib.admin import AdminSite
+from mango.contrib.auth.backends import ModelBackend
+from mango.contrib.auth.middleware import AuthenticationMiddleware
+from mango.contrib.contenttypes.admin import GenericStackedInline
+from mango.contrib.messages.middleware import MessageMiddleware
+from mango.contrib.sessions.middleware import SessionMiddleware
+from mango.core import checks
+from mango.test import SimpleTestCase, override_settings
 
 from .models import (
     Album, Author, Book, City, Influence, Song, State, TwoAlbumFKAndAnE,
@@ -60,10 +60,10 @@ class SessionMiddlewareSubclass(SessionMiddleware):
 @override_settings(
     SILENCED_SYSTEM_CHECKS=['fields.W342'],  # ForeignKey(unique=True)
     INSTALLED_APPS=[
-        'django.contrib.admin',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.messages',
+        'mango.contrib.admin',
+        'mango.contrib.auth',
+        'mango.contrib.contenttypes',
+        'mango.contrib.messages',
         'admin_checks',
     ],
 )
@@ -78,22 +78,22 @@ class SystemChecksTestCase(SimpleTestCase):
         finally:
             admin.site.unregister(Song)
 
-    @override_settings(INSTALLED_APPS=['django.contrib.admin'])
+    @override_settings(INSTALLED_APPS=['mango.contrib.admin'])
     def test_apps_dependencies(self):
         errors = admin.checks.check_dependencies()
         expected = [
             checks.Error(
-                "'django.contrib.contenttypes' must be in "
+                "'mango.contrib.contenttypes' must be in "
                 "INSTALLED_APPS in order to use the admin application.",
                 id="admin.E401",
             ),
             checks.Error(
-                "'django.contrib.auth' must be in INSTALLED_APPS in order "
+                "'mango.contrib.auth' must be in INSTALLED_APPS in order "
                 "to use the admin application.",
                 id='admin.E405',
             ),
             checks.Error(
-                "'django.contrib.messages' must be in INSTALLED_APPS in order "
+                "'mango.contrib.messages' must be in INSTALLED_APPS in order "
                 "to use the admin application.",
                 id='admin.E406',
             ),
@@ -104,7 +104,7 @@ class SystemChecksTestCase(SimpleTestCase):
     def test_no_template_engines(self):
         self.assertEqual(admin.checks.check_dependencies(), [
             checks.Error(
-                "A 'django.template.backends.django.DjangoTemplates' "
+                "A 'mango.template.backends.mango.MangoTemplates' "
                 "instance must be configured in TEMPLATES in order to use "
                 "the admin application.",
                 id='admin.E403',
@@ -113,7 +113,7 @@ class SystemChecksTestCase(SimpleTestCase):
 
     @override_settings(
         TEMPLATES=[{
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'BACKEND': 'mango.template.backends.mango.MangoTemplates',
             'DIRS': [],
             'APP_DIRS': True,
             'OPTIONS': {
@@ -124,27 +124,27 @@ class SystemChecksTestCase(SimpleTestCase):
     def test_context_processor_dependencies(self):
         expected = [
             checks.Error(
-                "'django.contrib.auth.context_processors.auth' must be "
-                "enabled in DjangoTemplates (TEMPLATES) if using the default "
+                "'mango.contrib.auth.context_processors.auth' must be "
+                "enabled in MangoTemplates (TEMPLATES) if using the default "
                 "auth backend in order to use the admin application.",
                 id='admin.E402',
             ),
             checks.Error(
-                "'django.contrib.messages.context_processors.messages' must "
-                "be enabled in DjangoTemplates (TEMPLATES) in order to use "
+                "'mango.contrib.messages.context_processors.messages' must "
+                "be enabled in MangoTemplates (TEMPLATES) in order to use "
                 "the admin application.",
                 id='admin.E404',
             ),
             checks.Warning(
-                "'django.template.context_processors.request' must be enabled "
-                "in DjangoTemplates (TEMPLATES) in order to use the admin "
+                "'mango.template.context_processors.request' must be enabled "
+                "in MangoTemplates (TEMPLATES) in order to use the admin "
                 "navigation sidebar.",
                 id='admin.W411',
             )
         ]
         self.assertEqual(admin.checks.check_dependencies(), expected)
         # The first error doesn't happen if
-        # 'django.contrib.auth.backends.ModelBackend' isn't in
+        # 'mango.contrib.auth.backends.ModelBackend' isn't in
         # AUTHENTICATION_BACKENDS.
         with self.settings(AUTHENTICATION_BACKENDS=[]):
             self.assertEqual(admin.checks.check_dependencies(), expected[1:])
@@ -152,13 +152,13 @@ class SystemChecksTestCase(SimpleTestCase):
     @override_settings(
         AUTHENTICATION_BACKENDS=['admin_checks.tests.ModelBackendSubclass'],
         TEMPLATES=[{
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'BACKEND': 'mango.template.backends.mango.MangoTemplates',
             'DIRS': [],
             'APP_DIRS': True,
             'OPTIONS': {
                 'context_processors': [
-                    'django.template.context_processors.request',
-                    'django.contrib.messages.context_processors.messages',
+                    'mango.template.context_processors.request',
+                    'mango.contrib.messages.context_processors.messages',
                 ],
             },
         }],
@@ -166,8 +166,8 @@ class SystemChecksTestCase(SimpleTestCase):
     def test_context_processor_dependencies_model_backend_subclass(self):
         self.assertEqual(admin.checks.check_dependencies(), [
             checks.Error(
-                "'django.contrib.auth.context_processors.auth' must be "
-                "enabled in DjangoTemplates (TEMPLATES) if using the default "
+                "'mango.contrib.auth.context_processors.auth' must be "
+                "enabled in MangoTemplates (TEMPLATES) if using the default "
                 "auth backend in order to use the admin application.",
                 id='admin.E402',
             ),
@@ -176,19 +176,19 @@ class SystemChecksTestCase(SimpleTestCase):
     @override_settings(
         TEMPLATES=[
             {
-                'BACKEND': 'django.template.backends.dummy.TemplateStrings',
+                'BACKEND': 'mango.template.backends.dummy.TemplateStrings',
                 'DIRS': [],
                 'APP_DIRS': True,
             },
             {
-                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'BACKEND': 'mango.template.backends.mango.MangoTemplates',
                 'DIRS': [],
                 'APP_DIRS': True,
                 'OPTIONS': {
                     'context_processors': [
-                        'django.template.context_processors.request',
-                        'django.contrib.auth.context_processors.auth',
-                        'django.contrib.messages.context_processors.messages',
+                        'mango.template.context_processors.request',
+                        'mango.contrib.auth.context_processors.auth',
+                        'mango.contrib.messages.context_processors.messages',
                     ],
                 },
             },
@@ -202,23 +202,23 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = admin.checks.check_dependencies()
         expected = [
             checks.Error(
-                "'django.contrib.auth.middleware.AuthenticationMiddleware' "
+                "'mango.contrib.auth.middleware.AuthenticationMiddleware' "
                 "must be in MIDDLEWARE in order to use the admin application.",
                 id='admin.E408',
             ),
             checks.Error(
-                "'django.contrib.messages.middleware.MessageMiddleware' "
+                "'mango.contrib.messages.middleware.MessageMiddleware' "
                 "must be in MIDDLEWARE in order to use the admin application.",
                 id='admin.E409',
             ),
             checks.Error(
-                "'django.contrib.sessions.middleware.SessionMiddleware' "
+                "'mango.contrib.sessions.middleware.SessionMiddleware' "
                 "must be in MIDDLEWARE in order to use the admin application.",
                 hint=(
                     "Insert "
-                    "'django.contrib.sessions.middleware.SessionMiddleware' "
+                    "'mango.contrib.sessions.middleware.SessionMiddleware' "
                     "before "
-                    "'django.contrib.auth.middleware.AuthenticationMiddleware'."
+                    "'mango.contrib.auth.middleware.AuthenticationMiddleware'."
                 ),
                 id='admin.E410',
             ),
@@ -234,10 +234,10 @@ class SystemChecksTestCase(SimpleTestCase):
         self.assertEqual(admin.checks.check_dependencies(), [])
 
     @override_settings(MIDDLEWARE=[
-        'django.contrib.does.not.Exist',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.contrib.sessions.middleware.SessionMiddleware',
+        'mango.contrib.does.not.Exist',
+        'mango.contrib.auth.middleware.AuthenticationMiddleware',
+        'mango.contrib.messages.middleware.MessageMiddleware',
+        'mango.contrib.sessions.middleware.SessionMiddleware',
     ])
     def test_admin_check_ignores_import_error_in_middleware(self):
         self.assertEqual(admin.checks.check_dependencies(), [])

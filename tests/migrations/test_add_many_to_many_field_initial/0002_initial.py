@@ -1,4 +1,4 @@
-from django.db import migrations, models
+from mango.db import migrations, models
 
 
 class Migration(migrations.Migration):

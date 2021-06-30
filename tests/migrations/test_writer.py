@@ -13,17 +13,17 @@ from unittest import mock
 import custom_migration_operations.more_operations
 import custom_migration_operations.operations
 
-from django import get_version
-from django.conf import SettingsReference, settings
-from django.core.validators import EmailValidator, RegexValidator
-from django.db import migrations, models
-from django.db.migrations.serializer import BaseSerializer
-from django.db.migrations.writer import MigrationWriter, OperationWriter
-from django.test import SimpleTestCase
-from django.utils.deconstruct import deconstructible
-from django.utils.functional import SimpleLazyObject
-from django.utils.timezone import get_default_timezone, get_fixed_timezone, utc
-from django.utils.translation import gettext_lazy as _
+from mango import get_version
+from mango.conf import SettingsReference, settings
+from mango.core.validators import EmailValidator, RegexValidator
+from mango.db import migrations, models
+from mango.db.migrations.serializer import BaseSerializer
+from mango.db.migrations.writer import MigrationWriter, OperationWriter
+from mango.test import SimpleTestCase
+from mango.utils.deconstruct import deconstructible
+from mango.utils.functional import SimpleLazyObject
+from mango.utils.timezone import get_default_timezone, get_fixed_timezone, utc
+from mango.utils.translation import gettext_lazy as _
 
 from .models import FoodManager, FoodQuerySet
 
@@ -499,7 +499,7 @@ class WriterTests(SimpleTestCase):
                     datetime.datetime(2012, 1, 1, 1, 1, tzinfo=tzinfo),
                     (
                         "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc)",
-                        {'import datetime', 'from django.utils.timezone import utc'},
+                        {'import datetime', 'from mango.utils.timezone import utc'},
                     )
                 )
 
@@ -507,19 +507,19 @@ class WriterTests(SimpleTestCase):
         self.assertSerializedFieldEqual(models.CharField(max_length=255))
         self.assertSerializedResultEqual(
             models.CharField(max_length=255),
-            ("models.CharField(max_length=255)", {"from django.db import models"})
+            ("models.CharField(max_length=255)", {"from mango.db import models"})
         )
         self.assertSerializedFieldEqual(models.TextField(null=True, blank=True))
         self.assertSerializedResultEqual(
             models.TextField(null=True, blank=True),
-            ("models.TextField(blank=True, null=True)", {'from django.db import models'})
+            ("models.TextField(blank=True, null=True)", {'from mango.db import models'})
         )
 
     def test_serialize_settings(self):
         self.assertSerializedEqual(SettingsReference(settings.AUTH_USER_MODEL, "AUTH_USER_MODEL"))
         self.assertSerializedResultEqual(
             SettingsReference("someapp.model", "AUTH_USER_MODEL"),
-            ("settings.AUTH_USER_MODEL", {"from django.conf import settings"})
+            ("settings.AUTH_USER_MODEL", {"from mango.conf import settings"})
         )
 
     def test_serialize_iterators(self):
@@ -542,31 +542,31 @@ class WriterTests(SimpleTestCase):
         """
         validator = RegexValidator(message="hello")
         string = MigrationWriter.serialize(validator)[0]
-        self.assertEqual(string, "django.core.validators.RegexValidator(message='hello')")
+        self.assertEqual(string, "mango.core.validators.RegexValidator(message='hello')")
         self.serialize_round_trip(validator)
 
         # Test with a compiled regex.
         validator = RegexValidator(regex=re.compile(r'^\w+$'))
         string = MigrationWriter.serialize(validator)[0]
-        self.assertEqual(string, "django.core.validators.RegexValidator(regex=re.compile('^\\\\w+$'))")
+        self.assertEqual(string, "mango.core.validators.RegexValidator(regex=re.compile('^\\\\w+$'))")
         self.serialize_round_trip(validator)
 
         # Test a string regex with flag
         validator = RegexValidator(r'^[0-9]+$', flags=re.S)
         string = MigrationWriter.serialize(validator)[0]
-        self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=re.RegexFlag['DOTALL'])")
+        self.assertEqual(string, "mango.core.validators.RegexValidator('^[0-9]+$', flags=re.RegexFlag['DOTALL'])")
         self.serialize_round_trip(validator)
 
         # Test message and code
         validator = RegexValidator('^[-a-zA-Z0-9_]+$', 'Invalid', 'invalid')
         string = MigrationWriter.serialize(validator)[0]
-        self.assertEqual(string, "django.core.validators.RegexValidator('^[-a-zA-Z0-9_]+$', 'Invalid', 'invalid')")
+        self.assertEqual(string, "mango.core.validators.RegexValidator('^[-a-zA-Z0-9_]+$', 'Invalid', 'invalid')")
         self.serialize_round_trip(validator)
 
         # Test with a subclass.
         validator = EmailValidator(message="hello")
         string = MigrationWriter.serialize(validator)[0]
-        self.assertEqual(string, "django.core.validators.EmailValidator(message='hello')")
+        self.assertEqual(string, "mango.core.validators.EmailValidator(message='hello')")
         self.serialize_round_trip(validator)
 
         validator = deconstructible(path="migrations.test_writer.EmailValidator")(EmailValidator)(message="hello")
@@ -577,8 +577,8 @@ class WriterTests(SimpleTestCase):
         with self.assertRaisesMessage(ImportError, "No module named 'custom'"):
             MigrationWriter.serialize(validator)
 
-        validator = deconstructible(path="django.core.validators.EmailValidator2")(EmailValidator)(message="hello")
-        with self.assertRaisesMessage(ValueError, "Could not find object EmailValidator2 in django.core.validators."):
+        validator = deconstructible(path="mango.core.validators.EmailValidator2")(EmailValidator)(message="hello")
+        with self.assertRaisesMessage(ValueError, "Could not find object EmailValidator2 in mango.core.validators."):
             MigrationWriter.serialize(validator)
 
     def test_serialize_empty_nonempty_tuple(self):
@@ -741,8 +741,8 @@ class WriterTests(SimpleTestCase):
         output = writer.as_string()
         self.assertIn(
             "import datetime\n"
-            "from django.db import migrations, models\n"
-            "from django.utils.timezone import utc\n",
+            "from mango.db import migrations, models\n"
+            "from mango.utils.timezone import utc\n",
             output
         )
 
@@ -754,7 +754,7 @@ class WriterTests(SimpleTestCase):
             "operations": []
         })
         dt = datetime.datetime(2015, 7, 31, 4, 40, 0, 0, tzinfo=utc)
-        with mock.patch('django.db.migrations.writer.now', lambda: dt):
+        with mock.patch('mango.db.migrations.writer.now', lambda: dt):
             for include_header in (True, False):
                 with self.subTest(include_header=include_header):
                     writer = MigrationWriter(migration, include_header)
@@ -763,7 +763,7 @@ class WriterTests(SimpleTestCase):
                     self.assertEqual(
                         include_header,
                         output.startswith(
-                            "# Generated by Django %s on 2015-07-31 04:40\n\n" % get_version()
+                            "# Generated by Mango %s on 2015-07-31 04:40\n\n" % get_version()
                         )
                     )
                     if not include_header:
@@ -773,7 +773,7 @@ class WriterTests(SimpleTestCase):
 
     def test_models_import_omitted(self):
         """
-        django.db.models shouldn't be imported if unused.
+        mango.db.models shouldn't be imported if unused.
         """
         migration = type("Migration", (migrations.Migration,), {
             "operations": [
@@ -785,7 +785,7 @@ class WriterTests(SimpleTestCase):
         })
         writer = MigrationWriter(migration)
         output = writer.as_string()
-        self.assertIn("from django.db import migrations\n", output)
+        self.assertIn("from mango.db import migrations\n", output)
 
     def test_deconstruct_class_arguments(self):
         # Yes, it doesn't make sense to use a class as a default for a

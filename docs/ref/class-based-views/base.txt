@@ -3,12 +3,12 @@ Base views
 ==========
 
 The following three classes provide much of the functionality needed to create
-Django views. You may think of them as *parent* views, which can be used by
+Mango views. You may think of them as *parent* views, which can be used by
 themselves or inherited from. They may not provide all the capabilities
 required for projects, in which case there are Mixins and Generic class-based
 views.
 
-Many of Django's built-in class-based views inherit from other class-based
+Many of Mango's built-in class-based views inherit from other class-based
 views or various mixins. Because this inheritance chain is very important, the
 ancestor classes are  documented under the section title of **Ancestors (MRO)**.
 MRO is an acronym for Method Resolution Order.
@@ -16,11 +16,11 @@ MRO is an acronym for Method Resolution Order.
 ``View``
 ========
 
-.. class:: django.views.generic.base.View
+.. class:: mango.views.generic.base.View
 
     The master class-based base view. All other class-based views inherit from
     this base class. It isn't strictly a generic view and thus can also be
-    imported from ``django.views``.
+    imported from ``mango.views``.
 
     **Method Flowchart**
 
@@ -31,8 +31,8 @@ MRO is an acronym for Method Resolution Order.
 
     **Example views.py**::
 
-        from django.http import HttpResponse
-        from django.views import View
+        from mango.http import HttpResponse
+        from mango.views import View
 
         class MyView(View):
 
@@ -41,7 +41,7 @@ MRO is an acronym for Method Resolution Order.
 
     **Example urls.py**::
 
-        from django.urls import path
+        from mango.urls import path
 
         from myapp.views import MyView
 
@@ -71,10 +71,10 @@ MRO is an acronym for Method Resolution Order.
         attributes.
 
         When the view is called during the request/response cycle, the
-        :meth:`setup` method assigns the :class:`~django.http.HttpRequest` to
+        :meth:`setup` method assigns the :class:`~mango.http.HttpRequest` to
         the view's ``request`` attribute, and any positional and/or keyword
         arguments :ref:`captured from the URL pattern
-        <how-django-processes-a-request>` to the ``args`` and ``kwargs``
+        <how-mango-processes-a-request>` to the ``args`` and ``kwargs``
         attributes, respectively. Then :meth:`dispatch` is called.
 
     .. method:: setup(request, *args, **kwargs)
@@ -115,7 +115,7 @@ MRO is an acronym for Method Resolution Order.
 ``TemplateView``
 ================
 
-.. class:: django.views.generic.base.TemplateView
+.. class:: mango.views.generic.base.TemplateView
 
     Renders a given template, with the context containing parameters captured
     in the URL.
@@ -124,20 +124,20 @@ MRO is an acronym for Method Resolution Order.
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.base.ContextMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`mango.views.generic.base.TemplateResponseMixin`
+    * :class:`mango.views.generic.base.ContextMixin`
+    * :class:`mango.views.generic.base.View`
 
     **Method Flowchart**
 
-    #. :meth:`~django.views.generic.base.View.setup()`
-    #. :meth:`~django.views.generic.base.View.dispatch()`
-    #. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
-    #. :meth:`~django.views.generic.base.ContextMixin.get_context_data()`
+    #. :meth:`~mango.views.generic.base.View.setup()`
+    #. :meth:`~mango.views.generic.base.View.dispatch()`
+    #. :meth:`~mango.views.generic.base.View.http_method_not_allowed()`
+    #. :meth:`~mango.views.generic.base.ContextMixin.get_context_data()`
 
     **Example views.py**::
 
-        from django.views.generic.base import TemplateView
+        from mango.views.generic.base import TemplateView
 
         from articles.models import Article
 
@@ -152,7 +152,7 @@ MRO is an acronym for Method Resolution Order.
 
     **Example urls.py**::
 
-        from django.urls import path
+        from mango.urls import path
 
         from myapp.views import HomePageView
 
@@ -162,16 +162,16 @@ MRO is an acronym for Method Resolution Order.
 
     **Context**
 
-    * Populated (through :class:`~django.views.generic.base.ContextMixin`) with
+    * Populated (through :class:`~mango.views.generic.base.ContextMixin`) with
       the keyword arguments captured from the URL pattern that served the view.
     * You can also add context using the
-      :attr:`~django.views.generic.base.ContextMixin.extra_context` keyword
-      argument for :meth:`~django.views.generic.base.View.as_view`.
+      :attr:`~mango.views.generic.base.ContextMixin.extra_context` keyword
+      argument for :meth:`~mango.views.generic.base.View.as_view`.
 
 ``RedirectView``
 ================
 
-.. class:: django.views.generic.base.RedirectView
+.. class:: mango.views.generic.base.RedirectView
 
     Redirects to a given URL.
 
@@ -181,26 +181,26 @@ MRO is an acronym for Method Resolution Order.
     ``"%"`` characters in the URL must be written as ``"%%"`` so that Python
     will convert them to a single percent sign on output.
 
-    If the given URL is ``None``, Django will return an ``HttpResponseGone``
+    If the given URL is ``None``, Mango will return an ``HttpResponseGone``
     (410).
 
     **Ancestors (MRO)**
 
     This view inherits methods and attributes from the following view:
 
-    * :class:`django.views.generic.base.View`
+    * :class:`mango.views.generic.base.View`
 
     **Method Flowchart**
 
-    #. :meth:`~django.views.generic.base.View.setup()`
-    #. :meth:`~django.views.generic.base.View.dispatch()`
-    #. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
+    #. :meth:`~mango.views.generic.base.View.setup()`
+    #. :meth:`~mango.views.generic.base.View.dispatch()`
+    #. :meth:`~mango.views.generic.base.View.http_method_not_allowed()`
     #. :meth:`get_redirect_url()`
 
     **Example views.py**::
 
-        from django.shortcuts import get_object_or_404
-        from django.views.generic.base import RedirectView
+        from mango.shortcuts import get_object_or_404
+        from mango.views.generic.base import RedirectView
 
         from articles.models import Article
 
@@ -217,15 +217,15 @@ MRO is an acronym for Method Resolution Order.
 
     **Example urls.py**::
 
-        from django.urls import path
-        from django.views.generic.base import RedirectView
+        from mango.urls import path
+        from mango.views.generic.base import RedirectView
 
         from article.views import ArticleCounterRedirectView, ArticleDetailView
 
         urlpatterns = [
             path('counter/<int:pk>/', ArticleCounterRedirectView.as_view(), name='article-counter'),
             path('details/<int:pk>/', ArticleDetailView.as_view(), name='article-detail'),
-            path('go-to-django/', RedirectView.as_view(url='https://www.djangoproject.com/'), name='go-to-django'),
+            path('go-to-mango/', RedirectView.as_view(url='https://www.mangoproject.com/'), name='go-to-mango'),
         ]
 
     **Attributes**
@@ -262,7 +262,7 @@ MRO is an acronym for Method Resolution Order.
 
         The ``args`` and ``kwargs`` arguments are positional and/or keyword
         arguments :ref:`captured from the URL pattern
-        <how-django-processes-a-request>`, respectively.
+        <how-mango-processes-a-request>`, respectively.
 
         The default implementation uses :attr:`url` as a starting
         string and performs expansion of ``%`` named parameters in that string

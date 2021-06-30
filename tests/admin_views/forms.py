@@ -1,6 +1,6 @@
-from django.contrib.admin.forms import AdminAuthenticationForm
-from django.contrib.admin.helpers import ActionForm
-from django.core.exceptions import ValidationError
+from mango.contrib.admin.forms import AdminAuthenticationForm
+from mango.contrib.admin.helpers import ActionForm
+from mango.core.exceptions import ValidationError
 
 
 class CustomAdminAuthenticationForm(AdminAuthenticationForm):

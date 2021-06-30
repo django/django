@@ -1,14 +1,14 @@
 ==========================
-Django 1.4.1 release notes
+Mango 1.4.1 release notes
 ==========================
 
 *July 30, 2012*
 
-This is the first security release in the Django 1.4 series, fixing several
-security issues in Django 1.4. Django 1.4.1 is a recommended upgrade for
-all users of Django 1.4.
+This is the first security release in the Mango 1.4 series, fixing several
+security issues in Mango 1.4. Mango 1.4.1 is a recommended upgrade for
+all users of Mango 1.4.
 
 For a full list of issues addressed in this release, see the `security
 advisory`_.
 
-.. _security advisory: https://www.djangoproject.com/weblog/2012/jul/30/security-releases-issued/
+.. _security advisory: https://www.mangoproject.com/weblog/2012/jul/30/security-releases-issued/

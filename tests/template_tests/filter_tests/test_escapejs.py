@@ -1,6 +1,6 @@
-from django.template.defaultfilters import escapejs_filter
-from django.test import SimpleTestCase
-from django.utils.functional import lazy
+from mango.template.defaultfilters import escapejs_filter
+from mango.test import SimpleTestCase
+from mango.utils.functional import lazy
 
 from ..utils import setup
 

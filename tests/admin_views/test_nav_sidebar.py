@@ -1,8 +1,8 @@
-from django.contrib import admin
-from django.contrib.admin.tests import AdminSeleniumTestCase
-from django.contrib.auth.models import User
-from django.test import TestCase, override_settings
-from django.urls import path, reverse
+from mango.contrib import admin
+from mango.contrib.admin.tests import AdminSeleniumTestCase
+from mango.contrib.auth.models import User
+from mango.test import TestCase, override_settings
+from mango.urls import path, reverse
 
 
 class AdminSiteWithSidebar(admin.AdminSite):
@@ -59,13 +59,13 @@ class AdminSidebarTests(TestCase):
 
     @override_settings(
         TEMPLATES=[{
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'BACKEND': 'mango.template.backends.mango.MangoTemplates',
             'DIRS': [],
             'APP_DIRS': True,
             'OPTIONS': {
                 'context_processors': [
-                    'django.contrib.auth.context_processors.auth',
-                    'django.contrib.messages.context_processors.messages',
+                    'mango.contrib.auth.context_processors.auth',
+                    'mango.contrib.messages.context_processors.messages',
                 ],
             },
         }]
@@ -82,7 +82,7 @@ class AdminSidebarTests(TestCase):
     def test_included_app_list_template_context_fully_set(self):
         # All context variables should be set when rendering the sidebar.
         url = reverse('test_with_sidebar:auth_user_changelist')
-        with self.assertNoLogs('django.template', 'DEBUG'):
+        with self.assertNoLogs('mango.template', 'DEBUG'):
             self.client.get(url)
 
 
@@ -95,7 +95,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             email='super@example.com',
         )
         self.admin_login(username='super', password='secret', login_url=reverse('test_with_sidebar:index'))
-        self.selenium.execute_script("localStorage.removeItem('django.admin.navSidebarIsOpen')")
+        self.selenium.execute_script("localStorage.removeItem('mango.admin.navSidebarIsOpen')")
 
     def test_sidebar_starts_open(self):
         self.selenium.get(self.live_server_url + reverse('test_with_sidebar:auth_user_changelist'))
@@ -118,11 +118,11 @@ class SeleniumTests(AdminSeleniumTestCase):
 
     def test_sidebar_state_persists(self):
         self.selenium.get(self.live_server_url + reverse('test_with_sidebar:auth_user_changelist'))
-        self.assertIsNone(self.selenium.execute_script("return localStorage.getItem('django.admin.navSidebarIsOpen')"))
+        self.assertIsNone(self.selenium.execute_script("return localStorage.getItem('mango.admin.navSidebarIsOpen')"))
         toggle_button = self.selenium.find_element_by_css_selector('#toggle-nav-sidebar')
         toggle_button.click()
         self.assertEqual(
-            self.selenium.execute_script("return localStorage.getItem('django.admin.navSidebarIsOpen')"),
+            self.selenium.execute_script("return localStorage.getItem('mango.admin.navSidebarIsOpen')"),
             'false',
         )
         self.selenium.get(self.live_server_url + reverse('test_with_sidebar:auth_user_changelist'))
@@ -137,7 +137,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         for link in self.selenium.find_elements_by_css_selector('#nav-sidebar a'):
             self.assertEqual(link.get_attribute('tabIndex'), '0')
         self.assertEqual(
-            self.selenium.execute_script("return localStorage.getItem('django.admin.navSidebarIsOpen')"),
+            self.selenium.execute_script("return localStorage.getItem('mango.admin.navSidebarIsOpen')"),
             'true',
         )
         self.selenium.get(self.live_server_url + reverse('test_with_sidebar:auth_user_changelist'))
@@ -150,7 +150,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             reverse('test_with_sidebar:auth_user_changelist')
         )
         filter_value_script = (
-            "return localStorage.getItem('django.admin.navSidebarFilterValue')"
+            "return localStorage.getItem('mango.admin.navSidebarFilterValue')"
         )
         self.assertIsNone(self.selenium.execute_script(filter_value_script))
         filter_input = self.selenium.find_element_by_css_selector('#nav-filter')

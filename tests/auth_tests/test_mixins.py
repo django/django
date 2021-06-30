@@ -1,14 +1,14 @@
 from unittest import mock
 
-from django.contrib.auth import models
-from django.contrib.auth.mixins import (
+from mango.contrib.auth import models
+from mango.contrib.auth.mixins import (
     LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin,
 )
-from django.contrib.auth.models import AnonymousUser
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
-from django.test import RequestFactory, SimpleTestCase, TestCase
-from django.views.generic import View
+from mango.contrib.auth.models import AnonymousUser
+from mango.core.exceptions import PermissionDenied
+from mango.http import HttpResponse
+from mango.test import RequestFactory, SimpleTestCase, TestCase
+from mango.views.generic import View
 
 
 class AlwaysTrueMixin(UserPassesTestMixin):

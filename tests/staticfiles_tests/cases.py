@@ -2,10 +2,10 @@ import os
 import shutil
 import tempfile
 
-from django.conf import settings
-from django.core.management import call_command
-from django.template import Context, Template
-from django.test import SimpleTestCase, override_settings
+from mango.conf import settings
+from mango.core.management import call_command
+from mango.template import Context, Template
+from mango.test import SimpleTestCase, override_settings
 
 from .settings import TEST_SETTINGS
 

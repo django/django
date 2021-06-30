@@ -1,19 +1,19 @@
 import os
 
 AUTH_MIDDLEWARE = [
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'mango.contrib.sessions.middleware.SessionMiddleware',
+    'mango.contrib.auth.middleware.AuthenticationMiddleware',
 ]
 
 AUTH_TEMPLATES = [{
-    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'BACKEND': 'mango.template.backends.mango.MangoTemplates',
     'DIRS': [os.path.join(os.path.dirname(__file__), 'templates')],
     'APP_DIRS': True,
     'OPTIONS': {
         'context_processors': [
-            'django.template.context_processors.request',
-            'django.contrib.auth.context_processors.auth',
-            'django.contrib.messages.context_processors.messages',
+            'mango.template.context_processors.request',
+            'mango.contrib.auth.context_processors.auth',
+            'mango.contrib.messages.context_processors.messages',
         ],
     },
 }]

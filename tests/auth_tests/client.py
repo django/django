@@ -1,9 +1,9 @@
 import re
 
-from django.contrib.auth.views import (
+from mango.contrib.auth.views import (
     INTERNAL_RESET_SESSION_TOKEN, PasswordResetConfirmView,
 )
-from django.test import Client
+from mango.test import Client
 
 
 def extract_token_from_url(url):

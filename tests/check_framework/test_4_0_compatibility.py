@@ -1,9 +1,9 @@
-from django.core.checks import Error
-from django.core.checks.compatibility.django_4_0 import (
+from mango.core.checks import Error
+from mango.core.checks.compatibility.mango_4_0 import (
     check_csrf_trusted_origins,
 )
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
+from mango.test import SimpleTestCase
+from mango.test.utils import override_settings
 
 
 class CheckCSRFTrustedOrigins(SimpleTestCase):
@@ -12,7 +12,7 @@ class CheckCSRFTrustedOrigins(SimpleTestCase):
     def test_invalid_url(self):
         self.assertEqual(check_csrf_trusted_origins(None), [
             Error(
-                'As of Django 4.0, the values in the CSRF_TRUSTED_ORIGINS '
+                'As of Mango 4.0, the values in the CSRF_TRUSTED_ORIGINS '
                 'setting must start with a scheme (usually http:// or '
                 'https://) but found example.com. See the release notes for '
                 'details.',

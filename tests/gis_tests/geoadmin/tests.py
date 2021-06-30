@@ -1,12 +1,12 @@
-from django.contrib.gis import admin
-from django.contrib.gis.geos import Point
-from django.test import SimpleTestCase, override_settings
+from mango.contrib.gis import admin
+from mango.contrib.gis.geos import Point
+from mango.test import SimpleTestCase, override_settings
 
 from .admin import UnmodifiableAdmin
 from .models import City, site
 
 
-@override_settings(ROOT_URLCONF='django.contrib.gis.tests.geoadmin.urls')
+@override_settings(ROOT_URLCONF='mango.contrib.gis.tests.geoadmin.urls')
 class GeoAdminTest(SimpleTestCase):
 
     def test_ensure_geographic_media(self):
@@ -15,14 +15,14 @@ class GeoAdminTest(SimpleTestCase):
         self.assertTrue(any(geoadmin.openlayers_url in js for js in admin_js))
 
     def test_olmap_OSM_rendering(self):
-        delete_all_btn = """<a href="javascript:geodjango_point.clearFeatures()">Delete all Features</a>"""
+        delete_all_btn = """<a href="javascript:geomango_point.clearFeatures()">Delete all Features</a>"""
 
         original_geoadmin = site._registry[City]
         params = original_geoadmin.get_map_widget(City._meta.get_field('point')).params
         result = original_geoadmin.get_map_widget(City._meta.get_field('point'))(
         ).render('point', Point(-79.460734, 40.18476), params)
         self.assertIn(
-            """geodjango_point.layers.base = new OpenLayers.Layer.OSM("OpenStreetMap (Mapnik)");""",
+            """geomango_point.layers.base = new OpenLayers.Layer.OSM("OpenStreetMap (Mapnik)");""",
             result)
 
         self.assertIn(delete_all_btn, result)
@@ -45,7 +45,7 @@ class GeoAdminTest(SimpleTestCase):
         result = geoadmin.get_map_widget(City._meta.get_field('point'))(
         ).render('point', Point(-79.460734, 40.18476))
         self.assertIn(
-            """geodjango_point.layers.base = new OpenLayers.Layer.WMS("OpenLayers WMS", """
+            """geomango_point.layers.base = new OpenLayers.Layer.WMS("OpenLayers WMS", """
             """"http://vmap0.tiles.osgeo.org/wms/vmap0", {layers: 'basic', format: 'image/jpeg'});""",
             result)
 
@@ -72,7 +72,7 @@ class GeoAdminTest(SimpleTestCase):
     def test_olwidget_empty_string(self):
         geoadmin = site._registry[City]
         form = geoadmin.get_changelist_form(None)({'point': ''})
-        with self.assertNoLogs('django.contrib.gis', 'ERROR'):
+        with self.assertNoLogs('mango.contrib.gis', 'ERROR'):
             output = str(form['point'])
         self.assertInHTML(
             '<textarea id="id_point" class="vWKTField required" cols="150"'
@@ -83,7 +83,7 @@ class GeoAdminTest(SimpleTestCase):
     def test_olwidget_invalid_string(self):
         geoadmin = site._registry[City]
         form = geoadmin.get_changelist_form(None)({'point': 'INVALID()'})
-        with self.assertLogs('django.contrib.gis', 'ERROR') as cm:
+        with self.assertLogs('mango.contrib.gis', 'ERROR') as cm:
             output = str(form['point'])
         self.assertInHTML(
             '<textarea id="id_point" class="vWKTField required" cols="150"'

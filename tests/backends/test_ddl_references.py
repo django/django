@@ -1,11 +1,11 @@
-from django.db import connection
-from django.db.backends.ddl_references import (
+from mango.db import connection
+from mango.db.backends.ddl_references import (
     Columns, Expressions, ForeignKeyName, IndexName, Statement, Table,
 )
-from django.db.models import ExpressionList, F
-from django.db.models.functions import Upper
-from django.db.models.indexes import IndexExpression
-from django.test import SimpleTestCase, TransactionTestCase
+from mango.db.models import ExpressionList, F
+from mango.db.models.functions import Upper
+from mango.db.models.indexes import IndexExpression
+from mango.test import SimpleTestCase, TransactionTestCase
 
 from .models import Person
 

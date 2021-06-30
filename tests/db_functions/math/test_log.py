@@ -1,8 +1,8 @@
 import math
 from decimal import Decimal
 
-from django.db.models.functions import Log
-from django.test import TestCase
+from mango.db.models.functions import Log
+from mango.test import TestCase
 
 from ..models import DecimalModel, FloatModel, IntegerModel
 

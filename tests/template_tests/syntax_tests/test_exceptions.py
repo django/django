@@ -1,5 +1,5 @@
-from django.template import TemplateDoesNotExist, TemplateSyntaxError
-from django.test import SimpleTestCase
+from mango.template import TemplateDoesNotExist, TemplateSyntaxError
+from mango.test import SimpleTestCase
 
 from ..utils import setup
 from .test_extends import inheritance_templates

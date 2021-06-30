@@ -1,5 +1,5 @@
-from django.core.serializers.base import DeserializedObject
-from django.test import SimpleTestCase
+from mango.core.serializers.base import DeserializedObject
+from mango.test import SimpleTestCase
 
 from .models import Author
 

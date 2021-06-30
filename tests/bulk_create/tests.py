@@ -1,10 +1,10 @@
 from math import ceil
 from operator import attrgetter
 
-from django.db import IntegrityError, NotSupportedError, connection
-from django.db.models import FileField, Value
-from django.db.models.functions import Lower
-from django.test import (
+from mango.db import IntegrityError, NotSupportedError, connection
+from mango.db.models import FileField, Value
+from mango.db.models.functions import Lower
+from mango.test import (
     TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature,
 )
 

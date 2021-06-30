@@ -1,5 +1,5 @@
-from django.contrib import admin
-from django.test import SimpleTestCase
+from mango.contrib import admin
+from mango.test import SimpleTestCase
 
 
 class AdminAutoDiscoverTests(SimpleTestCase):

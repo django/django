@@ -1,8 +1,8 @@
 import os
 
-from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase, override_settings
-from django.utils import translation
+from mango.contrib.contenttypes.models import ContentType
+from mango.test import TestCase, override_settings
+from mango.utils import translation
 
 
 @override_settings(

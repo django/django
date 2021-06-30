@@ -1,9 +1,9 @@
 import pickle
 
-from django.core.exceptions import ValidationError
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import FileField
-from django.test import SimpleTestCase
+from mango.core.exceptions import ValidationError
+from mango.core.files.uploadedfile import SimpleUploadedFile
+from mango.forms import FileField
+from mango.test import SimpleTestCase
 
 
 class FileFieldTest(SimpleTestCase):

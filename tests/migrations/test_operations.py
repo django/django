@@ -1,14 +1,14 @@
-from django.core.exceptions import FieldDoesNotExist
-from django.db import (
+from mango.core.exceptions import FieldDoesNotExist
+from mango.db import (
     IntegrityError, connection, migrations, models, transaction,
 )
-from django.db.migrations.migration import Migration
-from django.db.migrations.operations.fields import FieldOperation
-from django.db.migrations.state import ModelState, ProjectState
-from django.db.models.functions import Abs
-from django.db.transaction import atomic
-from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext
+from mango.db.migrations.migration import Migration
+from mango.db.migrations.operations.fields import FieldOperation
+from mango.db.migrations.state import ModelState, ProjectState
+from mango.db.models.functions import Abs
+from mango.db.transaction import atomic
+from mango.test import SimpleTestCase, override_settings, skipUnlessDBFeature
+from mango.test.utils import CaptureQueriesContext
 
 from .models import FoodManager, FoodQuerySet, UnicodeModel
 from .test_base import OperationTestBase
@@ -108,7 +108,7 @@ class OperationTests(OperationTestBase):
                 fields=[],
                 bases=(UnicodeModel, 'migrations.UnicodeModel',),
             )
-        message = "Found duplicate value <class 'django.db.models.base.Model'> in CreateModel bases argument."
+        message = "Found duplicate value <class 'mango.db.models.base.Model'> in CreateModel bases argument."
         with self.assertRaisesMessage(ValueError, message):
             migrations.CreateModel(
                 "Pony",
@@ -2872,13 +2872,13 @@ class OperationTests(OperationTestBase):
             # Use a multi-line string with a comment to test splitting on SQLite and MySQL respectively
             "CREATE TABLE i_love_ponies (id int, special_thing varchar(15));\n"
             "INSERT INTO i_love_ponies (id, special_thing) VALUES (1, 'i love ponies'); -- this is magic!\n"
-            "INSERT INTO i_love_ponies (id, special_thing) VALUES (2, 'i love django');\n"
+            "INSERT INTO i_love_ponies (id, special_thing) VALUES (2, 'i love mango');\n"
             "UPDATE i_love_ponies SET special_thing = 'Ponies' WHERE special_thing LIKE '%%ponies';"
-            "UPDATE i_love_ponies SET special_thing = 'Django' WHERE special_thing LIKE '%django';",
+            "UPDATE i_love_ponies SET special_thing = 'Mango' WHERE special_thing LIKE '%mango';",
 
             # Run delete queries to test for parameter substitution failure
             # reported in #23426
-            "DELETE FROM i_love_ponies WHERE special_thing LIKE '%Django%';"
+            "DELETE FROM i_love_ponies WHERE special_thing LIKE '%Mango%';"
             "DELETE FROM i_love_ponies WHERE special_thing LIKE '%%Ponies%%';"
             "DROP TABLE i_love_ponies",
 
@@ -2905,7 +2905,7 @@ class OperationTests(OperationTestBase):
         with connection.cursor() as cursor:
             cursor.execute("SELECT COUNT(*) FROM i_love_ponies")
             self.assertEqual(cursor.fetchall()[0][0], 2)
-            cursor.execute("SELECT COUNT(*) FROM i_love_ponies WHERE special_thing = 'Django'")
+            cursor.execute("SELECT COUNT(*) FROM i_love_ponies WHERE special_thing = 'Mango'")
             self.assertEqual(cursor.fetchall()[0][0], 1)
             cursor.execute("SELECT COUNT(*) FROM i_love_ponies WHERE special_thing = 'Ponies'")
             self.assertEqual(cursor.fetchall()[0][0], 1)
@@ -2937,13 +2937,13 @@ class OperationTests(OperationTestBase):
         param_operation = migrations.RunSQL(
             # forwards
             (
-                "INSERT INTO i_love_ponies (id, special_thing) VALUES (1, 'Django');",
+                "INSERT INTO i_love_ponies (id, special_thing) VALUES (1, 'Mango');",
                 ["INSERT INTO i_love_ponies (id, special_thing) VALUES (2, %s);", ['Ponies']],
                 ("INSERT INTO i_love_ponies (id, special_thing) VALUES (%s, %s);", (3, 'Python',)),
             ),
             # backwards
             [
-                "DELETE FROM i_love_ponies WHERE special_thing = 'Django';",
+                "DELETE FROM i_love_ponies WHERE special_thing = 'Mango';",
                 ["DELETE FROM i_love_ponies WHERE special_thing = 'Ponies';", None],
                 ("DELETE FROM i_love_ponies WHERE id = %s OR special_thing = %s;", [3, 'Python']),
             ]
@@ -3308,8 +3308,8 @@ class OperationTests(OperationTestBase):
             Article = models.get_model("test_article", "Article")
             Blog = models.get_model("test_blog", "Blog")
             blog2 = Blog.objects.create(name="Frameworks", id=target_value)
-            Article.objects.create(name="Django", blog=blog2)
-            Article.objects.create(id=target_value, name="Django2", blog=blog2)
+            Article.objects.create(name="Mango", blog=blog2)
+            Article.objects.create(id=target_value, name="Mango2", blog=blog2)
 
         create_blog = migrations.CreateModel(
             "Blog",

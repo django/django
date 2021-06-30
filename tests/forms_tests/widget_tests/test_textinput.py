@@ -1,5 +1,5 @@
-from django.forms import TextInput
-from django.utils.safestring import mark_safe
+from mango.forms import TextInput
+from mango.utils.safestring import mark_safe
 
 from .base import WidgetTest
 

@@ -1,9 +1,9 @@
-from django.contrib.auth import authenticate
-from django.contrib.auth.context_processors import PermLookupDict, PermWrapper
-from django.contrib.auth.models import Permission, User
-from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q
-from django.test import SimpleTestCase, TestCase, override_settings
+from mango.contrib.auth import authenticate
+from mango.contrib.auth.context_processors import PermLookupDict, PermWrapper
+from mango.contrib.auth.models import Permission, User
+from mango.contrib.contenttypes.models import ContentType
+from mango.db.models import Q
+from mango.test import SimpleTestCase, TestCase, override_settings
 
 from .settings import AUTH_MIDDLEWARE, AUTH_TEMPLATES
 
@@ -67,7 +67,7 @@ class PermWrapperTests(SimpleTestCase):
 @override_settings(ROOT_URLCONF='auth_tests.urls', TEMPLATES=AUTH_TEMPLATES)
 class AuthContextProcessorTests(TestCase):
     """
-    Tests for the ``django.contrib.auth.context_processors.auth`` processor
+    Tests for the ``mango.contrib.auth.context_processors.auth`` processor
     """
 
     @classmethod

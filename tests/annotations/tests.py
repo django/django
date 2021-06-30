@@ -1,18 +1,18 @@
 import datetime
 from decimal import Decimal
 
-from django.core.exceptions import FieldDoesNotExist, FieldError
-from django.db.models import (
+from mango.core.exceptions import FieldDoesNotExist, FieldError
+from mango.db.models import (
     BooleanField, Case, CharField, Count, DateTimeField, DecimalField, Exists,
     ExpressionWrapper, F, FloatField, Func, IntegerField, Max, OuterRef, Q,
     Subquery, Sum, Value, When,
 )
-from django.db.models.expressions import RawSQL
-from django.db.models.functions import (
+from mango.db.models.expressions import RawSQL
+from mango.db.models.functions import (
     Coalesce, ExtractYear, Floor, Length, Lower, Trim,
 )
-from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import register_lookup
+from mango.test import TestCase, skipUnlessDBFeature
+from mango.test.utils import register_lookup
 
 from .models import (
     Author, Book, Company, DepartmentStore, Employee, Publisher, Store, Ticket,
@@ -48,22 +48,22 @@ class NonAggregateAnnotationTestCase(TestCase):
         cls.p5 = Publisher.objects.create(name="Jonno's House of Books", num_awards=0)
 
         cls.b1 = Book.objects.create(
-            isbn='159059725', name='The Definitive Guide to Django: Web Development Done Right',
+            isbn='159059725', name='The Definitive Guide to Mango: Web Development Done Right',
             pages=447, rating=4.5, price=Decimal('30.00'), contact=cls.a1, publisher=cls.p1,
             pubdate=datetime.date(2007, 12, 6)
         )
         cls.b2 = Book.objects.create(
-            isbn='067232959', name='Sams Teach Yourself Django in 24 Hours',
+            isbn='067232959', name='Sams Teach Yourself Mango in 24 Hours',
             pages=528, rating=3.0, price=Decimal('23.09'), contact=cls.a3, publisher=cls.p2,
             pubdate=datetime.date(2008, 3, 3)
         )
         cls.b3 = Book.objects.create(
-            isbn='159059996', name='Practical Django Projects',
+            isbn='159059996', name='Practical Mango Projects',
             pages=300, rating=4.0, price=Decimal('29.69'), contact=cls.a4, publisher=cls.p1,
             pubdate=datetime.date(2008, 6, 23)
         )
         cls.b4 = Book.objects.create(
-            isbn='013235613', name='Python Web Development with Django',
+            isbn='013235613', name='Python Web Development with Mango',
             pages=350, rating=4.0, price=Decimal('29.69'), contact=cls.a5, publisher=cls.p3,
             pubdate=datetime.date(2008, 11, 3)
         )
@@ -166,7 +166,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         ])
 
     def test_chaining_transforms(self):
-        Company.objects.create(name=' Django Software Foundation  ')
+        Company.objects.create(name=' Mango Software Foundation  ')
         Company.objects.create(name='Yahoo')
         with register_lookup(CharField, Trim), register_lookup(CharField, Length):
             for expr in [Length('name__trim'), F('name__trim__length')]:
@@ -174,7 +174,7 @@ class NonAggregateAnnotationTestCase(TestCase):
                     self.assertCountEqual(
                         Company.objects.annotate(length=expr).values('name', 'length'),
                         [
-                            {'name': ' Django Software Foundation  ', 'length': 26},
+                            {'name': ' Mango Software Foundation  ', 'length': 26},
                             {'name': 'Yahoo', 'length': 5},
                         ],
                     )
@@ -373,7 +373,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         books = Book.objects.annotate(
             store_name=F('store__name'),
         ).filter(
-            name='Practical Django Projects',
+            name='Practical Mango Projects',
         ).order_by('store_name')
 
         self.assertQuerysetEqual(
@@ -578,7 +578,7 @@ class NonAggregateAnnotationTestCase(TestCase):
 
     def test_custom_functions(self):
         Company(name='Apple', motto=None, ticker_name='APPL', description='Beautiful Devices').save()
-        Company(name='Django Software Foundation', motto=None, ticker_name=None, description=None).save()
+        Company(name='Mango Software Foundation', motto=None, ticker_name=None, description=None).save()
         Company(name='Google', motto='Do No Evil', ticker_name='GOOG', description='Internet Company').save()
         Company(name='Yahoo', motto=None, ticker_name=None, description='Internet Company').save()
 
@@ -595,7 +595,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         self.assertQuerysetEqual(
             qs, [
                 ('Apple', 'APPL'),
-                ('Django Software Foundation', 'No Tag'),
+                ('Mango Software Foundation', 'No Tag'),
                 ('Google', 'Do No Evil'),
                 ('Yahoo', 'Internet Company')
             ],
@@ -604,7 +604,7 @@ class NonAggregateAnnotationTestCase(TestCase):
 
     def test_custom_functions_can_ref_other_functions(self):
         Company(name='Apple', motto=None, ticker_name='APPL', description='Beautiful Devices').save()
-        Company(name='Django Software Foundation', motto=None, ticker_name=None, description=None).save()
+        Company(name='Mango Software Foundation', motto=None, ticker_name=None, description=None).save()
         Company(name='Google', motto='Do No Evil', ticker_name='GOOG', description='Internet Company').save()
         Company(name='Yahoo', motto=None, ticker_name=None, description='Internet Company').save()
 
@@ -629,7 +629,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         self.assertQuerysetEqual(
             qs, [
                 ('Apple', 'APPL'.lower()),
-                ('Django Software Foundation', 'No Tag'.lower()),
+                ('Mango Software Foundation', 'No Tag'.lower()),
                 ('Google', 'Do No Evil'.lower()),
                 ('Yahoo', 'Internet Company'.lower())
             ],
@@ -778,12 +778,12 @@ class AliasTests(TestCase):
         cls.b1 = Book.objects.create(
             isbn='159059725', pages=447, rating=4.5, price=Decimal('30.00'),
             contact=cls.a1, publisher=p1, pubdate=datetime.date(2007, 12, 6),
-            name='The Definitive Guide to Django: Web Development Done Right',
+            name='The Definitive Guide to Mango: Web Development Done Right',
         )
         cls.b2 = Book.objects.create(
             isbn='159059996', pages=300, rating=4.0, price=Decimal('29.69'),
             contact=cls.a3, publisher=p1, pubdate=datetime.date(2008, 6, 23),
-            name='Practical Django Projects',
+            name='Practical Mango Projects',
         )
         cls.b3 = Book.objects.create(
             isbn='013790395', pages=1132, rating=4.0, price=Decimal('82.80'),

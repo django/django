@@ -1,5 +1,5 @@
-from django.db.models import F, Sum
-from django.test import TestCase
+from mango.db.models import F, Sum
+from mango.test import TestCase
 
 from .models import Company, Employee
 

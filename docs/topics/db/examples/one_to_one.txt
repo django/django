@@ -3,11 +3,11 @@ One-to-one relationships
 ========================
 
 To define a one-to-one relationship, use
-:class:`~django.db.models.OneToOneField`.
+:class:`~mango.db.models.OneToOneField`.
 
 In this example, a ``Place`` optionally can be a ``Restaurant``::
 
-    from django.db import models
+    from mango.db import models
 
     class Place(models.Model):
         name = models.CharField(max_length=50)
@@ -64,7 +64,7 @@ A Place can access its restaurant, if available::
 
 p2 doesn't have an associated restaurant::
 
-    >>> from django.core.exceptions import ObjectDoesNotExist
+    >>> from mango.core.exceptions import ObjectDoesNotExist
     >>> try:
     >>>     p2.restaurant
     >>> except ObjectDoesNotExist:

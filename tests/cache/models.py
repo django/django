@@ -1,5 +1,5 @@
-from django.db import models
-from django.utils import timezone
+from mango.db import models
+from mango.utils import timezone
 
 
 def expensive_calculation():

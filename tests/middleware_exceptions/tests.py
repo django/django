@@ -1,7 +1,7 @@
-from django.conf import settings
-from django.core.exceptions import MiddlewareNotUsed
-from django.http import HttpResponse
-from django.test import RequestFactory, SimpleTestCase, override_settings
+from mango.conf import settings
+from mango.core.exceptions import MiddlewareNotUsed
+from mango.http import HttpResponse
+from mango.test import RequestFactory, SimpleTestCase, override_settings
 
 from . import middleware as mw
 
@@ -143,7 +143,7 @@ class MyMiddlewareWithExceptionMessage:
 @override_settings(
     DEBUG=True,
     ROOT_URLCONF='middleware_exceptions.urls',
-    MIDDLEWARE=['django.middleware.common.CommonMiddleware'],
+    MIDDLEWARE=['mango.middleware.common.CommonMiddleware'],
 )
 class MiddlewareNotUsedTests(SimpleTestCase):
 
@@ -156,7 +156,7 @@ class MiddlewareNotUsedTests(SimpleTestCase):
 
     @override_settings(MIDDLEWARE=['middleware_exceptions.tests.MyMiddleware'])
     def test_log(self):
-        with self.assertLogs('django.request', 'DEBUG') as cm:
+        with self.assertLogs('mango.request', 'DEBUG') as cm:
             self.client.get('/middleware_exceptions/view/')
         self.assertEqual(
             cm.records[0].getMessage(),
@@ -165,7 +165,7 @@ class MiddlewareNotUsedTests(SimpleTestCase):
 
     @override_settings(MIDDLEWARE=['middleware_exceptions.tests.MyMiddlewareWithExceptionMessage'])
     def test_log_custom_message(self):
-        with self.assertLogs('django.request', 'DEBUG') as cm:
+        with self.assertLogs('mango.request', 'DEBUG') as cm:
             self.client.get('/middleware_exceptions/view/')
         self.assertEqual(
             cm.records[0].getMessage(),
@@ -177,7 +177,7 @@ class MiddlewareNotUsedTests(SimpleTestCase):
         MIDDLEWARE=['middleware_exceptions.tests.MyMiddleware'],
     )
     def test_do_not_log_when_debug_is_false(self):
-        with self.assertNoLogs('django.request', 'DEBUG'):
+        with self.assertNoLogs('mango.request', 'DEBUG'):
             self.client.get('/middleware_exceptions/view/')
 
     @override_settings(MIDDLEWARE=[
@@ -185,7 +185,7 @@ class MiddlewareNotUsedTests(SimpleTestCase):
         'middleware_exceptions.tests.MyMiddleware',
     ])
     async def test_async_and_sync_middleware_chain_async_call(self):
-        with self.assertLogs('django.request', 'DEBUG') as cm:
+        with self.assertLogs('mango.request', 'DEBUG') as cm:
             response = await self.async_client.get('/middleware_exceptions/view/')
         self.assertEqual(response.content, b'OK')
         self.assertEqual(response.status_code, 200)
@@ -223,7 +223,7 @@ class MiddlewareSyncAsyncTests(SimpleTestCase):
         'middleware_exceptions.middleware.async_payment_middleware',
     ])
     def test_async_middleware(self):
-        with self.assertLogs('django.request', 'DEBUG') as cm:
+        with self.assertLogs('mango.request', 'DEBUG') as cm:
             response = self.client.get('/middleware_exceptions/view/')
         self.assertEqual(response.status_code, 402)
         self.assertEqual(
@@ -249,7 +249,7 @@ class MiddlewareSyncAsyncTests(SimpleTestCase):
         'middleware_exceptions.middleware.PaymentMiddleware',
     ])
     async def test_sync_middleware_async(self):
-        with self.assertLogs('django.request', 'DEBUG') as cm:
+        with self.assertLogs('mango.request', 'DEBUG') as cm:
             response = await self.async_client.get('/middleware_exceptions/view/')
         self.assertEqual(response.status_code, 402)
         self.assertEqual(
@@ -262,7 +262,7 @@ class MiddlewareSyncAsyncTests(SimpleTestCase):
         'middleware_exceptions.middleware.async_payment_middleware',
     ])
     async def test_async_middleware_async(self):
-        with self.assertLogs('django.request', 'WARNING') as cm:
+        with self.assertLogs('mango.request', 'WARNING') as cm:
             response = await self.async_client.get('/middleware_exceptions/view/')
         self.assertEqual(response.status_code, 402)
         self.assertEqual(

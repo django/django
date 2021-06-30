@@ -1,5 +1,5 @@
-from django.urls import include, path
-from django.views import View
+from mango.urls import include, path
+from mango.views import View
 
 
 def view1(request):

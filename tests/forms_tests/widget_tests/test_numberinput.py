@@ -1,5 +1,5 @@
-from django.forms.widgets import NumberInput
-from django.test import override_settings
+from mango.forms.widgets import NumberInput
+from mango.test import override_settings
 
 from .base import WidgetTest
 

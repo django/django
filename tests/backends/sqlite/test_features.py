@@ -1,7 +1,7 @@
 from unittest import mock, skipUnless
 
-from django.db import OperationalError, connection
-from django.test import TestCase
+from mango.db import OperationalError, connection
+from mango.test import TestCase
 
 
 @skipUnless(connection.vendor == 'sqlite', 'SQLite tests.')
@@ -11,7 +11,7 @@ class FeaturesTests(TestCase):
             del connection.features.supports_json_field
         msg = 'unable to open database file'
         with mock.patch(
-            'django.db.backends.base.base.BaseDatabaseWrapper.cursor',
+            'mango.db.backends.base.base.BaseDatabaseWrapper.cursor',
             side_effect=OperationalError(msg),
         ):
             with self.assertRaisesMessage(OperationalError, msg):

@@ -2,17 +2,17 @@
 Writing code
 ============
 
-So you'd like to write some code to improve Django? Awesome! There are several
-ways you can help Django's development:
+So you'd like to write some code to improve Mango? Awesome! There are several
+ways you can help Mango's development:
 
 * :doc:`Report bugs <../bugs-and-features>` in our `ticket tracker`_.
 
-* Join the |django-developers| mailing list and share your ideas for how to
-  improve Django. We're always open to suggestions. You can also interact on
-  the `Django forum`_ and the `#django-dev IRC channel`_.
+* Join the |mango-developers| mailing list and share your ideas for how to
+  improve Mango. We're always open to suggestions. You can also interact on
+  the `Mango forum`_ and the `#mango-dev IRC channel`_.
 
 * :doc:`Submit patches <submitting-patches>` for new and/or fixed behavior. If
-  you're looking for a way to get started contributing to Django read the
+  you're looking for a way to get started contributing to Mango read the
   :doc:`/intro/contributing` tutorial and have a look at the `easy pickings`_
   tickets. The :ref:`patch-review-checklist` will also be helpful.
 
@@ -26,7 +26,7 @@ ways you can help Django's development:
   development process.
 
 Browse the following sections to find out how to give your code patches the
-best chances to be included in Django core:
+best chances to be included in Mango core:
 
 .. toctree::
    :maxdepth: 1
@@ -37,7 +37,7 @@ best chances to be included in Django core:
    working-with-git
    javascript
 
-.. _ticket tracker: https://code.djangoproject.com/
-.. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
-.. _#django-dev IRC channel: https://web.libera.chat/#django-dev
-.. _Django forum: https://forum.djangoproject.com/
+.. _ticket tracker: https://code.mangoproject.com/
+.. _easy pickings: https://code.mangoproject.com/query?status=!closed&easy=1
+.. _#mango-dev IRC channel: https://web.libera.chat/#mango-dev
+.. _Mango forum: https://forum.mangoproject.com/

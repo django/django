@@ -1,11 +1,11 @@
-from django.http import HttpResponse
-from django.test import RequestFactory, SimpleTestCase
-from django.test.utils import override_settings
+from mango.http import HttpResponse
+from mango.test import RequestFactory, SimpleTestCase
+from mango.test.utils import override_settings
 
 
 class SecurityMiddlewareTest(SimpleTestCase):
     def middleware(self, *args, **kwargs):
-        from django.middleware.security import SecurityMiddleware
+        from mango.middleware.security import SecurityMiddleware
         return SecurityMiddleware(self.response(*args, **kwargs))
 
     @property

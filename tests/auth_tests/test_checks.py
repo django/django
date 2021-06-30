@@ -1,14 +1,14 @@
-from django.contrib.auth.checks import (
+from mango.contrib.auth.checks import (
     check_models_permissions, check_user_model,
 )
-from django.contrib.auth.models import AbstractBaseUser
-from django.core import checks
-from django.db import models
-from django.db.models import Q, UniqueConstraint
-from django.test import (
+from mango.contrib.auth.models import AbstractBaseUser
+from mango.core import checks
+from mango.db import models
+from mango.db.models import Q, UniqueConstraint
+from mango.test import (
     SimpleTestCase, override_settings, override_system_checks,
 )
-from django.test.utils import isolate_apps
+from mango.test.utils import isolate_apps
 
 from .models import CustomUserNonUniqueUsername
 

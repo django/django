@@ -32,8 +32,8 @@ you quickly accomplish common tasks.
 
 .. seealso::
 
-    The `Django community aggregator`_, where we aggregate content from the
-    global Django community. Many writers in the aggregator write this sort of
+    The `Mango community aggregator`_, where we aggregate content from the
+    global Mango community. Many writers in the aggregator write this sort of
     how-to material.
 
-    .. _django community aggregator: https://www.djangoproject.com/community/
+    .. _mango community aggregator: https://www.mangoproject.com/community/

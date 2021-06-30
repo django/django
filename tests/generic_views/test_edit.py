@@ -1,10 +1,10 @@
-from django import forms
-from django.core.exceptions import ImproperlyConfigured
-from django.test import SimpleTestCase, TestCase, override_settings
-from django.test.client import RequestFactory
-from django.urls import reverse
-from django.views.generic.base import View
-from django.views.generic.edit import CreateView, FormMixin, ModelFormMixin
+from mango import forms
+from mango.core.exceptions import ImproperlyConfigured
+from mango.test import SimpleTestCase, TestCase, override_settings
+from mango.test.client import RequestFactory
+from mango.urls import reverse
+from mango.views.generic.base import View
+from mango.views.generic.edit import CreateView, FormMixin, ModelFormMixin
 
 from . import views
 from .forms import AuthorForm

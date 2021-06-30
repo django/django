@@ -3,10 +3,10 @@ import traceback
 from datetime import date, datetime, timedelta
 from threading import Thread
 
-from django.core.exceptions import FieldError
-from django.db import DatabaseError, IntegrityError, connection
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
-from django.utils.functional import lazy
+from mango.core.exceptions import FieldError
+from mango.db import DatabaseError, IntegrityError, connection
+from mango.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from mango.utils.functional import lazy
 
 from .models import (
     Author, Book, DefaultPerson, ManualPrimaryKeyTest, Person, Profile,
@@ -379,7 +379,7 @@ class UpdateOrCreateTests(TestCase):
         p = Publisher.objects.create(name="Acme Publishing")
         book = Book.objects.create(name="The Book of Ed & Fred", publisher=p)
         self.assertEqual(p.books.count(), 1)
-        name = "The Book of Django"
+        name = "The Book of Mango"
         book, created = p.books.update_or_create(defaults={'name': name}, id=book.id)
         self.assertFalse(created)
         self.assertEqual(book.name, name)
@@ -406,7 +406,7 @@ class UpdateOrCreateTests(TestCase):
         book = Book.objects.create(name="The Book of Ed & Fred", publisher=p)
         book.authors.add(author)
         self.assertEqual(author.books.count(), 1)
-        name = "The Book of Django"
+        name = "The Book of Mango"
         book, created = author.books.update_or_create(defaults={'name': name}, id=book.id)
         self.assertFalse(created)
         self.assertEqual(book.name, name)

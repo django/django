@@ -1,10 +1,10 @@
 from unittest import mock
 
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
-from django.test import TestCase, override_settings
-from django.urls import path, reverse
+from mango.contrib import admin
+from mango.contrib.auth.admin import UserAdmin
+from mango.contrib.auth.models import User
+from mango.test import TestCase, override_settings
+from mango.urls import path, reverse
 
 
 class Router:
@@ -37,7 +37,7 @@ class MultiDatabaseTests(TestCase):
                 username='admin', password='something', email='test@test.org',
             )
 
-    @mock.patch('django.contrib.auth.admin.transaction')
+    @mock.patch('mango.contrib.auth.admin.transaction')
     def test_add_view(self, mock):
         for db in self.databases:
             with self.subTest(db_connection=db):

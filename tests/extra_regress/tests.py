@@ -1,7 +1,7 @@
 import datetime
 
-from django.contrib.auth.models import User
-from django.test import TestCase
+from mango.contrib.auth.models import User
+from mango.test import TestCase
 
 from .models import Order, RevisionableModel, TestObject
 

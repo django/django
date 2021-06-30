@@ -3,20 +3,20 @@ import os
 from decimal import Decimal
 from unittest import mock, skipUnless
 
-from django import forms
-from django.core.exceptions import (
+from mango import forms
+from mango.core.exceptions import (
     NON_FIELD_ERRORS, FieldError, ImproperlyConfigured, ValidationError,
 )
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db import connection, models
-from django.db.models.query import EmptyQuerySet
-from django.forms.models import (
+from mango.core.files.uploadedfile import SimpleUploadedFile
+from mango.db import connection, models
+from mango.db.models.query import EmptyQuerySet
+from mango.forms.models import (
     ModelFormMetaclass, construct_instance, fields_for_model, model_to_dict,
     modelform_factory,
 )
-from django.template import Context, Template
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import isolate_apps
+from mango.template import Context, Template
+from mango.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from mango.test.utils import isolate_apps
 
 from .models import (
     Article, ArticleStatus, Author, Author1, Award, BetterWriter, BigInt, Book,
@@ -1059,28 +1059,28 @@ class UniqueTest(TestCase):
 
     def test_unique_for_date(self):
         p = Post.objects.create(
-            title="Django 1.0 is released", slug="Django 1.0",
+            title="Mango 1.0 is released", slug="Mango 1.0",
             subtitle="Finally", posted=datetime.date(2008, 9, 3),
         )
-        form = PostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
+        form = PostForm({'title': "Mango 1.0 is released", 'posted': '2008-09-03'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['title'], ['Title must be unique for Posted date.'])
-        form = PostForm({'title': "Work on Django 1.1 begins", 'posted': '2008-09-03'})
+        form = PostForm({'title': "Work on Mango 1.1 begins", 'posted': '2008-09-03'})
         self.assertTrue(form.is_valid())
-        form = PostForm({'title': "Django 1.0 is released", 'posted': '2008-09-04'})
+        form = PostForm({'title': "Mango 1.0 is released", 'posted': '2008-09-04'})
         self.assertTrue(form.is_valid())
-        form = PostForm({'slug': "Django 1.0", 'posted': '2008-01-01'})
+        form = PostForm({'slug': "Mango 1.0", 'posted': '2008-01-01'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['slug'], ['Slug must be unique for Posted year.'])
         form = PostForm({'subtitle': "Finally", 'posted': '2008-09-30'})
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['subtitle'], ['Subtitle must be unique for Posted month.'])
-        data = {'subtitle': "Finally", "title": "Django 1.0 is released", "slug": "Django 1.0", 'posted': '2008-09-03'}
+        data = {'subtitle': "Finally", "title": "Mango 1.0 is released", "slug": "Mango 1.0", 'posted': '2008-09-03'}
         form = PostForm(data, instance=p)
         self.assertTrue(form.is_valid())
-        form = PostForm({'title': "Django 1.0 is released"})
+        form = PostForm({'title': "Mango 1.0 is released"})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['posted'], ['This field is required.'])
@@ -1097,14 +1097,14 @@ class UniqueTest(TestCase):
                 fields = '__all__'
 
         DateTimePost.objects.create(
-            title="Django 1.0 is released", slug="Django 1.0",
+            title="Mango 1.0 is released", slug="Mango 1.0",
             subtitle="Finally", posted=datetime.datetime(2008, 9, 3, 10, 10, 1),
         )
         # 'title' has unique_for_date='posted'
-        form = DateTimePostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
+        form = DateTimePostForm({'title': "Mango 1.0 is released", 'posted': '2008-09-03'})
         self.assertTrue(form.is_valid())
         # 'slug' has unique_for_year='posted'
-        form = DateTimePostForm({'slug': "Django 1.0", 'posted': '2008-01-01'})
+        form = DateTimePostForm({'slug': "Mango 1.0", 'posted': '2008-01-01'})
         self.assertTrue(form.is_valid())
         # 'subtitle' has unique_for_month='posted'
         form = DateTimePostForm({'subtitle': "Finally", 'posted': '2008-09-30'})
@@ -1112,25 +1112,25 @@ class UniqueTest(TestCase):
 
     def test_inherited_unique_for_date(self):
         p = Post.objects.create(
-            title="Django 1.0 is released", slug="Django 1.0",
+            title="Mango 1.0 is released", slug="Mango 1.0",
             subtitle="Finally", posted=datetime.date(2008, 9, 3),
         )
-        form = DerivedPostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
+        form = DerivedPostForm({'title': "Mango 1.0 is released", 'posted': '2008-09-03'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['title'], ['Title must be unique for Posted date.'])
-        form = DerivedPostForm({'title': "Work on Django 1.1 begins", 'posted': '2008-09-03'})
+        form = DerivedPostForm({'title': "Work on Mango 1.1 begins", 'posted': '2008-09-03'})
         self.assertTrue(form.is_valid())
-        form = DerivedPostForm({'title': "Django 1.0 is released", 'posted': '2008-09-04'})
+        form = DerivedPostForm({'title': "Mango 1.0 is released", 'posted': '2008-09-04'})
         self.assertTrue(form.is_valid())
-        form = DerivedPostForm({'slug': "Django 1.0", 'posted': '2008-01-01'})
+        form = DerivedPostForm({'slug': "Mango 1.0", 'posted': '2008-01-01'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['slug'], ['Slug must be unique for Posted year.'])
         form = DerivedPostForm({'subtitle': "Finally", 'posted': '2008-09-30'})
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['subtitle'], ['Subtitle must be unique for Posted month.'])
-        data = {'subtitle': "Finally", "title": "Django 1.0 is released", "slug": "Django 1.0", 'posted': '2008-09-03'}
+        data = {'subtitle': "Finally", "title": "Mango 1.0 is released", "slug": "Mango 1.0", 'posted': '2008-09-03'}
         form = DerivedPostForm(data, instance=p)
         self.assertTrue(form.is_valid())
 
@@ -1141,17 +1141,17 @@ class UniqueTest(TestCase):
                 fields = '__all__'
 
         p = FlexibleDatePost.objects.create(
-            title="Django 1.0 is released", slug="Django 1.0",
+            title="Mango 1.0 is released", slug="Mango 1.0",
             subtitle="Finally", posted=datetime.date(2008, 9, 3),
         )
 
-        form = FlexDatePostForm({'title': "Django 1.0 is released"})
+        form = FlexDatePostForm({'title': "Mango 1.0 is released"})
         self.assertTrue(form.is_valid())
-        form = FlexDatePostForm({'slug': "Django 1.0"})
+        form = FlexDatePostForm({'slug': "Mango 1.0"})
         self.assertTrue(form.is_valid())
         form = FlexDatePostForm({'subtitle': "Finally"})
         self.assertTrue(form.is_valid())
-        data = {'subtitle': "Finally", "title": "Django 1.0 is released", "slug": "Django 1.0"}
+        data = {'subtitle': "Finally", "title": "Mango 1.0 is released", "slug": "Mango 1.0"}
         form = FlexDatePostForm(data, instance=p)
         self.assertTrue(form.is_valid())
 
@@ -1196,10 +1196,10 @@ class UniqueTest(TestCase):
                 }
 
         Post.objects.create(
-            title="Django 1.0 is released", slug="Django 1.0",
+            title="Mango 1.0 is released", slug="Mango 1.0",
             subtitle="Finally", posted=datetime.date(2008, 9, 3),
         )
-        form = CustomPostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
+        form = CustomPostForm({'title': "Mango 1.0 is released", 'posted': '2008-09-03'})
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['title'], ["Post's Title not unique for Posted date."])
 
@@ -2139,7 +2139,7 @@ class FileAndImageFieldTests(TestCase):
         instance = f.save()
         self.assertEqual(instance.file.name, 'tests/test1.txt')
 
-        # Delete the current file since this is not done by Django.
+        # Delete the current file since this is not done by Mango.
         instance.file.delete()
 
         # Override the file by uploading a new one.
@@ -2152,7 +2152,7 @@ class FileAndImageFieldTests(TestCase):
         instance = f.save()
         self.assertEqual(instance.file.name, 'tests/test2.txt')
 
-        # Delete the current file since this is not done by Django.
+        # Delete the current file since this is not done by Mango.
         instance.file.delete()
         instance.delete()
 
@@ -2181,7 +2181,7 @@ class FileAndImageFieldTests(TestCase):
         self.assertEqual(instance.description, 'New Description')
         self.assertEqual(instance.file.name, 'tests/test3.txt')
 
-        # Delete the current file since this is not done by Django.
+        # Delete the current file since this is not done by Mango.
         instance.file.delete()
         instance.delete()
 
@@ -2261,7 +2261,7 @@ class FileAndImageFieldTests(TestCase):
         self.assertEqual(instance.width, 16)
         self.assertEqual(instance.height, 16)
 
-        # Delete the current file since this is not done by Django, but don't save
+        # Delete the current file since this is not done by Mango, but don't save
         # because the dimension fields are not null=True.
         instance.image.delete(save=False)
         f = ImageFileForm(
@@ -2286,7 +2286,7 @@ class FileAndImageFieldTests(TestCase):
         self.assertEqual(instance.height, 16)
         self.assertEqual(instance.width, 16)
 
-        # Delete the current file since this is not done by Django, but don't save
+        # Delete the current file since this is not done by Mango, but don't save
         # because the dimension fields are not null=True.
         instance.image.delete(save=False)
         # Override the file by uploading a new one.
@@ -2302,7 +2302,7 @@ class FileAndImageFieldTests(TestCase):
         self.assertEqual(instance.height, 32)
         self.assertEqual(instance.width, 48)
 
-        # Delete the current file since this is not done by Django, but don't save
+        # Delete the current file since this is not done by Mango, but don't save
         # because the dimension fields are not null=True.
         instance.image.delete(save=False)
         instance.delete()
@@ -2317,7 +2317,7 @@ class FileAndImageFieldTests(TestCase):
         self.assertEqual(instance.height, 32)
         self.assertEqual(instance.width, 48)
 
-        # Delete the current file since this is not done by Django, but don't save
+        # Delete the current file since this is not done by Mango, but don't save
         # because the dimension fields are not null=True.
         instance.image.delete(save=False)
         instance.delete()
@@ -2358,7 +2358,7 @@ class FileAndImageFieldTests(TestCase):
         self.assertEqual(instance.width, 16)
         self.assertEqual(instance.height, 16)
 
-        # Delete the current file since this is not done by Django.
+        # Delete the current file since this is not done by Mango.
         instance.image.delete()
         instance.delete()
 

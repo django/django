@@ -1,9 +1,9 @@
 import unittest
 from io import StringIO
 
-from django.db import connection
-from django.test import TestCase
-from django.test.runner import DiscoverRunner
+from mango.db import connection
+from mango.test import TestCase
+from mango.test.runner import DiscoverRunner
 
 from .models import Person
 

@@ -1,9 +1,9 @@
 from functools import wraps
 
-from django.db import IntegrityError, connections, transaction
-from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
-from django.test.testcases import TestData
-from django.utils.deprecation import RemovedInDjango41Warning
+from mango.db import IntegrityError, connections, transaction
+from mango.test import TestCase, ignore_warnings, skipUnlessDBFeature
+from mango.test.testcases import TestData
+from mango.utils.deprecation import RemovedInMango41Warning
 
 from .models import Car, Person, PossessedCar
 
@@ -94,7 +94,7 @@ class TestDataTests(TestCase):
         self.assertIs(self.herbie.car, self.car)
         self.assertIs(self.herbie.belongs_to, self.jim_douglas)
 
-    @ignore_warnings(category=RemovedInDjango41Warning)
+    @ignore_warnings(category=RemovedInMango41Warning)
     def test_undeepcopyable(self):
         self.assertIs(self.non_deepcopy_able, self.__class__.non_deepcopy_able)
 
@@ -106,7 +106,7 @@ class TestDataTests(TestCase):
             "add support for deepcopy() to "
             "test_utils.test_testcase.TestDataTests.non_deepcopy_able."
         )
-        with self.assertRaisesMessage(RemovedInDjango41Warning, msg):
+        with self.assertRaisesMessage(RemovedInMango41Warning, msg):
             self.non_deepcopy_able
 
     def test_repr(self):

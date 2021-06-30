@@ -1,9 +1,9 @@
 import unittest
 from contextlib import contextmanager
 
-from django.core.exceptions import ImproperlyConfigured
-from django.db import connection
-from django.test import TestCase, override_settings
+from mango.core.exceptions import ImproperlyConfigured
+from mango.db import connection
+from mango.test import TestCase, override_settings
 
 
 @contextmanager

@@ -1,8 +1,8 @@
-from django.db.migrations.exceptions import (
+from mango.db.migrations.exceptions import (
     CircularDependencyError, NodeNotFoundError,
 )
-from django.db.migrations.graph import DummyNode, MigrationGraph, Node
-from django.test import SimpleTestCase
+from mango.db.migrations.graph import DummyNode, MigrationGraph, Node
+from mango.test import SimpleTestCase
 
 
 class GraphTests(SimpleTestCase):

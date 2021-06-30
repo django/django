@@ -1,11 +1,11 @@
 from datetime import datetime
 
-from django.core.exceptions import ValidationError
-from django.forms import (
+from mango.core.exceptions import ValidationError
+from mango.forms import (
     CharField, Form, MultipleChoiceField, MultiValueField, MultiWidget,
     SelectMultiple, SplitDateTimeField, SplitDateTimeWidget, TextInput,
 )
-from django.test import SimpleTestCase
+from mango.test import SimpleTestCase
 
 beatles = (('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))
 

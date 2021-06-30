@@ -1,11 +1,11 @@
 import pickle
 
-from django.contrib.auth.models import User
-from django.test import TestCase
-from django.utils.functional import SimpleLazyObject
+from mango.contrib.auth.models import User
+from mango.test import TestCase
+from mango.utils.functional import SimpleLazyObject
 
 
-class TestUtilsSimpleLazyObjectDjangoTestCase(TestCase):
+class TestUtilsSimpleLazyObjectMangoTestCase(TestCase):
 
     def test_pickle(self):
         user = User.objects.create_user('johndoe', 'john@example.com', 'pass')

@@ -2,11 +2,11 @@ import os
 import shutil
 from unittest import skipIf
 
-from django.core.exceptions import ImproperlyConfigured
-from django.core.files import File
-from django.core.files.images import ImageFile
-from django.test import TestCase
-from django.test.testcases import SerializeMixin
+from mango.core.exceptions import ImproperlyConfigured
+from mango.core.files import File
+from mango.core.files.images import ImageFile
+from mango.test import TestCase
+from mango.test.testcases import SerializeMixin
 
 try:
     from .models import Image

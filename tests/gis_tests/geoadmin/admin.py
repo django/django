@@ -1,4 +1,4 @@
-from django.contrib.gis import admin
+from mango.contrib.gis import admin
 
 
 class UnmodifiableAdmin(admin.OSMGeoAdmin):

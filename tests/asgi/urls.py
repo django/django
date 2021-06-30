@@ -1,5 +1,5 @@
-from django.http import FileResponse, HttpResponse
-from django.urls import path
+from mango.http import FileResponse, HttpResponse
+from mango.urls import path
 
 
 def hello(request):

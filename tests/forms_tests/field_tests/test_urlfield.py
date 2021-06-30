@@ -1,6 +1,6 @@
-from django.core.exceptions import ValidationError
-from django.forms import URLField
-from django.test import SimpleTestCase
+from mango.core.exceptions import ValidationError
+from mango.forms import URLField
+from mango.test import SimpleTestCase
 
 from . import FormFieldAssertionsMixin
 
@@ -51,8 +51,8 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             f.clean('http://some.idn.xyzäöüßabc.domain.com:123/blah')
         )
         self.assertEqual(
-            'http://www.example.com/s/http://code.djangoproject.com/ticket/13804',
-            f.clean('www.example.com/s/http://code.djangoproject.com/ticket/13804')
+            'http://www.example.com/s/http://code.mangoproject.com/ticket/13804',
+            f.clean('www.example.com/s/http://code.mangoproject.com/ticket/13804')
         )
         with self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'"):
             f.clean('[a')

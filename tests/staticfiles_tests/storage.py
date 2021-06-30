@@ -1,10 +1,10 @@
 import os
 from datetime import datetime, timedelta
 
-from django.conf import settings
-from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
-from django.core.files import storage
-from django.utils import timezone
+from mango.conf import settings
+from mango.contrib.staticfiles.storage import ManifestStaticFilesStorage
+from mango.core.files import storage
+from mango.utils import timezone
 
 
 class DummyStorage(storage.Storage):

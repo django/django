@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.auth.models import User
-from django.test import RequestFactory, TestCase
-from django.utils.timezone import make_aware
+from mango.contrib.admin.options import IncorrectLookupParameters
+from mango.contrib.auth.models import User
+from mango.test import RequestFactory, TestCase
+from mango.utils.timezone import make_aware
 
 from .admin import EventAdmin, site as custom_site
 from .models import Event

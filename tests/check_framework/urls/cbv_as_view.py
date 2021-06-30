@@ -1,6 +1,6 @@
-from django.http import HttpResponse
-from django.urls import path
-from django.views import View
+from mango.http import HttpResponse
+from mango.urls import path
+from mango.views import View
 
 
 class EmptyCBV(View):

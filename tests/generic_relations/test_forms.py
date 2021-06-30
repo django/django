@@ -1,9 +1,9 @@
-from django import forms
-from django.contrib.contenttypes.forms import generic_inlineformset_factory
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
-from django.test import TestCase
-from django.test.utils import isolate_apps
+from mango import forms
+from mango.contrib.contenttypes.forms import generic_inlineformset_factory
+from mango.contrib.contenttypes.models import ContentType
+from mango.db import models
+from mango.test import TestCase
+from mango.test.utils import isolate_apps
 
 from .models import (
     Animal, ForProxyModelModel, Gecko, Mineral, ProxyRelatedModel, TaggedItem,

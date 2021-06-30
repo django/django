@@ -1,15 +1,15 @@
 from unittest import TestCase
 
-from django.test import ignore_warnings
-from django.utils.deprecation import RemovedInDjango50Warning
+from mango.test import ignore_warnings
+from mango.utils.deprecation import RemovedInMango50Warning
 
-with ignore_warnings(category=RemovedInDjango50Warning):
-    from django.utils.baseconv import (
+with ignore_warnings(category=RemovedInMango50Warning):
+    from mango.utils.baseconv import (
         BaseConverter, base2, base16, base36, base56, base62, base64,
     )
 
 
-# RemovedInDjango50Warning
+# RemovedInMango50Warning
 class TestBaseConv(TestCase):
 
     def test_baseconv(self):

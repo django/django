@@ -1,7 +1,7 @@
 from unittest import mock
 
-from django.test import SimpleTestCase
-from django.utils.functional import cached_property, classproperty, lazy
+from mango.test import SimpleTestCase
+from mango.utils.functional import cached_property, classproperty, lazy
 
 
 class FunctionalTests(SimpleTestCase):

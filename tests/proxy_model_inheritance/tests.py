@@ -1,8 +1,8 @@
 import os
 
-from django.core.management import call_command
-from django.test import TestCase, TransactionTestCase
-from django.test.utils import extend_sys_path
+from mango.core.management import call_command
+from mango.test import TestCase, TransactionTestCase
+from mango.test.utils import extend_sys_path
 
 from .models import (
     ConcreteModel, ConcreteModelSubclass, ConcreteModelSubclassProxy,

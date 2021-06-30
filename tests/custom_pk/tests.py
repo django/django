@@ -1,5 +1,5 @@
-from django.db import IntegrityError, transaction
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from mango.db import IntegrityError, transaction
+from mango.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .fields import MyWrapper
 from .models import Bar, Business, CustomAutoFieldModel, Employee, Foo

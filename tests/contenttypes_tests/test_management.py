@@ -1,11 +1,11 @@
 from unittest import mock
 
-from django.apps.registry import Apps, apps
-from django.contrib.contenttypes import management as contenttypes_management
-from django.contrib.contenttypes.models import ContentType
-from django.core.management import call_command
-from django.test import TestCase, modify_settings
-from django.test.utils import captured_stdout
+from mango.apps.registry import Apps, apps
+from mango.contrib.contenttypes import management as contenttypes_management
+from mango.contrib.contenttypes.models import ContentType
+from mango.core.management import call_command
+from mango.test import TestCase, modify_settings
+from mango.test.utils import captured_stdout
 
 from .models import ModelWithNullFKToSite, Post
 
@@ -17,7 +17,7 @@ class RemoveStaleContentTypesTests(TestCase):
         'contenttypes_tests',
         'empty_models',
         'no_models',
-        'django.contrib.contenttypes',
+        'mango.contrib.contenttypes',
     ]
 
     @classmethod

@@ -1,6 +1,6 @@
-from django.template.defaultfilters import filesizeformat
-from django.test import SimpleTestCase
-from django.utils import translation
+from mango.template.defaultfilters import filesizeformat
+from mango.test import SimpleTestCase
+from mango.utils import translation
 
 
 class FunctionTests(SimpleTestCase):

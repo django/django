@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from mango.shortcuts import render
 
 from .models import DebugObject
 

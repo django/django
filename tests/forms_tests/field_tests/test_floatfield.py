@@ -1,8 +1,8 @@
-from django.core.exceptions import ValidationError
-from django.forms import FloatField, NumberInput
-from django.test import SimpleTestCase
-from django.test.utils import override_settings
-from django.utils import formats, translation
+from mango.core.exceptions import ValidationError
+from mango.forms import FloatField, NumberInput
+from mango.test import SimpleTestCase
+from mango.test.utils import override_settings
+from mango.utils import formats, translation
 
 from . import FormFieldAssertionsMixin
 

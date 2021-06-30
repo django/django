@@ -3,7 +3,7 @@ Writing documentation
 =====================
 
 We place a high importance on consistency and readability of documentation.
-After all, Django was created in a journalism environment! So we treat our
+After all, Mango was created in a journalism environment! So we treat our
 documentation like we treat our code: we aim to improve it as often as
 possible.
 
@@ -21,13 +21,13 @@ in the most useful and least error-prone ways.
 Getting the raw documentation
 =============================
 
-Though Django's documentation is intended to be read as HTML at
-https://docs.djangoproject.com/, we edit it as a collection of text files for
+Though Mango's documentation is intended to be read as HTML at
+https://docs.mangoproject.com/, we edit it as a collection of text files for
 maximum flexibility. These files live in the top-level ``docs/`` directory of a
-Django release.
+Mango release.
 
 If you'd like to start contributing to our docs, get the development version of
-Django from the source code repository
+Mango from the source code repository
 (see :ref:`installing-development-version`). The development version has the
 latest-and-greatest documentation, just as it has latest-and-greatest code.
 We also backport documentation fixes and improvements, at the discretion of the
@@ -38,7 +38,7 @@ to have the docs for the last release be up-to-date and correct (see
 Getting started with Sphinx
 ===========================
 
-Django's documentation uses the Sphinx__ documentation system, which in turn
+Mango's documentation uses the Sphinx__ documentation system, which in turn
 is based on docutils__. The basic idea is that lightly-formatted plain-text
 documentation is transformed into HTML, PDF, and any other output format.
 
@@ -61,7 +61,7 @@ To get started contributing, you'll want to read the :ref:`reStructuredText
 reference <sphinx:rst-index>`.
 
 Your locally-built documentation will be themed differently than the
-documentation at `docs.djangoproject.com <https://docs.djangoproject.com/>`_.
+documentation at `docs.mangoproject.com <https://docs.mangoproject.com/>`_.
 This is OK! If your changes look good on your local machine, they'll look good
 on the website.
 
@@ -93,12 +93,12 @@ The documentation is organized into several categories:
   that they already know.
 
 * :doc:`Reference guides </ref/index>` contain technical reference for APIs.
-  They describe the functioning of Django's internal machinery and instruct in
+  They describe the functioning of Mango's internal machinery and instruct in
   its use.
 
   Keep reference material tightly focused on the subject. Assume that the
   reader already understands the basic concepts involved but needs to know or
-  be reminded of how Django does it.
+  be reminded of how Mango does it.
 
   Reference guides aren't the place for general explanation. If you find
   yourself explaining basic concepts, you may want to move that material to a
@@ -109,10 +109,10 @@ The documentation is organized into several categories:
 
   What matters most in a how-to guide is what a user wants to achieve.
   A how-to should always be result-oriented rather than focused on internal
-  details of how Django implements whatever is being discussed.
+  details of how Mango implements whatever is being discussed.
 
   These guides are more advanced than tutorials and assume some knowledge about
-  how Django works. Assume that the reader has followed the tutorials and don't
+  how Mango works. Assume that the reader has followed the tutorials and don't
   hesitate to refer the reader back to the appropriate tutorial rather than
   repeat the same material.
 
@@ -141,8 +141,8 @@ Commonly used terms
 Here are some style guidelines on commonly used terms throughout the
 documentation:
 
-* **Django** -- when referring to the framework, capitalize Django. It is
-  lowercase only in Python code and in the djangoproject.com logo.
+* **Mango** -- when referring to the framework, capitalize Mango. It is
+  lowercase only in Python code and in the mangoproject.com logo.
 
 * **email** -- no hyphen.
 
@@ -165,7 +165,7 @@ documentation:
 
 * **website** -- use one word, without capitalization.
 
-Django-specific terminology
+Mango-specific terminology
 ===========================
 
 * **model** -- it's not capitalized.
@@ -192,17 +192,17 @@ documentation:
 * The main thing to keep in mind as you write and edit docs is that the
   more semantic markup you can add the better. So::
 
-      Add ``django.contrib.auth`` to your ``INSTALLED_APPS``...
+      Add ``mango.contrib.auth`` to your ``INSTALLED_APPS``...
 
   Isn't nearly as helpful as::
 
-      Add :mod:`django.contrib.auth` to your :setting:`INSTALLED_APPS`...
+      Add :mod:`mango.contrib.auth` to your :setting:`INSTALLED_APPS`...
 
   This is because Sphinx will generate proper links for the latter, which
   greatly helps readers.
 
   You can prefix the target with a ``~`` (that's a tilde) to get only the
-  "last bit" of that path. So ``:mod:`~django.contrib.auth``` will
+  "last bit" of that path. So ``:mod:`~mango.contrib.auth``` will
   display a link with the title "auth".
 
 * Use :mod:`~sphinx.ext.intersphinx` to reference Python's and Sphinx'
@@ -250,10 +250,10 @@ documentation:
   also need to define a reference to the documentation for that environment
   variable using :rst:dir:`.. envvar:: <envvar>`.
 
-Django-specific markup
+Mango-specific markup
 ======================
 
-Besides :ref:`Sphinx's built-in markup <sphinx:rst-index>`, Django's docs
+Besides :ref:`Sphinx's built-in markup <sphinx:rst-index>`, Mango's docs
 define some extra description units:
 
 * Settings::
@@ -280,15 +280,15 @@ define some extra description units:
 
   To link, use ``:lookup:`exact```.
 
-* ``django-admin`` commands::
+* ``mango-admin`` commands::
 
-        .. django-admin:: migrate
+        .. mango-admin:: migrate
 
   To link, use ``:djadmin:`migrate```.
 
-* ``django-admin`` command-line options::
+* ``mango-admin`` command-line options::
 
-        .. django-admin-option:: --traceback
+        .. mango-admin-option:: --traceback
 
   To link, use ``:option:`command_name --traceback``` (or omit ``command_name``
   for the options shared by all commands like ``--verbosity``).
@@ -297,8 +297,8 @@ define some extra description units:
 
         :ticket:`12345`
 
-Django's documentation uses a custom ``console`` directive for documenting
-command-line examples involving ``django-admin``, ``manage.py``, ``python``,
+Mango's documentation uses a custom ``console`` directive for documenting
+command-line examples involving ``mango-admin``, ``manage.py``, ``python``,
 etc.). In the HTML documentation, it renders a two-tab UI, with one tab showing
 a Unix-style command prompt and a second tab showing a Windows prompt.
 
@@ -349,7 +349,7 @@ Documenting new features
 Our policy for new features is:
 
     All documentation of new features should be written in a way that
-    clearly designates the features are only available in the Django
+    clearly designates the features are only available in the Mango
     development version. Assume documentation readers are using the latest
     release, not the development version.
 
@@ -384,10 +384,10 @@ something like this::
 
 Put the changed annotation notes at the bottom of a section, not the top.
 
-Also, avoid referring to a specific version of Django outside a
+Also, avoid referring to a specific version of Mango outside a
 ``versionadded`` or ``versionchanged`` block. Even inside a block, it's often
-redundant to do so as these annotations render as "New in Django A.B:" and
-"Changed in Django A.B", respectively.
+redundant to do so as these annotations render as "New in Mango A.B:" and
+"Changed in Mango A.B", respectively.
 
 If a function, attribute, etc. is added, it's also okay to use a
 ``versionadded`` annotation like this::
@@ -475,13 +475,13 @@ example:
     Default: ``[]`` (Empty list)
 
     A list of all the people who get code error notifications. When
-    ``DEBUG=False`` and a view raises an exception, Django will email these people
+    ``DEBUG=False`` and a view raises an exception, Mango will email these people
     with the full exception information. Each member of the list should be a tuple
     of (Full name, email address). Example::
 
         [('John', 'john@example.com'), ('Mary', 'mary@example.com')]
 
-    Note that Django will email *all* of these people whenever an error happens.
+    Note that Mango will email *all* of these people whenever an error happens.
     See :doc:`/howto/error-reporting` for more information.
 
   This marks up the following header as the "canonical" target for the
@@ -535,21 +535,21 @@ point to the latest or stable version of documentation, e.g. ``/en/stable/`` →
 Translating documentation
 =========================
 
-See :ref:`Localizing the Django documentation <translating-documentation>` if
+See :ref:`Localizing the Mango documentation <translating-documentation>` if
 you'd like to help translate the documentation into another language.
 
-.. _django-admin-manpage:
+.. _mango-admin-manpage:
 
-``django-admin`` man page
+``mango-admin`` man page
 =========================
 
 Sphinx can generate a manual page for the
-:doc:`django-admin </ref/django-admin>` command. This is configured in
+:doc:`mango-admin </ref/mango-admin>` command. This is configured in
 ``docs/conf.py``. Unlike other documentation output, this man page should be
-included in the Django repository and the releases as
-``docs/man/django-admin.1``. There isn't a need to update this file when
+included in the Mango repository and the releases as
+``docs/man/mango-admin.1``. There isn't a need to update this file when
 updating the documentation, as it's updated once as part of the release process.
 
 To generate an updated version of the man page, run ``make man`` in the
 ``docs`` directory. The new man page will be written in
-``docs/_build/man/django-admin.1``.
+``docs/_build/man/mango-admin.1``.

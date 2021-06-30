@@ -2,10 +2,10 @@
 Measurement Objects
 ===================
 
-.. module:: django.contrib.gis.measure
-    :synopsis: GeoDjango's distance and area measurement objects.
+.. module:: mango.contrib.gis.measure
+    :synopsis: GeoMango's distance and area measurement objects.
 
-The :mod:`django.contrib.gis.measure` module contains objects that allow
+The :mod:`mango.contrib.gis.measure` module contains objects that allow
 for convenient representation of distance and area units of measure. [#]_
 Specifically, it implements two objects, :class:`Distance` and
 :class:`Area` -- both of which may be accessed via the
@@ -18,7 +18,7 @@ Example
 context of the units.  In the example below, two different distance objects are
 instantiated in units of kilometers (``km``) and miles (``mi``)::
 
-    >>> from django.contrib.gis.measure import D, Distance
+    >>> from mango.contrib.gis.measure import D, Distance
     >>> d1 = Distance(km=5)
     >>> print(d1)
     5.0 km

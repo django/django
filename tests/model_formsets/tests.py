@@ -3,15 +3,15 @@ import re
 from datetime import date
 from decimal import Decimal
 
-from django import forms
-from django.core.exceptions import ImproperlyConfigured
-from django.db import models
-from django.forms.models import (
+from mango import forms
+from mango.core.exceptions import ImproperlyConfigured
+from mango.db import models
+from mango.forms.models import (
     BaseModelFormSet, _get_foreign_key, inlineformset_factory,
     modelformset_factory,
 )
-from django.http import QueryDict
-from django.test import TestCase, skipUnlessDBFeature
+from mango.http import QueryDict
+from mango.test import TestCase, skipUnlessDBFeature
 
 from .models import (
     AlternateBook, Author, AuthorMeeting, BetterAuthor, Book, BookWithCustomPK,
@@ -1384,7 +1384,7 @@ class ModelFormsetTest(TestCase):
         FormSet = inlineformset_factory(Person, Membership, can_delete=False, extra=1, fields="__all__")
         formset = FormSet(instance=person)
 
-        # Django will render a hidden field for model fields that have a callable
+        # Mango will render a hidden field for model fields that have a callable
         # default. This is required to ensure the value is tested for change correctly
         # when determine what extra forms have changed to save.
 
@@ -1486,7 +1486,7 @@ class ModelFormsetTest(TestCase):
 
     def test_inlineformset_with_arrayfield(self):
         class SimpleArrayField(forms.CharField):
-            """A proxy for django.contrib.postgres.forms.SimpleArrayField."""
+            """A proxy for mango.contrib.postgres.forms.SimpleArrayField."""
             def to_python(self, value):
                 value = super().to_python(value)
                 return value.split(',') if value else []

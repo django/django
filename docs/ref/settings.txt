@@ -10,13 +10,13 @@ Settings
 
     Be careful when you override settings, especially when the default value
     is a non-empty list or dictionary, such as :setting:`STATICFILES_FINDERS`.
-    Make sure you keep the components required by the features of Django you
+    Make sure you keep the components required by the features of Mango you
     wish to use.
 
 Core Settings
 =============
 
-Here's a list of settings available in Django core and their default values.
+Here's a list of settings available in Mango core and their default values.
 Settings provided by contrib apps are listed below, followed by a topical index
 of the core settings. For introductory material, see the :doc:`settings topic
 guide </topics/settings>`.
@@ -48,8 +48,8 @@ case of the actual model class name.
 Default: ``[]`` (Empty list)
 
 A list of all the people who get code error notifications. When
-:setting:`DEBUG=False <DEBUG>` and :class:`~django.utils.log.AdminEmailHandler`
-is configured in :setting:`LOGGING` (done by default), Django emails these
+:setting:`DEBUG=False <DEBUG>` and :class:`~mango.utils.log.AdminEmailHandler`
+is configured in :setting:`LOGGING` (done by default), Mango emails these
 people the details of exceptions raised in the request/response cycle.
 
 Each item in the list should be a tuple of (Full name, email address). Example::
@@ -63,7 +63,7 @@ Each item in the list should be a tuple of (Full name, email address). Example::
 
 Default: ``[]`` (Empty list)
 
-A list of strings representing the host/domain names that this Django site can
+A list of strings representing the host/domain names that this Mango site can
 serve. This is a security measure to prevent :ref:`HTTP Host header attacks
 <host-headers-virtual-hosting>`, which are possible even under many
 seemingly-safe web server configurations.
@@ -78,16 +78,16 @@ responsible to provide your own validation of the ``Host`` header (perhaps in a
 middleware; if so this middleware must be listed first in
 :setting:`MIDDLEWARE`).
 
-Django also allows the `fully qualified domain name (FQDN)`_ of any entries.
-Some browsers include a trailing dot in the ``Host`` header which Django
+Mango also allows the `fully qualified domain name (FQDN)`_ of any entries.
+Some browsers include a trailing dot in the ``Host`` header which Mango
 strips when performing host validation.
 
 .. _`fully qualified domain name (FQDN)`: https://en.wikipedia.org/wiki/Fully_qualified_domain_name
 
 If the ``Host`` header (or ``X-Forwarded-Host`` if
 :setting:`USE_X_FORWARDED_HOST` is enabled) does not match any value in this
-list, the :meth:`django.http.HttpRequest.get_host()` method will raise
-:exc:`~django.core.exceptions.SuspiciousOperation`.
+list, the :meth:`mango.http.HttpRequest.get_host()` method will raise
+:exc:`~mango.core.exceptions.SuspiciousOperation`.
 
 When :setting:`DEBUG` is ``True`` and ``ALLOWED_HOSTS`` is empty, the host
 is validated against ``['.localhost', '127.0.0.1', '[::1]']``.
@@ -95,7 +95,7 @@ is validated against ``['.localhost', '127.0.0.1', '[::1]']``.
 ``ALLOWED_HOSTS`` is also :ref:`checked when running tests
 <topics-testing-advanced-multiple-hosts>`.
 
-This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
+This validation only applies via :meth:`~mango.http.HttpRequest.get_host()`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
 
@@ -112,7 +112,7 @@ same URL with a slash appended. Note that the redirect may cause any data
 submitted in a POST request to be lost.
 
 The :setting:`APPEND_SLASH` setting is only used if
-:class:`~django.middleware.common.CommonMiddleware` is installed
+:class:`~mango.middleware.common.CommonMiddleware` is installed
 (see :doc:`/topics/http/middleware`). See also :setting:`PREPEND_WWW`.
 
 .. setting:: CACHES
@@ -124,12 +124,12 @@ Default::
 
     {
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'mango.core.cache.backends.locmem.LocMemCache',
         }
     }
 
 A dictionary containing the settings for all caches to be used with
-Django. It is a nested dictionary whose contents maps cache aliases
+Mango. It is a nested dictionary whose contents maps cache aliases
 to a dictionary containing the options for an individual cache.
 
 The :setting:`CACHES` setting must configure a ``default`` cache;
@@ -147,14 +147,14 @@ Default: ``''`` (Empty string)
 
 The cache backend to use. The built-in cache backends are:
 
-* ``'django.core.cache.backends.db.DatabaseCache'``
-* ``'django.core.cache.backends.dummy.DummyCache'``
-* ``'django.core.cache.backends.filebased.FileBasedCache'``
-* ``'django.core.cache.backends.locmem.LocMemCache'``
-* ``'django.core.cache.backends.memcached.PyMemcacheCache'``
-* ``'django.core.cache.backends.memcached.PyLibMCCache'``
+* ``'mango.core.cache.backends.db.DatabaseCache'``
+* ``'mango.core.cache.backends.dummy.DummyCache'``
+* ``'mango.core.cache.backends.filebased.FileBasedCache'``
+* ``'mango.core.cache.backends.locmem.LocMemCache'``
+* ``'mango.core.cache.backends.memcached.PyMemcacheCache'``
+* ``'mango.core.cache.backends.memcached.PyLibMCCache'``
 
-You can use a cache backend that doesn't ship with Django by setting
+You can use a cache backend that doesn't ship with Mango by setting
 :setting:`BACKEND <CACHES-BACKEND>` to a fully-qualified path of a cache
 backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 
@@ -188,7 +188,7 @@ information.
 Default: ``''`` (Empty string)
 
 A string that will be automatically included (prepended by default) to
-all cache keys used by the Django server.
+all cache keys used by the Mango server.
 
 See the :ref:`cache documentation <cache_key_prefixing>` for more information.
 
@@ -205,8 +205,8 @@ name for a local memory cache. e.g.::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-            'LOCATION': '/var/tmp/django_cache',
+            'BACKEND': 'mango.core.cache.backends.filebased.FileBasedCache',
+            'LOCATION': '/var/tmp/mango_cache',
         }
     }
 
@@ -241,7 +241,7 @@ this settings is ``None``, cache entries will not expire.
 
 Default: ``1``
 
-The default version number for cache keys generated by the Django server.
+The default version number for cache keys generated by the Mango server.
 
 See the :ref:`cache documentation <cache_versioning>` for more information.
 
@@ -315,7 +315,7 @@ site request forgery protection.  It should be set to a string such as
 ``".example.com"`` to allow a POST request from a form on one subdomain to be
 accepted by a view served from another subdomain.
 
-Please note that the presence of this setting does not imply that Django's CSRF
+Please note that the presence of this setting does not imply that Mango's CSRF
 protection is safe from cross-subdomain attacks by default - please see the
 :ref:`CSRF limitations <csrf-limitations>` section.
 
@@ -364,9 +364,9 @@ your application). See :doc:`/ref/csrf`.
 Default: ``'/'``
 
 The path set on the CSRF cookie. This should either match the URL path of your
-Django installation or be a parent of that path.
+Mango installation or be a parent of that path.
 
-This is useful if you have multiple Django instances running under the same
+This is useful if you have multiple Mango instances running under the same
 hostname. They can use different cookie paths, and each instance will only see
 its own CSRF cookie.
 
@@ -401,16 +401,16 @@ cookie is only sent with an HTTPS connection.
 Default: ``False``
 
 Whether to store the CSRF token in the user's session instead of in a cookie.
-It requires the use of :mod:`django.contrib.sessions`.
+It requires the use of :mod:`mango.contrib.sessions`.
 
-Storing the CSRF token in a cookie (Django's default) is safe, but storing it
+Storing the CSRF token in a cookie (Mango's default) is safe, but storing it
 in the session is common practice in other web frameworks and therefore
 sometimes demanded by security auditors.
 
 Since the :ref:`default error views <error-views>` require the CSRF token,
-:class:`~django.contrib.sessions.middleware.SessionMiddleware` must appear in
+:class:`~mango.contrib.sessions.middleware.SessionMiddleware` must appear in
 :setting:`MIDDLEWARE` before any middleware that may raise an exception to
-trigger an error view (such as :exc:`~django.core.exceptions.PermissionDenied`)
+trigger an error view (such as :exc:`~mango.core.exceptions.PermissionDenied`)
 if you're using ``CSRF_USE_SESSIONS``. See :ref:`middleware-ordering`.
 
 .. setting:: CSRF_FAILURE_VIEW
@@ -418,7 +418,7 @@ if you're using ``CSRF_USE_SESSIONS``. See :ref:`middleware-ordering`.
 ``CSRF_FAILURE_VIEW``
 ---------------------
 
-Default: ``'django.views.csrf.csrf_failure'``
+Default: ``'mango.views.csrf.csrf_failure'``
 
 A dotted path to the view function to be used when an incoming request is
 rejected by the :doc:`CSRF protection </ref/csrf>`. The function should have
@@ -429,9 +429,9 @@ this signature::
 
 where ``reason`` is a short message (intended for developers or logging, not
 for end users) indicating the reason the request was rejected. It should return
-an :class:`~django.http.HttpResponseForbidden`.
+an :class:`~mango.http.HttpResponseForbidden`.
 
-``django.views.csrf.csrf_failure()`` accepts an additional ``template_name``
+``mango.views.csrf.csrf_failure()`` accepts an additional ``template_name``
 parameter that defaults to ``'403_csrf.html'``. If a template with that name
 exists, it will be used to render the page.
 
@@ -459,10 +459,10 @@ Default: ``[]`` (Empty list)
 
 A list of trusted origins for unsafe requests (e.g. ``POST``).
 
-For requests that include the ``Origin`` header, Django's CSRF protection
+For requests that include the ``Origin`` header, Mango's CSRF protection
 requires that header match the origin present in the ``Host`` header.
 
-For a :meth:`secure <django.http.HttpRequest.is_secure>` unsafe
+For a :meth:`secure <mango.http.HttpRequest.is_secure>` unsafe
 request that doesn't include the ``Origin`` header, the request must have a
 ``Referer`` header that matches the origin present in the ``Host`` header.
 
@@ -491,7 +491,7 @@ of ``example.com``.
 Default: ``{}`` (Empty dictionary)
 
 A dictionary containing the settings for all databases to be used with
-Django. It is a nested dictionary whose contents map a database alias
+Mango. It is a nested dictionary whose contents map a database alias
 to a dictionary containing the options for an individual database.
 
 The :setting:`DATABASES` setting must configure a ``default`` database;
@@ -502,7 +502,7 @@ SQLite. This can be configured using the following::
 
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
+            'ENGINE': 'mango.db.backends.sqlite3',
             'NAME': 'mydatabase',
         }
     }
@@ -514,7 +514,7 @@ other database types. This example is for PostgreSQL::
 
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
+            'ENGINE': 'mango.db.backends.postgresql',
             'NAME': 'mydatabase',
             'USER': 'mydatabaseuser',
             'PASSWORD': 'mypassword',
@@ -543,7 +543,7 @@ Set this to ``True`` to wrap each view in a transaction on this database. See
 
 Default: ``True``
 
-Set this to ``False`` if you want to :ref:`disable Django's transaction
+Set this to ``False`` if you want to :ref:`disable Mango's transaction
 management <deactivate-transaction-management>` and implement your own.
 
 .. setting:: DATABASE-ENGINE
@@ -555,12 +555,12 @@ Default: ``''`` (Empty string)
 
 The database backend to use. The built-in database backends are:
 
-* ``'django.db.backends.postgresql'``
-* ``'django.db.backends.mysql'``
-* ``'django.db.backends.sqlite3'``
-* ``'django.db.backends.oracle'``
+* ``'mango.db.backends.postgresql'``
+* ``'mango.db.backends.mysql'``
+* ``'mango.db.backends.sqlite3'``
+* ``'mango.db.backends.oracle'``
 
-You can use a database backend that doesn't ship with Django by setting
+You can use a database backend that doesn't ship with Mango by setting
 ``ENGINE`` to a fully-qualified path (i.e. ``mypackage.backends.whatever``).
 
 .. setting:: HOST
@@ -609,7 +609,7 @@ file. When specifying the path, always use forward slashes, even on Windows
 Default: ``0``
 
 The lifetime of a database connection, as an integer of seconds. Use ``0`` to
-close database connections at the end of each request — Django's historical
+close database connections at the end of each request — Mango's historical
 behavior — and ``None`` for unlimited persistent connections.
 
 .. setting:: OPTIONS
@@ -661,13 +661,13 @@ from the database returns aware datetimes in this time zone instead of UTC.
 When :setting:`USE_TZ` is ``False``, it is an error to set this option.
 
 * If the database backend doesn't support time zones (e.g. SQLite, MySQL,
-  Oracle), Django reads and writes datetimes in local time according to this
+  Oracle), Mango reads and writes datetimes in local time according to this
   option if it is set and in UTC if it isn't.
 
   Changing the connection time zone changes how datetimes are read from and
   written to the database.
 
-  * If Django manages the database and you don't have a strong reason to do
+  * If Mango manages the database and you don't have a strong reason to do
     otherwise, you should leave this option unset. It's best to store datetimes
     in UTC because it avoids ambiguous or nonexistent datetimes during daylight
     saving time changes. Also, receiving datetimes in UTC keeps datetime
@@ -676,7 +676,7 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
 
   * If you're connecting to a third-party database that stores datetimes in a
     local time rather than UTC, then you must set this option to the
-    appropriate time zone. Likewise, if Django manages the database but
+    appropriate time zone. Likewise, if Mango manages the database but
     third-party systems connect to the same database and expect to find
     datetimes in local time, then you must set this option.
 
@@ -731,7 +731,7 @@ Here's an example with a test database configuration::
 
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
+            'ENGINE': 'mango.db.backends.postgresql',
             'USER': 'mydatabaseuser',
             'NAME': 'mydatabase',
             'TEST': {
@@ -840,7 +840,7 @@ with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
 .. deprecated:: 4.0
 
    This setting is deprecated as it can be inferred from the
-   :attr:`~django.test.TestCase.databases` with the
+   :attr:`~mango.test.TestCase.databases` with the
    :ref:`serialized_rollback <test-case-serialized-rollback>` option enabled.
 
 .. setting:: TEST_TEMPLATE
@@ -889,7 +889,7 @@ Default: ``None``
 This is an Oracle-specific setting.
 
 The username to use when connecting to the Oracle database that will be used
-when running tests. If not provided, Django will use ``'test_' + USER``.
+when running tests. If not provided, Mango will use ``'test_' + USER``.
 
 .. setting:: TEST_PASSWD
 
@@ -901,7 +901,7 @@ Default: ``None``
 This is an Oracle-specific setting.
 
 The password to use when connecting to the Oracle database that will be used
-when running tests. If not provided, Django will generate a random password.
+when running tests. If not provided, Mango will generate a random password.
 
 .. setting:: TEST_ORACLE_MANAGED_FILES
 
@@ -925,7 +925,7 @@ Default: ``None``
 This is an Oracle-specific setting.
 
 The name of the tablespace that will be used when running tests. If not
-provided, Django will use ``'test_' + USER``.
+provided, Mango will use ``'test_' + USER``.
 
 .. setting:: TEST_TBLSPACE_TMP
 
@@ -937,7 +937,7 @@ Default: ``None``
 This is an Oracle-specific setting.
 
 The name of the temporary tablespace that will be used when running tests. If
-not provided, Django will use ``'test_' + USER + '_temp'``.
+not provided, Mango will use ``'test_' + USER + '_temp'``.
 
 .. setting:: DATAFILE
 
@@ -948,7 +948,7 @@ Default: ``None``
 
 This is an Oracle-specific setting.
 
-The name of the datafile to use for the TBLSPACE. If not provided, Django will
+The name of the datafile to use for the TBLSPACE. If not provided, Mango will
 use ``TBLSPACE + '.dbf'``.
 
 .. setting:: DATAFILE_TMP
@@ -960,7 +960,7 @@ Default: ``None``
 
 This is an Oracle-specific setting.
 
-The name of the datafile to use for the TBLSPACE_TMP. If not provided, Django
+The name of the datafile to use for the TBLSPACE_TMP. If not provided, Mango
 will use ``TBLSPACE_TMP + '.dbf'``.
 
 .. setting:: DATAFILE_MAXSIZE
@@ -1037,7 +1037,7 @@ The amount by which the DATAFILE_TMP is extended when more space is required.
 Default: ``2621440`` (i.e. 2.5 MB).
 
 The maximum size in bytes that a request body may be before a
-:exc:`~django.core.exceptions.SuspiciousOperation` (``RequestDataTooBig``) is
+:exc:`~mango.core.exceptions.SuspiciousOperation` (``RequestDataTooBig``) is
 raised. The check is done when accessing ``request.body`` or ``request.POST``
 and is calculated against the total request size excluding any file upload
 data. You can set this to ``None`` to disable the check. Applications that are
@@ -1059,7 +1059,7 @@ See also :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`.
 Default: ``1000``
 
 The maximum number of parameters that may be received via GET or POST before a
-:exc:`~django.core.exceptions.SuspiciousOperation` (``TooManyFields``) is
+:exc:`~mango.core.exceptions.SuspiciousOperation` (``TooManyFields``) is
 raised. You can set this to ``None`` to disable the check. Applications that
 are expected to receive an unusually large number of form fields should tune
 this setting.
@@ -1180,12 +1180,12 @@ A boolean that turns on/off debug mode.
 Never deploy a site into production with :setting:`DEBUG` turned on.
 
 One of the main features of debug mode is the display of detailed error pages.
-If your app raises an exception when :setting:`DEBUG` is ``True``, Django will
+If your app raises an exception when :setting:`DEBUG` is ``True``, Mango will
 display a detailed traceback, including a lot of metadata about your
-environment, such as all the currently defined Django settings (from
+environment, such as all the currently defined Mango settings (from
 ``settings.py``).
 
-As a security measure, Django will *not* include settings that might be
+As a security measure, Mango will *not* include settings that might be
 sensitive, such as :setting:`SECRET_KEY`. Specifically, it will exclude any
 setting whose name includes any of the following:
 
@@ -1204,7 +1204,7 @@ that are inappropriate for public consumption. File paths, configuration
 options and the like all give attackers extra information about your server.
 
 It is also important to remember that when running with :setting:`DEBUG`
-turned on, Django will remember every SQL query it executes. This is useful
+turned on, Mango will remember every SQL query it executes. This is useful
 when you're debugging, but it'll rapidly consume memory on a production server.
 
 Finally, if :setting:`DEBUG` is ``False``, you also need to properly set
@@ -1213,7 +1213,7 @@ requests being returned as "Bad Request (400)".
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin
+    The default :file:`settings.py` file created by :djadmin:`mango-admin
     startproject <startproject>` sets ``DEBUG = True`` for convenience.
 
 .. setting:: DEBUG_PROPAGATE_EXCEPTIONS
@@ -1223,13 +1223,13 @@ requests being returned as "Bad Request (400)".
 
 Default: ``False``
 
-If set to ``True``, Django's exception handling of view functions
-(:data:`~django.conf.urls.handler500`, or the debug view if :setting:`DEBUG`
-is ``True``) and logging of 500 responses (:ref:`django-request-logger`) is
+If set to ``True``, Mango's exception handling of view functions
+(:data:`~mango.conf.urls.handler500`, or the debug view if :setting:`DEBUG`
+is ``True``) and logging of 500 responses (:ref:`mango-request-logger`) is
 skipped and exceptions propagate upwards.
 
 This can be useful for some test setups. It shouldn't be used on a live site
-unless you want your web server (instead of Django) to generate "Internal
+unless you want your web server (instead of Mango) to generate "Internal
 Server Error" responses. In that case, make sure your server doesn't show the
 stack trace or other sensitive information in the response.
 
@@ -1255,10 +1255,10 @@ See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 
 .. versionadded:: 3.2
 
-Default: ``'``:class:`django.db.models.AutoField`\ ``'``
+Default: ``'``:class:`mango.db.models.AutoField`\ ``'``
 
 Default primary key field type to use for models that don't have a field with
-:attr:`primary_key=True <django.db.models.Field.primary_key>`.
+:attr:`primary_key=True <mango.db.models.Field.primary_key>`.
 
 .. admonition:: Migrating auto-created through tables
 
@@ -1274,7 +1274,7 @@ Default primary key field type to use for models that don't have a field with
     key of the auto-created through table will not be migrated.
 
     In order to address this, you should add a
-    :class:`~django.db.migrations.operations.RunSQL` operation to your
+    :class:`~mango.db.migrations.operations.RunSQL` operation to your
     migrations to perform the required ``ALTER TABLE`` step. You can check the
     existing table name through ``sqlmigrate``, ``dbshell``, or with the
     field’s ``remote_field.through._meta.db_table`` property.
@@ -1300,10 +1300,10 @@ manually specified. Used when constructing the ``Content-Type`` header.
 ``DEFAULT_EXCEPTION_REPORTER``
 ------------------------------
 
-Default: ``'``:class:`django.views.debug.ExceptionReporter`\ ``'``
+Default: ``'``:class:`mango.views.debug.ExceptionReporter`\ ``'``
 
 Default exception reporter class to be used if none has been assigned to the
-:class:`~django.http.HttpRequest` instance yet. See
+:class:`~mango.http.HttpRequest` instance yet. See
 :ref:`custom-error-reports`.
 
 .. setting:: DEFAULT_EXCEPTION_REPORTER_FILTER
@@ -1311,10 +1311,10 @@ Default exception reporter class to be used if none has been assigned to the
 ``DEFAULT_EXCEPTION_REPORTER_FILTER``
 -------------------------------------
 
-Default: ``'``:class:`django.views.debug.SafeExceptionReporterFilter`\ ``'``
+Default: ``'``:class:`mango.views.debug.SafeExceptionReporterFilter`\ ``'``
 
 Default exception reporter filter class to be used if none has been assigned to
-the :class:`~django.http.HttpRequest` instance yet.
+the :class:`~mango.http.HttpRequest` instance yet.
 See :ref:`Filtering error reports<filtering-error-reports>`.
 
 .. setting:: DEFAULT_FILE_STORAGE
@@ -1322,7 +1322,7 @@ See :ref:`Filtering error reports<filtering-error-reports>`.
 ``DEFAULT_FILE_STORAGE``
 ------------------------
 
-Default: ``'``:class:`django.core.files.storage.FileSystemStorage`\ ``'``
+Default: ``'``:class:`mango.core.files.storage.FileSystemStorage`\ ``'``
 
 Default file storage class to be used for any file-related operations that don't
 specify a particular storage system. See :doc:`/topics/files`.
@@ -1375,7 +1375,7 @@ This is only used if ``CommonMiddleware`` is installed (see
 ``EMAIL_BACKEND``
 -----------------
 
-Default: ``'``:class:`django.core.mail.backends.smtp.EmailBackend`\ ``'``
+Default: ``'``:class:`mango.core.mail.backends.smtp.EmailBackend`\ ``'``
 
 The backend to use for sending emails. For the list of available backends see
 :doc:`/topics/email`.
@@ -1411,7 +1411,7 @@ Default: ``''`` (Empty string)
 Password to use for the SMTP server defined in :setting:`EMAIL_HOST`. This
 setting is used in conjunction with :setting:`EMAIL_HOST_USER` when
 authenticating to the SMTP server. If either of these settings is empty,
-Django won't attempt authentication.
+Mango won't attempt authentication.
 
 See also :setting:`EMAIL_HOST_USER`.
 
@@ -1423,7 +1423,7 @@ See also :setting:`EMAIL_HOST_USER`.
 Default: ``''`` (Empty string)
 
 Username to use for the SMTP server defined in :setting:`EMAIL_HOST`.
-If empty, Django won't attempt authentication.
+If empty, Mango won't attempt authentication.
 
 See also :setting:`EMAIL_HOST_PASSWORD`.
 
@@ -1441,10 +1441,10 @@ Port to use for the SMTP server defined in :setting:`EMAIL_HOST`.
 ``EMAIL_SUBJECT_PREFIX``
 ------------------------
 
-Default: ``'[Django] '``
+Default: ``'[Mango] '``
 
-Subject-line prefix for email messages sent with ``django.core.mail.mail_admins``
-or ``django.core.mail.mail_managers``. You'll probably want to include the
+Subject-line prefix for email messages sent with ``mango.core.mail.mail_admins``
+or ``mango.core.mail.mail_managers``. You'll probably want to include the
 trailing space.
 
 .. setting:: EMAIL_USE_LOCALTIME
@@ -1530,12 +1530,12 @@ attempt.
 Default::
 
     [
-        'django.core.files.uploadhandler.MemoryFileUploadHandler',
-        'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+        'mango.core.files.uploadhandler.MemoryFileUploadHandler',
+        'mango.core.files.uploadhandler.TemporaryFileUploadHandler',
     ]
 
 A list of handlers to use for uploading. Changing this setting allows complete
-customization -- even replacement -- of Django's upload process.
+customization -- even replacement -- of Mango's upload process.
 
 See :doc:`/topics/files` for details.
 
@@ -1608,7 +1608,7 @@ Default: ``None``
 
 The directory to store data to (typically files larger than
 :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`) temporarily while uploading files.
-If ``None``, Django will use the standard temporary directory for the operating
+If ``None``, Mango will use the standard temporary directory for the operating
 system. For example, this will default to ``/tmp`` on \*nix-style operating
 systems.
 
@@ -1654,7 +1654,7 @@ If not ``None``, this will be used as the value of the ``SCRIPT_NAME``
 environment variable in any HTTP request. This setting can be used to override
 the server-provided value of ``SCRIPT_NAME``, which may be a rewritten version
 of the preferred value or not supplied at all. It is also used by
-:func:`django.setup()` to set the URL resolver script prefix outside of the
+:func:`mango.setup()` to set the URL resolver script prefix outside of the
 request/response cycle (e.g. in management commands and standalone scripts) to
 generate correct URLs when ``SCRIPT_NAME`` is not ``/``.
 
@@ -1663,7 +1663,7 @@ generate correct URLs when ``SCRIPT_NAME`` is not ``/``.
 ``FORM_RENDERER``
 -----------------
 
-Default: ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``
+Default: ``'``:class:`mango.forms.renderers.MangoTemplates`\ ``'``
 
 The class that renders form widgets. It must implement :ref:`the low-level
 render API <low-level-widget-render-api>`.
@@ -1676,12 +1676,12 @@ render API <low-level-widget-render-api>`.
 Default: ``None``
 
 A full Python path to a Python package that contains custom format definitions
-for project locales. If not ``None``, Django will check for a ``formats.py``
+for project locales. If not ``None``, Mango will check for a ``formats.py``
 file, under the directory named as the current locale, and will use the
 formats defined in this file.
 
 For example, if :setting:`FORMAT_MODULE_PATH` is set to ``mysite.formats``,
-and current language is ``en`` (English), Django will expect a directory tree
+and current language is ``en`` (English), Mango will expect a directory tree
 like::
 
     mysite/
@@ -1698,7 +1698,7 @@ You can also set this setting to a list of Python paths, for example::
         'some_app.formats',
     ]
 
-When Django searches for a certain format, it will go through all given Python
+When Mango searches for a certain format, it will go through all given Python
 paths until it finds a module that actually defines the given format. This
 means that formats defined in packages farther up in the list will take
 precedence over the same formats in packages farther down.
@@ -1730,12 +1730,12 @@ Default: ``[]`` (Empty list)
 List of compiled regular expression objects describing URLs that should be
 ignored when reporting HTTP 404 errors via email (see
 :doc:`/howto/error-reporting`). Regular expressions are matched against
-:meth:`request's full paths <django.http.HttpRequest.get_full_path>` (including
+:meth:`request's full paths <mango.http.HttpRequest.get_full_path>` (including
 query string, if any). Use this if your site does not provide a commonly
 requested file such as ``favicon.ico`` or ``robots.txt``.
 
 This is only used if
-:class:`~django.middleware.common.BrokenLinkEmailsMiddleware` is enabled (see
+:class:`~mango.middleware.common.BrokenLinkEmailsMiddleware` is enabled (see
 :doc:`/topics/http/middleware`).
 
 .. setting:: INSTALLED_APPS
@@ -1746,7 +1746,7 @@ This is only used if
 Default: ``[]`` (Empty list)
 
 A list of strings designating all applications that are enabled in this
-Django installation. Each string should be a dotted Python path to:
+Mango installation. Each string should be a dotted Python path to:
 
 * an application configuration class (preferred), or
 * a package containing an application.
@@ -1756,21 +1756,21 @@ Django installation. Each string should be a dotted Python path to:
 .. admonition:: Use the application registry for introspection
 
     Your code should never access :setting:`INSTALLED_APPS` directly. Use
-    :attr:`django.apps.apps` instead.
+    :attr:`mango.apps.apps` instead.
 
 .. admonition:: Application names and labels must be unique in
                 :setting:`INSTALLED_APPS`
 
-    Application :attr:`names <django.apps.AppConfig.name>` — the dotted Python
+    Application :attr:`names <mango.apps.AppConfig.name>` — the dotted Python
     path to the application package — must be unique. There is no way to
     include the same application twice, short of duplicating its code under
     another name.
 
-    Application :attr:`labels <django.apps.AppConfig.label>` — by default the
+    Application :attr:`labels <mango.apps.AppConfig.label>` — by default the
     final part of the name — must be unique too. For example, you can't
-    include both ``django.contrib.auth`` and ``myproject.auth``. However, you
+    include both ``mango.contrib.auth`` and ``myproject.auth``. However, you
     can relabel an application with a custom configuration that defines a
-    different :attr:`~django.apps.AppConfig.label`.
+    different :attr:`~mango.apps.AppConfig.label`.
 
     These rules apply regardless of whether :setting:`INSTALLED_APPS`
     references application configuration classes or application packages.
@@ -1788,12 +1788,12 @@ Default: ``[]`` (Empty list)
 
 A list of IP addresses, as strings, that:
 
-* Allow the :func:`~django.template.context_processors.debug` context processor
+* Allow the :func:`~mango.template.context_processors.debug` context processor
   to add some variables to the template context.
 * Can use the :ref:`admindocs bookmarklets <admindocs-bookmarklets>` even if
   not logged in as a staff user.
 * Are marked as "internal" (as opposed to "EXTERNAL") in
-  :class:`~django.utils.log.AdminEmailHandler` emails.
+  :class:`~mango.utils.log.AdminEmailHandler` emails.
 
 .. setting:: LANGUAGE_CODE
 
@@ -1818,7 +1818,7 @@ It serves two purposes:
   website. It also provides the fallback translation when a translation for a
   given literal doesn't exist for the user's preferred language.
 
-See :ref:`how-django-discovers-language-preference` for more details.
+See :ref:`how-mango-discovers-language-preference` for more details.
 
 .. _list of language identifiers: http://www.i18nguy.com/unicode/language-identifiers.html
 
@@ -1870,7 +1870,7 @@ See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
 ``LANGUAGE_COOKIE_NAME``
 ------------------------
 
-Default: ``'django_language'``
+Default: ``'mango_language'``
 
 The name of the cookie to use for the language cookie. This can be whatever
 you want (as long as it's different from the other cookie names in your
@@ -1884,9 +1884,9 @@ application). See :doc:`/topics/i18n/index`.
 Default: ``'/'``
 
 The path set on the language cookie. This should either match the URL path of your
-Django installation or be a parent of that path.
+Mango installation or be a parent of that path.
 
-This is useful if you have multiple Django instances running under the same
+This is useful if you have multiple Mango instances running under the same
 hostname. They can use different cookie paths and each instance will only see
 its own language cookie.
 
@@ -1930,7 +1930,7 @@ ensure that the cookie is only sent under an HTTPS connection.
 Default: A list of all available languages. This list is continually growing
 and including a copy here would inevitably become rapidly out of date. You can
 see the current list of translated languages by looking in
-:source:`django/conf/global_settings.py`.
+:source:`mango/conf/global_settings.py`.
 
 The list is a list of two-tuples in the format
 (:term:`language code<language code>`, ``language name``) -- for example,
@@ -1939,15 +1939,15 @@ This specifies which languages are available for language selection. See
 :doc:`/topics/i18n/index`.
 
 Generally, the default value should suffice. Only set this setting if you want
-to restrict language selection to a subset of the Django-provided languages.
+to restrict language selection to a subset of the Mango-provided languages.
 
 If you define a custom :setting:`LANGUAGES` setting, you can mark the
 language names as translation strings using the
-:func:`~django.utils.translation.gettext_lazy` function.
+:func:`~mango.utils.translation.gettext_lazy` function.
 
 Here's a sample settings file::
 
-    from django.utils.translation import gettext_lazy as _
+    from mango.utils.translation import gettext_lazy as _
 
     LANGUAGES = [
         ('de', _('German')),
@@ -1961,13 +1961,13 @@ Here's a sample settings file::
 
 Default: A list of all language codes that are written right-to-left. You can
 see the current list of these languages by looking in
-:source:`django/conf/global_settings.py`.
+:source:`mango/conf/global_settings.py`.
 
 The list contains :term:`language codes<language code>` for languages that are
 written right-to-left.
 
 Generally, the default value should suffice. Only set this setting if you want
-to restrict language selection to a subset of the Django-provided languages.
+to restrict language selection to a subset of the Mango-provided languages.
 If you define a custom :setting:`LANGUAGES` setting, the list of bidirectional
 languages may contain language codes which are not enabled on a given site.
 
@@ -1978,8 +1978,8 @@ languages may contain language codes which are not enabled on a given site.
 
 Default: ``[]`` (Empty list)
 
-A list of directories where Django looks for translation files.
-See :ref:`how-django-discovers-translations`.
+A list of directories where Mango looks for translation files.
+See :ref:`how-mango-discovers-translations`.
 
 Example::
 
@@ -1988,7 +1988,7 @@ Example::
         '/var/local/translations/locale',
     ]
 
-Django will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
+Mango will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
 directories containing the actual translation files.
 
 .. setting:: LOGGING
@@ -2007,7 +2007,7 @@ errors to an email log handler when :setting:`DEBUG` is ``False``. See also
 :ref:`configuring-logging`.
 
 You can see the default logging configuration by looking in
-:source:`django/utils/log.py`.
+:source:`mango/utils/log.py`.
 
 .. setting:: LOGGING_CONFIG
 
@@ -2017,7 +2017,7 @@ You can see the default logging configuration by looking in
 Default: ``'logging.config.dictConfig'``
 
 A path to a callable that will be used to configure logging in the
-Django project. Points at an instance of Python's :ref:`dictConfig
+Mango project. Points at an instance of Python's :ref:`dictConfig
 <logging-config-dictschema>` configuration method by default.
 
 If you set :setting:`LOGGING_CONFIG` to ``None``, the logging
@@ -2032,7 +2032,7 @@ Default: ``[]`` (Empty list)
 
 A list in the same format as :setting:`ADMINS` that specifies who should get
 broken link notifications when
-:class:`~django.middleware.common.BrokenLinkEmailsMiddleware` is enabled.
+:class:`~mango.middleware.common.BrokenLinkEmailsMiddleware` is enabled.
 
 .. setting:: MEDIA_ROOT
 
@@ -2070,7 +2070,7 @@ to a non-empty value. You will need to :ref:`configure these files to be served
 environments.
 
 If you want to use ``{{ MEDIA_URL }}`` in your templates, add
-``'django.template.context_processors.media'`` in the ``'context_processors'``
+``'mango.template.context_processors.media'`` in the ``'context_processors'``
 option of :setting:`TEMPLATES`.
 
 Example: ``"http://media.example.com/"``
@@ -2090,7 +2090,7 @@ Example: ``"http://media.example.com/"``
 
     If :setting:`MEDIA_URL` is a relative path, then it will be prefixed by the
     server-provided value of ``SCRIPT_NAME`` (or ``/`` if not set). This makes
-    it easier to serve a Django application in a subpath without adding an
+    it easier to serve a Mango application in a subpath without adding an
     extra configuration to the settings.
 
 .. setting:: MIDDLEWARE
@@ -2123,7 +2123,7 @@ the ``blog.db_migrations`` package.
 If you provide the ``app_label`` argument, :djadmin:`makemigrations` will
 automatically create the package if it doesn't already exist.
 
-When you supply ``None`` as a value for an app, Django will consider the app as
+When you supply ``None`` as a value for an app, Mango will consider the app as
 an app without migrations regardless of an existing ``migrations`` submodule.
 This can be used, for example, in a test settings file to skip migrations while
 testing (tables will still be created for the apps' models). To disable
@@ -2140,11 +2140,11 @@ app.
 
 Default: ``'F j'``
 
-The default formatting to use for date fields on Django admin change-list
+The default formatting to use for date fields on Mango admin change-list
 pages -- and, possibly, by other parts of the system -- in cases when only the
 month and day are displayed.
 
-For example, when a Django admin change-list page is being filtered by a date
+For example, when a Mango admin change-list page is being filtered by a date
 drilldown, the header for a given day displays the day and month. Different
 locales have different formats. For example, U.S. English would say
 "January 1," whereas Spanish might say "1 Enero."
@@ -2196,7 +2196,7 @@ See also :setting:`DECIMAL_SEPARATOR`, :setting:`THOUSAND_SEPARATOR` and
 Default: ``False``
 
 Whether to prepend the "www." subdomain to URLs that don't have it. This is only
-used if :class:`~django.middleware.common.CommonMiddleware` is installed
+used if :class:`~mango.middleware.common.CommonMiddleware` is installed
 (see :doc:`/topics/http/middleware`). See also :setting:`APPEND_SLASH`.
 
 .. setting:: ROOT_URLCONF
@@ -2207,9 +2207,9 @@ used if :class:`~django.middleware.common.CommonMiddleware` is installed
 Default: Not defined
 
 A string representing the full Python import path to your root URLconf, for
-example ``"mydjangoapps.urls"``. Can be overridden on a per-request basis by
+example ``"mymangoapps.urls"``. Can be overridden on a per-request basis by
 setting the attribute ``urlconf`` on the incoming ``HttpRequest``
-object. See :ref:`how-django-processes-a-request` for details.
+object. See :ref:`how-mango-processes-a-request` for details.
 
 .. setting:: SECRET_KEY
 
@@ -2218,37 +2218,37 @@ object. See :ref:`how-django-processes-a-request` for details.
 
 Default: ``''`` (Empty string)
 
-A secret key for a particular Django installation. This is used to provide
+A secret key for a particular Mango installation. This is used to provide
 :doc:`cryptographic signing </topics/signing>`, and should be set to a unique,
 unpredictable value.
 
-:djadmin:`django-admin startproject <startproject>` automatically adds a
+:djadmin:`mango-admin startproject <startproject>` automatically adds a
 randomly-generated ``SECRET_KEY`` to each new project.
 
 Uses of the key shouldn't assume that it's text or bytes. Every use should go
-through :func:`~django.utils.encoding.force_str` or
-:func:`~django.utils.encoding.force_bytes` to convert it to the desired type.
+through :func:`~mango.utils.encoding.force_str` or
+:func:`~mango.utils.encoding.force_bytes` to convert it to the desired type.
 
-Django will refuse to start if :setting:`SECRET_KEY` is not set.
+Mango will refuse to start if :setting:`SECRET_KEY` is not set.
 
 .. warning::
 
     **Keep this value secret.**
 
-    Running Django with a known :setting:`SECRET_KEY` defeats many of Django's
+    Running Mango with a known :setting:`SECRET_KEY` defeats many of Mango's
     security protections, and can lead to privilege escalation and remote code
     execution vulnerabilities.
 
 The secret key is used for:
 
 * All :doc:`sessions </topics/http/sessions>` if you are using
-  any other session backend than ``django.contrib.sessions.backends.cache``,
+  any other session backend than ``mango.contrib.sessions.backends.cache``,
   or are using the default
-  :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`.
+  :meth:`~mango.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`.
 * All :doc:`messages </ref/contrib/messages>` if you are using
-  :class:`~django.contrib.messages.storage.cookie.CookieStorage` or
-  :class:`~django.contrib.messages.storage.fallback.FallbackStorage`.
-* All :class:`~django.contrib.auth.views.PasswordResetView` tokens.
+  :class:`~mango.contrib.messages.storage.cookie.CookieStorage` or
+  :class:`~mango.contrib.messages.storage.fallback.FallbackStorage`.
+* All :class:`~mango.contrib.auth.views.PasswordResetView` tokens.
 * Any usage of :doc:`cryptographic signing </topics/signing>`, unless a
   different key is provided.
 
@@ -2258,7 +2258,7 @@ affect them.
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin
+    The default :file:`settings.py` file created by :djadmin:`mango-admin
     startproject <startproject>` creates a unique ``SECRET_KEY`` for
     convenience.
 
@@ -2269,7 +2269,7 @@ affect them.
 
 Default: ``True``
 
-If ``True``, the :class:`~django.middleware.security.SecurityMiddleware`
+If ``True``, the :class:`~mango.middleware.security.SecurityMiddleware`
 sets the :ref:`x-content-type-options` header on all responses that do not
 already have it.
 
@@ -2283,7 +2283,7 @@ already have it.
 Default: ``'same-origin'``
 
 Unless set to ``None``, the
-:class:`~django.middleware.security.SecurityMiddleware` sets the
+:class:`~mango.middleware.security.SecurityMiddleware` sets the
 :ref:`cross-origin-opener-policy` header on all responses that do not already
 have it to the value provided.
 
@@ -2294,7 +2294,7 @@ have it to the value provided.
 
 Default: ``False``
 
-If ``True``, the :class:`~django.middleware.security.SecurityMiddleware` adds
+If ``True``, the :class:`~mango.middleware.security.SecurityMiddleware` adds
 the ``includeSubDomains`` directive to the :ref:`http-strict-transport-security`
 header. It has no effect unless :setting:`SECURE_HSTS_SECONDS` is set to a
 non-zero value.
@@ -2311,7 +2311,7 @@ non-zero value.
 
 Default: ``False``
 
-If ``True``, the :class:`~django.middleware.security.SecurityMiddleware` adds
+If ``True``, the :class:`~mango.middleware.security.SecurityMiddleware` adds
 the ``preload`` directive to the :ref:`http-strict-transport-security`
 header. It has no effect unless :setting:`SECURE_HSTS_SECONDS` is set to a
 non-zero value.
@@ -2324,7 +2324,7 @@ non-zero value.
 Default: ``0``
 
 If set to a non-zero integer value, the
-:class:`~django.middleware.security.SecurityMiddleware` sets the
+:class:`~mango.middleware.security.SecurityMiddleware` sets the
 :ref:`http-strict-transport-security` header on all responses that do not
 already have it.
 
@@ -2344,27 +2344,27 @@ is secure. This controls the behavior of the request object's ``is_secure()``
 method.
 
 By default, ``is_secure()`` determines if a request is secure by confirming
-that a requested URL uses ``https://``. This method is important for Django's
+that a requested URL uses ``https://``. This method is important for Mango's
 CSRF protection, and it may be used by your own code or third-party apps.
 
-If your Django app is behind a proxy, though, the proxy may be "swallowing"
+If your Mango app is behind a proxy, though, the proxy may be "swallowing"
 whether the original request uses HTTPS or not. If there is a non-HTTPS
-connection between the proxy and Django then ``is_secure()`` would always
+connection between the proxy and Mango then ``is_secure()`` would always
 return ``False`` -- even for requests that were made via HTTPS by the end user.
-In contrast, if there is an HTTPS connection between the proxy and Django then
+In contrast, if there is an HTTPS connection between the proxy and Mango then
 ``is_secure()`` would always return ``True`` -- even for requests that were
 made originally via HTTP.
 
 In this situation, configure your proxy to set a custom HTTP header that tells
-Django whether the request came in via HTTPS, and set
-``SECURE_PROXY_SSL_HEADER`` so that Django knows what header to look for.
+Mango whether the request came in via HTTPS, and set
+``SECURE_PROXY_SSL_HEADER`` so that Mango knows what header to look for.
 
 Set a tuple with two elements -- the name of the header to look for and the
 required value. For example::
 
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-This tells Django to trust the ``X-Forwarded-Proto`` header that comes from our
+This tells Mango to trust the ``X-Forwarded-Proto`` header that comes from our
 proxy, and any time its value is ``'https'``, then the request is guaranteed to
 be secure (i.e., it originally came in via HTTPS).
 
@@ -2372,7 +2372,7 @@ You should *only* set this setting if you control your proxy or have some other
 guarantee that it sets/strips this header appropriately.
 
 Note that the header needs to be in the format as used by ``request.META`` --
-all caps and likely starting with ``HTTP_``. (Remember, Django automatically
+all caps and likely starting with ``HTTP_``. (Remember, Mango automatically
 adds ``'HTTP_'`` to the start of x-header names before making the header
 available in ``request.META``.)
 
@@ -2384,11 +2384,11 @@ available in ``request.META``.)
     Make sure ALL of the following are true before setting this (assuming the
     values from the example above):
 
-    * Your Django app is behind a proxy.
+    * Your Mango app is behind a proxy.
     * Your proxy strips the ``X-Forwarded-Proto`` header from all incoming
       requests. In other words, if end users include that header in their
       requests, the proxy will discard it.
-    * Your proxy sets the ``X-Forwarded-Proto`` header and sends it to Django,
+    * Your proxy sets the ``X-Forwarded-Proto`` header and sends it to Mango,
       but only for requests that originally come in via HTTPS.
 
     If any of those are not true, you should keep this setting set to ``None``
@@ -2403,7 +2403,7 @@ Default: ``[]`` (Empty list)
 
 If a URL path matches a regular expression in this list, the request will not be
 redirected to HTTPS. The
-:class:`~django.middleware.security.SecurityMiddleware` strips leading slashes
+:class:`~mango.middleware.security.SecurityMiddleware` strips leading slashes
 from URL paths, so patterns shouldn't include them, e.g.
 ``SECURE_REDIRECT_EXEMPT = [r'^no-ssl/$', …]``. If
 :setting:`SECURE_SSL_REDIRECT` is ``False``, this setting has no effect.
@@ -2415,7 +2415,7 @@ from URL paths, so patterns shouldn't include them, e.g.
 
 Default: ``'same-origin'``
 
-If configured, the :class:`~django.middleware.security.SecurityMiddleware` sets
+If configured, the :class:`~mango.middleware.security.SecurityMiddleware` sets
 the :ref:`referrer-policy` header on all responses that do not already have it
 to the value provided.
 
@@ -2438,7 +2438,7 @@ setting has no effect.
 
 Default: ``False``
 
-If ``True``, the :class:`~django.middleware.security.SecurityMiddleware`
+If ``True``, the :class:`~mango.middleware.security.SecurityMiddleware`
 :ref:`redirects <ssl-redirect>` all non-HTTPS requests to HTTPS (except for
 those URLs matching a regular expression listed in
 :setting:`SECURE_REDIRECT_EXEMPT`).
@@ -2477,7 +2477,7 @@ The email address that error messages come from, such as those sent to
 .. admonition:: Why are my emails sent from a different address?
 
     This address is used only for error messages. It is *not* the address that
-    regular email messages sent with :meth:`~django.core.mail.send_mail()`
+    regular email messages sent with :meth:`~mango.core.mail.send_mail()`
     come from; for that, see :setting:`DEFAULT_FROM_EMAIL`.
 
 .. setting:: SHORT_DATE_FORMAT
@@ -2513,7 +2513,7 @@ See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
 ``SIGNING_BACKEND``
 -------------------
 
-Default: ``'django.core.signing.TimestampSigner'``
+Default: ``'mango.core.signing.TimestampSigner'``
 
 The backend used for signing cookies and other data.
 
@@ -2540,15 +2540,15 @@ See also the :doc:`/ref/checks` documentation.
 Default: ``[]`` (Empty list)
 
 A list containing the settings for all template engines to be used with
-Django. Each item of the list is a dictionary containing the options for an
+Mango. Each item of the list is a dictionary containing the options for an
 individual engine.
 
-Here's a setup that tells the Django template engine to load templates from the
+Here's a setup that tells the Mango template engine to load templates from the
 ``templates`` subdirectory inside each installed application::
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'BACKEND': 'mango.template.backends.mango.MangoTemplates',
             'APP_DIRS': True,
         },
     ]
@@ -2564,10 +2564,10 @@ Default: Not defined
 
 The template backend to use. The built-in template backends are:
 
-* ``'django.template.backends.django.DjangoTemplates'``
-* ``'django.template.backends.jinja2.Jinja2'``
+* ``'mango.template.backends.mango.MangoTemplates'``
+* ``'mango.template.backends.jinja2.Jinja2'``
 
-You can use a template backend that doesn't ship with Django by setting
+You can use a template backend that doesn't ship with Mango by setting
 ``BACKEND`` to a fully-qualified path (i.e. ``'mypackage.whatever.Backend'``).
 
 .. setting:: TEMPLATES-NAME
@@ -2608,7 +2608,7 @@ applications.
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin
+    The default :file:`settings.py` file created by :djadmin:`mango-admin
     startproject <startproject>` sets ``'APP_DIRS': True``.
 
 .. setting:: TEMPLATES-OPTIONS
@@ -2620,8 +2620,8 @@ Default: ``{}`` (Empty dict)
 
 Extra parameters to pass to the template backend. Available parameters vary
 depending on the template backend. See
-:class:`~django.template.backends.django.DjangoTemplates` and
-:class:`~django.template.backends.jinja2.Jinja2` for the options of the
+:class:`~mango.template.backends.mango.MangoTemplates` and
+:class:`~mango.template.backends.jinja2.Jinja2` for the options of the
 built-in backends.
 
 .. setting:: TEST_RUNNER
@@ -2629,7 +2629,7 @@ built-in backends.
 ``TEST_RUNNER``
 ---------------
 
-Default: ``'django.test.runner.DiscoverRunner'``
+Default: ``'mango.test.runner.DiscoverRunner'``
 
 The name of the class to use for starting the test suite. See
 :ref:`other-testing-frameworks`.
@@ -2642,14 +2642,14 @@ The name of the class to use for starting the test suite. See
 Default: ``[]`` (Empty list)
 
 In order to restore the database state between tests for
-``TransactionTestCase``\s and database backends without transactions, Django
+``TransactionTestCase``\s and database backends without transactions, Mango
 will :ref:`serialize the contents of all apps <test-case-serialized-rollback>`
 when it starts the test run so it can then reload from that copy before running
 tests that need it.
 
 This slows down the startup time of the test runner; if you have apps that
 you know don't need this feature, you can add their full names in here (e.g.
-``'django.contrib.contenttypes'``) to exclude them from this serialization
+``'mango.contrib.contenttypes'``) to exclude them from this serialization
 process.
 
 .. setting:: THOUSAND_SEPARATOR
@@ -2718,33 +2718,33 @@ A string representing the time zone for this installation. See the `list of
 time zones`_.
 
 .. note::
-    Since Django was first released with the :setting:`TIME_ZONE` set to
+    Since Mango was first released with the :setting:`TIME_ZONE` set to
     ``'America/Chicago'``, the global setting (used if nothing is defined in
     your project's ``settings.py``) remains ``'America/Chicago'`` for backwards
     compatibility. New project templates default to ``'UTC'``.
 
 Note that this isn't necessarily the time zone of the server. For example, one
-server may serve multiple Django-powered sites, each with a separate time zone
+server may serve multiple Mango-powered sites, each with a separate time zone
 setting.
 
-When :setting:`USE_TZ` is ``False``, this is the time zone in which Django
+When :setting:`USE_TZ` is ``False``, this is the time zone in which Mango
 will store all datetimes. When :setting:`USE_TZ` is ``True``, this is the
-default time zone that Django will use to display datetimes in templates and
+default time zone that Mango will use to display datetimes in templates and
 to interpret datetimes entered in forms.
 
-On Unix environments (where :func:`time.tzset` is implemented), Django sets the
+On Unix environments (where :func:`time.tzset` is implemented), Mango sets the
 ``os.environ['TZ']`` variable to the time zone you specify in the
 :setting:`TIME_ZONE` setting. Thus, all your views and models will
-automatically operate in this time zone. However, Django won't set the ``TZ``
+automatically operate in this time zone. However, Mango won't set the ``TZ``
 environment variable if you're using the manual configuration option as
 described in :ref:`manually configuring settings
-<settings-without-django-settings-module>`. If Django doesn't set the ``TZ``
+<settings-without-mango-settings-module>`. If Mango doesn't set the ``TZ``
 environment variable, it's up to you to ensure your processes are running in
 the correct environment.
 
 .. note::
-    Django cannot reliably use alternate time zones in a Windows environment.
-    If you're running Django on Windows, :setting:`TIME_ZONE` must be set to
+    Mango cannot reliably use alternate time zones in a Windows environment.
+    If you're running Mango on Windows, :setting:`TIME_ZONE` must be set to
     match the system time zone.
 
 .. _list of time zones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
@@ -2756,16 +2756,16 @@ the correct environment.
 
 Default: ``True``
 
-A boolean that specifies whether Django's translation system should be enabled.
+A boolean that specifies whether Mango's translation system should be enabled.
 This provides a way to turn it off, for performance. If this is set to
-``False``, Django will make some optimizations so as not to load the
+``False``, Mango will make some optimizations so as not to load the
 translation machinery.
 
 See also :setting:`LANGUAGE_CODE`, :setting:`USE_L10N` and :setting:`USE_TZ`.
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin
+    The default :file:`settings.py` file created by :djadmin:`mango-admin
     startproject <startproject>` includes ``USE_I18N = True`` for convenience.
 
 .. setting:: USE_L10N
@@ -2776,14 +2776,14 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_L10N` and :setting:`USE_TZ`.
 Default: ``False``
 
 A boolean that specifies if localized formatting of data will be enabled by
-default or not. If this is set to ``True``, e.g. Django will display numbers and
+default or not. If this is set to ``True``, e.g. Mango will display numbers and
 dates using the format of the current locale.
 
 See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin
+    The default :file:`settings.py` file created by :djadmin:`mango-admin
     startproject <startproject>` includes ``USE_L10N = True`` for convenience.
 
 .. setting:: USE_THOUSAND_SEPARATOR
@@ -2794,7 +2794,7 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
 Default: ``False``
 
 A boolean that specifies whether to display numbers using a thousand separator.
-When set to ``True`` and :setting:`USE_L10N` is also ``True``, Django will
+When set to ``True`` and :setting:`USE_L10N` is also ``True``, Mango will
 format numbers using the :setting:`NUMBER_GROUPING` and
 :setting:`THOUSAND_SEPARATOR` settings. These settings may also be dictated by
 the locale, which takes precedence.
@@ -2811,12 +2811,12 @@ Default: ``False``
 
 .. note::
 
-    In Django 5.0, the default value will change from ``False`` to ``True``.
+    In Mango 5.0, the default value will change from ``False`` to ``True``.
 
 A boolean that specifies if datetimes will be timezone-aware by default or not.
-If this is set to ``True``, Django will use timezone-aware datetimes internally.
+If this is set to ``True``, Mango will use timezone-aware datetimes internally.
 
-When ``USE_TZ`` is False, Django will use naive datetimes in local time, except
+When ``USE_TZ`` is False, Mango will use naive datetimes in local time, except
 when parsing ISO 8601 formatted strings, where timezone information will always
 be retained if present.
 
@@ -2825,7 +2825,7 @@ See also :setting:`TIME_ZONE`, :setting:`USE_I18N` and :setting:`USE_L10N`.
 .. note::
 
     The default :file:`settings.py` file created by
-    :djadmin:`django-admin startproject <startproject>` includes
+    :djadmin:`mango-admin startproject <startproject>` includes
     ``USE_TZ = True`` for convenience.
 
 .. setting:: USE_X_FORWARDED_HOST
@@ -2863,15 +2863,15 @@ enabled if a proxy which sets this header is in use.
 
 Default: ``None``
 
-The full Python path of the WSGI application object that Django's built-in
-servers (e.g. :djadmin:`runserver`) will use. The :djadmin:`django-admin
+The full Python path of the WSGI application object that Mango's built-in
+servers (e.g. :djadmin:`runserver`) will use. The :djadmin:`mango-admin
 startproject <startproject>` management command will create a standard
 ``wsgi.py`` file with an ``application`` callable in it, and point this setting
 to that ``application``.
 
-If not set, the return value of ``django.core.wsgi.get_wsgi_application()``
+If not set, the return value of ``mango.core.wsgi.get_wsgi_application()``
 will be used. In this case, the behavior of :djadmin:`runserver` will be
-identical to previous Django versions.
+identical to previous Mango versions.
 
 .. setting:: YEAR_MONTH_FORMAT
 
@@ -2880,11 +2880,11 @@ identical to previous Django versions.
 
 Default: ``'F Y'``
 
-The default formatting to use for date fields on Django admin change-list
+The default formatting to use for date fields on Mango admin change-list
 pages -- and, possibly, by other parts of the system -- in cases when only the
 year and month are displayed.
 
-For example, when a Django admin change-list page is being filtered by a date
+For example, when a Mango admin change-list page is being filtered by a date
 drilldown, the header for a given month displays the month and the year.
 Different locales have different formats. For example, U.S. English would say
 "January 2006," whereas another locale might say "2006/January."
@@ -2904,20 +2904,20 @@ and :setting:`MONTH_DAY_FORMAT`.
 Default: ``'DENY'``
 
 The default value for the X-Frame-Options header used by
-:class:`~django.middleware.clickjacking.XFrameOptionsMiddleware`. See the
+:class:`~mango.middleware.clickjacking.XFrameOptionsMiddleware`. See the
 :doc:`clickjacking protection </ref/clickjacking/>` documentation.
 
 Auth
 ====
 
-Settings for :mod:`django.contrib.auth`.
+Settings for :mod:`mango.contrib.auth`.
 
 .. setting:: AUTHENTICATION_BACKENDS
 
 ``AUTHENTICATION_BACKENDS``
 ---------------------------
 
-Default: ``['django.contrib.auth.backends.ModelBackend']``
+Default: ``['mango.contrib.auth.backends.ModelBackend']``
 
 A list of authentication backend classes (as strings) to use when attempting to
 authenticate a user. See the :ref:`authentication backends documentation
@@ -2948,7 +2948,7 @@ The model to use to represent a User. See :ref:`auth-custom-user`.
 Default: ``'/accounts/profile/'``
 
 The URL or :ref:`named URL pattern <naming-url-patterns>` where requests are
-redirected after login when the :class:`~django.contrib.auth.views.LoginView`
+redirected after login when the :class:`~mango.contrib.auth.views.LoginView`
 doesn't get a ``next`` GET parameter.
 
 .. setting:: LOGIN_URL
@@ -2960,9 +2960,9 @@ Default: ``'/accounts/login/'``
 
 The URL or :ref:`named URL pattern <naming-url-patterns>` where requests are
 redirected for login when using the
-:func:`~django.contrib.auth.decorators.login_required` decorator,
-:class:`~django.contrib.auth.mixins.LoginRequiredMixin`, or
-:class:`~django.contrib.auth.mixins.AccessMixin`.
+:func:`~mango.contrib.auth.decorators.login_required` decorator,
+:class:`~mango.contrib.auth.mixins.LoginRequiredMixin`, or
+:class:`~mango.contrib.auth.mixins.AccessMixin`.
 
 .. setting:: LOGOUT_REDIRECT_URL
 
@@ -2972,7 +2972,7 @@ redirected for login when using the
 Default: ``None``
 
 The URL or :ref:`named URL pattern <naming-url-patterns>` where requests are
-redirected after logout if :class:`~django.contrib.auth.views.LogoutView`
+redirected after logout if :class:`~mango.contrib.auth.views.LogoutView`
 doesn't have a ``next_page`` attribute.
 
 If ``None``, no redirect will be performed and the logout view will be
@@ -2987,7 +2987,7 @@ Default: ``259200`` (3 days, in seconds)
 
 The number of seconds a password reset link is valid for.
 
-Used by the :class:`~django.contrib.auth.views.PasswordResetConfirmView`.
+Used by the :class:`~mango.contrib.auth.views.PasswordResetConfirmView`.
 
 .. note::
 
@@ -3009,10 +3009,10 @@ See :ref:`auth_password_storage`.
 Default::
 
     [
-        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-        'django.contrib.auth.hashers.Argon2PasswordHasher',
-        'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+        'mango.contrib.auth.hashers.PBKDF2PasswordHasher',
+        'mango.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+        'mango.contrib.auth.hashers.Argon2PasswordHasher',
+        'mango.contrib.auth.hashers.BCryptSHA256PasswordHasher',
     ]
 
 .. setting:: AUTH_PASSWORD_VALIDATORS
@@ -3031,7 +3031,7 @@ performed and all passwords are accepted.
 Messages
 ========
 
-Settings for :mod:`django.contrib.messages`.
+Settings for :mod:`mango.contrib.messages`.
 
 .. setting:: MESSAGE_LEVEL
 
@@ -3049,7 +3049,7 @@ framework. See :ref:`message levels <message-level>` for more details.
    the built-in constants, you must import the constants module directly to
    avoid the potential for circular imports, e.g.::
 
-       from django.contrib.messages import constants as message_constants
+       from mango.contrib.messages import constants as message_constants
        MESSAGE_LEVEL = message_constants.DEBUG
 
    If desired, you may specify the numeric values for the constants directly
@@ -3061,19 +3061,19 @@ framework. See :ref:`message levels <message-level>` for more details.
 ``MESSAGE_STORAGE``
 -------------------
 
-Default: ``'django.contrib.messages.storage.fallback.FallbackStorage'``
+Default: ``'mango.contrib.messages.storage.fallback.FallbackStorage'``
 
-Controls where Django stores message data. Valid values are:
+Controls where Mango stores message data. Valid values are:
 
-* ``'django.contrib.messages.storage.fallback.FallbackStorage'``
-* ``'django.contrib.messages.storage.session.SessionStorage'``
-* ``'django.contrib.messages.storage.cookie.CookieStorage'``
+* ``'mango.contrib.messages.storage.fallback.FallbackStorage'``
+* ``'mango.contrib.messages.storage.session.SessionStorage'``
+* ``'mango.contrib.messages.storage.cookie.CookieStorage'``
 
 See :ref:`message storage backends <message-storage-backends>` for more details.
 
 The backends that use cookies --
-:class:`~django.contrib.messages.storage.cookie.CookieStorage` and
-:class:`~django.contrib.messages.storage.fallback.FallbackStorage` --
+:class:`~mango.contrib.messages.storage.cookie.CookieStorage` and
+:class:`~mango.contrib.messages.storage.fallback.FallbackStorage` --
 use the value of :setting:`SESSION_COOKIE_DOMAIN`, :setting:`SESSION_COOKIE_SECURE`
 and :setting:`SESSION_COOKIE_HTTPONLY` when setting their cookies.
 
@@ -3103,7 +3103,7 @@ to override. See :ref:`message-displaying` above for more details.
    the built-in constants, you must import the ``constants`` module directly to
    avoid the potential for circular imports, e.g.::
 
-       from django.contrib.messages import constants as message_constants
+       from mango.contrib.messages import constants as message_constants
        MESSAGE_TAGS = {message_constants.INFO: ''}
 
    If desired, you may specify the numeric values for the constants directly
@@ -3115,7 +3115,7 @@ to override. See :ref:`message-displaying` above for more details.
 Sessions
 ========
 
-Settings for :mod:`django.contrib.sessions`.
+Settings for :mod:`mango.contrib.sessions`.
 
 .. setting:: SESSION_CACHE_ALIAS
 
@@ -3157,7 +3157,7 @@ standard domain cookies, existing user cookies will be set to the old
 domain. This may result in them being unable to log in as long as these cookies
 persist.
 
-This setting also affects cookies set by :mod:`django.contrib.messages`.
+This setting also affects cookies set by :mod:`mango.contrib.messages`.
 
 .. setting:: SESSION_COOKIE_HTTPONLY
 
@@ -3199,9 +3199,9 @@ The name of the cookie to use for sessions. This can be whatever you want
 Default: ``'/'``
 
 The path set on the session cookie. This should either match the URL path of your
-Django installation or be parent of that path.
+Mango installation or be parent of that path.
 
-This is useful if you have multiple Django instances running under the same
+This is useful if you have multiple Mango instances running under the same
 hostname. They can use different cookie paths, and each instance will only see
 its own session cookie.
 
@@ -3269,15 +3269,15 @@ the user's session.
 ``SESSION_ENGINE``
 ------------------
 
-Default: ``'django.contrib.sessions.backends.db'``
+Default: ``'mango.contrib.sessions.backends.db'``
 
-Controls where Django stores session data. Included engines are:
+Controls where Mango stores session data. Included engines are:
 
-* ``'django.contrib.sessions.backends.db'``
-* ``'django.contrib.sessions.backends.file'``
-* ``'django.contrib.sessions.backends.cache'``
-* ``'django.contrib.sessions.backends.cached_db'``
-* ``'django.contrib.sessions.backends.signed_cookies'``
+* ``'mango.contrib.sessions.backends.db'``
+* ``'mango.contrib.sessions.backends.file'``
+* ``'mango.contrib.sessions.backends.cache'``
+* ``'mango.contrib.sessions.backends.cached_db'``
+* ``'mango.contrib.sessions.backends.signed_cookies'``
 
 See :ref:`configuring-sessions` for more details.
 
@@ -3299,8 +3299,8 @@ Whether to expire the session when the user closes their browser. See
 Default: ``None``
 
 If you're using file-based session storage, this sets the directory in
-which Django will store session data. When the default value (``None``) is
-used, Django will use the standard temporary directory for the system.
+which Mango will store session data. When the default value (``None``) is
+used, Mango will use the standard temporary directory for the system.
 
 
 .. setting:: SESSION_SAVE_EVERY_REQUEST
@@ -3320,22 +3320,22 @@ sessions won't be created, even if this setting is active.
 ``SESSION_SERIALIZER``
 ----------------------
 
-Default: ``'django.contrib.sessions.serializers.JSONSerializer'``
+Default: ``'mango.contrib.sessions.serializers.JSONSerializer'``
 
 Full import path of a serializer class to use for serializing session data.
 Included serializers are:
 
-* ``'django.contrib.sessions.serializers.PickleSerializer'``
-* ``'django.contrib.sessions.serializers.JSONSerializer'``
+* ``'mango.contrib.sessions.serializers.PickleSerializer'``
+* ``'mango.contrib.sessions.serializers.JSONSerializer'``
 
 See :ref:`session_serialization` for details, including a warning regarding
 possible remote code execution when using
-:class:`~django.contrib.sessions.serializers.PickleSerializer`.
+:class:`~mango.contrib.sessions.serializers.PickleSerializer`.
 
 Sites
 =====
 
-Settings for :mod:`django.contrib.sites`.
+Settings for :mod:`mango.contrib.sites`.
 
 .. setting:: SITE_ID
 
@@ -3344,7 +3344,7 @@ Settings for :mod:`django.contrib.sites`.
 
 Default: Not defined
 
-The ID, as an integer, of the current site in the ``django_site`` database
+The ID, as an integer, of the current site in the ``mango_site`` database
 table. This is used so that application data can hook into specific sites
 and a single database can manage content for multiple sites.
 
@@ -3354,7 +3354,7 @@ and a single database can manage content for multiple sites.
 Static Files
 ============
 
-Settings for :mod:`django.contrib.staticfiles`.
+Settings for :mod:`mango.contrib.staticfiles`.
 
 .. setting:: STATIC_ROOT
 
@@ -3410,7 +3410,7 @@ You may need to :ref:`configure these files to be served in development
 
     If :setting:`STATIC_URL` is a relative path, then it will be prefixed by
     the server-provided value of ``SCRIPT_NAME`` (or ``/`` if not set). This
-    makes it easier to serve a Django application in a subpath without adding
+    makes it easier to serve a Mango application in a subpath without adding
     an extra configuration to the settings.
 
 .. setting:: STATICFILES_DIRS
@@ -3459,7 +3459,7 @@ This would allow you to refer to the local file
 ``'/opt/webfiles/stats/polls_20101022.tar.gz'`` with
 ``'/static/downloads/polls_20101022.tar.gz'`` in your templates, e.g.:
 
-.. code-block:: html+django
+.. code-block:: html+mango
 
     <a href="{% static 'downloads/polls_20101022.tar.gz' %}">
 
@@ -3468,13 +3468,13 @@ This would allow you to refer to the local file
 ``STATICFILES_STORAGE``
 -----------------------
 
-Default: ``'django.contrib.staticfiles.storage.StaticFilesStorage'``
+Default: ``'mango.contrib.staticfiles.storage.StaticFilesStorage'``
 
 The file storage engine to use when collecting static files with the
 :djadmin:`collectstatic` management command.
 
 A ready-to-use instance of the storage backend defined in this setting
-can be found at ``django.contrib.staticfiles.storage.staticfiles_storage``.
+can be found at ``mango.contrib.staticfiles.storage.staticfiles_storage``.
 
 For an example, see :ref:`staticfiles-from-cdn`.
 
@@ -3486,22 +3486,22 @@ For an example, see :ref:`staticfiles-from-cdn`.
 Default::
 
     [
-        'django.contrib.staticfiles.finders.FileSystemFinder',
-        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+        'mango.contrib.staticfiles.finders.FileSystemFinder',
+        'mango.contrib.staticfiles.finders.AppDirectoriesFinder',
     ]
 
 The list of finder backends that know how to find static files in
 various locations.
 
 The default will find files stored in the :setting:`STATICFILES_DIRS` setting
-(using ``django.contrib.staticfiles.finders.FileSystemFinder``) and in a
+(using ``mango.contrib.staticfiles.finders.FileSystemFinder``) and in a
 ``static`` subdirectory of each app (using
-``django.contrib.staticfiles.finders.AppDirectoriesFinder``). If multiple
+``mango.contrib.staticfiles.finders.AppDirectoriesFinder``). If multiple
 files with the same name are present, the first file that is found will be
 used.
 
 One finder is disabled by default:
-``django.contrib.staticfiles.finders.DefaultStorageFinder``. If added to
+``mango.contrib.staticfiles.finders.DefaultStorageFinder``. If added to
 your :setting:`STATICFILES_FINDERS` setting, it will look for static files in
 the default file storage as defined by the :setting:`DEFAULT_FILE_STORAGE`
 setting.

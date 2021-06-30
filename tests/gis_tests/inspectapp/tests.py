@@ -2,12 +2,12 @@ import os
 import re
 from io import StringIO
 
-from django.contrib.gis.gdal import GDAL_VERSION, Driver, GDALException
-from django.contrib.gis.utils.ogrinspect import ogrinspect
-from django.core.management import call_command
-from django.db import connection, connections
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import modify_settings
+from mango.contrib.gis.gdal import GDAL_VERSION, Driver, GDALException
+from mango.contrib.gis.utils.ogrinspect import ogrinspect
+from mango.core.management import call_command
+from mango.db import connection, connections
+from mango.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from mango.test.utils import modify_settings
 
 from ..test_data import TEST_DATA
 from .models import AllOGRFields
@@ -57,7 +57,7 @@ class InspectDbTests(TestCase):
 
 
 @modify_settings(
-    INSTALLED_APPS={'append': 'django.contrib.gis'},
+    INSTALLED_APPS={'append': 'mango.contrib.gis'},
 )
 class OGRInspectTest(SimpleTestCase):
     expected_srid = 'srid=-1' if GDAL_VERSION < (2, 2) else ''
@@ -68,8 +68,8 @@ class OGRInspectTest(SimpleTestCase):
         model_def = ogrinspect(shp_file, 'MyModel')
 
         expected = [
-            '# This is an auto-generated Django model module created by ogrinspect.',
-            'from django.contrib.gis.db import models',
+            '# This is an auto-generated Mango model module created by ogrinspect.',
+            'from mango.contrib.gis.db import models',
             '',
             '',
             'class MyModel(models.Model):',
@@ -96,8 +96,8 @@ class OGRInspectTest(SimpleTestCase):
         model_def = ogrinspect(shp_file, 'City')
 
         expected = [
-            '# This is an auto-generated Django model module created by ogrinspect.',
-            'from django.contrib.gis.db import models',
+            '# This is an auto-generated Mango model module created by ogrinspect.',
+            'from mango.contrib.gis.db import models',
             '',
             '',
             'class City(models.Model):',
@@ -127,8 +127,8 @@ class OGRInspectTest(SimpleTestCase):
             self.skipTest("Unable to setup an OGR connection to your database")
 
         self.assertTrue(model_def.startswith(
-            '# This is an auto-generated Django model module created by ogrinspect.\n'
-            'from django.contrib.gis.db import models\n'
+            '# This is an auto-generated Mango model module created by ogrinspect.\n'
+            'from mango.contrib.gis.db import models\n'
             '\n'
             '\n'
             'class Measurement(models.Model):\n'
@@ -186,18 +186,18 @@ def get_ogr_db_string():
     """
     Construct the DB string that GDAL will use to inspect the database.
     GDAL will create its own connection to the database, so we re-use the
-    connection settings from the Django test.
+    connection settings from the Mango test.
     """
     db = connections.databases['default']
 
-    # Map from the django backend into the OGR driver name and database identifier
+    # Map from the mango backend into the OGR driver name and database identifier
     # https://www.gdal.org/ogr/ogr_formats.html
     #
     # TODO: Support Oracle (OCI).
     drivers = {
-        'django.contrib.gis.db.backends.postgis': ('PostgreSQL', "PG:dbname='%(db_name)s'", ' '),
-        'django.contrib.gis.db.backends.mysql': ('MySQL', 'MYSQL:"%(db_name)s"', ','),
-        'django.contrib.gis.db.backends.spatialite': ('SQLite', '%(db_name)s', '')
+        'mango.contrib.gis.db.backends.postgis': ('PostgreSQL', "PG:dbname='%(db_name)s'", ' '),
+        'mango.contrib.gis.db.backends.mysql': ('MySQL', 'MYSQL:"%(db_name)s"', ','),
+        'mango.contrib.gis.db.backends.spatialite': ('SQLite', '%(db_name)s', '')
     }
 
     db_engine = db['ENGINE']
@@ -221,7 +221,7 @@ def get_ogr_db_string():
 
     def add(key, template):
         value = db.get(key, None)
-        # Don't add the parameter if it is not in django's settings
+        # Don't add the parameter if it is not in mango's settings
         if value:
             params.append(template % value)
     add('HOST', "host='%s'")

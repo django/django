@@ -1,10 +1,10 @@
 import copy
 
-from django.core.exceptions import ValidationError
-from django.forms.utils import ErrorDict, ErrorList, flatatt
-from django.test import SimpleTestCase
-from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy
+from mango.core.exceptions import ValidationError
+from mango.forms.utils import ErrorDict, ErrorList, flatatt
+from mango.test import SimpleTestCase
+from mango.utils.safestring import mark_safe
+from mango.utils.translation import gettext_lazy
 
 
 class FormsUtilsTestCase(SimpleTestCase):

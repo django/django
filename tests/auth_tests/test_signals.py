@@ -1,9 +1,9 @@
-from django.apps import apps
-from django.contrib.auth import authenticate, signals
-from django.contrib.auth.models import User
-from django.core.exceptions import FieldDoesNotExist
-from django.test import TestCase, override_settings
-from django.test.client import RequestFactory
+from mango.apps import apps
+from mango.contrib.auth import authenticate, signals
+from mango.contrib.auth.models import User
+from mango.core.exceptions import FieldDoesNotExist
+from mango.test import TestCase, override_settings
+from mango.test.client import RequestFactory
 
 from .models import MinimalUser, UserWithDisabledLastLoginField
 

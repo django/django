@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from django.http import HttpRequest
-from django.http.request import MediaType
+from mango.http import HttpRequest
+from mango.http.request import MediaType
 
 
 class MediaTypeTests(TestCase):

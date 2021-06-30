@@ -1,5 +1,5 @@
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import ClearableFileInput, MultiWidget
+from mango.core.files.uploadedfile import SimpleUploadedFile
+from mango.forms import ClearableFileInput, MultiWidget
 
 from .base import WidgetTest
 

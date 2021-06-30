@@ -1,6 +1,6 @@
-from django.http import HttpResponse
-from django.template import Context, Template
-from django.urls import path
+from mango.http import HttpResponse
+from mango.template import Context, Template
+from mango.urls import path
 
 
 def inner_view(request):

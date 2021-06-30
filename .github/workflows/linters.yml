@@ -38,4 +38,4 @@ jobs:
         uses: liskin/gh-problem-matcher-wrap@v1
         with:
           linters: isort
-          run: isort --check --diff django tests scripts
+          run: isort --check --diff mango tests scripts

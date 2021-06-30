@@ -1,7 +1,7 @@
 import datetime
 
-from django import forms
-from django.test import TestCase
+from mango import forms
+from mango.test import TestCase
 
 from .models import Article
 

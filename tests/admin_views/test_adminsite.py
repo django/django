@@ -1,9 +1,9 @@
-from django.contrib import admin
-from django.contrib.admin.actions import delete_selected
-from django.contrib.auth.models import User
-from django.test import SimpleTestCase, TestCase, override_settings
-from django.test.client import RequestFactory
-from django.urls import path, reverse
+from mango.contrib import admin
+from mango.contrib.admin.actions import delete_selected
+from mango.contrib.auth.models import User
+from mango.test import SimpleTestCase, TestCase, override_settings
+from mango.test.client import RequestFactory
+from mango.urls import path, reverse
 
 from .models import Article
 
@@ -35,8 +35,8 @@ class SiteEachContextTest(TestCase):
 
     def test_each_context(self):
         ctx = self.ctx
-        self.assertEqual(ctx['site_header'], 'Django administration')
-        self.assertEqual(ctx['site_title'], 'Django site admin')
+        self.assertEqual(ctx['site_header'], 'Mango administration')
+        self.assertEqual(ctx['site_title'], 'Mango site admin')
         self.assertEqual(ctx['site_url'], '/')
         self.assertIs(ctx['has_permission'], True)
 

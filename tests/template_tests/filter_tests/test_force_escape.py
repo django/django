@@ -1,6 +1,6 @@
-from django.template.defaultfilters import force_escape
-from django.test import SimpleTestCase
-from django.utils.safestring import SafeData
+from mango.template.defaultfilters import force_escape
+from mango.test import SimpleTestCase
+from mango.utils.safestring import SafeData
 
 from ..utils import setup
 

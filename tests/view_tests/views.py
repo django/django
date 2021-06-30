@@ -4,18 +4,18 @@ import logging
 import sys
 from pathlib import Path
 
-from django.core.exceptions import (
+from mango.core.exceptions import (
     BadRequest, PermissionDenied, SuspiciousOperation,
 )
-from django.http import Http404, HttpResponse, JsonResponse
-from django.shortcuts import render
-from django.template import TemplateDoesNotExist
-from django.urls import get_resolver
-from django.views import View
-from django.views.debug import (
+from mango.http import Http404, HttpResponse, JsonResponse
+from mango.shortcuts import render
+from mango.template import TemplateDoesNotExist
+from mango.urls import get_resolver
+from mango.views import View
+from mango.views.debug import (
     ExceptionReporter, SafeExceptionReporterFilter, technical_500_response,
 )
-from django.views.decorators.debug import (
+from mango.views.decorators.debug import (
     sensitive_post_parameters, sensitive_variables,
 )
 
@@ -105,7 +105,7 @@ def render_no_template(request):
 
 
 def send_log(request, exc_info):
-    logger = logging.getLogger('django')
+    logger = logging.getLogger('mango')
     # The default logging config has a logging filter to ensure admin emails are
     # only sent with DEBUG=False, but since someone might choose to remove that
     # filter, we still want to be able to test the behavior of error emails

@@ -1,7 +1,7 @@
 import math
 
-from django.db.models.functions import Pi
-from django.test import TestCase
+from mango.db.models.functions import Pi
+from mango.test import TestCase
 
 from ..models import FloatModel
 

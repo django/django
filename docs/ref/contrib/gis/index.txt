@@ -1,11 +1,11 @@
 =========
-GeoDjango
+GeoMango
 =========
 
-.. module:: django.contrib.gis
-    :synopsis: Geographic Information System (GIS) extensions for Django
+.. module:: mango.contrib.gis
+    :synopsis: Geographic Information System (GIS) extensions for Mango
 
-GeoDjango intends to be a world-class geographic Web framework. Its goal is to
+GeoMango intends to be a world-class geographic Web framework. Its goal is to
 make it as easy as possible to build GIS Web applications and harness the power
 of spatially enabled data.
 

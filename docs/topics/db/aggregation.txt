@@ -2,14 +2,14 @@
 Aggregation
 ===========
 
-.. currentmodule:: django.db.models
+.. currentmodule:: mango.db.models
 
-The topic guide on :doc:`Django's database-abstraction API </topics/db/queries>`
-described the way that you can use Django queries that create,
+The topic guide on :doc:`Mango's database-abstraction API </topics/db/queries>`
+described the way that you can use Mango queries that create,
 retrieve, update and delete individual objects. However, sometimes you will
 need to retrieve values that are derived by summarizing or *aggregating* a
 collection of objects. This topic guide describes the ways that aggregate values
-can be generated and returned using Django queries.
+can be generated and returned using Mango queries.
 
 Throughout this guide, we'll refer to the following models. These models are
 used to track the inventory for a series of online bookstores:
@@ -18,7 +18,7 @@ used to track the inventory for a series of online bookstores:
 
 .. code-block:: python
 
-    from django.db import models
+    from mango.db import models
 
     class Author(models.Model):
         name = models.CharField(max_length=100)
@@ -55,17 +55,17 @@ above::
     73
 
     # Average price across all books.
-    >>> from django.db.models import Avg
+    >>> from mango.db.models import Avg
     >>> Book.objects.all().aggregate(Avg('price'))
     {'price__avg': 34.35}
 
     # Max price across all books.
-    >>> from django.db.models import Max
+    >>> from mango.db.models import Max
     >>> Book.objects.all().aggregate(Max('price'))
     {'price__max': Decimal('81.20')}
 
     # Difference between the highest priced book and the average price of all books.
-    >>> from django.db.models import FloatField
+    >>> from mango.db.models import FloatField
     >>> Book.objects.aggregate(
     ...     price_diff=Max('price', output_field=FloatField()) - Avg('price'))
     {'price_diff': 46.85}
@@ -74,7 +74,7 @@ above::
     # foreign key relationship backwards.
 
     # Each publisher, each with a count of books as a "num_books" attribute.
-    >>> from django.db.models import Count
+    >>> from mango.db.models import Count
     >>> pubs = Publisher.objects.annotate(num_books=Count('book'))
     >>> pubs
     <QuerySet [<Publisher: BaloneyPress>, <Publisher: SalamiPress>, ...]>
@@ -82,7 +82,7 @@ above::
     73
 
     # Each publisher, with a separate count of books with a rating above and below 5
-    >>> from django.db.models import Q
+    >>> from mango.db.models import Q
     >>> above_5 = Count('book', filter=Q(book__rating__gt=5))
     >>> below_5 = Count('book', filter=Q(book__rating__lte=5))
     >>> pubs = Publisher.objects.annotate(below_5=below_5).annotate(above_5=above_5)
@@ -99,9 +99,9 @@ above::
 Generating aggregates over a ``QuerySet``
 =========================================
 
-Django provides two ways to generate aggregates. The first way is to generate
+Mango provides two ways to generate aggregates. The first way is to generate
 summary values over an entire ``QuerySet``. For example, say you wanted to
-calculate the average price of all books available for sale. Django's query
+calculate the average price of all books available for sale. Mango's query
 syntax provides a means for describing the set of all books::
 
     >>> Book.objects.all()
@@ -110,7 +110,7 @@ What we need is a way to calculate summary values over the objects that
 belong to this ``QuerySet``. This is done by appending an ``aggregate()``
 clause onto the ``QuerySet``::
 
-    >>> from django.db.models import Avg
+    >>> from mango.db.models import Avg
     >>> Book.objects.all().aggregate(Avg('price'))
     {'price__avg': 34.35}
 
@@ -138,7 +138,7 @@ If you want to generate more than one aggregate, you add another argument to
 the ``aggregate()`` clause. So, if we also wanted to know the maximum and
 minimum price of all books, we would issue the query::
 
-    >>> from django.db.models import Avg, Max, Min
+    >>> from mango.db.models import Avg, Max, Min
     >>> Book.objects.aggregate(Avg('price'), Max('price'), Min('price'))
     {'price__avg': 34.35, 'price__max': Decimal('81.20'), 'price__min': Decimal('12.99')}
 
@@ -162,16 +162,16 @@ an aggregate that is to be calculated. For example, to annotate books with the
 number of authors::
 
     # Build an annotated queryset
-    >>> from django.db.models import Count
+    >>> from mango.db.models import Count
     >>> q = Book.objects.annotate(Count('authors'))
     # Interrogate the first object in the queryset
     >>> q[0]
-    <Book: The Definitive Guide to Django>
+    <Book: The Definitive Guide to Mango>
     >>> q[0].authors__count
     2
     # Interrogate the second object in the queryset
     >>> q[1]
-    <Book: Practical Django Projects>
+    <Book: Practical Mango Projects>
     >>> q[1].authors__count
     1
 
@@ -211,7 +211,7 @@ wrong results <10060>` because joins are used instead of subqueries:
     6
 
 For most aggregates, there is no way to avoid this problem, however, the
-:class:`~django.db.models.Count` aggregate has a ``distinct`` parameter that
+:class:`~mango.db.models.Count` aggregate has a ``distinct`` parameter that
 may help:
 
     >>> q = Book.objects.annotate(Count('authors', distinct=True), Count('store', distinct=True))
@@ -232,19 +232,19 @@ So far, we have dealt with aggregates over fields that belong to the
 model being queried. However, sometimes the value you want to aggregate
 will belong to a model that is related to the model you are querying.
 
-When specifying the field to be aggregated in an aggregate function, Django
+When specifying the field to be aggregated in an aggregate function, Mango
 will allow you to use the same :ref:`double underscore notation
 <field-lookups-intro>` that is used when referring to related fields in
-filters. Django will then handle any table joins that are required to retrieve
+filters. Mango will then handle any table joins that are required to retrieve
 and aggregate the related value.
 
 For example, to find the price range of books offered in each store,
 you could use the annotation::
 
-    >>> from django.db.models import Max, Min
+    >>> from mango.db.models import Max, Min
     >>> Store.objects.annotate(min_price=Min('books__price'), max_price=Max('books__price'))
 
-This tells Django to retrieve the ``Store`` model, join (through the
+This tells Mango to retrieve the ``Store`` model, join (through the
 many-to-many relationship) with the ``Book`` model, and aggregate on the
 price field of the book model to produce a minimum and maximum value.
 
@@ -272,7 +272,7 @@ For example, we can ask for all publishers, annotated with their respective
 total book stock counters (note how we use ``'book'`` to specify the
 ``Publisher`` -> ``Book`` reverse foreign key hop)::
 
-    >>> from django.db.models import Avg, Count, Min, Sum
+    >>> from mango.db.models import Avg, Count, Min, Sum
     >>> Publisher.objects.annotate(Count('book'))
 
 (Every ``Publisher`` in the resulting ``QuerySet`` will have an extra attribute
@@ -317,17 +317,17 @@ constraining the objects that are considered for aggregation.
 When used with an ``annotate()`` clause, a filter has the effect of
 constraining the objects for which an annotation is calculated. For example,
 you can generate an annotated list of all books that have a title starting
-with "Django" using the query::
+with "Mango" using the query::
 
-    >>> from django.db.models import Avg, Count
-    >>> Book.objects.filter(name__startswith="Django").annotate(num_authors=Count('authors'))
+    >>> from mango.db.models import Avg, Count
+    >>> Book.objects.filter(name__startswith="Mango").annotate(num_authors=Count('authors'))
 
 When used with an ``aggregate()`` clause, a filter has the effect of
 constraining the objects over which the aggregate is calculated.
 For example, you can generate the average price of all books with a
-title that starts with "Django" using the query::
+title that starts with "Mango" using the query::
 
-    >>> Book.objects.filter(name__startswith="Django").aggregate(Avg('price'))
+    >>> Book.objects.filter(name__startswith="Mango").aggregate(Avg('price'))
 
 .. _filtering-on-annotations:
 
@@ -516,7 +516,7 @@ shows up, particularly, when counting things.
 
 By way of example, suppose you have a model like this::
 
-    from django.db import models
+    from mango.db import models
 
     class Item(models.Model):
         name = models.CharField(max_length=10)
@@ -542,15 +542,15 @@ without any harmful effects, since that is already playing a role in the
 query.
 
 This behavior is the same as that noted in the queryset documentation for
-:meth:`~django.db.models.query.QuerySet.distinct` and the general rule is the
+:meth:`~mango.db.models.query.QuerySet.distinct` and the general rule is the
 same: normally you won't want extra columns playing a part in the result, so
 clear out the ordering, or at least make sure it's restricted only to those
 fields you also select in a ``values()`` call.
 
 .. note::
-    You might reasonably ask why Django doesn't remove the extraneous columns
+    You might reasonably ask why Mango doesn't remove the extraneous columns
     for you. The main reason is consistency with ``distinct()`` and other
-    places: Django **never** removes ordering constraints that you have
+    places: Mango **never** removes ordering constraints that you have
     specified (and we can't change those other methods' behavior, as that
     would violate our :doc:`/misc/api-stability` policy).
 
@@ -565,6 +565,6 @@ For example, if you wanted to calculate the average number of authors per
 book you first annotate the set of books with the author count, then
 aggregate that author count, referencing the annotation field::
 
-    >>> from django.db.models import Avg, Count
+    >>> from mango.db.models import Avg, Count
     >>> Book.objects.annotate(num_authors=Count('authors')).aggregate(Avg('num_authors'))
     {'num_authors__avg': 1.66}

@@ -2,13 +2,13 @@ import compileall
 import os
 from importlib import import_module
 
-from django.db import connection, connections
-from django.db.migrations.exceptions import (
+from mango.db import connection, connections
+from mango.db.migrations.exceptions import (
     AmbiguityError, InconsistentMigrationHistory, NodeNotFoundError,
 )
-from django.db.migrations.loader import MigrationLoader
-from django.db.migrations.recorder import MigrationRecorder
-from django.test import TestCase, modify_settings, override_settings
+from mango.db.migrations.loader import MigrationLoader
+from mango.db.migrations.recorder import MigrationRecorder
+from mango.test import TestCase, modify_settings, override_settings
 
 from .test_base import MigrationTestBase
 
@@ -383,7 +383,7 @@ class LoaderTests(TestCase):
 
         # However, starting at 3 or 4, nonexistent migrations would be needed.
         msg = ("Migration migrations.6_auto depends on nonexistent node ('migrations', '5_auto'). "
-               "Django tried to replace migration migrations.5_auto with any of "
+               "Mango tried to replace migration migrations.5_auto with any of "
                "[migrations.3_squashed_5] but wasn't able to because some of the replaced "
                "migrations are already applied.")
 

@@ -2,8 +2,8 @@
 GDAL API
 ========
 
-.. module:: django.contrib.gis.gdal
-    :synopsis: GeoDjango's high-level interface to the GDAL library.
+.. module:: mango.contrib.gis.gdal
+    :synopsis: GeoMango's high-level interface to the GDAL library.
 
 `GDAL`__ stands for **Geospatial Data Abstraction Library**,
 and is a veritable "Swiss army knife" of GIS data functionality.  A subset
@@ -11,14 +11,14 @@ of GDAL is the `OGR`__ Simple Features Library, which specializes
 in reading and writing vector geographic data in a variety of standard
 formats.
 
-GeoDjango provides a high-level Python interface for some of the
+GeoMango provides a high-level Python interface for some of the
 capabilities of OGR, including the reading and coordinate transformation
 of vector spatial data and minimal support for GDAL's features with respect
 to raster (image) data.
 
 .. note::
 
-    Although the module is named ``gdal``, GeoDjango only supports some of the
+    Although the module is named ``gdal``, GeoMango only supports some of the
     capabilities of OGR and GDAL's raster features at this time.
 
 __ https://gdal.org/
@@ -35,11 +35,11 @@ Sample Data
 The GDAL/OGR tools described here are designed to help you read in
 your geospatial data, in order for most of them to be useful you have
 to have some data to work with.  If you're starting out and don't yet
-have any data of your own to use, GeoDjango tests contain a number of
+have any data of your own to use, GeoMango tests contain a number of
 data sets that you can use for testing. You can download them here::
 
-    $ wget https://raw.githubusercontent.com/django/django/main/tests/gis_tests/data/cities/cities.{shp,prj,shx,dbf}
-    $ wget https://raw.githubusercontent.com/django/django/main/tests/gis_tests/data/rasters/raster.tif
+    $ wget https://raw.githubusercontent.com/nikhiljohn10/mango/main/tests/gis_tests/data/cities/cities.{shp,prj,shx,dbf}
+    $ wget https://raw.githubusercontent.com/nikhiljohn10/mango/main/tests/gis_tests/data/rasters/raster.tif
 
 Vector Data Source Objects
 ==========================
@@ -70,14 +70,14 @@ each feature in that layer.
 
     The optional ``encoding`` parameter allows you to specify a non-standard
     encoding of the strings in the source. This is typically useful when you
-    obtain ``DjangoUnicodeDecodeError`` exceptions while reading field values.
+    obtain ``MangoUnicodeDecodeError`` exceptions while reading field values.
 
     Once you've created your ``DataSource``, you can find out how many layers
     of data it contains by accessing the :attr:`layer_count` property, or
     (equivalently) by using the ``len()`` function. For information on
     accessing the layers of data themselves, see the next section::
 
-        >>> from django.contrib.gis.gdal import DataSource
+        >>> from mango.contrib.gis.gdal import DataSource
         >>> ds = DataSource('/path/to/your/cities.shp')
         >>> ds.name
         '/path/to/your/cities.shp'
@@ -246,7 +246,7 @@ __ https://gdal.org/drivers/vector/
 
     A method that returns a list containing the geometry of each feature in the
     layer. If the optional argument ``geos`` is set to ``True`` then the
-    geometries are converted to :class:`~django.contrib.gis.geos.GEOSGeometry`
+    geometries are converted to :class:`~mango.contrib.gis.geos.GEOSGeometry`
     objects. Otherwise, they are returned as :class:`OGRGeometry` objects::
 
         >>> [pt.tuple for pt in layer.get_geoms()]
@@ -432,13 +432,13 @@ OGR Geometries
 ---------------
 
 :class:`OGRGeometry` objects share similar functionality with
-:class:`~django.contrib.gis.geos.GEOSGeometry` objects and are thin wrappers
+:class:`~mango.contrib.gis.geos.GEOSGeometry` objects and are thin wrappers
 around OGR's internal geometry representation. Thus, they allow for more
 efficient access to data when using :class:`DataSource`. Unlike its GEOS
 counterpart, :class:`OGRGeometry` supports spatial reference systems and
 coordinate transformation::
 
-    >>> from django.contrib.gis.gdal import OGRGeometry
+    >>> from mango.contrib.gis.gdal import OGRGeometry
     >>> polygon = OGRGeometry('POLYGON((0 0, 5 0, 5 5, 0 5))')
 
 .. class:: OGRGeometry(geom_input, srs=None)
@@ -565,7 +565,7 @@ coordinate transformation::
 
     .. attribute:: geos
 
-    Returns a :class:`~django.contrib.gis.geos.GEOSGeometry` object
+    Returns a :class:`~mango.contrib.gis.geos.GEOSGeometry` object
     corresponding to this geometry.
 
     .. attribute:: gml
@@ -800,7 +800,7 @@ coordinate transformation::
     This class allows for the representation of an OGR geometry type
     in any of several ways::
 
-        >>> from django.contrib.gis.gdal import OGRGeomType
+        >>> from mango.contrib.gis.gdal import OGRGeomType
         >>> gt1 = OGRGeomType(3)             # Using an integer for the type
         >>> gt2 = OGRGeomType('Polygon')     # Using a string
         >>> gt3 = OGRGeomType('POLYGON')     # It's case-insensitive
@@ -821,12 +821,12 @@ coordinate transformation::
         >>> gt1.num
         3
 
-    .. attribute:: django
+    .. attribute:: mango
 
-    Returns the Django field type (a subclass of GeometryField) to use for
-    storing this OGR type, or ``None`` if there is no appropriate Django type::
+    Returns the Mango field type (a subclass of GeometryField) to use for
+    storing this OGR type, or ``None`` if there is no appropriate Mango type::
 
-        >>> gt1.django
+        >>> gt1.mango
         'PolygonField'
 
 ``Envelope``
@@ -1125,10 +1125,10 @@ blue.
     create rasters in the virtual filesystem, see :ref:`gdal-raster-vsimem`.
 
     The following example shows how rasters can be created from different input
-    sources (using the sample data from the GeoDjango tests; see also the
+    sources (using the sample data from the GeoMango tests; see also the
     :ref:`gdal_sample_data` section).
 
-        >>> from django.contrib.gis.gdal import GDALRaster
+        >>> from mango.contrib.gis.gdal import GDALRaster
         >>> rst = GDALRaster('/path/to/your/raster.tif', write=False)
         >>> rst.name
         '/path/to/your/raster.tif'
@@ -1436,9 +1436,9 @@ blue.
             >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
             >>> rst.metadata
             {}
-            >>> rst.metadata = {'DEFAULT': {'OWNER': 'Django', 'VERSION': '1.0'}}
+            >>> rst.metadata = {'DEFAULT': {'OWNER': 'Mango', 'VERSION': '1.0'}}
             >>> rst.metadata
-            {'DEFAULT': {'OWNER': 'Django', 'VERSION': '1.0'}}
+            {'DEFAULT': {'OWNER': 'Mango', 'VERSION': '1.0'}}
             >>> rst.metadata = {'DEFAULT': {'OWNER': None, 'VERSION': '2.0'}}
             >>> rst.metadata
             {'DEFAULT': {'VERSION': '2.0'}}
@@ -1637,7 +1637,7 @@ driver specified.
 
 There's no standard for describing raster data in a dictionary or JSON flavor.
 The definition of the dictionary input to the :class:`GDALRaster` class is
-therefore specific to Django. It's inspired by the `geojson`__ format, but the
+therefore specific to Mango. It's inspired by the `geojson`__ format, but the
 ``geojson`` standard is currently limited to vector formats.
 
 Examples of using the different keys when creating rasters can be found in the
@@ -1815,9 +1815,9 @@ dictionary representation and provide a ``name`` argument that starts with
 of the raster.
 
 Here's how to create a raster and return it as a file in an
-:class:`~django.http.HttpResponse`::
+:class:`~mango.http.HttpResponse`::
 
-    >>> from django.http import HttpResponse
+    >>> from mango.http import HttpResponse
     >>> rst = GDALRaster({
     ...     'name': '/vsimem/temporarymemfile',
     ...     'driver': 'tif',
@@ -1841,7 +1841,7 @@ documentation`_ for more details.
 .. warning:
 
     Rasters with names starting with `/vsi*/` will be treated as rasters from
-    the GDAL virtual filesystems. Django doesn't perform any extra validation.
+    the GDAL virtual filesystems. Mango doesn't perform any extra validation.
 
 Compressed rasters
 ^^^^^^^^^^^^^^^^^^
@@ -1850,7 +1850,7 @@ Instead decompressing the file and instantiating the resulting raster, GDAL can
 directly access compressed files using the ``/vsizip/``, ``/vsigzip/``, or
 ``/vsitar/`` virtual filesystems::
 
-   >>> from django.contrib.gis.gdal import GDALRaster
+   >>> from mango.contrib.gis.gdal import GDALRaster
    >>> rst = GDALRaster('/vsizip/path/to/your/file.zip/path/to/raster.tif')
    >>> rst = GDALRaster('/vsigzip/path/to/your/file.gz')
    >>> rst = GDALRaster('/vsitar/path/to/your/file.tar/path/to/raster.tif')
@@ -1864,7 +1864,7 @@ as it's built with such capabilities.
 To access a public raster file with no authentication, you can use
 ``/vsicurl/``::
 
-   >>> from django.contrib.gis.gdal import GDALRaster
+   >>> from mango.contrib.gis.gdal import GDALRaster
    >>> rst = GDALRaster('/vsicurl/https://example.com/raster.tif')
    >>> rst.name
    '/vsicurl/https://example.com/raster.tif'

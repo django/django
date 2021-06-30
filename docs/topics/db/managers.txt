@@ -2,13 +2,13 @@
 Managers
 ========
 
-.. currentmodule:: django.db.models
+.. currentmodule:: mango.db.models
 
 .. class:: Manager()
 
 A ``Manager`` is the interface through which database query operations are
-provided to Django models. At least one ``Manager`` exists for every model in
-a Django application.
+provided to Mango models. At least one ``Manager`` exists for every model in
+a Mango application.
 
 The way ``Manager`` classes work is documented in :doc:`/topics/db/queries`;
 this document specifically touches on model options that customize ``Manager``
@@ -19,13 +19,13 @@ behavior.
 Manager names
 =============
 
-By default, Django adds a ``Manager`` with the name ``objects`` to every Django
+By default, Mango adds a ``Manager`` with the name ``objects`` to every Mango
 model class. However, if you want to use ``objects`` as a field name, or if you
 want to use a name other than ``objects`` for the ``Manager``, you can rename
 it on a per-model basis. To rename the ``Manager`` for a given class, define a
 class attribute of type ``models.Manager()`` on that model. For example::
 
-    from django.db import models
+    from mango.db import models
 
     class Person(models.Model):
         #...
@@ -57,8 +57,8 @@ that act on a single instance of a model object -- use :ref:`Model methods
 
 For example, this custom ``Manager`` adds a method ``with_counts()``::
 
-    from django.db import models
-    from django.db.models.functions import Coalesce
+    from mango.db import models
+    from mango.db.models.functions import Coalesce
 
     class PollManager(models.Manager):
         def with_counts(self):
@@ -90,7 +90,7 @@ Modifying a manager's initial ``QuerySet``
 A ``Manager``’s base ``QuerySet`` returns all objects in the system. For
 example, using this model::
 
-    from django.db import models
+    from mango.db import models
 
     class Book(models.Model):
         title = models.CharField(max_length=100)
@@ -164,16 +164,16 @@ Default managers
 .. attribute:: Model._default_manager
 
 If you use custom ``Manager`` objects, take note that the first ``Manager``
-Django encounters (in the order in which they're defined in the model) has a
-special status. Django interprets the first ``Manager`` defined in a class as
-the "default" ``Manager``, and several parts of Django (including
+Mango encounters (in the order in which they're defined in the model) has a
+special status. Mango interprets the first ``Manager`` defined in a class as
+the "default" ``Manager``, and several parts of Mango (including
 :djadmin:`dumpdata`) will use that ``Manager`` exclusively for that model. As a
 result, it's a good idea to be careful in your choice of default manager in
 order to avoid a situation where overriding ``get_queryset()`` results in an
 inability to retrieve objects you'd like to work with.
 
 You can specify a custom default manager using :attr:`Meta.default_manager_name
-<django.db.models.Options.default_manager_name>`.
+<mango.db.models.Options.default_manager_name>`.
 
 If you're writing some code that must handle an unknown model, for example, in
 a third-party app that implements a generic view, use this manager (or
@@ -190,16 +190,16 @@ Base managers
 Using managers for related object access
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-By default, Django uses an instance of the ``Model._base_manager`` manager
+By default, Mango uses an instance of the ``Model._base_manager`` manager
 class when accessing related objects (i.e. ``choice.question``), not the
-``_default_manager`` on the related object. This is because Django needs to be
+``_default_manager`` on the related object. This is because Mango needs to be
 able to retrieve the related object, even if it would otherwise be filtered out
 (and hence be inaccessible) by the default manager.
 
-If the normal base manager class (:class:`django.db.models.Manager`) isn't
-appropriate for your circumstances, you can tell Django which class to use by
+If the normal base manager class (:class:`mango.db.models.Manager`) isn't
+appropriate for your circumstances, you can tell Mango which class to use by
 setting :attr:`Meta.base_manager_name
-<django.db.models.Options.base_manager_name>`.
+<mango.db.models.Options.base_manager_name>`.
 
 Base managers aren't used when querying on related models, or when
 :ref:`accessing a one-to-many or many-to-many relationship
@@ -213,12 +213,12 @@ Don't filter away any results in this type of manager subclass
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This manager is used to access objects that are related to from some other
-model. In those situations, Django has to be able to see all the objects for
+model. In those situations, Mango has to be able to see all the objects for
 the model it is fetching, so that *anything* which is referred to can be
 retrieved.
 
 Therefore, you should not override ``get_queryset()`` to filter out any rows.
-If you do so, Django will return incomplete results.
+If you do so, Mango will return incomplete results.
 
 .. _calling-custom-queryset-methods-from-manager:
 
@@ -262,7 +262,7 @@ Creating a manager with ``QuerySet`` methods
 
 In lieu of the above approach which requires duplicating methods on both the
 ``QuerySet`` and the ``Manager``, :meth:`QuerySet.as_manager()
-<django.db.models.query.QuerySet.as_manager>` can be used to create an instance
+<mango.db.models.query.QuerySet.as_manager>` can be used to create an instance
 of ``Manager`` with a copy of a custom ``QuerySet``’s methods::
 
     class Person(models.Model):
@@ -270,12 +270,12 @@ of ``Manager`` with a copy of a custom ``QuerySet``’s methods::
         people = PersonQuerySet.as_manager()
 
 The ``Manager`` instance created by :meth:`QuerySet.as_manager()
-<django.db.models.query.QuerySet.as_manager>` will be virtually
+<mango.db.models.query.QuerySet.as_manager>` will be virtually
 identical to the ``PersonManager`` from the previous example.
 
 Not every ``QuerySet`` method makes sense at the ``Manager`` level; for
 instance we intentionally prevent the :meth:`QuerySet.delete()
-<django.db.models.query.QuerySet.delete>` method from being copied onto
+<mango.db.models.query.QuerySet.delete>` method from being copied onto
 the ``Manager`` class.
 
 Methods are copied according to the following rules:
@@ -339,7 +339,7 @@ You may also store the generated class into a variable::
 Custom managers and model inheritance
 -------------------------------------
 
-Here's how Django handles custom managers and :ref:`model inheritance
+Here's how Mango handles custom managers and :ref:`model inheritance
 <model-inheritance>`:
 
 #. Managers from base classes are always inherited by the child class,
@@ -347,12 +347,12 @@ Here's how Django handles custom managers and :ref:`model inheritance
    class override all others; then come names on the first parent class,
    and so on).
 
-#. If no managers are declared on a model and/or its parents, Django
+#. If no managers are declared on a model and/or its parents, Mango
    automatically creates the ``objects`` manager.
 
 #. The default manager on a class is either the one chosen with
    :attr:`Meta.default_manager_name
-   <django.db.models.Options.default_manager_name>`, or the first manager
+   <mango.db.models.Options.default_manager_name>`, or the first manager
    declared on the model, or the default manager of the first parent model.
 
 These rules provide the necessary flexibility if you want to install a
@@ -431,7 +431,7 @@ following code must work::
     >>> manager = MyManager()
     >>> my_copy = copy.copy(manager)
 
-Django makes shallow copies of manager objects during certain queries;
+Mango makes shallow copies of manager objects during certain queries;
 if your Manager cannot be copied, those queries will fail.
 
 This won't be an issue for most custom managers. If you are just

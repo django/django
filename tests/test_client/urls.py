@@ -1,6 +1,6 @@
-from django.contrib.auth import views as auth_views
-from django.urls import path
-from django.views.generic import RedirectView
+from mango.contrib.auth import views as auth_views
+from mango.urls import path
+from mango.views.generic import RedirectView
 
 from . import views
 
@@ -45,7 +45,7 @@ urlpatterns = [
     path('mail_sending_view/', views.mail_sending_view),
     path('mass_mail_sending_view/', views.mass_mail_sending_view),
     path('nesting_exception_view/', views.nesting_exception_view),
-    path('django_project_redirect/', views.django_project_redirect),
+    path('mango_project_redirect/', views.mango_project_redirect),
     path('two_arg_exception/', views.two_arg_exception),
 
     path('accounts/', RedirectView.as_view(url='login/')),

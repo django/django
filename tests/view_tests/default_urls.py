@@ -1,5 +1,5 @@
-from django.contrib import admin
-from django.urls import path
+from mango.contrib import admin
+from mango.urls import path
 
 urlpatterns = [
     # This is the same as in the default project template

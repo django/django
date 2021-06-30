@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from django.template import Context, Engine
+from mango.template import Context, Engine
 
 
 class CallableVariablesTests(TestCase):

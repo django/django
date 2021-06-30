@@ -1,6 +1,6 @@
-from django.http import HttpResponse, StreamingHttpResponse
-from django.urls import reverse
-from django.utils.deprecation import MiddlewareMixin
+from mango.http import HttpResponse, StreamingHttpResponse
+from mango.urls import reverse
+from mango.utils.deprecation import MiddlewareMixin
 
 from . import urlconf_inner
 

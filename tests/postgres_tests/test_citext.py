@@ -3,14 +3,14 @@ The citext PostgreSQL extension supports indexing of case-insensitive text
 strings and thus eliminates the need for operations such as iexact and other
 modifiers to enforce use of an index.
 """
-from django.db import IntegrityError
-from django.test.utils import modify_settings
+from mango.db import IntegrityError
+from mango.test.utils import modify_settings
 
 from . import PostgreSQLTestCase
 from .models import CITestModel
 
 
-@modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
+@modify_settings(INSTALLED_APPS={'append': 'mango.contrib.postgres'})
 class CITextTestCase(PostgreSQLTestCase):
     case_sensitive_lookups = ('contains', 'startswith', 'endswith', 'regex')
 

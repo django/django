@@ -2,26 +2,26 @@
 Constraints reference
 =====================
 
-.. module:: django.db.models.constraints
+.. module:: mango.db.models.constraints
 
-.. currentmodule:: django.db.models
+.. currentmodule:: mango.db.models
 
 The classes defined in this module create database constraints. They are added
-in the model :attr:`Meta.constraints <django.db.models.Options.constraints>`
+in the model :attr:`Meta.constraints <mango.db.models.Options.constraints>`
 option.
 
 .. admonition:: Referencing built-in constraints
 
-    Constraints are defined in ``django.db.models.constraints``, but for
-    convenience they're imported into :mod:`django.db.models`. The standard
-    convention is to use ``from django.db import models`` and refer to the
+    Constraints are defined in ``mango.db.models.constraints``, but for
+    convenience they're imported into :mod:`mango.db.models`. The standard
+    convention is to use ``from mango.db import models`` and refer to the
     constraints as ``models.<Foo>Constraint``.
 
 .. admonition:: Constraints in abstract base classes
 
     You must always specify a unique name for the constraint. As such, you
     cannot normally specify a constraint on an abstract base class, since the
-    :attr:`Meta.constraints <django.db.models.Options.constraints>` option is
+    :attr:`Meta.constraints <mango.db.models.Options.constraints>` option is
     inherited by subclasses, with exactly the same values for the attributes
     (including ``name``) each time. To work around name collisions, part of the
     name may contain ``'%(app_label)s'`` and ``'%(class)s'``, which are
@@ -52,7 +52,7 @@ option.
 
 .. attribute:: CheckConstraint.check
 
-A :class:`Q` object or boolean :class:`~django.db.models.Expression` that
+A :class:`Q` object or boolean :class:`~mango.db.models.Expression` that
 specifies the check you want the constraint to enforce.
 
 For example, ``CheckConstraint(check=Q(age__gte=18), name='age_gte_18')``
@@ -138,7 +138,7 @@ These conditions have the same database restrictions as
 Set this parameter to create a deferrable unique constraint. Accepted values
 are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::
 
-    from django.db.models import Deferrable, UniqueConstraint
+    from mango.db.models import Deferrable, UniqueConstraint
 
     UniqueConstraint(
         name='unique_order',

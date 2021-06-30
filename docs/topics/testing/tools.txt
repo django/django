@@ -2,9 +2,9 @@
 Testing tools
 =============
 
-.. currentmodule:: django.test
+.. currentmodule:: mango.test
 
-Django provides a small set of tools that come in handy when writing tests.
+Mango provides a small set of tools that come in handy when writing tests.
 
 .. _test-client:
 
@@ -12,7 +12,7 @@ The test client
 ===============
 
 The test client is a Python class that acts as a dummy Web browser, allowing
-you to test your views and interact with your Django-powered application
+you to test your views and interact with your Mango-powered application
 programmatically.
 
 Some of the things you can do with the test client are:
@@ -24,30 +24,30 @@ Some of the things you can do with the test client are:
 * See the chain of redirects (if any) and check the URL and status code at
   each step.
 
-* Test that a given request is rendered by a given Django template, with
+* Test that a given request is rendered by a given Mango template, with
   a template context that contains certain values.
 
 Note that the test client is not intended to be a replacement for Selenium_ or
-other "in-browser" frameworks. Django's test client has a different focus. In
+other "in-browser" frameworks. Mango's test client has a different focus. In
 short:
 
-* Use Django's test client to establish that the correct template is being
+* Use Mango's test client to establish that the correct template is being
   rendered and that the template is passed the correct context data.
 
 * Use in-browser frameworks like Selenium_ to test *rendered* HTML and the
-  *behavior* of Web pages, namely JavaScript functionality. Django also
+  *behavior* of Web pages, namely JavaScript functionality. Mango also
   provides special support for those frameworks; see the section on
-  :class:`~django.test.LiveServerTestCase` for more details.
+  :class:`~mango.test.LiveServerTestCase` for more details.
 
 A comprehensive test suite should use a combination of both test types.
 
 Overview and a quick example
 ----------------------------
 
-To use the test client, instantiate ``django.test.Client`` and retrieve
+To use the test client, instantiate ``mango.test.Client`` and retrieve
 Web pages::
 
-    >>> from django.test import Client
+    >>> from mango.test import Client
     >>> c = Client()
     >>> response = c.post('/login/', {'username': 'john', 'password': 'smith'})
     >>> response.status_code
@@ -63,7 +63,7 @@ Note a few important things about how the test client works:
 
 * The test client does *not* require the Web server to be running. In fact,
   it will run just fine with no Web server running at all! That's because
-  it avoids the overhead of HTTP and deals directly with the Django
+  it avoids the overhead of HTTP and deals directly with the Mango
   framework. This helps make the unit tests run quickly.
 
 * When retrieving pages, remember to specify the *path* of the URL, not the
@@ -76,7 +76,7 @@ Note a few important things about how the test client works:
       >>> c.get('https://www.example.com/login/')
 
   The test client is not capable of retrieving Web pages that are not
-  powered by your Django project. If you need to retrieve other Web pages,
+  powered by your Mango project. If you need to retrieve other Web pages,
   use a Python standard library module such as :mod:`urllib`.
 
 * To resolve URLs, the test client uses whatever URLconf is pointed-to by
@@ -87,9 +87,9 @@ Note a few important things about how the test client works:
   template-related functionality, is only available *while tests are
   running*.
 
-  The reason for this is that Django's test runner performs a bit of black
+  The reason for this is that Mango's test runner performs a bit of black
   magic in order to determine which template was loaded by a given view.
-  This black magic (essentially a patching of Django's template system in
+  This black magic (essentially a patching of Mango's template system in
   memory) only happens during test running.
 
 * By default, the test client will disable any CSRF checks
@@ -101,15 +101,15 @@ Note a few important things about how the test client works:
   ``enforce_csrf_checks`` argument when you construct your
   client::
 
-      >>> from django.test import Client
+      >>> from mango.test import Client
       >>> csrf_client = Client(enforce_csrf_checks=True)
 
 Making requests
 ---------------
 
-Use the ``django.test.Client`` class to make requests.
+Use the ``mango.test.Client`` class to make requests.
 
-.. class:: Client(enforce_csrf_checks=False, json_encoder=DjangoJSONEncoder, **defaults)
+.. class:: Client(enforce_csrf_checks=False, json_encoder=MangoJSONEncoder, **defaults)
 
     It requires no arguments at time of construction. However, you can use
     keyword arguments to specify some default headers. For example, this will
@@ -118,8 +118,8 @@ Use the ``django.test.Client`` class to make requests.
         >>> c = Client(HTTP_USER_AGENT='Mozilla/5.0')
 
     The values from the ``extra`` keyword arguments passed to
-    :meth:`~django.test.Client.get()`,
-    :meth:`~django.test.Client.post()`, etc. have precedence over
+    :meth:`~mango.test.Client.get()`,
+    :meth:`~mango.test.Client.post()`, etc. have precedence over
     the defaults passed to the class constructor.
 
     The ``enforce_csrf_checks`` argument can be used to test CSRF
@@ -159,7 +159,7 @@ Use the ``django.test.Client`` class to make requests.
 
         ...will send the HTTP header ``HTTP_ACCEPT`` to the details view, which
         is a good way to test code paths that use the
-        :meth:`django.http.HttpRequest.accepts()` method.
+        :meth:`mango.http.HttpRequest.accepts()` method.
 
         .. admonition:: CGI specification
 
@@ -216,7 +216,7 @@ Use the ``django.test.Client`` class to make requests.
         If you provide ``content_type`` as :mimetype:`application/json`, the
         ``data`` is serialized using :func:`json.dumps` if it's a dict, list,
         or tuple. Serialization is performed with
-        :class:`~django.core.serializers.json.DjangoJSONEncoder` by default,
+        :class:`~mango.core.serializers.json.MangoJSONEncoder` by default,
         and can be overridden by providing a ``json_encoder`` argument to
         :class:`Client`. This serialization also happens for :meth:`put`,
         :meth:`patch`, and :meth:`delete` requests.
@@ -252,9 +252,9 @@ Use the ``django.test.Client`` class to make requests.
 
         You may also provide any file-like object (e.g., :class:`~io.StringIO` or
         :class:`~io.BytesIO`) as a file handle. If you're uploading to an
-        :class:`~django.db.models.ImageField`, the object needs a ``name``
+        :class:`~mango.db.models.ImageField`, the object needs a ``name``
         attribute that passes the
-        :data:`~django.core.validators.validate_image_file_extension` validator.
+        :data:`~mango.core.validators.validate_image_file_extension` validator.
         For example::
 
             >>> from io import BytesIO
@@ -353,7 +353,7 @@ Use the ``django.test.Client`` class to make requests.
 
     .. method:: Client.login(**credentials)
 
-        If your site uses Django's :doc:`authentication system</topics/auth/index>`
+        If your site uses Mango's :doc:`authentication system</topics/auth/index>`
         and you deal with logging in users, you can use the test client's
         ``login()`` method to simulate the effect of a user logging into the
         site.
@@ -366,7 +366,7 @@ Use the ``django.test.Client`` class to make requests.
         :ref:`authentication backend <authentication-backends>` you're using
         (which is configured by your :setting:`AUTHENTICATION_BACKENDS`
         setting). If you're using the standard authentication backend provided
-        by Django (``ModelBackend``), ``credentials`` should be the user's
+        by Mango (``ModelBackend``), ``credentials`` should be the user's
         username and password, provided as keyword arguments::
 
             >>> c = Client()
@@ -386,18 +386,18 @@ Use the ``django.test.Client`` class to make requests.
         using a test database, which contains no users by default. As a result,
         user accounts that are valid on your production site will not work
         under test conditions. You'll need to create users as part of the test
-        suite -- either manually (using the Django model API) or with a test
+        suite -- either manually (using the Mango model API) or with a test
         fixture. Remember that if you want your test user to have a password,
         you can't set the user's password by setting the password attribute
         directly -- you must use the
-        :meth:`~django.contrib.auth.models.User.set_password()` function to
+        :meth:`~mango.contrib.auth.models.User.set_password()` function to
         store a correctly hashed password. Alternatively, you can use the
-        :meth:`~django.contrib.auth.models.UserManager.create_user` helper
+        :meth:`~mango.contrib.auth.models.UserManager.create_user` helper
         method to create a new user with a correctly hashed password.
 
     .. method:: Client.force_login(user, backend=None)
 
-        If your site uses Django's :doc:`authentication
+        If your site uses Mango's :doc:`authentication
         system</topics/auth/index>`, you can use the ``force_login()`` method
         to simulate the effect of a user logging into the site. Use this method
         instead of :meth:`login` when a test requires a user be logged in and
@@ -405,13 +405,13 @@ Use the ``django.test.Client`` class to make requests.
 
         Unlike ``login()``, this method skips the authentication and
         verification steps: inactive users (:attr:`is_active=False
-        <django.contrib.auth.models.User.is_active>`) are permitted to login
+        <mango.contrib.auth.models.User.is_active>`) are permitted to login
         and the user's credentials don't need to be provided.
 
         The user will have its ``backend`` attribute set to the value of the
         ``backend`` argument (which should be a dotted Python path string), or
         to ``settings.AUTHENTICATION_BACKENDS[0]`` if a value isn't provided.
-        The :func:`~django.contrib.auth.authenticate` function called by
+        The :func:`~mango.contrib.auth.authenticate` function called by
         :meth:`login` normally annotates the user like this.
 
         This method is faster than ``login()`` since the expensive
@@ -421,20 +421,20 @@ Use the ``django.test.Client`` class to make requests.
 
     .. method:: Client.logout()
 
-        If your site uses Django's :doc:`authentication system</topics/auth/index>`,
+        If your site uses Mango's :doc:`authentication system</topics/auth/index>`,
         the ``logout()`` method can be used to simulate the effect of a user
         logging out of your site.
 
         After you call this method, the test client will have all the cookies
         and session data cleared to defaults. Subsequent requests will appear
-        to come from an :class:`~django.contrib.auth.models.AnonymousUser`.
+        to come from an :class:`~mango.contrib.auth.models.AnonymousUser`.
 
 Testing responses
 -----------------
 
 The ``get()`` and ``post()`` methods both return a ``Response`` object. This
 ``Response`` object is *not* the same as the ``HttpResponse`` object returned
-by Django views; the test response object has some additional data useful for
+by Mango views; the test response object has some additional data useful for
 test code to verify.
 
 Specifically, a ``Response`` object has the following attributes:
@@ -467,12 +467,12 @@ Specifically, a ``Response`` object has the following attributes:
             >>> response.context['name']
             'Arthur'
 
-        .. admonition:: Not using Django templates?
+        .. admonition:: Not using Mango templates?
 
             This attribute is only populated when using the
-            :class:`~django.template.backends.django.DjangoTemplates` backend.
+            :class:`~mango.template.backends.mango.MangoTemplates` backend.
             If you're using another template engine,
-            :attr:`~django.template.response.SimpleTemplateResponse.context_data`
+            :attr:`~mango.template.response.SimpleTemplateResponse.context_data`
             may be a suitable alternative on responses with that attribute.
 
     .. attribute:: exc_info
@@ -526,19 +526,19 @@ Specifically, a ``Response`` object has the following attributes:
         loaded from a file. (The name is a string such as
         ``'admin/index.html'``.)
 
-        .. admonition:: Not using Django templates?
+        .. admonition:: Not using Mango templates?
 
             This attribute is only populated when using the
-            :class:`~django.template.backends.django.DjangoTemplates` backend.
+            :class:`~mango.template.backends.mango.MangoTemplates` backend.
             If you're using another template engine,
-            :attr:`~django.template.response.SimpleTemplateResponse.template_name`
+            :attr:`~mango.template.response.SimpleTemplateResponse.template_name`
             may be a suitable alternative if you only need the name of the
             template used for rendering.
 
     .. attribute:: resolver_match
 
-        An instance of :class:`~django.urls.ResolverMatch` for the response.
-        You can use the :attr:`~django.urls.ResolverMatch.func` attribute, for
+        An instance of :class:`~mango.urls.ResolverMatch` for the response.
+        You can use the :attr:`~mango.urls.ResolverMatch.func` attribute, for
         example, to verify the view that served the response::
 
             # my_view here is a function based view
@@ -549,7 +549,7 @@ Specifically, a ``Response`` object has the following attributes:
             self.assertEqual(response.resolver_match.func.__name__, MyView.as_view().__name__)
 
         If the given URL is not found, accessing this attribute will raise a
-        :exc:`~django.urls.Resolver404` exception.
+        :exc:`~mango.urls.Resolver404` exception.
 
 As with a normal response, you can also access the headers through
 :attr:`.HttpResponse.headers`. For example, you could determine the content
@@ -564,9 +564,9 @@ in the test case. You can then use a standard ``try ... except`` block or
 :meth:`~unittest.TestCase.assertRaises` to test for exceptions.
 
 The only exceptions that are not visible to the test client are
-:class:`~django.http.Http404`,
-:class:`~django.core.exceptions.PermissionDenied`, :exc:`SystemExit`, and
-:class:`~django.core.exceptions.SuspiciousOperation`. Django catches these
+:class:`~mango.http.Http404`,
+:class:`~mango.core.exceptions.PermissionDenied`, :exc:`SystemExit`, and
+:class:`~mango.core.exceptions.SuspiciousOperation`. Mango catches these
 exceptions internally and converts them into the appropriate HTTP response
 codes. In these cases, you can check ``response.status_code`` in your test.
 
@@ -615,12 +615,12 @@ Setting the language
 When testing applications that support internationalization and localization,
 you might want to set the language for a test client request. The method for
 doing so depends on whether or not the
-:class:`~django.middleware.locale.LocaleMiddleware` is enabled.
+:class:`~mango.middleware.locale.LocaleMiddleware` is enabled.
 
 If the middleware is enabled, the language can be set by creating a cookie with
 a name of :setting:`LANGUAGE_COOKIE_NAME` and a value of the language code::
 
-    from django.conf import settings
+    from mango.conf import settings
 
     def test_language_using_cookie(self):
         self.client.cookies.load({settings.LANGUAGE_COOKIE_NAME: 'fr'})
@@ -633,12 +633,12 @@ or by including the ``Accept-Language`` HTTP header in the request::
         response = self.client.get('/', HTTP_ACCEPT_LANGUAGE='fr')
         self.assertEqual(response.content, b"Bienvenue sur mon site.")
 
-More details are in :ref:`how-django-discovers-language-preference`.
+More details are in :ref:`how-mango-discovers-language-preference`.
 
 If the middleware isn't enabled, the active language may be set using
 :func:`.translation.override`::
 
-    from django.utils import translation
+    from mango.utils import translation
 
     def test_language_using_override(self):
         with translation.override('fr'):
@@ -653,7 +653,7 @@ Example
 The following is a unit test using the test client::
 
     import unittest
-    from django.test import Client
+    from mango.test import Client
 
     class SimpleTest(unittest.TestCase):
         def setUp(self):
@@ -672,24 +672,24 @@ The following is a unit test using the test client::
 
 .. seealso::
 
-    :class:`django.test.RequestFactory`
+    :class:`mango.test.RequestFactory`
 
-.. _django-testcase-subclasses:
+.. _mango-testcase-subclasses:
 
 Provided test case classes
 ==========================
 
 Normal Python unit test classes extend a base class of
-:class:`unittest.TestCase`. Django provides a few extensions of this base class:
+:class:`unittest.TestCase`. Mango provides a few extensions of this base class:
 
 .. _testcase_hierarchy_diagram:
 
-.. figure:: _images/django_unittest_classes_hierarchy.*
-   :alt: Hierarchy of Django unit testing classes (TestCase subclasses)
+.. figure:: _images/mango_unittest_classes_hierarchy.*
+   :alt: Hierarchy of Mango unit testing classes (TestCase subclasses)
    :width: 508
    :height: 328
 
-   Hierarchy of Django unit testing classes
+   Hierarchy of Mango unit testing classes
 
 You can convert a normal :class:`unittest.TestCase` to any of the subclasses:
 change the base class of your test from ``unittest.TestCase`` to the subclass.
@@ -727,10 +727,10 @@ A subclass of :class:`unittest.TestCase` that adds this functionality:
     for equality.
 
 * The ability to run tests with :ref:`modified settings <overriding-settings>`.
-* Using the :attr:`~SimpleTestCase.client` :class:`~django.test.Client`.
+* Using the :attr:`~SimpleTestCase.client` :class:`~mango.test.Client`.
 
 If your tests make any database queries, use subclasses
-:class:`~django.test.TransactionTestCase` or :class:`~django.test.TestCase`.
+:class:`~mango.test.TransactionTestCase` or :class:`~mango.test.TestCase`.
 
 .. attribute:: SimpleTestCase.databases
 
@@ -762,7 +762,7 @@ If your tests make any database queries, use subclasses
 
     Be sure to account for Python's behavior if an exception is raised during
     ``setUpClass()``. If that happens, neither the tests in the class nor
-    ``tearDownClass()`` are run. In the case of :class:`django.test.TestCase`,
+    ``tearDownClass()`` are run. In the case of :class:`mango.test.TestCase`,
     this will leak the transaction created in ``super()``  which results in
     various symptoms including a segmentation fault on some platforms (reported
     on macOS). If you want to intentionally raise an exception such as
@@ -774,7 +774,7 @@ If your tests make any database queries, use subclasses
 
 .. class:: TransactionTestCase()
 
-``TransactionTestCase`` inherits from :class:`~django.test.SimpleTestCase` to
+``TransactionTestCase`` inherits from :class:`~mango.test.SimpleTestCase` to
 add some database-specific features:
 
 * Resetting the database to a known state at the beginning of each test to
@@ -784,14 +784,14 @@ add some database-specific features:
 * The remaining specialized :meth:`assert*
   <TransactionTestCase.assertQuerysetEqual>` methods.
 
-Django's :class:`TestCase` class is a more commonly used subclass of
+Mango's :class:`TestCase` class is a more commonly used subclass of
 ``TransactionTestCase`` that makes use of database transaction facilities
 to speed up the process of resetting the database to a known state at the
 beginning of each test. A consequence of this, however, is that some database
-behaviors cannot be tested within a Django ``TestCase`` class. For instance,
+behaviors cannot be tested within a Mango ``TestCase`` class. For instance,
 you cannot test that a block of code is executing within a transaction, as is
 required when using
-:meth:`~django.db.models.query.QuerySet.select_for_update()`. In those cases,
+:meth:`~mango.db.models.query.QuerySet.select_for_update()`. In those cases,
 you should use ``TransactionTestCase``.
 
 ``TransactionTestCase`` and ``TestCase`` are identical except for the manner
@@ -824,13 +824,13 @@ to test the effects of commit and rollback:
 
 .. class:: TestCase()
 
-This is the most common class to use for writing tests in Django. It inherits
+This is the most common class to use for writing tests in Mango. It inherits
 from :class:`TransactionTestCase` (and by extension :class:`SimpleTestCase`).
-If your Django application doesn't use a database, use :class:`SimpleTestCase`.
+If your Mango application doesn't use a database, use :class:`SimpleTestCase`.
 
 The class:
 
-* Wraps the tests within two nested :func:`~django.db.transaction.atomic`
+* Wraps the tests within two nested :func:`~mango.db.transaction.atomic`
   blocks: one for the whole class and one for each test. Therefore, if you want
   to test some specific database transaction behavior, use
   :class:`TransactionTestCase`.
@@ -847,7 +847,7 @@ It also provides an additional method:
 
     For example::
 
-        from django.test import TestCase
+        from mango.test import TestCase
 
         class MyTests(TestCase):
             @classmethod
@@ -873,7 +873,7 @@ It also provides an additional method:
         Objects assigned to class attributes in ``setUpTestData()`` must
         support creating deep copies with :py:func:`copy.deepcopy` in order to
         isolate them from alterations performed by each test methods. In
-        previous versions of Django these objects were reused and changes made
+        previous versions of Mango these objects were reused and changes made
         to them were persisted between test methods.
 
 .. classmethod:: TestCase.captureOnCommitCallbacks(using=DEFAULT_DB_ALIAS, execute=False)
@@ -881,7 +881,7 @@ It also provides an additional method:
     .. versionadded:: 3.2
 
     Returns a context manager that captures :func:`transaction.on_commit()
-    <django.db.transaction.on_commit>` callbacks for the given database
+    <mango.db.transaction.on_commit>` callbacks for the given database
     connection. It returns a list that contains, on exit of the context, the
     captured callback functions. From this list you can make assertions on the
     callbacks or call them to invoke their side effects, emulating a commit.
@@ -894,8 +894,8 @@ It also provides an additional method:
 
     For example::
 
-        from django.core import mail
-        from django.test import TestCase
+        from mango.core import mail
+        from mango.test import TestCase
 
 
         class ContactTests(TestCase):
@@ -920,10 +920,10 @@ It also provides an additional method:
 .. class:: LiveServerTestCase()
 
 ``LiveServerTestCase`` does basically the same as
-:class:`~django.test.TransactionTestCase` with one extra feature: it launches a
-live Django server in the background on setup, and shuts it down on teardown.
+:class:`~mango.test.TransactionTestCase` with one extra feature: it launches a
+live Mango server in the background on setup, and shuts it down on teardown.
 This allows the use of automated test clients other than the
-:ref:`Django dummy client <test-client>` such as, for example, the Selenium_
+:ref:`Mango dummy client <test-client>` such as, for example, the Selenium_
 client, to execute a series of functional tests inside a browser and simulate a
 real user's actions.
 
@@ -941,17 +941,17 @@ path:
 
 Then, add a ``LiveServerTestCase``-based test to your app's tests module
 (for example: ``myapp/tests.py``). For this example, we'll assume you're using
-the :mod:`~django.contrib.staticfiles` app and want to have static files served
+the :mod:`~mango.contrib.staticfiles` app and want to have static files served
 during the execution of your tests similar to what we get at development time
 with ``DEBUG=True``, i.e. without having to collect them using
 :djadmin:`collectstatic`. We'll use
-the  :class:`~django.contrib.staticfiles.testing.StaticLiveServerTestCase`
+the  :class:`~mango.contrib.staticfiles.testing.StaticLiveServerTestCase`
 subclass which provides that functionality. Replace it with
-``django.test.LiveServerTestCase`` if you don't need that.
+``mango.test.LiveServerTestCase`` if you don't need that.
 
 The code for this test may look as follows::
 
-    from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+    from mango.contrib.staticfiles.testing import StaticLiveServerTestCase
     from selenium.webdriver.firefox.webdriver import WebDriver
 
     class MySeleniumTests(StaticLiveServerTestCase):
@@ -1035,15 +1035,15 @@ Default test client
 
 .. attribute:: SimpleTestCase.client
 
-Every test case in a ``django.test.*TestCase`` instance has access to an
-instance of a Django test client. This client can be accessed as
+Every test case in a ``mango.test.*TestCase`` instance has access to an
+instance of a Mango test client. This client can be accessed as
 ``self.client``. This client is recreated for each test, so you don't have to
 worry about state (such as cookies) carrying over from one test to another.
 
 This means, instead of instantiating a ``Client`` in each test::
 
     import unittest
-    from django.test import Client
+    from mango.test import Client
 
     class SimpleTest(unittest.TestCase):
         def test_details(self):
@@ -1058,7 +1058,7 @@ This means, instead of instantiating a ``Client`` in each test::
 
 ...you can refer to ``self.client``, like so::
 
-    from django.test import TestCase
+    from mango.test import TestCase
 
     class SimpleTest(TestCase):
         def test_details(self):
@@ -1078,7 +1078,7 @@ If you want to use a different ``Client`` class (for example, a subclass
 with customized behavior), use the :attr:`~SimpleTestCase.client_class` class
 attribute::
 
-    from django.test import Client, TestCase
+    from mango.test import Client, TestCase
 
     class MyTestClient(Client):
         # Specialized methods for your environment
@@ -1103,7 +1103,7 @@ data in the database. Tests are more readable and it's more maintainable to
 create objects using the ORM, for example in :meth:`TestCase.setUpTestData`,
 however, you can also use fixtures.
 
-A fixture is a collection of data that Django knows how to import into a
+A fixture is a collection of data that Mango knows how to import into a
 database. For example, if your site has user accounts, you might set up a
 fixture of fake user accounts in order to populate your database during tests.
 
@@ -1114,10 +1114,10 @@ documentation<dumpdata>` for more details.
 
 Once you've created a fixture and placed it in a ``fixtures`` directory in one
 of your :setting:`INSTALLED_APPS`, you can use it in your unit tests by
-specifying a ``fixtures`` class attribute on your :class:`django.test.TestCase`
+specifying a ``fixtures`` class attribute on your :class:`mango.test.TestCase`
 subclass::
 
-    from django.test import TestCase
+    from mango.test import TestCase
     from myapp.models import Animal
 
     class AnimalTestCase(TestCase):
@@ -1133,11 +1133,11 @@ subclass::
 
 Here's specifically what will happen:
 
-* At the start of each test, before ``setUp()`` is run, Django will flush the
+* At the start of each test, before ``setUp()`` is run, Mango will flush the
   database, returning the database to the state it was in directly after
   :djadmin:`migrate` was called.
 
-* Then, all the named fixtures are installed. In this example, Django will
+* Then, all the named fixtures are installed. In this example, Mango will
   install any JSON fixture named ``mammals``, followed by any fixture named
   ``birds``. See the :djadmin:`loaddata` documentation for more
   details on defining and installing fixtures.
@@ -1169,17 +1169,17 @@ Multi-database support
 
 .. attribute:: TransactionTestCase.databases
 
-Django sets up a test database corresponding to every database that is
+Mango sets up a test database corresponding to every database that is
 defined in the :setting:`DATABASES` definition in your settings and referred to
 by at least one test through ``databases``.
 
-However, a big part of the time taken to run a Django ``TestCase`` is consumed
+However, a big part of the time taken to run a Mango ``TestCase`` is consumed
 by the call to ``flush`` that ensures that you have a clean database at the
 start of each test run. If you have multiple databases, multiple flushes are
 required (one for each database), which can be a time consuming activity --
 especially if your tests don't need to test multi-database activity.
 
-As an optimization, Django only flushes the ``default`` database at
+As an optimization, Mango only flushes the ``default`` database at
 the start of each test run. If your setup contains multiple databases,
 and you have a test that requires every database to be clean, you can
 use the ``databases`` attribute on the test suite to request extra databases
@@ -1234,17 +1234,17 @@ Overriding settings
 .. warning::
 
     Use the functions below to temporarily alter the value of settings in tests.
-    Don't manipulate ``django.conf.settings`` directly as Django won't restore
+    Don't manipulate ``mango.conf.settings`` directly as Mango won't restore
     the original values after such manipulations.
 
 .. method:: SimpleTestCase.settings()
 
 For testing purposes it's often useful to change a setting temporarily and
 revert to the original value after running the testing code. For this use case
-Django provides a standard Python context manager (see :pep:`343`) called
-:meth:`~django.test.SimpleTestCase.settings`, which can be used like this::
+Mango provides a standard Python context manager (see :pep:`343`) called
+:meth:`~mango.test.SimpleTestCase.settings`, which can be used like this::
 
-    from django.test import TestCase
+    from mango.test import TestCase
 
     class LoginTestCase(TestCase):
 
@@ -1265,22 +1265,22 @@ in the ``with`` block and reset its value to the previous state afterwards.
 .. method:: SimpleTestCase.modify_settings()
 
 It can prove unwieldy to redefine settings that contain a list of values. In
-practice, adding or removing values is often sufficient. Django provides the
-:meth:`~django.test.SimpleTestCase.modify_settings` context manager for easier
+practice, adding or removing values is often sufficient. Mango provides the
+:meth:`~mango.test.SimpleTestCase.modify_settings` context manager for easier
 settings changes::
 
-    from django.test import TestCase
+    from mango.test import TestCase
 
     class MiddlewareTestCase(TestCase):
 
         def test_cache_middleware(self):
             with self.modify_settings(MIDDLEWARE={
-                'append': 'django.middleware.cache.FetchFromCacheMiddleware',
-                'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
+                'append': 'mango.middleware.cache.FetchFromCacheMiddleware',
+                'prepend': 'mango.middleware.cache.UpdateCacheMiddleware',
                 'remove': [
-                    'django.contrib.sessions.middleware.SessionMiddleware',
-                    'django.contrib.auth.middleware.AuthenticationMiddleware',
-                    'django.contrib.messages.middleware.MessageMiddleware',
+                    'mango.contrib.sessions.middleware.SessionMiddleware',
+                    'mango.contrib.auth.middleware.AuthenticationMiddleware',
+                    'mango.contrib.messages.middleware.MessageMiddleware',
                 ],
             }):
                 response = self.client.get('/')
@@ -1292,11 +1292,11 @@ neither does ``remove`` when the value doesn't exist.
 
 .. function:: override_settings
 
-In case you want to override a setting for a test method, Django provides the
-:func:`~django.test.override_settings` decorator (see :pep:`318`). It's used
+In case you want to override a setting for a test method, Mango provides the
+:func:`~mango.test.override_settings` decorator (see :pep:`318`). It's used
 like this::
 
-    from django.test import TestCase, override_settings
+    from mango.test import TestCase, override_settings
 
     class LoginTestCase(TestCase):
 
@@ -1305,9 +1305,9 @@ like this::
             response = self.client.get('/sekrit/')
             self.assertRedirects(response, '/other/login/?next=/sekrit/')
 
-The decorator can also be applied to :class:`~django.test.TestCase` classes::
+The decorator can also be applied to :class:`~mango.test.TestCase` classes::
 
-    from django.test import TestCase, override_settings
+    from mango.test import TestCase, override_settings
 
     @override_settings(LOGIN_URL='/other/login/')
     class LoginTestCase(TestCase):
@@ -1318,16 +1318,16 @@ The decorator can also be applied to :class:`~django.test.TestCase` classes::
 
 .. function:: modify_settings
 
-Likewise, Django provides the :func:`~django.test.modify_settings`
+Likewise, Mango provides the :func:`~mango.test.modify_settings`
 decorator::
 
-    from django.test import TestCase, modify_settings
+    from mango.test import TestCase, modify_settings
 
     class MiddlewareTestCase(TestCase):
 
         @modify_settings(MIDDLEWARE={
-            'append': 'django.middleware.cache.FetchFromCacheMiddleware',
-            'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
+            'append': 'mango.middleware.cache.FetchFromCacheMiddleware',
+            'prepend': 'mango.middleware.cache.UpdateCacheMiddleware',
         })
         def test_cache_middleware(self):
             response = self.client.get('/')
@@ -1335,11 +1335,11 @@ decorator::
 
 The decorator can also be applied to test case classes::
 
-    from django.test import TestCase, modify_settings
+    from mango.test import TestCase, modify_settings
 
     @modify_settings(MIDDLEWARE={
-        'append': 'django.middleware.cache.FetchFromCacheMiddleware',
-        'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
+        'append': 'mango.middleware.cache.FetchFromCacheMiddleware',
+        'prepend': 'mango.middleware.cache.UpdateCacheMiddleware',
     })
     class MiddlewareTestCase(TestCase):
 
@@ -1354,23 +1354,23 @@ The decorator can also be applied to test case classes::
     tweak the above examples to assign the return value to a different name
     than ``LoginTestCase`` or ``MiddlewareTestCase``, you may be surprised to
     find that the original test case classes are still equally affected by the
-    decorator. For a given class, :func:`~django.test.modify_settings` is
-    always applied after :func:`~django.test.override_settings`.
+    decorator. For a given class, :func:`~mango.test.modify_settings` is
+    always applied after :func:`~mango.test.override_settings`.
 
 .. warning::
 
     The settings file contains some settings that are only consulted during
-    initialization of Django internals. If you change them with
+    initialization of Mango internals. If you change them with
     ``override_settings``, the setting is changed if you access it via the
-    ``django.conf.settings`` module, however, Django's internals access it
-    differently. Effectively, using :func:`~django.test.override_settings` or
-    :func:`~django.test.modify_settings` with these settings is probably not
+    ``mango.conf.settings`` module, however, Mango's internals access it
+    differently. Effectively, using :func:`~mango.test.override_settings` or
+    :func:`~mango.test.modify_settings` with these settings is probably not
     going to do what you expect it to do.
 
     We do not recommend altering the :setting:`DATABASES` setting. Altering
     the :setting:`CACHES` setting is possible, but a bit tricky if you are
     using internals that make using of caching, like
-    :mod:`django.contrib.sessions`. For example, you will have to reinitialize
+    :mod:`mango.contrib.sessions`. For example, you will have to reinitialize
     the session backend in a test that uses cached sessions and overrides
     :setting:`CACHES`.
 
@@ -1388,11 +1388,11 @@ have been overridden, like this::
 
 When overriding settings, make sure to handle the cases in which your app's
 code uses a cache or similar feature that retains state even if the setting is
-changed. Django provides the :data:`django.test.signals.setting_changed`
+changed. Mango provides the :data:`mango.test.signals.setting_changed`
 signal that lets you register callbacks to clean up and otherwise reset state
 when settings are changed.
 
-Django itself uses this signal to reset various data:
+Mango itself uses this signal to reset various data:
 
 ================================ ========================
 Overridden settings              Data reset
@@ -1409,7 +1409,7 @@ MEDIA_ROOT, DEFAULT_FILE_STORAGE Default file storage
 Emptying the test outbox
 ------------------------
 
-If you use any of Django's custom ``TestCase`` classes, the test runner will
+If you use any of Mango's custom ``TestCase`` classes, the test runner will
 clear the contents of the test email outbox at the start of each test case.
 
 For more detail on email services during tests, see `Email services`_ below.
@@ -1421,7 +1421,7 @@ Assertions
 
 As Python's normal :class:`unittest.TestCase` class implements assertion methods
 such as :meth:`~unittest.TestCase.assertTrue` and
-:meth:`~unittest.TestCase.assertEqual`, Django's custom :class:`TestCase` class
+:meth:`~unittest.TestCase.assertEqual`, Mango's custom :class:`TestCase` class
 provides a number of custom assertion methods that are useful for testing Web
 applications:
 
@@ -1483,7 +1483,7 @@ your test suite.
 
     ``field`` is the name of the field on the form to check. If ``field``
     has a value of ``None``, non-field errors (errors you can access via
-    :meth:`form.non_field_errors() <django.forms.Form.non_field_errors>`) will
+    :meth:`form.non_field_errors() <mango.forms.Form.non_field_errors>`) will
     be checked.
 
     ``errors`` is an error string, or a list of error strings, that are
@@ -1503,7 +1503,7 @@ your test suite.
 
     ``field`` is the name of the field on the form to check. If ``field``
     has a value of ``None``, non-field errors (errors you can access via
-    :meth:`form.non_field_errors() <django.forms.Form.non_field_errors>`) will
+    :meth:`form.non_field_errors() <mango.forms.Form.non_field_errors>`) will
     be checked.
 
     ``errors`` is an error string, or a list of error strings, that are
@@ -1577,7 +1577,7 @@ your test suite.
 
     If ``fetch_redirect_response`` is ``False``, the final page won't be
     loaded. Since the test client can't fetch external URLs, this is
-    particularly useful if ``expected_url`` isn't part of your Django app.
+    particularly useful if ``expected_url`` isn't part of your Mango app.
 
     Scheme is handled correctly when making comparisons between two URLs. If
     there isn't any scheme specified in the location where we are redirected to,
@@ -1713,7 +1713,7 @@ your test suite.
 
         If ``transform`` is not provided and ``values`` is a list of strings,
         it's compared to a list produced by applying ``repr()`` to each member
-        of ``qs``. This behavior is deprecated and will be removed in Django
+        of ``qs``. This behavior is deprecated and will be removed in Mango
         4.1. If you need it, explicitly set ``transform`` to ``repr``.
 
 .. method:: TransactionTestCase.assertNumQueries(num, func, *args, **kwargs)
@@ -1745,7 +1745,7 @@ Tagging tests
 You can tag your tests so you can easily run a particular subset. For example,
 you might label fast or slow tests::
 
-    from django.test import tag
+    from mango.test import tag
 
     class SampleTestCase(TestCase):
 
@@ -1811,15 +1811,15 @@ If you merely want to test the output of your asynchronous views, the standard
 test client will run them inside their own asynchronous loop without any extra
 work needed on your part.
 
-However, if you want to write fully-asynchronous tests for a Django project,
+However, if you want to write fully-asynchronous tests for a Mango project,
 you will need to take several things into account.
 
 Firstly, your tests must be ``async def`` methods on the test class (in order
-to give them an asynchronous context). Django will automatically detect
+to give them an asynchronous context). Mango will automatically detect
 any ``async def`` tests and wrap them so they run in their own event loop.
 
 If you are testing from an asynchronous function, you must also use the
-asynchronous test client. This is available as ``django.test.AsyncClient``,
+asynchronous test client. This is available as ``mango.test.AsyncClient``,
 or as ``self.async_client`` on any test.
 
 ``AsyncClient`` has the same methods and signatures as the synchronous (normal)
@@ -1844,7 +1844,7 @@ Using ``AsyncClient`` any method that makes a request must be awaited::
         self.assertEqual(response.status_code, 200)
 
 The asynchronous client can also call synchronous views; it runs through
-Django's :doc:`asynchronous request path </topics/async>`, which supports both.
+Mango's :doc:`asynchronous request path </topics/async>`, which supports both.
 Any view called through the ``AsyncClient`` will get an ``ASGIRequest`` object
 for its ``request`` rather than the ``WSGIRequest`` that the normal client
 creates.
@@ -1852,7 +1852,7 @@ creates.
 .. warning::
 
     If you are using test decorators, they must be async-compatible to ensure
-    they work correctly. Django's built-in decorators will behave correctly, but
+    they work correctly. Mango's built-in decorators will behave correctly, but
     third-party ones may appear to not execute (they will "wrap" the wrong part
     of the execution flow and not your test).
 
@@ -1860,7 +1860,7 @@ creates.
     methods with :func:`~asgiref.sync.async_to_sync` *inside* of them instead::
 
         from asgiref.sync import async_to_sync
-        from django.test import TestCase
+        from mango.test import TestCase
 
         class MyTests(TestCase):
 
@@ -1874,35 +1874,35 @@ creates.
 Email services
 ==============
 
-If any of your Django views send email using :doc:`Django's email
+If any of your Mango views send email using :doc:`Mango's email
 functionality </topics/email>`, you probably don't want to send email each time
-you run a test using that view. For this reason, Django's test runner
-automatically redirects all Django-sent email to a dummy outbox. This lets you
+you run a test using that view. For this reason, Mango's test runner
+automatically redirects all Mango-sent email to a dummy outbox. This lets you
 test every aspect of sending email -- from the number of messages sent to the
 contents of each message -- without actually sending the messages.
 
 The test runner accomplishes this by transparently replacing the normal
 email backend with a testing backend.
 (Don't worry -- this has no effect on any other email senders outside of
-Django, such as your machine's mail server, if you're running one.)
+Mango, such as your machine's mail server, if you're running one.)
 
-.. currentmodule:: django.core.mail
+.. currentmodule:: mango.core.mail
 
-.. data:: django.core.mail.outbox
+.. data:: mango.core.mail.outbox
 
 During test running, each outgoing email is saved in
-``django.core.mail.outbox``. This is a list of all
-:class:`~django.core.mail.EmailMessage` instances that have been sent.  The
+``mango.core.mail.outbox``. This is a list of all
+:class:`~mango.core.mail.EmailMessage` instances that have been sent.  The
 ``outbox`` attribute is a special attribute that is created *only* when the
 ``locmem`` email backend is used. It doesn't normally exist as part of the
-:mod:`django.core.mail` module and you can't import it directly. The code below
+:mod:`mango.core.mail` module and you can't import it directly. The code below
 shows how to access this attribute correctly.
 
-Here's an example test that examines ``django.core.mail.outbox`` for length
+Here's an example test that examines ``mango.core.mail.outbox`` for length
 and contents::
 
-    from django.core import mail
-    from django.test import TestCase
+    from mango.core import mail
+    from mango.test import TestCase
 
     class EmailTest(TestCase):
         def test_send_email(self):
@@ -1920,10 +1920,10 @@ and contents::
             self.assertEqual(mail.outbox[0].subject, 'Subject here')
 
 As noted :ref:`previously <emptying-test-outbox>`, the test outbox is emptied
-at the start of every test in a Django ``*TestCase``. To empty the outbox
+at the start of every test in a Mango ``*TestCase``. To empty the outbox
 manually, assign the empty list to ``mail.outbox``::
 
-    from django.core import mail
+    from mango.core import mail
 
     # Empty the test outbox
     mail.outbox = []
@@ -1934,12 +1934,12 @@ Management Commands
 ===================
 
 Management commands can be tested with the
-:func:`~django.core.management.call_command` function. The output can be
+:func:`~mango.core.management.call_command` function. The output can be
 redirected into a ``StringIO`` instance::
 
     from io import StringIO
-    from django.core.management import call_command
-    from django.test import TestCase
+    from mango.core.management import call_command
+    from mango.test import TestCase
 
     class ClosepollTest(TestCase):
         def test_command_output(self):
@@ -1952,7 +1952,7 @@ redirected into a ``StringIO`` instance::
 Skipping tests
 ==============
 
-.. currentmodule:: django.test
+.. currentmodule:: mango.test
 
 The unittest library provides the :func:`@skipIf <unittest.skipIf>` and
 :func:`@skipUnless <unittest.skipUnless>` decorators to allow you to skip tests
@@ -1964,14 +1964,14 @@ succeed, you could decorate the test case with :func:`@skipIf
 <unittest.skipIf>`. Then, the test runner will report that the test wasn't
 executed and why, instead of failing the test or omitting the test altogether.
 
-To supplement these test skipping behaviors, Django provides two
+To supplement these test skipping behaviors, Mango provides two
 additional skip decorators. Instead of testing a generic boolean,
 these decorators check the capabilities of the database, and skip the
 test if the database doesn't support a specific named feature.
 
 The decorators use a string identifier to describe database features.
 This string corresponds to attributes of the database connection
-features class. See ``django.db.backends.BaseDatabaseFeatures``
+features class. See ``mango.db.backends.BaseDatabaseFeatures``
 class for a full list of database features that can be used as a basis
 for skipping tests.
 

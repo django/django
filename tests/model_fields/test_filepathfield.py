@@ -1,7 +1,7 @@
 import os
 
-from django.db.models import FilePathField
-from django.test import SimpleTestCase
+from mango.db.models import FilePathField
+from mango.test import SimpleTestCase
 
 
 class FilePathFieldTests(SimpleTestCase):

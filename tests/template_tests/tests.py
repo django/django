@@ -1,11 +1,11 @@
 import sys
 
-from django.contrib.auth.models import Group
-from django.template import Context, Engine, TemplateSyntaxError
-from django.template.base import UNKNOWN_SOURCE
-from django.test import SimpleTestCase, override_settings
-from django.urls import NoReverseMatch
-from django.utils import translation
+from mango.contrib.auth.models import Group
+from mango.template import Context, Engine, TemplateSyntaxError
+from mango.template.base import UNKNOWN_SOURCE
+from mango.test import SimpleTestCase, override_settings
+from mango.urls import NoReverseMatch
+from mango.utils import translation
 
 
 class TemplateTests(SimpleTestCase):
@@ -154,7 +154,7 @@ class TemplateTests(SimpleTestCase):
 
     def test_extends_generic_template(self):
         """
-        #24338 -- Allow extending django.template.backends.django.Template
+        #24338 -- Allow extending mango.template.backends.mango.Template
         objects.
         """
         engine = Engine()

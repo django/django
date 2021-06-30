@@ -1,7 +1,7 @@
-from django.http import HttpRequest
-from django.middleware.csrf import _compare_masked_tokens as equivalent_tokens
-from django.template.context_processors import csrf
-from django.test import SimpleTestCase
+from mango.http import HttpRequest
+from mango.middleware.csrf import _compare_masked_tokens as equivalent_tokens
+from mango.template.context_processors import csrf
+from mango.test import SimpleTestCase
 
 
 class TestContextProcessor(SimpleTestCase):

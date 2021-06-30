@@ -1,7 +1,7 @@
-from django.core import signing
-from django.http import HttpRequest, HttpResponse
-from django.test import SimpleTestCase, override_settings
-from django.test.utils import freeze_time
+from mango.core import signing
+from mango.http import HttpRequest, HttpResponse
+from mango.test import SimpleTestCase, override_settings
+from mango.test.utils import freeze_time
 
 
 class SignedCookieTest(SimpleTestCase):

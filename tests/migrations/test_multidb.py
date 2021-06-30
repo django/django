@@ -1,6 +1,6 @@
-from django.db import connection, migrations, models
-from django.db.migrations.state import ProjectState
-from django.test import override_settings
+from mango.db import connection, migrations, models
+from mango.db.migrations.state import ProjectState
+from mango.test import override_settings
 
 from .test_base import OperationTestBase
 

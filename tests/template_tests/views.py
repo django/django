@@ -1,6 +1,6 @@
 # Fake views for testing url reverse lookup
-from django.http import HttpResponse
-from django.template.response import TemplateResponse
+from mango.http import HttpResponse
+from mango.template.response import TemplateResponse
 
 
 def index(request):

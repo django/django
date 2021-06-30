@@ -1,11 +1,11 @@
 import datetime
 
-from django.contrib.sites.models import Site
-from django.http import Http404
-from django.template import TemplateDoesNotExist
-from django.test import RequestFactory, TestCase
-from django.test.utils import override_settings
-from django.views.defaults import (
+from mango.contrib.sites.models import Site
+from mango.http import Http404
+from mango.template import TemplateDoesNotExist
+from mango.test import RequestFactory, TestCase
+from mango.test.utils import override_settings
+from mango.views.defaults import (
     bad_request, page_not_found, permission_denied, server_error,
 )
 
@@ -14,7 +14,7 @@ from ..models import Article, Author, UrlArticle
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
 class DefaultsTests(TestCase):
-    """Test django views in django/views/defaults.py"""
+    """Test mango views in mango/views/defaults.py"""
     nonexistent_urls = [
         '/nonexistent_url/',  # this is in urls.py
         '/other_nonexistent_url/',  # this NOT in urls.py
@@ -54,10 +54,10 @@ class DefaultsTests(TestCase):
         )
 
     @override_settings(TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
         'OPTIONS': {
             'loaders': [
-                ('django.template.loaders.locmem.Loader', {
+                ('mango.template.loaders.locmem.Loader', {
                     '404.html': '{{ csrf_token }}',
                 }),
             ],
@@ -84,10 +84,10 @@ class DefaultsTests(TestCase):
         self.assertContains(response, b'<h1>Bad Request (400)</h1>', status_code=400)
 
     @override_settings(TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
         'OPTIONS': {
             'loaders': [
-                ('django.template.loaders.locmem.Loader', {
+                ('mango.template.loaders.locmem.Loader', {
                     '404.html': 'This is a test template for a 404 error '
                                 '(path: {{ request_path }}, exception: {{ exception }}).',
                     '500.html': 'This is a test template for a 500 error.',

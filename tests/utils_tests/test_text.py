@@ -1,12 +1,12 @@
 import json
 import sys
 
-from django.core.exceptions import SuspiciousFileOperation
-from django.test import SimpleTestCase
-from django.utils import text
-from django.utils.functional import lazystr
-from django.utils.text import format_lazy
-from django.utils.translation import gettext_lazy, override
+from mango.core.exceptions import SuspiciousFileOperation
+from mango.test import SimpleTestCase
+from mango.utils import text
+from mango.utils.functional import lazystr
+from mango.utils.text import format_lazy
+from mango.utils.translation import gettext_lazy, override
 
 IS_WIDE_BUILD = (len('\U0001F4A9') == 1)
 
@@ -247,15 +247,15 @@ class TestUtilsText(SimpleTestCase):
         self.assertLess(compressed_length, actual_length)
 
     def test_format_lazy(self):
-        self.assertEqual('django/test', format_lazy('{}/{}', 'django', lazystr('test')))
-        self.assertEqual('django/test', format_lazy('{0}/{1}', *('django', 'test')))
-        self.assertEqual('django/test', format_lazy('{a}/{b}', **{'a': 'django', 'b': 'test'}))
-        self.assertEqual('django/test', format_lazy('{a[0]}/{a[1]}', a=('django', 'test')))
+        self.assertEqual('mango/test', format_lazy('{}/{}', 'mango', lazystr('test')))
+        self.assertEqual('mango/test', format_lazy('{0}/{1}', *('mango', 'test')))
+        self.assertEqual('mango/test', format_lazy('{a}/{b}', **{'a': 'mango', 'b': 'test'}))
+        self.assertEqual('mango/test', format_lazy('{a[0]}/{a[1]}', a=('mango', 'test')))
 
         t = {}
         s = format_lazy('{0[a]}-{p[a]}', t, p=t)
-        t['a'] = lazystr('django')
-        self.assertEqual('django-django', s)
+        t['a'] = lazystr('mango')
+        self.assertEqual('mango-mango', s)
         t['a'] = 'update'
         self.assertEqual('update-update', s)
 

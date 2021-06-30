@@ -1,4 +1,4 @@
-from django.apps import AppConfig
+from mango.apps import AppConfig
 
 
 class LoadingAppConfig(AppConfig):

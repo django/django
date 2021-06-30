@@ -1,11 +1,11 @@
 from urllib.parse import quote
 
-from django.contrib.contenttypes.fields import (
+from mango.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.sites.models import SiteManager
-from django.db import models
+from mango.contrib.contenttypes.models import ContentType
+from mango.contrib.sites.models import SiteManager
+from mango.db import models
 
 
 class Site(models.Model):

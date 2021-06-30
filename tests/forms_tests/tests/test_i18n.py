@@ -1,9 +1,9 @@
-from django.forms import (
+from mango.forms import (
     CharField, ChoiceField, Form, IntegerField, RadioSelect, Select, TextInput,
 )
-from django.test import SimpleTestCase
-from django.utils import translation
-from django.utils.translation import gettext_lazy
+from mango.test import SimpleTestCase
+from mango.utils import translation
+from mango.utils.translation import gettext_lazy
 
 
 class FormsI18nTests(SimpleTestCase):

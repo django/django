@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand, CommandError
+from mango.core.management.base import BaseCommand, CommandError
 
 
 class Command(BaseCommand):

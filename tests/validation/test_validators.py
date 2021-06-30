@@ -1,4 +1,4 @@
-from django.test import SimpleTestCase
+from mango.test import SimpleTestCase
 
 from . import ValidationAssertions
 from .models import ModelToValidate

@@ -2,10 +2,10 @@
 How to use sessions
 ===================
 
-.. module:: django.contrib.sessions
-   :synopsis: Provides session management for Django projects.
+.. module:: mango.contrib.sessions
+   :synopsis: Provides session management for Mango projects.
 
-Django provides full support for anonymous sessions. The session framework
+Mango provides full support for anonymous sessions. The session framework
 lets you store and retrieve arbitrary data on a per-site-visitor basis. It
 stores data on the server side and abstracts the sending and receiving of
 cookies. Cookies contain a session ID -- not the data itself (unless you're
@@ -19,13 +19,13 @@ Sessions are implemented via a piece of :doc:`middleware </ref/middleware>`.
 To enable session functionality, do the following:
 
 * Edit the :setting:`MIDDLEWARE` setting and make sure it contains
-  ``'django.contrib.sessions.middleware.SessionMiddleware'``. The default
-  ``settings.py`` created by ``django-admin startproject`` has
+  ``'mango.contrib.sessions.middleware.SessionMiddleware'``. The default
+  ``settings.py`` created by ``mango-admin startproject`` has
   ``SessionMiddleware`` activated.
 
 If you don't want to use sessions, you might as well remove the
 ``SessionMiddleware`` line from :setting:`MIDDLEWARE` and
-``'django.contrib.sessions'`` from your :setting:`INSTALLED_APPS`.
+``'mango.contrib.sessions'`` from your :setting:`INSTALLED_APPS`.
 It'll save you a small bit of overhead.
 
 .. _configuring-sessions:
@@ -33,16 +33,16 @@ It'll save you a small bit of overhead.
 Configuring the session engine
 ==============================
 
-By default, Django stores sessions in your database (using the model
-``django.contrib.sessions.models.Session``). Though this is convenient, in
-some setups it's faster to store session data elsewhere, so Django can be
+By default, Mango stores sessions in your database (using the model
+``mango.contrib.sessions.models.Session``). Though this is convenient, in
+some setups it's faster to store session data elsewhere, so Mango can be
 configured to store session data on your filesystem or in your cache.
 
 Using database-backed sessions
 ------------------------------
 
 If you want to use a database-backed session, you need to add
-``'django.contrib.sessions'`` to your :setting:`INSTALLED_APPS` setting.
+``'mango.contrib.sessions'`` to your :setting:`INSTALLED_APPS` setting.
 
 Once you have configured your installation, run ``manage.py migrate``
 to install the single database table that stores session data.
@@ -54,7 +54,7 @@ Using cached sessions
 
 For better performance, you may want to use a cache-based session backend.
 
-To store session data using Django's cache system, you'll first need to make
+To store session data using Mango's cache system, you'll first need to make
 sure you've configured your cache; see the :doc:`cache documentation
 </topics/cache>` for details.
 
@@ -68,7 +68,7 @@ sure you've configured your cache; see the :doc:`cache documentation
     NOT multi-process safe, therefore probably not a good choice for production
     environments.
 
-If you have multiple caches defined in :setting:`CACHES`, Django will use the
+If you have multiple caches defined in :setting:`CACHES`, Mango will use the
 default cache. To use another cache, set :setting:`SESSION_CACHE_ALIAS` to the
 name of that cache.
 
@@ -76,13 +76,13 @@ Once your cache is configured, you've got two choices for how to store data in
 the cache:
 
 * Set :setting:`SESSION_ENGINE` to
-  ``"django.contrib.sessions.backends.cache"`` for a simple caching session
+  ``"mango.contrib.sessions.backends.cache"`` for a simple caching session
   store. Session data will be stored directly in your cache. However, session
   data may not be persistent: cached data can be evicted if the cache fills
   up or if the cache server is restarted.
 
 * For persistent, cached data, set :setting:`SESSION_ENGINE` to
-  ``"django.contrib.sessions.backends.cached_db"``. This uses a
+  ``"mango.contrib.sessions.backends.cached_db"``. This uses a
   write-through cache -- every write to the cache will also be written to
   the database. Session reads only use the database if the data is not
   already in the cache.
@@ -99,11 +99,11 @@ Using file-based sessions
 -------------------------
 
 To use file-based sessions, set the :setting:`SESSION_ENGINE` setting to
-``"django.contrib.sessions.backends.file"``.
+``"mango.contrib.sessions.backends.file"``.
 
 You might also want to set the :setting:`SESSION_FILE_PATH` setting (which
 defaults to output from ``tempfile.gettempdir()``, most likely ``/tmp``) to
-control where Django stores session files. Be sure to check that your Web
+control where Mango stores session files. Be sure to check that your Web
 server has permissions to read and write to this location.
 
 .. _cookie-session-backend:
@@ -112,8 +112,8 @@ Using cookie-based sessions
 ---------------------------
 
 To use cookies-based sessions, set the :setting:`SESSION_ENGINE` setting to
-``"django.contrib.sessions.backends.signed_cookies"``. The session data will be
-stored using Django's tools for :doc:`cryptographic signing </topics/signing>`
+``"mango.contrib.sessions.backends.signed_cookies"``. The session data will be
+stored using Mango's tools for :doc:`cryptographic signing </topics/signing>`
 and the :setting:`SECRET_KEY` setting.
 
 .. note::
@@ -124,7 +124,7 @@ and the :setting:`SECRET_KEY` setting.
 .. warning::
 
     **If the SECRET_KEY is not kept secret and you are using the**
-    :class:`~django.contrib.sessions.serializers.PickleSerializer`, **this can
+    :class:`~mango.contrib.sessions.serializers.PickleSerializer`, **this can
     lead to arbitrary remote code execution.**
 
     An attacker in possession of the :setting:`SECRET_KEY` can not only
@@ -143,7 +143,7 @@ and the :setting:`SECRET_KEY` setting.
     changes by the client, so that the session data will be invalidated when being
     tampered with. The same invalidation happens if the client storing the
     cookie (e.g. your user's browser) can't store all of the session cookie and
-    drops data. Even though Django compresses the data, it's still entirely
+    drops data. Even though Mango compresses the data, it's still entirely
     possible to exceed the :rfc:`common limit of 4096 bytes <2965#section-5.3>`
     per cookie.
 
@@ -171,8 +171,8 @@ and the :setting:`SECRET_KEY` setting.
 Using sessions in views
 =======================
 
-When ``SessionMiddleware`` is activated, each :class:`~django.http.HttpRequest`
-object -- the first argument to any Django view function -- will have a
+When ``SessionMiddleware`` is activated, each :class:`~mango.http.HttpRequest`
+object -- the first argument to any Mango view function -- will have a
 ``session`` attribute, which is a dictionary-like object.
 
 You can read it and write to ``request.session`` at any point in your view.
@@ -223,7 +223,7 @@ You can edit it multiple times.
       Deletes the current session data from the session and deletes the session
       cookie. This is used if you want to ensure that the previous session data
       can't be accessed again from the user's browser (for example, the
-      :func:`django.contrib.auth.logout()` function calls it).
+      :func:`mango.contrib.auth.logout()` function calls it).
 
     .. method:: set_test_cookie()
 
@@ -261,7 +261,7 @@ You can edit it multiple times.
       * If ``value`` is a ``datetime`` or ``timedelta`` object, the
         session will expire at that specific date/time. Note that ``datetime``
         and ``timedelta`` values are only serializable if you are using the
-        :class:`~django.contrib.sessions.serializers.PickleSerializer`.
+        :class:`~mango.contrib.sessions.serializers.PickleSerializer`.
 
       * If ``value`` is ``0``, the user's session cookie will expire
         when the user's Web browser is closed.
@@ -309,7 +309,7 @@ You can edit it multiple times.
     .. method:: cycle_key()
 
       Creates a new session key while retaining the current session data.
-      :func:`django.contrib.auth.login()` calls this method to mitigate against
+      :func:`mango.contrib.auth.login()` calls this method to mitigate against
       session fixation.
 
 .. _session_serialization:
@@ -317,7 +317,7 @@ You can edit it multiple times.
 Session serialization
 ---------------------
 
-By default, Django serializes session data using JSON. You can use the
+By default, Mango serializes session data using JSON. You can use the
 :setting:`SESSION_SERIALIZER` setting to customize the session serialization
 format. Even with the caveats described in :ref:`custom-serializers`, we highly
 recommend sticking with JSON serialization *especially if you are using the
@@ -326,7 +326,7 @@ cookie backend*.
 For example, here's an attack scenario if you use :mod:`pickle` to serialize
 session data. If you're using the :ref:`signed cookie session backend
 <cookie-session-backend>` and :setting:`SECRET_KEY` is known by an attacker
-(there isn't an inherent vulnerability in Django that would cause it to leak),
+(there isn't an inherent vulnerability in Mango that would cause it to leak),
 the attacker could insert a string into their session which, when unpickled,
 executes arbitrary code on the server. The technique for doing so is simple and
 easily available on the internet. Although the cookie session storage signs the
@@ -338,7 +338,7 @@ Bundled serializers
 
 .. class:: serializers.JSONSerializer
 
-    A wrapper around the JSON serializer from :mod:`django.core.signing`. Can
+    A wrapper around the JSON serializer from :mod:`mango.core.signing`. Can
     only serialize basic data types.
 
     In addition, as JSON supports only string keys, note that using non-string
@@ -369,15 +369,15 @@ Bundled serializers
 Write your own serializer
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Note that unlike :class:`~django.contrib.sessions.serializers.PickleSerializer`,
-the :class:`~django.contrib.sessions.serializers.JSONSerializer` cannot handle
+Note that unlike :class:`~mango.contrib.sessions.serializers.PickleSerializer`,
+the :class:`~mango.contrib.sessions.serializers.JSONSerializer` cannot handle
 arbitrary Python data types. As is often the case, there is a trade-off between
 convenience and security. If you wish to store more advanced data types
 including ``datetime`` and ``Decimal`` in JSON backed sessions, you will need
 to write a custom serializer (or convert such values to a JSON serializable
 object before storing them in ``request.session``). While serializing these
 values is often straightforward
-(:class:`~django.core.serializers.json.DjangoJSONEncoder` may be helpful),
+(:class:`~mango.core.serializers.json.MangoJSONEncoder` may be helpful),
 writing a decoder that can reliably get back the same thing that you put in is
 more fragile. For example, you run the risk of returning a ``datetime`` that
 was actually a string that just happened to be in the same format chosen for
@@ -394,7 +394,7 @@ Session object guidelines
   is more of a convention than a hard-and-fast rule.
 
 * Session dictionary keys that begin with an underscore are reserved for
-  internal use by Django.
+  internal use by Mango.
 
 * Don't override ``request.session`` with a new object, and don't access or
   set its attributes. Use it like a Python dictionary.
@@ -432,7 +432,7 @@ This simplistic view logs in a "member" of the site::
             pass
         return HttpResponse("You're logged out.")
 
-The standard :meth:`django.contrib.auth.logout` function actually does a bit
+The standard :meth:`mango.contrib.auth.logout` function actually does a bit
 more than this to prevent inadvertent data leakage. It calls the
 :meth:`~backends.base.SessionBase.flush` method of ``request.session``.
 We are using this example as a demonstration of how to work with session
@@ -441,7 +441,7 @@ objects, not as a full ``logout()`` implementation.
 Setting test cookies
 ====================
 
-As a convenience, Django provides a way to test whether the user's browser
+As a convenience, Mango provides a way to test whether the user's browser
 accepts cookies. Call the :meth:`~backends.base.SessionBase.set_test_cookie`
 method of ``request.session`` in a view, and call
 :meth:`~backends.base.SessionBase.test_cookie_worked` in a subsequent view --
@@ -457,8 +457,8 @@ yourself. Do this after you've verified that the test cookie worked.
 
 Here's a typical usage example::
 
-    from django.http import HttpResponse
-    from django.shortcuts import render
+    from mango.http import HttpResponse
+    from mango.shortcuts import render
 
     def login(request):
         if request.method == 'POST':
@@ -476,17 +476,17 @@ Using sessions out of views
 .. note::
 
     The examples in this section import the ``SessionStore`` object directly
-    from the ``django.contrib.sessions.backends.db`` backend. In your own code,
+    from the ``mango.contrib.sessions.backends.db`` backend. In your own code,
     you should consider importing ``SessionStore`` from the session engine
     designated by :setting:`SESSION_ENGINE`, as below:
 
       >>> from importlib import import_module
-      >>> from django.conf import settings
+      >>> from mango.conf import settings
       >>> SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 
 An API is available to manipulate session data outside of a view::
 
-    >>> from django.contrib.sessions.backends.db import SessionStore
+    >>> from mango.contrib.sessions.backends.db import SessionStore
     >>> s = SessionStore()
     >>> # stored as seconds since epoch since datetimes are not serializable in JSON.
     >>> s['last_login'] = 1376587691
@@ -504,12 +504,12 @@ Calling ``save()`` on a new session may also work but has a small chance of
 generating a ``session_key`` that collides with an existing one. ``create()``
 calls ``save()`` and loops until an unused ``session_key`` is generated.
 
-If you're using the ``django.contrib.sessions.backends.db`` backend, each
-session is a normal Django model. The ``Session`` model is defined in
-``django/contrib/sessions/models.py``. Because it's a normal model, you can
-access sessions using the normal Django database API::
+If you're using the ``mango.contrib.sessions.backends.db`` backend, each
+session is a normal Mango model. The ``Session`` model is defined in
+``mango/contrib/sessions/models.py``. Because it's a normal model, you can
+access sessions using the normal Mango database API::
 
-    >>> from django.contrib.sessions.models import Session
+    >>> from mango.contrib.sessions.models import Session
     >>> s = Session.objects.get(pk='2b1189a188b44ad18c35e113ac6ceead')
     >>> s.expire_date
     datetime.datetime(2005, 8, 20, 13, 35, 12)
@@ -527,7 +527,7 @@ format::
 When sessions are saved
 =======================
 
-By default, Django only saves to the session database when the session has been
+By default, Mango only saves to the session database when the session has been
 modified -- that is if any of its dictionary values have been assigned or
 deleted::
 
@@ -551,7 +551,7 @@ the session object::
     request.session.modified = True
 
 To change this default behavior, set the :setting:`SESSION_SAVE_EVERY_REQUEST`
-setting to ``True``. When set to ``True``, Django will save the session to the
+setting to ``True``. When set to ``True``, Mango will save the session to the
 database on every single request.
 
 Note that the session cookie is only sent when a session has been created or
@@ -577,7 +577,7 @@ which means session cookies will be stored in users' browsers for as long as
 :setting:`SESSION_COOKIE_AGE`. Use this if you don't want people to have to
 log in every time they open a browser.
 
-If :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` is set to ``True``, Django will
+If :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` is set to ``True``, Mango will
 use browser-length cookies -- cookies that expire as soon as the user closes
 their browser. Use this if you want people to have to log in every time they
 open a browser.
@@ -593,7 +593,7 @@ of ``request.session`` as described above in `using sessions in views`_.
     some cases, this can interfere with the
     :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` setting and prevent sessions
     from expiring on browser close. Please be aware of this while testing
-    Django applications which have the
+    Mango applications which have the
     :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` setting enabled.
 
 .. _clearing-the-session-store:
@@ -603,17 +603,17 @@ Clearing the session store
 
 As users create new sessions on your website, session data can accumulate in
 your session store. If you're using the database backend, the
-``django_session`` database table will grow. If you're using the file backend,
+``mango_session`` database table will grow. If you're using the file backend,
 your temporary directory will contain an increasing number of files.
 
 To understand this problem, consider what happens with the database backend.
-When a user logs in, Django adds a row to the ``django_session`` database
-table. Django updates this row each time the session data changes. If the user
-logs out manually, Django deletes the row. But if the user does *not* log out,
+When a user logs in, Mango adds a row to the ``mango_session`` database
+table. Mango updates this row each time the session data changes. If the user
+logs out manually, Mango deletes the row. But if the user does *not* log out,
 the row never gets deleted. A similar process happens with the file backend.
 
-Django does *not* provide automatic purging of expired sessions. Therefore,
-it's your job to purge expired sessions on a regular basis. Django provides a
+Mango does *not* provide automatic purging of expired sessions. Therefore,
+it's your job to purge expired sessions on a regular basis. Mango provides a
 clean-up management command for this purpose: :djadmin:`clearsessions`. It's
 recommended to call this command on a regular basis, for example as a daily
 cron job.
@@ -625,7 +625,7 @@ session data is stored by the users' browsers.
 Settings
 ========
 
-A few :ref:`Django settings <settings-sessions>` give you control over session
+A few :ref:`Mango settings <settings-sessions>` give you control over session
 behavior:
 
 * :setting:`SESSION_CACHE_ALIAS`
@@ -666,25 +666,25 @@ Technical details
 =================
 
 * The session dictionary accepts any :mod:`json` serializable value when using
-  :class:`~django.contrib.sessions.serializers.JSONSerializer` or any
+  :class:`~mango.contrib.sessions.serializers.JSONSerializer` or any
   picklable Python object when using
-  :class:`~django.contrib.sessions.serializers.PickleSerializer`. See the
+  :class:`~mango.contrib.sessions.serializers.PickleSerializer`. See the
   :mod:`pickle` module for more information.
 
-* Session data is stored in a database table named ``django_session`` .
+* Session data is stored in a database table named ``mango_session`` .
 
-* Django only sends a cookie if it needs to. If you don't set any session
+* Mango only sends a cookie if it needs to. If you don't set any session
   data, it won't send a session cookie.
 
 The ``SessionStore`` object
 ---------------------------
 
-When working with sessions internally, Django uses a session store object from
+When working with sessions internally, Mango uses a session store object from
 the corresponding session engine. By convention, the session store object class
 is named ``SessionStore`` and is located in the module designated by
 :setting:`SESSION_ENGINE`.
 
-All ``SessionStore`` classes available in Django inherit from
+All ``SessionStore`` classes available in Mango inherit from
 :class:`~backends.base.SessionBase` and implement data manipulation methods,
 namely:
 
@@ -709,12 +709,12 @@ Extending database-backed session engines
 =========================================
 
 Creating a custom database-backed session engine built upon those included in
-Django (namely ``db`` and ``cached_db``) may be done by inheriting
+Mango (namely ``db`` and ``cached_db``) may be done by inheriting
 :class:`~base_session.AbstractBaseSession` and either ``SessionStore`` class.
 
 ``AbstractBaseSession`` and ``BaseSessionManager`` are importable from
-``django.contrib.sessions.base_session`` so that they can be imported without
-including ``django.contrib.sessions`` in :setting:`INSTALLED_APPS`.
+``mango.contrib.sessions.base_session`` so that they can be imported without
+including ``mango.contrib.sessions`` in :setting:`INSTALLED_APPS`.
 
 .. class:: base_session.AbstractBaseSession
 
@@ -750,7 +750,7 @@ including ``django.contrib.sessions`` in :setting:`INSTALLED_APPS`.
         Decoding is performed by the session store class.
 
 You can also customize the model manager by subclassing
-:class:`~django.contrib.sessions.base_session.BaseSessionManager`:
+:class:`~mango.contrib.sessions.base_session.BaseSessionManager`:
 
 .. class:: base_session.BaseSessionManager
 
@@ -799,9 +799,9 @@ The example below shows a custom database-backed session engine that includes
 an additional database column to store an account ID (thus providing an option
 to query the database for all active sessions for an account)::
 
-    from django.contrib.sessions.backends.db import SessionStore as DBStore
-    from django.contrib.sessions.base_session import AbstractBaseSession
-    from django.db import models
+    from mango.contrib.sessions.backends.db import SessionStore as DBStore
+    from mango.contrib.sessions.base_session import AbstractBaseSession
+    from mango.db import models
 
     class CustomSession(AbstractBaseSession):
         account_id = models.IntegerField(null=True, db_index=True)
@@ -824,7 +824,7 @@ to query the database for all active sessions for an account)::
             obj.account_id = account_id
             return obj
 
-If you are migrating from the Django's built-in ``cached_db`` session store to
+If you are migrating from the Mango's built-in ``cached_db`` session store to
 a custom one based on ``cached_db``, you should override the cache key prefix
 in order to prevent a namespace clash::
 
@@ -836,7 +836,7 @@ in order to prevent a namespace clash::
 Session IDs in URLs
 ===================
 
-The Django sessions framework is entirely, and solely, cookie-based. It does
+The Mango sessions framework is entirely, and solely, cookie-based. It does
 not fall back to putting session IDs in URLs as a last resort, as PHP does.
 This is an intentional design decision. Not only does that behavior make URLs
 ugly, it makes your site vulnerable to session-ID theft via the "Referer"

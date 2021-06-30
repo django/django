@@ -2,19 +2,19 @@
 Model field reference
 =====================
 
-.. module:: django.db.models.fields
+.. module:: mango.db.models.fields
    :synopsis: Built-in field types.
 
-.. currentmodule:: django.db.models
+.. currentmodule:: mango.db.models
 
 This document contains all the API references of :class:`Field` including the
-`field options`_ and `field types`_ Django offers.
+`field options`_ and `field types`_ Mango offers.
 
 .. seealso::
 
-    If the built-in fields don't do the trick, you can try `django-localflavor
-    <https://github.com/django/django-localflavor>`_ (`documentation
-    <https://django-localflavor.readthedocs.io/>`_), which contains assorted
+    If the built-in fields don't do the trick, you can try `mango-localflavor
+    <https://github.com/nikhiljohn10/mango-localflavor>`_ (`documentation
+    <https://mango-localflavor.readthedocs.io/>`_), which contains assorted
     pieces of code that are useful for particular countries and cultures.
 
     Also, you can easily :doc:`write your own custom model fields
@@ -22,9 +22,9 @@ This document contains all the API references of :class:`Field` including the
 
 .. note::
 
-    Technically, these models are defined in :mod:`django.db.models.fields`, but
-    for convenience they're imported into :mod:`django.db.models`; the standard
-    convention is to use ``from django.db import models`` and refer to fields as
+    Technically, these models are defined in :mod:`mango.db.models.fields`, but
+    for convenience they're imported into :mod:`mango.db.models`; the standard
+    convention is to use ``from mango.db import models`` and refer to fields as
     ``models.<Foo>Field``.
 
 .. _common-model-field-options:
@@ -39,14 +39,14 @@ The following arguments are available to all field types. All are optional.
 
 .. attribute:: Field.null
 
-If ``True``, Django will store empty values as ``NULL`` in the database. Default
+If ``True``, Mango will store empty values as ``NULL`` in the database. Default
 is ``False``.
 
 Avoid using :attr:`~Field.null` on string-based fields such as
 :class:`CharField` and :class:`TextField`. If a string-based field has
 ``null=True``, that means it has two possible values for "no data": ``NULL``,
 and the empty string. In most cases, it's redundant to have two possible values
-for "no data;" the Django convention is to use the empty string, not
+for "no data;" the Mango convention is to use the empty string, not
 ``NULL``. One exception is when a :class:`CharField` has both ``unique=True``
 and ``blank=True`` set. In this situation, ``null=True`` is required to avoid
 unique constraint violations when saving multiple objects with blank values.
@@ -100,7 +100,7 @@ and the second element is the human-readable name. For example::
 Generally, it's best to define choices inside a model class, and to
 define a suitably-named constant for each value::
 
-    from django.db import models
+    from mango.db import models
 
     class Student(models.Model):
         FRESHMAN = 'FR'
@@ -155,9 +155,9 @@ a value and a human-readable name for an option. Grouped options may be
 combined with ungrouped options within a single list (such as the
 ``'unknown'`` option in this example).
 
-For each model field that has :attr:`~Field.choices` set, Django will add a
+For each model field that has :attr:`~Field.choices` set, Mango will add a
 method to retrieve the human-readable name for the field's current value. See
-:meth:`~django.db.models.Model.get_FOO_display` in the database API
+:meth:`~mango.db.models.Model.get_FOO_display` in the database API
 documentation.
 
 Note that choices can be any sequence object -- not necessarily a list or
@@ -176,17 +176,17 @@ Unless :attr:`blank=False<Field.blank>` is set on the field along with a
 with the select box. To override this behavior, add a tuple to ``choices``
 containing ``None``; e.g. ``(None, 'Your String For Display')``.
 Alternatively, you can use an empty string instead of ``None`` where this makes
-sense - such as on a :class:`~django.db.models.CharField`.
+sense - such as on a :class:`~mango.db.models.CharField`.
 
 .. _field-choices-enum-types:
 
 Enumeration types
 ~~~~~~~~~~~~~~~~~
 
-In addition, Django provides enumeration types that you can subclass to define
+In addition, Mango provides enumeration types that you can subclass to define
 choices in a concise way::
 
-    from django.utils.translation import gettext_lazy as _
+    from mango.utils.translation import gettext_lazy as _
 
     class Student(models.Model):
 
@@ -213,7 +213,7 @@ These work similar to :mod:`enum` from Python's standard library, but with some
 modifications:
 
 * Enum member values are a tuple of arguments to use when constructing the
-  concrete data type. Django supports adding an extra string value to the end
+  concrete data type. Mango supports adding an extra string value to the end
   of this tuple to be used as the human-readable name, or ``label``. The
   ``label`` can be a lazy translatable string. Thus, in most cases, the member
   value will be a ``(value, label)`` two-tuple. See below for :ref:`an example
@@ -254,7 +254,7 @@ title-case)::
     'Jet Ski'
 
 Since the case where the enum values need to be integers is extremely common,
-Django provides an ``IntegerChoices`` class. For example::
+Mango provides an ``IntegerChoices`` class. For example::
 
     class Card(models.Model):
 
@@ -281,7 +281,7 @@ that labels are automatically generated as highlighted above::
 
 If you require support for a concrete data type other than ``int`` or ``str``,
 you can subclass ``Choices`` and the required concrete data type, e.g.
-:class:`~datetime.date` for use with :class:`~django.db.models.DateField`::
+:class:`~datetime.date` for use with :class:`~mango.db.models.DateField`::
 
     class MoonLandings(datetime.date, models.Choices):
         APOLLO_11 = 1969, 7, 20, 'Apollo 11 (Eagle)'
@@ -312,11 +312,11 @@ There are some additional caveats to be aware of:
 .. attribute:: Field.db_column
 
 The name of the database column to use for this field. If this isn't given,
-Django will use the field's name.
+Mango will use the field's name.
 
 If your database column name is an SQL reserved word, or contains
 characters that aren't allowed in Python variable names -- notably, the
-hyphen -- that's OK. Django quotes column and table names behind the
+hyphen -- that's OK. Mango quotes column and table names behind the
 scenes.
 
 ``db_index``
@@ -349,7 +349,7 @@ The default can't be a mutable object (model instance, ``list``, ``set``, etc.),
 as a reference to the same instance of that object would be used as the default
 value in all new model instances. Instead, wrap the desired default in a
 callable. For example, if you want to specify a default ``dict`` for
-:class:`~django.db.models.JSONField`, use a function::
+:class:`~mango.db.models.JSONField`, use a function::
 
     def contact_default():
         return {"email": "to1@example.com"}
@@ -374,7 +374,7 @@ also used when the field is set to ``None``.
 .. attribute:: Field.editable
 
 If ``False``, the field will not be displayed in the admin or any other
-:class:`~django.forms.ModelForm`. They are also skipped during :ref:`model
+:class:`~mango.forms.ModelForm`. They are also skipped during :ref:`model
 validation <validating-objects>`. Default is ``True``.
 
 ``error_messages``
@@ -408,7 +408,7 @@ desire. For example::
     help_text="Please use the following format: <em>YYYY-MM-DD</em>."
 
 Alternatively you can use plain text and
-:func:`django.utils.html.escape` to escape any HTML special characters. Ensure
+:func:`mango.utils.html.escape` to escape any HTML special characters. Ensure
 that you escape any help text that may come from untrusted users to avoid a
 cross-site scripting attack.
 
@@ -419,12 +419,12 @@ cross-site scripting attack.
 
 If ``True``, this field is the primary key for the model.
 
-If you don't specify ``primary_key=True`` for any field in your model, Django
+If you don't specify ``primary_key=True`` for any field in your model, Mango
 will automatically add a field to hold the primary key, so you don't need to
 set ``primary_key=True`` on any of your fields unless you want to override the
 default primary-key behavior. The type of auto-created primary key fields can
 be specified per app in :attr:`AppConfig.default_auto_field
-<django.apps.AppConfig.default_auto_field>` or globally in the
+<mango.apps.AppConfig.default_auto_field>` or globally in the
 :setting:`DEFAULT_AUTO_FIELD` setting. For more, see
 :ref:`automatic-primary-key-fields`.
 
@@ -450,8 +450,8 @@ If ``True``, this field must be unique throughout the table.
 
 This is enforced at the database level and by model validation. If
 you try to save a model with a duplicate value in a :attr:`~Field.unique`
-field, a :exc:`django.db.IntegrityError` will be raised by the model's
-:meth:`~django.db.models.Model.save` method.
+field, a :exc:`mango.db.IntegrityError` will be raised by the model's
+:meth:`~mango.db.models.Model.save` method.
 
 This option is valid on all field types except :class:`ManyToManyField` and
 :class:`OneToOneField`.
@@ -468,7 +468,7 @@ Set this to the name of a :class:`DateField` or :class:`DateTimeField` to
 require that this field be unique for the value of the date field.
 
 For example, if you have a field ``title`` that has
-``unique_for_date="pub_date"``, then Django wouldn't allow the entry of two
+``unique_for_date="pub_date"``, then Mango wouldn't allow the entry of two
 records with the same ``title`` and ``pub_date``.
 
 Note that if you set this to point to a :class:`DateTimeField`, only the date
@@ -478,7 +478,7 @@ portion of the field will be considered. Besides, when :setting:`USE_TZ` is
 
 This is enforced by :meth:`Model.validate_unique()` during model validation
 but not at the database level. If any :attr:`~Field.unique_for_date` constraint
-involves fields that are not part of a :class:`~django.forms.ModelForm` (for
+involves fields that are not part of a :class:`~mango.forms.ModelForm` (for
 example, if one of the fields is listed in ``exclude`` or has
 :attr:`editable=False<Field.editable>`), :meth:`Model.validate_unique()` will
 skip validation for that particular constraint.
@@ -503,7 +503,7 @@ Like :attr:`~Field.unique_for_date` and :attr:`~Field.unique_for_month`.
 
 .. attribute:: Field.verbose_name
 
-A human-readable name for the field. If the verbose name isn't given, Django
+A human-readable name for the field. If the verbose name isn't given, Mango
 will automatically create it using the field's attribute name, converting
 underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
 
@@ -527,7 +527,7 @@ how lookups are fetched from a field.
 Field types
 ===========
 
-.. currentmodule:: django.db.models
+.. currentmodule:: mango.db.models
 
 ``AutoField``
 -------------
@@ -555,7 +555,7 @@ guaranteed to fit numbers from ``1`` to ``9223372036854775807``.
 A 64-bit integer, much like an :class:`IntegerField` except that it is
 guaranteed to fit numbers from ``-9223372036854775808`` to
 ``9223372036854775807``. The default form widget for this field is a
-:class:`~django.forms.NumberInput`.
+:class:`~mango.forms.NumberInput`.
 
 ``BinaryField``
 ---------------
@@ -566,15 +566,15 @@ A field to store raw binary data. It can be assigned :class:`bytes`,
 :class:`bytearray`, or :class:`memoryview`.
 
 By default, ``BinaryField`` sets :attr:`~Field.editable` to ``False``, in which
-case it can't be included in a :class:`~django.forms.ModelForm`.
+case it can't be included in a :class:`~mango.forms.ModelForm`.
 
 ``BinaryField`` has one extra optional argument:
 
 .. attribute:: BinaryField.max_length
 
     The maximum length (in characters) of the field. The maximum length is
-    enforced in Django's validation using
-    :class:`~django.core.validators.MaxLengthValidator`.
+    enforced in Mango's validation using
+    :class:`~mango.core.validators.MaxLengthValidator`.
 
 .. admonition:: Abusing ``BinaryField``
 
@@ -589,8 +589,8 @@ case it can't be included in a :class:`~django.forms.ModelForm`.
 
 A true/false field.
 
-The default form widget for this field is :class:`~django.forms.CheckboxInput`,
-or :class:`~django.forms.NullBooleanSelect` if :attr:`null=True <Field.null>`.
+The default form widget for this field is :class:`~mango.forms.CheckboxInput`,
+or :class:`~mango.forms.NullBooleanSelect` if :attr:`null=True <Field.null>`.
 
 The default value of ``BooleanField`` is ``None`` when :attr:`Field.default`
 isn't defined.
@@ -602,17 +602,17 @@ isn't defined.
 
 A string field, for small- to large-sized strings.
 
-For large amounts of text, use :class:`~django.db.models.TextField`.
+For large amounts of text, use :class:`~mango.db.models.TextField`.
 
-The default form widget for this field is a :class:`~django.forms.TextInput`.
+The default form widget for this field is a :class:`~mango.forms.TextInput`.
 
 :class:`CharField` has two extra arguments:
 
 .. attribute:: CharField.max_length
 
     Required. The maximum length (in characters) of the field. The max_length
-    is enforced at the database level and in Django's validation using
-    :class:`~django.core.validators.MaxLengthValidator`.
+    is enforced at the database level and in Mango's validation using
+    :class:`~mango.core.validators.MaxLengthValidator`.
 
     .. note::
 
@@ -652,9 +652,9 @@ optional arguments:
     used; it's not just a default value that you can override.
 
     The field is only automatically updated when calling :meth:`Model.save()
-    <django.db.models.Model.save>`. The field isn't updated when making updates
+    <mango.db.models.Model.save>`. The field isn't updated when making updates
     to other fields in other ways such as :meth:`QuerySet.update()
-    <django.db.models.query.QuerySet.update>`, though you can specify a custom
+    <mango.db.models.query.QuerySet.update>`, though you can specify a custom
     value for the field in an update like that.
 
 .. attribute:: DateField.auto_now_add
@@ -669,10 +669,10 @@ optional arguments:
     * For :class:`DateField`: ``default=date.today`` - from
       :meth:`datetime.date.today`
     * For :class:`DateTimeField`: ``default=timezone.now`` - from
-      :func:`django.utils.timezone.now`
+      :func:`mango.utils.timezone.now`
 
 The default form widget for this field is a
-:class:`~django.forms.DateInput`. The admin adds a JavaScript calendar,
+:class:`~mango.forms.DateInput`. The admin adds a JavaScript calendar,
 and a shortcut for "Today". Includes an additional ``invalid_date`` error
 message key.
 
@@ -702,8 +702,8 @@ A date and time, represented in Python by a ``datetime.datetime`` instance.
 Takes the same extra arguments as :class:`DateField`.
 
 The default form widget for this field is a single
-:class:`~django.forms.DateTimeInput`. The admin uses two separate
-:class:`~django.forms.TextInput` widgets with JavaScript shortcuts.
+:class:`~mango.forms.DateTimeInput`. The admin uses two separate
+:class:`~mango.forms.TextInput` widgets with JavaScript shortcuts.
 
 ``DecimalField``
 ----------------
@@ -712,7 +712,7 @@ The default form widget for this field is a single
 
 A fixed-precision decimal number, represented in Python by a
 :class:`~decimal.Decimal` instance. It validates the input using
-:class:`~django.core.validators.DecimalValidator`.
+:class:`~mango.core.validators.DecimalValidator`.
 
 Has two **required** arguments:
 
@@ -735,9 +735,9 @@ decimal places::
 
     models.DecimalField(..., max_digits=19, decimal_places=10)
 
-The default form widget for this field is a :class:`~django.forms.NumberInput`
-when :attr:`~django.forms.Field.localize` is ``False`` or
-:class:`~django.forms.TextInput` otherwise.
+The default form widget for this field is a :class:`~mango.forms.NumberInput`
+when :attr:`~mango.forms.Field.localize` is ``False`` or
+:class:`~mango.forms.TextInput` otherwise.
 
 .. note::
 
@@ -769,7 +769,7 @@ SECOND(6)``. Otherwise a ``bigint`` of microseconds is used.
 .. class:: EmailField(max_length=254, **options)
 
 A :class:`CharField` that checks that the value is a valid email address using
-:class:`~django.core.validators.EmailValidator`.
+:class:`~mango.core.validators.EmailValidator`.
 
 ``FileField``
 -------------
@@ -788,7 +788,7 @@ Has two optional arguments:
 
     This attribute provides a way of setting the upload directory and file name,
     and can be set in two ways. In both cases, the value is passed to the
-    :meth:`Storage.save() <django.core.files.storage.Storage.save>` method.
+    :meth:`Storage.save() <mango.core.files.storage.Storage.save>` method.
 
     If you specify a string value or a :class:`~pathlib.Path`, it may contain
     :func:`~time.strftime` formatting, which will be replaced by the date/time
@@ -803,7 +803,7 @@ Has two optional arguments:
             upload = models.FileField(upload_to='uploads/%Y/%m/%d/')
 
     If you are using the default
-    :class:`~django.core.files.storage.FileSystemStorage`, the string value
+    :class:`~mango.core.files.storage.FileSystemStorage`, the string value
     will be appended to your :setting:`MEDIA_ROOT` path to form the location on
     the local filesystem where uploaded files will be stored. If you are using
     a different storage, check that storage's documentation to see how it
@@ -848,13 +848,13 @@ Has two optional arguments:
     for details on how to provide this object.
 
 The default form widget for this field is a
-:class:`~django.forms.ClearableFileInput`.
+:class:`~mango.forms.ClearableFileInput`.
 
 Using a :class:`FileField` or an :class:`ImageField` (see below) in a model
 takes a few steps:
 
 #. In your settings file, you'll need to define :setting:`MEDIA_ROOT` as the
-   full path to a directory where you'd like Django to store uploaded files.
+   full path to a directory where you'd like Mango to store uploaded files.
    (For performance, these files are not stored in the database.) Define
    :setting:`MEDIA_URL` as the base public URL of that directory. Make sure
    that this directory is writable by the Web server's user account.
@@ -865,8 +865,8 @@ takes a few steps:
 
 #. All that will be stored in your database is a path to the file
    (relative to :setting:`MEDIA_ROOT`). You'll most likely want to use the
-   convenience :attr:`~django.db.models.fields.files.FieldFile.url` attribute
-   provided by Django. For example, if your :class:`ImageField` is called
+   convenience :attr:`~mango.db.models.fields.files.FieldFile.url` attribute
+   provided by Mango. For example, if your :class:`ImageField` is called
    ``mug_shot``, you can get the absolute path to your image in a template with
    ``{{ object.mug_shot.url }}``.
 
@@ -878,10 +878,10 @@ the two-digit day. If you upload a file on Jan. 15, 2007, it will be saved in
 the directory ``/home/media/photos/2007/01/15``.
 
 If you wanted to retrieve the uploaded file's on-disk filename, or the file's
-size, you could use the :attr:`~django.core.files.File.name` and
-:attr:`~django.core.files.File.size` attributes respectively; for more
+size, you could use the :attr:`~mango.core.files.File.name` and
+:attr:`~mango.core.files.File.size` attributes respectively; for more
 information on the available attributes and methods, see the
-:class:`~django.core.files.File` class reference and the :doc:`/topics/files`
+:class:`~mango.core.files.File` class reference and the :doc:`/topics/files`
 topic guide.
 
 .. note::
@@ -890,9 +890,9 @@ topic guide.
     saved.
 
 The uploaded file's relative URL can be obtained using the
-:attr:`~django.db.models.fields.files.FieldFile.url` attribute. Internally,
-this calls the :meth:`~django.core.files.storage.Storage.url` method of the
-underlying :class:`~django.core.files.storage.Storage` class.
+:attr:`~mango.db.models.fields.files.FieldFile.url` attribute. Internally,
+this calls the :meth:`~mango.core.files.storage.Storage.url` method of the
+underlying :class:`~mango.core.files.storage.Storage` class.
 
 .. _file-upload-security:
 
@@ -915,22 +915,22 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 ``FileField`` and ``FieldFile``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. currentmodule:: django.db.models.fields.files
+.. currentmodule:: mango.db.models.fields.files
 
 .. class:: FieldFile
 
-When you access a :class:`~django.db.models.FileField` on a model, you are
+When you access a :class:`~mango.db.models.FileField` on a model, you are
 given an instance of :class:`FieldFile` as a proxy for accessing the underlying
 file.
 
-The API of :class:`FieldFile` mirrors that of :class:`~django.core.files.File`,
+The API of :class:`FieldFile` mirrors that of :class:`~mango.core.files.File`,
 with one key difference: *The object wrapped by the class is not necessarily a
 wrapper around Python's built-in file object.* Instead, it is a wrapper around
-the result of the :attr:`Storage.open()<django.core.files.storage.Storage.open>`
-method, which may be a :class:`~django.core.files.File` object, or it may be a
-custom storage's implementation of the :class:`~django.core.files.File` API.
+the result of the :attr:`Storage.open()<mango.core.files.storage.Storage.open>`
+method, which may be a :class:`~mango.core.files.File` object, or it may be a
+custom storage's implementation of the :class:`~mango.core.files.File` API.
 
-In addition to the API inherited from :class:`~django.core.files.File` such as
+In addition to the API inherited from :class:`~mango.core.files.File` such as
 ``read()`` and ``write()``, :class:`FieldFile` includes several methods that
 can be used to interact with the underlying file:
 
@@ -943,25 +943,25 @@ can be used to interact with the underlying file:
 .. attribute:: FieldFile.name
 
 The name of the file including the relative path from the root of the
-:class:`~django.core.files.storage.Storage` of the associated
-:class:`~django.db.models.FileField`.
+:class:`~mango.core.files.storage.Storage` of the associated
+:class:`~mango.db.models.FileField`.
 
 .. attribute:: FieldFile.path
 
 A read-only property to access the file's local filesystem path by calling the
-:meth:`~django.core.files.storage.Storage.path` method of the underlying
-:class:`~django.core.files.storage.Storage` class.
+:meth:`~mango.core.files.storage.Storage.path` method of the underlying
+:class:`~mango.core.files.storage.Storage` class.
 
 .. attribute:: FieldFile.size
 
 The result of the underlying :attr:`Storage.size()
-<django.core.files.storage.Storage.size>` method.
+<mango.core.files.storage.Storage.size>` method.
 
 .. attribute:: FieldFile.url
 
 A read-only property to access the file's relative URL by calling the
-:meth:`~django.core.files.storage.Storage.url` method of the underlying
-:class:`~django.core.files.storage.Storage` class.
+:meth:`~mango.core.files.storage.Storage.url` method of the underlying
+:class:`~mango.core.files.storage.Storage` class.
 
 .. method:: FieldFile.open(mode='rb')
 
@@ -983,7 +983,7 @@ associated with this instance.
 This method takes a filename and file contents and passes them to the storage
 class for the field, then associates the stored file with the model field.
 If you want to manually associate file data with
-:class:`~django.db.models.FileField` instances on your model, the ``save()``
+:class:`~mango.db.models.FileField` instances on your model, the ``save()``
 method is used to persist that file data.
 
 Takes two required arguments: ``name`` which is the name of the file, and
@@ -993,18 +993,18 @@ saved after the file associated with this field has been altered. Defaults to
 ``True``.
 
 Note that the ``content`` argument should be an instance of
-:class:`django.core.files.File`, not Python's built-in file object.
-You can construct a :class:`~django.core.files.File` from an existing
+:class:`mango.core.files.File`, not Python's built-in file object.
+You can construct a :class:`~mango.core.files.File` from an existing
 Python file object like this::
 
-    from django.core.files import File
+    from mango.core.files import File
     # Open an existing file using Python's built-in open()
     f = open('/path/to/hello.world')
     myfile = File(f)
 
 Or you can construct one from a Python string like this::
 
-    from django.core.files.base import ContentFile
+    from mango.core.files.base import ContentFile
     myfile = ContentFile("hello world")
 
 For more information, see :doc:`/topics/files`.
@@ -1024,7 +1024,7 @@ to cleanup orphaned files, you'll need to handle it yourself (for instance,
 with a custom management command that can be run manually or scheduled to run
 periodically via e.g. cron).
 
-.. currentmodule:: django.db.models
+.. currentmodule:: mango.db.models
 
 ``FilePathField``
 -----------------
@@ -1044,8 +1044,8 @@ directory on the filesystem. Has some special arguments, of which the first is
     path at runtime. Example::
 
         import os
-        from django.conf import settings
-        from django.db import models
+        from mango.conf import settings
+        from mango.db import models
 
         def images_path():
             return os.path.join(settings.LOCAL_FILE_DIR, 'images')
@@ -1097,9 +1097,9 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 
 A floating-point number represented in Python by a ``float`` instance.
 
-The default form widget for this field is a :class:`~django.forms.NumberInput`
-when :attr:`~django.forms.Field.localize` is ``False`` or
-:class:`~django.forms.TextInput` otherwise.
+The default form widget for this field is a :class:`~mango.forms.NumberInput`
+when :attr:`~mango.forms.Field.localize` is ``False`` or
+:class:`~mango.forms.TextInput` otherwise.
 
 .. _floatfield_vs_decimalfield:
 
@@ -1145,7 +1145,7 @@ columns with a default max length of 100 characters. As with other fields, you
 can change the maximum length using the :attr:`~CharField.max_length` argument.
 
 The default form widget for this field is a
-:class:`~django.forms.ClearableFileInput`.
+:class:`~mango.forms.ClearableFileInput`.
 
 ``IntegerField``
 ----------------
@@ -1153,15 +1153,15 @@ The default form widget for this field is a
 .. class:: IntegerField(**options)
 
 An integer. Values from ``-2147483648`` to ``2147483647`` are safe in all
-databases supported by Django.
+databases supported by Mango.
 
-It uses :class:`~django.core.validators.MinValueValidator` and
-:class:`~django.core.validators.MaxValueValidator` to validate the input based
+It uses :class:`~mango.core.validators.MinValueValidator` and
+:class:`~mango.core.validators.MaxValueValidator` to validate the input based
 on the values that the default database supports.
 
-The default form widget for this field is a :class:`~django.forms.NumberInput`
-when :attr:`~django.forms.Field.localize` is ``False`` or
-:class:`~django.forms.TextInput` otherwise.
+The default form widget for this field is a :class:`~mango.forms.NumberInput`
+when :attr:`~mango.forms.Field.localize` is ``False`` or
+:class:`~mango.forms.TextInput` otherwise.
 
 ``GenericIPAddressField``
 -------------------------
@@ -1170,7 +1170,7 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
 
 An IPv4 or IPv6 address, in string format (e.g. ``192.0.2.30`` or
 ``2a02:42fe::4``). The default form widget for this field is a
-:class:`~django.forms.TextInput`.
+:class:`~mango.forms.TextInput`.
 
 The IPv6 address normalization follows :rfc:`4291#section-2.2` section 2.2,
 including using the IPv4 format suggested in paragraph 3 of that section, like
@@ -1212,7 +1212,7 @@ PostgreSQL, and SQLite (with the :ref:`JSON1 extension enabled
     An optional :py:class:`json.JSONEncoder` subclass to serialize data types
     not supported by the standard JSON serializer (e.g. ``datetime.datetime``
     or :class:`~python:uuid.UUID`). For example, you can use the
-    :class:`~django.core.serializers.json.DjangoJSONEncoder` class.
+    :class:`~mango.core.serializers.json.MangoJSONEncoder` class.
 
     Defaults to ``json.JSONEncoder``.
 
@@ -1228,7 +1228,7 @@ PostgreSQL, and SQLite (with the :ref:`JSON1 extension enabled
 
     Defaults to ``json.JSONDecoder``.
 
-If you give the field a :attr:`~django.db.models.Field.default`, ensure it's an
+If you give the field a :attr:`~mango.db.models.Field.default`, ensure it's an
 immutable object, such as a ``str``, or a callable object that returns a fresh
 mutable object each time, such as ``dict`` or a function. Providing a mutable
 default object like ``default={}`` or ``default=[]`` shares the one object
@@ -1238,10 +1238,10 @@ To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
 
 .. admonition:: Indexing
 
-    :class:`~django.db.models.Index` and :attr:`.Field.db_index` both create a
+    :class:`~mango.db.models.Index` and :attr:`.Field.db_index` both create a
     B-tree index, which isn't particularly helpful when querying ``JSONField``.
     On PostgreSQL only, you can use
-    :class:`~django.contrib.postgres.indexes.GinIndex` that is better suited.
+    :class:`~mango.contrib.postgres.indexes.GinIndex` that is better suited.
 
 .. admonition:: PostgreSQL users
 
@@ -1266,7 +1266,7 @@ To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
 
 Like a :class:`PositiveIntegerField`, but only allows values under a certain
 (database-dependent) point. Values from ``0`` to ``9223372036854775807`` are
-safe in all databases supported by Django.
+safe in all databases supported by Mango.
 
 ``PositiveIntegerField``
 ------------------------
@@ -1275,7 +1275,7 @@ safe in all databases supported by Django.
 
 Like an :class:`IntegerField`, but must be either positive or zero (``0``).
 Values from ``0`` to ``2147483647`` are safe in all databases supported by
-Django. The value ``0`` is accepted for backward compatibility reasons.
+Mango. The value ``0`` is accepted for backward compatibility reasons.
 
 ``PositiveSmallIntegerField``
 -----------------------------
@@ -1284,7 +1284,7 @@ Django. The value ``0`` is accepted for backward compatibility reasons.
 
 Like a :class:`PositiveIntegerField`, but only allows values under a certain
 (database-dependent) point. Values from ``0`` to ``32767`` are safe in all
-databases supported by Django.
+databases supported by Mango.
 
 ``SlugField``
 -------------
@@ -1297,17 +1297,17 @@ in URLs.
 
 Like a CharField, you can specify :attr:`~CharField.max_length` (read the note
 about database portability and :attr:`~CharField.max_length` in that section,
-too). If :attr:`~CharField.max_length` is not specified, Django will use a
+too). If :attr:`~CharField.max_length` is not specified, Mango will use a
 default length of 50.
 
 Implies setting :attr:`Field.db_index` to ``True``.
 
 It is often useful to automatically prepopulate a SlugField based on the value
 of some other value.  You can do this automatically in the admin using
-:attr:`~django.contrib.admin.ModelAdmin.prepopulated_fields`.
+:attr:`~mango.contrib.admin.ModelAdmin.prepopulated_fields`.
 
-It uses :class:`~django.core.validators.validate_slug` or
-:class:`~django.core.validators.validate_unicode_slug` for validation.
+It uses :class:`~mango.core.validators.validate_slug` or
+:class:`~mango.core.validators.validate_unicode_slug` for validation.
 
 .. attribute:: SlugField.allow_unicode
 
@@ -1321,7 +1321,7 @@ It uses :class:`~django.core.validators.validate_slug` or
 
 Like an :class:`AutoField`, but only allows values under a certain
 (database-dependent) limit. Values from ``1`` to ``32767`` are safe in all
-databases supported by Django.
+databases supported by Mango.
 
 ``SmallIntegerField``
 ---------------------
@@ -1330,7 +1330,7 @@ databases supported by Django.
 
 Like an :class:`IntegerField`, but only allows values under a certain
 (database-dependent) point. Values from ``-32768`` to ``32767`` are safe in all
-databases supported by Django.
+databases supported by Mango.
 
 ``TextField``
 -------------
@@ -1338,10 +1338,10 @@ databases supported by Django.
 .. class:: TextField(**options)
 
 A large text field. The default form widget for this field is a
-:class:`~django.forms.Textarea`.
+:class:`~mango.forms.Textarea`.
 
 If you specify a ``max_length`` attribute, it will be reflected in the
-:class:`~django.forms.Textarea` widget of the auto-generated form field.
+:class:`~mango.forms.Textarea` widget of the auto-generated form field.
 However it is not enforced at the model or database level. Use a
 :class:`CharField` for that.
 
@@ -1368,7 +1368,7 @@ However it is not enforced at the model or database level. Use a
 A time, represented in Python by a ``datetime.time`` instance. Accepts the same
 auto-population options as :class:`DateField`.
 
-The default form widget for this field is a :class:`~django.forms.TimeInput`.
+The default form widget for this field is a :class:`~mango.forms.TimeInput`.
 The admin adds some JavaScript shortcuts.
 
 ``URLField``
@@ -1377,9 +1377,9 @@ The admin adds some JavaScript shortcuts.
 .. class:: URLField(max_length=200, **options)
 
 A :class:`CharField` for a URL, validated by
-:class:`~django.core.validators.URLValidator`.
+:class:`~mango.core.validators.URLValidator`.
 
-The default form widget for this field is a :class:`~django.forms.URLInput`.
+The default form widget for this field is a :class:`~mango.forms.URLInput`.
 
 Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 :attr:`~CharField.max_length` argument. If you don't specify
@@ -1399,7 +1399,7 @@ Universally unique identifiers are a good alternative to :class:`AutoField` for
 it is recommended to use :attr:`~Field.default`::
 
     import uuid
-    from django.db import models
+    from mango.db import models
 
     class MyUUIDModel(models.Model):
         id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -1418,12 +1418,12 @@ not an instance of ``UUID``.
 Relationship fields
 ===================
 
-.. module:: django.db.models.fields.related
+.. module:: mango.db.models.fields.related
    :synopsis: Related field types
 
-.. currentmodule:: django.db.models
+.. currentmodule:: mango.db.models
 
-Django also defines a set of fields that represent relations.
+Mango also defines a set of fields that represent relations.
 
 .. _ref-foreignkey:
 
@@ -1446,7 +1446,7 @@ on_delete=models.CASCADE)``.
 If you need to create a relationship on a model that has not yet been defined,
 you can use the name of the model, rather than the model object itself::
 
-    from django.db import models
+    from mango.db import models
 
     class Car(models.Model):
         manufacturer = models.ForeignKey(
@@ -1466,7 +1466,7 @@ concrete model and are not relative to the abstract model's ``app_label``:
 .. code-block:: python
     :caption: products/models.py
 
-    from django.db import models
+    from mango.db import models
 
     class AbstractCar(models.Model):
         manufacturer = models.ForeignKey('Manufacturer', on_delete=models.CASCADE)
@@ -1477,7 +1477,7 @@ concrete model and are not relative to the abstract model's ``app_label``:
 .. code-block:: python
     :caption: production/models.py
 
-    from django.db import models
+    from mango.db import models
     from products.models import AbstractCar
 
     class Manufacturer(models.Model):
@@ -1511,7 +1511,7 @@ like a partial or multiple column index.
 Database Representation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Behind the scenes, Django appends ``"_id"`` to the field name to create its
+Behind the scenes, Mango appends ``"_id"`` to the field name to create its
 database column name. In the above example, the database table for the ``Car``
 model will have a ``manufacturer_id`` column. (You can change this explicitly by
 specifying :attr:`~Field.db_column`) However, your code should never have to
@@ -1528,7 +1528,7 @@ relation works.
 
 .. attribute:: ForeignKey.on_delete
 
-    When an object referenced by a :class:`ForeignKey` is deleted, Django will
+    When an object referenced by a :class:`ForeignKey` is deleted, Mango will
     emulate the behavior of the SQL constraint specified by the
     :attr:`on_delete` argument. For example, if you have a nullable
     :class:`ForeignKey` and you want it to be set null when the referenced
@@ -1545,29 +1545,29 @@ relation works.
     database-level cascade options :ticket:`may be implemented later <21961>`.
 
 The possible values for :attr:`~ForeignKey.on_delete` are found in
-:mod:`django.db.models`:
+:mod:`mango.db.models`:
 
 * .. attribute:: CASCADE
 
-    Cascade deletes. Django emulates the behavior of the SQL constraint ON
+    Cascade deletes. Mango emulates the behavior of the SQL constraint ON
     DELETE CASCADE and also deletes the object containing the ForeignKey.
 
     :meth:`.Model.delete` isn't called on related models, but the
-    :data:`~django.db.models.signals.pre_delete` and
-    :data:`~django.db.models.signals.post_delete` signals are sent for all
+    :data:`~mango.db.models.signals.pre_delete` and
+    :data:`~mango.db.models.signals.post_delete` signals are sent for all
     deleted objects.
 
 * .. attribute:: PROTECT
 
     Prevent deletion of the referenced object by raising
-    :exc:`~django.db.models.ProtectedError`, a subclass of
-    :exc:`django.db.IntegrityError`.
+    :exc:`~mango.db.models.ProtectedError`, a subclass of
+    :exc:`mango.db.IntegrityError`.
 
 * .. attribute:: RESTRICT
 
     Prevent deletion of the referenced object by raising
-    :exc:`~django.db.models.RestrictedError` (a subclass of
-    :exc:`django.db.IntegrityError`). Unlike :attr:`PROTECT`, deletion of the
+    :exc:`~mango.db.models.RestrictedError` (a subclass of
+    :exc:`mango.db.IntegrityError`). Unlike :attr:`PROTECT`, deletion of the
     referenced object is allowed if it also references a different object
     that is being deleted in the same operation, but via a :attr:`CASCADE`
     relationship.
@@ -1614,14 +1614,14 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 * .. function:: SET()
 
     Set the :class:`ForeignKey` to the value passed to
-    :func:`~django.db.models.SET()`, or if a callable is passed in,
+    :func:`~mango.db.models.SET()`, or if a callable is passed in,
     the result of calling it. In most cases, passing a callable will be
     necessary to avoid executing queries at the time your models.py is
     imported::
 
-        from django.conf import settings
-        from django.contrib.auth import get_user_model
-        from django.db import models
+        from mango.conf import settings
+        from mango.contrib.auth import get_user_model
+        from mango.db import models
 
         def get_sentinel_user():
             return get_user_model().objects.get_or_create(username='deleted')[0]
@@ -1635,7 +1635,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 * .. attribute:: DO_NOTHING
 
     Take no action. If your database backend enforces referential
-    integrity, this will cause an :exc:`~django.db.IntegrityError` unless
+    integrity, this will cause an :exc:`~mango.db.IntegrityError` unless
     you manually add an SQL ``ON DELETE`` constraint to the database field.
 
 .. attribute:: ForeignKey.limit_choices_to
@@ -1643,8 +1643,8 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     Sets a limit to the available choices for this field when this field is
     rendered using a ``ModelForm`` or the admin (by default, all objects
     in the queryset are available to choose). Either a dictionary, a
-    :class:`~django.db.models.Q` object, or a callable returning a
-    dictionary or :class:`~django.db.models.Q` object can be used.
+    :class:`~mango.db.models.Q` object, or a callable returning a
+    dictionary or :class:`~mango.db.models.Q` object can be used.
 
     For example::
 
@@ -1655,7 +1655,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
         )
 
     causes the corresponding field on the ``ModelForm`` to list only ``Users``
-    that have ``is_staff=True``. This may be helpful in the Django admin.
+    that have ``is_staff=True``. This may be helpful in the Mango admin.
 
     The callable form can be helpful, for instance, when used in conjunction
     with the Python ``datetime`` module to limit selections by date range. For
@@ -1667,10 +1667,10 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
         limit_choices_to = limit_pub_date_choices
 
     If ``limit_choices_to`` is or returns a :class:`Q object
-    <django.db.models.Q>`, which is useful for :ref:`complex queries
+    <mango.db.models.Q>`, which is useful for :ref:`complex queries
     <complex-lookups-with-q>`, then it will only have an effect on the choices
     available in the admin when the field is not listed in
-    :attr:`~django.contrib.admin.ModelAdmin.raw_id_fields` in the
+    :attr:`~mango.contrib.admin.ModelAdmin.raw_id_fields` in the
     ``ModelAdmin`` for the model.
 
     .. note::
@@ -1692,7 +1692,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     :ref:`abstract models <abstract-base-classes>`; and when you do so
     :ref:`some special syntax <abstract-related-name>` is available.
 
-    If you'd prefer Django not to create a backwards relation, set
+    If you'd prefer Mango not to create a backwards relation, set
     ``related_name`` to ``'+'`` or end it with ``'+'``. For example, this will
     ensure that the ``User`` model won't have a backwards relation to this
     model::
@@ -1707,7 +1707,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
     The name to use for the reverse filter name from the target model. It
     defaults to the value of :attr:`related_name` or
-    :attr:`~django.db.models.Options.default_related_name` if set, otherwise it
+    :attr:`~mango.db.models.Options.default_related_name` if set, otherwise it
     defaults to the name of the model::
 
         # Declare the ForeignKey with related_query_name
@@ -1728,7 +1728,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
 .. attribute:: ForeignKey.to_field
 
-    The field on the related object that the relation is to. By default, Django
+    The field on the related object that the relation is to. By default, Mango
     uses the primary key of the related object. If you reference a different
     field, that field must have ``unique=True``.
 
@@ -1777,12 +1777,12 @@ which the model is related, which works exactly the same as it does for
 :ref:`lazy <lazy-relationships>` relationships.
 
 Related objects can be added, removed, or created with the field's
-:class:`~django.db.models.fields.related.RelatedManager`.
+:class:`~mango.db.models.fields.related.RelatedManager`.
 
 Database Representation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Behind the scenes, Django creates an intermediary join table to represent the
+Behind the scenes, Mango creates an intermediary join table to represent the
 many-to-many relationship. By default, this table name is generated using the
 name of the many-to-many field and the name of the table for the model that
 contains it. Since some databases don't support table names above a certain
@@ -1819,28 +1819,28 @@ that control how the relationship functions.
     Only used in the definition of ManyToManyFields on self. Consider the
     following model::
 
-        from django.db import models
+        from mango.db import models
 
         class Person(models.Model):
             friends = models.ManyToManyField("self")
 
-    When Django processes this model, it identifies that it has a
+    When Mango processes this model, it identifies that it has a
     :class:`ManyToManyField` on itself, and as a result, it doesn't add a
     ``person_set`` attribute to the ``Person`` class. Instead, the
     :class:`ManyToManyField` is assumed to be symmetrical -- that is, if I am
     your friend, then you are my friend.
 
     If you do not want symmetry in many-to-many relationships with ``self``, set
-    :attr:`~ManyToManyField.symmetrical` to ``False``. This will force Django to
+    :attr:`~ManyToManyField.symmetrical` to ``False``. This will force Mango to
     add the descriptor for the reverse relationship, allowing
     :class:`ManyToManyField` relationships to be non-symmetrical.
 
 .. attribute:: ManyToManyField.through
 
-    Django will automatically generate a table to manage many-to-many
+    Mango will automatically generate a table to manage many-to-many
     relationships. However, if you want to manually specify the intermediary
     table, you can use the :attr:`~ManyToManyField.through` option to specify
-    the Django model that represents the intermediate table that you want to
+    the Mango model that represents the intermediate table that you want to
     use.
 
     The most common use for this option is when you want to associate
@@ -1850,8 +1850,8 @@ that control how the relationship functions.
     .. note::
 
         If you don't want multiple associations between the same instances, add
-        a :class:`~django.db.models.UniqueConstraint` including the from and to
-        fields. Django's automatically generated many-to-many tables include
+        a :class:`~mango.db.models.UniqueConstraint` including the from and to
+        fields. Mango's automatically generated many-to-many tables include
         such a constraint.
 
     .. note::
@@ -1859,7 +1859,7 @@ that control how the relationship functions.
         Recursive relationships using an intermediary model can't determine the
         reverse accessors names, as they would be the same. You need to set a
         :attr:`~ForeignKey.related_name` to at least one of them. If you'd
-        prefer Django not to create a backwards relation, set ``related_name``
+        prefer Mango not to create a backwards relation, set ``related_name``
         to ``'+'``.
 
     If you don't specify an explicit ``through`` model, there is still an
@@ -1891,12 +1891,12 @@ that control how the relationship functions.
 
 .. attribute:: ManyToManyField.through_fields
 
-    Only used when a custom intermediary model is specified. Django will
+    Only used when a custom intermediary model is specified. Mango will
     normally determine which fields of the intermediary model to use in order
     to establish a many-to-many relationship automatically. However,
     consider the following models::
 
-        from django.db import models
+        from mango.db import models
 
         class Person(models.Model):
             name = models.CharField(max_length=50)
@@ -1920,9 +1920,9 @@ that control how the relationship functions.
             invite_reason = models.CharField(max_length=64)
 
     ``Membership`` has *two* foreign keys to ``Person`` (``person`` and
-    ``inviter``), which makes the relationship ambiguous and Django can't know
+    ``inviter``), which makes the relationship ambiguous and Mango can't know
     which one to use. In this case, you must explicitly specify which
-    foreign keys Django should use using ``through_fields``, as in the example
+    foreign keys Mango should use using ``through_fields``, as in the example
     above.
 
     ``through_fields`` accepts a 2-tuple ``('field1', 'field2')``, where
@@ -1937,12 +1937,12 @@ that control how the relationship functions.
     :ref:`recursive relationships <recursive-relationships>`
     when an intermediary model is used and there are more than two
     foreign keys to the model, or you want to explicitly specify which two
-    Django should use.
+    Mango should use.
 
 .. attribute:: ManyToManyField.db_table
 
     The name of the table to create for storing the many-to-many data. If this
-    is not provided, Django will assume a default name based upon the names of:
+    is not provided, Mango will assume a default name based upon the names of:
     the table for the model defining the relationship and the name of the field
     itself.
 
@@ -1999,13 +1999,13 @@ including all the options regarding :ref:`recursive <recursive-relationships>`
 and :ref:`lazy <lazy-relationships>` relationships.
 
 If you do not specify the :attr:`~ForeignKey.related_name` argument for the
-``OneToOneField``, Django will use the lowercase name of the current model as
+``OneToOneField``, Mango will use the lowercase name of the current model as
 default value.
 
 With the following example::
 
-    from django.conf import settings
-    from django.db import models
+    from mango.conf import settings
+    from mango.db import models
 
     class MySpecialUser(models.Model):
         user = models.OneToOneField(
@@ -2029,7 +2029,7 @@ your resulting ``User`` model will have the following attributes::
 A ``RelatedObjectDoesNotExist`` exception is raised when accessing the reverse
 relationship if an entry in the related table doesn't exist. This is a subclass
 of the target model's :exc:`Model.DoesNotExist
-<django.db.models.Model.DoesNotExist>` exception. For example, if a user
+<mango.db.models.Model.DoesNotExist>` exception. For example, if a user
 doesn't have a supervisor designated by ``MySpecialUser``::
 
     >>> user.supervisor_of
@@ -2059,27 +2059,27 @@ Field API reference
 .. class:: Field
 
     ``Field`` is an abstract class that represents a database table column.
-    Django uses fields to create the database table (:meth:`db_type`), to map
+    Mango uses fields to create the database table (:meth:`db_type`), to map
     Python types to database (:meth:`get_prep_value`) and vice-versa
     (:meth:`from_db_value`).
 
-    A field is thus a fundamental piece in different Django APIs, notably,
-    :class:`models <django.db.models.Model>` and :class:`querysets
-    <django.db.models.query.QuerySet>`.
+    A field is thus a fundamental piece in different Mango APIs, notably,
+    :class:`models <mango.db.models.Model>` and :class:`querysets
+    <mango.db.models.query.QuerySet>`.
 
     In models, a field is instantiated as a class attribute and represents a
     particular table column, see :doc:`/topics/db/models`. It has attributes
-    such as :attr:`null` and :attr:`unique`, and methods that Django uses to
+    such as :attr:`null` and :attr:`unique`, and methods that Mango uses to
     map the field value to database-specific values.
 
     A ``Field`` is a subclass of
-    :class:`~django.db.models.lookups.RegisterLookupMixin` and thus both
-    :class:`~django.db.models.Transform` and
-    :class:`~django.db.models.Lookup` can be registered on it to be used
+    :class:`~mango.db.models.lookups.RegisterLookupMixin` and thus both
+    :class:`~mango.db.models.Transform` and
+    :class:`~mango.db.models.Lookup` can be registered on it to be used
     in ``QuerySet``\s (e.g. ``field_name__exact="foo"``). All :ref:`built-in
     lookups <field-lookups>` are registered by default.
 
-    All of Django's built-in fields, such as :class:`CharField`, are particular
+    All of Mango's built-in fields, such as :class:`CharField`, are particular
     implementations of ``Field``. If you need a custom field, you can either
     subclass any of the built-in fields or write a ``Field`` from scratch. In
     either case, see :doc:`/howto/custom-model-fields`.
@@ -2087,7 +2087,7 @@ Field API reference
     .. attribute:: description
 
         A verbose description of the field, e.g. for the
-        :mod:`django.contrib.admindocs` application.
+        :mod:`mango.contrib.admindocs` application.
 
         The description can be of the form::
 
@@ -2103,7 +2103,7 @@ Field API reference
         Overriding this class attribute allows for customizing the get and set
         behavior.
 
-    To map a ``Field`` to a database-specific type, Django exposes several
+    To map a ``Field`` to a database-specific type, Mango exposes several
     methods:
 
     .. method:: get_internal_type()
@@ -2128,7 +2128,7 @@ Field API reference
 
         See :ref:`custom-database-types` for usage in custom fields.
 
-    There are three main situations where Django needs to interact with the
+    There are three main situations where Mango needs to interact with the
     database backend and fields:
 
     * when it queries the database (Python value -> database backend value)
@@ -2172,7 +2172,7 @@ Field API reference
         .. note::
 
             For performance reasons, ``from_db_value`` is not implemented as a
-            no-op on fields which do not require it (all Django fields).
+            no-op on fields which do not require it (all Mango fields).
             Consequently you may not call ``super`` in your definition.
 
     When saving, :meth:`pre_save` and :meth:`get_db_prep_save` are used:
@@ -2194,7 +2194,7 @@ Field API reference
 
         It should return the value of the appropriate attribute from
         ``model_instance`` for this field. The attribute name is in
-        ``self.attname`` (this is set up by :class:`~django.db.models.Field`).
+        ``self.attname`` (this is set up by :class:`~mango.db.models.Field`).
 
         See :ref:`preprocessing-values-before-saving` for usage.
 
@@ -2205,7 +2205,7 @@ Field API reference
 
         Converts the value into the correct Python object. It acts as the
         reverse of :meth:`value_to_string`, and is also called in
-        :meth:`~django.db.models.Model.clean`.
+        :meth:`~mango.db.models.Model.clean`.
 
         See :ref:`converting-values-to-python-objects` for usage.
 
@@ -2224,18 +2224,18 @@ Field API reference
 
         See :ref:`converting-model-field-to-serialization` for usage.
 
-    When using :class:`model forms <django.forms.ModelForm>`, the ``Field``
+    When using :class:`model forms <mango.forms.ModelForm>`, the ``Field``
     needs to know which form field it should be represented by:
 
     .. method:: formfield(form_class=None, choices_form_class=None, **kwargs)
 
-        Returns the default :class:`django.forms.Field` of this field for
-        :class:`~django.forms.ModelForm`.
+        Returns the default :class:`mango.forms.Field` of this field for
+        :class:`~mango.forms.ModelForm`.
 
         By default, if both ``form_class`` and ``choices_form_class`` are
-        ``None``, it uses :class:`~django.forms.CharField`. If the field has
-        :attr:`~django.db.models.Field.choices` and ``choices_form_class``
-        isn't specified, it uses :class:`~django.forms.TypedChoiceField`.
+        ``None``, it uses :class:`~mango.forms.CharField`. If the field has
+        :attr:`~mango.db.models.Field.choices` and ``choices_form_class``
+        isn't specified, it uses :class:`~mango.forms.TypedChoiceField`.
 
         See :ref:`specifying-form-field-for-model-field` for usage.
 
@@ -2244,7 +2244,7 @@ Field API reference
         Returns a 4-tuple with enough information to recreate the field:
 
         1. The name of the field on the model.
-        2. The import path of the field (e.g. ``"django.db.models.IntegerField"``).
+        2. The import path of the field (e.g. ``"mango.db.models.IntegerField"``).
            This should be the most portable version, so less specific may be better.
         3. A list of positional arguments.
         4. A dict of keyword arguments.
@@ -2289,7 +2289,7 @@ Attributes for fields
     .. note::
 
         :meth:`Options.get_fields()
-        <django.db.models.options.Options.get_fields()>`
+        <mango.db.models.options.Options.get_fields()>`
         excludes hidden fields by default. Pass in ``include_hidden=True`` to
         return hidden fields in the results.
 
@@ -2316,7 +2316,7 @@ have boolean values (rather than ``None``) if the field is a relation type
 .. attribute:: Field.many_to_many
 
     Boolean flag that is ``True`` if the field has a many-to-many relation;
-    ``False`` otherwise. The only field included with Django where this is
+    ``False`` otherwise. The only field included with Mango where this is
     ``True`` is ``ManyToManyField``.
 
 .. attribute:: Field.many_to_one

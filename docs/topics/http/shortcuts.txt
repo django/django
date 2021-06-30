@@ -1,14 +1,14 @@
 =========================
-Django shortcut functions
+Mango shortcut functions
 =========================
 
-.. module:: django.shortcuts
+.. module:: mango.shortcuts
    :synopsis:
-       Convenience shortcuts that span multiple levels of Django's MVC stack.
+       Convenience shortcuts that span multiple levels of Mango's MVC stack.
 
 .. index:: shortcuts
 
-The package ``django.shortcuts`` collects helper functions and classes that
+The package ``mango.shortcuts`` collects helper functions and classes that
 "span" multiple levels of MVC. In other words, these functions/classes
 introduce controlled coupling for convenience's sake.
 
@@ -18,11 +18,11 @@ introduce controlled coupling for convenience's sake.
 .. function:: render(request, template_name, context=None, content_type=None, status=None, using=None)
 
    Combines a given template with a given context dictionary and returns an
-   :class:`~django.http.HttpResponse` object with that rendered text.
+   :class:`~mango.http.HttpResponse` object with that rendered text.
 
-   Django does not provide a shortcut function which returns a
-   :class:`~django.template.response.TemplateResponse` because the constructor
-   of :class:`~django.template.response.TemplateResponse` offers the same level
+   Mango does not provide a shortcut function which returns a
+   :class:`~mango.template.response.TemplateResponse` because the constructor
+   of :class:`~mango.template.response.TemplateResponse` offers the same level
    of convenience as :func:`render()`.
 
 Required arguments
@@ -62,7 +62,7 @@ Example
 The following example renders the template ``myapp/index.html`` with the
 MIME type :mimetype:`application/xhtml+xml`::
 
-    from django.shortcuts import render
+    from mango.shortcuts import render
 
     def my_view(request):
         # View code here...
@@ -72,8 +72,8 @@ MIME type :mimetype:`application/xhtml+xml`::
 
 This example is equivalent to::
 
-    from django.http import HttpResponse
-    from django.template import loader
+    from mango.http import HttpResponse
+    from mango.template import loader
 
     def my_view(request):
         # View code here...
@@ -86,15 +86,15 @@ This example is equivalent to::
 
 .. function:: redirect(to, *args, permanent=False, **kwargs)
 
-   Returns an :class:`~django.http.HttpResponseRedirect` to the appropriate URL
+   Returns an :class:`~mango.http.HttpResponseRedirect` to the appropriate URL
    for the arguments passed.
 
    The arguments could be:
 
-   * A model: the model's :meth:`~django.db.models.Model.get_absolute_url()`
+   * A model: the model's :meth:`~mango.db.models.Model.get_absolute_url()`
      function will be called.
 
-   * A view name, possibly with arguments: :func:`~django.urls.reverse` will be
+   * A view name, possibly with arguments: :func:`~mango.urls.reverse` will be
      used to reverse-resolve the name.
 
    * An absolute or relative URL, which will be used as-is for the redirect
@@ -109,10 +109,10 @@ Examples
 You can use the :func:`redirect` function in a number of ways.
 
 #. By passing some object; that object's
-   :meth:`~django.db.models.Model.get_absolute_url` method will be called
+   :meth:`~mango.db.models.Model.get_absolute_url` method will be called
    to figure out the redirect URL::
 
-        from django.shortcuts import redirect
+        from mango.shortcuts import redirect
 
         def my_view(request):
             ...
@@ -121,7 +121,7 @@ You can use the :func:`redirect` function in a number of ways.
 
 #. By passing the name of a view and optionally some positional or
    keyword arguments; the URL will be reverse resolved using the
-   :func:`~django.urls.reverse` method::
+   :func:`~mango.urls.reverse` method::
 
         def my_view(request):
             ...
@@ -153,17 +153,17 @@ will be returned::
 
 .. function:: get_object_or_404(klass, *args, **kwargs)
 
-   Calls :meth:`~django.db.models.query.QuerySet.get()` on a given model manager,
-   but it raises :class:`~django.http.Http404` instead of the model's
-   :class:`~django.db.models.Model.DoesNotExist` exception.
+   Calls :meth:`~mango.db.models.query.QuerySet.get()` on a given model manager,
+   but it raises :class:`~mango.http.Http404` instead of the model's
+   :class:`~mango.db.models.Model.DoesNotExist` exception.
 
 Required arguments
 ------------------
 
 ``klass``
-    A :class:`~django.db.models.Model` class,
-    a :class:`~django.db.models.Manager`,
-    or a :class:`~django.db.models.query.QuerySet` instance from which to get
+    A :class:`~mango.db.models.Model` class,
+    a :class:`~mango.db.models.Manager`,
+    or a :class:`~mango.db.models.query.QuerySet` instance from which to get
     the object.
 
 ``**kwargs``
@@ -176,14 +176,14 @@ Example
 The following example gets the object with the primary key of 1 from
 ``MyModel``::
 
-    from django.shortcuts import get_object_or_404
+    from mango.shortcuts import get_object_or_404
 
     def my_view(request):
         obj = get_object_or_404(MyModel, pk=1)
 
 This example is equivalent to::
 
-    from django.http import Http404
+    from mango.http import Http404
 
     def my_view(request):
         try:
@@ -191,9 +191,9 @@ This example is equivalent to::
         except MyModel.DoesNotExist:
             raise Http404("No MyModel matches the given query.")
 
-The most common use case is to pass a :class:`~django.db.models.Model`, as
+The most common use case is to pass a :class:`~mango.db.models.Model`, as
 shown above. However, you can also pass a
-:class:`~django.db.models.query.QuerySet` instance::
+:class:`~mango.db.models.query.QuerySet` instance::
 
     queryset = Book.objects.filter(title__startswith='M')
     get_object_or_404(queryset, pk=1)
@@ -205,20 +205,20 @@ The above example is a bit contrived since it's equivalent to doing::
 but it can be useful if you are passed the ``queryset`` variable from somewhere
 else.
 
-Finally, you can also use a :class:`~django.db.models.Manager`. This is useful
+Finally, you can also use a :class:`~mango.db.models.Manager`. This is useful
 for example if you have a
 :ref:`custom manager<custom-managers>`::
 
     get_object_or_404(Book.dahl_objects, title='Matilda')
 
 You can also use
-:class:`related managers<django.db.models.fields.related.RelatedManager>`::
+:class:`related managers<mango.db.models.fields.related.RelatedManager>`::
 
     author = Author.objects.get(name='Roald Dahl')
     get_object_or_404(author.book_set, title='Matilda')
 
 Note: As with ``get()``, a
-:class:`~django.core.exceptions.MultipleObjectsReturned` exception
+:class:`~mango.core.exceptions.MultipleObjectsReturned` exception
 will be raised if more than one object is found.
 
 ``get_list_or_404()``
@@ -226,16 +226,16 @@ will be raised if more than one object is found.
 
 .. function:: get_list_or_404(klass, *args, **kwargs)
 
-   Returns the result of :meth:`~django.db.models.query.QuerySet.filter()` on a
-   given model manager cast to a list, raising :class:`~django.http.Http404` if
+   Returns the result of :meth:`~mango.db.models.query.QuerySet.filter()` on a
+   given model manager cast to a list, raising :class:`~mango.http.Http404` if
    the resulting list is empty.
 
 Required arguments
 ------------------
 
 ``klass``
-    A :class:`~django.db.models.Model`, :class:`~django.db.models.Manager` or
-    :class:`~django.db.models.query.QuerySet` instance from which to get the
+    A :class:`~mango.db.models.Model`, :class:`~mango.db.models.Manager` or
+    :class:`~mango.db.models.query.QuerySet` instance from which to get the
     list.
 
 ``**kwargs``
@@ -247,14 +247,14 @@ Example
 
 The following example gets all published objects from ``MyModel``::
 
-    from django.shortcuts import get_list_or_404
+    from mango.shortcuts import get_list_or_404
 
     def my_view(request):
         my_objects = get_list_or_404(MyModel, published=True)
 
 This example is equivalent to::
 
-    from django.http import Http404
+    from mango.http import Http404
 
     def my_view(request):
         my_objects = list(MyModel.objects.filter(published=True))

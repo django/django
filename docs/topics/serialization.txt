@@ -1,10 +1,10 @@
 ==========================
-Serializing Django objects
+Serializing Mango objects
 ==========================
 
-Django's serialization framework provides a mechanism for "translating" Django
+Mango's serialization framework provides a mechanism for "translating" Mango
 models into other formats. Usually these other formats will be text-based and
-used for sending Django data over a wire, but it's possible for a
+used for sending Mango data over a wire, but it's possible for a
 serializer to handle any format (text-based or not).
 
 .. seealso::
@@ -17,16 +17,16 @@ Serializing data
 
 At the highest level, you can serialize data like this::
 
-    from django.core import serializers
+    from mango.core import serializers
     data = serializers.serialize("xml", SomeModel.objects.all())
 
 The arguments to the ``serialize`` function are the format to serialize the data
 to (see `Serialization formats`_) and a
-:class:`~django.db.models.query.QuerySet` to serialize. (Actually, the second
-argument can be any iterator that yields Django model instances, but it'll
+:class:`~mango.db.models.query.QuerySet` to serialize. (Actually, the second
+argument can be any iterator that yields Mango model instances, but it'll
 almost always be a QuerySet).
 
-.. function:: django.core.serializers.get_serializer(format)
+.. function:: mango.core.serializers.get_serializer(format)
 
 You can also use a serializer object directly::
 
@@ -36,16 +36,16 @@ You can also use a serializer object directly::
     data = xml_serializer.getvalue()
 
 This is useful if you want to serialize data directly to a file-like object
-(which includes an :class:`~django.http.HttpResponse`)::
+(which includes an :class:`~mango.http.HttpResponse`)::
 
     with open("file.xml", "w") as out:
         xml_serializer.serialize(SomeModel.objects.all(), stream=out)
 
 .. note::
 
-    Calling :func:`~django.core.serializers.get_serializer` with an unknown
+    Calling :func:`~mango.core.serializers.get_serializer` with an unknown
     :ref:`format <serialization-formats>` will raise a
-    ``django.core.serializers.SerializerDoesNotExist`` exception.
+    ``mango.core.serializers.SerializerDoesNotExist`` exception.
 
 .. _subset-of-fields:
 
@@ -55,7 +55,7 @@ Subset of fields
 If you only want a subset of fields to be serialized, you can
 specify a ``fields`` argument to the serializer::
 
-    from django.core import serializers
+    from mango.core import serializers
     data = serializers.serialize('xml', SomeModel.objects.all(), fields=('name','size'))
 
 In this example, only the ``name`` and ``size`` attributes of each model will
@@ -114,7 +114,7 @@ As you can see, the ``deserialize`` function takes the same format argument as
 ``serialize``, a string or stream of data, and returns an iterator.
 
 However, here it gets slightly complicated. The objects returned by the
-``deserialize`` iterator *aren't* regular Django objects. Instead, they are
+``deserialize`` iterator *aren't* regular Mango objects. Instead, they are
 special ``DeserializedObject`` instances that wrap a created -- but unsaved --
 object and any associated relationship data.
 
@@ -138,7 +138,7 @@ In other words, the usual use is to examine the deserialized objects to make
 sure that they are "appropriate" for saving before doing so. If you trust your
 data source you can instead save the object directly and move on.
 
-The Django object itself can be inspected as ``deserialized_object.object``.
+The Mango object itself can be inspected as ``deserialized_object.object``.
 If fields in the serialized data do not exist on a model, a
 ``DeserializationError`` will be raised unless the ``ignorenonexistent``
 argument is passed in as ``True``::
@@ -150,7 +150,7 @@ argument is passed in as ``True``::
 Serialization formats
 =====================
 
-Django supports a number of serialization formats, some of which require you
+Mango supports a number of serialization formats, some of which require you
 to install third-party Python modules:
 
 ==========  ==============================================================
@@ -176,15 +176,15 @@ XML
 The basic XML serialization format looks like this::
 
     <?xml version="1.0" encoding="utf-8"?>
-    <django-objects version="1.0">
+    <mango-objects version="1.0">
         <object pk="123" model="sessions.session">
             <field type="DateTimeField" name="expire_date">2013-01-16T08:16:59.844560+00:00</field>
             <!-- ... -->
         </object>
-    </django-objects>
+    </mango-objects>
 
 The whole collection of objects that is either serialized or deserialized is
-represented by a ``<django-objects>``-tag which contains multiple
+represented by a ``<mango-objects>``-tag which contains multiple
 ``<object>``-elements. Each such object has two attributes: "pk" and "model",
 the latter being represented by the name of the app ("sessions") and the
 lowercase name of the model ("session") separated by a dot.
@@ -254,14 +254,14 @@ Foreign keys have the PK of the linked object as property value.
 ManyToMany-relations are serialized for the model that defines them and are
 represented as a list of PKs.
 
-Be aware that not all Django output can be passed unmodified to :mod:`json`.
+Be aware that not all Mango output can be passed unmodified to :mod:`json`.
 For example, if you have some custom type in an object to be serialized, you'll
 have to write a custom :mod:`json` encoder for it. Something like this will
 work::
 
-    from django.core.serializers.json import DjangoJSONEncoder
+    from mango.core.serializers.json import MangoJSONEncoder
 
-    class LazyEncoder(DjangoJSONEncoder):
+    class LazyEncoder(MangoJSONEncoder):
         def default(self, obj):
             if isinstance(obj, YourCustomType):
                 return str(obj)
@@ -270,19 +270,19 @@ work::
 You can then pass ``cls=LazyEncoder`` to the ``serializers.serialize()``
 function::
 
-    from django.core.serializers import serialize
+    from mango.core.serializers import serialize
 
     serialize('json', SomeModel.objects.all(), cls=LazyEncoder)
 
-Also note that GeoDjango provides a :doc:`customized GeoJSON serializer
+Also note that GeoMango provides a :doc:`customized GeoJSON serializer
 </ref/contrib/gis/serializers>`.
 
-``DjangoJSONEncoder``
+``MangoJSONEncoder``
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. class:: django.core.serializers.json.DjangoJSONEncoder
+.. class:: mango.core.serializers.json.MangoJSONEncoder
 
-The JSON serializer uses ``DjangoJSONEncoder`` for encoding. A subclass of
+The JSON serializer uses ``MangoJSONEncoder`` for encoding. A subclass of
 :class:`~json.JSONEncoder`, it handles these additional types:
 
 :class:`~datetime.datetime`
@@ -300,7 +300,7 @@ The JSON serializer uses ``DjangoJSONEncoder`` for encoding. A subclass of
    ``timedelta(days=1, hours=2, seconds=3.4)`` is represented as
    ``'P1DT02H00M03.400000S'``.
 
-:class:`~decimal.Decimal`, ``Promise`` (``django.utils.functional.lazy()`` objects), :class:`~uuid.UUID`
+:class:`~decimal.Decimal`, ``Promise`` (``mango.utils.functional.lazy()`` objects), :class:`~uuid.UUID`
    A string representation of the object.
 
 .. _ecma-262: https://262.ecma-international.org/5.1/#sec-15.9.1.15
@@ -347,16 +347,16 @@ This strategy works well for most objects, but it can cause difficulty in some
 circumstances.
 
 Consider the case of a list of objects that have a foreign key referencing
-:class:`~django.contrib.contenttypes.models.ContentType`. If you're going to
+:class:`~mango.contrib.contenttypes.models.ContentType`. If you're going to
 serialize an object that refers to a content type, then you need to have a way
 to refer to that content type to begin with. Since ``ContentType`` objects are
-automatically created by Django during the database synchronization process,
+automatically created by Mango during the database synchronization process,
 the primary key of a given content type isn't easy to predict; it will
 depend on how and when :djadmin:`migrate` was executed. This is true for all
 models which automatically generate objects, notably including
-:class:`~django.contrib.auth.models.Permission`,
-:class:`~django.contrib.auth.models.Group`, and
-:class:`~django.contrib.auth.models.User`.
+:class:`~mango.contrib.auth.models.Permission`,
+:class:`~mango.contrib.auth.models.Group`, and
+:class:`~mango.contrib.auth.models.User`.
 
 .. warning::
 
@@ -364,13 +364,13 @@ models which automatically generate objects, notably including
     other serialized data. By chance, the primary keys in the fixture
     may match those in the database and loading the fixture will
     have no effect. In the more likely case that they don't match, the fixture
-    loading will fail with an :class:`~django.db.IntegrityError`.
+    loading will fail with an :class:`~mango.db.IntegrityError`.
 
 There is also the matter of convenience. An integer id isn't always
 the most convenient way to refer to an object; sometimes, a
 more natural reference would be helpful.
 
-It is for these reasons that Django provides *natural keys*. A natural
+It is for these reasons that Mango provides *natural keys*. A natural
 key is a tuple of values that can be used to uniquely identify an
 object instance without using the primary key value.
 
@@ -379,7 +379,7 @@ Deserialization of natural keys
 
 Consider the following two models::
 
-    from django.db import models
+    from mango.db import models
 
     class Person(models.Model):
         first_name = models.CharField(max_length=100)
@@ -418,7 +418,7 @@ Manager for Person with a ``get_by_natural_key()`` method. In the case
 of a Person, a good natural key might be the pair of first and last
 name::
 
-    from django.db import models
+    from mango.db import models
 
     class PersonManager(models.Manager):
         def get_by_natural_key(self, first_name, last_name):
@@ -447,7 +447,7 @@ Now books can use that natural key to refer to ``Person`` objects::
     }
     ...
 
-When you try to load this serialized data, Django will use the
+When you try to load this serialized data, Mango will use the
 ``get_by_natural_key()`` method to resolve ``["Douglas", "Adams"]``
 into the primary key of an actual ``Person`` object.
 
@@ -469,7 +469,7 @@ populate the deserialized object's primary key.
 Serialization of natural keys
 -----------------------------
 
-So how do you get Django to emit a natural key when serializing an object?
+So how do you get Mango to emit a natural key when serializing an object?
 Firstly, you need to add another method -- this time to the model itself::
 
     class Person(models.Model):
@@ -493,11 +493,11 @@ or ``use_natural_primary_keys=True`` arguments::
     >>> serializers.serialize('json', [book1, book2], indent=2,
     ...      use_natural_foreign_keys=True, use_natural_primary_keys=True)
 
-When ``use_natural_foreign_keys=True`` is specified, Django will use the
+When ``use_natural_foreign_keys=True`` is specified, Mango will use the
 ``natural_key()`` method to serialize any foreign key reference to objects
 of the type that defines the method.
 
-When ``use_natural_primary_keys=True`` is specified, Django will not provide the
+When ``use_natural_primary_keys=True`` is specified, Mango will not provide the
 primary key in the serialized data of this object since it can be calculated
 during deserialization::
 
@@ -524,12 +524,12 @@ command line flags to generate natural keys.
 .. note::
 
     You don't need to define both ``natural_key()`` and
-    ``get_by_natural_key()``. If you don't want Django to output
+    ``get_by_natural_key()``. If you don't want Mango to output
     natural keys during serialization, but you want to retain the
     ability to load natural keys, then you can opt to not implement
     the ``natural_key()`` method.
 
-    Conversely, if (for some strange reason) you want Django to output
+    Conversely, if (for some strange reason) you want Mango to output
     natural keys during serialization, but *not* be able to load those
     key values, just don't define the ``get_by_natural_key()`` method.
 

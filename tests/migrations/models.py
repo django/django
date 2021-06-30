@@ -1,5 +1,5 @@
-from django.apps.registry import Apps
-from django.db import models
+from mango.apps.registry import Apps
+from mango.db import models
 
 
 class CustomModelBase(models.base.ModelBase):

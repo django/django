@@ -1,5 +1,5 @@
-from django.template import TemplateSyntaxError
-from django.test import SimpleTestCase
+from mango.template import TemplateSyntaxError
+from mango.test import SimpleTestCase
 
 from ..utils import SomeClass, SomeOtherException, UTF8Class, setup
 
@@ -11,7 +11,7 @@ class FilterSyntaxTests(SimpleTestCase):
         """
         Basic filter usage
         """
-        output = self.engine.render_to_string('filter-syntax01', {"var": "Django is the greatest!"})
+        output = self.engine.render_to_string('filter-syntax01', {"var": "Mango is the greatest!"})
         self.assertEqual(output, "DJANGO IS THE GREATEST!")
 
     @setup({'filter-syntax02': '{{ var|upper|lower }}'})
@@ -19,15 +19,15 @@ class FilterSyntaxTests(SimpleTestCase):
         """
         Chained filters
         """
-        output = self.engine.render_to_string('filter-syntax02', {"var": "Django is the greatest!"})
-        self.assertEqual(output, "django is the greatest!")
+        output = self.engine.render_to_string('filter-syntax02', {"var": "Mango is the greatest!"})
+        self.assertEqual(output, "mango is the greatest!")
 
     @setup({'filter-syntax03': '{{ var |upper }}'})
     def test_filter_syntax03(self):
         """
         Allow spaces before the filter pipe
         """
-        output = self.engine.render_to_string('filter-syntax03', {'var': 'Django is the greatest!'})
+        output = self.engine.render_to_string('filter-syntax03', {'var': 'Mango is the greatest!'})
         self.assertEqual(output, 'DJANGO IS THE GREATEST!')
 
     @setup({'filter-syntax04': '{{ var| upper }}'})
@@ -35,7 +35,7 @@ class FilterSyntaxTests(SimpleTestCase):
         """
         Allow spaces after the filter pipe
         """
-        output = self.engine.render_to_string('filter-syntax04', {'var': 'Django is the greatest!'})
+        output = self.engine.render_to_string('filter-syntax04', {'var': 'Mango is the greatest!'})
         self.assertEqual(output, 'DJANGO IS THE GREATEST!')
 
     @setup({'filter-syntax05': '{{ var|does_not_exist }}'})

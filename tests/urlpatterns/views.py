@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from mango.http import HttpResponse
 
 
 def empty_view(request, *args, **kwargs):

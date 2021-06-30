@@ -1,0 +1,6 @@
+from mango.apps import AppConfig
+
+
+class {{ camel_case_app_name }}Config(AppConfig):
+    default_auto_field = 'mango.db.models.BigAutoField'
+    name = '{{ app_name }}'

@@ -1,15 +1,15 @@
 from datetime import datetime
 
-from django.core.exceptions import FieldError
-from django.db.models import BooleanField, CharField, F, Q
-from django.db.models.expressions import Col, Func
-from django.db.models.fields.related_lookups import RelatedIsNull
-from django.db.models.functions import Lower
-from django.db.models.lookups import Exact, GreaterThan, IsNull, LessThan
-from django.db.models.sql.query import Query
-from django.db.models.sql.where import OR
-from django.test import SimpleTestCase
-from django.test.utils import register_lookup
+from mango.core.exceptions import FieldError
+from mango.db.models import BooleanField, CharField, F, Q
+from mango.db.models.expressions import Col, Func
+from mango.db.models.fields.related_lookups import RelatedIsNull
+from mango.db.models.functions import Lower
+from mango.db.models.lookups import Exact, GreaterThan, IsNull, LessThan
+from mango.db.models.sql.query import Query
+from mango.db.models.sql.where import OR
+from mango.test import SimpleTestCase
+from mango.test.utils import register_lookup
 
 from .models import Author, Item, ObjectC, Ranking
 

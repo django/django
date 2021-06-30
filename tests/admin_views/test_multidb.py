@@ -1,9 +1,9 @@
 from unittest import mock
 
-from django.contrib import admin
-from django.contrib.auth.models import User
-from django.test import TestCase, override_settings
-from django.urls import path, reverse
+from mango.contrib import admin
+from mango.contrib.auth.models import User
+from mango.test import TestCase, override_settings
+from mango.urls import path, reverse
 
 from .models import Book
 
@@ -42,7 +42,7 @@ class MultiDatabaseTests(TestCase):
             b.save(using=db)
             cls.test_book_ids[db] = b.id
 
-    @mock.patch('django.contrib.admin.options.transaction')
+    @mock.patch('mango.contrib.admin.options.transaction')
     def test_add_view(self, mock):
         for db in self.databases:
             with self.subTest(db=db):
@@ -54,7 +54,7 @@ class MultiDatabaseTests(TestCase):
                 )
                 mock.atomic.assert_called_with(using=db)
 
-    @mock.patch('django.contrib.admin.options.transaction')
+    @mock.patch('mango.contrib.admin.options.transaction')
     def test_change_view(self, mock):
         for db in self.databases:
             with self.subTest(db=db):
@@ -66,7 +66,7 @@ class MultiDatabaseTests(TestCase):
                 )
                 mock.atomic.assert_called_with(using=db)
 
-    @mock.patch('django.contrib.admin.options.transaction')
+    @mock.patch('mango.contrib.admin.options.transaction')
     def test_delete_view(self, mock):
         for db in self.databases:
             with self.subTest(db=db):

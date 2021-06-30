@@ -1,6 +1,6 @@
 import datetime
 
-from django.db import models
+from mango.db import models
 
 
 class Place(models.Model):

@@ -1,9 +1,9 @@
-from django.core.checks import Error
-from django.core.checks.translation import (
+from mango.core.checks import Error
+from mango.core.checks.translation import (
     check_language_settings_consistent, check_setting_language_code,
     check_setting_languages, check_setting_languages_bidi,
 )
-from django.test import SimpleTestCase, override_settings
+from mango.test import SimpleTestCase, override_settings
 
 
 class TranslationCheckTests(SimpleTestCase):

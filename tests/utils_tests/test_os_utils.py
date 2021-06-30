@@ -2,8 +2,8 @@ import os
 import unittest
 from pathlib import Path
 
-from django.core.exceptions import SuspiciousFileOperation
-from django.utils._os import safe_join, to_path
+from mango.core.exceptions import SuspiciousFileOperation
+from mango.utils._os import safe_join, to_path
 
 
 class SafeJoinTests(unittest.TestCase):

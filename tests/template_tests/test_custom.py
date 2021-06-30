@@ -1,10 +1,10 @@
 import os
 
-from django.template import Context, Engine, TemplateSyntaxError
-from django.template.base import Node
-from django.template.library import InvalidTemplateLibrary
-from django.test import SimpleTestCase
-from django.test.utils import extend_sys_path
+from mango.template import Context, Engine, TemplateSyntaxError
+from mango.template.base import Node
+from mango.template.library import InvalidTemplateLibrary
+from mango.test import SimpleTestCase
+from mango.test.utils import extend_sys_path
 
 from .templatetags import custom, inclusion
 from .utils import ROOT

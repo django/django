@@ -1,7 +1,7 @@
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
-from django.core import management
-from django.test import TestCase, override_settings
+from mango.contrib.auth.models import Permission
+from mango.contrib.contenttypes.models import ContentType
+from mango.core import management
+from mango.test import TestCase, override_settings
 
 from .models import Article
 
@@ -11,8 +11,8 @@ class SwappableModelTests(TestCase):
     # Limit memory usage when calling 'migrate'.
     available_apps = [
         'swappable_models',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
+        'mango.contrib.auth',
+        'mango.contrib.contenttypes',
     ]
 
     @override_settings(TEST_ARTICLE_MODEL='swappable_models.AlternateArticle')

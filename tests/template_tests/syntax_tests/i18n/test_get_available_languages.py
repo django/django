@@ -1,11 +1,11 @@
-from django.template import TemplateSyntaxError
-from django.test import SimpleTestCase
+from mango.template import TemplateSyntaxError
+from mango.test import SimpleTestCase
 
 from ...utils import setup
 
 
 class GetAvailableLanguagesTagTests(SimpleTestCase):
-    libraries = {'i18n': 'django.templatetags.i18n'}
+    libraries = {'i18n': 'mango.templatetags.i18n'}
 
     @setup({'i18n12': '{% load i18n %}'
                       '{% get_available_languages as langs %}{% for lang in langs %}'

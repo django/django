@@ -1,5 +1,5 @@
-from django.contrib.auth.models import User
-from django.db import models
+from mango.contrib.auth.models import User
+from mango.db import models
 
 
 # Regression for #13368. This is an example of a model

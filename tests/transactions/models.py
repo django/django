@@ -1,12 +1,12 @@
 """
 Transactions
 
-Django handles transactions in three different ways. The default is to commit
+Mango handles transactions in three different ways. The default is to commit
 each transaction upon a write, but you can decorate a function to get
 commit-on-success behavior. Alternatively, you can manage the transaction
 manually.
 """
-from django.db import models
+from mango.db import models
 
 
 class Reporter(models.Model):

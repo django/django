@@ -1,22 +1,22 @@
 ==========================
-Outputting CSV with Django
+Outputting CSV with Mango
 ==========================
 
 This document explains how to output CSV (Comma Separated Values) dynamically
-using Django views. To do this, you can either use the Python CSV library or the
-Django template system.
+using Mango views. To do this, you can either use the Python CSV library or the
+Mango template system.
 
 Using the Python CSV library
 ============================
 
-Python comes with a CSV library, :mod:`csv`. The key to using it with Django is
+Python comes with a CSV library, :mod:`csv`. The key to using it with Mango is
 that the :mod:`csv` module's CSV-creation capability acts on file-like objects,
-and Django's :class:`~django.http.HttpResponse` objects are file-like objects.
+and Mango's :class:`~mango.http.HttpResponse` objects are file-like objects.
 
 Here's an example::
 
     import csv
-    from django.http import HttpResponse
+    from mango.http import HttpResponse
 
     def some_view(request):
         # Create the HttpResponse object with the appropriate CSV header.
@@ -45,7 +45,7 @@ mention:
 
 * You can hook into the CSV-generation API by passing ``response`` as the first
   argument to ``csv.writer``. The ``csv.writer`` function expects a file-like
-  object, and :class:`~django.http.HttpResponse` objects fit the bill.
+  object, and :class:`~mango.http.HttpResponse` objects fit the bill.
 
 * For each row in your CSV file, call ``writer.writerow``, passing it an
   :term:`iterable`.
@@ -60,7 +60,7 @@ Streaming large CSV files
 -------------------------
 
 When dealing with views that generate very large responses, you might want to
-consider using Django's :class:`~django.http.StreamingHttpResponse` instead.
+consider using Mango's :class:`~mango.http.StreamingHttpResponse` instead.
 For example, by streaming a file that takes a long time to generate you can
 avoid a load balancer dropping a connection that might have otherwise timed out
 while the server was generating the response.
@@ -70,7 +70,7 @@ the assembly and transmission of a large CSV file::
 
     import csv
 
-    from django.http import StreamingHttpResponse
+    from mango.http import StreamingHttpResponse
 
     class Echo:
         """An object that implements just the write method of the file-like
@@ -97,7 +97,7 @@ the assembly and transmission of a large CSV file::
 Using the template system
 =========================
 
-Alternatively, you can use the :doc:`Django template system </topics/templates>`
+Alternatively, you can use the :doc:`Mango template system </topics/templates>`
 to generate CSV. This is lower-level than using the convenient Python :mod:`csv`
 module, but the solution is presented here for completeness.
 
@@ -106,8 +106,8 @@ template output the commas in a :ttag:`for` loop.
 
 Here's an example, which generates the same CSV file as above::
 
-    from django.http import HttpResponse
-    from django.template import loader
+    from mango.http import HttpResponse
+    from mango.template import loader
 
     def some_view(request):
         # Create the HttpResponse object with the appropriate CSV header.
@@ -134,7 +134,7 @@ such as the ``content_type='text/csv'`` -- is the same.
 
 Then, create the template ``my_template_name.txt``, with this template code:
 
-.. code-block:: html+django
+.. code-block:: html+mango
 
     {% for row in data %}"{{ row.0|addslashes }}", "{{ row.1|addslashes }}", "{{ row.2|addslashes }}", "{{ row.3|addslashes }}", "{{ row.4|addslashes }}"
     {% endfor %}

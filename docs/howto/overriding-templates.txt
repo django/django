@@ -2,13 +2,13 @@
 Overriding templates
 ====================
 
-In your project, you might want to override a template in another Django
+In your project, you might want to override a template in another Mango
 application, whether it be a third-party application or a contrib application
-such as ``django.contrib.admin``. You can either put template overrides in your
+such as ``mango.contrib.admin``. You can either put template overrides in your
 project's templates directory or in an application's templates directory.
 
 If you have app and project templates directories that both contain overrides,
-the default Django template loader will try to load the template from the
+the default Mango template loader will try to load the template from the
 project-level directory first. In other words, :setting:`DIRS <TEMPLATES-DIRS>`
 is searched before :setting:`APP_DIRS <TEMPLATES-APP_DIRS>`.
 
@@ -39,7 +39,7 @@ called ``blog``, which provides the templates ``blog/post.html`` and
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'BACKEND': 'mango.template.backends.mango.MangoTemplates',
             'DIRS': [BASE_DIR / 'templates'],
             'APP_DIRS': True,
             ...
@@ -111,7 +111,7 @@ reimplement the entire template.
 For example, you can use this technique to add a custom logo to the
 ``admin/base_site.html`` template:
 
-    .. code-block:: html+django
+    .. code-block:: html+mango
        :caption: templates/admin/base_site.html
 
         {% extends "admin/base_site.html" %}

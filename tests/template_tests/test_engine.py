@@ -1,9 +1,9 @@
 import os
 
-from django.core.exceptions import ImproperlyConfigured
-from django.template import Context
-from django.template.engine import Engine
-from django.test import SimpleTestCase, override_settings
+from mango.core.exceptions import ImproperlyConfigured
+from mango.template import Context
+from mango.template.engine import Engine
+from mango.test import SimpleTestCase, override_settings
 
 from .utils import ROOT, TEMPLATE_DIR
 
@@ -16,19 +16,19 @@ class EngineTest(SimpleTestCase):
         self.assertEqual(
             repr(engine),
             "<Engine: app_dirs=False debug=False loaders=[("
-            "'django.template.loaders.cached.Loader', "
-            "['django.template.loaders.filesystem.Loader'])] "
+            "'mango.template.loaders.cached.Loader', "
+            "['mango.template.loaders.filesystem.Loader'])] "
             "string_if_invalid='' file_charset='utf-8' builtins=["
-            "'django.template.defaulttags', 'django.template.defaultfilters', "
-            "'django.template.loader_tags'] autoescape=True>"
+            "'mango.template.defaulttags', 'mango.template.defaultfilters', "
+            "'mango.template.loader_tags'] autoescape=True>"
         )
 
     def test_repr(self):
         engine = Engine(
             dirs=[TEMPLATE_DIR],
-            context_processors=['django.template.context_processors.debug'],
+            context_processors=['mango.template.context_processors.debug'],
             debug=True,
-            loaders=['django.template.loaders.filesystem.Loader'],
+            loaders=['mango.template.loaders.filesystem.Loader'],
             string_if_invalid='x',
             file_charset='utf-16',
             libraries={'custom': 'template_tests.templatetags.custom'},
@@ -37,12 +37,12 @@ class EngineTest(SimpleTestCase):
         self.assertEqual(
             repr(engine),
             f"<Engine: dirs=[{TEMPLATE_DIR!r}] app_dirs=False "
-            "context_processors=['django.template.context_processors.debug'] "
-            "debug=True loaders=['django.template.loaders.filesystem.Loader'] "
+            "context_processors=['mango.template.context_processors.debug'] "
+            "debug=True loaders=['mango.template.loaders.filesystem.Loader'] "
             "string_if_invalid='x' file_charset='utf-16' "
             "libraries={'custom': 'template_tests.templatetags.custom'} "
-            "builtins=['django.template.defaulttags', "
-            "'django.template.defaultfilters', 'django.template.loader_tags'] "
+            "builtins=['mango.template.defaulttags', "
+            "'mango.template.defaultfilters', 'mango.template.loader_tags'] "
             "autoescape=False>"
         )
 
@@ -70,13 +70,13 @@ class GetDefaultTests(SimpleTestCase):
 
     @override_settings(TEMPLATES=[])
     def test_no_engines_configured(self):
-        msg = 'No DjangoTemplates backend is configured.'
+        msg = 'No MangoTemplates backend is configured.'
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             Engine.get_default()
 
     @override_settings(TEMPLATES=[{
         'NAME': 'default',
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
         'OPTIONS': {'file_charset': 'abc'},
     }])
     def test_single_engine_configured(self):
@@ -84,11 +84,11 @@ class GetDefaultTests(SimpleTestCase):
 
     @override_settings(TEMPLATES=[{
         'NAME': 'default',
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
         'OPTIONS': {'file_charset': 'abc'},
     }, {
         'NAME': 'other',
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'mango.template.backends.mango.MangoTemplates',
         'OPTIONS': {'file_charset': 'def'},
     }])
     def test_multiple_engines_configured(self):
@@ -107,8 +107,8 @@ class LoaderTests(SimpleTestCase):
         #21460 -- The order of template loader works.
         """
         loaders = [
-            'django.template.loaders.filesystem.Loader',
-            'django.template.loaders.app_directories.Loader',
+            'mango.template.loaders.filesystem.Loader',
+            'mango.template.loaders.app_directories.Loader',
         ]
         engine = Engine(dirs=[OTHER_DIR, TEMPLATE_DIR], loaders=loaders)
         template = engine.get_template('priority/foo.html')
@@ -119,9 +119,9 @@ class LoaderTests(SimpleTestCase):
         The order of template loader works. Refs #21460.
         """
         loaders = [
-            ('django.template.loaders.cached.Loader', [
-                'django.template.loaders.filesystem.Loader',
-                'django.template.loaders.app_directories.Loader',
+            ('mango.template.loaders.cached.Loader', [
+                'mango.template.loaders.filesystem.Loader',
+                'mango.template.loaders.app_directories.Loader',
             ]),
         ]
         engine = Engine(dirs=[OTHER_DIR, TEMPLATE_DIR], loaders=loaders)

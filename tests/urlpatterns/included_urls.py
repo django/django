@@ -1,4 +1,4 @@
-from django.urls import include, path
+from mango.urls import include, path
 
 from . import views
 

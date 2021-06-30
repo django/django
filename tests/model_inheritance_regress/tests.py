@@ -5,8 +5,8 @@ import datetime
 from operator import attrgetter
 from unittest import expectedFailure
 
-from django import forms
-from django.test import TestCase
+from mango import forms
+from mango.test import TestCase
 
 from .models import (
     ArticleWithAuthor, BachelorParty, BirthdayParty, BusStation, Child,
@@ -313,7 +313,7 @@ class ModelInheritanceTest(TestCase):
         # should be available on child classes (#7588). Creating this instance
         # should work without error.
         QualityControl.objects.create(
-            headline="Problems in Django",
+            headline="Problems in Mango",
             pub_date=datetime.datetime.now(),
             quality=10,
             assignee='adrian',
