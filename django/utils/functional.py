@@ -337,7 +337,15 @@ class LazyObject:
 
     # Need to pretend to be the wrapped class, for the sake of objects that
     # care about this (especially in equality tests)
-    __class__ = property(new_method_proxy(operator.attrgetter("__class__")))
+    
+    def __class__(self):
+        _class = self._wrapped
+        
+        if self._wrapped is empty:
+            _class = self
+            
+        return operator.attrgetter(_class, "__class__")
+    
     __eq__ = new_method_proxy(operator.eq)
     __lt__ = new_method_proxy(operator.lt)
     __gt__ = new_method_proxy(operator.gt)
