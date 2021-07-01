@@ -1230,3 +1230,16 @@ Versions affected
 * Django 3.2 :commit:`(patch) <9f75e2e562fa0c0482f3dde6fc7399a9070b4a3d>`
 * Django 3.1 :commit:`(patch) <203d4ab9ebcd72fc4d6eb7398e66ed9e474e118e>`
 * Django 2.2 :commit:`(patch) <f27c38ab5d90f68c9dd60cabef248a570c0be8fc>`
+
+July 1, 2021 - :cve:`2021-35042`
+--------------------------------
+
+Potential SQL injection via unsanitized ``QuerySet.order_by()`` input. `Full
+description
+<https://www.djangoproject.com/weblog/2021/jul/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.2 :commit:`(patch) <a34a5f724c5d5adb2109374ba3989ebb7b11f81f>`
+* Django 3.1 :commit:`(patch) <0bd57a879a0d54920bb9038a732645fb917040e9>`
