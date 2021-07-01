@@ -36,6 +36,19 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+July 1, 2021 - :cve:`2021-35042`
+--------------------------------
+
+Potential SQL injection via unsanitized ``QuerySet.order_by()`` input. `Full
+description
+<https://www.djangoproject.com/weblog/2021/jul/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.2 :commit:`(patch) <a34a5f724c5d5adb2109374ba3989ebb7b11f81f>`
+* Django 3.1 :commit:`(patch) <0bd57a879a0d54920bb9038a732645fb917040e9>`
+
 June 2, 2021 - :cve:`2021-33203`
 --------------------------------
 
