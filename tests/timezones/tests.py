@@ -37,7 +37,8 @@ from .forms import (
     EventSplitForm,
 )
 from .models import (
-    AllDayEvent, Event, MaybeEvent, Session, SessionEvent, Timestamp,
+    AllDayEvent, DailyEvent, Event, MaybeEvent, Session, SessionEvent,
+    Timestamp,
 )
 
 try:
@@ -145,6 +146,13 @@ class LegacyDatabaseTests(TestCase):
         msg = 'backend does not support timezone-aware datetimes when USE_TZ is False.'
         with self.assertRaisesMessage(ValueError, msg):
             Event.objects.create(dt=dt)
+
+    @skipIfDBFeature('supports_timezones')
+    def test_aware_time_unsupported(self):
+        t = datetime.time(21, 9, 1, 24_000, tzinfo=EAT)
+        msg = 'backend does not support timezone-aware times.'
+        with self.assertRaisesMessage(ValueError, msg):
+            DailyEvent.objects.create(time=t)
 
     def test_auto_now_and_auto_now_add(self):
         now = datetime.datetime.now()
