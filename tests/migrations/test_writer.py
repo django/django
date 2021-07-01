@@ -658,6 +658,13 @@ class WriterTests(SimpleTestCase):
     def test_serialize_type_none(self):
         self.assertSerializedEqual(type(None))
 
+    def test_serialize_type_model(self):
+        self.assertSerializedEqual(models.Model)
+        self.assertSerializedResultEqual(
+            MigrationWriter.serialize(models.Model),
+            ("('models.Model', {'from django.db import models'})", set()),
+        )
+
     def test_simple_migration(self):
         """
         Tests serializing a simple migration.
