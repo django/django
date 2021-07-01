@@ -37,7 +37,8 @@ from .forms import (
     EventSplitForm,
 )
 from .models import (
-    AllDayEvent, Event, MaybeEvent, Session, SessionEvent, Timestamp,
+    AllDayEvent, DailyEvent, Event, MaybeEvent, Session, SessionEvent,
+    Timestamp,
 )
 
 try:
@@ -269,6 +270,13 @@ class LegacyDatabaseTests(TestCase):
 @override_settings(TIME_ZONE='Africa/Nairobi', USE_TZ=True)
 class NewDatabaseTests(TestCase):
     naive_warning = 'DateTimeField Event.dt received a naive datetime'
+
+    @skipIfDBFeature('supports_timezones')
+    def test_aware_time_unsupported(self):
+        t = datetime.time(13, 20, 30, tzinfo=EAT)
+        msg = 'backend does not support timezone-aware times.'
+        with self.assertRaisesMessage(ValueError, msg):
+            DailyEvent.objects.create(time=t)
 
     @requires_tz_support
     def test_naive_datetime(self):
