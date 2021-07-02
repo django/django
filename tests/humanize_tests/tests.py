@@ -200,9 +200,6 @@ class HumanizeTests(SimpleTestCase):
             humanize.datetime = orig_humanize_datetime
 
     def test_naturaltime(self):
-        class naive(datetime.tzinfo):
-            def utcoffset(self, dt):
-                return None
         test_list = [
             'test',
             now,
@@ -224,7 +221,7 @@ class HumanizeTests(SimpleTestCase):
             now + datetime.timedelta(days=1),
             now + datetime.timedelta(days=2, hours=6),
             now + datetime.timedelta(days=500),
-            now.replace(tzinfo=naive()),
+            now.replace(tzinfo=None),
             now.replace(tzinfo=utc),
         ]
         result_list = [

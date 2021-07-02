@@ -142,17 +142,23 @@ class LegacyDatabaseTests(TestCase):
 
     @skipIfDBFeature('supports_timezones')
     def test_aware_datetime_unsupported(self):
-        dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
+        timezones = [EAT] + get_timezones('Europe/Paris')
         msg = 'backend does not support timezone-aware datetimes when USE_TZ is False.'
-        with self.assertRaisesMessage(ValueError, msg):
-            Event.objects.create(dt=dt)
+        for tz in timezones:
+            with self.subTest(repr(tz)):
+                dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=tz)
+                with self.assertRaisesMessage(ValueError, msg):
+                    Event.objects.create(dt=dt)
 
     @skipIfDBFeature('supports_timezones')
     def test_aware_time_unsupported(self):
-        t = datetime.time(21, 9, 1, 24_000, tzinfo=EAT)
+        timezones = [EAT] + get_timezones('Europe/Paris')
         msg = 'backend does not support timezone-aware times.'
-        with self.assertRaisesMessage(ValueError, msg):
-            DailyEvent.objects.create(time=t)
+        for tz in timezones:
+            with self.subTest(repr(tz)):
+                t = datetime.time(21, 9, 1, 24_000, tzinfo=EAT)
+                with self.assertRaisesMessage(ValueError, msg):
+                    DailyEvent.objects.create(time=t)
 
     def test_auto_now_and_auto_now_add(self):
         now = datetime.datetime.now()

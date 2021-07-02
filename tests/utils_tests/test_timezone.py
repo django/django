@@ -130,10 +130,25 @@ class TimezoneTests(SimpleTestCase):
     def test_is_aware(self):
         self.assertTrue(timezone.is_aware(datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)))
         self.assertFalse(timezone.is_aware(datetime.datetime(2011, 9, 1, 13, 20, 30)))
+        self.assertIs(timezone.is_aware(datetime.time(21, 9, 1, 24_000, tzinfo=EAT)), True)
+
+    def test_is_aware_custom_tzinfo_without_utcoffset(self):
+        # Regression test for 32661
+        class MockTimezone(datetime.tzinfo):
+            def utcoffset(self, dt):
+                return None
+        self.assertIs(timezone.is_aware(datetime.time(21, 9, 1, 24_000, tzinfo=MockTimezone())), True)
 
     def test_is_naive(self):
         self.assertFalse(timezone.is_naive(datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)))
         self.assertTrue(timezone.is_naive(datetime.datetime(2011, 9, 1, 13, 20, 30)))
+
+    def test_is_naive_custom_tzinfo_without_utcoffset(self):
+        # Regression test for 32661
+        class MockTimezone(datetime.tzinfo):
+            def utcoffset(self, dt):
+                return None
+        self.assertIs(timezone.is_naive(datetime.time(21, 9, 1, 24_000, tzinfo=MockTimezone())), False)
 
     def test_make_aware(self):
         self.assertEqual(
