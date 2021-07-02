@@ -526,6 +526,7 @@ class QuerySetSetOperationTests(TestCase):
         operators = [
             ("|", operator.or_),
             ("&", operator.and_),
+            ("^", operator.xor),
         ]
         for combinator in combinators:
             combined_qs = getattr(qs, combinator)(qs)

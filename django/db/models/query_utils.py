@@ -38,6 +38,7 @@ class Q(tree.Node):
     # Connection types
     AND = "AND"
     OR = "OR"
+    XOR = "XOR"
     default = AND
     conditional = True
 
@@ -69,6 +70,9 @@ class Q(tree.Node):
 
     def __and__(self, other):
         return self._combine(other, self.AND)
+
+    def __xor__(self, other):
+        return self._combine(other, self.XOR)
 
     def __invert__(self):
         obj = type(self)()
