@@ -273,6 +273,11 @@ Models
   as the ``chunk_size`` argument is provided. In older versions, no prefetching
   was done.
 
+* :class:`~django.db.models.Q` objects and querysets can now be combined using
+  ``^`` as the exclusive or (``XOR``) operator. ``XOR`` is natively supported
+  on MariaDB and MySQL. For databases that do not support ``XOR``, the query
+  will be converted to an equivalent using ``AND``, ``OR``, and ``NOT``.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

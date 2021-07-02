@@ -2339,7 +2339,9 @@ class ReprTests(SimpleTestCase):
 
 
 class CombinableTests(SimpleTestCase):
-    bitwise_msg = "Use .bitand() and .bitor() for bitwise logical operations."
+    bitwise_msg = (
+        "Use .bitand(), .bitor(), and .bitxor() for bitwise logical operations."
+    )
 
     def test_negation(self):
         c = Combinable()
@@ -2353,6 +2355,10 @@ class CombinableTests(SimpleTestCase):
         with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
             Combinable() | Combinable()
 
+    def test_xor(self):
+        with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
+            Combinable() ^ Combinable()
+
     def test_reversed_and(self):
         with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
             object() & Combinable()
@@ -2360,6 +2366,10 @@ class CombinableTests(SimpleTestCase):
     def test_reversed_or(self):
         with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
             object() | Combinable()
+
+    def test_reversed_xor(self):
+        with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
+            object() ^ Combinable()
 
 
 class CombinedExpressionTests(SimpleTestCase):

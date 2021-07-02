@@ -47,6 +47,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     supports_order_by_nulls_modifier = False
     order_by_nulls_first = True
+    supports_logical_xor = True
 
     @cached_property
     def minimum_database_version(self):

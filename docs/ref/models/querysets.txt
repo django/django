@@ -1903,6 +1903,40 @@ SQL equivalent:
 ``|`` is not a commutative operation, as different (though equivalent) queries
 may be generated.
 
+XOR (``^``)
+~~~~~~~~~~~
+
+.. versionadded:: 4.1
+
+Combines two ``QuerySet``\s using the SQL ``XOR`` operator.
+
+The following are equivalent::
+
+    Model.objects.filter(x=1) ^ Model.objects.filter(y=2)
+    from django.db.models import Q
+    Model.objects.filter(Q(x=1) ^ Q(y=2))
+
+SQL equivalent:
+
+.. code-block:: sql
+
+    SELECT ... WHERE x=1 XOR y=2
+
+.. note::
+
+    ``XOR`` is natively supported on MariaDB and MySQL. On other databases,
+    ``x ^ y ^ ... ^ z`` is converted to an equivalent:
+
+    .. code-block:: sql
+
+        (x OR y OR ... OR z) AND
+        1=(
+            (CASE WHEN x THEN 1 ELSE 0 END) +
+            (CASE WHEN y THEN 1 ELSE 0 END) +
+            ...
+            (CASE WHEN z THEN 1 ELSE 0 END) +
+        )
+
 Methods that do not return ``QuerySet``\s
 -----------------------------------------
 
@@ -3751,8 +3785,12 @@ A ``Q()`` object represents an SQL condition that can be used in
 database-related operations. It's similar to how an
 :class:`F() <django.db.models.F>` object represents the value of a model field
 or annotation. They make it possible to define and reuse conditions, and
-combine them using operators such as ``|`` (``OR``) and ``&`` (``AND``). See
-:ref:`complex-lookups-with-q`.
+combine them using operators such as ``|`` (``OR``), ``&`` (``AND``), and ``^``
+(``XOR``). See :ref:`complex-lookups-with-q`.
+
+.. versionchanged:: 4.1
+
+    Support for the ``^`` (``XOR``) operator was added.
 
 ``Prefetch()`` objects
 ----------------------

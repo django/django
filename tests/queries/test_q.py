@@ -27,6 +27,15 @@ class QTests(SimpleTestCase):
         self.assertEqual(q | Q(), q)
         self.assertEqual(Q() | q, q)
 
+    def test_combine_xor_empty(self):
+        q = Q(x=1)
+        self.assertEqual(q ^ Q(), q)
+        self.assertEqual(Q() ^ q, q)
+
+        q = Q(x__in={}.keys())
+        self.assertEqual(q ^ Q(), q)
+        self.assertEqual(Q() ^ q, q)
+
     def test_combine_empty_copy(self):
         base_q = Q(x=1)
         tests = [
@@ -34,6 +43,8 @@ class QTests(SimpleTestCase):
             Q() | base_q,
             base_q & Q(),
             Q() & base_q,
+            base_q ^ Q(),
+            Q() ^ base_q,
         ]
         for i, q in enumerate(tests):
             with self.subTest(i=i):
@@ -43,6 +54,9 @@ class QTests(SimpleTestCase):
     def test_combine_or_both_empty(self):
         self.assertEqual(Q() | Q(), Q())
 
+    def test_combine_xor_both_empty(self):
+        self.assertEqual(Q() ^ Q(), Q())
+
     def test_combine_not_q_object(self):
         obj = object()
         q = Q(x=1)
@@ -50,12 +64,15 @@ class QTests(SimpleTestCase):
             q | obj
         with self.assertRaisesMessage(TypeError, str(obj)):
             q & obj
+        with self.assertRaisesMessage(TypeError, str(obj)):
+            q ^ obj
 
     def test_combine_negated_boolean_expression(self):
         tagged = Tag.objects.filter(category=OuterRef("pk"))
         tests = [
             Q() & ~Exists(tagged),
             Q() | ~Exists(tagged),
+            Q() ^ ~Exists(tagged),
         ]
         for q in tests:
             with self.subTest(q=q):
@@ -87,6 +104,20 @@ class QTests(SimpleTestCase):
             ),
         )
         self.assertEqual(kwargs, {"_connector": "OR"})
+
+    def test_deconstruct_xor(self):
+        q1 = Q(price__gt=F("discounted_price"))
+        q2 = Q(price=F("discounted_price"))
+        q = q1 ^ q2
+        path, args, kwargs = q.deconstruct()
+        self.assertEqual(
+            args,
+            (
+                ("price__gt", F("discounted_price")),
+                ("price", F("discounted_price")),
+            ),
+        )
+        self.assertEqual(kwargs, {"_connector": "XOR"})
 
     def test_deconstruct_and(self):
         q1 = Q(price__gt=F("discounted_price"))
@@ -141,6 +172,13 @@ class QTests(SimpleTestCase):
         q1 = Q(price__gt=F("discounted_price"))
         q2 = Q(price=F("discounted_price"))
         q = q1 | q2
+        path, args, kwargs = q.deconstruct()
+        self.assertEqual(Q(*args, **kwargs), q)
+
+    def test_reconstruct_xor(self):
+        q1 = Q(price__gt=F("discounted_price"))
+        q2 = Q(price=F("discounted_price"))
+        q = q1 ^ q2
         path, args, kwargs = q.deconstruct()
         self.assertEqual(Q(*args, **kwargs), q)
 
