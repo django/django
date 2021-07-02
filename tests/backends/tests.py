@@ -3,6 +3,7 @@ import datetime
 import threading
 import unittest
 import warnings
+from unittest import mock
 
 from django.core.management.color import no_style
 from django.db import (
@@ -490,6 +491,23 @@ class BackendTestCase(TransactionTestCase):
         finally:
             BaseDatabaseWrapper.queries_limit = old_queries_limit
             new_connection.close()
+
+    @mock.patch('django.db.backends.utils.logger')
+    @override_settings(DEBUG=True)
+    def test_queries_logger(self, mocked_logger):
+        sql = 'SELECT 1' + connection.features.bare_select_suffix
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
+        params, kwargs = mocked_logger.debug.call_args
+        self.assertIn('; alias=%s', params[0])
+        self.assertEqual(params[2], sql)
+        self.assertEqual(params[3], None)
+        self.assertEqual(params[4], connection.alias)
+        self.assertEqual(
+            list(kwargs['extra']),
+            ['duration', 'sql', 'params', 'alias'],
+        )
+        self.assertEqual(tuple(kwargs['extra'].values()), params[1:])
 
     def test_timezone_none_use_tz_false(self):
         connection.ensure_connection()
