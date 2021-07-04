@@ -15,7 +15,7 @@ from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
 
 from .views import (
     ensure_csrf_cookie_view, non_token_view_using_request_processor,
-    post_form_view, token_view,
+    post_form_view, sandwiched_rotate_token_view, token_view,
 )
 
 # This is a test (unmasked) CSRF cookie / secret.
@@ -69,14 +69,30 @@ class CsrfFunctionTests(SimpleTestCase):
                 self.assertMaskedSecretCorrect(masked, secret)
 
 
+class TestingSessionStore(SessionStore):
+    """
+    A version of SessionStore that stores what cookie values are passed to
+    set_cookie() when CSRF_USE_SESSIONS=True.
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # This is a list of the cookie values passed to set_cookie() over
+        # the course of the request-response.
+        self._cookies_set = []
+
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
+        self._cookies_set.append(value)
+
+
 class TestingHttpRequest(HttpRequest):
     """
-    A version of HttpRequest that allows us to change some things
-    more easily
+    A version of HttpRequest that lets one track and change some things more
+    easily.
     """
     def __init__(self):
         super().__init__()
-        self.session = SessionStore()
+        self.session = TestingSessionStore()
 
     def is_secure(self):
         return getattr(self, '_is_secure_override', False)
@@ -98,6 +114,21 @@ class CsrfViewMiddlewareTestMixin:
         Return the CSRF cookie as a string, or False if no cookie is present.
         """
         raise NotImplementedError('This method must be implemented by a subclass.')
+
+    def _get_cookies_set(self, req, resp):
+        """
+        Return a list of the cookie values passed to set_cookie() over the
+        course of the request-response.
+        """
+        raise NotImplementedError('This method must be implemented by a subclass.')
+
+    def assertCookiesSet(self, req, resp, expected_secrets):
+        """
+        Assert that set_cookie() was called with the given sequence of secrets.
+        """
+        cookies_set = self._get_cookies_set(req, resp)
+        secrets_set = [_unmask_cipher_token(cookie) for cookie in cookies_set]
+        self.assertEqual(secrets_set, expected_secrets)
 
     def _get_request(self, method=None, cookie=None):
         if method is None:
@@ -331,6 +362,21 @@ class CsrfViewMiddlewareTestMixin:
         mw.process_request(req)
         resp = mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(resp)
+
+    def test_rotate_token_triggers_second_reset(self):
+        """
+        If rotate_token() is called after the token is reset in
+        CsrfViewMiddleware's process_response() and before another call to
+        the same process_response(), the cookie is reset a second time.
+        """
+        req = self._get_POST_request_with_token()
+        resp = sandwiched_rotate_token_view(req)
+        self.assertContains(resp, 'OK')
+        csrf_cookie = self._read_csrf_cookie(req, resp)
+        actual_secret = _unmask_cipher_token(csrf_cookie)
+        # set_cookie() was called a second time with a different secret.
+        self.assertCookiesSet(req, resp, [TEST_SECRET, actual_secret])
+        self.assertNotEqual(actual_secret, TEST_SECRET)
 
     # Tests for the template tag method
     def test_token_node_no_csrf_cookie(self):
@@ -875,6 +921,9 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         csrf_cookie = resp.cookies[settings.CSRF_COOKIE_NAME]
         return csrf_cookie.value
 
+    def _get_cookies_set(self, req, resp):
+        return resp._cookies_set
+
     def test_ensures_csrf_cookie_no_middleware(self):
         """
         The ensure_csrf_cookie() decorator works without middleware.
@@ -1088,6 +1137,9 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
         if CSRF_SESSION_KEY not in req.session:
             return False
         return req.session[CSRF_SESSION_KEY]
+
+    def _get_cookies_set(self, req, resp):
+        return req.session._cookies_set
 
     def test_no_session_on_request(self):
         msg = (
