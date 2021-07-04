@@ -68,7 +68,7 @@ def construct_instance(form, instance, fields=None, exclude=None):
 
 # ModelForms #################################################################
 
-def model_to_dict(instance, fields=None, exclude=None):
+def model_to_dict(instance, fields=None, exclude=None, include_non_writable_fields=False):
     """
     Return a dict containing the data in ``instance`` suitable for passing as
     a Form's ``initial`` keyword argument.
@@ -79,11 +79,15 @@ def model_to_dict(instance, fields=None, exclude=None):
     ``exclude`` is an optional list of field names. If provided, exclude the
     named from the returned dict, even if they are listed in the ``fields``
     argument.
+
+    ``include_non_writable_fields`` is an boolean value. Default is False,
+    If ``include_non_writable_fields`` is True, then non-writable fields will not
+    be ignored.
     """
     opts = instance._meta
     data = {}
     for f in chain(opts.concrete_fields, opts.private_fields, opts.many_to_many):
-        if not getattr(f, 'editable', False):
+        if not include_non_writable_fields and not getattr(f, 'editable', False):
             continue
         if fields is not None and f.name not in fields:
             continue
