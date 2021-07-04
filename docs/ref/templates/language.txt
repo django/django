@@ -135,7 +135,7 @@ filter, which converts text to lowercase. Use a pipe (``|``) to apply a filter.
 
 Filters can be "chained." The output of one filter is applied to the next.
 ``{{ text|escape|linebreaks }}`` is a common idiom for escaping text contents,
-then converting line breaks to ``<p>`` tags.
+then converting line breaks to ``<br>`` tags.
 
 Some filters take arguments. A filter argument looks like this: ``{{
 bio|truncatewords:30 }}``. This will display the first 30 words of the ``bio``
