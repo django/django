@@ -16,7 +16,7 @@ from zipimport import zipimporter
 
 import django
 from django.apps import apps
-from django.core.signals import request_finished
+from django.core.signals import request_finished, request_started
 from django.dispatch import Signal
 from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
@@ -384,6 +384,19 @@ class BaseReloader:
 class StatReloader(BaseReloader):
     SLEEP_TIME = 1  # Check for changes once per second.
 
+    def __init__(self):
+        self.requests_started_tracker = itertools.count()
+        self.requests_finished_tracker = itertools.count()
+        request_finished.connect(self.request_finished)
+        request_started.connect(self.request_started)
+        super().__init__()
+
+    def request_started(self, **kwargs):
+        return next(self.requests_started_tracker)
+
+    def request_finished(self, **kwargs):
+        return next(self.requests_finished_tracker)
+
     def tick(self):
         mtimes = {}
         while True:
@@ -400,10 +413,20 @@ class StatReloader(BaseReloader):
                         old_time,
                         mtime,
                     )
+                    self.wait_for_requests_to_finish()
                     self.notify_file_changed(filepath)
 
-            time.sleep(self.SLEEP_TIME)
+            self.sleep()
             yield
+
+    def wait_for_requests_to_finish(self):
+        while next(self.requests_started_tracker) > next(
+            self.requests_finished_tracker
+        ):
+            self.sleep()
+
+    def sleep(self):
+        time.sleep(self.SLEEP_TIME)
 
     def snapshot_files(self):
         # watched_files may produce duplicate paths if globs overlap.

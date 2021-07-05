@@ -845,13 +845,17 @@ class StatReloaderTests(ReloaderTests, IntegrationTests):
 
     @mock.patch("django.utils.autoreload.StatReloader.notify_file_changed")
     def test_tick_does_not_trigger_twice(self, mock_notify_file_changed):
+        self.reloader.wait_for_requests_to_finish = mock.MagicMock()
+
         with mock.patch.object(
             self.reloader, "watched_files", return_value=[self.existing_file]
         ):
             ticker = self.reloader.tick()
             next(ticker)
+            self.assertEqual(self.reloader.wait_for_requests_to_finish.call_count, 0)
             self.increment_mtime(self.existing_file)
             next(ticker)
+            self.assertEqual(self.reloader.wait_for_requests_to_finish.call_count, 1)
             next(ticker)
             self.assertEqual(mock_notify_file_changed.call_count, 1)
 
@@ -882,3 +886,16 @@ class StatReloaderTests(ReloaderTests, IntegrationTests):
             snapshot = list(self.reloader.snapshot_files())
             self.assertEqual(len(snapshot), 1)
             self.assertEqual(snapshot[0][0], self.existing_file)
+
+    def test_request_started_and_finished_signals_processed_correctly(self):
+        # itertools.count is a thread safe way to count with no "read" interface.
+        # next(itertools.count) yields the previous value of the counter and
+        # increments the counter by the given step size (1 here).
+
+        initial_value = next(self.reloader.requests_started_tracker)
+        current_value = self.reloader.request_started()
+        self.assertEqual(initial_value + 1, current_value)
+
+        initial_value = next(self.reloader.requests_finished_tracker)
+        current_value = self.reloader.request_finished()
+        self.assertEqual(initial_value + 1, current_value)
