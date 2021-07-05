@@ -594,6 +594,12 @@ class ModelAdmin(BaseModelAdmin):
     def __str__(self):
         return "%s.%s" % (self.model._meta.app_label, self.__class__.__name__)
 
+    def __repr__(self):
+        return (
+            f'<{self.__class__.__qualname__}: model={self.model.__qualname__} '
+            f'site={self.admin_site!r}>'
+        )
+
     def get_inline_instances(self, request, obj=None):
         inline_instances = []
         for inline_class in self.get_inlines(request, obj):

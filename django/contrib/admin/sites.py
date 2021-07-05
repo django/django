@@ -77,6 +77,9 @@ class AdminSite:
         self._global_actions = self._actions.copy()
         all_sites.add(self)
 
+    def __repr__(self):
+        return f'{self.__class__.__name__}(name={self.name!r})'
+
     def check(self, app_configs):
         """
         Run the system checks on all ModelAdmins, except if they aren't
@@ -560,6 +563,9 @@ class DefaultAdminSite(LazyObject):
     def _setup(self):
         AdminSiteClass = import_string(apps.get_app_config('admin').default_site)
         self._wrapped = AdminSiteClass()
+
+    def __repr__(self):
+        return repr(self._wrapped)
 
 
 # This global object represents the default admin site, for the common case.
