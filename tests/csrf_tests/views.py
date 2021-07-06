@@ -38,6 +38,11 @@ def protected_view(request):
     return HttpResponse('OK')
 
 
+@ensure_csrf_cookie
+def ensure_csrf_cookie_view(request):
+    return HttpResponse('OK')
+
+
 @csrf_protect
 @ensure_csrf_cookie
 def ensured_and_protected_view(request):
@@ -60,12 +65,6 @@ def post_form_view(request):
     return HttpResponse(content="""
 <html><body><h1>\u00a1Unicode!<form method="post"><input type="text"></form></body></html>
 """)
-
-
-@ensure_csrf_cookie
-def ensure_csrf_cookie_view(request):
-    # Doesn't insert a token or anything.
-    return HttpResponse()
 
 
 def token_view(request):
