@@ -4,10 +4,7 @@ import re
 import unicodedata
 from binascii import Error as BinasciiError
 from email.utils import formatdate
-from urllib.parse import (
-    ParseResult, SplitResult, _coerce_args, _splitnetloc, _splitparams,
-    scheme_chars, urlencode as original_urlencode, uses_params,
-)
+from urllib.parse import urlencode as original_urlencode, urlparse
 
 from django.utils.datastructures import MultiValueDict
 from django.utils.regex_helper import _lazy_re_compile
@@ -265,62 +262,13 @@ def url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
     )
 
 
-# Copied from urllib.parse.urlparse() but uses fixed urlsplit() function.
-def _urlparse(url, scheme='', allow_fragments=True):
-    """Parse a URL into 6 components:
-    <scheme>://<netloc>/<path>;<params>?<query>#<fragment>
-    Return a 6-tuple: (scheme, netloc, path, params, query, fragment).
-    Note that we don't break the components up in smaller bits
-    (e.g. netloc is a single string) and we don't expand % escapes."""
-    url, scheme, _coerce_result = _coerce_args(url, scheme)
-    splitresult = _urlsplit(url, scheme, allow_fragments)
-    scheme, netloc, url, query, fragment = splitresult
-    if scheme in uses_params and ';' in url:
-        url, params = _splitparams(url)
-    else:
-        params = ''
-    result = ParseResult(scheme, netloc, url, params, query, fragment)
-    return _coerce_result(result)
-
-
-# Copied from urllib.parse.urlsplit() with
-# https://github.com/python/cpython/pull/661 applied.
-def _urlsplit(url, scheme='', allow_fragments=True):
-    """Parse a URL into 5 components:
-    <scheme>://<netloc>/<path>?<query>#<fragment>
-    Return a 5-tuple: (scheme, netloc, path, query, fragment).
-    Note that we don't break the components up in smaller bits
-    (e.g. netloc is a single string) and we don't expand % escapes."""
-    url, scheme, _coerce_result = _coerce_args(url, scheme)
-    netloc = query = fragment = ''
-    i = url.find(':')
-    if i > 0:
-        for c in url[:i]:
-            if c not in scheme_chars:
-                break
-        else:
-            scheme, url = url[:i].lower(), url[i + 1:]
-
-    if url[:2] == '//':
-        netloc, url = _splitnetloc(url, 2)
-        if (('[' in netloc and ']' not in netloc) or
-                (']' in netloc and '[' not in netloc)):
-            raise ValueError("Invalid IPv6 URL")
-    if allow_fragments and '#' in url:
-        url, fragment = url.split('#', 1)
-    if '?' in url:
-        url, query = url.split('?', 1)
-    v = SplitResult(scheme, netloc, url, query, fragment)
-    return _coerce_result(v)
-
-
 def _url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
     # Chrome considers any URL with more than two slashes to be absolute, but
     # urlparse is not so flexible. Treat any url with three slashes as unsafe.
     if url.startswith('///'):
         return False
     try:
-        url_info = _urlparse(url)
+        url_info = urlparse(url)
     except ValueError:  # e.g. invalid IPv6 addresses
         return False
     # Forbid URLs like http:///example.com - with a scheme, but without a hostname.
