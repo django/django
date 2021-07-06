@@ -370,7 +370,8 @@ class Lexer:
         If in_tag is True, we are processing something that matched a tag,
         otherwise it should be treated as a literal string.
         """
-        if in_tag and token_string.startswith(BLOCK_TAG_START):
+        token_start = token_string[0:2]
+        if in_tag and token_start == BLOCK_TAG_START:
             # The [2:-2] ranges below strip off *_TAG_START and *_TAG_END.
             # We could do len(BLOCK_TAG_START) to be more "correct", but we've
             # hard-coded the 2s here for performance. And it's not like
@@ -379,13 +380,13 @@ class Lexer:
             if self.verbatim and block_content == self.verbatim:
                 self.verbatim = False
         if in_tag and not self.verbatim:
-            if token_string.startswith(VARIABLE_TAG_START):
+            if token_start == VARIABLE_TAG_START:
                 return Token(TokenType.VAR, token_string[2:-2].strip(), position, lineno)
-            elif token_string.startswith(BLOCK_TAG_START):
+            elif token_start == BLOCK_TAG_START:
                 if block_content[:9] in ('verbatim', 'verbatim '):
                     self.verbatim = 'end%s' % block_content
                 return Token(TokenType.BLOCK, block_content, position, lineno)
-            elif token_string.startswith(COMMENT_TAG_START):
+            elif token_start == COMMENT_TAG_START:
                 content = ''
                 if token_string.find(TRANSLATOR_COMMENT_MARK):
                     content = token_string[2:-2].strip()
@@ -457,9 +458,10 @@ class Parser:
         while self.tokens:
             token = self.next_token()
             # Use the raw values here for TokenType.* for a tiny performance boost.
-            if token.token_type.value == 0:  # TokenType.TEXT
+            token_type = token.token_type.value
+            if token_type == 0:  # TokenType.TEXT
                 self.extend_nodelist(nodelist, TextNode(token.contents), token)
-            elif token.token_type.value == 1:  # TokenType.VAR
+            elif token_type == 1:  # TokenType.VAR
                 if not token.contents:
                     raise self.error(token, 'Empty variable tag on line %d' % token.lineno)
                 try:
@@ -468,7 +470,7 @@ class Parser:
                     raise self.error(token, e)
                 var_node = VariableNode(filter_expression)
                 self.extend_nodelist(nodelist, var_node, token)
-            elif token.token_type.value == 2:  # TokenType.BLOCK
+            elif token_type == 2:  # TokenType.BLOCK
                 try:
                     command = token.contents.split()[0]
                 except IndexError:
@@ -515,7 +517,7 @@ class Parser:
             raise self.error(
                 token, '%r must be the first tag in the template.' % node,
             )
-        if isinstance(nodelist, NodeList) and not isinstance(node, TextNode):
+        if not isinstance(node, TextNode):
             nodelist.contains_nontext = True
         # Set origin and token here since we can't modify the node __init__()
         # method.
@@ -787,13 +789,13 @@ class Variable:
             if '.' in var or 'e' in var.lower():
                 self.literal = float(var)
                 # "2." is invalid
-                if var.endswith('.'):
+                if var[-1] == '.':
                     raise ValueError
             else:
                 self.literal = int(var)
         except ValueError:
             # A ValueError means that the variable isn't a number.
-            if var.startswith('_(') and var.endswith(')'):
+            if var[0:2] == '_(' and var[-1] == ')':
                 # The result of the lookup should be translated at rendering
                 # time.
                 self.translate = True
@@ -805,7 +807,7 @@ class Variable:
             except ValueError:
                 # Otherwise we'll set self.lookups so that resolve() knows we're
                 # dealing with a bonafide variable
-                if var.find(VARIABLE_ATTRIBUTE_SEPARATOR + '_') > -1 or var[0] == '_':
+                if VARIABLE_ATTRIBUTE_SEPARATOR + '_' in var or var[0] == '_':
                     raise TemplateSyntaxError("Variables and attributes may "
                                               "not begin with underscores: '%s'" %
                                               var)
@@ -976,6 +978,8 @@ class NodeList(list):
 
 
 class TextNode(Node):
+    child_nodelists = ()
+
     def __init__(self, s):
         self.s = s
 
@@ -1012,6 +1016,8 @@ def render_value_in_context(value, context):
 
 
 class VariableNode(Node):
+    child_nodelists = ()
+
     def __init__(self, filter_expression):
         self.filter_expression = filter_expression
 

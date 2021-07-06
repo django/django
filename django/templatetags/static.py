@@ -91,6 +91,8 @@ def get_media_prefix(parser, token):
 
 
 class StaticNode(template.Node):
+    child_nodelists = ()
+
     def __init__(self, varname=None, path=None):
         if path is None:
             raise template.TemplateSyntaxError(

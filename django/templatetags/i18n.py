@@ -68,6 +68,8 @@ class GetCurrentLanguageBidiNode(Node):
 
 
 class TranslateNode(Node):
+    child_nodelists = ()
+
     def __init__(self, filter_expression, noop, asvar=None,
                  message_context=None):
         self.noop = noop
