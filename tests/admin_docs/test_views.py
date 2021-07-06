@@ -385,7 +385,7 @@ class AdminDocViewFunctionsTests(SimpleTestCase):
 
     def test_simplify_regex(self):
         tests = (
-            (r'^a', '/a'),
+            # Named and unnamed groups.
             (r'^(?P<a>\w+)/b/(?P<c>\w+)/$', '/<a>/b/<c>/'),
             (r'^(?P<a>\w+)/b/(?P<c>\w+)$', '/<a>/b/<c>'),
             (r'^(?P<a>\w+)/b/(?P<c>\w+)', '/<a>/b/<c>'),
@@ -397,6 +397,17 @@ class AdminDocViewFunctionsTests(SimpleTestCase):
             (r'^(?P<a>(x|y))/b/(?P<c>\w+)', '/<a>/b/<c>'),
             (r'^(?P<a>(x|y))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
             (r'^(?P<a>(x|y)(\(|\)))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
+            # Single and repeated metacharacters.
+            (r'^a', '/a'),
+            (r'^^a', '/a'),
+            (r'^^^a', '/a'),
+            (r'a$', '/a'),
+            (r'a$$', '/a'),
+            (r'a$$$', '/a'),
+            (r'a?', '/a'),
+            (r'a??', '/a'),
+            (r'a???', '/a'),
+            # Multiple mixed metacharacters.
             (r'^a/?$', '/a/'),
         )
         for pattern, output in tests:
