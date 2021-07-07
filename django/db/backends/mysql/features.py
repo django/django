@@ -47,11 +47,18 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     supports_order_by_nulls_modifier = False
     order_by_nulls_first = True
-    test_collations = {
-        'ci': 'utf8_general_ci',
-        'non_default': 'utf8_esperanto_ci',
-        'swedish_ci': 'utf8_swedish_ci',
-    }
+
+    @cached_property
+    def test_collations(self):
+        charset = 'utf8'
+        if self.connection.mysql_is_mariadb and self.connection.mysql_version >= (10, 6):
+            # utf8 is an alias for utf8mb3 in MariaDB 10.6+.
+            charset = 'utf8mb3'
+        return {
+            'ci': f'{charset}_general_ci',
+            'non_default': f'{charset}_esperanto_ci',
+            'swedish_ci': f'{charset}_swedish_ci',
+        }
 
     @cached_property
     def django_test_skips(self):
