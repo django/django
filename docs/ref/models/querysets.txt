@@ -1792,11 +1792,11 @@ them::
     >>> Person.objects.select_related('hometown').select_for_update().exclude(hometown=None)
     <QuerySet [<Person: ...)>, ...]>
 
-Currently, the ``postgresql``, ``oracle``, and ``mysql`` database
-backends support ``select_for_update()``. However, MariaDB 10.3+ supports only
-the ``nowait`` argument and MySQL 8.0.1+ supports the ``nowait``,
-``skip_locked``, and ``of`` arguments. The ``no_key`` argument is supported
-only on PostgreSQL.
+The ``postgresql``, ``oracle``, and ``mysql`` database backends support
+``select_for_update()``. However, MariaDB 10.3+ only supports the ``nowait``
+argument, MariaDB 10.6+ also supports the ``skip_locked`` argument, and MySQL
+8.0.1+ supports the ``nowait``, ``skip_locked``, and ``of`` arguments. The
+``no_key`` argument is only supported on PostgreSQL.
 
 Passing ``nowait=True``, ``skip_locked=True``, ``no_key=True``, or ``of`` to
 ``select_for_update()`` using database backends that do not support these
@@ -1835,6 +1835,10 @@ raised if ``select_for_update()`` is used in autocommit mode.
     The ``no_key`` argument was added.
 
     The ``of`` argument was allowed on MySQL 8.0.1+.
+
+.. versionchanged:: 4.0
+
+    The ``skip_locked`` argument was allowed on MariaDB 10.6+.
 
 ``raw()``
 ~~~~~~~~~

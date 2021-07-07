@@ -686,7 +686,7 @@ a :exc:`~django.db.NotSupportedError` is raised.
 =============== ========= ==========
 Option          MariaDB   MySQL
 =============== ========= ==========
-``SKIP LOCKED``           X (≥8.0.1)
+``SKIP LOCKED`` X (≥10.6) X (≥8.0.1)
 ``NOWAIT``      X (≥10.3) X (≥8.0.1)
 ``OF``                    X (≥8.0.1)
 ``NO KEY``

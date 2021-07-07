@@ -274,6 +274,9 @@ Models
 * The new :attr:`.Aggregate.empty_aggregate_value` attribute allows specifying
   a value to return when the aggregation is used over an empty result set.
 
+* The ``skip_locked`` argument of :meth:`.QuerySet.select_for_update()` is now
+  allowed on MariaDB 10.6+.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
