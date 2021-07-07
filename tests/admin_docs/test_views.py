@@ -409,6 +409,34 @@ class AdminDocViewFunctionsTests(SimpleTestCase):
             (r'a???', '/a'),
             # Multiple mixed metacharacters.
             (r'^a/?$', '/a/'),
+            # Escaped single metacharacters.
+            (r'\^a', r'/^a'),
+            (r'\\^a', r'/\\a'),
+            (r'\\\^a', r'/\\^a'),
+            (r'\\\\^a', r'/\\\\a'),
+            (r'\\\\\^a', r'/\\\\^a'),
+            (r'a\$', r'/a$'),
+            (r'a\\$', r'/a\\'),
+            (r'a\\\$', r'/a\\$'),
+            (r'a\\\\$', r'/a\\\\'),
+            (r'a\\\\\$', r'/a\\\\$'),
+            (r'a\?', r'/a?'),
+            (r'a\\?', r'/a\\'),
+            (r'a\\\?', r'/a\\?'),
+            (r'a\\\\?', r'/a\\\\'),
+            (r'a\\\\\?', r'/a\\\\?'),
+            # Escaped mixed metacharacters.
+            (r'^a\?$', r'/a?'),
+            (r'^a\\?$', r'/a\\'),
+            (r'^a\\\?$', r'/a\\?'),
+            (r'^a\\\\?$', r'/a\\\\'),
+            (r'^a\\\\\?$', r'/a\\\\?'),
+            # Adjacent escaped metacharacters.
+            (r'^a\?\$', r'/a?$'),
+            (r'^a\\?\\$', r'/a\\\\'),
+            (r'^a\\\?\\\$', r'/a\\?\\$'),
+            (r'^a\\\\?\\\\$', r'/a\\\\\\\\'),
+            (r'^a\\\\\?\\\\\$', r'/a\\\\?\\\\$'),
         )
         for pattern, output in tests:
             with self.subTest(pattern=pattern):
