@@ -3348,7 +3348,10 @@ class AdminViewListEditable(TestCase):
         response = self.client.post(reverse('admin:admin_views_person_changelist'), data)
         non_form_errors = response.context['cl'].formset.non_form_errors()
         self.assertIsInstance(non_form_errors, ErrorList)
-        self.assertEqual(str(non_form_errors), str(ErrorList(["Grace is not a Zombie"])))
+        self.assertEqual(
+            str(non_form_errors),
+            str(ErrorList(['Grace is not a Zombie'], error_class='nonform')),
+        )
 
     def test_list_editable_ordering(self):
         collector = Collector.objects.create(id=1, name="Frederick Clegg")

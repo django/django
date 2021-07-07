@@ -365,6 +365,20 @@ The formset ``clean`` method is called after all the ``Form.clean`` methods
 have been called. The errors will be found using the ``non_form_errors()``
 method on the formset.
 
+Non-form errors will be rendered with an additional class of ``nonform`` to
+help distinguish them from form-specific errors. For example,
+``{{ formset.non_form_errors }}`` would look like:
+
+.. code-block:: html+django
+
+    <ul class="errorlist nonform">
+        <li>Articles in a set must have distinct titles.</li>
+    </ul>
+
+.. versionchanged:: 4.0
+
+    The additional ``nonform`` class was added.
+
 Validating the number of forms in a formset
 ===========================================
 
